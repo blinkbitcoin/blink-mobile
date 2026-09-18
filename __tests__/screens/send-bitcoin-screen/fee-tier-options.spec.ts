@@ -18,9 +18,9 @@ describe("buildFeeTierOptions", () => {
   }
 
   const labels = {
-    fast: "Fast",
-    medium: "Medium",
-    slow: "Slow",
+    fast: "Priority",
+    medium: "Standard",
+    slow: "Economy",
   }
 
   it("formats options with label, detail, and id", () => {
@@ -35,17 +35,17 @@ describe("buildFeeTierOptions", () => {
     expect(result).toHaveLength(3)
     expect(result[0]).toEqual({
       id: "fast",
-      label: "Fast (500 sats)",
+      label: "Priority (500 sats)",
       detail: "~ 10m",
     })
     expect(result[1]).toEqual({
       id: "medium",
-      label: "Medium (300 sats)",
+      label: "Standard (300 sats)",
       detail: "~ 30m",
     })
     expect(result[2]).toEqual({
       id: "slow",
-      label: "Slow (100 sats)",
+      label: "Economy (100 sats)",
       detail: "~ 60m",
     })
   })
@@ -59,7 +59,7 @@ describe("buildFeeTierOptions", () => {
       hasQuote: true,
     })
 
-    expect(result[0].label).toBe("Fast (500 sat/vB)")
+    expect(result[0].label).toBe("Priority (500 sat/vB)")
   })
 
   it("renders the 24-hour payout queue in hours rather than minutes", () => {
@@ -117,7 +117,11 @@ describe("buildFeeTierOptions", () => {
       hasQuote: false,
     })
 
-    expect(result.map((option) => option.label)).toEqual(["Fast", "Medium", "Slow"])
+    expect(result.map((option) => option.label)).toEqual([
+      "Priority",
+      "Standard",
+      "Economy",
+    ])
     expect(result.map((option) => option.detail)).toEqual(["~ 10m", "~ 60m", "~ 24h"])
   })
 
@@ -137,9 +141,9 @@ describe("buildFeeTierOptions", () => {
     // An onchain address that resolves intraledger really is free; saying nothing reads
     // as "not quoted yet" instead.
     expect(result.map((option) => option.label)).toEqual([
-      "Fast (0 sats)",
-      "Medium (0 sats)",
-      "Slow (0 sats)",
+      "Priority (0 sats)",
+      "Standard (0 sats)",
+      "Economy (0 sats)",
     ])
   })
 })

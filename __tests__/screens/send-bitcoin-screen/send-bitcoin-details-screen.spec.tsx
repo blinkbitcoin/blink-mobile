@@ -51,6 +51,7 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
 
 const DISPLAY_CURRENCY = {
   formatMoneyAmount: () => "$0.00",
+  getSecondaryAmountIfCurrencyIsDifferent: () => undefined,
   zeroDisplayAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
 }
 
@@ -62,12 +63,6 @@ const LEVEL = { currentLevel: "ONE" }
 
 jest.mock("@app/graphql/level-context", () => ({
   useLevel: () => LEVEL,
-}))
-
-const HIDE_AMOUNT = { hideAmount: false }
-
-jest.mock("@app/graphql/hide-amount-context", () => ({
-  useHideAmount: () => HIDE_AMOUNT,
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -121,22 +116,30 @@ jest.mock("@app/store/persistent-state", () => ({
   usePersistentStateContext: () => PERSISTENT_STATE,
 }))
 
-const PILL_WIDTH = { widthStyle: {}, onPillLayout: jest.fn() }
-
-jest.mock("@app/components/atomic/currency-pill/use-equal-pill-width", () => ({
-  useEqualPillWidth: () => PILL_WIDTH,
-}))
-
 /** The resolved screen renders the whole send form. None of it is what this file asserts,
  *  and rendering it for real is heavy enough to exhaust the worker, so the presentational
  *  pieces stand in as nothing. */
-jest.mock("@app/components/amount-input/amount-input", () => ({
-  AmountInput: () => null,
+const AMOUNT_PAD = {
+  padCurrency: "DisplayCurrency",
+  padAmount: { amount: 0, currency: "DisplayCurrency", currencyCode: "USD" },
+  typedAmountText: "",
+  hasTyped: false,
+  disabledKeys: new Set(),
+  onKeyPress: jest.fn(),
+  showAmount: jest.fn(),
+  toggleCurrency: jest.fn(),
+}
+
+jest.mock("@app/components/amount-input-screen/use-number-pad", () => ({
+  useNumberPad: () => AMOUNT_PAD,
+}))
+jest.mock("@app/screens/send-bitcoin-screen/send-hero", () => ({
+  SendHero: () => null,
+}))
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
 }))
 jest.mock("@app/components/note-input", () => ({ NoteInput: () => null }))
-jest.mock("@app/components/payment-destination-display", () => ({
-  PaymentDestinationDisplay: () => null,
-}))
 jest.mock("@app/screens/send-bitcoin-screen/confirm-fees-modal", () => ({
   ConfirmFeesModal: () => null,
 }))
@@ -196,7 +199,9 @@ describe("SendBitcoinDetailsScreen region gate", () => {
     mockCreatePaymentDetail.mockReturnValue({
       canSetAmount: false,
       paymentType: "lightning",
+      destination: "lnbc1sendbitcoindetailsscreenspec",
       sendingWalletDescriptor: { id: BTC_WALLET.id, currency: "BTC" },
+      unitOfAccountAmount: { amount: 1000, currency: "BTC", currencyCode: "BTC" },
       convertMoneyAmount: jest.fn(),
       setConvertMoneyAmount: jest.fn(),
     })
