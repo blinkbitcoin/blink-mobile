@@ -106,12 +106,18 @@ describe("resolveInvestmentFunding at the split boundary", () => {
 describe("resolveSettlementQuote", () => {
   const AT = new Date("2026-09-07T15:09:30.000Z")
 
-  /** The app prices in satoshis; the agreement is written in bitcoin. */
-  it("reads a whole-bitcoin rate off the price per satoshi", () => {
-    expect(resolveSettlementQuote("0.00100000", AT)).toEqual({
+  /** The app prices in cents; the agreement is written in dollars. */
+  it("reads the dollar rate off the price in cents", () => {
+    expect(resolveSettlementQuote(10_000_000, AT)).toEqual({
       btcUsdRate: 100000,
       at: AT,
     })
+  })
+
+  /** The rate the document states has to be the one the feed gave, cents included; a
+   *  price per satoshi to eight decimals would have held whole dollars only. */
+  it("keeps the cents of the rate", () => {
+    expect(resolveSettlementQuote(6_712_345, AT)?.btcUsdRate).toBe(67123.45)
   })
 
   it("has nothing to quote before the price feed answers", () => {
@@ -121,11 +127,11 @@ describe("resolveSettlementQuote", () => {
   /** A zero would divide the settlement by zero, and a NaN would reach the document as
    *  the string "NaN": neither may be quoted. */
   it("refuses a zero price", () => {
-    expect(resolveSettlementQuote("0", AT)).toBeNull()
+    expect(resolveSettlementQuote(0, AT)).toBeNull()
   })
 
   it("refuses a price that is not a number", () => {
-    expect(resolveSettlementQuote("not a price", AT)).toBeNull()
+    expect(resolveSettlementQuote(Number.NaN, AT)).toBeNull()
   })
 })
 

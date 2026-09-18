@@ -1,5 +1,5 @@
-import { SATS_PER_BTC } from "@app/hooks/use-price-conversion"
 import { formatUnixTimestampYMDHM } from "@app/utils/date"
+import { toMajorUnit } from "@app/utils/helper"
 
 /**
  * The economics of one investment, derived from the single figure the user picks: what the
@@ -46,17 +46,19 @@ export const BTC_DECIMALS = 8
 const AGREEMENT_TIMEZONE = "America/Tegucigalpa"
 
 /**
- * The app prices in satoshis; the agreement is written in bitcoin. Answers null rather
- * than a zero or a NaN, so the caller has one thing to check before quoting a rate a
- * signature will be bound to.
+ * The price of one bitcoin, taken in whole cents so the rate the agreement states is the
+ * one the feed gave, cents included; a price per satoshi to eight decimals would only
+ * hold whole dollars. Answers null rather than a zero or a NaN, so the caller has one
+ * thing to check before quoting a rate a signature will be bound to.
  */
 export const resolveSettlementQuote = (
-  usdPerSat: string | null,
+  usdCentsPerBtc: number | null,
   at: Date,
 ): SettlementQuote | null => {
-  const btcUsdRate = Number(usdPerSat) * SATS_PER_BTC
+  if (usdCentsPerBtc === null || !Number.isFinite(usdCentsPerBtc)) return null
+  if (usdCentsPerBtc <= 0) return null
 
-  return usdPerSat && btcUsdRate > 0 ? { btcUsdRate, at } : null
+  return { btcUsdRate: toMajorUnit(usdCentsPerBtc), at }
 }
 
 const formatAgreementTime = (at: Date): string =>

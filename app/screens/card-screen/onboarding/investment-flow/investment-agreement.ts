@@ -152,8 +152,9 @@ type MintAgreement = (
 
 type MintInvestmentAgreementInput = {
   totalUsd: number
-  /** The price per satoshi as the feed last answered, or null before it has. */
-  usdPerSat: string | null
+  /** The price of one bitcoin in whole cents as the feed last answered, or null
+   *  before it has. */
+  usdCentsPerBtc: number | null
   fields: AgreementPrefillConfig
   mint: MintAgreement
   /** The moment the rate is quoted at, which the agreement stamps. */
@@ -172,7 +173,7 @@ type MintInvestmentAgreementInput = {
  */
 export const mintInvestmentAgreement = async ({
   totalUsd,
-  usdPerSat,
+  usdCentsPerBtc,
   fields,
   mint,
   now = new Date(),
@@ -180,7 +181,10 @@ export const mintInvestmentAgreement = async ({
   minted: MintedAgreement
   settlementSats: number
 }> => {
-  const terms = resolveInvestmentTerms(totalUsd, resolveSettlementQuote(usdPerSat, now))
+  const terms = resolveInvestmentTerms(
+    totalUsd,
+    resolveSettlementQuote(usdCentsPerBtc, now),
+  )
 
   if (!isQuoted(terms)) {
     throw signingFailure("the bitcoin price is not available yet")
