@@ -785,6 +785,22 @@ describe("SignInvestScreen", () => {
       expect(mockReplace).not.toHaveBeenCalled()
     })
 
+    /** Declining lands the session back in idle, where the document is opened from; a
+     *  signer who just said no must not get a fresh envelope, nor the page again. */
+    it("does not open another session after the signer declines", async () => {
+      mockESign.status = "signing"
+      const { rerender } = await renderScreen()
+
+      await act(async () => {
+        callbackOf("onCancel")()
+      })
+      mockESign.status = "idle"
+      await rerenderScreen(rerender)
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expect(mockESign.sign).not.toHaveBeenCalled()
+    })
+
     it("reports the failure with its error code", async () => {
       await renderScreen()
 
