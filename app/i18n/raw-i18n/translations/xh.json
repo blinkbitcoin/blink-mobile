@@ -3727,6 +3727,9 @@
         "buttonText": "Qhubeka",
         "paymentsUnavailable": "Iintlawulo zotyalo-mali azikavulwa okwangoku. Nceda uzame kwakhona kamva."
       },
+      "SignInvest": {
+        "signerNotConfigured": "Umtyikityi akakalungiselelwa. Qalisa i-app kwakhona uze uzame kwakhona."
+      },
       "InsufficientBalance": {
         "title": "Ibhalansi ayonelanga",
         "paragraphs": {

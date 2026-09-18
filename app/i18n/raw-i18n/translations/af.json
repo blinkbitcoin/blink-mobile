@@ -3727,6 +3727,9 @@
         "buttonText": "Gaan voort",
         "paymentsUnavailable": "Beleggingsbetalings is nog nie oop nie. Probeer asseblief later weer."
       },
+      "SignInvest": {
+        "signerNotConfigured": "Ondertekenaar nog nie opgestel nie. Herbegin die app en probeer weer."
+      },
       "InsufficientBalance": {
         "title": "Onvoldoende saldo",
         "paragraphs": {

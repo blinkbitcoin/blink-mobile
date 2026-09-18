@@ -120,12 +120,39 @@ describe("mintSigningInstance", () => {
     })
   })
 
+  /** A refusal with no reason attached is as opaque as any other failure, so it gets the
+   *  retry copy rather than a bare status on the screen; an empty reason counts as none. */
+  it("reports a refusal without a reason as a failed mint", async () => {
+    answering(400, {})
+    await expect(mint()).rejects.toMatchObject({
+      code: "ENVELOPE_CREATION_FAILED",
+      message: "HTTP 400",
+    })
+
+    answering(400, { error: "" })
+    await expect(mint()).rejects.toMatchObject({
+      code: "ENVELOPE_CREATION_FAILED",
+      message: "HTTP 400",
+    })
+  })
+
   /** A session the service will not take is not something to retry against; the
    *  component has its own copy for it. */
   it("reports a session the service refused as unauthorized", async () => {
     answering(401, { error: "Unauthorized" })
 
     await expect(mint()).rejects.toMatchObject({ code: "UNAUTHORIZED" })
+  })
+
+  /** The component has its own copy for this code whatever the message, so the status
+   *  is enough of a reason for the log when the service gave none. */
+  it("still reports a bare 401 as unauthorized", async () => {
+    answering(401, {})
+
+    await expect(mint()).rejects.toMatchObject({
+      code: "UNAUTHORIZED",
+      message: "HTTP 401",
+    })
   })
 
   it("reports any other failure by its status, under the code the component words itself", async () => {

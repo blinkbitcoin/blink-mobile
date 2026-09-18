@@ -3899,6 +3899,9 @@ const en: BaseTranslation = {
         buttonText: "Continue",
         paymentsUnavailable: "Investment payments are not open yet. Please try again later.",
       },
+      SignInvest: {
+        signerNotConfigured: "Signer not set up yet. Restart the app and try again.",
+      },
       InsufficientBalance: {
         title: "Insufficient balance",
         paragraphs: {

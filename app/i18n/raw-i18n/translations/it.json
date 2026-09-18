@@ -3775,6 +3775,9 @@
                 "buttonText": "Continua",
                 "paymentsUnavailable": "I pagamenti dell'investimento non sono ancora aperti. Riprova più tardi."
             },
+            "SignInvest": {
+                "signerNotConfigured": "Firmatario non ancora configurato. Riavvia l'app e riprova."
+            },
             "InsufficientBalance": {
                 "title": "Saldo insufficiente",
                 "paragraphs": {
