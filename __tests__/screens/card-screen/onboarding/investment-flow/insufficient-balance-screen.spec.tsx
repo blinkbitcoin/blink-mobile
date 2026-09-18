@@ -16,6 +16,8 @@ jest.mock("react-native-linear-gradient", () => ({
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+/** Whether this screen is the one in front; false while the receive screen sits on it. */
+const mockIsFocused = { current: true }
 
 /** The amount the investor picked, deliberately not the $10,000 the copy used to
  *  hardcode: a screen that ignored the choice would still read correctly against that. */
@@ -31,6 +33,7 @@ jest.mock("@react-navigation/native", () => {
       navigate: mockNavigate,
       goBack: mockGoBack,
     }),
+    useIsFocused: () => mockIsFocused.current,
     useRoute: () => ({ params: mockRouteParams.current }),
   }
 })
@@ -70,6 +73,7 @@ describe("InsufficientBalanceScreen", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+    mockIsFocused.current = true
     mockFunding.current = {
       balanceUsd: 3333,
       balanceCurrency: WalletCurrency.Btc,
@@ -145,6 +149,37 @@ describe("InsufficientBalanceScreen", () => {
       shortfallUsd: 0,
       hasEnoughBalance: true,
     }
+    await act(async () => {
+      rerender(
+        <ContextForScreen>
+          <InsufficientBalanceScreen />
+        </ContextForScreen>,
+      )
+    })
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  /** A `goBack` fired from underneath pops whatever is in front, which would be the
+   *  receive screen the investor is watching their payment arrive on. */
+  it("waits for its turn in front before closing", async () => {
+    mockIsFocused.current = false
+    mockFunding.current = {
+      ...mockFunding.current,
+      balanceUsd: 25000,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+    }
+
+    const { rerender } = render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+    expect(mockGoBack).not.toHaveBeenCalled()
+
+    mockIsFocused.current = true
     await act(async () => {
       rerender(
         <ContextForScreen>
