@@ -1,5 +1,6 @@
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import { recordAppError } from "@app/utils/error-reporting"
+import { readString, saveString } from "@app/utils/storage"
 
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -156,6 +157,13 @@ export type SweepResult =
   | { status: "ok"; migrated: number }
   | { status: "incomplete"; failures: number }
 
+export type PurgeSkippedReason = "sweep-incomplete" | "already-done" | "index-unreadable"
+
+export type PurgeResult =
+  | { status: "done" }
+  | { status: "incomplete" }
+  | { status: "skipped"; reason: PurgeSkippedReason }
+
 /**
  * Migrates the mnemonic of every account in the index, whether or not the user
  * ever opens it.
@@ -208,4 +216,49 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
   }
 
   return failures > 0 ? { status: "incomplete", failures } : { status: "ok", migrated }
+}
+
+const LEGACY_PURGE_DONE_KEY = "legacyKeyStorePurged"
+
+/**
+ * Erases everything this app left in the legacy key store, once per install.
+ *
+ * Runs only after a sweep that reported every account read. The purge deletes
+ * the legacy mnemonic copies, so running it over an incomplete sweep would
+ * delete a copy whose value never reached the new store — the one failure mode
+ * in this migration that costs someone their funds rather than a re-login.
+ *
+ * The done-flag lives in AsyncStorage, which a reinstall clears. That is the
+ * right lifetime: after a reinstall the legacy store can still hold items that
+ * survived it, so the purge should run again rather than believe a flag from an
+ * install that is gone.
+ *
+ * The flag is set only on a purge that proved every key gone. A partial purge
+ * leaves it unset and simply runs again on the next boot, which is why nothing
+ * here retries or reports: there is no failure state to recover from, only a
+ * later attempt.
+ */
+export const purgeLegacyKeyStoreOnce = async (
+  sweep: SweepResult,
+): Promise<PurgeResult> => {
+  if (sweep.status !== "ok") return { status: "skipped", reason: "sweep-incomplete" }
+
+  const done = await readString(LEGACY_PURGE_DONE_KEY)
+  // A flag that cannot be read is not a flag that is unset: purging again is
+  // harmless, so the safe reading is to go ahead rather than skip.
+  if (done.status === "found") return { status: "skipped", reason: "already-done" }
+
+  const result = await readIndex()
+  // Without the index the per-account keys cannot be named, and a purge that
+  // skips them would still record itself as done.
+  if (result.status === StorageReadStatus.ReadFailed) {
+    return { status: "skipped", reason: "index-unreadable" }
+  }
+
+  const accountIds = result.entries.map((entry) => entry.id)
+  const purged = await KeyStoreWrapper.purgeLegacyKeyStore(accountIds)
+  if (!purged) return { status: "incomplete" }
+
+  await saveString(LEGACY_PURGE_DONE_KEY, "true")
+  return { status: "done" }
 }
