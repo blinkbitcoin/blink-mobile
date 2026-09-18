@@ -15,6 +15,7 @@ jest.mock("react-native-linear-gradient", () => ({
 }))
 
 const mockNavigate = jest.fn()
+const mockGoBack = jest.fn()
 
 /** The amount the investor picked, deliberately not the $10,000 the copy used to
  *  hardcode: a screen that ignored the choice would still read correctly against that. */
@@ -28,6 +29,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
+      goBack: mockGoBack,
     }),
     useRoute: () => ({ params: mockRouteParams.current }),
   }
@@ -102,6 +104,73 @@ describe("InsufficientBalanceScreen", () => {
 
     expect(getByText("You only have $3,333 in your Dollar account.")).toBeTruthy()
     expect(queryByText(/Bitcoin account/)).toBeNull()
+  })
+
+  /** Before the price answers the balance reads as zero, which would print "$0.00" and
+   *  the whole amount as missing; the figures wait, and so does the button. */
+  it("shows a spinner in place of the figures while the balance is loading", async () => {
+    mockFunding.current = { ...mockFunding.current, isLoading: true }
+
+    const { getByTestId, queryByText, getByText } = render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(getByTestId("insufficient-balance-loading")).toBeTruthy()
+    expect(queryByText(/You only have/)).toBeNull()
+    expect(queryByText(/Deposit more than/)).toBeNull()
+
+    await act(async () => {
+      fireEvent.press(getByText("Deposit"))
+    })
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The balance is read live: once a deposit covers the amount there is nothing left
+   *  to say here, and the step underneath takes over with the money in place. */
+  it("closes on its own once the balance covers the investment", async () => {
+    const { rerender } = render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+    expect(mockGoBack).not.toHaveBeenCalled()
+
+    mockFunding.current = {
+      ...mockFunding.current,
+      balanceUsd: 25000,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+    }
+    await act(async () => {
+      rerender(
+        <ContextForScreen>
+          <InsufficientBalanceScreen />
+        </ContextForScreen>,
+      )
+    })
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("does not close while the balance is still loading", async () => {
+    mockFunding.current = {
+      ...mockFunding.current,
+      hasEnoughBalance: true,
+      isLoading: true,
+    }
+
+    render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockGoBack).not.toHaveBeenCalled()
   })
 
   it("states the balance the investor actually holds", async () => {
