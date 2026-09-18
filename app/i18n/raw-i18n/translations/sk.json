@@ -3727,6 +3727,9 @@
         "buttonText": "Pokračovať",
         "paymentsUnavailable": "Platby za investíciu zatiaľ nie sú otvorené. Skús to prosím neskôr."
       },
+      "SignInvest": {
+        "signerNotConfigured": "Podpisujúca osoba ešte nie je nastavená. Reštartujte aplikáciu a skúste to znova."
+      },
       "InsufficientBalance": {
         "title": "Nedostatočný zostatok",
         "paragraphs": {

@@ -3727,6 +3727,9 @@
         "buttonText": "متابعة",
         "paymentsUnavailable": "مدفوعات الاستثمار غير متاحة بعد. يُرجى المحاولة لاحقاً."
       },
+      "SignInvest": {
+        "signerNotConfigured": "لم يتم إعداد الموقّع بعد. أعد تشغيل التطبيق وحاول مرة أخرى."
+      },
       "InsufficientBalance": {
         "title": "رصيد غير كافٍ",
         "paragraphs": {
