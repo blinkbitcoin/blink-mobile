@@ -38,6 +38,7 @@ const mockArmCardInvestmentPayment = jest.fn()
 const mockCardInvestmentProgress: {
   current: {
     selectedAmountUsd: number
+    signedAt: number
     settlementSats?: number
     invoice?: { paymentRequest: string; issuedAt: number }
   } | null
@@ -132,7 +133,10 @@ describe("TransferInvestScreen", () => {
     loadLocale("en")
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockDepositWalletId.current = "wallet-invest"
-    mockCardInvestmentProgress.current = null
+    mockCardInvestmentProgress.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      signedAt: Date.now(),
+    }
     mockIsFocused.current = true
     mockIsEligible.current = true
     mockAccountId.current = ACCOUNT_ID
@@ -145,6 +149,86 @@ describe("TransferInvestScreen", () => {
       isLoading: false,
     }
     jest.clearAllMocks()
+  })
+
+  /** A record that lapsed while the step was open would let an invoice be minted and
+   *  paid with nothing left to record the payment on, so the step leaves for the home. */
+  it("sends an account with no signed agreement home instead of issuing an invoice", async () => {
+    mockCardInvestmentProgress.current = null
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: { index: 0, routes: [{ name: "Primary" }] },
+      }),
+    )
+    expect(mockRequestInvoice).not.toHaveBeenCalled()
+  })
+
+  /** The record is read at render; if its day runs out before the tap, minting on it
+   *  would pay an invoice the receipt can no longer record. */
+  it("leaves for the home on a tap after the record's day ran out", async () => {
+    mockCardInvestmentProgress.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      signedAt: Date.now() - 25 * 60 * 60 * 1000,
+    }
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+    expect(mockDispatch).not.toHaveBeenCalled()
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: { index: 0, routes: [{ name: "Primary" }] },
+      }),
+    )
+    expect(mockRequestInvoice).not.toHaveBeenCalled()
+  })
+
+  /** Until the account is known there is no record to read, and a step just reached
+   *  from the signing must not be sent home in that moment. */
+  it("stays while the account is still unknown", async () => {
+    mockCardInvestmentProgress.current = null
+    mockAccountId.current = null
+
+    render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   /** The step can be reached by link with an amount in it, and would issue an invoice
@@ -624,6 +708,7 @@ describe("TransferInvestScreen", () => {
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockCardInvestmentProgress.current = {
       selectedAmountUsd: SELECTED_AMOUNT_USD,
+      signedAt: Date.now(),
       settlementSats: 12_682_228,
     }
 
@@ -643,6 +728,7 @@ describe("TransferInvestScreen", () => {
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockCardInvestmentProgress.current = {
       selectedAmountUsd: SELECTED_AMOUNT_USD,
+      signedAt: Date.now(),
       settlementSats: 12_682_228,
     }
     mockFunding.current = {
@@ -753,6 +839,7 @@ describe("TransferInvestScreen", () => {
     it("pays the invoice already issued while it can still be paid, without minting", async () => {
       mockCardInvestmentProgress.current = {
         selectedAmountUsd: SELECTED_AMOUNT_USD,
+        signedAt: Date.now(),
         invoice: {
           paymentRequest: "lnbc-issued-before",
           issuedAt: NOW_MS - 20 * 60 * 1000,
@@ -772,6 +859,7 @@ describe("TransferInvestScreen", () => {
     it("mints afresh once the issued invoice is too old to pay in time", async () => {
       mockCardInvestmentProgress.current = {
         selectedAmountUsd: SELECTED_AMOUNT_USD,
+        signedAt: Date.now(),
         invoice: {
           paymentRequest: "lnbc-issued-before",
           issuedAt: NOW_MS - 26 * 60 * 1000,
