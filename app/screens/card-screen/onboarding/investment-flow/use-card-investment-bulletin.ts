@@ -36,7 +36,7 @@ export const resolveCardInvestmentBulletin = ({
 }: ResolveCardInvestmentBulletinParams): CardInvestmentBulletinState | null => {
   if (!progress) {
     if (!isInvited) return null
-    return { kind: CardInvestmentBulletinKind.Invited, progress: null, dismiss }
+    return { kind: CardInvestmentBulletinKind.Invited, progress: null }
   }
   if (progress.paidAt) {
     return { kind: CardInvestmentBulletinKind.Shareholder, progress, dismiss }

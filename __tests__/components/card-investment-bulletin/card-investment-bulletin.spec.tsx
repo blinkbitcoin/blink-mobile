@@ -109,7 +109,6 @@ const renderInvitation = () =>
       bulletin={{
         kind: CardInvestmentBulletinKind.Invited,
         progress: null,
-        dismiss: jest.fn(),
       }}
     />,
   )

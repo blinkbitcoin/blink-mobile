@@ -83,12 +83,12 @@ export type SignedCardInvestmentBulletinKind = Exclude<
 >
 
 /** What the home renders: which card, the investment it is about, and how to close it.
- *  An invitation has no investment yet, so its card carries none. */
+ *  An invitation has no investment yet and cannot be closed, only signed or left to
+ *  lapse, so its card carries neither. */
 export type CardInvestmentBulletinState =
   | {
       kind: typeof CardInvestmentBulletinKind.Invited
       progress: null
-      dismiss: () => void
     }
   | {
       kind: SignedCardInvestmentBulletinKind

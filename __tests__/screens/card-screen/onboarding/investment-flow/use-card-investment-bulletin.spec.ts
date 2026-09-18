@@ -129,11 +129,19 @@ describe("resolveCardInvestmentBulletin", () => {
     expect(resolve()?.kind).toBe(CardInvestmentBulletinKind.Insufficient)
   })
 
-  it("carries the investment and the dismissal with every answer", () => {
+  it("carries the investment and the dismissal with every signed answer", () => {
     const bulletin = resolve()
 
     expect(bulletin?.progress).toBe(SIGNED)
-    expect(bulletin?.dismiss).toBe(dismiss)
+    expect(bulletin).toMatchObject({ dismiss })
+  })
+
+  /** An invitation is signed or left to lapse; there is nothing to close. */
+  it("offers no dismissal on the invitation", () => {
+    expect(resolve({ progress: null, isInvited: true })).toEqual({
+      kind: CardInvestmentBulletinKind.Invited,
+      progress: null,
+    })
   })
 })
 
@@ -239,7 +247,11 @@ describe("useCardInvestmentBulletin", () => {
     const { result } = renderHook(() =>
       useCardInvestmentBulletin({ hasPendingDeposit: false }),
     )
-    result.current?.dismiss()
+    const bulletin = result.current
+    if (bulletin?.kind === CardInvestmentBulletinKind.Invited) {
+      throw new Error("a paid investment is not an invitation")
+    }
+    bulletin?.dismiss()
 
     expect(mockClear).toHaveBeenCalledTimes(1)
   })
