@@ -6,7 +6,8 @@ import {
 
 /** A round rate, so every figure below can be checked by hand: $100,000 per bitcoin is
  *  $0.001 per satoshi, and $25,000 buys a quarter of a bitcoin. */
-const USD_PER_SAT = "0.00100000"
+/** One bitcoin at $100,000, in the cents the price feed is read in. */
+const USD_CENTS_PER_BTC = 10_000_000
 const QUOTED_AT = new Date("2026-09-14T22:00:00Z")
 const TOTAL_USD = 25000
 
@@ -30,7 +31,7 @@ const mintWith = (
 ) =>
   mintInvestmentAgreement({
     totalUsd: TOTAL_USD,
-    usdPerSat: USD_PER_SAT,
+    usdCentsPerBtc: USD_CENTS_PER_BTC,
     fields: HOST_FIELDS,
     mint,
     now: QUOTED_AT,
@@ -107,6 +108,17 @@ describe("mintInvestmentAgreement", () => {
     })
   })
 
+  /** The rate on the document is the feed's, cents and all, so what the signer reads is
+   *  the price they were quoted rather than a whole-dollar cut of it. */
+  it("writes the rate with its cents", async () => {
+    await mintWith({ usdCentsPerBtc: 6_712_345 })
+
+    expect(prefillSent()[AGREEMENT_LABELS.btcUsdRate]).toEqual({
+      value: "67123.45",
+      locked: true,
+    })
+  })
+
   /** The transfer step bills this, and it has to be the bitcoin the document names rather
    *  than a fresh conversion at a later price. */
   it("names the satoshis the document settles at", async () => {
@@ -116,7 +128,10 @@ describe("mintInvestmentAgreement", () => {
   /** The document states bitcoin to eight decimals, which is already whole satoshis; the
    *  rounding only guards against the float that multiplication leaves behind. */
   it("names whole satoshis", async () => {
-    const { settlementSats } = await mintWith({ totalUsd: 1000, usdPerSat: "0.00070000" })
+    const { settlementSats } = await mintWith({
+      totalUsd: 1000,
+      usdCentsPerBtc: 7_000_000,
+    })
 
     expect(Number.isInteger(settlementSats)).toBe(true)
     expect(settlementSats).toBe(1_428_571)
@@ -126,7 +141,7 @@ describe("mintInvestmentAgreement", () => {
    *  worse than none: the step fails under the component's own copy and the retry reads
    *  the price again. */
   it("does not mint before the price feed has answered", async () => {
-    await expect(mintWith({ usdPerSat: null })).rejects.toMatchObject({
+    await expect(mintWith({ usdCentsPerBtc: null })).rejects.toMatchObject({
       code: "ENVELOPE_CREATION_FAILED",
     })
 
