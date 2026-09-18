@@ -73,9 +73,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       common: { cancel: () => "Cancel" },
       SendBitcoinScreen: {
-        fast: () => "Fast",
-        medium: () => "Medium",
-        slow: () => "Slow",
+        fast: () => "Priority",
+        medium: () => "Standard",
+        slow: () => "Economy",
       },
       UnclaimedDeposit: {
         cardTitle: ({ sats }: { sats: string }) => `Claim ${sats} sats`,
@@ -155,9 +155,9 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     enterRefundMode(utils)
 
     // Each row reads "<label> <eta>", so the rate is matched at the head of the row.
-    expect(utils.getByText(/^Fast \(30 sat\/vB\) /)).toBeTruthy()
-    expect(utils.getByText(/^Medium \(20 sat\/vB\) /)).toBeTruthy()
-    expect(utils.getByText(/^Slow \(10 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Priority \(30 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Standard \(20 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Economy \(10 sat\/vB\) /)).toBeTruthy()
   })
 
   it("labels the tiers without a rate until the rates are quoted", () => {
@@ -166,7 +166,7 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     enterRefundMode(utils)
 
     // A zeroed placeholder must not read as a rate the SDK actually returned.
-    expect(utils.getByText(/^Medium ~/)).toBeTruthy()
+    expect(utils.getByText(/^Standard ~/)).toBeTruthy()
     expect(utils.queryByText(/sat\/vB/)).toBeNull()
   })
 
@@ -273,7 +273,7 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     enterRefundMode(utils)
     setAddress(utils, "bc1qaddr")
 
-    fireEvent.press(utils.getByText(/^Fast/))
+    fireEvent.press(utils.getByText(/^Priority/))
     fireEvent.press(utils.getByTestId("refund-now-button"))
 
     expect(mockHandleRefund).toHaveBeenCalledWith(
