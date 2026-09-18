@@ -1,6 +1,11 @@
 import * as React from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import {
+  RouteProp,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -50,11 +55,18 @@ export const InsufficientBalanceScreen: React.FC = () => {
    * missing. There is nothing left to say here then: the screen closes and the step
    * underneath, which is where the investor was sent from, takes over with the money
    * in place.
+   *
+   * Only while this screen is the one in front. The deposit usually lands while the
+   * receive screen sits on top of this one, and a `goBack` fired from underneath pops
+   * whatever is focused, which would take the receive screen away from an investor who
+   * is looking at their payment arrive. The check waits for this screen to regain focus,
+   * which is the moment they close it.
    */
+  const isFocused = useIsFocused()
   const isCovered = !isLoading && hasEnoughBalance
   React.useEffect(() => {
-    if (isCovered) navigation.goBack()
-  }, [isCovered, navigation])
+    if (isCovered && isFocused) navigation.goBack()
+  }, [isCovered, isFocused, navigation])
 
   const handleDeposit = () => {
     navigation.navigate("receiveBitcoin")
