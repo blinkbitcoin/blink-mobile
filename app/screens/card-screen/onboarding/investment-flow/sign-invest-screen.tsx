@@ -24,7 +24,10 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import { logError } from "@app/utils/log-error"
 
 import { mintSigningInstance, resolveMintOrigin } from "./esign-mint"
-import { mintInvestmentAgreement } from "./investment-agreement"
+import {
+  mintInvestmentAgreement,
+  SIGNER_NOT_CONFIGURED_CODE,
+} from "./investment-agreement"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -129,9 +132,6 @@ export const SignInvestScreen: React.FC = () => {
    */
   const settlementSats = React.useRef<number | undefined>(undefined)
 
-  /**
-   * What the mint reads the moment it runs, kept out of the source's dependencies for the
-   * same reason: the price ticks every few seconds, and a source rebuilt on each tick
   /** The price of one bitcoin in whole cents, or null while the feed has not answered:
    *  the rate the agreement states, taken with its cents rather than as the per-satoshi
    *  figure the hook also offers, which only holds whole dollars. */
@@ -139,6 +139,9 @@ export const SignInvestScreen: React.FC = () => {
     ? convertMoneyAmount(toBtcMoneyAmount(SATS_PER_BTC), WalletCurrency.Usd).amount
     : null
 
+  /**
+   * What the mint reads the moment it runs, kept out of the source's dependencies for the
+   * same reason: the price ticks every few seconds, and a source rebuilt on each tick
    * would restart the session mid-signature. The rate is read as the document is minted,
    * which is the stamped moment the agreement names.
    */
@@ -366,8 +369,8 @@ export const SignInvestScreen: React.FC = () => {
     </Screen>
   )
 
-  /** The status is the library's, so the wording of a failure is too. Only the title and
-   *  the button are the app's, which is as far as translation reaches today. */
+  /** The status is the library's, and so is the wording of a failure, save the one the
+   *  step words itself above; the title and the button are the app's. */
   const failure = (message: string, action: React.ReactNode) => (
     <>
       <Text type="p1" style={styles.statusTitle}>
@@ -394,9 +397,16 @@ export const SignInvestScreen: React.FC = () => {
   }
 
   if (status === "error") {
+    /** The one failure worded here rather than by the library: the host has not named
+     *  the signer, which whoever fills the host's fields should read in their language. */
+    const isSignerUnconfigured = error?.code === SIGNER_NOT_CONFIGURED_CODE
+    const failureMessage = isSignerUnconfigured
+      ? LL.CardFlow.Onboarding.SignInvest.signerNotConfigured()
+      : getErrorMessage(error?.code ?? "", error?.message)
+
     return centredOnScreen(
       failure(
-        getErrorMessage(error?.code ?? "", error?.message),
+        failureMessage,
         <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retry} />,
       ),
     )
