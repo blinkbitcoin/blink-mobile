@@ -3,6 +3,8 @@ import { View, TouchableOpacity } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
+import { fonts } from "@app/rne-theme/fonts"
+import { testProps } from "@app/utils/testProps"
 
 const PLACEHOLDER = "—"
 
@@ -12,6 +14,12 @@ type ActionFieldProps = {
   icon: IconNamesType
   label?: string
   testID?: string
+  /** Identifies the value itself, where a test needs to read it rather than the field. */
+  valueTestID?: string
+  /** A value that is one unbreakable string — an address, an invoice — shortens in the
+   *  middle on this many lines instead of wrapping. */
+  numberOfLines?: number
+  iconSize?: number
 }
 
 export const ActionField: React.FC<ActionFieldProps> = ({
@@ -20,6 +28,9 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   icon,
   label,
   testID,
+  valueTestID,
+  numberOfLines,
+  iconSize = 20,
 }) => {
   const styles = useStyles()
   const {
@@ -38,9 +49,16 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         style={styles.valueContainer}
         testID={testID}
       >
-        <Text style={styles.value}>{value ?? PLACEHOLDER}</Text>
+        <Text
+          style={styles.value}
+          numberOfLines={numberOfLines}
+          ellipsizeMode={numberOfLines ? "middle" : undefined}
+          {...(valueTestID ? testProps(valueTestID) : {})}
+        >
+          {value ?? PLACEHOLDER}
+        </Text>
         <View style={styles.actionButton}>
-          <GaloyIcon name={icon} size={20} color={iconColor} />
+          <GaloyIcon name={icon} size={iconSize} color={iconColor} />
         </View>
       </TouchableOpacity>
     </View>
@@ -54,8 +72,7 @@ const useStyles = makeStyles(({ colors }) => ({
   label: {
     color: colors.black,
     fontSize: 14,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 20,
   },
   valueContainer: {
@@ -64,14 +81,14 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "space-between",
     backgroundColor: colors.grey5,
     borderRadius: 8,
-    height: 50,
+    columnGap: 12,
+    minHeight: 50,
     paddingHorizontal: 10,
   },
   value: {
     color: colors.black,
     fontSize: 16,
-    fontFamily: "Source Sans Pro",
-    fontWeight: "400",
+    fontFamily: fonts.regular,
     lineHeight: 22,
     flex: 1,
   },

@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Húzd el a megerősítéshez",
     "slideConfirming": "Megerősítés...",
     "copiedDestination": "Címzett a vágólapra másolva",
-    "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
+    "lightningRecommended": "Magas díj. Lightning használata ajánlott.",
+    "sending": "Küldés",
+    "fromBalance": "Egyenlegről",
+    "details": "Részletek",
+    "changeAmount": "Összeg módosítása",
     "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
     "amount": "Összeg",
+    "addAmount": "Összeg hozzáadása",
+    "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
@@ -2403,10 +2409,11 @@
     "title": "Bitcoin küldése",
     "failedToFetchLnurlInvoice": "Nem sikerült lekérni az LNURL fizetési kérelmet",
     "lnurlInvoiceIncorrectAmount": "Az LNURL szerver helytelen összegű fizetési kérelemmel válaszolt.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Magas díj figyelmeztetés!",
-      "content": "A díjad több, mint 50%kal nagyobb, mint az elküldött összeg. Biztos vagy benne, hogy folytatod?\n\nA díjak csökkentése érdekében kérd meg a címzettet, hogy fogadja a tranzakciót Lightning hálózaton.",
-      "confirmButton": "Biztos vagyok benne."
+      "body": "A díj a küldött összeg 50%-a vagy több. Biztosan folytatod?",
+      "cancelPayment": "Fizetés megszakítása",
+      "acceptFee": "Díj elfogadása"
     },
     "copiedDestination": "Címzett a vágólapra másolva.",
     "pendingPayment": "A fizetés elküldve, de még nem érkezett visszaigazolás.\n\n Visszaigazolás hiányában a pénz visszakerül a számládra.",
@@ -2426,9 +2433,9 @@
     "time": "Időpont",
     "type": "Típus",
     "feeTier": "Tranzakció prioritása",
-    "fast": "Gyors",
-    "medium": "Közepes",
-    "slow": "Lassú",
+    "fast": "Elsőbbségi",
+    "medium": "Normál",
+    "slow": "Gazdaságos",
     "recommended": "Ajánlott",
     "walletOffline": "A tárcád offline. Kérjük, ellenőrizd a kapcsolatot és próbáld újra.",
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nem sikerült betölteni a hálózati díjakat. Ellenőrizd a kapcsolatot és próbáld újra.",
     "refundNow": "Visszatérítés most",

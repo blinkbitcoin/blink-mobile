@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Leret untuk Sahkan",
     "slideConfirming": "Mengesahkan...",
     "copiedDestination": "Destinasi telah disalin ke clipboard",
-    "lightningRecommended": "Yuran tinggi! Kami mengesyorkan Lightning.",
+    "lightningRecommended": "Yuran tinggi. Kami mengesyorkan Lightning.",
+    "sending": "Menghantar",
+    "fromBalance": "Daripada Baki",
+    "details": "Butiran",
+    "changeAmount": "Tukar amaun",
     "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
+    "addAmount": "Tambah amaun",
+    "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
@@ -2403,10 +2409,11 @@
     "title": "Hantar bitcoin",
     "failedToFetchLnurlInvoice": "Gagal untuk dapatkan invois lnurl ",
     "lnurlInvoiceIncorrectAmount": "Server lnurl telah beri respon invois tersebut salah amaunnya",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Amaran yuran tinggi!",
-      "content": "Yuran anda melebihi 50% daripada jumlah yang dihantar. Adakah anda pasti mahu meneruskan?\n\nUntuk mengurangkan yuran, minta penerima menerima transaksi melalui Lightning",
-      "confirmButton": "Saya 100% pasti"
+      "body": "Cas anda ialah 50% atau lebih daripada jumlah yang anda hantar. Adakah anda pasti mahu meneruskan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima cas"
     },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
     "pendingPayment": "Bayaran telah dihantar, tetapi belum disahkan lagi.\n\nKemungkinan bayaran tidak akan disahkan, dan dalam kes itu dana akan dikembalikan ke akaun anda.",
@@ -2426,9 +2433,9 @@
     "time": "Masa",
     "type": "Jenis",
     "feeTier": "Keutamaan transaksi",
-    "fast": "Cepat",
-    "medium": "Sederhana",
-    "slow": "Perlahan",
+    "fast": "Keutamaan",
+    "medium": "Standard",
+    "slow": "Ekonomi",
     "recommended": "Disyorkan",
     "walletOffline": "Dompet anda di luar talian. Sila semak sambungan anda dan cuba lagi.",
     "sdkInsufficientFunds": "Dana tidak mencukupi untuk transaksi ini.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Tidak dapat memuatkan yuran rangkaian. Sila semak sambungan anda dan cuba lagi.",
     "refundNow": "Bayar balik sekarang",

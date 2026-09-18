@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Llisca per confirmar",
     "slideConfirming": "Confirmant...",
     "copiedDestination": "Destinació copiada al porta-retalls",
-    "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
+    "lightningRecommended": "Comissió alta. Recomanem utilitzar Lightning.",
+    "sending": "Enviant",
+    "fromBalance": "Des del saldo",
+    "details": "Detalls",
+    "changeAmount": "Canvia l'import",
     "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",
+    "addAmount": "Afegir import",
+    "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
     "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
@@ -2403,10 +2409,11 @@
     "title": "Envia Bitcoin",
     "failedToFetchLnurlInvoice": "No s'ha pogut obtenir la factura lnurl",
     "lnurlInvoiceIncorrectAmount": "El servidor de lnurl ha enviat una factura amb un import incorrecte.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alerta d'altes comissions !",
-      "content": "La comissió és més gran que el 50% de l'import enviat. Estàs segur que vols continuar?\n\nPer reduir les comissions, demana al receptor que accepti la transacció a través de Lightning.",
-      "confirmButton": "Estic 100% segur"
+      "body": "La teva comissió és el 50% o més de l'import que envies. Segur que vols continuar?",
+      "cancelPayment": "Cancel·la el pagament",
+      "acceptFee": "Accepta la comissió"
     },
     "copiedDestination": "Destinació copiada al porta-retalls",
     "pendingPayment": "El pagament s'ha enviat, però encara no s'ha confirmat.\n\nÉs possible que el pagament no es confirmi, en aquest cas els fons es retornaran al teu compte.",
@@ -2426,9 +2433,9 @@
     "time": "Hora",
     "type": "Tipus",
     "feeTier": "Prioritat de la transacció",
-    "fast": "Ràpid",
-    "medium": "Mitjà",
-    "slow": "Lent",
+    "fast": "Prioritari",
+    "medium": "Estàndard",
+    "slow": "Econòmic",
     "recommended": "Recomanat",
     "walletOffline": "La teva cartera està fora de línia. Si us plau, comprova la connexió i torna-ho a provar.",
     "sdkInsufficientFunds": "No hi ha prou fons per a aquesta transacció.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Adreça Bitcoin per al reemborsament",
     "feeRate": "Comissió de xarxa",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "No s'han pogut carregar les comissions de xarxa. Comprova la connexió i torna-ho a provar.",
     "refundNow": "Reemborsar ara",

@@ -2370,8 +2370,30 @@ const en: BaseTranslation = {
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
     slideToConfirm: "Slide to Confirm",
     slideConfirming: "Confirming...",
+    slideToSend: "Slide to send",
+    calculatingFee: "Calculating fee…",
+    sendProgress: {
+      reviewing: "Reviewing",
+      signing: "Signing",
+      findingRoute: "Finding route",
+      broadcasting: "Broadcasting",
+      checkingDelivery: "Checking delivery",
+      retrying: "Re-trying",
+      almostThere: "Almost there",
+      anyTimeNow: "Any time now",
+      ohOh: "Oh oh",
+      tryingAgain: "Trying again",
+    },
     copiedDestination: "Copied destination to clipboard",
-    lightningRecommended: "High fee! We recommend Lightning.",
+    lightningRecommended: "High fee. We recommend Lightning.",
+    sending: "Sending",
+    sent: "Sent",
+    receipt: "Receipt",
+    fromBalance: "From Balance",
+    details: "Details",
+    changeAmount: "Change amount",
+    tryAgain: "Try again",
+    home: "Home",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
@@ -2428,8 +2450,13 @@ const en: BaseTranslation = {
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
+    addAmount: "Add amount",
+    lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
+    problemSheetTitle: "A small problem",
+    recipientUnreachableTitle: "Couldn't reach the recipient",
+    recipientWrongAmountTitle: "Recipient sent the wrong amount",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
     amountIsRequired: "Amount is required",
     cost: "Cost",
@@ -2451,11 +2478,11 @@ const en: BaseTranslation = {
     failedToFetchLnurlInvoice: "Failed to fetch lnurl invoice",
     lnurlInvoiceIncorrectAmount:
       "The lnurl server responded with an invoice with an incorrect amount.",
-    confirmFeesModal: {
+    highFeeSheet: {
       title: "High fee alert!",
-      content:
-        "Your fee is more than 50% bigger than the amount sent. Are you sure you want to proceed?\n\nTo reduce fees, ask the receiver to accept transaction via Lightning",
-      confirmButton: "I'm 100% sure",
+      body: "Your fee is 50% or more of the amount you're sending. Are you sure you want to proceed?",
+      cancelPayment: "Cancel payment",
+      acceptFee: "Accept fee",
     },
     copiedDestination: "Copied destination to clipboard",
     pendingPayment:
@@ -2476,9 +2503,16 @@ const en: BaseTranslation = {
     time: "Time",
     type: "Type",
     feeTier: "Transaction priority",
-    fast: "Fast",
-    medium: "Medium",
-    slow: "Slow",
+    /**
+     * Shared by two rails with different windows: the custodial payout queues
+     * (10m / 4h / 24h, use-onchain-fee-tier-options.ts) and the self-custodial refund's
+     * mempool fee rates (10m / 30m / 60m, unclaimed-deposits-screen.tsx). They name the
+     * relative speed within a rail, not an absolute time — don't tune either one for a
+     * single rail's window without splitting the keys per domain first.
+     */
+    fast: "Priority",
+    medium: "Standard",
+    slow: "Economy",
     recommended: "Recommended",
     walletOffline: "Your wallet is offline. Please check your connection and try again.",
     sdkInsufficientFunds: "Not enough funds for this transaction.",
@@ -4239,9 +4273,6 @@ const en: BaseTranslation = {
     refundFailed: "Refund failed: {error}",
     refundAddress: "Bitcoin address for refund",
     feeRate: "Network fee",
-    feeRateFastest: "Fastest (~{sats} sats) ~10 min",
-    feeRateHalfHour: "Normal (~{sats} sats) ~30 min",
-    feeRateHour: "Economy (~{sats} sats) ~60 min",
     feeRateUnit: "{rate} sat/vB",
     feeRateUnavailable: "Couldn't load network fees. Please check your connection and try again.",
     refundNow: "Refund now",

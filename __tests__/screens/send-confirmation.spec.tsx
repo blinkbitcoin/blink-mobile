@@ -1,11 +1,12 @@
 import React from "react"
-import { TouchableOpacity, Text } from "react-native"
+import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
-import { WalletCurrency } from "@app/graphql/generated"
+import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
+import { PayoutSpeed, WalletCurrency } from "@app/graphql/generated"
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
@@ -15,8 +16,15 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import * as colors from "@app/rne-theme/colors"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
+import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
+import {
+  SEND_HERO_PRIMARY_TEST_ID,
+  SEND_HERO_SECONDARY_TEST_ID,
+} from "@app/screens/send-bitcoin-screen/send-hero"
 
 import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
@@ -65,8 +73,17 @@ jest.mock("@app/hooks/use-effective-display-currency", () => ({
   }),
 }))
 
+/** The currency the sender last swapped the amount-entry keypad to; unset leads with the
+ *  display currency. */
+const mockPreferredAmountCurrency: { current?: string } = {}
+
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
+  usePreferredAmountCurrencyQuery: () => ({
+    data: mockPreferredAmountCurrency.current
+      ? { preferredAmountCurrency: mockPreferredAmountCurrency.current }
+      : undefined,
+  }),
   useSendBitcoinConfirmationScreenQuery: jest.fn(() => ({
     data: {
       me: {
@@ -208,12 +225,15 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
   useSendBalances: () => mockUseSendBalances(),
 }))
 
+const mockDefaultConversionLimits = {
+  limits: { minFromAmount: 800, minToAmount: null },
+  loading: false,
+  error: null,
+}
+const mockUseNonCustodialConversionLimits = jest.fn()
 jest.mock("@app/self-custodial/hooks/use-non-custodial-conversion-limits", () => ({
-  useNonCustodialConversionLimits: () => ({
-    limits: { minFromAmount: 800, minToAmount: null },
-    loading: false,
-    error: null,
-  }),
+  useNonCustodialConversionLimits: () =>
+    mockUseNonCustodialConversionLimits() ?? mockDefaultConversionLimits,
 }))
 
 const useActiveWalletMock = jest.fn(() => ({
@@ -229,12 +249,13 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 const navigationDispatchMock = jest.fn()
+const navigationGoBackMock = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
     dispatch: navigationDispatchMock,
     navigate: jest.fn(),
-    goBack: jest.fn(),
+    goBack: navigationGoBackMock,
     setOptions: jest.fn(),
   }),
 }))
@@ -248,27 +269,71 @@ jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder
   return { HiddenBalancePlaceholder: MockHiddenBalancePlaceholder }
 })
 
+const copyToClipboardMock = jest.fn()
+jest.mock("@app/hooks/use-clipboard", () => ({
+  useClipboard: () => ({ copyToClipboard: copyToClipboardMock }),
+}))
+
+const mockSliderProps = jest.fn()
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = {
     onSwipe: () => void
     testID?: string
     initialText?: string
+    disabledText?: string
     disabled?: boolean
   }
 
-  const MockGaloySliderButton = ({
-    onSwipe,
-    testID = "slider",
-    initialText = "Slide",
-    disabled = false,
-  }: Props) => (
-    <TouchableOpacity testID={testID} onPress={onSwipe} accessibilityState={{ disabled }}>
-      <Text>{initialText}</Text>
-    </TouchableOpacity>
-  )
+  const MockGaloySliderButton = (props: Props) => {
+    mockSliderProps(props)
+    const {
+      onSwipe,
+      testID = "slider",
+      initialText = "Slide",
+      disabledText,
+      disabled = false,
+    } = props
+    return (
+      <TouchableOpacity
+        testID={testID}
+        onPress={onSwipe}
+        accessibilityState={{ disabled }}
+      >
+        <Text>{disabled ? disabledText ?? initialText : initialText}</Text>
+      </TouchableOpacity>
+    )
+  }
 
   return { __esModule: true, default: MockGaloySliderButton }
 })
+
+const lastSliderProps = () => mockSliderProps.mock.calls.at(-1)?.[0]
+
+const ERROR_SHEET_TEST_ID = "review-error-msg-bottom-sheet"
+
+/** The error message sheet on review, or null while it is closed. */
+const errorSheet = () => screen.queryByTestId(ERROR_SHEET_TEST_ID)
+
+/** A failure shows twice while its sheet is open: inline under Details, and in the sheet
+ *  on top of it (ruling 2026-09-17). */
+const expectInlineAndInSheet = (text: string | RegExp) => {
+  expect(screen.getAllByText(text)).toHaveLength(2)
+  expect(within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(text)).toBeTruthy()
+}
+
+/** "Change amount" pops back to amount entry with a fresh `resetAmountAt`, never `goBack`. */
+const expectChangeAmountDispatched = () => {
+  expect(navigationDispatchMock).toHaveBeenCalledWith(
+    expect.objectContaining({
+      type: "POP_TO",
+      payload: expect.objectContaining({
+        name: "sendBitcoinDetails",
+        params: { resetAmountAt: expect.any(Number) },
+      }),
+    }),
+  )
+  expect(navigationGoBackMock).not.toHaveBeenCalled()
+}
 
 describe("SendBitcoinConfirmationScreen", () => {
   let LL: ReturnType<typeof i18nObject>
@@ -357,9 +422,9 @@ describe("SendBitcoinConfirmationScreen", () => {
     )
 
     expect(screen.getByText(lnurl)).toBeTruthy()
-    expect(screen.getByText("$0.05 (₦100)")).toBeTruthy()
+    expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("₦100")
     expect(screen.getByTestId("slider")).toBeTruthy()
-    expect(LL.SendBitcoinConfirmationScreen.slideToConfirm()).toBeTruthy()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
   })
 
   it("Calls saveLnAddressContact when LNURL payment is SUCCESS", async () => {
@@ -1065,7 +1130,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       ],
     })
 
-    expect(screen.getByText(insufficientFunds)).toBeTruthy()
+    expectInlineAndInSheet(insufficientFunds)
     expect(screen.queryByText(genericFeeError)).toBeNull()
   })
 
@@ -1080,7 +1145,7 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
       ],
     })
 
-    expect(screen.getByText(/Network connection problem/i)).toBeTruthy()
+    expectInlineAndInSheet(/Network connection problem/i)
   })
 
   it("falls back to the generic string when the quote carries no code", async () => {
@@ -1204,6 +1269,34 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
   })
 
+  it("keeps the slider busy while the 409 is verified, with no sheet or error (S6)", async () => {
+    let settleVerify: (value: undefined) => void = () => {}
+    sendPaymentMock.mockRejectedValueOnce(conflictError)
+    verifyPaymentSettledMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        settleVerify = resolve
+      }),
+    )
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
+    expect(mockSliderProps.mock.calls.at(-1)?.[0].isLoading).toBe(true)
+    expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
+
+    await act(async () => settleVerify(undefined))
+
+    expect(mockSliderProps.mock.calls.at(-1)?.[0].isLoading).toBe(false)
+  })
+
   it("falls back to the already-attempted message when settlement cannot be confirmed", async () => {
     sendPaymentMock.mockRejectedValueOnce(conflictError)
     verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
@@ -1219,7 +1312,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
-    expect(screen.getByText(/Payment already attempted/i)).toBeTruthy()
+    expectInlineAndInSheet(/Payment already attempted/i)
     expect(navigationDispatchMock).not.toHaveBeenCalled()
   })
 
@@ -1237,7 +1330,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
-    expect(screen.getByText(/Payment already attempted/i)).toBeTruthy()
+    expectInlineAndInSheet(/Payment already attempted/i)
     expect(navigationDispatchMock).not.toHaveBeenCalled()
   })
 
@@ -1255,7 +1348,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
-    expect(screen.getByText("insufficient balance")).toBeTruthy()
+    expectInlineAndInSheet("insufficient balance")
   })
 
   it("shows a generic error when the CSPRNG cannot mint an idempotency key", async () => {
@@ -1296,7 +1389,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
       fireEvent.press(screen.getByTestId("slider"))
     })
 
-    expect(screen.getByText("network died")).toBeTruthy()
+    expectInlineAndInSheet("network died")
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
 
@@ -1343,5 +1436,1075 @@ describe("hide balance", () => {
     await flushEffects()
 
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — slide to send", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
+    loadLocale("en")
+    LL = i18nObject("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  const renderRoute = async (
+    paymentRoute: ReturnType<
+      typeof buildUsdSettlementRoute | typeof buildBtcSettlementRoute
+    >,
+  ) => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={paymentRoute} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  it("reads 'Slide to send' once the fee has resolved", async () => {
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
+    expect(lastSliderProps().disabled).toBe(false)
+  })
+
+  it("reads 'Calculating fee…' while the fee quote is loading", async () => {
+    mockUseFee.mockReturnValue({ status: "loading" })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeTruthy()
+    expect(lastSliderProps().disabled).toBe(true)
+  })
+
+  it("reads 'Calculating fee…' when the fee quote failed without an amount", async () => {
+    mockUseFee.mockReturnValue({ status: "error" })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeTruthy()
+  })
+
+  it("reads 'Calculating fee…' while the dust check is pending", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: true,
+      error: null,
+    })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeTruthy()
+    expect(lastSliderProps().disabled).toBe(true)
+  })
+
+  it("stays disabled without claiming to calculate when the dust check is blocked (N1 deferred)", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: new Error("limits failed"),
+    })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(lastSliderProps().disabled).toBe(true)
+    expect(lastSliderProps().disabledText).toBeUndefined()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
+  })
+
+  it("does not claim to calculate when the amount is over balance", async () => {
+    await renderRoute(buildUsdSettlementRoute(11000))
+
+    expect(lastSliderProps().disabled).toBe(true)
+    expect(
+      screen.queryByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeNull()
+  })
+
+  it("uses the Dollar accent for a Dollar send", async () => {
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(lastSliderProps().accentColor).toBe(colors.dark._green)
+  })
+
+  it("uses the primary accent for a Bitcoin send", async () => {
+    await renderRoute(buildBtcSettlementRoute(1000))
+
+    expect([colors.light.primary, colors.dark.primary]).toContain(
+      lastSliderProps().accentColor,
+    )
+  })
+
+  it("rotates the send progress labels in the ticket's order", async () => {
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+    expect(lastSliderProps().busyLabels).toEqual([
+      progress.reviewing(),
+      progress.signing(),
+      progress.findingRoute(),
+      progress.broadcasting(),
+      progress.checkingDelivery(),
+      progress.retrying(),
+      progress.almostThere(),
+      progress.anyTimeNow(),
+      progress.ohOh(),
+      progress.tryingAgain(),
+    ])
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — review layout", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  const btcBalance = (balance: number) =>
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: { id: "btc-wallet-id", balance, walletCurrency: WalletCurrency.Btc },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+
+  const btcFee = (amount: number) =>
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+    })
+
+  /** An on-chain send built on the intraledger detail: review only reads these fields. */
+  const buildOnchainRoute = (
+    sats: number,
+    extra: { payoutSpeed?: PayoutSpeed; feeTier?: FeeTierOption } = {},
+  ) => {
+    const base = buildBtcSettlementRoute(sats)
+    return {
+      ...base,
+      params: {
+        paymentDetail: {
+          ...base.params.paymentDetail,
+          paymentType: "onchain",
+          destination: "bc1q6pwejxkd0gfr2m7fvs4yh3nh5ul7zc8smg9fq4aw",
+          ...extra,
+        },
+      },
+    } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+  }
+
+  const renderReview = async (
+    paymentRoute: ReturnType<typeof buildBtcSettlementRoute>,
+    hideAmount = false,
+    toggleHideAmount = jest.fn(),
+  ) => {
+    render(
+      <ContextForScreen>
+        <HideAmountContextProvider value={{ hideAmount, toggleHideAmount }}>
+          <Intraledger route={paymentRoute} />
+        </HideAmountContextProvider>
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  const outlineColor = () => {
+    const outline = screen.queryByTestId(INFO_SECTION_OUTLINE_TEST_ID)
+    return outline ? StyleSheet.flatten(outline.props.style).borderColor : undefined
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
+    loadLocale("en")
+    LL = i18nObject("en")
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    btcBalance(500000)
+    btcFee(0)
+  })
+
+  describe("sections", () => {
+    it("renders the hero, Destination, From Balance and Details in that order", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const json = JSON.stringify(screen.toJSON())
+      const positions = [
+        LL.SendBitcoinConfirmationScreen.sending(),
+        `${LL.SendBitcoinScreen.destination()}`,
+        LL.SendBitcoinConfirmationScreen.fromBalance(),
+        LL.SendBitcoinConfirmationScreen.details(),
+        // The destination label carries its payment type ("Destination - Intraledger"), so
+        // each section is found by the start of its string rather than the whole of it.
+      ].map((text) => json.indexOf(`"${text}`))
+
+      expect(positions.every((position) => position >= 0)).toBe(true)
+      expect([...positions].sort((a, b) => a - b)).toEqual(positions)
+    })
+
+    it("shows the same amounts in the hero that it hands to the completed screen", async () => {
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const primary = screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children
+      const secondary = screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID).props.children
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const reducer = navigationDispatchMock.mock.calls
+        .map(([action]) => action)
+        .find((action) => typeof action === "function")
+      const reset = reducer({ index: 0, routes: [] }) as {
+        payload: { routes: { name: string; params: Record<string, unknown> }[] }
+      }
+      const completed = reset.payload.routes.find(
+        (entry) => entry.name === "sendBitcoinCompleted",
+      )
+      expect(completed?.params.currencyAmount).toBe(primary)
+      expect(completed?.params.satAmount).toBe(secondary)
+    })
+
+    it("copies the destination when the Destination field is pressed", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      fireEvent.press(screen.getByTestId("send-review-copy-destination"))
+
+      expect(copyToClipboardMock).toHaveBeenCalledWith(
+        expect.objectContaining({ content: "test" }),
+      )
+    })
+
+    it("paints the Details card on the static grey7 surface", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const feeLabel = screen.getByText(LL.SendBitcoinConfirmationScreen.feeLabel())
+      let node = feeLabel.parent
+      let background: string | undefined
+      while (node && !background) {
+        background = StyleSheet.flatten(node.props.style)?.backgroundColor
+        node = node.parent
+      }
+      expect(background).toBe(colors.light.grey7)
+    })
+  })
+
+  describe("Details rows", () => {
+    it("shows a spinner in the Fee row while the fee loads", async () => {
+      mockUseFee.mockReturnValue({ status: "loading" })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(
+        screen.getByLabelText(`${LL.SendBitcoinConfirmationScreen.feeLabel()} loading`),
+      ).toBeTruthy()
+      expect(screen.queryByLabelText("Successful Fee")).toBeNull()
+    })
+
+    it("shows the fee error under the card, not in the Fee row, and outlines the card red when the quote fails", async () => {
+      mockUseFee.mockReturnValue({ status: "error" })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      const json = JSON.stringify(screen.toJSON())
+      expect(json.indexOf(`"${LL.common.feeError()}"`)).toBeGreaterThan(
+        json.indexOf(`"${LL.SendBitcoinConfirmationScreen.feeLabel()}"`),
+      )
+      expect(screen.getByText("—")).toBeTruthy()
+      expect(outlineColor()).toBe(colors.light.error)
+    })
+
+    it("marks a maximum fee with * and explains it under the card, in grey", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        amount: { amount: 10, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.getByText(/ \*$/)).toBeTruthy()
+      const footnote = screen.getByText(
+        `*${LL.SendBitcoinConfirmationScreen.maxFeeSelected()}`,
+      )
+      expect(StyleSheet.flatten(footnote.props.style).color).toBe(colors.light.grey2)
+      expect(outlineColor()).toBeUndefined()
+    })
+
+    it("adds a Note row only when the payment carries a note", async () => {
+      const base = buildBtcSettlementRoute(1000)
+      await renderReview({
+        ...base,
+        params: { paymentDetail: { ...base.params.paymentDetail, memo: "Dinner" } },
+      })
+
+      expect(screen.getByText(LL.common.note())).toBeTruthy()
+      expect(screen.getByText("Dinner")).toBeTruthy()
+    })
+
+    it("has no Note row without a note", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.queryByText(LL.common.note())).toBeNull()
+    })
+
+    it("shows the custodial payout speed as the Transaction priority on-chain", async () => {
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Slow }))
+
+      expect(screen.getByText(LL.SendBitcoinScreen.feeTier())).toBeTruthy()
+      expect(screen.getByText(`${LL.SendBitcoinScreen.slow()} ~ 24h`)).toBeTruthy()
+    })
+
+    it("shows the self-custodial fee tier as the Transaction priority on-chain", async () => {
+      await renderReview(buildOnchainRoute(1000, { feeTier: FeeTierOption.Medium }))
+
+      expect(screen.getByText(`${LL.SendBitcoinScreen.medium()} ~ 30m`)).toBeTruthy()
+    })
+
+    it("has no Transaction priority row off-chain", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(screen.queryByText(LL.SendBitcoinScreen.feeTier())).toBeNull()
+    })
+  })
+
+  describe("notices under Details", () => {
+    it("outlines the card red, explains the shortfall and offers Change amount when the total exceeds the balance", async () => {
+      btcBalance(1050)
+      btcFee(100)
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(outlineColor()).toBe(colors.light.error)
+      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expect(lastSliderProps().disabled).toBe(true)
+
+      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expectChangeAmountDispatched()
+    })
+
+    it("outlines the card in the warning colour and wraps the high-fee advice on-chain", async () => {
+      btcFee(100)
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Fast }))
+
+      expect(outlineColor()).toBe(colors.light.warning)
+      const advice = screen.getByText(
+        LL.SendBitcoinConfirmationScreen.lightningRecommended(),
+      )
+      expect(advice.props.numberOfLines).toBeUndefined()
+      expect(lastSliderProps().disabled).toBe(false)
+    })
+
+    it("lets the blocking low-funds error win over the high-fee advice", async () => {
+      btcBalance(1050)
+      btcFee(100)
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Fast }))
+
+      expect(outlineColor()).toBe(colors.light.error)
+      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.lightningRecommended()),
+      ).toBeNull()
+    })
+
+    it("shows a send failure under the card without outlining it or offering Change amount", async () => {
+      sendPaymentMock.mockRejectedValueOnce(new Error("route not found"))
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expectInlineAndInSheet("route not found")
+      expect(outlineColor()).toBeUndefined()
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+
+    it("offers Change amount when the fee quote fails because the amount is below the minimum", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          {
+            __typename: "GraphQLApplicationError",
+            message: SelfCustodialErrorCode.BelowMinimum,
+          },
+        ],
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expectInlineAndInSheet(LL.SelfCustodialError.belowMinimum())
+      // The inline link and the sheet's button are the same action.
+      const [inlineLink] = screen.getAllByText(
+        LL.SendBitcoinConfirmationScreen.changeAmount(),
+      )
+      fireEvent.press(inlineLink)
+      expectChangeAmountDispatched()
+    })
+
+    it("does not offer Change amount when the fee quote fails on the network", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          {
+            __typename: "GraphQLApplicationError",
+            message: SelfCustodialErrorCode.NetworkError,
+          },
+        ],
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expectInlineAndInSheet(LL.SelfCustodialError.networkError())
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+
+    it("offers Change amount when the send fails over the 24 hour limit", async () => {
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: "Cannot transfer more than $1000.00 in 24 hours",
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expectInlineAndInSheet(/Cannot transfer more than/)
+      const [inlineLink] = screen.getAllByText(
+        LL.SendBitcoinConfirmationScreen.changeAmount(),
+      )
+      fireEvent.press(inlineLink)
+      expectChangeAmountDispatched()
+    })
+  })
+
+  describe("amount currency", () => {
+    const heroLines = () => [
+      screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children,
+      screen.queryByTestId(SEND_HERO_SECONDARY_TEST_ID)?.props.children,
+    ]
+    const feeRow = () =>
+      [screen.getByLabelText("Successful Fee").props.children].flat().join("")
+
+    afterEach(() => {
+      mockPreferredAmountCurrency.current = undefined
+    })
+
+    it("leads the hero and Fee row with the display currency by default", async () => {
+      btcFee(50)
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(heroLines()).toEqual(["₦10", "1,000 SAT"])
+      expect(feeRow()).toBe("₦1 (50 SAT)")
+    })
+
+    it("leads the hero and Fee row with sats when the sender typed in sats", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(50)
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(heroLines()).toEqual(["1,000 SAT", "₦10"])
+      expect(feeRow()).toBe("50 SAT (₦1)")
+    })
+
+    it("pairs the display currency with dollars, not sats, for a dollar wallet", async () => {
+      mockUseSendBalances.mockReturnValue({
+        btcWallet: {
+          id: "btc-wallet-id",
+          balance: 0,
+          walletCurrency: WalletCurrency.Btc,
+        },
+        usdWallet: {
+          id: "usd-wallet-id",
+          balance: 10000,
+          walletCurrency: WalletCurrency.Usd,
+        },
+      })
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(50)
+      await renderReview(buildUsdSettlementRoute(999))
+
+      expect(heroLines()).toEqual(["$9.99", "₦10"])
+      expect(feeRow()).toBe("$0.01 (₦1)")
+    })
+
+    it("leads a fixed amount with the display currency whatever the sender last typed in", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(50)
+      const base = buildBtcSettlementRoute(1000)
+      await renderReview({
+        ...base,
+        params: {
+          paymentDetail: { ...base.params.paymentDetail, canSetAmount: false },
+        },
+      } as unknown as ReturnType<typeof buildBtcSettlementRoute>)
+
+      expect(heroLines()).toEqual(["₦10", "1,000 SAT"])
+      expect(feeRow()).toBe("₦1 (50 SAT)")
+    })
+  })
+
+  describe("hidden balance", () => {
+    it("reveals the From Balance on a tap without touching the hide-balance setting", async () => {
+      const toggleHideAmount = jest.fn()
+      await renderReview(buildBtcSettlementRoute(1000), true, toggleHideAmount)
+      expect(screen.getByTestId("hidden-balance-placeholder")).toBeTruthy()
+
+      fireEvent.press(screen.getByTestId("choose-wallet-to-send-from"))
+
+      expect(screen.queryByTestId("hidden-balance-placeholder")).toBeNull()
+      expect(screen.getByTestId(`${WalletCurrency.Btc} Wallet Balance`)).toBeTruthy()
+      expect(toggleHideAmount).not.toHaveBeenCalled()
+    })
+
+    it("offers no tap on the wallet card while balances are visible", async () => {
+      await renderReview(buildBtcSettlementRoute(1000))
+
+      expect(
+        screen.getByTestId("choose-wallet-to-send-from").props.accessibilityState
+          ?.disabled,
+      ).toBe(true)
+    })
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — error message sheet", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  const lnurlRoute = () =>
+    ({
+      key: "sendBitcoinConfirmationScreen",
+      name: "sendBitcoinConfirmation",
+      params: {
+        paymentDetail:
+          PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+      },
+    }) as const
+
+  const asSelfCustodial = () =>
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "SelfCustodial",
+    })
+
+  const failFee = (message: string) =>
+    mockUseFee.mockReturnValue({
+      status: "error",
+      errors: [{ __typename: "GraphQLApplicationError", message }],
+    })
+
+  const renderReview = async (
+    paymentRoute: Parameters<typeof Intraledger>[0]["route"],
+  ) => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={paymentRoute} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  const slide = () =>
+    act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+  const sheetButton = (label: string) =>
+    within(screen.getByTestId(ERROR_SHEET_TEST_ID)).getByText(label)
+
+  /** Runs the reducer "Try again" dispatched against a stack and returns the route names. */
+  const startOverRoutes = (routeNames: string[]) => {
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const action = reducer({
+      index: routeNames.length - 1,
+      routes: routeNames.map((name) => ({ key: `${name}-key`, name })),
+    }) as { type: string; payload: { routes: { name: string; key?: string }[] } }
+    expect(action.type).toBe("RESET")
+    return action.payload.routes
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "Custodial",
+    })
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 10000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("stays closed while nothing has failed", async () => {
+    await renderReview(route)
+
+    expect(errorSheet()).toBeNull()
+  })
+
+  describe("fee quote (R2)", () => {
+    it("opens titled 'A small problem' with Try again when a new amount can't fix it", async () => {
+      asSelfCustodial()
+      failFee(SelfCustodialErrorCode.Generic)
+      await renderReview(route)
+
+      const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+      expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+      expectInlineAndInSheet(LL.SelfCustodialError.generic())
+      expect(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+      expect(
+        sheet.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
+    })
+
+    it("offers Change amount when the amount is the problem", async () => {
+      asSelfCustodial()
+      failFee(SelfCustodialErrorCode.InsufficientFunds)
+      await renderReview(route)
+
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expectChangeAmountDispatched()
+    })
+
+    it("offers Try again instead when the invoice fixes the amount", async () => {
+      asSelfCustodial()
+      failFee(SelfCustodialErrorCode.InsufficientFunds)
+      const fixedAmountRoute = {
+        ...route,
+        params: { paymentDetail: { ...paymentDetail, canSetAmount: false } },
+      } as unknown as typeof route
+      await renderReview(fixedAmountRoute)
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+    })
+
+    it("opens no sheet for a custodial fee error, which carries raw server text", async () => {
+      mockUseFee.mockReturnValue({
+        status: "error",
+        errors: [
+          { __typename: "GraphQLApplicationError", message: "Unable to find a route" },
+        ],
+      })
+      await renderReview(route)
+
+      expect(screen.getByText(LL.common.feeError())).toBeTruthy()
+      expect(errorSheet()).toBeNull()
+    })
+  })
+
+  describe("Try again", () => {
+    it("replaces the send flow with a new destination screen", async () => {
+      asSelfCustodial()
+      failFee(SelfCustodialErrorCode.Generic)
+      await renderReview(route)
+
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain()))
+
+      const routes = startOverRoutes([
+        "Primary",
+        "sendBitcoinDestination",
+        "sendBitcoinDetails",
+        "sendBitcoinConfirmation",
+      ])
+      expect(routes.map(({ name }) => name)).toEqual([
+        "Primary",
+        "sendBitcoinDestination",
+      ])
+      // A fresh screen, not the old one popped back to with what was entered.
+      expect(routes[1].key).toBeUndefined()
+    })
+
+    it("adds a destination screen when the send was reached by scanning", async () => {
+      asSelfCustodial()
+      failFee(SelfCustodialErrorCode.Generic)
+      await renderReview(route)
+
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain()))
+
+      expect(
+        startOverRoutes(["Primary", "sendBitcoinDetails", "sendBitcoinConfirmation"]).map(
+          ({ name }) => name,
+        ),
+      ).toEqual(["Primary", "sendBitcoinDestination"])
+    })
+  })
+
+  describe("send failures", () => {
+    it("goes Home for an invoice that is already paid (S3)", async () => {
+      sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+      await renderReview(route)
+      await slide()
+
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
+      expect(navigationDispatchMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "POP_TO_TOP" }),
+      )
+    })
+
+    it("offers Try again for a custodial failure a new amount can't fix (S4)", async () => {
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: "Unable to find a route for payment.",
+      })
+      await renderReview(route)
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+    })
+
+    it("goes Home for a self-custodial generic failure on every rail, the Lightning address included (S10, N21)", async () => {
+      asSelfCustodial()
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.Generic,
+      })
+      const bitcoinToLightningAddress = {
+        ...lnurlRoute(),
+        params: {
+          paymentDetail:
+            PaymentDetailsLightning.createLnurlPaymentDetails<WalletCurrency>({
+              ...defaultLightningParams,
+              sendingWalletDescriptor: {
+                id: "btc-wallet-id",
+                currency: WalletCurrency.Btc,
+              },
+            }),
+        },
+      } as ReturnType<typeof lnurlRoute>
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={bitcoinToLightningAddress} />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+      expect(
+        within(screen.getByTestId(ERROR_SHEET_TEST_ID)).queryByText(
+          LL.SendBitcoinConfirmationScreen.tryAgain(),
+        ),
+      ).toBeNull()
+    })
+
+    it("goes Home for a custodial send that threw, since it may have landed (S9, N21)", async () => {
+      sendPaymentMock.mockRejectedValueOnce(new Error("network died"))
+      await renderReview(route)
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+    })
+
+    it("goes Home for a self-custodial send that threw, since it may have landed (S9)", async () => {
+      asSelfCustodial()
+      sendPaymentMock.mockRejectedValueOnce(new Error("network died"))
+      await renderReview(route)
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.home())).toBeTruthy()
+    })
+
+    it("offers Try again when the SDK rejected the details before sending (S10 invalidInput)", async () => {
+      asSelfCustodial()
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.InvalidInput,
+      })
+      await renderReview(route)
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+    })
+
+    it("offers Try again when no idempotency key could be made, since nothing was sent (S8)", async () => {
+      asSelfCustodial()
+      sendPaymentMock.mockRejectedValueOnce(new Error(IDEMPOTENCY_KEY_UNAVAILABLE))
+      await renderReview(route)
+      await slide()
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+    })
+
+    it("offers Change amount after a self-custodial send rejected for the amount (S10)", async () => {
+      asSelfCustodial()
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.InsufficientFunds,
+      })
+      await renderReview(route)
+      await slide()
+
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expectChangeAmountDispatched()
+    })
+  })
+
+  describe("closing", () => {
+    it("leaves the inline error when the sheet is closed, and opens again on the next failure", async () => {
+      sendPaymentMock
+        .mockResolvedValueOnce({ status: "FAILURE", errorsMessage: "route not found" })
+        .mockResolvedValueOnce({ status: "FAILURE", errorsMessage: "route not found" })
+      await renderReview(route)
+      await slide()
+      expect(errorSheet()).toBeTruthy()
+
+      // The scrim behind the sheet is the close control.
+      await act(async () => {
+        fireEvent.press(screen.getByLabelText(LL.common.close()))
+      })
+
+      expect(errorSheet()).toBeNull()
+      expect(screen.getByText("route not found")).toBeTruthy()
+
+      // Same text, new failure: the sheet opens again.
+      await slide()
+      expect(errorSheet()).toBeTruthy()
+    })
+
+    it("stays closed while the same fee failure holds", async () => {
+      asSelfCustodial()
+      failFee(SelfCustodialErrorCode.Generic)
+      await renderReview(route)
+
+      await act(async () => {
+        fireEvent.press(screen.getByLabelText(LL.common.close()))
+      })
+      await flushEffects()
+
+      expect(errorSheet()).toBeNull()
+      expect(screen.getByText(LL.SelfCustodialError.generic())).toBeTruthy()
+    })
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", () => {
+  const HIGH_FEE_SHEET_TEST_ID = "high-fee-sheet"
+  let LL: ReturnType<typeof i18nObject>
+
+  /** $100.00 to a Lightning address, settled in cents. */
+  const lightningRoute = {
+    key: "sendBitcoinConfirmationScreen",
+    name: "sendBitcoinConfirmation",
+    params: {
+      paymentDetail:
+        PaymentDetailsLightning.createLnurlPaymentDetails(defaultLightningParams),
+    },
+  } as const
+
+  const onchainRoute = {
+    ...lightningRoute,
+    params: {
+      paymentDetail: { ...lightningRoute.params.paymentDetail, paymentType: "onchain" },
+    },
+  } as unknown as typeof lightningRoute
+
+  const quoteFee = (cents: number) =>
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: cents, currency: WalletCurrency.Usd, currencyCode: "USD" },
+    })
+
+  const renderReview = async (paymentRoute = lightningRoute) => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={paymentRoute as never} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  const highFeeSheet = () => screen.queryByTestId(HIGH_FEE_SHEET_TEST_ID)
+  const sheetButton = (label: string) =>
+    within(screen.getByTestId(HIGH_FEE_SHEET_TEST_ID)).getByText(label)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: false,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "Custodial",
+    })
+    mockUseSendPayment.mockReturnValue({
+      loading: false,
+      hasAttemptedSend: false,
+      sendPayment: sendPaymentMock,
+    })
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 500000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 1000000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+  })
+
+  it("opens once a Lightning fee of half the amount lands", async () => {
+    quoteFee(5000)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeTruthy()
+    expect(sheetButton(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(sheetButton(LL.SendBitcoinScreen.highFeeSheet.acceptFee())).toBeTruthy()
+  })
+
+  it("opens on a self-custodial Lightning send too", async () => {
+    useActiveWalletMock.mockReturnValue({
+      isSelfCustodial: true,
+      isReady: true,
+      needsBackendAuth: false,
+      wallets: [],
+      status: "ready",
+      accountType: "SelfCustodial",
+    })
+    quoteFee(5000)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeTruthy()
+  })
+
+  it("stays closed while the fee is under half the amount", async () => {
+    quoteFee(4999)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeNull()
+  })
+
+  it("leaves an on-chain send alone, since amount entry already warned", async () => {
+    quoteFee(5000)
+    await renderReview(onchainRoute)
+
+    expect(highFeeSheet()).toBeNull()
+  })
+
+  it("closes on Accept and leaves the slider free to send", async () => {
+    quoteFee(5000)
+    await renderReview()
+
+    await act(async () => {
+      fireEvent.press(sheetButton(LL.SendBitcoinScreen.highFeeSheet.acceptFee()))
+    })
+    await flushEffects()
+
+    expect(highFeeSheet()).toBeNull()
+    expect(lastSliderProps()?.disabled).toBe(false)
+  })
+
+  it("starts the send over on Cancel payment", async () => {
+    quoteFee(5000)
+    await renderReview()
+
+    fireEvent.press(sheetButton(LL.SendBitcoinScreen.highFeeSheet.cancelPayment()))
+
+    const reducer = navigationDispatchMock.mock.calls
+      .map(([action]) => action)
+      .find((action) => typeof action === "function")
+    const action = reducer({
+      index: 2,
+      routes: ["Primary", "sendBitcoinDetails", "sendBitcoinConfirmation"].map(
+        (name) => ({ key: `${name}-key`, name }),
+      ),
+    })
+    expect(action.payload.routes.map(({ name }: { name: string }) => name)).toEqual([
+      "Primary",
+      "sendBitcoinDestination",
+    ])
+  })
+
+  it("gives way to what blocks the send", async () => {
+    // $100.00 plus a $50.00 fee is more than the wallet holds.
+    mockUseSendBalances.mockReturnValue({
+      btcWallet: {
+        id: "btc-wallet-id",
+        balance: 12000,
+        walletCurrency: WalletCurrency.Btc,
+      },
+      usdWallet: {
+        id: "usd-wallet-id",
+        balance: 12000,
+        walletCurrency: WalletCurrency.Usd,
+      },
+    })
+    quoteFee(5000)
+    await renderReview()
+
+    expect(highFeeSheet()).toBeNull()
   })
 })

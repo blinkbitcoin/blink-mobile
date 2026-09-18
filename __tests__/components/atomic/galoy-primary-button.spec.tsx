@@ -19,6 +19,21 @@ const getSpinnerColor = () =>
   screen.UNSAFE_getByType(ActivityIndicator).props.color as string
 
 describe("GaloyPrimaryButton", () => {
+  /**
+   * On Android, SourceSansPro-Bold draws a hair wider than it measures. A title box that hugs
+   * its measured width wrapped the last word onto a line the button never shows ("Add amount"
+   * drew as "Add"), so the title fills the row and centres its text instead.
+   */
+  it("lets the title fill the button row rather than hug its measured width", () => {
+    renderButton()
+    const titleStyle = StyleSheet.flatten(
+      screen.getByText("Continue").props.style,
+    ) as TextStyle
+
+    expect(titleStyle.flexGrow).toBe(1)
+    expect(titleStyle.textAlign).toBe("center")
+  })
+
   it("draws the spinner in the same colour as the title", () => {
     // The title is replaced by the spinner while loading, so read it from the
     // idle render. Dark theme inverts `white`, and the library's literal

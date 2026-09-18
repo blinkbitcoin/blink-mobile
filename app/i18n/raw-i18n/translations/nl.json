@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Veeg om te bevestigen",
     "slideConfirming": "Bevestigen...",
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
-    "lightningRecommended": "Hoge kosten! We raden Lightning aan.",
+    "lightningRecommended": "Hoge kosten. We raden Lightning aan.",
+    "sending": "Verzenden",
+    "fromBalance": "Van saldo",
+    "details": "Details",
+    "changeAmount": "Bedrag wijzigen",
     "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
+    "addAmount": "Bedrag toevoegen",
+    "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
@@ -2403,10 +2409,11 @@
     "title": "Verzend Bitcoin",
     "failedToFetchLnurlInvoice": "Kan ln-url factuur niet ophalen",
     "lnurlInvoiceIncorrectAmount": "De ln-url server reageerde met een factuur met een onjuist bedrag.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Waarschuwing: hoge kosten!",
-      "content": "Je kosten zijn meer dan 50% hoger dan het verzonden bedrag. Weet je zeker dat je wilt doorgaan?\n\nOm de kosten te verlagen, vraag de ontvanger om de transactie via Lightning te accepteren",
-      "confirmButton": "Ik weet het 100% zeker"
+      "body": "Je kosten zijn 50% of meer van het bedrag dat je verstuurt. Weet je zeker dat je wilt doorgaan?",
+      "cancelPayment": "Betaling annuleren",
+      "acceptFee": "Accepteer kosten"
     },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "pendingPayment": "De betaling is verzonden, maar nog niet bevestigd.\n\nHet is mogelijk dat de betaling niet wordt bevestigd, in dat geval worden de fondsen teruggestort naar je account.",
@@ -2426,9 +2433,9 @@
     "time": "Tijd",
     "type": "Type",
     "feeTier": "Transactieprioriteit",
-    "fast": "Snel",
-    "medium": "Gemiddeld",
-    "slow": "Langzaam",
+    "fast": "Prioriteit",
+    "medium": "Standaard",
+    "slow": "Voordelig",
     "recommended": "Aanbevolen",
     "walletOffline": "Je portemonnee is offline. Controleer je verbinding en probeer het opnieuw.",
     "sdkInsufficientFunds": "Onvoldoende saldo voor deze transactie.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Kon netwerkkosten niet laden. Controleer je verbinding en probeer het opnieuw.",
     "refundNow": "Nu terugbetalen",

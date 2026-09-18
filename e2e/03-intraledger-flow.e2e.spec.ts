@@ -101,7 +101,7 @@ describe("Username Payment Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next again", async () => {
@@ -109,7 +109,7 @@ describe("Username Payment Flow", () => {
   })
 
   it("Slides to confirm payment and get Green Checkmark success", async () => {
-    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToConfirm())
+    await swipeButton(LL.SendBitcoinConfirmationScreen.slideToSend())
   })
 
   it("Clicks on not enjoying app", async () => {
@@ -146,7 +146,7 @@ describe("Conversion Flow", () => {
   })
 
   it("Add amount", async () => {
-    await addSmallAmount(LL)
+    await addSmallAmount()
   })
 
   it("Click Next", async () => {

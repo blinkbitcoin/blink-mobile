@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Glisați pentru a confirma",
     "slideConfirming": "Confirmare...",
     "copiedDestination": "Destinație copiată în clipboard",
-    "lightningRecommended": "Taxă mare! Vă recomandăm Lightning.",
+    "lightningRecommended": "Taxă mare. Vă recomandăm Lightning.",
+    "sending": "Trimitere",
+    "fromBalance": "Din sold",
+    "details": "Detalii",
+    "changeAmount": "Schimbă suma",
     "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Tranzacția trebuie trimisă la mempool",
     "amount": "Suma",
+    "addAmount": "Adaugă suma",
+    "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
@@ -2403,10 +2409,11 @@
     "title": "Trimite Bitcoin",
     "failedToFetchLnurlInvoice": "Nu s-a reușit preluarea facturii lnurl",
     "lnurlInvoiceIncorrectAmount": "Serverul lnurl a răspuns cu o factură cu o sumă incorectă.",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Alertă de taxă mare!",
-      "content": "Taxa este cu peste 50% mai mare decât suma trimisă. Sunteți sigur că doriți să continuați?\n\nPentru a reduce taxele, cereți destinatarului să accepte tranzacția via Lightning",
-      "confirmButton": "Sunt 100% sigur"
+      "body": "Taxa ta este de 50% sau mai mult din suma pe care o trimiți. Sigur vrei să continui?",
+      "cancelPayment": "Anulează plata",
+      "acceptFee": "Acceptă taxa"
     },
     "copiedDestination": "Destinație copiată în clipboard",
     "pendingPayment": "Plata a fost trimisă, dar nu s-a confirmată încă.\n\nEste posibil ca plata să nu se confirme, caz în care fondurile vor fi returnate în contul dvs.",
@@ -2426,9 +2433,9 @@
     "time": "Ora",
     "type": "Tip",
     "feeTier": "Prioritatea tranzacției",
-    "fast": "Rapid",
-    "medium": "Mediu",
-    "slow": "Lent",
+    "fast": "Prioritar",
+    "medium": "Standard",
+    "slow": "Economic",
     "recommended": "Recomandat",
     "walletOffline": "Portofelul tău este offline. Te rugăm să verifici conexiunea și să încerci din nou.",
     "sdkInsufficientFunds": "Fonduri insuficiente pentru această tranzacție.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nu s-au putut încărca comisioanele rețelei. Verifică conexiunea și încearcă din nou.",
     "refundNow": "Rambursează acum",

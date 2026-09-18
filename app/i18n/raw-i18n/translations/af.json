@@ -2341,7 +2341,11 @@
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",
     "copiedDestination": "Bestemming na knipbord oorgedra",
-    "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
+    "lightningRecommended": "Hoë fooi. Ons beveel Lightning aan.",
+    "sending": "Besig om te stuur",
+    "fromBalance": "Van Balans",
+    "details": "Besonderhede",
+    "changeAmount": "Verander bedrag",
     "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2383,6 +2387,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksie behoort aan mempool voorgelê te word",
     "amount": "Bedrag",
+    "addAmount": "Voeg bedrag by",
+    "lowFunds": "Nie genoeg fondse",
     "amountExceed": "Bedrag oorskry jou saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag oorskry jou oorblywende daaglikse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Opgradeer jou rekening om jou limiet te verhoog",
@@ -2403,10 +2409,11 @@
     "title": "Stuur Bitcoin",
     "failedToFetchLnurlInvoice": "Kon nie LNURL-faktuur verkry nie",
     "lnurlInvoiceIncorrectAmount": "Die LNURL-bediener het reageer met 'n faktuur vir 'n verkeerde bedrag. ",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Hoë fooi-waarskuwing!",
-      "content": "Jou fooi is meer as 50% groter as die bedrag wat gestuur is. Is jy seker jy wil voortgaan?\n\nOm fooie te verminder, vra die ontvanger om transaksie via Lightning te aanvaar",
-      "confirmButton": "Ek is 100% seker"
+      "body": "Jou fooi is 50% of meer van die bedrag wat jy stuur. Is jy seker jy wil voortgaan?",
+      "cancelPayment": "Kanselleer betaling",
+      "acceptFee": "Aanvaar fooi"
     },
     "copiedDestination": "Bestemming na knipbord oorgedra",
     "pendingPayment": "Die betaling is gestuur, maar is nog nie bevestig nie.\n\nDit is moontlik dat die betaling nie sal bevestig nie, in welke geval die fondse na jou rekening teruggestuur sal word.",
@@ -2426,9 +2433,9 @@
     "time": "Tyd",
     "type": "Tipe",
     "feeTier": "Transaksieprioriteit",
-    "fast": "Vinnig",
-    "medium": "Medium",
-    "slow": "Stadig",
+    "fast": "Prioriteit",
+    "medium": "Standaard",
+    "slow": "Ekonomies",
     "recommended": "Aanbeveel",
     "walletOffline": "Jou beursie is vanlyn. Kontroleer asseblief jou verbinding en probeer weer.",
     "sdkInsufficientFunds": "Nie genoeg fondse vir hierdie transaksie nie.",
@@ -4082,9 +4089,6 @@
     "refundFailed": "Terugbetaling het misluk: {error}",
     "refundAddress": "Bitcoin adres vir terugbetaling",
     "feeRate": "Netwerkfooi",
-    "feeRateFastest": "Vinnigste (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normaal (~{sats} sats) ~30 min",
-    "feeRateHour": "Ekonomies (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Kon nie netwerkfooie laai nie. Kontroleer asseblief jou verbinding en probeer weer.",
     "refundNow": "Betaal nou terug",
