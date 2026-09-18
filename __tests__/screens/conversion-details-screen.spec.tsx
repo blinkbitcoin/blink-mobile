@@ -14,6 +14,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { ConversionDetailsScreen } from "@app/screens/conversion-flow/conversion-details-screen"
 import {
+  armInvestmentConversion,
   armMigrationConversion,
   resetDrainConversionArmed,
 } from "@app/screens/conversion-flow/drain-conversion"
@@ -112,18 +113,35 @@ jest.mock("@app/hooks/use-device-location", () => ({
 
 /** Both gates default to "allowed" so the rest of this file exercises the screen itself;
  *  the region-gate suite at the bottom is the one that varies them. */
-const mockDollarBalanceGuard = jest.fn(() => ({
-  isRestricted: false,
-  isRegionPending: false,
-}))
-const mockTransferGuard = jest.fn(() => ({ isBlocked: false, isRegionPending: false }))
+type DollarGuardAnswer = {
+  isRestricted: boolean
+  isRegionPending: boolean
+  isVerdictPending?: boolean
+}
+type TransferGuardAnswer = {
+  isBlocked: boolean
+  isRegionPending: boolean
+  isVerdictPending?: boolean
+}
+const mockDollarBalanceGuard = jest.fn(
+  (_options?: unknown): DollarGuardAnswer => ({
+    isRestricted: false,
+    isRegionPending: false,
+  }),
+)
+const mockTransferGuard = jest.fn(
+  (_options?: unknown): TransferGuardAnswer => ({
+    isBlocked: false,
+    isRegionPending: false,
+  }),
+)
 
 jest.mock("@app/hooks/use-dollar-balance-restriction-guard", () => ({
-  useDollarBalanceRestrictionGuard: () => mockDollarBalanceGuard(),
+  useDollarBalanceRestrictionGuard: (options: unknown) => mockDollarBalanceGuard(options),
 }))
 
 jest.mock("@app/hooks/use-transfer-blocked-guard", () => ({
-  useTransferBlockedGuard: () => mockTransferGuard(),
+  useTransferBlockedGuard: (options: unknown) => mockTransferGuard(options),
 }))
 
 jest.mock("@app/self-custodial/hooks", () => ({
@@ -1366,6 +1384,10 @@ describe("Migration conversion prefill", () => {
   afterEach(() => {
     jest.useRealTimers()
     resetDrainConversionArmed()
+    mockDollarBalanceGuard.mockReturnValue({
+      isRestricted: false,
+      isRegionPending: false,
+    })
   })
 
   /**
@@ -1437,6 +1459,106 @@ describe("Migration conversion prefill", () => {
     expect(getByTestId("convert-50%").props.accessibilityState?.disabled).toBe(true)
     expect(getByTestId("convert-75%").props.accessibilityState?.disabled).toBe(true)
     expect(getByTestId("Key 5").props.accessibilityState?.disabled).toBe(true)
+  })
+
+  /**
+   * The investment arm opens on the full balance like the drains do, since putting the
+   * whole amount in one wallet is what the investor came to do.
+   */
+  it("prefills the whole balance when armed by the investment step", async () => {
+    armInvestmentConversion(500)
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+      },
+      { timeout: 3000 },
+    )
+  })
+
+  /**
+   * It is not a drain: nothing is being emptied to get past a gate. The investor may want
+   * the other direction or a smaller amount, and locking the controls the way a migration
+   * does would take that away.
+   */
+  it("leaves the amount controls open during an investment conversion", async () => {
+    armInvestmentConversion(500)
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+      },
+      { timeout: 3000 },
+    )
+
+    expect(getByTestId("wallet-toggle-button").props.accessibilityState?.disabled).toBe(
+      false,
+    )
+    expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(false)
+  })
+
+  /** Let through the region gate, but only the way the restriction allows: into bitcoin,
+   *  with the direction held and the amount still the investor's to choose. */
+  it("holds a restricted investor to converting dollars into bitcoin", async () => {
+    armInvestmentConversion(500)
+    mockDollarBalanceGuard.mockReturnValue({ isRestricted: true, isRegionPending: false })
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(getByTestId("next-button")).toBeTruthy()
+    })
+
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+
+    await waitFor(
+      () => {
+        expect(getByTestId("convert-100%").props.accessibilityState?.selected).toBe(true)
+      },
+      { timeout: 3000 },
+    )
+
+    expect(getByTestId("wallet-toggle-button").props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(false)
   })
 })
 
@@ -2583,6 +2705,73 @@ describe("ConversionDetailsScreen region gate", () => {
 
     expect(queryByTestId("conversion-details-region-pending")).toBeNull()
     expect(queryByTestId("wallet-toggle-button")).toBeNull()
+  })
+
+  /** The gates only bounce a restricted user when they are on; an arrival from the
+   *  home's transfer button has nothing armed, so they are. */
+  it("keeps both gates on for an ordinary conversion", async () => {
+    const Wrapper = createTestWrapper(buildMocks())
+
+    render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(mockDollarBalanceGuard).toHaveBeenCalledWith({ enabled: true })
+    expect(mockTransferGuard).toHaveBeenCalledWith({ enabled: true })
+  })
+
+  /** A restricted investor with split funds is sent here by the home to consolidate
+   *  them; bounced back, the two screens would pass them to each other with no way to
+   *  pay. Converting dollars to bitcoin is what the restriction exists to allow. */
+  it("switches both gates off for an investment conversion", async () => {
+    armInvestmentConversion(500)
+    const Wrapper = createTestWrapper(buildMocks())
+
+    render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(mockDollarBalanceGuard).toHaveBeenCalledWith({ enabled: false })
+    expect(mockTransferGuard).toHaveBeenCalledWith({ enabled: false })
+  })
+
+  /** The wallets are set on first paint and not moved after, so an investor who arrives
+   *  before the verdict waits for it rather than being held to a direction decided on a
+   *  verdict that has not landed. */
+  it("shows the loader to an investor while the verdict is still out", async () => {
+    armInvestmentConversion(500)
+    mockDollarBalanceGuard.mockReturnValue({
+      isRestricted: false,
+      isRegionPending: false,
+      isVerdictPending: true,
+    })
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const { getByTestId, queryByTestId } = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(getByTestId("conversion-details-region-pending")).toBeTruthy()
+    expect(queryByTestId("wallet-toggle-button")).toBeNull()
+  })
+
+  it("switches both gates off for a drain", async () => {
+    armMigrationConversion()
+    const Wrapper = createTestWrapper(buildMocks())
+
+    render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    expect(mockDollarBalanceGuard).toHaveBeenCalledWith({ enabled: false })
   })
 
   it("renders the screen once the region resolves to allowed", async () => {

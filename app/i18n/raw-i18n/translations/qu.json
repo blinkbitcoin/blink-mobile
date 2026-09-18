@@ -3748,6 +3748,27 @@
         "message": "Depositoyki hunt'akunankama suyachkanchik; iskay cadena-pi takyachiykama suyay.",
         "buttonText": "Allinmi"
       },
+      "HomeBulletin": {
+          "invited": {
+              "body": "Blinkpa qullqi huñuy muyuyninpi yanapakunaykipaq invitasqa kanki. Blink munaqkunallapaq."
+          },
+          "insufficient": {
+              "title": "Mana aypaq qullqi",
+              "body": "Inversiónniykita tukunaykipaq, puchuq qullqita churay."
+          },
+          "depositPending": {
+              "title": "Suyaykuy",
+              "body": "Depositoyki hunt'akunankama suyachkanchik."
+          },
+          "ready": {
+              "title": "Inversiónniykita tukuy",
+              "body": "Kunanqa aypaq qullqiyuqñam kanki inversiónta tukunaykipaq."
+          },
+          "shareholder": {
+              "title": "Allin hamusqayki Blinkpa accionistan hina!",
+              "body": "Blink Visa Card-niyki listo kaptinqa willasqaykikum."
+          }
+      },
       "PersonalInformation": {
         "title": "Qhipa taki",
         "fields": {

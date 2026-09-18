@@ -18,6 +18,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
@@ -28,19 +29,10 @@ import {
   mintInvestmentAgreement,
   SIGNER_NOT_CONFIGURED_CODE,
 } from "./investment-agreement"
+import { resetToTransferStep } from "./transfer-invest-screen"
+import { LOST_CONNECTION_CODE, useGivenUpWaiting } from "./use-given-up-waiting"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
-
-/** Offline is a status of its own, not an error, so it carries no code. This is the one
- *  the library words as a lost connection, which is what the signer is looking at. */
-const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
-
-/**
- * How long a cold open waits for the price feed before it stops waiting and says so. A
- * spinner with no end and no button is a dead end; a feed that has not answered in this
- * long means the device is most likely offline, which is what the signer is then told.
- */
-const START_WAIT_TIMEOUT_MS = 15_000
 
 /** What the script below posts once the signing page has drawn something. */
 const PAGE_READY_MESSAGE = "blink-signing-page-ready"
@@ -120,6 +112,7 @@ export const SignInvestScreen: React.FC = () => {
   const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { start: startCardInvestment, isAccountResolved } = useCardInvestmentProgress()
 
   /**
    * The satoshis the minted agreement settles at, kept from the mint so the transfer step
@@ -154,16 +147,17 @@ export const SignInvestScreen: React.FC = () => {
     mintInputs.current = { token, fields: cardInvestmentAgreementPrefill, usdCentsPerBtc }
   }, [token, cardInvestmentAgreementPrefill, usdCentsPerBtc])
 
-  /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
-   *  screen behind would let a back swipe land on a finished session with no way on. */
-  const goToTransfer = React.useCallback(
-    () =>
-      navigation.replace("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd,
-        settlementSats: settlementSats.current,
-      }),
-    [navigation, selectedAmountUsd],
-  )
+  /**
+   * Rebuilds the stack as the home and the transfer step: the agreement cannot be
+   * unsigned, and every screen of the flow left underneath, from the welcome to this
+   * one, is a way to sign it a second time. The same moment records the investment, so
+   * the home's bulletin can steer the investor back to paying it if they leave first.
+   */
+  const goToTransfer = React.useCallback(() => {
+    const investment = { selectedAmountUsd, settlementSats: settlementSats.current }
+    startCardInvestment(investment)
+    navigation.dispatch(resetToTransferStep(investment))
+  }, [navigation, selectedAmountUsd, startCardInvestment])
 
   /**
    * A signer who declines is sent back, and the session returns to idle as they go.
@@ -244,27 +238,18 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
-  /** The agreement cannot be minted before the price feed has answered, so a cold open
-   *  waits on the spinner for it rather than failing the session it is about to start. */
+  /** The agreement cannot be minted before the price feed has answered, and it must not
+   *  be signed before the investment can be recorded against the account, or the home
+   *  would never steer the investor back to paying it. A cold open waits on the spinner
+   *  for both rather than failing the session it is about to start. */
   const isPriceQuoted = usdCentsPerBtc !== null
+  const canStartSigning = isPriceQuoted && isAccountResolved
 
-  /**
-   * Whether that wait has gone on too long. While it is waiting a timer runs; once the
-   * price is in, or the session has moved on, the flag drops so a later wait starts
-   * fresh. Trying again drops it too, which starts the timer over: the feed answers on
-   * its own once the device is back, and the session then starts without another tap.
-   */
-  const isWaitingToStart = status === "idle" && !isPriceQuoted
-  const [hasGivenUpWaiting, setHasGivenUpWaiting] = React.useState(false)
-  React.useEffect(() => {
-    if (!isWaitingToStart) {
-      setHasGivenUpWaiting(false)
-      return
-    }
-    if (hasGivenUpWaiting) return
-    const giveUp = setTimeout(() => setHasGivenUpWaiting(true), START_WAIT_TIMEOUT_MS)
-    return () => clearTimeout(giveUp)
-  }, [isWaitingToStart, hasGivenUpWaiting])
+  /** A cold open waits for the price and the account; once both are in, or the session
+   *  has moved on, the wait is over, and the session then starts without another tap. */
+  const isWaitingToStart = status === "idle" && !canStartSigning
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingToStart)
 
   /**
    * Opens the document as the screen does, once the price is in. Idle is also where a
@@ -283,11 +268,11 @@ export const SignInvestScreen: React.FC = () => {
       return
     }
 
-    if (hasStartedFromIdle.current || isLeaving.current || !isPriceQuoted) return
+    if (hasStartedFromIdle.current || isLeaving.current || !canStartSigning) return
 
     hasStartedFromIdle.current = true
     sign()
-  }, [status, sign, isPriceQuoted])
+  }, [status, sign, canStartSigning])
 
   /**
    * Whether the signing page has drawn its interface. Until it has, this step's own
@@ -386,7 +371,7 @@ export const SignInvestScreen: React.FC = () => {
   if (status === "offline") {
     return centredOnScreen(
       failure(
-        getErrorMessage(OFFLINE_MESSAGE_CODE),
+        getErrorMessage(LOST_CONNECTION_CODE),
         <GaloyPrimaryButton
           title={LL.common.tryAgain()}
           loading={isCheckingConnection}
@@ -416,11 +401,8 @@ export const SignInvestScreen: React.FC = () => {
   if (isWaitingToStart && hasGivenUpWaiting) {
     return centredOnScreen(
       failure(
-        getErrorMessage(OFFLINE_MESSAGE_CODE),
-        <GaloyPrimaryButton
-          title={LL.common.tryAgain()}
-          onPress={() => setHasGivenUpWaiting(false)}
-        />,
+        getErrorMessage(LOST_CONNECTION_CODE),
+        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={waitAgain} />,
       ),
     )
   }

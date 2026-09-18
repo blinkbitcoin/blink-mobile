@@ -12465,6 +12465,54 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			HomeBulletin: {
+				invited: {
+					/**
+					 * Y​o​u​ ​a​r​e​ ​i​n​v​i​t​e​d​ ​t​o​ ​p​a​r​t​i​c​i​p​a​t​e​ ​i​n​ ​t​h​e​ ​B​l​i​n​k​ ​f​i​n​a​n​c​i​n​g​ ​r​o​u​n​d​.​ ​F​o​r​ ​B​l​i​n​k​ ​f​a​n​s​ ​o​n​l​y​.
+					 */
+					body: string
+				}
+				insufficient: {
+					/**
+					 * I​n​s​u​f​f​i​c​i​e​n​t​ ​b​a​l​a​n​c​e
+					 */
+					title: string
+					/**
+					 * T​o​ ​c​o​m​p​l​e​t​e​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t​,​ ​d​e​p​o​s​i​t​ ​t​h​e​ ​r​e​m​a​i​n​i​n​g​ ​a​m​o​u​n​t​.
+					 */
+					body: string
+				}
+				depositPending: {
+					/**
+					 * H​o​l​d​ ​o​n
+					 */
+					title: string
+					/**
+					 * W​e​ ​a​r​e​ ​w​a​i​t​i​n​g​ ​f​o​r​ ​y​o​u​r​ ​d​e​p​o​s​i​t​ ​t​o​ ​s​e​t​t​l​e​.
+					 */
+					body: string
+				}
+				ready: {
+					/**
+					 * C​o​m​p​l​e​t​e​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t
+					 */
+					title: string
+					/**
+					 * Y​o​u​ ​n​o​w​ ​h​a​v​e​ ​e​n​o​u​g​h​ ​f​u​n​d​s​ ​t​o​ ​c​o​m​p​l​e​t​e​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​.
+					 */
+					body: string
+				}
+				shareholder: {
+					/**
+					 * W​e​l​c​o​m​e​ ​a​s​ ​B​l​i​n​k​ ​s​h​a​r​e​h​o​l​d​e​r​!
+					 */
+					title: string
+					/**
+					 * W​e​ ​w​i​l​l​ ​l​e​t​ ​y​o​u​ ​k​n​o​w​ ​a​s​ ​s​o​o​n​ ​a​s​ ​y​o​u​r​ ​B​l​i​n​k​ ​V​i​s​a​ ​C​a​r​d​ ​i​s​ ​r​e​a​d​y​.
+					 */
+					body: string
+				}
+			}
 			PersonalInformation: {
 				/**
 				 * F​i​n​a​l​ ​s​t​e​p
@@ -26175,6 +26223,54 @@ export type TranslationFunctions = {
 				 * Okay
 				 */
 				buttonText: () => LocalizedString
+			}
+			HomeBulletin: {
+				invited: {
+					/**
+					 * You are invited to participate in the Blink financing round. For Blink fans only.
+					 */
+					body: () => LocalizedString
+				}
+				insufficient: {
+					/**
+					 * Insufficient balance
+					 */
+					title: () => LocalizedString
+					/**
+					 * To complete your investment, deposit the remaining amount.
+					 */
+					body: () => LocalizedString
+				}
+				depositPending: {
+					/**
+					 * Hold on
+					 */
+					title: () => LocalizedString
+					/**
+					 * We are waiting for your deposit to settle.
+					 */
+					body: () => LocalizedString
+				}
+				ready: {
+					/**
+					 * Complete your investment
+					 */
+					title: () => LocalizedString
+					/**
+					 * You now have enough funds to complete the investment.
+					 */
+					body: () => LocalizedString
+				}
+				shareholder: {
+					/**
+					 * Welcome as Blink shareholder!
+					 */
+					title: () => LocalizedString
+					/**
+					 * We will let you know as soon as your Blink Visa Card is ready.
+					 */
+					body: () => LocalizedString
+				}
 			}
 			PersonalInformation: {
 				/**

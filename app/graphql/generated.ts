@@ -3425,6 +3425,11 @@ export type LevelQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type LevelQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly level: AccountLevel } } | null };
 
+export type CardInvestmentAccountQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type CardInvestmentAccountQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string } } | null };
+
 export type DisplayCurrencyQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -5319,6 +5324,48 @@ export type LevelQueryHookResult = ReturnType<typeof useLevelQuery>;
 export type LevelLazyQueryHookResult = ReturnType<typeof useLevelLazyQuery>;
 export type LevelSuspenseQueryHookResult = ReturnType<typeof useLevelSuspenseQuery>;
 export type LevelQueryResult = Apollo.QueryResult<LevelQuery, LevelQueryVariables>;
+export const CardInvestmentAccountDocument = gql`
+    query cardInvestmentAccount {
+  me {
+    id
+    defaultAccount {
+      id
+    }
+  }
+}
+    `;
+
+/**
+ * __useCardInvestmentAccountQuery__
+ *
+ * To run a query within a React component, call `useCardInvestmentAccountQuery` and pass it any options that fit your needs.
+ * When your component renders, `useCardInvestmentAccountQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useCardInvestmentAccountQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useCardInvestmentAccountQuery(baseOptions?: Apollo.QueryHookOptions<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>(CardInvestmentAccountDocument, options);
+      }
+export function useCardInvestmentAccountLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>(CardInvestmentAccountDocument, options);
+        }
+export function useCardInvestmentAccountSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>(CardInvestmentAccountDocument, options);
+        }
+export type CardInvestmentAccountQueryHookResult = ReturnType<typeof useCardInvestmentAccountQuery>;
+export type CardInvestmentAccountLazyQueryHookResult = ReturnType<typeof useCardInvestmentAccountLazyQuery>;
+export type CardInvestmentAccountSuspenseQueryHookResult = ReturnType<typeof useCardInvestmentAccountSuspenseQuery>;
+export type CardInvestmentAccountQueryResult = Apollo.QueryResult<CardInvestmentAccountQuery, CardInvestmentAccountQueryVariables>;
 export const DisplayCurrencyDocument = gql`
     query displayCurrency {
   me {

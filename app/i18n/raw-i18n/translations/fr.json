@@ -3795,6 +3795,27 @@
             "DepositPending": {
                 "message": "En attente du règlement de ton dépôt ; patiente pour 2 confirmations sur la chaîne.",
                 "buttonText": "D'accord"
+            },
+            "HomeBulletin": {
+                "invited": {
+                    "body": "Tu es invité à participer au tour de financement de Blink. Réservé aux fans de Blink."
+                },
+                "insufficient": {
+                    "title": "Solde insuffisant",
+                    "body": "Pour finaliser ton investissement, dépose le montant restant."
+                },
+                "depositPending": {
+                    "title": "Un instant",
+                    "body": "Nous attendons le règlement de ton dépôt."
+                },
+                "ready": {
+                    "title": "Finalise ton investissement",
+                    "body": "Tu as maintenant assez de fonds pour finaliser l'investissement."
+                },
+                "shareholder": {
+                    "title": "Bienvenue parmi les actionnaires de Blink !",
+                    "body": "Nous te préviendrons dès que ta Blink Visa Card sera prête."
+                }
             }
         }
     },

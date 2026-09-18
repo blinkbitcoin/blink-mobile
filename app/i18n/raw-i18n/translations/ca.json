@@ -3748,6 +3748,27 @@
         "message": "Esperant que el teu dipòsit es liquidi; espera 2 confirmacions a la cadena.",
         "buttonText": "D'acord"
       },
+      "HomeBulletin": {
+          "invited": {
+              "body": "Estàs convidat a participar en la ronda de finançament de Blink. Només per a fans de Blink."
+          },
+          "insufficient": {
+              "title": "Saldo insuficient",
+              "body": "Per completar la teva inversió, diposita l'import restant."
+          },
+          "depositPending": {
+              "title": "Un moment",
+              "body": "Estem esperant que el teu dipòsit es liquidi."
+          },
+          "ready": {
+              "title": "Completa la teva inversió",
+              "body": "Ja tens prou fons per completar la inversió."
+          },
+          "shareholder": {
+              "title": "Benvingut com a accionista de Blink!",
+              "body": "T'avisarem tan bon punt la teva Blink Visa Card estigui a punt."
+          }
+      },
       "PersonalInformation": {
         "title": "Últim pas",
         "fields": {

@@ -3748,6 +3748,27 @@
         "message": "Várakozás a befizetésed teljesülésére; kérjük, várj 2 megerősítésre a láncon.",
         "buttonText": "Rendben"
       },
+      "HomeBulletin": {
+          "invited": {
+              "body": "Meghívást kaptál a Blink finanszírozási körében való részvételre. Csak Blink-rajongóknak."
+          },
+          "insufficient": {
+              "title": "Nem elegendő egyenleg",
+              "body": "A befektetésed befejezéséhez fizesd be a fennmaradó összeget."
+          },
+          "depositPending": {
+              "title": "Egy pillanat",
+              "body": "Várunk a befizetésed teljesülésére."
+          },
+          "ready": {
+              "title": "Fejezd be a befektetésed",
+              "body": "Most már elegendő fedezeted van a befektetés befejezéséhez."
+          },
+          "shareholder": {
+              "title": "Üdvözlünk a Blink részvényesei között!",
+              "body": "Szólunk, amint elkészül a Blink Visa Card kártyád."
+          }
+      },
       "PersonalInformation": {
         "title": "Utolsó lépés",
         "fields": {

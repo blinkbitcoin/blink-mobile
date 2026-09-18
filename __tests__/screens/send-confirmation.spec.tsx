@@ -18,6 +18,16 @@ import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
+/** Which invoice the investment's record names; null while none is recorded. */
+const mockInvestmentInvoice: { current: string | null } = { current: null }
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({
+    isInvestmentInvoice: (paymentRequest?: string) =>
+      mockInvestmentInvoice.current !== null &&
+      paymentRequest === mockInvestmentInvoice.current,
+  }),
+}))
+
 import { flushEffects } from "../helpers/flush-effects"
 import { ContextForScreen } from "./helper"
 
@@ -524,10 +534,153 @@ describe("SendBitcoinConfirmationScreen", () => {
         const routes = action.payload?.routes ?? action.routes ?? []
         const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
         if (completed)
-          return completed.params as { successAction?: unknown; note?: unknown }
+          return completed.params as {
+            successAction?: unknown
+            note?: unknown
+            paymentRequest?: unknown
+            status?: unknown
+            createdAt?: unknown
+          }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
     }
+
+    /** Whatever asked for a lightning payment recognises its own by the invoice, so the
+     *  receipt is told which one it settled, unshortened. */
+    it("hands the completed screen the invoice a lightning payment settled", async () => {
+      const bolt11Invoice = "lnbc1m1psh8d8zpp5qk3z7t..."
+      const { createAmountLightningPaymentDetails } = PaymentDetailsLightning
+      const paymentDetailBolt11 = createAmountLightningPaymentDetails<WalletCurrency>({
+        paymentRequest: bolt11Invoice,
+        paymentRequestAmount: { currency: "BTC", currencyCode: "BTC", amount: 10000 },
+        convertMoneyAmount: convertMoneyAmountMock,
+        sendingWalletDescriptor: btcSendingWalletDescriptor,
+      })
+      const routeBolt11 = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: paymentDetailBolt11 },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={routeBolt11} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(findCompletedRouteParams().paymentRequest).toBe(bolt11Invoice)
+    })
+
+    describe("an invoice the recipient says is already paid", () => {
+      const bolt11Invoice = "lnbc1m1psh8d8zpp5investment..."
+
+      const renderBolt11 = () => {
+        const { createAmountLightningPaymentDetails } = PaymentDetailsLightning
+        const paymentDetailBolt11 = createAmountLightningPaymentDetails<WalletCurrency>({
+          paymentRequest: bolt11Invoice,
+          paymentRequestAmount: { currency: "BTC", currencyCode: "BTC", amount: 10000 },
+          convertMoneyAmount: convertMoneyAmountMock,
+          sendingWalletDescriptor: btcSendingWalletDescriptor,
+        })
+        const routeBolt11 = {
+          key: "sendBitcoinConfirmationScreen",
+          name: "sendBitcoinConfirmation",
+          params: { paymentDetail: paymentDetailBolt11 },
+        } as const
+
+        return render(
+          <ContextForScreen>
+            <LightningLnURL route={routeBolt11} />
+          </ContextForScreen>,
+        )
+      }
+
+      afterEach(() => {
+        mockInvestmentInvoice.current = null
+      })
+
+      /** The card investment's invoice is private to that investment, so "already
+       *  paid" on it means an earlier attempt from this device went through without
+       *  its receipt; refusing would have the home ask for the money again, and the
+       *  next attempt pay a second invoice. */
+      it("is taken to the receipt as settled when it is the card investment's", async () => {
+        mockInvestmentInvoice.current = bolt11Invoice
+        sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+        verifyPaymentSettledMock.mockResolvedValueOnce({
+          status: "SUCCESS",
+          createdAt: 1700000000,
+        })
+
+        renderBolt11()
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        /** The ledger's own account of the settlement, not an assumed one. */
+        expect(verifyPaymentSettledMock).toHaveBeenCalledWith({
+          walletId: btcSendingWalletDescriptor.id,
+          paymentRequest: bolt11Invoice,
+        })
+        const params = findCompletedRouteParams()
+        expect(params.paymentRequest).toBe(bolt11Invoice)
+        expect(params.status).toBe("SUCCESS")
+        expect(params.createdAt).toBe(1700000000)
+        expect(screen.queryByText("This invoice has already been paid")).toBeNull()
+      })
+
+      /** When the ledger cannot say, the receipt is still reached: refusing would leave
+       *  the home asking for money that has already gone. */
+      it("still reaches the receipt when the ledger cannot confirm the settlement", async () => {
+        mockInvestmentInvoice.current = bolt11Invoice
+        sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+        verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
+
+        renderBolt11()
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
+        const params = findCompletedRouteParams()
+        expect(params.paymentRequest).toBe(bolt11Invoice)
+        expect(params.status).toBe("SUCCESS")
+        expect(params.createdAt).toBeUndefined()
+      })
+
+      it("is refused, as before, for any other invoice", async () => {
+        sendPaymentMock.mockResolvedValueOnce({ status: "ALREADY_PAID" })
+
+        renderBolt11()
+        await act(async () => {
+          fireEvent.press(screen.getByTestId("slider"))
+        })
+
+        expect(screen.getByText("This invoice has already been paid")).toBeTruthy()
+        expect(() => findCompletedRouteParams()).toThrow()
+      })
+    })
+
+    it("names no invoice on the completed screen for a payment that had none", async () => {
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+
+      render(
+        <ContextForScreen>
+          <Intraledger route={route} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(findCompletedRouteParams().paymentRequest).toBeUndefined()
+    })
 
     it("forwards extraInfo.successAction to the completed screen when present", async () => {
       const extraInfoSuccessAction = {

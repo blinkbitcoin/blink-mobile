@@ -3748,6 +3748,27 @@
         "message": "Tulindirira ssente zo okumalirizibwa; tusaba olinde okukakasibwa emirundi 2 ku lujegere.",
         "buttonText": "Kale"
       },
+      "HomeBulletin": {
+          "invited": {
+              "body": "Oyitiddwa okwetaba mu mulundi gwa Blink ogw'okufuna ensimbi. Gwa bawagizi ba Blink bokka."
+          },
+          "insufficient": {
+              "title": "Ssente tezimala",
+              "body": "Okumaliriza okusiga kwo, teekamu ssente ezisigaddewo."
+          },
+          "depositPending": {
+              "title": "Lindako katono",
+              "body": "Tulindirira ssente zo okumalirizibwa."
+          },
+          "ready": {
+              "title": "Maliriza okusiga kwo",
+              "body": "Kati olina ssente ezimala okumaliriza okusiga."
+          },
+          "shareholder": {
+              "title": "Tukwanirizza nga nannyini migabo mu Blink!",
+              "body": "Tujja kukutegeeza amangu ddala Blink Visa Card yo bw'eneeba etegefu."
+          }
+      },
       "PersonalInformation": {
         "title": "Olugendo olw'enkomerero",
         "fields": {

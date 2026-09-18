@@ -3748,6 +3748,27 @@
         "message": "Čeká se na vypořádání tvého vkladu; počkej prosím na 2 potvrzení v řetězci.",
         "buttonText": "Dobře"
       },
+      "HomeBulletin": {
+          "invited": {
+              "body": "Jsi pozván k účasti na investičním kole Blinku. Pouze pro fanoušky Blinku."
+          },
+          "insufficient": {
+              "title": "Nedostatečný zůstatek",
+              "body": "Pro dokončení investice vlož zbývající částku."
+          },
+          "depositPending": {
+              "title": "Chvíli strpení",
+              "body": "Čekáme na vypořádání tvého vkladu."
+          },
+          "ready": {
+              "title": "Dokonči svou investici",
+              "body": "Nyní máš dostatek prostředků k dokončení investice."
+          },
+          "shareholder": {
+              "title": "Vítej jako akcionář Blinku!",
+              "body": "Dáme ti vědět, jakmile bude tvoje Blink Visa Card připravena."
+          }
+      },
       "PersonalInformation": {
         "title": "Poslední krok",
         "fields": {

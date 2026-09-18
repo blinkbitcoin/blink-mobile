@@ -3,13 +3,19 @@ import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { getErrorMessage } from "@blinkbitcoin/esign-react-native/webform"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+
+import { resetToTransferStep } from "./transfer-invest-screen"
+import { LOST_CONNECTION_CODE, useGivenUpWaiting } from "./use-given-up-waiting"
 
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -19,10 +25,71 @@ export const WelcomeInvestScreen: React.FC = () => {
 
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { progress, isEligible, isAccountResolved, markInvited, refetchAccount } =
+    useCardInvestmentProgress()
+
+  /** The investment is paid from a custodial balance; a self-custodial account that
+   *  arrives here, by a link or a notification, has no part in it and is sent home. */
+  React.useEffect(() => {
+    if (!isEligible) navigation.dispatch(RESET_TO_HOME)
+  }, [isEligible, navigation])
+
+  /**
+   * Opening this screen is what records the invitation, whichever way it was opened: the
+   * server's own invitation card is gone the moment it is tapped, and the home needs a
+   * record to hold a way back into the flow for an investor who leaves before signing.
+   * Recorded once the account it is filed under is known, and never over an agreement
+   * already signed.
+   */
+  React.useEffect(() => {
+    if (isAccountResolved) markInvited()
+  }, [isAccountResolved, markInvited])
+
+  /**
+   * An investor who already signed is not walked through the flow again: every way in,
+   * the home's cards, a link, a notification, lands here, and the screens beyond would
+   * let them sign a second agreement. A signed investment resumes at its payment, on the
+   * same stack the signing step leaves, whatever was open underneath; a paid one goes
+   * back to the home, where its welcome is.
+   */
+  React.useEffect(() => {
+    if (!progress) return
+    if (progress.paidAt) {
+      navigation.dispatch(RESET_TO_HOME)
+      return
+    }
+    navigation.dispatch(
+      resetToTransferStep({
+        selectedAmountUsd: progress.selectedAmountUsd,
+        settlementSats: progress.settlementSats,
+      }),
+    )
+  }, [progress, navigation])
 
   const handleNext = () => {
     navigation.navigate("cardOnboardingCompanyValuationScreen")
   }
+
+  /**
+   * Until the account is known the record cannot be read, and a tap in that window
+   * would push the next screen over a welcome about to send the investor elsewhere. The
+   * account is usually in the cache already; when it is not and does not come, the wait
+   * ends the way the signing step's does, with the reason and a way to ask again, since
+   * a fetch that failed offline is not retried on its own.
+   */
+  const isWaitingForAccount = isEligible && !isAccountResolved
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingForAccount)
+  const askForAccountAgain = () => {
+    refetchAccount()
+    waitAgain()
+  }
+  const isWaitingOut = isWaitingForAccount && !hasGivenUpWaiting
+  const isContinueDisabled = !isEligible || isWaitingOut
+  const continueTitle = hasGivenUpWaiting
+    ? LL.common.tryAgain()
+    : LL.CardFlow.Onboarding.WelcomeInvest.buttonText()
+  const handleContinue = hasGivenUpWaiting ? askForAccountAgain : handleNext
 
   return (
     <Screen headerShown={false}>
@@ -42,19 +109,26 @@ export const WelcomeInvestScreen: React.FC = () => {
           <Text type="p2" style={styles.bodyText}>
             {LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.paragraphs.body2()}
           </Text>
+
+          {hasGivenUpWaiting ? (
+            <Text type="p2" style={styles.errorText}>
+              {getErrorMessage(LOST_CONNECTION_CODE)}
+            </Text>
+          ) : null}
         </View>
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
-          title={LL.CardFlow.Onboarding.WelcomeInvest.buttonText()}
-          onPress={handleNext}
+          title={continueTitle}
+          disabled={isContinueDisabled}
+          onPress={handleContinue}
         />
       </View>
     </Screen>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   scrollView: {
     flex: 1,
   },
@@ -68,6 +142,12 @@ const useStyles = makeStyles(() => ({
     gap: 22,
   },
   bodyText: {
+    lineHeight: 22,
+    textAlign: "left",
+    width: "100%",
+  },
+  errorText: {
+    color: colors.error,
     lineHeight: 22,
     textAlign: "left",
     width: "100%",

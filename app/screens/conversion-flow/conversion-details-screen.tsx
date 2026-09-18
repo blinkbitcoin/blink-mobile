@@ -44,6 +44,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
 import {
+  DrainConversionArm,
   DrainConversionReturn,
   useConsumeDrainConversionArmed,
 } from "@app/screens/conversion-flow/drain-conversion"
@@ -100,21 +101,52 @@ const ANIMATION_CONFIG = {
  *  drives it the same way tapping that chip does. */
 const FULL_BALANCE_PERCENTAGE = 100
 
+/**
+ * Whether this conversion is a drain: one that empties a balance to get past a gate.
+ *
+ * Only those two lock the amount, because emptying the dollar balance is the whole point
+ * of them. The investment arm returns to its flow and nothing more: the investor still
+ * chooses how much, and which way unless the region holds them to one (see
+ * `isUsdToBtcOnly` below).
+ */
+const isDraining = (arm: DrainConversionArm | null): boolean =>
+  arm !== null && arm.target !== DrainConversionReturn.Investment
+
 export const ConversionDetailsScreen = () => {
   const drainConversion = useConsumeDrainConversionArmed()
-  const isDrainConversion = drainConversion !== null
 
-  /** A drain conversion waives the region restriction that would otherwise bounce a
-   *  restricted user home: emptying the dollar balance is the one way to migrate or to
-   *  switch to Anon Mode, and the flow arming the flag (not a deep-linkable param) is
-   *  what confirms it. */
-  const isGuardEnabled = !isDrainConversion
+  /**
+   * Any armed conversion waives the region restriction that would otherwise bounce a
+   * restricted user home. For a drain, emptying the dollar balance is the one way to
+   * migrate or to switch to Anon Mode; for the investment, the home keeps sending a
+   * restricted investor with split funds here to consolidate them, and bouncing them
+   * back would leave the two screens passing them to each other with no way to pay.
+   * The flow arming the flag (not a deep-linkable param) is what confirms it.
+   *
+   * A restricted or blocked investor is let through the way a drain is, dollars to
+   * bitcoin only, since that is the one direction either gate lets a drain take, with
+   * the amount still theirs to choose; an unrestricted one keeps both directions. The
+   * direction is decided once the verdict is in: the wallets are set on first paint and
+   * not moved after, so an investor who arrived while it was pending waits for it as
+   * an unarmed user would.
+   */
+  const isGuardEnabled = drainConversion === null
   const dollarBalanceGuard = useDollarBalanceRestrictionGuard({ enabled: isGuardEnabled })
   const transferGuard = useTransferBlockedGuard({ enabled: isGuardEnabled })
 
   const isRefused = dollarBalanceGuard.isGated || transferGuard.isGated
+  const isInvestmentConversion =
+    drainConversion?.target === DrainConversionReturn.Investment
+  const isInvestorVerdictPending =
+    isInvestmentConversion &&
+    (dollarBalanceGuard.isVerdictPending || transferGuard.isVerdictPending)
   const isRegionPending =
-    dollarBalanceGuard.isRegionPending || transferGuard.isRegionPending
+    dollarBalanceGuard.isRegionPending ||
+    transferGuard.isRegionPending ||
+    isInvestorVerdictPending
+  const isRegionRestricted = dollarBalanceGuard.isRestricted || transferGuard.isBlocked
+  const isRestrictedInvestmentConversion = isInvestmentConversion && isRegionRestricted
+  const isUsdToBtcOnly = isDraining(drainConversion) || isRestrictedInvestmentConversion
 
   /** A refusal is already navigating the user away, so there is nothing to render. */
   if (isRefused) return null
@@ -124,7 +156,12 @@ export const ConversionDetailsScreen = () => {
    *  a deep-linked user on an empty area under the header until the verdict lands. */
   if (isRegionPending) return <ConversionDetailsRegionPending />
 
-  return <ConversionDetailsScreenContent drainConversion={drainConversion} />
+  return (
+    <ConversionDetailsScreenContent
+      drainConversion={drainConversion}
+      isUsdToBtcOnly={isUsdToBtcOnly}
+    />
+  )
 }
 
 const ConversionDetailsRegionPending = () => {
@@ -147,13 +184,20 @@ const ConversionDetailsRegionPending = () => {
 }
 
 type ConversionDetailsScreenContentProps = {
-  drainConversion: DrainConversionReturn | null
+  drainConversion: DrainConversionArm | null
+  /** Opens USD to BTC with the toggle held: every drain, and a restricted investor. */
+  isUsdToBtcOnly: boolean
 }
 
 const ConversionDetailsScreenContent = ({
   drainConversion,
+  isUsdToBtcOnly,
 }: ConversionDetailsScreenContentProps) => {
-  const isDrainConversion = drainConversion !== null
+  const isDrainConversion = isDraining(drainConversion)
+
+  /** Both arms open on the full balance, which is what either caller came to do: empty
+   *  the wallet, or put the whole amount in one place. */
+  const shouldPrefillFullBalance = drainConversion !== null
   const {
     theme: { colors },
   } = useTheme()
@@ -215,8 +259,8 @@ const ConversionDetailsScreenContent = ({
     selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const initialWallets = useMemo(
-    () => resolveInitialConvertWallets(btcWallet, usdWallet, isDrainConversion),
-    [btcWallet, usdWallet, isDrainConversion],
+    () => resolveInitialConvertWallets(btcWallet, usdWallet, isUsdToBtcOnly),
+    [btcWallet, usdWallet, isUsdToBtcOnly],
   )
 
   const {
@@ -445,12 +489,12 @@ const ConversionDetailsScreenContent = ({
    *  confirm; reuses the chip path so it shows the spinner instead of flashing up from zero. */
   const hasPrefilledDrainAmountRef = useRef(false)
   useEffect(() => {
-    if (!isDrainConversion || hasPrefilledDrainAmountRef.current || !fromWallet) {
+    if (!shouldPrefillFullBalance || hasPrefilledDrainAmountRef.current || !fromWallet) {
       return
     }
     hasPrefilledDrainAmountRef.current = true
     applyBalancePercentage(FULL_BALANCE_PERCENTAGE)
-  }, [isDrainConversion, fromWallet, applyBalancePercentage])
+  }, [shouldPrefillFullBalance, fromWallet, applyBalancePercentage])
 
   const handleSetMoneyAmount = useCallback(
     (amount: MoneyAmount<WalletOrDisplayCurrency>) => setMoneyAmount(amount),
@@ -654,7 +698,7 @@ const ConversionDetailsScreenContent = ({
     conversionGuard.hasQuoteError ||
     isSelfCustodialBooting
 
-  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isDrainConversion
+  const isWalletToggleDisabled = !canToggleWallet || uiLocked || isUsdToBtcOnly
   const drainLockedPercentages = isDrainConversion
     ? PERCENTAGE_OPTIONS.filter((percentage) => percentage !== FULL_BALANCE_PERCENTAGE)
     : undefined

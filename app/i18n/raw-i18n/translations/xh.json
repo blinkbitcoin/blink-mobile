@@ -3748,6 +3748,27 @@
         "message": "Kulindwe ukuba idiphozithi yakho igqitywe; nceda ulinde iiqinisekiso ezi-2 kwitsheyini.",
         "buttonText": "Kulungile"
       },
+      "HomeBulletin": {
+          "invited": {
+              "body": "Umenyiwe ukuba uthathe inxaxheba kumjikelo wenkxaso-mali weBlink. Ngabalandeli beBlink kuphela."
+          },
+          "insufficient": {
+              "title": "Ibhalansi ayonelanga",
+              "body": "Ukugqiba utyalo-mali lwakho, faka imali eseleyo."
+          },
+          "depositPending": {
+              "title": "Linda kancinci",
+              "body": "Silinde ukuba idiphozithi yakho igqitywe."
+          },
+          "ready": {
+              "title": "Gqiba utyalo-mali lwakho",
+              "body": "Ngoku unemali eyaneleyo yokugqiba utyalo-mali."
+          },
+          "shareholder": {
+              "title": "Wamkelekile njengomnini-zabelo weBlink!",
+              "body": "Siza kukwazisa kwangoko xa iBlink Visa Card yakho ilungile."
+          }
+      },
       "PersonalInformation": {
         "title": "Inyathelo lokugqibela",
         "fields": {
