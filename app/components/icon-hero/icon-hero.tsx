@@ -1,5 +1,6 @@
 import React from "react"
-import { View } from "react-native"
+import { StyleProp, View, ViewStyle } from "react-native"
+import Animated, { AnimatedStyle } from "react-native-reanimated"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
@@ -8,7 +9,9 @@ import { GaloyIcon, IconNamesType } from "../atomic/galoy-icon"
 const ICON_FRAME_SIZE = 44
 
 type IconHeroProps = {
-  icon: IconNamesType
+  /** A glyph name, or the caller's own node when the glyph is animated (the send flow's
+   *  sent morph). */
+  icon: IconNamesType | React.ReactElement
   iconColor: string
   /** A plain heading, or the caller's own nodes when the heading is animated or sized by
    *  the screen (the send flow's amounts). */
@@ -28,6 +31,9 @@ type IconHeroProps = {
   /** Tightens the hero for a screen that leads with it rather than opening on it: no top
    *  padding, and the column runs the full width so a long value can use it. */
   compact?: boolean
+  /** Grows the icon frame, where the glyph swaps for a larger one (the send flow's sent
+   *  badge). */
+  iconFrameStyle?: StyleProp<AnimatedStyle<ViewStyle>>
 }
 
 export const IconHero: React.FC<IconHeroProps> = ({
@@ -40,6 +46,7 @@ export const IconHero: React.FC<IconHeroProps> = ({
   iconSize = 34,
   hasIconBackground = true,
   compact = false,
+  iconFrameStyle,
 }) => {
   const styles = useStyles()
 
@@ -50,9 +57,19 @@ export const IconHero: React.FC<IconHeroProps> = ({
 
   return (
     <View style={[styles.container, compact && styles.containerCompact]}>
-      <View style={[styles.iconContainer, hasIconBackground && styles.iconBackground]}>
-        <GaloyIcon name={icon} size={iconSize} color={iconColor} />
-      </View>
+      <Animated.View
+        style={[
+          styles.iconContainer,
+          hasIconBackground && styles.iconBackground,
+          iconFrameStyle,
+        ]}
+      >
+        {typeof icon === "string" ? (
+          <GaloyIcon name={icon} size={iconSize} color={iconColor} />
+        ) : (
+          icon
+        )}
+      </Animated.View>
       <View style={[styles.textContainer, compact && styles.textContainerCompact]}>
         {caption}
         {isPlainTextTitle ? (

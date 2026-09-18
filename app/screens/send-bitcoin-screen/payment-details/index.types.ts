@@ -30,6 +30,7 @@ import {
 } from "@app/types/amounts"
 import { PaymentType as SelfCustodialPaymentType } from "@app/types/transaction"
 import { WalletDescriptor } from "@app/types/wallets"
+import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
 export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
@@ -194,6 +195,9 @@ export type PaymentDetailSetSuccessAction<T extends WalletCurrency> = {
 export type PaymentDetailSetPayoutSpeed<T extends WalletCurrency> = {
   setPayoutSpeed?: SetPayoutSpeed<T>
   payoutSpeed?: PayoutSpeed
+  /** Self-custodial on-chain only: the tier the fee was quoted and the send is made on.
+   *  Read-only, for the review screen; changing it means rebuilding the detail. */
+  feeTier?: FeeTierOption
 }
 
 /**

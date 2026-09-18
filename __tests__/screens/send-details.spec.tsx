@@ -1,7 +1,14 @@
 import React from "react"
 import { Satoshis, type LnUrlPayServiceResponse } from "lnurl-pay"
 
-import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -47,6 +54,24 @@ jest.mock("lnurl-pay", () => ({
   requestInvoiceWithServiceParams: (...args: unknown[]) =>
     mockRequestInvoiceWithServiceParams(...args),
 }))
+
+/** The invoice decoder, real unless a test sets the next decode to a wrong amount. Read
+ *  lazily, since the factory is hoisted above this declaration. */
+const mockNextDecodedInvoice: { current?: unknown } = {}
+jest.mock("@blinkbitcoin/blink-client", () => {
+  const actual = jest.requireActual("@blinkbitcoin/blink-client")
+  return {
+    ...actual,
+    decodeInvoiceString: (...args: Parameters<typeof actual.decodeInvoiceString>) => {
+      const next = mockNextDecodedInvoice.current
+      mockNextDecodedInvoice.current = undefined
+      return next ?? actual.decodeInvoiceString(...args)
+    },
+  }
+})
+
+const ERROR_SHEET_TEST_ID = "amount-entry-error-msg-bottom-sheet"
+const errorSheet = () => screen.queryByTestId(ERROR_SHEET_TEST_ID)
 
 const mockNavigate = jest.fn()
 jest.mock("@react-navigation/native", () => ({
@@ -475,6 +500,195 @@ describe("SendBitcoinDetailsScreen — LNURL requestInvoice gate", () => {
   })
 })
 
+describe("SendBitcoinDetailsScreen — LNURL invoice errors", () => {
+  const lnurlParams: LnUrlPayServiceResponse = {
+    callback: "https://example.com/cb",
+    fixed: false,
+    min: 1 as Satoshis,
+    max: 1000000 as Satoshis,
+    domain: "example.com",
+    metadata: [["text/plain", "Test"]],
+    metadataHash: "",
+    identifier: "alice@example.com",
+    description: "Pay alice",
+    image: "",
+    commentAllowed: 0,
+    rawData: { metadata: '[["text/plain","Test"]]' },
+  }
+
+  const amount = {
+    amount: 5000,
+    currency: WalletCurrency.Btc,
+    currencyCode: "BTC",
+  } as const
+
+  const lnurlDetail = (): PaymentDetail<WalletCurrency> => {
+    const detail = {
+      paymentType: PaymentType.Lnurl,
+      destination: "alice@example.com",
+      memo: "",
+      convertMoneyAmount: ((money, currency) => ({
+        amount: money.amount,
+        currency,
+        currencyCode: currency,
+      })) as ConvertMoneyAmount,
+      setConvertMoneyAmount: () => detail,
+      settlementAmount: amount,
+      settlementAmountIsEstimated: false,
+      unitOfAccountAmount: amount,
+      sendingWalletDescriptor: { id: "btc-wallet-id", currency: WalletCurrency.Btc },
+      setSendingWalletDescriptor: () => detail,
+      lnurlParams,
+      setInvoice: () => detail,
+      successAction: undefined,
+      setSuccessAction: () => detail,
+      isMerchant: false,
+      canSetAmount: true as const,
+      setAmount: () => detail,
+      canSetMemo: true as const,
+      setMemo: () => detail,
+      canSendPayment: false as const,
+      canGetFee: false as const,
+    }
+    return detail as unknown as PaymentDetail<WalletCurrency>
+  }
+
+  const renderLnurl = async () => {
+    const detail = lnurlDetail()
+    render(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen
+          route={
+            {
+              key: "sendBitcoinDetails",
+              name: "sendBitcoinDetails",
+              params: {
+                paymentDestination: {
+                  valid: true,
+                  createPaymentDetail: () => detail,
+                } as never,
+              },
+            } as never
+          }
+        />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+  }
+
+  const pressNext = async (LL: ReturnType<typeof i18nObject>) => {
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.common.next()))
+    })
+    await flushAsync()
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+  })
+
+  it("titles the sheet 'Couldn't reach the recipient' and repeats Next on Try again (L1/L2)", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockRejectedValue(new Error("timeout"))
+    await renderLnurl()
+    await pressNext(LL)
+
+    const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.recipientUnreachableTitle())).toBeTruthy()
+    expect(
+      screen.getAllByText(LL.SendBitcoinScreen.failedToFetchLnurlInvoice()),
+    ).toHaveLength(2)
+    expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+    await flushAsync()
+
+    expect(mockRequestInvoiceWithServiceParams).toHaveBeenCalledTimes(2)
+    // The retry failed too, so the sheet is open again for the new failure.
+    expect(errorSheet()).toBeTruthy()
+  })
+
+  it("titles the sheet 'Recipient sent the wrong amount' and only offers Close (L3)", async () => {
+    const LL = i18nObject("en")
+    mockRequestInvoiceWithServiceParams.mockResolvedValue({
+      invoice: "lnbc-wrong-amount",
+      successAction: undefined,
+    })
+    mockNextDecodedInvoice.current = { millisatoshis: "1000" }
+    await renderLnurl()
+    await pressNext(LL)
+
+    const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.recipientWrongAmountTitle())).toBeTruthy()
+    expect(sheet.queryByText(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeNull()
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.common.close()))
+    })
+
+    expect(errorSheet()).toBeNull()
+    expect(
+      screen.getByText(LL.SendBitcoinScreen.lnurlInvoiceIncorrectAmount()),
+    ).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+})
+
+describe("SendBitcoinDetailsScreen — Change amount from review", () => {
+  it("empties the amount when review sends a fresh resetAmountAt, and not on a plain return", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    const { rerender } = render(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen route={intraledgerRoute} />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId(LL.common.next())
+    await flushAsync()
+    await flushAsync()
+
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await waitFor(() => {
+      expect(
+        screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled,
+      ).toBe(false)
+    })
+
+    // The back arrow: same params, the amount stays.
+    rerender(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen route={{ ...intraledgerRoute }} />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      false,
+    )
+
+    rerender(
+      <ContextForScreen>
+        <SendBitcoinDetailsScreen
+          route={{
+            ...intraledgerRoute,
+            params: { ...intraledgerRoute.params, resetAmountAt: 1 },
+          }}
+        />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+    expect(screen.getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
+  })
+})
+
 describe("onchain fee tier gating", () => {
   it("renders the speed selector for a custodial onchain send", async () => {
     render(
@@ -663,12 +877,43 @@ describe("onchain fee tier gating", () => {
       limit: "",
     }).trim()
 
+    // Inline, and in the sheet that opened on top of it when the amount crossed the limit.
     await waitFor(() => {
-      expect(screen.getByText(new RegExp(`^${amountExceedsLimitOpening}`))).toBeTruthy()
+      expect(
+        screen.getAllByText(new RegExp(`^${amountExceedsLimitOpening}`)),
+      ).toHaveLength(2)
     })
     expect(screen.queryByText(LL.common.feeError())).toBeNull()
     expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
       true,
     )
+  })
+
+  it("opens the error sheet on crossing the daily limit, and Change amount empties the amount (A3)", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalAllowance.remaining = 500
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+    for (let i = 0; i < 4; i += 1) fireEvent.press(screen.getByTestId("Key 9"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+    })
+    await flushAsync()
+
+    expect(errorSheet()).toBeNull()
+    expect(screen.getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
   })
 })

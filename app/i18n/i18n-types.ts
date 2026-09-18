@@ -7443,13 +7443,95 @@ type RootTranslation = {
 		 */
 		slideConfirming: string
 		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​n​d
+		 */
+		slideToSend: string
+		/**
+		 * C​a​l​c​u​l​a​t​i​n​g​ ​f​e​e​…
+		 */
+		calculatingFee: string
+		sendProgress: {
+			/**
+			 * R​e​v​i​e​w​i​n​g
+			 */
+			reviewing: string
+			/**
+			 * S​i​g​n​i​n​g
+			 */
+			signing: string
+			/**
+			 * F​i​n​d​i​n​g​ ​r​o​u​t​e
+			 */
+			findingRoute: string
+			/**
+			 * B​r​o​a​d​c​a​s​t​i​n​g
+			 */
+			broadcasting: string
+			/**
+			 * C​h​e​c​k​i​n​g​ ​d​e​l​i​v​e​r​y
+			 */
+			checkingDelivery: string
+			/**
+			 * R​e​-​t​r​y​i​n​g
+			 */
+			retrying: string
+			/**
+			 * A​l​m​o​s​t​ ​t​h​e​r​e
+			 */
+			almostThere: string
+			/**
+			 * A​n​y​ ​t​i​m​e​ ​n​o​w
+			 */
+			anyTimeNow: string
+			/**
+			 * O​h​ ​o​h
+			 */
+			ohOh: string
+			/**
+			 * T​r​y​i​n​g​ ​a​g​a​i​n
+			 */
+			tryingAgain: string
+		}
+		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedDestination: string
 		/**
-		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
+		 * H​i​g​h​ ​f​e​e​.​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * S​e​n​d​i​n​g
+		 */
+		sending: string
+		/**
+		 * S​e​n​t
+		 */
+		sent: string
+		/**
+		 * R​e​c​e​i​p​t
+		 */
+		receipt: string
+		/**
+		 * F​r​o​m​ ​B​a​l​a​n​c​e
+		 */
+		fromBalance: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
+		 */
+		changeAmount: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n
+		 */
+		tryAgain: string
+		/**
+		 * H​o​m​e
+		 */
+		home: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -7630,6 +7712,18 @@ type RootTranslation = {
 		 * @param {string} limit
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
+		/**
+		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
+		 */
+		problemSheetTitle: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​r​e​c​i​p​i​e​n​t
+		 */
+		recipientUnreachableTitle: string
+		/**
+		 * R​e​c​i​p​i​e​n​t​ ​s​e​n​t​ ​t​h​e​ ​w​r​o​n​g​ ​a​m​o​u​n​t
+		 */
+		recipientWrongAmountTitle: string
 		/**
 		 * U​p​g​r​a​d​e​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​i​n​c​r​e​a​s​e​ ​y​o​u​r​ ​l​i​m​i​t
 		 */
@@ -21090,13 +21184,95 @@ export type TranslationFunctions = {
 		 */
 		slideConfirming: () => LocalizedString
 		/**
+		 * Slide to send
+		 */
+		slideToSend: () => LocalizedString
+		/**
+		 * Calculating fee…
+		 */
+		calculatingFee: () => LocalizedString
+		sendProgress: {
+			/**
+			 * Reviewing
+			 */
+			reviewing: () => LocalizedString
+			/**
+			 * Signing
+			 */
+			signing: () => LocalizedString
+			/**
+			 * Finding route
+			 */
+			findingRoute: () => LocalizedString
+			/**
+			 * Broadcasting
+			 */
+			broadcasting: () => LocalizedString
+			/**
+			 * Checking delivery
+			 */
+			checkingDelivery: () => LocalizedString
+			/**
+			 * Re-trying
+			 */
+			retrying: () => LocalizedString
+			/**
+			 * Almost there
+			 */
+			almostThere: () => LocalizedString
+			/**
+			 * Any time now
+			 */
+			anyTimeNow: () => LocalizedString
+			/**
+			 * Oh oh
+			 */
+			ohOh: () => LocalizedString
+			/**
+			 * Trying again
+			 */
+			tryingAgain: () => LocalizedString
+		}
+		/**
 		 * Copied destination to clipboard
 		 */
 		copiedDestination: () => LocalizedString
 		/**
-		 * High fee! We recommend Lightning.
+		 * High fee. We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Sending
+		 */
+		sending: () => LocalizedString
+		/**
+		 * Sent
+		 */
+		sent: () => LocalizedString
+		/**
+		 * Receipt
+		 */
+		receipt: () => LocalizedString
+		/**
+		 * From Balance
+		 */
+		fromBalance: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Change amount
+		 */
+		changeAmount: () => LocalizedString
+		/**
+		 * Try again
+		 */
+		tryAgain: () => LocalizedString
+		/**
+		 * Home
+		 */
+		home: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
@@ -21257,6 +21433,18 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * A small problem
+		 */
+		problemSheetTitle: () => LocalizedString
+		/**
+		 * Couldn't reach the recipient
+		 */
+		recipientUnreachableTitle: () => LocalizedString
+		/**
+		 * Recipient sent the wrong amount
+		 */
+		recipientWrongAmountTitle: () => LocalizedString
 		/**
 		 * Upgrade your account to increase your limit
 		 */

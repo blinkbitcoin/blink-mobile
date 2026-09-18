@@ -2342,6 +2342,10 @@
         "slideConfirming": "Confirmando...",
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
+        "sending": "Enviando",
+        "fromBalance": "Desde el saldo",
+        "details": "Detalles",
+        "changeAmount": "Cambiar cantidad",
         "usdRemainderSweep": "Restante {remaining: string} ({remainingSats: string}) se convertirá a Bitcoin. Mínimo en USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {

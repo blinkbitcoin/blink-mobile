@@ -378,12 +378,18 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="sendBitcoinConfirmation"
         component={SendBitcoinConfirmationGated}
-        options={{ title: LL.SendBitcoinScreen.title() }}
+        // Headerless so the Sent glow can fill the screen; review draws its own back row.
+        options={{ headerShown: false }}
       />
       <RootNavigator.Screen
         name="sendBitcoinCompleted"
         component={SendBitcoinCompletedScreen}
-        options={{ title: LL.SendBitcoinScreen.title(), headerShown: false }}
+        options={({ route }) => ({
+          title: LL.SendBitcoinScreen.title(),
+          headerShown: false,
+          // Sent already holds on review, so the receipt fades in over it.
+          animation: route.params.hasShownSuccess ? "fade" : "default",
+        })}
       />
       <RootNavigator.Screen
         name="receiveBitcoin"

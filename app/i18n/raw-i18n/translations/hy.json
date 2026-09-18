@@ -2342,6 +2342,10 @@
     "slideConfirming": "Հաստատվում է...",
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
+    "sending": "Ուղարկվում է",
+    "fromBalance": "Հաշվեկշռից",
+    "details": "Մանրամասներ",
+    "changeAmount": "Փոխել գումարը",
     "usdRemainderSweep": "Մնացած {remaining: string} ({remainingSats: string}) կփոխարկվի Bitcoin-ի։ USD-ի նվազագույնը՝ {minimum: string}։"
   },
   "SendBitcoinDestinationScreen": {
