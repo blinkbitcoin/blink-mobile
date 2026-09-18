@@ -60,6 +60,10 @@ const UNAUTHORIZED_CODE = "UNAUTHORIZED"
 /** Any other failure is worded by the component; the reason goes to the log. */
 const FAILURE_CODE = "ENVELOPE_CREATION_FAILED"
 
+/** The service could not be reached at all, which the component words as a lost
+ *  connection rather than as a mint that failed. */
+const UNREACHABLE_CODE = "NETWORK_ERROR"
+
 /** The rejection carries a `code` because that is what the signing component reads to
  *  decide the wording; without one it falls back to a code that discards the message. */
 const signingError = (message: string, code: string): Error =>
@@ -71,6 +75,8 @@ export const signingUnauthorized = (message: string): Error =>
   signingError(message, UNAUTHORIZED_CODE)
 export const signingFailure = (message: string): Error =>
   signingError(message, FAILURE_CODE)
+export const signingUnreachable = (message: string): Error =>
+  signingError(message, UNREACHABLE_CODE)
 
 /** A value written onto the document, which the signer cannot change. */
 type LockedValue = { value: string; locked: true }

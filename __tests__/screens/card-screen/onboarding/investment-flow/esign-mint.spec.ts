@@ -137,6 +137,28 @@ describe("mintSigningInstance", () => {
     })
   })
 
+  /** Offline, the request rejects before any status exists; the component has copy
+   *  for a lost connection, and a failed-mint wording would hide what to do about it. */
+  it("reports a request that never reached the service as a lost connection", async () => {
+    mockFetch.mockRejectedValue(new TypeError("Network request failed"))
+
+    await expect(mint()).rejects.toMatchObject({
+      code: "NETWORK_ERROR",
+      message: "Network request failed",
+    })
+  })
+
+  /** A fetch polyfill may reject with a bare value rather than an Error; it is coerced
+   *  to text rather than throwing inside the catch. */
+  it("still words a lost connection when the rejection is not an Error", async () => {
+    mockFetch.mockRejectedValue("offline")
+
+    await expect(mint()).rejects.toMatchObject({
+      code: "NETWORK_ERROR",
+      message: "offline",
+    })
+  })
+
   /** A port answering with something other than JSON is still a failed mint, and the
    *  status is what explains it, so a parse error must not replace it. */
   it("names the status when the answer is not JSON", async () => {
