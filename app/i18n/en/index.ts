@@ -2531,6 +2531,7 @@ const en: BaseTranslation = {
     apiDocumentation: "API documentation",
     apiDashboard: "API access and dashboard",
     mode: "Mode",
+    modeNotSet: "Not set",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
     createAddress: "Create address",

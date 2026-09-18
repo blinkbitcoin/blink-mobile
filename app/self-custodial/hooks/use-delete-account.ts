@@ -1,19 +1,20 @@
 import { useCallback, useState } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
-import { storageDirFor } from "@app/self-custodial/config"
+import { storageDirFor, telemetryOutboxDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { createOutboxStore } from "@app/telemetry"
 import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 type DeleteState = "idle" | "deleting" | "error"
@@ -76,14 +77,31 @@ export const useDeleteAccount = (): DeleteAccountResult => {
 
         if (isActive && sdk) {
           await disconnectSdk(sdk).catch((err) => {
-            crashlytics().log(`[self-custodial delete] disconnect failed: ${err}`)
+            logBreadcrumb(`[self-custodial delete] disconnect failed: ${err}`)
           })
         }
 
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
-          crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
+          logBreadcrumb(`[self-custodial delete] storage dir unlink failed: ${err}`)
         })
+        /**
+         * The telemetry outbox is a sibling of the wallet store, so it belongs to the same
+         * pairing: without this its queued records outlive the account that produced them.
+         * Nothing would ever sweep them either — the 72h TTL only runs while a store for
+         * that account is mounted, and a deleted account never mounts one again.
+         *
+         * Retired through the store, never unlinked here: a bare unlink neither moves the
+         * queue's generation nor serialises with a drain, so a transport result still in
+         * flight for this account would write its record back into a directory the
+         * account no longer owns. A retirement that cannot finish leaves a durable signal
+         * next to the directory, and the provider's parent sweep finishes it later.
+         */
+        await createOutboxStore(telemetryOutboxDirFor(accountId, network))
+          .retire()
+          .catch((err) => {
+            logBreadcrumb(`[self-custodial delete] outbox retire failed: ${err}`)
+          })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()

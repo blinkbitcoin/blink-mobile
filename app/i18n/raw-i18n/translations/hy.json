@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API փաստաթղթեր",
     "apiDashboard": "API հասանելիություն և վահանակ",
     "mode": "Ռեժիմ",
+    "modeNotSet": "Not set",
     "pos": "Վաճառքի կետ",
     "posCopied": "Վաճառքի կետի հղումը պատծենվել է",
     "activated": "Ակտիվացված է",

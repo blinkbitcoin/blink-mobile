@@ -28,8 +28,15 @@ export const withSelfCustodialServerAccountMode = (
 
 /**
  * Settles an account's mode from what the server reported. A mode it holds is adopted and
- * recorded as confirmed, so nothing is pushed back at it. No mode leaves the Enhanced
- * default unconfirmed, which is what makes the sync push it.
+ * recorded as confirmed, so nothing is pushed back at it.
+ *
+ * **A null answer settles nothing.** This used to write `Enhanced` for an account the
+ * server held no mode for, so that the sync would push it and the Lightning Address would
+ * come alive — and every consumer downstream, the telemetry gate included, then read that
+ * default as a choice the user had made. It was the fail-open the whole mode design exists
+ * to prevent, sitting in the one place a default looked like an answer (AD-25). An account
+ * the server holds no mode for stays mode-less until the user picks one; nothing is
+ * assumed on their behalf.
  *
  * Only ever called with an answer the server actually gave: assuming one it never gave
  * would push Enhanced over an Anon it holds but could not report.
@@ -39,11 +46,10 @@ export const withSelfCustodialModeFromServer = (
   accountId: string,
   serverMode: AccountMode | null,
 ): PersistentState => {
-  const withMode = withSelfCustodialAccountMode(
-    state,
+  if (!serverMode) return state
+  return withSelfCustodialServerAccountMode(
+    withSelfCustodialAccountMode(state, accountId, serverMode),
     accountId,
-    serverMode ?? AccountMode.Enhanced,
+    serverMode,
   )
-  if (!serverMode) return withMode
-  return withSelfCustodialServerAccountMode(withMode, accountId, serverMode)
 }

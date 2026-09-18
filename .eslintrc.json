@@ -131,8 +131,27 @@
           {
             "name": "react-native-secure-key-store",
             "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+          },
+          {
+            "name": "@react-native-firebase/analytics",
+            "message": "Reach analytics only through app/telemetry. Everything the app emits passes the privacy boundary's gate and policy first; a direct import is call site number 37, and FR-2 is a build-time fact rather than a review claim."
+          },
+          {
+            "name": "@react-native-firebase/crashlytics",
+            "message": "Reach Crashlytics only through app/utils/error-reporting (recordAppError, logBreadcrumb). That sink holds every non-fatal and breadcrumb until the telemetry mode says the device may report (AD-13, AD-30); a direct import bypasses it."
           }
         ]
+      }
+    ],
+    "no-restricted-syntax": [
+      "error",
+      {
+        "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties|setAnalyticsCollectionEnabled)$/]",
+        "message": "User-scoped analytics identity and the collection switch belong in app/telemetry/platform-analytics.ts, where the mode gate controls them. Firebase merges identity into every later event, and a screen that toggles collection bypasses the gate entirely (AD-16, AD-29)."
+      },
+      {
+        "selector": "CallExpression[callee.property.name=/^(setCrashlyticsCollectionEnabled|deleteUnsentReports|sendUnsentReports|setCrashCollectionDisposition)$/]",
+        "message": "Crash collection follows the telemetry disposition, and only app/utils/error-reporting.ts applies it (AD-13). A call anywhere else can turn collection on for a device that must emit zero."
       }
     ],
     "no-return-assign": "error",
@@ -177,12 +196,124 @@
   },
   "overrides": [
     {
+      "files": ["app/utils/error-reporting.ts", "app/telemetry/diagnostics.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/analytics",
+                "message": "Reach analytics only through app/telemetry."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/utils/error-reporting.ts"],
+      "rules": {
+        "no-restricted-syntax": [
+          "error",
+          {
+            "selector": "CallExpression[callee.property.name=/^(setUserId|setUserProperty|setUserProperties|setAnalyticsCollectionEnabled)$/]",
+            "message": "User-scoped analytics identity and the collection switch belong in app/telemetry/platform-analytics.ts (AD-16, AD-29)."
+          }
+        ]
+      }
+    },
+    {
+      "files": ["app/telemetry/platform-analytics.ts"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Reach Crashlytics only through app/utils/error-reporting."
+              }
+            ]
+          }
+        ],
+        "no-restricted-syntax": "off"
+      }
+    },
+    {
+      "files": ["__tests__/**"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
       "files": [
         "app/utils/storage/legacy-key-store.ts",
         "app/utils/storage/secureStorage.ts"
       ],
       "rules": {
-        "no-restricted-imports": "off"
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "@react-native-firebase/analytics",
+                "message": "Reach analytics only through app/telemetry."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Reach Crashlytics only through app/utils/error-reporting."
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "files": [
+        "app/navigation/navigation-container-wrapper.tsx",
+        "app/screens/email-login-screen/email-login-validate.tsx",
+        "app/screens/get-started-screen/use-create-device-account.ts",
+        "app/screens/phone-auth-screen/phone-login-validation.tsx",
+        "app/screens/telegram-login-screen/telegram-auth.ts",
+        "app/screens/totp-screen/totp-login-validate.tsx",
+        "app/utils/analytics.ts",
+        "app/utils/storage/secure-store-migration.ts"
+      ],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              },
+              {
+                "name": "@react-native-firebase/crashlytics",
+                "message": "Reach Crashlytics only through app/utils/error-reporting."
+              }
+            ]
+          }
+        ]
       }
     }
   ],

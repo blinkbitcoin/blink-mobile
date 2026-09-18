@@ -41,6 +41,9 @@ const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
+/** AD-30's rollout flag for self-custodial telemetry. Off by default; a failed fetch leaves
+ *  it off, which is why this one may ride Remote Config when the kill switch may not. */
+const TelemetryEnabledKey = "telemetryEnabled"
 const BtcMapPlacesEnabledKey = "btcMapPlacesEnabled"
 const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
@@ -77,7 +80,17 @@ type FeatureFlags = {
   deviceAccountEnabled: boolean
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
+  /** Self-custodial telemetry rollout (AD-30). Off until the ramp turns it on. */
+  telemetryEnabled: boolean
+  /** The fetch has settled, either way. Gates rendering, not trust. */
   remoteConfigReady: boolean
+  /**
+   * The fetch actually succeeded. Distinct from `remoteConfigReady` because every flag
+   * here falls back to a shipped default when the fetch throws, and a default read as an
+   * answer is a fail-open: `nonCustodialEnabled` defaults to `false`, which reads as
+   * "self-custody was turned off for this user" rather than "we could not ask".
+   */
+  remoteConfigTrusted: boolean
 }
 
 type RemoteConfig = {
@@ -108,6 +121,7 @@ type RemoteConfig = {
   [BackupNudgeModalCooldownMsKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
+  [TelemetryEnabledKey]: boolean
   [BtcMapPlacesEnabledKey]: boolean
   [AutoConvertMaxAttemptsKey]: number
   [AutoConvertPollMaxAttemptsKey]: number
@@ -219,6 +233,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   backupNudgeModalCooldownMs: 24 * 60 * 60 * 1000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  telemetryEnabled: false,
   /** Kill switch for the map's merchant data, which comes from BTC Map — a third
    *  party we do not control. If the feed starts serving something harmful or
    *  simply wrong, turning this off empties the map without an app release. */
@@ -248,7 +263,9 @@ const defaultFeatureFlags: FeatureFlags = {
   deviceAccountEnabled: false,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  telemetryEnabled: false,
   remoteConfigReady: false,
+  remoteConfigTrusted: false,
 }
 
 remoteConfigInstance().setDefaults({
@@ -288,6 +305,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
+  const [remoteConfigTrusted, setRemoteConfigTrusted] = useState(false)
   const rolloutLoggedRef = useRef(false)
 
   const {
@@ -409,6 +427,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(StableBalanceEnabledKey)
           .asBoolean()
 
+        const telemetryEnabled = remoteConfigInstance()
+          .getValue(TelemetryEnabledKey)
+          .asBoolean()
+
         const btcMapPlacesEnabled = remoteConfigInstance()
           .getValue(BtcMapPlacesEnabledKey)
           .asBoolean()
@@ -510,6 +532,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           backupNudgeModalCooldownMs,
           nonCustodialEnabled,
           stableBalanceEnabled,
+          telemetryEnabled,
           btcMapPlacesEnabled,
           autoConvertMaxAttempts,
           autoConvertPollMaxAttempts,
@@ -525,6 +548,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           migrationDelayedRedirectEnabled,
           feeRatesConfig,
         })
+        setRemoteConfigTrusted(true)
       } catch (err) {
         logError({
           scope: "remote-config",
@@ -544,7 +568,9 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
+    telemetryEnabled: remoteConfig.telemetryEnabled,
     remoteConfigReady,
+    remoteConfigTrusted,
   }
 
   useEffect(() => {

@@ -112,9 +112,13 @@ export const useRestoreWallet = () => {
           reinitSdk()
           logSelfCustodialRestoreCompleted()
 
-          /** Only an unanswered server leaves the question open. Assuming a default here
-           *  would push it back and overwrite whatever the account really holds. */
-          if (!isServerModeKnown) {
+          /**
+           * An unanswered server leaves the question open, and so does a server that
+           * answered "none": the account holds no mode anywhere this device can see, and
+           * assuming one here would push it back as though the user had chosen it
+           * (AD-25). Only an actual mode is adopted without asking.
+           */
+          if (!isServerModeKnown || serverMode === null) {
             navigation.navigate("selfCustodialChooseExperience", {
               onContinue: {
                 route: ChooseExperienceContinueRoute.BackupSuccess,

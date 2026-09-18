@@ -11,6 +11,7 @@ import com.facebook.react.defaults.DefaultReactHost.getDefaultReactHost
 import com.facebook.react.defaults.DefaultReactNativeHost
 import com.facebook.react.soloader.OpenSourceMergedSoMapping
 import com.facebook.soloader.SoLoader
+import com.google.firebase.analytics.FirebaseAnalytics
 
 class MainApplication : Application(), ReactApplication {
 
@@ -20,6 +21,7 @@ class MainApplication : Application(), ReactApplication {
             PackageList(this).packages.apply {
               // Packages that cannot be autolinked yet can be added manually here, for example:
               // add(MyReactNativePackage())
+              add(CrashCollectionPackage())
             }
 
         override fun getJSMainModuleName(): String = "index"
@@ -35,6 +37,19 @@ class MainApplication : Application(), ReactApplication {
 
   override fun onCreate() {
     super.onCreate()
+    // Analytics collection starts every process OFF, whatever the previous run left
+    // persisted. Firebase keeps the last setAnalyticsCollectionEnabled() value across
+    // launches and it overrides the manifest default, so a device that ended a custodial
+    // session collecting would otherwise log session_start natively — before any
+    // JavaScript runs — even if that device has since become incognito. The telemetry
+    // boundary (app/telemetry/mode.ts) re-enables collection only once the mode has
+    // positively resolved as custodial. This runs before the first Activity resumes,
+    // which is where the automatic session events are logged.
+    FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false)
+    // Crash collection follows the same rule, one launch behind by the SDK's nature: the
+    // previous session's disposition decides whether the reports it left may go, and this
+    // session starts unresolved until the boundary says otherwise. See CrashCollectionPolicy.
+    CrashCollection.applyLaunch(this)
     SoLoader.init(this, OpenSourceMergedSoMapping)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {
       // If you opted-in for the New Architecture, we load the native entry point for this app.

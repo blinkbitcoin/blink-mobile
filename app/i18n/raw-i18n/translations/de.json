@@ -2449,6 +2449,7 @@
         "apiDocumentation": "API-Dokumentation",
         "apiDashboard": "API-Zugang und Dashboard",
         "mode": "Modus",
+        "modeNotSet": "Not set",
         "pos": "Point of Sale",
         "posCopied": "Ihr Point of Sale Link wurde kopiert",
         "activated": "Aktiviert",

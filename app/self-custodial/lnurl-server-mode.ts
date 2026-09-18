@@ -3,6 +3,7 @@ import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import { AccountMode } from "@app/types/account"
 
 import { getWalletInfo } from "./bridge/wallet"
+import { applyLnurlTelemetryFlag } from "./lnurl-telemetry-flag"
 
 /** The server refuses a request whose timestamp is further than this from its own clock,
  *  so a stalled request is dropped rather than sent to be rejected. */
@@ -56,6 +57,13 @@ export const setLnurlServerMode = async ({
   if (!response.ok) {
     throw new Error(`LNURL server refused mode '${mode}' with ${response.status}`)
   }
+
+  /** The switch rides every response the wallet already parses (AD-28), this one too. */
+  try {
+    applyLnurlTelemetryFlag(await response.json())
+  } catch {
+    /** The mode landed; a body this build cannot read changes nothing. */
+  }
 }
 
 /**
@@ -89,8 +97,14 @@ export const recoverLnurlServerMode = async ({
     throw new Error(`LNURL server refused recover with ${response.status}`)
   }
 
-  const { mode } = (await response.json()) as { mode?: string | null }
-  return toAccountMode(mode)
+  const body = (await response.json()) as LnurlServerModeBody
+  applyLnurlTelemetryFlag(body)
+  return toAccountMode(body.mode)
+}
+
+/** The mode, plus AD-28's flag — see `lnurl-telemetry-flag.ts`, which parses that half. */
+type LnurlServerModeBody = {
+  mode?: string | null
 }
 
 /** Unknown values read as "no mode": a variant this app does not know cannot be honored,

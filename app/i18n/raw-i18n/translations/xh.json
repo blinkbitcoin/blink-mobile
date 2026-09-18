@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Amaxwebhu e-API",
     "apiDashboard": "Ukufikelela kwi-API nedashbhodi",
     "mode": "Imo",
+    "modeNotSet": "Not set",
     "pos": "Indawo Yokuthengisa",
     "posCopied": "Ilinki yakho yendawo yokuthengisa ikopishiwe",
     "activated": "Yenziwe yasebenza",

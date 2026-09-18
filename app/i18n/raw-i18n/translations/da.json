@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API-dokumentation",
     "apiDashboard": "API-adgang og dashboard",
     "mode": "Tilstand",
+    "modeNotSet": "Not set",
     "pos": "Kasseterminal",
     "posCopied": "Dit kasseterminal-link er blevet kopieret",
     "activated": "Aktiveret",

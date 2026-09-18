@@ -15,7 +15,6 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import "react-native-url-polyfill/auto"
 
 import "@react-native-firebase/app"
-import "@react-native-firebase/crashlytics"
 
 import { GaloyThemeProvider } from "./components/galoy-theme-provider"
 import { GaloyToast } from "./components/galoy-toast"
@@ -25,12 +24,18 @@ import { FeatureFlagContextProvider } from "./config/feature-flags-context"
 import { CustodialRestrictionsProvider } from "./custodial/providers/restrictions"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
 import {
+  initializeTelemetryGate,
+  localOnlyTransport,
+  registerTelemetryTransport,
+} from "./telemetry"
+import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
   DisplayCurrencyFromRegionMount,
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialTelemetryMount } from "./self-custodial/providers/telemetry"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -55,6 +60,24 @@ import { RestrictedRegionProvider } from "./components/restricted-region"
 const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
 if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
+
+// Shut the analytics gate as early as any JavaScript can. Firebase persists the last value
+// of `setAnalyticsCollectionEnabled` across launches and that persisted value overrides
+// `firebase.json`, so a device that resolved Custodial last run would otherwise start this
+// one collecting — including automatic and screen-level events (FR-3).
+//
+// The window before JS runs is closed natively: MainApplication.kt and AppDelegate.mm turn
+// collection off at process start, before the first Activity resumes / the app becomes
+// active, which is where `session_start` is logged. This call is the JS half of the same
+// default; the mode gate re-enables collection only once the mode resolves Custodial.
+// Residual, stated: an `app_update` logged at SDK initialisation, before Application
+// start, on the one launch after an upgrade of a device that last ran custodial.
+initializeTelemetryGate()
+
+// The null adapter (AD-27) stands behind the port until OD-1 is signed: it acknowledges
+// and keeps what it was handed in a ring buffer the developer screen can read. Nothing
+// leaves the device, and the whole pipeline is exercisable end to end without it.
+registerTelemetryTransport(localOnlyTransport)
 
 /**
  * This is the root component of our app.
@@ -89,6 +112,7 @@ export const App = () => (
                                           <PushNotificationComponent />
                                           <AutoConvertListenerMount />
                                           <AccountModeSyncMount />
+                                          <SelfCustodialTelemetryMount />
                                           <DisplayCurrencyFromRegionMount />
                                           <RootStack />
                                           <NetworkErrorComponent />

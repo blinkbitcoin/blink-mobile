@@ -40,8 +40,13 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 const mockStorageDirFor = jest.fn((id: string, _network: unknown) => `/tmp/${id}`)
+const mockTelemetryOutboxDirFor = jest.fn(
+  (id: string, _network: unknown) => `/tmp/outbox/${id}`,
+)
 jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string, network: unknown) => mockStorageDirFor(id, network),
+  telemetryOutboxDirFor: (id: string, network: unknown) =>
+    mockTelemetryOutboxDirFor(id, network),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -79,6 +84,16 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 
 jest.mock("react-native-fs", () => ({
   unlink: (...args: unknown[]) => mockUnlink(...args),
+}))
+
+/** The outbox is retired through its store, never unlinked here (see the hook). */
+const mockRetire = jest.fn(() => Promise.resolve())
+const mockCreateOutboxStore = jest.fn((directory: string) => ({
+  directory,
+  retire: () => mockRetire(),
+}))
+jest.mock("@app/telemetry", () => ({
+  createOutboxStore: (directory: string) => mockCreateOutboxStore(directory),
 }))
 
 const mockSdk = { id: "sdk" }
@@ -147,6 +162,49 @@ describe("useDeleteAccount", () => {
       TEST_SC_ACCOUNT_ID,
       mockSparkNetwork.Mainnet,
     )
+  })
+
+  it("retires the telemetry outbox through its store, alongside the wallet store", async () => {
+    // The outbox is a sibling of the wallet store, so it shares its deletion pairing.
+    // Left behind, its queued records outlive the account that produced them and nothing
+    // ever sweeps them: the 72h TTL only runs while a store for that account is mounted,
+    // and a deleted account never mounts one again. And it is retired through the store
+    // rather than unlinked: a bare unlink neither moves the queue's generation nor
+    // serialises with a drain, so a transport result in flight would write the deleted
+    // account's queue back (the fourth review's HIGH).
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockTelemetryOutboxDirFor).toHaveBeenCalledWith(
+      TEST_SC_ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+    )
+    expect(mockCreateOutboxStore).toHaveBeenCalledWith(
+      `/tmp/outbox/${TEST_SC_ACCOUNT_ID}`,
+    )
+    expect(mockRetire).toHaveBeenCalledTimes(1)
+    expect(mockUnlink).not.toHaveBeenCalledWith(`/tmp/outbox/${TEST_SC_ACCOUNT_ID}`)
+    // Anchor: the wallet store is still wiped, so this is an addition rather than a
+    // swap of one directory for the other.
+    expect(mockUnlink).toHaveBeenCalledWith(`/tmp/${TEST_SC_ACCOUNT_ID}`)
+  })
+
+  it("finishes the delete when the outbox retirement fails", async () => {
+    // The retirement leaves its own durable signal for the provider's parent sweep; the
+    // account must still go.
+    mockRetire.mockRejectedValueOnce(new Error("telemetry outbox discard did not finish"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBe("logged-out")
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
   })
 
   it("switches to the custodial account and returns 'switched-to-custodial' when a custodial account exists", async () => {

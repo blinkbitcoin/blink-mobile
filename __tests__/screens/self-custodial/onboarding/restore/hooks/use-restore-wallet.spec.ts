@@ -114,6 +114,10 @@ describe("useRestoreWallet", () => {
   })
 
   it("restores wallet with new account id and navigates on success", async () => {
+    mockRestore.mockResolvedValue({
+      serverMode: AccountMode.Enhanced,
+      isServerModeKnown: true,
+    })
     const { result } = renderHook(() => useRestoreWallet())
 
     await act(async () => {
@@ -158,7 +162,7 @@ describe("useRestoreWallet", () => {
    */
   describe("the mode a restored wallet comes back with", () => {
     const baseState: PersistentState = {
-      schemaVersion: 21,
+      schemaVersion: 22,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: TEST_ACCOUNT_ID,
@@ -202,17 +206,33 @@ describe("useRestoreWallet", () => {
       )
     })
 
-    it("falls back to Enhanced when the server holds no mode", async () => {
-      const state = await restoreAndReadState(null)
+    /**
+     * AD-25. This used to fall back to Enhanced — a default every consumer downstream,
+     * the telemetry gate included, then read as a choice the user had made. A server
+     * that holds no mode leaves the question open, exactly like one that could not be
+     * reached, so the user is asked.
+     */
+    it("asks when the server holds no mode, instead of assuming Enhanced", async () => {
+      mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: true })
+      const { result } = renderHook(() => useRestoreWallet())
 
-      expect(getSelfCustodialAccountMode(state)).toBe(AccountMode.Enhanced)
+      await act(async () => {
+        await result.current.restore("word1 word2 word3")
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
+        onContinue: {
+          route: "selfCustodialBackupSuccess",
+          accountId: TEST_ACCOUNT_ID,
+        },
+      })
+      expect(mockNavigate).not.toHaveBeenCalledWith("selfCustodialBackupSuccess")
     })
 
-    /** Left unconfirmed on purpose: the server never said Enhanced, so the sync still
-     *  owes it that push. */
-    it("leaves an assumed Enhanced unconfirmed so the sync pushes it", async () => {
+    it("writes no mode when the server holds none", async () => {
       const state = await restoreAndReadState(null)
 
+      expect(getSelfCustodialAccountMode(state)).toBeNull()
       expect(getSelfCustodialServerAccountMode(state, TEST_ACCOUNT_ID)).toBeNull()
     })
 

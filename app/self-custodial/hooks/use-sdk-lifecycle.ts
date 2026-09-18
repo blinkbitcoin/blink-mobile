@@ -2,13 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -21,8 +21,10 @@ import {
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
+import { logPaymentSettled } from "../measurement"
 import {
   extractPaymentId,
+  extractSettledPayment,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
@@ -161,7 +163,7 @@ export const useSdkLifecycle = (
           if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
           if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline
           if (onlineState === OnlineState.Unknown) {
-            crashlytics().log(
+            logBreadcrumb(
               `[SparkSDK] connectivity check failed; preserving previous status`,
             )
             if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error
@@ -243,6 +245,21 @@ export const useSdkLifecycle = (
           const paymentId = extractPaymentId(event)
           if (paymentId) setLastReceivedPaymentId(paymentId)
         }
+
+        /**
+         * The sole emission point (AD-15). Both directions are counted from here rather
+         * than from the send and receive call sites (FR-10, FR-11): the SDK is the only
+         * place that observes settlement itself — a send returns before it is final, and
+         * receives arrive with no call site at all, over the Lightning Address, a plain
+         * BOLT11 invoice, or a direct Spark transfer. Nothing in the refresh path may emit;
+         * `refreshWallets` has three independent triggers and would count each settlement
+         * up to three times.
+         *
+         * The emitter is a no-op outside Enhanced mode, and the outbox keys on the SDK
+         * payment id, so a repeated callback costs nothing rather than a second count.
+         */
+        const settled = extractSettledPayment(event)
+        if (settled) logPaymentSettled(settled)
         await refreshWallets()
       })
       if (abortRef.current || !mounted) {

@@ -29,6 +29,14 @@ import { useSparkNetwork } from "./use-spark-network"
  * offline has to happen later anyway. What lands is recorded so the next launch stays
  * quiet, since each Enhanced push costs the server a paid country lookup.
  */
+/**
+ * Accounts the server answered "holds no mode" for, this session. The answer settles
+ * nothing (AD-25), so the account stays mode-less and the question would otherwise be
+ * asked again on every SDK reconnect. Once per launch is enough: another device setting
+ * a mode is a rare event, and the next launch asks again.
+ */
+const serverHeldNoModeThisSession = new Set<string>()
+
 export const useAccountModeSync = (): void => {
   const { accountMode } = useSelfCustodialAccountMode()
   const { persistentState, updateState } = usePersistentStateContext()
@@ -54,12 +62,16 @@ export const useAccountModeSync = (): void => {
     isSdkOnActiveAccount && Boolean(accountMode) && accountMode !== serverMode
   /** An account that has never held a mode, whatever the reason: created before the modes
    *  existed, or provisioned on another device. */
-  const isResolveDue = isSdkOnActiveAccount && !accountMode
+  const isResolveDue =
+    isSdkOnActiveAccount &&
+    !accountMode &&
+    !(activeAccountId && serverHeldNoModeThisSession.has(activeAccountId))
 
   useEffect(() => {
     if (!sdk || !isResolveDue || !activeAccountId) return
     recoverLnurlServerMode({ sdk, serverUrl: lnurlServerUrl })
       .then((recovered) => {
+        if (recovered === null) serverHeldNoModeThisSession.add(activeAccountId)
         updateState(
           (prev) =>
             prev && withSelfCustodialModeFromServer(prev, activeAccountId, recovered),
@@ -80,4 +92,8 @@ export const useAccountModeSync = (): void => {
       })
       .catch((err) => reportError("lnurl server mode sync", err))
   }, [sdk, isPushDue, activeAccountId, accountMode, lnurlServerUrl, updateState])
+}
+
+export const resetAccountModeSyncForTesting = (): void => {
+  serverHeldNoModeThisSession.clear()
 }

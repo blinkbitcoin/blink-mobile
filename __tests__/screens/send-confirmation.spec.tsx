@@ -1,7 +1,7 @@
 import React from "react"
 import { TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
@@ -788,9 +788,9 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       </ContextForScreen>,
     )
 
-    await flushEffects()
-
-    expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+    // The warning arrives after the fee quote's effect chain settles, which under a
+    // loaded worker can take more than the one tick `flushEffects` gives it.
+    expect(await screen.findByText(usdRemainderSweepMatcher)).toBeTruthy()
   })
 
   it("does NOT render the warning when there is no amountAdjustment in the fee quote", async () => {
@@ -1334,8 +1334,13 @@ describe("hide balance", () => {
     renderWithHideAmount(true)
     await flushEffects()
 
-    const { children } = await screen.findByLabelText("Successful Fee")
-    expect(children).toEqual(["₦0 ($0.00)"])
+    // The fee label renders before the display-currency dictionary has resolved and
+    // reads "Currency issue" until it does, so a one-tick flush is a race under load.
+    // Wait for the resolved text — that is what "readable" means here.
+    await waitFor(() => {
+      const { children } = screen.getByLabelText("Successful Fee")
+      expect(children).toEqual(["₦0 ($0.00)"])
+    })
   })
 
   it("shows the From balance when balances are visible", async () => {

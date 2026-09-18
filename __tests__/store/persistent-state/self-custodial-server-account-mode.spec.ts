@@ -8,7 +8,7 @@ import { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountMode } from "@app/types/account"
 
 const baseState: PersistentState = {
-  schemaVersion: 21,
+  schemaVersion: 22,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -94,14 +94,19 @@ describe("withSelfCustodialModeFromServer", () => {
     expect(getSelfCustodialServerAccountMode(next, "sc-1")).toBe(AccountMode.Anon)
   })
 
-  it("settles on Enhanced when the server reported no mode", () => {
+  /**
+   * AD-25. This used to settle on Enhanced, so that the sync would push it and the address
+   * would come alive — and everything downstream, the telemetry gate included, then read
+   * that default as a choice the user had made. A null answer now settles nothing.
+   */
+  it("settles nothing when the server reported no mode", () => {
     const next = withSelfCustodialModeFromServer(activeState, "sc-1", null)
 
-    expect(getSelfCustodialAccountMode(next)).toBe(AccountMode.Enhanced)
+    expect(getSelfCustodialAccountMode(next)).toBeNull()
+    expect(next).toBe(activeState)
   })
 
-  /** The server never said Enhanced, so it is still owed that push. */
-  it("leaves an assumed Enhanced unconfirmed", () => {
+  it("does not confirm a mode the server never gave", () => {
     const next = withSelfCustodialModeFromServer(activeState, "sc-1", null)
 
     expect(getSelfCustodialServerAccountMode(next, "sc-1")).toBeNull()

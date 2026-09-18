@@ -179,6 +179,9 @@ dependencies {
     ).sdkVersions
     implementation platform("com.google.firebase:firebase-bom:${rnfbSdkVersions.android.firebase}")
     implementation 'com.google.firebase:firebase-crashlytics'
+    // Same reason: MainApplication turns analytics collection off at process start, and
+    // RNFB keeps firebase-analytics off the app's compile classpath.
+    implementation 'com.google.firebase:firebase-analytics'
 
     testImplementation("junit:junit:4.13.2")
     testImplementation("androidx.test:core:1.6.0")

@@ -2,12 +2,12 @@ import React from "react"
 import { gql } from "@apollo/client"
 import { utils as lnurlUtils } from "lnurl-pay"
 import { PaymentType } from "@blinkbitcoin/blink-client"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { ContactType, useContactCreateMutation } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { findOrCreateContact as bridgeFindOrCreateContact } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 
 gql`
   mutation contactCreate($input: ContactCreateInput!) {
@@ -54,9 +54,9 @@ export const useSaveLnAddressContact = () => {
           await bridgeFindOrCreateContact(sdk, handle, handle)
           return { saved: true, handle }
         } catch (err) {
-          crashlytics().log(
-            `[self-custodial contacts] auto-save failed for ${handle}: ${err}`,
-          )
+          /** No handle in the breadcrumb: a counterparty's address next to a Crashlytics
+           *  installation id is a linkage, and the failure is diagnosable without it. */
+          logBreadcrumb(`[self-custodial contacts] auto-save failed: ${err}`)
           return { saved: false, handle }
         }
       }

@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Documentație API",
     "apiDashboard": "Acces API și panou de control",
     "mode": "Mod",
+    "modeNotSet": "Not set",
     "pos": "Punct de vânzare POS",
     "posCopied": "Link-ul punctului de vânzare a fost copiat",
     "activated": "Activat",

@@ -77,6 +77,18 @@ export const mismatchedNetworkLabel = (
 export const storageDirFor = (accountId: string, network: Network): string =>
   `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
 
+/**
+ * The telemetry outbox (AD-6): a **sibling** of the wallet store, never inside it.
+ * `storageDirFor` is the Breez wallet directory and its only existing pairing with
+ * `RNFS.unlink` is account deletion; the outbox's discard-on-mode-switch is an unlink of
+ * its own directory, so the two must not share a path.
+ */
+export const telemetryOutboxParentDirFor = (network: Network): string =>
+  `${DocumentDirectoryPath}/blink-telemetry-outbox-${networkLabelFor(network)}`
+
+export const telemetryOutboxDirFor = (accountId: string, network: Network): string =>
+  `${telemetryOutboxParentDirFor(network)}/${accountId}`
+
 // Validates BREEZ_API_KEY at SDK init (from `lifecycle.createSdkConfig`). A
 // missing key means the build is misconfigured (e.g. release minification
 // stripped the react-native-config BuildConfig values); failing loud here

@@ -3,7 +3,6 @@ import { Alert, FlatList, Pressable, View } from "react-native"
 import { RouteProp, useFocusEffect, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useDisplayCurrency } from "@app/hooks"
@@ -12,6 +11,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { logParseDestinationResult } from "@app/utils/analytics"
+import { recordAppError } from "@app/utils/error-reporting"
 import { testProps } from "@app/utils/testProps"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
@@ -103,7 +103,7 @@ export const MerchantSelectionScreen: React.FC<Props> = ({ route }) => {
           setSelectedMerchantId(null)
           if (!(err instanceof Error)) return
 
-          crashlytics().recordError(err)
+          recordAppError(err, { dedupKey: "merchant-selection-resolve" })
           Alert.alert(err.toString(), "", [{ text: LL.common.ok() }])
         } finally {
           if (isCurrentRequest()) {

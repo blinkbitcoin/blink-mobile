@@ -12,7 +12,7 @@ import {
   ChooseExperienceEntry,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
-import { AccountMode, ACCOUNT_MODE_NAMES } from "@app/types/account"
+import { ACCOUNT_MODE_NAMES } from "@app/types/account"
 import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
@@ -28,9 +28,13 @@ export const AccountModeSetting: React.FC = () => {
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   if (!isSelfCustodial) return null
 
-  /** An account that never chose behaves as Enhanced, so the row reads that default. */
-  const displayedMode = accountMode ?? AccountMode.Enhanced
-  const title = `${LL.SettingsScreen.mode()}: ${ACCOUNT_MODE_NAMES[displayedMode]}`
+  /** An account that never chose is not Enhanced: it holds no mode anywhere this device
+   *  can see, nothing is pushed for it, its Lightning Address stays dormant and it emits
+   *  no telemetry (AD-25). The row says so; it is the one path into choosing. */
+  const modeName = accountMode
+    ? ACCOUNT_MODE_NAMES[accountMode]
+    : LL.SettingsScreen.modeNotSet()
+  const title = `${LL.SettingsScreen.mode()}: ${modeName}`
   const openModeSelection = () =>
     navigation.navigate("selfCustodialChooseExperience", {
       entry: ChooseExperienceEntry.Settings,

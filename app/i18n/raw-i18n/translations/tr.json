@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API dokümantasyonu",
     "apiDashboard": "API erişimi ve kontrol paneli",
     "mode": "Mod",
+    "modeNotSet": "Not set",
     "pos": "Satış Noktası",
     "posCopied": "Satış noktası bağlantınız kopyalandı",
     "activated": "Aktive edildi",

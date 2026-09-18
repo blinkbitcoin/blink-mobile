@@ -2449,6 +2449,7 @@
         "apiDocumentation": "Documentación de la API",
         "apiDashboard": "Acceso a la API y panel de control",
         "mode": "Modo",
+        "modeNotSet": "Not set",
         "pos": "Punto de venta",
         "posCopied": "Su enlace de punto de venta ha sido copiado",
         "activated": "Activada",

@@ -99,3 +99,23 @@ afterAll(() => {
   jest.useRealTimers()
   clearLiveTimers()
 })
+
+// The privacy boundary's diagnostic gate (app/telemetry/transmissibility.ts) defaults to
+// unresolved: nothing reaches Crashlytics until the telemetry mode has positively resolved
+// as custodial or Enhanced. Production earns that default; a test that merely asserts
+// "this failure is recorded" should not have to know the boundary exists. So every test
+// file starts with the gate open, as a custodial device would have it after resolution.
+// The suites that exercise the gate itself — error-reporting, logging, the telemetry
+// boundary — close it explicitly in their own setup.
+import {
+  DiagnosticsModeInput,
+  setDiagnosticsModeInput,
+} from "./app/telemetry/transmissibility"
+
+setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+// And again before every test, so a test that closed the gate — by resolving a mode, or by
+// resetting the boundary — leaves the next one with the default rather than its leftovers.
+// Suites that manage the gate themselves do so in their own hooks, which run after this.
+beforeEach(() => {
+  setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+})
