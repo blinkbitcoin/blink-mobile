@@ -30,19 +30,9 @@ import {
   SIGNER_NOT_CONFIGURED_CODE,
 } from "./investment-agreement"
 import { resetToTransferStep } from "./transfer-invest-screen"
+import { LOST_CONNECTION_CODE, useGivenUpWaiting } from "./use-given-up-waiting"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
-
-/** Offline is a status of its own, not an error, so it carries no code. This is the one
- *  the library words as a lost connection, which is what the signer is looking at. */
-const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
-
-/**
- * How long a cold open waits for the price feed before it stops waiting and says so. A
- * spinner with no end and no button is a dead end; a feed that has not answered in this
- * long means the device is most likely offline, which is what the signer is then told.
- */
-const START_WAIT_TIMEOUT_MS = 15_000
 
 /** What the script below posts once the signing page has drawn something. */
 const PAGE_READY_MESSAGE = "blink-signing-page-ready"
@@ -255,24 +245,11 @@ export const SignInvestScreen: React.FC = () => {
   const isPriceQuoted = usdCentsPerBtc !== null
   const canStartSigning = isPriceQuoted && isAccountResolved
 
-  /**
-   * Whether that wait has gone on too long. While it is waiting a timer runs; once both
-   * are in, or the session has moved on, the flag drops so a later wait starts fresh.
-   * Trying again drops it too, which starts the timer over: the feed and the account
-   * answer on their own once the device is back, and the session then starts without
-   * another tap.
-   */
+  /** A cold open waits for the price and the account; once both are in, or the session
+   *  has moved on, the wait is over, and the session then starts without another tap. */
   const isWaitingToStart = status === "idle" && !canStartSigning
-  const [hasGivenUpWaiting, setHasGivenUpWaiting] = React.useState(false)
-  React.useEffect(() => {
-    if (!isWaitingToStart) {
-      setHasGivenUpWaiting(false)
-      return
-    }
-    if (hasGivenUpWaiting) return
-    const giveUp = setTimeout(() => setHasGivenUpWaiting(true), START_WAIT_TIMEOUT_MS)
-    return () => clearTimeout(giveUp)
-  }, [isWaitingToStart, hasGivenUpWaiting])
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingToStart)
 
   /**
    * Opens the document as the screen does, once the price is in. Idle is also where a
@@ -394,7 +371,7 @@ export const SignInvestScreen: React.FC = () => {
   if (status === "offline") {
     return centredOnScreen(
       failure(
-        getErrorMessage(OFFLINE_MESSAGE_CODE),
+        getErrorMessage(LOST_CONNECTION_CODE),
         <GaloyPrimaryButton
           title={LL.common.tryAgain()}
           loading={isCheckingConnection}
@@ -424,11 +401,8 @@ export const SignInvestScreen: React.FC = () => {
   if (isWaitingToStart && hasGivenUpWaiting) {
     return centredOnScreen(
       failure(
-        getErrorMessage(OFFLINE_MESSAGE_CODE),
-        <GaloyPrimaryButton
-          title={LL.common.tryAgain()}
-          onPress={() => setHasGivenUpWaiting(false)}
-        />,
+        getErrorMessage(LOST_CONNECTION_CODE),
+        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={waitAgain} />,
       ),
     )
   }
