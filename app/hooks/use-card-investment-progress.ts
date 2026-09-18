@@ -26,23 +26,30 @@ gql`
 `
 
 /**
- * The id the investment is filed under: the self-custodial account's own id, or the
- * custodial account's server id. Null while neither is known. The store's active-account
- * slot would not do, since every custodial profile on the device shares it.
+ * The account the investment belongs to: its server id, or null while it is not known.
+ * The store's active-account slot would not do, since every custodial profile on the
+ * device shares it.
+ *
+ * Custodial only. The investment is paid from the investor's own Blink balance, so a
+ * self-custodial account has no part in it: no id to file under, and so no record, no
+ * card on the home and no way through the flow.
  */
-const useCardInvestmentAccountId = (): string | null => {
+const useCardInvestmentAccount = (): {
+  accountId: string | null
+  isEligible: boolean
+} => {
   const { activeAccount } = useAccountRegistry()
   const isAuthed = useIsAuthed()
-  const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
+  const isEligible = activeAccount?.type !== AccountType.SelfCustodial
 
   /** Served from the cache the home already filled; only a fresh session fetches. */
   const { data } = useCardInvestmentAccountQuery({
-    skip: isSelfCustodial || !isAuthed,
+    skip: !isEligible || !isAuthed,
     fetchPolicy: "cache-first",
   })
 
-  if (isSelfCustodial) return activeAccount.id
-  return data?.me?.defaultAccount?.id ?? null
+  if (!isEligible) return { accountId: null, isEligible }
+  return { accountId: data?.me?.defaultAccount?.id ?? null, isEligible }
 }
 
 /** What the signing step knows when the agreement is signed. */
@@ -53,8 +60,12 @@ type CardInvestmentStart = Pick<
 
 type CardInvestmentProgressState = {
   progress: CardInvestmentProgress | null
+  /** Whether the active account can take part at all: the investment is paid from a
+   *  custodial balance, so a self-custodial account is sent back wherever it enters. */
+  isEligible: boolean
   /** Whether the account the record is filed under is known yet; until it is, nothing
-   *  can be recorded, so a step that must record should wait on this. */
+   *  can be recorded, so a step that must record should wait on this. Never, for an
+   *  account that cannot take part. */
   isAccountResolved: boolean
   /** Records the signed agreement, stamped with the moment; the home nags about its
    *  payment from here on. */
@@ -78,7 +89,7 @@ type CardInvestmentProgressState = {
  */
 export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   const { persistentState, updateState } = usePersistentStateContext()
-  const accountId = useCardInvestmentAccountId()
+  const { accountId, isEligible } = useCardInvestmentAccount()
   const progress = accountId
     ? getCardInvestment(persistentState, accountId, Date.now())
     : null
@@ -131,6 +142,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
 
   return {
     progress,
+    isEligible,
     isAccountResolved: accountId !== null,
     start,
     recordInvoice,

@@ -19,6 +19,7 @@ const mockDispatch = jest.fn()
 /** The record the home reads to steer the investor; its own spec covers the record, so
  *  what matters here is where this screen sends an investor the record says has moved on. */
 const mockIsAccountResolved = { current: true }
+const mockIsEligible = { current: true }
 const mockProgress: {
   current: { selectedAmountUsd: number; settlementSats?: number; paidAt?: number } | null
 } = { current: null }
@@ -26,6 +27,7 @@ const mockProgress: {
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
   useCardInvestmentProgress: () => ({
     progress: mockProgress.current,
+    isEligible: mockIsEligible.current,
     isAccountResolved: mockIsAccountResolved.current,
   }),
 }))
@@ -47,8 +49,30 @@ describe("WelcomeInvestScreen", () => {
   beforeEach(() => {
     loadLocale("en")
     mockIsAccountResolved.current = true
+    mockIsEligible.current = true
     mockProgress.current = null
     jest.clearAllMocks()
+  })
+
+  /** The investment is paid from a custodial balance; a self-custodial account that
+   *  arrives here by a link has no part in it, and the record is never written for it. */
+  it("sends a self-custodial account home without recording anything", async () => {
+    mockIsEligible.current = false
+    mockIsAccountResolved.current = false
+
+    render(
+      <ContextForScreen>
+        <WelcomeInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockDispatch).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "RESET",
+        payload: { index: 0, routes: [{ name: "Primary" }] },
+      }),
+    )
   })
 
   /** Every way into the flow lands here, and the screens beyond would let an investor

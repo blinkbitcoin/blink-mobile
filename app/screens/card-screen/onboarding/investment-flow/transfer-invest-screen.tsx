@@ -46,6 +46,12 @@ export const resetToTransferStep = (
     routes: [{ name: "Primary" }, { name: "cardOnboardingTransferInvestScreen", params }],
   })
 
+/** Out of the flow altogether, with nothing of it left to go back to. */
+export const RESET_TO_HOME = CommonActions.reset({
+  index: 0,
+  routes: [{ name: "Primary" }],
+})
+
 export const TransferInvestScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -66,9 +72,16 @@ export const TransferInvestScreen: React.FC = () => {
     terms.totalUsd,
   )
   const totalSats = useInvestmentSats(terms.totalUsd)
-  const { progress, recordInvoice } = useCardInvestmentProgress()
+  const { progress, recordInvoice, isEligible } = useCardInvestmentProgress()
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
   const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
+
+  /** This step can be reached by link, with an amount in it, and it would issue an
+   *  invoice for that amount with no agreement behind it. An account that cannot take
+   *  part in the investment is sent home before it can. */
+  React.useEffect(() => {
+    if (!isEligible) navigation.dispatch(RESET_TO_HOME)
+  }, [isEligible, navigation])
 
   /**
    * What the invoice is written for: the satoshis the agreement itself names, carried
