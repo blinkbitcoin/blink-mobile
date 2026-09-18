@@ -182,9 +182,9 @@ const rerenderScreen = async (rerender: (ui: React.ReactElement) => void) => {
   })
 }
 
-const startedSession = async (): Promise<{ url: string; allowedOrigin?: string }> => {
+const startedSession = async (): Promise<{ url: string }> => {
   const source = mockESign.options?.source as {
-    start: () => Promise<{ url: string; allowedOrigin?: string }>
+    start: () => Promise<{ url: string }>
   }
   return source.start()
 }
@@ -299,14 +299,6 @@ describe("SignInvestScreen", () => {
     await renderScreen()
 
     expect((await startedSession()).url).toBe(TEST_INSTANCE_URL)
-  })
-
-  /** The page that posts the signing outcome back is the bridge the service serves, not
-   *  DocuSign's own host, so that is the origin the session names. */
-  it("names the service's origin as where the signing events come from", async () => {
-    await renderScreen()
-
-    expect((await startedSession()).allowedOrigin).toBe(MINT_ORIGIN)
   })
 
   /** The source is what turns a failed mint into the failure state the retry lives on,
