@@ -153,7 +153,16 @@ export const SignInvestScreen: React.FC = () => {
     [navigation, selectedAmountUsd],
   )
 
-  const goBack = React.useCallback(() => navigation.goBack(), [navigation])
+  /**
+   * A signer who declines is sent back, and the session returns to idle as they go.
+   * Idle is also where the document is opened from, so without this mark the step would
+   * mint a fresh envelope, and could reopen the page, right after they said no.
+   */
+  const isLeaving = React.useRef(false)
+  const goBack = React.useCallback(() => {
+    isLeaving.current = true
+    navigation.goBack()
+  }, [navigation])
 
   /** Stays on the screen on purpose: the retry below is what a failed session needs, and
    *  navigating away would tear it down. Leaving is the close button's job. */
@@ -262,7 +271,7 @@ export const SignInvestScreen: React.FC = () => {
       return
     }
 
-    if (hasStartedFromIdle.current || !isPriceQuoted) return
+    if (hasStartedFromIdle.current || isLeaving.current || !isPriceQuoted) return
 
     hasStartedFromIdle.current = true
     sign()
