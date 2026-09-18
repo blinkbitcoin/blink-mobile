@@ -3,6 +3,11 @@ import { renderHook } from "@testing-library/react-native"
 import { useInvestmentInvoice } from "@app/screens/card-screen/onboarding/investment-flow/use-investment-invoice"
 
 const mockCreateInvoice = jest.fn()
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
@@ -82,6 +87,11 @@ describe("useInvestmentInvoice", () => {
     const { result } = renderHook(() => useInvestmentInvoice())
 
     expect(await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)).toBeNull()
+    /** The reason is the one thing that tells a wrong wallet id apart from an outage. */
+    expect(mockReportError).toHaveBeenCalledWith(
+      "investment-invoice",
+      new Error("recipient wallet not found"),
+    )
   })
 
   it("answers with nothing when the mutation returns no data at all", async () => {
@@ -90,6 +100,7 @@ describe("useInvestmentInvoice", () => {
     const { result } = renderHook(() => useInvestmentInvoice())
 
     expect(await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)).toBeNull()
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /**
@@ -104,5 +115,9 @@ describe("useInvestmentInvoice", () => {
     await expect(
       result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS),
     ).resolves.toBeNull()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "investment-invoice",
+      new Error("network request failed"),
+    )
   })
 })
