@@ -211,11 +211,9 @@ export const SignInvestScreen: React.FC = () => {
   const {
     status,
     error,
-    isSessionExpired,
     isCheckingConnection,
     sign,
     retry,
-    restart,
     checkConnection,
     webViewProps,
   } = useESignature({
@@ -269,10 +267,6 @@ export const SignInvestScreen: React.FC = () => {
     hasStartedFromIdle.current = true
     sign()
   }, [status, sign, isPriceQuoted])
-
-  /** An expired session keeps its envelope, so it is restarted rather than retried: a
-   *  retry would drop what the signer already filled in. */
-  const recoverFromFailure = isSessionExpired ? restart : retry
 
   /**
    * Whether the signing page has drawn its interface. Until it has, this step's own
@@ -385,7 +379,7 @@ export const SignInvestScreen: React.FC = () => {
     return centredOnScreen(
       failure(
         getErrorMessage(error?.code ?? "", error?.message),
-        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={recoverFromFailure} />,
+        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retry} />,
       ),
     )
   }
