@@ -22,9 +22,16 @@ jest.mock("@app/graphql/generated", () => ({
 
 const RECIPIENT_WALLET_ID = "wallet-invest"
 const SATOSHIS = 31_704_000
+/** The paying account, in the shape the server gives ids: a lowercase uuid. */
+const ACCOUNT_ID = "0f1e2d3c-4b5a-4968-8776-655443322110"
+const SUBSCRIBER = { accountId: ACCOUNT_ID, amountUsd: 25000 }
+/** What the ledger accepts as an external id, as its own validation states it. */
+const LEDGER_EXTERNAL_ID = /^[a-z0-9_-]{1,100}$/
+const MINTED_AT = 1_757_800_000_000
 
 describe("useInvestmentInvoice", () => {
   beforeEach(() => {
+    jest.restoreAllMocks()
     jest.clearAllMocks()
     mockCreateInvoice.mockResolvedValue({
       data: {
@@ -39,7 +46,11 @@ describe("useInvestmentInvoice", () => {
   it("asks the recipient's wallet for an invoice of the agreed amount", async () => {
     const { result } = renderHook(() => useInvestmentInvoice())
 
-    const minted = await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)
+    const minted = await result.current.requestInvoice(
+      RECIPIENT_WALLET_ID,
+      SATOSHIS,
+      SUBSCRIBER,
+    )
 
     expect(minted).toEqual({ paymentRequest: "lnbc-invoice" })
     expect(mockCreateInvoice).toHaveBeenCalledWith({
@@ -57,7 +68,7 @@ describe("useInvestmentInvoice", () => {
   it("gives the invoice an expiry", async () => {
     const { result } = renderHook(() => useInvestmentInvoice())
 
-    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)
+    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER)
 
     const { input } = mockCreateInvoice.mock.calls[0][0].variables
     expect(Number(input.expiresIn)).toBeGreaterThan(0)
@@ -69,10 +80,61 @@ describe("useInvestmentInvoice", () => {
   it("names the payment in English, whatever the app's locale", async () => {
     const { result } = renderHook(() => useInvestmentInvoice())
 
-    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)
+    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER)
 
     const { input } = mockCreateInvoice.mock.calls[0][0].variables
     expect(input.memo).toBe("Blink Private subscription")
+  })
+
+  /** The memo names no one, so the account and the amount are what tie the payment to
+   *  its subscriber in the receiving ledger; the id has to be one the ledger accepts. */
+  it("files the payment under the paying account and the amount signed for", async () => {
+    jest.spyOn(Date, "now").mockReturnValue(MINTED_AT)
+    const { result } = renderHook(() => useInvestmentInvoice())
+
+    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER)
+
+    const { input } = mockCreateInvoice.mock.calls[0][0].variables
+    expect(input.externalId).toBe(`investment_${ACCOUNT_ID}_25000_${MINTED_AT}`)
+    expect(input.externalId).toMatch(LEDGER_EXTERNAL_ID)
+  })
+
+  /** The ledger keeps the id unique per receiving account and never drops an unpaid
+   *  invoice, so an investor minting again for the same amount, once the first invoice
+   *  is too old to reuse, must not be refused as a duplicate. */
+  it("gives each mint for the same subscriber its own id", async () => {
+    jest
+      .spyOn(Date, "now")
+      .mockReturnValueOnce(MINTED_AT)
+      .mockReturnValueOnce(MINTED_AT + 1)
+    const { result } = renderHook(() => useInvestmentInvoice())
+
+    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER)
+    await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER)
+
+    const [first, second] = mockCreateInvoice.mock.calls.map(
+      ([call]) => call.variables.input.externalId,
+    )
+    expect(first).not.toBe(second)
+    expect(second).toMatch(LEDGER_EXTERNAL_ID)
+  })
+
+  /** A payment filed under nobody is what the id exists to prevent, so none is minted
+   *  without an account; the log says so, since the screen only shows a failed invoice. */
+  it("mints nothing while the paying account is unknown", async () => {
+    const { result } = renderHook(() => useInvestmentInvoice())
+
+    const minted = await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, {
+      ...SUBSCRIBER,
+      accountId: null,
+    })
+
+    expect(minted).toBeNull()
+    expect(mockCreateInvoice).not.toHaveBeenCalled()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "investment-invoice",
+      new Error("no account to file the investment payment under"),
+    )
   })
 
   /** The caller opens the send flow on what comes back, so answering with nothing has to
@@ -89,7 +151,9 @@ describe("useInvestmentInvoice", () => {
 
     const { result } = renderHook(() => useInvestmentInvoice())
 
-    expect(await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)).toBeNull()
+    expect(
+      await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER),
+    ).toBeNull()
     /** The reason is the one thing that tells a wrong wallet id apart from an outage. */
     expect(mockReportError).toHaveBeenCalledWith(
       "investment-invoice",
@@ -102,7 +166,9 @@ describe("useInvestmentInvoice", () => {
 
     const { result } = renderHook(() => useInvestmentInvoice())
 
-    expect(await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS)).toBeNull()
+    expect(
+      await result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER),
+    ).toBeNull()
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
@@ -116,7 +182,7 @@ describe("useInvestmentInvoice", () => {
     const { result } = renderHook(() => useInvestmentInvoice())
 
     await expect(
-      result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS),
+      result.current.requestInvoice(RECIPIENT_WALLET_ID, SATOSHIS, SUBSCRIBER),
     ).resolves.toBeNull()
     expect(mockReportError).toHaveBeenCalledWith(
       "investment-invoice",
