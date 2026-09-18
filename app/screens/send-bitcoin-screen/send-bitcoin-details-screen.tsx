@@ -31,6 +31,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { ErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -661,6 +662,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         onRetryLimits={undefined}
         onRetry={goToNextScreen || undefined}
         onChangeAmount={clearAmount}
+      />
+      {/* An amount the sender fixes right here gets the light refusal. Over the daily
+          limit opens the error sheet, which buzzes for itself. */}
+      <ErrorHaptic
+        error={lnurlBoundsErrorMessage || (isLowFunds ? "lowFunds" : undefined)}
+        kind="reject"
       />
       <ConfirmFeesModal
         action={() => {
