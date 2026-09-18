@@ -32,7 +32,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: false,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
   })
@@ -42,7 +47,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toEqual({ isGated: true, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: true,
+      isRegionPending: false,
+      isBlocked: true,
+      isVerdictPending: false,
+    })
     expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: "Primary" }] })
     expect(mockDispatch).toHaveBeenCalledWith(mockResetAction)
   })
@@ -52,7 +62,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: true })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: true,
+      isBlocked: false,
+      isVerdictPending: true,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -75,7 +90,12 @@ describe("useTransferBlockedGuard", () => {
     mockUseTransferGate.mockReturnValue(NOT_BLOCKED)
     rerender({})
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: false,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -107,7 +127,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: true,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -116,7 +141,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: false,
+      isVerdictPending: true,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })

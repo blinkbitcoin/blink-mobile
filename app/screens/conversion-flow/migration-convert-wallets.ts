@@ -8,19 +8,19 @@ type InitialConvertWallets = {
 }
 
 /**
- * The wallets the convert screen opens with. A migration conversion empties dollars into
- * bitcoin, so it opens USD to BTC; every other entry keeps the screen's usual BTC to USD
- * default. Undefined until both wallets are known, matching the convert hook's "no wallets
- * yet" state.
+ * The wallets the convert screen opens with. A drain empties dollars into bitcoin, and a
+ * restricted investor may only move that way, so those open USD to BTC; every other
+ * entry keeps the screen's usual BTC to USD default. Undefined until both wallets are
+ * known, matching the convert hook's "no wallets yet" state.
  */
 export const resolveInitialConvertWallets = (
   btcWallet: ConvertWalletFragment | undefined,
   usdWallet: ConvertWalletFragment | undefined,
-  isMigrationConversion: boolean,
+  isUsdToBtc: boolean,
 ): InitialConvertWallets | undefined => {
   if (!btcWallet || !usdWallet) return undefined
 
-  return isMigrationConversion
+  return isUsdToBtc
     ? { initialFromWallet: usdWallet, initialToWallet: btcWallet }
     : { initialFromWallet: btcWallet, initialToWallet: usdWallet }
 }
