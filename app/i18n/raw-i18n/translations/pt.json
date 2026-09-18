@@ -3778,7 +3778,8 @@
             "InsufficientBalance": {
                 "title": "Saldo insuficiente",
                 "paragraphs": {
-                    "body1": "Você só tem {bitcoinBalance: string} na sua conta Bitcoin.",
+                    "balanceBitcoin": "Você só tem {balance: string} na sua conta Bitcoin.",
+                    "balanceDollar": "Você só tem {balance: string} na sua conta Dólar.",
                     "body2": "Deposite mais de {shortfall: string} na sua conta para atingir o valor de investimento de {investmentAmount: string}.",
                     "body3": "Certifique-se de que o valor total esteja em uma das suas contas; Bitcoin ou Dólar."
                 },

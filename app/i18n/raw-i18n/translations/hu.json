@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Nem elegendő egyenleg",
         "paragraphs": {
-          "body1": "Csak {bitcoinBalance: string} van a Bitcoin-számládon.",
+          "balanceBitcoin": "Csak {balance: string} van a Bitcoin-számládon.",
+          "balanceDollar": "Csak {balance: string} van a Dollár-számládon.",
           "body2": "Utalj be több mint {shortfall: string} összeget a számládra, hogy elérd a {investmentAmount: string} befektetési összeget.",
           "body3": "Győződj meg róla, hogy a teljes összeg a számláid egyikén van; Bitcoin vagy dollár."
         },

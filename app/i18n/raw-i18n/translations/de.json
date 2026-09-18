@@ -3778,7 +3778,8 @@
             "InsufficientBalance": {
                 "title": "Unzureichendes Guthaben",
                 "paragraphs": {
-                    "body1": "Du hast nur {bitcoinBalance: string} auf deinem Bitcoin-Konto.",
+                    "balanceBitcoin": "Du hast nur {balance: string} auf deinem Bitcoin-Konto.",
+                    "balanceDollar": "Du hast nur {balance: string} auf deinem Dollar-Konto.",
                     "body2": "Zahle mehr als {shortfall: string} auf dein Konto ein, um den Investitionsbetrag von {investmentAmount: string} zu erreichen.",
                     "body3": "Stelle sicher, dass sich der gesamte Betrag auf einem deiner Konten befindet; Bitcoin oder Dollar."
                 },

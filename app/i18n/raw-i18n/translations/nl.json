@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Onvoldoende saldo",
         "paragraphs": {
-          "body1": "Je hebt maar {bitcoinBalance: string} op je Bitcoin-rekening.",
+          "balanceBitcoin": "Je hebt maar {balance: string} op je Bitcoin-rekening.",
+          "balanceDollar": "Je hebt maar {balance: string} op je dollar-rekening.",
           "body2": "Stort meer dan {shortfall: string} op je rekening om het investeringsbedrag van {investmentAmount: string} te bereiken.",
           "body3": "Zorg ervoor dat het volledige bedrag op een van je rekeningen staat; Bitcoin of dollar."
         },

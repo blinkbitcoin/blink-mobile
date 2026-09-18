@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Utilstrækkelig saldo",
         "paragraphs": {
-          "body1": "Du har kun {bitcoinBalance: string} på din Bitcoin-konto.",
+          "balanceBitcoin": "Du har kun {balance: string} på din Bitcoin-konto.",
+          "balanceDollar": "Du har kun {balance: string} på din dollar-konto.",
           "body2": "Indbetal mere end {shortfall: string} på din konto for at nå investeringsbeløbet på {investmentAmount: string}.",
           "body3": "Sørg for, at hele beløbet står på en af dine konti; Bitcoin eller Dollar."
         },

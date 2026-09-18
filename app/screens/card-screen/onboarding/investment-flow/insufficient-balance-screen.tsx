@@ -5,6 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { WalletCurrency } from "@app/graphql/generated"
 import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
@@ -34,9 +35,8 @@ export const InsufficientBalanceScreen: React.FC = () => {
     [selectedAmountUsd],
   )
 
-  const { balanceUsd, shortfallUsd, isSplitAcrossWallets } = useInvestmentFunding(
-    terms.totalUsd,
-  )
+  const { balanceUsd, balanceCurrency, shortfallUsd, isSplitAcrossWallets } =
+    useInvestmentFunding(terms.totalUsd)
 
   const handleDeposit = () => {
     navigation.navigate("receiveBitcoin")
@@ -47,6 +47,14 @@ export const InsufficientBalanceScreen: React.FC = () => {
   }
 
   const copy = LL.CardFlow.Onboarding.InsufficientBalance
+
+  /** The balance shown is the fullest wallet's, whichever that is, and the sentence
+   *  names that wallet: a dollar balance called a bitcoin one would be a lie. */
+  const balance = formatUsdAmount(balanceUsd)
+  const balanceSentence =
+    balanceCurrency === WalletCurrency.Btc
+      ? copy.paragraphs.balanceBitcoin({ balance })
+      : copy.paragraphs.balanceDollar({ balance })
 
   /**
    * Two ways of not being able to pay, and they need opposite answers.
@@ -68,7 +76,7 @@ export const InsufficientBalanceScreen: React.FC = () => {
     : {
         title: copy.title(),
         paragraphs: [
-          copy.paragraphs.body1({ bitcoinBalance: formatUsdAmount(balanceUsd) }),
+          balanceSentence,
           copy.paragraphs.body2({
             shortfall: formatUsdAmount(shortfallUsd),
             investmentAmount: formatUsdAmount(terms.totalUsd),

@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "Nedovoljno sredstava",
         "paragraphs": {
-          "body1": "Na svom Bitcoin računu imaš samo {bitcoinBalance: string}.",
+          "balanceBitcoin": "Na svom Bitcoin računu imaš samo {balance: string}.",
+          "balanceDollar": "Na svom dolarskom računu imaš samo {balance: string}.",
           "body2": "Uplati više od {shortfall: string} na svoj račun kako bi dosegnuo iznos ulaganja od {investmentAmount: string}.",
           "body3": "Provjeri da je cijeli iznos na jednom od tvojih računa; Bitcoin ili dolar."
         },

@@ -3730,7 +3730,8 @@
       "InsufficientBalance": {
         "title": "ยอดเงินไม่เพียงพอ",
         "paragraphs": {
-          "body1": "คุณมี {bitcoinBalance: string} ในบัญชี Bitcoin ของคุณเท่านั้น",
+          "balanceBitcoin": "คุณมี {balance: string} ในบัญชี Bitcoin ของคุณเท่านั้น",
+          "balanceDollar": "คุณมี {balance: string} ในบัญชีดอลลาร์ของคุณเท่านั้น",
           "body2": "ฝากเงินมากกว่า {shortfall: string} เข้าบัญชีของคุณเพื่อให้ถึงจำนวนเงินลงทุน {investmentAmount: string}",
           "body3": "ตรวจสอบให้แน่ใจว่ามีจำนวนเงินเต็มจำนวนอยู่ในบัญชีใดบัญชีหนึ่งของคุณ ไม่ว่าจะเป็น Bitcoin หรือ Dollar"
         },

@@ -12414,10 +12414,15 @@ type RootTranslation = {
 				title: string
 				paragraphs: {
 					/**
-					 * Y​o​u​ ​o​n​l​y​ ​h​a​v​e​ ​{​b​i​t​c​o​i​n​B​a​l​a​n​c​e​}​ ​i​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​.
-					 * @param {string} bitcoinBalance
+					 * Y​o​u​ ​o​n​l​y​ ​h​a​v​e​ ​{​b​a​l​a​n​c​e​}​ ​i​n​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​c​c​o​u​n​t​.
+					 * @param {string} balance
 					 */
-					body1: RequiredParams<'bitcoinBalance'>
+					balanceBitcoin: RequiredParams<'balance'>
+					/**
+					 * Y​o​u​ ​o​n​l​y​ ​h​a​v​e​ ​{​b​a​l​a​n​c​e​}​ ​i​n​ ​y​o​u​r​ ​D​o​l​l​a​r​ ​a​c​c​o​u​n​t​.
+					 * @param {string} balance
+					 */
+					balanceDollar: RequiredParams<'balance'>
 					/**
 					 * D​e​p​o​s​i​t​ ​m​o​r​e​ ​t​h​a​n​ ​{​s​h​o​r​t​f​a​l​l​}​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​t​o​ ​r​e​a​c​h​ ​t​h​e​ ​i​n​v​e​s​t​m​e​n​t​ ​a​m​o​u​n​t​ ​o​f​ ​{​i​n​v​e​s​t​m​e​n​t​A​m​o​u​n​t​}​.
 					 * @param {string} investmentAmount
@@ -26118,9 +26123,13 @@ export type TranslationFunctions = {
 				title: () => LocalizedString
 				paragraphs: {
 					/**
-					 * You only have {bitcoinBalance} in your Bitcoin account.
+					 * You only have {balance} in your Bitcoin account.
 					 */
-					body1: (arg: { bitcoinBalance: string }) => LocalizedString
+					balanceBitcoin: (arg: { balance: string }) => LocalizedString
+					/**
+					 * You only have {balance} in your Dollar account.
+					 */
+					balanceDollar: (arg: { balance: string }) => LocalizedString
 					/**
 					 * Deposit more than {shortfall} to your account to reach the investment amount of {investmentAmount}.
 					 */
