@@ -1,5 +1,5 @@
 import React from "react"
-import { Text } from "react-native"
+import { StyleSheet, Text } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { IconHero } from "@app/components/icon-hero"
@@ -55,6 +55,32 @@ describe("IconHero", () => {
     const title = getByText("deepbassoon958@walletofsatoshi.com")
     expect(title.props.numberOfLines).toBe(1)
     expect(title.props.ellipsizeMode).toBe("middle")
+  })
+
+  /** A long title used to clip at the icon's width: the text block stretches to the
+   *  container and the title fills it, so the title wraps on the screen's margin. */
+  it("gives the title the full width of the container", async () => {
+    const { getByText } = render(
+      <ContextForScreen>
+        <IconHero icon="btc-outline" iconColor="#000" title="Test Title" />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+    const title = getByText("Test Title")
+
+    expect(StyleSheet.flatten(title.props.style)).toMatchObject({
+      width: "100%",
+      textAlign: "center",
+    })
+    /** The themed Text wraps the host one, so the block holding the title is the first
+     *  stretched ancestor within the hero itself, a few levels up at most. */
+    const HERO_DEPTH = 4
+    let block = title.parent
+    for (let depth = 0; depth < HERO_DEPTH && block; depth += 1) {
+      if (StyleSheet.flatten(block.props.style)?.alignSelf === "stretch") break
+      block = block.parent
+    }
+    expect(StyleSheet.flatten(block?.props.style)).toMatchObject({ alignSelf: "stretch" })
   })
 
   it("renders subtitle when provided", async () => {
