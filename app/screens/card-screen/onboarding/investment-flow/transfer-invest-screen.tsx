@@ -68,11 +68,15 @@ export const TransferInvestScreen: React.FC = () => {
   )
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
+  const { progress, recordInvoice, isEligible } = useCardInvestmentProgress()
+  /** The satoshis the agreement names, from the route or the signed record: the debt
+   *  the balance is measured against, and the figure the invoice is written for. */
+  const signedSats = settlementSats ?? progress?.settlementSats
   const { hasEnoughBalance, balanceWalletId, isLoading } = useInvestmentFunding(
     terms.totalUsd,
+    signedSats,
   )
   const totalSats = useInvestmentSats(terms.totalUsd)
-  const { progress, recordInvoice, isEligible } = useCardInvestmentProgress()
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
   const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
 
@@ -93,7 +97,7 @@ export const TransferInvestScreen: React.FC = () => {
    * rose, more if it fell. The conversion only stands in when no figure exists anywhere,
    * so the investor is still billed rather than sent on with nothing.
    */
-  const owedSats = settlementSats ?? progress?.settlementSats ?? totalSats
+  const owedSats = signedSats ?? totalSats
 
   /**
    * Where the money goes, or the shortfall screen when there is not enough to send.
