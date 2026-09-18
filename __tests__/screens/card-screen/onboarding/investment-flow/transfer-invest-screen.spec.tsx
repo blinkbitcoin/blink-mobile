@@ -104,10 +104,15 @@ const mockFunding: { current: MockFunding } = {
   },
 }
 
+const mockUseInvestmentFunding = jest.fn(
+  (_totalUsd: number, _settlementSats?: number) => mockFunding.current,
+)
+
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding",
   () => ({
-    useInvestmentFunding: () => mockFunding.current,
+    useInvestmentFunding: (totalUsd: number, settlementSats?: number) =>
+      mockUseInvestmentFunding(totalUsd, settlementSats),
     useInvestmentSats: () => mockFunding.current.totalSats,
   }),
 )
@@ -573,6 +578,41 @@ describe("TransferInvestScreen", () => {
     })
 
     expect(mockArmCardInvestmentPayment).not.toHaveBeenCalled()
+  })
+
+  /** Once signed, the debt is the satoshis the agreement names; the balance is measured
+   *  against those, at today's price, rather than against the dollars chosen. */
+  it("measures the balance against the satoshis the agreement names", async () => {
+    mockRouteParams.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: 12_682_228,
+    }
+
+    render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(SELECTED_AMOUNT_USD, 12_682_228)
+  })
+
+  it("measures against the recorded satoshis when the route carries none", async () => {
+    mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+    mockCardInvestmentProgress.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: 12_682_228,
+    }
+
+    render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(SELECTED_AMOUNT_USD, 12_682_228)
   })
 
   /** The route lost the figure (a return from the home, or from a conversion), but the
