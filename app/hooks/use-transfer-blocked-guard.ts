@@ -17,6 +17,12 @@ export type TransferBlockedGuard = {
   /** The verdict has not landed yet. Kept apart from the block because the two owe the
    *  user different things: a block owes them nothing, a wait owes them a loader. */
   isRegionPending: boolean
+  /** The gate's own answer, region or Anon, whatever `enabled` says: for a caller that
+   *  lets a blocked user through the way a drain is let through, dollars to bitcoin
+   *  only, and so has to know the answer, and whether it has landed, even with the
+   *  bounce switched off. */
+  isBlocked: boolean
+  isVerdictPending: boolean
 }
 
 export const useTransferBlockedGuard = ({
@@ -35,5 +41,7 @@ export const useTransferBlockedGuard = ({
   return {
     isGated: shouldLeaveScreen,
     isRegionPending: enabled && isRegionPending,
+    isBlocked: isGated,
+    isVerdictPending: isRegionPending,
   }
 }
