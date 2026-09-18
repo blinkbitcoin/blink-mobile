@@ -40,19 +40,21 @@ describe("deep-linkable routes", () => {
   })
 
   /**
-   * A published path is a promise: the notification service emits these strings, and a
+   * A published path is a promise: the notification service emits this string, and a
    * rename lands as a dead link in the phone of anyone holding an older notification.
-   * They are also siblings of the rest of the card onboarding, and hang under it.
+   * It is also a sibling of the rest of the card onboarding, and hangs under it.
    */
-  it("keeps the investment paths under the card onboarding tree", () => {
+  it("keeps the investment entry under the card onboarding tree", () => {
     expect(DEEP_LINK_SCREENS.cardOnboardingWelcomeInvestScreen).toBe(
       "card/onboarding/investment",
     )
-    expect(DEEP_LINK_SCREENS.cardOnboardingTransferInvestScreen).toBe(
-      "card/onboarding/investment/transfer",
-    )
-    expect(DEEP_LINK_SCREENS.cardOnboardingDepositPendingScreen).toBe(
-      "card/onboarding/investment/deposit-pending",
-    )
+  })
+
+  /** The flow is entered at its first screen only. Its later steps take figures the
+   *  signing produced and are reached from it, or from the home once signed; a link
+   *  landing on one would open it with nothing to show, or with a sum nobody agreed to. */
+  it("links to no step of the investment flow past its entry", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingTransferInvestScreen")
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingDepositPendingScreen")
   })
 })
