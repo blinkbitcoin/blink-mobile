@@ -79,8 +79,17 @@ export const useInvestmentInvoice = (): {
 
         const paymentRequest =
           data?.lnInvoiceCreateOnBehalfOfRecipient.invoice?.paymentRequest
+        if (paymentRequest) return { paymentRequest }
 
-        return paymentRequest ? { paymentRequest } : null
+        /** The API's own reason, when it gave one, is the one thing that tells a wrong
+         *  wallet id apart from an outage, and the investor's screen cannot show it; the
+         *  log is where it goes so a misconfiguration is seen rather than guessed. */
+        const apiErrors = data?.lnInvoiceCreateOnBehalfOfRecipient.errors ?? []
+        if (apiErrors.length > 0) {
+          const reasons = apiErrors.map(({ message }) => message)
+          reportError("investment-invoice", new Error(reasons.join("; ")))
+        }
+        return null
       } catch (error) {
         /** A mutation that never reached the API rejects rather than answering, and an
          *  unhandled rejection here would leave the step silent: no invoice, no message,
