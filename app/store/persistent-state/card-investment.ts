@@ -21,12 +21,19 @@ const isSound = (progress: CardInvestmentProgress): boolean =>
   progress.selectedAmountUsd > 0 &&
   Number.isFinite(progress.signedAt)
 
-/** The last thing that happened to the record, which its life is counted from. */
+/** The last thing that happened to the record, which its life is counted from: the
+ *  signature, the invoice issued to pay it, or the payment. The invoice counts because
+ *  one issued near the end of the day is paid after it, and a record that had lapsed
+ *  by then would leave that payment with nothing to be recorded on. */
 const latestMomentOf = (progress: CardInvestmentProgress): number =>
-  progress.paidAt ?? progress.signedAt
+  Math.max(progress.signedAt, progress.invoice?.issuedAt ?? 0, progress.paidAt ?? 0)
 
-const isCurrent = (progress: CardInvestmentProgress, now: number): boolean =>
-  now - latestMomentOf(progress) < CARD_INVESTMENT_LIFETIME_MS
+/** Exported for the one step that acts on a record it read some renders ago: a tap
+ *  after the record's day is out must not mint on it. */
+export const isCardInvestmentCurrent = (
+  progress: CardInvestmentProgress,
+  now: number,
+): boolean => now - latestMomentOf(progress) < CARD_INVESTMENT_LIFETIME_MS
 
 /**
  * The card investment one account signed for and has not closed out, or null when there
@@ -43,7 +50,9 @@ export const getCardInvestment = (
   now: number,
 ): CardInvestmentProgress | null => {
   const progress = state.cardInvestmentByAccountId?.[accountId]
-  return progress && isSound(progress) && isCurrent(progress, now) ? progress : null
+  return progress && isSound(progress) && isCardInvestmentCurrent(progress, now)
+    ? progress
+    : null
 }
 
 export const withCardInvestment = (
