@@ -32,7 +32,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
 
     const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isRestricted: false,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockReset).not.toHaveBeenCalled()
   })
@@ -42,7 +47,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
 
     const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
-    expect(result.current).toEqual({ isGated: true, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: true,
+      isRegionPending: false,
+      isRestricted: true,
+      isVerdictPending: false,
+    })
     expect(mockReset).toHaveBeenCalledWith({
       index: 0,
       routes: [{ name: "Primary" }],
@@ -57,7 +67,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
 
     const { result } = renderHook(() => useDollarBalanceRestrictionGuard())
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: true })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: true,
+      isRestricted: false,
+      isVerdictPending: true,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -80,7 +95,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
     mockUseDollarBalanceGate.mockReturnValue(UNRESTRICTED)
     rerender({})
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isRestricted: false,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -114,7 +134,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
       useDollarBalanceRestrictionGuard({ enabled: false }),
     )
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isRestricted: true,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -125,7 +150,12 @@ describe("useDollarBalanceRestrictionGuard", () => {
       useDollarBalanceRestrictionGuard({ enabled: false }),
     )
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isRestricted: false,
+      isVerdictPending: true,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })
