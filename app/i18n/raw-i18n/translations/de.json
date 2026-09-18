@@ -3743,7 +3743,7 @@
                 "buttonText": "Weiter"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "Wie viel möchtest du investieren?",
+                "title": "Wie viel möchtest du investieren?",
                 "percent": "für ~{percent: number}%"
             },
             "CompanyValuation": {
@@ -3774,6 +3774,9 @@
                 },
                 "buttonText": "Weiter",
                 "paymentsUnavailable": "Zahlungen für die Investition sind noch nicht möglich. Bitte versuche es später noch einmal."
+            },
+            "SignInvest": {
+                "signerNotConfigured": "Unterzeichner noch nicht eingerichtet. Starte die App neu und versuche es erneut."
             },
             "InsufficientBalance": {
                 "title": "Unzureichendes Guthaben",

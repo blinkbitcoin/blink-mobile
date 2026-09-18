@@ -3695,7 +3695,7 @@
         "buttonText": "Weyongere"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ssente mmeka z'oyagala okuteekawo?",
+        "title": "Ssente mmeka z'oyagala okuteekawo?",
         "percent": "ku ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Ku muwendo gwa $10M nga temunnaba kufuna ssente",
           "units": "Ofuna ebitundu {units: string} ~{percent: number}% ebya Blink"
         },
-        "buttonText": "Weyongere Okusayina"
+        "buttonText": "Weyongere okusayina"
       },
       "TransferInvest": {
         "title": "Sindika ebintu byo",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Weyongere",
         "paymentsUnavailable": "Okusasula kw'okuteekawo tekunnaggulwawo. Ddamu ogezeeko oluvannyuma."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Omukozi tannateekebwateekebwa. Ddamu otandike app era ogezeeko nate."
       },
       "InsufficientBalance": {
         "title": "Ssente tezimala",

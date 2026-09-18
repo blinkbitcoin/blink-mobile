@@ -49,8 +49,8 @@ describe("useInvestmentFunding", () => {
 
   /**
    * A payment draws on one wallet, so what the fullest one holds is what decides whether
-   * the investment can go through. Adding the two together said yes to an investor the
-   * send flow then turned away.
+   * the investment can go through; adding the two together says yes to an investor the
+   * send flow would turn away.
    */
   it("measures the investment against the fullest wallet, not the two added up", () => {
     mockActiveWallet.current = {

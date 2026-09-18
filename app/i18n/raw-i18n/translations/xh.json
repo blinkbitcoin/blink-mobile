@@ -3695,7 +3695,7 @@
         "buttonText": "Qhubeka"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ungathanda ukutyala malini?",
+        "title": "Ungathanda ukutyala malini?",
         "percent": "nge-~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Ngoxabiso lwangaphambi kwemali lwe-$10M",
           "units": "Ufumana iiyunithi ezili-{units: string} ~{percent: number}% yeBlink"
         },
-        "buttonText": "Qhubeka ukuya kuSayina"
+        "buttonText": "Qhubeka ukuya kusayina"
       },
       "TransferInvest": {
         "title": "Dlulisela utyalo-mali lwakho",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Qhubeka",
         "paymentsUnavailable": "Iintlawulo zotyalo-mali azikavulwa okwangoku. Nceda uzame kwakhona kamva."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Umtyikityi akakalungiselelwa. Qalisa i-app kwakhona uze uzame kwakhona."
       },
       "InsufficientBalance": {
         "title": "Ibhalansi ayonelanga",

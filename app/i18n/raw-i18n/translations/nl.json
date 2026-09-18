@@ -3695,7 +3695,7 @@
         "buttonText": "Doorgaan"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hoeveel wil je investeren?",
+        "title": "Hoeveel wil je investeren?",
         "percent": "voor ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3712,11 +3712,11 @@
         "title": "Termsheet",
         "equitySection": {
           "title": "Aandeel in Blink",
-          "investment": "{amount: string} Investering",
+          "investment": "{amount: string} investering",
           "valuation": "Bij $10M pre-money waardering",
           "units": "Je ontvangt {units: string} eenheden ~{percent: number}% van Blink"
         },
-        "buttonText": "Ga naar Ondertekening"
+        "buttonText": "Ga naar ondertekening"
       },
       "TransferInvest": {
         "title": "Draag je investering over",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Doorgaan",
         "paymentsUnavailable": "Betalingen voor de investering zijn nog niet open. Probeer het later opnieuw."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Ondertekenaar nog niet ingesteld. Start de app opnieuw en probeer het nog eens."
       },
       "InsufficientBalance": {
         "title": "Onvoldoende saldo",

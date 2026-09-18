@@ -15,8 +15,8 @@ jest.mock("react-native-linear-gradient", () => ({
 
 const mockNavigate = jest.fn()
 
-/** Deliberately not the $10,000 the copy used to hardcode: an amount the screen ignores
- *  would still read correctly against that one. */
+/** An amount the screen could not get right by accident: the figures below only match it
+ *  when they are derived from the route. */
 const SELECTED_AMOUNT_USD = 25000
 
 const mockRouteParams: {
@@ -196,8 +196,8 @@ describe("TransferInvestScreen", () => {
     })
   })
 
-  /** The screen used to route here whatever the balance was, so an investor holding the
-   *  full amount was told they were short. */
+  /** An investor holding the full amount is not short, so the shortfall screen is not
+   *  where they go. */
   it("opens the send flow when the investment is covered", async () => {
     mockFunding.current = {
       balanceUsd: SELECTED_AMOUNT_USD,

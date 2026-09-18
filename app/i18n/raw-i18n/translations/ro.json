@@ -3695,7 +3695,7 @@
         "buttonText": "Continuă"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Cât ai dori să investești?",
+        "title": "Cât ai dori să investești?",
         "percent": "pentru ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "La o evaluare pre-money de $10M",
           "units": "Primești {units: string} de unități ~{percent: number}% din Blink"
         },
-        "buttonText": "Continuă la Semnătură"
+        "buttonText": "Continuă la semnătură"
       },
       "TransferInvest": {
         "title": "Transferă-ți investiția",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Continuă",
         "paymentsUnavailable": "Plățile pentru investiție nu sunt încă deschise. Te rugăm să încerci din nou mai târziu."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Semnatarul nu este configurat încă. Repornește aplicația și încearcă din nou."
       },
       "InsufficientBalance": {
         "title": "Sold insuficient",

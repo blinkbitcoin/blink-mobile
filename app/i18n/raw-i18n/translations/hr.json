@@ -3695,7 +3695,7 @@
         "buttonText": "Nastavi"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Koliko biste željeli uložiti?",
+        "title": "Koliko biste željeli uložiti?",
         "percent": "za ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Uz pre-money procjenu od $10M",
           "units": "Primate {units: string} jedinica ~{percent: number}% Blinka"
         },
-        "buttonText": "Nastavi na Potpis"
+        "buttonText": "Nastavi na potpis"
       },
       "TransferInvest": {
         "title": "Prenesite svoje ulaganje",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Nastavi",
         "paymentsUnavailable": "Uplate za ulaganje još nisu otvorene. Pokušaj ponovno kasnije."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Potpisnik još nije postavljen. Ponovno pokrenite aplikaciju i pokušajte ponovno."
       },
       "InsufficientBalance": {
         "title": "Nedovoljno sredstava",

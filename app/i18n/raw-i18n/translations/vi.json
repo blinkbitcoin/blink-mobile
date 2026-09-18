@@ -3695,7 +3695,7 @@
         "buttonText": "Tiếp tục"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Bạn muốn đầu tư bao nhiêu?",
+        "title": "Bạn muốn đầu tư bao nhiêu?",
         "percent": "cho ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Ở định giá trước vốn $10M",
           "units": "Bạn nhận được {units: string} đơn vị ~{percent: number}% của Blink"
         },
-        "buttonText": "Tiến hành Ký"
+        "buttonText": "Tiến hành ký"
       },
       "TransferInvest": {
         "title": "Chuyển khoản đầu tư của bạn",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Tiếp tục",
         "paymentsUnavailable": "Thanh toán đầu tư chưa mở. Vui lòng thử lại sau."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Người ký chưa được thiết lập. Hãy khởi động lại ứng dụng và thử lại."
       },
       "InsufficientBalance": {
         "title": "Số dư không đủ",

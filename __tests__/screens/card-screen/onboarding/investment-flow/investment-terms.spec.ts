@@ -1,11 +1,12 @@
 import {
+  INVESTMENT_OPTIONS,
   formatUnitCount,
   formatUsdAmount,
   resolveEquityPercent,
   resolveInvestmentFunding,
   resolveInvestmentTerms,
+  resolveSettlementQuote,
 } from "@app/screens/card-screen/onboarding/investment-flow/investment-terms"
-import { MOCK_CREDIT_LIMIT_VALUES } from "@app/screens/card-screen/onboarding/onboarding-mock-data"
 
 describe("resolveInvestmentTerms", () => {
   it("keeps the chosen amount as the total", () => {
@@ -22,6 +23,45 @@ describe("resolveInvestmentTerms", () => {
   it("prices every investment against the same company valuation", () => {
     expect(resolveInvestmentTerms(1000).preMoneyValuationUsd).toBe(10_000_000)
     expect(resolveInvestmentTerms(100000).preMoneyValuationUsd).toBe(10_000_000)
+  })
+
+  describe("the settlement quote", () => {
+    /** 2026-09-07 15:09 UTC, which Honduras reads six hours earlier. */
+    const AT = new Date("2026-09-07T15:09:30.000Z")
+    const quote = { btcUsdRate: 100000, at: AT }
+
+    it("converts the total at the quoted rate", () => {
+      expect(resolveInvestmentTerms(25000, quote).settlementBtc).toBe(0.25)
+    })
+
+    /** The signer commits to a figure that has to be payable to the satoshi, not to
+     *  whatever a float happens to print. */
+    it("quotes the settlement to the satoshi", () => {
+      expect(
+        resolveInvestmentTerms(1000, { ...quote, btcUsdRate: 63333 }).settlementBtc,
+      ).toBe(0.01578956)
+    })
+
+    it("carries the rate it quoted against", () => {
+      expect(resolveInvestmentTerms(25000, quote).btcUsdRate).toBe(100000)
+    })
+
+    /** The document names the zone, and Honduras holds UTC-6 all year. */
+    it("stamps the rate in Honduras time", () => {
+      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toBe("2026-09-07 09:09")
+    })
+
+    /**
+     * The agreement fixes a rate its payment is then owed at, so an invented one would be
+     * worse than none: without a price the three BTC figures are simply absent.
+     */
+    it("leaves the btc figures out when there is no price", () => {
+      const terms = resolveInvestmentTerms(25000, null)
+
+      expect(terms.settlementBtc).toBeUndefined()
+      expect(terms.btcUsdRate).toBeUndefined()
+      expect(terms.rateTimestamp).toBeUndefined()
+    })
   })
 })
 
@@ -42,11 +82,9 @@ describe("resolveEquityPercent", () => {
       [100000, 1],
     ])
 
-    expect(MOCK_CREDIT_LIMIT_VALUES).toEqual([...advertised.keys()])
-    MOCK_CREDIT_LIMIT_VALUES.forEach((value) => {
-      expect(resolveEquityPercent(resolveInvestmentTerms(value))).toBe(
-        advertised.get(value),
-      )
+    expect(INVESTMENT_OPTIONS).toEqual([...advertised.keys()])
+    INVESTMENT_OPTIONS.forEach((usd) => {
+      expect(resolveEquityPercent(resolveInvestmentTerms(usd))).toBe(advertised.get(usd))
     })
   })
 })
@@ -62,6 +100,38 @@ describe("resolveInvestmentFunding at the split boundary", () => {
         totalUsd: 5000,
       }).isSplitAcrossWallets,
     ).toBe(true)
+  })
+})
+
+describe("resolveSettlementQuote", () => {
+  const AT = new Date("2026-09-07T15:09:30.000Z")
+
+  /** The app prices in cents; the agreement is written in dollars. */
+  it("reads the dollar rate off the price in cents", () => {
+    expect(resolveSettlementQuote(10_000_000, AT)).toEqual({
+      btcUsdRate: 100000,
+      at: AT,
+    })
+  })
+
+  /** The rate the document states has to be the one the feed gave, cents included; a
+   *  price per satoshi to eight decimals would have held whole dollars only. */
+  it("keeps the cents of the rate", () => {
+    expect(resolveSettlementQuote(6_712_345, AT)?.btcUsdRate).toBe(67123.45)
+  })
+
+  it("has nothing to quote before the price feed answers", () => {
+    expect(resolveSettlementQuote(null, AT)).toBeNull()
+  })
+
+  /** A zero would divide the settlement by zero, and a NaN would reach the document as
+   *  the string "NaN": neither may be quoted. */
+  it("refuses a zero price", () => {
+    expect(resolveSettlementQuote(0, AT)).toBeNull()
+  })
+
+  it("refuses a price that is not a number", () => {
+    expect(resolveSettlementQuote(Number.NaN, AT)).toBeNull()
   })
 })
 
@@ -135,9 +205,8 @@ describe("resolveInvestmentFunding", () => {
   })
 
   /**
-   * Seen on device: an investor holding $370 in dollars and $154 in bitcoin was told the
-   * investment was covered and then turned away by the send flow, which spends from one
-   * wallet. What one wallet holds is what decides it.
+   * An investor holding $370 in dollars and $154 in bitcoin does not hold $500 in any
+   * wallet, and the send flow spends from one. What one wallet holds is what decides it.
    */
   it("does not count two wallets added together as covered", () => {
     const funding = resolveInvestmentFunding({

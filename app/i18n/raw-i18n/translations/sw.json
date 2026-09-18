@@ -3695,7 +3695,7 @@
         "buttonText": "Endelea"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ungependa kuwekeza kiasi gani?",
+        "title": "Ungependa kuwekeza kiasi gani?",
         "percent": "kwa ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Kwa thamani ya awali ya $10M",
           "units": "Unapokea vitengo {units: string} ~{percent: number}% vya Blink"
         },
-        "buttonText": "Endelea kwa Kusaini"
+        "buttonText": "Endelea kwa kusaini"
       },
       "TransferInvest": {
         "title": "Hamisha uwekezaji wako",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Endelea",
         "paymentsUnavailable": "Malipo ya uwekezaji bado hayajafunguliwa. Tafadhali jaribu tena baadaye."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Mtia saini bado hajawekwa. Anzisha upya programu na ujaribu tena."
       },
       "InsufficientBalance": {
         "title": "Salio halitoshi",

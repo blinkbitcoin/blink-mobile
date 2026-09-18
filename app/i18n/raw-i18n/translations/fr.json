@@ -3743,7 +3743,7 @@
                 "buttonText": "Continuer"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "Combien aimeriez-vous investir ?",
+                "title": "Combien aimeriez-vous investir ?",
                 "percent": "pour ~{percent: number}%"
             },
             "CompanyValuation": {
@@ -3764,7 +3764,7 @@
                     "valuation": "À une valorisation pré-money de 10M $",
                     "units": "Vous recevez {units: string} unités ~{percent: number}% de Blink"
                 },
-                "buttonText": "Procéder à la Signature"
+                "buttonText": "Procéder à la signature"
             },
             "TransferInvest": {
                 "title": "Transférez votre investissement",
@@ -3774,6 +3774,9 @@
                 },
                 "buttonText": "Continuer",
                 "paymentsUnavailable": "Les paiements de l'investissement ne sont pas encore ouverts. Réessaie plus tard."
+            },
+            "SignInvest": {
+                "signerNotConfigured": "Signataire pas encore configuré. Redémarrez l'application et réessayez."
             },
             "InsufficientBalance": {
                 "title": "Solde insuffisant",

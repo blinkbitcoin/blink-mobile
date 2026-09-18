@@ -3867,7 +3867,7 @@ const en: BaseTranslation = {
         buttonText: "Continue",
       },
       SelectInvest: {
-        desiredCreditLimit: "How much would you like to invest?",
+        title: "How much would you like to invest?",
         percent: "for ~{percent: number}%",
       },
       CompanyValuation: {
@@ -3884,11 +3884,11 @@ const en: BaseTranslation = {
         title: "Term Sheet",
         equitySection: {
           title: "Equity in Blink",
-          investment: "{amount: string} Investment",
+          investment: "{amount: string} investment",
           valuation: "At $10M pre-money valuation",
           units: "You receive {units: string} units ~{percent: number}% of Blink",
         },
-        buttonText: "Proceed to Sign",
+        buttonText: "Proceed to sign",
       },
       TransferInvest: {
         title: "Transfer your investment",
@@ -3898,6 +3898,9 @@ const en: BaseTranslation = {
         },
         buttonText: "Continue",
         paymentsUnavailable: "Investment payments are not open yet. Please try again later.",
+      },
+      SignInvest: {
+        signerNotConfigured: "Signer not set up yet. Restart the app and try again.",
       },
       InsufficientBalance: {
         title: "Insufficient balance",

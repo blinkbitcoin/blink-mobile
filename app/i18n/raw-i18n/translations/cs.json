@@ -3695,7 +3695,7 @@
         "buttonText": "Pokračovat"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Kolik byste chtěli investovat?",
+        "title": "Kolik byste chtěli investovat?",
         "percent": "za ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Při pre-money ocenění $10M",
           "units": "Obdržíte {units: string} jednotek ~{percent: number}% Blink"
         },
-        "buttonText": "Přejít k Podpisu"
+        "buttonText": "Přejít k podpisu"
       },
       "TransferInvest": {
         "title": "Převeďte svou investici",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Pokračovat",
         "paymentsUnavailable": "Platby za investici zatím nejsou otevřené. Zkus to prosím později."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Podepisující osoba ještě není nastavena. Restartujte aplikaci a zkuste to znovu."
       },
       "InsufficientBalance": {
         "title": "Nedostatečný zůstatek",

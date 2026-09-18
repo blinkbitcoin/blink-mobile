@@ -1,3 +1,6 @@
+import { formatUnixTimestampYMDHM } from "@app/utils/date"
+import { toMajorUnit } from "@app/utils/helper"
+
 /**
  * The economics of one investment, derived from the single figure the user picks: what the
  * signer receives, and what they owe for it.
@@ -7,6 +10,17 @@ export type InvestmentTerms = {
   units: number
   pricePerUnitUsd: number
   preMoneyValuationUsd: number
+  /** The three below are absent until the price feed has answered. The agreement fixes a
+   *  rate the payment is then owed at, so a guessed one would be worse than none. */
+  btcUsdRate?: number
+  settlementBtc?: number
+  rateTimestamp?: string
+}
+
+/** What the agreement's BTC figures are quoted against: a rate, and the moment it held. */
+export type SettlementQuote = {
+  btcUsdRate: number
+  at: Date
 }
 
 /** One unit per dollar, which is what the flow's own copy states ("$10,000 Investment …
@@ -17,11 +31,57 @@ const PRICE_PER_UNIT_USD = 1
  *  and $100,000 buys 1%, so the whole company is $10M pre-money. */
 const PRE_MONEY_VALUATION_USD = 10_000_000
 
-export const resolveInvestmentTerms = (totalUsd: number): InvestmentTerms => ({
+/** The amounts on offer, in dollars. The share of the company each buys is not written
+ *  beside them: it follows from the valuation above through `resolveEquityPercent`, the
+ *  same way the term sheet states it, so the two screens cannot describe different deals. */
+export const INVESTMENT_OPTIONS = [1000, 2500, 5000, 10000, 25000, 50000, 100000]
+
+/** So the figure the signer commits to is exact to the satoshi, not to whatever a float
+ *  happens to print. */
+export const BTC_DECIMALS = 8
+
+/** The zone the agreement is dated in: the host's, which the document names. Passed
+ *  to the formatter by name so the clock is not shifted by hand, and so the stamp stays
+ *  right should the zone ever observe daylight saving again. */
+const AGREEMENT_TIMEZONE = "America/Tegucigalpa"
+
+/**
+ * The price of one bitcoin, taken in whole cents so the rate the agreement states is the
+ * one the feed gave, cents included; a price per satoshi to eight decimals would only
+ * hold whole dollars. Answers null rather than a zero or a NaN, so the caller has one
+ * thing to check before quoting a rate a signature will be bound to.
+ */
+export const resolveSettlementQuote = (
+  usdCentsPerBtc: number | null,
+  at: Date,
+): SettlementQuote | null => {
+  if (usdCentsPerBtc === null || !Number.isFinite(usdCentsPerBtc)) return null
+  if (usdCentsPerBtc <= 0) return null
+
+  return { btcUsdRate: toMajorUnit(usdCentsPerBtc), at }
+}
+
+const formatAgreementTime = (at: Date): string =>
+  formatUnixTimestampYMDHM({
+    timestampSeconds: at.getTime() / 1000,
+    timezone: AGREEMENT_TIMEZONE,
+  })
+
+export const resolveInvestmentTerms = (
+  totalUsd: number,
+  settlement: SettlementQuote | null = null,
+): InvestmentTerms => ({
   totalUsd,
   units: totalUsd / PRICE_PER_UNIT_USD,
   pricePerUnitUsd: PRICE_PER_UNIT_USD,
   preMoneyValuationUsd: PRE_MONEY_VALUATION_USD,
+  ...(settlement
+    ? {
+        btcUsdRate: settlement.btcUsdRate,
+        settlementBtc: Number((totalUsd / settlement.btcUsdRate).toFixed(BTC_DECIMALS)),
+        rateTimestamp: formatAgreementTime(settlement.at),
+      }
+    : {}),
 })
 
 /** Whether the investor can pay for what they signed for, and what stands in the way. */

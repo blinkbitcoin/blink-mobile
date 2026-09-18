@@ -12321,7 +12321,7 @@ type RootTranslation = {
 				/**
 				 * H​o​w​ ​m​u​c​h​ ​w​o​u​l​d​ ​y​o​u​ ​l​i​k​e​ ​t​o​ ​i​n​v​e​s​t​?
 				 */
-				desiredCreditLimit: string
+				title: string
 				/**
 				 * f​o​r​ ​~​{​p​e​r​c​e​n​t​}​%
 				 * @param {number} percent
@@ -12361,7 +12361,7 @@ type RootTranslation = {
 					 */
 					title: string
 					/**
-					 * {​a​m​o​u​n​t​}​ ​I​n​v​e​s​t​m​e​n​t
+					 * {​a​m​o​u​n​t​}​ ​i​n​v​e​s​t​m​e​n​t
 					 * @param {string} amount
 					 */
 					investment: RequiredParams<'amount'>
@@ -12377,7 +12377,7 @@ type RootTranslation = {
 					units: RequiredParams<'percent' | 'units'>
 				}
 				/**
-				 * P​r​o​c​e​e​d​ ​t​o​ ​S​i​g​n
+				 * P​r​o​c​e​e​d​ ​t​o​ ​s​i​g​n
 				 */
 				buttonText: string
 			}
@@ -12406,6 +12406,12 @@ type RootTranslation = {
 				 * I​n​v​e​s​t​m​e​n​t​ ​p​a​y​m​e​n​t​s​ ​a​r​e​ ​n​o​t​ ​o​p​e​n​ ​y​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
 				 */
 				paymentsUnavailable: string
+			}
+			SignInvest: {
+				/**
+				 * S​i​g​n​e​r​ ​n​o​t​ ​s​e​t​ ​u​p​ ​y​e​t​.​ ​R​e​s​t​a​r​t​ ​t​h​e​ ​a​p​p​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+				 */
+				signerNotConfigured: string
 			}
 			InsufficientBalance: {
 				/**
@@ -26036,7 +26042,7 @@ export type TranslationFunctions = {
 				/**
 				 * How much would you like to invest?
 				 */
-				desiredCreditLimit: () => LocalizedString
+				title: () => LocalizedString
 				/**
 				 * for ~{percent}%
 				 */
@@ -26075,7 +26081,7 @@ export type TranslationFunctions = {
 					 */
 					title: () => LocalizedString
 					/**
-					 * {amount} Investment
+					 * {amount} investment
 					 */
 					investment: (arg: { amount: string }) => LocalizedString
 					/**
@@ -26088,7 +26094,7 @@ export type TranslationFunctions = {
 					units: (arg: { percent: number, units: string }) => LocalizedString
 				}
 				/**
-				 * Proceed to Sign
+				 * Proceed to sign
 				 */
 				buttonText: () => LocalizedString
 			}
@@ -26115,6 +26121,12 @@ export type TranslationFunctions = {
 				 * Investment payments are not open yet. Please try again later.
 				 */
 				paymentsUnavailable: () => LocalizedString
+			}
+			SignInvest: {
+				/**
+				 * Signer not set up yet. Restart the app and try again.
+				 */
+				signerNotConfigured: () => LocalizedString
 			}
 			InsufficientBalance: {
 				/**

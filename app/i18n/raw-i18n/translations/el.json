@@ -3695,7 +3695,7 @@
         "buttonText": "Συνέχεια"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Πόσο θα θέλατε να επενδύσετε;",
+        "title": "Πόσο θα θέλατε να επενδύσετε;",
         "percent": "για ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Συνέχεια",
         "paymentsUnavailable": "Οι πληρωμές επένδυσης δεν είναι ακόμη διαθέσιμες. Δοκίμασε ξανά αργότερα."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Ο υπογράφων δεν έχει οριστεί ακόμη. Επανεκκινήστε την εφαρμογή και δοκιμάστε ξανά."
       },
       "InsufficientBalance": {
         "title": "Ανεπαρκές υπόλοιπο",

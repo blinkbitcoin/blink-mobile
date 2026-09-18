@@ -3695,7 +3695,7 @@
         "buttonText": "Настави"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Колико бисте желели да уложите?",
+        "title": "Колико бисте желели да уложите?",
         "percent": "за ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,7 @@
           "valuation": "Уз пре-мани процену од $10М",
           "units": "Добијате {units: string} јединица ~{percent: number}% Блинка"
         },
-        "buttonText": "Наставите на Потпис"
+        "buttonText": "Наставите на потпис"
       },
       "TransferInvest": {
         "title": "Пренесите своје улагање",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Настави",
         "paymentsUnavailable": "Уплате за улагање још нису отворене. Покушај поново касније."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Потписник још није подешен. Поново покрени апликацију и покушај поново."
       },
       "InsufficientBalance": {
         "title": "Недовољан салдо",

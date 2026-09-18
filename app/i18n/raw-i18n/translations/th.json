@@ -3695,7 +3695,7 @@
         "buttonText": "ดำเนินการต่อ"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "คุณต้องการลงทุนเท่าไหร่?",
+        "title": "คุณต้องการลงทุนเท่าไหร่?",
         "percent": "สำหรับ ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "ดำเนินการต่อ",
         "paymentsUnavailable": "ยังไม่เปิดรับการชำระเงินลงทุน โปรดลองอีกครั้งในภายหลัง"
+      },
+      "SignInvest": {
+        "signerNotConfigured": "ยังไม่ได้ตั้งค่าผู้ลงนาม กรุณาเปิดแอปใหม่แล้วลองอีกครั้ง"
       },
       "InsufficientBalance": {
         "title": "ยอดเงินไม่เพียงพอ",

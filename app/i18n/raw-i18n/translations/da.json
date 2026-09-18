@@ -3695,7 +3695,7 @@
         "buttonText": "Fortsæt"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hvor meget vil du gerne investere?",
+        "title": "Hvor meget vil du gerne investere?",
         "percent": "for ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3712,11 +3712,11 @@
         "title": "Termblad",
         "equitySection": {
           "title": "Egenkapital i Blink",
-          "investment": "{amount: string} Investering",
+          "investment": "{amount: string} investering",
           "valuation": "Ved $10M pre-money vurdering",
           "units": "Du modtager {units: string} enheder ~{percent: number}% af Blink"
         },
-        "buttonText": "Fortsæt til Underskrift"
+        "buttonText": "Fortsæt til underskrift"
       },
       "TransferInvest": {
         "title": "Overfør din investering",
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Fortsæt",
         "paymentsUnavailable": "Betalinger for investeringen er ikke åbne endnu. Prøv venligst igen senere."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Underskriver ikke sat op endnu. Genstart appen og prøv igen."
       },
       "InsufficientBalance": {
         "title": "Utilstrækkelig saldo",

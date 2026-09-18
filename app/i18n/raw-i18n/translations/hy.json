@@ -3695,7 +3695,7 @@
         "buttonText": "Շարունակել"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Որքա՞ն կցանկանայիք ներդնել։",
+        "title": "Որքա՞ն կցանկանայիք ներդնել։",
         "percent": "~{percent: number}% դիմաց"
       },
       "CompanyValuation": {
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "Շարունակել",
         "paymentsUnavailable": "Ներդրման վճարումները դեռ բաց չեն։ Խնդրում ենք փորձել ավելի ուշ։"
+      },
+      "SignInvest": {
+        "signerNotConfigured": "Ստորագրողը դեռ սահմանված չէ։ Վերագործարկեք հավելվածը և փորձեք կրկին։"
       },
       "InsufficientBalance": {
         "title": "Անբավարար մնացորդ",

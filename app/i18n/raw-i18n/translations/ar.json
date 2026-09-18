@@ -3695,7 +3695,7 @@
         "buttonText": "متابعة"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "كم تود أن تستثمر؟",
+        "title": "كم تود أن تستثمر؟",
         "percent": "مقابل ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3726,6 +3726,9 @@
         },
         "buttonText": "متابعة",
         "paymentsUnavailable": "مدفوعات الاستثمار غير متاحة بعد. يُرجى المحاولة لاحقاً."
+      },
+      "SignInvest": {
+        "signerNotConfigured": "لم يتم إعداد الموقّع بعد. أعد تشغيل التطبيق وحاول مرة أخرى."
       },
       "InsufficientBalance": {
         "title": "رصيد غير كافٍ",
