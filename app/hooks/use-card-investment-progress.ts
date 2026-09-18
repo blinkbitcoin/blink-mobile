@@ -1,4 +1,4 @@
-import { useCallback, useRef } from "react"
+import { useCallback } from "react"
 import { gql } from "@apollo/client"
 
 import { useCardInvestmentAccountQuery } from "@app/graphql/generated"
@@ -84,6 +84,9 @@ type CardInvestmentProgressState = {
   /** Records the invoice the transfer step was issued, to be paid rather than reissued
    *  on a return while it can still be paid. */
   recordInvoice: (paymentRequest: string) => void
+  /** Whether an invoice is the one recorded for the investment: how the send flow,
+   *  which pays it like any other, tells the investment's payment from the rest. */
+  isInvestmentInvoice: (paymentRequest: string | undefined) => boolean
   /** Records the payment; the home welcomes the investor from here on. */
   markPaid: () => void
   /** Forgets the investment, once the investor has closed the welcome. */
@@ -142,9 +145,26 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [amend],
   )
 
+  /** The first mark stands: the moment is one the record's day is counted from, and
+   *  a second receipt or a doubled effect must not move it. */
   const markPaid = useCallback(() => {
-    amend((current) => ({ ...current, paidAt: Date.now() }))
+    amend((current) => (current.paidAt ? current : { ...current, paidAt: Date.now() }))
   }, [amend])
+
+  /**
+   * Read off the record rather than off a flag set on the way into the send flow, so
+   * it holds through the send flow's three generic screens, a payment to anyone else
+   * made in between, and an app killed with the payment in flight. Bolt11 is
+   * case-insensitive and the send flow may hand the invoice back in either.
+   */
+  const isInvestmentInvoice = useCallback(
+    (paymentRequest: string | undefined): boolean => {
+      const issued = progress?.invoice?.paymentRequest
+      if (issued === undefined || paymentRequest === undefined) return false
+      return issued.toLowerCase() === paymentRequest.toLowerCase()
+    },
+    [progress],
+  )
 
   const clear = useCallback(() => {
     if (!accountId) return
@@ -156,73 +176,11 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     isEligible,
     accountId,
     isAccountResolved: accountId !== null,
+    refetchAccount,
     start,
     recordInvoice,
+    isInvestmentInvoice,
     markPaid,
     clear,
   }
-}
-
-/**
- * The investment's invoice, armed by the transfer step right before it opens the send
- * flow on it and spent by the receipt that settles that very invoice, so the payment is
- * recorded against the investment without the send flow knowing it is one.
- *
- * Bound to the invoice rather than to the moment: the send flow stays open to other
- * destinations while the transfer step sits underneath, and a payment to anyone else
- * settled in that window must not be recorded as the investment. A module value rather
- * than a route param: the invoice travels through three generic send screens whose
- * params describe the payment, not why it is being made. An arm left behind by an
- * investor who backed out of the send flow is harmless: only a payment of that very
- * invoice can spend it, and that payment is the investment.
-    refetchAccount,
- */
-let armedCardInvestmentInvoice: string | null = null
-
-/** Bolt11 is case-insensitive and the send flow may hand the invoice back in either. */
-const sameInvoice = (a: string, b: string): boolean => a.toLowerCase() === b.toLowerCase()
-
-export const armCardInvestmentPayment = (paymentRequest: string): void => {
-  armedCardInvestmentInvoice = paymentRequest
-}
-
-/**
- * Whether the invoice is the armed one, without spending the arm: for the step that has
- * to decide what an answer about that invoice means before any receipt is shown.
- */
-export const isCardInvestmentPaymentArmed = (
-  paymentRequest: string | undefined,
-): boolean =>
-  armedCardInvestmentInvoice !== null &&
-  paymentRequest !== undefined &&
-  sameInvoice(armedCardInvestmentInvoice, paymentRequest)
-
-/**
- * Whether the settled invoice is the armed one, clearing the arm when it is so one arm
- * records at most one payment. Another invoice leaves the arm alone: the investment's
- * own payment may still follow.
- */
-export const consumeCardInvestmentPayment = (
-  paymentRequest: string | undefined,
-): boolean => {
-  const armed = armedCardInvestmentInvoice
-  if (!armed || !paymentRequest || !sameInvoice(armed, paymentRequest)) return false
-  armedCardInvestmentInvoice = null
-  return true
-}
-
-/**
- * Whether the screen calling this settles the investment's payment, read once on its
- * first render and held for its lifetime, so an arm set while it is showing is not
- * credited to it. A ref guard rather than a state initializer so StrictMode's double
- * render cannot spend the arm twice.
- */
-export const useConsumeCardInvestmentPayment = (
-  paymentRequest: string | undefined,
-): boolean => {
-  const consumedRef = useRef<boolean | null>(null)
-  if (consumedRef.current === null) {
-    consumedRef.current = consumeCardInvestmentPayment(paymentRequest)
-  }
-  return consumedRef.current
 }
