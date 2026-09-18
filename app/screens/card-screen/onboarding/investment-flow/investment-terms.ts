@@ -72,15 +72,23 @@ export const resolveEquityPercent = ({
 }: InvestmentTerms): number => (totalUsd / preMoneyValuationUsd) * 100
 
 /**
+ * The locale every figure of the flow is written in: the one the rest of the app formats
+ * money in, whatever the device is set to. Left to the device, a European phone would
+ * print $25.000 here and $25,000.00 everywhere else in the app.
+ */
+const FIGURE_LOCALE = "en-US"
+
+/**
  * Grouped the way the select screen writes its options, so the amount the signer chose
- * reads the same on the screens that follow.
+ * reads the same on every screen of the flow, from the option they tap to the transfer.
  *
  * Cut to cents, which is as far as dollars go: the chosen amounts are whole and print
  * unchanged, but a balance converted from satoshis carries a tail that would otherwise
  * reach the screen as $3,333.756.
  */
 export const formatUsdAmount = (amount: number): string =>
-  `$${amount.toLocaleString(undefined, { maximumFractionDigits: 2 })}`
+  `$${amount.toLocaleString(FIGURE_LOCALE, { maximumFractionDigits: 2 })}`
 
 /** Grouped for the same reason, but without the currency the units are not counted in. */
-export const formatUnitCount = (units: number): string => units.toLocaleString()
+export const formatUnitCount = (units: number): string =>
+  units.toLocaleString(FIGURE_LOCALE)

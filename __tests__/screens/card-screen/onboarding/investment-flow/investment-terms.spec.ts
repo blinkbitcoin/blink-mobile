@@ -54,6 +54,7 @@ describe("resolveEquityPercent", () => {
 describe("the figures as they are written", () => {
   it("groups an amount the way the select screen groups its options", () => {
     expect(formatUsdAmount(25000)).toBe("$25,000")
+    expect(formatUsdAmount(100000)).toBe("$100,000")
   })
 
   /** A balance converted from satoshis lands on a fraction of a cent, and dollars do not
