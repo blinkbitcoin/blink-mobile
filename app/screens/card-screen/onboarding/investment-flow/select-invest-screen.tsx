@@ -12,7 +12,11 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { MOCK_CREDIT_LIMIT_VALUES } from "../onboarding-mock-data"
-import { resolveEquityPercent, resolveInvestmentTerms } from "./investment-terms"
+import {
+  formatUsdAmount,
+  resolveEquityPercent,
+  resolveInvestmentTerms,
+} from "./investment-terms"
 
 export const SelectInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -28,6 +32,7 @@ export const SelectInvestScreen: React.FC = () => {
     () =>
       MOCK_CREDIT_LIMIT_VALUES.map((value) => ({
         value,
+        amount: formatUsdAmount(value),
         percent: LL.CardFlow.Onboarding.SelectInvest.percent({
           percent: resolveEquityPercent(resolveInvestmentTerms(value)),
         }),
@@ -68,7 +73,7 @@ export const SelectInvestScreen: React.FC = () => {
                 onPress={() => setSelectedLimit(item.value)}
               >
                 <Text type="p2" style={styles.limitText}>
-                  ${item.value.toLocaleString()} {item.percent}
+                  {item.amount} {item.percent}
                 </Text>
                 {isNotLastItem && <View style={styles.limitSeparator} />}
               </TouchableOpacity>
