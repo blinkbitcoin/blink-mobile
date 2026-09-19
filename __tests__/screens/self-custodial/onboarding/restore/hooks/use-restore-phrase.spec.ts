@@ -70,6 +70,19 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const mockToastShow = jest.fn()
+const mockImportAccount = jest.fn()
+let mockIsProvisioning = false
+
+let mockMigrationLoading = false
+
+jest.mock("@app/screens/account-migration/hooks", () => ({
+  useMigrationAccount: () => ({
+    importAccount: mockImportAccount,
+    isProvisioning: mockIsProvisioning,
+    loading: mockMigrationLoading,
+  }),
+}))
+
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
 }))
@@ -83,6 +96,8 @@ jest.mock("@app/utils/error-logging", () => ({
 describe("useRestorePhrase", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsProvisioning = false
+    mockMigrationLoading = false
     mockBip39State = {
       words: Array(12).fill(""),
       stepWords: Array(6).fill(""),
@@ -292,5 +307,118 @@ describe("useRestorePhrase", () => {
     })
 
     expect(mockUpdateWord).toHaveBeenCalledWith(0, "test")
+  })
+
+  describe("the migration flow", () => {
+    /** The custodial account stays active until migration commits, so the phrase must
+     *  never reach the onboarding restore, which activates the wallet at once. */
+    it("imports the phrase for migration instead of restoring it", async () => {
+      mockBip39State.allFilled = true
+      mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
+      mockImportAccount.mockResolvedValue("sc-imported-1")
+      const { result } = renderHook(() =>
+        useRestorePhrase({ step: PhraseStep.Second, flow: "migration" }),
+      )
+
+      await act(async () => {
+        await result.current.handleRestore()
+      })
+
+      expect(mockImportAccount).toHaveBeenCalledTimes(1)
+      expect(mockRestore).not.toHaveBeenCalled()
+      expect(mockNavigate).toHaveBeenCalledWith("acceptTermsAndConditions", {
+        flow: "migration",
+      })
+    })
+
+    /** importAccount reports its own failure and answers null; moving on anyway would
+     *  march the user into the terms screen with no wallet behind the migration. */
+    it("stays on the phrase screen when the import fails", async () => {
+      mockBip39State.allFilled = true
+      mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
+      mockImportAccount.mockResolvedValue(null)
+      const { result } = renderHook(() =>
+        useRestorePhrase({ step: PhraseStep.Second, flow: "migration" }),
+      )
+
+      await act(async () => {
+        await result.current.handleRestore()
+      })
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    /** savePendingAccount throws without the owner id, after the wallet is already derived
+     *  and registered: the user would get a bare failure plus a stray account. */
+    it("does not import while the migration owner is still loading", async () => {
+      mockMigrationLoading = true
+      mockBip39State.allFilled = true
+      mockBip39State.words = "valid a b c d e f g h i j k".split(" ")
+      const { result } = renderHook(() =>
+        useRestorePhrase({ step: PhraseStep.Second, flow: "migration" }),
+      )
+
+      await act(async () => {
+        await result.current.handleRestore()
+      })
+
+      expect(mockImportAccount).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    /** The refusal above would otherwise be silent, so the button says so. Reporting it as
+     *  Restoring instead would cover an empty phrase form with the full-page spinner, since
+     *  the owner query resolves on mount. */
+    it("blocks submission while the owner query runs, without claiming to be restoring", () => {
+      mockMigrationLoading = true
+      const { result } = renderHook(() =>
+        useRestorePhrase({ step: PhraseStep.Second, flow: "migration" }),
+      )
+
+      expect(result.current.isSubmitBlocked).toBe(true)
+      expect(result.current.status).not.toBe("restoring")
+    })
+
+    /** Outside the migration the flag belongs to another screen's run: an ordinary restore
+     *  must never have its button held shut by it. */
+    it("does not block an ordinary restore while the migration owner loads", () => {
+      mockMigrationLoading = true
+      const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
+
+      expect(result.current.isSubmitBlocked).toBe(false)
+    })
+
+    it("carries the flow across the step transition so it survives the second screen", () => {
+      const { result } = renderHook(() =>
+        useRestorePhrase({ step: PhraseStep.First, flow: "migration" }),
+      )
+
+      act(() => {
+        result.current.handleContinue()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "selfCustodialRestorePhrase",
+        expect.objectContaining({ flow: "migration" }),
+      )
+    })
+
+    it("reports the import as in flight through the restore status", () => {
+      mockIsProvisioning = true
+      const { result } = renderHook(() =>
+        useRestorePhrase({ step: PhraseStep.Second, flow: "migration" }),
+      )
+
+      expect(result.current.status).toBe("restoring")
+    })
+
+    /** Outside the migration the flag belongs to another screen's run and must not leak
+     *  into this one's button. */
+    it("ignores the migration in-flight flag outside the migration flow", () => {
+      mockIsProvisioning = true
+      const { result } = renderHook(() => useRestorePhrase({ step: PhraseStep.Second }))
+
+      expect(result.current.status).not.toBe("restoring")
+    })
   })
 })
