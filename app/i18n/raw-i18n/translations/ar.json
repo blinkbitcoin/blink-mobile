@@ -2667,7 +2667,7 @@
   "TransactionDetailScreen": {
     "paid": "دفعت إلى/من",
     "received": "استقبلت",
-    "spent": "أنفقت",
+    "sent": "أرسلت",
     "sending": "جارٍ الإرسال",
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",

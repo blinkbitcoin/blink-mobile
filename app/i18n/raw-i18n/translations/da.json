@@ -2667,7 +2667,7 @@
   "TransactionDetailScreen": {
     "paid": "Betalt til/fra",
     "received": "Du modtog",
-    "spent": "Du brugte",
+    "sent": "Du sendte",
     "sending": "Sending",
     "receivingAccount": "Modtagelseskonto",
     "sendingAccount": "Afsendelseskonto",
