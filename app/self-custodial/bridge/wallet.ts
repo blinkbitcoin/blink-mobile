@@ -1,6 +1,5 @@
 import {
   RegisterLightningAddressRequest,
-  SyncWalletRequest,
   defaultExternalSigners,
   type BreezSdkInterface,
   type Network,
@@ -53,9 +52,6 @@ export const deriveWalletIdentityPubkey = async (
     destroySigner(sparkSigner)
   }
 }
-
-export const syncSelfCustodialWallet = (sdk: BreezSdkInterface) =>
-  sdk.syncWallet(SyncWalletRequest.create({}))
 
 export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: number) =>
   sdk.listPayments({
