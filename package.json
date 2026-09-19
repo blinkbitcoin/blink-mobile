@@ -223,7 +223,7 @@
     "babel-plugin-module-resolver": "^5.0.1",
     "browserstack-local": "^1.5.1",
     "cross-fetch": "^4.0.0",
-    "csv-parse": "^5.5.5",
+    "csv-parse": "^7.0.2",
     "detox": "^20.20.2",
     "dotenv": "^16.4.5",
     "eslint": "^8.33.0",
