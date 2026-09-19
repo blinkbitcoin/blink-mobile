@@ -29,12 +29,16 @@ const mockUseHardwareBackGuard = jest.fn()
 /** The completion hook owns the custodial id now, so the screen reads it from there rather
  *  than opening a second owner query of its own. */
 let mockOwnerId: string | null = "custodial-1"
+let mockSparkInvoice: string | null = null
+const mockRecordMigrationSparkInvoice = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useCompleteMigration: () => ({
     migrationAccountId: mockMigrationAccountId,
     migrationExpectedReceiveSats: 21000,
+    migrationSparkInvoice: mockSparkInvoice,
+    recordMigrationSparkInvoice: mockRecordMigrationSparkInvoice,
     custodialAccountId: mockOwnerId,
     migrationLoading: mockMigrationLoading,
     completeMigration: mockCompleteMigration,
@@ -108,6 +112,7 @@ describe("MigrationTransferringFundsScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockOwnerId = "custodial-1"
+    mockSparkInvoice = null
     mockMigrationAccountId = "sc-account-1"
     mockMigrationLoading = false
     mockIsTransferred = false
@@ -147,8 +152,26 @@ describe("MigrationTransferringFundsScreen", () => {
       custodialAccountId: "custodial-1",
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
+      sparkInvoice: null,
+      recordSparkInvoice: mockRecordMigrationSparkInvoice,
       skip: false,
     })
+  })
+
+  /** Both come off the completion hook's checkpoint instance rather than a second owner
+   *  read of this screen's own, so the invoice is written and read against one id. */
+  it("hands the transfer the checkpointed invoice and its recorder", async () => {
+    mockSparkInvoice = "lnbcrt1invoice"
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockUseMigrationTransfer).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sparkInvoice: "lnbcrt1invoice",
+        recordSparkInvoice: mockRecordMigrationSparkInvoice,
+      }),
+    )
   })
 
   /** The session can end under the screen; the transfer then has no account to bill and

@@ -65,6 +65,8 @@ jest.mock(
   }),
 )
 
+const mockRecordSparkInvoice = jest.fn()
+
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => "regtest",
 }))
@@ -107,26 +109,33 @@ const renderTransfer = (
       custodialAccountId: "custodial-1",
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
+      sparkInvoice: null,
+      recordSparkInvoice: mockRecordSparkInvoice,
       skip: false,
       ...overrides,
     }),
   )
 
-describe("useMigrationTransfer", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    resetMigrationCommitGuard()
-    mockStatus = MigrationStatus.InProgress
-    mockRefetchStatus = () => Promise.resolve(mockStatus)
-    mockBuildTransferRequest.mockResolvedValue({
-      status: MigrationSdkStatus.Ok,
-      value: collectedRequest,
-    })
-    mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
-    mockIsDeviceClockSkewed.mockReturnValue(false)
-    mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
-    mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+/** Shared so the drain-invoice describe below starts from the same state as the main one
+ *  instead of inheriting a beforeEach it is no longer nested under. */
+const setupTransferMocks = () => {
+  jest.clearAllMocks()
+  resetMigrationCommitGuard()
+  mockStatus = MigrationStatus.InProgress
+  mockRefetchStatus = () => Promise.resolve(mockStatus)
+  mockBuildTransferRequest.mockResolvedValue({
+    status: MigrationSdkStatus.Ok,
+    value: collectedRequest,
   })
+  mockCommitMigration.mockResolvedValue({ data: { migrationCommit: { errors: [] } } })
+  mockIsDeviceClockSkewed.mockReturnValue(false)
+  mockCurrentProofTimestamp.mockReturnValue(1_700_000_000)
+  mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+  mockRecordSparkInvoice.mockResolvedValue(true)
+}
+
+describe("useMigrationTransfer", () => {
+  beforeEach(setupTransferMocks)
 
   it("commits the collected destination while the server awaits one", async () => {
     renderTransfer()
@@ -231,6 +240,8 @@ describe("useMigrationTransfer", () => {
           custodialAccountId,
           selfCustodialAccountId: "sc-account-1",
           expectedReceiveSats: 21000,
+          sparkInvoice: null,
+          recordSparkInvoice: mockRecordSparkInvoice,
           skip: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
@@ -269,6 +280,8 @@ describe("useMigrationTransfer", () => {
           custodialAccountId,
           selfCustodialAccountId: "sc-account-1",
           expectedReceiveSats: 21000,
+          sparkInvoice: null,
+          recordSparkInvoice: mockRecordSparkInvoice,
           skip: false,
         }),
       { initialProps: { custodialAccountId: null as string | null } },
@@ -439,6 +452,7 @@ describe("useMigrationTransfer", () => {
     expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith({
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
+      sparkInvoice: null,
       skip: true,
     })
 
@@ -449,6 +463,7 @@ describe("useMigrationTransfer", () => {
     expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith({
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
+      sparkInvoice: null,
       skip: false,
     })
   })
@@ -855,5 +870,61 @@ describe("useMigrationTransfer", () => {
     })
 
     expect(mockCommitMigration).not.toHaveBeenCalled()
+  })
+})
+
+describe("useMigrationTransfer drain invoice", () => {
+  beforeEach(setupTransferMocks)
+
+  /** What the receive gate matches on, recorded only once the backend has taken it. */
+  it("records the drain invoice after the backend accepts the commit", async () => {
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockRecordSparkInvoice).toHaveBeenCalledWith("lnbcrt1invoice")
+    expect(mockCommitMigration.mock.invocationCallOrder[0]).toBeLessThan(
+      mockRecordSparkInvoice.mock.invocationCallOrder[0],
+    )
+  })
+
+  /** A first commit whose response was lost leaves the server draining against invoice A
+   *  while the retry mints B. Writing B would clobber the invoice the drain actually pays
+   *  and leave the gate watching for a payment that never comes. */
+  it("leaves the stored invoice alone when the commit is refused", async () => {
+    mockCommitMigration.mockResolvedValue({
+      data: { migrationCommit: { errors: [{ message: "already in progress" }] } },
+    })
+
+    renderTransfer()
+    await flushEffects()
+
+    expect(mockRecordSparkInvoice).not.toHaveBeenCalled()
+  })
+
+  /** The drain is already requested by then, so a refused write must not strand the user:
+   *  it is reported, and the gate falls back to what it did before the field existed. */
+  it("reports a refused write but lets the flow continue", async () => {
+    mockRecordSparkInvoice.mockResolvedValue(false)
+
+    const { result } = renderTransfer()
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration drain invoice persist",
+      expect.any(Error),
+    )
+    expect(result.current.failureReason).toBeNull()
+  })
+
+  /** A resumed run reads the invoice back off the checkpoint, so it goes on watching for
+   *  the same payment rather than starting over with nothing to match. */
+  it("passes the checkpointed invoice to the receive gate", async () => {
+    mockStatus = MigrationStatus.Completed
+    renderTransfer({ sparkInvoice: "lnbcrt1invoice" })
+    await flushEffects()
+
+    expect(mockUseReceiveConfirmation).toHaveBeenLastCalledWith(
+      expect.objectContaining({ sparkInvoice: "lnbcrt1invoice" }),
+    )
   })
 })

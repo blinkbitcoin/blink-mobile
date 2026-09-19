@@ -8,6 +8,7 @@ const mockSetActiveAccountId = jest.fn()
 const mockDiscardCustodialSession = jest.fn()
 const mockCloseCustodialAccount = jest.fn()
 
+const mockSaveCheckpoint = jest.fn()
 let mockAccountId: string | undefined
 let mockCheckpoint: string | null
 let mockExpectedReceiveSats: number | null
@@ -16,6 +17,7 @@ let mockCheckpointOwnerId: string | null
 jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state", () => ({
   useMigrationCheckpointState: () => ({
     checkpoint: mockCheckpoint,
+    saveCheckpoint: mockSaveCheckpoint,
     accountId: mockAccountId,
     expectedReceiveSats: mockExpectedReceiveSats,
     checkpointOwnerId: mockCheckpointOwnerId,
@@ -105,6 +107,7 @@ describe("useCompleteMigration", () => {
     mockAccounts = [{ id: "sc-account-1" }]
     mockRegistryLoading = false
     mockCheckpoint = "backupAlerts"
+    mockSaveCheckpoint.mockResolvedValue(true)
     mockExpectedReceiveSats = 21000
     mockDiscardCustodialSession.mockResolvedValue(undefined)
     mockSeedMigratedSettings.mockResolvedValue(undefined)
@@ -472,6 +475,56 @@ describe("useCompleteMigration", () => {
 
       expect(await complete()).toBe(MigrationCompletion.Completed)
       expect(mockCloseCustodialAccount).toHaveBeenCalledTimes(2)
+    })
+  })
+})
+
+describe("recordMigrationSparkInvoice", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockCheckpoint = "balancesOverview"
+    mockSaveCheckpoint.mockResolvedValue(true)
+  })
+
+  /** The step is re-saved as it stands, so recording the invoice never moves where a
+   *  resume lands. */
+  it("records the invoice against the step the flow is already on", async () => {
+    const { result } = renderHook(() => useCompleteMigration())
+
+    await act(async () => {
+      expect(await result.current.recordMigrationSparkInvoice("lnbcrt1invoice")).toBe(
+        true,
+      )
+    })
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith("balancesOverview", {
+      sparkInvoice: "lnbcrt1invoice",
+    })
+  })
+
+  /** Without a step there is nothing to re-save onto, and the caller has to hear about it:
+   *  a silently skipped write leaves the receive gate on the balance test. */
+  it("answers false when no checkpoint step is known", async () => {
+    mockCheckpoint = null
+    const { result } = renderHook(() => useCompleteMigration())
+
+    await act(async () => {
+      expect(await result.current.recordMigrationSparkInvoice("lnbcrt1invoice")).toBe(
+        false,
+      )
+    })
+
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("passes a refused write back to the caller", async () => {
+    mockSaveCheckpoint.mockResolvedValue(false)
+    const { result } = renderHook(() => useCompleteMigration())
+
+    await act(async () => {
+      expect(await result.current.recordMigrationSparkInvoice("lnbcrt1invoice")).toBe(
+        false,
+      )
     })
   })
 })
