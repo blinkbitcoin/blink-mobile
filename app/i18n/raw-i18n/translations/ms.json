@@ -2454,6 +2454,7 @@
     "activated": "Telah diaktifkan",
     "addressScreen": "Cara untuk terima bayaran",
     "nonCustodialAccount": "Akaun bukan kustodial",
+    "custodialAccount": "Akaun kustodial",
     "tapUserName": "Tekan untuk tetapkan ID pengguna",
     "notifications": "Notifikasi",
     "title": "Tetapan",

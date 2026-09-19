@@ -2454,6 +2454,7 @@
     "activated": "Aktive edildi",
     "addressScreen": "Ödeme alma yolları",
     "nonCustodialAccount": "Saklamasız hesap",
+    "custodialAccount": "Saklamalı hesap",
     "tapUserName": "Kullanıcı adını ayarlamak için tıkla",
     "notifications": "Bildirimler",
     "title": "Ayarlar",
