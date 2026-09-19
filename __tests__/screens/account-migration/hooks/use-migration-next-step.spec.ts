@@ -10,6 +10,18 @@ let mockIsAtCommitPoint = false
 let mockCheckpointLoading = false
 let mockHasTransactions = false
 let mockTransactionsLoading = false
+let mockIsLocked = true
+let mockLockLoading = false
+let mockLockError = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({
+    isLocked: mockIsLocked,
+    loading: mockLockLoading,
+    hasError: mockLockError,
+    refetch: jest.fn(),
+  }),
+}))
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -39,6 +51,9 @@ describe("useMigrationNextStep", () => {
     mockCheckpointLoading = false
     mockHasTransactions = false
     mockTransactionsLoading = false
+    mockIsLocked = true
+    mockLockLoading = false
+    mockLockError = false
   })
 
   it("offers the history download to a fresh migration with history", () => {
@@ -143,5 +158,70 @@ describe("useMigrationNextStep", () => {
     const { result } = renderHook(() => useMigrationNextStep())
 
     expect(result.current.loading).toBe(true)
+  })
+
+  describe("a commit point the server no longer holds open", () => {
+    /** The device left off on the commit screen, but support has since cleared the flow. */
+    const arriveWithStaleCommitPoint = (): void => {
+      mockIsAtCommitPoint = true
+      mockIsLocked = false
+    }
+
+    it("starts the flow over instead of returning to the commit screen", () => {
+      arriveWithStaleCommitPoint()
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.goToNextStep()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("accountMigrationExplainer")
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("does the same for a skip guard, replacing rather than pushing", () => {
+      arriveWithStaleCommitPoint()
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.replaceToNextStep()
+      })
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationExplainer")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("offers the history download again, since this run starts from the top", () => {
+      arriveWithStaleCommitPoint()
+      mockHasTransactions = true
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.goToNextStep()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("accountMigrationDownloadHistory")
+    })
+
+    it("never skips ahead on an unanswered server, only on a confirmed one", () => {
+      mockIsAtCommitPoint = true
+      mockLockError = true
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.goToNextStep()
+      })
+
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("waits while the server is still being asked", () => {
+      mockIsAtCommitPoint = true
+      mockLockLoading = true
+
+      const { result } = renderHook(() => useMigrationNextStep())
+
+      expect(result.current.loading).toBe(true)
+    })
   })
 })
