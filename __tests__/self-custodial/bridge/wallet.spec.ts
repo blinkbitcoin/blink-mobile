@@ -7,6 +7,7 @@ import {
   getWalletInfo,
   listAllPayments,
   listPayments,
+  listSentPaymentsSince,
   registerLightningAddress,
 } from "@app/self-custodial/bridge/wallet"
 
@@ -129,6 +130,30 @@ describe("listPayments", () => {
       toTimestamp: undefined,
       offset: 20,
       limit: 50,
+      sortAscending: false,
+    })
+  })
+})
+
+describe("listSentPaymentsSince", () => {
+  it("asks for outgoing payments from the timestamp on, newest first, in any status", () => {
+    const listPaymentsFn = jest.fn().mockResolvedValue({ payments: [] })
+
+    listSentPaymentsSince(
+      { listPayments: listPaymentsFn } as never,
+      BigInt(1747691078),
+      20,
+    )
+
+    expect(listPaymentsFn).toHaveBeenCalledWith({
+      typeFilter: [0],
+      statusFilter: undefined,
+      assetFilter: undefined,
+      paymentDetailsFilter: undefined,
+      fromTimestamp: BigInt(1747691078),
+      toTimestamp: undefined,
+      offset: 0,
+      limit: 20,
       sortAscending: false,
     })
   })
