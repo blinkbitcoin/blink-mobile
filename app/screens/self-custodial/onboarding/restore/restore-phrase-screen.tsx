@@ -11,6 +11,7 @@ import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-butto
 import { headerRightNoGlass, noHeaderRight } from "@app/components/header-no-glass"
 import { WarningCard } from "@app/components/warning-card"
 import { SuggestionBar } from "@app/components/suggestion-bar"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   isPhraseStep,
@@ -64,6 +65,8 @@ export const RestorePhraseScreen: React.FC = () => {
       { dedupKey: "restore-phrase-params-missing", alwaysRecord: true },
     )
   }, [hasValidParams])
+
+  useScreenSecurity()
 
   const {
     stepWords,
