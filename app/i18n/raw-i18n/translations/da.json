@@ -31,6 +31,8 @@
     "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
     "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
     "loadError": "Dine API-nøgler kunne ikke indlæses. Prøv igen senere.",
+    "discardSecretTitle": "Kassér denne API-nøgle?",
+    "discardSecretBody": "Dette er den eneste gang, hemmeligheden vises. Hvis du forlader nu, kan nøglen ikke gendannes, og du bliver nødt til at oprette en ny.",
     "done": "Færdig"
   },
   "GaloyAddressScreen": {

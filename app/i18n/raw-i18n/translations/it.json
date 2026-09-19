@@ -31,6 +31,8 @@
         "createError": "Impossibile creare la chiave API. Riprova.",
         "revokeError": "Impossibile revocare la chiave API. Riprova.",
         "loadError": "Impossibile caricare le tue chiavi API. Riprova più tardi.",
+        "discardSecretTitle": "Eliminare questa chiave API?",
+        "discardSecretBody": "Questa è l'unica volta in cui il segreto viene mostrato. Se esci ora, la chiave non potrà essere recuperata e dovrai crearne una nuova.",
         "done": "Fatto"
     },
     "GaloyAddressScreen": {

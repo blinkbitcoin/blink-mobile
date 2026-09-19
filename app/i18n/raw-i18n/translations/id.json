@@ -31,6 +31,8 @@
     "createError": "Tidak dapat membuat kunci API. Silakan coba lagi.",
     "revokeError": "Tidak dapat mencabut kunci API. Silakan coba lagi.",
     "loadError": "Tidak dapat memuat kunci API Anda. Silakan coba lagi nanti.",
+    "discardSecretTitle": "Buang kunci API ini?",
+    "discardSecretBody": "Ini satu-satunya kali rahasia ditampilkan. Jika Anda pergi sekarang, kunci tidak dapat dipulihkan dan Anda harus membuat yang baru.",
     "done": "Selesai"
   },
   "GaloyAddressScreen": {
