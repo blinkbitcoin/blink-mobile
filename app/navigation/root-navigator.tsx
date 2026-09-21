@@ -389,6 +389,7 @@ const totpRegistrationScreens = (LL: TranslationFunctions) => (
   </>
 )
 
+// eslint-disable-next-line max-lines-per-function -- RootStack is one flat route table; splitting it solely to meet the line cap would scatter screen registrations that are read as a single list
 export const RootStack = () => {
   const styles = useStyles()
   const {
