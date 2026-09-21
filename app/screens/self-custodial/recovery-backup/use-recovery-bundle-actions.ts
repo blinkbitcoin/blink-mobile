@@ -130,6 +130,10 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         network,
         mnemonic,
         appVersion: DeviceInfo.getReadableVersion(),
+        // The user asked for this one, so it must never be served by a run that
+        // started earlier: reporting success for a bundle missing the balance
+        // they just looked at is the failure this screen exists to prevent.
+        coverageKey: `manual:${Date.now()}`,
       })
       if (result.success) {
         setBundleState(result.state)

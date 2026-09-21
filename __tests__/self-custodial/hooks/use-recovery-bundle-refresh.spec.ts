@@ -172,6 +172,9 @@ describe("useRecoveryBundleRefresh", () => {
         network: mockSparkNetwork.Regtest,
         mnemonic: MNEMONIC,
         appVersion: "1.0.0",
+        // Names the payment this run owes coverage for, so a payment landing
+        // mid-run is not handed the run that fetched before it settled.
+        coverageKey: "payment-1",
       })
     })
 
