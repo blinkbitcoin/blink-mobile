@@ -114,7 +114,7 @@ export const useRecoveryBundleRefresh = (): void => {
     }
     const currentAccountId = accountId
 
-    const runRefresh = async () => {
+    const runRefresh = async (coverageKey?: string) => {
       const settings = await readRecoveryBundleSettings(currentAccountId)
       if (!settings.autoRefresh) return
 
@@ -126,6 +126,9 @@ export const useRecoveryBundleRefresh = (): void => {
         network,
         mnemonic,
         appVersion: DeviceInfo.getReadableVersion(),
+        // Names the payment this run has to cover, so a later payment is not
+        // handed the in-flight run that fetched before it settled.
+        coverageKey,
       })
       if (result.success) {
         crashlytics().log(`[recovery-bundle] refreshed: ${result.state.leafCount} leaves`)
@@ -149,7 +152,7 @@ export const useRecoveryBundleRefresh = (): void => {
       timerRef.current = setTimeout(() => {
         timerRef.current = null
         pendingPaymentEventKeyRef.current = null
-        runRefresh().catch((err) => {
+        runRefresh(paymentEventKey ?? undefined).catch((err) => {
           crashlytics().recordError(
             err instanceof Error ? err : new Error(String(err)),
             "recovery-bundle-refresh",
