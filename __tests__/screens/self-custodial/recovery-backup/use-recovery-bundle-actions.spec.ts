@@ -244,6 +244,11 @@ describe("useRecoveryBundleActions", () => {
         network: mockSparkNetwork.Regtest,
         mnemonic: "test mnemonic words",
         appVersion: expect.any(String),
+        // A user-initiated refresh carries a coverage key of its own so it can
+        // never be served by a run that started before they tapped: a success
+        // toast over a bundle missing the balance they just saw is the failure
+        // this screen exists to prevent.
+        coverageKey: expect.stringMatching(/^manual:\d+$/),
       })
       expect(result.current.bundleState).toEqual(refreshedState)
       expect(mockToastShow).toHaveBeenCalledWith(

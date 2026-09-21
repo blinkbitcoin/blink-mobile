@@ -51,6 +51,15 @@ export type RefreshBundleParams = {
   network: Network
   mnemonic: string
   appVersion: string
+  /**
+   * What wallet state this caller needs the bundle to cover - the payment event
+   * key for a payment-triggered refresh, a fresh value for a user-initiated one.
+   * Callers sharing a key are the same request arriving twice and share the run;
+   * a different key means newer leaves the in-flight fetch never read, so it
+   * earns a second pass. Omit it to accept whatever run is already going: the
+   * staleness sweep only wants a current bundle and has no payment to cover.
+   */
+  coverageKey?: string
 }
 
 export type RefreshBundleResult =
@@ -398,7 +407,16 @@ export const revokeCloudRecoveryBundle = ({
   )
 }
 
-const inFlight = new Map<string, Promise<RefreshBundleResult>>()
+type InFlightRefresh = {
+  run: Promise<RefreshBundleResult>
+  coverageKey: string | undefined
+}
+
+const inFlight = new Map<string, InFlightRefresh>()
+
+/** Reruns owed to callers that arrived mid-run needing newer state, coalesced
+ *  one per key so a burst never queues more than a single extra pass. */
+const queuedReruns = new Map<string, Promise<RefreshBundleResult>>()
 
 /**
  * Marks an account as deleted so its work in flight (typically a refresh
@@ -413,7 +431,8 @@ export const markAccountDeletedForRefresh = (accountId: string): void => {
 
 /**
  * Resolves once every refresh, upload, state write and revocation registered
- * for the account (any network) has settled. Work already past its
+ * for the account (any network) has settled, a queued rerun included: it has
+ * not started yet but will write once it does. Work already past its
  * deleted-account check can still land writes after the deletion sweep;
  * re-sweeping after this resolves closes that window. Work registered while
  * waiting is waited for too.
@@ -500,6 +519,17 @@ const runRefresh = async ({
   }
 }
 
+const startRun = (
+  key: string,
+  params: RefreshBundleParams,
+): Promise<RefreshBundleResult> => {
+  const run = runRefresh(params).finally(() => {
+    inFlight.delete(key)
+  })
+  inFlight.set(key, { run, coverageKey: params.coverageKey })
+  return trackWork(params.accountId, run)
+}
+
 export const refreshRecoveryBundle = (
   params: RefreshBundleParams,
 ): Promise<RefreshBundleResult> => {
@@ -508,17 +538,37 @@ export const refreshRecoveryBundle = (
     return Promise.resolve({ success: false, error: accountDeletedError() })
   }
   const key = workKeyFor(accountId, network)
-  const existing = inFlight.get(key)
-  if (existing) {
-    // This caller's change may have landed after the shared run's fetch began;
-    // the mark keeps the bundle from reading as fresh until a save covers it.
-    markRecoveryBundleStale(accountId, network).catch(reportStaleMarkFailure)
-    return existing
-  }
+  const current = inFlight.get(key)
+  if (!current) return startRun(key, params)
 
-  const run = runRefresh(params).finally(() => {
-    inFlight.delete(key)
+  // The in-flight fetch read the leaves once, when it started. Handing its
+  // result to a caller that needs newer state would drop those leaves from the
+  // bundle for good: the save stamps savedAt, so the staleness path stops
+  // covering them too.
+  // A caller that names no coverage just wants a current bundle, so whatever is
+  // already fetching serves it; only one naming state the in-flight fetch
+  // cannot have read earns a second pass.
+  const needsNewerState =
+    params.coverageKey !== undefined && params.coverageKey !== current.coverageKey
+  if (!needsNewerState) return current.run
+
+  // The rerun covers this caller's change, but it starts only once the current
+  // run settles; the mark keeps the bundle from reading as fresh until then,
+  // even if the app closes first.
+  markRecoveryBundleStale(accountId, network).catch(reportStaleMarkFailure)
+
+  // One rerun serves every caller that arrived during this run, so a burst
+  // costs a second pass rather than one per caller.
+  const queued = queuedReruns.get(key)
+  if (queued) return queued
+
+  // allSettled, not the promise itself: the rerun is owed whether the run it
+  // waits on succeeded or failed, and a rejection must not leave the queue
+  // entry behind for the next caller to join.
+  const rerun = Promise.allSettled([current.run]).then(() => {
+    queuedReruns.delete(key)
+    return refreshRecoveryBundle(params)
   })
-  inFlight.set(key, run)
-  return trackWork(accountId, run)
+  queuedReruns.set(key, rerun)
+  return trackWork(accountId, rerun)
 }
