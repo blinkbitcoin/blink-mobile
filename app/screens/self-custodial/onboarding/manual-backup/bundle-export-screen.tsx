@@ -83,11 +83,14 @@ export const BundleExportScreen: React.FC = () => {
   }, [navigation, successMessage])
 
   /** The warning is shown once, before the first export; a user who has already
-   *  read it and comes back for the clipboard copy does not need it again. */
+   *  read it and comes back for the clipboard copy does not need it again.
+   *  Either way the flow advances only on a share that actually happened: a
+   *  dismissed sheet would otherwise confirm an emergency file that never left
+   *  the device, which is the one thing this screen exists to guarantee. */
   const onDownloadPress = useCallback(async () => {
     if (hasDownloaded) {
-      await handleShare()
-      onDownloaded()
+      const didShare = await handleShare()
+      if (didShare) onDownloaded()
       return
     }
     setConfirmingDownload(true)
@@ -95,13 +98,16 @@ export const BundleExportScreen: React.FC = () => {
 
   const onConfirmDownload = useCallback(async () => {
     setConfirmingDownload(false)
-    await handleShare()
+    const didShare = await handleShare()
+    if (!didShare) return
     setHasDownloaded(true)
     onDownloaded()
   }, [handleShare, onDownloaded])
 
   const isLoading = bundleState === undefined
   const hasBundle = Boolean(bundleState)
+  const isExporting = sharing || copying
+
   const subtitle = hasBundle
     ? LL.BackupScreen.BundleExport.subtitle()
     : LL.BackupScreen.BundleExport.subtitlePending()
@@ -122,9 +128,13 @@ export const BundleExportScreen: React.FC = () => {
         disabled={sharing}
         {...testProps("bundle-copy-button")}
       />
+      {/* Leaving this live during an export would finish the backup and
+          navigate away while the share sheet or the clipboard write is still
+          resolving into a screen the user has left. */}
       <GaloySecondaryButton
         title={LL.BackupScreen.BundleExport.skip()}
         onPress={finish}
+        disabled={isExporting}
         {...testProps("bundle-skip-button")}
       />
     </>
