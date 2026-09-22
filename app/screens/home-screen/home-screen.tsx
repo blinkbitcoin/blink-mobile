@@ -233,13 +233,8 @@ export const HomeScreen: React.FC = () => {
   const { shouldShowBanner, shouldShowModal, dismissBanner, dismissModal } =
     useBackupNudgeState()
 
-  /** Any positive balance means there is something a recovery backup could
-   *  actually recover; an empty wallet has nothing to warn about. */
-  const hasAnyBalance = isSelfCustodial
-    ? activeWallet.wallets.some((w) => Number(w.balance.amount) > 0)
-    : false
   const { variant: recoveryNudgeVariant, dismiss: dismissRecoveryNudge } =
-    useRecoveryBackupNudge(hasAnyBalance)
+    useRecoveryBackupNudge()
   const {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,

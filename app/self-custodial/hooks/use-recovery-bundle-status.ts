@@ -82,6 +82,23 @@ type RecoveryBundleStatusResult = {
    *  exported by the user nor uploaded to their cloud. The automatic on-device
    *  copy dies with the device, so this is "backed up" only in name. */
   isOnlyOnThisDevice: boolean
+  /**
+   * True only when the wallet is known to hold nothing a recovery backup could
+   * recover, which is when warning about that backup is a false alarm. A wallet
+   * emptied after a bundle was saved otherwise reports Stale forever: the
+   * exporter refuses to rebuild with no leaves, so the recorded balance never
+   * catches up with the zero.
+   *
+   * Bitcoin only, deliberately: the bundle records Bitcoin outputs and declares
+   * Dollars not covered by a unilateral exit.
+   *
+   * Phrased as "known to hold nothing" rather than "has a balance" so a balance
+   * still loading does not read as empty - that would suppress the surfaces on
+   * every cold start, when the stored state can already answer on its own.
+   * Owned here rather than by each surface, so the chip and the nudge cannot
+   * disagree about it.
+   */
+  hasNothingToRecover: boolean
   reload: () => Promise<void>
 }
 
@@ -115,6 +132,8 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
 
+  /** wallets here is WalletState (MoneyAmount balances), not the GraphQL
+   *  WalletBalance that getBtcWallet takes; this mirrors use-payment-request. */
   const btcWallet = wallets.find((w) => w.walletCurrency === WalletCurrency.Btc)
   const currentTotalSats =
     btcWallet === undefined ? null : String(btcWallet.balance.amount)
@@ -191,6 +210,7 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     savedAt: saved.savedAt,
     leafCount: saved.leafCount,
     isOnlyOnThisDevice,
+    hasNothingToRecover: currentTotalSats === "0",
     reload,
   }
 }

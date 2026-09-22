@@ -168,6 +168,64 @@ describe("useRecoveryBundleStatus", () => {
     expect(result.current.status).toBe(RecoveryBundleStatus.Fresh)
   })
 
+  /** Both surfaces gate their warnings on this, so it has to be decided here
+   *  rather than re-derived by each of them - that is what keeps the chip and
+   *  the home nudge from contradicting each other. */
+  describe("is the wallet known to hold nothing", () => {
+    it("says no on a funded Bitcoin wallet", async () => {
+      const { result } = await renderStatus()
+
+      expect(result.current.hasNothingToRecover).toBe(false)
+    })
+
+    /** Bitcoin only: the bundle records Bitcoin outputs and declares Dollars
+     *  not covered, and the exporter refuses to build one with no leaves. */
+    it("says yes on a Dollars-only wallet", async () => {
+      mockUseActiveWallet.mockReturnValue({
+        wallets: [
+          {
+            walletCurrency: WalletCurrency.Usd,
+            balance: { amount: 500, currency: WalletCurrency.Usd },
+          },
+          {
+            walletCurrency: WalletCurrency.Btc,
+            balance: { amount: 0, currency: WalletCurrency.Btc },
+          },
+        ],
+      })
+      const { result } = await renderStatus()
+
+      expect(result.current.hasNothingToRecover).toBe(true)
+    })
+
+    it("says yes on an emptied wallet", async () => {
+      mockUseActiveWallet.mockReturnValue({
+        wallets: [
+          {
+            walletCurrency: WalletCurrency.Btc,
+            balance: { amount: 0, currency: WalletCurrency.Btc },
+          },
+        ],
+      })
+      const { result } = await renderStatus()
+
+      expect(result.current.hasNothingToRecover).toBe(true)
+    })
+
+    /** A balance still loading is not a balance of zero. Collapsing the two
+     *  would hide the chip on every cold start, even when the stored state
+     *  already proves a bundle is missing. */
+    /** A balance still loading is not a balance of zero. Collapsing the two
+     *  would suppress both surfaces on every cold start, when the stored state
+     *  can already answer on its own. */
+    it("says no while the wallet has not loaded, rather than claiming it is empty", async () => {
+      mockUseActiveWallet.mockReturnValue({ wallets: [] })
+      const { result } = await renderStatus()
+
+      expect(result.current.hasNothingToRecover).toBe(false)
+    })
+  })
+
   describe("has the bundle left this device", () => {
     it("says no when it was never exported or synced", async () => {
       const { result } = await renderStatus()

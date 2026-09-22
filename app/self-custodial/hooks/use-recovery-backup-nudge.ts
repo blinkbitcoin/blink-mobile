@@ -46,9 +46,10 @@ type RecoveryBackupNudge = {
  * build a bundle and there is nothing to hand over. The first opportunity to
  * put a real backup in front of the user is here, once funds exist.
  */
-export const useRecoveryBackupNudge = (hasBalance: boolean): RecoveryBackupNudge => {
+export const useRecoveryBackupNudge = (): RecoveryBackupNudge => {
   const { activeAccount } = useAccountRegistry()
-  const { status, savedAt, isOnlyOnThisDevice } = useRecoveryBundleStatus()
+  const { status, savedAt, isOnlyOnThisDevice, hasNothingToRecover } =
+    useRecoveryBundleStatus()
   const [dismissedAt, setDismissedAt] = useState<number | null>(null)
   const [dismissalLoaded, setDismissalLoaded] = useState(false)
 
@@ -86,10 +87,10 @@ export const useRecoveryBackupNudge = (hasBalance: boolean): RecoveryBackupNudge
   const variant = ((): RecoveryBackupNudgeVariant | null => {
     if (!accountId || !dismissalLoaded) return null
 
-    /** No bundle and no balance is the ordinary state of a fresh wallet, not a
-     *  problem to nag about: there is nothing that could be backed up yet. */
+    /** No bundle and nothing to recover is the ordinary state of a fresh wallet,
+     *  not a problem to nag about: there is nothing that could be backed up. */
     if (status === RecoveryBundleStatus.Missing) {
-      return hasBalance ? RecoveryBackupNudgeVariant.Missing : null
+      return hasNothingToRecover ? null : RecoveryBackupNudgeVariant.Missing
     }
 
     /** A dismissal covers the state the user actually saw, not every future
@@ -97,6 +98,11 @@ export const useRecoveryBackupNudge = (hasBalance: boolean): RecoveryBackupNudge
     const dismissalCoversThisBundle =
       dismissedAt !== null && savedAt !== null && dismissedAt > savedAt
     if (dismissalCoversThisBundle) return null
+
+    /** Nothing left to lose and nothing to update: a wallet emptied after a
+     *  bundle was saved reports Stale forever, because the exporter refuses to
+     *  rebuild with no leaves and the recorded balance never catches up. */
+    if (hasNothingToRecover) return null
 
     /** Checked before staleness: a bundle that never left the device is a
      *  bigger problem than one that is merely out of date, and saying both at

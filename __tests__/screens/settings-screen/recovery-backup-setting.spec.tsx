@@ -46,12 +46,13 @@ const renderRow = () =>
     </ThemeProvider>,
   )
 
-const withStatus = (status: RecoveryBundleStatus) =>
+const withStatus = (status: RecoveryBundleStatus, hasNothingToRecover = false) =>
   mockStatus.mockReturnValue({
     status,
     savedAt: null,
     leafCount: null,
     isOnlyOnThisDevice: false,
+    hasNothingToRecover,
     reload: jest.fn(),
   })
 
@@ -88,6 +89,27 @@ describe("RecoveryBackupSetting", () => {
       const { getByText } = renderRow()
 
       expect(getByText(LL.RecoveryBundleScreen.chipFresh())).toBeTruthy()
+    })
+
+    /** A wallet with nothing to recover reports Stale forever: the exporter
+     *  refuses to rebuild with no leaves, so the recorded balance never catches
+     *  up with the zero. Warning about a backup of nothing is a false alarm. */
+    it("hides the out-of-date warning when there is nothing to recover", () => {
+      withStatus(RecoveryBundleStatus.Stale, true)
+      const { queryByText, queryByTestId } = renderRow()
+
+      expect(queryByTestId("recovery-backup-chip")).toBeNull()
+      expect(queryByText(LL.RecoveryBundleScreen.chipStale())).toBeNull()
+    })
+
+    /** Only the warning is suppressed. "Not set up" is the honest state of a
+     *  wallet that has no bundle yet, whether or not it holds funds, so it is
+     *  not a false alarm and must keep showing. */
+    it("still reads Not set up on a wallet with nothing to recover", () => {
+      withStatus(RecoveryBundleStatus.Missing, true)
+      const { getByText } = renderRow()
+
+      expect(getByText(LL.RecoveryBundleScreen.chipMissing())).toBeTruthy()
     })
 
     it("reads Out of date once the wallet has moved on", () => {

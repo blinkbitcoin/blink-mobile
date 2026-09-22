@@ -19,7 +19,7 @@ export const RecoveryBackupSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
-  const { status } = useRecoveryBundleStatus()
+  const { status, hasNothingToRecover } = useRecoveryBundleStatus()
 
   if (activeAccount?.type !== AccountType.SelfCustodial) return null
 
@@ -43,23 +43,25 @@ export const RecoveryBackupSetting: React.FC = () => {
       status: "primary",
     },
   }
-  const pill = chip[status]
+  /** Only the staleness warning is suppressed on a wallet with nothing to
+   *  recover: such a wallet reports Stale forever, because the exporter refuses
+   *  to rebuild with no leaves and the recorded balance never catches up with
+   *  the zero. "Not set up" is not a false alarm - it is the honest state of a
+   *  wallet that has no bundle yet - so it stays. */
+  const isFalseStaleWarning = hasNothingToRecover && status === RecoveryBundleStatus.Stale
+  const pill = isFalseStaleWarning ? null : chip[status]
+
+  /** Left undefined rather than an empty fragment when there is no chip: the
+   *  row already defaults the slot, so a fragment only adds a node. */
+  const chipComponent = pill ? (
+    <StatusPill label={pill.label} status={pill.status} testID="recovery-backup-chip" />
+  ) : undefined
 
   return (
     <SettingsRow
       title={LL.RecoveryBundleScreen.settingsTitle()}
       leftGaloyIcon="shield"
-      extraComponentBesideTitle={
-        pill ? (
-          <StatusPill
-            label={pill.label}
-            status={pill.status}
-            testID="recovery-backup-chip"
-          />
-        ) : (
-          <></>
-        )
-      }
+      extraComponentBesideTitle={chipComponent}
       action={() => navigate("selfCustodialRecoveryBackup")}
     />
   )
