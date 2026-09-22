@@ -2175,16 +2175,15 @@
     "walletCountNotTwo": "Beursietelling is nie 2 nie. Gebruik asseblief die kontroleskerm om al die beursies en fondse van hierdie rekening te sien"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
     "attemptsRemaining": "Verkeerde PIN. {attemptsRemaining: number} probeerslae oor. ",
     "enterPin": "Voer jou PIN-kode in",
-    "lockoutUnavailable": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
     "oneAttemptRemaining": "Verkeerde PIN, 1 probeerslag oor.",
     "pinUnreadable": "Kon nie jou PIN nagaan nie. Probeer asseblief weer.",
     "setPin": "Stel jou PIN-kode in",
     "setPinFailedMatch": "PINs stem nie ooreen nie - Stel jou PIN-kode in",
     "storePinFailed": "Kan nie nou jou PIN stoor nie.",
     "tooManyAttempts": "Te veel verkeerde probeerslae. Teken uit. ",
-    "tryAgainIn": "Probeer weer oor {seconds: number} s.",
     "verifyPin": "Bevestig jou PIN-kode"
   },
   "PriceHistoryScreen": {

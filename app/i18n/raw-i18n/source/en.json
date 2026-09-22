@@ -2141,16 +2141,15 @@
         "walletCountNotTwo": "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Couldn't record the failed attempt securely. Logging out.",
         "attemptsRemaining": "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
         "enterPin": "Enter your PIN code",
-        "lockoutUnavailable": "Couldn't record the failed attempt securely. Logging out.",
         "oneAttemptRemaining": "Incorrect PIN. 1 attempt remaining.",
         "pinUnreadable": "Couldn't check your PIN. Please try again.",
         "setPin": "Set your PIN code",
         "setPinFailedMatch": "Pins didn't match - Set your PIN code",
         "storePinFailed": "Unable to store your pin.",
         "tooManyAttempts": "Too many failed attempts. Logging out.",
-        "tryAgainIn": "Try again in {seconds: number}s.",
         "verifyPin": "Verify your PIN code"
     },
     "PriceHistoryScreen": {
