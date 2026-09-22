@@ -71,6 +71,14 @@ describe("BundleExportScreen", () => {
     mockActions.bundleState = undefined
     mockActions.sharing = false
     mockActions.copying = false
+    // Restored per test: jest.clearAllMocks() clears calls, not implementations,
+    // and cases below replace these members outright - without this the
+    // replacement leaks into every test that runs after them.
+    mockActions.reloadState = jest.fn().mockResolvedValue(undefined)
+    // true = the share sheet completed; cases below override it to cover a
+    // dismissal, which must not advance the flow.
+    mockActions.handleShare = jest.fn().mockResolvedValue(true)
+    mockActions.handleCopy = jest.fn().mockResolvedValue(undefined)
   })
 
   describe("when a recovery backup exists", () => {
@@ -143,6 +151,44 @@ describe("BundleExportScreen", () => {
         successMessage: "done",
       })
       expect(mockCompleteBackup).not.toHaveBeenCalled()
+    })
+
+    /** Dismissing the OS share sheet is one tap. Advancing anyway would tell the
+     *  user their emergency bundle is saved when no file ever left the device -
+     *  and the bundle is the artifact a unilateral exit depends on. */
+    it("stays put when the share sheet is dismissed", async () => {
+      mockActions.handleShare = jest.fn().mockResolvedValue(false)
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalled())
+
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    /** The repeat-download path skips the warning modal, so it needs the same
+     *  gate: it is the easier of the two to leave unguarded. */
+    it("stays put when a repeat share is dismissed", async () => {
+      // One mock across both presses: the screen captures the reference it was
+      // rendered with, so swapping the member mid-test would leave it calling
+      // the original.
+      mockActions.handleShare = jest
+        .fn()
+        .mockResolvedValueOnce(true)
+        .mockResolvedValueOnce(false)
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockNavigate).toHaveBeenCalled())
+      mockNavigate.mockClear()
+
+      // Second press skips the warning modal and shares straight away.
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(2))
+
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
 
     it("copies without leaving the screen", async () => {
@@ -250,5 +296,40 @@ describe("BundleExportScreen", () => {
     mockActions.reloadState = jest.fn().mockRejectedValue(new Error("nope"))
 
     expect(() => renderScreen()).not.toThrow()
+  })
+
+  /** Skip finishes the backup and navigates away. Left live during an export it
+   *  would tear the flow down while the share sheet or the clipboard write is
+   *  still resolving into a screen the user has left. */
+  describe("skip during an in-flight export", () => {
+    beforeEach(() => {
+      mockActions.bundleState = { updatedAt: 1, outputCount: 3 } as never
+    })
+
+    it("refuses the press while a share is in flight", () => {
+      mockActions.sharing = true
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("bundle-skip-button"))
+
+      expect(mockCompleteBackup).not.toHaveBeenCalled()
+    })
+
+    it("refuses the press while a copy is in flight", () => {
+      mockActions.copying = true
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("bundle-skip-button"))
+
+      expect(mockCompleteBackup).not.toHaveBeenCalled()
+    })
+
+    it("allows the press once nothing is in flight", () => {
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("bundle-skip-button"))
+
+      expect(mockCompleteBackup).toHaveBeenCalled()
+    })
   })
 })
