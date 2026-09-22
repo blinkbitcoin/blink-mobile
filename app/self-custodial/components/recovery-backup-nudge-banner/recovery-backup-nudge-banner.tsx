@@ -40,14 +40,16 @@ export const RecoveryBackupNudgeBanner: React.FC<Props> = ({ variant, onDismiss 
     },
   }[variant]
 
+  /** Missing means funds exist with no recovery path at all, which is not a
+   *  reminder to be snoozed; only the other variants can be dismissed. */
+  const dismissAction = isMissing ? undefined : onDismiss
+
   return (
     <NotificationCardUI
       title={copy.title}
       text={copy.body}
       action={openRecoveryBackup}
-      /** Missing means funds exist with no recovery path at all, which is not a
-       *  reminder to be snoozed; only the staleness variant can be dismissed. */
-      dismissAction={isMissing ? undefined : onDismiss}
+      dismissAction={dismissAction}
       buttonLabel={t.nudgeCta()}
       {...testProps(`recovery-backup-nudge-${variant}`)}
     />
