@@ -102,51 +102,52 @@ export const BundleExportScreen: React.FC = () => {
 
   const isLoading = bundleState === undefined
   const hasBundle = Boolean(bundleState)
+  const subtitle = hasBundle
+    ? LL.BackupScreen.BundleExport.subtitle()
+    : LL.BackupScreen.BundleExport.subtitlePending()
+
+  const exportActions = (
+    <>
+      <GaloyPrimaryButton
+        title={LL.BackupScreen.BundleExport.download()}
+        onPress={onDownloadPress}
+        loading={sharing}
+        disabled={copying}
+        {...testProps("bundle-download-button")}
+      />
+      <GaloySecondaryButton
+        title={LL.BackupScreen.BundleExport.copy()}
+        onPress={handleCopy}
+        loading={copying}
+        disabled={sharing}
+        {...testProps("bundle-copy-button")}
+      />
+      <GaloySecondaryButton
+        title={LL.BackupScreen.BundleExport.skip()}
+        onPress={finish}
+        {...testProps("bundle-skip-button")}
+      />
+    </>
+  )
+
+  const continueAction = (
+    <GaloyPrimaryButton
+      title={LL.common.next()}
+      onPress={finish}
+      disabled={isLoading}
+      {...testProps("bundle-continue-button")}
+    />
+  )
+
+  const footer = hasBundle ? exportActions : continueAction
 
   return (
-    <OnboardingScreenLayout
-      footer={
-        hasBundle ? (
-          <>
-            <GaloyPrimaryButton
-              title={LL.BackupScreen.BundleExport.download()}
-              onPress={onDownloadPress}
-              loading={sharing}
-              disabled={copying}
-              {...testProps("bundle-download-button")}
-            />
-            <GaloySecondaryButton
-              title={LL.BackupScreen.BundleExport.copy()}
-              onPress={handleCopy}
-              loading={copying}
-              disabled={sharing}
-              {...testProps("bundle-copy-button")}
-            />
-            <GaloySecondaryButton
-              title={LL.BackupScreen.BundleExport.skip()}
-              onPress={finish}
-              {...testProps("bundle-skip-button")}
-            />
-          </>
-        ) : (
-          <GaloyPrimaryButton
-            title={LL.common.next()}
-            onPress={finish}
-            disabled={isLoading}
-            {...testProps("bundle-continue-button")}
-          />
-        )
-      }
-    >
+    <OnboardingScreenLayout footer={footer}>
       <IconHero
         icon="emergency-kit"
         iconColor={colors._green}
         title={LL.BackupScreen.BundleExport.title()}
-        subtitle={
-          hasBundle
-            ? LL.BackupScreen.BundleExport.subtitle()
-            : LL.BackupScreen.BundleExport.subtitlePending()
-        }
+        subtitle={subtitle}
       />
 
       {hasBundle && (
