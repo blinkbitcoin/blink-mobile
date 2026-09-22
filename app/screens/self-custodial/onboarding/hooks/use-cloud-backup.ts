@@ -3,7 +3,6 @@ import { Platform } from "react-native"
 
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
@@ -13,7 +12,6 @@ import {
   readRecoveryBundleSettings,
   writeRecoveryBundleSettings,
 } from "@app/self-custodial/recovery-bundle/settings"
-import { AccountType } from "@app/types/wallet"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import { reportError } from "@app/utils/error-logging"
 import {
@@ -28,7 +26,11 @@ import { getCloudProviderName } from "../utils"
 
 import { useCompleteBackup } from "./use-complete-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
-import { useWalletIdentity, useWalletMnemonicState } from "./use-wallet-mnemonic"
+import {
+  useBackupTargetAccountId,
+  useWalletIdentity,
+  useWalletMnemonicState,
+} from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 
@@ -71,7 +73,9 @@ export const useCloudBackup = ({
   const { mnemonic, loading: mnemonicLoading } = useWalletMnemonicState()
   const { pubkey: identityPubkey, loading: identityLoading } = useWalletIdentity(mnemonic)
   const { lightningAddress } = useSelfCustodialAccountInfo()
-  const { activeAccount } = useAccountRegistry()
+  /** The same account the phrase above was read from: mid-migration that is the
+   *  provisioned self-custodial one, not the still-custodial active account. */
+  const accountId = useBackupTargetAccountId()
 
   /** The phrase is read from the keychain before the pubkey can derive from it; both
    *  windows leave the pubkey empty without it being a failure. */
@@ -156,8 +160,6 @@ export const useCloudBackup = ({
      *  alongside a password (D9). A failed upload must not leave sync enabled
      *  for a provider that holds nothing. Failure here is not fatal: the seed
      *  backup succeeded, and the toggle is available again in Settings. */
-    const accountId =
-      activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
     if (accountId && autoBundleSync && isEncrypted && password.length > 0) {
       /** Read separately rather than inline in the write's arguments: an
        *  argument that rejects aborts the call before .catch can attach, so a
@@ -198,7 +200,7 @@ export const useCloudBackup = ({
     isEncrypted,
     password,
     autoBundleSync,
-    activeAccount,
+    accountId,
     version,
     startSession,
     upload,

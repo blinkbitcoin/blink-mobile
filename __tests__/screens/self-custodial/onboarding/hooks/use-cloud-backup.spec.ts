@@ -61,6 +61,9 @@ let mockIdentityPubkey: string | null = "test-pubkey-1234"
 let mockIdentityLoading = false
 let mockMnemonic = "youth indicate void"
 let mockMnemonicLoading = false
+/** The account being backed up, which mid-migration is the provisioned
+ *  self-custodial one rather than the still-custodial active account. */
+let mockTargetAccountId: string | null = "account-1"
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
   useWalletMnemonic: () => mockMnemonic,
   useWalletMnemonicState: () => ({
@@ -71,6 +74,7 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", ()
     pubkey: mockIdentityPubkey ?? "",
     loading: mockIdentityLoading,
   }),
+  useBackupTargetAccountId: () => mockTargetAccountId,
 }))
 
 let mockLightningAddress: string | null = null
@@ -188,6 +192,10 @@ describe("useCloudBackup", () => {
     // test after it.
     mockReadSettings.mockResolvedValue({ autoRefresh: true, cloudSync: false })
     mockWriteSettings.mockResolvedValue(undefined)
+    // Restored here rather than at the end of a test body, so an assertion
+    // failing mid-test cannot leak a custodial account into every case after.
+    mockActiveAccount = { id: "account-1", type: "self-custodial" }
+    mockTargetAccountId = "account-1"
   })
 
   it("uploads unencrypted backup and navigates to success", async () => {
@@ -804,9 +812,15 @@ describe("useCloudBackup", () => {
       })
     })
 
-    it("has no bundle to sync when the active account is not self-custodial", async () => {
+    /** Mid-migration the active account is still the custodial one while the
+     *  phrase being uploaded belongs to the provisioned self-custodial account.
+     *  Recording the opt-in against the active account drops it silently: the
+     *  user ticks the box, the upload succeeds, and sync stays off with nothing
+     *  to tell them. */
+    it("records the opt-in against the migration account, not the active one", async () => {
       mockUpload.mockResolvedValue({ success: true })
-      mockActiveAccount = { id: "account-2", type: "custodial" }
+      mockActiveAccount = { id: "custodial-1", type: "custodial" }
+      mockTargetAccountId = "migration-account-1"
 
       const { result } = renderHook(() =>
         useCloudBackup({
@@ -819,10 +833,52 @@ describe("useCloudBackup", () => {
         await result.current.handleBackup()
       })
 
-      // Custodial accounts have no recovery bundle, so there is nothing the
-      // setting could refer to.
+      expect(mockWriteSettings).toHaveBeenCalledWith(
+        "migration-account-1",
+        expect.objectContaining({ cloudSync: true }),
+      )
+    })
+
+    it("reads the existing settings from the migration account too", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+      mockActiveAccount = { id: "custodial-1", type: "custodial" }
+      mockTargetAccountId = "migration-account-1"
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      // Reading one account and writing another would replace the target's
+      // record with a stranger's.
+      expect(mockReadSettings).toHaveBeenCalledWith("migration-account-1")
+    })
+
+    it("has no bundle to sync when there is no account to record it against", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+      mockActiveAccount = { id: "custodial-1", type: "custodial" }
+      mockTargetAccountId = null
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      // No migration in flight and no self-custodial account: there is nothing
+      // the setting could refer to.
       expect(mockWriteSettings).not.toHaveBeenCalled()
-      mockActiveAccount = { id: "account-1", type: "self-custodial" }
     })
 
     it("does not enable sync when the upload failed", async () => {
