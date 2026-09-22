@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, StyleProp, View, ViewStyle } from "react-native"
+import { View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
@@ -7,69 +7,29 @@ import { testProps } from "@app/utils/testProps"
 
 export type StatusPillVariant = "warning" | "error" | "success" | "primary"
 
-/** The pill can sit in width-capped rows (balance header), so its label must
- *  not outgrow the cap under iOS Dynamic Type — same ceiling as the header. */
+/** The pill sits beside a settings row's title, which is width-capped, so its
+ *  label must not outgrow that cap under iOS Dynamic Type. */
 const MAX_LABEL_FONT_SIZE_MULTIPLIER = 1.4
 
 type Props = {
   label: string
   status: StatusPillVariant
-  ghost?: boolean
   testID?: string
-  style?: StyleProp<ViewStyle>
-  onPress?: () => void
 }
 
-export const StatusPill: React.FC<Props> = ({
-  label,
-  status,
-  ghost,
-  testID,
-  style,
-  onPress,
-}) => {
+export const StatusPill: React.FC<Props> = ({ label, status, testID }) => {
   const styles = useStyles({ status })
 
-  const body = (
-    <Text
-      style={styles.label}
-      numberOfLines={1}
-      ellipsizeMode="tail"
-      maxFontSizeMultiplier={MAX_LABEL_FONT_SIZE_MULTIPLIER}
-    >
-      {label}
-    </Text>
-  )
-
-  if (ghost) {
-    return (
-      <View
-        style={[styles.pill, styles.ghost, style]}
-        pointerEvents="none"
-        accessibilityElementsHidden
-        importantForAccessibility="no-hide-descendants"
-      >
-        {body}
-      </View>
-    )
-  }
-
-  if (onPress) {
-    return (
-      <Pressable
-        onPress={onPress}
-        accessibilityRole="button"
-        style={[styles.pill, style]}
-        {...(testID ? testProps(testID) : { accessibilityLabel: label })}
-      >
-        {body}
-      </Pressable>
-    )
-  }
-
   return (
-    <View style={[styles.pill, style]} {...(testID ? testProps(testID) : {})}>
-      {body}
+    <View style={styles.pill} {...(testID ? testProps(testID) : {})}>
+      <Text
+        style={styles.label}
+        numberOfLines={1}
+        ellipsizeMode="tail"
+        maxFontSizeMultiplier={MAX_LABEL_FONT_SIZE_MULTIPLIER}
+      >
+        {label}
+      </Text>
     </View>
   )
 }
@@ -82,9 +42,6 @@ const useStyles = makeStyles(({ colors }, { status }: { status: StatusPillVarian
     paddingVertical: 2,
     borderRadius: 10,
     backgroundColor: colors[status],
-  },
-  ghost: {
-    opacity: 0,
   },
   label: {
     fontSize: 9,
