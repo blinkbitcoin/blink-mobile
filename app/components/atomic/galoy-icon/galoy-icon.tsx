@@ -379,8 +379,12 @@ export const GaloyIcon = ({
   return (
     <SvgIcon
       opacity={opacity || 1}
-      width={size ?? width}
-      height={size ?? height}
+      /* Falls back to resolvedSize, not to the raw width/height: those default
+         to 0, so a caller passing only sizeVariant would otherwise render the
+         icon at zero pixels. Kept per-axis rather than using resolvedSize
+         outright so an explicit width/height pair stays non-square. */
+      width={width || resolvedSize}
+      height={height || resolvedSize}
       color={resolvedColor}
       style={style}
       testID={`icon-${name}`}
