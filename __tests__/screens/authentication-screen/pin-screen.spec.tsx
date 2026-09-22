@@ -51,6 +51,8 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   },
 }))
 
+jest.mock("@app/utils/sleep", () => ({ sleep: jest.fn().mockResolvedValue(undefined) }))
+
 const CORRECT_PIN = "1234"
 const WRONG_PIN = "9999"
 
@@ -356,11 +358,13 @@ describe("PinScreen", () => {
 
       await enterPin(WRONG_PIN)
 
-      expect(mockLogout).toHaveBeenCalledTimes(1)
+      /** The lock outlives this logout, so the reset goes to the gate to ask
+       *  whether the device is still locked rather than assume it is not. */
+      expect(mockLogout).toHaveBeenCalledWith({ preserveAppLock: true })
       await advance(1000) // the screen sleeps 1s before resetting navigation
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
-        routes: [{ name: "Primary" }],
+        routes: [{ name: "authenticationCheck" }],
       })
     })
 
@@ -872,7 +876,7 @@ describe("PinScreen ChallengePin", () => {
 
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
-        routes: [{ name: "Primary" }],
+        routes: [{ name: "authenticationCheck" }],
       })
     })
 
@@ -950,7 +954,7 @@ describe("PinScreen ChallengePin", () => {
 
         expect(mockReset).toHaveBeenCalledWith({
           index: 0,
-          routes: [{ name: "Primary" }],
+          routes: [{ name: "authenticationCheck" }],
         })
         /** The reset unmounts the caller; a failure callback into it would be noise. */
         expect(onChallengeSuccess).not.toHaveBeenCalled()

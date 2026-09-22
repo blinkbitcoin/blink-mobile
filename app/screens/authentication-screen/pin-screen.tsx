@@ -106,7 +106,13 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       setEnteredPIN("")
       setFarewellText(message)
       try {
-        await logout()
+        /** The lock outlives the logout its own budget triggered. Dismantling
+         *  it here would leave the next screen ungated rather than locked, and
+         *  the spent budget has to go with it: cleared, it would hand the next
+         *  round a fresh three guesses against a PIN that now survives.
+         *  Everything the lock guarded still goes — the session and the saved
+         *  profiles. */
+        await logout({ preserveAppLock: true })
         await sleep(1000)
       } catch {
         /** Swallowed, not rethrown: usePinAttempts awaits this from a floating
@@ -115,10 +121,14 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         /** In a finally so a rejected logout cannot strand the screen. A
          *  challenge caller is already marked resolved by the removal this
          *  reset performs, so a screen that never left would leave it waiting
-         *  on a callback that can no longer fire. */
+         *  on a callback that can no longer fire.
+         *
+         *  To the gate rather than past it: the PIN outlives this logout, so
+         *  whether the device is still locked is a question to ask, not one to
+         *  answer here. */
         navigation.reset({
           index: 0,
-          routes: [{ name: "Primary" }],
+          routes: [{ name: "authenticationCheck" }],
         })
       }
     },
@@ -237,9 +247,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  The `disabled` prop is the whole guard here, unlike on the keypad, which
    *  additionally asks the in-flight guard at press time because its `disabled`
    *  had an observed bypass — a backspace from a render predating the
-   *  verification in flight. Nothing derives this from a stale render: it is this render's own
-   *  state, so a second check inside the handler would be a branch nothing can
-   *  reach. */
+   *  verification in flight. Nothing derives this from a stale render: it is
+   *  this render's own state, so a second check inside the handler would be a
+   *  branch nothing can reach. */
   const isTearingDown = Boolean(farewellText)
 
   const circleComponentForDigit = (digit: number) => {

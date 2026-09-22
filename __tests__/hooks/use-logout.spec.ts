@@ -72,9 +72,9 @@ beforeEach(() => {
 })
 
 describe("useLogout", () => {
-  it("clears the PIN lockout along with the PIN itself", async () => {
-    // A lockout that survives a logout greets the next person to sign in on
-    // this device — with a countdown they cannot explain and a spent budget.
+  it("clears the spent attempts along with the PIN itself", async () => {
+    // A budget that survives a logout greets the next person to sign in on
+    // this device, one typo from being thrown back out.
     await logoutOnce()
 
     expect(mockedStore.removePin).toHaveBeenCalledTimes(1)
@@ -172,7 +172,7 @@ describe("useLogout", () => {
   })
 
   it("leaves this device's PIN alone when another session's token is logged out", async () => {
-    // The multi-account path drops one stored session; the PIN and its lockout
+    // The multi-account path drops one stored session; the PIN and its budget
     // belong to the device, not to that session.
     await logoutOnce({ token: "other-session-token" })
 
@@ -181,5 +181,38 @@ describe("useLogout", () => {
     )
     expect(mockedStore.removePin).not.toHaveBeenCalled()
     expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+  })
+
+  describe("a logout the app lock itself triggered", () => {
+    it("keeps all three slots the lock is made of", async () => {
+      // Split any of them and the lock stops working: a PIN without its spent
+      // budget grants a fresh round of guesses, and a PIN without the
+      // biometrics flag routes every later unlock to the keypad, which is the
+      // one unlock screen that carries no way out.
+      await logoutOnce({ preserveAppLock: true })
+
+      expect(mockedStore.removePin).not.toHaveBeenCalled()
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+      expect(mockedStore.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+    })
+
+    it("still erases everything the lock was guarding", async () => {
+      await logoutOnce({ preserveAppLock: true })
+
+      expect(mockedStore.removeSessionProfiles).toHaveBeenCalledTimes(1)
+      expect(mockAsyncStorage.multiRemove).toHaveBeenCalledTimes(1)
+      expect(mockClearToken).toHaveBeenCalledTimes(1)
+      expect(mockResetState).toHaveBeenCalledTimes(1)
+    })
+
+    it("is overruled by preserveStoredCredentials, which keeps the profiles too", async () => {
+      // The wider option already keeps the lock; asking for both must not make
+      // the narrower one erase anything the wider one is holding.
+      await logoutOnce({ preserveStoredCredentials: true, preserveAppLock: true })
+
+      expect(mockedStore.removeSessionProfiles).not.toHaveBeenCalled()
+      expect(mockedStore.removePin).not.toHaveBeenCalled()
+      expect(mockClearToken).toHaveBeenCalledTimes(1)
+    })
   })
 })
