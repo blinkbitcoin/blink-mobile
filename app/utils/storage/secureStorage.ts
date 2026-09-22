@@ -1,5 +1,7 @@
 import { ACCESSIBLE } from "react-native-keychain"
 
+import { recordAppError } from "@app/utils/error-reporting"
+
 import { eraseEntireLegacyStore } from "./legacy-key-store"
 import { type SecureExists, secureRead, secureRemove, secureWrite } from "./secure-store"
 import {
@@ -638,11 +640,28 @@ export default class KeyStoreWrapper {
         const accountIds = tracked.status === "ok" ? tracked.accountIds : []
         if (accountIds.includes(accountId)) return
 
-        await secureWrite(
+        const written = await secureWrite(
           KeyStoreWrapper.MNEMONIC_ACCOUNTS,
           JSON.stringify([...accountIds, accountId]),
           ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
         )
+
+        // Reported after the write, and only once it landed, for two reasons.
+        // The message describes a loss that has actually happened rather than
+        // one being attempted, and a throw out of the telemetry call — the
+        // firebase handle is not guaranteed to be initialised — lands in the
+        // blanket catch below without having cost the rewrite that keeps
+        // tracking alive for this account.
+        //
+        // The loss is worth a report because nothing else notices it: every id
+        // the damaged list held stops being reachable by the wipe, which then
+        // reports a clean sweep over mnemonics it never looked at. No id goes
+        // into the message or the key, for the reason keyClassOf exists.
+        if (written && tracked.status === "malformed") {
+          recordAppError(new Error("Mnemonic accounts list malformed; rewritten"), {
+            dedupKey: "storage-mnemonic-accounts-malformed",
+          })
+        }
       })
     } catch {
       // The queue rejects on timeout. Best effort, as above.

@@ -10,6 +10,13 @@ const mockHasInternet = jest.fn()
 const mockResetInternet = jest.fn()
 const mockResetGenericPassword = jest.fn()
 
+const mockRecordError = jest.fn()
+const mockCrashlyticsLog = jest.fn()
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: (...args: unknown[]) => mockCrashlyticsLog(...args),
+}))
+
 // The six non-mnemonic slots now read and write through the Keychain-backed
 // store (blinkbitcoin/blink-wip#1161). The legacy mock below still drives every
 // read: an unmigrated slot misses in the new store and falls through to it,
@@ -226,7 +233,13 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       expect(listWrites).toHaveLength(0)
     })
 
-    it("starts a fresh list when the stored one is valid JSON but not a list", async () => {
+    /**
+     * First case in this file to reach the malformed-list dedup key, which is
+     * what lets it assert the non-fatal: `recordAppError` suppresses a repeated
+     * key for the lifetime of the process, and the set it keeps is shared by
+     * every test here. The cases below assert the breadcrumb instead.
+     */
+    it("starts a fresh list when the stored one is valid JSON but not a list, and reports the loss", async () => {
       mockGetInternet.mockImplementation(async (server: string) =>
         server === "secure-store.blink.local/mnemonicAccounts"
           ? { username: "mnemonicAccounts", password: JSON.stringify({ alice: true }) }
@@ -241,6 +254,13 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
         JSON.stringify(["alice"]),
         { accessible: MNEMONIC_ACCESSIBLE },
       )
+      // The rewrite drops every id the damaged list held, and nothing else
+      // notices: the wipe would go on reporting a clean sweep over mnemonics it
+      // never looked at.
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0]).toMatchObject({
+        message: "Mnemonic accounts list malformed; rewritten",
+      })
     })
 
     // A malformed list holds no id anything can recover, so refusing to touch
@@ -260,6 +280,9 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
         JSON.stringify(["bob"]),
         { accessible: MNEMONIC_ACCESSIBLE },
       )
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        "[defect] Mnemonic accounts list malformed; rewritten",
+      )
     })
 
     it("starts a fresh list when the stored one will not parse", async () => {
@@ -276,6 +299,44 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
         "mnemonicAccounts",
         JSON.stringify(["alice"]),
         { accessible: MNEMONIC_ACCESSIBLE },
+      )
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        "[defect] Mnemonic accounts list malformed; rewritten",
+      )
+    })
+
+    it("reports nothing when the rewrite itself fails, so the claim matches what happened", async () => {
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: "not json at all" }
+          : false,
+      )
+      mockSetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? false
+          : { service: "mock" },
+      )
+
+      await KeyStoreWrapper.setMnemonicForAccount("alice", "alice words")
+
+      // Nothing was lost: the damaged list is still there to be repaired by the
+      // next write, so a report claiming it was rewritten would be false.
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+        "[defect] Mnemonic accounts list malformed; rewritten",
+      )
+    })
+
+    it("reports nothing when the stored list is healthy", async () => {
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: JSON.stringify(["alice"]) }
+          : false,
+      )
+
+      await KeyStoreWrapper.setMnemonicForAccount("bob", "bob words")
+
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+        "[defect] Mnemonic accounts list malformed; rewritten",
       )
     })
 
