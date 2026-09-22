@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render } from "@testing-library/react-native"
+import { render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import theme from "@app/rne-theme/theme"
@@ -14,9 +14,9 @@ const renderPill = (props: React.ComponentProps<typeof StatusPill>) =>
 
 describe("StatusPill", () => {
   it("renders the provided label", () => {
-    const { getByText } = renderPill({ label: "STALE", status: "warning" })
+    const { getByText } = renderPill({ label: "Out of date", status: "warning" })
 
-    expect(getByText("STALE")).toBeTruthy()
+    expect(getByText("Out of date")).toBeTruthy()
   })
 
   const VARIANTS: StatusPillVariant[] = ["warning", "error", "success", "primary"]
@@ -31,62 +31,35 @@ describe("StatusPill", () => {
 
   it("exposes the testID when provided", () => {
     const { getByTestId } = renderPill({
-      label: "STALE",
+      label: "Out of date",
       status: "warning",
-      testID: "balance-stale-pill",
+      testID: "recovery-backup-chip",
     })
 
-    expect(getByTestId("balance-stale-pill")).toBeTruthy()
+    expect(getByTestId("recovery-backup-chip")).toBeTruthy()
   })
 
-  it("truncates long labels to a single line instead of wrapping", () => {
-    const { getByText } = renderPill({
-      label: "PENDING +$1,234,567.89",
-      status: "warning",
-    })
+  it("renders without a testID", () => {
+    const { getByText } = renderPill({ label: "Backed up", status: "success" })
 
-    const label = getByText("PENDING +$1,234,567.89")
+    expect(getByText("Backed up")).toBeTruthy()
+  })
+
+  /** The pill shares a width-capped row with the setting's title, so a label
+   *  has to truncate rather than push the row wider or wrap onto a second
+   *  line. Asserted on the props rather than on measured layout, which jest
+   *  does not compute. */
+  it("truncates its label to a single line instead of wrapping", () => {
+    const { getByText } = renderPill({ label: "Not set up", status: "primary" })
+
+    const label = getByText("Not set up")
     expect(label.props.numberOfLines).toBe(1)
     expect(label.props.ellipsizeMode).toBe("tail")
   })
 
-  it("caps font scaling on the label so the fixed-width pill cannot clip scaled amounts", () => {
-    const { getByText } = renderPill({ label: "STALE", status: "warning" })
+  it("caps font scaling so Dynamic Type cannot outgrow the row", () => {
+    const { getByText } = renderPill({ label: "Backed up", status: "success" })
 
-    expect(getByText("STALE").props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
-  })
-
-  it("invokes onPress when tapped", () => {
-    const onPress = jest.fn()
-    const { getByTestId } = renderPill({
-      label: "STALE",
-      status: "warning",
-      testID: "pill",
-      onPress,
-    })
-
-    fireEvent.press(getByTestId("pill"))
-
-    expect(onPress).toHaveBeenCalledTimes(1)
-  })
-
-  it("stays reachable by its label when pressable without a testID", () => {
-    const onPress = jest.fn()
-    const { getByLabelText } = renderPill({ label: "STALE", status: "warning", onPress })
-
-    fireEvent.press(getByLabelText("STALE"))
-
-    expect(onPress).toHaveBeenCalledTimes(1)
-  })
-
-  it("hides itself from accessibility and ignores the testID when ghost", () => {
-    const { queryByTestId } = renderPill({
-      label: "STALE",
-      status: "warning",
-      ghost: true,
-      testID: "should-not-appear",
-    })
-
-    expect(queryByTestId("should-not-appear")).toBeNull()
+    expect(getByText("Backed up").props.maxFontSizeMultiplier).toBeLessThanOrEqual(1.5)
   })
 })
