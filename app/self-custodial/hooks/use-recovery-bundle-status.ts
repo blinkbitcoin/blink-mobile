@@ -1,4 +1,4 @@
-import { useCallback, useEffect, useState } from "react"
+import { useCallback, useState } from "react"
 
 import { useFocusEffect } from "@react-navigation/native"
 
@@ -158,13 +158,12 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     }
   }, [accountId, network])
 
-  // `reload` handles its own failures, so there is nothing to catch here.
-  useEffect(() => {
-    reload()
-  }, [reload])
-
-  /** Re-read on focus: the bundle refreshes in the background after payments,
-   *  so a chip rendered once at mount would go stale while on screen. */
+  /** Re-read on focus, which also covers the mount for both consumers: they are
+   *  screens, and useFocusEffect runs its callback from its own effect when the
+   *  screen is already focused. A separate mount effect would only double every
+   *  read. A component mounting while blurred would wait for focus instead,
+   *  which is the correct moment for a surface nobody is looking at. `reload`
+   *  handles its own failures, so there is nothing to catch. */
   useFocusEffect(
     useCallback(() => {
       reload()
