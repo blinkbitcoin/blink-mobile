@@ -463,7 +463,7 @@ describe("KeyStoreWrapper PIN methods", () => {
   })
 })
 
-describe("KeyStoreWrapper PIN lockout state", () => {
+describe("KeyStoreWrapper PIN attempt state", () => {
   const missingKey = (message = "key has not been set") =>
     Object.assign(new Error(message), { code: "404" })
 
@@ -487,18 +487,32 @@ describe("KeyStoreWrapper PIN lockout state", () => {
   })
 
   describe("getPinFailureState", () => {
-    it("reads the count and the lock from one key", async () => {
+    it("reads the attempt count from one key", async () => {
       storedKeys({
-        pinFailureState: JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 }),
+        pinFailureState: JSON.stringify({ attempts: 2, lockedUntil: 0 }),
       })
 
       const result = await KeyStoreWrapper.getPinFailureState()
 
       expect(result).toEqual({
         status: "found",
-        state: { attempts: 2, lockedUntil: 1700000060000 },
+        state: { attempts: 2 },
       })
       expect(mockGet).toHaveBeenCalledWith("pinFailureState")
+    })
+
+    it("reads past a lock expiry a shipped release wrote alongside the count", async () => {
+      // Builds between 3.0.29 and 3.0.41 stored a lock expiry next to
+      // the attempt count. Those devices upgrade into this code, and the count
+      // they already spent has to survive the field going away.
+      storedKeys({
+        pinFailureState: JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 }),
+      })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2 },
+      })
     })
 
     it("reports a clean slate when nothing is stored", async () => {
@@ -510,17 +524,26 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     it("reads back a clean slate for a corrupt or non-finite value", async () => {
       // NaN would slip past every `<` comparison downstream and silently pick
       // the wrong branch, so it must never escape this layer.
+      // Number() is not a validator here: it turns null, "", [] and false into
+      // a finite 0, which would read as a genuine clean slate rather than the
+      // corrupt slot it is. Only a count stored as a number is a count.
       for (const stored of [
         "not json",
-        JSON.stringify({ attempts: "abc", lockedUntil: 1 }),
-        JSON.stringify({ attempts: 1, lockedUntil: "Infinity" }),
+        JSON.stringify({ attempts: "abc" }),
+        JSON.stringify({ attempts: "2" }),
+        JSON.stringify({ attempts: "Infinity" }),
+        JSON.stringify({ attempts: null }),
+        JSON.stringify({ attempts: "" }),
+        JSON.stringify({ attempts: [] }),
+        JSON.stringify({ attempts: false }),
+        JSON.stringify({}),
         JSON.stringify(null),
       ]) {
         storedKeys({ pinFailureState: stored })
 
         expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
           status: "found",
-          state: { attempts: 0, lockedUntil: 0 },
+          state: { attempts: 0 },
         })
       }
     })
@@ -530,17 +553,17 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
         status: "found",
-        state: { attempts: 0, lockedUntil: 0 },
+        state: { attempts: 0 },
       })
     })
 
-    it("carries a pre-lockout install's attempt count over from the legacy key", async () => {
+    it("carries an older install's attempt count over from the legacy key", async () => {
       // Upgrading must not hand back a budget the user already spent.
       storedKeys({ pinAttempts: "2" })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
         status: "found",
-        state: { attempts: 2, lockedUntil: 0 },
+        state: { attempts: 2 },
       })
     })
 
@@ -552,7 +575,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
         status: "found",
-        state: { attempts: 0, lockedUntil: 0 },
+        state: { attempts: 0 },
       })
     })
 
@@ -585,25 +608,25 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
   })
 
-  describe("migrating the lockout slots", () => {
-    it("moves a lockout state that still lives in the legacy store", async () => {
-      const stored = JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 })
+  describe("migrating the attempt-state slots", () => {
+    it("moves an attempt state that still lives in the legacy store", async () => {
+      const stored = JSON.stringify({ attempts: 2, lockedUntil: 0 })
       onlyInLegacyStore({ pinFailureState: stored })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
         status: "found",
-        state: { attempts: 2, lockedUntil: 1700000060000 },
+        state: { attempts: 2 },
       })
       expectMigratedWrite("pinFailureState", stored)
       expect(mockRemove).toHaveBeenCalledWith("pinFailureState")
     })
 
-    it("moves a pre-lockout install's bare attempt count, budget intact", async () => {
+    it("moves an older install's bare attempt count, budget intact", async () => {
       onlyInLegacyStore({ pinAttempts: "2" })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
         status: "found",
-        state: { attempts: 2, lockedUntil: 0 },
+        state: { attempts: 2 },
       })
       expectMigratedWrite("pinAttempts", "2")
       expect(mockRemove).toHaveBeenCalledWith("pinAttempts")
@@ -612,21 +635,22 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
   describe("setPinFailureState", () => {
     it("writes one value under one key with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY accessibility", async () => {
-      const result = await KeyStoreWrapper.setPinFailureState({
-        attempts: 2,
-        lockedUntil: 1700000060000,
-      })
+      // The zero lock expiry is written for the device that downgrades: builds
+      // 3.0.29 to 3.0.41 parse this blob and demand both fields be finite,
+      // falling back to a clean slate otherwise, so dropping the field would
+      // hand a downgraded install the budget its user already spent.
+      const result = await KeyStoreWrapper.setPinFailureState({ attempts: 2 })
 
       expect(result).toBe(true)
       expect(mockSetInternet).toHaveBeenCalledTimes(1)
       expectMigratedWrite(
         "pinFailureState",
-        JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 }),
+        JSON.stringify({ attempts: 2, lockedUntil: 0 }),
       )
     })
 
     it("drops the legacy key once the state has moved", async () => {
-      await KeyStoreWrapper.setPinFailureState({ attempts: 1, lockedUntil: 0 })
+      await KeyStoreWrapper.setPinFailureState({ attempts: 1 })
 
       expect(mockRemove).toHaveBeenCalledWith("pinAttempts")
     })
@@ -636,10 +660,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       // the caller must treat the failure as unrecorded rather than half-kept.
       mockSetInternet.mockRejectedValue(new Error("write locked"))
 
-      const result = await KeyStoreWrapper.setPinFailureState({
-        attempts: 1,
-        lockedUntil: 1700000030000,
-      })
+      const result = await KeyStoreWrapper.setPinFailureState({ attempts: 1 })
 
       expect(result).toBe(false)
       expect(mockRemove).not.toHaveBeenCalled()
@@ -669,7 +690,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       // the user out on the spot.
       mockRemove.mockRejectedValue(new Error("keystore locked"))
       storedKeys({
-        pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 1700000060000 }),
+        pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 0 }),
       })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
@@ -1195,9 +1216,9 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
       KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
     ).resolves.toBeUndefined()
 
-    // The lockout state is absent from this list on purpose: clearing it falls
+    // The attempt state is absent from this list on purpose: clearing it falls
     // back to writing a clean slate when the erase fails, and a stored
-    // {attempts: 0, lockedUntil: 0} strands nobody.
+    // {attempts: 0} strands nobody.
     expect(onFailure.mock.calls.flat()).toEqual([
       "active token",
       "session profiles",

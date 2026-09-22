@@ -2175,16 +2175,15 @@
     "walletCountNotTwo": "Walleta yupayqa mana 2 kanchu. Ama hina kaspa dashboard nisqata llamk'achiy tukuy walletakunata qullqikunatapas qhawanaykipaq"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Manam allinta waqaychayta atirqanchu pantasqa kutita. Chiqanichu.",
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
     "enterPin": "PIN kodiykita yaykuchiy",
-    "lockoutUnavailable": "Manam allinta waqaychayta atirqanchu pantasqa kutita. Chiqanichu.",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "pinUnreadable": "Manam PIN nikita qhawayta atirqanchu. Wakmanta ruwaykuy.",
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",
     "storePinFailed": "Ñuqa PIN kodiyan kawsayninkuqa mana kani.",
     "tooManyAttempts": "Rantiq kawsayninkuqa hukllaqmi. Chiqanichu.",
-    "tryAgainIn": "Wakmanta ruwaykuy {seconds: number} s qhipata.",
     "verifyPin": "PIN qillqinmi qhipanichu"
   },
   "PriceHistoryScreen": {
