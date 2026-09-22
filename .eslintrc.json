@@ -12,15 +12,7 @@
     },
     "ecmaVersion": 12
   },
-  "plugins": [
-    "react",
-    "react-hooks",
-    "react-native",
-    "@typescript-eslint",
-    "import",
-    "prettier",
-    "jest"
-  ],
+  "plugins": ["react", "react-hooks", "react-native", "@typescript-eslint", "import", "prettier", "jest"],
   "extends": [
     "eslint:recommended",
     "plugin:react/recommended",
@@ -181,6 +173,7 @@
     "jest/prefer-to-have-length": "warn",
     "jest/valid-expect": "error",
     "jest/no-async-promise-executor": "off"
+
   },
   "overrides": [
     {
