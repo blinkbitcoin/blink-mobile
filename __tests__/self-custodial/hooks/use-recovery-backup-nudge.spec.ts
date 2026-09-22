@@ -29,8 +29,13 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 const SAVED_AT = 1_700_000_000_000
 const selfCustodial = { id: "account-1", type: "self-custodial" }
 
-const renderNudge = (hasBalance: boolean) =>
-  renderHook(() => useRecoveryBackupNudge(hasBalance))
+/** The balance gate now lives in the status hook, which this spec mocks, so a
+ *  test sets it there rather than passing it in. */
+const renderNudge = (hasBalance: boolean) => {
+  const current = mockStatus()
+  mockStatus.mockReturnValue({ ...current, hasNothingToRecover: !hasBalance })
+  return renderHook(() => useRecoveryBackupNudge())
+}
 
 describe("useRecoveryBackupNudge", () => {
   beforeEach(() => {
@@ -139,6 +144,28 @@ describe("useRecoveryBackupNudge", () => {
         expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
       )
     })
+
+    /** A wallet emptied after a bundle was saved reports Stale forever: the
+     *  exporter refuses to rebuild with no leaves, so the recorded balance
+     *  never catches up with the zero. Nagging about a backup of nothing is the
+     *  false alarm this feature exists to avoid.
+     *
+     *  Asserted by flipping the balance on an already-settled hook: a bare
+     *  `toBeNull` would pass on the first render, before the dismissal read
+     *  lands, and prove nothing. */
+    it("stays quiet once the wallet has been emptied", async () => {
+      const settled = mockStatus()
+      mockStatus.mockReturnValue({ ...settled, hasNothingToRecover: false })
+      const { result, rerender } = renderHook(() => useRecoveryBackupNudge())
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+      )
+
+      mockStatus.mockReturnValue({ ...settled, hasNothingToRecover: true })
+      rerender({})
+
+      expect(result.current.variant).toBeNull()
+    })
   })
 
   it("stays quiet while the backup is current", async () => {
@@ -175,6 +202,24 @@ describe("useRecoveryBackupNudge", () => {
       await waitFor(() =>
         expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.OnlyOnThisDevice),
       )
+    })
+
+    /** Losing the phone loses nothing when the phone holds a backup of an empty
+     *  wallet, so the balance gate covers this variant too. Flipped on a
+     *  settled hook, so the assertion cannot pass on the pre-load render. */
+    it("stays quiet on an emptied wallet", async () => {
+      onlyHere(RecoveryBundleStatus.Fresh)
+      const settled = mockStatus()
+      mockStatus.mockReturnValue({ ...settled, hasNothingToRecover: false })
+      const { result, rerender } = renderHook(() => useRecoveryBackupNudge())
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.OnlyOnThisDevice),
+      )
+
+      mockStatus.mockReturnValue({ ...settled, hasNothingToRecover: true })
+      rerender({})
+
+      expect(result.current.variant).toBeNull()
     })
 
     it("can be dismissed for the bundle the user saw", async () => {
