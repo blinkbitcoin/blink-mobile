@@ -963,7 +963,7 @@ describe("useRecoveryBundleActions error handling", () => {
       )
       const { result } = renderHook(() => useRecoveryBundleActions())
 
-      let firstShare: Promise<void> = Promise.resolve()
+      let firstShare: Promise<boolean> = Promise.resolve(false)
       await act(async () => {
         firstShare = result.current.handleShare()
       })
@@ -1107,7 +1107,7 @@ describe("useRecoveryBundleActions error handling", () => {
     )
     const { result } = renderHook(() => useRecoveryBundleActions())
 
-    let first: Promise<void> = Promise.resolve()
+    let first: Promise<boolean> = Promise.resolve(false)
     await act(async () => {
       first = result.current.handleShare()
     })
