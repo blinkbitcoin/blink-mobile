@@ -173,6 +173,39 @@ describe("PersistentStateProvider", () => {
     )
   })
 
+  it("runs the mnemonic migration sweep once the boot interactions settle", async () => {
+    // The sweep is the only thing that records the mnemonics of an upgrading
+    // install, and the reinstall wipe reaches nothing without those records, so
+    // losing this call would quietly strand every seed it was meant to reach.
+    setPersistedBlob(scrubbedBlob)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockSweepMnemonicMigration).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("boots through a sweep that rejects, which is a migration detail and not a boot failure", async () => {
+    setPersistedBlob(scrubbedBlob)
+    mockGetActiveToken.mockResolvedValue("saved-token")
+    mockSweepMnemonicMigration.mockRejectedValue(new Error("keychain unavailable"))
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token").props.children).toBe("saved-token")
+    })
+  })
+
   it("falls back to default state when no persisted data exists", async () => {
     storedStrings.delete(PERSISTENT_STATE_KEY)
 
