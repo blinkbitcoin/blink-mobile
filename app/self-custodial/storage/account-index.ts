@@ -191,11 +191,14 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
     const mnemonic = await KeyStoreWrapper.readMnemonicWithStatus(entry.id)
     if (mnemonic.status === "failed") {
       failures += 1
+      // Breadcrumb only, so the cause of each failure survives without every
+      // account on a locked device raising its own non-fatal. The sweep being
+      // incomplete is the reportable event, and it is raised once below.
       recordAppError(
         mnemonic.err instanceof Error
           ? mnemonic.err
           : new Error(`Mnemonic sweep read failed: ${mnemonic.err}`),
-        { dedupKey: "storage-mnemonic-sweep-failed" },
+        { expected: true },
       )
     } else {
       if (mnemonic.status === "found") {
@@ -211,5 +214,17 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
     }
   }
 
-  return failures > 0 ? { status: "incomplete", failures } : { status: "ok", migrated }
+  if (failures === 0) return { status: "ok", migrated }
+
+  // One non-fatal for the whole sweep, carrying the share of the index that did
+  // not migrate. A key per account would say nothing about how much is left
+  // behind, and the dedup below only holds for this process, so the next boot
+  // reports the sweep again if it is still incomplete. The ids stay out of both
+  // the key and the message, for the reason keyClassOf exists.
+  recordAppError(
+    new Error(`Mnemonic sweep incomplete: ${failures}/${result.entries.length}`),
+    { dedupKey: "storage-mnemonic-sweep-failed" },
+  )
+
+  return { status: "incomplete", failures }
 }

@@ -25,9 +25,10 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 }))
 
 const mockRecordError = jest.fn()
+const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
-  log: jest.fn(),
+  log: (...args: unknown[]) => mockCrashlyticsLog(...args),
 }))
 
 import {
@@ -428,26 +429,87 @@ describe("self-custodial account-index", () => {
       expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a2")
     })
 
-    it("carries on past an account it cannot read, and reports it", async () => {
+    /**
+     * First case in this file to reach the sweep's dedup key, which is what lets
+     * it assert the non-fatal at all: `recordAppError` suppresses a repeated key
+     * for the lifetime of the process, and the module-level set it keeps is
+     * shared by every test here.
+     */
+    it("carries on past the accounts it cannot read, and reports the sweep once with the share left behind", async () => {
       setIndex([
         { id: "a1", lightningAddress: null },
         { id: "a2", lightningAddress: null },
+        { id: "a3", lightningAddress: null },
       ])
       mockReadMnemonicWithStatus.mockImplementation((id: string) =>
-        id === "a1"
-          ? Promise.resolve({ status: "failed", err: new Error("locked") })
-          : Promise.resolve({ status: "found", value: "words" }),
+        id === "a2"
+          ? Promise.resolve({ status: "found", value: "words" })
+          : Promise.resolve({ status: "failed", err: new Error("locked") }),
       )
 
       const result = await sweepMnemonicMigration()
 
-      expect(result).toEqual({ status: "incomplete", failures: 1 })
-      // The account behind the failure is still swept.
+      expect(result).toEqual({ status: "incomplete", failures: 2 })
+      // The account behind the failures is still swept.
       expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a2")
-      // The unreadable one is never recorded: the wipe must not be pointed at
+      // The unreadable ones are never recorded: the wipe must not be pointed at
       // a slot nothing confirmed.
       expect(mockRememberMnemonicAccount).not.toHaveBeenCalledWith("a1")
-      expect(mockRecordError).toHaveBeenCalled()
+      expect(mockRememberMnemonicAccount).not.toHaveBeenCalledWith("a3")
+
+      // One non-fatal for the sweep, not one per account, and it carries how
+      // much of the index was left behind rather than just that something was.
+      expect(mockRecordError).toHaveBeenCalledTimes(1)
+      expect(mockRecordError.mock.calls[0][0]).toMatchObject({
+        message: "Mnemonic sweep incomplete: 2/3",
+      })
+    })
+
+    it("keeps each failure's cause as a breadcrumb rather than its own non-fatal", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+      mockReadMnemonicWithStatus.mockResolvedValue({
+        status: "failed",
+        err: new Error("keychain locked"),
+      })
+
+      await sweepMnemonicMigration()
+
+      // "expected" is the class that logs without recording, so the reason each
+      // account failed survives for whoever opens the summary non-fatal.
+      const breadcrumbs = mockCrashlyticsLog.mock.calls.map(([line]) => line)
+      // Counted rather than matched: arrayContaining is satisfied by a single
+      // occurrence, which would pass even if only one of the two failures left
+      // a trace.
+      expect(
+        breadcrumbs.filter((line) => line === "[expected] keychain locked"),
+      ).toHaveLength(2)
+      expect(breadcrumbs).toContain("[defect] Mnemonic sweep incomplete: 2/2")
+    })
+
+    it("wraps a non-Error read failure so the breadcrumb still names it", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "failed", err: "-25308" })
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+      expect(mockCrashlyticsLog.mock.calls.map(([line]) => line)).toContain(
+        "[expected] Mnemonic sweep read failed: -25308",
+      )
+    })
+
+    it("raises no non-fatal when every account migrates", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockReadMnemonicWithStatus.mockResolvedValue({ status: "found", value: "words" })
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "ok", migrated: 1 })
+      expect(mockRecordError).not.toHaveBeenCalled()
+      expect(mockCrashlyticsLog).not.toHaveBeenCalled()
     })
 
     it("is a no-op on a fresh install", async () => {
