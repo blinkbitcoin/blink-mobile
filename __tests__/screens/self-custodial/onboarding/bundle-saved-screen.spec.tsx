@@ -15,7 +15,13 @@ let LL: TranslationFunctions
 const mockCompleteBackup = jest.fn()
 jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   ...jest.requireActual("@app/screens/self-custodial/onboarding/hooks"),
-  useCompleteBackup: () => mockCompleteBackup,
+  /** A fresh identity per render, like the real hook: completeBackup depends on
+   *  the backup-state context, and completing a backup re-identifies it. A
+   *  stable mock would hide any effect that re-arms on that identity. */
+  useCompleteBackup:
+    () =>
+    (...args: readonly unknown[]) =>
+      mockCompleteBackup(...args),
 }))
 
 const mockParams = jest.fn<{ successMessage?: string } | undefined, []>()
@@ -90,6 +96,31 @@ describe("BundleSavedScreen", () => {
       method: BackupMethod.Manual,
       message: undefined,
     })
+  })
+
+  /** finish() completes the backup, which re-identifies the backup-state
+   *  context and completeBackup with it. A dwell effect keyed on that identity
+   *  re-arms after every firing: duplicate analytics, duplicate storage writes,
+   *  and the success screen's copy flipping while the user reads it. */
+  it("finishes exactly once even when completeBackup re-identifies afterwards", () => {
+    const { rerender } = renderScreen()
+
+    act(() => {
+      jest.advanceTimersByTime(2000)
+    })
+    expect(mockCompleteBackup).toHaveBeenCalledTimes(1)
+
+    // Stands in for the context churn the completion itself causes.
+    rerender(
+      <ContextForScreen>
+        <BundleSavedScreen />
+      </ContextForScreen>,
+    )
+    act(() => {
+      jest.advanceTimersByTime(2000)
+    })
+
+    expect(mockCompleteBackup).toHaveBeenCalledTimes(1)
   })
 
   it("does not finish after unmount", () => {

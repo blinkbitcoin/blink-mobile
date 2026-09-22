@@ -1,7 +1,7 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { View } from "react-native"
 
-import { RouteProp, useRoute } from "@react-navigation/native"
+import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -34,15 +34,39 @@ export const BundleSavedScreen: React.FC = () => {
   const { successMessage } = useRoute<BundleSavedRouteProp>().params ?? {}
   const completeBackup = useCompleteBackup()
 
+  /** One manual backup is one completion, however many times this screen sends
+   *  the user onward. Navigating forward again after an iOS back-swipe is
+   *  correct; counting it as a second backup is not. */
+  const hasLoggedRef = useRef(false)
+
   const finish = useCallback(() => {
-    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
+    if (!hasLoggedRef.current) {
+      hasLoggedRef.current = true
+      logSelfCustodialBackupCompleted({ backupMethod: "manual" })
+    }
     completeBackup({ method: BackupMethod.Manual, message: successMessage })
   }, [completeBackup, successMessage])
 
+  /** Held in a ref so the dwell is not keyed on finish's identity: finish()
+   *  completes the backup, which re-identifies the backup-state context and
+   *  finish with it, so an effect depending on it re-arms after every firing -
+   *  duplicate analytics, duplicate writes, and the success copy flipping while
+   *  the user reads it. */
+  const finishRef = useRef(finish)
   useEffect(() => {
-    const timer = setTimeout(finish, DWELL_MS)
-    return () => clearTimeout(timer)
+    finishRef.current = finish
   }, [finish])
+
+  /** Focus-scoped rather than mount-scoped. The success screen this pushes stays
+   *  above a still-mounted copy of this one and is swipeable back on iOS; since
+   *  this screen has no action of its own, a dwell that only ever armed once
+   *  would strand the user here with no way forward. */
+  useFocusEffect(
+    useCallback(() => {
+      const timer = setTimeout(() => finishRef.current(), DWELL_MS)
+      return () => clearTimeout(timer)
+    }, []),
+  )
 
   return (
     <Screen preset="fixed" headerShown={false}>
