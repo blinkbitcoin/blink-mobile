@@ -123,6 +123,27 @@ describe("GaloyIcon", () => {
       expect(getByTestId("icon-emergency-kit").props.height).toBe(18)
     })
 
+    /** width and height default to 0, so a custom svg sized only by variant
+     *  would render at zero pixels - invisible, with no error to notice. */
+    it("sizes a custom svg from its size variant", () => {
+      const { getByTestId } = renderWithTheme(
+        <GaloyIcon name="emergency-kit" sizeVariant="lg" />,
+      )
+
+      const icon = getByTestId("icon-emergency-kit")
+      expect(icon.props.width).toBeGreaterThan(0)
+      expect(icon.props.width).toBe(icon.props.height)
+    })
+
+    it("sizes a custom svg from a numeric size", () => {
+      const { getByTestId } = renderWithTheme(
+        <GaloyIcon name="emergency-kit" size={40} />,
+      )
+
+      expect(getByTestId("icon-emergency-kit").props.width).toBe(40)
+      expect(getByTestId("icon-emergency-kit").props.height).toBe(40)
+    })
+
     it("renders a custom svg inside a background container with a fixed container size", () => {
       expect(
         renderWithTheme(
