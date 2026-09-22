@@ -131,6 +131,36 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
     })
   })
 
+  describe("readMnemonicWithStatus — legacy hit whose migrating write fails", () => {
+    /**
+     * The contract the boot sweep counts. A read that found the value in the
+     * legacy store answers "found" whether or not the write that was supposed to
+     * move it succeeded, because migration bookkeeping must never cost
+     * availability. The cost is that "found" alone does not mean "migrated", so
+     * a device whose keychain refuses every write reports a clean sweep while
+     * nothing has moved.
+     */
+    it("answers with the legacy value and leaves the legacy copy in place", async () => {
+      mockGet.mockResolvedValue("alice words")
+      mockSetInternet.mockRejectedValue(new Error("keychain write refused"))
+
+      const read = await KeyStoreWrapper.readMnemonicWithStatus("alice")
+
+      expect(read).toMatchObject({ status: "found", value: "alice words" })
+      // The move was attempted and refused, so the value is still only in the
+      // legacy store.
+      expect(mockSetInternet).toHaveBeenCalledWith(
+        "secure-store.blink.local/mnemonic:alice",
+        "mnemonic:alice",
+        "alice words",
+        { accessible: MNEMONIC_ACCESSIBLE },
+      )
+      // Never erased on a migrating read: the old copy is the rollback
+      // insurance, and erasing it here would lose the seed outright.
+      expect(mockRemove).not.toHaveBeenCalledWith("mnemonic:alice")
+    })
+  })
+
   describe("setMnemonicForAccount", () => {
     // Asserted literally, never expect.any(Object): a mnemonic rewritten at a
     // cloud-syncable class is a security regression that reads as a pass.
