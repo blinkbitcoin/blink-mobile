@@ -13,9 +13,12 @@ export const useCloudBackupForm = () => {
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordTouched, setPasswordTouched] = useState(false)
   const [confirmPasswordTouched, setConfirmPasswordTouched] = useState(false)
-  /** Ongoing cloud sync of the recovery backup: opt-in and off by default (D4),
-   *  even though the seed is being uploaded to the same provider right here. */
-  const [autoBundleSync, setAutoBundleSync] = useState(false)
+  /** The user's standing choice, kept apart from whether it currently applies:
+   *  a password being edited into a transient invalid state must not quietly
+   *  throw the opt-in away while the checkbox sits under the keyboard. Ongoing
+   *  cloud sync is opt-in and off by default (D4), even though the seed is
+   *  being uploaded to the same provider right here. */
+  const [isAutoBundleSyncRequested, setIsAutoBundleSyncRequested] = useState(false)
 
   useFocusEffect(
     useCallback(() => {
@@ -29,18 +32,15 @@ export const useCloudBackupForm = () => {
   )
 
   const toggleAutoBundleSync = useCallback(() => {
-    setAutoBundleSync((prev) => !prev)
+    setIsAutoBundleSyncRequested((prev) => !prev)
   }, [])
 
   const toggleEncryption = useCallback(() => {
-    setIsEncrypted((prev) => {
-      /** D9: the seed-encrypted recovery backup must never sit next to an
-       *  unencrypted seed - the co-located seed would decrypt it on the spot.
-       *  Dropping the password therefore drops bundle sync with it, rather
-       *  than leaving a checked box that silently would not apply. */
-      if (prev) setAutoBundleSync(false)
-      return !prev
-    })
+    setIsEncrypted((prev) => !prev)
+    /** D9: the seed-encrypted bundle must never sit next to an unencrypted
+     *  seed, so giving up the password gives up the sync with it. Deliberate,
+     *  unlike a password merely being edited - this drops the choice itself. */
+    setIsAutoBundleSyncRequested(false)
     setPassword("")
     setConfirmPassword("")
     setPasswordTouched(false)
@@ -75,6 +75,15 @@ export const useCloudBackupForm = () => {
     [isEncrypted, password, confirmPassword, passwordTouched, confirmPasswordTouched],
   )
 
+  /** Sync is only offered alongside a password-protected seed backup (D9). */
+  const canSyncBundle = isValid && isEncrypted
+
+  /** The D9 coupling in one place: the opt-in reads as on only while a
+   *  password-protected seed backup is actually on offer. Derived rather than
+   *  reset, so the row never renders checked inside a disabled control, and a
+   *  password being retyped does not cost the user their choice. */
+  const autoBundleSync = isAutoBundleSyncRequested && canSyncBundle
+
   const passwordError = shouldShowPasswordError
     ? LL.BackupScreen.CloudBackup.passwordTooShort()
     : undefined
@@ -85,8 +94,7 @@ export const useCloudBackupForm = () => {
   return {
     isEncrypted,
     autoBundleSync,
-    /** Sync is only offered alongside a password-protected seed backup (D9). */
-    canSyncBundle: isValid && isEncrypted,
+    canSyncBundle,
     toggleAutoBundleSync,
     password,
     confirmPassword,

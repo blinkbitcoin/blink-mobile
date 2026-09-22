@@ -244,5 +244,17 @@ describe("CloudBackupScreen", () => {
       fireEvent.press(getByTestId("auto-bundle-checkbox"))
       expect(mockToggleAutoBundleSync).toHaveBeenCalled()
     })
+
+    /** The copy alone does not hold the gate: without this, dropping the
+     *  disabled prop keeps every other case green while letting the user opt in
+     *  with no password - exactly what D9 forbids. */
+    it("refuses the press while no password is in place", () => {
+      mockCanSyncBundle = false
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("auto-bundle-checkbox"))
+
+      expect(mockToggleAutoBundleSync).not.toHaveBeenCalled()
+    })
   })
 })
