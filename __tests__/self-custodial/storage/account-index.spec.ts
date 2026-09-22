@@ -512,6 +512,29 @@ describe("self-custodial account-index", () => {
       expect(mockCrashlyticsLog).not.toHaveBeenCalled()
     })
 
+    it("passes over an account that has no mnemonic without counting or recording it", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        id === "a1"
+          ? Promise.resolve({ status: "absent" })
+          : Promise.resolve({ status: "found", value: "words" }),
+      )
+
+      const result = await sweepMnemonicMigration()
+
+      // Listed but seedless is a real state, reachable through a create that
+      // rolled back after addSelfCustodialAccountId. It is not a failure, and
+      // recording it would point the wipe at a slot that was never written.
+      expect(result).toEqual({ status: "ok", migrated: 1 })
+      expect(mockRememberMnemonicAccount).not.toHaveBeenCalledWith("a1")
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a2")
+      // The network marker still rides along on the same pass.
+      expect(mockGetMnemonicNetworkForAccount).toHaveBeenCalledWith("a1")
+    })
+
     it("is a no-op on a fresh install", async () => {
       const result = await sweepMnemonicMigration()
 
