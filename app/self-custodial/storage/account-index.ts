@@ -152,7 +152,11 @@ export const findSelfCustodialAccountByMnemonic = async (
   return { status: StorageReadStatus.Ok, id: null }
 }
 
-export type SweepResult =
+/**
+ * Deliberately not exported: the sweep reports its own outcome and no caller
+ * reads this, so exporting it would advertise a contract nothing honours.
+ */
+type SweepResult =
   | { status: "ok"; migrated: number }
   | { status: "incomplete"; failures: number }
 
