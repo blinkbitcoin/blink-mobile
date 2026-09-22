@@ -610,11 +610,16 @@ export default class KeyStoreWrapper {
    * Records an account in the list the reinstall wipe reads.
    *
    * Tracking is best effort by design: the mnemonic write is what the caller
-   * depends on, and failing that write is the only failure it should see. An id
-   * that never made it here costs the wipe one slot on a reinstall, which is the
-   * behaviour before this list existed, and the next write for that account
-   * records it again. That is also why the queue's rejection is swallowed:
-   * `setMnemonicForAccount` awaits this and must not start throwing.
+   * depends on, and failing that write is the only failure it should see. That
+   * is also why the queue's rejection is swallowed: `setMnemonicForAccount`
+   * awaits this and must not start throwing.
+   *
+   * An id that never reaches this list is not benign, and this is the cost of
+   * that design rather than a no-op. Before the mnemonics moved here they lived
+   * in the legacy store, where the reinstall wipe erased them by service without
+   * needing to name an account; now this list is the only thing that names them,
+   * so an untracked mnemonic survives the wipe until the next write for that
+   * account records it again.
    *
    * The read and the write are one turn in the slot queue. Split across two
    * turns they are not atomic, and a boot sweep recording one account while a

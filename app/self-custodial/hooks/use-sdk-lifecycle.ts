@@ -268,8 +268,10 @@ export const useSdkLifecycle = (
       const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
       // A keystore that could not answer is not an account without a wallet.
       // Unavailable is terminal for this account, so scoring a transient
-      // failure as such tells the user their wallet is gone; Error is the
-      // status the retry and backoff wiring already listens on.
+      // failure as such tells the user their wallet is gone, which Error does
+      // not. Recovery from here is not automatic though: the backoff retry is
+      // armed inside refreshWallets and gated on a live SDK, and this path
+      // never connected one.
       if (stored.status === "failed") {
         if (mounted) setStatus(ActiveWalletStatus.Error)
         return
