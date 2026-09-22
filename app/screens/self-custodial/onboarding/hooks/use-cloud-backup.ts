@@ -159,10 +159,25 @@ export const useCloudBackup = ({
     const accountId =
       activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
     if (accountId && autoBundleSync && isEncrypted && password.length > 0) {
-      await writeRecoveryBundleSettings(accountId, {
-        ...(await readRecoveryBundleSettings(accountId)),
-        cloudSync: true,
-      }).catch((err) => reportError("Recovery bundle cloud-sync opt-in", err))
+      /** Read separately rather than inline in the write's arguments: an
+       *  argument that rejects aborts the call before .catch can attach, so a
+       *  failing storage read would escape this best-effort block and skip the
+       *  completion below - leaving the seed uploaded but the backup
+       *  unrecorded. */
+      const current = await readRecoveryBundleSettings(accountId).catch((err) => {
+        reportError("Recovery bundle settings read", err)
+        return null
+      })
+      /** Skipped rather than defaulted when the read failed: the write replaces
+       *  the whole record, so falling back to the defaults would silently flip
+       *  an autoRefresh the user had turned off in Settings. Dropping the
+       *  opt-in is the recoverable half - the toggle is still there. */
+      if (current) {
+        await writeRecoveryBundleSettings(accountId, {
+          ...current,
+          cloudSync: true,
+        }).catch((err) => reportError("Recovery bundle cloud-sync opt-in", err))
+      }
     }
 
     logSelfCustodialBackupCompleted({

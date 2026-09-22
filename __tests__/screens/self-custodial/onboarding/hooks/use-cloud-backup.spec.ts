@@ -84,12 +84,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockActiveAccount }),
 }))
 
-const mockWriteSettings = jest.fn().mockResolvedValue(undefined)
+const mockWriteSettings = jest.fn()
+const mockReadSettings = jest.fn()
 jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
   ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
-  readRecoveryBundleSettings: jest
-    .fn()
-    .mockResolvedValue({ autoRefresh: true, cloudSync: false }),
+  readRecoveryBundleSettings: (...args: readonly unknown[]) => mockReadSettings(...args),
   writeRecoveryBundleSettings: (...args: readonly unknown[]) =>
     mockWriteSettings(...args),
 }))
@@ -184,6 +183,11 @@ describe("useCloudBackup", () => {
     mockLightningAddress = null
     mockStartSession.mockResolvedValue(sessionOk(noExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
+    // Restored per test: jest.clearAllMocks() clears calls, not implementations,
+    // so a case that makes one of these reject would otherwise leak into every
+    // test after it.
+    mockReadSettings.mockResolvedValue({ autoRefresh: true, cloudSync: false })
+    mockWriteSettings.mockResolvedValue(undefined)
   })
 
   it("uploads unencrypted backup and navigates to success", async () => {
@@ -728,6 +732,76 @@ describe("useCloudBackup", () => {
 
       expect(mockWriteSettings).toHaveBeenCalled()
       expect(result.current.loading).toBe(false)
+    })
+
+    /** The read feeds the write's arguments, and an argument that rejects
+     *  aborts the call before any .catch can attach. Left inline it would
+     *  escape this best-effort block and skip the completion below, leaving the
+     *  seed uploaded but the backup unrecorded and the user stuck on screen. */
+    it("still completes the backup when the settings read rejects", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+      mockReadSettings.mockRejectedValue(new Error("storage unavailable"))
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      expect(mockCompleteBackup).toHaveBeenCalledWith(
+        expect.objectContaining({ method: "cloud" }),
+      )
+      expect(result.current.loading).toBe(false)
+    })
+
+    /** The write replaces the whole record, so writing without a successful
+     *  read would flip whatever it could not see - an autoRefresh the user
+     *  turned off in Settings would silently come back on. Dropping the opt-in
+     *  is the recoverable half: the toggle is still there. */
+    it("skips the opt-in write entirely when the settings read rejects", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+      mockReadSettings.mockRejectedValue(new Error("storage unavailable"))
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      expect(mockWriteSettings).not.toHaveBeenCalled()
+    })
+
+    /** The stored record is carried through, not replaced: an autoRefresh the
+     *  user turned off must survive the opt-in write. */
+    it("preserves the stored settings when recording the opt-in", async () => {
+      mockUpload.mockResolvedValue({ success: true })
+      mockReadSettings.mockResolvedValue({ autoRefresh: false, cloudSync: false })
+
+      const { result } = renderHook(() =>
+        useCloudBackup({
+          isEncrypted: true,
+          password: "hunter2hunter2",
+          autoBundleSync: true,
+        }),
+      )
+      await act(async () => {
+        await result.current.handleBackup()
+      })
+
+      expect(mockWriteSettings).toHaveBeenCalledWith(expect.any(String), {
+        autoRefresh: false,
+        cloudSync: true,
+      })
     })
 
     it("has no bundle to sync when the active account is not self-custodial", async () => {
