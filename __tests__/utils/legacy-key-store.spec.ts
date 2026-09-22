@@ -206,6 +206,12 @@ describe("legacy-key-store", () => {
       expect(await eraseEntireLegacyStore()).toBe(false)
     })
 
+    /**
+     * Defence against a library change, not coverage of a reachable path:
+     * `resetGenericPasswordForOptions` resolves `@(YES)` or rejects, and never
+     * resolves false, so no iOS build reaches this today. It stays because the
+     * signature permits it and the cost of honouring it is one branch.
+     */
     it("passes a false resolution through as a failed erase", async () => {
       mockResetGenericPassword.mockResolvedValue(false)
 
