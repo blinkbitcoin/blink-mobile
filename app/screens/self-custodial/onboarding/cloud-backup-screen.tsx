@@ -60,6 +60,10 @@ export const CloudBackupScreen: React.FC = () => {
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
+  const autoBundleHint = canSyncBundle
+    ? LL.BackupScreen.CloudBackup.autoBundleHint()
+    : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()
+
   return (
     <Screen preset="fixed">
       <View style={styles.container}>
@@ -127,11 +131,7 @@ export const CloudBackupScreen: React.FC = () => {
               centered
               {...testProps("auto-bundle-checkbox")}
             />
-            <Text style={styles.hint}>
-              {canSyncBundle
-                ? LL.BackupScreen.CloudBackup.autoBundleHint()
-                : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()}
-            </Text>
+            <Text style={styles.hint}>{autoBundleHint}</Text>
           </View>
         </View>
 
