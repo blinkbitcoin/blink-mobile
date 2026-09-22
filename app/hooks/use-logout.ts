@@ -31,6 +31,20 @@ type LogoutOptions = {
    * scoped to that one session and destroys nothing else.
    */
   preserveStoredCredentials?: boolean
+  /**
+   * Keep the app lock intact while still erasing everything it guarded.
+   *
+   * A logout the lock itself triggered must not dismantle the lock it exists
+   * to enforce: the gate asks only whether a PIN is stored, so removing it
+   * here would leave the next screen ungated instead of locked.
+   *
+   * The lock is all three slots, and they are preserved together. A PIN
+   * without its spent attempt count hands the next round a fresh budget
+   * against a secret that no longer expires, and a PIN without the biometrics
+   * flag routes every later unlock to the keypad — the one unlock screen that
+   * carries no way out — instead of to the prompt that does.
+   */
+  preserveAppLock?: boolean
 }
 
 gql`
@@ -53,6 +67,7 @@ const useLogout = () => {
       token,
       isValidToken = true,
       preserveStoredCredentials = false,
+      preserveAppLock = false,
     }: LogoutOptions = {}): Promise<void> => {
       try {
         // Isolated: a failed push-token fetch must never skip the local
@@ -82,9 +97,11 @@ const useLogout = () => {
         } else {
           if (!preserveStoredCredentials) {
             await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
-            await KeyStoreWrapper.removeIsBiometricsEnabled()
-            await KeyStoreWrapper.removePin()
-            await KeyStoreWrapper.clearPinFailureState()
+            if (!preserveAppLock) {
+              await KeyStoreWrapper.removeIsBiometricsEnabled()
+              await KeyStoreWrapper.removePin()
+              await KeyStoreWrapper.clearPinFailureState()
+            }
             await KeyStoreWrapper.removeSessionProfiles()
           }
           await clearToken()
