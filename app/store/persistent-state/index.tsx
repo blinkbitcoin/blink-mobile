@@ -1,7 +1,5 @@
 import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
-import { InteractionManager } from "react-native"
-
 import { sweepMnemonicMigration } from "@app/self-custodial/storage/account-index"
 
 import { recordAppError } from "@app/utils/error-reporting"
@@ -22,6 +20,9 @@ import {
   MigrationStatus,
   PersistentState,
 } from "./state-migrations"
+
+/** Upper bound on the sweep's idle wait, so a busy boot still runs it. */
+const SWEEP_IDLE_TIMEOUT_MS = 5000
 
 const PERSISTENT_STATE_KEY = "persistentState"
 const PERSISTENT_STATE_QUARANTINE_PREFIX = "persistentStateQuarantine"
@@ -405,14 +406,22 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
       // Off the critical path and never awaited: the mnemonics of accounts the
       // user does not open would otherwise only migrate if something happened
       // to read them, and would be stranded when the legacy store is dropped.
-      // Scheduled after the interactions this boot has queued, so a slow
-      // keystore cannot compete with the first frame.
-      InteractionManager.runAfterInteractions(() => {
-        sweepMnemonicMigration().catch(() => {
-          // Never rejects by contract; a caught error here would still be a
-          // migration detail and must not reach a boot path.
-        })
-      })
+      // Scheduled for the first idle window, so a slow keystore cannot compete
+      // with the first frame. InteractionManager expresses the same intent but
+      // is deprecated in this React Native version and warns on every boot.
+      //
+      // The timeout is what keeps the two equivalent: an idle callback with no
+      // bound can be starved for a whole launch on a busy boot, and a launch
+      // that never sweeps is a launch whose mnemonics never migrate.
+      requestIdleCallback(
+        () => {
+          sweepMnemonicMigration().catch(() => {
+            // Never rejects by contract; a caught error here would still be a
+            // migration detail and must not reach a boot path.
+          })
+        },
+        { timeout: SWEEP_IDLE_TIMEOUT_MS },
+      )
     })()
   }, [])
 
