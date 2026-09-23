@@ -31,6 +31,8 @@
         "createError": "No se pudo crear la clave API. Inténtalo de nuevo.",
         "revokeError": "No se pudo revocar la clave API. Inténtalo de nuevo.",
         "loadError": "No se pudieron cargar tus claves API. Inténtalo más tarde.",
+        "discardSecretTitle": "¿Descartar esta clave API?",
+        "discardSecretBody": "Esta es la única vez que se muestra el secreto. Si sales ahora, la clave no se podrá recuperar y tendrás que crear una nueva.",
         "done": "Listo"
     },
     "GaloyAddressScreen": {

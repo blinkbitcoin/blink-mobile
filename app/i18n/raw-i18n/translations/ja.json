@@ -31,6 +31,8 @@
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
         "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "discardSecretTitle": "この API キーを破棄しますか？",
+        "discardSecretBody": "シークレットが表示されるのはこの一度だけです。今離れると、キーは復元できず、新しく作成する必要があります。",
         "done": "完了"
     },
     "GaloyAddressScreen": {
