@@ -17,10 +17,26 @@ export const PaymentOfflineNotice: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
-  const { refreshWallets } = useSelfCustodialWallet()
+  const { refreshWallets, retry, sdk } = useSelfCustodialWallet()
 
+  /**
+   * Which retry depends on whether anything ever connected.
+   *
+   * `refreshWallets` returns on its first line when there is no SDK, so on the
+   * statuses this screen shows for a wallet that never started — a keystore that
+   * would not answer, a network marker that could not be verified — the button
+   * could not succeed however often it was pressed. `retry` re-runs the
+   * lifecycle, which is the only thing that reaches those.
+   *
+   * With a live SDK the screen means what it always meant, offline with a
+   * connected wallet, and refreshing is the right answer.
+   */
   const handleRetry = () => {
-    refreshWallets()
+    if (sdk) {
+      refreshWallets()
+      return
+    }
+    retry()
   }
 
   return (
