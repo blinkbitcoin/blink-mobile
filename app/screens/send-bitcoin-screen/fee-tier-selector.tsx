@@ -11,6 +11,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 type OptionItem<T extends string> = {
   id: T
@@ -116,7 +117,7 @@ export const FeeTierSelector = <T extends string>({
 const useStyles = makeStyles(({ colors }) => ({
   title: {
     fontSize: 14,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
     marginBottom: 6,
   },
@@ -133,7 +134,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   selectedLabel: {
     fontSize: 16,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   selectedDetail: {
@@ -165,7 +166,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   optionLabel: {
     fontSize: 15,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   optionDetail: {

@@ -56,6 +56,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 import { openExternalUrl } from "@app/utils/external"
 import { toastShow } from "@app/utils/toast"
+import { fonts } from "@app/rne-theme/fonts"
 import { Skeleton, Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 const REFRESH_INTERVAL_MS = 60_000
@@ -656,7 +657,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   name: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   nameSkeleton: {
@@ -686,17 +687,17 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   badgeOpen: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors._green,
   },
   badgeClosed: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.error,
   },
   badgeBoosted: {
     fontSize: 12,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   verification: {
@@ -765,7 +766,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: StyleProps) => ({
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   skeletonBlock: {

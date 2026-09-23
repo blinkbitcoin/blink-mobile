@@ -227,7 +227,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.black,
     fontSize: 18,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: 24,
   },
   statementsContainer: {
