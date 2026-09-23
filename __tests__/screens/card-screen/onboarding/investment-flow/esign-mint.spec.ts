@@ -5,9 +5,7 @@ import {
 
 const CONFIGURED_ORIGIN = "https://esign.example.test"
 
-/** Synthetic signer and values, in the shape the service takes; nothing here is anyone's
- *  data. */
-const RECIPIENT = { name: "Test Signer", email: "signer@example.test" }
+/** Synthetic values, in the shape the service takes; nothing here is anyone's data. */
 const PREFILL = { reference: { value: "LIVE-1", locked: true as const } }
 const SESSION_TOKEN = "session-token"
 
@@ -79,7 +77,6 @@ describe("mintSigningInstance", () => {
     mintSigningInstance({
       origin: CONFIGURED_ORIGIN,
       token: SESSION_TOKEN,
-      recipient: RECIPIENT,
       prefill: PREFILL,
     })
 
@@ -94,7 +91,8 @@ describe("mintSigningInstance", () => {
     globalThis.fetch = realFetch
   })
 
-  it("posts the signer and the values to the service's envelope mint, as the session", async () => {
+  /** The signer is the service's to resolve from the session; the app sends none. */
+  it("posts the values alone to the service's envelope mint, as the session", async () => {
     answering(200, MINTED)
 
     await expect(mint()).resolves.toEqual(MINTED)
@@ -105,18 +103,18 @@ describe("mintSigningInstance", () => {
         "content-type": "application/json",
         "authorization": `Bearer ${SESSION_TOKEN}`,
       },
-      body: JSON.stringify({ recipient: RECIPIENT, prefill: PREFILL }),
+      body: JSON.stringify({ prefill: PREFILL }),
     })
   })
 
   /** The reason is the service's own, and it reaches the signer under the one code the
    *  component words with the message: a refused mint is something to read, not retry. */
   it("surfaces a refusal with the service's reason", async () => {
-    answering(400, { error: "recipient is required: a name and an email" })
+    answering(400, { error: "prefill must be an object of locked values" })
 
     await expect(mint()).rejects.toMatchObject({
       code: "VALIDATION_ERROR",
-      message: "recipient is required: a name and an email",
+      message: "prefill must be an object of locked values",
     })
   })
 
@@ -155,12 +153,14 @@ describe("mintSigningInstance", () => {
     })
   })
 
+  /** The host the service asks for the signer may have nothing for this user; the service
+   *  answers 502 with its own reason, and the component words it as a failed mint. */
   it("reports any other failure by its status, under the code the component words itself", async () => {
-    answering(502, { error: "Could not create signing session" })
+    answering(502, { error: "Could not compute the signing terms" })
 
     await expect(mint()).rejects.toMatchObject({
       code: "ENVELOPE_CREATION_FAILED",
-      message: expect.stringContaining("Could not create signing session"),
+      message: expect.stringContaining("Could not compute the signing terms"),
     })
   })
 
@@ -221,7 +221,6 @@ describe("mintSigningInstance", () => {
       mintSigningInstance({
         origin: "",
         token: SESSION_TOKEN,
-        recipient: RECIPIENT,
         prefill: PREFILL,
       }),
     ).rejects.toMatchObject({ code: "ENVELOPE_CREATION_FAILED" })
