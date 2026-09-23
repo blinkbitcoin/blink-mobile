@@ -1,4 +1,9 @@
-import { Network } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  Network,
+  PaymentDetails_Tags as PaymentDetailsTags,
+  PaymentStatus,
+  PaymentType,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   buildMigrationLnAddressProof,
@@ -12,6 +17,10 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 const mockInitSdk = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockGetWalletInfo = jest.fn()
+const mockListPayments = jest.fn()
+
+/** Obviously synthetic: the check only compares it for equality. */
+const MIGRATION_INVOICE = "lnbcrt-migration-invoice"
 const mockReceivePayment = jest.fn()
 const mockReportError = jest.fn()
 const mockClassifySdkError = jest.fn()
@@ -20,6 +29,8 @@ jest.mock("@app/self-custodial/bridge", () => ({
   initSdk: (args: unknown) => mockInitSdk(args),
   disconnectSdk: (sdk: unknown) => mockDisconnectSdk(sdk),
   getWalletInfo: (sdk: unknown) => mockGetWalletInfo(sdk),
+  listPayments: (sdk: unknown, offset: number, limit: number) =>
+    mockListPayments(sdk, offset, limit),
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
@@ -301,11 +312,12 @@ describe("buildMigrationTransferRequest", () => {
 describe("checkMigrationReceiveLanded", () => {
   const mockGetInfo = jest.fn()
 
-  const check = () =>
+  const check = (sparkInvoice: string | null = MIGRATION_INVOICE) =>
     checkMigrationReceiveLanded({
       accountId: "sc-account-1",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      sparkInvoice,
     })
 
   beforeEach(() => {
@@ -314,13 +326,23 @@ describe("checkMigrationReceiveLanded", () => {
     mockInitSdk.mockResolvedValue({ getInfo: mockGetInfo })
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockGetInfo.mockResolvedValue({ balanceSats: 0 })
+    mockListPayments.mockResolvedValue({ payments: [] })
     mockClassifySdkError.mockReturnValue(SelfCustodialErrorCode.Generic)
+  })
+
+  const settledReceiveOf = (invoice: string) => ({
+    paymentType: PaymentType.Receive,
+    status: PaymentStatus.Completed,
+    details: { tag: PaymentDetailsTags.Lightning, inner: { invoice } },
   })
 
   /** The forced sync is the point of the call: it is what claims a payment Spark held
    *  for the offline wallet, so the read is detector and actuator in one. */
-  it("confirms the receive once the synced wallet shows a balance", async () => {
+  it("confirms the receive once the drain invoice is settled", async () => {
     mockGetInfo.mockResolvedValue({ balanceSats: BigInt(21000) })
+    mockListPayments.mockResolvedValue({
+      payments: [settledReceiveOf(MIGRATION_INVOICE)],
+    })
 
     const result = await check()
 
@@ -331,10 +353,97 @@ describe("checkMigrationReceiveLanded", () => {
     })
   })
 
+  /** The whole point of matching the invoice: a wallet the user brought in, or one that
+   *  took an unrelated payment mid-flow, has a balance that says nothing about the drain. */
+  it("does not mistake a funded wallet for a settled drain", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(500000) })
+    mockListPayments.mockResolvedValue({
+      payments: [settledReceiveOf("lnbcrt-someone-elses-invoice")],
+    })
+
+    const result = await check()
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 500000 },
+    })
+  })
+
+  it("does not accept a pending payment of the drain invoice", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(0) })
+    mockListPayments.mockResolvedValue({
+      payments: [
+        { ...settledReceiveOf(MIGRATION_INVOICE), status: PaymentStatus.Pending },
+      ],
+    })
+
+    expect(await check()).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 0 },
+    })
+  })
+
+  /** A send carrying the same invoice is this wallet paying, not being paid. */
+  it("does not accept a send that quotes the drain invoice", async () => {
+    mockListPayments.mockResolvedValue({
+      payments: [
+        { ...settledReceiveOf(MIGRATION_INVOICE), paymentType: PaymentType.Send },
+      ],
+    })
+
+    expect(await check()).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 0 },
+    })
+  })
+
+  it("ignores a settled receive that is not a lightning payment", async () => {
+    mockListPayments.mockResolvedValue({
+      payments: [
+        {
+          paymentType: PaymentType.Receive,
+          status: PaymentStatus.Completed,
+          details: { tag: PaymentDetailsTags.Deposit, inner: {} },
+        },
+      ],
+    })
+
+    expect(await check()).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 0 },
+    })
+  })
+
+  it("ignores a settled receive carrying no details at all", async () => {
+    mockListPayments.mockResolvedValue({
+      payments: [{ paymentType: PaymentType.Receive, status: PaymentStatus.Completed }],
+    })
+
+    expect(await check()).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 0 },
+    })
+  })
+
+  /** Without the invoice there is nothing that proves the drain landed. Answering by
+   *  balance here is what would let a funded wallet confirm instantly, so the unprovable
+   *  case stays unproven — a funded balance must not change that. */
+  it("cannot confirm without an invoice, however funded the wallet is", async () => {
+    mockGetInfo.mockResolvedValue({ balanceSats: BigInt(21000) })
+
+    const result = await check(null)
+
+    expect(result).toEqual({
+      status: MigrationSdkStatus.Ok,
+      value: { hasReceived: false, balanceSats: 21000 },
+    })
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
   it("reports a still-empty wallet as not received", async () => {
     mockGetInfo.mockResolvedValue({ balanceSats: BigInt(0) })
 
-    const result = await check()
+    const result = await check(null)
 
     expect(result).toEqual({
       status: MigrationSdkStatus.Ok,

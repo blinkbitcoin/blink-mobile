@@ -41,6 +41,9 @@ const stillEmpty = { hasReceived: false, balanceSats: 0 }
 
 const ok = (value: typeof landed) => ({ status: MigrationSdkStatus.Ok, value })
 
+/** Obviously synthetic: the check only ever compares it for equality. */
+const MIGRATION_INVOICE = "lnbcrt-migration-invoice"
+
 type GateOverrides = Partial<Parameters<typeof useMigrationReceiveConfirmation>[0]>
 
 /** Prop-driven so a test can rerender through the transitions production actually
@@ -51,6 +54,7 @@ const renderGate = (overrides: GateOverrides = {}) =>
       useMigrationReceiveConfirmation({
         selfCustodialAccountId: "sc-account-1",
         expectedReceiveSats: 21000,
+        sparkInvoice: MIGRATION_INVOICE,
         skip: false,
         ...props,
       }),
@@ -227,6 +231,7 @@ describe("useMigrationReceiveConfirmation", () => {
       accountId: "sc-account-1",
       network: "regtest",
       leewaySatPerVbyte: 1,
+      sparkInvoice: MIGRATION_INVOICE,
     })
     expect(result.current.isReceiveConfirmed).toBe(true)
   })

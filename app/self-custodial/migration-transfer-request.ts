@@ -1,14 +1,18 @@
 import {
+  PaymentDetails_Tags as PaymentDetailsTags,
+  PaymentStatus,
+  PaymentType,
   ReceivePaymentMethod,
   ReceivePaymentRequest,
   type BreezSdkInterface,
   type Network,
+  type Payment,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { disconnectSdk, getWalletInfo, initSdk } from "./bridge"
+import { disconnectSdk, getWalletInfo, initSdk, listPayments } from "./bridge"
 import { storageDirFor } from "./config"
 import { classifySdkError, SelfCustodialErrorCode } from "./sdk-error"
 
@@ -199,19 +203,61 @@ type MigrationReceiveCheck = {
 }
 
 /**
- * Whether the migration payment has landed in the provisioned wallet. Any positive
- * balance is the receive: the wallet is provisioned by this flow and never used before
- * the session swap, so nothing else can have funded it. The forced sync is the point of
- * the call — Spark holds an incoming payment for an offline wallet and claims it on
- * sync, so this read is the detector and the actuator in one.
+ * How far back the settled receive is looked for. The drain settles within seconds of the
+ * request, and the wallet is quiet across that window, so the payment is at the head of
+ * the list. A page rather than a full scan: a wallet the user brought in can hold years of
+ * history, and paging all of it to answer one question would make the check itself the
+ * reason the screen hangs.
+ */
+const RECEIVE_LOOKUP_PAGE_SIZE = 50
+
+const isMigrationReceive = (payment: Payment, sparkInvoice: string): boolean => {
+  if (payment.paymentType !== PaymentType.Receive) return false
+  if (payment.status !== PaymentStatus.Completed) return false
+  if (payment.details?.tag !== PaymentDetailsTags.Lightning) return false
+  return payment.details.inner.invoice === sparkInvoice
+}
+
+/**
+ * Whether the migration payment has landed in the target wallet.
+ *
+ * It matches the invoice this flow issued for this migration, rather than reading the
+ * balance. A balance test only works while the target is a wallet this flow provisioned
+ * and nothing else could have funded — the moment the user supplies their own wallet, or
+ * an unrelated payment arrives mid-flow, "balance above zero" stops meaning "the drain
+ * landed" and the completion step deletes the custodial account over funds still in
+ * transit (#4102). The invoice is issued per migration and payable once, so nothing else
+ * can satisfy it.
+ *
+ * The forced sync is still the point of the call — Spark holds an incoming payment for an
+ * offline wallet and claims it on sync, so this remains the detector and the actuator in
+ * one. `balanceSats` is still reported, now for diagnostics rather than for the verdict.
  */
 export const checkMigrationReceiveLanded = (
-  args: MigrationSdkConnectionArgs,
+  args: MigrationSdkConnectionArgs & { sparkInvoice: string | null },
 ): Promise<MigrationSdkResult<MigrationReceiveCheck>> =>
   withMigrationSdk(args, async (sdk) => {
     const info = await sdk.getInfo({ ensureSynced: true })
     const balanceSats = Number(info.balanceSats)
-    return { hasReceived: balanceSats > 0, balanceSats }
+
+    /**
+     * No invoice, no proof. Deliberately not a fall back to the balance test: that test is
+     * only sound while the target is a wallet this flow provisioned and nothing else could
+     * have funded, and every route that loses the invoice — a checkpoint written before the
+     * field existed, a commit whose response never came, a stale reader — arrives here
+     * looking exactly like one that has it. Answering by balance on any of them is how
+     * #4102 comes back, so the unprovable case stays unproven and the flow takes its
+     * existing delayed-receive path instead.
+     */
+    const { sparkInvoice } = args
+    if (sparkInvoice === null) return { hasReceived: false, balanceSats }
+
+    const { payments } = await listPayments(sdk, 0, RECEIVE_LOOKUP_PAGE_SIZE)
+    const hasReceived = payments.some((payment) =>
+      isMigrationReceive(payment, sparkInvoice),
+    )
+
+    return { hasReceived, balanceSats }
   })
 
 /** The two proof fields `migrationLnAddressTransfer` takes; it re-points the lightning
