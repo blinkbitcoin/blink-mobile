@@ -14,7 +14,6 @@ import {
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
@@ -24,10 +23,7 @@ import { toBtcMoneyAmount } from "@app/types/amounts"
 import { logError } from "@app/utils/log-error"
 
 import { mintSigningInstance, resolveMintOrigin } from "./esign-mint"
-import {
-  mintInvestmentAgreement,
-  SIGNER_NOT_CONFIGURED_CODE,
-} from "./investment-agreement"
+import { mintInvestmentAgreement } from "./investment-agreement"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -116,7 +112,6 @@ export const SignInvestScreen: React.FC = () => {
   const {
     appConfig: { galoyInstance, token },
   } = useAppConfig()
-  const { cardInvestmentAgreementPrefill } = useRemoteConfig()
   const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -145,14 +140,10 @@ export const SignInvestScreen: React.FC = () => {
    * would restart the session mid-signature. The rate is read as the document is minted,
    * which is the stamped moment the agreement names.
    */
-  const mintInputs = React.useRef({
-    token,
-    fields: cardInvestmentAgreementPrefill,
-    usdCentsPerBtc,
-  })
+  const mintInputs = React.useRef({ token, usdCentsPerBtc })
   React.useEffect(() => {
-    mintInputs.current = { token, fields: cardInvestmentAgreementPrefill, usdCentsPerBtc }
-  }, [token, cardInvestmentAgreementPrefill, usdCentsPerBtc])
+    mintInputs.current = { token, usdCentsPerBtc }
+  }, [token, usdCentsPerBtc])
 
   /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
    *  screen behind would let a back swipe land on a finished session with no way on. */
@@ -198,27 +189,21 @@ export const SignInvestScreen: React.FC = () => {
    * render would restart the signing session, possibly mid-signature.
    *
    * The document is written from what the app knows at that moment: the figures from the
-   * chosen amount at the price just read, and the host's fields from remote config. A
-   * price that has not answered yet or a signer the host has not named cannot be minted
-   * around, so each is reported and the retry asks again.
+   * chosen amount at the price just read; the signer's details the service asks its host
+   * for. A price that has not answered yet cannot be minted around, so it is reported
+   * and the retry asks again.
    */
   const source = React.useMemo(
     () =>
       createHostedFormSource({
         createInstance: async () => {
-          const { token: session, fields, usdCentsPerBtc: price } = mintInputs.current
+          const { token: session, usdCentsPerBtc: price } = mintInputs.current
 
           const agreement = await mintInvestmentAgreement({
             totalUsd: selectedAmountUsd,
             usdCentsPerBtc: price,
-            fields,
-            mint: (recipient, prefill) =>
-              mintSigningInstance({
-                origin: mintOrigin,
-                token: session,
-                recipient,
-                prefill,
-              }),
+            mint: (prefill) =>
+              mintSigningInstance({ origin: mintOrigin, token: session, prefill }),
           })
 
           settlementSats.current = agreement.settlementSats
@@ -369,8 +354,8 @@ export const SignInvestScreen: React.FC = () => {
     </Screen>
   )
 
-  /** The status is the library's, and so is the wording of a failure, save the one the
-   *  step words itself above; the title and the button are the app's. */
+  /** The status is the library's, and so is the wording of a failure; the title and the
+   *  button are the app's. */
   const failure = (message: string, action: React.ReactNode) => (
     <>
       <Text type="p1" style={styles.statusTitle}>
@@ -397,16 +382,9 @@ export const SignInvestScreen: React.FC = () => {
   }
 
   if (status === "error") {
-    /** The one failure worded here rather than by the library: the host has not named
-     *  the signer, which whoever fills the host's fields should read in their language. */
-    const isSignerUnconfigured = error?.code === SIGNER_NOT_CONFIGURED_CODE
-    const failureMessage = isSignerUnconfigured
-      ? LL.CardFlow.Onboarding.SignInvest.signerNotConfigured()
-      : getErrorMessage(error?.code ?? "", error?.message)
-
     return centredOnScreen(
       failure(
-        failureMessage,
+        getErrorMessage(error?.code ?? "", error?.message),
         <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retry} />,
       ),
     )

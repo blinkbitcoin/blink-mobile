@@ -37,7 +37,6 @@ const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
-const CardInvestmentAgreementPrefillKey = "cardInvestmentAgreementPrefill"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
@@ -66,11 +65,6 @@ type DeliveryOptionConfig = {
 }
 
 type ReplaceCardDeliveryConfig = Record<string, DeliveryOptionConfig>
-
-/** The investment agreement's fields the host fills in rather than the app, keyed by the
- *  label the agreement's templates give each one, the signer's name and email among them.
- *  Every value is written onto the document and locked. */
-export type AgreementPrefillConfig = Record<string, string>
 
 export type FeeRatesConfig = {
   lightningSendBps: number
@@ -111,7 +105,6 @@ type RemoteConfig = {
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
   [CardInvestmentDepositBtcWalletIdKey]: string
-  [CardInvestmentAgreementPrefillKey]: AgreementPrefillConfig
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [BackupNudgeModalCooldownMsKey]: number
@@ -224,9 +217,6 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  money. A dollar wallet is refused by the API and reads as a failed invoice. Empty
    *  until that account is decided, and the transfer step cannot pay while it is. */
   cardInvestmentDepositBtcWalletId: "",
-  /** Empty until the host names the signer and the rest: with no signer the step cannot
-   *  mint, and a placeholder would put a made-up name on a legal document. */
-  cardInvestmentAgreementPrefill: {},
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   /** How long the self-custodial backup modal stays dismissed after the user closes it.
@@ -271,9 +261,6 @@ remoteConfigInstance().setDefaults({
   ...defaultRemoteConfig,
   replaceCardDeliveryConfig: serializeRemoteConfigDefault(
     defaultReplaceCardDeliveryConfig,
-  ),
-  cardInvestmentAgreementPrefill: serializeRemoteConfigDefault(
-    defaultRemoteConfig.cardInvestmentAgreementPrefill,
   ),
   custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
     custodialFirstSignupBlockedDefault,
@@ -406,12 +393,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardInvestmentDepositBtcWalletIdKey)
           .asString()
 
-        const cardInvestmentAgreementPrefill =
-          getRemoteConfigObject<AgreementPrefillConfig>(
-            CardInvestmentAgreementPrefillKey,
-            defaultRemoteConfig.cardInvestmentAgreementPrefill,
-          )
-
         const backupNudgeBannerThreshold = remoteConfigInstance()
           .getValue(BackupNudgeBannerThresholdKey)
           .asNumber()
@@ -535,7 +516,6 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
           cardInvestmentDepositBtcWalletId,
-          cardInvestmentAgreementPrefill,
           backupNudgeBannerThreshold,
           backupNudgeModalThreshold,
           backupNudgeModalCooldownMs,
