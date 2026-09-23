@@ -605,40 +605,39 @@ export default class KeyStoreWrapper {
    * is what enumerates them.
    */
   public static async rememberMnemonicAccount(accountId: string): Promise<void> {
-    return KeyStoreWrapper.trackMnemonicAccount(accountId)
+    await KeyStoreWrapper.trackMnemonicAccount(accountId)
   }
 
   /**
    * Records an account in the list the reinstall wipe reads.
    *
-   * Tracking is best effort by design: the mnemonic write is what the caller
-   * depends on, and failing that write is the only failure it should see. That
-   * is also why the queue's rejection is swallowed: `setMnemonicForAccount`
-   * awaits this and must not start throwing.
+   * Answers whether the id is tracked, which is what lets `setMnemonicForAccount`
+   * report a mnemonic it stored but could not name. The queue's rejection is
+   * still swallowed rather than thrown: this is called before the write the
+   * caller actually depends on, and must not stop it.
    *
-   * An id that never reaches this list is not benign, and this is the cost of
-   * that design rather than a no-op. Before the mnemonics moved here they lived
-   * in the legacy store, where the reinstall wipe erased them by service without
-   * needing to name an account; now this list is the only thing that names them,
-   * so an untracked mnemonic survives the wipe until the next write for that
-   * account records it again.
+   * An id that never reaches this list is not benign. Before the mnemonics moved
+   * here they lived in the legacy store, where the reinstall wipe erased them by
+   * service without needing to name an account; now this list is the only thing
+   * that names them, so an untracked mnemonic survives the wipe until something
+   * records it again.
    *
    * The read and the write are one turn in the slot queue. Split across two
    * turns they are not atomic, and a boot sweep recording one account while a
    * restore records another lands whichever write finishes last over the other,
    * dropping an id the wipe then never reaches.
    */
-  private static async trackMnemonicAccount(accountId: string): Promise<void> {
+  private static async trackMnemonicAccount(accountId: string): Promise<boolean> {
     try {
-      await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async () => {
+      return await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async () => {
         const tracked = await KeyStoreWrapper.readMnemonicAccounts()
-        if (tracked.status === "failed") return
+        if (tracked.status === "failed") return false
 
         // A list that will not parse is rewritten from scratch rather than left
         // alone: it holds no id anything can recover, and refusing to touch it
         // would retire tracking for every account written from here on.
         const accountIds = tracked.status === "ok" ? tracked.accountIds : []
-        if (accountIds.includes(accountId)) return
+        if (accountIds.includes(accountId)) return true
 
         const written = await secureWrite(
           KeyStoreWrapper.MNEMONIC_ACCOUNTS,
@@ -646,25 +645,32 @@ export default class KeyStoreWrapper {
           ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
         )
 
-        // Reported after the write, and only once it landed, for two reasons.
-        // The message describes a loss that has actually happened rather than
-        // one being attempted, and a throw out of the telemetry call — the
-        // firebase handle is not guaranteed to be initialised — lands in the
-        // blanket catch below without having cost the rewrite that keeps
-        // tracking alive for this account.
+        // Reported after the write, and only once it landed: the message
+        // describes a loss that has actually happened rather than one being
+        // attempted, and the rewrite that keeps tracking alive is already done
+        // by the time telemetry can fail.
         //
         // The loss is worth a report because nothing else notices it: every id
         // the damaged list held stops being reachable by the wipe, which then
         // reports a clean sweep over mnemonics it never looked at. No id goes
         // into the message or the key, for the reason keyClassOf exists.
         if (written && tracked.status === "malformed") {
-          recordAppError(new Error("Mnemonic accounts list malformed; rewritten"), {
-            dedupKey: "storage-mnemonic-accounts-malformed",
-          })
+          try {
+            recordAppError(new Error("Mnemonic accounts list malformed; rewritten"), {
+              dedupKey: "storage-mnemonic-accounts-malformed",
+            })
+          } catch {
+            // Guarded separately from the blanket catch below, which would turn
+            // a write that landed into a false answer and make
+            // setMnemonicForAccount file a defect that did not happen.
+          }
         }
+
+        return written
       })
     } catch {
       // The queue rejects on timeout. Best effort, as above.
+      return false
     }
   }
 
@@ -724,14 +730,35 @@ export default class KeyStoreWrapper {
     accountId: string,
     mnemonic: string,
   ): Promise<boolean> {
+    // Tracked before the value is written, so the list is a superset of what is
+    // stored rather than a subset. That is the safe direction of the two: a
+    // spurious id costs the reinstall wipe one no-op delete, and
+    // deleteMnemonicForAccount already untracks ids whose value is gone, so it
+    // clears itself. A missing id costs a mnemonic the wipe cannot reach at all.
+    const tracked = await KeyStoreWrapper.trackMnemonicAccount(accountId)
+
     const written = await writeThrough({
       slot: KeyStoreWrapper.mnemonicKeyFor(accountId),
       value: mnemonic,
       accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
     })
-    // Tracked only once the value it describes exists, so the wipe is never
-    // pointed at a slot that was never written.
-    if (written) await KeyStoreWrapper.trackMnemonicAccount(accountId)
+
+    // Reported even though the caller is told the write succeeded, because it
+    // did: the seed is stored and the wipe has no way to name it. The boot sweep
+    // re-records it, and this is what says the sweep has something to do.
+    if (written && !tracked) {
+      try {
+        recordAppError(new Error("Mnemonic stored but not tracked"), {
+          dedupKey: "storage-mnemonic-untracked",
+        })
+      } catch {
+        // The firebase handle is not guaranteed to be initialised, and this call
+        // sits after the write the caller depends on. Letting it reject would
+        // make a stored mnemonic look like a failed one, and the rollback in
+        // lifecycle.ts runs on that answer.
+      }
+    }
+
     return written
   }
 
