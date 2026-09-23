@@ -200,6 +200,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         useInternalStorage: true,
       }
       await Share.open(options)
+      // Recorded only after the sheet resolves, so a cancelled share does not
+      // count as the user having a copy.
+      await persistSettings({ ...settings, exportedAt: Date.now() }).catch(() => {})
       return true
     } catch (err) {
       /** Dismissing the sheet is a choice, not a failure, so it stays silent -
@@ -223,6 +226,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       const json = await loadDecryptedBundleJson()
       if (!json) return
       copyToClipboard({ content: json })
+      await persistSettings({ ...settings, exportedAt: Date.now() }).catch(() => {})
     } catch (err) {
       recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
     } finally {

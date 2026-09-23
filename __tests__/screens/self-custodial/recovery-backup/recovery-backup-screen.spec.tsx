@@ -14,7 +14,7 @@ import { ContextForScreen } from "../../helper"
 const mockUseBackupState = jest.fn()
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
-  settings: { autoRefresh: true, cloudSync: false },
+  settings: { autoRefresh: true, cloudSync: false, exportedAt: null },
   refreshing: false,
   uploading: false,
   sharing: false,
@@ -40,6 +40,14 @@ jest.mock(
 // Keep the real gate helpers: the three-way cloud section split under test is
 // the production isCloudSeedBackupCompleted / isPasswordProtectedCloudSeedBackup
 // logic, not a re-implementation.
+const mockWallets = jest.fn<
+  Array<{ walletCurrency: string; balance: { amount: number } }>,
+  []
+>(() => [])
+jest.mock("@app/hooks/use-active-wallet", () => ({
+  useActiveWallet: () => ({ wallets: mockWallets() }),
+}))
+
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   ...jest.requireActual("@app/self-custodial/providers/backup-state"),
   useBackupState: () => mockUseBackupState(),
@@ -90,7 +98,7 @@ describe("RecoveryBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActions.bundleState = savedState
-    mockActions.settings = { autoRefresh: true, cloudSync: false }
+    mockActions.settings = { autoRefresh: true, cloudSync: false, exportedAt: null }
     mockActions.sharing = false
     mockActions.copying = false
     mockUseBackupState.mockReturnValue({
@@ -147,7 +155,7 @@ describe("RecoveryBackupScreen", () => {
     expect(first.queryByTestId("recovery-bundle-cloud-upload")).toBeNull()
     first.unmount()
 
-    mockActions.settings = { autoRefresh: true, cloudSync: true }
+    mockActions.settings = { autoRefresh: true, cloudSync: true, exportedAt: null }
     const second = renderScreen()
     expect(second.getByTestId("recovery-bundle-cloud-upload")).toBeTruthy()
   })
@@ -179,5 +187,167 @@ describe("RecoveryBackupScreen", () => {
     // RNE Button renders a spinner instead of the title while loading.
     expect(queryByText(LL.RecoveryBundleScreen.copyJson())).toBeNull()
     expect(queryByText(LL.RecoveryBundleScreen.exportFile())).toBeTruthy()
+  })
+
+  describe("Dollar balance", () => {
+    it("says Dollars are not covered when the user holds some", () => {
+      mockWallets.mockReturnValue([{ walletCurrency: "USD", balance: { amount: 500 } }])
+      mockUseBackupState.mockReturnValue({
+        backupState: { status: "none", method: null },
+      })
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <RecoveryBackupScreen />
+        </ContextForScreen>,
+      )
+
+      // R3: on-chain recovery moves Bitcoin only, so "covers your balance"
+      // would otherwise read as covering the Dollars too.
+      expect(getByText(LL.RecoveryBundleScreen.dollarNotCovered())).toBeTruthy()
+    })
+
+    it("stays silent about Dollars when there are none", () => {
+      mockWallets.mockReturnValue([{ walletCurrency: "BTC", balance: { amount: 2000 } }])
+      mockUseBackupState.mockReturnValue({
+        backupState: { status: "none", method: null },
+      })
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <RecoveryBackupScreen />
+        </ContextForScreen>,
+      )
+
+      expect(queryByText(LL.RecoveryBundleScreen.dollarNotCovered())).toBeNull()
+    })
+  })
+
+  it("explains how recovery works on request", () => {
+    mockWallets.mockReturnValue([])
+    mockUseBackupState.mockReturnValue({ backupState: { status: "none", method: null } })
+
+    const { getByText, queryByText, getByTestId } = render(
+      <ContextForScreen>
+        <RecoveryBackupScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText(LL.RecoveryBundleScreen.howItWorksBody())).toBeNull()
+    fireEvent.press(getByTestId("recovery-how-it-works"))
+    expect(getByText(LL.RecoveryBundleScreen.howItWorksBody())).toBeTruthy()
+
+    // Closing must not disturb anything else on the screen.
+    fireEvent.press(getByText(LL.common.ok()))
+    fireEvent.press(getByTestId("recovery-how-it-works"))
+    fireEvent.press(getByTestId("modal-close"))
+    expect(mockActions.handleRefresh).not.toHaveBeenCalled()
+  })
+
+  describe("cloud sync status line", () => {
+    const withCloudSync = () => {
+      mockUseBackupState.mockReturnValue({
+        backupState: {
+          status: "completed",
+          method: "cloud",
+          cloudPasswordProtected: true,
+        },
+      })
+      mockActions.settings = { autoRefresh: true, cloudSync: true, exportedAt: null }
+      mockWallets.mockReturnValue([])
+    }
+
+    it("says when the bundle last reached the cloud", () => {
+      withCloudSync()
+      mockActions.bundleState = {
+        savedAt: 1_700_000_000_000,
+        bundleCreatedAt: "2026-08-05T00:00:00Z",
+        leafCount: 2,
+        totalSats: "21000",
+        cloudSyncedAt: 1_700_000_500_000,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <RecoveryBackupScreen />
+        </ContextForScreen>,
+      )
+
+      expect(getByText(/Cloud backup:/)).toBeTruthy()
+    })
+
+    it("says when it has not reached the cloud yet", () => {
+      // Sync is on but nothing has been uploaded: silence here would read as
+      // "safely in the cloud".
+      withCloudSync()
+      mockActions.bundleState = {
+        savedAt: 1_700_000_000_000,
+        bundleCreatedAt: "2026-08-05T00:00:00Z",
+        leafCount: 2,
+        totalSats: "21000",
+        cloudSyncedAt: null,
+      }
+
+      const { getByText } = render(
+        <ContextForScreen>
+          <RecoveryBackupScreen />
+        </ContextForScreen>,
+      )
+
+      expect(getByText(LL.RecoveryBundleScreen.cloudNotSynced())).toBeTruthy()
+    })
+  })
+
+  describe("when an action rejects", () => {
+    // Every action reports its own failure with a toast; an unhandled rejection
+    // reaching the screen would take the whole tree down instead.
+    it("survives a failing reload on focus", () => {
+      mockActions.reloadState = jest.fn().mockRejectedValue(new Error("nope"))
+
+      expect(() =>
+        render(
+          <ContextForScreen>
+            <RecoveryBackupScreen />
+          </ContextForScreen>,
+        ),
+      ).not.toThrow()
+    })
+
+    it("survives a failing auto-refresh toggle", () => {
+      mockActions.handleSetAutoRefresh = jest.fn().mockRejectedValue(new Error("nope"))
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <RecoveryBackupScreen />
+        </ContextForScreen>,
+      )
+
+      expect(() =>
+        fireEvent(
+          getByTestId("recovery-bundle-auto-refresh-switch"),
+          "valueChange",
+          false,
+        ),
+      ).not.toThrow()
+    })
+
+    it("survives a failing cloud-sync toggle", () => {
+      mockUseBackupState.mockReturnValue({
+        backupState: {
+          status: "completed",
+          method: "cloud",
+          cloudPasswordProtected: true,
+        },
+      })
+      mockActions.handleSetCloudSync = jest.fn().mockRejectedValue(new Error("nope"))
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <RecoveryBackupScreen />
+        </ContextForScreen>,
+      )
+
+      expect(() =>
+        fireEvent(getByTestId("recovery-bundle-cloud-sync-switch"), "valueChange", true),
+      ).not.toThrow()
+    })
   })
 })

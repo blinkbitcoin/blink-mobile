@@ -42,6 +42,7 @@ import { PendingAmountBadge } from "@app/components/pending-amount-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
+import { RecoveryBackupNudgeBanner } from "@app/self-custodial/components"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
@@ -49,6 +50,7 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useRecoveryBackupNudge } from "@app/self-custodial/hooks/use-recovery-backup-nudge"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceGate,
@@ -230,6 +232,9 @@ export const HomeScreen: React.FC = () => {
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner, dismissModal } =
     useBackupNudgeState()
+
+  const { variant: recoveryNudgeVariant, dismiss: dismissRecoveryNudge } =
+    useRecoveryBackupNudge()
   const {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
@@ -966,6 +971,12 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
+        {recoveryNudgeVariant && (
+          <RecoveryBackupNudgeBanner
+            variant={recoveryNudgeVariant}
+            onDismiss={dismissRecoveryNudge}
+          />
+        )}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin

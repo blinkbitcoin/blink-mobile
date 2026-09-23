@@ -42,10 +42,11 @@ describe("recovery bundle settings", () => {
 
     // These defaults are product rules (PRD 4.1): refresh is opt-out, cloud
     // sync is opt-in. Flipping either default is a product decision.
-    expect(settings).toEqual({ autoRefresh: true, cloudSync: false })
+    expect(settings).toEqual({ autoRefresh: true, cloudSync: false, exportedAt: null })
     expect(defaultRecoveryBundleSettings).toEqual({
       autoRefresh: true,
       cloudSync: false,
+      exportedAt: null,
     })
   })
 
@@ -53,11 +54,13 @@ describe("recovery bundle settings", () => {
     await writeRecoveryBundleSettings(ACCOUNT_ID, {
       autoRefresh: false,
       cloudSync: true,
+      exportedAt: null,
     })
 
     expect(await readRecoveryBundleSettings(ACCOUNT_ID)).toEqual({
       autoRefresh: false,
       cloudSync: true,
+      exportedAt: null,
     })
     // Another account keeps the defaults.
     expect(await readRecoveryBundleSettings(OTHER_ACCOUNT_ID)).toEqual(
@@ -88,11 +91,44 @@ describe("recovery bundle settings", () => {
     await writeRecoveryBundleSettings(ACCOUNT_ID, {
       autoRefresh: false,
       cloudSync: true,
+      exportedAt: null,
     })
     await removeRecoveryBundleSettings(ACCOUNT_ID)
 
     expect(await readRecoveryBundleSettings(ACCOUNT_ID)).toEqual(
       defaultRecoveryBundleSettings,
     )
+  })
+
+  it("degrades a non-numeric exportedAt to never-exported", async () => {
+    // A corrupt value must not read as "already exported", which would silence
+    // the only-on-this-device warning.
+    await AsyncStorage.setItem(
+      `recoveryBundleSettings:${ACCOUNT_ID}`,
+      JSON.stringify({ autoRefresh: true, cloudSync: false, exportedAt: "yesterday" }),
+    )
+
+    expect(await readRecoveryBundleSettings(ACCOUNT_ID)).toEqual({
+      autoRefresh: true,
+      cloudSync: false,
+      exportedAt: null,
+    })
+  })
+
+  it("keeps a stored export timestamp", async () => {
+    await AsyncStorage.setItem(
+      `recoveryBundleSettings:${ACCOUNT_ID}`,
+      JSON.stringify({
+        autoRefresh: false,
+        cloudSync: true,
+        exportedAt: 1_700_000_000_000,
+      }),
+    )
+
+    await expect(readRecoveryBundleSettings(ACCOUNT_ID)).resolves.toEqual({
+      autoRefresh: false,
+      cloudSync: true,
+      exportedAt: 1_700_000_000_000,
+    })
   })
 })
