@@ -4,6 +4,10 @@ const mockGetMnemonicForAccount = jest.fn()
 const mockReadMnemonicWithStatus = jest.fn()
 const mockGetMnemonicNetworkForAccount = jest.fn()
 const mockRememberMnemonicAccount = jest.fn()
+const mockMnemonicExists = jest.fn()
+const mockMnemonicNetworkExists = jest.fn()
+const mockMnemonicIsMigrated = jest.fn()
+const mockRebuildMnemonicAccountsIfMalformed = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -21,6 +25,11 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     getMnemonicNetworkForAccount: (...args: unknown[]) =>
       mockGetMnemonicNetworkForAccount(...args),
     rememberMnemonicAccount: (...args: unknown[]) => mockRememberMnemonicAccount(...args),
+    mnemonicExists: (...args: unknown[]) => mockMnemonicExists(...args),
+    mnemonicNetworkExists: (...args: unknown[]) => mockMnemonicNetworkExists(...args),
+    mnemonicIsMigrated: (...args: unknown[]) => mockMnemonicIsMigrated(...args),
+    rebuildMnemonicAccountsIfMalformed: (...args: unknown[]) =>
+      mockRebuildMnemonicAccountsIfMalformed(...args),
   },
 }))
 
@@ -38,6 +47,8 @@ import {
   StorageReadStatus,
   removeSelfCustodialAccountId,
   setSelfCustodialLightningAddress,
+  readSelfCustodialIndexPresence,
+  SelfCustodialIndexPresence,
   sweepMnemonicMigration,
   type SelfCustodialAccountEntry,
 } from "@app/self-custodial/storage/account-index"
@@ -68,7 +79,11 @@ describe("self-custodial account-index", () => {
     mockGetItem.mockResolvedValue(null)
     mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
     mockGetMnemonicNetworkForAccount.mockResolvedValue(null)
-    mockRememberMnemonicAccount.mockResolvedValue(undefined)
+    mockRememberMnemonicAccount.mockResolvedValue(true)
+    mockMnemonicExists.mockResolvedValue({ status: "no" })
+    mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
+    mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
+    mockRebuildMnemonicAccountsIfMalformed.mockResolvedValue("not-needed")
   })
 
   describe("listSelfCustodialAccounts", () => {
@@ -319,7 +334,10 @@ describe("self-custodial account-index", () => {
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        id: "a2",
+      })
     })
 
     it("matches on input with leading and trailing whitespace", async () => {
@@ -329,7 +347,10 @@ describe("self-custodial account-index", () => {
 
       const result = await findSelfCustodialAccountByMnemonic(`  ${STORED}  `)
 
-      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        id: "a2",
+      })
     })
 
     it("matches on input with collapsed-runs of internal whitespace (tabs, multi-space)", async () => {
@@ -340,7 +361,10 @@ describe("self-custodial account-index", () => {
       const noisy = STORED.replace(/ /g, "  \t  ")
       const result = await findSelfCustodialAccountByMnemonic(noisy)
 
-      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        id: "a2",
+      })
     })
 
     it("matches when the stored value itself has noisy whitespace (legacy data)", async () => {
@@ -354,7 +378,10 @@ describe("self-custodial account-index", () => {
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        id: "a2",
+      })
     })
 
     it("returns ok with id=null when no entry has the matching mnemonic", async () => {
@@ -365,7 +392,10 @@ describe("self-custodial account-index", () => {
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(result).toEqual({ status: StorageReadStatus.Ok, id: null })
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        id: null,
+      })
     })
 
     it("returns ok with id=null when an entry has no stored mnemonic", async () => {
@@ -373,7 +403,10 @@ describe("self-custodial account-index", () => {
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(result).toEqual({ status: StorageReadStatus.Ok, id: null })
+      expect(result).toEqual({
+        status: StorageReadStatus.Ok,
+        id: null,
+      })
     })
 
     it("returns read-failed when the underlying index read fails — never silently 'no match'", async () => {
@@ -391,11 +424,25 @@ describe("self-custodial account-index", () => {
     })
 
     /**
-     * A keystore that cannot answer is not "this is a different account".
-     * Scored that way, restoring a wallet already on the device reports no
-     * match and the caller creates a second account for the same seed.
+     * The inverse of what this file used to pin. Ending the scan on the first
+     * unreadable entry made one damaged slot fail every restore on the device,
+     * including a phrase belonging to an account further down the list. The
+     * count is what keeps "no match" honest: it says the answer covers only the
+     * entries that answered.
      */
-    it("returns read-failed when a mnemonic read fails, never 'no match'", async () => {
+    it("carries on past an entry it cannot read, so a readable match still wins", async () => {
+      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+        id === "a1"
+          ? Promise.resolve({ status: "failed", err: new Error("keystore unavailable") })
+          : Promise.resolve({ status: "found", value: STORED }),
+      )
+
+      const result = await findSelfCustodialAccountByMnemonic(STORED)
+
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: "a2" })
+    })
+
+    it("answers no-match with the count when nothing readable matched", async () => {
       mockReadMnemonicWithStatus.mockResolvedValue({
         status: "failed",
         err: new Error("keystore unavailable"),
@@ -403,7 +450,69 @@ describe("self-custodial account-index", () => {
 
       const result = await findSelfCustodialAccountByMnemonic(STORED)
 
-      expect(result.status).toBe(StorageReadStatus.ReadFailed)
+      // Not read-failed: the caller can still offer the restore, and a duplicate
+      // account is removable where a blocked restore is not.
+      expect(result).toEqual({ status: StorageReadStatus.Ok, id: null })
+      expect(mockRecordError.mock.calls[0][0]).toMatchObject({
+        message: "Mnemonic lookup incomplete: 2/2",
+      })
+    })
+
+    it("reports nothing when every entry answered", async () => {
+      mockReadMnemonicWithStatus.mockResolvedValue({
+        status: "found",
+        value: "totally different words",
+      })
+
+      await findSelfCustodialAccountByMnemonic(STORED)
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("readSelfCustodialIndexPresence", () => {
+    /**
+     * The reinstall wipe gates the mnemonic erase on this, so "read as empty"
+     * must never pass for "absent": readIndex degrades a stored value it cannot
+     * recognise to zero entries, and that would be a corrupted index
+     * authorising the one erase that cannot be undone.
+     */
+    it("is absent only when neither index key is stored", async () => {
+      expect(await readSelfCustodialIndexPresence()).toBe(
+        SelfCustodialIndexPresence.Absent,
+      )
+    })
+
+    it("is present when the canonical index is stored, however it parses", async () => {
+      mockGetItem.mockImplementation((key: string) =>
+        key === ACCOUNT_INDEX_KEY
+          ? Promise.resolve('{"not":"a list"}')
+          : Promise.resolve(null),
+      )
+
+      expect(await readSelfCustodialIndexPresence()).toBe(
+        SelfCustodialIndexPresence.Present,
+      )
+    })
+
+    it("is present when only the legacy id list is stored", async () => {
+      setLegacyOnly(["a1"])
+
+      expect(await readSelfCustodialIndexPresence()).toBe(
+        SelfCustodialIndexPresence.Present,
+      )
+    })
+
+    /**
+     * Kept apart from "present" because only this one leaves the wipe owed: the
+     * caller holds the blob back on it, so the next boot asks again.
+     */
+    it("is unknown when the read itself fails, which proves nothing either way", async () => {
+      mockGetItem.mockRejectedValue(new Error("AsyncStorage unavailable"))
+
+      expect(await readSelfCustodialIndexPresence()).toBe(
+        SelfCustodialIndexPresence.Unknown,
+      )
     })
   })
 
@@ -413,16 +522,16 @@ describe("self-custodial account-index", () => {
         { id: "a1", lightningAddress: null },
         { id: "a2", lightningAddress: null },
       ])
-      mockReadMnemonicWithStatus.mockResolvedValue({ status: "found", value: "words" })
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
 
       const result = await sweepMnemonicMigration()
 
       expect(result).toEqual({ status: "ok", migrated: 2 })
-      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a1")
-      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a2")
+      expect(mockMnemonicExists).toHaveBeenCalledWith("a1")
+      expect(mockMnemonicExists).toHaveBeenCalledWith("a2")
       // The network marker migrates on the same pass.
-      expect(mockGetMnemonicNetworkForAccount).toHaveBeenCalledWith("a1")
-      expect(mockGetMnemonicNetworkForAccount).toHaveBeenCalledWith("a2")
+      expect(mockMnemonicNetworkExists).toHaveBeenCalledWith("a1")
+      expect(mockMnemonicNetworkExists).toHaveBeenCalledWith("a2")
       // An upgrading install records its accounts here or nowhere: the wipe
       // has no other way to learn about a mnemonic it never wrote.
       expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a1")
@@ -441,9 +550,9 @@ describe("self-custodial account-index", () => {
         { id: "a2", lightningAddress: null },
         { id: "a3", lightningAddress: null },
       ])
-      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+      mockMnemonicExists.mockImplementation((id: string) =>
         id === "a2"
-          ? Promise.resolve({ status: "found", value: "words" })
+          ? Promise.resolve({ status: "yes" })
           : Promise.resolve({ status: "failed", err: new Error("locked") }),
       )
 
@@ -451,7 +560,7 @@ describe("self-custodial account-index", () => {
 
       expect(result).toEqual({ status: "incomplete", failures: 2 })
       // The account behind the failures is still swept.
-      expect(mockReadMnemonicWithStatus).toHaveBeenCalledWith("a2")
+      expect(mockMnemonicExists).toHaveBeenCalledWith("a2")
       // The unreadable ones are never recorded: the wipe must not be pointed at
       // a slot nothing confirmed.
       expect(mockRememberMnemonicAccount).not.toHaveBeenCalledWith("a1")
@@ -470,7 +579,7 @@ describe("self-custodial account-index", () => {
         { id: "a1", lightningAddress: null },
         { id: "a2", lightningAddress: null },
       ])
-      mockReadMnemonicWithStatus.mockResolvedValue({
+      mockMnemonicExists.mockResolvedValue({
         status: "failed",
         err: new Error("keychain locked"),
       })
@@ -491,19 +600,19 @@ describe("self-custodial account-index", () => {
 
     it("wraps a non-Error read failure so the breadcrumb still names it", async () => {
       setIndex([{ id: "a1", lightningAddress: null }])
-      mockReadMnemonicWithStatus.mockResolvedValue({ status: "failed", err: "-25308" })
+      mockMnemonicExists.mockResolvedValue({ status: "failed", err: "-25308" })
 
       const result = await sweepMnemonicMigration()
 
       expect(result).toEqual({ status: "incomplete", failures: 1 })
       expect(mockCrashlyticsLog.mock.calls.map(([line]) => line)).toContain(
-        "[expected] Mnemonic sweep read failed: -25308",
+        "[expected] Mnemonic sweep probe failed: -25308",
       )
     })
 
     it("raises no non-fatal when every account migrates", async () => {
       setIndex([{ id: "a1", lightningAddress: null }])
-      mockReadMnemonicWithStatus.mockResolvedValue({ status: "found", value: "words" })
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
 
       const result = await sweepMnemonicMigration()
 
@@ -517,10 +626,10 @@ describe("self-custodial account-index", () => {
         { id: "a1", lightningAddress: null },
         { id: "a2", lightningAddress: null },
       ])
-      mockReadMnemonicWithStatus.mockImplementation((id: string) =>
+      mockMnemonicExists.mockImplementation((id: string) =>
         id === "a1"
-          ? Promise.resolve({ status: "absent" })
-          : Promise.resolve({ status: "found", value: "words" }),
+          ? Promise.resolve({ status: "no" })
+          : Promise.resolve({ status: "yes" }),
       )
 
       const result = await sweepMnemonicMigration()
@@ -532,14 +641,117 @@ describe("self-custodial account-index", () => {
       expect(mockRememberMnemonicAccount).not.toHaveBeenCalledWith("a1")
       expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a2")
       // The network marker still rides along on the same pass.
-      expect(mockGetMnemonicNetworkForAccount).toHaveBeenCalledWith("a1")
+      expect(mockMnemonicNetworkExists).toHaveBeenCalledWith("a1")
+    })
+
+    /**
+     * The reason the sweep probes instead of reading. A read answers by putting
+     * the phrase into a JS string, which cannot be zeroed, for every indexed
+     * account on every launch — including accounts the user never opens.
+     */
+    it("never decrypts a mnemonic it is only counting", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
+
+      await sweepMnemonicMigration()
+
+      expect(mockReadMnemonicWithStatus).not.toHaveBeenCalled()
+      expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
+      expect(mockGetMnemonicNetworkForAccount).not.toHaveBeenCalled()
+    })
+
+    /**
+     * A record that does not land is a failure of the sweep, not a migration:
+     * the seed is in the new store and the reinstall wipe has no way to name it,
+     * which is the whole reason this runs.
+     */
+    it("counts an account it could not record as a failure, not a migration", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
+      mockRememberMnemonicAccount.mockResolvedValue(false)
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+    })
+
+    /**
+     * The index is the only place the ids of a damaged list still exist, so the
+     * sweep is the one caller that can rebuild rather than reset. Left alone,
+     * the next write replaces the list with a single entry and forgets the rest
+     * for good.
+     */
+    /**
+     * The store decides whether a rebuild is needed, inside one slot turn. Split
+     * across two, an account that onboarding records between the check and the
+     * write is overwritten by this older snapshot, dropping the very id the wipe
+     * needs.
+     */
+    it("hands the store the index to rebuild from, and lets it decide", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+
+      await sweepMnemonicMigration()
+
+      expect(mockRebuildMnemonicAccountsIfMalformed).toHaveBeenCalledWith(["a1", "a2"])
+    })
+
+    it("reports a rebuild that did not land, since the list stays damaged", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockRebuildMnemonicAccountsIfMalformed.mockResolvedValue("failed")
+
+      await sweepMnemonicMigration()
+
+      expect(mockRecordError.mock.calls[0][0]).toMatchObject({
+        message: "Mnemonic accounts list rebuild failed",
+      })
+    })
+
+    it("reports nothing when no rebuild was needed", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+
+      await sweepMnemonicMigration()
+
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The count that gates dropping the legacy store. The probe answers yes for
+     * a value it read out of the legacy store even when the write meant to move
+     * it failed, so a device whose keychain refuses every write would otherwise
+     * report a finished migration over seeds that never moved.
+     */
+    it("counts a seed the probe found but the migrating write never moved as a failure", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
+      mockMnemonicIsMigrated.mockResolvedValue({ status: "no" })
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+      expect(mockRememberMnemonicAccount).not.toHaveBeenCalled()
+    })
+
+    it("counts one that did reach the new store as migrated", async () => {
+      setIndex([{ id: "a1", lightningAddress: null }])
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "ok", migrated: 1 })
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("a1")
     })
 
     it("is a no-op on a fresh install", async () => {
       const result = await sweepMnemonicMigration()
 
       expect(result).toEqual({ status: "ok", migrated: 0 })
-      expect(mockReadMnemonicWithStatus).not.toHaveBeenCalled()
+      expect(mockMnemonicExists).not.toHaveBeenCalled()
     })
 
     it("reports incomplete when the index itself cannot be read", async () => {
@@ -548,12 +760,12 @@ describe("self-custodial account-index", () => {
       const result = await sweepMnemonicMigration()
 
       expect(result).toEqual({ status: "incomplete", failures: 0 })
-      expect(mockReadMnemonicWithStatus).not.toHaveBeenCalled()
+      expect(mockMnemonicExists).not.toHaveBeenCalled()
     })
 
     it("gives the same answer on a second run", async () => {
       setIndex([{ id: "a1", lightningAddress: null }])
-      mockReadMnemonicWithStatus.mockResolvedValue({ status: "found", value: "words" })
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
 
       const first = await sweepMnemonicMigration()
       const second = await sweepMnemonicMigration()

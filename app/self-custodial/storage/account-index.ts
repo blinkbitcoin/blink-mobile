@@ -89,6 +89,45 @@ const writeIndex = async (entries: SelfCustodialAccountEntry[]): Promise<void> =
 
 export const listSelfCustodialAccounts = async (): Promise<ReadIndexResult> => readIndex()
 
+export const SelfCustodialIndexPresence = {
+  /** Neither index key is stored, which a real reinstall guarantees. */
+  Absent: "absent",
+  /** Something is stored, so this device is not a fresh install. */
+  Present: "present",
+  /** The read could not answer, which proves nothing either way. */
+  Unknown: "unknown",
+} as const
+
+export type SelfCustodialIndexPresence =
+  (typeof SelfCustodialIndexPresence)[keyof typeof SelfCustodialIndexPresence]
+
+/**
+ * Whether the device still holds an account index, for the reinstall wipe.
+ *
+ * Three answers rather than two, because collapsing the last one costs
+ * something either way. "Present" and "unknown" both hold the erase back, but
+ * only "unknown" leaves it owed: the caller keeps that boot from persisting so
+ * the next one asks again, which is the retry the erase's own design assumes.
+ *
+ * Distinct from "the index read as empty": readIndex degrades a stored value it
+ * cannot recognise to zero entries, and an erase that cannot be undone must not
+ * take that as proof.
+ */
+export const readSelfCustodialIndexPresence =
+  async (): Promise<SelfCustodialIndexPresence> => {
+    try {
+      const [canonical, legacy] = await Promise.all([
+        AsyncStorage.getItem(ACCOUNT_INDEX_KEY),
+        AsyncStorage.getItem(LEGACY_ID_LIST_KEY),
+      ])
+      return canonical === null && legacy === null
+        ? SelfCustodialIndexPresence.Absent
+        : SelfCustodialIndexPresence.Present
+    } catch {
+      return SelfCustodialIndexPresence.Unknown
+    }
+  }
+
 export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
   const result = await readIndex()
   if (result.status === StorageReadStatus.ReadFailed) return
@@ -132,21 +171,39 @@ export const findSelfCustodialAccountByMnemonic = async (
   }
 
   const normalized = normalizeMnemonic(mnemonic)
+  let unreadableEntries = 0
+
   for (const entry of result.entries) {
     const stored = await KeyStoreWrapper.readMnemonicWithStatus(entry.id)
-    // A read that could not answer is not "this is a different account". Scored
-    // that way, a restore of a wallet already on the device reports no match and
-    // the caller creates a second account for the same seed.
+    // Counted and carried on past, not returned. One entry that will not answer
+    // used to end the scan, so a single damaged slot made every restore on the
+    // device fail — including a phrase belonging to an account further down the
+    // list that reads perfectly. On Android one lock-screen change invalidates
+    // the Keystore and fails all of them at once, which is exactly when the
+    // written-down phrase is the only way back in.
     if (stored.status === "failed") {
-      const error =
-        stored.err instanceof Error
-          ? stored.err
-          : new Error(`Mnemonic read failed: ${stored.err}`)
-      return { status: StorageReadStatus.ReadFailed, error }
-    }
-    if (stored.status === "found" && normalizeMnemonic(stored.value) === normalized) {
+      unreadableEntries += 1
+    } else if (
+      stored.status === "found" &&
+      normalizeMnemonic(stored.value) === normalized
+    ) {
       return { status: StorageReadStatus.Ok, id: entry.id }
     }
+  }
+
+  // A readable match still wins above. Reaching here with unreadable entries
+  // means "no match among the ones that answered", and the caller is told no
+  // match: a restore then creates a second account for a seed that may already
+  // be on the device. That is the chosen side of the trade — a duplicate can be
+  // removed later, a restore that cannot run has no way around it — and the
+  // report below is what keeps the cost visible.
+  if (unreadableEntries > 0) {
+    recordAppError(
+      new Error(
+        `Mnemonic lookup incomplete: ${unreadableEntries}/${result.entries.length}`,
+      ),
+      { dedupKey: "storage-mnemonic-lookup-incomplete" },
+    )
   }
 
   return { status: StorageReadStatus.Ok, id: null }
@@ -170,10 +227,17 @@ type SweepResult =
  * The index survives upgrades, so the accounts can be enumerated and there is no
  * reason to leave that to chance.
  *
- * Migration is the side effect of the read: no new write path exists here, and
+ * Migration is the side effect of the probe: no new write path exists here, and
  * a value already in the new store is answered from there without touching the
  * legacy one. Safe to run repeatedly and alongside the lazy path, which is what
  * lets a failure simply be retried on the next boot.
+ *
+ * It asks whether each mnemonic exists rather than reading it. A read answers by
+ * putting the phrase into a JS string, which cannot be zeroed, for every indexed
+ * account on every launch — including accounts the user never opens, whose seeds
+ * had no reason to enter memory at all. The existence probe also answers before
+ * the device's first unlock, where a read returns `errSecInteractionNotAllowed`
+ * and would score every account on the device as a failure.
  */
 export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
   const result = await readIndex()
@@ -183,12 +247,28 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
     return { status: "incomplete", failures: 0 }
   }
 
+  // A list that will not parse is rebuilt from the index rather than left for
+  // the next write to reset into a single entry, which would forget every id it
+  // named. This enumeration is the only place those ids still exist.
+  //
+  // The check and the write are one turn in the slot queue, inside the store:
+  // split across two, an account created by onboarding between them is recorded
+  // and then overwritten by this snapshot, dropping the very id the wipe needs.
+  const rebuild = await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed(
+    result.entries.map((entry) => entry.id),
+  )
+  if (rebuild === "failed") {
+    recordAppError(new Error("Mnemonic accounts list rebuild failed"), {
+      dedupKey: "storage-mnemonic-accounts-rebuild-failed",
+    })
+  }
+
   let migrated = 0
   let failures = 0
 
   for (const entry of result.entries) {
     // Per account, so one unreadable slot cannot strand the accounts behind it.
-    const mnemonic = await KeyStoreWrapper.readMnemonicWithStatus(entry.id)
+    const mnemonic = await KeyStoreWrapper.mnemonicExists(entry.id)
     if (mnemonic.status === "failed") {
       failures += 1
       // Breadcrumb only, so the cause of each failure survives without every
@@ -197,20 +277,38 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
       recordAppError(
         mnemonic.err instanceof Error
           ? mnemonic.err
-          : new Error(`Mnemonic sweep read failed: ${mnemonic.err}`),
+          : new Error(`Mnemonic sweep probe failed: ${mnemonic.err}`),
         { expected: true },
       )
     } else {
-      if (mnemonic.status === "found") {
-        migrated += 1
-        // An upgrading install stored its mnemonics before that list existed,
-        // so this is the only place they get recorded — and without the record
-        // the reinstall wipe has no account to reach.
-        await KeyStoreWrapper.rememberMnemonicAccount(entry.id)
+      if (mnemonic.status === "yes") {
+        // "Found" is not "moved". The probe answers yes for a value it read out
+        // of the legacy store even when the write meant to migrate it failed —
+        // deliberate there, since bookkeeping must never cost availability, but
+        // it means a device whose keychain refuses every write would otherwise
+        // report a finished migration while nothing had moved. The release that
+        // drops the legacy store is gated on this count, so it asks again,
+        // without the fallback.
+        const landed = await KeyStoreWrapper.mnemonicIsMigrated(entry.id)
+        if (landed.status === "yes") {
+          // An upgrading install stored its mnemonics before that list existed,
+          // so this is the only place they get recorded — and without the
+          // record the reinstall wipe has no account to reach. A record that
+          // does not land is a failure of the sweep too: the seed is there and
+          // the wipe cannot name it, which is the whole point of running this.
+          const remembered = await KeyStoreWrapper.rememberMnemonicAccount(entry.id)
+          if (remembered) {
+            migrated += 1
+          } else {
+            failures += 1
+          }
+        } else {
+          failures += 1
+        }
       }
-      // The network marker rides along: it is read for its side effect only,
-      // and an account with no marker is not a failure.
-      await KeyStoreWrapper.getMnemonicNetworkForAccount(entry.id)
+      // The network marker rides along: probed for its side effect only, and an
+      // account with no marker is not a failure.
+      await KeyStoreWrapper.mnemonicNetworkExists(entry.id)
     }
   }
 
