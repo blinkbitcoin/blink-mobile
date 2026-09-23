@@ -3,11 +3,10 @@
  * from the agreement's templates with the values written onto the documents and locked,
  * and hands back the url the signer opens.
  *
- * Everything the signed document states travels in this call, as `investment-agreement`
- * decided it. The service writes what it is told and locks what it is told to lock.
+ * The figures travel in this call, as `investment-agreement` decided them; who signs and
+ * the rest of the signer's details the service asks its host for, per user, and the app
+ * neither knows nor sends them.
  */
-
-import type { RecipientData } from "@blinkbitcoin/esign-react-native/webform"
 
 import { scriptHostname } from "@app/config/galoy-instances"
 
@@ -54,9 +53,9 @@ const EMPTY_ANSWER_REASON = "the service answered without a url"
 
 type MintSigningInstanceInput = {
   origin: string
-  /** The caller's session, which the service verifies before it mints. */
+  /** The caller's session, which the service verifies before it mints, and which its
+   *  host reads to tell whose signer details to answer with. */
   token: string
-  recipient: RecipientData
   prefill: AgreementPrefill
 }
 
@@ -85,7 +84,6 @@ const failureOf = (
 export const mintSigningInstance = async ({
   origin,
   token,
-  recipient,
   prefill,
 }: MintSigningInstanceInput): Promise<MintedAgreement> => {
   if (!origin) {
@@ -101,7 +99,7 @@ export const mintSigningInstance = async ({
       "content-type": "application/json",
       "authorization": `Bearer ${token}`,
     },
-    body: JSON.stringify({ recipient, prefill }),
+    body: JSON.stringify({ prefill }),
   }).catch((error: unknown) => {
     throw signingUnreachable(error instanceof Error ? error.message : String(error))
   })

@@ -27,15 +27,6 @@ const SETTLEMENT_SATS = 25_000_000
 const TEST_INSTANCE_URL = "https://sign.example.test/envelope/1"
 const TEST_ENVELOPE_ID = "11111111-2222-3333-4444-555555555555"
 
-/** The host's fields as remote config carries them; nothing here is anyone's data. */
-const HOST_COUNTRY_LABEL = "country_of_residence"
-
-const HOST_FIELDS = {
-  [AGREEMENT_LABELS.signerName]: "Test Signer",
-  [AGREEMENT_LABELS.signerEmail]: "signer@example.test",
-  [HOST_COUNTRY_LABEL]: "Testland",
-}
-
 jest.mock("@app/utils/log-error", () => ({
   logError: jest.fn(),
 }))
@@ -54,22 +45,9 @@ jest.mock("@app/hooks/use-app-config", () => {
   }
 })
 
-/** Read through holders so a test can change what the host named or what the price feed
- *  answers, without the screen being rebuilt around it. */
-const mockHostFields = { current: HOST_FIELDS as Record<string, string> }
+/** Read through a holder so a test can change what the price feed answers, without the
+ *  screen being rebuilt around it. */
 const mockUsdCentsPerBtc = { current: USD_CENTS_PER_BTC as number | null }
-
-jest.mock("@app/config/feature-flags-context", () => {
-  const actual = jest.requireActual("@app/config/feature-flags-context")
-
-  return {
-    ...actual,
-    useRemoteConfig: () => ({
-      ...actual.defaultRemoteConfig,
-      cardInvestmentAgreementPrefill: mockHostFields.current,
-    }),
-  }
-})
 
 /** The converter is absent until the feed answers, as in the real hook; once it has, it
  *  prices whatever satoshis it is handed at the holder's rate, so the figures below only
@@ -94,7 +72,7 @@ jest.mock("@app/hooks/use-price-conversion", () => {
 })
 
 /** The call to the service, which is what the screen has instead of a form url: it hands
- *  over the signer and the values and opens whatever the service answers with. */
+ *  over the values and opens whatever the service answers with. */
 const mockMintSigningInstance = jest.fn()
 
 jest.mock("@app/screens/card-screen/onboarding/investment-flow/esign-mint", () => ({
@@ -211,7 +189,6 @@ const mintRequest = () =>
   mockMintSigningInstance.mock.calls[0][0] as {
     origin: string
     token: string
-    recipient: { name: string; email: string }
     prefill: Record<string, { value: string; locked: boolean }>
   }
 
@@ -227,7 +204,6 @@ describe("SignInvestScreen", () => {
     mockESign.webViewProps = null
     mockESign.signSource = null
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
-    mockHostFields.current = HOST_FIELDS
     mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
     mockMintSigningInstance.mockResolvedValue({
       url: TEST_INSTANCE_URL,
@@ -279,10 +255,10 @@ describe("SignInvestScreen", () => {
 
   /**
    * The wiring, and nothing the agreement module already pins: the mint is made against
-   * the instance's service as the session, for the signer the host named, with the
-   * host's fields and the figures of the amount the investor chose on the document.
+   * the instance's service as the session, with the figures of the amount the investor
+   * chose and no signer, since the service asks its host who signs.
    */
-  it("mints the agreement against the service as the session, from the host's fields and the chosen amount", async () => {
+  it("mints the agreement against the service as the session, from the chosen amount alone", async () => {
     await renderScreen()
     await startedSession()
 
@@ -290,12 +266,9 @@ describe("SignInvestScreen", () => {
     expect(mintRequest()).toMatchObject({
       origin: MINT_ORIGIN,
       token: SESSION_TOKEN,
-      recipient: { name: "Test Signer", email: "signer@example.test" },
-      prefill: {
-        [AGREEMENT_LABELS.units]: { value: "25000", locked: true },
-        [HOST_COUNTRY_LABEL]: { value: "Testland", locked: true },
-      },
+      prefill: { [AGREEMENT_LABELS.units]: { value: "25000", locked: true } },
     })
+    expect(mintRequest()).not.toHaveProperty("recipient")
   })
 
   /** The agreement is written from the figure the investor picked, so a request that
@@ -816,23 +789,6 @@ describe("SignInvestScreen", () => {
       expect(mockGoBack).not.toHaveBeenCalled()
       expect(mockNavigate).not.toHaveBeenCalled()
       expect(mockReplace).not.toHaveBeenCalled()
-    })
-
-    /** The one failure the step words itself: whoever fills the host's fields reads, in
-     *  their language, that the signer is missing rather than a raw internal sentence. */
-    it("says in the app's own words that the signer is not set up", async () => {
-      mockESign.status = "error"
-      mockESign.error = {
-        code: "SIGNER_NOT_CONFIGURED",
-        message: "the agreement's signer is not configured",
-      }
-
-      const { getByText, queryByText } = await renderScreen()
-
-      expect(
-        getByText("Signer not set up yet. Restart the app and try again."),
-      ).toBeTruthy()
-      expect(queryByText("the agreement's signer is not configured")).toBeNull()
     })
 
     it("reports the failure with its error code", async () => {
