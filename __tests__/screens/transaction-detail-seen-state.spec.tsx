@@ -137,36 +137,9 @@ jest.mock("@app/store/persistent-state", () => ({
 
 jest.mock("@react-navigation/native", () => ({ useNavigation: () => ({}) }))
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-        tryAgain: LLText,
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-        findingAccount: LLText,
-        txNotFoundInAccounts: LLText,
-        txLoadFailed: LLText,
-      },
-    },
-    locale: "en",
-  }),
-}))
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n(),
+)
 
 type Fragment = {
   id: string
