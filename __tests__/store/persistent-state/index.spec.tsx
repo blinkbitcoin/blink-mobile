@@ -190,6 +190,33 @@ describe("PersistentStateProvider", () => {
     })
   })
 
+  /**
+   * The bound is what keeps this equivalent to the InteractionManager call it
+   * replaced. An idle callback with no timeout can be starved for a whole
+   * launch on a busy boot, and a launch that never sweeps is a launch whose
+   * mnemonics never migrate.
+   */
+  it("bounds the idle wait, so a busy boot still sweeps", async () => {
+    const scheduleIdle = jest.spyOn(global, "requestIdleCallback")
+    setPersistedBlob(scrubbedBlob)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockSweepMnemonicMigration).toHaveBeenCalled()
+    })
+
+    expect(scheduleIdle).toHaveBeenCalledWith(
+      expect.any(Function),
+      expect.objectContaining({ timeout: expect.any(Number) }),
+    )
+    scheduleIdle.mockRestore()
+  })
+
   it("boots through a sweep that rejects, which is a migration detail and not a boot failure", async () => {
     setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("saved-token")
