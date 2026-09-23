@@ -3727,9 +3727,6 @@
         "buttonText": "Fortsæt",
         "paymentsUnavailable": "Betalinger for investeringen er ikke åbne endnu. Prøv venligst igen senere."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Underskriver ikke sat op endnu. Genstart appen og prøv igen."
-      },
       "InsufficientBalance": {
         "title": "Utilstrækkelig saldo",
         "paragraphs": {

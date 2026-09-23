@@ -3727,9 +3727,6 @@
         "buttonText": "Nastavi",
         "paymentsUnavailable": "Uplate za ulaganje još nisu otvorene. Pokušaj ponovno kasnije."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Potpisnik još nije postavljen. Ponovno pokrenite aplikaciju i pokušajte ponovno."
-      },
       "InsufficientBalance": {
         "title": "Nedovoljno sredstava",
         "paragraphs": {
