@@ -3727,9 +3727,6 @@
         "buttonText": "Weyongere",
         "paymentsUnavailable": "Okusasula kw'okuteekawo tekunnaggulwawo. Ddamu ogezeeko oluvannyuma."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Omukozi tannateekebwateekebwa. Ddamu otandike app era ogezeeko nate."
-      },
       "InsufficientBalance": {
         "title": "Ssente tezimala",
         "paragraphs": {

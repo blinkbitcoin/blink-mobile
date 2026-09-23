@@ -3727,9 +3727,6 @@
         "buttonText": "Continuă",
         "paymentsUnavailable": "Plățile pentru investiție nu sunt încă deschise. Te rugăm să încerci din nou mai târziu."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Semnatarul nu este configurat încă. Repornește aplicația și încearcă din nou."
-      },
       "InsufficientBalance": {
         "title": "Sold insuficient",
         "paragraphs": {

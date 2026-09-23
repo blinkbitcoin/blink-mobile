@@ -3727,9 +3727,6 @@
         "buttonText": "Tovább",
         "paymentsUnavailable": "A befektetési befizetések még nem indultak el. Kérlek, próbáld újra később."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Az aláíró még nincs beállítva. Indítsd újra az alkalmazást, és próbáld újra."
-      },
       "InsufficientBalance": {
         "title": "Nem elegendő egyenleg",
         "paragraphs": {

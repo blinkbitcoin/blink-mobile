@@ -3775,9 +3775,6 @@
                 "buttonText": "Weiter",
                 "paymentsUnavailable": "Zahlungen für die Investition sind noch nicht möglich. Bitte versuche es später noch einmal."
             },
-            "SignInvest": {
-                "signerNotConfigured": "Unterzeichner noch nicht eingerichtet. Starte die App neu und versuche es erneut."
-            },
             "InsufficientBalance": {
                 "title": "Unzureichendes Guthaben",
                 "paragraphs": {

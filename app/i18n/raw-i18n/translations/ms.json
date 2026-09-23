@@ -3727,9 +3727,6 @@
         "buttonText": "Teruskan",
         "paymentsUnavailable": "Pembayaran pelaburan belum dibuka. Sila cuba lagi kemudian."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Penandatangan belum disediakan. Mulakan semula aplikasi dan cuba lagi."
-      },
       "InsufficientBalance": {
         "title": "Baki tidak mencukupi",
         "paragraphs": {
