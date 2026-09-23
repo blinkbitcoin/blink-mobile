@@ -75,19 +75,23 @@ const setLegacyOnly = (ids: string[]) => {
   })
 }
 
+// Shared by both top-level describes, which are split to satisfy
+// max-lines-per-function rather than because they test unrelated things.
+const setupAccountIndexMockDefaults = () => {
+  jest.clearAllMocks()
+  mockSetItem.mockResolvedValue(undefined)
+  mockGetItem.mockResolvedValue(null)
+  mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
+  mockGetMnemonicNetworkForAccount.mockResolvedValue(null)
+  mockRememberMnemonicAccount.mockResolvedValue(true)
+  mockMnemonicExists.mockResolvedValue({ status: "no" })
+  mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
+  mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
+  mockPurgeLegacyKeyStore.mockResolvedValue(true)
+}
+
 describe("self-custodial account-index", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockSetItem.mockResolvedValue(undefined)
-    mockGetItem.mockResolvedValue(null)
-    mockReadMnemonicWithStatus.mockResolvedValue({ status: "absent" })
-    mockGetMnemonicNetworkForAccount.mockResolvedValue(null)
-    mockRememberMnemonicAccount.mockResolvedValue(true)
-    mockMnemonicExists.mockResolvedValue({ status: "no" })
-    mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
-    mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
-    mockPurgeLegacyKeyStore.mockResolvedValue(true)
-  })
+  beforeEach(setupAccountIndexMockDefaults)
 
   describe("listSelfCustodialAccounts", () => {
     it("returns ok with parsed entries from the canonical index", async () => {
@@ -518,6 +522,10 @@ describe("self-custodial account-index", () => {
       )
     })
   })
+})
+
+describe("self-custodial account-index — boot sweep and purge", () => {
+  beforeEach(setupAccountIndexMockDefaults)
 
   describe("sweepMnemonicMigration", () => {
     it("reads every account in the index, so an unopened one still migrates", async () => {
