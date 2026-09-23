@@ -401,16 +401,95 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       expect(listWrites).toHaveLength(0)
     })
 
-    it("does not record an account whose mnemonic write failed", async () => {
+    /**
+     * The inverse of what this file used to pin. Recording only after a
+     * successful value write makes the list a subset of what is stored, and the
+     * one id it can miss names a mnemonic the reinstall wipe can then never
+     * reach. Recording first makes it a superset instead, and the extra id costs
+     * one no-op delete that deleteMnemonicForAccount untracks on its way out.
+     */
+    it("records the account even when the mnemonic write fails, erring towards a spurious id", async () => {
       mockSetInternet.mockRejectedValue(new Error("keychain write-locked"))
+
+      const written = await KeyStoreWrapper.setMnemonicForAccount("alice", "alice words")
+
+      expect(written).toBe(false)
+      expect(mockSetInternet).toHaveBeenCalledWith(
+        "secure-store.blink.local/mnemonicAccounts",
+        "mnemonicAccounts",
+        JSON.stringify(["alice"]),
+        { accessible: MNEMONIC_ACCESSIBLE },
+      )
+    })
+
+    it("records the account before writing the value, so a crash between the two is survivable", async () => {
+      await KeyStoreWrapper.setMnemonicForAccount("alice", "alice words")
+
+      const servers = mockSetInternet.mock.calls.map(([server]) => server)
+      expect(servers.indexOf("secure-store.blink.local/mnemonicAccounts")).toBeLessThan(
+        servers.indexOf("secure-store.blink.local/mnemonic:alice"),
+      )
+    })
+
+    /**
+     * The caller is still told the write succeeded, because it did. What it
+     * cannot see is that the wipe has no way to name the seed now stored, so the
+     * report is the only trace until the boot sweep re-records it.
+     */
+    it("reports a mnemonic that was stored but could not be tracked", async () => {
+      mockSetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? false
+          : { service: "mock" },
+      )
+
+      const written = await KeyStoreWrapper.setMnemonicForAccount("alice", "alice words")
+
+      expect(written).toBe(true)
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        "[defect] Mnemonic stored but not tracked",
+      )
+    })
+
+    /**
+     * The report sits after the write the caller depends on, and `lifecycle.ts`
+     * rolls the mnemonic back on a false answer. A firebase handle that is not
+     * initialised yet must therefore not be able to reject this call, or a seed
+     * that was stored fine gets orphaned under an unregistered account id.
+     */
+    it("still reports the write as successful when the telemetry call throws", async () => {
+      mockSetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? false
+          : { service: "mock" },
+      )
+      // Thrown from `log`, not from `recordError`: `recordAppError` logs a
+      // breadcrumb before it records, and the record half is suppressed here by
+      // the process-lifetime dedup the case above already spent. Throwing from
+      // the half that always runs is what makes this case exercise anything.
+      //
+      // Once, not for the file: clearAllMocks resets calls but not
+      // implementations, so a persistent throw would leak into every later test.
+      mockCrashlyticsLog.mockImplementationOnce(() => {
+        throw new Error("firebase not initialised")
+      })
+
+      const written = await KeyStoreWrapper.setMnemonicForAccount("alice", "alice words")
+
+      expect(written).toBe(true)
+    })
+
+    it("reports nothing when the account is already tracked", async () => {
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: JSON.stringify(["alice"]) }
+          : false,
+      )
 
       await KeyStoreWrapper.setMnemonicForAccount("alice", "alice words")
 
-      expect(mockSetInternet).not.toHaveBeenCalledWith(
-        "secure-store.blink.local/mnemonicAccounts",
-        "mnemonicAccounts",
-        expect.any(String),
-        expect.any(Object),
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+        "[defect] Mnemonic stored but not tracked",
       )
     })
   })
