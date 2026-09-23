@@ -43,11 +43,11 @@ jest.mock("@app/self-custodial/sdk-error", () => ({
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
-  default: { getMnemonicForAccount: jest.fn() },
+  default: { readMnemonicWithStatus: jest.fn() },
 }))
 
 const SPARK_PUBKEY = "03".padEnd(66, "a")
-const mockGetMnemonic = KeyStoreWrapper.getMnemonicForAccount as jest.Mock
+const mockReadMnemonic = KeyStoreWrapper.readMnemonicWithStatus as jest.Mock
 
 const buildRequest = (signChallenge = jest.fn(() => "migrate:challenge")) =>
   buildMigrationTransferRequest({
@@ -75,7 +75,10 @@ const sdkWith = (signMessage: jest.Mock = jest.fn()) => ({
 describe("buildMigrationTransferRequest", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockReadMnemonic.mockResolvedValue({
+      status: "found",
+      value: "abandon abandon ability",
+    })
     mockInitSdk.mockResolvedValue(sdkWith())
     mockGetWalletInfo.mockResolvedValue({ identityPubkey: SPARK_PUBKEY })
     mockDisconnectSdk.mockResolvedValue(undefined)
@@ -156,11 +159,26 @@ describe("buildMigrationTransferRequest", () => {
   })
 
   it("reports a device with no mnemonic for the provisioned account", async () => {
-    mockGetMnemonic.mockResolvedValue(null)
+    mockReadMnemonic.mockResolvedValue({ status: "absent" })
 
     const result = await buildRequest()
 
     expect(result).toEqual({ status: MigrationSdkStatus.NoMnemonic })
+    expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  /**
+   * NoMnemonic routes the user to support as a device that never held the key, so
+   * a read that merely failed must not land there: nothing is missing, the
+   * keychain just would not answer, and the next attempt may well succeed.
+   */
+  it("reports a failed read as a retryable failure, not as a device without the key", async () => {
+    const readError = new Error("keychain locked")
+    mockReadMnemonic.mockResolvedValue({ status: "failed", err: readError })
+
+    const result = await buildRequest()
+
+    expect(result).toEqual({ status: MigrationSdkStatus.Failed, error: readError })
     expect(mockInitSdk).not.toHaveBeenCalled()
   })
 
@@ -320,7 +338,10 @@ describe("checkMigrationReceiveLanded", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockReadMnemonic.mockResolvedValue({
+      status: "found",
+      value: "abandon abandon ability",
+    })
     mockInitSdk.mockResolvedValue({ getInfo: mockGetInfo })
     mockDisconnectSdk.mockResolvedValue(undefined)
     mockGetInfo.mockResolvedValue({ balanceSats: 0 })
@@ -353,7 +374,7 @@ describe("checkMigrationReceiveLanded", () => {
   })
 
   it("reports a device with no mnemonic for the provisioned account", async () => {
-    mockGetMnemonic.mockResolvedValue(null)
+    mockReadMnemonic.mockResolvedValue({ status: "absent" })
 
     const result = await check()
 
@@ -423,7 +444,10 @@ describe("checkMigrationReceiveLanded", () => {
 describe("buildMigrationLnAddressProof", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockGetMnemonic.mockResolvedValue("abandon abandon ability")
+    mockReadMnemonic.mockResolvedValue({
+      status: "found",
+      value: "abandon abandon ability",
+    })
     mockInitSdk.mockResolvedValue({
       signMessage: jest.fn().mockResolvedValue({ signature: "deadbeef" }),
     })
