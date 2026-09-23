@@ -3727,9 +3727,6 @@
         "buttonText": "Devam Et",
         "paymentsUnavailable": "Yatırım ödemeleri henüz açık değil. Lütfen daha sonra tekrar dene."
       },
-      "SignInvest": {
-        "signerNotConfigured": "İmzalayan henüz ayarlanmadı. Uygulamayı yeniden başlatıp tekrar deneyin."
-      },
       "InsufficientBalance": {
         "title": "Yetersiz bakiye",
         "paragraphs": {

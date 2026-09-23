@@ -3727,9 +3727,6 @@
         "buttonText": "ดำเนินการต่อ",
         "paymentsUnavailable": "ยังไม่เปิดรับการชำระเงินลงทุน โปรดลองอีกครั้งในภายหลัง"
       },
-      "SignInvest": {
-        "signerNotConfigured": "ยังไม่ได้ตั้งค่าผู้ลงนาม กรุณาเปิดแอปใหม่แล้วลองอีกครั้ง"
-      },
       "InsufficientBalance": {
         "title": "ยอดเงินไม่เพียงพอ",
         "paragraphs": {

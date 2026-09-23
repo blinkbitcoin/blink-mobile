@@ -3727,9 +3727,6 @@
         "buttonText": "Lanjutkan",
         "paymentsUnavailable": "Pembayaran investasi belum dibuka. Silakan coba lagi nanti."
       },
-      "SignInvest": {
-        "signerNotConfigured": "Penanda tangan belum disiapkan. Mulai ulang aplikasi dan coba lagi."
-      },
       "InsufficientBalance": {
         "title": "Saldo tidak mencukupi",
         "paragraphs": {
