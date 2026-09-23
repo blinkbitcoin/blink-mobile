@@ -98,8 +98,13 @@ const withMigrationSdk = async <T>(
   { accountId, network, leewaySatPerVbyte }: MigrationSdkConnectionArgs,
   use: (sdk: BreezSdkInterface) => Promise<T>,
 ): Promise<MigrationSdkResult<T>> => {
-  const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
-  if (!mnemonic) return { status: MigrationSdkStatus.NoMnemonic }
+  // NoMnemonic is routed to support as an account the device never held, so it has
+  // to mean exactly that: a read that merely failed is a retryable failure, not a
+  // missing key. getMnemonicForAccount answers null for both.
+  const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+  if (stored.status === "failed") return toSdkFailure(stored.err)
+  if (stored.status === "absent") return { status: MigrationSdkStatus.NoMnemonic }
+  const mnemonic = stored.value
 
   const storageDir = storageDirFor(accountId, network)
   return runExclusivePerStorageDir(storageDir, async () => {
