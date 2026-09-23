@@ -206,4 +206,116 @@ describe("useCloudBackupForm", () => {
     expect(result.current.confirmPassword).toBe("")
     expect(result.current.passwordError).toBeUndefined()
   })
+
+  describe("recovery-backup cloud sync (D4/D9)", () => {
+    const setPasswordProtected = (result: {
+      current: ReturnType<typeof useCloudBackupForm>
+    }) => {
+      act(() => result.current.toggleEncryption())
+      act(() => {
+        result.current.setPassword("hunter2hunter2")
+        result.current.setConfirmPassword("hunter2hunter2")
+      })
+    }
+
+    it("is off by default and not offered without a password", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      expect(result.current.autoBundleSync).toBe(false)
+      // D9: a seed-encrypted bundle must never be stored next to an
+      // unencrypted seed, so sync is not on offer until a password exists.
+      expect(result.current.canSyncBundle).toBe(false)
+    })
+
+    it("becomes available once the seed backup carries a valid password", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+
+      expect(result.current.canSyncBundle).toBe(true)
+    })
+
+    it("can be turned on", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+
+      expect(result.current.autoBundleSync).toBe(true)
+    })
+
+    it("is cleared when the password is removed again", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+      expect(result.current.autoBundleSync).toBe(true)
+
+      act(() => result.current.toggleEncryption())
+
+      // Leaving it checked would promise a sync that D9 forbids.
+      expect(result.current.autoBundleSync).toBe(false)
+      expect(result.current.canSyncBundle).toBe(false)
+    })
+
+    /** Reads as off while the gate is shut, so the row never renders a checked
+     *  box the user cannot uncheck - the password field is under the keyboard
+     *  at that moment. */
+    it("reads as off while the password is edited into an invalid state", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+      expect(result.current.autoBundleSync).toBe(true)
+
+      act(() => result.current.setPassword("short"))
+
+      expect(result.current.canSyncBundle).toBe(false)
+      expect(result.current.autoBundleSync).toBe(false)
+      // Encryption stays on: the gate closed, not the user's choice to encrypt.
+      expect(result.current.isEncrypted).toBe(true)
+    })
+
+    it("reads as off while the passwords do not match", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+
+      act(() => result.current.setConfirmPassword("hunter2hunter3"))
+
+      expect(result.current.canSyncBundle).toBe(false)
+      expect(result.current.autoBundleSync).toBe(false)
+    })
+
+    /** Fixing a typo is not withdrawing consent. Discarding the opt-in on a
+     *  transient dip would lose it silently, with the checkbox off-screen. */
+    it("comes back on once a retyped password is valid again", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+      act(() => result.current.setPassword("short"))
+      expect(result.current.autoBundleSync).toBe(false)
+
+      act(() => result.current.setPassword("hunter2hunter2"))
+
+      expect(result.current.canSyncBundle).toBe(true)
+      expect(result.current.autoBundleSync).toBe(true)
+    })
+
+    /** Turning encryption off is deliberate, so it drops the choice itself -
+     *  unlike a password merely being edited. */
+    it("stays off after encryption is switched off and on again", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      setPasswordProtected(result)
+      act(() => result.current.toggleAutoBundleSync())
+      act(() => result.current.toggleEncryption())
+      setPasswordProtected(result)
+
+      expect(result.current.canSyncBundle).toBe(true)
+      expect(result.current.autoBundleSync).toBe(false)
+    })
+  })
 })

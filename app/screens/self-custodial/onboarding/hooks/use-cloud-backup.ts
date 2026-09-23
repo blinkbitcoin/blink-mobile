@@ -8,7 +8,12 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
+import {
+  readRecoveryBundleSettings,
+  writeRecoveryBundleSettings,
+} from "@app/self-custodial/recovery-bundle/settings"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
+import { reportError } from "@app/utils/error-logging"
 import {
   buildBackupPayload,
   type BackupMetadata,
@@ -21,7 +26,11 @@ import { getCloudProviderName } from "../utils"
 
 import { useCompleteBackup } from "./use-complete-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
-import { useWalletIdentity, useWalletMnemonicState } from "./use-wallet-mnemonic"
+import {
+  useBackupTargetAccountId,
+  useWalletIdentity,
+  useWalletMnemonicState,
+} from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 
@@ -45,12 +54,15 @@ const buildExistingBackupMessage = (
 type UseCloudBackupParams = {
   isEncrypted: boolean
   password: string
+  /** Opt-in to ongoing cloud sync of the recovery backup (D4, off by default). */
+  autoBundleSync?: boolean
   version?: number
 }
 
 export const useCloudBackup = ({
   isEncrypted,
   password,
+  autoBundleSync = false,
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
@@ -61,6 +73,9 @@ export const useCloudBackup = ({
   const { mnemonic, loading: mnemonicLoading } = useWalletMnemonicState()
   const { pubkey: identityPubkey, loading: identityLoading } = useWalletIdentity(mnemonic)
   const { lightningAddress } = useSelfCustodialAccountInfo()
+  /** The same account the phrase above was read from: mid-migration that is the
+   *  provisioned self-custodial one, not the still-custodial active account. */
+  const accountId = useBackupTargetAccountId()
 
   /** The phrase is read from the keychain before the pubkey can derive from it; both
    *  windows leave the pubkey empty without it being a failure. */
@@ -141,6 +156,32 @@ export const useCloudBackup = ({
       return
     }
 
+    /** Record the opt-in only once the seed backup actually landed, and only
+     *  alongside a password (D9). A failed upload must not leave sync enabled
+     *  for a provider that holds nothing. Failure here is not fatal: the seed
+     *  backup succeeded, and the toggle is available again in Settings. */
+    if (accountId && autoBundleSync && isEncrypted && password.length > 0) {
+      /** Read separately rather than inline in the write's arguments: an
+       *  argument that rejects aborts the call before .catch can attach, so a
+       *  failing storage read would escape this best-effort block and skip the
+       *  completion below - leaving the seed uploaded but the backup
+       *  unrecorded. */
+      const current = await readRecoveryBundleSettings(accountId).catch((err) => {
+        reportError("Recovery bundle settings read", err)
+        return null
+      })
+      /** Skipped rather than defaulted when the read failed: the write replaces
+       *  the whole record, so falling back to the defaults would silently flip
+       *  an autoRefresh the user had turned off in Settings. Dropping the
+       *  opt-in is the recoverable half - the toggle is still there. */
+      if (current) {
+        await writeRecoveryBundleSettings(accountId, {
+          ...current,
+          cloudSync: true,
+        }).catch((err) => reportError("Recovery bundle cloud-sync opt-in", err))
+      }
+    }
+
     logSelfCustodialBackupCompleted({
       backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
     })
@@ -158,6 +199,8 @@ export const useCloudBackup = ({
   }, [
     isEncrypted,
     password,
+    autoBundleSync,
+    accountId,
     version,
     startSession,
     upload,
