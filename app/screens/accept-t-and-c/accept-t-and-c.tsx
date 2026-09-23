@@ -6,6 +6,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { toastShow } from "@app/utils/toast"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -49,8 +51,17 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
       /** The acceptance is part of the migration's consent trail, so advance only once the
        *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
        *  user already accepted. */
-      const saved = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
-      if (!saved) return
+      const { isSaved, failure } = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      /** A Continue that answers a tap with nothing reads as a broken button, and a full
+       *  disk is the one failure the user can go and fix. */
+      if (!isSaved) {
+        const isOutOfSpace = failure === StorageFailure.OutOfSpace
+        const message = isOutOfSpace
+          ? LL.AccountMigration.storageUnavailable.outOfSpaceBody()
+          : LL.errors.generic()
+        toastShow({ message, LL })
+        return
+      }
       navigation.navigate("selfCustodialBackupMethod")
       return
     }
