@@ -109,6 +109,22 @@ describe("verifyPin", () => {
       await expect(verifyPin(WRONG_PIN)).resolves.toEqual({ outcome: "exhausted" })
     })
 
+    it("reports a spent budget that could not be recorded", async () => {
+      // The logout that follows keeps the lock standing, so an unrecorded
+      // third failure leaves the next launch one short of the cap and grants
+      // another guess against a PIN that is still there.
+      storedState({ attempts: MAX_PIN_ATTEMPTS - 1 })
+      mockedStore.setPinFailureState.mockResolvedValue(false)
+
+      await expect(verifyPin(WRONG_PIN)).resolves.toEqual({ outcome: "exhausted" })
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Spent PIN budget could not be recorded",
+        }),
+        expect.objectContaining({ alwaysRecord: true }),
+      )
+    })
+
     it("records the spent budget before reporting it", async () => {
       // A kill during the logout that follows must not hand the attempts back.
       storedState({ attempts: MAX_PIN_ATTEMPTS - 1 })
