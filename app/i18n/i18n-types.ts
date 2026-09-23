@@ -12512,12 +12512,6 @@ type RootTranslation = {
 				 */
 				paymentsUnavailable: string
 			}
-			SignInvest: {
-				/**
-				 * S​i​g​n​e​r​ ​n​o​t​ ​s​e​t​ ​u​p​ ​y​e​t​.​ ​R​e​s​t​a​r​t​ ​t​h​e​ ​a​p​p​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
-				 */
-				signerNotConfigured: string
-			}
 			InsufficientBalance: {
 				/**
 				 * I​n​s​u​f​f​i​c​i​e​n​t​ ​b​a​l​a​n​c​e
@@ -26721,12 +26715,6 @@ export type TranslationFunctions = {
 				 * Investment payments are not open yet. Please try again later.
 				 */
 				paymentsUnavailable: () => LocalizedString
-			}
-			SignInvest: {
-				/**
-				 * Signer not set up yet. Restart the app and try again.
-				 */
-				signerNotConfigured: () => LocalizedString
 			}
 			InsufficientBalance: {
 				/**
