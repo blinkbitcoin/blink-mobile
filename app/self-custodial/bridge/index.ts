@@ -12,14 +12,17 @@ export {
   listAllPayments,
   listPayments,
   getUserSettings,
-  syncSelfCustodialWallet,
   getLightningAddress,
   checkLightningAddressAvailable,
   registerLightningAddress,
 } from "./wallet"
 export { getSparkStatus } from "./status"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
-export { createReceiveLightning, createReceiveOnchain } from "./receive"
+export {
+  bolt11ReceiveMethod,
+  createReceiveLightning,
+  createReceiveOnchain,
+} from "./receive"
 export { createLnurlWithdraw } from "./lnurl-withdraw"
 export {
   prepareSend,
