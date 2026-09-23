@@ -9,7 +9,6 @@ import { RouteProp } from "@react-navigation/native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
-import { MAX_LOCKOUT_MS } from "@app/screens/authentication-screen/pin-lockout"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -58,28 +57,26 @@ const WRONG_PIN = "9999"
 const mockedStore = jest.mocked(KeyStoreWrapper)
 
 /**
- * A real keystore rather than per-call stubs, because the lockout now re-reads
+ * A real keystore rather than per-call stubs, because the verification re-reads
  * storage on every attempt. Keeping the values here lets a test unmount and
  * re-render the screen to model a force-quit and relaunch.
  */
-let stored: { pin: string | null; attempts: number; lockedUntil: number }
+let stored: { pin: string | null; attempts: number }
 
 const primeStore = () => {
-  stored = { pin: CORRECT_PIN, attempts: 0, lockedUntil: 0 }
+  stored = { pin: CORRECT_PIN, attempts: 0 }
 
   mockedStore.getPin.mockImplementation(async () => stored.pin)
   mockedStore.getPinFailureState.mockImplementation(async () => ({
     status: "found",
-    state: { attempts: stored.attempts, lockedUntil: stored.lockedUntil },
+    state: { attempts: stored.attempts },
   }))
-  mockedStore.setPinFailureState.mockImplementation(async ({ attempts, lockedUntil }) => {
+  mockedStore.setPinFailureState.mockImplementation(async ({ attempts }) => {
     stored.attempts = attempts
-    stored.lockedUntil = lockedUntil
     return true
   })
   mockedStore.clearPinFailureState.mockImplementation(async () => {
     stored.attempts = 0
-    stored.lockedUntil = 0
     return true
   })
   mockedStore.setPin.mockResolvedValue(true)
@@ -291,7 +288,7 @@ describe("PinScreen", () => {
     })
   })
 
-  describe("brute-force lockout", () => {
+  describe("the attempt budget", () => {
     beforeEach(() => {
       // flushEffects relies on setImmediate; keep it real so effects settle.
       jest.useFakeTimers({ doNotFake: ["setImmediate"] })
@@ -309,7 +306,7 @@ describe("PinScreen", () => {
       await flushEffects()
     }
 
-    it("persists the attempt and the lockout before showing the result", async () => {
+    it("persists the attempt before showing the result", async () => {
       renderScreen(false)
       await flushEffects()
 
@@ -317,56 +314,27 @@ describe("PinScreen", () => {
 
       expect(mockedStore.setPinFailureState).toHaveBeenCalledTimes(1)
       expect(stored.attempts).toBe(1)
-      expect(stored.lockedUntil).toBeGreaterThan(Date.now())
     })
 
-    it("shows how many attempts are left alongside the countdown", async () => {
-      // The countdown used to replace this line, so a single typo read as
-      // "too many failed attempts" and hid the real count.
+    it("shows how many attempts are left after a wrong entry", async () => {
       renderScreen(false)
       await flushEffects()
 
       await enterPin(WRONG_PIN)
 
       expect(screen.getByText("Incorrect PIN. 2 attempts remaining.")).toBeTruthy()
-      expect(screen.getByText(/try again in/i)).toBeTruthy()
     })
 
-    it("makes the keypad inert while locked, even for the correct pin", async () => {
+    it("takes the correct pin on the next try and clears the spent count", async () => {
       renderScreen(false)
       await flushEffects()
 
       await enterPin(WRONG_PIN)
-      await enterPin(CORRECT_PIN)
-
-      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
-      expect(screen.getByText(/try again in/i)).toBeTruthy()
-    })
-
-    it("re-enables the keypad after the lockout elapses and clears both keys on success", async () => {
-      renderScreen(false)
-      await flushEffects()
-
-      await enterPin(WRONG_PIN)
-      await advance(11_000)
-
       await enterPin(CORRECT_PIN)
 
       expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
       expect(mockedStore.clearPinFailureState).toHaveBeenCalled()
-      expect(stored).toMatchObject({ attempts: 0, lockedUntil: 0 })
-    })
-
-    it("starts locked when a future lockout is persisted (survives relaunch)", async () => {
-      stored.lockedUntil = Date.now() + 10_000
-
-      renderScreen(false)
-      await flushEffects()
-
-      await enterPin(CORRECT_PIN)
-
-      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
-      expect(screen.getByText(/try again in/i)).toBeTruthy()
+      expect(stored).toMatchObject({ attempts: 0 })
     })
 
     it("warns about the last attempt after a relaunch, not just in session", async () => {
@@ -378,23 +346,6 @@ describe("PinScreen", () => {
       await flushEffects()
 
       expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
-    })
-
-    it("clamps an absurd persisted lockout and repairs it in storage", async () => {
-      // A wall clock rolled backward after the write must not lock forever, and
-      // leaving the bad value stored would re-impose the lock on every launch.
-      stored.lockedUntil = Date.now() + 100 * 24 * 60 * 60 * 1000
-
-      renderScreen(false)
-      await flushEffects()
-      expect(mockedStore.setPinFailureState).toHaveBeenCalledWith(
-        expect.objectContaining({ lockedUntil: expect.any(Number) }),
-      )
-
-      await advance(MAX_LOCKOUT_MS + 1000)
-      await enterPin(CORRECT_PIN)
-
-      expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
     })
 
     it("still logs out on the third failure", async () => {
@@ -414,7 +365,7 @@ describe("PinScreen", () => {
     })
 
     it("logs out rather than let an attempt go unrecorded", async () => {
-      // A lockout held only in memory dies with the process, so a failed write
+      // A budget held only in memory dies with the process, so a failed write
       // has to end the session instead of leaving the next guess free.
       mockedStore.setPinFailureState.mockResolvedValue(false)
 
@@ -424,7 +375,6 @@ describe("PinScreen", () => {
       await enterPin(WRONG_PIN)
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
-      expect(screen.queryByText(/try again in/i)).toBeNull()
       expect(
         screen.getByText("Couldn't record the failed attempt securely. Logging out."),
       ).toBeTruthy()
@@ -445,16 +395,15 @@ describe("PinScreen", () => {
       expect(screen.getByText("Incorrect PIN. 2 attempts remaining.")).toBeTruthy()
       expect(stored.attempts).toBe(1)
       expect(mockLogout).not.toHaveBeenCalled()
-      expect(screen.queryByText(/try again in/i)).toBeNull()
       expect(screen.getByText("1")).not.toBeDisabled()
     })
 
-    it("refuses a guess made on a fresh mount while the stored lock still runs", async () => {
-      // The relaunch bypass: the screen's own state starts at zero attempts and
-      // no lock, so a guess entered before hydration used to skip the lock and
-      // write the attempt count back down to 1.
+    it("drops a guess made before the screen hydrated, rather than miscounting it", async () => {
+      // The relaunch bypass: the screen's own state starts at zero attempts, so
+      // a guess entered before hydration used to be scored against that and
+      // write the stored count back DOWN to 1. The keypad refuses input until
+      // the read lands, so the stored budget is never contradicted.
       stored.attempts = 2
-      stored.lockedUntil = Date.now() + 25_000
 
       renderScreen(false)
       await enterPin(WRONG_PIN)
@@ -465,17 +414,13 @@ describe("PinScreen", () => {
 
     it("reaches the logout even when the app is killed between every guess", async () => {
       // Each guess lands in a freshly mounted screen that has hydrated nothing,
-      // and the attacker has to sit out each lock. The budget still runs out.
-      for (const { attempt, lockMs } of [
-        { attempt: 1, lockMs: 11_000 },
-        { attempt: 2, lockMs: 31_000 },
-      ]) {
+      // so nothing but storage carries the count between them. It still runs out.
+      for (const attempt of [1, 2]) {
         const { unmount } = renderScreen(false)
         await flushEffects()
         await enterPin(WRONG_PIN)
         expect(stored.attempts).toBe(attempt)
         unmount()
-        await advance(lockMs)
       }
 
       renderScreen(false)
@@ -485,8 +430,8 @@ describe("PinScreen", () => {
       expect(mockLogout).toHaveBeenCalledTimes(1)
     })
 
-    it("never locks the set-pin flow", async () => {
-      stored.lockedUntil = Date.now() + 10_000
+    it("never spends the budget in the set-pin flow", async () => {
+      stored.attempts = 2
 
       renderScreen(undefined, PinScreenPurpose.SetPin)
       await flushEffects()
@@ -555,23 +500,6 @@ describe("PinScreen", () => {
   })
 
   describe("input while a verification is in flight", () => {
-    beforeEach(() => {
-      // flushEffects relies on setImmediate; keep it real so effects settle.
-      jest.useFakeTimers({ doNotFake: ["setImmediate"] })
-    })
-
-    afterEach(() => {
-      jest.useRealTimers()
-    })
-
-    const advance = async (ms: number) => {
-      await flushEffects()
-      await act(async () => {
-        jest.advanceTimersByTime(ms)
-      })
-      await flushEffects()
-    }
-
     /** Holds the verification open on its stored-pin read. */
     const holdVerification = () => {
       let release: (pin: string) => void = () => {}
@@ -625,7 +553,6 @@ describe("PinScreen", () => {
       const release = holdVerification()
       await enterPin(WRONG_PIN)
       await release()
-      await advance(11_000)
 
       expect(screen.getByText("1")).not.toBeDisabled()
     })
@@ -734,7 +661,7 @@ describe("PinScreen ChallengePin", () => {
     })
 
     it("stays silent when a stack-wide reset removes the challenge", async () => {
-      /** A reset (migration blocker, resume relock, the lockout's own logout)
+      /** A reset (migration blocker, resume relock, the spent budget's logout)
        *  unmounts the caller too — a decline callback would toast and goBack
        *  into a screen that no longer exists. */
       const onChallengeFailure = jest.fn()
@@ -865,7 +792,7 @@ describe("PinScreen ChallengePin", () => {
      * dismiss tapped in that window declines into a session already going away
      * and races the reset that ends it.
      */
-    describe("the dismiss control during the lockout teardown", () => {
+    describe("the dismiss control during the logout teardown", () => {
       it("ignores a tap while the logout runs", async () => {
         let releaseLogout!: () => void
         mockLogout.mockReturnValueOnce(
@@ -890,17 +817,17 @@ describe("PinScreen ChallengePin", () => {
       })
 
       /**
-       * Deliberately still live during the countdown, which is where gating the
+       * Deliberately still live after a failure, which is where gating the
        * control on the keypad's own disabled state would have put it: a
-       * challenge the user cannot currently answer is exactly when they most
-       * want to leave, and the back gesture lets them regardless.
+       * challenge the user is getting wrong is exactly when they most want to
+       * leave, and the back gesture lets them regardless.
        */
-      it("still dismisses while the lockout countdown runs", async () => {
+      it("still dismisses after a wrong guess has spent budget", async () => {
         renderChallenge({ onChallengeSuccess: jest.fn(), onChallengeFailure: jest.fn() })
         await flushEffects()
 
         await enterPin(WRONG_PIN)
-        expect(screen.getByText(/try again in/i)).toBeTruthy()
+        expect(screen.getByText("Incorrect PIN. 2 attempts remaining.")).toBeTruthy()
 
         fireEvent.press(screen.getByTestId("pinScreenDismiss"))
 
@@ -932,22 +859,8 @@ describe("PinScreen ChallengePin", () => {
       expect(mockReset).not.toHaveBeenCalled()
     })
 
-    it("refuses a guess while the shared lockout from an earlier screen still runs", async () => {
-      stored.attempts = 1
-      stored.lockedUntil = Date.now() + 10_000
-
-      const onChallengeSuccess = jest.fn()
-      renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
-      await flushEffects()
-
-      await enterPin(CORRECT_PIN)
-
-      expect(onChallengeSuccess).not.toHaveBeenCalled()
-      expect(mockGoBack).not.toHaveBeenCalled()
-    })
-
-    it("still resets the stack when the lockout's logout fails", async () => {
-      /** The reset is the lockout's terminal answer; a logout error must not
+    it("still resets the stack when the terminal logout fails", async () => {
+      /** The reset is the spent budget's terminal answer; a logout error must not
        *  strand the caller behind a challenge that can no longer resolve. */
       mockLogout.mockRejectedValueOnce(new Error("network down"))
       stored.attempts = 2
@@ -963,8 +876,8 @@ describe("PinScreen ChallengePin", () => {
       })
     })
 
-    it("ignores input typed during the lockout's logout window", async () => {
-      /** The lockout awaits logout + a grace sleep before resetting the stack. The
+    it("ignores input typed during the terminal logout window", async () => {
+      /** The screen awaits logout + a grace sleep before resetting the stack. The
        *  keypad must be dead in that window: a correct pin typed there would
        *  otherwise resolve the challenge against a session being destroyed. */
       let releaseLogout!: () => void
@@ -989,9 +902,11 @@ describe("PinScreen ChallengePin", () => {
       releaseLogout()
     })
 
-    describe("after the shared lockout elapses", () => {
+    describe("after a wrong guess has landed", () => {
       beforeEach(() => {
-        // flushEffects relies on setImmediate; keep it real so effects settle.
+        // The exhausted path sleeps 1s before resetting the stack, and only
+        // that test advances them. flushEffects relies on setImmediate; keep it
+        // real so effects settle.
         jest.useFakeTimers({ doNotFake: ["setImmediate"] })
       })
 
@@ -999,7 +914,7 @@ describe("PinScreen ChallengePin", () => {
         jest.useRealTimers()
       })
 
-      it("re-arms the keypad after a wrong guess, so the next attempt can resolve", async () => {
+      it("re-arms the keypad, so the next attempt can resolve", async () => {
         const onChallengeSuccess = jest.fn()
         renderChallenge({ onChallengeSuccess, onChallengeFailure: jest.fn() })
         await flushEffects()
@@ -1007,10 +922,6 @@ describe("PinScreen ChallengePin", () => {
         await enterPin(WRONG_PIN)
         expect(stored.attempts).toBe(1)
 
-        await flushEffects()
-        await act(async () => {
-          jest.advanceTimersByTime(MAX_LOCKOUT_MS + 1000)
-        })
         await flushEffects()
 
         await enterPin(CORRECT_PIN)
