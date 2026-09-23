@@ -2437,7 +2437,7 @@
         "sdkGenericError": "Impossible d'estimer les frais. Essayez un montant différent."
     },
     "SettingsScreen": {
-        "createAddress": "Créer une adresse",
+        "createAddress": "Créer une adresse Lightning",
         "addressDisabled": "(désactivée)",
         "donationButton": "Bouton de don",
         "btcpayServer": "BTCPay Server",

@@ -2437,7 +2437,7 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Criar endereço",
+        "createAddress": "Criar endereço Lightning",
         "addressDisabled": "(desativado)",
         "donationButton": "Botão Doar",
         "btcpayServer": "BTCPay Server",
