@@ -1,6 +1,8 @@
 import React from "react"
 import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
+import { PhraseStep } from "@app/navigation/stack-param-lists"
+
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -145,6 +147,29 @@ describe("MigrationExplainerScreen", () => {
     expect(cta.props.accessibilityState?.busy).toBe(true)
 
     fireEvent.press(cta)
+    expect(mockEnsureAccount).not.toHaveBeenCalled()
+  })
+
+  /** The import route provisions nothing here: the phrase the user is about to type is
+   *  what decides the wallet, so creating one first would leave a zombie behind. */
+  it("keeps the import option inert until every checkbox is accepted, then routes to the phrase screen", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const importCta = screen.getByText(LL.AccountMigration.explainerImportCta())
+
+    fireEvent.press(importCta)
+    expect(mockNavigate).not.toHaveBeenCalled()
+
+    acceptAllChecks()
+    fireEvent.press(importCta)
+
+    await waitFor(() =>
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestorePhrase", {
+        step: PhraseStep.First,
+        flow: "migration",
+      }),
+    )
     expect(mockEnsureAccount).not.toHaveBeenCalled()
   })
 })

@@ -535,4 +535,64 @@ describe("RestorePhraseScreen", () => {
       unstable_headerRightItems: undefined,
     })
   })
+
+  describe("the migration flow flag", () => {
+    it("hands the migration flow to the hook when the route carries it", async () => {
+      mockRouteParams = { step: 2, words: [...validStep2Words], flow: "migration" }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith(
+        expect.objectContaining({ flow: "migration" }),
+      )
+    })
+
+    /** The flag validates itself, so it survives the step-1 fallback. Dropping it with the
+     *  step would hand the re-typed phrase to the onboarding restore, which activates the
+     *  wallet and switches away from a custodial account still holding the funds. */
+    it("keeps the migration flow when the step falls back to 1", async () => {
+      mockRouteParams = { step: 2, flow: "migration" }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith({
+        step: 1,
+        initialWords: undefined,
+        flow: "migration",
+      })
+    })
+
+    it("passes no flow for an ordinary restore", async () => {
+      mockRouteParams = { step: 2, words: [...validStep2Words] }
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalledWith(
+        expect.objectContaining({ flow: undefined }),
+      )
+    })
+  })
+
+  /** A valid phrase whose submission is still blocked: the button holds shut without the
+   *  screen claiming the phrase is wrong. */
+  it("keeps the restore button inert while submission is blocked", async () => {
+    const handleRestore = jest.fn()
+    mockUseRestorePhrase.mockReturnValue({
+      ...defaultHookReturn,
+      allFilled: true,
+      isValid: true,
+      isSubmitBlocked: true,
+      handleRestore,
+    })
+
+    const { getByText } = renderScreen()
+    await flushEffects()
+
+    fireEvent.press(getByText(LL.RestoreScreen.restore()))
+
+    expect(handleRestore).not.toHaveBeenCalled()
+  })
 })
