@@ -1672,178 +1672,6 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
     expect(onFailure).not.toHaveBeenCalled()
   })
 
-  /**
-   * The mnemonics are the reason this wipe exists at all now: the legacy
-   * library's own reinstall sweep used to clear them by accident, and with
-   * every slot behind the read-through helper that sweep never fires.
-   */
-  it("clears the mnemonic of every tracked account", async () => {
-    mockGetInternet.mockImplementation(async (server: string) =>
-      server === "secure-store.blink.local/mnemonicAccounts"
-        ? { username: "mnemonicAccounts", password: JSON.stringify(["alice", "bob"]) }
-        : false,
-    )
-
-    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-    for (const slot of [
-      "mnemonic:alice",
-      "mnemonic_network:alice",
-      "mnemonic:bob",
-      "mnemonic_network:bob",
-    ]) {
-      expect(mockResetInternet).toHaveBeenCalledWith({
-        server: `secure-store.blink.local/${slot}`,
-      })
-    }
-    expect(onFailure).not.toHaveBeenCalled()
-  })
-
-  it("reports the list rather than claiming a clean wipe it cannot verify", async () => {
-    mockGetInternet.mockImplementation(async (server: string) => {
-      if (server === "secure-store.blink.local/mnemonicAccounts") {
-        throw new Error("keychain unavailable")
-      }
-      return false
-    })
-
-    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-    expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
-  })
-
-  /**
-   * Every shape that is not a list of ids is reported, never read as an empty
-   * list. `[]` here would skip the mnemonic wipe entirely and say nothing, so
-   * the one signal that the key material was left in place would be gone.
-   */
-  const expectMalformedListReported = async (stored: string) => {
-    mockGetInternet.mockImplementation(async (server: string) =>
-      server === "secure-store.blink.local/mnemonicAccounts"
-        ? { username: "mnemonicAccounts", password: stored }
-        : false,
-    )
-
-    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-    expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
-    // And nothing is claimed to have been cleared: not even the ids the
-    // malformed list did carry, since a partial wipe reported as a clean one is
-    // the outcome this branch exists to prevent.
-    const mnemonicResets = mockResetInternet.mock.calls.filter(([arg]) =>
-      String((arg as { server: string }).server).includes("mnemonic:"),
-    )
-    expect(mnemonicResets).toHaveLength(0)
-  }
-
-  it("reports a list it cannot parse rather than reading it as no accounts", async () => {
-    await expectMalformedListReported("not json at all")
-  })
-
-  it("reports a list that is valid JSON but not a list", async () => {
-    await expectMalformedListReported(JSON.stringify({ alice: true }))
-  })
-
-  it("reports a list carrying an entry that is not an account id", async () => {
-    // Filtering the bad entry out and wiping the rest would be a partial wipe
-    // reported as a complete one.
-    await expectMalformedListReported(JSON.stringify(["alice", 42]))
-  })
-
-  it("clears nothing extra when no account was ever tracked", async () => {
-    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-    const mnemonicResets = mockResetInternet.mock.calls.filter(([arg]) =>
-      String((arg as { server: string }).server).includes("mnemonic"),
-    )
-    expect(mnemonicResets).toHaveLength(0)
-    expect(onFailure).not.toHaveBeenCalled()
-  })
-
-  /**
-   * The tracked list only names accounts a build that HAD it recorded. An
-   * install predating it left mnemonics no id here can reach, and the module's
-   * own reinstall sweep that used to catch them is disarmed now — so the wipe
-   * clears the legacy store by service instead.
-   */
-  describe("the legacy store", () => {
-    const LEGACY_SERVICE = { service: "RNSecureKeyStoreKeyChain" }
-
-    it("is erased even when no account was ever tracked", async () => {
-      // The pre-tracking reinstall: nothing to enumerate, and mnemonics still
-      // sitting in the legacy store.
-      await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-      expect(mockResetGenericPassword).toHaveBeenCalledWith(LEGACY_SERVICE)
-      expect(onFailure).not.toHaveBeenCalled()
-    })
-
-    it("is erased even when the tracked list cannot be read", async () => {
-      // The per-account wipe has nothing to work from, but the legacy copies
-      // are reachable without any id at all.
-      mockGetInternet.mockImplementation(async (server: string) => {
-        if (server === "secure-store.blink.local/mnemonicAccounts") {
-          throw new Error("keychain unavailable")
-        }
-        return false
-      })
-
-      await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-      expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
-      expect(mockResetGenericPassword).toHaveBeenCalledWith(LEGACY_SERVICE)
-    })
-
-    it("is erased after the accounts the list does name, not instead of them", async () => {
-      mockGetInternet.mockImplementation(async (server: string) =>
-        server === "secure-store.blink.local/mnemonicAccounts"
-          ? { username: "mnemonicAccounts", password: JSON.stringify(["alice"]) }
-          : false,
-      )
-      const order: string[] = []
-      mockRemove.mockImplementation(async (key: string) => {
-        if (key === "mnemonic:alice") order.push("tracked account")
-      })
-      mockResetGenericPassword.mockImplementation(async () => {
-        order.push("legacy store")
-        return true
-      })
-
-      await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-      expect(order).toEqual(["tracked account", "legacy store"])
-    })
-
-    it("reports a failed erase by name and never throws", async () => {
-      mockResetGenericPassword.mockResolvedValue(false)
-
-      await expect(
-        KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
-      ).resolves.toBeUndefined()
-
-      expect(onFailure).toHaveBeenCalledWith("legacy key store")
-    })
-
-    it("gets the same single retry as every other slot", async () => {
-      mockResetGenericPassword.mockResolvedValueOnce(false).mockResolvedValue(true)
-
-      await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-      expect(mockResetGenericPassword).toHaveBeenCalledTimes(2)
-      expect(onFailure).not.toHaveBeenCalled()
-    })
-
-    it("never touches the new store, whose items it cannot match anyway", async () => {
-      await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
-
-      // Internet credentials are a different item class: a generic-password
-      // delete cannot reach them, and this asserts the wipe does not try.
-      expect(mockResetGenericPassword).not.toHaveBeenCalledWith(
-        expect.objectContaining({ server: expect.anything() }),
-      )
-    })
-  })
-
   it("retries a failed removal once and stays silent when the retry lands", async () => {
     onlyInLegacyStore({ galoyAuthToken: "still here" })
     mockRemove
@@ -1881,6 +1709,247 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
     expect(onFailure).toHaveBeenCalledTimes(1)
     expect(onFailure).toHaveBeenCalledWith("session profiles")
   })
+})
+
+/**
+ * The mnemonics are the reason this wipe exists at all now: the legacy
+ * library's own reinstall sweep used to clear them by accident, and with every
+ * slot behind the read-through helper that sweep never fires.
+ *
+ * Split from the session credentials because the caller runs one without the
+ * other: the fresh-install verdict is a heuristic, and this half waits for the
+ * account index to corroborate it.
+ */
+describe("KeyStoreWrapper clearUninstallSurvivingKeyMaterial", () => {
+  const onFailure = jest.fn()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+    mockResetGenericPassword.mockResolvedValue(true)
+    mockGet.mockRejectedValue(
+      Object.assign(new Error("key does not present"), { code: "404" }),
+    )
+    mockRemove.mockResolvedValue(undefined)
+  })
+
+  it("clears the mnemonic of every tracked account", async () => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: JSON.stringify(["alice", "bob"]) }
+        : false,
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+    for (const slot of [
+      "mnemonic:alice",
+      "mnemonic_network:alice",
+      "mnemonic:bob",
+      "mnemonic_network:bob",
+    ]) {
+      expect(mockResetInternet).toHaveBeenCalledWith({
+        server: `secure-store.blink.local/${slot}`,
+      })
+    }
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  it("reports the list rather than claiming a clean wipe it cannot verify", async () => {
+    mockGetInternet.mockImplementation(async (server: string) => {
+      if (server === "secure-store.blink.local/mnemonicAccounts") {
+        throw new Error("keychain unavailable")
+      }
+      return false
+    })
+
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+    expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
+  })
+
+  /**
+   * Every shape that is not a list of ids is reported, never read as an empty
+   * list. `[]` here would skip the mnemonic wipe entirely and say nothing, so
+   * the one signal that the key material was left in place would be gone.
+   */
+  const expectMalformedListReported = async (stored: string) => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: stored }
+        : false,
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+    expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
+    // And nothing is claimed to have been cleared: not even the ids the
+    // malformed list did carry, since a partial wipe reported as a clean one is
+    // the outcome this branch exists to prevent.
+    const mnemonicResets = mockResetInternet.mock.calls.filter(([arg]) =>
+      String((arg as { server: string }).server).includes("mnemonic:"),
+    )
+    expect(mnemonicResets).toHaveLength(0)
+  }
+
+  it("reports a list it cannot parse rather than reading it as no accounts", async () => {
+    await expectMalformedListReported("not json at all")
+  })
+
+  it("reports a list that is valid JSON but not a list", async () => {
+    await expectMalformedListReported(JSON.stringify({ alice: true }))
+  })
+
+  it("reports a list carrying an entry that is not an account id", async () => {
+    // Filtering the bad entry out and wiping the rest would be a partial wipe
+    // reported as a complete one.
+    await expectMalformedListReported(JSON.stringify(["alice", 42]))
+  })
+
+  it("clears nothing extra when no account was ever tracked", async () => {
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+    const mnemonicResets = mockResetInternet.mock.calls.filter(([arg]) =>
+      String((arg as { server: string }).server).includes("mnemonic"),
+    )
+    expect(mnemonicResets).toHaveLength(0)
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The tracked list only names accounts a build that HAD it recorded. An
+   * install predating it left mnemonics no id here can reach, and the module's
+   * own reinstall sweep that used to catch them is disarmed now — so the wipe
+   * clears the legacy store by service instead.
+   */
+  describe("the legacy store", () => {
+    const LEGACY_SERVICE = { service: "RNSecureKeyStoreKeyChain" }
+
+    it("is erased even when no account was ever tracked", async () => {
+      // The pre-tracking reinstall: nothing to enumerate, and mnemonics still
+      // sitting in the legacy store.
+      await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+      expect(mockResetGenericPassword).toHaveBeenCalledWith(LEGACY_SERVICE)
+      expect(onFailure).not.toHaveBeenCalled()
+    })
+
+    it("is erased even when the tracked list cannot be read", async () => {
+      // The per-account wipe has nothing to work from, but the legacy copies
+      // are reachable without any id at all.
+      mockGetInternet.mockImplementation(async (server: string) => {
+        if (server === "secure-store.blink.local/mnemonicAccounts") {
+          throw new Error("keychain unavailable")
+        }
+        return false
+      })
+
+      await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+      expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
+      expect(mockResetGenericPassword).toHaveBeenCalledWith(LEGACY_SERVICE)
+    })
+
+    it("is erased before the accounts the list names, not after them", async () => {
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: JSON.stringify(["alice"]) }
+          : false,
+      )
+      const order: string[] = []
+      mockRemove.mockImplementation(async (key: string) => {
+        if (key === "mnemonic:alice") order.push("tracked account")
+      })
+      mockResetGenericPassword.mockImplementation(async () => {
+        order.push("legacy store")
+        return true
+      })
+
+      await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+      expect(order).toEqual(["legacy store", "tracked account"])
+    })
+
+    /**
+     * Why the order above is the one that matters. `removeThrough` refuses to
+     * empty the new store until the legacy copy is provably gone, so a legacy
+     * store that will not erase fails every per-account delete. Erasing it
+     * wholesale first is what lets those deletes finish on the same boot, rather
+     * than arriving after the loop it would have unblocked.
+     */
+    it("clears the way for a per-account delete that a stubborn legacy copy would block", async () => {
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: JSON.stringify(["alice"]) }
+          : false,
+      )
+      // The per-key erase never works; only the service-wide reset does.
+      mockRemove.mockRejectedValue(new Error("legacy erase refused"))
+      let legacyStoreEmptied = false
+      mockResetGenericPassword.mockImplementation(async () => {
+        legacyStoreEmptied = true
+        return true
+      })
+      mockGet.mockImplementation(async () => {
+        if (legacyStoreEmptied) {
+          throw Object.assign(new Error("key does not present"), { code: "404" })
+        }
+        return "alice words"
+      })
+
+      await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+      expect(onFailure).not.toHaveBeenCalledWith("mnemonic")
+      expect(mockResetInternet).toHaveBeenCalledWith({
+        server: "secure-store.blink.local/mnemonic:alice",
+      })
+    })
+
+    it("reports a failed erase by name and never throws", async () => {
+      mockResetGenericPassword.mockResolvedValue(false)
+
+      await expect(
+        KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure),
+      ).resolves.toBeUndefined()
+
+      expect(onFailure).toHaveBeenCalledWith("legacy key store")
+    })
+
+    it("gets the same single retry as every other slot", async () => {
+      mockResetGenericPassword.mockResolvedValueOnce(false).mockResolvedValue(true)
+
+      await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+      expect(mockResetGenericPassword).toHaveBeenCalledTimes(2)
+      expect(onFailure).not.toHaveBeenCalled()
+    })
+
+    it("never touches the new store, whose items it cannot match anyway", async () => {
+      await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+      // Internet credentials are a different item class: a generic-password
+      // delete cannot reach them, and this asserts the wipe does not try.
+      expect(mockResetGenericPassword).not.toHaveBeenCalledWith(
+        expect.objectContaining({ server: expect.anything() }),
+      )
+    })
+  })
+})
+
+describe("KeyStoreWrapper wipe reporting", () => {
+  const onFailure = jest.fn()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+    mockResetGenericPassword.mockResolvedValue(true)
+  })
 
   it("reports every slot when the keystore is fully unavailable, and never throws", async () => {
     mockGet.mockRejectedValue(new Error("keystore unavailable"))
@@ -1891,15 +1960,136 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
       KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
     ).resolves.toBeUndefined()
 
-    // The lockout state is absent from this list on purpose: clearing it falls
-    // back to writing a clean slate when the erase fails, and a stored
-    // {attempts: 0, lockedUntil: 0} strands nobody.
+    // The lockout state reports now. The wipe erases both of its keys directly
+    // instead of going through clearPinFailureState, whose fallback writes a
+    // zeroed value — a wipe must not end by creating an entry that then outlives
+    // the next uninstall.
     expect(onFailure.mock.calls.flat()).toEqual([
       "active token",
       "session profiles",
       "pin",
+      "pin lockout state",
+      "legacy pin attempts",
       "biometrics flag",
-      "legacy key store",
     ])
+  })
+
+  it("reports the key-material slots separately, since they wipe separately", async () => {
+    mockGet.mockRejectedValue(new Error("keystore unavailable"))
+    mockGetInternet.mockRejectedValue(new Error("keystore unavailable"))
+    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+    mockResetGenericPassword.mockRejectedValue(new Error("keystore unavailable"))
+
+    await expect(
+      KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure),
+    ).resolves.toBeUndefined()
+
+    // The legacy store first, because it is what unblocks the per-account
+    // deletes; the list is unreadable here, so no account is named.
+    expect(onFailure.mock.calls.flat()).toEqual([
+      "legacy key store",
+      "mnemonic account list",
+    ])
+  })
+
+  it("never writes a cleared lockout state while wiping, however the erase goes", async () => {
+    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+    mockResetInternet.mockRejectedValue(new Error("keystore unavailable"))
+
+    await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
+
+    // The write fallback lives in clearPinFailureState and is right for its own
+    // caller; reached from here it would leave behind exactly what the wipe came
+    // to remove.
+    expect(mockSetInternet).not.toHaveBeenCalledWith(
+      "secure-store.blink.local/pinFailureState",
+      expect.anything(),
+      expect.anything(),
+      expect.anything(),
+    )
+  })
+})
+
+describe("KeyStoreWrapper mnemonic account list repair", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+  })
+
+  describe("rebuildMnemonicAccountsIfMalformed", () => {
+    const damagedList = () =>
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: "not json at all" }
+          : false,
+      )
+
+    it("rebuilds a damaged list from the ids it is given", async () => {
+      damagedList()
+
+      const outcome = await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed([
+        "alice",
+        "bob",
+      ])
+
+      expect(outcome).toBe("rebuilt")
+      expect(mockSetInternet).toHaveBeenCalledWith(
+        "secure-store.blink.local/mnemonicAccounts",
+        "mnemonicAccounts",
+        JSON.stringify(["alice", "bob"]),
+        { accessible: MNEMONIC_ACCESSIBLE },
+      )
+    })
+
+    it("leaves a healthy list exactly as it is", async () => {
+      mockGetInternet.mockImplementation(async (server: string) =>
+        server === "secure-store.blink.local/mnemonicAccounts"
+          ? { username: "mnemonicAccounts", password: JSON.stringify(["alice"]) }
+          : false,
+      )
+
+      const outcome = await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed(["bob"])
+
+      expect(outcome).toBe("not-needed")
+      expect(mockSetInternet).not.toHaveBeenCalled()
+    })
+
+    it("leaves a list it could not read alone, since it may still hold ids", async () => {
+      mockGetInternet.mockRejectedValue(new Error("keychain unavailable"))
+
+      const outcome = await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed(["alice"])
+
+      expect(outcome).toBe("not-needed")
+      expect(mockSetInternet).not.toHaveBeenCalled()
+    })
+
+    /**
+     * Clearing the slot would destroy the damaged list and, with it, the one
+     * signal that this device holds mnemonics nothing can name. An empty index
+     * is nothing to rebuild from, not a licence to erase.
+     */
+    it("never clears the slot when there is nothing to rebuild from", async () => {
+      damagedList()
+
+      const outcome = await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed([])
+
+      expect(outcome).toBe("failed")
+      expect(mockResetInternet).not.toHaveBeenCalledWith({
+        server: "secure-store.blink.local/mnemonicAccounts",
+      })
+      expect(mockSetInternet).not.toHaveBeenCalled()
+    })
+
+    it("reports a rebuild the keychain refused", async () => {
+      damagedList()
+      mockSetInternet.mockResolvedValue(false)
+
+      expect(await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed(["alice"])).toBe(
+        "failed",
+      )
+    })
   })
 })
