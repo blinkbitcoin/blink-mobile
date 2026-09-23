@@ -62,7 +62,6 @@ import {
 } from "@react-navigation/native-stack"
 
 import { makeStyles, useTheme } from "@rn-vui/themed"
-import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
   AuthenticationCheckScreen,
@@ -171,6 +170,7 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+import { useBottomTabBarStyle } from "./bottom-tab-bar-style"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
@@ -1160,11 +1160,10 @@ export const PhoneLoginNavigator = () => {
 const Tab = createBottomTabNavigator<PrimaryStackParamList>()
 
 export const PrimaryNavigator = () => {
-  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const insets = useSafeAreaInsets()
+  const tabBarStyle = useBottomTabBarStyle()
 
   const { LL } = useI18nContext()
 
@@ -1181,13 +1180,7 @@ export const PrimaryNavigator = () => {
       screenOptions={{
         tabBarActiveTintColor: colors.primary,
         tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: [
-          styles.bottomNavigatorStyle,
-          {
-            height: 60 + insets.bottom,
-            paddingBottom: insets.bottom,
-          },
-        ],
+        tabBarStyle,
         tabBarLabelStyle: {
           paddingBottom: 6,
           fontSize: 12,
@@ -1252,11 +1245,6 @@ export const PrimaryNavigator = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
-  bottomNavigatorStyle: {
-    paddingTop: 4,
-    backgroundColor: colors.white,
-    borderTopColor: colors.grey4,
-  },
   headerStyle: {
     backgroundColor: colors.white,
   },
