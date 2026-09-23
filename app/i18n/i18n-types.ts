@@ -8028,6 +8028,10 @@ type RootTranslation = {
 		 */
 		nonCustodialAccount: string
 		/**
+		 * C​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		custodialAccount: string
+		/**
 		 * T​a​p​ ​t​o​ ​s​e​t​ ​u​s​e​r​n​a​m​e
 		 */
 		tapUserName: string
@@ -21655,6 +21659,10 @@ export type TranslationFunctions = {
 		 * Non-custodial account
 		 */
 		nonCustodialAccount: () => LocalizedString
+		/**
+		 * Custodial account
+		 */
+		custodialAccount: () => LocalizedString
 		/**
 		 * Tap to set username
 		 */

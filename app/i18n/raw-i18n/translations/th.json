@@ -2454,6 +2454,7 @@
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",
+    "custodialAccount": "บัญชีแบบฝากดูแล",
     "tapUserName": "กดเพื่อตั้งชื่อผู้ใช้",
     "notifications": "Notifications",
     "title": "การตั้งค่า",

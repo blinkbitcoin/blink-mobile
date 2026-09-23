@@ -2454,6 +2454,7 @@
     "activated": "Aktivirano",
     "addressScreen": "Načini plaćanja",
     "nonCustodialAccount": "Račun bez skrbništva",
+    "custodialAccount": "Račun sa skrbništvom",
     "tapUserName": "Dodirnite za postavljanje korisničkog imena",
     "notifications": "Obavijesti",
     "title": "Postavke",
