@@ -1,6 +1,10 @@
 import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
-import { sweepMnemonicMigration } from "@app/self-custodial/storage/account-index"
+import {
+  readSelfCustodialIndexPresence,
+  SelfCustodialIndexPresence,
+  sweepMnemonicMigration,
+} from "@app/self-custodial/storage/account-index"
 
 import { recordAppError } from "@app/utils/error-reporting"
 
@@ -150,6 +154,16 @@ type LoadedPersistentState = {
   // dirty-check ref from this, so a failed adoption ("") makes the first
   // save retry the keychain write instead of skipping it.
   persistedToken: string
+  /**
+   * This boot must not write the blob, for one of two reasons.
+   *
+   * Either the blob could not be read, so `state` is defaults rather than
+   * anything loaded and saving would put those defaults over an intact file;
+   * or a reinstall wipe is still owed and only stays owed while the blob is
+   * absent. Both want the same thing: leave the file alone so the next boot
+   * sees what this one saw.
+   */
+  holdBlobWrites?: boolean
 }
 
 const handleMigratedState = async (
@@ -197,17 +211,70 @@ const handleMigratedState = async (
 }
 
 const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
-  // Genuinely a fresh install: the key is absent, not unreadable, and an
-  // unrecognized schema is Failed. This branch owns only the trigger and the
-  // reporting — WHICH credentials survive uninstall and must be wiped is
-  // secureStorage's knowledge. It re-runs on every boot until the first blob
-  // write, so a failed wipe also retries across boots.
-  await KeyStoreWrapper.clearUninstallSurvivingCredentials((what) => {
+  const reportFailure = (what: string) => {
     recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
       alwaysRecord: true,
     })
-  })
-  return { state: defaultPersistentState, persistedToken: "" }
+  }
+
+  // Genuinely a fresh install: the key is absent, not unreadable, not present
+  // and empty, and an unrecognized schema is Failed. This branch owns only the
+  // trigger and the reporting — WHICH credentials survive uninstall and must be
+  // wiped is secureStorage's knowledge. It re-runs on every boot until the first
+  // blob write, so a failed wipe also retries across boots.
+  await KeyStoreWrapper.clearUninstallSurvivingCredentials(reportFailure)
+
+  // The key material waits for corroboration the session credentials do not
+  // need. Getting the verdict wrong costs a re-login on that side and someone's
+  // money on this one, and the account index is a second witness: it lives in
+  // AsyncStorage, which a real reinstall clears, so a successful read returning
+  // accounts is proof this device is not one.
+  //
+  // A read that fails proves nothing either way, so it also holds the erase
+  // back; the next boot re-runs this branch and can try again. Both skips are
+  // reported, because a verdict that keeps being wrong is invisible otherwise.
+  //
+  // Absence is the signal, not an empty list: readIndex degrades a stored value
+  // it cannot recognise to zero entries, so "no accounts" would otherwise let a
+  // corrupted index authorise the erase it should have prevented.
+  const presence = await readSelfCustodialIndexPresence()
+  if (presence === SelfCustodialIndexPresence.Absent) {
+    // An erase that ran and failed is as owed as one that never ran: the seeds
+    // are still there, and nothing outside this branch can reach them once the
+    // account ids are gone. So it holds the blob back on the same terms, and
+    // the next boot tries the whole thing again.
+    let erased = true
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial((what) => {
+      erased = false
+      reportFailure(what)
+    })
+    return {
+      state: defaultPersistentState,
+      persistedToken: "",
+      holdBlobWrites: !erased,
+    }
+  }
+
+  if (presence === SelfCustodialIndexPresence.Present) {
+    // Not a fresh install after all, so nothing is owed. The session half above
+    // has already run, which costs a re-login and no key material.
+    recordAppError(
+      new Error("Reinstall key-material wipe skipped: account index is populated"),
+      { alwaysRecord: true },
+    )
+    return { state: defaultPersistentState, persistedToken: "" }
+  }
+
+  // Unknown: the erase may still be owed, and this branch only fires while the
+  // blob is absent. Holding the blob back is what keeps that true, so the next
+  // boot reaches here again and asks the index a second time — the retry this
+  // design assumes rather than a marker, which would have to live either where
+  // an uninstall clears it (useless) or where it survives one (dangerous).
+  recordAppError(
+    new Error("Reinstall key-material wipe deferred: account index unreadable"),
+    { alwaysRecord: true },
+  )
+  return { state: defaultPersistentState, persistedToken: "", holdBlobWrites: true }
 }
 
 /**
@@ -250,7 +317,7 @@ const handleUnreadableStore = async (err: unknown): Promise<LoadedPersistentStat
     err instanceof Error ? err : new Error(`Persistent state read failed: ${err}`),
     { alwaysRecord: true },
   )
-  return bootOnDefaultsKeepingSession()
+  return { ...(await bootOnDefaultsKeepingSession()), holdBlobWrites: true }
 }
 
 export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
@@ -263,7 +330,13 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
   // must never be mistaken for a fresh install and cost the user every session
   // credential they have. readString draws the third one this branch needs — a
   // read that failed is not a key that is not there.
-  const read = await readString(PERSISTENT_STATE_KEY)
+  // One immediate retry, no backoff, mirroring the wipe's removeWithRetry: the
+  // failures worth a second attempt here are one-shot storage hiccups, and boot
+  // cannot wait out anything longer-lived. Without it a persistent fault would
+  // mean a session that never persists, every launch, which is worse for the
+  // user than the one-time loss this replaces.
+  let read = await readString(PERSISTENT_STATE_KEY)
+  if (read.status === "failed") read = await readString(PERSISTENT_STATE_KEY)
   if (read.status === "failed") return handleUnreadableStore(read.err)
 
   let data: unknown = null
@@ -274,6 +347,19 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
     } catch (err) {
       return handleUnusableBlob(err instanceof Error ? err : new Error(String(err)), () =>
         quarantineUnparseableState(raw, err),
+      )
+    }
+
+    // Parsed, but to something migratePersistentState scores as no data at all:
+    // its guard is `if (!data)`, so a stored "null", "0" or "false" would reach
+    // the fresh-install branch and spend the wipe on a device that never
+    // reinstalled. A key that is present is evidence against a fresh install
+    // whatever it holds, so this goes to the damaged-blob path, which also
+    // quarantines a copy.
+    if (!data) {
+      return handleUnusableBlob(
+        new Error("Persistent state parsed to an empty value"),
+        () => quarantineUnparseableState(raw, new Error("empty parsed value")),
       )
     }
   }
@@ -327,13 +413,19 @@ const removeActiveTokenDurably = async (
 const savePersistentState = async (
   state: PersistentState,
   lastPersistedTokenRef: React.MutableRefObject<string>,
+  skipBlob: boolean,
 ): Promise<void> => {
   const { galoyAuthToken, ...stateWithoutToken } = state
-  try {
-    await savePersistentStateBlob(stateWithoutToken)
-  } catch (err) {
-    // Storage failures are crash-adjacent: never downgrade on message wording.
-    reportError("Persistent state save", err, { alwaysRecord: true })
+  // Held back only for the blob, never for the token below. The two live in
+  // different stores and failed independently: the session is whatever the
+  // keychain says, and a login during a load-failed boot has to survive it.
+  if (!skipBlob) {
+    try {
+      await savePersistentStateBlob(stateWithoutToken)
+    } catch (err) {
+      // Storage failures are crash-adjacent: never downgrade on message wording.
+      reportError("Persistent state save", err, { alwaysRecord: true })
+    }
   }
   if (galoyAuthToken !== lastPersistedTokenRef.current) {
     if (!galoyAuthToken) {
@@ -385,6 +477,15 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
   const hasModified = React.useRef(false)
   const lastPersistedTokenRef = React.useRef("")
   const saveQueueRef = React.useRef<Promise<void>>(Promise.resolve())
+  /**
+   * Set when this boot must not write the blob, and never cleared for the
+   * session. See holdBlobWrites: either the blob was never read, or a reinstall
+   * wipe is still owed and only the blob's absence keeps it owed.
+   *
+   * Changes still apply in memory; only the write is held back, and the
+   * keychain token is independent and keeps saving.
+   */
+  const holdBlobWritesRef = React.useRef(false)
 
   React.useEffect(() => {
     if (hasModified.current && persistentState) {
@@ -393,14 +494,23 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
       // (savePersistentState catches all its own failures, so the chain
       // cannot reject and wedge.)
       saveQueueRef.current = saveQueueRef.current.then(() =>
-        savePersistentState(persistentState, lastPersistedTokenRef),
+        savePersistentState(
+          persistentState,
+          lastPersistedTokenRef,
+          holdBlobWritesRef.current,
+        ),
       )
     }
   }, [persistentState])
 
   React.useEffect(() => {
     ;(async () => {
-      const { state: loadedState, persistedToken } = await loadPersistentState()
+      const {
+        state: loadedState,
+        persistedToken,
+        holdBlobWrites,
+      } = await loadPersistentState()
+      holdBlobWritesRef.current = Boolean(holdBlobWrites)
       lastPersistedTokenRef.current = persistedToken
       setPersistentState(loadedState)
       // Off the critical path and never awaited: the mnemonics of accounts the
