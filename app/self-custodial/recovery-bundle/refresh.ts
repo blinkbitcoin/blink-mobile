@@ -40,6 +40,15 @@ export type RefreshBundleParams = {
   network: Network
   mnemonic: string
   appVersion: string
+  /**
+   * What wallet state this caller needs the bundle to cover - the payment event
+   * key for a payment-triggered refresh, a fresh value for a user-initiated one.
+   * Callers sharing a key are the same request arriving twice and share the run;
+   * a different key means newer leaves the in-flight fetch never read, so it
+   * earns a second pass. Omit it to accept whatever run is already going: the
+   * staleness sweep only wants a current bundle and has no payment to cover.
+   */
+  coverageKey?: string
 }
 
 export type RefreshBundleResult =
@@ -145,7 +154,16 @@ export const syncExistingBundleToCloud = async (
   return true
 }
 
-const inFlight = new Map<string, Promise<RefreshBundleResult>>()
+type InFlightRefresh = {
+  run: Promise<RefreshBundleResult>
+  coverageKey: string | undefined
+}
+
+const inFlight = new Map<string, InFlightRefresh>()
+
+/** Reruns owed to callers that arrived mid-run needing newer state, coalesced
+ *  one per key so a burst never queues more than a single extra pass. */
+const queuedReruns = new Map<string, Promise<RefreshBundleResult>>()
 
 // Account ids are random UUIDs and never reused. Membership lasts from the
 // deletion mark until the post-deletion re-sweep unmarks it (see
@@ -170,10 +188,16 @@ export const markAccountDeletedForRefresh = (accountId: string): void => {
  * that window.
  */
 export const waitForRefreshesToSettle = async (accountId: string): Promise<void> => {
+  const belongsToAccount = (key: string): boolean => key.startsWith(`${accountId}:`)
   const runs = [...inFlight.entries()]
-    .filter(([key]) => key.startsWith(`${accountId}:`))
-    .map(([, run]) => run)
-  await Promise.allSettled(runs)
+    .filter(([key]) => belongsToAccount(key))
+    .map(([, entry]) => entry.run)
+  // A queued rerun has not started yet but will write once it does, so the
+  // deletion sweep has to wait for it too.
+  const reruns = [...queuedReruns.entries()]
+    .filter(([key]) => belongsToAccount(key))
+    .map(([, rerun]) => rerun)
+  await Promise.allSettled([...runs, ...reruns])
 }
 
 /**
@@ -232,6 +256,17 @@ const runRefresh = async ({
   }
 }
 
+const startRun = (
+  key: string,
+  params: RefreshBundleParams,
+): Promise<RefreshBundleResult> => {
+  const run = runRefresh(params).finally(() => {
+    inFlight.delete(key)
+  })
+  inFlight.set(key, { run, coverageKey: params.coverageKey })
+  return run
+}
+
 export const refreshRecoveryBundle = (
   params: RefreshBundleParams,
 ): Promise<RefreshBundleResult> => {
@@ -245,12 +280,32 @@ export const refreshRecoveryBundle = (
   // network must not be handed to a caller on the other after an instance
   // switch.
   const key = `${params.accountId}:${networkLabelFor(params.network)}`
-  const existing = inFlight.get(key)
-  if (existing) return existing
+  const current = inFlight.get(key)
+  if (!current) return startRun(key, params)
 
-  const run = runRefresh(params).finally(() => {
-    inFlight.delete(key)
+  // The in-flight fetch read the leaves once, when it started. Handing its
+  // result to a caller that needs newer state would drop those leaves from the
+  // bundle for good: the save stamps savedAt, so the staleness path stops
+  // covering them too.
+  // A caller that names no coverage just wants a current bundle, so whatever is
+  // already fetching serves it; only one naming state the in-flight fetch
+  // cannot have read earns a second pass.
+  const needsNewerState =
+    params.coverageKey !== undefined && params.coverageKey !== current.coverageKey
+  if (!needsNewerState) return current.run
+
+  // One rerun serves every caller that arrived during this run, so a burst
+  // costs a second pass rather than one per caller.
+  const queued = queuedReruns.get(key)
+  if (queued) return queued
+
+  // allSettled, not the promise itself: the rerun is owed whether the run it
+  // waits on succeeded or failed, and a rejection must not leave the queue
+  // entry behind for the next caller to join.
+  const rerun = Promise.allSettled([current.run]).then(() => {
+    queuedReruns.delete(key)
+    return refreshRecoveryBundle(params)
   })
-  inFlight.set(key, run)
-  return run
+  queuedReruns.set(key, rerun)
+  return rerun
 }
