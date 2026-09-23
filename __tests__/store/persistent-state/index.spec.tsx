@@ -23,10 +23,19 @@ jest.mock("@app/utils/storage", () => ({
 }))
 
 const mockSweepMnemonicMigration = jest.fn()
+const mockReadSelfCustodialIndexPresence = jest.fn()
 // Scheduled off the boot path once the state has loaded; its own spec covers
 // what it does, and here it must not add reports to the ones under assertion.
+// The account index is the second witness the key-material wipe waits for.
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
+  readSelfCustodialIndexPresence: (...args: unknown[]) =>
+    mockReadSelfCustodialIndexPresence(...args),
+  SelfCustodialIndexPresence: {
+    Absent: "absent",
+    Present: "present",
+    Unknown: "unknown",
+  },
 }))
 
 const mockGetActiveToken = jest.fn()
@@ -34,6 +43,7 @@ const mockReadActiveToken = jest.fn()
 const mockSetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
 const mockClearUninstallSurvivingCredentials = jest.fn()
+const mockClearUninstallSurvivingKeyMaterial = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -42,6 +52,8 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     readActiveToken: (...args: unknown[]) => mockReadActiveToken(...args),
     setActiveToken: (...args: unknown[]) => mockSetActiveToken(...args),
     removeActiveToken: (...args: unknown[]) => mockRemoveActiveToken(...args),
+    clearUninstallSurvivingKeyMaterial: (...args: unknown[]) =>
+      mockClearUninstallSurvivingKeyMaterial(...args),
     clearUninstallSurvivingCredentials: (...args: unknown[]) =>
       mockClearUninstallSurvivingCredentials(...args),
   },
@@ -111,6 +123,8 @@ const setupStorageMockDefaults = () => {
   jest.clearAllMocks()
   storedStrings.clear()
   mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
+  // A real reinstall clears the index, so absence is the default here.
+  mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
@@ -270,6 +284,166 @@ describe("PersistentStateProvider", () => {
 
     expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
     expect(screen.getByTestId("token").props.children).toBe("")
+  })
+
+  /**
+   * The verdict that reaches here is a heuristic, and it is wrong often enough
+   * that the half which destroys key material waits for a second witness. The
+   * account index lives in AsyncStorage, which a real reinstall clears, so
+   * accounts still listed prove this device is not one.
+   */
+  it("does not erase key material when the account index still lists accounts", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    // The session half still runs: a wrong verdict there costs a re-login.
+    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
+      "Reinstall key-material wipe skipped: account index is populated",
+    )
+  })
+
+  /**
+   * The erase may still be owed here, and this branch only fires while the blob
+   * is absent. Holding the blob back is what keeps that true, so the next boot
+   * reaches the same branch and asks the index again — the retry the design
+   * assumes, without a marker that would have to survive an uninstall or not.
+   */
+  it("defers the key-material erase and holds the blob back when the index cannot answer", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("unknown")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
+      "Reinstall key-material wipe deferred: account index unreadable",
+    )
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    // The blob stays absent, so the next boot is a fresh install again.
+    expect(mockSaveJson).not.toHaveBeenCalled()
+  })
+
+  /**
+   * An erase that ran and failed is as owed as one that never ran: the seeds are
+   * still in the keychain, and once the blob lands this branch never runs again,
+   * so nothing would ever reach them.
+   */
+  it("holds the blob back when the key-material erase itself failed", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    // Once, not for the file: clearAllMocks resets calls but not
+    // implementations, so this would otherwise fail every later wipe.
+    mockClearUninstallSurvivingKeyMaterial.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("mnemonic")
+      },
+    )
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    expect(mockSaveJson).not.toHaveBeenCalled()
+  })
+
+  it("saves normally once the erase has actually completed", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+  })
+
+  it("saves normally once the index says this is not a reinstall", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    // Nothing is owed, so holding the blob back would strand this user on
+    // defaults for every future boot.
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+  })
+
+  it("erases key material once the index corroborates the fresh install", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
   })
 
   it("reports each failed credential wipe to crashlytics by name", async () => {
@@ -960,6 +1134,54 @@ describe("PersistentStateProvider migration failure handling", () => {
     ).toHaveLength(0)
   })
 
+  /**
+   * `migratePersistentState`'s guard is `if (!data)`, so a stored "null", "0" or
+   * "false" parses to something it scores as no data at all and would reach the
+   * fresh-install branch — spending a wipe that now destroys seed phrases on a
+   * device that never reinstalled. A key that is present is evidence against a
+   * fresh install whatever it holds.
+   */
+  it("does not treat a blob that parses to an empty value as a fresh install", async () => {
+    for (const stored of ["null", "0", "false", '""']) {
+      setupStorageMockDefaults()
+      storedStrings.set(PERSISTENT_STATE_KEY, stored)
+
+      const view = render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
+      expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+      view.unmount()
+    }
+  })
+
+  it("quarantines a blob that parsed to an empty value, rather than discarding it", async () => {
+    storedStrings.set(PERSISTENT_STATE_KEY, "null")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(
+      mockSaveString.mock.calls.filter(([k]) =>
+        String(k).startsWith("persistentStateQuarantine."),
+      ),
+    ).toHaveLength(1)
+  })
+
   it("does NOT touch crashlytics or the quarantine key for null persisted data", async () => {
     storedStrings.delete(PERSISTENT_STATE_KEY)
 
@@ -1063,6 +1285,90 @@ describe("PersistentStateProvider unreadable blob handling", () => {
   // absent would take a user's key material on a device nobody reinstalled.
   describe("a read that failed", () => {
     const readFailed = { status: "failed", err: new Error("storage unavailable") }
+
+    /**
+     * Most of these faults last an instant. Without the second attempt a
+     * persistent one would mean a session that never persists, on every launch,
+     * which is worse for the user than the one-time loss it replaces.
+     */
+    it("tries the read a second time before giving up on it", async () => {
+      setPersistedBlob(scrubbedBlob)
+      const succeed = mockReadString.getMockImplementation()
+      mockReadString
+        .mockResolvedValueOnce(readFailed)
+        .mockImplementation(succeed as (key: string) => Promise<unknown>)
+      mockGetActiveToken.mockResolvedValue("saved-token")
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token").props.children).toBe("saved-token")
+      })
+
+      // The retry answered, so this boot is a normal one: the state loaded and
+      // nothing was treated as unreadable.
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The state in memory is defaults, not anything loaded, so saving would put
+     * those defaults over a blob that is still intact and would have read fine
+     * next launch. That is how a momentary fault becomes permanent loss of every
+     * preference — the very next tap that selects a wallet triggers a save.
+     */
+    it("stops saving the blob for the session, so a tap cannot overwrite it", async () => {
+      mockReadString.mockResolvedValue(readFailed)
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      mockSaveJson.mockClear()
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("update-btn"))
+      })
+
+      expect(mockSaveJson).not.toHaveBeenCalled()
+    })
+
+    /**
+     * Only the blob is held back. The two stores failed independently: the
+     * session is whatever the keychain says, and a login during this boot has to
+     * survive it.
+     */
+    it("keeps saving the keychain token, which the blob failure says nothing about", async () => {
+      mockReadString.mockResolvedValue(readFailed)
+      mockGetActiveToken.mockResolvedValue("")
+
+      render(
+        <PersistentStateProvider>
+          <TestConsumer />
+        </PersistentStateProvider>,
+      )
+
+      await waitFor(() => {
+        expect(screen.getByTestId("token")).toBeTruthy()
+      })
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("update-btn"))
+      })
+
+      await waitFor(() => {
+        expect(mockSetActiveToken).toHaveBeenCalled()
+      })
+      expect(mockSaveJson).not.toHaveBeenCalled()
+    })
 
     it("does not wipe the credentials a fresh install would clear", async () => {
       mockReadString.mockResolvedValue(readFailed)
