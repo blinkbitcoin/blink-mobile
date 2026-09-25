@@ -11,8 +11,8 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { formatUsdAmount } from "./investment-figures"
 import {
-  formatUsdAmount,
   INVESTMENT_OPTIONS,
   resolveEquityPercent,
   resolveInvestmentTerms,

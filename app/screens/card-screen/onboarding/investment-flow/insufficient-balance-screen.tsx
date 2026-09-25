@@ -17,7 +17,8 @@ import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { formatUsdAmount, resolveInvestmentTerms } from "./investment-terms"
+import { formatUsdAmount } from "./investment-figures"
+import { resolveInvestmentTerms } from "./investment-terms"
 import { useInvestmentFunding } from "./use-investment-funding"
 
 type InsufficientBalanceRoute = RouteProp<
