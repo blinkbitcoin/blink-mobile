@@ -91,9 +91,7 @@ export const useInvestmentSats = (totalUsd: number): number => {
   return React.useMemo(() => {
     if (!convertMoneyAmount) return 0
 
-    return convertMoneyAmount(
-      toUsdMoneyAmount(toMinorUnit(String(totalUsd))),
-      WalletCurrency.Btc,
-    ).amount
+    return convertMoneyAmount(toUsdMoneyAmount(toMinorUnit(totalUsd)), WalletCurrency.Btc)
+      .amount
   }, [totalUsd, convertMoneyAmount])
 }
