@@ -60,7 +60,7 @@ export const SelectInvestScreen: React.FC = () => {
           title={LL.CardFlow.Onboarding.SelectInvest.title()}
         />
 
-        <View style={styles.optionsContainer}>
+        <View style={styles.optionsContainer} accessibilityRole="radiogroup">
           {options.map((option, index) => {
             const isSelected = selectedAmountUsd === option.usd
             const isNotLastItem = index < options.length - 1
