@@ -36,6 +36,7 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
     Present: "present",
     Unknown: "unknown",
   },
+  SWEEP_IDLE_TIMEOUT_MS: 5000,
 }))
 
 const mockGetActiveToken = jest.fn()
@@ -44,6 +45,7 @@ const mockSetActiveToken = jest.fn()
 const mockRemoveActiveToken = jest.fn()
 const mockClearUninstallSurvivingCredentials = jest.fn()
 const mockClearUninstallSurvivingKeyMaterial = jest.fn()
+const mockClearLegacyKeyStore = jest.fn()
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
@@ -52,6 +54,7 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     readActiveToken: (...args: unknown[]) => mockReadActiveToken(...args),
     setActiveToken: (...args: unknown[]) => mockSetActiveToken(...args),
     removeActiveToken: (...args: unknown[]) => mockRemoveActiveToken(...args),
+    clearLegacyKeyStore: (...args: unknown[]) => mockClearLegacyKeyStore(...args),
     clearUninstallSurvivingKeyMaterial: (...args: unknown[]) =>
       mockClearUninstallSurvivingKeyMaterial(...args),
     clearUninstallSurvivingCredentials: (...args: unknown[]) =>
@@ -263,187 +266,6 @@ describe("PersistentStateProvider", () => {
     expect(screen.getByTestId("token").props.children).toBe(
       defaultPersistentState.galoyAuthToken,
     )
-  })
-
-  it("clears uninstall-surviving credentials when no persisted data exists (reinstall)", async () => {
-    // The iOS keychain survives uninstall; a fresh install must not resurrect
-    // the previous session. Which credentials are wiped (and the retry
-    // behavior) is owned and tested by secureStorage — this locks the trigger.
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-    mockGetActiveToken.mockResolvedValue("token-from-before-uninstall")
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
-    expect(screen.getByTestId("token").props.children).toBe("")
-  })
-
-  /**
-   * The verdict that reaches here is a heuristic, and it is wrong often enough
-   * that the half which destroys key material waits for a second witness. The
-   * account index lives in AsyncStorage, which a real reinstall clears, so
-   * accounts still listed prove this device is not one.
-   */
-  it("does not erase key material when the account index still lists accounts", async () => {
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    // The session half still runs: a wrong verdict there costs a re-login.
-    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
-    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
-    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
-      "Reinstall key-material wipe skipped: account index is populated",
-    )
-  })
-
-  /**
-   * The erase may still be owed here, and this branch only fires while the blob
-   * is absent. Holding the blob back is what keeps that true, so the next boot
-   * reaches the same branch and asks the index again — the retry the design
-   * assumes, without a marker that would have to survive an uninstall or not.
-   */
-  it("defers the key-material erase and holds the blob back when the index cannot answer", async () => {
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-    mockReadSelfCustodialIndexPresence.mockResolvedValue("unknown")
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
-    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
-      "Reinstall key-material wipe deferred: account index unreadable",
-    )
-
-    mockSaveJson.mockClear()
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("update-btn"))
-    })
-
-    // The blob stays absent, so the next boot is a fresh install again.
-    expect(mockSaveJson).not.toHaveBeenCalled()
-  })
-
-  /**
-   * An erase that ran and failed is as owed as one that never ran: the seeds are
-   * still in the keychain, and once the blob lands this branch never runs again,
-   * so nothing would ever reach them.
-   */
-  it("holds the blob back when the key-material erase itself failed", async () => {
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-    // Once, not for the file: clearAllMocks resets calls but not
-    // implementations, so this would otherwise fail every later wipe.
-    mockClearUninstallSurvivingKeyMaterial.mockImplementationOnce(
-      async (onFailure: (what: string) => void) => {
-        onFailure("mnemonic")
-      },
-    )
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    mockSaveJson.mockClear()
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("update-btn"))
-    })
-
-    expect(mockSaveJson).not.toHaveBeenCalled()
-  })
-
-  it("saves normally once the erase has actually completed", async () => {
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    mockSaveJson.mockClear()
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("update-btn"))
-    })
-
-    await waitFor(() => {
-      expect(mockSaveJson).toHaveBeenCalled()
-    })
-  })
-
-  it("saves normally once the index says this is not a reinstall", async () => {
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    mockSaveJson.mockClear()
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("update-btn"))
-    })
-
-    // Nothing is owed, so holding the blob back would strand this user on
-    // defaults for every future boot.
-    await waitFor(() => {
-      expect(mockSaveJson).toHaveBeenCalled()
-    })
-  })
-
-  it("erases key material once the index corroborates the fresh install", async () => {
-    storedStrings.delete(PERSISTENT_STATE_KEY)
-
-    render(
-      <PersistentStateProvider>
-        <TestConsumer />
-      </PersistentStateProvider>,
-    )
-
-    await waitFor(() => {
-      expect(screen.getByTestId("token")).toBeTruthy()
-    })
-
-    expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
   })
 
   it("reports each failed credential wipe to crashlytics by name", async () => {
@@ -845,6 +667,467 @@ describe("PersistentStateProvider", () => {
       expect(mockSaveJson).toHaveBeenCalledTimes(1)
       expect(mockSaveJson.mock.calls[0][1]).not.toHaveProperty("galoyAuthToken")
     })
+  })
+})
+
+describe("PersistentStateProvider reinstall wipe", () => {
+  beforeEach(setupStorageMockDefaults)
+
+  it("clears uninstall-surviving credentials when no persisted data exists (reinstall)", async () => {
+    // The iOS keychain survives uninstall; a fresh install must not resurrect
+    // the previous session. Which credentials are wiped (and the retry
+    // behavior) is owned and tested by secureStorage — this locks the trigger.
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockGetActiveToken.mockResolvedValue("token-from-before-uninstall")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
+    expect(screen.getByTestId("token").props.children).toBe("")
+  })
+
+  /**
+   * The verdict that reaches here is a heuristic, and it is wrong often enough
+   * that the half which destroys key material waits for a second witness. The
+   * account index lives in AsyncStorage, which a real reinstall clears, so
+   * accounts still listed prove this device is not one.
+   */
+  it("does not erase key material when the account index still lists accounts", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    // The session half still runs: a wrong verdict there costs a re-login.
+    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
+      "Reinstall key-material wipe skipped: account index is populated",
+    )
+  })
+
+  /**
+   * Withholding the blob used to be how the erase stayed owed — but the blob's
+   * absence is also what re-triggers the session wipe, so the user was signed
+   * out on every launch with nothing to end the loop. The marker carries the
+   * owed work instead, and the blob is written.
+   */
+  it("records the erase as owed and still writes the blob when the index cannot answer", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("unknown")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
+      "Reinstall key-material wipe deferred: account index unreadable",
+    )
+
+    // Nothing is pressed on purpose. The blob is normally written because the
+    // user changed something, and a launch that just signed them out is the
+    // launch where they change nothing — so a marker that waits for a change
+    // is a marker that never lands, and the loop it ends never ends.
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallKeyMaterialWipe: true,
+    })
+  })
+
+  /**
+   * An erase that ran and failed is as owed as one that never ran: the seeds are
+   * still in the keychain, and once the blob lands this branch never runs again,
+   * so nothing would ever reach them.
+   */
+  it("records the erase as owed when it ran and failed", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    // Once, not for the file: clearAllMocks resets calls but not
+    // implementations, so this would otherwise fail every later wipe.
+    mockClearUninstallSurvivingKeyMaterial.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("mnemonic")
+      },
+    )
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    // Unprompted, as above: the marker only means something once written.
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallKeyMaterialWipe: true,
+    })
+  })
+
+  /**
+   * The legacy store holds the pre-migration copies of the very mnemonics this
+   * erase is for, so a clear that failed is a reinstall that left seeds behind.
+   * Reporting it is not enough — without the marker, the next boot reads a blob
+   * that says the wipe is done.
+   */
+  it("records the erase as owed when the legacy store cannot be cleared", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockClearLegacyKeyStore.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("legacy key store")
+      },
+    )
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallKeyMaterialWipe: true,
+    })
+  })
+
+  /**
+   * The only shape that shows the bug this marker replaced. Within one boot,
+   * "nothing was written" is also what a correct implementation looks like; it
+   * takes a second boot to see that the loop does not end. The keychain is
+   * modelled as a variable so the second render sees what the first left.
+   */
+  it("stops wiping the session on the second boot, and finishes the erase it owed", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockClearUninstallSurvivingKeyMaterial.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("mnemonic")
+      },
+    )
+
+    const first = render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+    // Written without anyone touching the app, which is the only way this
+    // sequence happens on a real device.
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    // The blob the first boot wrote is what the second one reads.
+    const written = mockSaveJson.mock.calls.at(-1)?.[1]
+    storedStrings.set(PERSISTENT_STATE_KEY, JSON.stringify(written))
+    first.unmount()
+
+    mockClearUninstallSurvivingCredentials.mockClear()
+    mockClearUninstallSurvivingKeyMaterial.mockClear()
+    mockSaveJson.mockClear()
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    // The loop is over: the session is not wiped a second time, which is what
+    // used to sign the user out on every launch.
+    expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
+    // And the erase that was owed is retried, not forgotten.
+    await waitFor(() => {
+      expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
+    })
+    await waitFor(() => {
+      expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+        "pendingReinstallKeyMaterialWipe",
+      )
+    })
+  })
+
+  /**
+   * The marker is recorded on an "unknown" verdict, and that boot skips the
+   * legacy clear along with everything else it holds back. The retry is
+   * therefore the first time it runs at all — a retry that only erased the new
+   * store would retire the marker with every pre-migration copy still there.
+   */
+  it("clears the legacy store when it retries the owed erase", async () => {
+    storedStrings.set(
+      PERSISTENT_STATE_KEY,
+      JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
+    )
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await waitFor(() => {
+      expect(mockClearLegacyKeyStore).toHaveBeenCalledTimes(1)
+    })
+    expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
+    // Only then is the marker retired.
+    await waitFor(() => {
+      expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+        "pendingReinstallKeyMaterialWipe",
+      )
+    })
+  })
+
+  /**
+   * The retry's own legacy clear is held to the same rule as the first one: it
+   * failed, so the seeds it covers are still there and the marker stays.
+   */
+  it("keeps the marker when the retry cannot clear the legacy store", async () => {
+    storedStrings.set(
+      PERSISTENT_STATE_KEY,
+      JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
+    )
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
+    mockClearLegacyKeyStore.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("legacy key store")
+      },
+    )
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallKeyMaterialWipe: true,
+    })
+  })
+
+  it("abandons the owed erase once the device has an account of its own", async () => {
+    storedStrings.set(
+      PERSISTENT_STATE_KEY,
+      JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
+    )
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    // The tracked list now names this user's mnemonic too, so the erase can no
+    // longer tell whose seeds it would take.
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
+      "Reinstall key-material wipe abandoned: an account now exists",
+    )
+  })
+
+  it("leaves no marker when the erase completed", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls[0][1]).not.toHaveProperty(
+      "pendingReinstallKeyMaterialWipe",
+    )
+  })
+
+  it("saves normally once the erase has actually completed", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+  })
+
+  it("saves normally once the index says this is not a reinstall", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    // Nothing is owed, so holding the blob back would strand this user on
+    // defaults for every future boot.
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+  })
+
+  /**
+   * Gap the session half used to have. `removeThrough` refuses to empty the new
+   * store until the legacy copy is provably gone, so a legacy store that cannot
+   * answer failed every session slot too — and a reinstall could leave the
+   * previous owner signed in. Clearing it by service first unblocks both halves,
+   * so it has to run before either.
+   */
+  it("clears the legacy store before either half, so neither is blocked by it", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    const order: string[] = []
+    mockClearLegacyKeyStore.mockImplementation(async () => {
+      order.push("legacy store")
+    })
+    mockClearUninstallSurvivingCredentials.mockImplementation(async () => {
+      order.push("session")
+    })
+    mockClearUninstallSurvivingKeyMaterial.mockImplementation(async () => {
+      order.push("key material")
+    })
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(order).toEqual(["legacy store", "session", "key material"])
+  })
+
+  /**
+   * Held back on a false positive: the legacy mnemonic copies are the rollback
+   * insurance, and a re-login is not worth taking them.
+   */
+  it("leaves the legacy store alone when the index says this is no reinstall", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearLegacyKeyStore).not.toHaveBeenCalled()
+    // The session half still runs, because being wrong there costs a re-login.
+    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledTimes(1)
+  })
+
+  it("erases key material once the index corroborates the fresh install", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
   })
 })
 

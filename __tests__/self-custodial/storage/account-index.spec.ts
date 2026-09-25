@@ -7,7 +7,6 @@ const mockRememberMnemonicAccount = jest.fn()
 const mockMnemonicExists = jest.fn()
 const mockMnemonicNetworkExists = jest.fn()
 const mockMnemonicIsMigrated = jest.fn()
-const mockRebuildMnemonicAccountsIfMalformed = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
@@ -28,8 +27,6 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     mnemonicExists: (...args: unknown[]) => mockMnemonicExists(...args),
     mnemonicNetworkExists: (...args: unknown[]) => mockMnemonicNetworkExists(...args),
     mnemonicIsMigrated: (...args: unknown[]) => mockMnemonicIsMigrated(...args),
-    rebuildMnemonicAccountsIfMalformed: (...args: unknown[]) =>
-      mockRebuildMnemonicAccountsIfMalformed(...args),
   },
 }))
 
@@ -83,7 +80,6 @@ describe("self-custodial account-index", () => {
     mockMnemonicExists.mockResolvedValue({ status: "no" })
     mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
     mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
-    mockRebuildMnemonicAccountsIfMalformed.mockResolvedValue("not-needed")
   })
 
   describe("listSelfCustodialAccounts", () => {
@@ -679,48 +675,6 @@ describe("self-custodial account-index", () => {
     })
 
     /**
-     * The index is the only place the ids of a damaged list still exist, so the
-     * sweep is the one caller that can rebuild rather than reset. Left alone,
-     * the next write replaces the list with a single entry and forgets the rest
-     * for good.
-     */
-    /**
-     * The store decides whether a rebuild is needed, inside one slot turn. Split
-     * across two, an account that onboarding records between the check and the
-     * write is overwritten by this older snapshot, dropping the very id the wipe
-     * needs.
-     */
-    it("hands the store the index to rebuild from, and lets it decide", async () => {
-      setIndex([
-        { id: "a1", lightningAddress: null },
-        { id: "a2", lightningAddress: null },
-      ])
-
-      await sweepMnemonicMigration()
-
-      expect(mockRebuildMnemonicAccountsIfMalformed).toHaveBeenCalledWith(["a1", "a2"])
-    })
-
-    it("reports a rebuild that did not land, since the list stays damaged", async () => {
-      setIndex([{ id: "a1", lightningAddress: null }])
-      mockRebuildMnemonicAccountsIfMalformed.mockResolvedValue("failed")
-
-      await sweepMnemonicMigration()
-
-      expect(mockRecordError.mock.calls[0][0]).toMatchObject({
-        message: "Mnemonic accounts list rebuild failed",
-      })
-    })
-
-    it("reports nothing when no rebuild was needed", async () => {
-      setIndex([{ id: "a1", lightningAddress: null }])
-
-      await sweepMnemonicMigration()
-
-      expect(mockRecordError).not.toHaveBeenCalled()
-    })
-
-    /**
      * The count that gates dropping the legacy store. The probe answers yes for
      * a value it read out of the legacy store even when the write meant to move
      * it failed, so a device whose keychain refuses every write would otherwise
@@ -761,6 +715,32 @@ describe("self-custodial account-index", () => {
 
       expect(result).toEqual({ status: "incomplete", failures: 0 })
       expect(mockMnemonicExists).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The result being stable is not the same as the work being done. Re-record
+     * calls are by design — they are what repairs a tracking write that failed —
+     * but nothing else should recur: the index is not rewritten, and the
+     * re-record is one call per account rather than a growing number. That the
+     * re-record is itself a keychain no-op once the id is already tracked is
+     * pinned in the store's own spec, which is where the write lives.
+     */
+    it("rewrites nothing on a second run over an index that has already migrated", async () => {
+      setIndex([
+        { id: "a1", lightningAddress: null },
+        { id: "a2", lightningAddress: null },
+      ])
+      mockMnemonicExists.mockResolvedValue({ status: "yes" })
+
+      await sweepMnemonicMigration()
+      mockSetItem.mockClear()
+      mockRememberMnemonicAccount.mockClear()
+
+      await sweepMnemonicMigration()
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+      // One per account, not a number that grows with the boot count.
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledTimes(2)
     })
 
     it("gives the same answer on a second run", async () => {
