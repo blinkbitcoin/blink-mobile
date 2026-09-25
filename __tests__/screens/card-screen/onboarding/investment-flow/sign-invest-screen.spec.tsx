@@ -1,19 +1,66 @@
 import React from "react"
+import * as vm from "vm"
+import { Linking, View } from "react-native"
 import { render, fireEvent, act } from "@testing-library/react-native"
 import type { ReactTestInstance } from "react-test-renderer"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { logError } from "@app/utils/log-error"
-import { AGREEMENT_LABELS } from "@app/screens/card-screen/onboarding/investment-flow/investment-agreement"
-import { SignInvestScreen } from "@app/screens/card-screen/onboarding/investment-flow/sign-invest-screen"
+import {
+  AGREEMENT_LABELS,
+  ROUTE_MISSING_CODE,
+  signingFailure,
+} from "@app/screens/card-screen/onboarding/investment-flow/investment-agreement"
+import {
+  REPORT_PAGE_READY_SCRIPT,
+  SignInvestScreen,
+} from "@app/screens/card-screen/onboarding/investment-flow/sign-invest-screen"
 
 import { ContextForScreen } from "../../../helper"
 
 /** The amount the user picked two screens earlier, which the agreement is written from. */
 const SELECTED_AMOUNT_USD = 25000
 
-/** Where the instance under test says the e-sign service answers. */
+/** Where the instance under test says the e-sign service answers, read through a holder
+ *  so a test can take it away, and where remote config may say it answers instead. */
 const MINT_ORIGIN = "https://esign.example.test"
+const mockInstanceMintUrl = { current: MINT_ORIGIN }
+const mockRemoteMintUrl = { current: "" }
+
+/** The page the service serves the outcome back through, which is where the library's
+ *  messages come from; and the signing page itself, which is DocuSign's. */
+const SERVICE_PAGE_URL = `${MINT_ORIGIN}/return`
+const SIGNING_PAGE_URL = "https://demo.docusign.net/Signing/StartInSession.aspx"
+
+jest.mock("@app/config/feature-flags-context", () => {
+  const actual = jest.requireActual("@app/config/feature-flags-context")
+  return {
+    ...actual,
+    useRemoteConfig: () => ({
+      ...actual.defaultRemoteConfig,
+      cardInvestmentEsignMintUrl: mockRemoteMintUrl.current,
+    }),
+  }
+})
+
+/** Restored after each use: the flag is global. The restore is a closure made before
+ *  the flag is touched, so nothing is written from stale state after the wait. */
+const devFlag = globalThis as unknown as { __DEV__: boolean }
+const setDevFlag = (isDev: boolean): (() => void) => {
+  const wasDev = devFlag.__DEV__
+  devFlag.__DEV__ = isDev
+  return () => {
+    devFlag.__DEV__ = wasDev
+  }
+}
+const withDevFlag = async (isDev: boolean, run: () => Promise<void>) => {
+  const restore = setDevFlag(isDev)
+  try {
+    await run()
+  } finally {
+    restore()
+  }
+}
 
 /** The session the service verifies before it mints. */
 const SESSION_TOKEN = "session-token"
@@ -38,7 +85,10 @@ jest.mock("@app/hooks/use-app-config", () => {
   return {
     useAppConfig: () => ({
       appConfig: {
-        galoyInstance: { ...GALOY_INSTANCES[0], esignMintUrl: MINT_ORIGIN },
+        galoyInstance: {
+          ...GALOY_INSTANCES[0],
+          esignMintUrl: mockInstanceMintUrl.current,
+        },
         token: SESSION_TOKEN,
       },
     }),
@@ -155,6 +205,11 @@ jest.mock("@blinkbitcoin/esign-react-native/webform", () => {
   }
 })
 
+/** Moves the stand-in to a status, as the library does between renders. */
+const settleTo = (status: SigningStatus) => {
+  mockESign.status = status
+}
+
 const renderScreen = async () => {
   const utils = render(
     <ContextForScreen>
@@ -192,24 +247,29 @@ const mintRequest = () =>
     prefill: Record<string, { value: string; locked: boolean }>
   }
 
-describe("SignInvestScreen", () => {
-  beforeEach(() => {
-    loadLocale("en")
-    jest.clearAllMocks()
-    mockESign.options = null
-    mockESign.status = "idle"
-    mockESign.error = null
-    mockESign.isSessionExpired = false
-    mockESign.isCheckingConnection = false
-    mockESign.webViewProps = null
-    mockESign.signSource = null
-    mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
-    mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
-    mockMintSigningInstance.mockResolvedValue({
-      url: TEST_INSTANCE_URL,
-      envelopeId: TEST_ENVELOPE_ID,
-    })
+/** Every stand-in back to its opening state. */
+const resetScreenMocks = () => {
+  loadLocale("en")
+  jest.clearAllMocks()
+  mockESign.options = null
+  mockESign.status = "idle"
+  mockESign.error = null
+  mockESign.isSessionExpired = false
+  mockESign.isCheckingConnection = false
+  mockESign.webViewProps = null
+  mockESign.signSource = null
+  mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+  mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
+  mockInstanceMintUrl.current = MINT_ORIGIN
+  mockRemoteMintUrl.current = ""
+  mockMintSigningInstance.mockResolvedValue({
+    url: TEST_INSTANCE_URL,
+    envelopeId: TEST_ENVELOPE_ID,
   })
+}
+
+describe("SignInvestScreen", () => {
+  beforeEach(resetScreenMocks)
 
   it("renders without crashing", async () => {
     const { toJSON } = await renderScreen()
@@ -477,9 +537,13 @@ describe("SignInvestScreen", () => {
         }
       }
 
-      const postFromPage = async (webview: ReactTestInstance, data: string) => {
+      const postFromPage = async (
+        webview: ReactTestInstance,
+        data: string,
+        url: string = SERVICE_PAGE_URL,
+      ) => {
         await act(async () => {
-          webview.props.onMessage({ nativeEvent: { data } })
+          webview.props.onMessage({ nativeEvent: { data, url } })
         })
       }
 
@@ -557,8 +621,186 @@ describe("SignInvestScreen", () => {
 
         expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledTimes(2)
         expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledWith({
-          nativeEvent: { data: "not json" },
+          nativeEvent: { data: "not json", url: SERVICE_PAGE_URL },
         })
+      })
+
+      /** A WebView message names the page it came from. Only the page the service
+       *  serves may drive the signing: a page reached through a link inside the
+       *  document could otherwise post a completion nobody signed. */
+      it("drops a signing message from a page the service does not serve", async () => {
+        signing()
+        const { getByTestId } = await renderScreen()
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        await postFromPage(
+          webview,
+          JSON.stringify({ event: "signing_complete" }),
+          "https://evil.example.test/complete",
+        )
+        await postFromPage(webview, JSON.stringify({ event: "signing_complete" }), "")
+
+        expect(mockESign.webViewProps?.onMessage).not.toHaveBeenCalled()
+        expect(logError).toHaveBeenCalledWith(
+          expect.objectContaining({
+            scope: "card-investment-esign",
+            context: { url: "https://evil.example.test/complete" },
+          }),
+        )
+        expect(logError).not.toHaveBeenCalledWith(
+          expect.objectContaining({ expected: true }),
+        )
+      })
+
+      /** A message with no page named cannot be from the service; it is dropped, not
+       *  thrown on. */
+      it("drops a signing message that names no page", async () => {
+        signing()
+        const { getByTestId } = await renderScreen()
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        await act(async () => {
+          webview.props.onMessage({
+            nativeEvent: { data: JSON.stringify({ event: "signing_complete" }) },
+          })
+        })
+
+        expect(mockESign.webViewProps?.onMessage).not.toHaveBeenCalled()
+        expect(logError).toHaveBeenCalledWith(
+          expect.objectContaining({ context: { url: "" } }),
+        )
+      })
+
+      /** Remote config may move the service while a session is open; the session's
+       *  messages are checked against the service that minted it, not the new one. */
+      it("checks messages against the service the session was minted at", async () => {
+        const { rerender, getByTestId } = await renderScreen()
+        await startedSession()
+        mockRemoteMintUrl.current = "https://esign-moved.blink.sv"
+        signing()
+        await rerenderScreen(rerender)
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        await postFromPage(webview, JSON.stringify({ event: "cancel" }), SERVICE_PAGE_URL)
+        await postFromPage(
+          webview,
+          JSON.stringify({ event: "cancel" }),
+          "https://esign-moved.blink.sv/return",
+        )
+
+        expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledTimes(1)
+        expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledWith({
+          nativeEvent: {
+            data: JSON.stringify({ event: "cancel" }),
+            url: SERVICE_PAGE_URL,
+          },
+        })
+      })
+
+      /** The service's origin is compared as an origin, not as a string. */
+      it("takes a signing message from the service's page whatever its case or path", async () => {
+        signing()
+        const { getByTestId } = await renderScreen()
+        const webview = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        })
+
+        await postFromPage(
+          webview,
+          JSON.stringify({ event: "cancel" }),
+          "HTTPS://ESIGN.EXAMPLE.TEST/return?event=cancel#x",
+        )
+
+        expect(mockESign.webViewProps?.onMessage).toHaveBeenCalledTimes(1)
+      })
+
+      /** The report is posted by whichever page is drawing, DocuSign's included; it only
+       *  uncovers the page, so it needs no such check. */
+      it("reads the page's report from whichever page draws it", async () => {
+        signing()
+        const { getByTestId, queryByTestId } = await renderScreen()
+
+        await postFromPage(
+          getByTestId("sign-invest-webview", { includeHiddenElements: true }),
+          PAGE_READY,
+          SIGNING_PAGE_URL,
+        )
+
+        expect(queryByTestId("sign-invest-loading")).toBeNull()
+      })
+
+      /** A link inside the document belongs in the browser: opened there, it never takes
+       *  the signing page's place in this WebView. */
+      it("keeps the WebView to the signing's own pages and opens anything else outside", async () => {
+        const openUrl = jest.spyOn(Linking, "openURL").mockResolvedValue(true)
+        signing()
+        const { getByTestId } = await renderScreen()
+        const shouldLoad = getByTestId("sign-invest-webview", {
+          includeHiddenElements: true,
+        }).props.onShouldStartLoadWithRequest as (request: {
+          url: string
+          isTopFrame?: boolean
+        }) => boolean
+
+        expect(shouldLoad({ url: SIGNING_PAGE_URL })).toBe(true)
+        expect(shouldLoad({ url: "https://account-d.docusign.com/oauth" })).toBe(true)
+        expect(shouldLoad({ url: SERVICE_PAGE_URL })).toBe(true)
+        expect(shouldLoad({ url: "about:blank" })).toBe(true)
+        expect(Linking.openURL).not.toHaveBeenCalled()
+
+        expect(shouldLoad({ url: "https://www.blink.sv/terms" })).toBe(false)
+        expect(shouldLoad({ url: "https://docusign.net.evil.example/x" })).toBe(false)
+        expect(shouldLoad({ url: "https://docusign.net:x@evil.example/x" })).toBe(false)
+        expect(shouldLoad({ url: "https://evil.example\\.docusign.net/x" })).toBe(false)
+        expect(shouldLoad({ url: "mailto:support@blink.sv" })).toBe(false)
+        /** The frames the page loads inside are its own business; iOS asks about
+         *  those too, and blocking one would open it over the signing. */
+        expect(
+          shouldLoad({ url: "https://cdn.example.test/captcha", isTopFrame: false }),
+        ).toBe(true)
+        /** A page the phone cannot open is neither loaded nor handed to the phone. */
+        expect(shouldLoad({ url: "about:srcdoc" })).toBe(false)
+        expect(shouldLoad({ url: "blob:https://demo.docusign.net/abc" })).toBe(false)
+        expect(Linking.openURL).not.toHaveBeenCalledWith("about:srcdoc")
+        expect(Linking.openURL).not.toHaveBeenCalledWith(
+          "blob:https://demo.docusign.net/abc",
+        )
+        expect(Linking.openURL).not.toHaveBeenCalledWith(
+          "https://cdn.example.test/captcha",
+        )
+
+        /** A phone with nothing to open the link with is not a failure of the signing. */
+        openUrl.mockRejectedValueOnce(new Error("no handler"))
+        expect(shouldLoad({ url: "tel:+50400000000" })).toBe(false)
+        await act(async () => {})
+        expect(Linking.openURL).toHaveBeenCalledWith("https://www.blink.sv/terms")
+        expect(Linking.openURL).toHaveBeenCalledWith(
+          "https://docusign.net.evil.example/x",
+        )
+        expect(Linking.openURL).toHaveBeenCalledWith("mailto:support@blink.sv")
+        openUrl.mockRestore()
+      })
+
+      /** The page is hidden from a screen reader while covered, so the cover has to be
+       *  what it reads instead: a spinner that says what it is, in a view that holds
+       *  the reader on it rather than on the close button and silence. */
+      it("gives a screen reader the cover to read while the page is hidden", async () => {
+        signing()
+        const screen = await renderScreen()
+
+        const spinner = screen.getByTestId("sign-invest-loading")
+        expect(spinner.props.accessibilityRole).toBe("progressbar")
+        expect(spinner.props.accessibilityLabel).toBe("Preparing your agreement.")
+        const cover = screen
+          .UNSAFE_getAllByType(View)
+          .find(({ props }) => props.accessibilityViewIsModal === true)
+        expect(cover).toBeTruthy()
       })
 
       it("uncovers the page after a while even if it never reports", async () => {
@@ -655,14 +897,47 @@ describe("SignInvestScreen", () => {
       expect(mockESign.checkConnection).toHaveBeenCalledTimes(1)
     })
 
-    it("words a failure with the library's own copy for its code", async () => {
+    /** The library's copy is English only; the app words every code it knows itself,
+     *  so the failure reads in the signer's language like the rest of the step. */
+    it("words a failure with the app's own copy for its code", async () => {
       mockESign.status = "error"
       mockESign.error = { code: "PROVIDER_UNAVAILABLE", message: "nope" }
 
-      const { getByText } = await renderScreen()
+      const { getByText, queryByText } = await renderScreen()
 
       expect(getByText("Error")).toBeTruthy()
-      expect(getByText(/Signing service temporarily unavailable/)).toBeTruthy()
+      expect(getByText(/The signing service is temporarily unavailable/)).toBeTruthy()
+      expect(queryByText(/^Signing service temporarily unavailable/)).toBeNull()
+    })
+
+    /** A refusal carries the service's reason, worded for the signer already. */
+    it("shows the service's own reason for a refusal", async () => {
+      mockESign.status = "error"
+      mockESign.error = { code: "VALIDATION_ERROR", message: "No investor on file." }
+
+      const { getByText } = await renderScreen()
+
+      expect(getByText("No investor on file.")).toBeTruthy()
+    })
+
+    it("words a code it does not know with the general copy", async () => {
+      mockESign.status = "error"
+      mockESign.error = { code: "SOMETHING_NEW", message: "nope" }
+
+      const { getByText } = await renderScreen()
+
+      expect(getByText(/Something went wrong/)).toBeTruthy()
+    })
+
+    /** A route the service does not serve is not cured by tapping again, so no button. */
+    it("offers no retry when the service does not serve the mint", async () => {
+      mockESign.status = "error"
+      mockESign.error = { code: ROUTE_MISSING_CODE, message: "HTTP 404" }
+
+      const { getByText, queryByText } = await renderScreen()
+
+      expect(getByText(/not available on this server/)).toBeTruthy()
+      expect(queryByText("Try Again")).toBeNull()
     })
 
     /** The library may report the state without a detail; the screen still has to say
@@ -706,107 +981,373 @@ describe("SignInvestScreen", () => {
       expect(mockESign.retry).toHaveBeenCalledTimes(1)
     })
   })
+})
 
-  describe("where each outcome leads", () => {
-    const callbackOf = (name: string) =>
-      mockESign.options?.[name] as (arg?: never) => void
+describe("SignInvestScreen, where it mints", () => {
+  beforeEach(resetScreenMocks)
 
-    /**
-     * Carries the agreement's own figure forward, which is the whole reason the signing
-     * step asks for it: the transfer step bills that, and converting the dollars again at
-     * a later price would charge something the signed document does not state.
-     */
-    it("advances to the transfer step once the agreement is signed", async () => {
+  /**
+   * `sign` is rebuilt whenever the source is; the effect that opens the session runs
+   * again then, and without the guard would open a second session on top of the first
+   * while the status is still idle. The most expensive mistake on this screen is a
+   * double mint, so this is the one that has to be pinned.
+   */
+  it("opens one session, not two, when the source is rebuilt while still idle", async () => {
+    const { rerender } = await renderScreen()
+    expect(mockESign.sign).toHaveBeenCalledTimes(1)
+
+    mockRouteParams.current = { selectedAmountUsd: 50000 }
+    await rerenderScreen(rerender)
+
+    expect(mockESign.sign).toHaveBeenCalledTimes(1)
+  })
+
+  /** Remote config names the service first, so the endpoint can be switched or withdrawn
+   *  without a release; the instance's own value stands until it does. */
+  it("mints at the origin remote config names over the instance's", async () => {
+    mockRemoteMintUrl.current = "https://esign-remote.blink.sv"
+    await renderScreen()
+
+    await startedSession()
+
+    expect(mintRequest().origin).toBe("https://esign-remote.blink.sv")
+  })
+
+  /** The mint carries the session token, so a release build follows the remote value
+   *  only onto Blink's own hosts; anything else is ignored and the instance's stands. */
+  it("keeps to the instance's origin when remote config names a host that is not Blink's", async () => {
+    mockRemoteMintUrl.current = "https://esign.evil.example"
+
+    await withDevFlag(false, async () => {
       await renderScreen()
       await startedSession()
 
-      await act(async () => {
-        callbackOf("onComplete")()
-      })
-
-      expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd: SELECTED_AMOUNT_USD,
-        settlementSats: SETTLEMENT_SATS,
-      })
-      expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mintRequest().origin).toBe(MINT_ORIGIN)
     })
+  })
 
-    /** With no figure to carry, the transfer step falls back to its own conversion, so
-     *  the investor is still billed rather than sent on with nothing. */
-    it("carries no figure when no agreement was minted", async () => {
-      await renderScreen()
+  /** A build with nowhere to mint says so, with no retry that cannot win, and opens no
+   *  session: the instance names no service, remote config none either, and a release
+   *  build has no developer's machine to fall back to. */
+  it("says signing is not available when this build has nowhere to mint", async () => {
+    mockInstanceMintUrl.current = ""
 
-      await act(async () => {
-        callbackOf("onComplete")()
-      })
+    await withDevFlag(false, async () => {
+      const { getByText, queryByText } = await renderScreen()
 
-      expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd: SELECTED_AMOUNT_USD,
-        settlementSats: undefined,
-      })
-    })
-
-    it("returns to the term sheet when the signer cancels", async () => {
-      await renderScreen()
-
-      await act(async () => {
-        callbackOf("onCancel")()
-      })
-
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
-      expect(mockReplace).not.toHaveBeenCalled()
-    })
-
-    /** Declining lands the session back in idle, where the document is opened from; a
-     *  signer who just said no must not get a fresh envelope, nor the page again. */
-    it("does not open another session after the signer declines", async () => {
-      mockESign.status = "signing"
-      const { rerender } = await renderScreen()
-
-      await act(async () => {
-        callbackOf("onCancel")()
-      })
-      mockESign.status = "idle"
-      await rerenderScreen(rerender)
-
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expect(getByText(/Signing is not available yet/)).toBeTruthy()
+      expect(queryByText("Try Again")).toBeNull()
       expect(mockESign.sign).not.toHaveBeenCalled()
     })
+  })
+})
 
-    /** The retry lives on this screen, so navigating away on a failure would take it
-     *  with it. Leaving is the close button's job. */
-    it("stays on the step when signing fails", async () => {
-      await renderScreen()
+describe("SignInvestScreen, where each outcome leads", () => {
+  beforeEach(resetScreenMocks)
 
-      await act(async () => {
-        callbackOf("onError")({
-          code: "ENVELOPE_CREATION_FAILED",
-          message: "nope",
-        } as never)
-      })
+  const callbackOf = (name: string) =>
+    mockESign.options?.[name] as (arg?: unknown) => void
 
-      expect(mockGoBack).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockReplace).not.toHaveBeenCalled()
+  /** What the library hands over once the session it opened completes. */
+  const signed = (envelopeId?: string) => ({ envelopeId, status: "completed" })
+
+  /**
+   * Carries the agreement's own figure forward, which is the whole reason the signing
+   * step asks for it: the transfer step bills that, and converting the dollars again at
+   * a later price would charge something the signed document does not state.
+   */
+  it("advances to the transfer step once the agreement is signed", async () => {
+    await renderScreen()
+    await startedSession()
+
+    await act(async () => {
+      callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
     })
 
-    it("reports the failure with its error code", async () => {
-      await renderScreen()
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: SETTLEMENT_SATS,
+    })
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
 
-      await act(async () => {
-        callbackOf("onError")({
-          code: "ENVELOPE_CREATION_FAILED",
-          message: "nope",
-        } as never)
-      })
+  /** The library names no envelope for a session minted without an id; the figure
+   *  minted last is still the one the document names. */
+  it("carries the figure when the library names no envelope", async () => {
+    mockMintSigningInstance.mockResolvedValue({ url: TEST_INSTANCE_URL })
+    await renderScreen()
+    await startedSession()
 
-      expect(logError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          scope: "card-investment-esign",
-          context: { code: "ENVELOPE_CREATION_FAILED" },
+    await act(async () => {
+      callbackOf("onComplete")(signed(undefined))
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: SETTLEMENT_SATS,
+    })
+  })
+
+  /**
+   * The transfer step bills the figure minted with the document that was signed. A
+   * session that completes on another envelope than the one minted last would put one
+   * document's figure under another's signature, so the step stops and says so.
+   */
+  it("stops when the signed envelope is not the one it minted last", async () => {
+    const { getByText, queryByText } = await renderScreen()
+    await startedSession()
+
+    await act(async () => {
+      callbackOf("onComplete")(signed("some-other-envelope"))
+    })
+
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(getByText(/not the one this step prepared/)).toBeTruthy()
+    expect(logError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: { signed: "some-other-envelope", minted: TEST_ENVELOPE_ID },
+      }),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByText("Try Again"))
+    })
+
+    expect(mockESign.retry).toHaveBeenCalledTimes(1)
+    expect(queryByText(/not the one this step prepared/)).toBeNull()
+  })
+
+  /** Once settled, the library lands back in idle, where a session would open on its
+   *  own; while the step is saying another envelope was signed, it must not. */
+  it("opens no session on its own while it says another envelope was signed", async () => {
+    const { getByText, rerender } = await renderScreen()
+    await startedSession()
+    expect(mockESign.sign).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      callbackOf("onComplete")(signed("some-other-envelope"))
+    })
+    settleTo("success")
+    await rerenderScreen(rerender)
+    settleTo("idle")
+    await rerenderScreen(rerender)
+    expect(mockESign.sign).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      fireEvent.press(getByText("Try Again"))
+    })
+
+    expect(mockESign.sign).toHaveBeenCalledTimes(2)
+  })
+
+  /**
+   * The library gives up on a mint after a while but cannot stop it. One that lands
+   * after the signer has moved on to a fresh mint must not put the older price's
+   * figure under the newer document, which is the one the signer sees and signs.
+   */
+  it("keeps the figure of the latest mint when an abandoned one lands late", async () => {
+    const { rerender } = await renderScreen()
+    let finishFirstMint: (minted: unknown) => void = () => {}
+    mockMintSigningInstance.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishFirstMint = resolve
         }),
-      )
+    )
+    const firstMint = startedSession()
+
+    /** The price moves before the second mint reads it: $125,000 per bitcoin, so the
+     *  same $25,000 settles at a fifth of a bitcoin. */
+    mockUsdCentsPerBtc.current = 12_500_000
+    await rerenderScreen(rerender)
+    let finishSecondMint: (minted: unknown) => void = () => {}
+    mockMintSigningInstance.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          finishSecondMint = resolve
+        }),
+    )
+    const secondMint = startedSession()
+
+    await act(async () => {
+      finishSecondMint({ url: TEST_INSTANCE_URL, envelopeId: "envelope-2" })
+      await secondMint
     })
+    await act(async () => {
+      finishFirstMint({ url: TEST_INSTANCE_URL, envelopeId: "envelope-1" })
+      await firstMint
+    })
+    await act(async () => {
+      callbackOf("onComplete")(signed("envelope-2"))
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: 20_000_000,
+    })
+  })
+
+  /** With no figure to carry, the transfer step falls back to its own conversion, so
+   *  the investor is still billed rather than sent on with nothing. */
+  it("carries no figure when no agreement was minted", async () => {
+    await renderScreen()
+
+    await act(async () => {
+      callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: undefined,
+    })
+  })
+
+  it("returns to the term sheet when the signer cancels", async () => {
+    await renderScreen()
+
+    await act(async () => {
+      callbackOf("onCancel")()
+    })
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  /** Declining lands the session back in idle, where the document is opened from; a
+   *  signer who just said no must not get a fresh envelope, nor the page again. */
+  it("does not open another session after the signer declines", async () => {
+    mockESign.status = "signing"
+    const { rerender } = await renderScreen()
+
+    await act(async () => {
+      callbackOf("onCancel")()
+    })
+    mockESign.status = "idle"
+    await rerenderScreen(rerender)
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockESign.sign).not.toHaveBeenCalled()
+  })
+
+  /** The retry lives on this screen, so navigating away on a failure would take it
+   *  with it. Leaving is the close button's job. */
+  it("stays on the step when signing fails", async () => {
+    await renderScreen()
+
+    await act(async () => {
+      callbackOf("onError")({
+        code: "ENVELOPE_CREATION_FAILED",
+        message: "nope",
+      } as never)
+    })
+
+    expect(mockGoBack).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  /** The error goes to the log as it came, stack and identity included, with its
+   *  code beside it; no status, since no service answered this one. */
+  it("reports the failure as it came, with its error code", async () => {
+    await renderScreen()
+    const failure = { code: "ENVELOPE_CREATION_FAILED", message: "nope" }
+
+    await act(async () => {
+      callbackOf("onError")(failure)
+    })
+
+    expect(logError).toHaveBeenCalledWith({
+      scope: "card-investment-esign",
+      error: failure,
+      context: { code: "ENVELOPE_CREATION_FAILED", status: undefined },
+    })
+  })
+
+  /** The library hands the screen a failure's code and message alone; the status the
+   *  service answered is kept on the way through, for the log to name. */
+  it("names the status the service answered a failed mint with", async () => {
+    await renderScreen()
+    mockMintSigningInstance.mockRejectedValueOnce(signingFailure("HTTP 502", 502))
+    await expect(startedSession()).rejects.toMatchObject({ message: "HTTP 502" })
+
+    await act(async () => {
+      callbackOf("onError")({ code: "ENVELOPE_CREATION_FAILED", message: "HTTP 502" })
+    })
+
+    expect(logError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        context: { code: "ENVELOPE_CREATION_FAILED", status: 502 },
+      }),
+    )
+  })
+})
+
+/**
+ * The script the WebView runs inside the signing page, run here the way a page would run
+ * it: no test renders a real WebView, so this is the only place it executes at all.
+ */
+describe("REPORT_PAGE_READY_SCRIPT", () => {
+  const PAGE_READY_POLL_LIMIT = 80
+
+  const runInPage = (innerText: string) => {
+    const ticks: Array<() => void> = []
+    const page = {
+      document: { body: { innerText } },
+      window: { ReactNativeWebView: { postMessage: jest.fn() } },
+      setInterval: jest.fn((tick: () => void) => {
+        ticks.push(tick)
+        return 7
+      }),
+      clearInterval: jest.fn(),
+    }
+    const result = vm.runInNewContext(REPORT_PAGE_READY_SCRIPT, page)
+    return { page, result, tick: () => ticks[0]() }
+  }
+
+  it("evaluates to true, as a WebView's injected script must", () => {
+    expect(runInPage("").result).toBe(true)
+  })
+
+  it("posts the report once the page has visible text, and stops looking", () => {
+    const { page, tick } = runInPage("Please review the documents")
+
+    tick()
+
+    expect(page.window.ReactNativeWebView.postMessage).toHaveBeenCalledWith(
+      JSON.stringify({ type: "blink-signing-page-ready" }),
+    )
+    expect(page.clearInterval).toHaveBeenCalledWith(7)
+  })
+
+  it("keeps looking while the page is blank", () => {
+    const { page, tick } = runInPage("   ")
+
+    tick()
+    tick()
+
+    expect(page.window.ReactNativeWebView.postMessage).not.toHaveBeenCalled()
+    expect(page.clearInterval).not.toHaveBeenCalled()
+  })
+
+  it("reports a page that draws later", () => {
+    const { page, tick } = runInPage("")
+
+    tick()
+    page.document.body.innerText = "Sign here"
+    tick()
+
+    expect(page.window.ReactNativeWebView.postMessage).toHaveBeenCalledTimes(1)
+  })
+
+  /** A page that never draws is uncovered by the step's own timeout; the script gives
+   *  up at the same moment rather than measure a page shown long ago. */
+  it("gives up without a report once the step would have uncovered the page", () => {
+    const { page, tick } = runInPage("")
+
+    for (let look = 0; look < PAGE_READY_POLL_LIMIT; look += 1) tick()
+
+    expect(page.clearInterval).toHaveBeenCalledWith(7)
+    expect(page.window.ReactNativeWebView.postMessage).not.toHaveBeenCalled()
   })
 })
