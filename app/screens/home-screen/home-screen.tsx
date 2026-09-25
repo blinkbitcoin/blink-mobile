@@ -75,6 +75,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { useAcknowledgeInvitationOnceSigned } from "@app/screens/card-screen/onboarding/investment-flow/investment-invitation-bulletin"
 import { useCardInvestmentBulletin } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
@@ -369,6 +370,9 @@ export const HomeScreen: React.FC = () => {
   const cardInvestmentBulletin = useCardInvestmentBulletin({
     hasPendingDeposit: hasPendingCustodialReceive,
   })
+  /** The server's invitation card is retired by the signature; this catches one the
+   *  signing step could not retire itself, as long as the signed record is alive. */
+  useAcknowledgeInvitationOnceSigned(bulletins)
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
