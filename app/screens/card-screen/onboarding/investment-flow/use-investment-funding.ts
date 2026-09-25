@@ -2,8 +2,8 @@ import * as React from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { toUsdMoneyAmount } from "@app/types/amounts"
+import { useSendWallets } from "@app/screens/send-bitcoin-screen/hooks/use-send-wallets"
+import { toUsdMoneyAmount, toWalletAmount } from "@app/types/amounts"
 
 import { type InvestmentFunding, resolveInvestmentFunding } from "./investment-terms"
 
@@ -15,8 +15,12 @@ const CENTS_PER_USD = 100
  * What the investor holds against what they signed for.
  *
  * The fullest wallet decides, because a payment draws on one; the two added together
- * only say whether consolidating would be enough. Reads through the active account, so
- * it answers for a custodial and a self-custodial investor alike.
+ * only say whether consolidating would be enough. Measured over the wallets the send
+ * flow would offer, read through the hook the send flow itself reads, so a wallet that
+ * flow will not pay from, the dollar wallet while it is gated, never counts as covering
+ * the investment; it answers for a custodial and a self-custodial investor alike. The
+ * judged wallet is named by id too, so the payment can be opened on it rather than on
+ * whichever the send flow would pick by default.
  *
  * While it is loading the balance reads as zero, which would say the investment is not
  * covered when it may well be. Callers wait rather than act on that: the flag is what
@@ -27,39 +31,44 @@ export const useInvestmentFunding = (
 ): InvestmentFunding & {
   /** The wallet the balance is read from, so the shortfall can be named after it. */
   balanceCurrency: WalletCurrency
+  /** That wallet's id, for the send flow to pay from; none while no wallet is offered. */
+  balanceWalletId: string | undefined
   isLoading: boolean
 } => {
   const { convertMoneyAmount } = usePriceConversion()
-  const { wallets, isReady } = useActiveWallet()
+  const { wallets, btcWallet, loading } = useSendWallets()
 
   /** The fullest wallet, which one it is, and the two together. With nothing held the
    *  bitcoin wallet is named, as the one a deposit lands in. */
-  const { largestWalletUsd, largestWalletCurrency, combinedUsd } = React.useMemo(() => {
+  const { largestWalletUsd, largestWallet, combinedUsd } = React.useMemo(() => {
     const empty: {
       largestWalletUsd: number
-      largestWalletCurrency: WalletCurrency
+      largestWallet: { id: string; walletCurrency: WalletCurrency } | undefined
       combinedUsd: number
-    } = { largestWalletUsd: 0, largestWalletCurrency: WalletCurrency.Btc, combinedUsd: 0 }
-    if (!convertMoneyAmount) return empty
+    } = { largestWalletUsd: 0, largestWallet: btcWallet, combinedUsd: 0 }
+    if (!convertMoneyAmount || !wallets) return empty
 
     return wallets.reduce((funding, wallet) => {
+      const balance = toWalletAmount({
+        amount: wallet.balance,
+        currency: wallet.walletCurrency,
+      })
       const balanceUsd =
-        convertMoneyAmount(wallet.balance, WalletCurrency.Usd).amount / CENTS_PER_USD
+        convertMoneyAmount(balance, WalletCurrency.Usd).amount / CENTS_PER_USD
       const isFullest = balanceUsd > funding.largestWalletUsd
       return {
         largestWalletUsd: isFullest ? balanceUsd : funding.largestWalletUsd,
-        largestWalletCurrency: isFullest
-          ? wallet.walletCurrency
-          : funding.largestWalletCurrency,
+        largestWallet: isFullest ? wallet : funding.largestWallet,
         combinedUsd: funding.combinedUsd + balanceUsd,
       }
     }, empty)
-  }, [wallets, convertMoneyAmount])
+  }, [wallets, btcWallet, convertMoneyAmount])
 
   return {
     ...resolveInvestmentFunding({ largestWalletUsd, combinedUsd, totalUsd }),
-    balanceCurrency: largestWalletCurrency,
-    isLoading: !convertMoneyAmount || !isReady,
+    balanceCurrency: largestWallet?.walletCurrency ?? WalletCurrency.Btc,
+    balanceWalletId: largestWallet?.id,
+    isLoading: !convertMoneyAmount || loading,
   }
 }
 

@@ -26,25 +26,42 @@ jest.mock("@app/hooks", () => ({
   usePriceConversion: () => ({ convertMoneyAmount: mockConvert.current }),
 }))
 
-const mockActiveWallet = {
-  current: { wallets: [] as unknown[], isReady: true },
+type SendWallet = { id: string; walletCurrency: WalletCurrency; balance: number }
+
+/** The wallets the send flow would offer, as its own hook answers them: the dollar
+ *  wallet is already gone from the list when the dollar balance is gated. */
+const mockSendWallets = {
+  current: {
+    wallets: [] as SendWallet[] | undefined,
+    btcWallet: undefined as SendWallet | undefined,
+    loading: false,
+  },
 }
 
-jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => mockActiveWallet.current,
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
+  useSendWallets: () => mockSendWallets.current,
 }))
 
-const walletOf = (currency: WalletCurrency, amount: number) => ({
+const walletOf = (currency: WalletCurrency, amount: number): SendWallet => ({
   id: `wallet-${currency}`,
   walletCurrency: currency,
-  balance: { amount, currency },
-  transactions: [],
+  balance: amount,
 })
+
+const offered = (...wallets: SendWallet[]) => {
+  mockSendWallets.current = {
+    wallets,
+    btcWallet: wallets.find(
+      ({ walletCurrency }) => walletCurrency === WalletCurrency.Btc,
+    ),
+    loading: false,
+  }
+}
 
 describe("useInvestmentFunding", () => {
   beforeEach(() => {
     mockConvert.current = (moneyAmount) => ({ amount: centsFor(moneyAmount) })
-    mockActiveWallet.current = { wallets: [], isReady: true }
+    offered()
   })
 
   /**
@@ -53,48 +70,59 @@ describe("useInvestmentFunding", () => {
    * send flow then turned away.
    */
   it("measures the investment against the fullest wallet, not the two added up", () => {
-    mockActiveWallet.current = {
-      wallets: [
-        walletOf(WalletCurrency.Btc, 1_000_000), // $1,000
-        walletOf(WalletCurrency.Usd, 250_000), // $2,500
-      ],
-      isReady: true,
-    }
+    offered(
+      walletOf(WalletCurrency.Btc, 1_000_000), // $1,000
+      walletOf(WalletCurrency.Usd, 250_000), // $2,500
+    )
 
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
     expect(result.current.balanceUsd).toBe(2500)
     expect(result.current.balanceCurrency).toBe(WalletCurrency.Usd)
+    expect(result.current.balanceWalletId).toBe("wallet-USD")
     expect(result.current.shortfallUsd).toBe(22500)
     expect(result.current.hasEnoughBalance).toBe(false)
   })
 
   /** The shortfall names the wallet the balance came from, so it has to say which. */
   it("names the bitcoin wallet when that is the fullest", () => {
-    mockActiveWallet.current = {
-      wallets: [
-        walletOf(WalletCurrency.Btc, 30_000_000), // $30,000
-        walletOf(WalletCurrency.Usd, 250_000), // $2,500
-      ],
-      isReady: true,
-    }
+    offered(
+      walletOf(WalletCurrency.Btc, 30_000_000), // $30,000
+      walletOf(WalletCurrency.Usd, 250_000), // $2,500
+    )
 
     const { result } = renderHook(() => useInvestmentFunding(50000))
 
     expect(result.current.balanceUsd).toBe(30000)
     expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
+    expect(result.current.balanceWalletId).toBe("wallet-BTC")
+  })
+
+  /**
+   * Only what the send flow would offer counts. While the dollar balance is gated, the
+   * send flow drops the dollar wallet, so a dollar balance that would cover the
+   * investment is money the payment cannot draw on; counting it sent the investor into
+   * a send flow that offered the bitcoin wallet alone and refused the amount.
+   */
+  it("counts only the wallets the send flow offers, not a gated dollar balance", () => {
+    offered(walletOf(WalletCurrency.Btc, 200_000)) // $200; $30,000 in dollars is gated
+
+    const { result } = renderHook(() => useInvestmentFunding(25000))
+
+    expect(result.current.hasEnoughBalance).toBe(false)
+    expect(result.current.isSplitAcrossWallets).toBe(false)
+    expect(result.current.balanceUsd).toBe(200)
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
+    expect(result.current.balanceWalletId).toBe("wallet-BTC")
   })
 
   /** Held between the two but not in either: the answer is to consolidate, not to
    *  deposit, and the screen offers a different way out for each. */
   it("marks a balance that is only split across the two wallets", () => {
-    mockActiveWallet.current = {
-      wallets: [
-        walletOf(WalletCurrency.Btc, 3_000_000), // $3,000
-        walletOf(WalletCurrency.Usd, 300_000), // $3,000
-      ],
-      isReady: true,
-    }
+    offered(
+      walletOf(WalletCurrency.Btc, 3_000_000), // $3,000
+      walletOf(WalletCurrency.Usd, 300_000), // $3,000
+    )
 
     const { result } = renderHook(() => useInvestmentFunding(5000))
 
@@ -103,10 +131,7 @@ describe("useInvestmentFunding", () => {
   })
 
   it("is not split when neither wallet nor both together are enough", () => {
-    mockActiveWallet.current = {
-      wallets: [walletOf(WalletCurrency.Usd, 100_000)],
-      isReady: true,
-    }
+    offered(walletOf(WalletCurrency.Usd, 100_000))
 
     const { result } = renderHook(() => useInvestmentFunding(5000))
 
@@ -114,10 +139,7 @@ describe("useInvestmentFunding", () => {
   })
 
   it("reports the investment covered once the wallets hold enough", () => {
-    mockActiveWallet.current = {
-      wallets: [walletOf(WalletCurrency.Usd, 2_500_000)],
-      isReady: true,
-    }
+    offered(walletOf(WalletCurrency.Usd, 2_500_000))
 
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
@@ -127,10 +149,7 @@ describe("useInvestmentFunding", () => {
 
   /** One wallet only: nothing can be split, and the fullest is the whole. */
   it("reads an account with one wallet as never split", () => {
-    mockActiveWallet.current = {
-      wallets: [walletOf(WalletCurrency.Btc, 3_000_000)], // $3,000
-      isReady: true,
-    }
+    offered(walletOf(WalletCurrency.Btc, 3_000_000)) // $3,000
 
     const { result } = renderHook(() => useInvestmentFunding(5000))
 
@@ -142,13 +161,10 @@ describe("useInvestmentFunding", () => {
   /** Two wallets holding the same amount: the first one listed is the one named, which
    *  is as good as any, and this pins that it is stable rather than arbitrary. */
   it("names the first of two equal wallets", () => {
-    mockActiveWallet.current = {
-      wallets: [
-        walletOf(WalletCurrency.Usd, 250_000), // $2,500
-        walletOf(WalletCurrency.Btc, 2_500_000), // $2,500
-      ],
-      isReady: true,
-    }
+    offered(
+      walletOf(WalletCurrency.Usd, 250_000), // $2,500
+      walletOf(WalletCurrency.Btc, 2_500_000), // $2,500
+    )
 
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
@@ -162,7 +178,19 @@ describe("useInvestmentFunding", () => {
 
     expect(result.current.balanceUsd).toBe(0)
     expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
+    expect(result.current.balanceWalletId).toBeUndefined()
     expect(result.current.isLoading).toBe(false)
+  })
+
+  /** Two empty wallets: the bitcoin one is named, by id as well, as the one a deposit
+   *  lands in and the one the send flow should open on. */
+  it("names the empty bitcoin wallet by id when it is offered", () => {
+    offered(walletOf(WalletCurrency.Usd, 0), walletOf(WalletCurrency.Btc, 0))
+
+    const { result } = renderHook(() => useInvestmentFunding(25000))
+
+    expect(result.current.balanceCurrency).toBe(WalletCurrency.Btc)
+    expect(result.current.balanceWalletId).toBe("wallet-BTC")
   })
 
   /**
@@ -171,10 +199,7 @@ describe("useInvestmentFunding", () => {
    */
   it("is loading until the price feed answers", () => {
     mockConvert.current = null
-    mockActiveWallet.current = {
-      wallets: [walletOf(WalletCurrency.Usd, 2_500_000)],
-      isReady: true,
-    }
+    offered(walletOf(WalletCurrency.Usd, 2_500_000))
 
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
@@ -182,8 +207,8 @@ describe("useInvestmentFunding", () => {
     expect(result.current.balanceUsd).toBe(0)
   })
 
-  it("is loading until the account's wallets are ready", () => {
-    mockActiveWallet.current = { wallets: [], isReady: false }
+  it("is loading until the send flow's wallets are ready", () => {
+    mockSendWallets.current = { wallets: undefined, btcWallet: undefined, loading: true }
 
     const { result } = renderHook(() => useInvestmentFunding(25000))
 
