@@ -1140,6 +1140,33 @@ query StatefulNotifications($after: String) {
   }
 }
 
+query UnacknowledgedBulletinKeys($first: Int!, $after: String) {
+  me {
+    id
+    unacknowledgedStatefulNotificationsWithBulletinEnabled(
+      first: $first
+      after: $after
+    ) {
+      pageInfo {
+        endCursor
+        hasNextPage
+        __typename
+      }
+      edges {
+        node {
+          id
+          bulletinKey
+          createdAt
+          __typename
+        }
+        __typename
+      }
+      __typename
+    }
+    __typename
+  }
+}
+
 query UnacknowledgedNotificationCount {
   me {
     id
