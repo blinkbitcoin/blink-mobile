@@ -85,6 +85,7 @@ import { StaleCloudBundleBulletin } from "@app/self-custodial/components/stale-c
 import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
+import { useAcknowledgeInvitationOnceSigned } from "@app/screens/card-screen/onboarding/investment-flow/investment-invitation-bulletin"
 import { useReconcileInvestmentPayment } from "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup"
 import { useCardInvestmentBulletin } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -407,6 +408,9 @@ export const HomeScreen: React.FC = () => {
   })
   /** A payment the record only knows as on its way is asked about, once per visit. */
   useReconcileInvestmentPayment()
+  /** The server's invitation card is retired by the signature; this catches one the
+   *  signing step could not retire itself, whenever the home holds a signed investment. */
+  useAcknowledgeInvitationOnceSigned(bulletins)
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
