@@ -145,6 +145,16 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
   }),
 }))
 
+/** The server's invitation bulletin is retired by the signature; its own spec covers
+ *  how, so here only the moment it is asked for matters. */
+const mockAcknowledgeInvestmentInvitation = jest.fn(() => Promise.resolve())
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/investment-invitation-bulletin",
+  () => ({
+    useAcknowledgeInvestmentInvitation: () => mockAcknowledgeInvestmentInvitation,
+  }),
+)
+
 /** Read through a getter so a test can arrive on the route with a different choice. */
 const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
 
@@ -1159,6 +1169,21 @@ describe("SignInvestScreen, where each outcome leads", () => {
     })
   })
 
+  /** The signature answers the server's invitation, so this is also the moment its
+   *  bulletin is retired; the step does not wait on that to move on. */
+  it("retires the invitation bulletin as it moves on", async () => {
+    await renderScreen()
+    await startedSession()
+    expect(mockAcknowledgeInvestmentInvitation).not.toHaveBeenCalled()
+
+    await act(async () => {
+      callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
+    })
+
+    expect(mockAcknowledgeInvestmentInvitation).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).toHaveBeenCalledTimes(1)
+  })
+
   /** The library names no envelope for a session minted without an id; the figure
    *  minted last is still the one the document names. */
   it("carries the figure when the library names no envelope", async () => {
@@ -1326,6 +1351,7 @@ describe("SignInvestScreen, where each outcome leads", () => {
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
     expect(mockDispatch).not.toHaveBeenCalled()
+    expect(mockAcknowledgeInvestmentInvitation).not.toHaveBeenCalled()
   })
 
   /** Declining lands the session back in idle, where the document is opened from; a

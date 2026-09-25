@@ -35,6 +35,7 @@ import {
   mintInvestmentAgreement,
   ROUTE_MISSING_CODE,
 } from "./investment-agreement"
+import { useAcknowledgeInvestmentInvitation } from "./investment-invitation-bulletin"
 import { resetToTransferStep } from "./transfer-invest-screen"
 import { useGivenUpWaiting } from "./use-given-up-waiting"
 
@@ -192,6 +193,7 @@ export const SignInvestScreen: React.FC = () => {
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { start: startCardInvestment, isAccountResolved } = useCardInvestmentProgress()
+  const acknowledgeInvestmentInvitation = useAcknowledgeInvestmentInvitation()
 
   /**
    * What the latest mint left behind, kept from the mint so the transfer step bills
@@ -244,7 +246,9 @@ export const SignInvestScreen: React.FC = () => {
    * the envelope that was signed; when the library names the envelope and it is not
    * that one, nothing is carried and the step does not move on. The same moment
    * records the investment, so the home's bulletin can steer the investor back to
-   * paying it if they leave first.
+   * paying it if they leave first, and retires the server's invitation, which the
+   * signature has answered. The acknowledgement is not waited on: the step moves on
+   * whether or not it lands.
    */
   const goToTransfer = React.useCallback(
     (result: { envelopeId?: string }) => {
@@ -265,9 +269,10 @@ export const SignInvestScreen: React.FC = () => {
 
       const investment = { selectedAmountUsd, settlementSats: minted?.settlementSats }
       startCardInvestment(investment)
+      acknowledgeInvestmentInvitation()
       navigation.dispatch(resetToTransferStep(investment))
     },
-    [navigation, selectedAmountUsd, startCardInvestment],
+    [navigation, selectedAmountUsd, startCardInvestment, acknowledgeInvestmentInvitation],
   )
 
   /**
