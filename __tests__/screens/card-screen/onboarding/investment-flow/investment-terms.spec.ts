@@ -44,9 +44,13 @@ describe("resolveInvestmentTerms", () => {
       expect(resolveInvestmentTerms(25000, quote).btcUsdRate).toBe(100000)
     })
 
-    /** The document names the zone, and Honduras holds UTC-6 all year. */
-    it("stamps the rate in Honduras time", () => {
-      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toBe("2026-09-07 09:09")
+    /** The document names the zone, and Honduras holds UTC-6 all year: the stamp says
+     *  which clock fixed the rate, as an offset that reads the same to every party and
+     *  on every device, since a bare time on a binding document says nothing. */
+    it("stamps the rate in Honduras time, naming the offset", () => {
+      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toBe(
+        "2026-09-07 09:09 UTC-06:00",
+      )
     })
 
     /**
