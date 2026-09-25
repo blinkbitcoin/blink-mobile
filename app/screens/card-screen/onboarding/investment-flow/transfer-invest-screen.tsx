@@ -12,11 +12,8 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import {
-  formatUnitCount,
-  formatUsdAmount,
-  resolveInvestmentTerms,
-} from "./investment-terms"
+import { formatUnitCount, formatUsdAmount } from "./investment-figures"
+import { resolveInvestmentTerms } from "./investment-terms"
 import { useInvestmentFunding, useInvestmentSats } from "./use-investment-funding"
 import { useInvestmentInvoice } from "./use-investment-invoice"
 
