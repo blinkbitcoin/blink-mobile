@@ -70,6 +70,21 @@ export const ActiveWalletStatus = {
 export type ActiveWalletStatus =
   (typeof ActiveWalletStatus)[keyof typeof ActiveWalletStatus]
 
+/**
+ * The statuses that leave a self-custodial wallet unusable, so the payment
+ * screens show the offline notice instead of their own UI.
+ *
+ * Blocking is a wider question than recovering: Unavailable belongs here, where
+ * it means the screens have no wallet to offer, but not in the set the provider
+ * retries on foreground, where it is the resting state of every custodial-only
+ * user and nothing a retry could change.
+ */
+export const SELF_CUSTODIAL_BLOCKED_STATUSES: readonly ActiveWalletStatus[] = [
+  ActiveWalletStatus.Offline,
+  ActiveWalletStatus.Error,
+  ActiveWalletStatus.Unavailable,
+]
+
 export type ActiveWalletState = {
   wallets: WalletState[]
   status: ActiveWalletStatus

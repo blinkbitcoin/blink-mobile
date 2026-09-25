@@ -1,5 +1,5 @@
 import React from "react"
-import { Text } from "react-native"
+import { AppState, Text } from "react-native"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, render, renderHook, waitFor } from "@testing-library/react-native"
 
@@ -231,27 +231,30 @@ const fireInitialSynced = async (
   })
 }
 
-describe("SelfCustodialWalletProvider", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockStableBalanceEnabled = true
-    mockGetMnemonicForAccount.mockResolvedValue(null)
-    mockGetMnemonicNetworkForAccount.mockResolvedValue("regtest")
-    mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
-    mockDisconnectSdk.mockResolvedValue(undefined)
-    mockAddSdkEventListener.mockResolvedValue("listener-id")
-    mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockGetUserSettings.mockResolvedValue({
-      stableBalanceActiveLabel: undefined,
-      sparkPrivateModeEnabled: false,
-    })
-    mockState.activeAccountId = "test-self-custodial-uuid"
-    mockListSelfCustodialAccounts.mockResolvedValue([
-      { id: "test-self-custodial-uuid", lightningAddress: null },
-    ])
-    mockGetLightningAddress.mockResolvedValue(null)
-    mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
+/** One self-custodial account, nothing connected: the state both describes start from. */
+const resetToDisconnectedWallet = () => {
+  jest.clearAllMocks()
+  mockStableBalanceEnabled = true
+  mockGetMnemonicForAccount.mockResolvedValue(null)
+  mockGetMnemonicNetworkForAccount.mockResolvedValue("regtest")
+  mockInitSdk.mockRejectedValue(new Error("SDK not available in test"))
+  mockDisconnectSdk.mockResolvedValue(undefined)
+  mockAddSdkEventListener.mockResolvedValue("listener-id")
+  mockRemoveSdkEventListener.mockResolvedValue(undefined)
+  mockGetUserSettings.mockResolvedValue({
+    stableBalanceActiveLabel: undefined,
+    sparkPrivateModeEnabled: false,
   })
+  mockState.activeAccountId = "test-self-custodial-uuid"
+  mockListSelfCustodialAccounts.mockResolvedValue([
+    { id: "test-self-custodial-uuid", lightningAddress: null },
+  ])
+  mockGetLightningAddress.mockResolvedValue(null)
+  mockSetSelfCustodialLightningAddress.mockResolvedValue(undefined)
+}
+
+describe("SelfCustodialWalletProvider", () => {
+  beforeEach(resetToDisconnectedWallet)
 
   it("renders children", async () => {
     const { getByText } = render(
@@ -1727,5 +1730,142 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
         }),
       )
     })
+  })
+})
+
+describe("SelfCustodialWalletProvider — foreground recovery", () => {
+  /**
+   * Both the provider and the lifecycle listen for "active"; this drives every
+   * listener that is still subscribed, which is what the OS does. Removal is
+   * tracked rather than ignored: both re-subscribe when their dependencies
+   * change, and calling a handler they already removed would run it with a stale
+   * closure production never sees — a wallet that has since connected still
+   * looking unconnected.
+   */
+  const liveForegroundListeners = new Set<(state: string) => void>()
+
+  // Re-armed per test rather than once for the describe: other describes in
+  // this file spy on the same method from inside their tests, and a spy
+  // installed at collection time is whichever of them ran last.
+  beforeEach(() => {
+    resetToDisconnectedWallet()
+    liveForegroundListeners.clear()
+    jest.spyOn(AppState, "addEventListener").mockImplementation(((
+      event: string,
+      handler: (state: string) => void,
+    ) => {
+      if (event === "change") liveForegroundListeners.add(handler)
+      return {
+        remove: () => {
+          liveForegroundListeners.delete(handler)
+        },
+      }
+    }) as unknown as typeof AppState.addEventListener)
+  })
+
+  const foreground = () => {
+    liveForegroundListeners.forEach((handler) => handler("active"))
+  }
+
+  /**
+   * Foregrounding is the first thing anyone tries, and it used to do nothing for
+   * a wallet that never started: the lifecycle's own handler refreshes, and a
+   * refresh returns immediately without an SDK.
+   */
+  it("re-runs the lifecycle when the app returns to the foreground with no wallet", async () => {
+    // A wallet that never started: the network marker could not be confirmed,
+    // so there is no SDK for the lifecycle's own refresh to work with.
+    // Once per run, twice, rather than for the file — an implementation set
+    // here outlives clearAllMocks and would fail every later test.
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    const mockValidate = jest.requireMock(
+      "@app/self-custodial/providers/validate-network",
+    ).validateStoredNetwork
+    mockValidate.mockResolvedValueOnce(false).mockResolvedValueOnce(false)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Error)
+    })
+
+    const readsBefore = mockGetMnemonicForAccount.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    expect(result.current.sdk).toBeNull()
+    // The retry bumps the count the lifecycle effect depends on, so it starts
+    // over — which is the whole point, since refreshing cannot.
+    expect(mockGetMnemonicForAccount.mock.calls.length).toBeGreaterThan(readsBefore)
+  })
+
+  /**
+   * Unavailable is where every custodial-only user rests: the provider mounts
+   * for them too, finds no self-custodial account, and stops. Retrying that
+   * would re-run the whole lifecycle on each foreground for people this feature
+   * never touches, and it could not connect anything if it did.
+   */
+  it("leaves a device with no self-custodial account alone on every foreground", async () => {
+    mockState.activeAccountId = "custodial-account"
+    mockListSelfCustodialAccounts.mockResolvedValue([])
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    })
+
+    const readsBefore = mockGetMnemonicForAccount.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    expect(mockGetMnemonicForAccount.mock.calls).toHaveLength(readsBefore)
+  })
+
+  /**
+   * The other Unavailable: an account whose mnemonic is gone. The lifecycle
+   * treats that as terminal, so re-reading the keystore would return the same
+   * answer however many times the user foregrounds the app.
+   */
+  it("leaves an account with no mnemonic alone, since a retry reads the same answer", async () => {
+    mockGetMnemonicForAccount.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.status).toBe(ActiveWalletStatus.Unavailable)
+    })
+
+    const readsBefore = mockGetMnemonicForAccount.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    expect(mockGetMnemonicForAccount.mock.calls).toHaveLength(readsBefore)
+  })
+
+  it("leaves a connected wallet to the refresh it already has", async () => {
+    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+    mockInitSdk.mockResolvedValue({
+      addEventListener: jest.fn().mockResolvedValue("listener-id"),
+      disconnect: jest.fn(),
+    })
+
+    const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => {
+      expect(result.current.sdk).not.toBeNull()
+    })
+
+    const initsBefore = mockInitSdk.mock.calls.length
+    await act(async () => {
+      foreground()
+    })
+    await flushEffects()
+
+    // No re-initialisation: with an SDK the lifecycle's refresh is the right
+    // answer and this path stays out of the way.
+    expect(mockInitSdk.mock.calls).toHaveLength(initsBefore)
   })
 })

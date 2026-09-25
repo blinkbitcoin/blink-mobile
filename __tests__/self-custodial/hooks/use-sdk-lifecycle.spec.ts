@@ -164,10 +164,16 @@ describe("useSdkLifecycle", () => {
 
     /**
      * Unavailable is terminal for an account: it reads as "there is no wallet
-     * here". A keystore that could not answer says nothing of the sort, and
-     * Error is the status the retry and backoff wiring already listens on.
+     * here". A keystore that could not answer says nothing of the sort. Recovery
+     * from here is not automatic — the backoff retry is armed inside
+     * refreshWallets and gated on a live SDK, which this path never connected.
+     *
+     * That null SDK is also the premise PaymentOfflineNotice's retry branches
+     * on, so it is asserted here rather than assumed: the notice's own spec
+     * mocks the provider, and would keep passing if a stale SDK ever survived
+     * this transition and quietly turned the fix into a no-op.
      */
-    it("falls to Error, not Unavailable, when the keystore cannot answer", async () => {
+    it("falls to Error with no connected SDK when the keystore cannot answer", async () => {
       mockReadMnemonicWithStatus.mockResolvedValue({
         status: "failed",
         err: new Error("keystore locked"),
@@ -178,6 +184,7 @@ describe("useSdkLifecycle", () => {
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Error)
       })
+      expect(result.current.sdk).toBeNull()
       expect(mockInitSdk).not.toHaveBeenCalled()
     })
 
