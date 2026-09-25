@@ -21,7 +21,15 @@ import {
   resolveSettlementQuote,
 } from "./investment-terms"
 
-/** The labels the agreement's templates give the figures the app computes. */
+/**
+ * The labels the agreement's templates give the figures the app computes.
+ *
+ * Every one of them must name a Text tab on the signer's role of the template the
+ * service mints from (its `DOCUSIGN_TEMPLATE_ID`): DocuSign matches a template-role
+ * value by tab type and label, so a label that names a Number, Date or List tab is
+ * ignored with a 200 and an empty, editable field, which nothing in the mint's answer
+ * reveals. The rendered document is checked against these labels before a release.
+ */
 export const AGREEMENT_LABELS = {
   units: "number_of_units",
   pricePerUnitUsd: "price_per_unit_usd",
@@ -53,19 +61,37 @@ const FAILURE_CODE = "ENVELOPE_CREATION_FAILED"
  *  connection rather than as a mint that failed. */
 const UNREACHABLE_CODE = "NETWORK_ERROR"
 
-/** The rejection carries a `code` because that is what the signing component reads to
- *  decide the wording; without one it falls back to a code that discards the message. */
-const signingError = (message: string, code: string): Error =>
-  Object.assign(new Error(message), { code })
+/** The service answered, but does not serve the mint at all: a deployment behind the
+ *  app, which no retry cures. The app's own code, since the library has none for it. */
+export const ROUTE_MISSING_CODE = "MINT_ROUTE_MISSING"
 
-export const signingRefusal = (message: string): Error =>
-  signingError(message, REFUSAL_CODE)
-export const signingUnauthorized = (message: string): Error =>
-  signingError(message, UNAUTHORIZED_CODE)
-export const signingFailure = (message: string): Error =>
-  signingError(message, FAILURE_CODE)
-export const signingUnreachable = (message: string): Error =>
+/** What a failed mint carries besides its message: the code the signing component
+ *  reads to decide the wording, and the status the service answered, for the log. */
+export type SigningError = Error & { code: string; status?: number }
+
+/**
+ * The rejection carries a `code` because that is what the signing component reads to
+ * decide the wording; without one it falls back to a code that discards the message.
+ * The library hands the screen the code and the message alone, so the status is for
+ * whoever catches this before the library does.
+ */
+const signingError = (message: string, code: string, status?: number): SigningError =>
+  Object.assign(new Error(message), { code, status })
+
+/** Whether a rejection is one of these, with the status it carries. */
+export const isSigningError = (error: unknown): error is SigningError =>
+  error instanceof Error && typeof (error as { code?: unknown }).code === "string"
+
+export const signingRefusal = (message: string, status?: number): SigningError =>
+  signingError(message, REFUSAL_CODE, status)
+export const signingUnauthorized = (message: string, status?: number): SigningError =>
+  signingError(message, UNAUTHORIZED_CODE, status)
+export const signingFailure = (message: string, status?: number): SigningError =>
+  signingError(message, FAILURE_CODE, status)
+export const signingUnreachable = (message: string): SigningError =>
   signingError(message, UNREACHABLE_CODE)
+export const signingRouteMissing = (message: string, status?: number): SigningError =>
+  signingError(message, ROUTE_MISSING_CODE, status)
 
 /** A value written onto the document, which the signer cannot change. */
 type LockedValue = { value: string; locked: true }
