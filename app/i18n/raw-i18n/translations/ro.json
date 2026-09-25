@@ -3718,6 +3718,20 @@
         },
         "buttonText": "Continuă la semnătură"
       },
+      "SignInvest": {
+        "loading": "Îți pregătim acordul.",
+        "notAvailable": "Semnarea nu este încă disponibilă. Încearcă din nou mai târziu.",
+        "errors": {
+          "envelopeCreationFailed": "Acordul nu a putut fi pregătit. Încearcă din nou.",
+          "networkError": "Conexiunea s-a pierdut. Verifică rețeaua și încearcă din nou.",
+          "unauthorized": "Sesiunea ta nu mai este validă. Autentifică-te din nou.",
+          "sessionExpired": "Sesiunea de semnare a expirat. Încearcă din nou.",
+          "providerUnavailable": "Serviciul de semnare este temporar indisponibil. Încearcă din nou mai târziu.",
+          "routeMissing": "Semnarea nu este încă disponibilă pe acest server. Actualizează aplicația sau încearcă din nou mai târziu.",
+          "envelopeMismatch": "Documentul semnat nu este cel pregătit de acest pas. Încearcă din nou.",
+          "generic": "Ceva nu a mers bine. Încearcă din nou."
+        }
+      },
       "TransferInvest": {
         "title": "Transferă-ți investiția",
         "paragraphs": {

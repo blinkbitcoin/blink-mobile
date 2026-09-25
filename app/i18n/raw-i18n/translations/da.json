@@ -3718,6 +3718,20 @@
         },
         "buttonText": "Fortsæt til underskrift"
       },
+      "SignInvest": {
+        "loading": "Forbereder din aftale.",
+        "notAvailable": "Underskrift er ikke tilgængelig endnu. Prøv venligst igen senere.",
+        "errors": {
+          "envelopeCreationFailed": "Aftalen kunne ikke forberedes. Prøv venligst igen.",
+          "networkError": "Forbindelsen blev afbrudt. Tjek venligst dit netværk, og prøv igen.",
+          "unauthorized": "Din session er ikke længere gyldig. Log venligst ind igen.",
+          "sessionExpired": "Underskriftssessionen udløb. Prøv venligst igen.",
+          "providerUnavailable": "Underskriftstjenesten er midlertidigt utilgængelig. Prøv venligst igen senere.",
+          "routeMissing": "Underskrift er ikke tilgængelig på denne server endnu. Opdater venligst appen, eller prøv igen senere.",
+          "envelopeMismatch": "Det underskrevne dokument er ikke det, som dette trin forberedte. Prøv venligst igen.",
+          "generic": "Noget gik galt. Prøv venligst igen."
+        }
+      },
       "TransferInvest": {
         "title": "Overfør din investering",
         "paragraphs": {

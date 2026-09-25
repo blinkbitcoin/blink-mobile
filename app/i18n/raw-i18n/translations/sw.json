@@ -3718,6 +3718,20 @@
         },
         "buttonText": "Endelea kwa kusaini"
       },
+      "SignInvest": {
+        "loading": "Tunaandaa makubaliano yako.",
+        "notAvailable": "Kusaini bado hakupatikani. Tafadhali jaribu tena baadaye.",
+        "errors": {
+          "envelopeCreationFailed": "Makubaliano hayakuweza kuandaliwa. Tafadhali jaribu tena.",
+          "networkError": "Muunganisho umekatika. Tafadhali angalia mtandao wako na ujaribu tena.",
+          "unauthorized": "Kipindi chako hakitumiki tena. Tafadhali ingia tena.",
+          "sessionExpired": "Kipindi cha kusaini kimeisha. Tafadhali jaribu tena.",
+          "providerUnavailable": "Huduma ya kusaini haipatikani kwa sasa. Tafadhali jaribu tena baadaye.",
+          "routeMissing": "Kusaini bado hakupatikani kwenye seva hii. Tafadhali sasisha programu au ujaribu tena baadaye.",
+          "envelopeMismatch": "Hati iliyosainiwa si ile ambayo hatua hii iliandaa. Tafadhali jaribu tena.",
+          "generic": "Hitilafu imetokea. Tafadhali jaribu tena."
+        }
+      },
       "TransferInvest": {
         "title": "Hamisha uwekezaji wako",
         "paragraphs": {
