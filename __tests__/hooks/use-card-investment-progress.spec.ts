@@ -283,6 +283,50 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
+  describe("recordInvitationBulletin", () => {
+    it("writes down the invitation bulletin the signature answered", () => {
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.recordInvitationBulletin("notif-invite"))
+
+      expect(applyLastUpdate(signed)?.cardInvestmentByAccountId?.[CUSTODIAL_ID]).toEqual({
+        ...INVESTMENT,
+        invitationBulletinId: "notif-invite",
+      })
+    })
+
+    /** A signature answers one invitation; a lookup repeated later must not move it. */
+    it("keeps the first one written", () => {
+      const signed = stateWith({
+        [CUSTODIAL_ID]: { ...INVESTMENT, invitationBulletinId: "notif-first" },
+      })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.recordInvitationBulletin("notif-second"))
+
+      expect(applyLastUpdate(signed)).toBe(signed)
+    })
+
+    it("changes nothing when nothing was signed", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.recordInvitationBulletin("notif-invite"))
+
+      expect(applyLastUpdate(baseState)).toBe(baseState)
+    })
+
+    it("leaves an unloaded store alone", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.recordInvitationBulletin("notif-invite"))
+
+      expect(applyLastUpdate(undefined)).toBeUndefined()
+    })
+  })
+
   describe("recordInvoice", () => {
     it("stamps the issued invoice on the signed investment", () => {
       const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
@@ -373,6 +417,23 @@ describe("useCardInvestmentProgress", () => {
   })
 
   describe("clear", () => {
+    /** A new invitation forgets the investment it supersedes, but only the one the
+     *  decision was made on: an agreement signed in the meantime answers the new one. */
+    it("forgets only the investment signed at the given moment when asked to", () => {
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.clear({ onlyIfSignedAt: INVESTMENT.signedAt }))
+      expect(applyLastUpdate(signed)?.cardInvestmentByAccountId).toEqual({})
+
+      act(() => result.current.clear({ onlyIfSignedAt: INVESTMENT.signedAt - 1 }))
+      expect(applyLastUpdate(signed)).toBe(signed)
+
+      act(() => result.current.clear({ onlyIfSignedAt: INVESTMENT.signedAt }))
+      expect(applyLastUpdate(baseState)).toBe(baseState)
+    })
+
     it("forgets the active account's investment", () => {
       const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
       mockPersistentState = signed
@@ -399,6 +460,7 @@ describe("useCardInvestmentProgress", () => {
     rerender({})
 
     expect(result.current.start).toBe(first.start)
+    expect(result.current.recordInvitationBulletin).toBe(first.recordInvitationBulletin)
     expect(result.current.recordInvoice).toBe(first.recordInvoice)
     expect(result.current.markPaid).toBe(first.markPaid)
     expect(result.current.clear).toBe(first.clear)

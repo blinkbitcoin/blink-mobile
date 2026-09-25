@@ -81,6 +81,9 @@ type CardInvestmentProgressState = {
   /** Records the signed agreement, stamped with the moment; the home nags about its
    *  payment from here on. */
   start: (investment: CardInvestmentStart) => void
+  /** Records which of the server's invitation bulletins the signature answered, so the
+   *  home can tell it from a later invitation. */
+  recordInvitationBulletin: (notificationId: string) => void
   /** Records the invoice the transfer step was issued, to be paid rather than reissued
    *  on a return while it can still be paid. */
   recordInvoice: (paymentRequest: string) => void
@@ -89,8 +92,10 @@ type CardInvestmentProgressState = {
   isInvestmentInvoice: (paymentRequest: string | undefined) => boolean
   /** Records the payment; the home welcomes the investor from here on. */
   markPaid: () => void
-  /** Forgets the investment, once the investor has closed the welcome. */
-  clear: () => void
+  /** Forgets the investment: once the investor has closed the welcome, or once a new
+   *  invitation has superseded it. The latter names the signature it decided on, so an
+   *  agreement signed while it was deciding is not the one forgotten. */
+  clear: (options?: { onlyIfSignedAt: number }) => void
 }
 
 /**
@@ -121,7 +126,8 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   )
 
   /** Nothing signed means nothing to add to: an invoice or a payment with no investment
-   *  behind it leaves the record as it is rather than inventing one. */
+   *  behind it leaves the record as it is rather than inventing one. A change that hands
+   *  the record back unchanged leaves the state as it is too, so nothing is written. */
   const amend = useCallback(
     (change: (current: CardInvestmentProgress) => CardInvestmentProgress) => {
       if (!accountId) return
@@ -129,10 +135,24 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
         if (!state) return state
         const current = getCardInvestment(state, accountId, Date.now())
         if (!current) return state
-        return withCardInvestment(state, accountId, change(current))
+        const next = change(current)
+        return next === current ? state : withCardInvestment(state, accountId, next)
       })
     },
     [accountId, updateState],
+  )
+
+  /** The first one written stands: a signature answers one invitation, and a lookup
+   *  repeated after the record was written must not move it to another. */
+  const recordInvitationBulletin = useCallback(
+    (notificationId: string) => {
+      amend((current) =>
+        current.invitationBulletinId
+          ? current
+          : { ...current, invitationBulletinId: notificationId },
+      )
+    },
+    [amend],
   )
 
   const recordInvoice = useCallback(
@@ -166,10 +186,20 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [progress],
   )
 
-  const clear = useCallback(() => {
-    if (!accountId) return
-    updateState((state) => state && withoutCardInvestment(state, accountId))
-  }, [accountId, updateState])
+  const clear = useCallback(
+    (options?: { onlyIfSignedAt: number }) => {
+      if (!accountId) return
+      updateState((state) => {
+        if (!state) return state
+        if (options) {
+          const current = getCardInvestment(state, accountId, Date.now())
+          if (current?.signedAt !== options.onlyIfSignedAt) return state
+        }
+        return withoutCardInvestment(state, accountId)
+      })
+    },
+    [accountId, updateState],
+  )
 
   return {
     progress,
@@ -178,6 +208,7 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     isAccountResolved: accountId !== null,
     refetchAccount,
     start,
+    recordInvitationBulletin,
     recordInvoice,
     isInvestmentInvoice,
     markPaid,
