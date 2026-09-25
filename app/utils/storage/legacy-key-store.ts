@@ -16,7 +16,7 @@ import type { SecureRead } from "./secure-store"
  * the only door left. So on iOS the reinstall sweep is disarmed before every
  * touch rather than depending on which caller the boot path reaches first —
  * which is why the mnemonics are now cleared deliberately, by
- * `clearUninstallSurvivingCredentials`, instead of by that sweep. What it
+ * `clearUninstallSurvivingKeyMaterial`, instead of by that sweep. What it
  * clears them WITH, for the accounts no list names, is `eraseEntireLegacyStore`
  * below: the same outcome as the sweep, scoped to this store's own service.
  *

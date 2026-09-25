@@ -61,7 +61,7 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 23,
+  schemaVersion: 24,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
   activeAccountId: "custodial-default",

@@ -311,8 +311,29 @@ type PersistentState_23 = Omit<PersistentState_22, "schemaVersion"> & {
   selfCustodialFiatCurrencies?: StoredFiatCurrencies
 }
 
-const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>
+type PersistentState_24 = Omit<PersistentState_23, "schemaVersion"> & {
+  schemaVersion: 24
+  /**
+   * A reinstall wipe of the key material that is still owed.
+   *
+   * The fresh-install branch only fires while the blob is absent, so the erase
+   * used to be retried by leaving the blob unwritten — which also re-triggered
+   * the session wipe, signing the user out on every launch with nothing to end
+   * the loop. Carrying it here instead lets the blob be written, which ends
+   * that loop, while the next boot still knows the erase has not happened.
+   *
+   * It lives in the blob rather than the keychain on purpose: an uninstall
+   * clears this, and a genuine reinstall should start the whole verdict again.
+   */
+  pendingReinstallKeyMaterialWipe?: boolean
+}
+
+const migrate24ToCurrent = (state: PersistentState_24): Promise<PersistentState> =>
   Promise.resolve(state)
+
+/** Adds the optional owed-reinstall-wipe marker; nothing to backfill. */
+const migrate23ToCurrent = (state: PersistentState_23): Promise<PersistentState> =>
+  migrate24ToCurrent({ ...state, schemaVersion: 24 })
 
 /** Adds the optional device-wide currency metadata; nothing to backfill. */
 const migrate22ToCurrent = (state: PersistentState_22): Promise<PersistentState> =>
@@ -494,6 +515,7 @@ type StateMigrations = {
   21: (state: PersistentState_21) => Promise<PersistentState>
   22: (state: PersistentState_22) => Promise<PersistentState>
   23: (state: PersistentState_23) => Promise<PersistentState>
+  24: (state: PersistentState_24) => Promise<PersistentState>
 }
 
 const stateMigrations: StateMigrations = {
@@ -518,12 +540,13 @@ const stateMigrations: StateMigrations = {
   21: migrate21ToCurrent,
   22: migrate22ToCurrent,
   23: migrate23ToCurrent,
+  24: migrate24ToCurrent,
 }
 
-export type PersistentState = PersistentState_23
+export type PersistentState = PersistentState_24
 
 export const defaultPersistentState: PersistentState = {
-  schemaVersion: 23,
+  schemaVersion: 24,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }
@@ -583,7 +606,8 @@ export const migratePersistentState = async (
     | 20
     | 21
     | 22
-    | 23 = data.schemaVersion
+    | 23
+    | 24 = data.schemaVersion
   try {
     const migration = stateMigrations[schemaVersion]
     const state = await migration(data)
