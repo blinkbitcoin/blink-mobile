@@ -1,35 +1,45 @@
 import * as React from "react"
-import { ActivityIndicator, View } from "react-native"
+import { ActivityIndicator, Linking, View } from "react-native"
 import { WebView, WebViewMessageEvent } from "react-native-webview"
+import type { ShouldStartLoadRequest } from "react-native-webview/lib/WebViewTypes"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import {
   createHostedFormSource,
-  getErrorMessage,
   useESignature,
 } from "@blinkbitcoin/esign-react-native/webform"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import { logError } from "@app/utils/log-error"
 
-import { mintSigningInstance, resolveMintOrigin } from "./esign-mint"
-import { mintInvestmentAgreement } from "./investment-agreement"
+import {
+  mintSigningInstance,
+  resolveMintOrigin,
+  trustedRemoteMintOrigin,
+} from "./esign-mint"
+import {
+  isSigningError,
+  mintInvestmentAgreement,
+  ROUTE_MISSING_CODE,
+} from "./investment-agreement"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
-/** Offline is a status of its own, not an error, so it carries no code. This is the one
- *  the library words as a lost connection, which is what the signer is looking at. */
-const OFFLINE_MESSAGE_CODE = "NETWORK_ERROR"
+/** The code the library files a mint refused for a reason the signer should read under;
+ *  its message is the service's own words, and the one case the copy is not the app's. */
+const REFUSAL_CODE = "VALIDATION_ERROR"
 
 /**
  * How long a cold open waits for the price feed before it stops waiting and says so. A
@@ -61,9 +71,10 @@ const PAGE_READY_POLL_LIMIT = PAGE_READY_TIMEOUT_MS / PAGE_READY_POLL_MS
  * the shell and the redirects it arrives through carry no text at all until the
  * interface is drawn. The WebView runs this on every page it loads, so it polls rather
  * than assumes; each copy stops once it has reported, or once the step would have
- * uncovered the page anyway.
+ * uncovered the page anyway. Exported for the spec that runs it, since no test renders
+ * a real WebView.
  */
-const REPORT_PAGE_READY_SCRIPT = `
+export const REPORT_PAGE_READY_SCRIPT = `
   (function () {
     var looks = 0;
     var tick = setInterval(function () {
@@ -88,6 +99,73 @@ const isPageReadyMessage = (data: string): boolean => {
 }
 
 /**
+ * The hosts the signing happens on: DocuSign's own, which the signing page and the
+ * redirects it arrives through live on, and the mint origin, which serves the page the
+ * outcome comes back through. Any other navigation is a link inside the document, and
+ * belongs in the browser rather than in this WebView.
+ */
+const SIGNING_PAGE_HOSTS = ["docusign.net", "docusign.com"]
+
+/** The scheme and host of a url, lowercased, or null for anything that has none. Only a
+ *  plain host name and at most a port count as one: userinfo, a backslash or an escape
+ *  before the first slash would let a url parser reach a different host than the one
+ *  a suffix check reads. */
+const originOf = (url: string): string | null =>
+  url.match(/^(https?:\/\/[a-z0-9.-]+(?::\d{1,5})?)(?:[/?#]|$)/i)?.[1]?.toLowerCase() ??
+  null
+
+const hostOf = (origin: string): string =>
+  origin.replace(/^https?:\/\//, "").split(":")[0]
+
+const isSigningPageHost = (host: string): boolean =>
+  SIGNING_PAGE_HOSTS.some((allowed) => host === allowed || host.endsWith(`.${allowed}`))
+
+/** Whether the WebView may move to this url: a page of the signing itself. The empty
+ *  page a WebView starts on counts, since it is where the first load comes from. */
+export const isSigningPageUrl = (url: string, mintOrigin: string): boolean => {
+  if (url === "about:blank") return true
+  const origin = originOf(url)
+  if (!origin) return false
+  return origin === mintOrigin.toLowerCase() || isSigningPageHost(hostOf(origin))
+}
+
+/**
+ * The copy for a failed session, from the app's own strings: the library's are English
+ * only. A refusal carries the service's reason, which is worded for the signer already,
+ * so it is shown as is, the way the library shows it.
+ */
+const signingErrorCopy = (
+  LL: TranslationFunctions,
+  error: { code: string; message?: string } | null,
+): string => {
+  const copy = LL.CardFlow.Onboarding.SignInvest.errors
+  if (error?.code === REFUSAL_CODE && error.message) return error.message
+
+  const byCode: Record<string, () => string> = {
+    ENVELOPE_CREATION_FAILED: copy.envelopeCreationFailed,
+    NETWORK_ERROR: copy.networkError,
+    UNAUTHORIZED: copy.unauthorized,
+    SESSION_EXPIRED: copy.sessionExpired,
+    PROVIDER_UNAVAILABLE: copy.providerUnavailable,
+    [ROUTE_MISSING_CODE]: copy.routeMissing,
+  }
+  return (byCode[error?.code ?? ""] ?? copy.generic)()
+}
+
+/** The schemes a link inside the document may be handed to the phone under. */
+const EXTERNAL_LINK_SCHEMES = /^(https?|mailto|tel):/i
+
+/** What a mint left behind: the envelope it opened, the satoshis its document names,
+ *  and the origin it was made at, kept together so the figure is never read against
+ *  another envelope and the session's messages are checked against the service that
+ *  actually minted it, not against whatever the origin has become since. */
+type MintedTerms = {
+  envelopeId?: string
+  settlementSats: number
+  origin: string
+}
+
+/**
  * The signing step between the Term Sheet and the transfer: the agreement is minted from
  * its DocuSign templates and signed on the documents themselves, embedded here. Signing
  * advances to the transfer step; cancelling or declining returns to the Term Sheet,
@@ -109,23 +187,33 @@ export const SignInvestScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const { LL } = useI18nContext()
+  const copy = LL.CardFlow.Onboarding.SignInvest
   const {
     appConfig: { galoyInstance, token },
   } = useAppConfig()
+  const { cardInvestmentEsignMintUrl } = useRemoteConfig()
   const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   /**
-   * The satoshis the minted agreement settles at, kept from the mint so the transfer step
-   * bills exactly the figure the signed document names.
+   * What the latest mint left behind, kept from the mint so the transfer step bills
+   * exactly the figure the signed document names.
    *
    * A ref rather than state: the signing source is rebuilt whenever what it closes over
    * changes, and a state update here would restart the session the moment the document
    * opened. It is written before the signer can reach the end, so it is set by the time
-   * the outcome lands.
+   * the outcome lands. Only the latest mint writes it: the library gives up on a mint
+   * after a while but cannot stop it, and one that lands after the signer has moved on
+   * to a fresh one must not put the older price's figure under the newer document.
    */
-  const settlementSats = React.useRef<number | undefined>(undefined)
+  const mintedTerms = React.useRef<MintedTerms | undefined>(undefined)
+  const mintCount = React.useRef(0)
+
+  /** The status the service answered the last failed mint with. The library hands the
+   *  screen a failure's code and message alone, so the status is kept here on the way
+   *  through, for the log to name beside the code. */
+  const lastMintStatus = React.useRef<number | undefined>(undefined)
 
   /** The price of one bitcoin in whole cents, or null while the feed has not answered:
    *  the rate the agreement states, taken with its cents rather than as the per-satoshi
@@ -145,14 +233,42 @@ export const SignInvestScreen: React.FC = () => {
     mintInputs.current = { token, usdCentsPerBtc }
   }, [token, usdCentsPerBtc])
 
-  /** Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
-   *  screen behind would let a back swipe land on a finished session with no way on. */
+  /**
+   * Set when the session that completed is not the envelope this step minted last. The
+   * transfer step would bill the figure of one document against the signature on
+   * another, so the step stops and says so instead of moving on.
+   */
+  const [hasSignedOtherEnvelope, setHasSignedOtherEnvelope] = React.useState(false)
+
+  /**
+   * Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
+   * screen behind would let a back swipe land on a finished session with no way on.
+   * The figure carried is the one minted with the envelope that was signed; when the
+   * library names the envelope and it is not that one, nothing is carried and the step
+   * does not move on.
+   */
   const goToTransfer = React.useCallback(
-    () =>
+    (result: { envelopeId?: string }) => {
+      const minted = mintedTerms.current
+      const isOtherEnvelope =
+        result.envelopeId !== undefined &&
+        minted?.envelopeId !== undefined &&
+        result.envelopeId !== minted.envelopeId
+      if (isOtherEnvelope) {
+        logError({
+          scope: "card-investment-esign",
+          error: new Error("the signed envelope is not the one minted last"),
+          context: { signed: result.envelopeId, minted: minted?.envelopeId },
+        })
+        setHasSignedOtherEnvelope(true)
+        return
+      }
+
       navigation.replace("cardOnboardingTransferInvestScreen", {
         selectedAmountUsd,
-        settlementSats: settlementSats.current,
-      }),
+        settlementSats: minted?.settlementSats,
+      })
+    },
     [navigation, selectedAmountUsd],
   )
 
@@ -168,21 +284,30 @@ export const SignInvestScreen: React.FC = () => {
   }, [navigation])
 
   /** Stays on the screen on purpose: the retry below is what a failed session needs, and
-   *  navigating away would tear it down. Leaving is the close button's job. */
+   *  navigating away would tear it down. Leaving is the close button's job. The error is
+   *  logged as it came, stack and identity included, with its code and the status the
+   *  service answered beside it. */
   const reportSigningError = React.useCallback(
     (error: { code: string; message: string }) =>
       logError({
         scope: "card-investment-esign",
-        error: new Error(error.message),
-        context: { code: error.code },
+        error,
+        context: { code: error.code, status: lastMintStatus.current },
       }),
     [],
   )
 
-  /** The service's own origin, which is what mints the envelope. It also serves the
-   *  page that posts the outcome back, but a WebView message carries no origin, so the
-   *  library cannot check it on this platform and the session is not told one. */
-  const mintOrigin = resolveMintOrigin(galoyInstance.esignMintUrl)
+  /**
+   * The service's own origin, which is what mints the envelope and serves the page the
+   * outcome comes back through, so it is also what a message from the WebView is checked
+   * against. Remote config names it first, so it can be switched or withdrawn without a
+   * release; the instance's value stands until it does. Empty means this build cannot
+   * mint anywhere, which the step says instead of offering a retry that cannot win.
+   */
+  const mintOrigin = resolveMintOrigin(
+    trustedRemoteMintOrigin(cardInvestmentEsignMintUrl) || galoyInstance.esignMintUrl,
+  )
+  const isSigningAvailable = mintOrigin !== ""
 
   /**
    * Rebuilt only when the chosen amount or the service changes: a new source on every
@@ -198,15 +323,33 @@ export const SignInvestScreen: React.FC = () => {
       createHostedFormSource({
         createInstance: async () => {
           const { token: session, usdCentsPerBtc: price } = mintInputs.current
+          mintCount.current += 1
+          const generation = mintCount.current
 
+          /** A mint the library gave up on lands here late; a newer one has written
+           *  the terms since, and this one is not the document the signer sees. */
+          const isLatestMint = () => generation === mintCount.current
+
+          lastMintStatus.current = undefined
           const agreement = await mintInvestmentAgreement({
             totalUsd: selectedAmountUsd,
             usdCentsPerBtc: price,
             mint: (prefill) =>
               mintSigningInstance({ origin: mintOrigin, token: session, prefill }),
+          }).catch((error: unknown) => {
+            if (isSigningError(error) && isLatestMint()) {
+              lastMintStatus.current = error.status
+            }
+            throw error
           })
 
-          settlementSats.current = agreement.settlementSats
+          if (isLatestMint()) {
+            mintedTerms.current = {
+              envelopeId: agreement.minted.envelopeId,
+              settlementSats: agreement.settlementSats,
+              origin: mintOrigin,
+            }
+          }
 
           return agreement.minted
         },
@@ -259,8 +402,11 @@ export const SignInvestScreen: React.FC = () => {
    * Started once per stay in idle, which the flag is for: `sign` is rebuilt whenever the
    * source is, and starting twice would open a second session on top of the first.
    * Leaving idle clears the flag, so the retry and the recovered connection still start
-   * one.
+   * one. Not started at all while this build has nowhere to mint, nor while the step is
+   * telling the signer that another envelope was signed: that is a tap to try again,
+   * not a session to open on its own.
    */
+  const canStartSigning = isPriceQuoted && isSigningAvailable && !hasSignedOtherEnvelope
   const hasStartedFromIdle = React.useRef(false)
   React.useEffect(() => {
     if (status !== "idle") {
@@ -268,11 +414,11 @@ export const SignInvestScreen: React.FC = () => {
       return
     }
 
-    if (hasStartedFromIdle.current || isLeaving.current || !isPriceQuoted) return
+    if (hasStartedFromIdle.current || isLeaving.current || !canStartSigning) return
 
     hasStartedFromIdle.current = true
     sign()
-  }, [status, sign, isPriceQuoted])
+  }, [status, sign, canStartSigning])
 
   /**
    * Whether the signing page has drawn its interface. Until it has, this step's own
@@ -295,26 +441,69 @@ export const SignInvestScreen: React.FC = () => {
   }, [isSigning])
 
   /** While covered, the page is kept out of the accessibility tree too, so a screen
-   *  reader cannot land on a form the signer cannot yet see. Android and iOS each have
-   *  their own prop for it. */
+   *  reader cannot land on a form the signer cannot yet see; the cover takes its place
+   *  as the one thing to read. Android and iOS each have their own prop for it. */
   const isPageCovered = !isPageReady
   const webViewAccessibilityImportance = isPageCovered ? "no-hide-descendants" : "auto"
 
   /** The one spinner this step shows, whether the session is being opened or the
-   *  page is still drawing. */
+   *  page is still drawing, and what a screen reader says it is. */
   const spinner = (
-    <ActivityIndicator size="large" color={colors.primary} testID="sign-invest-loading" />
+    <ActivityIndicator
+      size="large"
+      color={colors.primary}
+      accessibilityRole="progressbar"
+      accessibilityLabel={copy.loading()}
+      testID="sign-invest-loading"
+    />
   )
 
   if (status === "signing" && webViewProps) {
-    /** The page's own report is this step's to read; every other message is the
-     *  library's, which is how the outcome of the signing reaches it. */
+    /** The service this session was minted at, which is the one whose page may post
+     *  its outcome; the origin the screen would mint at now may have moved since. */
+    const sessionOrigin = mintedTerms.current?.origin ?? mintOrigin
+
+    /**
+     * The page's own report is this step's to read, from whichever page draws it. Every
+     * other message is the library's, which is how the outcome of the signing reaches
+     * it, and only the page the service serves may post one: a WebView message names
+     * the page it came from, and a page reached through a link inside the document
+     * could otherwise post a completion nobody signed. The service has to serve its
+     * return page at the origin it mints at for this to hold, which a deployment is
+     * held to; a drop is logged as the failure it would be if it did not.
+     */
     const handleWebViewMessage = (event: WebViewMessageEvent) => {
       if (isPageReadyMessage(event.nativeEvent.data)) {
         setIsPageReady(true)
         return
       }
+      const pageUrl = event.nativeEvent.url ?? ""
+      const isFromService = originOf(pageUrl) === sessionOrigin.toLowerCase()
+      if (!isFromService) {
+        logError({
+          scope: "card-investment-esign",
+          error: new Error("a signing message from a page the service does not serve"),
+          context: { url: pageUrl },
+        })
+        return
+      }
       webViewProps.onMessage?.(event)
+    }
+
+    /**
+     * The WebView stays on the signing's own pages; a link inside the document opens in
+     * the browser, where it belongs, and never takes the signing page's place. Only the
+     * page itself is held to that: the frames it loads inside are its own business, and
+     * iOS asks about those too. Only a link the phone can open is handed to it, and a
+     * phone that cannot is not a failure of the signing.
+     */
+    const shouldLoadInWebView = (request: ShouldStartLoadRequest): boolean => {
+      if (request.isTopFrame === false) return true
+      if (isSigningPageUrl(request.url, sessionOrigin)) return true
+      if (EXTERNAL_LINK_SCHEMES.test(request.url)) {
+        Linking.openURL(request.url).catch(() => undefined)
+      }
+      return false
     }
 
     return (
@@ -335,12 +524,17 @@ export const SignInvestScreen: React.FC = () => {
             geolocationEnabled={false}
             injectedJavaScript={REPORT_PAGE_READY_SCRIPT}
             onMessage={handleWebViewMessage}
+            onShouldStartLoadWithRequest={shouldLoadInWebView}
             importantForAccessibility={webViewAccessibilityImportance}
             accessibilityElementsHidden={isPageCovered}
             style={styles.webview}
             testID="sign-invest-webview"
           />
-          {isPageCovered && <View style={styles.pageCover}>{spinner}</View>}
+          {isPageCovered && (
+            <View style={styles.pageCover} accessibilityViewIsModal>
+              {spinner}
+            </View>
+          )}
         </View>
       </Screen>
     )
@@ -354,9 +548,9 @@ export const SignInvestScreen: React.FC = () => {
     </Screen>
   )
 
-  /** The status is the library's, and so is the wording of a failure; the title and the
-   *  button are the app's. */
-  const failure = (message: string, action: React.ReactNode) => (
+  /** A failure: the title, the app's wording for it, and what can be done about it, if
+   *  anything. */
+  const failure = (message: string, action?: React.ReactNode) => (
     <>
       <Text type="p1" style={styles.statusTitle}>
         {LL.common.error()}
@@ -368,10 +562,15 @@ export const SignInvestScreen: React.FC = () => {
     </>
   )
 
+  /** Nowhere to mint in this build: not a failure a tap can cure, so no button. */
+  if (!isSigningAvailable) {
+    return centredOnScreen(failure(copy.notAvailable()))
+  }
+
   if (status === "offline") {
     return centredOnScreen(
       failure(
-        getErrorMessage(OFFLINE_MESSAGE_CODE),
+        copy.errors.networkError(),
         <GaloyPrimaryButton
           title={LL.common.tryAgain()}
           loading={isCheckingConnection}
@@ -381,11 +580,28 @@ export const SignInvestScreen: React.FC = () => {
     )
   }
 
-  if (status === "error") {
+  if (hasSignedOtherEnvelope) {
+    const startOver = () => {
+      setHasSignedOtherEnvelope(false)
+      retry()
+    }
     return centredOnScreen(
       failure(
-        getErrorMessage(error?.code ?? "", error?.message),
-        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retry} />,
+        copy.errors.envelopeMismatch(),
+        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={startOver} />,
+      ),
+    )
+  }
+
+  if (status === "error") {
+    /** A route the service does not serve is not cured by tapping again. */
+    const isRetryable = error?.code !== ROUTE_MISSING_CODE
+    return centredOnScreen(
+      failure(
+        signingErrorCopy(LL, error),
+        isRetryable ? (
+          <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={retry} />
+        ) : undefined,
       ),
     )
   }
@@ -394,7 +610,7 @@ export const SignInvestScreen: React.FC = () => {
   if (isWaitingToStart && hasGivenUpWaiting) {
     return centredOnScreen(
       failure(
-        getErrorMessage(OFFLINE_MESSAGE_CODE),
+        copy.errors.networkError(),
         <GaloyPrimaryButton
           title={LL.common.tryAgain()}
           onPress={() => setHasGivenUpWaiting(false)}
