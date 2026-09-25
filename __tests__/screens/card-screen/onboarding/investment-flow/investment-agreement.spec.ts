@@ -94,6 +94,18 @@ describe("mintInvestmentAgreement", () => {
     expect(settlementSats).toBe(1_428_571)
   })
 
+  /** A product that lands a hair under the whole satoshi: 0.08388607 bitcoin times a
+   *  hundred million is 8388606.999999999 in floating point, and a fractional satoshi
+   *  count would reach the invoice. */
+  it("rounds a float that lands a hair under the whole satoshi", async () => {
+    const { settlementSats } = await mintWith({
+      totalUsd: 1000,
+      usdCentsPerBtc: 1_192_093,
+    })
+
+    expect(settlementSats).toBe(8_388_607)
+  })
+
   /** The agreement fixes a rate the payment is then owed at, so a guessed one would be
    *  worse than none: the step fails under the component's own copy and the retry reads
    *  the price again. */
