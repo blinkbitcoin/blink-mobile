@@ -8,11 +8,11 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { toWalletId } from "@app/types/wallet"
 
-const mockGetMnemonic = jest.fn()
+const mockReadMnemonic = jest.fn()
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    getMnemonicForAccount: (...args: unknown[]) => mockGetMnemonic(...args),
+    readMnemonicWithStatus: (...args: unknown[]) => mockReadMnemonic(...args),
   },
 }))
 
@@ -65,7 +65,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("returns no-mnemonic without initializing the SDK when no mnemonic is stored", async () => {
-    mockGetMnemonic.mockResolvedValue(null)
+    mockReadMnemonic.mockResolvedValue({ status: "absent" })
 
     const result = await probeSelfCustodialAccountWallets(
       TEST_ACCOUNT_ID,
@@ -78,8 +78,52 @@ describe("probeSelfCustodialAccountWallets", () => {
     expect(mockDisconnectSdk).not.toHaveBeenCalled()
   })
 
+  /**
+   * The read that merely failed must never be answered as "no mnemonic": the
+   * delete flow reads NoMnemonic as "nothing to warn about", skips the has-funds
+   * warning, and the erase that follows still reaches the seed, because deleting
+   * does not decrypt.
+   */
+  it("reports a failed read as a probe failure, not as an account without a mnemonic", async () => {
+    mockReadMnemonic.mockResolvedValue({
+      status: "failed",
+      err: new Error("secure-store.blink.local/mnemonic:account-123 locked"),
+    })
+
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+      TEST_LEEWAY,
+    )
+
+    expect(result.status).toBe(ProbeAccountWalletsStatus.ProbeFailed)
+    expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  /**
+   * profile-row hands this error straight to Crashlytics, and a keychain error
+   * can carry the server string, which ends in the account id.
+   */
+  it("keeps the account id out of the error it hands the caller", async () => {
+    mockReadMnemonic.mockResolvedValue({
+      status: "failed",
+      err: new Error(`secure-store.blink.local/mnemonic:${TEST_ACCOUNT_ID} locked`),
+    })
+
+    const result = await probeSelfCustodialAccountWallets(
+      TEST_ACCOUNT_ID,
+      Network.Regtest,
+      TEST_LEEWAY,
+    )
+
+    if (result.status === ProbeAccountWalletsStatus.ProbeFailed) {
+      expect(result.error.message).not.toContain(TEST_ACCOUNT_ID)
+      expect(result.error.message).toBe("Mnemonic read failed")
+    }
+  })
+
   it("connects with the account's mnemonic and storage dir, returns ok with snapshot wallets", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
       wallets: sampleWallets,
@@ -107,7 +151,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("disconnects the SDK after a successful snapshot read", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
       wallets: sampleWallets,
@@ -121,7 +165,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("returns probe-failed (not ok) when the snapshot fetch throws, but still disconnects the SDK", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue(new Error("getInfo failed"))
 
@@ -139,7 +183,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("returns probe-failed (not ok) when the connect step fails, and never attempts to disconnect", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockRejectedValue(new Error("connect failed"))
 
     const result = await probeSelfCustodialAccountWallets(
@@ -156,7 +200,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("wraps a non-Error rejection from the snapshot fetch into an Error", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockRejectedValue("opaque string failure")
 
@@ -174,7 +218,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("swallows disconnect errors so the snapshot read still resolves to ok", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
       wallets: sampleWallets,
@@ -196,7 +240,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("records the disconnect failure to crashlytics so leaking SDK instances are observable", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
       wallets: sampleWallets,
@@ -212,7 +256,7 @@ describe("probeSelfCustodialAccountWallets", () => {
   })
 
   it("wraps a non-Error disconnect rejection into an Error before recording it", async () => {
-    mockGetMnemonic.mockResolvedValue(TEST_MNEMONIC)
+    mockReadMnemonic.mockResolvedValue({ status: "found", value: TEST_MNEMONIC })
     mockInitSdk.mockResolvedValue(FAKE_SDK)
     mockGetSnapshot.mockResolvedValue({
       wallets: sampleWallets,

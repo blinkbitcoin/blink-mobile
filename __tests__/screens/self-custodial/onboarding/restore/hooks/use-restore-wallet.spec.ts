@@ -103,7 +103,10 @@ describe("useRestoreWallet", () => {
     jest.clearAllMocks()
     mockRestore.mockResolvedValue({ serverMode: null, isServerModeKnown: true })
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
-    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({ status: "ok", id: null })
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+      status: "ok",
+      id: null,
+    })
     mockValidateMnemonic.mockReturnValue(true)
   })
 
@@ -158,7 +161,7 @@ describe("useRestoreWallet", () => {
    */
   describe("the mode a restored wallet comes back with", () => {
     const baseState: PersistentState = {
-      schemaVersion: 21,
+      schemaVersion: 22,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: TEST_ACCOUNT_ID,
@@ -284,6 +287,28 @@ describe("useRestoreWallet", () => {
 
       expect(mockUpdateState.mock.calls[1][0](undefined)).toBeUndefined()
     })
+  })
+
+  /**
+   * The index read failing is still terminal, above. This is the other half:
+   * per-account reads that failed no longer end the lookup, so the restore runs
+   * on "no match among the entries that answered". A duplicate account can be
+   * removed later; a restore that cannot run has no way around it, and on
+   * Android one lock-screen change fails every entry at once.
+   */
+  it("restores when some entries were unreadable and none of the readable ones matched", async () => {
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+      status: "ok",
+      id: null,
+    })
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3").catch(() => {})
+    })
+
+    expect(mockRestore).toHaveBeenCalled()
   })
 
   it("aborts restore when the index lookup fails — never duplicates an existing account", async () => {

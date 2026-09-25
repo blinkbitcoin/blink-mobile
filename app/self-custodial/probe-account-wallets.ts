@@ -40,8 +40,18 @@ export const probeSelfCustodialAccountWallets = async (
   network: Network,
   leewaySatPerVbyte: number,
 ): Promise<ProbeAccountWalletsResult> => {
-  const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
-  if (!mnemonic) return { status: ProbeAccountWalletsStatus.NoMnemonic }
+  // Read with its status rather than through getMnemonicForAccount, which answers
+  // null for both "no mnemonic" and "the read failed". Collapsed here, a keychain
+  // that merely refused one read reports NoMnemonic, the delete flow skips the
+  // has-funds warning, and the erase that follows still succeeds — a delete does
+  // not decrypt, so it reaches a seed this probe could not.
+  const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+  // The cause is dropped on purpose: profile-row reports this error straight to
+  // Crashlytics, and a keychain error can carry the server string, which ends in
+  // the account id.
+  if (stored.status === "failed") return toProbeFailed(new Error("Mnemonic read failed"))
+  if (stored.status === "absent") return { status: ProbeAccountWalletsStatus.NoMnemonic }
+  const mnemonic = stored.value
 
   let sdk: BreezSdkInterface | undefined
   try {

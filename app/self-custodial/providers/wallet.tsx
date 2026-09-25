@@ -6,6 +6,7 @@ import React, {
   useMemo,
   useState,
 } from "react"
+import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -24,6 +25,22 @@ import { getLightningAddress } from "../bridge"
 import { useSdkLifecycle } from "../hooks/use-sdk-lifecycle"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 import { setSelfCustodialLightningAddress } from "../storage/account-index"
+
+/**
+ * The statuses a fresh start can actually clear, which is a narrower set than
+ * the one the offline gate blocks on.
+ *
+ * Unavailable is deliberately left out. The lifecycle uses it for "this device
+ * has no self-custodial wallet", which is where every custodial-only user
+ * rests, with no SDK and nothing to connect — retrying it would re-run the
+ * whole lifecycle on each foreground for people this feature does not touch,
+ * and it is terminal for an account without a mnemonic too, so there is no
+ * reading of it a retry could improve.
+ */
+const FOREGROUND_RETRYABLE_STATUSES: readonly ActiveWalletStatus[] = [
+  ActiveWalletStatus.Offline,
+  ActiveWalletStatus.Error,
+]
 
 const LightningAddressOperation = {
   Resolve: "resolve",
@@ -116,6 +133,26 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
   const retry = useCallback(() => {
     setRetryCount((prev) => prev + 1)
   }, [])
+
+  /**
+   * Foregrounding the app is the first thing anyone tries, and until now it did
+   * nothing for a wallet that never started: the lifecycle's own AppState
+   * handler calls refreshWallets, which returns on its first line without an
+   * SDK, and the backoff retry is gated the same way. The only working recovery
+   * lived on a screen the user has to navigate into.
+   *
+   * Narrow on purpose: with a connected SDK this changes nothing, and the
+   * lifecycle's refresh keeps handling the case this status usually means.
+   */
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (next) => {
+      if (next !== "active") return
+      if (sdk) return
+      if (!FOREGROUND_RETRYABLE_STATUSES.includes(status)) return
+      retry()
+    })
+    return () => subscription.remove()
+  }, [sdk, status, retry])
 
   const [lightningAddress, setLightningAddress] = useState<string | null>(null)
 
