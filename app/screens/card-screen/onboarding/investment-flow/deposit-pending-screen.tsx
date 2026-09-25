@@ -1,0 +1,54 @@
+import React from "react"
+import { useNavigation } from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { CloseHeader } from "@app/components/close-header"
+import { Screen } from "@app/components/screen"
+import { StatusScreenLayout } from "@app/components/status-screen-layout"
+import { useI18nContext } from "@app/i18n/i18n-react"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+
+export const DepositPendingScreen: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const {
+    theme: { colors },
+  } = useTheme()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  const handleOkay = () => {
+    navigation.goBack()
+  }
+
+  return (
+    <Screen preset="fixed" headerShown={false}>
+      <CloseHeader testID="deposit-pending-close" />
+      <StatusScreenLayout
+        icon="clock"
+        iconColor={colors.primary}
+        iconSize={57}
+        iconPadding={16}
+        iconBackgroundColor={colors.grey5}
+        footer={
+          <GaloyPrimaryButton
+            title={LL.CardFlow.Onboarding.DepositPending.buttonText()}
+            onPress={handleOkay}
+          />
+        }
+      >
+        <Text type="p1" style={styles.message}>
+          {LL.CardFlow.Onboarding.DepositPending.message()}
+        </Text>
+      </StatusScreenLayout>
+    </Screen>
+  )
+}
+
+const useStyles = makeStyles(({ colors }) => ({
+  message: {
+    color: colors.black,
+    textAlign: "center",
+  },
+}))

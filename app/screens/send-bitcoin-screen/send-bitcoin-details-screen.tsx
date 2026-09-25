@@ -150,7 +150,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
-  const { paymentDestination } = route.params
+  const { paymentDestination, sendingWalletId } = route.params
+
+  /** The wallet the caller judged able to pay, when it named one the flow offers; the
+   *  flow's own default otherwise. */
+  const requestedWallet = wallets?.find(({ id }) => id === sendingWalletId)
+  const initialWallet = requestedWallet ?? defaultWallet
 
   const [paymentDetail, setPaymentDetail] =
     useState<PaymentDetail<WalletCurrency> | null>(null)
@@ -219,15 +224,15 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
      * to withdraw, and this effect never runs again once `paymentDetail` is set, so the
      * screen would go on sending from a wallet it no longer offers.
      */
-    if (paymentDetail || !defaultWallet || !_convertMoneyAmount || isWalletListPending) {
+    if (paymentDetail || !initialWallet || !_convertMoneyAmount || isWalletListPending) {
       return
     }
 
     let initialPaymentDetail = paymentDestination.createPaymentDetail({
       convertMoneyAmount: _convertMoneyAmount,
       sendingWalletDescriptor: {
-        id: defaultWallet.id,
-        currency: defaultWallet.walletCurrency,
+        id: initialWallet.id,
+        currency: initialWallet.walletCurrency,
       },
     })
 
@@ -242,7 +247,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     paymentDestination,
     _convertMoneyAmount,
     paymentDetail,
-    defaultWallet,
+    initialWallet,
     btcWallet,
     zeroDisplayAmount,
     isWalletListPending,

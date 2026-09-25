@@ -172,6 +172,15 @@ const route = {
   },
 } as never
 
+/** The same route, with the caller naming the wallet it judged able to pay. */
+const routeAskingFor = (sendingWalletId: string) =>
+  ({
+    params: {
+      paymentDestination: { createPaymentDetail: mockCreatePaymentDetail },
+      sendingWalletId,
+    },
+  }) as never
+
 /** The amount sheet reads safe-area insets, so the tree needs a provider with real metrics
  *  rather than the live measurement a test cannot take. */
 const SCREEN_FRAME = { x: 0, y: 0, width: 390, height: 844 }
@@ -253,6 +262,43 @@ describe("SendBitcoinDetailsScreen region gate", () => {
     expect(mockCreatePaymentDetail).not.toHaveBeenCalledWith(
       expect.objectContaining({
         sendingWalletDescriptor: { id: USD_WALLET.id, currency: "USD" },
+      }),
+    )
+  })
+
+  /** A caller that judged which wallet can pay names it, and the screen seeds from that
+   *  one rather than from the flow's default, as long as the flow still offers it. */
+  it("seeds from the wallet the caller asked for when the flow offers it", () => {
+    mockSendWallets.mockReturnValue({ ...PENDING_WALLETS, loading: false })
+    const requested = routeAskingFor(BTC_WALLET.id)
+
+    render(
+      <Wrapper>
+        <SendBitcoinDetailsScreen route={requested} />
+      </Wrapper>,
+    )
+
+    expect(mockCreatePaymentDetail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sendingWalletDescriptor: { id: BTC_WALLET.id, currency: "BTC" },
+      }),
+    )
+  })
+
+  /** A wallet the flow no longer offers, the dollar wallet a restriction withdrew, is not
+   *  brought back by naming it: the default stands. */
+  it("falls back to the default when the wallet asked for is not offered", () => {
+    const requested = routeAskingFor(USD_WALLET.id)
+
+    render(
+      <Wrapper>
+        <SendBitcoinDetailsScreen route={requested} />
+      </Wrapper>,
+    )
+
+    expect(mockCreatePaymentDetail).toHaveBeenCalledWith(
+      expect.objectContaining({
+        sendingWalletDescriptor: { id: BTC_WALLET.id, currency: "BTC" },
       }),
     )
   })
