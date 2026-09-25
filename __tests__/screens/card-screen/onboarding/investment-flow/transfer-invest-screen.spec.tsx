@@ -53,7 +53,15 @@ jest.mock("@app/config/feature-flags-context", () => {
 
 /** The wallets and the price feed, answered by their own hook; its spec covers how the
  *  balance is worked out, so what matters here is which way the screen routes on it. */
-const mockFunding = {
+type MockFunding = {
+  balanceUsd: number
+  shortfallUsd: number
+  hasEnoughBalance: boolean
+  balanceWalletId?: string
+  totalSats: number
+  isLoading: boolean
+}
+const mockFunding: { current: MockFunding } = {
   current: {
     balanceUsd: 0,
     shortfallUsd: 0,
@@ -222,6 +230,37 @@ describe("TransferInvestScreen", () => {
     expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000)
     expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
       payment: "lnbc-invoice",
+      sendingWalletId: undefined,
+    })
+  })
+
+  /** The wallet judged to cover the investment is the one the payment is made from:
+   *  left to its default the send flow may pick the other wallet and refuse the amount
+   *  this step just said could be paid. */
+  it("opens the send flow on the wallet that was judged to cover the investment", async () => {
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      balanceWalletId: "wallet-usd",
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {})
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
+      payment: "lnbc-invoice",
+      sendingWalletId: "wallet-usd",
     })
   })
 

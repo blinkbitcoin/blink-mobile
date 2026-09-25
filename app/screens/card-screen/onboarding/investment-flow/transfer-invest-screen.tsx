@@ -41,7 +41,9 @@ export const TransferInvestScreen: React.FC = () => {
   )
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
-  const { hasEnoughBalance, isLoading } = useInvestmentFunding(terms.totalUsd)
+  const { hasEnoughBalance, balanceWalletId, isLoading } = useInvestmentFunding(
+    terms.totalUsd,
+  )
   const totalSats = useInvestmentSats(terms.totalUsd)
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
   const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
@@ -61,7 +63,9 @@ export const TransferInvestScreen: React.FC = () => {
    *
    * The send flow is opened on an invoice rather than on the receiving account, because
    * an invoice carries its amount: an account alone would let the investor send any sum
-   * against an agreement that names one.
+   * against an agreement that names one. It is opened on the wallet judged to cover the
+   * investment, too: left to its own default the flow may pick the other wallet and turn
+   * away a payment this step just said could be made.
    */
   const handleNext = async () => {
     if (!hasEnoughBalance) {
@@ -79,7 +83,10 @@ export const TransferInvestScreen: React.FC = () => {
       return
     }
 
-    navigation.navigate("sendBitcoinDestination", { payment: minted.paymentRequest })
+    navigation.navigate("sendBitcoinDestination", {
+      payment: minted.paymentRequest,
+      sendingWalletId: balanceWalletId,
+    })
   }
 
   /**
