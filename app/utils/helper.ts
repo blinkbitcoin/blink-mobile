@@ -124,6 +124,8 @@ export const parseDollarsToCents = (dollars: string): number | null => {
   return cents <= GRAPHQL_INT_MAX ? cents : null
 }
 
+export const toMinorUnit = (dollars: number): number => Math.round(dollars * 100)
+
 export const toMajorUnit = (cents: number): number => cents / 100
 
 export const toNumber = (value: bigint | string | number): number => {

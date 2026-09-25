@@ -3,6 +3,7 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 
 import {
   toMajorUnit,
+  toMinorUnit,
   parseDollarsToCents,
   ellipsizeMiddle,
   formatCardDisplayNumber,
@@ -149,6 +150,15 @@ describe("parseDollarsToCents", () => {
   it("takes the most a GraphQL Int holds and rejects anything above it", () => {
     expect(parseDollarsToCents("21474836.47")).toBe(2_147_483_647)
     expect(parseDollarsToCents("21474836.48")).toBeNull()
+  })
+})
+
+describe("toMinorUnit", () => {
+  /** A figure the code already holds as a number needs no round trip through text. */
+  it("takes a number as it is", () => {
+    expect(toMinorUnit(10)).toBe(1000)
+    expect(toMinorUnit(10.555)).toBe(1056)
+    expect(toMinorUnit(0)).toBe(0)
   })
 })
 
