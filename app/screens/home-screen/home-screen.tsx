@@ -75,6 +75,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { useAcknowledgeInvitationOnceSigned } from "@app/screens/card-screen/onboarding/investment-flow/investment-invitation-bulletin"
 import { useReconcileInvestmentPayment } from "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup"
 import { useCardInvestmentBulletin } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -381,6 +382,9 @@ export const HomeScreen: React.FC = () => {
   })
   /** A payment the record only knows as on its way is asked about, once per visit. */
   useReconcileInvestmentPayment()
+  /** The server's invitation card is retired by the signature; this catches one the
+   *  signing step could not retire itself, whenever the home holds a signed investment. */
+  useAcknowledgeInvitationOnceSigned(bulletins)
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
