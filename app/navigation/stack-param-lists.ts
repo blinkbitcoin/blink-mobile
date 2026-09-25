@@ -109,9 +109,15 @@ export type RootStackParamList = {
     payment?: string
     username?: string
     scanPressed?: number
+    /** The wallet to pay from, when the caller already judged which one can, so the
+     *  details step does not fall back to a default that cannot. Navigation-only: a
+     *  wallet the flow does not offer is ignored. */
+    sendingWalletId?: string
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
+    /** Handed on from the destination step; see it there. */
+    sendingWalletId?: string
   }
   merchantSelection: {
     merchants: MerchantChoice[]
