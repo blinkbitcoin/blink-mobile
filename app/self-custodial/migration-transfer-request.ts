@@ -99,10 +99,18 @@ const withMigrationSdk = async <T>(
   use: (sdk: BreezSdkInterface) => Promise<T>,
 ): Promise<MigrationSdkResult<T>> => {
   // NoMnemonic is routed to support as an account the device never held, so it has
-  // to mean exactly that: a read that merely failed is a retryable failure, not a
-  // missing key. getMnemonicForAccount answers null for both.
+  // to mean exactly that, and getMnemonicForAccount answers null for both. A read
+  // that merely failed lands on Failed, which ends the flow at the support screen
+  // rather than pausing on the shared retry — honest about the outcome, but not
+  // retried; whether it should be is a separate question from telling the two
+  // states apart.
+  //
+  // The cause is dropped, as in the sibling call sites: a keychain error can carry
+  // the server string, which ends in the account id, and this one reaches
+  // Crashlytics with its cause intact. classifySdkError scores the real error as
+  // Generic anyway, so nothing is lost by replacing it.
   const stored = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
-  if (stored.status === "failed") return toSdkFailure(stored.err)
+  if (stored.status === "failed") return toSdkFailure(new Error("Mnemonic read failed"))
   if (stored.status === "absent") return { status: MigrationSdkStatus.NoMnemonic }
   const mnemonic = stored.value
 
