@@ -7,7 +7,14 @@ import { TouchableWithoutFeedback } from "react-native-gesture-handler"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
-export const Notification: React.FC<StatefulNotification> = ({
+/** Only what the row shows: the schema type grows fields the history never reads, and
+ *  a row typed as the whole of it would break each time one is added. */
+type NotificationProps = Pick<
+  StatefulNotification,
+  "title" | "body" | "createdAt" | "acknowledgedAt" | "icon" | "action"
+>
+
+export const Notification: React.FC<NotificationProps> = ({
   title,
   body,
   createdAt,
