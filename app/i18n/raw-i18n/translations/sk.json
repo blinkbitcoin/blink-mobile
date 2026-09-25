@@ -3718,6 +3718,20 @@
         },
         "buttonText": "Pokračovať k podpisu"
       },
+      "SignInvest": {
+        "loading": "Pripravujeme tvoju zmluvu.",
+        "notAvailable": "Podpisovanie zatiaľ nie je k dispozícii. Skús to prosím neskôr.",
+        "errors": {
+          "envelopeCreationFailed": "Zmluvu sa nepodarilo pripraviť. Skús to prosím znova.",
+          "networkError": "Spojenie sa prerušilo. Skontroluj prosím sieť a skús to znova.",
+          "unauthorized": "Tvoja relácia už nie je platná. Prihlás sa prosím znova.",
+          "sessionExpired": "Relácia podpisovania vypršala. Skús to prosím znova.",
+          "providerUnavailable": "Služba podpisovania je dočasne nedostupná. Skús to prosím neskôr.",
+          "routeMissing": "Podpisovanie zatiaľ nie je na tomto serveri k dispozícii. Aktualizuj prosím aplikáciu alebo to skús neskôr.",
+          "envelopeMismatch": "Podpísaný dokument nie je ten, ktorý tento krok pripravil. Skús to prosím znova.",
+          "generic": "Niečo sa pokazilo. Skús to prosím znova."
+        }
+      },
       "TransferInvest": {
         "title": "Preveďte svoju investíciu",
         "paragraphs": {

@@ -3766,6 +3766,20 @@
                 },
                 "buttonText": "Weiter zur Unterschrift"
             },
+            "SignInvest": {
+                "loading": "Deine Vereinbarung wird vorbereitet.",
+                "notAvailable": "Das Unterschreiben ist noch nicht verfügbar. Bitte versuche es später erneut.",
+                "errors": {
+                    "envelopeCreationFailed": "Die Vereinbarung konnte nicht vorbereitet werden. Bitte versuche es erneut.",
+                    "networkError": "Verbindung unterbrochen. Bitte prüfe dein Netzwerk und versuche es erneut.",
+                    "unauthorized": "Deine Sitzung ist nicht mehr gültig. Bitte melde dich erneut an.",
+                    "sessionExpired": "Die Signatursitzung ist abgelaufen. Bitte versuche es erneut.",
+                    "providerUnavailable": "Der Signaturdienst ist vorübergehend nicht verfügbar. Bitte versuche es später erneut.",
+                    "routeMissing": "Das Unterschreiben ist auf diesem Server noch nicht verfügbar. Bitte aktualisiere die App oder versuche es später erneut.",
+                    "envelopeMismatch": "Das unterschriebene Dokument ist nicht das, das dieser Schritt vorbereitet hat. Bitte versuche es erneut.",
+                    "generic": "Etwas ist schiefgelaufen. Bitte versuche es erneut."
+                }
+            },
             "TransferInvest": {
                 "title": "Übertrage deine Investition",
                 "paragraphs": {

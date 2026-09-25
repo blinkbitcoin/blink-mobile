@@ -3718,6 +3718,20 @@
         },
         "buttonText": "Qhubeka ukuya kusayina"
       },
+      "SignInvest": {
+        "loading": "Silungiselela isivumelwano sakho.",
+        "notAvailable": "Ukutyikitya akukafumaneki okwangoku. Nceda uzame kwakhona kamva.",
+        "errors": {
+          "envelopeCreationFailed": "Isivumelwano asikwazanga ukulungiselelwa. Nceda uzame kwakhona.",
+          "networkError": "Unxibelelwano luphelile. Nceda ujonge inethiwekhi yakho uze uzame kwakhona.",
+          "unauthorized": "Iseshoni yakho ayisasebenzi. Nceda ungene kwakhona.",
+          "sessionExpired": "Iseshoni yokutyikitya iphelelwe lixesha. Nceda uzame kwakhona.",
+          "providerUnavailable": "Inkonzo yokutyikitya ayifumaneki okwethutyana. Nceda uzame kwakhona kamva.",
+          "routeMissing": "Ukutyikitya akukafumaneki kule seva okwangoku. Nceda uhlaziye i-app okanye uzame kwakhona kamva.",
+          "envelopeMismatch": "Uxwebhu olutyikitywe alulolo eli nyathelo lilungiseleleyo. Nceda uzame kwakhona.",
+          "generic": "Kukho into engahambanga kakuhle. Nceda uzame kwakhona."
+        }
+      },
       "TransferInvest": {
         "title": "Dlulisela utyalo-mali lwakho",
         "paragraphs": {

@@ -3718,6 +3718,20 @@
         },
         "buttonText": "Lanjut ke penandatanganan"
       },
+      "SignInvest": {
+        "loading": "Menyiapkan perjanjianmu.",
+        "notAvailable": "Penandatanganan belum tersedia. Silakan coba lagi nanti.",
+        "errors": {
+          "envelopeCreationFailed": "Perjanjian tidak dapat disiapkan. Silakan coba lagi.",
+          "networkError": "Koneksi terputus. Periksa jaringanmu dan coba lagi.",
+          "unauthorized": "Sesimu tidak lagi berlaku. Silakan masuk kembali.",
+          "sessionExpired": "Sesi penandatanganan telah berakhir. Silakan coba lagi.",
+          "providerUnavailable": "Layanan penandatanganan sedang tidak tersedia. Silakan coba lagi nanti.",
+          "routeMissing": "Penandatanganan belum tersedia di server ini. Perbarui aplikasi atau coba lagi nanti.",
+          "envelopeMismatch": "Dokumen yang ditandatangani bukan dokumen yang disiapkan langkah ini. Silakan coba lagi.",
+          "generic": "Terjadi kesalahan. Silakan coba lagi."
+        }
+      },
       "TransferInvest": {
         "title": "Transfer investasi Anda",
         "paragraphs": {

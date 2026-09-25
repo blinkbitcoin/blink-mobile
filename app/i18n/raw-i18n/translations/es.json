@@ -3766,6 +3766,20 @@
                 },
                 "buttonText": "Proceder a firmar"
             },
+            "SignInvest": {
+                "loading": "Preparando tu acuerdo.",
+                "notAvailable": "La firma aún no está disponible. Inténtalo de nuevo más tarde.",
+                "errors": {
+                    "envelopeCreationFailed": "No se pudo preparar el acuerdo. Inténtalo de nuevo.",
+                    "networkError": "Se perdió la conexión. Revisa tu red e inténtalo de nuevo.",
+                    "unauthorized": "Tu sesión ya no es válida. Inicia sesión de nuevo.",
+                    "sessionExpired": "La sesión de firma expiró. Inténtalo de nuevo.",
+                    "providerUnavailable": "El servicio de firma no está disponible temporalmente. Inténtalo de nuevo más tarde.",
+                    "routeMissing": "La firma aún no está disponible en este servidor. Actualiza la aplicación o inténtalo más tarde.",
+                    "envelopeMismatch": "El documento firmado no es el que preparó este paso. Inténtalo de nuevo.",
+                    "generic": "Algo salió mal. Inténtalo de nuevo."
+                }
+            },
             "TransferInvest": {
                 "title": "Transfiere tu inversión",
                 "paragraphs": {
