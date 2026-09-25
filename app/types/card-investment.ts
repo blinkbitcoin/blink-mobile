@@ -5,7 +5,8 @@
  * Kept on device because no backend records the investment yet: the home reads it to
  * steer the investor back to the payment, and to welcome them once it is made. It does
  * not lapse. Once signed, the record is also the mark that this account has signed, and
- * the flow refuses to be walked a second time while it stands.
+ * the flow refuses to be walked a second time while it stands; only a new invitation
+ * from the server supersedes it.
  */
 export type CardInvestmentProgress = {
   /** The amount the investor chose, which every later step derives its figures from. */
