@@ -175,12 +175,14 @@ export const findSelfCustodialAccountByMnemonic = async (
 
   for (const entry of result.entries) {
     const stored = await KeyStoreWrapper.readMnemonicWithStatus(entry.id)
-    // Counted and carried on past, not returned. One entry that will not answer
-    // used to end the scan, so a single damaged slot made every restore on the
-    // device fail — including a phrase belonging to an account further down the
-    // list that reads perfectly. On Android one lock-screen change invalidates
-    // the Keystore and fails all of them at once, which is exactly when the
-    // written-down phrase is the only way back in.
+    // Counted and carried on past, not returned. Ending the scan on the first
+    // entry that will not answer would let one damaged slot fail every restore
+    // on the device, including a phrase belonging to an account further down
+    // the list that reads perfectly. The trade is a scan that can finish
+    // without having looked at everything, which the count above reports; on
+    // Android one lock-screen change invalidates the Keystore and fails every
+    // entry at once, which is exactly when the written-down phrase is the only
+    // way back in.
     if (stored.status === "failed") {
       unreadableEntries += 1
     } else if (
@@ -218,6 +220,14 @@ type SweepResult =
   | { status: "incomplete"; failures: number }
 
 /**
+ * Upper bound on how long the sweep may wait for an idle window before it runs
+ * anyway. Exported so the bound and the thing it bounds are read together: an
+ * idle callback with no timeout can be starved for a whole launch on a busy
+ * boot, and a launch that never sweeps is a launch whose mnemonics never move.
+ */
+export const SWEEP_IDLE_TIMEOUT_MS = 5000
+
+/**
  * Migrates the mnemonic of every account in the index, whether or not the user
  * ever opens it.
  *
@@ -232,6 +242,12 @@ type SweepResult =
  * legacy one. Safe to run repeatedly and alongside the lazy path, which is what
  * lets a failure simply be retried on the next boot.
  *
+ * It runs on every launch and has no completion marker, which is deliberate: it
+ * is also what re-records an account whose tracking write failed or was reset,
+ * so retiring it early would leave those unreachable by the reinstall wipe. It
+ * retires with the legacy store itself (blinkbitcoin/blink-wip#1163), after
+ * which there is nothing left to migrate.
+ *
  * It asks whether each mnemonic exists rather than reading it. A read answers by
  * putting the phrase into a JS string, which cannot be zeroed, for every indexed
  * account on every launch — including accounts the user never opens, whose seeds
@@ -245,22 +261,6 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
   // migrations here would look like a completed sweep over accounts never seen.
   if (result.status === StorageReadStatus.ReadFailed) {
     return { status: "incomplete", failures: 0 }
-  }
-
-  // A list that will not parse is rebuilt from the index rather than left for
-  // the next write to reset into a single entry, which would forget every id it
-  // named. This enumeration is the only place those ids still exist.
-  //
-  // The check and the write are one turn in the slot queue, inside the store:
-  // split across two, an account created by onboarding between them is recorded
-  // and then overwritten by this snapshot, dropping the very id the wipe needs.
-  const rebuild = await KeyStoreWrapper.rebuildMnemonicAccountsIfMalformed(
-    result.entries.map((entry) => entry.id),
-  )
-  if (rebuild === "failed") {
-    recordAppError(new Error("Mnemonic accounts list rebuild failed"), {
-      dedupKey: "storage-mnemonic-accounts-rebuild-failed",
-    })
   }
 
   let migrated = 0
