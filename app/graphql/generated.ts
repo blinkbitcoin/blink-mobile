@@ -983,6 +983,7 @@ export type FeedbackSubmitInput = {
 export type FeesInformation = {
   readonly __typename: 'FeesInformation';
   readonly deposit: DepositFeesInformation;
+  readonly inactivityFee: InactivityFeeInformation;
 };
 
 /** Provides global settings for the application which might have an impact for the user. */
@@ -1070,6 +1071,14 @@ export const Icon = {
 } as const;
 
 export type Icon = typeof Icon[keyof typeof Icon];
+export type InactivityFeeInformation = {
+  readonly __typename: 'InactivityFeeInformation';
+  /** first date the inactivity fee applies */
+  readonly effectiveFrom: Scalars['Timestamp']['output'];
+  /** monthly fee per balance for an account with no activity for 12 months, in USD cents */
+  readonly usdCentsPerMonth: Scalars['CentAmount']['output'];
+};
+
 export type InitiationVia = InitiationViaIntraLedger | InitiationViaLn | InitiationViaOnChain;
 
 export type InitiationViaIntraLedger = {
@@ -2647,8 +2656,12 @@ export type StatefulNotification = {
   readonly action?: Maybe<NotificationAction>;
   readonly body: Scalars['String']['output'];
   readonly bulletinEnabled: Scalars['Boolean']['output'];
+  /** Groups bulletins so that at most one bulletin per key is active at a time */
+  readonly bulletinKey?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['Timestamp']['output'];
   readonly deepLink?: Maybe<Scalars['String']['output']>;
+  /** Whether the user can close the bulletin from the app */
+  readonly dismissible: Scalars['Boolean']['output'];
   readonly icon?: Maybe<Icon>;
   readonly id: Scalars['ID']['output'];
   readonly title: Scalars['String']['output'];
@@ -3673,7 +3686,7 @@ export type BulletinsQueryVariables = Exact<{
 }>;
 
 
-export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null } }> } } | null };
+export type BulletinsQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly unacknowledgedStatefulNotificationsWithBulletinEnabled: { readonly __typename: 'StatefulNotificationConnection', readonly pageInfo: { readonly __typename: 'PageInfo', readonly endCursor?: string | null, readonly hasNextPage: boolean, readonly hasPreviousPage: boolean, readonly startCursor?: string | null }, readonly edges: ReadonlyArray<{ readonly __typename: 'StatefulNotificationEdge', readonly cursor: string, readonly node: { readonly __typename: 'StatefulNotification', readonly id: string, readonly title: string, readonly body: string, readonly createdAt: number, readonly acknowledgedAt?: number | null, readonly bulletinEnabled: boolean, readonly dismissible: boolean, readonly icon?: Icon | null, readonly action?: { readonly __typename: 'OpenDeepLinkAction', readonly deepLink: string, readonly label?: string | null } | { readonly __typename: 'OpenExternalLinkAction', readonly url: string, readonly label?: string | null } | null } }> } } | null };
 
 export type StatefulNotificationAcknowledgeMutationVariables = Exact<{
   input: StatefulNotificationAcknowledgeInput;
@@ -7120,6 +7133,7 @@ export const BulletinsDocument = gql`
           createdAt
           acknowledgedAt
           bulletinEnabled
+          dismissible
           icon
           action {
             ... on OpenDeepLinkAction {
@@ -10718,6 +10732,7 @@ export type ResolversTypes = {
   GraphQLApplicationError: ResolverTypeWrapper<GraphQlApplicationError>;
   Hex32Bytes: ResolverTypeWrapper<Scalars['Hex32Bytes']['output']>;
   Icon: Icon;
+  InactivityFeeInformation: ResolverTypeWrapper<InactivityFeeInformation>;
   InitiationVia: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['InitiationVia']>;
   InitiationViaIntraLedger: ResolverTypeWrapper<InitiationViaIntraLedger>;
   InitiationViaLn: ResolverTypeWrapper<InitiationViaLn>;
@@ -11026,6 +11041,7 @@ export type ResolversParentTypes = {
   Globals: Globals;
   GraphQLApplicationError: GraphQlApplicationError;
   Hex32Bytes: Scalars['Hex32Bytes']['output'];
+  InactivityFeeInformation: InactivityFeeInformation;
   InitiationVia: ResolversUnionTypes<ResolversParentTypes>['InitiationVia'];
   InitiationViaIntraLedger: InitiationViaIntraLedger;
   InitiationViaLn: InitiationViaLn;
@@ -11736,6 +11752,7 @@ export interface FeedbackScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 
 export type FeesInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['FeesInformation'] = ResolversParentTypes['FeesInformation']> = {
   deposit?: Resolver<ResolversTypes['DepositFeesInformation'], ParentType, ContextType>;
+  inactivityFee?: Resolver<ResolversTypes['InactivityFeeInformation'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11762,6 +11779,12 @@ export type GraphQlApplicationErrorResolvers<ContextType = any, ParentType exten
 export interface Hex32BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Hex32Bytes'], any> {
   name: 'Hex32Bytes';
 }
+
+export type InactivityFeeInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['InactivityFeeInformation'] = ResolversParentTypes['InactivityFeeInformation']> = {
+  effectiveFrom?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  usdCentsPerMonth?: Resolver<ResolversTypes['CentAmount'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type InitiationViaResolvers<ContextType = any, ParentType extends ResolversParentTypes['InitiationVia'] = ResolversParentTypes['InitiationVia']> = {
   __resolveType: TypeResolveFn<'InitiationViaIntraLedger' | 'InitiationViaLn' | 'InitiationViaOnChain', ParentType, ContextType>;
@@ -12411,8 +12434,10 @@ export type StatefulNotificationResolvers<ContextType = any, ParentType extends 
   action?: Resolver<Maybe<ResolversTypes['NotificationAction']>, ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bulletinEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  bulletinKey?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   deepLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  dismissible?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   icon?: Resolver<Maybe<ResolversTypes['Icon']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -12769,6 +12794,7 @@ export type Resolvers<ContextType = any> = {
   Globals?: GlobalsResolvers<ContextType>;
   GraphQLApplicationError?: GraphQlApplicationErrorResolvers<ContextType>;
   Hex32Bytes?: GraphQLScalarType;
+  InactivityFeeInformation?: InactivityFeeInformationResolvers<ContextType>;
   InitiationVia?: InitiationViaResolvers<ContextType>;
   InitiationViaIntraLedger?: InitiationViaIntraLedgerResolvers<ContextType>;
   InitiationViaLn?: InitiationViaLnResolvers<ContextType>;

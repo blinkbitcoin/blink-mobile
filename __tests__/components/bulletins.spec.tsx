@@ -1,6 +1,6 @@
 import * as React from "react"
 import { Text as ReactNativeText, TouchableOpacity, View, Linking } from "react-native"
-import { render, fireEvent, waitFor } from "@testing-library/react-native"
+import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
 
 import { flushEffects } from "../helpers/flush-effects"
 
@@ -36,9 +36,14 @@ jest.mock("@app/graphql/generated", () => {
   }
 })
 
+/** What the app itself asked the home to show, when the server sent no bulletin. */
+const mockCardInfo: { current: Record<string, unknown> | undefined } = {
+  current: undefined,
+}
+
 jest.mock("@app/components/notifications", () => ({
   useNotifications: () => ({
-    cardInfo: undefined,
+    cardInfo: mockCardInfo.current,
     notifyModal: jest.fn(),
     notifyCard: jest.fn(),
   }),
@@ -90,6 +95,7 @@ const makeBulletin = (overrides: Record<string, unknown> = {}) => ({
   createdAt: 1700000000,
   acknowledgedAt: null,
   bulletinEnabled: true,
+  dismissible: true,
   icon: null,
   action: null,
   ...overrides,
@@ -123,6 +129,7 @@ const makeBulletinsQuery = (
 beforeEach(() => {
   jest.clearAllMocks()
   testBulletinsStore.clear()
+  mockCardInfo.current = undefined
 })
 
 describe("BulletinsCard", () => {
@@ -247,6 +254,118 @@ describe("BulletinsCard", () => {
     await flushEffects()
   })
 
+  /** The server keeps such a bulletin up until it retires it itself; the app offers no
+   *  way to close it and does not acknowledge it on a tap either. */
+  describe("a bulletin that is not dismissible", () => {
+    it("offers no close control", () => {
+      const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
+      const { queryByTestId } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      expect(queryByTestId("icon-button-close")).toBeNull()
+    })
+
+    it("opens its deep link on press without acknowledging it", async () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({
+          dismissible: false,
+          action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
+        }),
+      ])
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByText("Test Bulletin"))
+      await flushEffects()
+
+      expect(Linking.openURL).toHaveBeenCalledWith("blink:/settings")
+      expect(mockAck).not.toHaveBeenCalled()
+      expect(mockRefetchQueries).not.toHaveBeenCalled()
+    })
+
+    it("opens its external link on press without acknowledging it", async () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({
+          dismissible: false,
+          action: { __typename: "OpenExternalLinkAction", url: "https://example.com" },
+        }),
+      ])
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByText("Test Bulletin"))
+      await flushEffects()
+
+      expect(Linking.openURL).toHaveBeenCalledWith("https://example.com")
+      expect(mockAck).not.toHaveBeenCalled()
+    })
+
+    it("stays on the home next to a dismissible one, which keeps its close control", () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
+        makeBulletin({ id: "notif-2", title: "Closable", dismissible: true }),
+      ])
+      const { getByText, getAllByTestId } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      expect(getByText("Stays")).toBeTruthy()
+      expect(getByText("Closable")).toBeTruthy()
+      expect(getAllByTestId("icon-button-close")).toHaveLength(1)
+    })
+  })
+
+  /** The card is gone only once the server has taken the acknowledgement: a failed one
+   *  leaves it in place, and a successful one refetches the list after the exit animation. */
+  describe("acknowledging", () => {
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    it("keeps the bulletin and says so in the log when the acknowledgement fails", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockAck.mockRejectedValueOnce(new Error("offline"))
+      const bulletins = makeBulletinsQuery([makeBulletin()])
+      const { getByTestId, getByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByTestId("icon-button-close"))
+      await flushEffects()
+
+      expect(getByText("Test Bulletin")).toBeTruthy()
+      expect(mockRefetchQueries).not.toHaveBeenCalled()
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to acknowledge notification",
+        expect.any(Error),
+      )
+      consoleError.mockRestore()
+    })
+
+    it("refetches the bulletins once the exit animation has run", async () => {
+      jest.useFakeTimers()
+      const bulletins = makeBulletinsQuery([makeBulletin()])
+      const { getByTestId } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByTestId("icon-button-close"))
+      await act(async () => {})
+      expect(mockRefetchQueries).not.toHaveBeenCalled()
+
+      act(() => {
+        jest.runOnlyPendingTimers()
+      })
+
+      expect(mockRefetchQueries).toHaveBeenCalledWith({
+        include: [expect.objectContaining({ kind: "Document" })],
+      })
+    })
+  })
+
   it("renders multiple bulletins", () => {
     const bulletins = makeBulletinsQuery([
       makeBulletin({ id: "notif-1", title: "First" }),
@@ -256,6 +375,21 @@ describe("BulletinsCard", () => {
 
     expect(getByText("First")).toBeTruthy()
     expect(getByText("Second")).toBeTruthy()
+  })
+
+  /** With nothing from the server, the card the app itself asked for is what shows. */
+  it("falls back to the app's own card when no bulletin came from the server", () => {
+    mockCardInfo.current = {
+      title: "Local card",
+      text: "Shown by the app",
+      action: async () => {},
+      dismissAction: () => {},
+    }
+
+    const { getByText } = render(<BulletinsCard loading={false} bulletins={undefined} />)
+
+    expect(getByText("Local card")).toBeTruthy()
+    expect(getByText("Shown by the app")).toBeTruthy()
   })
 
   it("returns null when bulletins is undefined and no cardInfo", () => {

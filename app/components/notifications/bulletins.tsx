@@ -71,28 +71,37 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
     return (
       <Animated.View style={{ opacity, transform: [{ translateY }] }}>
         {bulletins?.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges.map(
-          ({ node: bulletin }) => (
-            <NotificationCardUI
-              icon={
-                bulletin.icon
-                  ? (bulletin.icon.toLowerCase().replace(/_/g, "-") as IconNamesType)
-                  : undefined
-              }
-              key={bulletin.id}
-              title={bulletin.title}
-              text={bulletin.body}
-              action={async () => {
-                if (bulletin.action?.__typename === "OpenDeepLinkAction")
-                  Linking.openURL(BLINK_DEEP_LINK_PREFIX + bulletin.action.deepLink)
-                else if (bulletin.action?.__typename === "OpenExternalLinkAction")
-                  Linking.openURL(bulletin.action.url)
-                await dismissWithAnimation(bulletin.id)
-              }}
-              dismissAction={() => dismissWithAnimation(bulletin.id)}
-              loading={ackLoading}
-              buttonLabel={bulletin.action?.label ?? undefined}
-            />
-          ),
+          ({ node: bulletin }) => {
+            /** A bulletin the server marks as not dismissible stays until the server
+             *  retires it: it gets no close control, and opening its link does not
+             *  acknowledge it, so it is still on the home when the user comes back. */
+            const dismiss = bulletin.dismissible
+              ? () => dismissWithAnimation(bulletin.id)
+              : undefined
+
+            return (
+              <NotificationCardUI
+                icon={
+                  bulletin.icon
+                    ? (bulletin.icon.toLowerCase().replace(/_/g, "-") as IconNamesType)
+                    : undefined
+                }
+                key={bulletin.id}
+                title={bulletin.title}
+                text={bulletin.body}
+                action={async () => {
+                  if (bulletin.action?.__typename === "OpenDeepLinkAction")
+                    Linking.openURL(BLINK_DEEP_LINK_PREFIX + bulletin.action.deepLink)
+                  else if (bulletin.action?.__typename === "OpenExternalLinkAction")
+                    Linking.openURL(bulletin.action.url)
+                  if (dismiss) await dismiss()
+                }}
+                dismissAction={dismiss}
+                loading={ackLoading}
+                buttonLabel={bulletin.action?.label ?? undefined}
+              />
+            )
+          },
         )}
         {hasTestBulletins &&
           testBulletins.map((bulletin) => (

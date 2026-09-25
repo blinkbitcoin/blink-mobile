@@ -176,6 +176,7 @@ gql`
             createdAt
             acknowledgedAt
             bulletinEnabled
+            dismissible
             icon
             action {
               ... on OpenDeepLinkAction {
