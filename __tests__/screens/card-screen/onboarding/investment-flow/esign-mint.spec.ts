@@ -1,7 +1,10 @@
 import {
+  ENVELOPE_INSTANCE_PATH,
   mintSigningInstance,
   resolveMintOrigin,
+  trustedRemoteMintOrigin,
 } from "@app/screens/card-screen/onboarding/investment-flow/esign-mint"
+import { ROUTE_MISSING_CODE } from "@app/screens/card-screen/onboarding/investment-flow/investment-agreement"
 
 const CONFIGURED_ORIGIN = "https://esign.example.test"
 
@@ -58,6 +61,84 @@ describe("resolveMintOrigin", () => {
       expect(resolveMintOrigin(CONFIGURED_ORIGIN)).toBe(CONFIGURED_ORIGIN)
     })
   })
+
+  /** A trailing slash is a copy-paste away, and would double up against the path. */
+  it("reads a configured value as an origin, whatever it was pasted with", () => {
+    expect(resolveMintOrigin(`${CONFIGURED_ORIGIN}/`)).toBe(CONFIGURED_ORIGIN)
+    expect(resolveMintOrigin(`  ${CONFIGURED_ORIGIN}// `)).toBe(CONFIGURED_ORIGIN)
+    expect(resolveMintOrigin("http://10.0.2.2:4100")).toBe("http://10.0.2.2:4100")
+  })
+
+  /** Anything that is not an http(s) origin is nowhere a mint can be made. */
+  it("reads a value that is not an http origin as not configured", () => {
+    withDevFlag(false, () => {
+      expect(resolveMintOrigin("esign.example.test")).toBe("")
+      expect(resolveMintOrigin("ftp://esign.example.test")).toBe("")
+      expect(resolveMintOrigin("https://esign.example.test/mint")).toBe("")
+      expect(resolveMintOrigin("https://user@esign.example.test")).toBe("")
+      expect(resolveMintOrigin("file:///etc/hosts")).toBe("")
+    })
+  })
+})
+
+/**
+ * The mint is made with the user's session token, so whoever can edit the remote value
+ * could otherwise send every investor's token wherever they liked.
+ */
+describe("trustedRemoteMintOrigin", () => {
+  it("takes one of Blink's own hosts over https in a release build", () => {
+    withDevFlag(false, () => {
+      expect(trustedRemoteMintOrigin("https://esign.blink.sv")).toBe(
+        "https://esign.blink.sv",
+      )
+      expect(trustedRemoteMintOrigin("https://esign.staging.blinkbtc.com/")).toBe(
+        "https://esign.staging.blinkbtc.com",
+      )
+      expect(trustedRemoteMintOrigin("https://blinkbtc.com")).toBe("https://blinkbtc.com")
+    })
+  })
+
+  it("ignores any other host, and plain http, in a release build", () => {
+    withDevFlag(false, () => {
+      expect(trustedRemoteMintOrigin("https://esign.example.test")).toBe("")
+      expect(trustedRemoteMintOrigin("https://blink.sv.evil.example")).toBe("")
+      expect(trustedRemoteMintOrigin("https://evilblink.sv")).toBe("")
+      expect(trustedRemoteMintOrigin("http://esign.blink.sv")).toBe("")
+      expect(trustedRemoteMintOrigin("esign.blink.sv")).toBe("")
+      expect(trustedRemoteMintOrigin("")).toBe("")
+    })
+  })
+
+  /** Forms a url parser reads as another host than a suffix check does: userinfo in
+   *  front of the real host, a backslash the parser treats as a slash, an escape. */
+  it("is not fooled by userinfo, a backslash or an escape in front of Blink's host", () => {
+    withDevFlag(false, () => {
+      expect(trustedRemoteMintOrigin("https://esign.blink.sv:443@evil.example")).toBe("")
+      expect(trustedRemoteMintOrigin("https://blink.sv:x@evil.example")).toBe("")
+      expect(trustedRemoteMintOrigin("https://esign.blink.sv@evil.example")).toBe("")
+      expect(trustedRemoteMintOrigin("https://evil.example\\.blink.sv")).toBe("")
+      expect(trustedRemoteMintOrigin("https://evil.example%2F.blink.sv")).toBe("")
+      expect(trustedRemoteMintOrigin("https://[::1].blink.sv")).toBe("")
+    })
+  })
+
+  it("reads the host whatever its case", () => {
+    withDevFlag(false, () => {
+      expect(trustedRemoteMintOrigin("https://ESIGN.BLINK.SV")).toBe(
+        "https://ESIGN.BLINK.SV",
+      )
+    })
+  })
+
+  /** A debug build is pointed at a developer's own machine by the same value. */
+  it("takes any origin in a debug build", () => {
+    withDevFlag(true, () => {
+      expect(trustedRemoteMintOrigin("http://10.0.2.2:4100/")).toBe(
+        "http://10.0.2.2:4100",
+      )
+      expect(trustedRemoteMintOrigin("not an origin")).toBe("")
+    })
+  })
 })
 
 describe("mintSigningInstance", () => {
@@ -92,6 +173,41 @@ describe("mintSigningInstance", () => {
   })
 
   /** The signer is the service's to resolve from the session; the app sends none. */
+  /** The client library exports no constant for its route, so the string is pinned
+   *  here: a service that moves it fails this spec rather than the signer. */
+  it("mints at the service's envelope route", () => {
+    expect(ENVELOPE_INSTANCE_PATH).toBe("/envelope/instance")
+  })
+
+  /** A route the service does not serve is not something a signer cures by tapping
+   *  again, so it gets a code of its own, and the status for the log. */
+  it("reports a route the service does not serve under its own code", async () => {
+    answering(404, {}, false)
+    await expect(mint()).rejects.toMatchObject({
+      code: ROUTE_MISSING_CODE,
+      status: 404,
+      message: "HTTP 404",
+    })
+
+    answering(405, { error: "Method Not Allowed" })
+    await expect(mint()).rejects.toMatchObject({
+      code: ROUTE_MISSING_CODE,
+      status: 405,
+      message: "Method Not Allowed",
+    })
+  })
+
+  it("carries the status the service answered on every failure", async () => {
+    answering(401, {})
+    await expect(mint()).rejects.toMatchObject({ status: 401 })
+
+    answering(400, { error: "the rate is stale" })
+    await expect(mint()).rejects.toMatchObject({ status: 400 })
+
+    answering(502, { error: "Could not compute the signing terms" })
+    await expect(mint()).rejects.toMatchObject({ status: 502 })
+  })
+
   it("posts the values alone to the service's envelope mint, as the session", async () => {
     answering(200, MINTED)
 
