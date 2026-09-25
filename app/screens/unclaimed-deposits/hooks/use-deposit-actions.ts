@@ -2,6 +2,7 @@ import { useCallback, useEffect, useState } from "react"
 
 import { usePayments } from "@app/hooks/use-payments"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useTranslateSdkError } from "@app/self-custodial/hooks"
 import {
   DepositErrorReason,
   DepositStatus,
@@ -24,12 +25,22 @@ type ActiveAction = {
 
 type PaymentError = { message: string }
 type LL = ReturnType<typeof useI18nContext>["LL"]
+/** Turns a classified self-custodial code into a sentence, and leaves anything else be. */
+type TranslateSdkError = ReturnType<typeof useTranslateSdkError>
 
-const resolveClaimErrorMessage = (
-  deposit: PendingDeposit,
-  errors: PaymentError[] | undefined,
-  LL: LL,
-): string => {
+type ErrorMessageParams = {
+  deposit: PendingDeposit
+  errors: PaymentError[] | undefined
+  LL: LL
+  translateSdkError: TranslateSdkError
+}
+
+const resolveClaimErrorMessage = ({
+  deposit,
+  errors,
+  LL,
+  translateSdkError,
+}: ErrorMessageParams): string => {
   if (deposit.errorReason === DepositErrorReason.BelowDust) {
     return LL.UnclaimedDeposit.belowDustLimit()
   }
@@ -42,16 +53,19 @@ const resolveClaimErrorMessage = (
     return LL.UnclaimedDeposit.missingUtxo()
   }
   if (errors?.length) {
-    return LL.UnclaimedDeposit.claimFailed({ error: errors[0].message })
+    return LL.UnclaimedDeposit.claimFailed({
+      error: translateSdkError(errors[0].message) ?? errors[0].message,
+    })
   }
   return LL.UnclaimedDeposit.error()
 }
 
-const resolveRefundErrorMessage = (
-  deposit: PendingDeposit,
-  errors: PaymentError[] | undefined,
-  LL: LL,
-): string => {
+const resolveRefundErrorMessage = ({
+  deposit,
+  errors,
+  LL,
+  translateSdkError,
+}: ErrorMessageParams): string => {
   if (deposit.errorReason === DepositErrorReason.BelowDust) {
     return LL.UnclaimedDeposit.belowDustLimit()
   }
@@ -61,13 +75,16 @@ const resolveRefundErrorMessage = (
     })
   }
   if (errors?.length) {
-    return LL.UnclaimedDeposit.refundFailed({ error: errors[0].message })
+    return LL.UnclaimedDeposit.refundFailed({
+      error: translateSdkError(errors[0].message) ?? errors[0].message,
+    })
   }
   return LL.UnclaimedDeposit.error()
 }
 
 export const useDepositActions = () => {
   const { LL } = useI18nContext()
+  const translateSdkError = useTranslateSdkError()
   const { listPendingDeposits, claimDeposit } = usePayments()
   const [deposits, setDeposits] = useState<PendingDeposit[]>([])
   const [activeAction, setActiveAction] = useState<ActiveAction | null>(null)
@@ -104,7 +121,12 @@ export const useDepositActions = () => {
           maxFeeSats: deposit.requiredFeeSats,
         })
         if (result.status === PaymentResultStatus.Failed) {
-          const message = resolveClaimErrorMessage(deposit, result.errors, LL)
+          const message = resolveClaimErrorMessage({
+            deposit,
+            errors: result.errors,
+            LL,
+            translateSdkError,
+          })
           toastShow({ message, LL })
           return
         }
@@ -118,7 +140,7 @@ export const useDepositActions = () => {
         setActiveAction(null)
       }
     },
-    [claimDeposit, refresh, LL],
+    [claimDeposit, refresh, LL, translateSdkError],
   )
 
   const handleRefund = useCallback(
@@ -140,7 +162,12 @@ export const useDepositActions = () => {
           feeRateSatPerVb,
         })
         if (result.status === PaymentResultStatus.Failed) {
-          const message = resolveRefundErrorMessage(deposit, result.errors, LL)
+          const message = resolveRefundErrorMessage({
+            deposit,
+            errors: result.errors,
+            LL,
+            translateSdkError,
+          })
           toastShow({ message, LL })
           return false
         }
@@ -155,7 +182,7 @@ export const useDepositActions = () => {
         setActiveAction(null)
       }
     },
-    [claimDeposit, refresh, LL],
+    [claimDeposit, refresh, LL, translateSdkError],
   )
 
   return {
