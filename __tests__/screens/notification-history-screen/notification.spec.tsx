@@ -32,6 +32,7 @@ const makeNotification = (
   createdAt: THIRTY_SECONDS_AGO,
   acknowledgedAt: null,
   bulletinEnabled: false,
+  dismissible: true,
   icon: null,
   action: null,
   ...overrides,

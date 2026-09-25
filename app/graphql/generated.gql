@@ -982,6 +982,7 @@ query Bulletins($first: Int!, $after: String) {
           createdAt
           acknowledgedAt
           bulletinEnabled
+          dismissible
           icon
           action {
             ... on OpenDeepLinkAction {
