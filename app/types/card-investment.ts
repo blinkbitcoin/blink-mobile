@@ -25,6 +25,10 @@ export type CardInvestmentProgress = {
   /** When the investor closed the welcome. The record stays past that, as the mark that
    *  this account signed; only the card goes. */
   welcomeDismissedAt?: number
+  /** The server's invitation bulletin the signature answered, once the signing step found
+   *  it. The home retires only this one, and reads any other investment bulletin as a new
+   *  invitation. Absent when the server could not be reached as the agreement was signed. */
+  invitationBulletinId?: string
   /** The invoice last issued for the payment, kept so a return to the transfer step pays
    *  the same claim rather than a second one, and so a payment that went through without
    *  being recorded can be found in the ledger before another invoice is minted. */
