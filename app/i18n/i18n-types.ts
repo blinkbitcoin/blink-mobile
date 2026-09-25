@@ -12381,6 +12381,50 @@ type RootTranslation = {
 				 */
 				buttonText: string
 			}
+			SignInvest: {
+				/**
+				 * P​r​e​p​a​r​i​n​g​ ​y​o​u​r​ ​a​g​r​e​e​m​e​n​t​.
+				 */
+				loading: string
+				/**
+				 * S​i​g​n​i​n​g​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​y​e​t​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+				 */
+				notAvailable: string
+				errors: {
+					/**
+					 * T​h​e​ ​a​g​r​e​e​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​p​r​e​p​a​r​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+					 */
+					envelopeCreationFailed: string
+					/**
+					 * C​o​n​n​e​c​t​i​o​n​ ​l​o​s​t​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​n​e​t​w​o​r​k​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+					 */
+					networkError: string
+					/**
+					 * Y​o​u​r​ ​s​e​s​s​i​o​n​ ​i​s​ ​n​o​ ​l​o​n​g​e​r​ ​v​a​l​i​d​.​ ​P​l​e​a​s​e​ ​s​i​g​n​ ​i​n​ ​a​g​a​i​n​.
+					 */
+					unauthorized: string
+					/**
+					 * T​h​e​ ​s​i​g​n​i​n​g​ ​s​e​s​s​i​o​n​ ​e​x​p​i​r​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+					 */
+					sessionExpired: string
+					/**
+					 * T​h​e​ ​s​i​g​n​i​n​g​ ​s​e​r​v​i​c​e​ ​i​s​ ​t​e​m​p​o​r​a​r​i​l​y​ ​u​n​a​v​a​i​l​a​b​l​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+					 */
+					providerUnavailable: string
+					/**
+					 * S​i​g​n​i​n​g​ ​i​s​ ​n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​s​e​r​v​e​r​ ​y​e​t​.​ ​P​l​e​a​s​e​ ​u​p​d​a​t​e​ ​t​h​e​ ​a​p​p​ ​o​r​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
+					 */
+					routeMissing: string
+					/**
+					 * T​h​e​ ​d​o​c​u​m​e​n​t​ ​t​h​a​t​ ​w​a​s​ ​s​i​g​n​e​d​ ​i​s​ ​n​o​t​ ​t​h​e​ ​o​n​e​ ​t​h​i​s​ ​s​t​e​p​ ​p​r​e​p​a​r​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+					 */
+					envelopeMismatch: string
+					/**
+					 * S​o​m​e​t​h​i​n​g​ ​w​e​n​t​ ​w​r​o​n​g​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+					 */
+					generic: string
+				}
+			}
 			TransferInvest: {
 				/**
 				 * T​r​a​n​s​f​e​r​ ​y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t
@@ -26091,6 +26135,50 @@ export type TranslationFunctions = {
 				 * Proceed to sign
 				 */
 				buttonText: () => LocalizedString
+			}
+			SignInvest: {
+				/**
+				 * Preparing your agreement.
+				 */
+				loading: () => LocalizedString
+				/**
+				 * Signing is not available yet. Please try again later.
+				 */
+				notAvailable: () => LocalizedString
+				errors: {
+					/**
+					 * The agreement could not be prepared. Please try again.
+					 */
+					envelopeCreationFailed: () => LocalizedString
+					/**
+					 * Connection lost. Please check your network and try again.
+					 */
+					networkError: () => LocalizedString
+					/**
+					 * Your session is no longer valid. Please sign in again.
+					 */
+					unauthorized: () => LocalizedString
+					/**
+					 * The signing session expired. Please try again.
+					 */
+					sessionExpired: () => LocalizedString
+					/**
+					 * The signing service is temporarily unavailable. Please try again later.
+					 */
+					providerUnavailable: () => LocalizedString
+					/**
+					 * Signing is not available on this server yet. Please update the app or try again later.
+					 */
+					routeMissing: () => LocalizedString
+					/**
+					 * The document that was signed is not the one this step prepared. Please try again.
+					 */
+					envelopeMismatch: () => LocalizedString
+					/**
+					 * Something went wrong. Please try again.
+					 */
+					generic: () => LocalizedString
+				}
 			}
 			TransferInvest: {
 				/**

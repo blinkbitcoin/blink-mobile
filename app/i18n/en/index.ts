@@ -3890,6 +3890,20 @@ const en: BaseTranslation = {
         },
         buttonText: "Proceed to sign",
       },
+      SignInvest: {
+        loading: "Preparing your agreement.",
+        notAvailable: "Signing is not available yet. Please try again later.",
+        errors: {
+          envelopeCreationFailed: "The agreement could not be prepared. Please try again.",
+          networkError: "Connection lost. Please check your network and try again.",
+          unauthorized: "Your session is no longer valid. Please sign in again.",
+          sessionExpired: "The signing session expired. Please try again.",
+          providerUnavailable: "The signing service is temporarily unavailable. Please try again later.",
+          routeMissing: "Signing is not available on this server yet. Please update the app or try again later.",
+          envelopeMismatch: "The document that was signed is not the one this step prepared. Please try again.",
+          generic: "Something went wrong. Please try again.",
+        },
+      },
       TransferInvest: {
         title: "Transfer your investment",
         paragraphs: {
