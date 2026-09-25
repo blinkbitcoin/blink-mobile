@@ -161,16 +161,38 @@ describe("buildMigrationTransferRequest", () => {
   /**
    * NoMnemonic routes the user to support as a device that never held the key, so
    * a read that merely failed must not land there: nothing is missing, the
-   * keychain just would not answer, and the next attempt may well succeed.
+   * keychain just would not answer.
    */
-  it("reports a failed read as a retryable failure, not as a device without the key", async () => {
-    const readError = new Error("keychain locked")
-    mockReadMnemonic.mockResolvedValue({ status: "failed", err: readError })
+  it("reports a failed read as a failure, not as a device without the key", async () => {
+    mockReadMnemonic.mockResolvedValue({
+      status: "failed",
+      err: new Error("keychain locked"),
+    })
 
     const result = await buildRequest()
 
-    expect(result).toEqual({ status: MigrationSdkStatus.Failed, error: readError })
+    expect(result.status).toBe(MigrationSdkStatus.Failed)
     expect(mockInitSdk).not.toHaveBeenCalled()
+  })
+
+  /**
+   * This error reaches Crashlytics with its cause intact, and a keychain error can
+   * carry the server string, which ends in the account id. The sibling call sites
+   * drop the cause for the same reason.
+   */
+  it("keeps the account id out of the error it hands the caller", async () => {
+    mockReadMnemonic.mockResolvedValue({
+      status: "failed",
+      err: new Error(`secure-store.blink.local/mnemonic:sc-account-1 locked`),
+    })
+
+    const result = await buildRequest()
+
+    expect(result.status).toBe(MigrationSdkStatus.Failed)
+    if (result.status === MigrationSdkStatus.Failed) {
+      expect(result.error.message).not.toContain("sc-account-1")
+      expect(result.error.message).toBe("Mnemonic read failed")
+    }
   })
 
   it("reports a failure when the wallet will not sign", async () => {
