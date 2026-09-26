@@ -3759,6 +3759,24 @@
         "message": "Se așteaptă decontarea depozitului tău; te rugăm să aștepți 2 confirmări pe lanț.",
         "buttonText": "OK"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Sold insuficient",
+              "body": "Pentru a-ți finaliza investiția, depune suma rămasă."
+          },
+          "depositPending": {
+              "title": "Un moment",
+              "body": "Așteptăm decontarea depozitului tău."
+          },
+          "ready": {
+              "title": "Finalizează-ți investiția",
+              "body": "Acum ai fonduri suficiente pentru a finaliza investiția."
+          },
+          "shareholder": {
+              "title": "Bine ai venit ca acționar Blink!",
+              "body": "Te vom anunța de îndată ce Blink Visa Card-ul tău este gata."
+          }
+      },
       "PersonalInformation": {
         "title": "Ultimul pas",
         "fields": {

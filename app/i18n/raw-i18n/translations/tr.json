@@ -3759,6 +3759,24 @@
         "message": "Yatırılan tutarın kesinleşmesi bekleniyor; lütfen zincir üzerinde 2 onay bekle.",
         "buttonText": "Tamam"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Yetersiz bakiye",
+              "body": "Yatırımını tamamlamak için kalan tutarı yatır."
+          },
+          "depositPending": {
+              "title": "Biraz bekle",
+              "body": "Yatırdığın tutarın kesinleşmesini bekliyoruz."
+          },
+          "ready": {
+              "title": "Yatırımını tamamla",
+              "body": "Artık yatırımı tamamlamak için yeterli bakiyen var."
+          },
+          "shareholder": {
+              "title": "Blink hissedarı olarak hoş geldin!",
+              "body": "Blink Visa Card'ın hazır olur olmaz sana haber vereceğiz."
+          }
+      },
       "PersonalInformation": {
         "title": "Son adım",
         "fields": {

@@ -15,6 +15,7 @@ import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -125,6 +126,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
+  const { isInvestmentInvoice } = useCardInvestmentProgress()
   const { LL } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
@@ -225,6 +227,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
       })
 
+      /** Only a lightning payment settles an invoice as such; the receipt is told which,
+       *  unshortened, so whatever asked for that payment can recognise its own. */
+      const settledPaymentRequest = paymentType === "lightning" ? destination : undefined
+
       navigation.dispatch((state) => {
         const routes = [
           { name: "Primary" },
@@ -250,6 +256,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                     }),
               paymentType: paymentDetail?.paymentType,
               createdAt: transaction?.createdAt,
+              paymentRequest: settledPaymentRequest,
             },
           },
         ]
@@ -277,6 +284,24 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     ],
   )
 
+  /** Asks the ledger whether a payment already made settled, under the spinner: the
+   *  answer both an idempotency conflict and an already-paid investment invoice read
+   *  the receipt from. */
+  const lookUpSettlement = React.useCallback(
+    async (paymentRequest: string) => {
+      setIsVerifying(true)
+      try {
+        return await verifyPaymentSettled({
+          walletId: sendingWalletDescriptor.id,
+          paymentRequest,
+        })
+      } finally {
+        setIsVerifying(false)
+      }
+    },
+    [verifyPaymentSettled, sendingWalletDescriptor.id],
+  )
+
   const handleSendPayment = React.useCallback(async () => {
     if (!sendPayment || !sendingWalletDescriptor?.currency) {
       return sendPayment
@@ -301,6 +326,31 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       }
 
       if (status === "ALREADY_PAID") {
+        /**
+         * The card investment's own invoice exists for that investment alone, so "already
+         * paid" on it means the money already landed against the agreement, whoever paid
+         * it; in practice an earlier attempt from this device that the app closed on
+         * before its receipt was recorded. Refusing here would leave the home asking for
+         * the money again, and the next attempt would mint and pay a second invoice; the
+         * receipt records it as settled instead. Custodial only: the self-custodial
+         * adapter reports a settled invoice as a plain failure.
+         *
+         * The ledger is asked for the settlement first, the way an idempotency conflict
+         * is, so the receipt carries the real status and moment rather than an assumed
+         * one; when it cannot answer, the receipt is still reached, since the alternative
+         * is the home asking for money that has already gone. The lookup is per sending
+         * wallet, so an earlier attempt paid from the other wallet costs the poll's few
+         * seconds before the receipt; the attempt's own result was logged above.
+         */
+        if (paymentType === "lightning" && isInvestmentInvoice(destination)) {
+          const settled = await lookUpSettlement(destination)
+          const receipt = settled
+            ? { status: settled.status, transaction: { createdAt: settled.createdAt } }
+            : { status: "SUCCESS" as const }
+          await navigateToCompleted(receipt)
+          return
+        }
+
         setPaymentError(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
         ReactNativeHapticFeedback.trigger("notificationError", {
           ignoreAndroidSystemSettings: true,
@@ -330,16 +380,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 : undefined
 
           if (paymentRequest) {
-            setIsVerifying(true)
-            let verified
-            try {
-              verified = await verifyPaymentSettled({
-                walletId: sendingWalletDescriptor.id,
-                paymentRequest,
-              })
-            } finally {
-              setIsVerifying(false)
-            }
+            const verified = await lookUpSettlement(paymentRequest)
             if (verified) {
               logPaymentResult({
                 paymentType: paymentDetail.paymentType,
@@ -371,12 +412,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   }, [
     LL,
     paymentDetail,
+    paymentType,
     sendPayment,
     setPaymentError,
     sendingWalletDescriptor,
     destination,
     navigateToCompleted,
-    verifyPaymentSettled,
+    lookUpSettlement,
+    isInvestmentInvoice,
     translateSdkError,
   ])
 

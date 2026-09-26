@@ -11,6 +11,7 @@ import {
 import { SuccessActionComponent } from "@app/components/success-action"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useScreenshot } from "@app/hooks"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -290,6 +291,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     destination,
     paymentType,
     createdAt,
+    paymentRequest,
   } = route.params
 
   const styles = useStyles()
@@ -299,6 +301,25 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
   const { LL } = useI18nContext()
+  const {
+    progress: cardInvestment,
+    markPaid: markCardInvestmentPaid,
+    isInvestmentInvoice,
+  } = useCardInvestmentProgress()
+
+  /**
+   * Recorded on any status that reaches this screen, a pending one included. A pending
+   * payment can still fail, and the record has no way back from "paid"; that loss is
+   * accepted, because holding the record would leave the home asking for the money
+   * again while it is in flight, and a second tap on that card mints a second invoice
+   * for an investment already being paid. Recorded once: a later receipt for the same
+   * invoice, the retry that met "already paid", finds the mark and leaves it.
+   */
+  const isUnrecordedInvestmentPayment =
+    isInvestmentInvoice(paymentRequest) && cardInvestment?.paidAt === undefined
+  useEffect(() => {
+    if (isUnrecordedInvestmentPayment) markCardInvestmentPaid()
+  }, [isUnrecordedInvestmentPayment, markCardInvestmentPaid])
 
   const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
   const { successIconDuration } = useRemoteConfig()

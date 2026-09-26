@@ -22,6 +22,11 @@ jest.mock("react-native-linear-gradient", () => ({
   LinearGradient: "LinearGradient",
 }))
 
+/** Nothing signed yet, so the balance is measured against the chosen dollars. */
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({ progress: null }),
+}))
+
 /**
  * A second spec for the same screen, on a real stack: the sibling spec mocks
  * `useNavigation` and `useIsFocused` module-wide, so it can say that `goBack` was

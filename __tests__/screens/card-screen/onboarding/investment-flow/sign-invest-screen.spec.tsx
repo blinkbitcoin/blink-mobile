@@ -15,6 +15,7 @@ import {
   REPORT_PAGE_READY_SCRIPT,
   SignInvestScreen,
 } from "@app/screens/card-screen/onboarding/investment-flow/sign-invest-screen"
+import { WAIT_TIMEOUT_MS } from "@app/screens/card-screen/onboarding/investment-flow/use-given-up-waiting"
 
 import { ContextForScreen } from "../../../helper"
 
@@ -130,12 +131,35 @@ jest.mock("@app/screens/card-screen/onboarding/investment-flow/esign-mint", () =
   mintSigningInstance: (...args: unknown[]) => mockMintSigningInstance(...args),
 }))
 
+/** The record the home reads to steer the investor back to paying; its own spec covers
+ *  the store, so what matters here is that signing writes it, with what. */
+const mockStartCardInvestment = jest.fn()
+/** Whether the account the record is filed under is known; a custodial session can
+ *  still be asking the server on a cold open. */
+const mockIsAccountResolved = { current: true }
+
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({
+    start: (...args: unknown[]) => mockStartCardInvestment(...args),
+    isAccountResolved: mockIsAccountResolved.current,
+  }),
+}))
+
 /** Read through a getter so a test can arrive on the route with a different choice. */
 const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
 
 const mockNavigate = jest.fn()
-const mockReplace = jest.fn()
+const mockDispatch = jest.fn()
 const mockGoBack = jest.fn()
+
+/** The routes a stack reset dispatched, so a test can say where the signer lands. */
+const resetRoutes = () => {
+  const action = mockDispatch.mock.calls[0]?.[0] as
+    | { type?: string; payload?: { index?: number; routes?: unknown[] } }
+    | undefined
+  expect(action?.type).toBe("RESET")
+  return action?.payload
+}
 
 jest.mock("@react-navigation/native", () => {
   const actualNav = jest.requireActual("@react-navigation/native")
@@ -143,7 +167,7 @@ jest.mock("@react-navigation/native", () => {
     ...actualNav,
     useNavigation: () => ({
       navigate: mockNavigate,
-      replace: mockReplace,
+      dispatch: mockDispatch,
       goBack: mockGoBack,
     }),
     useRoute: () => ({ params: mockRouteParams.current }),
@@ -262,6 +286,7 @@ const resetScreenMocks = () => {
   mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
   mockInstanceMintUrl.current = MINT_ORIGIN
   mockRemoteMintUrl.current = ""
+  mockIsAccountResolved.current = true
   mockMintSigningInstance.mockResolvedValue({
     url: TEST_INSTANCE_URL,
     envelopeId: TEST_ENVELOPE_ID,
@@ -379,7 +404,7 @@ describe("SignInvestScreen", () => {
   })
 
   describe("when the price does not come", () => {
-    const START_WAIT_TIMEOUT_MS = 15_000
+    const START_WAIT_TIMEOUT_MS = WAIT_TIMEOUT_MS
 
     beforeEach(() => {
       jest.useFakeTimers()
@@ -451,6 +476,38 @@ describe("SignInvestScreen", () => {
       expect(queryByText(/Connection lost/)).toBeNull()
       expect(mockESign.sign).toHaveBeenCalledTimes(1)
     })
+
+    /** The account is waited for the same way, and its absence ends the same way. */
+    it("gives up on the account the same way it gives up on the price", async () => {
+      mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
+      mockIsAccountResolved.current = false
+
+      const { getByText } = await renderScreen()
+      await waitOut()
+
+      expect(getByText(/Connection lost/)).toBeTruthy()
+      expect(mockESign.sign).not.toHaveBeenCalled()
+    })
+  })
+
+  /** Signing writes the investment against the account; with nowhere to file it the home
+   *  would never steer the investor back to paying, so the session waits for the account
+   *  the same way it waits for the price. */
+  it("waits until the investment can be filed before starting the session", async () => {
+    mockIsAccountResolved.current = false
+
+    const { rerender } = await renderScreen()
+    expect(mockESign.sign).not.toHaveBeenCalled()
+
+    mockIsAccountResolved.current = true
+    rerender(
+      <ContextForScreen>
+        <SignInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockESign.sign).toHaveBeenCalledTimes(1)
   })
 
   /**
@@ -1054,9 +1111,11 @@ describe("SignInvestScreen, where each outcome leads", () => {
   /**
    * Carries the agreement's own figure forward, which is the whole reason the signing
    * step asks for it: the transfer step bills that, and converting the dollars again at
-   * a later price would charge something the signed document does not state.
+   * a later price would charge something the signed document does not state. The stack
+   * is rebuilt as the home and that step: every screen of the flow left underneath is
+   * a way to sign a second agreement, and back belongs on the home.
    */
-  it("advances to the transfer step once the agreement is signed", async () => {
+  it("advances to the transfer step once signed, with nothing of the flow left underneath", async () => {
     await renderScreen()
     await startedSession()
 
@@ -1064,12 +1123,40 @@ describe("SignInvestScreen, where each outcome leads", () => {
       callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      settlementSats: SETTLEMENT_SATS,
+    expect(resetRoutes()).toEqual({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        {
+          name: "cardOnboardingTransferInvestScreen",
+          params: {
+            selectedAmountUsd: SELECTED_AMOUNT_USD,
+            settlementSats: SETTLEMENT_SATS,
+          },
+        },
+      ],
     })
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  /** Signing is the commitment worth following up on, so this is the moment the home
+   *  starts steering the investor back to the payment, with the same figures the
+   *  transfer step is handed. */
+  it("records the signed investment as it moves on", async () => {
+    await renderScreen()
+    await startedSession()
+    expect(mockStartCardInvestment).not.toHaveBeenCalled()
+
+    await act(async () => {
+      callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
+    })
+
+    expect(mockStartCardInvestment).toHaveBeenCalledTimes(1)
+    expect(mockStartCardInvestment).toHaveBeenCalledWith({
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: SETTLEMENT_SATS,
+    })
   })
 
   /** The library names no envelope for a session minted without an id; the figure
@@ -1083,9 +1170,18 @@ describe("SignInvestScreen, where each outcome leads", () => {
       callbackOf("onComplete")(signed(undefined))
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      settlementSats: SETTLEMENT_SATS,
+    expect(resetRoutes()).toEqual({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        {
+          name: "cardOnboardingTransferInvestScreen",
+          params: {
+            selectedAmountUsd: SELECTED_AMOUNT_USD,
+            settlementSats: SETTLEMENT_SATS,
+          },
+        },
+      ],
     })
   })
 
@@ -1102,7 +1198,7 @@ describe("SignInvestScreen, where each outcome leads", () => {
       callbackOf("onComplete")(signed("some-other-envelope"))
     })
 
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
     expect(getByText(/not the one this step prepared/)).toBeTruthy()
     expect(logError).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -1182,9 +1278,18 @@ describe("SignInvestScreen, where each outcome leads", () => {
       callbackOf("onComplete")(signed("envelope-2"))
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      settlementSats: 20_000_000,
+    expect(resetRoutes()).toEqual({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        {
+          name: "cardOnboardingTransferInvestScreen",
+          params: {
+            selectedAmountUsd: SELECTED_AMOUNT_USD,
+            settlementSats: 20_000_000,
+          },
+        },
+      ],
     })
   })
 
@@ -1197,9 +1302,18 @@ describe("SignInvestScreen, where each outcome leads", () => {
       callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
     })
 
-    expect(mockReplace).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      settlementSats: undefined,
+    expect(resetRoutes()).toEqual({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        {
+          name: "cardOnboardingTransferInvestScreen",
+          params: {
+            selectedAmountUsd: SELECTED_AMOUNT_USD,
+            settlementSats: undefined,
+          },
+        },
+      ],
     })
   })
 
@@ -1211,7 +1325,7 @@ describe("SignInvestScreen, where each outcome leads", () => {
     })
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   /** Declining lands the session back in idle, where the document is opened from; a
@@ -1244,7 +1358,7 @@ describe("SignInvestScreen, where each outcome leads", () => {
 
     expect(mockGoBack).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockDispatch).not.toHaveBeenCalled()
   })
 
   /** The error goes to the log as it came, stack and identity included, with its

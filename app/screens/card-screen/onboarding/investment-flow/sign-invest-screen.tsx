@@ -18,6 +18,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -34,19 +35,14 @@ import {
   mintInvestmentAgreement,
   ROUTE_MISSING_CODE,
 } from "./investment-agreement"
+import { resetToTransferStep } from "./transfer-invest-screen"
+import { useGivenUpWaiting } from "./use-given-up-waiting"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
 /** The code the library files a mint refused for a reason the signer should read under;
  *  its message is the service's own words, and the one case the copy is not the app's. */
 const REFUSAL_CODE = "VALIDATION_ERROR"
-
-/**
- * How long a cold open waits for the price feed before it stops waiting and says so. A
- * spinner with no end and no button is a dead end; a feed that has not answered in this
- * long means the device is most likely offline, which is what the signer is then told.
- */
-const START_WAIT_TIMEOUT_MS = 15_000
 
 /** What the script below posts once the signing page has drawn something. */
 const PAGE_READY_MESSAGE = "blink-signing-page-ready"
@@ -195,6 +191,7 @@ export const SignInvestScreen: React.FC = () => {
   const { convertMoneyAmount } = usePriceConversion()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { start: startCardInvestment, isAccountResolved } = useCardInvestmentProgress()
 
   /**
    * What the latest mint left behind, kept from the mint so the transfer step bills
@@ -241,11 +238,13 @@ export const SignInvestScreen: React.FC = () => {
   const [hasSignedOtherEnvelope, setHasSignedOtherEnvelope] = React.useState(false)
 
   /**
-   * Replaces rather than pushes: the agreement cannot be unsigned, so leaving this
-   * screen behind would let a back swipe land on a finished session with no way on.
-   * The figure carried is the one minted with the envelope that was signed; when the
-   * library names the envelope and it is not that one, nothing is carried and the step
-   * does not move on.
+   * Rebuilds the stack as the home and the transfer step: the agreement cannot be
+   * unsigned, and every screen of the flow left underneath, from the welcome to this
+   * one, is a way to sign it a second time. The figure carried is the one minted with
+   * the envelope that was signed; when the library names the envelope and it is not
+   * that one, nothing is carried and the step does not move on. The same moment
+   * records the investment, so the home's bulletin can steer the investor back to
+   * paying it if they leave first.
    */
   const goToTransfer = React.useCallback(
     (result: { envelopeId?: string }) => {
@@ -264,12 +263,11 @@ export const SignInvestScreen: React.FC = () => {
         return
       }
 
-      navigation.replace("cardOnboardingTransferInvestScreen", {
-        selectedAmountUsd,
-        settlementSats: minted?.settlementSats,
-      })
+      const investment = { selectedAmountUsd, settlementSats: minted?.settlementSats }
+      startCardInvestment(investment)
+      navigation.dispatch(resetToTransferStep(investment))
     },
-    [navigation, selectedAmountUsd],
+    [navigation, selectedAmountUsd, startCardInvestment],
   )
 
   /**
@@ -372,27 +370,18 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
-  /** The agreement cannot be minted before the price feed has answered, so a cold open
-   *  waits on the spinner for it rather than failing the session it is about to start. */
+  /** The agreement cannot be minted before the price feed has answered, and it must not
+   *  be signed before the investment can be recorded against the account, or the home
+   *  would never steer the investor back to paying it. A cold open waits on the spinner
+   *  for both rather than failing the session it is about to start. */
   const isPriceQuoted = usdCentsPerBtc !== null
+  const isReadyToMint = isPriceQuoted && isAccountResolved
 
-  /**
-   * Whether that wait has gone on too long. While it is waiting a timer runs; once the
-   * price is in, or the session has moved on, the flag drops so a later wait starts
-   * fresh. Trying again drops it too, which starts the timer over: the feed answers on
-   * its own once the device is back, and the session then starts without another tap.
-   */
-  const isWaitingToStart = status === "idle" && !isPriceQuoted
-  const [hasGivenUpWaiting, setHasGivenUpWaiting] = React.useState(false)
-  React.useEffect(() => {
-    if (!isWaitingToStart) {
-      setHasGivenUpWaiting(false)
-      return
-    }
-    if (hasGivenUpWaiting) return
-    const giveUp = setTimeout(() => setHasGivenUpWaiting(true), START_WAIT_TIMEOUT_MS)
-    return () => clearTimeout(giveUp)
-  }, [isWaitingToStart, hasGivenUpWaiting])
+  /** A cold open waits for the price and the account; once both are in, or the session
+   *  has moved on, the wait is over, and the session then starts without another tap. */
+  const isWaitingToStart = status === "idle" && !isReadyToMint
+  const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =
+    useGivenUpWaiting(isWaitingToStart)
 
   /**
    * Opens the document as the screen does, once the price is in. Idle is also where a
@@ -406,7 +395,7 @@ export const SignInvestScreen: React.FC = () => {
    * telling the signer that another envelope was signed: that is a tap to try again,
    * not a session to open on its own.
    */
-  const canStartSigning = isPriceQuoted && isSigningAvailable && !hasSignedOtherEnvelope
+  const canStartSigning = isReadyToMint && isSigningAvailable && !hasSignedOtherEnvelope
   const hasStartedFromIdle = React.useRef(false)
   React.useEffect(() => {
     if (status !== "idle") {
@@ -611,10 +600,7 @@ export const SignInvestScreen: React.FC = () => {
     return centredOnScreen(
       failure(
         copy.errors.networkError(),
-        <GaloyPrimaryButton
-          title={LL.common.tryAgain()}
-          onPress={() => setHasGivenUpWaiting(false)}
-        />,
+        <GaloyPrimaryButton title={LL.common.tryAgain()} onPress={waitAgain} />,
       ),
     )
   }

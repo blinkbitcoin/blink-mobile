@@ -3931,6 +3931,24 @@ const en: BaseTranslation = {
         message: "Waiting for your deposit to settle, please wait 2 on-chain confirmations",
         buttonText: "Okay",
       },
+      HomeBulletin: {
+        insufficient: {
+          title: "Insufficient balance",
+          body: "To complete your investment, deposit the remaining amount.",
+        },
+        depositPending: {
+          title: "Hold on",
+          body: "We are waiting for your deposit to settle.",
+        },
+        ready: {
+          title: "Complete your investment",
+          body: "You now have enough funds to complete the investment.",
+        },
+        shareholder: {
+          title: "Welcome as Blink shareholder!",
+          body: "We will let you know as soon as your Blink Visa Card is ready.",
+        },
+      },
       PersonalInformation: {
         title: "Final step",
         fields: {

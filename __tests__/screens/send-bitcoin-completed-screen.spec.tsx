@@ -17,7 +17,6 @@ import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import mocks from "@app/graphql/mocks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
-
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { AppStateStatus, Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
@@ -72,6 +71,26 @@ jest.mock("@react-navigation/native", () => {
     useNavigation: () => mockNavigation,
   }
 })
+
+/** The investment's record, as the hook reads it: which invoice is the investment's,
+ *  and whether it is already marked paid. Its own spec covers the record; what matters
+ *  here is when this screen marks it. */
+const mockCardInvestment: { current: { paidAt?: number } | null } = { current: null }
+const mockIsInvestmentInvoice = jest.fn((_paymentRequest?: string) => false)
+const mockMarkCardInvestmentPaid = jest.fn(() => {
+  mockCardInvestment.current = {
+    ...mockCardInvestment.current,
+    paidAt: 1_757_800_000_000,
+  }
+})
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({
+    progress: mockCardInvestment.current,
+    markPaid: mockMarkCardInvestmentPaid,
+    isInvestmentInvoice: (paymentRequest?: string) =>
+      mockIsInvestmentInvoice(paymentRequest),
+  }),
+}))
 
 let mockAppStateCurrentState: AppStateStatus = "active"
 const mockAppStateListeners: Array<(state: AppStateStatus) => void> = []
@@ -144,6 +163,36 @@ const pendingRoute = {
 } as const
 
 const Pending = () => <MockedScreen route={pendingRoute} />
+
+/** The invoice the card investment's transfer step minted and armed. */
+const INVESTMENT_INVOICE = "lnbc25m1investment"
+
+const investmentPaidRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "SUCCESS",
+    arrivalAtMempoolEstimate: undefined,
+    paymentType: "lightning",
+    paymentRequest: INVESTMENT_INVOICE,
+  },
+} as const
+
+const InvestmentPaid = () => <MockedScreen route={investmentPaidRoute} />
+
+const investmentPendingRoute = {
+  ...investmentPaidRoute,
+  params: { ...investmentPaidRoute.params, status: "PENDING" },
+} as const
+
+const InvestmentPending = () => <MockedScreen route={investmentPendingRoute} />
+
+const otherInvoiceRoute = {
+  ...investmentPaidRoute,
+  params: { ...investmentPaidRoute.params, paymentRequest: "lnbc1someoneelse" },
+} as const
+
+const OtherInvoicePaid = () => <MockedScreen route={otherInvoiceRoute} />
 
 const SuccessAction = ({
   route,
@@ -931,5 +980,132 @@ describe("SendBitcoinCompletedScreen", () => {
         backgroundColor: dark.white,
       })
     })
+  })
+})
+
+describe("SendBitcoinCompletedScreen card investment payment", () => {
+  /** The record holds the investment's invoice and, once paid, its mark. */
+  const recordedInvestment = () => {
+    mockCardInvestment.current = {}
+    mockIsInvestmentInvoice.mockImplementation(
+      (paymentRequest?: string) => paymentRequest === INVESTMENT_INVOICE,
+    )
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsFocused.mockReturnValue(true)
+    loadLocale("en")
+    mockCardInvestment.current = null
+    mockIsInvestmentInvoice.mockImplementation(() => false)
+  })
+
+  afterEach(() => {
+    jest.clearAllTimers()
+  })
+
+  it("records the investment as paid when this receipt settles its invoice", async () => {
+    recordedInvestment()
+
+    render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockIsInvestmentInvoice).toHaveBeenCalledWith(INVESTMENT_INVOICE)
+    expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
+  })
+
+  /** The wallet has taken the payment; holding the record until it settles would have
+   *  the home ask for the money again while it is in flight. */
+  it("records it on a pending payment as well", async () => {
+    recordedInvestment()
+
+    render(
+      <ContextForScreen>
+        <InvestmentPending />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
+  })
+
+  /** The investor backed into the send flow's destination step and paid someone else
+   *  while the transfer step still sat underneath: that payment is not the investment. */
+  it("records nothing for a receipt that settled another invoice", async () => {
+    recordedInvestment()
+
+    render(
+      <ContextForScreen>
+        <OtherInvoicePaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+  })
+
+  it("records nothing for a receipt that names no invoice", async () => {
+    recordedInvestment()
+
+    render(
+      <ContextForScreen>
+        <Success />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockIsInvestmentInvoice).toHaveBeenCalledWith(undefined)
+    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+  })
+
+  /** A second receipt for the same invoice, the retry that met "already paid", must not
+   *  move the mark: the mark itself is what says the payment is on record. */
+  it("records nothing for an investment already marked paid", async () => {
+    recordedInvestment()
+    mockCardInvestment.current = { paidAt: 1_757_700_000_000 }
+
+    render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+  })
+
+  it("records the payment once for the life of the receipt", async () => {
+    recordedInvestment()
+
+    const { rerender } = render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    rerender(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
+  })
+
+  it("records nothing when no investment invoice is on record", async () => {
+    render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
   })
 })

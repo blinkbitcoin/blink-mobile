@@ -3806,6 +3806,24 @@
             "DepositPending": {
                 "message": "In attesa del regolamento del tuo deposito; attendi 2 conferme sulla catena.",
                 "buttonText": "Okay"
+            },
+            "HomeBulletin": {
+                "insufficient": {
+                    "title": "Saldo insufficiente",
+                    "body": "Per completare il tuo investimento, deposita l'importo rimanente."
+                },
+                "depositPending": {
+                    "title": "Un momento",
+                    "body": "Stiamo aspettando il regolamento del tuo deposito."
+                },
+                "ready": {
+                    "title": "Completa il tuo investimento",
+                    "body": "Ora hai fondi sufficienti per completare l'investimento."
+                },
+                "shareholder": {
+                    "title": "Benvenuto come azionista di Blink!",
+                    "body": "Ti avviseremo non appena la tua Blink Visa Card sarà pronta."
+                }
             }
         }
     },

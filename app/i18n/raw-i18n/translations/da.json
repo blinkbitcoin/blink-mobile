@@ -3759,6 +3759,24 @@
         "message": "Venter på, at dit indskud afregnes; vent venligst på 2 bekræftelser på kæden.",
         "buttonText": "OK"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Utilstrækkelig saldo",
+              "body": "Indbetal det resterende beløb for at fuldføre din investering."
+          },
+          "depositPending": {
+              "title": "Vent lidt",
+              "body": "Vi venter på, at dit indskud afregnes."
+          },
+          "ready": {
+              "title": "Fuldfør din investering",
+              "body": "Du har nu midler nok til at fuldføre investeringen."
+          },
+          "shareholder": {
+              "title": "Velkommen som aktionær i Blink!",
+              "body": "Vi giver dig besked, så snart dit Blink Visa Card er klar."
+          }
+      },
       "PersonalInformation": {
         "title": "Sidste trin",
         "fields": {
