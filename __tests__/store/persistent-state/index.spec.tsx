@@ -253,6 +253,45 @@ describe("PersistentStateProvider", () => {
     })
   })
 
+  /**
+   * Chained onto the sweep rather than scheduled beside it, and the chaining is
+   * the whole claim: the purge erases the legacy mnemonic copies, so it must see
+   * whether every account's value actually reached the new store first. Scheduled
+   * in parallel it could erase a copy whose migration had not happened yet.
+   */
+  it("hands the sweep's result to the purge", async () => {
+    const sweepResult = { status: "ok", migrated: 2 }
+    setPersistedBlob(scrubbedBlob)
+    mockSweepMnemonicMigration.mockResolvedValue(sweepResult)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockPurgeLegacyKeyStoreOnce).toHaveBeenCalledWith(sweepResult)
+    })
+  })
+
+  it("does not purge when the sweep rejects, so no erase runs on an unknown sweep", async () => {
+    setPersistedBlob(scrubbedBlob)
+    mockGetActiveToken.mockResolvedValue("saved-token")
+    mockSweepMnemonicMigration.mockRejectedValue(new Error("keychain unavailable"))
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token").props.children).toBe("saved-token")
+    })
+    expect(mockPurgeLegacyKeyStoreOnce).not.toHaveBeenCalled()
+  })
+
   it("falls back to default state when no persisted data exists", async () => {
     storedStrings.delete(PERSISTENT_STATE_KEY)
 
