@@ -3695,7 +3695,7 @@
         "buttonText": "Weyongere"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ssente mmeka z'oyagala okuteekawo?",
+        "title": "Ssente mmeka z'oyagala okuteekawo?",
         "percent": "ku ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,21 @@
           "valuation": "Ku muwendo gwa $10M nga temunnaba kufuna ssente",
           "units": "Ofuna ebitundu {units: string} ~{percent: number}% ebya Blink"
         },
-        "buttonText": "Weyongere Okusayina"
+        "buttonText": "Weyongere okusayina"
+      },
+      "SignInvest": {
+        "loading": "Tutegeka endagaano yo.",
+        "notAvailable": "Okuteekako omukono tekunnasoboka. Ddamu ogezeeko oluvannyuma.",
+        "errors": {
+          "envelopeCreationFailed": "Endagaano teyasobose kutegekebwa. Ddamu ogezeeko.",
+          "networkError": "Omukutu gufudde. Kebera omukutu gwo oddemu ogezeeko.",
+          "unauthorized": "Omulundi gwo tegukyakola. Ddamu oyingire.",
+          "sessionExpired": "Omulundi gw'okuteekako omukono guweddeko. Ddamu ogezeeko.",
+          "providerUnavailable": "Empeereza y'okuteekako omukono tekola kaakano. Ddamu ogezeeko oluvannyuma.",
+          "routeMissing": "Okuteekako omukono tekunnasoboka ku ssava eno. Longoosa app oba ddamu ogezeeko oluvannyuma.",
+          "envelopeMismatch": "Ekiwandiiko ekyateekeddwako omukono si kye omutendera guno gwategese. Ddamu ogezeeko.",
+          "generic": "Waliwo ekitagenze bulungi. Ddamu ogezeeko."
+        }
       },
       "TransferInvest": {
         "title": "Sindika ebintu byo",

@@ -3695,7 +3695,7 @@
         "buttonText": "Devam Et"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Ne kadar yatırım yapmak istersiniz?",
+        "title": "Ne kadar yatırım yapmak istersiniz?",
         "percent": "~{percent: number}% için"
       },
       "CompanyValuation": {
@@ -3712,11 +3712,25 @@
         "title": "Şartname",
         "equitySection": {
           "title": "Blink'te Pay",
-          "investment": "{amount: string} Yatırım",
+          "investment": "{amount: string} yatırım",
           "valuation": "10M $ ön para değerlemesinde",
           "units": "{units: string} birim alırsınız ~Blink'in %{percent: number}'i"
         },
-        "buttonText": "İmzaya Geç"
+        "buttonText": "İmzaya geç"
+      },
+      "SignInvest": {
+        "loading": "Sözleşmen hazırlanıyor.",
+        "notAvailable": "İmzalama henüz kullanılamıyor. Lütfen daha sonra tekrar dene.",
+        "errors": {
+          "envelopeCreationFailed": "Sözleşme hazırlanamadı. Lütfen tekrar dene.",
+          "networkError": "Bağlantı kesildi. Lütfen ağını kontrol edip tekrar dene.",
+          "unauthorized": "Oturumun artık geçerli değil. Lütfen tekrar giriş yap.",
+          "sessionExpired": "İmzalama oturumunun süresi doldu. Lütfen tekrar dene.",
+          "providerUnavailable": "İmzalama hizmeti geçici olarak kullanılamıyor. Lütfen daha sonra tekrar dene.",
+          "routeMissing": "İmzalama bu sunucuda henüz kullanılamıyor. Lütfen uygulamayı güncelle veya daha sonra tekrar dene.",
+          "envelopeMismatch": "İmzalanan belge, bu adımın hazırladığı belge değil. Lütfen tekrar dene.",
+          "generic": "Bir şeyler ters gitti. Lütfen tekrar dene."
+        }
       },
       "TransferInvest": {
         "title": "Yatırımınızı transfer edin",

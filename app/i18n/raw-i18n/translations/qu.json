@@ -3695,7 +3695,7 @@
         "buttonText": "Ñawpaqman"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hayk'ata invertiy munawaq?",
+        "title": "Hayk'ata invertiy munawaq?",
         "percent": "~{percent: number}%-paq"
       },
       "CompanyValuation": {
@@ -3712,11 +3712,25 @@
         "title": "Kamachikuy Qillqa",
         "equitySection": {
           "title": "Rakiy Blink-pi",
-          "investment": "{amount: string} Invertiy",
+          "investment": "{amount: string} invertiy",
           "valuation": "$10M pre-money chaninchaypi",
           "units": "{units: string} rakinkunata chaskiwaq ~{percent: number}% Blink-manta"
         },
-        "buttonText": "Ñawpaqman Firmaman"
+        "buttonText": "Ñawpaqman firmaman"
+      },
+      "SignInvest": {
+        "loading": "Sutʼinchakuyniykita wakichichkanchik.",
+        "notAvailable": "Firmayqa manaraqmi atikunchu. Qhipamanraq kutirispa ruwaykuy.",
+        "errors": {
+          "envelopeCreationFailed": "Sutʼinchakuyqa mana wakichikuyta atikunchu. Kutirispa ruwaykuy.",
+          "networkError": "Tinkuyqa chinkarqun. Tinkuyniykita qhaway hinaspa kutirispa ruwaykuy.",
+          "unauthorized": "Sesionniykiqa manañam allinchu. Yapamanta yaykuy.",
+          "sessionExpired": "Firmay sesionqa tukurqun. Kutirispa ruwaykuy.",
+          "providerUnavailable": "Firmay servicioqa kunanqa mana llamkʼanchu. Qhipamanraq kutirispa ruwaykuy.",
+          "routeMissing": "Firmayqa kay servidorpi manaraqmi atikunchu. Aplicacionta musuqyachiy utaq qhipaman kutirispa ruwaykuy.",
+          "envelopeMismatch": "Firmasqa documentoqa manam kay pasupi wakichisqachu. Kutirispa ruwaykuy.",
+          "generic": "Imapas mana allinchu karqun. Kutirispa ruwaykuy."
+        }
       },
       "TransferInvest": {
         "title": "Invertiyniykita apachiy",

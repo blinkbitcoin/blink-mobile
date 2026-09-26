@@ -99,8 +99,8 @@ export const formatCardDisplayNumber = (
   return (masked.match(new RegExp(`.{1,${groupSize}}`, "g")) ?? [masked]).join(" ")
 }
 
-export const toMinorUnit = (dollars: string): number =>
-  Math.round(parseFloat(dollars) * 100)
+export const toMinorUnit = (dollars: string | number): number =>
+  Math.round((typeof dollars === "number" ? dollars : parseFloat(dollars)) * 100)
 
 export const toMajorUnit = (cents: number): number => cents / 100
 

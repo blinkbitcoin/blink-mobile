@@ -3743,7 +3743,7 @@
                 "buttonText": "Continuar"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "Quanto você gostaria de investir?",
+                "title": "Quanto você gostaria de investir?",
                 "percent": "por ~{percent: number}%"
             },
             "CompanyValuation": {
@@ -3764,7 +3764,21 @@
                     "valuation": "Com avaliação pré-money de $10M",
                     "units": "Você recebe {units: string} unidades ~{percent: number}% do Blink"
                 },
-                "buttonText": "Prosseguir para Assinatura"
+                "buttonText": "Prosseguir para assinatura"
+            },
+            "SignInvest": {
+                "loading": "Preparando seu acordo.",
+                "notAvailable": "A assinatura ainda não está disponível. Tente novamente mais tarde.",
+                "errors": {
+                    "envelopeCreationFailed": "Não foi possível preparar o acordo. Tente novamente.",
+                    "networkError": "Conexão perdida. Verifique sua rede e tente novamente.",
+                    "unauthorized": "Sua sessão não é mais válida. Entre novamente.",
+                    "sessionExpired": "A sessão de assinatura expirou. Tente novamente.",
+                    "providerUnavailable": "O serviço de assinatura está temporariamente indisponível. Tente novamente mais tarde.",
+                    "routeMissing": "A assinatura ainda não está disponível neste servidor. Atualize o aplicativo ou tente novamente mais tarde.",
+                    "envelopeMismatch": "O documento assinado não é o que esta etapa preparou. Tente novamente.",
+                    "generic": "Algo deu errado. Tente novamente."
+                }
             },
             "TransferInvest": {
                 "title": "Transfira seu investimento",

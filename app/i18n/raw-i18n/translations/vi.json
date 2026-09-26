@@ -3695,7 +3695,7 @@
         "buttonText": "Tiếp tục"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Bạn muốn đầu tư bao nhiêu?",
+        "title": "Bạn muốn đầu tư bao nhiêu?",
         "percent": "cho ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,21 @@
           "valuation": "Ở định giá trước vốn $10M",
           "units": "Bạn nhận được {units: string} đơn vị ~{percent: number}% của Blink"
         },
-        "buttonText": "Tiến hành Ký"
+        "buttonText": "Tiến hành ký"
+      },
+      "SignInvest": {
+        "loading": "Đang chuẩn bị thỏa thuận của bạn.",
+        "notAvailable": "Chưa thể ký lúc này. Vui lòng thử lại sau.",
+        "errors": {
+          "envelopeCreationFailed": "Không thể chuẩn bị thỏa thuận. Vui lòng thử lại.",
+          "networkError": "Mất kết nối. Vui lòng kiểm tra mạng và thử lại.",
+          "unauthorized": "Phiên của bạn không còn hiệu lực. Vui lòng đăng nhập lại.",
+          "sessionExpired": "Phiên ký đã hết hạn. Vui lòng thử lại.",
+          "providerUnavailable": "Dịch vụ ký tạm thời không khả dụng. Vui lòng thử lại sau.",
+          "routeMissing": "Máy chủ này chưa hỗ trợ ký. Vui lòng cập nhật ứng dụng hoặc thử lại sau.",
+          "envelopeMismatch": "Tài liệu đã ký không phải là tài liệu mà bước này đã chuẩn bị. Vui lòng thử lại.",
+          "generic": "Đã xảy ra lỗi. Vui lòng thử lại."
+        }
       },
       "TransferInvest": {
         "title": "Chuyển khoản đầu tư của bạn",
