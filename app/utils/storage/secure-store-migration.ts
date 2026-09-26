@@ -1,4 +1,6 @@
 /* eslint-disable camelcase */
+import { Platform } from "react-native"
+
 import analytics from "@react-native-firebase/analytics"
 import type { ACCESSIBLE } from "react-native-keychain"
 
@@ -73,6 +75,18 @@ const logLegacyHit = (legacyKey: string): void => {
 const SLOT_OPERATION_TIMEOUT_MS = 30_000
 
 /**
+ * What the purge waits, in place of the default above.
+ *
+ * The default is right for work whose caller has nowhere else to go: better a
+ * long wait than a failure. The purge is the opposite. It shares three slots with
+ * the lock screen (`PIN`, `pinFailureState`, `pinAttempts`) and runs in the same
+ * few seconds of boot, so a native call of its own that hangs would leave the
+ * user's PIN entry queued behind it. Giving up costs the purge nothing: every
+ * slot it abandons is named again on the next launch.
+ */
+export const PURGE_SLOT_TIMEOUT_MS = 3_000
+
+/**
  * Per-slot serialization of everything that can move a value between the two
  * stores.
  *
@@ -112,10 +126,15 @@ type IsCurrent = () => boolean
  *
  * Never call it from inside a task already holding the same slot — the inner
  * call would wait on the outer one and neither would ever finish.
+ *
+ * `timeoutMs` is for the one caller that shares slots with the unlock path and
+ * would rather give up than hold them: see PURGE_SLOT_TIMEOUT_MS. Everything else
+ * takes the default.
  */
 export const onSlot = <T>(
   slot: string,
   task: (isCurrent: IsCurrent) => Promise<T>,
+  timeoutMs: number = SLOT_OPERATION_TIMEOUT_MS,
 ): Promise<T> => {
   const previous = pendingBySlot.get(slot) ?? Promise.resolve()
   const result = previous.then(() => {
@@ -125,16 +144,14 @@ export const onSlot = <T>(
     let isAbandoned = false
     const running = task(() => !isAbandoned)
 
-    return withTimeout(
-      running,
-      SLOT_OPERATION_TIMEOUT_MS,
-      `secure store ${keyClassOf(slot)}`,
-    ).catch((err) => {
-      // Reached on timeout, where the task is still running and must stop, and
-      // on a task that rejected, where the flag is set on work already over.
-      isAbandoned = true
-      throw err
-    })
+    return withTimeout(running, timeoutMs, `secure store ${keyClassOf(slot)}`).catch(
+      (err) => {
+        // Reached on timeout, where the task is still running and must stop, and
+        // on a task that rejected, where the flag is set on work already over.
+        isAbandoned = true
+        throw err
+      },
+    )
   })
 
   // What gets queued is the settled promise, not the result: it absorbs the
@@ -164,8 +181,12 @@ export const onSlot = <T>(
  *
  * A read that cannot answer counts as not gone. It is the conservative half of
  * a real trade-off, recorded at `runRemove`.
+ *
+ * Exported for the one-shot purge, which erases legacy copies the read path is
+ * no longer allowed to reach and needs the same proof of absence to decide
+ * whether it may record itself as done.
  */
-const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
+export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
   const erased = await legacyErase(legacyKey)
   if (erased) return true
 
@@ -371,10 +392,168 @@ export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => 
  * the slot is unmigrated by definition, so its legacy copy is still readable
  * under the protection class it has today.
  */
-export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists> => {
+export const existsThrough = async (
+  args: ReadThroughArgs,
+  timeoutMs?: number,
+): Promise<SecureExists> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent), timeoutMs)
   } catch (err) {
     return { status: "failed", err }
+  }
+}
+
+/**
+ * Why a legacy copy is still there, split by whether a later launch could change
+ * the answer. Carries a whole pass as well as a single slot, worst outcome
+ * winning: `transient` beats `permanent`, because a pass with anything still worth
+ * retrying is worth retrying.
+ *
+ * `transient` covers everything a store's silence or a failed write caused. Those
+ * clear themselves, so they must never count against a retry bound: a keychain
+ * that cannot answer for a few launches would otherwise retire the purge and
+ * leave every legacy copy in place for good.
+ *
+ * `permanent` is the state no later launch resolves: every store answered, and
+ * the value is in none of them. An index entry can outlive its key material that
+ * way, and retrying it is spend with no upside.
+ */
+export type SlotPurge = "gone" | "transient" | "permanent"
+
+/** One option, named rather than positional: `purgeThrough(args, true)` at a call
+ *  site says nothing about which rule it is asking for. */
+export type PurgeThroughOptions = {
+  /**
+   * Whether the new store has to hold the value before an empty legacy read
+   * counts as nothing left to erase. True for the seed, where being wrong costs
+   * someone their money; false where it costs a re-login.
+   */
+  requireMigrated: boolean
+}
+
+/**
+ * Finishes a slot's migration and then erases its legacy copy, in that order.
+ *
+ * Erasing first is what the obvious implementation does and it is wrong. A
+ * read-through reports `found` for a value it read out of the legacy store
+ * even when the migrating write failed, so "this slot has been read" is not
+ * evidence the new store holds anything. Erasing on that evidence deletes the
+ * only copy — a re-login for a session slot, and someone's seed for a
+ * mnemonic.
+ *
+ * So the new store has to say `found` itself before anything is deleted, and
+ * every step runs inside the slot queue: a read-through migrating this same
+ * slot concurrently sits between its own miss and its legacy read, and an
+ * unqueued erase in that window takes the value out from under it.
+ *
+ * Anything but `gone` leaves the copy for the next boot, split by whether a
+ * later boot could answer differently. Only the caller can act on that
+ * difference, and it decides both what gets reported and what a retry bound is
+ * allowed to charge for.
+ *
+ * Never rejects, like every other operation on this queue: a slot that timed
+ * out must cost its own key and not the ones behind it, which a rejection
+ * propagating out of the loop would.
+ */
+export const purgeThrough = async (
+  args: ReadThroughArgs,
+  { requireMigrated }: PurgeThroughOptions,
+): Promise<SlotPurge> => {
+  // Probed rather than read. The probe still migrates when the value is only in
+  // the legacy store, which is the last chance this slot gets before its legacy
+  // copy is gone, but a slot the sweep already moved answers from the new store
+  // without its value leaving the keychain — the reason sweepMnemonicMigration
+  // probes rather than reads.
+  //
+  // A seed does enter memory below, where the erase or the done-flag needs proof
+  // that the value survived the move. That read is the price of not deleting the
+  // last readable copy, and it is paid on every launch the purge runs, not once:
+  // the pass has no per-slot marker, so a slot that already finished is proved
+  // again while any other slot keeps the pass short of done. On iOS that can be
+  // every launch, since no verdict there is terminal. Closing it means choosing
+  // between a legacy copy left behind and key material in memory, which is the
+  // trade the two reviews on blinkbitcoin/blink-mobile#4238 disagreed about.
+  await existsThrough(args, PURGE_SLOT_TIMEOUT_MS)
+
+  try {
+    return await onSlot(
+      args.slot,
+      async (isCurrent) => {
+        const legacy = await legacyRead(args.legacyKey)
+        if (legacy.status === "failed") return "transient"
+
+        // `absent` is not proof the legacy store is empty. The iOS module
+        // discards the OSStatus and rejects every failed lookup with the
+        // not-found code, so a lookup that merely failed is indistinguishable
+        // from one that found nothing.
+        //
+        // Nothing is erased on this path, so the question is only whether to keep
+        // asking. A session slot stops: a user who never set a PIN has nothing
+        // here and must not be retried forever, and the copy a lying read leaves
+        // behind costs a re-login. A mnemonic keeps its strict rule, because
+        // getting that wrong costs someone their seed — and when both stores agree
+        // the value is nowhere, no later boot changes that.
+        if (legacy.status === "absent") {
+          if (!requireMigrated) return "gone"
+
+          // Probed before it is read. The probe cannot say whether the value is
+          // recoverable — on Android `hasInternetCredentials` resolves true for an
+          // entry it never decrypts — but it is the cheap way to learn that there
+          // is nothing here to confirm, which is the answer on every slot of a
+          // device in this state. The purge names every account on every launch
+          // until it completes, and reading on all of them would put every seed
+          // into a JS string that cannot be zeroed.
+          const present = await secureExists(args.slot)
+          if (present.status === "failed") return "transient"
+
+          if (present.status === "yes") {
+            // `gone` here is what lets the caller record the purge as finished, so
+            // the proof has to be a read that returns the value. A locked iOS
+            // launch answers the probe from an item it cannot decrypt while
+            // legacyRead lies `absent` for the legacy copy, and believing both
+            // would write the done-flag over a seed still sitting in the legacy
+            // store, with no later launch to look again.
+            const migrated = await secureRead(args.slot)
+            return migrated.status === "found" ? "gone" : "transient"
+          }
+
+          // Both stores say the seed is nowhere. Terminal only where the legacy
+          // store can tell a missing key from a failed lookup: the iOS module
+          // rejects every failure with the not-found code, so legacyRead reports
+          // `absent` for both there (see its isKeyNotFound branch). Calling that
+          // permanent would let a handful of unlucky launches retire the purge and
+          // strand a seed in the legacy store for good. Android distinguishes the
+          // two, so the verdict is trustworthy and the retry bound gets the
+          // terminal state it exists for; iOS keeps retrying, which costs round
+          // trips off the boot path and never costs a seed.
+          return Platform.OS === "android" ? "permanent" : "transient"
+        }
+
+        // There is a legacy copy to erase, so the probe is no longer enough.
+        //
+        // On Android `hasInternetCredentials` resolves true for an entry that
+        // exists without decrypting it (KeychainModule.hasInternetCredentialsForOptions),
+        // so a Keystore key invalidated by a lock-screen change — the failure
+        // findSelfCustodialAccountByMnemonic already plans around — answers `yes`
+        // for a value nothing can read. Erasing the legacy copy on that answer
+        // destroys the last readable seed. Only a read that returns the value
+        // proves it survived the move, and it happens here, on the one launch
+        // that erases, rather than on every launch for every account.
+        const migrated = await secureRead(args.slot)
+
+        // `absent` means the migrating write failed and `failed` means the store
+        // could not say. Both keep the legacy copy, and both clear themselves.
+        if (migrated.status !== "found") return "transient"
+
+        // The queue handed this slot to someone else while it was held, so the
+        // proof above describes a state that may already have moved on.
+        if (!isCurrent()) return "transient"
+
+        return (await eraseLegacyCopy(args.legacyKey)) ? "gone" : "transient"
+      },
+      PURGE_SLOT_TIMEOUT_MS,
+    )
+  } catch {
+    return "transient"
   }
 }
