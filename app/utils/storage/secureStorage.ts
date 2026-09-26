@@ -2,7 +2,7 @@ import { ACCESSIBLE } from "react-native-keychain"
 
 import { recordAppError } from "@app/utils/error-reporting"
 
-import { eraseEntireLegacyStore, legacyRead } from "./legacy-key-store"
+import { eraseEntireLegacyStore } from "./legacy-key-store"
 import {
   type SecureExists,
   secureExists,
@@ -11,11 +11,12 @@ import {
   secureWrite,
 } from "./secure-store"
 import {
-  eraseLegacyCopy,
   type ReadThroughArgs,
   existsThrough,
   onSlot,
+  purgeThrough,
   readThrough,
+  type SlotPurge,
   removeThrough,
   writeThrough,
 } from "./secure-store-migration"
@@ -168,6 +169,30 @@ export default class KeyStoreWrapper {
    * Account ids only. A leaked id names nothing a mnemonic could unlock.
    */
   private static readonly MNEMONIC_ACCOUNTS = "mnemonicAccounts"
+
+  /**
+   * The fixed-key slots the legacy store ever held. MNEMONIC_ACCOUNTS has a fixed
+   * key too and is deliberately absent: it is introduced with the new store, so
+   * there is no legacy copy of it to purge or wipe.
+   *
+   * One list, because the alternative is a hand-maintained copy per operation:
+   * a slot added above tomorrow is read, written, removed and wiped by name, and
+   * a purge that spelled its own list would silently not purge it. The wipe in
+   * clearUninstallSurvivingCredentials keeps its named removers rather than
+   * looping this, since each one carries a different reason and a different
+   * failure label, but it covers exactly these keys.
+   *
+   * Mnemonic slots are deliberately absent: their keys carry an account id, so
+   * they are named from the account lists instead — see purgeLegacyKeyStore.
+   */
+  private static readonly SESSION_KEYS: readonly string[] = [
+    KeyStoreWrapper.IS_BIOMETRICS_ENABLED,
+    KeyStoreWrapper.PIN,
+    KeyStoreWrapper.PIN_FAILURE_STATE,
+    KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
+    KeyStoreWrapper.SESSION_PROFILES,
+    KeyStoreWrapper.ACTIVE_TOKEN,
+  ]
 
   /**
    * The protection class and erase rule for the six session slots that moved in
@@ -940,72 +965,6 @@ export default class KeyStoreWrapper {
   }
 
   /**
-   * Finishes a slot's migration and then erases its legacy copy, in that order.
-   *
-   * Erasing first is what the obvious implementation does and it is wrong. A
-   * read-through reports `found` for a value it read out of the legacy store
-   * even when the migrating write failed, so "this slot has been read" is not
-   * evidence the new store holds anything. Erasing on that evidence deletes the
-   * only copy — a re-login for a session slot, and someone's seed for a
-   * mnemonic.
-   *
-   * So the new store has to say `found` itself before anything is deleted, and
-   * every step runs inside the slot queue: a read-through migrating this same
-   * slot concurrently sits between its own miss and its legacy read, and an
-   * unqueued erase in that window takes the value out from under it.
-   *
-   * False whenever the copy is not provably safe to remove, which simply leaves
-   * it for the next boot. Never rejects, like every other operation on this
-   * queue: a slot that timed out must cost its own key and not the ones behind
-   * it, which a rejection propagating out of the loop would.
-   */
-  private static async purgeSlot(
-    args: ReadThroughArgs,
-    requireMigrated: boolean,
-  ): Promise<boolean> {
-    // Migrates as its side effect, and takes its own turn in the queue. A slot
-    // nothing has read yet is unmigrated by definition, and this is the last
-    // chance it gets before its legacy copy is gone.
-    await readThrough(args)
-
-    try {
-      return await onSlot(args.slot, async (isCurrent) => {
-        const migratedFirst = await secureRead(args.slot)
-
-        const legacy = await legacyRead(args.legacyKey)
-        if (legacy.status === "failed") return false
-
-        // `absent` is not the proof it looks like on iOS: the native module
-        // discards the OSStatus and rejects every failed lookup with the
-        // not-found code, so a read taken before first unlock reports an empty
-        // store rather than an unreadable one. Believing it is what would let a
-        // silent-push launch record the purge as done over a mnemonic that
-        // never left the legacy store.
-        //
-        // Where getting it wrong costs a re-login, absence is accepted: a user
-        // who never set a PIN has nothing here and must not be retried forever.
-        // Where it costs a seed, the new store has to hold the value first.
-        if (legacy.status === "absent") {
-          return requireMigrated ? migratedFirst.status === "found" : true
-        }
-
-        // The only status that proves the value survived the move. `absent`
-        // means the migrating write failed, `failed` means the store could not
-        // say. Re-read, because the read-through above may have migrated it
-        // since.
-        const migrated = await secureRead(args.slot)
-        if (migrated.status !== "found") return false
-
-        if (!isCurrent()) return false
-
-        return eraseLegacyCopy(args.legacyKey)
-      })
-    } catch {
-      return false
-    }
-  }
-
-  /**
    * Erases every item this app ever wrote to the legacy key store, by name.
    *
    * The migration moves a slot the first time something reads it, so a value
@@ -1019,30 +978,52 @@ export default class KeyStoreWrapper {
    * delete is the half that also works on Android, where the legacy store is a
    * shared-preferences file rather than a Keychain service.
    *
-   * `accountIds` comes from the caller because the account index lives in
-   * AsyncStorage, outside this file. An id missing from that list leaves its
-   * mnemonic behind, which is the conservative direction: the key stays until a
-   * boot that can name it.
+   * Mnemonic keys are named from both account lists. `accountIds` comes from the
+   * caller because the app's index lives in AsyncStorage, outside this file, and
+   * MNEMONIC_ACCOUNTS is read here because that index drifts: deleting an account
+   * removes its id from the index whether or not the legacy erase succeeded (see
+   * use-delete-account), which leaves a seed behind that no later boot can name.
+   * Neither list is a superset of the other, so the purge takes the union.
    *
-   * True only when every key is provably gone, so that a caller recording this
-   * as done cannot record it over a store that still holds something.
+   * `gone` only when every key this purge could name is provably gone. A key
+   * nothing on the device names is out of scope, which is the honest limit rather
+   * than a claim about the whole store.
+   *
+   * That limit is only as good as the two lists. MNEMONIC_ACCOUNTS reports a value
+   * it cannot read rather than answering empty, so a damaged one holds the purge
+   * back. The AsyncStorage index does not: `readIndex` degrades a stored value it
+   * cannot recognise to zero entries, so a damaged index hands this method fewer
+   * ids than the device has and nothing here can tell. Tracked as its own issue,
+   * since the degradation is that function's contract and has other callers.
    */
-  public static async purgeLegacyKeyStore(accountIds: string[]): Promise<boolean> {
+  public static async purgeLegacyKeyStore(accountIds: string[]): Promise<SlotPurge> {
+    // Unreadable is not empty. Naming no mnemonics and reporting the pass gone
+    // would let a caller record the purge as done over key material this boot
+    // never looked at, which is the same reading
+    // clearUninstallSurvivingKeyMaterial refuses for the same list.
+    //
+    // The session slots are purged either way: their keys are fixed, so they need
+    // nothing from this list, and leaving the legacy auth token, PIN and profiles
+    // behind over a mnemonic-scoped failure would spend the pass on nothing.
+    const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+    // The caller's ids survive a failed list read. They come from a different
+    // store and a different failure domain, so dropping them would leave the pass
+    // naming no mnemonic at all — and on the cause that never self-repairs that is
+    // the one way exhausting the bound could strand real key material.
+    const trackedAccountIds = tracked.status === "ok" ? tracked.accountIds : []
+    const purgeableAccountIds = [...new Set([...trackedAccountIds, ...accountIds])]
+
     // What an empty legacy read is allowed to mean, carried per slot rather than
     // derived from the key name: only the seed is held to the strict rule.
     // Session slots may legitimately have never existed, and the network marker
     // is optional metadata, so demanding proof of either would leave the purge
     // unable to finish and retrying every boot forever.
-    const sessionSlots = [
-      KeyStoreWrapper.IS_BIOMETRICS_ENABLED,
-      KeyStoreWrapper.PIN,
-      KeyStoreWrapper.PIN_FAILURE_STATE,
-      KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
-      KeyStoreWrapper.SESSION_PROFILES,
-      KeyStoreWrapper.ACTIVE_TOKEN,
-    ].map((key) => ({ args: KeyStoreWrapper.slotFor(key), requireMigrated: false }))
+    const sessionSlots = KeyStoreWrapper.SESSION_KEYS.map((key) => ({
+      args: KeyStoreWrapper.slotFor(key),
+      requireMigrated: false,
+    }))
 
-    const mnemonicSlots = accountIds.flatMap((accountId) => [
+    const mnemonicSlots = purgeableAccountIds.flatMap((accountId) => [
       {
         args: KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
         requireMigrated: true,
@@ -1055,15 +1036,45 @@ export default class KeyStoreWrapper {
       },
     ])
 
-    let allGone = true
+    // Seeded from the list read, so a pass that could not name the mnemonics
+    // reports itself even when every session slot it did name came back gone. The
+    // two causes end differently and are carried apart for it: a keystore that
+    // could not answer clears itself, while a stored value that is not a list of
+    // ids never does and would otherwise buy a full pass on every launch forever.
+    const isTrackedListDamaged =
+      tracked.status === "failed" &&
+      tracked.cause === MnemonicAccountsFailure.UnreadableValue
+
+    if (isTrackedListDamaged) {
+      // Raised here rather than left to the caller. It reaches the caller as
+      // `permanent`, which is otherwise the benign shape of a device whose key
+      // material is simply gone, and reporting it there would either bury this or
+      // drown that. A stored list that is not a list of ids is a real fault, it
+      // never repairs itself, and clearUninstallSurvivingKeyMaterial already
+      // labels the same condition apart for the same reason.
+      recordAppError(new Error("Mnemonic account list holds an unreadable value"), {
+        dedupKey: "storage-mnemonic-accounts-unreadable",
+      })
+    }
+
+    let outcome: SlotPurge = "gone"
+    if (isTrackedListDamaged) outcome = "permanent"
+    else if (tracked.status !== "ok") outcome = "transient"
+
     for (const slot of [...sessionSlots, ...mnemonicSlots]) {
       // Sequential, and never short-circuited: one slot that cannot be purged
       // must not leave the rest behind for a purge that may not run again for
       // months.
-      const gone = await KeyStoreWrapper.purgeSlot(slot.args, slot.requireMigrated)
-      if (!gone) allGone = false
+      const slotOutcome = await purgeThrough(slot.args, {
+        requireMigrated: slot.requireMigrated,
+      })
+
+      // Worst wins, and `transient` is the worst: a pass with anything still worth
+      // retrying is worth retrying, which a wholly `permanent` pass is not.
+      if (slotOutcome === "transient") outcome = "transient"
+      if (slotOutcome === "permanent" && outcome === "gone") outcome = "permanent"
     }
 
-    return allGone
+    return outcome
   }
 }
