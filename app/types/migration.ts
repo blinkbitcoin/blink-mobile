@@ -202,3 +202,18 @@ export const ServerMigrationFlow = {
 
 export type ServerMigrationFlow =
   (typeof ServerMigrationFlow)[keyof typeof ServerMigrationFlow]
+
+/** Where a commit-point checkpoint goes, once the server's answer and the device's record
+ *  of a confirmed start are read together. */
+export const CommitPointRoute = {
+  /** Back to the commit screen. */
+  Resume: "resume",
+  /** Support cleared a flow that had started: begin again. */
+  Restart: "restart",
+  /** The funds moved; the background resume finishes the swap. Stay put and say so. */
+  AwaitSwap: "await-swap",
+  /** No answer to act on: stay put and ask the server again. */
+  AskAgain: "ask-again",
+} as const
+
+export type CommitPointRoute = (typeof CommitPointRoute)[keyof typeof CommitPointRoute]
