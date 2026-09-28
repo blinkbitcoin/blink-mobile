@@ -150,7 +150,7 @@ describe("AcceptTermsAndConditionsScreen", () => {
 
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: LL.AccountMigration.storageUnavailable.outOfSpaceBody(),
+        message: LL.AccountMigration.storageUnavailable.notSavedOutOfSpaceBody(),
       }),
     )
   })

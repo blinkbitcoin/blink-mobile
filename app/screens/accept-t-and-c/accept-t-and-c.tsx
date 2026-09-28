@@ -57,7 +57,7 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
       if (!isSaved) {
         const isOutOfSpace = failure === StorageFailure.OutOfSpace
         const message = isOutOfSpace
-          ? LL.AccountMigration.storageUnavailable.outOfSpaceBody()
+          ? LL.AccountMigration.storageUnavailable.notSavedOutOfSpaceBody()
           : LL.errors.generic()
         toastShow({ message, LL })
         return
