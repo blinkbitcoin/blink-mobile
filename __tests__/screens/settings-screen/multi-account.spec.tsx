@@ -45,6 +45,18 @@ let mockAppConfigToken = "mock-token-1"
 
 let mockSelfCustodialEntries: { id: string; createdAt: number }[] = []
 let mockPendingAccountIds = new Set<string>()
+let mockPendingForActiveAccount: string | null = null
+let mockMigrationCompleted = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({
+    isLocked: false,
+    isCompleted: mockMigrationCompleted,
+    loading: false,
+    hasError: false,
+    refetch: jest.fn(),
+  }),
+}))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   ...jest.requireActual("@app/hooks/use-account-registry"),
@@ -61,7 +73,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   usePendingMigrationAccounts: () => ({
     pendingAccountIds: mockPendingAccountIds,
-    pendingForActiveAccount: null,
+    pendingForActiveAccount: mockPendingForActiveAccount,
     savePendingAccount: jest.fn(),
     clearPendingAccount: jest.fn(),
     loading: false,
@@ -100,6 +112,8 @@ describe("Settings", () => {
     mockSaveProfile.mockClear()
     mockSelfCustodialEntries = []
     mockPendingAccountIds = new Set()
+    mockPendingForActiveAccount = null
+    mockMigrationCompleted = false
   })
 
   it("Switch account shows user profiles", async () => {
@@ -173,6 +187,75 @@ describe("Settings", () => {
       expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
     })
     expect(screen.queryByTestId("sc-entry-sc-pending-1")).toBeNull()
+  })
+
+  /**
+   * The funds already left the custodial account for this wallet. Hiding it until the
+   * automatic swap confirms the receive would strand them whenever that swap cannot finish,
+   * so once the server completed the migration the user can switch to it themselves.
+   */
+  it("offers the migration's wallet once the server completed the migration", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [{ id: "sc-migrated-1", createdAt: 1 }]
+    mockPendingAccountIds = new Set(["sc-migrated-1"])
+    mockPendingForActiveAccount = "sc-migrated-1"
+    mockMigrationCompleted = true
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-migrated-1")).toBeTruthy()
+    })
+  })
+
+  it("keeps the migration's wallet hidden while the migration has not completed", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [
+      { id: "sc-migrating-1", createdAt: 1 },
+      { id: "sc-normal-1", createdAt: 2 },
+    ]
+    mockPendingAccountIds = new Set(["sc-migrating-1"])
+    mockPendingForActiveAccount = "sc-migrating-1"
+    mockMigrationCompleted = false
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
+    })
+    expect(screen.queryByTestId("sc-entry-sc-migrating-1")).toBeNull()
+  })
+
+  /** Only the active account's own wallet: another profile's pending wallet belongs to a
+   *  migration this account's completion says nothing about. */
+  it("keeps another account's pending wallet hidden after this one completed", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [
+      { id: "sc-migrated-1", createdAt: 1 },
+      { id: "sc-other-pending-1", createdAt: 2 },
+    ]
+    mockPendingAccountIds = new Set(["sc-migrated-1", "sc-other-pending-1"])
+    mockPendingForActiveAccount = "sc-migrated-1"
+    mockMigrationCompleted = true
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-migrated-1")).toBeTruthy()
+    })
+    expect(screen.queryByTestId("sc-entry-sc-other-pending-1")).toBeNull()
   })
 
   it("keeps a pending wallet visible once it became the active account", async () => {
