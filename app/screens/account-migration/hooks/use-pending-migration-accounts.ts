@@ -8,6 +8,7 @@ import { reportError } from "@app/utils/error-logging"
 import {
   classifyStorageFailure,
   StorageFailure,
+  StorageWriteError,
 } from "@app/utils/storage/storage-failure"
 
 import {
@@ -107,16 +108,22 @@ export const usePendingMigrationAccounts = () => {
   /** Run as provision's beforeCreate, so it MUST throw on failure: a swallowed error (or a
    *  missing owner) would let the wallet be created with no record behind it, the orphan
    *  #6 guards against. The write lands before the in-memory update so a failed write
-   *  leaves no phantom record either. The caller (ensureAccount) reports and toasts. */
+   *  leaves no phantom record either. The caller (ensureAccount) reports and toasts.
+   *  Only the store's own refusal is classified: the missing owner is not a storage
+   *  failure, so it throws a plain error the caller cannot mistake for a full disk. */
   const savePendingAccount = useCallback(
     async (accountId: string): Promise<void> => {
       if (!ownerId) {
         throw new Error("Cannot record a pending migration account without an owner id")
       }
-      await savePendingProvisionedAccount(storageKey, {
-        custodialAccountId: ownerId,
-        accountId,
-      })
+      try {
+        await savePendingProvisionedAccount(storageKey, {
+          custodialAccountId: ownerId,
+          accountId,
+        })
+      } catch (err) {
+        throw new StorageWriteError(err)
+      }
       setPendingByOwner((previous) => ({ ...previous, [ownerId]: accountId }))
     },
     [storageKey, ownerId],

@@ -4,6 +4,7 @@ import {
   classifyStorageFailure,
   PINNED_ASYNC_STORAGE_VERSION,
   StorageFailure,
+  StorageWriteError,
 } from "@app/utils/storage/storage-failure"
 
 describe("storage failure classification", () => {
@@ -101,5 +102,51 @@ describe("storage failure classification", () => {
         StorageFailure.OutOfSpace,
       )
     })
+  })
+})
+
+describe("StorageWriteError", () => {
+  /** Callers catch it among unrelated errors, so it has to stay an Error they can tell
+   *  apart by type and still report with the store's own message. */
+  it("is an Error that keeps the store's message and names itself", () => {
+    const error = new StorageWriteError(new Error("Database Error"))
+
+    expect(error).toBeInstanceOf(Error)
+    expect(error).toBeInstanceOf(StorageWriteError)
+    expect(error.message).toBe("Database Error")
+    expect(error.name).toBe("StorageWriteError")
+  })
+
+  /** The report groups by where the write failed, not by the hook that re-threw it. */
+  it("keeps the store's own stack", () => {
+    const storeError = new Error("Database Error")
+
+    expect(new StorageWriteError(storeError).stack).toBe(storeError.stack)
+  })
+
+  it("keeps a stack of its own when the store's error has none", () => {
+    const storeError = new Error("Database Error")
+    storeError.stack = undefined
+
+    expect(new StorageWriteError(storeError).stack).toEqual(expect.any(String))
+  })
+
+  it("classifies a full disk where the store answered", () => {
+    const error = new StorageWriteError(new Error("database or disk is full"))
+
+    expect(error.failure).toBe(StorageFailure.OutOfSpace)
+  })
+
+  it("classifies any other refusal as unknown", () => {
+    const error = new StorageWriteError(new Error("Database Error"))
+
+    expect(error.failure).toBe(StorageFailure.Unknown)
+  })
+
+  it("reads the message and the kind out of a rejection that is not an Error", () => {
+    const error = new StorageWriteError("database or disk is full")
+
+    expect(error.message).toBe("database or disk is full")
+    expect(error.failure).toBe(StorageFailure.OutOfSpace)
   })
 })

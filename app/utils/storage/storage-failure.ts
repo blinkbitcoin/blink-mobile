@@ -1,3 +1,5 @@
+import { toError } from "@app/utils/error-reporting"
+
 /**
  * What a storage failure can be told apart into, and how.
  *
@@ -54,4 +56,23 @@ export const classifyStorageFailure = (error: unknown): StorageFailure => {
   const isOutOfSpace = OUT_OF_SPACE_MARKERS.some((marker) => normalized.includes(marker))
 
   return isOutOfSpace ? StorageFailure.OutOfSpace : StorageFailure.Unknown
+}
+
+/**
+ * A store write that must abort the operation around it, classified where the store
+ * answered. A caller catching a mix of errors can then name a full disk only for a failure
+ * that came from storage, never for an unrelated error whose wording happens to contain a
+ * marker. The store's message and stack are kept, so a report groups by where the write
+ * failed rather than by the hook that re-threw it.
+ */
+export class StorageWriteError extends Error {
+  readonly failure: StorageFailure
+
+  constructor(storeError: unknown) {
+    const original = toError(storeError)
+    super(original.message)
+    this.name = "StorageWriteError"
+    this.failure = classifyStorageFailure(storeError)
+    this.stack = original.stack ?? this.stack
+  }
 }
