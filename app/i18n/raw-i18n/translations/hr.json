@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Nismo mogli pročitati napredak vaše migracije s ovog uređaja. Ništa nije izgubljeno — vaša sredstva su sigurna, a napredak je i dalje spremljen.",
       "outOfSpaceBody": "Vaš uređaj nema slobodnog prostora za pohranu pa ne možemo pročitati napredak vaše migracije. Oslobodite prostor i pokušajte ponovno. Ništa nije izgubljeno — vaša sredstva su sigurna.",
+      "notSavedBody": "Nismo mogli spremiti napredak vaše migracije na ovom uređaju. Ništa nije izgubljeno: vaša sredstva su sigurna. Pokušajte ponovno.",
+      "notSavedOutOfSpaceBody": "Vaš uređaj nema slobodnog prostora za pohranu pa ne možemo spremiti napredak vaše migracije. Oslobodite prostor i pokušajte ponovno. Ništa nije izgubljeno: vaša sredstva su sigurna.",
       "contactSupportCta": "Kontaktirajte podršku"
     },
     "clockOutOfSync": {

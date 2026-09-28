@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Chúng tôi không thể đọc tiến trình chuyển đổi của bạn từ thiết bị này. Không có gì bị mất: tiền của bạn vẫn an toàn và tiến trình vẫn được lưu.",
       "outOfSpaceBody": "Thiết bị của bạn không còn dung lượng lưu trữ, nên chúng tôi không thể đọc tiến trình chuyển đổi của bạn. Hãy giải phóng dung lượng rồi thử lại. Không có gì bị mất: tiền của bạn vẫn an toàn.",
+      "notSavedBody": "Chúng tôi không thể lưu tiến trình chuyển đổi của bạn trên thiết bị này. Không có gì bị mất: tiền của bạn vẫn an toàn. Hãy thử lại.",
+      "notSavedOutOfSpaceBody": "Thiết bị của bạn không còn dung lượng lưu trữ, nên chúng tôi không thể lưu tiến trình chuyển đổi của bạn. Hãy giải phóng dung lượng rồi thử lại. Không có gì bị mất: tiền của bạn vẫn an toàn.",
       "contactSupportCta": "Liên hệ hỗ trợ"
     },
     "clockOutOfSync": {

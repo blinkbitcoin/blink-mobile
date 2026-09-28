@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Kay rurayniykipi migracionniykipa ñawpaqmanchasqanta mana ñawinchayta atinikuchu. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan, ñawpaqmanchasqaykipas waqaychasqallam.",
       "outOfSpaceBody": "Rurayniykipa waqaychanan mana kapunchu, chayrayku migracionniykipa ñawpaqmanchasqanta mana ñawinchayta atinikuchu. Kichariy tumpa, hinaspa yapamanta ruray. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan.",
+      "notSavedBody": "Kay rurayniykipi migracionniykipa ñawpaqmanchasqanta mana waqaychayta atinikuchu. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan. Yapamanta ruray.",
+      "notSavedOutOfSpaceBody": "Rurayniykipa waqaychanan mana kapunchu, chayrayku migracionniykipa ñawpaqmanchasqanta mana waqaychayta atinikuchu. Kichariy tumpa, hinaspa yapamanta ruray. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan.",
       "contactSupportCta": "Yanapaqwan rimay"
     },
     "clockOutOfSync": {

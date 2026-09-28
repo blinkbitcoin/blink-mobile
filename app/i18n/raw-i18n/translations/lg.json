@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Tetusobodde kusoma bw'oyimiridde mu kujjulukuka ku kyuma kino. Tewali kibuze — ssente zo ziri bulungi era n'obw'oyimiridde bukyaterekeddwa.",
       "outOfSpaceBody": "Ekyuma kyo tekirina bbanga lya kutereka lisigadde, noolwekyo tetusobola kusoma bw'oyimiridde mu kujjulukuka. Ggyawo ebimu ozzeemu ogezaako. Tewali kibuze — ssente zo ziri bulungi.",
+      "notSavedBody": "Tetusobodde kutereka bw'oyimiridde mu kujjulukuka ku kyuma kino. Tewali kibuze: ssente zo ziri bulungi. Ozzeemu ogezaako.",
+      "notSavedOutOfSpaceBody": "Ekyuma kyo tekirina bbanga lya kutereka lisigadde, noolwekyo tetusobola kutereka bw'oyimiridde mu kujjulukuka. Ggyawo ebimu ozzeemu ogezaako. Tewali kibuze: ssente zo ziri bulungi.",
       "contactSupportCta": "Tukwatagane n'abayambi"
     },
     "clockOutOfSync": {

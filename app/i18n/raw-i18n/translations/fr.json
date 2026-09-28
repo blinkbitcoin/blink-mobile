@@ -3917,6 +3917,8 @@
         "storageUnavailable": {
             "unreadableBody": "Nous n'avons pas pu lire la progression de votre migration sur cet appareil. Rien n'est perdu : vos fonds sont en sécurité et votre progression est toujours enregistrée.",
             "outOfSpaceBody": "Votre appareil n'a plus d'espace de stockage, nous ne pouvons donc pas lire la progression de votre migration. Libérez de l'espace et réessayez. Rien n'est perdu : vos fonds sont en sécurité.",
+            "notSavedBody": "Nous n'avons pas pu enregistrer la progression de votre migration sur cet appareil. Rien n'est perdu : vos fonds sont en sécurité. Réessayez.",
+            "notSavedOutOfSpaceBody": "Votre appareil n'a plus d'espace de stockage, nous ne pouvons donc pas enregistrer la progression de votre migration. Libérez de l'espace et réessayez. Rien n'est perdu : vos fonds sont en sécurité.",
             "contactSupportCta": "Contacter le support"
         },
         "clockOutOfSync": {

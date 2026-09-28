@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Kami tidak dapat membaca progres migrasi Anda dari perangkat ini. Tidak ada yang hilang — dana Anda aman dan progres Anda masih tersimpan.",
       "outOfSpaceBody": "Perangkat Anda tidak memiliki sisa ruang penyimpanan, sehingga kami tidak dapat membaca progres migrasi Anda. Kosongkan ruang lalu coba lagi. Tidak ada yang hilang — dana Anda aman.",
+      "notSavedBody": "Kami tidak dapat menyimpan progres migrasi Anda di perangkat ini. Tidak ada yang hilang: dana Anda aman. Coba lagi.",
+      "notSavedOutOfSpaceBody": "Perangkat Anda tidak memiliki sisa ruang penyimpanan, sehingga kami tidak dapat menyimpan progres migrasi Anda. Kosongkan ruang lalu coba lagi. Tidak ada yang hilang: dana Anda aman.",
       "contactSupportCta": "Hubungi dukungan"
     },
     "clockOutOfSync": {

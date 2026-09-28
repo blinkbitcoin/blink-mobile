@@ -3917,6 +3917,8 @@
         "storageUnavailable": {
             "unreadableBody": "No pudimos leer el progreso de tu migración en este dispositivo. No se perdió nada: tus fondos están seguros y tu progreso sigue guardado.",
             "outOfSpaceBody": "Tu dispositivo no tiene espacio de almacenamiento disponible, así que no podemos leer el progreso de tu migración. Libera espacio e inténtalo de nuevo. No se perdió nada: tus fondos están seguros.",
+            "notSavedBody": "No pudimos guardar el progreso de tu migración en este dispositivo. No se perdió nada: tus fondos están seguros. Inténtalo de nuevo.",
+            "notSavedOutOfSpaceBody": "Tu dispositivo no tiene espacio de almacenamiento disponible, así que no podemos guardar el progreso de tu migración. Libera espacio e inténtalo de nuevo. No se perdió nada: tus fondos están seguros.",
             "contactSupportCta": "Contactar a soporte"
         },
         "clockOutOfSync": {

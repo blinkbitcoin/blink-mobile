@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Nem tudtuk beolvasni a migráció állapotát erről az eszközről. Semmi sem veszett el: az egyenleged biztonságban van, és az állapotod is megmaradt.",
       "outOfSpaceBody": "Az eszközödön nincs több tárhely, ezért nem tudjuk beolvasni a migráció állapotát. Szabadíts fel helyet, és próbáld újra. Semmi sem veszett el: az egyenleged biztonságban van.",
+      "notSavedBody": "Nem tudtuk menteni a migráció állapotát ezen az eszközön. Semmi sem veszett el: az egyenleged biztonságban van. Próbáld újra.",
+      "notSavedOutOfSpaceBody": "Az eszközödön nincs több tárhely, ezért nem tudjuk menteni a migráció állapotát. Szabadíts fel helyet, és próbáld újra. Semmi sem veszett el: az egyenleged biztonságban van.",
       "contactSupportCta": "Ügyfélszolgálat"
     },
     "clockOutOfSync": {

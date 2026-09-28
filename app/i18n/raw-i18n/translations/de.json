@@ -3917,6 +3917,8 @@
         "storageUnavailable": {
             "unreadableBody": "Wir konnten deinen Migrationsfortschritt auf diesem Gerät nicht lesen. Es ist nichts verloren — dein Guthaben ist sicher und dein Fortschritt ist weiterhin gespeichert.",
             "outOfSpaceBody": "Auf deinem Gerät ist kein Speicherplatz mehr frei, deshalb können wir deinen Migrationsfortschritt nicht lesen. Gib Speicher frei und versuche es erneut. Es ist nichts verloren — dein Guthaben ist sicher.",
+            "notSavedBody": "Wir konnten deinen Migrationsfortschritt auf diesem Gerät nicht speichern. Es ist nichts verloren: dein Guthaben ist sicher. Versuche es erneut.",
+            "notSavedOutOfSpaceBody": "Auf deinem Gerät ist kein Speicherplatz mehr frei, deshalb können wir deinen Migrationsfortschritt nicht speichern. Gib Speicher frei und versuche es erneut. Es ist nichts verloren: dein Guthaben ist sicher.",
             "contactSupportCta": "Support kontaktieren"
         },
         "clockOutOfSync": {

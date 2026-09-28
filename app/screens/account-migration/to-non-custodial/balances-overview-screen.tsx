@@ -16,6 +16,7 @@ import { WarningBanner } from "@app/components/warning-banner"
 import { MigrationStatus } from "@app/graphql/generated"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { BalancePairCard } from "@app/screens/account-migration/balance-pair-card"
 import {
@@ -35,7 +36,56 @@ import {
   MigrationSupportReason,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
+import {
+  StorageFailure,
+  type StorageWriteResult,
+} from "@app/utils/storage/storage-failure"
 import { testProps } from "@app/utils/testProps"
+
+type RetryMessageInput = {
+  LL: TranslationFunctions
+  hasNetworkFailure: boolean
+  /** The kind the checkpoint read failed with, null when that read is not what failed. */
+  checkpointReadFailure: StorageFailure | null
+  /** The kind the commit-point write failed with, null when it did not fail at the store. */
+  commitPointWriteFailure: StorageFailure | null
+}
+
+/**
+ * The line above the retry names the device only when the device is all that failed: any
+ * network source failing alongside keeps the connection wording, since telling a user whose
+ * request also dropped to free up space would send them looking in the wrong place (the
+ * gate follows the same rule).
+ *
+ * Between the two storage sources, the answer the user can act on wins, as in the gate: a
+ * full disk is named whichever side hit it, in that side's words. Otherwise the read leads,
+ * since the write reads the record before replacing it and an unreadable store fails both;
+ * a write can still fail on its own after a clean read, which is why a full disk on the
+ * write is checked before the read's opaque failure rather than after it.
+ *
+ * A write turned away before it reached the store carries no kind: it waits on the owner
+ * lookup, which is the network's.
+ */
+const resolveRetryMessage = ({
+  LL,
+  hasNetworkFailure,
+  checkpointReadFailure,
+  commitPointWriteFailure,
+}: RetryMessageInput): string => {
+  const { storageUnavailable } = LL.AccountMigration
+  if (hasNetworkFailure) return LL.errors.network.connection()
+
+  const isWriteOutOfSpace = commitPointWriteFailure === StorageFailure.OutOfSpace
+  if (isWriteOutOfSpace) return storageUnavailable.notSavedOutOfSpaceBody()
+
+  const isReadOutOfSpace = checkpointReadFailure === StorageFailure.OutOfSpace
+  if (isReadOutOfSpace) return storageUnavailable.outOfSpaceBody()
+
+  if (checkpointReadFailure !== null) return storageUnavailable.unreadableBody()
+  if (commitPointWriteFailure !== null) return storageUnavailable.notSavedBody()
+
+  return LL.errors.network.connection()
+}
 
 /**
  * The migration commit screen: the current and resulting balances plus the network fee,
@@ -55,6 +105,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     accountId: selfCustodialAccountId,
     loading: checkpointLoading,
     hasError: hasCheckpointError,
+    storageFailure: checkpointStorageFailure,
     refetch: refetchCheckpoint,
     saveCheckpoint,
   } = useMigrationCheckpoint()
@@ -141,17 +192,28 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * receive gate waits on, so the button holds until the record lands.
    */
   const [isCommitPointRecorded, setIsCommitPointRecorded] = useState(false)
-  const [hasCommitPointWriteFailed, setHasCommitPointWriteFailed] = useState(false)
+  /** The latest attempt's answer, kept whole so the retry below can say why it is there:
+   *  a store that refused is not a connection that dropped. Null until the first attempt. */
+  const [lastCommitPointWrite, setLastCommitPointWrite] =
+    useState<StorageWriteResult | null>(null)
+  const latestCommitPointWriteRef = useRef(0)
   const recordCommitPoint = useCallback(async (): Promise<void> => {
     if (expectedReceiveSats === null) return
-    const { isSaved } = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+    latestCommitPointWriteRef.current += 1
+    const writeId = latestCommitPointWriteRef.current
+    const writeResult = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
       expectedReceiveSats,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
      *  and a later failure cannot un-record a write that already landed. */
-    setIsCommitPointRecorded((wasRecorded) => wasRecorded || isSaved)
-    setHasCommitPointWriteFailed(!isSaved)
+    setIsCommitPointRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+    /** Overlapping writes (a focus and a retry, or a figure change) can answer out of
+     *  order. Only the latest one issued speaks for the store now, so an older answer that
+     *  lands late never puts a stale reason above the retry. */
+    const isLatestWrite = writeId === latestCommitPointWriteRef.current
+    if (isLatestWrite) setLastCommitPointWrite(writeResult)
   }, [expectedReceiveSats, saveCheckpoint])
+  const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
 
   useEffect(() => {
     if (!isFocused || checkpointLoading) return
@@ -286,20 +348,36 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  figures without a started migration are as useless as the reverse. */
   /** The id sources join the retry only while the re-point still needs them: past it they
    *  hold nothing back, and the retry replaces Approve on this screen, so offering it then
-   *  would hide a commit the user is ready to make behind an error about nothing. */
-  const isIdSourceRetryable =
-    areTransferIdsNeeded &&
-    (hasOwnerIdError || hasCheckpointError || isProvisionedAccountMissing)
+   *  would hide a commit the user is ready to make behind an error about nothing. The
+   *  checkpoint read is the device's store, not the network, so it is kept apart from the
+   *  owner lookup: an id missing because that read failed is the store's failure too. */
+  const hasCheckpointReadFailure = areTransferIdsNeeded && hasCheckpointError
+  const isProvisionedAccountUnresolved =
+    isProvisionedAccountMissing && !hasCheckpointError
+  const hasIdLookupFailure =
+    areTransferIdsNeeded && (hasOwnerIdError || isProvisionedAccountUnresolved)
   /** A refused commit-point write joins the retry rather than leaving the Approve it
    *  holds off dead: this screen swallows the hardware back, so a disabled button with
    *  nothing beside it is the one dead end it must never present. */
   const isCommitPointWriteRetryable = hasCommitPointWriteFailed && !isCommitPointRecorded
-  const isRetryable =
+  const hasNetworkFailure =
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
     hasLnAddressConnectionIssue ||
-    isIdSourceRetryable ||
-    isCommitPointWriteRetryable
+    hasIdLookupFailure
+  const isRetryable =
+    hasNetworkFailure || hasCheckpointReadFailure || isCommitPointWriteRetryable
+
+  const checkpointReadFailure = hasCheckpointReadFailure ? checkpointStorageFailure : null
+  const commitPointWriteFailure = isCommitPointWriteRetryable
+    ? lastCommitPointWrite?.failure ?? null
+    : null
+  const retryMessage = resolveRetryMessage({
+    LL,
+    hasNetworkFailure,
+    checkpointReadFailure,
+    commitPointWriteFailure,
+  })
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
@@ -400,9 +478,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
         <View style={styles.buttonsContainer}>
           {/** Sits with the buttons, not in the figures' place: the start can fail over a
            *   preview that loaded, leaving a retry under visible balances with no reason. */}
-          {isRetryable ? (
-            <Text style={styles.connectionIssue}>{LL.errors.network.connection()}</Text>
-          ) : null}
+          {isRetryable ? <Text style={styles.retryReason}>{retryMessage}</Text> : null}
 
           {isRetryable ? (
             <GaloyPrimaryButton
@@ -449,7 +525,7 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     justifyContent: "center",
   },
-  connectionIssue: {
+  retryReason: {
     fontSize: 16,
     lineHeight: 24,
     color: colors.error,

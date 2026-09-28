@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Ons kon nie jou migrasievordering op hierdie toestel lees nie. Niks is verlore nie — jou fondse is veilig en jou vordering is steeds gestoor.",
       "outOfSpaceBody": "Jou toestel het geen bergingspasie oor nie, dus kan ons nie jou migrasievordering lees nie. Maak spasie oop en probeer weer. Niks is verlore nie — jou fondse is veilig.",
+      "notSavedBody": "Ons kon nie jou migrasievordering op hierdie toestel stoor nie. Niks is verlore nie: jou fondse is veilig. Probeer weer.",
+      "notSavedOutOfSpaceBody": "Jou toestel het geen bergingspasie oor nie, dus kan ons nie jou migrasievordering stoor nie. Maak spasie oop en probeer weer. Niks is verlore nie: jou fondse is veilig.",
       "contactSupportCta": "Kontak ondersteuning"
     },
     "clockOutOfSync": {

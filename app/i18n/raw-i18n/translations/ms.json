@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Kami tidak dapat membaca kemajuan migrasi anda daripada peranti ini. Tiada apa yang hilang — dana anda selamat dan kemajuan anda masih disimpan.",
       "outOfSpaceBody": "Peranti anda tiada ruang storan yang tinggal, jadi kami tidak dapat membaca kemajuan migrasi anda. Kosongkan ruang dan cuba lagi. Tiada apa yang hilang — dana anda selamat.",
+      "notSavedBody": "Kami tidak dapat menyimpan kemajuan migrasi anda pada peranti ini. Tiada apa yang hilang: dana anda selamat. Cuba lagi.",
+      "notSavedOutOfSpaceBody": "Peranti anda tiada ruang storan yang tinggal, jadi kami tidak dapat menyimpan kemajuan migrasi anda. Kosongkan ruang dan cuba lagi. Tiada apa yang hilang: dana anda selamat.",
       "contactSupportCta": "Hubungi sokongan"
     },
     "clockOutOfSync": {

@@ -12758,6 +12758,14 @@ type RootTranslation = {
 			 */
 			outOfSpaceBody: string
 			/**
+			 * W​e​ ​c​o​u​l​d​n​'​t​ ​s​a​v​e​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​:​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​T​r​y​ ​a​g​a​i​n​.
+			 */
+			notSavedBody: string
+			/**
+			 * Y​o​u​r​ ​d​e​v​i​c​e​ ​h​a​s​ ​n​o​ ​s​t​o​r​a​g​e​ ​s​p​a​c​e​ ​l​e​f​t​,​ ​s​o​ ​w​e​ ​c​a​n​'​t​ ​s​a​v​e​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​.​ ​F​r​e​e​ ​u​p​ ​s​o​m​e​ ​s​p​a​c​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​:​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.
+			 */
+			notSavedOutOfSpaceBody: string
+			/**
 			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
 			 */
 			contactSupportCta: string
@@ -26315,6 +26323,14 @@ export type TranslationFunctions = {
 			 * Your device has no storage space left, so we can't read your migration progress. Free up some space and try again. Nothing is lost — your funds are safe.
 			 */
 			outOfSpaceBody: () => LocalizedString
+			/**
+			 * We couldn't save your migration progress on this device. Nothing is lost: your funds are safe. Try again.
+			 */
+			notSavedBody: () => LocalizedString
+			/**
+			 * Your device has no storage space left, so we can't save your migration progress. Free up some space and try again. Nothing is lost: your funds are safe.
+			 */
+			notSavedOutOfSpaceBody: () => LocalizedString
 			/**
 			 * Contact support
 			 */

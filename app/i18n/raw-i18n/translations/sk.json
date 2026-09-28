@@ -3917,6 +3917,8 @@
     "storageUnavailable": {
       "unreadableBody": "Nepodarilo sa nám načítať priebeh vašej migrácie z tohto zariadenia. Nič sa nestratilo — vaše prostriedky sú v bezpečí a váš postup je stále uložený.",
       "outOfSpaceBody": "Vo vašom zariadení už nie je voľné úložisko, takže nedokážeme načítať priebeh migrácie. Uvoľnite miesto a skúste to znova. Nič sa nestratilo — vaše prostriedky sú v bezpečí.",
+      "notSavedBody": "Priebeh vašej migrácie sa nám na tomto zariadení nepodarilo uložiť. Nič sa nestratilo: vaše prostriedky sú v bezpečí. Skúste to znova.",
+      "notSavedOutOfSpaceBody": "Vo vašom zariadení už nie je voľné úložisko, takže nedokážeme uložiť priebeh migrácie. Uvoľnite miesto a skúste to znova. Nič sa nestratilo: vaše prostriedky sú v bezpečí.",
       "contactSupportCta": "Kontaktovať podporu"
     },
     "clockOutOfSync": {
