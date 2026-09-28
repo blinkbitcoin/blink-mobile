@@ -51,8 +51,10 @@ gql`
   }
 `
 
-/** The key the invitation panel sends the investment invitation under. */
-export const INVESTMENT_INVITATION_BULLETIN_KEY = "investment-invitation"
+/** The key the invitation panel sends the investment invitation under. In the `system-`
+ *  namespace the server reserves for keys only an admin right may send, close or make
+ *  non-dismissible, so a marketing send can neither replace nor retire it. */
+export const INVESTMENT_INVITATION_BULLETIN_KEY = "system-investment-invitation"
 
 /** Unacknowledged bulletins are few; one page is the usual whole of them. The cap is
  *  there so a cursor that never advances cannot keep the lookup asking for ever. */
