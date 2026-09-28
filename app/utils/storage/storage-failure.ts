@@ -11,9 +11,6 @@
  * wording, so an upgrade has to re-derive them — the spec asserts the pin against the
  * installed package and fails when it moves, which is the reminder to come back here.
  */
-/** Exported so the spec asserts against this value rather than restating it: two copies of
- *  the same fact drift, and the drift is exactly what the pin exists to catch. */
-export const PINNED_ASYNC_STORAGE_VERSION = "2.2.0"
 export const StorageFailure = {
   /** The device has no room left. The user can fix this one themselves. */
   OutOfSpace: "out-of-space",
@@ -27,6 +24,10 @@ export const StorageFailure = {
 } as const
 
 export type StorageFailure = (typeof StorageFailure)[keyof typeof StorageFailure]
+
+/** Exported so the spec asserts against this value rather than restating it: two copies of
+ *  the same fact drift, and the drift is exactly what the pin exists to catch. */
+export const PINNED_ASYNC_STORAGE_VERSION = "2.2.0"
 
 /** What a storage write answers with. The boolean alone loses the one thing the user can
  *  act on, a full disk, so the kind travels with it. Null unless the write failed. */
