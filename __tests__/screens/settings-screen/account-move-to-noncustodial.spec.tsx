@@ -27,6 +27,11 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
 }))
 
+let mockMigrationCompleted = false
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({ isCompleted: mockMigrationCompleted }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -53,6 +58,7 @@ describe("MoveToNonCustodialSetting", () => {
     jest.clearAllMocks()
     mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockMigrationCompleted = false
   })
 
   it("renders for custodial accounts", () => {
@@ -87,6 +93,16 @@ describe("MoveToNonCustodialSetting", () => {
 
   it("hides the entry while the self-custodial kill-switch is off", () => {
     mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+
+    render(<MoveToNonCustodialSetting />)
+
+    expect(screen.queryByTestId("settings-row")).toBeNull()
+  })
+
+  /** Nothing is left to move once the migration completed: the row would only lead into a
+   *  flow the server refuses to start again. */
+  it("hides the entry once the migration completed", () => {
+    mockMigrationCompleted = true
 
     render(<MoveToNonCustodialSetting />)
 

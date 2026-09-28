@@ -7,6 +7,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks"
+import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
@@ -16,10 +17,14 @@ export const MoveToNonCustodialSetting: React.FC = () => {
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
+  const { isCompleted: isMigrationCompleted } = useMigrationLock()
 
   /** The kill-switch pauses every entry into the migration, this one included. */
   if (isSelfCustodialDisabled) return null
   if (activeAccount?.type === AccountType.SelfCustodial) return null
+  /** A completed migration has nothing left to move: the row would only lead into a flow
+   *  the server refuses to start again. */
+  if (isMigrationCompleted) return null
 
   /** Routes through the migration entry dispatcher, the single choke point that owns the
    *  resume-vs-fresh decision, instead of deciding it here. */
