@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -9,6 +9,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { MigrationBalancesOverviewScreen } from "@app/screens/account-migration/to-non-custodial/balances-overview-screen"
 import { MigrationLnAddressOutcome } from "@app/types/migration"
+import { type StorageWriteResult } from "@app/utils/storage/storage-failure"
 import { ContextForScreen } from "../../helper"
 import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -967,6 +968,34 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(screen.getByText("BTC 1000")).toBeTruthy()
     expect(screen.getByText("BTC 990")).toBeTruthy()
   })
+})
+
+describe("MigrationBalancesOverviewScreen commit-point write", () => {
+  beforeEach(resetScreenMocks)
+
+  /** The window the gate exists for: everything else has settled and the write is still on
+   *  its way to the store. A refused write swaps Approve for the retry, so only a write in
+   *  flight leaves Approve on screen for this term alone to hold. */
+  it("keeps Approve disabled while the commit-point write is still in flight", async () => {
+    let settleWrite: (result: StorageWriteResult) => void = () => undefined
+    mockSaveCheckpoint.mockImplementation(
+      () =>
+        new Promise<StorageWriteResult>((resolve) => {
+          settleWrite = resolve
+        }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+
+    await act(async () => {
+      settleWrite({ isSaved: true, failure: null })
+    })
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
 })
 
 describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
