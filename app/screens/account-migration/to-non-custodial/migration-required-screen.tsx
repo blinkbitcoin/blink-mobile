@@ -23,7 +23,8 @@ import { testProps } from "@app/utils/testProps"
  * - voluntary: the user opted in from Settings; can close (back to the app).
  * - forcedPreDeadline: the user is in the migration cohort but the deadline has not
  *   passed; can still close and wait.
- * - gate: the account is closed server-side (post-deadline); no close, balances shown.
+ * - gate: the account is closed server-side (post-deadline); balances shown, and no close
+ *   unless the caller allows one (a migration that already completed).
  */
 export type MigrationMode = "voluntary" | "forcedPreDeadline" | "gate"
 
@@ -41,14 +42,15 @@ type ModePresentation = {
   heroIconColor: string
   title: string
   subtitle: React.ReactNode
-  shouldShowClose: boolean
   shouldShowBalances: boolean
 }
 
 export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = ({
   mode,
   onClose,
-  isExitBlocked = false,
+  /** The closed gate stays shut unless the caller explicitly opens it, so a render that
+   *  forgets the prop can never offer a way out of a closed account. */
+  isExitBlocked = mode === "gate",
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -111,7 +113,6 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       heroIconColor: colors._green,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredBody(),
-      shouldShowClose: true,
       shouldShowBalances: false,
     },
     forcedPreDeadline: {
@@ -119,7 +120,6 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       heroIconColor: colors._green,
       title: LL.AccountMigration.migrationRequiredTitle(),
       subtitle: LL.AccountMigration.migrationRequiredForcedBody(),
-      shouldShowClose: true,
       shouldShowBalances: false,
     },
     gate: {
@@ -127,12 +127,13 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       heroIconColor: colors.warning,
       title: LL.AccountMigration.migrationGateTitle(),
       subtitle: gateBody,
-      shouldShowClose: false,
       shouldShowBalances: true,
     },
   }
   const presentation = presentationByMode[mode]
-  const canClose = presentation.shouldShowClose && !isExitBlocked
+  /** Whether a close is offered is the caller's call alone: every mode can be left, and
+   *  the closed gate stays shut by default unless the caller opens it. */
+  const canClose = !isExitBlocked
   const closeAction = canClose ? handleClose : undefined
 
   return (

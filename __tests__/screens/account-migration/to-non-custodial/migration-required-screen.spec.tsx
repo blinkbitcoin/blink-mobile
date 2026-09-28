@@ -81,10 +81,18 @@ jest.mock("@app/hooks/use-price-conversion", () => ({
   }),
 }))
 
-const renderScreen = (mode: MigrationMode, onClose?: () => void) =>
+const renderScreen = (
+  mode: MigrationMode,
+  onClose?: () => void,
+  isExitBlocked?: boolean,
+) =>
   render(
     <ContextForScreen>
-      <MigrationRequiredScreen mode={mode} onClose={onClose} />
+      <MigrationRequiredScreen
+        mode={mode}
+        onClose={onClose}
+        isExitBlocked={isExitBlocked}
+      />
     </ContextForScreen>,
   )
 
@@ -136,7 +144,7 @@ describe("MigrationRequiredScreen", () => {
 
   describe("gate mode", () => {
     it("renders the warning hero, gate title, balances and no close button", async () => {
-      renderScreen("gate")
+      renderScreen("gate", undefined, true)
       await flushEffects()
 
       expect(screen.getByTestId("icon-warning")).toBeTruthy()
@@ -144,6 +152,22 @@ describe("MigrationRequiredScreen", () => {
       expect(screen.getByText("BTC 1000 (display)")).toBeTruthy()
       expect(screen.getByText("USD 2500")).toBeTruthy()
       expect(screen.queryByTestId("migration-close")).toBeNull()
+    })
+
+    /** The closed gate leaves the exit to its caller, which only opens it once the
+     *  migration completed and there is nothing left to hold the user to. */
+    it("keeps the closed gate shut when the caller says nothing about the exit", async () => {
+      renderScreen("gate")
+      await flushEffects()
+
+      expect(screen.queryByTestId("migration-close")).toBeNull()
+    })
+
+    it("offers a close once the caller allows the exit", async () => {
+      renderScreen("gate", undefined, false)
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-close")).toBeTruthy()
     })
 
     it("opens the support email when the address link is pressed", async () => {
