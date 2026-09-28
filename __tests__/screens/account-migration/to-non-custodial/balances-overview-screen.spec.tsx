@@ -1168,6 +1168,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockLnRetry).toHaveBeenCalledTimes(1)
   })
@@ -1284,6 +1285,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
   })
@@ -1310,6 +1312,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockRefetchOwnerId).toHaveBeenCalledTimes(1)
   })
