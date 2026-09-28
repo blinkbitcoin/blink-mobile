@@ -184,11 +184,7 @@ export const MigrationGate: React.FC = () => {
    *  look unlocked, so a settled error blocks with a retry instead. The local reads join
    *  only when locked — that is the only decision they feed, and an unreadable store there
    *  would impersonate a wiped device and hand a resumable user to terminal support. */
-  const hasGateDataError =
-    apiKeysError ||
-    balancesError ||
-    lockError ||
-    (isMigrationLocked && hasResumeDataError)
+  const hasGateDataError = hasServerDataError || (isMigrationLocked && hasResumeDataError)
 
   /** Either read can be the one that failed. The answer the user can act on wins over the
    *  one that says nothing, rather than whichever source happened to answer first. */
