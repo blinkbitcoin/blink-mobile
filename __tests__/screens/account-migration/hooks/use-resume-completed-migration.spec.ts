@@ -72,6 +72,15 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   },
 }))
 
+const mockSetMigrationReceiveOverdue = jest.fn()
+const mockMarkAppForegrounded = jest.fn()
+
+jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
+  setMigrationReceiveOverdue: (isOverdue: boolean) =>
+    mockSetMigrationReceiveOverdue(isOverdue),
+  markAppForegrounded: () => mockMarkAppForegrounded(),
+}))
+
 jest.mock("@app/utils/error-logging", () => ({
   ...jest.requireActual("@app/utils/error-logging"),
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
@@ -552,6 +561,55 @@ describe("useResumeCompletedMigration", () => {
 
     await act(async () => {
       settle(MigrationCompletion.Completed)
+    })
+  })
+
+  /** The migration entry and steps cannot see this hook; they read the overdue receive
+   *  from the shared record it keeps up to date. */
+  describe("the overdue receive it shares", () => {
+    it("publishes a receive that has not landed within the notice window", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(true)
+    })
+
+    it("publishes a receive that is not overdue", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
+    })
+
+    it("withdraws it when the watch goes away", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+      const { unmount } = renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      unmount()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
+    })
+
+    it("records each return to the foreground", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      await foregroundApp()
+
+      expect(mockMarkAppForegrounded).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not record the app leaving the foreground", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      await act(async () => {
+        mockAppStateListeners.forEach((listener) => listener("background"))
+      })
+
+      expect(mockMarkAppForegrounded).not.toHaveBeenCalled()
     })
   })
 })
