@@ -199,28 +199,36 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const [lastCommitPointWrite, setLastCommitPointWrite] =
     useState<StorageWriteResult | null>(null)
   const latestCommitPointWriteRef = useRef(0)
-  /** The figure this focus already recorded. A landed write updates the very state that
-   *  saveCheckpoint closes over, so without this the effect below would fire a second,
-   *  identical write on the one screen where the disk is the thing in doubt. Cleared on
-   *  blur so every focus still refreshes the record. */
-  const recordedFigureRef = useRef<number | null>(null)
+  /** The step is recorded as soon as the figures are ready, which can be before the server
+   *  accepts the start (it waits on an emptied dollar balance, and can fail). The accepted
+   *  start is written with it once it lands, the one thing that later tells a flow support
+   *  cleared from one that never started, since the server reads not started for both. */
+  const startConfirmation = migrationStart.isStarted ? true : undefined
+  /** What this focus already recorded: the figure and whether the write carried the
+   *  accepted start, since a change to either is a new record to write. A landed write
+   *  updates the very state that saveCheckpoint closes over, so without this the effect
+   *  below would fire a second, identical write on the one screen where the disk is the
+   *  thing in doubt. Cleared on blur so every focus still refreshes the record. */
+  const commitPointWriteKey = `${expectedReceiveSats}:${startConfirmation === true}`
+  const recordedWriteKeyRef = useRef<string | null>(null)
   const recordCommitPoint = useCallback(async (): Promise<void> => {
     if (expectedReceiveSats === null) return
     latestCommitPointWriteRef.current += 1
     const writeId = latestCommitPointWriteRef.current
     const writeResult = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
       expectedReceiveSats,
+      isStartConfirmed: startConfirmation,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
      *  and a later failure cannot un-record a write that already landed. */
     setIsCommitPointRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
-    if (writeResult.isSaved) recordedFigureRef.current = expectedReceiveSats
+    if (writeResult.isSaved) recordedWriteKeyRef.current = commitPointWriteKey
     /** Overlapping writes (a focus and a retry, or a figure change) can answer out of
      *  order. Only the latest one issued speaks for the store now, so an older answer that
      *  lands late never puts a stale reason above the retry. */
     const isLatestWrite = writeId === latestCommitPointWriteRef.current
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
-  }, [expectedReceiveSats, saveCheckpoint])
+  }, [expectedReceiveSats, startConfirmation, commitPointWriteKey, saveCheckpoint])
   const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
   /**
    * A resumed commit point is already on disk, and the write this screen issues cannot
@@ -239,15 +247,14 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  that resolves late is what heals a write refused for want of one. */
   useEffect(() => {
     if (!isFocused) {
-      recordedFigureRef.current = null
+      recordedWriteKeyRef.current = null
       return
     }
     if (checkpointLoading) return
-    const isAlreadyRecorded =
-      expectedReceiveSats !== null && recordedFigureRef.current === expectedReceiveSats
+    const isAlreadyRecorded = recordedWriteKeyRef.current === commitPointWriteKey
     if (isAlreadyRecorded) return
     recordCommitPoint()
-  }, [isFocused, checkpointLoading, expectedReceiveSats, recordCommitPoint])
+  }, [isFocused, checkpointLoading, commitPointWriteKey, recordCommitPoint])
 
   /**
    * The ways this screen ends without an Approve to offer, as one value: the preview settled
