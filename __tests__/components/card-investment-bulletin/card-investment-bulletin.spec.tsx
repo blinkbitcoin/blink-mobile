@@ -178,14 +178,16 @@ describe("CardInvestmentBulletin", () => {
       expect(queryByTestId("dismiss-button")).toBeNull()
     })
 
-    it("opens the deposit-pending step when the card is tapped", async () => {
+    /** There is nothing to do but wait; a tap that opened a screen whose only control
+     *  is "Okay" would read as a button that does nothing. */
+    it("goes nowhere when the card is tapped", async () => {
       const { getByText } = renderBulletin(CardInvestmentBulletinKind.DepositPending)
 
       await act(async () => {
         fireEvent.press(getByText("Hold on"))
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingDepositPendingScreen")
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
   })
 
