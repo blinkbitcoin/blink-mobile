@@ -15,7 +15,7 @@ import { Transaction, WalletCurrency } from "@app/graphql/generated"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useClipboard, useDisplayCurrency } from "@app/hooks"
-import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
+import { usePaymentObservers } from "./hooks/use-payment-observers"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -126,7 +126,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const [paymentError, setPaymentError] = useState<string | undefined>(undefined)
   const [isVerifying, setIsVerifying] = useState(false)
   const verifyPaymentSettled = useVerifyPaymentSettled()
-  const { isInvestmentInvoice } = useCardInvestmentProgress()
+  const paymentObservers = usePaymentObservers()
   const { LL } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
   const { copyToClipboard } = useClipboard()
@@ -327,13 +327,14 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
       if (status === "ALREADY_PAID") {
         /**
-         * The card investment's own invoice exists for that investment alone, so "already
-         * paid" on it means the money already landed against the agreement, whoever paid
-         * it; in practice an earlier attempt from this device that the app closed on
-         * before its receipt was recorded. Refusing here would leave the home asking for
-         * the money again, and the next attempt would mint and pay a second invoice; the
-         * receipt records it as settled instead. Custodial only: the self-custodial
-         * adapter reports a settled invoice as a plain failure.
+         * An invoice someone in the app is watching exists for that one purpose (the card
+         * investment's, minted for that investment alone), so "already paid" on it means
+         * the money already landed against it, whoever paid; in practice an earlier
+         * attempt from this device that the app closed on before its receipt was
+         * recorded. Refusing here would leave the watcher asking for the money again, and
+         * the next attempt would mint and pay a second invoice; the receipt records it as
+         * settled instead. Custodial only: the self-custodial adapter reports a settled
+         * invoice as a plain failure.
          *
          * The ledger is asked for the settlement first, the way an idempotency conflict
          * is, so the receipt carries the real status and moment rather than an assumed
@@ -342,7 +343,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
          * wallet, so an earlier attempt paid from the other wallet costs the poll's few
          * seconds before the receipt; the attempt's own result was logged above.
          */
-        if (paymentType === "lightning" && isInvestmentInvoice(destination)) {
+        if (paymentType === "lightning" && paymentObservers.isObserved(destination)) {
           const settled = await lookUpSettlement(destination)
           const receipt = settled
             ? { status: settled.status, transaction: { createdAt: settled.createdAt } }
@@ -419,7 +420,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     destination,
     navigateToCompleted,
     lookUpSettlement,
-    isInvestmentInvoice,
+    paymentObservers,
     translateSdkError,
   ])
 
