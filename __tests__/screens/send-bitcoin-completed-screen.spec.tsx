@@ -72,23 +72,15 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
-/** The investment's record, as the hook reads it: which invoice is the investment's,
- *  and whether it is already marked paid. Its own spec covers the record; what matters
- *  here is when this screen marks it. */
-const mockCardInvestment: { current: { paidAt?: number } | null } = { current: null }
-const mockIsInvestmentInvoice = jest.fn((_paymentRequest?: string) => false)
-const mockMarkCardInvestmentPaid = jest.fn(() => {
-  mockCardInvestment.current = {
-    ...mockCardInvestment.current,
-    paidAt: 1_757_800_000_000,
-  }
-})
-jest.mock("@app/hooks/use-card-investment-progress", () => ({
-  useCardInvestmentProgress: () => ({
-    progress: mockCardInvestment.current,
-    markPaid: mockMarkCardInvestmentPaid,
-    isInvestmentInvoice: (paymentRequest?: string) =>
-      mockIsInvestmentInvoice(paymentRequest),
+/** Whoever watches payments through the send flow, stood in for: which invoices are
+ *  theirs, and what they are told. Their own specs cover what they do with it; what
+ *  matters here is that this screen tells them, once per receipt. */
+const mockIsObserved = jest.fn((_paymentRequest?: string) => false)
+const mockOnSettled = jest.fn()
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-payment-observers", () => ({
+  usePaymentObservers: () => ({
+    isObserved: (paymentRequest?: string) => mockIsObserved(paymentRequest),
+    onSettled: mockOnSettled,
   }),
 }))
 
@@ -983,11 +975,10 @@ describe("SendBitcoinCompletedScreen", () => {
   })
 })
 
-describe("SendBitcoinCompletedScreen card investment payment", () => {
-  /** The record holds the investment's invoice and, once paid, its mark. */
-  const recordedInvestment = () => {
-    mockCardInvestment.current = {}
-    mockIsInvestmentInvoice.mockImplementation(
+describe("SendBitcoinCompletedScreen payment observers", () => {
+  /** An observer following the investment's invoice. */
+  const investmentObserved = () => {
+    mockIsObserved.mockImplementation(
       (paymentRequest?: string) => paymentRequest === INVESTMENT_INVOICE,
     )
   }
@@ -996,16 +987,15 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     jest.clearAllMocks()
     mockIsFocused.mockReturnValue(true)
     loadLocale("en")
-    mockCardInvestment.current = null
-    mockIsInvestmentInvoice.mockImplementation(() => false)
+    mockIsObserved.mockImplementation(() => false)
   })
 
   afterEach(() => {
     jest.clearAllTimers()
   })
 
-  it("records the investment as paid when this receipt settles its invoice", async () => {
-    recordedInvestment()
+  it("tells the observers when a receipt settles an invoice they follow", async () => {
+    investmentObserved()
 
     render(
       <ContextForScreen>
@@ -1014,14 +1004,14 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
-    expect(mockIsInvestmentInvoice).toHaveBeenCalledWith(INVESTMENT_INVOICE)
-    expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
+    expect(mockIsObserved).toHaveBeenCalledWith(INVESTMENT_INVOICE)
+    expect(mockOnSettled).toHaveBeenCalledTimes(1)
+    expect(mockOnSettled).toHaveBeenCalledWith(INVESTMENT_INVOICE, "SUCCESS")
   })
 
-  /** The wallet has taken the payment; holding the record until it settles would have
-   *  the home ask for the money again while it is in flight. */
-  it("records it on a pending payment as well", async () => {
-    recordedInvestment()
+  /** A pending payment has left the wallet too; what to make of it is the observer's. */
+  it("tells them about a pending receipt as well, with its status", async () => {
+    investmentObserved()
 
     render(
       <ContextForScreen>
@@ -1030,13 +1020,13 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
-    expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
+    expect(mockOnSettled).toHaveBeenCalledWith(INVESTMENT_INVOICE, "PENDING")
   })
 
   /** The investor backed into the send flow's destination step and paid someone else
-   *  while the transfer step still sat underneath: that payment is not the investment. */
-  it("records nothing for a receipt that settled another invoice", async () => {
-    recordedInvestment()
+   *  while the transfer step still sat underneath: that payment is nobody's to hear of. */
+  it("tells nobody about a receipt for an invoice none of them follow", async () => {
+    investmentObserved()
 
     render(
       <ContextForScreen>
@@ -1045,11 +1035,11 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
-    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+    expect(mockOnSettled).not.toHaveBeenCalled()
   })
 
-  it("records nothing for a receipt that names no invoice", async () => {
-    recordedInvestment()
+  it("tells nobody about a receipt that names no invoice", async () => {
+    investmentObserved()
 
     render(
       <ContextForScreen>
@@ -1058,28 +1048,11 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
-    expect(mockIsInvestmentInvoice).toHaveBeenCalledWith(undefined)
-    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+    expect(mockOnSettled).not.toHaveBeenCalled()
   })
 
-  /** A second receipt for the same invoice, the retry that met "already paid", must not
-   *  move the mark: the mark itself is what says the payment is on record. */
-  it("records nothing for an investment already marked paid", async () => {
-    recordedInvestment()
-    mockCardInvestment.current = { paidAt: 1_757_700_000_000 }
-
-    render(
-      <ContextForScreen>
-        <InvestmentPaid />
-      </ContextForScreen>,
-    )
-    await waitFor(() => screen.findByTestId("Success Text"))
-
-    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
-  })
-
-  it("records the payment once for the life of the receipt", async () => {
-    recordedInvestment()
+  it("tells them once for the life of the receipt", async () => {
+    investmentObserved()
 
     const { rerender } = render(
       <ContextForScreen>
@@ -1095,10 +1068,10 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
-    expect(mockMarkCardInvestmentPaid).toHaveBeenCalledTimes(1)
+    expect(mockOnSettled).toHaveBeenCalledTimes(1)
   })
 
-  it("records nothing when no investment invoice is on record", async () => {
+  it("tells nobody while no observer follows anything", async () => {
     render(
       <ContextForScreen>
         <InvestmentPaid />
@@ -1106,6 +1079,6 @@ describe("SendBitcoinCompletedScreen card investment payment", () => {
     )
     await waitFor(() => screen.findByTestId("Success Text"))
 
-    expect(mockMarkCardInvestmentPaid).not.toHaveBeenCalled()
+    expect(mockOnSettled).not.toHaveBeenCalled()
   })
 })
