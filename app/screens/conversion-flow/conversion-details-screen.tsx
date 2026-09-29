@@ -147,6 +147,11 @@ export const ConversionDetailsScreen = () => {
   const isRegionRestricted = dollarBalanceGuard.isRestricted || transferGuard.isBlocked
   const isRestrictedInvestmentConversion = isInvestmentConversion && isRegionRestricted
   const isUsdToBtcOnly = isDraining(drainConversion) || isRestrictedInvestmentConversion
+  /** The investment's payment is an invoice in satoshis, so an investor consolidating for
+   *  it opens on dollars to bitcoin whoever they are: the other way round would leave
+   *  the payment waiting on a second spread at send time. Only the restricted investor is
+   *  held to that direction; the rest may still turn it. */
+  const isUsdToBtcFirst = isUsdToBtcOnly || isInvestmentConversion
 
   /** A refusal is already navigating the user away, so there is nothing to render. */
   if (isRefused) return null
@@ -160,6 +165,7 @@ export const ConversionDetailsScreen = () => {
     <ConversionDetailsScreenContent
       drainConversion={drainConversion}
       isUsdToBtcOnly={isUsdToBtcOnly}
+      isUsdToBtcFirst={isUsdToBtcFirst}
     />
   )
 }
@@ -187,11 +193,14 @@ type ConversionDetailsScreenContentProps = {
   drainConversion: DrainConversionArm | null
   /** Opens USD to BTC with the toggle held: every drain, and a restricted investor. */
   isUsdToBtcOnly: boolean
+  /** Which way the screen opens; the toggle may still turn it unless it is the only way. */
+  isUsdToBtcFirst: boolean
 }
 
 const ConversionDetailsScreenContent = ({
   drainConversion,
   isUsdToBtcOnly,
+  isUsdToBtcFirst,
 }: ConversionDetailsScreenContentProps) => {
   const isDrainConversion = isDraining(drainConversion)
 
@@ -259,8 +268,8 @@ const ConversionDetailsScreenContent = ({
     selfCustodialWalletsForConvert?.usd ?? getUsdWallet(data?.me?.defaultAccount?.wallets)
 
   const initialWallets = useMemo(
-    () => resolveInitialConvertWallets(btcWallet, usdWallet, isUsdToBtcOnly),
-    [btcWallet, usdWallet, isUsdToBtcOnly],
+    () => resolveInitialConvertWallets(btcWallet, usdWallet, isUsdToBtcFirst),
+    [btcWallet, usdWallet, isUsdToBtcFirst],
   )
 
   const {
