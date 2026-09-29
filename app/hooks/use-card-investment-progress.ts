@@ -89,16 +89,23 @@ type CardInvestmentProgressState = {
   /** Whether an invoice is the one recorded for the investment: how the send flow,
    *  which pays it like any other, tells the investment's payment from the rest. */
   isInvestmentInvoice: (paymentRequest: string | undefined) => boolean
-  /** Records the payment; the home welcomes the investor from here on. */
+  /** Records a payment sent and still on its way; the home stops asking for the money
+   *  and waits, since the payment can still fail. */
+  markPaying: () => void
+  /** Records that a payment on its way did not go through after all; the home asks for
+   *  the money again. */
+  clearPaying: () => void
+  /** Records the payment as settled; the home welcomes the investor from here on. */
   markPaid: () => void
   /** Closes the welcome. The record stays, as the mark that this account has signed. */
   dismissWelcome: () => void
 }
 
 /**
- * The active account's card investment in progress, and the three moments that move it:
- * signing, paying, and closing the welcome that follows. Read and written through the
- * persisted state so the home, the signing step and the send flow all see the same record.
+ * The active account's card investment in progress, and the moments that move it:
+ * signing, a payment on its way, the payment settled, and closing the welcome that
+ * follows. Read and written through the persisted state so the home, the flow's screens
+ * and the send flow all see the same record.
  *
  * With no account id resolved yet there is nothing to read and nowhere to write, so the
  * moments are dropped rather than filed under a guess.
@@ -150,9 +157,29 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [amend],
   )
 
-  /** The first mark stands: a second receipt or a doubled effect must not move it. */
+  /** A payment already settled is not on its way; the first mark of either stands. */
+  const markPaying = useCallback(() => {
+    amend((current) =>
+      current.paidAt || current.payingAt ? current : { ...current, payingAt: Date.now() },
+    )
+  }, [amend])
+
+  const clearPaying = useCallback(() => {
+    amend((current) => {
+      if (current.payingAt === undefined) return current
+      const { payingAt: _failed, ...owed } = current
+      return owed
+    })
+  }, [amend])
+
+  /** The first mark stands: a second receipt or a doubled effect must not move it. A
+   *  settled payment is no longer on its way. */
   const markPaid = useCallback(() => {
-    amend((current) => (current.paidAt ? current : { ...current, paidAt: Date.now() }))
+    amend((current) => {
+      if (current.paidAt) return current
+      const { payingAt: _landed, ...settled } = current
+      return { ...settled, paidAt: Date.now() }
+    })
   }, [amend])
 
   const dismissWelcome = useCallback(() => {
@@ -187,6 +214,8 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     start,
     recordInvoice,
     isInvestmentInvoice,
+    markPaying,
+    clearPaying,
     markPaid,
     dismissWelcome,
   }

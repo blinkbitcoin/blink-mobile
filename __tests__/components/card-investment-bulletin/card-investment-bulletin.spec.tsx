@@ -72,6 +72,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
               title: () => "Complete your investment",
               body: () => "You now have enough funds to complete the investment.",
             },
+            paymentPending: {
+              title: () => "Payment on its way",
+              body: () => "Your investment payment is being confirmed.",
+            },
             shareholder: {
               title: () => "Welcome as Blink shareholder!",
               body: () =>
@@ -182,6 +186,29 @@ describe("CardInvestmentBulletin", () => {
       })
 
       expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingDepositPendingScreen")
+    })
+  })
+
+  describe("payment pending", () => {
+    it("says the payment is on its way, with nothing to press", () => {
+      const { getByText, queryByTestId } = renderBulletin(
+        CardInvestmentBulletinKind.PaymentPending,
+      )
+
+      expect(getByText("Payment on its way")).toBeTruthy()
+      expect(getByText("Your investment payment is being confirmed.")).toBeTruthy()
+      expect(queryByTestId("cta-button")).toBeNull()
+      expect(queryByTestId("dismiss-button")).toBeNull()
+    })
+
+    it("goes nowhere when the card is tapped", async () => {
+      const { getByText } = renderBulletin(CardInvestmentBulletinKind.PaymentPending)
+
+      await act(async () => {
+        fireEvent.press(getByText("Payment on its way"))
+      })
+
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
   })
 

@@ -42,6 +42,7 @@ const mockCardInvestmentProgress: {
 } = { current: null }
 const mockRecordInvoice = jest.fn()
 const mockMarkPaid = jest.fn()
+const mockMarkPaying = jest.fn()
 /** Whether the active account can take part: false for a self-custodial one. */
 const mockIsEligible = { current: true }
 /** The account the invoice is filed under; null while the home has not resolved it. */
@@ -53,6 +54,7 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
     progress: mockCardInvestmentProgress.current,
     recordInvoice: (...args: unknown[]) => mockRecordInvoice(...args),
     markPaid: () => mockMarkPaid(),
+    markPaying: () => mockMarkPaying(),
     isEligible: mockIsEligible.current,
     accountId: mockAccountId.current,
     isAccountResolved: mockAccountId.current !== null,
@@ -950,15 +952,14 @@ describe("TransferInvestScreen, the invoice it pays", () => {
       )
     })
 
-    /** A pending payment has left the wallet; like the receipt, the step records it as
-     *  paid rather than mint a second invoice for money already on its way. */
-    it("records the payment when the ledger still holds it as pending", async () => {
+    it("records the payment as on its way when the ledger still holds it as pending", async () => {
       expiredInvoice()
       mockLookUpPayment.mockResolvedValue(CardInvestmentPaymentLookup.Pending)
 
       await pressContinue()
 
-      expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+      expect(mockMarkPaying).toHaveBeenCalledTimes(1)
+      expect(mockMarkPaid).not.toHaveBeenCalled()
       expect(mockRequestInvoice).not.toHaveBeenCalled()
       expect(mockDispatch).toHaveBeenCalledWith(
         expect.objectContaining({ type: "RESET" }),

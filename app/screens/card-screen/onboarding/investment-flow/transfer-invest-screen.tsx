@@ -66,8 +66,15 @@ export const TransferInvestScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
-  const { progress, recordInvoice, markPaid, isEligible, accountId, isAccountResolved } =
-    useCardInvestmentProgress()
+  const {
+    progress,
+    recordInvoice,
+    markPaid,
+    markPaying,
+    isEligible,
+    accountId,
+    isAccountResolved,
+  } = useCardInvestmentProgress()
 
   /**
    * The figures are the signed record's once it is in hand, and the route's only until
@@ -171,8 +178,7 @@ export const TransferInvestScreen: React.FC = () => {
    *
    * An invoice too old to pay again is asked about first: it may have been paid, and the
    * ledger is the only place that knows. Settled, the payment is recorded and the home
-   * takes over with its welcome; still pending, it is recorded the same way, as the
-   * receipt records a pending payment. A fresh
+   * takes over with its welcome; still pending, it is recorded as on its way. A fresh
    * invoice is minted only when every wallet answered and none holds the send, since the
    * ledger's own uniqueness cannot refuse a second one for this investment; a ledger that
    * could not be asked mints nothing, and the investor is asked to try again.
@@ -197,7 +203,7 @@ export const TransferInvestScreen: React.FC = () => {
         return { kind: "settled" }
       }
       if (lookup === CardInvestmentPaymentLookup.Pending) {
-        markPaid()
+        markPaying()
         return { kind: "settled" }
       }
       if (lookup === CardInvestmentPaymentLookup.Unknown) {

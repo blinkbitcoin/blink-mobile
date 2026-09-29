@@ -4,6 +4,7 @@ import {
   useHomeUnauthedQuery,
   useTransactionsByPaymentHashLazyQuery,
 } from "@app/graphql/generated"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useSendWallets } from "@app/screens/send-bitcoin-screen/hooks/use-send-wallets"
 import {
   getPaymentHashFromInvoice,
@@ -86,4 +87,36 @@ export const useLookUpInvestmentPayment = (): ((
       }),
     [fetchTransactionsByPaymentHash, network, walletIds],
   )
+}
+
+/**
+ * Settles a payment the record only knows as on its way. A pending payment can still
+ * fail, and the receipt that recorded it as pending is long gone by the time it does, so
+ * the home asks the ledger: settled, and the investor is welcomed; every wallet answered
+ * and none holds the send, which is what a failed payment leaves, and the home asks for
+ * the money again; still pending, or the ledger could not be asked, and it goes on
+ * waiting. Asked again whenever what it asks with changes, so a home that opened before
+ * the network or the wallets were known asks once they are.
+ */
+export const useReconcileInvestmentPayment = (): void => {
+  const { progress, markPaid, clearPaying } = useCardInvestmentProgress()
+  const lookUpPayment = useLookUpInvestmentPayment()
+
+  const isOnItsWay = progress?.payingAt !== undefined && progress.paidAt === undefined
+  const paymentRequest = isOnItsWay ? progress?.invoice?.paymentRequest : undefined
+
+  React.useEffect(() => {
+    if (!paymentRequest) return
+    let isStale = false
+
+    lookUpPayment(paymentRequest).then((status) => {
+      if (isStale) return
+      if (status === CardInvestmentPaymentLookup.Settled) markPaid()
+      if (status === CardInvestmentPaymentLookup.NotFound) clearPaying()
+    })
+
+    return () => {
+      isStale = true
+    }
+  }, [paymentRequest, lookUpPayment, markPaid, clearPaying])
 }
