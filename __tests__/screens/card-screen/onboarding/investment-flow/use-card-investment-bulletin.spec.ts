@@ -1,6 +1,8 @@
 import { renderHook } from "@testing-library/react-native"
 
+import { TxDirection, WalletCurrency } from "@app/graphql/generated"
 import {
+  PendingReceive,
   resolveCardInvestmentBulletin,
   useCardInvestmentBulletin,
 } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
@@ -17,6 +19,22 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
     progress: mockProgress.current,
     dismissWelcome: mockDismissWelcome,
   }),
+}))
+
+/** A round $100,000 per bitcoin: a satoshi is a tenth of a cent. */
+const SATS_PER_CENT = 10
+const centsFor = (moneyAmount: { amount: number; currency: WalletCurrency }): number =>
+  moneyAmount.currency === WalletCurrency.Btc
+    ? moneyAmount.amount / SATS_PER_CENT
+    : moneyAmount.amount
+const mockConvert = {
+  current: null as
+    | null
+    | ((amount: { amount: number; currency: WalletCurrency }) => { amount: number }),
+}
+jest.mock("@app/hooks", () => ({
+  ...jest.requireActual("@app/hooks"),
+  usePriceConversion: () => ({ convertMoneyAmount: mockConvert.current }),
 }))
 
 /** Its own spec covers how the balance is measured; here only the answer matters. */
@@ -52,7 +70,9 @@ const resolve = (
     hasEnoughBalance: false,
     isSplitAcrossWallets: false,
     isFundingLoading: false,
-    hasPendingDeposit: false,
+    balanceUsd: 0,
+    owedUsd: 25000,
+    pendingDepositUsd: 0,
     dismiss,
     ...overrides,
   })
@@ -77,7 +97,6 @@ describe("resolveCardInvestmentBulletin", () => {
     expect(resolve({ progress: WELCOMED, hasEnoughBalance: true })).toBeNull()
   })
 
-  /** A zero mid-load reads as a shortfall; the investor may well be covered. */
   /** The money has left the wallet; asking for it again would have the investor pay
    *  twice, so the card waits, whatever the balance now reads. */
   it("says the payment is on its way while it is, whatever the balance", () => {
@@ -92,9 +111,10 @@ describe("resolveCardInvestmentBulletin", () => {
     )
   })
 
+  /** A zero mid-load reads as a shortfall; the investor may well be covered. */
   it("says nothing while the balance is still unknown", () => {
     expect(resolve({ isFundingLoading: true })).toBeNull()
-    expect(resolve({ isFundingLoading: true, hasPendingDeposit: true })).toBeNull()
+    expect(resolve({ isFundingLoading: true, pendingDepositUsd: 25000 })).toBeNull()
     expect(resolve({ isFundingLoading: true, isSplitAcrossWallets: true })).toBeNull()
   })
 
@@ -106,7 +126,7 @@ describe("resolveCardInvestmentBulletin", () => {
 
   /** Money already in hand outranks money on its way: it is what can be acted on now. */
   it("prefers paying over waiting when a deposit is pending but the balance covers it", () => {
-    expect(resolve({ hasEnoughBalance: true, hasPendingDeposit: true })?.kind).toBe(
+    expect(resolve({ hasEnoughBalance: true, pendingDepositUsd: 25000 })?.kind).toBe(
       CardInvestmentBulletinKind.Ready,
     )
   })
@@ -119,14 +139,28 @@ describe("resolveCardInvestmentBulletin", () => {
   })
 
   it("prefers converting over waiting when funds are split and a deposit is pending", () => {
-    expect(resolve({ isSplitAcrossWallets: true, hasPendingDeposit: true })?.kind).toBe(
+    expect(resolve({ isSplitAcrossWallets: true, pendingDepositUsd: 25000 })?.kind).toBe(
       CardInvestmentBulletinKind.SplitFunds,
     )
   })
 
-  it("asks the investor to wait while a deposit is on its way", () => {
-    expect(resolve({ hasPendingDeposit: true })?.kind).toBe(
+  it("asks the investor to wait while a deposit that covers the gap is on its way", () => {
+    expect(resolve({ pendingDepositUsd: 25000 })?.kind).toBe(
       CardInvestmentBulletinKind.DepositPending,
+    )
+    expect(resolve({ balanceUsd: 20000, pendingDepositUsd: 5000 })?.kind).toBe(
+      CardInvestmentBulletinKind.DepositPending,
+    )
+  })
+
+  /** A deposit that would not close the gap leaves the investor with a card that says
+   *  to wait and nothing to wait for; the shortfall is what they need to hear about. */
+  it("asks for the money when the deposit on its way would still leave it short", () => {
+    expect(resolve({ balanceUsd: 20000, pendingDepositUsd: 4999 })?.kind).toBe(
+      CardInvestmentBulletinKind.Insufficient,
+    )
+    expect(resolve({ pendingDepositUsd: 100 })?.kind).toBe(
+      CardInvestmentBulletinKind.Insufficient,
     )
   })
 
@@ -147,17 +181,25 @@ describe("useCardInvestmentBulletin", () => {
     hasEnoughBalance: false,
     isSplitAcrossWallets: false,
     isLoading: false,
+    balanceUsd: 0,
+    owedUsd: 25000,
     ...overrides,
   })
+  const receive = (
+    settlementAmount: number,
+    settlementCurrency: WalletCurrency,
+    direction: TxDirection = TxDirection.Receive,
+  ): PendingReceive => ({ direction, settlementAmount, settlementCurrency })
 
   beforeEach(() => {
     jest.clearAllMocks()
     mockProgress.current = SIGNED
+    mockConvert.current = (moneyAmount) => ({ amount: centsFor(moneyAmount) })
     mockUseInvestmentFunding.mockReturnValue(funding())
   })
 
   it("measures the balance against what the investor signed for, satoshis included", () => {
-    renderHook(() => useCardInvestmentBulletin({ hasPendingDeposit: false }))
+    renderHook(() => useCardInvestmentBulletin({ pendingReceives: [] }))
 
     expect(mockUseInvestmentFunding).toHaveBeenCalledWith(
       SIGNED.selectedAmountUsd,
@@ -171,7 +213,9 @@ describe("useCardInvestmentBulletin", () => {
     mockProgress.current = null
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: true }),
+      useCardInvestmentBulletin({
+        pendingReceives: [receive(25_000_000, WalletCurrency.Btc)],
+      }),
     )
 
     expect(mockUseInvestmentFunding).toHaveBeenCalledWith(0, undefined)
@@ -182,7 +226,7 @@ describe("useCardInvestmentBulletin", () => {
     mockUseInvestmentFunding.mockReturnValue(funding({ hasEnoughBalance: true }))
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+      useCardInvestmentBulletin({ pendingReceives: [] }),
     )
 
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Ready)
@@ -192,25 +236,96 @@ describe("useCardInvestmentBulletin", () => {
     mockUseInvestmentFunding.mockReturnValue(funding({ isSplitAcrossWallets: true }))
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+      useCardInvestmentBulletin({ pendingReceives: [] }),
     )
 
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.SplitFunds)
   })
 
-  it("answers DepositPending when short with a deposit on its way", () => {
+  /** The receives come in either currency and are priced at today's rate: $20,000 held,
+   *  $5,000 on its way in bitcoin, and the $25,000 owed is covered. */
+  it("answers DepositPending when the receives on their way would close the gap", () => {
+    mockUseInvestmentFunding.mockReturnValue(funding({ balanceUsd: 20000 }))
+
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: true }),
+      useCardInvestmentBulletin({
+        pendingReceives: [receive(5_000_000, WalletCurrency.Btc)],
+      }),
     )
 
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.DepositPending)
+  })
+
+  /** Several small receives are summed after each is priced, so none is lost to
+   *  rounding on its own. */
+  it("adds up every receive on its way, in both currencies", () => {
+    mockUseInvestmentFunding.mockReturnValue(funding({ balanceUsd: 20000 }))
+
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({
+        pendingReceives: [
+          receive(2_000_000, WalletCurrency.Btc),
+          receive(300_000, WalletCurrency.Usd),
+        ],
+      }),
+    )
+
+    expect(result.current?.kind).toBe(CardInvestmentBulletinKind.DepositPending)
+  })
+
+  it("answers Insufficient when the receives on their way would leave it short", () => {
+    mockUseInvestmentFunding.mockReturnValue(funding({ balanceUsd: 20000 }))
+
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({
+        pendingReceives: [receive(4_000_000, WalletCurrency.Btc)],
+      }),
+    )
+
+    expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Insufficient)
+  })
+
+  /** A payment still confirming on its way out is not money coming in. */
+  it("does not count a pending send as a deposit", () => {
+    mockUseInvestmentFunding.mockReturnValue(funding({ balanceUsd: 20000 }))
+
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({
+        pendingReceives: [receive(5_000_000, WalletCurrency.Btc, TxDirection.Send)],
+      }),
+    )
+
+    expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Insufficient)
+  })
+
+  it("answers Insufficient when nothing is on its way", () => {
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({ pendingReceives: undefined }),
+    )
+
+    expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Insufficient)
+  })
+
+  /** Before the price answers the receives cannot be priced; the funding hook is
+   *  loading in the same moment, which already holds the card. */
+  it("counts nothing on its way before the price answers", () => {
+    mockConvert.current = null
+    mockUseInvestmentFunding.mockReturnValue(funding({ isLoading: true }))
+
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({
+        pendingReceives: [receive(25_000_000, WalletCurrency.Btc)],
+      }),
+    )
+
+    expect(result.current).toBeNull()
   })
 
   it("answers nothing while the balance is loading", () => {
     mockUseInvestmentFunding.mockReturnValue(funding({ isLoading: true }))
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+      useCardInvestmentBulletin({ pendingReceives: [] }),
     )
 
     expect(result.current).toBeNull()
@@ -220,7 +335,7 @@ describe("useCardInvestmentBulletin", () => {
     mockProgress.current = PAYING
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+      useCardInvestmentBulletin({ pendingReceives: [] }),
     )
 
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.PaymentPending)
@@ -230,7 +345,7 @@ describe("useCardInvestmentBulletin", () => {
     mockProgress.current = PAID
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+      useCardInvestmentBulletin({ pendingReceives: [] }),
     )
 
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Shareholder)
@@ -241,7 +356,7 @@ describe("useCardInvestmentBulletin", () => {
     mockProgress.current = PAID
 
     const { result } = renderHook(() =>
-      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+      useCardInvestmentBulletin({ pendingReceives: [] }),
     )
     result.current?.dismiss()
 

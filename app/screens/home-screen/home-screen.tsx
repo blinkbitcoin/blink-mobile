@@ -372,12 +372,12 @@ export const HomeScreen: React.FC = () => {
    *  pending row and that banner can never disagree about the same deposits. */
   const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
 
-  /** A deposit on its way into the custodial account: the investment bulletin says so
-   *  instead of asking for one the investor already made. Only custodial, since the
-   *  investment is paid from a custodial balance and the bulletin exists for none other. */
-  const hasPendingCustodialReceive = (pendingIncomingTransactions?.length ?? 0) > 0
+  /** Deposits on their way into the custodial account: the investment bulletin waits on
+   *  one that would cover the investment instead of asking for a deposit the investor
+   *  already made. Only custodial, since the investment is paid from a custodial balance
+   *  and the bulletin exists for none other. */
   const cardInvestmentBulletin = useCardInvestmentBulletin({
-    hasPendingDeposit: hasPendingCustodialReceive,
+    pendingReceives: pendingIncomingTransactions,
   })
   /** A payment the record only knows as on its way is asked about, once per visit. */
   useReconcileInvestmentPayment()
