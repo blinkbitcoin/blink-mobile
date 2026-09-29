@@ -2,8 +2,11 @@ import { renderHook } from "@testing-library/react-native"
 
 const mockUseDollarBalanceGate = jest.fn()
 const mockDispatch = jest.fn()
-const mockResetAction = { type: "RESET" }
-const mockReset = jest.fn((_arg: unknown) => mockResetAction)
+/** The one reset every guard shares, as the navigator would receive it. */
+const RESET_TO_HOME = expect.objectContaining({
+  type: "RESET",
+  payload: { index: 0, routes: [{ name: "Primary" }] },
+})
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
   useDollarBalanceGate: () => mockUseDollarBalanceGate(),
@@ -12,8 +15,8 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 const mockNavigation = { dispatch: mockDispatch }
 
 jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => mockNavigation,
-  CommonActions: { reset: (arg: unknown) => mockReset(arg) },
 }))
 
 import { useDollarBalanceRestrictionGuard } from "@app/hooks/use-dollar-balance-restriction-guard"
@@ -39,7 +42,6 @@ describe("useDollarBalanceRestrictionGuard", () => {
       isVerdictPending: false,
     })
     expect(mockDispatch).not.toHaveBeenCalled()
-    expect(mockReset).not.toHaveBeenCalled()
   })
 
   it("returns true and dispatches a reset to Primary when restricted", () => {
@@ -53,11 +55,7 @@ describe("useDollarBalanceRestrictionGuard", () => {
       isRestricted: true,
       isVerdictPending: false,
     })
-    expect(mockReset).toHaveBeenCalledWith({
-      index: 0,
-      routes: [{ name: "Primary" }],
-    })
-    expect(mockDispatch).toHaveBeenCalledWith(mockResetAction)
+    expect(mockDispatch).toHaveBeenCalledWith(RESET_TO_HOME)
   })
 
   /** Kept apart from the restriction so the caller can render a loader for the wait: a
