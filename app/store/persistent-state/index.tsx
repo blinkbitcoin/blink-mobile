@@ -7,6 +7,7 @@ import { reportError } from "@app/utils/error-logging"
 import { getAllKeys, loadString, saveJson, saveString } from "@app/utils/storage"
 import KeyStoreWrapper, { type GaloyAuthTokenKey } from "@app/utils/storage/secureStorage"
 
+import { withCardInvestmentsPrunedForLogout } from "./card-investment"
 import {
   defaultPersistentState,
   migratePersistentState,
@@ -377,15 +378,14 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
   /**
    * Everything starts over on logout except the card investments signed for: they are
    * filed by server account id, so nothing of them can reach another user, and a signed
-   * agreement outlives the session that signed it.
+   * agreement outlives the session that signed it. Pruned on the way through, so a paid
+   * one no longer carries its invoice.
    */
   const resetState = React.useCallback(() => {
     hasModified.current = true
     setPersistentState((prev) => ({
       ...defaultPersistentState,
-      ...(prev?.cardInvestmentByAccountId
-        ? { cardInvestmentByAccountId: prev.cardInvestmentByAccountId }
-        : {}),
+      ...(prev ? withCardInvestmentsPrunedForLogout(prev) : {}),
     }))
   }, [])
 

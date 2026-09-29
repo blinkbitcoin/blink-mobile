@@ -1,6 +1,7 @@
 import {
   getCardInvestment,
   withCardInvestment,
+  withCardInvestmentsPrunedForLogout,
   withoutCardInvestment,
 } from "@app/store/persistent-state/card-investment"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
@@ -18,6 +19,7 @@ const INVESTMENT = {
   signedAt: NOW - AN_HOUR_MS,
 }
 const OTHER_INVESTMENT = { selectedAmountUsd: 1000, signedAt: NOW - AN_HOUR_MS }
+const INVOICE = { paymentRequest: "lnbc1investment", issuedAt: NOW }
 
 describe("getCardInvestment", () => {
   it("is null when the account never signed for one", () => {
@@ -170,5 +172,84 @@ describe("withoutCardInvestment", () => {
     const state = { ...defaultPersistentState }
 
     expect(withoutCardInvestment(state, ACCOUNT_ID)).toBe(state)
+  })
+})
+
+describe("withCardInvestmentsPrunedForLogout", () => {
+  it("carries nothing when no account ever signed", () => {
+    expect(withCardInvestmentsPrunedForLogout(defaultPersistentState)).toEqual({})
+  })
+
+  /** A paid record's invoice is a payable claim on the account with nothing left to
+   *  pay; it is the one piece not worth leaving on a shared phone. */
+  it("drops the invoice from a paid record", () => {
+    const state = {
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: {
+        [ACCOUNT_ID]: { ...INVESTMENT, invoice: INVOICE, paidAt: NOW },
+      },
+    }
+
+    expect(withCardInvestmentsPrunedForLogout(state)).toEqual({
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: { ...INVESTMENT, paidAt: NOW } },
+    })
+  })
+
+  /** An unpaid invoice is what a payment that went through without a receipt is later
+   *  found by, so it stays; a payment on its way is found by it too. */
+  it("keeps the invoice of a record not yet paid", () => {
+    const unpaid = { ...INVESTMENT, invoice: INVOICE }
+    const paying = { ...OTHER_INVESTMENT, invoice: INVOICE, payingAt: NOW }
+    const state = {
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: unpaid, [OTHER_ACCOUNT_ID]: paying },
+    }
+
+    expect(withCardInvestmentsPrunedForLogout(state)).toEqual({
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: unpaid, [OTHER_ACCOUNT_ID]: paying },
+    })
+  })
+
+  it("keeps every account's record, paid or not", () => {
+    const paid = { ...INVESTMENT, paidAt: NOW, welcomeDismissedAt: NOW }
+    const state = {
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: {
+        [ACCOUNT_ID]: paid,
+        [OTHER_ACCOUNT_ID]: OTHER_INVESTMENT,
+      },
+    }
+
+    expect(withCardInvestmentsPrunedForLogout(state)).toEqual({
+      cardInvestmentByAccountId: {
+        [ACCOUNT_ID]: paid,
+        [OTHER_ACCOUNT_ID]: OTHER_INVESTMENT,
+      },
+    })
+  })
+
+  /** The entries come off disk, and a logout must never throw on one of them. */
+  it("carries an entry that is not a record through untouched", () => {
+    const state = {
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: null as unknown as typeof INVESTMENT },
+    }
+
+    expect(withCardInvestmentsPrunedForLogout(state)).toEqual({
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: null },
+    })
+  })
+
+  it("does not mutate the state it was given", () => {
+    const paid = { ...INVESTMENT, invoice: INVOICE, paidAt: NOW }
+    const state = {
+      ...defaultPersistentState,
+      cardInvestmentByAccountId: { [ACCOUNT_ID]: paid },
+    }
+
+    withCardInvestmentsPrunedForLogout(state)
+
+    expect(state.cardInvestmentByAccountId[ACCOUNT_ID]).toBe(paid)
+    expect(paid.invoice).toBe(INVOICE)
   })
 })
