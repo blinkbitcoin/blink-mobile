@@ -3,7 +3,7 @@ import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
 import { GraphQLError } from "graphql"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
-import { RefreshControl, StyleSheet } from "react-native"
+import { RefreshControl, StyleSheet, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
@@ -105,11 +105,30 @@ jest.mock(
     useReconcileInvestmentPayment: () => mockReconcileInvestmentPayment(),
   }),
 )
-const mockCardInvestmentBulletin = jest.fn<null, [Record<string, unknown>]>(() => null)
+const mockCardInvestmentBulletin = jest.fn<
+  React.ReactElement | null,
+  [Record<string, unknown>]
+>(() => null)
 jest.mock("@app/components/card-investment-bulletin", () => ({
   CardInvestmentBulletin: (props: Record<string, unknown>) =>
     mockCardInvestmentBulletin(props),
 }))
+/** The server bulletins, wrapped in a marker so their place in the column can be read.
+ *  The card inside is the real one, so what the server sends still reaches the screen. */
+jest.mock("@app/components/notifications/bulletins", () => {
+  const { View } = jest.requireActual("react-native")
+  const actual = jest.requireActual<
+    typeof import("@app/components/notifications/bulletins")
+  >("@app/components/notifications/bulletins")
+  return {
+    BulletinsCard: (props: React.ComponentProps<typeof actual.BulletinsCard>) => (
+      <View testID="server-bulletins">
+        <actual.BulletinsCard {...props} />
+      </View>
+    ),
+  }
+})
+
 let mockIsFocused = true
 
 // eslint-disable-next-line prefer-const
@@ -2167,6 +2186,32 @@ describe("CardInvestmentBulletin gating", () => {
     await flushEffects()
 
     expect(mockCardInvestmentBulletin).not.toHaveBeenCalled()
+  })
+
+  /** The investment bulletin goes above the server's bulletins: it is the one thing on
+   *  the home that asks the investor for money they agreed to pay. */
+  it("places the card above the server bulletins", async () => {
+    mockCardInvestmentBulletinState.current = {
+      kind: "ready",
+      progress: SIGNED,
+      dismiss: jest.fn(),
+    }
+    mockCardInvestmentBulletin.mockImplementation(() => (
+      <View testID="card-investment-bulletin" />
+    ))
+
+    const rendered = renderHome()
+    await flushEffects()
+
+    /** Every marked node in the order the column lays them out. */
+    const column = rendered.root
+      .findAll((node) => typeof node.props.testID === "string")
+      .map((node) => node.props.testID as string)
+    expect(column).toContain("card-investment-bulletin")
+    expect(column.indexOf("card-investment-bulletin")).toBeLessThan(
+      column.indexOf("server-bulletins"),
+    )
+    mockCardInvestmentBulletin.mockImplementation(() => null)
   })
 
   it("hands the hook no receives on a quiet account", async () => {
