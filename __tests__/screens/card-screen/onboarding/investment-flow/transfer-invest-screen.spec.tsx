@@ -154,8 +154,8 @@ describe("TransferInvestScreen", () => {
     jest.clearAllMocks()
   })
 
-  /** A record that lapsed while the step was open would let an invoice be minted and
-   *  paid with nothing left to record the payment on, so the step leaves for the home. */
+  /** An invoice minted with no agreement behind it would be paid with nothing to record
+   *  the payment on, so the step leaves for the home. */
   it("sends an account with no signed agreement home instead of issuing an invoice", async () => {
     mockCardInvestmentProgress.current = null
     mockFunding.current = {
@@ -182,20 +182,12 @@ describe("TransferInvestScreen", () => {
     expect(mockRequestInvoice).not.toHaveBeenCalled()
   })
 
-  /** The record is read at render; if its day runs out before the tap, minting on it
-   *  would pay an invoice the receipt can no longer record. */
-  it("leaves for the home on a tap after the record's day ran out", async () => {
-    mockCardInvestmentProgress.current = {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      signedAt: Date.now() - 25 * 60 * 60 * 1000,
-    }
-    mockFunding.current = {
-      balanceUsd: SELECTED_AMOUNT_USD,
-      shortfallUsd: 0,
-      hasEnoughBalance: true,
-      totalSats: 31_704_000,
-      isLoading: false,
-    }
+  /** The record is only readable once the account is known; a tap before that has no
+   *  agreement to act on, so it goes home, where the card returns once the record loads,
+   *  rather than into a shortfall step for an investment it cannot name. */
+  it("leaves for the home on a tap before the record can be read", async () => {
+    mockCardInvestmentProgress.current = null
+    mockAccountId.current = null
 
     const { getByText } = render(
       <ContextForScreen>
@@ -215,6 +207,7 @@ describe("TransferInvestScreen", () => {
         payload: { index: 0, routes: [{ name: "Primary" }] },
       }),
     )
+    expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockRequestInvoice).not.toHaveBeenCalled()
   })
 

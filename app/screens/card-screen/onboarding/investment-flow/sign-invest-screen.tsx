@@ -264,7 +264,12 @@ export const SignInvestScreen: React.FC = () => {
       }
 
       const investment = { selectedAmountUsd, settlementSats: minted?.settlementSats }
-      startCardInvestment(investment)
+      /** The envelope the library says was signed, or the one minted when it names none;
+       *  the two are the same whenever both are known, or the step stopped above. */
+      startCardInvestment({
+        ...investment,
+        envelopeId: result.envelopeId ?? minted?.envelopeId,
+      })
       navigation.dispatch(resetToTransferStep(investment))
     },
     [navigation, selectedAmountUsd, startCardInvestment],

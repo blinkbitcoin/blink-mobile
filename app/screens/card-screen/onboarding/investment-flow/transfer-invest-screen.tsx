@@ -17,7 +17,6 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
-import { isCardInvestmentCurrent } from "@app/store/persistent-state/card-investment"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { formatUnitCount, formatUsdAmount } from "./investment-figures"
@@ -78,10 +77,8 @@ export const TransferInvestScreen: React.FC = () => {
    * This step can be reached by link, with an amount in it, and it would issue an
    * invoice for that amount with no agreement behind it. An account that cannot take
    * part in the investment is sent home before it can, and so is one with no signed
-   * agreement on record: a record that lapsed with the step open would otherwise let an
-   * invoice be minted and paid with nothing left to record the payment on. The record is
-   * only read once the account is known, since until then there is none to read. This
-   * catches the lapse on the next render; the tap itself checks the clock again below.
+   * agreement on record. The record is only read once the account is known, since until
+   * then there is none to read.
    */
   const hasNothingToPayFor = isAccountResolved && !progress
   const isLeavingFlow = !isEligible || hasNothingToPayFor
@@ -111,9 +108,7 @@ export const TransferInvestScreen: React.FC = () => {
    * away a payment this step just said could be made.
    */
   const handleNext = async () => {
-    /** The record was read at render; a tap after its day is out would mint and pay on
-     *  a record the receipt can no longer find, so the clock is read again here. */
-    if (!progress || !isCardInvestmentCurrent(progress, Date.now())) {
+    if (!progress) {
       navigation.dispatch(RESET_TO_HOME)
       return
     }
