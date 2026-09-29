@@ -51,7 +51,7 @@ export const CardInvestmentBulletinKind = {
   /** Signed, and the money is there but spread over both wallets: the investor is sent
    *  to convert, since a payment draws on one. */
   SplitFunds: "splitFunds",
-  /** Signed, still short, and a deposit is on its way in. */
+  /** Signed, still short, and a deposit that would cover it is on its way in. */
   DepositPending: "depositPending",
   /** Signed and covered: the investor is sent back to pay. */
   Ready: "ready",
