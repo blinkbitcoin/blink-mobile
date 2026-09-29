@@ -1156,7 +1156,22 @@ describe("SignInvestScreen, where each outcome leads", () => {
     expect(mockStartCardInvestment).toHaveBeenCalledWith({
       selectedAmountUsd: SELECTED_AMOUNT_USD,
       settlementSats: SETTLEMENT_SATS,
+      envelopeId: TEST_ENVELOPE_ID,
     })
+  })
+
+  /** A mint that named no envelope leaves the library's word as the only one; the
+   *  record carries the envelope it says was signed. */
+  it("records the envelope the library names when the mint named none", async () => {
+    mockMintSigningInstance.mockResolvedValue({ url: TEST_INSTANCE_URL })
+    await renderScreen()
+    await startedSession()
+
+    await act(async () => {
+      callbackOf("onComplete")(signed(TEST_ENVELOPE_ID))
+    })
+
+    expect(mockStartCardInvestment.mock.calls[0][0].envelopeId).toBe(TEST_ENVELOPE_ID)
   })
 
   /** The library names no envelope for a session minted without an id; the figure
@@ -1170,6 +1185,8 @@ describe("SignInvestScreen, where each outcome leads", () => {
       callbackOf("onComplete")(signed(undefined))
     })
 
+    /** Nothing to name, so the record carries no envelope rather than a guessed one. */
+    expect(mockStartCardInvestment.mock.calls[0][0].envelopeId).toBeUndefined()
     expect(resetRoutes()).toEqual({
       index: 1,
       routes: [

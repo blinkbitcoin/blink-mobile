@@ -1,11 +1,11 @@
 /**
- * A card investment the account has signed for, from the moment the agreement is signed
- * until the investor closes the welcome that follows the payment.
+ * A card investment the account has signed for: from the moment the agreement is signed,
+ * through the payment, to the welcome that follows it.
  *
  * Kept on device because no backend records the investment yet: the home reads it to
- * steer the investor back to the payment, and to welcome them once it is made. Kept for
- * a day from its latest moment, the same life the agreement and its payment link are
- * given; after that it is read as nothing.
+ * steer the investor back to the payment, and to welcome them once it is made. It does
+ * not lapse. Once signed, the record is also the mark that this account has signed, and
+ * the flow refuses to be walked a second time while it stands.
  */
 export type CardInvestmentProgress = {
   /** The amount the investor chose, which every later step derives its figures from. */
@@ -14,8 +14,14 @@ export type CardInvestmentProgress = {
   signedAt: number
   /** The satoshis the signed agreement settles at, when the mint named them. */
   settlementSats?: number
+  /** The e-sign envelope the agreement was signed in, when the mint named it: what a
+   *  server-side record of the signature can be reconciled against. */
+  envelopeId?: string
   /** When the payment went through; absent while it is still owed. */
   paidAt?: number
+  /** When the investor closed the welcome. The record stays past that, as the mark that
+   *  this account signed; only the card goes. */
+  welcomeDismissedAt?: number
   /** The invoice last issued for the payment, kept so a return to the transfer step pays
    *  the same claim rather than a second one: a payment that went through without being
    *  recorded then meets an invoice the recipient has already settled, not a fresh one. */

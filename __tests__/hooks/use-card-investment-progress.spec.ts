@@ -39,7 +39,7 @@ const SELF_CUSTODIAL_ID = "self-custodial-1"
 const CUSTODIAL_ID = "custodial-account-1"
 const OTHER_CUSTODIAL_ID = "custodial-account-2"
 const NOW = 1_757_800_000_000
-const A_DAY_MS = 24 * 60 * 60 * 1000
+const A_YEAR_MS = 365 * 24 * 60 * 60 * 1000
 const INVESTMENT = {
   selectedAmountUsd: 25000,
   settlementSats: 31_704_000,
@@ -74,7 +74,11 @@ const custodialSession = (answer: string | null | { me: unknown } = CUSTODIAL_ID
 
 /** Runs the functional updater the hook handed to the store against a given state. */
 /** What the signing step hands over; the hook stamps the moment itself. */
-const SIGNING = { selectedAmountUsd: 25000, settlementSats: 31_704_000 }
+const SIGNING = {
+  selectedAmountUsd: 25000,
+  settlementSats: 31_704_000,
+  envelopeId: "envelope-1",
+}
 
 const applyLastUpdate = (state: PersistentState | undefined) => {
   const updater = mockUpdateState.mock.calls[mockUpdateState.mock.calls.length - 1][0]
@@ -107,7 +111,7 @@ describe("useCardInvestmentProgress", () => {
       act(() => {
         result.current.start(SIGNING)
         result.current.markPaid()
-        result.current.clear()
+        result.current.dismissWelcome()
       })
 
       expect(result.current.isEligible).toBe(false)
@@ -157,7 +161,7 @@ describe("useCardInvestmentProgress", () => {
         result.current.start(SIGNING)
         result.current.recordInvoice("lnbc25m1investment")
         result.current.markPaid()
-        result.current.clear()
+        result.current.dismissWelcome()
       })
 
       expect(result.current.progress).toBeNull()
@@ -208,14 +212,14 @@ describe("useCardInvestmentProgress", () => {
     expect(result.current.progress).toBeNull()
   })
 
-  /** A day on, the agreement and its payment link have lapsed; the home starts over. */
-  it("reads a record a day old as nothing", () => {
-    mockPersistentState = stateWith({
-      [CUSTODIAL_ID]: { ...INVESTMENT, signedAt: NOW - A_DAY_MS },
-    })
-    expect(
-      renderHook(() => useCardInvestmentProgress()).result.current.progress,
-    ).toBeNull()
+  /** The agreement is signed for good; the record is what keeps a second one from being
+   *  signed, so it must not fall away with time. */
+  it("reads a record however old it is", () => {
+    const old = { ...INVESTMENT, signedAt: NOW - A_YEAR_MS }
+    mockPersistentState = stateWith({ [CUSTODIAL_ID]: old })
+    expect(renderHook(() => useCardInvestmentProgress()).result.current.progress).toEqual(
+      old,
+    )
   })
 
   describe("start", () => {
@@ -227,6 +231,18 @@ describe("useCardInvestmentProgress", () => {
       expect(applyLastUpdate(baseState)?.cardInvestmentByAccountId).toEqual({
         [CUSTODIAL_ID]: { ...SIGNING, signedAt: NOW },
       })
+    })
+
+    /** The record is the mark that this account has signed: a second signing, whatever
+     *  it says, must not replace the first agreement or its payment. */
+    it("never writes over an agreement already signed", () => {
+      const signed = stateWith({ [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1 } })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.start({ ...SIGNING, selectedAmountUsd: 1000 }))
+
+      expect(applyLastUpdate(signed)).toBe(signed)
     })
 
     it("leaves an unloaded store alone", () => {
@@ -251,8 +267,7 @@ describe("useCardInvestmentProgress", () => {
       })
     })
 
-    /** The moment is one the record's day is counted from; a second receipt for the
-     *  same invoice must not move it. */
+    /** A second receipt for the same invoice must not move the mark. */
     it("keeps the first mark on an investment already paid", () => {
       const paid = stateWith({ [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1000 } })
       mockPersistentState = paid
@@ -372,21 +387,40 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
-  describe("clear", () => {
-    it("forgets the active account's investment", () => {
-      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
-      mockPersistentState = signed
+  describe("dismissWelcome", () => {
+    /** The record stays, as the mark that this account has signed; only the card goes. */
+    it("closes the welcome and keeps the investment", () => {
+      const paid = stateWith({ [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1000 } })
+      mockPersistentState = paid
       const { result } = renderHook(() => useCardInvestmentProgress())
 
-      act(() => result.current.clear())
+      act(() => result.current.dismissWelcome())
 
-      expect(applyLastUpdate(signed)?.cardInvestmentByAccountId).toEqual({})
+      expect(applyLastUpdate(paid)?.cardInvestmentByAccountId).toEqual({
+        [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1000, welcomeDismissedAt: NOW },
+      })
+    })
+
+    it("keeps the first closing", () => {
+      const welcomed = stateWith({
+        [CUSTODIAL_ID]: {
+          ...INVESTMENT,
+          paidAt: NOW - 2000,
+          welcomeDismissedAt: NOW - 1000,
+        },
+      })
+      mockPersistentState = welcomed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.dismissWelcome())
+
+      expect(applyLastUpdate(welcomed)).toBe(welcomed)
     })
 
     it("leaves an unloaded store alone", () => {
       const { result } = renderHook(() => useCardInvestmentProgress())
 
-      act(() => result.current.clear())
+      act(() => result.current.dismissWelcome())
 
       expect(applyLastUpdate(undefined)).toBeUndefined()
     })
@@ -401,7 +435,7 @@ describe("useCardInvestmentProgress", () => {
     expect(result.current.start).toBe(first.start)
     expect(result.current.recordInvoice).toBe(first.recordInvoice)
     expect(result.current.markPaid).toBe(first.markPaid)
-    expect(result.current.clear).toBe(first.clear)
+    expect(result.current.dismissWelcome).toBe(first.dismissWelcome)
   })
 })
 
