@@ -38,6 +38,8 @@ export const useInvestmentFunding = (
   totalUsd: number,
   settlementSats?: number,
 ): InvestmentFunding & {
+  /** The debt in today's dollars, for whoever measures something else against it. */
+  owedUsd: number
   /** The wallet the balance is read from, so the shortfall can be named after it. */
   balanceCurrency: WalletCurrency
   /** That wallet's id, for the send flow to pay from; none while no wallet is offered. */
@@ -57,37 +59,68 @@ export const useInvestmentFunding = (
     )
   }, [settlementSats, totalUsd, convertMoneyAmount])
 
-  /** The fullest wallet, which one it is, and the two together. With nothing held the
-   *  bitcoin wallet is named, as the one a deposit lands in. */
-  const { largestWalletUsd, largestWallet, combinedUsd } = React.useMemo(() => {
-    const empty: {
-      largestWalletUsd: number
-      largestWallet: { id: string; walletCurrency: WalletCurrency } | undefined
-      combinedUsd: number
-    } = { largestWalletUsd: 0, largestWallet: btcWallet, combinedUsd: 0 }
-    if (!convertMoneyAmount || !wallets) return empty
-
-    return wallets.reduce((funding, wallet) => {
-      const balance = toWalletAmount({
-        amount: wallet.balance,
-        currency: wallet.walletCurrency,
-      })
-      const balanceUsd = toMajorUnit(
-        convertMoneyAmount(balance, WalletCurrency.Usd).amount,
-      )
-      const isFullest = balanceUsd > funding.largestWalletUsd
-      return {
-        largestWalletUsd: isFullest ? balanceUsd : funding.largestWalletUsd,
-        largestWallet: isFullest ? wallet : funding.largestWallet,
-        combinedUsd: funding.combinedUsd + balanceUsd,
+  /**
+   * Each wallet in dollars, and whether it covers the debt on its own. A bitcoin wallet
+   * against a signed debt is compared in satoshis, which is exact and needs no price:
+   * the invoice is written in satoshis and paid within Blink, so no routing fee comes
+   * off the top. A dollar wallet is compared in dollars at today's rate, since that is
+   * what it buys. The wallet the payment would draw on is the fullest of those that
+   * cover it, or the fullest of all when none does, the first listed winning a tie; with
+   * nothing held the bitcoin wallet is named, as the one a deposit lands in.
+   */
+  const { balanceWallet, balanceUsd, isBalanceCovering, combinedUsd } =
+    React.useMemo(() => {
+      const empty = {
+        balanceWallet: btcWallet,
+        balanceUsd: 0,
+        isBalanceCovering: false,
+        combinedUsd: 0,
       }
-    }, empty)
-  }, [wallets, btcWallet, convertMoneyAmount])
+      if (!convertMoneyAmount || !wallets) return empty
+
+      const measured = wallets.map((wallet) => {
+        const balance = toWalletAmount({
+          amount: wallet.balance,
+          currency: wallet.walletCurrency,
+        })
+        const usd = toMajorUnit(convertMoneyAmount(balance, WalletCurrency.Usd).amount)
+        const isSignedBitcoinDebt =
+          wallet.walletCurrency === WalletCurrency.Btc && settlementSats !== undefined
+        const covers = isSignedBitcoinDebt
+          ? wallet.balance >= settlementSats
+          : usd >= owedUsd
+        return { wallet, usd, covers }
+      })
+      type Measured = (typeof measured)[number]
+      const fullestOf = (candidates: Measured[]): Measured | undefined =>
+        candidates.reduce<Measured | undefined>(
+          (best, candidate) => (best && best.usd >= candidate.usd ? best : candidate),
+          undefined,
+        )
+      const chosen =
+        fullestOf(measured.filter(({ covers }) => covers)) ?? fullestOf(measured)
+      if (!chosen || (chosen.usd === 0 && !chosen.covers)) {
+        return { ...empty, combinedUsd: measured.reduce((sum, { usd }) => sum + usd, 0) }
+      }
+
+      return {
+        balanceWallet: chosen.wallet,
+        balanceUsd: chosen.usd,
+        isBalanceCovering: chosen.covers,
+        combinedUsd: measured.reduce((sum, { usd }) => sum + usd, 0),
+      }
+    }, [wallets, btcWallet, convertMoneyAmount, settlementSats, owedUsd])
 
   return {
-    ...resolveInvestmentFunding({ largestWalletUsd, combinedUsd, totalUsd: owedUsd }),
-    balanceCurrency: largestWallet?.walletCurrency ?? WalletCurrency.Btc,
-    balanceWalletId: largestWallet?.id,
+    ...resolveInvestmentFunding({
+      balanceUsd,
+      isBalanceCovering,
+      combinedUsd,
+      totalUsd: owedUsd,
+    }),
+    owedUsd,
+    balanceCurrency: balanceWallet?.walletCurrency ?? WalletCurrency.Btc,
+    balanceWalletId: balanceWallet?.id,
     isLoading: !convertMoneyAmount || loading,
   }
 }

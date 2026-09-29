@@ -130,6 +130,31 @@ describe("useInvestmentFunding", () => {
     expect(result.current.isSplitAcrossWallets).toBe(true)
   })
 
+  /** Consolidating costs the spread; two wallets that only just add up would convert
+   *  into a shortfall of the spread, and a card that said "convert" would then say
+   *  "deposit". Only a combined balance that clears the debt by the spread is split. */
+  it("does not mark a balance that adds up to the amount and no more as split", () => {
+    offered(
+      walletOf(WalletCurrency.Btc, 2_500_000), // $2,500
+      walletOf(WalletCurrency.Usd, 250_000), // $2,500
+    )
+
+    const { result } = renderHook(() => useInvestmentFunding(5000))
+
+    expect(result.current.isSplitAcrossWallets).toBe(false)
+  })
+
+  it("marks a balance that clears the amount by the spread as split", () => {
+    offered(
+      walletOf(WalletCurrency.Btc, 2_550_000), // $2,550
+      walletOf(WalletCurrency.Usd, 250_000), // $2,500
+    )
+
+    const { result } = renderHook(() => useInvestmentFunding(5000))
+
+    expect(result.current.isSplitAcrossWallets).toBe(true)
+  })
+
   it("is not split when neither wallet nor both together are enough", () => {
     offered(walletOf(WalletCurrency.Usd, 100_000))
 
@@ -233,6 +258,82 @@ describe("useInvestmentFunding", () => {
 
     expect(result.current.hasEnoughBalance).toBe(true)
     expect(result.current.shortfallUsd).toBe(0)
+    expect(result.current.owedUsd).toBe(25000)
+  })
+
+  /** The debt in today's dollars is what the home measures a deposit on its way against,
+   *  so it is answered alongside: the signed satoshis at today's rate. */
+  it("names the debt in today's dollars", () => {
+    const { result } = renderHook(() => useInvestmentFunding(25000, 20_000_000))
+
+    expect(result.current.owedUsd).toBe(20000)
+  })
+
+  /**
+   * The invoice is written in satoshis and paid within Blink, with no routing fee off
+   * the top, so a bitcoin wallet is measured in satoshis and needs no price. One
+   * satoshi short is short, however the dollars round.
+   */
+  it("compares a bitcoin wallet against the signed satoshis to the satoshi", () => {
+    const signedSats = 20_000_000
+    offered(walletOf(WalletCurrency.Btc, signedSats - 1))
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, signedSats))
+
+    expect(result.current.hasEnoughBalance).toBe(false)
+  })
+
+  /** The debt in dollars comes out to $20,000.00; a dollar wallet holding exactly that
+   *  covers it, since dollars are what it buys the satoshis with. */
+  it("compares a dollar wallet against the signed satoshis at today's rate", () => {
+    offered(walletOf(WalletCurrency.Usd, 2_000_000))
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, 20_000_000))
+
+    expect(result.current.hasEnoughBalance).toBe(true)
+  })
+
+  /**
+   * The wallet the payment draws on is the one that covers it, not the fullest: measured
+   * in satoshis, a bitcoin wallet one satoshi short is short however the dollars round,
+   * and the dollar wallet that covers is the one that pays.
+   */
+  /** When both wallets cover the debt, the fuller one pays, as it always has: covering
+   *  only decides between a wallet that can pay and one that cannot. */
+  it("names the fuller wallet when both cover the debt", () => {
+    offered(
+      walletOf(WalletCurrency.Btc, 30_000_000), // $30,000
+      walletOf(WalletCurrency.Usd, 5_000_000), // $50,000
+    )
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, 20_000_000))
+
+    expect(result.current.hasEnoughBalance).toBe(true)
+    expect(result.current.balanceWalletId).toBe("wallet-USD")
+  })
+
+  it("names the first listed of two covering wallets holding the same", () => {
+    offered(
+      walletOf(WalletCurrency.Btc, 30_000_000), // $30,000
+      walletOf(WalletCurrency.Usd, 3_000_000), // $30,000
+    )
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, 20_000_000))
+
+    expect(result.current.balanceWalletId).toBe("wallet-BTC")
+  })
+
+  it("names the wallet that covers the debt over one that falls a satoshi short", () => {
+    /** $20,000 covers a $20,000 debt; 19,999,999 sats, worth $19,999.999, do not. */
+    offered(
+      walletOf(WalletCurrency.Btc, 19_999_999),
+      walletOf(WalletCurrency.Usd, 2_000_000),
+    )
+
+    const { result } = renderHook(() => useInvestmentFunding(25000, 20_000_000))
+
+    expect(result.current.hasEnoughBalance).toBe(true)
+    expect(result.current.balanceWalletId).toBe("wallet-USD")
   })
 
   /**
