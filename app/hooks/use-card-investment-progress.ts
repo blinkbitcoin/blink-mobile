@@ -50,7 +50,9 @@ const useCardInvestmentAccount = (): {
   })
 
   /** For the step that has waited on the id too long: a fetch that failed, offline, is
-   *  not retried on its own, so the tap that says "try again" asks for it again. */
+   *  not retried on its own, so the tap that says "try again" asks for it again. The
+   *  query is never skipped where that wait happens (an eligible account in a session),
+   *  so the refetch runs and its answer lands in the same data the wait reads. */
   const refetchAccount = useCallback(() => {
     refetch().catch(() => undefined)
   }, [refetch])
