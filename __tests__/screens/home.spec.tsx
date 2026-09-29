@@ -77,22 +77,24 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
 }))
 
 /** The investment bulletin's own hook and card are covered by their specs; the home is
- *  only expected to render what the hook answers, and to tell it about pending deposits. */
+ *  only expected to render what the hook answers, to hand it the receives still
+ *  confirming, and to reconcile a payment on its way once per visit. */
 type MockCardInvestmentBulletin = {
   kind: string
   progress: { selectedAmountUsd: number; settlementSats?: number; signedAt: number }
   dismiss: () => void
 }
+type CardInvestmentBulletinParams = { pendingReceives: unknown }
 const mockCardInvestmentBulletinState: { current: MockCardInvestmentBulletin | null } = {
   current: null,
 }
 const mockUseCardInvestmentBulletin = jest.fn(
-  (_params: { hasPendingDeposit: boolean }) => mockCardInvestmentBulletinState.current,
+  (_params: CardInvestmentBulletinParams) => mockCardInvestmentBulletinState.current,
 )
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin",
   () => ({
-    useCardInvestmentBulletin: (params: { hasPendingDeposit: boolean }) =>
+    useCardInvestmentBulletin: (params: CardInvestmentBulletinParams) =>
       mockUseCardInvestmentBulletin(params),
   }),
 )
@@ -108,7 +110,6 @@ jest.mock("@app/components/card-investment-bulletin", () => ({
   CardInvestmentBulletin: (props: Record<string, unknown>) =>
     mockCardInvestmentBulletin(props),
 }))
-
 let mockIsFocused = true
 
 // eslint-disable-next-line prefer-const
@@ -2168,23 +2169,18 @@ describe("CardInvestmentBulletin gating", () => {
     expect(mockCardInvestmentBulletin).not.toHaveBeenCalled()
   })
 
-  it("asks the ledger about a payment on its way once per visit", async () => {
-    renderHome()
-    await flushEffects()
-
-    expect(mockReconcileInvestmentPayment).toHaveBeenCalled()
-  })
-
-  it("tells the hook no deposit is pending on a quiet account", async () => {
+  it("hands the hook no receives on a quiet account", async () => {
     renderHome()
     await flushEffects()
 
     expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
-      hasPendingDeposit: false,
+      pendingReceives: [],
     })
   })
 
-  it("tells the hook a deposit is pending when a custodial receive is confirming", async () => {
+  /** The receives go over as the query lists them, amounts and currency included, so
+   *  the hook can price them against the shortfall. */
+  it("hands the hook the custodial receives still confirming", async () => {
     currentMocks = generateHomeMock({
       level: AccountLevel.One,
       network: Network.Mainnet,
@@ -2197,13 +2193,26 @@ describe("CardInvestmentBulletin gating", () => {
     await flushEffects()
 
     expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
-      hasPendingDeposit: true,
+      pendingReceives: [
+        expect.objectContaining({
+          direction: "RECEIVE",
+          settlementAmount: 50_000,
+          settlementCurrency: "BTC",
+        }),
+      ],
     })
+  })
+
+  it("asks the ledger about a payment on its way once per visit", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockReconcileInvestmentPayment).toHaveBeenCalled()
   })
 
   /** The bulletin is for custodial accounts alone, so a self-custodial deposit is not a
    *  pending deposit it could act on. */
-  it("does not tell the hook about a self-custodial deposit", async () => {
+  it("hands the hook nothing for a self-custodial deposit", async () => {
     mockActiveWalletOverride = {
       wallets: [],
       status: "ready",
@@ -2220,7 +2229,7 @@ describe("CardInvestmentBulletin gating", () => {
     await flushEffects()
 
     expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
-      hasPendingDeposit: false,
+      pendingReceives: undefined,
     })
   })
 })
