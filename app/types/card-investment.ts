@@ -23,8 +23,8 @@ export type CardInvestmentProgress = {
    *  this account signed; only the card goes. */
   welcomeDismissedAt?: number
   /** The invoice last issued for the payment, kept so a return to the transfer step pays
-   *  the same claim rather than a second one: a payment that went through without being
-   *  recorded then meets an invoice the recipient has already settled, not a fresh one. */
+   *  the same claim rather than a second one, and so a payment that went through without
+   *  being recorded can be found in the ledger before another invoice is minted. */
   invoice?: CardInvestmentInvoice
 }
 
@@ -58,6 +58,26 @@ export const CardInvestmentBulletinKind = {
 
 export type CardInvestmentBulletinKind =
   (typeof CardInvestmentBulletinKind)[keyof typeof CardInvestmentBulletinKind]
+
+/**
+ * What the ledger says about the investment's invoice on record.
+ *
+ * Not being able to ask is kept apart from asking and finding nothing, because they call
+ * for opposite answers: an invoice the ledger has no send for was never paid and may be
+ * replaced, while one it could not be asked about may well have been paid, and replacing
+ * it, or forgetting a payment on its way, could have the investor pay twice.
+ */
+export const CardInvestmentPaymentLookup = {
+  Settled: "settled",
+  Pending: "pending",
+  /** Every wallet was asked and none holds a send for the invoice. */
+  NotFound: "notFound",
+  /** The ledger could not be asked: no network, no wallets, or a request that failed. */
+  Unknown: "unknown",
+} as const
+
+export type CardInvestmentPaymentLookup =
+  (typeof CardInvestmentPaymentLookup)[keyof typeof CardInvestmentPaymentLookup]
 
 /** What the home renders: which card, the investment it is about, and how to close it. */
 export type CardInvestmentBulletinState = {

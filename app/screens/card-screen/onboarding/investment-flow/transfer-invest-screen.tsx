@@ -18,8 +18,10 @@ import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progre
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { CardInvestmentPaymentLookup } from "@app/types/card-investment"
 
 import { formatUnitCount, formatUsdAmount } from "./investment-figures"
+import { useLookUpInvestmentPayment } from "./investment-payment-lookup"
 import { resolveInvestmentTerms } from "./investment-terms"
 import { useInvestmentFunding, useInvestmentSats } from "./use-investment-funding"
 import { isInvoiceReusable, useInvestmentInvoice } from "./use-investment-invoice"
@@ -44,6 +46,15 @@ export const resetToTransferStep = (
     routes: [{ name: "Primary" }, { name: "cardOnboardingTransferInvestScreen", params }],
   })
 
+/** Why the step could not open the send flow: no invoice could be issued, or the ledger
+ *  could not be asked whether the one on record was already paid. */
+const TransferFailure = {
+  Invoice: "invoice",
+  Ledger: "ledger",
+} as const
+
+type TransferFailure = (typeof TransferFailure)[keyof typeof TransferFailure]
+
 export const TransferInvestScreen: React.FC = () => {
   const styles = useStyles()
   const {
@@ -55,7 +66,7 @@ export const TransferInvestScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
-  const { progress, recordInvoice, isEligible, accountId, isAccountResolved } =
+  const { progress, recordInvoice, markPaid, isEligible, accountId, isAccountResolved } =
     useCardInvestmentProgress()
 
   /**
@@ -78,7 +89,9 @@ export const TransferInvestScreen: React.FC = () => {
   )
   const totalSats = useInvestmentSats(terms.totalUsd)
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
-  const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
+  const lookUpPayment = useLookUpInvestmentPayment()
+  const [isLookingUpPayment, setIsLookingUpPayment] = React.useState(false)
+  const [failure, setFailure] = React.useState<TransferFailure | null>(null)
 
   /**
    * This step can be reached by link, with an amount in it, and it would issue an
@@ -127,20 +140,24 @@ export const TransferInvestScreen: React.FC = () => {
       return
     }
 
-    setHasInvoiceFailed(false)
-    const paymentRequest = await resolvePaymentRequest()
+    setFailure(null)
+    const payment = await resolvePayment()
 
     /** The investor may have closed the step while the invoice was being issued; a send
      *  flow opened over whatever they moved on to would be neither expected nor safe. */
     if (!navigation.isFocused()) return
 
-    if (!paymentRequest) {
-      setHasInvoiceFailed(true)
+    if (payment.kind === "settled") {
+      navigation.dispatch(RESET_TO_HOME)
+      return
+    }
+    if (payment.kind === "failed") {
+      setFailure(payment.failure)
       return
     }
 
     navigation.navigate("sendBitcoinDestination", {
-      payment: paymentRequest,
+      payment: payment.paymentRequest,
       sendingWalletId: balanceWalletId,
     })
   }
@@ -151,20 +168,50 @@ export const TransferInvestScreen: React.FC = () => {
    * recording it (the app killed with the payment in flight) leaves the home asking for
    * the money again; paying the same invoice then meets a claim the recipient has already
    * settled, where a fresh one would be paid a second time.
+   *
+   * An invoice too old to pay again is asked about first: it may have been paid, and the
+   * ledger is the only place that knows. Settled, the payment is recorded and the home
+   * takes over with its welcome; still pending, it is recorded the same way, as the
+   * receipt records a pending payment. A fresh
+   * invoice is minted only when every wallet answered and none holds the send, since the
+   * ledger's own uniqueness cannot refuse a second one for this investment; a ledger that
+   * could not be asked mints nothing, and the investor is asked to try again.
    */
-  async function resolvePaymentRequest(): Promise<string | null> {
+  async function resolvePayment(): Promise<
+    | { kind: "pay"; paymentRequest: string }
+    | { kind: "settled" }
+    | { kind: "failed"; failure: TransferFailure }
+  > {
     const issued = progress?.invoice
     if (issued && isInvoiceReusable(issued.issuedAt, Date.now())) {
-      return issued.paymentRequest
+      return { kind: "pay", paymentRequest: issued.paymentRequest }
+    }
+
+    if (issued) {
+      setIsLookingUpPayment(true)
+      const lookup = await lookUpPayment(issued.paymentRequest).finally(() =>
+        setIsLookingUpPayment(false),
+      )
+      if (lookup === CardInvestmentPaymentLookup.Settled) {
+        markPaid()
+        return { kind: "settled" }
+      }
+      if (lookup === CardInvestmentPaymentLookup.Pending) {
+        markPaid()
+        return { kind: "settled" }
+      }
+      if (lookup === CardInvestmentPaymentLookup.Unknown) {
+        return { kind: "failed", failure: TransferFailure.Ledger }
+      }
     }
 
     const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats, {
       accountId,
       amountUsd: selectedAmountUsd,
     })
-    if (!minted) return null
+    if (!minted) return { kind: "failed", failure: TransferFailure.Invoice }
     recordInvoice(minted.paymentRequest)
-    return minted.paymentRequest
+    return { kind: "pay", paymentRequest: minted.paymentRequest }
   }
 
   /**
@@ -179,6 +226,16 @@ export const TransferInvestScreen: React.FC = () => {
   const isMissingDepositWallet = hasEnoughBalance && !cardInvestmentDepositBtcWalletId
   const isMissingPayerAccount = hasEnoughBalance && !isAccountResolved
   const isContinueDisabled = isLoading || isMissingDepositWallet || isMissingPayerAccount
+
+  /** The invoice failure is borrowed from the receive screen, which words this exact
+   *  failure and is already translated everywhere; the ledger one is the flow's own
+   *  lost-connection line. */
+  const failureMessageFor: Record<TransferFailure, () => string> = {
+    [TransferFailure.Invoice]: () => LL.ReceiveScreen.error(),
+    [TransferFailure.Ledger]: () =>
+      LL.CardFlow.Onboarding.SignInvest.errors.networkError(),
+  }
+  const failureMessage = failure ? failureMessageFor[failure]() : null
 
   return (
     <Screen headerShown={false}>
@@ -203,12 +260,9 @@ export const TransferInvestScreen: React.FC = () => {
             })}
           </Text>
 
-          {/* Borrowed from the receive screen, which words this exact failure and is
-              already translated everywhere. The flow gets its own key if the wording
-              ever has to differ. */}
-          {hasInvoiceFailed ? (
+          {failureMessage ? (
             <Text type="p2" style={styles.errorText}>
-              {LL.ReceiveScreen.error()}
+              {failureMessage}
             </Text>
           ) : null}
 
@@ -223,7 +277,7 @@ export const TransferInvestScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.TransferInvest.buttonText()}
           disabled={isContinueDisabled}
-          loading={isRequesting}
+          loading={isRequesting || isLookingUpPayment}
           onPress={handleNext}
         />
       </View>

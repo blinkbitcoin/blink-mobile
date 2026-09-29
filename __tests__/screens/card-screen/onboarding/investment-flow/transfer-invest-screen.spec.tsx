@@ -3,6 +3,7 @@ import { render, fireEvent, act } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { TransferInvestScreen } from "@app/screens/card-screen/onboarding/investment-flow/transfer-invest-screen"
+import { CardInvestmentPaymentLookup } from "@app/types/card-investment"
 import { ContextForScreen } from "../../../helper"
 
 jest.mock("@react-native-community/blur", () => ({
@@ -40,6 +41,7 @@ const mockCardInvestmentProgress: {
   } | null
 } = { current: null }
 const mockRecordInvoice = jest.fn()
+const mockMarkPaid = jest.fn()
 /** Whether the active account can take part: false for a self-custodial one. */
 const mockIsEligible = { current: true }
 /** The account the invoice is filed under; null while the home has not resolved it. */
@@ -50,6 +52,7 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
   useCardInvestmentProgress: () => ({
     progress: mockCardInvestmentProgress.current,
     recordInvoice: (...args: unknown[]) => mockRecordInvoice(...args),
+    markPaid: () => mockMarkPaid(),
     isEligible: mockIsEligible.current,
     accountId: mockAccountId.current,
     isAccountResolved: mockAccountId.current !== null,
@@ -60,6 +63,16 @@ const mockDispatch = jest.fn()
 
 /** Whether the step is still in front when the invoice comes back. */
 const mockIsFocused = { current: true }
+
+/** What the ledger says about the invoice on record: settled, pending, or nothing. */
+const mockLookUpPayment = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup",
+  () => ({
+    useLookUpInvestmentPayment: () => (paymentRequest: string) =>
+      mockLookUpPayment(paymentRequest),
+  }),
+)
 
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-invoice",
@@ -144,6 +157,7 @@ const resetScreenMocks = () => {
   mockIsEligible.current = true
   mockAccountId.current = ACCOUNT_ID
   mockRequestInvoice.mockResolvedValue({ paymentRequest: "lnbc-invoice" })
+  mockLookUpPayment.mockResolvedValue(CardInvestmentPaymentLookup.NotFound)
   mockFunding.current = {
     balanceUsd: 0,
     shortfallUsd: SELECTED_AMOUNT_USD,
@@ -887,7 +901,7 @@ describe("TransferInvestScreen, the invoice it pays", () => {
       })
     })
 
-    it("mints afresh once the issued invoice is too old to pay in time", async () => {
+    const expiredInvoice = () => {
       mockCardInvestmentProgress.current = {
         selectedAmountUsd: SELECTED_AMOUNT_USD,
         signedAt: Date.now(),
@@ -896,14 +910,185 @@ describe("TransferInvestScreen, the invoice it pays", () => {
           issuedAt: NOW_MS - 26 * 60 * 1000,
         },
       }
+    }
+
+    /** An invoice the ledger has no trace of was never paid; the ledger cannot refuse
+     *  a second invoice for the same investment, so the step asks before it mints. */
+    it("mints afresh once the issued invoice is too old to pay in time and was never paid", async () => {
+      expiredInvoice()
 
       await pressContinue()
 
+      expect(mockLookUpPayment).toHaveBeenCalledWith("lnbc-issued-before")
       expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 31_704_000, {
         accountId: ACCOUNT_ID,
         amountUsd: SELECTED_AMOUNT_USD,
       })
       expect(mockRecordInvoice).toHaveBeenCalledWith("lnbc-invoice")
+    })
+
+    /**
+     * The app was killed with the payment in flight, the receipt never recorded it, and
+     * the investor came back after the invoice expired: the ledger says it settled. A
+     * fresh invoice here would be paid a second time, so the payment is recorded and the
+     * home takes over with its welcome.
+     */
+    it("records the payment and leaves for the home when the ledger says the old invoice settled", async () => {
+      expiredInvoice()
+      mockLookUpPayment.mockResolvedValue(CardInvestmentPaymentLookup.Settled)
+
+      await pressContinue()
+
+      expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+      expect(mockRequestInvoice).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+          payload: { index: 0, routes: [{ name: "Primary" }] },
+        }),
+      )
+    })
+
+    /** A pending payment has left the wallet; like the receipt, the step records it as
+     *  paid rather than mint a second invoice for money already on its way. */
+    it("records the payment when the ledger still holds it as pending", async () => {
+      expiredInvoice()
+      mockLookUpPayment.mockResolvedValue(CardInvestmentPaymentLookup.Pending)
+
+      await pressContinue()
+
+      expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+      expect(mockRequestInvoice).not.toHaveBeenCalled()
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "RESET" }),
+      )
+    })
+
+    /** Not being able to ask the ledger is not an unpaid invoice: the old one may have
+     *  been paid, so nothing is minted and the investor is told to try again. */
+    it("mints nothing and says so when the ledger could not be asked", async () => {
+      expiredInvoice()
+      mockLookUpPayment.mockResolvedValue(CardInvestmentPaymentLookup.Unknown)
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(mockRequestInvoice).not.toHaveBeenCalled()
+      expect(mockRecordInvoice).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(mockDispatch).not.toHaveBeenCalled()
+      expect(
+        getByText("Connection lost. Please check your network and try again."),
+      ).toBeTruthy()
+      expect(queryByText(/Failed to generate invoice/)).toBeNull()
+    })
+
+    it("mints once the ledger answers on a second try, and clears the line", async () => {
+      expiredInvoice()
+      mockLookUpPayment
+        .mockResolvedValueOnce(CardInvestmentPaymentLookup.Unknown)
+        .mockResolvedValueOnce(CardInvestmentPaymentLookup.NotFound)
+
+      const { getByText, queryByText } = render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(mockRequestInvoice).toHaveBeenCalledTimes(1)
+      expect(
+        queryByText("Connection lost. Please check your network and try again."),
+      ).toBeNull()
+      expect(mockNavigate).toHaveBeenCalledWith("sendBitcoinDestination", {
+        payment: "lnbc-invoice",
+      })
+    })
+
+    /** An invoice still payable is paid as it is; the ledger is not asked about it. */
+    it("does not ask the ledger about an invoice that can still be paid", async () => {
+      mockCardInvestmentProgress.current = {
+        selectedAmountUsd: SELECTED_AMOUNT_USD,
+        signedAt: Date.now(),
+        invoice: {
+          paymentRequest: "lnbc-issued-before",
+          issuedAt: NOW_MS - 20 * 60 * 1000,
+        },
+      }
+
+      await pressContinue()
+
+      expect(mockLookUpPayment).not.toHaveBeenCalled()
+    })
+
+    it("does not ask the ledger when no invoice was ever issued", async () => {
+      await pressContinue()
+
+      expect(mockLookUpPayment).not.toHaveBeenCalled()
+    })
+
+    /** The investor left the step while the ledger was being asked; the home must not
+     *  be reset over whatever they moved on to. */
+    it("does nothing with the ledger's answer once the step was left", async () => {
+      expiredInvoice()
+      let answer: (value: CardInvestmentPaymentLookup) => void = () => {}
+      mockLookUpPayment.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+
+      await pressContinue()
+      mockIsFocused.current = false
+      await act(async () => {
+        answer(CardInvestmentPaymentLookup.Settled)
+      })
+
+      expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+      expect(mockDispatch).not.toHaveBeenCalled()
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    /** The button shows it is busy while the ledger is asked, as it does while minting. */
+    it("holds the button while the ledger is asked", async () => {
+      expiredInvoice()
+      let answer: (value: CardInvestmentPaymentLookup) => void = () => {}
+      mockLookUpPayment.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+
+      const { getByText, getByRole } = render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+
+      expect(getByRole("button", { busy: true })).toBeTruthy()
+
+      await act(async () => {
+        answer(CardInvestmentPaymentLookup.NotFound)
+      })
+      expect(mockRequestInvoice).toHaveBeenCalledTimes(1)
     })
 
     it("records nothing when no invoice came back", async () => {
