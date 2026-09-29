@@ -1,4 +1,5 @@
 import {
+  CONVERSION_SPREAD_ALLOWANCE,
   INVESTMENT_OPTIONS,
   resolveEquityPercent,
   resolveInvestmentFunding,
@@ -92,16 +93,34 @@ describe("resolveEquityPercent", () => {
 })
 
 describe("resolveInvestmentFunding at the split boundary", () => {
-  /** The investor who converts exactly what they are short holds, between the two
-   *  wallets, exactly the amount: that is split, not short. */
-  it("counts the two wallets adding up to exactly the amount as split", () => {
+  /** Consolidating costs the spread, so two wallets adding up to exactly the amount
+   *  would convert into a shortfall of the spread: that is short, not split. */
+  it("does not count the two wallets adding up to exactly the amount as split", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 3000,
+        balanceUsd: 3000,
+        isBalanceCovering: false,
         combinedUsd: 5000,
         totalUsd: 5000,
       }).isSplitAcrossWallets,
-    ).toBe(true)
+    ).toBe(false)
+  })
+
+  it("counts the two wallets as split once they clear the amount by the spread", () => {
+    const funding = (combinedUsd: number) =>
+      resolveInvestmentFunding({
+        balanceUsd: 3000,
+        isBalanceCovering: false,
+        combinedUsd,
+        totalUsd: 5000,
+      }).isSplitAcrossWallets
+
+    expect(funding(5000 * (1 + CONVERSION_SPREAD_ALLOWANCE))).toBe(true)
+    expect(funding(5000 * (1 + CONVERSION_SPREAD_ALLOWANCE) - 1)).toBe(false)
+  })
+
+  it("allows one percent for the spread", () => {
+    expect(CONVERSION_SPREAD_ALLOWANCE).toBe(0.01)
   })
 })
 
@@ -141,7 +160,8 @@ describe("resolveInvestmentFunding", () => {
   it("names what is missing when the investor is short", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 3333,
+        balanceUsd: 3333,
+        isBalanceCovering: false,
         combinedUsd: 3333,
         totalUsd: 25000,
       }),
@@ -153,14 +173,25 @@ describe("resolveInvestmentFunding", () => {
     })
   })
 
-  it("counts an exact balance as covered", () => {
+  /** Whether the wallet covers the debt is the caller's to say, since only it knows
+   *  the debt in the wallet's own currency; it is carried, not re-derived. */
+  it("reports the balance covering as the caller decided", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 25000,
+        balanceUsd: 25000,
+        isBalanceCovering: true,
         combinedUsd: 25000,
         totalUsd: 25000,
       }).hasEnoughBalance,
     ).toBe(true)
+    expect(
+      resolveInvestmentFunding({
+        balanceUsd: 25000,
+        isBalanceCovering: false,
+        combinedUsd: 25000,
+        totalUsd: 25000,
+      }).hasEnoughBalance,
+    ).toBe(false)
   })
 
   /** Reported as nothing missing rather than as a negative sum, which the copy would
@@ -168,7 +199,8 @@ describe("resolveInvestmentFunding", () => {
   it("reports no shortfall when the balance is more than enough", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 30000,
+        balanceUsd: 30000,
+        isBalanceCovering: true,
         combinedUsd: 30000,
         totalUsd: 25000,
       }),
@@ -182,8 +214,12 @@ describe("resolveInvestmentFunding", () => {
 
   it("counts an empty balance as the whole amount missing", () => {
     expect(
-      resolveInvestmentFunding({ largestWalletUsd: 0, combinedUsd: 0, totalUsd: 25000 })
-        .shortfallUsd,
+      resolveInvestmentFunding({
+        balanceUsd: 0,
+        isBalanceCovering: false,
+        combinedUsd: 0,
+        totalUsd: 25000,
+      }).shortfallUsd,
     ).toBe(25000)
   })
 
@@ -193,7 +229,8 @@ describe("resolveInvestmentFunding", () => {
    */
   it("does not count two wallets added together as covered", () => {
     const funding = resolveInvestmentFunding({
-      largestWalletUsd: 370,
+      balanceUsd: 370,
+      isBalanceCovering: false,
       combinedUsd: 524,
       totalUsd: 500,
     })
@@ -207,7 +244,8 @@ describe("resolveInvestmentFunding", () => {
   it("marks a balance that only needs consolidating", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 370,
+        balanceUsd: 370,
+        isBalanceCovering: false,
         combinedUsd: 524,
         totalUsd: 500,
       }).isSplitAcrossWallets,
@@ -217,7 +255,8 @@ describe("resolveInvestmentFunding", () => {
   it("is not split when neither wallet nor both together are enough", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 100,
+        balanceUsd: 100,
+        isBalanceCovering: false,
         combinedUsd: 200,
         totalUsd: 500,
       }).isSplitAcrossWallets,
@@ -227,7 +266,8 @@ describe("resolveInvestmentFunding", () => {
   it("is not split when one wallet already covers it", () => {
     expect(
       resolveInvestmentFunding({
-        largestWalletUsd: 500,
+        balanceUsd: 500,
+        isBalanceCovering: true,
         combinedUsd: 900,
         totalUsd: 500,
       }).isSplitAcrossWallets,
