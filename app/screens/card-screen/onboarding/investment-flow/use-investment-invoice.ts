@@ -69,7 +69,10 @@ type InvoiceSubscriber = {
  * Stamped with the moment, because the ledger keeps the id unique per receiving
  * account and never drops an unpaid invoice: the same investor minting again for the
  * same amount, after letting the first invoice age past reuse, would otherwise be
- * refused for good. Account and amount stay in front, as the part worth searching by.
+ * refused for good. That leaves the ledger no way to refuse a second payment for the
+ * same investment, so the guard against one lives on the client: the transfer step
+ * asks the ledger about the invoice already on record before it mints another. Account
+ * and amount stay in front, as the part worth searching by.
  */
 const resolveInvoiceExternalId = (
   accountId: string,
