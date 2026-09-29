@@ -7,7 +7,6 @@ import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   getCardInvestment,
   withCardInvestment,
-  withoutCardInvestment,
 } from "@app/store/persistent-state/card-investment"
 import { AccountType } from "@app/types/wallet"
 import { CardInvestmentProgress } from "@app/types/card-investment"
@@ -64,7 +63,7 @@ const useCardInvestmentAccount = (): {
 /** What the signing step knows when the agreement is signed. */
 type CardInvestmentStart = Pick<
   CardInvestmentProgress,
-  "selectedAmountUsd" | "settlementSats"
+  "selectedAmountUsd" | "settlementSats" | "envelopeId"
 >
 
 type CardInvestmentProgressState = {
@@ -81,7 +80,8 @@ type CardInvestmentProgressState = {
   /** Asks the server for the account again, for a step whose wait on it has run out. */
   refetchAccount: () => void
   /** Records the signed agreement, stamped with the moment; the home nags about its
-   *  payment from here on. */
+   *  payment from here on. Never over an agreement already signed: the record is what
+   *  keeps a second one from being signed. */
   start: (investment: CardInvestmentStart) => void
   /** Records the invoice the transfer step was issued, to be paid rather than reissued
    *  on a return while it can still be paid. */
@@ -91,8 +91,8 @@ type CardInvestmentProgressState = {
   isInvestmentInvoice: (paymentRequest: string | undefined) => boolean
   /** Records the payment; the home welcomes the investor from here on. */
   markPaid: () => void
-  /** Forgets the investment, once the investor has closed the welcome. */
-  clear: () => void
+  /** Closes the welcome. The record stays, as the mark that this account has signed. */
+  dismissWelcome: () => void
 }
 
 /**
@@ -106,32 +106,35 @@ type CardInvestmentProgressState = {
 export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
   const { persistentState, updateState } = usePersistentStateContext()
   const { accountId, isEligible, refetchAccount } = useCardInvestmentAccount()
-  const progress = accountId
-    ? getCardInvestment(persistentState, accountId, Date.now())
-    : null
+  const progress = accountId ? getCardInvestment(persistentState, accountId) : null
 
   const start = useCallback(
     (investment: CardInvestmentStart) => {
       if (!accountId) return
-      updateState(
-        (state) =>
-          state &&
-          withCardInvestment(state, accountId, { ...investment, signedAt: Date.now() }),
-      )
+      updateState((state) => {
+        if (!state) return state
+        if (getCardInvestment(state, accountId)) return state
+        return withCardInvestment(state, accountId, {
+          ...investment,
+          signedAt: Date.now(),
+        })
+      })
     },
     [accountId, updateState],
   )
 
   /** Nothing signed means nothing to add to: an invoice or a payment with no investment
-   *  behind it leaves the record as it is rather than inventing one. */
+   *  behind it leaves the record as it is rather than inventing one. A change that hands
+   *  the record back unchanged leaves the state as it is too, so nothing is written. */
   const amend = useCallback(
     (change: (current: CardInvestmentProgress) => CardInvestmentProgress) => {
       if (!accountId) return
       updateState((state) => {
         if (!state) return state
-        const current = getCardInvestment(state, accountId, Date.now())
+        const current = getCardInvestment(state, accountId)
         if (!current) return state
-        return withCardInvestment(state, accountId, change(current))
+        const next = change(current)
+        return next === current ? state : withCardInvestment(state, accountId, next)
       })
     },
     [accountId, updateState],
@@ -147,10 +150,17 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [amend],
   )
 
-  /** The first mark stands: the moment is one the record's day is counted from, and
-   *  a second receipt or a doubled effect must not move it. */
+  /** The first mark stands: a second receipt or a doubled effect must not move it. */
   const markPaid = useCallback(() => {
     amend((current) => (current.paidAt ? current : { ...current, paidAt: Date.now() }))
+  }, [amend])
+
+  const dismissWelcome = useCallback(() => {
+    amend((current) =>
+      current.welcomeDismissedAt
+        ? current
+        : { ...current, welcomeDismissedAt: Date.now() },
+    )
   }, [amend])
 
   /**
@@ -168,11 +178,6 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [progress],
   )
 
-  const clear = useCallback(() => {
-    if (!accountId) return
-    updateState((state) => state && withoutCardInvestment(state, accountId))
-  }, [accountId, updateState])
-
   return {
     progress,
     isEligible,
@@ -183,6 +188,6 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     recordInvoice,
     isInvestmentInvoice,
     markPaid,
-    clear,
+    dismissWelcome,
   }
 }

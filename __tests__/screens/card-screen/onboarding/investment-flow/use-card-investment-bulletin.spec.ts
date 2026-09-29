@@ -9,11 +9,14 @@ import {
   CardInvestmentProgress,
 } from "@app/types/card-investment"
 
-const mockClear = jest.fn()
+const mockDismissWelcome = jest.fn()
 const mockProgress: { current: CardInvestmentProgress | null } = { current: null }
 
 jest.mock("@app/hooks/use-card-investment-progress", () => ({
-  useCardInvestmentProgress: () => ({ progress: mockProgress.current, clear: mockClear }),
+  useCardInvestmentProgress: () => ({
+    progress: mockProgress.current,
+    dismissWelcome: mockDismissWelcome,
+  }),
 }))
 
 /** Its own spec covers how the balance is measured; here only the answer matters. */
@@ -33,6 +36,10 @@ const SIGNED: CardInvestmentProgress = {
   signedAt: 1_757_700_000_000,
 }
 const PAID: CardInvestmentProgress = { ...SIGNED, paidAt: 1_757_800_000_000 }
+const WELCOMED: CardInvestmentProgress = {
+  ...PAID,
+  welcomeDismissedAt: 1_757_900_000_000,
+}
 
 const dismiss = () => {}
 
@@ -61,6 +68,12 @@ describe("resolveCardInvestmentBulletin", () => {
     expect(resolve({ progress: PAID, isFundingLoading: true })?.kind).toBe(
       CardInvestmentBulletinKind.Shareholder,
     )
+  })
+
+  /** The record stays as the mark that this account has signed; the card does not. */
+  it("says nothing once the welcome has been closed", () => {
+    expect(resolve({ progress: WELCOMED })).toBeNull()
+    expect(resolve({ progress: WELCOMED, hasEnoughBalance: true })).toBeNull()
   })
 
   /** A zero mid-load reads as a shortfall; the investor may well be covered. */
@@ -198,7 +211,8 @@ describe("useCardInvestmentBulletin", () => {
     expect(result.current?.kind).toBe(CardInvestmentBulletinKind.Shareholder)
   })
 
-  it("dismisses by forgetting the investment", () => {
+  /** Closing the welcome keeps the record: it is what says this account has signed. */
+  it("dismisses by closing the welcome, not by forgetting the investment", () => {
     mockProgress.current = PAID
 
     const { result } = renderHook(() =>
@@ -206,6 +220,6 @@ describe("useCardInvestmentBulletin", () => {
     )
     result.current?.dismiss()
 
-    expect(mockClear).toHaveBeenCalledTimes(1)
+    expect(mockDismissWelcome).toHaveBeenCalledTimes(1)
   })
 })
