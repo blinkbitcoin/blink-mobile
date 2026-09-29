@@ -1,6 +1,8 @@
 import { useEffect } from "react"
 
-import { CommonActions, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
+
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 
 import { useDollarBalanceGate } from "./use-dollar-balance-restricted"
 
@@ -35,7 +37,7 @@ export const useDollarBalanceRestrictionGuard = ({
 
   useEffect(() => {
     if (!shouldLeaveScreen) return
-    navigation.dispatch(CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }))
+    navigation.dispatch(RESET_TO_HOME)
   }, [shouldLeaveScreen, navigation])
 
   return {
