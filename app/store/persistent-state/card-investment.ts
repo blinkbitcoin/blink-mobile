@@ -55,3 +55,29 @@ export const withoutCardInvestment = (
   const { [accountId]: _dropped, ...rest } = state.cardInvestmentByAccountId
   return { ...state, cardInvestmentByAccountId: rest }
 }
+
+/**
+ * The records as they are carried through a logout, when everything else starts over.
+ *
+ * They are kept, filed by server account id, because a signed agreement outlives the
+ * session that signed it and must not be signed again by the same account. What a paid
+ * record no longer needs goes: its invoice, a payable claim on the account and the one
+ * piece of it worth not leaving on a shared phone. An unpaid record keeps its invoice,
+ * since that is what a payment that went through without a receipt is found by. One
+ * small entry per account that ever signed is the whole of what remains.
+ */
+export const withCardInvestmentsPrunedForLogout = (
+  state: PersistentState,
+): Pick<PersistentState, "cardInvestmentByAccountId"> => {
+  const records = state.cardInvestmentByAccountId
+  if (!records) return {}
+
+  const pruned = Object.fromEntries(
+    Object.entries(records).map(([accountId, progress]) => {
+      if (!progress?.paidAt || !progress.invoice) return [accountId, progress]
+      const { invoice: _spent, ...settled } = progress
+      return [accountId, settled]
+    }),
+  )
+  return { cardInvestmentByAccountId: pruned }
+}
