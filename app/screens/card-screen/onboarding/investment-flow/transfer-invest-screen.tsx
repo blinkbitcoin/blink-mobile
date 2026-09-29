@@ -51,20 +51,27 @@ export const TransferInvestScreen: React.FC = () => {
   } = useTheme()
 
   const { LL } = useI18nContext()
-  const { selectedAmountUsd, settlementSats } = useRoute<TransferInvestRoute>().params
+  const route = useRoute<TransferInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  const terms = React.useMemo(
-    () => resolveInvestmentTerms(selectedAmountUsd),
-    [selectedAmountUsd],
-  )
 
   const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
   const { progress, recordInvoice, isEligible, accountId, isAccountResolved } =
     useCardInvestmentProgress()
-  /** The satoshis the agreement names, from the route or the signed record: the debt
-   *  the balance is measured against, and the figure the invoice is written for. */
-  const signedSats = settlementSats ?? progress?.settlementSats
+
+  /**
+   * The figures are the signed record's once it is in hand, and the route's only until
+   * then: every caller passes the record's own amount today, but the record is what the
+   * invoice is filed under and what the payment is later found by, so it is the record
+   * that has the last word on what is being paid for.
+   */
+  const selectedAmountUsd = progress?.selectedAmountUsd ?? route.selectedAmountUsd
+  const terms = React.useMemo(
+    () => resolveInvestmentTerms(selectedAmountUsd),
+    [selectedAmountUsd],
+  )
+  /** The satoshis the agreement names, from the record or the route: the debt the
+   *  balance is measured against, and the figure the invoice is written for. */
+  const signedSats = progress?.settlementSats ?? route.settlementSats
   const { hasEnoughBalance, balanceWalletId, isLoading } = useInvestmentFunding(
     terms.totalUsd,
     signedSats,
