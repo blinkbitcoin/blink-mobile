@@ -131,28 +131,31 @@ jest.mock("@react-navigation/native", () => {
   }
 })
 
+/** Every spec starts from a signed, unpaid investor with nothing issued yet. */
+const resetScreenMocks = () => {
+  loadLocale("en")
+  mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
+  mockDepositWalletId.current = "wallet-invest"
+  mockCardInvestmentProgress.current = {
+    selectedAmountUsd: SELECTED_AMOUNT_USD,
+    signedAt: Date.now(),
+  }
+  mockIsFocused.current = true
+  mockIsEligible.current = true
+  mockAccountId.current = ACCOUNT_ID
+  mockRequestInvoice.mockResolvedValue({ paymentRequest: "lnbc-invoice" })
+  mockFunding.current = {
+    balanceUsd: 0,
+    shortfallUsd: SELECTED_AMOUNT_USD,
+    hasEnoughBalance: false,
+    totalSats: 0,
+    isLoading: false,
+  }
+  jest.clearAllMocks()
+}
+
 describe("TransferInvestScreen", () => {
-  beforeEach(() => {
-    loadLocale("en")
-    mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
-    mockDepositWalletId.current = "wallet-invest"
-    mockCardInvestmentProgress.current = {
-      selectedAmountUsd: SELECTED_AMOUNT_USD,
-      signedAt: Date.now(),
-    }
-    mockIsFocused.current = true
-    mockIsEligible.current = true
-    mockAccountId.current = ACCOUNT_ID
-    mockRequestInvoice.mockResolvedValue({ paymentRequest: "lnbc-invoice" })
-    mockFunding.current = {
-      balanceUsd: 0,
-      shortfallUsd: SELECTED_AMOUNT_USD,
-      hasEnoughBalance: false,
-      totalSats: 0,
-      isLoading: false,
-    }
-    jest.clearAllMocks()
-  })
+  beforeEach(resetScreenMocks)
 
   /** An invoice minted with no agreement behind it would be paid with nothing to record
    *  the payment on, so the step leaves for the home. */
@@ -320,6 +323,7 @@ describe("TransferInvestScreen", () => {
   /** Asking for one amount after signing for another is the failure worth guarding. */
   it("follows a different choice through both paragraphs", async () => {
     mockRouteParams.current = { selectedAmountUsd: 1000 }
+    mockCardInvestmentProgress.current = { selectedAmountUsd: 1000, signedAt: Date.now() }
 
     const { getByText } = render(
       <ContextForScreen>
@@ -333,6 +337,48 @@ describe("TransferInvestScreen", () => {
       getByText(/You have signed the subscription agreement for 1,000 units/),
     ).toBeTruthy()
     expect(getByText(/Time to transfer the investment amount of \$1,000/)).toBeTruthy()
+  })
+
+  /**
+   * The record is what the invoice is filed under and what the payment is later found
+   * by, so its figures win over a route that disagrees: an old link, or one edited by
+   * hand, must not bill a different amount than the one signed for.
+   */
+  it("reads the amount off the signed record over the route", async () => {
+    mockRouteParams.current = { selectedAmountUsd: 1000, settlementSats: 1_268_222 }
+    mockCardInvestmentProgress.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      signedAt: Date.now(),
+      settlementSats: 12_682_228,
+    }
+    mockFunding.current = {
+      balanceUsd: SELECTED_AMOUNT_USD,
+      shortfallUsd: 0,
+      hasEnoughBalance: true,
+      totalSats: 31_704_000,
+      isLoading: false,
+    }
+
+    const { getByText } = render(
+      <ContextForScreen>
+        <TransferInvestScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(
+      getByText(/You have signed the subscription agreement for 25,000 units/),
+    ).toBeTruthy()
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(SELECTED_AMOUNT_USD, 12_682_228)
+
+    await act(async () => {
+      fireEvent.press(getByText("Continue"))
+    })
+
+    expect(mockRequestInvoice).toHaveBeenCalledWith("wallet-invest", 12_682_228, {
+      accountId: ACCOUNT_ID,
+      amountUsd: SELECTED_AMOUNT_USD,
+    })
   })
 
   it("displays continue button", async () => {
@@ -774,6 +820,10 @@ describe("TransferInvestScreen", () => {
 
     expect(mockNavigate).not.toHaveBeenCalled()
   })
+})
+
+describe("TransferInvestScreen, the invoice it pays", () => {
+  beforeEach(resetScreenMocks)
 
   describe("the invoice it pays", () => {
     const NOW_MS = 1_757_800_000_000
