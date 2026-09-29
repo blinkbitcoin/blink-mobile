@@ -1,14 +1,6 @@
 import * as React from "react"
 
 /**
- * The code the e-sign library words as a lost connection. Offline is a status of its
- * own there, not an error, so it carries no code; this is the one whose copy a step
- * borrows when what it waits on, the price feed or the account, has been silent for
- * longer than a connected device would be.
- */
-export const LOST_CONNECTION_CODE = "NETWORK_ERROR"
-
-/**
  * How long a step waits before it stops waiting and says so. A spinner with no end and
  * no button is a dead end; something the device should already have that has not
  * arrived in this long means it is most likely offline.
