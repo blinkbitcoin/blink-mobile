@@ -12534,6 +12534,16 @@ type RootTranslation = {
 					 */
 					body: string
 				}
+				paymentPending: {
+					/**
+					 * P​a​y​m​e​n​t​ ​o​n​ ​i​t​s​ ​w​a​y
+					 */
+					title: string
+					/**
+					 * Y​o​u​r​ ​i​n​v​e​s​t​m​e​n​t​ ​p​a​y​m​e​n​t​ ​i​s​ ​b​e​i​n​g​ ​c​o​n​f​i​r​m​e​d​.
+					 */
+					body: string
+				}
 				shareholder: {
 					/**
 					 * W​e​l​c​o​m​e​ ​a​s​ ​B​l​i​n​k​ ​s​h​a​r​e​h​o​l​d​e​r​!
@@ -26326,6 +26336,16 @@ export type TranslationFunctions = {
 					title: () => LocalizedString
 					/**
 					 * You now have enough funds to complete the investment.
+					 */
+					body: () => LocalizedString
+				}
+				paymentPending: {
+					/**
+					 * Payment on its way
+					 */
+					title: () => LocalizedString
+					/**
+					 * Your investment payment is being confirmed.
 					 */
 					body: () => LocalizedString
 				}

@@ -17,7 +17,10 @@ export type CardInvestmentProgress = {
   /** The e-sign envelope the agreement was signed in, when the mint named it: what a
    *  server-side record of the signature can be reconciled against. */
   envelopeId?: string
-  /** When the payment went through; absent while it is still owed. */
+  /** When a payment was sent and is still on its way. The home stops asking for the
+   *  money then, but does not welcome yet: a pending payment can still fail. */
+  payingAt?: number
+  /** When the payment settled; absent while it is still owed or on its way. */
   paidAt?: number
   /** When the investor closed the welcome. The record stays past that, as the mark that
    *  this account signed; only the card goes. */
@@ -52,6 +55,8 @@ export const CardInvestmentBulletinKind = {
   DepositPending: "depositPending",
   /** Signed and covered: the investor is sent back to pay. */
   Ready: "ready",
+  /** Paid, and the payment is still on its way: nothing to do but wait. */
+  PaymentPending: "paymentPending",
   /** Paid: welcomed, until they close it. */
   Shareholder: "shareholder",
 } as const

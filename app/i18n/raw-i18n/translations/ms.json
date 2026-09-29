@@ -3772,6 +3772,10 @@
               "title": "Lengkapkan pelaburan anda",
               "body": "Kini anda mempunyai dana yang mencukupi untuk melengkapkan pelaburan."
           },
+          "paymentPending": {
+              "title": "Pembayaran dalam perjalanan",
+              "body": "Pembayaran pelaburan anda sedang disahkan."
+          },
           "shareholder": {
               "title": "Selamat datang sebagai pemegang saham Blink!",
               "body": "Kami akan memaklumkan anda sebaik sahaja Blink Visa Card anda sedia."

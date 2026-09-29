@@ -3820,6 +3820,10 @@
                     "title": "投資を完了しましょう",
                     "body": "投資を完了するのに十分な資金が揃いました。"
                 },
+                "paymentPending": {
+                    "title": "お支払い処理中",
+                    "body": "投資のお支払いを確認しています。"
+                },
                 "shareholder": {
                     "title": "Blinkの株主へようこそ！",
                     "body": "Blink Visa Cardの準備ができ次第お知らせします。"

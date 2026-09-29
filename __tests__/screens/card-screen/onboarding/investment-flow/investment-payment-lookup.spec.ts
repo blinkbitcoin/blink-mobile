@@ -1,11 +1,15 @@
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 
 import { TxDirection, TxStatus } from "@app/graphql/generated"
 import {
   lookUpInvestmentPayment,
   useLookUpInvestmentPayment,
+  useReconcileInvestmentPayment,
 } from "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup"
-import { CardInvestmentPaymentLookup } from "@app/types/card-investment"
+import {
+  CardInvestmentPaymentLookup,
+  CardInvestmentProgress,
+} from "@app/types/card-investment"
 
 /** The mainnet invoice used across the app's mocks (app/graphql/mocks.ts), decoded for
  *  real so the hash the ledger is asked with is the invoice's own. */
@@ -59,11 +63,31 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
   useSendWallets: () => ({ wallets: mockWallets.current }),
 }))
 
+const mockProgress: { current: CardInvestmentProgress | null } = { current: null }
+const mockMarkPaid = jest.fn()
+const mockClearPaying = jest.fn()
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({
+    progress: mockProgress.current,
+    markPaid: mockMarkPaid,
+    clearPaying: mockClearPaying,
+  }),
+}))
+
+const SIGNED: CardInvestmentProgress = {
+  selectedAmountUsd: 25000,
+  settlementSats: 31_704_000,
+  signedAt: 1_757_700_000_000,
+  invoice: { paymentRequest: INVOICE, issuedAt: 1_757_701_000_000 },
+}
+const PAYING: CardInvestmentProgress = { ...SIGNED, payingAt: 1_757_702_000_000 }
+
 beforeEach(() => {
   jest.clearAllMocks()
   mockLedger.current = { "wallet-btc": [], "wallet-usd": [] }
   mockNetwork.current = "mainnet"
   mockWallets.current = [{ id: "wallet-btc" }, { id: "wallet-usd" }]
+  mockProgress.current = null
 })
 
 describe("lookUpInvestmentPayment", () => {
@@ -202,5 +226,145 @@ describe("useLookUpInvestmentPayment", () => {
     rerender({})
 
     expect(result.current).toBe(first)
+  })
+})
+
+describe("useReconcileInvestmentPayment", () => {
+  it("records a payment on its way as paid once the ledger says it settled", async () => {
+    mockProgress.current = PAYING
+    mockLedger.current = { "wallet-btc": [send(TxStatus.Success)], "wallet-usd": [] }
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+    expect(mockClearPaying).not.toHaveBeenCalled()
+  })
+
+  /** A failed payment leaves no send in any wallet; the home asks for the money again. */
+  it("clears a payment on its way once every wallet answered without it", async () => {
+    mockProgress.current = PAYING
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockClearPaying).toHaveBeenCalledTimes(1)
+    expect(mockMarkPaid).not.toHaveBeenCalled()
+  })
+
+  it("keeps waiting on a payment the ledger still holds as pending", async () => {
+    mockProgress.current = PAYING
+    mockLedger.current = { "wallet-btc": [send(TxStatus.Pending)], "wallet-usd": [] }
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockMarkPaid).not.toHaveBeenCalled()
+    expect(mockClearPaying).not.toHaveBeenCalled()
+  })
+
+  /** Offline, a payment on its way must not be forgotten: the home would ask for the
+   *  money again while it may still land. */
+  it("keeps waiting when a wallet could not be asked", async () => {
+    mockProgress.current = PAYING
+    mockLedger.current = { "wallet-btc": [], "wallet-usd": "unanswered" }
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockMarkPaid).not.toHaveBeenCalled()
+    expect(mockClearPaying).not.toHaveBeenCalled()
+  })
+
+  /** A home opened before the network was known asks again once it is, rather than
+   *  reading the silence as a failed payment. */
+  it("asks again once the network is known", async () => {
+    mockProgress.current = PAYING
+    mockNetwork.current = undefined
+    mockLedger.current = { "wallet-btc": [send(TxStatus.Success)], "wallet-usd": [] }
+
+    const { rerender } = renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+    expect(mockClearPaying).not.toHaveBeenCalled()
+    expect(mockMarkPaid).not.toHaveBeenCalled()
+
+    mockNetwork.current = "mainnet"
+    rerender({})
+    await act(async () => {})
+
+    expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+  })
+
+  it("asks nothing while no payment is on its way", async () => {
+    mockProgress.current = SIGNED
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockFetchTransactions).not.toHaveBeenCalled()
+  })
+
+  it("asks nothing once the payment is recorded as paid", async () => {
+    mockProgress.current = { ...PAYING, paidAt: 1_757_703_000_000 }
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockFetchTransactions).not.toHaveBeenCalled()
+  })
+
+  /** A record marked as paying with no invoice to ask about cannot be reconciled;
+   *  nothing is invented for it. */
+  it("asks nothing when the record names no invoice", async () => {
+    const { invoice: _none, ...withoutInvoice } = PAYING
+    mockProgress.current = withoutInvoice
+
+    renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+
+    expect(mockFetchTransactions).not.toHaveBeenCalled()
+    expect(mockClearPaying).not.toHaveBeenCalled()
+  })
+
+  it("asks once for the same record", async () => {
+    mockProgress.current = PAYING
+    mockLedger.current = { "wallet-btc": [send(TxStatus.Pending)], "wallet-usd": [] }
+
+    const { rerender } = renderHook(() => useReconcileInvestmentPayment())
+    await act(async () => {})
+    await act(async () => {
+      rerender({})
+    })
+
+    expect(mockFetchTransactions).toHaveBeenCalledTimes(1)
+  })
+
+  /** The answer to a question asked by a home that has since gone is dropped rather
+   *  than written from beyond it. */
+  it("drops an answer that arrives after unmount", async () => {
+    mockProgress.current = PAYING
+    const settledAnswer = {
+      data: {
+        me: {
+          defaultAccount: {
+            walletById: { transactionsByPaymentHash: [send(TxStatus.Success)] },
+          },
+        },
+      },
+    }
+    let answer: (value: typeof settledAnswer) => void = () => {}
+    mockFetchTransactions.mockReturnValueOnce(
+      new Promise<typeof settledAnswer>((resolve) => {
+        answer = resolve
+      }),
+    )
+
+    const { unmount } = renderHook(() => useReconcileInvestmentPayment())
+    unmount()
+    await act(async () => {
+      answer(settledAnswer)
+    })
+
+    expect(mockMarkPaid).not.toHaveBeenCalled()
   })
 })

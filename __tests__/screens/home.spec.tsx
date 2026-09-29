@@ -96,6 +96,13 @@ jest.mock(
       mockUseCardInvestmentBulletin(params),
   }),
 )
+const mockReconcileInvestmentPayment = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup",
+  () => ({
+    useReconcileInvestmentPayment: () => mockReconcileInvestmentPayment(),
+  }),
+)
 const mockCardInvestmentBulletin = jest.fn<null, [Record<string, unknown>]>(() => null)
 jest.mock("@app/components/card-investment-bulletin", () => ({
   CardInvestmentBulletin: (props: Record<string, unknown>) =>
@@ -2159,6 +2166,13 @@ describe("CardInvestmentBulletin gating", () => {
     await flushEffects()
 
     expect(mockCardInvestmentBulletin).not.toHaveBeenCalled()
+  })
+
+  it("asks the ledger about a payment on its way once per visit", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockReconcileInvestmentPayment).toHaveBeenCalled()
   })
 
   it("tells the hook no deposit is pending on a quiet account", async () => {

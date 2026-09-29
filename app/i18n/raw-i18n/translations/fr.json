@@ -3820,6 +3820,10 @@
                     "title": "Finalise ton investissement",
                     "body": "Tu as maintenant assez de fonds pour finaliser l'investissement."
                 },
+                "paymentPending": {
+                    "title": "Paiement en cours",
+                    "body": "Le paiement de ton investissement est en cours de confirmation."
+                },
                 "shareholder": {
                     "title": "Bienvenue parmi les actionnaires de Blink !",
                     "body": "Nous te préviendrons dès que ta Blink Visa Card sera prête."

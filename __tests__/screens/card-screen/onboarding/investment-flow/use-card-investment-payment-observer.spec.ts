@@ -109,12 +109,21 @@ describe("useCardInvestmentPaymentObserver", () => {
       expect(recordAfterLastUpdate()).toEqual({ ...ISSUED, paidAt: NOW })
     })
 
-    /** The money has left the wallet; holding the record until it settles would have
-     *  the home ask for it again while it is in flight. */
-    it("marks the investment paid on a pending receipt as well", () => {
+    /** A pending payment can still fail, and the record has a way back from "paying"
+     *  but not from "paid". */
+    it("marks the investment as paying on a pending receipt", () => {
       const { result } = renderHook(() => useCardInvestmentPaymentObserver())
 
       result.current.onSettled(INVOICE, "PENDING")
+
+      expect(recordAfterLastUpdate()).toEqual({ ...ISSUED, payingAt: NOW })
+    })
+
+    it("marks a payment already on its way as paid once it settles", () => {
+      mockPersistentState = stateWith({ ...ISSUED, payingAt: NOW - 10_000 })
+      const { result } = renderHook(() => useCardInvestmentPaymentObserver())
+
+      result.current.onSettled(INVOICE, "SUCCESS")
 
       expect(recordAfterLastUpdate()).toEqual({ ...ISSUED, paidAt: NOW })
     })

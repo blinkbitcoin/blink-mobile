@@ -3772,6 +3772,10 @@
               "title": "Yatırımını tamamla",
               "body": "Artık yatırımı tamamlamak için yeterli bakiyen var."
           },
+          "paymentPending": {
+              "title": "Ödeme yolda",
+              "body": "Yatırım ödemen onaylanıyor."
+          },
           "shareholder": {
               "title": "Blink hissedarı olarak hoş geldin!",
               "body": "Blink Visa Card'ın hazır olur olmaz sana haber vereceğiz."

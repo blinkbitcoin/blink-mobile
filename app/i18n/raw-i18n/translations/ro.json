@@ -3772,6 +3772,10 @@
               "title": "Finalizează-ți investiția",
               "body": "Acum ai fonduri suficiente pentru a finaliza investiția."
           },
+          "paymentPending": {
+              "title": "Plata este pe drum",
+              "body": "Plata investiției tale este în curs de confirmare."
+          },
           "shareholder": {
               "title": "Bine ai venit ca acționar Blink!",
               "body": "Te vom anunța de îndată ce Blink Visa Card-ul tău este gata."

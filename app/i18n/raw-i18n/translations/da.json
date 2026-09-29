@@ -3772,6 +3772,10 @@
               "title": "Fuldfør din investering",
               "body": "Du har nu midler nok til at fuldføre investeringen."
           },
+          "paymentPending": {
+              "title": "Betaling på vej",
+              "body": "Din investeringsbetaling bliver bekræftet."
+          },
           "shareholder": {
               "title": "Velkommen som aktionær i Blink!",
               "body": "Vi giver dig besked, så snart dit Blink Visa Card er klar."

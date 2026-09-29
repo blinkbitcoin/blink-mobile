@@ -79,6 +79,10 @@ export const CardInvestmentBulletin: React.FC<CardInvestmentBulletinProps> = ({
         }),
       buttonLabel: LL.common.continue(),
     }),
+    [CardInvestmentBulletinKind.PaymentPending]: () => ({
+      title: copy.paymentPending.title(),
+      text: copy.paymentPending.body(),
+    }),
     [CardInvestmentBulletinKind.Shareholder]: () => ({
       title: copy.shareholder.title(),
       text: copy.shareholder.body(),

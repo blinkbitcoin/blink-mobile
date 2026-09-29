@@ -35,6 +35,7 @@ const SIGNED: CardInvestmentProgress = {
   settlementSats: 31_704_000,
   signedAt: 1_757_700_000_000,
 }
+const PAYING: CardInvestmentProgress = { ...SIGNED, payingAt: 1_757_790_000_000 }
 const PAID: CardInvestmentProgress = { ...SIGNED, paidAt: 1_757_800_000_000 }
 const WELCOMED: CardInvestmentProgress = {
   ...PAID,
@@ -77,6 +78,20 @@ describe("resolveCardInvestmentBulletin", () => {
   })
 
   /** A zero mid-load reads as a shortfall; the investor may well be covered. */
+  /** The money has left the wallet; asking for it again would have the investor pay
+   *  twice, so the card waits, whatever the balance now reads. */
+  it("says the payment is on its way while it is, whatever the balance", () => {
+    expect(resolve({ progress: PAYING })?.kind).toBe(
+      CardInvestmentBulletinKind.PaymentPending,
+    )
+    expect(resolve({ progress: PAYING, hasEnoughBalance: true })?.kind).toBe(
+      CardInvestmentBulletinKind.PaymentPending,
+    )
+    expect(resolve({ progress: PAYING, isFundingLoading: true })?.kind).toBe(
+      CardInvestmentBulletinKind.PaymentPending,
+    )
+  })
+
   it("says nothing while the balance is still unknown", () => {
     expect(resolve({ isFundingLoading: true })).toBeNull()
     expect(resolve({ isFundingLoading: true, hasPendingDeposit: true })).toBeNull()
@@ -199,6 +214,16 @@ describe("useCardInvestmentBulletin", () => {
     )
 
     expect(result.current).toBeNull()
+  })
+
+  it("answers PaymentPending while the payment is on its way", () => {
+    mockProgress.current = PAYING
+
+    const { result } = renderHook(() =>
+      useCardInvestmentBulletin({ hasPendingDeposit: false }),
+    )
+
+    expect(result.current?.kind).toBe(CardInvestmentBulletinKind.PaymentPending)
   })
 
   it("answers Shareholder once the investment is paid", () => {
