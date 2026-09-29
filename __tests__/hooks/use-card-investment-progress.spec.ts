@@ -160,6 +160,8 @@ describe("useCardInvestmentProgress", () => {
       act(() => {
         result.current.start(SIGNING)
         result.current.recordInvoice("lnbc25m1investment")
+        result.current.markPaying()
+        result.current.clearPaying()
         result.current.markPaid()
         result.current.dismissWelcome()
       })
@@ -254,6 +256,78 @@ describe("useCardInvestmentProgress", () => {
     })
   })
 
+  describe("markPaying", () => {
+    it("stamps a payment on its way on the signed investment", () => {
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaying())
+
+      expect(applyLastUpdate(signed)?.cardInvestmentByAccountId).toEqual({
+        [CUSTODIAL_ID]: { ...INVESTMENT, payingAt: NOW },
+      })
+    })
+
+    it("keeps the first mark on a payment already on its way", () => {
+      const paying = stateWith({
+        [CUSTODIAL_ID]: { ...INVESTMENT, payingAt: NOW - 1000 },
+      })
+      mockPersistentState = paying
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaying())
+
+      expect(applyLastUpdate(paying)).toBe(paying)
+    })
+
+    /** A settled payment is not on its way; a late pending receipt must not say it is. */
+    it("changes nothing on an investment already paid", () => {
+      const paid = stateWith({ [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW - 1000 } })
+      mockPersistentState = paid
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaying())
+
+      expect(applyLastUpdate(paid)).toBe(paid)
+    })
+
+    it("changes nothing when nothing was signed", () => {
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaying())
+
+      expect(applyLastUpdate(baseState)).toBe(baseState)
+    })
+  })
+
+  describe("clearPaying", () => {
+    /** The payment did not go through after all; the home asks for the money again. */
+    it("takes the mark off a payment that was on its way", () => {
+      const paying = stateWith({
+        [CUSTODIAL_ID]: { ...INVESTMENT, payingAt: NOW - 1000 },
+      })
+      mockPersistentState = paying
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.clearPaying())
+
+      expect(applyLastUpdate(paying)?.cardInvestmentByAccountId).toEqual({
+        [CUSTODIAL_ID]: INVESTMENT,
+      })
+    })
+
+    it("changes nothing when no payment is on its way", () => {
+      const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
+      mockPersistentState = signed
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.clearPaying())
+
+      expect(applyLastUpdate(signed)).toBe(signed)
+    })
+  })
+
   describe("markPaid", () => {
     it("stamps the payment on the signed investment", () => {
       const signed = stateWith({ [CUSTODIAL_ID]: INVESTMENT })
@@ -263,6 +337,20 @@ describe("useCardInvestmentProgress", () => {
       act(() => result.current.markPaid())
 
       expect(applyLastUpdate(signed)?.cardInvestmentByAccountId).toEqual({
+        [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW },
+      })
+    })
+
+    it("takes a payment that was on its way off the way once it settles", () => {
+      const paying = stateWith({
+        [CUSTODIAL_ID]: { ...INVESTMENT, payingAt: NOW - 1000 },
+      })
+      mockPersistentState = paying
+      const { result } = renderHook(() => useCardInvestmentProgress())
+
+      act(() => result.current.markPaid())
+
+      expect(applyLastUpdate(paying)?.cardInvestmentByAccountId).toEqual({
         [CUSTODIAL_ID]: { ...INVESTMENT, paidAt: NOW },
       })
     })
@@ -434,6 +522,8 @@ describe("useCardInvestmentProgress", () => {
 
     expect(result.current.start).toBe(first.start)
     expect(result.current.recordInvoice).toBe(first.recordInvoice)
+    expect(result.current.markPaying).toBe(first.markPaying)
+    expect(result.current.clearPaying).toBe(first.clearPaying)
     expect(result.current.markPaid).toBe(first.markPaid)
     expect(result.current.dismissWelcome).toBe(first.dismissWelcome)
   })

@@ -3772,6 +3772,10 @@
               "title": "Rond je investering af",
               "body": "Je hebt nu genoeg saldo om de investering af te ronden."
           },
+          "paymentPending": {
+              "title": "Betaling onderweg",
+              "body": "Je investeringsbetaling wordt bevestigd."
+          },
           "shareholder": {
               "title": "Welkom als aandeelhouder van Blink!",
               "body": "We laten het je weten zodra je Blink Visa Card klaar is."

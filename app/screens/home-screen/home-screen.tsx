@@ -75,6 +75,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { useReconcileInvestmentPayment } from "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup"
 import { useCardInvestmentBulletin } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
@@ -378,6 +379,8 @@ export const HomeScreen: React.FC = () => {
   const cardInvestmentBulletin = useCardInvestmentBulletin({
     hasPendingDeposit: hasPendingCustodialReceive,
   })
+  /** A payment the record only knows as on its way is asked about, once per visit. */
+  useReconcileInvestmentPayment()
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses

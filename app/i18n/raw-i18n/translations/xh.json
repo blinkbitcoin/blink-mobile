@@ -3772,6 +3772,10 @@
               "title": "Gqiba utyalo-mali lwakho",
               "body": "Ngoku unemali eyaneleyo yokugqiba utyalo-mali."
           },
+          "paymentPending": {
+              "title": "Intlawulo isendleleni",
+              "body": "Intlawulo yotyalo-mali lwakho iyaqinisekiswa."
+          },
           "shareholder": {
               "title": "Wamkelekile njengomnini-zabelo weBlink!",
               "body": "Siza kukwazisa kwangoko xa iBlink Visa Card yakho ilungile."

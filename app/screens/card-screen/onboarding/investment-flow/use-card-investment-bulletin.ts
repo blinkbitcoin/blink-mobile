@@ -18,7 +18,7 @@ type ResolveCardInvestmentBulletinParams = {
 
 /**
  * Pure so the order of precedence can be read on its own: the payment settles it, then
- * the balance, then a deposit in flight. Money already held outranks money on its way,
+ * a payment on its way, then the balance, then a deposit in flight. Money already held outranks money on its way,
  * whether it sits in one wallet or is spread over both, because it is what the investor
  * can act on now. Nothing is said while the balance is unknown, since a zero mid-load
  * would nag an investor who is covered. Nothing is said either once the welcome has been
@@ -36,6 +36,9 @@ export const resolveCardInvestmentBulletin = ({
   if (progress.paidAt) {
     if (progress.welcomeDismissedAt) return null
     return { kind: CardInvestmentBulletinKind.Shareholder, progress, dismiss }
+  }
+  if (progress.payingAt) {
+    return { kind: CardInvestmentBulletinKind.PaymentPending, progress, dismiss }
   }
   if (isFundingLoading) return null
   if (hasEnoughBalance) {

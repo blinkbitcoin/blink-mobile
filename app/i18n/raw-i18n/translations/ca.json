@@ -3772,6 +3772,10 @@
               "title": "Completa la teva inversió",
               "body": "Ja tens prou fons per completar la inversió."
           },
+          "paymentPending": {
+              "title": "Pagament en camí",
+              "body": "S'està confirmant el pagament de la teva inversió."
+          },
           "shareholder": {
               "title": "Benvingut com a accionista de Blink!",
               "body": "T'avisarem tan bon punt la teva Blink Visa Card estigui a punt."

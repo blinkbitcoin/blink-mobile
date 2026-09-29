@@ -3772,6 +3772,10 @@
               "title": "Selesaikan investasimu",
               "body": "Kini kamu memiliki dana yang cukup untuk menyelesaikan investasi."
           },
+          "paymentPending": {
+              "title": "Pembayaran sedang diproses",
+              "body": "Pembayaran investasimu sedang dikonfirmasi."
+          },
           "shareholder": {
               "title": "Selamat datang sebagai pemegang saham Blink!",
               "body": "Kami akan memberitahumu segera setelah Blink Visa Card-mu siap."

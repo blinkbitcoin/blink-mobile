@@ -3772,6 +3772,10 @@
               "title": "Fejezd be a befektetésed",
               "body": "Most már elegendő fedezeted van a befektetés befejezéséhez."
           },
+          "paymentPending": {
+              "title": "A fizetés úton van",
+              "body": "A befektetési fizetésed megerősítése folyamatban van."
+          },
           "shareholder": {
               "title": "Üdvözlünk a Blink részvényesei között!",
               "body": "Szólunk, amint elkészül a Blink Visa Card kártyád."

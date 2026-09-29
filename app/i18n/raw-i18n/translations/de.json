@@ -3820,6 +3820,10 @@
                     "title": "Schließe deine Investition ab",
                     "body": "Du hast jetzt genug Guthaben, um die Investition abzuschließen."
                 },
+                "paymentPending": {
+                    "title": "Zahlung unterwegs",
+                    "body": "Deine Investitionszahlung wird bestätigt."
+                },
                 "shareholder": {
                     "title": "Willkommen als Blink-Aktionär!",
                     "body": "Wir melden uns, sobald deine Blink Visa Card bereit ist."

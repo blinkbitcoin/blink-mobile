@@ -3772,6 +3772,10 @@
               "title": "Inversiónniykita tukuy",
               "body": "Kunanqa aypaq qullqiyuqñam kanki inversiónta tukunaykipaq."
           },
+          "paymentPending": {
+              "title": "Pagoqa ñanpim kachkan",
+              "body": "Inversiónniykipa pagonqa takyachikuchkanmi."
+          },
           "shareholder": {
               "title": "Allin hamusqayki Blinkpa accionistan hina!",
               "body": "Blink Visa Card-niyki listo kaptinqa willasqaykikum."

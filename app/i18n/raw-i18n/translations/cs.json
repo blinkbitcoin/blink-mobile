@@ -3772,6 +3772,10 @@
               "title": "Dokonči svou investici",
               "body": "Nyní máš dostatek prostředků k dokončení investice."
           },
+          "paymentPending": {
+              "title": "Platba je na cestě",
+              "body": "Tvoje investiční platba se potvrzuje."
+          },
           "shareholder": {
               "title": "Vítej jako akcionář Blinku!",
               "body": "Dáme ti vědět, jakmile bude tvoje Blink Visa Card připravena."

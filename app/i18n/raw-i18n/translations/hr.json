@@ -3772,6 +3772,10 @@
               "title": "Dovrši svoje ulaganje",
               "body": "Sada imaš dovoljno sredstava za dovršetak ulaganja."
           },
+          "paymentPending": {
+              "title": "Uplata je na putu",
+              "body": "Tvoja uplata za ulaganje se potvrđuje."
+          },
           "shareholder": {
               "title": "Dobro došao kao dioničar Blinka!",
               "body": "Javit ćemo ti čim tvoja Blink Visa Card bude spremna."
