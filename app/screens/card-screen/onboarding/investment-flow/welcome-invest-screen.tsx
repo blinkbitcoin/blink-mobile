@@ -3,7 +3,6 @@ import { ScrollView, View } from "react-native"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
-import { getErrorMessage } from "@blinkbitcoin/esign-react-native/webform"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { IconHero } from "@app/components/icon-hero"
@@ -15,7 +14,7 @@ import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
 import { resetToTransferStep } from "./transfer-invest-screen"
-import { LOST_CONNECTION_CODE, useGivenUpWaiting } from "./use-given-up-waiting"
+import { useGivenUpWaiting } from "./use-given-up-waiting"
 
 export const WelcomeInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -101,7 +100,7 @@ export const WelcomeInvestScreen: React.FC = () => {
 
           {hasGivenUpWaiting ? (
             <Text type="p2" style={styles.errorText}>
-              {getErrorMessage(LOST_CONNECTION_CODE)}
+              {LL.CardFlow.Onboarding.SignInvest.errors.networkError()}
             </Text>
           ) : null}
         </View>
