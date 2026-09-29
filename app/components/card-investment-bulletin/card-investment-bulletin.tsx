@@ -28,10 +28,11 @@ type BulletinContent = {
 
 /**
  * The home card that walks a signed investor back to the payment, and welcomes them once
- * it is made. Each state reuses the flow's own step for what it asks: the shortfall
- * screen already decides between depositing and converting, and the transfer step
- * already bills the figure the agreement names, so the card opens those rather than
- * restating their decisions.
+ * it is made. Each state that asks something reuses the flow's own step for it: the
+ * shortfall screen already decides between depositing and converting, and the transfer
+ * step already bills the figure the agreement names, so the card opens those rather
+ * than restating their decisions. A state that asks nothing, a deposit or a payment on
+ * its way, is a card and nothing more.
  */
 export const CardInvestmentBulletin: React.FC<CardInvestmentBulletinProps> = ({
   kind,
@@ -64,10 +65,11 @@ export const CardInvestmentBulletin: React.FC<CardInvestmentBulletinProps> = ({
       action: openShortfallStep,
       buttonLabel: LL.common.convert(),
     }),
+    /** Nothing to do but wait, so nothing to press: a card that opens a screen whose
+     *  only control is "Okay" would read as a button that does nothing. */
     [CardInvestmentBulletinKind.DepositPending]: () => ({
       title: copy.depositPending.title(),
       text: copy.depositPending.body(),
-      action: async () => navigation.navigate("cardOnboardingDepositPendingScreen"),
     }),
     [CardInvestmentBulletinKind.Ready]: () => ({
       title: copy.ready.title(),
