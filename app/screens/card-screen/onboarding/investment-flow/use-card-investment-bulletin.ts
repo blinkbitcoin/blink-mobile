@@ -21,7 +21,8 @@ type ResolveCardInvestmentBulletinParams = {
  * the balance, then a deposit in flight. Money already held outranks money on its way,
  * whether it sits in one wallet or is spread over both, because it is what the investor
  * can act on now. Nothing is said while the balance is unknown, since a zero mid-load
- * would nag an investor who is covered.
+ * would nag an investor who is covered. Nothing is said either once the welcome has been
+ * closed: the record stays, the card does not.
  */
 export const resolveCardInvestmentBulletin = ({
   progress,
@@ -33,6 +34,7 @@ export const resolveCardInvestmentBulletin = ({
 }: ResolveCardInvestmentBulletinParams): CardInvestmentBulletinState | null => {
   if (!progress) return null
   if (progress.paidAt) {
+    if (progress.welcomeDismissedAt) return null
     return { kind: CardInvestmentBulletinKind.Shareholder, progress, dismiss }
   }
   if (isFundingLoading) return null
@@ -62,7 +64,7 @@ type UseCardInvestmentBulletinParams = {
 export const useCardInvestmentBulletin = ({
   hasPendingDeposit,
 }: UseCardInvestmentBulletinParams): CardInvestmentBulletinState | null => {
-  const { progress, clear } = useCardInvestmentProgress()
+  const { progress, dismissWelcome } = useCardInvestmentProgress()
   /** Hooks cannot be skipped, so with nothing signed the balance is measured against
    *  zero and the answer discarded; the measurement is a memo over data the home
    *  already holds. */
@@ -77,6 +79,6 @@ export const useCardInvestmentBulletin = ({
     isSplitAcrossWallets,
     isFundingLoading: isLoading,
     hasPendingDeposit,
-    dismiss: clear,
+    dismiss: dismissWelcome,
   })
 }
