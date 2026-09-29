@@ -4,6 +4,7 @@ import {
   type LayoutChangeEvent,
   type StyleProp,
   type ViewStyle,
+  TextInput,
 } from "react-native"
 import { describe, it } from "@jest/globals"
 import { fireEvent, render, waitFor, act } from "@testing-library/react-native"
@@ -1525,6 +1526,46 @@ describe("Migration conversion prefill", () => {
       false,
     )
     expect(getByTestId("convert-25%").props.accessibilityState?.disabled).toBe(false)
+  })
+
+  /**
+   * The investment's payment is an invoice in satoshis, so the arm opens on dollars to
+   * bitcoin whoever the investor is: the first amount field is the dollar one. The other
+   * way round would leave the payment waiting on a second spread at send time. The
+   * toggle stays open, since an unrestricted investor may still turn it.
+   */
+  it("opens on dollars to bitcoin for an investment conversion, toggle still open", async () => {
+    armInvestmentConversion(500)
+    const Wrapper = createTestWrapper(buildMocks())
+
+    const rendered = render(
+      <Wrapper>
+        <ConversionDetailsScreen />
+      </Wrapper>,
+    )
+
+    await waitFor(() => {
+      expect(rendered.getByTestId("wallet-toggle-button")).toBeTruthy()
+    })
+
+    const [fromInput] = rendered.UNSAFE_getAllByType(TextInput)
+    expect(fromInput.props.placeholder).toBe("$0")
+
+    /** The toggle is held while the prefill settles; its state is read once it has. */
+    act(() => {
+      jest.advanceTimersByTime(1500)
+    })
+    await waitFor(
+      () => {
+        expect(
+          rendered.getByTestId("convert-100%").props.accessibilityState?.selected,
+        ).toBe(true)
+      },
+      { timeout: 3000 },
+    )
+    expect(
+      rendered.getByTestId("wallet-toggle-button").props.accessibilityState?.disabled,
+    ).toBe(false)
   })
 
   /** Let through the region gate, but only the way the restriction allows: into bitcoin,

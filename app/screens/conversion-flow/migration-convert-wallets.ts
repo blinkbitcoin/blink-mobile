@@ -8,10 +8,10 @@ type InitialConvertWallets = {
 }
 
 /**
- * The wallets the convert screen opens with. A drain empties dollars into bitcoin, and a
- * restricted investor may only move that way, so those open USD to BTC; every other
- * entry keeps the screen's usual BTC to USD default. Undefined until both wallets are
- * known, matching the convert hook's "no wallets yet" state.
+ * The wallets the convert screen opens with. A drain empties dollars into bitcoin, and an
+ * investor consolidating for a payment written in satoshis wants the same, so those open
+ * USD to BTC; every other entry keeps the screen's usual BTC to USD default. Undefined
+ * until both wallets are known, matching the convert hook's "no wallets yet" state.
  */
 export const resolveInitialConvertWallets = (
   btcWallet: ConvertWalletFragment | undefined,
