@@ -392,6 +392,54 @@ describe("PersistentStateProvider", () => {
     })
   })
 
+  /** A paid record's invoice is a payable claim with nothing left to pay; it is the one
+   *  piece of the record not worth leaving on a shared phone. An unpaid one keeps its
+   *  invoice, since that is what a payment that went through unrecorded is found by. */
+  it("drops the invoice of a paid investment on resetState and keeps an unpaid one's", async () => {
+    const invoice = { paymentRequest: "lnbc1investment", issuedAt: 1_757_800_000_000 }
+    const paid = {
+      selectedAmountUsd: 25000,
+      signedAt: 1_757_700_000_000,
+      paidAt: 1_757_800_000_000,
+      invoice,
+    }
+    const unpaid = { selectedAmountUsd: 1000, signedAt: 1_757_700_000_000, invoice }
+    setPersistedBlob({
+      ...scrubbedBlob,
+      cardInvestmentByAccountId: { "account-1": paid, "account-2": unpaid },
+    })
+    mockGetActiveToken.mockResolvedValue("some-token")
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("reset-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "persistentState",
+        expect.objectContaining({
+          cardInvestmentByAccountId: {
+            "account-1": {
+              selectedAmountUsd: 25000,
+              signedAt: 1_757_700_000_000,
+              paidAt: 1_757_800_000_000,
+            },
+            "account-2": unpaid,
+          },
+        }),
+      )
+    })
+  })
+
   it("reports a failed save to crashlytics instead of crashing, keeping the update in memory", async () => {
     setPersistedBlob(scrubbedBlob)
     mockGetActiveToken.mockResolvedValue("old-token")
