@@ -4049,6 +4049,9 @@
     "payTo": "Betal til {address}",
     "payment": "Betaling"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Vekselkursen er muligvis forældet"
+  },
   "SelfCustodialOffline": {
     "title": "Pungen er offline",
     "description": "Din ikke-deponerede pung kan ikke nå netværket lige nu. Prøv igen, når du er online.",

@@ -4049,6 +4049,9 @@
     "payTo": "Sasula {address}",
     "payment": "Okusasula"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Omuwendo gw'enkyusa guyinza okuba nga gukaddiye"
+  },
   "SelfCustodialOffline": {
     "title": "Envalopu si ku yintaneeti",
     "description": "Envalopu yo etesigibwamu tesobola kutuuka ku yintaneeti kati. Gezaako nate ng'oddayo ku yintaneeti.",

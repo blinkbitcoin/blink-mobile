@@ -13358,6 +13358,12 @@ type RootTranslation = {
 		 */
 		cta: string
 	}
+	SelfCustodialStaleRate: {
+		/**
+		 * E​x​c​h​a​n​g​e​ ​r​a​t​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e
+		 */
+		notice: string
+	}
 	SelfCustodialOffline: {
 		/**
 		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
@@ -26894,6 +26900,12 @@ export type TranslationFunctions = {
 		 * Read
 		 */
 		cta: () => LocalizedString
+	}
+	SelfCustodialStaleRate: {
+		/**
+		 * Exchange rate may be out of date
+		 */
+		notice: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

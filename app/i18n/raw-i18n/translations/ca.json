@@ -4049,6 +4049,9 @@
     "payTo": "Pagar a {address}",
     "payment": "Pagament"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "El tipus de canvi pot estar desactualitzat"
+  },
   "SelfCustodialOffline": {
     "title": "La cartera està fora de línia",
     "description": "La teva cartera no custodial no pot arribar a la xarxa ara mateix. Torna-ho a provar quan estiguis connectat.",

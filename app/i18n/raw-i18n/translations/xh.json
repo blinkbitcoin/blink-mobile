@@ -4049,6 +4049,9 @@
     "payTo": "Hlawula ku-{address}",
     "payment": "Intlawulo"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Izinga lotshintshiselwano lisenokuba lidlule ixesha"
+  },
   "SelfCustodialOffline": {
     "title": "Ingxowa-mali ayikho kwi-intanethi",
     "description": "Ingxowa-mali yakho engekho kugcino ayinakufikelela kwinethiwekhi ngoku. Zama kwakhona xa ubuyela kwi-intanethi.",

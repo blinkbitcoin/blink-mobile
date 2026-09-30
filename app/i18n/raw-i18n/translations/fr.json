@@ -4049,6 +4049,9 @@
         "payTo": "Payer à {address}",
         "payment": "Paiement"
     },
+    "SelfCustodialStaleRate": {
+        "notice": "Le taux de change n'est peut-être plus à jour"
+    },
     "SelfCustodialOffline": {
         "title": "Le portefeuille est hors ligne",
         "description": "Votre portefeuille non-custodial ne peut pas atteindre le réseau pour le moment. Réessayez lorsque vous serez de nouveau en ligne.",

@@ -4049,6 +4049,9 @@
         "payTo": "Pagar a {address}",
         "payment": "Pagamento"
     },
+    "SelfCustodialStaleRate": {
+        "notice": "A taxa de câmbio pode estar desatualizada"
+    },
     "SelfCustodialOffline": {
         "title": "A carteira está offline",
         "description": "A sua carteira não custodial não consegue alcançar a rede neste momento. Tente novamente quando voltar a estar online.",

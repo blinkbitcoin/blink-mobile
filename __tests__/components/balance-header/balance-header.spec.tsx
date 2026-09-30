@@ -24,6 +24,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
         balanceLabelBtc: () => "Balance · SATS",
         balanceLabelUsd: () => "Balance · USD",
       },
+      SelfCustodialStaleRate: {
+        notice: () => "Exchange rate may be out of date",
+      },
     },
   }),
 }))
@@ -121,5 +124,44 @@ describe("BalanceHeader", () => {
 
     const placeholder = getByTestId("hidden-balance-placeholder")
     expect(within(placeholder).queryByText(/./)).toBeNull()
+  })
+
+  describe("the stale-rate notice", () => {
+    it("is absent by default", () => {
+      const { queryByTestId } = renderHeader()
+
+      // Anchor: the header really rendered.
+      expect(queryByTestId("balance-value")).not.toBeNull()
+      expect(queryByTestId("balance-stale-rate")).toBeNull()
+    })
+
+    it("appears beside the balance when the rate behind it is old", () => {
+      const { getByText, getByTestId } = renderHeader({ isRateStale: true })
+
+      // The figure is still shown: an old rate is a caveat on a number, not a reason
+      // to withhold it.
+      expect(getByTestId("balance-value")).toBeTruthy()
+      expect(getByText("Exchange rate may be out of date")).toBeTruthy()
+    })
+
+    it("stays hidden while the balance itself is hidden", () => {
+      mockHideAmount = true
+
+      const { queryByTestId } = renderHeader({ isRateStale: true })
+
+      // Nothing is on screen to qualify, and the notice would leak that a balance
+      // exists to price.
+      expect(queryByTestId("balance-value")).toBeNull()
+      expect(queryByTestId("balance-stale-rate")).toBeNull()
+    })
+
+    it("is not shown while the balance is still loading", () => {
+      const { queryByTestId } = renderHeader({ isRateStale: true, loading: true })
+
+      // There is no figure yet to qualify, so the caveat would be noise under a
+      // skeleton.
+      expect(queryByTestId("balance-value")).toBeNull()
+      expect(queryByTestId("balance-stale-rate")).toBeNull()
+    })
   })
 })

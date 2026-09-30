@@ -4200,6 +4200,9 @@ const en: BaseTranslation = {
     body: "To learn more read our blog post",
     cta: "Read",
   },
+  SelfCustodialStaleRate: {
+    notice: "Exchange rate may be out of date",
+  },
   SelfCustodialOffline: {
     title: "Wallet is offline",
     description:

@@ -4049,6 +4049,9 @@
     "payTo": "Bayar kepada {address}",
     "payment": "Pembayaran"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Kadar pertukaran mungkin sudah lapuk"
+  },
   "SelfCustodialOffline": {
     "title": "Dompet luar talian",
     "description": "Dompet bukan kustodian anda tidak dapat mencapai rangkaian sekarang. Cuba lagi apabila anda dalam talian semula.",

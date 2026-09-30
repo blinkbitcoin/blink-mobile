@@ -4049,6 +4049,9 @@
         "payTo": "{address}に支払い",
         "payment": "支払い"
     },
+    "SelfCustodialStaleRate": {
+        "notice": "為替レートが最新でない可能性があります"
+    },
     "SelfCustodialOffline": {
         "title": "ウォレットはオフラインです",
         "description": "非保管型ウォレットは現在ネットワークに接続できません。オンラインに戻ったら再試行してください。",

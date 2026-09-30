@@ -4049,6 +4049,9 @@
     "payTo": "Betaal aan {address}",
     "payment": "Betaling"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Wisselkoers is dalk verouderd"
+  },
   "SelfCustodialOffline": {
     "title": "Beursie is vanlyn",
     "description": "Jou nie-bewaarderbeursie kan nie die netwerk nou bereik nie. Probeer weer wanneer jy aanlyn is.",

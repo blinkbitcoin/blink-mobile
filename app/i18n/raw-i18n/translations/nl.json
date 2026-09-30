@@ -4049,6 +4049,9 @@
     "payTo": "Betalen aan {address}",
     "payment": "Betaling"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "De wisselkoers is mogelijk verouderd"
+  },
   "SelfCustodialOffline": {
     "title": "Wallet is offline",
     "description": "Je niet-bewaarde wallet kan het netwerk momenteel niet bereiken. Probeer het opnieuw wanneer je weer online bent.",

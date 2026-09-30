@@ -4049,6 +4049,9 @@
     "payTo": "{address} adresine öde",
     "payment": "Ödeme"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Döviz kuru güncel olmayabilir"
+  },
   "SelfCustodialOffline": {
     "title": "Cüzdan çevrimdışı",
     "description": "Gözetimsiz cüzdanınız şu anda ağa ulaşamıyor. Tekrar çevrimiçi olduğunuzda tekrar deneyin.",

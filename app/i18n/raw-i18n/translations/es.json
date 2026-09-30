@@ -4049,6 +4049,9 @@
         "payTo": "Pagar a {address}",
         "payment": "Pago"
     },
+    "SelfCustodialStaleRate": {
+        "notice": "El tipo de cambio puede estar desactualizado"
+    },
     "SelfCustodialOffline": {
         "title": "La billetera está sin conexión",
         "description": "Tu billetera no custodial no puede alcanzar la red en este momento. Inténtalo de nuevo cuando vuelvas a estar en línea.",

@@ -29,6 +29,18 @@ import { useEffectiveDisplayCurrency } from "./use-effective-display-currency"
 
 export const SATS_PER_BTC = 100000000
 
+export const PriceStatus = {
+  /** A conversion is available. */
+  Ready: "ready",
+  /** None yet, but a source may still answer — the first frames of a launch or an
+   *  account switch. Callers should wait rather than show a figure. */
+  Pending: "pending",
+  /** None, and none is coming. Callers must show something other than a spinner. */
+  Unavailable: "unavailable",
+} as const
+
+export type PriceStatus = (typeof PriceStatus)[keyof typeof PriceStatus]
+
 const PRICE_POLL_INTERVAL_MS = 5 * 60 * 1000
 
 export const usePriceConversion = () => {
@@ -41,7 +53,11 @@ export const usePriceConversion = () => {
    * The SDK's feed, which a self-custodial account can read without the Blink backend.
    * Empty outside a self-custodial session, and expired when it is too old to present.
    */
-  const { rates: sdkRates, freshness: sdkFreshness } = useFiatRates()
+  const {
+    rates: sdkRates,
+    freshness: sdkFreshness,
+    hasSettled: sdkHasSettled,
+  } = useFiatRates()
   const sdkPriceRates =
     isSelfCustodial && sdkFreshness !== RateFreshness.Expired
       ? toPriceRates(sdkRates, displayCurrency)
@@ -63,7 +79,7 @@ export const usePriceConversion = () => {
   const skipUnauthed = isSelfCustodial
     ? Boolean(sdkPriceRates)
     : isAuthed || Boolean(authedPrice)
-  const { data: unauthedData } = useRealtimePriceUnauthedQuery({
+  const { data: unauthedData, loading: unauthedLoading } = useRealtimePriceUnauthedQuery({
     skip: skipUnauthed,
     variables: { currency: displayCurrency },
     pollInterval: skipUnauthed ? undefined : PRICE_POLL_INTERVAL_MS,
@@ -187,8 +203,24 @@ export const usePriceConversion = () => {
       ? RateFreshness.Fresh
       : RateFreshness.Expired
 
+  /**
+   * Whether a caller waiting on a conversion should keep waiting. Only self-custodial
+   * can reach Unavailable: it is the only session whose price source can be known to
+   * have finished and come back empty. A custodial session keeps today's behaviour,
+   * where no price means the screen is still loading.
+   */
+  const priceStatus: PriceStatus = converters
+    ? PriceStatus.Ready
+    : isSelfCustodial && sdkHasSettled && !unauthedLoading
+      ? PriceStatus.Unavailable
+      : PriceStatus.Pending
+
   return {
     convertMoneyAmount: converters?.convertMoneyAmount,
+    /** Ready, Pending or Unavailable — see {@link PriceStatus}. A caller that today
+     *  renders a spinner on a missing `convertMoneyAmount` should render something
+     *  else on Unavailable, or it spins forever. */
+    priceStatus,
     convertMoneyAmountWithRounding: converters?.convertMoneyAmountWithRounding,
     displayCurrency,
     toDisplayMoneyAmount: createToDisplayAmount(displayCurrency),

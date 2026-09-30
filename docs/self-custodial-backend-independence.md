@@ -234,11 +234,48 @@ beyond that. A feed timestamped in the future (clock correction, a user setting
 the date back) reads fresh rather than expired — blanking a figure the app just
 fetched is the worse failure.
 
-**Still open, and carried into Phase 2b:** the staleness marker and the
-sats-first fallback are not yet on screen. `priceFreshness` is plumbed but no
-surface reads it, and the permanent spinners at inventory rows 3 and 4 are gone
-only because a rate is now almost always available — not because those screens
-can yet render without one.
+### Phase 2b — Saying so on screen · done
+
+`usePriceConversion` now also returns `priceStatus`: `Ready`, `Pending` (none
+yet, a source may still answer) or `Unavailable` (none, and none is coming).
+Only a self-custodial session can reach `Unavailable`, because it is the only
+one whose price source can be known to have finished empty — the fiat provider
+reports `hasSettled`. A custodial session keeps today's behaviour, where no
+price means the screen is still loading.
+
+- **Balance header, no rate at all.** `useTotalBalance` shows the Bitcoin
+  balance in sats instead of a skeleton. The balance is read from the SDK's own
+  storage and is not in doubt; only its price is. A held USD balance is left out
+  of that figure rather than completed with a rate we do not have.
+- **Balance header, old rate.** A `Stale` rate adds one line under the figure:
+  "Exchange rate may be out of date". It never withholds the number — an old
+  rate is a caveat on it, not a reason to hide it — and it is suppressed while
+  the balance is hidden or still loading, and when the figure is in sats, which
+  needs no rate.
+
+**Deliberately not done: a sats-only receive and send flow.** The original plan
+called for one, on the reading that inventory rows 3 and 4 spin forever without
+a rate. Looking again at the routing, that case is almost unreachable:
+
+- Every receive, send, conversion and deposit route is wrapped in `OfflineGate`
+  ([root-navigator.tsx:229-262](../app/navigation/root-navigator.tsx)), which
+  shows the offline notice whenever the Spark status is `Offline`, `Error` or
+  `Unavailable`.
+- The SDK's fiat feed is served by Breez's own gRPC service, not by Blink. If
+  Spark is reachable enough to open the receive screen, that feed is reachable
+  too; if it is not, `OfflineGate` has already taken over.
+- A feed older than 24 h implies 24 h without Spark, which is the same gate.
+
+So the residual gap is a wallet that connected to Spark but cannot reach the
+fiat feed — narrow enough that rebuilding the receive request state to be
+fiat-optional is not worth the risk it would carry. **Home is the exception**,
+since it sits outside `OfflineGate`, and that is exactly the case the sats
+fallback above covers.
+
+If this is revisited, the work is in
+[use-payment-request.ts:566](../app/self-custodial/hooks/use-payment-request.ts),
+which returns null without a converter, and in the receive components that take
+`convertMoneyAmount` as a required prop.
 
 ### Phase 3 — Currency list independence
 
@@ -422,7 +459,7 @@ dependency.
 |-------|---------|-----------|--------|
 | 1 | Outage reproducible on demand | — | Done |
 | 2 | **Wallet is usable offline** | 1 | Done |
-| 2b | Staleness marker and sats-first fallback | 2 | |
+| 2b | Staleness marker and home sats fallback | 2 | Done |
 | 3 | Currency selection works offline | 2 | |
 | 4 | Honest, quiet UI | 1 | |
 | 5 | Lightning address degrades gracefully | 1, Q1 | |

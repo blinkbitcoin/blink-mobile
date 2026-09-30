@@ -4049,6 +4049,9 @@
     "payTo": "{address}man pagay",
     "payment": "Pagay"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Chaninchay yupay manaraqchá musuqchu"
+  },
   "SelfCustodialOffline": {
     "title": "Wallet manan conexionniyuqchu",
     "description": "Non-custodial walletniyki kunanqa manan networkman chayayta atinchu. Conexionniyuq kutipiwanki.",

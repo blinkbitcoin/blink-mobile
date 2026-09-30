@@ -4049,6 +4049,9 @@
     "payTo": "دفع إلى {address}",
     "payment": "دفعة"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "قد يكون سعر الصرف قديمًا"
+  },
   "SelfCustodialOffline": {
     "title": "المحفظة غير متصلة",
     "description": "محفظتك غير المحتجزة لا يمكنها الوصول إلى الشبكة الآن. حاول مرة أخرى عندما تكون متصلاً بالإنترنت.",
