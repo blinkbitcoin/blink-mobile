@@ -177,10 +177,7 @@
   },
   "overrides": [
     {
-      "files": [
-        "app/utils/storage/legacy-key-store.ts",
-        "app/utils/storage/secureStorage.ts"
-      ],
+      "files": ["app/utils/storage/legacy-key-store.ts"],
       "rules": {
         "no-restricted-imports": "off"
       }

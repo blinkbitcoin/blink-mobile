@@ -1,10 +1,22 @@
 import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
+import {
+  readSelfCustodialIndexPresence,
+  SelfCustodialIndexPresence,
+  SWEEP_IDLE_TIMEOUT_MS,
+  sweepMnemonicMigration,
+} from "@app/self-custodial/storage/account-index"
 
 import { recordAppError } from "@app/utils/error-reporting"
 
 import { reportError } from "@app/utils/error-logging"
-import { getAllKeys, loadString, saveJson, saveString } from "@app/utils/storage"
+import {
+  getAllKeys,
+  loadString,
+  readString,
+  saveJson,
+  saveString,
+} from "@app/utils/storage"
 import KeyStoreWrapper, { type GaloyAuthTokenKey } from "@app/utils/storage/secureStorage"
 
 import {
@@ -140,6 +152,19 @@ type LoadedPersistentState = {
   // dirty-check ref from this, so a failed adoption ("") makes the first
   // save retry the keychain write instead of skipping it.
   persistedToken: string
+  /**
+   * The blob could not be read, so `state` is defaults rather than anything
+   * loaded. Saving would put those defaults over a file that is still intact
+   * and would have read fine next launch, which is how a momentary storage
+   * fault becomes permanent loss of every preference.
+   */
+  holdBlobWrites?: boolean
+  /**
+   * The loader changed the state it is handing back — today only by clearing an
+   * owed reinstall wipe — so it has to be written even though the user has
+   * touched nothing.
+   */
+  stateChanged?: boolean
 }
 
 const handleMigratedState = async (
@@ -186,18 +211,171 @@ const handleMigratedState = async (
   }
 }
 
+/**
+ * Collects the failures of an erase that runs in more than one step, so the
+ * caller can ask one question at the end: did all of it complete?
+ *
+ * A step that ran and failed leaves the seeds exactly where a step that never
+ * ran does, so both have to reach the same answer — that is what marks the
+ * erase still owed instead of silently reporting a wipe that only half
+ * happened.
+ */
+const createEraseTracker = (reportFailure: (what: string) => void) => {
+  let erased = true
+  return {
+    onFailure: (what: string) => {
+      erased = false
+      reportFailure(what)
+    },
+    isComplete: () => erased,
+  }
+}
+
+const withoutOwedWipe = (state: PersistentState): PersistentState => {
+  const { pendingReinstallKeyMaterialWipe: _owed, ...rest } = state
+  return rest
+}
+
 const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
-  // Genuinely a fresh install: the key is absent, not unreadable, and an
-  // unrecognized schema is Failed. This branch owns only the trigger and the
-  // reporting — WHICH credentials survive uninstall and must be wiped is
-  // secureStorage's knowledge. It re-runs on every boot until the first blob
-  // write, so a failed wipe also retries across boots.
-  await KeyStoreWrapper.clearUninstallSurvivingCredentials((what) => {
+  const reportFailure = (what: string) => {
     recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
       alwaysRecord: true,
     })
-  })
-  return { state: defaultPersistentState, persistedToken: "" }
+  }
+
+  // Read before anything is erased, because both erases below are gated on it.
+  //
+  // The index is the second witness the key material waits for and the session
+  // credentials do not: it lives in AsyncStorage, which a real reinstall clears,
+  // so accounts still listed prove this device is not one. Absence is the
+  // signal, never an empty list — readIndex degrades a value it cannot
+  // recognise to zero entries, which would let a corrupted index authorise the
+  // erase it should have prevented. A read that fails proves nothing either
+  // way, and is reported, because a verdict that keeps being wrong is invisible.
+  const presence = await readSelfCustodialIndexPresence()
+
+  // Two steps with the session wipe between them, so failures are collected
+  // rather than answered one at a time.
+  const keyMaterial = createEraseTracker(reportFailure)
+
+  // Before either half, and only on a confirmed reinstall — see
+  // clearLegacyKeyStore for what it does and why it goes first. On a false
+  // positive it would take the legacy mnemonic copies that mnemonicSlotFor
+  // keeps as rollback insurance, and a re-login is not worth that.
+  //
+  // Its failure counts against the key material, not the session: those copies
+  // are seeds, so a clear that did not happen is a reinstall that left them
+  // behind, and the marker below is what brings the next boot back for them.
+  if (presence === SelfCustodialIndexPresence.Absent) {
+    await KeyStoreWrapper.clearLegacyKeyStore(keyMaterial.onFailure)
+  }
+
+  // This branch owns only the trigger and the reporting; WHICH credentials
+  // survive uninstall is secureStorage's knowledge. It re-runs every boot until
+  // the first blob write, so a failed wipe retries across boots.
+  await KeyStoreWrapper.clearUninstallSurvivingCredentials(reportFailure)
+
+  if (presence === SelfCustodialIndexPresence.Absent) {
+    // An erase that ran and failed is as owed as one that never ran: the seeds
+    // are still there, and nothing outside this branch can reach them once the
+    // account ids are gone. The blob is written either way, marked with what is
+    // still owed — holding it back would keep re-triggering the session wipe
+    // above, which signs the user out on every launch with nothing to end it.
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure)
+    if (keyMaterial.isComplete()) {
+      return { state: defaultPersistentState, persistedToken: "" }
+    }
+    // stateChanged, because nothing else will write this blob: the user has
+    // touched nothing on a launch that just signed them out, and a marker that
+    // is never written is a marker the next boot cannot read.
+    return {
+      state: { ...defaultPersistentState, pendingReinstallKeyMaterialWipe: true },
+      persistedToken: "",
+      stateChanged: true,
+    }
+  }
+
+  if (presence === SelfCustodialIndexPresence.Present) {
+    // Not a fresh install after all, so nothing is owed. The session half above
+    // has already run, which costs a re-login and no key material.
+    recordAppError(
+      new Error("Reinstall key-material wipe skipped: account index is populated"),
+      { alwaysRecord: true },
+    )
+    return { state: defaultPersistentState, persistedToken: "" }
+  }
+
+  // Unknown: the index could not answer, so the erase may still be owed. It is
+  // recorded in the blob rather than kept alive by withholding the blob — the
+  // marker is cleared by an uninstall, which is exactly right, because a real
+  // reinstall should start the whole verdict over.
+  recordAppError(
+    new Error("Reinstall key-material wipe deferred: account index unreadable"),
+    { alwaysRecord: true },
+  )
+  return {
+    state: { ...defaultPersistentState, pendingReinstallKeyMaterialWipe: true },
+    persistedToken: "",
+    stateChanged: true,
+  }
+}
+
+/**
+ * The owed erase, retried on a later boot.
+ *
+ * It can only run while the device still has no account of its own. Once one
+ * exists, the tracked list names that account's mnemonic too, and the erase
+ * could no longer tell the previous owner's seeds from this user's — so the
+ * window closes, loudly, rather than risking the wrong one.
+ */
+const retryOwedKeyMaterialWipe = async (
+  state: PersistentState,
+): Promise<{ state: PersistentState; changed: boolean }> => {
+  if (!state.pendingReinstallKeyMaterialWipe) return { state, changed: false }
+
+  const reportFailure = (what: string) => {
+    recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
+      alwaysRecord: true,
+    })
+  }
+
+  const presence = await readSelfCustodialIndexPresence()
+  if (presence === SelfCustodialIndexPresence.Unknown) {
+    return { state, changed: false }
+  }
+
+  if (presence === SelfCustodialIndexPresence.Present) {
+    recordAppError(
+      new Error("Reinstall key-material wipe abandoned: an account now exists"),
+      { alwaysRecord: true },
+    )
+    return { state: withoutOwedWipe(state), changed: true }
+  }
+
+  // Both steps, in the order handleFreshInstall runs them. The legacy clear is
+  // not optional here either: on the Unknown verdict that recorded the marker,
+  // it never ran at all, so leaving it out would retire the marker having
+  // erased only the copies in the new store.
+  const keyMaterial = createEraseTracker(reportFailure)
+  await KeyStoreWrapper.clearLegacyKeyStore(keyMaterial.onFailure)
+  await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure)
+
+  return keyMaterial.isComplete()
+    ? { state: withoutOwedWipe(state), changed: true }
+    : { state, changed: false }
+}
+
+/**
+ * Boots on defaults while keeping whatever session the keychain still holds.
+ * The credential lives there and is unaffected by anything that went wrong with
+ * the blob: losing settings must not cost the session.
+ */
+const bootOnDefaultsKeepingSession = async (): Promise<LoadedPersistentState> => {
+  const keychainToken = await KeyStoreWrapper.getActiveToken()
+  return {
+    state: { ...defaultPersistentState, galoyAuthToken: keychainToken },
+    persistedToken: keychainToken,
+  }
 }
 
 const handleUnusableBlob = async (
@@ -206,13 +384,28 @@ const handleUnusableBlob = async (
 ): Promise<LoadedPersistentState> => {
   recordAppError(error, { alwaysRecord: true })
   await quarantine()
-  // The credential lives in the keychain and is unaffected by blob damage:
-  // losing settings must not cost the session.
-  const keychainToken = await KeyStoreWrapper.getActiveToken()
-  return {
-    state: { ...defaultPersistentState, galoyAuthToken: keychainToken },
-    persistedToken: keychainToken,
-  }
+  return bootOnDefaultsKeepingSession()
+}
+
+/**
+ * The store could not answer, which is the one thing an absent key must never
+ * be confused with.
+ *
+ * Nothing is quarantined: the blob was not read, so there is no damage to
+ * describe and no reason to assume any. Nothing is wiped either, which is the
+ * whole point — the fresh-install branch destroys every credential that
+ * outlives an uninstall, and since blinkbitcoin/blink-wip#1162 that includes
+ * the mnemonics, from both stores. A transient AsyncStorage fault answered that
+ * way would take a user's key material with it.
+ *
+ * This boot runs on defaults and the next one reads the blob again.
+ */
+const handleUnreadableStore = async (err: unknown): Promise<LoadedPersistentState> => {
+  recordAppError(
+    err instanceof Error ? err : new Error(`Persistent state read failed: ${err}`),
+    { alwaysRecord: true },
+  )
+  return { ...(await bootOnDefaultsKeepingSession()), holdBlobWrites: true }
 }
 
 export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
@@ -220,15 +413,23 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
   scrubQuarantinedTokens().catch(() => {})
 
   // Read as text and parse here rather than via loadJson, which reports an
-  // absent key and an unparseable one identically. That distinction is now
+  // absent key and an unparseable one identically. That distinction is
   // load-bearing: "absent" triggers the reinstall wipe, and a truncated blob
   // must never be mistaken for a fresh install and cost the user every session
-  // credential they have. (A getItem that throws still surfaces as null, so a
-  // failed read remains indistinguishable from an absent key — closing that
-  // would mean changing loadString's contract for all of its callers.)
-  const raw = await loadString(PERSISTENT_STATE_KEY)
+  // credential they have. readString draws the third one this branch needs — a
+  // read that failed is not a key that is not there.
+  // One immediate retry, no backoff, mirroring the wipe's removeWithRetry: the
+  // failures worth a second attempt here are one-shot storage hiccups, and boot
+  // cannot wait out anything longer-lived. Without it a persistent fault would
+  // mean a session that never persists, every launch, which is worse for the
+  // user than the one-time loss this replaces.
+  let read = await readString(PERSISTENT_STATE_KEY)
+  if (read.status === "failed") read = await readString(PERSISTENT_STATE_KEY)
+  if (read.status === "failed") return handleUnreadableStore(read.err)
+
   let data: unknown = null
-  if (raw !== null) {
+  if (read.status === "found") {
+    const raw = read.value
     try {
       data = JSON.parse(raw)
     } catch (err) {
@@ -236,12 +437,30 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
         quarantineUnparseableState(raw, err),
       )
     }
+
+    // Parsed, but to something migratePersistentState scores as no data at all:
+    // its guard is `if (!data)`, so a stored "null", "0" or "false" would reach
+    // the fresh-install branch and spend the wipe on a device that never
+    // reinstalled. A key that is present is evidence against a fresh install
+    // whatever it holds, so this goes to the damaged-blob path, which also
+    // quarantines a copy.
+    if (!data) {
+      return handleUnusableBlob(
+        new Error("Persistent state parsed to an empty value"),
+        () => quarantineUnparseableState(raw, new Error("empty parsed value")),
+      )
+    }
   }
 
   const result = await migratePersistentState(data)
   switch (result.status) {
-    case MigrationStatus.Ok:
-      return handleMigratedState(result.state)
+    case MigrationStatus.Ok: {
+      const loaded = await handleMigratedState(result.state)
+      // A reinstall whose key-material erase never finished records it in the
+      // blob; this is the boot that acts on it.
+      const retried = await retryOwedKeyMaterialWipe(loaded.state)
+      return { ...loaded, state: retried.state, stateChanged: retried.changed }
+    }
     case MigrationStatus.NoData:
       return handleFreshInstall()
     case MigrationStatus.Failed:
@@ -287,13 +506,19 @@ const removeActiveTokenDurably = async (
 const savePersistentState = async (
   state: PersistentState,
   lastPersistedTokenRef: React.MutableRefObject<string>,
+  skipBlob: boolean,
 ): Promise<void> => {
   const { galoyAuthToken, ...stateWithoutToken } = state
-  try {
-    await savePersistentStateBlob(stateWithoutToken)
-  } catch (err) {
-    // Storage failures are crash-adjacent: never downgrade on message wording.
-    reportError("Persistent state save", err, { alwaysRecord: true })
+  // Held back only for the blob, never for the token below. The two live in
+  // different stores and failed independently: the session is whatever the
+  // keychain says, and a login during a load-failed boot has to survive it.
+  if (!skipBlob) {
+    try {
+      await savePersistentStateBlob(stateWithoutToken)
+    } catch (err) {
+      // Storage failures are crash-adjacent: never downgrade on message wording.
+      reportError("Persistent state save", err, { alwaysRecord: true })
+    }
   }
   if (galoyAuthToken !== lastPersistedTokenRef.current) {
     if (!galoyAuthToken) {
@@ -345,6 +570,15 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
   const hasModified = React.useRef(false)
   const lastPersistedTokenRef = React.useRef("")
   const saveQueueRef = React.useRef<Promise<void>>(Promise.resolve())
+  /**
+   * Set when this boot must not write the blob, and never cleared for the
+   * session. See holdBlobWrites: either the blob was never read, or a reinstall
+   * wipe is still owed and only the blob's absence keeps it owed.
+   *
+   * Changes still apply in memory; only the write is held back, and the
+   * keychain token is independent and keeps saving.
+   */
+  const holdBlobWritesRef = React.useRef(false)
 
   React.useEffect(() => {
     if (hasModified.current && persistentState) {
@@ -353,16 +587,49 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
       // (savePersistentState catches all its own failures, so the chain
       // cannot reject and wedge.)
       saveQueueRef.current = saveQueueRef.current.then(() =>
-        savePersistentState(persistentState, lastPersistedTokenRef),
+        savePersistentState(
+          persistentState,
+          lastPersistedTokenRef,
+          holdBlobWritesRef.current,
+        ),
       )
     }
   }, [persistentState])
 
   React.useEffect(() => {
     ;(async () => {
-      const { state: loadedState, persistedToken } = await loadPersistentState()
+      const {
+        state: loadedState,
+        persistedToken,
+        holdBlobWrites,
+        stateChanged,
+      } = await loadPersistentState()
+      holdBlobWritesRef.current = Boolean(holdBlobWrites)
       lastPersistedTokenRef.current = persistedToken
+      // The load itself changed the state, so the save effect below has to run
+      // without waiting for the user to touch anything.
+      if (stateChanged) hasModified.current = true
       setPersistentState(loadedState)
+      // Off the critical path and never awaited: the mnemonics of accounts the
+      // user does not open would otherwise migrate only if something happened
+      // to read them, and would be stranded when the legacy store is dropped.
+      // InteractionManager expresses the same intent but is deprecated in this
+      // React Native version and warns on every boot; SWEEP_IDLE_TIMEOUT_MS is
+      // what keeps the two equivalent.
+      //
+      // No cleanup and the handle discarded, which is safe rather than
+      // overlooked: the sweep is idempotent and its writes take their turn in
+      // the slot queue, so a second schedule — a fast remount, or StrictMode in
+      // development — costs one pass over an index with nothing left to move.
+      requestIdleCallback(
+        () => {
+          sweepMnemonicMigration().catch(() => {
+            // Never rejects by contract; a caught error here would still be a
+            // migration detail and must not reach a boot path.
+          })
+        },
+        { timeout: SWEEP_IDLE_TIMEOUT_MS },
+      )
     })()
   }, [])
 

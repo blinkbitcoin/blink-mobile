@@ -1,12 +1,19 @@
 import { ACCESSIBLE } from "react-native-keychain"
-import RNSecureKeyStore, {
-  ACCESSIBLE as LEGACY_ACCESSIBLE,
-} from "react-native-secure-key-store"
 
-import { type SecureExists } from "./secure-store"
+import { recordAppError } from "@app/utils/error-reporting"
+
+import { eraseEntireLegacyStore } from "./legacy-key-store"
+import {
+  type SecureExists,
+  secureExists,
+  secureRead,
+  secureRemove,
+  secureWrite,
+} from "./secure-store"
 import {
   type ReadThroughArgs,
   existsThrough,
+  onSlot,
   readThrough,
   removeThrough,
   writeThrough,
@@ -38,24 +45,6 @@ export type SessionProfilesRead =
   | { status: "absent" }
   | { status: "failed"; err: unknown }
 
-// Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
-// `get`, android RNSecureKeyStoreModule#get). Every other code means the read
-// itself went wrong.
-//
-// True on Android only. The iOS module discards the OSStatus from
-// SecItemCopyMatching (`searchKeychainCopyMatching` returns nil for any failure)
-// and `get` rejects nil with "404", so an entitlement or decode error is
-// indistinguishable from a missing key there. Every caller that branches on this
-// therefore degrades to "absent" on iOS; the distinction becomes real when the
-// slots move to react-native-keychain (blink-wip#1161).
-const KEY_NOT_FOUND_CODE = "404"
-
-const isKeyNotFound = (err: unknown): boolean =>
-  typeof err === "object" &&
-  err !== null &&
-  "code" in err &&
-  String((err as { code: unknown }).code) === KEY_NOT_FOUND_CODE
-
 /**
  * The failed-PIN state, stored as one value under one key — see the note above
  * the PIN lockout block.
@@ -77,6 +66,83 @@ type SecureStoreRead =
   | { readonly status: "absent" }
   | { readonly status: "failed"; readonly err: unknown }
 
+/**
+ * What the tracked account list holds, or that it could not be read.
+ *
+ * Two answers rather than three, because the stored format cannot be damaged as
+ * a whole. `failed` read as `ok` with no ids would make the next write drop
+ * every id already tracked, so those stay apart — but "read it and it was
+ * garbage" is no longer a state callers branch on. It used to be, and it used
+ * to be permanent: the only repair rebuilt the list from the account index, and
+ * a reinstall clears that index before the wipe ever runs.
+ */
+type MnemonicAccountsRead =
+  | { readonly status: "ok"; readonly accountIds: readonly string[] }
+  /**
+   * `cause` is not a third status in disguise: every caller still branches on
+   * `failed` alone. It exists because the two failures have opposite lifetimes
+   * and only the report can say which one is on the device — a read that failed
+   * clears itself on the next boot, while a value that cannot be read never
+   * does, and one label for both leaves an eternal report looking transient.
+   */
+  | { readonly status: "failed"; readonly cause: MnemonicAccountsFailure }
+
+const MnemonicAccountsFailure = {
+  /** The keystore could not answer; the value itself may be fine. */
+  Read: "read",
+  /** It answered, and what it holds is not a list of ids. */
+  UnreadableValue: "unreadable-value",
+} as const
+
+type MnemonicAccountsFailure =
+  (typeof MnemonicAccountsFailure)[keyof typeof MnemonicAccountsFailure]
+
+/**
+ * The tracked list as earlier builds of this branch wrote it — see
+ * readMnemonicAccounts for why both shapes are read.
+ *
+ * An array that will not parse, or that holds anything but strings, is
+ * reported as unreadable rather than salvaged line by line: those lines are
+ * not account ids, and reading them as such would tell the wipe it had
+ * finished while every real mnemonic stayed on the device. "Failed" is the
+ * honest answer, and it is the one that keeps the wipe owed.
+ */
+const parseLegacyAccountIdArray = (raw: string): MnemonicAccountsRead => {
+  const unreadable: MnemonicAccountsRead = {
+    status: "failed",
+    cause: MnemonicAccountsFailure.UnreadableValue,
+  }
+  try {
+    const parsed: unknown = JSON.parse(raw)
+    if (!Array.isArray(parsed)) return unreadable
+    if (!parsed.every((id) => typeof id === "string")) return unreadable
+    return { status: "ok", accountIds: parsed.filter((id) => id.length > 0) }
+  } catch {
+    return unreadable
+  }
+}
+
+/**
+ * One immediate retry, no backoff, reporting the slot by name on a second
+ * failure. Both halves of the reinstall wipe use it, so the policy is stated
+ * once: the failures worth a second attempt are one-shot keystore hiccups, and
+ * boot cannot wait out anything longer-lived — the fresh-install branch re-runs
+ * the wipe on the next launch. A failure is reported, never thrown, and never
+ * stops the slots behind it.
+ */
+const retryOnce = async (remove: () => Promise<boolean>): Promise<boolean> => {
+  if (await remove()) return true
+  return remove()
+}
+
+const withOneRetry =
+  (onFailure: (what: string) => void) =>
+  async (remove: () => Promise<boolean>, what: string): Promise<boolean> => {
+    const ok = await retryOnce(remove)
+    if (!ok) onFailure(what)
+    return ok
+  }
+
 const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
 
 export default class KeyStoreWrapper {
@@ -90,12 +156,22 @@ export default class KeyStoreWrapper {
   private static readonly ACTIVE_TOKEN = GALOY_AUTH_TOKEN_KEY
   private static readonly MNEMONIC = "mnemonic"
   private static readonly MNEMONIC_NETWORK = "mnemonic_network"
+  /**
+   * Which accounts hold a mnemonic, so the reinstall wipe below can reach keys
+   * whose names carry an account id. The app's own index lives in AsyncStorage,
+   * which a reinstall clears, and enumerating the keychain is the one refactor
+   * this area must not have — see clearUninstallSurvivingCredentials. Storing
+   * the list beside the values it describes is what leaves the wipe with a
+   * fixed slot list and no enumeration.
+   *
+   * Account ids only. A leaked id names nothing a mnemonic could unlock.
+   */
+  private static readonly MNEMONIC_ACCOUNTS = "mnemonicAccounts"
 
   /**
-   * The slots that have moved to the Keychain-backed store
-   * (blinkbitcoin/blink-wip#1161). Each carries the protection class its value
-   * is written under and whether a migrated legacy copy is erased. Mnemonics
-   * are deliberately absent: they move in blinkbitcoin/blink-wip#1162.
+   * The protection class and erase rule for the six session slots that moved in
+   * blinkbitcoin/blink-wip#1161. Mnemonics moved too, in
+   * blinkbitcoin/blink-wip#1162, but on different terms — see mnemonicSlotFor.
    *
    * **The protection class changes for all of them.**
    * `react-native-keychain` has no `ALWAYS_THIS_DEVICE_ONLY` — Apple deprecated
@@ -128,6 +204,30 @@ export default class KeyStoreWrapper {
     }
   }
 
+  /**
+   * The mnemonic slots differ from every other migrated slot in two ways, both
+   * because losing one costs someone their money rather than a re-login
+   * (blinkbitcoin/blink-wip#1162).
+   *
+   * **The protection class does not change.** These are already
+   * `WHEN_UNLOCKED_THIS_DEVICE_ONLY` and stay there, so the silent-push window
+   * that `MIGRATED_ACCESSIBLE` accepts for the session slots never applies here.
+   *
+   * **The legacy copy is kept.** A mnemonic is immutable per account, so the two
+   * stores cannot diverge and the stale-value argument that justifies erasing
+   * the other slots does not hold. What retaining it buys is a downgrade and
+   * rollback that still find the value. The copies go in the explicit purge of
+   * blinkbitcoin/blink-wip#1163, never on the read path.
+   */
+  private static mnemonicSlotFor(key: string): ReadThroughArgs {
+    return {
+      slot: key,
+      legacyKey: key,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+      deleteLegacyOnMigrate: false,
+    }
+  }
+
   // ── migrated-slot primitives ──────────────────────────────────────────────
   // Reads and existence probes go through the read-through helper, so a slot
   // still living in the legacy store migrates the first time it is touched.
@@ -152,48 +252,6 @@ export default class KeyStoreWrapper {
   /** Collapses absent and failed for callers where either means do nothing. */
   private static async migratedRead(key: string): Promise<string | null> {
     const read = await KeyStoreWrapper.migratedReadWithStatus(key)
-    return read.status === "found" ? read.value : null
-  }
-
-  // ── legacy-only primitives ────────────────────────────────────────────────
-  // Still backed by react-native-secure-key-store, and used only by the slots
-  // that have not moved yet. `accessible` is always passed explicitly and never
-  // defaulted: a default would let a new method silently downgrade the
-  // protection class of whatever it stores.
-
-  private static async write(
-    key: string,
-    value: string,
-    accessible: LEGACY_ACCESSIBLE,
-  ): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.set(key, value, { accessible })
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private static async erase(key: string): Promise<boolean> {
-    try {
-      await RNSecureKeyStore.remove(key)
-      return true
-    } catch {
-      return false
-    }
-  }
-
-  private static async readWithStatus(key: string): Promise<SecureStoreRead> {
-    try {
-      return { status: "found", value: await RNSecureKeyStore.get(key) }
-    } catch (err) {
-      return isKeyNotFound(err) ? { status: "absent" } : { status: "failed", err }
-    }
-  }
-
-  /** Collapses absent and failed for callers where either means do nothing. */
-  private static async read(key: string): Promise<string | null> {
-    const read = await KeyStoreWrapper.readWithStatus(key)
     return read.status === "found" ? read.value : null
   }
 
@@ -467,48 +525,28 @@ export default class KeyStoreWrapper {
 
   /**
    * Reinstall guard: the iOS keychain outlives the app install, so a genuine
-   * fresh install must clear every session credential the UI can reach.
-   * Owning the list here means adding a new uninstall-surviving slot and
-   * adding it to this wipe are the same edit, in the same file.
+   * fresh install must clear every session credential the UI can reach. The
+   * list lives here so that adding an uninstall-surviving slot and wiping it
+   * are one edit in one file.
    *
-   * Two consequences of the slots above moving stores, both deliberate and
-   * neither free:
+   * **Session credentials only, and unconditional.** This half runs on every
+   * fresh-install verdict because being wrong about it costs a re-login. The
+   * key material is the other half and waits for a second witness, because being
+   * wrong about that costs someone their money. Keeping the two apart is the
+   * safety property of this design: do not move a mnemonic slot into this list,
+   * and do not read the gate on the other half as redundant
+   * (blinkbitcoin/blink-wip#1162).
    *
-   * 1. On iOS the legacy library's unscoped sweep used to delete the app's own
-   *    generic passwords, mnemonics included, on the first legacy call after a
-   *    reinstall. The read-through helper disarms that sweep before every
-   *    legacy touch, so mnemonics now survive an uninstall for the first time.
-   *    That is the product decision recorded in blinkbitcoin/blink-wip#1143
-   *    (finding 2) and it blocks blinkbitcoin/blink-wip#1162; it arrives here
-   *    ahead of that answer and nothing in this file can defer it.
-   * 2. Adding the PIN and the biometrics flag widens a known false positive:
-   *    the caller reaches this through `MigrationStatus.NoData`, which a
-   *    throwing AsyncStorage read can produce without a reinstall, and the app
-   *    lock now goes with the session. Taken deliberately — a real reinstall
-   *    otherwise boots the next owner into a PIN nobody on the device chose,
-   *    which is unrecoverable, while this costs a lock the user can set again
-   *    on a boot that already signed them out loudly.
-   *
-   * Mnemonics are deliberately excluded: wallet keys outliving uninstall is a
-   * recovery/product decision, not cleanup (and their account index does not
-   * survive uninstall, so they cannot be enumerated here anyway).
-   *
-   * Each removal is retried once; a persistent failure is reported through
-   * onFailure but never thrown, and never stops the remaining slots — boot
-   * must go on and every slot must get its attempt.
+   * The PIN and the biometrics flag are here despite a known false positive:
+   * `MigrationStatus.NoData` can arrive without a reinstall. Deliberate, because
+   * a real reinstall otherwise boots the next owner into a PIN nobody on the
+   * device chose, which is unrecoverable, against a lock the user can set again.
    */
   public static async clearUninstallSurvivingCredentials(
     onFailure: (what: string) => void,
   ): Promise<void> {
-    const removeWithRetry = async (remove: () => Promise<boolean>, what: string) => {
-      // One immediate retry, no backoff: the failures worth a second attempt
-      // here are one-shot keystore hiccups, and boot cannot wait out anything
-      // longer-lived — the NoData branch re-runs this on the next launch.
-      const ok = (await remove()) || (await remove())
-      if (!ok) {
-        onFailure(what)
-      }
-    }
+    const removeWithRetry = withOneRetry(onFailure)
+
     await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
     await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
     // The migrated slots are Keychain internet credentials, which outlive an
@@ -516,8 +554,88 @@ export default class KeyStoreWrapper {
     // that strands its new owner, since a reinstall would boot into a PIN
     // nobody on this device ever chose.
     await removeWithRetry(KeyStoreWrapper.removePin, "pin")
-    await removeWithRetry(KeyStoreWrapper.clearPinFailureState, "pin lockout state")
+    // Erased rather than cleared: `clearPinFailureState` falls back to writing a
+    // zeroed value when both erases fail, which is right for its own caller but
+    // would let a wipe finish by creating an entry that then outlives the *next*
+    // uninstall. Both keys, because that is what the cleared path covers.
+    await removeWithRetry(
+      () => KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN_FAILURE_STATE),
+      "pin lockout state",
+    )
+    await removeWithRetry(
+      () => KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+      "legacy pin attempts",
+    )
     await removeWithRetry(KeyStoreWrapper.removeIsBiometricsEnabled, "biometrics flag")
+  }
+
+  /**
+   * Clears the legacy store by service, which the caller runs before either half
+   * of the wipe.
+   *
+   * Two jobs. It is the only thing that reaches mnemonics no id can name: the
+   * tracked list records accounts only from a build that had it, so an install
+   * predating it leaves seeds no enumeration here covers, and erasing by service
+   * covers them. And it unblocks everything that follows, because
+   * `removeThrough` refuses to empty the new store until the legacy copy is
+   * provably gone — a legacy store that cannot answer otherwise fails every slot
+   * that goes through it, session credentials included.
+   *
+   * A no-op once there is nothing left in it (blinkbitcoin/blink-wip#1162), and
+   * if it fails both halves behave exactly as they did before.
+   */
+  public static async clearLegacyKeyStore(
+    onFailure: (what: string) => void,
+  ): Promise<void> {
+    await withOneRetry(onFailure)(eraseEntireLegacyStore, "legacy key store")
+  }
+
+  /**
+   * The other half of the reinstall wipe: the key material, which is the part
+   * that cannot be re-issued.
+   *
+   * Separate from the session credentials above because the caller must be able
+   * to run one without the other. The fresh-install verdict is a heuristic, and
+   * getting it wrong costs a re-login on one side and someone's money on this
+   * one, so this half waits for evidence the other half does not need — see
+   * handleFreshInstall.
+   *
+   * **`clearLegacyKeyStore` must have run first**, which the caller owns rather
+   * than this method, because the session half needs it too. Skipping it leaves
+   * both of the things that method exists for undone — see its docblock.
+   */
+  public static async clearUninstallSurvivingKeyMaterial(
+    onFailure: (what: string) => void,
+  ): Promise<void> {
+    // A list that cannot be read, or cannot be trusted, leaves the per-account
+    // wipe with nothing to work from and says so. Treating either as empty
+    // would report a clean wipe over key material this boot never looked at.
+    const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+    if (tracked.status !== "ok") {
+      // Named apart because they end differently: one is worth waiting a boot
+      // for, the other will report forever until someone looks at the device.
+      const isUnreadableValue = tracked.cause === MnemonicAccountsFailure.UnreadableValue
+      const label = isUnreadableValue
+        ? "mnemonic account list (unreadable value)"
+        : "mnemonic account list"
+      onFailure(label)
+      return
+    }
+
+    // Counted, then reported once with the share left behind. One label per
+    // account says nothing about how much of the device was missed, and N
+    // identical entries are worse than one that carries the number — the sweep
+    // reports its own failures the same way, for the same reason.
+    let failed = 0
+    for (const accountId of tracked.accountIds) {
+      // Retried without reporting: the per-account label is the repetition this
+      // aggregate replaces.
+      const removed = await retryOnce(() =>
+        KeyStoreWrapper.deleteMnemonicForAccount(accountId),
+      )
+      if (!removed) failed += 1
+    }
+    if (failed > 0) onFailure(`mnemonic (${failed}/${tracked.accountIds.length})`)
   }
 
   public static async removeSessionProfileByToken(token: string): Promise<boolean> {
@@ -544,42 +662,279 @@ export default class KeyStoreWrapper {
     return `${KeyStoreWrapper.MNEMONIC_NETWORK}:${accountId}`
   }
 
+  /**
+   * The tracked account ids, or that they could not be read.
+   *
+   * **One id per line, not JSON**, because a parser that can reject the whole
+   * value gives damage an all-or-nothing cost: one truncated byte skipped the
+   * wipe entirely, and no repair could help, since the only one rebuilt from
+   * the account index that a reinstall has just cleared. Per line, damage costs
+   * at most the ids on the line it touched. Ids are UUIDs, so no newline needs
+   * escaping.
+   *
+   * Two ways to hold no ids, both real: an absent slot, because
+   * `untrackMnemonicAccount` removes the slot rather than storing an empty
+   * value, and a value of only blank lines.
+   *
+   * Not queued, so it can be called from within a queued task; callers take
+   * their turn where they mutate.
+   */
+  private static async readMnemonicAccounts(): Promise<MnemonicAccountsRead> {
+    // Never read through: this slot is introduced with the new store, so the
+    // legacy library cannot hold it, and asking would be one more call into the
+    // library this migration exists to stop touching.
+    const read = await secureRead(KeyStoreWrapper.MNEMONIC_ACCOUNTS)
+    if (read.status === "absent") return { status: "ok", accountIds: [] }
+    if (read.status === "failed") {
+      return { status: "failed", cause: MnemonicAccountsFailure.Read }
+    }
+
+    const raw = read.value.trim()
+    // Earlier builds of this branch wrote the list as a JSON array. No release
+    // carries one, so this is not a migration owed to any user — but a device
+    // that ran one of those builds still holds it, and split by line an array
+    // reads as a single id that matches no account: the wipe would report
+    // success having touched none of that device's mnemonics. Both shapes are
+    // accepted for one release rather than leaving those seeds behind.
+    if (raw.startsWith("[")) return parseLegacyAccountIdArray(raw)
+
+    const accountIds = raw
+      .split("\n")
+      .map((id) => id.trim())
+      .filter((id) => id.length > 0)
+    return { status: "ok", accountIds }
+  }
+
+  /**
+   * Records an account whose mnemonic was already stored before this list
+   * existed.
+   *
+   * Every upgrading install is in that position: its mnemonics arrive by
+   * migration, not by a write, so nothing else would ever record them and the
+   * reinstall wipe would have no account to reach. Called by the sweep, which
+   * is what enumerates them.
+   */
+  public static async rememberMnemonicAccount(accountId: string): Promise<boolean> {
+    return KeyStoreWrapper.trackMnemonicAccount(accountId)
+  }
+
+  /**
+   * Records an account in the list the reinstall wipe reads.
+   *
+   * An id that never reaches this list is not benign: the list is now the only
+   * thing that names a migrated mnemonic, so an untracked one survives the wipe
+   * until something records it again. Hence the boolean, which is what lets
+   * `setMnemonicForAccount` report a mnemonic it stored but could not name; a
+   * queue rejection is swallowed rather than thrown, because this runs before
+   * the write the caller actually depends on.
+   *
+   * The read and the write are one turn in the slot queue. Split in two they
+   * are not atomic, and a boot sweep recording one account while a restore
+   * records another lands whichever finishes last over the other.
+   */
+  private static async trackMnemonicAccount(accountId: string): Promise<boolean> {
+    try {
+      return await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async (isCurrent) => {
+        const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+        if (tracked.status === "failed") return false
+
+        const accountIds = tracked.accountIds
+        if (accountIds.includes(accountId)) return true
+        // A snapshot written after this task was abandoned lands over the turn
+        // that replaced it, dropping whatever that turn recorded.
+        if (!isCurrent()) return false
+
+        const written = await secureWrite(
+          KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+          [...accountIds, accountId].join("\n"),
+          ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+        )
+
+        return written
+      })
+    } catch {
+      // The queue rejects on timeout. Best effort, as above.
+      return false
+    }
+  }
+
+  /**
+   * Drops an account from the list, but only once its mnemonic is provably
+   * gone. Forgetting an id whose value survived would leave a mnemonic nothing
+   * can reach, which is the one outcome this list exists to prevent.
+   *
+   * One turn in the slot queue, for the reason given above trackMnemonicAccount.
+   */
+  private static async untrackMnemonicAccount(accountId: string): Promise<void> {
+    try {
+      await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async (isCurrent) => {
+        const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+        // A list that cannot be read is left exactly as it is: the ids still in
+        // it cannot be read out, so any rewrite here would forget accounts
+        // whose mnemonics are still stored. The wipe reports it instead, which
+        // is what gets it looked at.
+        if (tracked.status !== "ok") return
+        if (!tracked.accountIds.includes(accountId)) return
+
+        // Same guard as the writes above: forgetting an id on an abandoned turn
+        // leaves a mnemonic nothing can reach.
+        if (!isCurrent()) return
+
+        const remaining = tracked.accountIds.filter((id) => id !== accountId)
+        if (remaining.length > 0) {
+          await secureWrite(
+            KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+            remaining.join("\n"),
+            ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+          )
+          return
+        }
+
+        // Removed rather than stored as "[]", so an absent slot keeps meaning
+        // exactly "nothing is tracked" — see readMnemonicAccounts.
+        await secureRemove(KeyStoreWrapper.MNEMONIC_ACCOUNTS)
+      })
+    } catch {
+      // The queue rejects on timeout; the id stays tracked, which is the safe
+      // side of this one — the next wipe simply reaches a mnemonic already gone.
+    }
+  }
+
   public static async getMnemonicForAccount(accountId: string): Promise<string | null> {
-    return KeyStoreWrapper.read(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const read = await KeyStoreWrapper.readMnemonicWithStatus(accountId)
+    return read.status === "found" ? read.value : null
+  }
+
+  /** Keeps a failed read distinct from an account that has no mnemonic. */
+  public static async readMnemonicWithStatus(
+    accountId: string,
+  ): Promise<SecureStoreRead> {
+    return readThrough(
+      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
+    )
   }
 
   public static async setMnemonicForAccount(
     accountId: string,
     mnemonic: string,
   ): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.mnemonicKeyFor(accountId),
-      mnemonic,
-      LEGACY_ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-    )
+    // Tracked before the value is written, so the list is a superset of what is
+    // stored rather than a subset. That is the safe direction of the two: a
+    // spurious id costs the reinstall wipe one no-op delete, and
+    // deleteMnemonicForAccount already untracks ids whose value is gone, so it
+    // clears itself. A missing id costs a mnemonic the wipe cannot reach at all.
+    const tracked = await KeyStoreWrapper.trackMnemonicAccount(accountId)
+
+    const written = await writeThrough({
+      slot: KeyStoreWrapper.mnemonicKeyFor(accountId),
+      value: mnemonic,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    })
+
+    // Reported even though the caller is told the write succeeded, because it
+    // did: the seed is stored and the wipe has no way to name it. The boot sweep
+    // re-records it, and this is what says the sweep has something to do.
+    if (written && !tracked) {
+      try {
+        recordAppError(new Error("Mnemonic stored but not tracked"), {
+          dedupKey: "storage-mnemonic-untracked",
+        })
+      } catch {
+        // The firebase handle is not guaranteed to be initialised, and this call
+        // sits after the write the caller depends on. Letting it reject would
+        // make a stored mnemonic look like a failed one, and the rollback in
+        // lifecycle.ts runs on that answer.
+      }
+    }
+
+    return written
   }
 
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
-    const removed = await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const removed = await removeThrough({
+      slot: KeyStoreWrapper.mnemonicKeyFor(accountId),
+      legacyKey: KeyStoreWrapper.mnemonicKeyFor(accountId),
+    })
     // The network marker is derived data; failing to drop it is tolerated.
-    await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+    await removeThrough({
+      slot: KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      legacyKey: KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+    })
+    if (removed) await KeyStoreWrapper.untrackMnemonicAccount(accountId)
     return removed
   }
 
   public static async getMnemonicNetworkForAccount(
     accountId: string,
   ): Promise<string | null> {
-    return KeyStoreWrapper.read(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
+    const read = await KeyStoreWrapper.readMnemonicNetworkWithStatus(accountId)
+    return read.status === "found" ? read.value : null
+  }
+
+  /**
+   * Whether the mnemonic is present, without decrypting it.
+   *
+   * The boot sweep asks this instead of reading. A read answers by putting the
+   * phrase in a JS string, which cannot be zeroed, for every indexed account on
+   * every launch — including the ones the user never opens. This answers from
+   * the new store through `hasInternetCredentials`, which needs no decryption
+   * and works before the first unlock, and falls through to the migrating read
+   * only when the new store has nothing, which is the case that has to move.
+   *
+   * `yes` therefore means "in the new store", which is what "migrated" has to
+   * mean for the release that drops the legacy one.
+   */
+  public static async mnemonicExists(accountId: string): Promise<SecureExists> {
+    return existsThrough(
+      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
+    )
+  }
+
+  /**
+   * Whether the mnemonic is in the NEW store, with no migrating fallback.
+   *
+   * `mnemonicExists` answers yes for a value it found in the legacy store even
+   * when the write meant to move it failed, because migration bookkeeping must
+   * never cost availability. That makes it the wrong question for the sweep's
+   * count: "found" is not "moved", and the release that drops the legacy store
+   * is gated on knowing the difference.
+   *
+   * The one read on this slot that does not take its turn in the queue. Nothing
+   * but a count depends on the answer, and racing a write means counting the
+   * account on the next boot instead of this one; queueing it would serialise a
+   * probe behind the very writes it is only observing.
+   */
+  public static async mnemonicIsMigrated(accountId: string): Promise<SecureExists> {
+    return secureExists(KeyStoreWrapper.mnemonicKeyFor(accountId))
+  }
+
+  /** The network marker's counterpart to mnemonicExists, for the same reason. */
+  public static async mnemonicNetworkExists(accountId: string): Promise<SecureExists> {
+    return existsThrough(
+      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId)),
+    )
+  }
+
+  /**
+   * Keeps a failed read distinct from an account that was never tagged with a
+   * network, for callers that must not connect a wallet they could not verify.
+   */
+  public static async readMnemonicNetworkWithStatus(
+    accountId: string,
+  ): Promise<SecureStoreRead> {
+    return readThrough(
+      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId)),
+    )
   }
 
   public static async setMnemonicNetworkForAccount(
     accountId: string,
     network: string,
   ): Promise<boolean> {
-    return KeyStoreWrapper.write(
-      KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
-      network,
-      LEGACY_ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-    )
+    return writeThrough({
+      slot: KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      value: network,
+      accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+    })
   }
 }
