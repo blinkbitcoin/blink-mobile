@@ -515,6 +515,18 @@ describe("KeyStoreWrapper PIN attempt state", () => {
       })
     })
 
+    it("reads a count stored without a lock expiry", async () => {
+      /** The write side still adds `lockedUntil` for the device that downgrades,
+       *  but the read side must not depend on it: once no shipped release
+       *  demands the field, the writer drops it, and this is the blob it writes. */
+      storedKeys({ pinFailureState: JSON.stringify({ attempts: 2 }) })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2 },
+      })
+    })
+
     it("coerces a numeric string the way the shipped parser did", async () => {
       /** No writer stores the count as a string, but every shipped parser since
        *  3.0.29 accepted one, and this parser keeps that contract rather than
