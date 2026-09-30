@@ -10,6 +10,8 @@ import {
 } from "./use-close-custodial-account"
 import { useCustodialOwnerId } from "./use-custodial-owner-id"
 import { useDiscardCustodialSession } from "./use-discard-custodial-session"
+import { MigrationTargetOrigin } from "../utils/migration-checkpoint-storage"
+
 import { useMigrationCheckpointState } from "./use-migration-checkpoint-state"
 import { usePendingMigrationAccounts } from "./use-pending-migration-accounts"
 import { useSeedMigratedAccountSettings } from "./use-seed-migrated-account-settings"
@@ -68,6 +70,7 @@ export const useCompleteMigration = () => {
     accountId,
     expectedReceiveSats,
     sparkInvoice,
+    targetOrigin,
     checkpointOwnerId,
     loading,
     saveCheckpoint,
@@ -117,10 +120,16 @@ export const useCompleteMigration = () => {
        *  covered too (#4099). Reported but never rethrown: losing a currency preference
        *  must not strand a user mid-migration, and the account keeps today's defaults if
        *  the copy fails. */
-      try {
-        await seedMigratedSettings(accountId)
-      } catch (err) {
-        reportError("Migration settings carry-over", err)
+      /** An adopted wallet arrived with settings of its own, chosen for it before this
+       *  migration existed. Seeding would overwrite the user's own currency, language and
+       *  theme with the custodial account's, which is carry-over turned into loss. */
+      const isAdoptedWallet = targetOrigin === MigrationTargetOrigin.Adopted
+      if (!isAdoptedWallet) {
+        try {
+          await seedMigratedSettings(accountId)
+        } catch (err) {
+          reportError("Migration settings carry-over", err)
+        }
       }
 
       /** The close deletes whatever account the active token authenticates, so it may only
@@ -197,6 +206,7 @@ export const useCompleteMigration = () => {
       custodialOwnerId,
       checkpointOwnerId,
       seedMigratedSettings,
+      targetOrigin,
       closeCustodialAccount,
       finishOnDevice,
     ],
