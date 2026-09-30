@@ -350,6 +350,20 @@ describe("PinScreen", () => {
       expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
     })
 
+    it("shows one attempt left, not zero, over a keypad whose budget is already spent", async () => {
+      /** The logout a third failure triggers keeps the count at the cap on
+       *  purpose, and this keypad is what comes back after it. The next wrong
+       *  entry ends the session again, so that is what the user is told. */
+      stored.attempts = 3
+
+      renderScreen(false)
+      await flushEffects()
+
+      expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
+      expect(screen.queryByText(/0 attempts remaining/)).toBeNull()
+      expect(screen.getByText("1")).not.toBeDisabled()
+    })
+
     it("still logs out on the third failure", async () => {
       stored.attempts = 2
 

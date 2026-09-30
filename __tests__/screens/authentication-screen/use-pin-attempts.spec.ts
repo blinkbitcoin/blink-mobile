@@ -89,6 +89,21 @@ describe("usePinAttempts", () => {
       expect(result.current.attemptsRemaining).toBe(1)
     })
 
+    it("floors a count at or past the cap to one attempt, never zero", async () => {
+      /** The lock keeps its spent count through the logout it triggered, and a
+       *  clear that could not land leaves one above the cap. Both hydrate into
+       *  a live keypad where the next wrong entry ends the session, which is
+       *  what one attempt remaining says and zero would contradict. */
+      for (const stored of [MAX_PIN_ATTEMPTS, MAX_PIN_ATTEMPTS + 1]) {
+        mockedReadPinAttempts.mockResolvedValue(readableState(stored))
+
+        const { result } = renderAttempts()
+        await flushEffects()
+
+        expect(result.current.attemptsRemaining).toBe(1)
+      }
+    })
+
     it("reports no attempts spent on a clean slate", async () => {
       const { result } = renderAttempts()
       await flushEffects()
