@@ -2175,16 +2175,15 @@
     "walletCountNotTwo": "Inani lezipaji asizizo ezi-2. Nceda usebenzise idashbhodi ukubona zonke izipaji nemali yeli akhawunti"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
     "attemptsRemaining": "I-PIN engalunganga. {attemptsRemaining: number} imizamo eseleyo.",
     "enterPin": "Faka ikhowudi yakho ye-PIN",
-    "lockoutUnavailable": "Akukwazekanga ukurekhoda umzamo ongaphumelelanga ngokukhuselekileyo. Ukuloga ngaphandle.",
     "oneAttemptRemaining": "PIN engalunganga. Kushiyeke umzamo “1”.",
     "pinUnreadable": "Ayikwazanga ukujonga i-PIN yakho. Nceda uzame kwakhona.",
     "setPin": "Seta ikhowudi yakho ye-PIN",
     "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",
     "storePinFailed": "Ayikwazanga ukugcina iphini yakho.",
     "tooManyAttempts": "Mininzi kakhulu imizamo engaphumeleliyo. Ukuloga ngaphandle.",
-    "tryAgainIn": "Zama kwakhona emva kwe-{seconds: number} s.",
     "verifyPin": "Qinisekisa ikhowudi yakho ye-PIN"
   },
   "PriceHistoryScreen": {

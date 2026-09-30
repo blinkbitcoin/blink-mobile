@@ -2,12 +2,10 @@ import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 
-import { MAX_PIN_ATTEMPTS } from "./pin-lockout"
-import { readPinLockState, verifyPin } from "./pin-verification"
-import { useLockoutCountdown } from "./use-lockout-countdown"
+import { MAX_PIN_ATTEMPTS, readPinAttempts, verifyPin } from "./pin-verification"
 
-type UsePinLockoutParams = {
-  /** False for the set-pin flow, which is never subject to a lockout. */
+type UsePinAttemptsParams = {
+  /** False for the set-pin flow, which has no budget to spend. */
   readonly enabled: boolean
   readonly onUnlocked: () => void
   /** The entry was rejected but budget remains; clear the entered digits. */
@@ -18,11 +16,9 @@ type UsePinLockoutParams = {
   readonly onUnreadable: () => void
 }
 
-type UsePinLockout = {
-  readonly isLocked: boolean
+type UsePinAttempts = {
   /** For `disabled` props. Display only — never the authority. */
   readonly isInputDisabled: boolean
-  readonly remainingSeconds: number
   /** Attempts left before logout, or null when nothing has been failed yet. */
   readonly attemptsRemaining: number | null
   /** Fire-and-forget. A call made while one is already running is dropped. */
@@ -42,56 +38,38 @@ type UsePinLockout = {
 const attemptsLeftAfter = (failures: number): number | null =>
   failures > 0 ? Math.max(0, MAX_PIN_ATTEMPTS - failures) : null
 
-export const usePinLockout = ({
+export const usePinAttempts = ({
   enabled,
   onUnlocked,
   onWrongPin,
   onExhausted,
   onUnrecorded,
   onUnreadable,
-}: UsePinLockoutParams): UsePinLockout => {
+}: UsePinAttemptsParams): UsePinAttempts => {
   const guard = useInFlightGuard()
   const [isHydrated, setIsHydrated] = useState(!enabled)
   const [isVerifying, setIsVerifying] = useState(false)
-  const [lockedUntil, setLockedUntil] = useState(0)
   const [attemptsRemaining, setAttemptsRemaining] = useState<number | null>(null)
   const onUnreadableRef = useRef(onUnreadable)
   onUnreadableRef.current = onUnreadable
 
-  const repairLiveLock = useCallback((now: number) => {
-    readPinLockState(now).then((read) => {
-      if (read.status === "unreadable") {
-        onUnreadableRef.current()
-        return
-      }
-      setLockedUntil(read.state.lockedUntil)
-      setAttemptsRemaining(attemptsLeftAfter(read.state.attempts))
-    })
-  }, [])
-
-  const { remainingSeconds, isLocked } = useLockoutCountdown(
-    enabled ? lockedUntil : 0,
-    repairLiveLock,
-  )
-
-  // Restores what the screen *shows* after a relaunch: the countdown, and how
-  // many attempts are left. The decision itself never reads any of this — it
-  // re-reads storage on every submit — so a slow read cannot open a window.
+  // Restores what the screen *shows* after a relaunch: how many attempts are
+  // left. The decision itself never reads any of this — it re-reads storage on
+  // every submit — so a slow read cannot open a window.
   useEffect(() => {
     if (!enabled) return undefined
 
     let cancelled = false
 
     const hydrate = async () => {
-      const state = await readPinLockState(Date.now())
+      const read = await readPinAttempts()
       if (cancelled) return
-      if (state.status === "unreadable") {
+      if (read.status === "unreadable") {
         setIsHydrated(true)
         onUnreadableRef.current()
         return
       }
-      setLockedUntil(state.state.lockedUntil)
-      setAttemptsRemaining(attemptsLeftAfter(state.state.attempts))
+      setAttemptsRemaining(attemptsLeftAfter(read.state.attempts))
       setIsHydrated(true)
     }
     hydrate()
@@ -103,7 +81,7 @@ export const usePinLockout = ({
 
   // Disabled while verifying too, so the keypad never looks live while it is
   // silently dropping presses.
-  const isInputDisabled = !isHydrated || isLocked || isVerifying
+  const isInputDisabled = !isHydrated || isVerifying
 
   const submit = useCallback(
     (enteredPin: string) => {
@@ -113,17 +91,11 @@ export const usePinLockout = ({
 
         switch (result.outcome) {
           case "unlocked":
-            setLockedUntil(0)
             setAttemptsRemaining(null)
             setIsVerifying(false)
             onUnlocked()
             return
-          case "locked":
-            setLockedUntil(result.lockedUntil)
-            setIsVerifying(false)
-            return
           case "wrong":
-            setLockedUntil(result.lockedUntil)
             setAttemptsRemaining(result.attemptsRemaining)
             setIsVerifying(false)
             onWrongPin()
@@ -134,9 +106,9 @@ export const usePinLockout = ({
             await onExhausted()
             return
           case "unreadable":
-            // Nothing counted, nothing written: leave the lock and the attempt
-            // count exactly as they were and hand the keypad back, since a
-            // retry is what recovers from a transient keystore fault.
+            // Nothing counted, nothing written: leave the attempt count exactly
+            // as it was and hand the keypad back, since a retry is what
+            // recovers from a transient keystore fault.
             setIsVerifying(false)
             onUnreadable()
             return
@@ -154,9 +126,7 @@ export const usePinLockout = ({
   )
 
   return {
-    isLocked,
     isInputDisabled,
-    remainingSeconds,
     attemptsRemaining,
     submit,
     canAcceptInput,
