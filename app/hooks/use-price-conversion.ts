@@ -9,6 +9,13 @@ import {
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import {
+  RateFreshness,
+  toPriceRates,
+  toPriceRatesFromRealtimePrice,
+  type PriceRates,
+} from "@app/self-custodial/price/rate-mapping"
+import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
+import {
   createToDisplayAmount,
   DisplayCurrency,
   MoneyAmount,
@@ -30,6 +37,16 @@ export const usePriceConversion = () => {
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const { displayCurrency } = useEffectiveDisplayCurrency()
 
+  /**
+   * The SDK's feed, which a self-custodial account can read without the Blink backend.
+   * Empty outside a self-custodial session, and expired when it is too old to present.
+   */
+  const { rates: sdkRates, freshness: sdkFreshness } = useFiatRates()
+  const sdkPriceRates =
+    isSelfCustodial && sdkFreshness !== RateFreshness.Expired
+      ? toPriceRates(sdkRates, displayCurrency)
+      : undefined
+
   const skipAuthed = !isAuthed || isSelfCustodial
   const { data: authedData } = useRealtimePriceQuery({
     skip: skipAuthed,
@@ -37,7 +54,15 @@ export const usePriceConversion = () => {
   })
   const authedPrice = authedData?.me?.defaultAccount?.realtimePrice
 
-  const skipUnauthed = !isSelfCustodial && (isAuthed || Boolean(authedPrice))
+  /**
+   * Self-custodial keeps asking only while the SDK has not priced the display currency,
+   * which is the feed's own gap rather than an outage — an exotic code the SDK does not
+   * carry but the backend does. Once the SDK answers, the backend is not asked at all,
+   * so a self-custodial session makes no price request of its own.
+   */
+  const skipUnauthed = isSelfCustodial
+    ? Boolean(sdkPriceRates)
+    : isAuthed || Boolean(authedPrice)
   const { data: unauthedData } = useRealtimePriceUnauthedQuery({
     skip: skipUnauthed,
     variables: { currency: displayCurrency },
@@ -53,15 +78,19 @@ export const usePriceConversion = () => {
   const realtimePrice =
     candidatePrice?.denominatorCurrency === displayCurrency ? candidatePrice : undefined
 
-  let displayCurrencyPerSat = NaN
-  let displayCurrencyPerCent = NaN
+  const backendPriceRates: PriceRates | undefined = realtimePrice
+    ? toPriceRatesFromRealtimePrice(realtimePrice)
+    : undefined
 
-  if (realtimePrice) {
-    displayCurrencyPerSat =
-      realtimePrice.btcSatPrice.base / 10 ** realtimePrice.btcSatPrice.offset
-    displayCurrencyPerCent =
-      realtimePrice.usdCentPrice.base / 10 ** realtimePrice.usdCentPrice.offset
-  }
+  /**
+   * The SDK first for a self-custodial account. Both sources quote the same market, and
+   * preferring the one that is still there when the backend is not keeps the amounts on
+   * screen from changing meaning as services come and go.
+   */
+  const priceRates = sdkPriceRates ?? backendPriceRates
+
+  const displayCurrencyPerSat = priceRates?.displayCurrencyPerSat ?? NaN
+  const displayCurrencyPerCent = priceRates?.displayCurrencyPerCent ?? NaN
 
   const priceOfCurrencyInCurrency = useMemo(() => {
     if (!displayCurrencyPerSat || !displayCurrencyPerCent) {
@@ -147,11 +176,26 @@ export const usePriceConversion = () => {
     return { convertMoneyAmount, convertMoneyAmountWithRounding }
   }, [priceOfCurrencyInCurrency, displayCurrency])
 
+  /**
+   * How current the rate behind these amounts is. Only the SDK feed can be old enough to
+   * matter: the backend's price is refetched per session and has no cached-but-ancient
+   * state to inherit, so anything priced off it reads Fresh.
+   */
+  const priceFreshness: RateFreshness = sdkPriceRates
+    ? sdkFreshness
+    : backendPriceRates
+      ? RateFreshness.Fresh
+      : RateFreshness.Expired
+
   return {
     convertMoneyAmount: converters?.convertMoneyAmount,
     convertMoneyAmountWithRounding: converters?.convertMoneyAmountWithRounding,
     displayCurrency,
     toDisplayMoneyAmount: createToDisplayAmount(displayCurrency),
+    /** Fresh, Stale or Expired. Expired means no conversion is available at all, which
+     *  `convertMoneyAmount` being undefined already says; Stale means the amounts are
+     *  real but priced off a rate old enough that the user should be told. */
+    priceFreshness,
     usdPerSat: priceOfCurrencyInCurrency
       ? (priceOfCurrencyInCurrency(WalletCurrency.Btc, WalletCurrency.Usd) / 100).toFixed(
           8,
