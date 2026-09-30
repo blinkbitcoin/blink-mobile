@@ -55,6 +55,7 @@ const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
+const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -121,6 +122,7 @@ type RemoteConfig = {
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
   [MigrationReceiveDelayedNoticeMsKey]: number
   [MigrationDelayedRedirectEnabledKey]: boolean
+  [PersistentBulletinsEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -241,6 +243,11 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  releases the redirect once the notice window elapses instead of holding the swap
    *  until the receive confirms. Off by default — waiting is the product decision. */
   migrationDelayedRedirectEnabled: false,
+  /** Whether the home honours a bulletin the server marks as not dismissible. Off by
+   *  default, so every bulletin keeps its close control, as before the flag existed; on,
+   *  such a bulletin stays until the server retires it. A console toggle, so a bulletin
+   *  stuck on every home by mistake can be made closable again without a release. */
+  persistentBulletinsEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -477,6 +484,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(MigrationDelayedRedirectEnabledKey)
           .asBoolean()
 
+        const persistentBulletinsEnabled = remoteConfigInstance()
+          .getValue(PersistentBulletinsEnabledKey)
+          .asBoolean()
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -523,6 +534,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           selfCustodialDepositClaimLeewayVbyte,
           migrationReceiveDelayedNoticeMs,
           migrationDelayedRedirectEnabled,
+          persistentBulletinsEnabled,
           feeRatesConfig,
         })
       } catch (err) {
