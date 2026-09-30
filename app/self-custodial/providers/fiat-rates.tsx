@@ -46,6 +46,14 @@ type FiatRatesContextValue = {
   /** Unix milliseconds of the read, or null when nothing has ever been stored. */
   fetchedAt: number | null
   freshness: RateFreshness
+  /**
+   * Whether this provider has finished trying, so a caller can tell "no rate yet" from
+   * "no rate, and none is coming". Without it the home balance cannot choose between a
+   * skeleton and a sats figure, and would flash from one to the other on every launch.
+   *
+   * True as soon as a stored feed is in hand, or once a fetch has settled either way.
+   */
+  hasSettled: boolean
   refresh: () => Promise<void>
 }
 
@@ -55,6 +63,8 @@ const defaultValue: FiatRatesContextValue = {
   rates: EMPTY_RATES,
   fetchedAt: null,
   freshness: RateFreshness.Expired,
+  /** No provider above means nobody is fetching, so nothing is pending either. */
+  hasSettled: true,
   refresh: async () => {},
 }
 
@@ -70,17 +80,15 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
 
   const stored = getSelfCustodialFiatRates(persistentState)
 
-  /** Re-read on every tick so a feed that crosses a threshold while the user watches it
-   *  stops being presented as current, rather than waiting for the next render. */
+  /** Advanced on every tick so a feed that crosses a freshness threshold while the user
+   *  watches it stops being presented as current, rather than waiting for the next
+   *  unrelated render. */
   const [now, setNow] = useState(() => Date.now())
-  useEffect(() => {
-    const timer = setInterval(() => setNow(Date.now()), REFRESH_INTERVAL_MS)
-    return () => clearInterval(timer)
-  }, [])
 
   /** One in flight at a time: the mount, the foreground and the poll can all come due in
    *  the same moment, and the feed is the same for all three. */
   const inFlightRef = useRef<Promise<void> | null>(null)
+  const [hasFetchSettled, setHasFetchSettled] = useState(false)
 
   const persist = useCallback(
     (rates: FiatRate[]) => {
@@ -107,6 +115,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
         )
       } finally {
         inFlightRef.current = null
+        setHasFetchSettled(true)
       }
     })()
 
@@ -127,10 +136,19 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
     return () => subscription.remove()
   }, [refresh])
 
+  /** One timer for both jobs: they run at the same cadence, and a tick that refreshes
+   *  without re-reading the clock would leave the freshness label behind. */
   useEffect(() => {
-    const timer = setInterval(() => refresh(), REFRESH_INTERVAL_MS)
+    const timer = setInterval(() => {
+      setNow(Date.now())
+      refresh()
+    }, REFRESH_INTERVAL_MS)
     return () => clearInterval(timer)
   }, [refresh])
+
+  /** Nothing to wait for when there is no SDK to ask: a caller blocked on `hasSettled`
+   *  would otherwise wait forever on a custodial-only device. */
+  const hasSettled = hasFetchSettled || !sdk
 
   const value = useMemo<FiatRatesContextValue>(() => {
     if (!stored || stored.rates.length === 0) {
@@ -138,6 +156,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
         rates: EMPTY_RATES,
         fetchedAt: null,
         freshness: RateFreshness.Expired,
+        hasSettled,
         refresh,
       }
     }
@@ -145,9 +164,11 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
       rates: stored.rates,
       fetchedAt: stored.fetchedAt,
       freshness: rateFreshness(stored.fetchedAt, now),
+      /** A stored feed is an answer already, whatever a refresh is doing. */
+      hasSettled: true,
       refresh,
     }
-  }, [stored, now, refresh])
+  }, [stored, now, hasSettled, refresh])
 
   return <FiatRatesContext.Provider value={value}>{children}</FiatRatesContext.Provider>
 }

@@ -4415,6 +4415,9 @@ const en: BaseTranslation = {
     noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
     exportFailed: "Could not download the emergency bundle.",
   },
+  SelfCustodialStaleRate: {
+    notice: "Exchange rate may be out of date",
+  },
   SelfCustodialOffline: {
     title: "Wallet is offline",
     description:

@@ -4227,6 +4227,9 @@
     "payTo": "Bayar ke {address}",
     "payment": "Pembayaran"
   },
+  "SelfCustodialStaleRate": {
+    "notice": "Nilai tukar mungkin sudah tidak berlaku"
+  },
   "SelfCustodialOffline": {
     "title": "Dompet offline",
     "description": "Dompet non-kustodian Anda tidak dapat mencapai jaringan saat ini. Coba lagi ketika Anda kembali online.",

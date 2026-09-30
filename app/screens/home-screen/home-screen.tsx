@@ -27,6 +27,8 @@ import {
 } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { usePriceConversion } from "@app/hooks/use-price-conversion"
+import { RateFreshness } from "@app/self-custodial/price/rate-mapping"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
@@ -372,11 +374,16 @@ export const HomeScreen: React.FC = () => {
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
+  const { priceFreshness } = usePriceConversion()
 
-  const formattedBalance =
-    showStableBalanceToggle && balanceMode === BalanceMode.Btc
-      ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
-      : defaultFormattedBalance
+  const isShowingSats = showStableBalanceToggle && balanceMode === BalanceMode.Btc
+
+  const formattedBalance = isShowingSats
+    ? formatMoneyAmount({ moneyAmount: toBtcMoneyAmount(satsBalance) })
+    : defaultFormattedBalance
+
+  /** A sats figure needs no rate, so it is never stale; only a converted one can be. */
+  const isRateStale = priceFreshness === RateFreshness.Stale && !isShowingSats
 
   const accountId = dataAuthed?.me?.defaultAccount?.id
   const levelAccount = dataAuthed?.me?.defaultAccount?.level
@@ -952,6 +959,7 @@ export const HomeScreen: React.FC = () => {
         showStableBalanceToggle={showStableBalanceToggle}
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
+        isRateStale={isRateStale}
       />
       <View style={styles.badgeSlot}>
         {badgeSlotContent === "unseen" ? (

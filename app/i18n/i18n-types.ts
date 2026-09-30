@@ -13940,6 +13940,12 @@ type RootTranslation = {
 		 */
 		exportFailed: string
 	}
+	SelfCustodialStaleRate: {
+		/**
+		 * E​x​c​h​a​n​g​e​ ​r​a​t​e​ ​m​a​y​ ​b​e​ ​o​u​t​ ​o​f​ ​d​a​t​e
+		 */
+		notice: string
+	}
 	SelfCustodialOffline: {
 		/**
 		 * W​a​l​l​e​t​ ​i​s​ ​o​f​f​l​i​n​e
@@ -28025,6 +28031,12 @@ export type TranslationFunctions = {
 		 * Could not download the emergency bundle.
 		 */
 		exportFailed: () => LocalizedString
+	}
+	SelfCustodialStaleRate: {
+		/**
+		 * Exchange rate may be out of date
+		 */
+		notice: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

@@ -36,6 +36,10 @@ type Props = {
   showStableBalanceToggle?: boolean
   mode?: BalanceMode
   onModeChange?: () => void
+  /** The amount above is priced off an exchange rate old enough that the user should be
+   *  told, rather than read it as today's. Never blocks the figure: an old rate is a
+   *  caveat on a number, not a reason to withhold it. */
+  isRateStale?: boolean
 }
 
 export const BalanceHeader: React.FC<Props> = ({
@@ -44,6 +48,7 @@ export const BalanceHeader: React.FC<Props> = ({
   showStableBalanceToggle,
   mode,
   onModeChange,
+  isRateStale = false,
 }) => {
   const styles = useStyles()
   const { LL } = useI18nContext()
@@ -81,6 +86,11 @@ export const BalanceHeader: React.FC<Props> = ({
           </View>
         </TouchableOpacity>
       )}
+      {isRateStale && !hideAmount && !loading ? (
+        <Text style={styles.staleRateText} {...testProps("balance-stale-rate")}>
+          {LL.SelfCustodialStaleRate.notice()}
+        </Text>
+      ) : null}
       {showStableBalanceToggle && onModeChange ? (
         <Pressable
           onPress={onModeChange}
@@ -121,6 +131,12 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   loaderForefound: {
     color: colors.loaderForeground,
+  },
+  staleRateText: {
+    marginTop: 4,
+    fontSize: 12,
+    textAlign: "center",
+    color: colors.grey2,
   },
   modeToggle: {
     marginTop: 4,
