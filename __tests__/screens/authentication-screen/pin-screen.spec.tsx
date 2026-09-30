@@ -497,6 +497,60 @@ describe("PinScreen", () => {
 
       expect(mockedStore.setPin).toHaveBeenCalledWith("1111")
     })
+
+    it("refuses input while the pin is being stored", async () => {
+      /** The pad stays enabled here: the set-pin flow has no verification state
+       *  to disable it, so the in-flight guard is the only thing between a tap
+       *  and the entry. The digit is turned away by the full entry as well; the
+       *  backspace is the press only the guard stops. Let through, it would
+       *  shrink "1111", and the digit after it would complete "1112" against
+       *  "1111" and re-arm the screen with the mismatch text while the store
+       *  was still in flight. */
+      let releaseStore: (stored: boolean) => void = () => {}
+      mockedStore.setPin.mockImplementationOnce(
+        () =>
+          new Promise<boolean>((resolve) => {
+            releaseStore = resolve
+          }),
+      )
+
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("1111")
+
+      fireEvent.press(screen.getByTestId("pinPadBackspace"))
+      fireEvent.press(screen.getByText("2"))
+
+      expect(screen.getByText("Verify your PIN code")).toBeTruthy()
+      expect(screen.queryByText("Pins didn't match - Set your PIN code")).toBeNull()
+
+      await act(async () => {
+        releaseStore(true)
+      })
+
+      expect(mockedStore.setPin).toHaveBeenCalledTimes(1)
+      expect(mockedStore.setPin).toHaveBeenCalledWith("1111")
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    it("ignores a stray tap on the full entry once the pin is stored", async () => {
+      /** Success leaves the four digits on screen while the pop animates out. A
+       *  fifth digit landing in that window must not read as a new, longer entry
+       *  and re-run the confirmation against the pin just stored. */
+      renderScreen(undefined, PinScreenPurpose.SetPin)
+      await flushEffects()
+
+      await enterPin("1111")
+      await enterPin("1111")
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+
+      fireEvent.press(screen.getByText("2"))
+
+      expect(screen.queryByText("Pins didn't match - Set your PIN code")).toBeNull()
+      expect(mockedStore.setPin).toHaveBeenCalledTimes(1)
+    })
   })
 
   describe("input while a verification is in flight", () => {
