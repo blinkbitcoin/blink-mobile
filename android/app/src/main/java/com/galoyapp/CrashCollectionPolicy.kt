@@ -1,28 +1,28 @@
 package com.galoyapp
 
 /**
- * When automatic crash collection may run, and what to do with reports the SDK is holding
- * (AD-13, NFR-P1 — the telemetry boundary's rule, applied to fatal crashes).
+ * When automatic crash collection may run, and what to do with reports the crash SDK is
+ * still holding on disk.
  *
- * Two facts about the SDK shape this. First, Crashlytics writes a crash report at crash
- * time and uploads it at the *next* launch, so the decision about a report is always
- * taken one process later than the crash. Second, the SDK records a crash even while
- * collection is disabled — it only withholds the upload — so "disabled" alone cannot say
- * whether a report on disk was created under a disposition that permits sending it.
+ * Two facts about Crashlytics shape this. It writes a crash report when the crash happens
+ * and uploads it at the *next* launch, so the decision about any report is taken one
+ * process later than the crash itself. And it records a crash even while collection is
+ * switched off — it only holds the upload back — so "collection was off" does not tell us
+ * whether a report already on disk is one we are allowed to send.
  *
- * The device therefore keeps a one-word provenance: the disposition the *last* session
- * was in when it ended, which is by construction the disposition any crash in it happened
- * under (a crash ends its session). Every launch reads it, decides, and resets it to
- * `unresolved` for the session now starting; the JavaScript boundary overwrites it with
- * `permitted` or `denied` once the mode resolves.
+ * So the device remembers one word: what the *previous* session was allowed to do when it
+ * ended. That is also what any crash in that session was allowed to do, because a crash
+ * ends its session. Every launch reads the word, decides, and resets it to `unresolved` for
+ * the session now starting; JavaScript overwrites it with `permitted` or `denied` as soon
+ * as it knows which kind of wallet this is.
  *
- *  - previous session ended `permitted`: collection on from the start, so the SDK uploads
- *    the reports it holds — every one of them created under a permitted disposition.
- *  - anything else (`denied`, `unresolved`, first install): collection off, and the held
- *    reports deleted — a crash from an incognito wallet, or from a session that never
- *    said what it was, never leaves the device.
+ *  - previous session `permitted`: collect from the start, so the SDK sends what it holds.
+ *  - anything else — `denied`, `unresolved`, or a first install: do not collect, and delete
+ *    what it holds. A crash from an incognito wallet, or from a session that never said
+ *    what it was, never leaves the device.
  *
- * Pure, so the table is unit-tested on the JVM; [CrashCollection] applies it to Firebase.
+ * This object is pure so the table can be unit-tested on its own. [CrashCollection] is what
+ * applies a decision.
  */
 object CrashCollectionPolicy {
   const val PERMITTED = "permitted"
@@ -32,19 +32,19 @@ object CrashCollectionPolicy {
   data class Decision(
     /** Whether the SDK may collect and upload from now on. */
     val collect: Boolean,
-    /** Whether reports the SDK is holding must be deleted before anything could send them. */
+    /** Whether reports already on disk must be deleted before anything could send them. */
     val deleteUnsent: Boolean,
-    /** What the device should remember as the disposition in force from this point. */
+    /** What the device should remember as the permission in force from this point. */
     val provenance: String,
   )
 
-  /** At process start, from the provenance the previous session left (null on first install). */
+  /** At process start, from the word the previous session left. Null on a first install. */
   fun atLaunch(previous: String?): Decision {
     val permitted = previous == PERMITTED
     return Decision(collect = permitted, deleteUnsent = !permitted, provenance = UNRESOLVED)
   }
 
-  /** When the JavaScript boundary resolves a disposition for the running session. */
+  /** When JavaScript works out what this session is allowed to do. */
   fun onDisposition(permitted: Boolean): Decision =
     Decision(
       collect = permitted,

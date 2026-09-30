@@ -10,40 +10,62 @@
 #import <React/RCTBridgeModule.h>
 
 /**
- * Automatic crash collection under the telemetry boundary's rule (AD-13, NFR-P1). The
- * Android twin is CrashCollectionPolicy.kt / CrashCollection.kt; the reasoning lives
- * there. In short: Crashlytics uploads a crash at the *next* launch and records one even
- * while collection is off, so each launch decides by the disposition the previous session
- * ended in — "permitted" lets the held reports go, anything else deletes them — and resets
- * the provenance to "unresolved" until the JavaScript boundary resolves this session.
+ * When automatic crash collection may run, and what to do with reports the crash SDK is
+ * still holding on disk. The Android twin is CrashCollectionPolicy.kt and
+ * CrashCollection.kt, and the two must agree.
  *
- * Kept in this translation unit rather than a file of its own so the module needs no
- * project-file registration; RCT_EXPORT_MODULE registers it at load.
+ * Two facts about Crashlytics shape this. It writes a crash report when the crash happens
+ * and uploads it at the *next* launch, so the decision about any report is taken one
+ * process later than the crash itself. And it records a crash even while collection is
+ * switched off — it only holds the upload back — so "collection was off" does not tell us
+ * whether a report already on disk is one we are allowed to send.
+ *
+ * So the device remembers one word: what the previous session was allowed to do when it
+ * ended, which is also what any crash in that session was allowed to do, because a crash
+ * ends its session. Every launch reads the word, decides, and resets it to "unresolved" for
+ * the session now starting; JavaScript overwrites it as soon as it knows.
+ *
+ * These classes live in this file so the module needs no project-file entry;
+ * RCT_EXPORT_MODULE registers it when the binary loads.
  */
 static NSString *const kCrashProvenanceKey = @"blink.crash_collection.provenance";
 static NSString *const kProvenancePermitted = @"permitted";
 static NSString *const kProvenanceDenied = @"denied";
 static NSString *const kProvenanceUnresolved = @"unresolved";
 
-static void applyCrashCollection(BOOL collect, BOOL deleteUnsent, NSString *provenance)
-{
-  // Provenance first: a death between here and the SDK calls errs on the side of not sending.
-  [[NSUserDefaults standardUserDefaults] setObject:provenance forKey:kCrashProvenanceKey];
-  [[NSUserDefaults standardUserDefaults] synchronize];
-  [[FIRCrashlytics crashlytics] setCrashlyticsCollectionEnabled:collect];
-  if (deleteUnsent) {
-    [[FIRCrashlytics crashlytics] deleteUnsentReports];
-  }
-}
+/** What a launch or a disposition change should do. The Kotlin twin is a data class. */
+typedef struct {
+  BOOL collect;
+  BOOL deleteUnsent;
+  NSString *provenance;
+} CrashCollectionDecision;
 
-static void applyCrashCollectionAtLaunch(void)
+/** Pure, and the whole of the rule. */
+@interface CrashCollectionPolicy : NSObject
++ (CrashCollectionDecision)decisionAtLaunch:(NSString *)previous;
++ (CrashCollectionDecision)decisionForPermitted:(BOOL)permitted;
+@end
+
+@implementation CrashCollectionPolicy
+
++ (CrashCollectionDecision)decisionAtLaunch:(NSString *)previous
 {
-  NSString *previous = [[NSUserDefaults standardUserDefaults] stringForKey:kCrashProvenanceKey];
   BOOL permitted = [previous isEqualToString:kProvenancePermitted];
-  applyCrashCollection(permitted, !permitted, kProvenanceUnresolved);
+  return (CrashCollectionDecision){permitted, !permitted, kProvenanceUnresolved};
 }
 
++ (CrashCollectionDecision)decisionForPermitted:(BOOL)permitted
+{
+  return (CrashCollectionDecision){
+      permitted, !permitted, permitted ? kProvenancePermitted : kProvenanceDenied};
+}
+
+@end
+
+/** Applies a decision to the crash SDK and to the word the device remembers. */
 @interface CrashCollection : NSObject <RCTBridgeModule>
++ (void)applyLaunch;
++ (void)applyPermitted:(BOOL)permitted;
 @end
 
 @implementation CrashCollection
@@ -55,9 +77,39 @@ RCT_EXPORT_MODULE();
   return NO;
 }
 
++ (void)apply:(CrashCollectionDecision)decision
+{
+  // The word goes down first. If the process dies between here and the SDK calls, the next
+  // launch errs on the side of not sending.
+  [[NSUserDefaults standardUserDefaults] setObject:decision.provenance
+                                           forKey:kCrashProvenanceKey];
+  [[NSUserDefaults standardUserDefaults] synchronize];
+  [[FIRCrashlytics crashlytics] setCrashlyticsCollectionEnabled:decision.collect];
+  if (decision.deleteUnsent) {
+    [[FIRCrashlytics crashlytics] deleteUnsentReports];
+  }
+}
+
++ (void)applyLaunch
+{
+  NSString *previous =
+      [[NSUserDefaults standardUserDefaults] stringForKey:kCrashProvenanceKey];
+  [self apply:[CrashCollectionPolicy decisionAtLaunch:previous]];
+}
+
++ (void)applyPermitted:(BOOL)permitted
+{
+  [self apply:[CrashCollectionPolicy decisionForPermitted:permitted]];
+}
+
+/**
+ * The one runtime switch, driven from app/utils/error-reporting.ts once it knows what this
+ * session may send. React Native Firebase has its own setter, but that only stores a
+ * preference the next launch reads; this changes the running process.
+ */
 RCT_EXPORT_METHOD(setCrashCollectionDisposition:(BOOL)permitted)
 {
-  applyCrashCollection(permitted, !permitted, permitted ? kProvenancePermitted : kProvenanceDenied);
+  [CrashCollection applyPermitted:permitted];
 }
 
 @end
@@ -77,10 +129,10 @@ RCT_EXPORT_METHOD(setCrashCollectionDisposition:(BOOL)permitted)
   // is where the automatic session events are logged.
   [FIRAnalytics setAnalyticsCollectionEnabled:NO];
   // Crash collection follows the same rule, one launch behind by the SDK's nature; see
-  // the CrashCollection module above. Immediately after configure, the way Firebase's own
-  // opt-in guidance places it: the SDK's upload of held reports waits on a settings fetch,
-  // so this lands long before any upload could.
-  applyCrashCollectionAtLaunch();
+  // the CrashCollection module above. Immediately after configure, where Firebase's own
+  // opt-in guidance puts it: the SDK waits on a settings fetch before it uploads anything,
+  // so this lands well before an upload could.
+  [CrashCollection applyLaunch];
 
   self.moduleName = @"GaloyApp";
   self.dependencyProvider = [RCTAppDependencyProvider new];

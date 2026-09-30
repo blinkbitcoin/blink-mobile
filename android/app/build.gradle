@@ -120,6 +120,9 @@ android {
     buildTypes {
         debug {
             signingConfig signingConfigs.debug
+            // Lets `./gradlew :app:crashCollectionCoverage` measure the unit tests. Debug
+            // unit tests only; nothing that ships is instrumented.
+            enableUnitTestCoverage true
         }
         release {
             // Caution! In production, you need to generate your own keystore file.
@@ -144,6 +147,14 @@ android {
     testOptions {
         unitTests {
             includeAndroidResources true
+        }
+        // Robolectric loads classes in its own sandbox, which the coverage agent cannot see
+        // without this. Without it the Robolectric-backed tests read as zero coverage.
+        unitTests.all {
+            jacoco {
+                includeNoLocationClasses = true
+                excludes = ['jdk.internal.*']
+            }
         }
     }
 }
@@ -198,3 +209,31 @@ project.ext.vectoricons = [
 ]
 
 apply from: file("../../node_modules/react-native-vector-icons/fonts.gradle")
+
+// Coverage for the crash-collection classes, which decide whether a crash report may leave
+// the device. Run: ./gradlew :app:crashCollectionCoverage
+apply plugin: 'jacoco'
+
+tasks.register('crashCollectionCoverage', JacocoReport) {
+    dependsOn 'testDebugUnitTest'
+    group = 'verification'
+    description = 'Coverage for com.galoyapp.CrashCollection*'
+
+    classDirectories.setFrom(
+        fileTree('build/tmp/kotlin-classes/debug').matching {
+            include 'com/galoyapp/CrashCollection*.class'
+            include 'com/galoyapp/CrashReporter*.class'
+            include 'com/galoyapp/FirebaseCrashReporter*.class'
+        },
+    )
+    sourceDirectories.setFrom(files('src/main/java'))
+    executionData.setFrom(
+        files('build/outputs/unit_test_code_coverage/debugUnitTest/testDebugUnitTest.exec'),
+    )
+
+    reports {
+        xml.required = true
+        html.required = true
+        csv.required = true
+    }
+}

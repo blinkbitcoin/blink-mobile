@@ -8,19 +8,25 @@ import com.facebook.react.bridge.ReactMethod
 import com.facebook.react.uimanager.ViewManager
 
 /**
- * The one runtime switch for automatic crash collection, driven by the telemetry
- * disposition in `app/utils/error-reporting.ts`. React Native Firebase's own
- * `setCrashlyticsCollectionEnabled` only persists a preference for the *next* launch; this
- * changes the running process, and records the provenance the next launch decides by.
+ * The one runtime switch for automatic crash collection, driven from
+ * `app/utils/error-reporting.ts` once it knows what this session may send.
+ *
+ * React Native Firebase has its own `setCrashlyticsCollectionEnabled`, but that only
+ * stores a preference the *next* launch reads. This changes the running process, and
+ * records the word that next launch will decide by.
  */
 class CrashCollectionModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
 
-  override fun getName(): String = "CrashCollection"
+  override fun getName(): String = NAME
 
   @ReactMethod
   fun setCrashCollectionDisposition(permitted: Boolean) {
     CrashCollection.applyDisposition(reactApplicationContext, permitted)
+  }
+
+  companion object {
+    const val NAME = "CrashCollection"
   }
 }
 
