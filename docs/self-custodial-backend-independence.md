@@ -414,33 +414,25 @@ Invoices, on-chain addresses, Spark addresses and LNURL against third-party
 domains never touched a Blink service and are unchanged, so a scanned QR always
 works.
 
-### Phase 7 — Tests and release gate
+### Phase 7 — Tests and release gate · done
 
-**Unit** (`__tests__/self-custodial/`):
-- Rate mapping: sat and cent derivation, missing display currency, missing USD
-  anchor, zero and absurd rates.
-- Staleness thresholds and the three-tier fallback order in `usePriceConversion`.
-- Currency mapping including the flag override table.
-- The status provider's state machine, including backoff bounds and the
-  background suppression.
-- Error classification for registration and destination resolution.
+Unit and component coverage landed with each phase rather than in a pass at the
+end; every guard added was mutation-tested, since a guard whose removal keeps
+the suite green is not covered.
 
-**RNTL** (with Apollo mocks erroring and the SDK mocked):
-- Home renders a balance from persisted rates on a cold start.
-- Receive renders an invoice, not `receive-loading`.
-- Send details builds a payment detail and accepts a sats amount.
-- Display-currency picker is populated.
-- Exactly one banner, no toast storm.
+The one seam that needed a test of its own is the provider-to-hook wiring under
+the exact conditions this work exists for:
+[cold-start-offline.spec.tsx](../__tests__/self-custodial/price/cold-start-offline.spec.tsx)
+mounts the real fiat provider around the real `usePriceConversion`, with every
+backend query dead *and* the SDK's fiat feed rejecting, and asserts that a
+balance still converts off the persisted feed — that a failed refresh does not
+blank it, that a two-hour-old feed converts but reads stale, and that a feed
+older than a day reports `Unavailable` rather than spinning.
 
-Per the repo's testing notes: RNTL negative assertions need a positive anchor —
-`waitFor` + `not.toHaveBeenCalled` is vacuous, and a missing Apollo mock looks
-identical to correct offline behaviour. Mutation-test every guard added here.
-
-**Release gate.** Add a "Blink services unavailable" section to
-[self-custodial-rollout.md](./self-custodial-rollout.md) covering the matrix
-below, for each of self-custodial-only and mixed-account users.
-
----
+A "Blink services unavailable" section is added to
+[self-custodial-rollout.md](./self-custodial-rollout.md), covering both switches
+in both modes, cold start, the send-resolution case, Lightning Address, recovery
+within a session, and the custodial regression.
 
 ## Verification with the backend off
 
@@ -505,7 +497,7 @@ dependency.
 | 4 | Honest, quiet UI | 1 | Done |
 | 5 | Lightning address degrades gracefully | 1, Q1 | Done |
 | 6 | Send never misreports a payee | 4 | Done |
-| 7 | Regression-proofed | 2–6 | |
+| 7 | Regression-proofed | 2–6 | Done |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the
 one that must land first if only one does.
