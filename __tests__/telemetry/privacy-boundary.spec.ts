@@ -20,7 +20,12 @@ import {
   logSelfCustodialRolloutExposed,
 } from "@app/self-custodial/analytics"
 import { logPaymentSettled, logReferralCompleted } from "@app/self-custodial/measurement"
-import { RailType, TelemetryDirection } from "@app/telemetry/contract"
+import {
+  RailType,
+  TelemetryDirection,
+  TelemetryEvent,
+  WalletProvider,
+} from "@app/telemetry/contract"
 import {
   getDiagnosticCounters,
   resetDiagnosticsForTesting,
@@ -29,7 +34,12 @@ import {
   resetEnablementForTesting,
   setTelemetryRolloutEnabled,
 } from "@app/telemetry/enablement"
-import { setActiveOutbox } from "@app/telemetry/index"
+import {
+  captureTelemetryFact,
+  drainActiveOutbox,
+  setActiveOutbox,
+} from "@app/telemetry/index"
+import { getDroppedEventCounts } from "@app/telemetry/policy"
 import {
   initializeTelemetryGate,
   onTelemetrySuppressed,
@@ -110,6 +120,19 @@ const conversion = ({
 /** The gate owns the discard ordering; the provider is what registers it in the app. */
 const registerDiscard = (store: ReturnType<typeof createOutboxStore>) =>
   onTelemetrySuppressed(() => store.discardAll())
+
+const acked = (): SubmitResult => ({ kind: "acknowledged", ackedAt: Date.now() })
+
+const transportReturning = (result: SubmitResult) => {
+  const submit = jest.fn(() => Promise.resolve(result))
+  registerTelemetryTransport({
+    name: "test",
+    ackSemantics: "application",
+    attachesNoImplicitIdentity: true,
+    submit,
+  })
+  return submit
+}
 
 const settle = () =>
   new Promise((resolve) => {
@@ -492,6 +515,79 @@ describe("the telemetry privacy boundary", () => {
       expect(await queued(store)).toEqual([])
 
       expect(await enhancedCaptures()).toBe(1)
+    })
+  })
+
+  describe("what the boundary does with a fact it cannot file", () => {
+    beforeEach(async () => {
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+    })
+
+    it("drops a payload the policy stage refuses, and counts why", () => {
+      const store = createOutboxStore(DIR_A)
+      setActiveOutbox(store)
+      captureTelemetryFact({
+        event: TelemetryEvent.PaymentSettled,
+        telemetryEventId: "not-a-uuid",
+        walletProvider: WalletProvider.Spark,
+        direction: TelemetryDirection.Send,
+        railType: RailType.Lightning,
+      })
+
+      expect(getDroppedEventCounts().invalid_value).toBe(1)
+    })
+
+    it("counts an event it has nowhere to put, rather than losing it silently", async () => {
+      // An emitter running while no account's queue is mounted. The count is the only
+      // evidence, and it should be zero in a healthy session.
+      setActiveOutbox(null)
+
+      logPaymentSettled(payment({ id: "sdk-unrouted" }))
+      await settle()
+
+      expect(getDiagnosticCounters().unroutedEvents).toBe(1)
+    })
+
+    it("drains nothing when no queue is mounted", async () => {
+      setActiveOutbox(null)
+      const submit = transportReturning(acked())
+
+      await drainActiveOutbox()
+
+      expect(submit).not.toHaveBeenCalled()
+    })
+
+    it("files a settlement the SDK gave no id for, unkeyed rather than not at all", async () => {
+      const store = createOutboxStore(DIR_A)
+      setActiveOutbox(store)
+
+      logPaymentSettled(payment({ id: undefined }))
+      await settle()
+
+      const [record] = await queued(store)
+      expect(record.sdkPaymentId).toBeNull()
+    })
+
+    it("files a swap the SDK gave no id for the same way", async () => {
+      const store = createOutboxStore(DIR_A)
+      setActiveOutbox(store)
+
+      logPaymentSettled(payment({ id: undefined, conversionDetails: conversion() }))
+      await settle()
+
+      const [record] = await queued(store)
+      expect(record.event).toBe(TelemetryEvent.ConversionSettled)
+      expect(record.sdkPaymentId).toBeNull()
+    })
+
+    it("counts nothing for a settlement whose direction it cannot place", async () => {
+      const store = createOutboxStore(DIR_A)
+      setActiveOutbox(store)
+
+      logPaymentSettled(payment({ paymentType: "sideways" as unknown as SdkPaymentType }))
+      await settle()
+
+      expect(await queued(store)).toEqual([])
     })
   })
 

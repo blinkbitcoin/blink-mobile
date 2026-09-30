@@ -1,4 +1,4 @@
-import { forwardRef, useMemo, useRef } from "react"
+import React, { forwardRef, useMemo, useRef } from "react"
 import { View, Share as NativeShare } from "react-native"
 import { LinearGradient } from "react-native-linear-gradient"
 import Share from "react-native-share"

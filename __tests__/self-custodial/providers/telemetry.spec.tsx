@@ -497,4 +497,55 @@ describe("SelfCustodialTelemetryMount", () => {
       expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
     })
   })
+
+  describe("a filesystem that will not cooperate", () => {
+    // None of these is recoverable from the provider, and none of them may take the screen
+    // down with it: telemetry is never worth a render.
+    it("mounts even when the inactive-account sweep cannot read the disk", async () => {
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }, { id: OTHER_ACCOUNT_ID }]
+      const readDir = jest.spyOn(RNFS, "readDir").mockRejectedValue(new Error("EIO"))
+
+      expect(() => render(<SelfCustodialTelemetryMount />)).not.toThrow()
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      readDir.mockRestore()
+    })
+
+    it("mounts even when the leftovers sweep cannot read the parent directory", async () => {
+      const exists = jest.spyOn(RNFS, "exists").mockRejectedValue(new Error("EIO"))
+
+      expect(() => render(<SelfCustodialTelemetryMount />)).not.toThrow()
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      exists.mockRestore()
+    })
+
+    it("mounts even when the pending-discard check fails", async () => {
+      const unlink = jest.spyOn(RNFS, "unlink").mockRejectedValue(new Error("EBUSY"))
+      await RNFS.writeFile(`${DIR}.discard`, "1", "utf8")
+
+      expect(() => render(<SelfCustodialTelemetryMount />)).not.toThrow()
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      unlink.mockRestore()
+    })
+  })
+
+  it("ignores an app-state change that is not a return to the foreground", async () => {
+    const submit = ackingTransport()
+    render(<SelfCustodialTelemetryMount />)
+    await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+    await createOutboxStore(DIR).enqueue(queuedRecord())
+    resetDrainStateForTesting()
+    submit.mockClear()
+
+    const handlers = (AppState.addEventListener as jest.Mock).mock.calls
+      .filter(([type]) => type === "change")
+      .map(([, handler]) => handler as (state: string) => void)
+    act(() => {
+      for (const handler of handlers) handler("background")
+    })
+
+    expect(submit).not.toHaveBeenCalled()
+  })
 })

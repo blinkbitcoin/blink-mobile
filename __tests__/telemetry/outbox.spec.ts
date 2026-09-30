@@ -154,7 +154,7 @@ describe("the telemetry outbox", () => {
     setActiveOutbox(null)
   })
 
-  describe("AD-6 / AD-26 — its own directory, temp-and-rename, discard is an unlink", () => {
+  describe("its own directory, temp-and-rename, discard is an unlink", () => {
     it("writes nowhere near the wallet store", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
@@ -235,7 +235,7 @@ describe("the telemetry outbox", () => {
       expect(getOutboxCounters().parseFailed).toBe(1)
     })
 
-    it("empties on discard, and is idempotent (FR-5)", async () => {
+    it("empties on discard, and is idempotent", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
 
@@ -300,7 +300,7 @@ describe("the telemetry outbox", () => {
         )
     }
 
-    it("leaves a tombstone beside the directory when neither the rename nor the unlink succeeds (AD-26)", async () => {
+    it("leaves a tombstone beside the directory when neither the rename nor the unlink succeeds", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
       const rename = failRename()
@@ -317,7 +317,7 @@ describe("the telemetry outbox", () => {
 
     it("never hands out records behind a tombstone — a discard that did not finish is finished first, or the read fails", async () => {
       // The Anon transition required these destroyed. Returning them from `pending()` to
-      // a later Enhanced drain would be FR-5 by the back door.
+      // a later Enhanced drain would flush what the switch destroyed.
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
       const rename = failRename()
@@ -329,7 +329,8 @@ describe("the telemetry outbox", () => {
       rename.mockRestore()
       unlink.mockRestore()
 
-      // The filesystem works again: the next read finishes the discard, and the queue is empty.
+      // The filesystem works again: the next read finishes the discard, and the queue is
+      // empty.
       expect(await store.pending()).toEqual([])
       expect(await store.hasPendingDiscard()).toBe(false)
       expect(mockFs.__mockFilePaths().filter((path) => path.startsWith(PARENT))).toEqual(
@@ -338,7 +339,7 @@ describe("the telemetry outbox", () => {
     })
 
     it("survives a restart: the tombstone is what a new process reads, and it refuses the queue", async () => {
-      // The fourth review's MEDIUM. The owed entry and the generation die with the
+      // The owed entry and the generation die with the
       // process; the signal beside the directory does not.
       const before = createOutboxStore(DIR)
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -357,7 +358,8 @@ describe("the telemetry outbox", () => {
       await drainOutbox(after, instantly).catch(() => undefined)
       expect(submit).not.toHaveBeenCalled()
 
-      // And once the filesystem cooperates, the discard finishes rather than the records returning.
+      // And once the filesystem cooperates, the discard finishes rather than the records
+      // returning.
       rename.mockRestore()
       unlink.mockRestore()
       expect(await after.pending()).toEqual([])
@@ -494,7 +496,7 @@ describe("the telemetry outbox", () => {
       expect(submit).not.toHaveBeenCalled()
     })
 
-    it("reads a tombstone the last run left beside the directory, and re-runs the discard (AD-26)", async () => {
+    it("reads a tombstone the last run left beside the directory, and re-runs the discard", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record())
       await RNFS.writeFile(`${DIR}.discard`, "1", "utf8")
@@ -639,7 +641,7 @@ describe("the telemetry outbox", () => {
     })
 
     it("serialises two instances over the same directory, so neither loses the other's tombstones", async () => {
-      // The provider's active store and the FR-25 sweep can both exist for one directory.
+      // The provider's active store and its sweep can both exist for one directory.
       const one = createOutboxStore(DIR)
       const two = createOutboxStore(DIR)
       const a = record({ sdkPaymentId: "sdk-instance-a" })
@@ -689,7 +691,7 @@ describe("the telemetry outbox", () => {
       expect(pending).toHaveLength(1)
     })
 
-    it("never writes the SDK payment id into a payload (FR-24)", async () => {
+    it("never writes the SDK payment id into a payload", async () => {
       const store = createOutboxStore(DIR)
       await store.enqueue(record({ sdkPaymentId: "sdk-secret" }))
 
@@ -698,7 +700,7 @@ describe("the telemetry outbox", () => {
     })
   })
 
-  describe("AD-18 / AD-26 — bounded, and every loss is counted by its cause", () => {
+  describe("bounded, and every loss is counted by its cause", () => {
     it("derives capacity from the formula, not a guess", () => {
       // ceil(p99 × 100): the placeholder p99 is 5 until Q14 is measured.
       expect(OUTBOX_MAX_RECORDS).toBe(500)
@@ -714,7 +716,7 @@ describe("the telemetry outbox", () => {
       expect(await store.unreportedLoss()).toMatchObject({ expired: 1 })
     })
 
-    it("expires a record written under a contract version the relay no longer takes (AD-30)", async () => {
+    it("expires a record written under a contract version the relay no longer takes", async () => {
       const store = createOutboxStore(DIR)
       // Current version is 1; n−1 is tolerated; anything older is not.
       await store.enqueue(record({ version: -1 }))
@@ -748,6 +750,54 @@ describe("the telemetry outbox", () => {
       expect(await store.unreportedLoss()).toMatchObject({ evicted: 1, expired: 0 })
     })
 
+    it("survives a record file that cannot be read at all, and reports the fault", async () => {
+      // A directory listing that names a file the read then refuses: counted as a boundary
+      // fault, not a crash in the middle of a settlement.
+      const store = createOutboxStore(DIR)
+      await store.enqueue(record())
+      const readFile = jest.spyOn(RNFS, "readFile").mockRejectedValue(new Error("EIO"))
+
+      const pending = await store.pending()
+      readFile.mockRestore()
+
+      expect(pending).toEqual([])
+    })
+
+    it("reads a junk loss file as no loss, rather than trusting what it says", async () => {
+      await RNFS.writeFile(`${DIR}/loss.json`, '"not an object"', "utf8")
+
+      expect(await createOutboxStore(DIR).unreportedLoss()).toEqual({
+        expired: 0,
+        evicted: 0,
+        rejected: 0,
+        parseFailed: 0,
+      } satisfies LossCounters)
+    })
+
+    it("ignores loss counts that are not whole, positive numbers", async () => {
+      await RNFS.writeFile(
+        `${DIR}/loss.json`,
+        JSON.stringify({ expired: -3, evicted: 1.5, rejected: "many", parseFailed: 2 }),
+        "utf8",
+      )
+
+      expect(await createOutboxStore(DIR).unreportedLoss()).toMatchObject({
+        expired: 0,
+        evicted: 0,
+        rejected: 0,
+        parseFailed: 2,
+      })
+    })
+
+    it("reads a junk tombstone file as no tombstones, so a replay is not silently dropped", async () => {
+      await RNFS.writeFile(`${DIR}/acked.json`, "42", "utf8")
+      const store = createOutboxStore(DIR)
+
+      await store.enqueue(record({ sdkPaymentId: "sdk-after-junk" }))
+
+      expect(await store.pending()).toHaveLength(1)
+    })
+
     it("counts a record it cannot read as parse_failed and deletes it", async () => {
       await RNFS.writeFile(fileOf("corrupt"), "{ not json", "utf8")
 
@@ -761,7 +811,7 @@ describe("the telemetry outbox", () => {
     })
   })
 
-  describe("NFR-R1 — a record outlives the process that wrote it", () => {
+  describe("a record outlives the process that wrote it", () => {
     it("returns a record mid-flight when the process died to queued", () => {
       const stored = JSON.stringify(record({ state: OutboxState.Submitted }))
 
@@ -786,7 +836,7 @@ describe("the telemetry outbox", () => {
     })
   })
 
-  describe("AD-27 — the port", () => {
+  describe("the port", () => {
     it("acknowledges and remembers, and nothing leaves the process", async () => {
       const transport = createLocalOnlyTransport()
       const payload: ContractPayload = {
@@ -845,7 +895,7 @@ describe("the telemetry outbox — the drain", () => {
       expect(getOutboxCounters().acknowledged).toBe(1)
     })
 
-    it("treats a hand-off as acknowledged, collapsing the two states (FR-64)", async () => {
+    it("treats a hand-off as acknowledged, collapsing the two states", async () => {
       const store = createOutboxStore(DIR)
       transportReturning({ kind: "handed_off" })
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -856,7 +906,7 @@ describe("the telemetry outbox — the drain", () => {
       expect(await store.pending()).toEqual([])
     })
 
-    it("hands the adapter a contract payload — name, version, params — and never the row (AD-4)", async () => {
+    it("hands the adapter a contract payload — name, version, params — and never the row", async () => {
       const store = createOutboxStore(DIR)
       const submit = transportReturning(acked)
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -891,7 +941,47 @@ describe("the telemetry outbox — the drain", () => {
       expect(getDiagnosticCounters().drainRejected).toBe(1)
     })
 
-    describe("AD-26 — backoff on retryable, one drain per account", () => {
+    describe("backoff on retryable, one drain per account", () => {
+      it("runs with no options at all — the defaults are what production uses", async () => {
+        const store = createOutboxStore(DIR)
+        const submit = transportReturning(acked)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(record())
+
+        await drainOutbox(store)
+
+        expect(submit).toHaveBeenCalledTimes(1)
+        expect(await store.pending()).toEqual([])
+      })
+
+      it("settles a loss report whose counts arrived as junk as though they were zero", async () => {
+        // The report rides the queue like any other record, so a build that wrote a
+        // malformed one must not leave the loss counters un-settleable forever.
+        const store = createOutboxStore(DIR)
+        const submit = transportReturning(acked)
+        await resolveTelemetryMode(TelemetryMode.Enhanced)
+        await store.enqueue(
+          record({
+            event: TelemetryEvent.LossReported,
+            sdkPaymentId: null,
+            payload: {
+              event_version: 1,
+              wallet_provider: WalletProvider.Spark,
+              telemetry_event_id: uuid(80),
+              expired: "several",
+              evicted: true,
+              rejected: 1,
+              parse_failed: 0,
+            },
+          }),
+        )
+
+        await drainOutbox(store, instantly)
+
+        expect(submit).toHaveBeenCalledTimes(1)
+        expect(await store.pending()).toEqual([])
+      })
+
       it("requeues, stops the drain, and backs off from 5 s", async () => {
         const store = createOutboxStore(DIR)
         const submit = transportReturning({ kind: "retryable" })
@@ -1015,7 +1105,7 @@ describe("the telemetry outbox — the drain", () => {
       })
     })
 
-    it("submits one payload at a time, never a batch (AD-22)", async () => {
+    it("submits one payload at a time, never a batch", async () => {
       const store = createOutboxStore(DIR)
       const submit = transportReturning(acked)
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -1029,7 +1119,7 @@ describe("the telemetry outbox — the drain", () => {
       }
     })
 
-    describe("FR-72 — arrival order must not reconstruct settlement order", () => {
+    describe("arrival order must not reconstruct settlement order", () => {
       it("does not submit in the order events settled", async () => {
         const store = createOutboxStore(DIR)
         const submit = transportReturning(acked)
@@ -1062,7 +1152,7 @@ describe("the telemetry outbox — the drain", () => {
       })
     })
 
-    describe("AD-5 — the drain is gated too", () => {
+    describe("the drain is gated too", () => {
       it.each([
         { mode: TelemetryMode.Anon },
         { mode: TelemetryMode.Unresolved },
@@ -1111,7 +1201,7 @@ describe("the telemetry outbox — the drain", () => {
       it("does not submit a record whose mode closed during the write before it", async () => {
         // `markSubmitted` is a disk write. A switch to incognito during that await closes
         // the gate synchronously while the iteration is already past its first check; a
-        // submit after that is the one event FR-5's discard cannot unsend.
+        // submit after that is the one event the discard cannot take back.
         const base = createOutboxStore(DIR)
         const submit = transportReturning(acked)
         await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -1154,12 +1244,12 @@ describe("the telemetry outbox — the drain", () => {
 
     describe("a result that arrives after the queue it came from was discarded", () => {
       /**
-       * The third review's HIGH. The submit is held open; the mode switches to incognito
+       * The submit is held open; the mode switches to incognito
        * and the discard runs to completion; only then does the transport answer. Whatever
        * it answers, nothing may be written: not the record (`retryable`), not its loss
        * (`rejected`), not its tombstone (`acknowledged`, `handed_off`). Any of those
        * would recreate the directory, and a later grant would drain what the switch
-       * destroyed (FR-5).
+       * destroyed.
        */
       const results: Record<string, () => SubmitResult> = {
         retryable: () => ({ kind: "retryable" }),
@@ -1242,7 +1332,7 @@ describe("the telemetry outbox — the drain", () => {
       it.each(Object.keys(results))(
         "writes nothing back on a %s that lands after the account was deleted — the mode never moved",
         async (kind) => {
-          // The fourth review's HIGH: deletion retires the queue through the store, so the
+          // deletion retires the queue through the store, so the
           // generation moves even though the mode still says Enhanced.
           const store = createOutboxStore(DIR)
           const { submit, answer } = holdSubmit()
@@ -1309,7 +1399,7 @@ describe("the telemetry outbox — the drain", () => {
       })
 
       it("does not submit when Enhanced → Anon → Enhanced completes inside markSubmitted's write", async () => {
-        // The fourth review's MEDIUM: the second mode check says yes again, the queue is
+        // the second mode check says yes again, the queue is
         // already condemned, and the result would be refused — but the event would have
         // left. The lease is checked in the same breath as the mode, before the submit.
         const base = createOutboxStore(DIR)
@@ -1372,7 +1462,7 @@ describe("the telemetry outbox — the drain", () => {
         await drainOutbox(store, instantly)
 
         // Not submitted either: a record whose queue was condemned before it was marked
-        // is a withheld event, and sending it is the flush FR-5 forbids.
+        // is a withheld event, and sending it is the flush a switch must prevent.
         expect(submit).not.toHaveBeenCalled()
         expect(filesUnder()).toEqual([])
         expect(getOutboxCounters().staleWrites).toBeGreaterThanOrEqual(1)
@@ -1429,7 +1519,7 @@ describe("the telemetry outbox — loss and health", () => {
     setActiveOutbox(null)
   })
 
-  describe("AD-31 — loss is a pipeline: counted, reported once per drain, settled on ack", () => {
+  describe("loss is a pipeline: counted, reported once per drain, settled on ack", () => {
     const lossSeen = (submit: jest.Mock<Promise<SubmitResult>, [ContractPayload]>) =>
       submit.mock.calls
         .map(([payload]) => payload)
@@ -1558,7 +1648,7 @@ describe("the telemetry outbox — loss and health", () => {
       expect(await store.unreportedLoss()).toMatchObject({ expired: 1 })
     })
 
-    it("never reports from a device required to emit zero (AD-13)", async () => {
+    it("never reports from a device required to emit zero", async () => {
       const store = createOutboxStore(DIR)
       setActiveOutbox(store)
       const submit = transportReturning(acked)
@@ -1573,7 +1663,7 @@ describe("the telemetry outbox — loss and health", () => {
     })
   })
 
-  describe("FR-68 / AD-30 — the boundary's health is reachable, not just counted", () => {
+  describe("the boundary's health is reachable, not just counted", () => {
     const breadcrumbs = () => mockCrashlyticsLog.mock.calls.flat()
 
     it("aggregates every loss source and the drain's own numbers into one snapshot", async () => {
@@ -1607,7 +1697,7 @@ describe("the telemetry outbox — loss and health", () => {
       )
     })
 
-    it("says nothing from a device required to emit zero (AD-13)", async () => {
+    it("says nothing from a device required to emit zero", async () => {
       setActiveOutbox(createOutboxStore(DIR))
       await resolveTelemetryMode(TelemetryMode.Anon)
 

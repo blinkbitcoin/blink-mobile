@@ -403,4 +403,36 @@ describe("useDeleteAccount", () => {
 
     expect(setActiveOrder).toBeLessThan(disconnectOrder)
   })
+
+  it("clears the active account when the last wallet goes and there is no custodial one", async () => {
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    const updater = mockUpdateState.mock.calls.at(-1)?.[0] as (
+      prev: { activeAccountId?: string } | undefined,
+    ) => unknown
+    expect(updater({ activeAccountId: TEST_SC_ACCOUNT_ID })).toMatchObject({
+      activeAccountId: undefined,
+    })
+    // Nothing to clear before the store has loaded; the updater must say so rather than
+    // inventing a state object.
+    expect(updater(undefined)).toBeUndefined()
+  })
+
+  it("reports a rejection that is not an Error, without losing what it said", async () => {
+    mockDeleteMnemonicForAccount.mockRejectedValue("keystore exploded")
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBeUndefined()
+    expect(result.current.state).toBe("error")
+    expect(result.current.error?.message).toBe("keystore exploded")
+  })
 })

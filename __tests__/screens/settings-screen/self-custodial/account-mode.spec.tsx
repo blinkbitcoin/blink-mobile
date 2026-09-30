@@ -71,7 +71,7 @@ describe("AccountModeSetting", () => {
   })
 
   it("says an account that has not chosen a mode has none — it does not read as Enhanced", () => {
-    // Nothing is assumed for an account without a mode (AD-25): it is not pushed as
+    // Nothing is assumed for an account without a mode: it is not pushed as
     // Enhanced and does not behave as Enhanced, so the row must not say it is. The row is
     // still the path into choosing.
     const { getByText, queryByText } = renderRow()

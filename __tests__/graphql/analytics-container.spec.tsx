@@ -11,12 +11,14 @@ jest.mock("@app/telemetry", () => ({
     mockSetCustodialAnalyticsIdentity(...args),
 }))
 
+let mockMe: { id?: string; username?: string } | undefined = {
+  id: "ledger-account-id",
+  username: "satoshi",
+}
+
 jest.mock("@app/graphql/generated", () => ({
   useAnalyticsQuery: () => ({
-    data: {
-      me: { id: "ledger-account-id", username: "satoshi" },
-      globals: { network: "mainnet" },
-    },
+    data: { me: mockMe, globals: { network: "mainnet" } },
   }),
 }))
 
@@ -30,6 +32,7 @@ jest.mock("@app/hooks", () => ({
 
 describe("AnalyticsContainer", () => {
   beforeEach(() => {
+    mockMe = { id: "ledger-account-id", username: "satoshi" }
     jest.clearAllMocks()
   })
 
@@ -58,5 +61,26 @@ describe("AnalyticsContainer", () => {
       accountLevel: "One",
       galoyInstance: "Main",
     })
+  })
+
+  it("says so when the account has no username, rather than leaving the property unset", () => {
+    // The property is what the board splits on, so "no username" has to be a value.
+    mockMe = { id: "ledger-account-id" }
+
+    render(<AnalyticsContainer />)
+
+    expect(mockSetCustodialAnalyticsIdentity).toHaveBeenCalledWith({
+      properties: { hasUsername: "false" },
+    })
+  })
+
+  it("sets no user id at all when the query has not answered yet", () => {
+    mockMe = undefined
+
+    render(<AnalyticsContainer />)
+
+    expect(mockSetCustodialAnalyticsIdentity).not.toHaveBeenCalledWith(
+      expect.objectContaining({ userId: expect.anything() }),
+    )
   })
 })
