@@ -51,3 +51,39 @@ export const rateFreshness = (fetchedAt: number, now: number): RateFreshness => 
   if (age < RATES_USABLE_MS) return RateFreshness.Stale
   return RateFreshness.Expired
 }
+
+/**
+ * A place a price can come from — the port both account types implement.
+ *
+ * `app/self-custodial/adapters/price.ts` builds one over the Breez feed and the copy
+ * this device persisted; `app/custodial/adapters/price.ts` over the backend's
+ * `realtimePrice`. Shared code selects between them and never learns which answered.
+ */
+export type PriceSource = {
+  /** Undefined when this source cannot price the display currency. Never zero: an
+   *  amount derived from a missing rate would read as free. */
+  rates: PriceRates | undefined
+  freshness: RateFreshness
+  /** Whether this source has finished trying, so a caller can tell "not yet" from
+   *  "not coming" and stop spinning on a rate that will never arrive. */
+  hasSettled: boolean
+}
+
+/** A source that can price nothing and has nothing left to try. */
+export const noPriceSource: PriceSource = Object.freeze({
+  rates: undefined,
+  freshness: RateFreshness.Expired,
+  hasSettled: true,
+})
+
+/**
+ * The first source that could price the currency, or — when none could — the last, so
+ * the caller still learns whether anything is still trying.
+ *
+ * Order is preference. Adding a third source is appending to the call, which is the
+ * whole reason this is a list rather than a chain of `??`.
+ */
+export const firstPricedSource = (...sources: PriceSource[]): PriceSource =>
+  sources.find((source) => source.rates !== undefined) ??
+  sources[sources.length - 1] ??
+  noPriceSource

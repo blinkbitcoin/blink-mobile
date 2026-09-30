@@ -247,7 +247,7 @@ export const useMigrationTransfer = ({
       }
       fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
     },
-    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail],
+    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail, lnurlDomain],
   )
 
   /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already

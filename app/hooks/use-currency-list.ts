@@ -1,8 +1,14 @@
 import { useMemo } from "react"
 
+import { createCustodialCurrencyList } from "@app/custodial/adapters/currency"
 import { useCurrencyListQuery } from "@app/graphql/generated"
+import { createSelfCustodialCurrencyList } from "@app/self-custodial/adapters/currency"
 import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
-import { type DisplayCurrencyEntry } from "@app/types/currency"
+import {
+  firstPopulatedCurrencyList,
+  noCurrencyListSource,
+  type DisplayCurrencyEntry,
+} from "@app/types/currency"
 import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
@@ -28,38 +34,34 @@ export type CurrencyListResult = {
   isUnavailable: boolean
 }
 
-const EMPTY: readonly DisplayCurrencyEntry[] = Object.freeze([])
-
 export const useCurrencyList = (): CurrencyListResult => {
   const { activeAccount } = useAccountRegistry()
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const { currencies: sdkCurrencies, hasSettled: sdkHasSettled } = useFiatRates()
 
-  const hasSdkList = isSelfCustodial && sdkCurrencies.length > 0
+  const selfCustodialSource = isSelfCustodial
+    ? createSelfCustodialCurrencyList(sdkCurrencies, sdkHasSettled)
+    : noCurrencyListSource
 
   const { data, loading } = useCurrencyListQuery({
-    skip: hasSdkList,
+    skip: selfCustodialSource.currencies.length > 0,
     fetchPolicy: "cache-and-network",
   })
+  const backendSource = createCustodialCurrencyList(data?.currencyList, loading)
 
   return useMemo(() => {
-    if (hasSdkList) {
-      return { currencyList: sdkCurrencies, loading: false, isUnavailable: false }
-    }
-    const backendList = data?.currencyList ?? EMPTY
-    if (backendList.length > 0) {
-      return { currencyList: backendList, loading: false, isUnavailable: false }
+    const source = firstPopulatedCurrencyList(selfCustodialSource, backendSource)
+    if (source.currencies.length > 0) {
+      return { currencyList: source.currencies, loading: false, isUnavailable: false }
     }
     /** Only self-custodial can conclude that nothing is coming: it is the only session
-     *  whose other source can be known to have finished empty. */
-    const isUnavailable = !loading && isSelfCustodial && sdkHasSettled
-    return { currencyList: EMPTY, loading: loading && !isUnavailable, isUnavailable }
-  }, [
-    hasSdkList,
-    sdkCurrencies,
-    data?.currencyList,
-    loading,
-    isSelfCustodial,
-    sdkHasSettled,
-  ])
+     *  where every source can be known to have finished empty. */
+    const isUnavailable =
+      isSelfCustodial && selfCustodialSource.hasSettled && backendSource.hasSettled
+    return {
+      currencyList: source.currencies,
+      loading: !source.hasSettled && !isUnavailable,
+      isUnavailable,
+    }
+  }, [selfCustodialSource, backendSource, isSelfCustodial])
 }

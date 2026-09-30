@@ -230,7 +230,7 @@ export const useMigrationLnAddressTransfer = ({
           : MigrationLnAddressOutcome.Rejected
       }
     },
-    [network, selfCustodialDepositClaimLeewayVbyte, transferLnAddress],
+    [network, selfCustodialDepositClaimLeewayVbyte, transferLnAddress, lnurlDomain],
   )
 
   useEffect(() => {

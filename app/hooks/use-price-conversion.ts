@@ -8,10 +8,15 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { toPriceRatesFromRealtimePrice } from "@app/custodial/adapters/price"
-import { toPriceRates } from "@app/self-custodial/price/rate-mapping"
+import { createCustodialPriceSource } from "@app/custodial/adapters/price"
+import { createSelfCustodialPriceSource } from "@app/self-custodial/adapters/price"
 import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
-import { RateFreshness, type PriceRates } from "@app/types/price"
+import {
+  firstPricedSource,
+  noPriceSource,
+  RateFreshness,
+  type PriceSource,
+} from "@app/types/price"
 import {
   createToDisplayAmount,
   DisplayCurrency,
@@ -48,17 +53,13 @@ export const usePriceConversion = () => {
 
   /**
    * The SDK's feed, which a self-custodial account can read without the Blink backend.
-   * Empty outside a self-custodial session, and expired when it is too old to present.
+   * Only built for such an account: a second wallet on the device may have fetched a
+   * feed, but it is not this session's price.
    */
-  const {
-    rates: sdkRates,
-    freshness: sdkFreshness,
-    hasSettled: sdkHasSettled,
-  } = useFiatRates()
-  const sdkPriceRates =
-    isSelfCustodial && sdkFreshness !== RateFreshness.Expired
-      ? toPriceRates(sdkRates, displayCurrency)
-      : undefined
+  const feed = useFiatRates()
+  const selfCustodialSource: PriceSource = isSelfCustodial
+    ? createSelfCustodialPriceSource(feed, displayCurrency)
+    : noPriceSource
 
   const skipAuthed = !isAuthed || isSelfCustodial
   const { data: authedData } = useRealtimePriceQuery({
@@ -74,7 +75,7 @@ export const usePriceConversion = () => {
    * so a self-custodial session makes no price request of its own.
    */
   const skipUnauthed = isSelfCustodial
-    ? Boolean(sdkPriceRates)
+    ? Boolean(selfCustodialSource.rates)
     : isAuthed || Boolean(authedPrice)
   const { data: unauthedData, loading: unauthedLoading } = useRealtimePriceUnauthedQuery({
     skip: skipUnauthed,
@@ -83,27 +84,27 @@ export const usePriceConversion = () => {
     fetchPolicy: "cache-and-network",
   })
 
-  const candidatePrice = isSelfCustodial
-    ? unauthedData?.realtimePrice
-    : authedPrice ?? unauthedData?.realtimePrice
-
-  // Discard cached price when its denominator disagrees with the active preference.
-  const realtimePrice =
-    candidatePrice?.denominatorCurrency === displayCurrency ? candidatePrice : undefined
-
-  const backendPriceRates: PriceRates | undefined = realtimePrice
-    ? toPriceRatesFromRealtimePrice(realtimePrice)
-    : undefined
+  const backendSource = createCustodialPriceSource(
+    isSelfCustodial
+      ? unauthedData?.realtimePrice
+      : authedPrice ?? unauthedData?.realtimePrice,
+    displayCurrency,
+    !unauthedLoading,
+  )
 
   /**
-   * The SDK first for a self-custodial account. Both sources quote the same market, and
-   * preferring the one that is still there when the backend is not keeps the amounts on
-   * screen from changing meaning as services come and go.
+   * Order is preference: the SDK first for a self-custodial account, because both
+   * sources quote the same market and preferring the one that survives an outage keeps
+   * an amount on screen from changing meaning as services come and go. A custodial
+   * session has only the backend, and `noPriceSource` drops out of the selection.
+   *
+   * A third source — a cached third-party feed, a terminal's own rate — is an extra
+   * argument here rather than an edit to everything below.
    */
-  const priceRates = sdkPriceRates ?? backendPriceRates
+  const source = firstPricedSource(selfCustodialSource, backendSource)
 
-  const displayCurrencyPerSat = priceRates?.displayCurrencyPerSat ?? NaN
-  const displayCurrencyPerCent = priceRates?.displayCurrencyPerCent ?? NaN
+  const displayCurrencyPerSat = source.rates?.displayCurrencyPerSat ?? NaN
+  const displayCurrencyPerCent = source.rates?.displayCurrencyPerCent ?? NaN
 
   const priceOfCurrencyInCurrency = useMemo(() => {
     if (!displayCurrencyPerSat || !displayCurrencyPerCent) {
@@ -190,25 +191,21 @@ export const usePriceConversion = () => {
   }, [priceOfCurrencyInCurrency, displayCurrency])
 
   /**
-   * How current the rate behind these amounts is. Only the SDK feed can be old enough to
-   * matter: the backend's price is refetched per session and has no cached-but-ancient
-   * state to inherit, so anything priced off it reads Fresh.
+   * How current the rate behind these amounts is, as the source that answered reports
+   * it. Only the SDK feed can be old enough to matter; the backend has no persisted
+   * copy to inherit, so anything priced off it reads Fresh.
    */
-  const priceFreshness: RateFreshness = sdkPriceRates
-    ? sdkFreshness
-    : backendPriceRates
-      ? RateFreshness.Fresh
-      : RateFreshness.Expired
+  const priceFreshness: RateFreshness = source.freshness
 
   /**
    * Whether a caller waiting on a conversion should keep waiting. Only self-custodial
-   * can reach Unavailable: it is the only session whose price source can be known to
+   * can reach Unavailable: it is the only session where every source can be known to
    * have finished and come back empty. A custodial session keeps today's behaviour,
    * where no price means the screen is still loading.
    */
   const priceStatus: PriceStatus = converters
     ? PriceStatus.Ready
-    : isSelfCustodial && sdkHasSettled && !unauthedLoading
+    : isSelfCustodial && selfCustodialSource.hasSettled && backendSource.hasSettled
       ? PriceStatus.Unavailable
       : PriceStatus.Pending
 

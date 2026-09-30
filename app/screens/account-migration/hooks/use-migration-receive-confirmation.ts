@@ -239,7 +239,13 @@ export const useMigrationReceiveConfirmation = ({
       recheckRef.current = null
       if (timer) clearTimeout(timer)
     }
-  }, [isWatching, selfCustodialAccountId, network, selfCustodialDepositClaimLeewayVbyte])
+  }, [
+    isWatching,
+    selfCustodialAccountId,
+    network,
+    selfCustodialDepositClaimLeewayVbyte,
+    lnurlDomain,
+  ])
 
   /** The notice measures the wait for the receive, not the whole transfer: it runs from a
    *  timestamp rather than the effect's own lifetime because both callers recompute `skip`
