@@ -2,8 +2,11 @@ import { renderHook } from "@testing-library/react-native"
 
 const mockUseTransferGate = jest.fn()
 const mockDispatch = jest.fn()
-const mockResetAction = { type: "RESET" }
-const mockReset = jest.fn((_arg: unknown) => mockResetAction)
+/** The one reset every guard shares, as the navigator would receive it. */
+const RESET_TO_HOME = expect.objectContaining({
+  type: "RESET",
+  payload: { index: 0, routes: [{ name: "Primary" }] },
+})
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferGate: () => mockUseTransferGate(),
@@ -12,8 +15,8 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 const mockNavigation = { dispatch: mockDispatch }
 
 jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => mockNavigation,
-  CommonActions: { reset: (arg: unknown) => mockReset(arg) },
 }))
 
 import { useTransferBlockedGuard } from "@app/hooks/use-transfer-blocked-guard"
@@ -32,9 +35,13 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: false,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
-    expect(mockReset).not.toHaveBeenCalled()
   })
 
   it("returns true and dispatches a reset to Primary when transfers are blocked", () => {
@@ -42,9 +49,13 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toEqual({ isGated: true, isRegionPending: false })
-    expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [{ name: "Primary" }] })
-    expect(mockDispatch).toHaveBeenCalledWith(mockResetAction)
+    expect(result.current).toEqual({
+      isGated: true,
+      isRegionPending: false,
+      isBlocked: true,
+      isVerdictPending: false,
+    })
+    expect(mockDispatch).toHaveBeenCalledWith(RESET_TO_HOME)
   })
 
   it("reports a wait, not a block, while the region is still resolving", () => {
@@ -52,7 +63,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard())
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: true })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: true,
+      isBlocked: false,
+      isVerdictPending: true,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -75,7 +91,12 @@ describe("useTransferBlockedGuard", () => {
     mockUseTransferGate.mockReturnValue(NOT_BLOCKED)
     rerender({})
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: false,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -107,7 +128,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: true,
+      isVerdictPending: false,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 
@@ -116,7 +142,12 @@ describe("useTransferBlockedGuard", () => {
 
     const { result } = renderHook(() => useTransferBlockedGuard({ enabled: false }))
 
-    expect(result.current).toEqual({ isGated: false, isRegionPending: false })
+    expect(result.current).toEqual({
+      isGated: false,
+      isRegionPending: false,
+      isBlocked: false,
+      isVerdictPending: true,
+    })
     expect(mockDispatch).not.toHaveBeenCalled()
   })
 })

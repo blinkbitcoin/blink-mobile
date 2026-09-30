@@ -11,6 +11,7 @@ import {
 import { SuccessActionComponent } from "@app/components/success-action"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useScreenshot } from "@app/hooks"
+import { usePaymentObservers } from "./hooks/use-payment-observers"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
@@ -290,6 +291,7 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
     destination,
     paymentType,
     createdAt,
+    paymentRequest,
   } = route.params
 
   const styles = useStyles()
@@ -299,6 +301,20 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "sendBitcoinCompleted">>()
   const { LL } = useI18nContext()
+  /**
+   * Whoever was waiting on this payment is told it reached a receipt, and with which
+   * status; what they make of a pending one is theirs to decide. Told once for the life
+   * of the receipt: what an observer records in answer changes what it observes, and a
+   * receipt that told it again on every such change would say the same thing twice.
+   */
+  const paymentObservers = usePaymentObservers()
+  const hasToldObservers = useRef(false)
+  useEffect(() => {
+    if (hasToldObservers.current || paymentRequest === undefined) return
+    if (!paymentObservers.isObserved(paymentRequest)) return
+    hasToldObservers.current = true
+    paymentObservers.onSettled(paymentRequest, statusRaw)
+  }, [paymentRequest, statusRaw, paymentObservers])
 
   const { data } = useSettingsScreenQuery({ fetchPolicy: "cache-first" })
   const { successIconDuration } = useRemoteConfig()

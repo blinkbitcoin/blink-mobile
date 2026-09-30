@@ -3759,6 +3759,28 @@
         "message": "Menunggu deposit anda diselesaikan; sila tunggu 2 pengesahan pada rantai.",
         "buttonText": "OK"
       },
+      "HomeBulletin": {
+          "insufficient": {
+              "title": "Baki tidak mencukupi",
+              "body": "Untuk melengkapkan pelaburan anda, depositkan baki jumlah."
+          },
+          "depositPending": {
+              "title": "Tunggu sebentar",
+              "body": "Kami sedang menunggu deposit anda diselesaikan."
+          },
+          "ready": {
+              "title": "Lengkapkan pelaburan anda",
+              "body": "Kini anda mempunyai dana yang mencukupi untuk melengkapkan pelaburan."
+          },
+          "paymentPending": {
+              "title": "Pembayaran dalam perjalanan",
+              "body": "Pembayaran pelaburan anda sedang disahkan."
+          },
+          "shareholder": {
+              "title": "Selamat datang sebagai pemegang saham Blink!",
+              "body": "Kami akan memaklumkan anda sebaik sahaja Blink Visa Card anda sedia."
+          }
+      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {

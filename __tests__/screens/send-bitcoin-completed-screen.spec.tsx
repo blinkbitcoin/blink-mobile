@@ -17,7 +17,6 @@ import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import mocks from "@app/graphql/mocks"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import SendBitcoinCompletedScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-completed-screen"
-
 import { ContextForScreen, ContextForScreenWithTheme } from "./helper"
 import { AppStateStatus, Linking, View, ViewStyle } from "react-native"
 import { light, dark } from "@app/rne-theme/colors"
@@ -72,6 +71,18 @@ jest.mock("@react-navigation/native", () => {
     useNavigation: () => mockNavigation,
   }
 })
+
+/** Whoever watches payments through the send flow, stood in for: which invoices are
+ *  theirs, and what they are told. Their own specs cover what they do with it; what
+ *  matters here is that this screen tells them, once per receipt. */
+const mockIsObserved = jest.fn((_paymentRequest?: string) => false)
+const mockOnSettled = jest.fn()
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-payment-observers", () => ({
+  usePaymentObservers: () => ({
+    isObserved: (paymentRequest?: string) => mockIsObserved(paymentRequest),
+    onSettled: mockOnSettled,
+  }),
+}))
 
 let mockAppStateCurrentState: AppStateStatus = "active"
 const mockAppStateListeners: Array<(state: AppStateStatus) => void> = []
@@ -144,6 +155,36 @@ const pendingRoute = {
 } as const
 
 const Pending = () => <MockedScreen route={pendingRoute} />
+
+/** The invoice the card investment's transfer step minted and armed. */
+const INVESTMENT_INVOICE = "lnbc25m1investment"
+
+const investmentPaidRoute = {
+  key: "sendBitcoinCompleted",
+  name: "sendBitcoinCompleted",
+  params: {
+    status: "SUCCESS",
+    arrivalAtMempoolEstimate: undefined,
+    paymentType: "lightning",
+    paymentRequest: INVESTMENT_INVOICE,
+  },
+} as const
+
+const InvestmentPaid = () => <MockedScreen route={investmentPaidRoute} />
+
+const investmentPendingRoute = {
+  ...investmentPaidRoute,
+  params: { ...investmentPaidRoute.params, status: "PENDING" },
+} as const
+
+const InvestmentPending = () => <MockedScreen route={investmentPendingRoute} />
+
+const otherInvoiceRoute = {
+  ...investmentPaidRoute,
+  params: { ...investmentPaidRoute.params, paymentRequest: "lnbc1someoneelse" },
+} as const
+
+const OtherInvoicePaid = () => <MockedScreen route={otherInvoiceRoute} />
 
 const SuccessAction = ({
   route,
@@ -931,5 +972,113 @@ describe("SendBitcoinCompletedScreen", () => {
         backgroundColor: dark.white,
       })
     })
+  })
+})
+
+describe("SendBitcoinCompletedScreen payment observers", () => {
+  /** An observer following the investment's invoice. */
+  const investmentObserved = () => {
+    mockIsObserved.mockImplementation(
+      (paymentRequest?: string) => paymentRequest === INVESTMENT_INVOICE,
+    )
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsFocused.mockReturnValue(true)
+    loadLocale("en")
+    mockIsObserved.mockImplementation(() => false)
+  })
+
+  afterEach(() => {
+    jest.clearAllTimers()
+  })
+
+  it("tells the observers when a receipt settles an invoice they follow", async () => {
+    investmentObserved()
+
+    render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockIsObserved).toHaveBeenCalledWith(INVESTMENT_INVOICE)
+    expect(mockOnSettled).toHaveBeenCalledTimes(1)
+    expect(mockOnSettled).toHaveBeenCalledWith(INVESTMENT_INVOICE, "SUCCESS")
+  })
+
+  /** A pending payment has left the wallet too; what to make of it is the observer's. */
+  it("tells them about a pending receipt as well, with its status", async () => {
+    investmentObserved()
+
+    render(
+      <ContextForScreen>
+        <InvestmentPending />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockOnSettled).toHaveBeenCalledWith(INVESTMENT_INVOICE, "PENDING")
+  })
+
+  /** The investor backed into the send flow's destination step and paid someone else
+   *  while the transfer step still sat underneath: that payment is nobody's to hear of. */
+  it("tells nobody about a receipt for an invoice none of them follow", async () => {
+    investmentObserved()
+
+    render(
+      <ContextForScreen>
+        <OtherInvoicePaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockOnSettled).not.toHaveBeenCalled()
+  })
+
+  it("tells nobody about a receipt that names no invoice", async () => {
+    investmentObserved()
+
+    render(
+      <ContextForScreen>
+        <Success />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockOnSettled).not.toHaveBeenCalled()
+  })
+
+  it("tells them once for the life of the receipt", async () => {
+    investmentObserved()
+
+    const { rerender } = render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    rerender(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockOnSettled).toHaveBeenCalledTimes(1)
+  })
+
+  it("tells nobody while no observer follows anything", async () => {
+    render(
+      <ContextForScreen>
+        <InvestmentPaid />
+      </ContextForScreen>,
+    )
+    await waitFor(() => screen.findByTestId("Success Text"))
+
+    expect(mockOnSettled).not.toHaveBeenCalled()
   })
 })
