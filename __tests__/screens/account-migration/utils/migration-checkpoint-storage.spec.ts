@@ -123,6 +123,49 @@ describe("migration-checkpoint-storage", () => {
     })
   })
 
+  describe("validateStoredCheckpoint sparkInvoice", () => {
+    it("keeps a stored invoice", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        sparkInvoice: "lnbcrt1invoice",
+      })
+      expect(result?.sparkInvoice).toBe("lnbcrt1invoice")
+    })
+
+    /** Advisory like expectedReceiveSats: dropping it alone keeps the step and ids the
+     *  record resumes from, and an absent invoice falls back to the balance test. */
+    it("drops a non-string value but keeps the rest of the record", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        sparkInvoice: 42,
+      })
+
+      expect(result).toEqual({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        accountId: "sc-1",
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: undefined,
+        sparkInvoice: undefined,
+      })
+    })
+
+    /** An empty string would match no payment at all, so it is no better than absent and
+     *  must not be mistaken for a usable one. */
+    it("drops an empty invoice", () => {
+      const result = validateStoredCheckpoint({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1000,
+        sparkInvoice: "",
+      })
+      expect(result?.sparkInvoice).toBeUndefined()
+    })
+  })
+
   describe("validateStoredCheckpoint expectedReceiveSats", () => {
     it("keeps a stored number", () => {
       const result = validateStoredCheckpoint({
