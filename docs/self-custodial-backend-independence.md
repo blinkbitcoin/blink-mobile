@@ -259,29 +259,11 @@ price means the screen is still loading.
   the balance is hidden or still loading, and when the figure is in sats, which
   needs no rate.
 
-**Deliberately not done: a sats-only receive and send flow.** The original plan
-called for one, on the reading that inventory rows 3 and 4 spin forever without
-a rate. Looking again at the routing, that case is almost unreachable:
-
-- Every receive, send, conversion and deposit route is wrapped in `OfflineGate`
-  ([root-navigator.tsx:229-262](../app/navigation/root-navigator.tsx)), which
-  shows the offline notice whenever the Spark status is `Offline`, `Error` or
-  `Unavailable`.
-- The SDK's fiat feed is served by Breez's own gRPC service, not by Blink. If
-  Spark is reachable enough to open the receive screen, that feed is reachable
-  too; if it is not, `OfflineGate` has already taken over.
-- A feed older than 24 h implies 24 h without Spark, which is the same gate.
-
-So the residual gap is a wallet that connected to Spark but cannot reach the
-fiat feed — narrow enough that rebuilding the receive request state to be
-fiat-optional is not worth the risk it would carry. **Home is the exception**,
-since it sits outside `OfflineGate`, and that is exactly the case the sats
-fallback above covers.
-
-If this is revisited, the work is in
-[use-payment-request.ts:566](../app/self-custodial/hooks/use-payment-request.ts),
-which returns null without a converter, and in the receive components that take
-`convertMoneyAmount` as a required prop.
+**Superseded: the sats-only receive and send flow.** This phase originally
+argued that one was not worth building, on the reading that `OfflineGate` covers
+every route that could spin without a rate. That argument does not hold, and
+[Phase 11](#phase-11--sats-only-when-nothing-can-price) replaces it. What was
+wrong with it is recorded there rather than edited out of here.
 
 ### Phase 3 — Currency list independence · done
 
@@ -439,6 +421,88 @@ A "Blink services unavailable" section is added to
 [self-custodial-rollout.md](./self-custodial-rollout.md), covering both switches
 in both modes, cold start, the send-resolution case, Lightning Address, recovery
 within a session, and the custodial regression.
+
+---
+
+### Phase 11 — Sats-only when nothing can price
+
+*Reopens what Phase 2b closed. The reasoning that closed it was wrong twice.*
+
+**Why the earlier argument failed.** Phase 2b concluded that a wallet reaching
+the receive or send screen could always be priced, because those routes sit
+behind `OfflineGate` and the Breez fiat feed "rides on Breez's own gRPC, so if
+Spark is up the feed is reachable". Two holes:
+
+1. **They are different providers.** `strings` on the shipped
+   `libbreez_sdk_spark_bindings.so` shows the Spark operators at
+   `0.spark.lightspark.com`, `2.spark.flashnet.xyz` and `api.lightspark.com`,
+   while the rates gRPC and datasync are at `bs1.breez.technology` and
+   `nd1.breez.technology`. A regional block, a DNS failure or a Breez-side
+   outage can take the feed down with Spark perfectly healthy, and nothing
+   gates on that.
+2. **A currency the feed does not carry needs no outage at all.**
+   `listFiatRates` covers "fiat currencies for which there is a known exchange
+   rate" — a bounded list. `toPriceRates` returns undefined for anything outside
+   it, the backend is the only fallback, and if the backend is also down the
+   user has a healthy Spark wallet, a passing `OfflineGate`, and
+   `receive-screen.tsx:74` spinning on `!convertMoneyAmount` forever.
+
+The second is the sharper one: it is reachable on a good connection.
+
+**The rule.** When nothing can price, show every amount in the unit its own
+wallet is denominated in — sats for Bitcoin, dollars for USDB — and drop the
+converted line rather than inventing one. No rate is needed to state a balance
+in its own unit, which is why this degrades cleanly instead of partially.
+
+**Route taken: sats as the display currency, not a fiat-optional rewrite.**
+
+The instinct is to make every screen tolerate a missing converter, threading an
+optional one through the receive request state and the amount inputs. That is
+correct and expensive, and it spreads "might be undefined" across the send and
+receive flow, which is where the fund-loss watchpoints live.
+
+Cheaper and safer: keep `convertMoneyAmount` total by making the display
+currency *be* sats. Every screen keeps working unchanged, because the
+conversion it asks for — Bitcoin to display — becomes the identity.
+
+1. `usePriceConversion`, when `priceStatus === PriceStatus.Unavailable`, returns
+   a sats-only converter instead of `undefined`:
+   - Bitcoin ↔ display: identity, `currencyCode: "SAT"`.
+   - Any currency to itself: identity, as today.
+   - US dollars ↔ anything else: still unavailable. This is the honest gap and
+     it is bounded — see below.
+2. `useEffectiveDisplayCurrency` reports `"SAT"` in that mode, and
+   `useDisplayCurrency` gains the matching dictionary entry
+   (`symbol: ""`, `fractionDigits: 0`), which is the same shape
+   `WalletCurrency.Btc` already carries in `currencyInfo`.
+3. Remove the now-dead `!convertMoneyAmount` gates at
+   [receive-screen.tsx:74](../app/screens/receive-bitcoin-screen/receive-screen.tsx)
+   and [use-payment-request.ts:566](../app/self-custodial/hooks/use-payment-request.ts).
+   They stop being reachable once the converter is total, and leaving them would
+   hide a regression rather than catch one.
+4. Say so on screen. One line, in the pattern the stale-rate notice already
+   uses: amounts are in sats because no exchange rate is available. Without it
+   a user whose balance silently changes denomination will read it as their
+   money changing. One new string across 28 locales.
+
+**The bounded gap.** A Stable Balance holder has a USDB balance, and expressing
+it in sats needs the very rate that is missing. That row shows in dollars — its
+own unit — with no sats equivalent, and the total is the Bitcoin balance alone,
+exactly as `useTotalBalance` already does on the Unavailable branch. Understating
+a total is safer than completing it with a rate we do not have. A self-custodial
+account without Stable Balance has no USD leg at all, so for most users the
+sats-only mode is complete rather than partial.
+
+**Risk.** Lower than the rewrite, but not nil: `usePriceConversion` feeds every
+screen showing an amount, and this adds a mode in which its converter means
+something different. The guard is that the mode is reachable only from
+`PriceStatus.Unavailable`, which a custodial session cannot enter, plus the
+Phase 7 cold-start spec and the custodial regression in the release gate.
+
+**Done when** with both outage switches on, a display currency the Breez feed
+does not carry, and a cold start: home, receive and send all render in sats,
+an invoice can be produced, a payment can be sent, and one line on screen says
+why the amounts are not in the user's currency.
 
 ---
 
@@ -747,11 +811,13 @@ dependency.
 | 8 | Shared types out of the self-custodial module | — | Done |
 | 9 | Config seam pure again, clock injected | — | Done |
 | 10 | Price and currency behind a real port | 8 | Done |
+| 11 | Sats-only when nothing can price | 2b | |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the
 one that must land first if only one does.
 
-Phases 8–10 change no behaviour; they are the architecture follow-up described
-above. 8 and 9 are mechanical and independent of each other. 10 depends on 8 and
+Phase 11 reopens a decision Phase 2b got wrong and is the only outstanding
+behaviour change. Phases 8–10 change no behaviour; they are the architecture
+follow-up described above. 8 and 9 are mechanical and independent of each other. 10 depends on 8 and
 is the only one carrying real regression risk, so it is worth deciding on
 deliberately rather than treating as cleanup.
