@@ -1,14 +1,22 @@
 import * as React from "react"
-import { Text as ReactNativeText, TouchableOpacity, View, Linking } from "react-native"
+import {
+  ActivityIndicator,
+  Text as ReactNativeText,
+  TouchableOpacity,
+  View,
+  Linking,
+} from "react-native"
 import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
 
 import { flushEffects } from "../helpers/flush-effects"
 
+/** Records whether the list is asked to stay visible, the one thing the animation reads. */
+const mockDropInOut = jest.fn((_options: { visible: boolean }) => ({
+  opacity: { _value: 1 },
+  translateY: { _value: 0 },
+}))
 jest.mock("@app/components/animations", () => ({
-  useDropInOutAnimation: () => ({
-    opacity: { _value: 1 },
-    translateY: { _value: 0 },
-  }),
+  useDropInOutAnimation: (options: { visible: boolean }) => mockDropInOut(options),
 }))
 
 import { BulletinsCard } from "@app/components/notifications/bulletins"
@@ -128,6 +136,10 @@ const makeBulletinsQuery = (
 
 beforeEach(() => {
   jest.clearAllMocks()
+  /** Reset, not only cleared: a one-shot rejection a test queued and did not use must
+   *  not leak into the next one. */
+  mockAck.mockReset()
+  mockAck.mockImplementation(() => Promise.resolve())
   testBulletinsStore.clear()
   mockCardInfo.current = undefined
 })
@@ -317,6 +329,90 @@ describe("BulletinsCard", () => {
       expect(mockAck).not.toHaveBeenCalled()
     })
 
+    /** The one kept up goes on top, whatever arrived after it: a closable bulletin sent
+     *  later sits under it rather than pushing it down or out, and older closable ones
+     *  do not stack. */
+    it("puts the one it keeps up on top of the newest closable one", () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "notif-3", title: "Newer promo", dismissible: true }),
+        makeBulletin({ id: "notif-2", title: "Older promo", dismissible: true }),
+        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
+        makeBulletin({ id: "notif-0", title: "Older notice", dismissible: false }),
+      ])
+      const { queryByText, getAllByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      expect(
+        getAllByText(/Newer promo|Stays/).map((node) => node.props.children),
+      ).toEqual(["Stays", "Newer promo"])
+      expect(queryByText("Older promo")).toBeNull()
+      expect(queryByText("Older notice")).toBeNull()
+    })
+
+    it("shows the one it keeps up alone when nothing closable came with it", () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "notif-2", title: "Stays", dismissible: false }),
+        makeBulletin({ id: "notif-1", title: "Older notice", dismissible: false }),
+      ])
+      const { getByText, queryByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      expect(getByText("Stays")).toBeTruthy()
+      expect(queryByText("Older notice")).toBeNull()
+    })
+
+    /** Acknowledging one card spins that card alone; the one kept up stays readable. */
+    it("shows the spinner on the card being closed only", async () => {
+      let release: () => void = () => {}
+      mockAck.mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            release = resolve
+          }),
+      )
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
+        makeBulletin({ id: "notif-2", title: "Closable", dismissible: true }),
+      ])
+      const rendered = render(<BulletinsCard loading={false} bulletins={bulletins} />)
+
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
+      await act(async () => {})
+
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(1)
+      expect(rendered.getByText("Stays")).toBeTruthy()
+      expect(rendered.queryByText("Closable")).toBeNull()
+
+      await act(async () => {
+        release()
+      })
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
+    })
+
+    /** Closing one of two cards must not take the one that stays out with it: the list
+     *  animates out only when the card closed was the last one shown. */
+    it("keeps the list up when a card closes next to one that stays", async () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
+        makeBulletin({ id: "notif-2", title: "Closable", dismissible: true }),
+      ])
+      const { getByTestId } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByTestId("icon-button-close"))
+      await flushEffects()
+
+      expect(mockDropInOut).toHaveBeenLastCalledWith(
+        expect.objectContaining({ visible: true }),
+      )
+      expect(mockRefetchQueries).toHaveBeenCalledWith({
+        include: [expect.objectContaining({ kind: "Document" })],
+      })
+    })
+
     it("stays on the home next to a dismissible one, which keeps its close control", () => {
       const bulletins = makeBulletinsQuery([
         makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
@@ -380,15 +476,18 @@ describe("BulletinsCard", () => {
     })
   })
 
-  it("renders multiple bulletins", () => {
+  /** Closable bulletins do not stack: the newest one the server sent is the one shown. */
+  it("shows only the newest of several closable bulletins", () => {
     const bulletins = makeBulletinsQuery([
-      makeBulletin({ id: "notif-1", title: "First" }),
-      makeBulletin({ id: "notif-2", title: "Second" }),
+      makeBulletin({ id: "notif-2", title: "Newest" }),
+      makeBulletin({ id: "notif-1", title: "Older" }),
     ])
-    const { getByText } = render(<BulletinsCard loading={false} bulletins={bulletins} />)
+    const { getByText, queryByText } = render(
+      <BulletinsCard loading={false} bulletins={bulletins} />,
+    )
 
-    expect(getByText("First")).toBeTruthy()
-    expect(getByText("Second")).toBeTruthy()
+    expect(getByText("Newest")).toBeTruthy()
+    expect(queryByText("Older")).toBeNull()
   })
 
   /** With nothing from the server, the card the app itself asked for is what shows. */

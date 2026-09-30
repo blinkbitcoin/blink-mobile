@@ -2858,7 +2858,7 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0]).toEqual(
-      expect.objectContaining({ skip: false, variables: { first: 1 } }),
+      expect.objectContaining({ skip: false, variables: { first: 10 } }),
     )
   })
 

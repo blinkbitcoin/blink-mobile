@@ -196,6 +196,14 @@ gql`
   }
 `
 
+/**
+ * A page of bulletins rather than one: the home shows the newest bulletin the user cannot
+ * close next to the newest one they can, and one they cannot close must not be pushed off
+ * the page by the closable ones sent after it. Bulletins are few, so a small page holds
+ * them all; the card decides how many of them to show.
+ */
+const BULLETINS_PAGE_SIZE = 10
+
 // eslint-disable-next-line max-statements, max-lines-per-function -- HomeScreen orchestrates the entire home; splitting solely to meet the statement and line caps would fragment cohesive setup without improving readability
 export const HomeScreen: React.FC = () => {
   const styles = useStyles()
@@ -294,7 +302,7 @@ export const HomeScreen: React.FC = () => {
   } = useBulletinsQuery({
     skip: !isAuthed,
     fetchPolicy: "cache-and-network",
-    variables: { first: 1 },
+    variables: { first: BULLETINS_PAGE_SIZE },
   })
 
   // not loaded yet: no wallets while not ready (a loaded account keeps its balance
