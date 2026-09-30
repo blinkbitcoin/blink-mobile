@@ -5,7 +5,7 @@ import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
-import { Icon, StatefulNotification } from "@app/graphql/generated"
+import { Icon, StatefulNotificationsQuery } from "@app/graphql/generated"
 import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 import { Notification } from "@app/screens/notification-history-screen/notification"
@@ -22,9 +22,14 @@ const FIXED_NOW_MS = Date.UTC(2026, 0, 15, 12, 0, 0)
 const THIRTY_SECONDS_AGO = Math.floor(FIXED_NOW_MS / 1000) - 30
 const ACKNOWLEDGED_AT = Math.floor(FIXED_NOW_MS / 1000) - 60
 
+/** A notification as the history query returns it, the shape the row is typed from. */
+type HistoryNotification = NonNullable<
+  StatefulNotificationsQuery["me"]
+>["statefulNotificationsWithoutBulletinEnabled"]["nodes"][number]
+
 const makeNotification = (
-  overrides: Partial<StatefulNotification> = {},
-): StatefulNotification => ({
+  overrides: Partial<HistoryNotification> = {},
+): HistoryNotification => ({
   __typename: "StatefulNotification",
   id: "notification-1",
   title: "Self-custodial accounts have arrived",
@@ -32,13 +37,12 @@ const makeNotification = (
   createdAt: THIRTY_SECONDS_AGO,
   acknowledgedAt: null,
   bulletinEnabled: false,
-  dismissible: true,
   icon: null,
   action: null,
   ...overrides,
 })
 
-const renderNotification = (notification: StatefulNotification) =>
+const renderNotification = (notification: HistoryNotification) =>
   render(
     <ThemeProvider theme={theme}>
       <Notification {...notification} />
