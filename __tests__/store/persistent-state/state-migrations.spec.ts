@@ -520,7 +520,11 @@ describe("state-migrations schema 10", () => {
 
     expect(result).toEqual({ ...state20, schemaVersion: 23 })
   })
+})
 
+/** Split from the block above only to stay inside the max-lines-per-function cap; the
+ *  two halves are one suite in spirit. */
+describe("state-migrations — whole-chain and legacy attribution", () => {
   it("returns default state for invalid data", async () => {
     const result = await migrateAndGetPersistentState({ schemaVersion: 999 })
 

@@ -1,4 +1,5 @@
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
+import { AppState } from "react-native"
 
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { usePersistentStateContext } from "@app/store/persistent-state"
@@ -28,6 +29,11 @@ import { useSparkNetwork } from "./use-spark-network"
  * choice is made on screens with no connected SDK to sign with, and a push that fails
  * offline has to happen later anyway. What lands is recorded so the next launch stays
  * quiet, since each Enhanced push costs the server a paid country lookup.
+ *
+ * A failure is retried on the next return to the foreground rather than only on the next
+ * launch, so a user who regains signal mid-session gets their Lightning Address back
+ * without restarting the app. Only on the foreground, never on a timer: a retry loop
+ * against an Enhanced push would bill the server a country lookup per attempt.
  */
 export const useAccountModeSync = (): void => {
   const { accountMode } = useSelfCustodialAccountMode()
@@ -56,6 +62,16 @@ export const useAccountModeSync = (): void => {
    *  existed, or provisioned on another device. */
   const isResolveDue = isSdkOnActiveAccount && !accountMode
 
+  /** Bumped on each return to the foreground, which is what re-runs a sync that failed
+   *  while the server was unreachable. Nothing renders from it. */
+  const [foregroundCount, setForegroundCount] = useState(0)
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (status) => {
+      if (status === "active") setForegroundCount((count) => count + 1)
+    })
+    return () => subscription.remove()
+  }, [])
+
   useEffect(() => {
     if (!sdk || !isResolveDue || !activeAccountId) return
     recoverLnurlServerMode({ sdk, serverUrl: lnurlServerUrl })
@@ -66,7 +82,7 @@ export const useAccountModeSync = (): void => {
         )
       })
       .catch((err) => reportError("lnurl server mode resolve", err))
-  }, [sdk, isResolveDue, activeAccountId, lnurlServerUrl, updateState])
+  }, [sdk, isResolveDue, activeAccountId, lnurlServerUrl, updateState, foregroundCount])
 
   useEffect(() => {
     if (!sdk || !isPushDue || !activeAccountId || !accountMode) return
@@ -79,5 +95,13 @@ export const useAccountModeSync = (): void => {
         )
       })
       .catch((err) => reportError("lnurl server mode sync", err))
-  }, [sdk, isPushDue, activeAccountId, accountMode, lnurlServerUrl, updateState])
+  }, [
+    sdk,
+    isPushDue,
+    activeAccountId,
+    accountMode,
+    lnurlServerUrl,
+    updateState,
+    foregroundCount,
+  ])
 }
