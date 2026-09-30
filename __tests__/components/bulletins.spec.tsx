@@ -33,6 +33,17 @@ jest.mock("@apollo/client", () => ({
   }),
 }))
 
+/** Persistent bulletins on, the rollout this card is built for; the flag's own tests
+ *  switch it off. */
+const mockRemoteConfig = { persistentBulletinsEnabled: true }
+jest.mock("@app/config/feature-flags-context", () => {
+  const actual = jest.requireActual("@app/config/feature-flags-context")
+  return {
+    ...actual,
+    useRemoteConfig: () => ({ ...actual.defaultRemoteConfig, ...mockRemoteConfig }),
+  }
+})
+
 jest.mock("@app/graphql/generated", () => {
   const actual = jest.requireActual("@app/graphql/generated")
   return {
@@ -142,6 +153,7 @@ beforeEach(() => {
   mockAck.mockImplementation(() => Promise.resolve())
   testBulletinsStore.clear()
   mockCardInfo.current = undefined
+  mockRemoteConfig.persistentBulletinsEnabled = true
 })
 
 describe("BulletinsCard", () => {
@@ -488,6 +500,59 @@ describe("BulletinsCard", () => {
 
     expect(getByText("Newest")).toBeTruthy()
     expect(queryByText("Older")).toBeNull()
+  })
+
+  /** The rollout switch: off, a bulletin marked as not dismissible is treated like any
+   *  other, so a card stuck on every home by mistake can be closed without a release. */
+  describe("with persistent bulletins switched off", () => {
+    beforeEach(() => {
+      mockRemoteConfig.persistentBulletinsEnabled = false
+    })
+
+    it("gives a bulletin marked as not dismissible its close control back", async () => {
+      const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
+      const { getByTestId } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByTestId("icon-button-close"))
+      await flushEffects()
+
+      expect(mockAck).toHaveBeenCalledWith({
+        variables: { input: { notificationId: "notif-1" } },
+      })
+    })
+
+    it("acknowledges it on a press, as any closable bulletin", async () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({
+          dismissible: false,
+          action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
+        }),
+      ])
+      const { getByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      fireEvent.press(getByText("Test Bulletin"))
+      await flushEffects()
+
+      expect(Linking.openURL).toHaveBeenCalledWith("blink:/settings")
+      expect(mockAck).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows only the newest bulletin, whichever it is", () => {
+      const bulletins = makeBulletinsQuery([
+        makeBulletin({ id: "notif-2", title: "Newest", dismissible: true }),
+        makeBulletin({ id: "notif-1", title: "Kept up", dismissible: false }),
+      ])
+      const { getByText, queryByText } = render(
+        <BulletinsCard loading={false} bulletins={bulletins} />,
+      )
+
+      expect(getByText("Newest")).toBeTruthy()
+      expect(queryByText("Kept up")).toBeNull()
+    })
   })
 
   /** With nothing from the server, the card the app itself asked for is what shows. */

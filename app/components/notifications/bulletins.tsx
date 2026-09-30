@@ -6,6 +6,7 @@ import { useNotifications } from "."
 import { NotificationCardUI } from "./notification-card-ui"
 import { testBulletinsStore, useTestBulletins } from "./test-bulletins-store"
 import { useDropInOutAnimation } from "@app/components/animations"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import {
   BulletinsDocument,
   BulletinsQuery,
@@ -35,12 +36,16 @@ const linkOf = (action: Bulletin["action"]): string | null => {
 /**
  * The bulletins the home shows out of the page the server sent: the newest one the user
  * cannot close, if any, on top, where it stays however many closable ones arrive after
- * it, and under it the newest one they can close. Closable ones do not stack.
+ * it, and under it the newest one they can close. Closable ones do not stack. With
+ * persistent bulletins switched off every bulletin reads as closable, so only the newest
+ * one shows, as it always did.
  */
 const selectShownBulletins = (
   bulletins: readonly Bulletin[],
+  isPersistenceOn: boolean,
 ): { bulletin: Bulletin; canClose: boolean }[] => {
-  const canClose = (bulletin: Bulletin): boolean => bulletin.dismissible
+  const canClose = (bulletin: Bulletin): boolean =>
+    !isPersistenceOn || bulletin.dismissible
   const newestKept = bulletins.find((bulletin) => !canClose(bulletin))
   const newestClosable = bulletins.find(canClose)
   return [newestKept, newestClosable]
@@ -60,6 +65,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
   const [dismissing, setDismissing] = React.useState(false)
   const client = useApolloClient()
   const testBulletins = useTestBulletins()
+  const { persistentBulletinsEnabled } = useRemoteConfig()
 
   const [ack] = useStatefulNotificationAcknowledgeMutation()
   /** The bulletin whose acknowledgement is in flight: its card alone shows the spinner,
@@ -99,6 +105,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
     (
       bulletins?.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges ?? []
     ).map(({ node }) => node),
+    persistentBulletinsEnabled,
   )
   const hasBulletins = !loading && shownBulletins.length > 0
 
