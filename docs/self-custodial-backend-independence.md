@@ -70,7 +70,7 @@ wallet.**
 
 | # | Touchpoint | Where | Effect |
 |---|-----------|-------|--------|
-| 6 | `currencyList` | [display-currency-screen.tsx:35](../app/screens/settings-screen/display-currency-screen.tsx), [use-display-currency-from-region.ts:37](../app/self-custodial/hooks/use-display-currency-from-region.ts) | Empty currency picker; a fresh account never gets its region's currency and is stuck on USD. |
+| 6 | `currencyList` | [display-currency-screen.tsx:35](../app/screens/settings-screen/display-currency-screen.tsx), [use-display-currency-from-region.ts:37](../app/self-custodial/hooks/use-display-currency-from-region.ts), and `useDisplayCurrency`'s formatting dictionary | Empty currency picker; a fresh account never gets its region's currency; **and every amount renders with the US dollar defaults**, so a naira balance shows a dollar sign. |
 | 7 | Network-error toasts | [network-error-component.tsx:175](../app/graphql/network-error-component.tsx) | Every failed background query raises a toast. A self-custodial user gets repeated "connection" toasts for queries they never asked for. |
 | 8 | `homeUnauthed` in scan context | [use-scan-context.ts:25](../app/hooks/use-scan-context.ts) | Runs unskipped even in self-custodial mode, where the result is discarded — pure wasted request and one more toast. |
 | 9 | `mobileUpdate` | [app-update.tsx:47](../app/components/app-update/app-update.tsx) | `no-cache`, unskipped, on every home mount. Harmless result, another toast. |
@@ -277,26 +277,39 @@ If this is revisited, the work is in
 which returns null without a converter, and in the receive components that take
 `convertMoneyAmount` as a required prop.
 
-### Phase 3 — Currency list independence
+### Phase 3 — Currency list independence · done
 
-1. New `app/hooks/use-currency-list.ts` returning the app's `Currency[]`,
-   sourced from `listFiatCurrencies` for self-custodial and from
-   `useCurrencyListQuery` for custodial.
-2. `flag` derivation: ISO-4217 code → ISO-3166 alpha-2 prefix → regional-indicator
-   emoji, with an explicit override table for the codes that are not country
-   prefixed (`EUR`, `XAF`, `XOF`, `XCD`, `XPF`, `XDR`). Fall back to no flag
-   rather than a wrong one.
-3. Repoint [display-currency-screen.tsx:35](../app/screens/settings-screen/display-currency-screen.tsx)
-   and [use-display-currency-from-region.ts:37](../app/self-custodial/hooks/use-display-currency-from-region.ts)
-   at the new hook. The comment in the latter about "a launch that never reaches
-   the currency list writes nothing" can then be narrowed to the custodial case.
-4. Persist the list alongside the rates so the picker works on a cold start
-   before the SDK connects.
+The currency list is not only the settings picker. `useDisplayCurrency` builds
+its symbol-and-fraction-size dictionary from the same list, so with the backend
+down a naira balance rendered with a dollar sign and two forced decimals. That
+was the larger half of this phase.
 
-**Done when** the display-currency picker lists currencies and a freshly restored
-wallet picks up its region's currency, with both Phase 1 toggles on.
+- **Mapping** — [currency-mapping.ts](../app/self-custodial/price/currency-mapping.ts).
+  `FiatCurrency.info` gives name, `fractionSize` and a symbol grapheme; the flag
+  is derived, since ISO 4217 is the ISO 3166 country code plus a unit letter.
+  Checked against the backend's own `currencyList`, which answers `USD → 🇺🇸`,
+  `EUR → 🇪🇺`, `PKR → 🇵🇰`. The X-codes (`XAF`, `XOF`, `XCD`, `XPF`, `XDR`,
+  `XAU`, `XTS`) get no flag rather than a wrong one — `X` is not a country, the
+  row reads fine without one, and 🇽🇦 beside the Central African franc would be
+  a fabrication.
+- **Persistence** — [self-custodial-fiat-currencies.ts](../app/store/persistent-state/self-custodial-fiat-currencies.ts),
+  schema 23, beside the rates and for the same reason. No freshness rule: a
+  symbol and a fraction size do not move the way a price does.
+- **Provider** — the fiat provider now fetches both in one pass, with
+  `Promise.allSettled` rather than all-or-nothing. The rates are what the
+  balance needs; losing them because the currency list failed would be the
+  worse trade.
+- **One adapter** — [use-currency-list.ts](../app/hooks/use-currency-list.ts)
+  picks the source: the SDK for a self-custodial account that has a list, the
+  backend otherwise and for custodial always. It reports `isUnavailable` so the
+  picker can say so instead of spinning, which only a self-custodial session can
+  reach.
+- **Consumers repointed**: `useDisplayCurrency` (the formatting dictionary),
+  `display-currency-screen`, and `use-display-currency-from-region`.
 
----
+The region hook's old `skip` on the query is gone — the adapter owns that now,
+and `useDisplayCurrency` was fetching the list unconditionally anyway, so the
+skip saved nothing Apollo's cache was not already saving.
 
 ### Phase 4 — Backend health awareness and noise suppression
 
@@ -460,7 +473,7 @@ dependency.
 | 1 | Outage reproducible on demand | — | Done |
 | 2 | **Wallet is usable offline** | 1 | Done |
 | 2b | Staleness marker and home sats fallback | 2 | Done |
-| 3 | Currency selection works offline | 2 | |
+| 3 | Currency selection works offline | 2 | Done |
 | 4 | Honest, quiet UI | 1 | |
 | 5 | Lightning address degrades gracefully | 1, Q1 | |
 | 6 | Send never misreports a payee | 4 | |

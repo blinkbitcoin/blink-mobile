@@ -185,7 +185,7 @@ const persistentStateValue: NonNullable<
   React.ContextType<typeof PersistentStateContext>
 > = {
   persistentState: {
-    schemaVersion: 22,
+    schemaVersion: 23,
     galoyInstance: { id: "Main" },
     galoyAuthToken: "",
   },

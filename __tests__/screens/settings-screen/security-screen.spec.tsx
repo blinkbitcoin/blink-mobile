@@ -166,7 +166,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 
 const baseState: PersistentState = {
-  schemaVersion: 22,
+  schemaVersion: 23,
   galoyInstance: { id: "Main" },
   galoyAuthToken: "",
 }

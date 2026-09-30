@@ -2,7 +2,7 @@ import { useCallback, useMemo } from "react"
 
 import { gql } from "@apollo/client"
 import { APPROXIMATE_PREFIX } from "@app/config"
-import { useCurrencyListQuery, WalletCurrency } from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
 import {
@@ -16,6 +16,7 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 
+import { useCurrencyList } from "./use-currency-list"
 import { usePriceConversion } from "./use-price-conversion"
 
 gql`
@@ -135,20 +136,21 @@ const displayCurrencyHasSignificantMinorUnits = ({
 
 export const useDisplayCurrency = () => {
   const { LL } = useI18nContext()
-  const { data: dataCurrencyList } = useCurrencyListQuery()
+  const { currencyList } = useCurrencyList()
   const { convertMoneyAmount, displayCurrency, toDisplayMoneyAmount } =
     usePriceConversion()
 
-  const displayCurrencyDictionary = useMemo(() => {
-    const currencyList = dataCurrencyList?.currencyList || []
-    return currencyList.reduce(
-      (acc, currency) => {
-        acc[currency.id] = currency
-        return acc
-      },
-      {} as Record<string, typeof defaultDisplayCurrency>,
-    )
-  }, [dataCurrencyList?.currencyList])
+  const displayCurrencyDictionary = useMemo(
+    () =>
+      currencyList.reduce(
+        (acc, currency) => {
+          acc[currency.id] = currency
+          return acc
+        },
+        {} as Record<string, typeof defaultDisplayCurrency>,
+      ),
+    [currencyList],
+  )
 
   const displayCurrencyInfo =
     displayCurrencyDictionary[displayCurrency] || defaultDisplayCurrency

@@ -3,8 +3,9 @@ import { useCallback } from "react"
 import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 import { gql } from "@apollo/client"
 import { MenuSelect, MenuSelectItem } from "@app/components/menu-select"
-import { Currency, useCurrencyListQuery } from "@app/graphql/generated"
+import { useCurrencyList } from "@app/hooks/use-currency-list"
 import { useEffectiveDisplayCurrency } from "@app/hooks/use-effective-display-currency"
+import { type DisplayCurrencyEntry } from "@app/self-custodial/price/currency-mapping"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, SearchBar, Text } from "@rn-vui/themed"
@@ -32,31 +33,31 @@ export const DisplayCurrencyScreen: React.FC = () => {
 
   const { displayCurrency, setDisplayCurrency } = useEffectiveDisplayCurrency()
 
-  const { data, loading } = useCurrencyListQuery({
-    fetchPolicy: "cache-and-network",
-  })
+  const { currencyList, loading } = useCurrencyList()
 
   const [newCurrency, setNewCurrency] = React.useState("")
   const [searchText, setSearchText] = React.useState("")
-  const [matchingCurrencies, setMatchingCurrencies] = React.useState<Currency[]>([])
+  const [matchingCurrencies, setMatchingCurrencies] = React.useState<
+    DisplayCurrencyEntry[]
+  >([])
 
   const reset = () => {
     setSearchText("")
-    setMatchingCurrencies(data?.currencyList?.slice() ?? [])
+    setMatchingCurrencies(currencyList.slice())
   }
 
   React.useEffect(() => {
-    data?.currencyList && setMatchingCurrencies(data.currencyList.slice())
-  }, [data?.currencyList])
+    currencyList.length && setMatchingCurrencies(currencyList.slice())
+  }, [currencyList])
 
   const updateMatchingCurrency = useCallback(
     (newSearchText: string) => {
-      if (!data?.currencyList) {
+      if (currencyList.length === 0) {
         return
       }
       setSearchText(newSearchText)
 
-      const currencies = data.currencyList.slice()
+      const currencies = currencyList.slice()
       const matchSearch = getMatchingCurrencies(newSearchText, currencies)
       const currencyWithSearch = newSearchText.length > 0 ? matchSearch : currencies
 
@@ -79,7 +80,7 @@ export const DisplayCurrencyScreen: React.FC = () => {
 
       setMatchingCurrencies(currencyWithSearch)
     },
-    [data?.currencyList, displayCurrency],
+    [currencyList, displayCurrency],
   )
 
   if (loading) {
@@ -90,7 +91,7 @@ export const DisplayCurrencyScreen: React.FC = () => {
     )
   }
 
-  if (!data?.currencyList) {
+  if (currencyList.length === 0) {
     return <Text>{LL.DisplayCurrencyScreen.errorLoading()}</Text>
   }
 
@@ -135,14 +136,20 @@ export const DisplayCurrencyScreen: React.FC = () => {
   )
 }
 
-export const wordMatchesCurrency = (searchWord: string, currency: Currency): boolean => {
+export const wordMatchesCurrency = (
+  searchWord: string,
+  currency: DisplayCurrencyEntry,
+): boolean => {
   const matchForName = currency.name.toLowerCase().includes(searchWord.toLowerCase())
   const matchForId = currency.id.toLowerCase().includes(searchWord.toLowerCase())
 
   return matchForName || matchForId
 }
 
-export const getMatchingCurrencies = (searchText: string, currencies: Currency[]) => {
+export const getMatchingCurrencies = (
+  searchText: string,
+  currencies: DisplayCurrencyEntry[],
+) => {
   const searchWordArray = searchText.split(" ").filter((text) => text.trim().length > 0)
 
   return currencies.filter((currency) =>
