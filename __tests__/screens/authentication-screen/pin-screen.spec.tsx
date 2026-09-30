@@ -374,6 +374,7 @@ describe("PinScreen", () => {
 
       /** The lock outlives this logout, so the reset goes to the gate to ask
        *  whether the device is still locked rather than assume it is not. */
+      expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockLogout).toHaveBeenCalledWith({ preserveAppLock: true })
       await advance(1000) // the screen sleeps 1s before resetting navigation
       expect(mockReset).toHaveBeenCalledWith({
