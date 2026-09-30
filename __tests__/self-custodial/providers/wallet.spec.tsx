@@ -108,8 +108,16 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
   setSelfCustodialLightningAddress: (...args: unknown[]) =>
     mockSetSelfCustodialLightningAddress(...args),
+  getSelfCustodialLightningAddress: (id: string) =>
+    mockGetSelfCustodialLightningAddress(id),
   StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
 }))
+
+/** The provider seeds the address from what this device recorded, before asking the
+ *  SDK. Defaults to "nothing recorded", which is what a fresh account has. */
+const mockGetSelfCustodialLightningAddress = jest.fn(
+  async (_id: string): Promise<string | null> => null,
+)
 
 const mockUseIsAuthed = jest.fn().mockReturnValue(false)
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -1720,6 +1728,48 @@ describe("SelfCustodialWalletProvider — stale-write safety", () => {
           message: expect.stringContaining("Lightning address refresh failed"),
         }),
       )
+    })
+  })
+
+  describe("the Lightning Address when its server cannot be reached", () => {
+    /** Enough of an SDK for the resolve effect to run against. */
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fakeSdkForAddressTests = {} as any
+
+    it("offers the address this device recorded", async () => {
+      // An address is a name the LNURL server answers for, not device state: it keeps
+      // working for whoever pays it whether or not this device can ask about it.
+      mockGetSelfCustodialLightningAddress.mockResolvedValue("alice@blink.sv")
+      mockGetLightningAddress.mockRejectedValue(new Error("lnurl server down"))
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.lightningAddress).toBe("alice@blink.sv"))
+    })
+
+    it("lets the server's answer win over the recorded one", async () => {
+      // A name changed on another device is the truth; the seed only fills a gap.
+      mockGetSelfCustodialLightningAddress.mockResolvedValue("old@blink.sv")
+      mockGetLightningAddress.mockResolvedValue({ lightningAddress: "new@blink.sv" })
+
+      mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+      mockInitSdk.mockResolvedValue(fakeSdkForAddressTests)
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      await waitFor(() => expect(result.current.lightningAddress).toBe("new@blink.sv"))
+    })
+
+    it("stays empty for an account that never had one", async () => {
+      mockGetSelfCustodialLightningAddress.mockResolvedValue(null)
+      mockGetLightningAddress.mockRejectedValue(new Error("lnurl server down"))
+
+      const { result } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+
+      // Anchored on the lookup having happened, so a seed that never ran would fail
+      // here rather than pass by doing nothing.
+      await waitFor(() => expect(mockGetSelfCustodialLightningAddress).toHaveBeenCalled())
+      expect(result.current.lightningAddress).toBeNull()
     })
   })
 })

@@ -2354,6 +2354,8 @@
     "invalidAmount": "Chaynamanta kaniyta rikuyta munanpi, chaypi kawsayniyta qillqata sutichinaqinmi ch'usaq kayniyta rikuyta munanpi. Ñuqaqa ch'usaq kayniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi yachanakuyta sutichqin.",
     "usernameDoesNotExist": "{lnAddress: string} kaniyta rikuyta munanpi, {bankName: string} kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta. ",
     "usernameDoesNotExistAdvice": "Kaniyta yachanakuyta sutichinaqinmi k'anchaypi yachanakuyta sutichqinmi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi LN invoice kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi BTC kaniyta rikuyta munanpi yachanakuyta sutichqinmi.",
+    "destinationUnverifiable": "Kunanqa mana {lnAddress} qhawayta atinikuchu — {bankName} servidorkuna mana kutichinkuchu.",
+    "destinationUnverifiableAdvice": "Direccionqa allinpunichá. Pisi pachamanta yapamanta ruray, icha chaskiqmanta LN invoice utaq BTC direccion mañakuy.",
     "selfPaymentError": "{lnAddress: string} kaniyta rikuyta munanpi, kawsayniyta qillqata sutichinaqinmi {bankName: string} kaniyta rikuyta munanpi.",
     "selfPaymentAdvice": "Ñuqaqa kaniyta rikuyta munanpi, ñuqaqa kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi kaniyta yachanakuyta sutichinaqinmi, invoice, LN kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi BTC kaniyta rikuyta munanpi yachanakuyta sutichqinmi.",
     "lnAddressError": "Chaynamanta kaniyta rikuyta munanpi, Lightning kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanpi impuyta. Ñuqaqa kaniyta rikuyta munanpi kayniyta qillqata sutichinaqinmi, chaynamanta kaniyta rikuyta munanpi kawsayniyta qillqata sutichinaqinmi kaniyta rikuchiy.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Mana direccion servidorman chayayta atinchu. Direccionniykiqa kacharisqaraqmi — pisi pachamanta yapamanta ruray.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

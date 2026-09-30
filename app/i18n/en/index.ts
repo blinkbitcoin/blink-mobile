@@ -2392,6 +2392,10 @@ const en: BaseTranslation = {
       "{lnAddress: string} doesn't seem to be a {bankName: string} address that exists.",
     usernameDoesNotExistAdvice:
       "Either make sure the spelling is right or ask the recipient for an LN invoice or BTC address instead.",
+    destinationUnverifiable:
+      "We couldn't check {lnAddress: string} right now — {bankName: string}'s servers aren't responding.",
+    destinationUnverifiableAdvice:
+      "The address may well be fine. Try again in a moment, or ask the recipient for an LN invoice or BTC address instead.",
     selfPaymentError: "{lnAddress: string} is your {bankName: string} address.",
     selfPaymentAdvice:
       "If you want to send money to another account that you own, you can use an invoice, LN or BTC address instead.",
@@ -2863,6 +2867,8 @@ const en: BaseTranslation = {
       tooLong: "Address must be at most 50 characters long",
       invalidCharacter: "Address can only contain letters, numbers, and underscores",
       addressUnavailable: "Sorry, this address is already taken",
+      serverUnreachable:
+        "Couldn't reach the address server. Your address is still free — try again in a moment.",
       unknownError: "An unknown error occurred, please try again later",
       backupRequired: "Back up your wallet before creating a Lightning address",
     },

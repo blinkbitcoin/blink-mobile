@@ -2354,6 +2354,8 @@
     "invalidAmount": "Aceasta conține o sumă nevalidă. Vă rugăm să vă regenerați cu o sumă validă.",
     "usernameDoesNotExist": "{lnAddress: string} nu pare a fi o adresă {bankName: string} care există.",
     "usernameDoesNotExistAdvice": "Asigurați-vă că ortografia este corectă sau cereți destinatarului o factură LN sau o adresă BTC.",
+    "destinationUnverifiable": "Nu am putut verifica {lnAddress} acum — serverele {bankName} nu răspund.",
+    "destinationUnverifiableAdvice": "Adresa este probabil corectă. Încearcă din nou într-o clipă sau cere destinatarului o factură LN ori o adresă BTC.",
     "selfPaymentError": "{lnAddress: string} este adresa {bankName: string}.",
     "selfPaymentAdvice": "Dacă doriți să trimiteți bani către un alt cont pe care îl dețineți, puteți utiliza în schimb o factură, o adresă LN sau BTC.",
     "lnAddressError": "Nu putem avea acces la această adresă Lightning. Dacă sunteți sigur că există, puteți încerca din nou mai târziu.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Adresa poate să aibă cel mult 50 de caractere",
       "invalidCharacter": "Adresa poate conține doar litere, cifre și caractere de subliniere",
       "addressUnavailable": "Ne pare rău, această adresă este deja luată",
+      "serverUnreachable": "Serverul de adrese nu a putut fi contactat. Adresa ta este în continuare liberă — încearcă din nou într-o clipă.",
       "unknownError": "A apărut o eroare necunoscută, încercați din nou mai târziu",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

@@ -357,49 +357,62 @@ transaction limits, buy/sell and support still render and fail on tap. They are
 a smaller surface than the tabs and each needs its own copy; worth a pass of its
 own rather than a rushed one here.
 
-### Phase 5 — LNURL server degradation
+### Phase 5 — LNURL server degradation · done
 
-Scope decision required (see [Open questions](#open-questions)): whether "backend
-down" includes the LNURL server. Assuming yes:
+Scope decision: yes, "backend down" includes the LNURL server. It is a separate
+deployment, and the switches in Phase 1 can take it down on its own.
 
-1. **Receive without the server.** The receive screen must offer BOLT11, on-chain,
-   and Spark unconditionally — all three are SDK-local. Only the Lightning-address
-   tab depends on the server.
-2. **Address from storage.** Read the account's known address from
-   [storage/account-index.ts](../app/self-custodial/storage/account-index.ts)
-   rather than re-resolving through `getLightningAddress(sdk)` on every mount, and
-   show it with a "cannot verify right now" note when the server is unreachable.
-   The address keeps working for payers as soon as the server returns; nothing
-   about it is device state.
-3. **Registration errors.** Add `SetUsernameError.SERVER_UNREACHABLE` to
-   [username-validation.ts](../app/components/set-lightning-address-modal/username-validation.ts)
-   and classify it in
-   [use-register-lightning-address.ts](../app/self-custodial/hooks/use-register-lightning-address.ts),
-   with copy that says to try again rather than implying the name is taken.
-4. **Mode-sync retry.** Give
-   [use-account-mode-sync.ts](../app/self-custodial/hooks/use-account-mode-sync.ts)
-   a bounded in-session retry on foreground, so an Enhanced push that failed
-   offline lands as soon as connectivity returns instead of waiting a launch.
-   Keep the existing "record what landed" discipline — each Enhanced push costs
-   the server a paid country lookup.
+- **Receive already survives it.** BOLT11, on-chain and Spark are SDK-local, and
+  `canUsePaycode` in `use-payment-request` already turns only on whether an
+  address is known. Nothing to change; recorded here so the test matrix covers
+  it and nobody "fixes" it later.
+- **The address survives it too.** The wallet provider now seeds
+  `lightningAddress` from what this device recorded before asking the SDK. An
+  address is a name the LNURL server answers for, not device state: it keeps
+  working for whoever pays it whether or not this device can currently ask. A
+  question that could not be asked is not an answer that the account has none,
+  so a failed resolve leaves the seed standing. The SDK's answer still wins when
+  it arrives, so a name changed on another device is honoured.
+- **Registration says which failure it was.** New
+  `SetUsernameError.SERVER_UNREACHABLE`, classified off `classifySdkError`.
+  Collapsing it into `UNKNOWN_ERROR` told the user to try again later with no
+  hint that their chosen address is still free — the one thing they want to know
+  before going off to pick another.
+- **Mode sync retries on foreground**, not only on the next launch, so a user
+  who regains signal mid-session gets their Lightning Address back without
+  restarting. Foreground only, never a timer: each Enhanced push costs the
+  server a paid country lookup.
 
----
+### Phase 6 — Send destination resolution · done
 
-### Phase 6 — Send destination resolution
+The highest-stakes item in the plan. Telling a sender that a real payee does not
+exist is the worst thing the send screen can do: it sends them to correct a
+spelling that was right, or to abandon a payment that would have gone through.
 
-1. In [resolve-username.ts](../app/screens/send-bitcoin-screen/payment-destination/resolve-username.ts),
-   distinguish a *network failure* on `accountDefaultWallet` from a genuine
-   "no such account". On a network failure, fall straight through to the
-   Lightning-address/LNURL path instead of reporting `UsernameDoesNotExist`.
-2. If the LNURL fetch also fails, surface a new invalid reason
-   (`DestinationUnverifiable`) with copy that says the name could not be checked
-   right now — never that it does not exist. Misreporting a real payee as
-   nonexistent is the worst outcome in this whole plan.
-3. Document in the same file that invoices, on-chain addresses, Spark addresses,
-   and LNURL against third-party domains resolve without any Blink service, so a
-   scanned QR always works.
+`accountDefaultWallet` failing at the transport resolves with no data and an
+error, which was indistinguishable from an answer of "no such user".
+`getUserWalletId` now returns `Found | NotFound | Unverifiable`, reading the
+error rather than only the data, and treating a thrown lookup the same way —
+whatever went wrong, nothing was learned about the name. A found wallet still
+wins over an error alongside it, since a partial response that carries the id is
+an answer.
 
----
+`Unverifiable` becomes a new `InvalidDestinationReason.DestinationUnverifiable`
+with its own copy: "We couldn't check {address} right now", advising that the
+address may well be fine. `resolveUsername` retries over LNURL on it, as it does
+for a genuinely absent username, because that route runs against a different
+host.
+
+This also fixed a pre-existing bug one level up. A Blink LNURL whose account
+lookup failed used to fall through to `LnurlUnsupported` — marking a perfectly
+payable code as one Blink can never pay, because our own backend had a bad
+moment. It now falls back to paying over LNURL, which is what a self-custodial
+sender does anyway. The test that pinned the old behaviour is updated with the
+reasoning.
+
+Invoices, on-chain addresses, Spark addresses and LNURL against third-party
+domains never touched a Blink service and are unchanged, so a scanned QR always
+works.
 
 ### Phase 7 — Tests and release gate
 
@@ -465,8 +478,8 @@ dependency.
 
 ## Open questions
 
-1. **Scope of "down".** Does this work cover the LNURL server, or only the
-   GraphQL API? Phase 5 assumes yes.
+1. ~~**Scope of "down".**~~ Settled: it covers the LNURL server, which Phase 1's
+   switches can take down on its own.
 2. ~~**Rate provenance.**~~ Settled in Phase 2: the SDK wins for a
    self-custodial account whenever it can price the display currency. Both quote
    the same market, and preferring the source that survives an outage keeps an
@@ -490,8 +503,8 @@ dependency.
 | 2b | Staleness marker and home sats fallback | 2 | Done |
 | 3 | Currency selection works offline | 2 | Done |
 | 4 | Honest, quiet UI | 1 | Done |
-| 5 | Lightning address degrades gracefully | 1, Q1 | |
-| 6 | Send never misreports a payee | 4 | |
+| 5 | Lightning address degrades gracefully | 1, Q1 | Done |
+| 6 | Send never misreports a payee | 4 | Done |
 | 7 | Regression-proofed | 2–6 | |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the

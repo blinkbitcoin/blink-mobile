@@ -2354,6 +2354,8 @@
     "invalidAmount": "Ini mengandung jumlah yang tidak valid. Silakan buat ulang dengan jumlah yang valid.",
     "usernameDoesNotExist": "{lnAddress: string} tampaknya bukan alamat {bankName: string} yang ada.",
     "usernameDoesNotExistAdvice": "Pastikan ejaan benar atau minta penerima memberikan faktur LN atau alamat BTC.",
+    "destinationUnverifiable": "Kami tidak dapat memeriksa {lnAddress} sekarang — server {bankName} tidak merespons.",
+    "destinationUnverifiableAdvice": "Alamatnya kemungkinan besar benar. Coba lagi sebentar, atau minta penerima memberikan invoice LN atau alamat BTC.",
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} Anda.",
     "selfPaymentAdvice": "Jika Anda ingin mengirim uang ke akun lain milik Anda, gunakan faktur, LN, atau alamat BTC.",
     "lnAddressError": "Kami tidak dapat mencapai alamat Lightning ini. Jika Anda yakin itu ada, coba lagi nanti.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Alamat harus memiliki maksimal 50 karakter",
       "invalidCharacter": "Alamat hanya boleh berisi huruf, angka, dan garis bawah",
       "addressUnavailable": "Maaf, alamat ini sudah digunakan",
+      "serverUnreachable": "Tidak dapat menghubungi server alamat. Alamat Anda masih tersedia — coba lagi sebentar.",
       "unknownError": "Terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

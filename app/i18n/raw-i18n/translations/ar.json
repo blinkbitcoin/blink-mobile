@@ -2354,6 +2354,8 @@
     "invalidAmount": "في هذه الفاتورة مقدار غير صالح. ولّدها مرة أخرى بعنوان صالح من فضلك.",
     "usernameDoesNotExist": "لا يبدو أن عنوان البرق هذا ({lnAddress: string}) عنوان صالح وموجود في {bankName: string}.",
     "usernameDoesNotExistAdvice": "تحقق من الكتابة الصحيحة أو اطلب من المتلقّي فاتورة برق أو عنوان بيتكوين بدلًا من ذلك.",
+    "destinationUnverifiable": "تعذّر التحقق من {lnAddress} الآن — خوادم {bankName} لا تستجيب.",
+    "destinationUnverifiableAdvice": "قد يكون العنوان صحيحًا تمامًا. أعد المحاولة بعد قليل، أو اطلب من المستلم فاتورة LN أو عنوان BTC بدلاً من ذلك.",
     "selfPaymentError": "عنوان البرق هذا ({lnAddress: string}) هو عنوانك في {bankName: string}.",
     "selfPaymentAdvice": "إذا أردت إرسال النقد إلى حساب آخر لك، يمكنك أن تستعمل فاتورة في شبكة البرق أو عنوان بيتكوين.",
     "lnAddressError": "لم نستطع بلوغ عنوان البرق هذا. إن كنت متأكدًا من وجوده، جرّب مرة أخرى لاحقًا.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "تعذّر الوصول إلى خادم العناوين. عنوانك لا يزال متاحًا — أعد المحاولة بعد قليل.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

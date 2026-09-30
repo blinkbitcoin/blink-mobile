@@ -2354,6 +2354,8 @@
     "invalidAmount": "Số tiền không hợp lệ. Vui lòng tạo lại với số tiền hợp lệ.",
     "usernameDoesNotExist": "{lnAddress: string} dường như không phải là địa chỉ {bankName: string} tồn tại.",
     "usernameDoesNotExistAdvice": "Đảm bảo viết đúng chính tả hoặc yêu cầu người nhận cung cấp hóa đơn LN hoặc địa chỉ BTC. ",
+    "destinationUnverifiable": "Hiện chúng tôi không kiểm tra được {lnAddress} — máy chủ của {bankName} không phản hồi.",
+    "destinationUnverifiableAdvice": "Địa chỉ nhiều khả năng vẫn đúng. Hãy thử lại sau giây lát, hoặc xin người nhận hóa đơn LN hay địa chỉ BTC.",
     "selfPaymentError": "{lnAddress: string} là địa chỉ {bankName: string} của bạn.",
     "selfPaymentAdvice": "Nếu bạn muốn gửi tiền đến một tài khoản khác mà bạn sở hữu, bạn có thể sử dụng hóa đơn, địa chỉ LN hoặc BTC để thay thế.",
     "lnAddressError": "Chúng tôi không thể truy cập địa chỉ Lightning này. Nếu bạn chắc chắn rằng nó tồn tại, bạn có thể thử lại sau.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Không kết nối được máy chủ địa chỉ. Địa chỉ của bạn vẫn còn trống — hãy thử lại sau giây lát.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

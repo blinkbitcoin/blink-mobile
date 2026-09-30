@@ -196,8 +196,10 @@ export const resolveLnurlDestination = async ({
       })
     } catch {
       // Resolving the account behind the lnurl is a separate lookup against our own
-      // backend, and its failure is not a statement about the lnurl. Kept swallowed,
-      // as it was before.
+      // backend, and its failure is not a statement about the lnurl. A lookup that
+      // fails at the transport no longer reaches here at all — `getUserWalletId`
+      // reports it as unverifiable and the lnurl route is taken instead — so what is
+      // left is a genuine fault in building the destination.
     }
 
     return {

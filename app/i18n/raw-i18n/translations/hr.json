@@ -2354,6 +2354,8 @@
     "invalidAmount": "Ovo sadrži nevažeći iznos. Molimo regenerirajte s valjanim iznosom.",
     "usernameDoesNotExist": "Čini se da {lnAddress: string} nije adresa {bankName: string} koja postoji.",
     "usernameDoesNotExistAdvice": "Provjerite je li pravopis točan ili umjesto toga tražite od primatelja LN fakturu ili BTC adresu.",
+    "destinationUnverifiable": "Trenutačno nismo mogli provjeriti {lnAddress} — poslužitelji {bankName} ne odgovaraju.",
+    "destinationUnverifiableAdvice": "Adresa je vjerojatno ispravna. Pokušajte ponovno za trenutak ili zatražite od primatelja LN račun ili BTC adresu.",
     "selfPaymentError": "{lnAddress: string} je vaša {bankName: string} adresa.",
     "selfPaymentAdvice": "Ako želite poslati novac na drugi račun koji posjedujete, umjesto toga možete koristiti fakturu, LN ili BTC adresu.",
     "lnAddressError": "Ne možemo doći do ove Lightning adrese. Ako ste sigurni da postoji, možete pokušati ponovno kasnije.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Adresa mora imati najviše 50 znakova",
       "invalidCharacter": "Adresa može sadržavati samo slova, brojke i donje crte",
       "addressUnavailable": "Nažalost, ova adresa je već zauzeta",
+      "serverUnreachable": "Poslužitelj adresa nije dostupan. Vaša adresa je i dalje slobodna — pokušajte ponovno za trenutak.",
       "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

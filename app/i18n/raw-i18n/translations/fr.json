@@ -2354,6 +2354,8 @@
         "invalidAmount": "Cette facture contient un montant non valide. Merci d’en générer une nouvelle avec un montant valide.",
         "usernameDoesNotExist": "{lnAddress: string} ne semble pas être une adresse {bankName: string} existante.",
         "usernameDoesNotExistAdvice": "Assurez-vous que l’orthographe est correcte ou bien demandez au bénéficiaire une facture Lightning Network LN ou une adresse BTC à la place.",
+        "destinationUnverifiable": "Nous n'avons pas pu vérifier {lnAddress} pour le moment — les serveurs de {bankName} ne répondent pas.",
+        "destinationUnverifiableAdvice": "L'adresse est probablement correcte. Réessayez dans un instant, ou demandez plutôt une facture LN ou une adresse BTC au destinataire.",
         "selfPaymentError": "{lnAddress: string} est votre adresse {bankName: string}.",
         "selfPaymentAdvice": "Si vous souhaitez envoyer de l’argent à un autre compte que le vôtre, vous pouvez utiliser une facture avec une adresse Lightning Network LN ou BTC à la place.",
         "lnAddressError": "Nous ne pouvons pas accéder à cette adresse Lightning. Si vous êtes sûr qu’elle existe, vous pouvez essayer à nouveau ultérieurement.",
@@ -2741,6 +2743,7 @@
             "tooLong": "L’adresse ne peut excéder plus de 50 caractères",
             "invalidCharacter": "L’adresse ne peut contenir que des lettres, chiffres et des tirets.",
             "addressUnavailable": "Désolé, cette adresse est déjà utilisée",
+            "serverUnreachable": "Impossible de joindre le serveur d'adresses. Votre adresse est toujours libre — réessayez dans un instant.",
             "unknownError": "Une erreur inconnue est survenue, merci d’essayer ultérieurement",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
