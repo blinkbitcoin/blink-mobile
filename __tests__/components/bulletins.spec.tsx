@@ -266,6 +266,20 @@ describe("BulletinsCard", () => {
       expect(queryByTestId("icon-button-close")).toBeNull()
     })
 
+    /** A standing notice with no link has nothing to open and nothing to acknowledge, so
+     *  it is an inert card: no press feedback, no button role, no dead press. */
+    it("is an inert card when it has no link", () => {
+      const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
+      const rendered = render(<BulletinsCard loading={false} bulletins={bulletins} />)
+
+      expect(rendered.getByText("Test Bulletin")).toBeTruthy()
+      expect(rendered.UNSAFE_queryAllByType(TouchableOpacity)).toHaveLength(0)
+
+      fireEvent.press(rendered.getByText("Test Bulletin"))
+      expect(Linking.openURL).not.toHaveBeenCalled()
+      expect(mockAck).not.toHaveBeenCalled()
+    })
+
     it("opens its deep link on press without acknowledging it", async () => {
       const bulletins = makeBulletinsQuery([
         makeBulletin({

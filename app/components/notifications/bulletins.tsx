@@ -19,6 +19,19 @@ type Props = {
   bulletins: BulletinsQuery | undefined
 }
 
+type Bulletin = NonNullable<
+  BulletinsQuery["me"]
+>["unacknowledgedStatefulNotificationsWithBulletinEnabled"]["edges"][number]["node"]
+
+/** The address a bulletin's action opens, or null when it has none. */
+const linkOf = (action: Bulletin["action"]): string | null => {
+  if (action?.__typename === "OpenDeepLinkAction") {
+    return BLINK_DEEP_LINK_PREFIX + action.deepLink
+  }
+  if (action?.__typename === "OpenExternalLinkAction") return action.url
+  return null
+}
+
 const BULLETIN_ANIMATION = {
   delay: 300,
   distance: 50,
@@ -78,6 +91,15 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
             const dismiss = bulletin.dismissible
               ? () => dismissWithAnimation(bulletin.id)
               : undefined
+            const link = linkOf(bulletin.action)
+            /** With nothing to open and nothing to acknowledge, the card is inert rather
+             *  than a button that does nothing. */
+            const hasSomethingToDo = link !== null || bulletin.dismissible
+            const openBulletin = async () => {
+              if (link) Linking.openURL(link)
+              if (dismiss) await dismiss()
+            }
+            const pressAction = hasSomethingToDo ? openBulletin : undefined
 
             return (
               <NotificationCardUI
@@ -89,13 +111,7 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
                 key={bulletin.id}
                 title={bulletin.title}
                 text={bulletin.body}
-                action={async () => {
-                  if (bulletin.action?.__typename === "OpenDeepLinkAction")
-                    Linking.openURL(BLINK_DEEP_LINK_PREFIX + bulletin.action.deepLink)
-                  else if (bulletin.action?.__typename === "OpenExternalLinkAction")
-                    Linking.openURL(bulletin.action.url)
-                  if (dismiss) await dismiss()
-                }}
+                action={pressAction}
                 dismissAction={dismiss}
                 loading={ackLoading}
                 buttonLabel={bulletin.action?.label ?? undefined}
