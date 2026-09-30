@@ -35,6 +35,7 @@ import {
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialFiatRatesProvider } from "./self-custodial/providers/fiat-rates"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -86,36 +87,40 @@ export const App = () => (
                     <WindDownStatusProvider>
                       <TwoFactorEnforcementProvider>
                         <SelfCustodialWalletProvider>
-                          <BackupStateProvider>
-                            <AutoConvertStatusProvider>
-                              <ActionsProvider>
-                                <MigrationBlockerProvider>
-                                  <NavigationContainerWrapper>
-                                    <ErrorBoundary FallbackComponent={ErrorScreen}>
-                                      <RootSiblingParent>
-                                        <EnhancedModePromptProvider>
-                                          <RestrictedRegionProvider>
-                                            <NotificationsProvider>
-                                              <AppStateWrapper />
-                                              <PushNotificationComponent />
-                                              <AutoConvertListenerMount />
-                                              <AccountModeSyncMount />
-                                              <DisplayCurrencyFromRegionMount />
-                                              <RecoveryBundleListenerMount />
-                                              <RootStack />
-                                              <NetworkErrorComponent />
-                                              <ActionModals />
-                                            </NotificationsProvider>
-                                          </RestrictedRegionProvider>
-                                        </EnhancedModePromptProvider>
-                                        <GaloyToast />
-                                      </RootSiblingParent>
-                                    </ErrorBoundary>
-                                  </NavigationContainerWrapper>
-                                </MigrationBlockerProvider>
-                              </ActionsProvider>
-                            </AutoConvertStatusProvider>
-                          </BackupStateProvider>
+                          {/* Inside the wallet provider, which supplies the SDK it reads the
+                              fiat feed from, and above everything that prices an amount. */}
+                          <SelfCustodialFiatRatesProvider>
+                            <BackupStateProvider>
+                              <AutoConvertStatusProvider>
+                                <ActionsProvider>
+                                  <MigrationBlockerProvider>
+                                    <NavigationContainerWrapper>
+                                      <ErrorBoundary FallbackComponent={ErrorScreen}>
+                                        <RootSiblingParent>
+                                          <EnhancedModePromptProvider>
+                                            <RestrictedRegionProvider>
+                                              <NotificationsProvider>
+                                                <AppStateWrapper />
+                                                <PushNotificationComponent />
+                                                <AutoConvertListenerMount />
+                                                <AccountModeSyncMount />
+                                                <DisplayCurrencyFromRegionMount />
+                                                <RecoveryBundleListenerMount />
+                                                <RootStack />
+                                                <NetworkErrorComponent />
+                                                <ActionModals />
+                                              </NotificationsProvider>
+                                            </RestrictedRegionProvider>
+                                          </EnhancedModePromptProvider>
+                                          <GaloyToast />
+                                        </RootSiblingParent>
+                                      </ErrorBoundary>
+                                    </NavigationContainerWrapper>
+                                  </MigrationBlockerProvider>
+                                </ActionsProvider>
+                              </AutoConvertStatusProvider>
+                            </BackupStateProvider>
+                          </SelfCustodialFiatRatesProvider>
                         </SelfCustodialWalletProvider>
                       </TwoFactorEnforcementProvider>
                     </WindDownStatusProvider>

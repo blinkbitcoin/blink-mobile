@@ -140,10 +140,19 @@ type CurrencyInfo = {
 This covers everything the app's `Currency` type needs (`id`, `name`, `symbol`,
 `fractionDigits` ← `fractionSize`) except `flag`, which is derivable.
 
-Two things must be confirmed on a device before Phase 2 is committed to (see
-[Open questions](#open-questions)): the units of `Rate.value`, and whether
-`listFiatRates` is served from the SDK's own cache when its rate provider is
-unreachable.
+Both open questions about this feed are now answered, from the shipped
+`libbreez_sdk_spark_bindings.so` rather than from the bindings' own prose:
+
+- **`Rate.value` is the price of one whole BTC denominated in `coin`.** The
+  bindings only call it "denominator in an exchange rate". The direction is
+  settled by the SDK's own cross-chain code, which looks `"USD"` up in this feed
+  and fails with `Cross-chain: BTC/USD rate not found in feed` — so the entry
+  keyed `USD` *is* the BTC/USD rate.
+- **The SDK caches in memory only.** `breez_sdk_spark::cross_chain::cached_fiat`
+  holds a `HashMap<&str, CachedEntry>` behind `get_or_fetch`, with a `now_ms`
+  TTL. It answers offline within a session, but the map is rebuilt empty on every
+  process launch, so a cold start has nothing. The app must persist what it
+  reads; that layer is load-bearing, not belt-and-braces.
 
 ## Phases
 
@@ -152,7 +161,7 @@ The phases are ordered by user impact. Phase 2 alone converts "unusable" into
 
 ---
 
-### Phase 1 — Reproducibility ✅
+### Phase 1 — Reproducibility · done
 
 *Small. Prerequisite for trusting any later phase.*
 
@@ -187,68 +196,49 @@ that touch those call sites, rather than churning them twice.
 
 ---
 
-### Phase 2 — Price independence *(the blocker)*
+### Phase 2 — Price independence · done *(the blocker)*
 
 *The only phase that changes whether the wallet works at all.*
 
-1. **Bridge.** New `app/self-custodial/bridge/fiat.ts`, in the style of the other
-   bridge modules: `listFiatRates(sdk)`, `listFiatCurrencies(sdk)`, each with an
-   `AbortController` timeout and `classifySdkError` mapping. Export from
-   `app/self-custodial/bridge/index.ts`.
+- **Bridge** — [app/self-custodial/bridge/fiat.ts](../app/self-custodial/bridge/fiat.ts):
+  `listFiatRates` and `listFiatCurrencies`, each behind a 10 s abort.
+- **Mapping** — [app/self-custodial/price/rate-mapping.ts](../app/self-custodial/price/rate-mapping.ts),
+  pure. Turns the feed into the two ratios the conversion layer works in:
+  `displayCurrencyPerSat = rate(display) / 100_000_000` and
+  `displayCurrencyPerCent = rate(display) / rate("USD") / 100`. A display
+  currency of USD short-circuits to an exact hundredth rather than dividing a
+  rate by itself. A missing, zero, negative or non-finite rate yields
+  `undefined`, never a number: an amount derived from a missing rate would read
+  as free. `toPriceRatesFromRealtimePrice` brings the backend's price into the
+  same shape, so one comparison picks between the two sources.
+- **Persistence** — [self-custodial-fiat-rates.ts](../app/store/persistent-state/self-custodial-fiat-rates.ts),
+  schema 22. Device-wide, not per account: a rate belongs to the world. It lives
+  in `persistentState` rather than the Apollo cache precisely because that
+  cache's restore is skipped without a token, which is the privacy boundary
+  principle 5 protects.
+- **Provider** — [fiat-rates.tsx](../app/self-custodial/providers/fiat-rates.tsx).
+  Hydrates from persistent state on the first render, so a cold start has a rate
+  before any fetch settles; refreshes on SDK connect, on foreground and every
+  5 min; one request in flight at a time. A failed refresh is silent and leaves
+  the stored feed standing — the freshness the consumer reads already says how
+  old it is, and an empty result never overwrites a good feed.
+- **Conversion** — [use-price-conversion.ts](../app/hooks/use-price-conversion.ts).
+  For a self-custodial account: SDK feed first, backend second, and the backend
+  query is skipped entirely once the SDK has answered — so a self-custodial
+  session makes no price request of its own. It still asks when the feed cannot
+  price the display currency, which is the feed's own gap rather than an outage.
+  The hook now also returns `priceFreshness`.
 
-2. **Rate mapping.** New `app/self-custodial/price/rate-mapping.ts` translating
-   Breez rates into the shape `usePriceConversion` already consumes:
-   - `displayCurrencyPerSat = rate(display) / 100_000_000`
-   - `displayCurrencyPerCent = rate(display) / rate("USD") / 100`
-   - Keep the `base`/`offset` representation so the existing consumers and the
-     `RealtimePrice` cache normalisation in [cache.ts:56](../app/graphql/cache.ts)
-     are untouched.
-   - Return `undefined` when the display currency has no rate, so the caller can
-     fall through rather than render `NaN`.
+Staleness thresholds: fresh under 1 h, usable-but-marked under 24 h, withheld
+beyond that. A feed timestamped in the future (clock correction, a user setting
+the date back) reads fresh rather than expired — blanking a figure the app just
+fetched is the worse failure.
 
-3. **Persistence.** New `app/store/persistent-state/self-custodial-fiat-rates.ts`
-   holding `{ rates, fetchedAt, source }` keyed by nothing (rates are global, not
-   per-account), plus a migration in
-   [state-migrations.ts](../app/store/persistent-state/state-migrations.ts).
-   This is what survives a cold start, given the deliberate Apollo-restore skip.
-
-4. **Provider.** New `app/self-custodial/providers/fiat-rates.tsx`:
-   - Hydrates from persistent state synchronously on mount.
-   - Refreshes from the SDK on connect, on foreground, and on a poll matching the
-     existing `PRICE_POLL_INTERVAL_MS` (5 min).
-   - Exposes `{ rates, fetchedAt, isStale, refresh }`.
-   - Mount inside `SelfCustodialWalletProvider` in [app.tsx](../app/app.tsx) so it
-     has the connected SDK.
-
-5. **Wire into conversion.** In
-   [use-price-conversion.ts](../app/hooks/use-price-conversion.ts), the
-   self-custodial branch resolves in this order:
-   1. Fresh SDK rates.
-   2. `realtimePriceUnauthed` (keep it — it is a good second opinion when the
-      backend *is* up and the SDK has no rate for an exotic currency).
-   3. Persisted rates, marked stale.
-
-   Set `skipUnauthed` so the GraphQL query is not fired when the SDK already
-   answered; a mixed-account user on the self-custodial account stops hitting the
-   authed query at all.
-
-6. **Staleness UI.** Define a threshold (proposal: 1 h fresh, 24 h usable-stale,
-   beyond 24 h "rate unavailable"). Surface it as:
-   - an "as of <time>" line under the home balance,
-   - an inline notice on the receive and send-details screens when the entered
-     amount is priced off a stale rate,
-   - never a blocker: a user must always be able to fall back to entering sats.
-
-7. **Sats-first fallback.** When no rate is available at any age, amount entry
-   must degrade to BTC/sats-only rather than returning `null`. This is the
-   change that removes the permanent spinners at inventory rows 3 and 4.
-   - Files: `receive-screen.tsx`, `send-bitcoin-details-screen.tsx`,
-     `use-total-balance.ts`.
-
-**Done when** with both toggles from Phase 1 on and a cold app start, the home
-balance renders, receive produces an invoice, and send accepts an amount.
-
----
+**Still open, and carried into Phase 2b:** the staleness marker and the
+sats-first fallback are not yet on screen. `priceFreshness` is plumbed but no
+surface reads it, and the permanent spinners at inventory rows 3 and 4 are gone
+only because a rate is now almost always available — not because those screens
+can yet render without one.
 
 ### Phase 3 — Currency list independence
 
@@ -398,26 +388,28 @@ What I would like confirmed on-device, with the local backend stopped:
 | A4 | Toast storm | Count the connection toasts in the first 60 s on Home |
 | A5 | Everything SDK-local still works | Transaction list, CSV export, contacts, fee quotes, BTC↔USDB convert |
 | A6 | Boot is not blocked | The app reaches Home at all (the Apollo provider does not await the network — worth confirming empirically) |
-| A7 | `sdk.listFiatRates()` units | Log one call: is `value` the BTC price in that fiat, or the fiat price in BTC? |
-| A8 | `sdk.listFiatRates()` offline behaviour | Airplane mode after a successful connect: does it return cached rates or throw? |
+| A7 | ~~`sdk.listFiatRates()` units~~ | Answered from the binary: `value` is the BTC price in `coin`. |
+| A8 | ~~`sdk.listFiatRates()` offline behaviour~~ | Answered from the binary: an in-memory TTL cache, empty after a process launch. |
+| A9 | Phase 2 actually holds on a device | Both switches on, kill and relaunch: the balance, receive and send-amount screens all work off the persisted feed. |
 
-A7 and A8 decide whether Phase 2 can lean on the SDK alone or must keep the
-persisted-rate layer as the primary path. They are the only answers that could
-change the shape of the plan rather than its details, so they are worth getting
-first. Everything else above is a confirmation of static reading, not a
+A7 and A8 were the two answers that could have changed the shape of the plan
+rather than its details, and both are now settled from
+`libbreez_sdk_spark_bindings.so`. A9 replaces them as the thing worth checking
+on hardware. Everything else above is a confirmation of static reading, not a
 dependency.
 
 ## Open questions
 
 1. **Scope of "down".** Does this work cover the LNURL server, or only the
    GraphQL API? Phase 5 assumes yes.
-2. **Rate provenance.** If the SDK's rates and Blink's disagree, which wins while
-   both are available? Proposal: Blink when reachable (it is what the custodial
-   side prices against, and it keeps the two account types consistent for a mixed
-   user), SDK otherwise — with the SDK becoming primary if A8 shows it caches.
-3. **Stale-rate ceiling.** Is 24 h the right point to stop showing a fiat figure
-   at all? A merchant at a market stall would rather see a day-old rate than
-   nothing; a user checking net worth would not.
+2. ~~**Rate provenance.**~~ Settled in Phase 2: the SDK wins for a
+   self-custodial account whenever it can price the display currency. Both quote
+   the same market, and preferring the source that survives an outage keeps an
+   amount on screen from changing meaning as services come and go. A custodial
+   session is untouched.
+3. **Stale-rate ceiling.** Phase 2 picked 24 h, on the reasoning that the people
+   most likely to be offline for long would rather see yesterday's number than a
+   blank. Confirm before release — a user checking net worth may disagree.
 4. **Banner persistence.** Dismissible for the session, or sticky until services
    return?
 5. **Mixed-account users.** When the backend is down and the active account is
@@ -426,15 +418,16 @@ dependency.
 
 ## Sequencing summary
 
-| Phase | Outcome | Depends on |
-|-------|---------|-----------|
-| 1 | Outage reproducible on demand | — |
-| 2 | **Wallet is usable offline** | 1, answers to A7/A8 |
-| 3 | Currency selection works offline | 2 |
-| 4 | Honest, quiet UI | 1 |
-| 5 | Lightning address degrades gracefully | 1, Q1 |
-| 6 | Send never misreports a payee | 4 |
-| 7 | Regression-proofed | 2–6 |
+| Phase | Outcome | Depends on | Status |
+|-------|---------|-----------|--------|
+| 1 | Outage reproducible on demand | — | Done |
+| 2 | **Wallet is usable offline** | 1 | Done |
+| 2b | Staleness marker and sats-first fallback | 2 | |
+| 3 | Currency selection works offline | 2 | |
+| 4 | Honest, quiet UI | 1 | |
+| 5 | Lightning address degrades gracefully | 1, Q1 | |
+| 6 | Send never misreports a payee | 4 | |
+| 7 | Regression-proofed | 2–6 | |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the
 one that must land first if only one does.
