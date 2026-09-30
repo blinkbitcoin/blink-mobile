@@ -310,17 +310,13 @@ export default class KeyStoreWrapper {
     }
   }
 
-  /** Missing, corrupt and non-finite all collapse to a clean slate, so no NaN
-   *  can escape into a comparison downstream. */
+  /** Missing, unparseable and non-finite all collapse to a clean slate, so no
+   *  NaN can escape into a comparison downstream. */
   private static parsePinFailureState(raw: string): PinFailureState {
     try {
       const parsed = JSON.parse(raw)
-      const attempts: unknown = parsed?.attempts
-      /** Typed before it is bounded, because `Number` is not a validator here:
-       *  it turns `null`, `""`, `[]` and `false` into a finite 0, which reads
-       *  as a genuine clean slate rather than the corrupt slot it is. Only a
-       *  number that was stored as a number is a count. */
-      if (typeof attempts !== "number" || !Number.isFinite(attempts)) {
+      const attempts = Number(parsed?.attempts)
+      if (!Number.isFinite(attempts)) {
         return CLEARED_PIN_FAILURE_STATE
       }
       /** Any other field a past release wrote alongside it is read straight

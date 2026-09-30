@@ -515,6 +515,18 @@ describe("KeyStoreWrapper PIN attempt state", () => {
       })
     })
 
+    it("coerces a numeric string the way the shipped parser did", async () => {
+      /** No writer stores the count as a string, but every shipped parser since
+       *  3.0.29 accepted one, and this parser keeps that contract rather than
+       *  tightening it on the way out. */
+      storedKeys({ pinFailureState: JSON.stringify({ attempts: "2" }) })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2 },
+      })
+    })
+
     it("reports a clean slate when nothing is stored", async () => {
       storedKeys({})
 
@@ -523,14 +535,11 @@ describe("KeyStoreWrapper PIN attempt state", () => {
 
     it("reads back a clean slate for a corrupt or non-finite value", async () => {
       // NaN would slip past every `<` comparison downstream and silently pick
-      // the wrong branch, so it must never escape this layer.
-      // Number() is not a validator here: it turns null, "", [] and false into
-      // a finite 0, which would read as a genuine clean slate rather than the
-      // corrupt slot it is. Only a count stored as a number is a count.
+      // the wrong branch, so it must never escape this layer. The empty-ish
+      // values land on 0 the same way the shipped parser read them.
       for (const stored of [
         "not json",
         JSON.stringify({ attempts: "abc" }),
-        JSON.stringify({ attempts: "2" }),
         JSON.stringify({ attempts: "Infinity" }),
         JSON.stringify({ attempts: null }),
         JSON.stringify({ attempts: "" }),
