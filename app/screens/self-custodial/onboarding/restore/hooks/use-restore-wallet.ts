@@ -147,6 +147,7 @@ export const useRestoreWallet = () => {
       LL,
       network,
       selfCustodialDepositClaimLeewayVbyte,
+      lnurlServer,
     ],
   )
 

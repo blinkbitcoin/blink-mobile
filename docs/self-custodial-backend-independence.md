@@ -583,7 +583,7 @@ and without the assertions drifting with the wall clock.
 
 ---
 
-### Phase 10 — A real port for the price and currency sources
+### Phase 10 — A real port for the price and currency sources · done
 
 *The actual hexagonal fix, and the one with regression risk worth weighing.*
 
@@ -639,6 +639,44 @@ refactor is that neither should change.
 **Done when** `app/types/price.ts` declares the port, both `adapters/`
 directories implement it, neither hook mentions `isSelfCustodial` more than once,
 and the price specs construct fakes rather than mocking module paths.
+
+**Landed**, with one claim above corrected.
+
+`PriceSource` and `CurrencyListSource` are declared in `app/types/`, alongside
+`firstPricedSource` / `firstPopulatedCurrencyList` — the selection rule that was
+a chain of `??` in the middle of the hook. Four adapters implement them:
+`createSelfCustodialPriceSource`, `createCustodialPriceSource`,
+`createSelfCustodialCurrencyList`, `createCustodialCurrencyList`. Both hooks now
+build two sources and select, and adding a third is an extra argument to the
+combinator rather than an edit downstream.
+
+**The correction.** The plan said the price specs would "pass a fake
+`PriceSource` and stop caring" about module paths. They do not, and could not:
+`usePriceConversion` reaches its source through `useFiatRates`, a React context,
+so a hook-level spec still has to mock that module. What actually improved is
+better than a reworded claim:
+
+- The logic left the hook. Selection, staleness and the denominator guard are
+  now pure functions with specs that mock nothing at all —
+  `__tests__/types/price-source.spec.ts`,
+  `__tests__/self-custodial/adapters/price.spec.ts`,
+  `__tests__/custodial/adapters/price-source.spec.ts`, 21 tests between them.
+- The hook spec's fake is now typed against `SelfCustodialFeed`, a declared
+  input, rather than against whatever the provider happened to return.
+
+The remaining module mock is a property of `useFiatRates` being a context, not
+of the port. Removing it would mean passing the source in as an argument, which
+a hook consumed by screens cannot do — so it stays, deliberately.
+
+**Two things the refactor turned up.** `probeSelfCustodialAccountWallets` had
+grown a fourth positional parameter in Phase 9 and became an options object.
+And five dependency arrays were missing the value Phase 9 threaded through them:
+four gained it, and `use-sdk-lifecycle`'s effect did not — `lnurlDomain` is a
+pure function of `network`, which is already in that array, so the only thing
+that could move it alone is the developer switch, and tearing down a connected
+wallet to apply a debug toggle is worse than the reload the control already asks
+for. That one carries the reasoning and a scoped disable rather than a silent
+omission.
 
 ---
 
@@ -708,7 +746,7 @@ dependency.
 | 7 | Regression-proofed | 2–6 | Done |
 | 8 | Shared types out of the self-custodial module | — | Done |
 | 9 | Config seam pure again, clock injected | — | Done |
-| 10 | Price and currency behind a real port | 8 | |
+| 10 | Price and currency behind a real port | 8 | Done |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the
 one that must land first if only one does.

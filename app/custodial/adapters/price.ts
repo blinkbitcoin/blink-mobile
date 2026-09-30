@@ -1,4 +1,4 @@
-import { type PriceRates } from "@app/types/price"
+import { RateFreshness, type PriceRates, type PriceSource } from "@app/types/price"
 
 /**
  * Translates the backend's `realtimePrice` into the app's own price shape, so both
@@ -21,4 +21,35 @@ export const toPriceRatesFromRealtimePrice = (price: {
     return undefined
   }
   return { displayCurrencyPerSat, displayCurrencyPerCent }
+}
+
+export type RealtimePrice = {
+  denominatorCurrency: string
+  btcSatPrice: { base: number; offset: number }
+  usdCentPrice: { base: number; offset: number }
+}
+
+/**
+ * A {@link PriceSource} over the backend's `realtimePrice`.
+ *
+ * A price whose denominator disagrees with the active preference is discarded rather
+ * than converted: the cache can still be serving the previous currency's answer just
+ * after the user changes it, and converting with it would silently quote the wrong
+ * money.
+ *
+ * Always {@link RateFreshness.Fresh} when it has rates. Unlike the SDK feed there is no
+ * persisted copy to inherit, so anything this source returns was fetched this session.
+ */
+export const createCustodialPriceSource = (
+  price: RealtimePrice | undefined,
+  displayCurrency: string,
+  hasSettled: boolean,
+): PriceSource => {
+  const usable = price?.denominatorCurrency === displayCurrency ? price : undefined
+  const rates = usable ? toPriceRatesFromRealtimePrice(usable) : undefined
+  return {
+    rates,
+    freshness: rates ? RateFreshness.Fresh : RateFreshness.Expired,
+    hasSettled,
+  }
 }

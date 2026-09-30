@@ -307,6 +307,13 @@ export const useSdkLifecycle = (
         reportError("SDK cleanup", err)
       })
     }
+    /* `lnurlDomain` is deliberately out of this array. It is a pure function of
+       `network`, which is in it, so in a release build it cannot change without also
+       changing something that already re-runs this. The one case that would move it
+       alone is the developer outage switch, and tearing down a connected wallet to
+       apply a debug toggle is a worse trade than asking for a reload — which is what
+       the developer screen's control says to do. */
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [retryCount, refreshWallets, activeSelfCustodialAccountId, resetBackoff, network])
 
   useEffect(() => {
