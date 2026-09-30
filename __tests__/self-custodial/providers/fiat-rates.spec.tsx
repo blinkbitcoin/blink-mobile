@@ -53,7 +53,10 @@ type StateHolder = {
   updateState: jest.Mock
 }
 
-const mountWith = (stored?: { rates: typeof feed; fetchedAt: number }) => {
+const mountWith = (
+  stored?: { rates: typeof feed; fetchedAt: number },
+  now?: () => number,
+) => {
   const holder: StateHolder = {
     state: stored
       ? { ...defaultPersistentState, selfCustodialFiatRates: stored }
@@ -69,7 +72,7 @@ const mountWith = (stored?: { rates: typeof feed; fetchedAt: number }) => {
       }) as any,
   )
   const view = render(
-    <SelfCustodialFiatRatesProvider>
+    <SelfCustodialFiatRatesProvider now={now}>
       <Probe />
     </SelfCustodialFiatRatesProvider>,
   )
@@ -165,5 +168,37 @@ describe("SelfCustodialFiatRatesProvider", () => {
     // Anchor: the provider really did mount and serve its default.
     expect(view.getByTestId("probe").props.children).toBe("0|expired|none")
     expect(mockedListFiatRates).not.toHaveBeenCalled()
+  })
+
+  describe("the injected clock", () => {
+    /** Fixed so the freshness windows can be crossed without waiting a day for them,
+     *  and so these assertions do not drift with the wall clock. */
+    const FIXED_NOW = 1_700_000_000_000
+
+    it("judges freshness against the clock it was given, not the wall clock", () => {
+      mockedListFiatRates.mockImplementation(() => new Promise(() => {}))
+
+      const { view } = mountWith(
+        // Two hours before the injected now: stale, though its real age is negative.
+        { rates: feed, fetchedAt: FIXED_NOW - 2 * 60 * 60 * 1000 },
+        () => FIXED_NOW,
+      )
+
+      expect(view.getByTestId("probe").props.children).toContain(RateFreshness.Stale)
+    })
+
+    it("stamps what it persists with that clock too", async () => {
+      mockedListFiatRates.mockResolvedValue(feed)
+
+      const { holder } = mountWith(undefined, () => FIXED_NOW)
+
+      await waitFor(() => expect(holder.updateState).toHaveBeenCalled())
+      const reducer = holder.updateState.mock.calls[0]?.[0] as (
+        prev: typeof defaultPersistentState,
+      ) => typeof defaultPersistentState
+      expect(reducer(defaultPersistentState).selfCustodialFiatRates?.fetchedAt).toBe(
+        FIXED_NOW,
+      )
+    })
   })
 })

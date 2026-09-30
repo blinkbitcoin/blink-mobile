@@ -6,6 +6,7 @@ import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { MigrationStatus, useMigrationCommitMutation } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/transport-error"
 import { isDeviceClockSkewed } from "@app/graphql/server-time"
+import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationTransferRequest,
@@ -103,6 +104,7 @@ export const useMigrationTransfer = ({
   skip,
 }: UseMigrationTransferArgs): UseMigrationTransfer => {
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [commitMigration] = useMigrationCommitMutation()
   /** Seeded from the remembered outcome so a screen re-entered after a settled failure
@@ -190,6 +192,7 @@ export const useMigrationTransfer = ({
         accountId: selfCustodialId,
         network,
         leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+        lnurlDomain,
         signChallenge: (sparkPubkey) =>
           buildMigrationProofChallenge({
             custodialAccountId: custodialId,

@@ -101,6 +101,14 @@ import {
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
 
+/** Threaded explicitly since the config functions stopped reading a global; the real
+ *  value comes from `useLnurlServer()` at the calling hook. */
+const TEST_LNURL_DOMAIN = "staging.blink.sv"
+const TEST_LNURL_SERVER = {
+  serverUrl: `https://${TEST_LNURL_DOMAIN}`,
+  domain: TEST_LNURL_DOMAIN,
+}
+
 const makeSdk = () => ({
   updateUserSettings: (...args: unknown[]) => mockUpdateUserSettings(...args),
   disconnect: (...args: unknown[]) => mockDisconnect(...args),
@@ -122,6 +130,7 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockDefaultConfig).toHaveBeenCalledWith(Network.Regtest)
@@ -146,6 +155,7 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
@@ -168,6 +178,7 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 3,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
@@ -190,6 +201,7 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 2.9,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
@@ -212,6 +224,7 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: -5,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
@@ -235,6 +248,7 @@ describe("initSdk", () => {
         storageDir: "/test/storage",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlDomain: TEST_LNURL_DOMAIN,
       }),
     ).rejects.toThrow("connect refused")
   })
@@ -341,6 +355,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "  alpha   beta  gamma  ",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -353,6 +368,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "\talpha\tbeta\ngamma\r\n",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -365,6 +381,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "  alpha\t\tbeta \n gamma  ",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -380,6 +397,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "totally invalid",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Invalid BIP39 mnemonic")
 
@@ -394,6 +412,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "provided mnemonic words",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("provided mnemonic words")
@@ -412,6 +431,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "any words",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
@@ -427,6 +447,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "any valid words",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Failed to store mnemonic network")
     expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
@@ -442,6 +463,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "any valid words",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("SDK init refused")
 

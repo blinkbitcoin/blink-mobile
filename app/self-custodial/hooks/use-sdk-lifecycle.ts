@@ -41,6 +41,7 @@ import {
   mergeOrderedTransactions,
 } from "../providers/wallet-snapshot"
 
+import { useLnurlServer } from "./use-lnurl-server"
 import { useSparkNetwork } from "./use-spark-network"
 
 type SdkLifecycleState = {
@@ -85,6 +86,7 @@ export const useSdkLifecycle = (
   retryCount: number,
 ): SdkLifecycleState => {
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [wallets, setWallets] = useState<WalletState[]>([])
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
@@ -232,6 +234,7 @@ export const useSdkLifecycle = (
         storageDir: storageDirFor(accountId, network),
         network,
         leewaySatPerVbyte: depositClaimLeewayRef.current,
+        lnurlDomain,
       })
       if (abortRef.current || !mounted) {
         await teardownSdk(connectedSdk, null)
