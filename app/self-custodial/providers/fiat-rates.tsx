@@ -11,12 +11,20 @@ import { AppState } from "react-native"
 
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
+  getSelfCustodialFiatCurrencies,
+  withSelfCustodialFiatCurrencies,
+} from "@app/store/persistent-state/self-custodial-fiat-currencies"
+import {
   getSelfCustodialFiatRates,
   withSelfCustodialFiatRates,
 } from "@app/store/persistent-state/self-custodial-fiat-rates"
 
-import { listFiatRates } from "../bridge/fiat"
+import { listFiatCurrencies, listFiatRates } from "../bridge/fiat"
 import { recordErrorOnce } from "../logging"
+import {
+  toDisplayCurrencyList,
+  type DisplayCurrencyEntry,
+} from "../price/currency-mapping"
 import {
   rateFreshness,
   RateFreshness,
@@ -54,10 +62,14 @@ type FiatRatesContextValue = {
    * True as soon as a stored feed is in hand, or once a fetch has settled either way.
    */
   hasSettled: boolean
+  /** Code, name, symbol and fraction size for every currency the SDK can price. Empty
+   *  until one feed has been read on this device. Unlike a rate it does not go stale. */
+  currencies: readonly DisplayCurrencyEntry[]
   refresh: () => Promise<void>
 }
 
 const EMPTY_RATES: readonly FiatRate[] = Object.freeze([])
+const EMPTY_CURRENCIES: readonly DisplayCurrencyEntry[] = Object.freeze([])
 
 const defaultValue: FiatRatesContextValue = {
   rates: EMPTY_RATES,
@@ -65,6 +77,7 @@ const defaultValue: FiatRatesContextValue = {
   freshness: RateFreshness.Expired,
   /** No provider above means nobody is fetching, so nothing is pending either. */
   hasSettled: true,
+  currencies: EMPTY_CURRENCIES,
   refresh: async () => {},
 }
 
@@ -79,6 +92,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
   const { sdk } = useSelfCustodialWallet()
 
   const stored = getSelfCustodialFiatRates(persistentState)
+  const storedCurrencies = getSelfCustodialFiatCurrencies(persistentState)
 
   /** Advanced on every tick so a feed that crosses a freshness threshold while the user
    *  watches it stops being presented as current, rather than waiting for the next
@@ -90,11 +104,19 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
   const inFlightRef = useRef<Promise<void> | null>(null)
   const [hasFetchSettled, setHasFetchSettled] = useState(false)
 
-  const persist = useCallback(
+  const persistRates = useCallback(
     (rates: FiatRate[]) => {
       const next: StoredFiatRates = { rates, fetchedAt: Date.now() }
       updateState((prev) => prev && withSelfCustodialFiatRates(prev, next))
       setNow(Date.now())
+    },
+    [updateState],
+  )
+
+  const persistCurrencies = useCallback(
+    (currencies: DisplayCurrencyEntry[]) => {
+      const next = { currencies, fetchedAt: Date.now() }
+      updateState((prev) => prev && withSelfCustodialFiatCurrencies(prev, next))
     },
     [updateState],
   )
@@ -105,8 +127,21 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
 
     const run = (async () => {
       try {
-        const rates = await listFiatRates(sdk)
-        if (rates.length > 0) persist(rates)
+        /** Settled rather than all-or-nothing: the rates are what the balance needs, and
+         *  losing them because the currency list failed would be the worse trade. */
+        const [rates, currencies] = await Promise.allSettled([
+          listFiatRates(sdk),
+          listFiatCurrencies(sdk),
+        ])
+        if (rates.status === "fulfilled" && rates.value.length > 0) {
+          persistRates(rates.value)
+        }
+        if (currencies.status === "fulfilled") {
+          const mapped = toDisplayCurrencyList(currencies.value)
+          if (mapped.length > 0) persistCurrencies(mapped)
+        }
+        const failure = [rates, currencies].find((result) => result.status === "rejected")
+        if (failure?.status === "rejected") throw failure.reason
       } catch (err) {
         // Quiet by design: the stored feed stands, and its freshness says how old it is.
         recordErrorOnce(
@@ -121,7 +156,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
 
     inFlightRef.current = run
     return run
-  }, [sdk, persist])
+  }, [sdk, persistRates, persistCurrencies])
 
   /** On connect, and again whenever the wallet reconnects under a new SDK instance. */
   useEffect(() => {
@@ -150,6 +185,8 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
    *  would otherwise wait forever on a custodial-only device. */
   const hasSettled = hasFetchSettled || !sdk
 
+  const currencies = storedCurrencies?.currencies ?? EMPTY_CURRENCIES
+
   const value = useMemo<FiatRatesContextValue>(() => {
     if (!stored || stored.rates.length === 0) {
       return {
@@ -157,6 +194,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
         fetchedAt: null,
         freshness: RateFreshness.Expired,
         hasSettled,
+        currencies,
         refresh,
       }
     }
@@ -166,9 +204,10 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
       freshness: rateFreshness(stored.fetchedAt, now),
       /** A stored feed is an answer already, whatever a refresh is doing. */
       hasSettled: true,
+      currencies,
       refresh,
     }
-  }, [stored, now, hasSettled, refresh])
+  }, [stored, now, hasSettled, currencies, refresh])
 
   return <FiatRatesContext.Provider value={value}>{children}</FiatRatesContext.Provider>
 }

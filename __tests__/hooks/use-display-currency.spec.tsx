@@ -10,9 +10,11 @@ const mockUsePriceConversion = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
 const mockToDisplayMoneyAmount = jest.fn()
 
-jest.mock("@app/graphql/generated", () => ({
-  ...jest.requireActual("@app/graphql/generated"),
-  useCurrencyListQuery: (options: { skip: boolean }) => mockUseCurrencyListQuery(options),
+/** `useDisplayCurrency` reads the list through the shared adapter, which picks between
+ *  the Breez feed and the backend query; this suite is about the formatting on top of
+ *  whatever it returns, so the adapter is mocked rather than its two sources. */
+jest.mock("@app/hooks/use-currency-list", () => ({
+  useCurrencyList: () => mockUseCurrencyListQuery({}),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -37,9 +39,9 @@ const setCurrencyList = (
   currencyList: Array<{ id: string; symbol: string; fractionDigits: number }>,
 ) => {
   mockUseCurrencyListQuery.mockReturnValue({
-    data: {
-      currencyList,
-    },
+    currencyList,
+    loading: false,
+    isUnavailable: false,
   })
 }
 
