@@ -102,17 +102,19 @@ export const verifyPin = async (enteredPin: string): Promise<PinVerification> =>
   const failures = attempts + 1
 
   if (failures >= MAX_PIN_ATTEMPTS) {
-    // Recorded before returning, so a kill during the logout that follows
-    // cannot hand back a spent budget. The logout that follows keeps the lock
-    // standing, so this is the write that has to land: unrecorded, the next
-    // launch reads one failure short of the cap and grants another guess
-    // against a PIN that is still there. The outcome does not change — the
-    // session ends either way — but a budget that silently failed to close is
-    // worth knowing about.
+    /** Recorded before returning, so a kill during the logout that follows
+     *  cannot hand back a spent budget. The logout that follows keeps the lock
+     *  standing, so this is the write that has to land: unrecorded, the next
+     *  launch reads one failure short of the cap and grants another guess
+     *  against a PIN that is still there. The outcome does not change, since
+     *  the session ends either way, but a budget that silently failed to close
+     *  is worth knowing about. Its own dedup key, apart from the non-terminal
+     *  write below: they are different defects, and the first to fire must not
+     *  silence the other for the rest of the process. */
     if (!(await KeyStoreWrapper.setPinFailureState({ attempts: failures }))) {
       recordAppError(new Error("Spent PIN budget could not be recorded"), {
         alwaysRecord: true,
-        dedupKey: "pin-attempts-write",
+        dedupKey: "pin-budget-spent-write",
       })
     }
     return { outcome: "exhausted" }
