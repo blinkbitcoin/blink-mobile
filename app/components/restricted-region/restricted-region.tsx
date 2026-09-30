@@ -38,7 +38,7 @@ const RestrictedRegionContext = createContext<RestrictedRegionContextType>({
 export const useRestrictedRegion = (): RestrictedRegionContextType =>
   useContext(RestrictedRegionContext)
 
-/** NFR-1 bound for the custodial cold-start splash hold: past this the app is
+/** How long the custodial cold-start splash may hold: past this the app is
  *  revealed and a late restricted verdict surfaces over it instead of before it. */
 const RESTRICTED_REGION_HOLD_CAP_MS = 2000
 

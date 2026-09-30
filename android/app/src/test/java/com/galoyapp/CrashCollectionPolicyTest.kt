@@ -4,7 +4,7 @@ import org.junit.Assert.assertEquals
 import org.junit.Test
 
 /**
- * The decision table behind automatic crash collection (AD-13, NFR-P1). Each case is a
+ * The decision table behind automatic crash collection. Each case is a
  * launch or a resolution; the SDK calls that follow are the [CrashCollectionPolicy.Decision].
  */
 class CrashCollectionPolicyTest {

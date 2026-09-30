@@ -247,8 +247,8 @@ export const useSdkLifecycle = (
         }
 
         /**
-         * The sole emission point (AD-15). Both directions are counted from here rather
-         * than from the send and receive call sites (FR-10, FR-11): the SDK is the only
+         * The sole emission point. Both directions are counted from here rather
+         * than from the send and receive call sites: the SDK is the only
          * place that observes settlement itself — a send returns before it is final, and
          * receives arrive with no call site at all, over the Lightning Address, a plain
          * BOLT11 invoice, or a direct Spark transfer. Nothing in the refresh path may emit;

@@ -13,10 +13,11 @@ import {
  * Fault reporting for the boundary, and the only place it decides whether a diagnostic may
  * leave the device.
  *
- * AD-13: on an `Anon` or `Unresolved` device the boundary emits **nothing at all** —
+ * On an `Anon` or `Unresolved` device the boundary emits **nothing at all** —
  * including diagnostics, health signals and error reports. A crash report naming the
- * telemetry boundary, sent from a device that is required to emit zero, is the leak the
- * suppression exists to prevent, routed around the analytics disable by our own topology.
+ * telemetry boundary, sent from a device that must emit nothing, is the leak this whole
+ * boundary exists to prevent — and one we would have built ourselves, going around the
+ * very switch that turns collection off.
  *
  * The disposition itself lives in `transmissibility.ts`, which imports nothing, so the
  * app-wide Crashlytics sink in `app/utils/error-reporting.ts` can read the same value
@@ -27,8 +28,8 @@ import {
 export { DiagnosticsModeInput, mayTransmitDiagnostics, setDiagnosticsModeInput }
 
 /**
- * Counts of everything the boundary declined to do, held locally and never transmitted
- * (FR-7). A non-zero suppressed count is the expected state on an incognito device; a
+ * Counts of everything the boundary declined to do, held locally and never transmitted. A
+ * non-zero suppressed count is the expected state on an incognito device; a
  * non-zero fault count is a defect to be found in review, not a number to report to a
  * board.
  */
@@ -38,10 +39,10 @@ const counters = {
    *  count means an emitter is running outside the account context it belongs to. */
   unroutedEvents: 0,
   /** A fact whose `walletProvider` disagreed with the mode at capture: a settlement callback
-   *  that raced an account switch. Dropped rather than re-labelled (AD-20). */
+   *  that raced an account switch. Dropped rather than re-labelled. */
   mislabelledEvents: 0,
   untransmittedFaults: 0,
-  /** AD-30's "is it draining?" answers, from the last drain that ran. */
+  /** Answers to "is it draining?", from the last drain that ran. */
   lastDrainDurationMs: 0,
   lastDrainDepth: 0,
   drainRejected: 0,
@@ -90,7 +91,7 @@ export const resetDiagnosticsForTesting = (): void => {
 /**
  * A breadcrumb, subject to the same rule as everything else here: nothing leaves an `Anon`
  * or `Unresolved` device. On `Custodial` and `Enhanced` the spine permits boundary
- * diagnostics through Crashlytics, which is what makes the FR-68 loss counters reachable
+ * diagnostics through Crashlytics, which is what makes the loss counters reachable
  * from a real device rather than only from a debugger.
  */
 export const logDiagnosticBreadcrumb = (message: string): boolean => {

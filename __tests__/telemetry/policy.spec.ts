@@ -100,7 +100,7 @@ describe("privacy policy stage", () => {
     })
   })
 
-  describe("FR-7 — a field outside the allowlist drops the event", () => {
+  describe("a field outside the allowlist drops the event", () => {
     it.each(PROHIBITED_FIELDS)(
       "rejects the prohibited field $field",
       ({ field, value }) => {
@@ -149,9 +149,9 @@ describe("privacy policy stage", () => {
     })
   })
 
-  describe("FR-57 — derivation confers no permissibility", () => {
+  describe("derivation confers no permissibility", () => {
     it("rejects a hashed identifier smuggled through telemetry_event_id", () => {
-      // A sha256 of a pubkey. "It's hashed, so it's anonymous" is the intuition §5.5
+      // A sha256 of a pubkey. "It's hashed, so it's anonymous" is the intuition the rules
       // exists to refuse: a stable transform of a stable identifier is still one.
       const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),
@@ -210,8 +210,8 @@ describe("privacy policy stage", () => {
       },
     )
 
-    it("rejects a fine rail split that FR-17 has not yet unblocked", () => {
-      // Guards CD-5: the four coarse rails are the whole vocabulary at P2, whatever the
+    it("rejects a fine rail split the contract has not admitted yet", () => {
+      // The four coarse rails are the whole vocabulary for now, whatever the
       // SDK starts reporting.
       const verdict = applyPrivacyPolicy(TelemetryEvent.PaymentSettled, {
         ...validPaymentSettled(),

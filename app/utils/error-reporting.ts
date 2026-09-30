@@ -17,7 +17,7 @@ import {
  * stay the only caller of `crashlytics().recordError`.
  *
  * It is also where the privacy contract's zero-transmission rule is applied to error
- * reporting (AD-13, AD-30, NFR-P1). Nothing leaves a device whose telemetry mode is
+ * reporting. Nothing leaves a device whose telemetry mode is
  * `Anon` or `Unresolved`, or a self-custodial device under the kill switch: a non-fatal
  * or a breadcrumb carries a device-stable Crashlytics installation id, and from such a
  * device that is telemetry whatever product sends it. Gating here rather than at the 119
@@ -154,9 +154,9 @@ onDiagnosticsDispositionChanged((disposition) => {
 })
 
 /**
- * Automatic crash collection under the same rule as the explicit paths (AD-13, NFR-P1;
- * the third and fourth reviews). A fatal crash report carries the same installation id a
- * non-fatal does, so gating one and not the other would leave the larger channel open.
+ * Automatic crash collection, under the same rule as the explicit paths. A fatal crash
+ * report carries the same installation id a non-fatal does, so gating one and not the
+ * other would leave the larger channel open.
  *
  * Two SDK facts shape this. React Native Firebase's `setCrashlyticsCollectionEnabled`
  * persists a preference the native init provider applies at the *next* launch and does

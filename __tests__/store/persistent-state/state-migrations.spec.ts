@@ -471,7 +471,7 @@ describe("state-migrations schema 10", () => {
   })
 
   it("leaves telemetryKillSwitchEngaged undefined when migrating from v21", async () => {
-    // Absent means never engaged: the switch defaults off and only ever turns on (AD-28).
+    // Absent means never engaged: the switch defaults off and only ever turns on.
     const state21 = {
       schemaVersion: 21,
       galoyInstance: { id: "Main" },

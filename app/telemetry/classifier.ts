@@ -6,20 +6,20 @@ import {
 import { RailType, TelemetryConversionDirection, TelemetryDirection } from "./contract"
 
 /**
- * SDK vocabulary → contract vocabulary, in one hop (AD-2). There is no stub state, no
+ * SDK vocabulary → contract vocabulary, in one hop. There is no stub state, no
  * enrichment pass and no TTL-partial path: `PaymentSucceeded` carries direction, method
  * and status together, so a settlement is classifiable the moment it is observed.
  *
- * These take the SDK's *enums*, never its `Payment` record — AD-1 keeps that type out of
+ * These take the SDK's *enums*, never its `Payment` record, which keeps that type out of
  * every signature under this directory. The producer reads the record and hands over the
  * two fields that matter.
  */
 
 /**
- * The rail, coarse (FR-16, CD-5).
+ * The rail, coarse.
  *
- * An unrecognised method classifies as `unknown` rather than being dropped or guessed
- * (AD-7). `mappers/transaction.ts` masks `PaymentMethod.Unknown` as Lightning, which is
+ * An unrecognised method classifies as `unknown` rather than being dropped or guessed.
+ * `mappers/transaction.ts` masks `PaymentMethod.Unknown` as Lightning, which is
  * fine for a transaction row and wrong for a count: it would inflate a real bucket on a
  * board tile. Dropping instead would leave the rail split short of the settled total.
  * Naming the outcome is the only option that keeps both numbers honest.
@@ -57,7 +57,7 @@ export const classifyDirection = (
  *
  * `null` where both ends are the same kind of asset — a bitcoin-to-bitcoin or
  * token-to-token movement is not a dollar swap, and guessing a direction for it would put
- * a real count in the wrong bucket (FR-19).
+ * a real count in the wrong bucket.
  */
 export const classifyConversionDirection = (sides: {
   fromIsBitcoin: boolean

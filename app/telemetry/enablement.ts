@@ -1,12 +1,12 @@
 /**
- * The two switches that sit in front of the mode gate (AD-28, AD-30). Both default to
+ * The two switches that sit in front of the mode gate. Both default to
  * *off*, and the boundary emits nothing until the first turns it on.
  *
  * **Rollout flag** — P2 ships behind it, off by default, ramped internal → 5% → 25% → 100%
- * with the gates AD-30 states. It rides Remote Config, which is acceptable *here* because
+ * with a gate at each step. It rides Remote Config, which is acceptable *here* because
  * its failure mode is closed: a failed or absent fetch leaves the shipped default, and the
- * shipped default is off. That is the opposite of the `nonCustodialEnabled` fail-open AD-9
- * closed, where a default read as an answer turned collection *on*.
+ * shipped default is off. That is the opposite of the `nonCustodialEnabled` flag this
+ * replaced, where a default read as an answer turned collection *on*.
  *
  * **Kill switch** — one-directional: it can only turn telemetry off, and once engaged it
  * stays engaged across launches. It must not share Remote Config's failure mode, so it
@@ -15,8 +15,8 @@
  * the last value rather than resetting it. The channel's field is backend-owned and not
  * yet served; `applyServerKillSwitch` is where it lands when it is.
  *
- * Rollback under NFR-O4 *is* the kill switch: collection stops, nothing else happens.
- * Queued records are not discarded — that is FR-5's job for a mode switch — they simply
+ * Rollback *is* the kill switch: collection stops, nothing else happens. Queued records
+ * are not discarded — that is what a mode switch does — they simply
  * stop draining and expire on their own schedule, counted like any other expiry.
  */
 
@@ -28,7 +28,7 @@ let killSwitchEngaged = false
 type KillSwitchListener = () => void
 const killSwitchListeners = new Set<KillSwitchListener>()
 
-/** Fires once when the switch engages, so the provider can persist it (AD-28). */
+/** Fires once when the switch engages, so the provider can persist it. */
 export const onKillSwitchEngaged = (listener: KillSwitchListener): (() => void) => {
   killSwitchListeners.add(listener)
   return () => {
@@ -41,7 +41,8 @@ export const setTelemetryRolloutEnabled = (enabled: boolean): void => {
 }
 
 /**
- * NFR-O4 is "self-custodial telemetry collection stops", and on a self-custodial device
+ * Rollback means "self-custodial telemetry collection stops", and on a self-custodial
+ * device
  * every transmission is that collection — the boundary's events, the drain, and the
  * Crashlytics non-fatals and breadcrumbs too, since a breadcrumb carrying an SDK line is
  * as much a channel as an event. So engaging the switch also closes the diagnostic

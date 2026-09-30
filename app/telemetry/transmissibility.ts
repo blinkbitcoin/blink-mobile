@@ -1,5 +1,5 @@
 /**
- * Whether anything at all may leave this device right now (AD-13, AD-30, NFR-O4).
+ * Whether anything at all may leave this device right now.
  *
  * One derivation, no imports, so both ends of the app can read it without a cycle: the
  * boundary's own diagnostics on one side, and the app-wide Crashlytics sink in
@@ -9,7 +9,7 @@
  * send and no caller combines the inputs itself.
  *
  * Three states, not two, because "may not transmit" means two different things and the
- * sink must treat them differently (the second review's HIGH 2):
+ * sink must treat them differently:
  *
  *  - `unresolved` — the device has not yet said which kind it is. An error raised now
  *    may belong to a custodial user whose start-up failure ought to reach Crashlytics, so
@@ -34,8 +34,8 @@ export type DiagnosticsDisposition =
 
 /**
  * What the resolved mode says on its own. `SelfCustodial` is `Enhanced`: permitted by
- * mode, but subject to the switch below. `Custodial` is not — the switch is NFR-O4's
- * rollback of *self-custodial* collection, and custodial crash reporting predates it.
+ * mode, but subject to the switch below. `Custodial` is not — the switch rolls back
+ * *self-custodial* collection, and custodial crash reporting predates it.
  */
 export const DiagnosticsModeInput = {
   Unresolved: "unresolved",
@@ -48,7 +48,7 @@ export type DiagnosticsModeInput =
   (typeof DiagnosticsModeInput)[keyof typeof DiagnosticsModeInput]
 
 let modeInput: DiagnosticsModeInput = DiagnosticsModeInput.Unresolved
-/** AD-28: engaged means every self-custodial transmission stops, diagnostics included. */
+/** Engaged means every self-custodial transmission stops, diagnostics included. */
 let selfCustodialShutdown = false
 
 let disposition: DiagnosticsDisposition = DiagnosticsDisposition.Unresolved

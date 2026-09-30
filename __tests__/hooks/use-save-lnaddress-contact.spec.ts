@@ -146,7 +146,7 @@ describe("useSaveLnAddressContact", () => {
 
       expect(response).toEqual({ saved: false, handle: "alice@spark.tips" })
       // The failure is diagnosable without the counterparty's address, and the address
-      // next to a Crashlytics installation id would be a linkage (§5.3).
+      // next to a Crashlytics installation id would be a linkage.
       expect(mockCrashlyticsLog).toHaveBeenCalledWith(
         expect.stringContaining("contact upsert failed"),
       )
@@ -156,7 +156,7 @@ describe("useSaveLnAddressContact", () => {
       expect(mockContactCreate).not.toHaveBeenCalled()
     })
 
-    it("sends no breadcrumb at all from an incognito device (AD-13)", async () => {
+    it("sends no breadcrumb at all from an incognito device", async () => {
       // The breadcrumb goes through the app's one Crashlytics sink, and the sink holds
       // the zero-transmission rule: from a device that may not report, nothing leaves.
       setDiagnosticsModeInput(DiagnosticsModeInput.Denied)

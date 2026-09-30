@@ -26,11 +26,11 @@ gql`
  * These used to be direct `setUserId` / `setUserProperty` calls. Firebase merges
  * user-scoped identity into every subsequent event, and the `setUserId` here — the Blink
  * ledger account ID — was never cleared, so a self-custodial event would have inherited a
- * §5.3-prohibited identifier without any call site doing anything wrong. An import-path ban
+ * prohibited identifier without any call site doing anything wrong. An import-path ban
  * cannot see that, because the call sat inside a file already allowed to import analytics.
  *
  * Routing through the boundary is what makes the identity clearable: the mode gate drops it
- * the moment the resolved mode stops being Custodial (AD-16).
+ * the moment the resolved mode stops being Custodial.
  */
 export const AnalyticsContainer = () => {
   const isAuthed = useIsAuthed()

@@ -152,7 +152,7 @@ describe("the telemetry privacy boundary", () => {
     return (await queued(store)).length
   }
 
-  describe("FR-9 suppression matrix", () => {
+  describe("the suppression matrix", () => {
     it("cold start: captures nothing before a mode is resolved", async () => {
       await initializeTelemetryGate()
 
@@ -225,7 +225,7 @@ describe("the telemetry privacy boundary", () => {
       expect(await queued(storeB)).toHaveLength(1)
     })
 
-    it("custodial → self-custodial: no user-scoped identity survives (AD-16)", async () => {
+    it("custodial → self-custodial: no user-scoped identity survives", async () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)
       setUserId.mockClear()
 
@@ -266,7 +266,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("CD-7 — the carrier is chosen from the mode, never by the producer", () => {
+  describe("the carrier is chosen from the mode, never by the producer", () => {
     it("hands a Custodial contract event to GA4 and files nothing in the outbox", async () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)
 
@@ -312,7 +312,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("AD-20 — a fact whose provider disagrees with the mode is a race, not a row", () => {
+  describe("a fact whose provider disagrees with the mode is a race, not a row", () => {
     it("drops a Spark-labelled settlement that arrives after the mode resolved Custodial", async () => {
       // The listener's callback lands after an account switch: the fact says spark, the
       // carrier for Custodial is GA4. Handing it over would put a self-custodial event on
@@ -327,7 +327,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("AD-24 — the legacy events are gated by their row, pending review", () => {
+  describe("the legacy events are gated by their row, pending review", () => {
     it("suppresses a legacy event on Enhanced because its row does not admit it yet", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
@@ -351,7 +351,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("FR-70 — an Enhanced device leaves the platform's own counts", () => {
+  describe("an Enhanced device leaves the platform's own counts", () => {
     it("disables platform collection while permitting contract events", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
@@ -362,7 +362,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("classification (AD-2, AD-7)", () => {
+  describe("classification", () => {
     beforeEach(async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
     })
@@ -381,7 +381,7 @@ describe("the telemetry privacy boundary", () => {
       expect(record.payload.rail_type).toBe(rail)
     })
 
-    it("counts an unclassifiable rail rather than dropping or guessing it (AD-7)", async () => {
+    it("counts an unclassifiable rail rather than dropping or guessing it", async () => {
       // The transaction mapper masks Unknown as Lightning. Fine for a row, wrong for a
       // count: it would inflate a real bucket. Dropping would leave the split short of the
       // settled total. Naming it keeps both numbers honest.
@@ -495,7 +495,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("NFR-R2 — telemetry is never worth a payment", () => {
+  describe("telemetry is never worth a payment", () => {
     beforeEach(async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
     })
@@ -515,7 +515,7 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("AD-13 — a device required to emit zero emits nothing, diagnostics included", () => {
+  describe("a device required to emit zero emits nothing, diagnostics included", () => {
     it("holds a suppressed count locally instead of reporting it", async () => {
       await resolveTelemetryMode(TelemetryMode.Anon)
 

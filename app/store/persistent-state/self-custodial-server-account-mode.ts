@@ -34,7 +34,7 @@ export const withSelfCustodialServerAccountMode = (
  * server held no mode for, so that the sync would push it and the Lightning Address would
  * come alive — and every consumer downstream, the telemetry gate included, then read that
  * default as a choice the user had made. It was the fail-open the whole mode design exists
- * to prevent, sitting in the one place a default looked like an answer (AD-25). An account
+ * to prevent, sitting in the one place a default looked like an answer. An account
  * the server holds no mode for stays mode-less until the user picks one; nothing is
  * assumed on their behalf.
  *

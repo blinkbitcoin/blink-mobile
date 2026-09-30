@@ -8,16 +8,16 @@ import {
 /**
  * The privacy policy stage. Every payload passes through here before it can reach the
  * outbox or the platform SDK; a payload that fails is dropped and counted, never trimmed
- * and sent (FR-7). Dropping rather than sanitising is deliberate — a payload carrying a
+ * and sent. Dropping rather than sanitising is deliberate — a payload carrying a
  * field nobody declared is evidence the producer is wrong, and a sanitised send would hide
  * it.
  *
- * The checks read the contract table (AD-23) and nothing else, so a parameter that is not
+ * The checks read the contract table and nothing else, so a parameter that is not
  * in a row cannot pass, and a value outside a row's domain cannot pass. Those are two
- * different mistakes (addendum A2.4): an unknown key catches a *new* field appearing
+ * different mistakes: an unknown key catches a *new* field appearing
  * without review; the domain check catches a *prohibited value* smuggled through an
  * *allowed* field — a `rail_type` carrying a hashed destination, a `telemetry_event_id`
- * that is really a payment hash. The second is the half FR-57 exists for.
+ * that is really a payment hash. The second is the one a key check alone would miss.
  */
 
 /**
@@ -64,7 +64,7 @@ export type PolicyVerdict =
   | { permitted: false; rejection: PolicyRejection; field?: string }
 
 /**
- * Local, never transmitted (FR-7, AD-13). A non-zero count means a producer is emitting
+ * Local, never transmitted. A non-zero count means a producer is emitting
  * something the contract does not describe, which is a defect to be found in review rather
  * than a number to be reported to a board.
  */

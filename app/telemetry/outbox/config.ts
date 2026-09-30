@@ -1,13 +1,13 @@
 /**
- * The outbox's numbers (AD-18, AD-26). Derived, not chosen, and the derivation is here so
+ * The outbox's numbers. Derived, not chosen, and the derivation is here so
  * the next person can re-run it rather than re-guess it.
  */
 
 export const OUTBOX_TTL_MS = 72 * 60 * 60 * 1000
 
 /**
- * FR-29's 2% total loss budget is split once and sums: device-side (eviction plus expiry)
- * ≤1%, transport and warehouse together ≤1% (AD-17). Capacity is sized backwards from the
+ * The pipeline's 2% loss budget is split once and sums: device-side (eviction plus expiry)
+ * ≤1%, transport and warehouse together ≤1%. Capacity is sized backwards from the
  * device-side share: `ceil(p99 settlements per device per 72h × 100)`, the ×100 being the
  * inverse of 1% — a device at the 99th percentile of activity fills 1% of its outbox over a
  * full TTL window while offline, so eviction under that load is by definition inside the
@@ -25,7 +25,7 @@ export const OUTBOX_MAX_RECORDS = Math.ceil(
 )
 
 /**
- * Schema tolerance (AD-30): after an upgrade the outbox may hold records written by the
+ * Schema tolerance: after an upgrade the outbox may hold records written by the
  * previous contract version. They are still delivered for as long as the relay accepts
  * n−1 — 30 days — and anything older than n−1 counts as `Expired` rather than being sent
  * to a relay that will reject it.

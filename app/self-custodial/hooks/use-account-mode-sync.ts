@@ -31,7 +31,7 @@ import { useSparkNetwork } from "./use-spark-network"
  */
 /**
  * Accounts the server answered "holds no mode" for, this session. The answer settles
- * nothing (AD-25), so the account stays mode-less and the question would otherwise be
+ * nothing, so the account stays mode-less and the question would otherwise be
  * asked again on every SDK reconnect. Once per launch is enough: another device setting
  * a mode is a rare event, and the next launch asks again.
  */

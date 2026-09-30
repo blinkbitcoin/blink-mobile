@@ -321,7 +321,7 @@ type PersistentState_22 = {
   // Last transaction seen per currency, for accounts whose Apollo cache is never
   // restored from disk (self-custodial). Custodial keeps this in the cache itself.
   txLastSeenByAccountId?: Record<string, { btcId: string; usdId: string }>
-  // The telemetry kill switch (AD-28): one-directional, engaged by a Blink-controlled
+  // The telemetry kill switch: one-directional, engaged by a Blink-controlled
   // channel and persisted so an absent or failed fetch leaves the last value rather than
   // resetting it. Never written back to false.
   telemetryKillSwitchEngaged?: boolean
@@ -454,7 +454,8 @@ const migrate4ToCurrent = (state: PersistentState_4): Promise<PersistentState> =
     // otherwise data will be stored in GaloyInstancesInput[]
     galoyInstance = { ...state.galoyInstance, id: "Custom" }
   } else if (state.galoyInstance.name === "BBW" || state.galoyInstance.name === "Blink") {
-    // we are using "Main" instead of "BBW", so that the bankName is not hardcoded in the saved json
+    // we are using "Main" instead of "BBW", so that the bankName is not hardcoded in the
+    // saved json
     galoyInstance = { id: "Main" } as const
   } else {
     galoyInstance = { id: state.galoyInstance.name as "Staging" | "Local" }
@@ -552,7 +553,8 @@ export type MigrationResult =
 
 export const migratePersistentState = async (
   // TODO: pass the correct type.
-  // this is especially important given this is migration code and it's hard to test manually
+  // this is especially important given this is migration code and it's hard to test
+  // manually
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   data: any,
 ): Promise<MigrationResult> => {

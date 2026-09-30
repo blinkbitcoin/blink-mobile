@@ -103,7 +103,7 @@ describe("setLnurlServerMode", () => {
   })
 
   /* eslint-disable camelcase */
-  it("engages the kill switch when the mode response says telemetry is off (AD-28)", async () => {
+  it("engages the kill switch when the mode response says telemetry is off", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,
@@ -256,7 +256,7 @@ describe("recoverLnurlServerMode", () => {
   })
 
   /** Distinguishable from "no mode": a refusal must not read as an answer. */
-  it("engages the kill switch when the recover response says telemetry is off (AD-28)", async () => {
+  it("engages the kill switch when the recover response says telemetry is off", async () => {
     mockFetch.mockResolvedValue({
       ok: true,
       status: 200,

@@ -1,7 +1,7 @@
 import { applyServerKillSwitch } from "@app/telemetry"
 
 /**
- * AD-28's kill switch, as it rides the LNURL server's responses: one boolean field on any
+ * The kill switch, as it rides the LNURL server's responses: one boolean field on any
  * body the wallet already parses (`/recover`, `/mode`) and on the dedicated refresh
  * (`/telemetry-config`). `false` engages the switch; `true` and absence change nothing,
  * because it is one-directional.

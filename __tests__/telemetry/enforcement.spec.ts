@@ -15,7 +15,7 @@ const { ESLint } = require("eslint") as {
 }
 
 /**
- * AD-29: enforcement is committed config, and it is checked as *resolved* config. The
+ * Enforcement is committed config, and it is checked as *resolved* config. The
  * `.eslintrc.json` already carries an override that once turned `no-restricted-imports`
  * off for another package; nothing stops a future override doing the same for these two
  * rules except a check that reads what ESLint will actually apply to a file.
@@ -94,7 +94,7 @@ const resolvedRulesFor = async (file: string) => {
   return config.rules
 }
 
-describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
+describe("the two rules hold in the resolved ESLint config", () => {
   const ENFORCED_FILES = [
     "app/screens/home-screen/home-screen.tsx",
     "app/self-custodial/hooks/use-sdk-lifecycle.ts",
@@ -121,7 +121,7 @@ describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
   )
 
   /**
-   * AD-13 / AD-30: every non-fatal and breadcrumb in the app funnels through one gated
+   * Every non-fatal and breadcrumb in the app funnels through one gated
    * sink. The ban is what makes "every error path" a property of the build rather than of
    * a grep — so the exemption list is enumerated here in full, and every other file under
    * `app/` is checked, not a sample. Adding a file to the exemption means changing this
@@ -171,7 +171,7 @@ describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
     }
   })
 
-  it("bans it in particular where the second review found direct calls", async () => {
+  it("bans it in particular at the sites that used to call the SDK directly", async () => {
     for (const file of [
       "app/app.tsx",
       "app/graphql/hooks/use-apollo-rebuild-lifecycle.ts",
@@ -198,7 +198,7 @@ describe("AD-29 — the two rules hold in the resolved ESLint config", () => {
   it("keeps the legacy call sites on a shrinking allowlist, never a blanket exemption", async () => {
     const rules = await resolvedRulesFor("app/utils/analytics.ts")
 
-    // The import ban is lifted for this file alone (FR-2 backlog) …
+    // The import ban is lifted for this file alone …
     expect(bansAnalyticsImport(rules["no-restricted-imports"])).toBe(false)
     // … but the key-store ban is re-declared rather than the rule being turned off …
     expect(severityOf(rules["no-restricted-imports"])).not.toBe("off")

@@ -1,13 +1,13 @@
 import { applyLnurlTelemetryFlag } from "./lnurl-telemetry-flag"
 
 /**
- * The kill switch's channel (AD-28, NFR-O4): a Blink-controlled response that established
+ * The kill switch's channel: a Blink-controlled response that established
  * devices refresh on their own schedule, so operations can stop collection on a fleet
  * that is already running — not only on the accounts that happen to call `/recover`.
  *
  * It must not share Remote Config's failure mode, so it rides the LNURL server. An absent
  * endpoint, a failed fetch or a body without the field all change nothing: the switch is
- * one-directional and the last persisted value stands (AD-28).
+ * one-directional and the last persisted value stands.
  *
  * **[ASSUMPTION — the path and the field are backend-owned and not yet served.]** The
  * server has no config route in its current checkout; this is the client's half, and it
@@ -29,7 +29,7 @@ let inFlight: Promise<void> | null = null
 /**
  * Only an answer starts the interval. A device that was offline for the attempt asks again
  * on its next trigger rather than sitting out fifteen minutes: a kill switch that cannot be
- * retried promptly is the failure AD-28 exists to prevent. A 404 is an answer — not served
+ * retried promptly is the failure it exists to prevent. A 404 is an answer — not served
  * yet is not a reason to keep asking.
  */
 const fetchOnce = async (serverUrl: string, startedAt: number): Promise<void> => {

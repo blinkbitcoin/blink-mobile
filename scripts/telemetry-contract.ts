@@ -1,5 +1,5 @@
 /**
- * AD-23: the contract is data, and the landing schema derives from it.
+ * The contract is data, and the landing schema derives from it.
  *
  * Emits `app/telemetry/telemetry-contract.v<version>.json` from the typed table in
  * `app/telemetry/contract.ts`. The relay's allowlist, the landing schema and the dbt

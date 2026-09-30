@@ -55,7 +55,7 @@ const inputs = (overrides: Partial<TelemetryModeInputs> = {}): TelemetryModeInpu
   ...overrides,
 })
 
-describe("deriveTelemetryMode (AD-5, AD-25)", () => {
+describe("deriveTelemetryMode", () => {
   it.each([
     {
       case: "Enhanced chosen on this device, server silent",
@@ -84,7 +84,8 @@ describe("deriveTelemetryMode (AD-5, AD-25)", () => {
     },
     {
       // A fresh install, or a logged-out device: the custodial product's visitor. The
-      // acquisition funnel and sign-up crashes are custodial telemetry, and there is nothing
+      // acquisition funnel and sign-up crashes are custodial telemetry, and there is
+      // nothing
       // on the device that could have been rolled back from.
       case: "no account at all, and none on the device",
       given: inputs({
@@ -116,10 +117,11 @@ describe("deriveTelemetryMode (AD-5, AD-25)", () => {
     expect(deriveTelemetryMode(given)).toBe(expected)
   })
 
-  describe("FR-6 — failure never falls back to enabled", () => {
+  describe("failure never falls back to enabled", () => {
     it("resolves an account with no mode anywhere as Unresolved, never Enhanced", () => {
       // In flight, never asked, or the server holding no mode: the same answer. The
-      // settings row reads an unset mode as Enhanced so it has something to display; §5.7
+      // settings row reads an unset mode as Enhanced so it has something to display; the
+      // gate
       // asks for a positive resolution, and "we never asked" is not one.
       expect(deriveTelemetryMode(inputs())).toBe(TelemetryMode.Unresolved)
     })
@@ -131,14 +133,14 @@ describe("deriveTelemetryMode (AD-5, AD-25)", () => {
     })
 
     it("lets a local switch to Anon win over the server's stale Enhanced", () => {
-      // The window between choosing incognito here and the push landing. AD-25's literal
-      // precedence would read Enhanced from the stale server answer; deny wins instead.
+      // The window between choosing incognito here and the push landing. Plain precedence
+      // would read Enhanced from the stale server answer; deny wins instead.
       expect(
         deriveTelemetryMode(inputs({ persistedMode: "anon", serverMode: "enhanced" })),
       ).toBe(TelemetryMode.Anon)
     })
 
-    it("does not resolve Custodial off an untrusted remote config (AD-9)", () => {
+    it("does not resolve Custodial off an untrusted remote config", () => {
       expect(
         deriveTelemetryMode(
           inputs({
@@ -182,7 +184,7 @@ describe("the collection gate", () => {
     expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
   })
 
-  describe("FR-70 / AD-24 — the gate is mode × the row's `modes` column", () => {
+  describe("the gate is mode × the row's `modes` column", () => {
     const settlement = TelemetryEvent.PaymentSettled
     const legacy = TelemetryEvent.BackupCompleted
     const platform = "screen_view"
@@ -211,7 +213,7 @@ describe("the collection gate", () => {
     )
 
     it("runs platform collection on Custodial alone", async () => {
-      // CD-7. The 09-11 attempt to keep Enhanced on Firebase failed on Q13: the SDK cannot
+      // An earlier attempt to keep Enhanced on Firebase failed because the SDK cannot
       // suppress its reserved automatic events while logEvent() is live (verified against
       // @react-native-firebase/analytics@23.3.1 — see platform-analytics.ts).
       await resolveTelemetryMode(TelemetryMode.Custodial)
@@ -228,7 +230,7 @@ describe("the collection gate", () => {
     })
   })
 
-  describe("AD-28 / AD-30 — the two switches sit in front of the gate", () => {
+  describe("the two switches sit in front of the gate", () => {
     it("permits nothing from an Enhanced device until the rollout flag is on", async () => {
       resetEnablementForTesting()
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -302,7 +304,7 @@ describe("the collection gate", () => {
       { mode: TelemetryMode.Anon, disposition: DiagnosticsDisposition.Denied },
       { mode: TelemetryMode.Unresolved, disposition: DiagnosticsDisposition.Unresolved },
     ])(
-      "resolving $mode sets the diagnostic disposition to $disposition (AD-13)",
+      "resolving $mode sets the diagnostic disposition to $disposition",
       async ({ mode, disposition }) => {
         // Anon is *denied*, not merely unresolved: the sink holds under one and drops under
         // the other, and an incognito device's errors must never be held for a later grant.
@@ -313,7 +315,7 @@ describe("the collection gate", () => {
       },
     )
 
-    it("silences an Enhanced device's diagnostics when the switch engages (NFR-O4)", async () => {
+    it("silences an Enhanced device's diagnostics when the switch engages", async () => {
       // "Self-custodial telemetry collection stops" is every transmission a self-custodial
       // device makes: the boundary's events, the drain, and Crashlytics too.
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -340,7 +342,7 @@ describe("the collection gate", () => {
     })
   })
 
-  describe("AD-16 — no user-scoped identity survives into a self-custodial session", () => {
+  describe("no user-scoped identity survives into a self-custodial session", () => {
     it("clears the analytics user id when a self-custodial account activates", async () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)
       setUserId.mockClear()
@@ -407,7 +409,7 @@ describe("the collection gate", () => {
     )
 
     it("applies the identity the container asked for before the mode resolved, once it does", async () => {
-      // The fifth review's second blocker. The container's effects run on the first
+      // The container's effects run on the first
       // commit — the ledger id out of the persisted cache, the instance name from config —
       // and do not run again while those values stand; permission arrives later, once the
       // mode has resolved and its queued side effects have run.
@@ -516,7 +518,7 @@ describe("the collection gate", () => {
     })
   })
 
-  describe("FR-4 / FR-5 — closed before the discard, never reopened over one", () => {
+  describe("closed before the discard, never reopened over one", () => {
     /** A discard held open by the test: the unlink is a disk operation and can be slow. */
     const suspendedDiscard = () => {
       let release: () => void = () => undefined
@@ -604,7 +606,7 @@ describe("the collection gate", () => {
     })
   })
 
-  describe("AD-5 — the gate covers the drain, not just capture", () => {
+  describe("the gate covers the drain, not just capture", () => {
     it.each([
       { mode: TelemetryMode.Enhanced, permitted: true },
       { mode: TelemetryMode.Custodial, permitted: false },
@@ -616,7 +618,7 @@ describe("the collection gate", () => {
     })
   })
 
-  describe("AD-30 — mode-resolution latency is measured", () => {
+  describe("mode-resolution latency is measured", () => {
     it("records how long the device sat in Unresolved after initialisation", async () => {
       await initializeTelemetryGate()
       await resolveTelemetryMode(TelemetryMode.Enhanced)

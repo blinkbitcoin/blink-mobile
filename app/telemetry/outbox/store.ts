@@ -11,7 +11,7 @@ import {
 import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "./record"
 
 /**
- * The outbox store (AD-6, AD-18, AD-26): a dedicated directory, one per `(accountId,
+ * The outbox store: a dedicated directory, one per `(accountId,
  * network)`, **sibling to the wallet store and never inside it**. `storageDirFor` is the
  * Breez wallet directory, and its only existing pairing with `unlink` is account deletion —
  * discarding an outbox against that path would destroy live wallet state.
@@ -23,16 +23,16 @@ import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "
  *
  *   <dir>/<dedup-key>.json      one file per record
  *   <dir>/<dedup-key>.json.tmp  a write in progress; never read back
- *   <dir>/loss.json             the unreported loss counters (AD-31)
+ *   <dir>/loss.json             the unreported loss counters
  *   <dir>/acked.json            tombstones: SDK payment ids already delivered, so a
  *                               replay after cleanup cannot mint a second id
- *   <dir>.condemned-<ts>        a queue renamed out of its path by a discard (AD-26): never
+ *   <dir>.condemned-<ts>        a queue renamed out of its path by a discard: never
  *                               read again, removed when it can be
  *   <dir>.discard               a discard that could not rename: while this sibling file
  *                               exists, nothing in the directory is readable as a queue
  *
  * Every record is written to a temp name and renamed into place, so a crash mid-write
- * leaves a `.tmp` the reader ignores rather than a half-record it has to guess at. AD-26
+ * leaves a `.tmp` the reader ignores rather than a half-record it has to guess at. The
  * names files by `telemetryEventId`; they are named by the **dedup key** instead — the SDK
  * payment id where there is one — because that is what makes `enqueue` idempotent per
  * settlement: the second callback for a payment finds its file present and writes nothing,
@@ -42,10 +42,10 @@ import { dedupKeyFor, OutboxState, parseOutboxRecord, type OutboxRecord } from "
  */
 
 /**
- * Loss counters (FR-68, AD-31). Each source is separate because CM-5 must tell them apart:
+ * Loss counters, one per cause, because the board has to tell them apart:
  * one is age, one is pressure, one is the receiver's refusal, one is a record this build
- * could not read. `expired` and `evicted` together are the device-side share of FR-29's 2%
- * budget, which AD-17 allocates as ≤1%.
+ * could not read. `expired` and `evicted` together are the device's share of the pipeline's
+ * loss budget, which is one percent of events.
  *
  * The persisted copy in `loss.json` is the *unreported* loss: incremented on the event,
  * and reduced only when a `telemetry_loss_reported` carrying those counts is acknowledged.
@@ -61,9 +61,9 @@ export type LossCounters = {
 const EMPTY_LOSS: LossCounters = { expired: 0, evicted: 0, rejected: 0, parseFailed: 0 }
 
 const counters = {
-  /** Writes refused because a discard had run since the drain read the queue (AD-26). */
+  /** Writes refused because a discard had run since the drain read the queue. */
   staleWrites: 0,
-  /** Enqueues refused because the account was deleted in this process (AD-6). */
+  /** Enqueues refused because the account was deleted in this process. */
   retiredWrites: 0,
   enqueued: 0,
   deduplicated: 0,
@@ -82,7 +82,7 @@ export const getOutboxCounters = (): OutboxCounters => ({ ...counters })
 /**
  * Serialised per *directory*, not per instance: two settlements arriving together would
  * otherwise both read a below-capacity directory and both write, and two instances over
- * the same directory — the provider's active store and the FR-25 sweep's — would race
+ * the same directory — the provider's active store and the one its sweep makes — would race
  * each other's read-modify-write of the loss counters and the tombstones.
  */
 const queueByDirectory = new Map<string, Promise<unknown>>()
@@ -94,7 +94,7 @@ const queueByDirectory = new Map<string, Promise<unknown>>()
 const discardOwed = new Set<string>()
 
 /**
- * Directories retired with their account (AD-6 pairing). Permanent for the process: a
+ * Directories retired with their account. Permanent for the process: a
  * settlement for a deleted account cannot enqueue, whatever the mode says, and a store
  * created later for the same path — the same wallet restored in the same session —
  * inherits the refusal and counts what it refuses, until the next launch.
@@ -107,7 +107,7 @@ const retiredDirectories = new Set<string>()
  * that follows; a write whose lease is stale is refused. This is what stops a transport
  * result that was in flight while the mode switched — and while the discard ran to
  * completion — from writing the record, its loss or its tombstone into the successor of
- * a queue that no longer exists (the third review's HIGH). A mode check cannot do this
+ * a queue that no longer exists. A mode check cannot do this
  * job: Enhanced → Anon → Enhanced can complete before the response returns, and the
  * current mode then says yes.
  */
@@ -152,21 +152,21 @@ export type OutboxStore = {
   acknowledge: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
   reject: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
   requeue: (record: OutboxRecord, lease: OutboxLease) => Promise<boolean>
-  /** The loss not yet carried off the device by a `telemetry_loss_reported` (AD-31). */
+  /** The loss not yet carried off the device by a `telemetry_loss_reported`. */
   unreportedLoss: () => Promise<LossCounters>
   /** Called once the report carrying `reported` is acknowledged. */
   settleReportedLoss: (reported: LossCounters, lease: OutboxLease) => Promise<boolean>
-  /** FR-5. Idempotent: safe to re-run on activation after a half-finished delete. The
+  /** Idempotent: safe to re-run on activation after a half-finished delete. The
    *  queue's generation moves the instant this is called, before anything touches disk. */
   discardAll: () => Promise<void>
   /**
-   * The account is gone (AD-6): a discard, and then the path refuses to be a queue again
+   * The account is gone: a discard, and then the path refuses to be a queue again
    * for the rest of the process. Account deletion must come here rather than unlink the
    * directory itself — a bare unlink neither moves the generation nor serialises, so a
    * transport result in flight would write the deleted account's queue back.
    */
   retire: () => Promise<void>
-  /** AD-26: a discard begun here or in a previous run did not finish. */
+  /** A discard begun here or in a previous run did not finish. */
   hasPendingDiscard: () => Promise<boolean>
 }
 
@@ -178,7 +178,7 @@ const DISCARD_TOMBSTONE_SUFFIX = ".discard"
 const TEMP_SUFFIX = ".tmp"
 
 /**
- * Deduplication does not end when an acknowledged record is deleted (A2.3, FR-26). The SDK
+ * Deduplication does not end when an acknowledged record is deleted. The SDK
  * can re-deliver a settlement after the record that carried it has been cleaned — a resync
  * after a restart, a listener re-attached — and a fresh `telemetry_event_id` at that point
  * is a row the warehouse cannot collapse. So the SDK payment id of every acknowledged
@@ -200,7 +200,7 @@ const remove = async (path: string): Promise<void> => {
 }
 
 /**
- * Temp-and-rename (AD-26). `RNFS.moveFile` is a rename on the same volume, so a reader
+ * Temp-and-rename. `RNFS.moveFile` is a rename on the same volume, so a reader
  * never sees the front half of a file. What it is *not*, on iOS, is a replace:
  * `NSFileManager moveItemAtPath:toPath:` refuses an existing destination (Android's
  * `renameTo` overwrites), so a rewrite — a state transition, the loss counters, the
@@ -347,7 +347,7 @@ const addTombstone = async (directory: string, sdkPaymentId: string): Promise<vo
  * Removes what discards leave behind in a parent directory: condemned queues whose
  * unlink failed, and tombstones whose directory is gone. Called on mount for the whole
  * outbox parent, so a queue retired with a *deleted* account — one no store will ever be
- * created for again — still gets cleaned up (the fourth review's HIGH). A tombstone whose
+ * created for again — still gets cleaned up. A tombstone whose
  * directory still exists is a discard that never finished; it is finished here.
  */
 export const sweepCondemnedOutboxes = async (parent: string): Promise<void> => {
@@ -373,7 +373,7 @@ export const sweepCondemnedOutboxes = async (parent: string): Promise<void> => {
   }
 }
 
-/** A record written under a contract version the relay no longer accepts (AD-30). */
+/** A record written under a contract version the relay no longer accepts. */
 const isTooOld = (record: OutboxRecord): boolean =>
   record.version < eventVersionOf(record.event) - OUTBOX_SCHEMA_VERSIONS_TOLERATED
 
@@ -398,8 +398,8 @@ export const createOutboxStore = (directory: string): OutboxStore => {
    * instant after finds no queue at all — and a condemned directory is never read as
    * one, only removed. When the rename itself fails the signal goes *next to* the
    * directory instead of inside it: a tombstone file in the parent, which a failing
-   * unlink cannot take with it, and which a restart still sees (the fourth review's
-   * MEDIUM). Only a directory that survives every one of these throws, and then the
+   * unlink cannot take with it, and which a restart still sees. Only a directory that
+   * survives every one of these throws, and then the
    * in-memory owed entry keeps refusing reads for the rest of the process.
    */
   const condemn = async (): Promise<void> => {
@@ -435,7 +435,8 @@ export const createOutboxStore = (directory: string): OutboxStore => {
   /**
    * Every read of the queue finishes a pending discard first, or fails. A discard that
    * died leaves records behind that the mode switch required destroyed; returning them
-   * from `pending()` would hand them to the next drain (FR-5 by the back door), and
+   * from `pending()` would hand them to the next drain, which is the flush a switch is
+   * meant to prevent, and
    * writing next to them would bury the signal under fresh records. So they are never
    * readable: either the removal completes now, or the store refuses the read.
    */
@@ -474,7 +475,8 @@ export const createOutboxStore = (directory: string): OutboxStore => {
         entry.record.sdkPaymentId in tombstones
       ) {
         /** Acknowledged, and the process died before its file was removed: the tombstone
-         *  is written first, so this is a record already delivered — not one to resubmit. */
+         *  is written first, so this is a record already delivered — not one to resubmit.
+         * */
         await remove(entry.path)
       } else {
         live.push(entry)
@@ -487,7 +489,7 @@ export const createOutboxStore = (directory: string): OutboxStore => {
 
     /** Oldest-first, so eviction under pressure drops what is closest to expiring anyway.
      *  Eviction removes records from the queue and never reorders what is submitted, so
-     *  AD-22's ordering rule does not reach it. */
+     *  the shuffle's reason for existing does not reach it. */
     live.sort((a, b) => a.record.queuedAt - b.record.queuedAt)
     return { live, tombstones }
   }
@@ -528,12 +530,12 @@ export const createOutboxStore = (directory: string): OutboxStore => {
   }
 
   /**
-   * FR-5, made re-runnable (AD-26). The signals come first and the filesystem second:
+   * Made re-runnable. The signals come first and the filesystem second:
    * the generation and the owed set move synchronously in the caller (see `discardAll`
    * below), the directory is counted — best effort — and then condemned. A read that
    * fails before the signal existed would otherwise leave nothing to say a discard was
-   * ever due, and the next grant would drain the records the switch required destroyed
-   * (the third review's MEDIUM). Nothing to discard is not a failure; a directory that
+   * ever due, and the next grant would drain the records the switch required destroyed.
+   * Nothing to discard is not a failure; a directory that
    * survives is, and the error carries the owed entry with it for the next attempt.
    */
   const runDiscard = async (): Promise<void> => {

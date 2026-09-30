@@ -14,7 +14,8 @@ export type SparkToken = (typeof SparkToken)[keyof typeof SparkToken]
 
 export const MAX_SLIPPAGE_BPS = 50
 
-// Spark bech32 HRPs (spark1/sparkrt1); gates the async sdk.parse, which can hang on some non-Spark bech32 input.
+// Spark bech32 HRPs (spark1/sparkrt1); gates the async sdk.parse, which can hang on some
+// non-Spark bech32 input.
 const SPARK_ADDRESS_SHAPE_PATTERN = /^(?:spark1|sparkrt1)/i
 
 export const hasSparkAddressShape = (input: string): boolean =>
@@ -78,7 +79,7 @@ export const storageDirFor = (accountId: string, network: Network): string =>
   `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
 
 /**
- * The telemetry outbox (AD-6): a **sibling** of the wallet store, never inside it.
+ * The telemetry outbox: a **sibling** of the wallet store, never inside it.
  * `storageDirFor` is the Breez wallet directory and its only existing pairing with
  * `RNFS.unlink` is account deletion; the outbox's discard-on-mode-switch is an unlink of
  * its own directory, so the two must not share a path.

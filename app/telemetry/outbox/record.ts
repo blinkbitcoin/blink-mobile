@@ -5,7 +5,7 @@ import type { TelemetryEvent, TelemetryPayload } from "../contract"
 /**
  * One queued event, as it sits on disk.
  *
- * The state machine is the acknowledged one (FR-64, AD-17):
+ * The state machine is the acknowledged one:
  *
  *   queued → submitted → acknowledged → cleaned
  *          ↘ expired (72h TTL)   ↘ evicted (capacity)   ↘ discarded (mode switch)
@@ -16,7 +16,7 @@ import type { TelemetryEvent, TelemetryPayload } from "../contract"
  * process died between hand-off and confirmation, and the `telemetryEventId` is unchanged,
  * so a resubmission costs a deduplicated row rather than a second count.
  *
- * Building the strong machine and letting an adapter degrade it is the point of FR-64:
+ * Building the strong machine and letting an adapter degrade it is deliberate:
  * building the weak one first and strengthening it later means rewriting retry, cleanup and
  * reconciliation semantics under a system already in production.
  */
@@ -29,15 +29,16 @@ export const OutboxState = {
 export type OutboxState = (typeof OutboxState)[keyof typeof OutboxState]
 
 export type OutboxRecord = {
-  /** The dedup key the reporting layer groups on (FR-26). */
+  /** The dedup key the reporting layer groups on. */
   telemetryEventId: string
   event: TelemetryEvent
-  /** The contract version the record was written under, for AD-30's n−1 tolerance. */
+  /** The contract version the record was written under. The relay accepts this one and
+   *  the one before it, so a record can outlive an upgrade. */
   version: number
   /** Exactly what the policy stage approved — the adapter is handed this, and nothing else. */
   payload: TelemetryPayload
   /**
-   * Local only, never transmitted (FR-24). It is the key that makes a re-delivered
+   * Local only, never transmitted. It is the key that makes a re-delivered
    * settlement callback reuse its original record instead of minting a second one, which
    * addendum A2.3 names as the single most likely implementation error in this feature.
    */
@@ -52,7 +53,7 @@ export type OutboxRecord = {
  * idempotent per settlement: the second callback for a payment finds the file already
  * there and writes nothing, so the id it would have carried never exists. An event with no
  * payment to key on falls back to its own id and is therefore unkeyed — inventing a key
- * out of payment data to make it look deduplicable is exactly the derivation §5.5 forbids.
+ * out of payment data to make it look deduplicable is exactly what the rules forbid.
  *
  * The payment id is hashed, not sanitised: a sanitise-and-truncate let two ids that share
  * a normalised prefix pass the raw-id check in `enqueue` and then land on one filename,

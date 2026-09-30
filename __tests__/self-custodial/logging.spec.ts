@@ -111,7 +111,7 @@ describe("logSdkEvent", () => {
   })
 })
 
-describe("AD-13 / AD-30 — SDK log lines leave only a device permitted to report", () => {
+describe("SDK log lines leave only a device permitted to report", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetDiagnosticsForTesting()
@@ -147,7 +147,7 @@ describe("AD-13 / AD-30 — SDK log lines leave only a device permitted to repor
   })
 
   it("does not carry an incognito device's error lines out on a later switch to Enhanced", () => {
-    // The second review's HIGH 2, at the SDK path: an error raised while the device was
+    // at the SDK path: an error raised while the device was
     // incognito is dropped, not held, so a later grant has nothing to release.
     logSdkEvent(SdkLogLevel.Error, "incognito-era defect line")
 

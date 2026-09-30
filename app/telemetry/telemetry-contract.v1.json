@@ -124,7 +124,7 @@
           ]
         }
       },
-      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+      "review": "pending privacy review; custodial-only until it passes"
     },
     {
       "name": "self_custodial_restore_completed",
@@ -147,7 +147,7 @@
           "kind": "uuid_v4"
         }
       },
-      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+      "review": "pending privacy review; custodial-only until it passes"
     },
     {
       "name": "self_custodial_stable_balance_activated",
@@ -176,7 +176,7 @@
           ]
         }
       },
-      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+      "review": "pending privacy review; custodial-only until it passes"
     },
     {
       "name": "self_custodial_rollout_exposed",
@@ -208,7 +208,7 @@
           "kind": "boolean"
         }
       },
-      "review": "AD-24: pending privacy review; Custodial-only until it passes"
+      "review": "pending privacy review; custodial-only until it passes"
     },
     {
       "name": "telemetry_loss_reported",
@@ -244,7 +244,7 @@
           "kind": "count"
         }
       },
-      "review": "AD-31: accepted 2026-09-14 subject to FR-18 / NFR-P8 privacy review, because it adds an event to a closed allowlist"
+      "review": "accepted 2026-09-14 subject to privacy review, because it adds an event to a closed allowlist"
     }
   ]
 }

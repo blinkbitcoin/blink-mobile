@@ -30,7 +30,7 @@ export const AccountModeSetting: React.FC = () => {
 
   /** An account that never chose is not Enhanced: it holds no mode anywhere this device
    *  can see, nothing is pushed for it, its Lightning Address stays dormant and it emits
-   *  no telemetry (AD-25). The row says so; it is the one path into choosing. */
+   *  no telemetry. The row says so; it is the one path into choosing. */
   const modeName = accountMode
     ? ACCOUNT_MODE_NAMES[accountMode]
     : LL.SettingsScreen.modeNotSet()

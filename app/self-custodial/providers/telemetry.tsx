@@ -37,35 +37,34 @@ import { refreshTelemetryKillSwitch } from "../lnurl-telemetry-config"
 import { useSelfCustodialWallet } from "./wallet"
 
 /**
- * Owns the outbox and the drain (AD-14), resolves the mode that gates both (AD-25), and
- * holds the two switches in front of the gate (AD-28, AD-30).
+ * Owns the outbox and the drain, resolves the mode that gates both, and
+ * holds the two switches in front of the gate.
  *
  * It lives here rather than in `useSdkLifecycle` because that hook is already 370 lines
  * carrying three refresh triggers and a reconnect loop, and privacy-critical logic landing
  * inside it is how the ordering rules below get lost in a later refactor. It holds no
  * context: nothing consumes one, and the boundary is reached through its module surface.
  *
- * The ordering here is load-bearing, and it is the FR-5 rule in code:
+ * The order here matters:
  *
  *  1. the store for the newly active account is mounted **first**, its discard is
  *     registered with the gate, and any discard the previous run left unfinished — the
- *     `.discard` marker, or a queue under a mode that may not hold one — is finished now
- *     (AD-26);
+ *     `.discard` marker, or a queue under a mode that may not hold one — is finished now;
  *  2. only then is the mode resolved, so an account that switched to incognito while it was
  *     inactive has its queue discarded on activation — before anything can drain it. That
- *     path is flush-then-discard by the back door, and it is the one AD-5 exists to close.
+ *     path flushes exactly what the switch was supposed to destroy.
  *
- * The drain's triggers are exactly AD-26's three — SDK connect, a successful emission, and
+ * The drain has three triggers — SDK connect, a successful emission, and
  * app foreground — and it never subscribes to the 10 s connectivity poll. Each trigger
  * asks first whether the SDK is connected for this account and the wallet is online; the
  * mode gate and the switches are the drain's own to check.
  *
  * Two more things ride the same lifecycle. The kill switch is refreshed from its
  * Blink-controlled channel on activation and foreground, from devices that may report
- * (AD-28) — which is what makes it reachable for an account that settled its mode long
+ * — which is what makes it reachable for an account that settled its mode long
  * ago and never calls `/recover` again. And every self-custodial account's outbox is swept
  * on mount, not only the active one's, so a queue left behind by an account that is never
- * activated again still expires on FR-25's schedule rather than sitting on disk.
+ * activated again still expires on the usual schedule rather than sitting on disk.
  */
 export const SelfCustodialTelemetryMount: React.FC = () => {
   const { activeAccount, selfCustodialEntries } = useAccountRegistry()
@@ -92,7 +91,7 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     hasSelfCustodialAccount,
   })
 
-  /** AD-28 / AD-30: both switches sit in front of the gate, and both default to off. */
+  /** Both switches sit in front of the gate, and both default to off. */
   const killSwitchEngaged = persistentState.telemetryKillSwitchEngaged === true
   useEffect(() => {
     restoreKillSwitch(killSwitchEngaged)
@@ -110,7 +109,7 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     [updateState],
   )
 
-  /** FR-25: the TTL applies to every account's queue, active or not. `pending()` sweeps.
+  /** The TTL applies to every account's queue, active or not. `pending()` sweeps.
    *  The active account's own store sweeps on every drain, so it is left out here; the
    *  store serialises by directory anyway, so even an overlap could not race it. */
   const inactiveAccountIds = selfCustodialEntries
@@ -143,7 +142,7 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     const unsubscribe = onTelemetrySuppressed(() => store.discardAll())
 
     /**
-     * AD-26: finish what the last run started. Neither RNFS primitive is atomic, so a
+     * Finish what the last run started. Neither RNFS primitive is atomic, so a
      * discard that died halfway leaves records behind — and its marker. A queue under a
      * mode that may not hold one is discarded here too, whether or not a marker exists:
      * `resolveTelemetryMode` is a no-op when the mode has not changed, so a cold start
@@ -189,13 +188,13 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     return () => setEmissionListener(null)
   }, [drainIfAble])
 
-  /** The switch is the self-custodial pipeline's (NFR-O4), so only an Enhanced device
+  /** The switch is the self-custodial pipeline's, so only an Enhanced device
    *  asks for it: a custodial-only device has nothing it could roll back, and an Anon or
    *  Unresolved one must not make the request at all — a request is a transmission too. */
   const asksForKillSwitch = mode === TelemetryMode.Enhanced
   const lnurlServerUrl = lnurlServerUrlFor(network)
 
-  /** AD-28: the switch is fetched on activation. */
+  /** The switch is fetched on activation. */
   useEffect(() => {
     if (asksForKillSwitch) refreshTelemetryKillSwitch(lnurlServerUrl)
   }, [asksForKillSwitch, lnurlServerUrl])

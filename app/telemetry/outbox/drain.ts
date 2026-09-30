@@ -8,25 +8,24 @@ import type { OutboxRecord } from "./record"
 import type { LossCounters, OutboxStore } from "./store"
 
 /**
- * The drain (AD-22, AD-26, AD-27, AD-31, FR-72).
+ * The drain.
  *
- * Emission happens at the SDK settlement listener, so **emission order is settlement
- * order**. Submitting in insertion order would hand the receiver a per-device sequence —
- * a linkage vector arriving through the transport rather than through a field, which no
- * amount of payload discipline can close. So the queue is shuffled before it is submitted
- * and submissions are spaced by a random pause.
+ * Events are emitted as the SDK reports settlements, so the order they are queued in is
+ * the order they settled in. Sending them in that order would hand the receiver a
+ * sequence it knows came from one device — a link between events that no amount of care
+ * over payload fields can undo. So the queue is shuffled before anything is sent, and
+ * sends are spaced by a random pause.
  *
- * What this does *not* claim: the app has no background execution — no background fetch,
- * no headless task, and the connectivity poll self-gates on foreground — so any drain runs
- * while the device is in use. **Arrival timing therefore still correlates with device
- * activity, and that is a stated residual** recorded in the affected metric contracts
- * (FR-56), not a solved problem.
+ * What this does *not* fix: the app has no background execution — no background fetch, no
+ * headless task, and the connectivity poll only runs in the foreground — so a drain always
+ * runs while the device is in use. **When events arrive therefore still tracks when the
+ * device was used.** That is a known limit, recorded against the metrics it affects.
  *
- * One payload at a time, never a batch: a batch would hand the receiver an explicit
- * per-device equivalence class, and shuffling the modal one-event batch is the identity
- * permutation anyway.
+ * One payload at a time, never a batch: a batch tells the receiver outright that those
+ * events came from one device, and most batches hold a single event anyway, which a
+ * shuffle cannot disguise.
  *
- * Scheduling (AD-26): one drain per account at a time — a trigger arriving while one is
+ * Scheduling: one drain per account at a time — a trigger arriving while one is
  * running joins it rather than starting another. On `retryable` the account backs off
  * exponentially from 5 s to a 15 min cap, honouring the adapter's `retryAfterMs` where it
  * gives one; any `acknowledged` resets it. The triggers themselves — SDK connect, a
@@ -54,7 +53,7 @@ export type DrainDeps = {
   shuffle?: <T>(items: readonly T[]) => T[]
   delay?: (ms: number) => Promise<void>
   /**
-   * AD-31: files a `telemetry_loss_reported` for the loss not yet carried off the device.
+   * Files a `telemetry_loss_reported` for the loss not yet carried off the device.
    * Supplied by the boundary's public surface, which owns capture; the drain only decides
    * *when* — at most once per drain, and never while a previous report is still queued.
    */
@@ -98,9 +97,9 @@ const runDrain = async (
   /** A mode change in flight owns the queue until its discard has finished. */
   await whenModeSettled()
 
-  /** The gate covers the drain, not just capture (AD-5). An account can queue events,
+  /** The gate covers the drain, not just capture. An account can queue events,
    *  switch to incognito while inactive, and flush them on next activation — which is
-   *  flush-then-discard by the back door, and FR-5 prohibits it outright. */
+   *  flushing exactly what the switch was supposed to destroy. */
   if (!isDrainPermitted()) return
 
   const transport = getTelemetryTransport()
@@ -119,14 +118,14 @@ const runDrain = async (
    * transport result that arrives after a discard — the mode switched while the submit
    * was in flight, and the discard ran to completion — must not write the record back,
    * nor its loss, nor its tombstone: the directory it would recreate is the successor of
-   * a queue the switch destroyed, and a later grant would drain it (FR-5). The mode is
+   * a queue the switch destroyed, and a later grant would drain it. The mode is
    * not enough to tell, because Enhanced → Anon → Enhanced can complete before the
    * response returns; the generation is.
    */
   const lease = store.lease()
   let queued = await store.pending()
 
-  /** AD-31: the loss report rides the same queue as everything else, so it is gated,
+  /** The loss report rides the same queue as everything else, so it is gated,
    *  shuffled, deduplicated and acknowledged like any other record. The queue is read
    *  again only when a report was just filed, so that it rides this drain. */
   if (reportLoss) {
@@ -154,23 +153,23 @@ const runDrain = async (
      * Checked again here, not just at the top of the iteration: `markSubmitted` is a
      * disk write, and a switch to incognito during that await closes the gate
      * synchronously while this iteration is already past its first check. A submit
-     * after that would be the one event FR-5's discard cannot unsend. The record is
+     * after that would be the one event the discard cannot take back. The record is
      * left `submitted`; the discard the switch queued unlinks it behind us, and if it
      * somehow survives it returns to `queued` at the next startup.
      *
      * And the lease, synchronously, in the same breath: Enhanced → Anon → Enhanced can
      * complete inside that one write, leaving the mode saying yes while the queue this
      * record came from has already been condemned. The result of such a submit would be
-     * refused as stale, but the event would have left the device (the fourth review's
-     * MEDIUM). The generation is what knows; the mode does not.
+     * refused as stale, but the event would have left the device. The generation is what
+     * knows; the mode does not.
      */
     if (!isDrainPermitted() || store.lease() !== lease) break
 
     const result = await transport.submit(toContractPayload(record))
 
     if (result.kind === "acknowledged" || result.kind === "handed_off") {
-      /** `handed_off` collapses `submitted → acknowledged` into one transition (FR-64).
-       *  Whether such an adapter may be selected at all is AD-17's call, not the drain's. */
+      /** `handed_off` collapses `submitted → acknowledged` into one transition.
+       *  Whether such an adapter may be chosen at all is a separate decision. */
       if (!(await store.acknowledge(record, lease))) break
       const carried = lossCarriedBy(record)
       if (carried) await store.settleReportedLoss(carried, lease)

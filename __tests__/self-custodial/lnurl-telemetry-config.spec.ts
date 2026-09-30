@@ -14,7 +14,7 @@ const respond = (status: number, body?: unknown) =>
     json: () => Promise.resolve(body),
   } as Response)
 
-describe("refreshTelemetryKillSwitch (AD-28)", () => {
+describe("refreshTelemetryKillSwitch", () => {
   const fetchMock = jest.fn<Promise<Response>, [string, RequestInit?]>()
 
   beforeEach(() => {
@@ -89,7 +89,7 @@ describe("refreshTelemetryKillSwitch (AD-28)", () => {
 
   it("asks again on the next trigger when the fetch itself failed, and engages then", async () => {
     // A device offline for the attempt must not sit out the interval: a kill switch that
-    // cannot be retried promptly is the failure AD-28 exists to prevent.
+    // cannot be retried promptly is the failure the switch exists to prevent.
     fetchMock
       .mockRejectedValueOnce(new Error("network down"))
       .mockReturnValue(respond(200, { telemetry_enabled: false }))

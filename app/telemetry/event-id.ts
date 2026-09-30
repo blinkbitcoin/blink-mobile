@@ -3,10 +3,10 @@ import Crypto from "react-native-quick-crypto"
 import type { TelemetryEventId } from "./contract"
 
 /**
- * Mints the random per-payment identifier deduplication depends on (FR-22, FR-23).
+ * Mints the random per-payment identifier deduplication depends on.
  *
  * It is derived from nothing. That is the property that lets a single string field exist in
- * the payload at all: a hashed pubkey is a pubkey for the purposes of §5.5, so the id has to
+ * the payload at all: a hashed pubkey is still a pubkey, so the id has to
  * come from a random source rather than from anything about the payment.
  *
  * **Stability across callbacks is the outbox's job, not this function's.** Addendum A2.3

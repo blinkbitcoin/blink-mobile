@@ -15,6 +15,7 @@ import {
   ErrorReportClass,
   classifyError,
   isConnectivityError,
+  crashForTesting,
   logBreadcrumb,
   recordAppError,
   resetErrorReportingForTesting,
@@ -29,18 +30,21 @@ const mockNativeSetDisposition = jest.fn((_permitted: boolean) => undefined)
 /** RNFB's `crashlytics()` throws synchronously when the native module is not linked. */
 let mockCrashlyticsUnlinked = false
 
+/** One object per suite, so a test can attach `crash` without redeclaring the module. */
+const crashlyticsClient: Record<string, unknown> = {
+  log: (...args: string[]) => mockLog(...args),
+  recordError: (...args: Error[]) => mockRecordError(...args),
+  setCrashlyticsCollectionEnabled: (enabled: boolean) =>
+    mockSetCollectionEnabled(enabled),
+}
+
 jest.mock("@react-native-firebase/crashlytics", () => () => {
   if (mockCrashlyticsUnlinked) {
     throw new Error(
       "You attempted to use a Firebase module that's not installed natively",
     )
   }
-  return {
-    log: (...args: string[]) => mockLog(...args),
-    recordError: (...args: Error[]) => mockRecordError(...args),
-    setCrashlyticsCollectionEnabled: (enabled: boolean) =>
-      mockSetCollectionEnabled(enabled),
-  }
+  return crashlyticsClient
 })
 NativeModules.CrashCollection = {
   setCrashCollectionDisposition: (permitted: boolean) =>
@@ -236,14 +240,14 @@ describe("recordAppError", () => {
 })
 
 /**
- * AD-13 / AD-30 / NFR-P1. Every non-fatal and breadcrumb in the app funnels through this
+ * Every non-fatal and breadcrumb in the app funnels through this
  * sink, so this is where "nothing leaves an incognito or unresolved device" is enforced
  * for error reporting — including the `reportError()` sites in the SDK lifecycle hook that
  * do not go through `logSdkEvent`, and the screens that used to reach Crashlytics directly.
  *
  * The disposition has three states, and the sink must tell the two closed ones apart:
  * `unresolved` holds, `denied` drops. A sink that held under both would carry an incognito
- * device's errors out on a later switch to Enhanced (the second review's HIGH 2).
+ * device's errors out on a later switch to Enhanced.
  */
 describe("recordAppError — the zero-transmission gate", () => {
   beforeEach(() => {
@@ -365,7 +369,7 @@ describe("recordAppError — the zero-transmission gate", () => {
     expect(mockRecordError).toHaveBeenCalledTimes(1)
   })
 
-  describe("automatic crash collection follows the disposition (AD-13, NFR-P1)", () => {
+  describe("automatic crash collection follows the disposition", () => {
     // The switch that changes the running process is native (CrashCollection, both
     // platforms); it also records the provenance the next launch decides by. The RNFB
     // preference is kept in step so its own gate on log()/recordError() agrees.
@@ -452,6 +456,24 @@ describe("recordAppError — the zero-transmission gate", () => {
     })
   })
 
+  it("carries on when the crash SDK refuses the preference write", () => {
+    mockSetCollectionEnabled.mockRejectedValueOnce(new Error("write failed"))
+
+    expect(() => setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)).not.toThrow()
+    expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
+  })
+
+  it("carries on when the native switch throws", () => {
+    mockNativeSetDisposition.mockImplementationOnce(() => {
+      throw new Error("native module not linked")
+    })
+
+    setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
+    reportError("SDK init", new Error("still reported"))
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+  })
+
   it("keeps custodial reporting open whatever the self-custodial kill switch says", () => {
     setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
     setSelfCustodialDiagnosticsShutdown(true)
@@ -461,7 +483,7 @@ describe("recordAppError — the zero-transmission gate", () => {
     expect(mockRecordError).toHaveBeenCalledTimes(1)
   })
 
-  it("closes Enhanced reporting the moment the kill switch engages (NFR-O4)", () => {
+  it("closes Enhanced reporting the moment the kill switch engages", () => {
     setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
     setSelfCustodialDiagnosticsShutdown(true)
 
@@ -469,6 +491,38 @@ describe("recordAppError — the zero-transmission gate", () => {
     logBreadcrumb("[SparkSDK] payment received: 21000 sat")
 
     expect(mockRecordError).not.toHaveBeenCalled()
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+})
+
+describe("crashForTesting", () => {
+  // The developer screen's crash test. Its button already sits behind a development-only
+  // branch; the guard here is what stops a future caller shipping a crash in a release.
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("leaves a breadcrumb and crashes on purpose in a development build", () => {
+    const mockCrash = jest.fn()
+    crashlyticsClient.crash = mockCrash
+
+    crashForTesting()
+
+    expect(mockLog).toHaveBeenCalledWith("Testing crash")
+    expect(mockCrash).toHaveBeenCalledTimes(1)
+  })
+
+  it("does nothing in a release build", () => {
+    const mockCrash = jest.fn()
+    crashlyticsClient.crash = mockCrash
+    const globals = global as unknown as { __DEV__: boolean }
+    const dev = globals.__DEV__
+    globals.__DEV__ = false
+
+    crashForTesting()
+
+    globals.__DEV__ = dev
+    expect(mockCrash).not.toHaveBeenCalled()
     expect(mockLog).not.toHaveBeenCalled()
   })
 })

@@ -207,7 +207,7 @@ describe("useRestoreWallet", () => {
     })
 
     /**
-     * AD-25. This used to fall back to Enhanced — a default every consumer downstream,
+     * This used to fall back to Enhanced — a default every consumer downstream,
      * the telemetry gate included, then read as a choice the user had made. A server
      * that holds no mode leaves the question open, exactly like one that could not be
      * reached, so the user is asked.

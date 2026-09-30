@@ -30,11 +30,11 @@ const mockFs = RNFS as unknown as { __resetMockFileSystem: () => void }
 const DIR = "/mock/documents/blink-telemetry-outbox-regtest/legacy"
 
 /**
- * AD-24: these four used to call Firebase directly. They now go through the boundary, so
+ * These four used to call Firebase directly. They now go through the boundary, so
  * what a test can assert is what the boundary does with them — hands them to GA4 on
  * Custodial, and holds them on Enhanced until their row passes privacy review.
  */
-describe("self-custodial analytics helpers (AD-24)", () => {
+describe("self-custodial analytics helpers", () => {
   let store: ReturnType<typeof createOutboxStore>
 
   beforeEach(async () => {

@@ -64,7 +64,7 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 // Shut the analytics gate as early as any JavaScript can. Firebase persists the last value
 // of `setAnalyticsCollectionEnabled` across launches and that persisted value overrides
 // `firebase.json`, so a device that resolved Custodial last run would otherwise start this
-// one collecting — including automatic and screen-level events (FR-3).
+// one collecting — including automatic and screen-level events.
 //
 // The window before JS runs is closed natively: MainApplication.kt and AppDelegate.mm turn
 // collection off at process start, before the first Activity resumes / the app becomes
@@ -74,7 +74,7 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 // start, on the one launch after an upgrade of a device that last ran custodial.
 initializeTelemetryGate()
 
-// The null adapter (AD-27) stands behind the port until OD-1 is signed: it acknowledges
+// The null adapter stands behind the port until a real one ships: it acknowledges
 // and keeps what it was handed in a ring buffer the developer screen can read. Nothing
 // leaves the device, and the whole pipeline is exercisable end to end without it.
 registerTelemetryTransport(localOnlyTransport)

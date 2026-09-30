@@ -168,7 +168,7 @@ describe("SelfCustodialTelemetryMount", () => {
     setActiveOutbox(null)
   })
 
-  describe("AD-25 — three inputs, deny wins", () => {
+  describe("three inputs, deny wins", () => {
     it("resolves the mode of whichever account is active", async () => {
       render(<SelfCustodialTelemetryMount />)
 
@@ -202,7 +202,7 @@ describe("SelfCustodialTelemetryMount", () => {
     })
   })
 
-  describe("FR-5 / AD-26 — discard on activation, and finish what the last run started", () => {
+  describe("discard on activation, and finish what the last run started", () => {
     it("discards a queue left by an account that switched to incognito while inactive", async () => {
       await createOutboxStore(DIR).enqueue(queuedRecord())
       mockAccountMode = AccountMode.Anon
@@ -287,7 +287,7 @@ describe("SelfCustodialTelemetryMount", () => {
     })
   })
 
-  describe("AD-26 — the drain's triggers are SDK connect, emission and foreground", () => {
+  describe("the drain's triggers are SDK connect, emission and foreground", () => {
     it("does not drain while the SDK is connected for a different account", async () => {
       await createOutboxStore(DIR).enqueue(queuedRecord())
       const submit = ackingTransport()
@@ -352,7 +352,7 @@ describe("SelfCustodialTelemetryMount", () => {
     })
   })
 
-  describe("AD-28 — the kill switch reaches an account that settled its mode long ago", () => {
+  describe("the kill switch reaches an account that settled its mode long ago", () => {
     it("refreshes the switch on activation of an established Enhanced account", async () => {
       // No /recover call ever happens for this account: its mode is persisted and
       // confirmed. The switch has to arrive some other way, on a schedule the device
@@ -412,7 +412,7 @@ describe("SelfCustodialTelemetryMount", () => {
     })
   })
 
-  describe("FR-25 — every account's queue expires, active or not", () => {
+  describe("every account's queue expires, active or not", () => {
     it("sweeps an inactive account's expired records on mount", async () => {
       await createOutboxStore(OTHER_DIR).enqueue({
         ...queuedRecord("3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7a1"),
@@ -428,7 +428,7 @@ describe("SelfCustodialTelemetryMount", () => {
     })
   })
 
-  describe("AD-28 / AD-30 — the switches", () => {
+  describe("the switches", () => {
     it("restores a persisted kill switch, so nothing emits without a fetch", async () => {
       mockKillSwitchEngaged = true
 

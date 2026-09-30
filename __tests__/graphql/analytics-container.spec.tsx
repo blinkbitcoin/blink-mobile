@@ -33,7 +33,7 @@ describe("AnalyticsContainer", () => {
     jest.clearAllMocks()
   })
 
-  it("sets custodial identity through the boundary, not the platform SDK (AD-16)", () => {
+  it("sets custodial identity through the boundary, not the platform SDK", () => {
     // The ledger account ID used to reach `analytics().setUserId` directly and was never
     // cleared, so Firebase merged it into every later event — including one emitted after
     // the user switched to a self-custodial account. Routing it here is what makes the mode

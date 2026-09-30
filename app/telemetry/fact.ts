@@ -9,21 +9,22 @@ import {
 } from "./contract"
 
 /**
- * The only type the boundary accepts (AD-1).
+ * The only type the boundary accepts.
  *
  * Two types in this codebase carry data the contract prohibits: `NormalizedTransaction`
  * (twelve fields, among them `amount`, `fee`, `lnAddress`, `memo` and `timestamp` — the
- * timing-correlation vector §5.6 names explicitly) and the SDK's `Payment` (`amount`,
+ * timing correlation the rules call out) and the SDK's `Payment` (`amount`,
  * `fees`, `details`, `conversionDetails`, `timestamp`). **Neither may appear in any
  * signature under `app/telemetry/`.**
  *
  * The hazard is prohibited data in *producer* scope, so the projection is the producer's
  * job — see `app/self-custodial/measurement.ts` — and this type is its enforcement. That
- * is also what makes NFR-P5 true: a reviewer can enumerate everything capable of leaving
+ * is also what makes review possible: a reviewer can enumerate everything capable of
+ * leaving
  * the device by reading this file and `contract.ts`.
  *
  * Q10, answered: one fact type, a discriminated union with one variant per contract row.
- * The legacy events (AD-24) and the loss event (AD-31) fit it without a second type — each
+ * The legacy events and the loss event fit it without a second type — each
  * variant's keys are the camelCase spelling of its row's parameters, and a test holds the
  * two in lockstep.
  */

@@ -207,7 +207,7 @@ describe("useAccountModeSync", () => {
     })
 
     /**
-     * AD-25. This recovery path used to write Enhanced when the server held no mode — the
+     * This recovery path used to write Enhanced when the server held no mode — the
      * fail-open the whole mode design exists to prevent, in the one file the earlier
      * drafts did not read. A null answer now settles nothing: the account stays mode-less
      * until the user picks, and nothing downstream reads a default as a choice.

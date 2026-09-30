@@ -29,24 +29,24 @@ import { logPlatformEvent } from "./platform-analytics"
 import { applyPrivacyPolicy, getDroppedEventCounts } from "./policy"
 
 /**
- * The measurement boundary's only public surface (FR-1, NFR-P5).
+ * The measurement boundary's only public surface.
  *
  *   TelemetryFact → gate → privacy policy → { outbox → port  |  platform SDK }
  *
  * Producers construct a `TelemetryFact` and call `captureTelemetryFact`. They never build a
  * payload, never see the outbox and cannot reach the port or the platform SDK, which is
- * what makes the policy stage unbypassable rather than merely conventional.
+ * what makes the policy stage impossible to skip rather than merely discouraged.
  *
- * Where an approved payload goes is decided here, from the resolved mode and nowhere else
- * (CD-7): on `Enhanced` it is filed in the outbox for the port; on `Custodial` it is handed
+ * Where an approved payload goes is decided here, from the resolved mode and nowhere
+ * else: on `Enhanced` it is filed in the outbox for the port; on `Custodial` it is handed
  * to GA4, which stays the custodial analytics platform. A producer cannot pick a carrier.
  */
 
 /**
- * The store for the account currently active, mounted by the telemetry provider (AD-14).
+ * The store for the account currently active, mounted by the telemetry provider.
  * `null` means there is nowhere to file an Enhanced event — the provider not yet mounted —
  * and an event captured then is counted locally and dropped rather than held in memory
- * against an account it may not belong to (AD-20).
+ * against an account it may not belong to.
  */
 let activeOutbox: OutboxStore | null = null
 
@@ -64,7 +64,7 @@ const toPayload = (fact: TelemetryFact): TelemetryPayload => {
   return payload
 }
 
-/** The `walletProvider` a producer should write for the mode that is active now (AD-20).
+/** The `walletProvider` a producer should write for the mode that is active now.
  *  `null` where no event may be written at all. */
 export const currentWalletProvider = (): WalletProvider | null => {
   const mode = getTelemetryMode()
@@ -78,14 +78,14 @@ export const currentWalletProvider = (): WalletProvider | null => {
  *
  * The gate runs first, before a payload is even built: suppression is not a filter applied
  * to a finished event — nothing is assembled, so there is nothing queued, nothing logged
- * and nothing to leak if a later stage misbehaves (§5.7, FR-19).
+ * and nothing to leak if a later stage misbehaves.
  *
- * `sdkPaymentId` is the local deduplication key and is never transmitted (FR-24). It is a
+ * `sdkPaymentId` is the local deduplication key and is never transmitted. It is a
  * separate argument rather than a field of `TelemetryFact` so that the type crossing the
  * boundary stays exactly the contract.
  *
  * Nothing here may throw. The settlement listener that emits also drives the wallet
- * refresh, and a throw would cost the user their balance update to save a metric (NFR-R2).
+ * refresh, and a throw would cost the user their balance update to save a metric.
  */
 export const captureTelemetryFact = (
   fact: TelemetryFact,
@@ -110,7 +110,7 @@ const captureInto = (
     if (!isEventPermitted(fact.event)) return
 
     /**
-     * AD-20, enforced rather than assumed. `walletProvider` is written by the producer at
+     * Enforced rather than assumed. `walletProvider` is written by the producer at
      * emission; the carrier is chosen here from the mode. If the two disagree, a settlement
      * callback has raced an account switch — a Spark-labelled fact arriving after the mode
      * resolved Custodial would otherwise be handed to GA4 with `user_pseudo_id` on it. A
@@ -157,7 +157,7 @@ const captureInto = (
   }
 }
 
-/** AD-26: a successful emission is one of the drain's three triggers. The provider
+/** A successful emission is one of the drain's three triggers. The provider
  *  registers the trigger; the boundary only fires it. */
 let onEmitted: (() => void) | null = null
 
@@ -166,8 +166,8 @@ export const setEmissionListener = (listener: (() => void) | null): void => {
 }
 
 /**
- * Everything the pipeline knows about its own losses and its own health, in one object
- * (FR-68, AD-30, CM-5). The numbers are held in module scope and would otherwise die with
+ * Everything the pipeline knows about its own losses and its own health, in one object.
+ * The numbers are held in module scope and would otherwise die with
  * the process, which is what `reportTelemetryHealth` exists to prevent.
  */
 export const getTelemetryHealth = (): Readonly<Record<string, number>> => ({
@@ -200,7 +200,7 @@ export const resetTelemetryHealthReportingForTesting = (): void => {
 }
 
 /**
- * AD-31: the loss the outbox has accumulated leaves the device as a contract event, through
+ * The loss the outbox has accumulated leaves the device as a contract event, through
  * the same gate and policy as everything else — so an `Anon` device never reports, and a
  * `walletProvider` rides on it like on any other row. It is filed into the store being
  * drained, and only while that store's drain is still permitted: a loss report is a Spark
@@ -288,7 +288,7 @@ export {
 } from "./mode"
 // `OutboxRecord` and `OutboxStore` are deliberately absent from this surface: an adapter
 // is handed a payload and never a row, which is what keeps the local-only `sdkPaymentId`
-// out of its reach (AD-4).
+// out of its reach.
 export {
   createOutboxStore,
   getOutboxCounters,

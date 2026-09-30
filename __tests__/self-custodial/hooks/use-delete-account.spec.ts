@@ -86,6 +86,11 @@ jest.mock("react-native-fs", () => ({
   unlink: (...args: unknown[]) => mockUnlink(...args),
 }))
 
+const mockLogBreadcrumb = jest.fn()
+jest.mock("@app/utils/error-reporting", () => ({
+  logBreadcrumb: (...args: unknown[]) => mockLogBreadcrumb(...args),
+}))
+
 /** The outbox is retired through its store, never unlinked here (see the hook). */
 const mockRetire = jest.fn(() => Promise.resolve())
 const mockCreateOutboxStore = jest.fn((directory: string) => ({
@@ -171,7 +176,7 @@ describe("useDeleteAccount", () => {
     // and a deleted account never mounts one again. And it is retired through the store
     // rather than unlinked: a bare unlink neither moves the queue's generation nor
     // serialises with a drain, so a transport result in flight would write the deleted
-    // account's queue back (the fourth review's HIGH).
+    // account's queue back.
     const { result } = renderHook(() => useDeleteAccount())
 
     await act(async () => {
@@ -190,6 +195,28 @@ describe("useDeleteAccount", () => {
     // Anchor: the wallet store is still wiped, so this is an addition rather than a
     // swap of one directory for the other.
     expect(mockUnlink).toHaveBeenCalledWith(`/tmp/${TEST_SC_ACCOUNT_ID}`)
+  })
+
+  it("leaves a breadcrumb, and finishes, when the wallet directory cannot be removed", async () => {
+    // The account is gone from the registry either way; a directory left behind is a
+    // breadcrumb through the app's one sink, not a failed delete the user has to repeat.
+    mockUnlink.mockImplementation((path: string) =>
+      path === `/tmp/${TEST_SC_ACCOUNT_ID}`
+        ? Promise.reject(new Error("EBUSY"))
+        : Promise.resolve(undefined),
+    )
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBe("logged-out")
+    expect(mockLogBreadcrumb).toHaveBeenCalledWith(
+      expect.stringContaining("storage dir unlink failed"),
+    )
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
   })
 
   it("finishes the delete when the outbox retirement fails", async () => {
@@ -291,7 +318,9 @@ describe("useDeleteAccount", () => {
       outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
-    expect(mockCrashlyticsLog).toHaveBeenCalled()
+    expect(mockLogBreadcrumb).toHaveBeenCalledWith(
+      expect.stringContaining("disconnect failed"),
+    )
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")

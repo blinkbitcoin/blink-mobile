@@ -11,6 +11,7 @@ import {
   CONTRACT_VERSION,
   contractRowFor,
   EmittingMode,
+  eventVersionOf,
   isContractEvent,
   RailType,
   TelemetryConversionDirection,
@@ -24,9 +25,10 @@ import { wireNameOf, type TelemetryFact } from "@app/telemetry/fact"
 import { renderContractArtifact } from "../../scripts/telemetry-contract"
 
 /**
- * The §5.3 allowlist, transcribed from the PRD rather than from the code, plus the fields
+ * The approved field list, transcribed from the requirements rather than from the code,
+ * plus the fields
  * the spine has since admitted by name. If a field is added to the contract without being
- * added here, these tests fail — which is the point: NFR-P5 says a reviewer must be able
+ * added here, these tests fail — which is the point: a reviewer must be able
  * to enumerate everything that can leave the device, and that only holds while the list
  * has a second, independent copy to disagree with.
  */
@@ -38,8 +40,8 @@ const PRD_ALLOWLIST = [
   "telemetry_event_id",
 ] as const
 
-/** `event_version` is the one documented deviation (FR-14); the rest are AD-24's four
- *  legacy events and AD-31's loss counters, each with a row and a review note. */
+/** `event_version` is the one documented deviation; the rest are the four legacy events
+ *  and the loss counters, each with a row and a review note. */
 const SPINE_ADMITTED = [
   "event_version",
   "backup_method",
@@ -53,7 +55,7 @@ const SPINE_ADMITTED = [
   "parse_failed",
 ] as const
 
-/** One fact per row, so the fact union and the table are held in lockstep (Q10). */
+/** One fact per row, so the fact union and the table are held in lockstep. */
 const FACT_FOR_ROW: Record<TelemetryEvent, TelemetryFact> = {
   [TelemetryEvent.PaymentSettled]: {
     event: TelemetryEvent.PaymentSettled,
@@ -136,7 +138,7 @@ describe("the telemetry contract", () => {
     }
   })
 
-  it("keeps each fact variant's keys equal to its row's parameters (AD-1, Q10)", () => {
+  it("keeps each fact variant's keys equal to its row's parameters", () => {
     for (const row of CONTRACT) {
       const fact = FACT_FOR_ROW[row.event]
       const factWireKeys = Object.keys(fact)
@@ -151,7 +153,7 @@ describe("the telemetry contract", () => {
     }
   })
 
-  it("holds every field to a closed domain — no free strings (FR-57, FR-73)", () => {
+  it("holds every field to a closed domain — no free strings", () => {
     // The cardinality risk lives in published aggregates, not in the fields — but only
     // because every field is an enumeration, a boolean, a bounded integer or a pinned
     // shape. A free string here would move that risk back onto the device, where no
@@ -173,11 +175,11 @@ describe("the telemetry contract", () => {
     expect(Object.values(TelemetryConversionDirection)).toHaveLength(2)
   })
 
-  it("keeps `unknown` as a rail, so a split still sums to the settled total (AD-7)", () => {
+  it("keeps `unknown` as a rail, so a split still sums to the settled total", () => {
     expect(Object.values(RailType)).toContain("unknown")
   })
 
-  describe("AD-24 — the legacy events are ruled on, not silently suppressed", () => {
+  describe("the legacy events are ruled on, not silently suppressed", () => {
     it.each([
       { event: TelemetryEvent.BackupCompleted },
       { event: TelemetryEvent.RestoreCompleted },
@@ -186,7 +188,7 @@ describe("the telemetry contract", () => {
     ])("holds $event Custodial-only with its review pending", ({ event }) => {
       const row = contractRowFor(event)
       expect(row?.modes).toEqual([EmittingMode.Custodial])
-      expect(row?.review).toMatch(/AD-24/)
+      expect(row?.review).toMatch(/pending privacy review/)
     })
 
     it("lists no mode a row could not emit from", () => {
@@ -198,7 +200,7 @@ describe("the telemetry contract", () => {
     })
   })
 
-  describe("AD-23 — the artifact is generated from the table, and the committed copy matches", () => {
+  describe("the artifact is generated from the table, and the committed copy matches", () => {
     it("matches the committed telemetry-contract.v1.json", () => {
       // `yarn telemetry:contract` regenerates it; `check:telemetry-contract` fails CI when
       // it is stale. This is the same assertion from inside the suite, so a stale artifact
@@ -223,11 +225,11 @@ describe("the telemetry contract", () => {
       const loss = artifact.events.find(
         (event) => event.name === "telemetry_loss_reported",
       )
-      expect(loss?.review).toMatch(/AD-31/)
+      expect(loss?.review).toMatch(/subject to privacy review/)
     })
   })
 
-  describe("FR-63 — the transport's limits constrain the contract, never define it", () => {
+  describe("the transport's limits constrain the contract, never define it", () => {
     it.each(Object.values(TelemetryEvent).map((event) => ({ event })))(
       "fits $event inside the current transport's name length",
       ({ event }) => {
@@ -248,7 +250,7 @@ describe("the telemetry contract", () => {
     })
   })
 
-  describe("the contract-event axis of the gate (FR-70)", () => {
+  describe("the contract-event axis of the gate", () => {
     it.each(Object.values(TelemetryEvent).map((event) => ({ event })))(
       "recognises $event",
       ({ event }) => {
@@ -264,5 +266,17 @@ describe("the telemetry contract", () => {
     ])("treats $event as a non-contract event", ({ event }) => {
       expect(isContractEvent(event)).toBe(false)
     })
+  })
+})
+
+describe("eventVersionOf", () => {
+  it("reads a known event's version off the table", () => {
+    expect(eventVersionOf(TelemetryEvent.PaymentSettled)).toBe(1)
+  })
+
+  it("gives an event with no row version zero, which no row can match", () => {
+    // A version that matches nothing is what keeps an unknown event out of the queue's
+    // tolerance window rather than letting it in under a guessed version.
+    expect(eventVersionOf("not_an_event" as TelemetryEvent)).toBe(0)
   })
 })

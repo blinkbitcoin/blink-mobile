@@ -115,8 +115,8 @@ export const useRestoreWallet = () => {
           /**
            * An unanswered server leaves the question open, and so does a server that
            * answered "none": the account holds no mode anywhere this device can see, and
-           * assuming one here would push it back as though the user had chosen it
-           * (AD-25). Only an actual mode is adopted without asking.
+           * assuming one here would push it back as though the user had chosen it. Only
+           * an actual mode is adopted without asking.
            */
           if (!isServerModeKnown || serverMode === null) {
             navigation.navigate("selfCustodialChooseExperience", {

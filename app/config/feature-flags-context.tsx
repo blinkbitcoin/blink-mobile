@@ -41,7 +41,7 @@ const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
-/** AD-30's rollout flag for self-custodial telemetry. Off by default; a failed fetch leaves
+/** The rollout flag for self-custodial telemetry. Off by default; a failed fetch leaves
  *  it off, which is why this one may ride Remote Config when the kill switch may not. */
 const TelemetryEnabledKey = "telemetryEnabled"
 const BtcMapPlacesEnabledKey = "btcMapPlacesEnabled"
@@ -80,7 +80,7 @@ type FeatureFlags = {
   deviceAccountEnabled: boolean
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
-  /** Self-custodial telemetry rollout (AD-30). Off until the ramp turns it on. */
+  /** Self-custodial telemetry rollout. Off until the ramp turns it on. */
   telemetryEnabled: boolean
   /** The fetch has settled, either way. Gates rendering, not trust. */
   remoteConfigReady: boolean

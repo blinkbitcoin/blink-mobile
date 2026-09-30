@@ -82,7 +82,7 @@ describe("useSelfCustodialRollback", () => {
     expect(mockSetActiveAccountId).not.toHaveBeenCalled()
   })
 
-  describe("AD-9 — a failed remote config fetch is not an answer", () => {
+  describe("a failed remote config fetch is not an answer", () => {
     it("does not roll back on the default flag when the fetch threw", () => {
       // `remoteConfigReady` is set in a `finally` regardless of outcome, and
       // `nonCustodialEnabled` defaults to false. Gating on readiness alone bounced a

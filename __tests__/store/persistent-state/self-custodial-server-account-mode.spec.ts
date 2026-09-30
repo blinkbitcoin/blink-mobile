@@ -95,7 +95,7 @@ describe("withSelfCustodialModeFromServer", () => {
   })
 
   /**
-   * AD-25. This used to settle on Enhanced, so that the sync would push it and the address
+   * This used to settle on Enhanced, so that the sync would push it and the address
    * would come alive — and everything downstream, the telemetry gate included, then read
    * that default as a choice the user had made. A null answer now settles nothing.
    */

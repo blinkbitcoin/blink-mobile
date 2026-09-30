@@ -18,25 +18,24 @@ import {
 
 /**
  * Producer scope: where the SDK's settlement record is projected onto the narrow
- * `TelemetryFact` the boundary accepts (AD-1, AD-2).
+ * `TelemetryFact` the boundary accepts.
  *
  * The projection lives **here** rather than inside `app/telemetry/` on purpose. `Payment`
  * carries `amount`, `fees`, `details`, `conversionDetails` and `timestamp` — the last of
- * which §5.6 names as a linkage vector — so the hazard is holding it in producer scope,
+ * which is itself a way to link events — so the hazard is holding it in producer scope,
  * and the boundary's type is what enforces that it stops here. A reviewer can then
- * enumerate everything capable of leaving the device by reading `app/telemetry/` alone
- * (NFR-P5).
+ * enumerate everything capable of leaving the device by reading `app/telemetry/` alone.
  *
  * It is one hop: `PaymentSucceeded` carries direction, method and status together, so
  * there is no stub state, no enrichment pass and no race to solve.
  */
 
 /**
- * Telemetry is never worth a payment (NFR-R2). Every emitter runs inside this, so a fault
+ * Telemetry is never worth a payment. Every emitter runs inside this, so a fault
  * in projection or capture is swallowed rather than thrown back at the caller — the SDK
  * settlement listener that counts payments also drives the wallet refresh, and a throw
  * there would cost the user their balance update to save a metric. The fault sink is the
- * boundary's, so nothing is reported from a device required to emit zero (AD-13).
+ * boundary's, so nothing is reported from a device required to emit zero.
  */
 const safely = (what: string, run: () => void): void => {
   try {
@@ -74,8 +73,8 @@ const conversionSidesOf = (
 }
 
 /**
- * A completed dollar↔bitcoin swap (FR-12). Carries the direction and no amount: swap volume
- * is gated on OD-2, which is a policy decision rather than an engineering task (FR-15).
+ * A completed dollar↔bitcoin swap. Carries the direction and no amount: swap volume
+ * waits on a policy decision rather than on engineering work.
  *
  * Gated on the *conversion's* status, not the payment's. A conversion's send leg can
  * succeed while the swap as a whole is still in flight, and counting that as a settled swap
@@ -102,11 +101,11 @@ const logConversionSettled = (payment: Payment, details: ConversionDetails): voi
 }
 
 /**
- * A settled self-custodial payment, in either direction (FR-10), and the settled swaps that
+ * A settled self-custodial payment, in either direction, and the settled swaps that
  * arrive on the same event.
  *
  * Called for **every** SDK-observed settled receive, not only those arriving at the
- * Lightning Address (FR-11): direct Spark transfers and plain BOLT11 invoices are in scope,
+ * Lightning Address: direct Spark transfers and plain BOLT11 invoices are in scope,
  * and an LNURL-derived count would understate receives by however much the wallet is used
  * without its address.
  */
@@ -142,13 +141,12 @@ export const logPaymentSettled = (payment: Payment): void =>
   })
 
 /**
- * An Enhanced user successfully onboarding another user (FR-13).
+ * An Enhanced user successfully onboarding another user.
  *
  * Declared but not yet called: the app has no self-custodial referral surface today — the
  * invite flow behind Circles is custodial and needs an authenticated `me`. The contract
  * lives here so the event is specified when that flow is built; until then the board's
- * Enhanced onboarding tile has no client source and should read as unbuilt, not as zero
- * (FR-61).
+ * Enhanced onboarding tile has no client source and should read as unbuilt, not as zero.
  */
 export const logReferralCompleted = (params: { sdkPaymentId: string | null }): void =>
   safely("referral_completed", () => {

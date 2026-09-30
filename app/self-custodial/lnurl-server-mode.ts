@@ -58,7 +58,7 @@ export const setLnurlServerMode = async ({
     throw new Error(`LNURL server refused mode '${mode}' with ${response.status}`)
   }
 
-  /** The switch rides every response the wallet already parses (AD-28), this one too. */
+  /** The switch rides every response the wallet already parses, this one too. */
   try {
     applyLnurlTelemetryFlag(await response.json())
   } catch {
@@ -102,7 +102,7 @@ export const recoverLnurlServerMode = async ({
   return toAccountMode(body.mode)
 }
 
-/** The mode, plus AD-28's flag — see `lnurl-telemetry-flag.ts`, which parses that half. */
+/** The mode, plus the kill switch's flag — see `lnurl-telemetry-flag.ts`, which parses that. */
 type LnurlServerModeBody = {
   mode?: string | null
 }
