@@ -11,11 +11,10 @@ import {
 } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import { reportError } from "@app/utils/error-logging"
 
-import { lnurlServerUrlFor } from "../config"
 import { recoverLnurlServerMode, setLnurlServerMode } from "../lnurl-server-mode"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
-import { useSparkNetwork } from "./use-spark-network"
+import { useLnurlServer } from "./use-lnurl-server"
 
 /**
  * Keeps an account's mode and the LNURL server's copy of it in agreement, which is what
@@ -39,7 +38,7 @@ export const useAccountModeSync = (): void => {
   const { accountMode } = useSelfCustodialAccountMode()
   const { persistentState, updateState } = usePersistentStateContext()
   const { sdk, connectedAccountId } = useSelfCustodialWallet()
-  const lnurlServerUrl = lnurlServerUrlFor(useSparkNetwork())
+  const { serverUrl: lnurlServerUrl } = useLnurlServer()
 
   const activeAccountId = resolveActiveSelfCustodialId(persistentState)
   const serverMode = activeAccountId

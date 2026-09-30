@@ -182,6 +182,8 @@ jest.mock("@app/self-custodial/config", () => ({
   SparkConfig: { network: 1 },
   SparkNetworkLabel: "regtest",
   storageDirFor: (id: string) => `/tmp/${id}`,
+  /** Read by `useLnurlServer`, which the SDK lifecycle below calls. */
+  resolveLnurlServer: () => ({ serverUrl: "https://blink.sv", domain: "blink.sv" }),
 }))
 
 jest.mock("@app/self-custodial/providers/validate-network", () => ({
@@ -391,6 +393,7 @@ describe("SelfCustodialWalletProvider", () => {
       storageDir: "/tmp/test-self-custodial-uuid",
       network: mockSparkNetwork.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: "blink.sv",
     })
   })
 

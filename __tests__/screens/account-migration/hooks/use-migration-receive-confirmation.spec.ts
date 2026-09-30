@@ -227,6 +227,7 @@ describe("useMigrationReceiveConfirmation", () => {
       accountId: "sc-account-1",
       network: "regtest",
       leewaySatPerVbyte: 1,
+      lnurlDomain: "staging.blink.sv",
     })
     expect(result.current.isReceiveConfirmed).toBe(true)
   })

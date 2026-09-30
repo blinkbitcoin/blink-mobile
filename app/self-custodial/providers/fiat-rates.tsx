@@ -79,8 +79,15 @@ const FiatRatesContext = createContext<FiatRatesContextValue>(defaultValue)
 
 export const useFiatRates = (): FiatRatesContextValue => useContext(FiatRatesContext)
 
-export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> = ({
+type ProviderProps = React.PropsWithChildren<{
+  /** The clock this provider reads. Defaulted to the real one; a test passes its own so
+   *  the freshness windows can be crossed without waiting a day for them. */
+  now?: () => number
+}>
+
+export const SelfCustodialFiatRatesProvider: React.FC<ProviderProps> = ({
   children,
+  now: readClock = Date.now,
 }) => {
   const { persistentState, updateState } = usePersistentStateContext()
   const { sdk } = useSelfCustodialWallet()
@@ -91,7 +98,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
   /** Advanced on every tick so a feed that crosses a freshness threshold while the user
    *  watches it stops being presented as current, rather than waiting for the next
    *  unrelated render. */
-  const [now, setNow] = useState(() => Date.now())
+  const [now, setNow] = useState(() => readClock())
 
   /** One in flight at a time: the mount, the foreground and the poll can all come due in
    *  the same moment, and the feed is the same for all three. */
@@ -100,19 +107,19 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
 
   const persistRates = useCallback(
     (rates: FiatRate[]) => {
-      const next: StoredFiatRates = { rates, fetchedAt: Date.now() }
+      const next: StoredFiatRates = { rates, fetchedAt: readClock() }
       updateState((prev) => prev && withSelfCustodialFiatRates(prev, next))
-      setNow(Date.now())
+      setNow(readClock())
     },
-    [updateState],
+    [updateState, readClock],
   )
 
   const persistCurrencies = useCallback(
     (currencies: DisplayCurrencyEntry[]) => {
-      const next = { currencies, fetchedAt: Date.now() }
+      const next = { currencies, fetchedAt: readClock() }
       updateState((prev) => prev && withSelfCustodialFiatCurrencies(prev, next))
     },
-    [updateState],
+    [updateState, readClock],
   )
 
   const refresh = useCallback(async () => {
@@ -169,11 +176,11 @@ export const SelfCustodialFiatRatesProvider: React.FC<React.PropsWithChildren> =
    *  without re-reading the clock would leave the freshness label behind. */
   useEffect(() => {
     const timer = setInterval(() => {
-      setNow(Date.now())
+      setNow(readClock())
       refresh()
     }, REFRESH_INTERVAL_MS)
     return () => clearInterval(timer)
-  }, [refresh])
+  }, [refresh, readClock])
 
   /** Nothing to wait for when there is no SDK to ask: a caller blocked on `hasSettled`
    *  would otherwise wait forever on a custodial-only device. */

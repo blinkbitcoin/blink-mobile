@@ -528,7 +528,7 @@ off both adapters.
 
 ---
 
-### Phase 9 — Make the config seam honest again
+### Phase 9 — Make the config seam honest again · done
 
 *Small, and a defect rather than a trade-off.*
 
@@ -562,6 +562,24 @@ call sites than a hidden one inside a function that looks pure.
 
 **Done when** nothing in `app/self-custodial/config.ts` imports
 `simulated-outage`, and the freshness tests drive a fake clock.
+
+**Landed**, with one change of shape from the sketch. Rather than an optional
+`outageHost` argument on two functions, there is one pure
+`resolveLnurlServer(network, outageHost)` returning both halves — the base URL
+the app signs requests against and the domain the SDK connects with — and one
+hook, [use-lnurl-server.ts](../app/self-custodial/hooks/use-lnurl-server.ts),
+as the only place that reads the switch. Six callers now take the resolved
+value: the mode sync, the SDK lifecycle, wallet restore, the account probe and
+the two migration paths. Three of those are not React and receive it as an
+argument, which was the cost and the point.
+
+`probeSelfCustodialAccountWallets` became an options object on the way: the
+fourth positional parameter tripped `max-params`, and the lint rule was right
+that four positional arguments is where a call stops reading.
+
+The provider takes `now?: () => number`, defaulted to the real clock. Two tests
+drive a fixed one, so the freshness windows are crossed without waiting a day
+and without the assertions drifting with the wall clock.
 
 ---
 
@@ -689,7 +707,7 @@ dependency.
 | 6 | Send never misreports a payee | 4 | Done |
 | 7 | Regression-proofed | 2–6 | Done |
 | 8 | Shared types out of the self-custodial module | — | Done |
-| 9 | Config seam pure again, clock injected | — | |
+| 9 | Config seam pure again, clock injected | — | Done |
 | 10 | Price and currency behind a real port | 8 | |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the

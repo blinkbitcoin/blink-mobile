@@ -125,6 +125,11 @@ describe("useRestoreWallet", () => {
       mnemonic: "word1 word2 word3",
       network: mockSparkNetwork.Regtest,
       leewaySatPerVbyte: 5,
+      // The real resolver runs here, and this spec's network mock is regtest.
+      lnurlServer: {
+        serverUrl: "https://staging.blink.sv",
+        domain: "staging.blink.sv",
+      },
     })
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(2)

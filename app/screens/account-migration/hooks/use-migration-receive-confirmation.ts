@@ -1,6 +1,7 @@
 import { useEffect, useRef, useState } from "react"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   checkMigrationReceiveLanded,
@@ -63,6 +64,7 @@ export const useMigrationReceiveConfirmation = ({
   skip,
 }: UseMigrationReceiveConfirmationArgs): UseMigrationReceiveConfirmation => {
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
   const {
     selfCustodialDepositClaimLeewayVbyte,
     migrationReceiveDelayedNoticeMs,
@@ -121,6 +123,7 @@ export const useMigrationReceiveConfirmation = ({
           accountId,
           network,
           leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+          lnurlDomain,
         })
       } catch (err) {
         /** A keystore read that threw before the SDK result shape existed: transient as
