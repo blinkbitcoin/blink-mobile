@@ -121,7 +121,9 @@ describe("verifyPin", () => {
         expect.objectContaining({
           message: "Spent PIN budget could not be recorded",
         }),
-        expect.objectContaining({ alwaysRecord: true }),
+        /** Its own dedup key: a non-terminal write failure earlier in the
+         *  process must not swallow this report, nor the other way round. */
+        { alwaysRecord: true, dedupKey: "pin-budget-spent-write" },
       )
     })
 
