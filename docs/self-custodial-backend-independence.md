@@ -112,6 +112,12 @@ nobody "fixes" them later.
    self-custodial needs in `persistentState` instead.
 6. **Custodial behaviour is unchanged.** Every branch added here is behind
    `activeAccount?.type === AccountType.SelfCustodial`.
+7. **Shared code must not depend on one adapter.** Anything under `app/hooks/`,
+   `app/components/` or a screen both account types reach may depend on a port
+   in `app/types/`, never on `app/self-custodial/` or `app/custodial/`. Added
+   after the fact: phases 1–7 broke this in four places, which is what
+   [Phase 8](#phase-8--put-the-shared-types-where-they-belong) repairs. Stating
+   it here so the next addition does not have to rediscover it.
 
 ## The key enabler: Breez ships fiat data
 
@@ -434,6 +440,178 @@ A "Blink services unavailable" section is added to
 in both modes, cold start, the send-resolution case, Lightning Address, recovery
 within a session, and the custodial regression.
 
+---
+
+## Architecture follow-up: hexagonal adherence
+
+Phases 1–7 were driven by what a user experiences during an outage, and the
+shape of the code followed the shortest route to that. The result is sound in
+the middle and loose at the edges: the pure mapping functions and the SDK bridge
+sit where they should, but the seam between "which source answers" and "what the
+app does with the answer" was written as a branch inside a shared hook rather
+than as a port with two adapters.
+
+That matters beyond tidiness. The repo already has the pattern — a port type in
+`app/types/`, a `createCustodialX` / `createSelfCustodialX` pair under each
+side's `adapters/`, and a shared hook that only selects between them
+([use-scan-context.ts](../app/hooks/use-scan-context.ts) is the clearest
+example, with `ScanContextAdapter` and `ContactAdapter` as the ports). Price and
+currency now do the same job without the same shape, so a third price source —
+a cached third-party feed, a merchant terminal's own rate — cannot be added
+without editing the hook every screen depends on.
+
+**What is already right, and should not be churned:**
+
+- [bridge/fiat.ts](../app/self-custodial/bridge/fiat.ts) is a driven adapter and
+  the only caller of `sdk.listFiatRates`.
+- `rate-mapping.ts` and `currency-mapping.ts` are pure: no I/O, no React, no SDK
+  handle. That is why they carry 47 tests with no mocks.
+- Persistence is behind getter/wither pairs in `app/store/persistent-state/`.
+- `PriceStatus` is exported from the hook that produces it, so
+  `use-total-balance.ts` depends on the hook rather than on an adapter.
+
+**Deliberate non-goal.** [blink-services-status.ts](../app/graphql/blink-services-status.ts)
+stays a module-level store. It is written from inside Apollo links and read
+through a hook, exactly like `server-time.ts` beside it, and it has one consumer
+shape. Wrapping it in a context and a port would add indirection without
+decoupling anything that varies. Hexagonal is a tool for the seams that have
+more than one implementation, not a uniform coating.
+
+---
+
+### Phase 8 — Put the shared types where they belong
+
+*Mechanical. No behaviour change, and the one the other two depend on.*
+
+Today `app/hooks/` and two screens import domain types out of the
+self-custodial module:
+
+| Importer | Imports | From |
+|----------|---------|------|
+| [use-price-conversion.ts:12](../app/hooks/use-price-conversion.ts) | `RateFreshness`, `toPriceRates`, `toPriceRatesFromRealtimePrice`, `PriceRates` | `@app/self-custodial/price/rate-mapping` |
+| [use-currency-list.ts:4](../app/hooks/use-currency-list.ts) | `DisplayCurrencyEntry` | `@app/self-custodial/price/currency-mapping` |
+| [home-screen.tsx:31](../app/screens/home-screen/home-screen.tsx) | `RateFreshness` | same |
+| [display-currency-screen.tsx:8](../app/screens/settings-screen/display-currency-screen.tsx) | `DisplayCurrencyEntry` | `@app/self-custodial/price/currency-mapping` |
+
+The display-currency screen is shared with custodial users, so a custodial-only
+session now carries a compile-time dependency on the self-custodial module. The
+sharpest tell is `toPriceRatesFromRealtimePrice`: a function whose entire job is
+to translate the *custodial backend's* `realtimePrice`, living in
+`app/self-custodial/`.
+
+1. New `app/types/price.ts`: `FiatRate`, `PriceRates`, `RateFreshness`,
+   `RATES_FRESH_MS`, `RATES_USABLE_MS`, `rateFreshness`. These are statements
+   about money and time, not about Breez.
+2. New `app/types/currency.ts`: `DisplayCurrencyEntry`.
+3. Leave behind, in the self-custodial module, only what translates *from Breez*:
+   `toPriceRates`, `toDisplayCurrencyEntry`, `toDisplayCurrencyList`,
+   `flagForCurrencyCode`.
+4. Move `toPriceRatesFromRealtimePrice` to `app/custodial/adapters/price.ts`,
+   where the thing it translates lives.
+5. `StoredFiatRates` / `StoredFiatCurrencies` are persistence shapes: keep them
+   in their `app/store/persistent-state/` modules, importing the domain types.
+
+**Done when** `grep -rn "self-custodial" app/hooks app/screens/settings-screen/display-currency-screen.tsx app/screens/home-screen`
+returns nothing about price or currency, and the suite is unchanged.
+
+---
+
+### Phase 9 — Make the config seam honest again
+
+*Small, and a defect rather than a trade-off.*
+
+`lnurlServerUrlFor(network)` was a pure function of its argument. Phase 1 made
+it read `getSimulatedOutage()`, a global its signature does not declare, and
+added `sdkLnurlDomainFor` with the same shape. Both are now untestable from
+their inputs, and a reader cannot tell from the call site that a dev-only
+switch can change the answer.
+
+1. Take the override as a parameter: `lnurlServerUrlFor(network, outageHost?)`
+   and `sdkLnurlDomainFor(network, outageHost?)`. Pure again.
+2. Resolve it at the call sites, where the dependency is visible:
+   - [use-account-mode-sync.ts:42](../app/self-custodial/hooks/use-account-mode-sync.ts)
+     is a hook and can read `useSimulatedOutage()`.
+   - `createSdkConfig` is not, so `initSdk` takes the domain in its params
+     alongside `network` and `leewaySatPerVbyte`. Four callers
+     ([use-sdk-lifecycle](../app/self-custodial/hooks/use-sdk-lifecycle.ts),
+     [probe-account-wallets](../app/self-custodial/probe-account-wallets.ts),
+     [migration-transfer-request](../app/self-custodial/migration-transfer-request.ts),
+     and `lifecycle.ts` itself) each pass it.
+
+That last point is the cost, and it is the point: three of those callers are not
+React, so they must read the switch explicitly. Better a visible read at four
+call sites than a hidden one inside a function that looks pure.
+
+3. While there: the fiat provider calls `Date.now()` in five places
+   ([fiat-rates.tsx](../app/self-custodial/providers/fiat-rates.tsx)), so
+   freshness cannot be exercised without real wall-clock timestamps — the specs
+   work around it by computing offsets from `Date.now()` themselves. Inject a
+   `now: () => number` with the real clock as its default.
+
+**Done when** nothing in `app/self-custodial/config.ts` imports
+`simulated-outage`, and the freshness tests drive a fake clock.
+
+---
+
+### Phase 10 — A real port for the price and currency sources
+
+*The actual hexagonal fix, and the one with regression risk worth weighing.*
+
+`usePriceConversion` currently gathers both sources and branches on
+`isSelfCustodial` inline; `useCurrencyList` does the same. Neither declares what
+a "price source" is, so the custodial path is not an implementation of anything
+— it is the else-branch.
+
+1. Declare the ports beside the types from Phase 8:
+
+   ```ts
+   // app/types/price.ts
+   export type PriceSource = {
+     rates: PriceRates | undefined
+     freshness: RateFreshness
+     /** Whether this source has finished trying, so a caller can tell
+      *  "not yet" from "not coming". */
+     hasSettled: boolean
+   }
+
+   // app/types/currency.ts
+   export type CurrencyListSource = {
+     currencies: readonly DisplayCurrencyEntry[]
+     hasSettled: boolean
+   }
+   ```
+
+2. Implement both sides, matching the `adapters/` convention:
+   - `app/self-custodial/adapters/price.ts` — `createSelfCustodialPriceSource`,
+     over the SDK feed and the persisted copy.
+   - `app/custodial/adapters/price.ts` — `createCustodialPriceSource`, over
+     `realtimePrice` / `realtimePriceUnauthed`, and the new home of
+     `toPriceRatesFromRealtimePrice`.
+   - The same pair for the currency list.
+
+3. Reduce the hooks to selection, the way `use-scan-context.ts` already does:
+   gather inputs, pick the adapter, derive `PriceStatus` from
+   `rates` + `hasSettled`. The precedence rule the tests pin — SDK first for a
+   self-custodial account, backend when it cannot price the display currency —
+   becomes a property of the selection rather than of an `??` chain buried in
+   the middle of a 220-line hook.
+
+4. Retarget the tests. `use-price-conversion.spec.ts` currently mocks
+   `@app/self-custodial/providers/fiat-rates` by module path, so it is coupled
+   to where the implementation lives; with a port it passes a fake `PriceSource`
+   and stops caring. That is the measurable payoff, not the diagram.
+
+**Risk.** `usePriceConversion` is on every screen that shows an amount. Land it
+behind a green full suite, and re-run the Phase 7 cold-start spec and the
+custodial regression from the release gate before merging — the point of the
+refactor is that neither should change.
+
+**Done when** `app/types/price.ts` declares the port, both `adapters/`
+directories implement it, neither hook mentions `isSelfCustodial` more than once,
+and the price specs construct fakes rather than mocking module paths.
+
+---
+
 ## Verification with the backend off
 
 Yes — switching off the local stack is worth doing, and it is the only way to
@@ -498,6 +676,14 @@ dependency.
 | 5 | Lightning address degrades gracefully | 1, Q1 | Done |
 | 6 | Send never misreports a payee | 4 | Done |
 | 7 | Regression-proofed | 2–6 | Done |
+| 8 | Shared types out of the self-custodial module | — | |
+| 9 | Config seam pure again, clock injected | — | |
+| 10 | Price and currency behind a real port | 8 | |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the
 one that must land first if only one does.
+
+Phases 8–10 change no behaviour; they are the architecture follow-up described
+above. 8 and 9 are mechanical and independent of each other. 10 depends on 8 and
+is the only one carrying real regression risk, so it is worth deciding on
+deliberately rather than treating as cleanup.
