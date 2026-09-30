@@ -81,11 +81,11 @@ const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0 }
  * The stored shape, which is wider than the type this module reads back.
  *
  * `lockedUntil` is dead weight on the way in and read past on the way out, but
- * it is written for the device that goes the other way. Releases 3.0.29 to
- * 3.0.41 shipped a parser that demands both fields be finite and falls back to
- * a clean slate otherwise, so a blob without it would hand a downgraded install
- * the budget its user had already spent. Zero is what that parser reads as "no
- * lock in force".
+ * it is written for the device that goes the other way. Every release from
+ * 3.0.29 up to the one before this change shipped a parser that demands both
+ * fields be finite and falls back to a clean slate otherwise, so a blob without
+ * it would hand a downgraded install the budget its user had already spent.
+ * Zero is what that parser reads as "no lock in force".
  */
 const serializePinFailureState = (state: PinFailureState): string =>
   JSON.stringify({ attempts: state.attempts, lockedUntil: 0 })

@@ -502,7 +502,7 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("reads past a lock expiry a shipped release wrote alongside the count", async () => {
-      // Builds between 3.0.29 and 3.0.41 stored a lock expiry next to
+      // Builds from 3.0.29 until this change stored a live lock expiry next to
       // the attempt count. Those devices upgrade into this code, and the count
       // they already spent has to survive the field going away.
       storedKeys({
