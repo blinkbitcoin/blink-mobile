@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Το Blink δεν είναι προσβάσιμο",
+    "unreachableDescription": "Το {featureName} χρειάζεται τους διακομιστές του Blink, που αυτή τη στιγμή δεν απαντούν. Το πορτοφόλι και τα κεφάλαιά σας δεν επηρεάζονται.",
     "featureCircles": "Circles",
     "featureEarn": "Μάθηση",
     "featureCard": "Card"

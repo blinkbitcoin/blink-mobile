@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink je nedostupný",
+    "unreachableDescription": "{featureName} potřebuje servery Blinku, které právě neodpovídají. Vaše peněženka a prostředky nejsou dotčeny.",
     "featureCircles": "Circles",
     "featureEarn": "Učit se",
     "featureCard": "Card"

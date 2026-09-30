@@ -4026,6 +4026,8 @@
     "signInDescription": "Մուտք գործեք ձեր պահառու հաշվին՝ {featureName: string} օգտագործելու համար։",
     "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
     "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
+    "unreachableTitle": "Blink-ը հասանելի չէ",
+    "unreachableDescription": "{featureName}-ին անհրաժեշտ են Blink-ի սերվերները, որոնք այս պահին չեն պատասխանում։ Ձեր դրամապանակը և միջոցները չեն տուժում։",
     "featureCircles": "Circles",
     "featureEarn": "Սովորել",
     "featureCard": "Քարտ"

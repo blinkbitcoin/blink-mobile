@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "ไม่สามารถเชื่อมต่อ Blink ได้",
+    "unreachableDescription": "{featureName} ต้องใช้เซิร์ฟเวอร์ของ Blink ซึ่งขณะนี้ไม่ตอบสนอง กระเป๋าเงินและยอดเงินของคุณไม่ได้รับผลกระทบ",
     "featureCircles": "Circles",
     "featureEarn": "เรียนรู้",
     "featureCard": "Card"

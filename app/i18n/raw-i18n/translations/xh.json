@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "U-Blink akafikeleleki",
+    "unreachableDescription": "I-{featureName} ifuna iiseva ze-Blink, ezingaphenduliyo okwangoku. Isipaji sakho neemali zakho azichaphazelekanga.",
     "featureCircles": "Circles",
     "featureEarn": "Funda",
     "featureCard": "Card"

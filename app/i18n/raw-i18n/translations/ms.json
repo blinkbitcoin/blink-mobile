@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tidak dapat dihubungi",
+    "unreachableDescription": "{featureName} memerlukan pelayan Blink, yang tidak memberi respons buat masa ini. Dompet dan dana anda tidak terjejas.",
     "featureCircles": "Circles",
     "featureEarn": "Belajar",
     "featureCard": "Card"

@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "A Blink nem érhető el",
+    "unreachableDescription": "A(z) {featureName} a Blink szervereit igényli, amelyek most nem válaszolnak. A tárcádat és az egyenlegedet ez nem érinti.",
     "featureCircles": "Circles",
     "featureEarn": "Tanulás",
     "featureCard": "Card"

@@ -13665,6 +13665,15 @@ type RootTranslation = {
 		 */
 		noAccountDescription: RequiredParams<'featureName'>
 		/**
+		 * B​l​i​n​k​ ​i​s​ ​u​n​r​e​a​c​h​a​b​l​e
+		 */
+		unreachableTitle: string
+		/**
+		 * {​f​e​a​t​u​r​e​N​a​m​e​}​ ​n​e​e​d​s​ ​B​l​i​n​k​'​s​ ​s​e​r​v​e​r​s​,​ ​w​h​i​c​h​ ​a​r​e​n​'​t​ ​r​e​s​p​o​n​d​i​n​g​ ​r​i​g​h​t​ ​n​o​w​.​ ​Y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​f​u​n​d​s​ ​a​r​e​ ​u​n​a​f​f​e​c​t​e​d​.
+		 * @param {string} featureName
+		 */
+		unreachableDescription: RequiredParams<'featureName'>
+		/**
 		 * C​i​r​c​l​e​s
 		 */
 		featureCircles: string
@@ -27190,6 +27199,14 @@ export type TranslationFunctions = {
 		 * {featureName} requires a Blink custodial account.
 		 */
 		noAccountDescription: (arg: { featureName: string }) => LocalizedString
+		/**
+		 * Blink is unreachable
+		 */
+		unreachableTitle: () => LocalizedString
+		/**
+		 * {featureName} needs Blink's servers, which aren't responding right now. Your wallet and funds are unaffected.
+		 */
+		unreachableDescription: (arg: { featureName: string }) => LocalizedString
 		/**
 		 * Circles
 		 */

@@ -4026,6 +4026,8 @@
         "signInDescription": "Accedi al tuo account custodial per usare {featureName}.",
         "noAccountTitle": "Account custodial richiesto",
         "noAccountDescription": "{featureName} richiede un account custodial Blink.",
+        "unreachableTitle": "Blink non è raggiungibile",
+        "unreachableDescription": "{featureName} richiede i server di Blink, che al momento non rispondono. Il tuo portafoglio e i tuoi fondi non sono interessati.",
         "featureCircles": "Circoli",
         "featureEarn": "Impara",
         "featureCard": "Carta"

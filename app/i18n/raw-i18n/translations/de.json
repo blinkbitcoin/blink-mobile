@@ -4026,6 +4026,8 @@
         "signInDescription": "Melde dich bei deinem custodial-Konto an, um {featureName} zu nutzen.",
         "noAccountTitle": "Custodial-Konto erforderlich",
         "noAccountDescription": "{featureName} benötigt ein Blink custodial-Konto.",
+        "unreachableTitle": "Blink ist nicht erreichbar",
+        "unreachableDescription": "{featureName} benötigt die Server von Blink, die gerade nicht antworten. Deine Wallet und dein Guthaben sind nicht betroffen.",
         "featureCircles": "Circles",
         "featureEarn": "Lernen",
         "featureCard": "Karte"

@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink kan ikke nås",
+    "unreachableDescription": "{featureName} kræver Blinks servere, som ikke svarer lige nu. Din wallet og dine midler er upåvirkede.",
     "featureCircles": "Circles",
     "featureEarn": "Lær",
     "featureCard": "Card"

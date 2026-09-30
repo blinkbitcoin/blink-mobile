@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink nu poate fi contactat",
+    "unreachableDescription": "{featureName} are nevoie de serverele Blink, care nu răspund în acest moment. Portofelul și fondurile tale nu sunt afectate.",
     "featureCircles": "Circles",
     "featureEarn": "Învață",
     "featureCard": "Card"

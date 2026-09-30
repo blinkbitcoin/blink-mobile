@@ -7,6 +7,7 @@ import { gql } from "@apollo/client"
 import { VersionComponent } from "@app/components/version"
 import { APP_STORE_LINK, PLAY_STORE_LINK } from "@app/config"
 import { useMobileUpdateQuery } from "@app/graphql/generated"
+import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -44,7 +45,17 @@ export const AppUpdate: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
 
-  const { data } = useMobileUpdateQuery({ fetchPolicy: "no-cache" })
+  /**
+   * The minimum supported build is a property of the Blink backend the app talks to, so
+   * an account that does not talk to it has no version to be behind. Skipping keeps a
+   * self-custodial home mount from firing a `no-cache` request whose answer it would
+   * not act on.
+   */
+  const { isSelfCustodial } = useActiveWallet()
+  const { data } = useMobileUpdateQuery({
+    skip: isSelfCustodial,
+    fetchPolicy: "no-cache",
+  })
 
   const buildNumber = Number(DeviceInfo.getBuildNumber())
   const mobileVersions = data?.mobileVersions

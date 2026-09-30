@@ -4298,6 +4298,9 @@ const en: BaseTranslation = {
     noAccountTitle: "Custodial account required",
     noAccountDescription:
       "{featureName: string} requires a Blink custodial account.",
+    unreachableTitle: "Blink is unreachable",
+    unreachableDescription:
+      "{featureName: string} needs Blink's servers, which aren't responding right now. Your wallet and funds are unaffected.",
     featureCircles: "Circles",
     featureEarn: "Learn",
     featureCard: "Card",

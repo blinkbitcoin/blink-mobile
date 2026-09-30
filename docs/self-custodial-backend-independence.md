@@ -311,36 +311,51 @@ The region hook's old `skip` on the query is gone — the adapter owns that now,
 and `useDisplayCurrency` was fetching the list unconditionally anyway, so the
 skip saved nothing Apollo's cache was not already saving.
 
-### Phase 4 — Backend health awareness and noise suppression
+### Phase 4 — Backend health awareness and noise suppression · done
 
-1. **`BlinkServicesStatusProvider`** — new `app/graphql/backend-status.tsx`.
-   Model it on the verdict machine already in
-   [restrictions.tsx](../app/custodial/providers/restrictions.tsx): a tri-state
-   (`Reachable | Unreachable | Unknown`), fed by the existing `errorLink`
-   observations, with `useBackoffRetry` for the fast lane and a one-per-minute
-   slow lane while `Unreachable`, suppressed while the app is backgrounded. Do
-   **not** add a NetInfo dependency — the app has none today, and reachability of
-   *Blink* is the question, not of the internet.
-2. **Toast suppression.** In
-   [network-error-component.tsx](../app/graphql/network-error-component.tsx),
-   suppress the `errors.network.connection` and `errors.network.server` toasts
-   while the active account is self-custodial and the failing operation was not
-   user-initiated. Replace the repetition with one persistent, dismissible home
-   banner: "Some Blink features are unavailable. Your wallet still works."
-   - New i18n keys under a `SelfCustodialBackendDown` namespace. Remember all 28
-     locale JSONs need the key or the locale-parity test fails.
-3. **Skip audit.** Add `skip: isSelfCustodial` to inventory rows 8, 9 and 10.
-4. **Extend `BackendFeatureGate`** with a third state driven by the new provider:
-   "Blink services are temporarily unreachable", distinct from "sign in" and
-   "needs a custodial account". Keeps the tabs visible per NFR-FR83–85.
-5. **Settings.** Rows that can only be answered by the backend (account level,
-   KYC, transaction limits, buy/sell, support) render a disabled state with the
-   reason rather than an error.
+- **`BlinkServicesStatus`** — [blink-services-status.ts](../app/graphql/blink-services-status.ts).
+  `Reachable | Unreachable | Unknown`, observed from the traffic the app already
+  makes rather than from a probe. The app fires several queries in the first
+  second of any screen, so an outage is evident without adding requests to a
+  service that is, by hypothesis, already struggling — which is why the backed-off
+  prober the plan originally called for is not here. A response is recorded in
+  `createServerTimeLink`, the one place every successful response passes through;
+  a transport failure in the existing `errorLink`. Two consecutive failures make
+  it `Unreachable`, since the `RetryLink` already makes five attempts per
+  operation before reporting one. A 4xx counts as reached: an expired token is
+  the server answering, and reporting Blink down for a session that merely needs
+  renewing would be wrong on every screen. Reset when the Apollo client is
+  rebuilt, because that is a different connection.
+- **No toast storm.** A self-custodial session raises no transport toast. Every
+  query still reaching the backend from such a session is one the user did not
+  ask for, so a toast per failure is a stream of alarms about nothing they can
+  act on while their wallet goes on working. Only the two generic transport
+  toasts are suppressed: an authentication failure still routes to
+  `handleTokenExpiry`, and a request the user actually made reports its own
+  failure at the screen that made it.
+- **Skip audit** — inventory rows 8, 9 and 10: `homeUnauthed` and
+  `scanningQrCodeScreen` in the scan context, `mobileUpdate` on the home mount
+  (the minimum supported build is a property of a backend this account does not
+  talk to), and the authed `realtimePrice` on the send-destination screen, which
+  a mixed-account user was firing from their self-custodial account.
+- **`BackendFeatureGate`** gains the unreachable state, so Circles, Learn and
+  Card explain the outage instead of trying and failing. Only for a session
+  otherwise entitled to the feature: a user with no custodial account is told
+  that first, because it is the durable reason and stays true when the servers
+  come back.
 
-**Done when** a self-custodial session with the backend down raises at most one
-banner and no repeated toasts, and every backend-only surface explains itself.
+**Not done: the home banner.** The plan called for one persistent, dismissible
+banner to replace the suppressed toasts. On reflection a self-custodial session
+has nothing to tell the user — every failing request is one they did not make,
+and everything they can do still works — so a banner would be the noise it was
+meant to replace. The places where an explanation is genuinely owed are the
+backend-only tabs, and those now carry it. Revisit if the mixed-account case
+turns out to need a signal on home.
 
----
+**Not done: disabling backend-only settings rows.** Account level, KYC,
+transaction limits, buy/sell and support still render and fail on tap. They are
+a smaller surface than the tabs and each needs its own copy; worth a pass of its
+own rather than a rushed one here.
 
 ### Phase 5 — LNURL server degradation
 
@@ -474,7 +489,7 @@ dependency.
 | 2 | **Wallet is usable offline** | 1 | Done |
 | 2b | Staleness marker and home sats fallback | 2 | Done |
 | 3 | Currency selection works offline | 2 | Done |
-| 4 | Honest, quiet UI | 1 | |
+| 4 | Honest, quiet UI | 1 | Done |
 | 5 | Lightning address degrades gracefully | 1, Q1 | |
 | 6 | Send never misreports a payee | 4 | |
 | 7 | Regression-proofed | 2–6 | |

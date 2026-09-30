@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink no està disponible",
+    "unreachableDescription": "{featureName} necessita els servidors de Blink, que ara mateix no responen. La teva cartera i els teus fons no es veuen afectats.",
     "featureCircles": "Circles",
     "featureEarn": "Aprendre",
     "featureCard": "Card"

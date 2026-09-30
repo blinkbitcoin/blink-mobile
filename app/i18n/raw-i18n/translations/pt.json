@@ -4026,6 +4026,8 @@
         "signInDescription": "Faça login na sua conta custodial para usar {featureName}.",
         "noAccountTitle": "Conta custodial necessária",
         "noAccountDescription": "{featureName} requer uma conta custodial da Blink.",
+        "unreachableTitle": "O Blink está inacessível",
+        "unreachableDescription": "{featureName} precisa dos servidores da Blink, que não estão a responder neste momento. A sua carteira e os seus fundos não são afetados.",
         "featureCircles": "Círculos",
         "featureEarn": "Aprender",
         "featureCard": "Cartão"

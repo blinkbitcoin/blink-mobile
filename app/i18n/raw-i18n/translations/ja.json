@@ -4026,6 +4026,8 @@
         "signInDescription": "Sign in to your custodial account to use {featureName}.",
         "noAccountTitle": "Custodial account required",
         "noAccountDescription": "{featureName} requires a Blink custodial account.",
+        "unreachableTitle": "Blink に接続できません",
+        "unreachableDescription": "{featureName} には Blink のサーバーが必要ですが、現在応答していません。ウォレットと資金に影響はありません。",
         "featureCircles": "Circles",
         "featureEarn": "学ぶ",
         "featureCard": "Card"

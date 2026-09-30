@@ -4026,6 +4026,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Không kết nối được Blink",
+    "unreachableDescription": "{featureName} cần máy chủ của Blink, hiện không phản hồi. Ví và số dư của bạn không bị ảnh hưởng.",
     "featureCircles": "Circles",
     "featureEarn": "Học",
     "featureCard": "Card"
