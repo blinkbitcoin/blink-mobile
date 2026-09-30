@@ -80,6 +80,11 @@ module.exports = {
       // that, Jest needs them transformed.
       "|supercluster" +
       "|kdbush" +
+      // The e-sign packages point their "react-native" entry at TypeScript
+      // source, which is what Metro and Jest both resolve, so it has to be
+      // transformed rather than read as plain CommonJS. The rest of the scope
+      // ships compiled and stays out of the transform.
+      "|@blinkbitcoin/esign-[^/]*" +
       ")/)",
   ],
 }

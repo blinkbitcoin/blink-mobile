@@ -4,12 +4,9 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { usePriceConversion } from "@app/hooks"
 import { useSendWallets } from "@app/screens/send-bitcoin-screen/hooks/use-send-wallets"
 import { toUsdMoneyAmount, toWalletAmount } from "@app/types/amounts"
+import { toMajorUnit, toMinorUnit } from "@app/utils/helper"
 
 import { type InvestmentFunding, resolveInvestmentFunding } from "./investment-terms"
-
-/** Wallet balances are integers in their currency's minor unit; the agreement is written
- *  in whole dollars. */
-const CENTS_PER_USD = 100
 
 /**
  * What the investor holds against what they signed for.
@@ -20,7 +17,9 @@ const CENTS_PER_USD = 100
  * flow will not pay from, the dollar wallet while it is gated, never counts as covering
  * the investment; it answers for a custodial and a self-custodial investor alike. The
  * judged wallet is named by id too, so the payment can be opened on it rather than on
- * whichever the send flow would pick by default.
+ * whichever the send flow would pick by default. Balances arrive in cents and the
+ * agreement is written in whole dollars, so they are converted at the edge and the
+ * rule reasons in dollars.
  *
  * While it is loading the balance reads as zero, which would say the investment is not
  * covered when it may well be. Callers wait rather than act on that: the flag is what
@@ -53,8 +52,9 @@ export const useInvestmentFunding = (
         amount: wallet.balance,
         currency: wallet.walletCurrency,
       })
-      const balanceUsd =
-        convertMoneyAmount(balance, WalletCurrency.Usd).amount / CENTS_PER_USD
+      const balanceUsd = toMajorUnit(
+        convertMoneyAmount(balance, WalletCurrency.Usd).amount,
+      )
       const isFullest = balanceUsd > funding.largestWalletUsd
       return {
         largestWalletUsd: isFullest ? balanceUsd : funding.largestWalletUsd,
@@ -73,18 +73,17 @@ export const useInvestmentFunding = (
 }
 
 /**
- * What the investment comes to in satoshis at today's price, which is what an invoice is
- * written in. Zero until the price feed answers.
+ * What the investment comes to in satoshis at today's price. Zero until the price feed
+ * answers.
+ *
+ * A fallback, not the figure to bill: the agreement fixes a rate at a stamped moment and
+ * names the bitcoin owed against it, and the signing step carries that figure forward.
+ * This stands in only when none was carried, since converting again at today's price
+ * charges something the signer never agreed to.
  *
  * Its own hook, apart from the balance check, so each reads as the one rule it is: what
  * the investor holds is one question, what the invoice is written for is another, and
  * only the step that writes the invoice asks both.
- *
- * TEMPORARY, and the one figure here that should not be the app's to work out: the
- * agreement fixes a rate at a stamped moment and names the bitcoin owed against it, so
- * the amount charged has to be that one. Converting again at today's price would charge
- * something the signer never agreed to. It stands in until the mint returns the terms it
- * computed.
  */
 export const useInvestmentSats = (totalUsd: number): number => {
   const { convertMoneyAmount } = usePriceConversion()
@@ -92,9 +91,7 @@ export const useInvestmentSats = (totalUsd: number): number => {
   return React.useMemo(() => {
     if (!convertMoneyAmount) return 0
 
-    return convertMoneyAmount(
-      toUsdMoneyAmount(totalUsd * CENTS_PER_USD),
-      WalletCurrency.Btc,
-    ).amount
+    return convertMoneyAmount(toUsdMoneyAmount(toMinorUnit(totalUsd)), WalletCurrency.Btc)
+      .amount
   }, [totalUsd, convertMoneyAmount])
 }

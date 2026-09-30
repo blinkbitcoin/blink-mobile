@@ -37,6 +37,7 @@ const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
 const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
+const CardInvestmentEsignMintUrlKey = "cardInvestmentEsignMintUrl"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
@@ -106,6 +107,7 @@ type RemoteConfig = {
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
   [CardInvestmentDepositBtcWalletIdKey]: string
+  [CardInvestmentEsignMintUrlKey]: string
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [BackupNudgeModalCooldownMsKey]: number
@@ -219,6 +221,10 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  money. A dollar wallet is refused by the API and reads as a failed invoice. Empty
    *  until that account is decided, and the transfer step cannot pay while it is. */
   cardInvestmentDepositBtcWalletId: "",
+  /** The e-sign service that mints the investment agreement, as an origin. Empty means
+   *  the instance's own value; set here so the endpoint can be switched, or withdrawn
+   *  after an incident, without shipping a build. */
+  cardInvestmentEsignMintUrl: "",
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   /** How long the self-custodial backup modal stays dismissed after the user closes it.
@@ -400,6 +406,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(CardInvestmentDepositBtcWalletIdKey)
           .asString()
 
+        const cardInvestmentEsignMintUrl = remoteConfigInstance()
+          .getValue(CardInvestmentEsignMintUrlKey)
+          .asString()
+
         const backupNudgeBannerThreshold = remoteConfigInstance()
           .getValue(BackupNudgeBannerThresholdKey)
           .asNumber()
@@ -527,6 +537,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
           cardInvestmentDepositBtcWalletId,
+          cardInvestmentEsignMintUrl,
           backupNudgeBannerThreshold,
           backupNudgeModalThreshold,
           backupNudgeModalCooldownMs,

@@ -3743,7 +3743,7 @@
                 "buttonText": "Continua"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "Quanto vorresti investire?",
+                "title": "Quanto vorresti investire?",
                 "percent": "per ~{percent: number}%"
             },
             "CompanyValuation": {
@@ -3764,7 +3764,21 @@
                     "valuation": "A una valutazione pre-money di $10M",
                     "units": "Ricevi {units: string} unità ~{percent: number}% di Blink"
                 },
-                "buttonText": "Procedi alla Firma"
+                "buttonText": "Procedi alla firma"
+            },
+            "SignInvest": {
+                "loading": "Preparazione del tuo accordo.",
+                "notAvailable": "La firma non è ancora disponibile. Riprova più tardi.",
+                "errors": {
+                    "envelopeCreationFailed": "Non è stato possibile preparare l'accordo. Riprova.",
+                    "networkError": "Connessione persa. Controlla la rete e riprova.",
+                    "unauthorized": "La tua sessione non è più valida. Accedi di nuovo.",
+                    "sessionExpired": "La sessione di firma è scaduta. Riprova.",
+                    "providerUnavailable": "Il servizio di firma non è temporaneamente disponibile. Riprova più tardi.",
+                    "routeMissing": "La firma non è ancora disponibile su questo server. Aggiorna l'app o riprova più tardi.",
+                    "envelopeMismatch": "Il documento firmato non è quello preparato da questo passaggio. Riprova.",
+                    "generic": "Qualcosa è andato storto. Riprova."
+                }
             },
             "TransferInvest": {
                 "title": "Trasferisci il tuo investimento",

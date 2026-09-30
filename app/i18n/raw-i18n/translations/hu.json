@@ -3695,7 +3695,7 @@
         "buttonText": "Tovább"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Mennyit szeretnél befektetni?",
+        "title": "Mennyit szeretnél befektetni?",
         "percent": "~{percent: number}%-ért"
       },
       "CompanyValuation": {
@@ -3712,11 +3712,25 @@
         "title": "Feltételek",
         "equitySection": {
           "title": "Részesedés a Blinkben",
-          "investment": "{amount: string} Befektetés",
+          "investment": "{amount: string} befektetés",
           "valuation": "$10M pre-money értékelésnél",
           "units": "{units: string} egységet kapsz ~{percent: number}%-ot a Blinkből"
         },
-        "buttonText": "Tovább az Aláíráshoz"
+        "buttonText": "Tovább az aláíráshoz"
+      },
+      "SignInvest": {
+        "loading": "Előkészítjük a megállapodásodat.",
+        "notAvailable": "Az aláírás még nem érhető el. Kérjük, próbáld újra később.",
+        "errors": {
+          "envelopeCreationFailed": "A megállapodást nem sikerült előkészíteni. Kérjük, próbáld újra.",
+          "networkError": "Megszakadt a kapcsolat. Kérjük, ellenőrizd a hálózatot, és próbáld újra.",
+          "unauthorized": "A munkameneted már nem érvényes. Kérjük, jelentkezz be újra.",
+          "sessionExpired": "Az aláírási munkamenet lejárt. Kérjük, próbáld újra.",
+          "providerUnavailable": "Az aláírási szolgáltatás átmenetileg nem érhető el. Kérjük, próbáld újra később.",
+          "routeMissing": "Az aláírás ezen a kiszolgálón még nem érhető el. Kérjük, frissítsd az alkalmazást, vagy próbáld újra később.",
+          "envelopeMismatch": "Az aláírt dokumentum nem az, amelyet ez a lépés előkészített. Kérjük, próbáld újra.",
+          "generic": "Valami hiba történt. Kérjük, próbáld újra."
+        }
       },
       "TransferInvest": {
         "title": "Utald át a befektetésedet",
