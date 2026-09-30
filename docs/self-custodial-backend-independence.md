@@ -479,7 +479,7 @@ more than one implementation, not a uniform coating.
 
 ---
 
-### Phase 8 — Put the shared types where they belong
+### Phase 8 — Put the shared types where they belong · done
 
 *Mechanical. No behaviour change, and the one the other two depend on.*
 
@@ -513,6 +513,18 @@ to translate the *custodial backend's* `realtimePrice`, living in
 
 **Done when** `grep -rn "self-custodial" app/hooks app/screens/settings-screen/display-currency-screen.tsx app/screens/home-screen`
 returns nothing about price or currency, and the suite is unchanged.
+
+**Landed.** Both screens are clean; the suite is unchanged at 9,435. The specs
+moved with the code they cover, which is the part worth noting: the freshness
+rules are now `__tests__/types/price.spec.ts` and the `realtimePrice`
+translation `__tests__/custodial/adapters/price.spec.ts`, so neither is filed
+under a module that does not own it.
+
+What remains in `app/hooks/` is two *function* imports — `toPriceRates` from the
+self-custodial module and `toPriceRatesFromRealtimePrice` from the custodial one
+— which is the branch [Phase 10](#phase-10--a-real-port-for-the-price-and-currency-sources)
+replaces with selection. The types no longer leak, so the screens are already
+off both adapters.
 
 ---
 
@@ -676,7 +688,7 @@ dependency.
 | 5 | Lightning address degrades gracefully | 1, Q1 | Done |
 | 6 | Send never misreports a payee | 4 | Done |
 | 7 | Regression-proofed | 2–6 | Done |
-| 8 | Shared types out of the self-custodial module | — | |
+| 8 | Shared types out of the self-custodial module | — | Done |
 | 9 | Config seam pure again, clock injected | — | |
 | 10 | Price and currency behind a real port | 8 | |
 

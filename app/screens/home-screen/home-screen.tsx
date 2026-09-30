@@ -28,7 +28,7 @@ import {
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { RateFreshness } from "@app/self-custodial/price/rate-mapping"
+import { RateFreshness } from "@app/types/price"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"

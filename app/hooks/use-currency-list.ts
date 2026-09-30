@@ -1,8 +1,8 @@
 import { useMemo } from "react"
 
 import { useCurrencyListQuery } from "@app/graphql/generated"
-import { type DisplayCurrencyEntry } from "@app/self-custodial/price/currency-mapping"
 import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
+import { type DisplayCurrencyEntry } from "@app/types/currency"
 import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"

@@ -25,7 +25,7 @@ const mockUseFiatRates = jest.fn().mockReturnValue({
 })
 
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
-import { RateFreshness } from "@app/self-custodial/price/rate-mapping"
+import { RateFreshness } from "@app/types/price"
 import {
   BtcMoneyAmount,
   DisplayAmount,

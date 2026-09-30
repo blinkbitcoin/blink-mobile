@@ -1,29 +1,18 @@
 import { type FiatCurrency } from "@breeztech/breez-sdk-spark-react-native"
 
+import { type DisplayCurrencyEntry } from "@app/types/currency"
+
 /**
- * Turns the SDK's currency metadata into the shape the app already renders, so a
+ * Translates the Breez SDK's currency metadata into the app's own shape, so a
  * self-custodial account can name and format its display currency without the Blink
  * backend.
  *
+ * Only the translation lives here; {@link DisplayCurrencyEntry} itself is in
+ * `app/types/currency.ts`, because the settings screen that renders it is shared with
+ * custodial users and must not depend on this module.
+ *
  * Pure: no SDK call, no storage, no React.
  */
-
-/** The fields of the GraphQL `Currency` the app actually consumes. Declared here rather
- *  than imported so this module does not depend on the generated schema. */
-export type DisplayCurrencyEntry = {
-  id: string
-  flag: string
-  name: string
-  symbol: string
-  fractionDigits: number
-}
-
-export type StoredFiatCurrencies = {
-  currencies: DisplayCurrencyEntry[]
-  /** Unix milliseconds. Kept for symmetry with the rates feed and for debugging; the
-   *  list does not go stale the way a price does, so nothing reads it as a deadline. */
-  fetchedAt: number
-}
 
 const REGIONAL_INDICATOR_A = 0x1f1e6
 const LATIN_A = "A".charCodeAt(0)

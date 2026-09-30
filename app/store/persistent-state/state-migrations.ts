@@ -1,6 +1,6 @@
 import { GALOY_INSTANCES, GaloyInstance, GaloyInstanceInput } from "@app/config"
-import { type StoredFiatCurrencies } from "@app/self-custodial/price/currency-mapping"
-import { type StoredFiatRates } from "@app/self-custodial/price/rate-mapping"
+import { type StoredFiatCurrencies } from "./self-custodial-fiat-currencies"
+import { type StoredFiatRates } from "./self-custodial-fiat-rates"
 import { AccountMode } from "@app/types/account"
 import { DefaultAccountId } from "@app/types/wallet"
 

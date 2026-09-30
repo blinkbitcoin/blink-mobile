@@ -17,20 +17,14 @@ import {
 import {
   getSelfCustodialFiatRates,
   withSelfCustodialFiatRates,
+  type StoredFiatRates,
 } from "@app/store/persistent-state/self-custodial-fiat-rates"
+import { type DisplayCurrencyEntry } from "@app/types/currency"
+import { rateFreshness, RateFreshness, type FiatRate } from "@app/types/price"
 
 import { listFiatCurrencies, listFiatRates } from "../bridge/fiat"
 import { recordErrorOnce } from "../logging"
-import {
-  toDisplayCurrencyList,
-  type DisplayCurrencyEntry,
-} from "../price/currency-mapping"
-import {
-  rateFreshness,
-  RateFreshness,
-  type FiatRate,
-  type StoredFiatRates,
-} from "../price/rate-mapping"
+import { toDisplayCurrencyList } from "../price/currency-mapping"
 import { useSelfCustodialWallet } from "./wallet"
 
 /**

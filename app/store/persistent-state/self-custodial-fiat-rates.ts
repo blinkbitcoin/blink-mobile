@@ -1,6 +1,14 @@
-import { type StoredFiatRates } from "@app/self-custodial/price/rate-mapping"
+import { type FiatRate } from "@app/types/price"
 
 import { PersistentState } from "./state-migrations"
+
+/** The persisted shape. It lives with the code that reads and writes it rather than
+ *  with the domain types, because the timestamp is a property of this device's copy. */
+export type StoredFiatRates = {
+  rates: FiatRate[]
+  /** Unix milliseconds, from the device clock at the moment the feed was read. */
+  fetchedAt: number
+}
 
 /**
  * The last fiat feed the SDK served, kept so a cold start with no connectivity can still
