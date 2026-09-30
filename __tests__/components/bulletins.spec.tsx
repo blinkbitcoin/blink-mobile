@@ -106,7 +106,13 @@ jest.mock("@app/components/atomic/galoy-primary-button", () => ({
   ),
 }))
 
-const makeBulletin = (overrides: Record<string, unknown> = {}) => ({
+/** A bulletin as the home's query returns it, so a field dropped from the query or the
+ *  generated types is a compile error here rather than a green suite. */
+type BulletinNode = NonNullable<
+  BulletinsQuery["me"]
+>["unacknowledgedStatefulNotificationsWithBulletinEnabled"]["edges"][number]["node"]
+
+const makeBulletin = (overrides: Partial<BulletinNode> = {}): BulletinNode => ({
   __typename: "StatefulNotification" as const,
   id: "notif-1",
   title: "Test Bulletin",
@@ -120,9 +126,7 @@ const makeBulletin = (overrides: Record<string, unknown> = {}) => ({
   ...overrides,
 })
 
-const makeBulletinsQuery = (
-  bulletins: ReturnType<typeof makeBulletin>[],
-): BulletinsQuery => ({
+const makeBulletinsQuery = (bulletins: BulletinNode[]): BulletinsQuery => ({
   __typename: "Query",
   me: {
     __typename: "User",
@@ -283,10 +287,11 @@ describe("BulletinsCard", () => {
   describe("a bulletin that is not dismissible", () => {
     it("offers no close control", () => {
       const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
-      const { queryByTestId } = render(
+      const { getByText, queryByTestId } = render(
         <BulletinsCard loading={false} bulletins={bulletins} />,
       )
 
+      expect(getByText("Test Bulletin")).toBeTruthy()
       expect(queryByTestId("icon-button-close")).toBeNull()
     })
 
@@ -302,6 +307,30 @@ describe("BulletinsCard", () => {
       fireEvent.press(rendered.getByText("Test Bulletin"))
       expect(Linking.openURL).not.toHaveBeenCalled()
       expect(mockAck).not.toHaveBeenCalled()
+    })
+
+    /** What the feature promises: pressing it opens its link and leaves it in place, and
+     *  the list the server sends back afterwards still carries it. */
+    it("is still on the home after a press and the refetch that follows", async () => {
+      const bulletin = makeBulletin({
+        dismissible: false,
+        action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
+      })
+      const { getByText, rerender } = render(
+        <BulletinsCard loading={false} bulletins={makeBulletinsQuery([bulletin])} />,
+      )
+
+      fireEvent.press(getByText("Test Bulletin"))
+      await flushEffects()
+      rerender(
+        <BulletinsCard
+          loading={false}
+          bulletins={makeBulletinsQuery([{ ...bulletin }])}
+        />,
+      )
+
+      expect(mockAck).not.toHaveBeenCalled()
+      expect(getByText("Test Bulletin")).toBeTruthy()
     })
 
     it("opens its deep link on press without acknowledging it", async () => {
