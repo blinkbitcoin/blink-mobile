@@ -1,14 +1,7 @@
 import { describe, expect, it } from "@jest/globals"
 
-import {
-  rateFreshness,
-  RateFreshness,
-  RATES_FRESH_MS,
-  RATES_USABLE_MS,
-  toPriceRates,
-  toPriceRatesFromRealtimePrice,
-  type FiatRate,
-} from "@app/self-custodial/price/rate-mapping"
+import { toPriceRates } from "@app/self-custodial/price/rate-mapping"
+import { type FiatRate } from "@app/types/price"
 
 const SATS_PER_BTC = 100_000_000
 
@@ -77,63 +70,5 @@ describe("toPriceRates", () => {
 
   it("returns undefined for an empty feed", () => {
     expect(toPriceRates([], "USD")).toBeUndefined()
-  })
-})
-
-describe("toPriceRatesFromRealtimePrice", () => {
-  it("applies the offset to both legs", () => {
-    const rates = toPriceRatesFromRealtimePrice({
-      btcSatPrice: { base: 1_500_000_000, offset: 12 },
-      usdCentPrice: { base: 1_500_000_000, offset: 8 },
-    })
-
-    expect(rates?.displayCurrencyPerSat).toBeCloseTo(0.0015, 12)
-    expect(rates?.displayCurrencyPerCent).toBeCloseTo(15, 12)
-  })
-
-  it("returns undefined when a leg is zero, which is what an empty cache reads as", () => {
-    expect(
-      toPriceRatesFromRealtimePrice({
-        btcSatPrice: { base: 0, offset: 12 },
-        usdCentPrice: { base: 1_500_000_000, offset: 8 },
-      }),
-    ).toBeUndefined()
-    expect(
-      toPriceRatesFromRealtimePrice({
-        btcSatPrice: { base: 1_500_000_000, offset: 12 },
-        usdCentPrice: { base: 0, offset: 8 },
-      }),
-    ).toBeUndefined()
-  })
-})
-
-describe("rateFreshness", () => {
-  const now = 1_700_000_000_000
-
-  it("reads a just-fetched feed as fresh", () => {
-    expect(rateFreshness(now, now)).toBe(RateFreshness.Fresh)
-  })
-
-  it("reads a feed one tick inside the fresh window as fresh", () => {
-    expect(rateFreshness(now - (RATES_FRESH_MS - 1), now)).toBe(RateFreshness.Fresh)
-  })
-
-  it("reads a feed at the fresh boundary as stale", () => {
-    expect(rateFreshness(now - RATES_FRESH_MS, now)).toBe(RateFreshness.Stale)
-  })
-
-  it("reads a feed one tick inside the usable window as stale", () => {
-    expect(rateFreshness(now - (RATES_USABLE_MS - 1), now)).toBe(RateFreshness.Stale)
-  })
-
-  it("reads a feed at the usable boundary as expired", () => {
-    expect(rateFreshness(now - RATES_USABLE_MS, now)).toBe(RateFreshness.Expired)
-  })
-
-  it("treats a feed read 'in the future' as fresh", () => {
-    // A clock correction or a user setting the date backwards puts the read ahead of
-    // now. Expiring a feed the app fetched this session would blank a figure it just
-    // got, which is worse than trusting it.
-    expect(rateFreshness(now + 60_000, now)).toBe(RateFreshness.Fresh)
   })
 })

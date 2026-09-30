@@ -1,6 +1,14 @@
-import { type StoredFiatCurrencies } from "@app/self-custodial/price/currency-mapping"
+import { type DisplayCurrencyEntry } from "@app/types/currency"
 
 import { PersistentState } from "./state-migrations"
+
+/** The persisted shape, beside the code that reads and writes it. */
+export type StoredFiatCurrencies = {
+  currencies: DisplayCurrencyEntry[]
+  /** Unix milliseconds. Kept for symmetry with the rates feed and for debugging; the
+   *  list does not go stale the way a price does, so nothing reads it as a deadline. */
+  fetchedAt: number
+}
 
 /**
  * The currency metadata the SDK last served — code, name, symbol and fraction size.

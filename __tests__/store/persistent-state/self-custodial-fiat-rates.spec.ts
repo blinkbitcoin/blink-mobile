@@ -1,4 +1,4 @@
-import { type FiatRate } from "@app/self-custodial/price/rate-mapping"
+import { type FiatRate } from "@app/types/price"
 import {
   getSelfCustodialFiatRates,
   withSelfCustodialFiatRates,

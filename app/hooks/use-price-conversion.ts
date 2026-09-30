@@ -8,13 +8,10 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import {
-  RateFreshness,
-  toPriceRates,
-  toPriceRatesFromRealtimePrice,
-  type PriceRates,
-} from "@app/self-custodial/price/rate-mapping"
+import { toPriceRatesFromRealtimePrice } from "@app/custodial/adapters/price"
+import { toPriceRates } from "@app/self-custodial/price/rate-mapping"
 import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
+import { RateFreshness, type PriceRates } from "@app/types/price"
 import {
   createToDisplayAmount,
   DisplayCurrency,

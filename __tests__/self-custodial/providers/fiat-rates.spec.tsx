@@ -4,7 +4,7 @@ import { beforeEach, describe, expect, it, jest } from "@jest/globals"
 import { act, render, waitFor } from "@testing-library/react-native"
 
 import { listFiatRates } from "@app/self-custodial/bridge/fiat"
-import { RateFreshness, RATES_USABLE_MS } from "@app/self-custodial/price/rate-mapping"
+import { RateFreshness, RATES_USABLE_MS } from "@app/types/price"
 import {
   SelfCustodialFiatRatesProvider,
   useFiatRates,
