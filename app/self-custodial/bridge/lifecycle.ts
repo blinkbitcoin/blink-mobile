@@ -17,12 +17,12 @@ import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
-  lnurlDomainFor,
   lnurlServerUrlFor,
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
   requireSparkTokenIdentifier,
+  sdkLnurlDomainFor,
   SparkToken,
   storageDirFor,
 } from "../config"
@@ -46,7 +46,7 @@ const initializeLogging = (() => {
 const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
   const config = defaultConfig(network)
   config.apiKey = requireBreezApiKey()
-  config.lnurlDomain = lnurlDomainFor(network)
+  config.lnurlDomain = sdkLnurlDomainFor(network)
 
   /**
    * The SDK default cap is 1 sat/vByte, which blocks almost every deposit claim.
