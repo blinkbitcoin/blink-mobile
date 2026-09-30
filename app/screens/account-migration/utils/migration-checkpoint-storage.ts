@@ -1,4 +1,4 @@
-import { loadJson, remove, saveJson } from "@app/utils/storage"
+import { loadJsonOrThrow, remove, saveJson } from "@app/utils/storage"
 
 /** Values are persisted to AsyncStorage: do not rename them. */
 export enum MigrationCheckpoint {
@@ -99,25 +99,29 @@ export const resolveCheckpointRoute = (
     ? { name: "accountMigrationBalancesOverview" }
     : DEFAULT_DESTINATION
 
+/**
+ * Throws when the store cannot be read, so the caller can tell that apart from an empty
+ * one: they are opposite situations (a record still on the device versus none at all) and
+ * only one of them may end the migration at support (blink-wip#1211).
+ *
+ * A failed read leaves the record alone. Removing it here would turn a store that is
+ * merely unreadable right now into the wiped device the gate cannot recover from, which
+ * is the one outcome this flow can never take back.
+ */
 export const loadCheckpoint = async (
   storageKey: string,
 ): Promise<StoredCheckpoint | null> => {
-  try {
-    const raw = await loadJson(storageKey)
-    const parsed = validateStoredCheckpoint(raw)
+  const raw = await loadJsonOrThrow(storageKey)
+  const parsed = validateStoredCheckpoint(raw)
 
-    if (!parsed) return null
+  if (!parsed) return null
 
-    if (isExpired(parsed)) {
-      await remove(storageKey)
-      return null
-    }
-
-    return parsed
-  } catch (err) {
-    await remove(storageKey).catch(() => {})
-    throw err
+  if (isExpired(parsed)) {
+    await remove(storageKey)
+    return null
   }
+
+  return parsed
 }
 
 export type CheckpointUpdate = {
@@ -157,11 +161,17 @@ export const mergeCheckpoint = (
   }
 }
 
+/**
+ * Refuses rather than overwrites when the prior record cannot be read: merging against an
+ * unreadable store would drop the accountId and expected receive it holds, and that save
+ * is what turns a store the device could not read this once into progress genuinely lost.
+ * The caller reports the throw and keeps the step unsaved, which is the recoverable half.
+ */
 export const saveCheckpointToStorage = async (
   storageKey: string,
   update: CheckpointUpdate,
 ): Promise<void> => {
-  const stored = validateStoredCheckpoint(await loadJson(storageKey).catch(() => null))
+  const stored = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
   /** An expired prior record must not lend its accountId to the fresh save; treat it as
    *  absent, matching loadCheckpoint, so the 48h expiry stays authoritative for the id. */
   const isReusableRecord = stored !== null && !isExpired(stored)
@@ -186,10 +196,15 @@ const PENDING_ACCOUNTS_KEY_PREFIX = "migrationPendingAccounts"
 export const getPendingAccountsStorageKey = (environment: string): string =>
   `${PENDING_ACCOUNTS_KEY_PREFIX}_${environment.toLowerCase()}`
 
+/**
+ * Throws on an unreadable store for the same reason loadCheckpoint does, and it matters
+ * twice over: this record is the gate's second way to resume, so reading it as empty
+ * retires the fallback meant to cover the first one being gone.
+ */
 export const loadPendingProvisionedAccounts = async (
   storageKey: string,
 ): Promise<PendingProvisionedAccounts> => {
-  const raw = await loadJson(storageKey).catch(() => null)
+  const raw = await loadJsonOrThrow(storageKey)
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {}
   const entries = Object.entries(raw as Record<string, unknown>).filter(
     (entry): entry is [string, string] => typeof entry[1] === "string",
