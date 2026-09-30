@@ -41,8 +41,11 @@ type LogoutOptions = {
    * The lock is all three slots, and they are preserved together. A PIN
    * without its spent attempt count hands the next round a fresh budget
    * against a secret that no longer expires, and a PIN without the biometrics
-   * flag routes every later unlock to the keypad — the one unlock screen that
-   * carries no way out — instead of to the prompt that does.
+   * flag routes every later unlock to the keypad, the one unlock screen that
+   * carries no way out, instead of to the prompt that does.
+   *
+   * Only the untokened path reads this: a call that passes a token never
+   * touches the lock slots, so there it is a no-op.
    */
   preserveAppLock?: boolean
 }

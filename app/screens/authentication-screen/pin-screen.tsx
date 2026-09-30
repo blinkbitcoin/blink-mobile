@@ -110,7 +110,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
          *  it here would leave the next screen ungated rather than locked, and
          *  the spent budget has to go with it: cleared, it would hand the next
          *  round a fresh three guesses against a PIN that now survives.
-         *  Everything the lock guarded still goes — the session and the saved
+         *  Everything the lock guarded still goes: the session and the saved
          *  profiles. */
         await logout({ preserveAppLock: true })
         await sleep(1000)
