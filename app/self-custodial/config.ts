@@ -4,6 +4,7 @@ import { DocumentDirectoryPath } from "react-native-fs"
 
 import { LNURL_DOMAINS } from "@app/config/appinfo"
 import { type GaloyInstanceName } from "@app/config/galoy-instances"
+import { getSimulatedOutage, simulatedOutageHost } from "@app/config/simulated-outage"
 
 export const SparkToken = {
   Label: "USDB",
@@ -58,8 +59,21 @@ export const lnurlDomainsFor = (network: Network): string[] =>
  * spelled with, which is what serves the authenticated `/lnurlpay/{pubkey}` routes. Not
  * the custodial `lnAddressHostname` — `pay.*` fronts the payment app and 404s them.
  */
-export const lnurlServerUrlFor = (network: Network): string =>
-  `https://${lnurlDomainFor(network)}`
+export const lnurlServerUrlFor = (network: Network): string => {
+  const simulated = simulatedOutageHost(getSimulatedOutage().lnurlServer)
+  if (simulated) return `http://${simulated}`
+  return `https://${lnurlDomainFor(network)}`
+}
+
+/**
+ * The domain handed to the SDK, which registers and resolves Lightning Addresses against
+ * it. Split from {@link lnurlDomainFor} so a simulated outage reaches the SDK's own
+ * requests without also rewriting what the app *recognises* as one of our domains:
+ * {@link lnurlDomainsFor} decides whether a scanned code names an account we issued, and
+ * a black-holed host there would change parsing rather than connectivity.
+ */
+export const sdkLnurlDomainFor = (network: Network): string =>
+  simulatedOutageHost(getSimulatedOutage().lnurlServer) ?? lnurlDomainFor(network)
 
 /**
  * Returns the wallet's stored network label when it conflicts with the current
