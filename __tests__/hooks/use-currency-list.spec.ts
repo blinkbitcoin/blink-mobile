@@ -110,6 +110,50 @@ describe("useCurrencyList", () => {
       expect(result.current.currencyList.map((c) => c.id)).toEqual(["USD", "NGN", "COP"])
     })
 
+    /**
+     * The regression this describe block exists to prevent. The currency screen seeds
+     * its filtered rows from an effect keyed on this list, so a new array identity on
+     * every render re-seeded them on the render after each keystroke and the search box
+     * appeared to do nothing. The overlay made that visible; the cause was a `useMemo`
+     * depending on source objects rebuilt every render, which never memoised anything.
+     */
+    it("returns the same list across renders when nothing has changed", () => {
+      selfCustodial()
+      fiatRates(sdkList)
+      mockUseCurrencyListQuery.mockReturnValue({
+        data: { currencyList: backendNames },
+        loading: false,
+      })
+
+      const { result, rerender } = renderHook(() => useCurrencyList())
+      const first = result.current.currencyList
+      rerender()
+
+      expect(result.current.currencyList).toBe(first)
+    })
+
+    it("returns a new list once the wording actually arrives", () => {
+      // The flip side: stability must not mean staleness.
+      selfCustodial()
+      fiatRates(sdkList)
+      mockUseCurrencyListQuery.mockReturnValue({ data: undefined, loading: false })
+
+      const { result, rerender } = renderHook(() => useCurrencyList())
+      const beforeNames = result.current.currencyList
+      expect(beforeNames.find((c) => c.id === "NGN")?.name).toBe("Naira")
+
+      mockUseCurrencyListQuery.mockReturnValue({
+        data: { currencyList: backendNames },
+        loading: false,
+      })
+      rerender()
+
+      expect(result.current.currencyList).not.toBe(beforeNames)
+      expect(result.current.currencyList.find((c) => c.id === "NGN")?.name).toBe(
+        "Nigerian Naira",
+      )
+    })
+
     it("falls back to the SDK's wording when the backend is unreachable", () => {
       selfCustodial()
       fiatRates(sdkList)
