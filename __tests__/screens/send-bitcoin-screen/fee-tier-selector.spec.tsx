@@ -38,9 +38,9 @@ jest.mock("react-native-modal", () => {
 })
 
 const buildOptions = () => [
-  { id: "fast", label: "Fast", detail: "30 sat/vB" },
-  { id: "medium", label: "Medium", detail: "20 sat/vB" },
-  { id: "slow", label: "Slow", detail: "10 sat/vB" },
+  { id: "fast", label: "Priority", detail: "30 sat/vB" },
+  { id: "medium", label: "Standard", detail: "20 sat/vB" },
+  { id: "slow", label: "Economy", detail: "10 sat/vB" },
 ]
 
 const renderSelector = (
@@ -65,49 +65,39 @@ describe("FeeTierSelector", () => {
     expect(getByText("Network fee")).toBeTruthy()
   })
 
-  it("shows the label and detail of the currently selected option", () => {
+  it("shows the selected tier as one value of name and detail", () => {
     const { getByText } = renderSelector({ selected: "fast" })
 
-    expect(getByText("Fast")).toBeTruthy()
-    expect(getByText("30 sat/vB")).toBeTruthy()
+    expect(getByText("Priority 30 sat/vB")).toBeTruthy()
   })
 
-  it("opens the modal when the dropdown is pressed and lists every option", () => {
-    const { getByTestId, getAllByText } = renderSelector()
+  it("shows no chevron on the row", () => {
+    const { queryByTestId } = renderSelector()
+
+    expect(queryByTestId("icon-caret-down")).toBeNull()
+  })
+
+  it("opens the modal when the row is pressed and lists every option", () => {
+    const { getByTestId, getByText } = renderSelector()
 
     fireEvent.press(getByTestId("fee-tier-dropdown"))
 
-    // Every option label is now visible in the modal list.
-    expect(getAllByText("Fast").length).toBeGreaterThan(0)
-    expect(getAllByText("Medium").length).toBeGreaterThan(0)
-    expect(getAllByText("Slow").length).toBeGreaterThan(0)
+    expect(getByText("Priority")).toBeTruthy()
+    expect(getByText("Standard")).toBeTruthy()
+    expect(getByText("Economy")).toBeTruthy()
+  })
+
+  it("marks only the selected option with a check", () => {
+    const { getByTestId, getAllByTestId } = renderSelector({ selected: "medium" })
+
+    fireEvent.press(getByTestId("fee-tier-dropdown"))
+
+    expect(getAllByTestId("icon-check-circle")).toHaveLength(1)
   })
 
   it("calls onSelect with the chosen tier id when an option is tapped", () => {
     const onSelect = jest.fn()
     const { getByTestId } = renderSelector({ onSelect })
-
-    fireEvent.press(getByTestId("fee-tier-dropdown"))
-    fireEvent.press(getByTestId("fee-tier-slow"))
-
-    expect(onSelect).toHaveBeenCalledWith("slow")
-  })
-
-  it("swaps the caret for a spinner while the fees are being quoted", () => {
-    const { getByTestId } = renderSelector({ loading: true })
-
-    expect(getByTestId("fee-tier-spinner")).toBeTruthy()
-  })
-
-  it("shows no spinner once the quote has landed", () => {
-    const { queryByTestId } = renderSelector()
-
-    expect(queryByTestId("fee-tier-spinner")).toBeNull()
-  })
-
-  it("still opens the tier list while quoting", () => {
-    const onSelect = jest.fn()
-    const { getByTestId } = renderSelector({ loading: true, onSelect })
 
     fireEvent.press(getByTestId("fee-tier-dropdown"))
     fireEvent.press(getByTestId("fee-tier-slow"))

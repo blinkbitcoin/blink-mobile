@@ -19,6 +19,7 @@ import { testProps } from "@app/utils/testProps"
 
 import { useBackupConfirm, useCompleteBackup } from "../hooks"
 import { type Challenge, isValidChallenges } from "../utils"
+import { fonts } from "@app/rne-theme/fonts"
 
 type ConfirmRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhraseConfirm">
 
@@ -232,7 +233,7 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     fontSize: 14,
     color: colors.black,
-    fontFamily: "SourceSansPro-Regular",
+    fontFamily: fonts.regular,
   },
   errorContainer: {
     flexDirection: "row",
