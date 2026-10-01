@@ -374,7 +374,7 @@ export const HomeScreen: React.FC = () => {
     stableBalanceEnabled && isSelfCustodial && isStableBalanceActive
 
   const { formatMoneyAmount } = useDisplayCurrency()
-  const { priceFreshness } = usePriceConversion()
+  const { priceFreshness, isSatsOnly } = usePriceConversion()
 
   const isShowingSats = showStableBalanceToggle && balanceMode === BalanceMode.Btc
 
@@ -960,6 +960,7 @@ export const HomeScreen: React.FC = () => {
         mode={balanceMode}
         onModeChange={toggleBalanceMode}
         isRateStale={isRateStale}
+        isSatsOnly={isSatsOnly}
       />
       <View style={styles.badgeSlot}>
         {badgeSlotContent === "unseen" ? (

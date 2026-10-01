@@ -4423,6 +4423,7 @@ const en: BaseTranslation = {
   },
   SelfCustodialStaleRate: {
     notice: "Exchange rate may be out of date",
+    satsOnly: "Showing sats — no exchange rate available",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

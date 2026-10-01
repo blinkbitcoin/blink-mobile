@@ -15,6 +15,7 @@ import {
   firstPricedSource,
   noPriceSource,
   RateFreshness,
+  SATS_DISPLAY_CURRENCY,
   type PriceSource,
 } from "@app/types/price"
 import {
@@ -43,7 +44,43 @@ export const PriceStatus = {
 
 export type PriceStatus = (typeof PriceStatus)[keyof typeof PriceStatus]
 
+/**
+ * The conversion matrix for a wallet nothing can price in fiat, where the display
+ * currency *is* sats.
+ *
+ * Bitcoin and the display currency become the same unit, so those legs are the identity
+ * and every screen that asks "this amount, in the display currency" keeps working. The
+ * US dollar legs stay unknown, because expressing a held USDB balance in sats needs the
+ * very rate that is missing — a `NaN` there renders as an empty string rather than a
+ * fabricated number, and the surfaces that hold dollars show them in dollars instead.
+ */
+const SATS_ONLY_PRICES: Record<
+  WalletOrDisplayCurrency,
+  Record<WalletOrDisplayCurrency, number>
+> = {
+  [WalletCurrency.Btc]: {
+    [DisplayCurrency]: 1,
+    [WalletCurrency.Usd]: Number.NaN,
+    [WalletCurrency.Btc]: 1,
+  },
+  [WalletCurrency.Usd]: {
+    [DisplayCurrency]: Number.NaN,
+    [WalletCurrency.Btc]: Number.NaN,
+    [WalletCurrency.Usd]: 1,
+  },
+  [DisplayCurrency]: {
+    [WalletCurrency.Btc]: 1,
+    [WalletCurrency.Usd]: Number.NaN,
+    [DisplayCurrency]: 1,
+  },
+}
+
 const PRICE_POLL_INTERVAL_MS = 5 * 60 * 1000
+
+const finiteOrNull = (btcInUsdCents: number | undefined): string | null =>
+  btcInUsdCents === undefined || !Number.isFinite(btcInUsdCents)
+    ? null
+    : (btcInUsdCents / 100).toFixed(8)
 
 export const usePriceConversion = () => {
   const isAuthed = useIsAuthed()
@@ -103,10 +140,34 @@ export const usePriceConversion = () => {
    */
   const source = firstPricedSource(selfCustodialSource, backendSource)
 
+  /**
+   * No source can price this wallet in fiat, and none is still trying. Rather than
+   * leaving every screen without a converter — which is what left the receive screen
+   * spinning — the display currency becomes sats and amounts are stated in the unit
+   * their own wallet is denominated in.
+   *
+   * Self-custodial only, because it is the only session where every source can be known
+   * to have finished empty. A custodial session keeps waiting, as it always has.
+   */
+  const isSatsOnly =
+    isSelfCustodial &&
+    source.rates === undefined &&
+    selfCustodialSource.hasSettled &&
+    backendSource.hasSettled
+
+  /** What amounts are *shown* in. The real preference still drives the queries above and
+   *  the feed lookup, so turning the rate back on restores the user's own currency. */
+  const shownCurrency = isSatsOnly ? SATS_DISPLAY_CURRENCY : displayCurrency
+
   const displayCurrencyPerSat = source.rates?.displayCurrencyPerSat ?? NaN
   const displayCurrencyPerCent = source.rates?.displayCurrencyPerCent ?? NaN
 
   const priceOfCurrencyInCurrency = useMemo(() => {
+    if (isSatsOnly) {
+      return (currency: WalletOrDisplayCurrency, inCurrency: WalletOrDisplayCurrency) =>
+        SATS_ONLY_PRICES[currency][inCurrency]
+    }
+
     if (!displayCurrencyPerSat || !displayCurrencyPerCent) {
       return undefined
     }
@@ -135,7 +196,7 @@ export const usePriceConversion = () => {
       }
       return priceOfCurrencyInCurrency[currency][inCurrency]
     }
-  }, [displayCurrencyPerSat, displayCurrencyPerCent])
+  }, [displayCurrencyPerSat, displayCurrencyPerCent, isSatsOnly])
 
   const converters = useMemo(() => {
     if (!priceOfCurrencyInCurrency) {
@@ -158,13 +219,13 @@ export const usePriceConversion = () => {
 
       if (
         moneyAmountIsCurrencyType(moneyAmount, DisplayCurrency) &&
-        moneyAmount.currencyCode !== displayCurrency
+        moneyAmount.currencyCode !== shownCurrency
       ) {
         amount = NaN
 
         recordAppError(
           new Error(
-            `Price conversion is out of sync with display currency. Money amount: ${moneyAmount.currencyCode}, display currency: ${displayCurrency}`,
+            `Price conversion is out of sync with display currency. Money amount: ${moneyAmount.currencyCode}, display currency: ${shownCurrency}`,
           ),
         )
       }
@@ -172,7 +233,7 @@ export const usePriceConversion = () => {
       return {
         amount,
         currency: toCurrency,
-        currencyCode: toCurrency === DisplayCurrency ? displayCurrency : toCurrency,
+        currencyCode: toCurrency === DisplayCurrency ? shownCurrency : toCurrency,
       }
     }
 
@@ -188,7 +249,7 @@ export const usePriceConversion = () => {
     ): MoneyAmount<T> => convertWithRounding(moneyAmount, toCurrency, roundingFn)
 
     return { convertMoneyAmount, convertMoneyAmountWithRounding }
-  }, [priceOfCurrencyInCurrency, displayCurrency])
+  }, [priceOfCurrencyInCurrency, shownCurrency])
 
   /**
    * How current the rate behind these amounts is, as the source that answered reports
@@ -203,11 +264,16 @@ export const usePriceConversion = () => {
    * have finished and come back empty. A custodial session keeps today's behaviour,
    * where no price means the screen is still loading.
    */
-  const priceStatus: PriceStatus = converters
-    ? PriceStatus.Ready
-    : isSelfCustodial && selfCustodialSource.hasSettled && backendSource.hasSettled
-      ? PriceStatus.Unavailable
-      : PriceStatus.Pending
+  const priceStatus: PriceStatus = isSatsOnly
+    ? /** A converter exists, but there is no fiat price. Callers keyed on this — the
+       *  balance header's own sats fallback — must not start behaving as though a rate
+       *  had arrived. */
+      PriceStatus.Unavailable
+    : converters
+      ? PriceStatus.Ready
+      : isSelfCustodial && selfCustodialSource.hasSettled && backendSource.hasSettled
+        ? PriceStatus.Unavailable
+        : PriceStatus.Pending
 
   return {
     convertMoneyAmount: converters?.convertMoneyAmount,
@@ -216,16 +282,20 @@ export const usePriceConversion = () => {
      *  else on Unavailable, or it spins forever. */
     priceStatus,
     convertMoneyAmountWithRounding: converters?.convertMoneyAmountWithRounding,
-    displayCurrency,
-    toDisplayMoneyAmount: createToDisplayAmount(displayCurrency),
+    displayCurrency: shownCurrency,
+    /** True while amounts are stated in sats because no rate could be found. Surfaces
+     *  that show money read this to tell the user why, rather than letting a balance
+     *  silently change denomination. */
+    isSatsOnly,
+    toDisplayMoneyAmount: createToDisplayAmount(shownCurrency),
     /** Fresh, Stale or Expired. Expired means no conversion is available at all, which
      *  `convertMoneyAmount` being undefined already says; Stale means the amounts are
      *  real but priced off a rate old enough that the user should be told. */
     priceFreshness,
-    usdPerSat: priceOfCurrencyInCurrency
-      ? (priceOfCurrencyInCurrency(WalletCurrency.Btc, WalletCurrency.Usd) / 100).toFixed(
-          8,
-        )
-      : null,
+    /** Null rather than the string "NaN" when the dollar leg is unknown, which is the
+     *  case in sats-only mode: a caller checking for a price must not be handed one. */
+    usdPerSat: finiteOrNull(
+      priceOfCurrencyInCurrency?.(WalletCurrency.Btc, WalletCurrency.Usd),
+    ),
   }
 }

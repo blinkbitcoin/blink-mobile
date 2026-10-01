@@ -563,6 +563,9 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     [onchainAddress, amountInSats, memo],
   )
 
+  /** `convertMoneyAmount` is undefined only while a price source is still trying; once
+   *  they have all settled it falls back to sats, so this is a bootstrap gate rather
+   *  than a dead end for a wallet nothing can price. */
   if (!sdk || !btcWallet || !convertMoneyAmount) return null
 
   const buildInvoiceData = (): ReceiveInvoiceInfo | undefined => {

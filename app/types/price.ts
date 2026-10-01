@@ -7,6 +7,15 @@
  * code can price an amount without knowing which account type is active.
  */
 
+/**
+ * The display currency the app falls back to when nothing can price a wallet in fiat.
+ *
+ * Not a currency a user can choose, and never in the picker: it is what the display
+ * currency *becomes* while no exchange rate is available, so every amount can still be
+ * stated in the unit its own wallet is denominated in.
+ */
+export const SATS_DISPLAY_CURRENCY = "SAT"
+
 /** One entry of a fiat feed: the price of a whole BTC, denominated in `coin`. */
 export type FiatRate = {
   coin: string

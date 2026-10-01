@@ -4233,7 +4233,8 @@
     "payment": "Ödeme"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Döviz kuru güncel olmayabilir"
+    "notice": "Döviz kuru güncel olmayabilir",
+    "satsOnly": "Sats olarak gösteriliyor — döviz kuru yok"
   },
   "SelfCustodialOffline": {
     "title": "Cüzdan çevrimdışı",
