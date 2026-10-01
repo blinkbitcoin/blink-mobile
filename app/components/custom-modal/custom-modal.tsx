@@ -39,6 +39,7 @@ export type CustomModalProps = {
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
   backgroundModalColor?: string
   titleFontSize?: number
+  onModalHide?: () => void
 }
 
 const CustomModal: React.FC<CustomModalProps> = ({
@@ -65,6 +66,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   dismissable = true,
   backgroundModalColor,
   titleFontSize,
+  onModalHide,
 }) => {
   const styles = useStyles({
     hasPrimaryButtonTextAbove: Boolean(primaryButtonTextAbove),
@@ -89,6 +91,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       avoidKeyboard={true}
       onBackdropPress={dismissable ? toggleModal : undefined}
       onBackButtonPress={dismissable ? toggleModal : undefined}
+      onModalHide={onModalHide}
     >
       <View style={styles.container}>
         <View style={styles.headerContainer}>

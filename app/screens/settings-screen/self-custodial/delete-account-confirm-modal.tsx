@@ -11,12 +11,14 @@ type Props = {
   isVisible: boolean
   onClose: () => void
   onConfirm: () => void | Promise<void>
+  onModalHide?: () => void
 }
 
 export const DeleteAccountConfirmModal: React.FC<Props> = ({
   isVisible,
   onClose,
   onConfirm,
+  onModalHide,
 }) => {
   const styles = useStyles()
   const {
@@ -67,6 +69,7 @@ export const DeleteAccountConfirmModal: React.FC<Props> = ({
       primaryButtonOnPress={handleConfirm}
       secondaryButtonTitle={LL.common.cancel()}
       secondaryButtonOnPress={handleClose}
+      onModalHide={onModalHide}
       {...testProps("self-custodial-confirm-removal-modal")}
     />
   )

@@ -3,7 +3,7 @@ import { ActivityIndicator, TouchableOpacity, View } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { ListItem, makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
+import { ListItem, makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
@@ -28,9 +28,7 @@ import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
-import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
-
-import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
+import { useAccountRemoval } from "./use-account-removal"
 
 type ProfileRowProps = {
   entry: SelfCustodialAccountEntry
@@ -50,7 +48,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
-  const { state: deleteState, deleteWallet } = useDeleteAccount()
+  const { requestRemoval, runPendingRemoval } = useAccountRemoval()
   const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -133,10 +131,9 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
   }
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
+    requestRemoval(accountId, rowTitle)
     setConfirmVisible(false)
-    const outcome = await deleteWallet(accountId)
-    if (outcome) navigateAfterAccountDelete(navigation, outcome)
   }
 
   const dismissHasFundsWarning = () => {
@@ -181,10 +178,6 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
           )}
         </ListItem>
       </TouchableOpacity>
-      <Overlay isVisible={deleteState === "deleting"} overlayStyle={styles.overlayStyle}>
-        <ActivityIndicator size={50} color={colors.primary} />
-        <Text>{LL.AccountScreen.pleaseWait()}</Text>
-      </Overlay>
       <DeleteAccountHasFundsModal
         isVisible={hasFundsWarningVisible}
         onClose={dismissHasFundsWarning}
@@ -194,6 +187,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
         isVisible={confirmVisible}
         onClose={() => setConfirmVisible(false)}
         onConfirm={handleConfirm}
+        onModalHide={runPendingRemoval}
       />
     </>
   )
@@ -214,9 +208,5 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   subtleText: {
     color: colors.grey2,
-  },
-  overlayStyle: {
-    backgroundColor: "transparent",
-    shadowColor: "transparent",
   },
 }))
