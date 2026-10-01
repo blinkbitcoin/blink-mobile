@@ -32,22 +32,41 @@ const findUsableRate = (rates: readonly FiatRate[], coin: string): number | unde
  * treat as "no price" rather than as zero: every amount derived from a missing rate
  * would otherwise read as free.
  *
+ * **Units are the whole difficulty here, and the two sources disagree.** Breez reports
+ * `Rate.value` as the price of one whole BTC in whole units of `coin` — 10,118,784 for
+ * naira. The app works in *minor* units throughout: a `DisplayCurrency` money amount
+ * holds kobo, not naira (`moneyAmountToMajorUnitOrSats` divides by `fractionDigits` on
+ * the way out), and the backend's own `realtimePrice` says so in its type names —
+ * `PriceOfOneSatInMinorUnit`, `PriceOfOneUsdCentInMinorUnit`. So every rate out of the
+ * Breez feed has to be scaled by `10 ** fractionDigits` to mean the same thing as one
+ * out of the backend. Without it every self-custodial fiat amount reads 100× too small
+ * on a two-decimal currency.
+ *
+ * `fractionDigits` is therefore required, not defaulted: guessing two would silently
+ * misprice the zero-decimal currencies (yen, won, franc CFA) rather than failing.
+ *
  * The cent ratio needs the USD rate as well, since the app's USD wallet is denominated
  * in cents rather than in the display currency. A display currency of USD short-circuits
- * to an exact hundredth instead of dividing the same rate by itself, which would leave
- * float noise in every dollar amount on screen.
+ * rather than dividing the same rate by itself, which would leave float noise in every
+ * dollar amount on screen.
  */
 export const toPriceRates = (
   rates: readonly FiatRate[],
   displayCurrency: string,
+  fractionDigits: number,
 ): PriceRates | undefined => {
+  if (!Number.isInteger(fractionDigits) || fractionDigits < 0) return undefined
+
   const displayRate = findUsableRate(rates, displayCurrency)
   if (displayRate === undefined) return undefined
 
-  const displayCurrencyPerSat = displayRate / SATS_PER_BTC
+  /** Whole display units per BTC → minor display units per sat. */
+  const minorUnitsPerMajor = 10 ** fractionDigits
+  const displayCurrencyPerSat = (displayRate * minorUnitsPerMajor) / SATS_PER_BTC
 
   if (displayCurrency.toUpperCase() === USD) {
-    return { displayCurrencyPerSat, displayCurrencyPerCent: 1 / CENTS_PER_USD }
+    // One US cent priced in US cents. Exactly one, whatever the float would have said.
+    return { displayCurrencyPerSat, displayCurrencyPerCent: 1 }
   }
 
   const usdRate = findUsableRate(rates, USD)
@@ -55,6 +74,8 @@ export const toPriceRates = (
 
   return {
     displayCurrencyPerSat,
-    displayCurrencyPerCent: displayRate / usdRate / CENTS_PER_USD,
+    /** Whole display units per USD → minor display units per US cent. */
+    displayCurrencyPerCent:
+      ((displayRate / usdRate) * minorUnitsPerMajor) / CENTS_PER_USD,
   }
 }
