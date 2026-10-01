@@ -4055,7 +4055,8 @@
     "payment": "Intlawulo"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Izinga lotshintshiselwano lisenokuba lidlule ixesha"
+    "notice": "Izinga lotshintshiselwano lisenokuba lidlule ixesha",
+    "satsOnly": "Ibonisa ii-sats — alikho izinga lotshintshiselwano"
   },
   "SelfCustodialOffline": {
     "title": "Ingxowa-mali ayikho kwi-intanethi",

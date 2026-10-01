@@ -4055,7 +4055,8 @@
     "payment": "Plaćanje"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Tečaj možda nije ažuran"
+    "notice": "Tečaj možda nije ažuran",
+    "satsOnly": "Prikaz u satima — tečaj nije dostupan"
   },
   "SelfCustodialOffline": {
     "title": "Novčanik je izvan mreže",

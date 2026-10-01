@@ -4055,7 +4055,8 @@
     "payment": "Վճարում"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Փոխարժեքը կարող է հնացած լինել"
+    "notice": "Փոխարժեքը կարող է հնացած լինել",
+    "satsOnly": "Ցուցադրվում է sats-ով — փոխարժեք հասանելի չէ"
   },
   "SelfCustodialOffline": {
     "title": "Դրամապանակը անցանց է",

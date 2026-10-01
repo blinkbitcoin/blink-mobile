@@ -4055,7 +4055,8 @@
         "payment": "支払い"
     },
     "SelfCustodialStaleRate": {
-        "notice": "為替レートが最新でない可能性があります"
+        "notice": "為替レートが最新でない可能性があります",
+        "satsOnly": "sats で表示中 — 為替レートを取得できません"
     },
     "SelfCustodialOffline": {
         "title": "ウォレットはオフラインです",

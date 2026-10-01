@@ -4055,7 +4055,8 @@
     "payment": "Pagament"
   },
   "SelfCustodialStaleRate": {
-    "notice": "El tipus de canvi pot estar desactualitzat"
+    "notice": "El tipus de canvi pot estar desactualitzat",
+    "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {
     "title": "La cartera està fora de línia",

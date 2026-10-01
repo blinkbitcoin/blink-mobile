@@ -4055,7 +4055,8 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Wisselkoers is dalk verouderd"
+    "notice": "Wisselkoers is dalk verouderd",
+    "satsOnly": "Wys sats — geen wisselkoers beskikbaar nie"
   },
   "SelfCustodialOffline": {
     "title": "Beursie is vanlyn",

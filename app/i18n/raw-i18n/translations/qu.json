@@ -4055,7 +4055,8 @@
     "payment": "Pagay"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Chaninchay yupay manaraqchá musuqchu"
+    "notice": "Chaninchay yupay manaraqchá musuqchu",
+    "satsOnly": "Sats-pi rikuchisqa — mana chaninchay yupay kanchu"
   },
   "SelfCustodialOffline": {
     "title": "Wallet manan conexionniyuqchu",

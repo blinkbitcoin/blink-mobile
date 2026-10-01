@@ -4055,7 +4055,8 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "De wisselkoers is mogelijk verouderd"
+    "notice": "De wisselkoers is mogelijk verouderd",
+    "satsOnly": "Weergave in sats — geen wisselkoers beschikbaar"
   },
   "SelfCustodialOffline": {
     "title": "Wallet is offline",

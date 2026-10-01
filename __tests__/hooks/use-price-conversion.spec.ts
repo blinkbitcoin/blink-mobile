@@ -21,6 +21,7 @@ const mockUseFiatRates = jest.fn().mockReturnValue({
   rates: [],
   fetchedAt: null,
   freshness: "expired",
+  hasSettled: true,
   refresh: jest.fn(),
 })
 
@@ -124,6 +125,8 @@ const noSdkRates = {
   rates: [],
   fetchedAt: null,
   freshness: RateFreshness.Expired,
+  /** Settled and empty — the SDK answered and its feed carries nothing for NGN. */
+  hasSettled: true,
   refresh: jest.fn(),
 }
 
@@ -138,6 +141,7 @@ const sdkRatesAt = (freshness: RateFreshness) => ({
   rates: sdkFeed,
   fetchedAt: 1_700_000_000_000,
   freshness,
+  hasSettled: true,
   refresh: jest.fn(),
 })
 
@@ -281,7 +285,10 @@ describe("usePriceConversion", () => {
 
       const { result } = renderHook(() => usePriceConversion())
 
-      expect(result.current.convertMoneyAmount).toBeUndefined()
+      // A converter exists — it falls back to sats rather than leaving screens without
+      // one — but the authed price is not what is behind it.
+      expect(result.current.isSatsOnly).toBe(true)
+      expect(result.current.displayCurrency).toBe("SAT")
       expect(result.current.usdPerSat).toBeNull()
     })
   })
@@ -428,8 +435,114 @@ describe("usePriceConversion", () => {
 
       const { result } = renderHook(() => usePriceConversion())
 
-      expect(result.current.convertMoneyAmount).toBeUndefined()
+      // Expired is about the rate, not about the converter: the sats fallback below
+      // supplies one so no screen is left waiting on a price that is not coming.
       expect(result.current.priceFreshness).toBe(RateFreshness.Expired)
+      expect(result.current.priceStatus).toBe("unavailable")
+    })
+  })
+
+  describe("when nothing can price the wallet", () => {
+    beforeEach(() => {
+      mockUseAccountRegistry.mockReturnValue({
+        activeAccount: { id: "self-custodial-1", type: AccountType.SelfCustodial },
+      })
+      mockUseRealtimePriceQuery.mockReturnValue({ data: undefined })
+      mockUseRealtimePriceUnauthedQuery.mockReturnValue({
+        data: undefined,
+        loading: false,
+      })
+      // Settled and empty: the SDK answered, and its feed does not carry NGN.
+      mockUseFiatRates.mockReturnValue(noSdkRates)
+    })
+
+    it("gives a converter instead of undefined, so no screen can spin forever", () => {
+      // This is the whole point: `receive-screen` and `use-payment-request` both bail
+      // on a missing converter, and a healthy wallet whose currency nothing can price
+      // used to sit on a loader indefinitely.
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.convertMoneyAmount).toBeDefined()
+      expect(result.current.isSatsOnly).toBe(true)
+    })
+
+    it("states a Bitcoin amount in sats, one for one", () => {
+      const { result } = renderHook(() => usePriceConversion())
+
+      const converted = result.current.convertMoneyAmount?.(
+        toBtcMoneyAmount(1000),
+        DisplayCurrency,
+      )
+      expect(converted?.amount).toBe(1000)
+      expect(converted?.currencyCode).toBe("SAT")
+    })
+
+    it("round-trips back to Bitcoin without drift", () => {
+      const { result } = renderHook(() => usePriceConversion())
+      const convert = result.current.convertMoneyAmount
+
+      /** Taken off the amount rather than imported: `WalletCurrency` is a value on the
+       *  mocked `@app/graphql/generated`, and importing it here would load that module
+       *  before the mocks above are initialised. */
+      const btc = toBtcMoneyAmount(2500)
+      const asDisplay = convert?.(btc, DisplayCurrency)
+      expect(convert?.(asDisplay!, btc.currency).amount).toBe(2500)
+    })
+
+    it("reports sats as the display currency, not the unpriceable preference", () => {
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.displayCurrency).toBe("SAT")
+    })
+
+    it("still reports the price as unavailable", () => {
+      // The converter exists, but there is no fiat price. Callers keyed on this — the
+      // balance header's sats fallback — must not start behaving as though there were.
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.priceStatus).toBe("unavailable")
+    })
+
+    it("leaves the dollar legs unknown rather than inventing them", () => {
+      // Expressing a held USDB balance in sats needs the very rate that is missing.
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(
+        result.current.convertMoneyAmount?.(toUsdMoneyAmount(100), DisplayCurrency)
+          ?.amount,
+      ).toBeNaN()
+    })
+
+    it("does not engage while a source is still trying", () => {
+      // Sats would flash up and then be replaced by the real currency a moment later.
+      mockUseFiatRates.mockReturnValue({ ...noSdkRates, hasSettled: false })
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.isSatsOnly).toBe(false)
+      expect(result.current.convertMoneyAmount).toBeUndefined()
+    })
+
+    it("does not engage for a custodial account", () => {
+      // Its only source is the backend, which may still be retried; today's behaviour
+      // there is to keep waiting rather than change denomination.
+      mockUseAccountRegistry.mockReturnValue({
+        activeAccount: { id: "custodial-1", type: AccountType.Custodial },
+      })
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.isSatsOnly).toBe(false)
+      expect(result.current.convertMoneyAmount).toBeUndefined()
+    })
+
+    it("steps aside the moment a real rate arrives", () => {
+      mockUseFiatRates.mockReturnValue(sdkRatesAt(RateFreshness.Fresh))
+
+      const { result } = renderHook(() => usePriceConversion())
+
+      expect(result.current.isSatsOnly).toBe(false)
+      expect(result.current.displayCurrency).toBe("NGN")
     })
   })
 })

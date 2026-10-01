@@ -4055,7 +4055,8 @@
         "payment": "Pagamento"
     },
     "SelfCustodialStaleRate": {
-        "notice": "A taxa de câmbio pode estar desatualizada"
+        "notice": "A taxa de câmbio pode estar desatualizada",
+        "satsOnly": "A mostrar sats — nenhuma taxa de câmbio disponível"
     },
     "SelfCustodialOffline": {
         "title": "A carteira está offline",

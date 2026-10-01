@@ -4055,7 +4055,8 @@
         "payment": "Zahlung"
     },
     "SelfCustodialStaleRate": {
-        "notice": "Der Wechselkurs ist möglicherweise veraltet"
+        "notice": "Der Wechselkurs ist möglicherweise veraltet",
+        "satsOnly": "Anzeige in Sats – kein Wechselkurs verfügbar"
     },
     "SelfCustodialOffline": {
         "title": "Wallet ist offline",

@@ -103,7 +103,7 @@ fresh launch proves the persisted copies are doing their job.
 For a self-custodial-only user, with both switches on:
 
 - Home shows a balance, not a skeleton. With a persisted rate it is in the
-  display currency; with none it is in sats.
+  display currency; with none it is in sats, with a line saying why.
 - Receive produces a Lightning invoice, an on-chain address and a Spark address.
   The Lightning Address tab still offers the account's address.
 - Send accepts an amount, quotes a fee and completes over Lightning, on-chain
@@ -129,6 +129,16 @@ Lightning Address, with the LNURL switch on:
 - An account that already has an address keeps showing it.
 - Turn the switch off and return the app to the foreground: a mode change made
   while it was on reaches the server without a relaunch.
+
+Separately, with a display currency the Breez feed does not carry (anything
+outside `listFiatCurrencies`) and the GraphQL switch on — a case that needs no
+outage of the rates service at all:
+
+- Home, receive and send all render in sats, and say why.
+- An invoice can still be produced and a payment still sent.
+- A Stable Balance holder's dollar row shows dollars, not a blank.
+- Set the display currency back to one the feed carries: amounts return to it
+  without a relaunch.
 
 Then turn both switches off and confirm recovery within a session: the price
 refreshes, the tabs come back, and toasts resume for a custodial account.

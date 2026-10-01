@@ -622,4 +622,51 @@ describe("useDisplayCurrency", () => {
       })
     })
   })
+
+  describe("moneyAmountToDisplayCurrencyString when the display cannot express an amount", () => {
+    it("shows the amount in its own unit rather than a blank", () => {
+      // The sats-only fallback: there is no rate to cross dollars into sats, so the
+      // conversion is NaN. A blank where a balance should be reads as money gone.
+      setCurrencyList([{ id: "SAT", symbol: "", fractionDigits: 0 }])
+      mockUsePriceConversion.mockReturnValue({
+        convertMoneyAmount: () => ({
+          amount: Number.NaN,
+          currency: DisplayCurrency,
+          currencyCode: "SAT",
+        }),
+        displayCurrency: "SAT",
+        toDisplayMoneyAmount: mockToDisplayMoneyAmount,
+      })
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(
+        result.current.moneyAmountToDisplayCurrencyString({
+          moneyAmount: toUsdMoneyAmount(500),
+        }),
+      ).toBe("$5.00")
+    })
+
+    it("still converts when the display can express it", () => {
+      // Anchors the negative above: the fallback must not swallow the normal path.
+      setCurrencyList([{ id: "NGN", symbol: "₦", fractionDigits: 2 }])
+      mockUsePriceConversion.mockReturnValue({
+        convertMoneyAmount: () => ({
+          amount: 150000,
+          currency: DisplayCurrency,
+          currencyCode: "NGN",
+        }),
+        displayCurrency: "NGN",
+        toDisplayMoneyAmount: mockToDisplayMoneyAmount,
+      })
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(
+        result.current.moneyAmountToDisplayCurrencyString({
+          moneyAmount: toUsdMoneyAmount(500),
+        }),
+      ).toBe("₦1,500")
+    })
+  })
 })

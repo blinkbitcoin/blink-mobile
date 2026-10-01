@@ -5,6 +5,7 @@ import { APPROXIMATE_PREFIX } from "@app/config"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
+import { SATS_DISPLAY_CURRENCY } from "@app/types/price"
 import {
   DisplayAmount,
   DisplayCurrency,
@@ -53,6 +54,18 @@ const usdDisplayCurrency = {
   symbol: "$",
   id: "USD",
   fractionDigits: 2,
+}
+
+/**
+ * The synthetic entry for the sats-only fallback. Not part of the currency list and
+ * never offered in the picker — `usePriceConversion` names it as the display currency
+ * only while no exchange rate can be found, and without an entry here every amount
+ * would render with the US dollar defaults below.
+ */
+const satsDisplayCurrency = {
+  symbol: "",
+  id: SATS_DISPLAY_CURRENCY,
+  fractionDigits: 0,
 }
 
 const defaultDisplayCurrency = usdDisplayCurrency
@@ -153,7 +166,9 @@ export const useDisplayCurrency = () => {
   )
 
   const displayCurrencyInfo =
-    displayCurrencyDictionary[displayCurrency] || defaultDisplayCurrency
+    displayCurrency === SATS_DISPLAY_CURRENCY
+      ? satsDisplayCurrency
+      : displayCurrencyDictionary[displayCurrency] || defaultDisplayCurrency
 
   const moneyAmountToMajorUnitOrSats = useCallback(
     (moneyAmount: MoneyAmount<WalletOrDisplayCurrency>) => {
@@ -276,8 +291,13 @@ export const useDisplayCurrency = () => {
         isApproximate,
         symbol: noSymbol ? "" : symbol,
         fractionDigits: showFractionDigits ? minorUnitToMajorUnitOffset : 0,
+        /** Sats carry their unit as a suffix rather than a symbol, and that holds
+         *  whether they arrive as a Bitcoin amount or as the display currency during
+         *  the sats-only fallback — a bare "1,000" would not say what it counts. */
         currencyCode:
-          moneyAmount.currency === WalletCurrency.Btc && !noSuffix
+          !noSuffix &&
+          (moneyAmount.currency === WalletCurrency.Btc ||
+            currencyCode === SATS_DISPLAY_CURRENCY)
             ? currencyCode
             : undefined,
       })
@@ -352,10 +372,20 @@ export const useDisplayCurrency = () => {
       if (!convertMoneyAmount) {
         return undefined
       }
-      return formatMoneyAmount({
-        moneyAmount: convertMoneyAmount(moneyAmount, DisplayCurrency),
-        isApproximate,
-      })
+      const converted = convertMoneyAmount(moneyAmount, DisplayCurrency)
+
+      /**
+       * A conversion the display currency cannot express — a held USDB balance while
+       * the app is in its sats-only fallback, with no rate to cross the two — comes
+       * back NaN, which `formatMoneyAmount` renders as an empty string. Show the amount
+       * in its own unit instead: a blank where a balance should be reads as money
+       * gone, and "$5.00" is both true and the best available.
+       */
+      if (Number.isNaN(converted.amount)) {
+        return formatMoneyAmount({ moneyAmount, isApproximate })
+      }
+
+      return formatMoneyAmount({ moneyAmount: converted, isApproximate })
     },
     [convertMoneyAmount, formatMoneyAmount],
   )

@@ -424,7 +424,7 @@ within a session, and the custodial regression.
 
 ---
 
-### Phase 11 — Sats-only when nothing can price
+### Phase 11 — Sats-only when nothing can price · done
 
 *Reopens what Phase 2b closed. The reasoning that closed it was wrong twice.*
 
@@ -503,6 +503,26 @@ Phase 7 cold-start spec and the custodial regression in the release gate.
 does not carry, and a cold start: home, receive and send all render in sats,
 an invoice can be produced, a payment can be sent, and one line on screen says
 why the amounts are not in the user's currency.
+
+**Landed**, with two things the implementation turned up.
+
+`priceStatus` stays `Unavailable` in sats-only mode. The converter exists, but
+there is no *fiat* price, and callers keyed on that status — the balance
+header's own sats fallback — would otherwise start behaving as though a rate
+had arrived. `usdPerSat` likewise returns null rather than the string `"NaN"`,
+which it would have done once the matrix was total.
+
+The dollar gap needed more than documenting. `moneyAmountToDisplayCurrencyString`
+rendered a `NaN` conversion as an empty string, so a Stable Balance holder's
+USDB row would have gone blank — and a blank where a balance should be reads as
+money gone. It now falls back to formatting the amount in its own unit, so that
+row shows `$5.00`. One general fix rather than a per-screen patch, and it states
+the phase's rule exactly: an amount the display currency cannot express is shown
+in the unit it is denominated in.
+
+Three older assertions pinned the behaviour this phase deliberately changes —
+two in the hook spec, two in the cold-start spec — and were rewritten to the new
+contract rather than loosened: the converter exists, the fiat price does not.
 
 ---
 
@@ -811,13 +831,12 @@ dependency.
 | 8 | Shared types out of the self-custodial module | — | Done |
 | 9 | Config seam pure again, clock injected | — | Done |
 | 10 | Price and currency behind a real port | 8 | Done |
-| 11 | Sats-only when nothing can price | 2b | |
+| 11 | Sats-only when nothing can price | 2b | Done |
 
 Phases 4 and 5 are independent of 2 and 3 and can run in parallel. Phase 2 is the
 one that must land first if only one does.
 
-Phase 11 reopens a decision Phase 2b got wrong and is the only outstanding
-behaviour change. Phases 8–10 change no behaviour; they are the architecture
-follow-up described above. 8 and 9 are mechanical and independent of each other. 10 depends on 8 and
+Phase 11 reopened a decision Phase 2b got wrong. Phases 8–10 changed no
+behaviour; they are the architecture follow-up described above. 8 and 9 are mechanical and independent of each other. 10 depends on 8 and
 is the only one carrying real regression risk, so it is worth deciding on
 deliberately rather than treating as cleanup.

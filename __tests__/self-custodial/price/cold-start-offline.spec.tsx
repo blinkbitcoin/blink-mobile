@@ -149,14 +149,30 @@ describe("a cold start with every Blink service unreachable", () => {
   })
 
   it("reports Unavailable, not a permanent Pending, when nothing was ever stored", async () => {
-    // This is what stops the home balance spinning forever: the caller can tell that
-    // no rate is coming and show sats instead.
+    // What stops the home balance spinning forever: the caller can tell that no rate
+    // is coming. The converter below still exists, in sats.
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(defaultPersistentState),
     })
 
     await waitFor(() => expect(result.current.priceStatus).toBe("unavailable"))
-    expect(result.current.convertMoneyAmount).toBeUndefined()
+    expect(result.current.usdPerSat).toBeNull()
+  })
+
+  it("falls back to sats rather than leaving screens without a converter", async () => {
+    // The worst case this whole phase exists for: a device that has never held a rate,
+    // with nothing reachable to supply one. Receive and send both bail on a missing
+    // converter, so without this they spin on a wallet that is otherwise healthy.
+    const { result } = renderHook(() => usePriceConversion(), {
+      wrapper: wrapperWith(defaultPersistentState),
+    })
+
+    await waitFor(() => expect(result.current.isSatsOnly).toBe(true))
+    expect(result.current.displayCurrency).toBe("SAT")
+    expect(
+      result.current.convertMoneyAmount?.(toBtcMoneyAmount(1000), DisplayCurrency)
+        ?.amount,
+    ).toBe(1000)
   })
 
   it("withholds a figure priced off a feed older than a day", async () => {
@@ -169,8 +185,10 @@ describe("a cold start with every Blink service unreachable", () => {
       wrapper: wrapperWith(state),
     })
 
-    // A day-old rate presented as today's is worse than no figure at all.
+    // A day-old rate presented as today's is worse than no figure at all, so the fiat
+    // price is withheld — and the amounts fall back to sats rather than disappearing.
     await waitFor(() => expect(result.current.priceStatus).toBe("unavailable"))
-    expect(result.current.convertMoneyAmount).toBeUndefined()
+    expect(result.current.isSatsOnly).toBe(true)
+    expect(result.current.displayCurrency).toBe("SAT")
   })
 })

@@ -4055,7 +4055,8 @@
     "payment": "Malipo"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Kiwango cha ubadilishaji huenda kimepitwa na wakati"
+    "notice": "Kiwango cha ubadilishaji huenda kimepitwa na wakati",
+    "satsOnly": "Inaonyesha sats — hakuna kiwango cha ubadilishaji"
   },
   "SelfCustodialOffline": {
     "title": "Pochi iko nje ya mtandao",

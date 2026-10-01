@@ -4055,7 +4055,8 @@
     "payment": "Betaling"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Vekselkursen er muligvis forældet"
+    "notice": "Vekselkursen er muligvis forældet",
+    "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {
     "title": "Pungen er offline",

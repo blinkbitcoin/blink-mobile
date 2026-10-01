@@ -4055,7 +4055,8 @@
     "payment": "Плаћање"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Курс можда није ажуран"
+    "notice": "Курс можда није ажуран",
+    "satsOnly": "Приказ у сатима — курс није доступан"
   },
   "SelfCustodialOffline": {
     "title": "Новчаник је ван мреже",

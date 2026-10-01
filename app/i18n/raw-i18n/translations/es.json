@@ -4055,7 +4055,8 @@
         "payment": "Pago"
     },
     "SelfCustodialStaleRate": {
-        "notice": "El tipo de cambio puede estar desactualizado"
+        "notice": "El tipo de cambio puede estar desactualizado",
+        "satsOnly": "Mostrando sats: no hay tipo de cambio disponible"
     },
     "SelfCustodialOffline": {
         "title": "La billetera está sin conexión",

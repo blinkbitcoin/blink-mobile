@@ -4055,7 +4055,8 @@
     "payment": "Platba"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Směnný kurz může být zastaralý"
+    "notice": "Směnný kurz může být zastaralý",
+    "satsOnly": "Zobrazeno v satech – není dostupný směnný kurz"
   },
   "SelfCustodialOffline": {
     "title": "Peněženka je offline",

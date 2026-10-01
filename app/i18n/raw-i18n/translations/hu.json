@@ -4055,7 +4055,8 @@
     "payment": "Fizetés"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Az árfolyam elavult lehet"
+    "notice": "Az árfolyam elavult lehet",
+    "satsOnly": "Satoshiban megjelenítve – nincs elérhető árfolyam"
   },
   "SelfCustodialOffline": {
     "title": "A pénztárca offline",

@@ -4055,7 +4055,8 @@
     "payment": "Pembayaran"
   },
   "SelfCustodialStaleRate": {
-    "notice": "Kadar pertukaran mungkin sudah lapuk"
+    "notice": "Kadar pertukaran mungkin sudah lapuk",
+    "satsOnly": "Memaparkan sats — tiada kadar pertukaran tersedia"
   },
   "SelfCustodialOffline": {
     "title": "Dompet luar talian",

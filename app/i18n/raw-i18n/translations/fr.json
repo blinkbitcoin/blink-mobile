@@ -4055,7 +4055,8 @@
         "payment": "Paiement"
     },
     "SelfCustodialStaleRate": {
-        "notice": "Le taux de change n'est peut-être plus à jour"
+        "notice": "Le taux de change n'est peut-être plus à jour",
+        "satsOnly": "Affichage en sats — aucun taux de change disponible"
     },
     "SelfCustodialOffline": {
         "title": "Le portefeuille est hors ligne",
