@@ -8,6 +8,7 @@ import { listFiatCurrencies, listFiatRates } from "@app/self-custodial/bridge/fi
 import { SelfCustodialFiatRatesProvider } from "@app/self-custodial/providers/fiat-rates"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { withSelfCustodialFiatCurrencies } from "@app/store/persistent-state/self-custodial-fiat-currencies"
 import { withSelfCustodialFiatRates } from "@app/store/persistent-state/self-custodial-fiat-rates"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 import { DisplayCurrency, toBtcMoneyAmount } from "@app/types/amounts"
@@ -51,6 +52,9 @@ jest.mock("@app/hooks/use-effective-display-currency", () => ({
 jest.mock("@app/graphql/generated", () => ({
   useRealtimePriceQuery: () => ({ data: undefined, loading: false }),
   useRealtimePriceUnauthedQuery: () => ({ data: undefined, loading: false }),
+  /** The currency list is a Blink service too, so it answers nothing here. The
+   *  fraction size has to come from the copy this device persisted. */
+  useCurrencyListQuery: () => ({ data: undefined, loading: false }),
   WalletCurrency: { Btc: "BTC", Usd: "USD" },
 }))
 
@@ -65,11 +69,25 @@ const mockedUsePersistentState = usePersistentStateContext as jest.MockedFunctio
   typeof usePersistentStateContext
 >
 
-/** One BTC is 150,000,000 NGN, so a sat is 1.5 NGN. */
+/** One BTC is 150,000,000 NGN, so a sat is 1.5 NGN — 150 kobo, which is the unit the
+ *  app works in. */
 const feed = [
   { coin: "USD", value: 100_000 },
   { coin: "NGN", value: 150_000_000 },
 ]
+
+/** Persisted beside the rates, and needed with them: Breez quotes whole units, so the
+ *  fraction size is what makes them comparable with the backend's minor-unit price. */
+const persistedCurrencies = [
+  { id: "NGN", flag: "🇳🇬", name: "Nigerian Naira", symbol: "₦", fractionDigits: 2 },
+  { id: "USD", flag: "🇺🇸", name: "US Dollar", symbol: "$", fractionDigits: 2 },
+]
+
+const storedWith = (rates: typeof feed, fetchedAt: number) =>
+  withSelfCustodialFiatCurrencies(
+    withSelfCustodialFiatRates(defaultPersistentState, { rates, fetchedAt }),
+    { currencies: persistedCurrencies, fetchedAt },
+  )
 
 const wrapperWith = (state: typeof defaultPersistentState) => {
   mockedUsePersistentState.mockImplementation(
@@ -100,11 +118,29 @@ describe("a cold start with every Blink service unreachable", () => {
     mockedListFiatCurrencies.mockRejectedValue(new Error("offline"))
   })
 
-  it("converts a balance from the feed this device persisted", async () => {
-    const state = withSelfCustodialFiatRates(defaultPersistentState, {
+  it("falls back to sats when the rates were stored without the currency metadata", async () => {
+    // Rates alone cannot be converted to fiat: Breez quotes whole units and the app
+    // works in minor ones, so without a fraction size the figure would be out by a
+    // factor of a hundred. Guessing is refused — and the sats fallback catches it, so
+    // the two mechanisms compose rather than leaving a screen with no converter.
+    const ratesOnly = withSelfCustodialFiatRates(defaultPersistentState, {
       rates: feed,
       fetchedAt: Date.now(),
     })
+
+    const { result } = renderHook(() => usePriceConversion(), {
+      wrapper: wrapperWith(ratesOnly),
+    })
+
+    await waitFor(() => expect(result.current.isSatsOnly).toBe(true))
+    expect(
+      result.current.convertMoneyAmount?.(toBtcMoneyAmount(1000), DisplayCurrency)
+        ?.amount,
+    ).toBe(1000)
+  })
+
+  it("converts a balance from the feed this device persisted", async () => {
+    const state = storedWith(feed, Date.now())
 
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(state),
@@ -114,15 +150,13 @@ describe("a cold start with every Blink service unreachable", () => {
       toBtcMoneyAmount(1000),
       DisplayCurrency,
     )
-    expect(converted?.amount).toBe(1500)
+    // 1,000 sats at 150 kobo each: 150,000 kobo, which renders as ₦1,500.00.
+    expect(converted?.amount).toBe(150_000)
     expect(converted?.currencyCode).toBe("NGN")
   })
 
   it("keeps converting after the refresh has failed", async () => {
-    const state = withSelfCustodialFiatRates(defaultPersistentState, {
-      rates: feed,
-      fetchedAt: Date.now(),
-    })
+    const state = storedWith(feed, Date.now())
 
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(state),
@@ -135,10 +169,7 @@ describe("a cold start with every Blink service unreachable", () => {
   })
 
   it("marks a day-old persisted feed stale, and still converts from it", () => {
-    const state = withSelfCustodialFiatRates(defaultPersistentState, {
-      rates: feed,
-      fetchedAt: Date.now() - 2 * 60 * 60 * 1000,
-    })
+    const state = storedWith(feed, Date.now() - 2 * 60 * 60 * 1000)
 
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(state),
@@ -176,10 +207,7 @@ describe("a cold start with every Blink service unreachable", () => {
   })
 
   it("withholds a figure priced off a feed older than a day", async () => {
-    const state = withSelfCustodialFiatRates(defaultPersistentState, {
-      rates: feed,
-      fetchedAt: Date.now() - 25 * 60 * 60 * 1000,
-    })
+    const state = storedWith(feed, Date.now() - 25 * 60 * 60 * 1000)
 
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(state),

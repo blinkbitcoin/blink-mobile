@@ -149,7 +149,13 @@ This covers everything the app's `Currency` type needs (`id`, `name`, `symbol`,
 Both open questions about this feed are now answered, from the shipped
 `libbreez_sdk_spark_bindings.so` rather than from the bindings' own prose:
 
-- **`Rate.value` is the price of one whole BTC denominated in `coin`.** The
+- **`Rate.value` is the price of one whole BTC denominated in `coin`, in *whole*
+  units of it.** Blink's `realtimePrice` is in *minor* units and says so in its
+  own type names — `PriceOfOneSatInMinorUnit`, `PriceOfOneUsdCentInMinorUnit` —
+  and a `DisplayCurrency` money amount holds minor units throughout the app. So
+  every Breez rate must be scaled by `10 ** fractionDigits` to mean the same
+  thing, and the fraction size is required rather than assumed: two is wrong for
+  yen, won and franc CFA. The
   bindings only call it "denominator in an exchange rate". The direction is
   settled by the SDK's own cross-chain code, which looks `"USD"` up in this feed
   and fails with `Cross-chain: BTC/USD rate not found in feed` — so the entry

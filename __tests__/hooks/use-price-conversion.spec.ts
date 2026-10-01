@@ -17,6 +17,17 @@ const mockUseEffectiveDisplayCurrency = jest.fn().mockReturnValue({
 })
 /** Defaulted at module scope, not only in `beforeEach`: one describe body below calls
  *  `renderHook` at collection time, before any hook has run. */
+/** Supplies the display currency's fraction size, which is what makes the SDK's
+ *  whole-unit rates comparable with the backend's minor-unit ones. */
+const mockUseCurrencyList = jest.fn().mockReturnValue({
+  currencyList: [
+    { id: "NGN", flag: "🇳🇬", name: "Nigerian Naira", symbol: "₦", fractionDigits: 2 },
+    { id: "USD", flag: "🇺🇸", name: "US Dollar", symbol: "$", fractionDigits: 2 },
+  ],
+  loading: false,
+  isUnavailable: false,
+})
+
 const mockUseFiatRates = jest.fn().mockReturnValue({
   rates: [],
   fetchedAt: null,
@@ -55,6 +66,9 @@ jest.mock("@app/hooks/use-effective-display-currency", () => ({
 }))
 jest.mock("@app/self-custodial/providers/fiat-rates", () => ({
   useFiatRates: () => mockUseFiatRates(),
+}))
+jest.mock("@app/hooks/use-currency-list", () => ({
+  useCurrencyList: () => mockUseCurrencyList(),
 }))
 
 const mockPriceData: MockUseRealtimePriceResponse = {
@@ -130,8 +144,9 @@ const noSdkRates = {
   refresh: jest.fn(),
 }
 
-/** One BTC is 150,000,000 NGN and 100,000 USD here, so a sat is 1.5 NGN and a US cent
- *  is 15 NGN — the same market the mocked backend price quotes. */
+/** One BTC is 150,000,000 NGN and 100,000 USD here, so a sat is 1.5 NGN — 150 kobo —
+ *  and a US cent is 15 NGN, or 1,500 kobo. The app works in minor units throughout, so
+ *  those are the numbers the conversions below produce. */
 const sdkFeed = [
   { coin: "USD", value: 100_000 },
   { coin: "NGN", value: 150_000_000 },
@@ -340,7 +355,8 @@ describe("usePriceConversion", () => {
         toBtcMoneyAmount(1000),
         DisplayCurrency,
       )
-      expect(converted?.amount).toBe(1500)
+      // 1,000 sats at 150 kobo each: 150,000 kobo, which renders as ₦1,500.00.
+      expect(converted?.amount).toBe(150_000)
       expect(converted?.currencyCode).toBe("NGN")
     })
 
@@ -427,7 +443,7 @@ describe("usePriceConversion", () => {
       expect(
         result.current.convertMoneyAmount?.(toBtcMoneyAmount(1000), DisplayCurrency)
           ?.amount,
-      ).toBe(1500)
+      ).toBe(150_000)
     })
 
     it("reads Expired when neither source can price the account", () => {
