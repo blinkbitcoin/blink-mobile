@@ -15,6 +15,7 @@ import { TemporarilyUnavailableScreen } from "@app/screens/feature-unavailable/t
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { WindDownStatus } from "@app/types/wind-down"
 import { reportError } from "@app/utils/error-logging"
+import { toastShow } from "@app/utils/toast"
 import { testProps } from "@app/utils/testProps"
 
 import {
@@ -23,6 +24,7 @@ import {
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
+import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/use-reusable-pending-wallet"
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
@@ -74,11 +76,48 @@ export const MigrationGate: React.FC = () => {
    *  already recorded this account as migrating and the transfer will claim its balance. */
   const {
     isLocked: isMigrationLocked,
+    isCompleted: isMigrationCompleted,
     loading: lockLoading,
     hasError: lockError,
     refetch: refetchLock,
   } = useMigrationLock()
-  const isExitBlocked = isGated || isMigrationLocked
+  /** A completed migration has nothing left for the closed gate to hold the user to, so
+   *  reaching it anyway (a deeplink, a support reset) never leaves them without a way out. */
+  const isGateExitBlocked = isGated && !isMigrationCompleted
+  const isExitBlocked = isGateExitBlocked || isMigrationLocked
+  /**
+   * The blocker reads the phase once per launch on its own instance, so it can hold a stale
+   * answer this gate has already moved past. It is only ever asked to read again while it
+   * is up: a re-read that fails then leaves it exactly where it was, whereas refreshing a
+   * blocker the user is already past could fail and bring it back over their session.
+   */
+  const { isVisible: isBlockerVisible, refetch: refetchBlocker } = useMigrationBlocker()
+  const refreshVisibleBlocker = useCallback(async (): Promise<void> => {
+    if (!isBlockerVisible) return
+    await refetchBlocker()
+  }, [isBlockerVisible, refetchBlocker])
+
+  /** A completed migration seen here means a blocker still up is holding a stale answer,
+   *  with the gate stuck as the root screen and no error to retry from: asking it to read
+   *  again is what lifts it. A read that fails again leaves the gate where it is. */
+  useEffect(() => {
+    if (!isMigrationCompleted) return
+    refreshVisibleBlocker().catch(() => undefined)
+  }, [isMigrationCompleted, refreshVisibleBlocker])
+
+  /** Every close on this screen (the intro, the API-service warning, the dollar modal).
+   *  Pushed as a route it simply goes back; as the root blocker there is nothing behind it,
+   *  which only a completed migration can reach with a close on offer, so closing asks the
+   *  blocker to read again, and says so when that read fails rather than doing nothing. */
+  const exitGate = useCallback(() => {
+    if (navigation.canGoBack()) {
+      navigation.goBack()
+      return
+    }
+    refreshVisibleBlocker().catch(() => {
+      toastShow({ message: LL.errors.generic(), LL })
+    })
+  }, [navigation, refreshVisibleBlocker, LL])
   const [isApiWarningAcknowledged, setIsApiWarningAcknowledged] = useState(false)
 
   /** While a pushed screen (the dollar transfer) has focus the modal hides instead of
@@ -107,10 +146,6 @@ export const MigrationGate: React.FC = () => {
 
   const acknowledgeApiWarning = useCallback(() => setIsApiWarningAcknowledged(true), [])
 
-  const exitFlow = useCallback(() => {
-    navigation.goBack()
-  }, [navigation])
-
   const goToDollarTransfer = useCallback(() => {
     /** Arm the flag before navigating so the convert screen waives its region restriction
      *  for this migration step (see drain-conversion); the deep-linkable route is
@@ -129,6 +164,7 @@ export const MigrationGate: React.FC = () => {
         refetchApiKeys(),
         refetchBalances(),
         refetchLock(),
+        refreshVisibleBlocker(),
         refetchCheckpoint(),
         refetchPendingWallet(),
       ])
@@ -141,6 +177,7 @@ export const MigrationGate: React.FC = () => {
     refetchApiKeys,
     refetchBalances,
     refetchLock,
+    refreshVisibleBlocker,
     refetchCheckpoint,
     refetchPendingWallet,
   ])
@@ -298,7 +335,7 @@ export const MigrationGate: React.FC = () => {
   if (shouldWarnAboutApiKeys) {
     /** Same close rules as the "Time to upgrade" screen: closable until the way out is
      *  blocked by the armed gate or by a locked migration. */
-    const apiCloseAction = isExitBlocked ? undefined : exitFlow
+    const apiCloseAction = isExitBlocked ? undefined : exitGate
     return (
       <MigrationApiServiceScreen
         onContinue={acknowledgeApiWarning}
@@ -316,10 +353,14 @@ export const MigrationGate: React.FC = () => {
     const canCloseDollarModal = !isExitBlocked
     return (
       <>
-        <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
+        <MigrationRequiredScreen
+          mode={mode}
+          isExitBlocked={isExitBlocked}
+          onClose={exitGate}
+        />
         <DollarBalanceMigrationModal
           isVisible={isFocused}
-          toggleModal={exitFlow}
+          toggleModal={exitGate}
           onTransfer={goToDollarTransfer}
           showCloseIconButton={canCloseDollarModal}
         />
@@ -327,7 +368,13 @@ export const MigrationGate: React.FC = () => {
     )
   }
 
-  return <MigrationRequiredScreen mode={mode} isExitBlocked={isExitBlocked} />
+  return (
+    <MigrationRequiredScreen
+      mode={mode}
+      isExitBlocked={isExitBlocked}
+      onClose={exitGate}
+    />
+  )
 }
 
 const useStyles = makeStyles(() => ({

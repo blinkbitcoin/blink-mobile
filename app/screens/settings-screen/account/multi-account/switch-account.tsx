@@ -9,6 +9,7 @@ import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePendingMigrationAccounts } from "@app/screens/account-migration/hooks"
+import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 
 import { ProfileRow } from "../../self-custodial/profile-row"
 
@@ -28,12 +29,28 @@ export const SwitchAccount: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { selfCustodialEntries, activeAccount } = useAccountRegistry()
-  const { pendingAccountIds } = usePendingMigrationAccounts()
+  const { pendingAccountIds, pendingForActiveAccount } = usePendingMigrationAccounts()
+  const { isCompleted: isMigrationCompleted } = useMigrationLock()
 
-  /** Wallets provisioned mid-migration stay hidden until the flow activates them: an
-   *  empty, unbacked account must never be switchable from here. */
-  const visibleSelfCustodialEntries = selfCustodialEntries.filter(
-    (entry) => entry.id === activeAccount?.id || !pendingAccountIds.has(entry.id),
+  /**
+   * Wallets provisioned mid-migration stay hidden until the flow activates them: an empty,
+   * unbacked account must never be switchable from here.
+   *
+   * Except the active account's own once the server completed its migration. The funds
+   * have left the custodial account for that wallet, so hiding it strands them whenever the
+   * automatic swap cannot finish (the receive is not confirmed, or the app never gets that
+   * far). The custodial account stays in the list, so switching is never one-way. The
+   * automatic swap, which also closes the custodial account, runs while that account is
+   * the active one: a user who switched by hand finishes it by switching back.
+   */
+  const completedMigrationWalletId = isMigrationCompleted ? pendingForActiveAccount : null
+  const isSwitchable = (entryId: string): boolean => {
+    if (entryId === activeAccount?.id) return true
+    if (entryId === completedMigrationWalletId) return true
+    return !pendingAccountIds.has(entryId)
+  }
+  const visibleSelfCustodialEntries = selfCustodialEntries.filter((entry) =>
+    isSwitchable(entry.id),
   )
 
   const [profiles, setProfiles] = useState<ProfileProps[]>([])
