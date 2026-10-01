@@ -1,6 +1,7 @@
 import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import {
+  useBackupTargetAccountId,
   useWalletIdentity,
   useWalletMnemonic,
   useWalletMnemonicState,
@@ -62,6 +63,72 @@ const setNoActiveAccount = (): void => {
   mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
   mockUseAccountRegistry.mockReturnValue({ activeAccount: undefined })
 }
+
+/**
+ * Every step of a backup flow has to agree on which account it is acting on.
+ * Mid-migration the active account is still custodial while the phrase, the
+ * identity and the recovery bundle belong to the provisioned one, so reading
+ * from one and writing to the other records an opt-in where nothing will ever
+ * look for it.
+ */
+describe("useBackupTargetAccountId", () => {
+  it("is the active account once it is self-custodial", () => {
+    setActiveSelfCustodial()
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: MIGRATION_ACCOUNT_ID })
+
+    const { result } = renderHook(() => useBackupTargetAccountId())
+
+    // A stale checkpoint must not outrank the account the user is actually on.
+    expect(result.current).toBe(ACCOUNT_ID)
+  })
+
+  it("is the provisioned account while the active one is still custodial", () => {
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: "custodial-uuid", type: AccountType.Custodial },
+    })
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: MIGRATION_ACCOUNT_ID })
+
+    const { result } = renderHook(() => useBackupTargetAccountId())
+
+    expect(result.current).toBe(MIGRATION_ACCOUNT_ID)
+  })
+
+  /** useActiveWallet().isSelfCustodial also encodes SDK availability, so it
+   *  reads false on the initial renders at cold start and right after an
+   *  account switch. Branching on it would hand back the migration id - null
+   *  here - and drop the target for a user whose SDK is merely still starting. */
+  it("is the active account even while the SDK is still unavailable", () => {
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: false })
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: { id: ACCOUNT_ID, type: AccountType.SelfCustodial },
+    })
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
+
+    const { result } = renderHook(() => useBackupTargetAccountId())
+
+    expect(result.current).toBe(ACCOUNT_ID)
+  })
+
+  it("is null when self-custodial with no active account loaded yet", () => {
+    mockUseActiveWallet.mockReturnValue({ isSelfCustodial: true })
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: undefined })
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
+
+    const { result } = renderHook(() => useBackupTargetAccountId())
+
+    expect(result.current).toBeNull()
+  })
+
+  it("is null when custodial with no migration in flight", () => {
+    setNoActiveAccount()
+    mockUseMigrationCheckpoint.mockReturnValue({ accountId: null })
+
+    const { result } = renderHook(() => useBackupTargetAccountId())
+
+    expect(result.current).toBeNull()
+  })
+})
 
 describe("useWalletMnemonic", () => {
   beforeEach(() => {

@@ -577,6 +577,62 @@ describe("useRecoveryBundleActions", () => {
       )
     })
 
+    it("reports success when the share sheet completes", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let didShare: boolean | undefined
+      await act(async () => {
+        didShare = await result.current.handleShare()
+      })
+
+      expect(didShare).toBe(true)
+    })
+
+    /** react-native-share rejects with this message when the sheet is
+     *  dismissed. It stays silent - a dismissal is a choice, not a failure -
+     *  but the caller has to hear about it, or it confirms an export that never
+     *  happened. */
+    it("reports failure without a toast when the user dismisses the sheet", async () => {
+      mockShareOpen.mockRejectedValue(new Error("User did not share"))
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let didShare: boolean | undefined
+      await act(async () => {
+        didShare = await result.current.handleShare()
+      })
+
+      expect(didShare).toBe(false)
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("reports failure and toasts when the share genuinely fails", async () => {
+      mockShareOpen.mockRejectedValue(new Error("no activity found"))
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let didShare: boolean | undefined
+      await act(async () => {
+        didShare = await result.current.handleShare()
+      })
+
+      expect(didShare).toBe(false)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not export the recovery backup" }),
+      )
+    })
+
+    it("reports failure when no bundle is saved to export", async () => {
+      mockLoadEncryptedBundleFile.mockResolvedValue(null)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let didShare: boolean | undefined
+      await act(async () => {
+        didShare = await result.current.handleShare()
+      })
+
+      expect(didShare).toBe(false)
+    })
+
     it("toasts noBundleToExport and never opens the share sheet when no bundle is saved", async () => {
       mockLoadEncryptedBundleFile.mockResolvedValue(null)
       const { result } = renderHook(() => useRecoveryBundleActions())
@@ -601,7 +657,7 @@ describe("useRecoveryBundleActions", () => {
       )
       const { result } = renderHook(() => useRecoveryBundleActions())
 
-      let sharePromise: Promise<void> = Promise.resolve()
+      let sharePromise: Promise<boolean> = Promise.resolve(false)
       act(() => {
         sharePromise = result.current.handleShare()
       })

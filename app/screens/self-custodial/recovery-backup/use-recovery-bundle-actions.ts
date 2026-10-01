@@ -55,7 +55,11 @@ export type RecoveryBundleActions = {
   copying: boolean
   reloadState: () => Promise<void>
   handleRefresh: () => Promise<void>
-  handleShare: () => Promise<void>
+  /** Resolves false when nothing was exported - a dismissed sheet, no saved
+   *  bundle, or a failure already reported to the user. Callers that advance
+   *  the flow must gate on it: confirming a file that never left the device is
+   *  the one thing this export must not do. */
+  handleShare: () => Promise<boolean>
   handleCopy: () => Promise<void>
   handleCloudUpload: () => Promise<void>
   handleSetAutoRefresh: (enabled: boolean) => Promise<void>
@@ -178,12 +182,12 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     return JSON.stringify(bundle, null, 2)
   }
 
-  const handleShare = async () => {
-    if (exportAction) return
+  const handleShare = async (): Promise<boolean> => {
+    if (exportAction) return false
     setExportAction("share")
     try {
       const json = await loadDecryptedBundleJson()
-      if (!json) return
+      if (!json) return false
       // `useInternalStorage` is honored by the Android native module
       // (ShareIntent.java) but missing from the lib's ShareOptions type.
       // Android writes data: URLs to a file before sharing; keep the
@@ -196,12 +200,17 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         useInternalStorage: true,
       }
       await Share.open(options)
+      return true
     } catch (err) {
+      /** Dismissing the sheet is a choice, not a failure, so it stays silent -
+       *  but it still has to read as "nothing was exported" to the caller,
+       *  which otherwise confirms a file that never left the device. */
       const userCancelled =
         err instanceof Error && /User did not share/i.test(err.message)
       if (!userCancelled) {
         recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
       }
+      return false
     } finally {
       setExportAction(null)
     }

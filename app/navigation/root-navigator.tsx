@@ -142,6 +142,8 @@ import {
   ViewBackupSecurityChecksScreen,
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
+  BundleExportScreen,
+  BundleSavedScreen,
   BackupSuccessScreen,
   ChooseExperienceScreen,
   WalletCreationScreen,
@@ -262,6 +264,7 @@ const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
 const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
 
+// eslint-disable-next-line max-lines-per-function -- RootStack is one flat route table; splitting it solely to meet the line cap would scatter screen registrations that are read as a single list
 export const RootStack = () => {
   const styles = useStyles()
   const {
@@ -909,6 +912,18 @@ export const RootStack = () => {
         options={{
           title: LL.BackupScreen.ManualBackup.Confirm.headerTitle(),
         }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBackupBundleExport"
+        component={BundleExportScreen}
+        options={{
+          title: LL.BackupScreen.BundleExport.title(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialBundleSaved"
+        component={BundleSavedScreen}
+        options={{ headerShown: false, gestureEnabled: false }}
       />
       <RootNavigator.Screen
         name="selfCustodialBackupSuccess"
