@@ -40,10 +40,6 @@ export const useCurrencyList = (): CurrencyListResult => {
   const isSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
   const { currencies: sdkCurrencies, hasSettled: sdkHasSettled } = useFiatRates()
 
-  const selfCustodialSource = isSelfCustodial
-    ? createSelfCustodialCurrencyList(sdkCurrencies, sdkHasSettled)
-    : noCurrencyListSource
-
   /**
    * Asked even when the SDK has a list, because the backend is the authority on the
    * *wording* — see `withPreferredNames`. It is a public, rarely-changing query served
@@ -52,10 +48,22 @@ export const useCurrencyList = (): CurrencyListResult => {
    * an earlier pass had removed.
    */
   const { data, loading } = useCurrencyListQuery({ fetchPolicy: "cache-and-network" })
-  const backendSource = createCustodialCurrencyList(data?.currencyList, loading)
+  const backendCurrencies = data?.currencyList
 
+  /**
+   * Memoised on the underlying arrays and flags rather than on the two source objects,
+   * which are built fresh on every render — depending on those made this recompute
+   * every time, and the returned list a new array every time. The currency screen keys
+   * an effect on that list to seed its filtered rows, so an unstable identity wiped the
+   * user's search on the very next render as they typed.
+   */
   return useMemo(() => {
+    const selfCustodialSource = isSelfCustodial
+      ? createSelfCustodialCurrencyList(sdkCurrencies, sdkHasSettled)
+      : noCurrencyListSource
+    const backendSource = createCustodialCurrencyList(backendCurrencies, loading)
     const source = firstPopulatedCurrencyList(selfCustodialSource, backendSource)
+
     if (source.currencies.length > 0) {
       return {
         currencyList: withPreferredNames(source.currencies, backendSource.currencies),
@@ -72,5 +80,5 @@ export const useCurrencyList = (): CurrencyListResult => {
       loading: !source.hasSettled && !isUnavailable,
       isUnavailable,
     }
-  }, [selfCustodialSource, backendSource, isSelfCustodial])
+  }, [isSelfCustodial, sdkCurrencies, sdkHasSettled, backendCurrencies, loading])
 }
