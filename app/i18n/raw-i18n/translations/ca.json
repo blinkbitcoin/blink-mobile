@@ -2354,6 +2354,8 @@
     "invalidAmount": "Això conté un import invàlid. Si us plau torna-ho a generar amb un import vàlid.",
     "usernameDoesNotExist": "{lnAddress: string} no sembla ser una {bankName: string} adreça existent.",
     "usernameDoesNotExistAdvice": "Assegurat que l'ortografia sigui correcta o demana al destinatari una factura LN o una adreça BTC.",
+    "destinationUnverifiable": "No hem pogut comprovar {lnAddress} ara mateix: els servidors de {bankName} no responen.",
+    "destinationUnverifiableAdvice": "És probable que l'adreça sigui correcta. Torna-ho a provar d'aquí a un moment o demana al destinatari una factura LN o una adreça BTC.",
     "selfPaymentError": "{lnAddress: string} és la teva adreça {bankName: string} .",
     "selfPaymentAdvice": "Si vols enviar diners a un altre compte teu, pots utilitzar una adreça de factura, LN o BTC.",
     "lnAddressError": "No podem contactar a aquesta adreça de Lightning. Si estas segur que existeix, tornar-ho a provar més tard.",
@@ -2741,6 +2743,7 @@
       "tooLong": "L'adreça pot ser com a màxim de 50 caràcters",
       "invalidCharacter": "L'adreça només pot contenir lletres, números i guions baixos",
       "addressUnavailable": "Ho sentim, aquesta adreça ja està presa",
+      "serverUnreachable": "No s'ha pogut contactar amb el servidor d'adreces. La teva adreça encara està lliure: torna-ho a provar d'aquí a un moment.",
       "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink no està disponible",
+    "unreachableDescription": "{featureName} necessita els servidors de Blink, que ara mateix no responen. La teva cartera i els teus fons no es veuen afectats.",
     "featureCircles": "Circles",
     "featureEarn": "Aprendre",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "Transferència {token}",
     "payTo": "Pagar a {address}",
     "payment": "Pagament"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "El tipus de canvi pot estar desactualitzat",
+    "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {
     "title": "La cartera està fora de línia",

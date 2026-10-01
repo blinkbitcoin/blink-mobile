@@ -2354,6 +2354,8 @@
     "invalidAmount": "Սա պարունակում է անվավեր չափ։ Խնդրում ենք վերաստեղծել վավեր չափով։ ",
     "usernameDoesNotExist": "{lnAddress: string}, կարծես, գոյություն ունեցող {bankName: string} հասցե չէ։ ",
     "usernameDoesNotExistAdvice": "Կամ համոզվեք, որ ուղղագրությունը ճիշտ է, կամ դրա փոխարեն ստացողից խնդրեք Lightning ցանցի վճարման հարցում կամ BTC հասցե:",
+    "destinationUnverifiable": "Այս պահին չհաջողվեց ստուգել {lnAddress}-ը — {bankName}-ի սերվերները չեն պատասխանում։",
+    "destinationUnverifiableAdvice": "Հասցեն ամենայն հավանականությամբ ճիշտ է։ Փորձեք մի պահից նորից կամ ստացողից խնդրեք LN հաշիվ կամ BTC հասցե։",
     "selfPaymentError": "{lnAddress: string}ը Ձեր {bankName: string} հասցեն է։ ",
     "selfPaymentAdvice": "Եթե Դուք ցանկանում եք գումար ուղարկել Ձեր մեկ այլ հաշվի, ապա փոխարենը Դուք կարող եք օգտագործել վճարման հարցում, Lightning ցանց կամ BTC հարսցե։ ",
     "lnAddressError": "Մենք չենք կարողանում կապ հաստատել այս Lightning հասցեի հետ։ Եթե Դուք վստահ եք, որ այն գոյություն ունի, մի փոքր ուշ կարող եք կրկին փորձել։",
@@ -2741,6 +2743,7 @@
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
       "invalidCharacter": "րՀասցեն կարող է ունենալ միայն նամակներ, թվեր, և ստորագծեր",
       "addressUnavailable": "Ներողություն, այս հասցեն արդեն կիրառվում է",
+      "serverUnreachable": "Հասցեների սերվերը հասանելի չէ։ Ձեր հասցեն դեռ ազատ է — փորձեք մի պահից նորից։",
       "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Մուտք գործեք ձեր պահառու հաշվին՝ {featureName: string} օգտագործելու համար։",
     "noAccountTitle": "Պահառու հաշիվ է պահանջվում",
     "noAccountDescription": "{featureName: string}-ի համար անհրաժեշտ է Blink պահառու հաշիվ։",
+    "unreachableTitle": "Blink-ը հասանելի չէ",
+    "unreachableDescription": "{featureName}-ին անհրաժեշտ են Blink-ի սերվերները, որոնք այս պահին չեն պատասխանում։ Ձեր դրամապանակը և միջոցները չեն տուժում։",
     "featureCircles": "Circles",
     "featureEarn": "Սովորել",
     "featureCard": "Քարտ"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "{token} փոխանցում",
     "payTo": "Վճարել՝ {address}",
     "payment": "Վճարում"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Փոխարժեքը կարող է հնացած լինել",
+    "satsOnly": "Ցուցադրվում է sats-ով — փոխարժեք հասանելի չէ"
   },
   "SelfCustodialOffline": {
     "title": "Դրամապանակը անցանց է",

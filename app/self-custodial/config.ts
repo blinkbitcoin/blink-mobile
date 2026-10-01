@@ -54,12 +54,33 @@ export const lnurlDomainsFor = (network: Network): string[] =>
     : [lnurlDomainFor(network), REGTEST_PAY_DOMAIN]
 
 /**
- * Base URL of the LNURL server for a self-custodial account: the same host its address is
- * spelled with, which is what serves the authenticated `/lnurlpay/{pubkey}` routes. Not
- * the custodial `lnAddressHostname` — `pay.*` fronts the payment app and 404s them.
+ * Where an account's Lightning Address lives: the base URL the app makes its own signed
+ * requests against, and the domain the SDK registers and resolves against at connect.
+ * Both spell the same host — not the custodial `lnAddressHostname`, since `pay.*` fronts
+ * the payment app and 404s the `/lnurlpay/{pubkey}` routes.
  */
-export const lnurlServerUrlFor = (network: Network): string =>
-  `https://${lnurlDomainFor(network)}`
+export type LnurlServer = {
+  serverUrl: string
+  domain: string
+}
+
+/**
+ * Pure in both arguments. `outageHost` is the developer-only override from
+ * `app/config/simulated-outage.ts`, passed in rather than read here so this function
+ * says what it depends on and a caller cannot be surprised by a switch it cannot see.
+ *
+ * The override reaches the SDK's own requests without touching {@link lnurlDomainsFor},
+ * which decides whether a scanned code names an account we issued: black-holing that
+ * would change parsing rather than connectivity.
+ */
+export const resolveLnurlServer = (
+  network: Network,
+  outageHost: string | null,
+): LnurlServer => {
+  if (outageHost) return { serverUrl: `http://${outageHost}`, domain: outageHost }
+  const domain = lnurlDomainFor(network)
+  return { serverUrl: `https://${domain}`, domain }
+}
 
 /**
  * Returns the wallet's stored network label when it conflicts with the current

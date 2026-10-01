@@ -2354,6 +2354,8 @@
     "invalidAmount": "Obsahuje neplatnú sumu. Vytvorte znova a zadajte platnú sumu.",
     "usernameDoesNotExist": "Príjemca {lnAddress: string} s adresou {bankName: string} pravdepodobne neexistuje.",
     "usernameDoesNotExistAdvice": "Uistite sa, že máte správny text, alebo požiadajte príjemcu o LN faktúru alebo BTC adresu.",
+    "destinationUnverifiable": "Teraz sa nepodarilo overiť {lnAddress} – servery {bankName} neodpovedajú.",
+    "destinationUnverifiableAdvice": "Adresa je pravdepodobne v poriadku. Skúste to o chvíľu znova alebo požiadajte príjemcu o LN faktúru či BTC adresu.",
     "selfPaymentError": "{lnAddress: string} je vaša {bankName: string} adresa.",
     "selfPaymentAdvice": "Ak chcete poslať peniaze na iný účet, ktorý vlastníte, použite LN faktúru alebo adresu, prípadne BTC adresu.",
     "lnAddressError": "Na túto Lightning adresu sa nemôžeme pripojiť. Ak ste si istí, že existuje, skúste to prosím neskôr.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Adresa môže mať maximálne 50 znakov",
       "invalidCharacter": "Adresa môže obsahovať iba písmená, číslice a podčiarkovníky.",
       "addressUnavailable": "Táto adresa je už obsadená",
+      "serverUnreachable": "Nepodarilo sa spojiť so serverom adries. Vaša adresa je stále voľná – skúste to o chvíľu znova.",
       "unknownError": "Došlo k neznámej chybe, skúste to prosím neskôr",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink je nedostupný",
+    "unreachableDescription": "{featureName} potrebuje servery Blinku, ktoré práve neodpovedajú. Vaša peňaženka a prostriedky nie sú dotknuté.",
     "featureCircles": "Circles",
     "featureEarn": "Učiť sa",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "{token} prevod",
     "payTo": "Zaplatiť na {address}",
     "payment": "Platba"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Výmenný kurz môže byť zastaraný",
+    "satsOnly": "Zobrazené v satoch – výmenný kurz nie je dostupný"
   },
   "SelfCustodialOffline": {
     "title": "Peňaženka je offline",

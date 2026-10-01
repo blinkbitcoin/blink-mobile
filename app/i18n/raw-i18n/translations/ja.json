@@ -2354,6 +2354,8 @@
         "invalidAmount": "無効な金額が含まれています。有効な金額で再発行してください。",
         "usernameDoesNotExist": "{lnAddress: string}は、{bankName: string}アドレスとして存在しないようです。",
         "usernameDoesNotExistAdvice": "スペルが正しいことを確認するか、代わりにライトニング・インボイスまたはビットコイン・アドレスを受金者にお尋ねください。",
+        "destinationUnverifiable": "現在 {lnAddress} を確認できませんでした。{bankName} のサーバーが応答していません。",
+        "destinationUnverifiableAdvice": "アドレスは問題ない可能性が高いです。少し待って再試行するか、受取人に LN 請求書か BTC アドレスを尋ねてください。",
         "selfPaymentError": "{lnAddress: string}は、あなたの{bankName: string}アドレスです。",
         "selfPaymentAdvice": "あなたが所有している別ウォレットに送金したい場合は、代わりにライトニング・インボイス、またはビットコイン・アドレスを使用することができます。",
         "lnAddressError": "このライトニング・アドレスにアクセスできません。アドレスに誤りがない場合は、のちほど再トライしてください。",
@@ -2741,6 +2743,7 @@
             "tooLong": "アドレスは50文字以上でなければなりません",
             "invalidCharacter": "アドレスにはアルファベット、数字、アンダースコアのみ使用できます",
             "addressUnavailable": "申し訳ありませんが、このアドレスは既に使われています",
+            "serverUnreachable": "アドレスサーバーに接続できませんでした。あなたのアドレスはまだ空いています。少し待って再試行してください。",
             "unknownError": "不明なエラーが発生しました。時間をあけてもう一度トライしてみてください",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -4026,6 +4029,8 @@
         "signInDescription": "Sign in to your custodial account to use {featureName}.",
         "noAccountTitle": "Custodial account required",
         "noAccountDescription": "{featureName} requires a Blink custodial account.",
+        "unreachableTitle": "Blink に接続できません",
+        "unreachableDescription": "{featureName} には Blink のサーバーが必要ですが、現在応答していません。ウォレットと資金に影響はありません。",
         "featureCircles": "Circles",
         "featureEarn": "学ぶ",
         "featureCard": "Card"
@@ -4048,6 +4053,10 @@
         "tokenTransfer": "{token}送金",
         "payTo": "{address}に支払い",
         "payment": "支払い"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "為替レートが最新でない可能性があります",
+        "satsOnly": "sats で表示中 — 為替レートを取得できません"
     },
     "SelfCustodialOffline": {
         "title": "ウォレットはオフラインです",

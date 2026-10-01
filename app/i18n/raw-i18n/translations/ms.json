@@ -2354,6 +2354,8 @@
     "invalidAmount": "Amaun yang salah. Mohon buat semula amaun yang tepat.",
     "usernameDoesNotExist": "Alamat {lnAddress: string} tak sama macam alamat {bankName: string} yang ada",
     "usernameDoesNotExistAdvice": "Pastikan ejaan betul atau minta penerima invois LN atau alamat BTC",
+    "destinationUnverifiable": "Kami tidak dapat menyemak {lnAddress} sekarang — pelayan {bankName} tidak memberi respons.",
+    "destinationUnverifiableAdvice": "Alamat itu berkemungkinan besar betul. Cuba lagi sebentar, atau minta penerima memberikan invois LN atau alamat BTC.",
     "selfPaymentError": "{lnAddress: string} adalah alamat {bankName: string} anda",
     "selfPaymentAdvice": "Jika anda nak hantar wang kepada akaun lain kepunyaan anda, anda boleh gunakan invois, LN atau alamat BTC ",
     "lnAddressError": "Kami tak dapat nak capai alamat LN ini. Jika anda pasti alamat ini betul, sila cuba lagi.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Panjang alamat maksimum adalah 50 aksara",
       "invalidCharacter": "Alamat hanya boleh mengandungi huruf, nombor dan underscores sahaja",
       "addressUnavailable": "Maaf, alamat ini sudah ada pemiliknya ",
+      "serverUnreachable": "Tidak dapat menghubungi pelayan alamat. Alamat anda masih tersedia — cuba lagi sebentar.",
       "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali.",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tidak dapat dihubungi",
+    "unreachableDescription": "{featureName} memerlukan pelayan Blink, yang tidak memberi respons buat masa ini. Dompet dan dana anda tidak terjejas.",
     "featureCircles": "Circles",
     "featureEarn": "Belajar",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "Pemindahan {token}",
     "payTo": "Bayar kepada {address}",
     "payment": "Pembayaran"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Kadar pertukaran mungkin sudah lapuk",
+    "satsOnly": "Memaparkan sats — tiada kadar pertukaran tersedia"
   },
   "SelfCustodialOffline": {
     "title": "Dompet luar talian",
