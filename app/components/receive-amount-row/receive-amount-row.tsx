@@ -1,14 +1,10 @@
 import React, { useState } from "react"
 import { Pressable, View } from "react-native"
-import Animated from "react-native-reanimated"
-
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text } from "@rn-vui/themed"
 
 import { AmountInputModal } from "@app/components/amount-input/amount-input-modal"
-import { useAlternatingSpin } from "@app/components/animations"
-import { CurrencyPill, useEqualPillWidth } from "@app/components/atomic/currency-pill"
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
+import { WalletSwitch } from "@app/components/wallet-switch"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details"
@@ -78,18 +74,11 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
   disabled,
 }) => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
   const { formatMoneyAmount, getSecondaryAmountIfCurrencyIsDifferent } =
     useDisplayCurrency()
   const [isPressed, setIsPressed] = useState(false)
   const [isModalOpen, setIsModalOpen] = useState(false)
-  const { widthStyle: pillWidthStyle, onPillLayout } = useEqualPillWidth({
-    labels: { BTC: LL.common.bitcoin(), USD: LL.common.dollar() },
-  })
-  const { triggerSpin, spinStyle } = useAlternatingSpin()
 
   const { formattedPrimary, formattedSecondary } = formatAmounts({
     unitOfAccountAmount,
@@ -130,25 +119,14 @@ export const ReceiveAmountRow: React.FC<ReceiveAmountRowProps> = ({
         </Pressable>
         <Pressable
           style={styles.walletSection}
-          onPress={() => {
-            triggerSpin()
-            onToggleWallet()
-          }}
+          onPress={onToggleWallet}
           onPressIn={() => setIsPressed(true)}
           onPressOut={() => setIsPressed(false)}
           disabled={!canToggleWallet}
           accessibilityRole="button"
           accessibilityLabel="Toggle wallet"
         >
-          <Animated.View style={[spinStyle, !canToggleWallet && styles.iconHidden]}>
-            <GaloyIcon name="refresh" size={16} color={colors.grey1} />
-          </Animated.View>
-          <CurrencyPill
-            currency={walletCurrency}
-            containerSize="medium"
-            containerStyle={pillWidthStyle}
-            onLayout={onPillLayout(walletCurrency)}
-          />
+          <WalletSwitch currency={walletCurrency} canToggle={canToggleWallet} />
         </Pressable>
       </View>
       <AmountInputModal
@@ -183,9 +161,6 @@ const useStyles = makeStyles(({ colors }) => ({
   textDisabled: {
     opacity: 0.5,
   },
-  iconHidden: {
-    opacity: 0,
-  },
   amountSection: {
     flex: 1,
     justifyContent: "center",
@@ -213,7 +188,6 @@ const useStyles = makeStyles(({ colors }) => ({
   walletSection: {
     flexDirection: "row",
     alignItems: "center",
-    columnGap: 12,
     paddingHorizontal: 14,
     paddingVertical: 14,
   },
