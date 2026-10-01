@@ -1,23 +1,28 @@
 import React from "react"
-import { View } from "react-native"
-import { fireEvent, render, waitFor } from "@testing-library/react-native"
+import {
+  fireGestureHandler,
+  getByGestureTestId,
+} from "react-native-gesture-handler/jest-utils"
+import type { PanGesture } from "react-native-gesture-handler"
+import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { PLACE_CATEGORIES, PlaceCategory } from "@app/btcmap"
+import { PAN_TEST_ID } from "@app/components/bottom-sheet"
 import { CategoryFilterSheet } from "@app/components/map-component/category-filter-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
 import { ContextForScreen } from "../../screens/helper"
 
 // The rows are `Switch`, whose animated style predates the explicit-dependency
-// convention and throws without the Babel plugin. Same stand-in as switch.spec.
-jest.mock("react-native-reanimated", () => ({
-  __esModule: true,
-  default: { View },
-  useSharedValue: (initial: number) => ({ value: initial }),
-  useAnimatedStyle: () => ({}),
-  withTiming: (value: number) => value,
-  interpolateColor: () => "transparent",
-}))
+// convention and throws without the Babel plugin. Only that one hook is stubbed
+// now: the sheet around them is `BottomSheet`, which reaches gesture-handler
+// through the rest of the real module, and replacing the whole of it wholesale
+// — as this did while the sheet was hand-rolled here — leaves gesture-handler
+// unable to build its animated wrapper.
+jest.mock("react-native-reanimated", () => {
+  const actual = jest.requireActual("react-native-reanimated")
+  return { __esModule: true, ...actual, useAnimatedStyle: () => ({}) }
+})
 
 jest.mock("react-native-safe-area-context", () => ({
   ...jest.requireActual("react-native-safe-area-context"),
@@ -100,5 +105,24 @@ describe("CategoryFilterSheet", () => {
     // Empty is "show everything", so this is the same map — arrived at without
     // fifteen presses.
     expect(onChange).toHaveBeenCalledWith(new Set())
+  })
+  it("can be thrown away, the same as the sheet a merchant opens", async () => {
+    // It could not before it shared their sheet: the filter was a partial copy
+    // that had left the gesture behind, so the only way out of it was the
+    // scrim.
+    const onClose = jest.fn()
+    const { getByTestId } = renderSheet({ onClose })
+
+    await waitFor(() => expect(getByTestId("category-restaurants")).toBeTruthy())
+
+    await act(async () => {
+      fireGestureHandler<PanGesture>(getByGestureTestId(PAN_TEST_ID), [
+        { translationY: 0, velocityY: 0 },
+        { translationY: 200, velocityY: 0 },
+        { state: 5, translationY: 200, velocityY: 0 },
+      ])
+    })
+
+    await waitFor(() => expect(onClose).toHaveBeenCalled())
   })
 })
