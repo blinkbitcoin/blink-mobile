@@ -28,6 +28,7 @@ import {
 import { AccountType } from "@app/types/wallet"
 
 import { useAccountRegistry } from "./use-account-registry"
+import { useCurrencyList } from "./use-currency-list"
 import { useEffectiveDisplayCurrency } from "./use-effective-display-currency"
 
 export const SATS_PER_BTC = 100000000
@@ -94,8 +95,20 @@ export const usePriceConversion = () => {
    * feed, but it is not this session's price.
    */
   const feed = useFiatRates()
+
+  /**
+   * Breez quotes whole units and the app works in minor ones, so the display currency's
+   * fraction size is what makes its rates comparable with the backend's. Taken from the
+   * resolved list rather than the SDK's own, so the backend can supply it when the SDK's
+   * currency call failed while its rates call succeeded.
+   */
+  const { currencyList } = useCurrencyList()
+  const fractionDigits = currencyList.find(
+    (currency) => currency.id.toUpperCase() === displayCurrency.toUpperCase(),
+  )?.fractionDigits
+
   const selfCustodialSource: PriceSource = isSelfCustodial
-    ? createSelfCustodialPriceSource(feed, displayCurrency)
+    ? createSelfCustodialPriceSource(feed, displayCurrency, fractionDigits)
     : noPriceSource
 
   const skipAuthed = !isAuthed || isSelfCustodial
