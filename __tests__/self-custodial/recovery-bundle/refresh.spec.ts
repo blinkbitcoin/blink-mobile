@@ -242,6 +242,137 @@ describe("refreshRecoveryBundle cloud gating", () => {
     expect(first).toBe(second)
   })
 
+  describe("coverageKey", () => {
+    it("shares the in-flight run with a caller needing the same coverage", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const [first, second] = await Promise.all([
+        refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" }),
+        refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" }),
+      ])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(1)
+      expect(first).toBe(second)
+    })
+
+    /** The in-flight fetch read the leaves before payment B settled, so handing
+     *  it to B would drop B's leaves for good: the save stamps savedAt, which
+     *  makes the staleness path skip them too. */
+    it("reruns for a caller needing newer coverage instead of returning the stale run", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      expect(second).not.toBe(first)
+
+      await Promise.all([first, second])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("serves every mid-run caller with a single rerun rather than one each", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+      const third = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-c" })
+
+      // Both late callers collapse onto the same rerun, so a burst costs one
+      // extra pass over the operators, not one per payment.
+      expect(third).toBe(second)
+
+      await Promise.all([first, second, third])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("reports the rerun's own result to the late caller", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      const [, secondResult] = await Promise.all([first, second])
+
+      expect(secondResult.success).toBe(true)
+    })
+
+    /** A failed run must not strand the caller waiting behind it: the rerun is
+     *  chained off settlement, not success. */
+    it("still reruns when the in-flight run rejects", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+      mockFetchRecoveryBundle.mockRejectedValueOnce(new Error("operator down"))
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      const [firstResult, secondResult] = await Promise.all([first, second])
+
+      expect(firstResult.success).toBe(false)
+      expect(secondResult.success).toBe(true)
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    /** The staleness sweep names no payment: it only wants a current bundle, so
+     *  a run already fetching satisfies it and a second pass over the operators
+     *  would buy nothing. */
+    it("joins any in-flight run when the caller names no coverage", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const keyed = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const unkeyed = refreshRecoveryBundle(refreshParams)
+
+      expect(unkeyed).toBe(keyed)
+
+      await Promise.all([keyed, unkeyed])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(1)
+    })
+
+    /** The reverse: a payment arriving during the staleness run does need its
+     *  own pass, because that run fetched before the payment settled. */
+    it("reruns for a keyed caller arriving during an unkeyed run", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const unkeyed = refreshRecoveryBundle(refreshParams)
+      const keyed = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+
+      expect(keyed).not.toBe(unkeyed)
+
+      await Promise.all([unkeyed, keyed])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    /** The deletion sweep waits on in-flight work before re-sweeping. A queued
+     *  rerun has not started yet but will write once it does, so leaving it out
+     *  would let it recreate the deleted account's files after the sweep. */
+    it("makes waitForRefreshesToSettle await a queued rerun too", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      await waitForRefreshesToSettle(refreshParams.accountId)
+
+      // Both passes are done by the time the sweep is allowed to proceed.
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+      await Promise.all([first, second])
+    })
+
+    it("starts a fresh run once the previous one settled", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      await refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      await refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+
+      // Same key, but nothing is in flight the second time: coalescing must not
+      // outlive the run it belonged to.
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+  })
+
   it("keys the in-flight run per network: same-network callers share, different networks run separately", async () => {
     mockReadBackupStateFor.mockResolvedValue(manualBackupState)
 
