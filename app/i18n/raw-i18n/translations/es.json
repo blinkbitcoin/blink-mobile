@@ -2354,6 +2354,8 @@
         "invalidAmount": "Esto contiene un monto inválido. Por favor, ingrese nuevamente con un monto válido.",
         "usernameDoesNotExist": "{lnAddress: string} no parece ser una dirección de {bankName: string} que exista.",
         "usernameDoesNotExistAdvice": "En su lugar, puede pedirle al destinatario una factura o una dirección BTC.",
+        "destinationUnverifiable": "No hemos podido comprobar {lnAddress} ahora mismo: los servidores de {bankName} no responden.",
+        "destinationUnverifiableAdvice": "Es probable que la dirección esté bien. Inténtalo de nuevo en un momento o pide al destinatario una factura LN o una dirección BTC.",
         "selfPaymentError": "{lnAddress: string} es su dirección de {bankName: string}.",
         "selfPaymentAdvice": "Si desea enviar dinero a otra billetera de su propiedad, puede usar una factura, una dirección LN o BTC en su lugar.",
         "lnAddressError": "No podemos comunicarnos con esta dirección Lightning. Si está seguro de que existe, puede volver a intentarlo más tarde.",
@@ -2741,6 +2743,7 @@
             "tooLong": "La dirección debe tener como máximo 50 carácteres",
             "invalidCharacter": "La dirección solo puede contener letras, números y guiones bajos",
             "addressUnavailable": "Lo siento, esta dirección ya está ocupada por otro usuario.",
+            "serverUnreachable": "No se pudo contactar con el servidor de direcciones. Tu dirección sigue libre: inténtalo de nuevo en un momento.",
             "unknownError": "Se produjo un error desconocido, inténtelo de nuevo más tarde",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -4026,6 +4029,8 @@
         "signInDescription": "Inicia sesión en tu cuenta custodial para usar {featureName}.",
         "noAccountTitle": "Cuenta custodial requerida",
         "noAccountDescription": "{featureName} requiere una cuenta custodial de Blink.",
+        "unreachableTitle": "Blink no está disponible",
+        "unreachableDescription": "{featureName} necesita los servidores de Blink, que ahora mismo no responden. Tu billetera y tus fondos no se ven afectados.",
         "featureCircles": "Círculos",
         "featureEarn": "Aprender",
         "featureCard": "Tarjeta"
@@ -4048,6 +4053,10 @@
         "tokenTransfer": "Transferencia {token}",
         "payTo": "Pagar a {address}",
         "payment": "Pago"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "El tipo de cambio puede estar desactualizado",
+        "satsOnly": "Mostrando sats: no hay tipo de cambio disponible"
     },
     "SelfCustodialOffline": {
         "title": "La billetera está sin conexión",

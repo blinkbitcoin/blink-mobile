@@ -8,6 +8,7 @@ import {
   useMigrationLnAddressTransferMutation,
 } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/transport-error"
+import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   buildMigrationLnAddressProof,
@@ -96,6 +97,7 @@ export const useMigrationLnAddressTransfer = ({
   skip,
 }: UseMigrationLnAddressTransferArgs): UseMigrationLnAddressTransfer => {
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const [transferLnAddress] = useMigrationLnAddressTransferMutation()
 
@@ -144,6 +146,7 @@ export const useMigrationLnAddressTransfer = ({
         accountId: selfCustodialId,
         network,
         leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+        lnurlDomain,
         signChallenge: (sparkPubkey) =>
           buildMigrationProofChallenge({
             custodialAccountId: custodialId,
@@ -227,7 +230,7 @@ export const useMigrationLnAddressTransfer = ({
           : MigrationLnAddressOutcome.Rejected
       }
     },
-    [network, selfCustodialDepositClaimLeewayVbyte, transferLnAddress],
+    [network, selfCustodialDepositClaimLeewayVbyte, transferLnAddress, lnurlDomain],
   )
 
   useEffect(() => {

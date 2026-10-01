@@ -2354,6 +2354,8 @@
         "invalidAmount": "Diese Invoice enthält einen ungültigen Betrag. Bitte generiere eine neue Invoice.",
         "usernameDoesNotExist": "{lnAddress: string} scheint keine existierende {bankName: string} Adresse zu sein.",
         "usernameDoesNotExistAdvice": "Gehe sicher, dass Du alles richtig geschrieben hast oder frage den Empfänger nach einer Lightning Invoice oder BTC Adresse.",
+        "destinationUnverifiable": "Wir konnten {lnAddress} gerade nicht prüfen – die Server von {bankName} antworten nicht.",
+        "destinationUnverifiableAdvice": "Die Adresse ist wahrscheinlich in Ordnung. Versuch es gleich noch einmal oder bitte den Empfänger stattdessen um eine LN-Rechnung oder BTC-Adresse.",
         "selfPaymentError": "{lnAddress: string} ist deine {bankName: string} Adresse.",
         "selfPaymentAdvice": "Wenn Du Geld an ein anderes Konto von dir senden möchtest, nutze dafür eine Lightning Invoice, Lightning Adresse oder BTC Adresse.",
         "lnAddressError": "Wir konnten diese Lightning Adresse nicht erreichen. Wenn Du dir sicher bist dass sie existiert, probiere es später erneut.",
@@ -2741,6 +2743,7 @@
             "tooLong": "Die Adresse darf nicht länger als 50 Zeichen sein",
             "invalidCharacter": "Die Adresse darf nur Buchstaben, Zahlen und Unterstriche beinhalten",
             "addressUnavailable": "Entschuldigung, diese Adresse ist schon vergeben",
+            "serverUnreachable": "Der Adressserver war nicht erreichbar. Deine Adresse ist weiterhin frei – versuch es gleich noch einmal.",
             "unknownError": "Ein unbekannter Fehler ist aufgetreten, bitte versuche es später erneut",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
@@ -4026,6 +4029,8 @@
         "signInDescription": "Melde dich bei deinem custodial-Konto an, um {featureName} zu nutzen.",
         "noAccountTitle": "Custodial-Konto erforderlich",
         "noAccountDescription": "{featureName} benötigt ein Blink custodial-Konto.",
+        "unreachableTitle": "Blink ist nicht erreichbar",
+        "unreachableDescription": "{featureName} benötigt die Server von Blink, die gerade nicht antworten. Deine Wallet und dein Guthaben sind nicht betroffen.",
         "featureCircles": "Circles",
         "featureEarn": "Lernen",
         "featureCard": "Karte"
@@ -4048,6 +4053,10 @@
         "tokenTransfer": "{token}-Überweisung",
         "payTo": "Zahlen an {address}",
         "payment": "Zahlung"
+    },
+    "SelfCustodialStaleRate": {
+        "notice": "Der Wechselkurs ist möglicherweise veraltet",
+        "satsOnly": "Anzeige in Sats – kein Wechselkurs verfügbar"
     },
     "SelfCustodialOffline": {
         "title": "Wallet ist offline",

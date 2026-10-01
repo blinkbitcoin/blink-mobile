@@ -22,6 +22,8 @@ import { GaloyToast } from "./components/galoy-toast"
 import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
+import { hydrateFeatureFlagOverrides } from "./config/feature-flag-overrides"
+import { hydrateSimulatedOutage } from "./config/simulated-outage"
 import { CustodialRestrictionsProvider } from "./custodial/providers/restrictions"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
 import {
@@ -31,6 +33,7 @@ import {
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialFiatRatesProvider } from "./self-custodial/providers/fiat-rates"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -56,6 +59,12 @@ const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
 if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 
+// Developer-only, and a no-op in a release build. Started here rather than in an effect
+// so a simulated outage is already in memory by the time the Apollo client is built,
+// which is what makes a reload reproduce a cold start with the backend already down.
+hydrateSimulatedOutage()
+hydrateFeatureFlagOverrides()
+
 /**
  * This is the root component of our app.
  */
@@ -75,35 +84,39 @@ export const App = () => (
                 <CustodialWalletProvider>
                   <CustodialRestrictionsProvider>
                     <SelfCustodialWalletProvider>
-                      <BackupStateProvider>
-                        <AutoConvertStatusProvider>
-                          <ActionsProvider>
-                            <MigrationBlockerProvider>
-                              <NavigationContainerWrapper>
-                                <ErrorBoundary FallbackComponent={ErrorScreen}>
-                                  <RootSiblingParent>
-                                    <EnhancedModePromptProvider>
-                                      <RestrictedRegionProvider>
-                                        <NotificationsProvider>
-                                          <AppStateWrapper />
-                                          <PushNotificationComponent />
-                                          <AutoConvertListenerMount />
-                                          <AccountModeSyncMount />
-                                          <DisplayCurrencyFromRegionMount />
-                                          <RootStack />
-                                          <NetworkErrorComponent />
-                                          <ActionModals />
-                                        </NotificationsProvider>
-                                      </RestrictedRegionProvider>
-                                    </EnhancedModePromptProvider>
-                                    <GaloyToast />
-                                  </RootSiblingParent>
-                                </ErrorBoundary>
-                              </NavigationContainerWrapper>
-                            </MigrationBlockerProvider>
-                          </ActionsProvider>
-                        </AutoConvertStatusProvider>
-                      </BackupStateProvider>
+                      {/* Inside the wallet provider, which supplies the SDK it reads the
+                          fiat feed from, and above everything that prices an amount. */}
+                      <SelfCustodialFiatRatesProvider>
+                        <BackupStateProvider>
+                          <AutoConvertStatusProvider>
+                            <ActionsProvider>
+                              <MigrationBlockerProvider>
+                                <NavigationContainerWrapper>
+                                  <ErrorBoundary FallbackComponent={ErrorScreen}>
+                                    <RootSiblingParent>
+                                      <EnhancedModePromptProvider>
+                                        <RestrictedRegionProvider>
+                                          <NotificationsProvider>
+                                            <AppStateWrapper />
+                                            <PushNotificationComponent />
+                                            <AutoConvertListenerMount />
+                                            <AccountModeSyncMount />
+                                            <DisplayCurrencyFromRegionMount />
+                                            <RootStack />
+                                            <NetworkErrorComponent />
+                                            <ActionModals />
+                                          </NotificationsProvider>
+                                        </RestrictedRegionProvider>
+                                      </EnhancedModePromptProvider>
+                                      <GaloyToast />
+                                    </RootSiblingParent>
+                                  </ErrorBoundary>
+                                </NavigationContainerWrapper>
+                              </MigrationBlockerProvider>
+                            </ActionsProvider>
+                          </AutoConvertStatusProvider>
+                        </BackupStateProvider>
+                      </SelfCustodialFiatRatesProvider>
                     </SelfCustodialWalletProvider>
                   </CustodialRestrictionsProvider>
                 </CustodialWalletProvider>

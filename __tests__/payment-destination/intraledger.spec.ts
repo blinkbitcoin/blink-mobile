@@ -46,6 +46,71 @@ describe("resolve intraledger", () => {
     })
   })
 
+  describe("when the lookup itself cannot be made", () => {
+    /**
+     * Telling a sender that a real payee does not exist is the worst thing this screen
+     * can do: it sends them to correct a spelling that was right, or to give up on a
+     * payment that would have gone through. A backend that did not answer is not an
+     * answer about the name.
+     */
+    it("reports a transport failure as unverifiable, not as a missing user", async () => {
+      defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
+        data: undefined,
+        error: new Error("Network request failed"),
+      })
+
+      const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
+
+      expect(destination).toEqual({
+        valid: false,
+        invalidReason: InvalidDestinationReason.DestinationUnverifiable,
+        invalidPaymentDestination: defaultIntraledgerParams.parsedIntraledgerDestination,
+      })
+    })
+
+    it("reports a thrown lookup as unverifiable too", async () => {
+      // Whatever went wrong, nothing was learned about the name.
+      defaultIntraledgerParams.accountDefaultWalletQuery.mockRejectedValue(
+        new Error("boom"),
+      )
+
+      const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          invalidReason: InvalidDestinationReason.DestinationUnverifiable,
+        }),
+      )
+    })
+
+    it("still reports a missing user when the backend answered and holds none", async () => {
+      // The distinction is only worth anything if the negative case survives it.
+      defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
+        data: { accountDefaultWallet: null },
+      })
+
+      const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
+        }),
+      )
+    })
+
+    it("prefers the wallet it found over an error alongside it", async () => {
+      // A partial response that still carries the id is an answer.
+      defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
+        data: { accountDefaultWallet: { id: "successwalletid" } },
+        error: new Error("partial failure"),
+      })
+
+      const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
+
+      expect(destination).toEqual(expect.objectContaining({ valid: true }))
+    })
+  })
+
   it("returns invalid destination if user is owned by self", async () => {
     defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
       data: { accountDefaultWallet: { id: "testwalletid" } },

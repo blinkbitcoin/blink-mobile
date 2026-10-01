@@ -89,6 +89,23 @@ const writeIndex = async (entries: SelfCustodialAccountEntry[]): Promise<void> =
 
 export const listSelfCustodialAccounts = async (): Promise<ReadIndexResult> => readIndex()
 
+/**
+ * The Lightning Address last known for an account, or null when none is recorded or the
+ * index cannot be read.
+ *
+ * An address is a name a server answers for, not device state: it keeps working for
+ * payers whether or not this device can currently ask about it. Reading the recorded one
+ * is therefore what lets the wallet go on offering an address while the LNURL server is
+ * unreachable, instead of hiding it as though it had been given up.
+ */
+export const getSelfCustodialLightningAddress = async (
+  id: string,
+): Promise<string | null> => {
+  const result = await readIndex()
+  if (result.status === StorageReadStatus.ReadFailed) return null
+  return result.entries.find((entry) => entry.id === id)?.lightningAddress ?? null
+}
+
 export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
   const result = await readIndex()
   if (result.status === StorageReadStatus.ReadFailed) return

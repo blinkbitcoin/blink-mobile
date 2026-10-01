@@ -2354,6 +2354,8 @@
     "invalidAmount": "Oku kuqulethe isixa esingasebenziyo. Nceda wenze ngokutsha ngexabiso elisebenzayo.",
     "usernameDoesNotExist": " {lnAddress: string} ayibonakali ngathi yi {bankName: string} idilesi ekhoyo.",
     "usernameDoesNotExistAdvice": "Qiniseka ukuba upelo luchanekile okanye ucele umamkeli nge-invoyisi ye-LN okanye idilesi ye-BTC endaweni yoko.",
+    "destinationUnverifiable": "Asikwazanga ukujonga i-{lnAddress} okwangoku — iiseva ze-{bankName} azipheduli.",
+    "destinationUnverifiableAdvice": "Idilesi mhlawumbi ilungile. Zama kwakhona kungekudala, okanye ucele umamkeli akunike i-invoice ye-LN okanye idilesi ye-BTC.",
     "selfPaymentError": "{lnAddress: string} yeyakho {bankName: string} idilesi.",
     "selfPaymentAdvice": "Ukuba ufuna ukuthumela imali kwenye iakhawunti yakho, ungasebenzisa i-invoyisi, i-LN okanye idilesi ye-BTC endaweni yoko.",
     "lnAddressError": "Asikwazi ukufikelela kule dilesi yoMbane. Ukuba uqinisekile ukuba ikhona, ungazama kwakhona kamva.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "Ayikwazanga ukufikelela kwiseva yedilesi. Idilesi yakho isekhona — zama kwakhona kungekudala.",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "U-Blink akafikeleleki",
+    "unreachableDescription": "I-{featureName} ifuna iiseva ze-Blink, ezingaphenduliyo okwangoku. Isipaji sakho neemali zakho azichaphazelekanga.",
     "featureCircles": "Circles",
     "featureEarn": "Funda",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "Ukudluliswa kwe-{token}",
     "payTo": "Hlawula ku-{address}",
     "payment": "Intlawulo"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Izinga lotshintshiselwano lisenokuba lidlule ixesha",
+    "satsOnly": "Ibonisa ii-sats — alikho izinga lotshintshiselwano"
   },
   "SelfCustodialOffline": {
     "title": "Ingxowa-mali ayikho kwi-intanethi",

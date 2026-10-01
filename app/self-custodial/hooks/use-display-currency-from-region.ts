@@ -1,6 +1,6 @@
 import { useEffect } from "react"
 
-import { useCurrencyListQuery } from "@app/graphql/generated"
+import { useCurrencyList } from "@app/hooks/use-currency-list"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { resolveActiveSelfCustodialId } from "@app/store/persistent-state/active-self-custodial-account"
 import {
@@ -20,13 +20,14 @@ import { detectDefaultCurrency } from "@app/utils/locale-detector"
  * switch mid-session, and the settings row would read as already selected while refusing
  * the tap that would confirm it.
  *
- * The device's currency is honoured only when the backend can price it: an unsupported
- * code leaves the realtime price with no denominator, which is worse than dollars.
+ * The device's currency is honoured only when it can actually be priced: an unsupported
+ * code leaves the price with no denominator, which is worse than dollars. The list now
+ * comes from whichever source can answer — the Breez SDK for a self-custodial account,
+ * the backend otherwise — so a launch with Blink down still resolves a region default.
  *
- * A launch that never reaches the currency list writes nothing and leaves the account on
- * dollars until the next one, since the client's retry link gives up in seconds and no
- * refetch follows. Restoring a wallet needs the network anyway, so the list is there on
- * the launch that matters; waiting a session beats freezing a guess.
+ * A launch that reaches neither writes nothing and leaves the account on dollars until
+ * the next one. Restoring a wallet needs the network anyway, so a list is there on the
+ * launch that matters; waiting a session beats freezing a guess.
  */
 export const useDisplayCurrencyFromRegion = (): void => {
   const { persistentState, updateState } = usePersistentStateContext()
@@ -35,11 +36,7 @@ export const useDisplayCurrencyFromRegion = (): void => {
   const isDisplayCurrencyUnanswered =
     Boolean(activeAccountId) && !getSelfCustodialDisplayCurrency(persistentState)
 
-  const { data } = useCurrencyListQuery({
-    skip: !isDisplayCurrencyUnanswered,
-    fetchPolicy: "cache-first",
-  })
-  const currencyList = data?.currencyList
+  const { currencyList } = useCurrencyList()
 
   useEffect(() => {
     if (!isDisplayCurrencyUnanswered || !currencyList?.length) return

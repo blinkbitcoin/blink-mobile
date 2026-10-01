@@ -1,5 +1,14 @@
 import * as React from "react"
-import { Alert, DevSettings, Linking, View, Share } from "react-native"
+import {
+  Alert,
+  DevSettings,
+  Linking,
+  View,
+  Share,
+  type StyleProp,
+  type TextStyle,
+  type ViewStyle,
+} from "react-native"
 import DeviceInfo from "react-native-device-info"
 import { ScrollView } from "react-native-gesture-handler"
 import { InAppBrowser } from "react-native-inappbrowser-reborn"
@@ -11,6 +20,20 @@ import {
   possibleGaloyInstanceNames,
   SPARK_EXPLORER_TX_URL,
 } from "@app/config"
+import {
+  FLAG_OVERRIDES,
+  FlagOverride,
+  setFeatureFlagOverride,
+  useFeatureFlagOverrides,
+  type FeatureFlagOverrides,
+} from "@app/config/feature-flag-overrides"
+import {
+  OUTAGE_MODES,
+  OutageMode,
+  setSimulatedOutage,
+  useSimulatedOutage,
+  type SimulatedOutage,
+} from "@app/config/simulated-outage"
 import {
   testBulletinsStore,
   useTestBulletins,
@@ -58,6 +81,9 @@ export const DeveloperScreen: React.FC = () => {
 
   const { appConfig, saveTokenAndInstance } = useAppConfig()
   const token = appConfig.token
+
+  const simulatedOutage = useSimulatedOutage()
+  const flagOverrides = useFeatureFlagOverrides()
 
   const { data: dataLevel } = useLevelQuery({ fetchPolicy: "cache-only" })
   const level = String(dataLevel?.me?.defaultAccount?.level)
@@ -297,6 +323,26 @@ export const DeveloperScreen: React.FC = () => {
               })
             }
           />
+          {__DEV__ && (
+            <FeatureFlagOverrideControls
+              overrides={flagOverrides}
+              buttonStyles={{
+                selected: styles.selectedInstanceButton,
+                notSelected: styles.notSelectedInstanceButton,
+              }}
+              headerStyle={styles.textHeader}
+            />
+          )}
+          {__DEV__ && (
+            <SimulatedOutageControls
+              outage={simulatedOutage}
+              buttonStyles={{
+                selected: styles.selectedInstanceButton,
+                notSelected: styles.notSelectedInstanceButton,
+              }}
+              headerStyle={styles.textHeader}
+            />
+          )}
           <Text style={styles.textHeader}>Trigger Bulletins</Text>
           <Button
             title="Onboarding Phase 1: KYC"
@@ -474,6 +520,121 @@ export const DeveloperScreen: React.FC = () => {
     </Screen>
   )
 }
+
+type OutageButtonStyles = {
+  selected: StyleProp<ViewStyle>
+  notSelected: StyleProp<ViewStyle>
+}
+
+const OUTAGE_SERVICES: ReadonlyArray<{ key: keyof SimulatedOutage; label: string }> = [
+  { key: "graphql", label: "GraphQL API" },
+  { key: "lnurlServer", label: "LNURL server" },
+]
+
+/** The controls sit outside the screen's `makeStyles` scope and need one margin. */
+const outageButtonContainer: ViewStyle = { marginVertical: 6 }
+
+const OVERRIDABLE_FLAGS: ReadonlyArray<{
+  key: keyof FeatureFlagOverrides
+  label: string
+}> = [
+  { key: "nonCustodialEnabled", label: "nonCustodialEnabled" },
+  { key: "stableBalanceEnabled", label: "stableBalanceEnabled" },
+]
+
+const FLAG_OVERRIDE_LABELS: Record<FlagOverride, string> = {
+  [FlagOverride.Default]: "Remote",
+  [FlagOverride.On]: "On",
+  [FlagOverride.Off]: "Off",
+}
+
+/**
+ * Forces the self-custodial rollout flags, which otherwise come from Remote Config and
+ * default to false — so on an emulator without Play Services the fetch fails and the
+ * self-custodial path is simply absent. "Remote" hands the flag back to whatever the
+ * fetch resolved to. Dev builds only.
+ *
+ * Read when the flag context renders, so a change applies on the next render; a reload
+ * is only needed for the parts of the app that read a flag once at startup.
+ */
+const FeatureFlagOverrideControls: React.FC<{
+  overrides: FeatureFlagOverrides
+  buttonStyles: OutageButtonStyles
+  headerStyle: StyleProp<TextStyle>
+}> = ({ overrides, buttonStyles, headerStyle }) => (
+  <View>
+    <Text style={headerStyle}>Override rollout flags</Text>
+    {OVERRIDABLE_FLAGS.map(({ key, label }) => (
+      <View key={key}>
+        <Text>{label}</Text>
+        {FLAG_OVERRIDES.map((override) => {
+          const isSelected = overrides[key] === override
+          const style = isSelected ? buttonStyles.selected : buttonStyles.notSelected
+          return (
+            <Button
+              key={override}
+              title={FLAG_OVERRIDE_LABELS[override]}
+              onPress={() => setFeatureFlagOverride({ [key]: override })}
+              {...testProps(`flag ${key} ${override}`)}
+              buttonStyle={style}
+              titleStyle={style}
+              containerStyle={style}
+            />
+          )
+        })}
+      </View>
+    ))}
+  </View>
+)
+
+const OUTAGE_MODE_LABELS: Record<OutageMode, string> = {
+  [OutageMode.Off]: "Up",
+  [OutageMode.Refused]: "Refused",
+  [OutageMode.Unreachable]: "Timeout",
+}
+
+/**
+ * Points a service at a host that cannot answer, so the self-custodial paths that must
+ * survive an outage can be exercised without stopping a backend. Dev builds only.
+ *
+ * The GraphQL switch takes effect on the next render — the Apollo client is rebuilt from
+ * the instance's URIs. The LNURL switch reaches the SDK through its config, which is read
+ * at connect, so it needs a reload to apply to an already-connected wallet.
+ */
+const SimulatedOutageControls: React.FC<{
+  outage: SimulatedOutage
+  buttonStyles: OutageButtonStyles
+  headerStyle: StyleProp<TextStyle>
+}> = ({ outage, buttonStyles, headerStyle }) => (
+  <View>
+    <Text style={headerStyle}>Simulate Blink service outage</Text>
+    {OUTAGE_SERVICES.map(({ key, label }) => (
+      <View key={key}>
+        <Text>{label}</Text>
+        {OUTAGE_MODES.map((mode) => {
+          const isSelected = outage[key] === mode
+          const style = isSelected ? buttonStyles.selected : buttonStyles.notSelected
+          return (
+            <Button
+              key={mode}
+              title={OUTAGE_MODE_LABELS[mode]}
+              onPress={() => setSimulatedOutage({ [key]: mode })}
+              {...testProps(`outage ${key} ${mode}`)}
+              buttonStyle={style}
+              titleStyle={style}
+              containerStyle={style}
+            />
+          )
+        })}
+      </View>
+    ))}
+    <Button
+      title="Reload (apply to the connected SDK)"
+      containerStyle={outageButtonContainer}
+      onPress={() => DevSettings.reload()}
+    />
+  </View>
+)
 
 const useStyles = makeStyles(({ colors }) => ({
   button: {

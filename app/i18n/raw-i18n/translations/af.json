@@ -2354,6 +2354,8 @@
     "invalidAmount": "Hierdie bevat 'n ongeldige bedrag. Hersien asseblief met 'n geldige bedrag. ",
     "usernameDoesNotExist": "{lnAddress: string} blyk nie 'n {bankName: string}  adres te wees wat bestaan nie.",
     "usernameDoesNotExistAdvice": "Maak seker die spelling is reg of vra die ontvanger vir 'n LN-faktuur of BTC-adres. ",
+    "destinationUnverifiable": "Ons kon {lnAddress} nie nou nagaan nie — {bankName} se bedieners reageer nie.",
+    "destinationUnverifiableAdvice": "Die adres is waarskynlik reg. Probeer netnou weer, of vra die ontvanger eerder vir 'n LN-faktuur of BTC-adres.",
     "selfPaymentError": "{lnAddress: string} is jou {bankName: string} adres. ",
     "selfPaymentAdvice": "As jy geld wil stuur na 'n ander rekening wat jy besit kan jy gebruik maak van 'n LN-faktuur of BTC-adres. ",
     "lnAddressError": "Ons sukkel om hierdie adres te bereik. As jy seker is dat dit korrek is en bestaan kan jy weer later probeer. ",
@@ -2741,6 +2743,7 @@
       "tooLong": "Adres kan nie meer as 50 karakters lank wees nie",
       "invalidCharacter": "Adres kan net letters, nommers en 'n onderstreep bevat",
       "addressUnavailable": "Jammer, die adres is reeds geneem",
+      "serverUnreachable": "Kon nie die adresbediener bereik nie. Jou adres is steeds beskikbaar — probeer oor 'n oomblik weer.",
       "unknownError": "'n Onbekende fout het voorgekom, probeer asseblief later weer",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink is onbereikbaar",
+    "unreachableDescription": "{featureName} het Blink se bedieners nodig, wat tans nie reageer nie. Jou beursie en fondse word nie geraak nie.",
     "featureCircles": "Circles",
     "featureEarn": "Leer",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "{token}-oordrag",
     "payTo": "Betaal aan {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Wisselkoers is dalk verouderd",
+    "satsOnly": "Wys sats — geen wisselkoers beskikbaar nie"
   },
   "SelfCustodialOffline": {
     "title": "Beursie is vanlyn",
