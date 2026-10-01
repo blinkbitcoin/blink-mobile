@@ -348,6 +348,10 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       (#3824); concurrency guarded with `useInFlightGuard` (#3868).
 - [ ] Fees/limits from the SDK: don't rely on SDK defaults silently (default fee caps bit
       us in #3903); make chosen fee policy explicit and remote-configurable.
+- [ ] SDK bumps: LNURL-server wire compatibility. The SDK talks to Blink's own
+      `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
+      the SDK's `lnurl.rs` between the two tags, and run username register, availability
+      and restore against staging before merging (#4257).
 
 ### Feature flags / Remote Config
 

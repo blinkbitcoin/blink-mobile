@@ -82,7 +82,7 @@ describe("createReceiveLightning", () => {
     currencyCode: "BTC" as const,
   })
 
-  it("passes amount, memo and expiry through to the SDK", async () => {
+  it("passes amount, memo and expiry through to the SDK, naming no other receiver", async () => {
     const { sdk, receivePayment } = buildSdk("lnbc1invoice")
 
     const result = await createReceiveLightning(sdk)({
@@ -92,11 +92,12 @@ describe("createReceiveLightning", () => {
     })
 
     expect(result).toEqual({ invoice: "lnbc1invoice" })
-    expect(methodInnerOf(receivePayment)).toEqual({
+    expect(methodInnerOf(receivePayment)).toStrictEqual({
       description: "coffee",
       amountSats: BigInt(5000),
       expirySecs: 600,
       paymentHash: undefined,
+      receiverIdentityPublicKey: undefined,
     })
   })
 
@@ -105,11 +106,12 @@ describe("createReceiveLightning", () => {
 
     await createReceiveLightning(sdk)({})
 
-    expect(methodInnerOf(receivePayment)).toEqual({
+    expect(methodInnerOf(receivePayment)).toStrictEqual({
       description: "",
       amountSats: undefined,
       expirySecs: undefined,
       paymentHash: undefined,
+      receiverIdentityPublicKey: undefined,
     })
   })
 
