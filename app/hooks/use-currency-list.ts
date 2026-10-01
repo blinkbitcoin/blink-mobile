@@ -7,6 +7,7 @@ import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
 import {
   firstPopulatedCurrencyList,
   noCurrencyListSource,
+  withPreferredNames,
   type DisplayCurrencyEntry,
 } from "@app/types/currency"
 import { AccountType } from "@app/types/wallet"
@@ -43,16 +44,24 @@ export const useCurrencyList = (): CurrencyListResult => {
     ? createSelfCustodialCurrencyList(sdkCurrencies, sdkHasSettled)
     : noCurrencyListSource
 
-  const { data, loading } = useCurrencyListQuery({
-    skip: selfCustodialSource.currencies.length > 0,
-    fetchPolicy: "cache-and-network",
-  })
+  /**
+   * Asked even when the SDK has a list, because the backend is the authority on the
+   * *wording* — see `withPreferredNames`. It is a public, rarely-changing query served
+   * from the Apollo cache after the first hit, and `useDisplayCurrency` fetched it
+   * unconditionally before any of this, so this is not new traffic so much as traffic
+   * an earlier pass had removed.
+   */
+  const { data, loading } = useCurrencyListQuery({ fetchPolicy: "cache-and-network" })
   const backendSource = createCustodialCurrencyList(data?.currencyList, loading)
 
   return useMemo(() => {
     const source = firstPopulatedCurrencyList(selfCustodialSource, backendSource)
     if (source.currencies.length > 0) {
-      return { currencyList: source.currencies, loading: false, isUnavailable: false }
+      return {
+        currencyList: withPreferredNames(source.currencies, backendSource.currencies),
+        loading: false,
+        isUnavailable: false,
+      }
     }
     /** Only self-custodial can conclude that nothing is coming: it is the only session
      *  where every source can be known to have finished empty. */
