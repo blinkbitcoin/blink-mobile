@@ -7,6 +7,10 @@ import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
 import { logError } from "@app/utils/log-error"
 import {
+  deriveSelfCustodialFlags,
+  useFeatureFlagOverrides,
+} from "@app/config/feature-flag-overrides"
+import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigPositiveNumber,
@@ -550,12 +554,18 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     })()
   }, [])
 
+  /** A no-op outside `__DEV__`, where the store always reads "no override". */
+  const overrides = useFeatureFlagOverrides()
+
+  /** Overrides applied, then the cascade. Shared with the spec so the two cannot
+   *  drift — see `deriveSelfCustodialFlags`. */
+  const selfCustodialFlags = deriveSelfCustodialFlags(remoteConfig, overrides)
+
   const featureFlags: FeatureFlags = {
     deviceAccountEnabled:
       remoteConfig.deviceAccountEnabledRestAuth || galoyInstance.id === "Local",
-    nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
-    stableBalanceEnabled:
-      remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
+    nonCustodialEnabled: selfCustodialFlags.nonCustodialEnabled,
+    stableBalanceEnabled: selfCustodialFlags.stableBalanceEnabled,
     remoteConfigReady,
   }
 

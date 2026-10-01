@@ -22,6 +22,7 @@ import { GaloyToast } from "./components/galoy-toast"
 import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
+import { hydrateFeatureFlagOverrides } from "./config/feature-flag-overrides"
 import { hydrateSimulatedOutage } from "./config/simulated-outage"
 import { CustodialRestrictionsProvider } from "./custodial/providers/restrictions"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
@@ -62,6 +63,7 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 // so a simulated outage is already in memory by the time the Apollo client is built,
 // which is what makes a reload reproduce a cold start with the backend already down.
 hydrateSimulatedOutage()
+hydrateFeatureFlagOverrides()
 
 /**
  * This is the root component of our app.

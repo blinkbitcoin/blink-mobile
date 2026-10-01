@@ -42,8 +42,8 @@ address, BIP21, Spark address):
 
 ## Custodial regression (NFR24, FR68)
 
-Run the suite with `nonCustodialEnabled` forced to `false` (Firebase Remote
-Config or local override). Every existing custodial-only flow must work
+Run the suite with `nonCustodialEnabled` forced to `Off` (developer screen, or
+Firebase Remote Config for a real-build check). Every existing custodial-only flow must work
 identically to a pre-Spark build:
 
 - Onboarding (account-type selection screen is hidden; user lands on the
@@ -55,8 +55,19 @@ Document any visible diff and treat it as a release blocker.
 
 ## Feature-flag rollback (Story 6.4 / NFR15)
 
-With a self-custodial account active and operational on a device, flip
-`nonCustodialEnabled` to `false` in Remote Config and re-launch the app.
+The developer screen's **Override rollout flags** section (debug builds only)
+forces `nonCustodialEnabled` and `stableBalanceEnabled` to `On` or `Off`, or
+hands them back to Remote Config with `Remote`. Use it for the scenarios below
+rather than changing the project's Remote Config, which would reach every client
+on it.
+
+It is also how you get at self-custodial on an emulator at all: Remote Config
+needs Google Play Services, so on an image without them `fetchAndActivate`
+fails, every flag falls back to its shipped `false`, and Get Started routes
+straight to custodial login with no account-type choice offered.
+
+With a self-custodial account active and operational on a device, set
+`nonCustodialEnabled` to `Off` and re-launch the app.
 
 - If the user has a custodial account on the device: app must auto-route to
   custodial. Self-custodial UI must disappear. Mnemonic and backup state must
@@ -64,7 +75,7 @@ With a self-custodial account active and operational on a device, flip
 - If the user has only self-custodial: app must show the
   `TemporarilyUnavailableScreen`. Mnemonic must remain in the keychain.
 
-Then flip the flag back to `true` and re-launch:
+Then set the flag back to `On` (or `Remote`) and re-launch:
 
 - Self-custodial provider must reinitialize with the same wallet identifier,
   backup status, and Stable Balance preference. No data loss.
