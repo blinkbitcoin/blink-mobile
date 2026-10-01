@@ -2667,7 +2667,7 @@
   "TransactionDetailScreen": {
     "paid": "Плаћено/примљено од",
     "received": "Примили сте",
-    "spent": "Потрошили сте",
+    "sent": "Послали сте",
     "sending": "Слање",
     "receivingAccount": "Рачун за примање",
     "sendingAccount": "Рачун за слање",

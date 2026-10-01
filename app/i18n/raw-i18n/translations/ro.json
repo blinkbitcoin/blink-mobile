@@ -2667,7 +2667,7 @@
   "TransactionDetailScreen": {
     "paid": "Plătit către/de la",
     "received": "Ați primit",
-    "spent": "Ați cheltuit",
+    "sent": "Ați trimis",
     "sending": "Trimitere",
     "receivingAccount": "Cont de primire",
     "sendingAccount": "Cont de trimitere",
