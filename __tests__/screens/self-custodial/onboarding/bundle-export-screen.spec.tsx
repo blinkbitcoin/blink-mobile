@@ -18,7 +18,7 @@ let LL: TranslationFunctions
 const mockCompleteBackup = jest.fn()
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
-  settings: { autoRefresh: true, cloudSync: false },
+  settings: { autoRefresh: true, cloudSync: false, exportedAt: null },
   refreshing: false,
   uploading: false,
   sharing: false,
