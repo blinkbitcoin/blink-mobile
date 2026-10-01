@@ -1,11 +1,5 @@
 import React, { ReactNode } from "react"
-import {
-  Platform,
-  View,
-  TouchableOpacity,
-  StyleSheet,
-  DimensionValue,
-} from "react-native"
+import { View, TouchableOpacity, StyleSheet, DimensionValue } from "react-native"
 import { ScrollView } from "react-native-gesture-handler"
 import Modal from "react-native-modal"
 
@@ -14,6 +8,7 @@ import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
+import { fonts } from "@app/rne-theme/fonts"
 
 export type CustomModalProps = {
   isVisible: boolean
@@ -190,7 +185,7 @@ const useStyles = makeStyles(({ colors }, props: UseStylesProps) => ({
   },
   modalTitleText: {
     fontSize: props.titleFontSize ?? 24,
-    fontWeight: Platform.OS === "ios" ? "600" : "700",
+    fontFamily: fonts.bold,
     lineHeight: 32,
     maxWidth: props.titleMaxWidth || "80%",
     textAlign: props.titleTextAlignment || "center",

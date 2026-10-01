@@ -53,7 +53,7 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.grey2,
     fontSize: 14,
     fontFamily: "Source Sans Pro",
-    fontWeight: "600",
+    fontWeight: "700",
     lineHeight: 20,
   },
   regularLabel: {

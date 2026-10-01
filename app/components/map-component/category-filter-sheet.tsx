@@ -10,6 +10,7 @@ import { useSafeAreaInsets } from "react-native-safe-area-context"
 import { PLACE_CATEGORIES, PlaceCategory } from "@app/btcmap"
 import { Switch } from "@app/components/atomic/switch"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { fonts } from "@app/rne-theme/fonts"
 import { Text, makeStyles } from "@rn-vui/themed"
 
 const SCRIM_COLOR = "rgba(0, 0, 0, 0.4)"
@@ -163,7 +164,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   title: {
     fontSize: 20,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   action: {
