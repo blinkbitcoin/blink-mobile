@@ -15,6 +15,7 @@ import { usePinAttempts } from "./use-pin-attempts"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
+import { useReturnToGate } from "../../hooks/use-return-to-gate"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
@@ -48,6 +49,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  lock — the back-press swallow is isResume-gated and completeUnlock is only invoked
    *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
+  const returnToGate = useReturnToGate()
   const { LL } = useI18nContext()
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
@@ -106,13 +108,12 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       setEnteredPIN("")
       setFarewellText(message)
       try {
-        /** The lock outlives the logout its own budget triggered. Dismantling
-         *  it here would leave the next screen ungated rather than locked, and
-         *  the spent budget has to go with it: cleared, it would hand the next
-         *  round a fresh three guesses against a PIN that now survives.
-         *  Everything the lock guarded still goes: the session and the saved
-         *  profiles. */
-        await logout({ preserveAppLock: true })
+        /** Everything the session held goes: the token and the saved profiles.
+         *  Whether the lock goes with it is the logout's own call, made on what
+         *  the device still stores: it stays, spent budget included, for as
+         *  long as a wallet is left here for it to guard, so the next round
+         *  does not open on a fresh three guesses against it. */
+        await logout()
         await sleep(1000)
       } catch {
         /** Swallowed, not rethrown: usePinAttempts awaits this from a floating
@@ -123,16 +124,13 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
          *  reset performs, so a screen that never left would leave it waiting
          *  on a callback that can no longer fire.
          *
-         *  To the gate rather than past it: the PIN outlives this logout, so
+         *  To the gate rather than past it: the PIN can outlive this logout, so
          *  whether the device is still locked is a question to ask, not one to
          *  answer here. */
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "authenticationCheck" }],
-        })
+        returnToGate()
       }
     },
-    [logout, navigation],
+    [logout, returnToGate],
   )
 
   /** The challenge's success answer: tell the caller before leaving, and mark it
@@ -160,10 +158,10 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         resolveChallenge()
         return
       }
-      completeUnlock(() =>
+      completeUnlock((coldStartRoute) =>
         navigation.reset({
           index: 0,
-          routes: [{ name: "Primary" }],
+          routes: [{ name: coldStartRoute }],
         }),
       )
     },

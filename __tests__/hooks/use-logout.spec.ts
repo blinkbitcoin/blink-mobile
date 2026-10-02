@@ -3,6 +3,19 @@ import { renderHook } from "@testing-library/react-native"
 import useLogout from "@app/hooks/use-logout"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
+const mockListSelfCustodialAccounts = jest.fn()
+
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/account-index"),
+  listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+}))
+
+/** What the device's account index answers with: the wallets it still stores. */
+const storedWallets = (ids: ReadonlyArray<string>) => ({
+  status: "ok",
+  entries: ids.map((id) => ({ id, lightningAddress: null })),
+})
+
 const mockClearToken = jest.fn()
 const mockResetState = jest.fn()
 const mockLogoutMutation = jest.fn()
@@ -56,7 +69,7 @@ const logoutOnce = async (
   options?: Parameters<ReturnType<typeof useLogout>["logout"]>[0],
 ) => {
   const { result } = renderHook(() => useLogout())
-  await result.current.logout(options)
+  return result.current.logout(options)
 }
 
 beforeEach(() => {
@@ -69,6 +82,7 @@ beforeEach(() => {
   mockGetDeviceToken.mockResolvedValue("")
   mockAsyncStorage.multiRemove.mockResolvedValue(undefined)
   mockLogoutMutation.mockResolvedValue({ data: {} })
+  mockListSelfCustodialAccounts.mockResolvedValue(storedWallets([]))
 })
 
 describe("useLogout", () => {
@@ -183,36 +197,159 @@ describe("useLogout", () => {
     expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
   })
 
-  describe("a logout the app lock itself triggered", () => {
-    it("keeps all three slots the lock is made of", async () => {
-      // Split any of them and the lock stops working: a PIN without its spent
-      // budget grants a fresh round of guesses, and a PIN without the
-      // biometrics flag routes every later unlock to the keypad, which is the
-      // one unlock screen that carries no way out.
-      await logoutOnce({ preserveAppLock: true })
+  describe("the app lock, on a device with nothing left for it to guard", () => {
+    it("goes with the session, and says so", async () => {
+      /** A lock with nothing behind it only locks its owner out: whoever forgot it
+       *  signs in again from outside the device and sets a new one. */
+      const result = await logoutOnce()
+
+      expect(mockedStore.removePin).toHaveBeenCalledTimes(1)
+      expect(mockedStore.clearPinFailureState).toHaveBeenCalledTimes(1)
+      expect(mockedStore.removeIsBiometricsEnabled).toHaveBeenCalledTimes(1)
+      expect(result).toEqual({ isAppLockKept: false })
+    })
+
+    it("goes last, after everything it guards", async () => {
+      /** A teardown cut short then leaves a lock in front of what is left, never
+       *  what is left with no lock in front of it. */
+      await logoutOnce()
+
+      const firstLockErasure =
+        mockedStore.removeIsBiometricsEnabled.mock.invocationCallOrder[0]
+      expect(mockedStore.removeSessionProfiles.mock.invocationCallOrder[0]).toBeLessThan(
+        firstLockErasure,
+      )
+      expect(mockClearToken.mock.invocationCallOrder[0]).toBeLessThan(firstLockErasure)
+    })
+
+    it("is decided before anything is erased", async () => {
+      /** Nothing then sits between the erasures for a kill to land on. */
+      await logoutOnce()
+
+      expect(mockListSelfCustodialAccounts.mock.invocationCallOrder[0]).toBeLessThan(
+        mockAsyncStorage.multiRemove.mock.invocationCallOrder[0],
+      )
+    })
+
+    it("stays when the saved sessions could not be erased, and says so", async () => {
+      /** The erasure reports a failure rather than throwing one. A lock dropped
+       *  over sessions that are still stored would leave their tokens with
+       *  nothing in front of them. */
+      mockedStore.removeSessionProfiles.mockResolvedValue(false)
+
+      const result = await logoutOnce()
 
       expect(mockedStore.removePin).not.toHaveBeenCalled()
       expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
       expect(mockedStore.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
     })
 
-    it("still erases everything the lock was guarding", async () => {
-      await logoutOnce({ preserveAppLock: true })
+    it("is reported as kept when one of its slots could not be erased", async () => {
+      /** A slot that could not be erased is a lock that is still set, and a caller
+       *  told otherwise would walk the lock screen away from it. */
+      for (const failingSlot of [
+        mockedStore.removeIsBiometricsEnabled,
+        mockedStore.removePin,
+        mockedStore.clearPinFailureState,
+      ]) {
+        failingSlot.mockResolvedValueOnce(false)
+
+        expect(await logoutOnce()).toEqual({ isAppLockKept: true })
+      }
+    })
+
+    it("is reported as kept when the teardown fails before it is reached", async () => {
+      /** A teardown that threw part-way says nothing about the lock's slots, and a
+       *  caller told the lock went would walk a lock screen away from one that
+       *  may still be set. */
+      const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {})
+      mockedStore.removeSessionProfiles.mockRejectedValue(new Error("keystore locked"))
+
+      const result = await logoutOnce()
+
+      expect(mockedStore.removePin).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
+      consoleDebugSpy.mockRestore()
+    })
+
+    it("is reported as kept when its own erasure is cut short", async () => {
+      const consoleDebugSpy = jest.spyOn(console, "debug").mockImplementation(() => {})
+      mockedStore.removePin.mockRejectedValue(new Error("keystore locked"))
+
+      const result = await logoutOnce()
+
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
+      consoleDebugSpy.mockRestore()
+    })
+  })
+
+  describe("the app lock, on a device that still stores a self-custodial wallet", () => {
+    /** No logout erases a stored wallet, and the account switcher opens it
+     *  again for whoever holds the phone. The lock is all that stands between
+     *  that person and it, so it outlives the session. */
+    beforeEach(() => {
+      mockListSelfCustodialAccounts.mockResolvedValue(storedWallets(["stored-wallet-id"]))
+    })
+
+    it("keeps all three slots the lock is made of, and says so", async () => {
+      /** Split any of them and the lock stops working: a PIN without its spent
+       *  budget grants a fresh round of guesses, and a PIN without the
+       *  biometrics flag routes every later unlock to the keypad. */
+      const result = await logoutOnce()
+
+      expect(mockedStore.removePin).not.toHaveBeenCalled()
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+      expect(mockedStore.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
+    })
+
+    it("still erases everything the session held", async () => {
+      await logoutOnce()
 
       expect(mockedStore.removeSessionProfiles).toHaveBeenCalledTimes(1)
       expect(mockAsyncStorage.multiRemove).toHaveBeenCalledTimes(1)
       expect(mockClearToken).toHaveBeenCalledTimes(1)
       expect(mockResetState).toHaveBeenCalledTimes(1)
     })
+  })
 
-    it("is overruled by preserveStoredCredentials, which keeps the profiles too", async () => {
-      // The wider option already keeps the lock; asking for both must not make
-      // the narrower one erase anything the wider one is holding.
-      await logoutOnce({ preserveStoredCredentials: true, preserveAppLock: true })
+  describe("the app lock, when the device's wallets cannot be counted", () => {
+    it("keeps the lock when the account index cannot be read", async () => {
+      /** An index that cannot answer is not an index with no wallets. Dropping
+       *  the lock on that guess would open whatever the index failed to name. */
+      mockListSelfCustodialAccounts.mockResolvedValue({
+        status: "read-failed",
+        error: new Error("AsyncStorage unavailable"),
+      })
 
-      expect(mockedStore.removeSessionProfiles).not.toHaveBeenCalled()
+      const result = await logoutOnce()
+
       expect(mockedStore.removePin).not.toHaveBeenCalled()
-      expect(mockClearToken).toHaveBeenCalledTimes(1)
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+      expect(mockedStore.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
+    })
+  })
+
+  describe("the app lock, on paths that never erase it", () => {
+    it("is kept with the stored credentials, without asking what the device stores", async () => {
+      /** The wider option already keeps the lock with everything else, so there
+       *  is no decision left for the question to inform. */
+      const result = await logoutOnce({ preserveStoredCredentials: true })
+
+      expect(mockListSelfCustodialAccounts).not.toHaveBeenCalled()
+      expect(mockedStore.removePin).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
+    })
+
+    it("is kept when a single session's token is logged out, without asking either", async () => {
+      const result = await logoutOnce({ token: "other-session-token" })
+
+      expect(mockListSelfCustodialAccounts).not.toHaveBeenCalled()
+      expect(mockedStore.removePin).not.toHaveBeenCalled()
+      expect(result).toEqual({ isAppLockKept: true })
     })
   })
 })

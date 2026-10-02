@@ -45,6 +45,35 @@ jest.mock("@app/hooks/use-logout", () => ({
   default: () => ({ logout: mockLogout }),
 }))
 
+/** Leaving the lock screen without having answered it: back to the gate, lock raised. What
+ *  that does is its own spec; here it only has to be what a kept lock is handed to. */
+const mockReturnToGate = jest.fn()
+
+jest.mock("@app/hooks/use-return-to-gate", () => ({
+  useReturnToGate: () => mockReturnToGate,
+}))
+
+/** What gives the device an account to show once its lock is answered: a session, or
+ *  failing that a wallet it stores. A session is there unless a test puts a device with
+ *  none behind its lock on the screen. */
+let mockIsAuthed = true
+const mockListSelfCustodialAccounts = jest.fn()
+
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => mockIsAuthed,
+}))
+
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/account-index"),
+  listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+}))
+
+const storedWallets = (ids: ReadonlyArray<string>) => ({
+  status: "ok",
+  entries: ids.map((id) => ({ id, lightningAddress: null })),
+})
+
 jest.mock("@app/utils/biometricAuthentication", () => ({
   __esModule: true,
   default: { authenticate: jest.fn() },
@@ -116,6 +145,9 @@ describe("AuthenticationScreen", () => {
     mockedBiometrics.authenticate.mockImplementation(async (_description, onSuccess) => {
       onSuccess()
     })
+    mockIsAuthed = true
+    mockListSelfCustodialAccounts.mockResolvedValue(storedWallets([]))
+    mockLogout.mockResolvedValue({ isAppLockKept: false })
   })
 
   it("steps back into the screen the user left when the lock came from a resume", async () => {
@@ -171,6 +203,55 @@ describe("AuthenticationScreen", () => {
 
     expect(mockReplace).toHaveBeenCalledWith("Primary")
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("lands on the landing screen when the device has no account behind its lock", async () => {
+    /** Every launch passes the lock now, including one on a device that holds no account
+     *  at all. Answering it there must not open a home screen with nothing to show. */
+    mockIsAuthed = false
+    renderScreen(false)
+    await flushEffects()
+
+    expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+    expect(mockReplace).toHaveBeenCalledWith("getStarted")
+  })
+
+  it("opens the home screen for a wallet stored with no session behind the lock", async () => {
+    /** What a logout leaves behind on a device that stores a wallet: the account its
+     *  owner expects to find behind the lock they just answered. */
+    mockIsAuthed = false
+    mockListSelfCustodialAccounts.mockResolvedValue(storedWallets(["stored-wallet-id"]))
+    renderScreen(false)
+    await flushEffects()
+
+    expect(mockReplace).toHaveBeenCalledTimes(1)
+    expect(mockReplace).toHaveBeenCalledWith("Primary")
+  })
+
+  it("lands where the device stands when the prompt is passed, not when it was first shown", async () => {
+    /** The prompt is handed its success handler on the screen's first render, and what
+     *  the device holds can change before the prompt is passed. A handler that kept the
+     *  first answer would land on the landing screen with a session waiting. */
+    let passPrompt: () => void = () => {}
+    mockedBiometrics.authenticate.mockImplementation(async (_description, onSuccess) => {
+      passPrompt = onSuccess
+    })
+    mockIsAuthed = false
+    const { rerender } = renderScreen(false)
+    await flushEffects()
+
+    mockIsAuthed = true
+    rerender(
+      <ContextForScreen>
+        <AuthenticationScreen route={buildRoute(false)} />
+      </ContextForScreen>,
+    )
+    await act(async () => {
+      passPrompt()
+    })
+
+    expect(mockReplace).toHaveBeenCalledTimes(1)
+    expect(mockReplace).toHaveBeenCalledWith("Primary")
   })
 
   it("leaves the user on the lock when the prompt is not passed", async () => {
@@ -251,7 +332,11 @@ describe("AuthenticationScreen", () => {
     it("resets the stack to the splash, which then cannot lead back into the stale session", async () => {
       /** A resume relock pushes this screen on top of the live stack, so anything short of
        *  a reset leaves the logged-out account's screens behind the splash — and hands it a
-       *  back arrow pointing at them, now that its header follows `canGoBack()`. */
+       *  back arrow pointing at them, now that its header follows `canGoBack()`.
+       *
+       *  Straight to the splash when the lock went with the session: there is nothing
+       *  left to ask for, and this is the way out the gate promises a lock it could only
+       *  infer, which sending it back to the gate would take away. */
       renderScreen(true)
       await flushEffects()
 
@@ -260,11 +345,48 @@ describe("AuthenticationScreen", () => {
       await pressAlertButton("OK")
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(mockLogout).toHaveBeenCalledWith()
       expect(mockReset).toHaveBeenCalledWith({
         index: 0,
         routes: [{ name: "getStarted" }],
       })
+      expect(mockReturnToGate).not.toHaveBeenCalled()
       expect(mockReplace).not.toHaveBeenCalled()
+    })
+
+    it("lowers the lock flag with the lock that went, before the splash is on screen", async () => {
+      /** Left up, the app would never relock on resume and every payment link would stay
+       *  parked behind a lock that is no longer there. */
+      renderScreen(true)
+      await flushEffects()
+
+      fireEvent.press(screen.getByLabelText("Log Out"))
+      await pressAlertButton("Confirm")
+      await pressAlertButton("OK")
+
+      expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+      expect(mockSetAppUnlocked.mock.invocationCallOrder[0]).toBeLessThan(
+        mockReset.mock.invocationCallOrder[0],
+      )
+    })
+
+    it("returns to the gate instead when the logout kept the lock", async () => {
+      /** The logout keeps the lock for as long as the device still stores something it
+       *  guards, and the splash can open a new account that reaches it. A lock that was
+       *  kept is still owed an answer. */
+      mockLogout.mockResolvedValue({ isAppLockKept: true })
+      renderScreen(true)
+      await flushEffects()
+
+      fireEvent.press(screen.getByLabelText("Log Out"))
+      await pressAlertButton("Confirm")
+      await pressAlertButton("OK")
+
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+      expect(mockReset).not.toHaveBeenCalled()
+      /** The lock is still set, so the flag stays where returning to the gate puts it. */
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     })
 
     it("stays put until the confirmation is accepted", async () => {

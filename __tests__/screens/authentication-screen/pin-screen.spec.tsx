@@ -38,6 +38,35 @@ jest.mock("@app/hooks/use-logout", () => ({
   default: () => ({ logout: mockLogout }),
 }))
 
+/** Leaving the lock screen without having answered it: back to the gate, lock raised. What
+ *  that does is its own spec; here it only has to be what the terminal outcomes call. */
+const mockReturnToGate = jest.fn()
+
+jest.mock("@app/hooks/use-return-to-gate", () => ({
+  useReturnToGate: () => mockReturnToGate,
+}))
+
+/** What gives the device an account to show once its lock is answered: a session, or
+ *  failing that a wallet it stores. A session is there unless a test puts a device with
+ *  none behind its lock on the screen. */
+let mockIsAuthed = true
+const mockListSelfCustodialAccounts = jest.fn()
+
+jest.mock("@app/graphql/is-authed-context", () => ({
+  ...jest.requireActual("@app/graphql/is-authed-context"),
+  useIsAuthed: () => mockIsAuthed,
+}))
+
+jest.mock("@app/self-custodial/storage/account-index", () => ({
+  ...jest.requireActual("@app/self-custodial/storage/account-index"),
+  listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+}))
+
+const storedWallets = (ids: ReadonlyArray<string>) => ({
+  status: "ok",
+  entries: ids.map((id) => ({ id, lightningAddress: null })),
+})
+
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
@@ -83,6 +112,8 @@ const primeStore = () => {
   })
   mockedStore.setPin.mockResolvedValue(true)
   mockedStore.getSessionProfiles.mockResolvedValue([])
+  mockIsAuthed = true
+  mockListSelfCustodialAccounts.mockResolvedValue(storedWallets([]))
 }
 
 type ChallengeCallbacks = {
@@ -231,6 +262,39 @@ describe("PinScreen", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
+  it("lands on the landing screen when the device has no account behind its lock", async () => {
+    /** Every launch passes the lock now, including one on a device that holds no account
+     *  at all. Answering it there must not open a home screen with nothing to show. */
+    mockIsAuthed = false
+    renderScreen(false)
+    await flushEffects()
+
+    await enterPin(CORRECT_PIN)
+
+    expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "getStarted" }],
+    })
+  })
+
+  it("opens the home screen for a wallet stored with no session behind the lock", async () => {
+    /** What a logout leaves behind on a device that stores a wallet: the account its
+     *  owner expects to find behind the lock they just answered. */
+    mockIsAuthed = false
+    mockListSelfCustodialAccounts.mockResolvedValue(storedWallets(["stored-wallet-id"]))
+    renderScreen(false)
+    await flushEffects()
+
+    await enterPin(CORRECT_PIN)
+
+    expect(mockReset).toHaveBeenCalledTimes(1)
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 0,
+      routes: [{ name: "Primary" }],
+    })
+  })
+
   it("keeps a wrong pin on the lock, resuming nothing", async () => {
     renderScreen(true)
     await flushEffects()
@@ -372,15 +436,15 @@ describe("PinScreen", () => {
 
       await enterPin(WRONG_PIN)
 
-      /** The lock outlives this logout, so the reset goes to the gate to ask
-       *  whether the device is still locked rather than assume it is not. */
+      /** A plain logout: whether the lock survives it is the logout's own call,
+       *  made on what the device still stores. The lock can outlive it, so the
+       *  screen returns to the gate to ask whether the device is still locked
+       *  rather than assume it is not. */
       expect(mockLogout).toHaveBeenCalledTimes(1)
-      expect(mockLogout).toHaveBeenCalledWith({ preserveAppLock: true })
-      await advance(1000) // the screen sleeps 1s before resetting navigation
-      expect(mockReset).toHaveBeenCalledWith({
-        index: 0,
-        routes: [{ name: "authenticationCheck" }],
-      })
+      expect(mockLogout).toHaveBeenCalledWith()
+      await advance(1000) // the screen sleeps 1s before leaving for the gate
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+      expect(mockReset).not.toHaveBeenCalled()
     })
 
     it("logs out rather than let an attempt go unrecorded", async () => {
@@ -929,11 +993,11 @@ describe("PinScreen ChallengePin", () => {
       expect(onChallengeSuccess).not.toHaveBeenCalled()
       expect(onChallengeFailure).not.toHaveBeenCalled()
       expect(mockGoBack).not.toHaveBeenCalled()
-      expect(mockReset).not.toHaveBeenCalled()
+      expect(mockReturnToGate).not.toHaveBeenCalled()
     })
 
-    it("still resets the stack when the terminal logout fails", async () => {
-      /** The reset is the spent budget's terminal answer; a logout error must not
+    it("still returns to the gate when the terminal logout fails", async () => {
+      /** Leaving is the spent budget's terminal answer; a logout error must not
        *  strand the caller behind a challenge that can no longer resolve. */
       mockLogout.mockRejectedValueOnce(new Error("network down"))
       stored.attempts = 2
@@ -943,10 +1007,7 @@ describe("PinScreen ChallengePin", () => {
 
       await enterPin(WRONG_PIN)
 
-      expect(mockReset).toHaveBeenCalledWith({
-        index: 0,
-        routes: [{ name: "authenticationCheck" }],
-      })
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
     })
 
     it("ignores input typed during the terminal logout window", async () => {
@@ -1017,14 +1078,13 @@ describe("PinScreen ChallengePin", () => {
 
         expect(mockLogout).toHaveBeenCalledTimes(1)
         await act(async () => {
-          jest.advanceTimersByTime(1000) // the screen sleeps 1s before resetting
+          jest.advanceTimersByTime(1000) // the screen sleeps 1s before leaving
         })
         await flushEffects()
 
-        expect(mockReset).toHaveBeenCalledWith({
-          index: 0,
-          routes: [{ name: "authenticationCheck" }],
-        })
+        /** With the lock raised, though the session it ran in was unlocked: a gate shown
+         *  with the flag down would let a payment link open over the lock screen. */
+        expect(mockReturnToGate).toHaveBeenCalledTimes(1)
         /** The reset unmounts the caller; a failure callback into it would be noise. */
         expect(onChallengeSuccess).not.toHaveBeenCalled()
         expect(onChallengeFailure).not.toHaveBeenCalled()
