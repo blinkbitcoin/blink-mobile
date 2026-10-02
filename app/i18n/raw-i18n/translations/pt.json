@@ -2175,15 +2175,18 @@
         "walletCountNotTwo": "O número de carteiras não é 2. Por favor, utilize o painel para ver todas as carteiras e fundos desta conta."
     },
     "PinScreen": {
-        "attemptUnrecorded": "Não foi possível registar a tentativa falhada em segurança. Saindo.",
+        "attemptUnrecorded": "Não foi possível registar a tentativa em segurança.",
+        "attemptsLeft": "{attemptsRemaining: string} tentativas restantes.",
         "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
         "enterPin": "Insira seu código PIN",
+        "oneAttemptLeft": "1 tentativa restante.",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
         "pinUnreadable": "Não foi possível verificar o seu PIN. Tente novamente.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
         "storePinFailed": "Não foi possível armazenar seu pin.",
-        "tooManyAttempts": "Muitas tentativas falharam. Saindo.",
+        "tooManyAttempts": "Muitas tentativas falharam.",
+        "tryAgainIn": "Tente novamente em {time: string}.",
         "verifyPin": "Verifique seu código PIN"
     },
     "PriceHistoryScreen": {

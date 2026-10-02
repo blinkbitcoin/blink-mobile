@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Počet peňaženiek nie je 2. Na zobrazenie všetkých peňaženiek a prostriedkov tohto účtu použite informačný panel"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Neúspešný pokus sa nepodarilo bezpečne zaznamenať. Odhlásenie.",
+    "attemptUnrecorded": "Pokus sa nepodarilo bezpečne zaznamenať.",
+    "attemptsLeft": "Zostávajú {attemptsRemaining: number} pokusy.",
     "attemptsRemaining": "Nesprávny PIN kód. Zostávajú {attemptsRemaining: number} pokusy.",
     "enterPin": "Zadajte svoj PIN kód",
+    "oneAttemptLeft": "Zostáva 1 pokus.",
     "oneAttemptRemaining": "Nesprávny PIN kód. Zostáva 1 pokus.",
     "pinUnreadable": "PIN kód sa nepodarilo overiť. Skúste to znova.",
     "setPin": "Nastavenie PIN kódu",
     "setPinFailedMatch": "PINy sa nezhodujú - nastavte svoj PIN kód",
     "storePinFailed": "Nepodarilo sa uložiť váš PIN.",
-    "tooManyAttempts": "Príliš veľa neúspešných pokusov. Odhlásenie.",
+    "tooManyAttempts": "Príliš veľa neúspešných pokusov.",
+    "tryAgainIn": "Skúste to znova o {time: string}.",
     "verifyPin": "Overte svoj PIN kód"
   },
   "PriceHistoryScreen": {

@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Број новчаника није 2. Молимо користите контролну таблу да видите све новчанике и средства овог налога"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Неуспели покушај није могуће безбедно забележити. Одјављивање.",
+    "attemptUnrecorded": "Покушај није могуће безбедно забележити.",
+    "attemptsLeft": "Преостало је {attemptsRemaining: number} покушаја.",
     "attemptsRemaining": "Неисправан ПИН. Преостало је {attemptsRemaining: number} покушаја.",
     "enterPin": "Унесите свој ПИН код",
+    "oneAttemptLeft": "Преостао је 1 покушај.",
     "oneAttemptRemaining": "Неисправан ПИН. Преостао је 1 покушај.",
     "pinUnreadable": "Није било могуће проверити ваш ПИН. Покушајте поново.",
     "setPin": "Поставите свој ПИН код",
     "setPinFailedMatch": "ПИН-ови се не подударају - Поставите свој ПИН код",
     "storePinFailed": "Неуспешно снимање ПИН кода.",
-    "tooManyAttempts": "Превише неуспелих покушаја. Одјављивање.",
+    "tooManyAttempts": "Превише неуспелих покушаја.",
+    "tryAgainIn": "Покушајте поново за {time: string}.",
     "verifyPin": "Потврдите свој ПИН код"
   },
   "PriceHistoryScreen": {

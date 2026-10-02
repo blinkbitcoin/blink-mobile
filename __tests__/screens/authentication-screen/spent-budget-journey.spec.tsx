@@ -17,10 +17,11 @@ import { ThemeProvider } from "@rn-vui/themed"
 import { flushEffects } from "../../helpers/flush-effects"
 
 /**
- * The spent budget's whole way round, on a real stack: the keypad, the logout its third
- * failure triggers, the gate that logout returns to, and whatever the gate opens next.
- * Each screen's own spec pins its half; this pins what the halves compose into. Only the
- * device is faked: what it stores, and whether it holds a session.
+ * The spent budget's whole way round, on a real stack: the keypad and its waits, the
+ * logout its third failure triggers, the gate that logout returns to, and whatever the
+ * gate opens next. Each screen's own spec pins its half; this pins what the halves compose
+ * into. Only the device is faked: what it stores, its clock, and whether it holds a
+ * session.
  */
 
 jest.mock("@app/assets/logo/app-logo-dark.svg", () => "AppLogoDark")
@@ -30,9 +31,15 @@ const CORRECT_PIN = "1234"
 const WRONG_PIN = "9999"
 const STORED_WALLET_ID = "stored-wallet"
 
+const SECOND_MS = 1000
+const MINUTE_MS = 60 * SECOND_MS
+/** The farewell stays up this long before the keypad leaves for the gate. */
+const FAREWELL_MS = SECOND_MS
+
 type Device = {
   pin: string | null
   attempts: number
+  lockedUntil: number
   walletIds: ReadonlyArray<string>
   hasSession: boolean
   isAppLocked: boolean
@@ -48,14 +55,16 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     getPin: async () => mockDevice.pin,
     getPinFailureState: async () => ({
       status: "found",
-      state: { attempts: mockDevice.attempts },
+      state: { attempts: mockDevice.attempts, lockedUntil: mockDevice.lockedUntil },
     }),
-    setPinFailureState: async ({ attempts }: { attempts: number }) => {
-      mockDevice.attempts = attempts
+    setPinFailureState: async (state: { attempts: number; lockedUntil: number }) => {
+      mockDevice.attempts = state.attempts
+      mockDevice.lockedUntil = state.lockedUntil
       return true
     },
     clearPinFailureState: async () => {
       mockDevice.attempts = 0
+      mockDevice.lockedUntil = 0
       return true
     },
     removePin: async () => {
@@ -168,20 +177,30 @@ const enterPin = async (pin: string) => {
   await flushEffects()
 }
 
-/** The farewell stays up for a second before the keypad leaves for the gate. */
-const waitOutFarewell = async () => {
+/** Moves the device's clock, with the effects on either side of it settled. */
+const wait = async (ms: number) => {
   await flushEffects()
   await act(async () => {
-    jest.advanceTimersByTime(1000)
+    jest.advanceTimersByTime(ms)
   })
   await flushEffects()
 }
 
+/** Three wrong entries, each made as soon as the wait before it is over, and the farewell
+ *  the third one shows. */
 const spendBudget = async () => {
   await enterPin(WRONG_PIN)
+  await wait(10 * SECOND_MS)
   await enterPin(WRONG_PIN)
+  await wait(30 * SECOND_MS)
   await enterPin(WRONG_PIN)
-  await waitOutFarewell()
+  await wait(FAREWELL_MS)
+}
+
+/** One more wrong entry from a keypad whose budget is already spent. */
+const failAnotherRound = async () => {
+  await enterPin(WRONG_PIN)
+  await wait(FAREWELL_MS)
 }
 
 describe("the spent PIN budget, from the keypad round to wherever the gate opens", () => {
@@ -195,6 +214,7 @@ describe("the spent PIN budget, from the keypad round to wherever the gate opens
     mockDevice = {
       pin: CORRECT_PIN,
       attempts: 0,
+      lockedUntil: 0,
       walletIds: [],
       hasSession: true,
       isAppLocked: true,
@@ -210,7 +230,7 @@ describe("the spent PIN budget, from the keypad round to wherever the gate opens
       mockDevice.walletIds = [STORED_WALLET_ID]
     })
 
-    it("ends the session and comes back to the same lock, with nothing around it", async () => {
+    it("ends the session and comes back to the same lock, shut, with nothing around it", async () => {
       launchApp()
       await flushEffects()
 
@@ -222,39 +242,61 @@ describe("the spent PIN budget, from the keypad round to wherever the gate opens
       expect(mockDevice.attempts).toBe(3)
       expect(mockDevice.isAppLocked).toBe(true)
 
-      /** The keypad again, live, one entry from ending the round, and no way past it. */
-      expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
-      expect(screen.getByText("1")).not.toBeDisabled()
+      /** The keypad again, shut for the minute the third failure started, and no way past
+       *  it: no dismiss control, and neither screen behind the gate. */
+      expect(screen.getByText("Too many failed attempts.")).toBeTruthy()
+      expect(screen.getByText("Try again in 00:59.")).toBeTruthy()
+      expect(screen.getByText("1")).toBeDisabled()
       expect(screen.queryByTestId("pinScreenDismiss")).toBeNull()
       expect(screen.queryByText("home screen")).toBeNull()
       expect(screen.queryByText("landing screen")).toBeNull()
     })
 
-    it("keeps coming back to it for as long as the entry is wrong", async () => {
+    it("refuses the guess that follows, and makes every round after it wait longer", async () => {
       launchApp()
       await flushEffects()
       await spendBudget()
 
+      /** A fourth guess, made at once: nothing takes it, so nothing is counted. */
       await enterPin(WRONG_PIN)
-      await waitOutFarewell()
+      expect(mockDevice.attempts).toBe(3)
 
-      expect(mockDevice.pin).toBe(CORRECT_PIN)
+      await wait(MINUTE_MS - FAREWELL_MS)
+      await failAnotherRound()
+
       expect(mockDevice.attempts).toBe(4)
       expect(mockDevice.isAppLocked).toBe(true)
-      expect(screen.getByText("Incorrect PIN. 1 attempt remaining.")).toBeTruthy()
+      expect(screen.getByText("Try again in 04:59.")).toBeTruthy()
+
+      /** The minute that was enough for the round before is no longer enough. */
+      await wait(MINUTE_MS)
+      await enterPin(WRONG_PIN)
+      expect(mockDevice.attempts).toBe(4)
+
+      await wait(4 * MINUTE_MS - FAREWELL_MS)
+      await failAnotherRound()
+
+      expect(mockDevice.attempts).toBe(5)
+      expect(screen.getByText("Try again in 14:59.")).toBeTruthy()
       expect(screen.queryByText("home screen")).toBeNull()
       expect(screen.queryByText("landing screen")).toBeNull()
     })
 
-    it("opens the stored wallet for the correct PIN, and clears the spent count", async () => {
+    it("refuses the correct PIN during the wait, and opens the stored wallet for it after", async () => {
       launchApp()
       await flushEffects()
       await spendBudget()
 
       await enterPin(CORRECT_PIN)
+      expect(screen.queryByText("home screen")).toBeNull()
+      expect(mockDevice.isAppLocked).toBe(true)
+
+      await wait(MINUTE_MS - FAREWELL_MS)
+      await enterPin(CORRECT_PIN)
 
       expect(screen.getByText("home screen")).toBeTruthy()
       expect(mockDevice.attempts).toBe(0)
+      expect(mockDevice.lockedUntil).toBe(0)
       expect(mockDevice.isAppLocked).toBe(false)
     })
   })
