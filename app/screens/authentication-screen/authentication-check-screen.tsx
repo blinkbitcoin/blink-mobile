@@ -71,11 +71,13 @@ export const AuthenticationCheckScreen: React.FC = () => {
           isResume,
         })
       } else {
-        /** Only a cold start opens a device session, and only it owes the user the home
-         *  screen; a resume whose lock was turned off meanwhile just steps back. */
-        completeUnlock(() => {
-          updateDeviceSessionCount(client)
-          navigation.replace("Primary")
+        /** Only a cold start opens a device session, and only one with an account to show
+         *  owes the user the home screen: without one it lands on the landing screen, and
+         *  a resume whose lock was turned off meanwhile just steps back. */
+        completeUnlock((coldStartRoute) => {
+          const isOpeningHome = coldStartRoute === "Primary"
+          if (isOpeningHome) updateDeviceSessionCount(client)
+          navigation.replace(coldStartRoute)
         })
       }
     })()
