@@ -514,9 +514,7 @@ describe("PinScreen", () => {
 
       expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockLogout).toHaveBeenCalledWith()
-      expect(
-        screen.getByText("Couldn't record the failed attempt securely. Logging out."),
-      ).toBeTruthy()
+      expect(screen.getByText("Couldn't record the attempt securely.")).toBeTruthy()
 
       /** The same way out as the spent budget: to the gate, once the farewell has shown. */
       expect(mockReturnToGate).not.toHaveBeenCalled()
