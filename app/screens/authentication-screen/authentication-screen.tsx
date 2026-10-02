@@ -4,6 +4,7 @@ import { Alert, View } from "react-native"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { recordAppError } from "@app/utils/error-reporting"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -15,6 +16,7 @@ import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
+import { useReturnToGate } from "../../hooks/use-return-to-gate"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import BiometricWrapper from "../../utils/biometricAuthentication"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../../utils/enum"
@@ -37,6 +39,8 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   const { logout } = useLogout()
   const { screenPurpose, isPinEnabled, isResume = false } = route.params
   const { completeUnlock } = useUnlockScreen({ isResume })
+  const returnToGate = useReturnToGate()
+  const { setAppUnlocked } = useAuthenticationContext()
   const { LL } = useI18nContext()
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
@@ -54,7 +58,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
       KeyStoreWrapper.setIsBiometricsEnabled()
     }
-    completeUnlock(() => navigation.replace("Primary"))
+    completeUnlock((coldStartRoute) => navigation.replace(coldStartRoute))
   }, [navigation, screenPurpose, completeUnlock])
 
   const attemptAuthentication = React.useCallback(() => {
@@ -74,15 +78,30 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const logoutAndNavigateToLanding = async () => {
-    await logout()
+  const logoutFromLock = async () => {
+    const { isAppLockKept } = await logout()
     Alert.alert(LL.common.logout(), LL.common.loggedOut(), [
       {
         text: LL.common.ok(),
         onPress: () => {
+          /** A lock the logout kept is still owed an answer: the device stores something
+           *  it guards, and the landing screen can open an account that reaches it. */
+          if (isAppLockKept) {
+            returnToGate()
+            return
+          }
+
           /** Reset, not replace: a resume relock pushes this screen on top of the live
            *  stack, and anything left beneath would still be reachable — and advertised,
-           *  now that the splash header follows `canGoBack()`. */
+           *  now that the splash header follows `canGoBack()`.
+           *
+           *  Straight to the landing screen, not through the gate: with the lock gone
+           *  there is nothing left for it to ask, and this is the way out the gate
+           *  promises a lock it could only infer, which asking again would take away.
+           *
+           *  The flag goes down with the lock. Left up, the app would never relock on
+           *  resume and every payment link would stay parked behind it. */
+          setAppUnlocked()
           navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
         },
       },
@@ -96,7 +115,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       },
       {
         text: LL.common.confirm(),
-        onPress: logoutAndNavigateToLanding,
+        onPress: logoutFromLock,
       },
     ])
   }
