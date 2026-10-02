@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "จำนวนกระเป๋าไม่ใช่ 2 กรุณาใช้แดชบอร์ดเพื่อดูกระเป๋าและเงินทั้งหมดของบัญชีนี้"
   },
   "PinScreen": {
-    "attemptUnrecorded": "ไม่สามารถบันทึกการพยายามที่ผิดพลาดได้อย่างปลอดภัย ทำการออกจากระบบ",
+    "attemptUnrecorded": "ไม่สามารถบันทึกการพยายามได้อย่างปลอดภัย",
+    "attemptsLeft": "มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
     "attemptsRemaining": "พินนี้ผิด มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
     "enterPin": "ป้อนพินโค้ด",
+    "oneAttemptLeft": "โอกาสสุดท้าย",
     "oneAttemptRemaining": "พินนี้ผิด โอกาสสุดท้าย",
     "pinUnreadable": "ไม่สามารถตรวจสอบพินของคุณได้ กรุณาลองอีกครั้ง",
     "setPin": "ตั้งค่าพินโค้ด",
     "setPinFailedMatch": "พินไม่ตรงกัน - ตั้งค่าพินโค้ดอีกครั้ง",
     "storePinFailed": "ไม่สามารถเก็บพินได้",
-    "tooManyAttempts": "คุณใส่ผิดมากเกินไป ทำการออกจากระบบ",
+    "tooManyAttempts": "คุณใส่ผิดมากเกินไป",
+    "tryAgainIn": "ลองอีกครั้งใน {time: string}",
     "verifyPin": "ยืนยันพินโค้ด"
   },
   "PriceHistoryScreen": {
