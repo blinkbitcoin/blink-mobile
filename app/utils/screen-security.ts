@@ -134,6 +134,13 @@ const startRegistration = (): void => {
         // live guard cannot be relied on to replace it, so it comes down first.
         try {
           await ScreenGuard.unregister()
+        } catch (error) {
+          // Reported and carried on, not rethrown: the library's unregister does
+          // reject, and letting it escape here would skip the re-registration
+          // below and leave the guard down under a lease that is still waiting.
+          // The teardown treats the same rejection as recoverable for the same
+          // reason.
+          reportError("Disable screen security", error)
         } finally {
           // Same reasoning as the teardown below: after a rejected unregister the
           // native state is unknown and `false` is the only recoverable state.
