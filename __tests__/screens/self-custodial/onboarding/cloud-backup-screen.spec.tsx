@@ -38,13 +38,10 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   }),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: readonly unknown[]) =>
-    mockEnableScreenSecurity(...args),
-  disableScreenSecurity: (...args: readonly unknown[]) =>
-    mockDisableScreenSecurity(...args),
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
 }))
 
 const mockUseMigrationBackupCheckpoint = jest.fn()
@@ -86,8 +83,10 @@ const LL = i18nObject("en")
 describe("CloudBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     mockLoading = false
     mockIsValid = true
     mockIsEncrypted = false
@@ -233,7 +232,7 @@ describe("CloudBackupScreen", () => {
       )
       await flushEffects()
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
     it("guards the screen before encryption is switched on", async () => {
@@ -244,7 +243,7 @@ describe("CloudBackupScreen", () => {
       )
       await flushEffects()
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
     it("drops the guard on unmount", async () => {
@@ -257,7 +256,7 @@ describe("CloudBackupScreen", () => {
 
       unmount()
 
-      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 })
