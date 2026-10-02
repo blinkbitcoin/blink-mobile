@@ -76,8 +76,8 @@ GestureHandlerRootView
 
 ```
 RootStack (Stack Navigator)
-├── getStarted          # Initial screen (unauthenticated)
-├── authenticationCheck # Auth check screen
+├── getStarted          # Landing screen (no account), reached through the gate
+├── authenticationCheck # Gate: every launch starts here and asks for the app lock, if set
 ├── authentication      # Login/PIN screen
 ├── login               # Login method selection
 ├── pin                 # PIN entry
@@ -168,6 +168,14 @@ cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
 `android/gradle.properties`.
 
 ## Authentication Flow
+
+Every launch starts at `authenticationCheck`, with an account or without. It asks for the
+app lock when the device has one, then lands on `Primary` for a device with an account to
+show and on `getStarted` for one without. A logout keeps the app lock for as long as the
+device still stores a self-custodial wallet, and whatever ends a session without the lock
+having been answered returns to the gate rather than to `getStarted`.
+
+The diagram below is the sign-in that starts from `getStarted`.
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐

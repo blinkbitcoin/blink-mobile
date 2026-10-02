@@ -4,7 +4,6 @@ import HomeIcon from "@app/assets/icons/home.svg"
 import LearnIcon from "@app/assets/icons/learn.svg"
 import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
-import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ConversionConfirmationScreen,
@@ -94,7 +93,6 @@ import { UnclaimedDepositsScreen } from "../screens/unclaimed-deposits/unclaimed
 
 import { OfflineGate } from "@app/self-custodial/components"
 import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unavailable"
-import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
@@ -266,18 +264,20 @@ export const RootStack = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const isAuthed = useIsAuthed()
   const { LL } = useI18nContext()
-  const { persistentState } = usePersistentStateContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const hasAccount = isAuthed || Boolean(persistentState.activeAccountId)
   const shouldShowUnavailable = useSelfCustodialUnavailable()
 
   if (shouldShowUnavailable) {
     return <TemporarilyUnavailableScreen />
   }
 
+  /** Every launch starts at the gate, with an account or without. Starting a device that
+   *  has none on the landing screen put that screen in front of a lock that could still be
+   *  set, and from there a new account can be opened with no credentials: it lists every
+   *  wallet the device stores. The gate sends a launch with nothing to unlock straight on
+   *  to where it used to start. */
   return (
     <RootNavigator.Navigator
       screenOptions={{
@@ -289,7 +289,7 @@ export const RootStack = () => {
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
-      initialRouteName={hasAccount ? "authenticationCheck" : "getStarted"}
+      initialRouteName="authenticationCheck"
     >
       <RootNavigator.Screen
         name="getStarted"

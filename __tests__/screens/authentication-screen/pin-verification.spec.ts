@@ -109,8 +109,28 @@ describe("verifyPin", () => {
       await expect(verifyPin(WRONG_PIN)).resolves.toEqual({ outcome: "exhausted" })
     })
 
+    it("reports a spent budget that could not be recorded, which costs the budget nothing", async () => {
+      /** A signal about the keystore, not a leak in the budget: the count stays
+       *  one short of the cap, and from there the next wrong entry exhausts it
+       *  just the same. */
+      storedState({ attempts: MAX_PIN_ATTEMPTS - 1 })
+      mockedStore.setPinFailureState.mockResolvedValue(false)
+
+      await expect(verifyPin(WRONG_PIN)).resolves.toEqual({ outcome: "exhausted" })
+      expect(mockRecordAppError).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: "Spent PIN budget could not be recorded",
+        }),
+        /** The key of the non-terminal write: the same slot refusing the same
+         *  write is one defect, reported once. */
+        { alwaysRecord: true, dedupKey: "pin-attempts-write" },
+      )
+
+      await expect(verifyPin(WRONG_PIN)).resolves.toEqual({ outcome: "exhausted" })
+    })
+
     it("records the spent budget before reporting it", async () => {
-      // A kill during the logout that follows must not hand the attempts back.
+      // Awaited, so the stored count says what happened before the logout runs.
       storedState({ attempts: MAX_PIN_ATTEMPTS - 1 })
 
       await verifyPin(WRONG_PIN)

@@ -6,6 +6,10 @@ import { useUserLogoutMutation } from "@app/graphql/generated"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { logLogout } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
+import {
+  listSelfCustodialAccounts,
+  StorageReadStatus,
+} from "@app/self-custodial/storage/account-index"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import messaging from "@react-native-firebase/messaging"
 
@@ -24,13 +28,42 @@ type LogoutOptions = {
    *
    * The group cannot be split. Profiles without the PIN would leave live
    * bearer tokens behind with the lock that guarded them gone, and dropping
-   * the schema marker alone makes the next boot read as a fresh install, whose
-   * reinstall sweep erases the profiles anyway.
+   * the schema marker makes the next boot purge the persisted query cache,
+   * which is erasing all the same.
    *
    * Only the untokened path reads this; a call that passes a token is already
    * scoped to that one session and destroys nothing else.
    */
   preserveStoredCredentials?: boolean
+}
+
+type LogoutResult = {
+  /**
+   * Whether the app lock is still set once the logout is done. A caller that
+   * leaves a lock screen behind has to know: a lock that was kept is still owed
+   * an answer, and one that went is not there to ask for it.
+   */
+  readonly isAppLockKept: boolean
+}
+
+/**
+ * Whether the app lock still has something on this device to guard once the
+ * session is gone.
+ *
+ * A self-custodial wallet is stored on the device and outlives every logout:
+ * nothing here erases it, and the account switcher opens it again for whoever
+ * is holding the phone. Erasing it is not a logout's call either: the app does
+ * not delete a wallet that still holds funds, and a logout cannot tell whether
+ * this one does. The lock is the only thing between that person and the
+ * wallet, so it stays for as long as one is stored. With none stored it goes,
+ * as it always did: a lock with nothing behind it only locks its owner out.
+ *
+ * Fails closed: an index that cannot be read is not an index with no wallets.
+ */
+const hasStoredSelfCustodialWallet = async (): Promise<boolean> => {
+  const wallets = await listSelfCustodialAccounts()
+  if (wallets.status === StorageReadStatus.ReadFailed) return true
+  return wallets.entries.length > 0
 }
 
 gql`
@@ -53,7 +86,12 @@ const useLogout = () => {
       token,
       isValidToken = true,
       preserveStoredCredentials = false,
-    }: LogoutOptions = {}): Promise<void> => {
+    }: LogoutOptions = {}): Promise<LogoutResult> => {
+      /** Kept until its slots are seen to go: a teardown that threw part-way
+       *  says nothing about them, and a caller told the lock went would walk a
+       *  lock screen away from a lock that may still be set. */
+      let isAppLockKept = true
+
       try {
         // Isolated: a failed push-token fetch must never skip the local
         // key-store cleanup below. The server-side revocation is best-effort
@@ -80,14 +118,44 @@ const useLogout = () => {
           }
           context = { headers: { authorization: `Bearer ${token}` } }
         } else {
+          /** Keeping the stored credentials whole keeps the lock with them, and
+           *  sessions that were not erased are sessions still stored. */
+          let isLockOwed = true
+          let areSavedSessionsErased = false
+
           if (!preserveStoredCredentials) {
+            /** Asked before anything is erased, so that nothing sits between
+             *  the erasures below for a kill to land on. */
+            isLockOwed = await hasStoredSelfCustodialWallet()
             await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
-            await KeyStoreWrapper.removeIsBiometricsEnabled()
-            await KeyStoreWrapper.removePin()
-            await KeyStoreWrapper.clearPinFailureState()
-            await KeyStoreWrapper.removeSessionProfiles()
+            areSavedSessionsErased = await KeyStoreWrapper.removeSessionProfiles()
           }
           await clearToken()
+
+          /** The lock goes last, and only once what it guards is provably
+           *  gone. The erasure above reports a failure rather than throwing
+           *  one, and a lock dropped over sessions that are still stored would
+           *  leave their tokens with nothing in front of them. A teardown cut
+           *  short leaves a lock in front of what is left, never the reverse.
+           *
+           *  It is all three slots, kept or dropped together. A PIN without
+           *  its spent attempt count hands the next round a fresh budget
+           *  against a secret that no longer expires, and a PIN without the
+           *  biometrics flag routes every later unlock to the keypad instead
+           *  of to the prompt its owner chose. */
+          const canDropLock = !isLockOwed && areSavedSessionsErased
+          if (canDropLock) {
+            const isBiometricsFlagErased =
+              await KeyStoreWrapper.removeIsBiometricsEnabled()
+            const isPinErased = await KeyStoreWrapper.removePin()
+            const isSpentBudgetErased = await KeyStoreWrapper.clearPinFailureState()
+
+            /** Gone only when every slot says so: one that could not be erased
+             *  is a lock that is still set. */
+            const isLockFullyErased =
+              isBiometricsFlagErased && isPinErased && isSpentBudgetErased
+            isAppLockKept = !isLockFullyErased
+          }
         }
 
         logLogout()
@@ -117,6 +185,8 @@ const useLogout = () => {
           resetState()
         }
       }
+
+      return { isAppLockKept }
     },
     [resetState, clearToken, userLogoutMutation],
   )
