@@ -179,7 +179,8 @@ A wrong PIN starts a wait before the keypad takes another entry: seconds for the
 failures, then minutes that grow with each failure from the third on, up to an hour. The
 third failure is the one that ends the session. Where the lock outlives that logout, the
 wait is what paces the guesses. The count and the wait are stored as one value, so they
-survive a relaunch.
+survive a relaunch, and an entry is written there before it is compared: one the store
+cannot record is not judged at all.
 
 The diagram below is the sign-in that starts from `getStarted`.
 

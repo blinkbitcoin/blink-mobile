@@ -26,8 +26,8 @@ export type PinVerification =
   /** The attempt budget is spent. The caller must log out. */
   | { readonly outcome: "exhausted" }
   /**
-   * The failed attempt could not be written down, so the next one would be
-   * free. The caller must log out: see the note on failing closed below.
+   * The attempt could not be written down, so it was not judged at all. The
+   * caller must log out: see the note on failing closed below.
    */
   | { readonly outcome: "unrecorded" }
   /**
@@ -83,6 +83,11 @@ export const readPinLockState = async (now: number): Promise<PinLockStateRead> =
  * count, so it can neither skip an active lock nor overwrite a higher count
  * with a lower one.
  *
+ * An entry is written down before it is judged: the count goes up and its wait
+ * starts before the PIN is compared, and a correct PIN takes both back. An
+ * entry the store cannot record is therefore never compared, so no guess comes
+ * free, whatever it is that makes the write fail.
+ *
  * `now` is a parameter so callers and tests can pin the clock exactly.
  */
 export const verifyPin = async (
@@ -116,11 +121,36 @@ export const verifyPin = async (
     return { outcome: "unreadable" }
   }
 
+  const countedAttempts = state.attempts + 1
+  const recordedState: PinFailureState = {
+    attempts: countedAttempts,
+    lockedUntil: now + lockoutMsForFailures(countedAttempts),
+  }
+
+  /** Written before the PIN is compared, as if the entry were already wrong.
+   *  The count and the wait it starts are one value, and both have to be in
+   *  the store before anyone learns whether the entry was right, so a kill at
+   *  any point after this leaves the attempt counted. */
+  const isRecorded = await KeyStoreWrapper.setPinFailureState(recordedState)
+
+  if (!isRecorded) {
+    /** Fail closed, and without comparing. An entry judged with nothing
+     *  written down is a free guess for as long as the store refuses writes,
+     *  and a lockout held only in memory dies with the process, so a disabled
+     *  keypad would be bypassed by force-quitting. Ending the session is the
+     *  refusal that does not rest on the write that just failed. */
+    recordAppError(new Error("PIN attempt could not be persisted"), {
+      alwaysRecord: true,
+      dedupKey: PinErrorKey.AttemptsWrite,
+    })
+    return { outcome: "unrecorded" }
+  }
+
   if (enteredPin === storedPin) {
-    /** Awaited so a kill right after unlock can't leave the spent count behind.
-     *  Entry is never refused over a storage fault, since the PIN was proven
-     *  correct, but a clear that could not land leaves a spent budget readable,
-     *  which would log this user out on their next typo, so it is reported. */
+    /** Takes the recorded attempt back. Awaited so a kill right after unlock
+     *  can't leave it behind. Entry is never refused over a clear that failed,
+     *  since the PIN was proven correct, but what could not be cleared stays
+     *  counted, and locked, for the next unlock, so it is reported. */
     if (!(await KeyStoreWrapper.clearPinFailureState())) {
       recordAppError(new Error("PIN attempt count could not be cleared"), {
         alwaysRecord: true,
@@ -130,44 +160,9 @@ export const verifyPin = async (
     return { outcome: "unlocked" }
   }
 
-  const failures = state.attempts + 1
-  const stateAfterFailure: PinFailureState = {
-    attempts: failures,
-    lockedUntil: now + lockoutMsForFailures(failures),
-  }
-
-  /** Every failure is written the same way, under the cap and past it, and
-   *  before anything is returned: the count and the wait it starts are one
-   *  value, and a kill during whatever the caller does next must not hand
-   *  either of them back. */
-  const isRecorded = await KeyStoreWrapper.setPinFailureState(stateAfterFailure)
-
-  if (failures >= MAX_PIN_ATTEMPTS) {
-    /** The session ends whether or not the write landed, so the outcome does
-     *  not change. What the write carries past the logout is the count and the
-     *  wait the next round opens on, on a device whose lock outlives it. A
-     *  write the keystore refused is worth knowing about, and it is the slot
-     *  the report below is about, refusing the same write, so it goes under
-     *  the same key. */
-    if (!isRecorded) {
-      recordAppError(new Error("Spent PIN budget could not be recorded"), {
-        alwaysRecord: true,
-        dedupKey: PinErrorKey.AttemptsWrite,
-      })
-    }
+  if (countedAttempts >= MAX_PIN_ATTEMPTS) {
     return { outcome: "exhausted" }
   }
 
-  if (!isRecorded) {
-    /** Fail closed. A lockout held only in memory dies with the process, so a
-     *  disabled keypad would be bypassed by force-quitting. Ending the session
-     *  is the refusal that does not rest on the write that just failed. */
-    recordAppError(new Error("PIN attempt could not be persisted"), {
-      alwaysRecord: true,
-      dedupKey: PinErrorKey.AttemptsWrite,
-    })
-    return { outcome: "unrecorded" }
-  }
-
-  return { outcome: "wrong", state: stateAfterFailure }
+  return { outcome: "wrong", state: recordedState }
 }
