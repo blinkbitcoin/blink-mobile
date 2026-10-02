@@ -555,7 +555,7 @@ describe("self-custodial account-index", () => {
   })
 })
 
-describe("self-custodial account-index — boot sweep and purge", () => {
+describe("self-custodial account-index — boot sweep", () => {
   beforeEach(setupAccountIndexMockDefaults)
 
   describe("sweepMnemonicMigration", () => {
@@ -799,6 +799,12 @@ describe("self-custodial account-index — boot sweep and purge", () => {
       expect(second).toEqual(first)
     })
   })
+})
+
+// Split from the sweep for the same reason the file's first two describes are:
+// max-lines-per-function, not because they test unrelated things.
+describe("self-custodial account-index — legacy key store purge", () => {
+  beforeEach(setupAccountIndexMockDefaults)
 
   describe("purgeLegacyKeyStoreOnce", () => {
     /** The index is read for the account ids, and the done-flag from its own key. */
