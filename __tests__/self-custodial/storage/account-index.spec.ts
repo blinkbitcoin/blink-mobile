@@ -64,11 +64,17 @@ const ACCOUNT_INDEX_KEY = "selfCustodialAccountIndex"
 const LEGACY_ID_LIST_KEY = "selfCustodialAccountIds"
 const LEGACY_PURGE_DONE_KEY = "legacyKeyStorePurged"
 const LEGACY_PURGE_ATTEMPTS_KEY = "legacyKeyStorePurgeAttempts"
+const LEGACY_PURGE_SLOTS_KEY = "legacyKeyStorePurgedSlots"
 /** Mirrors LEGACY_PURGE_MAX_ATTEMPTS, which is not exported. */
 const LEGACY_PURGE_MAX_ATTEMPTS = 5
 
 const SWEEP_OK = { status: "ok", migrated: 1 } as const
 const SWEEP_INCOMPLETE = { status: "incomplete", failures: 1 } as const
+
+/** How a purge pass ends when it proved no slot gone that it was not handed. */
+const PASS_GONE = { outcome: "gone", purgedSlots: [] } as const
+const PASS_TRANSIENT = { outcome: "transient", purgedSlots: [] } as const
+const PASS_PERMANENT = { outcome: "permanent", purgedSlots: [] } as const
 
 const setIndex = (entries: SelfCustodialAccountEntry[]) => {
   mockGetItem.mockImplementation((key: string) =>
@@ -99,7 +105,7 @@ const setupAccountIndexMockDefaults = () => {
   mockMnemonicExists.mockResolvedValue({ status: "no" })
   mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
   mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
-  mockPurgeLegacyKeyStore.mockResolvedValue("gone")
+  mockPurgeLegacyKeyStore.mockResolvedValue(PASS_GONE)
   // logPurgeOutcome chains off the returned promise, so a mock that answers
   // undefined would throw inside its own isolation and hide whether the event was
   // ever emitted — the same reason secure-store-migration's spec sets this.
@@ -810,7 +816,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
       const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
       expect(result).toEqual({ status: "done" })
-      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"])
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
       expect(mockSetItem).toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
 
@@ -820,7 +826,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
       const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
       expect(result).toEqual({ status: "done" })
-      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith([])
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith([], [])
     })
 
     /**
@@ -836,7 +842,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
       const result = await purgeLegacyKeyStoreOnce(SWEEP_INCOMPLETE)
 
       expect(result).toEqual({ status: "sweep-incomplete" })
-      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"])
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
       expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
 
@@ -860,7 +866,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
       const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
       expect(result).toEqual({ status: "done" })
-      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"])
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
     })
 
     it("does not purge when the index cannot be read", async () => {
@@ -877,7 +883,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
 
     it("leaves the flag unset when a key could not be erased", async () => {
       setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
-      mockPurgeLegacyKeyStore.mockResolvedValue("transient")
+      mockPurgeLegacyKeyStore.mockResolvedValue(PASS_TRANSIENT)
 
       const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
@@ -932,7 +938,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
 
       it("counts an attempt whose mnemonic was in neither store", async () => {
         setAttempts("2")
-        mockPurgeLegacyKeyStore.mockResolvedValue("permanent")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_PERMANENT)
 
         await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
@@ -947,7 +953,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
        */
       it("does not count an attempt a store was simply unable to answer", async () => {
         setAttempts("4")
-        mockPurgeLegacyKeyStore.mockResolvedValue("transient")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_TRANSIENT)
 
         const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
@@ -960,7 +966,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
 
       it("keeps attempting after any number of unreadable launches", async () => {
         setAttempts(String(LEGACY_PURGE_MAX_ATTEMPTS - 1))
-        mockPurgeLegacyKeyStore.mockResolvedValue("transient")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_TRANSIENT)
 
         await purgeLegacyKeyStoreOnce(SWEEP_OK)
         await purgeLegacyKeyStoreOnce(SWEEP_OK)
@@ -975,7 +981,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
        */
       it("announces giving up once, on the launch that reaches the bound", async () => {
         setAttempts(String(LEGACY_PURGE_MAX_ATTEMPTS - 1))
-        mockPurgeLegacyKeyStore.mockResolvedValue("permanent")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_PERMANENT)
 
         const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
@@ -1085,6 +1091,117 @@ describe("self-custodial account-index — legacy key store purge", () => {
     })
 
     /**
+     * A slot proven gone is never named again. Without the marker a pass kept
+     * short of done by one slot re-proved every other one on each launch, which
+     * for a mnemonic means reading the seed into a JS string that cannot be zeroed.
+     */
+    describe("the slots an earlier launch proved gone", () => {
+      const setPurgedSlots = (stored: string | null) => {
+        mockGetItem.mockImplementation((key: string) => {
+          if (key === ACCOUNT_INDEX_KEY) {
+            return Promise.resolve(JSON.stringify([{ id: "a1", lightningAddress: null }]))
+          }
+          if (key === LEGACY_PURGE_SLOTS_KEY) return Promise.resolve(stored)
+          return Promise.resolve(null)
+        })
+      }
+
+      it("hands the purge the slots it need not name again", async () => {
+        setPurgedSlots(JSON.stringify(["PIN", "mnemonic:a1"]))
+
+        await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(
+          ["a1"],
+          ["PIN", "mnemonic:a1"],
+        )
+      })
+
+      it("remembers what a pass proved gone even when it ended short of done", async () => {
+        setPurgedSlots(null)
+        mockPurgeLegacyKeyStore.mockResolvedValue({
+          outcome: "transient",
+          purgedSlots: ["PIN"],
+        })
+
+        await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(mockSetItem).toHaveBeenCalledWith(
+          LEGACY_PURGE_SLOTS_KEY,
+          JSON.stringify(["PIN"]),
+        )
+      })
+
+      it("rewrites nothing when the pass proved no slot it was not already handed", async () => {
+        setPurgedSlots(JSON.stringify(["PIN"]))
+        mockPurgeLegacyKeyStore.mockResolvedValue({
+          outcome: "transient",
+          purgedSlots: ["PIN"],
+        })
+
+        await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(mockSetItem).not.toHaveBeenCalledWith(
+          LEGACY_PURGE_SLOTS_KEY,
+          expect.anything(),
+        )
+      })
+
+      /**
+       * A marker read as fuller than it is would skip a slot nothing proved gone,
+       * and the flag could then be written over a legacy copy. One entry that is
+       * not a slot name discards the whole value, the way the tracked account list
+       * is read, and the pass re-proves slots it had already emptied instead.
+       */
+      it("names every slot again when the marker holds anything that is not a slot name", async () => {
+        setPurgedSlots(JSON.stringify(["PIN", 7]))
+
+        await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
+      })
+
+      it("names every slot again when the marker is not a list at all", async () => {
+        setPurgedSlots(JSON.stringify({ PIN: true }))
+
+        await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
+      })
+
+      it("names every slot again when the marker cannot be read", async () => {
+        mockGetItem.mockImplementation((key: string) => {
+          if (key === LEGACY_PURGE_SLOTS_KEY) {
+            return Promise.reject(new Error("AsyncStorage unavailable"))
+          }
+          if (key === ACCOUNT_INDEX_KEY) {
+            return Promise.resolve(JSON.stringify([{ id: "a1", lightningAddress: null }]))
+          }
+          return Promise.resolve(null)
+        })
+
+        await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
+      })
+
+      /** The marker write's result is discarded like the flag's: a re-proof next
+       *  launch is all a lost marker costs. */
+      it("still reports what the pass found when the marker cannot be written", async () => {
+        setPurgedSlots(null)
+        mockPurgeLegacyKeyStore.mockResolvedValue({
+          outcome: "gone",
+          purgedSlots: ["PIN"],
+        })
+        mockSetItem.mockRejectedValue(new Error("AsyncStorage unavailable"))
+
+        const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(result).toEqual({ status: "done" })
+      })
+    })
+
+    /**
      * Without a field signal an install stuck short of done is indistinguishable
      * from one that finished on its first launch, and the release that drops the
      * dependency has nothing to gate on.
@@ -1108,7 +1225,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
        */
       it("raises a purge that could not finish, without naming a key or an id", async () => {
         setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
-        mockPurgeLegacyKeyStore.mockResolvedValue("transient")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_TRANSIENT)
 
         await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
@@ -1126,6 +1243,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
         mockGetItem.mockImplementation((key: string) => {
           if (key === LEGACY_PURGE_DONE_KEY) return Promise.resolve(null)
           if (key === LEGACY_PURGE_ATTEMPTS_KEY) return Promise.resolve(null)
+          if (key === LEGACY_PURGE_SLOTS_KEY) return Promise.resolve(null)
           return Promise.reject(new Error("AsyncStorage unavailable"))
         })
 
@@ -1168,7 +1286,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
        */
       it("counts a mnemonic that is in neither store without raising a defect", async () => {
         setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
-        mockPurgeLegacyKeyStore.mockResolvedValue("permanent")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_PERMANENT)
 
         const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 

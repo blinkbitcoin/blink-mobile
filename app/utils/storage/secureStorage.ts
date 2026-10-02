@@ -68,6 +68,14 @@ type SecureStoreRead =
   | { readonly status: "absent" }
   | { readonly status: "failed"; readonly err: unknown }
 
+/** What a purge pass left behind, and which slots it can now vouch for. */
+export type LegacyKeyStorePurge = {
+  readonly outcome: SlotPurge
+  /** Every slot proven gone, on this pass or one before it, for the caller to
+   *  hand back on the next launch — see purgeLegacyKeyStore. */
+  readonly purgedSlots: readonly string[]
+}
+
 /**
  * What the tracked account list holds, or that it could not be read.
  *
@@ -995,8 +1003,27 @@ export default class KeyStoreWrapper {
    * cannot recognise to zero entries, so a damaged index hands this method fewer
    * ids than the device has and nothing here can tell. Tracked as its own issue,
    * since the degradation is that function's contract and has other callers.
+   *
+   * A slot in `purgedSlots` is not named again. Proving a slot gone is what puts
+   * a seed into a JS string that cannot be zeroed, and without the marker a pass
+   * kept short of done by one slot paid that for every other slot on every
+   * launch. The caller keeps the list beside its done-flag, with the same
+   * lifetime and the same limits, and this method only ever extends it: a slot
+   * that reached `gone` is added, one that did not is named again next launch.
+   *
+   * "The same limits" includes the empty legacy read a session slot is allowed
+   * to take as gone, which purgeThrough documents as accepted residue: on iOS a
+   * lookup that merely failed reads as absent, and a session slot scored gone on
+   * it is remembered like any other. Before the marker that slot was asked again
+   * only on launches some other slot kept short of done, which was a side effect
+   * of the pass having no memory rather than a safeguard: a pass that finished
+   * committed the same verdict through the flag. A mnemonic is never in this
+   * position, since its `gone` always rests on a read that returned the value.
    */
-  public static async purgeLegacyKeyStore(accountIds: string[]): Promise<SlotPurge> {
+  public static async purgeLegacyKeyStore(
+    accountIds: string[],
+    purgedSlots: readonly string[],
+  ): Promise<LegacyKeyStorePurge> {
     // Unreadable is not empty. Naming no mnemonics and reporting the pass gone
     // would let a caller record the purge as done over key material this boot
     // never looked at, which is the same reading
@@ -1061,7 +1088,13 @@ export default class KeyStoreWrapper {
     if (isTrackedListDamaged) outcome = "permanent"
     else if (tracked.status !== "ok") outcome = "transient"
 
-    for (const slot of [...sessionSlots, ...mnemonicSlots]) {
+    const alreadyGone = new Set(purgedSlots)
+    const slotsToName = [...sessionSlots, ...mnemonicSlots].filter(
+      (slot) => !alreadyGone.has(slot.args.slot),
+    )
+    const provenGone = [...purgedSlots]
+
+    for (const slot of slotsToName) {
       // Sequential, and never short-circuited: one slot that cannot be purged
       // must not leave the rest behind for a purge that may not run again for
       // months.
@@ -1069,12 +1102,14 @@ export default class KeyStoreWrapper {
         requireMigrated: slot.requireMigrated,
       })
 
+      if (slotOutcome === "gone") provenGone.push(slot.args.slot)
+
       // Worst wins, and `transient` is the worst: a pass with anything still worth
       // retrying is worth retrying, which a wholly `permanent` pass is not.
       if (slotOutcome === "transient") outcome = "transient"
       if (slotOutcome === "permanent" && outcome === "gone") outcome = "permanent"
     }
 
-    return outcome
+    return { outcome, purgedSlots: provenGone }
   }
 }

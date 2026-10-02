@@ -2,7 +2,7 @@ import AsyncStorage from "@react-native-async-storage/async-storage"
 import analytics from "@react-native-firebase/analytics"
 
 import { recordAppError } from "@app/utils/error-reporting"
-import { readString, remove, saveString } from "@app/utils/storage"
+import { loadJson, readString, remove, save, saveString } from "@app/utils/storage"
 
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
@@ -348,19 +348,20 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
 
 const LEGACY_PURGE_DONE_KEY = "legacyKeyStorePurged"
 const LEGACY_PURGE_ATTEMPTS_KEY = "legacyKeyStorePurgeAttempts"
+const LEGACY_PURGE_SLOTS_KEY = "legacyKeyStorePurgedSlots"
 
 /**
  * How many launches may end `unmigrated` before the purge stops trying.
  *
  * That state never resolves on its own: an index entry whose mnemonic exists in
  * neither store. Nothing is there to erase and no later launch changes that, but
- * the purge would still pay a keychain round trip per slot every launch.
+ * the purge would still pay that slot's keychain round trips every launch.
  *
  * Two states reach it. A seed in neither store is **Android only**, by
  * construction: that verdict needs a legacy store that can tell a missing key from
  * a failed lookup, and only Android's can (see purgeThrough). So a restored iOS device
- * with an index entry whose key material did not come with it keeps paying the pass
- * every launch and reports `incomplete` each time. That cost is accepted, because
+ * with an index entry whose key material did not come with it keeps paying for that
+ * slot every launch and reports `incomplete` each time. That cost is accepted, because
  * the alternative is retiring the purge on an answer iOS cannot stand behind.
  *
  * A damaged MNEMONIC_ACCOUNTS value reaches it on **both** platforms. Nothing read
@@ -456,6 +457,22 @@ const readPurgeAttempts = async (): Promise<number> => {
 }
 
 /**
+ * Empty when the marker cannot be read or holds anything that is not a list of
+ * slot names. The two errors cost differently: a marker read as fuller than it
+ * is would skip a slot nothing proved gone, and the flag could then be written
+ * over a legacy copy, while an empty one costs a re-proof of slots already
+ * emptied. So a single entry that is not a string discards the whole value
+ * rather than the entry, the way the tracked account list is read.
+ */
+const readPurgedSlots = async (): Promise<readonly string[]> => {
+  const stored: unknown = await loadJson(LEGACY_PURGE_SLOTS_KEY)
+  if (!Array.isArray(stored)) return []
+
+  const isListOfSlots = stored.every((slot) => typeof slot === "string")
+  return isListOfSlots ? stored : []
+}
+
+/**
  * Erases everything this app left in the legacy key store, once per install.
  *
  * The pass runs whatever the sweep reported. The six session slots have fixed
@@ -468,12 +485,15 @@ const readPurgeAttempts = async (): Promise<number> => {
  * What the sweep gates is the done-flag. The flag says the migration is finished
  * for this install, and the sweep is what confirms every account was read, moved
  * and recorded, so a pass that finishes over an incomplete sweep is reported as
- * such and runs again next launch.
+ * such and runs again next launch, over the slots the marker lets it skip.
  *
  * The done-flag lives in AsyncStorage, which a reinstall clears. That is the
  * right lifetime: after a reinstall the legacy store can still hold items that
  * survived it, so the purge should run again rather than believe a flag from an
- * install that is gone.
+ * install that is gone. The per-slot marker beside it has the same lifetime and
+ * the same limits: a slot proven gone is never named again, so a pass kept short
+ * of done by one slot costs that slot alone rather than a re-proof of every
+ * other, which for a mnemonic is a read of the seed into memory.
  *
  * The flag is set only on a purge that proved every key gone. A partial purge
  * leaves it unset and runs again on the next boot, bounded by
@@ -507,15 +527,22 @@ export const purgeLegacyKeyStoreOnce = async (
   }
 
   const accountIds = result.entries.map((entry) => entry.id)
-  const purged = await KeyStoreWrapper.purgeLegacyKeyStore(accountIds)
+  const purgedSlots = await readPurgedSlots()
+  const purged = await KeyStoreWrapper.purgeLegacyKeyStore(accountIds, purgedSlots)
+
+  // Saved before the verdict is acted on, so a pass that ends short of done still
+  // keeps what it proved. Result discarded like the flag's: a marker that cannot
+  // be written costs a re-proof on the next launch, nothing worse.
+  const hasProvedMoreSlots = purged.purgedSlots.length > purgedSlots.length
+  if (hasProvedMoreSlots) await save(LEGACY_PURGE_SLOTS_KEY, purged.purgedSlots)
 
   // Uncounted on purpose: see LEGACY_PURGE_MAX_ATTEMPTS. A store that could not
   // answer, or a migrating write that failed, gets every later launch it needs.
-  if (purged === "transient") {
+  if (purged.outcome === "transient") {
     return reportPurgeOutcome({ status: "incomplete" })
   }
 
-  if (purged === "permanent") {
+  if (purged.outcome === "permanent") {
     // Counted before the report, so the bound advances on a launch whose report
     // is deduped away. Result discarded like the flag below: a counter that
     // cannot be written costs another attempt, not correctness.
@@ -547,7 +574,7 @@ export const purgeLegacyKeyStoreOnce = async (
   await remove(LEGACY_PURGE_ATTEMPTS_KEY)
 
   // The sweep's verdict gates the flag, not the pass: every key this launch could
-  // name is gone, but an account the sweep could not
+  // name is gone, and the marker keeps that, but an account the sweep could not
   // confirm is not one the migration may call finished. Reported as its own
   // outcome, so the release decision can count the installs stuck here.
   if (sweep.status !== "ok") {
@@ -555,7 +582,7 @@ export const purgeLegacyKeyStoreOnce = async (
   }
 
   // Discarded deliberately: a flag that cannot be written means the purge runs
-  // again on the next boot, over a store it has already emptied, which is a
+  // again on the next boot, over slots the marker lets it skip, which is a
   // wasted pass and nothing worse.
   await saveString(LEGACY_PURGE_DONE_KEY, "true")
   return reportPurgeOutcome({ status: "done" })

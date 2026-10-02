@@ -467,12 +467,10 @@ export const purgeThrough = async (
   //
   // A seed does enter memory below, where the erase or the done-flag needs proof
   // that the value survived the move. That read is the price of not deleting the
-  // last readable copy, and it is paid on every launch the purge runs, not once:
-  // the pass has no per-slot marker, so a slot that already finished is proved
-  // again while any other slot keeps the pass short of done. On iOS that can be
-  // every launch, since no verdict there is terminal. Closing it means choosing
-  // between a legacy copy left behind and key material in memory, which is the
-  // trade the two reviews on blinkbitcoin/blink-mobile#4238 disagreed about.
+  // last readable copy, and it is paid on every launch until this slot is proven
+  // gone, not on every launch the purge runs: the caller remembers a slot that
+  // reached `gone` and never names it again (see purgeLegacyKeyStore), so a slot
+  // that keeps the pass short of done costs its own re-proof and nobody else's.
   await existsThrough(args, PURGE_SLOT_TIMEOUT_MS)
 
   try {
@@ -500,9 +498,9 @@ export const purgeThrough = async (
           // recoverable — on Android `hasInternetCredentials` resolves true for an
           // entry it never decrypts — but it is the cheap way to learn that there
           // is nothing here to confirm, which is the answer on every slot of a
-          // device in this state. The purge names every account on every launch
-          // until it completes, and reading on all of them would put every seed
-          // into a JS string that cannot be zeroed.
+          // device in this state. The purge names every account it has not yet
+          // proven gone, on every launch until it completes, and reading on all
+          // of them would put every seed into a JS string that cannot be zeroed.
           const present = await secureExists(args.slot)
           if (present.status === "failed") return "transient"
 
