@@ -10,6 +10,7 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { PinErrorKey } from "./pin-verification"
 import { useUnlockScreen } from "./unlock-screen"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
@@ -52,7 +53,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       if (!(await KeyStoreWrapper.clearPinFailureState())) {
         recordAppError(new Error("PIN attempt count could not be cleared"), {
           alwaysRecord: true,
-          dedupKey: "pin-attempts-clear",
+          dedupKey: PinErrorKey.AttemptsClear,
         })
       }
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
