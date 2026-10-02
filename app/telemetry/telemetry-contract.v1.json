@@ -98,7 +98,8 @@
       "name": "self_custodial_backup_completed",
       "version": 1,
       "modes": [
-        "custodial"
+        "custodial",
+        "enhanced"
       ],
       "params": {
         "event_version": {
@@ -123,14 +124,14 @@
             "keychain"
           ]
         }
-      },
-      "review": "pending privacy review; custodial-only until it passes"
+      }
     },
     {
       "name": "self_custodial_restore_completed",
       "version": 1,
       "modes": [
-        "custodial"
+        "custodial",
+        "enhanced"
       ],
       "params": {
         "event_version": {
@@ -146,14 +147,14 @@
         "telemetry_event_id": {
           "kind": "uuid_v4"
         }
-      },
-      "review": "pending privacy review; custodial-only until it passes"
+      }
     },
     {
       "name": "self_custodial_stable_balance_activated",
       "version": 1,
       "modes": [
-        "custodial"
+        "custodial",
+        "enhanced"
       ],
       "params": {
         "event_version": {
@@ -175,14 +176,14 @@
             "USDB"
           ]
         }
-      },
-      "review": "pending privacy review; custodial-only until it passes"
+      }
     },
     {
       "name": "self_custodial_rollout_exposed",
       "version": 1,
       "modes": [
-        "custodial"
+        "custodial",
+        "enhanced"
       ],
       "params": {
         "event_version": {
@@ -207,8 +208,7 @@
         "has_custodial_account": {
           "kind": "boolean"
         }
-      },
-      "review": "pending privacy review; custodial-only until it passes"
+      }
     },
     {
       "name": "telemetry_loss_reported",

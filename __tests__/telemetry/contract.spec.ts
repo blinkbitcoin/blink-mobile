@@ -185,10 +185,15 @@ describe("the telemetry contract", () => {
       { event: TelemetryEvent.RestoreCompleted },
       { event: TelemetryEvent.StableBalanceActivated },
       { event: TelemetryEvent.RolloutExposed },
-    ])("holds $event Custodial-only with its review pending", ({ event }) => {
+    ])("admits $event on both emitting modes", ({ event }) => {
       const row = contractRowFor(event)
-      expect(row?.modes).toEqual([EmittingMode.Custodial])
-      expect(row?.review).toMatch(/pending privacy review/)
+      expect(row?.modes).toEqual([EmittingMode.Custodial, EmittingMode.Enhanced])
+    })
+
+    it("parks no row on one mode, so no row is emitted from nowhere", () => {
+      for (const row of CONTRACT) {
+        expect(row.modes).toEqual([EmittingMode.Custodial, EmittingMode.Enhanced])
+      }
     })
 
     it("lists no mode a row could not emit from", () => {

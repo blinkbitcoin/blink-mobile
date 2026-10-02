@@ -1,6 +1,7 @@
 /* eslint-disable camelcase */
 import analytics from "@react-native-firebase/analytics"
 import RNFS from "react-native-fs"
+import Crypto from "react-native-quick-crypto"
 
 import {
   logSelfCustodialBackupCompleted,
@@ -25,14 +26,15 @@ import {
 } from "@app/telemetry/outbox/store"
 
 const logEvent = analytics().logEvent as jest.Mock
+const randomUUID = Crypto.randomUUID as jest.Mock
 const mockFs = RNFS as unknown as { __resetMockFileSystem: () => void }
 
 const DIR = "/mock/documents/blink-telemetry-outbox-regtest/legacy"
 
 /**
- * These four used to call Firebase directly. They now go through the boundary, so
- * what a test can assert is what the boundary does with them — hands them to GA4 on
- * Custodial, and holds them on Enhanced until their row passes privacy review.
+ * These four used to call Firebase directly. They now go through the boundary, so what a
+ * test can assert is what the boundary does with them — hands them to GA4 on Custodial, and
+ * files them in the outbox on Enhanced.
  */
 describe("self-custodial analytics helpers", () => {
   let store: ReturnType<typeof createOutboxStore>
@@ -129,9 +131,16 @@ describe("self-custodial analytics helpers", () => {
   })
 
   describe("the ruling, in behaviour", () => {
-    it("holds every legacy event on Enhanced until its row passes review", async () => {
+    it("sends every legacy event to the outbox on Enhanced, never to Firebase", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
       logEvent.mockClear()
+      // A distinct id each, because the outbox keys its records on the id: four events
+      // minted with the shared mock id are one record, which would hide three of them.
+      randomUUID
+        .mockReturnValueOnce("00000000-0000-4000-8000-000000000001")
+        .mockReturnValueOnce("00000000-0000-4000-8000-000000000002")
+        .mockReturnValueOnce("00000000-0000-4000-8000-000000000003")
+        .mockReturnValueOnce("00000000-0000-4000-8000-000000000004")
 
       logSelfCustodialBackupCompleted({ backupMethod: "manual" })
       logSelfCustodialRestoreCompleted()
@@ -142,8 +151,14 @@ describe("self-custodial analytics helpers", () => {
         hasCustodialAccount: false,
       })
 
+      const queued = await store.pending()
+      expect(queued.map((record) => record.event).sort()).toEqual([
+        "self_custodial_backup_completed",
+        "self_custodial_restore_completed",
+        "self_custodial_rollout_exposed",
+        "self_custodial_stable_balance_activated",
+      ])
       expect(logEvent).not.toHaveBeenCalled()
-      expect(await store.pending()).toEqual([])
     })
 
     it("emits nothing from a device with no resolved mode", async () => {

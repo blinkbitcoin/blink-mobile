@@ -208,7 +208,7 @@ describe("the telemetry privacy boundary", () => {
       logPaymentSettled(payment())
 
       expect(await queued(store)).toEqual([])
-      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
     })
 
     it("incognito: captures nothing, and discards what was already queued", async () => {
@@ -248,14 +248,15 @@ describe("the telemetry privacy boundary", () => {
       expect(await queued(storeB)).toHaveLength(1)
     })
 
-    it("custodial → self-custodial: no user-scoped identity survives", async () => {
+    it("custodial → self-custodial: the identity goes, the collection stays", async () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)
       setUserId.mockClear()
 
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
       expect(setUserId).toHaveBeenCalledWith(null)
-      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+      // Collecting on Enhanced is permitted; naming the account behind it is not.
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
     })
 
     it("offline then reconnect: retried without duplicating", async () => {
@@ -350,18 +351,15 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("the legacy events are gated by their row, pending review", () => {
-    it("suppresses a legacy event on Enhanced because its row does not admit it yet", async () => {
+  describe("the legacy events ride their row, on both modes", () => {
+    it("files a legacy event in the outbox on Enhanced, and never hands it to GA4", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
       logSelfCustodialBackupCompleted({ backupMethod: "manual" })
 
-      expect(await queued(store)).toEqual([])
+      expect(await queued(store)).toHaveLength(1)
       expect(logEvent).not.toHaveBeenCalled()
-      expect(getDiagnosticCounters().suppressedEvents).toBe(1)
-
-      // Anchor: a settlement on the same device does land, so the silence is the row's.
-      expect(await enhancedCaptures()).toBe(1)
+      expect(getDiagnosticCounters().suppressedEvents).toBe(0)
     })
 
     it("emits nothing at all while no mode is resolved", async () => {
@@ -374,14 +372,16 @@ describe("the telemetry privacy boundary", () => {
     })
   })
 
-  describe("an Enhanced device leaves the platform's own counts", () => {
-    it("disables platform collection while permitting contract events", async () => {
+  describe("an Enhanced device is counted by the platform, not named to it", () => {
+    it("collects, and still keeps its contract events on the outbox", async () => {
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
       logPaymentSettled(payment())
 
-      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+      expect(setUserId).toHaveBeenLastCalledWith(null)
       expect(await queued(store)).toHaveLength(1)
+      expect(logEvent).not.toHaveBeenCalled()
     })
   })
 

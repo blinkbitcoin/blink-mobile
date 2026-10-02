@@ -10,18 +10,16 @@ import {
 /**
  * The four self-custodial events that were already shipping straight to Firebase.
  *
- * None is in the three-event settlement contract, so the collection switch would have
- * silenced them on Enhanced devices the day P2 shipped — and silenced them *silently*, as a
- * side effect of a switch rather than as a decision. Each goes to
- * privacy review case by case with admission expected, and that its status is a contract
- * fact: a row in `contract.ts` with a `modes` column. Until a row passes review it is
- * restricted to `Custodial`, which is what a row that failed would get anyway, so the
- * behaviour on Enhanced is the same as before P2 and now says so in one place.
+ * They now have rows like everything else, and their rows name both emitting modes, so
+ * whether one may be emitted is a fact in `contract.ts` rather than a side effect of the
+ * collection switch. These four were parked on `Custodial` for a while, which meant the
+ * three that fire inside self-custodial flows were emitted from nowhere at all; a row says
+ * so in one place instead.
  *
  * Routing them through the boundary is what makes that true. The gate reads the row, the
- * policy stage checks the domain, and the boundary picks the carrier from the mode —
- * GA4 on Custodial, the outbox on Enhanced once a row is admitted. A producer here
- * cannot reach Firebase, cannot pick a carrier, and cannot emit for a mode it may not.
+ * policy stage checks the domain, and the boundary picks the carrier from the mode — GA4 on
+ * Custodial, the outbox on Enhanced. A producer here cannot reach Firebase, cannot pick a
+ * carrier, and cannot emit for a mode it may not.
  */
 
 type Common = Pick<TelemetryFact, "telemetryEventId" | "walletProvider">

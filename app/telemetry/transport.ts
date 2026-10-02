@@ -5,13 +5,14 @@ import type { ContractPayload } from "./contract"
  * seam, so choosing one later is an adapter plus a landing relay rather than a
  * reimplementation of the contract, the outbox, the dedup model and the board tiles.
  *
- * The decision is made: self-custodial events go to a Blink endpoint, and custodial
- * analytics stay on GA4 and never pass through here. GA4 was considered for both and ruled
- * out, because the SDK cannot suppress its own automatic events while `logEvent()` stays
- * live — verified against `@react-native-firebase/analytics@23.3.1`, see
- * `platform-analytics.ts`. The endpoint itself is still to come; until an adapter
- * registers,
- * `localOnlyTransport` stands in so the client work can be exercised end to end.
+ * Self-custodial contract events go to a Blink endpoint; custodial analytics stay on GA4 and
+ * never pass through here. GA4 could carry both — the platform collects on an Enhanced
+ * device too — and does not, so that a settlement fact lands in a warehouse we own, with our
+ * own dedup and our own loss accounting, rather than in a vendor's. What the platform is for
+ * on Enhanced is what only it can give: app instances, geography and sessions.
+ *
+ * Until an adapter registers, `localOnlyTransport` stands in so the client work can be
+ * exercised end to end.
  *
  * The port admits both acknowledgment styles so the outbox state machine is built once: an
  * `application`-ack adapter runs it whole, a `hand-off` adapter collapses

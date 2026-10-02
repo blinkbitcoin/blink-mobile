@@ -26,21 +26,23 @@ import {
  * The gate has two dimensions: the mode, and the contract row's `modes` column. It is not
  * "what the boundary emitted versus what the platform emitted" — every call goes through
  * the boundary, so that split says nothing. An event with a row is permitted where its row
- * says; anything without a row is permitted on Custodial alone. For the three settlement
- * events the table reads:
+ * says; anything without a row is permitted on Custodial alone. Every contract row now
+ * names both emitting modes, so the table reads:
  *
  * | mode       | contract events | non-contract events | platform collection |
  * |------------|-----------------|---------------------|---------------------|
  * | Custodial  | permitted       | permitted           | on                  |
- * | Enhanced   | permitted       | suppressed  | off                 |
+ * | Enhanced   | permitted       | suppressed          | on                  |
  * | Anon       | suppressed      | suppressed          | off                 |
  * | Unresolved | suppressed      | suppressed          | off                 |
  *
- * The last column is where this table parts ways with an earlier plan, which would have
- * kept Enhanced collection on so its events could ride Firebase. That needs the SDK to
- * suppress its own automatic events while `logEvent()` stays live, and it cannot — see
- * `platform-analytics.ts`. So Enhanced events go to the outbox instead, and Enhanced
- * collection stays off. Same table, different carrier.
+ * The last column reads `on` for Enhanced because a platform pseudo identifier is allowed
+ * there. It used to read `off`, to keep the SDK's automatic events — each one carrying that
+ * identifier — out of the allowlist; with the identifier allowed there is nothing left to
+ * suppress. Two things that did not change with it: a contract event still goes to the
+ * outbox on Enhanced and never to Firebase, and the ledger account id still rides Custodial
+ * alone. So the platform counts an app instance it cannot name, and the settlements stay
+ * ours.
  */
 
 export const TelemetryMode = {
@@ -199,36 +201,48 @@ let applying: Promise<void> = Promise.resolve()
 
 /**
  * Everything that closes, closes here and now — synchronously, in the same tick the mode
- * moves, ahead of anything queued behind a discard. Leaving `Custodial` for any reason
- * turns platform collection off, withdraws the identity permission and clears the
- * identity the SDK would otherwise merge into its next event. A discard is a directory
- * unlink and can be slow; collection staying on for its duration would let the SDK's
- * automatic events, and the analytics calls that still reach the SDK directly, transmit
- * from a device whose mode has already closed.
+ * moves, ahead of anything queued behind a discard. A discard is a directory unlink and can
+ * be slow; collection staying on for its duration would let the SDK's automatic events, and
+ * the analytics calls that still reach the SDK directly, transmit from a device whose mode
+ * has already closed.
+ *
+ * Two closes, because they answer to different rules. Leaving `Custodial` always withdraws
+ * the identity permission and clears the identity the SDK would otherwise merge into its
+ * next event: the ledger account id is custodial-only, so an `Enhanced` device collects
+ * without ever naming an account. Collection itself closes only on a mode that may emit
+ * nothing at all.
  */
 const closeSynchronously = (mode: TelemetryMode): void => {
   setDiagnosticsModeInput(diagnosticsInputFor(mode))
-  if (mode === TelemetryMode.Custodial) return
-  setCustodialIdentityPermitted(false)
-  clearCustodialAnalyticsIdentity()
-  setPlatformCollectionEnabled(false)
+  if (mode !== TelemetryMode.Custodial) {
+    setCustodialIdentityPermitted(false)
+    clearCustodialAnalyticsIdentity()
+  }
+  if (isSuppressedMode(mode)) setPlatformCollectionEnabled(false)
 }
 
 /**
- * The queued half: the discard, and the one thing that *opens*. Opening waits its turn
- * behind every discard queued before it — never flush what a switch withheld, and never
- * start collecting again over a queue still being destroyed — and it happens only if
- * `Custodial` is
- * still the current mode when its turn comes — a `Custodial` resolved and immediately
- * overtaken by `Anon` must not reopen collection on the way through.
+ * The queued half: the discard, and the things that *open*. Opening waits its turn behind
+ * every discard queued before it — never flush what a switch withheld, and never start
+ * collecting again over a queue still being destroyed — and it happens only if the mode that
+ * asked for it is still the current one when its turn comes, so a mode resolved and
+ * immediately overtaken by `Anon` does not reopen collection on the way through.
+ *
+ * The identity opens on `Custodial` alone. Collection opens on `Enhanced` too, and the
+ * identity stays shut there — which is the whole of the difference between the two modes at
+ * the platform SDK.
  */
 const applyMode = async (mode: TelemetryMode): Promise<void> => {
   if (isSuppressedMode(mode)) await notifySuppressed()
+  if (mode !== currentMode) return
 
-  if (mode === TelemetryMode.Custodial && currentMode === TelemetryMode.Custodial) {
+  if (mode === TelemetryMode.Custodial) {
     setCustodialIdentityPermitted(true)
     setPlatformCollectionEnabled(true)
+    return
   }
+
+  if (mode === TelemetryMode.Enhanced) setPlatformCollectionEnabled(true)
 }
 
 /**
@@ -308,12 +322,10 @@ export const whenModeSettled = (): Promise<void> => applying
  * The gate. Reads the event **name** against the contract before a payload exists,
  * which is why `TelemetryFact` needs no origin field.
  *
- * The two switches sit in front of the *self-custodial* pipeline only. P2
- * is what ships behind the rollout flag and what the kill switch rolls back; the
- * custodial contract events — `backup_completed`, `restore_completed`,
- * `stable_balance_activated`, `rollout_exposed` — predate it and ride GA4 as they did
- * before the boundary existed. Gating them on a flag that defaults to off would silence
- * the self-custody rollout's own control group until the ramp reached each device.
+ * The two switches sit in front of the *self-custodial* pipeline only, so a custodial
+ * device never answers to them. The rollout flag defaults to off, and gating custodial
+ * emission on it would silence the self-custody rollout's own control group until the ramp
+ * reached each device.
  */
 export const isEventPermitted = (event: string): boolean => {
   const permitted =

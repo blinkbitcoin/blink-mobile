@@ -154,22 +154,6 @@ const BOTH_MODES: readonly EmittingMode[] = [
 ]
 
 /**
- * The four legacy events go to privacy review one at a time, and are expected to pass.
- * Until a row does, it is restricted to `Custodial` — what a row that failed would get
- * anyway — so its status on Enhanced is stated in the table rather than falling out of the
- * collection switch. Admitting one is a one-word change to its `modes`.
- *
- * What that means in practice, stated so nobody expects otherwise: `rollout_exposed` fires
- * from the feature-flags context on every device and so is emitted from custodial and
- * pre-account ones; the other three fire only inside self-custodial flows with that account
- * already active, so until their rows are admitted they are emitted from nowhere. That is
- * the park, not an accident — on `main` they went to GA4 from a self-custodial device,
- * which
- * is the emission the review exists to decide on.
- */
-const PENDING_PRIVACY_REVIEW = "pending privacy review; custodial-only until it passes"
-
-/**
  * The contract's own version, and the version in the generated artifact's file name
  * (`telemetry-contract.v1.json`). Bump it when the *set* of rows changes; an individual
  * row's parameter change bumps that row's `version` instead.
@@ -206,23 +190,20 @@ export const CONTRACT: readonly ContractRow[] = [
     event: TelemetryEvent.BackupCompleted,
     version: 1,
     params: { ...COMMON_PARAMS, backup_method: enumOf(BackupMethod) },
-    modes: [EmittingMode.Custodial],
-    review: PENDING_PRIVACY_REVIEW,
+    modes: BOTH_MODES,
   },
   {
     event: TelemetryEvent.RestoreCompleted,
     version: 1,
     params: COMMON_PARAMS,
-    modes: [EmittingMode.Custodial],
-    review: PENDING_PRIVACY_REVIEW,
+    modes: BOTH_MODES,
   },
   {
     event: TelemetryEvent.StableBalanceActivated,
     version: 1,
     /** The producer passes `SparkToken.Label` — one literal, and the domain says so. */
     params: { ...COMMON_PARAMS, label: { kind: "enum", values: ["USDB"] } },
-    modes: [EmittingMode.Custodial],
-    review: PENDING_PRIVACY_REVIEW,
+    modes: BOTH_MODES,
   },
   {
     event: TelemetryEvent.RolloutExposed,
@@ -233,8 +214,7 @@ export const CONTRACT: readonly ContractRow[] = [
       stable_balance_enabled: { kind: "boolean" },
       has_custodial_account: { kind: "boolean" },
     },
-    modes: [EmittingMode.Custodial],
-    review: PENDING_PRIVACY_REVIEW,
+    modes: BOTH_MODES,
   },
   {
     event: TelemetryEvent.LossReported,

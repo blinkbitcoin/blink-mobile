@@ -5,37 +5,34 @@ import { reportBoundaryFault } from "./diagnostics"
 /**
  * The single point of contact with the analytics platform SDK.
  *
- * This is **not** the telemetry transport. The decision is made: custodial analytics
- * stay on GA4, and the first adapter for Enhanced telemetry is a Blink endpoint behind the
- * port. Self-custodial facts go to the outbox and wait for that port; they never pass
- * through this file. Custodial contract events do: this is their carrier, and
- * `logPlatformEvent` is the one place they are handed over.
- *
- * How the ruling was reached matters here because this file is where the alternative
- * would have lived. The 09-11 re-review tolerated GA4's `user_pseudo_id` as a scoped
- * exception and would have kept collection on for Enhanced so contract events could
- * ride Firebase. That needed the SDK to suppress its automatic events while `logEvent()`
- * stayed live — the spine's Q13, assigned to mobile. **Verified against
- * `@react-native-firebase/analytics@23.3.1`: it cannot.** `first_open`, `session_start`
- * and `user_engagement` are SDK-generated reserved events with no per-event switch; the
- * only controls the bridge exposes are `setAnalyticsCollectionEnabled` (a single boolean),
- * `setSessionTimeoutDuration`, and `setConsent`, which on mobile nulls the app-instance id
- * rather than splitting automatic from custom events. Suppressing platform events on
- * Enhanced and carrying Enhanced events over Firebase are mutually exclusive, which is what
- * settled the question.
+ * This is **not** the telemetry transport. Custodial contract events ride GA4 and this is
+ * their carrier: `logPlatformEvent` is the one place they are handed over. Self-custodial
+ * contract events never pass through this file — they go to the outbox and leave through the
+ * transport port, so a settlement fact lands in our own warehouse rather than the vendor's.
  *
  * What lives here is platform *control*: whether the SDK collects at all, the user-scoped
  * identity it would otherwise merge into every event it does collect, and the custodial
  * hand-off.
+ *
+ * One SDK limit shapes the first of those, and it is measured rather than assumed:
+ * collection is a single boolean. `first_open`, `session_start` and `user_engagement` are
+ * SDK-generated with no per-event switch, and the only other controls the bridge exposes are
+ * `setSessionTimeoutDuration` and `setConsent`, which on mobile nulls the app-instance id
+ * rather than splitting automatic events from custom ones. Verified against
+ * `@react-native-firebase/analytics@23.3.1`. So a mode that collects gets the automatic
+ * events too, and turning collection on for a mode is a decision about the identifiers
+ * riding those events, not only about the events the app sends itself.
  */
 
 /**
- * Collection runs on **Custodial only**. Enhanced, Anon and Unresolved all disable it: the
- * SDK's automatic, screen and session events are telemetry like any other, and each one
- * carries `user_pseudo_id`, which is not an approved field whatever the payload says.
+ * Collection runs on **Custodial and Enhanced**. Anon and Unresolved disable it: the SDK's
+ * automatic, screen and session events are telemetry like any other, and a device that must
+ * emit nothing may not send them either.
  *
- * The accepted cost is stated in the PRD: the board's app-instance tile and
- * platform-derived geography become custodial-only from P2.
+ * On Enhanced the SDK attaches its own app-instance identifier, which is allowed. What is
+ * not allowed is naming the account behind it: the ledger id and the user properties are
+ * permitted on Custodial alone, so the platform may count an Enhanced instance and may not
+ * join it to a Blink account.
  */
 /**
  * Every call to the SDK goes through here, and the seam never throws. `analytics()` throws

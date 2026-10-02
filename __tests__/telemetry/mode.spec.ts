@@ -191,7 +191,7 @@ describe("the collection gate", () => {
 
     it.each([
       { mode: TelemetryMode.Custodial, settlement: true, legacy: true, platform: true },
-      { mode: TelemetryMode.Enhanced, settlement: true, legacy: false, platform: false },
+      { mode: TelemetryMode.Enhanced, settlement: true, legacy: true, platform: false },
       { mode: TelemetryMode.Anon, settlement: false, legacy: false, platform: false },
       {
         mode: TelemetryMode.Unresolved,
@@ -200,7 +200,7 @@ describe("the collection gate", () => {
         platform: false,
       },
     ])(
-      "$mode — settlement: $settlement, legacy pending review: $legacy, non-contract: $platform",
+      "$mode — settlement: $settlement, legacy: $legacy, non-contract: $platform",
       async ({ mode, ...expected }) => {
         await resolveTelemetryMode(mode)
 
@@ -212,21 +212,41 @@ describe("the collection gate", () => {
       },
     )
 
-    it("runs platform collection on Custodial alone", async () => {
-      // An earlier attempt to keep Enhanced on Firebase failed because the SDK cannot
-      // suppress its reserved automatic events while logEvent() is live (verified against
-      // @react-native-firebase/analytics@23.3.1 — see platform-analytics.ts).
+    it("runs platform collection on Custodial and Enhanced, and nowhere else", async () => {
       await resolveTelemetryMode(TelemetryMode.Custodial)
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
 
       await resolveTelemetryMode(TelemetryMode.Enhanced)
-      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
 
       await resolveTelemetryMode(TelemetryMode.Anon)
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
 
       await resolveTelemetryMode(TelemetryMode.Unresolved)
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("collects on Enhanced without ever naming the account", async () => {
+      setCustodialAnalyticsIdentity({ userId: "ledger-account", properties: {} })
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      expect(setUserId).toHaveBeenLastCalledWith("ledger-account")
+
+      setUserId.mockClear()
+      setUserProperties.mockClear()
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+      expect(setUserId).toHaveBeenCalledWith(null)
+      expect(setUserId).not.toHaveBeenCalledWith("ledger-account")
+
+      // The container keeps pushing on its own triggers; the seam has to refuse while
+      // Enhanced, or the ledger id rides every automatic event the SDK now collects.
+      setUserId.mockClear()
+      setCustodialAnalyticsIdentity({ userId: "ledger-account", properties: {} })
+      expect(setUserId).not.toHaveBeenCalled()
+      expect(setUserProperties).not.toHaveBeenCalledWith(
+        expect.objectContaining({ network: expect.anything() }),
+      )
     })
   })
 

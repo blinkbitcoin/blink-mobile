@@ -63,15 +63,17 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 
 // Shut the analytics gate as early as any JavaScript can. Firebase persists the last value
 // of `setAnalyticsCollectionEnabled` across launches and that persisted value overrides
-// `firebase.json`, so a device that resolved Custodial last run would otherwise start this
-// one collecting — including automatic and screen-level events.
+// `firebase.json`, so a device that collected last run would otherwise start this one
+// collecting — including automatic and screen-level events — before it knows whether this
+// launch is incognito.
 //
 // The window before JS runs is closed natively: MainApplication.kt and AppDelegate.mm turn
 // collection off at process start, before the first Activity resumes / the app becomes
 // active, which is where `session_start` is logged. This call is the JS half of the same
-// default; the mode gate re-enables collection only once the mode resolves Custodial.
-// Residual, stated: an `app_update` logged at SDK initialisation, before Application
-// start, on the one launch after an upgrade of a device that last ran custodial.
+// default; the mode gate re-enables collection once the mode resolves Custodial or Enhanced.
+// Residual, stated: an `app_update` logged at SDK initialisation, before Application start,
+// on the one launch after an upgrade of a device that last ran collecting. The cost of the
+// native default is the first `session_start` of a launch that turns out to be permitted.
 initializeTelemetryGate()
 
 // The null adapter stands behind the port until the provider knows which network it is on
