@@ -625,8 +625,8 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
       requestIdleCallback(
         () => {
           // The purge is chained onto the sweep rather than scheduled beside it:
-          // it deletes the legacy mnemonic copies, so it must see whether every
-          // account's value actually reached the new store first.
+          // the pass runs either way, but it records itself as done only over a
+          // sweep that confirmed every account, so it needs the sweep's verdict.
           sweepMnemonicMigration()
             .then(purgeLegacyKeyStoreOnce)
             .catch(() => {
