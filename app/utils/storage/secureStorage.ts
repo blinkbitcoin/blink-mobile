@@ -61,7 +61,8 @@ const isKeyNotFound = (err: unknown): boolean =>
  * the PIN lockout block.
  */
 export type PinFailureState = {
-  /** Consecutive wrong-PIN entries. */
+  /** Consecutive PIN entries counted against the budget: the wrong ones, and
+   *  the one being judged, which is counted before it is compared. */
   readonly attempts: number
   /** Epoch ms the lock lifts at; 0 when no lock is in force. */
   readonly lockedUntil: number
@@ -336,8 +337,9 @@ export default class KeyStoreWrapper {
     }
   }
 
-  /** One write, so the boolean is the whole truth: false means the failure was
-   *  not recorded at all, which a caller that must not lose one has to act on. */
+  /** One write, so the boolean is the whole truth: false means nothing was
+   *  recorded at all, which a caller that must not lose an attempt has to act
+   *  on. */
   public static async setPinFailureState(state: PinFailureState): Promise<boolean> {
     const written = await KeyStoreWrapper.migratedWrite(
       KeyStoreWrapper.PIN_FAILURE_STATE,

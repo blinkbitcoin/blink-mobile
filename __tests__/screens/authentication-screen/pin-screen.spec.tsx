@@ -564,6 +564,22 @@ describe("PinScreen", () => {
       expect(mockReset).not.toHaveBeenCalled()
     })
 
+    it("does not open on the correct pin either when the attempt cannot be written down", async () => {
+      /** No entry is judged before it is in the store. One judged with nothing written
+       *  would be a guess that costs nothing, so the correct one is refused with the rest. */
+      mockedStore.setPinFailureState.mockResolvedValue(false)
+
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(CORRECT_PIN)
+
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+      expect(mockLogout).toHaveBeenCalledTimes(1)
+      expect(screen.getByText("Couldn't record the attempt securely.")).toBeTruthy()
+    })
+
     it("invites a retry, and spends no budget, when the stored pin cannot be read", async () => {
       // A keystore fault is not a wrong entry. Scoring it as one would log the
       // user out and wipe their pin after three unlucky unlocks.
