@@ -177,7 +177,10 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
 
     /** Resetting a stack with nothing above the blocker, purely to route a locked session
      *  through the unlock, is arming's job alone. A retry doing it would bounce a session
-     *  onto a PIN its own flow never owed.
+     *  that reached the blocker with the lock still up onto a PIN its own flow never owed.
+     *  Nothing reaches it that way while every way out of a lock screen either lowers the
+     *  lock or goes back to the gate (see useReturnToGate), and this is what keeps a retry
+     *  harmless for one that does not.
      *
      *  Judged before the unlock is: a reset that would achieve nothing has nothing to come
      *  back for either, so it must not leave a retry armed behind it. */

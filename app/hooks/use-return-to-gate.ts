@@ -23,6 +23,10 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
  *
  * Reset, not replace: this can be asked from a screen pushed on top of the live
  * stack, and anything left beneath would still be reachable.
+ *
+ * The gate is given no params, so it opens as a cold start even when the lock it
+ * replaces was pushed by a resume. It has to: the reset leaves nothing beneath
+ * it, and a resume unlock steps back to the screen it was pushed over.
  */
 export const useReturnToGate = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()

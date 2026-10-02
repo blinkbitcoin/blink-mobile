@@ -28,8 +28,8 @@ type LogoutOptions = {
    *
    * The group cannot be split. Profiles without the PIN would leave live
    * bearer tokens behind with the lock that guarded them gone, and dropping
-   * the schema marker alone makes the next boot read as a fresh install, whose
-   * reinstall sweep erases the profiles anyway.
+   * the schema marker makes the next boot purge the persisted query cache,
+   * which is erasing all the same.
    *
    * Only the untokened path reads this; a call that passes a token is already
    * scoped to that one session and destroys nothing else.
@@ -52,7 +52,9 @@ type LogoutResult = {
  *
  * A self-custodial wallet is stored on the device and outlives every logout:
  * nothing here erases it, and the account switcher opens it again for whoever
- * is holding the phone. The lock is the only thing between that person and the
+ * is holding the phone. Erasing it is not a logout's call either: the app does
+ * not delete a wallet that still holds funds, and a logout cannot tell whether
+ * this one does. The lock is the only thing between that person and the
  * wallet, so it stays for as long as one is stored. With none stored it goes,
  * as it always did: a lock with nothing behind it only locks its owner out.
  *
