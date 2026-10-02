@@ -28,7 +28,16 @@ export type ScreenSecurityLease = {
  *  time: a lease acquired while a teardown is in flight re-registers behind it
  *  instead of trusting a `registered` flag that is about to go stale, and a screen
  *  replaced by another protected screen does not churn the guard through
- *  unregister/register. */
+ *  unregister/register.
+ *
+ *  Each lease is settled by its own task and nothing else. A shared settle was the
+ *  mechanism behind two ways of lying to the gate: a cycle that landed with one
+ *  color resolved a lease that had asked for another, so content mounted and the
+ *  guard then came down under it to change color; and a cycle that exhausted its
+ *  retries rejected a lease that had joined it, whose own cycle then landed the
+ *  guard behind a failure view. A task that finds the guard already registered with
+ *  its lease's color resolves at once, so stacked screens still share one native
+ *  registration. */
 let leaseCount = 0
 let registered = false
 /** The color the live guard was registered with. `registered` alone cannot tell a
@@ -37,10 +46,6 @@ let registered = false
  *  nothing — but the former must still re-register, or the native guard keeps the
  *  stale color. */
 let registeredColor: string | undefined
-/** The color the newest live lease asked for. Read inside the queued task rather
- *  than captured at enqueue time: a lease that lands while earlier tasks are still
- *  queued is the one the guard must end up with. */
-let desiredColor: string | undefined
 let pending: Promise<void> = Promise.resolve()
 
 // A screen whose registration rejected would otherwise stay unprotected for its
@@ -49,11 +54,15 @@ let pending: Promise<void> = Promise.resolve()
 const ENABLE_RETRY_DELAY_MS = 10_000
 const ENABLE_RETRY_LIMIT = 3
 
-type Waiter = {
+/** What one acquire asked for, and how to answer it. The cycle checks `released`
+ *  rather than the lease count: a lease that is gone has nobody to settle and no
+ *  reason to keep registering, while any other live lease has a task of its own. */
+type Registration = {
+  readonly color: string
+  released: boolean
   resolve: () => void
-  reject: (_: unknown) => void
+  reject: (error: unknown) => void
 }
-let waiters: Waiter[] = []
 
 const enqueue = (task: () => Promise<void>): Promise<void> => {
   // Keep the queue alive even when a native call rejects.
@@ -61,8 +70,24 @@ const enqueue = (task: () => Promise<void>): Promise<void> => {
   return pending
 }
 
-// The wait between retry attempts, cut short when the last lease is released —
-// a retry nobody is waiting for must not register a guard nobody will unregister.
+/** A promise with its two settlers handed out beside it, so a registration can
+ *  carry them without placeholder functions that nothing ever calls. */
+const createSettlement = (): Pick<Registration, "resolve" | "reject"> & {
+  ready: Promise<void>
+} => {
+  let resolve!: () => void
+  let reject!: (error: unknown) => void
+  const ready = new Promise<void>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { ready, resolve, reject }
+}
+
+// The wait between retry attempts, cut short when a lease is released: the cycle's
+// own lease gone means the cycle stops, and the last lease gone means a retry must
+// not register a guard nobody will unregister. Only one cycle runs at a time, so a
+// single handle is enough.
 let wakeRetry: (() => void) | undefined
 
 const sleepBetweenRetries = (): Promise<void> =>
@@ -78,21 +103,19 @@ const sleepBetweenRetries = (): Promise<void> =>
     }
   })
 
-const settleWaiters = (settle: (waiter: Waiter) => void): void => {
-  const settled = waiters
-  waiters = []
-  for (const waiter of settled) settle(waiter)
-}
-
-const registerWithRetries = async (backgroundColor: string): Promise<void> => {
+const registerWithRetries = async (registration: Registration): Promise<void> => {
   let lastError: unknown = new Error("Screen security registration abandoned")
-  // leaseCount is mutated from outside this loop — acquire/release while a retry
-  // sleep is awaited — which is exactly how a cancelled cycle stops early.
+  // `released` is flipped from outside this loop — a release while a retry sleep is
+  // awaited — which is exactly how an abandoned cycle stops early.
   // eslint-disable-next-line no-unmodified-loop-condition
-  for (let attempt = 0; attempt <= ENABLE_RETRY_LIMIT && leaseCount > 0; attempt += 1) {
+  for (
+    let attempt = 0;
+    attempt <= ENABLE_RETRY_LIMIT && !registration.released;
+    attempt += 1
+  ) {
     try {
       await ScreenGuard.initSettings()
-      await ScreenGuard.register({ backgroundColor })
+      await ScreenGuard.register({ backgroundColor: registration.color })
       return
     } catch (error) {
       lastError = error
@@ -104,30 +127,32 @@ const registerWithRetries = async (backgroundColor: string): Promise<void> => {
         attempt === 0 ? "Enable screen security" : "Retry enable screen security",
         error,
       )
-      if (attempt < ENABLE_RETRY_LIMIT && leaseCount > 0) await sleepBetweenRetries()
+      if (attempt < ENABLE_RETRY_LIMIT && !registration.released)
+        await sleepBetweenRetries()
     }
   }
   throw lastError
 }
 
-const startRegistration = (): void => {
-  // One task per acquire; the queue serializes them, so concurrent leases simply
-  // no-op behind the task that lands the registration and share its waiter settle.
+const startRegistration = (registration: Registration): void => {
+  // One task per acquire; the queue serializes them. A task that finds the guard
+  // already registered with its color makes no native call, which is what lets
+  // stacked screens share one registration without sharing each other's outcome.
   enqueue(async () => {
+    // Decided at run time, not call time: a teardown queued ahead of this task may
+    // have run by now, and a `registered` flag read at call time would be stale
+    // exactly when it matters. A lease released before its turn has nobody to
+    // settle and makes no native call at all.
+    if (registration.released) return
     try {
-      // Decided at run time, not call time: a teardown queued ahead of this task
-      // may have run by now, and a `registered` flag read at call time would be
-      // stale exactly when it matters.
-      const color = desiredColor
-      if (color === undefined) return
       if (!registered) {
-        await registerWithRetries(color)
+        await registerWithRetries(registration)
         // Serialized by the queue: no other task can touch `registered` here.
         // eslint-disable-next-line require-atomic-updates
         registered = true
         // eslint-disable-next-line require-atomic-updates
-        registeredColor = color
-      } else if (registeredColor !== color) {
+        registeredColor = registration.color
+      } else if (registeredColor !== registration.color) {
         // A same-tick replace with a new color (a theme flip re-acquires the lease
         // before the queued teardown runs) cancels the teardown, so without this
         // branch the native guard would keep the stale color. Registering over a
@@ -149,50 +174,51 @@ const startRegistration = (): void => {
           // eslint-disable-next-line require-atomic-updates
           registeredColor = undefined
         }
-        await registerWithRetries(color)
+        await registerWithRetries(registration)
         // eslint-disable-next-line require-atomic-updates
         registered = true
         // eslint-disable-next-line require-atomic-updates
-        registeredColor = color
+        registeredColor = registration.color
       }
-      settleWaiters((waiter) => waiter.resolve())
+      if (!registration.released) registration.resolve()
     } catch (error) {
-      // A cycle abandoned because the last lease was released has nobody to
-      // report to; a genuinely exhausted cycle fails every waiter.
-      if (leaseCount > 0) settleWaiters((waiter) => waiter.reject(error))
+      // A cycle abandoned because its lease was released has nobody to report to;
+      // a genuinely exhausted cycle fails the one lease that asked for it.
+      if (!registration.released) registration.reject(error)
     }
   })
 }
 
 export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLease => {
   leaseCount += 1
-  desiredColor = backgroundColor
 
-  const waiter: Waiter = { resolve: () => {}, reject: () => {} }
-  const ready = new Promise<void>((resolve, reject) => {
-    waiter.resolve = resolve
-    waiter.reject = reject
-  })
-  waiters.push(waiter)
+  const { ready, resolve, reject } = createSettlement()
+  const registration: Registration = {
+    color: backgroundColor,
+    released: false,
+    resolve,
+    reject,
+  }
 
-  startRegistration()
+  startRegistration(registration)
 
-  let released = false
+  // Doubles as the idempotency marker: a second release returns the first one's
+  // promise rather than deflating the count again.
   let releasePromise: Promise<void> | undefined
 
   const release = (): Promise<void> => {
-    if (released) return releasePromise ?? Promise.resolve()
-    released = true
+    if (releasePromise) return releasePromise
+    // A released lease stops waiting: its ready promise never settles, and a cycle
+    // running on its behalf stops at its next check.
+    registration.released = true
     leaseCount -= 1
-    // A released lease stops waiting; its ready promise never settles.
-    waiters = waiters.filter((current) => current !== waiter)
+    wakeRetry?.()
 
     if (leaseCount > 0) {
       releasePromise = Promise.resolve()
       return releasePromise
     }
 
-    wakeRetry?.()
     releasePromise = enqueue(async () => {
       if (leaseCount > 0 || !registered) return
       try {

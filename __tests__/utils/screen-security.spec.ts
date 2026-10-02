@@ -201,7 +201,10 @@ describe("screen-security", () => {
   it("applies a color change that arrives while a registration is in flight", async () => {
     const { acquireScreenSecurity } = loadModule()
     const pendingRegister = deferred<void>()
-    mockRegister.mockReturnValueOnce(pendingRegister.promise)
+    const pendingRecolor = deferred<void>()
+    mockRegister
+      .mockReturnValueOnce(pendingRegister.promise)
+      .mockReturnValueOnce(pendingRecolor.promise)
 
     const leaving = acquireScreenSecurity("#ffffff")
     await jest.advanceTimersByTimeAsync(0)
@@ -209,12 +212,46 @@ describe("screen-security", () => {
 
     const releasePromise = leaving.release()
     const arriving = acquireScreenSecurity("#000000")
+    const arrivingSettled = settlementOf(arriving.ready)
     pendingRegister.resolve(undefined)
-    await Promise.all([releasePromise, arriving.ready])
     await jest.advanceTimersByTimeAsync(0)
 
+    // The stale-color registration landed, and the arriving lease is still waiting
+    // on the one with its own color: settling it here would mount content that the
+    // re-registration is about to pull the guard from under.
+    expect(arrivingSettled).not.toHaveBeenCalled()
+    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
+
+    pendingRecolor.resolve(undefined)
+    await Promise.all([releasePromise, arriving.ready])
+
+    expect(mockRegister).toHaveBeenCalledTimes(2)
+  })
+
+  /** A theme flip during a retry sleep. The leaving lease's cycle must not resolve
+   *  the arriving lease on the color it was registering with: the gate would mount the
+   *  content, and the arriving lease's own task would then pull the guard down under
+   *  it to apply the new color. A lease settles only from a registration with its own
+   *  color, and a cycle whose lease is gone stops rather than registering for nobody. */
+  it("never resolves a new lease on a retry that lands with the old color", async () => {
+    const { acquireScreenSecurity } = loadModule()
+    mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+    const leaving = acquireScreenSecurity("#ffffff")
+    await jest.advanceTimersByTimeAsync(0)
+    expect(mockRegister).toHaveBeenCalledTimes(1)
+
+    // Automatic dark mode kicks in while the retry sleeps.
+    const releasePromise = leaving.release()
+    const arriving = acquireScreenSecurity("#000000")
+    const arrivingSettled = settlementOf(arriving.ready)
+    await Promise.all([releasePromise, arriving.ready])
+
+    expect(arrivingSettled).toHaveBeenCalledWith("resolved")
     expect(mockRegister).toHaveBeenCalledTimes(2)
     expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
+    // Nothing was registered with the stale color, so nothing had to come down.
+    expect(mockUnregister).not.toHaveBeenCalled()
   })
 
   /** A lease acquired after release() but before the queued teardown runs cancels
@@ -307,21 +344,47 @@ describe("screen-security", () => {
     expect(mockRegister).toHaveBeenCalledTimes(1 + RETRY_LIMIT + 1)
   })
 
-  /** The phrase screen's registration fails, the confirm screen is pushed on top,
-   *  and its lease must join the same cycle and see the same outcome rather than
-   *  early-resolving on a count that claims protection which was never installed. */
-  it("fails every concurrent lease when the shared cycle is exhausted", async () => {
+  /** The phrase screen's registration is failing and the confirm screen is pushed
+   *  before the retries run out. The exhausted cycle must not fail the lease that
+   *  joined it: that lease's own cycle runs next and may land the guard, and a
+   *  screen on the failure view with the guard on is the state nothing recovers
+   *  from. It fails only once its own cycle is exhausted. */
+  it("fails a lease that joined a failing cycle only once its own cycle is exhausted", async () => {
     const { acquireScreenSecurity } = loadModule()
     mockRegister.mockRejectedValue(new Error("native failure"))
 
     const first = acquireScreenSecurity("#000000")
-    const second = acquireScreenSecurity("#000000")
     const firstSettled = settlementOf(first.ready)
+    await jest.advanceTimersByTimeAsync(0)
+    const second = acquireScreenSecurity("#000000")
     const secondSettled = settlementOf(second.ready)
-    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * (RETRY_LIMIT + 1))
 
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * RETRY_LIMIT)
     expect(firstSettled).toHaveBeenCalledWith("rejected")
+    expect(secondSettled).not.toHaveBeenCalled()
+
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * RETRY_LIMIT)
     expect(secondSettled).toHaveBeenCalledWith("rejected")
+  })
+
+  it("settles a lease that joined a failing cycle from its own cycle", async () => {
+    const { acquireScreenSecurity } = loadModule()
+    mockRegister.mockRejectedValue(new Error("native failure"))
+
+    const first = acquireScreenSecurity("#000000")
+    const firstSettled = settlementOf(first.ready)
+    await jest.advanceTimersByTimeAsync(0)
+    const second = acquireScreenSecurity("#000000")
+    const secondSettled = settlementOf(second.ready)
+
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * RETRY_LIMIT)
+    expect(firstSettled).toHaveBeenCalledWith("rejected")
+
+    // The guard comes back for the second lease's retry.
+    mockRegister.mockResolvedValue(undefined)
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS)
+
+    expect(secondSettled).toHaveBeenCalledWith("resolved")
   })
 
   it("resolves ready when a retry succeeds, and not before", async () => {
