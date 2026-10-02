@@ -4,6 +4,16 @@ import KeyStoreWrapper, { PinFailureState } from "@app/utils/storage/secureStora
 /** Consecutive wrong entries the app allows before it ends the session. */
 export const MAX_PIN_ATTEMPTS = 3
 
+/** The keys the PIN's storage faults are reported under. A key names a defect, not a call
+ *  site: the first report under one silences the rest for the life of the process, so two
+ *  reports share a key only when they are the same slot refusing the same operation. */
+export const PinErrorKey = {
+  AttemptsRead: "pin-attempts-read",
+  AttemptsWrite: "pin-attempts-write",
+  AttemptsClear: "pin-attempts-clear",
+  PinRead: "pin-read",
+} as const
+
 export type PinVerification =
   | { readonly outcome: "unlocked" }
   | {
@@ -40,7 +50,7 @@ export const readPinAttempts = async (): Promise<PinAttemptsRead> => {
   if (read.status === "failed") {
     recordAppError(new Error("PIN attempt count could not be read"), {
       alwaysRecord: true,
-      dedupKey: "pin-attempts-read",
+      dedupKey: PinErrorKey.AttemptsRead,
     })
     return { status: "unreadable" }
   }
@@ -80,7 +90,7 @@ export const verifyPin = async (enteredPin: string): Promise<PinVerification> =>
   if (storedPin === null || storedPin.length === 0) {
     recordAppError(new Error("PIN could not be read"), {
       alwaysRecord: true,
-      dedupKey: "pin-read",
+      dedupKey: PinErrorKey.PinRead,
     })
     return { outcome: "unreadable" }
   }
@@ -93,7 +103,7 @@ export const verifyPin = async (enteredPin: string): Promise<PinVerification> =>
     if (!(await KeyStoreWrapper.clearPinFailureState())) {
       recordAppError(new Error("PIN attempt count could not be cleared"), {
         alwaysRecord: true,
-        dedupKey: "pin-attempts-clear",
+        dedupKey: PinErrorKey.AttemptsClear,
       })
     }
     return { outcome: "unlocked" }
@@ -102,19 +112,17 @@ export const verifyPin = async (enteredPin: string): Promise<PinVerification> =>
   const failures = attempts + 1
 
   if (failures >= MAX_PIN_ATTEMPTS) {
-    /** Recorded before returning, so a kill during the logout that follows
-     *  cannot hand back a spent budget. The logout that follows keeps the lock
-     *  standing, so this is the write that has to land: unrecorded, the next
-     *  launch reads one failure short of the cap and grants another guess
-     *  against a PIN that is still there. The outcome does not change, since
-     *  the session ends either way, but a budget that silently failed to close
-     *  is worth knowing about. Its own dedup key, apart from the non-terminal
-     *  write below: they are different defects, and the first to fire must not
-     *  silence the other for the rest of the process. */
+    /** Written so the stored count says what happened, and awaited so the
+     *  logout that follows does not race it. The budget does not rest on it:
+     *  a count left one short of the cap makes the next wrong entry exhaust it
+     *  just the same, and the keypad shows one attempt left either way. A
+     *  write the keystore refused is still worth knowing about, as a signal
+     *  about the keystore. It is the slot the write below reports on, refusing
+     *  the same write, so it goes under the same key. */
     if (!(await KeyStoreWrapper.setPinFailureState({ attempts: failures }))) {
       recordAppError(new Error("Spent PIN budget could not be recorded"), {
         alwaysRecord: true,
-        dedupKey: "pin-budget-spent-write",
+        dedupKey: PinErrorKey.AttemptsWrite,
       })
     }
     return { outcome: "exhausted" }
@@ -128,7 +136,7 @@ export const verifyPin = async (enteredPin: string): Promise<PinVerification> =>
     // Logging out is the only refusal that survives a relaunch.
     recordAppError(new Error("PIN attempt could not be persisted"), {
       alwaysRecord: true,
-      dedupKey: "pin-attempts-write",
+      dedupKey: PinErrorKey.AttemptsWrite,
     })
     return { outcome: "unrecorded" }
   }
