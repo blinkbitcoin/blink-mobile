@@ -558,7 +558,7 @@ describe("self-custodial account-index", () => {
   })
 })
 
-describe("self-custodial account-index — boot sweep and purge", () => {
+describe("self-custodial account-index — boot sweep", () => {
   beforeEach(setupAccountIndexMockDefaults)
 
   describe("sweepMnemonicMigration", () => {
@@ -792,6 +792,12 @@ describe("self-custodial account-index — boot sweep and purge", () => {
       expect(second).toEqual(first)
     })
   })
+})
+
+// Split from the sweep for the same reason the file's first two describes are:
+// max-lines-per-function, not because they test unrelated things.
+describe("self-custodial account-index — legacy key store purge", () => {
+  beforeEach(setupAccountIndexMockDefaults)
 
   /**
    * The one reading two callers with opposite biases share. Keeping "could not tell" as its
