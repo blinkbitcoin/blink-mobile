@@ -4,6 +4,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
@@ -32,6 +33,7 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
   const { logout } = useLogout()
   const { saveToken } = useAppConfig()
   const { LL } = useI18nContext()
+  const { isAppLocked } = useAuthenticationContext()
 
   const switchToNextProfile = async (
     tokenToDeactivate: string,
@@ -61,7 +63,11 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
       message: LL.ProfileScreen.switchAccount(),
       LL,
     })
-    navigation.navigate("Primary")
+    /** Behind a lock that has not been answered, the switch changes which
+     *  session is waiting, not which screen is up: a session can die while the
+     *  lock screen is the one on show, and the home screen pushed from here
+     *  would sit on top of it. Answering the lock is what lands on home. */
+    if (!isAppLocked) navigation.navigate("Primary")
     return SwitchProfileOutcome.Switched
   }
 
