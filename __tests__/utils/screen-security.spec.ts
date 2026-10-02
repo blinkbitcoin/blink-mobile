@@ -158,8 +158,10 @@ describe("screen-security", () => {
   /** Theme flip on a mounted screen: the effect releases the old lease and re-acquires
    *  with the new color in the same tick, so the queued teardown cancels itself and no
    *  fresh registration task would run on the lease count alone. The color the guard
-   *  was registered with must be tracked, or the native guard keeps the stale color. */
-  it("re-registers when a same-tick replace changes the background color", async () => {
+   *  was registered with must be tracked, or the native guard keeps the stale color.
+   *  The new color is registered over the live guard, never after bringing it down:
+   *  the content is still on screen for the frames before the gate re-hides it. */
+  it("re-registers in place when a same-tick replace changes the background color", async () => {
     const { acquireScreenSecurity } = loadModule()
 
     const leaving = acquireScreenSecurity("#ffffff")
@@ -169,31 +171,79 @@ describe("screen-security", () => {
     const arriving = acquireScreenSecurity("#000000")
     await Promise.all([releasePromise, arriving.ready])
 
-    expect(mockUnregister).toHaveBeenCalledTimes(1)
+    expect(mockUnregister).not.toHaveBeenCalled()
     expect(mockRegister).toHaveBeenCalledTimes(2)
     expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
   })
 
-  /** Theme flip on a mounted screen whose unregister rejects: the color-change branch
-   *  must still re-register with the new color, the way the teardown treats a rejected
-   *  unregister as the recoverable state. Otherwise the guard ends up down, no register
-   *  is ever attempted, and every gated screen lands on the failure view. */
-  it("re-registers with the new color when the unregister of a color change rejects", async () => {
+  /** Only a re-registration that exhausts its retries brings the guard down: by then
+   *  the gate has long hidden the content, and a guard left up with the stale color
+   *  would lie to the next lease about what is registered. The lease fails like any
+   *  exhausted cycle. */
+  it("brings the guard down and fails the lease once an in-place re-registration is exhausted", async () => {
     const { acquireScreenSecurity } = loadModule()
 
     const leaving = acquireScreenSecurity("#ffffff")
     await leaving.ready
-    mockUnregister.mockRejectedValueOnce(new Error("native failure"))
+    mockRegister.mockRejectedValue(new Error("native failure"))
 
     const releasePromise = leaving.release()
     const arriving = acquireScreenSecurity("#000000")
-    await Promise.all([releasePromise, arriving.ready])
+    const arrivingSettled = settlementOf(arriving.ready)
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * RETRY_LIMIT)
+    await releasePromise
 
-    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
+    expect(arrivingSettled).toHaveBeenCalledWith("rejected")
+    expect(mockUnregister).toHaveBeenCalledTimes(1)
+    // Nothing is registered now, so the next lease starts from scratch.
+    mockRegister.mockResolvedValue(undefined)
+    const next = acquireScreenSecurity("#000000")
+    await next.ready
+    expect(mockRegister).toHaveBeenCalledTimes(1 + RETRY_LIMIT + 1 + 1)
+  })
+
+  /** The teardown after an exhausted re-registration treats a rejected unregister the
+   *  way the last-lease teardown does: reported, and `false` is the recoverable state. */
+  it("reports a rejected unregister after an exhausted re-registration and still fails the lease", async () => {
+    const { acquireScreenSecurity } = loadModule()
+
+    const leaving = acquireScreenSecurity("#ffffff")
+    await leaving.ready
+    mockRegister.mockRejectedValue(new Error("native failure"))
+    mockUnregister.mockRejectedValueOnce(new Error("unregister failure"))
+
+    const releasePromise = leaving.release()
+    const arriving = acquireScreenSecurity("#000000")
+    const arrivingSettled = settlementOf(arriving.ready)
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS * RETRY_LIMIT)
+    await releasePromise
+
+    expect(arrivingSettled).toHaveBeenCalledWith("rejected")
     expect(mockReportError).toHaveBeenCalledWith(
       "Disable screen security",
       expect.any(Error),
     )
+  })
+
+  /** A retry sleep belongs to the cycle of one lease. Releasing another lease must not
+   *  cut it short and burn an attempt: popping a screen stacked on a failing one would
+   *  otherwise spend the bottom screen's retries early. */
+  it("does not cut a lease's retry sleep short when an unrelated lease releases", async () => {
+    const { acquireScreenSecurity } = loadModule()
+    mockRegister.mockRejectedValueOnce(new Error("native failure"))
+
+    const bottom = acquireScreenSecurity("#000000")
+    await jest.advanceTimersByTimeAsync(0)
+    expect(mockRegister).toHaveBeenCalledTimes(1)
+
+    const top = acquireScreenSecurity("#000000")
+    await top.release()
+    await jest.advanceTimersByTimeAsync(0)
+    expect(mockRegister).toHaveBeenCalledTimes(1)
+
+    await jest.advanceTimersByTimeAsync(RETRY_DELAY_MS)
+    await bottom.ready
+    expect(mockRegister).toHaveBeenCalledTimes(2)
   })
 
   /** A color change can also land while the previous registration is still in flight;
@@ -226,6 +276,7 @@ describe("screen-security", () => {
     await Promise.all([releasePromise, arriving.ready])
 
     expect(mockRegister).toHaveBeenCalledTimes(2)
+    expect(mockUnregister).not.toHaveBeenCalled()
   })
 
   /** A theme flip during a retry sleep. The leaving lease's cycle must not resolve

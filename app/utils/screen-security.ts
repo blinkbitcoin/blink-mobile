@@ -84,24 +84,41 @@ const createSettlement = (): Pick<Registration, "resolve" | "reject"> & {
   return { ready, resolve, reject }
 }
 
-// The wait between retry attempts, cut short when a lease is released: the cycle's
-// own lease gone means the cycle stops, and the last lease gone means a retry must
-// not register a guard nobody will unregister. Only one cycle runs at a time, so a
-// single handle is enough.
-let wakeRetry: (() => void) | undefined
+/** The wait between retry attempts, and whose cycle is waiting. Only one cycle runs
+ *  at a time, so a single handle is enough. Cut short only by the release of its own
+ *  lease, which is what stops the cycle at its next check: waking it for another
+ *  lease's release would burn one of its attempts early. */
+type RetrySleep = {
+  readonly registration: Registration
+  readonly wake: () => void
+}
+let retrySleep: RetrySleep | undefined
 
-const sleepBetweenRetries = (): Promise<void> =>
+const sleepBetweenRetries = (registration: Registration): Promise<void> =>
   new Promise((resolve) => {
     const timer = setTimeout(() => {
-      wakeRetry = undefined
+      retrySleep = undefined
       resolve()
     }, ENABLE_RETRY_DELAY_MS)
-    wakeRetry = () => {
-      clearTimeout(timer)
-      wakeRetry = undefined
-      resolve()
+    retrySleep = {
+      registration,
+      wake: () => {
+        clearTimeout(timer)
+        retrySleep = undefined
+        resolve()
+      },
     }
   })
+
+/** After an unregister, settled or rejected: the native state may be either way,
+ *  and `false` is the only recoverable reading. Leaving `registered` true would
+ *  wedge the guard, since every later acquire would skip the register on the
+ *  strength of it; the next acquire re-registers instead, which is harmless if
+ *  the shield is in fact still on. */
+const forgetGuard = (): void => {
+  registered = false
+  registeredColor = undefined
+}
 
 const registerWithRetries = async (registration: Registration): Promise<void> => {
   let lastError: unknown = new Error("Screen security registration abandoned")
@@ -128,7 +145,7 @@ const registerWithRetries = async (registration: Registration): Promise<void> =>
         error,
       )
       if (attempt < ENABLE_RETRY_LIMIT && !registration.released)
-        await sleepBetweenRetries()
+        await sleepBetweenRetries(registration)
     }
   }
   throw lastError
@@ -155,28 +172,30 @@ const startRegistration = (registration: Registration): void => {
       } else if (registeredColor !== registration.color) {
         // A same-tick replace with a new color (a theme flip re-acquires the lease
         // before the queued teardown runs) cancels the teardown, so without this
-        // branch the native guard would keep the stale color. Registering over a
-        // live guard cannot be relied on to replace it, so it comes down first.
+        // branch the native guard would keep the stale color. The new color is
+        // registered over the live guard, which both platforms replace in place:
+        // iOS `secureViewWithBackgroundColor` only recolors a secure field that
+        // already exists, and Android `activateShield` re-applies FLAG_SECURE.
+        // Bringing the guard down first would leave the content, still on screen
+        // for the frames before the gate re-hides it, capturable.
         try {
-          await ScreenGuard.unregister()
+          await registerWithRetries(registration)
         } catch (error) {
-          // Reported and carried on, not rethrown: the library's unregister does
-          // reject, and letting it escape here would skip the re-registration
-          // below and leave the guard down under a lease that is still waiting.
-          // The teardown treats the same rejection as recoverable for the same
-          // reason.
-          reportError("Disable screen security", error)
-        } finally {
-          // Same reasoning as the teardown below: after a rejected unregister the
-          // native state is unknown and `false` is the only recoverable state.
-          // eslint-disable-next-line require-atomic-updates
-          registered = false
-          // eslint-disable-next-line require-atomic-updates
-          registeredColor = undefined
+          // Only a re-registration that exhausts its retries brings the guard
+          // down: by now the gate has long hidden the content, and a guard left up
+          // with the stale color would lie to the next lease about what is
+          // registered. The library's unregister does reject; here that is
+          // reported rather than rethrown, so the lease fails with the error that
+          // caused the teardown, and `forgetGuard` keeps the state recoverable.
+          try {
+            await ScreenGuard.unregister()
+          } catch (unregisterError) {
+            reportError("Disable screen security", unregisterError)
+          } finally {
+            forgetGuard()
+          }
+          throw error
         }
-        await registerWithRetries(registration)
-        // eslint-disable-next-line require-atomic-updates
-        registered = true
         // eslint-disable-next-line require-atomic-updates
         registeredColor = registration.color
       }
@@ -212,7 +231,8 @@ export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLe
     // running on its behalf stops at its next check.
     registration.released = true
     leaseCount -= 1
-    wakeRetry?.()
+    const isOwnCycleSleeping = retrySleep?.registration === registration
+    if (isOwnCycleSleeping) retrySleep?.wake()
 
     if (leaseCount > 0) {
       releasePromise = Promise.resolve()
@@ -224,16 +244,10 @@ export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLe
       try {
         await ScreenGuard.unregister()
       } finally {
-        // A rejected unregister leaves the native state unknown — the shield may
-        // or may not have come down — and no later release can reach this task to
-        // retry. Leaving `registered` true would wedge the guard: every later
-        // acquire would skip the register on the strength of it. `false` is the
-        // only recoverable state; the next acquire re-registers, which is
-        // harmless if the shield is in fact still on.
-        // eslint-disable-next-line require-atomic-updates
-        registered = false
-        // eslint-disable-next-line require-atomic-updates
-        registeredColor = undefined
+        // No later release can reach this task to retry a rejected unregister, so
+        // the state is forgotten either way; the rejection still propagates so the
+        // hook can report it.
+        forgetGuard()
       }
     })
     return releasePromise

@@ -78,10 +78,11 @@ describe("useScreenSecurity through the real screen-guard manager", () => {
     pendingLight.resolve()
     await flushEffects()
 
-    // The stale-color registration landed and was brought down; nothing may show
-    // until the dark one is up.
+    // The stale-color registration landed and the dark one is being registered over
+    // it: nothing may show until that lands, and the guard never comes down, since
+    // the content is still on screen for the frames before the gate re-hides it.
     expect(result.current).toBe("activating")
-    expect(mockUnregister).toHaveBeenCalledTimes(1)
+    expect(mockUnregister).not.toHaveBeenCalled()
     expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: dark.black })
 
     pendingDark.resolve()
@@ -90,7 +91,7 @@ describe("useScreenSecurity through the real screen-guard manager", () => {
 
     unmount()
     await flushEffects()
-    expect(mockUnregister).toHaveBeenCalledTimes(2)
+    expect(mockUnregister).toHaveBeenCalledTimes(1)
     expect(mockReportError).not.toHaveBeenCalled()
   })
 })
