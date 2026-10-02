@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Số ví không phải là 2. Vui lòng sử dụng bảng điều khiển để xem tất cả các ví và tiền trong tài khoản này"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Không thể ghi lại lần thử không thành công một cách an toàn. Đang đăng xuất.",
+    "attemptUnrecorded": "Không thể ghi lại lần thử một cách an toàn.",
+    "attemptsLeft": "Còn lại {attemptsRemaining: number} lần thử.",
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
     "enterPin": "Nhập mã PIN của bạn",
+    "oneAttemptLeft": "Còn lại 1 lần thử.",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
     "pinUnreadable": "Không thể kiểm tra mã PIN của bạn. Vui lòng thử lại.",
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",
-    "tooManyAttempts": "Quá nhiều lần thử không thành công. Đang đăng xuất.",
+    "tooManyAttempts": "Quá nhiều lần thử không thành công.",
+    "tryAgainIn": "Thử lại sau {time: string}.",
     "verifyPin": "Xác minh mã PIN của bạn"
   },
   "PriceHistoryScreen": {

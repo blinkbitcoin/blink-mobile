@@ -2175,15 +2175,18 @@
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
-        "attemptUnrecorded": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
+        "attemptUnrecorded": "Der Versuch konnte nicht sicher gespeichert werden.",
+        "attemptsLeft": "{attemptsRemaining: string} verbleibende Versuche.",
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
         "enterPin": "Gib deinen PIN Code ein",
+        "oneAttemptLeft": "Letzter Versuch.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
         "storePinFailed": "Dein PIN Code konnte nicht gespeichert werden.",
-        "tooManyAttempts": "Zu viele Fehlversuche. Du wirst nun ausgeloggt.",
+        "tooManyAttempts": "Zu viele Fehlversuche.",
+        "tryAgainIn": "Versuche es in {time: string} erneut.",
         "verifyPin": "Bestätige deinen PIN Code"
     },
     "PriceHistoryScreen": {

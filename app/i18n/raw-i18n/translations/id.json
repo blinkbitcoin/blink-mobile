@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Jumlah dompet bukan 2. Silakan gunakan dasbor untuk melihat semua dompet dan dana akun ini"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Tidak dapat mencatat percobaan gagal dengan aman. Keluar.",
+    "attemptUnrecorded": "Tidak dapat mencatat percobaan dengan aman.",
+    "attemptsLeft": "{attemptsRemaining: number} percobaan tersisa.",
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
     "enterPin": "Masukkan kode PIN Anda",
+    "oneAttemptLeft": "1 percobaan tersisa.",
     "oneAttemptRemaining": "PIN salah. 1 percobaan tersisa.",
     "pinUnreadable": "Tidak dapat memeriksa PIN Anda. Silakan coba lagi.",
     "setPin": "Atur kode PIN Anda",
     "setPinFailedMatch": "PIN tidak cocok - Atur kode PIN Anda",
     "storePinFailed": "Tidak dapat menyimpan PIN Anda.",
-    "tooManyAttempts": "Terlalu banyak percobaan gagal. Keluar.",
+    "tooManyAttempts": "Terlalu banyak percobaan gagal.",
+    "tryAgainIn": "Coba lagi dalam {time: string}.",
     "verifyPin": "Verifikasi kode PIN Anda"
   },
   "PriceHistoryScreen": {

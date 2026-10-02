@@ -2175,15 +2175,18 @@
         "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
     },
     "PinScreen": {
-        "attemptUnrecorded": "No se ha podido registrar el intento fallido de forma segura. Cerrando sesión.",
+        "attemptUnrecorded": "No se ha podido registrar el intento de forma segura.",
+        "attemptsLeft": "Quedan {attemptsRemaining: string} intentos.",
         "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining: string} intentos.",
         "enterPin": "Introduzca su PIN",
+        "oneAttemptLeft": "Queda 1 intento.",
         "oneAttemptRemaining": "PIN incorrecto. Queda 1 intento.",
         "pinUnreadable": "No se ha podido comprobar su PIN. Inténtelo de nuevo.",
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
         "storePinFailed": "No se puede guardar su PIN.",
-        "tooManyAttempts": "Ha superado el límite de intentos. Cerrando sesión.",
+        "tooManyAttempts": "Ha superado el límite de intentos.",
+        "tryAgainIn": "Inténtelo de nuevo en {time: string}.",
         "verifyPin": "Verifique su PIN"
     },
     "PriceHistoryScreen": {
