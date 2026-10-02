@@ -4,6 +4,7 @@ import { Alert } from "react-native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import useLogout from "@app/hooks/use-logout"
+import { useReturnToGate } from "@app/hooks/use-return-to-gate"
 import { useAppConfig } from "@app/hooks"
 import { toastShow } from "@app/utils/toast"
 import { useNavigation } from "@react-navigation/native"
@@ -15,14 +16,24 @@ import { NetworkErrorComponent } from "@app/graphql/network-error-component"
 jest.mock("@app/graphql/network-error-context")
 jest.mock("@app/i18n/i18n-react")
 jest.mock("@app/hooks/use-logout")
+/** A factory, not an automock: building one would load the hook's module, and the lock
+ *  context it imports pulls in native boot code. */
+jest.mock("@app/hooks/use-return-to-gate", () => ({ useReturnToGate: jest.fn() }))
+/** The profile switch runs for real here and asks whether the lock is up; these tests run
+ *  with it down, where a switch opens the home screen as it always did. */
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  useAuthenticationContext: () => ({ isAppLocked: false }),
+}))
 jest.mock("@app/hooks")
 jest.mock("@app/utils/toast")
 jest.mock("@react-navigation/native")
 jest.mock("@app/utils/storage/secureStorage")
 
+let mockIsSelfCustodialActive = false
+
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({
-    isSelfCustodial: false,
+    isSelfCustodial: mockIsSelfCustodialActive,
     activeWalletId: "current-custodial-id",
   }),
 }))
@@ -33,6 +44,9 @@ const mockLogout = jest.fn()
 const mockSaveToken = jest.fn()
 const mockNavigate = jest.fn()
 const mockReset = jest.fn()
+/** Where a session the backend no longer accepts leaves for: the gate, lock raised. What
+ *  that does is its own spec. */
+const mockReturnToGate = jest.fn()
 
 const mockNavigation = {
   navigate: mockNavigate,
@@ -48,6 +62,7 @@ const storeProfiles = (profiles: unknown[]) => {
 
 beforeEach(() => {
   jest.clearAllMocks()
+  mockIsSelfCustodialActive = false
   ;(useNetworkError as jest.Mock).mockReturnValue({
     networkError: null,
     clearNetworkError: mockClearNetworkError,
@@ -66,6 +81,7 @@ beforeEach(() => {
     },
   })
   ;(useLogout as jest.Mock).mockReturnValue({ logout: mockLogout })
+  ;(useReturnToGate as jest.Mock).mockReturnValue(mockReturnToGate)
   ;(useAppConfig as jest.Mock).mockReturnValue({
     appConfig: { token: "current-token" },
     saveToken: mockSaveToken,
@@ -165,7 +181,7 @@ describe("NetworkErrorComponent", () => {
     })
   })
 
-  it("handles InvalidAuthentication with one profile - shows alert and navigates to getStarted", async () => {
+  it("handles InvalidAuthentication with one profile - shows alert and returns to the gate", async () => {
     storeProfiles([{ token: "current-token", username: "user1" }])
 
     const { rerender } = render(<NetworkErrorComponent />)
@@ -182,10 +198,11 @@ describe("NetworkErrorComponent", () => {
       expect(Alert.alert).toHaveBeenCalled()
       // Readable store, genuinely the last profile: the list goes with it.
       expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: false })
-      expect(mockReset).toHaveBeenCalledWith({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
+      /** To the gate, never straight to the landing screen: the logout keeps the
+       *  lock while the device still stores something it guards, and a 401 can
+       *  land while the lock screen is the one on show. */
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+      expect(mockReset).not.toHaveBeenCalled()
       expect(mockClearNetworkError).toHaveBeenCalled()
     })
   })
@@ -210,14 +227,59 @@ describe("NetworkErrorComponent", () => {
         // A 401 with no active token can be a stale one arriving mid-switch,
         // so what is stored stays put.
         expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: true })
-        expect(mockReset).toHaveBeenCalledWith({
-          index: 0,
-          routes: [{ name: "getStarted" }],
-        })
+        expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+        expect(mockReset).not.toHaveBeenCalled()
         expect(mockClearNetworkError).toHaveBeenCalled()
       },
       { timeout: 1000 },
     )
+  })
+
+  describe("while a self-custodial wallet is the one in use", () => {
+    /** A dead custodial session is not this user's problem right now: they are in a
+     *  wallet the backend does not sign in. Ending their session, or sending them back to
+     *  the gate over it, would take them out of a wallet nothing was wrong with. */
+    beforeEach(() => {
+      mockIsSelfCustodialActive = true
+    })
+
+    it("leaves a stale 401 with no active token alone", async () => {
+      ;(useAppConfig as jest.Mock).mockReturnValue({
+        appConfig: { token: null },
+        saveToken: mockSaveToken,
+      })
+      const { rerender } = render(<NetworkErrorComponent />)
+
+      ;(useNetworkError as jest.Mock).mockReturnValue({
+        networkError: { statusCode: 401 },
+        clearNetworkError: mockClearNetworkError,
+      })
+      rerender(<NetworkErrorComponent />)
+
+      await waitFor(() => {
+        expect(mockClearNetworkError).toHaveBeenCalled()
+      })
+      expect(mockLogout).not.toHaveBeenCalled()
+      expect(mockReturnToGate).not.toHaveBeenCalled()
+    })
+
+    it("signs the dead custodial session out quietly, without leaving the wallet", async () => {
+      storeProfiles([{ token: "current-token", username: "user1" }])
+      const { rerender } = render(<NetworkErrorComponent />)
+
+      ;(useNetworkError as jest.Mock).mockReturnValue({
+        networkError: { statusCode: 401 },
+        token: "current-token",
+        clearNetworkError: mockClearNetworkError,
+      })
+      rerender(<NetworkErrorComponent />)
+
+      await waitFor(() => {
+        expect(mockClearNetworkError).toHaveBeenCalled()
+      })
+      expect(Alert.alert).not.toHaveBeenCalled()
+      expect(mockReturnToGate).not.toHaveBeenCalled()
+    })
   })
 
   it("handles network connectivity error", async () => {
@@ -290,10 +352,8 @@ describe("NetworkErrorComponent", () => {
     await waitFor(() => {
       // The teardown threw, so the saved list is kept rather than erased blind.
       expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: true })
-      expect(mockReset).toHaveBeenCalledWith({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+      expect(mockReset).not.toHaveBeenCalled()
       expect(mockClearNetworkError).toHaveBeenCalled()
     })
     expect(consoleErrorSpy).toHaveBeenCalledWith(
@@ -323,11 +383,9 @@ describe("NetworkErrorComponent", () => {
 
     await waitFor(() => {
       expect(Alert.alert).toHaveBeenCalled()
-      expect(mockReset).toHaveBeenCalledWith({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
+      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
     })
+    expect(mockReset).not.toHaveBeenCalled()
     expect(mockLogout).toHaveBeenCalledWith({ preserveStoredCredentials: true })
     // The dead session's own token was still deactivated.
     expect(mockLogout).toHaveBeenCalledWith({

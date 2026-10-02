@@ -42,6 +42,12 @@ jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({ appConfig: { token: "custodial-token" } }),
 }))
 
+/** The profile switch's module reads the lock flag from this context, which pulls in native
+ *  boot code; the switch itself is stood in for below, so only the import has to load. */
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  useAuthenticationContext: () => ({ isAppLocked: false }),
+}))
+
 jest.mock("@app/hooks/use-switch-to-next-profile", () => ({
   ...jest.requireActual("@app/hooks/use-switch-to-next-profile"),
   useSwitchToNextProfile: () => ({ switchToNextProfile: mockSwitchToNextProfile }),
