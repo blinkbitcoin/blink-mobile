@@ -45,6 +45,7 @@ import {
 const setCollectionEnabled = analytics().setAnalyticsCollectionEnabled as jest.Mock
 const setUserId = analytics().setUserId as jest.Mock
 const setUserProperties = analytics().setUserProperties as jest.Mock
+const resetAnalyticsData = analytics().resetAnalyticsData as jest.Mock
 
 const inputs = (overrides: Partial<TelemetryModeInputs> = {}): TelemetryModeInputs => ({
   activeAccount: ActiveAccountKind.SelfCustodial,
@@ -247,6 +248,34 @@ describe("the collection gate", () => {
       expect(setUserProperties).not.toHaveBeenCalledWith(
         expect.objectContaining({ network: expect.anything() }),
       )
+    })
+
+    it("resets the app instance when leaving Custodial, so the earlier rows cannot be joined", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      expect(resetAnalyticsData).not.toHaveBeenCalled()
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      // Clearing the user id governs only what comes next. The custodial rows already sent
+      // carry this install's app-instance id, and a new instance is what unlinks them.
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("resets on the way to incognito too, not only to Enhanced", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      await resolveTelemetryMode(TelemetryMode.Anon)
+
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps its app instance on a launch that reaches Enhanced without collecting as Custodial", async () => {
+      await initializeTelemetryGate()
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      // A reset per launch would mint a new app instance every time, and inflate every
+      // instance-derived count the platform reports.
+      expect(resetAnalyticsData).not.toHaveBeenCalled()
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
     })
   })
 

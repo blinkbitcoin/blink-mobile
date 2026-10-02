@@ -9,6 +9,7 @@ import {
 import { isTelemetryEnabled } from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
+  resetPlatformAnalyticsData,
   setCustodialIdentityPermitted,
   setPlatformCollectionEnabled,
 } from "./platform-analytics"
@@ -206,17 +207,24 @@ let applying: Promise<void> = Promise.resolve()
  * the analytics calls that still reach the SDK directly, transmit from a device whose mode
  * has already closed.
  *
- * Two closes, because they answer to different rules. Leaving `Custodial` always withdraws
- * the identity permission and clears the identity the SDK would otherwise merge into its
- * next event: the ledger account id is custodial-only, so an `Enhanced` device collects
- * without ever naming an account. Collection itself closes only on a mode that may emit
- * nothing at all.
+ * Three closes, because they answer to different rules. Leaving `Custodial` always withdraws
+ * the identity permission and clears the identity the SDK would otherwise merge into its next
+ * event: the ledger account id is custodial-only, so an `Enhanced` device collects without
+ * ever naming an account. Leaving `Custodial` also resets the app instance, which is what
+ * stops the account being recoverable from the device's own earlier rows — see
+ * `resetPlatformAnalyticsData`. Collection itself closes only on a mode that may emit nothing
+ * at all.
+ *
+ * The previous mode is passed in because `currentMode` has already moved by the time this
+ * runs, and only the transition *out of* Custodial resets the instance: doing it on every
+ * entry into a collecting mode would mint a new app instance on every launch.
  */
-const closeSynchronously = (mode: TelemetryMode): void => {
+const closeSynchronously = (mode: TelemetryMode, previous: TelemetryMode): void => {
   setDiagnosticsModeInput(diagnosticsInputFor(mode))
   if (mode !== TelemetryMode.Custodial) {
     setCustodialIdentityPermitted(false)
     clearCustodialAnalyticsIdentity()
+    if (previous === TelemetryMode.Custodial) resetPlatformAnalyticsData()
   }
   if (isSuppressedMode(mode)) setPlatformCollectionEnabled(false)
 }
@@ -261,11 +269,12 @@ export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
     initialisedAt = null
   }
 
+  const previous = currentMode
   currentMode = mode
   /** This runs inside a React effect, and at module scope through the gate's
    *  initialisation. Neither has anywhere to show a throw, so it never gets one. */
   try {
-    closeSynchronously(mode)
+    closeSynchronously(mode, previous)
   } catch (err) {
     settleFault(err)
   }
@@ -297,7 +306,7 @@ export const initializeTelemetryGate = (): Promise<void> => {
   currentMode = TelemetryMode.Unresolved
   initialisedAt = Date.now()
   try {
-    closeSynchronously(TelemetryMode.Unresolved)
+    closeSynchronously(TelemetryMode.Unresolved, TelemetryMode.Unresolved)
   } catch (err) {
     settleFault(err)
   }

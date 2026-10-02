@@ -155,6 +155,24 @@ export const clearCustodialAnalyticsIdentity = (): void => {
   )
 }
 
+/**
+ * Resets the SDK's own app-instance identifier, and with it everything the platform holds
+ * for this install.
+ *
+ * Clearing `user_id` stops the ledger account riding *future* events and does nothing about
+ * the ones already sent. Those rows carry the same app-instance id the device keeps using, so
+ * a device that collected as Custodial and then became Enhanced is joinable to its ledger
+ * account through its own history — no call site having done anything wrong. Resetting the id
+ * on the way out of Custodial is what breaks that join: the Enhanced rows then share no
+ * identifier with the custodial ones.
+ *
+ * The cost is this install's platform history, for a device that leaves Custodial. That is
+ * the point of it.
+ */
+export const resetPlatformAnalyticsData = (): void => {
+  withAnalytics("reset analytics data", (client) => client.resetAnalyticsData())
+}
+
 export const resetPlatformIdentityForTesting = (): void => {
   identityPermitted = false
   requested = { properties: {} }

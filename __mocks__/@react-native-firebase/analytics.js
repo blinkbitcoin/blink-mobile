@@ -5,6 +5,7 @@ const setAnalyticsCollectionEnabled = jest.fn(() => Promise.resolve())
 const setUserId = jest.fn(() => Promise.resolve())
 const setUserProperty = jest.fn(() => Promise.resolve())
 const setUserProperties = jest.fn(() => Promise.resolve())
+const resetAnalyticsData = jest.fn(() => Promise.resolve())
 
 export default () => ({
   logEvent,
@@ -12,4 +13,5 @@ export default () => ({
   setUserId,
   setUserProperty,
   setUserProperties,
+  resetAnalyticsData,
 })
