@@ -2401,9 +2401,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
   it("erases the six fixed keys", async () => {
     FIXED_KEYS.forEach((key) => stores.legacy.set(key, `${key}-value`))
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
     expect([...stores.legacy.keys()]).toEqual([])
   })
 
@@ -2411,9 +2411,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     stores.legacy.set("mnemonic:alice", "alpha beta")
     stores.legacy.set("mnemonic_network:alice", "bitcoin")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
     expect([...stores.legacy.keys()]).toEqual([])
   })
 
@@ -2435,24 +2435,24 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       return value === undefined ? false : { username: slot, password: value }
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
   })
 
   it("moves a value to the new store before erasing it", async () => {
     stores.legacy.set("mnemonic:alice", "alpha beta")
 
-    await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
     expect(stores.migrated.get("mnemonic:alice")).toBe("alpha beta")
   })
 
   it("counts a key that was never there as gone", async () => {
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
     expect(mockRemove).not.toHaveBeenCalled()
   })
 
@@ -2465,9 +2465,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     stores.legacy.set("mnemonic:alice", "alpha beta")
     mockSetInternet.mockResolvedValue(false)
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
   })
 
@@ -2484,9 +2484,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       return stores.migrated.has(slot)
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect(stores.legacy.get("PIN")).toBe("1234")
     expect(mockRemove).not.toHaveBeenCalledWith("PIN")
   })
@@ -2500,9 +2500,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     stores.migrated.set("mnemonicAccounts", "ghost")
     stores.legacy.set("mnemonic:ghost", "alpha beta")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
     expect(stores.legacy.has("mnemonic:ghost")).toBe(false)
   })
 
@@ -2510,9 +2510,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     stores.migrated.set("mnemonicAccounts", "alice")
     stores.legacy.set("mnemonic:alice", "alpha beta")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
     const removedMnemonicCalls = mockRemove.mock.calls.filter(
       ([key]) => key === "mnemonic:alice",
     )
@@ -2540,9 +2540,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       return value === undefined ? false : { username: slot, password: value }
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect(stores.legacy.has("PIN")).toBe(false)
     expect(stores.legacy.has("galoyAuthToken")).toBe(false)
     // Unnameable this boot, so it survives for one that can name it.
@@ -2560,9 +2560,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     stores.legacy.set("PIN", "1234")
     stores.legacy.set("mnemonic:alice", "alpha beta")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("permanent")
+    expect(purged.outcome).toBe("permanent")
     expect(stores.legacy.has("PIN")).toBe(false)
     expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
     // Raised where it is detected. It reaches the caller as `permanent`, which is
@@ -2582,9 +2582,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
   it("leaves a mnemonic no list names, and still reports the purge done", async () => {
     stores.legacy.set("mnemonic:unknown-old-account", "alpha beta")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
     expect(stores.legacy.get("mnemonic:unknown-old-account")).toBe("alpha beta")
   })
 
@@ -2604,9 +2604,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       return value
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
   })
 
   /**
@@ -2623,9 +2623,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       setPlatform("android")
       stores.migrated.set("mnemonicAccounts", "alice")
 
-      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-      expect(purged).toBe("permanent")
+      expect(purged.outcome).toBe("permanent")
     })
 
     /**
@@ -2637,9 +2637,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       setPlatform("ios")
       stores.migrated.set("mnemonicAccounts", "alice")
 
-      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-      expect(purged).toBe("transient")
+      expect(purged.outcome).toBe("transient")
     })
 
     /**
@@ -2656,9 +2656,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
         return stores.migrated.has(slot)
       })
 
-      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-      expect(purged).toBe("transient")
+      expect(purged.outcome).toBe("transient")
     })
   })
 
@@ -2684,18 +2684,18 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       return value
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
   })
 
   it("keeps going when the legacy store cannot say what it holds", async () => {
     mockGet.mockRejectedValue(new Error("keychain unavailable"))
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect(mockRemove).not.toHaveBeenCalled()
   })
 
@@ -2706,18 +2706,18 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
    * over a seed that never left the legacy store.
    */
   it("does not call a mnemonic purged on an empty legacy read alone", async () => {
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).not.toBe("gone")
+    expect(purged.outcome).not.toBe("gone")
   })
 
   it("calls a mnemonic purged once the new store holds it", async () => {
     stores.migrated.set("mnemonic:alice", "alpha beta")
     stores.migrated.set("mnemonic_network:alice", "bitcoin")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
   })
 
   /**
@@ -2727,16 +2727,77 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
   it("completes for an account with a seed but no network marker", async () => {
     stores.migrated.set("mnemonic:alice", "alpha beta")
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
   })
 
   /** A user who never set a PIN has nothing here and must not be retried forever. */
   it("accepts an empty legacy read for the session slots", async () => {
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
-    expect(purged).toBe("gone")
+    expect(purged.outcome).toBe("gone")
+  })
+
+  /**
+   * The marker the caller keeps between launches. Proving a slot gone is what
+   * reads a seed into a JS string that cannot be zeroed, so a slot that reached
+   * `gone` once is never named again, and a pass kept short of done by one slot
+   * costs that slot alone.
+   */
+  describe("the slots an earlier launch proved gone", () => {
+    it("does not touch either store for a slot it was told is gone", async () => {
+      stores.legacy.set("mnemonic:alice", "alpha beta")
+
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore(
+        ["alice"],
+        ["mnemonic:alice"],
+      )
+
+      expect(purged.outcome).toBe("gone")
+      expect(mockGet).not.toHaveBeenCalledWith("mnemonic:alice")
+      expect(mockGetInternet).not.toHaveBeenCalledWith(serverFor("mnemonic:alice"))
+      expect(mockHasInternet).not.toHaveBeenCalledWith({
+        server: serverFor("mnemonic:alice"),
+      })
+      // Left exactly where it was: the marker, not a store, is what skipped it,
+      // and the marker has the same limits as the done-flag it sits beside.
+      expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+    })
+
+    it("reports every slot it proved gone after the ones it was handed, each once", async () => {
+      stores.legacy.set("PIN", "1234")
+      stores.migrated.set("mnemonic:alice", "alpha beta")
+
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore(
+        ["alice"],
+        ["galoyAuthToken"],
+      )
+
+      expect(purged.outcome).toBe("gone")
+      expect(purged.purgedSlots).toEqual([
+        "galoyAuthToken",
+        "isBiometricsEnabled",
+        "PIN",
+        "pinFailureState",
+        "pinAttempts",
+        "sessionProfiles",
+        "mnemonic:alice",
+        "mnemonic_network:alice",
+      ])
+    })
+
+    it("leaves a slot it could not prove gone out of the list, so the next launch names it", async () => {
+      stores.legacy.set("mnemonic:alice", "alpha beta")
+      mockSetInternet.mockResolvedValue(false)
+
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+      expect(purged.outcome).toBe("transient")
+      expect(purged.purgedSlots).not.toContain("mnemonic:alice")
+      // The slots around it are kept, which is the whole saving.
+      expect(purged.purgedSlots).toEqual(expect.arrayContaining(FIXED_KEYS))
+    })
   })
 
   /**
@@ -2774,10 +2835,10 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     it("gives up on its own budget rather than the default one", async () => {
       hangThePurgeOnPin()
 
-      const purged = KeyStoreWrapper.purgeLegacyKeyStore([])
+      const purged = KeyStoreWrapper.purgeLegacyKeyStore([], [])
       await jest.advanceTimersByTimeAsync(PURGE_SLOT_TIMEOUT_MS + 500)
 
-      expect(await purged).toBe("transient")
+      expect((await purged).outcome).toBe("transient")
     })
   })
 
@@ -2789,9 +2850,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       stores.legacy.delete(key)
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"])
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
-    expect(purged).toBe("transient")
+    expect(purged.outcome).toBe("transient")
     expect([...stores.legacy.keys()]).toEqual(["PIN"])
   })
 
@@ -2821,9 +2882,9 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       return value === undefined ? false : { username: slot, password: value }
     })
 
-    const purged = KeyStoreWrapper.purgeLegacyKeyStore([])
+    const purged = KeyStoreWrapper.purgeLegacyKeyStore([], [])
     await jest.advanceTimersByTimeAsync(30_000)
-    expect(await purged).toBe("transient")
+    expect((await purged).outcome).toBe("transient")
 
     mockRemove.mockClear()
     releaseHungVerify()
