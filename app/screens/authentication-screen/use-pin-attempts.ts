@@ -33,13 +33,14 @@ type UsePinAttempts = {
   readonly runGuarded: <T>(operation: () => Promise<T>) => Promise<T | undefined>
 }
 
-/** Floored at one: a count at or above the budget is what the keypad shows
- *  after the logout its third failure triggered, since the lock keeps its
- *  spent count on purpose, and what a clear that could not land leaves behind.
- *  Either way the next wrong entry ends the session, which is exactly what
- *  "1 attempt remaining" tells the user; "0 attempts remaining" over a live
- *  keypad would not. */
-const attemptsLeftAfter = (failures: number): number | null =>
+/** What the keypad says is left, which is not the arithmetic once the budget
+ *  is spent. A count at or above the budget is what a lock that outlived the
+ *  logout its third failure triggered comes back with, since it keeps its spent
+ *  count on purpose, and what a clear that could not land leaves behind. Either
+ *  way the next wrong entry ends the session, which is exactly what "1 attempt
+ *  remaining" tells the user; "0 attempts remaining" over a live keypad would
+ *  not. Hence the floor at one. */
+const attemptsLeftToShow = (failures: number): number | null =>
   failures > 0 ? Math.max(1, MAX_PIN_ATTEMPTS - failures) : null
 
 export const usePinAttempts = ({
@@ -73,7 +74,7 @@ export const usePinAttempts = ({
         onUnreadableRef.current()
         return
       }
-      setAttemptsRemaining(attemptsLeftAfter(read.state.attempts))
+      setAttemptsRemaining(attemptsLeftToShow(read.state.attempts))
       setIsHydrated(true)
     }
     hydrate()
