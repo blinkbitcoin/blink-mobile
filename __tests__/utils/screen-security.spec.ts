@@ -174,6 +174,28 @@ describe("screen-security", () => {
     expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
   })
 
+  /** Theme flip on a mounted screen whose unregister rejects: the color-change branch
+   *  must still re-register with the new color, the way the teardown treats a rejected
+   *  unregister as the recoverable state. Otherwise the guard ends up down, no register
+   *  is ever attempted, and every gated screen lands on the failure view. */
+  it("re-registers with the new color when the unregister of a color change rejects", async () => {
+    const { acquireScreenSecurity } = loadModule()
+
+    const leaving = acquireScreenSecurity("#ffffff")
+    await leaving.ready
+    mockUnregister.mockRejectedValueOnce(new Error("native failure"))
+
+    const releasePromise = leaving.release()
+    const arriving = acquireScreenSecurity("#000000")
+    await Promise.all([releasePromise, arriving.ready])
+
+    expect(mockRegister).toHaveBeenLastCalledWith({ backgroundColor: "#000000" })
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Disable screen security",
+      expect.any(Error),
+    )
+  })
+
   /** A color change can also land while the previous registration is still in flight;
    *  the arriving lease's queued task must re-register behind it with the new color. */
   it("applies a color change that arrives while a registration is in flight", async () => {
