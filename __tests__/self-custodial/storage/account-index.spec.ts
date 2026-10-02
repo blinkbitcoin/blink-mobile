@@ -68,6 +68,7 @@ const LEGACY_PURGE_ATTEMPTS_KEY = "legacyKeyStorePurgeAttempts"
 const LEGACY_PURGE_MAX_ATTEMPTS = 5
 
 const SWEEP_OK = { status: "ok", migrated: 1 } as const
+const SWEEP_INCOMPLETE = { status: "incomplete", failures: 1 } as const
 
 const setIndex = (entries: SelfCustodialAccountEntry[]) => {
   mockGetItem.mockImplementation((key: string) =>
@@ -838,13 +839,21 @@ describe("self-custodial account-index — legacy key store purge", () => {
       expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith([])
     })
 
-    it("does not purge while the sweep left an account unread", async () => {
+    /**
+     * The session slots have fixed keys and need nothing from the sweep, and each
+     * mnemonic is proof-gated inside the pass, so an account the sweep could not
+     * read costs the flag and not the pass. Gating the pass would leave the legacy
+     * PIN, token and profiles in place for good on a device with one Keystore
+     * entry a lock-screen change invalidated, and say nothing about it.
+     */
+    it("still purges when the sweep left an account unread, and withholds the flag", async () => {
       setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
 
-      const result = await purgeLegacyKeyStoreOnce({ status: "incomplete", failures: 1 })
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_INCOMPLETE)
 
-      expect(result).toEqual({ status: "skipped", reason: "sweep-incomplete" })
-      expect(mockPurgeLegacyKeyStore).not.toHaveBeenCalled()
+      expect(result).toEqual({ status: "sweep-incomplete" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"])
+      expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
 
     it("does not purge twice on the same install", async () => {
@@ -893,11 +902,14 @@ describe("self-custodial account-index — legacy key store purge", () => {
     })
 
     it("leaves the flag unset when the purge was skipped, not merely incomplete", async () => {
-      setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === LEGACY_PURGE_DONE_KEY) return Promise.resolve(null)
+        return Promise.reject(new Error("AsyncStorage unavailable"))
+      })
 
-      const result = await purgeLegacyKeyStoreOnce({ status: "incomplete", failures: 1 })
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
 
-      expect(result).toEqual({ status: "skipped", reason: "sweep-incomplete" })
+      expect(result).toEqual({ status: "skipped", reason: "index-unreadable" })
       expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
 
@@ -1060,6 +1072,20 @@ describe("self-custodial account-index — legacy key store purge", () => {
         expect(mockRemoveItem).toHaveBeenCalledWith(LEGACY_PURGE_ATTEMPTS_KEY)
       })
 
+      /**
+       * The bound charges for the state the pass just resolved, so it is spent
+       * whether or not the flag follows: a sweep that withholds the flag has
+       * nothing to say about how many launches ended with a seed in neither store.
+       */
+      it("clears the counter on a pass that left nothing behind, even when the sweep withholds the flag", async () => {
+        setAttempts("3")
+
+        await purgeLegacyKeyStoreOnce(SWEEP_INCOMPLETE)
+
+        expect(mockRemoveItem).toHaveBeenCalledWith(LEGACY_PURGE_ATTEMPTS_KEY)
+        expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
+      })
+
       it("still reports done when the counter cannot be cleared", async () => {
         setAttempts("3")
         mockRemoveItem.mockRejectedValue(new Error("AsyncStorage unavailable"))
@@ -1108,10 +1134,9 @@ describe("self-custodial account-index — legacy key store purge", () => {
       })
 
       /**
-       * readIndex already records the read failure with `alwaysRecord`, and the
-       * sweep raises its own incompleteness. Reporting either here would
-       * double-count the same device and leave this metric measuring someone
-       * else's failure instead of the purge's.
+       * readIndex already records the read failure with `alwaysRecord`. Reporting
+       * it here would double-count the same device and leave this metric measuring
+       * someone else's failure instead of the purge's.
        */
       it("leaves an unreadable index to the reader that already reported it", async () => {
         mockGetItem.mockImplementation((key: string) => {
@@ -1125,12 +1150,21 @@ describe("self-custodial account-index — legacy key store purge", () => {
         expect(mockLogEvent).not.toHaveBeenCalled()
       })
 
-      it("leaves an incomplete sweep to the sweep that already reported it", async () => {
+      /**
+       * The sweep raised the account it could not confirm; what is the purge's
+       * own here is a pass that finished and could not record itself, which the
+       * release that drops the dependency has to count rather than mistake for a
+       * device that never launched.
+       */
+      it("counts a pass the sweep kept from recording itself, without raising a defect", async () => {
         setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
 
-        await purgeLegacyKeyStoreOnce({ status: "incomplete", failures: 1 })
+        await purgeLegacyKeyStoreOnce(SWEEP_INCOMPLETE)
 
-        expect(mockLogEvent).not.toHaveBeenCalled()
+        expect(mockLogEvent).toHaveBeenCalledWith("legacy_key_store_purge", {
+          outcome: "sweep-incomplete",
+        })
+        expect(mockRecordError).not.toHaveBeenCalled()
       })
 
       /** The steady state: every launch after the first would report it. */

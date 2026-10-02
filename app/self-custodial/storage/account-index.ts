@@ -233,14 +233,13 @@ type SweepResult =
 
 /** Deliberately not exported, like SweepResult above: the boot path awaits the
  *  purge for its side effects and the reporting happens in here. */
-type PurgeSkippedReason =
-  | "sweep-incomplete"
-  | "already-done"
-  | "index-unreadable"
-  | "retries-exhausted"
+type PurgeSkippedReason = "already-done" | "index-unreadable" | "retries-exhausted"
 
 type PurgeResult =
   | { status: "done" }
+  /** Every named key is gone, but the sweep left an account unconfirmed, so the
+   *  done-flag is withheld and the next launch runs the pass again. */
+  | { status: "sweep-incomplete" }
   /** A store could not answer, so the next boot is worth spending. */
   | { status: "incomplete" }
   /** Every store answered and a mnemonic is not in the new one, which no later
@@ -411,10 +410,9 @@ const logPurgeOutcome = (outcome: string): void => {
  * indistinguishable from one that finished on its first launch, and the release
  * that drops the dependency has nothing to gate on but an argument.
  *
- * Three outcomes say nothing here. `already-done` is the steady state after the
- * first launch. The other two are already reported by whoever caused them — the
- * sweep raises its own incompleteness, and readIndex records an unreadable index
- * with `alwaysRecord` — so repeating them would double-count the same device and
+ * Two outcomes say nothing here. `already-done` is the steady state after the
+ * first launch. `index-unreadable` is already reported by readIndex, which records
+ * it with `alwaysRecord`, so repeating it would double-count the same device and
  * leave this metric measuring someone else's failure.
  *
  * Of what remains, only a store's silence is raised as a defect, deduped per
@@ -423,15 +421,17 @@ const logPurgeOutcome = (outcome: string): void => {
  * raising it would bury the real faults under the noise of every restored phone.
  * `retries-exhausted` is not one either, for the same reason: it is that same state
  * having run out of launches, and it reaches this function only once, so the event
- * carries it without a defect report behind it.
+ * carries it without a defect report behind it. `sweep-incomplete` is not one
+ * either: the sweep already raised the account it could not confirm, and the pass
+ * itself left nothing behind. It is still counted, because a pass that finishes
+ * and cannot record itself is the purge's own outcome, and the release that drops
+ * the dependency has to tell that install from one that never launched.
  */
 const reportPurgeOutcome = (result: PurgeResult): PurgeResult => {
   const outcome = result.status === "skipped" ? result.reason : result.status
 
   const isReportedByItsCause =
-    outcome === "already-done" ||
-    outcome === "sweep-incomplete" ||
-    outcome === "index-unreadable"
+    outcome === "already-done" || outcome === "index-unreadable"
   if (isReportedByItsCause) return result
 
   logPurgeOutcome(outcome)
@@ -468,10 +468,17 @@ const readPurgeAttempts = async (): Promise<number> => {
 /**
  * Erases everything this app left in the legacy key store, once per install.
  *
- * Runs only after a sweep that reported every account read. The purge deletes
- * the legacy mnemonic copies, so running it over an incomplete sweep would
- * delete a copy whose value never reached the new store — the one failure mode
- * in this migration that costs someone their funds rather than a re-login.
+ * The pass runs whatever the sweep reported. The six session slots have fixed
+ * keys and need nothing from it, and purgeThrough proves each mnemonic reached
+ * the new store before its legacy copy is erased, so an account the sweep could
+ * not read cannot cost a seed here. Gating the whole pass on the sweep would
+ * leave the legacy PIN, token and profiles in place for good on a device with
+ * one Keystore entry a lock-screen change invalidated, and say nothing about it.
+ *
+ * What the sweep gates is the done-flag. The flag says the migration is finished
+ * for this install, and the sweep is what confirms every account was read, moved
+ * and recorded, so a pass that finishes over an incomplete sweep is reported as
+ * such and runs again next launch.
  *
  * The done-flag lives in AsyncStorage, which a reinstall clears. That is the
  * right lifetime: after a reinstall the legacy store can still hold items that
@@ -487,10 +494,6 @@ const readPurgeAttempts = async (): Promise<number> => {
 export const purgeLegacyKeyStoreOnce = async (
   sweep: SweepResult,
 ): Promise<PurgeResult> => {
-  if (sweep.status !== "ok") {
-    return reportPurgeOutcome({ status: "skipped", reason: "sweep-incomplete" })
-  }
-
   const done = await readString(LEGACY_PURGE_DONE_KEY)
   // A flag that cannot be read is not a flag that is unset: purging again is
   // harmless, so the safe reading is to go ahead rather than skip.
@@ -546,12 +549,20 @@ export const purgeLegacyKeyStoreOnce = async (
     return reportPurgeOutcome({ status: "unmigrated" })
   }
 
-  // Cleared with the flag, so an install that recovers after a few bad launches
-  // does not carry a spent bound into a future reinstall — the flag's own
-  // lifetime resets there, and a counter that outlived it would let a handful of
-  // old failures cancel the next install's first purge. Through the same helper
-  // as the other two counter operations, which swallows its own failures.
+  // Cleared once the pass leaves nothing behind, whether or not the flag follows:
+  // the bound charges for the state the pass just resolved, and a counter that
+  // outlived it would let a handful of old failures cancel a later purge — the
+  // flag's own lifetime resets at a reinstall, and so does this. Through the same
+  // helper as the other two counter operations, which swallows its own failures.
   await remove(LEGACY_PURGE_ATTEMPTS_KEY)
+
+  // The sweep's verdict gates the flag, not the pass: every key this launch could
+  // name is gone, but an account the sweep could not
+  // confirm is not one the migration may call finished. Reported as its own
+  // outcome, so the release decision can count the installs stuck here.
+  if (sweep.status !== "ok") {
+    return reportPurgeOutcome({ status: "sweep-incomplete" })
+  }
 
   // Discarded deliberately: a flag that cannot be written means the purge runs
   // again on the next boot, over a store it has already emptied, which is a
