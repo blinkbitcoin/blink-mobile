@@ -37,6 +37,7 @@ import {
   registerTelemetryTransport,
   resetTelemetryTransportForTesting,
   type SubmitResult,
+  getTelemetryTransport,
 } from "@app/telemetry/transport"
 import {
   DiagnosticsDisposition,
@@ -96,8 +97,23 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   }),
 }))
 
+const mockRelaySubmit = jest.fn<Promise<SubmitResult>, [ContractPayload]>(() =>
+  Promise.resolve({ kind: "acknowledged", ackedAt: 1 }),
+)
+const mockCreateRelay = jest.fn((url: string) => ({
+  name: "blink-relay" as const,
+  ackSemantics: "application" as const,
+  attachesNoImplicitIdentity: true as const,
+  submit: mockRelaySubmit,
+  url,
+}))
+jest.mock("@app/self-custodial/telemetry-relay", () => ({
+  createTelemetryRelayTransport: (url: string) => mockCreateRelay(url),
+}))
+
+let mockNetwork: Network = Network.Regtest
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
-  useSparkNetwork: () => "regtest",
+  useSparkNetwork: () => mockNetwork,
 }))
 
 const mockRefreshKillSwitch = jest.fn((_serverUrl: string) => Promise.resolve())
@@ -128,17 +144,22 @@ const queuedRecord = (id = "3f2a1b4c-5d6e-4f70-8192-a3b4c5d6e7f8") => ({
   state: OutboxState.Queued,
 })
 
+/**
+ * The provider registers the adapter itself, so a test cannot install one beside it: the
+ * mount would replace it. The relay factory is mocked instead, which also keeps the spec
+ * off the network.
+ */
 const ackingTransport = () => {
-  const submit = jest.fn<Promise<SubmitResult>, [ContractPayload]>(() =>
+  mockRelaySubmit.mockImplementation(() =>
     Promise.resolve({ kind: "acknowledged", ackedAt: 1 }),
   )
   registerTelemetryTransport({
-    name: "test",
+    name: "blink-relay",
     ackSemantics: "application",
     attachesNoImplicitIdentity: true,
-    submit,
+    submit: mockRelaySubmit,
   })
-  return submit
+  return mockRelaySubmit
 }
 
 describe("SelfCustodialTelemetryMount", () => {
@@ -547,5 +568,26 @@ describe("SelfCustodialTelemetryMount", () => {
     })
 
     expect(submit).not.toHaveBeenCalled()
+  })
+
+  describe("the transport the port stands on", () => {
+    it("registers the relay for the network it is running on", async () => {
+      render(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryTransport()?.name).toBe("blink-relay"))
+      expect(mockCreateRelay).toHaveBeenCalledWith("https://staging.blink.sv")
+    })
+
+    it("registers a fresh adapter when the network changes, so nothing reports to the other network's relay", async () => {
+      const { rerender } = render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryTransport()?.name).toBe("blink-relay"))
+      const onRegtest = getTelemetryTransport()
+
+      mockNetwork = Network.Mainnet
+      rerender(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryTransport()).not.toBe(onRegtest))
+      expect(mockCreateRelay).toHaveBeenLastCalledWith("https://blink.sv")
+    })
   })
 })

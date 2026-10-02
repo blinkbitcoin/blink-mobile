@@ -8,6 +8,7 @@ import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/s
 import {
   ActiveAccountKind,
   createOutboxStore,
+  localOnlyTransport,
   sweepCondemnedOutboxes,
   deriveTelemetryMode,
   drainActiveOutbox,
@@ -16,6 +17,7 @@ import {
   resolveTelemetryMode,
   restoreKillSwitch,
   setActiveOutbox,
+  registerTelemetryTransport,
   setEmissionListener,
   setTelemetryRolloutEnabled,
   TelemetryMode,
@@ -29,10 +31,12 @@ import {
   lnurlServerUrlFor,
   telemetryOutboxDirFor,
   telemetryOutboxParentDirFor,
+  telemetryRelayUrlFor,
 } from "../config"
 import { useSelfCustodialAccountMode } from "../hooks/use-self-custodial-account-mode"
 import { useSparkNetwork } from "../hooks/use-spark-network"
 import { refreshTelemetryKillSwitch } from "../lnurl-telemetry-config"
+import { createTelemetryRelayTransport } from "../telemetry-relay"
 
 import { useSelfCustodialWallet } from "./wallet"
 
@@ -100,6 +104,22 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
   useEffect(() => {
     setTelemetryRolloutEnabled(telemetryEnabled)
   }, [telemetryEnabled])
+
+  /**
+   * The adapter behind the transport port, registered here rather than at start-up because
+   * the relay it posts to is per network and the network is not known at module scope. The
+   * null adapter `app.tsx` registers stands until this runs.
+   *
+   * Registering it is inert on its own: a self-custodial device queues and drains nothing
+   * until the rollout flag turns the pipeline on, which is also the signal that the relay
+   * exists. A device with no relay for its network keeps the null adapter.
+   */
+  useEffect(() => {
+    const relayUrl = telemetryRelayUrlFor(network)
+    registerTelemetryTransport(
+      relayUrl ? createTelemetryRelayTransport(relayUrl) : localOnlyTransport,
+    )
+  }, [network])
 
   useEffect(
     () =>

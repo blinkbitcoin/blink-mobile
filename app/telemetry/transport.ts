@@ -49,9 +49,10 @@ export interface TelemetryTransport {
 }
 
 /**
- * The null adapter. Acknowledges everything and keeps the last few hundred payloads
- * in a ring buffer the developer screen can read, so QA can watch what would have left the
- * device until a real adapter exists. Nothing leaves the process.
+ * The null adapter. Acknowledges everything and keeps the last few hundred payloads in a
+ * ring buffer, so the whole pipeline can be exercised before a real adapter is registered.
+ * Nothing leaves the process. `entries()` is the only way to read what it holds; nothing in
+ * the app surfaces it yet.
  */
 export const LOCAL_ONLY_RING_SIZE = 200
 
@@ -78,8 +79,8 @@ export const createLocalOnlyTransport = (): TelemetryTransport & {
   }
 }
 
-/** The one instance the app registers, so the developer screen and the drain see the same
- *  buffer. */
+/** The one instance the app registers at start-up, so anything reading `entries()` sees
+ *  what the drain submitted. */
 export const localOnlyTransport = createLocalOnlyTransport()
 
 let transport: TelemetryTransport | null = null

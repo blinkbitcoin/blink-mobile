@@ -87,6 +87,17 @@ export const storageDirFor = (accountId: string, network: Network): string =>
 export const telemetryOutboxParentDirFor = (network: Network): string =>
   `${DocumentDirectoryPath}/blink-telemetry-outbox-${networkLabelFor(network)}`
 
+/**
+ * Base URL of the telemetry relay for a network: the receiver behind the boundary's
+ * transport port. The same host family as the LNURL server, so a device that already talks
+ * to Blink for its Lightning Address does not reach a new domain to report.
+ *
+ * **[ASSUMPTION — backend-owned and not yet served.]** See `telemetry-relay.ts` for the
+ * request and status contract it has to satisfy.
+ */
+export const telemetryRelayUrlFor = (network: Network): string =>
+  `https://${lnurlDomainFor(network)}`
+
 export const telemetryOutboxDirFor = (accountId: string, network: Network): string =>
   `${telemetryOutboxParentDirFor(network)}/${accountId}`
 

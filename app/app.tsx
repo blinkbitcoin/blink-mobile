@@ -74,9 +74,9 @@ if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
 // start, on the one launch after an upgrade of a device that last ran custodial.
 initializeTelemetryGate()
 
-// The null adapter stands behind the port until a real one ships: it acknowledges
-// and keeps what it was handed in a ring buffer the developer screen can read. Nothing
-// leaves the device, and the whole pipeline is exercisable end to end without it.
+// The null adapter stands behind the port until the provider knows which network it is on
+// and registers the relay for it. It acknowledges everything and keeps what it was handed
+// in a ring buffer, so nothing leaves the device in the meantime.
 registerTelemetryTransport(localOnlyTransport)
 
 /**
