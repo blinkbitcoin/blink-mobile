@@ -82,6 +82,29 @@ describe("verifyPin", () => {
       expect(order).toEqual(["cleared", "returned"])
     })
 
+    it("writes the attempt down before judging it, and takes it back once it proves correct", async () => {
+      /** No entry is compared before it is in the store, the correct one included: until
+       *  it is judged, nothing tells it apart from a guess. */
+      const order: string[] = []
+      mockedStore.setPinFailureState.mockImplementation(async () => {
+        order.push("recorded")
+        return true
+      })
+      mockedStore.clearPinFailureState.mockImplementation(async () => {
+        order.push("cleared")
+        return true
+      })
+      storedState({ attempts: 1, lockedUntil: NOW - 1 })
+
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({ outcome: "unlocked" })
+
+      expect(order).toEqual(["recorded", "cleared"])
+      expect(mockedStore.setPinFailureState).toHaveBeenCalledWith({
+        attempts: 2,
+        lockedUntil: NOW + 30 * SECOND_MS,
+      })
+    })
+
     it("still unlocks when the failure state cannot be cleared, and reports it", async () => {
       // Refusing entry over a storage fault would punish the one person who
       // just proved the PIN — but the leftover count is sticky, so it is
@@ -187,23 +210,6 @@ describe("verifyPin", () => {
       order.push("returned")
 
       expect(order).toEqual(["recorded", "returned"])
-    })
-
-    it("reports a spent budget that could not be recorded, and still ends the round", async () => {
-      storedState({ attempts: MAX_PIN_ATTEMPTS - 1, lockedUntil: NOW - 1 })
-      mockedStore.setPinFailureState.mockResolvedValue(false)
-
-      await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "exhausted" })
-      expect(mockRecordAppError).toHaveBeenCalledWith(
-        expect.objectContaining({
-          message: "Spent PIN budget could not be recorded",
-        }),
-        /** The key of the non-terminal write: the same slot refusing the same
-         *  write is one defect, reported once. */
-        { alwaysRecord: true, dedupKey: "pin-attempts-write" },
-      )
-
-      await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "exhausted" })
     })
 
     it("never loses a failure across sequential verifications", async () => {
@@ -336,17 +342,39 @@ describe("verifyPin", () => {
     })
   })
 
-  describe("when the failure cannot be persisted", () => {
-    it("fails closed rather than letting the attempt go unrecorded", async () => {
-      // An unrecorded attempt means the next one is free after a force-quit.
+  describe("when the attempt cannot be written down", () => {
+    /** An entry judged with nothing written is a guess that costs nothing, for as long as
+     *  the store refuses writes. So none is judged: not a wrong one, not the correct one,
+     *  and not the one that would have spent the budget. */
+    beforeEach(() => {
       mockedStore.setPinFailureState.mockResolvedValue(false)
+    })
 
+    it("fails closed on a wrong entry", async () => {
       await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "unrecorded" })
     })
 
-    it("reports the storage fault", async () => {
-      mockedStore.setPinFailureState.mockResolvedValue(false)
+    it("does not take the correct entry either, and clears nothing", async () => {
+      storedState({ attempts: 1, lockedUntil: NOW - 1 })
 
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({
+        outcome: "unrecorded",
+      })
+      expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
+    })
+
+    it("answers the same for the entry that would have spent the budget, time after time", async () => {
+      /** Told apart from a spent budget on purpose: nothing was judged, so nothing says
+       *  the entry was wrong. */
+      storedState({ attempts: MAX_PIN_ATTEMPTS - 1, lockedUntil: NOW - 1 })
+
+      await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "unrecorded" })
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({
+        outcome: "unrecorded",
+      })
+    })
+
+    it("reports the storage fault", async () => {
       await verifyPin(WRONG_PIN, NOW)
 
       expect(mockRecordAppError).toHaveBeenCalledWith(
