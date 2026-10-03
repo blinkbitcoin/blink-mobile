@@ -2,7 +2,6 @@ import {
   AesSuccessActionDataResult_Tags as AesResultTag,
   FeePolicy,
   PaymentDetails,
-  PaymentStatus,
   SuccessActionProcessed_Tags as SuccessActionTag,
   type BreezSdkInterface,
   type LnurlPayRequestDetails,
@@ -263,14 +262,11 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     },
   })
 
-  /** The wallet's own record of a send this detail made, as the outcome to report. */
-  const foundOutcome = (found: Payment) => {
-    const status =
-      found.status === PaymentStatus.Completed
-        ? PaymentSendResult.Success
-        : PaymentSendResult.Pending
-    return sendOutcome(found, extractProcessedSuccessAction(found), status)
-  }
+  /** The wallet's own record of a send this detail made, reported as the send itself
+   *  would have reported it: the SDK hands a payment back as soon as it is dispatched,
+   *  pending or not, and every rail reports that as sent. */
+  const foundOutcome = (found: Payment) =>
+    sendOutcome(found, extractProcessedSuccessAction(found), PaymentSendResult.Success)
 
   const findThisSend = (startedAtMs: number, paymentHashes: ReadonlyArray<string>) =>
     findLostSend({

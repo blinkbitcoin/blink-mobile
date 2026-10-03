@@ -1135,12 +1135,14 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     expect(result.errors).toBeUndefined()
   })
 
-  it("reports it as pending when the wallet shows it still in flight", async () => {
+  /** Reported as the send itself would have reported it: the SDK hands a payment back
+   *  as soon as it is dispatched, pending or not, and every rail reports that as sent. */
+  it("reports it as sent when the wallet still shows it in flight, as the send would have", async () => {
     mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, PENDING)))
 
     const result = await sendFromDollars()
 
-    expect(result.status).toBe(PaymentSendResult.Pending)
+    expect(result.status).toBe(PaymentSendResult.Success)
     expect(result.transaction?.createdAt).toBe(1747691078)
     expect(result.extraInfo?.preimage).toBe("found-preimage")
     expect(result.extraInfo?.successAction).toBeUndefined()
@@ -1471,7 +1473,7 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
       const result = await sendFromDollars()
 
-      expect(result.status).toBe(PaymentSendResult.Pending)
+      expect(result.status).toBe(PaymentSendResult.Success)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
@@ -1488,7 +1490,7 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       })
       const retry = await detail.sendPaymentMutation({} as never)
 
-      expect(retry.status).toBe(PaymentSendResult.Pending)
+      expect(retry.status).toBe(PaymentSendResult.Success)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
@@ -1501,7 +1503,7 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       historyShows(lostSendRecord(QUOTED_HASH))
       const retry = await detail.sendPaymentMutation({} as never)
 
-      expect(retry.status).toBe(PaymentSendResult.Pending)
+      expect(retry.status).toBe(PaymentSendResult.Success)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
