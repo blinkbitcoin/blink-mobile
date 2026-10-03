@@ -17,11 +17,10 @@ import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import {
   BaseCreatePaymentDetailsParams,
   ConvertMoneyAmount,
-  IdempotencyKeyRef,
-  LostSendRef,
   PaymentDetail,
   PaymentDetailSendPaymentGetFee,
   PaymentDetailSetMemo,
+  SendAttemptRef,
   SetAmount,
   SetInvoice,
   SetSendingWalletDescriptor,
@@ -176,8 +175,7 @@ type CreateSCLnurlParams<T extends WalletCurrency> = {
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   successAction?: LNURLPaySuccessAction
   isMerchant: boolean
-  idempotencyKeyRef?: IdempotencyKeyRef
-  lostSendRef?: LostSendRef
+  idempotencyKeyRef?: SendAttemptRef
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>(
@@ -200,14 +198,12 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
    * Same holder for every rebuild, as the custodial details keep it: the send hook mints
    * the key into it on the first attempt, inside its own try, and reads it back on a
    * retry, so a bitcoin send retried after a throw is refused by the SDK as a duplicate
-   * rather than paid twice.
+   * rather than paid twice. The lost attempts ride on it too.
    */
-  const idempotencyKeyRef = params.idempotencyKeyRef ?? {}
-  const lostSendRef = params.lostSendRef ?? {}
+  const attemptRef: SendAttemptRef = params.idempotencyKeyRef ?? {}
   const paramsWithKey: CreateSCLnurlParams<T> = {
     ...params,
-    idempotencyKeyRef,
-    lostSendRef,
+    idempotencyKeyRef: attemptRef,
   }
 
   const destinationSpecifiedAmount =
@@ -284,12 +280,10 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     })
 
   const rememberLostAttempts = (startedAtMs: number, paymentHashes: string[]) => {
-    lostSendRef.startedAtMs = startedAtMs
-    lostSendRef.paymentHashes = paymentHashes
+    attemptRef.lostSend = { startedAtMs, paymentHashes }
   }
   const forgetLostAttempts = () => {
-    lostSendRef.startedAtMs = undefined
-    lostSendRef.paymentHashes = undefined
+    attemptRef.lostSend = undefined
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -321,12 +315,12 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
          */
         sendPaymentMutation: async () => {
           const isKeyedSend = !isUsdSend
-          const sendIdempotencyKey = isKeyedSend ? idempotencyKeyRef.current : undefined
+          const sendIdempotencyKey = isKeyedSend ? attemptRef.current : undefined
 
-          /** Looked for whatever this send is: the lost attempt was keyless, and its
-           *  payment is as real after a switch to the bitcoin wallet or a new amount. */
-          const earlierAttemptMs = lostSendRef.startedAtMs
-          const earlierHashes = lostSendRef.paymentHashes ?? []
+          /** Looked for whatever this send is: the lost attempt's payment is as real
+           *  after a switch of wallet or a new amount. */
+          const earlierAttemptMs = attemptRef.lostSend?.startedAtMs
+          const earlierHashes = attemptRef.lostSend?.paymentHashes ?? []
           const hasLostAttempt = earlierAttemptMs !== undefined
           if (hasLostAttempt) {
             const earlier = await findThisSend(earlierAttemptMs, earlierHashes)
@@ -408,14 +402,14 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: undefined,
+      idempotencyKeyRef: { lostSend: attemptRef.lostSend },
       unitOfAccountAmount: newAmount,
     })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
-      idempotencyKeyRef: undefined,
+      idempotencyKeyRef: { lostSend: attemptRef.lostSend },
       sendingWalletDescriptor: desc,
     })
 
@@ -444,7 +438,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     setSendingWalletDescriptor,
     lnurlParams,
     setInvoice,
-    idempotencyKeyRef,
+    idempotencyKeyRef: attemptRef,
     successAction,
     setSuccessAction,
     isMerchant,
