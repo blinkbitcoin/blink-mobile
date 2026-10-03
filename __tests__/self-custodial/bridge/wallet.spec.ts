@@ -136,14 +136,14 @@ describe("listPayments", () => {
 })
 
 describe("listSentPaymentsSince", () => {
-  it("asks for outgoing payments from the timestamp on, newest first, in any status", () => {
+  it("asks for a page of outgoing payments from the timestamp on, newest first, in any status", () => {
     const listPaymentsFn = jest.fn().mockResolvedValue({ payments: [] })
 
-    listSentPaymentsSince(
-      { listPayments: listPaymentsFn } as never,
-      BigInt(1747691078),
-      20,
-    )
+    listSentPaymentsSince({ listPayments: listPaymentsFn } as never, {
+      fromTimestamp: BigInt(1747691078),
+      limit: 50,
+      offset: 100,
+    })
 
     expect(listPaymentsFn).toHaveBeenCalledWith({
       typeFilter: [0],
@@ -152,8 +152,8 @@ describe("listSentPaymentsSince", () => {
       paymentDetailsFilter: undefined,
       fromTimestamp: BigInt(1747691078),
       toTimestamp: undefined,
-      offset: 0,
-      limit: 20,
+      offset: 100,
+      limit: 50,
       sortAscending: false,
     })
   })

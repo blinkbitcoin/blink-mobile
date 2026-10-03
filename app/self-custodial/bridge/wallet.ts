@@ -71,12 +71,16 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
     sortAscending: false,
   })
 
-/** Outgoing payments created at or after `fromTimestamp` (unix seconds), newest first, in
- *  any status: what a send whose outcome the SDK lost is looked up against. */
+/** One page of the outgoing payments created at or after `fromTimestamp` (unix seconds),
+ *  newest first, in any status: what a send whose outcome the SDK lost is looked up
+ *  against. */
 export const listSentPaymentsSince = (
   sdk: BreezSdkInterface,
-  fromTimestamp: bigint,
-  limit: number,
+  {
+    fromTimestamp,
+    limit,
+    offset,
+  }: { fromTimestamp: bigint; limit: number; offset: number },
 ) =>
   sdk.listPayments({
     typeFilter: [PaymentType.Send],
@@ -85,7 +89,7 @@ export const listSentPaymentsSince = (
     paymentDetailsFilter: undefined,
     fromTimestamp,
     toTimestamp: undefined,
-    offset: 0,
+    offset,
     limit,
     sortAscending: false,
   })

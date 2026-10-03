@@ -54,6 +54,15 @@ export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
  */
 export type IdempotencyKeyRef = { current?: string }
 
+/**
+ * The attempts of a keyless send that threw after dispatch without their payment turning
+ * up: the payment hash of each invoice they paid, and when the first of them was made.
+ * Held the way the key is, on an object every rebuild shares, so the retry the user makes
+ * later looks for those payments before it sends anything. Unlike the key, it survives a
+ * new amount or wallet too: the payment that may have gone out is as real after either.
+ */
+export type LostSendRef = { startedAtMs?: number; paymentHashes?: string[] }
+
 export type BaseCreatePaymentDetailsParams<T extends WalletCurrency> = {
   convertMoneyAmount: ConvertMoneyAmount
   sendingWalletDescriptor: WalletDescriptor<T>

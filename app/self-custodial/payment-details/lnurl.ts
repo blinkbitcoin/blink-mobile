@@ -7,6 +7,7 @@ import {
   type BreezSdkInterface,
   type LnurlPayRequestDetails,
   type Payment,
+  type SparkHtlcDetails,
   type SuccessActionProcessed,
 } from "@breeztech/breez-sdk-spark-react-native"
 import { PaymentType } from "@blinkbitcoin/blink-client"
@@ -17,6 +18,7 @@ import {
   BaseCreatePaymentDetailsParams,
   ConvertMoneyAmount,
   IdempotencyKeyRef,
+  LostSendRef,
   PaymentDetail,
   PaymentDetailSendPaymentGetFee,
   PaymentDetailSetMemo,
@@ -47,13 +49,6 @@ import { feeFailure, findLostSend } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
-/**
- * When a keyless send last threw after dispatch without its payment turning up, held
- * the way the idempotency key is: on a holder every rebuild shares, so the retry the
- * user makes later, once the connection is back, looks for that payment first.
- */
-type LostSendRef = { startedAtMs?: number }
-
 const extractMetadataStr = (lnurlParams: LnUrlPayServiceResponse): string => {
   const raw = lnurlParams.rawData?.metadata
   if (typeof raw === "string") return raw
@@ -76,11 +71,21 @@ const lnurlParamsToPayRequest = (
   nostrPubkey: undefined,
 })
 
-const extractPreimage = (payment: Payment): string | undefined => {
+/**
+ * The HTLC a payment in the wallet's history settled, whichever rail carried it: a
+ * Lightning payment's, or a Spark transfer's when the invoice was paid to a Spark wallet
+ * directly. Both carry the invoice's payment hash and, once released, its preimage.
+ */
+const htlcDetailsOf = (payment: Payment): SparkHtlcDetails | undefined => {
   const details = payment.details
-  if (!details || !PaymentDetails.Lightning.instanceOf(details)) return undefined
-  return details.inner.htlcDetails.preimage
+  if (!details) return undefined
+  if (PaymentDetails.Lightning.instanceOf(details)) return details.inner.htlcDetails
+  if (PaymentDetails.Spark.instanceOf(details)) return details.inner.htlcDetails
+  return undefined
 }
+
+const extractPreimage = (payment: Payment): string | undefined =>
+  htlcDetailsOf(payment)?.preimage
 
 /** The success action the wallet kept with a payment, for one found after the fact. */
 const extractProcessedSuccessAction = (
@@ -92,18 +97,18 @@ const extractProcessedSuccessAction = (
 }
 
 /**
- * Whether a payment in the wallet's history went to this destination: by Lightning
- * address when the destination has one, by the LNURL's domain otherwise, both as the
- * wallet records them on a pay-request send.
+ * Whether a payment in the wallet's history is one of the invoices this detail's attempts
+ * paid: by payment hash, the one thing the quoted invoice and the wallet's record of
+ * paying it share, and that no other payment does.
+ *
+ * Not by the destination's address. The wallet records the address of a pay-request send
+ * only once the send finished normally, and such a send never needs looking for; a send
+ * that threw after dispatch reaches the history as a bare payment of the invoice. And
+ * another payment to the same address, made moments earlier, is not this one.
  */
-const isPaymentTo = (lnurlParams: LnUrlPayServiceResponse, payment: Payment): boolean => {
-  const details = payment.details
-  if (!details || !PaymentDetails.Lightning.instanceOf(details)) return false
-  const info = details.inner.lnurlPayInfo
-  if (!info) return false
-  if (lnurlParams.identifier) return info.lnAddress === lnurlParams.identifier
-  const hasDomain = Boolean(lnurlParams.domain)
-  return hasDomain && info.domain === lnurlParams.domain
+const isPaymentOf = (paymentHashes: ReadonlyArray<string>, payment: Payment): boolean => {
+  const paymentHash = htlcDetailsOf(payment)?.paymentHash
+  return paymentHash !== undefined && paymentHashes.includes(paymentHash)
 }
 
 const sdkSuccessActionToLib = (
@@ -271,18 +276,20 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     return sendOutcome(found, extractProcessedSuccessAction(found), status)
   }
 
-  const findThisSend = (startedAtMs: number) =>
+  const findThisSend = (startedAtMs: number, paymentHashes: ReadonlyArray<string>) =>
     findLostSend({
       sdk,
       startedAtMs,
-      matches: (payment) => isPaymentTo(lnurlParams, payment),
+      matches: (payment) => isPaymentOf(paymentHashes, payment),
     })
 
-  const rememberLostAttempt = (startedAtMs: number) => {
+  const rememberLostAttempts = (startedAtMs: number, paymentHashes: string[]) => {
     lostSendRef.startedAtMs = startedAtMs
+    lostSendRef.paymentHashes = paymentHashes
   }
-  const forgetLostAttempt = () => {
+  const forgetLostAttempts = () => {
     lostSendRef.startedAtMs = undefined
+    lostSendRef.paymentHashes = undefined
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -306,22 +313,31 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
          *
          * Without a key the SDK's own warning applies: "retrying after a failure that
          * leaves the outcome unknown may pay twice … look for the payment before sending
-         * it again". So a dollar send that throws after dispatch looks for its payment
-         * before it is reported as failed, and a retry made later, once the connection
-         * is back and the wallet has caught up, looks for the earlier attempt's payment
-         * before it sends anything.
+         * it again". So a dollar send that throws after dispatch looks for the payment
+         * of the invoice it was paying before it is reported as failed, and a retry made
+         * later, once the connection is back, looks for the earlier attempts' payments
+         * before it sends anything. Every attempt pays a freshly quoted invoice, so each
+         * lost one is remembered by its own hash.
          */
         sendPaymentMutation: async () => {
           const isKeyedSend = !isUsdSend
           const sendIdempotencyKey = isKeyedSend ? idempotencyKeyRef.current : undefined
 
+          /** Looked for whatever this send is: the lost attempt was keyless, and its
+           *  payment is as real after a switch to the bitcoin wallet or a new amount. */
           const earlierAttemptMs = lostSendRef.startedAtMs
-          if (!isKeyedSend && earlierAttemptMs !== undefined) {
-            const earlier = await findThisSend(earlierAttemptMs)
-            if (earlier) {
-              forgetLostAttempt()
-              return foundOutcome(earlier)
+          const earlierHashes = lostSendRef.paymentHashes ?? []
+          const hasLostAttempt = earlierAttemptMs !== undefined
+          if (hasLostAttempt) {
+            const earlier = await findThisSend(earlierAttemptMs, earlierHashes)
+            if (earlier.status === "found") {
+              forgetLostAttempts()
+              return foundOutcome(earlier.payment)
             }
+            /** Nothing is sent over a history that could not be read: the payment it
+             *  may hold would be paid again. The attempt stays remembered, and the next
+             *  retry asks again. */
+            if (earlier.status === "unreadable") return sendFailure(earlier.error)
           }
 
           /** Nothing has moved before the send itself, so a quote that fails is safe to
@@ -334,23 +350,31 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
           }
 
           const startedAtMs = earlierAttemptMs ?? Date.now()
+          const paymentHashes = [...earlierHashes, prepared.invoiceDetails.paymentHash]
           try {
             const result = await executeLnurl(sdk, prepared, sendIdempotencyKey)
-            forgetLostAttempt()
+            forgetLostAttempts()
             return sendOutcome(
               result.payment,
               result.successAction,
               PaymentSendResult.Success,
             )
           } catch (err) {
-            if (isKeyedSend) return sendFailure(err)
-
-            const lost = await findThisSend(startedAtMs)
-            if (lost) {
-              forgetLostAttempt()
-              return foundOutcome(lost)
+            /** A keyed send needs no looking for now: a retry under the same key is
+             *  refused as a duplicate by the SDK. The attempt is still remembered, since
+             *  a new amount or wallet starts the key over, and the send made after that
+             *  has only the lookup between it and paying twice. */
+            if (isKeyedSend) {
+              rememberLostAttempts(startedAtMs, paymentHashes)
+              return sendFailure(err)
             }
-            rememberLostAttempt(startedAtMs)
+
+            const lost = await findThisSend(startedAtMs, paymentHashes)
+            if (lost.status === "found") {
+              forgetLostAttempts()
+              return foundOutcome(lost.payment)
+            }
+            rememberLostAttempts(startedAtMs, paymentHashes)
             return sendFailure(err)
           }
         },
@@ -375,16 +399,16 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   }
 
   /**
-   * A new amount or wallet is a new payment, so both holders start over, as the custodial
+   * A new amount or wallet is a new payment, so the key starts over, as the custodial
    * details do: the SDK answers a reused key with the payment it already made, which
-   * would report the old amount as sent, and an earlier attempt's payment is not this
-   * one's to claim.
+   * would report the old amount as sent. The lost attempts stay, as on every rebuild: a
+   * payment that may have gone out does not stop being one because the amount changed,
+   * and a send made without looking for it first could be the second one.
    */
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
-      lostSendRef: undefined,
       unitOfAccountAmount: newAmount,
     })
 
@@ -392,7 +416,6 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     createSelfCustodialLnurlPaymentDetails({
       ...paramsWithKey,
       idempotencyKeyRef: undefined,
-      lostSendRef: undefined,
       sendingWalletDescriptor: desc,
     })
 

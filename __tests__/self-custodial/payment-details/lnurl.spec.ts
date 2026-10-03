@@ -10,11 +10,15 @@ import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 const mockPrepareLnurl = jest.fn()
 const mockExecuteLnurl = jest.fn()
 const mockExtractLnurlFee = jest.fn()
+const mockListSentPaymentsSince = jest.fn()
+const mockSyncSelfCustodialWallet = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
   executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
   extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
+  listSentPaymentsSince: (...args: unknown[]) => mockListSentPaymentsSince(...args),
+  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),
   resolveSendTokenIdentifier: (currency: WalletCurrency) =>
     currency === WalletCurrency.Usd ? "usdb-token-id" : undefined,
@@ -30,6 +34,15 @@ jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
   ...jest.requireActual("@app/self-custodial/payment-details/send-helpers"),
   findLostSend: (...args: unknown[]) => mockFindLostSend(...args),
 }))
+
+/** The real lookup, for the tests that run it against a history shaped the way the
+ *  wallet writes it. Its waits between looks are skipped. */
+const { findLostSend: actualFindLostSend } = jest.requireActual<
+  typeof import("@app/self-custodial/payment-details/send-helpers")
+>("@app/self-custodial/payment-details/send-helpers")
+
+jest.mock("@app/utils/sleep", () => ({ sleep: () => Promise.resolve() }))
+jest.mock("@app/utils/error-logging", () => ({ reportError: jest.fn() }))
 
 jest.mock("@app/self-custodial/sdk-error", () => {
   const tags = {
@@ -79,6 +92,16 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Token: { instanceOf: (obj: { tag?: string } | undefined) => obj?.tag === "Token" },
   },
 }))
+
+/** The hash of the invoice a quote came back with: what the wallet's record of paying it
+ *  carries, and what a send that threw after dispatch is looked up by. */
+const QUOTED_HASH = "a".repeat(64)
+
+/** What prepareLnurl answers: a fee, and the invoice the send would pay. */
+const quote = (paymentHash = QUOTED_HASH) => ({
+  feeSats: BigInt(0),
+  invoiceDetails: { paymentHash },
+})
 
 const baseLnurlParams = (overrides: Partial<LnUrlPayServiceResponse> = {}) =>
   ({
@@ -311,7 +334,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("sends the typed memo as the comment instead of the destination description", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           lnurlParams: baseLnurlParams({ commentAllowed: 200 }),
@@ -331,7 +354,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("truncates the comment to the length the destination allows", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({ lnurlParams: baseLnurlParams({ commentAllowed: 10 }) }),
       )
@@ -352,7 +375,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     /** The SDK's pay request wants a string for the domain; the lnurl-pay library leaves it
      *  unset when the response named none. */
     it("hands the SDK an empty domain when the lnurl params carry none", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({ lnurlParams: baseLnurlParams({ domain: undefined }) }),
       )
@@ -367,7 +390,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("USD wallet: passes USDB base units + tokenIdentifier + ToBitcoin + FeesIncluded", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
@@ -395,7 +418,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("BTC wallet: passes amount in sats + no tokenIdentifier + no conversionOptions + no feePolicy", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(createParams())
       if (!detail.canGetFee) throw new Error("expected canGetFee")
       await detail.getFee({} as never)
@@ -412,7 +435,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("includes the comment only when commentAllowed > 0 and a memo is set", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           lnurlParams: baseLnurlParams({ commentAllowed: 200 }),
@@ -429,7 +452,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("omits the comment when commentAllowed is 0 even if a memo is set", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           lnurlParams: baseLnurlParams({ commentAllowed: 0 }),
@@ -446,7 +469,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("omits the comment when commentAllowed > 0 but memo is empty", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           lnurlParams: baseLnurlParams({ commentAllowed: 200 }),
@@ -465,7 +488,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
 
   describe("getFee", () => {
     it("returns the fee in BTC sats from extractLnurlFee", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExtractLnurlFee.mockReturnValue(5)
       const detail = createSelfCustodialLnurlPaymentDetails(createParams())
       if (!detail.canGetFee) throw new Error("expected canGetFee")
@@ -475,7 +498,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("returns currency: Btc regardless of the sending wallet generic (USD wallet)", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExtractLnurlFee.mockReturnValue(50)
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
@@ -525,7 +548,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("leaves errors unset on a successful quote", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExtractLnurlFee.mockReturnValue(5)
       const detail = createSelfCustodialLnurlPaymentDetails(createParams())
       if (!detail.canGetFee) throw new Error("expected canGetFee")
@@ -536,7 +559,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
 
   describe("sendPaymentMutation", () => {
     it("returns Success with successAction in extraInfo on success (Message)", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
         payment: { id: "p1" },
         successAction: { tag: "Message", inner: { data: { message: "Thanks!" } } },
@@ -551,7 +574,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("converts a URL successAction to the lnurl-pay shape", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
         payment: { id: "p1" },
         successAction: {
@@ -569,7 +592,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("carries the decrypted plaintext on `message` (not via decipher) for AES Decrypted", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
         payment: { id: "p1" },
         successAction: {
@@ -595,7 +618,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("maps AES ErrorStatus to description with no plaintext leakage", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
         payment: { id: "p1" },
         successAction: {
@@ -646,7 +669,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("propagates preimage from Lightning htlcDetails and createdAt from payment.timestamp on success", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
         payment: {
           id: "p1",
@@ -667,7 +690,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("returns undefined preimage when payment.details is non-Lightning", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
         payment: {
           id: "p1",
@@ -686,7 +709,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
 
   describe("metadataStr preservation (LUD-06 description hash)", () => {
     it("uses the raw metadata string from lnurlParams.rawData when available", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const rawMetadata = '[ ["text/plain","Spaces in raw"] ]'
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
@@ -708,7 +731,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     })
 
     it("falls back to JSON.stringify when rawData.metadata is missing", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           lnurlParams: baseLnurlParams({ rawData: {} }),
@@ -730,7 +753,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
 
   describe("min/max → millisats conversion in payRequest", () => {
     it("multiplies sat values by 1000 to produce SDK-shaped millisats", async () => {
-      mockPrepareLnurl.mockResolvedValue({})
+      mockPrepareLnurl.mockResolvedValue(quote())
       const detail = createSelfCustodialLnurlPaymentDetails(
         createParams({
           lnurlParams: baseLnurlParams({ min: 100 as Satoshis, max: 200 as Satoshis }),
@@ -787,7 +810,7 @@ describe("createSelfCustodialLnurlPaymentDetails idempotency key", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
+    mockPrepareLnurl.mockResolvedValue(quote())
     mockExecuteLnurl.mockResolvedValue({
       payment: { id: "p1" },
       successAction: undefined,
@@ -968,23 +991,37 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       },
     })
 
-  /** A payment as the wallet records a pay-request send: its address and the success
-   *  action it processed travel on the Lightning details. */
-  const paymentTo = (
-    lnAddress: string | undefined,
-    status: number,
-    domain = "example.com",
-  ) => ({
+  const COMPLETED = 0
+  const PENDING = 1
+  const RETRY_HASH = "b".repeat(64)
+
+  /** A payment as the wallet records a send that threw after dispatch: a bare Lightning
+   *  payment of the invoice, carrying its hash and, once released, its preimage. No
+   *  lnurlPayInfo, which the wallet writes only once a pay-request send finished. */
+  const paymentOf = (paymentHash: string, status: number) => ({
     id: "found-1",
     status,
     timestamp: BigInt(1747691078),
     details: {
       tag: "Lightning",
       inner: {
-        htlcDetails: { preimage: "found-preimage" },
+        htlcDetails: { paymentHash, preimage: "found-preimage" },
+        lnurlPayInfo: undefined,
+      },
+    },
+  })
+
+  /** The same payment as the wallet records it once the send finished normally: the
+   *  address and the success action it processed travel on the Lightning details. */
+  const finishedPaymentOf = (paymentHash: string, status: number) => ({
+    ...paymentOf(paymentHash, status),
+    details: {
+      tag: "Lightning",
+      inner: {
+        htlcDetails: { paymentHash, preimage: "found-preimage" },
         lnurlPayInfo: {
-          lnAddress,
-          domain,
+          lnAddress: "user@example.com",
+          domain: "example.com",
           processedSuccessAction: {
             tag: "Message",
             inner: { data: { message: "Thanks!" } },
@@ -993,8 +1030,21 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       },
     },
   })
-  const COMPLETED = 0
-  const PENDING = 1
+
+  /** The same invoice, settled as a Spark transfer because the payee was a Spark wallet. */
+  const sparkPaymentOf = (paymentHash: string, status: number) => ({
+    id: "found-spark",
+    status,
+    timestamp: BigInt(1747691078),
+    details: {
+      tag: "Spark",
+      inner: { htlcDetails: { paymentHash, preimage: "spark-preimage" } },
+    },
+  })
+
+  const found = (payment: unknown) => ({ status: "found", payment })
+  const notFound = () => ({ status: "not-found" })
+  const unreadable = (error: unknown) => ({ status: "unreadable", error })
 
   const sendFromDollars = async (params = usdParams()) => {
     const detail = createSelfCustodialLnurlPaymentDetails(params)
@@ -1002,26 +1052,27 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     return detail.sendPaymentMutation({} as never)
   }
 
-  const lastLookup = () =>
-    mockFindLostSend.mock.calls[mockFindLostSend.mock.calls.length - 1][0] as {
-      sdk: unknown
-      startedAtMs: number
-      matches: (payment: unknown) => boolean
-    }
+  type Lookup = {
+    sdk: unknown
+    startedAtMs: number
+    matches: (payment: unknown) => boolean
+  }
+  const lookupAt = (index: number) => mockFindLostSend.mock.calls[index][0] as Lookup
+  const lastLookup = () => lookupAt(mockFindLostSend.mock.calls.length - 1)
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockPrepareLnurl.mockResolvedValue({ feeSats: BigInt(0) })
+    mockPrepareLnurl.mockResolvedValue(quote())
     mockExecuteLnurl.mockRejectedValue({ tag: "NetworkError" })
-    mockFindLostSend.mockResolvedValue(undefined)
+    mockFindLostSend.mockResolvedValue(notFound())
   })
 
   /**
    * Without a key the SDK cannot refuse a duplicate, and its own guidance for a send
    * that throws after dispatch is to look for the payment before sending again. The
-   * lookup starts at the attempt and is bound to this destination.
+   * lookup starts at the attempt and is bound to the invoice this attempt paid.
    */
-  it("looks the payment up from the moment of the attempt, by destination", async () => {
+  it("looks the payment up from the moment of the attempt, by the hash of the invoice it paid", async () => {
     const before = Date.now()
 
     await sendFromDollars()
@@ -1029,14 +1080,33 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     const lookup = lastLookup()
     expect(lookup.startedAtMs).toBeGreaterThanOrEqual(before)
     expect(lookup.startedAtMs).toBeLessThanOrEqual(Date.now())
-    expect(lookup.matches(paymentTo("user@example.com", COMPLETED))).toBe(true)
-    expect(lookup.matches(paymentTo("someone@else.com", COMPLETED))).toBe(false)
-    expect(lookup.matches(paymentTo(undefined, COMPLETED))).toBe(false)
-    expect(lookup.matches({ id: "x", details: { tag: "Spark", inner: {} } })).toBe(false)
-    expect(lookup.matches({ id: "x", details: undefined })).toBe(false)
+    expect(lookup.matches(paymentOf(QUOTED_HASH, COMPLETED))).toBe(true)
+    expect(lookup.matches(finishedPaymentOf(QUOTED_HASH, COMPLETED))).toBe(true)
+    expect(lookup.matches(paymentOf(RETRY_HASH, COMPLETED))).toBe(false)
   })
 
-  it("matches a raw lnurl by its domain when the destination has no address", async () => {
+  /** The wallet records the address only once a send finished normally, and a payment
+   *  to the same address made moments earlier is not this one, so neither is looked at. */
+  it("neither needs the address the wallet did not record nor takes another payment to it", async () => {
+    await sendFromDollars()
+
+    const { matches } = lastLookup()
+    expect(matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
+    expect(matches(finishedPaymentOf(RETRY_HASH, COMPLETED))).toBe(false)
+  })
+
+  it("recognises the invoice whichever rail the wallet settled it over", async () => {
+    await sendFromDollars()
+
+    const { matches } = lastLookup()
+    expect(matches(sparkPaymentOf(QUOTED_HASH, COMPLETED))).toBe(true)
+    expect(matches(sparkPaymentOf(RETRY_HASH, COMPLETED))).toBe(false)
+    expect(matches({ id: "x", details: { tag: "Spark", inner: {} } })).toBe(false)
+    expect(matches({ id: "x", details: { tag: "Token", inner: {} } })).toBe(false)
+    expect(matches({ id: "x", details: undefined })).toBe(false)
+  })
+
+  it("matches a raw lnurl's payment the same way, with no address or domain to go by", async () => {
     await sendFromDollars(
       createParams({
         sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
@@ -1045,23 +1115,15 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
           currency: WalletCurrency.Usd,
           currencyCode: "USD",
         },
-        lnurlParams: baseLnurlParams({ identifier: "", domain: "pay.example.com" }),
+        lnurlParams: baseLnurlParams({ identifier: "", domain: undefined }),
       }),
     )
 
-    const { matches } = lastLookup()
-    expect(matches(paymentTo(undefined, COMPLETED, "pay.example.com"))).toBe(true)
-    expect(matches(paymentTo(undefined, COMPLETED, "other.example.com"))).toBe(false)
-    expect(
-      matches({
-        id: "x",
-        details: { tag: "Lightning", inner: { lnurlPayInfo: undefined } },
-      }),
-    ).toBe(false)
+    expect(lastLookup().matches(paymentOf(QUOTED_HASH, COMPLETED))).toBe(true)
   })
 
   it("reports the payment as sent when the wallet shows it completed", async () => {
-    mockFindLostSend.mockResolvedValue(paymentTo("user@example.com", COMPLETED))
+    mockFindLostSend.mockResolvedValue(found(finishedPaymentOf(QUOTED_HASH, COMPLETED)))
 
     const result = await sendFromDollars()
 
@@ -1074,21 +1136,35 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
   })
 
   it("reports it as pending when the wallet shows it still in flight", async () => {
-    mockFindLostSend.mockResolvedValue(paymentTo("user@example.com", PENDING))
+    mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, PENDING)))
 
     const result = await sendFromDollars()
 
     expect(result.status).toBe(PaymentSendResult.Pending)
     expect(result.transaction?.createdAt).toBe(1747691078)
+    expect(result.extraInfo?.preimage).toBe("found-preimage")
+    expect(result.extraInfo?.successAction).toBeUndefined()
+  })
+
+  it("carries the preimage of a payment the wallet settled over Spark", async () => {
+    mockFindLostSend.mockResolvedValue(found(sparkPaymentOf(QUOTED_HASH, COMPLETED)))
+
+    const result = await sendFromDollars()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.extraInfo?.preimage).toBe("spark-preimage")
+    expect(result.extraInfo?.successAction).toBeUndefined()
   })
 
   it("carries no preimage or success action for a found payment without them", async () => {
-    mockFindLostSend.mockResolvedValue({
-      id: "found-2",
-      status: COMPLETED,
-      timestamp: BigInt(1747691078),
-      details: { tag: "Spark", inner: {} },
-    })
+    mockFindLostSend.mockResolvedValue(
+      found({
+        id: "found-2",
+        status: COMPLETED,
+        timestamp: BigInt(1747691078),
+        details: { tag: "Spark", inner: {} },
+      }),
+    )
 
     const result = await sendFromDollars()
 
@@ -1104,6 +1180,21 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     expect(mockFindLostSend).toHaveBeenCalledTimes(1)
     expect(result.status).toBe(PaymentSendResult.Failure)
     expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
+  })
+
+  it("reports the failure, and keeps the attempt to look for, when the history could not be read", async () => {
+    mockFindLostSend.mockResolvedValue(unreadable({ tag: "NetworkError" }))
+    const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+    const first = await detail.sendPaymentMutation({} as never)
+    expect(first.status).toBe(PaymentSendResult.Failure)
+
+    mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, COMPLETED)))
+    const retry = await detail.sendPaymentMutation({} as never)
+
+    expect(retry.status).toBe(PaymentSendResult.Success)
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
   })
 
   describe("the retry after a lost attempt", () => {
@@ -1126,15 +1217,17 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       const first = await detail.sendPaymentMutation({} as never)
       expect(first.status).toBe(PaymentSendResult.Failure)
       nowSpy.mockReturnValue(RETRY_MS)
+      /** The retry quotes afresh, so it pays a different invoice from the lost attempt. */
+      mockPrepareLnurl.mockResolvedValue(quote(RETRY_HASH))
       return detail
     }
 
     /** The SDK's guidance is to look "before sending it again": the wallet may only have
      *  caught up with the payment once the connection is back, which is when the retry
      *  comes, so the retry looks for the earlier attempt's payment before it sends. */
-    it("looks for the earlier attempt's payment before sending, from that attempt's moment", async () => {
+    it("looks for the earlier attempt's invoice before sending, from that attempt's moment", async () => {
       const detail = await lostFirstAttempt()
-      mockFindLostSend.mockResolvedValue(paymentTo("user@example.com", COMPLETED))
+      mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, COMPLETED)))
       mockPrepareLnurl.mockClear()
       mockExecuteLnurl.mockClear()
 
@@ -1143,11 +1236,12 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
       expect(retry.status).toBe(PaymentSendResult.Success)
       expect(lastLookup().startedAtMs).toBe(FIRST_ATTEMPT_MS)
+      expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
       expect(mockPrepareLnurl).not.toHaveBeenCalled()
       expect(mockExecuteLnurl).not.toHaveBeenCalled()
     })
 
-    it("sends again when the earlier attempt still shows nothing, and keeps looking from its moment", async () => {
+    it("sends again when the earlier attempt still shows nothing, then looks for both invoices", async () => {
       const detail = await lostFirstAttempt()
       mockFindLostSend.mockClear()
 
@@ -1157,8 +1251,38 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(retry.status).toBe(PaymentSendResult.Failure)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(2)
       expect(mockFindLostSend).toHaveBeenCalledTimes(2)
-      expect(mockFindLostSend.mock.calls[0][0].startedAtMs).toBe(FIRST_ATTEMPT_MS)
-      expect(mockFindLostSend.mock.calls[1][0].startedAtMs).toBe(FIRST_ATTEMPT_MS)
+      /** Before the retry sends: only the lost attempt's invoice can have been paid. */
+      expect(lookupAt(0).startedAtMs).toBe(FIRST_ATTEMPT_MS)
+      expect(lookupAt(0).matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
+      expect(lookupAt(0).matches(paymentOf(RETRY_HASH, PENDING))).toBe(false)
+      /** After the retry threw too: either invoice may have landed. */
+      expect(lookupAt(1).startedAtMs).toBe(FIRST_ATTEMPT_MS)
+      expect(lookupAt(1).matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
+      expect(lookupAt(1).matches(paymentOf(RETRY_HASH, PENDING))).toBe(true)
+    })
+
+    /** A history that could not be read may hold the earlier payment, so nothing is sent
+     *  over it: the retry fails as the connection problem it is, and the next one asks
+     *  again. */
+    it("sends nothing while the earlier attempt's history cannot be read", async () => {
+      const detail = await lostFirstAttempt()
+      mockFindLostSend.mockResolvedValue(unreadable({ tag: "NetworkError" }))
+      mockPrepareLnurl.mockClear()
+      mockExecuteLnurl.mockClear()
+
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Failure)
+      expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
+      expect(mockPrepareLnurl).not.toHaveBeenCalled()
+      expect(mockExecuteLnurl).not.toHaveBeenCalled()
+
+      mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, COMPLETED)))
+      const later = await detail.sendPaymentMutation({} as never)
+
+      expect(later.status).toBe(PaymentSendResult.Success)
+      expect(mockExecuteLnurl).not.toHaveBeenCalled()
     })
 
     it("stops looking once a send went through", async () => {
@@ -1176,11 +1300,13 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
       expect(mockFindLostSend).toHaveBeenCalledTimes(1)
       expect(lastLookup().startedAtMs).toBe(RETRY_MS)
+      expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(false)
+      expect(lastLookup().matches(paymentOf(RETRY_HASH, PENDING))).toBe(true)
     })
 
     it("stops looking once the earlier payment was found", async () => {
       const detail = await lostFirstAttempt()
-      mockFindLostSend.mockResolvedValueOnce(paymentTo("user@example.com", COMPLETED))
+      mockFindLostSend.mockResolvedValueOnce(found(paymentOf(QUOTED_HASH, COMPLETED)))
       if (!detail.canSendPayment) throw new Error("expected canSendPayment")
       await detail.sendPaymentMutation({} as never)
       mockFindLostSend.mockClear()
@@ -1189,31 +1315,73 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
       expect(mockFindLostSend).toHaveBeenCalledTimes(1)
       expect(lastLookup().startedAtMs).toBe(RETRY_MS)
+      expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(false)
     })
 
-    /** The moment of the lost attempt rides the same holder as the key: a rebuild that
-     *  keeps the payment carries it, one that changes the payment starts over. */
-    it("is carried by a rebuild that keeps the payment and dropped by one that changes it", async () => {
+    /** The lost attempts ride the same holder as the key, and unlike the key they ride
+     *  through every rebuild: the payment that may have gone out is as real after a new
+     *  memo, a price tick, a new amount or a switch of wallet. */
+    it("is carried by every rebuild, a new amount and wallet included", async () => {
       const detail = await lostFirstAttempt()
       if (!detail.canSetMemo) throw new Error("expected canSetMemo")
       if (!detail.canSetAmount) throw new Error("expected canSetAmount")
+
+      const rebuilt = [
+        detail.setMemo("new memo"),
+        detail.setConvertMoneyAmount(convertMoneyAmount),
+        detail.setAmount({
+          amount: 200,
+          currency: WalletCurrency.Usd,
+          currencyCode: "USD",
+        }),
+        detail.setSendingWalletDescriptor({
+          id: "w-btc",
+          currency: WalletCurrency.Btc,
+        } as never),
+      ]
+      for (const rebuild of rebuilt) {
+        mockFindLostSend.mockClear()
+        if (!rebuild.canSendPayment) throw new Error("expected canSendPayment")
+
+        await rebuild.sendPaymentMutation({} as never)
+
+        expect(lookupAt(0).startedAtMs).toBe(FIRST_ATTEMPT_MS)
+        expect(lookupAt(0).matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
+      }
+    })
+
+    /** Once switched to the bitcoin wallet the new send carries a key, but the lost
+     *  attempt did not: its payment is looked for before this one is dispatched. */
+    it("still looks for the lost dollar attempt before a bitcoin send", async () => {
+      const detail = await lostFirstAttempt()
+      const switched = detail.setSendingWalletDescriptor({
+        id: "w-btc",
+        currency: WalletCurrency.Btc,
+      } as never)
+      if (!switched.idempotencyKeyRef) throw new Error("expected idempotencyKeyRef")
+      switched.idempotencyKeyRef.current = "uuid-1"
+      mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, COMPLETED)))
+      mockExecuteLnurl.mockClear()
+
+      if (!switched.canSendPayment) throw new Error("expected canSendPayment")
+      const result = await switched.sendPaymentMutation({} as never)
+
+      expect(result.status).toBe(PaymentSendResult.Success)
+      expect(mockExecuteLnurl).not.toHaveBeenCalled()
+    })
+
+    it("keeps the lost attempt when the retry's own quote fails", async () => {
+      const detail = await lostFirstAttempt()
+      mockPrepareLnurl.mockRejectedValueOnce({ tag: "NetworkError" })
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const failedQuote = await detail.sendPaymentMutation({} as never)
+      expect(failedQuote.status).toBe(PaymentSendResult.Failure)
       mockFindLostSend.mockClear()
 
-      const reMemoed = detail.setMemo("new memo")
-      if (!reMemoed.canSendPayment) throw new Error("expected canSendPayment")
-      await reMemoed.sendPaymentMutation({} as never)
-      expect(mockFindLostSend.mock.calls[0][0].startedAtMs).toBe(FIRST_ATTEMPT_MS)
-      mockFindLostSend.mockClear()
+      await detail.sendPaymentMutation({} as never)
 
-      const reAmounted = detail.setAmount({
-        amount: 200,
-        currency: WalletCurrency.Usd,
-        currencyCode: "USD",
-      })
-      if (!reAmounted.canSendPayment) throw new Error("expected canSendPayment")
-      await reAmounted.sendPaymentMutation({} as never)
-      expect(mockFindLostSend).toHaveBeenCalledTimes(1)
-      expect(lastLookup().startedAtMs).toBe(RETRY_MS)
+      expect(lookupAt(0).startedAtMs).toBe(FIRST_ATTEMPT_MS)
+      expect(lookupAt(0).matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
     })
   })
 
@@ -1240,5 +1408,127 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
     expect(mockFindLostSend).not.toHaveBeenCalled()
     expect(result.status).toBe(PaymentSendResult.Failure)
+  })
+
+  /** A new amount or wallet starts the key over, and with it goes the SDK's refusal of a
+   *  duplicate. The attempt that threw is remembered all the same, so the send made after
+   *  that looks for its payment first. */
+  it("remembers a bitcoin attempt that threw, for the send made after a new amount", async () => {
+    const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+    if (!detail.idempotencyKeyRef) throw new Error("expected idempotencyKeyRef")
+    detail.idempotencyKeyRef.current = "uuid-1"
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+    if (!detail.canSetAmount) throw new Error("expected canSetAmount")
+    await detail.sendPaymentMutation({} as never)
+    mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, COMPLETED)))
+    mockExecuteLnurl.mockClear()
+
+    const reAmounted = detail.setAmount({
+      amount: 3000,
+      currency: WalletCurrency.Btc,
+      currencyCode: WalletCurrency.Btc,
+    })
+    if (!reAmounted.canSendPayment) throw new Error("expected canSendPayment")
+    const result = await reAmounted.sendPaymentMutation({} as never)
+
+    expect(mockFindLostSend).toHaveBeenCalledTimes(1)
+    expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(mockExecuteLnurl).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The real lookup against a history shaped the way the wallet writes a send that threw
+   * after dispatch: a bare Lightning payment of the invoice, with no lnurlPayInfo. This is
+   * the seam where a match by address could never find the payment it was for.
+   */
+  describe("against the wallet's own history", () => {
+    const lostSendRecord = (paymentHash: string) => ({
+      id: "transfer-1",
+      status: PENDING,
+      timestamp: BigInt(Math.floor(Date.now() / 1000)),
+      details: {
+        tag: "Lightning",
+        inner: {
+          htlcDetails: { paymentHash, preimage: undefined },
+          lnurlPayInfo: undefined,
+        },
+      },
+    })
+
+    const historyShows = (...payments: unknown[]) => {
+      mockListSentPaymentsSince.mockResolvedValue({ payments })
+    }
+
+    beforeEach(() => {
+      mockFindLostSend.mockImplementation(actualFindLostSend)
+      mockSyncSelfCustodialWallet.mockResolvedValue(undefined)
+      historyShows()
+    })
+
+    it("finds the dispatched payment as the wallet records it, instead of re-arming the slider", async () => {
+      historyShows(lostSendRecord(QUOTED_HASH))
+
+      const result = await sendFromDollars()
+
+      expect(result.status).toBe(PaymentSendResult.Pending)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not dispatch a second payment on the retry once the wallet shows the first", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      const first = await detail.sendPaymentMutation({} as never)
+      expect(first.status).toBe(PaymentSendResult.Failure)
+
+      historyShows(lostSendRecord(QUOTED_HASH))
+      mockExecuteLnurl.mockResolvedValue({
+        payment: { id: "p2" },
+        successAction: undefined,
+      })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Pending)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
+    it("finds the lost attempt by its own invoice although the retry quoted a new one", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      await detail.sendPaymentMutation({} as never)
+
+      mockPrepareLnurl.mockResolvedValue(quote(RETRY_HASH))
+      historyShows(lostSendRecord(QUOTED_HASH))
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Pending)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
+    it("sends nothing on the retry while the wallet cannot catch up with the server", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      await detail.sendPaymentMutation({} as never)
+
+      mockSyncSelfCustodialWallet.mockRejectedValue({ tag: "NetworkError" })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Failure)
+      expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+
+    it("sends nothing on the retry while the history cannot be read", async () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      await detail.sendPaymentMutation({} as never)
+
+      mockListSentPaymentsSince.mockRejectedValue({ tag: "NetworkError" })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Failure)
+      expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
+      expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
   })
 })
