@@ -1148,6 +1148,30 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     expect(result.extraInfo?.successAction).toBeUndefined()
   })
 
+  /** The SDK refused the send on the way in: nothing was dispatched, so nothing is
+   *  looked for and the error shows at once. Whether that is so is the SDK's word, not
+   *  this code's, so the attempt is remembered and the next send looks first. */
+  it("shows a failure the SDK raised before sending at once, and still remembers the attempt", async () => {
+    mockExecuteLnurl.mockRejectedValue({ tag: "LnurlError" })
+    const detail = createSelfCustodialLnurlPaymentDetails(usdParams())
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+    const first = await detail.sendPaymentMutation({} as never)
+
+    expect(mockFindLostSend).not.toHaveBeenCalled()
+    expect(first.status).toBe(PaymentSendResult.Failure)
+    expect(first.errors?.[0]?.message).toBe(SelfCustodialErrorCode.InvalidInput)
+
+    mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, COMPLETED)))
+    mockExecuteLnurl.mockClear()
+    const next = await detail.sendPaymentMutation({} as never)
+
+    expect(mockFindLostSend).toHaveBeenCalledTimes(1)
+    expect(lastLookup().matches(paymentOf(QUOTED_HASH, PENDING))).toBe(true)
+    expect(next.status).toBe(PaymentSendResult.Success)
+    expect(mockExecuteLnurl).not.toHaveBeenCalled()
+  })
+
   it("carries the preimage of a payment the wallet settled over Spark", async () => {
     mockFindLostSend.mockResolvedValue(found(sparkPaymentOf(QUOTED_HASH, COMPLETED)))
 

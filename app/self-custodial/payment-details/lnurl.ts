@@ -41,11 +41,22 @@ import {
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "../bridge"
-import { classifySdkError } from "../sdk-error"
+import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 import { feeFailure, findLostSend } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
+
+/**
+ * The failures the SDK raises before it sends anything: the amount, the request or the
+ * funds were refused on the way in. Shown at once, since the looks that follow a throw
+ * are for a payment that may have been dispatched, and none was.
+ */
+const CODES_RAISED_BEFORE_DISPATCH: ReadonlySet<SelfCustodialErrorCode> = new Set([
+  SelfCustodialErrorCode.InsufficientFunds,
+  SelfCustodialErrorCode.BelowMinimum,
+  SelfCustodialErrorCode.InvalidInput,
+])
 
 const extractMetadataStr = (lnurlParams: LnUrlPayServiceResponse): string => {
   const raw = lnurlParams.rawData?.metadata
@@ -350,19 +361,22 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
               PaymentSendResult.Success,
             )
           } catch (err) {
-            /** A keyed send needs no looking for now: a retry under the same key is
-             *  refused as a duplicate by the SDK. The attempt is still remembered, since
-             *  a new amount or wallet starts the key over, and the send made after that
-             *  has only the lookup between it and paying twice. */
-            if (isKeyedSend) {
-              rememberLostAttempts(startedAtMs, paymentHashes)
-              return sendFailure(err)
-            }
-
-            const lost = await findThisSend(startedAtMs, paymentHashes)
-            if (lost.status === "found") {
-              forgetLostAttempts()
-              return foundOutcome(lost.payment)
+            /** Not looked for now when a retry under the same key is refused as a
+             *  duplicate by the SDK anyway, nor when the SDK refused the send on the
+             *  way in. Remembered all the same, in both cases: a new amount or wallet
+             *  starts the key over, whether anything was dispatched is the SDK's word
+             *  and not this code's, and the send made next has only the lookup between
+             *  it and paying twice. */
+            const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(
+              classifySdkError(err),
+            )
+            const needsLookingFor = !isKeyedSend && !isRaisedBeforeDispatch
+            if (needsLookingFor) {
+              const lost = await findThisSend(startedAtMs, paymentHashes)
+              if (lost.status === "found") {
+                forgetLostAttempts()
+                return foundOutcome(lost.payment)
+              }
             }
             rememberLostAttempts(startedAtMs, paymentHashes)
             return sendFailure(err)
