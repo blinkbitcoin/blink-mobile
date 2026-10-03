@@ -8,6 +8,7 @@ import {
   createGetFeeOnchain,
   createSendMutation,
   createSendMutationOnchain,
+  findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { ConvertAmountAdjustment } from "@app/types/payment"
@@ -43,6 +44,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
       Bolt11Invoice: "Bolt11Invoice",
     },
     OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+    PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+    SyncWalletRequest: { create: (request: unknown) => request },
+    PaymentType: { Send: 0, Receive: 1 },
     Seed: { Mnemonic: jest.fn().mockImplementation((args: unknown) => args) },
     StableBalanceActiveLabel: {
       Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
@@ -84,9 +88,14 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: jest.fn(),
 }))
 
+const mockListPayments = jest.fn()
+const mockSyncWallet = jest.fn()
+
 const mockSdk = {
   prepareSendPayment: (...args: unknown[]) => mockPrepareSendPayment(...args),
   sendPayment: (...args: unknown[]) => mockSendPayment(...args),
+  listPayments: (...args: unknown[]) => mockListPayments(...args),
+  syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
 } as never
 
 const sdkError = (tag: string, inner?: readonly [string]) => ({ tag, inner })
@@ -712,5 +721,281 @@ describe("createSendMutationOnchain", () => {
 
     expect(result.status).toBe(PaymentSendResult.Failure)
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.NetworkError)
+  })
+})
+
+describe("findLostSend", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const STARTED_AT_MS = 1_747_691_078_000
+  const PAGE_SIZE = 50
+
+  /** A sent payment the wallet has described, as any it has caught up with. */
+  const sent = (id: string, status: number, to = "friend") => ({
+    id,
+    status,
+    to,
+    details: { tag: "Lightning" },
+  })
+  /** A sent payment the wallet has not described yet: nothing to match on. */
+  const undescribed = (id: string, status: number) => ({ id, status, details: undefined })
+  const toFriend = (payment: { to?: string }) => payment.to === "friend"
+  /** A page the wallet filled to the brim, none of it the payment looked for. */
+  const fullPageOfOthers = () =>
+    Array.from({ length: PAGE_SIZE }, (_, i) => sent(`other-${i}`, COMPLETED, "someone"))
+
+  /** Answers the wallet's listing once per call, in order. */
+  const walletAnswers = (...pages: Array<Array<ReturnType<typeof sent>>>) => {
+    pages.forEach((payments) => mockListPayments.mockResolvedValueOnce({ payments }))
+  }
+
+  const lookup = () =>
+    findLostSend({ sdk: mockSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+
+  /** Runs the lookup to its end, releasing each wait between looks. */
+  const settle = async <T>(pending: Promise<T>): Promise<T> => {
+    for (let i = 0; i < 3; i += 1) {
+      await Promise.resolve()
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    return pending
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    jest.useFakeTimers()
+    mockSyncWallet.mockResolvedValue(undefined)
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  /** The caller matches by payment hash, so the window only bounds the work: it opens
+   *  a day before the attempt's own clock, because the wallet stamps a payment with the
+   *  server's clock and a phone's can be set well ahead of it. Only what was sent from
+   *  this wallet is asked for. */
+  it("asks for outgoing payments from a day before the attempt", async () => {
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(lookup())
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({
+        typeFilter: [0],
+        fromTimestamp: BigInt(1_747_691_078 - 24 * 60 * 60),
+        offset: 0,
+        limit: PAGE_SIZE,
+        sortAscending: false,
+      }),
+    )
+  })
+
+  /** The history is local, and a send that threw reaches it only once the wallet has
+   *  caught up with the server, so every look asks it to first. */
+  it("has the wallet catch up with the server before every look", async () => {
+    walletAnswers([], [], [])
+
+    await settle(lookup())
+
+    expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    expect(mockSyncWallet.mock.invocationCallOrder[0]).toBeLessThan(
+      mockListPayments.mock.invocationCallOrder[0],
+    )
+  })
+
+  it("returns the completed payment to the destination on the first look", async () => {
+    walletAnswers([sent("other", COMPLETED, "someone-else"), sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED) })
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("returns a pending payment when that is all the wallet shows", async () => {
+    walletAnswers([sent("p1", PENDING)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "found", payment: sent("p1", PENDING) })
+  })
+
+  it("prefers a completed payment over a pending one for the same attempt", async () => {
+    walletAnswers([sent("in-flight", PENDING), sent("done", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "done" } })
+  })
+
+  /** A failed payment is not the attempt landing; it is exactly what makes a retry safe. */
+  it("passes over a failed payment", async () => {
+    walletAnswers([sent("p1", FAILED)], [sent("p1", FAILED)], [sent("p1", FAILED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found" })
+  })
+
+  /** A busy wallet fills the first page with later sends; the payment is on the next. */
+  it("turns the page when the wallet fills one, and stops at a short one", async () => {
+    walletAnswers(fullPageOfOthers(), [
+      sent("other-x", COMPLETED, "someone"),
+      sent("p1", PENDING),
+    ])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+    expect(mockListPayments).toHaveBeenLastCalledWith(
+      expect.objectContaining({ offset: PAGE_SIZE, limit: PAGE_SIZE }),
+    )
+  })
+
+  it("stops at a completed match without turning the page", async () => {
+    walletAnswers([...fullPageOfOthers().slice(1), sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  /** A match is a payment of the invoice, whatever a later page would have said. */
+  it("keeps a match made before a page that could not be read", async () => {
+    walletAnswers([...fullPageOfOthers().slice(1), sent("p1", PENDING)])
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+  })
+
+  /** A failed payment of the invoice is not the attempt landing, so it settles nothing
+   *  about the pages after it. */
+  it("does not let a failed match stand in for the pages that could not be read", async () => {
+    mockListPayments.mockImplementation(async ({ offset }: { offset: number }) => {
+      if (offset === 0)
+        return { payments: [...fullPageOfOthers().slice(1), sent("p1", FAILED)] }
+      throw new Error("sdk offline")
+    })
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "unreadable" })
+  })
+
+  /** Pages that never run short are a history that was not read to its end. */
+  it("answers unreadable, not nothing found, when twenty full pages have no end", async () => {
+    mockListPayments.mockResolvedValue({ payments: fullPageOfOthers() })
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "unreadable" })
+    expect(mockListPayments).toHaveBeenCalledTimes(3 * 20)
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  /** The payment can land in the history a moment after the call that dispatched it
+   *  gave up, so the wallet is asked again, spaced out, before giving up. */
+  it("asks again after a wait when the first look shows nothing", async () => {
+    walletAnswers([], [sent("p1", COMPLETED)])
+
+    const pending = lookup()
+    await Promise.resolve()
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+
+    const found = await settle(pending)
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  it("gives up after three looks that show nothing", async () => {
+    walletAnswers([], [], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found" })
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  /** A history that cannot be read is not proof the payment was never made. */
+  it("still finds the payment on a later look after a listing that threw", async () => {
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+    walletAnswers([sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    expect(mockRecordError).toHaveBeenCalled()
+  })
+
+  /** The last look decides: each one reads the history afresh after the wallet caught
+   *  up, so an earlier look that could not read says nothing about one that did. */
+  it("answers unreadable when the last look could not read the history", async () => {
+    const offline = new Error("sdk offline")
+    walletAnswers([], [])
+    mockListPayments.mockRejectedValueOnce(offline)
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "unreadable", error: offline })
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  it("answers nothing found once a later look read the history after one that could not", async () => {
+    mockListPayments.mockRejectedValueOnce(new Error("sdk offline"))
+    walletAnswers([], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found" })
+  })
+
+  it("answers unreadable when the wallet could not catch up with the server on the last look", async () => {
+    const offline = new Error("no connection")
+    walletAnswers([], [])
+    mockSyncWallet.mockResolvedValueOnce(undefined)
+    mockSyncWallet.mockResolvedValueOnce(undefined)
+    mockSyncWallet.mockRejectedValueOnce(offline)
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "unreadable", error: offline })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  /** A send the wallet has not described yet carries nothing to match on, and may be the
+   *  attempt itself: it is not known to be absent. */
+  it("answers unreadable while the window holds a send the wallet has not described", async () => {
+    walletAnswers(
+      [undescribed("bare", PENDING)],
+      [undescribed("bare", PENDING)],
+      [undescribed("bare", PENDING)],
+    )
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "unreadable" })
+  })
+
+  it("finds the payment once the wallet has described it", async () => {
+    walletAnswers([undescribed("bare", PENDING)], [sent("p1", PENDING)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+  })
+
+  it("passes over an undescribed send that failed", async () => {
+    walletAnswers([undescribed("bare", FAILED)], [], [])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "not-found" })
   })
 })
