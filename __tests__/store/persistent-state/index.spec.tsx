@@ -191,9 +191,9 @@ describe("PersistentStateProvider", () => {
   })
 
   it("runs the mnemonic migration sweep once the boot interactions settle", async () => {
-    // The sweep is the only thing that records the mnemonics of an upgrading
-    // install, and the reinstall wipe reaches nothing without those records, so
-    // losing this call would quietly strand every seed it was meant to reach.
+    // The sweep moves the mnemonics nothing reads and repairs the records that
+    // did not land, and the reinstall wipe reaches nothing without those
+    // records, so losing this call would quietly strand the seeds it covers.
     setPersistedBlob(scrubbedBlob)
 
     render(
@@ -1128,6 +1128,80 @@ describe("PersistentStateProvider reinstall wipe", () => {
     })
 
     expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
+  })
+})
+
+describe("PersistentStateProvider owed reinstall wipe across a reset", () => {
+  beforeEach(setupStorageMockDefaults)
+
+  const boot = async () => {
+    const view = render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+    return view
+  }
+
+  const resetState = async () => {
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("reset-btn"))
+    })
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    return mockSaveJson.mock.calls.at(-1)?.[1]
+  }
+
+  it("keeps the erase owed when the state is reset", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("unknown")
+    await boot()
+
+    const written = await resetState()
+
+    expect(written).toEqual({
+      ...defaultStateWithoutToken,
+      pendingReinstallKeyMaterialWipe: true,
+    })
+  })
+
+  it("resets to plain defaults when nothing is owed", async () => {
+    setPersistedBlob(scrubbedBlob)
+    await boot()
+
+    const written = await resetState()
+
+    expect(written).toEqual(defaultStateWithoutToken)
+    expect(written).not.toHaveProperty("pendingReinstallKeyMaterialWipe")
+  })
+
+  it("finishes the erase on the boot after a reset", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("unknown")
+    const reinstallBoot = await boot()
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+
+    setPersistedBlob(await resetState())
+    reinstallBoot.unmount()
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
+    mockSaveJson.mockClear()
+    await boot()
+
+    expect(mockClearLegacyKeyStore).toHaveBeenCalledTimes(1)
+    expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+      "pendingReinstallKeyMaterialWipe",
+    )
   })
 })
 
