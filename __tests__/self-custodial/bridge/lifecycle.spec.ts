@@ -105,6 +105,9 @@ import {
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
 import { sparkTokenIdentifier } from "@app/self-custodial/config"
+import { addSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
+
+const mockedAddAccountId = jest.mocked(addSelfCustodialAccountId)
 
 /** Threaded explicitly since the config functions stopped reading a global; the real
  *  value comes from `useLnurlServer()` at the calling hook. */
@@ -471,6 +474,16 @@ describe("selfCustodialCreateWallet", () => {
     expect(mockRecordError).not.toHaveBeenCalled()
   })
 
+  it("deletes the stored phrase and rethrows when the account cannot be registered", async () => {
+    mockedAddAccountId.mockRejectedValueOnce(new Error("Account index unreadable"))
+    mockDeleteMnemonic.mockResolvedValue(true)
+
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("Account index unreadable")
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+  })
+
   /**
    * A rollback that could not finish leaves key material under an account id
    * the app's index never learned about, so nothing in the UI can reach it.
@@ -621,5 +634,21 @@ describe("selfCustodialRestoreWallet", () => {
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("SDK init refused") }),
     )
+  })
+
+  it("rolls back the stored mnemonic when the account cannot be registered", async () => {
+    mockedAddAccountId.mockRejectedValueOnce(new Error("Account index unreadable"))
+
+    await expect(
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any valid words",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
+      }),
+    ).rejects.toThrow("Account index unreadable")
+
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
   })
 })
