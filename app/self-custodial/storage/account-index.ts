@@ -128,9 +128,18 @@ export const readSelfCustodialIndexPresence =
     }
   }
 
+/**
+ * Registers an account, and throws when the index cannot be read.
+ *
+ * Returning quietly there would hand back a wallet that works and that the
+ * index does not list. The owed reinstall wipe takes an absent index as proof
+ * that every tracked mnemonic belongs to the previous owner, so that wallet's
+ * seed would go with them. Both callers undo the mnemonic they stored when this
+ * throws.
+ */
 export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
   const result = await readIndex()
-  if (result.status === StorageReadStatus.ReadFailed) return
+  if (result.status === StorageReadStatus.ReadFailed) throw result.error
   if (result.entries.some((e) => e.id === id)) return
 
   await writeIndex([...result.entries, { id, lightningAddress: null }])

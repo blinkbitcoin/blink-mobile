@@ -221,13 +221,29 @@ describe("self-custodial account-index", () => {
       expect(mockSetItem).not.toHaveBeenCalled()
     })
 
-    it("does NOT write (preserving the registry) when the underlying read fails", async () => {
-      mockGetItem.mockRejectedValueOnce(new Error("AsyncStorage unavailable"))
+    it("throws when the index cannot be read, and writes nothing", async () => {
+      const failure = new Error("AsyncStorage unavailable")
+      mockGetItem.mockRejectedValueOnce(failure)
 
-      await addSelfCustodialAccountId("new-id")
+      await expect(addSelfCustodialAccountId("new-id")).rejects.toBe(failure)
 
       expect(mockSetItem).not.toHaveBeenCalled()
       expect(mockRecordError).toHaveBeenCalledTimes(1)
+    })
+
+    it("throws on an index it cannot parse, instead of registering beside it", async () => {
+      mockGetItem.mockResolvedValueOnce("{not json")
+
+      await expect(addSelfCustodialAccountId("new-id")).rejects.toThrow(SyntaxError)
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
+    it("throws when the index cannot be written", async () => {
+      setIndex([])
+      mockSetItem.mockRejectedValueOnce(new Error("disk full"))
+
+      await expect(addSelfCustodialAccountId("new-id")).rejects.toThrow("disk full")
     })
   })
 
