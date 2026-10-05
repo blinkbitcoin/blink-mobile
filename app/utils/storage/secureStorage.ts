@@ -218,13 +218,22 @@ export default class KeyStoreWrapper {
    * the other slots does not hold. What retaining it buys is a downgrade and
    * rollback that still find the value. The copies go in the explicit purge of
    * blinkbitcoin/blink-wip#1163, never on the read path.
+   *
+   * One more thing sets them apart, this one for the reinstall wipe: **the
+   * account is recorded before its copy is written.** The wipe reaches a
+   * migrated copy only through the tracked list, so a copy written first would
+   * outlive every reinstall if the app died before the list caught up. The
+   * same order `setMnemonicForAccount` keeps, on the same terms: a record that
+   * fails does not hold the value back, it is reported, and the boot sweep
+   * records it again.
    */
-  private static mnemonicSlotFor(key: string): ReadThroughArgs {
+  private static mnemonicSlotFor(accountId: string, key: string): ReadThroughArgs {
     return {
       slot: key,
       legacyKey: key,
       accessible: ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
       deleteLegacyOnMigrate: false,
+      recordBeforeMigrate: () => KeyStoreWrapper.recordMigratingAccount(accountId),
     }
   }
 
@@ -706,16 +715,30 @@ export default class KeyStoreWrapper {
   }
 
   /**
-   * Records an account whose mnemonic was already stored before this list
-   * existed.
+   * Records an account whose mnemonic is stored without the list naming it.
    *
-   * Every upgrading install is in that position: its mnemonics arrive by
-   * migration, not by a write, so nothing else would ever record them and the
-   * reinstall wipe would have no account to reach. Called by the sweep, which
-   * is what enumerates them.
+   * Both writes record the account themselves, a new mnemonic in
+   * `setMnemonicForAccount` and a migrated one in `mnemonicSlotFor`, so this is
+   * the repair for a record that did not land or was lost since. Without it the
+   * reinstall wipe would have no way to reach that mnemonic. Called by the
+   * sweep, which is what enumerates the accounts.
    */
   public static async rememberMnemonicAccount(accountId: string): Promise<boolean> {
     return KeyStoreWrapper.trackMnemonicAccount(accountId)
+  }
+
+  /**
+   * Records the account whose mnemonic a read is about to migrate, and reports
+   * a record that did not land. The copy is written either way, so without the
+   * report nothing would say a seed the wipe cannot name is on its way in.
+   */
+  private static async recordMigratingAccount(accountId: string): Promise<void> {
+    const tracked = await KeyStoreWrapper.trackMnemonicAccount(accountId)
+    if (tracked) return
+
+    recordAppError(new Error("Mnemonic migrating but not tracked"), {
+      dedupKey: "storage-mnemonic-migrating-untracked",
+    })
   }
 
   /**
@@ -810,7 +833,10 @@ export default class KeyStoreWrapper {
     accountId: string,
   ): Promise<SecureStoreRead> {
     return readThrough(
-      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
+      KeyStoreWrapper.mnemonicSlotFor(
+        accountId,
+        KeyStoreWrapper.mnemonicKeyFor(accountId),
+      ),
     )
   }
 
@@ -886,7 +912,10 @@ export default class KeyStoreWrapper {
    */
   public static async mnemonicExists(accountId: string): Promise<SecureExists> {
     return existsThrough(
-      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicKeyFor(accountId)),
+      KeyStoreWrapper.mnemonicSlotFor(
+        accountId,
+        KeyStoreWrapper.mnemonicKeyFor(accountId),
+      ),
     )
   }
 
@@ -911,7 +940,10 @@ export default class KeyStoreWrapper {
   /** The network marker's counterpart to mnemonicExists, for the same reason. */
   public static async mnemonicNetworkExists(accountId: string): Promise<SecureExists> {
     return existsThrough(
-      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId)),
+      KeyStoreWrapper.mnemonicSlotFor(
+        accountId,
+        KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      ),
     )
   }
 
@@ -923,7 +955,10 @@ export default class KeyStoreWrapper {
     accountId: string,
   ): Promise<SecureStoreRead> {
     return readThrough(
-      KeyStoreWrapper.mnemonicSlotFor(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId)),
+      KeyStoreWrapper.mnemonicSlotFor(
+        accountId,
+        KeyStoreWrapper.mnemonicNetworkKeyFor(accountId),
+      ),
     )
   }
 

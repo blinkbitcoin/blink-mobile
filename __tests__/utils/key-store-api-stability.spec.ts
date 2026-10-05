@@ -57,6 +57,7 @@ const PINNED_SURFACE = [
   "readMnemonicNetworkWithStatus",
   "readMnemonicWithStatus",
   "readSessionProfiles",
+  "recordMigratingAccount",
   "rememberMnemonicAccount",
   "removeActiveToken",
   "removeIsBiometricsEnabled",

@@ -150,7 +150,12 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
      */
     it("answers with the legacy value and leaves the legacy copy in place", async () => {
       mockGet.mockResolvedValue("alice words")
-      mockSetInternet.mockRejectedValue(new Error("keychain write refused"))
+      mockSetInternet.mockImplementation(async (server: string) => {
+        if (server === "secure-store.blink.local/mnemonic:alice") {
+          throw new Error("keychain write refused")
+        }
+        return { service: "mock" }
+      })
 
       const read = await KeyStoreWrapper.readMnemonicWithStatus("alice")
 
@@ -410,9 +415,7 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       )
     })
 
-    // The upgrade path: mnemonics that arrived by migration were never written
-    // through here, so the sweep is the only thing that can record them.
-    it("records an account whose mnemonic predates the list, through the sweep's entry point", async () => {
+    it("records an account the list does not name, through the sweep's entry point", async () => {
       await KeyStoreWrapper.rememberMnemonicAccount("alice")
 
       expect(mockSetInternet).toHaveBeenCalledWith(
@@ -805,6 +808,157 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
 
       expect(result).toBe(false)
     })
+  })
+})
+
+describe("KeyStoreWrapper mnemonic that arrives by migration", () => {
+  const LIST_SERVER = "secure-store.blink.local/mnemonicAccounts"
+  const MNEMONIC_SERVER = "secure-store.blink.local/mnemonic:alice"
+  const NETWORK_SERVER = "secure-store.blink.local/mnemonic_network:alice"
+
+  const writtenServers = () => mockSetInternet.mock.calls.map(([server]) => server)
+  const writes = () =>
+    mockSetInternet.mock.calls.map(([server, , value]) => [server, value])
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockHasInternet.mockResolvedValue(false)
+    onlyInLegacyStore({
+      "mnemonic:alice": "alice words",
+      "mnemonic_network:alice": "mainnet",
+    })
+  })
+
+  it("records the account before it writes the migrated copy", async () => {
+    await KeyStoreWrapper.readMnemonicWithStatus("alice")
+
+    expect(writtenServers()).toEqual([LIST_SERVER, MNEMONIC_SERVER])
+    expect(mockSetInternet).toHaveBeenCalledWith(
+      LIST_SERVER,
+      "mnemonicAccounts",
+      "alice",
+      { accessible: MNEMONIC_ACCESSIBLE },
+    )
+  })
+
+  it("records it when the existence probe is what migrates the mnemonic", async () => {
+    await KeyStoreWrapper.mnemonicExists("alice")
+
+    expect(writes()).toEqual([
+      [LIST_SERVER, "alice"],
+      [MNEMONIC_SERVER, "alice words"],
+    ])
+  })
+
+  it("records it when the network marker migrates, read or probed", async () => {
+    await KeyStoreWrapper.readMnemonicNetworkWithStatus("alice")
+    expect(writes()).toEqual([
+      [LIST_SERVER, "alice"],
+      [NETWORK_SERVER, "mainnet"],
+    ])
+
+    mockSetInternet.mockClear()
+    await KeyStoreWrapper.mnemonicNetworkExists("alice")
+    expect(writes()).toEqual([
+      [LIST_SERVER, "alice"],
+      [NETWORK_SERVER, "mainnet"],
+    ])
+  })
+
+  it("still migrates the mnemonic when the record does not land", async () => {
+    mockSetInternet.mockImplementation(async (server: string) =>
+      server === LIST_SERVER ? false : { service: "mock" },
+    )
+
+    const read = await KeyStoreWrapper.readMnemonicWithStatus("alice")
+
+    expect(read).toMatchObject({ status: "found", value: "alice words" })
+    expect(writtenServers()).toEqual([LIST_SERVER, MNEMONIC_SERVER])
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      "[defect] Mnemonic migrating but not tracked",
+    )
+  })
+
+  it("reports nothing when the record lands", async () => {
+    await KeyStoreWrapper.readMnemonicWithStatus("alice")
+
+    expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+      "[defect] Mnemonic migrating but not tracked",
+    )
+  })
+
+  it("still migrates the mnemonic when reporting the missed record throws", async () => {
+    mockSetInternet.mockImplementation(async (server: string) =>
+      server === LIST_SERVER ? false : { service: "mock" },
+    )
+    mockCrashlyticsLog.mockImplementationOnce(() => {
+      throw new Error("firebase not initialised")
+    })
+
+    const read = await KeyStoreWrapper.readMnemonicWithStatus("alice")
+
+    expect(read).toMatchObject({ status: "found", value: "alice words" })
+    expect(writtenServers()).toEqual([LIST_SERVER, MNEMONIC_SERVER])
+  })
+
+  it("writes neither the list nor a copy when recording hangs past the slot timeout", async () => {
+    jest.useFakeTimers()
+    let answerListRead = () => {}
+    mockGetInternet.mockImplementation((server: string) =>
+      server === LIST_SERVER
+        ? new Promise((resolve) => {
+            answerListRead = () => resolve(false)
+          })
+        : Promise.resolve(false),
+    )
+
+    const read = KeyStoreWrapper.readMnemonicWithStatus("alice")
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await read).toMatchObject({ status: "failed" })
+
+    answerListRead()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockSetInternet).not.toHaveBeenCalled()
+  })
+
+  it("still migrates the mnemonic when the list cannot be read", async () => {
+    mockGetInternet.mockImplementation(async (server: string) => {
+      if (server === LIST_SERVER) throw new Error("keychain unavailable")
+      return false
+    })
+
+    const exists = await KeyStoreWrapper.mnemonicExists("alice")
+
+    expect(exists).toEqual({ status: "yes" })
+    expect(writtenServers()).toEqual([MNEMONIC_SERVER])
+  })
+
+  it("counts a mnemonic as migrated from the new store alone", async () => {
+    mockHasInternet.mockImplementation(
+      async ({ server }: { server: string }) => server === MNEMONIC_SERVER,
+    )
+
+    expect(await KeyStoreWrapper.mnemonicIsMigrated("alice")).toEqual({ status: "yes" })
+    expect(await KeyStoreWrapper.mnemonicIsMigrated("bob")).toEqual({ status: "no" })
+    expect(mockGet).not.toHaveBeenCalled()
+  })
+
+  it("does not rewrite the list for an account it already names", async () => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === LIST_SERVER
+        ? { username: "mnemonicAccounts", password: "alice" }
+        : false,
+    )
+
+    await KeyStoreWrapper.readMnemonicWithStatus("alice")
+
+    expect(writtenServers()).toEqual([MNEMONIC_SERVER])
   })
 })
 
@@ -1964,6 +2118,35 @@ describe("KeyStoreWrapper clearUninstallSurvivingKeyMaterial", () => {
 
     expect(onFailure).toHaveBeenCalledWith("mnemonic account list")
     expect(await KeyStoreWrapper.getMnemonicForAccount("alice")).toBe("alice words")
+  })
+
+  it("reaches a mnemonic a read migrated, with no sweep in between", async () => {
+    const keychain = new Map<string, string>()
+    mockGetInternet.mockImplementation(async (server: string) => {
+      const value = keychain.get(server)
+      return value === undefined ? false : { username: server, password: value }
+    })
+    mockSetInternet.mockImplementation(
+      async (server: string, _slot: string, value: string) => {
+        keychain.set(server, value)
+        return { service: "mock" }
+      },
+    )
+    mockResetInternet.mockImplementation(async ({ server }: { server: string }) => {
+      keychain.delete(server)
+    })
+    mockGet.mockImplementation(async (key: string) => {
+      if (key === "mnemonic:alice") return "alice words"
+      throw Object.assign(new Error("key does not present"), { code: "404" })
+    })
+
+    await KeyStoreWrapper.getMnemonicForAccount("alice")
+    expect(keychain.get("secure-store.blink.local/mnemonic:alice")).toBe("alice words")
+
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure)
+
+    expect([...keychain.keys()]).toEqual([])
+    expect(onFailure).not.toHaveBeenCalled()
   })
 
   it("clears nothing extra when no account was ever tracked", async () => {

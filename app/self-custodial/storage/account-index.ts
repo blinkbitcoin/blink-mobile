@@ -291,11 +291,12 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
         // without the fallback.
         const landed = await KeyStoreWrapper.mnemonicIsMigrated(entry.id)
         if (landed.status === "yes") {
-          // An upgrading install stored its mnemonics before that list existed,
-          // so this is the only place they get recorded — and without the
-          // record the reinstall wipe has no account to reach. A record that
-          // does not land is a failure of the sweep too: the seed is there and
-          // the wipe cannot name it, which is the whole point of running this.
+          // The write that put the mnemonic there records the account first, so
+          // this is the repair for a record that did not land or was lost
+          // since: without it the reinstall wipe has no account to reach. A
+          // record that does not land here is a failure of the sweep too: the
+          // seed is there and the wipe cannot name it, which is the whole point
+          // of running this.
           const remembered = await KeyStoreWrapper.rememberMnemonicAccount(entry.id)
           if (remembered) {
             migrated += 1
