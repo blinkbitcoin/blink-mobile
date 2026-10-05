@@ -305,6 +305,9 @@ type PersistentState_22 = Omit<PersistentState_21, "schemaVersion"> & {
    *
    * It lives in the blob rather than the keychain on purpose: an uninstall
    * clears this, and a genuine reinstall should start the whole verdict again.
+   *
+   * It is not a setting, so a state reset carries it over. Only the retry that
+   * finishes the erase, or gives it up for good, removes it.
    */
   pendingReinstallKeyMaterialWipe?: boolean
 }

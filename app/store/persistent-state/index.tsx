@@ -236,6 +236,22 @@ const withoutOwedWipe = (state: PersistentState): PersistentState => {
   return rest
 }
 
+const withOwedWipe = (state: PersistentState): PersistentState => ({
+  ...state,
+  pendingReinstallKeyMaterialWipe: true,
+})
+
+/**
+ * What a reset leaves: every setting back at its default, and an owed reinstall
+ * wipe still owed. The marker is not a setting. It stands for key material of
+ * the previous owner that is still on the device, and a logout erases none of
+ * it, so only the retry may retire it, by finishing the erase or giving it up.
+ */
+const resetKeepingOwedWipe = (current: PersistentState | null): PersistentState =>
+  current?.pendingReinstallKeyMaterialWipe
+    ? withOwedWipe(defaultPersistentState)
+    : defaultPersistentState
+
 const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   const reportFailure = (what: string) => {
     recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
@@ -289,7 +305,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
     // touched nothing on a launch that just signed them out, and a marker that
     // is never written is a marker the next boot cannot read.
     return {
-      state: { ...defaultPersistentState, pendingReinstallKeyMaterialWipe: true },
+      state: withOwedWipe(defaultPersistentState),
       persistedToken: "",
       stateChanged: true,
     }
@@ -314,7 +330,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
     { alwaysRecord: true },
   )
   return {
-    state: { ...defaultPersistentState, pendingReinstallKeyMaterialWipe: true },
+    state: withOwedWipe(defaultPersistentState),
     persistedToken: "",
     stateChanged: true,
   }
@@ -643,7 +659,7 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
 
   const resetState = React.useCallback(() => {
     hasModified.current = true
-    setPersistentState(defaultPersistentState)
+    setPersistentState(resetKeepingOwedWipe)
   }, [])
 
   const clearToken = React.useCallback(async () => {
