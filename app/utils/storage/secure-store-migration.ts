@@ -104,7 +104,16 @@ const pendingBySlot = new Map<string, Promise<void>>()
  */
 type IsCurrent = () => boolean
 
-const onSlot = <T>(
+/**
+ * Exported for the one caller that needs the queue without the migration: the
+ * mnemonic account list is read-modify-written as a whole in `secureStorage.ts`
+ * and has no legacy copy to read through. Taking its turn here is what makes
+ * that transaction atomic against every other one on the same slot.
+ *
+ * Never call it from inside a task already holding the same slot — the inner
+ * call would wait on the outer one and neither would ever finish.
+ */
+export const onSlot = <T>(
   slot: string,
   task: (isCurrent: IsCurrent) => Promise<T>,
 ): Promise<T> => {
@@ -179,6 +188,14 @@ export type ReadThroughArgs = {
   readonly accessible: ACCESSIBLE
   /** Whether a successful migration should erase the legacy copy. */
   readonly deleteLegacyOnMigrate: boolean
+  /**
+   * Runs before a migrating write, for a slot whose new-store copy has to be
+   * named somewhere else. Named first, a process killed between the two leaves
+   * a name with no copy, which is harmless; written first, it leaves a copy
+   * that nothing names. Best effort and inside the slot's turn: a record that
+   * fails does not hold the write back.
+   */
+  readonly recordBeforeMigrate?: () => Promise<void>
 }
 
 export type RemoveThroughArgs = {
@@ -203,6 +220,19 @@ const abandoned = (slot: string): { status: "failed"; err: unknown } => ({
   status: "failed",
   err: new Error(`secure store ${keyClassOf(slot)} operation was abandoned`),
 })
+
+/**
+ * Best effort, like the legacy-hit counter. Letting a rejection out would fail
+ * a read whose value is already in hand, and bookkeeping must never cost
+ * availability.
+ */
+const recordBeforeMigrate = async (args: ReadThroughArgs): Promise<void> => {
+  try {
+    await args.recordBeforeMigrate?.()
+  } catch {
+    // The owner of the record repairs it later; the migration goes ahead.
+  }
+}
 
 const runRead = async (
   args: ReadThroughArgs,
@@ -234,6 +264,10 @@ const runRead = async (
   if (!isCurrent()) return abandoned(args.slot)
 
   logLegacyHit(args.legacyKey)
+
+  await recordBeforeMigrate(args)
+  // Recording is an await too, so the slot may have changed hands during it.
+  if (!isCurrent()) return abandoned(args.slot)
 
   // A failed write leaves the legacy copy intact and retries on the next read:
   // migration bookkeeping must never cost availability, so the erase outcome is

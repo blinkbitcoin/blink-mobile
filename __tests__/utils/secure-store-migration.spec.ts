@@ -225,6 +225,84 @@ describe("readThrough", () => {
     })
   })
 
+  describe("a slot that records before it migrates", () => {
+    const recordBeforeMigrate = jest.fn<Promise<void>, []>()
+    const RECORDED_ARGS = { ...ARGS, recordBeforeMigrate }
+
+    beforeEach(() => {
+      mockedSecureRead.mockResolvedValue({ status: "absent" })
+      mockedLegacyRead.mockResolvedValue({ status: "found", value: "legacy-value" })
+      recordBeforeMigrate.mockResolvedValue(undefined)
+    })
+
+    it("records first, and only then writes the new copy", async () => {
+      const calls: string[] = []
+      recordBeforeMigrate.mockImplementation(async () => {
+        calls.push("record")
+      })
+      mockedSecureWrite.mockImplementation(async () => {
+        calls.push("write")
+        return true
+      })
+
+      const read = await readThrough(RECORDED_ARGS)
+
+      expect(read).toEqual({ status: "found", value: "legacy-value" })
+      expect(calls).toEqual(["record", "write"])
+    })
+
+    it("still migrates and answers with the value when the record rejects", async () => {
+      recordBeforeMigrate.mockRejectedValue(new Error("list unavailable"))
+
+      const read = await readThrough(RECORDED_ARGS)
+
+      expect(read).toEqual({ status: "found", value: "legacy-value" })
+      expect(mockedSecureWrite).toHaveBeenCalledWith(
+        ARGS.slot,
+        "legacy-value",
+        ARGS.accessible,
+      )
+    })
+
+    it("records nothing for a read the new store answered", async () => {
+      mockedSecureRead.mockResolvedValue({ status: "found", value: "new-value" })
+
+      await readThrough(RECORDED_ARGS)
+
+      expect(recordBeforeMigrate).not.toHaveBeenCalled()
+    })
+
+    it("records nothing when there is no legacy value to move", async () => {
+      mockedLegacyRead.mockResolvedValue({ status: "absent" })
+      await readThrough(RECORDED_ARGS)
+
+      mockedLegacyRead.mockResolvedValue({ status: "failed", err: new Error("locked") })
+      await readThrough(RECORDED_ARGS)
+
+      expect(recordBeforeMigrate).not.toHaveBeenCalled()
+    })
+
+    it("drops the write when the slot changed hands while it was recording", async () => {
+      jest.useFakeTimers()
+      let finishRecording: () => void = () => {}
+      recordBeforeMigrate.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishRecording = resolve
+          }),
+      )
+
+      const abandoned = readThrough(RECORDED_ARGS)
+      await jest.advanceTimersByTimeAsync(30_000)
+      expect(await abandoned).toMatchObject({ status: "failed" })
+
+      finishRecording()
+      await jest.advanceTimersByTimeAsync(0)
+
+      expect(mockedSecureWrite).not.toHaveBeenCalled()
+    })
+  })
+
   describe("neither store answers", () => {
     beforeEach(() => {
       mockedSecureRead.mockResolvedValue({ status: "absent" })
@@ -714,6 +792,25 @@ describe("existsThrough", () => {
     mockedLegacyRead.mockResolvedValue({ status: "absent" })
 
     expect(await existsThrough(ARGS)).toEqual({ status: "no" })
+  })
+
+  it("records before the copy its fallback read writes", async () => {
+    mockedSecureExists.mockResolvedValue({ status: "no" })
+    mockedSecureRead.mockResolvedValue({ status: "absent" })
+    mockedLegacyRead.mockResolvedValue({ status: "found", value: "legacy-value" })
+    const calls: string[] = []
+    const recordBeforeMigrate = async () => {
+      calls.push("record")
+    }
+    mockedSecureWrite.mockImplementation(async () => {
+      calls.push("write")
+      return true
+    })
+
+    const exists = await existsThrough({ ...ARGS, recordBeforeMigrate })
+
+    expect(exists).toEqual({ status: "yes" })
+    expect(calls).toEqual(["record", "write"])
   })
 
   it("waits for a remove in flight on the same slot before answering", async () => {
