@@ -10,6 +10,7 @@ import { InfoBanner } from "@app/components/info-banner"
 import { PasswordInput } from "@app/components/password-input"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   MigrationCheckpoint,
@@ -28,6 +29,11 @@ export const CloudBackupScreen: React.FC = () => {
   } = useTheme()
 
   const cloudProvider = getCloudProviderName(LL)
+
+  // The encryption password is typed here, and PasswordInput's eye toggle shows it in
+  // plain text. Guarded from mount, not from the moment encryption is switched on, so
+  // the first keystroke never lands on an unguarded frame.
+  useScreenSecurity()
 
   const {
     isEncrypted,

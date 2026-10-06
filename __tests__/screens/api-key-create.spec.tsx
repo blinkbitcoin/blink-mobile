@@ -69,8 +69,8 @@ jest.mock("@react-native-clipboard/clipboard", () => ({
 }))
 
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: jest.fn(),
-  disableScreenSecurity: jest.fn(),
+  enableScreenSecurity: jest.fn(() => Promise.resolve()),
+  disableScreenSecurity: jest.fn(() => Promise.resolve()),
 }))
 
 loadLocale("en")
