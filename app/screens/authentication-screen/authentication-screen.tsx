@@ -41,14 +41,14 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
     if (screenPurpose === AuthenticationScreenPurpose.Authenticate) {
-      // Awaited so a kill right after unlock can't leave a stale lock behind
+      // Awaited so a kill right after unlock can't leave a spent budget behind
       // for a user who has just proven who they are biometrically. Unlock is
       // never refused over it — but a clear that could not land leaves a spent
       // attempt budget readable, so it is reported rather than dropped.
       if (!(await KeyStoreWrapper.clearPinFailureState())) {
-        recordAppError(new Error("PIN lockout state could not be cleared"), {
+        recordAppError(new Error("PIN attempt count could not be cleared"), {
           alwaysRecord: true,
-          dedupKey: "pin-lockout-clear",
+          dedupKey: "pin-attempts-clear",
         })
       }
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
