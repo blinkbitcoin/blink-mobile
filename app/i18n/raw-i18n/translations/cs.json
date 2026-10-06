@@ -31,6 +31,8 @@
     "createError": "Klíč API se nepodařilo vytvořit. Zkuste to znovu.",
     "revokeError": "Klíč API se nepodařilo zrušit. Zkuste to znovu.",
     "loadError": "Vaše klíče API se nepodařilo načíst. Zkuste to později.",
+    "discardSecretTitle": "Zahodit tento API klíč?",
+    "discardSecretBody": "Toto je jediný okamžik, kdy se tajný klíč zobrazí. Pokud nyní odejdete, klíč nelze obnovit a budete muset vytvořit nový.",
     "done": "Hotovo"
   },
   "GaloyAddressScreen": {
