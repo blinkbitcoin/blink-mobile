@@ -120,6 +120,13 @@ describe("toMinorUnit", () => {
     expect(toMinorUnit("10")).toBe(1000)
   })
 
+  /** A figure the code already holds as a number needs no round trip through text. */
+  it("takes a number as it is", () => {
+    expect(toMinorUnit(10)).toBe(1000)
+    expect(toMinorUnit(10.555)).toBe(1056)
+    expect(toMinorUnit(0)).toBe(0)
+  })
+
   it("converts major units with decimals to minor units", () => {
     expect(toMinorUnit("10.50")).toBe(1050)
   })

@@ -3695,7 +3695,7 @@
         "buttonText": "Continuar"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Quant t'agradaria invertir?",
+        "title": "Quant t'agradaria invertir?",
         "percent": "per ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,21 @@
           "valuation": "Amb valoració pre-money de $10M",
           "units": "Reps {units: string} unitats ~{percent: number}% de Blink"
         },
-        "buttonText": "Procedir a Signar"
+        "buttonText": "Procedir a signar"
+      },
+      "SignInvest": {
+        "loading": "Preparant el teu acord.",
+        "notAvailable": "La signatura encara no està disponible. Torna-ho a provar més tard.",
+        "errors": {
+          "envelopeCreationFailed": "No s'ha pogut preparar l'acord. Torna-ho a provar.",
+          "networkError": "S'ha perdut la connexió. Comprova la xarxa i torna-ho a provar.",
+          "unauthorized": "La teva sessió ja no és vàlida. Torna a iniciar la sessió.",
+          "sessionExpired": "La sessió de signatura ha caducat. Torna-ho a provar.",
+          "providerUnavailable": "El servei de signatura no està disponible temporalment. Torna-ho a provar més tard.",
+          "routeMissing": "La signatura encara no està disponible en aquest servidor. Actualitza l'aplicació o torna-ho a provar més tard.",
+          "envelopeMismatch": "El document signat no és el que aquest pas havia preparat. Torna-ho a provar.",
+          "generic": "Alguna cosa ha fallat. Torna-ho a provar."
+        }
       },
       "TransferInvest": {
         "title": "Transfereix la teva inversió",

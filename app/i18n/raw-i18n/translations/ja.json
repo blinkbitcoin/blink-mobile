@@ -3743,7 +3743,7 @@
                 "buttonText": "続ける"
             },
             "SelectInvest": {
-                "desiredCreditLimit": "いくら投資したいですか？",
+                "title": "いくら投資したいですか？",
                 "percent": "約{percent: number}%に相当"
             },
             "CompanyValuation": {
@@ -3765,6 +3765,20 @@
                     "units": "{units: string}ユニット（Blinkの約{percent: number}%）を受け取ります"
                 },
                 "buttonText": "署名に進む"
+            },
+            "SignInvest": {
+                "loading": "契約書を準備しています。",
+                "notAvailable": "署名はまだ利用できません。しばらくしてからもう一度お試しください。",
+                "errors": {
+                    "envelopeCreationFailed": "契約書を準備できませんでした。もう一度お試しください。",
+                    "networkError": "接続が切断されました。ネットワークを確認して、もう一度お試しください。",
+                    "unauthorized": "セッションが無効になりました。もう一度ログインしてください。",
+                    "sessionExpired": "署名セッションの有効期限が切れました。もう一度お試しください。",
+                    "providerUnavailable": "署名サービスは一時的に利用できません。しばらくしてからもう一度お試しください。",
+                    "routeMissing": "このサーバーではまだ署名を利用できません。アプリを更新するか、しばらくしてからお試しください。",
+                    "envelopeMismatch": "署名された書類は、このステップで準備したものと一致しません。もう一度お試しください。",
+                    "generic": "問題が発生しました。もう一度お試しください。"
+                }
             },
             "TransferInvest": {
                 "title": "投資額を送金してください",
