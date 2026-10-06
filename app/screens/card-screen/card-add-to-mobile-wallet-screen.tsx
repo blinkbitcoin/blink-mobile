@@ -22,7 +22,7 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
   } = useTheme()
   const { LL } = useI18nContext()
   const route = useRoute<AddToMobileWalletRouteProp>()
-  const { lastFour, holderName } = route.params
+  const { lastFour, cardId } = route.params
   const [isLoading, setIsLoading] = useState(false)
 
   const handleAddToWallet = async () => {
@@ -49,8 +49,8 @@ export const CardAddToMobileWalletScreen: React.FC = () => {
         </View>
 
         <BlinkCard
+          cardId={cardId}
           cardNumber={lastFour}
-          holderName={holderName}
           validThruDate=""
           isFrozen={false}
         />
