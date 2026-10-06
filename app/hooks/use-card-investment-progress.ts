@@ -7,6 +7,7 @@ import { usePersistentStateContext } from "@app/store/persistent-state"
 import {
   getCardInvestment,
   withCardInvestment,
+  withoutCardInvestment,
 } from "@app/store/persistent-state/card-investment"
 import { AccountType } from "@app/types/wallet"
 import { CardInvestmentProgress } from "@app/types/card-investment"
@@ -83,6 +84,9 @@ type CardInvestmentProgressState = {
    *  payment from here on. Never over an agreement already signed: the record is what
    *  keeps a second one from being signed. */
   start: (investment: CardInvestmentStart) => void
+  /** Records which of the server's invitation bulletins the signature answered, so the
+   *  home can tell it from a later invitation. */
+  recordInvitationBulletin: (notificationId: string) => void
   /** Records the invoice the transfer step was issued, to be paid rather than reissued
    *  on a return while it can still be paid. */
   recordInvoice: (paymentRequest: string) => void
@@ -99,6 +103,10 @@ type CardInvestmentProgressState = {
   markPaid: () => void
   /** Closes the welcome. The record stays, as the mark that this account has signed. */
   dismissWelcome: () => void
+  /** Forgets the investment once a new invitation has superseded it, so the flow can be
+   *  walked again for it. It names the signature it decided on, so an agreement signed
+   *  while it was deciding is not the one forgotten. */
+  clear: (options: { onlyIfSignedAt: number }) => void
 }
 
 /**
@@ -145,6 +153,19 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
       })
     },
     [accountId, updateState],
+  )
+
+  /** The first one written stands: a signature answers one invitation, and a lookup
+   *  repeated after the record was written must not move it to another. */
+  const recordInvitationBulletin = useCallback(
+    (notificationId: string) => {
+      amend((current) =>
+        current.invitationBulletinId
+          ? current
+          : { ...current, invitationBulletinId: notificationId },
+      )
+    },
+    [amend],
   )
 
   const recordInvoice = useCallback(
@@ -205,6 +226,18 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     [progress],
   )
 
+  const clear = useCallback(
+    ({ onlyIfSignedAt }: { onlyIfSignedAt: number }) => {
+      if (!accountId) return
+      updateState((state) => {
+        if (!state) return state
+        if (getCardInvestment(state, accountId)?.signedAt !== onlyIfSignedAt) return state
+        return withoutCardInvestment(state, accountId)
+      })
+    },
+    [accountId, updateState],
+  )
+
   return {
     progress,
     isEligible,
@@ -212,11 +245,13 @@ export const useCardInvestmentProgress = (): CardInvestmentProgressState => {
     isAccountResolved: accountId !== null,
     refetchAccount,
     start,
+    recordInvitationBulletin,
     recordInvoice,
     isInvestmentInvoice,
     markPaying,
     clearPaying,
     markPaid,
     dismissWelcome,
+    clear,
   }
 }
