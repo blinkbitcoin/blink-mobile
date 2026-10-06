@@ -3,7 +3,7 @@ import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
 import { GraphQLError } from "graphql"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
-import { RefreshControl, StyleSheet } from "react-native"
+import { RefreshControl, StyleSheet, View } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
 
 import { HomeScreen } from "../../app/screens/home-screen"
@@ -21,7 +21,7 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
 import { GateReason } from "@app/types/account"
-import { ConvertDirection } from "@app/types/payment"
+import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import {
   NormalizedTransaction,
   PaymentType,
@@ -75,6 +75,59 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
   SelfCustodialInfoBulletin: (props: { onDismiss: () => void }) =>
     mockSelfCustodialInfoBulletin(props),
 }))
+
+/** The investment bulletin's own hook and card are covered by their specs; the home is
+ *  only expected to render what the hook answers, to hand it the receives still
+ *  confirming, and to reconcile a payment on its way once per visit. */
+type MockCardInvestmentBulletin = {
+  kind: string
+  progress: { selectedAmountUsd: number; settlementSats?: number; signedAt: number }
+  dismiss: () => void
+}
+type CardInvestmentBulletinParams = { pendingReceives: unknown }
+const mockCardInvestmentBulletinState: { current: MockCardInvestmentBulletin | null } = {
+  current: null,
+}
+const mockUseCardInvestmentBulletin = jest.fn(
+  (_params: CardInvestmentBulletinParams) => mockCardInvestmentBulletinState.current,
+)
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin",
+  () => ({
+    useCardInvestmentBulletin: (params: CardInvestmentBulletinParams) =>
+      mockUseCardInvestmentBulletin(params),
+  }),
+)
+const mockReconcileInvestmentPayment = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup",
+  () => ({
+    useReconcileInvestmentPayment: () => mockReconcileInvestmentPayment(),
+  }),
+)
+const mockCardInvestmentBulletin = jest.fn<
+  React.ReactElement | null,
+  [Record<string, unknown>]
+>(() => null)
+jest.mock("@app/components/card-investment-bulletin", () => ({
+  CardInvestmentBulletin: (props: Record<string, unknown>) =>
+    mockCardInvestmentBulletin(props),
+}))
+/** The server bulletins, wrapped in a marker so their place in the column can be read.
+ *  The card inside is the real one, so what the server sends still reaches the screen. */
+jest.mock("@app/components/notifications/bulletins", () => {
+  const { View } = jest.requireActual("react-native")
+  const actual = jest.requireActual<
+    typeof import("@app/components/notifications/bulletins")
+  >("@app/components/notifications/bulletins")
+  return {
+    BulletinsCard: (props: React.ComponentProps<typeof actual.BulletinsCard>) => (
+      <View testID="server-bulletins">
+        <actual.BulletinsCard {...props} />
+      </View>
+    ),
+  }
+})
 
 let mockIsFocused = true
 
@@ -2080,6 +2133,149 @@ describe("SelfCustodialInfoBulletin gating", () => {
     await flushEffects()
 
     expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
+  })
+})
+
+describe("CardInvestmentBulletin gating", () => {
+  const SIGNED = {
+    selectedAmountUsd: 25000,
+    settlementSats: 31_704_000,
+    signedAt: 1_757_700_000_000,
+  }
+
+  beforeEach(() => {
+    currentMocks = []
+    mockActiveWalletOverride = null
+    mockPendingDepositsOverride = null
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+    mockCardInvestmentBulletinState.current = null
+  })
+
+  afterEach(() => {
+    mockCardInvestmentBulletinState.current = null
+    mockPendingDepositsOverride = null
+    mockActiveWalletOverride = null
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("renders the card with what the hook answers", async () => {
+    const dismiss = jest.fn()
+    mockCardInvestmentBulletinState.current = { kind: "ready", progress: SIGNED, dismiss }
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockCardInvestmentBulletin).toHaveBeenCalledWith(
+      expect.objectContaining({ kind: "ready", progress: SIGNED, onDismiss: dismiss }),
+    )
+  })
+
+  it("renders nothing when the hook has nothing to say", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockCardInvestmentBulletin).not.toHaveBeenCalled()
+  })
+
+  /** The investment bulletin goes above the server's bulletins: it is the one thing on
+   *  the home that asks the investor for money they agreed to pay. */
+  it("places the card above the server bulletins", async () => {
+    mockCardInvestmentBulletinState.current = {
+      kind: "ready",
+      progress: SIGNED,
+      dismiss: jest.fn(),
+    }
+    mockCardInvestmentBulletin.mockImplementation(() => (
+      <View testID="card-investment-bulletin" />
+    ))
+
+    const rendered = renderHome()
+    await flushEffects()
+
+    /** Every marked node in the order the column lays them out. */
+    const column = rendered.root
+      .findAll((node) => typeof node.props.testID === "string")
+      .map((node) => node.props.testID as string)
+    expect(column).toContain("card-investment-bulletin")
+    expect(column.indexOf("card-investment-bulletin")).toBeLessThan(
+      column.indexOf("server-bulletins"),
+    )
+    mockCardInvestmentBulletin.mockImplementation(() => null)
+  })
+
+  it("hands the hook no receives on a quiet account", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
+      pendingReceives: [],
+    })
+  })
+
+  /** The receives go over as the query lists them, amounts and currency included, so
+   *  the hook can price them against the shortfall. */
+  it("hands the hook the custodial receives still confirming", async () => {
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+      pendingIncomingTransactions: [pendingOnchainReceiveTx],
+    })
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
+      pendingReceives: [
+        expect.objectContaining({
+          direction: "RECEIVE",
+          settlementAmount: 50_000,
+          settlementCurrency: "BTC",
+        }),
+      ],
+    })
+  })
+
+  it("asks the ledger about a payment on its way once per visit", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockReconcileInvestmentPayment).toHaveBeenCalled()
+  })
+
+  /** The bulletin is for custodial accounts alone, so a self-custodial deposit is not a
+   *  pending deposit it could act on. */
+  it("hands the hook nothing for a self-custodial deposit", async () => {
+    mockActiveWalletOverride = {
+      wallets: [],
+      status: "ready",
+      accountType: "self-custodial",
+      isReady: true,
+      isSelfCustodial: true,
+      needsBackendAuth: false,
+    }
+    mockPendingDepositsOverride = {
+      deposits: [{ id: "txid:0", status: DepositStatus.Immature }],
+    }
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseCardInvestmentBulletin).toHaveBeenLastCalledWith({
+      pendingReceives: undefined,
+    })
   })
 })
 

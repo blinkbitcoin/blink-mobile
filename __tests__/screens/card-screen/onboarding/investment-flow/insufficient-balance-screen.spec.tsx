@@ -51,12 +51,33 @@ const mockFunding = {
   },
 }
 
+const mockArmInvestmentConversion = jest.fn()
+
+jest.mock("@app/screens/conversion-flow/drain-conversion", () => ({
+  ...jest.requireActual("@app/screens/conversion-flow/drain-conversion"),
+  armInvestmentConversion: (...args: unknown[]) => mockArmInvestmentConversion(...args),
+}))
+
+const mockUseInvestmentFunding = jest.fn(
+  (_totalUsd: number, _settlementSats?: number) => mockFunding.current,
+)
+
 jest.mock(
   "@app/screens/card-screen/onboarding/investment-flow/use-investment-funding",
   () => ({
-    useInvestmentFunding: () => mockFunding.current,
+    useInvestmentFunding: (totalUsd: number, settlementSats?: number) =>
+      mockUseInvestmentFunding(totalUsd, settlementSats),
   }),
 )
+
+/** The signed record, which carries the satoshis the balance is measured against. */
+const mockProgress: {
+  current: { selectedAmountUsd: number; settlementSats?: number } | null
+} = { current: null }
+
+jest.mock("@app/hooks/use-card-investment-progress", () => ({
+  useCardInvestmentProgress: () => ({ progress: mockProgress.current }),
+}))
 
 const renderScreen = async () => {
   const utils = render(
@@ -74,6 +95,7 @@ describe("InsufficientBalanceScreen", () => {
     jest.clearAllMocks()
     mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
     mockIsFocused.current = true
+    mockProgress.current = null
     mockFunding.current = {
       balanceUsd: 3333,
       balanceCurrency: WalletCurrency.Btc,
@@ -82,6 +104,35 @@ describe("InsufficientBalanceScreen", () => {
       isSplitAcrossWallets: false,
       isLoading: false,
     }
+  })
+
+  /** Once signed, the debt is the satoshis the agreement names; the figures shown here
+   *  are measured against those, like the step that sent the investor here. */
+  it("measures the balance against the satoshis the signed record names", async () => {
+    mockProgress.current = {
+      selectedAmountUsd: SELECTED_AMOUNT_USD,
+      settlementSats: 12_682_228,
+    }
+
+    render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(SELECTED_AMOUNT_USD, 12_682_228)
+  })
+
+  it("measures against the chosen dollars while nothing is signed", async () => {
+    render(
+      <ContextForScreen>
+        <InsufficientBalanceScreen />
+      </ContextForScreen>,
+    )
+    await act(async () => {})
+
+    expect(mockUseInvestmentFunding).toHaveBeenCalledWith(SELECTED_AMOUNT_USD, undefined)
   })
 
   it("renders without crashing", async () => {
@@ -294,6 +345,18 @@ describe("InsufficientBalanceScreen", () => {
       })
 
       expect(mockNavigate).toHaveBeenCalledWith("conversionDetails")
+    })
+
+    /** Without the arm the conversion ends on Home, and the investor has to walk the
+     *  flow again from the start, signature included. */
+    it("arms the return so the conversion comes back to this investment", async () => {
+      const { getByText } = await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(getByText("Convert"))
+      })
+
+      expect(mockArmInvestmentConversion).toHaveBeenCalledWith(SELECTED_AMOUNT_USD)
     })
   })
 

@@ -1,6 +1,11 @@
 import * as React from "react"
 import { ScrollView, View } from "react-native"
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import {
+  CommonActions,
+  RouteProp,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -9,18 +14,46 @@ import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progress"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { CardInvestmentPaymentLookup } from "@app/types/card-investment"
 
 import { formatUnitCount, formatUsdAmount } from "./investment-figures"
+import { useLookUpInvestmentPayment } from "./investment-payment-lookup"
 import { resolveInvestmentTerms } from "./investment-terms"
 import { useInvestmentFunding, useInvestmentSats } from "./use-investment-funding"
-import { useInvestmentInvoice } from "./use-investment-invoice"
+import { isInvoiceReusable, useInvestmentInvoice } from "./use-investment-invoice"
 
 type TransferInvestRoute = RouteProp<
   RootStackParamList,
   "cardOnboardingTransferInvestScreen"
 >
+
+/**
+ * The stack an investor who has signed lands on: the home and this step, nothing else.
+ * Every screen of the flow left underneath would be a way to sign a second agreement,
+ * and back from here belongs on the home, where the bulletin points at the payment.
+ * Built here, by the step it leads to, so the signing step and every re-entry into the
+ * flow rebuild the same stack.
+ */
+export const resetToTransferStep = (
+  params: RootStackParamList["cardOnboardingTransferInvestScreen"],
+) =>
+  CommonActions.reset({
+    index: 1,
+    routes: [{ name: "Primary" }, { name: "cardOnboardingTransferInvestScreen", params }],
+  })
+
+/** Why the step could not open the send flow: no invoice could be issued, or the ledger
+ *  could not be asked whether the one on record was already paid. */
+const TransferFailure = {
+  Invoice: "invoice",
+  Ledger: "ledger",
+} as const
+
+type TransferFailure = (typeof TransferFailure)[keyof typeof TransferFailure]
 
 export const TransferInvestScreen: React.FC = () => {
   const styles = useStyles()
@@ -29,32 +62,68 @@ export const TransferInvestScreen: React.FC = () => {
   } = useTheme()
 
   const { LL } = useI18nContext()
-  const { selectedAmountUsd, settlementSats } = useRoute<TransferInvestRoute>().params
+  const route = useRoute<TransferInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
+  const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
+  const {
+    progress,
+    recordInvoice,
+    markPaid,
+    markPaying,
+    isEligible,
+    accountId,
+    isAccountResolved,
+  } = useCardInvestmentProgress()
+
+  /**
+   * The figures are the signed record's once it is in hand, and the route's only until
+   * then: every caller passes the record's own amount today, but the record is what the
+   * invoice is filed under and what the payment is later found by, so it is the record
+   * that has the last word on what is being paid for.
+   */
+  const selectedAmountUsd = progress?.selectedAmountUsd ?? route.selectedAmountUsd
   const terms = React.useMemo(
     () => resolveInvestmentTerms(selectedAmountUsd),
     [selectedAmountUsd],
   )
-
-  const { cardInvestmentDepositBtcWalletId } = useRemoteConfig()
+  /** The satoshis the agreement names, from the record or the route: the debt the
+   *  balance is measured against, and the figure the invoice is written for. */
+  const signedSats = progress?.settlementSats ?? route.settlementSats
   const { hasEnoughBalance, balanceWalletId, isLoading } = useInvestmentFunding(
     terms.totalUsd,
+    signedSats,
   )
   const totalSats = useInvestmentSats(terms.totalUsd)
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
-  const [hasInvoiceFailed, setHasInvoiceFailed] = React.useState(false)
+  const lookUpPayment = useLookUpInvestmentPayment()
+  const [isLookingUpPayment, setIsLookingUpPayment] = React.useState(false)
+  const [failure, setFailure] = React.useState<TransferFailure | null>(null)
+
+  /**
+   * This step can be reached by link, with an amount in it, and it would issue an
+   * invoice for that amount with no agreement behind it. An account that cannot take
+   * part in the investment is sent home before it can, and so is one with no signed
+   * agreement on record. The record is only read once the account is known, since until
+   * then there is none to read.
+   */
+  const hasNothingToPayFor = isAccountResolved && !progress
+  const isLeavingFlow = !isEligible || hasNothingToPayFor
+  React.useEffect(() => {
+    if (isLeavingFlow) navigation.dispatch(RESET_TO_HOME)
+  }, [isLeavingFlow, navigation])
 
   /**
    * What the invoice is written for: the satoshis the agreement itself names, carried
-   * here from the step that minted it.
+   * here from the step that minted it, or read back from the signed record when the
+   * route came without them (a return from the home, or from a conversion).
    *
    * The rate was fixed when the agreement was minted, so converting the dollars again now
    * would charge a different amount of bitcoin than the document says: less if the price
-   * rose, more if it fell. The conversion only stands in when no figure was carried, so
-   * the investor is still billed rather than sent on with nothing.
+   * rose, more if it fell. The conversion only stands in when no figure exists anywhere,
+   * so the investor is still billed rather than sent on with nothing.
    */
-  const owedSats = settlementSats ?? totalSats
+  const owedSats = signedSats ?? totalSats
 
   /**
    * Where the money goes, or the shortfall screen when there is not enough to send.
@@ -66,6 +135,11 @@ export const TransferInvestScreen: React.FC = () => {
    * away a payment this step just said could be made.
    */
   const handleNext = async () => {
+    if (!progress) {
+      navigation.dispatch(RESET_TO_HOME)
+      return
+    }
+
     if (!hasEnoughBalance) {
       navigation.navigate("cardOnboardingInsufficientBalanceScreen", {
         selectedAmountUsd,
@@ -73,18 +147,77 @@ export const TransferInvestScreen: React.FC = () => {
       return
     }
 
-    setHasInvoiceFailed(false)
-    const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats)
+    setFailure(null)
+    const payment = await resolvePayment()
 
-    if (!minted) {
-      setHasInvoiceFailed(true)
+    /** The investor may have closed the step while the invoice was being issued; a send
+     *  flow opened over whatever they moved on to would be neither expected nor safe. */
+    if (!navigation.isFocused()) return
+
+    if (payment.kind === "settled") {
+      navigation.dispatch(RESET_TO_HOME)
+      return
+    }
+    if (payment.kind === "failed") {
+      setFailure(payment.failure)
       return
     }
 
     navigation.navigate("sendBitcoinDestination", {
-      payment: minted.paymentRequest,
+      payment: payment.paymentRequest,
       sendingWalletId: balanceWalletId,
     })
+  }
+
+  /**
+   * The invoice to pay: the one already issued for this investment while it can still be
+   * paid, a fresh one otherwise. A payment that went through without the receipt ever
+   * recording it (the app killed with the payment in flight) leaves the home asking for
+   * the money again; paying the same invoice then meets a claim the recipient has already
+   * settled, where a fresh one would be paid a second time.
+   *
+   * An invoice too old to pay again is asked about first: it may have been paid, and the
+   * ledger is the only place that knows. Settled, the payment is recorded and the home
+   * takes over with its welcome; still pending, it is recorded as on its way. A fresh
+   * invoice is minted only when every wallet answered and none holds the send, since the
+   * ledger's own uniqueness cannot refuse a second one for this investment; a ledger that
+   * could not be asked mints nothing, and the investor is asked to try again.
+   */
+  async function resolvePayment(): Promise<
+    | { kind: "pay"; paymentRequest: string }
+    | { kind: "settled" }
+    | { kind: "failed"; failure: TransferFailure }
+  > {
+    const issued = progress?.invoice
+    if (issued && isInvoiceReusable(issued.issuedAt, Date.now())) {
+      return { kind: "pay", paymentRequest: issued.paymentRequest }
+    }
+
+    if (issued) {
+      setIsLookingUpPayment(true)
+      const lookup = await lookUpPayment(issued.paymentRequest).finally(() =>
+        setIsLookingUpPayment(false),
+      )
+      if (lookup === CardInvestmentPaymentLookup.Settled) {
+        markPaid()
+        return { kind: "settled" }
+      }
+      if (lookup === CardInvestmentPaymentLookup.Pending) {
+        markPaying()
+        return { kind: "settled" }
+      }
+      if (lookup === CardInvestmentPaymentLookup.Unknown) {
+        return { kind: "failed", failure: TransferFailure.Ledger }
+      }
+    }
+
+    const minted = await requestInvoice(cardInvestmentDepositBtcWalletId, owedSats, {
+      accountId,
+      amountUsd: selectedAmountUsd,
+    })
+    if (!minted) return { kind: "failed", failure: TransferFailure.Invoice }
+    recordInvoice(minted.paymentRequest)
+    return { kind: "pay", paymentRequest: minted.paymentRequest }
   }
 
   /**
@@ -92,10 +225,23 @@ export const TransferInvestScreen: React.FC = () => {
    * on a balance of zero. Pressing with the money ready but no wallet configured would
    * ask for an invoice from nowhere; the shortfall path needs none, so it stays reachable
    * either way. The missing wallet is said out loud: a button that stays grey with the
-   * money in place, and nothing to explain it, reads as the app being broken.
+   * money in place, and nothing to explain it, reads as the app being broken. The paying
+   * account is waited on the same way, and only on the send path, since the invoice is
+   * filed under it; the home has usually read it already, so the wait is the cache's.
    */
   const isMissingDepositWallet = hasEnoughBalance && !cardInvestmentDepositBtcWalletId
-  const isContinueDisabled = isLoading || isMissingDepositWallet
+  const isMissingPayerAccount = hasEnoughBalance && !isAccountResolved
+  const isContinueDisabled = isLoading || isMissingDepositWallet || isMissingPayerAccount
+
+  /** The invoice failure is borrowed from the receive screen, which words this exact
+   *  failure and is already translated everywhere; the ledger one is the flow's own
+   *  lost-connection line. */
+  const failureMessageFor: Record<TransferFailure, () => string> = {
+    [TransferFailure.Invoice]: () => LL.ReceiveScreen.error(),
+    [TransferFailure.Ledger]: () =>
+      LL.CardFlow.Onboarding.SignInvest.errors.networkError(),
+  }
+  const failureMessage = failure ? failureMessageFor[failure]() : null
 
   return (
     <Screen headerShown={false}>
@@ -120,12 +266,9 @@ export const TransferInvestScreen: React.FC = () => {
             })}
           </Text>
 
-          {/* Borrowed from the receive screen, which words this exact failure and is
-              already translated everywhere. The flow gets its own key if the wording
-              ever has to differ. */}
-          {hasInvoiceFailed ? (
+          {failureMessage ? (
             <Text type="p2" style={styles.errorText}>
-              {LL.ReceiveScreen.error()}
+              {failureMessage}
             </Text>
           ) : null}
 
@@ -140,7 +283,7 @@ export const TransferInvestScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.TransferInvest.buttonText()}
           disabled={isContinueDisabled}
-          loading={isRequesting}
+          loading={isRequesting || isLookingUpPayment}
           onPress={handleNext}
         />
       </View>
