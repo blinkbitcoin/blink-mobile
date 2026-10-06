@@ -109,9 +109,15 @@ export type RootStackParamList = {
     payment?: string
     username?: string
     scanPressed?: number
+    /** The wallet to pay from, when the caller already judged which one can, so the
+     *  details step does not fall back to a default that cannot. Navigation-only: a
+     *  wallet the flow does not offer is ignored. */
+    sendingWalletId?: string
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
+    /** Handed on from the destination step; see it there. */
+    sendingWalletId?: string
   }
   merchantSelection: {
     merchants: MerchantChoice[]
@@ -266,6 +272,18 @@ export type RootStackParamList = {
   cardOnboardingSubscribeScreen: undefined
   cardOnboardingPaymentScreen: undefined
   cardOnboardingLoadingScreen: undefined
+  cardOnboardingWelcomeInvestScreen: undefined
+  cardOnboardingSelectInvestScreen: undefined
+  cardOnboardingTermSheetScreen: { selectedAmountUsd: number }
+  cardOnboardingTransferInvestScreen: {
+    selectedAmountUsd: number
+    /** The satoshis the signed agreement names, carried from the signing step. It is what
+     *  the investor owes: the rate was fixed when they signed. */
+    settlementSats?: number
+  }
+  cardOnboardingInsufficientBalanceScreen: { selectedAmountUsd: number }
+  cardOnboardingDepositPendingScreen: undefined
+  cardOnboardingCompanyValuationScreen: undefined
   cardOnboardingPersonalInfoScreen: undefined
   cardOnboardingAcknowledgementScreen: undefined
   cardOnboardingPreapprovedScreen: undefined
