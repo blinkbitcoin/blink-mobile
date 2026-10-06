@@ -11,7 +11,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toMajorUnit } from "@app/utils/helper"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 
 import { LimitField, useCardLimits } from "./hooks"
 import { createCurrencyFormatters } from "../utils"

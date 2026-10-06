@@ -15,7 +15,7 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 const mockUseCardData = jest.fn()
-jest.mock("@app/screens/card-screen/hooks/use-card-data", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
 

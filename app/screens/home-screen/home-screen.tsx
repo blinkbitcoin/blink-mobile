@@ -27,7 +27,7 @@ import {
 } from "@app/components/balance-header"
 import { BalanceMode, useBalanceMode } from "@app/hooks/use-balance-mode"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { CARD, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { StableTokenConvertToBtcModal } from "@app/screens/conversion-flow/stable-token-convert-to-btc-modal"
 import { TrialAccountLimitsModal } from "@app/components/upgrade-account-modal"
 import SlideUpHandle from "@app/components/slide-up-handle"
@@ -75,15 +75,19 @@ import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { getErrorMessages } from "@app/graphql/utils"
-import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
-import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { AccountBalance, getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
-import { useAppConfig, useAutoShowUpgradeModal } from "@app/hooks"
+import {
+  useAppConfig,
+  useAutoShowUpgradeModal,
+  useCardBalance,
+  useCardData,
+} from "@app/hooks"
 import {
   AccountLevel,
   useBulletinsQuery,
@@ -338,14 +342,25 @@ export const HomeScreen: React.FC = () => {
    */
   const isCardBackendAvailable = galoyInstanceId === "Staging"
   const { card: homeCard } = useCardData({ skip: !isCardBackendAvailable })
-  const hasCard = homeCard !== undefined && isCardUsable(homeCard.status)
-  const cardLastFour = homeCard?.lastFour
+  const showCardRow = homeCard !== undefined && isCardUsable(homeCard.status)
+  const { availableSats: cardBalanceSats } = useCardBalance(
+    showCardRow ? homeCard?.id : undefined,
+  )
+
+  const accountBalances: AccountBalance[] = [...(wallets ?? [])]
+  if (showCardRow && homeCard) {
+    accountBalances.push({
+      id: homeCard.id,
+      walletCurrency: CARD,
+      balance: cardBalanceSats ?? 0,
+    })
+  }
 
   const {
     formattedBalance: defaultFormattedBalance,
     satsBalance,
     isLoading: balanceConversionLoading,
-  } = useTotalBalance(wallets)
+  } = useTotalBalance(wallets, showCardRow ? cardBalanceSats : undefined)
 
   const loading = queryLoading || balanceConversionLoading
 
@@ -943,9 +958,7 @@ export const HomeScreen: React.FC = () => {
           loading={loading}
           setIsStablesatModalVisible={setIsStablesatModalVisible}
           onGatedTap={onGatedDollarTap}
-          wallets={wallets}
-          hasCard={hasCard}
-          cardLastFour={cardLastFour}
+          accounts={accountBalances}
           showBtcNotification={isOutgoing ? false : hasUnseenBtcTx}
           showUsdNotification={isOutgoing ? false : hasUnseenUsdTx}
         />

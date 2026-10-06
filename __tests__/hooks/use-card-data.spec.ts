@@ -1,5 +1,5 @@
 import { renderHook } from "@testing-library/react-hooks"
-import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
+import { useCardData } from "@app/hooks/use-card-data"
 
 const mockUseIsAuthed = jest.fn()
 jest.mock("@app/graphql/is-authed-context", () => ({
