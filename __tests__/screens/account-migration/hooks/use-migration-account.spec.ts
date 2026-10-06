@@ -2,6 +2,7 @@ import { renderHook, act } from "@testing-library/react-native"
 
 import { useMigrationAccount } from "@app/screens/account-migration/hooks/use-migration-account"
 import { MigrationCheckpoint } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
+import { StorageFailure, StorageWriteError } from "@app/utils/storage/storage-failure"
 
 const mockSaveCheckpoint = jest.fn()
 const mockProvision = jest.fn()
@@ -50,9 +51,17 @@ jest.mock("@app/hooks/use-in-flight-guard", () => ({
   }),
 }))
 
+const mockCreateFailedCopy = "creation failed"
+const mockOutOfSpaceCopy = "free up some space"
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
-    LL: { AccountTypeSelectionScreen: { createFailed: () => "creation failed" } },
+    LL: {
+      AccountTypeSelectionScreen: { createFailed: () => mockCreateFailedCopy },
+      AccountMigration: {
+        storageUnavailable: { notSavedOutOfSpaceBody: () => mockOutOfSpaceCopy },
+      },
+    },
   }),
 }))
 
@@ -69,7 +78,7 @@ describe("useMigrationAccount", () => {
     jest.clearAllMocks()
     mockAccountId = null
     mockGuardBlocked = false
-    mockSaveCheckpoint.mockResolvedValue(true)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
     mockSavePendingAccount.mockResolvedValue(undefined)
     mockPendingForActiveAccount = null
     mockRegistryAccounts = []
@@ -125,7 +134,10 @@ describe("useMigrationAccount", () => {
   })
 
   it("stops the flow with the failure toast when the checkpoint write fails", async () => {
-    mockSaveCheckpoint.mockResolvedValue(false)
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
     const { result } = renderHook(() => useMigrationAccount())
 
     let ensured: string | null = "unset"
@@ -134,8 +146,124 @@ describe("useMigrationAccount", () => {
     })
 
     expect(ensured).toBeNull()
-    expect(mockReportError).toHaveBeenCalled()
-    expect(mockToastShow).toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: mockCreateFailedCopy }),
+    )
+  })
+
+  /** saveCheckpoint reports a store that refused with the store's own error; reporting it
+   *  again here would count one failure twice under a message that says less. */
+  it("leaves a store refusal to the report saveCheckpoint already made", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /** A write turned away for want of an owner never reaches the store, so nothing else
+   *  reports it. */
+  it("reports a checkpoint write refused without an owner", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration account creation",
+      expect.objectContaining({ message: expect.stringContaining("without an owner") }),
+    )
+  })
+
+  it("asks to free up space when the checkpoint write found the disk full", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    const { result } = renderHook(() => useMigrationAccount())
+
+    let ensured: string | null = "unset"
+    await act(async () => {
+      ensured = await result.current.ensureAccount()
+    })
+
+    expect(ensured).toBeNull()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: mockOutOfSpaceCopy }),
+    )
+  })
+
+  /** Refused before reaching the store (no owner to key it by), so there is no disk to
+   *  blame and the generic copy stands. */
+  it("keeps the generic copy when the checkpoint write carries no kind", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: mockCreateFailedCopy }),
+    )
+  })
+
+  it("asks to free up space when the pending-record write found the disk full", async () => {
+    mockSavePendingAccount.mockRejectedValue(
+      new StorageWriteError(new Error("database or disk is full")),
+    )
+    const { result } = renderHook(() => useMigrationAccount())
+
+    let ensured: string | null = "unset"
+    await act(async () => {
+      ensured = await result.current.ensureAccount()
+    })
+
+    expect(ensured).toBeNull()
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: mockOutOfSpaceCopy }),
+    )
+  })
+
+  it("keeps the generic copy for any other pending-record write failure", async () => {
+    mockSavePendingAccount.mockRejectedValue(
+      new StorageWriteError(new Error("Database Error")),
+    )
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: mockCreateFailedCopy }),
+    )
+  })
+
+  /** Only a failure that came from storage is classified. Provisioning and the SDK throw
+   *  their own errors, and one worded like a full disk must not send the user to free up
+   *  space on the screen where their wallet is created. */
+  it("never reads a full disk into an error that did not come from storage", async () => {
+    mockProvision.mockRejectedValue(new Error("key store out of space"))
+    const { result } = renderHook(() => useMigrationAccount())
+
+    await act(async () => {
+      await result.current.ensureAccount()
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: mockCreateFailedCopy }),
+    )
   })
 
   it("reports the error and returns null when provisioning fails", async () => {

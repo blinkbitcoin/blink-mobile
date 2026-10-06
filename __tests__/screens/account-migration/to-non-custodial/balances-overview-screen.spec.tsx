@@ -1,6 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -9,6 +9,10 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { MigrationBalancesOverviewScreen } from "@app/screens/account-migration/to-non-custodial/balances-overview-screen"
 import { MigrationLnAddressOutcome } from "@app/types/migration"
+import {
+  StorageFailure,
+  type StorageWriteResult,
+} from "@app/utils/storage/storage-failure"
 import { ContextForScreen } from "../../helper"
 import { walletOverviewQueryResult } from "../helpers"
 import { flushEffects } from "../../../helpers/flush-effects"
@@ -16,6 +20,7 @@ import { flushEffects } from "../../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 const LLOverview = LL.AccountMigration.balancesOverview
+const LLStorage = LL.AccountMigration.storageUnavailable
 const CONTACT_EMAIL = "support@blink.sv"
 
 const mockNavigate = jest.fn()
@@ -99,7 +104,8 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
-const mockSaveCheckpoint = jest.fn()
+/** Resolves true like the real one: the commit point is recorded before Approve opens. */
+const mockSaveCheckpoint = jest.fn().mockResolvedValue({ isSaved: true, failure: null })
 let mockCheckpointLoading = false
 
 let mockCheckpointAccountId: string | null = "sc-account-1"
@@ -112,6 +118,7 @@ const lnTransferWith = (outcome: MigrationLnAddressOutcome) => ({
 let mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
 
 let mockCheckpointHasError = false
+let mockCheckpointStorageFailure: StorageFailure | null = null
 const mockRefetchCheckpoint = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
@@ -120,6 +127,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     accountId: mockCheckpointAccountId,
     loading: mockCheckpointLoading,
     hasError: mockCheckpointHasError,
+    storageFailure: mockCheckpointStorageFailure,
     refetch: mockRefetchCheckpoint,
     saveCheckpoint: mockSaveCheckpoint,
   }),
@@ -224,6 +232,7 @@ const renderScreen = () => render(screenTree())
 
 const resetScreenMocks = () => {
   jest.clearAllMocks()
+  mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -237,6 +246,7 @@ const resetScreenMocks = () => {
   mockOwnerIdSkipped = false
   mockOwnerIdError = false
   mockCheckpointHasError = false
+  mockCheckpointStorageFailure = null
   mockRefetchOwnerId.mockResolvedValue(undefined)
   mockRefetchCheckpoint.mockResolvedValue(undefined)
   mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
@@ -700,6 +710,60 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  /** Approving without this record drains an account whose device then remembers neither
+   *  the step nor the figure the receive gate waits on. */
+  it("does not offer Approve when the commit-point write is refused", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+  })
+
+  /** A withheld Approve with nothing beside it is the dead end this screen may never
+   *  present: the hardware back is swallowed here. */
+  it("offers a retry instead, rather than nothing at all", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+  })
+
+  it("re-attempts the write from that retry and opens Approve once it lands", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    mockUseMigrationQuery.mockReturnValue({
+      ...migrationQueryResult({
+        balanceSats: 1000,
+        feeSats: 10,
+        feeCoveredByBlink: false,
+        receiveSats: 990,
+      }),
+      refetch: jest.fn(),
+    })
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+      refetch: jest.fn(),
+    })
+    renderScreen()
+    await flushEffects()
+
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
+    fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("opens Approve once that record lands", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
   it("persists the commit-point checkpoint with the preview's receive figure", async () => {
     renderScreen()
     await flushEffects()
@@ -913,6 +977,228 @@ describe("MigrationBalancesOverviewScreen", () => {
   })
 })
 
+describe("MigrationBalancesOverviewScreen commit-point write", () => {
+  beforeEach(resetScreenMocks)
+
+  /** The window the gate exists for: everything else has settled and the write is still on
+   *  its way to the store. A refused write swaps Approve for the retry, so only a write in
+   *  flight leaves Approve on screen for this term alone to hold. */
+  it("keeps Approve disabled while the commit-point write is still in flight", async () => {
+    let settleWrite: (result: StorageWriteResult) => void = () => undefined
+    mockSaveCheckpoint.mockImplementation(
+      () =>
+        new Promise<StorageWriteResult>((resolve) => {
+          settleWrite = resolve
+        }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+
+    await act(async () => {
+      settleWrite({ isSaved: true, failure: null })
+    })
+
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  describe("the line above the retry", () => {
+    const offlineStart = () =>
+      Object.assign(new Error("Network request failed"), {
+        networkError: new Error("offline"),
+      })
+
+    it("asks to free up space when the commit-point write found the disk full", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+
+    /** The device refused, and the connection is fine: sending the user to check it would
+     *  have them retry the same refusal with the same wrong instruction. */
+    it("says the progress was not saved when the store refused for another reason", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.Unknown,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.notSavedBody())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+
+    /** Refused before it reached the store, for want of an owner the lookup could not
+     *  fetch: a network failure, so the network wording stands. */
+    it("keeps the connection wording when the write carries no storage kind", async () => {
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    it("keeps the connection wording when the network failed alongside the store", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      mockMigrationStart.mockRejectedValue(offlineStart())
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedOutOfSpaceBody())).toBeNull()
+    })
+
+    it("keeps the connection wording when only the network failed", async () => {
+      mockMigrationStart.mockRejectedValue(offlineStart())
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    /** The read that feeds the re-point's ids is the device's store too: the checkpoint
+     *  could not be read, the id is missing because of it, and the network is fine. */
+    const failCheckpointRead = (failure: StorageFailure) => {
+      mockCheckpointAccountId = null
+      mockCheckpointHasError = true
+      mockCheckpointStorageFailure = failure
+      mockLnAddressTransfer = unsettledLnTransfer()
+    }
+
+    it("says the progress could not be read when the checkpoint read failed", async () => {
+      failCheckpointRead(StorageFailure.Unknown)
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.unreadableBody())).toBeTruthy()
+      expect(screen.queryByText(LL.errors.network.connection())).toBeNull()
+    })
+
+    it("asks to free up space when the checkpoint read found the disk full", async () => {
+      failCheckpointRead(StorageFailure.OutOfSpace)
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.outOfSpaceBody())).toBeTruthy()
+    })
+
+    /** The write reads the record before replacing it, so an unreadable store fails both
+     *  and the read, as the cause, speaks for them. */
+    it("names the read when both failed at the store for no nameable reason", async () => {
+      failCheckpointRead(StorageFailure.Unknown)
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.Unknown,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.unreadableBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    /** A write can fail on its own after a clean read, and a full disk is the one answer
+     *  the user can act on: it wins over the read's opaque failure. */
+    it("asks to free up space when the write found the disk full after an opaque read failure", async () => {
+      failCheckpointRead(StorageFailure.Unknown)
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.unreadableBody())).toBeNull()
+    })
+
+    it("asks to free up space when the read found the disk full and the write failed opaquely", async () => {
+      failCheckpointRead(StorageFailure.OutOfSpace)
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.Unknown,
+      })
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LLStorage.outOfSpaceBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedBody())).toBeNull()
+    })
+
+    it("keeps the connection wording when the owner lookup failed alongside the read", async () => {
+      failCheckpointRead(StorageFailure.OutOfSpace)
+      mockOwnerIdError = true
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.outOfSpaceBody())).toBeNull()
+    })
+
+    /** The store answered and simply holds no id: the lookup that keys it is the one to
+     *  retry, and that lookup is the network's. */
+    it("keeps the connection wording for a missing account the store did read", async () => {
+      mockCheckpointAccountId = null
+      mockLnAddressTransfer = unsettledLnTransfer()
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+    })
+
+    /** A figure change starts a second write while the first is still out. The first one
+     *  answering last must not put its stale reason back above the retry. */
+    it("speaks for the latest write when two answer out of order", async () => {
+      const settleWrites: Array<(result: StorageWriteResult) => void> = []
+      mockSaveCheckpoint.mockImplementation(
+        () =>
+          new Promise<StorageWriteResult>((resolve) => {
+            settleWrites.push(resolve)
+          }),
+      )
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 20,
+          feeCoveredByBlink: false,
+          receiveSats: 980,
+        }),
+      )
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(settleWrites.length).toBeGreaterThanOrEqual(2)
+      const settleLatest = settleWrites[settleWrites.length - 1]
+      const settleOldest = settleWrites[0]
+      await act(async () => {
+        settleLatest({ isSaved: false, failure: StorageFailure.Unknown })
+      })
+      await act(async () => {
+        settleOldest({ isSaved: false, failure: StorageFailure.OutOfSpace })
+      })
+
+      expect(screen.getByText(LLStorage.notSavedBody())).toBeTruthy()
+      expect(screen.queryByText(LLStorage.notSavedOutOfSpaceBody())).toBeNull()
+    })
+  })
+})
+
 describe("MigrationBalancesOverviewScreen lightning-address re-point gating", () => {
   beforeEach(resetScreenMocks)
 
@@ -1083,6 +1369,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockLnRetry).toHaveBeenCalledTimes(1)
   })
@@ -1199,6 +1486,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
   })
@@ -1225,6 +1513,7 @@ describe("MigrationBalancesOverviewScreen lightning-address re-point gating", ()
     await flushEffects()
 
     fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+    await flushEffects()
 
     expect(mockRefetchOwnerId).toHaveBeenCalledTimes(1)
   })

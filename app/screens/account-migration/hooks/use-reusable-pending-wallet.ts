@@ -1,6 +1,7 @@
 import { useCallback } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { resolveReusablePendingAccount } from "../utils/migration-pending-account"
 
@@ -17,12 +18,14 @@ export const useReusablePendingWallet = (): {
   reusablePendingAccountId: string | null
   loading: boolean
   hasError: boolean
+  storageFailure: StorageFailure | null
   refetch: () => Promise<unknown>
 } => {
   const {
     pendingForActiveAccount,
     loading: pendingLoading,
     hasError,
+    storageFailure,
     refetch: refetchPending,
   } = usePendingMigrationAccounts()
   const {
@@ -47,6 +50,7 @@ export const useReusablePendingWallet = (): {
     reusablePendingAccountId,
     loading: pendingLoading || registryLoading,
     hasError,
+    storageFailure,
     refetch,
   }
 }

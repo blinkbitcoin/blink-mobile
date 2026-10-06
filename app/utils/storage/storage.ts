@@ -67,6 +67,31 @@ export const loadJson = async (key: string) => {
 }
 
 /**
+ * Loads something from storage and runs it thru JSON.parse, propagating the read error
+ * instead of swallowing it — the read counterpart of saveJson.
+ *
+ * Absent and unreadable are different answers: the first is null, the second throws. A
+ * caller that acts on "nothing stored" must use this one whenever being wrong is
+ * expensive, since loadJson reports both as null.
+ *
+ * @param key The key to fetch.
+ */
+export const loadJsonOrThrow = async (key: string) => {
+  const data = await AsyncStorage.getItem(key)
+  if (!data) return null
+
+  try {
+    return JSON.parse(data)
+  } catch {
+    /** Only the read is propagated, never the parse: content the store handed over
+     *  intact but that no longer parses is definitively unusable, so it reads as absent
+     *  and the next save replaces it. Throwing here instead would strand the key —
+     *  unreadable forever, and unwritable too for any caller that merges onto it. */
+    return null
+  }
+}
+
+/**
  * Saves an object to storage.
  *
  * @param key The key to fetch.
