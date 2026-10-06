@@ -909,3 +909,85 @@ describe("useMigrationCheckpoint write ordering", () => {
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BalancesOverview)
   })
 })
+
+describe("useMigrationCheckpoint a start the server accepted", () => {
+  beforeEach(resetCheckpointMocks)
+
+  it("exposes the confirmation stored for this account's flow", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      isStartConfirmed: true,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.isStartConfirmed).toBe(true)
+  })
+
+  /** Another profile's confirmed start says nothing about this account's flow. */
+  it("ignores a confirmation stored for another account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-other",
+      isStartConfirmed: true,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.isStartConfirmed).toBe(false)
+  })
+
+  it("reads unconfirmed when nothing is stored", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.isStartConfirmed).toBe(false)
+  })
+
+  it("persists a confirmation the caller saw and exposes it", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        provisionedAccountId: "sc-1",
+        expectedReceiveSats: 21000,
+        isStartConfirmed: true,
+      })
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
+      "migrationCheckpoint_main",
+      expect.objectContaining({ isStartConfirmed: true }),
+    )
+    expect(result.current.isStartConfirmed).toBe(true)
+  })
+
+  /** The record keeps it for the run; re-sending it from memory would carry it into a
+   *  run that restarted, where it no longer holds. */
+  it("never re-sends a stored confirmation on a later save", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      isStartConfirmed: true,
+    })
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.TermsAndConditions)
+    })
+
+    const [, update] = mockSaveCheckpointToStorage.mock.calls[0]
+    expect(update.isStartConfirmed).toBeUndefined()
+  })
+})

@@ -13,6 +13,11 @@ import {
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
+import {
+  markAppForegrounded,
+  setMigrationReceiveOverdue,
+} from "../utils/migration-receive-wait"
+
 import { useCompleteMigration } from "./use-complete-migration"
 import { useMigrationReceiveConfirmation } from "./use-migration-receive-confirmation"
 import { useMigrationStatus } from "./use-migration-status"
@@ -77,6 +82,24 @@ export const useResumeCompletedMigration = (): void => {
       new Error("Receive has not landed within the notice window"),
     )
   }, [isReceiveDelayed])
+
+  /** The migration entry and step screens cannot see this hook, so the overdue receive is
+   *  published for them: past the notice window a tap there offers support instead of
+   *  another "on its way". Withdrawn when this hook unmounts, so a stale wait never outlives
+   *  the watch that raised it. */
+  useEffect(() => {
+    setMigrationReceiveOverdue(isReceiveDelayed)
+  }, [isReceiveDelayed])
+  useEffect(() => () => setMigrationReceiveOverdue(false), [])
+
+  /** And when the app comes back, so the overdue flag is only acted on once the receive
+   *  check that fires on return has had time to clear it. */
+  useEffect(() => {
+    const subscription = AppState.addEventListener("change", (nextAppState) => {
+      if (nextAppState === "active") markAppForegrounded()
+    })
+    return () => subscription.remove()
+  }, [])
 
   /** Blocks the effect from re-entering once the user has been handed to support, so a
    *  terminal outcome hands over exactly once. */
