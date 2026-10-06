@@ -54,6 +54,20 @@ export type ConvertMoneyAmount = <W extends WalletOrDisplayCurrency>(
  */
 export type IdempotencyKeyRef = { current?: string }
 
+/**
+ * The attempts of a send that threw after dispatch without their payment turning up: the
+ * payment hash of each invoice they paid, and when the first of them was made.
+ */
+export type LostSend = { startedAtMs: number; paymentHashes: string[] }
+
+/**
+ * Everything an attempt leaves behind for the next one, on one holder: the idempotency
+ * key above, and the lost attempts to look for before anything is sent. Shared by every
+ * rebuild the same way. The key alone starts over with a new amount or wallet; the lost
+ * attempts survive either, since the payment that may have gone out is as real after it.
+ */
+export type SendAttemptRef = IdempotencyKeyRef & { lostSend?: LostSend }
+
 export type BaseCreatePaymentDetailsParams<T extends WalletCurrency> = {
   convertMoneyAmount: ConvertMoneyAmount
   sendingWalletDescriptor: WalletDescriptor<T>
