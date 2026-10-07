@@ -5,6 +5,7 @@ import { usePendingMigrationAccounts } from "@app/screens/account-migration/hook
 const mockLoadPendingProvisionedAccounts = jest.fn()
 const mockSavePendingProvisionedAccount = jest.fn()
 const mockClearPendingProvisionedAccount = jest.fn()
+const mockClearPendingProvisionedWallet = jest.fn()
 const mockReportError = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
 let mockOwnerId: string | null = "custodial-1"
@@ -35,6 +36,8 @@ jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", (
     mockSavePendingProvisionedAccount(...args),
   clearPendingProvisionedAccount: (...args: readonly unknown[]) =>
     mockClearPendingProvisionedAccount(...args),
+  clearPendingProvisionedWallet: (...args: readonly unknown[]) =>
+    mockClearPendingProvisionedWallet(...args),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -55,6 +58,7 @@ describe("usePendingMigrationAccounts", () => {
     mockLoadPendingProvisionedAccounts.mockResolvedValue({})
     mockSavePendingProvisionedAccount.mockResolvedValue(undefined)
     mockClearPendingProvisionedAccount.mockResolvedValue(undefined)
+    mockClearPendingProvisionedWallet.mockResolvedValue(undefined)
   })
 
   it("loads the pending map and exposes the active owner's wallet", async () => {
@@ -99,20 +103,70 @@ describe("usePendingMigrationAccounts", () => {
     expect(result.current.pendingForActiveAccount).toBe("sc-pending-2")
   })
 
-  /** A cleanup write lost to a crash leaves a record hiding the now-active wallet; on
-   *  load it is dropped so the funded wallet never vanishes from the switcher. */
-  it("self-heals a record whose wallet is already the active account", async () => {
+  /**
+   * The mark is what keeps a wallet undeletable while a migration still owes it funds, so
+   * switching into that wallet by hand must NOT drop it: that is the exact state where the
+   * only key to the funds in flight would otherwise become deletable.
+   */
+  it("keeps the mark when its wallet is already the active account", async () => {
     mockLoadPendingProvisionedAccounts.mockResolvedValue({ "custodial-1": "sc-wallet-1" })
     mockActiveAccount = { id: "sc-wallet-1", type: "selfCustodial" }
 
     const { result } = renderHook(() => usePendingMigrationAccounts())
     await waitFor(() => expect(result.current.loading).toBe(false))
 
-    expect(result.current.pendingAccountIds.has("sc-wallet-1")).toBe(false)
-    expect(mockClearPendingProvisionedAccount).toHaveBeenCalledWith(
+    expect(result.current.pendingAccountIds.has("sc-wallet-1")).toBe(true)
+    expect(mockClearPendingProvisionedAccount).not.toHaveBeenCalled()
+    expect(mockClearPendingProvisionedWallet).not.toHaveBeenCalled()
+  })
+
+  it("clears the mark by wallet id, without needing the owner it was filed under", async () => {
+    mockLoadPendingProvisionedAccounts.mockResolvedValue({
+      "custodial-1": "sc-wallet-1",
+      "custodial-2": "sc-wallet-2",
+    })
+    /** The self-custodial session the heal runs from reports no owner at all. */
+    mockOwnerId = null
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.clearPendingWallet("sc-wallet-1")
+    })
+
+    expect(mockClearPendingProvisionedWallet).toHaveBeenCalledWith(
       "migrationPendingAccounts_main",
-      "custodial-1",
+      "sc-wallet-1",
     )
+    expect(result.current.pendingAccountIds.has("sc-wallet-1")).toBe(false)
+    /** Only the named wallet goes: another owner's pending wallet is untouched. */
+    expect(result.current.pendingAccountIds.has("sc-wallet-2")).toBe(true)
+  })
+
+  /**
+   * The mark gates deletion and `deleteWallet` re-reads it from storage, so a failed write
+   * must leave the in-memory map saying what storage says. Reporting it gone would offer a
+   * delete control that then refuses, silently.
+   */
+  it("keeps the mark in memory when clearing it by wallet id fails, and reports", async () => {
+    mockLoadPendingProvisionedAccounts.mockResolvedValue({
+      "custodial-1": "sc-wallet-1",
+    })
+    mockClearPendingProvisionedWallet.mockRejectedValue(new Error("clear failed"))
+
+    const { result } = renderHook(() => usePendingMigrationAccounts())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.clearPendingWallet("sc-wallet-1")
+    })
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Pending migration wallet clear",
+      expect.any(Error),
+    )
+    expect(result.current.pendingAccountIds.has("sc-wallet-1")).toBe(true)
   })
 
   it("persists a newly provisioned wallet under the active custodial owner", async () => {
@@ -236,9 +290,9 @@ describe("usePendingMigrationAccounts", () => {
     expect(result.current.hasError).toBe(true)
   })
 
-  /** The record itself was read fine in the self-heal case, so it counts as a success
-   *  and clears a raised error rather than leaving the gate stuck on retry. */
-  it("clears hasError when a refetch lands on the self-heal path", async () => {
+  /** A refetch that reads the mark of the now-active wallet is an ordinary success: the
+   *  error clears and the mark stays, rather than leaving the gate stuck on retry. */
+  it("clears hasError on a refetch that reads the active wallet's own mark", async () => {
     mockLoadPendingProvisionedAccounts.mockRejectedValueOnce(new Error("read failed"))
     mockLoadPendingProvisionedAccounts.mockResolvedValue({
       "custodial-1": "sc-wallet-1",
@@ -253,23 +307,7 @@ describe("usePendingMigrationAccounts", () => {
     })
 
     expect(result.current.hasError).toBe(false)
-    expect(result.current.pendingForActiveAccount).toBeNull()
-  })
-
-  it("reports when the self-heal cleanup write fails", async () => {
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({ "custodial-1": "sc-wallet-1" })
-    mockActiveAccount = { id: "sc-wallet-1", type: "selfCustodial" }
-    mockClearPendingProvisionedAccount.mockRejectedValue(new Error("clear failed"))
-
-    const { result } = renderHook(() => usePendingMigrationAccounts())
-    await waitFor(() => expect(result.current.loading).toBe(false))
-
-    await waitFor(() =>
-      expect(mockReportError).toHaveBeenCalledWith(
-        "Pending migration account self-heal",
-        expect.any(Error),
-      ),
-    )
+    expect(result.current.pendingAccountIds.has("sc-wallet-1")).toBe(true)
   })
 
   it("propagates a failed write and records nothing, so provision aborts before creating the wallet", async () => {
@@ -284,7 +322,10 @@ describe("usePendingMigrationAccounts", () => {
     expect(result.current.pendingForActiveAccount).toBeNull()
   })
 
-  it("reports when clearing a pending wallet fails", async () => {
+  it("keeps the mark in memory when the owner-keyed clear fails, and reports", async () => {
+    mockLoadPendingProvisionedAccounts.mockResolvedValue({
+      "custodial-1": "sc-pending-1",
+    })
     mockClearPendingProvisionedAccount.mockRejectedValue(new Error("clear failed"))
 
     const { result } = renderHook(() => usePendingMigrationAccounts())
@@ -298,6 +339,8 @@ describe("usePendingMigrationAccounts", () => {
       "Pending migration account clear",
       expect.any(Error),
     )
+    /** Storage still holds it, and deleteWallet reads storage: memory may not disagree. */
+    expect(result.current.pendingAccountIds.has("sc-pending-1")).toBe(true)
   })
 
   it("drops a load that resolves after unmount", async () => {
@@ -309,14 +352,17 @@ describe("usePendingMigrationAccounts", () => {
     )
     mockActiveAccount = { id: "sc-wallet-1", type: "selfCustodial" }
 
-    const { unmount } = renderHook(() => usePendingMigrationAccounts())
+    const { result, unmount } = renderHook(() => usePendingMigrationAccounts())
     unmount()
 
     await act(async () => {
       resolveLoad({ owner: "sc-wallet-1" })
     })
 
-    expect(mockClearPendingProvisionedAccount).not.toHaveBeenCalled()
+    /** The late answer never lands: loading is still the initial true, so no consumer
+     *  reads the resolved map as this mount's settled state. */
+    expect(result.current.loading).toBe(true)
+    expect(result.current.pendingAccountIds.size).toBe(0)
   })
 
   it("drops a load that rejects after unmount", async () => {
