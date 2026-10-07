@@ -18,6 +18,7 @@ export {
   registerLightningAddress,
 } from "./wallet"
 export { getSparkStatus } from "./status"
+export { listFiatRates, listFiatCurrencies } from "./fiat"
 export { activateStableBalance, deactivateStableBalance } from "./stable-balance"
 export { createReceiveLightning, createReceiveOnchain } from "./receive"
 export { createLnurlWithdraw } from "./lnurl-withdraw"

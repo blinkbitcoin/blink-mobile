@@ -2354,6 +2354,8 @@
     "invalidAmount": "Kino kirimu omuwendo ogutali mutuufu. Nsaba oddemu okukola n'omuwendo omutuufu.",
     "usernameDoesNotExist": "{lnAddress: string} erabika nga teri ndagiriro ya {bankName: string} eriwo.",
     "usernameDoesNotExistAdvice": "Kakasa nti enjawulo mu mpandiika ntuufu oba saba oyo afuna yinivoyisi oba endagiriro ya BTC",
+    "destinationUnverifiable": "Tetusobodde kukebera {lnAddress} kaakano — sevva za {bankName} teziddamu.",
+    "destinationUnverifiableAdvice": "Endagiriro eyinza okuba nga ntuufu. Ddamu ogezeeko mu kaseera katono, oba saba omufuna LN invoice oba endagiriro ya BTC.",
     "selfPaymentError": "{lnAddress: string} ye ndagiriro yo eya {bankName: string}.",
     "selfPaymentAdvice": "Bwoba oyagala okusindika ssente ku akawunti endala gy'olina, osobola okukozesa yinivoyisi, LN oba endagiriro eya BTC.",
     "lnAddressError": "Tetusobola kutuuka ku ndagiriro eno eya Lightning. Bw’oba ​​okakasa nti kiriwo, osobola okuddamu okugezaako oluvannyuma.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Endagiriro eteekwa ennyo okuba n'ennukuta 50",
       "invalidCharacter": "Endagiriro esobola okubaamu ennukuta, ennamba, n'okuggumiza",
       "addressUnavailable": "Tusonyiwe, eno endagiriro yatwaliddwa dda",
+      "serverUnreachable": "Tetusobodde kutuuka ku sevva y'endagiriro. Endagiriro yo ekyali nnamba — ddamu ogezeeko mu kaseera katono.",
       "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink tetuukibwa",
+    "unreachableDescription": "{featureName} yeetaagisa sevva za Blink, ezitali kuddamu kaakano. Ewaleti yo n'ensimbi zo tezikwatiddwako.",
     "featureCircles": "Circles",
     "featureEarn": "Yiga",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "Okukyusa {token}",
     "payTo": "Sasula {address}",
     "payment": "Okusasula"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Omuwendo gw'enkyusa guyinza okuba nga gukaddiye",
+    "satsOnly": "Tulaga mu sats — tewali muwendo gwa nkyusa"
   },
   "SelfCustodialOffline": {
     "title": "Envalopu si ku yintaneeti",

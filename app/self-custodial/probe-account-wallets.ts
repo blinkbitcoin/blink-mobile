@@ -35,11 +35,21 @@ const toProbeFailed = (err: unknown): ProbeAccountWalletsResult => ({
  * explicitly; falling through silently would skip the has-funds warning
  * on the delete flow.
  */
-export const probeSelfCustodialAccountWallets = async (
-  accountId: string,
-  network: Network,
-  leewaySatPerVbyte: number,
-): Promise<ProbeAccountWalletsResult> => {
+type ProbeAccountWalletsParams = {
+  accountId: string
+  network: Network
+  /** Leeway (sat/vByte) over the network-recommended fee for auto-claiming deposits. */
+  leewaySatPerVbyte: number
+  /** From `useLnurlServer()` at the calling component. */
+  lnurlDomain: string
+}
+
+export const probeSelfCustodialAccountWallets = async ({
+  accountId,
+  network,
+  leewaySatPerVbyte,
+  lnurlDomain,
+}: ProbeAccountWalletsParams): Promise<ProbeAccountWalletsResult> => {
   const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
   if (!mnemonic) return { status: ProbeAccountWalletsStatus.NoMnemonic }
 
@@ -50,6 +60,7 @@ export const probeSelfCustodialAccountWallets = async (
       storageDir: storageDirFor(accountId, network),
       network,
       leewaySatPerVbyte,
+      lnurlDomain,
     })
     const snapshot = await getSelfCustodialWalletSnapshot(sdk)
     return { status: ProbeAccountWalletsStatus.Ok, wallets: snapshot.wallets }

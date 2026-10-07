@@ -17,14 +17,13 @@ import { normalizeMnemonic } from "@app/utils/mnemonic"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
-  lnurlDomainFor,
-  lnurlServerUrlFor,
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
   requireSparkTokenIdentifier,
   SparkToken,
   storageDirFor,
+  type LnurlServer,
 } from "../config"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
 import { createSdkLogListener } from "../logging"
@@ -43,10 +42,14 @@ const initializeLogging = (() => {
   }
 })()
 
-const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
+const createSdkConfig = (
+  network: Network,
+  leewaySatPerVbyte: number,
+  lnurlDomain: string,
+) => {
   const config = defaultConfig(network)
   config.apiKey = requireBreezApiKey()
-  config.lnurlDomain = lnurlDomainFor(network)
+  config.lnurlDomain = lnurlDomain
 
   /**
    * The SDK default cap is 1 sat/vByte, which blocks almost every deposit claim.
@@ -75,6 +78,10 @@ type InitSdkParams = {
   network: Network
   /** Leeway (sat/vByte) over the network-recommended fee for auto-claiming deposits. */
   leewaySatPerVbyte: number
+  /** The host the SDK registers and resolves Lightning Addresses against. Passed in
+   *  rather than derived, so the developer outage switch is visible at the call site
+   *  (`useLnurlServer`) instead of reaching into a global from down here. */
+  lnurlDomain: string
 }
 
 export const initSdk = async ({
@@ -82,10 +89,11 @@ export const initSdk = async ({
   storageDir,
   network,
   leewaySatPerVbyte,
+  lnurlDomain,
 }: InitSdkParams): Promise<BreezSdkInterface> => {
   initializeLogging()
   const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
-  const config = createSdkConfig(network, leewaySatPerVbyte)
+  const config = createSdkConfig(network, leewaySatPerVbyte, lnurlDomain)
   return connect({ config, seed, storageDir })
 }
 
@@ -134,6 +142,9 @@ type RestoreWalletParams = {
   network: Network
   /** Leeway (sat/vByte) over the network-recommended fee for auto-claiming deposits. */
   leewaySatPerVbyte: number
+  /** Both halves are needed here: the domain to connect with, and the base URL to ask
+   *  for the mode this wallet already holds. */
+  lnurlServer: LnurlServer
 }
 
 type RestoredWallet = {
@@ -151,6 +162,7 @@ export const selfCustodialRestoreWallet = async ({
   mnemonic,
   network,
   leewaySatPerVbyte,
+  lnurlServer,
 }: RestoreWalletParams): Promise<RestoredWallet> => {
   const normalized = normalizeMnemonic(mnemonic)
   if (!validateMnemonic(normalized)) {
@@ -171,11 +183,12 @@ export const selfCustodialRestoreWallet = async ({
       storageDir: storageDirFor(accountId, network),
       network,
       leewaySatPerVbyte,
+      lnurlDomain: lnurlServer.domain,
     })
     /** An unreachable server must not fail the restore: the wallet itself is whole. */
     const recovered = await recoverLnurlServerMode({
       sdk,
-      serverUrl: lnurlServerUrlFor(network),
+      serverUrl: lnurlServer.serverUrl,
     })
       .then((serverMode) => ({ serverMode, isServerModeKnown: true }))
       .catch((err) => {

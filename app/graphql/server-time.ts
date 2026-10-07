@@ -1,5 +1,7 @@
 import { ApolloLink } from "@apollo/client"
 
+import { recordBlinkServiceResponse } from "./blink-services-status"
+
 /**
  * The latest gap (ms) between this device's clock and the server's, from the HTTP `Date`
  * header of every response. The migration commit reads it to tell a proof rejected for a
@@ -14,10 +16,17 @@ const recordServerTime = (dateHeader: string): void => {
   latestClockSkewMs = serverMs - Date.now()
 }
 
-/** Afterware that records the server clock from each response's `Date` header. */
+/**
+ * Afterware that records the server clock from each response's `Date` header, and the
+ * fact that a response arrived at all.
+ *
+ * Reachability rides along here because this is the one place every successful response
+ * passes through. A second link for it would be the same subscription twice.
+ */
 export const createServerTimeLink = (): ApolloLink =>
   new ApolloLink((operation, forward) =>
     forward(operation).map((result) => {
+      recordBlinkServiceResponse()
       const dateHeader = operation.getContext().response?.headers?.get?.("date")
       if (dateHeader) recordServerTime(dateHeader)
       return result

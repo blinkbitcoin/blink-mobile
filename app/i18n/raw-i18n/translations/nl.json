@@ -2354,6 +2354,8 @@
     "invalidAmount": "Hierin staat een ongeldig bedrag. Gelieve opnieuw te genereren met een geldig bedrag.",
     "usernameDoesNotExist": "{lnAddress: string} lijkt geen bestaand {bankName: string}-adres te zijn.",
     "usernameDoesNotExistAdvice": "Zorg ervoor dat de spelling juist is of vraag de ontvanger in plaats daarvan om een LN-factuur of BTC-adres.",
+    "destinationUnverifiable": "We konden {lnAddress} nu niet controleren — de servers van {bankName} reageren niet.",
+    "destinationUnverifiableAdvice": "Het adres klopt waarschijnlijk gewoon. Probeer het zo opnieuw, of vraag de ontvanger om een LN-factuur of BTC-adres.",
     "selfPaymentError": "{lnAddress: string} is uw {bankName: string} adres.",
     "selfPaymentAdvice": "Als u geld wilt overmaken naar een andere rekening waarvan u de eigenaar bent, kunt u in plaats daarvan een factuur-, LN- of BTC-adres gebruiken.",
     "lnAddressError": "We kunnen dit Lightning-adres niet bereiken. Als u zeker weet dat het bestaat, kunt u het later opnieuw proberen.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
       "invalidCharacter": "Adres mag alleen letters, cijfers en onderstrepingstekens bevatten",
       "addressUnavailable": "Sorry, dit adres is al in gebruik",
+      "serverUnreachable": "Kon de adresserver niet bereiken. Je adres is nog vrij — probeer het zo opnieuw.",
       "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink is onbereikbaar",
+    "unreachableDescription": "{featureName} heeft de servers van Blink nodig, die nu niet reageren. Je wallet en tegoed zijn niet geraakt.",
     "featureCircles": "Circles",
     "featureEarn": "Leren",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "{token}-overdracht",
     "payTo": "Betalen aan {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "De wisselkoers is mogelijk verouderd",
+    "satsOnly": "Weergave in sats — geen wisselkoers beschikbaar"
   },
   "SelfCustodialOffline": {
     "title": "Wallet is offline",

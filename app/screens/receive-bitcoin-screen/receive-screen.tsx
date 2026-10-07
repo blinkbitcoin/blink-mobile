@@ -70,7 +70,12 @@ const ReceiveScreen = () => {
     return null
   }
 
-  /** Loader while price conversion bootstraps after an account switch. */
+  /**
+   * Loader while price conversion bootstraps after an account switch. It is never a
+   * permanent state: once every price source has settled empty, the converter falls
+   * back to sats rather than staying undefined, which is what used to leave this
+   * screen spinning on a healthy wallet whose currency nothing could price.
+   */
   if (!convertMoneyAmount) {
     return <LoadingView />
   }

@@ -2354,6 +2354,8 @@
     "invalidAmount": "Ez egy érvénytelen összeget tartalmaz. Kérjük, generáld újra egy érvényes összeggel.",
     "usernameDoesNotExist": "{lnAddress: string} úgy tűnik, hogy nem létező {bankName: string} cím.",
     "usernameDoesNotExistAdvice": "Ellenőrizd, hogy helyesen írtad-e be, vagy kérd meg a címzettet, hogy inkább küldjön LN fizetési kérelmet vagy BTC címet.",
+    "destinationUnverifiable": "Most nem tudtuk ellenőrizni a(z) {lnAddress} címet – a(z) {bankName} szerverei nem válaszolnak.",
+    "destinationUnverifiableAdvice": "A cím valószínűleg rendben van. Próbáld újra egy pillanat múlva, vagy kérj a címzettől LN-számlát vagy BTC-címet.",
     "selfPaymentError": "{lnAddress: string} a te {bankName: string} címed.",
     "selfPaymentAdvice": "Ha pénzt szeretnél küldeni egy másik saját számládra, használj inkább egy LN fizetési kérelmet, vagy BTC címet.",
     "lnAddressError": "Nem érjük el ezt a Lightning címet. Ha biztos vagy benne, hogy létezik, próbáld újra később.",
@@ -2741,6 +2743,7 @@
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
       "invalidCharacter": "A cím csak betűket, számokat és aláhúzásjeleket tartalmazhat",
       "addressUnavailable": "Sajnáljuk, ez a cím már foglalt",
+      "serverUnreachable": "Nem sikerült elérni a címszervert. A címed továbbra is szabad – próbáld újra egy pillanat múlva.",
       "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "A Blink nem érhető el",
+    "unreachableDescription": "A(z) {featureName} a Blink szervereit igényli, amelyek most nem válaszolnak. A tárcádat és az egyenlegedet ez nem érinti.",
     "featureCircles": "Circles",
     "featureEarn": "Tanulás",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "{token} átutalás",
     "payTo": "Fizetés: {address}",
     "payment": "Fizetés"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Az árfolyam elavult lehet",
+    "satsOnly": "Satoshiban megjelenítve – nincs elérhető árfolyam"
   },
   "SelfCustodialOffline": {
     "title": "A pénztárca offline",

@@ -2354,6 +2354,8 @@
     "invalidAmount": "Denne indeholder et ugyldigt beløb. Generer venligst med et gyldigt beløb.",
     "usernameDoesNotExist": "{lnAddress: string} synes ikke at være en {bankName: string} adresse, der eksisterer.",
     "usernameDoesNotExistAdvice": "Sørg enten for, at stavningen er korrekt, eller bed modtageren om en LN faktura eller BTC adresse i stedet.",
+    "destinationUnverifiable": "Vi kunne ikke tjekke {lnAddress} lige nu – {bankName}s servere svarer ikke.",
+    "destinationUnverifiableAdvice": "Adressen er sandsynligvis fin. Prøv igen om lidt, eller bed modtageren om en LN-faktura eller BTC-adresse i stedet.",
     "selfPaymentError": "{lnAddress: string} er din {bankName: string} adresse.",
     "selfPaymentAdvice": "Hvis du vil sende penge til en anden konto, som du ejer, kan du bruge en faktura, LN eller BTC adresse i stedet.",
     "lnAddressError": "Vi kan ikke nå denne Lightning-adresse. Hvis du er sikker på, at den eksisterer, kan du prøve igen senere.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
+      "serverUnreachable": "Kunne ikke nå adresseserveren. Din adresse er stadig ledig – prøv igen om lidt.",
       "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink kan ikke nås",
+    "unreachableDescription": "{featureName} kræver Blinks servere, som ikke svarer lige nu. Din wallet og dine midler er upåvirkede.",
     "featureCircles": "Circles",
     "featureEarn": "Lær",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "{token}-overførsel",
     "payTo": "Betal til {address}",
     "payment": "Betaling"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Vekselkursen er muligvis forældet",
+    "satsOnly": "Viser sats – ingen vekselkurs tilgængelig"
   },
   "SelfCustodialOffline": {
     "title": "Pungen er offline",

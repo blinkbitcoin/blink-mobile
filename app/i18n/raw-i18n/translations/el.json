@@ -2354,6 +2354,8 @@
     "invalidAmount": "Αυτό περιέχει ένα άκυρο ποσό. Παρακαλούμε αναδημιουργήστε το με ένα έγκυρο ποσό.",
     "usernameDoesNotExist": "{lnAddress: string} δεν φαίνεται να υπάρχει αυτή η διεύθυνση {bankName: string}.",
     "usernameDoesNotExistAdvice": "Είτε βεβαιωθείτε ότι η ορθογραφία είναι σωστή είτε ζητήστε από τον παραλήπτη μια διεύθυνση τιμολογίου LN ή μια διεύθυνση BTC.",
+    "destinationUnverifiable": "Δεν μπορέσαμε να ελέγξουμε το {lnAddress} τώρα — οι διακομιστές του {bankName} δεν απαντούν.",
+    "destinationUnverifiableAdvice": "Η διεύθυνση μάλλον είναι σωστή. Δοκιμάστε ξανά σε λίγο ή ζητήστε από τον παραλήπτη τιμολόγιο LN ή διεύθυνση BTC.",
     "selfPaymentError": "{lnAddress: string} είναι η {bankName: string} διεύθυνσή σας.",
     "selfPaymentAdvice": "Αν θέλετε να στείλετε χρήματα σε άλλο λογαριασμό που σας ανήκει, μπορείτε να χρησιμοποιήσετε μια διεύθυνση τιμολογίου, LN ή BTC.",
     "lnAddressError": "Δεν μπορούμε να βρούμε αυτή τη διεύθυνση Lightning. Αν είστε σίγουροι ότι υπάρχει, μπορείτε να προσπαθήσετε ξανά αργότερα.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Η διεύθυνση πρέπει να είναι μέχρι 50 χαρακτήσρες",
       "invalidCharacter": "Η διεύθυνση μπορεί να περιέχει μόνο γράμματα, αριθμούς και κάτω παύλες",
       "addressUnavailable": "Λυπούμαστε, αυτή η διεύθυνση είναι κατειλημμένη ",
+      "serverUnreachable": "Δεν ήταν δυνατή η σύνδεση με τον διακομιστή διευθύνσεων. Η διεύθυνσή σας είναι ακόμη διαθέσιμη — δοκιμάστε ξανά σε λίγο.",
       "unknownError": "Προέκυψε άγνωστο σφάλμα, παρακαλούμε δοκιμάστε ξανά αργότερα ",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Το Blink δεν είναι προσβάσιμο",
+    "unreachableDescription": "Το {featureName} χρειάζεται τους διακομιστές του Blink, που αυτή τη στιγμή δεν απαντούν. Το πορτοφόλι και τα κεφάλαιά σας δεν επηρεάζονται.",
     "featureCircles": "Circles",
     "featureEarn": "Μάθηση",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "Μεταφορά {token}",
     "payTo": "Πληρωμή σε {address}",
     "payment": "Πληρωμή"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Η ισοτιμία μπορεί να μην είναι ενημερωμένη",
+    "satsOnly": "Εμφάνιση σε sats — δεν υπάρχει διαθέσιμη ισοτιμία"
   },
   "SelfCustodialOffline": {
     "title": "Το πορτοφόλι είναι εκτός σύνδεσης",

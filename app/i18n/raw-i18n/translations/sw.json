@@ -2354,6 +2354,8 @@
     "invalidAmount": "Hii ina kiasi batili. Tafadhali toa yenye kiasi halali.",
     "usernameDoesNotExist": "{lnAddress: string} haionekani kuwa anwani ya {bankName: string} ambayo ipo.",
     "usernameDoesNotExistAdvice": "Hakikisha kwamba tahajia ni sahihi ama uliza anayepokea akupee ankara ya LN au anwani ya BTC badala yake.",
+    "destinationUnverifiable": "Hatukuweza kuthibitisha {lnAddress} kwa sasa — seva za {bankName} hazijibu.",
+    "destinationUnverifiableAdvice": "Anwani huenda iko sawa kabisa. Jaribu tena baada ya muda mfupi, au mwombe mpokeaji ankara ya LN au anwani ya BTC.",
     "selfPaymentError": "{lnAddress: string} ni anwani yako ya {bankName: string}",
     "selfPaymentAdvice": "Ikiwa unataka kutuma pesa kwa akaunti yako nyingine, unaweza kutumia ankara ya malipo, LN au anwani ya BTC badala yake.",
     "lnAddressError": "Hatuwezi kupata anwani hii ya Lightning. Ikiwa una uhakika iko, unaweza jaribu tena baadaye.",
@@ -2741,6 +2743,7 @@
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
       "invalidCharacter": "Anwani inaweza kuwa na herufi, nambari, na alama ya chini pekee",
       "addressUnavailable": "Samahani, anwani hii tayari imetumika",
+      "serverUnreachable": "Haikuweza kufikia seva ya anwani. Anwani yako bado iko wazi — jaribu tena baada ya muda mfupi.",
       "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -4026,6 +4029,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink haifikiki",
+    "unreachableDescription": "{featureName} inahitaji seva za Blink, ambazo hazijibu kwa sasa. Pochi yako na fedha zako haziathiriwi.",
     "featureCircles": "Circles",
     "featureEarn": "Jifunze",
     "featureCard": "Card"
@@ -4048,6 +4053,10 @@
     "tokenTransfer": "Uhamisho wa {token}",
     "payTo": "Lipa kwa {address}",
     "payment": "Malipo"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Kiwango cha ubadilishaji huenda kimepitwa na wakati",
+    "satsOnly": "Inaonyesha sats — hakuna kiwango cha ubadilishaji"
   },
   "SelfCustodialOffline": {
     "title": "Pochi iko nje ya mtandao",

@@ -298,11 +298,12 @@ describe("ProfileRow", () => {
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(
-      TEST_ENTRY_ID,
-      mockSparkNetwork.Mainnet,
-      5,
-    )
+    expect(mockProbeWallets).toHaveBeenCalledWith({
+      accountId: TEST_ENTRY_ID,
+      network: mockSparkNetwork.Mainnet,
+      leewaySatPerVbyte: 5,
+      lnurlDomain: "blink.sv",
+    })
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 
