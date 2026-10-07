@@ -216,3 +216,21 @@ export const clearPendingProvisionedAccount = async (
   const { [custodialAccountId]: cleared, ...rest } = existing
   await saveJson(storageKey, rest)
 }
+
+/**
+ * Clears by provisioned wallet rather than by owner, for the one caller that holds the
+ * wallet id without the owner it was filed under: once the session is self-custodial the
+ * custodial `me` query is skipped, so the owner id is unreachable. Every owner pointing at
+ * the wallet is dropped, so a record duplicated across owners cannot leave half of it
+ * behind.
+ */
+export const clearPendingProvisionedWallet = async (
+  storageKey: string,
+  accountId: string,
+): Promise<void> => {
+  const existing = await loadPendingProvisionedAccounts(storageKey)
+  const remaining = Object.fromEntries(
+    Object.entries(existing).filter(([, walletId]) => walletId !== accountId),
+  )
+  await saveJson(storageKey, remaining)
+}

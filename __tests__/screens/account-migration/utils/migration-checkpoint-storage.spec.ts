@@ -11,6 +11,7 @@ import {
   loadPendingProvisionedAccounts,
   savePendingProvisionedAccount,
   clearPendingProvisionedAccount,
+  clearPendingProvisionedWallet,
   validateStoredCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 
@@ -613,6 +614,38 @@ describe("migration-checkpoint-storage", () => {
       await clearPendingProvisionedAccount("pending-key", "custodial-1")
 
       expect(mockSaveJson).toHaveBeenCalledWith("pending-key", { "custodial-2": "sc-2" })
+    })
+
+    /** The caller that heals a settled wallet holds its id, never the owner it was filed
+     *  under: a self-custodial session cannot ask the custodial API who that is. */
+    it("clears by wallet id, leaving every other owner's wallet in place", async () => {
+      mockLoadJson.mockResolvedValue({ "custodial-1": "sc-1", "custodial-2": "sc-2" })
+
+      await clearPendingProvisionedWallet("pending-key", "sc-1")
+
+      expect(mockSaveJson).toHaveBeenCalledWith("pending-key", { "custodial-2": "sc-2" })
+    })
+
+    /** A record duplicated across owners must not leave half of itself behind, or the
+     *  surviving half would keep a settled wallet undeletable. */
+    it("clears every owner pointing at the same wallet", async () => {
+      mockLoadJson.mockResolvedValue({
+        "custodial-1": "sc-1",
+        "custodial-2": "sc-1",
+        "custodial-3": "sc-3",
+      })
+
+      await clearPendingProvisionedWallet("pending-key", "sc-1")
+
+      expect(mockSaveJson).toHaveBeenCalledWith("pending-key", { "custodial-3": "sc-3" })
+    })
+
+    it("writes the map back unchanged when no owner points at the wallet", async () => {
+      mockLoadJson.mockResolvedValue({ "custodial-1": "sc-1" })
+
+      await clearPendingProvisionedWallet("pending-key", "sc-unknown")
+
+      expect(mockSaveJson).toHaveBeenCalledWith("pending-key", { "custodial-1": "sc-1" })
     })
   })
 })
