@@ -19,7 +19,7 @@ export type AmountInputScreenUIProps = {
   secondaryCurrencyCode?: string
   errorMessage?: string
   setAmountDisabled?: boolean
-  onKeyPress: (key: Key) => void
+  onKeyPress: (key: Key) => boolean
   onPaste: (keys: number) => void
   onToggleCurrency?: () => void
   onClearAmount: () => void

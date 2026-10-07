@@ -122,6 +122,17 @@ export const getDisabledKeys = ({
   return keys
 }
 
+/**
+ * Whether a key press would change the amount. The reducer hands back the very same
+ * state object for a key it refuses (a third decimal digit), which is what lets a
+ * refused press stay silent instead of feeling like an accepted one.
+ */
+export const isKeyAccepted = (state: NumberPadReducerState, key: Key): boolean =>
+  numberPadReducer(state, {
+    action: NumberPadReducerActionType.HandleKeyPress,
+    payload: { key },
+  }) !== state
+
 export const numberPadReducer = (
   state: NumberPadReducerState,
   action: NumberPadReducerAction,
