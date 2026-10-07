@@ -41,7 +41,24 @@ jest.mock("@app/self-custodial/bridge", () => ({
 
 const mockStorageDirFor = jest.fn((id: string, _network: unknown) => `/tmp/${id}`)
 jest.mock("@app/self-custodial/config", () => ({
+  ...jest.requireActual("@app/self-custodial/config"),
   storageDirFor: (id: string, network: unknown) => mockStorageDirFor(id, network),
+}))
+
+const mockLoadPendingProvisionedAccounts = jest.fn()
+jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", () => ({
+  ...jest.requireActual(
+    "@app/screens/account-migration/utils/migration-checkpoint-storage",
+  ),
+  loadPendingProvisionedAccounts: (...args: unknown[]) =>
+    mockLoadPendingProvisionedAccounts(...args),
+}))
+
+let mockInstanceId = "Staging"
+jest.mock("@app/hooks/use-app-config", () => ({
+  useAppConfig: () => ({
+    appConfig: { galoyInstance: { id: mockInstanceId, name: "Main" } },
+  }),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -109,6 +126,8 @@ describe("useDeleteAccount", () => {
     mockRemoveSelfCustodialAccountId.mockResolvedValue(undefined)
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
+    mockLoadPendingProvisionedAccounts.mockResolvedValue({})
+    mockInstanceId = "Staging"
   })
 
   it("starts in idle state with no error", () => {
@@ -315,5 +334,115 @@ describe("useDeleteAccount", () => {
     const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
 
     expect(setActiveOrder).toBeLessThan(disconnectOrder)
+  })
+
+  describe("migration destination guard", () => {
+    beforeEach(() => {
+      mockNetwork = mockSparkNetwork.Mainnet
+      mockInstanceId = "Staging"
+    })
+
+    /**
+     * The last line of defense: the delete controls consult the guard before offering
+     * themselves, and this is the same question asked where the key is actually destroyed,
+     * so a surface that forgets the guard still cannot take it.
+     */
+    it("destroys nothing and returns 'blocked' for a wallet a migration still owes funds", async () => {
+      mockLoadPendingProvisionedAccounts.mockResolvedValue({
+        "custodial-1": TEST_SC_ACCOUNT_ID,
+      })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("blocked")
+      expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+      expect(mockUnlink).not.toHaveBeenCalled()
+      expect(mockRemoveSelfCustodialAccountId).not.toHaveBeenCalled()
+      expect(mockRemoveBackupStateFor).not.toHaveBeenCalled()
+      expect(mockDisconnectSdk).not.toHaveBeenCalled()
+      expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+      /** No spinner either: nothing was ever started. */
+      expect(result.current.state).toBe("idle")
+    })
+
+    it("reads the record fresh on every attempt rather than trusting render-time state", async () => {
+      mockLoadPendingProvisionedAccounts.mockResolvedValue({
+        "custodial-1": TEST_SC_ACCOUNT_ID,
+      })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      await act(async () => {
+        await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      /** The migration finished between the two attempts, so the second one proceeds. */
+      mockLoadPendingProvisionedAccounts.mockResolvedValue({})
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+      expect(mockLoadPendingProvisionedAccounts).toHaveBeenCalledTimes(2)
+    })
+
+    it("deletes another owner's wallet, which this migration never marked", async () => {
+      mockLoadPendingProvisionedAccounts.mockResolvedValue({
+        "custodial-1": "some-other-pending-wallet",
+      })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    })
+
+    it("skips the check on the Local instance, where a half-finished migration must stay cleanable", async () => {
+      mockInstanceId = "Local"
+      mockLoadPendingProvisionedAccounts.mockResolvedValue({
+        "custodial-1": TEST_SC_ACCOUNT_ID,
+      })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+      expect(mockLoadPendingProvisionedAccounts).not.toHaveBeenCalled()
+    })
+
+    /**
+     * Staging runs on the regtest network like Local, so the refusal may not key off the
+     * network: Staging is where this flow is device-tested.
+     */
+    it("refuses on Staging even though it runs on the regtest network", async () => {
+      mockInstanceId = "Staging"
+      mockNetwork = mockSparkNetwork.Regtest
+      mockLoadPendingProvisionedAccounts.mockResolvedValue({
+        "custodial-1": TEST_SC_ACCOUNT_ID,
+      })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("blocked")
+      expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+    })
   })
 })

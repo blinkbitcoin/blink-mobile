@@ -18,6 +18,10 @@ export const navigateAfterAccountDelete = (
         CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
       )
       return
+    /** Nothing was deleted, so there is nowhere to go: the user stays where they are, on a
+     *  screen whose own copy already says why the wallet cannot be removed yet. */
+    case "blocked":
+      return
     case "logged-out":
       navigation.dispatch(
         CommonActions.reset({ index: 0, routes: [{ name: "getStarted" }] }),

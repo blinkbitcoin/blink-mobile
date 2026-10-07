@@ -3,8 +3,14 @@ import { useCallback, useState } from "react"
 import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
 
+import { isLocalInstance } from "@app/config/galoy-instances"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
+import {
+  getPendingAccountsStorageKey,
+  loadPendingProvisionedAccounts,
+} from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
@@ -23,6 +29,9 @@ export type DeleteAccountOutcome =
   | "switched-to-self-custodial"
   | "switched-to-custodial"
   | "logged-out"
+  /** Nothing was touched: a migration still owes this wallet its funds, and the key that
+   *  reaches them is the thing deletion destroys. */
+  | "blocked"
 
 type DeleteAccountResult = {
   state: DeleteState
@@ -40,9 +49,36 @@ export const useDeleteAccount = (): DeleteAccountResult => {
   const [state, setState] = useState<DeleteState>("idle")
   const [error, setError] = useState<Error | null>(null)
   const network = useSparkNetwork()
+  const {
+    appConfig: {
+      galoyInstance: { id: instanceId, name: environment },
+    },
+  } = useAppConfig()
 
   const deleteWallet = useCallback(
     async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
+      /**
+       * The policy lives in useMigrationDeletionGuard, which every delete control consults
+       * before offering itself; this is the same question asked where the destruction
+       * actually happens, so a surface that forgets the guard still cannot take the key to
+       * funds in flight. Read fresh rather than from React state: the answer must be the
+       * one true at this instant.
+       *
+       * An unreadable record reads as absent here, as it does for every other reader of it
+       * (AsyncStorage failures are indistinguishable from a missing key), so this backs the
+       * guard up rather than replacing it.
+       *
+       * Exempt on the Local instance only, matching the guard: Staging is where the flow is
+       * tested, so the refusal has to be real there.
+       */
+      if (!isLocalInstance(instanceId)) {
+        const pendingByOwner = await loadPendingProvisionedAccounts(
+          getPendingAccountsStorageKey(environment),
+        )
+        const isAwaitingMigrationFunds = Object.values(pendingByOwner).includes(accountId)
+        if (isAwaitingMigrationFunds) return "blocked"
+      }
+
       setState("deleting")
       setError(null)
       try {
@@ -111,6 +147,8 @@ export const useDeleteAccount = (): DeleteAccountResult => {
       updateState,
       hasCustodialAccount,
       network,
+      environment,
+      instanceId,
     ],
   )
 
