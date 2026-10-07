@@ -4108,6 +4108,7 @@
         "dangerZoneBulletPermanent": "La eliminación de la cuenta es permanente",
         "dangerZoneBulletEmpty": "Asegúrate de que la cuenta esté vacía",
         "dangerZoneDeleteButton": "Eliminar cuenta y datos",
+        "dangerZoneMigrationPendingNotice": "No puedes eliminar esta billetera mientras los fondos migrados aún están en camino.",
         "confirmModalTitle": "Confirmar eliminación de cuenta",
         "confirmModalTypeToConfirm": "Escribe \"{delete: string}\" para confirmar",
         "hasFundsWarningTitle": "Advertencia",

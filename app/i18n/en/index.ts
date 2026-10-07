@@ -4316,6 +4316,8 @@ const en: BaseTranslation = {
     dangerZoneBulletPermanent: "Account deletion is permanent",
     dangerZoneBulletEmpty: "Make sure account is empty",
     dangerZoneDeleteButton: "Delete account and data",
+    dangerZoneMigrationPendingNotice:
+      "You can't delete this wallet while the migrated funds are still on their way.",
     confirmModalTitle: "Confirm account removal",
     confirmModalTypeToConfirm: 'Type "{delete: string}" to confirm',
     hasFundsWarningTitle: "Warning",

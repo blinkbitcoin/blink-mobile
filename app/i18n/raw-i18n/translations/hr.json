@@ -4108,6 +4108,7 @@
     "dangerZoneBulletPermanent": "Brisanje računa je trajno",
     "dangerZoneBulletEmpty": "Provjerite je li račun prazan",
     "dangerZoneDeleteButton": "Izbriši račun i podatke",
+    "dangerZoneMigrationPendingNotice": "Ovaj novčanik ne možete izbrisati dok su migrirana sredstva još na putu.",
     "confirmModalTitle": "Potvrdi brisanje računa",
     "confirmModalTypeToConfirm": "Upišite \"{delete: string}\" za potvrdu",
     "hasFundsWarningTitle": "Upozorenje",

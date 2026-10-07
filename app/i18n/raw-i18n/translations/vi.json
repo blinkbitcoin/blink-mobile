@@ -4108,6 +4108,7 @@
     "dangerZoneBulletPermanent": "Xóa tài khoản là vĩnh viễn",
     "dangerZoneBulletEmpty": "Đảm bảo tài khoản trống",
     "dangerZoneDeleteButton": "Xóa tài khoản và dữ liệu",
+    "dangerZoneMigrationPendingNotice": "Bạn không thể xóa ví này khi số tiền được chuyển vẫn đang trên đường về.",
     "confirmModalTitle": "Xác nhận xóa tài khoản",
     "confirmModalTypeToConfirm": "Nhập \"{delete: string}\" để xác nhận",
     "hasFundsWarningTitle": "Cảnh báo",

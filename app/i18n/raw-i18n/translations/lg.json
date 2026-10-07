@@ -4108,6 +4108,7 @@
     "dangerZoneBulletPermanent": "Okusangulawo akawunti kya lubeerera",
     "dangerZoneBulletEmpty": "Kakasa nti akawunti nkalu",
     "dangerZoneDeleteButton": "Sangulawo akawunti n'ebigamuli",
+    "dangerZoneMigrationPendingNotice": "Tosobola kusangulawo akawunti eno nga ssente ezijja ziri ku kkubo.",
     "confirmModalTitle": "Kakasa okusangulawo akawunti",
     "confirmModalTypeToConfirm": "Wandika \"{delete: string}\" okukakasa",
     "hasFundsWarningTitle": "Okulabula",
