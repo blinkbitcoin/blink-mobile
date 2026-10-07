@@ -49,7 +49,17 @@ jest.mock("@app/store/persistent-state", () => ({
  *  that read answers with are stood in for. */
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
+  StoredWalletPresence: { Present: "present", Absent: "absent", Unknown: "unknown" },
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+  /** Mirrors the real mapping over the stubbed read above, so these tests keep driving the
+   *  cold start from the index they already describe. The mapping itself, and the "could
+   *  not tell" answer this screen leans the opposite way on, are covered in the
+   *  account-index spec. */
+  readStoredWalletPresence: async () => {
+    const wallets = await mockListSelfCustodialAccounts()
+    if (wallets.status === "read-failed") return "unknown"
+    return wallets.entries.length > 0 ? "present" : "absent"
+  },
 }))
 
 /**

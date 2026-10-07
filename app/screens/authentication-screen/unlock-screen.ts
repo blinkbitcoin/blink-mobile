@@ -13,8 +13,8 @@ import { useAuthenticationContext } from "@app/navigation/navigation-container-w
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { UnlockRouteName } from "@app/navigation/unlock-routes"
 import {
-  listSelfCustodialAccounts,
-  StorageReadStatus,
+  readStoredWalletPresence,
+  StoredWalletPresence,
 } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 
@@ -31,13 +31,13 @@ export type ColdStartRoute = "Primary" | "getStarted"
  * they just answered, and on the landing screen when it stores none.
  *
  * An index that cannot be read lands on the landing screen, where a launch with no session
- * always started before the gate was in front of it.
+ * always started before the gate was in front of it. That is the opposite of the bias a
+ * logout applies to the same unreadable answer, where the lock stays; both read through the
+ * same shared presence call so the two cannot drift.
  */
 const readSessionlessColdStartRoute = async (): Promise<ColdStartRoute> => {
-  const wallets = await listSelfCustodialAccounts()
-  const hasStoredWallet =
-    wallets.status === StorageReadStatus.Ok && wallets.entries.length > 0
-  return hasStoredWallet ? "Primary" : "getStarted"
+  const presence = await readStoredWalletPresence()
+  return presence === StoredWalletPresence.Present ? "Primary" : "getStarted"
 }
 
 /**

@@ -52,6 +52,14 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   ...jest.requireActual("@app/self-custodial/storage/account-index"),
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
+  /** Mirrors the real mapping over the stubbed read above: the presence call reads the
+   *  index through the module itself, so overriding the exported read alone would not
+   *  reach it. The mapping is covered in the account-index spec. */
+  readStoredWalletPresence: async () => {
+    const wallets = await mockListSelfCustodialAccounts()
+    if (wallets.status === "read-failed") return "unknown"
+    return wallets.entries.length > 0 ? "present" : "absent"
+  },
 }))
 
 const storedWallets = (ids: ReadonlyArray<string>) => ({
