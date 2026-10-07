@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
   },
   "SettingsScreen": {
-    "createAddress": "Направи адресу",
+    "createAddress": "Направи Lightning адресу",
     "addressDisabled": "(онемогућено)",
     "donationButton": "Дугме за донирање",
     "btcpayServer": "BTCPay Server",

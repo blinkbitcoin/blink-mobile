@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nie je možné odhadnúť poplatky. Skúste inú sumu."
   },
   "SettingsScreen": {
-    "createAddress": "Vytvoriť adresu",
+    "createAddress": "Vytvoriť Lightning adresu",
     "addressDisabled": "(zakázané)",
     "donationButton": "Darovacie tlačidlo",
     "btcpayServer": "BTCPay Server",

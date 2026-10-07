@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
-    "createAddress": "Cím létrehozása",
+    "createAddress": "Lightning cím létrehozása",
     "addressDisabled": "(letiltva)",
     "donationButton": "Adományozás gomb",
     "btcpayServer": "BTCPay Server",
