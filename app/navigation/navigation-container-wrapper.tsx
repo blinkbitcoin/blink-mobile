@@ -87,9 +87,8 @@ const isResetWarranted = (
 /** Why the stack is being judged. The triggers differ on WHETHER a reset is owed, not on
  *  where one lands: arming owns both of the jobs above, while a retry exists only to finish
  *  the pop an unlock stood in front of, so it must not reset a session it finds already at
- *  the blocker on the strength of a lock its own flow never lowered (the three-strikes
- *  logout resets the stack without unlocking). Where a reset that IS owed lands is the
- *  lock's call and no trigger's: see mustRouteThroughUnlock below. */
+ *  the blocker on the strength of a lock its own flow never lowered. Where a reset that IS
+ *  owed lands is the lock's call and no trigger's: see mustRouteThroughUnlock below. */
 type ResetTrigger = "gate-armed" | "unlock-cleared"
 
 export type AuthenticationContextType = {
@@ -177,9 +176,11 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     const isArming = trigger === "gate-armed"
 
     /** Resetting a stack with nothing above the blocker, purely to route a locked session
-     *  through the unlock, is arming's job alone. A retry doing it would bounce the
-     *  three-strikes logout, which resets to the blocker itself without ever unlocking,
-     *  back onto a PIN its own flow never owed.
+     *  through the unlock, is arming's job alone. A retry doing it would bounce a session
+     *  that reached the blocker with the lock still up onto a PIN its own flow never owed.
+     *  Nothing reaches it that way while every way out of a lock screen either lowers the
+     *  lock or goes back to the gate (see useReturnToGate), and this is what keeps a retry
+     *  harmless for one that does not.
      *
      *  Judged before the unlock is: a reset that would achieve nothing has nothing to come
      *  back for either, so it must not leave a retry armed behind it. */

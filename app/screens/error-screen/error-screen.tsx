@@ -10,6 +10,7 @@ import { Screen } from "@app/components/screen"
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { isIos } from "@app/utils/helper"
 import { recordAppError } from "@app/utils/error-reporting"
 import { makeStyles, Text } from "@rn-vui/themed"
@@ -25,6 +26,7 @@ export const ErrorScreen = ({
 }) => {
   const [isContactModalVisible, setIsContactModalVisible] = React.useState(false)
   const { logout } = useLogout()
+  const { setAppLocked, setAppUnlocked } = useAuthenticationContext()
   const { LL } = useI18nContext()
   const { appConfig } = useAppConfig()
   const { name: bankName } = appConfig.galoyInstance
@@ -33,7 +35,25 @@ export const ErrorScreen = ({
   useEffect(() => recordAppError(error, { alwaysRecord: true }), [error])
 
   const resetApp = async () => {
-    await logout()
+    const { isAppLockKept } = await logout()
+
+    /**
+     * The flag only, because this boundary sits outside the navigator: there is nothing to
+     * navigate while the fallback is up, and the reset below is what brings the stack back.
+     *
+     * That reset is also the other half of raising a lock. Clearing the boundary remounts
+     * the root stack, which initialises at its own `authenticationCheck` entry (the
+     * container keeps no state to restore it to anything else), so the gate is what the
+     * user meets. The flag is what defers an incoming deep link until that gate is
+     * answered, exactly as the resume relock pairs the two.
+     *
+     * Both directions are set, never just the one. The flag starts raised, so a crash
+     * before the first unlock would otherwise leave it up after the lock itself was erased,
+     * with no lock screen left that could lower it.
+     */
+    const matchLockFlagToLock = isAppLockKept ? setAppLocked : setAppUnlocked
+    matchLockFlagToLock()
+
     resetError()
   }
 

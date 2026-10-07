@@ -5,10 +5,8 @@ import useLogout from "@app/hooks/use-logout"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useReturnToGate } from "@app/hooks/use-return-to-gate"
 import { toastShow } from "@app/utils/toast"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
   SwitchProfileOutcome,
   useSwitchToNextProfile,
@@ -18,7 +16,11 @@ import { NetworkErrorCode } from "./error-code"
 import { useNetworkError } from "./network-error-context"
 
 export const NetworkErrorComponent: React.FC = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  /** A session the backend no longer accepts ends here whatever screen is up, the lock
+   *  screen included, and the logout keeps the lock for as long as the device still stores
+   *  something it guards. So it leaves for the gate, never straight for the landing screen:
+   *  the gate hands a device with nothing left to unlock to the landing screen itself. */
+  const returnToGate = useReturnToGate()
 
   const { networkError, clearNetworkError, token: networkErrorToken } = useNetworkError()
   const { LL } = useI18nContext()
@@ -50,10 +52,7 @@ export const NetworkErrorComponent: React.FC = () => {
         // arriving mid-switch lands here, and erasing on it would take the
         // account the user is switching to.
         await logout({ preserveStoredCredentials: true })
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "getStarted" }],
-        })
+        returnToGate()
         return
       }
 
@@ -86,10 +85,7 @@ export const NetworkErrorComponent: React.FC = () => {
             text: LL.common.ok(),
             onPress: () => {
               setShowedAlert(false)
-              navigation.reset({
-                index: 0,
-                routes: [{ name: "getStarted" }],
-              })
+              returnToGate()
             },
           },
         ])
@@ -100,10 +96,7 @@ export const NetworkErrorComponent: React.FC = () => {
       // mid-teardown, so the saved list stays rather than being erased on a
       // guess. A stale entry costs one failed switch; erasing costs sessions.
       await logout({ preserveStoredCredentials: true })
-      navigation.reset({
-        index: 0,
-        routes: [{ name: "getStarted" }],
-      })
+      returnToGate()
     } finally {
       resetSyncFlag()
     }
@@ -112,7 +105,7 @@ export const NetworkErrorComponent: React.FC = () => {
     isSelfCustodialActive,
     logout,
     LL,
-    navigation,
+    returnToGate,
     networkErrorToken,
     showedAlert,
     switchToNextProfile,

@@ -15,6 +15,7 @@ import { usePinAttempts } from "./use-pin-attempts"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
+import { useReturnToGate } from "../../hooks/use-return-to-gate"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
@@ -48,6 +49,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  lock — the back-press swallow is isResume-gated and completeUnlock is only invoked
    *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
+  const returnToGate = useReturnToGate()
   const { LL } = useI18nContext()
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
@@ -106,6 +108,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       setEnteredPIN("")
       setFarewellText(message)
       try {
+        /** Everything the session held goes: the token and the saved profiles.
+         *  Whether the lock goes with it is the logout's own call, made on what
+         *  the device still stores: it stays, spent budget included, for as
+         *  long as a wallet is left here for it to guard, so the next round
+         *  does not open on a fresh three guesses against it. */
         await logout()
         await sleep(1000)
       } catch {
@@ -115,14 +122,15 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         /** In a finally so a rejected logout cannot strand the screen. A
          *  challenge caller is already marked resolved by the removal this
          *  reset performs, so a screen that never left would leave it waiting
-         *  on a callback that can no longer fire. */
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Primary" }],
-        })
+         *  on a callback that can no longer fire.
+         *
+         *  To the gate rather than past it: the PIN can outlive this logout, so
+         *  whether the device is still locked is a question to ask, not one to
+         *  answer here. */
+        returnToGate()
       }
     },
-    [logout, navigation],
+    [logout, returnToGate],
   )
 
   /** The challenge's success answer: tell the caller before leaving, and mark it
@@ -150,10 +158,10 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         resolveChallenge()
         return
       }
-      completeUnlock(() =>
+      completeUnlock((coldStartRoute) =>
         navigation.reset({
           index: 0,
-          routes: [{ name: "Primary" }],
+          routes: [{ name: coldStartRoute }],
         }),
       )
     },
@@ -237,9 +245,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  The `disabled` prop is the whole guard here, unlike on the keypad, which
    *  additionally asks the in-flight guard at press time because its `disabled`
    *  had an observed bypass — a backspace from a render predating the
-   *  verification in flight. Nothing derives this from a stale render: it is this render's own
-   *  state, so a second check inside the handler would be a branch nothing can
-   *  reach. */
+   *  verification in flight. Nothing derives this from a stale render: it is
+   *  this render's own state, so a second check inside the handler would be a
+   *  branch nothing can reach. */
   const isTearingDown = Boolean(farewellText)
 
   const circleComponentForDigit = (digit: number) => {

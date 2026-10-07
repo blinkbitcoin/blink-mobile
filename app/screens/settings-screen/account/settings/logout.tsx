@@ -1,21 +1,21 @@
+/** Needed despite the automatic JSX runtime: the Jest tsconfig compiles JSX the classic
+ *  way, so a file reached by a spec has to have React in scope or it fails to build. */
+import React from "react"
 import { Alert } from "react-native"
 
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsButton } from "../../button"
 import { useLoginMethods } from "../login-methods-hook"
 
 export const LogOut = () => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
   const { phone, bothEmailAndPhoneVerified, email, emailVerified } = useLoginMethods()
   const { LL } = useI18nContext()
 
   const { logout } = useLogout()
+  const { routeAfterLogout } = useLogoutAndRoute()
 
   const logoutAlert = () => {
     const logAlertContent = () => {
@@ -45,15 +45,21 @@ export const LogOut = () => {
   }
 
   const logoutAction = async () => {
-    await logout()
-    navigation.reset({
-      index: 0,
-      routes: [{ name: "getStarted" }],
-    })
+    const { isAppLockKept } = await logout()
+
+    /**
+     * The farewell is acknowledged before the route is taken, not after. The route can now
+     * be the gate, which raises a biometric prompt the moment it opens, and an alert left
+     * to fire over that prompt covers the only thing the user can answer.
+     *
+     * Which way out it is stays the logout's to decide: a lock kept because the device
+     * still stores a wallet is owed an answer, so it returns through the gate rather than
+     * landing on the screen that can open that wallet again.
+     */
     Alert.alert(LL.common.loggedOut(), "", [
       {
         text: LL.common.ok(),
-        onPress: () => {},
+        onPress: () => routeAfterLogout(isAppLockKept),
       },
     ])
   }
