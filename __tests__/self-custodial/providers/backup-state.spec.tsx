@@ -624,6 +624,144 @@ describe("BackupStateProvider", () => {
     })
   })
 
+  describe("isCloudSeedBackupCompleted (reads history, not last-wins method)", () => {
+    /** `method` is last-wins, so a gate keyed on it reads a later manual or
+     *  keychain backup as "never backed up to the cloud" and silently closes
+     *  on a cloud seed that is still there. The app's own security-score card
+     *  invites exactly that second backup, so the sequence is routine. */
+    it("stays true when a manual backup follows the cloud one", () => {
+      const state = {
+        status: BackupStatus.Completed,
+        method: BackupMethod.Manual,
+        completedMethods: [BackupMethod.Cloud, BackupMethod.Manual],
+      }
+
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+    })
+
+    it("stays true when a keychain backup follows the cloud one", () => {
+      const state = {
+        status: BackupStatus.Completed,
+        method: BackupMethod.Keychain,
+        completedMethods: [BackupMethod.Cloud, BackupMethod.Keychain],
+      }
+
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+    })
+
+    it("is true for a cloud-only history", () => {
+      const state = {
+        status: BackupStatus.Completed,
+        method: BackupMethod.Cloud,
+        completedMethods: [BackupMethod.Cloud],
+      }
+
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+    })
+
+    it("is false when the user has never backed up to the cloud", () => {
+      const state = {
+        status: BackupStatus.Completed,
+        method: BackupMethod.Manual,
+        completedMethods: [BackupMethod.Manual, BackupMethod.Keychain],
+      }
+
+      expect(isCloudSeedBackupCompleted(state)).toBe(false)
+    })
+
+    it("is false for a null state", () => {
+      expect(isCloudSeedBackupCompleted(null)).toBe(false)
+    })
+
+    /** resetBackupState persists the default state, which carries no
+     *  completedMethods - so a reset must close the gate rather than let the
+     *  pre-reset history leak through. */
+    it("is false after a reset, despite an earlier cloud backup", () => {
+      expect(
+        isCloudSeedBackupCompleted({ status: BackupStatus.None, method: null }),
+      ).toBe(false)
+    })
+
+    /** completedMethodsOf doubles as the migration for records written before
+     *  completedMethods existed; the gate must keep honouring them. */
+    it("is true for a legacy completed cloud state with no completedMethods", () => {
+      expect(
+        isCloudSeedBackupCompleted({
+          status: BackupStatus.Completed,
+          method: BackupMethod.Cloud,
+        }),
+      ).toBe(true)
+    })
+
+    /** completedMethods comes back from storage unvalidated, so a shape the
+     *  provider never writes must not open a security gate. */
+    it("is false when a non-completed state carries a cloud entry in completedMethods", () => {
+      expect(
+        isCloudSeedBackupCompleted({
+          status: BackupStatus.Pending,
+          method: BackupMethod.Cloud,
+          completedMethods: [BackupMethod.Cloud],
+        }),
+      ).toBe(false)
+    })
+
+    it("is false for a legacy pending state whose method is cloud", () => {
+      expect(
+        isCloudSeedBackupCompleted({
+          status: BackupStatus.Pending,
+          method: BackupMethod.Cloud,
+        }),
+      ).toBe(false)
+    })
+  })
+
+  describe("D9 gate across a later non-cloud backup", () => {
+    it("stays open when a manual backup follows a password-protected cloud one", () => {
+      const state = {
+        status: BackupStatus.Completed,
+        method: BackupMethod.Manual,
+        completedMethods: [BackupMethod.Cloud, BackupMethod.Manual],
+        cloudPasswordProtected: true,
+      }
+
+      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(true)
+    })
+
+    /** Widening the completion check must not widen the password check: a
+     *  cloud backup redone without a password writes the flag false, and that
+     *  explicit false has to keep the bundle out of the cloud. */
+    it("closes when the cloud backup is redone without a password", () => {
+      const state = {
+        status: BackupStatus.Completed,
+        method: BackupMethod.Cloud,
+        completedMethods: [BackupMethod.Cloud, BackupMethod.Manual],
+        cloudPasswordProtected: false,
+      }
+
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
+    })
+
+    it("survives the real sequence: password-protected cloud backup, then manual", async () => {
+      let persisted: string | null = null
+      mockSetItem.mockImplementation(async (_key: string, value: string) => {
+        persisted = value
+      })
+      mockGetItem.mockImplementation(async () => persisted)
+
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud, {
+        cloudPasswordProtected: true,
+      })
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Manual)
+
+      const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
+      expect(state?.method).toBe(BackupMethod.Manual)
+      expect(completedMethodsOf(state)).toEqual([BackupMethod.Cloud, BackupMethod.Manual])
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
+      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(true)
+    })
+  })
+
   describe("removeBackupStateFor", () => {
     it("removes the persisted backup state for the given accountId", async () => {
       await removeBackupStateFor(TEST_SC_ACCOUNT_ID)

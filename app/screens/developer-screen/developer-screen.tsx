@@ -19,6 +19,7 @@ import { activateBeta } from "@app/graphql/client-only-query"
 import { useBetaQuery, useDebugScreenQuery, useLevelQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { cancelPendingClipboardClear } from "@app/hooks/use-clipboard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
@@ -386,6 +387,7 @@ export const DeveloperScreen: React.FC = () => {
               title="Copy access token"
               containerStyle={styles.button}
               onPress={async () => {
+                cancelPendingClipboardClear()
                 Clipboard.setString(newToken || "")
                 Alert.alert("Token copied in clipboard.")
               }}

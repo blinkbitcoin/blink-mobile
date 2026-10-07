@@ -135,9 +135,19 @@ export const readBackupStateFor = async (
  * Single definition of "the seed is backed up to the cloud" - the gate the
  * recovery-bundle cloud sync follows. Screen, refresh hook, and refresh core
  * all use this so they cannot diverge on it.
+ *
+ * Reads completedMethods rather than method: method is last-wins, so a manual
+ * or keychain backup run after a cloud one would otherwise read as "never
+ * backed up to the cloud" and close the gate on a cloud seed that is still
+ * sitting there, silently stopping the bundle sync the user opted into.
  */
-export const isCloudSeedBackupCompleted = (state: BackupState | null): boolean =>
-  state?.status === BackupStatus.Completed && state.method === BackupMethod.Cloud
+export const isCloudSeedBackupCompleted = (state: BackupState | null): boolean => {
+  /** completedMethods is returned as stored, so status is checked here rather
+   *  than relying on it: readBackupState does not validate the persisted shape,
+   *  and this gate must fail closed on anything it did not write itself. */
+  const isBackupCompleted = state?.status === BackupStatus.Completed
+  return isBackupCompleted && completedMethodsOf(state).includes(BackupMethod.Cloud)
+}
 
 /**
  * The gate for storing the seed-encrypted bundle in the cloud: the bundle must
