@@ -2454,6 +2454,7 @@
     "activated": "Geactiveerd",
     "addressScreen": "Manieren om betaald te krijgen",
     "nonCustodialAccount": "Niet-bewaarde rekening",
+    "custodialAccount": "Bewaarde rekening",
     "tapUserName": "Click om gebruikersnaam in te stellen",
     "notifications": "Meldingen",
     "title": "Instellingen",

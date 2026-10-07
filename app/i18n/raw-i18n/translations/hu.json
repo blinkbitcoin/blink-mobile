@@ -2454,6 +2454,7 @@
     "activated": "Aktiválva",
     "addressScreen": "Fizetési módok",
     "nonCustodialAccount": "Nem letétkezelt fiók",
+    "custodialAccount": "Letétkezelt fiók",
     "tapUserName": "Koppints a felhasználónév beállításához",
     "notifications": "Értesítések",
     "title": "Beállítások",
