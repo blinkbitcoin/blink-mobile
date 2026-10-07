@@ -97,9 +97,11 @@ jest.mock("@app/screens/send-bitcoin-screen/payment-destination", () => ({
   parseDestination: jest.fn(),
 }))
 
+type MockDeviceLocation = { countryCode: string | undefined; loading: boolean }
+let mockDeviceLocation: MockDeviceLocation = { countryCode: "SV", loading: false }
 jest.mock("@app/hooks/use-device-location", () => ({
   __esModule: true,
-  default: () => ({ countryCode: "SV", loading: false }),
+  default: () => mockDeviceLocation,
 }))
 
 jest.mock("@app/hooks/use-app-config", () => ({
@@ -196,6 +198,7 @@ describe("SendBitcoinDestinationScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDeviceLocation = { countryCode: "SV", loading: false }
     loadLocale("en")
     LL = i18nObject("en")
     useActiveWalletMock.mockReturnValue({
@@ -435,6 +438,44 @@ describe("SendBitcoinDestinationScreen", () => {
       return
     }
     expect(parseDestinationMock).not.toHaveBeenCalled()
+
+    await flushEffects()
+  })
+
+  it("strips the trunk leading zero from a national number before validating (issue #2604)", async () => {
+    mockDeviceLocation = { countryCode: "FR", loading: false }
+
+    parseDestinationMock.mockResolvedValue({
+      valid: true,
+      destinationDirection: DestinationDirection.Send,
+      validDestination: {
+        valid: true,
+        paymentType: PaymentType.Lnurl,
+        lnurl: "lnurl",
+        isMerchant: false,
+        lnurlParams: createLnurlPayParams("+33612345678"),
+      },
+      createPaymentDetail: jest.fn(),
+    })
+
+    render(
+      <ContextForScreen>
+        <SendBitcoinDestinationScreen route={sendBitcoinDestination} />
+      </ContextForScreen>,
+    )
+
+    fireEvent.changeText(screen.getByLabelText("telephoneNumber"), "0612345678")
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText(LL.common.next()))
+    await flushAsync()
+
+    // the trunk "0" must be dropped, not kept alongside the "+33" country code
+    expect(parseDestinationMock).toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "+33612345678" }),
+    )
+    expect(parseDestinationMock).not.toHaveBeenCalledWith(
+      expect.objectContaining({ rawInput: "+330612345678" }),
+    )
 
     await flushEffects()
   })
@@ -1299,6 +1340,7 @@ describe("SendBitcoinDestinationScreen paste buttons", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    mockDeviceLocation = { countryCode: "SV", loading: false }
     loadLocale("en")
     LL = i18nObject("en")
   })
