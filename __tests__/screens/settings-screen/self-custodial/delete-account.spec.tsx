@@ -127,6 +127,20 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => mockNetwork,
 }))
 
+const mockIsDeletionBlocked = jest.fn()
+let mockGuardLoading = false
+jest.mock("@app/screens/account-migration/hooks/use-migration-deletion-guard", () => ({
+  useMigrationDeletionGuard: () => ({
+    isDeletionBlocked: mockIsDeletionBlocked,
+    isLoading: mockGuardLoading,
+  }),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+}))
+
 const mockFormatMoneyAmount = jest.fn(
   ({ moneyAmount }: { moneyAmount: { amount: number; currencyCode: string } }) =>
     `${moneyAmount.currencyCode} ${moneyAmount.amount}`,
@@ -157,6 +171,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
         dangerZoneBulletPermanent: () => "Account deletion is permanent",
         dangerZoneBulletEmpty: () => "Make sure account is empty",
         dangerZoneDeleteButton: () => "Delete account and data",
+        dangerZoneMigrationPendingNotice: () =>
+          "You can't delete this wallet while the migrated funds are still on their way.",
       },
     },
   }),
@@ -180,6 +196,11 @@ describe("DeleteAccount", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockNetwork = mockSparkNetwork.Mainnet
+    mockIsDeletionBlocked.mockReturnValue(false)
+    mockGuardLoading = false
+    /** clearAllMocks keeps implementations, so a test that returns a refusal would leak
+     *  it into the next one. */
+    mockDeleteWallet.mockResolvedValue(undefined)
     lastWarningProps.isVisible = undefined
     lastConfirmProps.isVisible = undefined
   })
@@ -268,5 +289,88 @@ describe("DeleteAccount", () => {
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(queryByTestId("confirm-modal")).toBeNull()
+  })
+
+  describe("while a migration still owes this wallet its funds", () => {
+    beforeEach(() => {
+      mockIsDeletionBlocked.mockReturnValue(true)
+      mockUseSelfCustodialWallet.mockReturnValue({
+        wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+      })
+    })
+
+    /** The section exists only to delete, so it says why it cannot rather than vanishing:
+     *  a control that disappears with no reason reads as a bug. */
+    it("replaces the delete control with the reason it is unavailable", () => {
+      const { getByTestId, queryByTestId } = render(<DeleteAccount />)
+
+      expect(queryByTestId("danger-zone-delete-button")).toBeNull()
+      expect(getByTestId("self-custodial-danger-zone-blocked-notice")).toBeTruthy()
+      expect(
+        getByTestId("self-custodial-danger-zone-blocked-notice").props.children,
+      ).toBe(
+        "You can't delete this wallet while the migrated funds are still on their way.",
+      )
+    })
+
+    it("asks the guard about the active wallet", () => {
+      render(<DeleteAccount />)
+
+      expect(mockIsDeletionBlocked).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    })
+
+    it("opens no modal and deletes nothing", () => {
+      const { queryByTestId } = render(<DeleteAccount />)
+
+      expect(queryByTestId("confirm-modal")).toBeNull()
+      expect(queryByTestId("warning-modal")).toBeNull()
+      expect(mockDeleteWallet).not.toHaveBeenCalled()
+    })
+
+    /** The screen read the record before the mark landed, so it offered the control and
+     *  deleteWallet refused from a fresher read: the reason is surfaced rather than the
+     *  modal closing over nothing. */
+    it("surfaces the reason when deleteWallet refuses from a fresher read", async () => {
+      mockIsDeletionBlocked.mockReturnValue(false)
+      mockDeleteWallet.mockResolvedValue("blocked")
+
+      const { getByTestId } = render(<DeleteAccount />)
+      fireEvent.press(getByTestId("danger-zone-delete-button"))
+
+      await act(async () => {
+        await lastConfirmProps.onConfirm?.()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "error",
+          message:
+            "You can't delete this wallet while the migrated funds are still on their way.",
+        }),
+      )
+    })
+
+    /** Nothing at all while the record is being read: the button would have to be taken
+     *  back, and the reason is not yet known to be true. */
+    it("offers neither the control nor the reason while the record is being read", () => {
+      mockGuardLoading = true
+      mockIsDeletionBlocked.mockReturnValue(true)
+
+      const { queryByTestId } = render(<DeleteAccount />)
+
+      expect(queryByTestId("danger-zone-delete-button")).toBeNull()
+      expect(queryByTestId("self-custodial-danger-zone-blocked-notice")).toBeNull()
+    })
+
+    it("restores the delete control once the block lifts", () => {
+      const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
+      expect(queryByTestId("danger-zone-delete-button")).toBeNull()
+
+      mockIsDeletionBlocked.mockReturnValue(false)
+      rerender(<DeleteAccount />)
+
+      expect(getByTestId("danger-zone-delete-button")).toBeTruthy()
+      expect(queryByTestId("self-custodial-danger-zone-blocked-notice")).toBeNull()
+    })
   })
 })
