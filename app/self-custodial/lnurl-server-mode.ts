@@ -101,6 +101,12 @@ const toAccountMode = (mode: string | null | undefined): AccountMode | null => {
   return null
 }
 
+/**
+ * Signed by hand in the legacy `{message}-{timestamp}` format, which the SDK can no
+ * longer produce for us: it refuses to sign anything in its own `breez-lnurl:` v2
+ * namespace. `/recover` and `/mode` therefore work only while blink-lnurl-server keeps
+ * its legacy verifier on those routes.
+ */
 const postSigned = (url: string, body: unknown): Promise<Response> => {
   const controller = new AbortController()
   const timeout = setTimeout(() => controller.abort(), MODE_REQUEST_TIMEOUT_MS)
