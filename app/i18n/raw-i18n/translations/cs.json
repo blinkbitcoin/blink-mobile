@@ -2667,7 +2667,7 @@
   "TransactionDetailScreen": {
     "paid": "Zaplaceno do/z",
     "received": "Obdrželi jste",
-    "spent": "Utratili jste",
+    "sent": "Odeslali jste",
     "sending": "Odesílání",
     "receivingAccount": "Přijímací zůstatek",
     "sendingAccount": "Odesílající zůstatek",
