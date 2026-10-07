@@ -3,6 +3,8 @@ import path from "path"
 
 import en from "@app/i18n/en"
 
+import retiredTierCopy from "./retired-tier-copy.json"
+
 const TRANSLATIONS_DIR = path.resolve(
   __dirname,
   "..",
@@ -133,6 +135,111 @@ const placeholderDrift = (localeFile: string, parsed: AnyTranslation): string[] 
   return Object.keys(sourceLeaves).filter(hasDrifted)
 }
 
+/**
+ * Words the on-chain fee tiers have been called in English before. A locale holding one of
+ * these is an untranslated fallback left behind by a copy change (#3862) — it ships the
+ * old words to that locale's senders while `en` reads correctly. Key parity above already
+ * forbids omitting the keys, so a locale has to carry *something*; this says what it may
+ * not carry.
+ *
+ * This catches only the locales that never translated the tier at all. A locale that *did*
+ * translate it keeps a word no English list can predict — `es` held "Rápido", `de` held
+ * "Schnell", `ja` held "高速" — so the per-locale ledger below carries those.
+ */
+const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal"]
+
+/**
+ * Per-locale tier copy this app has already retired, keyed by translation file. The
+ * invariant the tier keys actually need is cross-version — "when `en`'s tier copy changes,
+ * every locale's changes with it" — and a spec that only ever sees the working tree cannot
+ * observe a change. This approximates it with state: each rename appends that rename's
+ * outgoing strings here, and a locale whose current value is still one of its own retired
+ * ones is a locale the rename skipped.
+ *
+ * The ledger is append-only and grows by three entries per locale per rename, which is the
+ * point — the omission a reviewer would otherwise have to notice by reading 28 files shows
+ * up as a missing line in this diff. Seeded at `ef449120d` with the
+ * Fast / Medium / Slow generation.
+ */
+const RETIRED_TIER_COPY = retiredTierCopy as Record<string, string[]>
+
+const TIER_KEYS = [
+  "SendBitcoinScreen.fast",
+  "SendBitcoinScreen.medium",
+  "SendBitcoinScreen.slow",
+]
+
+const normalize = (value: string): string => value.trim().toLowerCase()
+
+const supersededTierCopy = (localeFile: string, parsed: AnyTranslation): string[] => {
+  const localeLeaves = collectLeaves(parsed)
+  const retired = [
+    ...SUPERSEDED_TIER_NAMES,
+    ...(RETIRED_TIER_COPY[localeFile] ?? []),
+  ].map(normalize)
+
+  return TIER_KEYS.filter((key) => {
+    const value = localeLeaves[key]
+    return typeof value === "string" && retired.includes(normalize(value))
+  })
+}
+
+/**
+ * The same three tiers are named twice: in the send selector and in Settings → Fee rates,
+ * where #4228 wraps them as "Onchain <tier> (~<window>)". The two screens have to use one
+ * word per tier, so each Settings row is reduced to its bare tier word — the "Onchain"
+ * marker (`I-Onchain` in `xh`, オンチェーン in `ja`, trailing in `ar`) and the window
+ * dropped — and compared with the selector's word.
+ */
+const TIER_WORD_PAIRS: [selectorKey: string, settingsKey: string][] = [
+  ["SendBitcoinScreen.fast", "FeeRatesScreen.onchainPriority"],
+  ["SendBitcoinScreen.medium", "FeeRatesScreen.onchainStandard"],
+  ["SendBitcoinScreen.slow", "FeeRatesScreen.onchainEconomy"],
+]
+
+/**
+ * Where a language inflects the tier word for what it qualifies, the two screens can
+ * legitimately differ in the ending only. Keyed `<file>:<selectorKey>`, the value is the
+ * Settings form the selector form is accepted against.
+ */
+const TIER_WORD_AGREEMENT: Record<string, Record<string, string>> = {
+  // The selector agrees with a feminine noun, the Settings row with a neuter one.
+  "el.json:SendBitcoinScreen.medium": { κανονική: "κανονικό" },
+  "el.json:SendBitcoinScreen.slow": { οικονομική: "οικονομικό" },
+}
+
+const ONCHAIN_MARKERS = ["I-Onchain", "Onchain", "オンチェーン"]
+
+// The marker sits at one end of the label, so it is sliced off that end once rather
+// than removed wherever it appears.
+const withoutOnchainMarker = (value: string): string => {
+  const marker = ONCHAIN_MARKERS.find((m) => value.startsWith(m) || value.endsWith(m))
+  if (!marker) return value
+  return value.startsWith(marker)
+    ? value.slice(marker.length)
+    : value.slice(0, -marker.length)
+}
+
+const bareTierWord = (value: string, locale: string): string =>
+  withoutOnchainMarker(value.replace(/\s*\([^)]*\)\s*$/, "").trim())
+    .trim()
+    .toLocaleLowerCase(locale)
+
+const tierWordMismatches = (localeFile: string, parsed: AnyTranslation): string[] => {
+  const localeLeaves = collectLeaves(parsed)
+  const locale = localeFile.replace(/\.json$/, "")
+
+  return TIER_WORD_PAIRS.filter(([selectorKey, settingsKey]) => {
+    const selector = bareTierWord(String(localeLeaves[selectorKey]), locale)
+    const settings = bareTierWord(String(localeLeaves[settingsKey]), locale)
+    const agreed = TIER_WORD_AGREEMENT[`${localeFile}:${selectorKey}`]?.[selector]
+    return (agreed ?? selector) !== settings
+  }).map(
+    ([selectorKey, settingsKey]) =>
+      `${selectorKey} "${localeLeaves[selectorKey]}" vs ${settingsKey} "${localeLeaves[settingsKey]}"`,
+  )
+}
+
 const localeFiles = fs
   .readdirSync(TRANSLATIONS_DIR)
   .filter((name) => name.endsWith(".json"))
@@ -159,6 +266,22 @@ describe("locale parity", () => {
       // this.
       it("interpolates the same placeholders as the English source", () => {
         expect(placeholderDrift(localeFile, parsed)).toEqual([])
+      })
+
+      // A locale that kept its own translation of "Fast"/"Medium"/"Slow" keeps shipping the
+      // queue-describing naming the on-chain tiers moved off, invisibly to `en`-only specs.
+      it("carries no superseded on-chain fee tier name", () => {
+        expect(supersededTierCopy(localeFile, parsed)).toEqual([])
+      })
+
+      it("names the on-chain fee tiers the same in the send selector and Settings", () => {
+        expect(tierWordMismatches(localeFile, parsed)).toEqual([])
+      })
+
+      // Without this, a locale added after a rename can quietly opt out of the check above
+      // by never being listed — the ledger only guards the files it names.
+      it("is covered by the retired tier copy ledger", () => {
+        expect(Object.keys(RETIRED_TIER_COPY)).toContain(localeFile)
       })
     })
   })
