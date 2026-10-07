@@ -129,7 +129,7 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   modeToggleText: {
     fontSize: 11,
-    fontWeight: "600",
+    fontWeight: "700",
     color: colors.grey2,
     letterSpacing: 0.6,
   },

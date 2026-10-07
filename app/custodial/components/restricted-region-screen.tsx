@@ -152,7 +152,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   title: {
     textAlign: "center",
-    fontWeight: "700",
   },
   body: {
     lineHeight: 22,
@@ -178,7 +177,6 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   balanceValueBold: {
     lineHeight: 20,
-    fontWeight: "700",
   },
   spacer: {
     flex: 1,
