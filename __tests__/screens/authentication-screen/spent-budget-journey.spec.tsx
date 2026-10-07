@@ -78,6 +78,11 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
     status: "ok",
     entries: mockDevice.walletIds.map((id) => ({ id, lightningAddress: null })),
   }),
+  /** Mirrors the real mapping over the same device fixture: the presence call reads the
+   *  index through the module itself, so overriding the exported read alone would not
+   *  reach it. */
+  readStoredWalletPresence: async () =>
+    mockDevice.walletIds.length > 0 ? "present" : "absent",
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -132,6 +137,7 @@ const persistentStateValue: NonNullable<
   resetState: () => {},
   clearToken: async () => {
     mockDevice.hasSession = false
+    return true
   },
 }
 

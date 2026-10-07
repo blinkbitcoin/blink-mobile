@@ -181,7 +181,7 @@ const Harness: React.FC<{ initialState: PersistentState }> = ({ initialState }) 
           setPersistentState((prev) => update(prev) ?? prev)
         },
         resetState: mockResetState,
-        clearToken: async () => {},
+        clearToken: async () => true,
       }}
     >
       {/* eslint-disable @typescript-eslint/no-explicit-any */}
