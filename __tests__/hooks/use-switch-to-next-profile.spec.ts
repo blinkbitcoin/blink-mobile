@@ -87,6 +87,74 @@ describe("useSwitchToNextProfile", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
+  /**
+   * The switch reads the lock long after it started. Backgrounding the app during the
+   * token save raises the lock, and a value captured when the switch began still says
+   * unlocked: navigating on that one puts this session on top of the lock screen it just
+   * raised, with the lock flag still set.
+   */
+  it("opens no home screen when the lock is raised while the switch is still in flight", async () => {
+    storeProfiles([profileA, profileB])
+
+    let resolveSaveToken: () => void = () => {}
+    mockSaveToken.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSaveToken = resolve
+      }),
+    )
+
+    const { result, rerender } = renderHook(() => useSwitchToNextProfile())
+
+    let switchDone: Promise<SwitchProfileOutcome> | undefined
+    act(() => {
+      switchDone = result.current.switchToNextProfile("tok-a")
+    })
+
+    /** The resume relock lands while the save is still pending. */
+    mockIsAppLocked = true
+    rerender(undefined)
+
+    await act(async () => {
+      resolveSaveToken()
+      await switchDone
+    })
+
+    expect(await switchDone).toBe(SwitchProfileOutcome.Switched)
+    expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The mirror has to follow the lock down as well, or a switch after an answered lock
+   *  would stop landing on home. */
+  it("opens the home screen when the lock is answered while the switch is in flight", async () => {
+    mockIsAppLocked = true
+    storeProfiles([profileA, profileB])
+
+    let resolveSaveToken: () => void = () => {}
+    mockSaveToken.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSaveToken = resolve
+      }),
+    )
+
+    const { result, rerender } = renderHook(() => useSwitchToNextProfile())
+
+    let switchDone: Promise<SwitchProfileOutcome> | undefined
+    act(() => {
+      switchDone = result.current.switchToNextProfile("tok-a")
+    })
+
+    mockIsAppLocked = false
+    rerender(undefined)
+
+    await act(async () => {
+      resolveSaveToken()
+      await switchDone
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+  })
+
   it("deactivates the old token before saving the next profile's token", async () => {
     storeProfiles([profileA, profileB])
 
