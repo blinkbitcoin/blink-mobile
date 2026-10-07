@@ -58,11 +58,14 @@ const isKeyNotFound = (err: unknown): boolean =>
 
 /**
  * The failed-PIN state, stored as one value under one key — see the note above
- * the PIN attempt-budget block.
+ * the PIN lockout block.
  */
 export type PinFailureState = {
-  /** Consecutive wrong-PIN entries. */
+  /** Consecutive PIN entries counted against the budget: the wrong ones, and
+   *  the one being judged, which is counted before it is compared. */
   readonly attempts: number
+  /** Epoch ms the lock lifts at; 0 when no lock is in force. */
+  readonly lockedUntil: number
 }
 
 export type PinFailureStateRead =
@@ -75,26 +78,24 @@ type SecureStoreRead =
   | { readonly status: "absent" }
   | { readonly status: "failed"; readonly err: unknown }
 
-const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0 }
+const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
 
 /**
- * The stored shape, which is wider than the type this module reads back.
+ * The stored shape: both fields, spelled out, on every write.
  *
- * `lockedUntil` is dead weight on the way in and read past on the way out, but
- * it is written for the device that goes the other way. Every release from
- * 3.0.29 up to the one before this change shipped a parser that demands both
- * fields be finite and falls back to a clean slate otherwise, so a blob without
- * it would hand a downgraded install the budget its user had already spent.
- * Zero is what that parser reads as "no lock in force".
+ * Every release since 3.0.29 parses this blob, and the ones that shipped the
+ * first lockout demand both fields be finite and fall back to a clean slate
+ * otherwise. A blob missing either would hand a downgraded install the budget
+ * its user had already spent.
  */
 const serializePinFailureState = (state: PinFailureState): string =>
-  JSON.stringify({ attempts: state.attempts, lockedUntil: 0 })
+  JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil })
 
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
-  /** The key keeps its name across the lockout's arrival and removal: it is
-   *  what shipped releases wrote, and renaming it would orphan their state. */
+  /** The key keeps its name across the lockout's arrival, removal and return: it
+   *  is what shipped releases wrote, and renaming it would orphan their state. */
   private static readonly PIN_FAILURE_STATE = "pinFailureState"
   /** Older releases stored the bare attempt count here. Read once, then
    *  erased — see getPinFailureState. */
@@ -276,10 +277,13 @@ export default class KeyStoreWrapper {
     return KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN)
   }
 
-  // ── PIN attempt budget ────────────────────────────────────────────────────
-  // One key, one serialized write, so the boolean a write returns is the whole
-  // truth about whether the failure was recorded. A caller that must not lose
-  // one has something to act on, rather than a half-written pair of keys.
+  // ── PIN lockout ───────────────────────────────────────────────────────────
+  /** The attempt count and the lock expiry are one logical value, so they live
+   *  under one key as one serialized write. Two keys would make a write
+   *  non-atomic: if only the lock landed, the failure itself would be lost, and
+   *  the budget would come back the moment the lock expired. One write also
+   *  makes the boolean it returns the whole truth about whether the failure was
+   *  recorded, which a caller that must not lose one has to act on. */
 
   public static async getPinFailureState(): Promise<PinFailureStateRead> {
     const current = await KeyStoreWrapper.migratedReadWithStatus(
@@ -294,9 +298,10 @@ export default class KeyStoreWrapper {
     }
     if (current.status === "failed") return current
 
-    // Upgrade path: an install that failed a PIN under an older release has an
-    // attempt count under the legacy key. Reading it keeps that budget spent;
-    // the next write moves it to the new key and erases this one.
+    /** Upgrade path: an install that failed a PIN under an older release has an
+     *  attempt count under the legacy key and no lock. Reading it keeps that
+     *  budget spent; the next write moves it to the new key and erases this
+     *  one. */
     const legacy = await KeyStoreWrapper.migratedReadWithStatus(
       KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
     )
@@ -306,12 +311,15 @@ export default class KeyStoreWrapper {
     const attempts = Number(legacy.value)
     return {
       status: "found",
-      state: { attempts: Number.isFinite(attempts) ? attempts : 0 },
+      state: {
+        attempts: Number.isFinite(attempts) ? attempts : 0,
+        lockedUntil: 0,
+      },
     }
   }
 
-  /** Missing, unparseable and non-finite all collapse to a clean slate, so no
-   *  NaN can escape into a comparison downstream. */
+  /** Missing, unparseable and a non-finite count all collapse to a clean slate,
+   *  so no NaN can escape into a comparison downstream. */
   private static parsePinFailureState(raw: string): PinFailureState {
     try {
       const parsed = JSON.parse(raw)
@@ -319,17 +327,19 @@ export default class KeyStoreWrapper {
       if (!Number.isFinite(attempts)) {
         return CLEARED_PIN_FAILURE_STATE
       }
-      /** Any other field a past release wrote alongside it is read straight
-       *  past, so a blob from a build that also stored a lock expiry still
-       *  yields the one number this reads. */
-      return { attempts }
+      /** A count that reads fine keeps its meaning whatever sits beside it: an
+       *  expiry that does not read is no lock, not a reason to hand the spent
+       *  attempts back. */
+      const lockedUntil = Number(parsed?.lockedUntil)
+      return { attempts, lockedUntil: Number.isFinite(lockedUntil) ? lockedUntil : 0 }
     } catch {
       return CLEARED_PIN_FAILURE_STATE
     }
   }
 
-  /** One write, so the boolean is the whole truth: false means the failure was
-   *  not recorded at all, which a caller that must not lose one has to act on. */
+  /** One write, so the boolean is the whole truth: false means nothing was
+   *  recorded at all, which a caller that must not lose an attempt has to act
+   *  on. */
   public static async setPinFailureState(state: PinFailureState): Promise<boolean> {
     const written = await KeyStoreWrapper.migratedWrite(
       KeyStoreWrapper.PIN_FAILURE_STATE,
@@ -363,9 +373,11 @@ export default class KeyStoreWrapper {
     // is actually still readable rather than writing on every clear.
     const remaining = await KeyStoreWrapper.getPinFailureState()
     if (remaining.status === "absent") return true
-    const storedAttempts = remaining.status === "found" ? remaining.state.attempts : null
-    const hasNoAttemptsLeftToClear = storedAttempts === 0
-    if (hasNoAttemptsLeftToClear) {
+    const isAlreadyCleared =
+      remaining.status === "found" &&
+      remaining.state.attempts === 0 &&
+      remaining.state.lockedUntil === 0
+    if (isAlreadyCleared) {
       return true
     }
 

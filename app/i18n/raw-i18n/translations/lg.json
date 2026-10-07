@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Embala ya waleti teri 2. Nsaba okozese dashboard olabe waleti zonna ne ssente za akawunti eno"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Tetusobodde kuwandiika kugezaako okulemeredwa mu bukuumi. Logging out.",
+    "attemptUnrecorded": "Tetusobodde kuwandiika kugezaako mu bukuumi.",
+    "attemptsLeft": "{attemptsRemaining: number} okugezaako okusigaddewo.",
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",
     "enterPin": "Teeka pini koodi yo",
+    "oneAttemptLeft": "Mulundi 1 ogw'okugezaako ogusigaddewo.",
     "oneAttemptRemaining": "PIN enkyamu. mulundi 1 ogw'okugezaako ogusigaddewo.",
     "pinUnreadable": "Tetusobodde kukebera PIN yo. Gezaako nate.",
     "setPin": "Kola PIN yo",
     "setPinFailedMatch": "Pins tezikwatagana - Kola PIN yo",
     "storePinFailed": "Tetusobodde kutereka pin yo",
-    "tooManyAttempts": "Okugezaako okungi ennyo okulemeredwa. Logging out.",
+    "tooManyAttempts": "Okugezaako okungi ennyo okulemeredwa.",
+    "tryAgainIn": "Gezaako nate mu {time: string}.",
     "verifyPin": "Kakasa pini koodi yo"
   },
   "PriceHistoryScreen": {

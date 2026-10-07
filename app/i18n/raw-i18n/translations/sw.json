@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Idadi ya mifuko haitoshi. Tafadhali tumia kiolesura ili kuona mifuko yote na fedha za akaunti hii"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
+    "attemptUnrecorded": "Imeshindwa kurekodi jaribio kwa usalama.",
+    "attemptsLeft": "Majaribio {attemptsRemaining: number} yamesalia.",
     "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
     "enterPin": "Ingiza pini yako",
+    "oneAttemptLeft": "Jaribio 1 limesalia.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",
     "storePinFailed": "Imeshindwa kuhifadhi pini yako.",
-    "tooManyAttempts": "Majaribio mengi sana yaliyokosa. Kutoka nje ya programu.",
+    "tooManyAttempts": "Majaribio mengi sana yaliyokosa.",
+    "tryAgainIn": "Jaribu tena baada ya {time: string}.",
     "verifyPin": "Thibitisha nambari yako ya pini"
   },
   "PriceHistoryScreen": {

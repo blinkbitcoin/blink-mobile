@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Դրամապանակների քանակը 2 չէ։ Խնդրում ենք օգտագործել վահանակը՝ այս հաշվի բոլոր դրամապանակներն ու միջոցները տեսնելու համար"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Չհաջողվեց ապահով կերպով գրանցել ձախողված փորձը։ Ելք համակարգից։",
+    "attemptUnrecorded": "Չհաջողվեց ապահով կերպով գրանցել փորձը։",
+    "attemptsLeft": "{attemptsRemaining: number} փորձեր են մնացել։",
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",
     "enterPin": "Մուտքագրեք Ձեր PIN ծածկագիրը",
+    "oneAttemptLeft": "1 փորձ է մնացել։",
     "oneAttemptRemaining": "Սխալ PIN: 1 փորձ է մնացել։ ",
     "pinUnreadable": "Չհաջողվեց ստուգել Ձեր PIN-ը։ Խնդրում ենք կրկին փորձել։",
     "setPin": "Սահմանել PIN ծածկագիր",
     "setPinFailedMatch": "Pin ծածկագրերը չեն համընկնում - Կարգավորել PIN ծածկագիրը",
     "storePinFailed": "Չհաջողվեց պահպանել Ձեր pin-ը։ ",
-    "tooManyAttempts": "Չափից շատ անհաջող փորձեր։ Ելք համակարգից։ ",
+    "tooManyAttempts": "Չափից շատ անհաջող փորձեր։",
+    "tryAgainIn": "Կրկին փորձեք {time: string} հետո։",
     "verifyPin": "Հաստատեք Ձեր PIN ծածկագիրը"
   },
   "PriceHistoryScreen": {
