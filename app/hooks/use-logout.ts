@@ -7,8 +7,8 @@ import { usePersistentStateContext } from "@app/store/persistent-state"
 import { logLogout } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import {
-  listSelfCustodialAccounts,
-  StorageReadStatus,
+  readStoredWalletPresence,
+  StoredWalletPresence,
 } from "@app/self-custodial/storage/account-index"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import messaging from "@react-native-firebase/messaging"
@@ -58,12 +58,13 @@ type LogoutResult = {
  * wallet, so it stays for as long as one is stored. With none stored it goes,
  * as it always did: a lock with nothing behind it only locks its owner out.
  *
- * Fails closed: an index that cannot be read is not an index with no wallets.
+ * Fails closed: an index that cannot be read is not an index with no wallets. The opposite
+ * bias belongs to the sessionless cold start, which lands on the landing screen when it
+ * cannot tell; both read through the same shared presence call so neither drifts.
  */
-const hasStoredSelfCustodialWallet = async (): Promise<boolean> => {
-  const wallets = await listSelfCustodialAccounts()
-  if (wallets.status === StorageReadStatus.ReadFailed) return true
-  return wallets.entries.length > 0
+const isAppLockStillOwed = async (): Promise<boolean> => {
+  const presence = await readStoredWalletPresence()
+  return presence !== StoredWalletPresence.Absent
 }
 
 gql`
@@ -126,24 +127,29 @@ const useLogout = () => {
           if (!preserveStoredCredentials) {
             /** Asked before anything is erased, so that nothing sits between
              *  the erasures below for a kill to land on. */
-            isLockOwed = await hasStoredSelfCustodialWallet()
+            isLockOwed = await isAppLockStillOwed()
             await AsyncStorage.multiRemove([SCHEMA_VERSION_KEY])
             areSavedSessionsErased = await KeyStoreWrapper.removeSessionProfiles()
           }
-          await clearToken()
+          const isActiveTokenErased = await clearToken()
 
           /** The lock goes last, and only once what it guards is provably
-           *  gone. The erasure above reports a failure rather than throwing
+           *  gone. The erasures above report a failure rather than throwing
            *  one, and a lock dropped over sessions that are still stored would
            *  leave their tokens with nothing in front of them. A teardown cut
            *  short leaves a lock in front of what is left, never the reverse.
+           *
+           *  The active token counts among them: it is the live credential, and
+           *  the keychain outlives the app, so one that could not be erased is
+           *  one the next launch can recover. Erasing the lock over it would
+           *  leave that recovery with nothing to answer to.
            *
            *  It is all three slots, kept or dropped together. A PIN without
            *  its spent attempt count hands the next round a fresh budget
            *  against a secret that no longer expires, and a PIN without the
            *  biometrics flag routes every later unlock to the keypad instead
            *  of to the prompt its owner chose. */
-          const canDropLock = !isLockOwed && areSavedSessionsErased
+          const canDropLock = !isLockOwed && areSavedSessionsErased && isActiveTokenErased
           if (canDropLock) {
             const isBiometricsFlagErased =
               await KeyStoreWrapper.removeIsBiometricsEnabled()
