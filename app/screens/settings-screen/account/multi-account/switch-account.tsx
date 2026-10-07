@@ -9,6 +9,7 @@ import { useAppConfig, useSaveSessionProfile } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePendingMigrationAccounts } from "@app/screens/account-migration/hooks"
+import { useMigrationDeletionGuard } from "@app/screens/account-migration/hooks/use-migration-deletion-guard"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 
 import { ProfileRow } from "../../self-custodial/profile-row"
@@ -31,6 +32,7 @@ export const SwitchAccount: React.FC = () => {
   const { selfCustodialEntries, activeAccount } = useAccountRegistry()
   const { pendingAccountIds, pendingForActiveAccount } = usePendingMigrationAccounts()
   const { isCompleted: isMigrationCompleted } = useMigrationLock()
+  const { isDeletionBlocked } = useMigrationDeletionGuard()
 
   /**
    * Wallets provisioned mid-migration stay hidden until the flow activates them: an empty,
@@ -92,13 +94,17 @@ export const SwitchAccount: React.FC = () => {
             nextProfileToken={nextProfileToken}
           />
         ))}
-        {visibleSelfCustodialEntries.map((entry, index) => (
-          <ProfileRow
-            key={entry.id}
-            entry={entry}
-            isFirstItem={profiles.length === 0 && index === 0}
-          />
-        ))}
+        {visibleSelfCustodialEntries.map((entry, index) => {
+          const isFirstItem = profiles.length === 0 && index === 0
+          return (
+            <ProfileRow
+              key={entry.id}
+              entry={entry}
+              isFirstItem={isFirstItem}
+              isDeletionBlocked={isDeletionBlocked(entry.id)}
+            />
+          )
+        })}
       </ScrollView>
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
