@@ -74,6 +74,14 @@ type UseMigrationTransferArgs = {
   selfCustodialAccountId: string | null
   /** From the checkpoint; null on records saved before the field existed. */
   expectedReceiveSats: number | null
+  /** From the checkpoint. What the receive gate matches on; null on a record saved before
+   *  the field existed, which the gate answers by balance as it always did. */
+  sparkInvoice: string | null
+  /** Writes the invoice this commit is about to request the drain against. Supplied by the
+   *  screen so it runs on the one checkpoint instance behind the custodial id: a second
+   *  no-cache owner read can disagree for a render after an account switch, and an invoice
+   *  written against the wrong one would be invisible to every other reader. */
+  recordSparkInvoice: (invoice: string) => Promise<boolean>
   skip: boolean
 }
 
@@ -100,10 +108,15 @@ export const useMigrationTransfer = ({
   custodialAccountId,
   selfCustodialAccountId,
   expectedReceiveSats,
+  sparkInvoice,
+  recordSparkInvoice,
   skip,
 }: UseMigrationTransferArgs): UseMigrationTransfer => {
   const network = useSparkNetwork()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
+  /** The invoice is issued inside commit, so unlike expectedReceiveSats it cannot arrive as
+   *  a prop: it is written to the checkpoint there and read back from it here, which is also
+   *  what lets a resumed run go on watching for the same payment. */
   const [commitMigration] = useMigrationCommitMutation()
   /** Seeded from the remembered outcome so a screen re-entered after a settled failure
    *  shows it at once, rather than blocking the re-commit and spinning with nothing shown. */
@@ -142,6 +155,7 @@ export const useMigrationTransfer = ({
     useMigrationReceiveConfirmation({
       selfCustodialAccountId,
       expectedReceiveSats,
+      sparkInvoice,
       skip: isReceiveGateSkipped,
     })
 
@@ -218,6 +232,11 @@ export const useMigrationTransfer = ({
         return
       }
 
+      /** Recorded before the drain is requested, and blocking: without the invoice the gate
+       *  falls back to the balance test, which confirms instantly on a reused wallet the
+       *  user had already funded and deletes the custodial account with the drain still in
+       *  transit (#4102). Treated like the checkpoint saves — the screen holds and the
+       *  retry re-runs it — rather than letting the commit go out unwatched. */
       const { data } = await commitMigration({
         variables: {
           input: {
@@ -230,7 +249,26 @@ export const useMigrationTransfer = ({
       })
 
       const [rejection] = data?.migrationCommit?.errors ?? []
-      if (!rejection) return
+      if (!rejection) {
+        /** Recorded only once the backend has taken this invoice, and never before. A
+         *  first commit whose response was lost leaves the server already draining against
+         *  invoice A while the retry mints B; writing B up front would clobber the invoice
+         *  the drain actually pays, and the gate would watch for a payment that never
+         *  comes. A refused commit leaves the stored invoice untouched for the same reason.
+         *
+         *  Not blocking: the drain is already requested, so refusing here would strand the
+         *  user with funds in flight and no way forward. A lost write costs the proof, not
+         *  the funds — the gate cannot confirm and the flow takes its delayed-receive path.
+         */
+        const isInvoiceRecorded = await recordSparkInvoice(result.value.sparkInvoice)
+        if (!isInvoiceRecorded) {
+          reportError(
+            "Migration drain invoice persist",
+            new Error(`Checkpoint refused the drain invoice for ${selfCustodialId}`),
+          )
+        }
+        return
+      }
 
       /** A skewed clock makes the proof stale, which the backend rejects under the
        *  bad-destination code; that code plus a real skew is what earns a retry rather
@@ -244,7 +282,13 @@ export const useMigrationTransfer = ({
       }
       fail(MigrationSupportReason.TransferFailed, new Error(rejection.message))
     },
-    [network, selfCustodialDepositClaimLeewayVbyte, commitMigration, fail],
+    [
+      network,
+      selfCustodialDepositClaimLeewayVbyte,
+      commitMigration,
+      fail,
+      recordSparkInvoice,
+    ],
   )
 
   /** The server is waiting for a destination only while IN_PROGRESS: TRANSFERRING already
