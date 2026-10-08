@@ -201,6 +201,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       common: {
         anonymousUser: () => "Anon user",
       },
+      errors: { generic: () => "Something went wrong" },
       SelfCustodialDelete: {
         dangerZoneMigrationPendingNotice: () =>
           "You can't delete this wallet while the migrated funds are still on their way.",

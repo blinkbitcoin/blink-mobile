@@ -11,14 +11,17 @@ const mockClearPendingWallet = jest.fn()
 let mockInstanceId = "Staging"
 let mockPendingAccountIds = new Set<string>()
 let mockPendingLoading = false
+let mockPendingHasError = false
 let mockWalletState: {
-  wallets: ReadonlyArray<{ balance: { amount: number } }>
+  wallets: ReadonlyArray<{ walletCurrency: string; balance: { amount: number } }>
   status: string
   connectedAccountId: string | null
 }
 
 jest.mock("@app/hooks/use-app-config", () => ({
-  useAppConfig: () => ({ appConfig: { galoyInstance: { id: mockInstanceId } } }),
+  useAppConfig: () => ({
+    appConfig: { galoyInstance: { id: mockInstanceId, name: "Main" } },
+  }),
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-pending-provisioned-wallets", () => ({
@@ -26,6 +29,7 @@ jest.mock("@app/screens/account-migration/hooks/use-pending-provisioned-wallets"
     pendingAccountIds: mockPendingAccountIds,
     clearPendingWallet: (...args: readonly unknown[]) => mockClearPendingWallet(...args),
     loading: mockPendingLoading,
+    hasError: mockPendingHasError,
   }),
 }))
 
@@ -33,8 +37,8 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockWalletState,
 }))
 
-const fundedWallets = [{ balance: { amount: 5000 } }]
-const emptyWallets = [{ balance: { amount: 0 } }]
+const fundedWallets = [{ walletCurrency: "BTC", balance: { amount: 5000 } }]
+const emptyWallets = [{ walletCurrency: "BTC", balance: { amount: 0 } }]
 
 describe("useMigrationDeletionGuard", () => {
   beforeEach(() => {
@@ -42,6 +46,7 @@ describe("useMigrationDeletionGuard", () => {
     mockInstanceId = "Staging"
     mockPendingAccountIds = new Set([PENDING_WALLET_ID])
     mockPendingLoading = false
+    mockPendingHasError = false
     mockWalletState = {
       wallets: emptyWallets,
       status: ActiveWalletStatus.Ready,
@@ -209,6 +214,51 @@ describe("useMigrationDeletionGuard", () => {
     const { result } = renderHook(() => useMigrationDeletionGuard())
 
     expect(result.current.isDeletionBlocked(PENDING_WALLET_ID)).toBe(false)
+  })
+
+  /**
+   * A record that could not be read is not a record with nothing in it. Answering "not
+   * blocked" here would offer a control that `deleteWallet` then refuses, since it reads
+   * the same record strictly and will not clear what it cannot see.
+   */
+  it("blocks every wallet when the record could not be read", () => {
+    mockPendingHasError = true
+
+    const { result } = renderHook(() => useMigrationDeletionGuard())
+
+    expect(result.current.isDeletionBlocked(PENDING_WALLET_ID)).toBe(true)
+    expect(result.current.isDeletionBlocked(OTHER_WALLET_ID)).toBe(true)
+  })
+
+  /** The copy a blocked Danger Zone shows is about funds in flight, which a failed read is
+   *  not, so that caller is told what actually went wrong instead. */
+  it("reports a failed read apart from a read still running", () => {
+    mockPendingHasError = true
+
+    const { result } = renderHook(() => useMigrationDeletionGuard())
+
+    expect(result.current.hasRecordError).toBe(true)
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  it("reports neither once the record is read", () => {
+    const { result } = renderHook(() => useMigrationDeletionGuard())
+
+    expect(result.current.hasRecordError).toBe(false)
+    expect(result.current.isLoading).toBe(false)
+  })
+
+  /** Nothing is withheld where nothing is blocked: the exemption exists to keep the control
+   *  offered, so a broken read must not hide it either. */
+  it("blocks nothing and withholds nothing on a failed read on the Local instance", () => {
+    mockPendingHasError = true
+    mockInstanceId = "Local"
+
+    const { result } = renderHook(() => useMigrationDeletionGuard())
+
+    expect(result.current.isDeletionBlocked(PENDING_WALLET_ID)).toBe(false)
+    expect(result.current.isLoading).toBe(false)
+    expect(result.current.hasRecordError).toBe(false)
   })
 
   it("reports the record settled once the read finishes", () => {

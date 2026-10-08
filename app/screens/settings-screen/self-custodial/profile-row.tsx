@@ -146,6 +146,13 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({
     setConfirmVisible(false)
     const outcome = await deleteWallet(accountId)
 
+    /** A record that could not be read is not a migration owing funds, so it does not get
+     *  that sentence: what went wrong is the read. */
+    if (outcome === "record-unavailable") {
+      toastShow({ type: "error", message: LL.errors.generic(), LL })
+      return
+    }
+
     /** The stored mark outlived the control that offered this: say so rather than close the
      *  modal over a deletion that never happened. */
     if (outcome === "blocked") {

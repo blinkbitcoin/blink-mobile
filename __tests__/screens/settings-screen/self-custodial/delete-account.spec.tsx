@@ -54,10 +54,12 @@ jest.mock("@app/components/card-screen", () => ({
 }))
 
 jest.mock("@app/screens/settings-screen/button", () => ({
-  SettingsButton: ({ onPress, title }: { onPress: () => void; title: string }) =>
+  /** Props travel through, so a second button on this screen keeps its own test id rather
+   *  than answering to the delete button's. */
+  SettingsButton: ({ onPress, title, ...rest }: { onPress: () => void; title: string }) =>
     React.createElement(
       "Pressable",
-      { onPress, testID: "danger-zone-delete-button" },
+      { onPress, ...rest },
       React.createElement("Text", {}, title),
     ),
 }))
@@ -129,10 +131,14 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 const mockIsDeletionBlocked = jest.fn()
 let mockGuardLoading = false
+let mockGuardRecordError = false
+const mockRetryRecordRead = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-migration-deletion-guard", () => ({
   useMigrationDeletionGuard: () => ({
     isDeletionBlocked: mockIsDeletionBlocked,
     isLoading: mockGuardLoading,
+    hasRecordError: mockGuardRecordError,
+    retryRecordRead: mockRetryRecordRead,
   }),
 }))
 
@@ -165,6 +171,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       AccountScreen: { pleaseWait: () => "Please wait" },
+      common: { tryAgain: () => "Try again" },
+      errors: { generic: () => "Something went wrong" },
       SelfCustodialDelete: {
         dangerZoneImportantTitle: () => "Important",
         dangerZoneBulletReinstated: () => "Deleted account cannot be reinstated",
@@ -198,6 +206,7 @@ describe("DeleteAccount", () => {
     mockNetwork = mockSparkNetwork.Mainnet
     mockIsDeletionBlocked.mockReturnValue(false)
     mockGuardLoading = false
+    mockGuardRecordError = false
     /** clearAllMocks keeps implementations, so a test that returns a refusal would leak
      *  it into the next one. */
     mockDeleteWallet.mockResolvedValue(undefined)
@@ -211,7 +220,7 @@ describe("DeleteAccount", () => {
     })
 
     const { getByTestId, queryByTestId } = render(<DeleteAccount />)
-    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
 
     expect(getByTestId("confirm-modal")).toBeTruthy()
     expect(queryByTestId("warning-modal")).toBeNull()
@@ -223,7 +232,7 @@ describe("DeleteAccount", () => {
     })
 
     const { getByTestId, queryByTestId } = render(<DeleteAccount />)
-    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
 
     expect(getByTestId("warning-modal")).toBeTruthy()
     expect(queryByTestId("confirm-modal")).toBeNull()
@@ -236,7 +245,7 @@ describe("DeleteAccount", () => {
     })
 
     const { getByTestId, queryByTestId } = render(<DeleteAccount />)
-    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
 
     expect(getByTestId("warning-modal")).toBeTruthy()
     expect(queryByTestId("confirm-modal")).toBeNull()
@@ -248,7 +257,7 @@ describe("DeleteAccount", () => {
     })
 
     const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
-    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
     expect(getByTestId("warning-modal")).toBeTruthy()
 
     act(() => {
@@ -267,7 +276,7 @@ describe("DeleteAccount", () => {
     })
 
     const { getByTestId, queryByTestId } = render(<DeleteAccount />)
-    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
 
     expect(getByTestId("confirm-modal")).toBeTruthy()
     expect(queryByTestId("warning-modal")).toBeNull()
@@ -279,7 +288,7 @@ describe("DeleteAccount", () => {
     })
 
     const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
-    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
 
     await act(async () => {
       await lastConfirmProps.onConfirm?.()
@@ -304,7 +313,7 @@ describe("DeleteAccount", () => {
     it("replaces the delete control with the reason it is unavailable", () => {
       const { getByTestId, queryByTestId } = render(<DeleteAccount />)
 
-      expect(queryByTestId("danger-zone-delete-button")).toBeNull()
+      expect(queryByTestId("self-custodial-danger-zone-delete-button")).toBeNull()
       expect(getByTestId("self-custodial-danger-zone-blocked-notice")).toBeTruthy()
       expect(
         getByTestId("self-custodial-danger-zone-blocked-notice").props.children,
@@ -335,7 +344,7 @@ describe("DeleteAccount", () => {
       mockDeleteWallet.mockResolvedValue("blocked")
 
       const { getByTestId } = render(<DeleteAccount />)
-      fireEvent.press(getByTestId("danger-zone-delete-button"))
+      fireEvent.press(getByTestId("self-custodial-danger-zone-delete-button"))
 
       await act(async () => {
         await lastConfirmProps.onConfirm?.()
@@ -358,18 +367,45 @@ describe("DeleteAccount", () => {
 
       const { queryByTestId } = render(<DeleteAccount />)
 
-      expect(queryByTestId("danger-zone-delete-button")).toBeNull()
+      expect(queryByTestId("self-custodial-danger-zone-delete-button")).toBeNull()
       expect(queryByTestId("self-custodial-danger-zone-blocked-notice")).toBeNull()
+    })
+
+    /** Blocked, but for a reason the blocked copy does not describe. Saying nothing at all
+     *  would leave the section with no button, no reason and nothing to act on. */
+    it("says what went wrong when the record could not be read", () => {
+      mockGuardRecordError = true
+      mockIsDeletionBlocked.mockReturnValue(true)
+
+      const { getByTestId, queryByTestId } = render(<DeleteAccount />)
+
+      expect(queryByTestId("self-custodial-danger-zone-delete-button")).toBeNull()
+      expect(queryByTestId("self-custodial-danger-zone-blocked-notice")).toBeNull()
+      expect(getByTestId("self-custodial-danger-zone-record-error").props.children).toBe(
+        "Something went wrong",
+      )
+    })
+
+    /** The only other way back is an unprompted blur and refocus, which nothing tells the
+     *  user to do. */
+    it("offers a retry that reads the record again", () => {
+      mockGuardRecordError = true
+      mockIsDeletionBlocked.mockReturnValue(true)
+
+      const { getByTestId } = render(<DeleteAccount />)
+      fireEvent.press(getByTestId("self-custodial-danger-zone-record-retry"))
+
+      expect(mockRetryRecordRead).toHaveBeenCalledTimes(1)
     })
 
     it("restores the delete control once the block lifts", () => {
       const { getByTestId, queryByTestId, rerender } = render(<DeleteAccount />)
-      expect(queryByTestId("danger-zone-delete-button")).toBeNull()
+      expect(queryByTestId("self-custodial-danger-zone-delete-button")).toBeNull()
 
       mockIsDeletionBlocked.mockReturnValue(false)
       rerender(<DeleteAccount />)
 
-      expect(getByTestId("danger-zone-delete-button")).toBeTruthy()
+      expect(getByTestId("self-custodial-danger-zone-delete-button")).toBeTruthy()
       expect(queryByTestId("self-custodial-danger-zone-blocked-notice")).toBeNull()
     })
   })
