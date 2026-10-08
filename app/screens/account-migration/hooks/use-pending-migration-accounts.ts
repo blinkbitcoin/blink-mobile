@@ -1,11 +1,6 @@
 import { useCallback } from "react"
 
-import { reportError } from "@app/utils/error-logging"
-
-import {
-  clearPendingProvisionedAccount,
-  savePendingProvisionedAccount,
-} from "../utils/migration-checkpoint-storage"
+import { savePendingProvisionedAccount } from "../utils/migration-checkpoint-storage"
 
 import { useCustodialOwnerId } from "./use-custodial-owner-id"
 import { usePendingProvisionedWallets } from "./use-pending-provisioned-wallets"
@@ -18,8 +13,8 @@ import { usePendingProvisionedWallets } from "./use-pending-provisioned-wallets"
  *
  * It is also what marks a wallet as undeletable while it waits for the migration's funds,
  * so it is NOT dropped merely because its wallet became the active account: a user who
- * switched into the wallet by hand is exactly the case the mark has to survive. Only the
- * completing flow clears it by owner, or `clearPendingWallet` once the funds are proven to
+ * switched into the wallet by hand is exactly the case the mark has to survive. It is
+ * cleared by wallet, through `clearPendingWallet`, and only once those funds are proven to
  * have landed.
  *
  * This is the owner-aware half; usePendingProvisionedWallets holds the record itself, for
@@ -58,33 +53,11 @@ export const usePendingMigrationAccounts = () => {
     [storageKey, ownerId, setPendingByOwner],
   )
 
-  /** Memory follows the write, never leads it, for the same reason `clearPendingWallet`
-   *  does: this record gates deletion and `deleteWallet` re-reads it from storage, so a map
-   *  that reported the mark gone while the write failed would offer a delete control that
-   *  then refuses, silently. */
-  const clearPendingAccount = useCallback(
-    async (custodialAccountId: string): Promise<void> => {
-      try {
-        await clearPendingProvisionedAccount(storageKey, custodialAccountId)
-      } catch (err) {
-        reportError("Pending migration account clear", err)
-        return
-      }
-
-      setPendingByOwner((previous) => {
-        const { [custodialAccountId]: cleared, ...rest } = previous
-        return rest
-      })
-    },
-    [storageKey, setPendingByOwner],
-  )
-
   return {
     pendingAccountIds,
     pendingForActiveAccount,
     ownerId,
     savePendingAccount,
-    clearPendingAccount,
     clearPendingWallet,
     loading: loading || ownerLoading,
     hasError,

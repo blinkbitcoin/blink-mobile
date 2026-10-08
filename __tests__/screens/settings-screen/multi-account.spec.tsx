@@ -75,7 +75,6 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     pendingAccountIds: mockPendingAccountIds,
     pendingForActiveAccount: mockPendingForActiveAccount,
     savePendingAccount: jest.fn(),
-    clearPendingAccount: jest.fn(),
     loading: false,
   }),
 }))

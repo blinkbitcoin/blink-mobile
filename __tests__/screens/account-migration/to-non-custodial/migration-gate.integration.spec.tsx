@@ -16,8 +16,7 @@ import { walletOverviewQueryResult } from "../helpers"
 
 const mockNavigate = jest.fn()
 const mockNavigateToCheckpoint = jest.fn()
-const mockLoadPendingProvisionedAccounts = jest.fn()
-const mockClearPendingProvisionedAccount = jest.fn()
+const mockReadPendingProvisionedAccounts = jest.fn()
 const mockReportError = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
 let mockRegistryAccounts: { id: string }[] = []
@@ -76,10 +75,8 @@ jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", (
   ...jest.requireActual(
     "@app/screens/account-migration/utils/migration-checkpoint-storage",
   ),
-  loadPendingProvisionedAccounts: (...args: readonly unknown[]) =>
-    mockLoadPendingProvisionedAccounts(...args),
-  clearPendingProvisionedAccount: (...args: readonly unknown[]) =>
-    mockClearPendingProvisionedAccount(...args),
+  readPendingProvisionedAccounts: (...args: readonly unknown[]) =>
+    mockReadPendingProvisionedAccounts(...args),
 }))
 
 /**
@@ -189,16 +186,21 @@ describe("MigrationGate pending-wallet integration", () => {
     jest.clearAllMocks()
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockRegistryAccounts = [{ id: "custodial-1" }]
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({})
-    mockClearPendingProvisionedAccount.mockResolvedValue(undefined)
+    mockReadPendingProvisionedAccounts.mockResolvedValue({
+      status: "ok",
+      pendingByOwner: {},
+    })
   })
 
   /** A crash without a reinstall keeps the record and its wallet: the real chain must
    *  read the stored record, find the wallet in the registry, and resume — the same
    *  predicate ensureAccount will apply when the restarted flow reuses that wallet. */
   it("resumes when the stored pending record's wallet still exists on the device", async () => {
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({
-      "custodial-1": "sc-account-1",
+    mockReadPendingProvisionedAccounts.mockResolvedValue({
+      status: "ok",
+      pendingByOwner: {
+        "custodial-1": "sc-account-1",
+      },
     })
     mockRegistryAccounts = [{ id: "custodial-1" }, { id: "sc-account-1" }]
 
@@ -218,8 +220,11 @@ describe("MigrationGate pending-wallet integration", () => {
    * the migration may still owe it funds.
    */
   it("hands over for a record pointing at the active account, without dropping it", async () => {
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({
-      "custodial-1": "sc-wallet-1",
+    mockReadPendingProvisionedAccounts.mockResolvedValue({
+      status: "ok",
+      pendingByOwner: {
+        "custodial-1": "sc-wallet-1",
+      },
     })
     mockActiveAccount = { id: "sc-wallet-1", type: "selfCustodial" }
     mockRegistryAccounts = [{ id: "custodial-1" }, { id: "sc-wallet-1" }]
@@ -232,7 +237,6 @@ describe("MigrationGate pending-wallet integration", () => {
         origin: "gate",
       }),
     )
-    expect(mockClearPendingProvisionedAccount).not.toHaveBeenCalled()
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
   })
 
