@@ -4108,6 +4108,7 @@
         "dangerZoneBulletPermanent": "L'eliminazione dell'account è permanente",
         "dangerZoneBulletEmpty": "Assicurati che l'account sia vuoto",
         "dangerZoneDeleteButton": "Elimina account e dati",
+        "dangerZoneMigrationPendingNotice": "Non puoi eliminare questo portafoglio mentre i fondi migrati sono ancora in transito.",
         "confirmModalTitle": "Conferma eliminazione account",
         "confirmModalTypeToConfirm": "Digita \"{delete: string}\" per confermare",
         "hasFundsWarningTitle": "Attenzione",

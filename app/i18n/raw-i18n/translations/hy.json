@@ -4108,6 +4108,7 @@
     "dangerZoneBulletPermanent": "Հաշվի ջնջումը մշտական է",
     "dangerZoneBulletEmpty": "Համոզվեք, որ հաշիվը դատարկ է",
     "dangerZoneDeleteButton": "Ջնջել հաշիվը և տվյալները",
+    "dangerZoneMigrationPendingNotice": "Չեք կարող ջնջել այս դրամապանակը, քանի դեռ տեղափոխված միջոցները ճանապարհին են։",
     "confirmModalTitle": "Հաստատել հաշվի ջնջումը",
     "confirmModalTypeToConfirm": "Մուտքագրեք \"{delete: string}\" հաստատելու համար",
     "hasFundsWarningTitle": "Զգուշացում",

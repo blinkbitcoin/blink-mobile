@@ -271,6 +271,14 @@ jest.mock("@app/graphql/generated", () => {
       },
       loading: false,
     })),
+    /** The migration entry reads the phase to stand down after a completed migration;
+     *  unanswered here, like a launch whose read has not landed. */
+    useMigrationStatusQuery: jest.fn(() => ({
+      data: undefined,
+      loading: false,
+      error: undefined,
+      refetch: jest.fn(),
+    })),
     useUnacknowledgedNotificationCountQuery: jest.fn(() => ({
       data: {
         me: {

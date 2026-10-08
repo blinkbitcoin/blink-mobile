@@ -12,6 +12,15 @@ let mockIsFocused = true
 const mockUseActiveApiKeys = jest.fn()
 let mockWindDown: WindDown | null = null
 let mockIsMigrationLocked = false
+let mockIsMigrationCompleted = false
+let mockCanGoBack = true
+let mockIsBlockerVisible = true
+const mockToastShow = jest.fn()
+
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: readonly unknown[]) => mockToastShow(...args),
+}))
+const mockRefetchBlocker = jest.fn()
 let mockLockLoading = false
 let mockLockError = false
 const mockRefetchLock = jest.fn()
@@ -105,7 +114,11 @@ const windDownWith = (status: WindDownStatus): WindDown => ({
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    goBack: mockGoBack,
+    canGoBack: () => mockCanGoBack,
+  }),
   useIsFocused: () => mockIsFocused,
 }))
 
@@ -146,9 +159,17 @@ jest.mock("@app/screens/account-migration/hooks/use-custodial-wind-down", () => 
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({
     isLocked: mockIsMigrationLocked,
+    isCompleted: mockIsMigrationCompleted,
     loading: mockLockLoading,
     hasError: mockLockError,
     refetch: mockRefetchLock,
+  }),
+}))
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-blocker", () => ({
+  useMigrationBlocker: () => ({
+    isVisible: mockIsBlockerVisible,
+    refetch: mockRefetchBlocker,
   }),
 }))
 
@@ -238,28 +259,34 @@ jest.mock("@app/utils/error-logging", () => ({
       : mockReportError(operation, err, options),
 }))
 
+const resetGateMocks = () => {
+  jest.clearAllMocks()
+  mockIsFocused = true
+  mockWindDown = null
+  mockSelfCustodialDisabled = false
+  mockIsMigrationLocked = false
+  mockIsMigrationCompleted = false
+  mockCanGoBack = true
+  mockIsBlockerVisible = true
+  mockRefetchBlocker.mockResolvedValue(undefined)
+  mockLockLoading = false
+  mockLockError = false
+  mockCheckpointLoading = false
+  mockCheckpointError = false
+  mockHasResumableCheckpoint = true
+  mockReusablePendingAccountId = null
+  mockPendingWalletLoading = false
+  mockPendingWalletError = false
+  mockUseActiveApiKeys.mockReturnValue(apiKeysState())
+  mockUseTransferBlocked.mockReturnValue(false)
+  mockUseDollarBalanceRestricted.mockReturnValue(false)
+  mockUseWalletOverviewScreenQuery.mockReturnValue(
+    walletOverviewQueryResult({ usdBalance: 0 }),
+  )
+}
+
 describe("MigrationGate", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockIsFocused = true
-    mockWindDown = null
-    mockSelfCustodialDisabled = false
-    mockIsMigrationLocked = false
-    mockLockLoading = false
-    mockLockError = false
-    mockCheckpointLoading = false
-    mockCheckpointError = false
-    mockHasResumableCheckpoint = true
-    mockReusablePendingAccountId = null
-    mockPendingWalletLoading = false
-    mockPendingWalletError = false
-    mockUseActiveApiKeys.mockReturnValue(apiKeysState())
-    mockUseTransferBlocked.mockReturnValue(false)
-    mockUseDollarBalanceRestricted.mockReturnValue(false)
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ usdBalance: 0 }),
-    )
-  })
+  beforeEach(resetGateMocks)
 
   it("shows the temporarily-unavailable screen while the kill-switch is on, whatever the entry", () => {
     mockSelfCustodialDisabled = true
@@ -910,5 +937,150 @@ describe("MigrationGate", () => {
     render(<MigrationGate />)
 
     expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("forcedPreDeadline")
+  })
+})
+
+describe("MigrationGate after a completed migration", () => {
+  beforeEach(resetGateMocks)
+
+  /** The blocker reads the phase once per launch on its own instance: a launch whose read
+   *  failed would keep it up over a completed migration unless the retry refreshes it. */
+  it("refreshes the blocker's read with the retry", async () => {
+    mockUseActiveApiKeys.mockReturnValue(apiKeysState({ hasError: true, isReady: false }))
+    mockUseWalletOverviewScreenQuery.mockReturnValue({
+      ...walletOverviewQueryResult({ usdBalance: 0 }),
+      refetch: jest.fn().mockResolvedValue(undefined),
+    })
+
+    const { getByTestId } = render(<MigrationGate />)
+    fireEvent.press(getByTestId("gate-retry-button"))
+    await act(async () => {})
+
+    expect(mockRefetchBlocker).toHaveBeenCalledTimes(1)
+  })
+
+  /** Reached anyway after the migration completed (a deeplink, a support reset), the
+   *  closed gate has nothing left to hold the user to. */
+  it("leaves the way out open on the closed gate once the migration completed", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockIsMigrationCompleted = true
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "gate", isExitBlocked: false }),
+    )
+  })
+
+  /** The blocker reads on its own and can fail while this read answers: a completion seen
+   *  here asks it to read again, which is what lifts it. */
+  it("asks the blocker to read again once it sees the migration completed", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockIsMigrationCompleted = true
+
+    render(<MigrationGate />)
+
+    expect(mockRefetchBlocker).toHaveBeenCalledTimes(1)
+  })
+
+  /** Refreshing a blocker the user is already past could fail and bring it back over their
+   *  session, so only one that is still up is asked to read again. */
+  it("leaves a blocker that is already down alone", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockIsMigrationCompleted = true
+    mockIsBlockerVisible = false
+
+    render(<MigrationGate />)
+
+    expect(mockRefetchBlocker).not.toHaveBeenCalled()
+  })
+
+  it("leaves the blocker's read alone while the migration has not completed", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+
+    render(<MigrationGate />)
+
+    expect(mockRefetchBlocker).not.toHaveBeenCalled()
+  })
+
+  it("swallows a blocker re-read that fails again, leaving the gate in place", async () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+    mockIsMigrationCompleted = true
+    mockRefetchBlocker.mockRejectedValue(new Error("offline"))
+
+    render(<MigrationGate />)
+    await act(async () => {})
+
+    expect(mockRequiredScreen).toHaveBeenCalled()
+  })
+
+  describe("the way out of a completed migration", () => {
+    const closeGate = () => {
+      mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+      mockIsMigrationCompleted = true
+      render(<MigrationGate />)
+      const [props] =
+        mockRequiredScreen.mock.calls[mockRequiredScreen.mock.calls.length - 1]
+      act(() => {
+        props.onClose?.()
+      })
+    }
+
+    it("goes back when the gate was pushed as a route", () => {
+      closeGate()
+
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
+    /** As the root blocker there is nothing behind it: closing asks the blocker to read
+     *  again, which is what lifts it. */
+    it("asks the blocker to read again when the gate is the root", () => {
+      mockCanGoBack = false
+      closeGate()
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockRefetchBlocker).toHaveBeenCalledTimes(2)
+    })
+
+    /** The dollar modal closes through the same exit, so as the root blocker it lifts the
+     *  blocker instead of calling a goBack with nothing behind it. */
+    it("closes the dollar modal through the same exit", () => {
+      mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+      mockIsMigrationCompleted = true
+      mockCanGoBack = false
+      mockUseWalletOverviewScreenQuery.mockReturnValue(
+        walletOverviewQueryResult({ usdBalance: 20 }),
+      )
+      render(<MigrationGate />)
+      const [props] =
+        mockDollarBalanceModal.mock.calls[mockDollarBalanceModal.mock.calls.length - 1]
+      act(() => {
+        props.toggleModal()
+      })
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockRefetchBlocker).toHaveBeenCalledTimes(2)
+    })
+
+    /** A close that does nothing reads as a broken button: a failed re-read says so. */
+    it("says so when the blocker's re-read fails on close", async () => {
+      mockCanGoBack = false
+      mockRefetchBlocker.mockRejectedValue(new Error("offline"))
+      closeGate()
+      await act(async () => {})
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("keeps the closed gate's way out shut while the migration has not completed", () => {
+    mockWindDown = windDownWith(WindDownStatus.GatedClosed)
+
+    render(<MigrationGate />)
+
+    expect(mockRequiredScreen).toHaveBeenCalledWith(
+      expect.objectContaining({ mode: "gate", isExitBlocked: true }),
+    )
   })
 })

@@ -36,6 +36,15 @@ export const SPARK_EXPLORER_TX_URL = "https://sparkscan.io/tx/"
 export const possibleGaloyInstanceNames = ["Main", "Staging", "Local", "Custom"] as const
 export type GaloyInstanceName = (typeof possibleGaloyInstanceNames)[number]
 
+/**
+ * The developer's own backend. For exempting a dev-only convenience that must stay ON for
+ * Staging, where the flows are tested for real: the Spark network alone cannot tell the two
+ * apart, since every instance that is not Main runs on regtest. Custom is not exempt, as it
+ * may well point at a shared backend.
+ */
+export const isLocalInstance = (instanceId: GaloyInstanceName): boolean =>
+  instanceId === "Local"
+
 export type StandardInstance = {
   id: "Main" | "Staging" | "Local"
 }

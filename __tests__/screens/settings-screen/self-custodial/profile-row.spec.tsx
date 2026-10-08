@@ -201,6 +201,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
       common: {
         anonymousUser: () => "Anon user",
       },
+      errors: { generic: () => "Something went wrong" },
+      SelfCustodialDelete: {
+        dangerZoneMigrationPendingNotice: () =>
+          "You can't delete this wallet while the migrated funds are still on their way.",
+      },
     },
   }),
 }))
@@ -215,6 +220,9 @@ describe("ProfileRow", () => {
     lastWarningModalProps.isVisible = undefined
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
+    /** clearAllMocks keeps implementations, so a test that returns a refusal would leak
+     *  it into the next one. */
+    mockDeleteWallet.mockResolvedValue(undefined)
     mockUseDeleteAccount.mockReturnValue({
       state: "idle",
       deleteWallet: mockDeleteWallet,
@@ -235,6 +243,7 @@ describe("ProfileRow", () => {
     const { getByText, queryByText } = render(
       <ProfileRow
         entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@staging.blink.sv" }}
+        isDeletionBlocked={false}
       />,
     )
 
@@ -244,7 +253,10 @@ describe("ProfileRow", () => {
 
   it("falls back to anonymous user label when no lightning address is set", () => {
     const { getByText } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
 
     expect(getByText("Anon user")).toBeTruthy()
@@ -252,7 +264,10 @@ describe("ProfileRow", () => {
 
   it("switches to the entry's account id when the row is pressed", () => {
     const { getByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
 
     fireEvent.press(getByTestId(`profile-row-${TEST_ENTRY_ID}`))
@@ -277,7 +292,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
 
     fireEvent.press(getByTestId(`profile-row-${TEST_ENTRY_ID}`))
@@ -290,7 +308,10 @@ describe("ProfileRow", () => {
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
 
     expect(queryByTestId("delete-modal")).toBeNull()
@@ -310,7 +331,7 @@ describe("ProfileRow", () => {
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
     const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
     const { getByTestId, queryByTestId, findByTestId, rerender } = render(
-      <ProfileRow entry={entry} />,
+      <ProfileRow entry={entry} isDeletionBlocked={false} />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
     await findByTestId("delete-modal")
@@ -318,7 +339,7 @@ describe("ProfileRow", () => {
     await act(async () => {
       await lastConfirmModalProps.onConfirm?.()
     })
-    rerender(<ProfileRow entry={entry} />)
+    rerender(<ProfileRow entry={entry} isDeletionBlocked={false} />)
 
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_ENTRY_ID)
@@ -339,7 +360,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -352,7 +376,10 @@ describe("ProfileRow", () => {
     mockNetwork = mockSparkNetwork.Regtest
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -375,7 +402,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -390,7 +420,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -410,7 +443,10 @@ describe("ProfileRow", () => {
     mockProbeWallets.mockResolvedValue({ status: "no-mnemonic" })
 
     const { getByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -441,7 +477,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -475,7 +514,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -508,7 +550,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -526,7 +571,10 @@ describe("ProfileRow", () => {
     )
 
     const { getByTestId, queryByTestId, findByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
     fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
 
@@ -545,7 +593,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
     )
 
     expect(getByTestId("delete-overlay")).toBeTruthy()
@@ -568,7 +619,10 @@ describe("ProfileRow", () => {
     })
 
     const { getByText } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }} />,
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }}
+        isDeletionBlocked={false}
+      />,
     )
 
     expect(getByText("magentamouse1845")).toBeTruthy()
@@ -583,9 +637,96 @@ describe("ProfileRow", () => {
     const { getByText } = render(
       <ProfileRow
         entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@example.com" }}
+        isDeletionBlocked={false}
       />,
     )
 
     expect(getByText("stored")).toBeTruthy()
+  })
+
+  /** The whole point of admitting the wallet into the switcher: reaching it must stay
+   *  possible while destroying it must not, because it holds the only key to funds the
+   *  migration has already moved out of the custodial account. */
+  it("keeps the wallet switchable but offers no delete control while deletion is blocked", () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+
+    const { getByTestId, queryByTestId } = render(
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={true}
+      />,
+    )
+
+    expect(queryByTestId(`delete-button-${TEST_ENTRY_ID}`)).toBeNull()
+
+    fireEvent.press(getByTestId(`profile-row-${TEST_ENTRY_ID}`))
+
+    expect(setActiveAccountId).toHaveBeenCalledWith(TEST_ENTRY_ID)
+  })
+
+  it("does not probe or delete while deletion is blocked, even on regtest", async () => {
+    mockNetwork = mockSparkNetwork.Regtest
+
+    const { queryByTestId } = render(
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={true}
+      />,
+    )
+    await flushEffects()
+
+    expect(queryByTestId(`delete-button-${TEST_ENTRY_ID}`)).toBeNull()
+    expect(queryByTestId("delete-modal")).toBeNull()
+    expect(mockProbeWallets).not.toHaveBeenCalled()
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The row offered the control from its own read of the record, and `deleteWallet` refused
+   * from a fresher one. Closing the modal over a deletion that never happened would read as
+   * a silent failure, so the reason is surfaced.
+   */
+  it("surfaces the reason when deleteWallet refuses a wallet the migration still owes", async () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
+    mockDeleteWallet.mockResolvedValue("blocked")
+
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow
+        entry={{ id: TEST_ENTRY_ID, lightningAddress: null }}
+        isDeletionBlocked={false}
+      />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        message:
+          "You can't delete this wallet while the migrated funds are still on their way.",
+      }),
+    )
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The control is restored by the same prop going false, so a lifted block needs no
+   *  remount: the row a user returns to after the funds land is the deletable one. */
+  it("restores the delete control once the block lifts", () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
+
+    const { queryByTestId, rerender } = render(
+      <ProfileRow entry={entry} isDeletionBlocked={true} />,
+    )
+    expect(queryByTestId(`delete-button-${TEST_ENTRY_ID}`)).toBeNull()
+
+    rerender(<ProfileRow entry={entry} isDeletionBlocked={false} />)
+
+    expect(queryByTestId(`delete-button-${TEST_ENTRY_ID}`)).toBeTruthy()
   })
 })
