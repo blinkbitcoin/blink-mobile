@@ -3,12 +3,16 @@ import { useCallback, useMemo, useRef, useState } from "react"
 import { useFocusEffect } from "@react-navigation/native"
 
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { StorageReadStatus } from "@app/self-custodial/storage/account-index"
 import { reportError } from "@app/utils/error-logging"
 
 import {
   clearPendingProvisionedWallet,
   getPendingAccountsStorageKey,
-  loadPendingProvisionedAccounts,
+  PendingRecordStatus,
+  type PendingProvisionedAccountsRead,
+  readPendingProvisionedAccounts,
+  repairPendingProvisionedAccounts,
 } from "../utils/migration-checkpoint-storage"
 
 export type PendingProvisionedWallets = {
@@ -47,17 +51,57 @@ export const usePendingProvisionedWallets = (): PendingProvisionedWallets => {
 
   const storageKey = getPendingAccountsStorageKey(environment)
 
-  /** The error only clears on a read that succeeds, never at the start of one, so a retry
-   *  never presents the still-empty map as settled data while the read is in flight.
-   *  Resolves instead of rejecting; the failure already traveled through reportError and
-   *  hasError. */
+  /**
+   * Nothing is recoverable from a corrupt value, and leaving it in place would block
+   * provisioning and deletion alike for good, since only a write repairs it and writes run
+   * only during a migration. So it is repaired where it is found, through the same per-key
+   * queue as every other write, and the read that follows sees the empty record it has
+   * become. Until that write lands the record stays unreadable, which is what `deleteWallet`
+   * independently decides too: reporting it empty here is what would offer a delete control
+   * that then refuses.
+   */
+  const readRecord = useCallback(async (): Promise<PendingProvisionedAccountsRead> => {
+    const read = await readPendingProvisionedAccounts(storageKey)
+    if (read.status !== PendingRecordStatus.Corrupt) return read
+
+    reportError("Pending migration accounts repair", read.error, {
+      dedupKey: "pending-migration-accounts-corrupt",
+    })
+
+    /** Deduped like the report above, and swallowed: this runs on every focus, with two
+     *  hook instances mounted on the switcher, so a store that stays unwritable would file
+     *  the same non-fatal twice per visit. The caller learns through the corrupt read it
+     *  gets back. */
+    try {
+      await repairPendingProvisionedAccounts(storageKey)
+    } catch (err) {
+      reportError("Pending migration accounts repair", err, {
+        dedupKey: "pending-migration-accounts-repair-failed",
+      })
+      return read
+    }
+
+    return readPendingProvisionedAccounts(storageKey)
+  }, [storageKey])
+
   const load = useCallback(
     (): Promise<void> =>
-      loadPendingProvisionedAccounts(storageKey)
-        .then((pending) => {
+      readRecord()
+        .then((read) => {
           if (!isMountedRef.current) return
 
-          setPendingByOwner(pending)
+          if (read.status !== StorageReadStatus.Ok) {
+            /** The cause travels, and only once: this read runs on every focus, and a store
+             *  that stays broken would otherwise file the same unexplained report each time. */
+            reportError("Pending migration accounts load", read.error, {
+              dedupKey: "pending-migration-accounts-unreadable",
+            })
+            setHasError(true)
+            setLoading(false)
+            return
+          }
+
+          setPendingByOwner(read.pendingByOwner)
           setHasError(false)
           setLoading(false)
         })
@@ -67,7 +111,7 @@ export const usePendingProvisionedWallets = (): PendingProvisionedWallets => {
           setHasError(true)
           setLoading(false)
         }),
-    [storageKey],
+    [readRecord],
   )
 
   const reloadPendingAccounts = useCallback(() => {

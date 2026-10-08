@@ -1,4 +1,32 @@
+import AsyncStorage from "@react-native-async-storage/async-storage"
+
+import { StorageReadStatus } from "@app/self-custodial/storage/account-index"
 import { loadJson, remove, saveJson } from "@app/utils/storage"
+
+/**
+ * One turn at a time per storage key.
+ *
+ * Every writer below is a read, a change and a write back, and the record holds one entry
+ * per owner. Two of them interleaving means the second reads the snapshot the first took
+ * before its write landed, so whichever finishes last writes the other's entry away: a
+ * wallet cleared while another is being saved comes back, or the saved one vanishes. Both
+ * are silent, and one of them resurrects a mark that gates deletion.
+ *
+ * Per key rather than globally, because records under different keys share nothing. The
+ * chain swallows the previous turn's failure so one rejected write cannot wedge the queue
+ * for the rest of the session; each caller still sees its own.
+ */
+const writeQueuesByKey = new Map<string, Promise<unknown>>()
+
+const queueOnKey = <T>(storageKey: string, run: () => Promise<T>): Promise<T> => {
+  const previous = writeQueuesByKey.get(storageKey) ?? Promise.resolve()
+  const next = previous.catch(() => undefined).then(run)
+  writeQueuesByKey.set(
+    storageKey,
+    next.catch(() => undefined),
+  )
+  return next
+}
 
 /** Values are persisted to AsyncStorage: do not rename them. */
 export enum MigrationCheckpoint {
@@ -186,10 +214,7 @@ const PENDING_ACCOUNTS_KEY_PREFIX = "migrationPendingAccounts"
 export const getPendingAccountsStorageKey = (environment: string): string =>
   `${PENDING_ACCOUNTS_KEY_PREFIX}_${environment.toLowerCase()}`
 
-export const loadPendingProvisionedAccounts = async (
-  storageKey: string,
-): Promise<PendingProvisionedAccounts> => {
-  const raw = await loadJson(storageKey).catch(() => null)
+const toPendingAccounts = (raw: unknown): PendingProvisionedAccounts => {
   if (!raw || typeof raw !== "object" || Array.isArray(raw)) return {}
   const entries = Object.entries(raw as Record<string, unknown>).filter(
     (entry): entry is [string, string] => typeof entry[1] === "string",
@@ -197,25 +222,123 @@ export const loadPendingProvisionedAccounts = async (
   return Object.fromEntries(entries)
 }
 
+export type PendingProvisionedAccountsRead =
+  | { status: typeof StorageReadStatus.Ok; pendingByOwner: PendingProvisionedAccounts }
+  /** Storage could not answer. What it holds is unknown, so it must not be overwritten. */
+  | { status: typeof StorageReadStatus.ReadFailed; error: Error }
+  /** Storage answered with something that is not a record. Nothing is recoverable from it,
+   *  so a writer may repair it, while a reader deciding to destroy still may not act on it. */
+  | { status: typeof PendingRecordStatus.Corrupt; error: Error }
+
+export const PendingRecordStatus = { Corrupt: "corrupt" } as const
+
+/**
+ * The record, read strictly: a key that is absent is an empty record, while a read that
+ * failed or a value that will not parse is reported as such rather than flattened into
+ * "there is nothing pending".
+ *
+ * The only read of it, deliberately. This record gates a destructive action, and the shared
+ * `loadJson` turns every failure into `null` by design, which is right for a reader deciding
+ * what to show and wrong for one deciding whether to delete the only key to funds in flight.
+ * Having the screens read it tolerantly while the deletion read strictly was worse than
+ * either: the control would be offered and then refuse. AsyncStorage is reached directly
+ * here because no tolerant helper can tell the two cases apart after the fact.
+ *
+ * The writers below read through it too: a write-back built on a failed read would persist
+ * the caller's entry over a map it never actually saw, dropping other owners' marks.
+ */
+export const readPendingProvisionedAccounts = async (
+  storageKey: string,
+): Promise<PendingProvisionedAccountsRead> => {
+  let raw: string | null
+  try {
+    raw = await AsyncStorage.getItem(storageKey)
+  } catch (err) {
+    return {
+      status: StorageReadStatus.ReadFailed,
+      error: err instanceof Error ? err : new Error(String(err)),
+    }
+  }
+
+  /** Falsy rather than strictly null, matching what the tolerant loader treated as absent:
+   *  an empty string is a key with nothing in it, not a record that will not parse. */
+  if (!raw) return { status: StorageReadStatus.Ok, pendingByOwner: {} }
+
+  let parsed: unknown
+  try {
+    parsed = JSON.parse(raw)
+  } catch (err) {
+    return {
+      status: PendingRecordStatus.Corrupt,
+      error: err instanceof Error ? err : new Error(String(err)),
+    }
+  }
+
+  /** A value that parses but is not a record is corrupt just the same. Flattening it to an
+   *  empty map would answer "nothing is pending" on a storage fault, which is the one
+   *  answer that grants permission to delete. */
+  if (!parsed || typeof parsed !== "object" || Array.isArray(parsed)) {
+    return {
+      status: PendingRecordStatus.Corrupt,
+      error: new Error("Pending migration accounts value is not a record"),
+    }
+  }
+
+  return { status: StorageReadStatus.Ok, pendingByOwner: toPendingAccounts(parsed) }
+}
+
+/**
+ * Overwrites a record nothing can be recovered from, so the device is not left with a value
+ * that blocks provisioning and deletion alike with no way back.
+ *
+ * The decision is made again inside the queue, not carried into it: a mark written between
+ * the caller's read and this turn would otherwise be wiped by a repair aimed at the value
+ * it replaced, leaving a wallet mid-migration unmarked. A store that merely could not
+ * answer is never repaired either, since it may still hold live marks.
+ */
+export const repairPendingProvisionedAccounts = async (
+  storageKey: string,
+): Promise<void> =>
+  queueOnKey(storageKey, async () => {
+    const current = await readPendingProvisionedAccounts(storageKey)
+    if (current.status !== PendingRecordStatus.Corrupt) return
+
+    await saveJson(storageKey, {})
+  })
+
+/**
+ * What a writer may safely build its write-back on.
+ *
+ * A store that could not answer stops the write: overwriting it would persist this caller's
+ * entry over a map it never saw, dropping other owners' marks. A value that is not a record
+ * is different in kind, since nothing is recoverable from it and refusing would leave it
+ * unrepairable for good, blocking provisioning and deletion alike with no way back. Writing
+ * over that one is the repair.
+ */
+const readRecordForWrite = async (
+  storageKey: string,
+): Promise<PendingProvisionedAccounts> => {
+  const read = await readPendingProvisionedAccounts(storageKey)
+  if (read.status === StorageReadStatus.ReadFailed) {
+    throw new Error("Pending migration accounts unreadable; refusing to overwrite")
+  }
+  if (read.status === PendingRecordStatus.Corrupt) return {}
+
+  return read.pendingByOwner
+}
+
 export const savePendingProvisionedAccount = async (
   storageKey: string,
   update: { custodialAccountId: string; accountId: string },
-): Promise<void> => {
-  const existing = await loadPendingProvisionedAccounts(storageKey)
-  await saveJson(storageKey, {
-    ...existing,
-    [update.custodialAccountId]: update.accountId,
-  })
-}
+): Promise<void> =>
+  queueOnKey(storageKey, async () => {
+    const existing = await readRecordForWrite(storageKey)
 
-export const clearPendingProvisionedAccount = async (
-  storageKey: string,
-  custodialAccountId: string,
-): Promise<void> => {
-  const existing = await loadPendingProvisionedAccounts(storageKey)
-  const { [custodialAccountId]: cleared, ...rest } = existing
-  await saveJson(storageKey, rest)
-}
+    await saveJson(storageKey, {
+      ...existing,
+      [update.custodialAccountId]: update.accountId,
+    })
+  })
 
 /**
  * Clears by provisioned wallet rather than by owner, for the one caller that holds the
@@ -227,10 +350,12 @@ export const clearPendingProvisionedAccount = async (
 export const clearPendingProvisionedWallet = async (
   storageKey: string,
   accountId: string,
-): Promise<void> => {
-  const existing = await loadPendingProvisionedAccounts(storageKey)
-  const remaining = Object.fromEntries(
-    Object.entries(existing).filter(([, walletId]) => walletId !== accountId),
-  )
-  await saveJson(storageKey, remaining)
-}
+): Promise<void> =>
+  queueOnKey(storageKey, async () => {
+    const existing = await readRecordForWrite(storageKey)
+
+    const remaining = Object.fromEntries(
+      Object.entries(existing).filter(([, walletId]) => walletId !== accountId),
+    )
+    await saveJson(storageKey, remaining)
+  })

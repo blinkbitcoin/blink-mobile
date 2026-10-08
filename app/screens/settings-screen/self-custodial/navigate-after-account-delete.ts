@@ -21,6 +21,7 @@ export const navigateAfterAccountDelete = (
     /** Nothing was deleted, so there is nowhere to go: the user stays where they are, on a
      *  screen whose own copy already says why the wallet cannot be removed yet. */
     case "blocked":
+    case "record-unavailable":
       return
     case "logged-out":
       navigation.dispatch(
