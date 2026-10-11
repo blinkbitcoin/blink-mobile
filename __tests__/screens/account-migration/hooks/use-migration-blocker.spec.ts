@@ -14,13 +14,20 @@ jest.mock("@app/config/feature-flags-context", () => ({
 
 let mockGateArmed = false
 let mockMigrationLocked = false
+let mockMigrationCompleted = false
+const mockRefetchLock = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-gate-armed", () => ({
   useWindDownGateArmed: () => mockGateArmed,
 }))
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
-  useMigrationLock: () => ({ isLocked: mockMigrationLocked, loading: false }),
+  useMigrationLock: () => ({
+    isLocked: mockMigrationLocked,
+    isCompleted: mockMigrationCompleted,
+    loading: false,
+    refetch: mockRefetchLock,
+  }),
 }))
 
 /** Rendered through the provider, so the test reads the one shared answer both consumers
@@ -33,6 +40,7 @@ describe("useMigrationBlocker", () => {
     jest.clearAllMocks()
     mockGateArmed = false
     mockMigrationLocked = false
+    mockMigrationCompleted = false
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
   })
 
@@ -100,5 +108,69 @@ describe("useMigrationBlocker", () => {
     const { result } = renderHook(() => useMigrationBlocker())
 
     expect(result.current.isVisible).toBe(false)
+  })
+
+  /**
+   * The server keeps reporting the custodial account as closed after its funds have left.
+   * A gate that stayed up would replace the whole app with a flow the server refuses to
+   * start again, keeping the user from the wallet the funds went to.
+   */
+  describe("once the migration has completed", () => {
+    it("lifts the armed gate", () => {
+      mockGateArmed = true
+      mockMigrationCompleted = true
+
+      const { result } = renderBlocker()
+
+      expect(result.current.isVisible).toBe(false)
+    })
+
+    it("keeps the armed gate while the migration has not completed", () => {
+      mockGateArmed = true
+      mockMigrationCompleted = false
+
+      const { result } = renderBlocker()
+
+      expect(result.current.isVisible).toBe(true)
+    })
+
+    /** Completed and locked cannot both come from one server answer, but the lock is the
+     *  stronger signal: if it ever says the flow is still open, the flow wins. */
+    it("never lifts a lock", () => {
+      mockMigrationLocked = true
+      mockMigrationCompleted = true
+
+      const { result } = renderBlocker()
+
+      expect(result.current.isVisible).toBe(true)
+    })
+  })
+
+  /** Its answer is read once per launch, so the gate's retry refreshes it through here. */
+  describe("the re-read it shares", () => {
+    it("hands out the read behind its answer", async () => {
+      const { result } = renderBlocker()
+
+      await result.current.refetch()
+
+      expect(mockRefetchLock).toHaveBeenCalledTimes(1)
+    })
+
+    it("hands it out while the kill-switch hides the blocker too", async () => {
+      mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+      const { result } = renderBlocker()
+
+      await result.current.refetch()
+
+      expect(mockRefetchLock).toHaveBeenCalledTimes(1)
+    })
+
+    /** Outside the provider nothing can re-read, and asking must not throw. */
+    it("answers a re-read outside the provider with nothing", async () => {
+      const { result } = renderHook(() => useMigrationBlocker())
+
+      await expect(result.current.refetch()).resolves.toBeUndefined()
+      expect(mockRefetchLock).not.toHaveBeenCalled()
+    })
   })
 })

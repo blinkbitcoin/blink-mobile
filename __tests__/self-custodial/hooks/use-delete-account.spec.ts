@@ -41,7 +41,30 @@ jest.mock("@app/self-custodial/bridge", () => ({
 
 const mockStorageDirFor = jest.fn((id: string, _network: unknown) => `/tmp/${id}`)
 jest.mock("@app/self-custodial/config", () => ({
+  ...jest.requireActual("@app/self-custodial/config"),
   storageDirFor: (id: string, network: unknown) => mockStorageDirFor(id, network),
+}))
+
+const mockReadPendingProvisionedAccounts = jest.fn()
+jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", () => ({
+  ...jest.requireActual(
+    "@app/screens/account-migration/utils/migration-checkpoint-storage",
+  ),
+  readPendingProvisionedAccounts: (...args: unknown[]) =>
+    mockReadPendingProvisionedAccounts(...args),
+}))
+
+/** What the strict read answers with: a record, or the fact that it could not be read. */
+const pendingRecord = (pendingByOwner: Record<string, string>) => ({
+  status: "ok",
+  pendingByOwner,
+})
+
+let mockInstanceId = "Staging"
+jest.mock("@app/hooks/use-app-config", () => ({
+  useAppConfig: () => ({
+    appConfig: { galoyInstance: { id: mockInstanceId, name: "Main" } },
+  }),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -53,6 +76,9 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
 }))
 
 jest.mock("@app/self-custodial/storage/account-index", () => ({
+  /** The strict read's statuses travel with it; the module itself reaches native storage,
+   *  so only what this hook uses is stood in for. */
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
   removeSelfCustodialAccountId: (...args: unknown[]) =>
     mockRemoveSelfCustodialAccountId(...args),
 }))
@@ -109,6 +135,8 @@ describe("useDeleteAccount", () => {
     mockRemoveSelfCustodialAccountId.mockResolvedValue(undefined)
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
+    mockReadPendingProvisionedAccounts.mockResolvedValue(pendingRecord({}))
+    mockInstanceId = "Staging"
   })
 
   it("starts in idle state with no error", () => {
@@ -315,5 +343,167 @@ describe("useDeleteAccount", () => {
     const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
 
     expect(setActiveOrder).toBeLessThan(disconnectOrder)
+  })
+
+  describe("migration destination guard", () => {
+    beforeEach(() => {
+      mockNetwork = mockSparkNetwork.Mainnet
+      mockInstanceId = "Staging"
+    })
+
+    /**
+     * The last line of defense: the delete controls consult the guard before offering
+     * themselves, and this is the same question asked where the key is actually destroyed,
+     * so a surface that forgets the guard still cannot take it.
+     */
+    it("destroys nothing and returns 'blocked' for a wallet a migration still owes funds", async () => {
+      mockReadPendingProvisionedAccounts.mockResolvedValue(
+        pendingRecord({ "custodial-1": TEST_SC_ACCOUNT_ID }),
+      )
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("blocked")
+      expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+      expect(mockUnlink).not.toHaveBeenCalled()
+      expect(mockRemoveSelfCustodialAccountId).not.toHaveBeenCalled()
+      expect(mockRemoveBackupStateFor).not.toHaveBeenCalled()
+      expect(mockDisconnectSdk).not.toHaveBeenCalled()
+      expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+      /** No spinner either: nothing was ever started. */
+      expect(result.current.state).toBe("idle")
+    })
+
+    it("reads the record fresh on every attempt rather than trusting render-time state", async () => {
+      mockReadPendingProvisionedAccounts.mockResolvedValue(
+        pendingRecord({ "custodial-1": TEST_SC_ACCOUNT_ID }),
+      )
+      const { result } = renderHook(() => useDeleteAccount())
+
+      await act(async () => {
+        await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      /** The migration finished between the two attempts, so the second one proceeds. */
+      mockReadPendingProvisionedAccounts.mockResolvedValue(pendingRecord({}))
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+      expect(mockReadPendingProvisionedAccounts).toHaveBeenCalledTimes(2)
+    })
+
+    it("deletes another owner's wallet, which this migration never marked", async () => {
+      mockReadPendingProvisionedAccounts.mockResolvedValue(
+        pendingRecord({ "custodial-1": "some-other-pending-wallet" }),
+      )
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    })
+
+    it("skips the check on the Local instance, where a half-finished migration must stay cleanable", async () => {
+      mockInstanceId = "Local"
+      mockReadPendingProvisionedAccounts.mockResolvedValue(
+        pendingRecord({ "custodial-1": TEST_SC_ACCOUNT_ID }),
+      )
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+      expect(mockReadPendingProvisionedAccounts).not.toHaveBeenCalled()
+    })
+
+    /**
+     * The tolerant loader the screens use turns an unreadable or malformed record into
+     * "nothing is pending". Here that would be a storage blip granting permission to
+     * destroy the only key able to claim funds already in flight.
+     */
+    /** Refusing is right, but a read that failed is not a migration owing funds, and the
+     *  two must not reach the user as the same sentence. */
+    it("destroys nothing and says the record is unavailable when it cannot be read", async () => {
+      mockReadPendingProvisionedAccounts.mockResolvedValue({ status: "read-failed" })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("record-unavailable")
+      expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+      expect(mockUnlink).not.toHaveBeenCalled()
+      expect(mockRemoveSelfCustodialAccountId).not.toHaveBeenCalled()
+      expect(mockRemoveBackupStateFor).not.toHaveBeenCalled()
+      expect(result.current.state).toBe("idle")
+    })
+
+    it("says the same for a record that will not parse", async () => {
+      mockReadPendingProvisionedAccounts.mockResolvedValue({ status: "corrupt" })
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("record-unavailable")
+      expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+    })
+
+    /** A key that was never written is an answer, not a failure: there is nothing to
+     *  protect, so deletion proceeds. */
+    it("deletes when the record is simply absent", async () => {
+      mockReadPendingProvisionedAccounts.mockResolvedValue(pendingRecord({}))
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    })
+
+    /**
+     * Staging runs on the regtest network like Local, so the refusal may not key off the
+     * network: Staging is where this flow is device-tested.
+     */
+    it("refuses on Staging even though it runs on the regtest network", async () => {
+      mockInstanceId = "Staging"
+      mockNetwork = mockSparkNetwork.Regtest
+      mockReadPendingProvisionedAccounts.mockResolvedValue(
+        pendingRecord({ "custodial-1": TEST_SC_ACCOUNT_ID }),
+      )
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("blocked")
+      expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+    })
   })
 })

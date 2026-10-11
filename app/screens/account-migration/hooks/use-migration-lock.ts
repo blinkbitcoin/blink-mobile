@@ -6,6 +6,11 @@ import { useMigrationStatus } from "./use-migration-status"
 
 type MigrationLock = {
   isLocked: boolean
+  /** The server finished moving the funds. Unlocked like a migration that never started,
+   *  but the opposite for everything that would still push the user into the flow: there
+   *  is nothing left to migrate, and the wallet the funds went to is theirs. Only a settled,
+   *  current answer counts: a read still in flight or one that failed confirms nothing. */
+  isCompleted: boolean
   /** Travels with the lock so a caller that would otherwise render the wrong screen can
    *  wait: an unknown lock is not an unlocked one, it is an answer still on its way. */
   loading: boolean
@@ -35,7 +40,13 @@ export const useMigrationLock = (): MigrationLock => {
   const { status, loading, error, refetch } = useMigrationStatus({ skip: !isCustodial })
 
   if (!isCustodial) {
-    return { isLocked: false, loading: false, hasError: false, refetch }
+    return {
+      isLocked: false,
+      isCompleted: false,
+      loading: false,
+      hasError: false,
+      refetch,
+    }
   }
 
   const isInProgress = status === MigrationStatus.InProgress
@@ -43,11 +54,16 @@ export const useMigrationLock = (): MigrationLock => {
   /** A failed migration stays locked too: the funds may still settle server-side, so the
    *  account is kept in the flow (routed to support) instead of handed back to spend. */
   const isFailed = status === MigrationStatus.Failed
+  const hasError = Boolean(error)
+  const isCompletedStatus = status === MigrationStatus.Completed
+  const isSettledAnswer = !loading && !hasError
+  const isCompleted = isCompletedStatus && isSettledAnswer
 
   return {
     isLocked: isInProgress || isTransferring || isFailed,
+    isCompleted,
     loading,
-    hasError: Boolean(error),
+    hasError,
     refetch,
   }
 }

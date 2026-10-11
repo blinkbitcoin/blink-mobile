@@ -13711,6 +13711,10 @@ type RootTranslation = {
 		 */
 		dangerZoneDeleteButton: string
 		/**
+		 * Y​o​u​ ​c​a​n​'​t​ ​d​e​l​e​t​e​ ​t​h​i​s​ ​w​a​l​l​e​t​ ​w​h​i​l​e​ ​t​h​e​ ​m​i​g​r​a​t​e​d​ ​f​u​n​d​s​ ​a​r​e​ ​s​t​i​l​l​ ​o​n​ ​t​h​e​i​r​ ​w​a​y​.
+		 */
+		dangerZoneMigrationPendingNotice: string
+		/**
 		 * C​o​n​f​i​r​m​ ​a​c​c​o​u​n​t​ ​r​e​m​o​v​a​l
 		 */
 		confirmModalTitle: string
@@ -27230,6 +27234,10 @@ export type TranslationFunctions = {
 		 * Delete account and data
 		 */
 		dangerZoneDeleteButton: () => LocalizedString
+		/**
+		 * You can't delete this wallet while the migrated funds are still on their way.
+		 */
+		dangerZoneMigrationPendingNotice: () => LocalizedString
 		/**
 		 * Confirm account removal
 		 */

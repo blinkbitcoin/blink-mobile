@@ -16,8 +16,7 @@ import { walletOverviewQueryResult } from "../helpers"
 
 const mockNavigate = jest.fn()
 const mockNavigateToCheckpoint = jest.fn()
-const mockLoadPendingProvisionedAccounts = jest.fn()
-const mockClearPendingProvisionedAccount = jest.fn()
+const mockReadPendingProvisionedAccounts = jest.fn()
 const mockReportError = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
 let mockRegistryAccounts: { id: string }[] = []
@@ -76,14 +75,20 @@ jest.mock("@app/screens/account-migration/utils/migration-checkpoint-storage", (
   ...jest.requireActual(
     "@app/screens/account-migration/utils/migration-checkpoint-storage",
   ),
-  loadPendingProvisionedAccounts: (...args: readonly unknown[]) =>
-    mockLoadPendingProvisionedAccounts(...args),
-  clearPendingProvisionedAccount: (...args: readonly unknown[]) =>
-    mockClearPendingProvisionedAccount(...args),
+  readPendingProvisionedAccounts: (...args: readonly unknown[]) =>
+    mockReadPendingProvisionedAccounts(...args),
 }))
 
+/**
+ * Mirrors the real hook: the owner id comes from the custodial `me` query, which is
+ * skipped for any session that is not custodial. A flat "custodial-1" here would let the
+ * gate look up a record no non-custodial session can actually reach.
+ */
 jest.mock("@app/screens/account-migration/hooks/use-custodial-owner-id", () => ({
-  useCustodialOwnerId: () => ({ ownerId: "custodial-1", loading: false }),
+  useCustodialOwnerId: () => ({
+    ownerId: mockActiveAccount?.type === "custodial" ? "custodial-1" : null,
+    loading: false,
+  }),
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -181,16 +186,21 @@ describe("MigrationGate pending-wallet integration", () => {
     jest.clearAllMocks()
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockRegistryAccounts = [{ id: "custodial-1" }]
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({})
-    mockClearPendingProvisionedAccount.mockResolvedValue(undefined)
+    mockReadPendingProvisionedAccounts.mockResolvedValue({
+      status: "ok",
+      pendingByOwner: {},
+    })
   })
 
   /** A crash without a reinstall keeps the record and its wallet: the real chain must
    *  read the stored record, find the wallet in the registry, and resume — the same
    *  predicate ensureAccount will apply when the restarted flow reuses that wallet. */
   it("resumes when the stored pending record's wallet still exists on the device", async () => {
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({
-      "custodial-1": "sc-account-1",
+    mockReadPendingProvisionedAccounts.mockResolvedValue({
+      status: "ok",
+      pendingByOwner: {
+        "custodial-1": "sc-account-1",
+      },
     })
     mockRegistryAccounts = [{ id: "custodial-1" }, { id: "sc-account-1" }]
 
@@ -200,12 +210,21 @@ describe("MigrationGate pending-wallet integration", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  /** A record pointing at the ACTIVE account is a completed migration whose cleanup
-   *  write was lost: the real hook self-heals it away, so nothing is reusable and the
-   *  locked gate hands over — instead of "resuming" onto the account already in use. */
-  it("hands over after the self-heal drops a record pointing at the active account", async () => {
-    mockLoadPendingProvisionedAccounts.mockResolvedValue({
-      "custodial-1": "sc-wallet-1",
+  /**
+   * A record pointing at the ACTIVE account is a completed migration whose cleanup write
+   * was lost. The session is self-custodial by then, so it has no owner id to look that
+   * record up under and nothing is reusable: the locked gate hands over instead of
+   * "resuming" onto the account already in use.
+   *
+   * The record itself stays, because it is also what marks that wallet undeletable while
+   * the migration may still owe it funds.
+   */
+  it("hands over for a record pointing at the active account, without dropping it", async () => {
+    mockReadPendingProvisionedAccounts.mockResolvedValue({
+      status: "ok",
+      pendingByOwner: {
+        "custodial-1": "sc-wallet-1",
+      },
     })
     mockActiveAccount = { id: "sc-wallet-1", type: "selfCustodial" }
     mockRegistryAccounts = [{ id: "custodial-1" }, { id: "sc-wallet-1" }]
@@ -217,10 +236,6 @@ describe("MigrationGate pending-wallet integration", () => {
         reason: "locked-without-checkpoint",
         origin: "gate",
       }),
-    )
-    expect(mockClearPendingProvisionedAccount).toHaveBeenCalledWith(
-      "migrationPendingAccounts_main",
-      "custodial-1",
     )
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
   })

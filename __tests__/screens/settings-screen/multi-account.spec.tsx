@@ -45,6 +45,18 @@ let mockAppConfigToken = "mock-token-1"
 
 let mockSelfCustodialEntries: { id: string; createdAt: number }[] = []
 let mockPendingAccountIds = new Set<string>()
+let mockPendingForActiveAccount: string | null = null
+let mockMigrationCompleted = false
+
+jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
+  useMigrationLock: () => ({
+    isLocked: false,
+    isCompleted: mockMigrationCompleted,
+    loading: false,
+    hasError: false,
+    refetch: jest.fn(),
+  }),
+}))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   ...jest.requireActual("@app/hooks/use-account-registry"),
@@ -61,18 +73,37 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   usePendingMigrationAccounts: () => ({
     pendingAccountIds: mockPendingAccountIds,
-    pendingForActiveAccount: null,
+    pendingForActiveAccount: mockPendingForActiveAccount,
     savePendingAccount: jest.fn(),
-    clearPendingAccount: jest.fn(),
     loading: false,
   }),
 }))
 
+const mockIsDeletionBlocked = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-migration-deletion-guard", () => ({
+  useMigrationDeletionGuard: () => ({ isDeletionBlocked: mockIsDeletionBlocked }),
+}))
+
+/**
+ * Stands in for the row so these tests stay about which wallets the switcher offers and
+ * what it tells each row. The real row's own delete control, and its absence while
+ * deletion is blocked, are proven against the real component in profile-row.spec.
+ */
 jest.mock("@app/screens/settings-screen/self-custodial/profile-row", () => ({
-  ProfileRow: ({ entry }: { entry: { id: string } }) => {
+  ProfileRow: ({
+    entry,
+    isDeletionBlocked,
+  }: {
+    entry: { id: string }
+    isDeletionBlocked: boolean
+  }) => {
     const ReactActual = jest.requireActual("react")
     const { Text } = jest.requireActual("react-native")
-    return ReactActual.createElement(Text, { testID: `sc-entry-${entry.id}` }, entry.id)
+    return ReactActual.createElement(
+      Text,
+      { testID: `sc-entry-${entry.id}` },
+      isDeletionBlocked ? `${entry.id}:blocked` : entry.id,
+    )
   },
 }))
 
@@ -100,6 +131,9 @@ describe("Settings", () => {
     mockSaveProfile.mockClear()
     mockSelfCustodialEntries = []
     mockPendingAccountIds = new Set()
+    mockPendingForActiveAccount = null
+    mockMigrationCompleted = false
+    mockIsDeletionBlocked.mockReturnValue(false)
   })
 
   it("Switch account shows user profiles", async () => {
@@ -173,6 +207,131 @@ describe("Settings", () => {
       expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
     })
     expect(screen.queryByTestId("sc-entry-sc-pending-1")).toBeNull()
+  })
+
+  /**
+   * The funds already left the custodial account for this wallet. Hiding it until the
+   * automatic swap confirms the receive would strand them whenever that swap cannot finish,
+   * so once the server completed the migration the user can switch to it themselves.
+   */
+  it("offers the migration's wallet once the server completed the migration", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [{ id: "sc-migrated-1", createdAt: 1 }]
+    mockPendingAccountIds = new Set(["sc-migrated-1"])
+    mockPendingForActiveAccount = "sc-migrated-1"
+    mockMigrationCompleted = true
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-migrated-1")).toBeTruthy()
+    })
+  })
+
+  it("keeps the migration's wallet hidden while the migration has not completed", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [
+      { id: "sc-migrating-1", createdAt: 1 },
+      { id: "sc-normal-1", createdAt: 2 },
+    ]
+    mockPendingAccountIds = new Set(["sc-migrating-1"])
+    mockPendingForActiveAccount = "sc-migrating-1"
+    mockMigrationCompleted = false
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
+    })
+    expect(screen.queryByTestId("sc-entry-sc-migrating-1")).toBeNull()
+  })
+
+  /** Only the active account's own wallet: another profile's pending wallet belongs to a
+   *  migration this account's completion says nothing about. */
+  it("keeps another account's pending wallet hidden after this one completed", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [
+      { id: "sc-migrated-1", createdAt: 1 },
+      { id: "sc-other-pending-1", createdAt: 2 },
+    ]
+    mockPendingAccountIds = new Set(["sc-migrated-1", "sc-other-pending-1"])
+    mockPendingForActiveAccount = "sc-migrated-1"
+    mockMigrationCompleted = true
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-migrated-1")).toBeTruthy()
+    })
+    expect(screen.queryByTestId("sc-entry-sc-other-pending-1")).toBeNull()
+  })
+
+  /**
+   * The wallet this PR admits into the switcher is reachable and undeletable at once: it
+   * holds the only key to funds the server already moved out of the custodial account, so
+   * the row it gets must be told not to offer removal.
+   */
+  it("tells the migration's newly offered wallet that deletion is blocked", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [{ id: "sc-migrated-1", createdAt: 1 }]
+    mockPendingAccountIds = new Set(["sc-migrated-1"])
+    mockPendingForActiveAccount = "sc-migrated-1"
+    mockMigrationCompleted = true
+    mockIsDeletionBlocked.mockImplementation(
+      (accountId: string) => accountId === "sc-migrated-1",
+    )
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-migrated-1")).toBeTruthy()
+    })
+    expect(screen.getByText("sc-migrated-1:blocked")).toBeTruthy()
+    expect(mockIsDeletionBlocked).toHaveBeenCalledWith("sc-migrated-1")
+  })
+
+  /** The flag is per row, not per screen: an ordinary wallet beside a blocked one keeps
+   *  its delete control. */
+  it("asks the guard per wallet and leaves unrelated wallets deletable", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [
+      { id: "sc-migrated-1", createdAt: 1 },
+      { id: "sc-normal-1", createdAt: 2 },
+    ]
+    mockPendingAccountIds = new Set(["sc-migrated-1"])
+    mockPendingForActiveAccount = "sc-migrated-1"
+    mockMigrationCompleted = true
+    mockIsDeletionBlocked.mockImplementation(
+      (accountId: string) => accountId === "sc-migrated-1",
+    )
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
+    })
+    expect(screen.getByText("sc-migrated-1:blocked")).toBeTruthy()
+    expect(screen.getByText("sc-normal-1")).toBeTruthy()
   })
 
   it("keeps a pending wallet visible once it became the active account", async () => {

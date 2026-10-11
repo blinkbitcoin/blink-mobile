@@ -4108,6 +4108,7 @@
     "dangerZoneBulletPermanent": "Sletning af kontoen er permanent",
     "dangerZoneBulletEmpty": "Sørg for, at kontoen er tom",
     "dangerZoneDeleteButton": "Slet konto og data",
+    "dangerZoneMigrationPendingNotice": "Du kan ikke slette denne tegnebog, mens de migrerede midler stadig er på vej.",
     "confirmModalTitle": "Bekræft sletning af konto",
     "confirmModalTypeToConfirm": "Skriv \"{delete: string}\" for at bekræfte",
     "hasFundsWarningTitle": "Advarsel",

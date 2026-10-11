@@ -7,6 +7,7 @@ import { AccountType } from "@app/types/wallet"
 const mockUseMigrationStatus = jest.fn()
 
 let mockActiveAccountType: AccountType | undefined = AccountType.Custodial
+let mockActiveAccountId = "account-1"
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => mockUseMigrationStatus(options),
@@ -16,7 +17,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({
     activeAccount: mockActiveAccountType
-      ? { id: "account-1", type: mockActiveAccountType }
+      ? { id: mockActiveAccountId, type: mockActiveAccountType }
       : undefined,
   }),
 }))
@@ -31,6 +32,7 @@ describe("useMigrationLock", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveAccountType = AccountType.Custodial
+    mockActiveAccountId = "account-1"
   })
 
   it("locks an account the server reports as in progress", () => {
@@ -198,5 +200,75 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.refetch).toBe(refetch)
+  })
+
+  /** Completed is unlocked too, but it is its own answer: everything that would still push
+   *  the user into the flow reads it to stand down. Only a current answer counts. */
+  describe("a completed migration", () => {
+    it("reports a migration the server completed", () => {
+      mockUseMigrationStatus.mockReturnValue(serverReports(MigrationStatus.Completed))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.isCompleted).toBe(true)
+    })
+
+    const otherStatuses = [
+      MigrationStatus.NotStarted,
+      MigrationStatus.InProgress,
+      MigrationStatus.Transferring,
+      MigrationStatus.Failed,
+    ]
+
+    for (const status of otherStatuses) {
+      it(`does not report ${status} as completed`, () => {
+        mockUseMigrationStatus.mockReturnValue(serverReports(status))
+
+        const { result } = renderHook(() => useMigrationLock())
+
+        expect(result.current.isCompleted).toBe(false)
+      })
+    }
+
+    it("confirms nothing while the answer is on its way", () => {
+      mockUseMigrationStatus.mockReturnValue(serverReports(null, true))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.isCompleted).toBe(false)
+    })
+
+    /** A failed re-read can leave the previous answer behind; it is no longer current. */
+    it("does not confirm a completion a failed re-read left behind", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(MigrationStatus.Completed, false, new Error("offline")),
+      )
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.isCompleted).toBe(false)
+    })
+
+    /** A read still in flight may carry a previous answer; only a settled one counts. */
+    it("does not confirm a completion while the read is still in flight", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(MigrationStatus.Completed, true),
+      )
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.isCompleted).toBe(false)
+    })
+
+    /** Even with a completed status in hand: the answer belongs to a custodial account the
+     *  user is not on, so it never counts for this session. */
+    it("never reports it for a self-custodial session", () => {
+      mockActiveAccountType = AccountType.SelfCustodial
+      mockUseMigrationStatus.mockReturnValue(serverReports(MigrationStatus.Completed))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.isCompleted).toBe(false)
+    })
   })
 })

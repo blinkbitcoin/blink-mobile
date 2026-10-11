@@ -4108,6 +4108,7 @@
         "dangerZoneBulletPermanent": "La suppression du compte est définitive",
         "dangerZoneBulletEmpty": "Assure-toi que le compte est vide",
         "dangerZoneDeleteButton": "Supprimer compte et données",
+        "dangerZoneMigrationPendingNotice": "Vous ne pouvez pas supprimer ce portefeuille tant que les fonds migrés sont encore en cours de transfert.",
         "confirmModalTitle": "Confirmer la suppression du compte",
         "confirmModalTypeToConfirm": "Saisissez \"{delete: string}\" pour confirmer",
         "hasFundsWarningTitle": "Avertissement",

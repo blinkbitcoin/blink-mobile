@@ -62,11 +62,11 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
-const mockClearPendingAccount = jest.fn()
+const mockClearPendingWallet = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts", () => ({
   usePendingMigrationAccounts: () => ({
-    clearPendingAccount: mockClearPendingAccount,
+    clearPendingWallet: mockClearPendingWallet,
   }),
 }))
 
@@ -265,10 +265,33 @@ describe("useCompleteMigration", () => {
     expect(result.current.migrationLoading).toBe(true)
   })
 
-  it("clears the custodial owner's pending wallet record after the swap", async () => {
+  /**
+   * The mark is what keeps this wallet from being deleted while a migration still owes it,
+   * so a handover that never confirmed the receive must leave it in place. The user moves
+   * on to the wallet either way; what they must not get is a delete control over the only
+   * key to funds that may still arrive.
+   */
+  it("leaves the mark in place when the receive was never proven", async () => {
+    const { result } = renderHook(() => useCompleteMigration())
+
+    await act(async () => {
+      await result.current.completeMigration({ isReceiveProven: false })
+    })
+
+    expect(mockClearPendingWallet).not.toHaveBeenCalled()
+    /** The rest of the handover still runs: the session goes and the wallet becomes active. */
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
+  })
+
+  /**
+   * Cleared by wallet, not by owner. The owner-mismatch path finishes under the session's
+   * owner while the record was filed under the checkpoint's, so clearing by owner there
+   * clears nothing and leaves the wallet marked, and so undeletable, for good.
+   */
+  it("clears the provisioned wallet's pending record after the swap", async () => {
     await complete()
 
-    expect(mockClearPendingAccount).toHaveBeenCalledWith("custodial-1")
+    expect(mockClearPendingWallet).toHaveBeenCalledWith("sc-account-1")
   })
 
   describe("when the close does not settle", () => {
@@ -293,7 +316,7 @@ describe("useCompleteMigration", () => {
       await complete()
 
       expect(mockClearCheckpoint).not.toHaveBeenCalled()
-      expect(mockClearPendingAccount).not.toHaveBeenCalled()
+      expect(mockClearPendingWallet).not.toHaveBeenCalled()
     })
   })
 
@@ -314,7 +337,7 @@ describe("useCompleteMigration", () => {
       expect(mockDiscardCustodialSession).toHaveBeenCalledTimes(1)
       expect(mockSetActiveAccountId).toHaveBeenCalledWith("sc-account-1")
       expect(mockClearCheckpoint).toHaveBeenCalledTimes(1)
-      expect(mockClearPendingAccount).toHaveBeenCalledWith("custodial-1")
+      expect(mockClearPendingWallet).toHaveBeenCalledWith("sc-account-1")
     })
 
     /** The account survived, so its session is alive and the revocation is worth making. */
@@ -343,7 +366,7 @@ describe("useCompleteMigration", () => {
       expect(mockDiscardCustodialSession).not.toHaveBeenCalled()
       expect(mockSetActiveAccountId).not.toHaveBeenCalled()
       expect(mockClearCheckpoint).not.toHaveBeenCalled()
-      expect(mockClearPendingAccount).not.toHaveBeenCalled()
+      expect(mockClearPendingWallet).not.toHaveBeenCalled()
     })
 
     /** A pending query is a waiting state, not a fault: reporting it would raise a non-fatal

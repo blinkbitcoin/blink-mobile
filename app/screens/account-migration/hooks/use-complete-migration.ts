@@ -47,10 +47,12 @@ type CompleteMigrationArgs = {
 
 type FinishOnDeviceArgs = {
   selfCustodialAccountId: string
-  custodialAccountId: string
   /** The outcome rather than a boolean derived from it: a caller cannot invert what it does
    *  not compute. Absent where the close never ran, which leaves the session alive. */
   closeOutcome?: AccountCloseOutcome
+  /** Whether the funds are proven to be in the provisioned wallet. Only a proven receive
+   *  releases the mark that keeps that wallet from being deleted. */
+  isReceiveProven: boolean
 }
 
 /** Closes the emptied custodial account, discards its session, then switches to the
@@ -71,7 +73,7 @@ export const useCompleteMigration = () => {
     loading,
     clearCheckpoint,
   } = useMigrationCheckpointState()
-  const { clearPendingAccount } = usePendingMigrationAccounts()
+  const { clearPendingWallet } = usePendingMigrationAccounts()
   const { setActiveAccountId, accounts, loading: accountsLoading } = useAccountRegistry()
   const { ownerId: custodialOwnerId } = useCustodialOwnerId()
   const { closeCustodialAccount } = useCloseCustodialAccount()
@@ -84,8 +86,8 @@ export const useCompleteMigration = () => {
   const finishOnDevice = useCallback(
     async ({
       selfCustodialAccountId,
-      custodialAccountId,
       closeOutcome,
+      isReceiveProven,
     }: FinishOnDeviceArgs): Promise<void> => {
       /** A closed account took its Kratos identity with it, so the revocation the discard
        *  would fire has nothing left to authenticate with. */
@@ -93,9 +95,23 @@ export const useCompleteMigration = () => {
       await discardCustodialSession({ isSessionAlive })
       setActiveAccountId(selfCustodialAccountId)
       await clearCheckpoint()
-      await clearPendingAccount(custodialAccountId)
+
+      /**
+       * The mark goes only once the funds are proven to be here. It is what keeps this
+       * wallet from being deleted while a migration still owes it, so dropping it on a
+       * handover that never confirmed the receive would hand out the only key to funds
+       * that may still arrive.
+       *
+       * Cleared by wallet rather than by owner: the owner-mismatch path finishes under the
+       * session's owner while the record was filed under the checkpoint's, so clearing by
+       * owner there clears nothing and leaves the wallet marked, and so undeletable, for
+       * good.
+       */
+      if (!isReceiveProven) return
+
+      await clearPendingWallet(selfCustodialAccountId)
     },
-    [discardCustodialSession, setActiveAccountId, clearCheckpoint, clearPendingAccount],
+    [discardCustodialSession, setActiveAccountId, clearCheckpoint, clearPendingWallet],
   )
 
   const runCompletion = useCallback(
@@ -146,7 +162,7 @@ export const useCompleteMigration = () => {
         )
         await finishOnDevice({
           selfCustodialAccountId: accountId,
-          custodialAccountId: custodialOwnerId,
+          isReceiveProven,
         })
         return MigrationCompletion.CloseRefused
       }
@@ -164,7 +180,7 @@ export const useCompleteMigration = () => {
         )
         await finishOnDevice({
           selfCustodialAccountId: accountId,
-          custodialAccountId: custodialOwnerId,
+          isReceiveProven: false,
         })
         return MigrationCompletion.CloseRefused
       }
@@ -178,8 +194,8 @@ export const useCompleteMigration = () => {
       const isAccountClosed = closeOutcome === AccountCloseOutcome.Closed
       await finishOnDevice({
         selfCustodialAccountId: accountId,
-        custodialAccountId: custodialOwnerId,
         closeOutcome,
+        isReceiveProven: true,
       })
 
       /** A refused close still finishes the migration: the funds are already self-custodial,

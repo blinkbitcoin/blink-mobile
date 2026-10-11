@@ -6,12 +6,21 @@ import { useWindDownGateArmed } from "./use-wind-down-gate-armed"
 
 type MigrationBlocker = {
   isVisible: boolean
+  /** Re-reads the migration phase behind the blocker. Its answer is read once per launch,
+   *  so the gate's retry calls this too: a launch whose read failed would otherwise keep
+   *  the blocker up over a completed migration until the app restarts. */
+  refetch: () => Promise<unknown>
 }
+
+const noRefetch = async (): Promise<undefined> => undefined
 
 /** One shared answer for the two consumers (the container wrapper's deeplink reset and the
  *  primary navigator's gate): separate no-cache reads could disagree and leave a deeplinked
  *  screen operating over a locked account. */
-const MigrationBlockerContext = createContext<MigrationBlocker>({ isVisible: false })
+const MigrationBlockerContext = createContext<MigrationBlocker>({
+  isVisible: false,
+  refetch: noRefetch,
+})
 
 /**
  * Decides the forced root blocker, from two independent server signals. The armed gate
@@ -23,6 +32,11 @@ const MigrationBlockerContext = createContext<MigrationBlocker>({ isVisible: fal
  * a screen imposed on launch. The self-custodial disable outranks both: with the stack
  * turned off there is no target to push anyone toward, and a locked user cannot finish a
  * migration whose destination is gone.
+ *
+ * A completed migration disarms the gate. The server keeps reporting the custodial account
+ * as closed once its funds have left, and a gate that stays up replaces the whole app with
+ * a flow the server refuses to start again: the user can reach neither the account
+ * switcher nor the wallet the funds went to. The gate's job is done by then.
  */
 const useComputeMigrationBlocker = (): MigrationBlocker => {
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
@@ -31,12 +45,13 @@ const useComputeMigrationBlocker = (): MigrationBlocker => {
   /** Deliberately ignores the lock's loading: waiting here would put a spinner in front
    *  of every custodial launch to spare the rare unlocked user a frame of the app they
    *  are entitled to. The gate below waits, because it would render the wrong screen. */
-  const { isLocked } = useMigrationLock()
+  const { isLocked, isCompleted: isMigrationCompleted, refetch } = useMigrationLock()
 
-  if (isSelfCustodialDisabled) return { isVisible: false }
+  if (isSelfCustodialDisabled) return { isVisible: false, refetch }
 
-  const isBlocking = isGateArmed || isLocked
-  return { isVisible: isBlocking }
+  const isGateStillDue = isGateArmed && !isMigrationCompleted
+  const isBlocking = isGateStillDue || isLocked
+  return { isVisible: isBlocking, refetch }
 }
 
 /** Reads the blocker signals once and shares them, so the two consumers never disagree. */

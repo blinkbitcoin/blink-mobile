@@ -4108,6 +4108,7 @@
         "dangerZoneBulletPermanent": "A exclusão da conta é permanente",
         "dangerZoneBulletEmpty": "Certifique-se de que a conta esteja vazia",
         "dangerZoneDeleteButton": "Excluir conta e dados",
+        "dangerZoneMigrationPendingNotice": "Você não pode excluir esta carteira enquanto os fundos migrados ainda estiverem a caminho.",
         "confirmModalTitle": "Confirmar exclusão da conta",
         "confirmModalTypeToConfirm": "Digite \"{delete: string}\" para confirmar",
         "hasFundsWarningTitle": "Atenção",

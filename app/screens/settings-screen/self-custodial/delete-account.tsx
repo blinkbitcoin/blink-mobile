@@ -9,6 +9,7 @@ import { InfoCard } from "@app/components/card-screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useMigrationDeletionGuard } from "@app/screens/account-migration/hooks/use-migration-deletion-guard"
 import { isRegtestNetwork } from "@app/self-custodial/config"
 import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
@@ -16,6 +17,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { hasFunds } from "@app/utils/has-funds"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
 import { SettingsButton } from "../button"
 
@@ -38,7 +40,21 @@ export const DeleteAccount: React.FC = () => {
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [warningVisible, setWarningVisible] = useState(false)
 
+  const {
+    isDeletionBlocked,
+    isLoading: isGuardLoading,
+    hasRecordError,
+    retryRecordRead,
+  } = useMigrationDeletionGuard()
+
+  const activeSelfCustodialAccountId =
+    activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+  const isDeletionBlockedForWallet =
+    activeSelfCustodialAccountId !== null &&
+    isDeletionBlocked(activeSelfCustodialAccountId)
+
   const handleDeletePress = () => {
+    if (isDeletionBlockedForWallet) return
     if (!isRegtestNetwork(network) && hasFunds(wallets)) {
       setWarningVisible(true)
       return
@@ -50,7 +66,76 @@ export const DeleteAccount: React.FC = () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
     setConfirmVisible(false)
     const outcome = await deleteWallet(activeAccount.id)
+
+    /** A record that could not be read is not a migration owing funds, so it does not get
+     *  that sentence: what went wrong is the read. */
+    if (outcome === "record-unavailable") {
+      toastShow({ type: "error", message: LL.errors.generic(), LL })
+      return
+    }
+
+    /** The stored mark outlived the control that offered this: say so rather than close the
+     *  modal over a deletion that never happened. */
+    if (outcome === "blocked") {
+      toastShow({
+        type: "error",
+        message: LL.SelfCustodialDelete.dangerZoneMigrationPendingNotice(),
+        LL,
+      })
+      return
+    }
+
     if (outcome) navigateAfterAccountDelete(navigation, outcome)
+  }
+
+  /**
+   * Neither control until the record has been read: offering the button would mean taking
+   * it back, and offering the reason would explain something not yet known to be true.
+   *
+   * A record that could not be read is blocked too, but for a reason the blocked copy does
+   * not describe, so it says what actually went wrong rather than leaving the section empty
+   * with no button, no reason and nothing to act on.
+   */
+  const renderDeleteControl = () => {
+    if (isGuardLoading) return null
+    if (hasRecordError) {
+      return (
+        <>
+          <Text
+            type="p2"
+            style={styles.blockedNotice}
+            {...testProps("self-custodial-danger-zone-record-error")}
+          >
+            {LL.errors.generic()}
+          </Text>
+          <SettingsButton
+            title={LL.common.tryAgain()}
+            variant="warning"
+            onPress={() => retryRecordRead()}
+            {...testProps("self-custodial-danger-zone-record-retry")}
+          />
+        </>
+      )
+    }
+    if (isDeletionBlockedForWallet) {
+      return (
+        <Text
+          type="p2"
+          style={styles.blockedNotice}
+          {...testProps("self-custodial-danger-zone-blocked-notice")}
+        >
+          {LL.SelfCustodialDelete.dangerZoneMigrationPendingNotice()}
+        </Text>
+      )
+    }
+    return (
+      <SettingsButton
+        title={LL.SelfCustodialDelete.dangerZoneDeleteButton()}
+        variant="critical"
+        onPress={handleDeletePress}
+        {...testProps("self-custodial-danger-zone-delete-button")}
+      />
+    )
   }
 
   const bulletItems = [
@@ -67,12 +152,7 @@ export const DeleteAccount: React.FC = () => {
         bulletSpacing={4}
       />
 
-      <SettingsButton
-        title={LL.SelfCustodialDelete.dangerZoneDeleteButton()}
-        variant="critical"
-        onPress={handleDeletePress}
-        {...testProps("self-custodial-danger-zone-delete-button")}
-      />
+      {renderDeleteControl()}
 
       <Overlay isVisible={state === "deleting"} overlayStyle={styles.overlayStyle}>
         <ActivityIndicator size={50} color={colors.primary} />
@@ -94,11 +174,14 @@ export const DeleteAccount: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     flexDirection: "column",
     rowGap: 18,
     marginTop: 8,
+  },
+  blockedNotice: {
+    color: colors.grey2,
   },
   overlayStyle: {
     backgroundColor: "transparent",

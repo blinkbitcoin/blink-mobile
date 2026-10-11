@@ -35,9 +35,17 @@ import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
 type ProfileRowProps = {
   entry: SelfCustodialAccountEntry
   isFirstItem?: boolean
+  /** Required rather than defaulted: a caller that forgets it would offer the delete
+   *  control for a wallet still owed a migration's funds, so the omission has to fail at
+   *  compile time instead of failing open. */
+  isDeletionBlocked: boolean
 }
 
-export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) => {
+export const ProfileRow: React.FC<ProfileRowProps> = ({
+  entry,
+  isFirstItem,
+  isDeletionBlocked,
+}) => {
   const { id: accountId, lightningAddress: persistedLightningAddress } = entry
   const styles = useStyles()
   const {
@@ -98,6 +106,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 
   const handleRemovePress = async () => {
     if (probingBalance) return
+    if (isDeletionBlocked) return
 
     /**
      * Regtest accounts are deletable regardless of funds, so the balance is
@@ -136,12 +145,58 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const handleConfirm = async () => {
     setConfirmVisible(false)
     const outcome = await deleteWallet(accountId)
+
+    /** A record that could not be read is not a migration owing funds, so it does not get
+     *  that sentence: what went wrong is the read. */
+    if (outcome === "record-unavailable") {
+      toastShow({ type: "error", message: LL.errors.generic(), LL })
+      return
+    }
+
+    /** The stored mark outlived the control that offered this: say so rather than close the
+     *  modal over a deletion that never happened. */
+    if (outcome === "blocked") {
+      toastShow({
+        type: "error",
+        message: LL.SelfCustodialDelete.dangerZoneMigrationPendingNotice(),
+        LL,
+      })
+      return
+    }
+
     if (outcome) navigateAfterAccountDelete(navigation, outcome)
   }
 
   const dismissHasFundsWarning = () => {
     setHasFundsWarningVisible(false)
     setWarningWallets([])
+  }
+
+  /**
+   * No control at all while deletion is blocked: a disabled button invites a press it
+   * cannot answer, and the row's job here is switching into the wallet. The Danger Zone
+   * inside that wallet is where the reason is spelled out.
+   */
+  const renderDeleteControl = () => {
+    if (isDeletionBlocked) return null
+    if (probingBalance) {
+      return (
+        <ActivityIndicator
+          size="small"
+          color={colors.primary}
+          {...testProps(`probe-spinner-${accountId}`)}
+        />
+      )
+    }
+    return (
+      <GaloyIconButton
+        name="close"
+        size="small"
+        onPress={handleRemovePress}
+        backgroundColor={colors.grey4}
+        {...testProps(`delete-button-${accountId}`)}
+      />
+    )
   }
 
   return (
@@ -164,21 +219,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
             </Text>
           </ListItem.Content>
-          {probingBalance ? (
-            <ActivityIndicator
-              size="small"
-              color={colors.primary}
-              {...testProps(`probe-spinner-${accountId}`)}
-            />
-          ) : (
-            <GaloyIconButton
-              name="close"
-              size="small"
-              onPress={handleRemovePress}
-              backgroundColor={colors.grey4}
-              {...testProps(`delete-button-${accountId}`)}
-            />
-          )}
+          {renderDeleteControl()}
         </ListItem>
       </TouchableOpacity>
       <Overlay isVisible={deleteState === "deleting"} overlayStyle={styles.overlayStyle}>

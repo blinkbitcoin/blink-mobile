@@ -4108,6 +4108,7 @@
     "dangerZoneBulletPermanent": "Zmazanie účtu je trvalé",
     "dangerZoneBulletEmpty": "Uistite sa, že je účet prázdny",
     "dangerZoneDeleteButton": "Zmazať účet a údaje",
+    "dangerZoneMigrationPendingNotice": "Túto peňaženku nemôžete odstrániť, kým sú migrované prostriedky stále na ceste.",
     "confirmModalTitle": "Potvrdiť zmazanie účtu",
     "confirmModalTypeToConfirm": "Zadajte \"{delete: string}\" na potvrdenie",
     "hasFundsWarningTitle": "Upozornenie",
