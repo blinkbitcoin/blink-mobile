@@ -418,7 +418,7 @@ describe("CardSettingsScreen", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("cardAddToMobileWalletScreen", {
         lastFour: "1234",
-        holderName: "",
+        cardId: "card-123",
       })
     })
 

@@ -229,7 +229,7 @@ export type RootStackParamList = {
   cardFeeScheduleScreen: undefined
   cardAddToMobileWalletScreen: {
     lastFour: string
-    holderName: string
+    cardId: string
   }
   cardDetailsScreen: undefined
   cardLimitsScreen: undefined
@@ -247,7 +247,7 @@ export type RootStackParamList = {
     showCard?: boolean
     showAddToWallet?: boolean
     lastFour?: string
-    holderName?: string
+    cardId?: string
   }
   cardShippingAddressScreen: undefined
   cardCreatePinScreen: undefined

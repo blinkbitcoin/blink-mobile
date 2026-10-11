@@ -374,7 +374,7 @@ describe("ReplaceCardScreen", () => {
         iconName: "delivery",
         iconColor: expect.any(String),
         lastFour: "4321",
-        holderName: "",
+        cardId: "card-123",
       })
     })
 

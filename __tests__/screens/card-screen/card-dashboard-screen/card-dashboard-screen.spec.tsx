@@ -34,6 +34,10 @@ jest.mock("@app/utils/toast", () => ({
 }))
 
 const mockUseCardData = jest.fn()
+jest.mock("@app/hooks/use-card-holder", () => ({
+  useCardHolder: () => ({ firstName: "", lastName: "", fullName: "", loading: false }),
+}))
+
 jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => mockUseCardData(),
 }))
