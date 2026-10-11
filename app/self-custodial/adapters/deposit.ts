@@ -12,11 +12,36 @@ import {
 } from "@app/types/payment"
 
 import { claimDeposit, listDeposits, refundDeposit, type MappedDeposit } from "../bridge"
+import { classifySdkError } from "../sdk-error"
 
 const failed = (message: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,
   errors: [{ message }],
 })
+
+/**
+ * Whether the deposit is still waiting to be claimed.
+ *
+ * A throw from `claimDeposit` is not proof that the claim failed: the SDK also raises from
+ * the step after the funds have already settled, which is what told a reader
+ * "Claim Failed: sdkError.SparkError" over money that had arrived. The unclaimed list is
+ * the record that settles it, so it is read back before anyone is told anything.
+ *
+ * A listing that itself fails leaves the outcome unknown, and unknown counts as still
+ * unclaimed: announcing a deposit that may never have landed is the worse of the two
+ * mistakes, and the reader can retry a claim that already succeeded for free.
+ */
+const isStillUnclaimed = async (
+  sdk: BreezSdkInterface,
+  { txid, vout }: { txid: string; vout: number },
+): Promise<boolean> => {
+  try {
+    const deposits = await listDeposits(sdk)
+    return deposits.some((deposit) => deposit.txid === txid && deposit.vout === vout)
+  } catch {
+    return true
+  }
+}
 
 const resolveStatus = ({
   isMature,
@@ -60,7 +85,8 @@ export const parseDepositId = (
   const voutStr = depositId.substring(lastColon + 1)
   if (!txid || !/^\d+$/.test(voutStr)) return null
   const vout = Number(voutStr)
-  if (!Number.isSafeInteger(vout) || vout < 0) return null
+  /** Negatives never reach here: the digits-only test above already refused them. */
+  if (!Number.isSafeInteger(vout)) return null
   return { txid, vout }
 }
 
@@ -98,7 +124,12 @@ export const createClaimDeposit = (sdk: BreezSdkInterface): ClaimDepositAdapter 
       await claimDeposit({ sdk, ...parsed, maxFeeSats })
       return { status: PaymentResultStatus.Success }
     } catch (err) {
-      return failed(err instanceof Error ? err.message : `Claim failed: ${err}`)
+      if (!(await isStillUnclaimed(sdk, parsed))) {
+        return { status: PaymentResultStatus.Success }
+      }
+      /** A classified code, so the screen shows the reader a sentence rather than the
+       *  SDK's own wording. The SDK's log listener records the raw error already. */
+      return failed(classifySdkError(err))
     }
   },
 
