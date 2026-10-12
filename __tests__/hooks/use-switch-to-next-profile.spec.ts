@@ -30,7 +30,9 @@ jest.mock("@react-navigation/native", () => ({
 let mockIsAppLocked = false
 
 jest.mock("@app/navigation/navigation-container-wrapper", () => ({
-  useAuthenticationContext: () => ({ isAppLocked: mockIsAppLocked }),
+  /** The lock's own synchronous read, which answers at once rather than a commit later:
+   *  that is the whole point of the switch asking it after its awaits. */
+  useAuthenticationContext: () => ({ readIsAppLocked: () => mockIsAppLocked }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -103,16 +105,16 @@ describe("useSwitchToNextProfile", () => {
       }),
     )
 
-    const { result, rerender } = renderHook(() => useSwitchToNextProfile())
+    const { result } = renderHook(() => useSwitchToNextProfile())
 
     let switchDone: Promise<SwitchProfileOutcome> | undefined
     act(() => {
       switchDone = result.current.switchToNextProfile("tok-a")
     })
 
-    /** The resume relock lands while the save is still pending. */
+    /** The resume relock lands while the save is still pending. No rerender: the lock's
+     *  own ref answers at once, which is what a mirror of it could not promise. */
     mockIsAppLocked = true
-    rerender(undefined)
 
     await act(async () => {
       resolveSaveToken()
@@ -137,7 +139,7 @@ describe("useSwitchToNextProfile", () => {
       }),
     )
 
-    const { result, rerender } = renderHook(() => useSwitchToNextProfile())
+    const { result } = renderHook(() => useSwitchToNextProfile())
 
     let switchDone: Promise<SwitchProfileOutcome> | undefined
     act(() => {
@@ -145,7 +147,6 @@ describe("useSwitchToNextProfile", () => {
     })
 
     mockIsAppLocked = false
-    rerender(undefined)
 
     await act(async () => {
       resolveSaveToken()

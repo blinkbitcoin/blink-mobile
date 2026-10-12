@@ -19,10 +19,11 @@ jest.mock("@app/hooks/use-logout")
 /** A factory, not an automock: building one would load the hook's module, and the lock
  *  context it imports pulls in native boot code. */
 jest.mock("@app/hooks/use-return-to-gate", () => ({ useReturnToGate: jest.fn() }))
-/** The profile switch runs for real here and asks whether the lock is up; these tests run
- *  with it down, where a switch opens the home screen as it always did. */
+/** The profile switch runs for real here and asks whether the lock is up, reading it from
+ *  the lock's own ref rather than a mirror; these tests run with it down, where a switch
+ *  opens the home screen as it always did. */
 jest.mock("@app/navigation/navigation-container-wrapper", () => ({
-  useAuthenticationContext: () => ({ isAppLocked: false }),
+  useAuthenticationContext: () => ({ readIsAppLocked: () => false }),
 }))
 jest.mock("@app/hooks")
 jest.mock("@app/utils/toast")
