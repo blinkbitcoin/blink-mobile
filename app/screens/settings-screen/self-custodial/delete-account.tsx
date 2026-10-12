@@ -7,6 +7,7 @@ import { makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
 import { InfoCard } from "@app/components/card-screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isRegtestNetwork } from "@app/self-custodial/config"
@@ -32,6 +33,7 @@ export const DeleteAccount: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
   const { state, deleteWallet } = useDeleteAccount()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { wallets } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
@@ -50,6 +52,18 @@ export const DeleteAccount: React.FC = () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
     setConfirmVisible(false)
     const outcome = await deleteWallet(activeAccount.id)
+    /** Both ends of the session go through the shared logout route: a lock the wipe could
+     *  not take is owed an answer and returns to the gate, and one the wipe did take has to
+     *  lower the flag with it, or a relock raised mid-delete would park every deep link
+     *  behind a lock that no longer exists. */
+    const isLogoutWithLockKept = outcome === "logged-out-locked"
+    const isLogoutWithLockDropped = outcome === "logged-out"
+    const isSessionOver = isLogoutWithLockDropped || isLogoutWithLockKept
+    if (isSessionOver) {
+      routeAfterLogout(isLogoutWithLockKept)
+      return
+    }
+
     if (outcome) navigateAfterAccountDelete(navigation, outcome)
   }
 

@@ -46,6 +46,17 @@ let mockAppConfigToken = "mock-token-1"
 let mockSelfCustodialEntries: { id: string; createdAt: number }[] = []
 let mockPendingAccountIds = new Set<string>()
 
+/** The profile row reaches the logout route, which reads the lock flag from this context
+ *  and pulls in native boot code with it. Nothing here exercises a logout, so only the
+ *  import has to load. */
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  useAuthenticationContext: () => ({
+    isAppLocked: false,
+    setAppUnlocked: jest.fn(),
+    setAppLocked: jest.fn(),
+  }),
+}))
+
 jest.mock("@app/hooks/use-account-registry", () => ({
   ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({

@@ -9,6 +9,13 @@ export const navigateAfterAccountDelete = (
   outcome: DeleteAccountOutcome,
 ): void => {
   switch (outcome) {
+    /** Neither end of the session is routed from here. This navigator cannot move the lock
+     *  flag, and both outcomes need it moved: one is owed an answer and has to keep it
+     *  raised, the other took the lock with it and has to lower it. The caller sends both
+     *  through the shared logout route, which owns that flag. */
+    case "logged-out":
+    case "logged-out-locked":
+      return
     case "switched-to-self-custodial":
       navigation.navigate("Primary")
       return
@@ -16,11 +23,6 @@ export const navigateAfterAccountDelete = (
     case "switched-to-custodial":
       navigation.dispatch(
         CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-      )
-      return
-    case "logged-out":
-      navigation.dispatch(
-        CommonActions.reset({ index: 0, routes: [{ name: "getStarted" }] }),
       )
   }
 }
