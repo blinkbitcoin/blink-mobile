@@ -113,14 +113,23 @@ export const useUnlockScreen = ({ isResume }: UseUnlockScreenParams) => {
        *  decides. One read, which reports a failure rather than throwing one, so the
        *  landing cannot be left waiting. A screen that went meanwhile is not routed, and
        *  a session that turned up meanwhile is an account to show after all. */
-      readSessionlessColdStartRoute().then((sessionlessRoute) => {
-        if (!isMounted()) return
+      readSessionlessColdStartRoute()
+        /** On the read, not on the chain: a fallback hung off the end would also swallow a
+         *  throw from the routing below and send an authed user to the landing screen. The
+         *  read reports a failure rather than throwing one, so this catches nothing today;
+         *  it is here because the one-way latch above has already fired, and anything that
+         *  did throw would leave the user on the logo gate with the lock lowered and no
+         *  second attempt. The landing screen is where a launch with nothing to show has
+         *  always gone. */
+        .catch((): ColdStartRoute => "getStarted")
+        .then((sessionlessRoute) => {
+          if (!isMounted()) return
 
-        const coldStartRoute: ColdStartRoute = hasSessionOrChosenAccountRef.current
-          ? "Primary"
-          : sessionlessRoute
-        navigateOnColdStart(coldStartRoute)
-      })
+          const coldStartRoute: ColdStartRoute = hasSessionOrChosenAccountRef.current
+            ? "Primary"
+            : sessionlessRoute
+          navigateOnColdStart(coldStartRoute)
+        })
     },
     [isResume, navigation, setAppUnlocked, isMounted],
   )

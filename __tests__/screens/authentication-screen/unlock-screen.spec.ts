@@ -361,4 +361,22 @@ describe("useUnlockScreen", () => {
       expect(remove).toHaveBeenCalledTimes(1)
     })
   })
+
+  /**
+   * The read reports a failure rather than throwing one, so this cannot happen today. The
+   * one-way latch is what makes it worth guarding: by the time the read runs the lock is
+   * already lowered and the screen has spent its single way out, so anything that did throw
+   * would leave the user on the logo gate with no second attempt.
+   */
+  describe("when the stored-wallet read throws", () => {
+    it("still routes, landing where a launch with nothing to show has always gone", async () => {
+      deviceHolds({})
+      mockListSelfCustodialAccounts.mockRejectedValue(new Error("AsyncStorage down"))
+
+      const { navigateOnColdStart } = await completeColdStart()
+
+      expect(navigateOnColdStart).toHaveBeenCalledTimes(1)
+      expect(navigateOnColdStart).toHaveBeenCalledWith("getStarted")
+    })
+  })
 })
