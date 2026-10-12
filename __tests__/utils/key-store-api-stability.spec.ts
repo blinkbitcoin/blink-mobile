@@ -22,6 +22,7 @@ const PINNED_SURFACE = [
   "PIN",
   "PIN_FAILURE_STATE",
   "SESSION_PROFILES",
+  "clearAppLock",
   "clearPinFailureState",
   "clearUninstallSurvivingCredentials",
   "deleteMnemonicForAccount",

@@ -59,6 +59,15 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
     removeIsBiometricsEnabled: jest.fn(),
     removePin: jest.fn(),
     clearPinFailureState: jest.fn(),
+    /** Mirrors the real grouping over the three stubs above, so these tests keep asserting
+     *  on the slots themselves. The grouping is covered where it lives. */
+    clearAppLock: jest.fn(async () => {
+      const isBiometricsFlagErased = await mockedStore.removeIsBiometricsEnabled()
+      const isPinErased = await mockedStore.removePin()
+      const isSpentBudgetErased = await mockedStore.clearPinFailureState()
+
+      return isBiometricsFlagErased && isPinErased && isSpentBudgetErased
+    }),
     removeSessionProfiles: jest.fn(),
     removeSessionProfileByToken: jest.fn(),
     getActiveToken: jest.fn(),

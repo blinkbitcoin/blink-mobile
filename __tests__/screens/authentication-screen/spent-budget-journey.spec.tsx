@@ -63,6 +63,13 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
       return true
     },
     removeIsBiometricsEnabled: async () => true,
+    /** Mirrors the real grouping over the slots above, so this journey still spells out what
+     *  the device is left holding. The grouping is covered where it lives. */
+    clearAppLock: async () => {
+      mockDevice.pin = null
+      mockDevice.attempts = 0
+      return true
+    },
     removeSessionProfiles: async () => true,
   },
 }))
