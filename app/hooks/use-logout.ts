@@ -144,23 +144,14 @@ const useLogout = () => {
            *  one the next launch can recover. Erasing the lock over it would
            *  leave that recovery with nothing to answer to.
            *
-           *  It is all three slots, kept or dropped together. A PIN without
-           *  its spent attempt count hands the next round a fresh budget
-           *  against a secret that no longer expires, and a PIN without the
-           *  biometrics flag routes every later unlock to the keypad instead
-           *  of to the prompt its owner chose. */
+           *  The lock goes as one thing, which `clearAppLock` owns beside the
+           *  slots: every caller that may erase it has to erase the same three,
+           *  and a second copy of that list is a second chance to miss one. */
           const canDropLock = !isLockOwed && areSavedSessionsErased && isActiveTokenErased
           if (canDropLock) {
-            const isBiometricsFlagErased =
-              await KeyStoreWrapper.removeIsBiometricsEnabled()
-            const isPinErased = await KeyStoreWrapper.removePin()
-            const isSpentBudgetErased = await KeyStoreWrapper.clearPinFailureState()
-
             /** Gone only when every slot says so: one that could not be erased
              *  is a lock that is still set. */
-            const isLockFullyErased =
-              isBiometricsFlagErased && isPinErased && isSpentBudgetErased
-            isAppLockKept = !isLockFullyErased
+            isAppLockKept = !(await KeyStoreWrapper.clearAppLock())
           }
         }
 
