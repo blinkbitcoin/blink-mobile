@@ -2182,7 +2182,7 @@
   "PinScreen": {
     "attemptUnrecorded": "Imeshindwa kurekodi jaribio kwa usalama.",
     "attemptsLeft": "Majaribio {attemptsRemaining: number} yamesalia.",
-    "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "attemptsRemaining": "Pini si sahihi. Majaribio {attemptsRemaining: number} yamesalia.",
     "enterPin": "Ingiza pini yako",
     "oneAttemptLeft": "Jaribio 1 limesalia.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
