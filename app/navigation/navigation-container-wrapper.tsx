@@ -97,6 +97,13 @@ type ResetTrigger = "gate-armed" | "unlock-cleared"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
+  /**
+   * The same answer without waiting for a commit, for the callers that read it outside a
+   * render: a lock raised during an awaited piece of work is already true here while the
+   * state, and any mirror of it, is still a commit behind. Written by the two setters, so
+   * it is never the stale one.
+   */
+  readIsAppLocked: () => boolean
   setAppUnlocked: () => void
   setAppLocked: () => void
 }
@@ -281,6 +288,8 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     }
   }, [canOpenQueuedUrl, urlAfterUnlockAndAuth])
 
+  const readIsAppLocked = React.useCallback(() => isAppLockedRef.current, [])
+
   const setAppUnlocked = React.useMemo(
     () => async () => {
       isAppLockedRef.current = false
@@ -373,7 +382,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   }
 
   return (
-    <AuthenticationContextProvider value={{ isAppLocked, setAppUnlocked, setAppLocked }}>
+    <AuthenticationContextProvider
+      value={{ isAppLocked, readIsAppLocked, setAppUnlocked, setAppLocked }}
+    >
       <NavigationContainer
         ref={navigationRef}
         {...(mode === "dark" ? { theme: DarkTheme } : {})}

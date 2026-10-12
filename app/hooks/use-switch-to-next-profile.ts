@@ -1,5 +1,3 @@
-import { useEffect, useRef } from "react"
-
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -35,18 +33,7 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
   const { logout } = useLogout()
   const { saveToken } = useAppConfig()
   const { LL } = useI18nContext()
-  const { isAppLocked } = useAuthenticationContext()
-
-  /**
-   * Mirrored because the switch reads the lock long after it started: the profile read, the
-   * logout and the token save all await, and a background-and-resume during any of them
-   * raises the lock while the value captured at the call still says unlocked. Navigating on
-   * that one puts the switched session on top of the lock screen it just raised.
-   */
-  const isAppLockedRef = useRef(isAppLocked)
-  useEffect(() => {
-    isAppLockedRef.current = isAppLocked
-  }, [isAppLocked])
+  const { readIsAppLocked } = useAuthenticationContext()
 
   const switchToNextProfile = async (
     tokenToDeactivate: string,
@@ -81,9 +68,10 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
      *  lock screen is the one on show, and the home screen pushed from here
      *  would sit on top of it. Answering the lock is what lands on home.
      *
-     *  Read now rather than at the call: a lock raised during the awaits above
-     *  is one this navigation would land on top of. */
-    if (!isAppLockedRef.current) navigation.navigate("Primary")
+     *  Read now rather than at the call, and from the lock's own ref rather than a mirror
+     *  of it: a relock raised during the awaits above lands there at once, while any state
+     *  copied from it is still a commit behind. */
+    if (!readIsAppLocked()) navigation.navigate("Primary")
     return SwitchProfileOutcome.Switched
   }
 
