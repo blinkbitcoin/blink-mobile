@@ -49,14 +49,25 @@ describe("navigateAfterAccountDelete", () => {
     expect(navigate).not.toHaveBeenCalled()
   })
 
-  it("resets the stack to getStarted when the user has no account left", () => {
+  /** Both ends of the session belong to the caller, which owns the lock flag this
+   *  navigator cannot touch: one outcome is owed an answer and has to keep the flag
+   *  raised, the other took the lock with it and has to lower it. Routing either from
+   *  here would move the screen and leave the flag behind. */
+  it("navigates nowhere when the session ended and the lock went with it", () => {
     const { navigation, dispatch, navigate } = buildNavigation()
 
     navigateAfterAccountDelete(navigation, "logged-out")
 
-    expect(dispatch).toHaveBeenCalledWith(
-      CommonActions.reset({ index: 0, routes: [{ name: "getStarted" }] }),
-    )
+    expect(dispatch).not.toHaveBeenCalled()
+    expect(navigate).not.toHaveBeenCalled()
+  })
+
+  it("navigates nowhere when the session ended with the lock still standing", () => {
+    const { navigation, dispatch, navigate } = buildNavigation()
+
+    navigateAfterAccountDelete(navigation, "logged-out-locked")
+
+    expect(dispatch).not.toHaveBeenCalled()
     expect(navigate).not.toHaveBeenCalled()
   })
 })
