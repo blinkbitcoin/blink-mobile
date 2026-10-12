@@ -136,8 +136,8 @@ describe("AuthenticationScreen", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
-  it("clears the pin lockout before leaving, so biometrics doesn't strand a lock", async () => {
-    // Proving identity biometrically has to release the pin lockout, and the
+  it("clears the spent attempts before leaving, so biometrics doesn't strand them", async () => {
+    // Proving identity biometrically has to release the attempt budget, and the
     // write has to land before we navigate away: a kill in that gap would
     // leave the user locked out, one wrong digit from a forced logout.
     renderScreen(false)
@@ -148,7 +148,7 @@ describe("AuthenticationScreen", () => {
     expect(clearOrder).toBeLessThan(mockSetAppUnlocked.mock.invocationCallOrder[0])
   })
 
-  it("still unlocks, and reports, when the lockout state cannot be cleared", async () => {
+  it("still unlocks, and reports, when the attempt count cannot be cleared", async () => {
     // The clear is awaited, so a keystore fault sits between the user and their
     // wallet. Refusing entry over it would punish someone who just proved who
     // they are — but the leftover count is sticky, so it has to be reported.
@@ -160,7 +160,7 @@ describe("AuthenticationScreen", () => {
     expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
     expect(mockReplace).toHaveBeenCalledWith("Primary")
     expect(recordAppError).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "PIN lockout state could not be cleared" }),
+      expect.objectContaining({ message: "PIN attempt count could not be cleared" }),
       expect.objectContaining({ alwaysRecord: true }),
     )
   })
