@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Numărul portofelelor nu este 2. Vă rugăm să utilizați tabloul de bord pentru a vedea toate portofelele și fondurile acestui cont"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Încercarea eșuată nu a putut fi înregistrată în siguranță. Deconectare.",
+    "attemptUnrecorded": "Încercarea nu a putut fi înregistrată în siguranță.",
+    "attemptsLeft": "{attemptsRemaining: number} încercări rămase.",
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
     "enterPin": "Introduceți codul PIN",
+    "oneAttemptLeft": "1 încercare rămasă.",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "pinUnreadable": "Nu am putut verifica PIN-ul. Vă rugăm să încercați din nou.",
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",
     "storePinFailed": "Nu se poate stoca codul PIN.",
-    "tooManyAttempts": "Prea multe încercări eșuate. Deconectare.",
+    "tooManyAttempts": "Prea multe încercări eșuate.",
+    "tryAgainIn": "Încercați din nou în {time: string}.",
     "verifyPin": "Verificați codul PIN"
   },
   "PriceHistoryScreen": {

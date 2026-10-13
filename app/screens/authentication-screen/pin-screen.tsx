@@ -19,6 +19,7 @@ import { useReturnToGate } from "../../hooks/use-return-to-gate"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
+import { parseTimer } from "../../utils/timer"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
 type Props = {
@@ -54,8 +55,8 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
   /** Both purposes verify a PIN the user already set, so both answer to the one
-   *  shared attempt budget. Only SetPin is exempt — there is nothing to be
-   *  wrong about yet. */
+   *  shared attempt budget and its escalating lockout. Only SetPin is exempt:
+   *  there is nothing to be wrong about yet. */
   const isVerifyingExistingPin = isAuthenticate || isChallenge
   /** Settings jobs and a caller's challenge are both dismissable — the back
    *  gesture already leaves them, and this is its visible counterpart on the
@@ -165,7 +166,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         }),
       )
     },
-    onWrongPin: () => setEnteredPIN(""),
+    onRejected: () => setEnteredPIN(""),
     onUnreadable: () => {
       setEnteredPIN("")
       setNoticeText(LL.PinScreen.pinUnreadable())
@@ -235,12 +236,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  dismiss tapped in that window declines into a session already going away
    *  and races the reset that ends it.
    *
-   *  Deliberately NOT the keypad's `isInputDisabled`: that is also true while
-   *  the stored count hydrates and while a verification is in flight, and a
-   *  challenge the user cannot currently answer is exactly when they most want
-   *  to leave it. The back gesture allows that regardless, so disabling the
-   *  control there would only make the visible affordance disagree with the
-   *  gesture it stands for.
+   *  Deliberately NOT the keypad's `isInputDisabled`: that is also true for the
+   *  whole lockout countdown, and a challenge the user cannot currently answer
+   *  is exactly when they most want to leave it. The back gesture allows that
+   *  regardless, so disabling the control there would only make the visible
+   *  affordance disagree with the gesture it stands for.
    *
    *  The `disabled` prop is the whole guard here, unlike on the keypad, which
    *  additionally asks the in-flight guard at press time because its `disabled`
@@ -281,12 +281,26 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   const attemptsText = () => {
     if (farewellText) return farewellText
     if (!isVerifyingExistingPin) return helperText
-    if (attempts.attemptsRemaining === null) return helperText
-    return attempts.attemptsRemaining === 1
-      ? LL.PinScreen.oneAttemptRemaining()
-      : LL.PinScreen.attemptsRemaining({
-          attemptsRemaining: attempts.attemptsRemaining,
-        })
+
+    const { attemptsRemaining, hasRejectedEntry } = attempts
+    if (attemptsRemaining === null) return helperText
+    /** A spent budget has no number left to show. It is what the keypad comes
+     *  back with when the lock outlives the logout, where a wrong entry no
+     *  longer costs a session but a longer wait. */
+    if (attemptsRemaining === 0) return LL.PinScreen.tooManyAttempts()
+
+    const isLastAttempt = attemptsRemaining === 1
+    /** "Incorrect PIN" is said only of an entry made on this screen. A count the
+     *  screen came back to, after a relaunch or from a challenge elsewhere, is
+     *  stated without blaming an entry nobody made here. */
+    if (hasRejectedEntry) {
+      return isLastAttempt
+        ? LL.PinScreen.oneAttemptRemaining()
+        : LL.PinScreen.attemptsRemaining({ attemptsRemaining })
+    }
+    return isLastAttempt
+      ? LL.PinScreen.oneAttemptLeft()
+      : LL.PinScreen.attemptsLeft({ attemptsRemaining })
   }
 
   return (
@@ -298,8 +312,14 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         ))}
       </View>
       <View style={styles.helperTextContainer}>
+        {/* Both lines, so a countdown never hides how many tries are left. */}
         <Text style={styles.helperText}>{attemptsText()}</Text>
         {noticeText ? <Text style={styles.helperText}>{noticeText}</Text> : null}
+        {attempts.isLocked ? (
+          <Text style={styles.helperText}>
+            {LL.PinScreen.tryAgainIn({ time: parseTimer(attempts.remainingSeconds) })}
+          </Text>
+        ) : null}
       </View>
       <View style={styles.pinPad}>
         <View style={styles.pinPadRow}>
