@@ -9,7 +9,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { toastShow } from "@app/utils/toast"
 
-import { useCardData } from "../../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 import { groupTransactionsByMonth } from "../group-transactions-by-month"
 
 const PAGE_SIZE = 100

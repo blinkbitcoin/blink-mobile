@@ -5,13 +5,17 @@ import { useCardPinUpdate } from "@app/screens/card-screen/pin-screens/hooks/use
 
 const mockMutate = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual("@app/graphql/generated"),
   useCardPinUpdateMutation: () => [mockMutate, { loading: false }],
 }))
 
 let mockCard: { id: string } | undefined = { id: "card-123" }
 const mockFetchPublicKey = jest.fn()
-jest.mock("@app/screens/card-screen/hooks", () => ({
+jest.mock("@app/hooks/use-card-data", () => ({
   useCardData: () => ({ card: mockCard }),
+}))
+
+jest.mock("@app/screens/card-screen/hooks", () => ({
   useCardEncryption: () => ({ fetchPublicKey: mockFetchPublicKey, loading: false }),
 }))
 
