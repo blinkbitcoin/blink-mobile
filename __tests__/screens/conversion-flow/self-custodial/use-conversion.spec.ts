@@ -4,7 +4,11 @@ import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useSelfCustodialConversion } from "@app/screens/conversion-flow/hooks/self-custodial/use-conversion"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { ConvertDirection, PaymentResultStatus } from "@app/types/payment"
+import {
+  ConvertDirection,
+  ConvertErrorCode,
+  PaymentResultStatus,
+} from "@app/types/payment"
 
 const mockGetQuote = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
@@ -55,6 +59,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       errors: {
         generic: () => "Generic error",
+      },
+      SelfCustodialError: {
+        outcomeUnknown: () => "Check your history",
       },
     },
   }),
@@ -526,6 +533,48 @@ describe("useSelfCustodialConversion", () => {
       await waitFor(() => expect(result.current.hasQuoteError).toBe(true))
 
       expect(quotesShown()).toHaveLength(0)
+    })
+  })
+
+  describe("a conversion whose outcome is unknown", () => {
+    const unknownOutcome = () =>
+      jest.fn().mockResolvedValue({
+        status: PaymentResultStatus.Failed,
+        errors: [{ message: "raw", code: ConvertErrorCode.OutcomeUnknown }],
+      })
+
+    it("tells the user to check their history", async () => {
+      mockGetQuote.mockResolvedValue(makeQuote({ execute: unknownOutcome() }))
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(result.current.errorMessage).toBe("Check your history")
+    })
+
+    it("hands every quote the same attempt ref, so a re-quote cannot convert again", async () => {
+      const firstExecute = unknownOutcome()
+      const secondExecute = unknownOutcome()
+      mockGetQuote
+        .mockResolvedValueOnce(makeQuote({ execute: firstExecute }))
+        .mockResolvedValueOnce(makeQuote({ execute: secondExecute }))
+
+      const { result } = renderHook(() => useSelfCustodialConversion(defaultParams))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+      await waitFor(() => expect(mockGetQuote).toHaveBeenCalledTimes(2))
+      await waitFor(() => expect(result.current.canExecute).toBe(true))
+      await act(async () => {
+        await result.current.execute()
+      })
+
+      expect(firstExecute.mock.calls[0][0]).toBeDefined()
+      expect(secondExecute.mock.calls[0][0]).toBe(firstExecute.mock.calls[0][0])
     })
   })
 })

@@ -185,6 +185,9 @@ export type ConversionLimits = {
 export const ConvertErrorCode = {
   BelowMinimum: "below_minimum",
   LimitsUnavailable: "limits_unavailable",
+  /** A conversion threw after it was dispatched and its payment could not be found, so
+   *  it may have gone through: no further conversion is sent until the user has checked. */
+  OutcomeUnknown: "outcome_unknown",
 } as const
 
 export type ConvertErrorCode = (typeof ConvertErrorCode)[keyof typeof ConvertErrorCode]
@@ -264,10 +267,17 @@ export const resolveDustAdjustment = (
   return amountInSourceCurrency >= fromWalletBalance ? null : amountAdjustment
 }
 
+/**
+ * What a conversion that may have gone out leaves for the next one on the same screen.
+ * Every quote pays a fresh invoice, so a retry is a new payment that a lost one would be
+ * doubled by; the holder outlives the quotes so the retry can be refused.
+ */
+export type ConvertAttemptRef = { hasUnresolvedConversion?: boolean }
+
 export type ConvertQuote = {
   feeAmount: UsdMoneyAmount
   amountAdjustment?: ConvertAmountAdjustment
-  execute: () => Promise<PaymentAdapterResult>
+  execute: (attemptRef?: ConvertAttemptRef) => Promise<PaymentAdapterResult>
 }
 
 export type GetConversionQuoteAdapter = (
