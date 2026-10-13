@@ -24,11 +24,13 @@ jest.mock("@app/utils/storage", () => ({
 
 const mockSweepMnemonicMigration = jest.fn()
 const mockReadSelfCustodialIndexPresence = jest.fn()
-// Scheduled off the boot path once the state has loaded; its own spec covers
-// what it does, and here it must not add reports to the ones under assertion.
-// The account index is the second witness the key-material wipe waits for.
+const mockPurgeLegacyKeyStoreOnce = jest.fn()
+// Scheduled off the boot path once the state has loaded; their own specs cover
+// what they do, and here they must not add reports to the ones under assertion.
+// The account index is also the second witness the key-material wipe waits for.
 jest.mock("@app/self-custodial/storage/account-index", () => ({
   sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
+  purgeLegacyKeyStoreOnce: (...args: unknown[]) => mockPurgeLegacyKeyStoreOnce(...args),
   readSelfCustodialIndexPresence: (...args: unknown[]) =>
     mockReadSelfCustodialIndexPresence(...args),
   SelfCustodialIndexPresence: {
@@ -128,6 +130,7 @@ const setupStorageMockDefaults = () => {
   mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
   // A real reinstall clears the index, so absence is the default here.
   mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
+  mockPurgeLegacyKeyStoreOnce.mockResolvedValue({ status: "done" })
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
@@ -248,6 +251,45 @@ describe("PersistentStateProvider", () => {
     await waitFor(() => {
       expect(screen.getByTestId("token").props.children).toBe("saved-token")
     })
+  })
+
+  /**
+   * Chained onto the sweep rather than scheduled beside it, and the chaining is
+   * the whole claim: the purge erases the legacy mnemonic copies, so it must see
+   * whether every account's value actually reached the new store first. Scheduled
+   * in parallel it could erase a copy whose migration had not happened yet.
+   */
+  it("hands the sweep's result to the purge", async () => {
+    const sweepResult = { status: "ok", migrated: 2 }
+    setPersistedBlob(scrubbedBlob)
+    mockSweepMnemonicMigration.mockResolvedValue(sweepResult)
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(mockPurgeLegacyKeyStoreOnce).toHaveBeenCalledWith(sweepResult)
+    })
+  })
+
+  it("does not purge when the sweep rejects, so no erase runs on an unknown sweep", async () => {
+    setPersistedBlob(scrubbedBlob)
+    mockGetActiveToken.mockResolvedValue("saved-token")
+    mockSweepMnemonicMigration.mockRejectedValue(new Error("keychain unavailable"))
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token").props.children).toBe("saved-token")
+    })
+    expect(mockPurgeLegacyKeyStoreOnce).not.toHaveBeenCalled()
   })
 
   it("falls back to default state when no persisted data exists", async () => {
