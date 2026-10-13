@@ -101,6 +101,24 @@ export const addSdkEventListener = (
 export const removeSdkEventListener = (sdk: BreezSdkInterface, listenerId: string) =>
   sdk.removeEventListener(listenerId)
 
+/**
+ * Undoes the mnemonic write when the rest of create or restore fails.
+ *
+ * A rollback that could not finish leaves key material under an account id that
+ * never entered the app's index, so nothing in the UI can reach it to try again.
+ * Reported rather than thrown: the caller is already failing for its own reason
+ * and that is the error the user should see.
+ */
+const rollbackStoredMnemonic = async (accountId: string): Promise<void> => {
+  const removed = await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+  if (removed) return
+
+  reportError(
+    "Wallet rollback",
+    new Error("Failed to remove the mnemonic of an account that never registered"),
+  )
+}
+
 export const selfCustodialCreateWallet = async (
   accountId: string,
   network: Network,
@@ -123,7 +141,7 @@ export const selfCustodialCreateWallet = async (
     if (!labelled) throw new Error("Failed to store mnemonic network")
     await addSelfCustodialAccountId(accountId)
   } catch (err) {
-    await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+    await rollbackStoredMnemonic(accountId)
     throw err
   }
 }
@@ -186,7 +204,7 @@ export const selfCustodialRestoreWallet = async ({
     await addSelfCustodialAccountId(accountId)
     return recovered
   } catch (err) {
-    await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+    await rollbackStoredMnemonic(accountId)
     reportError("Wallet restore", err)
     throw err
   }
