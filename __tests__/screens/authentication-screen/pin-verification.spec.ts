@@ -534,6 +534,44 @@ describe("readPinLockState", () => {
     })
   })
 
+  /** Named for the slot, not the repair: the key is shared with the write that ends a
+   *  session, and whichever fires first is the only one recorded. */
+  it("reports a repair the keystore refused", async () => {
+    storedState({ attempts: 1, lockedUntil: NOW + 60 * MINUTE_MS })
+    mockedStore.setPinFailureState.mockResolvedValue(false)
+
+    await readPinLockState(NOW)
+
+    expect(mockRecordAppError).toHaveBeenCalledTimes(1)
+    expect(mockRecordAppError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "PIN attempt state could not be persisted (lock repair)",
+      }),
+      { alwaysRecord: true, dedupKey: "pin-attempts-write" },
+    )
+  })
+
+  it("says nothing when the repair lands", async () => {
+    storedState({ attempts: 1, lockedUntil: NOW + 60 * MINUTE_MS })
+    mockedStore.setPinFailureState.mockResolvedValue(true)
+
+    await readPinLockState(NOW)
+
+    expect(mockedStore.setPinFailureState).toHaveBeenCalledTimes(1)
+    expect(mockRecordAppError).not.toHaveBeenCalled()
+  })
+
+  /** No write, so no result to judge: a lock already inside its wait must not report one. */
+  it("says nothing when there was nothing to repair", async () => {
+    storedState({ attempts: 2, lockedUntil: NOW + 20 * SECOND_MS })
+    mockedStore.setPinFailureState.mockResolvedValue(false)
+
+    await readPinLockState(NOW)
+
+    expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
+    expect(mockRecordAppError).not.toHaveBeenCalled()
+  })
+
   it("floors a negative stored attempt count at zero", async () => {
     // A tampered slot must not widen the budget past the three guesses it grants.
     storedState({ attempts: -5 })
