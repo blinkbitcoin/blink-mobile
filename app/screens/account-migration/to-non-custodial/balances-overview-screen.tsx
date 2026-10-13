@@ -197,12 +197,18 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const [lastCommitPointWrite, setLastCommitPointWrite] =
     useState<StorageWriteResult | null>(null)
   const latestCommitPointWriteRef = useRef(0)
+  /** The step is recorded as soon as the figures are ready, which can be before the server
+   *  accepts the start (it waits on an emptied dollar balance, and can fail). The accepted
+   *  start is written with it once it lands, the one thing that later tells a flow support
+   *  cleared from one that never started, since the server reads not started for both. */
+  const startConfirmation = migrationStart.isStarted ? true : undefined
   const recordCommitPoint = useCallback(async (): Promise<void> => {
     if (expectedReceiveSats === null) return
     latestCommitPointWriteRef.current += 1
     const writeId = latestCommitPointWriteRef.current
     const writeResult = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
       expectedReceiveSats,
+      isStartConfirmed: startConfirmation,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
      *  and a later failure cannot un-record a write that already landed. */
@@ -212,7 +218,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
      *  lands late never puts a stale reason above the retry. */
     const isLatestWrite = writeId === latestCommitPointWriteRef.current
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
-  }, [expectedReceiveSats, saveCheckpoint])
+  }, [expectedReceiveSats, startConfirmation, saveCheckpoint])
   const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
 
   useEffect(() => {

@@ -9,7 +9,7 @@ import { useExportTransactionsCsv } from "@app/custodial/hooks/use-export-transa
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   useCustodialWalletBalances,
-  useMigrationCheckpoint,
+  useMigrationNextStep,
 } from "@app/screens/account-migration/hooks"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { reportError } from "@app/utils/error-logging"
@@ -21,22 +21,22 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { navigateToCheckpoint, loading: checkpointLoading } = useMigrationCheckpoint()
+  /** Continues through the same routing as every other step, so a commit point the server
+   *  has since closed restarts from here instead of landing back on the commit screen. */
+  const { continuePastHistory, loading: nextStepLoading } = useMigrationNextStep()
 
   const { walletIds, isReady: areWalletsReady } = useCustodialWalletBalances()
 
   const { exportCsv } = useExportTransactionsCsv()
   const [isDownloading, setIsDownloading] = useState(false)
   const [hasDownloaded, setHasDownloaded] = useState(false)
-  const isBusy = checkpointLoading || isDownloading
+  const isBusy = nextStepLoading || isDownloading
   /** The export needs the wallet ids, so Download waits for the balances query; Skip never
-   *  does, so a still-loading or failed query can never trap the user on this optional step. */
+   *  does, so a still-loading or failed balances query can never trap the user on this
+   *  optional step. Skip only waits on the routing's own reads, and a failed one answers
+   *  the tap with a retry rather than holding the button off. */
   const isDownloadDisabled = isBusy || !areWalletsReady
   const secondaryButtonTitle = hasDownloaded ? LL.common.continue() : LL.common.skip()
-
-  const goToNextStep = useCallback(() => {
-    navigateToCheckpoint()
-  }, [navigateToCheckpoint])
 
   const handleDownload = useCallback(async () => {
     setIsDownloading(true)
@@ -67,7 +67,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
           <GaloySecondaryButton
             title={secondaryButtonTitle}
             disabled={isBusy}
-            onPress={goToNextStep}
+            onPress={continuePastHistory}
             {...testProps("migration-download-history-continue")}
           />
         </>

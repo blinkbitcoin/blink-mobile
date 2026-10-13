@@ -180,3 +180,40 @@ export const MigrationCompletion = {
 
 export type MigrationCompletion =
   (typeof MigrationCompletion)[keyof typeof MigrationCompletion]
+
+/**
+ * What the server says about the migration a commit-point checkpoint belongs to, reduced
+ * to the four answers the routing acts on differently. The checkpoint only knows WHICH
+ * screen the device left off on; this says WHETHER that is still where the user belongs.
+ */
+export const ServerMigrationFlow = {
+  /** In progress, transferring, or failed: the flow is still open, and resumes. */
+  Open: "open",
+  /** No migration, because none started or support cleared a stuck one: start over. */
+  NotStarted: "not-started",
+  /** The server moved the funds and this device has yet to swap into the new wallet. The
+   *  background resume finishes that on its own, so the flow is neither resumed (the
+   *  server refuses to start it again) nor restarted (that would drop the figure the swap
+   *  waits on). */
+  Completed: "completed",
+  /** No answer to act on: the read failed, never ran, or is still on its way. */
+  Unanswered: "unanswered",
+} as const
+
+export type ServerMigrationFlow =
+  (typeof ServerMigrationFlow)[keyof typeof ServerMigrationFlow]
+
+/** Where a commit-point checkpoint goes, once the server's answer and the device's record
+ *  of a confirmed start are read together. */
+export const CommitPointRoute = {
+  /** Back to the commit screen. */
+  Resume: "resume",
+  /** Support cleared a flow that had started: begin again. */
+  Restart: "restart",
+  /** The funds moved; the background resume finishes the swap. Stay put and say so. */
+  AwaitSwap: "await-swap",
+  /** No answer to act on: stay put and ask the server again. */
+  AskAgain: "ask-again",
+} as const
+
+export type CommitPointRoute = (typeof CommitPointRoute)[keyof typeof CommitPointRoute]

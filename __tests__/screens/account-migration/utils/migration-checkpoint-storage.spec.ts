@@ -3,8 +3,10 @@ import {
   clearCheckpointFromStorage,
   getStorageKey,
   isCommitPointCheckpoint,
-  isExpired,
   loadCheckpoint,
+  mergeCheckpoint,
+  resolveCommitPointRoute,
+  RESTART_ROUTE,
   resolveCheckpointRoute,
   saveCheckpointToStorage,
   getPendingAccountsStorageKey,
@@ -13,6 +15,7 @@ import {
   clearPendingProvisionedAccount,
   validateStoredCheckpoint,
 } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
+import { CommitPointRoute, ServerMigrationFlow } from "@app/types/migration"
 
 const mockLoadJsonOrThrow = jest.fn()
 const mockSaveJson = jest.fn()
@@ -63,41 +66,6 @@ describe("migration-checkpoint-storage", () => {
     it("returns valid checkpoint", () => {
       const result = validateStoredCheckpoint({ step: "backupMethod", savedAt: 1000 })
       expect(result).toEqual({ step: "backupMethod", savedAt: 1000 })
-    })
-  })
-
-  describe("isExpired (48h uniform)", () => {
-    const now = 1000000000
-    const h = 60 * 60 * 1000
-
-    it("not expired at 24h", () => {
-      const cp = { step: MigrationCheckpoint.BackupMethod, savedAt: now - 24 * h }
-      expect(isExpired(cp, now)).toBe(false)
-    })
-
-    it("not expired at 47h", () => {
-      const cp = { step: MigrationCheckpoint.CloudBackup, savedAt: now - 47 * h }
-      expect(isExpired(cp, now)).toBe(false)
-    })
-
-    it("not expired at 1h", () => {
-      const cp = { step: MigrationCheckpoint.BackupAlerts, savedAt: now - Number(h) }
-      expect(isExpired(cp, now)).toBe(false)
-    })
-
-    it("expired at 49h for BackupMethod", () => {
-      const cp = { step: MigrationCheckpoint.BackupMethod, savedAt: now - 49 * h }
-      expect(isExpired(cp, now)).toBe(true)
-    })
-
-    it("expired at 49h for CloudBackup", () => {
-      const cp = { step: MigrationCheckpoint.CloudBackup, savedAt: now - 49 * h }
-      expect(isExpired(cp, now)).toBe(true)
-    })
-
-    it("expired at 49h for BackupAlerts", () => {
-      const cp = { step: MigrationCheckpoint.BackupAlerts, savedAt: now - 49 * h }
-      expect(isExpired(cp, now)).toBe(true)
     })
   })
 
@@ -217,6 +185,13 @@ describe("migration-checkpoint-storage", () => {
 
       expect(everyDestination).not.toContain("accountMigrationStart")
     })
+
+    /** A restart and a device with nothing to resume must land in the same place, and that
+     *  place must never be the commit screen. */
+    it("restarts where a checkpoint-less device starts", () => {
+      expect(RESTART_ROUTE).toBe(resolveCheckpointRoute(null).name)
+      expect(RESTART_ROUTE).not.toBe("accountMigrationBalancesOverview")
+    })
   })
 
   describe("isCommitPointCheckpoint", () => {
@@ -249,7 +224,7 @@ describe("migration-checkpoint-storage", () => {
   })
 
   describe("loadCheckpoint", () => {
-    it("returns valid non-expired checkpoint", async () => {
+    it("returns the stored checkpoint", async () => {
       mockLoadJsonOrThrow.mockResolvedValue({
         step: "backupAlerts",
         savedAt: Date.now() - 1000,
@@ -262,15 +237,33 @@ describe("migration-checkpoint-storage", () => {
       })
     })
 
-    it("returns null and removes expired checkpoint", async () => {
+    it("keeps an old record, since only the server can retire a migration", async () => {
       mockLoadJsonOrThrow.mockResolvedValue({
-        step: "backupMethod",
-        savedAt: Date.now() - 49 * 60 * 60 * 1000,
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
+        accountId: "sc-1",
       })
 
       const result = await loadCheckpoint("test-key")
-      expect(result).toBeNull()
-      expect(mockRemove).toHaveBeenCalledWith("test-key")
+
+      expect(result).toMatchObject({ accountId: "sc-1" })
+      expect(mockRemove).not.toHaveBeenCalled()
+    })
+
+    /** Nothing expires on the device any more: a month-old record still routes by its
+     *  stored step, and the server's lock is what decides whether that step still holds. */
+    it("routes a month-old record by its stored step", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
+        accountId: "sc-1",
+      })
+
+      const result = await loadCheckpoint("test-key")
+
+      expect(resolveCheckpointRoute(result?.step ?? null)).toEqual({
+        name: "accountMigrationBalancesOverview",
+      })
     })
 
     it("returns null for invalid data", async () => {
@@ -549,10 +542,10 @@ describe("migration-checkpoint-storage", () => {
       expect(mockSaveJson).not.toHaveBeenCalled()
     })
 
-    it("drops an expired prior record's account id instead of lending it to the fresh save", async () => {
+    it("lends an old record's account id to the fresh save, so the wallet is reused", async () => {
       mockLoadJsonOrThrow.mockResolvedValue({
         step: MigrationCheckpoint.BackupMethod,
-        savedAt: Date.now() - 49 * 60 * 60 * 1000,
+        savedAt: Date.now() - 30 * 24 * 60 * 60 * 1000,
         accountId: "sc-1",
         custodialAccountId: "cust-1",
       })
@@ -565,9 +558,101 @@ describe("migration-checkpoint-storage", () => {
       expect(mockSaveJson).toHaveBeenCalledWith("test-key", {
         step: MigrationCheckpoint.BackupAlerts,
         savedAt: expect.any(Number),
-        accountId: undefined,
+        accountId: "sc-1",
         custodialAccountId: "cust-1",
       })
+    })
+  })
+
+  describe("a run that starts over", () => {
+    /** The only way back behind the commit point: the routing only restarts a flow the
+     *  server confirmed cleared, and the backup screens only save while focused, so a step
+     *  regression is a restart and its predecessor's figures are stale. */
+    const priorRun = {
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-1",
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 36726,
+    }
+
+    it("drops the previous run's expected receive amount", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: undefined }),
+      )
+    })
+
+    /** The caller re-sends the figure it already holds on every save, to heal a write that
+     *  never landed, so a restart has to refuse it from the update as well. */
+    it("drops it even when the caller echoes it back in the update", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BackupMethod,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 36726,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: undefined }),
+      )
+    })
+
+    it("keeps the wallet it already provisioned", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-1",
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ accountId: "sc-1" }),
+      )
+    })
+
+    it("takes the new run's own figure once it reaches the commit point again", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue({
+        ...priorRun,
+        step: MigrationCheckpoint.TermsAndConditions,
+        expectedReceiveSats: undefined,
+      })
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 41000,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: 41000 }),
+      )
+    })
+
+    it("still holds the figure across a re-entered commit screen", async () => {
+      mockLoadJsonOrThrow.mockResolvedValue(priorRun)
+
+      await saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 0,
+      })
+
+      expect(mockSaveJson).toHaveBeenCalledWith(
+        "test-key",
+        expect.objectContaining({ expectedReceiveSats: 36726 }),
+      )
     })
   })
 
@@ -620,5 +705,120 @@ describe("migration-checkpoint-storage", () => {
 
       expect(mockSaveJson).toHaveBeenCalledWith("pending-key", { "custodial-2": "sc-2" })
     })
+  })
+})
+
+describe("migration-checkpoint-storage a confirmed start", () => {
+  it("keeps a confirmed start on a stored record", () => {
+    expect(
+      validateStoredCheckpoint({
+        step: MigrationCheckpoint.BalancesOverview,
+        savedAt: 1,
+        isStartConfirmed: true,
+      }),
+    ).toMatchObject({ isStartConfirmed: true })
+  })
+
+  /** Advisory: anything but a literal true reads as unconfirmed, which resumes, and the
+   *  step and ids the record carries survive. */
+  it("reads anything but a literal true as unconfirmed, keeping the record", () => {
+    const record = validateStoredCheckpoint({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: 1,
+      accountId: "sc-1",
+      isStartConfirmed: "yes",
+    })
+
+    expect(record).toMatchObject({ accountId: "sc-1" })
+    expect(record?.isStartConfirmed).toBeUndefined()
+  })
+
+  const confirmedRun = {
+    step: MigrationCheckpoint.BalancesOverview,
+    savedAt: 1,
+    accountId: "sc-1",
+    custodialAccountId: "cust-1",
+    expectedReceiveSats: 36726,
+    isStartConfirmed: true as const,
+  }
+
+  it("sets it from the update that saw the start accepted", () => {
+    const merged = mergeCheckpoint(null, {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      isStartConfirmed: true,
+    })
+
+    expect(merged.isStartConfirmed).toBe(true)
+  })
+
+  it("keeps it across later saves of the same run", () => {
+    const merged = mergeCheckpoint(confirmedRun, {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+    })
+
+    expect(merged.isStartConfirmed).toBe(true)
+  })
+
+  /** The new run has not started anything yet: carrying the old confirmation would make
+   *  its own not-started read as cleared and restart it again. */
+  it("drops it when the run starts over", () => {
+    const merged = mergeCheckpoint(confirmedRun, {
+      step: MigrationCheckpoint.TermsAndConditions,
+      custodialAccountId: "cust-1",
+    })
+
+    expect(merged.isStartConfirmed).toBeUndefined()
+  })
+
+  it("never lends it to another account's flow", () => {
+    const merged = mergeCheckpoint(confirmedRun, {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-2",
+    })
+
+    expect(merged.isStartConfirmed).toBeUndefined()
+  })
+})
+
+/** The one rule the entry screen and the step routing both follow for a commit point. */
+describe("migration-checkpoint-storage resolveCommitPointRoute", () => {
+  it("resumes an open flow, confirmed start or not", () => {
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Open, true)).toBe(
+      CommitPointRoute.Resume,
+    )
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Open, false)).toBe(
+      CommitPointRoute.Resume,
+    )
+  })
+
+  it("restarts a flow support cleared after its start was accepted", () => {
+    expect(resolveCommitPointRoute(ServerMigrationFlow.NotStarted, true)).toBe(
+      CommitPointRoute.Restart,
+    )
+  })
+
+  /** A dollar balance, a failed start, or a cut-off one: the server reads not started
+   *  because it has not started yet, and the commit screen is where it does. */
+  it("resumes a flow whose start the server never accepted", () => {
+    expect(resolveCommitPointRoute(ServerMigrationFlow.NotStarted, false)).toBe(
+      CommitPointRoute.Resume,
+    )
+  })
+
+  it("waits for the swap once the server completed the migration", () => {
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Completed, true)).toBe(
+      CommitPointRoute.AwaitSwap,
+    )
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Completed, false)).toBe(
+      CommitPointRoute.AwaitSwap,
+    )
+  })
+
+  it("asks again when the server gave no answer", () => {
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Unanswered, true)).toBe(
+      CommitPointRoute.AskAgain,
+    )
   })
 })

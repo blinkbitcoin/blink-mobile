@@ -28,6 +28,10 @@ import { useCustodialOwnerId } from "./use-custodial-owner-id"
 type SaveCheckpointOptions = {
   provisionedAccountId?: string
   expectedReceiveSats?: number
+  /** Marks this run's start as accepted by the server. Never re-sent from what the hook
+   *  holds: the record keeps it for the run, and only the caller that saw the start may
+   *  set it. */
+  isStartConfirmed?: true
 }
 
 /**
@@ -113,6 +117,9 @@ export const useMigrationCheckpointState = () => {
   const expectedReceiveSats = isOwnedByActiveAccount
     ? stored?.expectedReceiveSats ?? null
     : null
+  /** Owned like the ids above: another profile's confirmed start says nothing about this
+   *  account's flow. */
+  const isStartConfirmed = isOwnedByActiveAccount && stored?.isStartConfirmed === true
 
   /** Answers `isSaved: false` when the write fails, so callers can stop the flow instead of
    *  advancing on a checkpoint that only exists in memory, and carries the kind of failure
@@ -125,6 +132,7 @@ export const useMigrationCheckpointState = () => {
       {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
+        isStartConfirmed: isStartConfirmedUpdate,
       }: SaveCheckpointOptions = {},
     ): Promise<StorageWriteResult> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
@@ -137,6 +145,7 @@ export const useMigrationCheckpointState = () => {
         custodialAccountId: ownerId,
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
+        isStartConfirmed: isStartConfirmedUpdate,
       }
       try {
         await saveCheckpointToStorage(storageKey, update)
@@ -172,6 +181,7 @@ export const useMigrationCheckpointState = () => {
     checkpoint,
     accountId,
     expectedReceiveSats,
+    isStartConfirmed,
     /** The owner the record was actually saved under, null on one written before owners
      *  existed. Read by consumers that spend something irreversible, since the ownership
      *  flag above claims an owner-less record for whoever is active. */

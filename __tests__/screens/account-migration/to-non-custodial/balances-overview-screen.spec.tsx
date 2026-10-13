@@ -1003,6 +1003,36 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
   })
 
+  /** The step is recorded before the server accepts the start; the accepted start is what
+   *  later tells a flow support cleared from one that never started. */
+  it("records the accepted start with the commit point once the server takes it", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+      MigrationCheckpoint.BalancesOverview,
+      {
+        expectedReceiveSats: 990,
+        isStartConfirmed: true,
+      },
+    )
+  })
+
+  /** A dollar balance holds the start back, so the step is recorded without a confirmed
+   *  start: coming back after the conversion must resume here, not restart the flow. */
+  it("records the commit point without a confirmed start while dollars hold it back", async () => {
+    mockUseWalletOverviewScreenQuery.mockReturnValue(
+      walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 5000 }),
+    )
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalled()
+    for (const [, options] of mockSaveCheckpoint.mock.calls) {
+      expect(options.isStartConfirmed).toBeUndefined()
+    }
+  })
+
   describe("the line above the retry", () => {
     const offlineStart = () =>
       Object.assign(new Error("Network request failed"), {

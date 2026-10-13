@@ -13,10 +13,10 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
-const mockNavigateToCheckpoint = jest.fn()
+const mockContinuePastHistory = jest.fn()
 const mockExportCsv = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
-const mockUseMigrationCheckpoint = jest.fn()
+const mockUseMigrationNextStep = jest.fn()
 const mockReportError = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
@@ -36,7 +36,7 @@ jest.mock("@app/graphql/is-authed-context", () => ({
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
-  useMigrationCheckpoint: () => mockUseMigrationCheckpoint(),
+  useMigrationNextStep: () => mockUseMigrationNextStep(),
 }))
 
 jest.mock("@app/custodial/hooks/use-export-transactions-csv", () => ({
@@ -78,8 +78,8 @@ describe("MigrationDownloadHistoryScreen", () => {
     mockUseWalletOverviewScreenQuery.mockReturnValue(
       walletOverviewQueryResult({ btcBalance: 1, usdBalance: 1 }),
     )
-    mockUseMigrationCheckpoint.mockReturnValue({
-      navigateToCheckpoint: mockNavigateToCheckpoint,
+    mockUseMigrationNextStep.mockReturnValue({
+      continuePastHistory: mockContinuePastHistory,
       loading: false,
     })
     mockExportCsv.mockResolvedValue(true)
@@ -214,9 +214,9 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(isContinueDisabled()).toBe(false)
   })
 
-  it("disables both actions while the migration checkpoint is loading", async () => {
-    mockUseMigrationCheckpoint.mockReturnValue({
-      navigateToCheckpoint: mockNavigateToCheckpoint,
+  it("disables both actions while the next step is still being resolved", async () => {
+    mockUseMigrationNextStep.mockReturnValue({
+      continuePastHistory: mockContinuePastHistory,
       loading: true,
     })
     renderScreen()
@@ -229,12 +229,16 @@ describe("MigrationDownloadHistoryScreen", () => {
     expect(isContinueDisabled()).toBe(true)
   })
 
-  it("continues the migration flow when the secondary action is pressed", async () => {
+  /** Through the same routing as every other step, not the stored checkpoint directly: a
+   *  commit point the server has since closed must restart from here, not land back on
+   *  the commit screen. Where that routing goes is pinned in the next-step hook's spec. */
+  it("continues through the flow's routing when the secondary action is pressed", async () => {
     renderScreen()
     await flushEffects()
 
     pressSecondary()
 
-    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockContinuePastHistory).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 })

@@ -1,3 +1,4 @@
+import { CommitPointRoute, ServerMigrationFlow } from "@app/types/migration"
 import { loadJsonOrThrow, remove, saveJson } from "@app/utils/storage"
 
 /** Values are persisted to AsyncStorage: do not rename them. */
@@ -12,6 +13,9 @@ export enum MigrationCheckpoint {
 
 export type StoredCheckpoint = {
   step: MigrationCheckpoint
+  /** Diagnostic only: no decision reads it since the record stopped expiring, the server's
+   *  lock deciding instead. Still required by validation, which is what every record this
+   *  app writes satisfies, so a record without it is malformed rather than half-trusted. */
   savedAt: number
   accountId?: string
   custodialAccountId?: string
@@ -19,6 +23,11 @@ export type StoredCheckpoint = {
    *  point — the only moment it is knowable (after the drain the preview reads an already
    *  emptied balance). Absent on records saved by app versions before the field existed. */
   expectedReceiveSats?: number
+  /** Set once the server accepted this run's start, which the commit screen can reach
+   *  after it records its step (the start waits on an emptied dollar balance, and can fail
+   *  or be cut off). It is what tells a flow support cleared from one that never started:
+   *  the server reads not started for both. Absent means not confirmed, never false. */
+  isStartConfirmed?: true
 }
 
 /**
@@ -30,9 +39,12 @@ type CheckpointDestination = {
 
 const STORAGE_KEY_PREFIX = "migrationCheckpoint"
 
-const CHECKPOINT_EXPIRATION_MS = 48 * 60 * 60 * 1000 // 48h
+/** Where a flow with nothing to resume starts, and so where a restart lands. Narrowed to
+ *  this one route so a restart can never be pointed at the commit screen by a change to
+ *  the table below. */
+export const RESTART_ROUTE = "accountMigrationExplainer" as const
 
-const DEFAULT_DESTINATION: CheckpointDestination = { name: "accountMigrationExplainer" }
+const DEFAULT_DESTINATION: CheckpointDestination = { name: RESTART_ROUTE }
 
 /** Exhaustive on purpose: a step added to the enum has no entry here and fails to compile,
  *  so a checkpoint past the commit point can never inherit the restart by omission. */
@@ -56,16 +68,17 @@ export const isCommitPointCheckpoint = (
 export const getStorageKey = (environment: string): string =>
   `${STORAGE_KEY_PREFIX}_${environment.toLowerCase()}`
 
-export const isExpired = (
-  checkpoint: StoredCheckpoint,
-  now: number = Date.now(),
-): boolean => now - checkpoint.savedAt > CHECKPOINT_EXPIRATION_MS
-
 export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null => {
   if (!raw || typeof raw !== "object") return null
 
-  const { step, savedAt, accountId, custodialAccountId, expectedReceiveSats } =
-    raw as StoredCheckpoint
+  const {
+    step,
+    savedAt,
+    accountId,
+    custodialAccountId,
+    expectedReceiveSats,
+    isStartConfirmed,
+  } = raw as StoredCheckpoint
 
   if (!Object.values(MigrationCheckpoint).includes(step)) return null
   if (typeof savedAt !== "number") return null
@@ -84,6 +97,9 @@ export const validateStoredCheckpoint = (raw: unknown): StoredCheckpoint | null 
     accountId,
     custodialAccountId,
     expectedReceiveSats: hasUsableExpectedReceiveSats ? expectedReceiveSats : undefined,
+    /** Advisory too, and only a literal true counts: anything else reads as unconfirmed,
+     *  which resumes, the behaviour a record written before the field existed gets. */
+    isStartConfirmed: isStartConfirmed === true ? true : undefined,
   }
 }
 
@@ -99,6 +115,32 @@ export const resolveCheckpointRoute = (
     ? { name: "accountMigrationBalancesOverview" }
     : DEFAULT_DESTINATION
 
+/** Exhaustive on purpose: a server answer added later has no entry here and fails to
+ *  compile, so it is routed deliberately instead of falling into a resume by default. */
+const COMMIT_POINT_ROUTE_BY_FLOW: Record<
+  Exclude<ServerMigrationFlow, typeof ServerMigrationFlow.NotStarted>,
+  CommitPointRoute
+> = {
+  [ServerMigrationFlow.Open]: CommitPointRoute.Resume,
+  [ServerMigrationFlow.Completed]: CommitPointRoute.AwaitSwap,
+  [ServerMigrationFlow.Unanswered]: CommitPointRoute.AskAgain,
+}
+
+/**
+ * What a commit-point checkpoint does given the server's answer, the one rule the entry
+ * screen and the flow's step routing both follow. Not started is the only answer that
+ * needs the device's side too: the server says it for a flow support cleared and for one
+ * that never started, and only the first may start over. The second resumes, as it always
+ * did, and the commit screen starts it.
+ */
+export const resolveCommitPointRoute = (
+  flow: ServerMigrationFlow,
+  isStartConfirmed: boolean,
+): CommitPointRoute => {
+  if (flow !== ServerMigrationFlow.NotStarted) return COMMIT_POINT_ROUTE_BY_FLOW[flow]
+  return isStartConfirmed ? CommitPointRoute.Restart : CommitPointRoute.Resume
+}
+
 /**
  * Throws when the store cannot be read, so the caller can tell that apart from an empty
  * one: they are opposite situations (a record still on the device versus none at all) and
@@ -111,17 +153,7 @@ export const resolveCheckpointRoute = (
 export const loadCheckpoint = async (
   storageKey: string,
 ): Promise<StoredCheckpoint | null> => {
-  const raw = await loadJsonOrThrow(storageKey)
-  const parsed = validateStoredCheckpoint(raw)
-
-  if (!parsed) return null
-
-  if (isExpired(parsed)) {
-    await remove(storageKey)
-    return null
-  }
-
-  return parsed
+  return validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
 }
 
 export type CheckpointUpdate = {
@@ -129,6 +161,7 @@ export type CheckpointUpdate = {
   accountId?: string
   custodialAccountId?: string
   expectedReceiveSats?: number
+  isStartConfirmed?: true
 }
 
 /**
@@ -145,19 +178,46 @@ export const mergeCheckpoint = (
     existing?.custodialAccountId === undefined ||
     existing.custodialAccountId === update.custodialAccountId
 
-  /** Write-once for one owner's flow: the figure is only knowable before the drain, so a
-   *  re-entered commit screen would carry the post-drain zero the gate reads as "nothing
-   *  will ever arrive" and swap while the funds are still in transit (#4102). */
+  /**
+   * The expected receive is write-once for one owner's RUN of the flow: it is only knowable
+   * before the drain, so a re-entered commit screen would carry the post-drain zero the
+   * gate reads as "nothing will ever arrive" and swap while the funds are still in transit
+   * (#4102).
+   *
+   * A run ends when the step falls back behind the commit point. The routing only does
+   * that on a restart the server confirmed: the account reads not started after a start
+   * this device saw accepted, which is support clearing the flow. An unanswered
+   * server holds the user instead, and the backup screens that save a pre-commit step only
+   * save while focused, so a screen left mounted beneath the commit point cannot regress it
+   * either. On a restart the figure is dropped from both sides, the record and the update,
+   * because callers re-send what they hold to heal a write that never landed and the
+   * previous run's amount would otherwise ride back in. The next commit point supplies the
+   * new run's own.
+   *
+   * The confirmed start belongs to the run the same way: kept across its steps, gone once
+   * it restarts, since the new run has not started anything yet.
+   */
+  const hasRestarted =
+    isCommitPointCheckpoint(existing?.step ?? null) &&
+    !isCommitPointCheckpoint(update.step)
   const inheritedExpectedReceiveSats = hasSameOwner
     ? existing?.expectedReceiveSats
     : undefined
+  const expectedReceiveSats = hasRestarted
+    ? undefined
+    : inheritedExpectedReceiveSats ?? update.expectedReceiveSats
+  const inheritedStartConfirmation = hasSameOwner ? existing?.isStartConfirmed : undefined
+  const isStartConfirmed = hasRestarted
+    ? undefined
+    : inheritedStartConfirmation ?? update.isStartConfirmed
 
   return {
     step: update.step,
     savedAt: Date.now(),
     accountId: update.accountId ?? (hasSameOwner ? existing?.accountId : undefined),
     custodialAccountId: update.custodialAccountId,
-    expectedReceiveSats: inheritedExpectedReceiveSats ?? update.expectedReceiveSats,
+    expectedReceiveSats,
+    isStartConfirmed,
   }
 }
 
@@ -171,11 +231,7 @@ export const saveCheckpointToStorage = async (
   storageKey: string,
   update: CheckpointUpdate,
 ): Promise<void> => {
-  const stored = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
-  /** An expired prior record must not lend its accountId to the fresh save; treat it as
-   *  absent, matching loadCheckpoint, so the 48h expiry stays authoritative for the id. */
-  const isReusableRecord = stored !== null && !isExpired(stored)
-  const existing = isReusableRecord ? stored : null
+  const existing = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
   await saveJson(storageKey, mergeCheckpoint(existing, update))
 }
 
@@ -185,7 +241,7 @@ export const clearCheckpointFromStorage = async (storageKey: string): Promise<vo
 
 /**
  * Wallets provisioned for a migration but not yet activated, keyed by the custodial
- * account that started the flow. Unlike the checkpoint this record never expires: the
+ * account that started the flow. It never expires, and neither does the checkpoint: the
  * wallet exists (its phrase may already be written down), so a restarted flow must
  * reuse it instead of provisioning a zombie, and the account switcher must not offer it.
  */
