@@ -68,7 +68,29 @@ export const readPinLockState = async (now: number): Promise<PinLockStateRead> =
   const lockedUntil = clampLockedUntil({ attempts, lockedUntil: stored.lockedUntil }, now)
 
   if (lockedUntil !== stored.lockedUntil) {
-    await KeyStoreWrapper.setPinFailureState({ attempts, lockedUntil })
+    /** The cut state is returned either way, so a refused repair costs correctness nothing:
+     *  it is cut again on the next read. What it costs is silence. A slot that will not take
+     *  this write will not take the ones the budget depends on either, and nothing else here
+     *  would say so, because this is the one write whose result had no reader.
+     *
+     *  Under the attempt-write key rather than its own: this is that same slot refusing that
+     *  same write. The message names the slot rather than the repair because the key is
+     *  shared and the first report under it silences the rest, and this one can be the first:
+     *  it fires on mount and on a clock moved backward, both before any entry is submitted.
+     *  A message about a lock repair would file the write that ends a session as a nit. */
+    const isRepairWritten = await KeyStoreWrapper.setPinFailureState({
+      attempts,
+      lockedUntil,
+    })
+    if (!isRepairWritten) {
+      recordAppError(
+        new Error("PIN attempt state could not be persisted (lock repair)"),
+        {
+          alwaysRecord: true,
+          dedupKey: PinErrorKey.AttemptsWrite,
+        },
+      )
+    }
   }
 
   return { status: "readable", state: { attempts, lockedUntil } }
