@@ -278,7 +278,7 @@
     "sha.js": "^2.4.12",
     "shell-quote": "^1.11.0",
     "@react-native/codegen": "0.85.3",
-    "handlebars": ">=4.7.9",
+    "handlebars": ">=4.7.10",
     "protobufjs": ">=7.5.5"
   },
   "engines": {
