@@ -31,6 +31,8 @@
     "createError": "Ekisumuluzo kya API tekisoboye kukolebwa. Gezaako nate.",
     "revokeError": "Ekisumuluzo kya API tekisoboye kujjibwamu. Gezaako nate.",
     "loadError": "Ebisumuluzo byo bya API tebisoboye kutikkulwa. Gezaako oluvannyuma.",
+    "discardSecretTitle": "Suula ekisumuluzo kya API kino?",
+    "discardSecretBody": "Kino kye kiseera kyokka ekyama we kirabikira. Bw'ovaawo kati, ekisumuluzo tekija kuddizibwamu era ojakwetaaga okukola ekirala.",
     "done": "Kimaze"
   },
   "GaloyAddressScreen": {
