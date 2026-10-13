@@ -13557,6 +13557,10 @@ type RootTranslation = {
 		 * T​h​e​ ​p​a​y​m​e​n​t​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​c​o​m​p​l​e​t​e​d​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​,​ ​o​r​ ​u​s​e​ ​a​ ​s​m​a​l​l​e​r​ ​a​m​o​u​n​t​.
 		 */
 		generic: string
+		/**
+		 * T​h​i​s​ ​p​a​y​m​e​n​t​ ​m​a​y​ ​a​l​r​e​a​d​y​ ​h​a​v​e​ ​g​o​n​e​ ​t​h​r​o​u​g​h​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​t​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y​ ​b​e​f​o​r​e​ ​s​e​n​d​i​n​g​ ​i​t​ ​a​g​a​i​n​.
+		 */
+		outcomeUnknown: string
 	}
 	SelfCustodialNetworkMismatch: {
 		/**
@@ -27248,6 +27252,10 @@ export type TranslationFunctions = {
 		 * The payment could not be completed. Try again in a moment, or use a smaller amount.
 		 */
 		generic: () => LocalizedString
+		/**
+		 * This payment may already have gone through. Check your transaction history before sending it again.
+		 */
+		outcomeUnknown: () => LocalizedString
 	}
 	SelfCustodialNetworkMismatch: {
 		/**

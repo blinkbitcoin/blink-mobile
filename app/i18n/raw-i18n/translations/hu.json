@@ -4120,7 +4120,8 @@
     "belowMinimum": "Az összeg az ehhez a fizetéshez szükséges minimum alatt van. Próbálj nagyobb összeget.",
     "networkError": "Hálózati kapcsolódási probléma. Ellenőrizd a kapcsolatot, és próbáld újra.",
     "invalidInput": "A fizetés adatai érvénytelennek tűnnek. Kérjük, ellenőrizd, és próbáld újra.",
-    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget."
+    "generic": "A fizetés nem sikerült. Próbáld újra egy pillanat múlva, vagy használj kisebb összeget.",
+    "outcomeUnknown": "Lehet, hogy ez a fizetés már teljesült. Mielőtt újra elküldenéd, nézd meg a tranzakcióid előzményeit."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ez a fiók a(z) {network} hálózaton jött létre. Használatához váltson a(z) {network} hálózatra."

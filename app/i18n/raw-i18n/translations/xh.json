@@ -4120,7 +4120,8 @@
     "belowMinimum": "Isixa singaphantsi kweminimum efunekayo kule ntlawulo. Zama isixa esikhulu.",
     "networkError": "Ingxaki yoqhagamshelwano kwithungelwano. Khangela uqhagamshelwano lwakho uphinde uzame.",
     "invalidInput": "Iinkcukacha zentlawulo zibonakala zingafanelekanga. Nceda uphinde ujonge uphinde uzame.",
-    "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci."
+    "generic": "Intlawulo ayizange igqibekise. Zama kwakhona kwakamsinya, okanye usebenzise isixa esincinci.",
+    "outcomeUnknown": "Le ntlawulo isenokuba sele iphumelele. Jonga imbali yeentengiselwano zakho ngaphambi kokuyithumela kwakhona."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Le akhawunti yenziwe kwi-{network}. Tshintshela kwi-{network} ukuze uyisebenzise."

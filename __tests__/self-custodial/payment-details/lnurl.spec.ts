@@ -13,12 +13,16 @@ const mockExtractLnurlFee = jest.fn()
 const mockListSentPaymentsSince = jest.fn()
 const mockSyncSelfCustodialWallet = jest.fn()
 
+/** The wallet's history, read by the lost-send lookup straight from the wallet bridge. */
+jest.mock("@app/self-custodial/bridge/wallet", () => ({
+  listSentPaymentsSince: (...args: unknown[]) => mockListSentPaymentsSince(...args),
+  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
+}))
+
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
   executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
   extractLnurlFee: (...args: unknown[]) => mockExtractLnurlFee(...args),
-  listSentPaymentsSince: (...args: unknown[]) => mockListSentPaymentsSince(...args),
-  syncSelfCustodialWallet: (...args: unknown[]) => mockSyncSelfCustodialWallet(...args),
   buildConversionType: jest.fn().mockReturnValue({ tag: "ToBitcoin" }),
   resolveSendTokenIdentifier: (currency: WalletCurrency) =>
     currency === WalletCurrency.Usd ? "usdb-token-id" : undefined,
@@ -30,16 +34,16 @@ jest.mock("@app/self-custodial/bridge", () => ({
  *  have their own spec; here only when it is asked, and what is done with its answer. */
 const mockFindLostSend = jest.fn()
 
-jest.mock("@app/self-custodial/payment-details/send-helpers", () => ({
-  ...jest.requireActual("@app/self-custodial/payment-details/send-helpers"),
+jest.mock("@app/self-custodial/payment-details/lost-send", () => ({
+  ...jest.requireActual("@app/self-custodial/payment-details/lost-send"),
   findLostSend: (...args: unknown[]) => mockFindLostSend(...args),
 }))
 
 /** The real lookup, for the tests that run it against a history shaped the way the
  *  wallet writes it. Its waits between looks are skipped. */
 const { findLostSend: actualFindLostSend } = jest.requireActual<
-  typeof import("@app/self-custodial/payment-details/send-helpers")
->("@app/self-custodial/payment-details/send-helpers")
+  typeof import("@app/self-custodial/payment-details/lost-send")
+>("@app/self-custodial/payment-details/lost-send")
 
 jest.mock("@app/utils/sleep", () => ({ sleep: () => Promise.resolve() }))
 jest.mock("@app/utils/error-logging", () => ({ reportError: jest.fn() }))

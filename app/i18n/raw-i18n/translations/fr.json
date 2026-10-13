@@ -4120,7 +4120,8 @@
         "belowMinimum": "Le montant est inférieur au minimum requis pour ce paiement. Essayez un montant plus grand.",
         "networkError": "Problème de connexion réseau. Vérifiez votre connexion et réessayez.",
         "invalidInput": "Les détails du paiement semblent invalides. Veuillez les vérifier et réessayer.",
-        "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit."
+        "generic": "Le paiement n'a pas pu être finalisé. Réessayez dans un instant, ou utilisez un montant plus petit.",
+        "outcomeUnknown": "Ce paiement a peut-être déjà été effectué. Vérifiez votre historique de transactions avant de le renvoyer."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Ce compte a été créé sur {network}. Passez à {network} pour l'utiliser."

@@ -6,6 +6,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { carryLostAttempts } from "@app/self-custodial/payment-details/send-helpers"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { toWalletAmount } from "@app/types/amounts"
 
@@ -126,7 +127,14 @@ export const useOnchainFeeTierOptions = ({
 
       if (!sdk || !paymentDestination || !convertMoneyAmount) return null
 
-      const wrapped = wrapDestination(paymentDestination, sdk, { feeTier: tier })
+      /**
+       * A new fee is a new payment, so the key starts over; a send that may already have
+       * gone out under the old one is carried, so the rebuilt payment cannot pay it twice.
+       */
+      const wrapped = wrapDestination(paymentDestination, sdk, {
+        feeTier: tier,
+        attemptRef: carryLostAttempts(currentDetail.idempotencyKeyRef),
+      })
       if (!wrapped.valid || !("createPaymentDetail" in wrapped)) return null
 
       const rebuilt = wrapped.createPaymentDetail({

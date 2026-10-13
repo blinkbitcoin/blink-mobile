@@ -4120,7 +4120,8 @@
     "belowMinimum": "Suma je pod minimom požadovaným pre túto platbu. Skúste väčšiu sumu.",
     "networkError": "Problém so sieťovým pripojením. Skontrolujte pripojenie a skúste znova.",
     "invalidInput": "Detaily platby vyzerajú neplatné. Skontrolujte ich a skúste znova.",
-    "generic": "Platbu sa nepodarilo dokončiť. Skúste znova o chvíľu alebo použite menšiu sumu."
+    "generic": "Platbu sa nepodarilo dokončiť. Skúste znova o chvíľu alebo použite menšiu sumu.",
+    "outcomeUnknown": "Táto platba už možno prebehla. Pred opätovným odoslaním si skontrolujte históriu transakcií."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tento účet bol vytvorený v sieti {network}. Ak ho chcete použiť, prepnite na {network}."

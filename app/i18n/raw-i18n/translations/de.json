@@ -4120,7 +4120,8 @@
         "belowMinimum": "Der Betrag liegt unter dem für diese Zahlung erforderlichen Minimum. Versuche einen größeren Betrag.",
         "networkError": "Netzwerkverbindungsproblem. Überprüfe deine Verbindung und versuche es erneut.",
         "invalidInput": "Die Zahlungsdetails scheinen ungültig zu sein. Bitte überprüfen und erneut versuchen.",
-        "generic": "Die Zahlung konnte nicht abgeschlossen werden. Versuche es in einem Moment erneut oder verwende einen kleineren Betrag."
+        "generic": "Die Zahlung konnte nicht abgeschlossen werden. Versuche es in einem Moment erneut oder verwende einen kleineren Betrag.",
+        "outcomeUnknown": "Diese Zahlung wurde möglicherweise bereits ausgeführt. Prüfe deinen Transaktionsverlauf, bevor du sie erneut sendest."
     },
     "SelfCustodialNetworkMismatch": {
         "toast": "Dieses Konto wurde auf {network} erstellt. Wechsle zu {network}, um es zu verwenden."

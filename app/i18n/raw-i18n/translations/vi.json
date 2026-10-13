@@ -4120,7 +4120,8 @@
     "belowMinimum": "Số tiền dưới mức tối thiểu cần thiết cho khoản thanh toán này. Hãy thử số tiền lớn hơn.",
     "networkError": "Sự cố kết nối mạng. Kiểm tra kết nối và thử lại.",
     "invalidInput": "Chi tiết thanh toán có vẻ không hợp lệ. Vui lòng xem lại và thử lại.",
-    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn."
+    "generic": "Không thể hoàn tất thanh toán. Hãy thử lại sau một lát, hoặc dùng số tiền nhỏ hơn.",
+    "outcomeUnknown": "Khoản thanh toán này có thể đã được thực hiện. Hãy kiểm tra lịch sử giao dịch trước khi gửi lại."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Tài khoản này được tạo trên {network}. Chuyển sang {network} để sử dụng."

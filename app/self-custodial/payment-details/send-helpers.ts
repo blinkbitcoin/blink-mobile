@@ -1,21 +1,23 @@
 import {
   OnchainConfirmationSpeed,
-  PaymentStatus,
+  SendPaymentMethod_Tags as MethodTag,
   type BreezSdkInterface,
   type ConversionOptions,
   type Payment,
+  type PrepareSendPaymentResponse,
 } from "@breeztech/breez-sdk-spark-react-native"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import {
   GetFee,
+  LostSend,
+  SendAttemptRef,
   SendPaymentMutation,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
-import { sleep } from "@app/utils/sleep"
 
 /** GetFee result plus the SDK dust adjustment, kept behind the self-custodial port so the shared GetFee contract stays free of it. */
 export type SelfCustodialFeeResult<T extends WalletCurrency> = Awaited<
@@ -28,12 +30,16 @@ import {
   executeSend,
   extractLightningFee,
   extractOnchainFees,
-  listSentPaymentsSince,
   mapAmountAdjustment,
   prepareSend,
-  syncSelfCustodialWallet,
 } from "../bridge"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
+
+import {
+  CODES_RAISED_BEFORE_DISPATCH,
+  findLostSend,
+  isPaymentOfLostSend,
+} from "./lost-send"
 
 type PrepareParams = {
   sdk: BreezSdkInterface
@@ -134,178 +140,236 @@ const reportSendFailure = (
   return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
-export const createSendMutation = (params: PrepareParams): SendPaymentMutation => {
-  return async () => {
-    try {
-      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared)
-      return { status: PaymentSendResult.Success }
-    } catch (err) {
-      return {
-        status: PaymentSendResult.Failure,
-        errors: [reportSendFailure("Self-custodial Lightning send", err)],
-      }
-    }
+/**
+ * Whether a send carries no token leg, so the attempt's idempotency key can ride on it:
+ * a bitcoin send that neither pays a token nor converts out of one on the way.
+ */
+const isKeyedSendOf = (params: PrepareParams): boolean =>
+  params.tokenIdentifier === undefined && params.conversionOptions === undefined
+
+/**
+ * What a prepared send can be found by in the wallet's history once dispatched: the
+ * invoice's payment hash for Lightning, the invoice itself for a Spark invoice. A send to
+ * a bare Spark or bitcoin address carries nothing no other payment shares.
+ */
+export const identifyPreparedSend = (
+  prepared: PrepareSendPaymentResponse,
+): SendIdentity | undefined => {
+  const method = prepared.paymentMethod
+  if (!method) return undefined
+  if (method.tag === MethodTag.Bolt11Invoice) {
+    return { paymentHash: method.inner.invoiceDetails.paymentHash }
   }
+  if (method.tag === MethodTag.SparkInvoice) {
+    return { sparkInvoice: method.inner.sparkInvoiceDetails.invoice }
+  }
+  return undefined
+}
+
+type SendRail = { scope: string; confirmationSpeed?: OnchainConfirmationSpeed }
+
+const runSendMutation = (
+  params: PrepareParams,
+  attemptRef: SendAttemptRef,
+  { scope, confirmationSpeed }: SendRail,
+): ReturnType<SendPaymentMutation> =>
+  runSelfCustodialSend({
+    sdk: params.sdk,
+    attemptRef,
+    isKeyedSend: isKeyedSendOf(params),
+    prepare: () => prepareSend(params.sdk, toPrepareOptions(params)),
+    identify: identifyPreparedSend,
+    execute: async (prepared, idempotencyKey) => {
+      await executeSend(params.sdk, prepared, { confirmationSpeed, idempotencyKey })
+      return { status: PaymentSendResult.Success }
+    },
+    foundOutcome: () => ({ status: PaymentSendResult.Success }),
+    failure: (err) => ({
+      status: PaymentSendResult.Failure,
+      errors: [reportSendFailure(scope, err)],
+    }),
+  })
+
+/**
+ * The attempt ref is the payment detail's: the send hook mints the idempotency key into
+ * it before every attempt and a retry reads the same one back, so a bitcoin send retried
+ * after a throw is refused by the SDK as a duplicate rather than paid twice.
+ */
+export const createSendMutation = (
+  params: PrepareParams,
+  attemptRef: SendAttemptRef = {},
+): SendPaymentMutation => {
+  return () =>
+    runSendMutation(params, attemptRef, { scope: "Self-custodial Lightning send" })
 }
 
 export const createSendMutationOnchain = (
   params: PrepareParams,
   feeTier: FeeTierOption,
+  attemptRef: SendAttemptRef = {},
 ): SendPaymentMutation => {
-  return async () => {
-    try {
-      const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
-      return { status: PaymentSendResult.Success }
-    } catch (err) {
-      return {
-        status: PaymentSendResult.Failure,
-        errors: [reportSendFailure("Self-custodial onchain send", err)],
+  return () =>
+    runSendMutation(params, attemptRef, {
+      scope: "Self-custodial onchain send",
+      confirmationSpeed: TIER_TO_SPEED[feeTier],
+    })
+}
+
+/** What a dispatched send can be found by in the wallet's history. */
+export type SendIdentity = { paymentHash?: string; sparkInvoice?: string }
+
+const withIdentity = (
+  earlier: LostSend | undefined,
+  startedAtMs: number,
+  identity: SendIdentity,
+): LostSend => ({
+  startedAtMs,
+  paymentHashes: [
+    ...(earlier?.paymentHashes ?? []),
+    ...(identity.paymentHash ? [identity.paymentHash] : []),
+  ],
+  sparkInvoices: [
+    ...(earlier?.sparkInvoices ?? []),
+    ...(identity.sparkInvoice ? [identity.sparkInvoice] : []),
+  ],
+})
+
+type SendOutcome = Awaited<ReturnType<SendPaymentMutation>>
+
+const outcomeUnknown = (): SendOutcome => ({
+  status: PaymentSendResult.Failure,
+  errors: [
+    {
+      __typename: "GraphQLApplicationError",
+      message: SelfCustodialErrorCode.OutcomeUnknown,
+    },
+  ],
+})
+
+type RunSelfCustodialSendParams<P> = {
+  sdk: BreezSdkInterface
+  /** The payment detail's holder: the key the send hook minted, and what earlier
+   *  attempts left behind. */
+  attemptRef: SendAttemptRef
+  /** Whether the send carries the attempt's idempotency key, so the SDK itself refuses a
+   *  retry under it as a duplicate. False for any send with a token leg. */
+  isKeyedSend: boolean
+  prepare: () => Promise<P>
+  identify: (prepared: P) => SendIdentity | undefined
+  execute: (prepared: P, idempotencyKey: string | undefined) => Promise<SendOutcome>
+  /** The wallet's own record of a send an earlier or this attempt made, reported as the
+   *  send itself would have reported it. */
+  foundOutcome: (payment: Payment) => SendOutcome
+  failure: (err: unknown) => SendOutcome
+}
+
+/**
+ * One attempt of a self-custodial send, made so a retry can never pay twice.
+ *
+ * A bitcoin send carries the attempt's idempotency key, and a retry under it is refused
+ * by the SDK as a duplicate. A send with a token leg cannot carry one (the SDK rejects
+ * it), so the SDK's own warning applies: "retrying after a failure that leaves the
+ * outcome unknown may pay twice … look for the payment before sending it again". Such a
+ * send that throws after dispatch looks for its payment before it is reported as failed,
+ * and the next attempt looks for every earlier attempt's payment before it sends.
+ *
+ * A send that carries nothing to look for it by (a bare Spark or bitcoin address) and
+ * throws after dispatch is never sent again except under the key it went out with: the
+ * sender is told the outcome is unknown and pointed at their history instead.
+ */
+export const runSelfCustodialSend = async <P>({
+  sdk,
+  attemptRef,
+  isKeyedSend,
+  prepare,
+  identify,
+  execute,
+  foundOutcome,
+  failure,
+}: RunSelfCustodialSendParams<P>): Promise<SendOutcome> => {
+  const idempotencyKey = isKeyedSend ? attemptRef.current : undefined
+
+  const unresolved = attemptRef.unresolvedSend
+  const isRetryUnderSameKey =
+    idempotencyKey !== undefined && unresolved?.idempotencyKey === idempotencyKey
+  if (unresolved && !isRetryUnderSameKey) return outcomeUnknown()
+
+  const findThisSend = (lost: LostSend) =>
+    findLostSend({
+      sdk,
+      startedAtMs: lost.startedAtMs,
+      matches: (payment) => isPaymentOfLostSend(lost, payment),
+    })
+  const forgetLostAttempts = () => {
+    attemptRef.lostSend = undefined
+    attemptRef.unresolvedSend = undefined
+  }
+  const rememberLostAttempts = (lostSend: LostSend) => {
+    attemptRef.lostSend = lostSend
+  }
+  const rememberUnresolved = () => {
+    attemptRef.unresolvedSend = { idempotencyKey }
+  }
+
+  /** Looked for whatever this send is: the lost attempt's payment is as real after a
+   *  switch of wallet or a new amount. */
+  const earlier = attemptRef.lostSend
+  if (earlier) {
+    const look = await findThisSend(earlier)
+    if (look.status === "found") {
+      forgetLostAttempts()
+      return foundOutcome(look.payment)
+    }
+    /** Nothing is sent over a history that could not be read: the payment it may hold
+     *  would be paid again. The attempt stays remembered, and the next retry asks again. */
+    if (look.status === "unreadable") return failure(look.error)
+  }
+
+  /** Nothing has moved before the send itself, so a quote that fails is safe to report
+   *  as a failure and try again. */
+  let prepared: P
+  try {
+    prepared = await prepare()
+  } catch (err) {
+    return failure(err)
+  }
+
+  const identity = identify(prepared)
+  const startedAtMs = earlier?.startedAtMs ?? Date.now()
+  try {
+    const outcome = await execute(prepared, idempotencyKey)
+    forgetLostAttempts()
+    return outcome
+  } catch (err) {
+    const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(classifySdkError(err))
+
+    if (!identity) {
+      if (isRaisedBeforeDispatch) return failure(err)
+      rememberUnresolved()
+      return isKeyedSend ? failure(err) : outcomeUnknown()
+    }
+
+    /** Not looked for now when a retry under the same key is refused as a duplicate by
+     *  the SDK anyway, nor when the SDK refused the send on the way in. Remembered all
+     *  the same, in both cases: a new amount or wallet starts the key over, whether
+     *  anything was dispatched is the SDK's word and not this code's, and the send made
+     *  next has only the lookup between it and paying twice. */
+    const lostSend = withIdentity(earlier, startedAtMs, identity)
+    if (!isKeyedSend && !isRaisedBeforeDispatch) {
+      const lost = await findThisSend(lostSend)
+      if (lost.status === "found") {
+        forgetLostAttempts()
+        return foundOutcome(lost.payment)
       }
     }
+    rememberLostAttempts(lostSend)
+    return failure(err)
   }
 }
 
-/**
- * How a send whose outcome the SDK lost is looked for before it is treated as never made.
- *
- * The SDK's own guidance for a payment that throws after dispatch ("Retrying after a
- * failure that leaves the outcome unknown may pay twice … look for the payment before
- * sending it again"). The wallet's history is local, and a send that threw reaches it
- * only once the wallet has caught up with the server, so every look first asks it to,
- * and the looks are spaced out for the payment to land in between.
- *
- * The caller matches by something no other payment shares (the invoice's payment hash),
- * so the window only bounds the work. It opens a day before the attempt's own clock,
- * since the wallet stamps a payment with the server's clock and a phone's can be set
- * well ahead of it, and it is paged through to its end, so a busy wallet cannot push the
- * payment past the first page.
- */
-const LOST_SEND_ATTEMPTS = 3
-const LOST_SEND_DELAY_MS = 2000
-const LOST_SEND_LOOKBACK_SECONDS = 24 * 60 * 60
-const LOST_SEND_PAGE_SIZE = 50
-/** Far beyond what a wallet sends in the window: hitting it means the pages never got
- *  shorter, and a history that was not read to its end is one that was not read. */
-const LOST_SEND_MAX_PAGES = 20
-
-type FindLostSendParams = {
-  sdk: BreezSdkInterface
-  /** When the attempt was dispatched, in milliseconds. */
-  startedAtMs: number
-  /** Whether a payment in the history is one this attempt may have made. */
-  matches: (payment: Payment) => boolean
-}
-
-export type LostSendLookup =
-  | { readonly status: "found"; readonly payment: Payment }
-  /** The last look read the history to its end and none of it was the payment: the one
-   *  answer that makes the send safe to try again. */
-  | { readonly status: "not-found" }
-  /** The last look could not read the history, or found a send it cannot tell apart from
-   *  the attempt, so nothing is known: not the payment, and not its absence. The error
-   *  it met is carried for the caller to report. */
-  | { readonly status: "unreadable"; readonly error: unknown }
-
-type HistoryScan = {
-  readonly matches: Payment[]
-  /** Whether the window holds a send the wallet has not described yet. Such a payment
-   *  carries nothing to match on, and a Lightning send can sit that way until the
-   *  wallet has fetched what it paid, so it may be the attempt itself. */
-  readonly hasUndescribedSend: boolean
-}
-
-const isUndescribedSend = (payment: Payment): boolean =>
-  payment.details === undefined && payment.status !== PaymentStatus.Failed
-
-const isCompleted = (payment: Payment): boolean =>
-  payment.status === PaymentStatus.Completed
-
-const isPendingPayment = (payment: Payment): boolean =>
-  payment.status === PaymentStatus.Pending
-
-/** A match that is the attempt landing: a failed payment of the invoice is not one. */
-const isLanded = (payment: Payment): boolean =>
-  isCompleted(payment) || isPendingPayment(payment)
-
-/**
- * One look: the wallet catches up with the server, then its outgoing payments in the
- * window are read page by page, until the caller's match is complete, the pages run
- * short, or the cap is hit. Throws when the history could not be read, except that a
- * page failing after a landed match was made takes nothing away from it: a payment of
- * the invoice exists. A failed match is not one, so the pages after it still count.
- */
-const scanHistorySince = async (
-  sdk: BreezSdkInterface,
-  since: bigint,
-  matches: (payment: Payment) => boolean,
-): Promise<HistoryScan> => {
-  await syncSelfCustodialWallet(sdk)
-
-  const found: Payment[] = []
-  let hasUndescribedSend = false
-  for (let page = 0; page < LOST_SEND_MAX_PAGES; page += 1) {
-    let payments: Payment[]
-    try {
-      ;({ payments } = await listSentPaymentsSince(sdk, {
-        fromTimestamp: since,
-        limit: LOST_SEND_PAGE_SIZE,
-        offset: page * LOST_SEND_PAGE_SIZE,
-      }))
-    } catch (err) {
-      if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
-      throw err
-    }
-
-    found.push(...payments.filter(matches))
-    if (payments.some(isUndescribedSend)) hasUndescribedSend = true
-
-    const isScanComplete =
-      found.some(isCompleted) || payments.length < LOST_SEND_PAGE_SIZE
-    if (isScanComplete) return { matches: found, hasUndescribedSend }
-  }
-
-  throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
-}
-
-/**
- * The payment an attempt made in spite of throwing, "not-found" when the last look read
- * the history and showed none, or "unreadable" when it could not. A completed payment
- * outranks a pending one for the same attempt; a failed one is not the attempt landing,
- * so it is passed over.
- *
- * The last look decides, since each one reads the history afresh after the wallet caught
- * up: a look that could not read earlier says nothing about one that did later.
- */
-export const findLostSend = async ({
-  sdk,
-  startedAtMs,
-  matches,
-}: FindLostSendParams): Promise<LostSendLookup> => {
-  const since = BigInt(Math.floor(startedAtMs / 1000) - LOST_SEND_LOOKBACK_SECONDS)
-  let lastLook: LostSendLookup = { status: "not-found" }
-
-  for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
-    try {
-      const scan = await scanHistorySince(sdk, since, matches)
-      const payment =
-        scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
-      if (payment) return { status: "found", payment }
-      lastLook = scan.hasUndescribedSend
-        ? {
-            status: "unreadable",
-            error: new Error("Lost send lookup met an undescribed send"),
-          }
-        : { status: "not-found" }
-    } catch (err) {
-      reportError("Self-custodial lost send lookup", err)
-      lastLook = { status: "unreadable", error: err }
-    }
-
-    const isLastAttempt = attempt === LOST_SEND_ATTEMPTS
-    if (!isLastAttempt) await sleep(LOST_SEND_DELAY_MS)
-  }
-
-  return lastLook
-}
+/** What a rebuild that starts the key over (a new amount, wallet or fee) carries from the
+ *  attempt ref it replaces: everything but the key. */
+export const carryLostAttempts = (ref: SendAttemptRef | undefined): SendAttemptRef => ({
+  lostSend: ref?.lostSend,
+  unresolvedSend: ref?.unresolvedSend,
+})

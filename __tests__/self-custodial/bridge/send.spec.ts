@@ -183,7 +183,7 @@ describe("executeSend", () => {
       paymentMethod: { tag: "BitcoinAddress", inner: {} },
     }
 
-    await executeSend(sdk, prepared as never, 0 /* Fast */)
+    await executeSend(sdk, prepared as never, { confirmationSpeed: 0 /* Fast */ })
 
     expect(sendPayment).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -207,6 +207,39 @@ describe("executeSend", () => {
     expect(sendPayment).toHaveBeenCalledWith(
       expect.objectContaining({ options: undefined }),
     )
+  })
+})
+
+describe("executeSend idempotency key", () => {
+  const KEY = "11111111-1111-4111-8111-111111111111"
+  const send = async (prepared: Record<string, unknown>) => {
+    const sendPayment = jest.fn().mockResolvedValue(undefined)
+    await executeSend({ sendPayment } as never, prepared as never, {
+      idempotencyKey: KEY,
+    })
+    return sendPayment.mock.calls[0][0].idempotencyKey
+  }
+
+  it("forwards the key on a bitcoin send", async () => {
+    expect(await send({ paymentMethod: { tag: "SparkAddress", inner: {} } })).toBe(KEY)
+  })
+
+  it("drops it on a token transfer, which the SDK rejects a key on", async () => {
+    expect(
+      await send({
+        paymentMethod: { tag: "SparkAddress", inner: {} },
+        tokenIdentifier: "usdb-token-id",
+      }),
+    ).toBeUndefined()
+  })
+
+  it("drops it on a send that converts on the way, which is a token leg too", async () => {
+    expect(
+      await send({
+        paymentMethod: { tag: "BitcoinAddress", inner: {} },
+        conversionEstimate: { amountIn: 1n },
+      }),
+    ).toBeUndefined()
   })
 })
 

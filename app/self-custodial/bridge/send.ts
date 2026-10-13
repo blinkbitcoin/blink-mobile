@@ -97,15 +97,31 @@ export const resolveSendTokenIdentifier = (
 ): string | undefined =>
   currency === WalletCurrency.Usd ? requireSparkTokenIdentifier() : undefined
 
+/**
+ * Whether a prepared send moves a token on any leg: a USDB transfer, or a conversion in
+ * or out of USDB on the way. The SDK has no idempotency hook for token transfers and
+ * rejects a key on such a payment as invalid input before anything is sent.
+ */
+export const hasTokenLeg = (prepared: PrepareSendPaymentResponse): boolean =>
+  prepared.tokenIdentifier !== undefined || prepared.conversionEstimate !== undefined
+
+export type ExecuteSendOptions = {
+  confirmationSpeed?: OnchainConfirmationSpeed
+  /** Makes a retry of the same send come back as the payment already made instead of a
+   *  second one. Dropped on a token leg, where the SDK refuses it. */
+  idempotencyKey?: string
+}
+
 export const executeSend = (
   sdk: BreezSdkInterface,
   prepareResponse: Awaited<ReturnType<typeof prepareSend>>,
-  confirmationSpeed?: OnchainConfirmationSpeed,
+  { confirmationSpeed, idempotencyKey }: ExecuteSendOptions = {},
 ) =>
   sdk.sendPayment(
     SendPaymentRequest.create({
       prepareResponse,
       options: buildSendOptions(prepareResponse, confirmationSpeed),
+      idempotencyKey: hasTokenLeg(prepareResponse) ? undefined : idempotencyKey,
     }),
   )
 

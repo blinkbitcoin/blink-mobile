@@ -4120,7 +4120,8 @@
     "belowMinimum": "Beløbet er under minimumskravet for denne betaling. Prøv et større beløb.",
     "networkError": "Problem med netværksforbindelsen. Tjek din forbindelse og prøv igen.",
     "invalidInput": "Betalingsoplysningerne ser ugyldige ud. Tjek dem og prøv igen.",
-    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb."
+    "generic": "Betalingen kunne ikke gennemføres. Prøv igen om et øjeblik eller brug et mindre beløb.",
+    "outcomeUnknown": "Denne betaling er muligvis allerede gennemført. Tjek din transaktionshistorik, før du sender den igen."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Denne konto blev oprettet på {network}. Skift til {network} for at bruge den."

@@ -4120,7 +4120,8 @@
     "belowMinimum": "Tutar bu ödeme için gereken minimumun altında. Daha büyük bir tutar deneyin.",
     "networkError": "Ağ bağlantısı sorunu. Bağlantınızı kontrol edip tekrar deneyin.",
     "invalidInput": "Ödeme bilgileri geçersiz görünüyor. Lütfen gözden geçirip tekrar deneyin.",
-    "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın."
+    "generic": "Ödeme tamamlanamadı. Bir an sonra tekrar deneyin veya daha küçük bir tutar kullanın.",
+    "outcomeUnknown": "Bu ödeme zaten gerçekleşmiş olabilir. Tekrar göndermeden önce işlem geçmişini kontrol et."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Bu hesap {network} ağında oluşturuldu. Kullanmak için {network} ağına geçin."

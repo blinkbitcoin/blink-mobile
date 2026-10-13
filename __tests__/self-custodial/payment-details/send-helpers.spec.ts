@@ -8,8 +8,8 @@ import {
   createGetFeeOnchain,
   createSendMutation,
   createSendMutationOnchain,
-  findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import { findLostSend } from "@app/self-custodial/payment-details/lost-send"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
@@ -365,7 +365,10 @@ describe("createGetFee", () => {
 
   it("forwards amount and tokenIdentifier on the prepare call", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFee({
@@ -386,7 +389,10 @@ describe("createGetFee", () => {
 
   it("forwards conversionOptions on the prepare call (USDB→BTC Lightning)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
     const conversionOptions = {
       conversionType: { tag: "ToBitcoin", inner: { fromTokenIdentifier: "usdb" } },
@@ -454,7 +460,10 @@ describe("createGetFeeOnchain", () => {
   it("returns undefined amount when extractOnchainFees returns null (regression)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFeeOnchain(
@@ -470,7 +479,10 @@ describe("createGetFeeOnchain", () => {
   it("reports the Generic code when extractOnchainFees returns null", async () => {
     mockPrepareSendPayment.mockResolvedValue({
       amount: BigInt(50000),
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
 
     const getFee = createGetFeeOnchain(
@@ -546,7 +558,10 @@ describe("createSendMutation", () => {
 
   it("returns success on a successful send", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
     mockSendPayment.mockResolvedValue(undefined)
 
@@ -643,7 +658,10 @@ describe("createSendMutation", () => {
 
   it("forwards tokenIdentifier on the prepare call", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
     mockSendPayment.mockResolvedValue(undefined)
 
@@ -662,7 +680,10 @@ describe("createSendMutation", () => {
 
   it("forwards conversionOptions on the prepare call (USDB→BTC Lightning)", async () => {
     mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      paymentMethod: {
+        tag: "Bolt11Invoice",
+        inner: { invoiceDetails: { paymentHash: "hash-1" } },
+      },
     })
     mockSendPayment.mockResolvedValue(undefined)
     const conversionOptions = {

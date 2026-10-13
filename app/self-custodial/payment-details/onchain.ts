@@ -10,17 +10,23 @@ import {
   SetAmount,
   SetSendingWalletDescriptor,
   BaseCreatePaymentDetailsParams,
+  SendAttemptRef,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { FeeTierOption } from "@app/screens/send-bitcoin-screen/hooks/fee-tiers.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
-import { createGetFeeOnchain, createSendMutationOnchain } from "./send-helpers"
+import {
+  carryLostAttempts,
+  createGetFeeOnchain,
+  createSendMutationOnchain,
+} from "./send-helpers"
 
 type CreateOnchainParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   address: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   feeTier?: FeeTierOption
+  idempotencyKeyRef?: SendAttemptRef
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrency>(
@@ -36,6 +42,18 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
   } = params
+
+  /**
+   * Same holder for every rebuild, as the LNURL detail keeps it: the send hook mints the
+   * key into it on the first attempt and reads it back on a retry, so a bitcoin send
+   * retried after a throw is refused by the SDK as a duplicate rather than paid twice.
+   * What a lost attempt leaves behind rides on it too.
+   */
+  const attemptRef: SendAttemptRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey: CreateOnchainParams<T> = {
+    ...params,
+    idempotencyKeyRef: attemptRef,
+  }
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
@@ -54,13 +72,18 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
         canSendPayment: true,
         canGetFee: true,
         getFee: createGetFeeOnchain(prepareParams, feeTier),
-        sendPaymentMutation: createSendMutationOnchain(prepareParams, feeTier),
+        sendPaymentMutation: createSendMutationOnchain(
+          prepareParams,
+          feeTier,
+          attemptRef,
+        ),
       }
     : { canSendPayment: false, canGetFee: false }
 
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
+      idempotencyKeyRef: carryLostAttempts(attemptRef),
       unitOfAccountAmount: newAmount,
     })
 
@@ -70,19 +93,20 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
         canSetMemo: true,
         setMemo: (newMemo) =>
           createSelfCustodialOnchainPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
       }
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialOnchainPaymentDetails({
-      ...params,
+      ...paramsWithKey,
+      idempotencyKeyRef: carryLostAttempts(attemptRef),
       sendingWalletDescriptor: desc,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSelfCustodialOnchainPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialOnchainPaymentDetails({ ...paramsWithKey, convertMoneyAmount: fn })
 
   return {
     destination: address,
@@ -95,6 +119,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     unitOfAccountAmount,
     sendingWalletDescriptor,
     setSendingWalletDescriptor,
+    idempotencyKeyRef: attemptRef,
     canSetAmount: true,
     setAmount,
     ...setMemo,

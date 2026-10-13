@@ -4277,6 +4277,8 @@ const en: BaseTranslation = {
     invalidInput: "The payment details look invalid. Please review and try again.",
     generic:
       "The payment could not be completed. Try again in a moment, or use a smaller amount.",
+    outcomeUnknown:
+      "This payment may already have gone through. Check your transaction history before sending it again.",
   },
   SelfCustodialNetworkMismatch: {
     toast:

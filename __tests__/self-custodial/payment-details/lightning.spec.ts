@@ -245,6 +245,7 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(3065) }),
+      expect.any(Object),
     )
   })
 
@@ -261,6 +262,7 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
+      expect.any(Object),
     )
   })
 

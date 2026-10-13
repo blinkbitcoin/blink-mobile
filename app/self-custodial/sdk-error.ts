@@ -9,6 +9,9 @@ export const SelfCustodialErrorCode = {
   NetworkError: "sc_network_error",
   InvalidInput: "sc_invalid_input",
   Generic: "sc_generic",
+  /** Not from the SDK: a send threw after dispatch and nothing can tell whether it paid,
+   *  so the app refuses to send it again until the sender has checked their history. */
+  OutcomeUnknown: "sc_outcome_unknown",
 } as const
 
 export type SelfCustodialErrorCode =

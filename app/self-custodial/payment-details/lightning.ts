@@ -10,19 +10,21 @@ import {
   SetAmount,
   SetSendingWalletDescriptor,
   BaseCreatePaymentDetailsParams,
+  SendAttemptRef,
 } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { ConvertDirection } from "@app/types/payment"
 
 import { buildConversionType } from "../bridge"
 
-import { createGetFee, createSendMutation } from "./send-helpers"
+import { carryLostAttempts, createGetFee, createSendMutation } from "./send-helpers"
 
 type CreateLightningParams<T extends WalletCurrency> = {
   sdk: BreezSdkInterface
   paymentRequest: string
   unitOfAccountAmount: MoneyAmount<WalletOrDisplayCurrency>
   hasAmount: boolean
+  idempotencyKeyRef?: SendAttemptRef
 } & BaseCreatePaymentDetailsParams<T>
 
 export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurrency>(
@@ -38,6 +40,18 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
     destinationSpecifiedMemo,
     senderSpecifiedMemo,
   } = params
+
+  /**
+   * Same holder for every rebuild, as the LNURL detail keeps it: the send hook mints the
+   * key into it on the first attempt and reads it back on a retry, so a bitcoin send
+   * retried after a throw is refused by the SDK as a duplicate rather than paid twice.
+   * What a lost attempt leaves behind rides on it too.
+   */
+  const attemptRef: SendAttemptRef = params.idempotencyKeyRef ?? {}
+  const paramsWithKey: CreateLightningParams<T> = {
+    ...params,
+    idempotencyKeyRef: attemptRef,
+  }
 
   const memo = destinationSpecifiedMemo || senderSpecifiedMemo
   const settlementAmount = convertMoneyAmount(
@@ -65,7 +79,7 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
         canSendPayment: true,
         canGetFee: true,
         getFee: createGetFee(prepareParams),
-        sendPaymentMutation: createSendMutation(prepareParams),
+        sendPaymentMutation: createSendMutation(prepareParams, attemptRef),
       }
     : { canSendPayment: false, canGetFee: false }
 
@@ -75,25 +89,30 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
         canSetMemo: true,
         setMemo: (newMemo) =>
           createSelfCustodialLightningPaymentDetails({
-            ...params,
+            ...paramsWithKey,
             senderSpecifiedMemo: newMemo,
           }),
       }
 
   const setAmount: SetAmount<T> = (newAmount) =>
     createSelfCustodialLightningPaymentDetails({
-      ...params,
+      ...paramsWithKey,
+      idempotencyKeyRef: carryLostAttempts(attemptRef),
       unitOfAccountAmount: newAmount,
     })
 
   const setSendingWalletDescriptor: SetSendingWalletDescriptor<T> = (desc) =>
     createSelfCustodialLightningPaymentDetails({
-      ...params,
+      ...paramsWithKey,
+      idempotencyKeyRef: carryLostAttempts(attemptRef),
       sendingWalletDescriptor: desc,
     })
 
   const setConvertMoneyAmount = (fn: ConvertMoneyAmount) =>
-    createSelfCustodialLightningPaymentDetails({ ...params, convertMoneyAmount: fn })
+    createSelfCustodialLightningPaymentDetails({
+      ...paramsWithKey,
+      convertMoneyAmount: fn,
+    })
 
   return {
     destination: paymentRequest,
@@ -106,6 +125,7 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
     unitOfAccountAmount,
     sendingWalletDescriptor,
     setSendingWalletDescriptor,
+    idempotencyKeyRef: attemptRef,
     ...(hasAmount
       ? { canSetAmount: false as const, destinationSpecifiedAmount: unitOfAccountAmount }
       : { canSetAmount: true as const, setAmount }),

@@ -4120,7 +4120,8 @@
     "belowMinimum": "Suma este sub minimul necesar pentru această plată. Încearcă o sumă mai mare.",
     "networkError": "Problemă de conexiune la rețea. Verifică conexiunea și încearcă din nou.",
     "invalidInput": "Detaliile plății par invalide. Te rog verifică și încearcă din nou.",
-    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică."
+    "generic": "Plata nu a putut fi finalizată. Încearcă din nou într-un moment, sau folosește o sumă mai mică.",
+    "outcomeUnknown": "Este posibil ca această plată să fi fost deja efectuată. Verifică istoricul tranzacțiilor înainte de a o trimite din nou."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Acest cont a fost creat pe {network}. Comută la {network} pentru a-l folosi."

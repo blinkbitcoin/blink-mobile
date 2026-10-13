@@ -92,6 +92,7 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
+      expect.any(Object),
     )
     expect(mockCreateGetFee).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: "usdb-token-id" }),
@@ -103,6 +104,7 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
+      expect.any(Object),
     )
     expect(mockCreateGetFee).toHaveBeenCalledWith(
       expect.objectContaining({ tokenIdentifier: undefined }),
@@ -124,6 +126,7 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
     // 70 cents ($0.70) × 10^4 = 700_000 USDB base units
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(700000) }),
+      expect.any(Object),
     )
   })
 
@@ -140,6 +143,7 @@ describe("createSelfCustodialSparkPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
+      expect.any(Object),
     )
   })
 

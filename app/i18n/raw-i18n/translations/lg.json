@@ -4120,7 +4120,8 @@
     "belowMinimum": "Omuwendo guli wansi w'omuwendo omutono ogwetagisa eby'okusasula kuno. Gezaako omuwendo omunene.",
     "networkError": "Ekizibu ky'okuyungibwa ku mukutu. Kebera enkolagana yo oddemu ogezeeko.",
     "invalidInput": "Ebikwata ku kusasula bifaanana nga si bituufu. Wonna obyebibebule oddemu ogezeeko.",
-    "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono."
+    "generic": "Okusasula tekuyinzizza kuwedwa. Ddamu ogezeeko mu kaseera, oba kozesa omuwendo omutono.",
+    "outcomeUnknown": "Okusasula kuno kuyinza okuba nga kwatambula dda. Kebera ebyafaayo by'enkolagana zo nga tonnakuweereza nate."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Akawunti eno yakolebwa ku {network}. Kyuka odde ku {network} okugikozesa."

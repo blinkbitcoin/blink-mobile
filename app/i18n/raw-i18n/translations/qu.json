@@ -4120,7 +4120,8 @@
     "belowMinimum": "Qullqiqa kay quypaq mañasqa ñut'u qullqi sayanmantaqa pisinmanmi. Aswan hatun qullqitaqa rikuychis.",
     "networkError": "Conexión sasachakuy. Conexión qhawariy hinaspa kaqmanta rurariy.",
     "invalidInput": "Quy yachayninkuna mana allinmi kashan. Ama hina kaspa qhawariy hinaspa kaqmanta rurariy.",
-    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy."
+    "generic": "Quy mana tukukuyta atinmi. Pisi kutilla suyay hinaspa kaqmanta rurariy, utaq aswan huch'uy qullqitaqa rurariy.",
+    "outcomeUnknown": "Kay qullqi kutichiyqa ñachá rirqanña. Manaraq kaqmanta kachaspa, transaccionniykikunap willakuyninta qhaway."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Kay cuentaqa {network} pi kamarisqa karqan. Llamk'achinapaq {network} man tikray."

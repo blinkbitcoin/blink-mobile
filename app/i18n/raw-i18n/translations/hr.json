@@ -4120,7 +4120,8 @@
     "belowMinimum": "Iznos je ispod minimuma potrebnog za ovo plaćanje. Pokušajte s većim iznosom.",
     "networkError": "Problem s mrežnom vezom. Provjerite vezu i pokušajte ponovno.",
     "invalidInput": "Detalji plaćanja izgledaju nevažeći. Molimo provjerite i pokušajte ponovno.",
-    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos."
+    "generic": "Plaćanje nije moglo biti dovršeno. Pokušajte ponovno za trenutak ili upotrijebite manji iznos.",
+    "outcomeUnknown": "Ovo plaćanje je možda već izvršeno. Provjerite povijest transakcija prije ponovnog slanja."
   },
   "SelfCustodialNetworkMismatch": {
     "toast": "Ovaj račun je stvoren na mreži {network}. Prebacite se na {network} kako biste ga koristili."

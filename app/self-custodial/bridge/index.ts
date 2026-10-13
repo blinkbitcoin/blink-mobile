@@ -25,6 +25,7 @@ export { createLnurlWithdraw } from "./lnurl-withdraw"
 export {
   prepareSend,
   executeSend,
+  hasTokenLeg,
   extractOnchainFees,
   extractLightningFee,
   toSdkSendAmount,
@@ -33,7 +34,12 @@ export {
   executeLnurl,
   extractLnurlFee,
 } from "./send"
-export type { OnchainFeeTiers, PrepareSendOptions, PrepareLnurlOptions } from "./send"
+export type {
+  ExecuteSendOptions,
+  OnchainFeeTiers,
+  PrepareSendOptions,
+  PrepareLnurlOptions,
+} from "./send"
 export { listDeposits, claimDeposit, refundDeposit, getRecommendedFees } from "./deposits"
 export type { MappedDeposit, NetworkFeeRates } from "./deposits"
 export { createGetConversionQuote, mapAmountAdjustment } from "./convert"

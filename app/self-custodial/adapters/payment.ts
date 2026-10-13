@@ -1,4 +1,5 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import { v5 as uuidv5 } from "uuid"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { toBtcMoneyAmount } from "@app/types/amounts"
@@ -14,20 +15,37 @@ import {
 } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
+import { generateSecureRandomUUID } from "@app/utils/uuid"
 
 import {
   executeSend,
   extractLightningFee,
   extractOnchainFees,
+  hasTokenLeg,
   prepareSend,
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "../bridge"
+import { identifyPreparedSend } from "../payment-details/send-helpers"
 
 const failed = (message: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,
   errors: [{ message }],
 })
+
+/** Namespace for the keys derived from an invoice's payment hash (any fixed UUID). */
+const INVOICE_KEY_NAMESPACE = "8f0c2a51-6b0e-4f63-9a1d-3c5e7b9d1f20"
+
+/**
+ * The key a bitcoin send through this adapter carries. Its callers hold no payment intent
+ * to keep a key on across retries, so an invoice keys itself: every send of the same
+ * invoice carries the same key and the SDK refuses all but the first. A send with no
+ * invoice gets a key of its own, which at least makes the SDK's internal retries safe.
+ */
+const adapterIdempotencyKey = (paymentHash: string | undefined): Promise<string> =>
+  paymentHash
+    ? Promise.resolve(uuidv5(paymentHash, INVOICE_KEY_NAMESPACE))
+    : generateSecureRandomUUID()
 
 export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter => {
   return async ({ destination, amount }) => {
@@ -38,7 +56,10 @@ export const createSendPayment = (sdk: BreezSdkInterface): SendPaymentAdapter =>
         amount: amount ? toSdkSendAmount(amount.amount, currency) : undefined,
         tokenIdentifier: resolveSendTokenIdentifier(currency),
       })
-      await executeSend(sdk, prepared)
+      const idempotencyKey = hasTokenLeg(prepared)
+        ? undefined
+        : await adapterIdempotencyKey(identifyPreparedSend(prepared)?.paymentHash)
+      await executeSend(sdk, prepared, { idempotencyKey })
 
       return { status: PaymentResultStatus.Success }
     } catch (err) {
