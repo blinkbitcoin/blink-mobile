@@ -303,13 +303,264 @@ remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,
 })
 
+/**
+ * Reads the config Firebase has activated: the values of the last fetch, persisted
+ * on the device, or the shipped defaults before any fetch. Read at the first render
+ * as well as after each fetch, so no flag is defaulted for the seconds a fetch takes.
+ */
+const readRemoteConfig = (): RemoteConfig => {
+  const deviceAccountEnabledRestAuth = remoteConfigInstance()
+    .getValue(DeviceAccountEnabledKey)
+    .asBoolean()
+
+  const balanceLimitToTriggerUpgradeModal = remoteConfigInstance()
+    .getValue(BalanceLimitToTriggerUpgradeModalKey)
+    .asNumber()
+
+  const feedbackEmailAddress = remoteConfigInstance()
+    .getValue(FeedbackEmailKey)
+    .asString()
+
+  const supportEmailAddress = remoteConfigInstance().getValue(SupportEmailKey).asString()
+
+  const upgradeModalCooldownDays = remoteConfigInstance()
+    .getValue(UpgradeModalCooldownDaysKey)
+    .asNumber()
+
+  const upgradeModalShowAtSessionNumber = remoteConfigInstance()
+    .getValue(UpgradeModalShowAtSessionNumberKey)
+    .asNumber()
+
+  const feeReimbursementMemo = remoteConfigInstance()
+    .getValue(FeeReimbursementMemoKey)
+    .asString()
+  const successIconDuration = remoteConfigInstance()
+    .getValue(SuccessIconDurationKey)
+    .asNumber()
+
+  const appLockGracePeriodSeconds = remoteConfigInstance()
+    .getValue(AppLockGracePeriodSecondsKey)
+    .asNumber()
+
+  const cardTermsAndConditionsUrl = remoteConfigInstance()
+    .getValue(CardTermsAndConditionsUrlKey)
+    .asString()
+
+  const cardPrivacyPolicyUrl = remoteConfigInstance()
+    .getValue(CardPrivacyPolicyUrlKey)
+    .asString()
+
+  const cardCardholderAgreementUrl = remoteConfigInstance()
+    .getValue(CardCardholderAgreementUrlKey)
+    .asString()
+
+  const cardESignConsentUrl = remoteConfigInstance()
+    .getValue(CardESignConsentUrlKey)
+    .asString()
+
+  const cardIssuerPrivacyPolicyUrl = remoteConfigInstance()
+    .getValue(CardIssuerPrivacyPolicyUrlKey)
+    .asString()
+
+  const cardSubscriptionPriceUsd = remoteConfigInstance()
+    .getValue(CardSubscriptionPriceUsdKey)
+    .asNumber()
+
+  const cardReplacementFeeUsd = remoteConfigInstance()
+    .getValue(CardReplacementFeeUsdKey)
+    .asNumber()
+
+  const cardUsdTransactionFeePercent = remoteConfigInstance()
+    .getValue(CardUsdTransactionFeePercentKey)
+    .asNumber()
+
+  const cardForeignTransactionFeePercent = remoteConfigInstance()
+    .getValue(CardForeignTransactionFeePercentKey)
+    .asNumber()
+
+  const cardMaxOverdraftUsd = remoteConfigInstance()
+    .getValue(CardMaxOverdraftUsdKey)
+    .asNumber()
+
+  const cardLateRepaymentFeeUsd = remoteConfigInstance()
+    .getValue(CardLateRepaymentFeeUsdKey)
+    .asNumber()
+
+  const sparkCompatibleWalletsUrl = remoteConfigInstance()
+    .getValue(SparkCompatibleWalletsUrlKey)
+    .asString()
+
+  const cardInvestmentDepositBtcWalletId = remoteConfigInstance()
+    .getValue(CardInvestmentDepositBtcWalletIdKey)
+    .asString()
+
+  const backupNudgeBannerThreshold = remoteConfigInstance()
+    .getValue(BackupNudgeBannerThresholdKey)
+    .asNumber()
+
+  const backupNudgeModalThreshold = remoteConfigInstance()
+    .getValue(BackupNudgeModalThresholdKey)
+    .asNumber()
+
+  // asNumber() yields 0 for a malformed remote value, and a zero cooldown would
+  // make the modal undismissable again — fall back to the shipped default.
+  const remoteBackupNudgeModalCooldownMs = remoteConfigInstance()
+    .getValue(BackupNudgeModalCooldownMsKey)
+    .asNumber()
+  const backupNudgeModalCooldownMs =
+    remoteBackupNudgeModalCooldownMs > 0
+      ? remoteBackupNudgeModalCooldownMs
+      : defaultRemoteConfig.backupNudgeModalCooldownMs
+
+  const nonCustodialEnabled = remoteConfigInstance()
+    .getValue(NonCustodialEnabledKey)
+    .asBoolean()
+
+  const stableBalanceEnabled = remoteConfigInstance()
+    .getValue(StableBalanceEnabledKey)
+    .asBoolean()
+
+  const btcMapPlacesEnabled = remoteConfigInstance()
+    .getValue(BtcMapPlacesEnabledKey)
+    .asBoolean()
+
+  const autoConvertMaxAttempts = remoteConfigInstance()
+    .getValue(AutoConvertMaxAttemptsKey)
+    .asNumber()
+
+  const autoConvertPollMaxAttempts = remoteConfigInstance()
+    .getValue(AutoConvertPollMaxAttemptsKey)
+    .asNumber()
+
+  const autoConvertPollIntervalMs = remoteConfigInstance()
+    .getValue(AutoConvertPollIntervalMsKey)
+    .asNumber()
+
+  const autoConvertAmountMatchToleranceBps = remoteConfigInstance()
+    .getValue(AutoConvertAmountMatchToleranceBpsKey)
+    .asNumber()
+
+  const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
+    ReplaceCardDeliveryConfigKey,
+    {},
+  )
+
+  const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
+    ...defaultReplaceCardDeliveryConfig,
+    ...parsedDeliveryConfig,
+  }
+
+  const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
+    CustodialFirstSignupBlockedCountriesKey,
+    custodialFirstSignupBlockedDefault,
+  )
+
+  const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
+    SelfCustodialDollarBalanceBlockedCountriesKey,
+    defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
+  )
+
+  const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
+    SelfCustodialTransferBlockedCountriesKey,
+    defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+  )
+
+  const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
+    SelfCustodialCreationBlockedCountriesKey,
+    defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+  )
+
+  const offboardOnlyCountries = getRemoteConfigStringList(
+    OffboardOnlyCountriesKey,
+    defaultRemoteConfig.offboardOnlyCountries,
+  )
+
+  const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
+    .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
+    .asNumber()
+
+  const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
+    MigrationReceiveDelayedNoticeMsKey,
+    defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
+  )
+
+  const migrationDelayedRedirectEnabled = remoteConfigInstance()
+    .getValue(MigrationDelayedRedirectEnabledKey)
+    .asBoolean()
+
+  const persistentBulletinsEnabled = remoteConfigInstance()
+    .getValue(PersistentBulletinsEnabledKey)
+    .asBoolean()
+
+  const custodialTwoFactorEnforcementEnabled = remoteConfigInstance()
+    .getValue(CustodialTwoFactorEnforcementEnabledKey)
+    .asBoolean()
+
+  const feeRatesConfig = getRemoteConfigNumericObject(
+    FeeRatesConfigKey,
+    defaultFeeRatesConfig,
+  )
+
+  const inactivityFeeEnabled = remoteConfigInstance()
+    .getValue(InactivityFeeEnabledKey)
+    .asBoolean()
+
+  return {
+    deviceAccountEnabledRestAuth,
+    balanceLimitToTriggerUpgradeModal,
+    feedbackEmailAddress,
+    supportEmailAddress,
+    upgradeModalCooldownDays,
+    upgradeModalShowAtSessionNumber,
+    feeReimbursementMemo,
+    successIconDuration,
+    appLockGracePeriodSeconds,
+    cardTermsAndConditionsUrl,
+    cardPrivacyPolicyUrl,
+    cardCardholderAgreementUrl,
+    cardESignConsentUrl,
+    cardIssuerPrivacyPolicyUrl,
+    cardSubscriptionPriceUsd,
+    cardReplacementFeeUsd,
+    cardUsdTransactionFeePercent,
+    cardForeignTransactionFeePercent,
+    cardMaxOverdraftUsd,
+    cardLateRepaymentFeeUsd,
+    replaceCardDeliveryConfig,
+    sparkCompatibleWalletsUrl,
+    cardInvestmentDepositBtcWalletId,
+    backupNudgeBannerThreshold,
+    backupNudgeModalThreshold,
+    backupNudgeModalCooldownMs,
+    nonCustodialEnabled,
+    stableBalanceEnabled,
+    btcMapPlacesEnabled,
+    autoConvertMaxAttempts,
+    autoConvertPollMaxAttempts,
+    autoConvertPollIntervalMs,
+    autoConvertAmountMatchToleranceBps,
+    custodialFirstSignupBlockedCountries,
+    selfCustodialDollarBalanceBlockedCountries,
+    selfCustodialTransferBlockedCountries,
+    selfCustodialCreationBlockedCountries,
+    offboardOnlyCountries,
+    selfCustodialDepositClaimLeewayVbyte,
+    migrationReceiveDelayedNoticeMs,
+    migrationDelayedRedirectEnabled,
+    persistentBulletinsEnabled,
+    custodialTwoFactorEnforcementEnabled,
+    feeRatesConfig,
+    inactivityFeeEnabled,
+  }
+}
+
 export const FeatureFlagContext = createContext<FeatureFlags>(defaultFeatureFlags)
 export const RemoteConfigContext = createContext<RemoteConfig>(defaultRemoteConfig)
 
 export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [remoteConfig, setRemoteConfig] = useState<RemoteConfig>(defaultRemoteConfig)
+  const [remoteConfig, setRemoteConfig] = useState<RemoteConfig>(readRemoteConfig)
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
@@ -325,251 +576,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
       try {
         await remoteConfigInstance().fetchAndActivate()
 
-        const deviceAccountEnabledRestAuth = remoteConfigInstance()
-          .getValue(DeviceAccountEnabledKey)
-          .asBoolean()
-
-        const balanceLimitToTriggerUpgradeModal = remoteConfigInstance()
-          .getValue(BalanceLimitToTriggerUpgradeModalKey)
-          .asNumber()
-
-        const feedbackEmailAddress = remoteConfigInstance()
-          .getValue(FeedbackEmailKey)
-          .asString()
-
-        const supportEmailAddress = remoteConfigInstance()
-          .getValue(SupportEmailKey)
-          .asString()
-
-        const upgradeModalCooldownDays = remoteConfigInstance()
-          .getValue(UpgradeModalCooldownDaysKey)
-          .asNumber()
-
-        const upgradeModalShowAtSessionNumber = remoteConfigInstance()
-          .getValue(UpgradeModalShowAtSessionNumberKey)
-          .asNumber()
-
-        const feeReimbursementMemo = remoteConfigInstance()
-          .getValue(FeeReimbursementMemoKey)
-          .asString()
-        const successIconDuration = remoteConfigInstance()
-          .getValue(SuccessIconDurationKey)
-          .asNumber()
-
-        const appLockGracePeriodSeconds = remoteConfigInstance()
-          .getValue(AppLockGracePeriodSecondsKey)
-          .asNumber()
-
-        const cardTermsAndConditionsUrl = remoteConfigInstance()
-          .getValue(CardTermsAndConditionsUrlKey)
-          .asString()
-
-        const cardPrivacyPolicyUrl = remoteConfigInstance()
-          .getValue(CardPrivacyPolicyUrlKey)
-          .asString()
-
-        const cardCardholderAgreementUrl = remoteConfigInstance()
-          .getValue(CardCardholderAgreementUrlKey)
-          .asString()
-
-        const cardESignConsentUrl = remoteConfigInstance()
-          .getValue(CardESignConsentUrlKey)
-          .asString()
-
-        const cardIssuerPrivacyPolicyUrl = remoteConfigInstance()
-          .getValue(CardIssuerPrivacyPolicyUrlKey)
-          .asString()
-
-        const cardSubscriptionPriceUsd = remoteConfigInstance()
-          .getValue(CardSubscriptionPriceUsdKey)
-          .asNumber()
-
-        const cardReplacementFeeUsd = remoteConfigInstance()
-          .getValue(CardReplacementFeeUsdKey)
-          .asNumber()
-
-        const cardUsdTransactionFeePercent = remoteConfigInstance()
-          .getValue(CardUsdTransactionFeePercentKey)
-          .asNumber()
-
-        const cardForeignTransactionFeePercent = remoteConfigInstance()
-          .getValue(CardForeignTransactionFeePercentKey)
-          .asNumber()
-
-        const cardMaxOverdraftUsd = remoteConfigInstance()
-          .getValue(CardMaxOverdraftUsdKey)
-          .asNumber()
-
-        const cardLateRepaymentFeeUsd = remoteConfigInstance()
-          .getValue(CardLateRepaymentFeeUsdKey)
-          .asNumber()
-
-        const sparkCompatibleWalletsUrl = remoteConfigInstance()
-          .getValue(SparkCompatibleWalletsUrlKey)
-          .asString()
-
-        const cardInvestmentDepositBtcWalletId = remoteConfigInstance()
-          .getValue(CardInvestmentDepositBtcWalletIdKey)
-          .asString()
-
-        const backupNudgeBannerThreshold = remoteConfigInstance()
-          .getValue(BackupNudgeBannerThresholdKey)
-          .asNumber()
-
-        const backupNudgeModalThreshold = remoteConfigInstance()
-          .getValue(BackupNudgeModalThresholdKey)
-          .asNumber()
-
-        // asNumber() yields 0 for a malformed remote value, and a zero cooldown would
-        // make the modal undismissable again — fall back to the shipped default.
-        const remoteBackupNudgeModalCooldownMs = remoteConfigInstance()
-          .getValue(BackupNudgeModalCooldownMsKey)
-          .asNumber()
-        const backupNudgeModalCooldownMs =
-          remoteBackupNudgeModalCooldownMs > 0
-            ? remoteBackupNudgeModalCooldownMs
-            : defaultRemoteConfig.backupNudgeModalCooldownMs
-
-        const nonCustodialEnabled = remoteConfigInstance()
-          .getValue(NonCustodialEnabledKey)
-          .asBoolean()
-
-        const stableBalanceEnabled = remoteConfigInstance()
-          .getValue(StableBalanceEnabledKey)
-          .asBoolean()
-
-        const btcMapPlacesEnabled = remoteConfigInstance()
-          .getValue(BtcMapPlacesEnabledKey)
-          .asBoolean()
-
-        const autoConvertMaxAttempts = remoteConfigInstance()
-          .getValue(AutoConvertMaxAttemptsKey)
-          .asNumber()
-
-        const autoConvertPollMaxAttempts = remoteConfigInstance()
-          .getValue(AutoConvertPollMaxAttemptsKey)
-          .asNumber()
-
-        const autoConvertPollIntervalMs = remoteConfigInstance()
-          .getValue(AutoConvertPollIntervalMsKey)
-          .asNumber()
-
-        const autoConvertAmountMatchToleranceBps = remoteConfigInstance()
-          .getValue(AutoConvertAmountMatchToleranceBpsKey)
-          .asNumber()
-
-        const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
-          ReplaceCardDeliveryConfigKey,
-          {},
-        )
-
-        const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
-          ...defaultReplaceCardDeliveryConfig,
-          ...parsedDeliveryConfig,
-        }
-
-        const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
-          CustodialFirstSignupBlockedCountriesKey,
-          custodialFirstSignupBlockedDefault,
-        )
-
-        const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
-          SelfCustodialDollarBalanceBlockedCountriesKey,
-          defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
-        )
-
-        const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
-          SelfCustodialTransferBlockedCountriesKey,
-          defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-        )
-
-        const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
-          SelfCustodialCreationBlockedCountriesKey,
-          defaultRemoteConfig.selfCustodialCreationBlockedCountries,
-        )
-
-        const offboardOnlyCountries = getRemoteConfigStringList(
-          OffboardOnlyCountriesKey,
-          defaultRemoteConfig.offboardOnlyCountries,
-        )
-
-        const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
-          .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
-          .asNumber()
-
-        const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
-          MigrationReceiveDelayedNoticeMsKey,
-          defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
-        )
-
-        const migrationDelayedRedirectEnabled = remoteConfigInstance()
-          .getValue(MigrationDelayedRedirectEnabledKey)
-          .asBoolean()
-
-        const persistentBulletinsEnabled = remoteConfigInstance()
-          .getValue(PersistentBulletinsEnabledKey)
-          .asBoolean()
-
-        const custodialTwoFactorEnforcementEnabled = remoteConfigInstance()
-          .getValue(CustodialTwoFactorEnforcementEnabledKey)
-          .asBoolean()
-
-        const feeRatesConfig = getRemoteConfigNumericObject(
-          FeeRatesConfigKey,
-          defaultFeeRatesConfig,
-        )
-
-        const inactivityFeeEnabled = remoteConfigInstance()
-          .getValue(InactivityFeeEnabledKey)
-          .asBoolean()
-
-        setRemoteConfig({
-          deviceAccountEnabledRestAuth,
-          balanceLimitToTriggerUpgradeModal,
-          feedbackEmailAddress,
-          supportEmailAddress,
-          upgradeModalCooldownDays,
-          upgradeModalShowAtSessionNumber,
-          feeReimbursementMemo,
-          successIconDuration,
-          appLockGracePeriodSeconds,
-          cardTermsAndConditionsUrl,
-          cardPrivacyPolicyUrl,
-          cardCardholderAgreementUrl,
-          cardESignConsentUrl,
-          cardIssuerPrivacyPolicyUrl,
-          cardSubscriptionPriceUsd,
-          cardReplacementFeeUsd,
-          cardUsdTransactionFeePercent,
-          cardForeignTransactionFeePercent,
-          cardMaxOverdraftUsd,
-          cardLateRepaymentFeeUsd,
-          replaceCardDeliveryConfig,
-          sparkCompatibleWalletsUrl,
-          cardInvestmentDepositBtcWalletId,
-          backupNudgeBannerThreshold,
-          backupNudgeModalThreshold,
-          backupNudgeModalCooldownMs,
-          nonCustodialEnabled,
-          stableBalanceEnabled,
-          btcMapPlacesEnabled,
-          autoConvertMaxAttempts,
-          autoConvertPollMaxAttempts,
-          autoConvertPollIntervalMs,
-          autoConvertAmountMatchToleranceBps,
-          custodialFirstSignupBlockedCountries,
-          selfCustodialDollarBalanceBlockedCountries,
-          selfCustodialTransferBlockedCountries,
-          selfCustodialCreationBlockedCountries,
-          offboardOnlyCountries,
-          selfCustodialDepositClaimLeewayVbyte,
-          migrationReceiveDelayedNoticeMs,
-          migrationDelayedRedirectEnabled,
-          persistentBulletinsEnabled,
-          custodialTwoFactorEnforcementEnabled,
-          feeRatesConfig,
-          inactivityFeeEnabled,
-        })
+        setRemoteConfig(readRemoteConfig())
       } catch (err) {
         logError({
           scope: "remote-config",
