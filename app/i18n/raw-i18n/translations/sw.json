@@ -2667,7 +2667,7 @@
   "TransactionDetailScreen": {
     "paid": "Imelipwa kutoka/kuelekea",
     "received": "Ulipokea",
-    "spent": "Umetumia",
+    "sent": "Ulituma",
     "sending": "Inatuma",
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
