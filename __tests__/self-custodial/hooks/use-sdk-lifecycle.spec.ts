@@ -85,6 +85,9 @@ jest.mock("@app/self-custodial/logging", () => ({
 
 jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string) => `/tmp/${id}`,
+  /** Read by `useLnurlServer`, which the lifecycle hook calls for the domain it hands
+   *  to `initSdk`. Its value is irrelevant here; its absence is not. */
+  resolveLnurlServer: () => ({ serverUrl: "https://blink.sv", domain: "blink.sv" }),
 }))
 
 let mockDepositClaimLeewayVbyte = 7
@@ -227,6 +230,7 @@ describe("useSdkLifecycle", () => {
         storageDir: "/tmp/acct-1",
         network: mockSparkNetwork.Regtest,
         leewaySatPerVbyte: 7,
+        lnurlDomain: "blink.sv",
       })
       expect(result.current.connectedAccountId).toBe("acct-1")
 
@@ -292,6 +296,7 @@ describe("useSdkLifecycle", () => {
           storageDir: "/tmp/acct-A",
           network: mockSparkNetwork.Regtest,
           leewaySatPerVbyte: 7,
+          lnurlDomain: "blink.sv",
         })
       })
 
@@ -306,6 +311,7 @@ describe("useSdkLifecycle", () => {
           storageDir: "/tmp/acct-B",
           network: mockSparkNetwork.Regtest,
           leewaySatPerVbyte: 7,
+          lnurlDomain: "blink.sv",
         })
       })
 

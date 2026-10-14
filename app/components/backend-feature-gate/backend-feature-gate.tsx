@@ -3,6 +3,10 @@ import { View } from "react-native"
 
 import { makeStyles, Text } from "@rn-vui/themed"
 
+import {
+  BlinkServicesStatus,
+  useBlinkServicesStatus,
+} from "@app/graphql/blink-services-status"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
@@ -27,18 +31,41 @@ export const BackendFeatureGate: React.FC<BackendFeatureGateProps> = ({
   const isAuthed = useIsAuthed()
   const { isSelfCustodial } = useActiveWallet()
   const hasCustodialAccount = useHasCustodialAccount()
+  const servicesStatus = useBlinkServicesStatus()
 
-  if (isAuthed && !isSelfCustodial) {
+  /**
+   * An authed custodial session whose backend is not answering. Explaining that is the
+   * point of this screen: the feature genuinely cannot work, and without this the user
+   * watches it try and fail with no account-shaped reason for it.
+   *
+   * Deliberately only when the session is otherwise entitled to the feature. A user who
+   * has no custodial account is told that first — it is the durable reason, and it stays
+   * true when the servers come back.
+   */
+  const isUnreachable = servicesStatus === BlinkServicesStatus.Unreachable
+
+  if (isAuthed && !isSelfCustodial && !isUnreachable) {
     return <>{children}</>
   }
 
-  const title = hasCustodialAccount
-    ? LL.BackendFeatureGate.signInTitle()
-    : LL.BackendFeatureGate.noAccountTitle()
-
-  const description = hasCustodialAccount
-    ? LL.BackendFeatureGate.signInDescription({ featureName })
-    : LL.BackendFeatureGate.noAccountDescription({ featureName })
+  const { title, description } = ((): { title: string; description: string } => {
+    if (isAuthed && !isSelfCustodial) {
+      return {
+        title: LL.BackendFeatureGate.unreachableTitle(),
+        description: LL.BackendFeatureGate.unreachableDescription({ featureName }),
+      }
+    }
+    if (hasCustodialAccount) {
+      return {
+        title: LL.BackendFeatureGate.signInTitle(),
+        description: LL.BackendFeatureGate.signInDescription({ featureName }),
+      }
+    }
+    return {
+      title: LL.BackendFeatureGate.noAccountTitle(),
+      description: LL.BackendFeatureGate.noAccountDescription({ featureName }),
+    }
+  })()
 
   return (
     <Screen preset="fixed">

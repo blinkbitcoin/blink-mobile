@@ -167,6 +167,9 @@ export const SetLightningAddressScreen: React.FC<{
     case SetUsernameError.ADDRESS_UNAVAILABLE:
       errorMessage = LL.SetAddressModal.Errors.addressUnavailable()
       break
+    case SetUsernameError.SERVER_UNREACHABLE:
+      errorMessage = LL.SetAddressModal.Errors.serverUnreachable()
+      break
     case SetUsernameError.UNKNOWN_ERROR:
       errorMessage = LL.SetAddressModal.Errors.unknownError()
       break

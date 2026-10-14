@@ -13,10 +13,17 @@ jest.mock("react-native-localize", () => ({
   getLocales: () => [],
 }))
 
-type CurrencyListResult = { data?: { currencyList: { id: string }[] } }
-const mockUseCurrencyListQuery = jest.fn<CurrencyListResult, [unknown]>()
-jest.mock("@app/graphql/generated", () => ({
-  useCurrencyListQuery: (options: unknown) => mockUseCurrencyListQuery(options),
+type CurrencyListResult = {
+  currencyList: { id: string }[]
+  loading: boolean
+  isUnavailable: boolean
+}
+/** The list now reaches this hook through the shared adapter, which picks between the
+ *  Breez feed and the backend query. Which source answered is that adapter's concern;
+ *  this suite is about what the hook writes once one has. */
+const mockUseCurrencyList = jest.fn<CurrencyListResult, []>()
+jest.mock("@app/hooks/use-currency-list", () => ({
+  useCurrencyList: () => mockUseCurrencyList(),
 }))
 
 const SELF_CUSTODIAL_ID = "self-custodial-1"
@@ -45,8 +52,10 @@ describe("useDisplayCurrencyFromRegion", () => {
       activeAccountId: SELF_CUSTODIAL_ID,
     }
     mockGetCurrencies.mockReturnValue(["CRC", "USD"])
-    mockUseCurrencyListQuery.mockReturnValue({
-      data: { currencyList: [{ id: "USD" }, { id: "EUR" }, { id: "CRC" }] },
+    mockUseCurrencyList.mockReturnValue({
+      currencyList: [{ id: "USD" }, { id: "EUR" }, { id: "CRC" }],
+      loading: false,
+      isUnavailable: false,
     })
   })
 
@@ -65,29 +74,23 @@ describe("useDisplayCurrencyFromRegion", () => {
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    await waitFor(() => expect(mockUseCurrencyListQuery).toHaveBeenCalled())
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
-  it("does not ask for the currency list once a preference is stored", () => {
-    mockPersistentState = {
-      ...mockPersistentState,
-      selfCustodialDisplayCurrencyByAccountId: { [SELF_CUSTODIAL_ID]: "EUR" },
-    }
+  it("writes a region default off a list the backend never served", async () => {
+    // The point of sourcing the list from the SDK: a restored wallet still lands on its
+    // region's currency with Blink unreachable.
+    mockUseCurrencyList.mockReturnValue({
+      currencyList: [{ id: "USD" }, { id: "CRC" }],
+      loading: false,
+      isUnavailable: false,
+    })
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    expect(mockUseCurrencyListQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: true }),
-    )
-  })
-
-  it("asks for the currency list only while the preference is unanswered", () => {
-    renderHook(() => useDisplayCurrencyFromRegion())
-
-    expect(mockUseCurrencyListQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ skip: false }),
-    )
+    await waitFor(() => expect(mockUpdateState).toHaveBeenCalledTimes(1))
+    expect(storedCurrency()).toBe("CRC")
   })
 
   it("writes nothing for a custodial account", async () => {
@@ -98,7 +101,7 @@ describe("useDisplayCurrencyFromRegion", () => {
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    await waitFor(() => expect(mockUseCurrencyListQuery).toHaveBeenCalled())
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
@@ -107,25 +110,33 @@ describe("useDisplayCurrencyFromRegion", () => {
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    await waitFor(() => expect(mockUseCurrencyListQuery).toHaveBeenCalled())
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
   it("waits for the currency list instead of guessing", async () => {
-    mockUseCurrencyListQuery.mockReturnValue({ data: undefined })
+    mockUseCurrencyList.mockReturnValue({
+      currencyList: [],
+      loading: true,
+      isUnavailable: false,
+    })
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    await waitFor(() => expect(mockUseCurrencyListQuery).toHaveBeenCalled())
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
   it("waits rather than write from an empty currency list", async () => {
-    mockUseCurrencyListQuery.mockReturnValue({ data: { currencyList: [] } })
+    mockUseCurrencyList.mockReturnValue({
+      currencyList: [],
+      loading: false,
+      isUnavailable: true,
+    })
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    await waitFor(() => expect(mockUseCurrencyListQuery).toHaveBeenCalled())
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
@@ -134,7 +145,7 @@ describe("useDisplayCurrencyFromRegion", () => {
 
     renderHook(() => useDisplayCurrencyFromRegion())
 
-    await waitFor(() => expect(mockUseCurrencyListQuery).toHaveBeenCalled())
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).not.toHaveBeenCalled()
   })
 
@@ -165,11 +176,9 @@ describe("useDisplayCurrencyFromRegion", () => {
     }
     rerender(undefined)
 
-    await waitFor(() =>
-      expect(mockUseCurrencyListQuery).toHaveBeenLastCalledWith(
-        expect.objectContaining({ skip: true }),
-      ),
-    )
+    // Still only the one write: the answered preference is what stops the second, not
+    // the absence of a list.
+    await waitFor(() => expect(mockUseCurrencyList).toHaveBeenCalled())
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
   })
 })

@@ -23,7 +23,10 @@ import {
 import { getLightningAddress } from "../bridge"
 import { useSdkLifecycle } from "../hooks/use-sdk-lifecycle"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
-import { setSelfCustodialLightningAddress } from "../storage/account-index"
+import {
+  getSelfCustodialLightningAddress,
+  setSelfCustodialLightningAddress,
+} from "../storage/account-index"
 
 const LightningAddressOperation = {
   Resolve: "resolve",
@@ -123,6 +126,36 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     setLightningAddress(null)
   }, [activeSelfCustodialAccountId])
 
+  /**
+   * Seeds the address from what this device last recorded, before the SDK is asked.
+   *
+   * An address is a name the LNURL server answers for, not device state: it keeps
+   * working for whoever pays it whether or not this device can currently ask about it.
+   * Without this seed a launch with that server unreachable hides the user's own
+   * address and the paycode tab with it, as though the name had been given up.
+   *
+   * The SDK's answer below overwrites this when it arrives, so a name changed on
+   * another device still wins; this only fills the gap where there is no answer.
+   */
+  useEffect(() => {
+    if (!activeSelfCustodialAccountId) return undefined
+    let mounted = true
+    const accountId = activeSelfCustodialAccountId
+
+    getSelfCustodialLightningAddress(accountId)
+      .then((stored) => {
+        if (!mounted || !stored) return
+        setLightningAddress((current) => current ?? stored)
+      })
+      .catch((err) => {
+        reportLightningAddressError(LightningAddressOperation.Resolve, err)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [activeSelfCustodialAccountId])
+
   useEffect(() => {
     if (!sdk || !connectedAccountId) return undefined
     let mounted = true
@@ -140,6 +173,8 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         })
         if (mounted) await reloadSelfCustodialAccounts()
       } catch (err) {
+        /** The seeded address stands: a question that could not be asked is not an
+         *  answer that the account has none. */
         reportLightningAddressError(LightningAddressOperation.Resolve, err)
       }
     }

@@ -14,6 +14,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
 import { isRegtestNetwork } from "@app/self-custodial/config"
+import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   probeSelfCustodialAccountWallets,
@@ -52,6 +53,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const { state: deleteState, deleteWallet } = useDeleteAccount()
   const network = useSparkNetwork()
+  const { domain: lnurlDomain } = useLnurlServer()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
   const [hasFundsWarningVisible, setHasFundsWarningVisible] = useState(false)
@@ -114,11 +116,12 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
 
     setProbingBalance(true)
-    const result = await probeSelfCustodialAccountWallets(
+    const result = await probeSelfCustodialAccountWallets({
       accountId,
       network,
-      selfCustodialDepositClaimLeewayVbyte,
-    )
+      leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+      lnurlDomain,
+    })
     setProbingBalance(false)
 
     switch (result.status) {

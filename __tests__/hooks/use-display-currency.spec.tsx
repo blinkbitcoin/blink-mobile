@@ -10,9 +10,11 @@ const mockUsePriceConversion = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
 const mockToDisplayMoneyAmount = jest.fn()
 
-jest.mock("@app/graphql/generated", () => ({
-  ...jest.requireActual("@app/graphql/generated"),
-  useCurrencyListQuery: (options: { skip: boolean }) => mockUseCurrencyListQuery(options),
+/** `useDisplayCurrency` reads the list through the shared adapter, which picks between
+ *  the Breez feed and the backend query; this suite is about the formatting on top of
+ *  whatever it returns, so the adapter is mocked rather than its two sources. */
+jest.mock("@app/hooks/use-currency-list", () => ({
+  useCurrencyList: () => mockUseCurrencyListQuery({}),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -37,9 +39,9 @@ const setCurrencyList = (
   currencyList: Array<{ id: string; symbol: string; fractionDigits: number }>,
 ) => {
   mockUseCurrencyListQuery.mockReturnValue({
-    data: {
-      currencyList,
-    },
+    currencyList,
+    loading: false,
+    isUnavailable: false,
   })
 }
 
@@ -618,6 +620,53 @@ describe("useDisplayCurrency", () => {
         currency: DisplayCurrency,
         currencyCode: "USD",
       })
+    })
+  })
+
+  describe("moneyAmountToDisplayCurrencyString when the display cannot express an amount", () => {
+    it("shows the amount in its own unit rather than a blank", () => {
+      // The sats-only fallback: there is no rate to cross dollars into sats, so the
+      // conversion is NaN. A blank where a balance should be reads as money gone.
+      setCurrencyList([{ id: "SAT", symbol: "", fractionDigits: 0 }])
+      mockUsePriceConversion.mockReturnValue({
+        convertMoneyAmount: () => ({
+          amount: Number.NaN,
+          currency: DisplayCurrency,
+          currencyCode: "SAT",
+        }),
+        displayCurrency: "SAT",
+        toDisplayMoneyAmount: mockToDisplayMoneyAmount,
+      })
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(
+        result.current.moneyAmountToDisplayCurrencyString({
+          moneyAmount: toUsdMoneyAmount(500),
+        }),
+      ).toBe("$5.00")
+    })
+
+    it("still converts when the display can express it", () => {
+      // Anchors the negative above: the fallback must not swallow the normal path.
+      setCurrencyList([{ id: "NGN", symbol: "₦", fractionDigits: 2 }])
+      mockUsePriceConversion.mockReturnValue({
+        convertMoneyAmount: () => ({
+          amount: 150000,
+          currency: DisplayCurrency,
+          currencyCode: "NGN",
+        }),
+        displayCurrency: "NGN",
+        toDisplayMoneyAmount: mockToDisplayMoneyAmount,
+      })
+
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      expect(
+        result.current.moneyAmountToDisplayCurrencyString({
+          moneyAmount: toUsdMoneyAmount(500),
+        }),
+      ).toBe("₦1,500")
     })
   })
 })

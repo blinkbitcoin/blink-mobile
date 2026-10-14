@@ -770,10 +770,15 @@ describe("lnurl service failures", () => {
   })
 
   /**
-   * The account lookup behind an lnurl is a separate request against our own backend.
-   * It failing is not the merchant service failing, so it must not be reported as one.
+   * The account lookup behind an lnurl is a separate request against our own backend,
+   * asked only to see whether the payee can be paid over the ledger instead. Its
+   * failing says nothing about the lnurl, which the merchant's own service already
+   * answered — so the payment falls back to lnurl rather than being refused.
+   *
+   * This used to report LnurlUnsupported, which marked a perfectly payable code as one
+   * Blink can never pay because our own backend had a bad moment.
    */
-  it("keeps reporting a failed account lookup as unsupported", async () => {
+  it("pays over lnurl when the account lookup behind it cannot be made", async () => {
     mockRequestPayServiceParams.mockResolvedValue(
       manualMockLnUrlPayServiceResponse("someone@ourdomain.com"),
     )
@@ -781,8 +786,8 @@ describe("lnurl service failures", () => {
 
     expect(await resolveMerchantLnurl()).toEqual(
       expect.objectContaining({
-        valid: false,
-        invalidReason: InvalidDestinationReason.LnurlUnsupported,
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
       }),
     )
   })

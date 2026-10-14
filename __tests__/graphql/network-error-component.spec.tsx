@@ -1,3 +1,6 @@
+// The ambient `it` here is wdio/mocha's, which has no `.each`; Jest's own does.
+import { it } from "@jest/globals"
+
 import React from "react"
 import { render, waitFor } from "@testing-library/react-native"
 import { Alert } from "react-native"
@@ -20,9 +23,10 @@ jest.mock("@app/utils/toast")
 jest.mock("@react-navigation/native")
 jest.mock("@app/utils/storage/secureStorage")
 
+const mockIsSelfCustodial = { value: false }
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({
-    isSelfCustodial: false,
+    isSelfCustodial: mockIsSelfCustodial.value,
     activeWalletId: "current-custodial-id",
   }),
 }))
@@ -334,6 +338,57 @@ describe("NetworkErrorComponent", () => {
       stateToDefault: false,
       token: "current-token",
       isValidToken: false,
+    })
+  })
+
+  describe("on a self-custodial account", () => {
+    beforeEach(() => {
+      mockIsSelfCustodial.value = true
+    })
+
+    afterEach(() => {
+      mockIsSelfCustodial.value = false
+    })
+
+    it.each([
+      ["a server error", { statusCode: 500 }],
+      ["a generic client error", { statusCode: 404 }],
+      ["a lost connection", { message: "Network request failed" }],
+    ])("raises no toast for %s", async (_label, networkError) => {
+      const { rerender } = render(<NetworkErrorComponent />)
+      ;(useNetworkError as jest.Mock).mockReturnValue({
+        networkError,
+        clearNetworkError: mockClearNetworkError,
+      })
+
+      rerender(<NetworkErrorComponent />)
+
+      // Anchored on the clear, so a component that never saw the error at all would
+      // fail here rather than pass by doing nothing.
+      await waitFor(() => expect(mockClearNetworkError).toHaveBeenCalled())
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("still handles an expired session rather than swallowing it", async () => {
+      // Only the generic transport toasts are suppressed; authentication is not a
+      // background nuisance, and the mixed-account user's custodial session depends on
+      // it being acted on.
+      ;(useAppConfig as jest.Mock).mockReturnValue({
+        appConfig: { token: "current-token" },
+        saveToken: mockSaveToken,
+      })
+      storeProfiles([])
+      const { rerender } = render(<NetworkErrorComponent />)
+      ;(useNetworkError as jest.Mock).mockReturnValue({
+        networkError: { statusCode: 401 },
+        clearNetworkError: mockClearNetworkError,
+        token: "current-token",
+      })
+
+      rerender(<NetworkErrorComponent />)
+
+      await waitFor(() => expect(mockClearNetworkError).toHaveBeenCalled())
+      expect(mockToastShow).not.toHaveBeenCalled()
     })
   })
 })
