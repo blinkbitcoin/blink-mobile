@@ -25,6 +25,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { NotificationBadge } from "@app/components/notification-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { CurrencyPill, useEqualPillWidth } from "../atomic/currency-pill"
+import { fonts } from "@app/rne-theme/fonts"
 
 const CARD_NUMBER_MASK = "••••"
 
@@ -401,7 +402,7 @@ const useStyles = makeStyles(({ colors }) => ({
     textAlign: "right",
   },
   boldBalance: {
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
   },
   loaderContainer: {
     flex: 1,
