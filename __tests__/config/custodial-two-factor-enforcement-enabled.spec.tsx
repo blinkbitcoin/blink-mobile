@@ -8,7 +8,11 @@ import {
   useRemoteConfig,
 } from "@app/config/feature-flags-context"
 
+/** What Firebase holds before this launch's fetch: the previous fetch's activated values. */
+const mockActivatedBooleans: { current: Record<string, boolean> } = { current: {} }
+/** What this launch's fetch brings down. */
 const mockRemoteBooleans: { current: Record<string, boolean> } = { current: {} }
+const mockFetch = { isDone: false }
 
 jest.mock("@react-native-firebase/remote-config", () => ({
   __esModule: true,
@@ -17,10 +21,16 @@ jest.mock("@react-native-firebase/remote-config", () => ({
     setConfigSettings: jest.fn(),
     getValue: (key: string) => ({
       asString: () => "",
-      asBoolean: () => mockRemoteBooleans.current[key] ?? false,
+      asBoolean: () =>
+        (mockFetch.isDone ? mockRemoteBooleans.current : mockActivatedBooleans.current)[
+          key
+        ] ?? false,
       asNumber: () => 0,
     }),
-    fetchAndActivate: jest.fn().mockResolvedValue(true),
+    fetchAndActivate: jest.fn(async () => {
+      mockFetch.isDone = true
+      return true
+    }),
   }),
 }))
 
@@ -45,7 +55,7 @@ jest.mock("@app/utils/log-error", () => ({
 }))
 
 const FLAG_KEY = "custodialTwoFactorEnforcementEnabled"
-/** A boolean whose remote value differs from its default, to know the fetch landed. */
+/** A boolean the fetch flips from its activated value, to know the fetch landed. */
 const SENTINEL_KEY = "btcMapPlacesEnabled"
 
 const FlagProbe: React.FC = () => {
@@ -58,20 +68,34 @@ const FlagProbe: React.FC = () => {
   )
 }
 
-const renderWithRemoteFlag = async (value: boolean): Promise<string> => {
-  mockRemoteBooleans.current = { [FLAG_KEY]: value, [SENTINEL_KEY]: false }
-  const view = render(
+const renderProbe = () =>
+  render(
     <FeatureFlagContextProvider>
       <FlagProbe />
     </FeatureFlagContextProvider>,
   )
-  await waitFor(() => {
+
+const flagShown = (view: ReturnType<typeof render>): string =>
+  view.getByTestId("flag").props.children
+
+const whenFetched = (view: ReturnType<typeof render>) =>
+  waitFor(() => {
     expect(view.getByTestId("sentinel").props.children).toBe("false")
   })
-  return view.getByTestId("flag").props.children
+
+const renderWithRemoteFlag = async (value: boolean): Promise<string> => {
+  mockRemoteBooleans.current = { [FLAG_KEY]: value, [SENTINEL_KEY]: false }
+  const view = renderProbe()
+  await whenFetched(view)
+  return flagShown(view)
 }
 
 describe("custodialTwoFactorEnforcementEnabled remote config", () => {
+  beforeEach(() => {
+    mockFetch.isDone = false
+    mockActivatedBooleans.current = { [SENTINEL_KEY]: true }
+  })
+
   it("ships switched off", () => {
     expect(defaultRemoteConfig.custodialTwoFactorEnforcementEnabled).toBe(false)
   })
@@ -82,5 +106,28 @@ describe("custodialTwoFactorEnforcementEnabled remote config", () => {
 
   it("stays off when the console leaves it off", async () => {
     expect(await renderWithRemoteFlag(false)).toBe("false")
+  })
+
+  it("applies the value Firebase already activated from the first render, before the fetch lands", async () => {
+    mockActivatedBooleans.current = { [FLAG_KEY]: true, [SENTINEL_KEY]: true }
+    mockRemoteBooleans.current = { [FLAG_KEY]: true, [SENTINEL_KEY]: false }
+
+    const view = renderProbe()
+
+    expect(flagShown(view)).toBe("true")
+    expect(view.getByTestId("sentinel").props.children).toBe("true")
+    await whenFetched(view)
+    expect(flagShown(view)).toBe("true")
+  })
+
+  it("lets the fetch replace the activated value", async () => {
+    mockActivatedBooleans.current = { [FLAG_KEY]: true, [SENTINEL_KEY]: true }
+    mockRemoteBooleans.current = { [FLAG_KEY]: false, [SENTINEL_KEY]: false }
+
+    const view = renderProbe()
+
+    expect(flagShown(view)).toBe("true")
+    await whenFetched(view)
+    expect(flagShown(view)).toBe("false")
   })
 })
