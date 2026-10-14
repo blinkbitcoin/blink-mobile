@@ -17,7 +17,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       BackupScreen: {
         CloudBackup: {
           passwordTooShort: () => "Minimum 12 characters",
-          passwordMismatch: () => "Passwords do not match",
+          passwordMismatch: () => "Passphrases do not match",
         },
       },
     },
@@ -109,7 +109,7 @@ describe("useCloudBackupForm", () => {
     act(() => result.current.setConfirmPassword("wrong"))
     act(() => result.current.markConfirmPasswordTouched())
 
-    expect(result.current.confirmPasswordError).toBe("Passwords do not match")
+    expect(result.current.confirmPasswordError).toBe("Passphrases do not match")
 
     act(() => result.current.setConfirmPassword(""))
     act(() => result.current.setConfirmPassword("s"))
@@ -125,7 +125,7 @@ describe("useCloudBackupForm", () => {
     act(() => result.current.setConfirmPassword("different"))
     act(() => result.current.markConfirmPasswordTouched())
 
-    expect(result.current.confirmPasswordError).toBe("Passwords do not match")
+    expect(result.current.confirmPasswordError).toBe("Passphrases do not match")
     expect(result.current.isValid).toBe(false)
   })
 
@@ -183,7 +183,7 @@ describe("useCloudBackupForm", () => {
     act(() => result.current.setConfirmPassword("different"))
     act(() => result.current.markConfirmPasswordTouched())
 
-    expect(result.current.confirmPasswordError).toBe("Passwords do not match")
+    expect(result.current.confirmPasswordError).toBe("Passphrases do not match")
 
     act(() => result.current.setConfirmPassword("123456789012"))
 
