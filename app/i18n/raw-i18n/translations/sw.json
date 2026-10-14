@@ -4052,6 +4052,17 @@
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
   },
+  "TwoFactorEnforcement": {
+    "title": "Weka uthibitishaji wa hatua mbili",
+    "cardDescription": "Linda akaunti yako dhidi ya ufikiaji usioidhinishwa.",
+    "cardCta": "Weka",
+    "settingsDescription": "Linda akaunti yako dhidi ya ufikiaji usioidhinishwa kwa kuuweka.",
+    "setupTitle": "Weka uthibitishaji wa hatua mbili sasa",
+    "setupDescription": "Ili kuzuia ufikiaji usioidhinishwa wa akaunti yako, ongeza uthibitishaji wa hatua mbili sasa.",
+    "addEmail": "Ongeza barua pepe",
+    "addPhoneNumber": "Ongeza nambari ya simu",
+    "setAuthenticator": "Weka kithibitishaji"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

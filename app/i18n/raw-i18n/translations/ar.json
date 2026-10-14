@@ -4052,6 +4052,17 @@
     "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
     "secureMe": "تأمين المحفظة"
   },
+  "TwoFactorEnforcement": {
+    "title": "فعّل المصادقة الثنائية",
+    "cardDescription": "احمِ حسابك من الوصول غير المصرح به.",
+    "cardCta": "تفعيل",
+    "settingsDescription": "احمِ حسابك من الوصول غير المصرح به عبر تفعيلها.",
+    "setupTitle": "فعّل المصادقة الثنائية الآن",
+    "setupDescription": "لمنع الوصول غير المصرح به إلى حسابك، أضف المصادقة الثنائية الآن.",
+    "addEmail": "إضافة بريد إلكتروني",
+    "addPhoneNumber": "إضافة رقم هاتف",
+    "setAuthenticator": "إعداد تطبيق المصادقة"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4052,6 +4052,17 @@
         "modalDescription": "このデバイスを紛失した場合の資金の完全な喪失を防ぐために、ウォレットのバックアップを強くお勧めします。",
         "secureMe": "ウォレットを保護"
     },
+    "TwoFactorEnforcement": {
+        "title": "2要素認証を設定する",
+        "cardDescription": "不正アクセスからアカウントを保護しましょう。",
+        "cardCta": "設定",
+        "settingsDescription": "設定して、不正アクセスからアカウントを保護しましょう。",
+        "setupTitle": "今すぐ2要素認証を設定する",
+        "setupDescription": "アカウントへの不正アクセスを防ぐため、今すぐ2要素認証を追加してください。",
+        "addEmail": "メールを追加",
+        "addPhoneNumber": "電話番号を追加",
+        "setAuthenticator": "認証アプリを設定"
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
