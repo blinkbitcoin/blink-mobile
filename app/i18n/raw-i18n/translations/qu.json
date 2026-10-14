@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
   },
   "SettingsScreen": {
-    "createAddress": "Tinkunata ruray",
+    "createAddress": "Lightning tinkunata ruray",
     "addressDisabled": "(mana atikuq)",
     "donationButton": "Qaray ñit'ana",
     "btcpayServer": "BTCPay Server",

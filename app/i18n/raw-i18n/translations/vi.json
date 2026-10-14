@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
-    "createAddress": "Tạo địa chỉ",
+    "createAddress": "Tạo địa chỉ Lightning",
     "addressDisabled": "(đã tắt)",
     "donationButton": "Nút quyên góp",
     "btcpayServer": "BTCPay Server",
