@@ -66,6 +66,13 @@ jest.mock("@app/screens/card-screen/onboarding/investment-flow/esign-mint", () =
   mintSigningInstance: (...args: unknown[]) => mockMintSigningInstance(...args),
 }))
 
+/** Retiring the server's invitation is its own module's, and its spec covers it; the
+ *  screen only has to set it off and move on, so the lookup it would start is stood in. */
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/investment-invitation-bulletin",
+  () => ({ useAcknowledgeInvestmentInvitation: () => () => Promise.resolve() }),
+)
+
 /** The device's connectivity, which the library probes before every start. */
 const mockIsConnected = { current: true }
 jest.mock("@react-native-community/netinfo", () => {

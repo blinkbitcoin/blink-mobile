@@ -128,6 +128,16 @@ jest.mock("@app/components/notifications/bulletins", () => {
     ),
   }
 })
+/** Retires the server's invitation once signed; its own spec covers when. The home only
+ *  has to hand it the bulletins it loaded. */
+const mockUseAcknowledgeInvitationOnceSigned = jest.fn()
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/investment-invitation-bulletin",
+  () => ({
+    useAcknowledgeInvitationOnceSigned: (bulletins: unknown) =>
+      mockUseAcknowledgeInvitationOnceSigned(bulletins),
+  }),
+)
 
 let mockIsFocused = true
 
@@ -2212,6 +2222,21 @@ describe("CardInvestmentBulletin gating", () => {
       column.indexOf("server-bulletins"),
     )
     mockCardInvestmentBulletin.mockImplementation(() => null)
+  })
+
+  it("hands the bulletins it loaded to the invitation fallback", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseAcknowledgeInvitationOnceSigned).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        me: expect.objectContaining({
+          unacknowledgedStatefulNotificationsWithBulletinEnabled: expect.objectContaining(
+            { edges: [] },
+          ),
+        }),
+      }),
+    )
   })
 
   it("hands the hook no receives on a quiet account", async () => {
