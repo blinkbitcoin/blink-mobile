@@ -3695,7 +3695,7 @@
         "buttonText": "Teruskan"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Berapa banyak yang anda ingin laburkan?",
+        "title": "Berapa banyak yang anda ingin laburkan?",
         "percent": "untuk ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,21 @@
           "valuation": "Pada penilaian pra-wang $10M",
           "units": "Anda menerima {units: string} unit ~{percent: number}% daripada Blink"
         },
-        "buttonText": "Teruskan ke Tandatangan"
+        "buttonText": "Teruskan ke tandatangan"
+      },
+      "SignInvest": {
+        "loading": "Menyediakan perjanjian anda.",
+        "notAvailable": "Penandatanganan belum tersedia. Sila cuba lagi kemudian.",
+        "errors": {
+          "envelopeCreationFailed": "Perjanjian tidak dapat disediakan. Sila cuba lagi.",
+          "networkError": "Sambungan terputus. Sila semak rangkaian anda dan cuba lagi.",
+          "unauthorized": "Sesi anda tidak lagi sah. Sila log masuk semula.",
+          "sessionExpired": "Sesi penandatanganan telah tamat. Sila cuba lagi.",
+          "providerUnavailable": "Perkhidmatan penandatanganan tidak tersedia buat sementara waktu. Sila cuba lagi kemudian.",
+          "routeMissing": "Penandatanganan belum tersedia pada pelayan ini. Sila kemas kini aplikasi atau cuba lagi kemudian.",
+          "envelopeMismatch": "Dokumen yang ditandatangani bukan dokumen yang disediakan oleh langkah ini. Sila cuba lagi.",
+          "generic": "Sesuatu telah berlaku. Sila cuba lagi."
+        }
       },
       "TransferInvest": {
         "title": "Pindahkan pelaburan anda",

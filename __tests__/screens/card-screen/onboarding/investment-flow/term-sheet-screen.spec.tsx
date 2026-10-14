@@ -15,8 +15,8 @@ jest.mock("react-native-linear-gradient", () => ({
 
 const mockNavigate = jest.fn()
 
-/** Deliberately not the $10,000 the copy used to hardcode: an amount the screen ignores
- *  would still read correctly against that one. */
+/** An amount the screen could not get right by accident: the figures below only match it
+ *  when they are derived from the route. */
 const SELECTED_AMOUNT_USD = 25000
 
 const mockRouteParams = { current: { selectedAmountUsd: SELECTED_AMOUNT_USD } }
@@ -72,7 +72,7 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("$25,000 Investment")).toBeTruthy()
+    expect(getByText("$25,000 investment")).toBeTruthy()
     expect(getByText("You receive 25,000 units ~0.25% of Blink")).toBeTruthy()
   })
 
@@ -89,7 +89,7 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("$1,000 Investment")).toBeTruthy()
+    expect(getByText("$1,000 investment")).toBeTruthy()
     expect(getByText("You receive 1,000 units ~0.01% of Blink")).toBeTruthy()
   })
 
@@ -115,10 +115,10 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    expect(getByText("Proceed to Sign")).toBeTruthy()
+    expect(getByText("Proceed to sign")).toBeTruthy()
   })
 
-  it("navigates to transfer invest screen on button press", async () => {
+  it("navigates to the signing step on button press", async () => {
     const { getByText } = render(
       <ContextForScreen>
         <TermSheetScreen />
@@ -127,12 +127,12 @@ describe("TermSheetScreen", () => {
 
     await act(async () => {})
 
-    const button = getByText("Proceed to Sign")
+    const button = getByText("Proceed to sign")
     await act(async () => {
       fireEvent.press(button)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingTransferInvestScreen", {
+    expect(mockNavigate).toHaveBeenCalledWith("cardOnboardingSignInvestScreen", {
       selectedAmountUsd: SELECTED_AMOUNT_USD,
     })
   })

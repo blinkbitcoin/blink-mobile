@@ -3695,7 +3695,7 @@
         "buttonText": "Doorgaan"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Hoeveel wil je investeren?",
+        "title": "Hoeveel wil je investeren?",
         "percent": "voor ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3712,11 +3712,25 @@
         "title": "Termsheet",
         "equitySection": {
           "title": "Aandeel in Blink",
-          "investment": "{amount: string} Investering",
+          "investment": "{amount: string} investering",
           "valuation": "Bij $10M pre-money waardering",
           "units": "Je ontvangt {units: string} eenheden ~{percent: number}% van Blink"
         },
-        "buttonText": "Ga naar Ondertekening"
+        "buttonText": "Ga naar ondertekening"
+      },
+      "SignInvest": {
+        "loading": "Je overeenkomst wordt voorbereid.",
+        "notAvailable": "Ondertekenen is nog niet beschikbaar. Probeer het later opnieuw.",
+        "errors": {
+          "envelopeCreationFailed": "De overeenkomst kon niet worden voorbereid. Probeer het opnieuw.",
+          "networkError": "Verbinding verbroken. Controleer je netwerk en probeer het opnieuw.",
+          "unauthorized": "Je sessie is niet meer geldig. Log opnieuw in.",
+          "sessionExpired": "De ondertekensessie is verlopen. Probeer het opnieuw.",
+          "providerUnavailable": "De ondertekendienst is tijdelijk niet beschikbaar. Probeer het later opnieuw.",
+          "routeMissing": "Ondertekenen is op deze server nog niet beschikbaar. Werk de app bij of probeer het later opnieuw.",
+          "envelopeMismatch": "Het ondertekende document is niet het document dat deze stap heeft voorbereid. Probeer het opnieuw.",
+          "generic": "Er is iets misgegaan. Probeer het opnieuw."
+        }
       },
       "TransferInvest": {
         "title": "Draag je investering over",

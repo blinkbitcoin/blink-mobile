@@ -3695,7 +3695,7 @@
         "buttonText": "Nastavi"
       },
       "SelectInvest": {
-        "desiredCreditLimit": "Koliko biste željeli uložiti?",
+        "title": "Koliko biste željeli uložiti?",
         "percent": "za ~{percent: number}%"
       },
       "CompanyValuation": {
@@ -3716,7 +3716,21 @@
           "valuation": "Uz pre-money procjenu od $10M",
           "units": "Primate {units: string} jedinica ~{percent: number}% Blinka"
         },
-        "buttonText": "Nastavi na Potpis"
+        "buttonText": "Nastavi na potpis"
+      },
+      "SignInvest": {
+        "loading": "Pripremamo tvoj ugovor.",
+        "notAvailable": "Potpisivanje još nije dostupno. Pokušaj ponovno kasnije.",
+        "errors": {
+          "envelopeCreationFailed": "Ugovor nije bilo moguće pripremiti. Pokušaj ponovno.",
+          "networkError": "Veza je prekinuta. Provjeri mrežu i pokušaj ponovno.",
+          "unauthorized": "Tvoja sesija više nije valjana. Prijavi se ponovno.",
+          "sessionExpired": "Sesija potpisivanja je istekla. Pokušaj ponovno.",
+          "providerUnavailable": "Usluga potpisivanja privremeno nije dostupna. Pokušaj ponovno kasnije.",
+          "routeMissing": "Potpisivanje još nije dostupno na ovom poslužitelju. Ažuriraj aplikaciju ili pokušaj kasnije.",
+          "envelopeMismatch": "Potpisani dokument nije onaj koji je ovaj korak pripremio. Pokušaj ponovno.",
+          "generic": "Nešto je pošlo po zlu. Pokušaj ponovno."
+        }
       },
       "TransferInvest": {
         "title": "Prenesite svoje ulaganje",
