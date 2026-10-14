@@ -422,7 +422,11 @@ describe("BackupPhraseConfirmScreen", () => {
 
     await act(async () => {})
 
-    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(
+      "migration-uuid",
+      "manual",
+      undefined,
+    )
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       onContinue: {
         route: "accountMigrationBalancesOverview",
@@ -471,7 +475,7 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: false }),
