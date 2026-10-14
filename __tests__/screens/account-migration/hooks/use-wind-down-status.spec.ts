@@ -33,33 +33,39 @@ describe("useWindDownStatus", () => {
   })
 
   it("serves the account's wind-down state, mapped to the domain shape", () => {
-    mockUseWindDownQuery.mockReturnValue({ data: { windDown: serverWindDown } })
+    mockUseWindDownQuery.mockReturnValue({
+      data: { windDown: serverWindDown },
+      loading: false,
+    })
 
     const { result } = renderHook(() => useWindDownStatus())
 
     const { __typename, ...domainWindDown } = serverWindDown
-    expect(result.current).toEqual(domainWindDown)
+    expect(result.current.windDown).toEqual(domainWindDown)
+    expect(result.current.isPending).toBe(false)
   })
 
   it("returns null when the wind-down does not affect the account", () => {
-    mockUseWindDownQuery.mockReturnValue({ data: { windDown: null } })
+    mockUseWindDownQuery.mockReturnValue({ data: { windDown: null }, loading: false })
 
     const { result } = renderHook(() => useWindDownStatus())
 
-    expect(result.current).toBeNull()
+    expect(result.current.windDown).toBeNull()
+    expect(result.current.isPending).toBe(false)
   })
 
-  it("returns null while the query has no data yet", () => {
-    mockUseWindDownQuery.mockReturnValue({ data: undefined })
+  it("is pending, with no wind-down yet, while the query is still in flight", () => {
+    mockUseWindDownQuery.mockReturnValue({ data: undefined, loading: true })
 
     const { result } = renderHook(() => useWindDownStatus())
 
-    expect(result.current).toBeNull()
+    expect(result.current.windDown).toBeNull()
+    expect(result.current.isPending).toBe(true)
   })
 
   it("skips the query and stays null while the user is not authenticated", () => {
     mockIsAuthed = false
-    mockUseWindDownQuery.mockReturnValue({ data: undefined })
+    mockUseWindDownQuery.mockReturnValue({ data: undefined, loading: false })
 
     const { result } = renderHook(() => useWindDownStatus())
 
@@ -67,7 +73,8 @@ describe("useWindDownStatus", () => {
       skip: true,
       fetchPolicy: "no-cache",
     })
-    expect(result.current).toBeNull()
+    expect(result.current.windDown).toBeNull()
+    expect(result.current.isPending).toBe(false)
   })
 
   it("fetches without touching the cache so a switch never serves the previous account's status", () => {

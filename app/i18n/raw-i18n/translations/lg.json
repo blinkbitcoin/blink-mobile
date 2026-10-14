@@ -4054,7 +4054,18 @@
     "setupDescription": "Okuziyiza abatakkiriziddwa okuyingira mu akawunti yo, yongerako kati okukakasa emirundi ebiri.",
     "addEmail": "Yongerako email",
     "addPhoneNumber": "Yongerako ennamba y'essimu",
-    "setAuthenticator": "Teekawo authenticator"
+    "setAuthenticator": "Teekawo authenticator",
+    "modalReminder": "Bw'okigaana kati, kakasa nti okiteekawo mangu ddala.",
+    "dismissTwoMore": "Osobola okugaana kino emirundi ebiri endala.",
+    "dismissOneMore": "Osobola okugaana kino omulundi gumu omulala.",
+    "dismissLast": "Guno gwe mulundi ogusembayo gw'osobola okugaana kino.",
+    "setNow": "Teekawo kati",
+    "dontWantTo": "Sagala",
+    "protectionRequiredTitle": "Tukusaba oyongereko obukuumi obulala",
+    "highBalanceTitle": "Olina okusinga {amount}, tukusaba oyongereko obukuumi obulala",
+    "protectionRequiredBody": "Gy'olina ssente ennyingi, gye bukoma okuba obukulu okuba n'obukuumi obusinga. Tukusaba oyongereko authenticator osobole okweyongera okukozesa Blink.",
+    "nonCustodialTitle": "Bw'oba tooyagala kuteekawo kukakasa mirundi ebiri",
+    "nonCustodialBody": "Ekirala kye kudda mu non-custodial. Olwo ggwe ovunaanyizibwa ku ssente zo."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

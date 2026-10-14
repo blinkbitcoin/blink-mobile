@@ -53,7 +53,11 @@ import {
   TotpRegistrationInitiateScreen,
   TotpRegistrationValidateScreen,
 } from "@app/screens/totp-screen"
-import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
+import {
+  TwoFactorNonCustodialScreen,
+  TwoFactorProtectionRequiredScreen,
+  TwoFactorSetupScreen,
+} from "@app/screens/two-factor-enforcement"
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
@@ -308,6 +312,33 @@ const investmentOnboardingScreens = () => (
       name="cardOnboardingDepositPendingScreen"
       component={DepositPendingScreen}
       options={{ headerShown: false }}
+    />
+  </>
+)
+
+/** The two-factor enforcement leg, out of RootStack for the same line limit. Leaving
+ *  any of these screens is something the account is held to, so none can be swiped
+ *  away: each exit goes through the screen's own control, which does the counting. */
+const twoFactorEnforcementScreens = () => (
+  <>
+    <RootNavigator.Screen
+      name="twoFactorSetup"
+      component={TwoFactorSetupScreen}
+      options={{
+        title: "",
+        headerLeft: headerBackControl({ canGoBack: false }),
+        gestureEnabled: false,
+      }}
+    />
+    <RootNavigator.Screen
+      name="twoFactorProtectionRequired"
+      component={TwoFactorProtectionRequiredScreen}
+      options={{ headerShown: false, gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="twoFactorNonCustodial"
+      component={TwoFactorNonCustodialScreen}
+      options={{ headerShown: false, gestureEnabled: false }}
     />
   </>
 )
@@ -699,14 +730,7 @@ export const RootStack = () => {
           title: LL.common.codeConfirmation(),
         }}
       />
-      <RootNavigator.Screen
-        name="twoFactorSetup"
-        component={TwoFactorSetupScreen}
-        options={{
-          title: "",
-          headerLeft: headerBackControl({ canGoBack: false }),
-        }}
-      />
+      {twoFactorEnforcementScreens()}
       <RootNavigator.Screen
         name="totpRegistrationInitiate"
         component={TotpRegistrationInitiateScreen}

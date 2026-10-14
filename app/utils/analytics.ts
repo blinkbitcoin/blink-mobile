@@ -212,3 +212,15 @@ export const logTwoFactorSetupStarted = (params: LogTwoFactorSetupStartedParams)
     method: params.method,
   })
 }
+
+type LogTwoFactorNonCustodialChosenParams = {
+  tier: TwoFactorTier
+}
+
+export const logTwoFactorNonCustodialChosen = (
+  params: LogTwoFactorNonCustodialChosenParams,
+) => {
+  analytics().logEvent("two_factor_non_custodial_chosen", {
+    tier: params.tier,
+  })
+}

@@ -16,21 +16,9 @@ import { flushEffects } from "../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 
-type RemovalEvent = { data: { action: { type: string } }; preventDefault: jest.Mock }
-type RemovalListener = (event: RemovalEvent) => void
-
-const removalBy = (type: string): RemovalEvent => ({
-  data: { action: { type } },
-  preventDefault: jest.fn(),
-})
-
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
-const mockRemoveListener = jest.fn()
-const mockAddListener = jest.fn(
-  (_name: string, _listener: RemovalListener) => mockRemoveListener,
-)
 let mockIsFocused = true
 
 jest.mock("@react-navigation/native", () => ({
@@ -39,27 +27,30 @@ jest.mock("@react-navigation/native", () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
     setOptions: mockSetOptions,
-    addListener: mockAddListener,
   }),
   useIsFocused: () => mockIsFocused,
 }))
 
-const removalListenerInstalls = () =>
-  mockAddListener.mock.calls.filter(([name]) => name === "beforeRemove")
+const mockUseHardwareBackGuard = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => ({
+  useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
+}))
 
-/** The listener the screen installed against being removed, if any. */
-const installedRemovalListener = (): RemovalListener | undefined =>
-  removalListenerInstalls()[0]?.[1]
+/** The handler the screen last gave the hardware back, which follows its hold. */
+const pressHardwareBack = () => {
+  const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
+  onBack()
+}
 
+const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
-  tier: TwoFactorTier.Nudge as TwoFactorTier,
+  unmetTier: TwoFactorTier.Nudge as TwoFactorTier,
   hasTwoFactor: false,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
-  shouldShowNudgeCard: true,
-  shouldShowSettingsBanner: true,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
+  registerDismissal: mockRegisterDismissal,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
@@ -120,7 +111,7 @@ describe("TwoFactorSetupScreen", () => {
     mockIsFocused = true
     mockIsReverifying = false
     mockIsAskedHere = true
-    mockEnforcement.tier = TwoFactorTier.Nudge
+    mockEnforcement.unmetTier = TwoFactorTier.Nudge
     mockEnforcement.hasTwoFactor = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
@@ -151,7 +142,7 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("sends an address that was never verified through re-verification, told to return here", async () => {
+  it("sends an address that was never verified through re-verification", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     await renderScreen()
 
@@ -168,8 +159,9 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("holds both flows while a re-verification is in flight", async () => {
+  it("holds every exit while a re-verification is in flight", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockEnforcement.unmetTier = TwoFactorTier.Required
     mockIsReverifying = true
     await renderScreen()
 
@@ -182,33 +174,18 @@ describe("TwoFactorSetupScreen", () => {
     expect(secondary.props.disabled).toBe(true)
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
+    pressHardwareBack()
+    renderInstalledCloseControl()
+    fireEvent.press(screen.getByTestId("icon-close"))
 
     expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it("refuses every way back while a re-verification is in flight, but not a reset", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockIsReverifying = true
-    await renderScreen()
-
-    const listener = installedRemovalListener()
-    const back = removalBy("GO_BACK")
-    const pop = removalBy("POP")
-    const reset = removalBy("RESET")
-    listener?.(back)
-    listener?.(pop)
-    listener?.(reset)
-
-    expect(back.preventDefault).toHaveBeenCalledTimes(1)
-    expect(pop.preventDefault).toHaveBeenCalledTimes(1)
-    expect(reset.preventDefault).not.toHaveBeenCalled()
-    expect(mockSetOptions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gestureEnabled: false }),
-    )
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).not.toHaveBeenCalled()
   })
 
   it("shows the spinner but holds nothing for a re-verification joined from elsewhere", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockEnforcement.unmetTier = TwoFactorTier.Required
     mockIsReverifying = true
     mockIsAskedHere = false
     await renderScreen()
@@ -216,43 +193,34 @@ describe("TwoFactorSetupScreen", () => {
     // eslint-disable-next-line camelcase
     const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
     expect(secondary.props.loading).toBe(true)
-    expect(installedRemovalListener()).toBeUndefined()
-    expect(mockSetOptions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gestureEnabled: true }),
-    )
-  })
+    pressHardwareBack()
 
-  it("can be left the usual ways while nothing is in flight", async () => {
-    await renderScreen()
-
-    expect(installedRemovalListener()).toBeUndefined()
-    expect(mockSetOptions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gestureEnabled: true }),
-    )
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   /** The hook ends the sequence for its screens at its own deadline, so this is also
    *  how the hold lifts for a request that never answers. */
   it("releases the hold once the hook ends the re-verification, and holds again for a new run", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockEnforcement.unmetTier = TwoFactorTier.Required
     mockIsReverifying = true
     const rendered = await renderScreen()
+    pressHardwareBack()
+    expect(mockGoBack).not.toHaveBeenCalled()
 
     mockIsReverifying = false
     await rerenderScreen(rendered)
+    pressHardwareBack()
 
-    expect(mockRemoveListener).toHaveBeenCalledTimes(1)
-    expect(mockSetOptions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gestureEnabled: true }),
-    )
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
 
     mockIsReverifying = true
     await rerenderScreen(rendered)
+    pressHardwareBack()
 
-    expect(removalListenerInstalls()).toHaveLength(2)
-    expect(mockSetOptions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gestureEnabled: false }),
-    )
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("greys the close control out while it holds, so the refusal shows", async () => {
@@ -281,7 +249,7 @@ describe("TwoFactorSetupScreen", () => {
 
   it("offers to add a phone number when the email is already verified", async () => {
     mockEnforcement.missingMethod = TwoFactorMethod.Phone
-    mockEnforcement.tier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Required
     await renderScreen()
 
     expect(screen.queryByText(LL.TwoFactorEnforcement.addEmail())).toBeNull()
@@ -294,7 +262,7 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("offers the authenticator as the call to action, told to return here", async () => {
+  it("offers the authenticator as the call to action", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
@@ -333,12 +301,24 @@ describe("TwoFactorSetupScreen", () => {
     expect(secondary.props.title).toBe(LL.TwoFactorEnforcement.addPhoneNumber())
   })
 
-  it("installs a close control that leaves the screen", async () => {
+  it("installs a close control that charges the exit to the tier it opened for", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Required
     await renderScreen()
 
     renderInstalledCloseControl()
     fireEvent.press(screen.getByTestId("icon-close"))
 
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("treats the hardware back as the close control", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Required
+    await renderScreen()
+
+    pressHardwareBack()
+
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -349,6 +329,7 @@ describe("TwoFactorSetupScreen", () => {
     await rerenderScreen(rendered)
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   it("stays put while another screen is on top, even with two factors", async () => {

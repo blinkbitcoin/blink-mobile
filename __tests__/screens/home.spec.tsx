@@ -78,13 +78,20 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
 
 const mockTwoFactorEnforcement = {
   tier: 0,
+  unmetTier: 0,
   hasTwoFactor: false,
   missingMethod: "email",
   unverifiedEmail: null,
+  highBalanceCurrency: "BTC",
+  remainingDismissals: 3,
+  requiredPrompt: "none",
+  isSessionStartPending: false,
   shouldShowNudgeCard: false,
   shouldShowSettingsBanner: false,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
+  consumeSessionStart: jest.fn(),
+  registerDismissal: jest.fn(),
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockTwoFactorEnforcement,
@@ -94,6 +101,32 @@ type TwoFactorNudgeCardProps = Record<string, never>
 const mockTwoFactorNudgeCard = jest.fn<null, [TwoFactorNudgeCardProps]>(() => null)
 jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
   TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
+}))
+
+const mockTwoFactorSessionPrompt = {
+  isModalOpen: false,
+  promptTier: 2,
+  closeModal: jest.fn(),
+}
+const mockUseTwoFactorSessionPrompt = jest.fn(
+  (_options: { isBlocked: boolean }) => mockTwoFactorSessionPrompt,
+)
+jest.mock("@app/screens/home-screen/hooks/use-two-factor-session-prompt", () => ({
+  useTwoFactorSessionPrompt: (options: { isBlocked: boolean }) =>
+    mockUseTwoFactorSessionPrompt(options),
+}))
+
+type TwoFactorSessionModalProps = {
+  isVisible: boolean
+  tier: number
+  remainingDismissals: number
+  onDismiss: () => void
+  onLeave: () => void
+}
+const mockTwoFactorSessionModal = jest.fn<null, [TwoFactorSessionModalProps]>(() => null)
+jest.mock("@app/custodial/components/two-factor-session-modal", () => ({
+  TwoFactorSessionModal: (props: TwoFactorSessionModalProps) =>
+    mockTwoFactorSessionModal(props),
 }))
 
 let mockIsFocused = true
@@ -272,6 +305,7 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
 }))
 
 let mockMigratePromptVisible = false
+let mockMigratePromptPending = false
 let mockCanReopen = false
 const mockDismissMigratePrompt = jest.fn()
 const mockReopenMigratePrompt = jest.fn()
@@ -279,6 +313,7 @@ const mockReopenMigratePrompt = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
   useMigrateNowPrompt: () => ({
     isVisible: mockMigratePromptVisible,
+    isPending: mockMigratePromptPending,
     canReopen: mockCanReopen,
     deadlineTimestamp: 1787003999,
     timezone: "Europe/Paris",
@@ -2107,7 +2142,7 @@ describe("TwoFactorNudgeCard gating", () => {
   beforeEach(() => {
     resetHomeScreenMocks()
     mockTwoFactorEnforcement.shouldShowNudgeCard = false
-    mockTwoFactorEnforcement.tier = 0
+    mockTwoFactorEnforcement.unmetTier = 0
   })
 
   afterEach(() => {
@@ -2123,7 +2158,7 @@ describe("TwoFactorNudgeCard gating", () => {
 
   it("renders the card when the hook says it should show", async () => {
     mockTwoFactorEnforcement.shouldShowNudgeCard = true
-    mockTwoFactorEnforcement.tier = 1
+    mockTwoFactorEnforcement.unmetTier = 1
 
     renderHome()
     await flushEffects()
@@ -2136,6 +2171,129 @@ describe("TwoFactorNudgeCard gating", () => {
     await flushEffects()
 
     expect(mockTwoFactorNudgeCard).not.toHaveBeenCalled()
+  })
+})
+
+describe("TwoFactorSessionModal wiring", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorSessionPrompt.isModalOpen = false
+    mockTwoFactorEnforcement.remainingDismissals = 2
+  })
+
+  afterEach(() => {
+    mockTwoFactorSessionPrompt.isModalOpen = false
+    mockTwoFactorEnforcement.remainingDismissals = 3
+    mockMigratePromptVisible = false
+    mockMigratePromptPending = false
+    mockIsFocused = true
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  const lastModalProps = (): TwoFactorSessionModalProps => {
+    const call = mockTwoFactorSessionModal.mock.calls.at(-1)
+    if (!call) throw new Error("the session modal was not rendered")
+    return call[0]
+  }
+
+  it("shows the modal for the prompt's tier with the countdown while the home says it is open", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(lastModalProps()).toEqual(
+      expect.objectContaining({ isVisible: true, tier: 2, remainingDismissals: 2 }),
+    )
+  })
+
+  it("keeps the modal hidden while the home says it is closed", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(lastModalProps().isVisible).toBe(false)
+  })
+
+  it("keeps the modal hidden while the home is not focused", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    mockIsFocused = false
+
+    renderHome()
+    await flushEffects()
+
+    expect(lastModalProps().isVisible).toBe(false)
+  })
+
+  it("lets the session start proceed while no other home modal is up", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseTwoFactorSessionPrompt).toHaveBeenLastCalledWith({ isBlocked: false })
+  })
+
+  it("holds the session start while the wind-down nudge is up", async () => {
+    mockMigratePromptVisible = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseTwoFactorSessionPrompt).toHaveBeenLastCalledWith({ isBlocked: true })
+  })
+
+  it("holds the session start while the wind-down has not answered yet", async () => {
+    mockMigratePromptPending = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseTwoFactorSessionPrompt).toHaveBeenLastCalledWith({ isBlocked: true })
+  })
+
+  it("shows the wind-down nudge while the home is in front and no two-factor modal is open", async () => {
+    mockMigratePromptVisible = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(true)
+  })
+
+  it("keeps the wind-down nudge off a screen the two-factor prompt pushed", async () => {
+    mockMigratePromptVisible = true
+    mockIsFocused = false
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(false)
+  })
+
+  it("charges the dismissal to the prompt's tier and closes when the modal is waved away", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    renderHome()
+    await flushEffects()
+
+    act(() => lastModalProps().onDismiss())
+
+    expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2)
+    expect(mockTwoFactorSessionPrompt.closeModal).toHaveBeenCalledTimes(1)
+  })
+
+  it("only closes when the modal makes way for a flow", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    renderHome()
+    await flushEffects()
+
+    act(() => lastModalProps().onLeave())
+
+    expect(mockTwoFactorEnforcement.registerDismissal).not.toHaveBeenCalled()
+    expect(mockTwoFactorSessionPrompt.closeModal).toHaveBeenCalledTimes(1)
   })
 })
 

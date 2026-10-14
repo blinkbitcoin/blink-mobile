@@ -33,9 +33,13 @@ const affectedWindDown: WindDown = {
 
 let mockStatus: WindDownStatus | null = WindDownStatus.ReceiveDisabled
 
+let mockIsPending = false
+
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () =>
-    mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+  useWindDownStatus: () => ({
+    windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+    isPending: mockIsPending,
+  }),
 }))
 
 describe("useMigrateNowPrompt", () => {
@@ -43,12 +47,24 @@ describe("useMigrateNowPrompt", () => {
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockOwnerId = "custodial-1"
     mockStatus = WindDownStatus.ReceiveDisabled
+    mockIsPending = false
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+  })
+
+  it("reports the wind-down as pending while the server has not answered", () => {
+    mockStatus = null
+    mockIsPending = true
+
+    const { result } = renderHook(() => useMigrateNowPrompt())
+
+    expect(result.current.isPending).toBe(true)
+    expect(result.current.isVisible).toBe(false)
   })
 
   it("prompts a custodial account once the server disables receiving", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
+    expect(result.current.isPending).toBe(false)
     expect(result.current.isVisible).toBe(true)
     expect(result.current.canReopen).toBe(true)
     expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)
