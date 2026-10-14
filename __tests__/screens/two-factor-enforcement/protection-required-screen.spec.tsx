@@ -5,11 +5,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorProtectionRequiredScreen } from "@app/screens/two-factor-enforcement"
-import {
-  TwoFactorMethod,
-  TwoFactorSessionPrompt,
-  TwoFactorTier,
-} from "@app/types/two-factor-enforcement"
+import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -18,13 +14,10 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
-const mockGoBack = jest.fn()
-let mockIsFocused = true
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
-  useIsFocused: () => mockIsFocused,
+  useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
 const mockUseHardwareBackGuard = jest.fn()
@@ -33,12 +26,13 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 }))
 
 const mockRegisterDismissal = jest.fn()
+const mockConsumeSessionStart = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.Recommended as TwoFactorTier,
   remainingDismissals: 0,
-  requiredPrompt: TwoFactorSessionPrompt.ProtectionRequired as TwoFactorSessionPrompt,
   enforcedCurrency: WalletCurrency.Btc as WalletCurrency,
   registerDismissal: mockRegisterDismissal,
+  consumeSessionStart: mockConsumeSessionStart,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
@@ -85,10 +79,8 @@ describe("TwoFactorProtectionRequiredScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    mockIsFocused = true
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     mockEnforcement.remainingDismissals = 0
-    mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.ProtectionRequired
     mockEnforcement.enforcedCurrency = WalletCurrency.Btc
   })
 
@@ -146,7 +138,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       ).toBeTruthy()
     })
 
-    it("charges the X to the enforced tier, logs it and goes back", async () => {
+    it("charges the X to the enforced tier, logs it and takes the session start so the home can show", async () => {
       atEnforcedTier(1)
       await renderScreen()
 
@@ -157,7 +149,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
         prompt: "protection_required_screen",
       })
       expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
     })
 
     it("treats the hardware back as the X while dismissals remain", async () => {
@@ -168,7 +160,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       onBack()
 
       expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
-      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
     })
 
     it("blocks once the dismissals are spent", async () => {
@@ -180,7 +172,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     })
   })
 
-  it("opens the authenticator setup and logs it", async () => {
+  it("opens the authenticator setup and logs it, without taking the session start", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
@@ -190,6 +182,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       method: TwoFactorMethod.Authenticator,
     })
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
   })
 
   it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
@@ -202,24 +195,6 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     })
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
-  })
-
-  it("steps aside once the account no longer needs it", async () => {
-    const rendered = await renderScreen()
-    expect(mockGoBack).not.toHaveBeenCalled()
-
-    mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.None
-    await rerenderScreen(rendered)
-
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-  })
-
-  it("stays put while another screen is on top, even once no longer needed", async () => {
-    mockIsFocused = false
-    mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.None
-
-    await renderScreen()
-
-    expect(mockGoBack).not.toHaveBeenCalled()
+    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
   })
 })

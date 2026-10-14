@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { useIsFocused, useNavigation } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -18,7 +18,6 @@ import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-h
 import {
   TwoFactorMethod,
   TwoFactorPrompt,
-  TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import {
@@ -55,9 +54,10 @@ const formatHighBalanceAmount = (currency: WalletCurrency): string => {
 /**
  * The full-screen prompt of the tiers that stop asking nicely: the recommended tier once
  * its dismissals are spent, and the enforced tier from its first session. It
- * offers exactly two ways forward. While the enforced tier still has dismissals
- * left it also offers an X; otherwise there is no header, no gesture and no hardware
- * back, so the only exits are the two buttons.
+ * stands in for the home at the session start that owes it, so the home is never seen
+ * first, and offers exactly two ways forward. While the enforced tier still has
+ * dismissals left it also offers an X; otherwise there is no header, no gesture and no
+ * hardware back, so the only exits are the two buttons.
  */
 export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -65,17 +65,13 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const navigation =
-    useNavigation<
-      NativeStackNavigationProp<RootStackParamList, "twoFactorProtectionRequired">
-    >()
-  const isFocused = useIsFocused()
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const {
     unmetTier,
     remainingDismissals,
-    requiredPrompt,
     enforcedCurrency,
     registerDismissal,
+    consumeSessionStart,
   } = useTwoFactorEnforcement()
   /** The tier this screen was raised for: what it reports, and what its X is charged
    *  to, even if the balance moves while it is open. */
@@ -83,7 +79,6 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
 
   const isEnforcedTier = promptTier === TwoFactorTier.Enforced
   const isDismissible = isEnforcedTier && remainingDismissals > 0
-  const isStillRequired = requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
 
   useEffect(() => {
     logTwoFactorPromptShown({
@@ -92,25 +87,19 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     })
   }, [promptTier])
 
-  /** Once the account complies, or stops being the custodial one this screen was raised
-   *  for, there is nothing left to require. Only while focused: a screen lower in the
-   *  stack going back would pop whichever screen is on top instead of itself. */
-  const isRequirementMet = isFocused && !isStillRequired
-  useEffect(() => {
-    if (isRequirementMet) navigation.goBack()
-  }, [isRequirementMet, navigation])
-
+  /** Charging the dismissal and taking the session start is what lets the home in: the
+   *  screen stands in for the home only while that start is still owed. */
   const handleDismiss = useCallback(() => {
     logTwoFactorPromptDismissed({
       tier: promptTier,
       prompt: TwoFactorPrompt.ProtectionRequiredScreen,
     })
     registerDismissal(promptTier)
-    navigation.goBack()
-  }, [promptTier, registerDismissal, navigation])
+    consumeSessionStart()
+  }, [promptTier, registerDismissal, consumeSessionStart])
 
   /** The hardware back is the X while there is one, and nothing at all once there is
-   *  none: a blocking screen swallows it rather than letting it pop. */
+   *  none: a blocking screen swallows it rather than letting the app go. */
   useHardwareBackGuard(isDismissible ? handleDismiss : undefined)
 
   const handleSetAuthenticator = useCallback(() => {

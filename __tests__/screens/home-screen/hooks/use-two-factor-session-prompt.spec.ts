@@ -3,13 +3,8 @@ import { act, renderHook } from "@testing-library/react-native"
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { TwoFactorSessionPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
-const mockNavigate = jest.fn()
-/** One object for the whole test, as the real hook hands back the same navigation
- *  object on every render. */
-const mockNavigation = { navigate: mockNavigate }
 let mockIsFocused = true
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => mockNavigation,
   useIsFocused: () => mockIsFocused,
 }))
 
@@ -47,7 +42,6 @@ describe("useTwoFactorSessionPrompt", () => {
 
     expect(result.current.isModalOpen).toBe(false)
     expect(mockConsumeSessionStart).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("takes a session start that owes nothing, so a later balance change waits", () => {
@@ -57,7 +51,6 @@ describe("useTwoFactorSessionPrompt", () => {
 
     expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
     expect(result.current.isModalOpen).toBe(false)
-    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("opens the modal for the recommended tier and takes the session start", () => {
@@ -68,15 +61,13 @@ describe("useTwoFactorSessionPrompt", () => {
     expect(result.current.isModalOpen).toBe(true)
     expect(result.current.promptTier).toBe(TwoFactorTier.Recommended)
     expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("opens the protection screen and takes the session start", () => {
+  it("leaves the full-screen prompt to the navigator: takes the start, opens no modal", () => {
     sessionStartOwing(TwoFactorSessionPrompt.ProtectionRequired, TwoFactorTier.Enforced)
 
     const { result } = renderPrompt()
 
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorProtectionRequired")
     expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
     expect(result.current.isModalOpen).toBe(false)
   })
@@ -98,19 +89,19 @@ describe("useTwoFactorSessionPrompt", () => {
   })
 
   it("waits while another home modal blocks it", () => {
-    sessionStartOwing(TwoFactorSessionPrompt.ProtectionRequired, TwoFactorTier.Enforced)
+    sessionStartOwing(TwoFactorSessionPrompt.RequiredModal, TwoFactorTier.Recommended)
 
-    const { rerender } = renderHook(
+    const { result, rerender } = renderHook(
       ({ isBlocked }: { isBlocked: boolean }) => useTwoFactorSessionPrompt({ isBlocked }),
       { initialProps: { isBlocked: true } },
     )
 
     expect(mockConsumeSessionStart).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(result.current.isModalOpen).toBe(false)
 
     rerender({ isBlocked: false })
 
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorProtectionRequired")
+    expect(result.current.isModalOpen).toBe(true)
     expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
   })
 

@@ -96,9 +96,15 @@ export type TwoFactorEnforcementState = {
   /** The prompt the unmet tier calls for at a session start, None once the account
    *  complies. */
   requiredPrompt: TwoFactorSessionPrompt
-  /** Whether this session's start is still to be acted on: the account's state has
-   *  been read fresh and no surface has taken the session start yet. */
+  /** Whether this session's start is still to be acted on: the account's state is
+   *  decided and no surface has taken the session start yet. */
   isSessionStartPending: boolean
+  /** The account's record is still being read: nothing is decided for the session
+   *  start, and the home must wait rather than show before a prompt that replaces it. */
+  isPreparingSessionStart: boolean
+  /** The full-screen prompt stands in for the home: shown in its place for the session
+   *  start that owes it, until a dismissal takes that start or the account complies. */
+  isProtectionGateActive: boolean
   shouldShowNudgeCard: boolean
   shouldShowSettingsBanner: boolean
   /** Reports a prompt as shown, once per session for each tier it is shown at: a
@@ -122,6 +128,8 @@ const INERT_STATE: TwoFactorEnforcementState = {
   remainingDismissals: 0,
   requiredPrompt: TwoFactorSessionPrompt.None,
   isSessionStartPending: false,
+  isPreparingSessionStart: false,
+  isProtectionGateActive: false,
   shouldShowNudgeCard: false,
   shouldShowSettingsBanner: false,
   markPromptShown: () => {},
@@ -273,8 +281,21 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     : TwoFactorTier.None
   const dismissalsLeft = remainingDismissals(record, unmetTier)
   const requiredPrompt = resolveSessionPrompt({ unmetTier, record })
+  /** The local read decides first: the stored tier never lowers and the cached factors
+   *  are what the account last showed, so a prompt they already call for goes up on the
+   *  first frame. Only a local read that owes nothing waits for the fresh one, which can
+   *  still raise the tier from a balance that moved elsewhere. */
+  const hasLocalPrompt = requiredPrompt !== TwoFactorSessionPrompt.None
+  const isSessionStartDecided = hasLocalPrompt || !isReadingAccount
   const isSessionStartPending =
-    isEnforced && isSessionForAccount && session.isStartPending && !isReadingAccount
+    isEnforced && isSessionForAccount && session.isStartPending && isSessionStartDecided
+  /** The record of this account is still being read: nothing is decided yet, and the
+   *  home must not show for the frames that read takes. */
+  const isPreparingSessionStart = isEnabled && accountId !== null && !isSessionForAccount
+  /** The full-screen prompt replaces the home for the session start that owes it, until
+   *  a dismissal takes that start or the account complies. */
+  const isProtectionGateActive =
+    isSessionStartPending && requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
 
   /** The card belongs to the suggested tier alone: from the recommended tier on, the
    *  session prompt is the one asking, and the home never stacks two. The banner asks at
@@ -341,6 +362,8 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       remainingDismissals: dismissalsLeft,
       requiredPrompt,
       isSessionStartPending,
+      isPreparingSessionStart,
+      isProtectionGateActive,
       shouldShowNudgeCard,
       shouldShowSettingsBanner,
       markPromptShown,
@@ -358,6 +381,8 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       dismissalsLeft,
       requiredPrompt,
       isSessionStartPending,
+      isPreparingSessionStart,
+      isProtectionGateActive,
       shouldShowNudgeCard,
       shouldShowSettingsBanner,
       markPromptShown,
