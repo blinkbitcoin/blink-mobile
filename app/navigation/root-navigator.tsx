@@ -53,6 +53,7 @@ import {
   TotpRegistrationInitiateScreen,
   TotpRegistrationValidateScreen,
 } from "@app/screens/totp-screen"
+import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
@@ -696,6 +697,14 @@ export const RootStack = () => {
         component={EmailLoginValidateScreen}
         options={{
           title: LL.common.codeConfirmation(),
+        }}
+      />
+      <RootNavigator.Screen
+        name="twoFactorSetup"
+        component={TwoFactorSetupScreen}
+        options={{
+          title: "",
+          headerLeft: headerBackControl({ canGoBack: false }),
         }}
       />
       <RootNavigator.Screen

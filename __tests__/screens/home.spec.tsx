@@ -76,6 +76,25 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
     mockSelfCustodialInfoBulletin(props),
 }))
 
+const mockTwoFactorEnforcement = {
+  tier: 0,
+  hasTwoFactor: false,
+  missingMethod: "email",
+  unverifiedEmail: null,
+  shouldShowNudgeCard: false,
+  shouldShowSettingsBanner: false,
+  dismissNudgeCard: jest.fn(),
+}
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => mockTwoFactorEnforcement,
+}))
+
+type TwoFactorNudgeCardProps = { tier: number; onDismiss: () => void }
+const mockTwoFactorNudgeCard = jest.fn<null, [TwoFactorNudgeCardProps]>(() => null)
+jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
+  TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
+}))
+
 let mockIsFocused = true
 
 // eslint-disable-next-line prefer-const
@@ -2080,6 +2099,47 @@ describe("SelfCustodialInfoBulletin gating", () => {
     await flushEffects()
 
     expect(mockSelfCustodialInfoBulletin).not.toHaveBeenCalled()
+  })
+})
+
+describe("TwoFactorNudgeCard gating", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorEnforcement.shouldShowNudgeCard = false
+    mockTwoFactorEnforcement.tier = 0
+  })
+
+  afterEach(() => {
+    mockTwoFactorEnforcement.shouldShowNudgeCard = false
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("renders the card with the tier and dismissal the hook provides", async () => {
+    mockTwoFactorEnforcement.shouldShowNudgeCard = true
+    mockTwoFactorEnforcement.tier = 1
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorNudgeCard).toHaveBeenCalledWith(
+      expect.objectContaining({
+        tier: 1,
+        onDismiss: mockTwoFactorEnforcement.dismissNudgeCard,
+      }),
+    )
+  })
+
+  it("does not render the card when the hook says it should not show", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorNudgeCard).not.toHaveBeenCalled()
   })
 })
 

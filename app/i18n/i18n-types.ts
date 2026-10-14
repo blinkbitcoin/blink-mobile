@@ -13494,6 +13494,44 @@ type RootTranslation = {
 		 */
 		secureMe: string
 	}
+	TwoFactorEnforcement: {
+		/**
+		 * S​e​t​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+		 */
+		title: string
+		/**
+		 * P​r​o​t​e​c​t​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​f​r​o​m​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​a​c​c​e​s​s​.
+		 */
+		cardDescription: string
+		/**
+		 * S​e​t
+		 */
+		cardCta: string
+		/**
+		 * P​r​o​t​e​c​t​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​f​r​o​m​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​a​c​c​e​s​s​ ​b​y​ ​s​e​t​t​i​n​g​ ​i​t​ ​u​p​.
+		 */
+		settingsDescription: string
+		/**
+		 * S​e​t​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​n​o​w
+		 */
+		setupTitle: string
+		/**
+		 * T​o​ ​p​r​e​v​e​n​t​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​,​ ​a​d​d​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​n​o​w​.
+		 */
+		setupDescription: string
+		/**
+		 * A​d​d​ ​e​m​a​i​l
+		 */
+		addEmail: string
+		/**
+		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		addPhoneNumber: string
+		/**
+		 * S​e​t​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
+		 */
+		setAuthenticator: string
+	}
 	BackupRequired: {
 		/**
 		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​i​r​s​t
@@ -27184,6 +27222,44 @@ export type TranslationFunctions = {
 		 * Secure wallet
 		 */
 		secureMe: () => LocalizedString
+	}
+	TwoFactorEnforcement: {
+		/**
+		 * Set two-factor authentication
+		 */
+		title: () => LocalizedString
+		/**
+		 * Protect your account from unauthorized access.
+		 */
+		cardDescription: () => LocalizedString
+		/**
+		 * Set
+		 */
+		cardCta: () => LocalizedString
+		/**
+		 * Protect your account from unauthorized access by setting it up.
+		 */
+		settingsDescription: () => LocalizedString
+		/**
+		 * Set two-factor authentication now
+		 */
+		setupTitle: () => LocalizedString
+		/**
+		 * To prevent unauthorized access to your account, add two-factor authentication now.
+		 */
+		setupDescription: () => LocalizedString
+		/**
+		 * Add email
+		 */
+		addEmail: () => LocalizedString
+		/**
+		 * Add phone number
+		 */
+		addPhoneNumber: () => LocalizedString
+		/**
+		 * Set authenticator
+		 */
+		setAuthenticator: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

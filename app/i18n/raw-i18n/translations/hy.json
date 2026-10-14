@@ -4045,6 +4045,17 @@
     "modalDescription": "Խիստ խորհուրդ ենք տալիս պահուստավորել ձեր դրամապանակը՝ միջոցների ամբողջական կորուստը կանխելու համար, եթե կորցնեք այս սարքը։",
     "secureMe": "Ապահովել դրամապանակը"
   },
+  "TwoFactorEnforcement": {
+    "title": "Կարգավորեք երկգործոն նույնականացումը",
+    "cardDescription": "Պաշտպանեք ձեր հաշիվը չարտոնված մուտքից։",
+    "cardCta": "Կարգավորել",
+    "settingsDescription": "Պաշտպանեք ձեր հաշիվը չարտոնված մուտքից՝ կարգավորելով այն։",
+    "setupTitle": "Կարգավորեք երկգործոն նույնականացումը հիմա",
+    "setupDescription": "Ձեր հաշիվ չարտոնված մուտքը կանխելու համար հիմա ավելացրեք երկգործոն նույնականացում։",
+    "addEmail": "Ավելացնել էլ.փոստ",
+    "addPhoneNumber": "Ավելացնել հեռախոսահամար",
+    "setAuthenticator": "Կարգավորել նույնականացուցիչը"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4045,6 +4045,17 @@
     "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
   },
+  "TwoFactorEnforcement": {
+    "title": "Állítsd be a kétlépcsős azonosítást",
+    "cardDescription": "Védd meg fiókodat a jogosulatlan hozzáféréstől.",
+    "cardCta": "Beállítás",
+    "settingsDescription": "Védd meg fiókodat a jogosulatlan hozzáféréstől a beállításával.",
+    "setupTitle": "Állítsd be most a kétlépcsős azonosítást",
+    "setupDescription": "A fiókodhoz való jogosulatlan hozzáférés megakadályozásához add hozzá most a kétlépcsős azonosítást.",
+    "addEmail": "Email hozzáadása",
+    "addPhoneNumber": "Telefonszám hozzáadása",
+    "setAuthenticator": "Hitelesítő beállítása"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4045,6 +4045,17 @@
         "modalDescription": "Ti consigliamo vivamente di eseguire il backup del tuo portafoglio per prevenire una perdita totale dei fondi nel caso in cui perdessi questo dispositivo.",
         "secureMe": "Proteggi portafoglio"
     },
+    "TwoFactorEnforcement": {
+        "title": "Imposta l'autenticazione a due fattori",
+        "cardDescription": "Proteggi il tuo account dagli accessi non autorizzati.",
+        "cardCta": "Imposta",
+        "settingsDescription": "Proteggi il tuo account dagli accessi non autorizzati impostandola.",
+        "setupTitle": "Imposta ora l'autenticazione a due fattori",
+        "setupDescription": "Per prevenire accessi non autorizzati al tuo account, aggiungi ora l'autenticazione a due fattori.",
+        "addEmail": "Aggiungi email",
+        "addPhoneNumber": "Aggiungi numero di telefono",
+        "setAuthenticator": "Imposta l'autenticatore"
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
