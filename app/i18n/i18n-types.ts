@@ -13563,6 +13563,51 @@ type RootTranslation = {
 		 * S​e​t​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
 		 */
 		setAuthenticator: string
+		/**
+		 * I​f​ ​y​o​u​ ​d​i​s​m​i​s​s​ ​n​o​w​,​ ​m​a​k​e​ ​s​u​r​e​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​ ​a​s​ ​s​o​o​n​ ​a​s​ ​p​o​s​s​i​b​l​e​.
+		 */
+		modalReminder: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​d​i​s​m​i​s​s​ ​t​h​i​s​ ​t​w​o​ ​m​o​r​e​ ​t​i​m​e​s​.
+		 */
+		dismissTwoMore: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​d​i​s​m​i​s​s​ ​t​h​i​s​ ​o​n​e​ ​m​o​r​e​ ​t​i​m​e​.
+		 */
+		dismissOneMore: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​l​a​s​t​ ​t​i​m​e​ ​y​o​u​ ​c​a​n​ ​d​i​s​m​i​s​s​ ​t​h​i​s​.
+		 */
+		dismissLast: string
+		/**
+		 * S​e​t​ ​n​o​w
+		 */
+		setNow: string
+		/**
+		 * I​ ​d​o​n​'​t​ ​w​a​n​t​ ​t​o
+		 */
+		dontWantTo: string
+		/**
+		 * P​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n
+		 */
+		protectionRequiredTitle: string
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​o​v​e​r​ ​{​a​m​o​u​n​t​}​,​ ​p​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n
+		 * @param {string} amount
+		 */
+		highBalanceTitle: RequiredParams<'amount'>
+		/**
+		 * T​h​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​y​o​u​ ​h​a​v​e​,​ ​t​h​e​ ​m​o​r​e​ ​i​m​p​o​r​t​a​n​t​ ​i​t​ ​i​s​ ​w​i​t​h​ ​b​e​t​t​e​r​ ​s​e​c​u​r​i​t​y​.​ ​P​l​e​a​s​e​ ​a​d​d​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​.
+		 */
+		protectionRequiredBody: string
+		/**
+		 * I​f​ ​y​o​u​ ​d​o​n​'​t​ ​w​a​n​t​ ​t​o​ ​s​e​t​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+		 */
+		nonCustodialTitle: string
+		/**
+		 * T​h​e​ ​o​t​h​e​r​ ​o​p​t​i​o​n​ ​i​s​ ​t​o​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​.​ ​T​h​e​n​ ​y​o​u​ ​a​r​e​ ​r​e​s​p​o​n​s​i​b​l​e​ ​f​o​r​ ​y​o​u​r​ ​o​w​n​ ​f​u​n​d​s​.
+		 */
+		nonCustodialBody: string
 	}
 	BackupRequired: {
 		/**
@@ -27322,6 +27367,50 @@ export type TranslationFunctions = {
 		 * Set authenticator
 		 */
 		setAuthenticator: () => LocalizedString
+		/**
+		 * If you dismiss now, make sure to enable it as soon as possible.
+		 */
+		modalReminder: () => LocalizedString
+		/**
+		 * You can dismiss this two more times.
+		 */
+		dismissTwoMore: () => LocalizedString
+		/**
+		 * You can dismiss this one more time.
+		 */
+		dismissOneMore: () => LocalizedString
+		/**
+		 * This is the last time you can dismiss this.
+		 */
+		dismissLast: () => LocalizedString
+		/**
+		 * Set now
+		 */
+		setNow: () => LocalizedString
+		/**
+		 * I don't want to
+		 */
+		dontWantTo: () => LocalizedString
+		/**
+		 * Please add additional protection
+		 */
+		protectionRequiredTitle: () => LocalizedString
+		/**
+		 * You have over {amount}, please add additional protection
+		 */
+		highBalanceTitle: (arg: { amount: string }) => LocalizedString
+		/**
+		 * The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.
+		 */
+		protectionRequiredBody: () => LocalizedString
+		/**
+		 * If you don't want to set two-factor authentication
+		 */
+		nonCustodialTitle: () => LocalizedString
+		/**
+		 * The other option is to move to non-custodial. Then you are responsible for your own funds.
+		 */
+		nonCustodialBody: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

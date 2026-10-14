@@ -9,7 +9,7 @@ import React, {
 } from "react"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { useSettingsScreenQuery } from "@app/graphql/generated"
+import { useSettingsScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -17,6 +17,7 @@ import {
   TwoFactorEnforcementRecord,
   TwoFactorMethod,
   TwoFactorPrompt,
+  TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import { AccountType } from "@app/types/wallet"
@@ -31,8 +32,13 @@ import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   hasTwoFactor,
   normalizeStoredRecord,
+  remainingDismissals,
   resolveBalanceTier,
   resolveMissingMethod,
+  resolveSessionPrompt,
+  resolveUnmetTier,
+  withDismissal,
+  withTierReached,
 } from "../two-factor-enforcement"
 
 const STORAGE_KEY_PREFIX = "twoFactorEnforcement"
@@ -49,6 +55,23 @@ const INITIAL_STORED: StoredState = {
   record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
 }
 
+/**
+ * What this session has already done for the account, kept in memory on purpose: a
+ * session is a cold launch or a fresh login, and both give this provider a fresh
+ * account to load, while a return from the background gives it nothing new.
+ */
+type SessionState = {
+  accountId: string | null
+  isStartPending: boolean
+  isDismissalCounted: boolean
+}
+
+const INITIAL_SESSION: SessionState = {
+  accountId: null,
+  isStartPending: false,
+  isDismissalCounted: false,
+}
+
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
 
 /** The prompts reported as shown this session, by prompt and tier, for the account
@@ -60,28 +83,51 @@ type ShownPrompts = {
 
 export type TwoFactorEnforcementState = {
   tier: TwoFactorTier
+  /** The highest tier whose condition the account still fails, None once it complies. */
+  unmetTier: TwoFactorTier
   hasTwoFactor: boolean
   missingMethod: TwoFactorMethod
   /** An address the account holds but never verified. It cannot be registered again as
    *  new, so the setup has to send it through re-verification instead. */
   unverifiedEmail: string | null
+  /** The wallet the high-balance copy names, meaningful at the enforced tier. */
+  enforcedCurrency: WalletCurrency
+  remainingDismissals: number
+  /** The prompt the unmet tier calls for at a session start, None once the account
+   *  complies. */
+  requiredPrompt: TwoFactorSessionPrompt
+  /** Whether this session's start is still to be acted on: the account's state has
+   *  been read fresh and no surface has taken the session start yet. */
+  isSessionStartPending: boolean
   shouldShowNudgeCard: boolean
   shouldShowSettingsBanner: boolean
   /** Reports a prompt as shown, once per session for each tier it is shown at: a
    *  surface mounts again on every visit, and that is no new impression. */
   markPromptShown: (prompt: TwoFactorPrompt) => void
   dismissNudgeCard: () => void
+  /** Takes the session start, whether or not it owed a prompt: what the balance does
+   *  later in the session waits for the next one. */
+  consumeSessionStart: () => void
+  /** Counts a prompt of the given tier waved away, at most once per session. */
+  registerDismissal: (tier: TwoFactorTier) => void
 }
 
 const INERT_STATE: TwoFactorEnforcementState = {
   tier: TwoFactorTier.None,
+  unmetTier: TwoFactorTier.None,
   hasTwoFactor: false,
   missingMethod: TwoFactorMethod.Email,
   unverifiedEmail: null,
+  enforcedCurrency: WalletCurrency.Btc,
+  remainingDismissals: 0,
+  requiredPrompt: TwoFactorSessionPrompt.None,
+  isSessionStartPending: false,
   shouldShowNudgeCard: false,
   shouldShowSettingsBanner: false,
   markPromptShown: () => {},
   dismissNudgeCard: () => {},
+  consumeSessionStart: () => {},
+  registerDismissal: () => {},
 }
 
 const TwoFactorEnforcementContext = createContext<TwoFactorEnforcementState>(INERT_STATE)
@@ -105,9 +151,12 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const { activeAccount } = useAccountRegistry()
   const { custodialTwoFactorEnforcementEnabled } = useRemoteConfig()
   const [stored, setStored] = useState<StoredState>(INITIAL_STORED)
-  /** The record as last written, so two writes in the same pass build on each other:
-   *  a dismissal and a tier raise that land together must both survive. */
+  const [session, setSession] = useState<SessionState>(INITIAL_SESSION)
+  /** The record and the session as last written, so two writes in the same pass build
+   *  on each other: a dismissal and a tier raise that land together must both survive,
+   *  and two dismissals that land together must still count as one. */
   const latestStoredRef = useRef<StoredState>(INITIAL_STORED)
+  const latestSessionRef = useRef<SessionState>(INITIAL_SESSION)
   const shownPromptsRef = useRef<ShownPrompts>({
     accountId: null,
     impressions: new Set(),
@@ -124,10 +173,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     isAtLeastLevelOne &&
     !isSelfCustodialAccount
 
-  const { data } = useSettingsScreenQuery({
+  /** Each session reads the balances and the factors from the network: the persisted
+   *  cache can carry a session-old balance, and a prompt decided from it would miss a
+   *  threshold crossed elsewhere. Once answered, the session keeps the cached copy. */
+  const { data, loading: isReadingAccount } = useSettingsScreenQuery({
     skip: !isEnabled,
-    fetchPolicy: "cache-first",
-    nextFetchPolicy: "cache-and-network",
+    fetchPolicy: "cache-and-network",
+    nextFetchPolicy: "cache-first",
   })
   /** Read through the gate, not only the skip: a skipped query may still hand back the
    *  answer it last had, and that answer belongs to a session this one must not act on. */
@@ -139,27 +191,39 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     setStored(next)
   }, [])
 
+  const commitSession = useCallback((next: SessionState) => {
+    latestSessionRef.current = next
+    setSession(next)
+  }, [])
+
   useEffect(() => {
     if (!accountId) {
       commitStored(INITIAL_STORED)
+      commitSession(INITIAL_SESSION)
       return
     }
     let isMounted = true
     /** A record that could not be read is not a missing one: with the account left
      *  unloaded, nothing is prompted and nothing is written, so a transient read
      *  failure cannot replace a dismissal or a reached tier with the defaults. The
-     *  prompts stay off for that launch; the next one reads the record again. */
+     *  prompts stay off for that launch; the next one reads the record again. The
+     *  session is still marked as this account's, with nothing to start, so no
+     *  surface waits on a start that will never be decided. */
     loadJsonOrThrow(storageKeyFor(accountId))
       .then((raw) => {
-        if (isMounted) commitStored({ accountId, record: normalizeStoredRecord(raw) })
+        if (!isMounted) return
+        commitStored({ accountId, record: normalizeStoredRecord(raw) })
+        commitSession({ accountId, isStartPending: true, isDismissalCounted: false })
       })
       .catch((err) => {
-        if (isMounted) reportError("Two-factor enforcement read", err)
+        if (!isMounted) return
+        reportError("Two-factor enforcement read", err)
+        commitSession({ accountId, isStartPending: false, isDismissalCounted: false })
       })
     return () => {
       isMounted = false
     }
-  }, [accountId, commitStored])
+  }, [accountId, commitStored, commitSession])
 
   /** Writes through the record, once this account's is loaded; tells whether it did. */
   const persist = useCallback(
@@ -177,36 +241,50 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   )
 
   const isLoadedForAccount = accountId !== null && stored.accountId === accountId
+  const isSessionForAccount = accountId !== null && session.accountId === accountId
   /** Only this account's record counts: while the next account's is still being read,
    *  the previous one's tier must not leak into the context or the events. */
   const record = isLoadedForAccount ? stored.record : DEFAULT_TWO_FACTOR_ENFORCEMENT
-  const balanceTier = resolveBalanceTier(me?.defaultAccount.wallets)
+  const wallets = me?.defaultAccount.wallets
+  const balanceTier = resolveBalanceTier(wallets)
   const tier = balanceTier > record.highestTier ? balanceTier : record.highestTier
 
   useEffect(() => {
     if (!isLoadedForAccount || balanceTier <= record.highestTier) return
-    persist((current) => ({ ...current, highestTier: balanceTier }))
-  }, [isLoadedForAccount, balanceTier, record.highestTier, persist])
+    persist((current) => withTierReached(current, balanceTier, wallets))
+  }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, persist])
 
   const emailAddress = me?.email?.address ?? null
   const isEmailVerified = Boolean(me?.email?.verified)
+  const hasAuthenticator = Boolean(me?.totpEnabled)
   const factors = {
     hasPhone: Boolean(me?.phone),
     hasVerifiedEmail: isEmailVerified,
-    hasAuthenticator: Boolean(me?.totpEnabled),
+    hasAuthenticator,
   }
   const isTwoFactorSet = hasTwoFactor(factors)
   const missingMethod = resolveMissingMethod(factors)
   const hasUnverifiedEmail = emailAddress !== null && !isEmailVerified
   const unverifiedEmail = hasUnverifiedEmail ? emailAddress : null
 
-  /** Both prompts ask from the suggested tier on and stop once the account holds two
-   *  factors, whatever the tier: the setup they open leads with the authenticator,
-   *  which is what the highest tier asks for. The card alone can be waved away. */
-  const isEnforced = isEnabled && isLoadedForAccount && !isTwoFactorSet
-  const shouldPrompt = isEnforced && tier >= TwoFactorTier.Suggested
-  const shouldShowNudgeCard = shouldPrompt && !record.nudgeCardDismissed
-  const shouldShowSettingsBanner = shouldPrompt
+  const isEnforced = isEnabled && isLoadedForAccount
+  const unmetTier = isEnforced
+    ? resolveUnmetTier({ tier, hasTwoFactor: isTwoFactorSet, hasAuthenticator })
+    : TwoFactorTier.None
+  const dismissalsLeft = remainingDismissals(record, unmetTier)
+  const requiredPrompt = resolveSessionPrompt({ unmetTier, record })
+  const isSessionStartPending =
+    isEnforced && isSessionForAccount && session.isStartPending && !isReadingAccount
+
+  /** The card belongs to the suggested tier alone: from the recommended tier on, the
+   *  session prompt is the one asking, and the home never stacks two. The banner asks at
+   *  every tier until the account holds two factors, since the setup it opens leads with
+   *  the authenticator, which is what the highest tier asks for; an account that already
+   *  holds two factors is asked for its authenticator by the session prompt alone. */
+  const shouldShowNudgeCard =
+    unmetTier === TwoFactorTier.Suggested && !record.nudgeCardDismissed
+  const isUnmet = unmetTier !== TwoFactorTier.None
+  const shouldShowSettingsBanner = isUnmet && !isTwoFactorSet
 
   /** Another account's impressions start afresh; the same account coming back through
    *  a gate that closed and opened again within the session keeps its own. With the
@@ -233,26 +311,59 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.HomeCard })
   }, [tier, persist])
 
+  const consumeSessionStart = useCallback(() => {
+    commitSession({ ...latestSessionRef.current, isStartPending: false })
+  }, [commitSession])
+
+  const registerDismissal = useCallback(
+    (promptTier: TwoFactorTier) => {
+      const latest = latestSessionRef.current
+      const isCountable =
+        accountId !== null &&
+        latest.accountId === accountId &&
+        !latest.isDismissalCounted &&
+        promptTier >= TwoFactorTier.Recommended
+      if (!isCountable) return
+      persist((current) => withDismissal(current, promptTier))
+      commitSession({ ...latest, isDismissalCounted: true })
+    },
+    [accountId, persist, commitSession],
+  )
+
   const contextValue = useMemo(
     () => ({
       tier,
+      unmetTier,
       hasTwoFactor: isTwoFactorSet,
       missingMethod,
       unverifiedEmail,
+      enforcedCurrency: record.enforcedCurrency,
+      remainingDismissals: dismissalsLeft,
+      requiredPrompt,
+      isSessionStartPending,
       shouldShowNudgeCard,
       shouldShowSettingsBanner,
       markPromptShown,
       dismissNudgeCard,
+      consumeSessionStart,
+      registerDismissal,
     }),
     [
       tier,
+      unmetTier,
       isTwoFactorSet,
       missingMethod,
       unverifiedEmail,
+      record.enforcedCurrency,
+      dismissalsLeft,
+      requiredPrompt,
+      isSessionStartPending,
       shouldShowNudgeCard,
       shouldShowSettingsBanner,
       markPromptShown,
       dismissNudgeCard,
+      consumeSessionStart,
+      registerDismissal,
     ],
   )
 

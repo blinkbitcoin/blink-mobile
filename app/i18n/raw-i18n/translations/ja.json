@@ -4063,7 +4063,18 @@
         "setupDescription": "アカウントへの不正アクセスを防ぐため、今すぐ2要素認証を追加してください。",
         "addEmail": "メールを追加",
         "addPhoneNumber": "電話番号を追加",
-        "setAuthenticator": "認証アプリを設定"
+        "setAuthenticator": "認証アプリを設定",
+        "modalReminder": "今閉じる場合は、できるだけ早く有効にしてください。",
+        "dismissTwoMore": "あと2回閉じることができます。",
+        "dismissOneMore": "あと1回閉じることができます。",
+        "dismissLast": "これを閉じられるのはこれが最後です。",
+        "setNow": "今すぐ設定",
+        "dontWantTo": "設定しない",
+        "protectionRequiredTitle": "追加の保護を設定してください",
+        "highBalanceTitle": "{amount}以上をお持ちです。追加の保護を設定してください",
+        "protectionRequiredBody": "資金が多いほど、より高いセキュリティが重要になります。Blinkを引き続き利用するには認証アプリを追加してください。",
+        "nonCustodialTitle": "2要素認証を設定しない場合",
+        "nonCustodialBody": "もう一つの選択肢はノンカストディアルへの移行です。その場合、資金の管理はご自身の責任となります。"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

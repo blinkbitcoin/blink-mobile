@@ -4063,7 +4063,18 @@
         "setupDescription": "Pour empêcher tout accès non autorisé à votre compte, ajoutez l'authentification à deux facteurs maintenant.",
         "addEmail": "Ajouter un e-mail",
         "addPhoneNumber": "Ajouter un numéro de téléphone",
-        "setAuthenticator": "Configurer l'authentificateur"
+        "setAuthenticator": "Configurer l'authentificateur",
+        "modalReminder": "Si vous ignorez maintenant, pensez à l'activer dès que possible.",
+        "dismissTwoMore": "Vous pouvez ignorer ceci encore deux fois.",
+        "dismissOneMore": "Vous pouvez ignorer ceci encore une fois.",
+        "dismissLast": "C'est la dernière fois que vous pouvez ignorer ceci.",
+        "setNow": "Configurer maintenant",
+        "dontWantTo": "Je ne veux pas",
+        "protectionRequiredTitle": "Veuillez ajouter une protection supplémentaire",
+        "highBalanceTitle": "Vous avez plus de {amount}, veuillez ajouter une protection supplémentaire",
+        "protectionRequiredBody": "Plus vous avez de fonds, plus une meilleure sécurité est importante. Veuillez ajouter un authentificateur pour continuer à utiliser Blink.",
+        "nonCustodialTitle": "Si vous ne voulez pas configurer l'authentification à deux facteurs",
+        "nonCustodialBody": "L'autre option est de passer en non-custodial. Vous êtes alors responsable de vos propres fonds."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

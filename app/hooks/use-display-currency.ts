@@ -48,7 +48,7 @@ export type CurrencyInfo = {
   showFractionDigits: boolean
 }
 
-const usdDisplayCurrency = {
+export const usdDisplayCurrency = {
   symbol: "$",
   id: "USD",
   fractionDigits: 2,
@@ -76,7 +76,7 @@ const numberFormatterFor = (fractionDigits: number): Intl.NumberFormat => {
   return formatter
 }
 
-const formatCurrencyHelper = ({
+export const formatCurrencyHelper = ({
   amountInMajorUnits,
   symbol,
   isApproximate,

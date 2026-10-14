@@ -17,6 +17,7 @@ import {
   logRequestAuthCode,
   logStartCaptcha,
   logToastShown,
+  logTwoFactorNonCustodialChosen,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
   logTwoFactorSetupStarted,
@@ -302,6 +303,14 @@ describe("analytics helpers", () => {
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_started", {
         tier: 3,
         method: "authenticator",
+      })
+    })
+
+    it("emits 'two_factor_non_custodial_chosen' with the tier", () => {
+      logTwoFactorNonCustodialChosen({ tier: 2 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_non_custodial_chosen", {
+        tier: 2,
       })
     })
   })
