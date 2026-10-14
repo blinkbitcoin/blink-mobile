@@ -5,6 +5,7 @@ import { Pressable, View } from "react-native"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
+import { fonts } from "@app/rne-theme/fonts"
 
 const KEY_ROW_PREFIX = "row-"
 const KEY_TEST_ID_PREFIX = "Key"
@@ -143,9 +144,9 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
   },
   keyText: {
-    fontSize: 26,
-    fontWeight: "700",
-    lineHeight: 30,
+    fontFamily: fonts.bold,
+    fontSize: 28,
+    lineHeight: 32,
     textAlign: "center",
   },
   backspaceIcon: {
