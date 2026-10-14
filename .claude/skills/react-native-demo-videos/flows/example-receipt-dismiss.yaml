@@ -1,0 +1,46 @@
+# Worked example: a payment receipt that should disappear after a long trip
+# away from the app.
+#
+# Read this for the shape, not the taps. Three things generalise:
+#   - launchApp with clearState + arguments at the top, so a re-run starts
+#     where the last one did. clearState wipes the app container INCLUDING the
+#     persisted RCT_jsLocation Metro redirect, so the redirect must travel as a
+#     launch argument — on EVERY launchApp in the flow, because launch
+#     arguments are per-launch (record-flow.sh injects ${DEMO_PORT} via -e)
+#   - appId comes from ${APP_ID} (injected by record-flow.sh), never hardcoded
+#   - waitForAnimationToEnd between steps, so the recording never catches a
+#     half-finished transition
+appId: ${APP_ID}
+---
+- launchApp:
+    clearState: true
+    arguments:
+      RCT_jsLocation: "localhost:${DEMO_PORT}"
+- waitForAnimationToEnd:
+    timeout: 10000
+
+# The receipt is reached via a TEMP initialRouteName rather than by paying —
+# see the simulator skill. Give the viewer a beat to read it.
+- assertVisible: "Success Text"
+- waitForAnimationToEnd:
+    timeout: 3000
+
+# The trip away. Backgrounding is what the fix keys on.
+- pressKey: Home
+- waitForAnimationToEnd:
+    timeout: 2000
+
+# 30s+ is what makes the trip stale. Long waits are why demos need a size
+# budget — consider trimming this in post rather than recording the full wait.
+- extendedWaitUntil:
+    notVisible: "Success Text"
+    timeout: 35000
+
+- launchApp:
+    arguments:
+      RCT_jsLocation: "localhost:${DEMO_PORT}"
+- waitForAnimationToEnd:
+    timeout: 5000
+
+# The payoff: Home, not a stale receipt.
+- assertNotVisible: "Success Text"

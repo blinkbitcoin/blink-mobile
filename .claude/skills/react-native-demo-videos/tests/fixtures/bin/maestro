@@ -1,0 +1,36 @@
+#!/bin/bash
+# Fake `maestro` for the tests.
+#
+# Records every invocation (so the suite can assert --udid was pinned and that
+# the warm-up ran before the recorder started) and exits with whatever
+# $FAKE_MAESTRO_RC says, so a failing flow can be simulated.
+
+set -uo pipefail
+
+ARGS_LOG="${FAKE_ARGS_LOG:-/dev/null}"
+echo "maestro $*" >> "$ARGS_LOG"
+
+case "${1:-}" in
+  test)
+    UDID=""
+    FLOW=""
+    shift
+    while [ $# -gt 0 ]; do
+      case "$1" in
+        --udid|--device) UDID="${2:-}"; shift 2 ;;
+        -e|--env) shift 2 ;;
+        -*) shift ;;
+        *) FLOW="$1"; shift ;;
+      esac
+    done
+    [ -n "$UDID" ] || { echo "fake maestro: refusing to run without --udid" >&2; exit 70; }
+    [ -n "$FLOW" ] && [ -f "$FLOW" ] || { echo "fake maestro: flow not found: $FLOW" >&2; exit 1; }
+
+    case "$FLOW" in
+      *_warmup.yaml) exit "${FAKE_WARMUP_RC:-0}" ;;
+      *) sleep "${FAKE_FLOW_SECONDS:-0.3}"; exit "${FAKE_MAESTRO_RC:-0}" ;;
+    esac
+    ;;
+  --version) echo "2.6.1" ;;
+  *) echo "fake maestro: unsupported subcommand '${1:-}'" >&2; exit 64 ;;
+esac
