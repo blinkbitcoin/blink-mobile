@@ -43,6 +43,7 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
+import { CardInvestmentBulletin } from "@app/components/card-investment-bulletin"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
 import { useHideAmount } from "@app/graphql/hide-amount-context"
@@ -74,6 +75,8 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { useReconcileInvestmentPayment } from "@app/screens/card-screen/onboarding/investment-flow/investment-payment-lookup"
+import { useCardInvestmentBulletin } from "@app/screens/card-screen/onboarding/investment-flow/use-card-investment-bulletin"
 import { getErrorMessages } from "@app/graphql/utils"
 import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
@@ -368,6 +371,16 @@ export const HomeScreen: React.FC = () => {
   /** Fetched once here and shared with the UnclaimedDepositBanner below, so the
    *  pending row and that banner can never disagree about the same deposits. */
   const { deposits, refetch: refetchPendingDeposits } = usePendingDeposits()
+
+  /** Deposits on their way into the custodial account: the investment bulletin waits on
+   *  one that would cover the investment instead of asking for a deposit the investor
+   *  already made. Only custodial, since the investment is paid from a custodial balance
+   *  and the bulletin exists for none other. */
+  const cardInvestmentBulletin = useCardInvestmentBulletin({
+    pendingReceives: pendingIncomingTransactions,
+  })
+  /** A payment the record only knows as on its way is asked about, once per visit. */
+  useReconcileInvestmentPayment()
 
   /** Pending deposits stay visible under the balance until confirmed —
    *  unlike the unseen-tx badge sharing that slot, which auto-dismisses
@@ -987,6 +1000,13 @@ export const HomeScreen: React.FC = () => {
         )}
         {shouldShowSelfCustodialInfoBulletin && (
           <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
+        {cardInvestmentBulletin && (
+          <CardInvestmentBulletin
+            kind={cardInvestmentBulletin.kind}
+            progress={cardInvestmentBulletin.progress}
+            onDismiss={cardInvestmentBulletin.dismiss}
+          />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />
