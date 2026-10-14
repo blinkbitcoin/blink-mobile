@@ -1,16 +1,13 @@
 import { useCallback, useEffect, useState } from "react"
 
-import { useIsFocused, useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
+import { useIsFocused } from "@react-navigation/native"
 
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TwoFactorSessionPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 type TwoFactorSessionPromptOptions = {
   /** Another home modal is up or may still arrive: the session start waits for it,
-   *  since two native modals cannot present at once and a pushed screen must not end
-   *  up under a floating one. */
+   *  since two native modals cannot present at once. */
   isBlocked: boolean
 }
 
@@ -34,12 +31,11 @@ const CLOSED: ModalState = { isOpen: false, tier: TwoFactorTier.None }
  * never land on top of a payment or a scan. The start is taken whether or not it owes
  * a prompt, so a balance that crosses a threshold later in the session waits for the
  * next one. The countdown modal is the home's own to open and close; the full-screen
- * prompt is a route.
+ * prompt never reaches here, since it stands in for the home until its start is taken.
  */
 export const useTwoFactorSessionPrompt = ({
   isBlocked,
 }: TwoFactorSessionPromptOptions): TwoFactorSessionPromptState => {
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isFocused = useIsFocused()
   const { isSessionStartPending, requiredPrompt, unmetTier, consumeSessionStart } =
     useTwoFactorEnforcement()
@@ -52,12 +48,8 @@ export const useTwoFactorSessionPrompt = ({
     consumeSessionStart()
     if (requiredPrompt === TwoFactorSessionPrompt.RequiredModal) {
       setModal({ isOpen: true, tier: unmetTier })
-      return
     }
-    if (requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired) {
-      navigation.navigate("twoFactorProtectionRequired")
-    }
-  }, [isStartDue, requiredPrompt, unmetTier, consumeSessionStart, navigation])
+  }, [isStartDue, requiredPrompt, unmetTier, consumeSessionStart])
 
   /** The modal was raised from the account's state as read at session start; once a
    *  fresher read says it no longer applies, the modal has nothing left to ask. */

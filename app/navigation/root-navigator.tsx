@@ -183,6 +183,7 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
@@ -329,11 +330,6 @@ const twoFactorEnforcementScreens = () => (
         headerLeft: headerBackControl({ canGoBack: false }),
         gestureEnabled: false,
       }}
-    />
-    <RootNavigator.Screen
-      name="twoFactorProtectionRequired"
-      component={TwoFactorProtectionRequiredScreen}
-      options={{ headerShown: false, gestureEnabled: false }}
     />
     <RootNavigator.Screen
       name="twoFactorNonCustodial"
@@ -1257,7 +1253,14 @@ export const PrimaryNavigator = () => {
   useResumeCompletedMigration()
 
   const migrationBlocker = useMigrationBlocker()
+  const twoFactor = useTwoFactorEnforcement()
   if (migrationBlocker.isVisible) return <MigrationGate />
+
+  /** The two-factor prompt that blocks stands in for the home the way the armed gate
+   *  does, so the home is never seen first; the frames its record read takes stay
+   *  blank for the same reason. The wind-down gate above keeps its precedence. */
+  if (twoFactor.isPreparingSessionStart) return null
+  if (twoFactor.isProtectionGateActive) return <TwoFactorProtectionRequiredScreen />
 
   return (
     <Tab.Navigator
