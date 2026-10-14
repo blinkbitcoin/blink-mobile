@@ -29,12 +29,19 @@ const toWindDown = (node: WindDownQuery["windDown"]): WindDown | null => {
   }
 }
 
+export type WindDownRead = {
+  windDown: WindDown | null
+  /** The server has not answered yet, so a null wind-down is not yet an answer: a
+   *  surface that must yield to the wind-down waits on this rather than on the null. */
+  isPending: boolean
+}
+
 /**
  * The account's server-authoritative wind-down state (top-level `Query.windDown`). Null
  * means the wind-down does not affect this account, so every wind-down surface stays off;
  * the status is server-derived and the client never computes a phase from the dates.
  */
-export const useWindDownStatus = (): WindDown | null => {
+export const useWindDownStatus = (): WindDownRead => {
   const isAuthed = useIsAuthed()
 
   /**
@@ -44,7 +51,7 @@ export const useWindDownStatus = (): WindDown | null => {
    * PRE_CUTOFF). Skipping the cache entirely keeps the phase tied to the active account and
    * never writes account-scoped data under the shared key.
    */
-  const { data } = useWindDownQuery({ skip: !isAuthed, fetchPolicy: "no-cache" })
+  const { data, loading } = useWindDownQuery({ skip: !isAuthed, fetchPolicy: "no-cache" })
 
-  return toWindDown(data?.windDown)
+  return { windDown: toWindDown(data?.windDown), isPending: loading }
 }

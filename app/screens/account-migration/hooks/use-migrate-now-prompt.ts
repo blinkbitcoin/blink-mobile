@@ -1,11 +1,14 @@
 import { WindDownStatus } from "@app/types/wind-down"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
-import { useCustodialWindDown } from "./use-custodial-wind-down"
+import { useCustodialWindDownRead } from "./use-custodial-wind-down"
 import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
 
 type MigrateNowPrompt = {
   isVisible: boolean
+  /** The wind-down has not answered yet, so the prompt may still turn out to be due:
+   *  a nudge that must yield to it waits on this rather than on `isVisible` alone. */
+  isPending: boolean
   canReopen: boolean
   deadlineTimestamp: number
   timezone: string | undefined
@@ -21,7 +24,7 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
     useAccountSessionDismissal()
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
 
-  const windDown = useCustodialWindDown()
+  const { windDown, isPending } = useCustodialWindDownRead()
 
   const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
 
@@ -32,6 +35,7 @@ export const useMigrateNowPrompt = (): MigrateNowPrompt => {
   /** The deadline fields are display data for the modal, only read while visible. */
   return {
     isVisible: canReopen && !isDismissedForSession,
+    isPending,
     canReopen,
     deadlineTimestamp: windDown?.finalDeadline ?? 0,
     timezone: windDown?.timezone,

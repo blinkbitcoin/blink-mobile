@@ -1,17 +1,33 @@
 import {
+  AUTHENTICATOR_THRESHOLD,
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   hasTwoFactor,
   normalizeStoredRecord,
+  remainingDismissals,
   resolveBalanceTier,
+  resolveHighBalanceCurrency,
   resolveMissingMethod,
+  resolveSessionPrompt,
+  resolveUnmetTier,
+  withDismissal,
+  withTierReached,
 } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
-import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
+import {
+  TwoFactorEnforcementRecord,
+  TwoFactorMethod,
+  TwoFactorSessionPrompt,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 
 const walletsWith = (sats: number, usdCents: number) => [
   { id: "btc-wallet", walletCurrency: WalletCurrency.Btc, balance: sats },
   { id: "usd-wallet", walletCurrency: WalletCurrency.Usd, balance: usdCents },
 ]
+
+const recordWith = (
+  overrides: Partial<TwoFactorEnforcementRecord>,
+): TwoFactorEnforcementRecord => ({ ...DEFAULT_TWO_FACTOR_ENFORCEMENT, ...overrides })
 
 describe("resolveBalanceTier", () => {
   it("is none without wallets", () => {
@@ -51,6 +67,57 @@ describe("resolveBalanceTier", () => {
     expect(resolveBalanceTier(walletsWith(50_000, 500_000))).toBe(
       TwoFactorTier.Authenticator,
     )
+  })
+
+  it("exposes the authenticator threshold the copy quotes", () => {
+    expect(AUTHENTICATOR_THRESHOLD).toEqual({ sats: 5_000_000, usdCents: 500_000 })
+  })
+})
+
+describe("resolveHighBalanceCurrency", () => {
+  it("names sats when the bitcoin wallet crossed the threshold", () => {
+    expect(resolveHighBalanceCurrency(walletsWith(5_000_000, 0))).toBe(WalletCurrency.Btc)
+  })
+
+  it("names dollars when only the dollar wallet crossed it", () => {
+    expect(resolveHighBalanceCurrency(walletsWith(4_999_999, 500_000))).toBe(
+      WalletCurrency.Usd,
+    )
+  })
+
+  it("names sats when both wallets crossed it", () => {
+    expect(resolveHighBalanceCurrency(walletsWith(5_000_000, 500_000))).toBe(
+      WalletCurrency.Btc,
+    )
+  })
+
+  it("falls back to sats when neither has", () => {
+    expect(resolveHighBalanceCurrency(walletsWith(0, 0))).toBe(WalletCurrency.Btc)
+    expect(resolveHighBalanceCurrency(undefined)).toBe(WalletCurrency.Btc)
+  })
+})
+
+describe("withTierReached", () => {
+  it("raises the tier and leaves the named wallet alone below the authenticator tier", () => {
+    const record = withTierReached(
+      recordWith({ highBalanceCurrency: WalletCurrency.Usd }),
+      TwoFactorTier.Required,
+      walletsWith(500_000, 0),
+    )
+
+    expect(record.highestTier).toBe(TwoFactorTier.Required)
+    expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
+  })
+
+  it("remembers the wallet that crossed into the authenticator tier", () => {
+    const record = withTierReached(
+      DEFAULT_TWO_FACTOR_ENFORCEMENT,
+      TwoFactorTier.Authenticator,
+      walletsWith(0, 500_000),
+    )
+
+    expect(record.highestTier).toBe(TwoFactorTier.Authenticator)
+    expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
   })
 })
 
@@ -109,24 +176,208 @@ describe("resolveMissingMethod", () => {
   })
 })
 
+describe("resolveUnmetTier", () => {
+  it("is none below the nudge tier", () => {
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.None,
+        hasTwoFactor: false,
+        hasAuthenticator: false,
+      }),
+    ).toBe(TwoFactorTier.None)
+  })
+
+  it("is the reached tier while the account has no two factors", () => {
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.Nudge,
+        hasTwoFactor: false,
+        hasAuthenticator: false,
+      }),
+    ).toBe(TwoFactorTier.Nudge)
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.Required,
+        hasTwoFactor: false,
+        hasAuthenticator: false,
+      }),
+    ).toBe(TwoFactorTier.Required)
+  })
+
+  it("is none once two factors satisfy the nudge and required tiers", () => {
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.Required,
+        hasTwoFactor: true,
+        hasAuthenticator: false,
+      }),
+    ).toBe(TwoFactorTier.None)
+  })
+
+  it("asks for an authenticator at the authenticator tier even with two factors", () => {
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.Authenticator,
+        hasTwoFactor: true,
+        hasAuthenticator: false,
+      }),
+    ).toBe(TwoFactorTier.Authenticator)
+  })
+
+  it("is none at the authenticator tier once an authenticator joins a second factor", () => {
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.Authenticator,
+        hasTwoFactor: true,
+        hasAuthenticator: true,
+      }),
+    ).toBe(TwoFactorTier.None)
+  })
+
+  it("still asks for a second factor when the authenticator is the only one", () => {
+    expect(
+      resolveUnmetTier({
+        tier: TwoFactorTier.Authenticator,
+        hasTwoFactor: false,
+        hasAuthenticator: true,
+      }),
+    ).toBe(TwoFactorTier.Required)
+  })
+})
+
+describe("dismissals", () => {
+  it("allows three per tier", () => {
+    expect(
+      remainingDismissals(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Required),
+    ).toBe(3)
+    expect(
+      remainingDismissals(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Authenticator),
+    ).toBe(3)
+  })
+
+  it("counts the required tier's dismissals on their own counter", () => {
+    const record = withDismissal(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Required)
+
+    expect(record.requiredDismissals).toBe(1)
+    expect(record.authenticatorDismissals).toBe(0)
+    expect(remainingDismissals(record, TwoFactorTier.Required)).toBe(2)
+    expect(remainingDismissals(record, TwoFactorTier.Authenticator)).toBe(3)
+  })
+
+  it("counts the authenticator tier's dismissals on their own counter", () => {
+    const record = withDismissal(
+      DEFAULT_TWO_FACTOR_ENFORCEMENT,
+      TwoFactorTier.Authenticator,
+    )
+
+    expect(record.authenticatorDismissals).toBe(1)
+    expect(record.requiredDismissals).toBe(0)
+  })
+
+  it("leaves the record untouched for tiers that never prompt at session start", () => {
+    expect(withDismissal(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Nudge)).toBe(
+      DEFAULT_TWO_FACTOR_ENFORCEMENT,
+    )
+    expect(withDismissal(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.None)).toBe(
+      DEFAULT_TWO_FACTOR_ENFORCEMENT,
+    )
+  })
+
+  it("never reports fewer than zero remaining", () => {
+    expect(
+      remainingDismissals(recordWith({ requiredDismissals: 5 }), TwoFactorTier.Required),
+    ).toBe(0)
+  })
+})
+
+describe("resolveSessionPrompt", () => {
+  it("owes nothing below the required tier", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Nudge,
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+      }),
+    ).toBe(TwoFactorSessionPrompt.None)
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.None,
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+      }),
+    ).toBe(TwoFactorSessionPrompt.None)
+  })
+
+  it("owes the modal at the required tier while dismissals remain", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Required,
+        record: recordWith({ requiredDismissals: 2 }),
+      }),
+    ).toBe(TwoFactorSessionPrompt.RequiredModal)
+  })
+
+  it("owes the protection screen at the required tier once dismissals are spent", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Required,
+        record: recordWith({ requiredDismissals: 3 }),
+      }),
+    ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
+  })
+
+  it("owes the protection screen at the authenticator tier from the first session", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Authenticator,
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+      }),
+    ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
+  })
+})
+
 describe("normalizeStoredRecord", () => {
   it("falls back to the default without a stored record", () => {
     expect(normalizeStoredRecord(null)).toEqual(DEFAULT_TWO_FACTOR_ENFORCEMENT)
   })
 
   it("keeps a valid stored record", () => {
+    const record = {
+      highestTier: TwoFactorTier.Authenticator,
+      highBalanceCurrency: WalletCurrency.Usd,
+      nudgeCardDismissed: true,
+      requiredDismissals: 2,
+      authenticatorDismissals: 1,
+    }
+
+    expect(normalizeStoredRecord(record)).toEqual(record)
+  })
+
+  it("starts the fields a record from before they existed at their defaults", () => {
     expect(
       normalizeStoredRecord({
         highestTier: TwoFactorTier.Required,
         nudgeCardDismissed: true,
       }),
-    ).toEqual({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: true })
+    ).toEqual(
+      recordWith({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: true }),
+    )
   })
 
   it("drops a tier this build does not know", () => {
     expect(normalizeStoredRecord({ highestTier: 7 })).toEqual(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
     )
+  })
+
+  it("drops a wallet currency this build does not know", () => {
+    expect(
+      normalizeStoredRecord({ highBalanceCurrency: "EUR" as WalletCurrency }),
+    ).toEqual(DEFAULT_TWO_FACTOR_ENFORCEMENT)
+  })
+
+  it("drops a counter that is not a whole, non-negative number", () => {
+    expect(
+      normalizeStoredRecord({ requiredDismissals: -1, authenticatorDismissals: 1.5 }),
+    ).toEqual(DEFAULT_TWO_FACTOR_ENFORCEMENT)
   })
 
   it("only reads a dismissal that is exactly true", () => {
