@@ -4054,6 +4054,17 @@
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
     "secureMe": "Portemonnee beveiligen"
   },
+  "TwoFactorEnforcement": {
+    "title": "Stel tweefactorauthenticatie in",
+    "cardDescription": "Bescherm je account tegen ongeautoriseerde toegang.",
+    "cardCta": "Instellen",
+    "settingsDescription": "Bescherm je account tegen ongeautoriseerde toegang door deze in te stellen.",
+    "setupTitle": "Stel nu tweefactorauthenticatie in",
+    "setupDescription": "Voeg nu tweefactorauthenticatie toe om ongeautoriseerde toegang tot je account te voorkomen.",
+    "addEmail": "E-mail toevoegen",
+    "addPhoneNumber": "Telefoonnummer toevoegen",
+    "setAuthenticator": "Authenticator instellen"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

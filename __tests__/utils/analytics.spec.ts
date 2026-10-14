@@ -17,6 +17,9 @@ import {
   logRequestAuthCode,
   logStartCaptcha,
   logToastShown,
+  logTwoFactorPromptDismissed,
+  logTwoFactorPromptShown,
+  logTwoFactorSetupStarted,
   logUpgradeLoginAttempt,
   logUpgradeLoginSuccess,
   logValidateAuthCodeFailure,
@@ -270,6 +273,35 @@ describe("analytics helpers", () => {
         message: "raw string",
         type: "warning",
         is_translated: false,
+      })
+    })
+  })
+
+  describe("two-factor enforcement events", () => {
+    it("emits 'two_factor_prompt_shown' with tier and prompt", () => {
+      logTwoFactorPromptShown({ tier: 1, prompt: "home_card" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_shown", {
+        tier: 1,
+        prompt: "home_card",
+      })
+    })
+
+    it("emits 'two_factor_prompt_dismissed' with tier and prompt", () => {
+      logTwoFactorPromptDismissed({ tier: 2, prompt: "settings_banner" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
+        tier: 2,
+        prompt: "settings_banner",
+      })
+    })
+
+    it("emits 'two_factor_setup_started' with tier and method", () => {
+      logTwoFactorSetupStarted({ tier: 3, method: "authenticator" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_started", {
+        tier: 3,
+        method: "authenticator",
       })
     })
   })

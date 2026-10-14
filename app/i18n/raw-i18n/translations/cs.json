@@ -4054,6 +4054,17 @@
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
     "secureMe": "Zabezpečit peněženku"
   },
+  "TwoFactorEnforcement": {
+    "title": "Nastavte dvoufaktorové ověření",
+    "cardDescription": "Chraňte svůj účet před neoprávněným přístupem.",
+    "cardCta": "Nastavit",
+    "settingsDescription": "Chraňte svůj účet před neoprávněným přístupem jeho nastavením.",
+    "setupTitle": "Nastavte dvoufaktorové ověření nyní",
+    "setupDescription": "Abyste zabránili neoprávněnému přístupu ke svému účtu, přidejte nyní dvoufaktorové ověření.",
+    "addEmail": "Přidat e-mail",
+    "addPhoneNumber": "Přidat telefonní číslo",
+    "setAuthenticator": "Nastavit autentikátor"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4263,6 +4263,18 @@ const en: BaseTranslation = {
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
   },
+  TwoFactorEnforcement: {
+    title: "Set two-factor authentication",
+    cardDescription: "Protect your account from unauthorized access.",
+    cardCta: "Set",
+    settingsDescription: "Protect your account from unauthorized access by setting it up.",
+    setupTitle: "Set two-factor authentication now",
+    setupDescription:
+      "To prevent unauthorized access to your account, add two-factor authentication now.",
+    addEmail: "Add email",
+    addPhoneNumber: "Add phone number",
+    setAuthenticator: "Set authenticator",
+  },
   BackupRequired: {
     modalTitle: "Back up your wallet first",
     modalDescription:

@@ -4054,6 +4054,17 @@
     "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
     "secureMe": "Securizare portofel"
   },
+  "TwoFactorEnforcement": {
+    "title": "Configurează autentificarea cu doi factori",
+    "cardDescription": "Protejează-ți contul împotriva accesului neautorizat.",
+    "cardCta": "Configurează",
+    "settingsDescription": "Protejează-ți contul împotriva accesului neautorizat configurând-o.",
+    "setupTitle": "Configurează acum autentificarea cu doi factori",
+    "setupDescription": "Pentru a preveni accesul neautorizat la contul tău, adaugă acum autentificarea cu doi factori.",
+    "addEmail": "Adaugă email",
+    "addPhoneNumber": "Adaugă număr de telefon",
+    "setAuthenticator": "Configurează autentificatorul"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
