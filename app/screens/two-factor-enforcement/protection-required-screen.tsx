@@ -73,13 +73,8 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const {
-    unmetTier,
-    remainingDismissals,
-    enforcedCurrency,
-    registerDismissal,
-    consumeSessionStart,
-  } = useTwoFactorEnforcement()
+  const { unmetTier, remainingDismissals, enforcedCurrency, registerDismissal } =
+    useTwoFactorEnforcement()
   const { promptReverification, spinner: isReverifying } = useEmailReverification({
     returnTo: GATE_RETURN_ROUTE,
   })
@@ -97,16 +92,15 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     })
   }, [promptTier])
 
-  /** Charging the dismissal and taking the session start is what lets the home in: the
-   *  screen stands in for the home only while that start is still owed. */
+  /** Charging the dismissal is what lets the home in: it takes the session start, and
+   *  the screen stands in for the home only while that start is still owed. */
   const handleDismiss = useCallback(() => {
     logTwoFactorPromptDismissed({
       tier: promptTier,
       prompt: TwoFactorPrompt.ProtectionRequiredScreen,
     })
     registerDismissal(promptTier)
-    consumeSessionStart()
-  }, [promptTier, registerDismissal, consumeSessionStart])
+  }, [promptTier, registerDismissal])
 
   /** The hardware back is the X while there is one, and nothing at all once there is
    *  none: a blocking screen swallows it rather than letting the app go. */

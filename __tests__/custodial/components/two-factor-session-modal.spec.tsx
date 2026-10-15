@@ -99,14 +99,12 @@ type RenderOptions = {
   isVisible?: boolean
   remainingDismissals?: number
   onDismiss?: () => void
-  onLeave?: () => void
 }
 
 const renderModal = ({
   isVisible = true,
   remainingDismissals = 3,
   onDismiss = jest.fn(),
-  onLeave = jest.fn(),
 }: RenderOptions = {}) =>
   render(
     <TwoFactorSessionModal
@@ -114,7 +112,6 @@ const renderModal = ({
       tier={TwoFactorTier.Recommended}
       remainingDismissals={remainingDismissals}
       onDismiss={onDismiss}
-      onLeave={onLeave}
     />,
   )
 
@@ -135,21 +132,10 @@ describe("TwoFactorSessionModal", () => {
     ).toBeTruthy()
   })
 
-  it("stays off screen and unlogged while hidden", () => {
+  it("stays off screen while hidden", () => {
     const { queryByTestId } = renderModal({ isVisible: false })
 
     expect(queryByTestId("modal")).toBeNull()
-    expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
-  })
-
-  it("logs the prompt as shown for its tier", () => {
-    renderModal()
-
-    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
-    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      prompt: "session_modal",
-    })
   })
 
   const countdownCases: ReadonlyArray<readonly [number, string]> = [
@@ -169,14 +155,12 @@ describe("TwoFactorSessionModal", () => {
 
   it("counts the X as the dismissal and logs it", () => {
     const onDismiss = jest.fn()
-    const onLeave = jest.fn()
     // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getByType } = renderModal({ onDismiss, onLeave })
+    const { UNSAFE_getByType } = renderModal({ onDismiss })
 
     fireEvent.press(UNSAFE_getByType(TouchableOpacity))
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
-    expect(onLeave).not.toHaveBeenCalled()
     expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
       tier: TwoFactorTier.Recommended,
       prompt: "session_modal",
@@ -186,25 +170,49 @@ describe("TwoFactorSessionModal", () => {
 
   it("makes way for the setup from Set now without a dismissal", () => {
     const onDismiss = jest.fn()
-    const onLeave = jest.fn()
-    const { getByTestId } = renderModal({ onDismiss, onLeave })
+    const { getByTestId } = renderModal({ onDismiss })
 
     fireEvent.press(getByTestId("primary-button"))
 
-    expect(onLeave).toHaveBeenCalledTimes(1)
     expect(onDismiss).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
   })
 
   it("makes way for the non-custodial screen from I don't want to", () => {
     const onDismiss = jest.fn()
-    const onLeave = jest.fn()
-    const { getByTestId } = renderModal({ onDismiss, onLeave })
+    const { getByTestId } = renderModal({ onDismiss })
 
     fireEvent.press(getByTestId("secondary-button"))
 
-    expect(onLeave).toHaveBeenCalledTimes(1)
     expect(onDismiss).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial")
+  })
+
+  /** A native modal dismissed while the native-stack push runs can hang, so the modal
+   *  hides in the frame of the press; it is back with the home if the flow was left. */
+  it("hides in the same frame as the push, and comes back with the home while it is still up", () => {
+    const { getByTestId, queryByTestId, rerender } = renderModal()
+
+    fireEvent.press(getByTestId("primary-button"))
+    expect(queryByTestId("modal")).toBeNull()
+
+    rerender(
+      <TwoFactorSessionModal
+        isVisible={false}
+        tier={TwoFactorTier.Recommended}
+        remainingDismissals={3}
+        onDismiss={jest.fn()}
+      />,
+    )
+    rerender(
+      <TwoFactorSessionModal
+        isVisible={true}
+        tier={TwoFactorTier.Recommended}
+        remainingDismissals={3}
+        onDismiss={jest.fn()}
+      />,
+    )
+
+    expect(queryByTestId("modal")).toBeTruthy()
   })
 })

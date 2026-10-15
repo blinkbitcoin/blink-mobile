@@ -671,12 +671,10 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
       expect(result.current.isProtectionGateActive).toBe(true)
 
-      act(() => {
-        result.current.registerDismissal(TwoFactorTier.Enforced)
-        result.current.consumeSessionStart()
-      })
+      act(() => result.current.registerDismissal(TwoFactorTier.Enforced))
 
       expect(result.current.isProtectionGateActive).toBe(false)
+      expect(result.current.isSessionStartPending).toBe(false)
       expect(result.current.remainingDismissals).toBe(2)
     })
 
@@ -780,6 +778,80 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
   beforeEach(resetProviderMocks)
 
   describe("session dismissals", () => {
+    it("takes the session start with a dismissal, whether or not the tier counts it", async () => {
+      storeRecord({ highestTier: TwoFactorTier.Suggested })
+      const { result } = await renderEnforcement()
+      expect(result.current.isSessionStartPending).toBe(true)
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Suggested))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
+    it("takes the start with a dismissal reported from a flow the modal opened, so the home does not ask again", async () => {
+      setAccount({ sats: 500_000 })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result } = await renderEnforcement()
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.remainingDismissals).toBe(2)
+    })
+
+    it("keeps the start for a prompt a fresher read raised past the one dismissed, while counting the dismissal", async () => {
+      setAccount({ sats: 500_000 })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result, rerender } = await renderEnforcement()
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+
+      setAccount({ sats: 5_000_000 })
+      await act(async () => rerender({}))
+      expect(result.current.isProtectionGateActive).toBe(true)
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+
+      expect(result.current.isSessionStartPending).toBe(true)
+      expect(result.current.isProtectionGateActive).toBe(true)
+      expect(lastWrittenRecord().recommendedDismissals).toBe(1)
+
+      /** The higher tier's prompt, raised in the same session, counts its own dismissal. */
+      act(() => result.current.registerDismissal(TwoFactorTier.Enforced))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(lastWrittenRecord().enforcedDismissals).toBe(1)
+    })
+
+    it("keeps a start the fresh read has not decided yet, which may still come to owe a prompt", async () => {
+      setAccount({ sats: 50_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Suggested })
+      const { result, rerender } = await renderEnforcement()
+      expect(result.current.isSessionStartPending).toBe(false)
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Suggested))
+
+      setAccount({ sats: 500_000 })
+      rerender({})
+
+      expect(result.current.isSessionStartPending).toBe(true)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+    })
+
+    it("leaves the session untouched by a dismissal that neither counts nor takes a start", async () => {
+      setAccount({ sats: 500_000 })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result } = await renderEnforcement()
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+      const settled = result.current
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+
+      expect(result.current).toBe(settled)
+      expect(mockSetItem).toHaveBeenCalledTimes(1)
+    })
+
     it("counts a dismissal against the recommended tier at most once per session", async () => {
       setAccount({ sats: 500_000 })
       storeRecord({ highestTier: TwoFactorTier.Recommended })

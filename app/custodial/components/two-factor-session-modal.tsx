@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -9,10 +9,7 @@ import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { TwoFactorPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
-import {
-  logTwoFactorPromptDismissed,
-  logTwoFactorPromptShown,
-} from "@app/utils/analytics"
+import { logTwoFactorPromptDismissed } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
 type TwoFactorSessionModalProps = {
@@ -21,9 +18,6 @@ type TwoFactorSessionModalProps = {
   remainingDismissals: number
   /** The X, the backdrop and the Android back: the dismissal this session counts. */
   onDismiss: () => void
-  /** Either button: the modal makes way for the flow it opens, with no dismissal yet.
-   *  Leaving that flow unfinished is what counts, and the flow reports it itself. */
-  onLeave: () => void
 }
 
 export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
@@ -31,7 +25,6 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   tier,
   remainingDismissals,
   onDismiss,
-  onLeave,
 }) => {
   const styles = useStyles()
   const {
@@ -40,28 +33,38 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  useEffect(() => {
-    if (isVisible) logTwoFactorPromptShown({ tier, prompt: TwoFactorPrompt.SessionModal })
-  }, [isVisible, tier])
-
+  /** The prompt is logged as shown by the home that raises it, once: this modal is
+   *  hidden and shown again with the home's focus while it stays up. */
   const handleDismiss = useCallback(() => {
     logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.SessionModal })
     onDismiss()
   }, [tier, onDismiss])
 
+  /** Either button makes way for the flow it opens, with no dismissal yet: the modal
+   *  hides in the same frame as the push, since a native modal dismissed while a
+   *  native-stack transition runs can hang, and stays down with the home while the
+   *  flow is up. It comes back with the home if the flow was left without adding the
+   *  factor or reporting the dismissal that leaving it unfinished is. */
+  const [isLeavingForFlow, setIsLeavingForFlow] = useState(false)
+  useEffect(() => {
+    if (!isVisible) setIsLeavingForFlow(false)
+  }, [isVisible])
+
   const handleSetNow = useCallback(() => {
-    onLeave()
+    setIsLeavingForFlow(true)
     navigation.navigate("twoFactorSetup")
-  }, [onLeave, navigation])
+  }, [navigation])
 
   const handleDecline = useCallback(() => {
-    onLeave()
+    setIsLeavingForFlow(true)
     navigation.navigate("twoFactorNonCustodial")
-  }, [onLeave, navigation])
+  }, [navigation])
+
+  const isShown = isVisible && !isLeavingForFlow
 
   return (
     <CustomModal
-      isVisible={isVisible}
+      isVisible={isShown}
       toggleModal={handleDismiss}
       showCloseIconButton={true}
       image={

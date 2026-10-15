@@ -28,7 +28,6 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 }))
 
 const mockRegisterDismissal = jest.fn()
-const mockConsumeSessionStart = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.Recommended as TwoFactorTier,
   remainingDismissals: 0,
@@ -36,7 +35,6 @@ const mockEnforcement = {
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
   registerDismissal: mockRegisterDismissal,
-  consumeSessionStart: mockConsumeSessionStart,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
@@ -184,7 +182,8 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       ).toBeTruthy()
     })
 
-    it("charges the X to the enforced tier, logs it and takes the session start so the home can show", async () => {
+    /** The dismissal is what takes the session start and lets the home in. */
+    it("charges the X to the enforced tier and logs it", async () => {
       atEnforcedTier(1)
       await renderScreen()
 
@@ -195,7 +194,6 @@ describe("TwoFactorProtectionRequiredScreen", () => {
         prompt: "protection_required_screen",
       })
       expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
-      expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
     })
 
     it("treats the hardware back as the X while dismissals remain", async () => {
@@ -206,7 +204,6 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       onBack()
 
       expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
-      expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
     })
 
     it("blocks once the dismissals are spent", async () => {
@@ -217,7 +214,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
     })
 
-    it("opens the authenticator setup and logs it, without taking the session start", async () => {
+    it("opens the authenticator setup and logs it, with no dismissal to take the session start", async () => {
       atEnforcedTier(0)
       await renderScreen()
 
@@ -230,7 +227,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
         returnTo: "Primary",
       })
-      expect(mockConsumeSessionStart).not.toHaveBeenCalled()
+      expect(mockRegisterDismissal).not.toHaveBeenCalled()
     })
 
     it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
@@ -244,7 +241,6 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       })
       expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
       expect(mockRegisterDismissal).not.toHaveBeenCalled()
-      expect(mockConsumeSessionStart).not.toHaveBeenCalled()
     })
   })
 })
