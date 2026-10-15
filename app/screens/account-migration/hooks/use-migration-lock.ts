@@ -33,7 +33,10 @@ const FLOW_BY_STATUS: Record<MigrationStatus, ServerMigrationFlow> = {
 }
 
 /** A failed re-read can leave the previous answer in place, so a status is only an answer
- *  while the read that carries it is current. */
+ *  while the read that carries it is current. A null migration is never the server's
+ *  word for a cleared flow: its resolver answers NOT_STARTED for an account with no record
+ *  and throws for anything else, and support's retry resets the record to IN_PROGRESS, so
+ *  null only ever arrives with an error or before the read settles. */
 const resolveServerFlow = (
   status: MigrationStatus | null,
   hasError: boolean,
