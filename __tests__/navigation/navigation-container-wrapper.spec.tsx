@@ -22,12 +22,19 @@ jest.mock("@app/components/upgrade-account-modal", () => ({
 
 const mockReset = jest.fn()
 let mockBlockerVisible = false
+let mockTwoFactorGateActive = false
+let mockTwoFactorStartPreparing = false
+let mockTwoFactorStartPending = false
+/** A pending start owes a prompt unless a test says it owes nothing. */
+let mockTwoFactorPromptOwed = true
 let mockIsReady = true
 let mockRootState:
   | { index: number; routes: { name: string; params?: object }[] }
   | undefined
 let mockOnReady: (() => void) | undefined
 let mockOnStateChange: ((state: unknown) => void) | undefined
+type LinkingSubscribe = (listener: (url: string) => void) => () => void
+let mockLinking: { subscribe?: LinkingSubscribe } | undefined
 
 /** The navigationRef is module-level, so the container ref is stubbed. The stub APPLIES the
  *  reset to the stack it serves, as the real container does, so a second evaluation sees the
@@ -47,13 +54,16 @@ jest.mock("@react-navigation/native", () => ({
     children,
     onReady,
     onStateChange,
+    linking,
   }: {
     children?: React.ReactNode
     onReady?: () => void
     onStateChange?: (state: unknown) => void
+    linking?: { subscribe?: LinkingSubscribe }
   }) => {
     mockOnReady = onReady
     mockOnStateChange = onStateChange
+    mockLinking = linking
     return children ?? null
   },
 }))
@@ -78,6 +88,22 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-blocker", () => ({
   useMigrationBlocker: () => ({ isVisible: mockBlockerVisible }),
 }))
 
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => {
+  const { TwoFactorSessionPrompt } = jest.requireActual(
+    "@app/types/two-factor-enforcement",
+  )
+  return {
+    useTwoFactorEnforcement: () => ({
+      isProtectionGateActive: mockTwoFactorGateActive,
+      isPreparingSessionStart: mockTwoFactorStartPreparing,
+      isSessionStartPending: mockTwoFactorStartPending,
+      requiredPrompt: mockTwoFactorPromptOwed
+        ? TwoFactorSessionPrompt.RequiredModal
+        : TwoFactorSessionPrompt.None,
+    }),
+  }
+})
+
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => true,
 }))
@@ -97,7 +123,7 @@ jest.mock("@rn-vui/themed", () => ({
 }))
 
 import * as React from "react"
-import { Text } from "react-native"
+import { Linking, Text } from "react-native"
 import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import RNBootSplash from "react-native-bootsplash"
 
@@ -343,9 +369,12 @@ describe("NavigationContainerWrapper boot splash", () => {
 
 describe("NavigationContainerWrapper armed-gate reset", () => {
   /** onReady logs on the way past, which would print a console block from every spec that
-   *  fires it. */
-  const consoleLogSpy = jest.spyOn(console, "log")
-  beforeAll(() => consoleLogSpy.mockImplementation(() => {}))
+   *  fires it. The spy is made when the block runs, not when the file is collected: a
+   *  spy made at collection is the one the block before restores. */
+  let consoleLogSpy: jest.SpyInstance
+  beforeAll(() => {
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+  })
   afterAll(() => consoleLogSpy.mockRestore())
 
   beforeEach(() => {
@@ -874,5 +903,362 @@ describe("NavigationContainerWrapper armed-gate reset", () => {
     )
 
     await waitFor(() => expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY))
+  })
+})
+
+/** The gate's own remedies above the home, which a reset leaves alone. */
+const STACK_WITH_REMEDIES_ABOVE = {
+  index: 2,
+  routes: [
+    { name: "Primary" },
+    { name: "twoFactorSetup" },
+    { name: "emailRegistrationInitiate" },
+  ],
+}
+/** A working screen reached from Settings, with the setup opened on top of it. */
+const STACK_WITH_SCREEN_UNDER_REMEDY = {
+  index: 2,
+  routes: [{ name: "Primary" }, { name: "settings" }, { name: "twoFactorSetup" }],
+}
+/** The migration remedy, mid-drain: the screens it pushes carry no remedy name. */
+const STACK_WITH_REMEDY_FLOW_ABOVE = {
+  index: 4,
+  routes: [
+    { name: "Primary" },
+    { name: "twoFactorNonCustodial" },
+    { name: "accountMigrationEntry" },
+    { name: "acceptTermsAndConditions" },
+    { name: "conversionDetails" },
+  ],
+}
+/** The home as the container holds it, with its key and the state of its tabs. */
+const KEYED_HOME_ROUTE = {
+  name: "Primary",
+  key: "Primary-1",
+  state: { index: 1, routes: [{ name: "Home" }, { name: "Earn" }] },
+}
+const STACK_WITH_SCREEN_ABOVE_KEYED_HOME = {
+  index: 1,
+  routes: [KEYED_HOME_ROUTE, { name: "scanningQRCode" }],
+}
+/** The screen the migration gate opened above a resume unlock, leaving the unlock under it. */
+const STACK_WITH_UNLOCK_UNDER_FRONT = STACK_WITH_GATE_SCREEN_OVER_UNLOCK
+const STACK_WITH_SCREEN_UNDER_GATE_SCREEN = STACK_WITH_GATE_SCREEN_ABOVE
+
+const PAYMENT_DEEPLINK = "lightning://lnbc1payment"
+const MIGRATION_DEEPLINK = "blink://account-migration"
+
+/** Subscribes to the container's linking the way the real container does on mount, and
+ *  hands back the url handler the wrapper registered with the OS. */
+const subscribeToLinks = () => {
+  const listener = jest.fn()
+  mockLinking?.subscribe?.(listener)
+  const handler = jest.mocked(Linking.addEventListener).mock.calls.at(-1)?.[1]
+  if (!handler) throw new Error("the wrapper registered no url handler")
+  return { listener, receive: (url: string) => act(() => handler({ url })) }
+}
+
+const rerenderWrapper = (
+  rendered: ReturnType<typeof render>,
+  children: React.ReactNode,
+) =>
+  rendered.rerender(<NavigationContainerWrapper>{children}</NavigationContainerWrapper>)
+
+describe("NavigationContainerWrapper two-factor gate", () => {
+  let consoleLogSpy: jest.SpyInstance
+  beforeAll(() => {
+    consoleLogSpy = jest.spyOn(console, "log").mockImplementation(() => {})
+  })
+  afterAll(() => consoleLogSpy.mockRestore())
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+    mockTwoFactorGateActive = false
+    mockTwoFactorStartPreparing = false
+    mockTwoFactorStartPending = false
+    mockTwoFactorPromptOwed = true
+    mockIsReady = true
+    mockOnReady = undefined
+    mockOnStateChange = undefined
+    mockLinking = undefined
+    mockRootState = STACK_AT_BLOCKER
+  })
+
+  /** The gate stands in only for a start it is owed, which is pending meanwhile. */
+  const armGateOverPendingStart = (rendered: ReturnType<typeof render>) => {
+    mockTwoFactorStartPending = true
+    armGate(rendered)
+  }
+
+  /** Renders with the lock already lowered, as it is for everything but a cold start. */
+  const renderUnlocked = async () => {
+    const rendered = renderWrapper(<UnlockProbe />)
+    unlock()
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+    return rendered
+  }
+
+  const armGate = (rendered: ReturnType<typeof render>) => {
+    mockTwoFactorGateActive = true
+    rerenderWrapper(rendered, <UnlockProbe />)
+  }
+
+  it("pops a working screen above the home once the gate stands in for it", async () => {
+    mockRootState = STACK_WITH_SCREEN_ABOVE
+    const rendered = await renderUnlocked()
+
+    armGate(rendered)
+
+    await waitFor(() => expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY))
+  })
+
+  it("leaves the gate's own remedies above the home", async () => {
+    mockRootState = STACK_WITH_REMEDIES_ABOVE
+    const rendered = await renderUnlocked()
+
+    armGate(rendered)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("leaves a home with nothing above it alone", async () => {
+    const rendered = await renderUnlocked()
+
+    armGate(rendered)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("pops a working screen under a remedy, and keeps the remedy on the home", async () => {
+    mockRootState = STACK_WITH_SCREEN_UNDER_REMEDY
+    const rendered = await renderUnlocked()
+
+    armGate(rendered)
+
+    await waitFor(() =>
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 1,
+        routes: [{ name: "Primary" }, { name: "twoFactorSetup" }],
+      }),
+    )
+  })
+
+  it("leaves whatever a remedy flow pushed after it, which is the flow's own", async () => {
+    mockRootState = STACK_WITH_REMEDY_FLOW_ABOVE
+    const rendered = await renderUnlocked()
+
+    armGate(rendered)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("keeps the home's own route, so the gate it shows is not mounted twice", async () => {
+    mockRootState = STACK_WITH_SCREEN_ABOVE_KEYED_HOME
+    const rendered = await renderUnlocked()
+
+    armGate(rendered)
+
+    await waitFor(() =>
+      expect(mockReset).toHaveBeenCalledWith({ index: 0, routes: [KEYED_HOME_ROUTE] }),
+    )
+  })
+
+  it("leaves the blocker's own screens alone while the blocker stands in front of it", async () => {
+    mockRootState = STACK_WITH_SCREEN_ABOVE
+    const rendered = await renderUnlocked()
+    mockBlockerVisible = true
+    rerenderWrapper(rendered, <UnlockProbe />)
+    await waitFor(() => expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY))
+    mockReset.mockClear()
+    navigateTo(STACK_WITH_SCREEN_ABOVE)
+
+    armGate(rendered)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+  })
+
+  it("waits while the app is still locked, then pops once it is not", async () => {
+    mockTwoFactorGateActive = true
+    mockRootState = STACK_WITH_SCREEN_ABOVE
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+
+    unlock()
+    navigateTo(STACK_WITH_SCREEN_ABOVE)
+
+    expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY)
+  })
+
+  it("waits for an unlock under the screen in front, rather than pop it from beneath", async () => {
+    mockTwoFactorGateActive = true
+    mockRootState = STACK_WITH_UNLOCK_UNDER_FRONT
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+
+    unlock()
+    navigateTo(STACK_WITH_SCREEN_UNDER_GATE_SCREEN)
+
+    expect(mockReset).toHaveBeenCalledWith({
+      index: 1,
+      routes: [{ name: "Primary" }, GATE_CONTACT_SUPPORT_ROUTE],
+    })
+  })
+
+  /** A kept flow can end on a working screen of its own: a registration started from
+   *  Settings returns there, not to the gate. */
+  it("pops a working screen a kept flow lands on, on the navigation that lands it", async () => {
+    mockRootState = STACK_WITH_REMEDIES_ABOVE
+    const rendered = await renderUnlocked()
+    armGate(rendered)
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+
+    navigateTo({ index: 1, routes: [{ name: "Primary" }, { name: "accountScreen" }] })
+
+    expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY)
+  })
+
+  it("waits for an unlock in front to step aside, then pops what it covered", async () => {
+    mockTwoFactorGateActive = true
+    mockRootState = STACK_AT_RESUME_UNLOCK
+
+    renderWrapper(<UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(mockReset).not.toHaveBeenCalled()
+
+    unlock()
+    navigateTo(STACK_WITH_SCREEN_ABOVE)
+
+    expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY)
+  })
+
+  it("resets from onReady when the gate was up before the container was ready", async () => {
+    mockTwoFactorGateActive = true
+    mockIsReady = false
+    mockRootState = STACK_WITH_SCREEN_ABOVE
+    await renderUnlocked()
+    expect(mockReset).not.toHaveBeenCalled()
+
+    mockIsReady = true
+    act(() => mockOnReady?.())
+
+    expect(mockReset).toHaveBeenCalledWith(RESET_TO_PRIMARY)
+  })
+
+  it("holds a payment link while a prompt holds the session start and opens it once the start is taken, letting the migration entry through meanwhile", async () => {
+    mockTwoFactorStartPending = true
+    mockTwoFactorGateActive = true
+    const rendered = renderWrapper(<UnlockProbe />)
+    unlock()
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    receive(MIGRATION_DEEPLINK)
+    expect(listener).toHaveBeenCalledWith(MIGRATION_DEEPLINK)
+
+    mockTwoFactorStartPending = false
+    mockTwoFactorGateActive = false
+    rerenderWrapper(rendered, <UnlockProbe />)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  /** The countdown modal, and the flow it opened, hold the start without the gate. */
+  it("holds a payment link while the countdown modal holds the session start", async () => {
+    mockTwoFactorStartPending = true
+    const rendered = await renderUnlocked()
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+  })
+
+  /** The home takes a start that owes nothing only once it is focused and clear of
+   *  other modals, which can be the whole session; nothing is shown for it meanwhile. */
+  it("lets a payment link through while a pending start owes no prompt", async () => {
+    mockTwoFactorStartPending = true
+    mockTwoFactorPromptOwed = false
+    const rendered = await renderUnlocked()
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+
+    expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK)
+  })
+
+  it("drops a payment link while the blocker is up, which never lets the home back", async () => {
+    mockBlockerVisible = true
+    const rendered = renderWrapper(<UnlockProbe />)
+    unlock()
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+    mockBlockerVisible = false
+    rerenderWrapper(rendered, <UnlockProbe />)
+
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+  })
+
+  it("replays a queued migration link through the prompts, as it lets a live one through", async () => {
+    const rendered = renderWrapper(<UnlockProbe />)
+    const { receive } = subscribeToLinks()
+    receive(MIGRATION_DEEPLINK)
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    armGateOverPendingStart(rendered)
+    unlock()
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
+  })
+
+  it("holds a link while the session start is still being decided, and opens it once it is", async () => {
+    mockTwoFactorStartPreparing = true
+    const rendered = renderWrapper(<UnlockProbe />)
+    unlock()
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    mockTwoFactorStartPreparing = false
+    rerenderWrapper(rendered, <UnlockProbe />)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
   })
 })
