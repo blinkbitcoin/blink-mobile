@@ -87,7 +87,7 @@ describe("useMigrationReceiveConfirmation", () => {
     await flushCheck()
 
     expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
-    expect(result.current).toEqual({
+    expect(result.current).toMatchObject({
       isReceiveConfirmed: false,
       isReceiveProven: false,
       isReceiveDelayed: false,
@@ -130,7 +130,7 @@ describe("useMigrationReceiveConfirmation", () => {
     mockCheckReceiveLanded.mockResolvedValue(ok(landed))
     await advance(DELAYED_RETRY_MS)
 
-    expect(result.current).toEqual({
+    expect(result.current).toMatchObject({
       isReceiveConfirmed: true,
       isReceiveProven: true,
       isReceiveDelayed: false,
@@ -149,7 +149,7 @@ describe("useMigrationReceiveConfirmation", () => {
     rerender({ skip: true })
     await advance(60_000)
 
-    expect(result.current).toEqual({
+    expect(result.current).toMatchObject({
       isReceiveConfirmed: false,
       isReceiveProven: false,
       isReceiveDelayed: false,
@@ -537,5 +537,111 @@ describe("useMigrationReceiveConfirmation", () => {
 
     await advance(5000)
     expect(result.current.isReceiveConfirmed).toBe(true)
+  })
+
+  /** The caller hands support over only on a look taken since the app came back, so it
+   *  is told when each one settles and when that look began. */
+  describe("each settled check", () => {
+    it("reports when the check began, whatever it found", async () => {
+      jest.setSystemTime(1_000_000)
+      const onCheckSettled = jest.fn()
+      mockCheckReceiveLanded
+        .mockResolvedValueOnce(ok(stillEmpty))
+        .mockRejectedValueOnce(new Error("keystore locked"))
+        .mockResolvedValue(ok(stillEmpty))
+
+      renderGate({ onCheckSettled })
+      await flushCheck()
+      expect(onCheckSettled).toHaveBeenLastCalledWith(1_000_000)
+
+      await advance(RECEIVE_CHECK_RETRY_MS)
+      expect(onCheckSettled).toHaveBeenCalledTimes(2)
+      expect(onCheckSettled).toHaveBeenLastCalledWith(1_000_000 + RECEIVE_CHECK_RETRY_MS)
+    })
+
+    /** Funds that landed confirm the gate, which withdraws the notice itself; the report
+     *  still goes out so the caller's record of the latest look stays true. */
+    it("reports the check that confirms the receive too", async () => {
+      const onCheckSettled = jest.fn()
+      mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+
+      renderGate({ onCheckSettled })
+      await flushCheck()
+
+      expect(onCheckSettled).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not re-arm the polling when the caller passes a fresh callback", async () => {
+      const { rerender } = renderGate({ onCheckSettled: jest.fn() })
+      await flushCheck()
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      rerender({ onCheckSettled: jest.fn() })
+      await flushCheck()
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /** Once the wait is overdue the next scheduled look can be half a minute out, so the
+   *  caller asks for one on the spot when the app comes back. */
+  describe("recheck", () => {
+    it("looks at once instead of waiting for the next scheduled check", async () => {
+      const { result } = renderGate()
+      await flushCheck()
+      await advance(DELAYED_NOTICE_MS)
+      const checksSoFar = mockCheckReceiveLanded.mock.calls.length
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksSoFar + 1)
+
+      /** The scheduled check it replaced does not also fire on its old deadline. */
+      await advance(DELAYED_RETRY_MS - 1)
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksSoFar + 1)
+      await advance(1)
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksSoFar + 2)
+    })
+
+    /** A check in flight began before whatever the caller knows changed: the fresh look
+     *  follows it rather than stacking a second connection beside it. */
+    it("queues behind a check already in flight", async () => {
+      let settleCheck: (value: ReturnType<typeof ok>) => void = () => undefined
+      mockCheckReceiveLanded.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            settleCheck = resolve
+          }),
+      )
+      const { result } = renderGate()
+      await flushCheck()
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        settleCheck(ok(stillEmpty))
+        await Promise.resolve()
+      })
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(2)
+    })
+
+    it("does nothing while the gate is skipped", async () => {
+      const { result } = renderGate({ skip: true })
+      await flushCheck()
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+
+      expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
+    })
   })
 })

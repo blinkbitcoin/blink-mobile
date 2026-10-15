@@ -10,7 +10,9 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
  * The overdue flag alone would route too eagerly after the app comes back: timers stop
  * while it is backgrounded, so the notice window can elapse unseen and the receive check
  * that would clear it only runs once the app is active again. Support is therefore due
- * only after the app has been in the foreground long enough for that check to settle.
+ * only once a check that started after the app came back has settled and still found
+ * nothing. That is tied to the check itself rather than to a guess at how long one takes,
+ * so the cadence of the checks can change without this falling out of step with it.
  */
 
 /** Where an overdue receive hands over, from the entry and the steps alike: the delayed
@@ -21,26 +23,41 @@ export const OVERDUE_RECEIVE_SUPPORT = {
   origin: MigrationSupportOrigin.Resume,
 } as const
 
-/** A receive check is a connect plus a forced sync, which takes a few seconds; this leaves
- *  room for the one that fires as soon as the app comes back. */
-export const FOREGROUND_RECHECK_GRACE_MS = 15_000
-
 let isReceiveOverdue = false
 let foregroundedAt = Date.now()
+/** When the latest settled check began, not when it settled: one already in flight as the
+ *  app went to the background may settle after it returns, on a look taken before. */
+let lastSettledCheckStartedAt: number | null = null
 
 /** Published by the background resume whenever its receive gate reports the wait. */
 export const setMigrationReceiveOverdue = (isOverdue: boolean): void => {
   isReceiveOverdue = isOverdue
 }
 
-/** Published by the background resume each time the app becomes active. */
+/** Published by the background resume each time the app becomes active, before it asks
+ *  for the fresh check, so that check always counts as one taken since. */
 export const markAppForegrounded = (at: number = Date.now()): void => {
   foregroundedAt = at
 }
 
-/** True once the receive is overdue and the app has been active long enough for a fresh
- *  check to have confirmed it is still missing. */
-export const isMigrationReceiveSupportDue = (now: number = Date.now()): boolean => {
+/** Published by the background resume each time a receive check settles, whatever it
+ *  found: one that found the funds clears the overdue flag through the gate instead. */
+export const markMigrationReceiveChecked = (startedAt: number): void => {
+  lastSettledCheckStartedAt = startedAt
+}
+
+/** Back to a cold start, for when the watch that published all of this goes away: a
+ *  stale wait must never outlive it. */
+export const resetMigrationReceiveWait = (): void => {
+  isReceiveOverdue = false
+  foregroundedAt = Date.now()
+  lastSettledCheckStartedAt = null
+}
+
+/** True once the receive is overdue and a check taken since the app last came back has
+ *  confirmed it is still missing. */
+export const isMigrationReceiveSupportDue = (): boolean => {
   if (!isReceiveOverdue) return false
-  return now - foregroundedAt >= FOREGROUND_RECHECK_GRACE_MS
+  if (lastSettledCheckStartedAt === null) return false
+  return lastSettledCheckStartedAt >= foregroundedAt
 }
