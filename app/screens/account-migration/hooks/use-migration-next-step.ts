@@ -13,6 +13,7 @@ import {
   resolveCommitPointRoute,
 } from "../utils/migration-checkpoint-storage"
 import {
+  isMigrationReceiveOverdue,
   isMigrationReceiveSupportDue,
   OVERDUE_RECEIVE_SUPPORT,
 } from "../utils/migration-receive-wait"
@@ -129,9 +130,9 @@ export const useMigrationNextStep = () => {
   const hold = useCallback(
     (route: HoldRoute, isSkipGuard: boolean) => {
       const isAskingAgain = route === CommitPointRoute.AskAgain
-      /** Funds past the notice window, with the app back long enough for a fresh check to
-       *  have cleared them, are genuinely late: support takes over instead of another "on
-       *  its way". */
+      /** Funds past the notice window, and still missing on a check taken since the app
+       *  came back, are genuinely late: support takes over instead of another "on its
+       *  way". */
       const isReceiveOverdue = !isAskingAgain && isMigrationReceiveSupportDue()
       if (isReceiveOverdue) {
         if (isSkipGuard) {
@@ -142,9 +143,12 @@ export const useMigrationNextStep = () => {
         return
       }
       if (isAskingAgain) retryLockRead()
-      const message = isAskingAgain
-        ? LL.errors.generic()
-        : LL.AccountMigration.transferDelayed.body()
+      /** "Longer than usual" only once the wait has earned it: the swap is usually seconds
+       *  from done when a tap lands here. */
+      const transferMessage = isMigrationReceiveOverdue()
+        ? LL.AccountMigration.transferDelayed.body()
+        : LL.AccountMigration.transferInProgress.body()
+      const message = isAskingAgain ? LL.errors.generic() : transferMessage
       toastShow({ message, LL, type: "warning" })
       if (!isSkipGuard) return
       /** Home when there is nothing to step back to, as the entry screen does: a skip guard

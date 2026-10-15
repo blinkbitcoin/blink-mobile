@@ -22,14 +22,17 @@ let mockFlow: ServerMigrationFlow = ServerMigrationFlow.Open
 let mockLockLoading = false
 const mockRefetchLock = jest.fn()
 let mockIsSupportDue = false
+let mockIsOverdue = false
 jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
   ...jest.requireActual("@app/screens/account-migration/utils/migration-receive-wait"),
   isMigrationReceiveSupportDue: () => mockIsSupportDue,
+  isMigrationReceiveOverdue: () => mockIsOverdue,
 }))
 
 const mockToastShow = jest.fn()
 const mockGenericErrorCopy = "There was an error"
 const mockFundsOnTheirWayCopy = "Your funds are on their way"
+const mockTakingLongerCopy = "This is taking longer than usual"
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
   useMigrationLock: () => ({
@@ -43,7 +46,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       errors: { generic: () => mockGenericErrorCopy },
-      AccountMigration: { transferDelayed: { body: () => mockFundsOnTheirWayCopy } },
+      AccountMigration: {
+        transferInProgress: { body: () => mockFundsOnTheirWayCopy },
+        transferDelayed: { body: () => mockTakingLongerCopy },
+      },
     },
   }),
 }))
@@ -91,6 +97,7 @@ describe("useMigrationNextStep", () => {
     mockLockLoading = false
     mockCanGoBack = true
     mockIsSupportDue = false
+    mockIsOverdue = false
     mockRefetchLock.mockResolvedValue(null)
   })
 
@@ -359,8 +366,25 @@ describe("useMigrationNextStep", () => {
       expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
     })
 
-    /** Past the notice window, with the app back long enough for a fresh check, the funds
-     *  are genuinely late: support takes over instead of another "on its way". */
+    /** Overdue, but with no check taken since the app came back to say it is still
+     *  missing: the user stays, told the wait is unusual rather than seconds old. */
+    it("says the wait is taking longer while the overdue receive awaits a fresh check", () => {
+      arriveAwaitingSwap()
+      mockIsOverdue = true
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.goToNextStep()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: mockTakingLongerCopy }),
+      )
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    /** Past the notice window, and still missing on a check taken since the app came back,
+     *  the funds are genuinely late: support takes over instead of another "on its way". */
     it("hands a receive that is genuinely late to support instead", () => {
       arriveAwaitingSwap()
       mockIsSupportDue = true

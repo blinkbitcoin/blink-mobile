@@ -4067,6 +4067,13 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    // The migration entry and steps' toast while a completed transfer is still finishing
+    // on this device, usually seconds in: no "longer than usual" until it is overdue.
+    transferInProgress: {
+      body: "Your funds are on their way to your new account. Keep the app open and we'll finish up automatically.",
+    },
+    // Shared with the migration entry and steps' toast for an overdue receive; keep it
+    // saying the wait is unusual, since both only show it once it is.
     transferDelayed: {
       body: "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
       contactSupportCta: "Contact support",

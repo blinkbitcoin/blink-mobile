@@ -3971,6 +3971,9 @@
     "explainerCheck5": "Akaun anda akan dikenakan yuran rangkaian Spark",
     "explainerCta": "Saya faham",
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat.",
+    "transferInProgress": {
+      "body": "Dana anda sedang dalam perjalanan ke akaun baharu anda. Biarkan aplikasi terbuka dan kami akan menyelesaikannya secara automatik."
+    },
     "transferDelayed": {
       "body": "Dana anda sedang dalam perjalanan ke akaun baharu anda. Ia mengambil masa lebih lama daripada biasa — biarkan aplikasi terbuka dan kami akan menyelesaikannya secara automatik.",
       "contactSupportCta": "Hubungi sokongan"

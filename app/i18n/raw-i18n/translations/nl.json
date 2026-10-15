@@ -3971,6 +3971,9 @@
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "transferInProgress": {
+      "body": "Je saldo is onderweg naar je nieuwe account. Houd de app open, dan ronden we het automatisch af."
+    },
     "transferDelayed": {
       "body": "Je saldo is onderweg naar je nieuwe account. Het duurt langer dan gebruikelijk — houd de app open, dan ronden we het automatisch af.",
       "contactSupportCta": "Contact opnemen met support"

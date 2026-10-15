@@ -3971,6 +3971,9 @@
     "explainerCheck5": "Tài khoản của bạn sẽ bị trừ phí mạng Spark",
     "explainerCta": "Tôi hiểu",
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây.",
+    "transferInProgress": {
+      "body": "Tiền của bạn đang trên đường chuyển đến tài khoản mới. Hãy giữ ứng dụng mở và chúng tôi sẽ tự động hoàn tất."
+    },
     "transferDelayed": {
       "body": "Tiền của bạn đang trên đường chuyển đến tài khoản mới. Quá trình này lâu hơn bình thường — hãy giữ ứng dụng mở và chúng tôi sẽ tự động hoàn tất.",
       "contactSupportCta": "Liên hệ hỗ trợ"
