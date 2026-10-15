@@ -31,6 +31,10 @@ const mockRefetchPendingWallet = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
+/** Every query result carries a refetch that settles, unless a case overrides it: without
+ *  one the gate's retry throws before its first await, never disables itself, and lets a
+ *  burst of presses count as attempts no user could make. */
+const mockRefetchWalletOverview = jest.fn()
 const mockReportError = jest.fn()
 /** The child mocks render a Pressable per action instead of returning null, so tests drive
  *  them with real fireEvent (which honours `disabled`) rather than calling captured props;
@@ -103,7 +107,7 @@ const apiKeysState = (overrides: Record<string, unknown> = {}) => ({
   loading: false,
   isReady: true,
   hasError: false,
-  refetch: jest.fn(),
+  refetch: jest.fn().mockResolvedValue(undefined),
   ...overrides,
 })
 
@@ -182,7 +186,10 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
+  useWalletOverviewScreenQuery: () => ({
+    refetch: mockRefetchWalletOverview,
+    ...mockUseWalletOverviewScreenQuery(),
+  }),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -282,6 +289,10 @@ const resetGateMocks = (): void => {
   mockPendingWalletLoading = false
   mockPendingWalletError = false
   mockUseActiveApiKeys.mockReturnValue(apiKeysState())
+  mockRefetchWalletOverview.mockResolvedValue(undefined)
+  mockRefetchLock.mockResolvedValue(undefined)
+  mockRefetchCheckpoint.mockResolvedValue(undefined)
+  mockRefetchPendingWallet.mockResolvedValue(undefined)
   mockUseTransferBlocked.mockReturnValue(false)
   mockUseDollarBalanceRestricted.mockReturnValue(false)
   mockUseWalletOverviewScreenQuery.mockReturnValue(
@@ -800,13 +811,6 @@ describe("MigrationGate", () => {
   it("refetches the local reads too when the retry button is pressed", async () => {
     mockIsMigrationLocked = true
     mockCheckpointError = true
-    mockUseActiveApiKeys.mockReturnValue(
-      apiKeysState({ refetch: jest.fn().mockResolvedValue(undefined) }),
-    )
-    mockUseWalletOverviewScreenQuery.mockReturnValue({
-      ...walletOverviewQueryResult({ usdBalance: 0 }),
-      refetch: jest.fn().mockResolvedValue(undefined),
-    })
 
     const { getByTestId } = render(<MigrationGate />)
     fireEvent.press(getByTestId("gate-retry-button"))
@@ -814,6 +818,9 @@ describe("MigrationGate", () => {
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
     expect(mockRefetchPendingWallet).toHaveBeenCalledTimes(1)
+    /** The anchor that keeps this fixture honest: a retry that threw instead of fetching
+     *  would report here and still leave the counts above looking plausible. */
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /** The local reads only feed the locked resume-or-handover decision, so their failure
@@ -953,10 +960,18 @@ describe("MigrationGate, with an unreadable device store", () => {
     mockCheckpointError = true
   }
 
-  const pressRetry = (getByTestId: (id: string) => unknown, times: number): void => {
-    Array.from({ length: times }).forEach(() => {
-      fireEvent.press(getByTestId("gate-retry-button") as never)
-    })
+  /** Each press settles before the next, the way a user spends the budget: the button
+   *  disables itself while a retry is in flight, so a burst of taps is one attempt. */
+  const pressRetry = async (
+    getByTestId: (id: string) => unknown,
+    times: number,
+  ): Promise<void> => {
+    for (let attempt = 0; attempt < times; attempt += 1) {
+      // eslint-disable-next-line no-await-in-loop -- each retry must settle before the next
+      await act(async () => {
+        fireEvent.press(getByTestId("gate-retry-button") as never)
+      })
+    }
   }
 
   it("says the device is full when the failure was about space", () => {
@@ -998,29 +1013,63 @@ describe("MigrationGate, with an unreadable device store", () => {
     expect(queryByText("could not read your progress")).toBeNull()
   })
 
-  it("offers only the retry while retrying is still worth a try", () => {
+  it("offers only the retry while retrying is still worth a try", async () => {
     arriveAtStorageError()
 
     const { getByTestId, queryByTestId } = render(<MigrationGate />)
-    pressRetry(getByTestId, 2)
+    await pressRetry(getByTestId, 2)
 
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(2)
     expect(queryByTestId("gate-storage-support-button")).toBeNull()
   })
 
-  it("offers support once retrying has failed enough times to stop being a fix", () => {
+  it("offers support once retrying has failed enough times to stop being a fix", async () => {
     arriveAtStorageError()
 
     const { getByTestId } = render(<MigrationGate />)
-    pressRetry(getByTestId, 3)
+    await pressRetry(getByTestId, 3)
 
+    /** Three real round-trips, not three taps on a retry that threw before fetching. */
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(mockReportError).not.toHaveBeenCalled()
     expect(getByTestId("gate-storage-support-button")).toBeTruthy()
   })
 
-  it("hands over saying the store was unreadable, never that the records are gone", () => {
+  it("holds the retry and the handover while a retry is still in flight", async () => {
+    arriveAtStorageError()
+    let settleRefetch: () => void = () => undefined
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    mockRefetchCheckpoint.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          settleRefetch = resolve
+        }),
+    )
+    await act(async () => {
+      fireEvent.press(getByTestId("gate-retry-button"))
+    })
+    /** A tap while the third attempt is out must not start a fourth. */
+    fireEvent.press(getByTestId("gate-retry-button"))
+
+    expect(getByTestId("gate-retry-button")).toBeDisabled()
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+
+    await act(async () => {
+      settleRefetch()
+    })
+
+    expect(getByTestId("gate-retry-button")).toBeEnabled()
+    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+  })
+
+  it("hands over saying the store was unreadable, never that the records are gone", async () => {
     arriveAtStorageError()
 
     const { getByTestId } = render(<MigrationGate />)
-    pressRetry(getByTestId, 3)
+    await pressRetry(getByTestId, 3)
     fireEvent.press(getByTestId("gate-storage-support-button"))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
@@ -1030,8 +1079,7 @@ describe("MigrationGate, with an unreadable device store", () => {
     })
   })
 
-  /** The rules this screen cannot honestly test live in the hook's own spec: the retry
-   *  button disables itself, so repeated presses never raise the count, and an unlocked
+  /** The rule this screen cannot honestly test lives in the hook's own spec: an unlocked
    *  account never renders this screen at all. */
   it("says the store is unreadable only when the network sources answered", () => {
     arriveAtStorageError()
