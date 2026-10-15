@@ -102,6 +102,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const {
+    checkpoint: storedCheckpoint,
+    expectedReceiveSats: storedExpectedReceiveSats,
     accountId: selfCustodialAccountId,
     loading: checkpointLoading,
     hasError: hasCheckpointError,
@@ -214,6 +216,18 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
   }, [expectedReceiveSats, saveCheckpoint])
   const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
+  /**
+   * A resumed commit point is already on disk, and the write this screen issues cannot
+   * change what Approve depends on: the step is already this one and the figure is
+   * write-once per owner (mergeCheckpoint), so only savedAt would move. Holding Approve on
+   * that write would trap a user whose disk filled after the lock was taken server-side,
+   * with the hardware back swallowed, over a record that already exists. The latch above
+   * still governs the first visit, where the record genuinely does not exist yet.
+   */
+  const isCommitPointOnDisk =
+    storedCheckpoint === MigrationCheckpoint.BalancesOverview &&
+    storedExpectedReceiveSats !== null
+  const isCommitPointHeld = isCommitPointOnDisk || isCommitPointRecorded
 
   useEffect(() => {
     if (!isFocused || checkpointLoading) return
@@ -359,7 +373,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   /** A refused commit-point write joins the retry rather than leaving the Approve it
    *  holds off dead: this screen swallows the hardware back, so a disabled button with
    *  nothing beside it is the one dead end it must never present. */
-  const isCommitPointWriteRetryable = hasCommitPointWriteFailed && !isCommitPointRecorded
+  const isCommitPointWriteRetryable = hasCommitPointWriteFailed && !isCommitPointHeld
   const hasNetworkFailure =
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
@@ -412,7 +426,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     preview.isDollarRegionPending ||
     !migrationStart.isStarted ||
     !isLnAddressSettled ||
-    !isCommitPointRecorded
+    !isCommitPointHeld
 
   return (
     <Screen preset="fixed" headerShown={false}>

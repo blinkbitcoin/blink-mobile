@@ -109,6 +109,11 @@ const mockSaveCheckpoint = jest.fn().mockResolvedValue({ isSaved: true, failure:
 let mockCheckpointLoading = false
 
 let mockCheckpointAccountId: string | null = "sc-account-1"
+/** What the store already holds for this owner: a first visit arrives from the step before
+ *  the commit point with no figure yet, which is the default every case starts from. */
+let mockStoredCheckpoint: MigrationCheckpoint | null =
+  MigrationCheckpoint.ChooseExperience
+let mockStoredExpectedReceiveSats: number | null = null
 let mockOwnerId: string | null = "owner-1"
 const mockLnRetry = jest.fn()
 const lnTransferWith = (outcome: MigrationLnAddressOutcome) => ({
@@ -124,6 +129,8 @@ const mockRefetchCheckpoint = jest.fn()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
+    checkpoint: mockStoredCheckpoint,
+    expectedReceiveSats: mockStoredExpectedReceiveSats,
     accountId: mockCheckpointAccountId,
     loading: mockCheckpointLoading,
     hasError: mockCheckpointHasError,
@@ -240,6 +247,8 @@ const resetScreenMocks = () => {
   mockConvertReady = true
   mockCheckpointLoading = false
   mockCheckpointAccountId = "sc-account-1"
+  mockStoredCheckpoint = MigrationCheckpoint.ChooseExperience
+  mockStoredExpectedReceiveSats = null
   mockStoredModes = {}
   mockOwnerId = "owner-1"
   mockOwnerIdLoading = false
@@ -1001,6 +1010,39 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     })
 
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  /** A resume: the lock is already held server-side and the record Approve depends on is
+   *  already durable, so a write that can only refresh its timestamp must not hold it. */
+  it("opens Approve on a resumed commit point even when the refresh write is refused", async () => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = 990
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalled()
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  /** The step alone is not the record: one saved before the figure existed still lacks the
+   *  number the receive gate waits on, so only the write can complete it. */
+  it("still holds Approve on a stored commit point that never got its figure", async () => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = null
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
   })
 
   describe("the line above the retry", () => {
