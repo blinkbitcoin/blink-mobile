@@ -71,6 +71,16 @@ export type RegistrationReturnRoute =
 const isRegistrationReturnRoute = (value: unknown): value is RegistrationReturnRoute =>
   Object.values(RegistrationReturnRoute).some((route) => route === value)
 
+const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
+
+/** Whether a removal is one the user's own back press dispatched: the header arrow and
+ *  the Android hardware back raise GO_BACK, the swipe raises POP. A screen that holds
+ *  the user refuses only these. A removal the app dispatches on its own, a reset for a
+ *  logout or a gate, or a navigation for a profile switch, has to keep working, and
+ *  blocking those is how a hold meant to protect the user ends up trapping them. */
+export const isBackwardAction = (action: { type: string }): boolean =>
+  BACKWARD_ACTIONS.includes(action.type)
+
 type RouteStack = { routes: ReadonlyArray<{ name: string }> }
 
 /** A registration flow may return only to one of the routes above, and only while its

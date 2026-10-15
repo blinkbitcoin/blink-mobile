@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -16,9 +16,21 @@ import { flushEffects } from "../../helpers/flush-effects"
 loadLocale("en")
 const LL = i18nObject("en")
 
+type RemovalEvent = { data: { action: { type: string } }; preventDefault: jest.Mock }
+type RemovalListener = (event: RemovalEvent) => void
+
+const removalBy = (type: string): RemovalEvent => ({
+  data: { action: { type } },
+  preventDefault: jest.fn(),
+})
+
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
+const mockRemoveListener = jest.fn()
+const mockAddListener = jest.fn(
+  (_name: string, _listener: RemovalListener) => mockRemoveListener,
+)
 let mockIsFocused = true
 
 jest.mock("@react-navigation/native", () => ({
@@ -27,9 +39,17 @@ jest.mock("@react-navigation/native", () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
     setOptions: mockSetOptions,
+    addListener: mockAddListener,
   }),
   useIsFocused: () => mockIsFocused,
 }))
+
+const removalListenerInstalls = () =>
+  mockAddListener.mock.calls.filter(([name]) => name === "beforeRemove")
+
+/** The listener the screen installed against being removed, if any. */
+const installedRemovalListener = (): RemovalListener | undefined =>
+  removalListenerInstalls()[0]?.[1]
 
 const mockEnforcement = {
   tier: TwoFactorTier.Nudge as TwoFactorTier,
@@ -68,6 +88,15 @@ const renderScreen = async () => {
   return rendered
 }
 
+const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
+  rendered.rerender(
+    <ContextForScreen>
+      <TwoFactorSetupScreen />
+    </ContextForScreen>,
+  )
+  await flushEffects()
+}
+
 /** The control is rendered on its own: the navigation it needs is the mock above, and
  *  the screen providers would only add async account loads that outlive the test. */
 const renderInstalledCloseControl = () => {
@@ -85,6 +114,10 @@ describe("TwoFactorSetupScreen", () => {
     mockEnforcement.hasTwoFactor = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
   })
 
   it("renders the lock hero with the setup copy", async () => {
@@ -129,7 +162,7 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("holds every exit while a re-verification is in flight", async () => {
+  it("holds both flows while a re-verification is in flight", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     mockIsReverifying = true
     await renderScreen()
@@ -143,11 +176,95 @@ describe("TwoFactorSetupScreen", () => {
     expect(secondary.props.disabled).toBe(true)
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
-    renderInstalledCloseControl()
-    fireEvent.press(screen.getByTestId("icon-close"))
 
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("refuses every way back while a re-verification is in flight, but not a reset", async () => {
+    mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockIsReverifying = true
+    await renderScreen()
+
+    const listener = installedRemovalListener()
+    const back = removalBy("GO_BACK")
+    const pop = removalBy("POP")
+    const reset = removalBy("RESET")
+    listener?.(back)
+    listener?.(pop)
+    listener?.(reset)
+
+    expect(back.preventDefault).toHaveBeenCalledTimes(1)
+    expect(pop.preventDefault).toHaveBeenCalledTimes(1)
+    expect(reset.preventDefault).not.toHaveBeenCalled()
+    expect(mockSetOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gestureEnabled: false }),
+    )
+  })
+
+  it("can be left the usual ways while nothing is in flight", async () => {
+    await renderScreen()
+
+    expect(installedRemovalListener()).toBeUndefined()
+    expect(mockSetOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gestureEnabled: true }),
+    )
+  })
+
+  it("releases the hold once the re-verification is done", async () => {
+    mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockIsReverifying = true
+    const rendered = await renderScreen()
+
+    mockIsReverifying = false
+    await rerenderScreen(rendered)
+
+    expect(mockRemoveListener).toHaveBeenCalledTimes(1)
+    expect(mockSetOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gestureEnabled: true }),
+    )
+  })
+
+  /** `setImmediate` stays real so that the effects settle; the hold's own timer is
+   *  the one driven. */
+  it("lets the user leave once the hold has run past its deadline, and holds again for a new run", async () => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockIsReverifying = true
+    const rendered = await renderScreen()
+    expect(installedRemovalListener()).toBeDefined()
+
+    act(() => {
+      jest.runOnlyPendingTimers()
+    })
+    await flushEffects()
+
+    expect(mockRemoveListener).toHaveBeenCalledTimes(1)
+    expect(mockSetOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gestureEnabled: true }),
+    )
+
+    mockIsReverifying = false
+    await rerenderScreen(rendered)
+    mockIsReverifying = true
+    await rerenderScreen(rendered)
+
+    expect(removalListenerInstalls()).toHaveLength(2)
+    expect(mockSetOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gestureEnabled: false }),
+    )
+  })
+
+  it("steps aside for a complete account only once the hold has lifted", async () => {
+    mockEnforcement.hasTwoFactor = true
+    mockIsReverifying = true
+    const rendered = await renderScreen()
+
     expect(mockGoBack).not.toHaveBeenCalled()
+
+    mockIsReverifying = false
+    await rerenderScreen(rendered)
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("offers to add a phone number when the email is already verified", async () => {
@@ -217,12 +334,7 @@ describe("TwoFactorSetupScreen", () => {
     const rendered = await renderScreen()
 
     mockEnforcement.hasTwoFactor = true
-    rendered.rerender(
-      <ContextForScreen>
-        <TwoFactorSetupScreen />
-      </ContextForScreen>,
-    )
-    await flushEffects()
+    await rerenderScreen(rendered)
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
