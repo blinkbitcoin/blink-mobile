@@ -999,6 +999,8 @@ const resetHomeScreenMocks = () => {
   mockIsRestrictedRegion = false
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
+  mockTwoFactorSessionPrompt.isModalOpen = false
+  mockTwoFactorEnforcement.isSessionStartPending = false
   jest.clearAllMocks()
   mockUseNonCustodialConversionLimits.mockReturnValue({
     limits: null,
@@ -3452,6 +3454,37 @@ describe("HomeScreen sanctioned session", () => {
     const { queryByTestId } = await renderAndSettleUpgradeDelay()
 
     expect(queryByTestId("trial-account-limits-modal")).toBeTruthy()
+  })
+
+  it("keeps the upgrade modal away while the two-factor session start is pending, with its modal up, so only one modal presents", async () => {
+    mockTwoFactorEnforcement.isSessionStartPending = true
+    mockTwoFactorSessionPrompt.isModalOpen = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeNull()
+    expect(mockTwoFactorSessionModal.mock.calls.at(-1)?.[0].isVisible).toBe(true)
+  })
+
+  it("gives the upgrade modal its turn once the two-factor session start is taken", async () => {
+    mockTwoFactorEnforcement.isSessionStartPending = true
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    const view = await renderAndSettleUpgradeDelay()
+    expect(view.queryByTestId("trial-account-limits-modal")).toBeNull()
+
+    mockTwoFactorEnforcement.isSessionStartPending = false
+    mockTwoFactorSessionPrompt.isModalOpen = false
+    view.rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+    await act(async () => {
+      jest.advanceTimersByTime(UPGRADE_MODAL_DELAY_WITH_SLACK_MS)
+    })
+
+    expect(view.queryByTestId("trial-account-limits-modal")).toBeTruthy()
   })
 
   it("keeps the upgrade modal away while the region is restricted", async () => {
