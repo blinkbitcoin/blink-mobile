@@ -104,6 +104,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const {
     checkpoint: storedCheckpoint,
     expectedReceiveSats: storedExpectedReceiveSats,
+    isStartConfirmed: storedIsStartConfirmed,
     accountId: selfCustodialAccountId,
     loading: checkpointLoading,
     hasError: hasCheckpointError,
@@ -193,7 +194,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * a drained account whose device remembers neither the commit point nor the figure the
    * receive gate waits on, so the button holds until the record lands.
    */
-  const [isCommitPointRecorded, setIsCommitPointRecorded] = useState(false)
+  const [isStepRecorded, setIsStepRecorded] = useState(false)
+  const [isStartConfirmationRecorded, setIsStartConfirmationRecorded] = useState(false)
   /** The latest attempt's answer, kept whole so the retry below can say why it is there:
    *  a store that refused is not a connection that dropped. Null until the first attempt. */
   const [lastCommitPointWrite, setLastCommitPointWrite] =
@@ -220,8 +222,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
       isStartConfirmed: startConfirmation,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
-     *  and a later failure cannot un-record a write that already landed. */
-    setIsCommitPointRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+     *  and a later failure cannot un-record a write that already landed. The confirmation
+     *  latches apart, since a write without it can land first. */
+    setIsStepRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+    if (startConfirmation) {
+      setIsStartConfirmationRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+    }
     if (writeResult.isSaved) recordedWriteKeyRef.current = commitPointWriteKey
     /** Overlapping writes (a focus and a retry, or a figure change) can answer out of
      *  order. Only the latest one issued speaks for the store now, so an older answer that
@@ -230,17 +236,27 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
   }, [expectedReceiveSats, startConfirmation, commitPointWriteKey, saveCheckpoint])
   const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
+  /** The commit point and the accepted start are one record, not two: once the server has
+   *  taken the start, a step written without it is the record a support-cleared flow is
+   *  later mistaken for a fresh one by, so only the write carrying it counts. */
+  const isCommitPointRecorded = startConfirmation
+    ? isStartConfirmationRecorded
+    : isStepRecorded
   /**
    * A resumed commit point is already on disk, and the write this screen issues cannot
    * change what Approve depends on: the step is already this one and the figure is
    * write-once per owner (mergeCheckpoint), so only savedAt would move. Holding Approve on
    * that write would trap a user whose disk filled after the lock was taken server-side,
    * with the hardware back swallowed, over a record that already exists. The latch above
-   * still governs the first visit, where the record genuinely does not exist yet.
+   * still governs the first visit, where the record genuinely does not exist yet. Once the
+   * server has taken the start, the stored record counts only if it carries it, by the
+   * same rule as the latch.
    */
+  const isStoredStartCurrent = !startConfirmation || storedIsStartConfirmed
   const isCommitPointOnDisk =
     storedCheckpoint === MigrationCheckpoint.BalancesOverview &&
-    storedExpectedReceiveSats !== null
+    storedExpectedReceiveSats !== null &&
+    isStoredStartCurrent
   const isCommitPointHeld = isCommitPointOnDisk || isCommitPointRecorded
 
   /** Still re-fires on a new saveCheckpoint after a write that did NOT land: an owner

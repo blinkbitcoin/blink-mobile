@@ -117,6 +117,7 @@ let mockCheckpointAccountId: string | null = "sc-account-1"
 let mockStoredCheckpoint: MigrationCheckpoint | null =
   MigrationCheckpoint.ChooseExperience
 let mockStoredExpectedReceiveSats: number | null = null
+let mockStoredIsStartConfirmed = false
 let mockOwnerId: string | null = "owner-1"
 const mockLnRetry = jest.fn()
 const lnTransferWith = (outcome: MigrationLnAddressOutcome) => ({
@@ -134,6 +135,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   useMigrationCheckpoint: () => ({
     checkpoint: mockStoredCheckpoint,
     expectedReceiveSats: mockStoredExpectedReceiveSats,
+    isStartConfirmed: mockStoredIsStartConfirmed,
     accountId: mockCheckpointAccountId,
     loading: mockCheckpointLoading,
     hasError: mockCheckpointHasError,
@@ -253,6 +255,7 @@ const resetScreenMocks = () => {
   mockCheckpointAccountId = "sc-account-1"
   mockStoredCheckpoint = MigrationCheckpoint.ChooseExperience
   mockStoredExpectedReceiveSats = null
+  mockStoredIsStartConfirmed = false
   mockStoredModes = {}
   mockOwnerId = "owner-1"
   mockOwnerIdLoading = false
@@ -1074,6 +1077,7 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
   it("opens Approve on a resumed commit point even when the refresh write is refused", async () => {
     mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
     mockStoredExpectedReceiveSats = 990
+    mockStoredIsStartConfirmed = true
     mockSaveCheckpoint.mockResolvedValue({
       isSaved: false,
       failure: StorageFailure.OutOfSpace,
@@ -1084,6 +1088,20 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     expect(mockSaveCheckpoint).toHaveBeenCalled()
     expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  it("still holds Approve on a resumed commit point that never recorded the accepted start", async () => {
+    mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+    mockStoredExpectedReceiveSats = 990
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
   })
 
   /** The step alone is not the record: one saved before the figure existed still lacks the
@@ -1130,6 +1148,66 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     for (const [, options] of mockSaveCheckpoint.mock.calls) {
       expect(options.isStartConfirmed).toBeUndefined()
     }
+  })
+
+  /** The step can land before the server accepts the start, so a write without the
+   *  confirmation is not the record Approve waits on: refusing only the one that carries it
+   *  would otherwise leave a started flow the device later mistakes for one never started. */
+  describe("when only the write carrying the accepted start is refused", () => {
+    const refuseConfirmedWrite = () =>
+      mockSaveCheckpoint.mockImplementation(
+        async (_step: MigrationCheckpoint, options: { isStartConfirmed?: true }) =>
+          options.isStartConfirmed
+            ? { isSaved: false, failure: StorageFailure.OutOfSpace }
+            : { isSaved: true, failure: null },
+      )
+
+    it("issues the step's write before the confirmed one", async () => {
+      refuseConfirmedWrite()
+      renderScreen()
+      await flushEffects()
+
+      const confirmations = mockSaveCheckpoint.mock.calls.map(
+        ([, options]) => options.isStartConfirmed,
+      )
+      expect(confirmations[0]).toBeUndefined()
+      expect(confirmations).toContain(true)
+    })
+
+    it("holds Approve and names the full disk above the retry", async () => {
+      refuseConfirmedWrite()
+      renderScreen()
+      await flushEffects()
+
+      expect(screen.queryByTestId("migration-balances-overview-approve")).toBeNull()
+      expect(screen.getByTestId("migration-balances-overview-retry")).toBeTruthy()
+      expect(screen.getByText(LLStorage.notSavedOutOfSpaceBody())).toBeTruthy()
+    })
+
+    it("opens Approve once a retry lands the confirmation", async () => {
+      refuseConfirmedWrite()
+      mockUseMigrationQuery.mockReturnValue({
+        ...migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 990,
+        }),
+        refetch: jest.fn(),
+      })
+      mockUseWalletOverviewScreenQuery.mockReturnValue({
+        ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+        refetch: jest.fn(),
+      })
+      renderScreen()
+      await flushEffects()
+
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
+      fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+      await flushEffects()
+
+      expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+    })
   })
 
   describe("the line above the retry", () => {
