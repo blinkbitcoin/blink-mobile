@@ -568,15 +568,12 @@ export const HomeScreen: React.FC = () => {
    *  the session start waits for that answer too. */
   const isTwoFactorPromptBlocked =
     isAnotherHomeModalVisible || migrateNowPrompt.isVisible || migrateNowPrompt.isPending
-  const {
-    isModalOpen: isTwoFactorModalOpen,
-    promptTier: twoFactorPromptTier,
-    closeModal: closeTwoFactorModal,
-  } = useTwoFactorSessionPrompt({ isBlocked: isTwoFactorPromptBlocked })
+  const { isModalOpen: isTwoFactorModalOpen, promptTier: twoFactorPromptTier } =
+    useTwoFactorSessionPrompt({ isBlocked: isTwoFactorPromptBlocked })
+  /** The dismissal takes the session start, which is what brings the modal down. */
   const dismissTwoFactorModal = useCallback(() => {
     registerTwoFactorDismissal(twoFactorPromptTier)
-    closeTwoFactorModal()
-  }, [registerTwoFactorDismissal, twoFactorPromptTier, closeTwoFactorModal])
+  }, [registerTwoFactorDismissal, twoFactorPromptTier])
   const isTwoFactorModalVisible = isTwoFactorModalOpen && isFocused
   /** Only while the home is in front: a screen the two-factor prompt pushed must not
    *  end up under this modal, and the modal comes back with the home. */
@@ -1046,7 +1043,6 @@ export const HomeScreen: React.FC = () => {
         tier={twoFactorPromptTier}
         remainingDismissals={twoFactorRemainingDismissals}
         onDismiss={dismissTwoFactorModal}
-        onLeave={closeTwoFactorModal}
       />
     </Screen>
   )
