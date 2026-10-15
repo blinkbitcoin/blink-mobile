@@ -65,6 +65,7 @@ jest.mock("@app/hooks/use-in-flight-guard", () => ({
 
 const mockCreateFailedCopy = "creation failed"
 const mockOutOfSpaceCopy = "free up some space"
+const mockNotSavedCopy = "could not save your progress"
 const mockUnreadableCopy = "could not read your progress"
 const mockReadOutOfSpaceCopy = "no space left to read your progress"
 
@@ -75,6 +76,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
       AccountMigration: {
         storageUnavailable: {
           notSavedOutOfSpaceBody: () => mockOutOfSpaceCopy,
+          notSavedBody: () => mockNotSavedCopy,
           unreadableBody: () => mockUnreadableCopy,
           outOfSpaceBody: () => mockReadOutOfSpaceCopy,
         },
@@ -157,7 +159,9 @@ describe("useMigrationAccount", () => {
     expect(mockProvision).not.toHaveBeenCalled()
   })
 
-  it("stops the flow with the failure toast when the checkpoint write fails", async () => {
+  /** The wallet was created; only its checkpoint was turned away. Saying creation failed
+   *  would have the user retry the wrong thing and never learn the funds are safe. */
+  it("stops the flow saying the progress was not saved when the store refused", async () => {
     mockSaveCheckpoint.mockResolvedValue({
       isSaved: false,
       failure: StorageFailure.Unknown,
@@ -171,7 +175,7 @@ describe("useMigrationAccount", () => {
 
     expect(ensured).toBeNull()
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: mockCreateFailedCopy }),
+      expect.objectContaining({ message: mockNotSavedCopy }),
     )
   })
 
@@ -259,7 +263,7 @@ describe("useMigrationAccount", () => {
     )
   })
 
-  it("keeps the generic copy for any other pending-record write failure", async () => {
+  it("says the progress was not saved for any other pending-record write failure", async () => {
     mockSavePendingAccount.mockRejectedValue(
       new StorageWriteError(new Error("Database Error")),
     )
@@ -270,7 +274,7 @@ describe("useMigrationAccount", () => {
     })
 
     expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: mockCreateFailedCopy }),
+      expect.objectContaining({ message: mockNotSavedCopy }),
     )
   })
 

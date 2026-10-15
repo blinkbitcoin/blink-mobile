@@ -111,12 +111,34 @@ describe("AcceptTermsAndConditionsScreen", () => {
   })
 
   /** A Continue that answers a tap with nothing reads as a broken button, so the refusal
-   *  has to be said out loud. */
-  it("says so when the checkpoint write fails", async () => {
+   *  has to be said out loud, and as the device's: "try again later" hides that the funds
+   *  are safe and the problem is the store. */
+  it("says the progress was not saved when the store refused", async () => {
     mockSaveCheckpoint.mockResolvedValue({
       isSaved: false,
       failure: StorageFailure.Unknown,
     })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.AccountMigration.storageUnavailable.notSavedBody(),
+      }),
+    )
+  })
+
+  /** Turned away before it reached the store, for want of an owner: not the device's
+   *  failure, so it is not blamed on the device. */
+  it("keeps the generic apology for a write that never reached the store", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
     render(
       <ContextForScreen>
         <AcceptTermsAndConditionsScreen />

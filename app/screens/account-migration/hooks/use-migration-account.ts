@@ -72,14 +72,20 @@ export const useMigrationAccount = () => {
       refetchPending()
       return null
     }
-    /** A full disk is the one failure the user can clear, so it is named; anything else,
-     *  storage or not, keeps the generic copy. */
+    /** A store that refused is named as the device's: by then the wallet may well exist,
+     *  and telling the user its creation failed would have them retry the wrong thing and
+     *  never learn their funds are safe. Only a failure that never reached the store
+     *  (provisioning, the SDK, a missing owner) keeps the creation copy. */
+    const resolveCreateFailedMessage = (failure: StorageFailure | null): string => {
+      const { storageUnavailable } = LL.AccountMigration
+      if (failure === StorageFailure.OutOfSpace) {
+        return storageUnavailable.notSavedOutOfSpaceBody()
+      }
+      if (failure !== null) return storageUnavailable.notSavedBody()
+      return LL.AccountTypeSelectionScreen.createFailed()
+    }
     const showCreateFailed = (failure: StorageFailure | null): void => {
-      const isOutOfSpace = failure === StorageFailure.OutOfSpace
-      const message = isOutOfSpace
-        ? LL.AccountMigration.storageUnavailable.notSavedOutOfSpaceBody()
-        : LL.AccountTypeSelectionScreen.createFailed()
-      toastShow({ message, LL })
+      toastShow({ message: resolveCreateFailedMessage(failure), LL })
     }
     setIsProvisioning(true)
     try {

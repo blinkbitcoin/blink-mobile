@@ -46,20 +46,27 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     })
   }
 
+  const resolveNotSavedMessage = (failure: StorageFailure | null): string => {
+    const { storageUnavailable } = LL.AccountMigration
+    if (failure === StorageFailure.OutOfSpace) {
+      return storageUnavailable.notSavedOutOfSpaceBody()
+    }
+    if (failure !== null) return storageUnavailable.notSavedBody()
+    return LL.errors.generic()
+  }
+
   const action = async () => {
     if (flow === "migration") {
       /** The acceptance is part of the migration's consent trail, so advance only once the
        *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
        *  user already accepted. */
       const { isSaved, failure } = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
-      /** A Continue that answers a tap with nothing reads as a broken button, and a full
-       *  disk is the one failure the user can go and fix. */
+      /** A Continue that answers a tap with nothing reads as a broken button. A store that
+       *  refused is named as the device's, a full disk most of all since the user can go
+       *  and fix it; a write turned away before it reached the store (no owner yet) is not
+       *  the device's fault and keeps the generic copy. */
       if (!isSaved) {
-        const isOutOfSpace = failure === StorageFailure.OutOfSpace
-        const message = isOutOfSpace
-          ? LL.AccountMigration.storageUnavailable.notSavedOutOfSpaceBody()
-          : LL.errors.generic()
-        toastShow({ message, LL })
+        toastShow({ message: resolveNotSavedMessage(failure), LL })
         return
       }
       navigation.navigate("selfCustodialBackupMethod")
