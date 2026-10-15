@@ -45,10 +45,11 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 }))
 
 const mockPromptReverification = jest.fn()
+let mockIsReverifying = false
 jest.mock("@app/hooks/use-email-reverification", () => ({
   useEmailReverification: () => ({
     promptReverification: (...args: unknown[]) => mockPromptReverification(...args),
-    spinner: false,
+    spinner: mockIsReverifying,
   }),
 }))
 
@@ -79,6 +80,7 @@ describe("TwoFactorSetupScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockIsFocused = true
+    mockIsReverifying = false
     mockEnforcement.tier = TwoFactorTier.Nudge
     mockEnforcement.hasTwoFactor = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
@@ -125,6 +127,27 @@ describe("TwoFactorSetupScreen", () => {
       tier: TwoFactorTier.Nudge,
       method: TwoFactorMethod.Email,
     })
+  })
+
+  it("holds every exit while a re-verification is in flight", async () => {
+    mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockIsReverifying = true
+    await renderScreen()
+
+    /** The missing-factor button shows its spinner in place of its title while it is
+     *  held, so there is no label to press; its disabled state is what keeps a second
+     *  re-verification from starting. */
+    // eslint-disable-next-line camelcase
+    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
+    expect(secondary.props.loading).toBe(true)
+    expect(secondary.props.disabled).toBe(true)
+
+    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
+    renderInstalledCloseControl()
+    fireEvent.press(screen.getByTestId("icon-close"))
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockGoBack).not.toHaveBeenCalled()
   })
 
   it("offers to add a phone number when the email is already verified", async () => {
