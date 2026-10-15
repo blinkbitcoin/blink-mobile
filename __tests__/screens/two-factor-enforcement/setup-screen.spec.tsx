@@ -95,12 +95,14 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
-  it("offers to add an email when that is the missing factor", async () => {
+  it("offers to add an email when that is the missing factor, told to return here", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate")
+    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate", {
+      returnTo: "twoFactorSetup",
+    })
     expect(mockPromptReverification).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
       tier: TwoFactorTier.Nudge,
@@ -108,13 +110,16 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("sends an address that was never verified through re-verification", async () => {
+  it("sends an address that was never verified through re-verification, told to return here", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
 
-    expect(mockPromptReverification).toHaveBeenCalledWith("someone@example.com")
+    expect(mockPromptReverification).toHaveBeenCalledWith(
+      "someone@example.com",
+      "twoFactorSetup",
+    )
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
       tier: TwoFactorTier.Nudge,
@@ -137,12 +142,14 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("offers the authenticator as the call to action", async () => {
+  it("offers the authenticator as the call to action, told to return here", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      returnTo: "twoFactorSetup",
+    })
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
       tier: TwoFactorTier.Nudge,
       method: TwoFactorMethod.Authenticator,

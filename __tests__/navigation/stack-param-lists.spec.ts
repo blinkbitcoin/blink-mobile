@@ -1,7 +1,42 @@
 import {
   canGoBackFromChooseExperience,
+  canReturnToRoute,
   ChooseExperienceContinueRoute,
 } from "@app/navigation/stack-param-lists"
+
+describe("canReturnToRoute", () => {
+  const stackWith = (...names: string[]) => ({ routes: names.map((name) => ({ name })) })
+
+  it("lets a flow return to the two-factor setup while that screen is in its stack", () => {
+    expect(
+      canReturnToRoute(
+        stackWith("Primary", "twoFactorSetup", "emailRegistrationInitiate"),
+        "twoFactorSetup",
+      ),
+    ).toBe(true)
+  })
+
+  /** The param reaches the registration screens through deep links too, so a name the
+   *  stack never had must not be dispatched. */
+  it("refuses a return route the stack does not hold", () => {
+    expect(
+      canReturnToRoute(
+        stackWith("Primary", "emailRegistrationInitiate"),
+        "twoFactorSetup",
+      ),
+    ).toBe(false)
+  })
+
+  it("refuses when no return route was asked for", () => {
+    expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), undefined)).toBe(
+      false,
+    )
+  })
+
+  it("refuses when the navigator has no state to check against", () => {
+    expect(canReturnToRoute(undefined, "twoFactorSetup")).toBe(false)
+  })
+})
 
 describe("canGoBackFromChooseExperience", () => {
   /** Settings carries no onward step: it opened this screen over a live session, which is a
