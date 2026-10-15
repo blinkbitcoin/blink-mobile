@@ -1,4 +1,4 @@
-import { useCallback } from "react"
+import { useCallback, useRef, useState } from "react"
 import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
@@ -60,12 +60,23 @@ export const useEmailReverification = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const [emailDeleteMutation, { loading: deleting }] = useUserEmailDeleteMutation()
-  const [setEmailMutation, { loading: registering }] =
-    useUserEmailRegistrationInitiateMutation()
+  const [emailDeleteMutation] = useUserEmailDeleteMutation()
+  const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
+
+  /** One sequence at a time: it deletes the address before registering it again, and a
+   *  second run on top of the first could leave the account with none. The ref is the
+   *  guard, as a prompt's buttons close over the render that raised it, and two prompts
+   *  raised before either is answered would both see a state unset. The state is what
+   *  callers render, and it spans the sequence from before the first request to after
+   *  the last, rather than following each mutation's own loading flag. */
+  const isSequenceRunningRef = useRef(false)
+  const [isSequenceRunning, setIsSequenceRunning] = useState(false)
 
   const confirmEmailAgain = useCallback(
     async (email: string, returnTo?: RegistrationReturnRoute) => {
+      if (isSequenceRunningRef.current) return
+      isSequenceRunningRef.current = true
+      setIsSequenceRunning(true)
       try {
         await emailDeleteMutation({
           // to avoid flacky behavior
@@ -96,6 +107,10 @@ export const useEmailReverification = () => {
         }
       } catch (err) {
         console.error(err, "error in setEmailMutation")
+      } finally {
+        // eslint-disable-next-line require-atomic-updates -- single writer; the flag above keeps a second run out until here
+        isSequenceRunningRef.current = false
+        setIsSequenceRunning(false)
       }
     },
     [emailDeleteMutation, setEmailMutation, navigate],
@@ -120,5 +135,5 @@ export const useEmailReverification = () => {
     [LL, confirmEmailAgain],
   )
 
-  return { promptReverification, spinner: deleting || registering }
+  return { promptReverification, spinner: isSequenceRunning }
 }
