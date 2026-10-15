@@ -250,6 +250,7 @@ export const HomeScreen: React.FC = () => {
   const {
     shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
     remainingDismissals: twoFactorRemainingDismissals,
+    isSessionStartPending: isTwoFactorStartPending,
     registerDismissal: registerTwoFactorDismissal,
   } = useTwoFactorEnforcement()
   const { LL } = useI18nContext()
@@ -620,6 +621,11 @@ export const HomeScreen: React.FC = () => {
    *  the effect re-arms its timer once the evaluation settles. */
   const triggerUpgradeModal = React.useCallback(() => {
     if (isRestrictedRegion || isRestrictedRegionEvaluationPending) return
+    /** The two-factor prompt goes first: its session start stays pending until its
+     *  modal is resolved, and the two would otherwise present as two native modals.
+     *  Being a dependency of the focus effect below, this re-arms the timer once the
+     *  start is taken, so the upgrade prompt gets its turn afterwards. */
+    if (isTwoFactorStartPending) return
     if (!accountId || levelAccount !== AccountLevel.Zero) return
     if (!canShowUpgradeModal || satsBalance <= balanceLimitToTriggerUpgradeModal) return
 
@@ -628,6 +634,7 @@ export const HomeScreen: React.FC = () => {
   }, [
     isRestrictedRegion,
     isRestrictedRegionEvaluationPending,
+    isTwoFactorStartPending,
     accountId,
     levelAccount,
     canShowUpgradeModal,
