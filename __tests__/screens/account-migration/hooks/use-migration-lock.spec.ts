@@ -234,6 +234,17 @@ describe("useMigrationLock", () => {
       expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
     })
 
+    /** A settled read with no migration on it is never the server's word for a cleared
+     *  flow (that arrives as NOT_STARTED), so it must not route a commit point to the
+     *  restart: only a status the server sent is an answer. */
+    it("has no answer when a settled read carried no status", () => {
+      mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
+
     /** A failed re-read can leave the previous answer behind; it is no longer current. */
     it("has no answer when the read failed, whatever it said before", () => {
       mockUseMigrationStatus.mockReturnValue(

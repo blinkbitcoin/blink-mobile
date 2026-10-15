@@ -820,5 +820,8 @@ describe("migration-checkpoint-storage resolveCommitPointRoute", () => {
     expect(resolveCommitPointRoute(ServerMigrationFlow.Unanswered, true)).toBe(
       CommitPointRoute.AskAgain,
     )
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Unanswered, false)).toBe(
+      CommitPointRoute.AskAgain,
+    )
   })
 })
