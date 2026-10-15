@@ -5,9 +5,9 @@ import { useTheme } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { IconHero } from "@app/components/icon-hero"
+import { CloseHeader } from "@app/components/close-header"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { MigrationCloseHeader } from "@app/screens/account-migration/migration-close-header"
 import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
 import { testProps } from "@app/utils/testProps"
 
@@ -26,10 +26,19 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
   } = useTheme()
   const { openSupport } = useContactSupport()
 
+  /** A step reached with no way out draws the row without the control. */
+  const isCloseHidden = !onClose
+
   return (
     <MigrationStepLayout
       headerShown={false}
-      header={<MigrationCloseHeader onClose={onClose} testID="migration-api-close" />}
+      header={
+        <CloseHeader
+          onClose={onClose}
+          isHidden={isCloseHidden}
+          testID="migration-api-close"
+        />
+      }
       footer={
         <>
           <GaloyPrimaryButton

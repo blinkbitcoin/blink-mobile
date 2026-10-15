@@ -1,6 +1,7 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
+import { GraphQLError } from "graphql"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { RefreshControl, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -10,6 +11,7 @@ import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 import {
   AccountLevel,
+  BulletinsDocument,
   HomeAuthedDocument,
   HomeUnauthedDocument,
   Network,
@@ -2858,7 +2860,7 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0]).toEqual(
-      expect.objectContaining({ skip: false, variables: { first: 1 } }),
+      expect.objectContaining({ skip: false, variables: { first: 10 } }),
     )
   })
 
@@ -2877,6 +2879,100 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0].skip).toBe(true)
+  })
+})
+
+/**
+ * The real path from the home's query to a card on screen: the bulletin node comes from
+ * the mocked server, not from a hand-built object, so a field the query stops selecting
+ * breaks this rather than passing unnoticed.
+ */
+describe("bulletins from the server", () => {
+  const bulletinsResponse = (result: MockedResponse["result"]): MockedResponse => ({
+    request: { query: BulletinsDocument, variables: { first: 10 } },
+    result,
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+  })
+
+  afterEach(() => {
+    currentMocks = []
+  })
+
+  it("renders the bulletin the server sends", async () => {
+    currentMocks = [
+      bulletinsResponse({
+        data: {
+          me: {
+            __typename: "User",
+            id: "70df9822-efe0-419c-b864-c9efa99872ea",
+            unacknowledgedStatefulNotificationsWithBulletinEnabled: {
+              __typename: "StatefulNotificationConnection",
+              pageInfo: {
+                __typename: "PageInfo",
+                endCursor: null,
+                hasNextPage: false,
+                hasPreviousPage: false,
+                startCursor: null,
+              },
+              edges: [
+                {
+                  __typename: "StatefulNotificationEdge",
+                  cursor: "notif-home",
+                  node: {
+                    __typename: "StatefulNotification",
+                    id: "notif-home",
+                    title: "Scheduled maintenance tonight",
+                    body: "Payments may be slower for a few minutes.",
+                    createdAt: 1757800000,
+                    acknowledgedAt: null,
+                    bulletinEnabled: true,
+                    dismissible: true,
+                    icon: null,
+                    action: null,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      }),
+    ]
+
+    const { findByText } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByText("Scheduled maintenance tonight")).toBeTruthy()
+  })
+
+  /** A server that rejects the query, as a backend without the fields the query names
+   *  does, leaves the home without bulletins and nothing else missing. */
+  it("shows no bulletin, and the rest of the home, when the query fails", async () => {
+    currentMocks = [
+      bulletinsResponse({
+        errors: [new GraphQLError('Cannot query field "dismissible"')],
+      }),
+    ]
+
+    const { getByTestId, queryByText } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("home-screen")).toBeTruthy()
+    expect(queryByText("Scheduled maintenance tonight")).toBeNull()
   })
 })
 

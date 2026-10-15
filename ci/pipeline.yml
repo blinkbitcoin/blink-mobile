@@ -463,7 +463,7 @@ resources:
 - name: daily
   type: time
   source:
-    day_of_week: 1-6
+    days: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
     start: 6:00 AM
     stop: 6:00 AM
     location: UTC

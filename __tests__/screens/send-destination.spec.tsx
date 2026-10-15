@@ -1193,6 +1193,47 @@ describe("SendBitcoinDestinationScreen", () => {
       await settleModalAnimations()
     })
 
+    /** A caller that already judged which wallet can pay names it; the details step
+     *  seeds from it instead of the flow's default. */
+    it("hands the requested sending wallet on to the details step", async () => {
+      /** An invoice, which goes straight to the details step; a handle would stop at
+       *  the username confirmation first. */
+      parseDestinationMock.mockResolvedValue({
+        valid: true,
+        destinationDirection: DestinationDirection.Send,
+        validDestination: {
+          valid: true,
+          paymentType: PaymentType.Lightning,
+          paymentRequest: "lnbc1testpayment123",
+        },
+        createPaymentDetail: jest.fn(),
+      } as unknown as ParseDestinationResult)
+
+      const route = {
+        ...sendBitcoinDestination,
+        params: {
+          ...sendBitcoinDestination.params,
+          payment: "lnbc1testpayment123",
+          sendingWalletId: "wallet-usd",
+        },
+      } as unknown as typeof sendBitcoinDestination
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinDestinationScreen route={route} />
+        </ContextForScreen>,
+      )
+
+      await flushAsync()
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "sendBitcoinDetails",
+        expect.objectContaining({ sendingWalletId: "wallet-usd" }),
+      )
+
+      await settleModalAnimations()
+    })
+
     it("processes the selected merchant lnurl from route params, not the unresolved input", async () => {
       setupParseDestinationMock(parseDestinationMock)
 

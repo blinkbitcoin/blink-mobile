@@ -8,6 +8,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { PasswordInput } from "@app/components/password-input"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { PhraseStep, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
@@ -21,6 +22,11 @@ export const CloudRestoreScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  // The decryption password is typed here, and PasswordInput's eye toggle shows it in
+  // plain text. Guarded from the first render, not from the password step, so no step
+  // paints unguarded.
+  useScreenSecurity()
 
   const {
     isLoading,
