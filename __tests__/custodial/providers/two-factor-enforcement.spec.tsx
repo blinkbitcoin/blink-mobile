@@ -146,6 +146,39 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowSettingsBanner).toBe(false)
     })
 
+    it("keeps the account unloaded and writes nothing when its record cannot be read", async () => {
+      mockGetItem.mockRejectedValue(new Error("storage unavailable"))
+      setAccount({ sats: 50_000 })
+
+      const { result } = await renderEnforcement()
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Two-factor enforcement read",
+        expect.any(Error),
+      )
+      expect(result.current.shouldShowNudgeCard).toBe(false)
+      expect(result.current.shouldShowSettingsBanner).toBe(false)
+      expect(mockSetItem).not.toHaveBeenCalled()
+
+      act(() => result.current.dismissNudgeCard())
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
+    /** Content the store hands over but that no longer parses is unusable: storage reads
+     *  it as absent, so the account starts afresh and the record written then replaces
+     *  it, instead of the key staying unreadable for good. */
+    it("reads content it cannot parse as no record, which the next write replaces", async () => {
+      mockGetItem.mockResolvedValue("{not json")
+      setAccount({ sats: 50_000 })
+
+      const { result } = await renderEnforcement()
+
+      expect(mockReportError).not.toHaveBeenCalled()
+      expect(result.current.shouldShowNudgeCard).toBe(true)
+      expect(mockSetItem).toHaveBeenCalled()
+    })
+
     it("ignores a self-custodial account even when the query still answers", async () => {
       mockAccountType = AccountType.SelfCustodial
 

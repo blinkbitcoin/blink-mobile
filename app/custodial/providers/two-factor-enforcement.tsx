@@ -19,7 +19,7 @@ import {
 } from "@app/types/two-factor-enforcement"
 import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
-import { loadJson, saveJson } from "@app/utils/storage"
+import { loadJsonOrThrow, saveJson } from "@app/utils/storage"
 
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
@@ -118,9 +118,17 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       return
     }
     let isMounted = true
-    loadJson(storageKeyFor(accountId)).then((raw) => {
-      if (isMounted) commitStored({ accountId, record: normalizeStoredRecord(raw) })
-    })
+    /** A record that could not be read is not a missing one: with the account left
+     *  unloaded, nothing is prompted and nothing is written, so a transient read
+     *  failure cannot replace a dismissal or a reached tier with the defaults. The
+     *  prompts stay off for that launch; the next one reads the record again. */
+    loadJsonOrThrow(storageKeyFor(accountId))
+      .then((raw) => {
+        if (isMounted) commitStored({ accountId, record: normalizeStoredRecord(raw) })
+      })
+      .catch((err) => {
+        if (isMounted) reportError("Two-factor enforcement read", err)
+      })
     return () => {
       isMounted = false
     }
