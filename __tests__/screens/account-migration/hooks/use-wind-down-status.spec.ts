@@ -77,6 +77,18 @@ describe("useWindDownStatus", () => {
     expect(result.current.isPending).toBe(false)
   })
 
+  it("leaves the server unasked when told to skip, for a reader that cannot use the answer", () => {
+    mockUseWindDownQuery.mockReturnValue({ data: undefined, loading: false })
+
+    const { result } = renderHook(() => useWindDownStatus({ skip: true }))
+
+    expect(mockUseWindDownQuery).toHaveBeenCalledWith({
+      skip: true,
+      fetchPolicy: "no-cache",
+    })
+    expect(result.current.windDown).toBeNull()
+  })
+
   it("fetches without touching the cache so a switch never serves the previous account's status", () => {
     mockUseWindDownQuery.mockReturnValue({ data: { windDown: null } })
 

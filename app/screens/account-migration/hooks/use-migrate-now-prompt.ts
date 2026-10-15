@@ -1,8 +1,30 @@
-import { WindDownStatus } from "@app/types/wind-down"
+import { WindDown, WindDownStatus } from "@app/types/wind-down"
 
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
 import { useCustodialWindDownRead } from "./use-custodial-wind-down"
 import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
+import { WindDownReadOptions } from "./use-wind-down-status"
+
+type MigrateNowRemedy = {
+  /** The post-cutoff push into the migration applies to the account: receiving is
+   *  disabled and the self-custodial stack is on. */
+  isDue: boolean
+  isPending: boolean
+  windDown: WindDown | null
+}
+
+/** Whether the push into the migration applies, before any session dismissal, which the
+ *  prompt keeps for itself: what a surface that must yield to the push reads. */
+export const useMigrateNowRemedy = (options?: WindDownReadOptions): MigrateNowRemedy => {
+  const isSelfCustodialDisabled = useSelfCustodialDisabled()
+  const { windDown, isPending } = useCustodialWindDownRead(options)
+
+  const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
+
+  /** Reopening the greyed-Receive nudge only surfaces the prompt when receiving is disabled
+   *  and the self-custodial flag is on; the home falls back to a toast otherwise. */
+  return { isDue: isReceiveDisabled && !isSelfCustodialDisabled, isPending, windDown }
+}
 
 type MigrateNowPrompt = {
   isVisible: boolean
@@ -22,15 +44,7 @@ type MigrateNowPrompt = {
 export const useMigrateNowPrompt = (): MigrateNowPrompt => {
   const { isDismissedForSession, dismissForSession, reopen } =
     useAccountSessionDismissal()
-  const isSelfCustodialDisabled = useSelfCustodialDisabled()
-
-  const { windDown, isPending } = useCustodialWindDownRead()
-
-  const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
-
-  /** Reopening the greyed-Receive nudge only surfaces the prompt when receiving is disabled
-   *  and the self-custodial flag is on; the home falls back to a toast otherwise. */
-  const canReopen = isReceiveDisabled && !isSelfCustodialDisabled
+  const { isDue: canReopen, isPending, windDown } = useMigrateNowRemedy()
 
   /** The deadline fields are display data for the modal, only read while visible. */
   return {
