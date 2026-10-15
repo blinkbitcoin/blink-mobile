@@ -85,6 +85,7 @@ type MeOverrides = {
   sats?: number
   usdCents?: number
   loading?: boolean
+  error?: Error
 }
 
 const setAccount = ({
@@ -95,9 +96,11 @@ const setAccount = ({
   sats = 0,
   usdCents = 0,
   loading = false,
+  error,
 }: MeOverrides = {}) => {
   mockUseSettingsScreenQuery.mockReturnValue({
     loading,
+    error,
     data: {
       me: {
         id: "user-1",
@@ -595,10 +598,11 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     })
 
-    it("reports a dismissal the storage could not keep", async () => {
+    it("reports a dismissal the storage could not keep, and still honours it for the session", async () => {
       const failure = new Error("disk full")
       mockSetItem.mockRejectedValue(failure)
       const { result } = await renderEnforcement()
+      expect(result.current.shouldShowNudgeCard).toBe(true)
 
       await act(async () => result.current.dismissNudgeCard())
 
@@ -606,6 +610,7 @@ describe("TwoFactorEnforcementProvider", () => {
         "Two-factor enforcement write",
         failure,
       )
+      expect(result.current.shouldShowNudgeCard).toBe(false)
     })
   })
 
@@ -687,6 +692,41 @@ describe("TwoFactorEnforcementProvider", () => {
         TwoFactorSessionPrompt.ProtectionRequired,
       )
       expect(result.current.isProtectionGateActive).toBe(false)
+    })
+
+    it("decides from the account as last read when the fresh read fails, rather than skip the session", async () => {
+      setAccount({ sats: 500_000, error: new Error("network down") })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.isSessionStartPending).toBe(true)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+    })
+
+    it("stays inert when the fresh read fails with nothing cached, without holding the home", async () => {
+      mockUseSettingsScreenQuery.mockReturnValue({
+        loading: false,
+        error: new Error("network down"),
+        data: undefined,
+      })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.isPreparingSessionStart).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(false)
+    })
+
+    it("stands the protection screen in when a fresher read raises the tier while the start is still pending", async () => {
+      setAccount({ sats: 500_000 })
+      const { result, rerender } = await renderEnforcement()
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.isProtectionGateActive).toBe(false)
+
+      setAccount({ sats: 5_000_000 })
+      await act(async () => rerender({}))
+
+      expect(result.current.isProtectionGateActive).toBe(true)
     })
 
     it("is pending even when nothing is owed, so the session can be taken", async () => {
