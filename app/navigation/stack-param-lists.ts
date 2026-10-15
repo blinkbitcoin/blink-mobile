@@ -62,6 +62,21 @@ export const canGoBackFromChooseExperience = (
   return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
 }
 
+/** Where a registration flow goes on success when it was opened from the two-factor
+ *  setup: back into the setup, instead of the destination the flow has on its own. */
+export type RegistrationReturnRoute = "twoFactorSetup"
+
+type RouteStack = { routes: ReadonlyArray<{ name: string }> }
+
+/** A registration flow may return only to a route its stack holds. The param reaches
+ *  these screens through deep links as well, so a name the stack never had, or a route
+ *  already left, must fall back to the flow's own destination rather than be dispatched. */
+export const canReturnToRoute = (
+  stack: RouteStack | undefined,
+  returnTo: RegistrationReturnRoute | undefined,
+): returnTo is RegistrationReturnRoute =>
+  returnTo !== undefined && Boolean(stack?.routes.some(({ name }) => name === returnTo))
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
@@ -202,17 +217,25 @@ export type RootStackParamList = {
   transactionLimitsScreen: undefined
   feeRatesScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
-  emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }
+  emailRegistrationInitiate?: {
+    onboarding?: boolean
+    hasUsername?: boolean
+    returnTo?: RegistrationReturnRoute
+  }
   emailRegistrationValidate: {
     email: string
     emailRegistrationId: string
     onboarding?: boolean
     hasUsername?: boolean
+    returnTo?: RegistrationReturnRoute
   }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }
-  totpRegistrationInitiate: undefined
-  totpRegistrationValidate: { totpRegistrationId: string }
+  totpRegistrationInitiate?: { returnTo?: RegistrationReturnRoute }
+  totpRegistrationValidate: {
+    totpRegistrationId: string
+    returnTo?: RegistrationReturnRoute
+  }
   totpLoginValidate: { authToken: string }
   twoFactorSetup: undefined
   webView: {

@@ -13,9 +13,14 @@ import { Screen } from "@app/components/screen"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  RegistrationReturnRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
+
+const RETURN_ROUTE: RegistrationReturnRoute = "twoFactorSetup"
 
 export const TwoFactorSetupScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -49,14 +54,17 @@ export const TwoFactorSetupScreen: React.FC = () => {
     if (isSetupComplete) navigation.goBack()
   }, [isSetupComplete, navigation])
 
+  /** Each flow is told to come back here when it succeeds, rather than to the
+   *  destination it has on its own; this screen then steps aside to wherever it was
+   *  opened from. The phone flow already pops back to its caller. */
   const handleAddMissingMethod = useCallback(() => {
     logTwoFactorSetupStarted({ tier, method: missingMethod })
     if (unverifiedEmail) {
-      promptReverification(unverifiedEmail)
+      promptReverification(unverifiedEmail, RETURN_ROUTE)
       return
     }
     if (isEmailMissing) {
-      navigation.navigate("emailRegistrationInitiate")
+      navigation.navigate("emailRegistrationInitiate", { returnTo: RETURN_ROUTE })
       return
     }
     navigation.navigate("phoneRegistrationInitiate")
@@ -71,7 +79,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   const handleSetAuthenticator = useCallback(() => {
     logTwoFactorSetupStarted({ tier, method: TwoFactorMethod.Authenticator })
-    navigation.navigate("totpRegistrationInitiate")
+    navigation.navigate("totpRegistrationInitiate", { returnTo: RETURN_ROUTE })
   }, [navigation, tier])
 
   return (

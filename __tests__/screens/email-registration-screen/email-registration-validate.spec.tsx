@@ -10,6 +10,8 @@ import { RouteProp } from "@react-navigation/native"
 const mockPopTo = jest.fn()
 const mockReplace = jest.fn()
 const mockNavigate = jest.fn()
+/** The routes under this screen, as the navigator would report them. */
+let mockStackRouteNames: string[] = []
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -17,6 +19,7 @@ jest.mock("@react-navigation/native", () => ({
     popTo: mockPopTo,
     replace: mockReplace,
     navigate: mockNavigate,
+    getState: () => ({ routes: mockStackRouteNames.map((name) => ({ name })) }),
   }),
 }))
 
@@ -86,6 +89,7 @@ const verifiedResponse = {
 describe("EmailRegistrationValidateScreen — navigation after success", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockStackRouteNames = ["Primary", "settings", "emailRegistrationInitiate"]
     mockEmailVerify.mockResolvedValue(verifiedResponse)
     mockUpdateCurrentProfile.mockResolvedValue(undefined)
   })
@@ -108,6 +112,57 @@ describe("EmailRegistrationValidateScreen — navigation after success", () => {
 
     expect(mockPopTo).toHaveBeenCalledWith("settings")
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("pops back into the two-factor setup when the flow was opened from it", async () => {
+    mockStackRouteNames = ["Primary", "twoFactorSetup", "emailRegistrationInitiate"]
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({
+            emailRegistrationId: "id",
+            email: "a@b.com",
+            returnTo: "twoFactorSetup",
+          })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockPopTo).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockPopTo).not.toHaveBeenCalledWith("settings")
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  it("ignores a return route the stack does not hold, as a deep link could name one", async () => {
+    mockStackRouteNames = ["Primary", "emailRegistrationInitiate"]
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({
+            emailRegistrationId: "id",
+            email: "a@b.com",
+            returnTo: "twoFactorSetup",
+          })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockPopTo).toHaveBeenCalledWith("settings")
+    expect(mockPopTo).not.toHaveBeenCalledWith("twoFactorSetup")
   })
 
   it("replaces with the onboarding flow (not Settings) when started from onboarding", async () => {
