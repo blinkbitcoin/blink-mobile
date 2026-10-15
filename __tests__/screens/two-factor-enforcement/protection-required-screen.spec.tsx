@@ -1,6 +1,8 @@
 import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { WalletCurrency } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -31,11 +33,22 @@ const mockEnforcement = {
   unmetTier: TwoFactorTier.Recommended as TwoFactorTier,
   remainingDismissals: 0,
   enforcedCurrency: WalletCurrency.Btc as WalletCurrency,
+  missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
+  unverifiedEmail: null as string | null,
   registerDismissal: mockRegisterDismissal,
   consumeSessionStart: mockConsumeSessionStart,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
+}))
+
+const mockUseEmailReverification = jest.fn((_options?: { returnTo?: string }) => ({
+  promptReverification: jest.fn(),
+  spinner: false,
+}))
+jest.mock("@app/hooks/use-email-reverification", () => ({
+  useEmailReverification: (options?: { returnTo?: string }) =>
+    mockUseEmailReverification(options),
 }))
 
 const mockLogTwoFactorPromptShown = jest.fn()
@@ -82,21 +95,51 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.enforcedCurrency = WalletCurrency.Btc
+    mockEnforcement.missingMethod = TwoFactorMethod.Email
+    mockEnforcement.unverifiedEmail = null
   })
 
   describe("at the recommended tier", () => {
-    it("blocks: warning hero, no amount in the title, no close control", async () => {
+    it("stands the setup in, with no close control and no other way out", async () => {
       await renderScreen()
 
-      expect(screen.getByTestId("icon-warning")).toBeTruthy()
-      expect(
-        screen.getByText(LL.TwoFactorEnforcement.protectionRequiredTitle()),
-      ).toBeTruthy()
-      expect(
-        screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
-      ).toBeTruthy()
+      expect(screen.getByTestId("icon-lock-closed")).toBeTruthy()
+      expect(screen.getByText(LL.TwoFactorEnforcement.setupTitle())).toBeTruthy()
+      expect(screen.getByText(LL.TwoFactorEnforcement.setupDescription())).toBeTruthy()
       expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
+      expect(screen.queryByTestId("two-factor-protection-move")).toBeNull()
+      expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
       expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
+    })
+
+    it("offers the authenticator first and the missing factor second", async () => {
+      await renderScreen()
+
+      // eslint-disable-next-line camelcase
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe(
+        LL.TwoFactorEnforcement.setAuthenticator(),
+      )
+      // eslint-disable-next-line camelcase
+      expect(screen.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe(
+        LL.TwoFactorEnforcement.addEmail(),
+      )
+    })
+
+    it("starts the missing factor's flow under the recommended tier, returning to the home", async () => {
+      await renderScreen()
+
+      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
+
+      expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate", {
+        returnTo: "Primary",
+      })
+      expect(mockUseEmailReverification).toHaveBeenLastCalledWith({
+        returnTo: "Primary",
+      })
+      expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
+        tier: TwoFactorTier.Recommended,
+        method: TwoFactorMethod.Email,
+      })
     })
 
     it("logs the prompt as shown once, for the tier it was raised for", async () => {
@@ -123,6 +166,9 @@ describe("TwoFactorProtectionRequiredScreen", () => {
         screen.getByText(
           LL.TwoFactorEnforcement.highBalanceTitle({ amount: "5,000,000 SAT" }),
         ),
+      ).toBeTruthy()
+      expect(
+        screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
       ).toBeTruthy()
       expect(screen.getByTestId("two-factor-protection-close")).toBeTruthy()
       expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(expect.any(Function))
@@ -170,31 +216,35 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
       expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
     })
-  })
 
-  it("opens the authenticator setup and logs it, without taking the session start", async () => {
-    await renderScreen()
+    it("opens the authenticator setup and logs it, without taking the session start", async () => {
+      atEnforcedTier(0)
+      await renderScreen()
 
-    fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
+      fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
 
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      method: TwoFactorMethod.Authenticator,
+      expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
+        tier: TwoFactorTier.Enforced,
+        method: TwoFactorMethod.Authenticator,
+      })
+      expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+        returnTo: "Primary",
+      })
+      expect(mockConsumeSessionStart).not.toHaveBeenCalled()
     })
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
-    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
-  })
 
-  it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
-    await renderScreen()
+    it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
+      atEnforcedTier(0)
+      await renderScreen()
 
-    fireEvent.press(screen.getByTestId("two-factor-protection-move"))
+      fireEvent.press(screen.getByTestId("two-factor-protection-move"))
 
-    expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
+      expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
+        tier: TwoFactorTier.Enforced,
+      })
+      expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+      expect(mockRegisterDismissal).not.toHaveBeenCalled()
+      expect(mockConsumeSessionStart).not.toHaveBeenCalled()
     })
-    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
-    expect(mockRegisterDismissal).not.toHaveBeenCalled()
-    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
   })
 })

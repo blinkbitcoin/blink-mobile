@@ -2,8 +2,6 @@ import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
-import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
@@ -117,32 +115,32 @@ describe("TwoFactorSetupScreen", () => {
     mockEnforcement.unverifiedEmail = null
   })
 
-  it("renders the lock hero with the setup copy", async () => {
+  it("shows the setup under its header, with the authenticator as the call to action", async () => {
     await renderScreen()
 
     expect(screen.getByTestId("icon-lock-closed")).toBeTruthy()
     expect(screen.getByText(LL.TwoFactorEnforcement.setupTitle())).toBeTruthy()
-    expect(screen.getByText(LL.TwoFactorEnforcement.setupDescription())).toBeTruthy()
     expect(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator())).toBeTruthy()
+    expect(screen.getByText(LL.TwoFactorEnforcement.addEmail())).toBeTruthy()
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
-  it("offers to add an email when that is the missing factor, told to return here", async () => {
+  it("tells the flows it starts to return here, under the tier it was opened for", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Recommended
     await renderScreen()
 
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
+    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate", {
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
       returnTo: "twoFactorSetup",
     })
-    expect(mockPromptReverification).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Suggested,
-      method: TwoFactorMethod.Email,
+      tier: TwoFactorTier.Recommended,
+      method: TwoFactorMethod.Authenticator,
     })
   })
 
-  it("sends an address that was never verified through re-verification", async () => {
+  it("hands an address that was never verified to re-verification, told to return here", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     await renderScreen()
 
@@ -152,47 +150,50 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockUseEmailReverification).toHaveBeenLastCalledWith({
       returnTo: "twoFactorSetup",
     })
-    expect(mockNavigate).not.toHaveBeenCalled()
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Suggested,
-      method: TwoFactorMethod.Email,
-    })
   })
 
-  it("holds every exit while a re-verification is in flight", async () => {
+  it("installs a close control that charges the exit to the tier it opened for", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Recommended
+    await renderScreen()
+
+    renderInstalledCloseControl()
+    fireEvent.press(screen.getByTestId("icon-close"))
+
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("treats the hardware back as the close control", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Recommended
+    await renderScreen()
+
+    pressHardwareBack()
+
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds the close control and the hardware back while a re-verification is in flight", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     mockIsReverifying = true
     await renderScreen()
 
-    /** The missing-factor button shows its spinner in place of its title while it is
-     *  held, so there is no label to press; its disabled state is what keeps a second
-     *  re-verification from starting. */
-    // eslint-disable-next-line camelcase
-    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
-    expect(secondary.props.loading).toBe(true)
-    expect(secondary.props.disabled).toBe(true)
-
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
     pressHardwareBack()
     renderInstalledCloseControl()
     fireEvent.press(screen.getByTestId("icon-close"))
 
-    expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
-  it("shows the spinner but holds nothing for a re-verification joined from elsewhere", async () => {
+  it("holds nothing for a re-verification joined from elsewhere", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     mockIsReverifying = true
     mockIsAskedHere = false
     await renderScreen()
 
-    // eslint-disable-next-line camelcase
-    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
-    expect(secondary.props.loading).toBe(true)
     pressHardwareBack()
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
@@ -234,6 +235,16 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
+  it("steps aside once the account holds two factors", async () => {
+    const rendered = await renderScreen()
+
+    mockEnforcement.hasTwoFactor = true
+    await rerenderScreen(rendered)
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+
   it("steps aside for a complete account only once the hold has lifted", async () => {
     mockEnforcement.hasTwoFactor = true
     mockIsReverifying = true
@@ -245,91 +256,6 @@ describe("TwoFactorSetupScreen", () => {
     await rerenderScreen(rendered)
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
-  })
-
-  it("offers to add a phone number when the email is already verified", async () => {
-    mockEnforcement.missingMethod = TwoFactorMethod.Phone
-    mockEnforcement.unmetTier = TwoFactorTier.Recommended
-    await renderScreen()
-
-    expect(screen.queryByText(LL.TwoFactorEnforcement.addEmail())).toBeNull()
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addPhoneNumber()))
-
-    expect(mockNavigate).toHaveBeenCalledWith("phoneRegistrationInitiate")
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      method: TwoFactorMethod.Phone,
-    })
-  })
-
-  it("offers the authenticator as the call to action", async () => {
-    await renderScreen()
-
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
-
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
-      returnTo: "twoFactorSetup",
-    })
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Suggested,
-      method: TwoFactorMethod.Authenticator,
-    })
-  })
-
-  it("makes the authenticator the primary button and the missing factor the secondary one", async () => {
-    await renderScreen()
-
-    // eslint-disable-next-line camelcase
-    const primary = screen.UNSAFE_getByType(GaloyPrimaryButton)
-    // eslint-disable-next-line camelcase
-    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
-
-    expect(primary.props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
-    expect(secondary.props.title).toBe(LL.TwoFactorEnforcement.addEmail())
-  })
-
-  it("keeps the authenticator primary when the phone number is the missing factor", async () => {
-    mockEnforcement.missingMethod = TwoFactorMethod.Phone
-    await renderScreen()
-
-    // eslint-disable-next-line camelcase
-    const primary = screen.UNSAFE_getByType(GaloyPrimaryButton)
-    // eslint-disable-next-line camelcase
-    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
-
-    expect(primary.props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
-    expect(secondary.props.title).toBe(LL.TwoFactorEnforcement.addPhoneNumber())
-  })
-
-  it("installs a close control that charges the exit to the tier it opened for", async () => {
-    mockEnforcement.unmetTier = TwoFactorTier.Recommended
-    await renderScreen()
-
-    renderInstalledCloseControl()
-    fireEvent.press(screen.getByTestId("icon-close"))
-
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-  })
-
-  it("treats the hardware back as the close control", async () => {
-    mockEnforcement.unmetTier = TwoFactorTier.Recommended
-    await renderScreen()
-
-    pressHardwareBack()
-
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-  })
-
-  it("steps aside once the account holds two factors", async () => {
-    const rendered = await renderScreen()
-
-    mockEnforcement.hasTwoFactor = true
-    await rerenderScreen(rendered)
-
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   it("stays put while another screen is on top, even with two factors", async () => {

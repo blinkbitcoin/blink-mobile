@@ -4070,7 +4070,6 @@
     "dismissLast": "Aquesta és l'última vegada que pots descartar això.",
     "setNow": "Configura ara",
     "dontWantTo": "No vull",
-    "protectionRequiredTitle": "Afegeix protecció addicional",
     "highBalanceTitle": "Tens més de {amount}, afegeix protecció addicional",
     "protectionRequiredBody": "Com més fons tens, més important és una millor seguretat. Afegeix un autenticador per continuar fent servir Blink.",
     "nonCustodialTitle": "Si no vols configurar l'autenticació de dos factors",
