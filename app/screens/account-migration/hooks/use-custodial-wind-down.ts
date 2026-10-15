@@ -3,7 +3,11 @@ import { AccountType } from "@app/types/wallet"
 
 import type { WindDown } from "@app/types/wind-down"
 
-import { useWindDownStatus, WindDownRead } from "./use-wind-down-status"
+import {
+  useWindDownStatus,
+  WindDownRead,
+  WindDownReadOptions,
+} from "./use-wind-down-status"
 
 /**
  * The wind-down as it applies to the ACTIVE account: null when the account is not
@@ -12,9 +16,9 @@ import { useWindDownStatus, WindDownRead } from "./use-wind-down-status"
  * Reads the account type from the registry, not the active wallet whose no-account
  * placeholder defaults to Custodial and would arm the gate on a device with no account.
  */
-export const useCustodialWindDownRead = (): WindDownRead => {
+export const useCustodialWindDownRead = (options?: WindDownReadOptions): WindDownRead => {
   const { activeAccount } = useAccountRegistry()
-  const read = useWindDownStatus()
+  const read = useWindDownStatus(options)
 
   if (activeAccount?.type !== AccountType.Custodial) {
     return { windDown: null, isPending: false }
