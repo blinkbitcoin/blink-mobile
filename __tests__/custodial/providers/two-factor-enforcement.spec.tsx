@@ -146,6 +146,39 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowSettingsBanner).toBe(false)
     })
 
+    it("keeps the account unloaded and writes nothing when its record cannot be read", async () => {
+      mockGetItem.mockRejectedValue(new Error("storage unavailable"))
+      setAccount({ sats: 50_000 })
+
+      const { result } = await renderEnforcement()
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Two-factor enforcement read",
+        expect.any(Error),
+      )
+      expect(result.current.shouldShowNudgeCard).toBe(false)
+      expect(result.current.shouldShowSettingsBanner).toBe(false)
+      expect(mockSetItem).not.toHaveBeenCalled()
+
+      act(() => result.current.dismissNudgeCard())
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
+    it("treats content it cannot parse as a failed read, not as a missing record", async () => {
+      mockGetItem.mockResolvedValue("{not json")
+      setAccount({ sats: 50_000 })
+
+      const { result } = await renderEnforcement()
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Two-factor enforcement read",
+        expect.any(Error),
+      )
+      expect(result.current.shouldShowNudgeCard).toBe(false)
+      expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
     it("ignores a self-custodial account even when the query still answers", async () => {
       mockAccountType = AccountType.SelfCustodial
 
