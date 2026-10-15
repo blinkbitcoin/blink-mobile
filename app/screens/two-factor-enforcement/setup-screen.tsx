@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect } from "react"
+import React, { useCallback, useEffect, useLayoutEffect, useState } from "react"
 import { View } from "react-native"
 
 import { useIsFocused, useNavigation } from "@react-navigation/native"
@@ -14,6 +14,7 @@ import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enf
 import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
+  isBackwardAction,
   RegistrationReturnRoute,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
@@ -21,6 +22,12 @@ import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 
 const RETURN_ROUTE = RegistrationReturnRoute.TwoFactorSetup
+
+/** How long the screen holds the user while a re-verification runs. A request that
+ *  never answers, which the platform allows, would otherwise seal the screen; past the
+ *  deadline the user may leave, and a result that arrives later falls back to the
+ *  flow's own destination. */
+const HOLD_TIMEOUT_MS = 30_000
 
 export const TwoFactorSetupScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -39,23 +46,46 @@ export const TwoFactorSetupScreen: React.FC = () => {
     ? LL.TwoFactorEnforcement.addEmail()
     : LL.TwoFactorEnforcement.addPhoneNumber()
 
+  const handleClose = useCallback(() => navigation.goBack(), [navigation])
+
+  const [isHoldExpired, setIsHoldExpired] = useState(false)
+  useEffect(() => {
+    setIsHoldExpired(false)
+    if (!isReverifying) return
+    const timer = setTimeout(() => setIsHoldExpired(true), HOLD_TIMEOUT_MS)
+    return () => clearTimeout(timer)
+  }, [isReverifying])
+  const isHeld = isReverifying && !isHoldExpired
+
   /** While an email re-verification runs, the screen holds still: the hook navigates
    *  to the code screen when it is done, and that must land on this screen, not on
-   *  another flow or on whatever lies beneath once this one is gone. */
-  const handleClose = useCallback(() => {
-    if (isReverifying) return
-    navigation.goBack()
-  }, [navigation, isReverifying])
+   *  another flow or on whatever lies beneath once this one is gone. The hold sits on
+   *  the navigator so that it covers every way back the user has, the close control and
+   *  the hardware back alike; the swipe completes natively before it could be refused,
+   *  so it is switched off for the interval instead. Only the user's own back is held:
+   *  a removal the app dispatches, for a logout, a gate or a profile switch, goes
+   *  through, and the flow then falls back to its own destination. */
+  useEffect(() => {
+    if (!isHeld) return
+    return navigation.addListener("beforeRemove", (event) => {
+      if (!isBackwardAction(event.data.action)) return
+      event.preventDefault()
+    })
+  }, [navigation, isHeld])
 
   useLayoutEffect(() => {
-    navigation.setOptions(headerCloseControlOptions({ onPress: handleClose }))
-  }, [navigation, handleClose])
+    navigation.setOptions({
+      ...headerCloseControlOptions({ onPress: handleClose }),
+      gestureEnabled: !isHeld,
+    })
+  }, [navigation, handleClose, isHeld])
 
   /** The flows this screen hands off to return into it. Once the account holds two
    *  factors there is nothing left to offer, so it steps aside rather than asking for a
    *  factor the account just added. Only while focused: a screen lower in the stack
-   *  going back would pop whichever screen is on top instead of itself. */
-  const isSetupComplete = isFocused && hasTwoFactor
+   *  going back would pop whichever screen is on top instead of itself. And only once
+   *  the hold above has lifted, which would refuse the step aside and not repeat it. */
+  const isSetupComplete = isFocused && hasTwoFactor && !isHeld
   useEffect(() => {
     if (isSetupComplete) navigation.goBack()
   }, [isSetupComplete, navigation])
