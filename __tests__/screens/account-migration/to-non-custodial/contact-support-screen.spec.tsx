@@ -370,6 +370,16 @@ describe("MigrationContactSupportScreen", () => {
     expect(screen.getByText("storage-unreadable")).toBeTruthy()
   })
 
+  it("shows a full-device handover's own reason code", async () => {
+    mockReason = MigrationSupportReason.StorageOutOfSpace
+    mockOrigin = MigrationSupportOrigin.GateStorage
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByText("storage-out-of-space")).toBeTruthy()
+    expect(screen.queryByText("storage-unreadable")).toBeNull()
+  })
+
   it("leaves a removal alone when opened from the gate handover", async () => {
     mockOrigin = MigrationSupportOrigin.Gate
     renderScreen()

@@ -192,12 +192,17 @@ export const MigrationGate: React.FC = () => {
     checkpointStorageFailure === StorageFailure.OutOfSpace ||
     pendingWalletStorageFailure === StorageFailure.OutOfSpace
 
+  /** The ticket carries the same diagnosis the screen gave: a user told to free up space
+   *  must not reach support under a code claiming the store could not be read. */
   const goToStorageSupport = useCallback(() => {
+    const reason = isStorageOutOfSpace
+      ? MigrationSupportReason.StorageOutOfSpace
+      : MigrationSupportReason.StorageUnreadable
     navigation.navigate("accountMigrationContactSupport", {
-      reason: MigrationSupportReason.StorageUnreadable,
+      reason,
       origin: MigrationSupportOrigin.GateStorage,
     })
-  }, [navigation])
+  }, [isStorageOutOfSpace, navigation])
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */

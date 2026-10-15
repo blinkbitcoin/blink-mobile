@@ -1079,6 +1079,39 @@ describe("MigrationGate, with an unreadable device store", () => {
     })
   })
 
+  /** The user was just told to free up space; a ticket claiming the store could not be read
+   *  would contradict that and drop the one remedy they can apply. */
+  it("hands over naming a full device when that is what the screen said", async () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByTestId, getByText } = render(<MigrationGate />)
+    expect(getByText("no space left")).toBeTruthy()
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("gate-storage-support-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.StorageOutOfSpace,
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  })
+
+  it("names a full device for the ticket when only the pending-wallet read hit one", async () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("gate-storage-support-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: MigrationSupportReason.StorageOutOfSpace }),
+    )
+  })
+
   /** The rule this screen cannot honestly test lives in the hook's own spec: an unlocked
    *  account never renders this screen at all. */
   it("says the store is unreadable only when the network sources answered", () => {

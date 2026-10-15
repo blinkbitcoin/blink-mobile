@@ -56,6 +56,10 @@ export const MigrationSupportReason = {
    *  asserts the records are gone and this one asserts nothing. The records may well be
    *  intact and unread, so support must not treat it as a wiped device. */
   StorageUnreadable: "storage-unreadable",
+  /** The same store failure as above, but one the device named as a full disk: the user
+   *  was told to free up space, so the ticket says so too. Kept apart because support
+   *  answers it with a remedy the user can apply, where the code above has none. */
+  StorageOutOfSpace: "storage-out-of-space",
   /** The transfer itself failed or threw. */
   TransferFailed: "transfer-failed",
   /** The server paid the migration out, but the receive into the new self-custodial
