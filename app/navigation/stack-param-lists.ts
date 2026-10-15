@@ -63,8 +63,12 @@ export const canGoBackFromChooseExperience = (
 }
 
 /** Where a registration flow goes on success when it was opened from the two-factor
- *  setup: back into the setup, instead of the destination the flow has on its own. */
-export const RegistrationReturnRoute = { TwoFactorSetup: "twoFactorSetup" } as const
+ *  setup, instead of the destination the flow has on its own: back into the setup
+ *  route, or back to the home when the setup stood in for it at a session start. */
+export const RegistrationReturnRoute = {
+  TwoFactorSetup: "twoFactorSetup",
+  Primary: "Primary",
+} as const
 export type RegistrationReturnRoute =
   (typeof RegistrationReturnRoute)[keyof typeof RegistrationReturnRoute]
 

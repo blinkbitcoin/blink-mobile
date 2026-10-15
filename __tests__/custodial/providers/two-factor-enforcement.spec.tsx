@@ -263,6 +263,17 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(mockSetItem).toHaveBeenCalled()
     })
 
+    it("marks the session as the account's, with nothing to start, when the record cannot be read", async () => {
+      mockGetItem.mockRejectedValue(new Error("storage unavailable"))
+      setAccount({ sats: 500_000 })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.isPreparingSessionStart).toBe(false)
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(false)
+    })
+
     it("ignores a self-custodial account even when the query still answers", async () => {
       mockAccountType = AccountType.SelfCustodial
 
@@ -832,6 +843,21 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
 
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(mockSetItem).not.toHaveBeenCalled()
+    })
+
+    it("drops a failed read that lands after the provider is gone, without reporting it", async () => {
+      let rejectRead: (reason: Error) => void = () => {}
+      mockGetItem.mockReturnValue(
+        new Promise<string | null>((_, reject) => {
+          rejectRead = reject
+        }),
+      )
+      const { unmount } = renderHook(() => useTwoFactorEnforcement(), { wrapper })
+      unmount()
+
+      await act(async () => rejectRead(new Error("storage unavailable")))
+
+      expect(mockReportError).not.toHaveBeenCalled()
     })
 
     it("never applies the previous account's record to the next one", async () => {

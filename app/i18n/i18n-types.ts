@@ -13578,10 +13578,6 @@ type RootTranslation = {
 		 */
 		dontWantTo: string
 		/**
-		 * P​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n
-		 */
-		protectionRequiredTitle: string
-		/**
 		 * Y​o​u​ ​h​a​v​e​ ​o​v​e​r​ ​{​a​m​o​u​n​t​}​,​ ​p​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n
 		 * @param {string} amount
 		 */
@@ -27373,10 +27369,6 @@ export type TranslationFunctions = {
 		 * I don't want to
 		 */
 		dontWantTo: () => LocalizedString
-		/**
-		 * Please add additional protection
-		 */
-		protectionRequiredTitle: () => LocalizedString
 		/**
 		 * You have over {amount}, please add additional protection
 		 */
