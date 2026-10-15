@@ -64,18 +64,25 @@ export const canGoBackFromChooseExperience = (
 
 /** Where a registration flow goes on success when it was opened from the two-factor
  *  setup: back into the setup, instead of the destination the flow has on its own. */
-export type RegistrationReturnRoute = "twoFactorSetup"
+export const RegistrationReturnRoute = { TwoFactorSetup: "twoFactorSetup" } as const
+export type RegistrationReturnRoute =
+  (typeof RegistrationReturnRoute)[keyof typeof RegistrationReturnRoute]
+
+const isRegistrationReturnRoute = (value: unknown): value is RegistrationReturnRoute =>
+  Object.values(RegistrationReturnRoute).some((route) => route === value)
 
 type RouteStack = { routes: ReadonlyArray<{ name: string }> }
 
-/** A registration flow may return only to a route its stack holds. The param reaches
- *  these screens through deep links as well, so a name the stack never had, or a route
- *  already left, must fall back to the flow's own destination rather than be dispatched. */
+/** A registration flow may return only to one of the routes above, and only while its
+ *  stack holds it. The param reaches these screens through deep links as well, where it
+ *  is any string: a route a flow may not return to, a name the stack never had, or a
+ *  route already left, all fall back to the flow's own destination. */
 export const canReturnToRoute = (
   stack: RouteStack | undefined,
-  returnTo: RegistrationReturnRoute | undefined,
+  returnTo: string | undefined,
 ): returnTo is RegistrationReturnRoute =>
-  returnTo !== undefined && Boolean(stack?.routes.some(({ name }) => name === returnTo))
+  isRegistrationReturnRoute(returnTo) &&
+  Boolean(stack?.routes.some(({ name }) => name === returnTo))
 
 export type RootStackParamList = {
   getStarted: undefined
