@@ -70,7 +70,7 @@ export const useResumeCompletedMigration = (): void => {
       selfCustodialAccountId: migrationAccountId,
       expectedReceiveSats: migrationExpectedReceiveSats,
       skip: !isServerCompleted,
-      onCheckSettled: markMigrationReceiveChecked,
+      onWalletChecked: markMigrationReceiveChecked,
     })
 
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at

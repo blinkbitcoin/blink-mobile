@@ -231,7 +231,7 @@ describe("useResumeCompletedMigration", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: true,
-      onCheckSettled: expect.any(Function),
+      onWalletChecked: expect.any(Function),
     })
   })
 
@@ -243,7 +243,7 @@ describe("useResumeCompletedMigration", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
-      onCheckSettled: expect.any(Function),
+      onWalletChecked: expect.any(Function),
     })
   })
 
@@ -616,14 +616,16 @@ describe("useResumeCompletedMigration", () => {
       expect(mockResetMigrationReceiveWait).toHaveBeenCalledTimes(1)
     })
 
-    it("shares when each receive check settles", async () => {
+    /** Through the gate's own report, so only a look that reached the wallet is shared;
+     *  the composed behaviour is driven end to end in the receive-wait spec beside this. */
+    it("shares each look at the wallet the gate reports", async () => {
       renderHook(() => useResumeCompletedMigration())
       await flushEffects()
 
-      const [{ onCheckSettled }] = mockUseReceiveConfirmation.mock.lastCall as [
-        { onCheckSettled: (startedAt: number) => void },
+      const [{ onWalletChecked }] = mockUseReceiveConfirmation.mock.lastCall as [
+        { onWalletChecked: (startedAt: number) => void },
       ]
-      onCheckSettled(1234)
+      onWalletChecked(1234)
 
       expect(mockMarkMigrationReceiveChecked).toHaveBeenCalledWith(1234)
     })

@@ -29,10 +29,12 @@ type UseMigrationReceiveConfirmationArgs = {
   /** True until the server phase is COMPLETED: before the drain is even paid there is
    *  nothing to look for, and each look opens a whole SDK connection. */
   skip: boolean
-  /** Told when each check settles, whatever it found, with the moment it began. Read
-   *  through a ref, so a caller passing a fresh function each render never re-arms the
-   *  polling (a re-armed effect fires an extra check at once). */
-  onCheckSettled?: (startedAt: number) => void
+  /** Told when a check got an answer about the wallet, with the moment it began: the funds
+   *  landed or not, or the wallet's key is gone. A check that failed to look (a dropped
+   *  connection, a keystore read that threw) is not reported, since it says nothing about
+   *  where the funds are. Read through a ref, so a caller passing a fresh function each
+   *  render never re-arms the polling (a re-armed effect fires an extra check at once). */
+  onWalletChecked?: (startedAt: number) => void
 }
 
 type UseMigrationReceiveConfirmation = {
@@ -69,7 +71,7 @@ export const useMigrationReceiveConfirmation = ({
   selfCustodialAccountId,
   expectedReceiveSats,
   skip,
-  onCheckSettled,
+  onWalletChecked,
 }: UseMigrationReceiveConfirmationArgs): UseMigrationReceiveConfirmation => {
   const network = useSparkNetwork()
   const {
@@ -103,8 +105,8 @@ export const useMigrationReceiveConfirmation = ({
    *  current cadence without re-arming (a re-armed effect fires an extra check at once). */
   const isReceiveDelayedRef = useRef(false)
 
-  const onCheckSettledRef = useRef(onCheckSettled)
-  onCheckSettledRef.current = onCheckSettled
+  const onWalletCheckedRef = useRef(onWalletChecked)
+  onWalletCheckedRef.current = onWalletChecked
 
   /** Set by the polling effect while it runs; the effect owns the timer and the in-flight
    *  check the recheck has to coordinate with. */
@@ -140,10 +142,6 @@ export const useMigrationReceiveConfirmation = ({
     const runCheck = async () => {
       isCheckInFlight = true
       const startedAt = Date.now()
-      const settle = () => {
-        isCheckInFlight = false
-        onCheckSettledRef.current?.(startedAt)
-      }
       let result: Awaited<ReturnType<typeof checkMigrationReceiveLanded>>
       try {
         result = await checkMigrationReceiveLanded({
@@ -155,13 +153,20 @@ export const useMigrationReceiveConfirmation = ({
         /** A keystore read that threw before the SDK result shape existed: transient as
          *  far as this gate can tell, so it is retried like a lost connection. */
         if (!isActive) return
-        settle()
+        isCheckInFlight = false
         reportOnce(err)
         scheduleNextCheck()
         return
       }
       if (!isActive) return
-      settle()
+      isCheckInFlight = false
+      /** Listed rather than excluded: a dropped connection and a settled failure both mean
+       *  the wallet was never seen, and a status added later should have to earn its place
+       *  here rather than count by default. */
+      const hasLooked =
+        result.status === MigrationSdkStatus.Ok ||
+        result.status === MigrationSdkStatus.NoMnemonic
+      if (hasLooked) onWalletCheckedRef.current?.(startedAt)
 
       /**
        * The wallet's key is gone from the device, and the gate must not answer that with a

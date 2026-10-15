@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useMigrationReceiveConfirmation } from "@app/screens/account-migration/hooks/use-migration-receive-confirmation"
@@ -87,10 +88,11 @@ describe("useMigrationReceiveConfirmation", () => {
     await flushCheck()
 
     expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
-    expect(result.current).toMatchObject({
+    expect(result.current).toEqual({
       isReceiveConfirmed: false,
       isReceiveProven: false,
       isReceiveDelayed: false,
+      recheck: expect.any(Function),
     })
   })
 
@@ -130,10 +132,11 @@ describe("useMigrationReceiveConfirmation", () => {
     mockCheckReceiveLanded.mockResolvedValue(ok(landed))
     await advance(DELAYED_RETRY_MS)
 
-    expect(result.current).toMatchObject({
+    expect(result.current).toEqual({
       isReceiveConfirmed: true,
       isReceiveProven: true,
       isReceiveDelayed: false,
+      recheck: expect.any(Function),
     })
   })
 
@@ -149,10 +152,11 @@ describe("useMigrationReceiveConfirmation", () => {
     rerender({ skip: true })
     await advance(60_000)
 
-    expect(result.current).toMatchObject({
+    expect(result.current).toEqual({
       isReceiveConfirmed: false,
       isReceiveProven: false,
       isReceiveDelayed: false,
+      recheck: expect.any(Function),
     })
     expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
   })
@@ -540,43 +544,106 @@ describe("useMigrationReceiveConfirmation", () => {
   })
 
   /** The caller hands support over only on a look taken since the app came back, so it
-   *  is told when each one settles and when that look began. */
-  describe("each settled check", () => {
-    it("reports when the check began, whatever it found", async () => {
+   *  is told each time a check reaches the wallet, and when that look began. A check that
+   *  never reached it says nothing about the funds and must not count as one. */
+  describe("each check that reaches the wallet", () => {
+    it("reports when a look that found nothing began", async () => {
       jest.setSystemTime(1_000_000)
-      const onCheckSettled = jest.fn()
-      mockCheckReceiveLanded
-        .mockResolvedValueOnce(ok(stillEmpty))
-        .mockRejectedValueOnce(new Error("keystore locked"))
-        .mockResolvedValue(ok(stillEmpty))
+      const onWalletChecked = jest.fn()
 
-      renderGate({ onCheckSettled })
+      renderGate({ onWalletChecked })
       await flushCheck()
-      expect(onCheckSettled).toHaveBeenLastCalledWith(1_000_000)
+      expect(onWalletChecked).toHaveBeenLastCalledWith(1_000_000)
 
       await advance(RECEIVE_CHECK_RETRY_MS)
-      expect(onCheckSettled).toHaveBeenCalledTimes(2)
-      expect(onCheckSettled).toHaveBeenLastCalledWith(1_000_000 + RECEIVE_CHECK_RETRY_MS)
+      expect(onWalletChecked).toHaveBeenCalledTimes(2)
+      expect(onWalletChecked).toHaveBeenLastCalledWith(1_000_000 + RECEIVE_CHECK_RETRY_MS)
     })
 
     /** Funds that landed confirm the gate, which withdraws the notice itself; the report
      *  still goes out so the caller's record of the latest look stays true. */
-    it("reports the check that confirms the receive too", async () => {
-      const onCheckSettled = jest.fn()
+    it("reports the look that confirms the receive too", async () => {
+      const onWalletChecked = jest.fn()
       mockCheckReceiveLanded.mockResolvedValue(ok(landed))
 
-      renderGate({ onCheckSettled })
+      renderGate({ onWalletChecked })
       await flushCheck()
 
-      expect(onCheckSettled).toHaveBeenCalledTimes(1)
+      expect(onWalletChecked).toHaveBeenCalledTimes(1)
+    })
+
+    /** A missing key is an answer that no retry will change, and support is where it has
+     *  to end: not counting it would leave that user on "on its way" for good. */
+    it("reports a wallet whose key is gone", async () => {
+      const onWalletChecked = jest.fn()
+      mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+      renderGate({ onWalletChecked })
+      await flushCheck()
+
+      expect(onWalletChecked).toHaveBeenCalledTimes(1)
+    })
+
+    const UNSEEN_WALLET_CASES: { label: string; status: MigrationSdkStatus }[] = [
+      { label: "a dropped connection", status: MigrationSdkStatus.ConnectionError },
+      { label: "a settled failure", status: MigrationSdkStatus.Failed },
+    ]
+
+    it.each(UNSEEN_WALLET_CASES)(
+      "does not report $label, which never saw the wallet",
+      async ({ status }) => {
+        const onWalletChecked = jest.fn()
+        mockCheckReceiveLanded.mockResolvedValue({ status, error: new Error("offline") })
+
+        renderGate({ onWalletChecked })
+        await flushCheck()
+
+        expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+        expect(onWalletChecked).not.toHaveBeenCalled()
+      },
+    )
+
+    it("does not report a keystore read that threw", async () => {
+      const onWalletChecked = jest.fn()
+      mockCheckReceiveLanded.mockRejectedValue(new Error("keystore locked"))
+
+      renderGate({ onWalletChecked })
+      await flushCheck()
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+      expect(onWalletChecked).not.toHaveBeenCalled()
+    })
+
+    /** A failed look still frees the slot: a recheck asked for behind it must run. */
+    it("runs a queued recheck after a look that failed", async () => {
+      let settleCheck: (value: unknown) => void = () => undefined
+      mockCheckReceiveLanded.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            settleCheck = resolve
+          }),
+      )
+      const { result } = renderGate()
+      await flushCheck()
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+      await act(async () => {
+        settleCheck({ status: MigrationSdkStatus.ConnectionError, error: new Error("x") })
+        await Promise.resolve()
+      })
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(2)
     })
 
     it("does not re-arm the polling when the caller passes a fresh callback", async () => {
-      const { rerender } = renderGate({ onCheckSettled: jest.fn() })
+      const { rerender } = renderGate({ onWalletChecked: jest.fn() })
       await flushCheck()
       expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
 
-      rerender({ onCheckSettled: jest.fn() })
+      rerender({ onWalletChecked: jest.fn() })
       await flushCheck()
 
       expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
