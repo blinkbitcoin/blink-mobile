@@ -65,9 +65,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
 const mockLL = LL
 
 let mockIsSupportDue = false
+let mockIsOverdue = false
 jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
   ...jest.requireActual("@app/screens/account-migration/utils/migration-receive-wait"),
   isMigrationReceiveSupportDue: () => mockIsSupportDue,
+  isMigrationReceiveOverdue: () => mockIsOverdue,
 }))
 
 const mockToastShow = jest.fn()
@@ -110,6 +112,7 @@ describe("MigrationEntryScreen", () => {
     mockHasResumableCheckpoint = false
     mockIsStartConfirmed = false
     mockIsSupportDue = false
+    mockIsOverdue = false
     mockCheckpointLoading = false
     mockSelfCustodialDisabled = false
     mockFlow = ServerMigrationFlow.NotStarted
@@ -253,12 +256,28 @@ describe("MigrationEntryScreen", () => {
 
         expect(mockToastShow).toHaveBeenCalledWith(
           expect.objectContaining({
-            message: LL.AccountMigration.transferDelayed.body(),
+            message: LL.AccountMigration.transferInProgress.body(),
           }),
         )
         expect(mockGoBack).toHaveBeenCalledTimes(1)
         expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
         expect(mockReplace).not.toHaveBeenCalled()
+      })
+
+      /** Overdue, but not yet confirmed missing by a check since the app came back: the
+       *  user still goes back, told the wait is unusual rather than seconds old. */
+      it("says the wait is taking longer while the overdue receive awaits a fresh check", () => {
+        arriveAwaitingSwap()
+        mockIsOverdue = true
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockToastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.AccountMigration.transferDelayed.body(),
+          }),
+        )
+        expect(mockGoBack).toHaveBeenCalledTimes(1)
       })
 
       it("goes home when there is nothing to go back to", () => {
@@ -271,8 +290,8 @@ describe("MigrationEntryScreen", () => {
         expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
       })
 
-      /** Past the notice window, with the app back long enough for a fresh check, the
-       *  funds are genuinely late: support takes over, with the delayed reason. */
+      /** Past the notice window, and still missing on a check taken since the app came
+       *  back, the funds are genuinely late: support takes over, with the delayed reason. */
       it("hands a receive that is genuinely late to support instead", () => {
         arriveAwaitingSwap()
         mockIsSupportDue = true

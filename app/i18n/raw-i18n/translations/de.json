@@ -3910,6 +3910,9 @@
         "explainerCheck5": "Deinem Konto wird eine Spark-Netzwerkgebühr abgezogen",
         "explainerCta": "Ich verstehe",
         "transferringFunds": "Deine Guthaben werden übertragen. Es sollte in wenigen Sekunden abgeschlossen sein.",
+        "transferInProgress": {
+            "body": "Deine Guthaben sind auf dem Weg zu deinem neuen Konto. Lass die App geöffnet, wir schließen es automatisch ab."
+        },
         "transferDelayed": {
             "body": "Deine Guthaben sind auf dem Weg zu deinem neuen Konto. Es dauert länger als üblich — lass die App geöffnet, wir schließen es automatisch ab.",
             "contactSupportCta": "Support kontaktieren"

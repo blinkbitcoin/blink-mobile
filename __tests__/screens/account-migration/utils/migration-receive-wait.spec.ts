@@ -1,4 +1,5 @@
 import {
+  isMigrationReceiveOverdue,
   isMigrationReceiveSupportDue,
   markAppForegrounded,
   markMigrationReceiveChecked,
@@ -77,6 +78,17 @@ describe("migration-receive-wait", () => {
     resetMigrationReceiveWait()
     setMigrationReceiveOverdue(true)
 
+    expect(isMigrationReceiveSupportDue()).toBe(false)
+  })
+
+  /** The hold's wording follows the wait, not the handover: overdue says so even while
+   *  support still waits on a fresh check. */
+  it("reports the receive overdue before support is due", () => {
+    expect(isMigrationReceiveOverdue()).toBe(false)
+
+    setMigrationReceiveOverdue(true)
+
+    expect(isMigrationReceiveOverdue()).toBe(true)
     expect(isMigrationReceiveSupportDue()).toBe(false)
   })
 

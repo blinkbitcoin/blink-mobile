@@ -3910,6 +3910,9 @@
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "transferInProgress": {
+      "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis."
+    },
     "transferDelayed": {
       "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Ini memakan waktu lebih lama dari biasanya — biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis.",
       "contactSupportCta": "Hubungi dukungan"

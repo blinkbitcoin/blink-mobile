@@ -3910,6 +3910,9 @@
     "explainerCheck5": "S tvog računa bit će naplaćena mrežna naknada Spark",
     "explainerCta": "Razumijem",
     "transferringFunds": "Prebacujemo vaša sredstva. Trebalo bi biti gotovo za nekoliko sekundi.",
+    "transferInProgress": {
+      "body": "Vaša sredstva su na putu prema vašem novom računu. Držite aplikaciju otvorenom i automatski ćemo dovršiti."
+    },
     "transferDelayed": {
       "body": "Vaša sredstva su na putu prema vašem novom računu. Traje duže nego inače — držite aplikaciju otvorenom i automatski ćemo dovršiti.",
       "contactSupportCta": "Kontaktirajte podršku"

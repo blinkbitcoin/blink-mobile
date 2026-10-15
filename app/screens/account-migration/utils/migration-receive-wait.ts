@@ -54,6 +54,10 @@ export const resetMigrationReceiveWait = (): void => {
   lastSettledCheckStartedAt = null
 }
 
+/** Past the notice window, whether or not support is due yet: what earns a hold the "taking
+ *  longer than usual" wording rather than the ordinary "on its way". */
+export const isMigrationReceiveOverdue = (): boolean => isReceiveOverdue
+
 /** True once the receive is overdue and a check taken since the app last came back has
  *  confirmed it is still missing. */
 export const isMigrationReceiveSupportDue = (): boolean => {
