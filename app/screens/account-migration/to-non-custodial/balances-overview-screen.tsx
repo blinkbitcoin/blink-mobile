@@ -191,7 +191,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * a drained account whose device remembers neither the commit point nor the figure the
    * receive gate waits on, so the button holds until the record lands.
    */
-  const [isCommitPointRecorded, setIsCommitPointRecorded] = useState(false)
+  const [isStepRecorded, setIsStepRecorded] = useState(false)
+  const [isStartConfirmationRecorded, setIsStartConfirmationRecorded] = useState(false)
   /** The latest attempt's answer, kept whole so the retry below can say why it is there:
    *  a store that refused is not a connection that dropped. Null until the first attempt. */
   const [lastCommitPointWrite, setLastCommitPointWrite] =
@@ -211,8 +212,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
       isStartConfirmed: startConfirmation,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
-     *  and a later failure cannot un-record a write that already landed. */
-    setIsCommitPointRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+     *  and a later failure cannot un-record a write that already landed. The confirmation
+     *  latches apart, since a write without it can land first. */
+    setIsStepRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+    if (startConfirmation) {
+      setIsStartConfirmationRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+    }
     /** Overlapping writes (a focus and a retry, or a figure change) can answer out of
      *  order. Only the latest one issued speaks for the store now, so an older answer that
      *  lands late never puts a stale reason above the retry. */
@@ -220,6 +225,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
   }, [expectedReceiveSats, startConfirmation, saveCheckpoint])
   const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
+  /** The commit point and the accepted start are one record, not two: once the server has
+   *  taken the start, a step written without it is the record a support-cleared flow is
+   *  later mistaken for a fresh one by, so only the write carrying it counts. */
+  const isCommitPointRecorded = startConfirmation
+    ? isStartConfirmationRecorded
+    : isStepRecorded
 
   useEffect(() => {
     if (!isFocused || checkpointLoading) return
