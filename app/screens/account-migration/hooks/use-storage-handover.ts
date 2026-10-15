@@ -1,5 +1,6 @@
 import { useCallback, useEffect, useState } from "react"
 
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { reportError } from "@app/utils/error-logging"
 
 /** How many failed retries stand in for "this is not going to clear on its own". Low
@@ -52,6 +53,9 @@ export const useStorageHandover = ({
    *  is in flight so repeated taps cannot stack requests over an unchanged error screen. */
   const [isRetrying, setIsRetrying] = useState(false)
   const [storageRetryAttempts, setStorageRetryAttempts] = useState(0)
+  /** The disabled button only holds once React has committed it; a second tap before then
+   *  would start a batch of reads racing the first, which can answer out of order. */
+  const { run: runExclusively } = useInFlightGuard()
 
   const isDeviceStorageFailure = isStorageReadFailure({
     isMigrationLocked,
@@ -60,19 +64,21 @@ export const useStorageHandover = ({
   })
 
   const retry = useCallback(async (): Promise<void> => {
-    setIsRetrying(true)
-    /** Only this device's failures count. A retry made while the network is what failed
-     *  says nothing about whether the store will ever answer, and carrying those attempts
-     *  over would arm the handover on the first local read that fails. */
-    if (isDeviceStorageFailure) setStorageRetryAttempts((previous) => previous + 1)
-    try {
-      await refetchGateData()
-    } catch (err) {
-      reportError("Migration gate retry", err)
-    } finally {
-      setIsRetrying(false)
-    }
-  }, [isDeviceStorageFailure, refetchGateData])
+    await runExclusively(async () => {
+      setIsRetrying(true)
+      /** Only this device's failures count. A retry made while the network is what failed
+       *  says nothing about whether the store will ever answer, and carrying those attempts
+       *  over would arm the handover on the first local read that fails. */
+      if (isDeviceStorageFailure) setStorageRetryAttempts((previous) => previous + 1)
+      try {
+        await refetchGateData()
+      } catch (err) {
+        reportError("Migration gate retry", err)
+      } finally {
+        setIsRetrying(false)
+      }
+    })
+  }, [isDeviceStorageFailure, refetchGateData, runExclusively])
 
   /** Only a local read that LANDS ends the run. Resetting when the branch merely goes quiet
    *  would also fire on a server failure, erasing the evidence every time the signal drops. */

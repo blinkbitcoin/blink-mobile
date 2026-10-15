@@ -131,23 +131,29 @@ export const MigrationGate: React.FC = () => {
    *  don't blame the device — so a reader must not widen it on the strength of the name. */
   const hasServerDataError = apiKeysError || balancesError || lockError
 
-  const refetchGateData = useCallback(
-    () =>
-      Promise.all([
-        refetchApiKeys(),
-        refetchBalances(),
-        refetchLock(),
-        refetchCheckpoint(),
-        refetchPendingWallet(),
-      ]),
-    [
-      refetchApiKeys,
-      refetchBalances,
-      refetchLock,
-      refetchCheckpoint,
-      refetchPendingWallet,
-    ],
-  )
+  /** Settles only once every source has: the three server refetches reject on a network
+   *  error, and failing fast on one would end the retry while the local reads it exists to
+   *  measure are still running. The first rejection is rethrown afterwards for the retry's
+   *  report. */
+  const refetchGateData = useCallback(async (): Promise<void> => {
+    const results = await Promise.allSettled([
+      refetchApiKeys(),
+      refetchBalances(),
+      refetchLock(),
+      refetchCheckpoint(),
+      refetchPendingWallet(),
+    ])
+    const rejection = results.find(
+      (result): result is PromiseRejectedResult => result.status === "rejected",
+    )
+    if (rejection) throw rejection.reason
+  }, [
+    refetchApiKeys,
+    refetchBalances,
+    refetchLock,
+    refetchCheckpoint,
+    refetchPendingWallet,
+  ])
 
   const {
     isStorageReadFailure,

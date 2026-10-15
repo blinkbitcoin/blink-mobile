@@ -181,6 +181,40 @@ describe("useStorageHandover", () => {
     expect(result.current.shouldOfferHandover).toBe(true)
   })
 
+  /** Two taps can land before React commits the disabled button. The second must not start
+   *  a batch of reads racing the first, nor spend an attempt the user never saw answered. */
+  it("ignores a retry made while the previous one is still in flight", async () => {
+    let settleRefetch: () => void = () => undefined
+    const refetchGateData = jest
+      .fn<Promise<void>, []>()
+      .mockResolvedValue(undefined)
+      .mockImplementationOnce(
+        () =>
+          new Promise<void>((resolve) => {
+            settleRefetch = () => resolve()
+          }),
+      )
+    const { result } = renderHandover({ refetchGateData })
+
+    let firstRetry: Promise<void> = Promise.resolve()
+    let secondRetry: Promise<void> = Promise.resolve()
+    act(() => {
+      firstRetry = result.current.retry()
+      secondRetry = result.current.retry()
+    })
+
+    expect(refetchGateData).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      settleRefetch()
+      await Promise.all([firstRetry, secondRetry])
+    })
+    await retryTimes(result, MAX_RETRIES_BEFORE_STORAGE_HANDOVER - 2)
+
+    /** Two attempts spent so far, not three: the ignored tap counted for nothing. */
+    expect(result.current.shouldOfferHandover).toBe(false)
+  })
+
   it("reports a refetch that rejects rather than failing silently", async () => {
     const { result } = renderHandover({
       refetchGateData: () => Promise.reject(new Error("offline")),

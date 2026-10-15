@@ -1065,6 +1065,44 @@ describe("MigrationGate, with an unreadable device store", () => {
     expect(getByTestId("gate-storage-support-button")).toBeTruthy()
   })
 
+  /** Production ordering: Apollo's refetch rejects on a network error, often well before the
+   *  local reads answer. The retry must stay in flight until every source has settled, or
+   *  the budget advances on an attempt whose storage answer is still outstanding. */
+  it("stays in flight until the local reads settle, even when a server refetch fails first", async () => {
+    arriveAtStorageError()
+    const offline = new Error("Network request failed")
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ refetch: jest.fn().mockRejectedValue(offline) }),
+    )
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    let settleCheckpointRead: () => void = () => undefined
+    mockRefetchCheckpoint.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          settleCheckpointRead = resolve
+        }),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("gate-retry-button"))
+    })
+    fireEvent.press(getByTestId("gate-retry-button"))
+
+    expect(getByTestId("gate-retry-button")).toBeDisabled()
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+
+    await act(async () => {
+      settleCheckpointRead()
+    })
+
+    expect(getByTestId("gate-retry-button")).toBeEnabled()
+    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+    expect(mockReportError).toHaveBeenLastCalledWith("Migration gate retry", offline)
+  })
+
   it("hands over saying the store was unreadable, never that the records are gone", async () => {
     arriveAtStorageError()
 
