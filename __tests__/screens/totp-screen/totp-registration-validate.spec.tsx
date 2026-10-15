@@ -5,7 +5,10 @@ import { act, fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  RegistrationReturnRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
 const mockPopTo = jest.fn()
@@ -119,6 +122,19 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
   it("ignores a return route the stack does not hold, as a deep link could name one", async () => {
     mockStackRouteNames = ["Primary", "totpRegistrationInitiate"]
     await submitCode({ totpRegistrationId: "reg", returnTo: "twoFactorSetup" })
+    pressSuccessOk()
+
+    expect(mockReset).toHaveBeenCalledWith({
+      routes: [{ name: "Primary" }, { name: "accountScreen" }],
+    })
+    expect(mockPopTo).not.toHaveBeenCalled()
+  })
+
+  it("ignores a return route a flow may not return to, even one the stack holds, as a deep link could name it", async () => {
+    mockStackRouteNames = ["Primary", "totpRegistrationInitiate"]
+    /** What a crafted link hands the screen: a string the type never admits. */
+    const returnTo = "Primary" as RegistrationReturnRoute
+    await submitCode({ totpRegistrationId: "reg", returnTo })
     pressSuccessOk()
 
     expect(mockReset).toHaveBeenCalledWith({

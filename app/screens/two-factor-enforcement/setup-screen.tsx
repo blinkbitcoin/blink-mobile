@@ -20,7 +20,7 @@ import {
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 
-const RETURN_ROUTE: RegistrationReturnRoute = "twoFactorSetup"
+const RETURN_ROUTE = RegistrationReturnRoute.TwoFactorSetup
 
 export const TwoFactorSetupScreen: React.FC = () => {
   const { LL } = useI18nContext()

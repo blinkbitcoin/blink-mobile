@@ -27,6 +27,14 @@ describe("canReturnToRoute", () => {
     ).toBe(false)
   })
 
+  /** A deep link can name any route the app holds; only the setup is a place a flow
+   *  may return to. */
+  it("refuses a route the stack holds but a flow may not return to", () => {
+    expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), "Primary")).toBe(
+      false,
+    )
+  })
+
   it("refuses when no return route was asked for", () => {
     expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), undefined)).toBe(
       false,
