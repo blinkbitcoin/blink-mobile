@@ -582,6 +582,21 @@ describe("useResumeCompletedMigration", () => {
       expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
     })
 
+    /** A receive that lands late must not leave a tap on Migrate handed to support while
+     *  the swap, or a deferred close behind it, is still finishing on its own. */
+    it("withdraws it once the receive lands after the notice window", async () => {
+      mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+      const { rerender } = renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(true)
+
+      mockReceiveConfirmation = { isReceiveConfirmed: true, isReceiveDelayed: false }
+      rerender({})
+      await flushEffects()
+
+      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
+    })
+
     it("withdraws it when the watch goes away", async () => {
       mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
       const { unmount } = renderHook(() => useResumeCompletedMigration())
