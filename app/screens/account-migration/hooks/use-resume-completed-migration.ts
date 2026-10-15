@@ -15,6 +15,8 @@ import { reportError } from "@app/utils/error-logging"
 
 import {
   markAppForegrounded,
+  markMigrationReceiveChecked,
+  resetMigrationReceiveWait,
   setMigrationReceiveOverdue,
 } from "../utils/migration-receive-wait"
 
@@ -63,11 +65,12 @@ export const useResumeCompletedMigration = (): void => {
    *  the custodial account, nor swap into a wallet whose funds are still in transit
    *  (#4102). Unconfirmed simply means no swap this session — the custodial session stays
    *  intact and the next launch (or this one, once a check lands) picks the swap back up. */
-  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed } =
+  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed, recheck } =
     useMigrationReceiveConfirmation({
       selfCustodialAccountId: migrationAccountId,
       expectedReceiveSats: migrationExpectedReceiveSats,
       skip: !isServerCompleted,
+      onCheckSettled: markMigrationReceiveChecked,
     })
 
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
@@ -90,16 +93,19 @@ export const useResumeCompletedMigration = (): void => {
   useEffect(() => {
     setMigrationReceiveOverdue(isReceiveDelayed)
   }, [isReceiveDelayed])
-  useEffect(() => () => setMigrationReceiveOverdue(false), [])
+  useEffect(() => () => resetMigrationReceiveWait(), [])
 
-  /** And when the app comes back, so the overdue flag is only acted on once the receive
-   *  check that fires on return has had time to clear it. */
+  /** And when the app comes back, with a fresh look at the wallet asked for on the spot:
+   *  the scheduled one can be half a minute out once the wait is overdue, and the overdue
+   *  flag is only acted on after a check taken since. Marked first, so that check counts. */
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState === "active") markAppForegrounded()
+      if (nextAppState !== "active") return
+      markAppForegrounded()
+      recheck()
     })
     return () => subscription.remove()
-  }, [])
+  }, [recheck])
 
   /** Blocks the effect from re-entering once the user has been handed to support, so a
    *  terminal outcome hands over exactly once. */

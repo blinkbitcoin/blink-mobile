@@ -51,6 +51,7 @@ let mockReceiveConfirmation: {
   isReceiveProven?: boolean
 } = { isReceiveConfirmed: true, isReceiveDelayed: false }
 const mockUseReceiveConfirmation = jest.fn()
+const mockRecheck = jest.fn()
 
 jest.mock(
   "@app/screens/account-migration/hooks/use-migration-receive-confirmation",
@@ -59,6 +60,7 @@ jest.mock(
       mockUseReceiveConfirmation(args)
       return {
         isReceiveProven: mockReceiveConfirmation.isReceiveConfirmed,
+        recheck: mockRecheck,
         ...mockReceiveConfirmation,
       }
     },
@@ -74,11 +76,16 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
 
 const mockSetMigrationReceiveOverdue = jest.fn()
 const mockMarkAppForegrounded = jest.fn()
+const mockMarkMigrationReceiveChecked = jest.fn()
+const mockResetMigrationReceiveWait = jest.fn()
 
 jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
   setMigrationReceiveOverdue: (isOverdue: boolean) =>
     mockSetMigrationReceiveOverdue(isOverdue),
   markAppForegrounded: () => mockMarkAppForegrounded(),
+  markMigrationReceiveChecked: (startedAt: number) =>
+    mockMarkMigrationReceiveChecked(startedAt),
+  resetMigrationReceiveWait: () => mockResetMigrationReceiveWait(),
 }))
 
 jest.mock("@app/utils/error-logging", () => ({
@@ -224,6 +231,7 @@ describe("useResumeCompletedMigration", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: true,
+      onCheckSettled: expect.any(Function),
     })
   })
 
@@ -235,6 +243,7 @@ describe("useResumeCompletedMigration", () => {
       selfCustodialAccountId: "sc-account-1",
       expectedReceiveSats: 21000,
       skip: false,
+      onCheckSettled: expect.any(Function),
     })
   })
 
@@ -604,7 +613,33 @@ describe("useResumeCompletedMigration", () => {
 
       unmount()
 
-      expect(mockSetMigrationReceiveOverdue).toHaveBeenLastCalledWith(false)
+      expect(mockResetMigrationReceiveWait).toHaveBeenCalledTimes(1)
+    })
+
+    it("shares when each receive check settles", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      const [{ onCheckSettled }] = mockUseReceiveConfirmation.mock.lastCall as [
+        { onCheckSettled: (startedAt: number) => void },
+      ]
+      onCheckSettled(1234)
+
+      expect(mockMarkMigrationReceiveChecked).toHaveBeenCalledWith(1234)
+    })
+
+    /** Marked first, so the look it asks for counts as one taken since the app came
+     *  back: the other order leaves the overdue flag waiting on the check after. */
+    it("asks for a fresh receive check on each return, after recording it", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      await foregroundApp()
+
+      expect(mockRecheck).toHaveBeenCalledTimes(1)
+      const [markedAt] = mockMarkAppForegrounded.mock.invocationCallOrder
+      const [recheckedAt] = mockRecheck.mock.invocationCallOrder
+      expect(markedAt).toBeLessThan(recheckedAt)
     })
 
     it("records each return to the foreground", async () => {
@@ -625,6 +660,7 @@ describe("useResumeCompletedMigration", () => {
       })
 
       expect(mockMarkAppForegrounded).not.toHaveBeenCalled()
+      expect(mockRecheck).not.toHaveBeenCalled()
     })
   })
 })
