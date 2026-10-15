@@ -32,14 +32,20 @@ export const TwoFactorSetupScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
   const { tier, hasTwoFactor, missingMethod, unverifiedEmail } = useTwoFactorEnforcement()
-  const { promptReverification } = useEmailReverification()
+  const { promptReverification, spinner: isReverifying } = useEmailReverification()
 
   const isEmailMissing = missingMethod === TwoFactorMethod.Email
   const missingMethodTitle = isEmailMissing
     ? LL.TwoFactorEnforcement.addEmail()
     : LL.TwoFactorEnforcement.addPhoneNumber()
 
-  const handleClose = useCallback(() => navigation.goBack(), [navigation])
+  /** While an email re-verification runs, the screen holds still: the hook navigates
+   *  to the code screen when it is done, and that must land on this screen, not on
+   *  another flow or on whatever lies beneath once this one is gone. */
+  const handleClose = useCallback(() => {
+    if (isReverifying) return
+    navigation.goBack()
+  }, [navigation, isReverifying])
 
   useLayoutEffect(() => {
     navigation.setOptions(headerCloseControlOptions({ onPress: handleClose }))
@@ -103,10 +109,16 @@ export const TwoFactorSetupScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.TwoFactorEnforcement.setAuthenticator()}
             onPress={handleSetAuthenticator}
+            disabled={isReverifying}
           />
+          {/** Re-verifying an email deletes it before registering it again, so the
+           *   button waits for that to finish rather than let a second press start the
+           *   sequence over on top of the first. */}
           <GaloySecondaryButton
             title={missingMethodTitle}
             onPress={handleAddMissingMethod}
+            loading={isReverifying}
+            disabled={isReverifying}
           />
         </View>
       </View>
