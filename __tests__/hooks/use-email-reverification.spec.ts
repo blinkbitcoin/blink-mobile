@@ -93,6 +93,19 @@ describe("useEmailReverification", () => {
     })
   })
 
+  it("hands the code screen the route to return to, for a caller the flow must come back to", async () => {
+    const { result } = renderHook(() => useEmailReverification())
+
+    result.current.promptReverification(EMAIL, "twoFactorSetup")
+    await pressAlertButton("OK")
+
+    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationValidate", {
+      email: EMAIL,
+      emailRegistrationId: "registration-id",
+      returnTo: "twoFactorSetup",
+    })
+  })
+
   it("leaves the address alone when the prompt is cancelled", async () => {
     const { result } = renderHook(() => useEmailReverification())
 

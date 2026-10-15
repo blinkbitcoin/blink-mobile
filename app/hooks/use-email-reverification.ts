@@ -7,7 +7,10 @@ import {
   useUserEmailRegistrationInitiateMutation,
 } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  RegistrationReturnRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -62,7 +65,7 @@ export const useEmailReverification = () => {
     useUserEmailRegistrationInitiateMutation()
 
   const confirmEmailAgain = useCallback(
-    async (email: string) => {
+    async (email: string, returnTo?: RegistrationReturnRoute) => {
       try {
         await emailDeleteMutation({
           // to avoid flacky behavior
@@ -86,6 +89,7 @@ export const useEmailReverification = () => {
           navigate("emailRegistrationValidate", {
             emailRegistrationId,
             email,
+            returnTo,
           })
         } else {
           console.warn("no flow returned")
@@ -97,8 +101,10 @@ export const useEmailReverification = () => {
     [emailDeleteMutation, setEmailMutation, navigate],
   )
 
+  /** `returnTo` is where the validation screen goes on success instead of its own
+   *  destination, for a caller the flow has to return into. */
   const promptReverification = useCallback(
-    (email: string) => {
+    (email: string, returnTo?: RegistrationReturnRoute) => {
       Alert.alert(
         LL.AccountScreen.emailUnverified(),
         LL.AccountScreen.emailUnverifiedContent(),
@@ -106,7 +112,7 @@ export const useEmailReverification = () => {
           { text: LL.common.cancel(), onPress: () => {} },
           {
             text: LL.common.ok(),
-            onPress: () => confirmEmailAgain(email),
+            onPress: () => confirmEmailAgain(email, returnTo),
           },
         ],
       )

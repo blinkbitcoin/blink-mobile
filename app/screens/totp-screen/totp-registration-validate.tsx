@@ -9,7 +9,7 @@ import {
 } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { canReturnToRoute, RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -47,7 +47,7 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const [errorMessage, setErrorMessage] = useState<string>("")
 
   const [loading, setLoading] = useState(false)
-  const totpRegistrationId = route.params.totpRegistrationId
+  const { totpRegistrationId, returnTo } = route.params
 
   const { appConfig } = useAppConfig()
   const authToken = appConfig.token
@@ -75,6 +75,12 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
             {
               text: LL.common.ok(),
               onPress: () => {
+                /** A flow opened from the two-factor setup returns into it; the setup
+                 *  then steps aside to wherever it was opened from. */
+                if (canReturnToRoute(navigation.getState(), returnTo)) {
+                  navigation.popTo(returnTo)
+                  return
+                }
                 navigation.reset({
                   routes: [
                     {
@@ -94,7 +100,7 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         setLoading(false)
       }
     },
-    [navigation, LL, totpRegistrationId, authToken, totpRegistrationValidate],
+    [navigation, LL, totpRegistrationId, returnTo, authToken, totpRegistrationValidate],
   )
 
   const header = LL.TotpRegistrationValidateScreen.enter6digitCode()
