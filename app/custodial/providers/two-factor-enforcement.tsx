@@ -13,6 +13,7 @@ import { useSettingsScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useMigrateNowRemedy } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import {
   TwoFactorEnforcementRecord,
   TwoFactorMethod,
@@ -106,7 +107,8 @@ export type TwoFactorEnforcementState = {
    *  start, and the home must wait rather than show before a prompt that replaces it. */
   isPreparingSessionStart: boolean
   /** The full-screen prompt stands in for the home: shown in its place for the session
-   *  start that owes it, until a dismissal takes that start or the account complies. */
+   *  start that owes it, until a dismissal takes that start or the account complies.
+   *  Off while the wind-down's push into the migration applies, which outranks it. */
   isProtectionGateActive: boolean
   shouldShowNudgeCard: boolean
   shouldShowSettingsBanner: boolean
@@ -184,6 +186,9 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     isAuthed &&
     isAtLeastLevelOne &&
     !isSelfCustodialAccount
+  /** The wind-down's push into the migration, which the full-screen prompt yields to;
+   *  not asked for while nothing here can use the answer. */
+  const migrateNowRemedy = useMigrateNowRemedy({ skip: !isEnabled })
 
   /** Each session reads the balances and the factors from the network: the persisted
    *  cache can carry a session-old balance, and a prompt decided from it would miss a
@@ -305,9 +310,18 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  home must not show for the frames that read takes. */
   const isPreparingSessionStart = isEnabled && accountId !== null && !isSessionForAccount
   /** The full-screen prompt replaces the home for the session start that owes it, until
-   *  a dismissal takes that start or the account complies. */
-  const isProtectionGateActive =
+   *  a dismissal takes that start or the account complies. The wind-down's push into
+   *  the migration outranks it, as it does the modal on the home: an account whose
+   *  custodial service is ending has one remedy that matters more than a second factor,
+   *  and that push lives on the home, which the prompt would stand in for. The push's
+   *  session dismissal is the home's own, so the prompt yields for as long as the push
+   *  applies, and the home then takes the start with no prompt. The prompt goes up from
+   *  the local read at once rather than wait for the wind-down's answer, which a
+   *  network that never answers would hold forever; should the answer then say the push
+   *  applies, the prompt yields to it. */
+  const isProtectionGateOwed =
     isSessionStartPending && requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
+  const isProtectionGateActive = isProtectionGateOwed && !migrateNowRemedy.isDue
 
   /** The card belongs to the suggested tier alone: from the recommended tier on, the
    *  session prompt is the one asking, and the home never stacks two. The banner asks at

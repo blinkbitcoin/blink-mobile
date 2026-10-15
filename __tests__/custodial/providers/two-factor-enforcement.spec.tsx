@@ -50,6 +50,15 @@ jest.mock("@app/utils/analytics", () => ({
     mockLogTwoFactorPromptDismissed(...args),
 }))
 
+/** The wind-down's push into the migration, which the full-screen prompt yields to. */
+const mockMigrateNowRemedy = { isDue: false, isPending: false, windDown: null }
+const mockUseMigrateNowRemedy = jest.fn(
+  (_options?: { skip?: boolean }) => mockMigrateNowRemedy,
+)
+jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
+  useMigrateNowRemedy: (options?: { skip?: boolean }) => mockUseMigrateNowRemedy(options),
+}))
+
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -148,6 +157,8 @@ const resetProviderMocks = () => {
   mockAccountType = AccountType.Custodial
   mockGetItem.mockResolvedValue(null)
   mockSetItem.mockResolvedValue(undefined)
+  mockMigrateNowRemedy.isDue = false
+  mockMigrateNowRemedy.isPending = false
   setAccount({ sats: 50_000 })
 }
 
@@ -776,6 +787,55 @@ describe("TwoFactorEnforcementProvider", () => {
 /** Split from the block above only to keep each one under the file's line budget. */
 describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
   beforeEach(resetProviderMocks)
+
+  describe("wind-down precedence", () => {
+    const atBlockingTier = () => {
+      setAccount({ sats: 500_000 })
+      storeRecord({ highestTier: TwoFactorTier.Recommended, recommendedDismissals: 3 })
+    }
+
+    it("yields the protection screen to the wind-down's push into the migration, leaving the start to the home", async () => {
+      atBlockingTier()
+      mockMigrateNowRemedy.isDue = true
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.requiredPrompt).toBe(
+        TwoFactorSessionPrompt.ProtectionRequired,
+      )
+      expect(result.current.isProtectionGateActive).toBe(false)
+      expect(result.current.isPreparingSessionStart).toBe(false)
+      expect(result.current.isSessionStartPending).toBe(true)
+    })
+
+    /** A network that never answers must not hold the home blank, so the prompt does
+     *  not wait for the wind-down; it yields once the answer is in. */
+    it("stands the protection screen in before the wind-down answers, and yields once it says the push applies", async () => {
+      atBlockingTier()
+      mockMigrateNowRemedy.isPending = true
+      const { result, rerender } = await renderEnforcement()
+
+      expect(result.current.isPreparingSessionStart).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(true)
+
+      mockMigrateNowRemedy.isPending = false
+      mockMigrateNowRemedy.isDue = true
+      rerender({})
+
+      expect(result.current.isProtectionGateActive).toBe(false)
+      expect(result.current.isSessionStartPending).toBe(true)
+    })
+
+    it("asks the wind-down only while enforcement applies", async () => {
+      mockEnforcementEnabled = false
+      await renderEnforcement()
+      expect(mockUseMigrateNowRemedy).toHaveBeenLastCalledWith({ skip: true })
+
+      mockEnforcementEnabled = true
+      await renderEnforcement()
+      expect(mockUseMigrateNowRemedy).toHaveBeenLastCalledWith({ skip: false })
+    })
+  })
 
   describe("session dismissals", () => {
     it("takes the session start with a dismissal, whether or not the tier counts it", async () => {

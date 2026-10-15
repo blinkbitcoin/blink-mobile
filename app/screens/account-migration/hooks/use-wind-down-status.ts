@@ -36,12 +36,19 @@ export type WindDownRead = {
   isPending: boolean
 }
 
+export type WindDownReadOptions = {
+  /** Leaves the server unasked, for a reader that cannot use the answer. */
+  skip?: boolean
+}
+
 /**
  * The account's server-authoritative wind-down state (top-level `Query.windDown`). Null
  * means the wind-down does not affect this account, so every wind-down surface stays off;
  * the status is server-derived and the client never computes a phase from the dates.
  */
-export const useWindDownStatus = (): WindDownRead => {
+export const useWindDownStatus = ({
+  skip = false,
+}: WindDownReadOptions = {}): WindDownRead => {
   const isAuthed = useIsAuthed()
 
   /**
@@ -51,7 +58,10 @@ export const useWindDownStatus = (): WindDownRead => {
    * PRE_CUTOFF). Skipping the cache entirely keeps the phase tied to the active account and
    * never writes account-scoped data under the shared key.
    */
-  const { data, loading } = useWindDownQuery({ skip: !isAuthed, fetchPolicy: "no-cache" })
+  const { data, loading } = useWindDownQuery({
+    skip: !isAuthed || skip,
+    fetchPolicy: "no-cache",
+  })
 
   return { windDown: toWindDown(data?.windDown), isPending: loading }
 }

@@ -1,6 +1,9 @@
 import { act, renderHook } from "@testing-library/react-native"
 
-import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
+import {
+  useMigrateNowPrompt,
+  useMigrateNowRemedy,
+} from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
@@ -35,12 +38,45 @@ let mockStatus: WindDownStatus | null = WindDownStatus.ReceiveDisabled
 
 let mockIsPending = false
 
-jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () => ({
-    windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
-    isPending: mockIsPending,
-  }),
+const mockUseWindDownStatus = jest.fn((_options?: { skip?: boolean }) => ({
+  windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+  isPending: mockIsPending,
 }))
+jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
+  useWindDownStatus: (options?: { skip?: boolean }) => mockUseWindDownStatus(options),
+}))
+
+describe("useMigrateNowRemedy", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockActiveAccount = { id: "custodial-1", type: AccountType.Custodial }
+    mockStatus = WindDownStatus.ReceiveDisabled
+    mockIsPending = false
+  })
+
+  it("is due once receiving is disabled and the self-custodial stack is on", () => {
+    const { result } = renderHook(() => useMigrateNowRemedy())
+
+    expect(result.current.isDue).toBe(true)
+    expect(result.current.isPending).toBe(false)
+  })
+
+  it("is not due before the cutoff, nor while the self-custodial stack is off", () => {
+    mockStatus = WindDownStatus.PreCutoff
+    expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
+
+    mockStatus = WindDownStatus.ReceiveDisabled
+    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
+  })
+
+  it("hands a reader's request to leave the server unasked down to the wind-down read", () => {
+    renderHook(() => useMigrateNowRemedy({ skip: true }))
+
+    expect(mockUseWindDownStatus).toHaveBeenCalledWith({ skip: true })
+  })
+})
 
 describe("useMigrateNowPrompt", () => {
   beforeEach(() => {
