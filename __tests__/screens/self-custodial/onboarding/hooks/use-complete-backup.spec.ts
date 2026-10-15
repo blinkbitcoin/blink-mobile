@@ -3,6 +3,7 @@ import { renderHook } from "@testing-library/react-native"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { useCompleteBackup } from "@app/screens/self-custodial/onboarding/hooks/use-complete-backup"
 import { reportError } from "@app/utils/error-logging"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 const mockNavigate = jest.fn()
 const mockSaveCheckpoint = jest.fn()
@@ -67,7 +68,7 @@ describe("useCompleteBackup", () => {
     mockCheckpoint = "backupAlerts"
     mockMigrationAccountId = "migration-uuid"
     mockMarkBackupCompletedFor.mockResolvedValue(undefined)
-    mockSaveCheckpoint.mockResolvedValue(true)
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   })
 
   it("marks the provisioned account and continues to the balance summary during a migration", async () => {
@@ -90,7 +91,10 @@ describe("useCompleteBackup", () => {
    *  without this checkpoint. Blocking on the write would buy no resume behaviour and would
    *  strand a user who just finished their backup on a screen with nothing left to do. */
   it("continues to the mode screen when the checkpoint write fails", async () => {
-    mockSaveCheckpoint.mockResolvedValueOnce(false)
+    mockSaveCheckpoint.mockResolvedValueOnce({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
 
     const { result } = renderHook(() => useCompleteBackup())
 
@@ -103,6 +107,34 @@ describe("useCompleteBackup", () => {
         accountId: "migration-uuid",
       },
     })
+  })
+
+  /** Not gated on, but not silent either: a store refusing this write is the same store
+   *  the commit point is about to depend on. */
+  it("reports a choose-experience checkpoint write the store refused", async () => {
+    mockSaveCheckpoint.mockResolvedValueOnce({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    await result.current({ method: "manual" })
+
+    expect(reportError).toHaveBeenCalledTimes(1)
+    expect(reportError).toHaveBeenCalledWith(
+      "Migration choose-experience checkpoint save",
+      expect.objectContaining({ message: "Choose-experience step was not persisted" }),
+    )
+  })
+
+  it("reports nothing when the choose-experience checkpoint write lands", async () => {
+    const { result } = renderHook(() => useCompleteBackup())
+
+    await result.current({ method: "manual" })
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.ChooseExperience)
+    expect(reportError).not.toHaveBeenCalled()
   })
 
   it("marks the active self-custodial account on a standalone backup (no migration)", () => {

@@ -20,13 +20,13 @@ const mockMigrationAccountId = jest.fn<string | null, []>()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
-    saveCheckpoint: jest.fn().mockResolvedValue(true),
+    saveCheckpoint: jest.fn().mockResolvedValue({ isSaved: true, failure: null }),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
   }),
   useMigrationCheckpointState: () => ({
-    saveCheckpoint: jest.fn().mockResolvedValue(true),
+    saveCheckpoint: jest.fn().mockResolvedValue({ isSaved: true, failure: null }),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
@@ -429,6 +429,9 @@ describe("BackupPhraseConfirmScreen", () => {
         accountId: "migration-uuid",
       },
     })
+    /** A checkpoint write that landed reports nothing; a mock out of step with the
+     *  write's answer would report here on every happy path. */
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {

@@ -2,7 +2,9 @@ import React from "react"
 import { render, act, fireEvent } from "@testing-library/react-native"
 
 import { MigrationGate } from "@app/screens/account-migration/to-non-custodial/migration-gate"
+import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import { walletOverviewQueryResult } from "../helpers"
 
@@ -17,16 +19,22 @@ let mockLockError = false
 const mockRefetchLock = jest.fn()
 let mockCheckpointLoading = false
 let mockCheckpointError = false
+let mockCheckpointStorageFailure: StorageFailure | null = null
 const mockRefetchCheckpoint = jest.fn()
 let mockHasResumableCheckpoint = true
 const mockNavigateToCheckpoint = jest.fn()
 let mockReusablePendingAccountId: string | null = null
 let mockPendingWalletLoading = false
 let mockPendingWalletError = false
+let mockPendingWalletStorageFailure: StorageFailure | null = null
 const mockRefetchPendingWallet = jest.fn()
 const mockUseTransferBlocked = jest.fn()
 const mockUseDollarBalanceRestricted = jest.fn()
 const mockUseWalletOverviewScreenQuery = jest.fn()
+/** Every query result carries a refetch that settles, unless a case overrides it: without
+ *  one the gate's retry throws before its first await, never disables itself, and lets a
+ *  burst of presses count as attempts no user could make. */
+const mockRefetchWalletOverview = jest.fn()
 const mockReportError = jest.fn()
 /** The child mocks render a Pressable per action instead of returning null, so tests drive
  *  them with real fireEvent (which honours `disabled`) rather than calling captured props;
@@ -66,6 +74,15 @@ const mockDollarBalanceModal = jest.fn(
   },
 )
 const mockUnavailableScreen = jest.fn(() => null)
+const mockSecondaryButton = jest.fn((props: { title: string; onPress: () => void }) => {
+  const { Pressable, Text } = jest.requireActual("react-native")
+  return (
+    <Pressable testID="gate-storage-support-button" onPress={props.onPress}>
+      <Text>{props.title}</Text>
+    </Pressable>
+  )
+})
+
 const mockPrimaryButton = jest.fn(
   (props: { title: string; onPress: () => void; disabled?: boolean }) => {
     const { Pressable, Text } = jest.requireActual("react-native")
@@ -90,7 +107,7 @@ const apiKeysState = (overrides: Record<string, unknown> = {}) => ({
   loading: false,
   isReady: true,
   hasError: false,
-  refetch: jest.fn(),
+  refetch: jest.fn().mockResolvedValue(undefined),
   ...overrides,
 })
 
@@ -125,6 +142,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     navigateToCheckpoint: mockNavigateToCheckpoint,
     loading: mockCheckpointLoading,
     hasError: mockCheckpointError,
+    storageFailure: mockCheckpointStorageFailure,
     refetch: mockRefetchCheckpoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
   }),
@@ -135,6 +153,7 @@ jest.mock("@app/screens/account-migration/hooks/use-reusable-pending-wallet", ()
     reusablePendingAccountId: mockReusablePendingAccountId,
     loading: mockPendingWalletLoading,
     hasError: mockPendingWalletError,
+    storageFailure: mockPendingWalletStorageFailure,
     refetch: mockRefetchPendingWallet,
   }),
 }))
@@ -167,7 +186,10 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useWalletOverviewScreenQuery: () => mockUseWalletOverviewScreenQuery(),
+  useWalletOverviewScreenQuery: () => ({
+    refetch: mockRefetchWalletOverview,
+    ...mockUseWalletOverviewScreenQuery(),
+  }),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -217,6 +239,13 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       errors: { generic: () => "generic error" },
       common: { tryAgain: () => "Try Again" },
+      AccountMigration: {
+        storageUnavailable: {
+          unreadableBody: () => "could not read your progress",
+          outOfSpaceBody: () => "no space left",
+          contactSupportCta: () => "Contact support",
+        },
+      },
     },
   }),
 }))
@@ -224,6 +253,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
 jest.mock("@app/components/atomic/galoy-primary-button", () => ({
   GaloyPrimaryButton: (props: { title: string; onPress: () => void }) =>
     mockPrimaryButton(props),
+}))
+
+jest.mock("@app/components/atomic/galoy-secondary-button", () => ({
+  GaloySecondaryButton: (props: { title: string; onPress: () => void }) =>
+    mockSecondaryButton(props),
 }))
 
 jest.mock("@app/components/atomic/galoy-icon", () => ({
@@ -238,28 +272,36 @@ jest.mock("@app/utils/error-logging", () => ({
       : mockReportError(operation, err, options),
 }))
 
+const resetGateMocks = (): void => {
+  jest.clearAllMocks()
+  mockIsFocused = true
+  mockWindDown = null
+  mockSelfCustodialDisabled = false
+  mockIsMigrationLocked = false
+  mockLockLoading = false
+  mockLockError = false
+  mockCheckpointLoading = false
+  mockCheckpointError = false
+  mockCheckpointStorageFailure = null
+  mockPendingWalletStorageFailure = null
+  mockHasResumableCheckpoint = true
+  mockReusablePendingAccountId = null
+  mockPendingWalletLoading = false
+  mockPendingWalletError = false
+  mockUseActiveApiKeys.mockReturnValue(apiKeysState())
+  mockRefetchWalletOverview.mockResolvedValue(undefined)
+  mockRefetchLock.mockResolvedValue(undefined)
+  mockRefetchCheckpoint.mockResolvedValue(undefined)
+  mockRefetchPendingWallet.mockResolvedValue(undefined)
+  mockUseTransferBlocked.mockReturnValue(false)
+  mockUseDollarBalanceRestricted.mockReturnValue(false)
+  mockUseWalletOverviewScreenQuery.mockReturnValue(
+    walletOverviewQueryResult({ usdBalance: 0 }),
+  )
+}
+
 describe("MigrationGate", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockIsFocused = true
-    mockWindDown = null
-    mockSelfCustodialDisabled = false
-    mockIsMigrationLocked = false
-    mockLockLoading = false
-    mockLockError = false
-    mockCheckpointLoading = false
-    mockCheckpointError = false
-    mockHasResumableCheckpoint = true
-    mockReusablePendingAccountId = null
-    mockPendingWalletLoading = false
-    mockPendingWalletError = false
-    mockUseActiveApiKeys.mockReturnValue(apiKeysState())
-    mockUseTransferBlocked.mockReturnValue(false)
-    mockUseDollarBalanceRestricted.mockReturnValue(false)
-    mockUseWalletOverviewScreenQuery.mockReturnValue(
-      walletOverviewQueryResult({ usdBalance: 0 }),
-    )
-  })
+  beforeEach(resetGateMocks)
 
   it("shows the temporarily-unavailable screen while the kill-switch is on, whatever the entry", () => {
     mockSelfCustodialDisabled = true
@@ -769,13 +811,6 @@ describe("MigrationGate", () => {
   it("refetches the local reads too when the retry button is pressed", async () => {
     mockIsMigrationLocked = true
     mockCheckpointError = true
-    mockUseActiveApiKeys.mockReturnValue(
-      apiKeysState({ refetch: jest.fn().mockResolvedValue(undefined) }),
-    )
-    mockUseWalletOverviewScreenQuery.mockReturnValue({
-      ...walletOverviewQueryResult({ usdBalance: 0 }),
-      refetch: jest.fn().mockResolvedValue(undefined),
-    })
 
     const { getByTestId } = render(<MigrationGate />)
     fireEvent.press(getByTestId("gate-retry-button"))
@@ -783,6 +818,9 @@ describe("MigrationGate", () => {
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
     expect(mockRefetchPendingWallet).toHaveBeenCalledTimes(1)
+    /** The anchor that keeps this fixture honest: a retry that threw instead of fetching
+     *  would report here and still leave the counts above looking plausible. */
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /** The local reads only feed the locked resume-or-handover decision, so their failure
@@ -910,5 +948,228 @@ describe("MigrationGate", () => {
     render(<MigrationGate />)
 
     expect(mockRequiredScreen.mock.calls[0][0].mode).toBe("forcedPreDeadline")
+  })
+})
+
+describe("MigrationGate, with an unreadable device store", () => {
+  beforeEach(resetGateMocks)
+
+  /** The gate reaches its error screen for a locked account whose local reads failed. */
+  const arriveAtStorageError = (): void => {
+    mockIsMigrationLocked = true
+    mockCheckpointError = true
+  }
+
+  /** Each press settles before the next, the way a user spends the budget: the button
+   *  disables itself while a retry is in flight, so a burst of taps is one attempt. */
+  const pressRetry = async (
+    getByTestId: (id: string) => unknown,
+    times: number,
+  ): Promise<void> => {
+    for (let attempt = 0; attempt < times; attempt += 1) {
+      // eslint-disable-next-line no-await-in-loop -- each retry must settle before the next
+      await act(async () => {
+        fireEvent.press(getByTestId("gate-retry-button") as never)
+      })
+    }
+  }
+
+  it("says the device is full when the failure was about space", () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByText } = render(<MigrationGate />)
+
+    expect(getByText("no space left")).toBeTruthy()
+  })
+
+  it("reads the failure off the pending-wallet source too", () => {
+    arriveAtStorageError()
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByText } = render(<MigrationGate />)
+
+    expect(getByText("no space left")).toBeTruthy()
+  })
+
+  it("says the device could not be read when the message could not say why", () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    expect(getByText("could not read your progress")).toBeTruthy()
+    expect(queryByText("no space left")).toBeNull()
+  })
+
+  it("keeps the generic wording for a failure that was not the device's", () => {
+    mockIsMigrationLocked = true
+    mockLockError = true
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    expect(getByText("generic error")).toBeTruthy()
+    expect(queryByText("could not read your progress")).toBeNull()
+  })
+
+  it("offers only the retry while retrying is still worth a try", async () => {
+    arriveAtStorageError()
+
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(2)
+    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+  })
+
+  it("offers support once retrying has failed enough times to stop being a fix", async () => {
+    arriveAtStorageError()
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+
+    /** Three real round-trips, not three taps on a retry that threw before fetching. */
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(mockReportError).not.toHaveBeenCalled()
+    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+  })
+
+  it("holds the retry and the handover while a retry is still in flight", async () => {
+    arriveAtStorageError()
+    let settleRefetch: () => void = () => undefined
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    mockRefetchCheckpoint.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          settleRefetch = resolve
+        }),
+    )
+    await act(async () => {
+      fireEvent.press(getByTestId("gate-retry-button"))
+    })
+    /** A tap while the third attempt is out must not start a fourth. */
+    fireEvent.press(getByTestId("gate-retry-button"))
+
+    expect(getByTestId("gate-retry-button")).toBeDisabled()
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+
+    await act(async () => {
+      settleRefetch()
+    })
+
+    expect(getByTestId("gate-retry-button")).toBeEnabled()
+    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+  })
+
+  /** Production ordering: Apollo's refetch rejects on a network error, often well before the
+   *  local reads answer. The retry must stay in flight until every source has settled, or
+   *  the budget advances on an attempt whose storage answer is still outstanding. */
+  it("stays in flight until the local reads settle, even when a server refetch fails first", async () => {
+    arriveAtStorageError()
+    const offline = new Error("Network request failed")
+    mockUseActiveApiKeys.mockReturnValue(
+      apiKeysState({ refetch: jest.fn().mockRejectedValue(offline) }),
+    )
+    const { getByTestId, queryByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 2)
+
+    let settleCheckpointRead: () => void = () => undefined
+    mockRefetchCheckpoint.mockImplementationOnce(
+      () =>
+        new Promise<void>((resolve) => {
+          settleCheckpointRead = resolve
+        }),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("gate-retry-button"))
+    })
+    fireEvent.press(getByTestId("gate-retry-button"))
+
+    expect(getByTestId("gate-retry-button")).toBeDisabled()
+    expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
+    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+
+    await act(async () => {
+      settleCheckpointRead()
+    })
+
+    expect(getByTestId("gate-retry-button")).toBeEnabled()
+    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+    expect(mockReportError).toHaveBeenLastCalledWith("Migration gate retry", offline)
+  })
+
+  it("hands over saying the store was unreadable, never that the records are gone", async () => {
+    arriveAtStorageError()
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("gate-storage-support-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.StorageUnreadable,
+      /** Not the terminal gate origin: a user who frees up space has to get back here. */
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  })
+
+  /** The user was just told to free up space; a ticket claiming the store could not be read
+   *  would contradict that and drop the one remedy they can apply. */
+  it("hands over naming a full device when that is what the screen said", async () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByTestId, getByText } = render(<MigrationGate />)
+    expect(getByText("no space left")).toBeTruthy()
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("gate-storage-support-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: MigrationSupportReason.StorageOutOfSpace,
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  })
+
+  it("names a full device for the ticket when only the pending-wallet read hit one", async () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByTestId } = render(<MigrationGate />)
+    await pressRetry(getByTestId, 3)
+    fireEvent.press(getByTestId("gate-storage-support-button"))
+
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "accountMigrationContactSupport",
+      expect.objectContaining({ reason: MigrationSupportReason.StorageOutOfSpace }),
+    )
+  })
+
+  /** The rule this screen cannot honestly test lives in the hook's own spec: an unlocked
+   *  account never renders this screen at all. */
+  it("says the store is unreadable only when the network sources answered", () => {
+    arriveAtStorageError()
+    mockLockError = true
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    expect(getByText("generic error")).toBeTruthy()
+    expect(queryByText("could not read your progress")).toBeNull()
+  })
+
+  it("prefers the failure the user can act on when the two sources disagree", () => {
+    arriveAtStorageError()
+    mockCheckpointStorageFailure = StorageFailure.Unknown
+    mockPendingWalletError = true
+    mockPendingWalletStorageFailure = StorageFailure.OutOfSpace
+
+    const { getByText } = render(<MigrationGate />)
+
+    expect(getByText("no space left")).toBeTruthy()
   })
 })
