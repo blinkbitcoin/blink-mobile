@@ -117,6 +117,9 @@ export const loadCheckpoint = async (
   if (!parsed) return null
 
   if (isExpired(parsed)) {
+    /** Cannot reject: `remove` swallows the store's error. That is what this branch needs,
+     *  since the read already answered and a cleanup that did not land is retried by the
+     *  next read that finds the same expired record. */
     await remove(storageKey)
     return null
   }

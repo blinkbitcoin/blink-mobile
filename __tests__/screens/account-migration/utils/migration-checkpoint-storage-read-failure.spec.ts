@@ -178,6 +178,20 @@ describe("an unreadable store is not an empty one", () => {
     await expect(loadPendingProvisionedAccounts(PENDING_KEY)).resolves.toEqual({})
   })
 
+  /** The read answered and the answer is "nothing resumable"; only the housekeeping
+   *  failed. Surfacing that as an unreadable store would show a locked user a retry that
+   *  fails identically every time over a record that was merely stale. */
+  it("answers an expired record as absent even when removing it fails", async () => {
+    const consoleError = jest.spyOn(console, "error").mockImplementation(() => undefined)
+    disk[STORAGE_KEY] = JSON.stringify({ ...healthyCheckpoint, savedAt: 0 })
+    mockRemoveItem.mockRejectedValue(new Error("database or disk is full"))
+
+    await expect(loadCheckpoint(STORAGE_KEY)).resolves.toBeNull()
+
+    expect(mockRemoveItem).toHaveBeenCalledWith(STORAGE_KEY)
+    consoleError.mockRestore()
+  })
+
   it("reads a truncated checkpoint as absent instead of stranding the key", async () => {
     disk[STORAGE_KEY] = '{"step":"balancesOverview","savedAt"'
 
