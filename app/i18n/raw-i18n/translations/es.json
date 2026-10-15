@@ -4061,7 +4061,6 @@
         "dismissLast": "Esta es la última vez que puedes descartar esto.",
         "setNow": "Configurar ahora",
         "dontWantTo": "No quiero",
-        "protectionRequiredTitle": "Por favor, agrega protección adicional",
         "highBalanceTitle": "Tienes más de {amount}, por favor agrega protección adicional",
         "protectionRequiredBody": "Cuantos más fondos tengas, más importante es contar con mejor seguridad. Agrega un autenticador para seguir usando Blink.",
         "nonCustodialTitle": "Si no quieres configurar la autenticación de dos factores",

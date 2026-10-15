@@ -4061,7 +4061,6 @@
         "dismissLast": "これを閉じられるのはこれが最後です。",
         "setNow": "今すぐ設定",
         "dontWantTo": "設定しない",
-        "protectionRequiredTitle": "追加の保護を設定してください",
         "highBalanceTitle": "{amount}以上をお持ちです。追加の保護を設定してください",
         "protectionRequiredBody": "資金が多いほど、より高いセキュリティが重要になります。Blinkを引き続き利用するには認証アプリを追加してください。",
         "nonCustodialTitle": "2要素認証を設定しない場合",

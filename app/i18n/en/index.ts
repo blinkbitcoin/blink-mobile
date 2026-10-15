@@ -4267,7 +4267,6 @@ const en: BaseTranslation = {
     dismissLast: "This is the last time you can dismiss this.",
     setNow: "Set now",
     dontWantTo: "I don't want to",
-    protectionRequiredTitle: "Please add additional protection",
     highBalanceTitle: "You have over {amount: string}, please add additional protection",
     protectionRequiredBody:
       "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",

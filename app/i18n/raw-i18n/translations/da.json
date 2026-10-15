@@ -4061,7 +4061,6 @@
     "dismissLast": "Dette er sidste gang, du kan afvise dette.",
     "setNow": "Opsæt nu",
     "dontWantTo": "Det vil jeg ikke",
-    "protectionRequiredTitle": "Tilføj venligst ekstra beskyttelse",
     "highBalanceTitle": "Du har over {amount}, tilføj venligst ekstra beskyttelse",
     "protectionRequiredBody": "Jo flere midler du har, jo vigtigere er bedre sikkerhed. Tilføj venligst en authenticator for at fortsætte med at bruge Blink.",
     "nonCustodialTitle": "Hvis du ikke vil opsætte to-faktor godkendelse",

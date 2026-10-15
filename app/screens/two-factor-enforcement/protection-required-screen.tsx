@@ -12,8 +12,12 @@ import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enf
 import { AUTHENTICATOR_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import { formatCurrencyHelper, usdDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  RegistrationReturnRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
 import {
   TwoFactorMethod,
@@ -28,10 +32,13 @@ import {
 } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
+import { TwoFactorSetupContent } from "./setup-content"
 import { StepLayout } from "./step-layout"
 
 const SATS_CODE = "SAT"
 const CENTS_PER_DOLLAR = 100
+/** The gate stands in for the home, so its flows come back to the home. */
+const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 
 /** The threshold the title quotes, in the wallet that crossed it: "5,000,000 SAT" or
  *  "$5,000", whole units only. */
@@ -52,12 +59,12 @@ const formatHighBalanceAmount = (currency: WalletCurrency): string => {
 }
 
 /**
- * The full-screen prompt of the tiers that stop asking nicely: the required tier once
- * its dismissals are spent, and the authenticator tier from its first session. It
- * stands in for the home at the session start that owes it, so the home is never seen
- * first, and offers exactly two ways forward. While the authenticator tier still has
- * dismissals left it also offers an X; otherwise there is no header, no gesture and no
- * hardware back, so the only exits are the two buttons.
+ * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
+ * at the session start that owes it, so the home is never seen first. The required
+ * tier, once its dismissals are spent, shows the setup itself with no way to close it:
+ * the only exits are the factors it offers. The authenticator tier shows the
+ * high-balance screen, with an X while it still has dismissals left and none after, and
+ * offers exactly two ways forward. Neither takes the swipe or the hardware back.
  */
 export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -73,6 +80,9 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     registerDismissal,
     consumeSessionStart,
   } = useTwoFactorEnforcement()
+  const { promptReverification, spinner: isReverifying } = useEmailReverification({
+    returnTo: GATE_RETURN_ROUTE,
+  })
   /** The tier this screen was raised for: what it reports, and what its X is charged
    *  to, even if the balance moves while it is open. */
   const [promptTier] = useState(unmetTier)
@@ -102,9 +112,11 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
    *  none: a blocking screen swallows it rather than letting the app go. */
   useHardwareBackGuard(isDismissible ? handleDismiss : undefined)
 
+  /** A flow started from the gate returns to the home, where the gate decides again
+   *  with the factor just added. */
   const handleSetAuthenticator = useCallback(() => {
     logTwoFactorSetupStarted({ tier: promptTier, method: TwoFactorMethod.Authenticator })
-    navigation.navigate("totpRegistrationInitiate")
+    navigation.navigate("totpRegistrationInitiate", { returnTo: GATE_RETURN_ROUTE })
   }, [navigation, promptTier])
 
   const handleMove = useCallback(() => {
@@ -112,21 +124,20 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     navigation.navigate("accountMigrationEntry")
   }, [navigation, promptTier])
 
-  const highBalancePresentation = {
-    icon: "dollar" as const,
-    iconColor: colors.primary,
-    title: LL.TwoFactorEnforcement.highBalanceTitle({
-      amount: formatHighBalanceAmount(highBalanceCurrency),
-    }),
+  /** The setup keeps the header row its route draws, empty: the hero then sits where
+   *  it does on every other screen of the flow, instead of climbing into the gap. */
+  if (!isAuthenticatorTier) {
+    return (
+      <TwoFactorSetupContent
+        promptTier={promptTier}
+        returnTo={GATE_RETURN_ROUTE}
+        promptReverification={promptReverification}
+        isReverifying={isReverifying}
+        headerShown={false}
+        header={<CloseHeader isHidden testID="two-factor-protection-close" />}
+      />
+    )
   }
-  const requiredPresentation = {
-    icon: "warning" as const,
-    iconColor: colors.warning,
-    title: LL.TwoFactorEnforcement.protectionRequiredTitle(),
-  }
-  const presentation = isAuthenticatorTier
-    ? highBalancePresentation
-    : requiredPresentation
 
   return (
     <StepLayout
@@ -154,9 +165,11 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
       }
     >
       <IconHero
-        icon={presentation.icon}
-        iconColor={presentation.iconColor}
-        title={presentation.title}
+        icon="dollar"
+        iconColor={colors.primary}
+        title={LL.TwoFactorEnforcement.highBalanceTitle({
+          amount: formatHighBalanceAmount(highBalanceCurrency),
+        })}
         subtitle={
           <Text type="p3" style={styles.description}>
             {LL.TwoFactorEnforcement.protectionRequiredBody()}
