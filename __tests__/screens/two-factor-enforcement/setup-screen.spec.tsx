@@ -2,6 +2,8 @@ import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
@@ -135,7 +137,7 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("always offers the authenticator as the second option", async () => {
+  it("offers the authenticator as the call to action", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
@@ -145,6 +147,31 @@ describe("TwoFactorSetupScreen", () => {
       tier: TwoFactorTier.Nudge,
       method: TwoFactorMethod.Authenticator,
     })
+  })
+
+  it("makes the authenticator the primary button and the missing factor the secondary one", async () => {
+    await renderScreen()
+
+    // eslint-disable-next-line camelcase
+    const primary = screen.UNSAFE_getByType(GaloyPrimaryButton)
+    // eslint-disable-next-line camelcase
+    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
+
+    expect(primary.props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
+    expect(secondary.props.title).toBe(LL.TwoFactorEnforcement.addEmail())
+  })
+
+  it("keeps the authenticator primary when the phone number is the missing factor", async () => {
+    mockEnforcement.missingMethod = TwoFactorMethod.Phone
+    await renderScreen()
+
+    // eslint-disable-next-line camelcase
+    const primary = screen.UNSAFE_getByType(GaloyPrimaryButton)
+    // eslint-disable-next-line camelcase
+    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
+
+    expect(primary.props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
+    expect(secondary.props.title).toBe(LL.TwoFactorEnforcement.addPhoneNumber())
   })
 
   it("installs a close control that leaves the screen", async () => {

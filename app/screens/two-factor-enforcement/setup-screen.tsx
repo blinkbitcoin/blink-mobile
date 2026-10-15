@@ -30,7 +30,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const { promptReverification } = useEmailReverification()
 
   const isEmailMissing = missingMethod === TwoFactorMethod.Email
-  const primaryTitle = isEmailMissing
+  const missingMethodTitle = isEmailMissing
     ? LL.TwoFactorEnforcement.addEmail()
     : LL.TwoFactorEnforcement.addPhoneNumber()
 
@@ -89,11 +89,16 @@ export const TwoFactorSetupScreen: React.FC = () => {
             }
           />
         </View>
+        {/** The authenticator is the call to action, whatever the account holds; the
+         *   factor it is missing is offered underneath as the lighter alternative. */}
         <View style={styles.footer}>
-          <GaloyPrimaryButton title={primaryTitle} onPress={handleAddMissingMethod} />
-          <GaloySecondaryButton
+          <GaloyPrimaryButton
             title={LL.TwoFactorEnforcement.setAuthenticator()}
             onPress={handleSetAuthenticator}
+          />
+          <GaloySecondaryButton
+            title={missingMethodTitle}
+            onPress={handleAddMissingMethod}
           />
         </View>
       </View>
