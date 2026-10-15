@@ -11,6 +11,12 @@ const mockToastShow = jest.fn()
 let mockAccountId: string | null = null
 
 let mockPendingForActiveAccount: string | null = null
+let mockPendingReadError = false
+let mockPendingReadFailure: StorageFailure | null = null
+const mockRefetchPending = jest.fn()
+let mockCheckpointReadError = false
+let mockCheckpointReadFailure: StorageFailure | null = null
+const mockRefetchCheckpoint = jest.fn()
 let mockRegistryAccounts: { id: string }[] = []
 const mockSavePendingAccount = jest.fn()
 
@@ -19,6 +25,9 @@ jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts",
     pendingForActiveAccount: mockPendingForActiveAccount,
     savePendingAccount: mockSavePendingAccount,
     loading: false,
+    hasError: mockPendingReadError,
+    storageFailure: mockPendingReadFailure,
+    refetch: mockRefetchPending,
   }),
 }))
 
@@ -35,6 +44,9 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint-state",
   useMigrationCheckpointState: () => ({
     accountId: mockAccountId,
     loading: false,
+    hasError: mockCheckpointReadError,
+    storageFailure: mockCheckpointReadFailure,
+    refetch: mockRefetchCheckpoint,
     saveCheckpoint: mockSaveCheckpoint,
   }),
 }))
@@ -53,13 +65,19 @@ jest.mock("@app/hooks/use-in-flight-guard", () => ({
 
 const mockCreateFailedCopy = "creation failed"
 const mockOutOfSpaceCopy = "free up some space"
+const mockUnreadableCopy = "could not read your progress"
+const mockReadOutOfSpaceCopy = "no space left to read your progress"
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       AccountTypeSelectionScreen: { createFailed: () => mockCreateFailedCopy },
       AccountMigration: {
-        storageUnavailable: { notSavedOutOfSpaceBody: () => mockOutOfSpaceCopy },
+        storageUnavailable: {
+          notSavedOutOfSpaceBody: () => mockOutOfSpaceCopy,
+          unreadableBody: () => mockUnreadableCopy,
+          outOfSpaceBody: () => mockReadOutOfSpaceCopy,
+        },
       },
     },
   }),
@@ -81,6 +99,12 @@ describe("useMigrationAccount", () => {
     mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
     mockSavePendingAccount.mockResolvedValue(undefined)
     mockPendingForActiveAccount = null
+    mockPendingReadError = false
+    mockPendingReadFailure = null
+    mockCheckpointReadError = false
+    mockCheckpointReadFailure = null
+    mockRefetchPending.mockResolvedValue(undefined)
+    mockRefetchCheckpoint.mockResolvedValue(undefined)
     mockRegistryAccounts = []
     mockRegistryLoading = false
     mockProvision.mockImplementation(
@@ -338,5 +362,92 @@ describe("useMigrationAccount", () => {
     expect(ensured).toBe("sc-account-1")
     expect(mockProvision).toHaveBeenCalledTimes(1)
     expect(mockSavePendingAccount).toHaveBeenCalledWith("sc-account-1")
+  })
+
+  describe("with a resume read in error", () => {
+    /** The pending record read null because it could not be read, not because there is
+     *  none: provisioning on that null hands a second wallet to a user who holds one. */
+    it("refuses to provision when the pending-wallet read failed", async () => {
+      mockPendingReadError = true
+      mockPendingReadFailure = StorageFailure.Unknown
+      const { result } = renderHook(() => useMigrationAccount())
+
+      let ensured: string | null = "unset"
+      await act(async () => {
+        ensured = await result.current.ensureAccount()
+      })
+
+      expect(ensured).toBeNull()
+      expect(mockProvision).not.toHaveBeenCalled()
+      expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: mockUnreadableCopy }),
+      )
+    })
+
+    /** A pending wallet read from the same store that just failed is no firmer an answer
+     *  than the null was, so it is not reused either. */
+    it("refuses even a reusable pending wallet when the checkpoint read failed", async () => {
+      mockCheckpointReadError = true
+      mockCheckpointReadFailure = StorageFailure.Unknown
+      mockPendingForActiveAccount = "sc-pending-1"
+      mockRegistryAccounts = [{ id: "sc-pending-1" }]
+      const { result } = renderHook(() => useMigrationAccount())
+
+      let ensured: string | null = "unset"
+      await act(async () => {
+        ensured = await result.current.ensureAccount()
+      })
+
+      expect(ensured).toBeNull()
+      expect(mockProvision).not.toHaveBeenCalled()
+      expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("names a full device when either read hit one", async () => {
+      mockCheckpointReadError = true
+      mockCheckpointReadFailure = StorageFailure.Unknown
+      mockPendingReadError = true
+      mockPendingReadFailure = StorageFailure.OutOfSpace
+      const { result } = renderHook(() => useMigrationAccount())
+
+      await act(async () => {
+        await result.current.ensureAccount()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: mockReadOutOfSpaceCopy }),
+      )
+    })
+
+    /** The reads only reload on focus, so without this the next tap would replay the same
+     *  stale error for as long as the user stays on the screen. */
+    it("re-reads both sources so the next tap can go through", async () => {
+      mockPendingReadError = true
+      const { result } = renderHook(() => useMigrationAccount())
+
+      await act(async () => {
+        await result.current.ensureAccount()
+      })
+
+      expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockRefetchPending).toHaveBeenCalledTimes(1)
+    })
+
+    /** An id the checkpoint did return was read fine, and is the account to continue
+     *  with whatever the pending record's read said. */
+    it("still returns an account the checkpoint already holds", async () => {
+      mockAccountId = "sc-account-1"
+      mockPendingReadError = true
+      const { result } = renderHook(() => useMigrationAccount())
+
+      let ensured: string | null = null
+      await act(async () => {
+        ensured = await result.current.ensureAccount()
+      })
+
+      expect(ensured).toBe("sc-account-1")
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
   })
 })

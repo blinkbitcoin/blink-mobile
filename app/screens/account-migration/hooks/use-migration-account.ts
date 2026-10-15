@@ -21,12 +21,18 @@ export const useMigrationAccount = () => {
   const {
     accountId,
     loading: checkpointLoading,
+    hasError: hasCheckpointReadError,
+    storageFailure: checkpointReadFailure,
+    refetch: refetchCheckpoint,
     saveCheckpoint,
   } = useMigrationCheckpointState()
   const {
     pendingForActiveAccount,
     savePendingAccount,
     loading: pendingLoading,
+    hasError: hasPendingReadError,
+    storageFailure: pendingReadFailure,
+    refetch: refetchPending,
   } = usePendingMigrationAccounts()
   const { accounts, loading: registryLoading } = useAccountRegistry()
   const { provision } = useProvisionSelfCustodialAccount()
@@ -44,6 +50,28 @@ export const useMigrationAccount = () => {
 
   const ensureAccount = useCallback(async (): Promise<string | null> => {
     if (accountId) return accountId
+    /**
+     * Both ids below come from the store, and a failed read reports them null exactly as
+     * an empty store would. Provisioning against that null would hand a user who already
+     * holds a wallet (and may have written its phrase down) a second one, orphaning the
+     * first: the zombie the pending record exists to prevent. The reads were already
+     * reported, so this only says why the tap did nothing and re-reads, letting the next
+     * tap go through once the store answers again.
+     */
+    const hasResumeReadError = hasCheckpointReadError || hasPendingReadError
+    if (hasResumeReadError) {
+      const isOutOfSpace =
+        checkpointReadFailure === StorageFailure.OutOfSpace ||
+        pendingReadFailure === StorageFailure.OutOfSpace
+      const { storageUnavailable } = LL.AccountMigration
+      const message = isOutOfSpace
+        ? storageUnavailable.outOfSpaceBody()
+        : storageUnavailable.unreadableBody()
+      toastShow({ message, LL })
+      refetchCheckpoint()
+      refetchPending()
+      return null
+    }
     /** A full disk is the one failure the user can clear, so it is named; anything else,
      *  storage or not, keeps the generic copy. */
     const showCreateFailed = (failure: StorageFailure | null): void => {
@@ -97,6 +125,12 @@ export const useMigrationAccount = () => {
     }
   }, [
     accountId,
+    hasCheckpointReadError,
+    hasPendingReadError,
+    checkpointReadFailure,
+    pendingReadFailure,
+    refetchCheckpoint,
+    refetchPending,
     guard,
     provision,
     reusableAccountId,
