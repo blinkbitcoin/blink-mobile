@@ -199,6 +199,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const [lastCommitPointWrite, setLastCommitPointWrite] =
     useState<StorageWriteResult | null>(null)
   const latestCommitPointWriteRef = useRef(0)
+  /** The figure this focus already recorded. A landed write updates the very state that
+   *  saveCheckpoint closes over, so without this the effect below would fire a second,
+   *  identical write on the one screen where the disk is the thing in doubt. Cleared on
+   *  blur so every focus still refreshes the record. */
+  const recordedFigureRef = useRef<number | null>(null)
   const recordCommitPoint = useCallback(async (): Promise<void> => {
     if (expectedReceiveSats === null) return
     latestCommitPointWriteRef.current += 1
@@ -209,6 +214,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
      *  and a later failure cannot un-record a write that already landed. */
     setIsCommitPointRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
+    if (writeResult.isSaved) recordedFigureRef.current = expectedReceiveSats
     /** Overlapping writes (a focus and a retry, or a figure change) can answer out of
      *  order. Only the latest one issued speaks for the store now, so an older answer that
      *  lands late never puts a stale reason above the retry. */
@@ -229,10 +235,19 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     storedExpectedReceiveSats !== null
   const isCommitPointHeld = isCommitPointOnDisk || isCommitPointRecorded
 
+  /** Still re-fires on a new saveCheckpoint after a write that did NOT land: an owner
+   *  that resolves late is what heals a write refused for want of one. */
   useEffect(() => {
-    if (!isFocused || checkpointLoading) return
+    if (!isFocused) {
+      recordedFigureRef.current = null
+      return
+    }
+    if (checkpointLoading) return
+    const isAlreadyRecorded =
+      expectedReceiveSats !== null && recordedFigureRef.current === expectedReceiveSats
+    if (isAlreadyRecorded) return
     recordCommitPoint()
-  }, [isFocused, checkpointLoading, recordCommitPoint])
+  }, [isFocused, checkpointLoading, expectedReceiveSats, recordCommitPoint])
 
   /**
    * The ways this screen ends without an Approve to offer, as one value: the preview settled

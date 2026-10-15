@@ -106,6 +106,9 @@ jest.mock("@app/utils/error-logging", () => ({
 
 /** Resolves true like the real one: the commit point is recorded before Approve opens. */
 const mockSaveCheckpoint = jest.fn().mockResolvedValue({ isSaved: true, failure: null })
+/** What the hook hands out as saveCheckpoint. The real one changes identity once a write
+ *  lands (it closes over the stored figure), which a case swaps this to reproduce. */
+let mockSaveCheckpointHandle: (...args: unknown[]) => unknown = mockSaveCheckpoint
 let mockCheckpointLoading = false
 
 let mockCheckpointAccountId: string | null = "sc-account-1"
@@ -136,7 +139,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     hasError: mockCheckpointHasError,
     storageFailure: mockCheckpointStorageFailure,
     refetch: mockRefetchCheckpoint,
-    saveCheckpoint: mockSaveCheckpoint,
+    saveCheckpoint: mockSaveCheckpointHandle,
   }),
 }))
 
@@ -240,6 +243,7 @@ const renderScreen = () => render(screenTree())
 const resetScreenMocks = () => {
   jest.clearAllMocks()
   mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
+  mockSaveCheckpointHandle = mockSaveCheckpoint
   loadLocale("en")
   mockDollarRestricted = false
   mockCurrentDollarRestricted = false
@@ -1009,6 +1013,35 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
       settleWrite({ isSaved: true, failure: null })
     })
 
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
+  /** The real saveCheckpoint changes identity once its write lands; that alone must not
+   *  send the same record to a store already in doubt a second time. */
+  it("writes the commit point once when the landed write re-identities saveCheckpoint", async () => {
+    const { rerender } = renderScreen()
+    await flushEffects()
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+
+    mockSaveCheckpointHandle = (...args: unknown[]) => mockSaveCheckpoint(...args)
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+  })
+
+  /** The re-fire is what heals a write refused for want of an owner: when the owner lands,
+   *  saveCheckpoint changes identity and the record must be attempted again. */
+  it("tries again when saveCheckpoint changes after a write that did not land", async () => {
+    mockSaveCheckpoint.mockResolvedValueOnce({ isSaved: false, failure: null })
+    const { rerender } = renderScreen()
+    await flushEffects()
+
+    mockSaveCheckpointHandle = (...args: unknown[]) => mockSaveCheckpoint(...args)
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
   })
 
