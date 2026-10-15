@@ -849,6 +849,47 @@ describe("useMigrationCheckpoint owner recovery", () => {
 
 /** What the hook admits to having stored. The optimistic update used to run before the
  *  write, so a refused write left it reporting a step the disk never took. */
+describe("useMigrationCheckpoint read failures", () => {
+  beforeEach(resetCheckpointMocks)
+
+  /** The kind travels with the flag, read off the store's own message, so the screens
+   *  above can tell a full device from one that would not answer. */
+  it("names a read that failed for want of space", async () => {
+    mockLoadCheckpoint.mockRejectedValue(new Error("database or disk is full (code 13)"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+    expect(result.current.storageFailure).toBe(StorageFailure.OutOfSpace)
+  })
+
+  it("leaves a read failure unnamed when the message says nothing", async () => {
+    mockLoadCheckpoint.mockRejectedValue(new Error("Database Error"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.hasError).toBe(true))
+    expect(result.current.storageFailure).toBe(StorageFailure.Unknown)
+  })
+
+  it("clears the named failure once a refetch reads the store", async () => {
+    mockLoadCheckpoint.mockRejectedValueOnce(new Error("database or disk is full"))
+    mockLoadCheckpoint.mockResolvedValue(null)
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() =>
+      expect(result.current.storageFailure).toBe(StorageFailure.OutOfSpace),
+    )
+
+    await act(async () => {
+      await result.current.refetch()
+    })
+
+    expect(result.current.hasError).toBe(false)
+    expect(result.current.storageFailure).toBeNull()
+  })
+})
+
 describe("useMigrationCheckpoint write ordering", () => {
   beforeEach(resetCheckpointMocks)
 

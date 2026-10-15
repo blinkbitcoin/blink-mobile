@@ -1012,6 +1012,29 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
   })
 
+  /** Every focus records the commit point again; a store that refuses a later write cannot
+   *  un-record the one that already landed, so Approve must not close behind it. */
+  it("keeps Approve open when a re-write after a landed one is refused", async () => {
+    const { rerender } = renderScreen()
+    await flushEffects()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.OutOfSpace,
+    })
+    mockIsFocused = false
+    rerender(screenTree())
+    await flushEffects()
+    mockIsFocused = true
+    rerender(screenTree())
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
+    expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+    expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
+  })
+
   /** A resume: the lock is already held server-side and the record Approve depends on is
    *  already durable, so a write that can only refresh its timestamp must not hold it. */
   it("opens Approve on a resumed commit point even when the refresh write is refused", async () => {

@@ -406,6 +406,23 @@ describe("useMigrationAccount", () => {
       expect(ensured).toBeNull()
       expect(mockProvision).not.toHaveBeenCalled()
       expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: mockUnreadableCopy }),
+      )
+    })
+
+    it("names a full device when the checkpoint read alone hit one", async () => {
+      mockCheckpointReadError = true
+      mockCheckpointReadFailure = StorageFailure.OutOfSpace
+      const { result } = renderHook(() => useMigrationAccount())
+
+      await act(async () => {
+        await result.current.ensureAccount()
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: mockReadOutOfSpaceCopy }),
+      )
     })
 
     it("names a full device when either read hit one", async () => {
