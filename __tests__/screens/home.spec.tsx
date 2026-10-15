@@ -106,7 +106,6 @@ jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
 const mockTwoFactorSessionPrompt = {
   isModalOpen: false,
   promptTier: 2,
-  closeModal: jest.fn(),
 }
 const mockUseTwoFactorSessionPrompt = jest.fn(
   (_options: { isBlocked: boolean }) => mockTwoFactorSessionPrompt,
@@ -121,7 +120,6 @@ type TwoFactorSessionModalProps = {
   tier: number
   remainingDismissals: number
   onDismiss: () => void
-  onLeave: () => void
 }
 const mockTwoFactorSessionModal = jest.fn<null, [TwoFactorSessionModalProps]>(() => null)
 jest.mock("@app/custodial/components/two-factor-session-modal", () => ({
@@ -2276,7 +2274,7 @@ describe("TwoFactorSessionModal wiring", () => {
     expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(false)
   })
 
-  it("charges the dismissal to the prompt's tier and closes when the modal is waved away", async () => {
+  it("charges the dismissal to the prompt's tier when the modal is waved away", async () => {
     mockTwoFactorSessionPrompt.isModalOpen = true
     renderHome()
     await flushEffects()
@@ -2284,18 +2282,6 @@ describe("TwoFactorSessionModal wiring", () => {
     act(() => lastModalProps().onDismiss())
 
     expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2)
-    expect(mockTwoFactorSessionPrompt.closeModal).toHaveBeenCalledTimes(1)
-  })
-
-  it("only closes when the modal makes way for a flow", async () => {
-    mockTwoFactorSessionPrompt.isModalOpen = true
-    renderHome()
-    await flushEffects()
-
-    act(() => lastModalProps().onLeave())
-
-    expect(mockTwoFactorEnforcement.registerDismissal).not.toHaveBeenCalled()
-    expect(mockTwoFactorSessionPrompt.closeModal).toHaveBeenCalledTimes(1)
   })
 })
 

@@ -1,4 +1,4 @@
-import { act, renderHook } from "@testing-library/react-native"
+import { renderHook } from "@testing-library/react-native"
 
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { TwoFactorSessionPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
@@ -15,6 +15,7 @@ const mockConsumeSessionStart = jest.fn(() => {
 })
 const mockEnforcement = {
   isSessionStartPending: false,
+  isProtectionGateActive: false,
   requiredPrompt: TwoFactorSessionPrompt.None as TwoFactorSessionPrompt,
   unmetTier: TwoFactorTier.None as TwoFactorTier,
   consumeSessionStart: mockConsumeSessionStart,
@@ -23,13 +24,30 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
 }))
 
+const mockLogTwoFactorPromptShown = jest.fn()
+jest.mock("@app/utils/analytics", () => ({
+  logTwoFactorPromptShown: (...args: unknown[]) => mockLogTwoFactorPromptShown(...args),
+}))
+
 const renderPrompt = (isBlocked = false) =>
   renderHook(() => useTwoFactorSessionPrompt({ isBlocked }))
 
-const sessionStartOwing = (prompt: TwoFactorSessionPrompt, tier: TwoFactorTier) => {
+/** The navigator stands the full-screen prompt in whenever the start owes it, unless
+ *  told otherwise. */
+const sessionStartOwing = (
+  prompt: TwoFactorSessionPrompt,
+  tier: TwoFactorTier,
+  { isGateActive = prompt === TwoFactorSessionPrompt.ProtectionRequired } = {},
+) => {
   mockEnforcement.isSessionStartPending = true
   mockEnforcement.requiredPrompt = prompt
   mockEnforcement.unmetTier = tier
+  mockEnforcement.isProtectionGateActive = isGateActive
+}
+
+/** What a dismissal reported from the home or from a flow does in the provider. */
+const dismissalTakesStart = () => {
+  mockEnforcement.isSessionStartPending = false
 }
 
 describe("useTwoFactorSessionPrompt", () => {
@@ -37,6 +55,7 @@ describe("useTwoFactorSessionPrompt", () => {
     jest.clearAllMocks()
     mockIsFocused = true
     mockEnforcement.isSessionStartPending = false
+    mockEnforcement.isProtectionGateActive = false
     mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.None
     mockEnforcement.unmetTier = TwoFactorTier.None
   })
@@ -57,24 +76,29 @@ describe("useTwoFactorSessionPrompt", () => {
     expect(result.current.isModalOpen).toBe(false)
   })
 
-  it("opens the modal for the required tier and keeps the start pending while it is up", () => {
+  it("opens the modal for the required tier, logs it as shown and keeps the start pending while it is up", () => {
     sessionStartOwing(TwoFactorSessionPrompt.RequiredModal, TwoFactorTier.Required)
 
     const { result } = renderPrompt()
 
     expect(result.current.isModalOpen).toBe(true)
     expect(result.current.promptTier).toBe(TwoFactorTier.Required)
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
+      tier: TwoFactorTier.Required,
+      prompt: "session_modal",
+    })
     expect(mockConsumeSessionStart).not.toHaveBeenCalled()
   })
 
-  it("takes the start when the modal is resolved", () => {
+  it("brings the modal down once the dismissal reported from the home takes the start", () => {
     sessionStartOwing(TwoFactorSessionPrompt.RequiredModal, TwoFactorTier.Required)
-    const { result } = renderPrompt()
+    const { result, rerender } = renderPrompt()
 
-    act(() => result.current.closeModal())
+    dismissalTakesStart()
+    rerender({})
 
     expect(result.current.isModalOpen).toBe(false)
-    expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
+    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
   })
 
   it("does not reopen the modal for a start still pending behind it", () => {
@@ -88,6 +112,57 @@ describe("useTwoFactorSessionPrompt", () => {
     expect(mockConsumeSessionStart).not.toHaveBeenCalled()
   })
 
+  /** The modal is hidden with the home while the user is away in a flow it opened;
+   *  the start stays pending, so a fresher read can still call for the full-screen
+   *  prompt and have the navigator stand it in. */
+  it("keeps the modal and the start while the user is away in a flow the modal opened, until the full-screen prompt overtakes it", () => {
+    sessionStartOwing(TwoFactorSessionPrompt.RequiredModal, TwoFactorTier.Required)
+    const { result, rerender } = renderPrompt()
+
+    mockIsFocused = false
+    rerender({})
+
+    expect(result.current.isModalOpen).toBe(true)
+    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
+
+    sessionStartOwing(
+      TwoFactorSessionPrompt.ProtectionRequired,
+      TwoFactorTier.Authenticator,
+    )
+    rerender({})
+
+    expect(result.current.isModalOpen).toBe(false)
+    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
+  })
+
+  it("logs the modal as shown once when it is raised, not again when the home comes back to it", () => {
+    sessionStartOwing(TwoFactorSessionPrompt.RequiredModal, TwoFactorTier.Required)
+    const { result, rerender } = renderPrompt()
+
+    mockIsFocused = false
+    rerender({})
+    mockIsFocused = true
+    rerender({})
+
+    expect(result.current.isModalOpen).toBe(true)
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
+  })
+
+  it("brings the modal down once a dismissal on the flow it opened takes the start", () => {
+    sessionStartOwing(TwoFactorSessionPrompt.RequiredModal, TwoFactorTier.Required)
+    const { result, rerender } = renderPrompt()
+    mockIsFocused = false
+    rerender({})
+
+    dismissalTakesStart()
+    rerender({})
+    mockIsFocused = true
+    rerender({})
+
+    expect(result.current.isModalOpen).toBe(false)
+    expect(mockConsumeSessionStart).not.toHaveBeenCalled()
+  })
+
   it("leaves a start that owes the full-screen prompt to the navigator: neither takes it nor opens the modal", () => {
     sessionStartOwing(
       TwoFactorSessionPrompt.ProtectionRequired,
@@ -98,6 +173,20 @@ describe("useTwoFactorSessionPrompt", () => {
 
     expect(mockConsumeSessionStart).not.toHaveBeenCalled()
     expect(result.current.isModalOpen).toBe(false)
+  })
+
+  it("takes a start whose full-screen prompt yielded to the wind-down, with no prompt of its own", () => {
+    sessionStartOwing(
+      TwoFactorSessionPrompt.ProtectionRequired,
+      TwoFactorTier.Authenticator,
+      { isGateActive: false },
+    )
+
+    const { result } = renderPrompt()
+
+    expect(mockConsumeSessionStart).toHaveBeenCalledTimes(1)
+    expect(result.current.isModalOpen).toBe(false)
+    expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
   })
 
   it("waits for the home to be focused before taking the session start", () => {
@@ -146,8 +235,10 @@ describe("useTwoFactorSessionPrompt", () => {
     const { result, rerender } = renderPrompt()
     expect(result.current.isModalOpen).toBe(true)
 
-    mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.ProtectionRequired
-    mockEnforcement.unmetTier = TwoFactorTier.Authenticator
+    sessionStartOwing(
+      TwoFactorSessionPrompt.ProtectionRequired,
+      TwoFactorTier.Authenticator,
+    )
     rerender({})
 
     expect(result.current.isModalOpen).toBe(false)

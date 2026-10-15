@@ -63,13 +63,16 @@ const INITIAL_STORED: StoredState = {
 type SessionState = {
   accountId: string | null
   isStartPending: boolean
-  isDismissalCounted: boolean
+  /** The highest tier whose prompt was waved away this session, None for none yet: a
+   *  tier counts one dismissal per session, and a higher tier's prompt raised later in
+   *  the same session, by a fresher read, counts its own. */
+  countedTier: TwoFactorTier
 }
 
 const INITIAL_SESSION: SessionState = {
   accountId: null,
   isStartPending: false,
-  isDismissalCounted: false,
+  countedTier: TwoFactorTier.None,
 }
 
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
@@ -114,7 +117,8 @@ export type TwoFactorEnforcementState = {
   /** Takes the session start, whether or not it owed a prompt: what the balance does
    *  later in the session waits for the next one. */
   consumeSessionStart: () => void
-  /** Counts a prompt of the given tier waved away, at most once per session. */
+  /** Counts a prompt of the given tier waved away, at most once per session, and takes
+   *  the session start: the surface that raised the prompt is done asking for it. */
   registerDismissal: (tier: TwoFactorTier) => void
 }
 
@@ -221,12 +225,20 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       .then((raw) => {
         if (!isMounted) return
         commitStored({ accountId, record: normalizeStoredRecord(raw) })
-        commitSession({ accountId, isStartPending: true, isDismissalCounted: false })
+        commitSession({
+          accountId,
+          isStartPending: true,
+          countedTier: TwoFactorTier.None,
+        })
       })
       .catch((err) => {
         if (!isMounted) return
         reportError("Two-factor enforcement read", err)
-        commitSession({ accountId, isStartPending: false, isDismissalCounted: false })
+        commitSession({
+          accountId,
+          isStartPending: false,
+          countedTier: TwoFactorTier.None,
+        })
       })
     return () => {
       isMounted = false
@@ -336,19 +348,29 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     commitSession({ ...latestSessionRef.current, isStartPending: false })
   }, [commitSession])
 
+  /** A dismissal takes the session start when the prompt waved away is the one the
+   *  start owes, counted or not: on the home or on a flow the prompt opened, the home
+   *  must not raise it again on the way back. A start that a fresher read has since
+   *  made owe a higher tier's prompt is kept for that prompt, as is one the fresh read
+   *  has not decided yet, which may still come to owe one. */
   const registerDismissal = useCallback(
     (promptTier: TwoFactorTier) => {
       const latest = latestSessionRef.current
+      const isSessionAccount = accountId !== null && latest.accountId === accountId
+      if (!isSessionAccount) return
       const isCountable =
-        accountId !== null &&
-        latest.accountId === accountId &&
-        !latest.isDismissalCounted &&
-        promptTier >= TwoFactorTier.Required
-      if (!isCountable) return
-      persist((current) => withDismissal(current, promptTier))
-      commitSession({ ...latest, isDismissalCounted: true })
+        promptTier >= TwoFactorTier.Required && promptTier > latest.countedTier
+      const isStartOwedToPrompt = isSessionStartDecided && promptTier >= unmetTier
+      const isStartTaken = latest.isStartPending && isStartOwedToPrompt
+      if (!isCountable && !isStartTaken) return
+      if (isCountable) persist((current) => withDismissal(current, promptTier))
+      commitSession({
+        accountId,
+        isStartPending: latest.isStartPending && !isStartTaken,
+        countedTier: isCountable ? promptTier : latest.countedTier,
+      })
     },
-    [accountId, persist, commitSession],
+    [accountId, isSessionStartDecided, unmetTier, persist, commitSession],
   )
 
   const contextValue = useMemo(
