@@ -25,8 +25,8 @@ const RETURN_ROUTE = RegistrationReturnRoute.TwoFactorSetup
 
 /** How long the screen holds the user while a re-verification runs. A request that
  *  never answers, which the platform allows, would otherwise seal the screen; past the
- *  deadline the user may leave, and a result that arrives later falls back to the
- *  flow's own destination. */
+ *  deadline the user may leave, and a result that arrives later reaches this screen
+ *  only if it is reopened, where it joins the sequence still in flight. */
 const HOLD_TIMEOUT_MS = 30_000
 
 export const TwoFactorSetupScreen: React.FC = () => {
@@ -39,7 +39,9 @@ export const TwoFactorSetupScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
   const { tier, hasTwoFactor, missingMethod, unverifiedEmail } = useTwoFactorEnforcement()
-  const { promptReverification, spinner: isReverifying } = useEmailReverification()
+  const { promptReverification, spinner: isReverifying } = useEmailReverification({
+    returnTo: RETURN_ROUTE,
+  })
 
   const isEmailMissing = missingMethod === TwoFactorMethod.Email
   const missingMethodTitle = isEmailMissing
@@ -64,7 +66,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
    *  the hardware back alike; the swipe completes natively before it could be refused,
    *  so it is switched off for the interval instead. Only the user's own back is held:
    *  a removal the app dispatches, for a logout, a gate or a profile switch, goes
-   *  through, and the flow then falls back to its own destination. */
+   *  through, and the sequence's result then reaches no screen the user has left. */
   useEffect(() => {
     if (!isHeld) return
     return navigation.addListener("beforeRemove", (event) => {
@@ -96,7 +98,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const handleAddMissingMethod = useCallback(() => {
     logTwoFactorSetupStarted({ tier, method: missingMethod })
     if (unverifiedEmail) {
-      promptReverification(unverifiedEmail, RETURN_ROUTE)
+      promptReverification(unverifiedEmail)
       return
     }
     if (isEmailMissing) {
