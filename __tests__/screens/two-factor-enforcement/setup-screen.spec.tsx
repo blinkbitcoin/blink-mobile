@@ -65,12 +65,14 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 }))
 
 const mockPromptReverification = jest.fn()
+const mockUseEmailReverification = jest.fn((_options?: { returnTo?: string }) => ({
+  promptReverification: (...args: unknown[]) => mockPromptReverification(...args),
+  spinner: mockIsReverifying,
+}))
 let mockIsReverifying = false
 jest.mock("@app/hooks/use-email-reverification", () => ({
-  useEmailReverification: () => ({
-    promptReverification: (...args: unknown[]) => mockPromptReverification(...args),
-    spinner: mockIsReverifying,
-  }),
+  useEmailReverification: (options?: { returnTo?: string }) =>
+    mockUseEmailReverification(options),
 }))
 
 const mockLogTwoFactorSetupStarted = jest.fn()
@@ -151,10 +153,10 @@ describe("TwoFactorSetupScreen", () => {
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
 
-    expect(mockPromptReverification).toHaveBeenCalledWith(
-      "someone@example.com",
-      "twoFactorSetup",
-    )
+    expect(mockPromptReverification).toHaveBeenCalledWith("someone@example.com")
+    expect(mockUseEmailReverification).toHaveBeenLastCalledWith({
+      returnTo: "twoFactorSetup",
+    })
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
       tier: TwoFactorTier.Nudge,
