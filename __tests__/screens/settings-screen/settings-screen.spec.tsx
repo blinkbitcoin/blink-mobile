@@ -193,6 +193,9 @@ jest.mock("@react-navigation/native", () => ({
         }
       }
     },
+    /** The email row's re-verification watches the screen's focus. */
+    isFocused: () => true,
+    addListener: () => () => {},
   }),
   useIsFocused: () => true,
 }))
