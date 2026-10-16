@@ -68,8 +68,12 @@ const mockPromptReverification = jest.fn()
 const mockUseEmailReverification = jest.fn((_options?: { returnTo?: string }) => ({
   promptReverification: (...args: unknown[]) => mockPromptReverification(...args),
   spinner: mockIsReverifying,
+  isAskedHere: mockIsReverifying && mockIsAskedHere,
 }))
 let mockIsReverifying = false
+/** A re-verification in flight was asked for from this screen, unless a test says it
+ *  was joined from elsewhere. */
+let mockIsAskedHere = true
 jest.mock("@app/hooks/use-email-reverification", () => ({
   useEmailReverification: (options?: { returnTo?: string }) =>
     mockUseEmailReverification(options),
@@ -112,6 +116,7 @@ describe("TwoFactorSetupScreen", () => {
     loadLocale("en")
     mockIsFocused = true
     mockIsReverifying = false
+    mockIsAskedHere = true
     mockEnforcement.tier = TwoFactorTier.Nudge
     mockEnforcement.hasTwoFactor = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
@@ -200,6 +205,21 @@ describe("TwoFactorSetupScreen", () => {
     expect(reset.preventDefault).not.toHaveBeenCalled()
     expect(mockSetOptions).toHaveBeenLastCalledWith(
       expect.objectContaining({ gestureEnabled: false }),
+    )
+  })
+
+  it("shows the spinner but holds nothing for a re-verification joined from elsewhere", async () => {
+    mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockIsReverifying = true
+    mockIsAskedHere = false
+    await renderScreen()
+
+    // eslint-disable-next-line camelcase
+    const secondary = screen.UNSAFE_getByType(GaloySecondaryButton)
+    expect(secondary.props.loading).toBe(true)
+    expect(installedRemovalListener()).toBeUndefined()
+    expect(mockSetOptions).toHaveBeenLastCalledWith(
+      expect.objectContaining({ gestureEnabled: true }),
     )
   })
 

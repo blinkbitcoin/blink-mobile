@@ -39,9 +39,11 @@ export const TwoFactorSetupScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
   const { tier, hasTwoFactor, missingMethod, unverifiedEmail } = useTwoFactorEnforcement()
-  const { promptReverification, spinner: isReverifying } = useEmailReverification({
-    returnTo: RETURN_ROUTE,
-  })
+  const {
+    promptReverification,
+    spinner: isReverifying,
+    isAskedHere: isReverifyingFromHere,
+  } = useEmailReverification({ returnTo: RETURN_ROUTE })
 
   const isEmailMissing = missingMethod === TwoFactorMethod.Email
   const missingMethodTitle = isEmailMissing
@@ -50,14 +52,17 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   const handleClose = useCallback(() => navigation.goBack(), [navigation])
 
+  /** The hold is for a re-verification asked for from this screen; one joined from
+   *  elsewhere, started on another screen before this one opened, only shows its
+   *  spinner, since the user pressed nothing here. */
   const [isHoldExpired, setIsHoldExpired] = useState(false)
   useEffect(() => {
     setIsHoldExpired(false)
-    if (!isReverifying) return
+    if (!isReverifyingFromHere) return
     const timer = setTimeout(() => setIsHoldExpired(true), HOLD_TIMEOUT_MS)
     return () => clearTimeout(timer)
-  }, [isReverifying])
-  const isHeld = isReverifying && !isHoldExpired
+  }, [isReverifyingFromHere])
+  const isHeld = isReverifyingFromHere && !isHoldExpired
 
   /** While an email re-verification runs, the screen holds still: the hook navigates
    *  to the code screen when it is done, and that must land on this screen, not on
