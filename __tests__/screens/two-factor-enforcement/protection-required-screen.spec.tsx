@@ -155,11 +155,12 @@ describe("TwoFactorProtectionRequiredScreen", () => {
   })
 
   describe("at the enforced tier", () => {
-    it("names the sats threshold with a dollar hero and offers an X while dismissals remain", async () => {
+    it("names the sats threshold with a warning hero and offers an X while dismissals remain", async () => {
       atEnforcedTier(3)
       await renderScreen()
 
-      expect(screen.getByTestId("icon-dollar")).toBeTruthy()
+      expect(screen.getByTestId("icon-warning")).toBeTruthy()
+      expect(screen.queryByTestId("icon-dollar")).toBeNull()
       expect(
         screen.getByText(
           LL.TwoFactorEnforcement.highBalanceTitle({ amount: "5,000,000 SAT" }),
@@ -172,11 +173,13 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(expect.any(Function))
     })
 
-    it("names the dollar threshold, sign first and without cents, when only the dollar wallet crossed", async () => {
+    it("names the dollar threshold with a dollar hero, sign first and without cents, when only the dollar wallet crossed", async () => {
       atEnforcedTier(3)
       mockEnforcement.enforcedCurrency = WalletCurrency.Usd
       await renderScreen()
 
+      expect(screen.getByTestId("icon-dollar")).toBeTruthy()
+      expect(screen.queryByTestId("icon-warning")).toBeNull()
       expect(
         screen.getByText(LL.TwoFactorEnforcement.highBalanceTitle({ amount: "$5,000" })),
       ).toBeTruthy()

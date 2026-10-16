@@ -6,6 +6,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
@@ -39,6 +40,11 @@ const SATS_CODE = "SAT"
 const CENTS_PER_DOLLAR = 100
 /** The gate stands in for the home, so its flows come back to the home. */
 const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
+
+/** The hero names the wallet that crossed, as the title does: the warning sign for the
+ *  bitcoin wallet, the dollar sign for the dollar wallet. */
+const highBalanceIcon = (currency: WalletCurrency): IconNamesType =>
+  currency === WalletCurrency.Usd ? "dollar" : "warning"
 
 /** The threshold the title quotes, in the wallet that crossed it: "5,000,000 SAT" or
  *  "$5,000", whole units only. */
@@ -159,7 +165,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
       }
     >
       <IconHero
-        icon="dollar"
+        icon={highBalanceIcon(enforcedCurrency)}
         iconColor={colors.primary}
         title={LL.TwoFactorEnforcement.highBalanceTitle({
           amount: formatHighBalanceAmount(enforcedCurrency),
