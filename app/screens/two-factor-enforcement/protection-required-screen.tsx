@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -72,29 +72,28 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { promptReverification, spinner: isReverifying } = useEmailReverification({
     returnTo: GATE_RETURN_ROUTE,
   })
-  /** The tier this screen was raised for: what it reports, and what its X is charged
-   *  to, even if the balance moves while it is open. */
-  const [promptTier] = useState(unmetTier)
-
-  const isAuthenticatorTier = promptTier === TwoFactorTier.Authenticator
+  /** The gate mounts this screen anew for each tier it is raised for, so the tier it
+   *  reports and charges its X to is the one it was raised for, for as long as it is
+   *  open. */
+  const isAuthenticatorTier = unmetTier === TwoFactorTier.Authenticator
   const isDismissible = isAuthenticatorTier && remainingDismissals > 0
 
   useEffect(() => {
     logTwoFactorPromptShown({
-      tier: promptTier,
+      tier: unmetTier,
       prompt: TwoFactorPrompt.ProtectionRequiredScreen,
     })
-  }, [promptTier])
+  }, [unmetTier])
 
   /** Charging the dismissal is what lets the home in: it takes the session start, and
    *  the screen stands in for the home only while that start is still owed. */
   const handleDismiss = useCallback(() => {
     logTwoFactorPromptDismissed({
-      tier: promptTier,
+      tier: unmetTier,
       prompt: TwoFactorPrompt.ProtectionRequiredScreen,
     })
-    registerDismissal(promptTier)
-  }, [promptTier, registerDismissal])
+    registerDismissal(unmetTier)
+  }, [unmetTier, registerDismissal])
 
   /** The hardware back is the X while there is one, and nothing at all once there is
    *  none: a blocking screen swallows it rather than letting the app go. */
@@ -103,21 +102,21 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   /** A flow started from the gate returns to the home, where the gate decides again
    *  with the factor just added. */
   const handleSetAuthenticator = useCallback(() => {
-    logTwoFactorSetupStarted({ tier: promptTier, method: TwoFactorMethod.Authenticator })
+    logTwoFactorSetupStarted({ tier: unmetTier, method: TwoFactorMethod.Authenticator })
     navigation.navigate("totpRegistrationInitiate", { returnTo: GATE_RETURN_ROUTE })
-  }, [navigation, promptTier])
+  }, [navigation, unmetTier])
 
   const handleMove = useCallback(() => {
-    logTwoFactorNonCustodialChosen({ tier: promptTier })
+    logTwoFactorNonCustodialChosen({ tier: unmetTier })
     navigation.navigate("accountMigrationEntry")
-  }, [navigation, promptTier])
+  }, [navigation, unmetTier])
 
   /** The setup keeps the header row its route draws, empty: the hero then sits where
    *  it does on every other screen of the flow, instead of climbing into the gap. */
   if (!isAuthenticatorTier) {
     return (
       <TwoFactorSetupContent
-        promptTier={promptTier}
+        promptTier={unmetTier}
         returnTo={GATE_RETURN_ROUTE}
         promptReverification={promptReverification}
         isReverifying={isReverifying}
