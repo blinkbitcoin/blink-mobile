@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useLayoutEffect,
   useRef,
   useState,
 } from "react"
@@ -68,12 +69,17 @@ type SessionState = {
    *  tier counts one dismissal per session, and a higher tier's prompt raised later in
    *  the same session, by a fresher read, counts its own. */
   countedTier: TwoFactorTier
+  /** The tier of a prompt waved away while the fresh read of the account was still
+   *  out, None for none: whether that takes the session start is decided once the
+   *  read lands, since the read may raise a prompt the dismissal does not cover. */
+  dismissedTier: TwoFactorTier
 }
 
 const INITIAL_SESSION: SessionState = {
   accountId: null,
   isStartPending: false,
   countedTier: TwoFactorTier.None,
+  dismissedTier: TwoFactorTier.None,
 }
 
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
@@ -234,15 +240,19 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
           accountId,
           isStartPending: true,
           countedTier: TwoFactorTier.None,
+          dismissedTier: TwoFactorTier.None,
         })
       })
       .catch((err) => {
         if (!isMounted) return
         reportError("Two-factor enforcement read", err)
+        /** Nothing to start, stated as such even though an unloaded record already
+         *  keeps the start from being pending: the session says what it means. */
         commitSession({
           accountId,
           isStartPending: false,
           countedTier: TwoFactorTier.None,
+          dismissedTier: TwoFactorTier.None,
         })
       })
     return () => {
@@ -304,8 +314,16 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  still raise the tier from a balance that moved elsewhere. */
   const hasLocalPrompt = requiredPrompt !== TwoFactorSessionPrompt.None
   const isSessionStartDecided = hasLocalPrompt || !isReadingAccount
+  /** A dismissal the fresh read has yet to judge has already answered the prompt as
+   *  far as every surface is concerned: nothing shows for the start until the read
+   *  lands and either takes the start or raises the prompt the dismissal fell short of. */
+  const isDismissalAwaitingRead = session.dismissedTier !== TwoFactorTier.None
   const isSessionStartPending =
-    isEnforced && isSessionForAccount && session.isStartPending && isSessionStartDecided
+    isEnforced &&
+    isSessionForAccount &&
+    session.isStartPending &&
+    isSessionStartDecided &&
+    !isDismissalAwaitingRead
   /** The record of this account is still being read: nothing is decided yet, and the
    *  home must not show for the frames that read takes. */
   const isPreparingSessionStart = isEnabled && accountId !== null && !isSessionForAccount
@@ -362,30 +380,71 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     commitSession({ ...latestSessionRef.current, isStartPending: false })
   }, [commitSession])
 
+  /** The read as last committed, for a dismissal reported by a handler bound to an
+   *  earlier render, as the hardware back's can be in the frames between a commit and
+   *  its effects: the dismissal is judged by what the account owes now, not by what it
+   *  owed when the handler was bound, so no commit shows the home in between. */
+  const latestReadRef = useRef({ isReadingAccount, unmetTier, isSessionStartDecided })
+  useLayoutEffect(() => {
+    latestReadRef.current = { isReadingAccount, unmetTier, isSessionStartDecided }
+  })
+
   /** A dismissal takes the session start when the prompt waved away is the one the
    *  start owes, counted or not: on the home or on a flow the prompt opened, the home
    *  must not raise it again on the way back. A start that a fresher read has since
-   *  made owe a higher tier's prompt is kept for that prompt, as is one the fresh read
-   *  has not decided yet, which may still come to owe one. */
+   *  made owe a higher tier's prompt is kept for that prompt. While the fresh read is
+   *  still out, a prompt raised from the local read can be waved away before the read
+   *  says whether the account owes more: the dismissal is kept until it lands, and
+   *  judged then by the effect below, so a balance that crossed into a higher tier
+   *  elsewhere still gets that tier's prompt this session. What is kept is the highest
+   *  tier waved away, so a lower one reported after it, or the no prompt the modal's
+   *  closing frames report, cannot replace it and raise the prompt again. */
   const registerDismissal = useCallback(
     (promptTier: TwoFactorTier) => {
+      if (promptTier === TwoFactorTier.None) return
       const latest = latestSessionRef.current
+      const read = latestReadRef.current
       const isSessionAccount = accountId !== null && latest.accountId === accountId
       if (!isSessionAccount) return
       const isCountable =
         promptTier >= TwoFactorTier.Recommended && promptTier > latest.countedTier
-      const isStartOwedToPrompt = isSessionStartDecided && promptTier >= unmetTier
-      const isStartTaken = latest.isStartPending && isStartOwedToPrompt
-      if (!isCountable && !isStartTaken) return
+      const isStartOwedToPrompt =
+        read.isSessionStartDecided && promptTier >= read.unmetTier
+      const isStartAwaitingRead = latest.isStartPending && read.isReadingAccount
+      const isStartTaken =
+        latest.isStartPending && isStartOwedToPrompt && !isStartAwaitingRead
+      const isHigherThanKept = promptTier > latest.dismissedTier
+      const isKeptForRead = isStartAwaitingRead && isHigherThanKept
+      if (!isCountable && !isStartTaken && !isKeptForRead) return
       if (isCountable) persist((current) => withDismissal(current, promptTier))
       commitSession({
         accountId,
         isStartPending: latest.isStartPending && !isStartTaken,
         countedTier: isCountable ? promptTier : latest.countedTier,
+        dismissedTier: isKeptForRead ? promptTier : latest.dismissedTier,
       })
     },
-    [accountId, isSessionStartDecided, unmetTier, persist, commitSession],
+    [accountId, persist, commitSession],
   )
+
+  /** Judges a dismissal made while the fresh read was out, once it has landed: the
+   *  start is taken if the prompt waved away still covers what the account owes, and
+   *  kept for the escalated prompt otherwise. A read that failed lands as what the
+   *  account last read as, which the dismissal covered. The dismissal itself is among
+   *  what wakes the judging, so none can wait on a change that is not coming. */
+  useEffect(() => {
+    const latest = latestSessionRef.current
+    const isSessionAccount = accountId !== null && latest.accountId === accountId
+    const isDismissalDue =
+      latest.dismissedTier !== TwoFactorTier.None && !isReadingAccount
+    if (!isSessionAccount || !isDismissalDue) return
+    const isCovered = latest.dismissedTier >= unmetTier
+    commitSession({
+      ...latest,
+      isStartPending: latest.isStartPending && !isCovered,
+      dismissedTier: TwoFactorTier.None,
+    })
+  }, [accountId, isReadingAccount, unmetTier, session.dismissedTier, commitSession])
 
   const contextValue = useMemo(
     () => ({

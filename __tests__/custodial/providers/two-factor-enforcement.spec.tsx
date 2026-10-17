@@ -887,6 +887,133 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
     })
 
+    /** The local read raises the modal before the fresh read lands; waving it away
+     *  then must not spend the start on a prompt the fresh read is about to outgrow. */
+    it("keeps the start for a prompt the fresh read raises after the dismissal, with nothing shown meanwhile", async () => {
+      setAccount({ sats: 500_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result, rerender } = await renderEnforcement()
+      expect(result.current.isSessionStartPending).toBe(true)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(lastWrittenRecord().recommendedDismissals).toBe(1)
+
+      setAccount({ sats: 5_000_000, loading: false })
+      await act(async () => rerender({}))
+
+      expect(result.current.isSessionStartPending).toBe(true)
+      expect(result.current.requiredPrompt).toBe(
+        TwoFactorSessionPrompt.ProtectionRequired,
+      )
+      expect(result.current.isProtectionGateActive).toBe(true)
+    })
+
+    it("takes the start once the fresh read confirms the prompt waved away still covers the account", async () => {
+      setAccount({ sats: 500_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result, rerender } = await renderEnforcement()
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+      setAccount({ sats: 500_000, loading: false })
+      await act(async () => rerender({}))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(false)
+    })
+
+    /** A read that fails lands as what the account last read as, which the dismissal
+     *  already covered: the start is spent, not parked, so a balance that crosses
+     *  later in the session waits for the next one. */
+    it("takes the start when the fresh read fails after the dismissal", async () => {
+      setAccount({ sats: 500_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result, rerender } = await renderEnforcement()
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+      setAccount({ sats: 500_000, loading: false, error: new Error("network down") })
+      await act(async () => rerender({}))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(false)
+
+      setAccount({ sats: 5_000_000 })
+      await act(async () => rerender({}))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(false)
+    })
+
+    /** The modal keeps its X and the back wired through its closing frames, when the
+     *  home already reports no prompt: that second tap waves nothing away, and must
+     *  not undo the dismissal kept for the read. */
+    it("keeps a dismissal waiting for the read through a dismissal of no prompt", async () => {
+      setAccount({ sats: 500_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result, rerender } = await renderEnforcement()
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+      act(() => result.current.registerDismissal(TwoFactorTier.None))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(mockSetItem).toHaveBeenCalledTimes(1)
+
+      setAccount({ sats: 500_000, loading: false })
+      await act(async () => rerender({}))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+    })
+
+    it("keeps the highest tier waved away while the read is out, through a lower one reported after it", async () => {
+      setAccount({ sats: 500_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const { result, rerender } = await renderEnforcement()
+
+      act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
+      act(() => result.current.registerDismissal(TwoFactorTier.Suggested))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+
+      setAccount({ sats: 500_000, loading: false })
+      await act(async () => rerender({}))
+
+      expect(result.current.isSessionStartPending).toBe(false)
+      expect(result.current.isProtectionGateActive).toBe(false)
+    })
+
+    /** A handler bound while the read was out can still fire after it landed, as the
+     *  hardware back's can; the dismissal it reports is judged by what the account
+     *  owes now, with no commit showing the home in between. */
+    it("judges a dismissal bound while the read was out by what the account owes now, with no frame of the home between", async () => {
+      setAccount({ sats: 500_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Recommended })
+      const gateLog: boolean[] = []
+      const { result, rerender } = renderHook(
+        () => {
+          const enforcement = useTwoFactorEnforcement()
+          gateLog.push(enforcement.isProtectionGateActive)
+          return enforcement
+        },
+        { wrapper },
+      )
+      await act(async () => {})
+      const dismissBoundWhileReading = result.current.registerDismissal
+
+      setAccount({ sats: 5_000_000, loading: false })
+      await act(async () => rerender({}))
+      expect(result.current.isProtectionGateActive).toBe(true)
+      gateLog.length = 0
+
+      act(() => dismissBoundWhileReading(TwoFactorTier.Recommended))
+
+      expect(gateLog).not.toContain(false)
+      expect(result.current.isProtectionGateActive).toBe(true)
+      expect(result.current.isSessionStartPending).toBe(true)
+      expect(lastWrittenRecord().recommendedDismissals).toBe(1)
+    })
+
     it("leaves the session untouched by a dismissal that neither counts nor takes a start", async () => {
       setAccount({ sats: 500_000 })
       storeRecord({ highestTier: TwoFactorTier.Recommended })
