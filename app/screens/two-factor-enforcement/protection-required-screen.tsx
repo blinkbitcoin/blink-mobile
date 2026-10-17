@@ -13,7 +13,7 @@ import { StepLayout } from "@app/components/step-layout"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { AUTHENTICATOR_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
-import { formatCurrencyHelper, usdDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
@@ -32,12 +32,11 @@ import {
   logTwoFactorPromptShown,
   logTwoFactorSetupStarted,
 } from "@app/utils/analytics"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 import { TwoFactorSetupContent } from "./setup-content"
 
-const SATS_CODE = "SAT"
-const CENTS_PER_DOLLAR = 100
 /** The gate stands in for the home, so its flows come back to the home. */
 const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 
@@ -46,23 +45,11 @@ const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 const highBalanceIcon = (currency: WalletCurrency): IconNamesType =>
   currency === WalletCurrency.Usd ? "dollar" : "warning"
 
-/** The threshold the title quotes, in the wallet that crossed it: "5,000,000 SAT" or
- *  "$5,000", whole units only. */
-const formatHighBalanceAmount = (currency: WalletCurrency): string => {
-  if (currency === WalletCurrency.Usd) {
-    return formatCurrencyHelper({
-      amountInMajorUnits: AUTHENTICATOR_THRESHOLD.usdCents / CENTS_PER_DOLLAR,
-      symbol: usdDisplayCurrency.symbol,
-      fractionDigits: 0,
-    })
-  }
-  return formatCurrencyHelper({
-    amountInMajorUnits: AUTHENTICATOR_THRESHOLD.sats,
-    symbol: "",
-    fractionDigits: 0,
-    currencyCode: SATS_CODE,
-  })
-}
+/** The threshold the title quotes, in the wallet that crossed it. */
+const highBalanceThreshold = (currency: WalletCurrency) =>
+  currency === WalletCurrency.Usd
+    ? toUsdMoneyAmount(AUTHENTICATOR_THRESHOLD.usdCents)
+    : toBtcMoneyAmount(AUTHENTICATOR_THRESHOLD.sats)
 
 /**
  * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
@@ -79,6 +66,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { formatMoneyAmount } = useDisplayCurrency()
   const { unmetTier, remainingDismissals, highBalanceCurrency, registerDismissal } =
     useTwoFactorEnforcement()
   const { promptReverification, spinner: isReverifying } = useEmailReverification({
@@ -169,7 +157,10 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
         icon={highBalanceIcon(highBalanceCurrency)}
         iconColor={colors.primary}
         title={LL.TwoFactorEnforcement.highBalanceTitle({
-          amount: formatHighBalanceAmount(highBalanceCurrency),
+          amount: formatMoneyAmount({
+            moneyAmount: highBalanceThreshold(highBalanceCurrency),
+            noFractionDigits: true,
+          }),
         })}
         subtitle={
           <Text type="p3" style={styles.description}>
