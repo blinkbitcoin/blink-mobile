@@ -83,13 +83,14 @@ const mockTwoFactorEnforcement = {
   unverifiedEmail: null,
   shouldShowNudgeCard: false,
   shouldShowSettingsBanner: false,
+  markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockTwoFactorEnforcement,
 }))
 
-type TwoFactorNudgeCardProps = { tier: number; onDismiss: () => void }
+type TwoFactorNudgeCardProps = Record<string, never>
 const mockTwoFactorNudgeCard = jest.fn<null, [TwoFactorNudgeCardProps]>(() => null)
 jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
   TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
@@ -2120,19 +2121,14 @@ describe("TwoFactorNudgeCard gating", () => {
       </ContextForScreen>,
     )
 
-  it("renders the card with the tier and dismissal the hook provides", async () => {
+  it("renders the card when the hook says it should show", async () => {
     mockTwoFactorEnforcement.shouldShowNudgeCard = true
     mockTwoFactorEnforcement.tier = 1
 
     renderHome()
     await flushEffects()
 
-    expect(mockTwoFactorNudgeCard).toHaveBeenCalledWith(
-      expect.objectContaining({
-        tier: 1,
-        onDismiss: mockTwoFactorEnforcement.dismissNudgeCard,
-      }),
-    )
+    expect(mockTwoFactorNudgeCard).toHaveBeenCalled()
   })
 
   it("does not render the card when the hook says it should not show", async () => {

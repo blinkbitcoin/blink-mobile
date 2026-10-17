@@ -2,7 +2,6 @@ import React from "react"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 const mockNavigate = jest.fn()
 
@@ -47,12 +46,13 @@ jest.mock("@app/components/atomic/galoy-primary-button", () => ({
     ),
 }))
 
-const mockLogTwoFactorPromptShown = jest.fn()
-const mockLogTwoFactorPromptDismissed = jest.fn()
-jest.mock("@app/utils/analytics", () => ({
-  logTwoFactorPromptShown: (...args: unknown[]) => mockLogTwoFactorPromptShown(...args),
-  logTwoFactorPromptDismissed: (...args: unknown[]) =>
-    mockLogTwoFactorPromptDismissed(...args),
+const mockMarkPromptShown = jest.fn()
+const mockDismissNudgeCard = jest.fn()
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => ({
+    markPromptShown: mockMarkPromptShown,
+    dismissNudgeCard: mockDismissNudgeCard,
+  }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -73,47 +73,33 @@ describe("TwoFactorNudgeCard", () => {
   })
 
   it("renders the title, body and Set button", () => {
-    const { getByText } = render(
-      <TwoFactorNudgeCard tier={TwoFactorTier.Nudge} onDismiss={jest.fn()} />,
-    )
+    const { getByText } = render(<TwoFactorNudgeCard />)
 
     expect(getByText("Set two-factor authentication")).toBeTruthy()
     expect(getByText("Protect your account from unauthorized access.")).toBeTruthy()
     expect(getByText("Set")).toBeTruthy()
   })
 
-  it("logs the prompt as shown for its tier", () => {
-    render(<TwoFactorNudgeCard tier={TwoFactorTier.Required} onDismiss={jest.fn()} />)
+  it("reports itself as shown to the enforcement, which counts the impressions", () => {
+    render(<TwoFactorNudgeCard />)
 
-    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
-    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
-      prompt: "home_card",
-    })
+    expect(mockMarkPromptShown).toHaveBeenCalledTimes(1)
+    expect(mockMarkPromptShown).toHaveBeenCalledWith("home_card")
   })
 
   it("opens the setup screen from Set", () => {
-    const { getByTestId } = render(
-      <TwoFactorNudgeCard tier={TwoFactorTier.Nudge} onDismiss={jest.fn()} />,
-    )
+    const { getByTestId } = render(<TwoFactorNudgeCard />)
 
     fireEvent.press(getByTestId("cta-button"))
 
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
   })
 
-  it("dismisses through the X and logs it", () => {
-    const onDismiss = jest.fn()
-    const { getByTestId } = render(
-      <TwoFactorNudgeCard tier={TwoFactorTier.Nudge} onDismiss={onDismiss} />,
-    )
+  it("hands the X to the enforcement's dismissal", () => {
+    const { getByTestId } = render(<TwoFactorNudgeCard />)
 
     fireEvent.press(getByTestId("dismiss-button"))
 
-    expect(onDismiss).toHaveBeenCalledTimes(1)
-    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Nudge,
-      prompt: "home_card",
-    })
+    expect(mockDismissNudgeCard).toHaveBeenCalledTimes(1)
   })
 })

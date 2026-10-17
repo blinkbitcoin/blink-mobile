@@ -4,45 +4,30 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { NotificationCardUI } from "@app/components/notifications/notification-card-ui"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { TwoFactorPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
-import {
-  logTwoFactorPromptDismissed,
-  logTwoFactorPromptShown,
-} from "@app/utils/analytics"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 
-type TwoFactorNudgeCardProps = {
-  tier: TwoFactorTier
-  onDismiss: () => void
-}
-
-export const TwoFactorNudgeCard: React.FC<TwoFactorNudgeCardProps> = ({
-  tier,
-  onDismiss,
-}) => {
+export const TwoFactorNudgeCard: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { markPromptShown, dismissNudgeCard } = useTwoFactorEnforcement()
 
   useEffect(() => {
-    logTwoFactorPromptShown({ tier, prompt: TwoFactorPrompt.HomeCard })
-  }, [tier])
+    markPromptShown(TwoFactorPrompt.HomeCard)
+  }, [markPromptShown])
 
-  const handleSet = useCallback(async () => {
+  const handleSet = useCallback(() => {
     navigation.navigate("twoFactorSetup")
   }, [navigation])
-
-  const handleDismiss = useCallback(() => {
-    logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.HomeCard })
-    onDismiss()
-  }, [tier, onDismiss])
 
   return (
     <NotificationCardUI
       title={LL.TwoFactorEnforcement.title()}
       text={LL.TwoFactorEnforcement.cardDescription()}
       action={handleSet}
-      dismissAction={handleDismiss}
+      dismissAction={dismissNudgeCard}
       buttonLabel={LL.TwoFactorEnforcement.cardCta()}
     />
   )

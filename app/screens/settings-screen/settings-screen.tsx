@@ -113,7 +113,7 @@ export const SettingsScreen: React.FC = () => {
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
   const shouldShowSettingsBanner =
     isSelfCustodialMode && backupState.status !== BackupStatus.Completed
-  const { shouldShowSettingsBanner: shouldShowTwoFactorBanner, tier: twoFactorTier } =
+  const { shouldShowSettingsBanner: shouldShowTwoFactorBanner } =
     useTwoFactorEnforcement()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode } = useEnhancedModePrompt()
@@ -198,7 +198,7 @@ export const SettingsScreen: React.FC = () => {
             titleColor="primary"
           />
         )}
-        {shouldShowTwoFactorBanner && <TwoFactorBanner tier={twoFactorTier} />}
+        {shouldShowTwoFactorBanner && <TwoFactorBanner />}
         <SettingsGroup name={LL.common.account()} items={items.account} />
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}
