@@ -297,142 +297,194 @@ remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,
 })
 
+/** A value Firebase holds for the key, or none while it holds only the static empty
+ *  one: the shipped defaults above are applied asynchronously, and a read before that
+ *  lands sees every key as an empty static value, which is no value at all. */
+const activatedValue = (key: string) => {
+  const value = remoteConfigInstance().getValue(key)
+  return value.getSource() === "static" ? null : value
+}
+
+const readBoolean = (key: string, fallback: boolean): boolean =>
+  activatedValue(key)?.asBoolean() ?? fallback
+
+const readNumber = (key: string, fallback: number): number =>
+  activatedValue(key)?.asNumber() ?? fallback
+
+const readString = (key: string, fallback: string): string =>
+  activatedValue(key)?.asString() ?? fallback
+
 /**
  * Reads the config Firebase has activated: the values of the last fetch, persisted
  * on the device, or the shipped defaults before any fetch. Read at the first render
  * as well as after each fetch, so no flag is defaulted for the seconds a fetch takes.
+ * A key Firebase holds nothing for yet reads as its shipped default.
  */
 const readRemoteConfig = (): RemoteConfig => {
-  const deviceAccountEnabledRestAuth = remoteConfigInstance()
-    .getValue(DeviceAccountEnabledKey)
-    .asBoolean()
+  const deviceAccountEnabledRestAuth = readBoolean(
+    DeviceAccountEnabledKey,
+    defaultRemoteConfig.deviceAccountEnabledRestAuth,
+  )
 
-  const balanceLimitToTriggerUpgradeModal = remoteConfigInstance()
-    .getValue(BalanceLimitToTriggerUpgradeModalKey)
-    .asNumber()
+  const balanceLimitToTriggerUpgradeModal = readNumber(
+    BalanceLimitToTriggerUpgradeModalKey,
+    defaultRemoteConfig.balanceLimitToTriggerUpgradeModal,
+  )
 
-  const feedbackEmailAddress = remoteConfigInstance()
-    .getValue(FeedbackEmailKey)
-    .asString()
+  const feedbackEmailAddress = readString(
+    FeedbackEmailKey,
+    defaultRemoteConfig.feedbackEmailAddress,
+  )
 
-  const supportEmailAddress = remoteConfigInstance().getValue(SupportEmailKey).asString()
+  const supportEmailAddress = readString(
+    SupportEmailKey,
+    defaultRemoteConfig.supportEmailAddress,
+  )
 
-  const upgradeModalCooldownDays = remoteConfigInstance()
-    .getValue(UpgradeModalCooldownDaysKey)
-    .asNumber()
+  const upgradeModalCooldownDays = readNumber(
+    UpgradeModalCooldownDaysKey,
+    defaultRemoteConfig.upgradeModalCooldownDays,
+  )
 
-  const upgradeModalShowAtSessionNumber = remoteConfigInstance()
-    .getValue(UpgradeModalShowAtSessionNumberKey)
-    .asNumber()
+  const upgradeModalShowAtSessionNumber = readNumber(
+    UpgradeModalShowAtSessionNumberKey,
+    defaultRemoteConfig.upgradeModalShowAtSessionNumber,
+  )
 
-  const feeReimbursementMemo = remoteConfigInstance()
-    .getValue(FeeReimbursementMemoKey)
-    .asString()
-  const successIconDuration = remoteConfigInstance()
-    .getValue(SuccessIconDurationKey)
-    .asNumber()
+  const feeReimbursementMemo = readString(
+    FeeReimbursementMemoKey,
+    defaultRemoteConfig.feeReimbursementMemo,
+  )
+  const successIconDuration = readNumber(
+    SuccessIconDurationKey,
+    defaultRemoteConfig.successIconDuration,
+  )
 
-  const appLockGracePeriodSeconds = remoteConfigInstance()
-    .getValue(AppLockGracePeriodSecondsKey)
-    .asNumber()
+  const appLockGracePeriodSeconds = readNumber(
+    AppLockGracePeriodSecondsKey,
+    defaultRemoteConfig.appLockGracePeriodSeconds,
+  )
 
-  const cardTermsAndConditionsUrl = remoteConfigInstance()
-    .getValue(CardTermsAndConditionsUrlKey)
-    .asString()
+  const cardTermsAndConditionsUrl = readString(
+    CardTermsAndConditionsUrlKey,
+    defaultRemoteConfig.cardTermsAndConditionsUrl,
+  )
 
-  const cardPrivacyPolicyUrl = remoteConfigInstance()
-    .getValue(CardPrivacyPolicyUrlKey)
-    .asString()
+  const cardPrivacyPolicyUrl = readString(
+    CardPrivacyPolicyUrlKey,
+    defaultRemoteConfig.cardPrivacyPolicyUrl,
+  )
 
-  const cardCardholderAgreementUrl = remoteConfigInstance()
-    .getValue(CardCardholderAgreementUrlKey)
-    .asString()
+  const cardCardholderAgreementUrl = readString(
+    CardCardholderAgreementUrlKey,
+    defaultRemoteConfig.cardCardholderAgreementUrl,
+  )
 
-  const cardESignConsentUrl = remoteConfigInstance()
-    .getValue(CardESignConsentUrlKey)
-    .asString()
+  const cardESignConsentUrl = readString(
+    CardESignConsentUrlKey,
+    defaultRemoteConfig.cardESignConsentUrl,
+  )
 
-  const cardIssuerPrivacyPolicyUrl = remoteConfigInstance()
-    .getValue(CardIssuerPrivacyPolicyUrlKey)
-    .asString()
+  const cardIssuerPrivacyPolicyUrl = readString(
+    CardIssuerPrivacyPolicyUrlKey,
+    defaultRemoteConfig.cardIssuerPrivacyPolicyUrl,
+  )
 
-  const cardSubscriptionPriceUsd = remoteConfigInstance()
-    .getValue(CardSubscriptionPriceUsdKey)
-    .asNumber()
+  const cardSubscriptionPriceUsd = readNumber(
+    CardSubscriptionPriceUsdKey,
+    defaultRemoteConfig.cardSubscriptionPriceUsd,
+  )
 
-  const cardReplacementFeeUsd = remoteConfigInstance()
-    .getValue(CardReplacementFeeUsdKey)
-    .asNumber()
+  const cardReplacementFeeUsd = readNumber(
+    CardReplacementFeeUsdKey,
+    defaultRemoteConfig.cardReplacementFeeUsd,
+  )
 
-  const cardUsdTransactionFeePercent = remoteConfigInstance()
-    .getValue(CardUsdTransactionFeePercentKey)
-    .asNumber()
+  const cardUsdTransactionFeePercent = readNumber(
+    CardUsdTransactionFeePercentKey,
+    defaultRemoteConfig.cardUsdTransactionFeePercent,
+  )
 
-  const cardForeignTransactionFeePercent = remoteConfigInstance()
-    .getValue(CardForeignTransactionFeePercentKey)
-    .asNumber()
+  const cardForeignTransactionFeePercent = readNumber(
+    CardForeignTransactionFeePercentKey,
+    defaultRemoteConfig.cardForeignTransactionFeePercent,
+  )
 
-  const cardMaxOverdraftUsd = remoteConfigInstance()
-    .getValue(CardMaxOverdraftUsdKey)
-    .asNumber()
+  const cardMaxOverdraftUsd = readNumber(
+    CardMaxOverdraftUsdKey,
+    defaultRemoteConfig.cardMaxOverdraftUsd,
+  )
 
-  const cardLateRepaymentFeeUsd = remoteConfigInstance()
-    .getValue(CardLateRepaymentFeeUsdKey)
-    .asNumber()
+  const cardLateRepaymentFeeUsd = readNumber(
+    CardLateRepaymentFeeUsdKey,
+    defaultRemoteConfig.cardLateRepaymentFeeUsd,
+  )
 
-  const sparkCompatibleWalletsUrl = remoteConfigInstance()
-    .getValue(SparkCompatibleWalletsUrlKey)
-    .asString()
+  const sparkCompatibleWalletsUrl = readString(
+    SparkCompatibleWalletsUrlKey,
+    defaultRemoteConfig.sparkCompatibleWalletsUrl,
+  )
 
-  const cardInvestmentDepositBtcWalletId = remoteConfigInstance()
-    .getValue(CardInvestmentDepositBtcWalletIdKey)
-    .asString()
+  const cardInvestmentDepositBtcWalletId = readString(
+    CardInvestmentDepositBtcWalletIdKey,
+    defaultRemoteConfig.cardInvestmentDepositBtcWalletId,
+  )
 
-  const backupNudgeBannerThreshold = remoteConfigInstance()
-    .getValue(BackupNudgeBannerThresholdKey)
-    .asNumber()
+  const backupNudgeBannerThreshold = readNumber(
+    BackupNudgeBannerThresholdKey,
+    defaultRemoteConfig.backupNudgeBannerThreshold,
+  )
 
-  const backupNudgeModalThreshold = remoteConfigInstance()
-    .getValue(BackupNudgeModalThresholdKey)
-    .asNumber()
+  const backupNudgeModalThreshold = readNumber(
+    BackupNudgeModalThresholdKey,
+    defaultRemoteConfig.backupNudgeModalThreshold,
+  )
 
   // asNumber() yields 0 for a malformed remote value, and a zero cooldown would
   // make the modal undismissable again — fall back to the shipped default.
-  const remoteBackupNudgeModalCooldownMs = remoteConfigInstance()
-    .getValue(BackupNudgeModalCooldownMsKey)
-    .asNumber()
+  const remoteBackupNudgeModalCooldownMs = readNumber(
+    BackupNudgeModalCooldownMsKey,
+    defaultRemoteConfig.backupNudgeModalCooldownMs,
+  )
   const backupNudgeModalCooldownMs =
     remoteBackupNudgeModalCooldownMs > 0
       ? remoteBackupNudgeModalCooldownMs
       : defaultRemoteConfig.backupNudgeModalCooldownMs
 
-  const nonCustodialEnabled = remoteConfigInstance()
-    .getValue(NonCustodialEnabledKey)
-    .asBoolean()
+  const nonCustodialEnabled = readBoolean(
+    NonCustodialEnabledKey,
+    defaultRemoteConfig.nonCustodialEnabled,
+  )
 
-  const stableBalanceEnabled = remoteConfigInstance()
-    .getValue(StableBalanceEnabledKey)
-    .asBoolean()
+  const stableBalanceEnabled = readBoolean(
+    StableBalanceEnabledKey,
+    defaultRemoteConfig.stableBalanceEnabled,
+  )
 
-  const btcMapPlacesEnabled = remoteConfigInstance()
-    .getValue(BtcMapPlacesEnabledKey)
-    .asBoolean()
+  const btcMapPlacesEnabled = readBoolean(
+    BtcMapPlacesEnabledKey,
+    defaultRemoteConfig.btcMapPlacesEnabled,
+  )
 
-  const autoConvertMaxAttempts = remoteConfigInstance()
-    .getValue(AutoConvertMaxAttemptsKey)
-    .asNumber()
+  const autoConvertMaxAttempts = readNumber(
+    AutoConvertMaxAttemptsKey,
+    defaultRemoteConfig.autoConvertMaxAttempts,
+  )
 
-  const autoConvertPollMaxAttempts = remoteConfigInstance()
-    .getValue(AutoConvertPollMaxAttemptsKey)
-    .asNumber()
+  const autoConvertPollMaxAttempts = readNumber(
+    AutoConvertPollMaxAttemptsKey,
+    defaultRemoteConfig.autoConvertPollMaxAttempts,
+  )
 
-  const autoConvertPollIntervalMs = remoteConfigInstance()
-    .getValue(AutoConvertPollIntervalMsKey)
-    .asNumber()
+  const autoConvertPollIntervalMs = readNumber(
+    AutoConvertPollIntervalMsKey,
+    defaultRemoteConfig.autoConvertPollIntervalMs,
+  )
 
-  const autoConvertAmountMatchToleranceBps = remoteConfigInstance()
-    .getValue(AutoConvertAmountMatchToleranceBpsKey)
-    .asNumber()
+  const autoConvertAmountMatchToleranceBps = readNumber(
+    AutoConvertAmountMatchToleranceBpsKey,
+    defaultRemoteConfig.autoConvertAmountMatchToleranceBps,
+  )
 
   const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
     ReplaceCardDeliveryConfigKey,
@@ -469,26 +521,30 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.offboardOnlyCountries,
   )
 
-  const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
-    .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
-    .asNumber()
+  const selfCustodialDepositClaimLeewayVbyte = readNumber(
+    SelfCustodialDepositClaimLeewayVbyteKey,
+    defaultRemoteConfig.selfCustodialDepositClaimLeewayVbyte,
+  )
 
   const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
     MigrationReceiveDelayedNoticeMsKey,
     defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
   )
 
-  const migrationDelayedRedirectEnabled = remoteConfigInstance()
-    .getValue(MigrationDelayedRedirectEnabledKey)
-    .asBoolean()
+  const migrationDelayedRedirectEnabled = readBoolean(
+    MigrationDelayedRedirectEnabledKey,
+    defaultRemoteConfig.migrationDelayedRedirectEnabled,
+  )
 
-  const persistentBulletinsEnabled = remoteConfigInstance()
-    .getValue(PersistentBulletinsEnabledKey)
-    .asBoolean()
+  const persistentBulletinsEnabled = readBoolean(
+    PersistentBulletinsEnabledKey,
+    defaultRemoteConfig.persistentBulletinsEnabled,
+  )
 
-  const custodialTwoFactorEnforcementEnabled = remoteConfigInstance()
-    .getValue(CustodialTwoFactorEnforcementEnabledKey)
-    .asBoolean()
+  const custodialTwoFactorEnforcementEnabled = readBoolean(
+    CustodialTwoFactorEnforcementEnabledKey,
+    defaultRemoteConfig.custodialTwoFactorEnforcementEnabled,
+  )
 
   const feeRatesConfig = getRemoteConfigNumericObject(
     FeeRatesConfigKey,
@@ -560,12 +616,13 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
   } = useAppConfig()
   const hasCustodialAccount = useHasCustodialAccount()
 
+  /** Read again whether or not the fetch lands: a fetch that fails, offline, still
+   *  leaves Firebase holding what the device activated on an earlier launch, which the
+   *  first read could not see while the shipped defaults were still being applied. */
   useEffect(() => {
     ;(async () => {
       try {
         await remoteConfigInstance().fetchAndActivate()
-
-        setRemoteConfig(readRemoteConfig())
       } catch (err) {
         logError({
           scope: "remote-config",
@@ -574,6 +631,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           dedupKey: "remote-config-fetch",
         })
       } finally {
+        setRemoteConfig(readRemoteConfig())
         setRemoteConfigReady(true)
       }
     })()
