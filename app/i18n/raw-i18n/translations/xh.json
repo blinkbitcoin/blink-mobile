@@ -4054,7 +4054,17 @@
     "setupDescription": "Ukuthintela ukufikelela okungagunyaziswanga kwiakhawunti yakho, yongeza uqinisekiso lwezinto ezimbini ngoku.",
     "addEmail": "Yongeza i-imeyile",
     "addPhoneNumber": "Yongeza inombolo yomnxeba",
-    "setAuthenticator": "Misela i-authenticator"
+    "setAuthenticator": "Misela i-authenticator",
+    "modalReminder": "Ukuba uyayichitha ngoku, qinisekisa ukuba uyayivula ngokukhawuleza.",
+    "dismissTwoMore": "Ungayichitha le nto kabini kwakhona.",
+    "dismissOneMore": "Ungayichitha le nto kanye kwakhona.",
+    "dismissLast": "Esi sisihlandlo sokugqibela unokuyichitha le nto.",
+    "setNow": "Misela ngoku",
+    "dontWantTo": "Andifuni",
+    "highBalanceTitle": "Unengaphezu kwe-{amount}, nceda wongeze ukhuseleko olongezelelekileyo",
+    "protectionRequiredBody": "Okukhona unemali eninzi, kokukhona ukhuseleko olungcono lubaluleke ngakumbi. Nceda wongeze i-authenticator ukuze uqhubeke usebenzisa i-Blink.",
+    "nonCustodialTitle": "Ukuba awufuni ukumisela uqinisekiso lwezinto ezimbini",
+    "nonCustodialBody": "Olunye ukhetho kukufudukela kwi-non-custodial. Emva koko uyena onoxanduva lwemali yakho."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -60,16 +60,18 @@ GestureHandlerRootView
         └── GaloyClient               # Apollo GraphQL client
             └── GaloyThemeProvider    # UI theming
                 └── FeatureFlagContextProvider
-                    └── ActionsProvider
-                        └── NavigationContainerWrapper
-                            └── ErrorBoundary
-                                └── RootSiblingParent
-                                    └── NotificationsProvider
-                                        ├── AppStateWrapper
-                                        ├── PushNotificationComponent
-                                        ├── RootStack (Navigation)
-                                        ├── NetworkErrorComponent
-                                        └── ActionModals
+                    └── WindDownStatusProvider        # One wind-down read per session, shared by every surface that yields to it
+                        └── TwoFactorEnforcementProvider  # Balance-tiered two-factor prompts
+                            └── ActionsProvider
+                                └── NavigationContainerWrapper
+                                    └── ErrorBoundary
+                                        └── RootSiblingParent
+                                            └── NotificationsProvider
+                                                ├── AppStateWrapper
+                                                ├── PushNotificationComponent
+                                                ├── RootStack (Navigation)
+                                                ├── NetworkErrorComponent
+                                                └── ActionModals
 ```
 
 ### Navigation Structure
@@ -245,6 +247,7 @@ cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
 3. **PIN Protection**: Optional PIN/biometric lock
 4. **App Check**: Firebase device attestation
 5. **Network**: HTTPS/WSS only, certificate pinning consideration
+6. **Two-factor nudges by balance** (`app/custodial/providers/two-factor-enforcement.tsx`): custodial accounts are prompted to add factors as their balance crosses tiers, up to a full-screen prompt that stands in for the home. The tier reached and the dismissal counters live only on the device (AsyncStorage, per account), so the wall is a strong nudge rather than an enforcement: a reinstall or a second device starts its counters over, and the backend requires a second code at login only when an authenticator is set. Compliance must not rely on it.
 
 ## Performance Patterns
 

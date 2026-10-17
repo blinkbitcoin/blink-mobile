@@ -4054,7 +4054,17 @@
     "setupDescription": "A fiókodhoz való jogosulatlan hozzáférés megakadályozásához add hozzá most a kétlépcsős azonosítást.",
     "addEmail": "Email hozzáadása",
     "addPhoneNumber": "Telefonszám hozzáadása",
-    "setAuthenticator": "Hitelesítő beállítása"
+    "setAuthenticator": "Hitelesítő beállítása",
+    "modalReminder": "Ha most elutasítod, mindenképp kapcsold be, amint lehet.",
+    "dismissTwoMore": "Ezt még kétszer elutasíthatod.",
+    "dismissOneMore": "Ezt még egyszer elutasíthatod.",
+    "dismissLast": "Ez az utolsó alkalom, hogy elutasíthatod.",
+    "setNow": "Beállítás most",
+    "dontWantTo": "Nem szeretném",
+    "highBalanceTitle": "Több mint {amount} van nálad, kérjük, adj hozzá további védelmet",
+    "protectionRequiredBody": "Minél több pénzed van, annál fontosabb a jobb biztonság. Kérjük, adj hozzá hitelesítőt a Blink további használatához.",
+    "nonCustodialTitle": "Ha nem szeretnél kétlépcsős azonosítást beállítani",
+    "nonCustodialBody": "A másik lehetőség az átállás nem letétkezelt módra. Akkor te felelsz a saját pénzedért."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

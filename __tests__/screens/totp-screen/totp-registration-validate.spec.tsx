@@ -133,7 +133,7 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
   it("ignores a return route a flow may not return to, even one the stack holds, as a deep link could name it", async () => {
     mockStackRouteNames = ["Primary", "totpRegistrationInitiate"]
     /** What a crafted link hands the screen: a string the type never admits. */
-    const returnTo = "Primary" as RegistrationReturnRoute
+    const returnTo = "totpRegistrationInitiate" as RegistrationReturnRoute
     await submitCode({ totpRegistrationId: "reg", returnTo })
     pressSuccessOk()
 

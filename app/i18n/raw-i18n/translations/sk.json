@@ -4054,7 +4054,17 @@
     "setupDescription": "Aby ste zabránili neoprávnenému prístupu k svojmu účtu, pridajte teraz dvojfaktorové overenie.",
     "addEmail": "Pridať e-mail",
     "addPhoneNumber": "Pridať telefónne číslo",
-    "setAuthenticator": "Nastaviť autentifikátor"
+    "setAuthenticator": "Nastaviť autentifikátor",
+    "modalReminder": "Ak to teraz odmietnete, nezabudnite to čo najskôr zapnúť.",
+    "dismissTwoMore": "Môžete to odmietnuť ešte dvakrát.",
+    "dismissOneMore": "Môžete to odmietnuť ešte raz.",
+    "dismissLast": "Toto je naposledy, čo to môžete odmietnuť.",
+    "setNow": "Nastaviť teraz",
+    "dontWantTo": "Nechcem",
+    "highBalanceTitle": "Máte viac ako {amount}, pridajte prosím dodatočnú ochranu",
+    "protectionRequiredBody": "Čím viac prostriedkov máte, tým dôležitejšie je lepšie zabezpečenie. Na ďalšie používanie Blinku prosím pridajte autentifikátor.",
+    "nonCustodialTitle": "Ak nechcete nastaviť dvojfaktorové overenie",
+    "nonCustodialBody": "Druhou možnosťou je prejsť na nesprávcovský režim. Potom za svoje prostriedky zodpovedáte sami."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

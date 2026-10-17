@@ -4054,7 +4054,17 @@
     "setupDescription": "Untuk mencegah akses yang tidak sah ke akun Anda, tambahkan otentikasi dua faktor sekarang.",
     "addEmail": "Tambah email",
     "addPhoneNumber": "Tambah nomor telepon",
-    "setAuthenticator": "Atur authenticator"
+    "setAuthenticator": "Atur authenticator",
+    "modalReminder": "Jika Anda menutupnya sekarang, pastikan untuk mengaktifkannya sesegera mungkin.",
+    "dismissTwoMore": "Anda dapat menutup ini dua kali lagi.",
+    "dismissOneMore": "Anda dapat menutup ini satu kali lagi.",
+    "dismissLast": "Ini adalah terakhir kalinya Anda dapat menutup ini.",
+    "setNow": "Atur sekarang",
+    "dontWantTo": "Saya tidak mau",
+    "highBalanceTitle": "Anda memiliki lebih dari {amount}, harap tambahkan perlindungan tambahan",
+    "protectionRequiredBody": "Semakin banyak dana yang Anda miliki, semakin penting keamanan yang lebih baik. Harap tambahkan authenticator untuk terus menggunakan Blink.",
+    "nonCustodialTitle": "Jika Anda tidak ingin mengatur otentikasi dua faktor",
+    "nonCustodialBody": "Pilihan lainnya adalah beralih ke non-kustodial. Maka Anda bertanggung jawab atas dana Anda sendiri."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

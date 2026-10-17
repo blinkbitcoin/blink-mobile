@@ -4054,7 +4054,17 @@
     "setupDescription": "لمنع الوصول غير المصرح به إلى حسابك، أضف المصادقة الثنائية الآن.",
     "addEmail": "إضافة بريد إلكتروني",
     "addPhoneNumber": "إضافة رقم هاتف",
-    "setAuthenticator": "إعداد تطبيق المصادقة"
+    "setAuthenticator": "إعداد تطبيق المصادقة",
+    "modalReminder": "إذا تجاهلت هذا الآن، فاحرص على تفعيله في أقرب وقت ممكن.",
+    "dismissTwoMore": "يمكنك تجاهل هذا مرتين أخريين.",
+    "dismissOneMore": "يمكنك تجاهل هذا مرة واحدة أخرى.",
+    "dismissLast": "هذه آخر مرة يمكنك فيها تجاهل هذا.",
+    "setNow": "فعّل الآن",
+    "dontWantTo": "لا أريد ذلك",
+    "highBalanceTitle": "لديك أكثر من {amount}، يرجى إضافة حماية إضافية",
+    "protectionRequiredBody": "كلما زادت أموالك، زادت أهمية الأمان الأفضل. يرجى إضافة تطبيق المصادقة لمواصلة استخدام Blink.",
+    "nonCustodialTitle": "إذا كنت لا تريد تفعيل المصادقة الثنائية",
+    "nonCustodialBody": "الخيار الآخر هو الانتقال إلى الحفظ الذاتي. عندها تكون مسؤولًا عن أموالك."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

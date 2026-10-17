@@ -4054,7 +4054,17 @@
     "setupDescription": "Pentru a preveni accesul neautorizat la contul tău, adaugă acum autentificarea cu doi factori.",
     "addEmail": "Adaugă email",
     "addPhoneNumber": "Adaugă număr de telefon",
-    "setAuthenticator": "Configurează autentificatorul"
+    "setAuthenticator": "Configurează autentificatorul",
+    "modalReminder": "Dacă respingi acum, asigură-te că o activezi cât mai curând.",
+    "dismissTwoMore": "Mai poți respinge asta de două ori.",
+    "dismissOneMore": "Mai poți respinge asta o singură dată.",
+    "dismissLast": "Aceasta este ultima dată când poți respinge asta.",
+    "setNow": "Configurează acum",
+    "dontWantTo": "Nu vreau",
+    "highBalanceTitle": "Ai peste {amount}, te rugăm să adaugi protecție suplimentară",
+    "protectionRequiredBody": "Cu cât ai mai multe fonduri, cu atât o securitate mai bună este mai importantă. Te rugăm să adaugi un autentificator pentru a continua să folosești Blink.",
+    "nonCustodialTitle": "Dacă nu vrei să configurezi autentificarea cu doi factori",
+    "nonCustodialBody": "Cealaltă opțiune este să treci la non-custodial. Atunci ești responsabil pentru propriile fonduri."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

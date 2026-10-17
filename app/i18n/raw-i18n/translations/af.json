@@ -4054,7 +4054,17 @@
     "setupDescription": "Om ongemagtigde toegang tot jou rekening te voorkom, voeg nou twee-faktor-verifikasie by.",
     "addEmail": "Voeg e-pos by",
     "addPhoneNumber": "Voeg telefoonnommer by",
-    "setAuthenticator": "Stel authenticator op"
+    "setAuthenticator": "Stel authenticator op",
+    "modalReminder": "As jy dit nou afwys, maak seker jy skakel dit so gou moontlik aan.",
+    "dismissTwoMore": "Jy kan dit nog twee keer afwys.",
+    "dismissOneMore": "Jy kan dit nog een keer afwys.",
+    "dismissLast": "Dit is die laaste keer dat jy dit kan afwys.",
+    "setNow": "Stel nou op",
+    "dontWantTo": "Ek wil nie",
+    "highBalanceTitle": "Jy het meer as {amount}, voeg asseblief bykomende beskerming by",
+    "protectionRequiredBody": "Hoe meer fondse jy het, hoe belangriker is beter sekuriteit. Voeg asseblief 'n authenticator by om Blink te bly gebruik.",
+    "nonCustodialTitle": "As jy nie twee-faktor-verifikasie wil opstel nie",
+    "nonCustodialBody": "Die ander opsie is om na nie-bewaring te skuif. Dan is jy self verantwoordelik vir jou fondse."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -11,7 +11,7 @@ import {
   useCustodialWalletBalances,
   useMigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -54,7 +54,7 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
   }, [exportCsv, walletIds, LL])
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       footer={
         <>
           <GaloyPrimaryButton
@@ -79,6 +79,6 @@ export const MigrationDownloadHistoryScreen: React.FC = () => {
         title={LL.AccountMigration.downloadHistoryTitle()}
         subtitle={LL.AccountMigration.downloadHistoryBody()}
       />
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }

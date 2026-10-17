@@ -43,12 +43,16 @@ describe("canReturnToRoute", () => {
     ).toBe(false)
   })
 
-  /** A deep link can name any route the app holds; only the setup is a place a flow
-   *  may return to. */
+  it("lets a flow return to the home when the setup stood in for it", () => {
+    expect(
+      canReturnToRoute(stackWith("Primary", "emailRegistrationInitiate"), "Primary"),
+    ).toBe(true)
+  })
+
+  /** A deep link can name any route the app holds; only the setup and the home are
+   *  places a flow may return to. */
   it("refuses a route the stack holds but a flow may not return to", () => {
-    expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), "Primary")).toBe(
-      false,
-    )
+    expect(canReturnToRoute(stackWith("Primary", "settings"), "settings")).toBe(false)
   })
 
   it("refuses when no return route was asked for", () => {
