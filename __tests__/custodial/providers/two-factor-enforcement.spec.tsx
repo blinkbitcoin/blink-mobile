@@ -52,11 +52,9 @@ jest.mock("@app/utils/analytics", () => ({
 
 /** The wind-down's push into the migration, which the full-screen prompt yields to. */
 const mockMigrateNowRemedy = { isDue: false, isPending: false, windDown: null }
-const mockUseMigrateNowRemedy = jest.fn(
-  (_options?: { skip?: boolean }) => mockMigrateNowRemedy,
-)
+const mockUseMigrateNowRemedy = jest.fn(() => mockMigrateNowRemedy)
 jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
-  useMigrateNowRemedy: (options?: { skip?: boolean }) => mockUseMigrateNowRemedy(options),
+  useMigrateNowRemedy: () => mockUseMigrateNowRemedy(),
 }))
 
 const mockGetItem = jest.fn()
@@ -824,16 +822,6 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
 
       expect(result.current.isProtectionGateActive).toBe(false)
       expect(result.current.isSessionStartPending).toBe(true)
-    })
-
-    it("asks the wind-down only while enforcement applies", async () => {
-      mockEnforcementEnabled = false
-      await renderEnforcement()
-      expect(mockUseMigrateNowRemedy).toHaveBeenLastCalledWith({ skip: true })
-
-      mockEnforcementEnabled = true
-      await renderEnforcement()
-      expect(mockUseMigrateNowRemedy).toHaveBeenLastCalledWith({ skip: false })
     })
   })
 

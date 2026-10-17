@@ -40,11 +40,9 @@ const CLOSED: ModalState = { isOpen: false, tier: TwoFactorTier.None }
  * have the navigator stand it in for the home. The modal comes down once the start is
  * taken, by the dismissal the modal or the flow reports, or once the account complies.
  * A start the navigator stands the full-screen prompt in for is left to it; one whose
- * full-screen prompt yielded to the wind-down is taken here with no prompt. The
- * navigator judged that yield from its own read of the wind-down, and the home shows
- * the wind-down's push from another: should the two disagree, the start is spent with
- * nothing shown for this session, which beats holding every link and prompt that waits
- * on the start until the next one.
+ * full-screen prompt yielded to the wind-down is taken here with no prompt, since the
+ * wind-down's push is what the home shows for it. The yield and the push are judged
+ * from the session's one wind-down read, so they cannot disagree.
  */
 export const useTwoFactorSessionPrompt = ({
   isBlocked,

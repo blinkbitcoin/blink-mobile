@@ -3,7 +3,6 @@ import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { useAccountSessionDismissal } from "./use-account-session-dismissal"
 import { useCustodialWindDownRead } from "./use-custodial-wind-down"
 import { useSelfCustodialDisabled } from "./use-self-custodial-disabled"
-import { WindDownReadOptions } from "./use-wind-down-status"
 
 type MigrateNowRemedy = {
   /** The post-cutoff push into the migration applies to the account: receiving is
@@ -14,10 +13,11 @@ type MigrateNowRemedy = {
 }
 
 /** Whether the push into the migration applies, before any session dismissal, which the
- *  prompt keeps for itself: what a surface that must yield to the push reads. */
-export const useMigrateNowRemedy = (options?: WindDownReadOptions): MigrateNowRemedy => {
+ *  prompt keeps for itself: what a surface that must yield to the push reads. Every
+ *  reader decides from the session's one wind-down read, so no two of them disagree. */
+export const useMigrateNowRemedy = (): MigrateNowRemedy => {
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
-  const { windDown, isPending } = useCustodialWindDownRead(options)
+  const { windDown, isPending } = useCustodialWindDownRead()
 
   const isReceiveDisabled = windDown?.status === WindDownStatus.ReceiveDisabled
 
@@ -29,7 +29,8 @@ export const useMigrateNowRemedy = (options?: WindDownReadOptions): MigrateNowRe
 type MigrateNowPrompt = {
   isVisible: boolean
   /** The wind-down has not answered yet, so the prompt may still turn out to be due:
-   *  a nudge that must yield to it waits on this rather than on `isVisible` alone. */
+   *  a nudge that must yield to it waits on this rather than on `isVisible` alone. The
+   *  wait is bounded by the read itself. */
   isPending: boolean
   canReopen: boolean
   deadlineTimestamp: number
