@@ -2,7 +2,6 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
-import jsSha256 from "js-sha256"
 
 import {
   useUserEmailDeleteMutation,
@@ -15,7 +14,7 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { usePersistentStateContext } from "@app/store/persistent-state"
-import { resolveAccountKey } from "@app/store/persistent-state/account-key"
+import { resolveSessionKey } from "@app/store/persistent-state/account-key"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -66,39 +65,29 @@ type Sequence = {
   result: Promise<string | null>
 }
 
-/** How long the screens waiting on a sequence wait for it. A request that never
- *  answers, which the platform allows, would otherwise keep them waiting for the life
- *  of the process; at the deadline the sequence is over for them, and whatever its
- *  requests still answer is dropped. The requests themselves keep their place until
- *  they settle, and a late delete is still followed by its register: a new sequence
- *  over a delete still on its way, or a delete left without its register, could end
- *  with no address at all. */
+/** How long the screens waiting on a sequence wait for it, since a request can hang
+ *  for the life of the process: at the deadline the sequence is over for them and a
+ *  later answer is dropped. The requests keep their place until they settle, and a
+ *  late delete is still followed by its register, as a second delete over one still on
+ *  its way, or a delete left alone, could end with no address at all. The one deadline
+ *  for a screen that holds the user while the sequence runs, which it reads from the
+ *  running state rather than keep a clock of its own. */
 const SEQUENCE_DEADLINE_MS = 60_000
 
-/**
- * The sequence in flight, if any. It deletes the account's address before it registers
- * it again, so a second one interleaved with it could leave the account with no address
- * at all: one runs at a time, and whoever asks meanwhile joins it. Kept outside the
- * hook, since a sequence outlives any one screen: a screen that holds the user while
- * one runs releases the hold after a while, and the hook on a reopened screen must find
- * the sequence its predecessor started rather than start another.
- */
+/** The sequence in flight, if any: one runs at a time, and whoever asks meanwhile joins
+ *  it, since two interleaved could leave the account with no address. Module state, as
+ *  a sequence outlives any one screen: a reopened screen must find the one its
+ *  predecessor started rather than start another. */
 let sequenceInFlight: Sequence | null = null
 
 /** How many sequences have started, which also numbers the next one. */
 let sequenceCount = 0
 
-/**
- * The sequence each session is owed a code screen for, by id: the latest one started,
- * until the code screen is shown for it, which happens once however many screens
- * waited on it. A newer sequence of the session takes the place of an older one still
- * unshown, since it registers the address again and a code screen for the older
- * registration would validate one that no longer exists; another session's sequence
- * touches its own address only, so it takes nobody's place. One that went nowhere
- * has no code screen to show and stays the session's until the next one, at the cost
- * of an id: nothing else of a sequence is kept here, so no address outlives the
- * screens that waited on it.
- */
+/** The sequence each session is owed a code screen for, by id: the latest started,
+ *  until shown, which happens once however many screens waited on it. A newer one of
+ *  the session takes an older one's place, since it registers the address again; one
+ *  that went nowhere just stays until the next. Only ids live here, so no address
+ *  outlives the screens that waited on it. */
 const owedCodeScreenBySession = new Map<string, number>()
 
 const isCodeScreenOwedFor = (sequence: Sequence) =>
@@ -151,24 +140,17 @@ type EmailReverificationOptions = {
  * sits on the identity — so the stale one is deleted and set again in one go.
  * Shared by the account settings row, the security score card and the two-factor
  * setup, which all land on this state and must behave the same way. The code
- * screen is shown once per sequence, by the screen that is in front when the
- * sequence is done, with that screen's own return route: a screen that is covered at
- * that moment, by the lock on a resume or by a route pushed over it, shows it as
- * soon as it is in front again, and a screen the user has left shows nothing.
+ * screen is shown once per sequence, by the screen in front when it is done, with
+ * that screen's own return route; a screen covered at that moment shows it once it is
+ * back in front, and one the user has left shows nothing.
  */
 export const useEmailReverification = ({ returnTo }: EmailReverificationOptions = {}) => {
   const { LL } = useI18nContext()
   const { persistentState } = usePersistentStateContext()
-  const { galoyAuthToken } = persistentState
-  /** The profile the token is used for. Resolved the way the client does, so a
-   *  custodial profile id first saved under the screen is not taken for a switch. */
-  const accountKey = resolveAccountKey(persistentState)
-  /** The token digest plus the profile, so that profiles sharing a stored token stay
-   *  distinct: a self-custodial profile keeps the custodial token stored while it is
-   *  active. A digest, so no sequence keeps the token itself alive past a logout. */
+  const { galoyAuthToken, activeAccountId } = persistentState
   const sessionKey = useMemo(
-    () => `${jsSha256.sha256(galoyAuthToken)}:${accountKey}`,
-    [galoyAuthToken, accountKey],
+    () => resolveSessionKey({ galoyAuthToken, activeAccountId }),
+    [galoyAuthToken, activeAccountId],
   )
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const isMounted = useIsMounted()
@@ -194,17 +176,14 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
   const returnToRef = useRef(returnTo)
   returnToRef.current = returnTo
 
-  /** Deletes the address and registers it again, both under the session that asked:
-   *  the requests go through the client of the moment, so a session switched between
-   *  the two would register the address on the other account. The sequence stops
-   *  there instead, and the account asked under is left without its address, with no
-   *  word of it: whatever is in front by then is the other account's. A switch within
-   *  the seconds between the two requests is rare, and registering the address through
-   *  the other account's session would be worse. Past the deadline the register still
-   *  runs, since a delete left without it strips the account of the address, and a
-   *  refusal is still shown: it is the one word the user gets that the address is gone.
-   *  Never throws: a sequence that went nowhere hands back null, and every screen
-   *  waiting on it stays put. */
+  /** Deletes the address and registers it again under the session that asked. The
+   *  requests go through the client of the moment, so on a session switch between the
+   *  two the sequence stops rather than register the address on the other account; the
+   *  account asked under is then left without its address, and nothing says so, since
+   *  whatever is in front is the other account's. An accepted loss: the switch has to
+   *  land within the seconds between the two requests. Past the deadline the register
+   *  still runs, and a refusal is still shown, as the one word that the address is
+   *  gone. Never throws: a sequence that went nowhere hands back null. */
   const runSequence = useCallback(
     async ({
       sessionKey: askedUnder,
@@ -248,13 +227,11 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
     [emailDeleteMutation, setEmailMutation],
   )
 
-  /** Moves this screen on to the code screen, once per sequence, when it is in front:
-   *  at once if it is, or on a later focus if it is covered. A screen the user has
-   *  left has nothing to show it on. A sequence a newer one has taken the place of is
-   *  not shown, nor is one of a session that has been switched away from; a covered
-   *  screen keeps waiting through a focus under another session, since the switch can
-   *  be undone before the screen is back under its own. One pending focus at a time:
-   *  a newer one replaces an older one still pending. */
+  /** Moves this screen on to the code screen, once per sequence: at once when it is
+   *  in front, on a later focus when it is covered, never once the user has left it. A
+   *  sequence a newer one replaced, or of a session switched away from, is not shown;
+   *  a covered screen keeps waiting through a focus under another session, as the
+   *  switch can be undone. One pending focus at a time, the newest. */
   const moveOnWhenInFront = useCallback(
     (sequence: Sequence, emailRegistrationId: string) => {
       const isUnderOwnSession = () => sequence.sessionKey === sessionKeyRef.current
@@ -344,14 +321,11 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
     return navigation.addListener("focus", joinSequenceInFlight)
   }, [navigation, sessionKey, waitOnSequence])
 
-  /** Joins the sequence in flight or starts one, unless the sequence in flight is
-   *  another session's: its register may still land on this account, so nothing runs
-   *  alongside it. A prompt answered after a session switch asked about the other
-   *  account's address, and one answered after the app removed the screen has nothing
-   *  to show the code screen on: both start nothing, and the address stays as it is.
-   *  Nor does one answered after a sequence started or was shown since the prompt was
-   *  raised, as a second tap's can be: the user is on that sequence now, and another
-   *  would delete the address under the code screen they are typing into. */
+  /** Joins the sequence in flight or starts one. Nothing runs alongside another
+   *  session's sequence, whose register may still land on this account. A prompt
+   *  answered after a session switch, after the app removed its screen, or after a
+   *  sequence started or was shown since it was raised, as a second tap's is, starts
+   *  nothing: another sequence would delete the address under the code screen. */
   const confirmEmailAgain = useCallback(
     (email: string, prompt: PromptContext) => {
       const askedUnder = sessionKeyRef.current
