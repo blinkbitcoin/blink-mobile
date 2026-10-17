@@ -8,7 +8,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { CloseHeader } from "@app/components/close-header"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
 type MigrationApiServiceScreenProps = {
@@ -30,7 +30,7 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
   const isCloseHidden = !onClose
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       headerShown={false}
       header={
         <CloseHeader
@@ -60,6 +60,6 @@ export const MigrationApiServiceScreen: React.FC<MigrationApiServiceScreenProps>
         title={LL.AccountMigration.apiServiceTitle()}
         subtitle={LL.AccountMigration.apiServiceBody()}
       />
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
