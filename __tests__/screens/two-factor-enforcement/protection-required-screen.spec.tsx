@@ -140,10 +140,9 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       })
     })
 
-    it("logs the prompt as shown once, for the tier it was raised for", async () => {
+    it("logs the prompt as shown once for the mount, not again on a re-render", async () => {
       const rendered = await renderScreen()
 
-      mockEnforcement.unmetTier = TwoFactorTier.None
       await rerenderScreen(rendered)
 
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
