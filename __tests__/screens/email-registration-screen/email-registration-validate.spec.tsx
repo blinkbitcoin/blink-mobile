@@ -217,4 +217,32 @@ describe("EmailRegistrationValidateScreen — navigation after success", () => {
     })
     expect(mockPopTo).not.toHaveBeenCalled()
   })
+
+  /** A deep link can carry both params; the onboarding, which the setup never starts,
+   *  comes first. */
+  it("lets the onboarding flow outrank a return route when a link carries both", async () => {
+    mockStackRouteNames = ["Primary", "twoFactorSetup", "emailRegistrationInitiate"]
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({
+            emailRegistrationId: "id",
+            email: "a@b.com",
+            onboarding: true,
+            returnTo: "twoFactorSetup",
+          })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("onboarding", expect.anything())
+    expect(mockPopTo).not.toHaveBeenCalled()
+  })
 })
