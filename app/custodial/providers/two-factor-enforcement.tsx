@@ -11,6 +11,7 @@ import React, {
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
+import { useLevel } from "@app/graphql/level-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import {
   TwoFactorEnforcementRecord,
@@ -84,6 +85,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   children,
 }) => {
   const isAuthed = useIsAuthed()
+  const { isAtLeastLevelOne } = useLevel()
   const { activeAccount } = useAccountRegistry()
   const { custodialTwoFactorEnforcementEnabled } = useRemoteConfig()
   const [stored, setStored] = useState<StoredState>(INITIAL_STORED)
@@ -94,8 +96,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   /** The account's registered type rather than the wallet state, so the answer holds
    *  steady through the self-custodial cold-start window while the SDK connects. */
   const isSelfCustodialAccount = activeAccount?.type === AccountType.SelfCustodial
+  /** A trial account adds no factor: the settings offer it no login methods, and it
+   *  upgrades through the phone login instead, so it is not prompted. */
   const isEnabled =
-    custodialTwoFactorEnforcementEnabled && isAuthed && !isSelfCustodialAccount
+    custodialTwoFactorEnforcementEnabled &&
+    isAuthed &&
+    isAtLeastLevelOne &&
+    !isSelfCustodialAccount
 
   const { data } = useSettingsScreenQuery({
     skip: !isEnabled,

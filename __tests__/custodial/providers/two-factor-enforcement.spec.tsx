@@ -31,6 +31,11 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+let mockIsAtLeastLevelOne = true
+jest.mock("@app/graphql/level-context", () => ({
+  useLevel: () => ({ isAtLeastLevelOne: mockIsAtLeastLevelOne }),
+}))
+
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -108,6 +113,7 @@ describe("TwoFactorEnforcementProvider", () => {
     jest.clearAllMocks()
     mockEnforcementEnabled = true
     mockIsAuthed = true
+    mockIsAtLeastLevelOne = true
     mockAccountType = AccountType.Custodial
     mockGetItem.mockResolvedValue(null)
     mockSetItem.mockResolvedValue(undefined)
@@ -133,6 +139,22 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith(
         expect.objectContaining({ skip: true }),
       )
+      expect(result.current.shouldShowNudgeCard).toBe(false)
+      expect(result.current.shouldShowSettingsBanner).toBe(false)
+    })
+
+    /** A trial account adds no factor: the settings offer it no login methods, and it
+     *  upgrades through the phone login instead. */
+    it("shows nothing for a trial account, and does not read it", async () => {
+      mockIsAtLeastLevelOne = false
+
+      const { result } = await renderEnforcement()
+
+      expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith(
+        expect.objectContaining({ skip: true }),
+      )
+      expect(mockGetItem).not.toHaveBeenCalled()
+      expect(result.current.tier).toBe(TwoFactorTier.None)
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(result.current.shouldShowSettingsBanner).toBe(false)
     })
