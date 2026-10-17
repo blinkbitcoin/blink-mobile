@@ -53,14 +53,25 @@ export const saveJson = async (key: string, value: unknown): Promise<void> => {
 }
 
 /**
+ * Loads something from storage and runs it thru JSON.parse, propagating a failed read
+ * or unparsable content instead of reading it as absent, so a caller that must not
+ * overwrite a record it could not read can tell the two apart.
+ *
+ * @param key The key to fetch.
+ */
+export const loadJsonOrThrow = async (key: string) => {
+  const data = await AsyncStorage.getItem(key)
+  return data ? JSON.parse(data) : null
+}
+
+/**
  * Loads something from storage and runs it thru JSON.parse.
  *
  * @param key The key to fetch.
  */
 export const loadJson = async (key: string) => {
   try {
-    const data = await AsyncStorage.getItem(key)
-    return data ? JSON.parse(data) : null
+    return await loadJsonOrThrow(key)
   } catch {
     return null
   }

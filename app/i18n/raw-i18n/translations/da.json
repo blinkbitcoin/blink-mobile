@@ -4045,6 +4045,17 @@
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
   },
+  "TwoFactorEnforcement": {
+    "title": "Opsæt to-faktor godkendelse",
+    "cardDescription": "Beskyt din konto mod uautoriseret adgang.",
+    "cardCta": "Opsæt",
+    "settingsDescription": "Beskyt din konto mod uautoriseret adgang ved at opsætte den.",
+    "setupTitle": "Opsæt to-faktor godkendelse nu",
+    "setupDescription": "For at forhindre uautoriseret adgang til din konto skal du tilføje to-faktor godkendelse nu.",
+    "addEmail": "Tilføj e-mail",
+    "addPhoneNumber": "Tilføj telefonnummer",
+    "setAuthenticator": "Opsæt authenticator"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

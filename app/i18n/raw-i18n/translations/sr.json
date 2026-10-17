@@ -4045,6 +4045,17 @@
     "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Obezbedi novčanik"
   },
+  "TwoFactorEnforcement": {
+    "title": "Подесите двофакторску аутентификацију",
+    "cardDescription": "Заштитите свој налог од неовлашћеног приступа.",
+    "cardCta": "Подеси",
+    "settingsDescription": "Заштитите свој налог од неовлашћеног приступа тако што ћете је подесити.",
+    "setupTitle": "Подесите двофакторску аутентификацију сада",
+    "setupDescription": "Да бисте спречили неовлашћени приступ свом налогу, додајте двофакторску аутентификацију сада.",
+    "addEmail": "Додај е-пошту",
+    "addPhoneNumber": "Додај број телефона",
+    "setAuthenticator": "Подеси аутентификатор"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

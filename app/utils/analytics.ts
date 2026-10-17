@@ -8,6 +8,11 @@ import {
 import { ValidatePhoneCodeErrorsType } from "@app/screens/phone-auth-screen"
 import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import {
+  TwoFactorMethod,
+  TwoFactorPrompt,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 import { PaymentType as ParsedPaymentType } from "@blinkbitcoin/blink-client"
 import analytics from "@react-native-firebase/analytics"
 
@@ -174,5 +179,36 @@ export const logToastShown = (params: LogToastShownParams) => {
     message: params.message,
     type: params.type,
     is_translated: params.isTranslated,
+  })
+}
+
+type LogTwoFactorPromptParams = {
+  tier: TwoFactorTier
+  prompt: TwoFactorPrompt
+}
+
+export const logTwoFactorPromptShown = (params: LogTwoFactorPromptParams) => {
+  analytics().logEvent("two_factor_prompt_shown", {
+    tier: params.tier,
+    prompt: params.prompt,
+  })
+}
+
+export const logTwoFactorPromptDismissed = (params: LogTwoFactorPromptParams) => {
+  analytics().logEvent("two_factor_prompt_dismissed", {
+    tier: params.tier,
+    prompt: params.prompt,
+  })
+}
+
+type LogTwoFactorSetupStartedParams = {
+  tier: TwoFactorTier
+  method: TwoFactorMethod
+}
+
+export const logTwoFactorSetupStarted = (params: LogTwoFactorSetupStartedParams) => {
+  analytics().logEvent("two_factor_setup_started", {
+    tier: params.tier,
+    method: params.method,
   })
 }
