@@ -27,7 +27,6 @@ import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
-import { isTwoFactorRemedyRoute } from "./two-factor-remedy-routes"
 import { isUnlockInProgress } from "./unlock-routes"
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
@@ -48,8 +47,8 @@ export const isMigrationDeeplink = (url: string): boolean => {
   }
 }
 
-/** Where the blocker lives, and the two-factor gate with it: PrimaryNavigator swaps its
- *  tabs for either gate. */
+/** Where the blocker lives, and the two-factor gate with it: the home gate stands either
+ *  in for the tabs. */
 const BLOCKER_ROUTE = "Primary" satisfies keyof RootStackParamList
 
 /** Where a still-locked session has to pass through first. */
@@ -149,34 +148,25 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     isBlockerVisibleRef.current = isBlockerVisible
   }, [isBlockerVisible])
 
-  /** The two-factor gate stands in for the home the way the blocker does, and yields to
-   *  it: PrimaryNavigator renders the blocker first, so while the blocker is up the
-   *  two-factor prompt is not what is on screen, and its reset must not pop what the
-   *  blocker's own flows open. Links are held for as long as the session start is owed
-   *  to a prompt: while its record is read, while the countdown modal is up or the user
-   *  is away in a flow it opened, and while the gate stands in. A link that opened in
-   *  the meantime would land a working screen over the prompt, or hide the modal under
-   *  a push. A start that owes no prompt holds nothing, whether or not the home has
-   *  taken it yet, and neither does the fresh read a start waits on with the home
+  /** Links are held for as long as the two-factor session start is owed to a prompt:
+   *  while its record is read, while the countdown modal is up or the user is away in
+   *  a flow it opened, and while the gate stands in for the home. A link that opened
+   *  in the meantime would land a working screen over the prompt, or hide the modal
+   *  under a push. A start that owes no prompt holds nothing, whether or not the home
+   *  has taken it yet, and neither does the fresh read a start waits on with the home
    *  already showing: that read has no bound, and the home is usable meanwhile. The
-   *  same readers need both flags outside a render. */
+   *  gate itself never pops anything: it arms on the home once the user is back there.
+   *  The linking listener closes over stale values, so the flag lives in a ref. */
   const twoFactor = useTwoFactorEnforcement()
-  const isTwoFactorGateActive = twoFactor.isProtectionGateActive && !isBlockerVisible
   const isTwoFactorPromptOwed = twoFactor.requiredPrompt !== TwoFactorSessionPrompt.None
   const isTwoFactorStartHeldByPrompt =
     twoFactor.isSessionStartPending && isTwoFactorPromptOwed
   const isTwoFactorHoldingLinks =
     twoFactor.isPreparingSessionStart || isTwoFactorStartHeldByPrompt
-  const twoFactorRef = useRef({
-    isGateActive: isTwoFactorGateActive,
-    isHoldingLinks: isTwoFactorHoldingLinks,
-  })
+  const isTwoFactorHoldingLinksRef = useRef(isTwoFactorHoldingLinks)
   useEffect(() => {
-    twoFactorRef.current = {
-      isGateActive: isTwoFactorGateActive,
-      isHoldingLinks: isTwoFactorHoldingLinks,
-    }
-  }, [isTwoFactorGateActive, isTwoFactorHoldingLinks])
+    isTwoFactorHoldingLinksRef.current = isTwoFactorHoldingLinks
+  }, [isTwoFactorHoldingLinks])
 
   /** Mirrors the lock for the readers that run outside a render: the state is a commit
    *  behind, and the retry below runs during a navigation dispatch, before that commit
@@ -263,55 +253,6 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     resetToBlocker("gate-armed")
   }, [isBlockerVisible, resetToBlocker])
 
-  /** Pop the working screens above the home while the two-factor gate stands in for it,
-   *  so nothing keeps working over a prompt that blocks. The gate arms at a session
-   *  start, with nothing above the home yet, but a link can open while the fresh read
-   *  the start waits on is in flight, before that read raises the prompt, and the
-   *  remote flag can turn the whole thing on mid-session. The gate's own remedies stay:
-   *  from the first of them up, the stack is a flow the gate wants finished, whatever
-   *  it pushed after; what sits under it goes. Every route kept keeps its state, so
-   *  neither the gate nor the flow is mounted twice. Judged again on every navigation
-   *  while the gate is up, since a kept flow can end on a working screen of its own:
-   *  a registration started from Settings returns there, not to the gate. Never while
-   *  the app is locked or an unlock is anywhere on the stack: a reset would tear the
-   *  unlock down mid-PIN (#4150), or pop it from under the screen in front and leave
-   *  the lock up with nothing to lower it; the unlock steps aside through a navigation,
-   *  which judges the stack again. That is also why no lock routing is needed here,
-   *  unlike in the blocker's reset: the unlock is never popped. */
-  const resetToTwoFactorGate = useCallback(() => {
-    if (!navigationRef.isReady()) return
-
-    const rootState = navigationRef.getRootState()
-    const routes = rootState?.routes ?? []
-    const homeIndex = routes.findIndex((route) => route.name === BLOCKER_ROUTE)
-    const routesAboveHome = homeIndex === -1 ? [] : routes.slice(homeIndex + 1)
-    const firstRemedyOffset = routesAboveHome.findIndex((route) =>
-      isTwoFactorRemedyRoute(route.name),
-    )
-    const hasRemedyAbove = firstRemedyOffset !== -1
-    const routesToPop = hasRemedyAbove
-      ? routesAboveHome.slice(0, firstRemedyOffset)
-      : routesAboveHome
-    const routesToKeep = hasRemedyAbove ? routesAboveHome.slice(firstRemedyOffset) : []
-    const hasWorkingScreenToPop = routesToPop.some((route) => !isUnlockInProgress(route))
-    if (!hasWorkingScreenToPop) return
-
-    const isLockUp = isAppLockedRef.current || routes.some(isUnlockInProgress)
-    if (isLockUp) return
-
-    const keptRoutes = [routes[homeIndex], ...routesToKeep]
-    navigationRef.reset({
-      ...rootState,
-      index: keptRoutes.length - 1,
-      routes: keptRoutes,
-    })
-  }, [])
-
-  useEffect(() => {
-    if (!isTwoFactorGateActive) return
-    resetToTwoFactorGate()
-  }, [isTwoFactorGateActive, resetToTwoFactorGate])
-
   /** A link that waited for the unlock, the sign-in or the two-factor prompts opens
    *  once all of them are out of the way; the migration link, which the prompts let
    *  through live, goes through here as well. */
@@ -394,7 +335,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
          *  for that instead. The migration is a way out they offer, so its link passes. */
         const isGateRemedyLink = isMigrationDeeplink(url)
         if (isBlockerVisibleRef.current && !isGateRemedyLink) return
-        const isHeldByTwoFactor = twoFactorRef.current.isHoldingLinks && !isGateRemedyLink
+        const isHeldByTwoFactor = isTwoFactorHoldingLinksRef.current && !isGateRemedyLink
 
         const canOpenNow = !isAppLocked && canHandlePayments && !isHeldByTwoFactor
         if (canOpenNow) {
@@ -431,7 +372,6 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
           /** Cold-started already gated: reset now that the container is ready, since the
            *  effect above may have run before isReady() turned true. */
           if (isBlockerVisibleRef.current) resetToBlocker("gate-armed")
-          if (twoFactorRef.current.isGateActive) resetToTwoFactorGate()
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
@@ -453,7 +393,6 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
            *  lock already down, so keying the retry on the lock would spend it too early. */
           const isRetryPending = isBlockerVisible && isResetDeferredRef.current
           if (isRetryPending) resetToBlocker("unlock-cleared")
-          if (isTwoFactorGateActive) resetToTwoFactorGate()
         }}
       >
         {children}

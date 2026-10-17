@@ -110,7 +110,8 @@ export type TwoFactorEnforcementState = {
    *  decided and no surface has taken the session start yet. */
   isSessionStartPending: boolean
   /** The account's record is still being read: nothing is decided for the session
-   *  start, and the home must wait rather than show before a prompt that replaces it. */
+   *  start, and a home that has not shown yet waits rather than show before a prompt
+   *  that replaces it. */
   isPreparingSessionStart: boolean
   /** The full-screen prompt stands in for the home: shown in its place for the session
    *  start that owes it, until a dismissal takes that start or the account complies.
@@ -324,8 +325,8 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     session.isStartPending &&
     isSessionStartDecided &&
     !isDismissalAwaitingRead
-  /** The record of this account is still being read: nothing is decided yet, and the
-   *  home must not show for the frames that read takes. */
+  /** The record of this account is still being read: nothing is decided yet, and a home
+   *  that has not shown yet does not show for the frames that read takes. */
   const isPreparingSessionStart = isEnabled && accountId !== null && !isSessionForAccount
   /** The full-screen prompt replaces the home for the session start that owes it, until
    *  a dismissal takes that start or the account complies. The wind-down's push into

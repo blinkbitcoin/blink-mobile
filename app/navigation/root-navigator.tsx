@@ -55,7 +55,6 @@ import {
 } from "@app/screens/totp-screen"
 import {
   TwoFactorNonCustodialScreen,
-  TwoFactorProtectionRequiredScreen,
   TwoFactorSetupScreen,
 } from "@app/screens/two-factor-enforcement"
 import { WebViewScreen } from "@app/screens/webview/webview"
@@ -183,9 +182,9 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
-import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
-import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
+
+import { HomeGate } from "./home-gate"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
@@ -1252,89 +1251,81 @@ export const PrimaryNavigator = () => {
    *  here, before any screen renders, since no screen in the flow is mounted to do it. */
   useResumeCompletedMigration()
 
-  const migrationBlocker = useMigrationBlocker()
-  const twoFactor = useTwoFactorEnforcement()
-  if (migrationBlocker.isVisible) return <MigrationGate />
-
-  /** The two-factor prompt that blocks stands in for the home the way the armed gate
-   *  does, so the home is never seen first; the frames its record read takes stay
-   *  blank for the same reason. The wind-down gate above keeps its precedence. */
-  if (twoFactor.isPreparingSessionStart) return null
-  if (twoFactor.isProtectionGateActive) return <TwoFactorProtectionRequiredScreen />
-
   return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: [
-          styles.bottomNavigatorStyle,
-          {
-            height: 60 + insets.bottom,
-            paddingBottom: insets.bottom,
+    <HomeGate>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.grey2,
+          tabBarStyle: [
+            styles.bottomNavigatorStyle,
+            {
+              height: 60 + insets.bottom,
+              paddingBottom: insets.bottom,
+            },
+          ],
+          tabBarLabelStyle: {
+            paddingBottom: 6,
+            fontSize: 12,
+            fontWeight: "bold",
+            width: "100%",
           },
-        ],
-        tabBarLabelStyle: {
-          paddingBottom: 6,
-          fontSize: 12,
-          fontWeight: "bold",
-          width: "100%",
-        },
-        tabBarHideOnKeyboard: true,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: LL.HomeScreen.title(),
-          tabBarAccessibilityLabel: LL.HomeScreen.title(),
-          tabBarButtonTestID: LL.HomeScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => (
-            <HomeIcon {...testProps("Home")} fill={color} color={color} />
-          ),
-          headerShown: false,
+          tabBarHideOnKeyboard: true,
         }}
-      />
-      <Tab.Screen
-        name="People"
-        component={ContactNavigator}
-        options={{
-          headerShown: false,
-          title: LL.PeopleScreen.title(),
-          tabBarAccessibilityLabel: LL.PeopleScreen.title(),
-          tabBarButtonTestID: LL.PeopleScreen.title(),
-          tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
-            <PeopleTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          title: LL.MapScreen.title(),
-          headerShown: false,
-          tabBarAccessibilityLabel: LL.MapScreen.title(),
-          tabBarButtonTestID: LL.MapScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Earn"
-        component={EarnMapScreen}
-        options={{
-          title: LL.EarnScreen.title(),
-          headerShown: false,
-          tabBarAccessibilityLabel: LL.EarnScreen.title(),
-          tabBarButtonTestID: LL.EarnScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => (
-            <LearnIcon {...testProps("Earn")} color={color} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: LL.HomeScreen.title(),
+            tabBarAccessibilityLabel: LL.HomeScreen.title(),
+            tabBarButtonTestID: LL.HomeScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => (
+              <HomeIcon {...testProps("Home")} fill={color} color={color} />
+            ),
+            headerShown: false,
+          }}
+        />
+        <Tab.Screen
+          name="People"
+          component={ContactNavigator}
+          options={{
+            headerShown: false,
+            title: LL.PeopleScreen.title(),
+            tabBarAccessibilityLabel: LL.PeopleScreen.title(),
+            tabBarButtonTestID: LL.PeopleScreen.title(),
+            tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
+              <PeopleTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Map"
+          component={MapScreen}
+          options={{
+            title: LL.MapScreen.title(),
+            headerShown: false,
+            tabBarAccessibilityLabel: LL.MapScreen.title(),
+            tabBarButtonTestID: LL.MapScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
+          }}
+        />
+        <Tab.Screen
+          name="Earn"
+          component={EarnMapScreen}
+          options={{
+            title: LL.EarnScreen.title(),
+            headerShown: false,
+            tabBarAccessibilityLabel: LL.EarnScreen.title(),
+            tabBarButtonTestID: LL.EarnScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => (
+              <LearnIcon {...testProps("Earn")} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </HomeGate>
   )
 }
 
