@@ -379,6 +379,8 @@ describe("useEmailReverification", () => {
 
     expect(starter.result.current.spinner).toBe(false)
     expect(waiter.result.current.spinner).toBe(false)
+    /** What releases a screen that holds the user for its own request. */
+    expect(starter.result.current.isAskedHere).toBe(false)
     expect(mockNavigate).not.toHaveBeenCalled()
 
     /** The stalled delete is still on its way: nothing starts over it. */
