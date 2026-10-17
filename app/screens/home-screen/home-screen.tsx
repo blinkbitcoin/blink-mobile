@@ -245,11 +245,7 @@ export const HomeScreen: React.FC = () => {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
   } = useSelfCustodialInfoBulletinState()
-  const {
-    shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
-    tier: twoFactorTier,
-    dismissNudgeCard: dismissTwoFactorNudgeCard,
-  } = useTwoFactorEnforcement()
+  const { shouldShowNudgeCard: shouldShowTwoFactorNudgeCard } = useTwoFactorEnforcement()
   const { LL } = useI18nContext()
   const {
     appConfig: {
@@ -982,12 +978,7 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
-        {shouldShowTwoFactorNudgeCard && (
-          <TwoFactorNudgeCard
-            tier={twoFactorTier}
-            onDismiss={dismissTwoFactorNudgeCard}
-          />
-        )}
+        {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin

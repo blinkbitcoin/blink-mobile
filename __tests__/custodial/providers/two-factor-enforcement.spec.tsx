@@ -36,6 +36,14 @@ jest.mock("@app/graphql/level-context", () => ({
   useLevel: () => ({ isAtLeastLevelOne: mockIsAtLeastLevelOne }),
 }))
 
+const mockLogTwoFactorPromptShown = jest.fn()
+const mockLogTwoFactorPromptDismissed = jest.fn()
+jest.mock("@app/utils/analytics", () => ({
+  logTwoFactorPromptShown: (...args: unknown[]) => mockLogTwoFactorPromptShown(...args),
+  logTwoFactorPromptDismissed: (...args: unknown[]) =>
+    mockLogTwoFactorPromptDismissed(...args),
+}))
+
 const mockGetItem = jest.fn()
 const mockSetItem = jest.fn()
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -128,7 +136,10 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(result.current.shouldShowSettingsBanner).toBe(false)
       act(() => result.current.dismissNudgeCard())
+      act(() => result.current.markPromptShown("home_card"))
       expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
+      expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     })
 
     it("shows nothing while the flag is off", async () => {
@@ -411,7 +422,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
 
-    it("persists the dismissal for the account", async () => {
+    it("persists the dismissal for the account, and logs it for the tier", async () => {
       const { result } = await renderEnforcement()
 
       act(() => result.current.dismissNudgeCard())
@@ -421,6 +432,11 @@ describe("TwoFactorEnforcementProvider", () => {
         storageKeyFor(ACCOUNT_ID),
         JSON.stringify({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: true }),
       )
+      expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
+      expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
+        tier: TwoFactorTier.Nudge,
+        prompt: "home_card",
+      })
     })
 
     it("keeps a dismissal that lands in the same pass as a tier raise", async () => {
@@ -441,22 +457,24 @@ describe("TwoFactorEnforcementProvider", () => {
       )
     })
 
-    it("ignores a dismissal without an account to store it for", async () => {
+    it("ignores a dismissal without an account to store it for, and logs none", async () => {
       mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
       const { result } = await renderEnforcement()
 
       act(() => result.current.dismissNudgeCard())
 
       expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     })
 
-    it("ignores a dismissal while the account's record is still loading", () => {
+    it("ignores a dismissal while the account's record is still loading, and logs none", () => {
       mockGetItem.mockReturnValue(new Promise(() => {}))
       const { result } = renderHook(() => useTwoFactorEnforcement(), { wrapper })
 
       act(() => result.current.dismissNudgeCard())
 
       expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     })
 
     it("reports a dismissal the storage could not keep", async () => {
@@ -508,6 +526,84 @@ describe("TwoFactorEnforcementProvider", () => {
       rerender({})
 
       expect(result.current.tier).toBe(TwoFactorTier.None)
+    })
+  })
+
+  describe("impressions", () => {
+    it("logs a prompt as shown once per session, however often its surface mounts", async () => {
+      const { result } = await renderEnforcement()
+
+      act(() => result.current.markPromptShown("home_card"))
+      act(() => result.current.markPromptShown("home_card"))
+
+      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
+      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
+        tier: TwoFactorTier.Nudge,
+        prompt: "home_card",
+      })
+    })
+
+    it("logs each surface on its own", async () => {
+      const { result } = await renderEnforcement()
+
+      act(() => result.current.markPromptShown("home_card"))
+      act(() => result.current.markPromptShown("settings_banner"))
+
+      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(2)
+      expect(mockLogTwoFactorPromptShown).toHaveBeenLastCalledWith({
+        tier: TwoFactorTier.Nudge,
+        prompt: "settings_banner",
+      })
+    })
+
+    it("logs a prompt again once it is shown at a higher tier", async () => {
+      const { result, rerender } = await renderEnforcement()
+      act(() => result.current.markPromptShown("settings_banner"))
+
+      setAccount({ sats: 500_000 })
+      rerender({})
+      act(() => result.current.markPromptShown("settings_banner"))
+
+      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(2)
+      expect(mockLogTwoFactorPromptShown).toHaveBeenLastCalledWith({
+        tier: TwoFactorTier.Required,
+        prompt: "settings_banner",
+      })
+    })
+
+    it("logs a prompt again for the next account", async () => {
+      const { result, rerender } = await renderEnforcement()
+      act(() => result.current.markPromptShown("home_card"))
+
+      setAccount({ accountId: "custodial-account-2", sats: 50_000 })
+      await act(async () => rerender({}))
+      act(() => result.current.markPromptShown("home_card"))
+
+      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(2)
+    })
+
+    /** A gate that closes and opens again within the session, as the flag can, is not
+     *  a new session for the same account. */
+    it("does not log a prompt again when the same account merely comes back", async () => {
+      const { result, rerender } = await renderEnforcement()
+      act(() => result.current.markPromptShown("home_card"))
+
+      mockEnforcementEnabled = false
+      await act(async () => rerender({}))
+      mockEnforcementEnabled = true
+      await act(async () => rerender({}))
+      act(() => result.current.markPromptShown("home_card"))
+
+      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
+    })
+
+    it("logs nothing without an account to show a prompt to", async () => {
+      mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
+      const { result } = await renderEnforcement()
+
+      act(() => result.current.markPromptShown("home_card"))
+
+      expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
     })
   })
 })

@@ -3,24 +3,21 @@ import React, { useCallback, useEffect } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { TwoFactorPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
-import { logTwoFactorPromptShown } from "@app/utils/analytics"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 
 import { SettingsCard } from "./settings-card"
 
-type TwoFactorBannerProps = {
-  tier: TwoFactorTier
-}
-
-export const TwoFactorBanner: React.FC<TwoFactorBannerProps> = ({ tier }) => {
+export const TwoFactorBanner: React.FC = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { markPromptShown } = useTwoFactorEnforcement()
 
   useEffect(() => {
-    logTwoFactorPromptShown({ tier, prompt: TwoFactorPrompt.SettingsBanner })
-  }, [tier])
+    markPromptShown(TwoFactorPrompt.SettingsBanner)
+  }, [markPromptShown])
 
   const handlePress = useCallback(() => {
     navigation.navigate("twoFactorSetup")

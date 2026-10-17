@@ -16,9 +16,14 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import {
   TwoFactorEnforcementRecord,
   TwoFactorMethod,
+  TwoFactorPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import { AccountType } from "@app/types/wallet"
+import {
+  logTwoFactorPromptDismissed,
+  logTwoFactorPromptShown,
+} from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { loadJsonOrThrow, saveJson } from "@app/utils/storage"
 
@@ -46,6 +51,13 @@ const INITIAL_STORED: StoredState = {
 
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
 
+/** The prompts reported as shown this session, by prompt and tier, for the account
+ *  they were shown to. */
+type ShownPrompts = {
+  accountId: string | null
+  impressions: Set<string>
+}
+
 export type TwoFactorEnforcementState = {
   tier: TwoFactorTier
   hasTwoFactor: boolean
@@ -55,6 +67,9 @@ export type TwoFactorEnforcementState = {
   unverifiedEmail: string | null
   shouldShowNudgeCard: boolean
   shouldShowSettingsBanner: boolean
+  /** Reports a prompt as shown, once per session for each tier it is shown at: a
+   *  surface mounts again on every visit, and that is no new impression. */
+  markPromptShown: (prompt: TwoFactorPrompt) => void
   dismissNudgeCard: () => void
 }
 
@@ -65,6 +80,7 @@ const INERT_STATE: TwoFactorEnforcementState = {
   unverifiedEmail: null,
   shouldShowNudgeCard: false,
   shouldShowSettingsBanner: false,
+  markPromptShown: () => {},
   dismissNudgeCard: () => {},
 }
 
@@ -92,6 +108,10 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   /** The record as last written, so two writes in the same pass build on each other:
    *  a dismissal and a tier raise that land together must both survive. */
   const latestStoredRef = useRef<StoredState>(INITIAL_STORED)
+  const shownPromptsRef = useRef<ShownPrompts>({
+    accountId: null,
+    impressions: new Set(),
+  })
 
   /** The account's registered type rather than the wallet state, so the answer holds
    *  steady through the self-custodial cold-start window while the SDK connects. */
@@ -141,15 +161,17 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     }
   }, [accountId, commitStored])
 
+  /** Writes through the record, once this account's is loaded; tells whether it did. */
   const persist = useCallback(
-    (update: RecordUpdate) => {
+    (update: RecordUpdate): boolean => {
       const latest = latestStoredRef.current
-      if (!accountId || latest.accountId !== accountId) return
+      if (!accountId || latest.accountId !== accountId) return false
       const record = update(latest.record)
       commitStored({ accountId, record })
       saveJson(storageKeyFor(accountId), record).catch((err) =>
         reportError("Two-factor enforcement write", err),
       )
+      return true
     },
     [accountId, commitStored],
   )
@@ -186,9 +208,30 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const shouldShowNudgeCard = shouldPrompt && !record.nudgeCardDismissed
   const shouldShowSettingsBanner = shouldPrompt
 
+  /** Another account's impressions start afresh; the same account coming back through
+   *  a gate that closed and opened again within the session keeps its own. With the
+   *  gate closed there is no account to have shown a prompt to. */
+  const markPromptShown = useCallback(
+    (prompt: TwoFactorPrompt) => {
+      if (!accountId) return
+      const isAnotherAccount = shownPromptsRef.current.accountId !== accountId
+      if (isAnotherAccount) {
+        shownPromptsRef.current = { accountId, impressions: new Set() }
+      }
+      const { impressions } = shownPromptsRef.current
+      const impression = `${prompt}:${tier}`
+      if (impressions.has(impression)) return
+      impressions.add(impression)
+      logTwoFactorPromptShown({ tier, prompt })
+    },
+    [accountId, tier],
+  )
+
   const dismissNudgeCard = useCallback(() => {
-    persist((record) => ({ ...record, nudgeCardDismissed: true }))
-  }, [persist])
+    const isDismissed = persist((current) => ({ ...current, nudgeCardDismissed: true }))
+    if (isDismissed)
+      logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.HomeCard })
+  }, [tier, persist])
 
   const contextValue = useMemo(
     () => ({
@@ -198,6 +241,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       unverifiedEmail,
       shouldShowNudgeCard,
       shouldShowSettingsBanner,
+      markPromptShown,
       dismissNudgeCard,
     }),
     [
@@ -207,6 +251,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       unverifiedEmail,
       shouldShowNudgeCard,
       shouldShowSettingsBanner,
+      markPromptShown,
       dismissNudgeCard,
     ],
   )
