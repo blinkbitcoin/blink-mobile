@@ -13,11 +13,20 @@ type HeaderCloseControlParams = {
   /** Replaces the navigation, for a screen that closes back to wherever it was opened
    *  from rather than to a fixed route. */
   onPress?: () => void
+  /** Greys the control out and ignores its presses, for a screen that holds the user
+   *  for a while: the refusal shows instead of a tap that does nothing. */
+  disabled?: boolean
 }
 
-const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
-  navigateTo = "Primary",
+/** The options above resolve the route, so the button itself takes no default. */
+type HeaderCloseButtonProps = HeaderCloseControlParams & {
+  navigateTo: keyof RootStackParamList
+}
+
+const HeaderCloseButton: React.FC<HeaderCloseButtonProps> = ({
+  navigateTo,
   onPress,
+  disabled,
 }) => {
   const styles = useStyles()
   const {
@@ -34,6 +43,7 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
       name="close"
       backgroundColor={colors.grey5}
       style={styles.headerCloseButton}
+      disabled={disabled}
     />
   )
 }
@@ -44,9 +54,10 @@ const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
 export const headerCloseControlOptions = ({
   navigateTo = "Primary",
   onPress,
+  disabled = false,
 }: HeaderCloseControlParams = {}) =>
   headerRightNoGlass(() => (
-    <HeaderCloseButton navigateTo={navigateTo} onPress={onPress} />
+    <HeaderCloseButton navigateTo={navigateTo} onPress={onPress} disabled={disabled} />
   ))
 
 const useStyles = makeStyles(() => ({

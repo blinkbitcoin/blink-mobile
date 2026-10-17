@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react"
+import React, { useCallback, useEffect, useLayoutEffect } from "react"
 import { View } from "react-native"
 
 import { useIsFocused, useNavigation } from "@react-navigation/native"
@@ -23,12 +23,6 @@ import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 
 const RETURN_ROUTE = RegistrationReturnRoute.TwoFactorSetup
 
-/** How long the screen holds the user while a re-verification runs. A request that
- *  never answers, which the platform allows, would otherwise seal the screen; past the
- *  deadline the user may leave, and a result that arrives later reaches this screen
- *  only if it is reopened, where it joins the sequence still in flight. */
-const HOLD_TIMEOUT_MS = 30_000
-
 export const TwoFactorSetupScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -39,10 +33,15 @@ export const TwoFactorSetupScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
   const { tier, hasTwoFactor, missingMethod, unverifiedEmail } = useTwoFactorEnforcement()
+  /** The screen holds the user for a re-verification asked for from it, for as long
+   *  as the hook runs it: the hook bounds that with its own deadline, so the hold, the
+   *  spinner and the buttons release together. One joined from elsewhere, started on
+   *  another screen before this one opened, only shows its spinner, since the user
+   *  pressed nothing here. */
   const {
     promptReverification,
     spinner: isReverifying,
-    isAskedHere: isReverifyingFromHere,
+    isAskedHere: isHeld,
   } = useEmailReverification({ returnTo: RETURN_ROUTE })
 
   const isEmailMissing = missingMethod === TwoFactorMethod.Email
@@ -52,26 +51,14 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   const handleClose = useCallback(() => navigation.goBack(), [navigation])
 
-  /** The hold is for a re-verification asked for from this screen; one joined from
-   *  elsewhere, started on another screen before this one opened, only shows its
-   *  spinner, since the user pressed nothing here. */
-  const [isHoldExpired, setIsHoldExpired] = useState(false)
-  useEffect(() => {
-    setIsHoldExpired(false)
-    if (!isReverifyingFromHere) return
-    const timer = setTimeout(() => setIsHoldExpired(true), HOLD_TIMEOUT_MS)
-    return () => clearTimeout(timer)
-  }, [isReverifyingFromHere])
-  const isHeld = isReverifyingFromHere && !isHoldExpired
-
-  /** While an email re-verification runs, the screen holds still: the hook navigates
-   *  to the code screen when it is done, and that must land on this screen, not on
-   *  another flow or on whatever lies beneath once this one is gone. The hold sits on
-   *  the navigator so that it covers every way back the user has, the close control and
-   *  the hardware back alike; the swipe completes natively before it could be refused,
-   *  so it is switched off for the interval instead. Only the user's own back is held:
-   *  a removal the app dispatches, for a logout, a gate or a profile switch, goes
-   *  through, and the sequence's result then reaches no screen the user has left. */
+  /** While held, the screen stays: the hook navigates to the code screen when it is
+   *  done, and that must land here, not on whatever lies beneath once this screen is
+   *  gone. The hold sits on the navigator so that it covers the close control and the
+   *  hardware back alike; the swipe completes natively before it could be refused, so
+   *  it is switched off instead, and the close control is greyed out so the refusal
+   *  shows. Only the user's own back is held: a removal the app dispatches, for a
+   *  logout, a gate or a profile switch, goes through, and the sequence's result then
+   *  reaches no screen the user has left. */
   useEffect(() => {
     if (!isHeld) return
     return navigation.addListener("beforeRemove", (event) => {
@@ -82,7 +69,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   useLayoutEffect(() => {
     navigation.setOptions({
-      ...headerCloseControlOptions({ onPress: handleClose }),
+      ...headerCloseControlOptions({ onPress: handleClose, disabled: isHeld }),
       gestureEnabled: !isHeld,
     })
   }, [navigation, handleClose, isHeld])
