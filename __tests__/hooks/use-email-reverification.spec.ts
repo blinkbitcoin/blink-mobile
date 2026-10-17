@@ -18,7 +18,13 @@ const mockNavigation = {
   isFocused: () => mockIsFocused(),
   addListener: mockAddListener,
 }
-let mockToken = "session-of-account-a"
+/** Each test gets sessions of its own: the hook keeps module state (the sequence in
+ *  flight, the code screen owed per session), and a test that fails midway must not
+ *  hand the next one a session it had started on. */
+let testCount = 0
+let sessionA = ""
+let sessionB = ""
+let mockToken = ""
 let mockAccountId: string | undefined = "custodial-default"
 const mockEmailDelete = jest.fn()
 const mockRegistrationInitiate = jest.fn()
@@ -133,7 +139,10 @@ describe("useEmailReverification", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockIsFocused.mockReturnValue(true)
-    mockToken = "session-of-account-a"
+    testCount += 1
+    sessionA = `session-of-account-a:${testCount}`
+    sessionB = `session-of-account-b:${testCount}`
+    mockToken = sessionA
     mockAccountId = "custodial-default"
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
     // The give-up branches log on purpose; the assertions cover them.
@@ -321,7 +330,7 @@ describe("useEmailReverification", () => {
     await pressOkAndLeaveRunning()
     previous.unmount()
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     const next = renderHook(() => useEmailReverification())
     await flushEffects()
     expect(next.result.current.spinner).toBe(false)
@@ -471,7 +480,7 @@ describe("useEmailReverification", () => {
     await flushEffects()
     expect(mockRegistrationInitiate).toHaveBeenCalledTimes(1)
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     rerender({})
     finishRefusedRegistration()
     await flushEffects()
@@ -491,14 +500,14 @@ describe("useEmailReverification", () => {
     const moveOnOnFocus = focusListeners().at(-1)
     mockIsFocused.mockReturnValue(true)
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     mockEmailDelete.mockResolvedValue({ data: {} })
     const other = renderHook(() => useEmailReverification())
     other.result.current.promptReverification("other@example.com")
     await pressAlertButton("OK", 1)
     expect(mockNavigate).toHaveBeenCalledTimes(1)
 
-    mockToken = "session-of-account-a"
+    mockToken = sessionA
     covered.rerender({})
     act(() => moveOnOnFocus?.())
 
@@ -520,14 +529,14 @@ describe("useEmailReverification", () => {
     const moveOnOnFocus = focusListeners().at(-1)
     mockIsFocused.mockReturnValue(true)
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     mockEmailDelete.mockResolvedValue({ data: {} })
     const other = renderHook(() => useEmailReverification())
     other.result.current.promptReverification("other@example.com")
     await pressAlertButton("OK", 1)
     other.unmount()
 
-    mockToken = "session-of-account-a"
+    mockToken = sessionA
     covered.rerender({})
     const newer = renderHook(() => useEmailReverification())
     newer.result.current.promptReverification(EMAIL)
@@ -655,13 +664,13 @@ describe("useEmailReverification", () => {
     const moveOnOnFocus = focusListeners().at(-1)
     const removeMoveOn = lastFocusUnsubscribe()
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     rerender({})
     act(() => moveOnOnFocus?.())
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(removeMoveOn).not.toHaveBeenCalled()
 
-    mockToken = "session-of-account-a"
+    mockToken = sessionA
     rerender({})
     act(() => moveOnOnFocus?.())
 
@@ -677,7 +686,7 @@ describe("useEmailReverification", () => {
     await pressOkAndLeaveRunning()
     await flushEffects()
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     rerender({})
     finishRegistration()
     await flushEffects()
@@ -744,14 +753,14 @@ describe("useEmailReverification", () => {
     expect(mockRegistrationInitiate).toHaveBeenCalledTimes(1)
 
     mockIsFocused.mockReturnValue(false)
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     rerender({})
     finishRegistration()
     await flushEffects()
     const moveOnOnFocus = focusListeners().at(-1)
     expect(mockNavigate).not.toHaveBeenCalled()
 
-    mockToken = "session-of-account-a"
+    mockToken = sessionA
     rerender({})
     act(() => moveOnOnFocus?.())
 
@@ -770,7 +779,7 @@ describe("useEmailReverification", () => {
     result.current.promptReverification(EMAIL)
     await pressOkAndLeaveRunning()
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     rerender({})
     finishDeletion()
     await flushEffects()
@@ -784,7 +793,7 @@ describe("useEmailReverification", () => {
     const { result, rerender } = renderHook(() => useEmailReverification())
     result.current.promptReverification(EMAIL)
 
-    mockToken = "session-of-account-b"
+    mockToken = sessionB
     rerender({})
     await pressAlertButton("OK")
 
