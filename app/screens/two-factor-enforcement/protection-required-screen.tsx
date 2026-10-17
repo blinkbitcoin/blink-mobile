@@ -9,6 +9,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
+import { StepLayout } from "@app/components/step-layout"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { AUTHENTICATOR_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -34,7 +35,6 @@ import {
 import { testProps } from "@app/utils/testProps"
 
 import { TwoFactorSetupContent } from "./setup-content"
-import { StepLayout } from "./step-layout"
 
 const SATS_CODE = "SAT"
 const CENTS_PER_DOLLAR = 100
@@ -142,6 +142,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   return (
     <StepLayout
       headerShown={false}
+      contentStyle={styles.content}
       header={
         <CloseHeader
           onClose={handleDismiss}
@@ -181,6 +182,9 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  content: {
+    paddingTop: 10,
+  },
   description: {
     color: colors.grey1,
     textAlign: "center",

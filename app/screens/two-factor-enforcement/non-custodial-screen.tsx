@@ -19,7 +19,7 @@ import {
 } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
-import { StepLayout } from "./step-layout"
+import { StepLayout } from "@app/components/step-layout"
 
 export const TwoFactorNonCustodialScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -60,6 +60,7 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
   return (
     <StepLayout
       headerShown={false}
+      contentStyle={styles.content}
       header={
         <CloseHeader onClose={handleCancel} testID="two-factor-non-custodial-close" />
       }
@@ -93,6 +94,9 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  content: {
+    paddingTop: 10,
+  },
   description: {
     color: colors.grey1,
     textAlign: "center",
