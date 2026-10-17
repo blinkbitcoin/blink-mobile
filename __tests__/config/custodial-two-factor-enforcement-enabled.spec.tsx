@@ -12,7 +12,10 @@ import {
 const mockActivatedBooleans: { current: Record<string, boolean> } = { current: {} }
 /** What this launch's fetch brings down. */
 const mockRemoteBooleans: { current: Record<string, boolean> } = { current: {} }
-const mockFetch = { isDone: false }
+const mockFetch = { isDone: false, isFailing: false }
+/** Where Firebase says each value comes from: "static" until the shipped defaults have
+ *  been applied, which happens asynchronously after the first read can run. */
+const mockSource = { current: "remote" }
 
 jest.mock("@react-native-firebase/remote-config", () => ({
   __esModule: true,
@@ -20,6 +23,7 @@ jest.mock("@react-native-firebase/remote-config", () => ({
     setDefaults: jest.fn(),
     setConfigSettings: jest.fn(),
     getValue: (key: string) => ({
+      getSource: () => mockSource.current,
       asString: () => "",
       asBoolean: () =>
         (mockFetch.isDone ? mockRemoteBooleans.current : mockActivatedBooleans.current)[
@@ -28,6 +32,7 @@ jest.mock("@react-native-firebase/remote-config", () => ({
       asNumber: () => 0,
     }),
     fetchAndActivate: jest.fn(async () => {
+      if (mockFetch.isFailing) throw new Error("offline")
       mockFetch.isDone = true
       return true
     }),
@@ -93,7 +98,50 @@ const renderWithRemoteFlag = async (value: boolean): Promise<string> => {
 describe("custodialTwoFactorEnforcementEnabled remote config", () => {
   beforeEach(() => {
     mockFetch.isDone = false
+    mockFetch.isFailing = false
+    mockSource.current = "remote"
     mockActivatedBooleans.current = { [SENTINEL_KEY]: true }
+  })
+
+  /** Offline, the fetch fails, but by then the shipped defaults have been applied and
+   *  what the device activated on an earlier launch can be read: the session runs on
+   *  that, not on the shipped defaults the first read fell back to. */
+  it("reads the activated values after a fetch that fails, once Firebase holds them", async () => {
+    mockSource.current = "static"
+    mockFetch.isFailing = true
+    mockActivatedBooleans.current = { [FLAG_KEY]: true, [SENTINEL_KEY]: true }
+
+    const view = renderProbe()
+    expect(flagShown(view)).toBe(
+      String(defaultRemoteConfig.custodialTwoFactorEnforcementEnabled),
+    )
+
+    mockSource.current = "remote"
+    await waitFor(() => {
+      expect(flagShown(view)).toBe("true")
+    })
+  })
+
+  /** Before the shipped defaults have been applied, Firebase holds an empty static
+   *  value for every key: reading that as the flag's value would switch the map off
+   *  and zero every number for the whole session on an offline launch. */
+  it("reads the shipped defaults while Firebase holds only static values", async () => {
+    mockSource.current = "static"
+    mockActivatedBooleans.current = { [FLAG_KEY]: true, [SENTINEL_KEY]: false }
+    mockRemoteBooleans.current = { [FLAG_KEY]: true, [SENTINEL_KEY]: false }
+
+    const view = renderProbe()
+
+    expect(flagShown(view)).toBe(
+      String(defaultRemoteConfig.custodialTwoFactorEnforcementEnabled),
+    )
+    expect(view.getByTestId("sentinel").props.children).toBe(
+      String(defaultRemoteConfig.btcMapPlacesEnabled),
+    )
+
+    mockSource.current = "remote"
+    await whenFetched(view)
+    expect(flagShown(view)).toBe("true")
   })
 
   it("ships switched off", () => {
