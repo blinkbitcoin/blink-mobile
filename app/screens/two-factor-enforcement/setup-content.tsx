@@ -16,7 +16,7 @@ import {
 import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 
-import { StepLayout } from "./step-layout"
+import { StepLayout } from "@app/components/step-layout"
 
 type TwoFactorSetupContentProps = {
   /** The tier the setup was raised for: what every flow it starts is reported under. */
@@ -94,6 +94,7 @@ export const TwoFactorSetupContent: React.FC<TwoFactorSetupContentProps> = ({
     <StepLayout
       headerShown={headerShown}
       header={header}
+      contentStyle={styles.content}
       footer={
         /** The authenticator is the call to action, whatever the account holds; the
          *  factor it is missing is offered underneath as the lighter alternative. Both
@@ -129,6 +130,10 @@ export const TwoFactorSetupContent: React.FC<TwoFactorSetupContentProps> = ({
 }
 
 const useStyles = makeStyles(({ colors }) => ({
+  /** The gap the two-factor screens keep between the header row and the hero. */
+  content: {
+    paddingTop: 10,
+  },
   description: {
     color: colors.grey1,
     textAlign: "center",

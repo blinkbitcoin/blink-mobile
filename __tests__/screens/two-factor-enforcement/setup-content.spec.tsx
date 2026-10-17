@@ -7,7 +7,7 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorSetupContent } from "@app/screens/two-factor-enforcement/setup-content"
-import { StepLayout } from "@app/screens/two-factor-enforcement/step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
