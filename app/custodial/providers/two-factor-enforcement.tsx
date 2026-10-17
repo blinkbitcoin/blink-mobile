@@ -155,14 +155,16 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   )
 
   const isLoadedForAccount = accountId !== null && stored.accountId === accountId
+  /** Only this account's record counts: while the next account's is still being read,
+   *  the previous one's tier must not leak into the context or the events. */
+  const record = isLoadedForAccount ? stored.record : DEFAULT_TWO_FACTOR_ENFORCEMENT
   const balanceTier = resolveBalanceTier(me?.defaultAccount.wallets)
-  const tier =
-    balanceTier > stored.record.highestTier ? balanceTier : stored.record.highestTier
+  const tier = balanceTier > record.highestTier ? balanceTier : record.highestTier
 
   useEffect(() => {
-    if (!isLoadedForAccount || balanceTier <= stored.record.highestTier) return
-    persist((record) => ({ ...record, highestTier: balanceTier }))
-  }, [isLoadedForAccount, balanceTier, stored.record, persist])
+    if (!isLoadedForAccount || balanceTier <= record.highestTier) return
+    persist((current) => ({ ...current, highestTier: balanceTier }))
+  }, [isLoadedForAccount, balanceTier, record.highestTier, persist])
 
   const emailAddress = me?.email?.address ?? null
   const isEmailVerified = Boolean(me?.email?.verified)
@@ -176,14 +178,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const hasUnverifiedEmail = emailAddress !== null && !isEmailVerified
   const unverifiedEmail = hasUnverifiedEmail ? emailAddress : null
 
+  /** Both prompts ask from the nudge tier on and stop once the account holds two
+   *  factors, whatever the tier: the setup they open leads with the authenticator,
+   *  which is what the highest tier asks for. The card alone can be waved away. */
   const isEnforced = isEnabled && isLoadedForAccount && !isTwoFactorSet
-  const isNudgeCardDismissed = stored.record.nudgeCardDismissed
-  const shouldShowNudgeCard =
-    isEnforced && tier >= TwoFactorTier.Nudge && !isNudgeCardDismissed
-  /** No banner at the authenticator tier: that tier asks for a third factor, which the
-   *  banner's setup never offers first. */
-  const isBannerTier = tier === TwoFactorTier.Nudge || tier === TwoFactorTier.Required
-  const shouldShowSettingsBanner = isEnforced && isBannerTier
+  const shouldPrompt = isEnforced && tier >= TwoFactorTier.Nudge
+  const shouldShowNudgeCard = shouldPrompt && !record.nudgeCardDismissed
+  const shouldShowSettingsBanner = shouldPrompt
 
   const dismissNudgeCard = useCallback(() => {
     persist((record) => ({ ...record, nudgeCardDismissed: true }))
