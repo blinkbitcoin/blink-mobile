@@ -38,12 +38,12 @@ let mockStatus: WindDownStatus | null = WindDownStatus.ReceiveDisabled
 
 let mockIsPending = false
 
-const mockUseWindDownStatus = jest.fn((_options?: { skip?: boolean }) => ({
+const mockUseWindDownStatus = jest.fn(() => ({
   windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
   isPending: mockIsPending,
 }))
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: (options?: { skip?: boolean }) => mockUseWindDownStatus(options),
+  useWindDownStatus: () => mockUseWindDownStatus(),
 }))
 
 describe("useMigrateNowRemedy", () => {
@@ -69,12 +69,6 @@ describe("useMigrateNowRemedy", () => {
     mockStatus = WindDownStatus.ReceiveDisabled
     mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
     expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
-  })
-
-  it("hands a reader's request to leave the server unasked down to the wind-down read", () => {
-    renderHook(() => useMigrateNowRemedy({ skip: true }))
-
-    expect(mockUseWindDownStatus).toHaveBeenCalledWith({ skip: true })
   })
 })
 

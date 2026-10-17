@@ -186,9 +186,9 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     isAuthed &&
     isAtLeastLevelOne &&
     !isSelfCustodialAccount
-  /** The wind-down's push into the migration, which the full-screen prompt yields to;
-   *  not asked for while nothing here can use the answer. */
-  const migrateNowRemedy = useMigrateNowRemedy({ skip: !isEnabled })
+  /** The wind-down's push into the migration, which the full-screen prompt yields to,
+   *  from the same read the home shows the push from. */
+  const migrateNowRemedy = useMigrateNowRemedy()
 
   /** Each session reads the balances and the factors from the network: the persisted
    *  cache can carry a session-old balance, and a prompt decided from it would miss a
