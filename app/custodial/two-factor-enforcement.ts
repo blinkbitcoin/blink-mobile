@@ -64,13 +64,16 @@ export const DEFAULT_TWO_FACTOR_ENFORCEMENT: TwoFactorEnforcementRecord = {
 
 const TIERS: readonly TwoFactorTier[] = Object.values(TwoFactorTier)
 
-const isTwoFactorTier = (value: number | undefined): value is TwoFactorTier =>
+const isTwoFactorTier = (value: unknown): value is TwoFactorTier =>
   TIERS.some((tier) => tier === value)
+
+/** What the storage hands back: the record's fields, each as whatever was stored. */
+type StoredRecord = { [Field in keyof TwoFactorEnforcementRecord]?: unknown }
 
 /** A stored record is trusted field by field: a value this build cannot read falls back
  *  to the default rather than carrying a tier the rules do not know. */
 export const normalizeStoredRecord = (
-  stored: Partial<TwoFactorEnforcementRecord> | null,
+  stored: StoredRecord | null,
 ): TwoFactorEnforcementRecord => ({
   highestTier: isTwoFactorTier(stored?.highestTier)
     ? stored.highestTier

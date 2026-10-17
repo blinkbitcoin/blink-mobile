@@ -124,7 +124,7 @@ describe("normalizeStoredRecord", () => {
   })
 
   it("drops a tier this build does not know", () => {
-    expect(normalizeStoredRecord({ highestTier: 7 as TwoFactorTier })).toEqual(
+    expect(normalizeStoredRecord({ highestTier: 7 })).toEqual(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
     )
   })
@@ -133,5 +133,19 @@ describe("normalizeStoredRecord", () => {
     expect(
       normalizeStoredRecord({ nudgeCardDismissed: undefined }).nudgeCardDismissed,
     ).toBe(false)
+  })
+
+  /** What a hand-edited or foreign record can hold: truthy values that are not the
+   *  boolean this build writes. */
+  it("does not read a dismissal from the string true", () => {
+    expect(normalizeStoredRecord({ nudgeCardDismissed: "true" }).nudgeCardDismissed).toBe(
+      false,
+    )
+  })
+
+  it("does not read a dismissal from the number one", () => {
+    expect(normalizeStoredRecord({ nudgeCardDismissed: 1 }).nudgeCardDismissed).toBe(
+      false,
+    )
   })
 })
