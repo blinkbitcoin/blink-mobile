@@ -48,7 +48,7 @@ export type CurrencyInfo = {
   showFractionDigits: boolean
 }
 
-export const usdDisplayCurrency = {
+const usdDisplayCurrency = {
   symbol: "$",
   id: "USD",
   fractionDigits: 2,
@@ -76,7 +76,7 @@ const numberFormatterFor = (fractionDigits: number): Intl.NumberFormat => {
   return formatter
 }
 
-export const formatCurrencyHelper = ({
+const formatCurrencyHelper = ({
   amountInMajorUnits,
   symbol,
   isApproximate,
@@ -246,11 +246,14 @@ export const useDisplayCurrency = () => {
       moneyAmount,
       noSymbol = false,
       noSuffix = false,
+      noFractionDigits = false,
       isApproximate = false,
     }: {
       moneyAmount: MoneyAmount<WalletOrDisplayCurrency>
       noSymbol?: boolean
       noSuffix?: boolean
+      /** Whole units only, for an amount that is a round threshold rather than a balance. */
+      noFractionDigits?: boolean
       isApproximate?: boolean
     }): string => {
       const amount = moneyAmountToMajorUnitOrSats(moneyAmount)
@@ -273,7 +276,8 @@ export const useDisplayCurrency = () => {
         amountInMajorUnits: amount,
         isApproximate,
         symbol: noSymbol ? "" : symbol,
-        fractionDigits: showFractionDigits ? minorUnitToMajorUnitOffset : 0,
+        fractionDigits:
+          showFractionDigits && !noFractionDigits ? minorUnitToMajorUnitOffset : 0,
         currencyCode:
           moneyAmount.currency === WalletCurrency.Btc && !noSuffix
             ? currencyCode
