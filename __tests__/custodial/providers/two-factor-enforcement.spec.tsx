@@ -274,14 +274,26 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
 
-    it("drops the banner but keeps the card at the authenticator tier", async () => {
+    /** The banner stays until the account holds two factors, whatever the tier: the
+     *  setup it opens leads with the authenticator, which the highest tier asks for. */
+    it("keeps the card and the banner at the authenticator tier", async () => {
       setAccount({ sats: 5_000_000 })
 
       const { result } = await renderEnforcement()
 
       expect(result.current.tier).toBe(TwoFactorTier.Authenticator)
       expect(result.current.shouldShowNudgeCard).toBe(true)
-      expect(result.current.shouldShowSettingsBanner).toBe(false)
+      expect(result.current.shouldShowSettingsBanner).toBe(true)
+    })
+
+    it("keeps the banner at the authenticator tier once the card is dismissed", async () => {
+      setAccount({ sats: 5_000_000 })
+      storeRecord({ highestTier: TwoFactorTier.Authenticator, nudgeCardDismissed: true })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.shouldShowNudgeCard).toBe(false)
+      expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
 
     it("keeps the highest tier the account ever reached", async () => {
@@ -482,6 +494,20 @@ describe("TwoFactorEnforcementProvider", () => {
 
       expect(result.current.shouldShowNudgeCard).toBe(true)
       expect(mockGetItem).toHaveBeenLastCalledWith(storageKeyFor("custodial-account-2"))
+    })
+
+    /** The tier reaches the context and the events, not only the prompts. */
+    it("reports no tier from the previous account's record while the next one loads", async () => {
+      setAccount({ sats: 0 })
+      storeRecord({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: false })
+      const { result, rerender } = await renderEnforcement()
+      expect(result.current.tier).toBe(TwoFactorTier.Required)
+
+      mockGetItem.mockReturnValue(new Promise(() => {}))
+      setAccount({ accountId: "custodial-account-2", sats: 0 })
+      rerender({})
+
+      expect(result.current.tier).toBe(TwoFactorTier.None)
     })
   })
 })
