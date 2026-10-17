@@ -15,6 +15,7 @@ const mockTwoFactorEnforcement = {
   unverifiedEmail: null,
   shouldShowNudgeCard: false,
   shouldShowSettingsBanner: false,
+  markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
