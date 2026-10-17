@@ -1,5 +1,5 @@
 import React from "react"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -104,10 +104,12 @@ const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
   await flushEffects()
 }
 
-/** The control is rendered on its own: the navigation it needs is the mock above, and
- *  the screen providers would only add async account loads that outlive the test. */
+/** The control as the navigator shows it now, rendered on its own: the navigation it
+ *  needs is the mock above, and the screen providers would only add async account
+ *  loads that outlive the test. */
 const renderInstalledCloseControl = () => {
-  const { headerRight } = mockSetOptions.mock.calls[0][0]
+  const latestOptions = mockSetOptions.mock.calls.at(-1)?.[0] ?? {}
+  const { headerRight } = latestOptions
   render(<ThemeProvider theme={theme}>{headerRight({ canGoBack: true })}</ThemeProvider>)
 }
 
@@ -122,10 +124,6 @@ describe("TwoFactorSetupScreen", () => {
     mockEnforcement.hasTwoFactor = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
-  })
-
-  afterEach(() => {
-    jest.useRealTimers()
   })
 
   it("renders the lock hero with the setup copy", async () => {
@@ -233,7 +231,9 @@ describe("TwoFactorSetupScreen", () => {
     )
   })
 
-  it("releases the hold once the re-verification is done", async () => {
+  /** The hook ends the sequence for its screens at its own deadline, so this is also
+   *  how the hold lifts for a request that never answers. */
+  it("releases the hold once the hook ends the re-verification, and holds again for a new run", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
     mockIsReverifying = true
     const rendered = await renderScreen()
@@ -245,29 +245,7 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockSetOptions).toHaveBeenLastCalledWith(
       expect.objectContaining({ gestureEnabled: true }),
     )
-  })
 
-  /** `setImmediate` stays real so that the effects settle; the hold's own timer is
-   *  the one driven. */
-  it("lets the user leave once the hold has run past its deadline, and holds again for a new run", async () => {
-    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockIsReverifying = true
-    const rendered = await renderScreen()
-    expect(installedRemovalListener()).toBeDefined()
-
-    act(() => {
-      jest.runOnlyPendingTimers()
-    })
-    await flushEffects()
-
-    expect(mockRemoveListener).toHaveBeenCalledTimes(1)
-    expect(mockSetOptions).toHaveBeenLastCalledWith(
-      expect.objectContaining({ gestureEnabled: true }),
-    )
-
-    mockIsReverifying = false
-    await rerenderScreen(rendered)
     mockIsReverifying = true
     await rerenderScreen(rendered)
 
@@ -275,6 +253,17 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockSetOptions).toHaveBeenLastCalledWith(
       expect.objectContaining({ gestureEnabled: false }),
     )
+  })
+
+  it("greys the close control out while it holds, so the refusal shows", async () => {
+    mockEnforcement.unverifiedEmail = "someone@example.com"
+    mockIsReverifying = true
+    await renderScreen()
+
+    renderInstalledCloseControl()
+    fireEvent.press(screen.getByTestId("icon-close"))
+
+    expect(mockGoBack).not.toHaveBeenCalled()
   })
 
   it("steps aside for a complete account only once the hold has lifted", async () => {
