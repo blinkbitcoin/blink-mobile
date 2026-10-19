@@ -61,7 +61,7 @@ jest.mock("@app/utils/analytics", () => ({
     mockLogTwoFactorPromptDismissed(...args),
 }))
 
-/** The wind-down's push into the migration, which the full-screen prompt yields to. */
+/** The wind-down's push into the migration, which the blocking screen yields to. */
 const mockMigrateNowRemedy = { isDue: false, isPending: false, windDown: null }
 const mockUseMigrateNowRemedy = jest.fn(() => mockMigrateNowRemedy)
 jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
@@ -141,6 +141,7 @@ const setNoAccount = () =>
 const DEFAULT_RECORD: TwoFactorEnforcementRecord = {
   highestTier: TwoFactorTier.None,
   highBalanceCurrency: WalletCurrency.Btc,
+  highBalanceThreshold: 0,
   nudgeCardDismissed: false,
   requiredDismissals: 0,
   authenticatorDismissals: 0,
@@ -363,7 +364,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.unmetTier).toBe(TwoFactorTier.Nudge)
       expect(result.current.shouldShowNudgeCard).toBe(true)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
     })
 
     it("reaches the tier from the dollar wallet alone", async () => {
@@ -384,7 +385,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.unmetTier).toBe(TwoFactorTier.Reminder)
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
       expect(result.current.remainingDismissals).toBe(3)
     })
 
@@ -398,7 +399,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.unmetTier).toBe(TwoFactorTier.HighBalance)
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
       expect(result.current.remainingDismissals).toBe(3)
     })
 
@@ -451,10 +452,13 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.highBalanceCurrency).toBe(WalletCurrency.Usd)
+      expect(result.current.highBalanceThreshold).toBe(500_000)
       expect(lastWrittenRecord()).toEqual({
         ...DEFAULT_RECORD,
         highestTier: TwoFactorTier.HighBalance,
         highBalanceCurrency: WalletCurrency.Usd,
+        highBalanceThreshold: 500_000,
+        highestUsdCents: 500_000,
       })
     })
 
@@ -492,9 +496,32 @@ describe("TwoFactorEnforcementProvider", () => {
 
       expect(result.current.highBalanceCurrency).toBe(WalletCurrency.Usd)
     })
+
+    /** The tier stays once reached, so the copy keeps quoting what raised it. */
+    it("keeps quoting the threshold crossed after the console raises it", async () => {
+      mockThresholds = { ...SHIPPED_THRESHOLDS, highBalanceSats: 8_000_000 }
+      setAccount({ sats: 0 })
+      storeRecord({
+        highestTier: TwoFactorTier.HighBalance,
+        highBalanceThreshold: 5_000_000,
+      })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.highBalanceThreshold).toBe(5_000_000)
+    })
+
+    it("quotes the configured threshold for a record from before the crossing was kept", async () => {
+      setAccount({ sats: 0 })
+      storeRecord({ highestTier: TwoFactorTier.HighBalance })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.highBalanceThreshold).toBe(SHIPPED_THRESHOLDS.highBalanceSats)
+    })
   })
 
-  describe("factors", () => {
+  describe("the authenticator", () => {
     /** An attacker who takes an account over can change both its email and its phone,
      *  so those two together are no second factor: the account is prompted. */
     it("prompts an account with a phone and a verified email but no authenticator", async () => {
@@ -514,7 +541,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
       expect(result.current.hasAuthenticator).toBe(false)
       expect(result.current.unmetTier).toBe(TwoFactorTier.HighBalance)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("asks for nothing at any tier once an authenticator is set, whatever else the account holds", async () => {
@@ -525,7 +552,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.hasAuthenticator).toBe(true)
       expect(result.current.unmetTier).toBe(TwoFactorTier.None)
       expect(result.current.shouldShowSettingsBanner).toBe(false)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
     })
 
     it("does not count an email, verified or not, toward the authenticator it asks for", async () => {
@@ -560,6 +587,7 @@ describe("TwoFactorEnforcementProvider", () => {
           ...DEFAULT_RECORD,
           highestTier: TwoFactorTier.Nudge,
           nudgeCardDismissed: true,
+          highestSats: 50_000,
         }),
       )
       expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
@@ -584,6 +612,7 @@ describe("TwoFactorEnforcementProvider", () => {
         ...DEFAULT_RECORD,
         highestTier: TwoFactorTier.Reminder,
         nudgeCardDismissed: true,
+        highestSats: 500_000,
       })
     })
 
@@ -630,7 +659,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("is pending from the local read alone when it already owes a prompt, before the fresh read lands", async () => {
@@ -639,7 +668,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("waits for the fresh read while the local read owes nothing, since that read can still raise the tier", async () => {
@@ -651,7 +680,7 @@ describe("TwoFactorEnforcementProvider", () => {
       rerender({})
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("stands the blocking screen in for the home while the start that owes it is pending", async () => {
@@ -695,9 +724,7 @@ describe("TwoFactorEnforcementProvider", () => {
       setAccount({ sats: 5_000_000 })
       await act(async () => rerender({}))
 
-      expect(result.current.requiredPrompt).toBe(
-        TwoFactorSessionPrompt.ProtectionRequired,
-      )
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.ProtectionRequired)
       expect(result.current.isProtectionGateActive).toBe(false)
     })
 
@@ -707,7 +734,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("stays inert when the fresh read fails with nothing cached, without holding the home", async () => {
@@ -728,7 +755,7 @@ describe("TwoFactorEnforcementProvider", () => {
       setAccount({ sats: 500_000 })
       storeRecord({ authenticatorDismissals: 3 })
       const { result, rerender } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
       expect(result.current.isProtectionGateActive).toBe(false)
 
       setAccount({ sats: 5_000_000 })
@@ -741,7 +768,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
     })
 
     it("stops being pending once taken, whatever the balance does next", async () => {
@@ -752,7 +779,7 @@ describe("TwoFactorEnforcementProvider", () => {
       rerender({})
 
       expect(result.current.isSessionStartPending).toBe(false)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("owes the blocking screen once the high-balance tier has no dismissals left", async () => {
@@ -762,9 +789,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.remainingDismissals).toBe(0)
-      expect(result.current.requiredPrompt).toBe(
-        TwoFactorSessionPrompt.ProtectionRequired,
-      )
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.ProtectionRequired)
     })
 
     /** Only the high-balance tier blocks: the reminder tier never does, however many
@@ -776,7 +801,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.remainingDismissals).toBe(0)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
       expect(result.current.isProtectionGateActive).toBe(false)
     })
 
@@ -812,9 +837,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.requiredPrompt).toBe(
-        TwoFactorSessionPrompt.ProtectionRequired,
-      )
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.ProtectionRequired)
       expect(result.current.isProtectionGateActive).toBe(false)
       expect(result.current.isPreparingSessionStart).toBe(false)
       expect(result.current.isSessionStartPending).toBe(true)
@@ -855,7 +878,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       setAccount({ sats: 5_000_000 })
       storeRecord({ highestTier: TwoFactorTier.HighBalance })
       const { result } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       act(() => result.current.registerDismissal(TwoFactorTier.HighBalance))
 
@@ -869,11 +892,11 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       setAccount({ sats: 500_000 })
       storeRecord({ highestTier: TwoFactorTier.Reminder })
       const { result, rerender } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
 
       setAccount({ sats: 5_000_000 })
       await act(async () => rerender({}))
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       act(() => result.current.registerDismissal(TwoFactorTier.Reminder))
 
@@ -899,7 +922,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       rerender({})
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     /** A setup left unfinished at the reminder tier while the fresh read is still out
@@ -918,7 +941,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       await act(async () => rerender({}))
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("takes the start once the fresh read confirms the prompt waved away still covers the account", async () => {
@@ -1078,14 +1101,12 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       setAccount({ sats: 5_000_000 })
       storeRecord({ highestTier: TwoFactorTier.HighBalance, authenticatorDismissals: 2 })
       const { result } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       act(() => result.current.registerDismissal(TwoFactorTier.HighBalance))
 
       expect(result.current.remainingDismissals).toBe(0)
-      expect(result.current.requiredPrompt).toBe(
-        TwoFactorSessionPrompt.ProtectionRequired,
-      )
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.ProtectionRequired)
     })
 
     it("never blocks the reminder tier on its third dismissal", async () => {
@@ -1096,7 +1117,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       act(() => result.current.registerDismissal(TwoFactorTier.Reminder))
 
       expect(result.current.remainingDismissals).toBe(0)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
       expect(result.current.isProtectionGateActive).toBe(false)
     })
 
@@ -1314,7 +1335,7 @@ describe("TwoFactorEnforcementProvider reminder bulletin", () => {
     expect(result.current.shouldShowReminderBulletin).toBe(true)
     expect(result.current.reminderReason).toBe(TwoFactorReminderReason.FirstSessions)
     expect(result.current.shouldShowNudgeCard).toBe(false)
-    expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+    expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
   })
 
   it("shows the bulletin even when the nudge card was closed", async () => {
@@ -1446,12 +1467,70 @@ describe("TwoFactorEnforcementProvider reminder bulletin", () => {
     expect(mockSetItem).not.toHaveBeenCalled()
   })
 
-  it("records no all-time high away from the reminder tier", async () => {
-    setAccount({ sats: 5_000_000 })
+  /** Above the reminder tier the bulletin never comes back, so there is no high to
+   *  keep reading. */
+  it("reads no all-time high above the reminder tier", async () => {
+    storeRecord({ highestTier: TwoFactorTier.HighBalance, highestSats: 5_000_000 })
+    setAccount({ sats: 6_000_000 })
 
     await renderEnforcement()
 
-    expect(lastWrittenRecord()).toMatchObject({ highestSats: 0, highestUsdCents: 0 })
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  /** However far the balance falls after the crossing, a session start below the
+   *  balance that raised the tier is no new high. */
+  it("takes the balance that raised the tier mid-session as the first all-time high", async () => {
+    storeRecord({ highestTier: TwoFactorTier.Nudge })
+    setAccount({ sats: 400_000 })
+    const crossed = await renderEnforcement()
+
+    setAccount({ sats: 600_000 })
+    await act(async () => crossed.rerender({}))
+    expect(lastWrittenRecord()).toMatchObject({
+      highestTier: TwoFactorTier.Reminder,
+      highestSats: 600_000,
+    })
+    const crossedRecord = lastWrittenRecord()
+    crossed.unmount()
+
+    storeRecord({ ...crossedRecord, requiredDismissals: 3 })
+    setAccount({ sats: 150_000 })
+    const { result } = await renderEnforcement()
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+    expect(result.current.reminderReason).toBeNull()
+  })
+
+  /** A record from before the highs were kept holds the tier with no highs: its first
+   *  session start seeds them, so the bulletin's last dismissal is not undone by a
+   *  balance that never moved. */
+  it("seeds the highs at a first session start, so a later one at the same balance reads no new high", async () => {
+    storeRecord({ highestTier: TwoFactorTier.Reminder, requiredDismissals: 2 })
+    setAccount({ sats: 600_000 })
+    const { result, rerender } = await renderEnforcement()
+    expect(lastWrittenRecord()).toMatchObject({ highestSats: 600_000 })
+
+    act(() => result.current.dismissReminderBulletin())
+    await loginAgain(rerender, { sats: 600_000 })
+
+    expect(result.current.remainingDismissals).toBe(0)
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+  })
+
+  /** A second tap that lands before the bulletin goes is no second dismissal. */
+  it("counts and reports a double tap on the X as one dismissal", async () => {
+    setAccount({ sats: 500_000 })
+    const { result } = await renderEnforcement()
+    const { dismissReminderBulletin } = result.current
+
+    act(() => {
+      dismissReminderBulletin()
+      dismissReminderBulletin()
+    })
+
+    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
+    expect(lastWrittenRecord().requiredDismissals).toBe(1)
   })
 
   it("leaves the bulletin's X alone while the bulletin is not due", async () => {
@@ -1481,5 +1560,28 @@ describe("TwoFactorEnforcementProvider reminder bulletin", () => {
       prompt: TwoFactorPrompt.ReminderBulletin,
       reason: TwoFactorReminderReason.FirstSessions,
     })
+  })
+
+  /** A logout ends the session: the same account's next login is a new one, where the
+   *  bulletin is due again and is a new impression. */
+  it("reports the bulletin as shown again after logging out and back in to the same account", async () => {
+    setAccount({ sats: 500_000 })
+    const { result, rerender } = await renderEnforcement()
+    const showBulletin = () =>
+      act(() =>
+        result.current.markPromptShown(
+          TwoFactorPrompt.ReminderBulletin,
+          TwoFactorReminderReason.FirstSessions,
+        ),
+      )
+    showBulletin()
+
+    mockIsAuthed = false
+    rerender({})
+    mockIsAuthed = true
+    await act(async () => rerender({}))
+    showBulletin()
+
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(2)
   })
 })

@@ -2,6 +2,8 @@ import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
@@ -76,6 +78,11 @@ const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
   await flushEffects()
 }
 
+// eslint-disable-next-line camelcase
+const primaryButton = () => screen.UNSAFE_getByType(GaloyPrimaryButton)
+// eslint-disable-next-line camelcase
+const secondaryButton = () => screen.UNSAFE_getByType(GaloySecondaryButton)
+
 /** The control as the navigator shows it now, rendered on its own: the navigation it
  *  needs is the mock above, and the screen providers would only add async account
  *  loads that outlive the test. */
@@ -94,14 +101,22 @@ describe("TwoFactorSetupScreen", () => {
     mockEnforcement.hasAuthenticator = false
   })
 
-  it("shows the setup under its header, with the authenticator as the call to action", async () => {
+  it("renders the lock hero with the setup copy", async () => {
     await renderScreen()
 
     expect(screen.getByTestId("icon-lock-closed")).toBeTruthy()
     expect(screen.getByText(LL.TwoFactorEnforcement.setupTitle())).toBeTruthy()
-    expect(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator())).toBeTruthy()
-    expect(screen.getByText(LL.AccountMigration.moveToNonCustodial())).toBeTruthy()
+    expect(screen.getByText(LL.TwoFactorEnforcement.setupDescription())).toBeTruthy()
     expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  /** An email or a phone added to the one the account logs in with protects nothing:
+   *  the setup offers the authenticator, or leaving custody, and nothing else. */
+  it("offers the authenticator first and leaving custody second, and nothing else", async () => {
+    await renderScreen()
+
+    expect(primaryButton().props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
+    expect(secondaryButton().props.title).toBe(LL.AccountMigration.moveToNonCustodial())
   })
 
   it("tells the authenticator flow to return here, under the tier it was opened for", async () => {
@@ -117,6 +132,21 @@ describe("TwoFactorSetupScreen", () => {
       tier: TwoFactorTier.Reminder,
       method: TwoFactorMethod.Authenticator,
     })
+  })
+
+  /** Leaving custody goes through the screen that explains what it means; that screen
+   *  reports the choice, so nothing is reported here. The setup stays under it, which
+   *  that screen is told, so backing out of it lands back here with no dismissal. */
+  it("opens the screen that explains leaving custody over the setup, reporting nothing itself", async () => {
+    await renderScreen()
+
+    fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
+
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial", {
+      isFromSetup: true,
+    })
+    expect(mockLogTwoFactorSetupStarted).not.toHaveBeenCalled()
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   it("keeps reporting the tier it was opened for once the balance moves", async () => {

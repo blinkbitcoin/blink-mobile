@@ -1,6 +1,6 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -31,6 +31,8 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "twoFactorNonCustodial">
     >()
+  const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorNonCustodial">>()
+  const isFromSetup = params?.isFromSetup ?? false
   const { unmetTier, registerDismissal } = useTwoFactorEnforcement()
   /** The tier this screen was opened for: what it reports, and what backing out of it
    *  is charged to, even if the balance moves while it is open. */
@@ -44,11 +46,13 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
   }, [promptTier])
 
   /** Backing out here, by Cancel, the X or the hardware back, is the dismissal the modal
-   *  deferred. The swipe is off for this route, so no exit skips the count. */
+   *  deferred. The swipe is off for this route, so no exit skips the count. Opened from
+   *  the setup, it only returns there: the setup is still up, and leaving it is what
+   *  counts. */
   const handleCancel = useCallback(() => {
-    registerDismissal(promptTier)
+    if (!isFromSetup) registerDismissal(promptTier)
     navigation.goBack()
-  }, [registerDismissal, promptTier, navigation])
+  }, [isFromSetup, registerDismissal, promptTier, navigation])
 
   useHardwareBackGuard(handleCancel)
 

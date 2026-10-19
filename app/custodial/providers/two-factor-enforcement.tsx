@@ -35,8 +35,9 @@ import {
   isAboveAllTimeHigh,
   normalizeStoredRecord,
   remainingDismissals,
+  quotedHighBalanceThreshold,
   resolveBalanceTier,
-  resolveHighBalanceCurrency,
+  resolveHighBalanceCrossing,
   resolveReminderReason,
   resolveSessionPrompt,
   resolveUnmetTier,
@@ -61,12 +62,12 @@ const INITIAL_STORED: StoredState = {
 
 /** What this session's start found against the wallets' all-time highs: nothing yet
  *  until the fresh read of the account lands, then the answer for the whole session. */
-const SessionHigh = {
+const AllTimeHighStatus = {
   Unread: "unread",
   Risen: "risen",
   Unchanged: "unchanged",
 } as const
-type SessionHigh = (typeof SessionHigh)[keyof typeof SessionHigh]
+type AllTimeHighStatus = (typeof AllTimeHighStatus)[keyof typeof AllTimeHighStatus]
 
 /**
  * What this session has already done for the account, kept in memory on purpose: a
@@ -84,7 +85,7 @@ type SessionState = {
    *  out, None for none: whether that takes the session start is decided once the
    *  read lands, since the read may raise a prompt the dismissal does not cover. */
   dismissedTier: TwoFactorTier
-  allTimeHigh: SessionHigh
+  allTimeHighStatus: AllTimeHighStatus
 }
 
 const INITIAL_SESSION: SessionState = {
@@ -92,7 +93,7 @@ const INITIAL_SESSION: SessionState = {
   isStartPending: false,
   countedTier: TwoFactorTier.None,
   dismissedTier: TwoFactorTier.None,
-  allTimeHigh: SessionHigh.Unread,
+  allTimeHighStatus: AllTimeHighStatus.Unread,
 }
 
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
@@ -111,10 +112,12 @@ export type TwoFactorEnforcementState = {
   hasAuthenticator: boolean
   /** The wallet the high-balance copy names, meaningful at the high-balance tier. */
   highBalanceCurrency: WalletCurrency
+  /** The threshold that copy quotes, in that wallet's unit. */
+  highBalanceThreshold: number
   remainingDismissals: number
   /** The prompt the unmet tier calls for at a session start, None once the account
    *  complies. */
-  requiredPrompt: TwoFactorSessionPrompt
+  sessionPrompt: TwoFactorSessionPrompt
   /** Whether this session's start is still to be acted on: the account's state is
    *  decided and no surface has taken the session start yet. */
   isSessionStartPending: boolean
@@ -154,8 +157,9 @@ const INERT_STATE: TwoFactorEnforcementState = {
   unmetTier: TwoFactorTier.None,
   hasAuthenticator: false,
   highBalanceCurrency: WalletCurrency.Btc,
+  highBalanceThreshold: 0,
   remainingDismissals: 0,
-  requiredPrompt: TwoFactorSessionPrompt.None,
+  sessionPrompt: TwoFactorSessionPrompt.None,
   isSessionStartPending: false,
   isPreparingSessionStart: false,
   isProtectionGateActive: false,
@@ -215,13 +219,14 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     isAuthed &&
     isAtLeastLevelOne &&
     !isSelfCustodialAccount
-  /** The wind-down's push into the migration, which the full-screen prompt yields to,
+  /** The wind-down's push into the migration, which the blocking screen yields to,
    *  from the same read the home shows the push from. */
   const migrateNowRemedy = useMigrateNowRemedy()
 
-  /** Each session reads the balances and the factors from the network: the persisted
-   *  cache can carry a session-old balance, and a prompt decided from it would miss a
-   *  threshold crossed elsewhere. Once answered, the session keeps the cached copy. */
+  /** Each session reads the balances and the authenticator from the network: the
+   *  persisted cache can carry a session-old balance, and a prompt decided from it would
+   *  miss a threshold crossed elsewhere. Once answered, the session keeps the cached
+   *  copy. */
   const { data, loading: isReadingAccount } = useSettingsScreenQuery({
     skip: !isEnabled,
     fetchPolicy: "cache-and-network",
@@ -297,10 +302,15 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const balanceTier = resolveBalanceTier(wallets, thresholds)
   const tier = balanceTier > record.highestTier ? balanceTier : record.highestTier
 
+  /** The balance that raises the tier is also the first all-time high the reminder
+   *  tier measures against, mid-session or not: a later session start below it is no
+   *  new high, however far the balance fell in between. */
   useEffect(() => {
     if (!isLoadedForAccount || balanceTier <= record.highestTier) return
-    const crossedCurrency = resolveHighBalanceCurrency(wallets, thresholds)
-    persist((current) => withTierReached(current, balanceTier, crossedCurrency))
+    const crossing = resolveHighBalanceCrossing(wallets, thresholds)
+    persist((current) =>
+      withAllTimeHigh(withTierReached(current, balanceTier, crossing), wallets),
+    )
   }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, thresholds, persist])
 
   const hasAuthenticator = Boolean(me?.totpEnabled)
@@ -310,12 +320,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     ? resolveUnmetTier({ tier, hasAuthenticator })
     : TwoFactorTier.None
   const dismissalsLeft = remainingDismissals(record, unmetTier)
-  const requiredPrompt = resolveSessionPrompt({ unmetTier, record })
-  /** The local read decides first: the stored tier never lowers and the cached factors
-   *  are what the account last showed, so a prompt they already call for goes up on the
+  const highBalanceThreshold = quotedHighBalanceThreshold(record, thresholds)
+  const sessionPrompt = resolveSessionPrompt({ unmetTier, record })
+  /** The local read decides first: the stored tier never lowers and the cached
+   *  authenticator is what the account last showed, so a prompt they already call for goes up on the
    *  first frame. Only a local read that owes nothing waits for the fresh one, which can
    *  still raise the tier from a balance that moved elsewhere. */
-  const hasLocalPrompt = requiredPrompt !== TwoFactorSessionPrompt.None
+  const hasLocalPrompt = sessionPrompt !== TwoFactorSessionPrompt.None
   const isSessionStartDecided = hasLocalPrompt || !isReadingAccount
   /** A dismissal the fresh read has yet to judge has already answered the prompt as
    *  far as every surface is concerned: nothing shows for the start until the read
@@ -341,7 +352,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  hold forever; should the answer then say the push applies, the screen yields to
    *  it. */
   const isProtectionGateOwed =
-    isSessionStartPending && requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
+    isSessionStartPending && sessionPrompt === TwoFactorSessionPrompt.ProtectionRequired
   const isProtectionGateActive = isProtectionGateOwed && !migrateNowRemedy.isDue
 
   /** The card belongs to the nudge tier alone: from the reminder tier on, that tier's
@@ -357,11 +368,17 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const reminderReason = resolveReminderReason({
     unmetTier,
     record,
-    hasNewAllTimeHigh: session.allTimeHigh === SessionHigh.Risen,
+    hasNewAllTimeHigh: session.allTimeHighStatus === AllTimeHighStatus.Risen,
   })
   const isReminderWavedAway = session.countedTier >= TwoFactorTier.Reminder
   const isReminderDue = reminderReason !== null && isSessionForAccount
   const shouldShowReminderBulletin = isReminderDue && !isReminderWavedAway
+
+  /** A logout ends the session, so a fresh login starts its impressions afresh, for
+   *  the same account too: its prompts are due again and are new impressions. */
+  useEffect(() => {
+    if (!isAuthed) shownPromptsRef.current = { accountId: null, impressions: new Set() }
+  }, [isAuthed])
 
   /** Another account's impressions start afresh; the same account coming back through
    *  a gate that closed and opened again within the session keeps its own. With the
@@ -410,14 +427,15 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  judged then by the effect below, so a balance that crossed into a higher tier
    *  elsewhere still gets that tier's prompt this session. What is kept is the highest
    *  tier waved away, so a lower one reported after it, or the no prompt the modal's
-   *  closing frames report, cannot replace it and raise the prompt again. */
+   *  closing frames report, cannot replace it and raise the prompt again. Tells whether
+   *  the dismissal was counted. */
   const registerDismissal = useCallback(
-    (promptTier: TwoFactorTier) => {
-      if (promptTier === TwoFactorTier.None) return
+    (promptTier: TwoFactorTier): boolean => {
+      if (promptTier === TwoFactorTier.None) return false
       const latest = latestSessionRef.current
       const read = latestReadRef.current
       const isSessionAccount = accountId !== null && latest.accountId === accountId
-      if (!isSessionAccount) return
+      if (!isSessionAccount) return false
       const isCountable =
         promptTier >= TwoFactorTier.Reminder && promptTier > latest.countedTier
       const isStartOwedToPrompt =
@@ -427,7 +445,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
         latest.isStartPending && isStartOwedToPrompt && !isStartAwaitingRead
       const isHigherThanKept = promptTier > latest.dismissedTier
       const isKeptForRead = isStartAwaitingRead && isHigherThanKept
-      if (!isCountable && !isStartTaken && !isKeptForRead) return
+      if (!isCountable && !isStartTaken && !isKeptForRead) return false
       if (isCountable) persist((current) => withDismissal(current, promptTier))
       commitSession({
         ...latest,
@@ -435,6 +453,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
         countedTier: isCountable ? promptTier : latest.countedTier,
         dismissedTier: isKeptForRead ? promptTier : latest.dismissedTier,
       })
+      return isCountable
     },
     [accountId, persist, commitSession],
   )
@@ -460,14 +479,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
 
   /** At the reminder tier, the session start reads each wallet against its all-time
    *  high once, when the fresh read of the account has landed, and raises the highs it
-   *  finds exceeded: a bulletin waved away after a new high then waits for the next one,
-   *  whether or not it was waved away. What the balance does later in the session waits
-   *  for the next session start. Below the tier there is nothing to read the highs for,
-   *  and above it the tier never comes back. */
+   *  finds exceeded, so the next session start measures against the new ones. What the
+   *  balance does later in the session waits for the next session start. Below the tier
+   *  there is nothing to read the highs for, and above it the tier never comes back. */
   useEffect(() => {
     const latest = latestSessionRef.current
     const isSessionAccount = accountId !== null && latest.accountId === accountId
-    const isHighUnread = latest.allTimeHigh === SessionHigh.Unread
+    const isHighUnread = latest.allTimeHighStatus === AllTimeHighStatus.Unread
     const isAccountRead = isLoadedForAccount && !isReadingAccount
     const isHighDue = isSessionAccount && isHighUnread && isAccountRead
     if (!isHighDue) return
@@ -476,7 +494,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     if (hasRisen) persist((current) => withAllTimeHigh(current, wallets))
     commitSession({
       ...latest,
-      allTimeHigh: hasRisen ? SessionHigh.Risen : SessionHigh.Unchanged,
+      allTimeHighStatus: hasRisen ? AllTimeHighStatus.Risen : AllTimeHighStatus.Unchanged,
     })
   }, [
     accountId,
@@ -490,16 +508,18 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     commitSession,
   ])
 
-  /** The reason is the one the bulletin was shown for, which a bulletin on screen
-   *  always has. */
+  /** Logged only when counted, so a second tap that lands before the bulletin goes is
+   *  no second dismissal. The reason is the one the bulletin was shown for, which a
+   *  bulletin on screen always has. */
   const dismissReminderBulletin = useCallback(() => {
     if (reminderReason === null) return
+    const isCounted = registerDismissal(TwoFactorTier.Reminder)
+    if (!isCounted) return
     logTwoFactorPromptDismissed({
       tier,
       prompt: TwoFactorPrompt.ReminderBulletin,
       reason: reminderReason,
     })
-    registerDismissal(TwoFactorTier.Reminder)
   }, [tier, reminderReason, registerDismissal])
 
   const contextValue = useMemo(
@@ -508,8 +528,9 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       unmetTier,
       hasAuthenticator,
       highBalanceCurrency: record.highBalanceCurrency,
+      highBalanceThreshold,
       remainingDismissals: dismissalsLeft,
-      requiredPrompt,
+      sessionPrompt,
       isSessionStartPending,
       isPreparingSessionStart,
       isProtectionGateActive,
@@ -528,8 +549,9 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       unmetTier,
       hasAuthenticator,
       record.highBalanceCurrency,
+      highBalanceThreshold,
       dismissalsLeft,
-      requiredPrompt,
+      sessionPrompt,
       isSessionStartPending,
       isPreparingSessionStart,
       isProtectionGateActive,

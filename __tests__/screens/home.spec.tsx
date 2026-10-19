@@ -82,7 +82,7 @@ const mockTwoFactorEnforcement = {
   hasAuthenticator: false,
   highBalanceCurrency: "BTC",
   remainingDismissals: 3,
-  requiredPrompt: "none",
+  sessionPrompt: "none",
   isSessionStartPending: false,
   shouldShowNudgeCard: false,
   shouldShowReminderBulletin: false,

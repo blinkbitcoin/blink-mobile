@@ -16,7 +16,7 @@ const mockConsumeSessionStart = jest.fn(() => {
 const mockEnforcement = {
   isSessionStartPending: false,
   isProtectionGateActive: false,
-  requiredPrompt: TwoFactorSessionPrompt.None as TwoFactorSessionPrompt,
+  sessionPrompt: TwoFactorSessionPrompt.None as TwoFactorSessionPrompt,
   unmetTier: TwoFactorTier.None as TwoFactorTier,
   consumeSessionStart: mockConsumeSessionStart,
 }
@@ -40,7 +40,7 @@ const sessionStartOwing = (
   { isGateActive = prompt === TwoFactorSessionPrompt.ProtectionRequired } = {},
 ) => {
   mockEnforcement.isSessionStartPending = true
-  mockEnforcement.requiredPrompt = prompt
+  mockEnforcement.sessionPrompt = prompt
   mockEnforcement.unmetTier = tier
   mockEnforcement.isProtectionGateActive = isGateActive
 }
@@ -56,7 +56,7 @@ describe("useTwoFactorSessionPrompt", () => {
     mockIsFocused = true
     mockEnforcement.isSessionStartPending = false
     mockEnforcement.isProtectionGateActive = false
-    mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.None
+    mockEnforcement.sessionPrompt = TwoFactorSessionPrompt.None
     mockEnforcement.unmetTier = TwoFactorTier.None
   })
 
@@ -223,7 +223,7 @@ describe("useTwoFactorSessionPrompt", () => {
     const { result, rerender } = renderPrompt()
     expect(result.current.isModalOpen).toBe(true)
 
-    mockEnforcement.requiredPrompt = TwoFactorSessionPrompt.None
+    mockEnforcement.sessionPrompt = TwoFactorSessionPrompt.None
     rerender({})
 
     expect(result.current.isModalOpen).toBe(false)

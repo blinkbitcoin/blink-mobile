@@ -117,10 +117,11 @@ describe("TwoFactorReminderBulletin", () => {
     )
   })
 
-  it("reports nothing while the bulletin has no reason to be up", () => {
+  it("is not up, and reports nothing, while it has no reason to be", () => {
     mockReminderReason = null
-    render(<TwoFactorReminderBulletin />)
+    const { queryByText } = render(<TwoFactorReminderBulletin />)
 
+    expect(queryByText(TITLE)).toBeNull()
     expect(mockMarkPromptShown).not.toHaveBeenCalled()
   })
 

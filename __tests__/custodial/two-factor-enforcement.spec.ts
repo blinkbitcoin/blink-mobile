@@ -3,9 +3,10 @@ import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   isAboveAllTimeHigh,
   normalizeStoredRecord,
+  quotedHighBalanceThreshold,
   remainingDismissals,
   resolveBalanceTier,
-  resolveHighBalanceCurrency,
+  resolveHighBalanceCrossing,
   resolveReminderReason,
   resolveSessionPrompt,
   resolveUnmetTier,
@@ -101,60 +102,97 @@ describe("resolveBalanceTier", () => {
     expect(resolveBalanceTier(walletsWith(0, 300_000), lowered)).toBe(
       TwoFactorTier.HighBalance,
     )
-    expect(resolveHighBalanceCurrency(walletsWith(0, 300_000), lowered)).toBe(
-      WalletCurrency.Usd,
-    )
+    expect(resolveHighBalanceCrossing(walletsWith(0, 300_000), lowered)).toEqual({
+      currency: WalletCurrency.Usd,
+      threshold: 300_000,
+    })
   })
 })
 
-describe("resolveHighBalanceCurrency", () => {
-  it("names sats when the bitcoin wallet crossed the threshold", () => {
-    expect(resolveHighBalanceCurrency(walletsWith(5_000_000, 0), THRESHOLDS)).toBe(
-      WalletCurrency.Btc,
+describe("resolveHighBalanceCrossing", () => {
+  const SATS_CROSSING = {
+    currency: WalletCurrency.Btc,
+    threshold: THRESHOLDS.highBalanceSats,
+  }
+
+  it("names sats and their threshold when the bitcoin wallet crossed it", () => {
+    expect(resolveHighBalanceCrossing(walletsWith(5_000_000, 0), THRESHOLDS)).toEqual(
+      SATS_CROSSING,
     )
   })
 
-  it("names dollars when only the dollar wallet crossed it", () => {
-    expect(resolveHighBalanceCurrency(walletsWith(4_999_999, 500_000), THRESHOLDS)).toBe(
-      WalletCurrency.Usd,
-    )
+  it("names dollars and their threshold when only the dollar wallet crossed it", () => {
+    expect(
+      resolveHighBalanceCrossing(walletsWith(4_999_999, 500_000), THRESHOLDS),
+    ).toEqual({ currency: WalletCurrency.Usd, threshold: THRESHOLDS.highBalanceUsdCents })
   })
 
   it("names sats when both wallets crossed it", () => {
-    expect(resolveHighBalanceCurrency(walletsWith(5_000_000, 500_000), THRESHOLDS)).toBe(
-      WalletCurrency.Btc,
-    )
+    expect(
+      resolveHighBalanceCrossing(walletsWith(5_000_000, 500_000), THRESHOLDS),
+    ).toEqual(SATS_CROSSING)
   })
 
   it("falls back to sats when neither has", () => {
-    expect(resolveHighBalanceCurrency(walletsWith(0, 0), THRESHOLDS)).toBe(
-      WalletCurrency.Btc,
+    expect(resolveHighBalanceCrossing(walletsWith(0, 0), THRESHOLDS)).toEqual(
+      SATS_CROSSING,
     )
-    expect(resolveHighBalanceCurrency(undefined, THRESHOLDS)).toBe(WalletCurrency.Btc)
+    expect(resolveHighBalanceCrossing(undefined, THRESHOLDS)).toEqual(SATS_CROSSING)
   })
 })
 
 describe("withTierReached", () => {
-  it("raises the tier and leaves the named wallet alone below the high-balance tier", () => {
+  const USD_CROSSING = { currency: WalletCurrency.Usd, threshold: 500_000 }
+
+  it("raises the tier and leaves the crossing alone below the high-balance tier", () => {
     const record = withTierReached(
-      recordWith({ highBalanceCurrency: WalletCurrency.Usd }),
+      recordWith({ highBalanceCurrency: WalletCurrency.Usd, highBalanceThreshold: 0 }),
       TwoFactorTier.Reminder,
-      WalletCurrency.Btc,
+      { currency: WalletCurrency.Btc, threshold: 5_000_000 },
     )
 
     expect(record.highestTier).toBe(TwoFactorTier.Reminder)
     expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
+    expect(record.highBalanceThreshold).toBe(0)
   })
 
-  it("remembers the wallet that crossed into the high-balance tier", () => {
+  it("remembers the wallet that crossed into the high-balance tier and its threshold", () => {
     const record = withTierReached(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
       TwoFactorTier.HighBalance,
-      WalletCurrency.Usd,
+      USD_CROSSING,
     )
 
     expect(record.highestTier).toBe(TwoFactorTier.HighBalance)
     expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
+    expect(record.highBalanceThreshold).toBe(500_000)
+  })
+})
+
+describe("quotedHighBalanceThreshold", () => {
+  /** The console can move the threshold after the account crossed it; the tier stays,
+   *  so the copy keeps quoting the amount that raised it. */
+  it("quotes the threshold the account crossed, not the one configured now", () => {
+    const raised = { ...THRESHOLDS, highBalanceSats: 8_000_000 }
+
+    expect(
+      quotedHighBalanceThreshold(recordWith({ highBalanceThreshold: 5_000_000 }), raised),
+    ).toBe(5_000_000)
+  })
+
+  it("quotes the configured sats for a record from before the crossing was kept", () => {
+    expect(quotedHighBalanceThreshold(DEFAULT_TWO_FACTOR_ENFORCEMENT, THRESHOLDS)).toBe(
+      THRESHOLDS.highBalanceSats,
+    )
+  })
+
+  it("quotes the configured dollars when such a record names the dollar wallet", () => {
+    expect(
+      quotedHighBalanceThreshold(
+        recordWith({ highBalanceCurrency: WalletCurrency.Usd }),
+        THRESHOLDS,
+      ),
+    ).toBe(THRESHOLDS.highBalanceUsdCents)
   })
 })
 
@@ -379,6 +417,7 @@ describe("normalizeStoredRecord", () => {
       authenticatorDismissals: 1,
       highestSats: 800_000,
       highestUsdCents: 60_000,
+      highBalanceThreshold: 500_000,
     }
 
     expect(normalizeStoredRecord(record)).toEqual(record)
@@ -417,6 +456,13 @@ describe("normalizeStoredRecord", () => {
    *  session start at the reminder tier reads every wallet as a new high. */
   it("drops an all-time high that is not a whole, non-negative balance", () => {
     expect(normalizeStoredRecord({ highestSats: -5, highestUsdCents: "60" })).toEqual(
+      DEFAULT_TWO_FACTOR_ENFORCEMENT,
+    )
+  })
+
+  /** Dropped, the copy quotes the threshold configured now instead. */
+  it("drops a crossed threshold that is not a whole, non-negative amount", () => {
+    expect(normalizeStoredRecord({ highBalanceThreshold: 2.5 })).toEqual(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
     )
   })
