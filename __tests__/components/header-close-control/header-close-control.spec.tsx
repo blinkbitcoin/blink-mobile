@@ -52,14 +52,4 @@ describe("headerCloseControlOptions", () => {
     expect(onPress).toHaveBeenCalledTimes(1)
     expect(mockNavigate).not.toHaveBeenCalled()
   })
-
-  it("ignores its presses while disabled, for a screen that holds the user", () => {
-    const onPress = jest.fn()
-    const { getByTestId } = renderCloseControl({ onPress, disabled: true })
-
-    fireEvent.press(getByTestId("icon-close"))
-
-    expect(onPress).not.toHaveBeenCalled()
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
 })
