@@ -67,6 +67,10 @@ export type TwoFactorEnforcementRecord = {
   /** The wallet that carried the account over the enforced threshold, for the copy
    *  that names it after the balance may have moved on. */
   enforcedCurrency: WalletCurrency
+  /** The threshold that wallet crossed, in its own unit, for the same copy: the tier
+   *  stays once reached, so the copy quotes what was crossed, not what the threshold
+   *  has since been set to. Zero for a record from before it was kept. */
+  enforcedThreshold: number
   nudgeCardDismissed: boolean
   /** Dismissals counted at the recommended tier. */
   recommendedDismissals: number

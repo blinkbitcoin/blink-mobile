@@ -257,7 +257,9 @@ export type RootStackParamList = {
   }
   totpLoginValidate: { authToken: string }
   twoFactorSetup: undefined
-  twoFactorNonCustodial: undefined
+  /** Opened from the setup, which stays under it, or from the session modal, which
+   *  backing out of it dismisses. */
+  twoFactorNonCustodial?: { isFromSetup?: boolean }
   webView: {
     url: string
     initialTitle?: string

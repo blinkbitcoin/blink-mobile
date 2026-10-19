@@ -126,6 +126,26 @@ describe("custodialTwoFactorThresholds remote config", () => {
     expect(mockLogError).toHaveBeenCalled()
   })
 
+  /** A tier reached never lowers, so a typo that puts a higher tier below a lower one
+   *  would keep accounts escalated after the console is fixed. */
+  it("keeps the shipped thresholds as a whole when the console's do not rise tier by tier", async () => {
+    mockThresholdsJson.current = '{"enforcedSats":400000}'
+
+    expect(await readThresholds()).toEqual(defaultTwoFactorThresholds)
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        scope: "remote-config",
+        context: expect.objectContaining({ key: THRESHOLDS_KEY }),
+      }),
+    )
+  })
+
+  it("keeps the shipped thresholds when the dollar tiers do not rise either", async () => {
+    mockThresholdsJson.current = '{"suggestedUsdCents":60000}'
+
+    expect(await readThresholds()).toEqual(defaultTwoFactorThresholds)
+  })
+
   it("reads the shipped thresholds while Firebase holds only static values", async () => {
     mockSource.current = "static"
     mockThresholdsJson.current = '{"recommendedSats":400000}'

@@ -3,11 +3,6 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import {
-  defaultRemoteConfig,
-  defaultTwoFactorThresholds,
-  RemoteConfigContext,
-} from "@app/config/feature-flags-context"
 import { WalletCurrency } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -37,6 +32,7 @@ const mockEnforcement = {
   unmetTier: TwoFactorTier.Enforced as TwoFactorTier,
   remainingDismissals: 0,
   enforcedCurrency: WalletCurrency.Btc as WalletCurrency,
+  enforcedThreshold: 5_000_000,
   registerDismissal: mockRegisterDismissal,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
@@ -81,6 +77,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     mockEnforcement.unmetTier = TwoFactorTier.Enforced
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.enforcedCurrency = WalletCurrency.Btc
+    mockEnforcement.enforcedThreshold = 5_000_000
   })
 
   it("names the sats threshold under a warning sign, with no close control", async () => {
@@ -101,6 +98,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
 
   it("names the dollar threshold under a dollar sign, sign first and without cents, when only the dollar wallet crossed", async () => {
     mockEnforcement.enforcedCurrency = WalletCurrency.Usd
+    mockEnforcement.enforcedThreshold = 500_000
     await renderScreen()
 
     expect(screen.getByTestId("icon-dollar")).toBeTruthy()
@@ -110,19 +108,11 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     ).toBeTruthy()
   })
 
-  /** The thresholds are configuration: the title quotes the one the console set. */
-  it("quotes the enforced threshold as configured", async () => {
-    const thresholds = { ...defaultTwoFactorThresholds, enforcedSats: 3_000_000 }
-    render(
-      <RemoteConfigContext.Provider
-        value={{ ...defaultRemoteConfig, custodialTwoFactorThresholds: thresholds }}
-      >
-        <ContextForScreen>
-          <TwoFactorProtectionRequiredScreen />
-        </ContextForScreen>
-      </RemoteConfigContext.Provider>,
-    )
-    await flushEffects()
+  /** The thresholds are configuration: the title quotes the one the account crossed,
+   *  which the provider keeps. */
+  it("quotes the enforced threshold the account crossed", async () => {
+    mockEnforcement.enforcedThreshold = 3_000_000
+    await renderScreen()
 
     expect(
       screen.getByText(

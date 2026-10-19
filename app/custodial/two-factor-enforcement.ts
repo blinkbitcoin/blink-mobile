@@ -70,28 +70,53 @@ export const resolveBalanceTier = (
   return reached?.tier ?? TwoFactorTier.None
 }
 
-/** The wallet the high-balance screen names: sats whenever the bitcoin wallet crossed
- *  its threshold, which is also the rule when both did. */
-export const resolveEnforcedCurrency = (
+/** The wallet the high-balance screen names and the threshold it crossed, in its own
+ *  unit: sats whenever the bitcoin wallet crossed, which is also the rule when both
+ *  did. */
+export type EnforcedCrossing = {
+  currency: WalletCurrency
+  threshold: number
+}
+
+export const resolveEnforcedCrossing = (
   wallets: readonly WalletBalance[] | undefined,
   thresholds: TwoFactorThresholds,
-): WalletCurrency => {
+): EnforcedCrossing => {
   const { sats, usdCents } = balancesOf(wallets)
   const isOnlyDollarWalletOver =
     usdCents >= thresholds.enforcedUsdCents && sats < thresholds.enforcedSats
-  return isOnlyDollarWalletOver ? WalletCurrency.Usd : WalletCurrency.Btc
+  return isOnlyDollarWalletOver
+    ? { currency: WalletCurrency.Usd, threshold: thresholds.enforcedUsdCents }
+    : { currency: WalletCurrency.Btc, threshold: thresholds.enforcedSats }
 }
 
 /** Raises the remembered tier, and with it the wallet that crossed into the
- *  enforced tier, so the copy still names the right one once the balance moves. */
+ *  enforced tier and the threshold it crossed, so the copy still names them once
+ *  the balance or the threshold moves. */
 export const withTierReached = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
-  enforcedCurrency: WalletCurrency,
+  crossing: EnforcedCrossing,
 ): TwoFactorEnforcementRecord => {
   const raised = { ...record, highestTier: tier }
   if (tier !== TwoFactorTier.Enforced) return raised
-  return { ...raised, enforcedCurrency }
+  return {
+    ...raised,
+    enforcedCurrency: crossing.currency,
+    enforcedThreshold: crossing.threshold,
+  }
+}
+
+/** The threshold the high-balance copy quotes: the one the account crossed, or, for a
+ *  record from before that was kept, the one configured now for the wallet it names. */
+export const quotedEnforcedThreshold = (
+  record: TwoFactorEnforcementRecord,
+  thresholds: TwoFactorThresholds,
+): number => {
+  if (record.enforcedThreshold > 0) return record.enforcedThreshold
+  return record.enforcedCurrency === WalletCurrency.Usd
+    ? thresholds.enforcedUsdCents
+    : thresholds.enforcedSats
 }
 
 type UnmetTierInputs = {
@@ -121,8 +146,8 @@ export const remainingDismissals = (
 ): number => Math.max(0, MAX_DISMISSALS_PER_TIER - dismissalsOf(record, tier))
 
 /** Each tier counts its own dismissals: the enforced tier starts from zero however
- *  many times the recommended tier's prompt was waved away. Tiers that never prompt at
- *  session start leave the record untouched. */
+ *  many times the recommended tier's bulletin was waved away. The suggested tier's card
+ *  is closed for good instead, so a dismissal of it leaves the counts untouched. */
 export const withDismissal = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
@@ -203,6 +228,7 @@ export const resolveReminderReason = ({
 export const DEFAULT_TWO_FACTOR_ENFORCEMENT: TwoFactorEnforcementRecord = {
   highestTier: TwoFactorTier.None,
   enforcedCurrency: WalletCurrency.Btc,
+  enforcedThreshold: 0,
   nudgeCardDismissed: false,
   recommendedDismissals: 0,
   enforcedDismissals: 0,
@@ -238,6 +264,9 @@ export const normalizeStoredRecord = (
   enforcedCurrency: isWalletCurrency(stored?.enforcedCurrency)
     ? stored.enforcedCurrency
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.enforcedCurrency,
+  enforcedThreshold: isWholeCount(stored?.enforcedThreshold)
+    ? stored.enforcedThreshold
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.enforcedThreshold,
   nudgeCardDismissed: stored?.nudgeCardDismissed === true,
   recommendedDismissals: isWholeCount(stored?.recommendedDismissals)
     ? stored.recommendedDismissals

@@ -84,7 +84,8 @@ describe("TwoFactorNudgeCard", () => {
     render(<TwoFactorNudgeCard />)
 
     expect(mockMarkPromptShown).toHaveBeenCalledTimes(1)
-    expect(mockMarkPromptShown).toHaveBeenCalledWith("home_card")
+    /** The nudge has no reason to report: only the reminder bulletin carries one. */
+    expect(mockMarkPromptShown).toHaveBeenCalledWith("home_card", undefined)
   })
 
   it("opens the setup screen from Set", () => {

@@ -19,7 +19,10 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import theme from "@app/rne-theme/theme"
 import { TotpRegistrationValidateScreen } from "@app/screens/totp-screen/totp-registration-validate"
-import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
+import {
+  TwoFactorNonCustodialScreen,
+  TwoFactorSetupScreen,
+} from "@app/screens/two-factor-enforcement"
 import { TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 /**
@@ -59,6 +62,8 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: jest.fn(),
   logTwoFactorSetupCompleted: jest.fn(),
+  logTwoFactorPromptShown: jest.fn(),
+  logTwoFactorNonCustodialChosen: jest.fn(),
 }))
 
 /** The code screen's own collaborators, as its sibling spec mocks them. */
@@ -125,8 +130,6 @@ const TotpInitiateStub = ({
   </Pressable>
 )
 
-const NonCustodialStub = () => <Text>non-custodial</Text>
-
 const renderStack = async () => {
   render(
     <ThemeProvider theme={theme}>
@@ -146,7 +149,10 @@ const renderStack = async () => {
               name="totpRegistrationValidate"
               component={TotpRegistrationValidateScreen}
             />
-            <Stack.Screen name="twoFactorNonCustodial" component={NonCustodialStub} />
+            <Stack.Screen
+              name="twoFactorNonCustodial"
+              component={TwoFactorNonCustodialScreen}
+            />
           </Stack.Navigator>
         </NavigationContainer>
       </TypesafeI18n>
@@ -213,6 +219,23 @@ describe("TwoFactorSetupScreen in a stack", () => {
     })
 
     expect(currentRoute()).toBe("twoFactorNonCustodial")
+  })
+
+  /** The setup stays under the explanation: backing out of it lands back on the setup,
+   *  and only leaving the setup counts. */
+  it("lands back on the setup when leaving custody is backed out of, charging nothing", async () => {
+    await renderStack()
+    await openSetup()
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
+    })
+
+    expect(currentRoute()).toBe("twoFactorSetup")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   it("lets the close control out, charging the exit to the tier", async () => {

@@ -10,7 +10,6 @@ import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
-import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
@@ -21,11 +20,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import {
-  TwoFactorMethod,
-  TwoFactorPrompt,
-  TwoFactorThresholds,
-} from "@app/types/two-factor-enforcement"
+import { TwoFactorMethod, TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorPromptShown,
@@ -41,11 +36,11 @@ const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 const highBalanceIcon = (currency: WalletCurrency): IconNamesType =>
   currency === WalletCurrency.Usd ? "dollar" : "warning"
 
-/** The threshold the title quotes, as configured, in the wallet that crossed it. */
-const enforcedThreshold = (currency: WalletCurrency, thresholds: TwoFactorThresholds) =>
+/** The threshold the title quotes, as an amount of the wallet that crossed it. */
+const highBalanceAmount = (currency: WalletCurrency, threshold: number) =>
   currency === WalletCurrency.Usd
-    ? toUsdMoneyAmount(thresholds.enforcedUsdCents)
-    : toBtcMoneyAmount(thresholds.enforcedSats)
+    ? toUsdMoneyAmount(threshold)
+    : toBtcMoneyAmount(threshold)
 
 /**
  * The blocking screen of the enforced tier, standing in for the home at every
@@ -62,8 +57,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
-  const { custodialTwoFactorThresholds } = useRemoteConfig()
-  const { unmetTier, enforcedCurrency } = useTwoFactorEnforcement()
+  const { unmetTier, enforcedCurrency, enforcedThreshold } = useTwoFactorEnforcement()
 
   useEffect(() => {
     logTwoFactorPromptShown({
@@ -115,10 +109,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
         iconColor={colors.primary}
         title={LL.TwoFactorEnforcement.highBalanceTitle({
           amount: formatMoneyAmount({
-            moneyAmount: enforcedThreshold(
-              enforcedCurrency,
-              custodialTwoFactorThresholds,
-            ),
+            moneyAmount: highBalanceAmount(enforcedCurrency, enforcedThreshold),
             noFractionDigits: true,
           }),
         })}

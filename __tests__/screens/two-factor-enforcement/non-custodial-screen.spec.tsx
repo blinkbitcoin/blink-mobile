@@ -14,10 +14,12 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+let mockRouteParams: { isFromSetup?: boolean } | undefined
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useRoute: () => ({ params: mockRouteParams }),
 }))
 
 const mockUseHardwareBackGuard = jest.fn()
@@ -28,7 +30,7 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 const mockRegisterDismissal = jest.fn()
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => ({
-    unmetTier: 2,
+    unmetTier: 3,
     registerDismissal: mockRegisterDismissal,
   }),
 }))
@@ -54,6 +56,7 @@ describe("TwoFactorNonCustodialScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockRouteParams = undefined
   })
 
   it("renders the key hero with the non-custodial copy and logs it as shown once", async () => {
@@ -64,7 +67,7 @@ describe("TwoFactorNonCustodialScreen", () => {
     expect(screen.getByText(LL.TwoFactorEnforcement.nonCustodialBody())).toBeTruthy()
     expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
     expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
+      tier: TwoFactorTier.Enforced,
       prompt: "non_custodial_screen",
     })
   })
@@ -75,7 +78,7 @@ describe("TwoFactorNonCustodialScreen", () => {
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-move"))
 
     expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
+      tier: TwoFactorTier.Enforced,
     })
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
@@ -86,7 +89,7 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -95,7 +98,7 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-close"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -105,7 +108,20 @@ describe("TwoFactorNonCustodialScreen", () => {
     const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
     onBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Recommended)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  /** The setup is still up under it, and leaving the setup is what counts. */
+  it("only returns to the setup it was opened from, charging nothing", async () => {
+    mockRouteParams = { isFromSetup: true }
+    await renderScreen()
+
+    fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
+    const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
+    onBack()
+
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(2)
   })
 })
