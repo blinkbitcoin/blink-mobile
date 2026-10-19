@@ -58,6 +58,7 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: jest.fn(),
+  logTwoFactorSetupCompleted: jest.fn(),
 }))
 
 /** The code screen's own collaborators, as its sibling spec mocks them. */

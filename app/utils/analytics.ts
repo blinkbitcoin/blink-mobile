@@ -229,3 +229,15 @@ export const logTwoFactorNonCustodialChosen = (
     tier: params.tier,
   })
 }
+
+type LogTwoFactorSetupCompletedParams = {
+  tier: TwoFactorTier
+}
+
+/** An authenticator added to the account, from a prompt or from the settings alike: the
+ *  adoption the prompts are measured by. */
+export const logTwoFactorSetupCompleted = (params: LogTwoFactorSetupCompletedParams) => {
+  analytics().logEvent("two_factor_setup_completed", {
+    tier: params.tier,
+  })
+}

@@ -20,6 +20,7 @@ import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
+  logTwoFactorSetupCompleted,
   logTwoFactorSetupStarted,
   logUpgradeLoginAttempt,
   logUpgradeLoginSuccess,
@@ -314,6 +315,14 @@ describe("analytics helpers", () => {
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
         tier: 2,
         prompt: "settings_banner",
+      })
+    })
+
+    it("emits 'two_factor_setup_completed' with the tier", () => {
+      logTwoFactorSetupCompleted({ tier: 2 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
+        tier: 2,
       })
     })
 
