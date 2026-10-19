@@ -32,7 +32,6 @@ import { loadJsonOrThrow, saveJson } from "@app/utils/storage"
 
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
-  hasTwoFactor,
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
@@ -93,9 +92,9 @@ type ShownPrompts = {
 
 export type TwoFactorEnforcementState = {
   tier: TwoFactorTier
-  /** The highest tier whose condition the account still fails, None once it complies. */
+  /** The tier the account still owes, None once it holds an authenticator. */
   unmetTier: TwoFactorTier
-  hasTwoFactor: boolean
+  hasAuthenticator: boolean
   missingMethod: TwoFactorMethod
   /** An address the account holds but never verified. It cannot be registered again as
    *  new, so the setup has to send it through re-verification instead. */
@@ -134,7 +133,7 @@ export type TwoFactorEnforcementState = {
 const INERT_STATE: TwoFactorEnforcementState = {
   tier: TwoFactorTier.None,
   unmetTier: TwoFactorTier.None,
-  hasTwoFactor: false,
+  hasAuthenticator: false,
   missingMethod: TwoFactorMethod.Email,
   unverifiedEmail: null,
   highBalanceCurrency: WalletCurrency.Btc,
@@ -293,19 +292,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const emailAddress = me?.email?.address ?? null
   const isEmailVerified = Boolean(me?.email?.verified)
   const hasAuthenticator = Boolean(me?.totpEnabled)
-  const factors = {
-    hasPhone: Boolean(me?.phone),
-    hasVerifiedEmail: isEmailVerified,
-    hasAuthenticator,
-  }
-  const isTwoFactorSet = hasTwoFactor(factors)
-  const missingMethod = resolveMissingMethod(factors)
+  const missingMethod = resolveMissingMethod({ hasVerifiedEmail: isEmailVerified })
   const hasUnverifiedEmail = emailAddress !== null && !isEmailVerified
   const unverifiedEmail = hasUnverifiedEmail ? emailAddress : null
 
   const isEnforced = isEnabled && isLoadedForAccount
   const unmetTier = isEnforced
-    ? resolveUnmetTier({ tier, hasTwoFactor: isTwoFactorSet, hasAuthenticator })
+    ? resolveUnmetTier({ tier, hasAuthenticator })
     : TwoFactorTier.None
   const dismissalsLeft = remainingDismissals(record, unmetTier)
   const requiredPrompt = resolveSessionPrompt({ unmetTier, record })
@@ -344,13 +337,10 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
 
   /** The card belongs to the nudge tier alone: from the reminder tier on, the session
    *  prompt is the one asking, and the home never stacks two. The banner asks at every
-   *  tier until the account holds two factors, since the setup it opens leads with the
-   *  authenticator, which is what the highest tier asks for; an account that already
-   *  holds two factors is asked for its authenticator by the session prompt alone. */
+   *  tier until the account holds an authenticator. */
   const shouldShowNudgeCard =
     unmetTier === TwoFactorTier.Nudge && !record.nudgeCardDismissed
-  const isUnmet = unmetTier !== TwoFactorTier.None
-  const shouldShowSettingsBanner = isUnmet && !isTwoFactorSet
+  const shouldShowSettingsBanner = unmetTier !== TwoFactorTier.None
 
   /** Another account's impressions start afresh; the same account coming back through
    *  a gate that closed and opened again within the session keeps its own. With the
@@ -451,7 +441,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     () => ({
       tier,
       unmetTier,
-      hasTwoFactor: isTwoFactorSet,
+      hasAuthenticator,
       missingMethod,
       unverifiedEmail,
       highBalanceCurrency: record.highBalanceCurrency,
@@ -470,7 +460,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     [
       tier,
       unmetTier,
-      isTwoFactorSet,
+      hasAuthenticator,
       missingMethod,
       unverifiedEmail,
       record.highBalanceCurrency,

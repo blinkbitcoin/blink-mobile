@@ -335,7 +335,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowSettingsBanner).toBe(false)
     })
 
-    it("shows the card and the banner at the nudge tier without two factors", async () => {
+    it("shows the card and the banner at the nudge tier without an authenticator", async () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.tier).toBe(TwoFactorTier.Nudge)
@@ -366,8 +366,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.remainingDismissals).toBe(3)
     })
 
-    /** The banner stays until the account holds two factors, whatever the tier: the
-     *  setup it opens leads with the authenticator, which the highest tier asks for. */
+    /** The banner stays until the account holds an authenticator, whatever the tier. */
     it("owes the protection screen at the high-balance tier, with the banner but no card", async () => {
       setAccount({ sats: 5_000_000 })
 
@@ -382,15 +381,13 @@ describe("TwoFactorEnforcementProvider", () => {
       )
     })
 
-    /** The ticket's one exception: an account that already holds two factors is asked
-     *  for its authenticator by the session prompt alone. */
-    it("drops the banner at the high-balance tier once the account holds two factors", async () => {
+    it("keeps the banner at the high-balance tier for an account with a phone and a verified email", async () => {
       setAccount({ sats: 5_000_000, phone: PHONE, email: verifiedEmail })
 
       const { result } = await renderEnforcement()
 
       expect(result.current.unmetTier).toBe(TwoFactorTier.HighBalance)
-      expect(result.current.shouldShowSettingsBanner).toBe(false)
+      expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
 
     it("keeps the highest tier the account ever reached", async () => {
@@ -453,36 +450,39 @@ describe("TwoFactorEnforcementProvider", () => {
   })
 
   describe("factors", () => {
-    it("never prompts an account with a phone and a verified email below the high-balance tier", async () => {
+    /** An attacker who takes an account over can change both its email and its phone,
+     *  so those two together are no second factor: the account is prompted. */
+    it("prompts an account with a phone and a verified email but no authenticator", async () => {
       setAccount({ sats: 500_000, phone: PHONE, email: verifiedEmail })
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.hasTwoFactor).toBe(true)
-      expect(result.current.unmetTier).toBe(TwoFactorTier.None)
-      expect(result.current.shouldShowNudgeCard).toBe(false)
-      expect(result.current.shouldShowSettingsBanner).toBe(false)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+      expect(result.current.hasAuthenticator).toBe(false)
+      expect(result.current.unmetTier).toBe(TwoFactorTier.Reminder)
+      expect(result.current.shouldShowSettingsBanner).toBe(true)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
-    it("still asks for an authenticator at the high-balance tier with two factors", async () => {
+    it("asks for an authenticator at the high-balance tier from an account with a phone and a verified email", async () => {
       setAccount({ sats: 5_000_000, phone: PHONE, email: verifiedEmail })
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.hasTwoFactor).toBe(true)
+      expect(result.current.hasAuthenticator).toBe(false)
       expect(result.current.unmetTier).toBe(TwoFactorTier.HighBalance)
       expect(result.current.requiredPrompt).toBe(
         TwoFactorSessionPrompt.ProtectionRequired,
       )
     })
 
-    it("asks for nothing at the high-balance tier once an authenticator is set", async () => {
-      setAccount({ sats: 5_000_000, phone: PHONE, totpEnabled: true })
+    it("asks for nothing at any tier once an authenticator is set, whatever else the account holds", async () => {
+      setAccount({ sats: 5_000_000, totpEnabled: true })
 
       const { result } = await renderEnforcement()
 
+      expect(result.current.hasAuthenticator).toBe(true)
       expect(result.current.unmetTier).toBe(TwoFactorTier.None)
+      expect(result.current.shouldShowSettingsBanner).toBe(false)
       expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
     })
 
@@ -491,7 +491,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.hasTwoFactor).toBe(false)
+      expect(result.current.hasAuthenticator).toBe(false)
       expect(result.current.shouldShowNudgeCard).toBe(true)
       expect(result.current.missingMethod).toBe(TwoFactorMethod.Email)
       expect(result.current.unverifiedEmail).toBe(EMAIL)
@@ -506,7 +506,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.hasTwoFactor).toBe(false)
+      expect(result.current.hasAuthenticator).toBe(false)
       expect(result.current.unverifiedEmail).toBe(EMAIL)
     })
 
@@ -676,7 +676,7 @@ describe("TwoFactorEnforcementProvider", () => {
     })
 
     it("lets the home in once the gate's dismissal takes the start, with the dismissal charged", async () => {
-      setAccount({ sats: 5_000_000, phone: PHONE, email: verifiedEmail })
+      setAccount({ sats: 5_000_000 })
       const { result } = await renderEnforcement()
       expect(result.current.isProtectionGateActive).toBe(true)
 
@@ -688,11 +688,11 @@ describe("TwoFactorEnforcementProvider", () => {
     })
 
     it("keeps the protection screen down for a tier crossed after the start was taken", async () => {
-      setAccount({ sats: 500_000, phone: PHONE, email: verifiedEmail })
+      setAccount({ sats: 500_000 })
       const { result, rerender } = await renderEnforcement()
       act(() => result.current.consumeSessionStart())
 
-      setAccount({ sats: 5_000_000, phone: PHONE, email: verifiedEmail })
+      setAccount({ sats: 5_000_000 })
       await act(async () => rerender({}))
 
       expect(result.current.requiredPrompt).toBe(
@@ -1047,7 +1047,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
     })
 
     it("charges the dismissal to the tier of the prompt that was waved away", async () => {
-      setAccount({ sats: 5_000_000, phone: PHONE, email: verifiedEmail })
+      setAccount({ sats: 5_000_000 })
       storeRecord({ highestTier: TwoFactorTier.HighBalance, requiredDismissals: 3 })
       const { result } = await renderEnforcement()
       expect(result.current.remainingDismissals).toBe(3)

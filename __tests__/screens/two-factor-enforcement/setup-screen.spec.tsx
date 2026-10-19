@@ -43,7 +43,7 @@ const pressHardwareBack = () => {
 const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.Nudge as TwoFactorTier,
-  hasTwoFactor: false,
+  hasAuthenticator: false,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
   markPromptShown: jest.fn(),
@@ -110,7 +110,7 @@ describe("TwoFactorSetupScreen", () => {
     mockIsReverifying = false
     mockIsAskedHere = true
     mockEnforcement.unmetTier = TwoFactorTier.Nudge
-    mockEnforcement.hasTwoFactor = false
+    mockEnforcement.hasAuthenticator = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
   })
@@ -235,10 +235,10 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
-  it("steps aside once the account holds two factors", async () => {
+  it("steps aside once the account holds an authenticator", async () => {
     const rendered = await renderScreen()
 
-    mockEnforcement.hasTwoFactor = true
+    mockEnforcement.hasAuthenticator = true
     await rerenderScreen(rendered)
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
@@ -246,7 +246,7 @@ describe("TwoFactorSetupScreen", () => {
   })
 
   it("steps aside for a complete account only once the hold has lifted", async () => {
-    mockEnforcement.hasTwoFactor = true
+    mockEnforcement.hasAuthenticator = true
     mockIsReverifying = true
     const rendered = await renderScreen()
 
@@ -258,9 +258,9 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
-  it("stays put while another screen is on top, even with two factors", async () => {
+  it("stays put while another screen is on top, even with an authenticator", async () => {
     mockIsFocused = false
-    mockEnforcement.hasTwoFactor = true
+    mockEnforcement.hasAuthenticator = true
 
     await renderScreen()
 
