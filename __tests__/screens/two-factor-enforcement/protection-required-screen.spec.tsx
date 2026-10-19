@@ -2,6 +2,11 @@ import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import {
+  defaultRemoteConfig,
+  defaultTwoFactorThresholds,
+  RemoteConfigContext,
+} from "@app/config/feature-flags-context"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { WalletCurrency } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -163,6 +168,28 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       expect(screen.queryByTestId("icon-warning")).toBeNull()
       expect(
         screen.getByText(LL.TwoFactorEnforcement.highBalanceTitle({ amount: "$5,000" })),
+      ).toBeTruthy()
+    })
+
+    /** The thresholds are configuration: the title quotes the one the console set. */
+    it("quotes the enforced threshold as configured", async () => {
+      atEnforcedTier(0)
+      const thresholds = { ...defaultTwoFactorThresholds, enforcedSats: 3_000_000 }
+      render(
+        <RemoteConfigContext.Provider
+          value={{ ...defaultRemoteConfig, custodialTwoFactorThresholds: thresholds }}
+        >
+          <ContextForScreen>
+            <TwoFactorProtectionRequiredScreen />
+          </ContextForScreen>
+        </RemoteConfigContext.Provider>,
+      )
+      await flushEffects()
+
+      expect(
+        screen.getByText(
+          LL.TwoFactorEnforcement.highBalanceTitle({ amount: "3,000,000 SAT" }),
+        ),
       ).toBeTruthy()
     })
 

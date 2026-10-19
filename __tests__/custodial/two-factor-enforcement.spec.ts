@@ -1,5 +1,5 @@
+import { defaultTwoFactorThresholds } from "@app/config/feature-flags-context"
 import {
-  ENFORCED_THRESHOLD,
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   normalizeStoredRecord,
   remainingDismissals,
@@ -22,71 +22,111 @@ const walletsWith = (sats: number, usdCents: number) => [
   { id: "usd-wallet", walletCurrency: WalletCurrency.Usd, balance: usdCents },
 ]
 
+const THRESHOLDS = defaultTwoFactorThresholds
+
 const recordWith = (
   overrides: Partial<TwoFactorEnforcementRecord>,
 ): TwoFactorEnforcementRecord => ({ ...DEFAULT_TWO_FACTOR_ENFORCEMENT, ...overrides })
 
 describe("resolveBalanceTier", () => {
   it("is none without wallets", () => {
-    expect(resolveBalanceTier(undefined)).toBe(TwoFactorTier.None)
-    expect(resolveBalanceTier([])).toBe(TwoFactorTier.None)
+    expect(resolveBalanceTier(undefined, THRESHOLDS)).toBe(TwoFactorTier.None)
+    expect(resolveBalanceTier([], THRESHOLDS)).toBe(TwoFactorTier.None)
   })
 
   it("stays none one unit below the first threshold on both wallets", () => {
-    expect(resolveBalanceTier(walletsWith(49_999, 4_999))).toBe(TwoFactorTier.None)
+    expect(resolveBalanceTier(walletsWith(49_999, 4_999), THRESHOLDS)).toBe(
+      TwoFactorTier.None,
+    )
   })
 
   it("reaches nudge from the bitcoin wallet alone", () => {
-    expect(resolveBalanceTier(walletsWith(50_000, 0))).toBe(TwoFactorTier.Suggested)
+    expect(resolveBalanceTier(walletsWith(50_000, 0), THRESHOLDS)).toBe(
+      TwoFactorTier.Suggested,
+    )
   })
 
   it("reaches nudge from the dollar wallet alone", () => {
-    expect(resolveBalanceTier(walletsWith(0, 5_000))).toBe(TwoFactorTier.Suggested)
+    expect(resolveBalanceTier(walletsWith(0, 5_000), THRESHOLDS)).toBe(
+      TwoFactorTier.Suggested,
+    )
   })
 
   it("never adds the wallets together", () => {
-    expect(resolveBalanceTier(walletsWith(499_999, 49_999))).toBe(TwoFactorTier.Suggested)
+    expect(resolveBalanceTier(walletsWith(499_999, 49_999), THRESHOLDS)).toBe(
+      TwoFactorTier.Suggested,
+    )
   })
 
   it("reaches the recommended tier at 500,000 sats or $500", () => {
-    expect(resolveBalanceTier(walletsWith(500_000, 0))).toBe(TwoFactorTier.Recommended)
-    expect(resolveBalanceTier(walletsWith(0, 50_000))).toBe(TwoFactorTier.Recommended)
+    expect(resolveBalanceTier(walletsWith(500_000, 0), THRESHOLDS)).toBe(
+      TwoFactorTier.Recommended,
+    )
+    expect(resolveBalanceTier(walletsWith(0, 50_000), THRESHOLDS)).toBe(
+      TwoFactorTier.Recommended,
+    )
   })
 
   it("reaches the enforced tier at 5,000,000 sats or $5,000", () => {
-    expect(resolveBalanceTier(walletsWith(5_000_000, 0))).toBe(TwoFactorTier.Enforced)
-    expect(resolveBalanceTier(walletsWith(0, 500_000))).toBe(TwoFactorTier.Enforced)
+    expect(resolveBalanceTier(walletsWith(5_000_000, 0), THRESHOLDS)).toBe(
+      TwoFactorTier.Enforced,
+    )
+    expect(resolveBalanceTier(walletsWith(0, 500_000), THRESHOLDS)).toBe(
+      TwoFactorTier.Enforced,
+    )
   })
 
   it("takes the highest tier either wallet reaches", () => {
-    expect(resolveBalanceTier(walletsWith(50_000, 500_000))).toBe(TwoFactorTier.Enforced)
+    expect(resolveBalanceTier(walletsWith(50_000, 500_000), THRESHOLDS)).toBe(
+      TwoFactorTier.Enforced,
+    )
   })
 
-  it("exposes the enforced threshold the copy quotes", () => {
-    expect(ENFORCED_THRESHOLD).toEqual({ sats: 5_000_000, usdCents: 500_000 })
+  /** The thresholds are configuration: whatever the console sets is where each tier
+   *  starts, for both wallets alike. */
+  it("starts each tier where the configured thresholds say", () => {
+    const lowered = {
+      ...THRESHOLDS,
+      recommendedSats: 400_000,
+      enforcedUsdCents: 300_000,
+    }
+
+    expect(resolveBalanceTier(walletsWith(450_000, 0), lowered)).toBe(
+      TwoFactorTier.Recommended,
+    )
+    expect(resolveBalanceTier(walletsWith(0, 300_000), lowered)).toBe(
+      TwoFactorTier.Enforced,
+    )
+    expect(resolveEnforcedCurrency(walletsWith(0, 300_000), lowered)).toBe(
+      WalletCurrency.Usd,
+    )
   })
 })
 
 describe("resolveEnforcedCurrency", () => {
   it("names sats when the bitcoin wallet crossed the threshold", () => {
-    expect(resolveEnforcedCurrency(walletsWith(5_000_000, 0))).toBe(WalletCurrency.Btc)
+    expect(resolveEnforcedCurrency(walletsWith(5_000_000, 0), THRESHOLDS)).toBe(
+      WalletCurrency.Btc,
+    )
   })
 
   it("names dollars when only the dollar wallet crossed it", () => {
-    expect(resolveEnforcedCurrency(walletsWith(4_999_999, 500_000))).toBe(
+    expect(resolveEnforcedCurrency(walletsWith(4_999_999, 500_000), THRESHOLDS)).toBe(
       WalletCurrency.Usd,
     )
   })
 
   it("names sats when both wallets crossed it", () => {
-    expect(resolveEnforcedCurrency(walletsWith(5_000_000, 500_000))).toBe(
+    expect(resolveEnforcedCurrency(walletsWith(5_000_000, 500_000), THRESHOLDS)).toBe(
       WalletCurrency.Btc,
     )
   })
 
   it("falls back to sats when neither has", () => {
-    expect(resolveEnforcedCurrency(walletsWith(0, 0))).toBe(WalletCurrency.Btc)
-    expect(resolveEnforcedCurrency(undefined)).toBe(WalletCurrency.Btc)
+    expect(resolveEnforcedCurrency(walletsWith(0, 0), THRESHOLDS)).toBe(
+      WalletCurrency.Btc,
+    )
+    expect(resolveEnforcedCurrency(undefined, THRESHOLDS)).toBe(WalletCurrency.Btc)
   })
 })
 
@@ -95,7 +135,7 @@ describe("withTierReached", () => {
     const record = withTierReached(
       recordWith({ enforcedCurrency: WalletCurrency.Usd }),
       TwoFactorTier.Recommended,
-      walletsWith(500_000, 0),
+      WalletCurrency.Btc,
     )
 
     expect(record.highestTier).toBe(TwoFactorTier.Recommended)
@@ -106,7 +146,7 @@ describe("withTierReached", () => {
     const record = withTierReached(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
       TwoFactorTier.Enforced,
-      walletsWith(0, 500_000),
+      WalletCurrency.Usd,
     )
 
     expect(record.highestTier).toBe(TwoFactorTier.Enforced)
