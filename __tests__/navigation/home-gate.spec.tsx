@@ -13,19 +13,16 @@ import {
 
 import { HomeGate } from "@app/navigation/home-gate"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 /**
  * The enforcement as a store every mounted screen subscribes to, the way the provider's
  * context reaches them: a change under a mounted stack re-renders the gate in place.
  */
 type TwoFactorState = {
-  unmetTier: TwoFactorTier
   isPreparingSessionStart: boolean
   isProtectionGateActive: boolean
 }
 const AT_REST: TwoFactorState = {
-  unmetTier: TwoFactorTier.Reminder,
   isPreparingSessionStart: false,
   isProtectionGateActive: false,
 }
@@ -58,8 +55,8 @@ jest.mock("@app/screens/account-migration/to-non-custodial/migration-gate", () =
   }
 })
 
-/** The protection screen as the gate mounts it: each mount is counted, since the gate
- *  must remount it for a tier raised past the one on screen. */
+/** The blocking screen as the gate mounts it: each mount is counted, since the gate
+ *  must keep the one it stood in under the flows it started. */
 const mockProtectionMounts = jest.fn()
 jest.mock("@app/screens/two-factor-enforcement", () => {
   const ReactActual = jest.requireActual("react")
@@ -226,16 +223,5 @@ describe("HomeGate", () => {
 
     expect(screen.getByText("protection screen")).toBeTruthy()
     expect(mockProtectionMounts).toHaveBeenCalledTimes(1)
-  })
-
-  it("remounts the protection screen for a tier raised past the one on screen", async () => {
-    mockTwoFactor.current = { ...AT_REST, isProtectionGateActive: true }
-    await renderStack()
-    expect(mockProtectionMounts).toHaveBeenCalledTimes(1)
-
-    setTwoFactor({ unmetTier: TwoFactorTier.HighBalance })
-
-    expect(mockProtectionMounts).toHaveBeenCalledTimes(2)
-    expect(screen.getByText("protection screen")).toBeTruthy()
   })
 })

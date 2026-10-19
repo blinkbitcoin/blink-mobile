@@ -2,12 +2,12 @@ import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import {
   defaultRemoteConfig,
   defaultTwoFactorThresholds,
   RemoteConfigContext,
 } from "@app/config/feature-flags-context"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { WalletCurrency } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -34,7 +34,7 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 
 const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
-  unmetTier: TwoFactorTier.Reminder as TwoFactorTier,
+  unmetTier: TwoFactorTier.HighBalance as TwoFactorTier,
   remainingDismissals: 0,
   highBalanceCurrency: WalletCurrency.Btc as WalletCurrency,
   registerDismissal: mockRegisterDismissal,
@@ -44,13 +44,10 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 }))
 
 const mockLogTwoFactorPromptShown = jest.fn()
-const mockLogTwoFactorPromptDismissed = jest.fn()
 const mockLogTwoFactorSetupStarted = jest.fn()
 const mockLogTwoFactorNonCustodialChosen = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorPromptShown: (...args: unknown[]) => mockLogTwoFactorPromptShown(...args),
-  logTwoFactorPromptDismissed: (...args: unknown[]) =>
-    mockLogTwoFactorPromptDismissed(...args),
   logTwoFactorSetupStarted: (...args: unknown[]) => mockLogTwoFactorSetupStarted(...args),
   logTwoFactorNonCustodialChosen: (...args: unknown[]) =>
     mockLogTwoFactorNonCustodialChosen(...args),
@@ -75,183 +72,123 @@ const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
   await flushEffects()
 }
 
-const atAuthenticatorTier = (remaining: number) => {
-  mockEnforcement.unmetTier = TwoFactorTier.HighBalance
-  mockEnforcement.remainingDismissals = remaining
-}
-
+/** The blocking screen is the high-balance tier's alone, once its modal has spent its
+ *  dismissals. */
 describe("TwoFactorProtectionRequiredScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    mockEnforcement.unmetTier = TwoFactorTier.Reminder
+    mockEnforcement.unmetTier = TwoFactorTier.HighBalance
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.highBalanceCurrency = WalletCurrency.Btc
   })
 
-  describe("at the reminder tier", () => {
-    it("stands the setup in, with no close control", async () => {
-      await renderScreen()
+  it("names the sats threshold under a warning sign, with no close control", async () => {
+    await renderScreen()
 
-      expect(screen.getByTestId("icon-lock-closed")).toBeTruthy()
-      expect(screen.getByText(LL.TwoFactorEnforcement.setupTitle())).toBeTruthy()
-      expect(screen.getByText(LL.TwoFactorEnforcement.setupDescription())).toBeTruthy()
-      expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
-      expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
-    })
+    expect(screen.getByTestId("icon-warning")).toBeTruthy()
+    expect(screen.queryByTestId("icon-dollar")).toBeNull()
+    expect(
+      screen.getByText(
+        LL.TwoFactorEnforcement.highBalanceTitle({ amount: "5,000,000 SAT" }),
+      ),
+    ).toBeTruthy()
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
+    ).toBeTruthy()
+    expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
+  })
 
-    it("offers the authenticator first and leaving custody second", async () => {
-      await renderScreen()
+  it("names the dollar threshold under a dollar sign, sign first and without cents, when only the dollar wallet crossed", async () => {
+    mockEnforcement.highBalanceCurrency = WalletCurrency.Usd
+    await renderScreen()
 
-      // eslint-disable-next-line camelcase
-      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe(
-        LL.TwoFactorEnforcement.setAuthenticator(),
-      )
-      // eslint-disable-next-line camelcase
-      expect(screen.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe(
-        LL.AccountMigration.moveToNonCustodial(),
-      )
-    })
+    expect(screen.getByTestId("icon-dollar")).toBeTruthy()
+    expect(screen.queryByTestId("icon-warning")).toBeNull()
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.highBalanceTitle({ amount: "$5,000" })),
+    ).toBeTruthy()
+  })
 
-    it("starts the authenticator flow under the reminder tier, returning to the home", async () => {
-      await renderScreen()
+  /** The thresholds are configuration: the title quotes the one the console set. */
+  it("quotes the high-balance threshold as configured", async () => {
+    const thresholds = { ...defaultTwoFactorThresholds, highBalanceSats: 3_000_000 }
+    render(
+      <RemoteConfigContext.Provider
+        value={{ ...defaultRemoteConfig, custodialTwoFactorThresholds: thresholds }}
+      >
+        <ContextForScreen>
+          <TwoFactorProtectionRequiredScreen />
+        </ContextForScreen>
+      </RemoteConfigContext.Provider>,
+    )
+    await flushEffects()
 
-      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
+    expect(
+      screen.getByText(
+        LL.TwoFactorEnforcement.highBalanceTitle({ amount: "3,000,000 SAT" }),
+      ),
+    ).toBeTruthy()
+  })
 
-      expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
-        returnTo: "Primary",
-      })
-      expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Reminder,
-        method: TwoFactorMethod.Authenticator,
-      })
-    })
+  it("offers the authenticator first and leaving custody second", async () => {
+    await renderScreen()
 
-    it("logs the prompt as shown once for the mount, not again on a re-render", async () => {
-      const rendered = await renderScreen()
+    // eslint-disable-next-line camelcase
+    expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe(
+      LL.TwoFactorEnforcement.setAuthenticator(),
+    )
+    // eslint-disable-next-line camelcase
+    expect(screen.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe(
+      LL.AccountMigration.moveToNonCustodial(),
+    )
+  })
 
-      await rerenderScreen(rendered)
+  /** A blocking screen swallows the hardware back rather than letting the app go, and
+   *  nothing on it is a dismissal. */
+  it("swallows the hardware back and charges no dismissal", async () => {
+    await renderScreen()
 
-      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
-      expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Reminder,
-        prompt: "protection_required_screen",
-      })
+    expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+
+  it("logs the screen as shown once for the mount, not again on a re-render", async () => {
+    const rendered = await renderScreen()
+
+    await rerenderScreen(rendered)
+
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
+      tier: TwoFactorTier.HighBalance,
+      prompt: "protection_required_screen",
     })
   })
 
-  describe("at the high-balance tier", () => {
-    it("names the sats threshold with a warning hero and offers an X while dismissals remain", async () => {
-      atAuthenticatorTier(3)
-      await renderScreen()
+  it("opens the authenticator setup and logs it, returning to the home", async () => {
+    await renderScreen()
 
-      expect(screen.getByTestId("icon-warning")).toBeTruthy()
-      expect(screen.queryByTestId("icon-dollar")).toBeNull()
-      expect(
-        screen.getByText(
-          LL.TwoFactorEnforcement.highBalanceTitle({ amount: "5,000,000 SAT" }),
-        ),
-      ).toBeTruthy()
-      expect(
-        screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
-      ).toBeTruthy()
-      expect(screen.getByTestId("two-factor-protection-close")).toBeTruthy()
-      expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(expect.any(Function))
+    fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
+
+    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
+      tier: TwoFactorTier.HighBalance,
+      method: TwoFactorMethod.Authenticator,
     })
-
-    it("names the dollar threshold with a dollar hero, sign first and without cents, when only the dollar wallet crossed", async () => {
-      atAuthenticatorTier(3)
-      mockEnforcement.highBalanceCurrency = WalletCurrency.Usd
-      await renderScreen()
-
-      expect(screen.getByTestId("icon-dollar")).toBeTruthy()
-      expect(screen.queryByTestId("icon-warning")).toBeNull()
-      expect(
-        screen.getByText(LL.TwoFactorEnforcement.highBalanceTitle({ amount: "$5,000" })),
-      ).toBeTruthy()
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      returnTo: "Primary",
     })
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
 
-    /** The thresholds are configuration: the title quotes the one the console set. */
-    it("quotes the high-balance threshold as configured", async () => {
-      atAuthenticatorTier(0)
-      const thresholds = { ...defaultTwoFactorThresholds, highBalanceSats: 3_000_000 }
-      render(
-        <RemoteConfigContext.Provider
-          value={{ ...defaultRemoteConfig, custodialTwoFactorThresholds: thresholds }}
-        >
-          <ContextForScreen>
-            <TwoFactorProtectionRequiredScreen />
-          </ContextForScreen>
-        </RemoteConfigContext.Provider>,
-      )
-      await flushEffects()
+  it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
+    await renderScreen()
 
-      expect(
-        screen.getByText(
-          LL.TwoFactorEnforcement.highBalanceTitle({ amount: "3,000,000 SAT" }),
-        ),
-      ).toBeTruthy()
+    fireEvent.press(screen.getByTestId("two-factor-protection-move"))
+
+    expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
+      tier: TwoFactorTier.HighBalance,
     })
-
-    /** The dismissal is what takes the session start and lets the home in. */
-    it("charges the X to the high-balance tier and logs it", async () => {
-      atAuthenticatorTier(1)
-      await renderScreen()
-
-      fireEvent.press(screen.getByTestId("two-factor-protection-close"))
-
-      expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-        tier: TwoFactorTier.HighBalance,
-        prompt: "protection_required_screen",
-      })
-      expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.HighBalance)
-    })
-
-    it("treats the hardware back as the X while dismissals remain", async () => {
-      atAuthenticatorTier(2)
-      await renderScreen()
-
-      const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
-      onBack()
-
-      expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.HighBalance)
-    })
-
-    it("blocks once the dismissals are spent", async () => {
-      atAuthenticatorTier(0)
-      await renderScreen()
-
-      expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
-      expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
-    })
-
-    it("opens the authenticator setup and logs it, with no dismissal to take the session start", async () => {
-      atAuthenticatorTier(0)
-      await renderScreen()
-
-      fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
-
-      expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-        tier: TwoFactorTier.HighBalance,
-        method: TwoFactorMethod.Authenticator,
-      })
-      expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
-        returnTo: "Primary",
-      })
-      expect(mockRegisterDismissal).not.toHaveBeenCalled()
-    })
-
-    it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
-      atAuthenticatorTier(0)
-      await renderScreen()
-
-      fireEvent.press(screen.getByTestId("two-factor-protection-move"))
-
-      expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
-        tier: TwoFactorTier.HighBalance,
-      })
-      expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
-      expect(mockRegisterDismissal).not.toHaveBeenCalled()
-    })
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 })

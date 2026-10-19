@@ -34,15 +34,14 @@ const CLOSED: ModalState = { isOpen: false, tier: TwoFactorTier.None }
  * Takes the session start from the home, and only while it is focused: a prompt must
  * never land on top of a payment or a scan. A start that owes nothing is taken at once,
  * so a balance that crosses a threshold later in the session waits for the next one. A
- * start that owes the countdown modal stays pending for as long as the modal is up,
+ * start that owes the high-balance modal stays pending for as long as the modal is up,
  * and the modal stays up, hidden with the home, while the user is away in a flow it
- * opened: a fresher read in the meantime can still call for the full-screen prompt and
- * have the navigator stand it in for the home. The modal comes down once the start is
- * taken, by the dismissal the modal or the flow reports, or once the account complies.
- * A start the navigator stands the full-screen prompt in for is left to it; one whose
- * full-screen prompt yielded to the wind-down is taken here with no prompt, since the
- * wind-down's push is what the home shows for it. The yield and the push are judged
- * from the session's one wind-down read, so they cannot disagree.
+ * opened. The modal comes down once the start is taken, by the dismissal the modal or
+ * the flow reports, or once the account complies. A start the navigator stands the
+ * blocking screen in for is left to it; one whose blocking screen yielded to the
+ * wind-down is taken here with no prompt, since the wind-down's push is what the home
+ * shows for it. The yield and the push are judged from the session's one wind-down
+ * read, so they cannot disagree.
  */
 export const useTwoFactorSessionPrompt = ({
   isBlocked,

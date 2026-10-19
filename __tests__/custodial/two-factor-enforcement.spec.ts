@@ -247,29 +247,45 @@ describe("resolveSessionPrompt", () => {
     ).toBe(TwoFactorSessionPrompt.None)
   })
 
-  it("owes the modal at the reminder tier while dismissals remain", () => {
+  /** The reminder tier reminds on the home and never blocks. */
+  it("owes nothing at the reminder tier, with or without dismissals left", () => {
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Reminder,
-        record: recordWith({ requiredDismissals: 2 }),
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
       }),
-    ).toBe(TwoFactorSessionPrompt.SessionModal)
-  })
-
-  it("owes the protection screen at the reminder tier once dismissals are spent", () => {
+    ).toBe(TwoFactorSessionPrompt.None)
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Reminder,
         record: recordWith({ requiredDismissals: 3 }),
       }),
-    ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
+    ).toBe(TwoFactorSessionPrompt.None)
   })
 
-  it("owes the protection screen at the high-balance tier from the first session", () => {
+  it("owes the modal at the high-balance tier while dismissals remain", () => {
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.HighBalance,
-        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        record: recordWith({ authenticatorDismissals: 2 }),
+      }),
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
+  })
+
+  it("owes the modal at the high-balance tier however many reminder dismissals were spent", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.HighBalance,
+        record: recordWith({ requiredDismissals: 3 }),
+      }),
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
+  })
+
+  it("owes the blocking screen at the high-balance tier once dismissals are spent", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.HighBalance,
+        record: recordWith({ authenticatorDismissals: 3 }),
       }),
     ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
   })

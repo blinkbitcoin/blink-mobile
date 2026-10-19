@@ -137,14 +137,14 @@ type SessionPromptInputs = {
   record: TwoFactorEnforcementRecord
 }
 
+/** Only the high-balance tier asks at the session start: its modal while dismissals
+ *  remain, then the blocking screen. The reminder tier reminds on the home and never
+ *  blocks, and the nudge tier only nudges. */
 export const resolveSessionPrompt = ({
   unmetTier,
   record,
 }: SessionPromptInputs): TwoFactorSessionPrompt => {
-  if (unmetTier === TwoFactorTier.HighBalance) {
-    return TwoFactorSessionPrompt.ProtectionRequired
-  }
-  if (unmetTier !== TwoFactorTier.Reminder) return TwoFactorSessionPrompt.None
+  if (unmetTier !== TwoFactorTier.HighBalance) return TwoFactorSessionPrompt.None
   const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
   return hasDismissalsLeft
     ? TwoFactorSessionPrompt.SessionModal
