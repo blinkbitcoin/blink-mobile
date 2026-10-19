@@ -10,8 +10,8 @@ import { IconNamesType } from "@app/components/atomic/galoy-icon"
 import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
+import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
-import { HIGH_BALANCE_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -20,9 +20,11 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import {
   TwoFactorMethod,
   TwoFactorPrompt,
+  TwoFactorThresholds,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import {
@@ -31,7 +33,6 @@ import {
   logTwoFactorPromptShown,
   logTwoFactorSetupStarted,
 } from "@app/utils/analytics"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 
 import { TwoFactorSetupContent } from "./setup-content"
@@ -44,11 +45,14 @@ const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 const highBalanceIcon = (currency: WalletCurrency): IconNamesType =>
   currency === WalletCurrency.Usd ? "dollar" : "warning"
 
-/** The threshold the title quotes, in the wallet that crossed it. */
-const highBalanceThreshold = (currency: WalletCurrency) =>
+/** The threshold the title quotes, as configured, in the wallet that crossed it. */
+const highBalanceThreshold = (
+  currency: WalletCurrency,
+  thresholds: TwoFactorThresholds,
+) =>
   currency === WalletCurrency.Usd
-    ? toUsdMoneyAmount(HIGH_BALANCE_THRESHOLD.usdCents)
-    : toBtcMoneyAmount(HIGH_BALANCE_THRESHOLD.sats)
+    ? toUsdMoneyAmount(thresholds.highBalanceUsdCents)
+    : toBtcMoneyAmount(thresholds.highBalanceSats)
 
 /**
  * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
@@ -66,6 +70,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
+  const { custodialTwoFactorThresholds } = useRemoteConfig()
   const { unmetTier, remainingDismissals, highBalanceCurrency, registerDismissal } =
     useTwoFactorEnforcement()
   /** The gate mounts this screen anew for each tier it is raised for, so the tier it
@@ -151,7 +156,10 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
         iconColor={colors.primary}
         title={LL.TwoFactorEnforcement.highBalanceTitle({
           amount: formatMoneyAmount({
-            moneyAmount: highBalanceThreshold(highBalanceCurrency),
+            moneyAmount: highBalanceThreshold(
+              highBalanceCurrency,
+              custodialTwoFactorThresholds,
+            ),
             noFractionDigits: true,
           }),
         })}

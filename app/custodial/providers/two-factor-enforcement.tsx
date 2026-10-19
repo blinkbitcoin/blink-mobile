@@ -34,6 +34,7 @@ import {
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
+  resolveHighBalanceCurrency,
   resolveSessionPrompt,
   resolveUnmetTier,
   withDismissal,
@@ -161,7 +162,10 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
   const { activeAccount } = useAccountRegistry()
-  const { custodialTwoFactorEnforcementEnabled } = useRemoteConfig()
+  const {
+    custodialTwoFactorEnforcementEnabled,
+    custodialTwoFactorThresholds: thresholds,
+  } = useRemoteConfig()
   const [stored, setStored] = useState<StoredState>(INITIAL_STORED)
   const [session, setSession] = useState<SessionState>(INITIAL_SESSION)
   /** The record and the session as last written, so two writes in the same pass build
@@ -273,13 +277,14 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  the previous one's tier must not leak into the context or the events. */
   const record = isLoadedForAccount ? stored.record : DEFAULT_TWO_FACTOR_ENFORCEMENT
   const wallets = me?.defaultAccount.wallets
-  const balanceTier = resolveBalanceTier(wallets)
+  const balanceTier = resolveBalanceTier(wallets, thresholds)
   const tier = balanceTier > record.highestTier ? balanceTier : record.highestTier
 
   useEffect(() => {
     if (!isLoadedForAccount || balanceTier <= record.highestTier) return
-    persist((current) => withTierReached(current, balanceTier, wallets))
-  }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, persist])
+    const crossedCurrency = resolveHighBalanceCurrency(wallets, thresholds)
+    persist((current) => withTierReached(current, balanceTier, crossedCurrency))
+  }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, thresholds, persist])
 
   const hasAuthenticator = Boolean(me?.totpEnabled)
 

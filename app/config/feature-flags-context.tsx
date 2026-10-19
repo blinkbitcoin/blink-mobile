@@ -4,12 +4,14 @@ import remoteConfigInstance from "@react-native-firebase/remote-config"
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
+import { TwoFactorThresholds } from "@app/types/two-factor-enforcement"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
 import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigPositiveNumber,
+  getRemoteConfigPositiveNumericObject,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
@@ -58,6 +60,7 @@ const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
 const CustodialTwoFactorEnforcementEnabledKey = "custodialTwoFactorEnforcementEnabled"
+const CustodialTwoFactorThresholdsKey = "custodialTwoFactorThresholds"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -127,6 +130,7 @@ type RemoteConfig = {
   [MigrationDelayedRedirectEnabledKey]: boolean
   [PersistentBulletinsEnabledKey]: boolean
   [CustodialTwoFactorEnforcementEnabledKey]: boolean
+  [CustodialTwoFactorThresholdsKey]: TwoFactorThresholds
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -151,6 +155,19 @@ export const defaultFeeRatesConfig: FeeRatesConfig = {
   onchainStandardBps: 60,
   onchainEconomyBps: 40,
   transferBps: 50,
+}
+
+/** The two-factor tiers as shipped: 50,000 sats or $50 for the nudge, 500,000 sats or
+ *  $500 for the reminders, 5,000,000 sats or $5,000 for the high balance. Dollars are
+ *  in cents, the unit the dollar wallet reports its balance in. A value the console
+ *  sets that is not above zero falls back to its default here. */
+export const defaultTwoFactorThresholds: TwoFactorThresholds = {
+  nudgeSats: 50_000,
+  nudgeUsdCents: 5_000,
+  reminderSats: 500_000,
+  reminderUsdCents: 50_000,
+  highBalanceSats: 5_000_000,
+  highBalanceUsdCents: 500_000,
 }
 
 /** Default transfer/swap block, read by both account types. */
@@ -260,6 +277,7 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  so the prompts reach users only once the console turns them on, and can be pulled
    *  back the same way without a release. */
   custodialTwoFactorEnforcementEnabled: false,
+  custodialTwoFactorThresholds: defaultTwoFactorThresholds,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -290,6 +308,7 @@ remoteConfigInstance().setDefaults({
   offboardOnlyCountries: serializeRemoteConfigDefault(
     defaultRemoteConfig.offboardOnlyCountries,
   ),
+  custodialTwoFactorThresholds: serializeRemoteConfigDefault(defaultTwoFactorThresholds),
   feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
 })
 
@@ -546,6 +565,11 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.custodialTwoFactorEnforcementEnabled,
   )
 
+  const custodialTwoFactorThresholds = getRemoteConfigPositiveNumericObject(
+    CustodialTwoFactorThresholdsKey,
+    defaultTwoFactorThresholds,
+  )
+
   const feeRatesConfig = getRemoteConfigNumericObject(
     FeeRatesConfigKey,
     defaultFeeRatesConfig,
@@ -595,6 +619,7 @@ const readRemoteConfig = (): RemoteConfig => {
     migrationDelayedRedirectEnabled,
     persistentBulletinsEnabled,
     custodialTwoFactorEnforcementEnabled,
+    custodialTwoFactorThresholds,
     feeRatesConfig,
   }
 }

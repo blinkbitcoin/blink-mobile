@@ -38,6 +38,17 @@ export const TwoFactorSessionPrompt = {
 export type TwoFactorSessionPrompt =
   (typeof TwoFactorSessionPrompt)[keyof typeof TwoFactorSessionPrompt]
 
+/** The balance each tier starts at, per wallet in its own unit and never converted:
+ *  configuration, so the tiers can follow the bitcoin price without a release. */
+export type TwoFactorThresholds = {
+  nudgeSats: number
+  nudgeUsdCents: number
+  reminderSats: number
+  reminderUsdCents: number
+  highBalanceSats: number
+  highBalanceUsdCents: number
+}
+
 /** What the device remembers per account. The field names are the stored keys, kept as
  *  first written: renaming one would read every record already on a device as unset. */
 export type TwoFactorEnforcementRecord = {

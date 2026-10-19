@@ -9,6 +9,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import {
   TwoFactorEnforcementRecord,
   TwoFactorSessionPrompt,
+  TwoFactorThresholds,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import { AccountType } from "@app/types/wallet"
@@ -30,11 +31,20 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 let mockEnforcementEnabled = true
-jest.mock("@app/config/feature-flags-context", () => ({
-  useRemoteConfig: () => ({
-    custodialTwoFactorEnforcementEnabled: mockEnforcementEnabled,
-  }),
-}))
+/** The tier thresholds as the console sets them; the shipped ones unless a test moves
+ *  one. */
+let mockThresholds: TwoFactorThresholds | undefined
+jest.mock("@app/config/feature-flags-context", () => {
+  const { defaultTwoFactorThresholds } = jest.requireActual(
+    "@app/config/feature-flags-context",
+  )
+  return {
+    useRemoteConfig: () => ({
+      custodialTwoFactorEnforcementEnabled: mockEnforcementEnabled,
+      custodialTwoFactorThresholds: mockThresholds ?? defaultTwoFactorThresholds,
+    }),
+  }
+})
 
 let mockIsAtLeastLevelOne = true
 jest.mock("@app/graphql/level-context", () => ({
@@ -67,6 +77,10 @@ const mockReportError = jest.fn()
 jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
 }))
+
+const SHIPPED_THRESHOLDS: TwoFactorThresholds = jest.requireActual(
+  "@app/config/feature-flags-context",
+).defaultTwoFactorThresholds
 
 const ACCOUNT_ID = "custodial-account-1"
 const PHONE = "+10000000000"
@@ -149,6 +163,7 @@ const renderEnforcement = async () => {
 const resetProviderMocks = () => {
   jest.clearAllMocks()
   mockEnforcementEnabled = true
+  mockThresholds = undefined
   mockIsAuthed = true
   mockIsAtLeastLevelOne = true
   mockAccountType = AccountType.Custodial
@@ -433,6 +448,29 @@ describe("TwoFactorEnforcementProvider", () => {
         highestTier: TwoFactorTier.HighBalance,
         highBalanceCurrency: WalletCurrency.Usd,
       })
+    })
+
+    /** A threshold lowered in the console raises the accounts it now covers. */
+    it("starts a tier where the console moved its threshold", async () => {
+      mockThresholds = { ...SHIPPED_THRESHOLDS, reminderSats: 400_000 }
+      setAccount({ sats: 450_000 })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.tier).toBe(TwoFactorTier.Reminder)
+      expect(lastWrittenRecord().highestTier).toBe(TwoFactorTier.Reminder)
+    })
+
+    /** Raising a threshold never lowers a tier an account already reached. */
+    it("keeps a reached tier when the console raises its threshold above the balance", async () => {
+      mockThresholds = { ...SHIPPED_THRESHOLDS, reminderSats: 900_000 }
+      setAccount({ sats: 600_000 })
+      storeRecord({ highestTier: TwoFactorTier.Reminder })
+
+      const { result } = await renderEnforcement()
+
+      expect(result.current.tier).toBe(TwoFactorTier.Reminder)
+      expect(mockSetItem).not.toHaveBeenCalled()
     })
 
     it("keeps naming the wallet that crossed after the balance moved on", async () => {

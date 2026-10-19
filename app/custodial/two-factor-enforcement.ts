@@ -3,19 +3,13 @@ import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-
 import {
   TwoFactorEnforcementRecord,
   TwoFactorSessionPrompt,
+  TwoFactorThresholds,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 
 type TierThreshold = {
   sats: number
   usdCents: number
-}
-
-const NUDGE_THRESHOLD: TierThreshold = { sats: 50_000, usdCents: 5_000 }
-const REMINDER_THRESHOLD: TierThreshold = { sats: 500_000, usdCents: 50_000 }
-export const HIGH_BALANCE_THRESHOLD: TierThreshold = {
-  sats: 5_000_000,
-  usdCents: 500_000,
 }
 
 type TierStep = {
@@ -28,10 +22,22 @@ type TierStep = {
  * is measured against its own threshold with no conversion between them: a balance
  * split across both can sit below every threshold and still not reach the tier.
  */
-const TIER_STEPS: readonly TierStep[] = [
-  { tier: TwoFactorTier.HighBalance, threshold: HIGH_BALANCE_THRESHOLD },
-  { tier: TwoFactorTier.Reminder, threshold: REMINDER_THRESHOLD },
-  { tier: TwoFactorTier.Nudge, threshold: NUDGE_THRESHOLD },
+const tierStepsOf = (thresholds: TwoFactorThresholds): readonly TierStep[] => [
+  {
+    tier: TwoFactorTier.HighBalance,
+    threshold: {
+      sats: thresholds.highBalanceSats,
+      usdCents: thresholds.highBalanceUsdCents,
+    },
+  },
+  {
+    tier: TwoFactorTier.Reminder,
+    threshold: { sats: thresholds.reminderSats, usdCents: thresholds.reminderUsdCents },
+  },
+  {
+    tier: TwoFactorTier.Nudge,
+    threshold: { sats: thresholds.nudgeSats, usdCents: thresholds.nudgeUsdCents },
+  },
 ]
 
 type WalletBalances = {
@@ -51,9 +57,10 @@ const reachesThreshold = (
 
 export const resolveBalanceTier = (
   wallets: readonly WalletBalance[] | undefined,
+  thresholds: TwoFactorThresholds,
 ): TwoFactorTier => {
   const balances = balancesOf(wallets)
-  const reached = TIER_STEPS.find(({ threshold }) =>
+  const reached = tierStepsOf(thresholds).find(({ threshold }) =>
     reachesThreshold(balances, threshold),
   )
   return reached?.tier ?? TwoFactorTier.None
@@ -63,10 +70,11 @@ export const resolveBalanceTier = (
  *  its threshold, which is also the rule when both did. */
 export const resolveHighBalanceCurrency = (
   wallets: readonly WalletBalance[] | undefined,
+  thresholds: TwoFactorThresholds,
 ): WalletCurrency => {
   const { sats, usdCents } = balancesOf(wallets)
   const isOnlyDollarWalletOver =
-    usdCents >= HIGH_BALANCE_THRESHOLD.usdCents && sats < HIGH_BALANCE_THRESHOLD.sats
+    usdCents >= thresholds.highBalanceUsdCents && sats < thresholds.highBalanceSats
   return isOnlyDollarWalletOver ? WalletCurrency.Usd : WalletCurrency.Btc
 }
 
@@ -75,11 +83,11 @@ export const resolveHighBalanceCurrency = (
 export const withTierReached = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
-  wallets: readonly WalletBalance[] | undefined,
+  highBalanceCurrency: WalletCurrency,
 ): TwoFactorEnforcementRecord => {
   const raised = { ...record, highestTier: tier }
   if (tier !== TwoFactorTier.HighBalance) return raised
-  return { ...raised, highBalanceCurrency: resolveHighBalanceCurrency(wallets) }
+  return { ...raised, highBalanceCurrency }
 }
 
 type UnmetTierInputs = {
