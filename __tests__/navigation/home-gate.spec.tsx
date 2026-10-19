@@ -25,7 +25,7 @@ type TwoFactorState = {
   isProtectionGateActive: boolean
 }
 const AT_REST: TwoFactorState = {
-  unmetTier: TwoFactorTier.Required,
+  unmetTier: TwoFactorTier.Reminder,
   isPreparingSessionStart: false,
   isProtectionGateActive: false,
 }
@@ -233,7 +233,7 @@ describe("HomeGate", () => {
     await renderStack()
     expect(mockProtectionMounts).toHaveBeenCalledTimes(1)
 
-    setTwoFactor({ unmetTier: TwoFactorTier.Authenticator })
+    setTwoFactor({ unmetTier: TwoFactorTier.HighBalance })
 
     expect(mockProtectionMounts).toHaveBeenCalledTimes(2)
     expect(screen.getByText("protection screen")).toBeTruthy()

@@ -64,7 +64,7 @@ describe("TwoFactorNonCustodialScreen", () => {
     expect(screen.getByText(LL.TwoFactorEnforcement.nonCustodialBody())).toBeTruthy()
     expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
     expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
       prompt: "non_custodial_screen",
     })
   })
@@ -75,7 +75,7 @@ describe("TwoFactorNonCustodialScreen", () => {
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-move"))
 
     expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
     })
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
@@ -86,7 +86,7 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -95,7 +95,7 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-close"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -105,7 +105,7 @@ describe("TwoFactorNonCustodialScreen", () => {
     const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
     onBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 })

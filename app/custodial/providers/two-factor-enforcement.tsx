@@ -100,7 +100,7 @@ export type TwoFactorEnforcementState = {
   /** An address the account holds but never verified. It cannot be registered again as
    *  new, so the setup has to send it through re-verification instead. */
   unverifiedEmail: string | null
-  /** The wallet the high-balance copy names, meaningful at the authenticator tier. */
+  /** The wallet the high-balance copy names, meaningful at the high-balance tier. */
   highBalanceCurrency: WalletCurrency
   remainingDismissals: number
   /** The prompt the unmet tier calls for at a session start, None once the account
@@ -342,7 +342,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     isSessionStartPending && requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
   const isProtectionGateActive = isProtectionGateOwed && !migrateNowRemedy.isDue
 
-  /** The card belongs to the nudge tier alone: from the required tier on, the session
+  /** The card belongs to the nudge tier alone: from the reminder tier on, the session
    *  prompt is the one asking, and the home never stacks two. The banner asks at every
    *  tier until the account holds two factors, since the setup it opens leads with the
    *  authenticator, which is what the highest tier asks for; an account that already
@@ -408,7 +408,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       const isSessionAccount = accountId !== null && latest.accountId === accountId
       if (!isSessionAccount) return
       const isCountable =
-        promptTier >= TwoFactorTier.Required && promptTier > latest.countedTier
+        promptTier >= TwoFactorTier.Reminder && promptTier > latest.countedTier
       const isStartOwedToPrompt =
         read.isSessionStartDecided && promptTier >= read.unmetTier
       const isStartAwaitingRead = latest.isStartPending && read.isReadingAccount

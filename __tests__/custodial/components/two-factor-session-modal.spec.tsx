@@ -109,7 +109,7 @@ const renderModal = ({
   render(
     <TwoFactorSessionModal
       isVisible={isVisible}
-      tier={TwoFactorTier.Required}
+      tier={TwoFactorTier.Reminder}
       remainingDismissals={remainingDismissals}
       onDismiss={onDismiss}
     />,
@@ -162,7 +162,7 @@ describe("TwoFactorSessionModal", () => {
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
     expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
       prompt: "session_modal",
     })
     expect(mockNavigate).not.toHaveBeenCalled()
@@ -199,7 +199,7 @@ describe("TwoFactorSessionModal", () => {
     rerender(
       <TwoFactorSessionModal
         isVisible={false}
-        tier={TwoFactorTier.Required}
+        tier={TwoFactorTier.Reminder}
         remainingDismissals={3}
         onDismiss={jest.fn()}
       />,
@@ -207,7 +207,7 @@ describe("TwoFactorSessionModal", () => {
     rerender(
       <TwoFactorSessionModal
         isVisible={true}
-        tier={TwoFactorTier.Required}
+        tier={TwoFactorTier.Reminder}
         remainingDismissals={3}
         onDismiss={jest.fn()}
       />,

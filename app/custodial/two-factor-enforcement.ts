@@ -13,8 +13,8 @@ type TierThreshold = {
 }
 
 const NUDGE_THRESHOLD: TierThreshold = { sats: 50_000, usdCents: 5_000 }
-const REQUIRED_THRESHOLD: TierThreshold = { sats: 500_000, usdCents: 50_000 }
-export const AUTHENTICATOR_THRESHOLD: TierThreshold = {
+const REMINDER_THRESHOLD: TierThreshold = { sats: 500_000, usdCents: 50_000 }
+export const HIGH_BALANCE_THRESHOLD: TierThreshold = {
   sats: 5_000_000,
   usdCents: 500_000,
 }
@@ -30,8 +30,8 @@ type TierStep = {
  * split across both can sit below every threshold and still not reach the tier.
  */
 const TIER_STEPS: readonly TierStep[] = [
-  { tier: TwoFactorTier.Authenticator, threshold: AUTHENTICATOR_THRESHOLD },
-  { tier: TwoFactorTier.Required, threshold: REQUIRED_THRESHOLD },
+  { tier: TwoFactorTier.HighBalance, threshold: HIGH_BALANCE_THRESHOLD },
+  { tier: TwoFactorTier.Reminder, threshold: REMINDER_THRESHOLD },
   { tier: TwoFactorTier.Nudge, threshold: NUDGE_THRESHOLD },
 ]
 
@@ -67,19 +67,19 @@ export const resolveHighBalanceCurrency = (
 ): WalletCurrency => {
   const { sats, usdCents } = balancesOf(wallets)
   const isOnlyDollarWalletOver =
-    usdCents >= AUTHENTICATOR_THRESHOLD.usdCents && sats < AUTHENTICATOR_THRESHOLD.sats
+    usdCents >= HIGH_BALANCE_THRESHOLD.usdCents && sats < HIGH_BALANCE_THRESHOLD.sats
   return isOnlyDollarWalletOver ? WalletCurrency.Usd : WalletCurrency.Btc
 }
 
 /** Raises the remembered tier, and with it the wallet that crossed into the
- *  authenticator tier, so the copy still names the right one once the balance moves. */
+ *  high-balance tier, so the copy still names the right one once the balance moves. */
 export const withTierReached = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
   wallets: readonly WalletBalance[] | undefined,
 ): TwoFactorEnforcementRecord => {
   const raised = { ...record, highestTier: tier }
-  if (tier !== TwoFactorTier.Authenticator) return raised
+  if (tier !== TwoFactorTier.HighBalance) return raised
   return { ...raised, highBalanceCurrency: resolveHighBalanceCurrency(wallets) }
 }
 
@@ -112,7 +112,7 @@ type UnmetTierInputs = {
   hasAuthenticator: boolean
 }
 
-/** The highest tier whose condition the account has not met. The authenticator tier
+/** The highest tier whose condition the account has not met. The high-balance tier
  *  asks for an authenticator even from an account that already holds two factors; the
  *  tiers below it ask for two factors of any kind. */
 export const resolveUnmetTier = ({
@@ -120,10 +120,10 @@ export const resolveUnmetTier = ({
   hasTwoFactor: isTwoFactorSet,
   hasAuthenticator,
 }: UnmetTierInputs): TwoFactorTier => {
-  const isAuthenticatorMissing = tier >= TwoFactorTier.Authenticator && !hasAuthenticator
-  if (isAuthenticatorMissing) return TwoFactorTier.Authenticator
+  const isAuthenticatorMissing = tier >= TwoFactorTier.HighBalance && !hasAuthenticator
+  if (isAuthenticatorMissing) return TwoFactorTier.HighBalance
   if (isTwoFactorSet) return TwoFactorTier.None
-  if (tier >= TwoFactorTier.Required) return TwoFactorTier.Required
+  if (tier >= TwoFactorTier.Reminder) return TwoFactorTier.Reminder
   if (tier >= TwoFactorTier.Nudge) return TwoFactorTier.Nudge
   return TwoFactorTier.None
 }
@@ -131,7 +131,7 @@ export const resolveUnmetTier = ({
 const MAX_DISMISSALS_PER_TIER = 3
 
 const dismissalsOf = (record: TwoFactorEnforcementRecord, tier: TwoFactorTier): number =>
-  tier === TwoFactorTier.Authenticator
+  tier === TwoFactorTier.HighBalance
     ? record.authenticatorDismissals
     : record.requiredDismissals
 
@@ -140,17 +140,17 @@ export const remainingDismissals = (
   tier: TwoFactorTier,
 ): number => Math.max(0, MAX_DISMISSALS_PER_TIER - dismissalsOf(record, tier))
 
-/** Each tier counts its own dismissals: the authenticator tier starts from zero however
- *  many times the required tier's prompt was waved away. Tiers that never prompt at
+/** Each tier counts its own dismissals: the high-balance tier starts from zero however
+ *  many times the reminder tier's prompt was waved away. Tiers that never prompt at
  *  session start leave the record untouched. */
 export const withDismissal = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
 ): TwoFactorEnforcementRecord => {
-  if (tier === TwoFactorTier.Authenticator) {
+  if (tier === TwoFactorTier.HighBalance) {
     return { ...record, authenticatorDismissals: record.authenticatorDismissals + 1 }
   }
-  if (tier === TwoFactorTier.Required) {
+  if (tier === TwoFactorTier.Reminder) {
     return { ...record, requiredDismissals: record.requiredDismissals + 1 }
   }
   return record
@@ -165,13 +165,13 @@ export const resolveSessionPrompt = ({
   unmetTier,
   record,
 }: SessionPromptInputs): TwoFactorSessionPrompt => {
-  if (unmetTier === TwoFactorTier.Authenticator) {
+  if (unmetTier === TwoFactorTier.HighBalance) {
     return TwoFactorSessionPrompt.ProtectionRequired
   }
-  if (unmetTier !== TwoFactorTier.Required) return TwoFactorSessionPrompt.None
+  if (unmetTier !== TwoFactorTier.Reminder) return TwoFactorSessionPrompt.None
   const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
   return hasDismissalsLeft
-    ? TwoFactorSessionPrompt.RequiredModal
+    ? TwoFactorSessionPrompt.SessionModal
     : TwoFactorSessionPrompt.ProtectionRequired
 }
 

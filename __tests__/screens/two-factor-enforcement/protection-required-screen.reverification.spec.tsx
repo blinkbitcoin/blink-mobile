@@ -35,7 +35,7 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 }))
 
 const mockEnforcement = {
-  unmetTier: TwoFactorTier.Required as TwoFactorTier,
+  unmetTier: TwoFactorTier.Reminder as TwoFactorTier,
   remainingDismissals: 0,
   highBalanceCurrency: WalletCurrency.Btc as WalletCurrency,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,

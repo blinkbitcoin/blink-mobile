@@ -126,7 +126,7 @@ describe("TwoFactorSetupScreen", () => {
   })
 
   it("tells the flows it starts to return here, under the tier it was opened for", async () => {
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
@@ -135,7 +135,7 @@ describe("TwoFactorSetupScreen", () => {
       returnTo: "twoFactorSetup",
     })
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
       method: TwoFactorMethod.Authenticator,
     })
   })
@@ -153,29 +153,29 @@ describe("TwoFactorSetupScreen", () => {
   })
 
   it("installs a close control that charges the exit to the tier it opened for", async () => {
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     await renderScreen()
 
     renderInstalledCloseControl()
     fireEvent.press(screen.getByTestId("icon-close"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("treats the hardware back as the close control", async () => {
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     await renderScreen()
 
     pressHardwareBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("holds the close control and the hardware back while a re-verification is in flight", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     mockIsReverifying = true
     await renderScreen()
 
@@ -189,14 +189,14 @@ describe("TwoFactorSetupScreen", () => {
 
   it("holds nothing for a re-verification joined from elsewhere", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     mockIsReverifying = true
     mockIsAskedHere = false
     await renderScreen()
 
     pressHardwareBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -204,7 +204,7 @@ describe("TwoFactorSetupScreen", () => {
    *  how the hold lifts for a request that never answers. */
   it("releases the hold once the hook ends the re-verification, and holds again for a new run", async () => {
     mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     mockIsReverifying = true
     const rendered = await renderScreen()
     pressHardwareBack()
@@ -214,7 +214,7 @@ describe("TwoFactorSetupScreen", () => {
     await rerenderScreen(rendered)
     pressHardwareBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
     expect(mockGoBack).toHaveBeenCalledTimes(1)
 
     mockIsReverifying = true

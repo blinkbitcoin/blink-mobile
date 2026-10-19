@@ -29,7 +29,7 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 
 const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
-  unmetTier: TwoFactorTier.Required as TwoFactorTier,
+  unmetTier: TwoFactorTier.Reminder as TwoFactorTier,
   remainingDismissals: 0,
   highBalanceCurrency: WalletCurrency.Btc as WalletCurrency,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
@@ -82,7 +82,7 @@ const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
 }
 
 const atAuthenticatorTier = (remaining: number) => {
-  mockEnforcement.unmetTier = TwoFactorTier.Authenticator
+  mockEnforcement.unmetTier = TwoFactorTier.HighBalance
   mockEnforcement.remainingDismissals = remaining
 }
 
@@ -90,14 +90,14 @@ describe("TwoFactorProtectionRequiredScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    mockEnforcement.unmetTier = TwoFactorTier.Required
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.highBalanceCurrency = WalletCurrency.Btc
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
   })
 
-  describe("at the required tier", () => {
+  describe("at the reminder tier", () => {
     it("stands the setup in, with no close control and no other way out", async () => {
       await renderScreen()
 
@@ -123,7 +123,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       )
     })
 
-    it("starts the missing factor's flow under the required tier, returning to the home", async () => {
+    it("starts the missing factor's flow under the reminder tier, returning to the home", async () => {
       await renderScreen()
 
       fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
@@ -135,7 +135,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
         returnTo: "Primary",
       })
       expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Required,
+        tier: TwoFactorTier.Reminder,
         method: TwoFactorMethod.Email,
       })
     })
@@ -147,13 +147,13 @@ describe("TwoFactorProtectionRequiredScreen", () => {
 
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Required,
+        tier: TwoFactorTier.Reminder,
         prompt: "protection_required_screen",
       })
     })
   })
 
-  describe("at the authenticator tier", () => {
+  describe("at the high-balance tier", () => {
     it("names the sats threshold with a warning hero and offers an X while dismissals remain", async () => {
       atAuthenticatorTier(3)
       await renderScreen()
@@ -185,17 +185,17 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     })
 
     /** The dismissal is what takes the session start and lets the home in. */
-    it("charges the X to the authenticator tier and logs it", async () => {
+    it("charges the X to the high-balance tier and logs it", async () => {
       atAuthenticatorTier(1)
       await renderScreen()
 
       fireEvent.press(screen.getByTestId("two-factor-protection-close"))
 
       expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Authenticator,
+        tier: TwoFactorTier.HighBalance,
         prompt: "protection_required_screen",
       })
-      expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Authenticator)
+      expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.HighBalance)
     })
 
     it("treats the hardware back as the X while dismissals remain", async () => {
@@ -205,7 +205,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
       onBack()
 
-      expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Authenticator)
+      expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.HighBalance)
     })
 
     it("blocks once the dismissals are spent", async () => {
@@ -223,7 +223,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
 
       expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Authenticator,
+        tier: TwoFactorTier.HighBalance,
         method: TwoFactorMethod.Authenticator,
       })
       expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
@@ -239,7 +239,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       fireEvent.press(screen.getByTestId("two-factor-protection-move"))
 
       expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Authenticator,
+        tier: TwoFactorTier.HighBalance,
       })
       expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
       expect(mockRegisterDismissal).not.toHaveBeenCalled()

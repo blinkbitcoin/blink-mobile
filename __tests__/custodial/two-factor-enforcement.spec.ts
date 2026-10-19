@@ -1,5 +1,5 @@
 import {
-  AUTHENTICATOR_THRESHOLD,
+  HIGH_BALANCE_THRESHOLD,
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   hasTwoFactor,
   normalizeStoredRecord,
@@ -51,26 +51,24 @@ describe("resolveBalanceTier", () => {
     expect(resolveBalanceTier(walletsWith(499_999, 49_999))).toBe(TwoFactorTier.Nudge)
   })
 
-  it("reaches required at 500,000 sats or $500", () => {
-    expect(resolveBalanceTier(walletsWith(500_000, 0))).toBe(TwoFactorTier.Required)
-    expect(resolveBalanceTier(walletsWith(0, 50_000))).toBe(TwoFactorTier.Required)
+  it("reaches the reminder tier at 500,000 sats or $500", () => {
+    expect(resolveBalanceTier(walletsWith(500_000, 0))).toBe(TwoFactorTier.Reminder)
+    expect(resolveBalanceTier(walletsWith(0, 50_000))).toBe(TwoFactorTier.Reminder)
   })
 
-  it("reaches authenticator at 5,000,000 sats or $5,000", () => {
-    expect(resolveBalanceTier(walletsWith(5_000_000, 0))).toBe(
-      TwoFactorTier.Authenticator,
-    )
-    expect(resolveBalanceTier(walletsWith(0, 500_000))).toBe(TwoFactorTier.Authenticator)
+  it("reaches the high-balance tier at 5,000,000 sats or $5,000", () => {
+    expect(resolveBalanceTier(walletsWith(5_000_000, 0))).toBe(TwoFactorTier.HighBalance)
+    expect(resolveBalanceTier(walletsWith(0, 500_000))).toBe(TwoFactorTier.HighBalance)
   })
 
   it("takes the highest tier either wallet reaches", () => {
     expect(resolveBalanceTier(walletsWith(50_000, 500_000))).toBe(
-      TwoFactorTier.Authenticator,
+      TwoFactorTier.HighBalance,
     )
   })
 
-  it("exposes the authenticator threshold the copy quotes", () => {
-    expect(AUTHENTICATOR_THRESHOLD).toEqual({ sats: 5_000_000, usdCents: 500_000 })
+  it("exposes the high-balance threshold the copy quotes", () => {
+    expect(HIGH_BALANCE_THRESHOLD).toEqual({ sats: 5_000_000, usdCents: 500_000 })
   })
 })
 
@@ -98,25 +96,25 @@ describe("resolveHighBalanceCurrency", () => {
 })
 
 describe("withTierReached", () => {
-  it("raises the tier and leaves the named wallet alone below the authenticator tier", () => {
+  it("raises the tier and leaves the named wallet alone below the high-balance tier", () => {
     const record = withTierReached(
       recordWith({ highBalanceCurrency: WalletCurrency.Usd }),
-      TwoFactorTier.Required,
+      TwoFactorTier.Reminder,
       walletsWith(500_000, 0),
     )
 
-    expect(record.highestTier).toBe(TwoFactorTier.Required)
+    expect(record.highestTier).toBe(TwoFactorTier.Reminder)
     expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
   })
 
-  it("remembers the wallet that crossed into the authenticator tier", () => {
+  it("remembers the wallet that crossed into the high-balance tier", () => {
     const record = withTierReached(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
-      TwoFactorTier.Authenticator,
+      TwoFactorTier.HighBalance,
       walletsWith(0, 500_000),
     )
 
-    expect(record.highestTier).toBe(TwoFactorTier.Authenticator)
+    expect(record.highestTier).toBe(TwoFactorTier.HighBalance)
     expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
   })
 })
@@ -197,37 +195,37 @@ describe("resolveUnmetTier", () => {
     ).toBe(TwoFactorTier.Nudge)
     expect(
       resolveUnmetTier({
-        tier: TwoFactorTier.Required,
+        tier: TwoFactorTier.Reminder,
         hasTwoFactor: false,
         hasAuthenticator: false,
       }),
-    ).toBe(TwoFactorTier.Required)
+    ).toBe(TwoFactorTier.Reminder)
   })
 
-  it("is none once two factors satisfy the nudge and required tiers", () => {
+  it("is none once two factors satisfy the nudge and reminder tiers", () => {
     expect(
       resolveUnmetTier({
-        tier: TwoFactorTier.Required,
+        tier: TwoFactorTier.Reminder,
         hasTwoFactor: true,
         hasAuthenticator: false,
       }),
     ).toBe(TwoFactorTier.None)
   })
 
-  it("asks for an authenticator at the authenticator tier even with two factors", () => {
+  it("asks for an authenticator at the high-balance tier even with two factors", () => {
     expect(
       resolveUnmetTier({
-        tier: TwoFactorTier.Authenticator,
+        tier: TwoFactorTier.HighBalance,
         hasTwoFactor: true,
         hasAuthenticator: false,
       }),
-    ).toBe(TwoFactorTier.Authenticator)
+    ).toBe(TwoFactorTier.HighBalance)
   })
 
-  it("is none at the authenticator tier once an authenticator joins a second factor", () => {
+  it("is none at the high-balance tier once an authenticator joins a second factor", () => {
     expect(
       resolveUnmetTier({
-        tier: TwoFactorTier.Authenticator,
+        tier: TwoFactorTier.HighBalance,
         hasTwoFactor: true,
         hasAuthenticator: true,
       }),
@@ -237,37 +235,37 @@ describe("resolveUnmetTier", () => {
   it("still asks for a second factor when the authenticator is the only one", () => {
     expect(
       resolveUnmetTier({
-        tier: TwoFactorTier.Authenticator,
+        tier: TwoFactorTier.HighBalance,
         hasTwoFactor: false,
         hasAuthenticator: true,
       }),
-    ).toBe(TwoFactorTier.Required)
+    ).toBe(TwoFactorTier.Reminder)
   })
 })
 
 describe("dismissals", () => {
   it("allows three per tier", () => {
     expect(
-      remainingDismissals(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Required),
+      remainingDismissals(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Reminder),
     ).toBe(3)
     expect(
-      remainingDismissals(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Authenticator),
+      remainingDismissals(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.HighBalance),
     ).toBe(3)
   })
 
-  it("counts the required tier's dismissals on their own counter", () => {
-    const record = withDismissal(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Required)
+  it("counts the reminder tier's dismissals on their own counter", () => {
+    const record = withDismissal(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Reminder)
 
     expect(record.requiredDismissals).toBe(1)
     expect(record.authenticatorDismissals).toBe(0)
-    expect(remainingDismissals(record, TwoFactorTier.Required)).toBe(2)
-    expect(remainingDismissals(record, TwoFactorTier.Authenticator)).toBe(3)
+    expect(remainingDismissals(record, TwoFactorTier.Reminder)).toBe(2)
+    expect(remainingDismissals(record, TwoFactorTier.HighBalance)).toBe(3)
   })
 
-  it("counts the authenticator tier's dismissals on their own counter", () => {
+  it("counts the high-balance tier's dismissals on their own counter", () => {
     const record = withDismissal(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
-      TwoFactorTier.Authenticator,
+      TwoFactorTier.HighBalance,
     )
 
     expect(record.authenticatorDismissals).toBe(1)
@@ -285,13 +283,13 @@ describe("dismissals", () => {
 
   it("never reports fewer than zero remaining", () => {
     expect(
-      remainingDismissals(recordWith({ requiredDismissals: 5 }), TwoFactorTier.Required),
+      remainingDismissals(recordWith({ requiredDismissals: 5 }), TwoFactorTier.Reminder),
     ).toBe(0)
   })
 })
 
 describe("resolveSessionPrompt", () => {
-  it("owes nothing below the required tier", () => {
+  it("owes nothing below the reminder tier", () => {
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Nudge,
@@ -306,28 +304,28 @@ describe("resolveSessionPrompt", () => {
     ).toBe(TwoFactorSessionPrompt.None)
   })
 
-  it("owes the modal at the required tier while dismissals remain", () => {
+  it("owes the modal at the reminder tier while dismissals remain", () => {
     expect(
       resolveSessionPrompt({
-        unmetTier: TwoFactorTier.Required,
+        unmetTier: TwoFactorTier.Reminder,
         record: recordWith({ requiredDismissals: 2 }),
       }),
-    ).toBe(TwoFactorSessionPrompt.RequiredModal)
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
   })
 
-  it("owes the protection screen at the required tier once dismissals are spent", () => {
+  it("owes the protection screen at the reminder tier once dismissals are spent", () => {
     expect(
       resolveSessionPrompt({
-        unmetTier: TwoFactorTier.Required,
+        unmetTier: TwoFactorTier.Reminder,
         record: recordWith({ requiredDismissals: 3 }),
       }),
     ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
   })
 
-  it("owes the protection screen at the authenticator tier from the first session", () => {
+  it("owes the protection screen at the high-balance tier from the first session", () => {
     expect(
       resolveSessionPrompt({
-        unmetTier: TwoFactorTier.Authenticator,
+        unmetTier: TwoFactorTier.HighBalance,
         record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
       }),
     ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
@@ -341,7 +339,7 @@ describe("normalizeStoredRecord", () => {
 
   it("keeps a valid stored record", () => {
     const record = {
-      highestTier: TwoFactorTier.Authenticator,
+      highestTier: TwoFactorTier.HighBalance,
       highBalanceCurrency: WalletCurrency.Usd,
       nudgeCardDismissed: true,
       requiredDismissals: 2,
@@ -354,11 +352,11 @@ describe("normalizeStoredRecord", () => {
   it("starts the fields a record from before they existed at their defaults", () => {
     expect(
       normalizeStoredRecord({
-        highestTier: TwoFactorTier.Required,
+        highestTier: TwoFactorTier.Reminder,
         nudgeCardDismissed: true,
       }),
     ).toEqual(
-      recordWith({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: true }),
+      recordWith({ highestTier: TwoFactorTier.Reminder, nudgeCardDismissed: true }),
     )
   })
 

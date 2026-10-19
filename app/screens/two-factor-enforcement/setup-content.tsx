@@ -39,7 +39,7 @@ type TwoFactorSetupContentProps = {
 /**
  * The setup itself: the lock hero and the two ways to add a factor. The route shows it
  * under a header with a close control; the session gate shows it bare, with no way to
- * close it, once the required tier has spent its dismissals.
+ * close it, once the reminder tier has spent its dismissals.
  */
 export const TwoFactorSetupContent: React.FC<TwoFactorSetupContentProps> = ({
   promptTier,

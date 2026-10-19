@@ -64,7 +64,7 @@ export const useTwoFactorSessionPrompt = ({
    *  hidden and shown again with the home's focus while it stays up. */
   useEffect(() => {
     if (!isStartForHome) return
-    if (requiredPrompt === TwoFactorSessionPrompt.RequiredModal) {
+    if (requiredPrompt === TwoFactorSessionPrompt.SessionModal) {
       setModal({ isOpen: true, tier: unmetTier })
       logTwoFactorPromptShown({ tier: unmetTier, prompt: TwoFactorPrompt.SessionModal })
       return
@@ -76,7 +76,7 @@ export const useTwoFactorSessionPrompt = ({
    *  to ask once that start is taken, or once a fresher read says the modal no longer
    *  applies: the effect above then takes the start, or the navigator does. */
   const isStartTaken = !isSessionStartPending
-  const isModalOutgrown = requiredPrompt !== TwoFactorSessionPrompt.RequiredModal
+  const isModalOutgrown = requiredPrompt !== TwoFactorSessionPrompt.SessionModal
   const isModalStale = modal.isOpen && (isStartTaken || isModalOutgrown)
   useEffect(() => {
     if (isModalStale) setModal(CLOSED)

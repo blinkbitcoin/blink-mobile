@@ -51,7 +51,7 @@ const renderContent = async ({
   const rendered = render(
     <ContextForScreen>
       <TwoFactorSetupContent
-        promptTier={TwoFactorTier.Required}
+        promptTier={TwoFactorTier.Reminder}
         returnTo="twoFactorSetup"
         promptReverification={mockPromptReverification}
         isReverifying={isReverifying}
@@ -115,7 +115,7 @@ describe("TwoFactorSetupContent", () => {
       returnTo: "twoFactorSetup",
     })
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
       method: TwoFactorMethod.Authenticator,
     })
   })
@@ -130,7 +130,7 @@ describe("TwoFactorSetupContent", () => {
     })
     expect(mockPromptReverification).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
       method: TwoFactorMethod.Email,
     })
   })
@@ -154,7 +154,7 @@ describe("TwoFactorSetupContent", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("phoneRegistrationInitiate")
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Reminder,
       method: TwoFactorMethod.Phone,
     })
   })

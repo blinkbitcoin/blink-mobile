@@ -11,7 +11,7 @@ import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
-import { AUTHENTICATOR_THRESHOLD } from "@app/custodial/two-factor-enforcement"
+import { HIGH_BALANCE_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useEmailReverification } from "@app/hooks/use-email-reverification"
@@ -48,14 +48,14 @@ const highBalanceIcon = (currency: WalletCurrency): IconNamesType =>
 /** The threshold the title quotes, in the wallet that crossed it. */
 const highBalanceThreshold = (currency: WalletCurrency) =>
   currency === WalletCurrency.Usd
-    ? toUsdMoneyAmount(AUTHENTICATOR_THRESHOLD.usdCents)
-    : toBtcMoneyAmount(AUTHENTICATOR_THRESHOLD.sats)
+    ? toUsdMoneyAmount(HIGH_BALANCE_THRESHOLD.usdCents)
+    : toBtcMoneyAmount(HIGH_BALANCE_THRESHOLD.sats)
 
 /**
  * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
  * at the session start that owes it, so the home is never seen first. The required
  * tier, once its dismissals are spent, shows the setup itself with no way to close it:
- * the only exits are the factors it offers. The authenticator tier shows the
+ * the only exits are the factors it offers. The high-balance tier shows the
  * high-balance screen, with an X while it still has dismissals left and none after, and
  * offers exactly two ways forward. Neither takes the swipe or the hardware back.
  */
@@ -75,7 +75,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   /** The gate mounts this screen anew for each tier it is raised for, so the tier it
    *  reports and charges its X to is the one it was raised for, for as long as it is
    *  open. */
-  const isAuthenticatorTier = unmetTier === TwoFactorTier.Authenticator
+  const isAuthenticatorTier = unmetTier === TwoFactorTier.HighBalance
   const isDismissible = isAuthenticatorTier && remainingDismissals > 0
 
   useEffect(() => {
