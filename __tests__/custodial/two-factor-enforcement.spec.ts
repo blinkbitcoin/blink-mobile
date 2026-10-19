@@ -311,7 +311,7 @@ describe("resolveSessionPrompt", () => {
         unmetTier: TwoFactorTier.Recommended,
         record: recordWith({ recommendedDismissals: 2 }),
       }),
-    ).toBe(TwoFactorSessionPrompt.RequiredModal)
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
   })
 
   it("owes the protection screen at the recommended tier once dismissals are spent", () => {

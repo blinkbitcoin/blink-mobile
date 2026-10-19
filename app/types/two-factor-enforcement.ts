@@ -1,5 +1,8 @@
 import { WalletCurrency } from "@app/graphql/generated"
 
+/** The balance tiers, named after how hard each pushes an account without an
+ *  authenticator to set one: suggested, then recommended, then enforced, the only one
+ *  that can block. The values are what the record stores and the events report. */
 export const TwoFactorTier = {
   None: 0,
   Suggested: 1,
@@ -29,18 +32,22 @@ export type TwoFactorPrompt = (typeof TwoFactorPrompt)[keyof typeof TwoFactorPro
  *  at the enforced tier, or nothing. */
 export const TwoFactorSessionPrompt = {
   None: "none",
-  RequiredModal: "required_modal",
+  SessionModal: "session_modal",
   ProtectionRequired: "protection_required",
 } as const
 export type TwoFactorSessionPrompt =
   (typeof TwoFactorSessionPrompt)[keyof typeof TwoFactorSessionPrompt]
 
+/** What the device remembers per account. The field names are the stored keys, kept as
+ *  first written: renaming one would read every record already on a device as unset. */
 export type TwoFactorEnforcementRecord = {
   highestTier: TwoFactorTier
-  /** The wallet that carried the account over the enforced threshold, for the
-   *  copy that names it after the balance may have moved on. */
+  /** The wallet that carried the account over the enforced threshold, for the copy
+   *  that names it after the balance may have moved on. */
   enforcedCurrency: WalletCurrency
   nudgeCardDismissed: boolean
+  /** Dismissals counted at the recommended tier. */
   recommendedDismissals: number
+  /** Dismissals counted at the enforced tier. */
   enforcedDismissals: number
 }

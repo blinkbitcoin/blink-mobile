@@ -98,7 +98,7 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => {
       isPreparingSessionStart: mockTwoFactorStartPreparing,
       isSessionStartPending: mockTwoFactorStartPending,
       requiredPrompt: mockTwoFactorPromptOwed
-        ? TwoFactorSessionPrompt.RequiredModal
+        ? TwoFactorSessionPrompt.SessionModal
         : TwoFactorSessionPrompt.None,
     }),
   }

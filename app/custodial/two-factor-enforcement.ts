@@ -171,7 +171,7 @@ export const resolveSessionPrompt = ({
   if (unmetTier !== TwoFactorTier.Recommended) return TwoFactorSessionPrompt.None
   const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
   return hasDismissalsLeft
-    ? TwoFactorSessionPrompt.RequiredModal
+    ? TwoFactorSessionPrompt.SessionModal
     : TwoFactorSessionPrompt.ProtectionRequired
 }
 

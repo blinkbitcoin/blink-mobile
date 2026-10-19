@@ -362,7 +362,7 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.unmetTier).toBe(TwoFactorTier.Recommended)
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
       expect(result.current.remainingDismissals).toBe(3)
     })
 
@@ -630,7 +630,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("is pending from the local read alone when it already owes a prompt, before the fresh read lands", async () => {
@@ -639,7 +639,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("waits for the fresh read while the local read owes nothing, since that read can still raise the tier", async () => {
@@ -651,7 +651,7 @@ describe("TwoFactorEnforcementProvider", () => {
       rerender({})
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("stands the protection screen in for the home while the start that owes it is pending", async () => {
@@ -707,7 +707,7 @@ describe("TwoFactorEnforcementProvider", () => {
       const { result } = await renderEnforcement()
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("stays inert when the fresh read fails with nothing cached, without holding the home", async () => {
@@ -727,7 +727,7 @@ describe("TwoFactorEnforcementProvider", () => {
     it("stands the protection screen in when a fresher read raises the tier while the start is still pending", async () => {
       setAccount({ sats: 500_000 })
       const { result, rerender } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
       expect(result.current.isProtectionGateActive).toBe(false)
 
       setAccount({ sats: 5_000_000 })
@@ -751,7 +751,7 @@ describe("TwoFactorEnforcementProvider", () => {
       rerender({})
 
       expect(result.current.isSessionStartPending).toBe(false)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     it("owes the protection screen once the recommended tier has no dismissals left", async () => {
@@ -841,7 +841,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       setAccount({ sats: 500_000 })
       storeRecord({ highestTier: TwoFactorTier.Recommended })
       const { result } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
 
@@ -853,7 +853,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       setAccount({ sats: 500_000 })
       storeRecord({ highestTier: TwoFactorTier.Recommended })
       const { result, rerender } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       setAccount({ sats: 5_000_000 })
       await act(async () => rerender({}))
@@ -884,7 +884,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       rerender({})
 
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
     /** The local read raises the modal before the fresh read lands; waving it away
@@ -894,7 +894,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       storeRecord({ highestTier: TwoFactorTier.Recommended })
       const { result, rerender } = await renderEnforcement()
       expect(result.current.isSessionStartPending).toBe(true)
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
 
@@ -1067,7 +1067,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       setAccount({ sats: 500_000 })
       storeRecord({ highestTier: TwoFactorTier.Recommended, recommendedDismissals: 2 })
       const { result } = await renderEnforcement()
-      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.RequiredModal)
+      expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
 
       act(() => result.current.registerDismissal(TwoFactorTier.Recommended))
 
