@@ -4061,8 +4061,6 @@
         "settingsDescription": "設定して、不正アクセスからアカウントを保護しましょう。",
         "setupTitle": "今すぐ2要素認証を設定する",
         "setupDescription": "アカウントへの不正アクセスを防ぐため、今すぐ2要素認証を追加してください。",
-        "addEmail": "メールを追加",
-        "addPhoneNumber": "電話番号を追加",
         "setAuthenticator": "認証アプリを設定",
         "modalReminder": "今閉じる場合は、できるだけ早く有効にしてください。",
         "dismissTwoMore": "あと2回閉じることができます。",

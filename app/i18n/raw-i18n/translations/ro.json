@@ -4061,8 +4061,6 @@
     "settingsDescription": "Protejează-ți contul împotriva accesului neautorizat configurând-o.",
     "setupTitle": "Configurează acum autentificarea cu doi factori",
     "setupDescription": "Pentru a preveni accesul neautorizat la contul tău, adaugă acum autentificarea cu doi factori.",
-    "addEmail": "Adaugă email",
-    "addPhoneNumber": "Adaugă număr de telefon",
     "setAuthenticator": "Configurează autentificatorul",
     "modalReminder": "Dacă respingi acum, asigură-te că o activezi cât mai curând.",
     "dismissTwoMore": "Mai poți respinge asta de două ori.",

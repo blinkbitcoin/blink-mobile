@@ -4061,8 +4061,6 @@
     "settingsDescription": "Hesabınızı yetkisiz erişime karşı korumak için bunu ayarlayın.",
     "setupTitle": "İki aşamalı doğrulamayı şimdi ayarlayın",
     "setupDescription": "Hesabınıza yetkisiz erişimi önlemek için şimdi iki aşamalı doğrulama ekleyin.",
-    "addEmail": "E-posta ekle",
-    "addPhoneNumber": "Telefon numarası ekle",
     "setAuthenticator": "Doğrulayıcı ayarla",
     "modalReminder": "Şimdi reddederseniz, en kısa sürede etkinleştirdiğinizden emin olun.",
     "dismissTwoMore": "Bunu iki kez daha reddedebilirsiniz.",

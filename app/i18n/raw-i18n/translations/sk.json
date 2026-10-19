@@ -4061,8 +4061,6 @@
     "settingsDescription": "Chráňte svoj účet pred neoprávneným prístupom jeho nastavením.",
     "setupTitle": "Nastavte dvojfaktorové overenie teraz",
     "setupDescription": "Aby ste zabránili neoprávnenému prístupu k svojmu účtu, pridajte teraz dvojfaktorové overenie.",
-    "addEmail": "Pridať e-mail",
-    "addPhoneNumber": "Pridať telefónne číslo",
     "setAuthenticator": "Nastaviť autentifikátor",
     "modalReminder": "Ak to teraz odmietnete, nezabudnite to čo najskôr zapnúť.",
     "dismissTwoMore": "Môžete to odmietnuť ešte dvakrát.",

@@ -4061,8 +4061,6 @@
     "settingsDescription": "Lindungi akun Anda dari akses yang tidak sah dengan mengaturnya.",
     "setupTitle": "Atur otentikasi dua faktor sekarang",
     "setupDescription": "Untuk mencegah akses yang tidak sah ke akun Anda, tambahkan otentikasi dua faktor sekarang.",
-    "addEmail": "Tambah email",
-    "addPhoneNumber": "Tambah nomor telepon",
     "setAuthenticator": "Atur authenticator",
     "modalReminder": "Jika Anda menutupnya sekarang, pastikan untuk mengaktifkannya sesegera mungkin.",
     "dismissTwoMore": "Anda dapat menutup ini dua kali lagi.",

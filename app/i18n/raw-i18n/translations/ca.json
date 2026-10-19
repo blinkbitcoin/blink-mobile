@@ -4061,8 +4061,6 @@
     "settingsDescription": "Protegeix el teu compte de l'accés no autoritzat configurant-la.",
     "setupTitle": "Configura ara l'autenticació de dos factors",
     "setupDescription": "Per evitar l'accés no autoritzat al teu compte, afegeix ara l'autenticació de dos factors.",
-    "addEmail": "Afegeix correu electrònic",
-    "addPhoneNumber": "Afegeix número de telèfon",
     "setAuthenticator": "Configura l'autenticador",
     "modalReminder": "Si ho descartes ara, assegura't d'activar-ho tan aviat com puguis.",
     "dismissTwoMore": "Pots descartar això dues vegades més.",

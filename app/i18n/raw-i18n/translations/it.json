@@ -4061,8 +4061,6 @@
         "settingsDescription": "Proteggi il tuo account dagli accessi non autorizzati impostandola.",
         "setupTitle": "Imposta ora l'autenticazione a due fattori",
         "setupDescription": "Per prevenire accessi non autorizzati al tuo account, aggiungi ora l'autenticazione a due fattori.",
-        "addEmail": "Aggiungi email",
-        "addPhoneNumber": "Aggiungi numero di telefono",
         "setAuthenticator": "Imposta l'autenticatore",
         "modalReminder": "Se lo ignori ora, assicurati di attivarlo il prima possibile.",
         "dismissTwoMore": "Puoi ignorarlo ancora due volte.",

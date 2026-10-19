@@ -4061,8 +4061,6 @@
     "settingsDescription": "Beskyt din konto mod uautoriseret adgang ved at opsætte den.",
     "setupTitle": "Opsæt to-faktor godkendelse nu",
     "setupDescription": "For at forhindre uautoriseret adgang til din konto skal du tilføje to-faktor godkendelse nu.",
-    "addEmail": "Tilføj e-mail",
-    "addPhoneNumber": "Tilføj telefonnummer",
     "setAuthenticator": "Opsæt authenticator",
     "modalReminder": "Hvis du afviser nu, så sørg for at slå det til hurtigst muligt.",
     "dismissTwoMore": "Du kan afvise dette to gange mere.",

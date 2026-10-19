@@ -32,21 +32,10 @@ const mockEnforcement = {
   unmetTier: TwoFactorTier.Recommended as TwoFactorTier,
   remainingDismissals: 0,
   enforcedCurrency: WalletCurrency.Btc as WalletCurrency,
-  missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
-  unverifiedEmail: null as string | null,
   registerDismissal: mockRegisterDismissal,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
-}))
-
-const mockUseEmailReverification = jest.fn((_options?: { returnTo?: string }) => ({
-  promptReverification: jest.fn(),
-  spinner: false,
-}))
-jest.mock("@app/hooks/use-email-reverification", () => ({
-  useEmailReverification: (options?: { returnTo?: string }) =>
-    mockUseEmailReverification(options),
 }))
 
 const mockLogTwoFactorPromptShown = jest.fn()
@@ -93,24 +82,20 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.enforcedCurrency = WalletCurrency.Btc
-    mockEnforcement.missingMethod = TwoFactorMethod.Email
-    mockEnforcement.unverifiedEmail = null
   })
 
   describe("at the recommended tier", () => {
-    it("stands the setup in, with no close control and no other way out", async () => {
+    it("stands the setup in, with no close control", async () => {
       await renderScreen()
 
       expect(screen.getByTestId("icon-lock-closed")).toBeTruthy()
       expect(screen.getByText(LL.TwoFactorEnforcement.setupTitle())).toBeTruthy()
       expect(screen.getByText(LL.TwoFactorEnforcement.setupDescription())).toBeTruthy()
       expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
-      expect(screen.queryByTestId("two-factor-protection-move")).toBeNull()
-      expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
       expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
     })
 
-    it("offers the authenticator first and the missing factor second", async () => {
+    it("offers the authenticator first and leaving custody second", async () => {
       await renderScreen()
 
       // eslint-disable-next-line camelcase
@@ -119,24 +104,21 @@ describe("TwoFactorProtectionRequiredScreen", () => {
       )
       // eslint-disable-next-line camelcase
       expect(screen.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe(
-        LL.TwoFactorEnforcement.addEmail(),
+        LL.AccountMigration.moveToNonCustodial(),
       )
     })
 
-    it("starts the missing factor's flow under the recommended tier, returning to the home", async () => {
+    it("starts the authenticator flow under the recommended tier, returning to the home", async () => {
       await renderScreen()
 
-      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
+      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
 
-      expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate", {
-        returnTo: "Primary",
-      })
-      expect(mockUseEmailReverification).toHaveBeenLastCalledWith({
+      expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
         returnTo: "Primary",
       })
       expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
         tier: TwoFactorTier.Recommended,
-        method: TwoFactorMethod.Email,
+        method: TwoFactorMethod.Authenticator,
       })
     })
 

@@ -4061,8 +4061,6 @@
         "settingsDescription": "Protege tu cuenta del acceso no autorizado configurándola.",
         "setupTitle": "Configura ahora la autenticación de dos factores",
         "setupDescription": "Para evitar el acceso no autorizado a tu cuenta, agrega ahora la autenticación de dos factores.",
-        "addEmail": "Agregar correo electrónico",
-        "addPhoneNumber": "Agregar número de teléfono",
         "setAuthenticator": "Configurar autenticador",
         "modalReminder": "Si lo descartas ahora, asegúrate de activarlo lo antes posible.",
         "dismissTwoMore": "Puedes descartar esto dos veces más.",

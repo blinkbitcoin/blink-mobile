@@ -22,39 +22,22 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
-const mockEnforcement = {
-  missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
-  unverifiedEmail: null as string | null,
-}
-jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
-  useTwoFactorEnforcement: () => mockEnforcement,
-}))
-
 const mockLogTwoFactorSetupStarted = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: (...args: unknown[]) => mockLogTwoFactorSetupStarted(...args),
 }))
 
-const mockPromptReverification = jest.fn()
-
 type LayoutOptions = {
-  isReverifying?: boolean
   headerShown?: boolean
   header?: React.ReactNode
 }
 
-const renderContent = async ({
-  isReverifying = false,
-  headerShown,
-  header,
-}: LayoutOptions = {}) => {
+const renderContent = async ({ headerShown, header }: LayoutOptions = {}) => {
   const rendered = render(
     <ContextForScreen>
       <TwoFactorSetupContent
         promptTier={TwoFactorTier.Recommended}
         returnTo="twoFactorSetup"
-        promptReverification={mockPromptReverification}
-        isReverifying={isReverifying}
         headerShown={headerShown}
         header={header}
       />
@@ -73,8 +56,6 @@ describe("TwoFactorSetupContent", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    mockEnforcement.missingMethod = TwoFactorMethod.Email
-    mockEnforcement.unverifiedEmail = null
   })
 
   it("draws the row it is handed in place of the navigation header", async () => {
@@ -91,19 +72,15 @@ describe("TwoFactorSetupContent", () => {
     expect(screen.getByText(LL.TwoFactorEnforcement.setupDescription())).toBeTruthy()
   })
 
-  it("makes the authenticator the primary button and the missing email the secondary one", async () => {
+  /** An email or a phone added to the one the account logs in with protects nothing:
+   *  the setup offers the authenticator, or leaving custody, and nothing else. */
+  it("offers the authenticator first and leaving custody second, with no email or phone", async () => {
     await renderContent()
 
     expect(primaryButton().props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
-    expect(secondaryButton().props.title).toBe(LL.TwoFactorEnforcement.addEmail())
-  })
-
-  it("keeps the authenticator primary when the phone number is the missing factor", async () => {
-    mockEnforcement.missingMethod = TwoFactorMethod.Phone
-    await renderContent()
-
-    expect(primaryButton().props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
-    expect(secondaryButton().props.title).toBe(LL.TwoFactorEnforcement.addPhoneNumber())
+    expect(secondaryButton().props.title).toBe(LL.AccountMigration.moveToNonCustodial())
+    expect(screen.queryByText("Add email")).toBeNull()
+    expect(screen.queryByText("Add phone number")).toBeNull()
   })
 
   it("opens the authenticator setup, told to return here, under the tier it was raised for", async () => {
@@ -120,57 +97,15 @@ describe("TwoFactorSetupContent", () => {
     })
   })
 
-  it("adds an email when that is the missing factor, told to return here", async () => {
+  /** Leaving custody goes through the screen that explains what it means; that screen
+   *  reports the choice, so nothing is reported here. */
+  it("opens the screen that explains leaving custody, reporting nothing itself", async () => {
     await renderContent()
 
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
+    fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationInitiate", {
-      returnTo: "twoFactorSetup",
-    })
-    expect(mockPromptReverification).not.toHaveBeenCalled()
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      method: TwoFactorMethod.Email,
-    })
-  })
-
-  it("sends an address that was never verified through re-verification", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    await renderContent()
-
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
-
-    expect(mockPromptReverification).toHaveBeenCalledWith("someone@example.com")
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
-
-  it("adds a phone number when the email is already verified", async () => {
-    mockEnforcement.missingMethod = TwoFactorMethod.Phone
-    await renderContent()
-
-    expect(screen.queryByText(LL.TwoFactorEnforcement.addEmail())).toBeNull()
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addPhoneNumber()))
-
-    expect(mockNavigate).toHaveBeenCalledWith("phoneRegistrationInitiate")
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      method: TwoFactorMethod.Phone,
-    })
-  })
-
-  it("holds both buttons while a re-verification is in flight", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    await renderContent({ isReverifying: true })
-
-    /** The missing-factor button shows its spinner in place of its title while it is
-     *  held, so there is no label to press; its disabled state is what keeps a second
-     *  re-verification from starting. */
-    expect(secondaryButton().props.loading).toBe(true)
-    expect(secondaryButton().props.disabled).toBe(true)
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
-
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial")
+    expect(mockLogTwoFactorSetupStarted).not.toHaveBeenCalled()
   })
 
   it("draws the navigation header unless told otherwise", async () => {

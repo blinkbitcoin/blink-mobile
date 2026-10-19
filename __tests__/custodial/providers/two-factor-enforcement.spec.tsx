@@ -8,7 +8,6 @@ import {
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   TwoFactorEnforcementRecord,
-  TwoFactorMethod,
   TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
@@ -486,55 +485,13 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
     })
 
-    it("does not count an unverified email and hands its address to the setup", async () => {
+    it("does not count an email, verified or not, toward the authenticator it asks for", async () => {
       setAccount({ sats: 50_000, phone: PHONE, email: unverifiedEmail })
 
       const { result } = await renderEnforcement()
 
       expect(result.current.hasAuthenticator).toBe(false)
       expect(result.current.shouldShowNudgeCard).toBe(true)
-      expect(result.current.missingMethod).toBe(TwoFactorMethod.Email)
-      expect(result.current.unverifiedEmail).toBe(EMAIL)
-    })
-
-    it("treats an address whose verification is unknown as unverified", async () => {
-      setAccount({
-        sats: 50_000,
-        phone: PHONE,
-        email: { address: EMAIL, verified: null },
-      })
-
-      const { result } = await renderEnforcement()
-
-      expect(result.current.hasAuthenticator).toBe(false)
-      expect(result.current.unverifiedEmail).toBe(EMAIL)
-    })
-
-    it("hands no address to the setup when the unverified email has none", async () => {
-      setAccount({ sats: 50_000, email: { address: null, verified: false } })
-
-      const { result } = await renderEnforcement()
-
-      expect(result.current.missingMethod).toBe(TwoFactorMethod.Email)
-      expect(result.current.unverifiedEmail).toBeNull()
-    })
-
-    it("offers a phone once the email is verified, with no address to re-verify", async () => {
-      setAccount({ email: verifiedEmail })
-
-      const { result } = await renderEnforcement()
-
-      expect(result.current.missingMethod).toBe(TwoFactorMethod.Phone)
-      expect(result.current.unverifiedEmail).toBeNull()
-    })
-
-    it("offers an email to an account with only a phone", async () => {
-      setAccount({ phone: PHONE })
-
-      const { result } = await renderEnforcement()
-
-      expect(result.current.missingMethod).toBe(TwoFactorMethod.Email)
-      expect(result.current.unverifiedEmail).toBeNull()
     })
   })
 

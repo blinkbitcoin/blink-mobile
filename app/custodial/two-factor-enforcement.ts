@@ -2,7 +2,6 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import {
   TwoFactorEnforcementRecord,
-  TwoFactorMethod,
   TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
@@ -82,14 +81,6 @@ export const withTierReached = (
   if (tier !== TwoFactorTier.Enforced) return raised
   return { ...raised, enforcedCurrency: resolveEnforcedCurrency(wallets) }
 }
-
-/** The setup offers the factor the account lacks: a phone when the email is already
- *  verified, otherwise an email, which is also the step an account with nothing takes. */
-export const resolveMissingMethod = ({
-  hasVerifiedEmail,
-}: {
-  hasVerifiedEmail: boolean
-}): TwoFactorMethod => (hasVerifiedEmail ? TwoFactorMethod.Phone : TwoFactorMethod.Email)
 
 type UnmetTierInputs = {
   tier: TwoFactorTier
