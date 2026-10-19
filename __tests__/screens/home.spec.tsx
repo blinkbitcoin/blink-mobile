@@ -80,13 +80,12 @@ const mockTwoFactorEnforcement = {
   tier: 0,
   unmetTier: 0,
   hasAuthenticator: false,
-  missingMethod: "email",
-  unverifiedEmail: null,
   enforcedCurrency: "BTC",
   remainingDismissals: 3,
   requiredPrompt: "none",
   isSessionStartPending: false,
   shouldShowNudgeCard: false,
+  shouldShowReminderBulletin: false,
   shouldShowSettingsBanner: false,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
@@ -101,6 +100,12 @@ type TwoFactorNudgeCardProps = Record<string, never>
 const mockTwoFactorNudgeCard = jest.fn<null, [TwoFactorNudgeCardProps]>(() => null)
 jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
   TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
+}))
+
+const mockTwoFactorReminderBulletin = jest.fn<null, [Record<string, never>]>(() => null)
+jest.mock("@app/custodial/components/two-factor-reminder-bulletin", () => ({
+  TwoFactorReminderBulletin: (props: Record<string, never>) =>
+    mockTwoFactorReminderBulletin(props),
 }))
 
 const mockTwoFactorSessionPrompt = {
@@ -2171,6 +2176,40 @@ describe("TwoFactorNudgeCard gating", () => {
     await flushEffects()
 
     expect(mockTwoFactorNudgeCard).not.toHaveBeenCalled()
+  })
+})
+
+describe("TwoFactorReminderBulletin gating", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorEnforcement.shouldShowReminderBulletin = false
+  })
+
+  afterEach(() => {
+    mockTwoFactorEnforcement.shouldShowReminderBulletin = false
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("renders the bulletin when the enforcement says it is due", async () => {
+    mockTwoFactorEnforcement.shouldShowReminderBulletin = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorReminderBulletin).toHaveBeenCalled()
+  })
+
+  it("does not render the bulletin otherwise", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorReminderBulletin).not.toHaveBeenCalled()
   })
 })
 

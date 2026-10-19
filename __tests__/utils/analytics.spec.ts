@@ -288,6 +288,26 @@ describe("analytics helpers", () => {
       })
     })
 
+    it("adds the reason the reminder bulletin is up for, to both its events", () => {
+      logTwoFactorPromptShown({ tier: 2, prompt: "tier2_bulletin", reason: "new_ath" })
+      logTwoFactorPromptDismissed({
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "first_sessions",
+      })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_shown", {
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "new_ath",
+      })
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "first_sessions",
+      })
+    })
+
     it("emits 'two_factor_prompt_dismissed' with tier and prompt", () => {
       logTwoFactorPromptDismissed({ tier: 2, prompt: "settings_banner" })
 

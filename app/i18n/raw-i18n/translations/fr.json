@@ -4062,6 +4062,8 @@
         "setupTitle": "Configurez l'authentification à deux facteurs maintenant",
         "setupDescription": "Pour empêcher tout accès non autorisé à votre compte, ajoutez l'authentification à deux facteurs maintenant.",
         "setAuthenticator": "Configurer l'authentificateur",
+        "reminderTitle": "Ajoutez un authentificateur pour protéger vos fonds",
+        "reminderDescription": "Votre solde a augmenté. Une application d'authentification protège votre compte, même si quelqu'un met la main sur votre e-mail ou votre téléphone.",
         "modalReminder": "Si vous ignorez maintenant, pensez à l'activer dès que possible.",
         "dismissTwoMore": "Vous pouvez ignorer ceci encore deux fois.",
         "dismissOneMore": "Vous pouvez ignorer ceci encore une fois.",

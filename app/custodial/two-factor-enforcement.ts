@@ -2,6 +2,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import {
   TwoFactorEnforcementRecord,
+  TwoFactorReminderReason,
   TwoFactorSessionPrompt,
   TwoFactorThresholds,
   TwoFactorTier,
@@ -154,12 +155,59 @@ export const resolveSessionPrompt = ({
     : TwoFactorSessionPrompt.ProtectionRequired
 }
 
+/** Whether either wallet now holds more than its all-time high. Each wallet is measured
+ *  in its own unit, so a move in the bitcoin price never reads as a new high. */
+export const isAboveAllTimeHigh = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+): boolean => {
+  const { sats, usdCents } = balancesOf(wallets)
+  return sats > record.highestSats || usdCents > record.highestUsdCents
+}
+
+/** Raises each wallet's all-time high to its balance where the balance is above it. */
+export const withAllTimeHigh = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+): TwoFactorEnforcementRecord => {
+  const { sats, usdCents } = balancesOf(wallets)
+  return {
+    ...record,
+    highestSats: Math.max(record.highestSats, sats),
+    highestUsdCents: Math.max(record.highestUsdCents, usdCents),
+  }
+}
+
+type ReminderInputs = {
+  unmetTier: TwoFactorTier
+  record: TwoFactorEnforcementRecord
+  /** Whether this session started with a wallet above its all-time high. */
+  hasNewAllTimeHigh: boolean
+}
+
+/** Why the reminder bulletin is due, or null when it is not. It belongs to the
+ *  recommended tier alone and never blocks: it comes back at every session start while
+ *  the tier's dismissals last, and after that only at a session start that found a wallet
+ *  above its all-time high, as many times as that happens. */
+export const resolveReminderReason = ({
+  unmetTier,
+  record,
+  hasNewAllTimeHigh,
+}: ReminderInputs): TwoFactorReminderReason | null => {
+  if (unmetTier !== TwoFactorTier.Recommended) return null
+  const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
+  if (hasDismissalsLeft) return TwoFactorReminderReason.FirstSessions
+  return hasNewAllTimeHigh ? TwoFactorReminderReason.NewAllTimeHigh : null
+}
+
 export const DEFAULT_TWO_FACTOR_ENFORCEMENT: TwoFactorEnforcementRecord = {
   highestTier: TwoFactorTier.None,
   enforcedCurrency: WalletCurrency.Btc,
   nudgeCardDismissed: false,
   recommendedDismissals: 0,
   enforcedDismissals: 0,
+  highestSats: 0,
+  highestUsdCents: 0,
 }
 
 const TIERS: readonly TwoFactorTier[] = Object.values(TwoFactorTier)
@@ -172,7 +220,8 @@ const WALLET_CURRENCIES: readonly WalletCurrency[] = Object.values(WalletCurrenc
 const isWalletCurrency = (value: unknown): value is WalletCurrency =>
   WALLET_CURRENCIES.some((currency) => currency === value)
 
-const isDismissalCount = (value: unknown): value is number =>
+/** A dismissal count or a balance: a whole number, never below zero. */
+const isWholeCount = (value: unknown): value is number =>
   typeof value === "number" && Number.isInteger(value) && value >= 0
 
 /** What the storage hands back: the record's fields, each as whatever was stored. */
@@ -190,10 +239,16 @@ export const normalizeStoredRecord = (
     ? stored.enforcedCurrency
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.enforcedCurrency,
   nudgeCardDismissed: stored?.nudgeCardDismissed === true,
-  recommendedDismissals: isDismissalCount(stored?.recommendedDismissals)
+  recommendedDismissals: isWholeCount(stored?.recommendedDismissals)
     ? stored.recommendedDismissals
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.recommendedDismissals,
-  enforcedDismissals: isDismissalCount(stored?.enforcedDismissals)
+  enforcedDismissals: isWholeCount(stored?.enforcedDismissals)
     ? stored.enforcedDismissals
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.enforcedDismissals,
+  highestSats: isWholeCount(stored?.highestSats)
+    ? stored.highestSats
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.highestSats,
+  highestUsdCents: isWholeCount(stored?.highestUsdCents)
+    ? stored.highestUsdCents
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.highestUsdCents,
 })

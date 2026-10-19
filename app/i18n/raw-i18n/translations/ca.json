@@ -4062,6 +4062,8 @@
     "setupTitle": "Configura ara l'autenticació de dos factors",
     "setupDescription": "Per evitar l'accés no autoritzat al teu compte, afegeix ara l'autenticació de dos factors.",
     "setAuthenticator": "Configura l'autenticador",
+    "reminderTitle": "Afegeix un autenticador per protegir els teus fons",
+    "reminderDescription": "El teu saldo ha augmentat. Una aplicació d'autenticació manté el teu compte segur, fins i tot si algú s'apodera del teu correu electrònic o del teu telèfon.",
     "modalReminder": "Si ho descartes ara, assegura't d'activar-ho tan aviat com puguis.",
     "dismissTwoMore": "Pots descartar això dues vegades més.",
     "dismissOneMore": "Pots descartar això una vegada més.",

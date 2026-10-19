@@ -4062,6 +4062,8 @@
     "setupTitle": "Stel nu tweefactorauthenticatie in",
     "setupDescription": "Voeg nu tweefactorauthenticatie toe om ongeautoriseerde toegang tot je account te voorkomen.",
     "setAuthenticator": "Authenticator instellen",
+    "reminderTitle": "Voeg een authenticator toe om je tegoed te beschermen",
+    "reminderDescription": "Je saldo is gegroeid. Een authenticator-app houdt je account veilig, zelfs als iemand toegang krijgt tot je e-mail of telefoon.",
     "modalReminder": "Als je dit nu wegklikt, zorg dan dat je het zo snel mogelijk inschakelt.",
     "dismissTwoMore": "Je kunt dit nog twee keer wegklikken.",
     "dismissOneMore": "Je kunt dit nog één keer wegklikken.",

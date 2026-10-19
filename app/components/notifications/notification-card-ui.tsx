@@ -16,6 +16,9 @@ export type NotificationCardUIProps = {
   loading?: boolean
   dismissAction?: () => void
   buttonLabel?: string
+  /** Outlines the card in the primary colour, for a bulletin that asks for more than
+   *  the others do. */
+  isHighlighted?: boolean
 }
 
 export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
@@ -26,6 +29,7 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
   loading,
   dismissAction,
   buttonLabel,
+  isHighlighted = false,
 }) => {
   const styles = useStyles()
   const {
@@ -81,14 +85,16 @@ export const NotificationCardUI: React.FC<NotificationCardUIProps> = ({
     </>
   )
 
+  const containerStyle = [styles.buttonContainer, isHighlighted && styles.highlighted]
+
   /** No action means a text-only card: a plain View, so it never gives press feedback
    *  or announces as a button to screen readers. */
   if (!action) {
-    return <View style={styles.buttonContainer}>{content}</View>
+    return <View style={containerStyle}>{content}</View>
   }
 
   return (
-    <TouchableOpacity style={styles.buttonContainer} onPress={action}>
+    <TouchableOpacity style={containerStyle} onPress={action}>
       {content}
     </TouchableOpacity>
   )
@@ -99,6 +105,10 @@ const useStyles = makeStyles(({ colors }) => ({
     backgroundColor: colors.grey5,
     borderRadius: 8,
     flexDirection: "column",
+  },
+  highlighted: {
+    borderWidth: 1,
+    borderColor: colors.primary,
   },
   contentSection: {
     paddingVertical: 14,

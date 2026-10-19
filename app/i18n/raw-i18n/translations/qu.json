@@ -4062,6 +4062,8 @@
     "setupTitle": "Kunan iskay rakiypi riqsichiyta churay",
     "setupDescription": "Cuentaykiman mana saqisqa yaykuyta harkanaykipaq, kunan iskay rakiypi riqsichiyta yapay.",
     "setAuthenticator": "Autenticadorta churay",
+    "reminderTitle": "Autenticadorta yapay qullqiykita harkanaykipaq",
+    "reminderDescription": "Qullqiyki yapakurqanmi. Autenticador app cuentaykita allinta waqaychan, pipas correoykita utaq telefonoykita hap'iptinpas.",
     "modalReminder": "Kunan saqispaykiqa, usqhaylla chayta qallarichiy.",
     "dismissTwoMore": "Kayta iskay kutita saqiyta atinkiraq.",
     "dismissOneMore": "Kayta huk kutita saqiyta atinkiraq.",

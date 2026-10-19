@@ -44,6 +44,7 @@ import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-cont
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
+import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
 import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
@@ -249,6 +250,7 @@ export const HomeScreen: React.FC = () => {
   } = useSelfCustodialInfoBulletinState()
   const {
     shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
+    shouldShowReminderBulletin: shouldShowTwoFactorReminderBulletin,
     remainingDismissals: twoFactorRemainingDismissals,
     isSessionStartPending: isTwoFactorStartPending,
     registerDismissal: registerTwoFactorDismissal,
@@ -1010,6 +1012,7 @@ export const HomeScreen: React.FC = () => {
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
+        {shouldShowTwoFactorReminderBulletin && <TwoFactorReminderBulletin />}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
