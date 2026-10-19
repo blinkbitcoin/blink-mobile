@@ -62,9 +62,9 @@ export const canGoBackFromChooseExperience = (
   return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
 }
 
-/** Where a registration flow goes on success when it was opened from the two-factor
- *  setup, instead of the destination the flow has on its own: back into the setup
- *  route, or back to the home when the setup stood in for it at a session start. */
+/** Where the authenticator flow goes on success when it was opened from a two-factor
+ *  prompt, instead of the destination the flow has on its own: back into the setup
+ *  route, or back to the home when a prompt stood in for it at a session start. */
 export const RegistrationReturnRoute = {
   TwoFactorSetup: "twoFactorSetup",
   Primary: "Primary",
@@ -87,10 +87,10 @@ export const isBackwardAction = (action: { type: string }): boolean =>
 
 type RouteStack = { routes: ReadonlyArray<{ name: string }> }
 
-/** A registration flow may return only to one of the routes above, and only while its
- *  stack holds it. The param reaches these screens through deep links as well, where it
- *  is any string: a route a flow may not return to, a name the stack never had, or a
- *  route already left, all fall back to the flow's own destination. */
+/** The authenticator flow may return only to one of the routes above, and only while
+ *  its stack holds it. The param reaches its screens through deep links as well, where
+ *  it is any string: a route the flow may not return to, a name the stack never had, or
+ *  a route already left, all fall back to the flow's own destination. */
 export const canReturnToRoute = (
   stack: RouteStack | undefined,
   returnTo: string | undefined,
@@ -241,14 +241,12 @@ export type RootStackParamList = {
   emailRegistrationInitiate?: {
     onboarding?: boolean
     hasUsername?: boolean
-    returnTo?: RegistrationReturnRoute
   }
   emailRegistrationValidate: {
     email: string
     emailRegistrationId: string
     onboarding?: boolean
     hasUsername?: boolean
-    returnTo?: RegistrationReturnRoute
   }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }

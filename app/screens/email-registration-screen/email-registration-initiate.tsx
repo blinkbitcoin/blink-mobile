@@ -89,7 +89,7 @@ export const EmailRegistrationInitiateScreen: React.FC<
   const [emailInput, setEmailInput] = React.useState<string>("")
   const [errorMessage, setErrorMessage] = React.useState<string>("")
   const [loading, setLoading] = React.useState<boolean>(false)
-  const { onboarding = false, hasUsername = false, returnTo } = route.params ?? {}
+  const { onboarding = false, hasUsername = false } = route.params ?? {}
 
   const { LL } = useI18nContext()
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
@@ -122,7 +122,6 @@ export const EmailRegistrationInitiateScreen: React.FC<
           email: emailInput,
           onboarding,
           hasUsername,
-          returnTo,
         })
       } else {
         setErrorMessage(LL.EmailRegistrationInitiateScreen.missingEmailRegistrationId())
