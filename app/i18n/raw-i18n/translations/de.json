@@ -4060,6 +4060,8 @@
         "setupTitle": "Richte jetzt die Zwei-Faktor-Authentifizierung ein",
         "setupDescription": "Um unbefugten Zugriff auf dein Konto zu verhindern, füge jetzt die Zwei-Faktor-Authentifizierung hinzu.",
         "setAuthenticator": "Authenticator einrichten",
+        "reminderTitle": "Füge einen Authenticator hinzu, um dein Guthaben zu schützen",
+        "reminderDescription": "Dein Guthaben ist gewachsen. Eine Authenticator-App schützt dein Konto, selbst wenn jemand Zugriff auf deine E-Mail oder dein Telefon bekommt.",
         "modalReminder": "Wenn du jetzt ablehnst, aktiviere es bitte so bald wie möglich.",
         "dismissTwoMore": "Du kannst dies noch zweimal ablehnen.",
         "dismissOneMore": "Du kannst dies noch einmal ablehnen.",

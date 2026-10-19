@@ -4270,6 +4270,9 @@ const en: BaseTranslation = {
     setupDescription:
       "To prevent unauthorized access to your account, add two-factor authentication now.",
     setAuthenticator: "Set authenticator",
+    reminderTitle: "Add an authenticator to protect your funds",
+    reminderDescription:
+      "Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.",
     modalReminder: "If you dismiss now, make sure to enable it as soon as possible.",
     dismissTwoMore: "You can dismiss this two more times.",
     dismissOneMore: "You can dismiss this one more time.",

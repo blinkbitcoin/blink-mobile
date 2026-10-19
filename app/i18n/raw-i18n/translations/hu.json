@@ -4060,6 +4060,8 @@
     "setupTitle": "Állítsd be most a kétlépcsős azonosítást",
     "setupDescription": "A fiókodhoz való jogosulatlan hozzáférés megakadályozásához add hozzá most a kétlépcsős azonosítást.",
     "setAuthenticator": "Hitelesítő beállítása",
+    "reminderTitle": "Adj hozzá hitelesítőt a pénzed védelméhez",
+    "reminderDescription": "Az egyenleged megnőtt. Egy hitelesítő alkalmazás biztonságban tartja a fiókodat, még akkor is, ha valaki megszerzi az e-mail-címedet vagy a telefonodat.",
     "modalReminder": "Ha most elutasítod, mindenképp kapcsold be, amint lehet.",
     "dismissTwoMore": "Ezt még kétszer elutasíthatod.",
     "dismissOneMore": "Ezt még egyszer elutasíthatod.",

@@ -8,6 +8,8 @@ import {
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   TwoFactorEnforcementRecord,
+  TwoFactorPrompt,
+  TwoFactorReminderReason,
   TwoFactorSessionPrompt,
   TwoFactorThresholds,
   TwoFactorTier,
@@ -142,6 +144,8 @@ const DEFAULT_RECORD: TwoFactorEnforcementRecord = {
   nudgeCardDismissed: false,
   requiredDismissals: 0,
   authenticatorDismissals: 0,
+  highestSats: 0,
+  highestUsdCents: 0,
 }
 
 const storeRecord = (record: Partial<TwoFactorEnforcementRecord>) =>
@@ -184,10 +188,13 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.tier).toBe(TwoFactorTier.None)
       expect(result.current.unmetTier).toBe(TwoFactorTier.None)
       expect(result.current.shouldShowNudgeCard).toBe(false)
+      expect(result.current.shouldShowReminderBulletin).toBe(false)
+      expect(result.current.reminderReason).toBeNull()
       expect(result.current.shouldShowSettingsBanner).toBe(false)
       expect(result.current.isSessionStartPending).toBe(false)
       act(() => {
         result.current.dismissNudgeCard()
+        result.current.dismissReminderBulletin()
         result.current.registerDismissal(TwoFactorTier.Reminder)
         result.current.consumeSessionStart()
         result.current.markPromptShown("home_card")
@@ -426,6 +433,7 @@ describe("TwoFactorEnforcementProvider", () => {
         ...DEFAULT_RECORD,
         highestTier: TwoFactorTier.Reminder,
         nudgeCardDismissed: true,
+        highestSats: 500_000,
       })
     })
 
@@ -465,7 +473,7 @@ describe("TwoFactorEnforcementProvider", () => {
     it("keeps a reached tier when the console raises its threshold above the balance", async () => {
       mockThresholds = { ...SHIPPED_THRESHOLDS, reminderSats: 900_000 }
       setAccount({ sats: 600_000 })
-      storeRecord({ highestTier: TwoFactorTier.Reminder })
+      storeRecord({ highestTier: TwoFactorTier.Reminder, highestSats: 600_000 })
 
       const { result } = await renderEnforcement()
 
@@ -1018,7 +1026,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
 
     it("leaves the session untouched by a dismissal that neither counts nor takes a start", async () => {
       setAccount({ sats: 500_000 })
-      storeRecord({ highestTier: TwoFactorTier.Reminder })
+      storeRecord({ highestTier: TwoFactorTier.Reminder, highestSats: 500_000 })
       const { result } = await renderEnforcement()
       act(() => result.current.registerDismissal(TwoFactorTier.Reminder))
       const settled = result.current
@@ -1031,7 +1039,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
 
     it("counts a dismissal against the reminder tier at most once per session", async () => {
       setAccount({ sats: 500_000 })
-      storeRecord({ highestTier: TwoFactorTier.Reminder })
+      storeRecord({ highestTier: TwoFactorTier.Reminder, highestSats: 500_000 })
       const { result } = await renderEnforcement()
 
       act(() => {
@@ -1045,6 +1053,7 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
         ...DEFAULT_RECORD,
         highestTier: TwoFactorTier.Reminder,
         requiredDismissals: 1,
+        highestSats: 500_000,
       })
     })
 
@@ -1273,6 +1282,204 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       act(() => result.current.markPromptShown("home_card"))
 
       expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
+    })
+  })
+})
+
+/** The reminder tier reminds on the home, never at the session start and never by
+ *  blocking: three sessions, then only when a wallet rises above its all-time high. */
+describe("TwoFactorEnforcementProvider reminder bulletin", () => {
+  beforeEach(resetProviderMocks)
+
+  /** Three dismissals spent at the reminder tier, with the highs each wallet reached. */
+  const pastFirstSessions = (highs: { highestSats?: number; highestUsdCents?: number }) =>
+    storeRecord({ highestTier: TwoFactorTier.Reminder, requiredDismissals: 3, ...highs })
+
+  const loginAgain = async (
+    rerender: (props: object) => void,
+    account: { sats?: number; usdCents?: number },
+  ) => {
+    mockGetItem.mockResolvedValue(mockSetItem.mock.calls.at(-1)?.[1])
+    setNoAccount()
+    rerender({})
+    setAccount(account)
+    await act(async () => rerender({}))
+  }
+
+  it("shows the bulletin in the card's place at the reminder tier, for the first sessions", async () => {
+    setAccount({ sats: 500_000 })
+
+    const { result } = await renderEnforcement()
+
+    expect(result.current.shouldShowReminderBulletin).toBe(true)
+    expect(result.current.reminderReason).toBe(TwoFactorReminderReason.FirstSessions)
+    expect(result.current.shouldShowNudgeCard).toBe(false)
+    expect(result.current.requiredPrompt).toBe(TwoFactorSessionPrompt.None)
+  })
+
+  it("shows the bulletin even when the nudge card was closed", async () => {
+    setAccount({ sats: 500_000 })
+    storeRecord({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: true })
+
+    const { result } = await renderEnforcement()
+
+    expect(result.current.shouldShowReminderBulletin).toBe(true)
+  })
+
+  it("shows no bulletin below or above the reminder tier", async () => {
+    setAccount({ sats: 50_000 })
+    const nudge = await renderEnforcement()
+    expect(nudge.result.current.shouldShowReminderBulletin).toBe(false)
+    expect(nudge.result.current.reminderReason).toBeNull()
+
+    setAccount({ sats: 5_000_000 })
+    const highBalance = await renderEnforcement()
+    expect(highBalance.result.current.shouldShowReminderBulletin).toBe(false)
+    expect(highBalance.result.current.reminderReason).toBeNull()
+  })
+
+  it("puts the bulletin away for the session when waved away, counting one dismissal and reporting its reason", async () => {
+    setAccount({ sats: 500_000 })
+    const { result } = await renderEnforcement()
+
+    act(() => result.current.dismissReminderBulletin())
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+    expect(lastWrittenRecord().requiredDismissals).toBe(1)
+    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
+      tier: TwoFactorTier.Reminder,
+      prompt: TwoFactorPrompt.ReminderBulletin,
+      reason: TwoFactorReminderReason.FirstSessions,
+    })
+  })
+
+  it("puts the bulletin away once a setup left unfinished counts the tier's dismissal", async () => {
+    setAccount({ sats: 500_000 })
+    const { result } = await renderEnforcement()
+
+    act(() => result.current.registerDismissal(TwoFactorTier.Reminder))
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+  })
+
+  it("brings the bulletin back at the next session start while its dismissals last", async () => {
+    setAccount({ sats: 500_000 })
+    const { result, rerender } = await renderEnforcement()
+    act(() => result.current.dismissReminderBulletin())
+
+    await loginAgain(rerender, { sats: 500_000 })
+
+    expect(result.current.shouldShowReminderBulletin).toBe(true)
+    expect(result.current.remainingDismissals).toBe(2)
+  })
+
+  it("stops the bulletin after three dismissals while no wallet is above its all-time high", async () => {
+    pastFirstSessions({ highestSats: 800_000, highestUsdCents: 60_000 })
+    setAccount({ sats: 700_000, usdCents: 50_000 })
+
+    const { result } = await renderEnforcement()
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+    expect(result.current.reminderReason).toBeNull()
+    expect(result.current.isProtectionGateActive).toBe(false)
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  it("brings the bulletin back when the bitcoin wallet rises above its all-time high, and records the new high", async () => {
+    pastFirstSessions({ highestSats: 800_000, highestUsdCents: 60_000 })
+    setAccount({ sats: 800_001, usdCents: 0 })
+
+    const { result } = await renderEnforcement()
+
+    expect(result.current.shouldShowReminderBulletin).toBe(true)
+    expect(result.current.reminderReason).toBe(TwoFactorReminderReason.NewAllTimeHigh)
+    expect(lastWrittenRecord()).toMatchObject({
+      highestSats: 800_001,
+      highestUsdCents: 60_000,
+    })
+  })
+
+  it("brings the bulletin back when the dollar wallet rises above its all-time high", async () => {
+    pastFirstSessions({ highestSats: 800_000, highestUsdCents: 60_000 })
+    setAccount({ sats: 0, usdCents: 60_100 })
+
+    const { result } = await renderEnforcement()
+
+    expect(result.current.reminderReason).toBe(TwoFactorReminderReason.NewAllTimeHigh)
+    expect(lastWrittenRecord()).toMatchObject({
+      highestSats: 800_000,
+      highestUsdCents: 60_100,
+    })
+  })
+
+  it("waits for the next high once the bulletin a high brought back is waved away", async () => {
+    pastFirstSessions({ highestSats: 800_000 })
+    setAccount({ sats: 900_000 })
+    const { result, rerender } = await renderEnforcement()
+    expect(result.current.shouldShowReminderBulletin).toBe(true)
+
+    act(() => result.current.dismissReminderBulletin())
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+    expect(lastWrittenRecord().requiredDismissals).toBe(4)
+
+    await loginAgain(rerender, { sats: 900_000 })
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+  })
+
+  /** The all-time high is the highest balance seen at a session start: a balance that
+   *  rises later in the session waits for the next one. */
+  it("reads the highs once, when the fresh read lands, and not for a balance that rises later in the session", async () => {
+    pastFirstSessions({ highestSats: 800_000 })
+    setAccount({ sats: 900_000, loading: true })
+    const { result, rerender } = await renderEnforcement()
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+
+    setAccount({ sats: 700_000 })
+    await act(async () => rerender({}))
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+
+    setAccount({ sats: 900_000 })
+    await act(async () => rerender({}))
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  it("records no all-time high away from the reminder tier", async () => {
+    setAccount({ sats: 5_000_000 })
+
+    await renderEnforcement()
+
+    expect(lastWrittenRecord()).toMatchObject({ highestSats: 0, highestUsdCents: 0 })
+  })
+
+  it("leaves the bulletin's X alone while the bulletin is not due", async () => {
+    setAccount({ sats: 50_000 })
+    storeRecord({ highestTier: TwoFactorTier.Nudge })
+    const { result } = await renderEnforcement()
+
+    act(() => result.current.dismissReminderBulletin())
+
+    expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  it("reports the bulletin's reason with its impression", async () => {
+    setAccount({ sats: 500_000 })
+    const { result } = await renderEnforcement()
+
+    act(() =>
+      result.current.markPromptShown(
+        TwoFactorPrompt.ReminderBulletin,
+        TwoFactorReminderReason.FirstSessions,
+      ),
+    )
+
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
+      tier: TwoFactorTier.Reminder,
+      prompt: TwoFactorPrompt.ReminderBulletin,
+      reason: TwoFactorReminderReason.FirstSessions,
     })
   })
 })

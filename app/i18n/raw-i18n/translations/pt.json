@@ -4060,6 +4060,8 @@
         "setupTitle": "Configure agora a autenticação de dois fatores",
         "setupDescription": "Para evitar acessos não autorizados à sua conta, adicione agora a autenticação de dois fatores.",
         "setAuthenticator": "Configurar autenticador",
+        "reminderTitle": "Adicione um autenticador para proteger seus fundos",
+        "reminderDescription": "Seu saldo cresceu. Um aplicativo autenticador mantém sua conta segura, mesmo que alguém tenha acesso ao seu e-mail ou telefone.",
         "modalReminder": "Se você dispensar agora, não se esqueça de ativar o quanto antes.",
         "dismissTwoMore": "Você pode dispensar isto mais duas vezes.",
         "dismissOneMore": "Você pode dispensar isto mais uma vez.",

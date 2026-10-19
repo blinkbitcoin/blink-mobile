@@ -4060,6 +4060,8 @@
         "setupTitle": "今すぐ2要素認証を設定する",
         "setupDescription": "アカウントへの不正アクセスを防ぐため、今すぐ2要素認証を追加してください。",
         "setAuthenticator": "認証アプリを設定",
+        "reminderTitle": "資金を守るために認証アプリを追加してください",
+        "reminderDescription": "残高が増えました。認証アプリがあれば、誰かにメールや電話を乗っ取られても、アカウントを安全に保てます。",
         "modalReminder": "今閉じる場合は、できるだけ早く有効にしてください。",
         "dismissTwoMore": "あと2回閉じることができます。",
         "dismissOneMore": "あと1回閉じることができます。",

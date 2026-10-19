@@ -4060,6 +4060,8 @@
     "setupTitle": "Nastavte dvoufaktorové ověření nyní",
     "setupDescription": "Abyste zabránili neoprávněnému přístupu ke svému účtu, přidejte nyní dvoufaktorové ověření.",
     "setAuthenticator": "Nastavit autentikátor",
+    "reminderTitle": "Přidejte autentikátor a ochraňte své prostředky",
+    "reminderDescription": "Váš zůstatek vzrostl. Autentikační aplikace udrží váš účet v bezpečí, i když někdo získá přístup k vašemu e-mailu nebo telefonu.",
     "modalReminder": "Pokud to teď odmítnete, nezapomeňte to co nejdříve zapnout.",
     "dismissTwoMore": "Můžete to odmítnout ještě dvakrát.",
     "dismissOneMore": "Můžete to odmítnout ještě jednou.",

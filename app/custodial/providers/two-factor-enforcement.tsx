@@ -18,6 +18,7 @@ import { useMigrateNowRemedy } from "@app/screens/account-migration/hooks/use-mi
 import {
   TwoFactorEnforcementRecord,
   TwoFactorPrompt,
+  TwoFactorReminderReason,
   TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
@@ -31,12 +32,15 @@ import { loadJsonOrThrow, saveJson } from "@app/utils/storage"
 
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
+  isAboveAllTimeHigh,
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
   resolveHighBalanceCurrency,
+  resolveReminderReason,
   resolveSessionPrompt,
   resolveUnmetTier,
+  withAllTimeHigh,
   withDismissal,
   withTierReached,
 } from "../two-factor-enforcement"
@@ -55,6 +59,15 @@ const INITIAL_STORED: StoredState = {
   record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
 }
 
+/** What this session's start found against the wallets' all-time highs: nothing yet
+ *  until the fresh read of the account lands, then the answer for the whole session. */
+const SessionHigh = {
+  Unread: "unread",
+  Risen: "risen",
+  Unchanged: "unchanged",
+} as const
+type SessionHigh = (typeof SessionHigh)[keyof typeof SessionHigh]
+
 /**
  * What this session has already done for the account, kept in memory on purpose: a
  * session is a cold launch or a fresh login, and both give this provider a fresh
@@ -71,6 +84,7 @@ type SessionState = {
    *  out, None for none: whether that takes the session start is decided once the
    *  read lands, since the read may raise a prompt the dismissal does not cover. */
   dismissedTier: TwoFactorTier
+  allTimeHigh: SessionHigh
 }
 
 const INITIAL_SESSION: SessionState = {
@@ -78,6 +92,7 @@ const INITIAL_SESSION: SessionState = {
   isStartPending: false,
   countedTier: TwoFactorTier.None,
   dismissedTier: TwoFactorTier.None,
+  allTimeHigh: SessionHigh.Unread,
 }
 
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
@@ -113,11 +128,19 @@ export type TwoFactorEnforcementState = {
    *  applies, which outranks it. */
   isProtectionGateActive: boolean
   shouldShowNudgeCard: boolean
+  /** The reminder tier's bulletin on the home, in the card's place: due at every
+   *  session start while the tier's dismissals last, then at each new all-time high,
+   *  and gone for the session once waved away. It never blocks. */
+  shouldShowReminderBulletin: boolean
+  /** Why the reminder bulletin is due, null when it is not: what its events report. */
+  reminderReason: TwoFactorReminderReason | null
   shouldShowSettingsBanner: boolean
   /** Reports a prompt as shown, once per session for each tier it is shown at: a
    *  surface mounts again on every visit, and that is no new impression. */
-  markPromptShown: (prompt: TwoFactorPrompt) => void
+  markPromptShown: (prompt: TwoFactorPrompt, reason?: TwoFactorReminderReason) => void
   dismissNudgeCard: () => void
+  /** The bulletin's X: one dismissal of the reminder tier, at most one per session. */
+  dismissReminderBulletin: () => void
   /** Takes the session start, whether or not it owed a prompt: what the balance does
    *  later in the session waits for the next one. */
   consumeSessionStart: () => void
@@ -137,9 +160,12 @@ const INERT_STATE: TwoFactorEnforcementState = {
   isPreparingSessionStart: false,
   isProtectionGateActive: false,
   shouldShowNudgeCard: false,
+  shouldShowReminderBulletin: false,
+  reminderReason: null,
   shouldShowSettingsBanner: false,
   markPromptShown: () => {},
   dismissNudgeCard: () => {},
+  dismissReminderBulletin: () => {},
   consumeSessionStart: () => {},
   registerDismissal: () => {},
 }
@@ -233,24 +259,14 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       .then((raw) => {
         if (!isMounted) return
         commitStored({ accountId, record: normalizeStoredRecord(raw) })
-        commitSession({
-          accountId,
-          isStartPending: true,
-          countedTier: TwoFactorTier.None,
-          dismissedTier: TwoFactorTier.None,
-        })
+        commitSession({ ...INITIAL_SESSION, accountId, isStartPending: true })
       })
       .catch((err) => {
         if (!isMounted) return
         reportError("Two-factor enforcement read", err)
         /** Nothing to start, stated as such even though an unloaded record already
          *  keeps the start from being pending: the session says what it means. */
-        commitSession({
-          accountId,
-          isStartPending: false,
-          countedTier: TwoFactorTier.None,
-          dismissedTier: TwoFactorTier.None,
-        })
+        commitSession({ ...INITIAL_SESSION, accountId, isStartPending: false })
       })
     return () => {
       isMounted = false
@@ -335,11 +351,23 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     unmetTier === TwoFactorTier.Nudge && !record.nudgeCardDismissed
   const shouldShowSettingsBanner = unmetTier !== TwoFactorTier.None
 
+  /** The reminder bulletin takes the card's place at the reminder tier, whether or not
+   *  the card was closed. A dismissal of the tier this session, from the bulletin or
+   *  from a setup left unfinished, puts it away until the next session start. */
+  const reminderReason = resolveReminderReason({
+    unmetTier,
+    record,
+    hasNewAllTimeHigh: session.allTimeHigh === SessionHigh.Risen,
+  })
+  const isReminderWavedAway = session.countedTier >= TwoFactorTier.Reminder
+  const isReminderDue = reminderReason !== null && isSessionForAccount
+  const shouldShowReminderBulletin = isReminderDue && !isReminderWavedAway
+
   /** Another account's impressions start afresh; the same account coming back through
    *  a gate that closed and opened again within the session keeps its own. With the
    *  gate closed there is no account to have shown a prompt to. */
   const markPromptShown = useCallback(
-    (prompt: TwoFactorPrompt) => {
+    (prompt: TwoFactorPrompt, reason?: TwoFactorReminderReason) => {
       if (!accountId) return
       const isAnotherAccount = shownPromptsRef.current.accountId !== accountId
       if (isAnotherAccount) {
@@ -349,7 +377,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       const impression = `${prompt}:${tier}`
       if (impressions.has(impression)) return
       impressions.add(impression)
-      logTwoFactorPromptShown({ tier, prompt })
+      logTwoFactorPromptShown({ tier, prompt, reason })
     },
     [accountId, tier],
   )
@@ -402,7 +430,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       if (!isCountable && !isStartTaken && !isKeptForRead) return
       if (isCountable) persist((current) => withDismissal(current, promptTier))
       commitSession({
-        accountId,
+        ...latest,
         isStartPending: latest.isStartPending && !isStartTaken,
         countedTier: isCountable ? promptTier : latest.countedTier,
         dismissedTier: isKeptForRead ? promptTier : latest.dismissedTier,
@@ -430,6 +458,50 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     })
   }, [accountId, isReadingAccount, unmetTier, session.dismissedTier, commitSession])
 
+  /** At the reminder tier, the session start reads each wallet against its all-time
+   *  high once, when the fresh read of the account has landed, and raises the highs it
+   *  finds exceeded: a bulletin waved away after a new high then waits for the next one,
+   *  whether or not it was waved away. What the balance does later in the session waits
+   *  for the next session start. Below the tier there is nothing to read the highs for,
+   *  and above it the tier never comes back. */
+  useEffect(() => {
+    const latest = latestSessionRef.current
+    const isSessionAccount = accountId !== null && latest.accountId === accountId
+    const isHighUnread = latest.allTimeHigh === SessionHigh.Unread
+    const isAccountRead = isLoadedForAccount && !isReadingAccount
+    const isHighDue = isSessionAccount && isHighUnread && isAccountRead
+    if (!isHighDue) return
+    const isAtReminderTier = unmetTier === TwoFactorTier.Reminder
+    const hasRisen = isAtReminderTier && isAboveAllTimeHigh(record, wallets)
+    if (hasRisen) persist((current) => withAllTimeHigh(current, wallets))
+    commitSession({
+      ...latest,
+      allTimeHigh: hasRisen ? SessionHigh.Risen : SessionHigh.Unchanged,
+    })
+  }, [
+    accountId,
+    isLoadedForAccount,
+    isReadingAccount,
+    unmetTier,
+    record,
+    wallets,
+    session.accountId,
+    persist,
+    commitSession,
+  ])
+
+  /** The reason is the one the bulletin was shown for, which a bulletin on screen
+   *  always has. */
+  const dismissReminderBulletin = useCallback(() => {
+    if (reminderReason === null) return
+    logTwoFactorPromptDismissed({
+      tier,
+      prompt: TwoFactorPrompt.ReminderBulletin,
+      reason: reminderReason,
+    })
+    registerDismissal(TwoFactorTier.Reminder)
+  }, [tier, reminderReason, registerDismissal])
+
   const contextValue = useMemo(
     () => ({
       tier,
@@ -442,9 +514,12 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       isPreparingSessionStart,
       isProtectionGateActive,
       shouldShowNudgeCard,
+      shouldShowReminderBulletin,
+      reminderReason,
       shouldShowSettingsBanner,
       markPromptShown,
       dismissNudgeCard,
+      dismissReminderBulletin,
       consumeSessionStart,
       registerDismissal,
     }),
@@ -459,9 +534,12 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       isPreparingSessionStart,
       isProtectionGateActive,
       shouldShowNudgeCard,
+      shouldShowReminderBulletin,
+      reminderReason,
       shouldShowSettingsBanner,
       markPromptShown,
       dismissNudgeCard,
+      dismissReminderBulletin,
       consumeSessionStart,
       registerDismissal,
     ],

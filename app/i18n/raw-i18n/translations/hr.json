@@ -4060,6 +4060,8 @@
     "setupTitle": "Postavite dvofaktorsku autentifikaciju sada",
     "setupDescription": "Kako biste spriječili neovlašteni pristup svom računu, dodajte dvofaktorsku autentifikaciju sada.",
     "setAuthenticator": "Postavi autentifikator",
+    "reminderTitle": "Dodajte autentifikator kako biste zaštitili svoja sredstva",
+    "reminderDescription": "Vaše stanje je poraslo. Aplikacija za autentifikaciju čuva vaš račun sigurnim, čak i ako netko dođe do vaše e-pošte ili telefona.",
     "modalReminder": "Ako ovo sada odbacite, svakako to uključite što prije.",
     "dismissTwoMore": "Ovo možete odbaciti još dva puta.",
     "dismissOneMore": "Ovo možete odbaciti još jednom.",

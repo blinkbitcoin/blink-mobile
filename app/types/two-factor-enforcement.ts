@@ -21,11 +21,22 @@ export type TwoFactorMethod = (typeof TwoFactorMethod)[keyof typeof TwoFactorMet
 export const TwoFactorPrompt = {
   HomeCard: "home_card",
   SettingsBanner: "settings_banner",
+  ReminderBulletin: "tier2_bulletin",
   SessionModal: "session_modal",
   ProtectionRequiredScreen: "protection_required_screen",
   NonCustodialScreen: "non_custodial_screen",
 } as const
 export type TwoFactorPrompt = (typeof TwoFactorPrompt)[keyof typeof TwoFactorPrompt]
+
+/** Why the reminder bulletin is on the home: one of the first sessions at the tier,
+ *  while its dismissals last, or a wallet that has risen above its all-time high since
+ *  they ran out. Reported with the bulletin's events; the bulletin itself never says. */
+export const TwoFactorReminderReason = {
+  FirstSessions: "first_sessions",
+  NewAllTimeHigh: "new_ath",
+} as const
+export type TwoFactorReminderReason =
+  (typeof TwoFactorReminderReason)[keyof typeof TwoFactorReminderReason]
 
 /** What a session start owes the account: at the high-balance tier, the countdown
  *  modal while dismissals remain and the blocking screen once they are spent; below it,
@@ -61,4 +72,9 @@ export type TwoFactorEnforcementRecord = {
   requiredDismissals: number
   /** Dismissals counted at the high-balance tier. */
   authenticatorDismissals: number
+  /** The bitcoin wallet's all-time high, in sats: the highest balance seen at a session
+   *  start while the account was at the reminder tier. */
+  highestSats: number
+  /** The dollar wallet's all-time high, in cents, kept the same way. */
+  highestUsdCents: number
 }

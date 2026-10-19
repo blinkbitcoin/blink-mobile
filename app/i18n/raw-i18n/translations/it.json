@@ -4060,6 +4060,8 @@
         "setupTitle": "Imposta ora l'autenticazione a due fattori",
         "setupDescription": "Per prevenire accessi non autorizzati al tuo account, aggiungi ora l'autenticazione a due fattori.",
         "setAuthenticator": "Imposta l'autenticatore",
+        "reminderTitle": "Aggiungi un autenticatore per proteggere i tuoi fondi",
+        "reminderDescription": "Il tuo saldo è cresciuto. Un'app di autenticazione mantiene il tuo account al sicuro, anche se qualcuno entra in possesso della tua email o del tuo telefono.",
         "modalReminder": "Se lo ignori ora, assicurati di attivarlo il prima possibile.",
         "dismissTwoMore": "Puoi ignorarlo ancora due volte.",
         "dismissOneMore": "Puoi ignorarlo ancora una volta.",

@@ -4060,6 +4060,8 @@
     "setupTitle": "Misela uqinisekiso lwezinto ezimbini ngoku",
     "setupDescription": "Ukuthintela ukufikelela okungagunyaziswanga kwiakhawunti yakho, yongeza uqinisekiso lwezinto ezimbini ngoku.",
     "setAuthenticator": "Misela i-authenticator",
+    "reminderTitle": "Yongeza i-authenticator ukukhusela imali yakho",
+    "reminderDescription": "Ibhalansi yakho ikhulile. I-app ye-authenticator igcina iakhawunti yakho ikhuselekile, nokuba umntu ufumene i-imeyile okanye ifowuni yakho.",
     "modalReminder": "Ukuba uyayichitha ngoku, qinisekisa ukuba uyayivula ngokukhawuleza.",
     "dismissTwoMore": "Ungayichitha le nto kabini kwakhona.",
     "dismissOneMore": "Ungayichitha le nto kanye kwakhona.",

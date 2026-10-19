@@ -4060,6 +4060,8 @@
     "setupTitle": "Configurează acum autentificarea cu doi factori",
     "setupDescription": "Pentru a preveni accesul neautorizat la contul tău, adaugă acum autentificarea cu doi factori.",
     "setAuthenticator": "Configurează autentificatorul",
+    "reminderTitle": "Adaugă un autentificator pentru a-ți proteja fondurile",
+    "reminderDescription": "Soldul tău a crescut. O aplicație de autentificare îți păstrează contul în siguranță, chiar dacă cineva pune mâna pe e-mailul sau pe telefonul tău.",
     "modalReminder": "Dacă respingi acum, asigură-te că o activezi cât mai curând.",
     "dismissTwoMore": "Mai poți respinge asta de două ori.",
     "dismissOneMore": "Mai poți respinge asta o singură dată.",

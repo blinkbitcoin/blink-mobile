@@ -4060,6 +4060,8 @@
     "setupTitle": "Opsæt to-faktor godkendelse nu",
     "setupDescription": "For at forhindre uautoriseret adgang til din konto skal du tilføje to-faktor godkendelse nu.",
     "setAuthenticator": "Opsæt authenticator",
+    "reminderTitle": "Tilføj en authenticator for at beskytte dine midler",
+    "reminderDescription": "Din saldo er vokset. En authenticator-app holder din konto sikker, selv hvis nogen får fat i din e-mail eller telefon.",
     "modalReminder": "Hvis du afviser nu, så sørg for at slå det til hurtigst muligt.",
     "dismissTwoMore": "Du kan afvise dette to gange mere.",
     "dismissOneMore": "Du kan afvise dette én gang mere.",

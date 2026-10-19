@@ -1,18 +1,22 @@
 import { defaultTwoFactorThresholds } from "@app/config/feature-flags-context"
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
+  isAboveAllTimeHigh,
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
   resolveHighBalanceCurrency,
+  resolveReminderReason,
   resolveSessionPrompt,
   resolveUnmetTier,
+  withAllTimeHigh,
   withDismissal,
   withTierReached,
 } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   TwoFactorEnforcementRecord,
+  TwoFactorReminderReason,
   TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
@@ -291,6 +295,76 @@ describe("resolveSessionPrompt", () => {
   })
 })
 
+describe("all-time highs", () => {
+  const highs = recordWith({ highestSats: 800_000, highestUsdCents: 60_000 })
+
+  it("finds a wallet above its all-time high, each in its own unit", () => {
+    expect(isAboveAllTimeHigh(highs, walletsWith(800_001, 0))).toBe(true)
+    expect(isAboveAllTimeHigh(highs, walletsWith(0, 60_001))).toBe(true)
+  })
+
+  it("finds nothing above a high that was only reached, or not at all", () => {
+    expect(isAboveAllTimeHigh(highs, walletsWith(800_000, 60_000))).toBe(false)
+    expect(isAboveAllTimeHigh(highs, walletsWith(100, 100))).toBe(false)
+    expect(isAboveAllTimeHigh(highs, undefined)).toBe(false)
+  })
+
+  it("raises each high to its wallet's balance only where the balance is above it", () => {
+    expect(withAllTimeHigh(highs, walletsWith(900_000, 10_000))).toMatchObject({
+      highestSats: 900_000,
+      highestUsdCents: 60_000,
+    })
+  })
+})
+
+describe("resolveReminderReason", () => {
+  it("is due for the first sessions at the reminder tier while its dismissals last", () => {
+    expect(
+      resolveReminderReason({
+        unmetTier: TwoFactorTier.Reminder,
+        record: recordWith({ requiredDismissals: 2 }),
+        hasNewAllTimeHigh: false,
+      }),
+    ).toBe(TwoFactorReminderReason.FirstSessions)
+  })
+
+  it("is due again only at a new all-time high once its dismissals are spent", () => {
+    const spent = recordWith({ requiredDismissals: 3 })
+
+    expect(
+      resolveReminderReason({
+        unmetTier: TwoFactorTier.Reminder,
+        record: spent,
+        hasNewAllTimeHigh: true,
+      }),
+    ).toBe(TwoFactorReminderReason.NewAllTimeHigh)
+    expect(
+      resolveReminderReason({
+        unmetTier: TwoFactorTier.Reminder,
+        record: spent,
+        hasNewAllTimeHigh: false,
+      }),
+    ).toBeNull()
+  })
+
+  it("is never due away from the reminder tier", () => {
+    expect(
+      resolveReminderReason({
+        unmetTier: TwoFactorTier.Nudge,
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        hasNewAllTimeHigh: true,
+      }),
+    ).toBeNull()
+    expect(
+      resolveReminderReason({
+        unmetTier: TwoFactorTier.HighBalance,
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        hasNewAllTimeHigh: true,
+      }),
+    ).toBeNull()
+  })
+})
+
 describe("normalizeStoredRecord", () => {
   it("falls back to the default without a stored record", () => {
     expect(normalizeStoredRecord(null)).toEqual(DEFAULT_TWO_FACTOR_ENFORCEMENT)
@@ -303,6 +377,8 @@ describe("normalizeStoredRecord", () => {
       nudgeCardDismissed: true,
       requiredDismissals: 2,
       authenticatorDismissals: 1,
+      highestSats: 800_000,
+      highestUsdCents: 60_000,
     }
 
     expect(normalizeStoredRecord(record)).toEqual(record)
@@ -335,6 +411,14 @@ describe("normalizeStoredRecord", () => {
     expect(
       normalizeStoredRecord({ requiredDismissals: -1, authenticatorDismissals: 1.5 }),
     ).toEqual(DEFAULT_TWO_FACTOR_ENFORCEMENT)
+  })
+
+  /** A record from before the highs were kept starts them at zero, so the first
+   *  session start at the reminder tier reads every wallet as a new high. */
+  it("drops an all-time high that is not a whole, non-negative balance", () => {
+    expect(normalizeStoredRecord({ highestSats: -5, highestUsdCents: "60" })).toEqual(
+      DEFAULT_TWO_FACTOR_ENFORCEMENT,
+    )
   })
 
   it("only reads a dismissal that is exactly true", () => {

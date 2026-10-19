@@ -13546,6 +13546,14 @@ type RootTranslation = {
 		 */
 		setAuthenticator: string
 		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​p​r​o​t​e​c​t​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		reminderTitle: string
+		/**
+		 * Y​o​u​r​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​g​r​o​w​n​.​ ​A​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​k​e​e​p​s​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​s​a​f​e​,​ ​e​v​e​n​ ​i​f​ ​s​o​m​e​o​n​e​ ​g​e​t​s​ ​h​o​l​d​ ​o​f​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​.
+		 */
+		reminderDescription: string
+		/**
 		 * I​f​ ​y​o​u​ ​d​i​s​m​i​s​s​ ​n​o​w​,​ ​m​a​k​e​ ​s​u​r​e​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​ ​a​s​ ​s​o​o​n​ ​a​s​ ​p​o​s​s​i​b​l​e​.
 		 */
 		modalReminder: string
@@ -27329,6 +27337,14 @@ export type TranslationFunctions = {
 		 * Set authenticator
 		 */
 		setAuthenticator: () => LocalizedString
+		/**
+		 * Add an authenticator to protect your funds
+		 */
+		reminderTitle: () => LocalizedString
+		/**
+		 * Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.
+		 */
+		reminderDescription: () => LocalizedString
 		/**
 		 * If you dismiss now, make sure to enable it as soon as possible.
 		 */

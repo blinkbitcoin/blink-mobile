@@ -4060,6 +4060,8 @@
     "setupTitle": "Weka uthibitishaji wa hatua mbili sasa",
     "setupDescription": "Ili kuzuia ufikiaji usioidhinishwa wa akaunti yako, ongeza uthibitishaji wa hatua mbili sasa.",
     "setAuthenticator": "Weka kithibitishaji",
+    "reminderTitle": "Ongeza kithibitishaji ili kulinda fedha zako",
+    "reminderDescription": "Salio lako limeongezeka. Programu ya kithibitishaji huweka akaunti yako salama, hata kama mtu atapata barua pepe au simu yako.",
     "modalReminder": "Ukikataa sasa, hakikisha unaiwasha haraka iwezekanavyo.",
     "dismissTwoMore": "Unaweza kukataa hii mara mbili zaidi.",
     "dismissOneMore": "Unaweza kukataa hii mara moja zaidi.",
