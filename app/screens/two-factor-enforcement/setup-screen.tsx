@@ -26,7 +26,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
-  const { unmetTier, hasTwoFactor, registerDismissal } = useTwoFactorEnforcement()
+  const { unmetTier, hasAuthenticator, registerDismissal } = useTwoFactorEnforcement()
   /** The screen holds the user for a re-verification asked for from it, for as long
    *  as the hook runs it: the hook bounds that with its own deadline, so the hold, the
    *  spinner and the buttons release together. One joined from elsewhere, started on
@@ -61,12 +61,12 @@ export const TwoFactorSetupScreen: React.FC = () => {
     )
   }, [navigation, handleClose, isHeld])
 
-  /** The flows this screen hands off to return into it. Once the account holds two
-   *  factors there is nothing left to offer, so it steps aside rather than asking for a
-   *  factor the account just added. Only while focused: a screen lower in the stack
+  /** The flows this screen hands off to return into it. Once the account holds an
+   *  authenticator there is nothing left to offer, so it steps aside rather than asking
+   *  for one the account just added. Only while focused: a screen lower in the stack
    *  going back would pop whichever screen is on top instead of itself. And only once
    *  the hold above has lifted: the flow it holds for returns into this screen. */
-  const isSetupComplete = isFocused && hasTwoFactor && !isHeld
+  const isSetupComplete = isFocused && hasAuthenticator && !isHeld
   useEffect(() => {
     if (isSetupComplete) navigation.goBack()
   }, [isSetupComplete, navigation])

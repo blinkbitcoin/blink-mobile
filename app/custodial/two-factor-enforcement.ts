@@ -83,50 +83,27 @@ export const withTierReached = (
   return { ...raised, enforcedCurrency: resolveEnforcedCurrency(wallets) }
 }
 
-type TwoFactorFactors = {
-  hasPhone: boolean
-  hasVerifiedEmail: boolean
-  hasAuthenticator: boolean
-}
-
-const REQUIRED_FACTOR_COUNT = 2
-
-export const hasTwoFactor = ({
-  hasPhone,
-  hasVerifiedEmail,
-  hasAuthenticator,
-}: TwoFactorFactors): boolean =>
-  [hasPhone, hasVerifiedEmail, hasAuthenticator].filter(Boolean).length >=
-  REQUIRED_FACTOR_COUNT
-
 /** The setup offers the factor the account lacks: a phone when the email is already
  *  verified, otherwise an email, which is also the step an account with nothing takes. */
 export const resolveMissingMethod = ({
   hasVerifiedEmail,
-}: TwoFactorFactors): TwoFactorMethod =>
-  hasVerifiedEmail ? TwoFactorMethod.Phone : TwoFactorMethod.Email
+}: {
+  hasVerifiedEmail: boolean
+}): TwoFactorMethod => (hasVerifiedEmail ? TwoFactorMethod.Phone : TwoFactorMethod.Email)
 
 type UnmetTierInputs = {
   tier: TwoFactorTier
-  hasTwoFactor: boolean
   hasAuthenticator: boolean
 }
 
-/** The highest tier whose condition the account has not met. The enforced tier
- *  asks for an authenticator even from an account that already holds two factors; the
- *  tiers below it ask for two factors of any kind. */
+/** The tier the account still owes, None once it complies. Two-factor authentication
+ *  is an authenticator: an attacker who takes an account over can change its email and
+ *  its phone, so those two together protect nothing, and every tier asks for the
+ *  authenticator alone. */
 export const resolveUnmetTier = ({
   tier,
-  hasTwoFactor: isTwoFactorSet,
   hasAuthenticator,
-}: UnmetTierInputs): TwoFactorTier => {
-  const isAuthenticatorMissing = tier >= TwoFactorTier.Enforced && !hasAuthenticator
-  if (isAuthenticatorMissing) return TwoFactorTier.Enforced
-  if (isTwoFactorSet) return TwoFactorTier.None
-  if (tier >= TwoFactorTier.Recommended) return TwoFactorTier.Recommended
-  if (tier >= TwoFactorTier.Suggested) return TwoFactorTier.Suggested
-  return TwoFactorTier.None
-}
+}: UnmetTierInputs): TwoFactorTier => (hasAuthenticator ? TwoFactorTier.None : tier)
 
 const MAX_DISMISSALS_PER_TIER = 3
 

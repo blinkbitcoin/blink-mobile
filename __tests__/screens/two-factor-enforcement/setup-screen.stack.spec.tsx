@@ -37,7 +37,7 @@ const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   tier: TwoFactorTier.Suggested as TwoFactorTier,
   unmetTier: TwoFactorTier.Suggested as TwoFactorTier,
-  hasTwoFactor: false,
+  hasAuthenticator: false,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
   remainingDismissals: 3,
@@ -187,7 +187,7 @@ describe("TwoFactorSetupScreen in a stack", () => {
     jest.useFakeTimers()
     loadLocale("en")
     mockIsReverifyingFromHere = false
-    mockEnforcement.hasTwoFactor = false
+    mockEnforcement.hasAuthenticator = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
     mockEmailVerify.mockResolvedValue({
@@ -218,7 +218,7 @@ describe("TwoFactorSetupScreen in a stack", () => {
     expect(currentRoute()).toBe("emailRegistrationValidate")
 
     /** What the account reads as once the address is verified. */
-    mockEnforcement.hasTwoFactor = true
+    mockEnforcement.hasAuthenticator = true
     await act(async () => {
       fireEvent.press(screen.getByTestId("submit-code"))
     })

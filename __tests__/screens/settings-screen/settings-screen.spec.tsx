@@ -10,7 +10,7 @@ jest.mock("@app/self-custodial/hooks/use-backup-nudge-state", () => ({
 
 const mockTwoFactorEnforcement = {
   tier: 0,
-  hasTwoFactor: false,
+  hasAuthenticator: false,
   missingMethod: "email",
   unverifiedEmail: null,
   shouldShowNudgeCard: false,

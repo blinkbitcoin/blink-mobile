@@ -79,7 +79,7 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
 const mockTwoFactorEnforcement = {
   tier: 0,
   unmetTier: 0,
-  hasTwoFactor: false,
+  hasAuthenticator: false,
   missingMethod: "email",
   unverifiedEmail: null,
   enforcedCurrency: "BTC",

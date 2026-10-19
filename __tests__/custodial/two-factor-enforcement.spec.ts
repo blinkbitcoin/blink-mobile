@@ -1,7 +1,6 @@
 import {
   ENFORCED_THRESHOLD,
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
-  hasTwoFactor,
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
@@ -117,127 +116,45 @@ describe("withTierReached", () => {
   })
 })
 
-describe("hasTwoFactor", () => {
-  it("needs two verified factors", () => {
-    expect(
-      hasTwoFactor({ hasPhone: true, hasVerifiedEmail: false, hasAuthenticator: false }),
-    ).toBe(false)
-    expect(
-      hasTwoFactor({ hasPhone: true, hasVerifiedEmail: true, hasAuthenticator: false }),
-    ).toBe(true)
-  })
-
-  it("counts the authenticator as a factor", () => {
-    expect(
-      hasTwoFactor({ hasPhone: false, hasVerifiedEmail: true, hasAuthenticator: true }),
-    ).toBe(true)
-  })
-
-  it("is false with nothing set", () => {
-    expect(
-      hasTwoFactor({ hasPhone: false, hasVerifiedEmail: false, hasAuthenticator: false }),
-    ).toBe(false)
-  })
-})
-
 describe("resolveMissingMethod", () => {
   it("offers a phone once the email is verified", () => {
-    expect(
-      resolveMissingMethod({
-        hasPhone: false,
-        hasVerifiedEmail: true,
-        hasAuthenticator: false,
-      }),
-    ).toBe(TwoFactorMethod.Phone)
+    expect(resolveMissingMethod({ hasVerifiedEmail: true })).toBe(TwoFactorMethod.Phone)
   })
 
-  it("offers an email when only a phone is set", () => {
-    expect(
-      resolveMissingMethod({
-        hasPhone: true,
-        hasVerifiedEmail: false,
-        hasAuthenticator: false,
-      }),
-    ).toBe(TwoFactorMethod.Email)
-  })
-
-  it("offers an email when nothing is set", () => {
-    expect(
-      resolveMissingMethod({
-        hasPhone: false,
-        hasVerifiedEmail: false,
-        hasAuthenticator: false,
-      }),
-    ).toBe(TwoFactorMethod.Email)
+  it("offers an email until one is verified", () => {
+    expect(resolveMissingMethod({ hasVerifiedEmail: false })).toBe(TwoFactorMethod.Email)
   })
 })
 
 describe("resolveUnmetTier", () => {
   it("is none below the suggested tier", () => {
-    expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.None,
-        hasTwoFactor: false,
-        hasAuthenticator: false,
-      }),
-    ).toBe(TwoFactorTier.None)
+    expect(resolveUnmetTier({ tier: TwoFactorTier.None, hasAuthenticator: false })).toBe(
+      TwoFactorTier.None,
+    )
   })
 
-  it("is the reached tier while the account has no two factors", () => {
+  it("is the reached tier, whichever it is, while the account has no authenticator", () => {
     expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.Suggested,
-        hasTwoFactor: false,
-        hasAuthenticator: false,
-      }),
+      resolveUnmetTier({ tier: TwoFactorTier.Suggested, hasAuthenticator: false }),
     ).toBe(TwoFactorTier.Suggested)
     expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.Recommended,
-        hasTwoFactor: false,
-        hasAuthenticator: false,
-      }),
+      resolveUnmetTier({ tier: TwoFactorTier.Recommended, hasAuthenticator: false }),
     ).toBe(TwoFactorTier.Recommended)
-  })
-
-  it("is none once two factors satisfy the suggested and recommended tiers", () => {
     expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.Recommended,
-        hasTwoFactor: true,
-        hasAuthenticator: false,
-      }),
-    ).toBe(TwoFactorTier.None)
-  })
-
-  it("asks for an authenticator at the enforced tier even with two factors", () => {
-    expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.Enforced,
-        hasTwoFactor: true,
-        hasAuthenticator: false,
-      }),
+      resolveUnmetTier({ tier: TwoFactorTier.Enforced, hasAuthenticator: false }),
     ).toBe(TwoFactorTier.Enforced)
   })
 
-  it("is none at the enforced tier once an authenticator joins a second factor", () => {
+  it("is none at every tier once the account holds an authenticator", () => {
     expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.Enforced,
-        hasTwoFactor: true,
-        hasAuthenticator: true,
-      }),
+      resolveUnmetTier({ tier: TwoFactorTier.Suggested, hasAuthenticator: true }),
     ).toBe(TwoFactorTier.None)
-  })
-
-  it("still asks for a second factor when the authenticator is the only one", () => {
     expect(
-      resolveUnmetTier({
-        tier: TwoFactorTier.Enforced,
-        hasTwoFactor: false,
-        hasAuthenticator: true,
-      }),
-    ).toBe(TwoFactorTier.Recommended)
+      resolveUnmetTier({ tier: TwoFactorTier.Recommended, hasAuthenticator: true }),
+    ).toBe(TwoFactorTier.None)
+    expect(
+      resolveUnmetTier({ tier: TwoFactorTier.Enforced, hasAuthenticator: true }),
+    ).toBe(TwoFactorTier.None)
   })
 })
 
