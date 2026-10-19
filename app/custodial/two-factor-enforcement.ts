@@ -41,6 +41,35 @@ const tierStepsOf = (thresholds: TwoFactorThresholds): readonly TierStep[] => [
   },
 ]
 
+/** Whether each wallet's thresholds rise from the nudge to the high balance. */
+const isAscending = ({
+  nudgeSats,
+  nudgeUsdCents,
+  reminderSats,
+  reminderUsdCents,
+  highBalanceSats,
+  highBalanceUsdCents,
+}: TwoFactorThresholds): boolean => {
+  const isSatsAscending = nudgeSats < reminderSats && reminderSats < highBalanceSats
+  const isUsdAscending =
+    nudgeUsdCents < reminderUsdCents && reminderUsdCents < highBalanceUsdCents
+  return isSatsAscending && isUsdAscending
+}
+
+/** Whether every threshold is a whole amount: sats and cents have no fractions, and a
+ *  crossed threshold is kept on the device as one. */
+const hasWholeAmounts = (thresholds: TwoFactorThresholds): boolean =>
+  Object.values(thresholds).every(Number.isInteger)
+
+/**
+ * Whether a set of thresholds can drive the tiers: whole amounts that rise tier by tier
+ * for both wallets. Anything else is a typo, and a typo here is costly: a tier reached
+ * never lowers, so a high-balance threshold set below the reminder one would hold
+ * accounts at the blocking screen even after the console is fixed.
+ */
+export const isUsableThresholdSet = (thresholds: TwoFactorThresholds): boolean =>
+  hasWholeAmounts(thresholds) && isAscending(thresholds)
+
 type WalletBalances = {
   sats: number
   usdCents: number
@@ -144,7 +173,8 @@ export const remainingDismissals = (
 
 /** Each tier counts its own dismissals: the high-balance tier starts from zero however
  *  many times the reminder tier's bulletin was waved away. The nudge tier's card is
- *  closed for good instead, so a dismissal of it leaves the counts untouched. */
+ *  closed for good instead, so a dismissal of it leaves the counts untouched. A
+ *  reminder dismissal is also the close that settles a pending new high. */
 export const withDismissal = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
@@ -153,7 +183,11 @@ export const withDismissal = (
     return { ...record, authenticatorDismissals: record.authenticatorDismissals + 1 }
   }
   if (tier === TwoFactorTier.Reminder) {
-    return { ...record, requiredDismissals: record.requiredDismissals + 1 }
+    return {
+      ...record,
+      requiredDismissals: record.requiredDismissals + 1,
+      isNewHighPending: false,
+    }
   }
   return record
 }
@@ -200,26 +234,43 @@ export const withAllTimeHigh = (
   }
 }
 
+/** What a session start's read of the highs leaves: the highs raised to any balance
+ *  above them, and a new high pending for the reminder bulletin while the reminder tier
+ *  is owed, whether found now or still unclosed from an earlier session. An account that
+ *  owes it no longer, with an authenticator, settles it. A record with no highs yet has
+ *  nothing to measure against: its first read seeds them, and finds no new high. */
+export const withSessionStartHigh = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+  unmetTier: TwoFactorTier,
+): TwoFactorEnforcementRecord => {
+  const hasHighs = record.highestSats > 0 || record.highestUsdCents > 0
+  const isNewHigh = hasHighs && isAboveAllTimeHigh(record, wallets)
+  const isReminderOwed = unmetTier === TwoFactorTier.Reminder
+  const isPending = record.isNewHighPending || isNewHigh
+  return {
+    ...withAllTimeHigh(record, wallets),
+    isNewHighPending: isReminderOwed && isPending,
+  }
+}
+
 type ReminderInputs = {
   unmetTier: TwoFactorTier
   record: TwoFactorEnforcementRecord
-  /** Whether this session started with a wallet above its all-time high. */
-  hasNewAllTimeHigh: boolean
 }
 
 /** Why the reminder bulletin is due, or null when it is not. It belongs to the reminder
  *  tier alone and never blocks: it comes back at every session start while the tier's
- *  dismissals last, and after that only at a session start that found a wallet above
- *  its all-time high, as many times as that happens. */
+ *  dismissals last, and after that whenever a session start found a wallet above its
+ *  all-time high, until it is closed. */
 export const resolveReminderReason = ({
   unmetTier,
   record,
-  hasNewAllTimeHigh,
 }: ReminderInputs): TwoFactorReminderReason | null => {
   if (unmetTier !== TwoFactorTier.Reminder) return null
   const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
   if (hasDismissalsLeft) return TwoFactorReminderReason.FirstSessions
-  return hasNewAllTimeHigh ? TwoFactorReminderReason.NewAllTimeHigh : null
+  return record.isNewHighPending ? TwoFactorReminderReason.NewAllTimeHigh : null
 }
 
 export const DEFAULT_TWO_FACTOR_ENFORCEMENT: TwoFactorEnforcementRecord = {
@@ -231,6 +282,7 @@ export const DEFAULT_TWO_FACTOR_ENFORCEMENT: TwoFactorEnforcementRecord = {
   authenticatorDismissals: 0,
   highestSats: 0,
   highestUsdCents: 0,
+  isNewHighPending: false,
 }
 
 const TIERS: readonly TwoFactorTier[] = Object.values(TwoFactorTier)
@@ -277,4 +329,5 @@ export const normalizeStoredRecord = (
   highestUsdCents: isWholeCount(stored?.highestUsdCents)
     ? stored.highestUsdCents
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.highestUsdCents,
+  isNewHighPending: stored?.isNewHighPending === true,
 })

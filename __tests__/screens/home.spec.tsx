@@ -2241,14 +2241,14 @@ describe("TwoFactorSessionModal wiring", () => {
     return call[0]
   }
 
-  it("shows the modal for the prompt's tier with the countdown while the home says it is open", async () => {
+  it("shows the modal with the countdown while the home says it is open", async () => {
     mockTwoFactorSessionPrompt.isModalOpen = true
 
     renderHome()
     await flushEffects()
 
     expect(lastModalProps()).toEqual(
-      expect.objectContaining({ isVisible: true, tier: 2, remainingDismissals: 2 }),
+      expect.objectContaining({ isVisible: true, remainingDismissals: 2 }),
     )
   })
 
@@ -2313,14 +2313,16 @@ describe("TwoFactorSessionModal wiring", () => {
     expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(false)
   })
 
-  it("charges the dismissal to the prompt's tier when the modal is waved away", async () => {
+  it("charges the dismissal to the prompt's tier, as the modal's, when the modal is waved away", async () => {
     mockTwoFactorSessionPrompt.isModalOpen = true
     renderHome()
     await flushEffects()
 
     act(() => lastModalProps().onDismiss())
 
-    expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2)
+    expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2, {
+      prompt: "session_modal",
+    })
   })
 })
 

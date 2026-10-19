@@ -1,11 +1,12 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import remoteConfigInstance from "@react-native-firebase/remote-config"
 
+import { isUsableThresholdSet } from "@app/custodial/two-factor-enforcement"
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { TwoFactorThresholds } from "@app/types/two-factor-enforcement"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
+import { TwoFactorThresholds } from "@app/types/two-factor-enforcement"
 import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
@@ -333,37 +334,17 @@ const readNumber = (key: string, fallback: number): number =>
 const readString = (key: string, fallback: string): string =>
   activatedValue(key)?.asString() ?? fallback
 
-/** Whether each wallet's thresholds rise from the nudge to the high balance. */
-const isAscending = ({
-  nudgeSats,
-  nudgeUsdCents,
-  reminderSats,
-  reminderUsdCents,
-  highBalanceSats,
-  highBalanceUsdCents,
-}: TwoFactorThresholds): boolean => {
-  const isSatsAscending = nudgeSats < reminderSats && reminderSats < highBalanceSats
-  const isUsdAscending =
-    nudgeUsdCents < reminderUsdCents && reminderUsdCents < highBalanceUsdCents
-  return isSatsAscending && isUsdAscending
-}
-
-/**
- * The tier thresholds as the console sets them, read as one set. A set whose tiers do
- * not rise for both wallets is a typo, and a typo here is costly: a tier reached never
- * lowers, so a high-balance threshold set below the reminder one would hold accounts
- * at the blocking screen even after the console is fixed. Such a set falls back to the
- * shipped one as a whole, and is reported.
- */
+/** The tier thresholds as the console sets them, read as one set: a set the two-factor
+ *  rules cannot use falls back to the shipped one as a whole, and is reported. */
 const readTwoFactorThresholds = (): TwoFactorThresholds => {
   const thresholds = getRemoteConfigPositiveNumericObject(
     CustodialTwoFactorThresholdsKey,
     defaultTwoFactorThresholds,
   )
-  if (isAscending(thresholds)) return thresholds
+  if (isUsableThresholdSet(thresholds)) return thresholds
   logError({
     scope: "remote-config",
-    error: new Error(`Thresholds in "${CustodialTwoFactorThresholdsKey}" do not ascend`),
+    error: new Error(`Thresholds in "${CustodialTwoFactorThresholdsKey}" are not usable`),
     context: { key: CustodialTwoFactorThresholdsKey, thresholds },
   })
   return defaultTwoFactorThresholds

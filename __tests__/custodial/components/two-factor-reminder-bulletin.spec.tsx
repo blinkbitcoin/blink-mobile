@@ -125,12 +125,15 @@ describe("TwoFactorReminderBulletin", () => {
     expect(mockMarkPromptShown).not.toHaveBeenCalled()
   })
 
-  it("opens the setup from Set authenticator", () => {
+  it("opens the setup from Set authenticator, telling it the bulletin opened it and why", () => {
     const { getByTestId } = render(<TwoFactorReminderBulletin />)
 
     fireEvent.press(getByTestId("cta-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
+      prompt: TwoFactorPrompt.ReminderBulletin,
+      reason: TwoFactorReminderReason.FirstSessions,
+    })
   })
 
   it("hands the X to the enforcement's dismissal", () => {

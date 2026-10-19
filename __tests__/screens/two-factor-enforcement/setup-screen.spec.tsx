@@ -8,7 +8,13 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
 import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
-import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
+import {
+  TwoFactorMethod,
+  TwoFactorPrompt,
+  TwoFactorPromptOrigin,
+  TwoFactorReminderReason,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -20,6 +26,7 @@ const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 let mockIsFocused = true
+let mockRouteParams: TwoFactorPromptOrigin | undefined
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -29,6 +36,12 @@ jest.mock("@react-navigation/native", () => ({
     setOptions: mockSetOptions,
   }),
   useIsFocused: () => mockIsFocused,
+  useRoute: () => ({ params: mockRouteParams }),
+}))
+
+let mockIsSelfCustodialDisabled = false
+jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
+  useSelfCustodialDisabled: () => mockIsSelfCustodialDisabled,
 }))
 
 const mockUseHardwareBackGuard = jest.fn()
@@ -58,6 +71,12 @@ const mockLogTwoFactorSetupStarted = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: (...args: unknown[]) => mockLogTwoFactorSetupStarted(...args),
 }))
+
+const BANNER_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.SettingsBanner }
+const BULLETIN_ORIGIN: TwoFactorPromptOrigin = {
+  prompt: TwoFactorPrompt.ReminderBulletin,
+  reason: TwoFactorReminderReason.NewAllTimeHigh,
+}
 
 const renderScreen = async () => {
   const rendered = render(
@@ -97,6 +116,8 @@ describe("TwoFactorSetupScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockIsFocused = true
+    mockRouteParams = BANNER_ORIGIN
+    mockIsSelfCustodialDisabled = false
     mockEnforcement.unmetTier = TwoFactorTier.Nudge
     mockEnforcement.hasAuthenticator = false
   })
@@ -117,6 +138,15 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(primaryButton().props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
     expect(secondaryButton().props.title).toBe(LL.AccountMigration.moveToNonCustodial())
+  })
+
+  /** With the self-custodial stack switched off there is nothing to move toward. */
+  it("offers the authenticator alone while the self-custodial stack is switched off", async () => {
+    mockIsSelfCustodialDisabled = true
+    await renderScreen()
+
+    expect(primaryButton().props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
+    expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
   })
 
   it("tells the authenticator flow to return here, under the tier it was opened for", async () => {
@@ -157,7 +187,10 @@ describe("TwoFactorSetupScreen", () => {
     await rerenderScreen(rendered)
     pressHardwareBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Reminder,
+      BANNER_ORIGIN,
+    )
   })
 
   it("installs a close control that charges the exit to the tier it opened for", async () => {
@@ -167,7 +200,10 @@ describe("TwoFactorSetupScreen", () => {
     renderInstalledCloseControl()
     fireEvent.press(screen.getByTestId("icon-close"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Reminder,
+      BANNER_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -177,8 +213,42 @@ describe("TwoFactorSetupScreen", () => {
 
     pressHardwareBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Reminder,
+      BANNER_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  /** Leaving the setup unfinished is the dismissal of the prompt that opened it, which
+   *  the enforcement reports once it counts it. */
+  it("charges an exit to the prompt that opened it, with the reason it was up", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
+    mockRouteParams = BULLETIN_ORIGIN
+    await renderScreen()
+
+    pressHardwareBack()
+
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Reminder,
+      BULLETIN_ORIGIN,
+    )
+  })
+
+  /** The authenticator flow's return to this route replaces its params. */
+  it("keeps the prompt that opened it once its params are replaced", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
+    mockRouteParams = BULLETIN_ORIGIN
+    const rendered = await renderScreen()
+
+    mockRouteParams = undefined
+    await rerenderScreen(rendered)
+    pressHardwareBack()
+
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Reminder,
+      BULLETIN_ORIGIN,
+    )
   })
 
   it("steps aside once the account holds an authenticator", async () => {

@@ -25,8 +25,9 @@ type TwoFactorHomeCardProps = {
 
 /**
  * A two-factor prompt on the home, as a card: it reports itself as shown to the
- * enforcement, which counts the impressions, and its button opens the setup. What sets
- * one prompt apart from another is its copy, its outline and its dismissal.
+ * enforcement, which counts the impressions, and its button opens the setup, told which
+ * prompt opened it and why it was up. What sets one prompt apart from another is its
+ * copy, its outline and its dismissal.
  */
 export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
   prompt,
@@ -45,8 +46,8 @@ export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
   }, [markPromptShown, prompt, reason])
 
   const handleSet = useCallback(() => {
-    navigation.navigate("twoFactorSetup")
-  }, [navigation])
+    navigation.navigate("twoFactorSetup", { prompt, reason })
+  }, [navigation, prompt, reason])
 
   return (
     <NotificationCardUI

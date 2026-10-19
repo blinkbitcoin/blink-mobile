@@ -37,6 +37,8 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
   /** The tier this screen was opened for: what it reports, and what backing out of it
    *  is charged to, even if the balance moves while it is open. */
   const [promptTier] = useState(unmetTier)
+  /** The prompt that opened it, whose dismissal backing out is. */
+  const [origin] = useState(params?.origin)
 
   useEffect(() => {
     logTwoFactorPromptShown({
@@ -50,9 +52,9 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
    *  the setup, it only returns there: the setup is still up, and leaving it is what
    *  counts. */
   const handleCancel = useCallback(() => {
-    if (!isFromSetup) registerDismissal(promptTier)
+    if (!isFromSetup) registerDismissal(promptTier, origin)
     navigation.goBack()
-  }, [isFromSetup, registerDismissal, promptTier, navigation])
+  }, [isFromSetup, registerDismissal, promptTier, origin, navigation])
 
   useHardwareBackGuard(handleCancel)
 

@@ -2,6 +2,7 @@ import { defaultTwoFactorThresholds } from "@app/config/feature-flags-context"
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   isAboveAllTimeHigh,
+  isUsableThresholdSet,
   normalizeStoredRecord,
   quotedHighBalanceThreshold,
   remainingDismissals,
@@ -12,6 +13,7 @@ import {
   resolveUnmetTier,
   withAllTimeHigh,
   withDismissal,
+  withSessionStartHigh,
   withTierReached,
 } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
@@ -32,6 +34,29 @@ const THRESHOLDS = defaultTwoFactorThresholds
 const recordWith = (
   overrides: Partial<TwoFactorEnforcementRecord>,
 ): TwoFactorEnforcementRecord => ({ ...DEFAULT_TWO_FACTOR_ENFORCEMENT, ...overrides })
+
+describe("isUsableThresholdSet", () => {
+  it("takes the shipped set", () => {
+    expect(isUsableThresholdSet(THRESHOLDS)).toBe(true)
+  })
+
+  /** A tier reached never lowers, so a higher tier set below a lower one would keep
+   *  accounts escalated after the console is fixed. */
+  it("refuses a set whose bitcoin tiers do not rise", () => {
+    expect(isUsableThresholdSet({ ...THRESHOLDS, highBalanceSats: 400_000 })).toBe(false)
+  })
+
+  it("refuses a set whose dollar tiers do not rise", () => {
+    expect(isUsableThresholdSet({ ...THRESHOLDS, nudgeUsdCents: 60_000 })).toBe(false)
+  })
+
+  /** Sats and cents have no fractions, and a crossed threshold is kept as one. */
+  it("refuses a set that holds a fraction of a sat or a cent", () => {
+    expect(isUsableThresholdSet({ ...THRESHOLDS, highBalanceUsdCents: 250_000.5 })).toBe(
+      false,
+    )
+  })
+})
 
 describe("resolveBalanceTier", () => {
   it("is none without wallets", () => {
@@ -247,6 +272,14 @@ describe("dismissals", () => {
     expect(remainingDismissals(record, TwoFactorTier.HighBalance)).toBe(3)
   })
 
+  /** The close that settles the new high its bulletin was brought back for. */
+  it("settles a pending new high with a reminder dismissal, and only with one", () => {
+    const pending = recordWith({ requiredDismissals: 3, isNewHighPending: true })
+
+    expect(withDismissal(pending, TwoFactorTier.Reminder).isNewHighPending).toBe(false)
+    expect(withDismissal(pending, TwoFactorTier.HighBalance).isNewHighPending).toBe(true)
+  })
+
   it("counts the high-balance tier's dismissals on their own counter", () => {
     const record = withDismissal(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
@@ -257,7 +290,7 @@ describe("dismissals", () => {
     expect(record.requiredDismissals).toBe(0)
   })
 
-  it("leaves the record untouched for tiers that never prompt at session start", () => {
+  it("leaves the record untouched for the tiers that count no dismissal", () => {
     expect(withDismissal(DEFAULT_TWO_FACTOR_ENFORCEMENT, TwoFactorTier.Nudge)).toBe(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
     )
@@ -353,6 +386,55 @@ describe("all-time highs", () => {
       highestUsdCents: 60_000,
     })
   })
+
+  it("leaves a new high pending when a session start owing the reminder tier finds one", () => {
+    expect(
+      withSessionStartHigh(highs, walletsWith(900_000, 0), TwoFactorTier.Reminder),
+    ).toMatchObject({ highestSats: 900_000, isNewHighPending: true })
+  })
+
+  it("keeps a new high pending from an earlier session while the reminder tier is owed", () => {
+    const pending = recordWith({ highestSats: 900_000, isNewHighPending: true })
+
+    expect(
+      withSessionStartHigh(pending, walletsWith(800_000, 0), TwoFactorTier.Reminder),
+    ).toMatchObject({ highestSats: 900_000, isNewHighPending: true })
+  })
+
+  /** An authenticator added from the bulletin's setup counts no dismissal, so the
+   *  pending high would otherwise outlive it. */
+  it("settles a pending new high once the account owes the reminder tier no longer", () => {
+    const pending = recordWith({ highestSats: 900_000, isNewHighPending: true })
+
+    expect(
+      withSessionStartHigh(pending, walletsWith(900_000, 0), TwoFactorTier.None),
+    ).toMatchObject({ isNewHighPending: false })
+  })
+
+  /** A record from before the highs were kept has nothing to measure against. */
+  it("seeds a record with no highs yet, finding no new high in it", () => {
+    expect(
+      withSessionStartHigh(
+        DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        walletsWith(600_000, 40_000),
+        TwoFactorTier.Reminder,
+      ),
+    ).toMatchObject({
+      highestSats: 600_000,
+      highestUsdCents: 40_000,
+      isNewHighPending: false,
+    })
+  })
+
+  /** Below the tier, or with an authenticator, there is no bulletin to remind of it. */
+  it("only raises the highs when the reminder tier is not owed", () => {
+    expect(
+      withSessionStartHigh(highs, walletsWith(900_000, 0), TwoFactorTier.Nudge),
+    ).toMatchObject({ highestSats: 900_000, isNewHighPending: false })
+    expect(
+      withSessionStartHigh(highs, walletsWith(900_000, 0), TwoFactorTier.None),
+    ).toMatchObject({ highestSats: 900_000, isNewHighPending: false })
+  })
 })
 
 describe("resolveReminderReason", () => {
@@ -361,44 +443,33 @@ describe("resolveReminderReason", () => {
       resolveReminderReason({
         unmetTier: TwoFactorTier.Reminder,
         record: recordWith({ requiredDismissals: 2 }),
-        hasNewAllTimeHigh: false,
       }),
     ).toBe(TwoFactorReminderReason.FirstSessions)
   })
 
-  it("is due again only at a new all-time high once its dismissals are spent", () => {
-    const spent = recordWith({ requiredDismissals: 3 })
-
+  it("is due again only while a new all-time high is pending once its dismissals are spent", () => {
     expect(
       resolveReminderReason({
         unmetTier: TwoFactorTier.Reminder,
-        record: spent,
-        hasNewAllTimeHigh: true,
+        record: recordWith({ requiredDismissals: 3, isNewHighPending: true }),
       }),
     ).toBe(TwoFactorReminderReason.NewAllTimeHigh)
     expect(
       resolveReminderReason({
         unmetTier: TwoFactorTier.Reminder,
-        record: spent,
-        hasNewAllTimeHigh: false,
+        record: recordWith({ requiredDismissals: 3 }),
       }),
     ).toBeNull()
   })
 
   it("is never due away from the reminder tier", () => {
+    const pending = recordWith({ isNewHighPending: true })
+
     expect(
-      resolveReminderReason({
-        unmetTier: TwoFactorTier.Nudge,
-        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
-        hasNewAllTimeHigh: true,
-      }),
+      resolveReminderReason({ unmetTier: TwoFactorTier.Nudge, record: pending }),
     ).toBeNull()
     expect(
-      resolveReminderReason({
-        unmetTier: TwoFactorTier.HighBalance,
-        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
-        hasNewAllTimeHigh: true,
-      }),
+      resolveReminderReason({ unmetTier: TwoFactorTier.HighBalance, record: pending }),
     ).toBeNull()
   })
 })
@@ -418,6 +489,7 @@ describe("normalizeStoredRecord", () => {
       highestSats: 800_000,
       highestUsdCents: 60_000,
       highBalanceThreshold: 500_000,
+      isNewHighPending: true,
     }
 
     expect(normalizeStoredRecord(record)).toEqual(record)
@@ -464,6 +536,12 @@ describe("normalizeStoredRecord", () => {
   it("drops a crossed threshold that is not a whole, non-negative amount", () => {
     expect(normalizeStoredRecord({ highBalanceThreshold: 2.5 })).toEqual(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,
+    )
+  })
+
+  it("only reads a pending new high that is exactly true", () => {
+    expect(normalizeStoredRecord({ isNewHighPending: "true" }).isNewHighPending).toBe(
+      false,
     )
   })
 

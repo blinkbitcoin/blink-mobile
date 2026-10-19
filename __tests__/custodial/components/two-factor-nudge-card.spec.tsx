@@ -88,12 +88,15 @@ describe("TwoFactorNudgeCard", () => {
     expect(mockMarkPromptShown).toHaveBeenCalledWith("home_card", undefined)
   })
 
-  it("opens the setup screen from Set", () => {
+  it("opens the setup from Set, telling it the card opened it", () => {
     const { getByTestId } = render(<TwoFactorNudgeCard />)
 
     fireEvent.press(getByTestId("cta-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
+      prompt: "home_card",
+      reason: undefined,
+    })
   })
 
   it("hands the X to the enforcement's dismissal", () => {

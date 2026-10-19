@@ -52,11 +52,13 @@ describe("TwoFactorBanner", () => {
     expect(mockMarkPromptShown).toHaveBeenCalledWith("settings_banner")
   })
 
-  it("opens the setup screen when pressed", async () => {
+  it("opens the setup when pressed, telling it the banner opened it", async () => {
     await renderBanner()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.title()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
+      prompt: "settings_banner",
+    })
   })
 })
