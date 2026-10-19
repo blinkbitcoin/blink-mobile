@@ -25,17 +25,13 @@ import {
   TwoFactorMethod,
   TwoFactorPrompt,
   TwoFactorThresholds,
-  TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import {
   logTwoFactorNonCustodialChosen,
-  logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
   logTwoFactorSetupStarted,
 } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
-
-import { TwoFactorSetupContent } from "./setup-content"
 
 /** The gate stands in for the home, so its flows come back to the home. */
 const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
@@ -52,12 +48,11 @@ const enforcedThreshold = (currency: WalletCurrency, thresholds: TwoFactorThresh
     : toBtcMoneyAmount(thresholds.enforcedSats)
 
 /**
- * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
- * at the session start that owes it, so the home is never seen first. The recommended
- * tier, once its dismissals are spent, shows the setup itself with no way to close it:
- * the only exits are an authenticator or leaving custody. The enforced tier shows the
- * high-balance screen, with an X while it still has dismissals left and none after, and
- * offers exactly two ways forward. Neither takes the swipe or the hardware back.
+ * The blocking screen of the enforced tier, standing in for the home at every
+ * session start once the tier's modal has spent its dismissals, so the home is never
+ * seen first. It names the threshold of the wallet that crossed it and offers exactly
+ * two ways forward, an authenticator or leaving custody, with no close control: it
+ * takes neither the swipe nor the hardware back. Only this tier blocks.
  */
 export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -68,13 +63,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
   const { custodialTwoFactorThresholds } = useRemoteConfig()
-  const { unmetTier, remainingDismissals, enforcedCurrency, registerDismissal } =
-    useTwoFactorEnforcement()
-  /** The gate mounts this screen anew for each tier it is raised for, so the tier it
-   *  reports and charges its X to is the one it was raised for, for as long as it is
-   *  open. */
-  const isEnforcedTier = unmetTier === TwoFactorTier.Enforced
-  const isDismissible = isEnforcedTier && remainingDismissals > 0
+  const { unmetTier, enforcedCurrency } = useTwoFactorEnforcement()
 
   useEffect(() => {
     logTwoFactorPromptShown({
@@ -83,22 +72,12 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     })
   }, [unmetTier])
 
-  /** Charging the dismissal is what lets the home in: it takes the session start, and
-   *  the screen stands in for the home only while that start is still owed. */
-  const handleDismiss = useCallback(() => {
-    logTwoFactorPromptDismissed({
-      tier: unmetTier,
-      prompt: TwoFactorPrompt.ProtectionRequiredScreen,
-    })
-    registerDismissal(unmetTier)
-  }, [unmetTier, registerDismissal])
-
-  /** The hardware back is the X while there is one, and nothing at all once there is
-   *  none: a blocking screen swallows it rather than letting the app go. */
-  useHardwareBackGuard(isDismissible ? handleDismiss : undefined)
+  /** No handler: a blocking screen swallows the hardware back rather than letting the
+   *  app go. */
+  useHardwareBackGuard(undefined)
 
   /** A flow started from the gate returns to the home, where the gate decides again
-   *  with the factor just added. */
+   *  with the authenticator just added. */
   const handleSetAuthenticator = useCallback(() => {
     logTwoFactorSetupStarted({ tier: unmetTier, method: TwoFactorMethod.Authenticator })
     navigation.navigate("totpRegistrationInitiate", { returnTo: GATE_RETURN_ROUTE })
@@ -109,30 +88,13 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     navigation.navigate("accountMigrationEntry")
   }, [navigation, unmetTier])
 
-  /** The setup keeps the header row its route draws, empty: the hero then sits where
-   *  it does on every other screen of the flow, instead of climbing into the gap. */
-  if (!isEnforcedTier) {
-    return (
-      <TwoFactorSetupContent
-        promptTier={unmetTier}
-        returnTo={GATE_RETURN_ROUTE}
-        headerShown={false}
-        header={<CloseHeader isHidden testID="two-factor-protection-close" />}
-      />
-    )
-  }
-
+  /** The header row is kept, empty, so the hero sits where it does on every other
+   *  screen of the flow instead of climbing into the gap. */
   return (
     <StepLayout
       headerShown={false}
       contentStyle={styles.content}
-      header={
-        <CloseHeader
-          onClose={handleDismiss}
-          isHidden={!isDismissible}
-          testID="two-factor-protection-close"
-        />
-      }
+      header={<CloseHeader isHidden testID="two-factor-protection-close" />}
       footer={
         <>
           <GaloyPrimaryButton

@@ -27,9 +27,9 @@ export const TwoFactorPrompt = {
 } as const
 export type TwoFactorPrompt = (typeof TwoFactorPrompt)[keyof typeof TwoFactorPrompt]
 
-/** What a session start owes the account: the countdown modal while the recommended tier
- *  still has dismissals left, the full-screen prompt once it has none or the account is
- *  at the enforced tier, or nothing. */
+/** What a session start owes the account: at the enforced tier, the countdown
+ *  modal while dismissals remain and the blocking screen once they are spent; below it,
+ *  nothing. */
 export const TwoFactorSessionPrompt = {
   None: "none",
   SessionModal: "session_modal",

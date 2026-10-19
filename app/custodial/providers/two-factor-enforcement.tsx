@@ -107,9 +107,10 @@ export type TwoFactorEnforcementState = {
    *  start, and a home that has not shown yet waits rather than show before a prompt
    *  that replaces it. */
   isPreparingSessionStart: boolean
-  /** The full-screen prompt stands in for the home: shown in its place for the session
-   *  start that owes it, until a dismissal takes that start or the account complies.
-   *  Off while the wind-down's push into the migration applies, which outranks it. */
+  /** The high-balance blocking screen stands in for the home: shown in its place for
+   *  the session start that owes it, once the tier's modal has spent its dismissals,
+   *  until the account complies. Off while the wind-down's push into the migration
+   *  applies, which outranks it. */
   isProtectionGateActive: boolean
   shouldShowNudgeCard: boolean
   shouldShowSettingsBanner: boolean
@@ -313,22 +314,22 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   /** The record of this account is still being read: nothing is decided yet, and a home
    *  that has not shown yet does not show for the frames that read takes. */
   const isPreparingSessionStart = isEnabled && accountId !== null && !isSessionForAccount
-  /** The full-screen prompt replaces the home for the session start that owes it, until
-   *  a dismissal takes that start or the account complies. The wind-down's push into
-   *  the migration outranks it, as it does the modal on the home: an account whose
-   *  custodial service is ending has one remedy that matters more than a second factor,
-   *  and that push lives on the home, which the prompt would stand in for. The push's
-   *  session dismissal is the home's own, so the prompt yields for as long as the push
-   *  applies, and the home then takes the start with no prompt. The prompt goes up from
-   *  the local read at once rather than wait for the wind-down's answer, which a
-   *  network that never answers would hold forever; should the answer then say the push
-   *  applies, the prompt yields to it. */
+  /** The blocking screen replaces the home for the session start that owes it, until
+   *  the account complies. The wind-down's push into the migration outranks it, as it
+   *  does the modal on the home: an account whose custodial service is ending has one
+   *  remedy that matters more than a second factor, and that push lives on the home,
+   *  which the screen would stand in for. The push's session dismissal is the home's
+   *  own, so the screen yields for as long as the push applies, and the home then takes
+   *  the start with no prompt. The screen goes up from the local read at once rather
+   *  than wait for the wind-down's answer, which a network that never answers would
+   *  hold forever; should the answer then say the push applies, the screen yields to
+   *  it. */
   const isProtectionGateOwed =
     isSessionStartPending && requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
   const isProtectionGateActive = isProtectionGateOwed && !migrateNowRemedy.isDue
 
-  /** The card belongs to the suggested tier alone: from the recommended tier on, the
-   *  session prompt is the one asking, and the home never stacks two. The banner asks at
+  /** The card belongs to the suggested tier alone: from the recommended tier on, that
+   *  tier's own prompt asks instead, and the home never stacks two. The banner asks at
    *  every tier until the account holds an authenticator. */
   const shouldShowNudgeCard =
     unmetTier === TwoFactorTier.Suggested && !record.nudgeCardDismissed

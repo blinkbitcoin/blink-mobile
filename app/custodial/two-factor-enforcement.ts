@@ -140,14 +140,14 @@ type SessionPromptInputs = {
   record: TwoFactorEnforcementRecord
 }
 
+/** Only the enforced tier asks at the session start: its modal while dismissals
+ *  remain, then the blocking screen. The recommended tier reminds on the home and never
+ *  blocks, and the suggested tier only nudges. */
 export const resolveSessionPrompt = ({
   unmetTier,
   record,
 }: SessionPromptInputs): TwoFactorSessionPrompt => {
-  if (unmetTier === TwoFactorTier.Enforced) {
-    return TwoFactorSessionPrompt.ProtectionRequired
-  }
-  if (unmetTier !== TwoFactorTier.Recommended) return TwoFactorSessionPrompt.None
+  if (unmetTier !== TwoFactorTier.Enforced) return TwoFactorSessionPrompt.None
   const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
   return hasDismissalsLeft
     ? TwoFactorSessionPrompt.SessionModal

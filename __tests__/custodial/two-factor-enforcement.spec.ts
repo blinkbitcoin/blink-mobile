@@ -250,29 +250,45 @@ describe("resolveSessionPrompt", () => {
     ).toBe(TwoFactorSessionPrompt.None)
   })
 
-  it("owes the modal at the recommended tier while dismissals remain", () => {
+  /** The recommended tier reminds on the home and never blocks. */
+  it("owes nothing at the recommended tier, with or without dismissals left", () => {
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Recommended,
-        record: recordWith({ recommendedDismissals: 2 }),
+        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
       }),
-    ).toBe(TwoFactorSessionPrompt.SessionModal)
-  })
-
-  it("owes the protection screen at the recommended tier once dismissals are spent", () => {
+    ).toBe(TwoFactorSessionPrompt.None)
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Recommended,
         record: recordWith({ recommendedDismissals: 3 }),
       }),
-    ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
+    ).toBe(TwoFactorSessionPrompt.None)
   })
 
-  it("owes the protection screen at the enforced tier from the first session", () => {
+  it("owes the modal at the enforced tier while dismissals remain", () => {
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Enforced,
-        record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        record: recordWith({ enforcedDismissals: 2 }),
+      }),
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
+  })
+
+  it("owes the modal at the enforced tier however many reminder dismissals were spent", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Enforced,
+        record: recordWith({ recommendedDismissals: 3 }),
+      }),
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
+  })
+
+  it("owes the blocking screen at the enforced tier once dismissals are spent", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Enforced,
+        record: recordWith({ enforcedDismissals: 3 }),
       }),
     ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
   })

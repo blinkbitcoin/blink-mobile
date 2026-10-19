@@ -24,11 +24,6 @@ type TwoFactorSetupContentProps = {
   /** Where the authenticator flow returns on success, rather than to the destination it
    *  has on its own: the screen this content is shown on, which carries on from there. */
   returnTo: RegistrationReturnRoute
-  /** Whether the navigation header, and the close control it carries, is drawn. */
-  headerShown?: boolean
-  /** A row drawn in place of the navigation header, so a headerless use keeps the
-   *  layout of one with a header. */
-  header?: React.ReactNode
 }
 
 /**
@@ -36,15 +31,12 @@ type TwoFactorSetupContentProps = {
  * and every tier. An authenticator is what the account is asked for; an email or a
  * phone number added to the one it logs in with protects nothing, since an attacker who
  * takes the account over can change both. The alternative is to leave custody, and it
- * goes through the screen that explains what that means. The route shows the setup
- * under a header with a close control; the session gate shows it bare, with no way to
- * close it, once the recommended tier has spent its dismissals.
+ * goes through the screen that explains what that means. The route draws it under a
+ * header with a close control.
  */
 export const TwoFactorSetupContent: React.FC<TwoFactorSetupContentProps> = ({
   promptTier,
   returnTo,
-  headerShown,
-  header,
 }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
@@ -64,8 +56,6 @@ export const TwoFactorSetupContent: React.FC<TwoFactorSetupContentProps> = ({
 
   return (
     <StepLayout
-      headerShown={headerShown}
-      header={header}
       contentStyle={styles.content}
       footer={
         <>

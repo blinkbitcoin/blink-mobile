@@ -1,13 +1,11 @@
 import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
-import { Text } from "react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorSetupContent } from "@app/screens/two-factor-enforcement/setup-content"
-import { StepLayout } from "@app/components/step-layout"
 import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
@@ -27,19 +25,12 @@ jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: (...args: unknown[]) => mockLogTwoFactorSetupStarted(...args),
 }))
 
-type LayoutOptions = {
-  headerShown?: boolean
-  header?: React.ReactNode
-}
-
-const renderContent = async ({ headerShown, header }: LayoutOptions = {}) => {
+const renderContent = async () => {
   const rendered = render(
     <ContextForScreen>
       <TwoFactorSetupContent
         promptTier={TwoFactorTier.Recommended}
         returnTo="twoFactorSetup"
-        headerShown={headerShown}
-        header={header}
       />
     </ContextForScreen>,
   )
@@ -56,12 +47,6 @@ describe("TwoFactorSetupContent", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-  })
-
-  it("draws the row it is handed in place of the navigation header", async () => {
-    await renderContent({ headerShown: false, header: <Text>header row</Text> })
-
-    expect(screen.getByText("header row")).toBeTruthy()
   })
 
   it("renders the lock hero with the setup copy", async () => {
@@ -106,17 +91,5 @@ describe("TwoFactorSetupContent", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial")
     expect(mockLogTwoFactorSetupStarted).not.toHaveBeenCalled()
-  })
-
-  it("draws the navigation header unless told otherwise", async () => {
-    await renderContent()
-    // eslint-disable-next-line camelcase
-    expect(screen.UNSAFE_getByType(StepLayout).props.headerShown).toBeUndefined()
-
-    screen.unmount()
-    await renderContent({ headerShown: false })
-
-    // eslint-disable-next-line camelcase
-    expect(screen.UNSAFE_getByType(StepLayout).props.headerShown).toBe(false)
   })
 })
