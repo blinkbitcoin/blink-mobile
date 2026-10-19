@@ -23,7 +23,11 @@ import {
   TwoFactorNonCustodialScreen,
   TwoFactorSetupScreen,
 } from "@app/screens/two-factor-enforcement"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
+import {
+  TwoFactorPrompt,
+  TwoFactorPromptOrigin,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 
 /**
  * The setup on a real stack: the sibling spec mocks the navigator and the hardware
@@ -99,13 +103,18 @@ const pressSuccessOk = () => {
   buttons?.[0]?.onPress?.()
 }
 
+const CARD_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.HomeCard }
+
 const Stack = createNativeStackNavigator<RootStackParamList>()
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
 
 const HomeStub = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   return (
-    <Pressable testID="open-setup" onPress={() => navigation.navigate("twoFactorSetup")}>
+    <Pressable
+      testID="open-setup"
+      onPress={() => navigation.navigate("twoFactorSetup", CARD_ORIGIN)}
+    >
       <Text>home</Text>
     </Pressable>
   )
@@ -247,7 +256,10 @@ describe("TwoFactorSetupScreen in a stack", () => {
     })
 
     expect(currentRoute()).toBe("Primary")
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Suggested)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Suggested,
+      CARD_ORIGIN,
+    )
   })
 
   it("lets the hardware back out, charging the exit to the tier", async () => {
@@ -259,6 +271,9 @@ describe("TwoFactorSetupScreen in a stack", () => {
     })
 
     expect(currentRoute()).toBe("Primary")
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Suggested)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Suggested,
+      CARD_ORIGIN,
+    )
   })
 })

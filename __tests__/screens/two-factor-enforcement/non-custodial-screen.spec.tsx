@@ -4,7 +4,11 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorNonCustodialScreen } from "@app/screens/two-factor-enforcement"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
+import {
+  TwoFactorPrompt,
+  TwoFactorPromptOrigin,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -14,7 +18,9 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
-let mockRouteParams: { isFromSetup?: boolean } | undefined
+let mockRouteParams: { origin?: TwoFactorPromptOrigin; isFromSetup?: boolean } | undefined
+
+const MODAL_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.SessionModal }
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -56,7 +62,7 @@ describe("TwoFactorNonCustodialScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    mockRouteParams = undefined
+    mockRouteParams = { origin: MODAL_ORIGIN }
   })
 
   it("renders the key hero with the non-custodial copy and logs it as shown once", async () => {
@@ -84,12 +90,15 @@ describe("TwoFactorNonCustodialScreen", () => {
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
-  it("charges Cancel to the tier it opened for and goes back", async () => {
+  it("charges Cancel to the tier it opened for, as the dismissal of the prompt that opened it, and goes back", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Enforced,
+      MODAL_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -98,7 +107,10 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-close"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Enforced,
+      MODAL_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -108,7 +120,10 @@ describe("TwoFactorNonCustodialScreen", () => {
     const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
     onBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Enforced)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.Enforced,
+      MODAL_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 

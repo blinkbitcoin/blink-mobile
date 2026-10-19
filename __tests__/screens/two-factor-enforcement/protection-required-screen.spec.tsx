@@ -27,6 +27,11 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
   useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
 }))
 
+let mockIsSelfCustodialDisabled = false
+jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
+  useSelfCustodialDisabled: () => mockIsSelfCustodialDisabled,
+}))
+
 const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.Enforced as TwoFactorTier,
@@ -78,6 +83,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.enforcedCurrency = WalletCurrency.Btc
     mockEnforcement.enforcedThreshold = 5_000_000
+    mockIsSelfCustodialDisabled = false
   })
 
   it("names the sats threshold under a warning sign, with no close control", async () => {
@@ -136,6 +142,16 @@ describe("TwoFactorProtectionRequiredScreen", () => {
 
   /** A blocking screen swallows the hardware back rather than letting the app go, and
    *  nothing on it is a dismissal. */
+  /** With the self-custodial stack switched off there is nothing to move toward, so
+   *  the authenticator is the one way forward. */
+  it("offers the authenticator alone while the self-custodial stack is switched off", async () => {
+    mockIsSelfCustodialDisabled = true
+    await renderScreen()
+
+    expect(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator())).toBeTruthy()
+    expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
+  })
+
   it("swallows the hardware back and charges no dismissal", async () => {
     await renderScreen()
 

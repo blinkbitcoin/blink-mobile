@@ -3,7 +3,6 @@ import { TouchableOpacity } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 const mockNavigate = jest.fn()
 
@@ -109,7 +108,6 @@ const renderModal = ({
   render(
     <TwoFactorSessionModal
       isVisible={isVisible}
-      tier={TwoFactorTier.Recommended}
       remainingDismissals={remainingDismissals}
       onDismiss={onDismiss}
     />,
@@ -153,7 +151,9 @@ describe("TwoFactorSessionModal", () => {
     })
   })
 
-  it("counts the X as the dismissal and logs it", () => {
+  /** The dismissal reports itself once it counts, so a second press during the exit
+   *  animation reports nothing: the modal logs nothing of its own. */
+  it("hands the X to the dismissal, leaving the report to it", () => {
     const onDismiss = jest.fn()
     // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getByType } = renderModal({ onDismiss })
@@ -161,10 +161,7 @@ describe("TwoFactorSessionModal", () => {
     fireEvent.press(UNSAFE_getByType(TouchableOpacity))
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
-    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      prompt: "session_modal",
-    })
+    expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
@@ -175,17 +172,22 @@ describe("TwoFactorSessionModal", () => {
     fireEvent.press(getByTestId("primary-button"))
 
     expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
+      prompt: "session_modal",
+    })
   })
 
-  it("makes way for the non-custodial screen from I don't want to", () => {
+  /** Backing out of that screen is the modal's dismissal, which it is told. */
+  it("makes way for the non-custodial screen from I don't want to, telling it the modal opened it", () => {
     const onDismiss = jest.fn()
     const { getByTestId } = renderModal({ onDismiss })
 
     fireEvent.press(getByTestId("secondary-button"))
 
     expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial", {
+      origin: { prompt: "session_modal" },
+    })
   })
 
   /** A native modal dismissed while the native-stack push runs can hang, so the modal
@@ -199,7 +201,6 @@ describe("TwoFactorSessionModal", () => {
     rerender(
       <TwoFactorSessionModal
         isVisible={false}
-        tier={TwoFactorTier.Recommended}
         remainingDismissals={3}
         onDismiss={jest.fn()}
       />,
@@ -207,7 +208,6 @@ describe("TwoFactorSessionModal", () => {
     rerender(
       <TwoFactorSessionModal
         isVisible={true}
-        tier={TwoFactorTier.Recommended}
         remainingDismissals={3}
         onDismiss={jest.fn()}
       />,

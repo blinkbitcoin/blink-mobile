@@ -38,6 +38,13 @@ export const TwoFactorReminderReason = {
 export type TwoFactorReminderReason =
   (typeof TwoFactorReminderReason)[keyof typeof TwoFactorReminderReason]
 
+/** The prompt a dismissal answers, and why it was up: a flow the prompt opened and the
+ *  user left unfinished is that prompt's dismissal, and is reported as such. */
+export type TwoFactorPromptOrigin = {
+  prompt: TwoFactorPrompt
+  reason?: TwoFactorReminderReason
+}
+
 /** What a session start owes the account: at the enforced tier, the countdown
  *  modal while dismissals remain and the blocking screen once they are spent; below it,
  *  nothing. */
@@ -77,8 +84,12 @@ export type TwoFactorEnforcementRecord = {
   /** Dismissals counted at the enforced tier. */
   enforcedDismissals: number
   /** The bitcoin wallet's all-time high, in sats: the highest balance seen at a session
-   *  start while the account was at the recommended tier. */
+   *  start at the suggested or recommended tier, or when the balance raised the tier. */
   highestSats: number
   /** The dollar wallet's all-time high, in cents, kept the same way. */
   highestUsdCents: number
+  /** A session start owing the recommended tier found a wallet above its all-time high,
+   *  and the bulletin that brought back has not been closed since: it comes back at every
+   *  session start until it is. */
+  isNewHighPending: boolean
 }

@@ -146,6 +146,13 @@ describe("custodialTwoFactorThresholds remote config", () => {
     expect(await readThresholds()).toEqual(defaultTwoFactorThresholds)
   })
 
+  /** A crossed threshold is kept on the device as a whole amount. */
+  it("keeps the shipped thresholds when one holds a fraction of a cent", async () => {
+    mockThresholdsJson.current = '{"enforcedUsdCents":250000.5}'
+
+    expect(await readThresholds()).toEqual(defaultTwoFactorThresholds)
+  })
+
   it("reads the shipped thresholds while Firebase holds only static values", async () => {
     mockSource.current = "static"
     mockThresholdsJson.current = '{"recommendedSats":400000}'

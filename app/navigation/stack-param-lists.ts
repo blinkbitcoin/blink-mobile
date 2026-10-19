@@ -16,6 +16,7 @@ import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conver
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
+import { TwoFactorPromptOrigin } from "@app/types/two-factor-enforcement"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
@@ -256,10 +257,10 @@ export type RootStackParamList = {
     returnTo?: RegistrationReturnRoute
   }
   totpLoginValidate: { authToken: string }
-  twoFactorSetup: undefined
-  /** Opened from the setup, which stays under it, or from the session modal, which
-   *  backing out of it dismisses. */
-  twoFactorNonCustodial?: { isFromSetup?: boolean }
+  twoFactorSetup: TwoFactorPromptOrigin | undefined
+  /** Opened from a prompt, whose dismissal backing out of it is, or from the setup,
+   *  which stays under it and counts its own. */
+  twoFactorNonCustodial?: { origin?: TwoFactorPromptOrigin; isFromSetup?: boolean }
   webView: {
     url: string
     initialTitle?: string

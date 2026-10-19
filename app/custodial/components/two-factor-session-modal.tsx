@@ -8,21 +8,19 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { TwoFactorPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
-import { logTwoFactorPromptDismissed } from "@app/utils/analytics"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { testProps } from "@app/utils/testProps"
 
 type TwoFactorSessionModalProps = {
   isVisible: boolean
-  tier: TwoFactorTier
   remainingDismissals: number
-  /** The X, the backdrop and the Android back: the dismissal this session counts. */
+  /** The X, the backdrop and the Android back: the dismissal this session counts, and
+   *  reports once it counts it. */
   onDismiss: () => void
 }
 
 export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   isVisible,
-  tier,
   remainingDismissals,
   onDismiss,
 }) => {
@@ -32,13 +30,6 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  /** The prompt is logged as shown by the home that raises it, once: this modal is
-   *  hidden and shown again with the home's focus while it stays up. */
-  const handleDismiss = useCallback(() => {
-    logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.SessionModal })
-    onDismiss()
-  }, [tier, onDismiss])
 
   /** Either button makes way for the flow it opens, with no dismissal yet: the modal
    *  hides in the same frame as the push, since a native modal dismissed while a
@@ -52,12 +43,14 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
 
   const handleSetNow = useCallback(() => {
     setIsLeavingForFlow(true)
-    navigation.navigate("twoFactorSetup")
+    navigation.navigate("twoFactorSetup", { prompt: TwoFactorPrompt.SessionModal })
   }, [navigation])
 
   const handleDecline = useCallback(() => {
     setIsLeavingForFlow(true)
-    navigation.navigate("twoFactorNonCustodial")
+    navigation.navigate("twoFactorNonCustodial", {
+      origin: { prompt: TwoFactorPrompt.SessionModal },
+    })
   }, [navigation])
 
   const isShown = isVisible && !isLeavingForFlow
@@ -65,7 +58,7 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   return (
     <CustomModal
       isVisible={isShown}
-      toggleModal={handleDismiss}
+      toggleModal={onDismiss}
       showCloseIconButton={true}
       image={
         <GaloyIcon

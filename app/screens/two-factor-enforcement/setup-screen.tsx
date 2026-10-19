@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useLayoutEffect, useState } from "react"
 
-import { useIsFocused, useNavigation } from "@react-navigation/native"
+import {
+  RouteProp,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -16,6 +21,7 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
+import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
@@ -25,11 +31,13 @@ import { testProps } from "@app/utils/testProps"
  * every tier. An authenticator is what the account is asked for; an email or a phone
  * number added to the one it logs in with protects nothing, since an attacker who takes
  * the account over can change both. The alternative is to leave custody, through the
- * screen that explains what that means.
+ * screen that explains what that means, offered only while the self-custodial stack is
+ * on: nothing may push the user toward it once it is switched off.
  *
  * Reached from the home card, the reminder bulletin, the Settings banner and the
  * session modal, and closable from its header. Leaving it without an authenticator
- * counts as the session's dismissal for the tiers that count one. The authenticator
+ * counts as the session's dismissal for the tiers that count one, reported as the
+ * dismissal of the prompt that opened it. The authenticator
  * flow returns into it on success, and it then steps aside to wherever it was opened
  * from.
  */
@@ -41,19 +49,24 @@ export const TwoFactorSetupScreen: React.FC = () => {
   } = useTheme()
   const navigation =
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
+  const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
+  const isMoveOffered = !useSelfCustodialDisabled()
   const { unmetTier, hasAuthenticator, registerDismissal } = useTwoFactorEnforcement()
   /** The tier this screen was opened for: what it reports, and what leaving it unfinished
    *  is charged to, even if the balance moves while it is open. */
   const [promptTier] = useState(unmetTier)
+  /** The prompt that opened it, kept from the first render: the authenticator flow's
+   *  return replaces the route's params. */
+  const [origin] = useState(params)
 
   /** Leaving without an authenticator is a dismissal for the tiers that count one; the
    *  provider ignores it below them. The hardware back leaves the same way, and the
    *  swipe is off for this route, so no exit skips the count. */
   const handleClose = useCallback(() => {
-    registerDismissal(promptTier)
+    registerDismissal(promptTier, origin)
     navigation.goBack()
-  }, [registerDismissal, promptTier, navigation])
+  }, [registerDismissal, promptTier, origin, navigation])
 
   useHardwareBackGuard(handleClose)
 
@@ -92,11 +105,13 @@ export const TwoFactorSetupScreen: React.FC = () => {
             onPress={handleSetAuthenticator}
             {...testProps("two-factor-setup-authenticator")}
           />
-          <GaloySecondaryButton
-            title={LL.AccountMigration.moveToNonCustodial()}
-            onPress={handleMove}
-            {...testProps("two-factor-setup-move")}
-          />
+          {isMoveOffered && (
+            <GaloySecondaryButton
+              title={LL.AccountMigration.moveToNonCustodial()}
+              onPress={handleMove}
+              {...testProps("two-factor-setup-move")}
+            />
+          )}
         </>
       }
     >

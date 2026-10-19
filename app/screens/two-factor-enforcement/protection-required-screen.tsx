@@ -19,6 +19,7 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
+import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { TwoFactorMethod, TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import {
@@ -45,9 +46,11 @@ const highBalanceAmount = (currency: WalletCurrency, threshold: number) =>
 /**
  * The blocking screen of the enforced tier, standing in for the home at every
  * session start once the tier's modal has spent its dismissals, so the home is never
- * seen first. It names the threshold of the wallet that crossed it and offers exactly
- * two ways forward, an authenticator or leaving custody, with no close control: it
- * takes neither the swipe nor the hardware back. Only this tier blocks.
+ * seen first. It names the threshold of the wallet that crossed it and offers two ways
+ * forward, an authenticator or leaving custody, with no close control: it takes neither
+ * the swipe nor the hardware back. Only this tier blocks. Leaving custody is offered
+ * only while the self-custodial stack is on, which leaves the authenticator alone once
+ * it is switched off.
  */
 export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -57,6 +60,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
+  const isMoveOffered = !useSelfCustodialDisabled()
   const { unmetTier, enforcedCurrency, enforcedThreshold } = useTwoFactorEnforcement()
 
   useEffect(() => {
@@ -96,11 +100,13 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
             onPress={handleSetAuthenticator}
             {...testProps("two-factor-protection-authenticator")}
           />
-          <GaloySecondaryButton
-            title={LL.AccountMigration.moveToNonCustodial()}
-            onPress={handleMove}
-            {...testProps("two-factor-protection-move")}
-          />
+          {isMoveOffered && (
+            <GaloySecondaryButton
+              title={LL.AccountMigration.moveToNonCustodial()}
+              onPress={handleMove}
+              {...testProps("two-factor-protection-move")}
+            />
+          )}
         </>
       }
     >
