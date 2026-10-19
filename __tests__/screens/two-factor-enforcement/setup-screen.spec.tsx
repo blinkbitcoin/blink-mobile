@@ -34,7 +34,7 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
   useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
 }))
 
-/** The handler the screen last gave the hardware back, which follows its hold. */
+/** The handler the screen last gave the hardware back. */
 const pressHardwareBack = () => {
   const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
   onBack()
@@ -44,29 +44,12 @@ const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.Nudge as TwoFactorTier,
   hasAuthenticator: false,
-  missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
-  unverifiedEmail: null as string | null,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
   registerDismissal: mockRegisterDismissal,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
-}))
-
-const mockPromptReverification = jest.fn()
-const mockUseEmailReverification = jest.fn((_options?: { returnTo?: string }) => ({
-  promptReverification: (...args: unknown[]) => mockPromptReverification(...args),
-  spinner: mockIsReverifying,
-  isAskedHere: mockIsReverifying && mockIsAskedHere,
-}))
-let mockIsReverifying = false
-/** A re-verification in flight was asked for from this screen, unless a test says it
- *  was joined from elsewhere. */
-let mockIsAskedHere = true
-jest.mock("@app/hooks/use-email-reverification", () => ({
-  useEmailReverification: (options?: { returnTo?: string }) =>
-    mockUseEmailReverification(options),
 }))
 
 const mockLogTwoFactorSetupStarted = jest.fn()
@@ -107,12 +90,8 @@ describe("TwoFactorSetupScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockIsFocused = true
-    mockIsReverifying = false
-    mockIsAskedHere = true
     mockEnforcement.unmetTier = TwoFactorTier.Nudge
     mockEnforcement.hasAuthenticator = false
-    mockEnforcement.missingMethod = TwoFactorMethod.Email
-    mockEnforcement.unverifiedEmail = null
   })
 
   it("shows the setup under its header, with the authenticator as the call to action", async () => {
@@ -121,11 +100,11 @@ describe("TwoFactorSetupScreen", () => {
     expect(screen.getByTestId("icon-lock-closed")).toBeTruthy()
     expect(screen.getByText(LL.TwoFactorEnforcement.setupTitle())).toBeTruthy()
     expect(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator())).toBeTruthy()
-    expect(screen.getByText(LL.TwoFactorEnforcement.addEmail())).toBeTruthy()
+    expect(screen.getByText(LL.AccountMigration.moveToNonCustodial())).toBeTruthy()
     expect(mockGoBack).not.toHaveBeenCalled()
   })
 
-  it("tells the flows it starts to return here, under the tier it was opened for", async () => {
+  it("tells the authenticator flow to return here, under the tier it was opened for", async () => {
     mockEnforcement.unmetTier = TwoFactorTier.Reminder
     await renderScreen()
 
@@ -140,16 +119,15 @@ describe("TwoFactorSetupScreen", () => {
     })
   })
 
-  it("hands an address that was never verified to re-verification, told to return here", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    await renderScreen()
+  it("keeps reporting the tier it was opened for once the balance moves", async () => {
+    mockEnforcement.unmetTier = TwoFactorTier.Reminder
+    const rendered = await renderScreen()
 
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
+    mockEnforcement.unmetTier = TwoFactorTier.HighBalance
+    await rerenderScreen(rendered)
+    pressHardwareBack()
 
-    expect(mockPromptReverification).toHaveBeenCalledWith("someone@example.com")
-    expect(mockUseEmailReverification).toHaveBeenLastCalledWith({
-      returnTo: "twoFactorSetup",
-    })
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
   })
 
   it("installs a close control that charges the exit to the tier it opened for", async () => {
@@ -173,68 +151,6 @@ describe("TwoFactorSetupScreen", () => {
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
-  it("holds the close control and the hardware back while a re-verification is in flight", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockEnforcement.unmetTier = TwoFactorTier.Reminder
-    mockIsReverifying = true
-    await renderScreen()
-
-    pressHardwareBack()
-    renderInstalledCloseControl()
-    fireEvent.press(screen.getByTestId("icon-close"))
-
-    expect(mockRegisterDismissal).not.toHaveBeenCalled()
-    expect(mockGoBack).not.toHaveBeenCalled()
-  })
-
-  it("holds nothing for a re-verification joined from elsewhere", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockEnforcement.unmetTier = TwoFactorTier.Reminder
-    mockIsReverifying = true
-    mockIsAskedHere = false
-    await renderScreen()
-
-    pressHardwareBack()
-
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-  })
-
-  /** The hook ends the sequence for its screens at its own deadline, so this is also
-   *  how the hold lifts for a request that never answers. */
-  it("releases the hold once the hook ends the re-verification, and holds again for a new run", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockEnforcement.unmetTier = TwoFactorTier.Reminder
-    mockIsReverifying = true
-    const rendered = await renderScreen()
-    pressHardwareBack()
-    expect(mockGoBack).not.toHaveBeenCalled()
-
-    mockIsReverifying = false
-    await rerenderScreen(rendered)
-    pressHardwareBack()
-
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Reminder)
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-
-    mockIsReverifying = true
-    await rerenderScreen(rendered)
-    pressHardwareBack()
-
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
-  })
-
-  it("greys the close control out while it holds, so the refusal shows", async () => {
-    mockEnforcement.unverifiedEmail = "someone@example.com"
-    mockIsReverifying = true
-    await renderScreen()
-
-    renderInstalledCloseControl()
-    fireEvent.press(screen.getByTestId("icon-close"))
-
-    expect(mockGoBack).not.toHaveBeenCalled()
-  })
-
   it("steps aside once the account holds an authenticator", async () => {
     const rendered = await renderScreen()
 
@@ -243,19 +159,6 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockGoBack).toHaveBeenCalledTimes(1)
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
-  })
-
-  it("steps aside for a complete account only once the hold has lifted", async () => {
-    mockEnforcement.hasAuthenticator = true
-    mockIsReverifying = true
-    const rendered = await renderScreen()
-
-    expect(mockGoBack).not.toHaveBeenCalled()
-
-    mockIsReverifying = false
-    await rerenderScreen(rendered)
-
-    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("stays put while another screen is on top, even with an authenticator", async () => {

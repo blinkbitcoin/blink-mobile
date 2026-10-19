@@ -4059,8 +4059,6 @@
         "settingsDescription": "Protégez votre compte contre tout accès non autorisé en la configurant.",
         "setupTitle": "Configurez l'authentification à deux facteurs maintenant",
         "setupDescription": "Pour empêcher tout accès non autorisé à votre compte, ajoutez l'authentification à deux facteurs maintenant.",
-        "addEmail": "Ajouter un e-mail",
-        "addPhoneNumber": "Ajouter un numéro de téléphone",
         "setAuthenticator": "Configurer l'authentificateur",
         "modalReminder": "Si vous ignorez maintenant, pensez à l'activer dès que possible.",
         "dismissTwoMore": "Vous pouvez ignorer ceci encore deux fois.",

@@ -4059,8 +4059,6 @@
     "settingsDescription": "Zaštitite svoj račun od neovlaštenog pristupa tako da je postavite.",
     "setupTitle": "Postavite dvofaktorsku autentifikaciju sada",
     "setupDescription": "Kako biste spriječili neovlašteni pristup svom računu, dodajte dvofaktorsku autentifikaciju sada.",
-    "addEmail": "Dodaj e-poštu",
-    "addPhoneNumber": "Dodaj telefonski broj",
     "setAuthenticator": "Postavi autentifikator",
     "modalReminder": "Ako ovo sada odbacite, svakako to uključite što prije.",
     "dismissTwoMore": "Ovo možete odbaciti još dva puta.",

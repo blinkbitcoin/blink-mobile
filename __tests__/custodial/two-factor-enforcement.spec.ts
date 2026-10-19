@@ -5,7 +5,6 @@ import {
   remainingDismissals,
   resolveBalanceTier,
   resolveHighBalanceCurrency,
-  resolveMissingMethod,
   resolveSessionPrompt,
   resolveUnmetTier,
   withDismissal,
@@ -14,7 +13,6 @@ import {
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   TwoFactorEnforcementRecord,
-  TwoFactorMethod,
   TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
@@ -115,16 +113,6 @@ describe("withTierReached", () => {
 
     expect(record.highestTier).toBe(TwoFactorTier.HighBalance)
     expect(record.highBalanceCurrency).toBe(WalletCurrency.Usd)
-  })
-})
-
-describe("resolveMissingMethod", () => {
-  it("offers a phone once the email is verified", () => {
-    expect(resolveMissingMethod({ hasVerifiedEmail: true })).toBe(TwoFactorMethod.Phone)
-  })
-
-  it("offers an email until one is verified", () => {
-    expect(resolveMissingMethod({ hasVerifiedEmail: false })).toBe(TwoFactorMethod.Email)
   })
 })
 

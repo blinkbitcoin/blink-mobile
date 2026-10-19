@@ -11,9 +11,9 @@ export const TwoFactorTier = {
 } as const
 export type TwoFactorTier = (typeof TwoFactorTier)[keyof typeof TwoFactorTier]
 
+/** The factor a setup started from a two-factor prompt adds: the authenticator, the
+ *  only one the prompts ask for. Reported with the setup's start. */
 export const TwoFactorMethod = {
-  Email: "email",
-  Phone: "phone",
   Authenticator: "authenticator",
 } as const
 export type TwoFactorMethod = (typeof TwoFactorMethod)[keyof typeof TwoFactorMethod]

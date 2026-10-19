@@ -4059,8 +4059,6 @@
     "settingsDescription": "Védd meg fiókodat a jogosulatlan hozzáféréstől a beállításával.",
     "setupTitle": "Állítsd be most a kétlépcsős azonosítást",
     "setupDescription": "A fiókodhoz való jogosulatlan hozzáférés megakadályozásához add hozzá most a kétlépcsős azonosítást.",
-    "addEmail": "Email hozzáadása",
-    "addPhoneNumber": "Telefonszám hozzáadása",
     "setAuthenticator": "Hitelesítő beállítása",
     "modalReminder": "Ha most elutasítod, mindenképp kapcsold be, amint lehet.",
     "dismissTwoMore": "Ezt még kétszer elutasíthatod.",

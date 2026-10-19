@@ -4059,8 +4059,6 @@
         "settingsDescription": "Schütze dein Konto vor unbefugtem Zugriff, indem du sie einrichtest.",
         "setupTitle": "Richte jetzt die Zwei-Faktor-Authentifizierung ein",
         "setupDescription": "Um unbefugten Zugriff auf dein Konto zu verhindern, füge jetzt die Zwei-Faktor-Authentifizierung hinzu.",
-        "addEmail": "E-Mail hinzufügen",
-        "addPhoneNumber": "Telefonnummer hinzufügen",
         "setAuthenticator": "Authenticator einrichten",
         "modalReminder": "Wenn du jetzt ablehnst, aktiviere es bitte so bald wie möglich.",
         "dismissTwoMore": "Du kannst dies noch zweimal ablehnen.",

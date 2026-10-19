@@ -4059,8 +4059,6 @@
     "settingsDescription": "Bescherm je account tegen ongeautoriseerde toegang door deze in te stellen.",
     "setupTitle": "Stel nu tweefactorauthenticatie in",
     "setupDescription": "Voeg nu tweefactorauthenticatie toe om ongeautoriseerde toegang tot je account te voorkomen.",
-    "addEmail": "E-mail toevoegen",
-    "addPhoneNumber": "Telefoonnummer toevoegen",
     "setAuthenticator": "Authenticator instellen",
     "modalReminder": "Als je dit nu wegklikt, zorg dan dat je het zo snel mogelijk inschakelt.",
     "dismissTwoMore": "Je kunt dit nog twee keer wegklikken.",

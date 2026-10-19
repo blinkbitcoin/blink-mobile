@@ -14,7 +14,6 @@ import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enf
 import { HIGH_BALANCE_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   RegistrationReturnRoute,
@@ -53,9 +52,9 @@ const highBalanceThreshold = (currency: WalletCurrency) =>
 
 /**
  * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
- * at the session start that owes it, so the home is never seen first. The required
+ * at the session start that owes it, so the home is never seen first. The reminder
  * tier, once its dismissals are spent, shows the setup itself with no way to close it:
- * the only exits are the factors it offers. The high-balance tier shows the
+ * the only exits are an authenticator or leaving custody. The high-balance tier shows the
  * high-balance screen, with an X while it still has dismissals left and none after, and
  * offers exactly two ways forward. Neither takes the swipe or the hardware back.
  */
@@ -69,9 +68,6 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { formatMoneyAmount } = useDisplayCurrency()
   const { unmetTier, remainingDismissals, highBalanceCurrency, registerDismissal } =
     useTwoFactorEnforcement()
-  const { promptReverification, spinner: isReverifying } = useEmailReverification({
-    returnTo: GATE_RETURN_ROUTE,
-  })
   /** The gate mounts this screen anew for each tier it is raised for, so the tier it
    *  reports and charges its X to is the one it was raised for, for as long as it is
    *  open. */
@@ -118,8 +114,6 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
       <TwoFactorSetupContent
         promptTier={unmetTier}
         returnTo={GATE_RETURN_ROUTE}
-        promptReverification={promptReverification}
-        isReverifying={isReverifying}
         headerShown={false}
         header={<CloseHeader isHidden testID="two-factor-protection-close" />}
       />

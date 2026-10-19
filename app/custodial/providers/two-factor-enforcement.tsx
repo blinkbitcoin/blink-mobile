@@ -17,7 +17,6 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useMigrateNowRemedy } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import {
   TwoFactorEnforcementRecord,
-  TwoFactorMethod,
   TwoFactorPrompt,
   TwoFactorSessionPrompt,
   TwoFactorTier,
@@ -35,7 +34,6 @@ import {
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
-  resolveMissingMethod,
   resolveSessionPrompt,
   resolveUnmetTier,
   withDismissal,
@@ -95,10 +93,6 @@ export type TwoFactorEnforcementState = {
   /** The tier the account still owes, None once it holds an authenticator. */
   unmetTier: TwoFactorTier
   hasAuthenticator: boolean
-  missingMethod: TwoFactorMethod
-  /** An address the account holds but never verified. It cannot be registered again as
-   *  new, so the setup has to send it through re-verification instead. */
-  unverifiedEmail: string | null
   /** The wallet the high-balance copy names, meaningful at the high-balance tier. */
   highBalanceCurrency: WalletCurrency
   remainingDismissals: number
@@ -134,8 +128,6 @@ const INERT_STATE: TwoFactorEnforcementState = {
   tier: TwoFactorTier.None,
   unmetTier: TwoFactorTier.None,
   hasAuthenticator: false,
-  missingMethod: TwoFactorMethod.Email,
-  unverifiedEmail: null,
   highBalanceCurrency: WalletCurrency.Btc,
   remainingDismissals: 0,
   requiredPrompt: TwoFactorSessionPrompt.None,
@@ -289,12 +281,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     persist((current) => withTierReached(current, balanceTier, wallets))
   }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, persist])
 
-  const emailAddress = me?.email?.address ?? null
-  const isEmailVerified = Boolean(me?.email?.verified)
   const hasAuthenticator = Boolean(me?.totpEnabled)
-  const missingMethod = resolveMissingMethod({ hasVerifiedEmail: isEmailVerified })
-  const hasUnverifiedEmail = emailAddress !== null && !isEmailVerified
-  const unverifiedEmail = hasUnverifiedEmail ? emailAddress : null
 
   const isEnforced = isEnabled && isLoadedForAccount
   const unmetTier = isEnforced
@@ -442,8 +429,6 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       tier,
       unmetTier,
       hasAuthenticator,
-      missingMethod,
-      unverifiedEmail,
       highBalanceCurrency: record.highBalanceCurrency,
       remainingDismissals: dismissalsLeft,
       requiredPrompt,
@@ -461,8 +446,6 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       tier,
       unmetTier,
       hasAuthenticator,
-      missingMethod,
-      unverifiedEmail,
       record.highBalanceCurrency,
       dismissalsLeft,
       requiredPrompt,

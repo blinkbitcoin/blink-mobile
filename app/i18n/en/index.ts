@@ -4269,8 +4269,6 @@ const en: BaseTranslation = {
     setupTitle: "Set two-factor authentication now",
     setupDescription:
       "To prevent unauthorized access to your account, add two-factor authentication now.",
-    addEmail: "Add email",
-    addPhoneNumber: "Add phone number",
     setAuthenticator: "Set authenticator",
     modalReminder: "If you dismiss now, make sure to enable it as soon as possible.",
     dismissTwoMore: "You can dismiss this two more times.",

@@ -13542,14 +13542,6 @@ type RootTranslation = {
 		 */
 		setupDescription: string
 		/**
-		 * A​d​d​ ​e​m​a​i​l
-		 */
-		addEmail: string
-		/**
-		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
-		 */
-		addPhoneNumber: string
-		/**
 		 * S​e​t​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
 		 */
 		setAuthenticator: string
@@ -27333,14 +27325,6 @@ export type TranslationFunctions = {
 		 * To prevent unauthorized access to your account, add two-factor authentication now.
 		 */
 		setupDescription: () => LocalizedString
-		/**
-		 * Add email
-		 */
-		addEmail: () => LocalizedString
-		/**
-		 * Add phone number
-		 */
-		addPhoneNumber: () => LocalizedString
 		/**
 		 * Set authenticator
 		 */
