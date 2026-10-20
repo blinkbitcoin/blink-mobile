@@ -38,6 +38,15 @@ jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
   }),
 }))
 
+const mockEnableScreenSecurity = jest.fn()
+const mockDisableScreenSecurity = jest.fn()
+jest.mock("@app/utils/screen-security", () => ({
+  enableScreenSecurity: (...args: readonly unknown[]) =>
+    mockEnableScreenSecurity(...args),
+  disableScreenSecurity: (...args: readonly unknown[]) =>
+    mockDisableScreenSecurity(...args),
+}))
+
 const mockUseMigrationBackupCheckpoint = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks", () => ({
@@ -77,6 +86,8 @@ const LL = i18nObject("en")
 describe("CloudBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockEnableScreenSecurity.mockResolvedValue(undefined)
+    mockDisableScreenSecurity.mockResolvedValue(undefined)
     mockLoading = false
     mockIsValid = true
     mockIsEncrypted = false
@@ -203,5 +214,50 @@ describe("CloudBackupScreen", () => {
     expect(mockUseMigrationBackupCheckpoint).toHaveBeenCalledWith(
       MigrationCheckpoint.CloudBackup,
     )
+  })
+
+  /**
+   * The encryption password is typed here, and PasswordInput's eye toggle shows it in
+   * plain text, so a recents snapshot or a screen recorder would capture it. Guarded from
+   * mount rather than from the moment encryption is switched on, so the first keystroke
+   * never lands on an unguarded frame.
+   */
+  describe("screenshot protection", () => {
+    it("guards the encryption password", async () => {
+      mockIsEncrypted = true
+
+      render(
+        <ContextForScreen>
+          <CloudBackupScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    it("guards the screen before encryption is switched on", async () => {
+      render(
+        <ContextForScreen>
+          <CloudBackupScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    it("drops the guard on unmount", async () => {
+      const { unmount } = render(
+        <ContextForScreen>
+          <CloudBackupScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      unmount()
+
+      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+    })
   })
 })

@@ -2587,7 +2587,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",
-    "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում"
+    "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում",
+    "unknownRegionWalletLabel": "հասանելիությունը հնարավոր չեղավ ստուգել, քաշեք ներքև՝ կրկին փորձելու համար"
   },
   "AnonModeConvertModal": {
     "title": "Նախ փոխանցեք ձեր դոլարային մնացորդը",
@@ -2610,7 +2611,9 @@
     "contactSupport": "Կապվել աջակցության հետ"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում"
+    "modalTitle": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում",
+    "unknownRegionModalTitle": "Հնարավոր չեղավ ստուգել դոլարային մնացորդի հասանելիությունը",
+    "unknownRegionModalBody": "Մենք չկարողացանք ստուգել՝ արդյոք դոլարային մնացորդը հասանելի է ձեզ։ Քաշեք ներքև գլխավոր էկրանին՝ կրկին փորձելու համար։"
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Դոլարային մնացորդը հասանելի չէ ձեր տարածաշրջանում",
@@ -3687,6 +3690,67 @@
         "codingBackend": "...մշակում ենք backend-ը",
         "buttonText": "Հիանալի"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Բարի գալուստ Blink-ի մի մասը դառնալու",
+          "paragraphs": {
+            "body1": "Մինչ մասնագիտական ներդրողներից ավելի շատ միջոցներ ներգրավելը, մենք որոշեցինք հրավեր ուղարկել Blink ընտանիքին, մեր ամենաակտիվ օգտատերերին և աջակիցներին։ Ինչո՞ւ նախ հրավիրել անծանոթների, եթե նախ կարող ենք հրավիրել Ձեզ նման մեկին։",
+            "body2": "Սա անձնական հրավեր է։ Խնդրում ենք այն չվերահասցեագրել և հրապարակային չկիսվել։"
+          }
+        },
+        "buttonText": "Շարունակել"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Որքա՞ն կցանկանայիք ներդնել։",
+        "percent": "~{percent: number}% դիմաց"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Ընկերության գնահատում",
+          "paragraphs": {
+            "body1": "Այս ներդրումային փուլում Blink-ի pre-money գնահատումը $10 միլիոն է։",
+            "body2": "Կարող էինք ներգրավել ավելի բարձր գնով VC-ներից։ Սակայն մենք երկարաժամկետ փոխադարձ օգուտ ենք տեսնում մեր superuser-ների հետ գործընկերության մեջ։ Այդ իսկ պատճառով քեզ առաջարկում ենք այս հնարավորությունն ավելի լավ պայմաններով։"
+          }
+        },
+        "buttonText": "Պարզ է"
+      },
+      "TermSheet": {
+        "title": "Պայմանների թերթիկ",
+        "equitySection": {
+          "title": "Բաժնեմաս Blink-ում",
+          "investment": "{amount: string} ներդրում",
+          "valuation": "$10 մլն pre-money գնահատմամբ",
+          "units": "Դուք ստանում եք {units: string} միավոր` Blink-ի մոտ {percent: number}%-ը"
+        },
+        "buttonText": "Անցնել ստորագրմանը"
+      },
+      "TransferInvest": {
+        "title": "Փոխանցեք Ձեր ներդրումը",
+        "paragraphs": {
+          "body1": "Դուք ստորագրել եք Blink-ի {units: string} միավորի բաժանորդագրման համաձայնագիրը։",
+          "body2": "Ժամանակն է փոխանցել {amount: string} ներդրման գումարը։ Դուք կվճարեք Bitcoin-ով։"
+        },
+        "buttonText": "Շարունակել",
+        "paymentsUnavailable": "Ներդրման վճարումները դեռ բաց չեն։ Խնդրում ենք փորձել ավելի ուշ։"
+      },
+      "InsufficientBalance": {
+        "title": "Անբավարար մնացորդ",
+        "paragraphs": {
+          "balanceBitcoin": "Դու քո Bitcoin հաշվին ունես ընդամենը {balance: string}։",
+          "balanceDollar": "Դու քո Դոլար հաշվին ունես ընդամենը {balance: string}։",
+          "body2": "Ավելացրու քո հաշվին ավելի քան {shortfall: string}՝ {investmentAmount: string} ներդրման գումարին հասնելու համար։",
+          "body3": "Համոզվիր, որ ամբողջ գումարը քո հաշիվներից մեկում է՝ Bitcoin կամ դոլար։"
+        },
+        "buttonText": "Ավանդ",
+        "splitFunds": {
+          "title": "Ձեր միջոցները բաժանված են",
+          "body": "Դուք բավականաչափ ունեք ներդրում կատարելու համար, բայց այն բաժանված է Bitcoin և Դոլար հաշիվների միջև։ Փոխարկեք, որպեսզի ամբողջ գումարը լինի մեկում։"
+        }
+      },
+      "DepositPending": {
+        "message": "Սպասում ենք քո ավանդի հաստատմանը. խնդրում ենք սպասել շղթայի 2 հաստատման։",
+        "buttonText": "Լավ"
+      },
       "PersonalInformation": {
         "title": "Վերջին քայլը",
         "fields": {
@@ -3864,6 +3928,7 @@
       "newBitcoinBalance": "Նոր Bitcoin-ի մնացորդ",
       "newDollarBalance": "Նոր դոլարային մնացորդ",
       "dollarBalanceNotAvailable": "հասանելի չէ",
+      "lnAddressNotMoved": "Ձեր Lightning հասցեն հնարավոր չեղավ տեղափոխել։ Ձեր միջոցները այնուամենայնիվ կփոխանցվեն։",
       "networkFee": "Ցանցի վճար. <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ցանցի վճար. <bold>{fee: string}</bold> (ծածկում է Blink-ը)",
       "retryCta": "Փորձել կրկին",

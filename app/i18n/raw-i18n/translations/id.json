@@ -2587,7 +2587,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
-    "anonModeWalletLabel": "tidak tersedia dalam mode Incognito"
+    "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
@@ -2610,7 +2611,9 @@
     "contactSupport": "Hubungi dukungan"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda"
+    "modalTitle": "Saldo dolar tidak tersedia di wilayah Anda",
+    "unknownRegionModalTitle": "Tidak dapat memeriksa ketersediaan saldo dolar",
+    "unknownRegionModalBody": "Kami tidak dapat memeriksa apakah saldo dolar tersedia untuk Anda. Tarik ke bawah di layar beranda untuk mencoba lagi."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Saldo dolar tidak tersedia di wilayah Anda",
@@ -3687,6 +3690,67 @@
         "codingBackend": "...membuat kode backend",
         "buttonText": "Bagus"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Selamat datang untuk menjadi bagian dari Blink",
+          "paragraphs": {
+            "body1": "Sebelum kami mengumpulkan lebih banyak dana dari investor profesional, kami memutuskan untuk memperluas undangan kepada keluarga Blink, pengguna super dan pendukung kami. Mengapa membawa orang asing ketika kami bisa mengundang seseorang seperti Anda terlebih dahulu?",
+            "body2": "Ini adalah undangan pribadi. Mohon jangan meneruskan atau membagikan secara publik."
+          }
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Berapa banyak yang ingin Anda investasikan?",
+        "percent": "untuk ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Valuasi perusahaan",
+          "paragraphs": {
+            "body1": "Dalam putaran investasi ini, valuasi pre-money Blink adalah $10 juta.",
+            "body2": "Kami bisa menggalang dana dengan harga lebih tinggi dari VC. Namun, kami melihat manfaat timbal balik jangka panjang dalam bermitra dengan pengguna super kami. Oleh karena itu, kami menawarkan penawaran ini dengan ketentuan yang lebih baik untuk Anda."
+          }
+        },
+        "buttonText": "Mengerti"
+      },
+      "TermSheet": {
+        "title": "Lembar Ketentuan",
+        "equitySection": {
+          "title": "Ekuitas di Blink",
+          "investment": "Investasi {amount: string}",
+          "valuation": "Pada valuasi pre-money $10M",
+          "units": "Anda menerima {units: string} unit ~{percent: number}% dari Blink"
+        },
+        "buttonText": "Lanjut ke Penandatanganan"
+      },
+      "TransferInvest": {
+        "title": "Transfer investasi Anda",
+        "paragraphs": {
+          "body1": "Anda telah menandatangani perjanjian langganan untuk {units: string} unit di Blink.",
+          "body2": "Saatnya mentransfer jumlah investasi {amount: string}. Anda akan membayar dengan Bitcoin."
+        },
+        "buttonText": "Lanjutkan",
+        "paymentsUnavailable": "Pembayaran investasi belum dibuka. Silakan coba lagi nanti."
+      },
+      "InsufficientBalance": {
+        "title": "Saldo tidak mencukupi",
+        "paragraphs": {
+          "balanceBitcoin": "Kamu hanya memiliki {balance: string} di akun Bitcoin-mu.",
+          "balanceDollar": "Kamu hanya memiliki {balance: string} di akun Dolar-mu.",
+          "body2": "Setor lebih dari {shortfall: string} ke akunmu untuk mencapai jumlah investasi sebesar {investmentAmount: string}.",
+          "body3": "Pastikan seluruh jumlah berada di salah satu akunmu; Bitcoin atau Dolar."
+        },
+        "buttonText": "Setor",
+        "splitFunds": {
+          "title": "Dana Anda terbagi",
+          "body": "Anda punya cukup untuk berinvestasi, tetapi tersebar di akun Bitcoin dan Dolar Anda. Konversikan agar seluruh jumlahnya ada di salah satunya."
+        }
+      },
+      "DepositPending": {
+        "message": "Menunggu setoranmu diselesaikan; harap tunggu 2 konfirmasi di rantai.",
+        "buttonText": "Oke"
+      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {
@@ -3864,6 +3928,7 @@
       "newBitcoinBalance": "Saldo Bitcoin baru",
       "newDollarBalance": "Saldo Dolar baru",
       "dollarBalanceNotAvailable": "tidak tersedia",
+      "lnAddressNotMoved": "Alamat Lightning Anda tidak dapat dipindahkan. Dana Anda tetap akan ditransfer.",
       "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Biaya jaringan: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
       "retryCta": "Coba lagi",
