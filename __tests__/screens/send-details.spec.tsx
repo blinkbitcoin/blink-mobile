@@ -132,6 +132,12 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => {
  */
 const mockWithdrawalAllowance = { remaining: 100_000_000 }
 
+/** The limits query's own failure, and its refetch, for the fail-closed tests. */
+const mockWithdrawalLimitsQuery: { error?: Error; refetch: jest.Mock } = {
+  error: undefined,
+  refetch: jest.fn(),
+}
+
 /**
  * The tier quote, answered per test rather than left to fall off the end of the mocked
  * responses. Held as one stable function because Apollo hands back a stable execute across
@@ -142,6 +148,8 @@ const mockQuoteFees = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useSendBitcoinWithdrawalLimitsQuery: () => ({
+    error: mockWithdrawalLimitsQuery.error,
+    refetch: mockWithdrawalLimitsQuery.refetch,
     data: {
       me: {
         defaultAccount: {
@@ -174,6 +182,8 @@ beforeEach(() => {
 
 afterEach(() => {
   mockWithdrawalAllowance.remaining = 100_000_000
+  mockWithdrawalLimitsQuery.error = undefined
+  mockWithdrawalLimitsQuery.refetch.mockClear()
 })
 
 jest.mock("@react-native-firebase/app-check", () => {
