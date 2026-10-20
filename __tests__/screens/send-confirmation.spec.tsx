@@ -1052,9 +1052,10 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
      */
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
 
+    // The banner and the R5 notice sheet both carry the text.
     await waitFor(
       () => {
-        expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+        expect(screen.getAllByText(usdRemainderSweepMatcher).length).toBeGreaterThan(0)
       },
       { timeout: SETTLE_TIMEOUT_MS },
     )
@@ -1338,9 +1339,12 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     throw new Error("sendBitcoinCompleted route was not dispatched")
   }
 
+  let LL: ReturnType<typeof i18nObject>
+
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({
       loading: false,
       hasAttemptedSend: false,
@@ -1388,7 +1392,9 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     const params = findCompletedRouteParams()
     expect(params.status).toBe("SUCCESS")
     expect(params.createdAt).toBe(1700000000)
-    expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
+    expect(
+      screen.queryByText(LL.SendBitcoinConfirmationScreen.paymentMayStillLand()),
+    ).toBeNull()
   })
 
   it("keeps the slider busy while the 409 is verified, with no sheet or error (S6)", async () => {
@@ -1412,7 +1418,9 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 
     expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
     expect(mockSliderProps.mock.calls.at(-1)?.[0].isLoading).toBe(true)
-    expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
+    expect(
+      screen.queryByText(LL.SendBitcoinConfirmationScreen.paymentMayStillLand()),
+    ).toBeNull()
 
     await act(async () => settleVerify(undefined))
 
@@ -1434,7 +1442,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
-    expectInlineAndInSheet(/Payment already attempted/i)
+    expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.paymentMayStillLand())
     expect(navigationDispatchMock).not.toHaveBeenCalled()
   })
 
@@ -1452,11 +1460,11 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
-    expectInlineAndInSheet(/Payment already attempted/i)
+    expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.paymentMayStillLand())
     expect(navigationDispatchMock).not.toHaveBeenCalled()
   })
 
-  it("still surfaces non-conflict errors unchanged", async () => {
+  it("shows fixed copy for a non-conflict throw, never the raw error", async () => {
     sendPaymentMock.mockRejectedValueOnce(new Error("insufficient balance"))
 
     render(
@@ -1470,7 +1478,8 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
-    expectInlineAndInSheet("insufficient balance")
+    expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.paymentMayStillLand())
+    expect(screen.queryByText("insufficient balance")).toBeNull()
   })
 
   it("shows a generic error when the CSPRNG cannot mint an idempotency key", async () => {
@@ -1495,7 +1504,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
   it("disables the slider after an ambiguous throw, so a second swipe sends nothing", async () => {
     // A non-409 throw may have landed. The hook stays locked (pinned in the hook spec);
     // the screen's half is that the failure on show disables the slider too.
-    sendPaymentMock.mockRejectedValue(new Error("network died"))
+    sendPaymentMock.mockRejectedValueOnce(new Error("network died"))
 
     render(
       <ContextForScreen>
@@ -1507,7 +1516,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
       fireEvent.press(screen.getByTestId("slider"))
     })
 
-    expectInlineAndInSheet("network died")
+    expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.paymentMayStillLand())
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
 
@@ -1516,7 +1525,6 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     })
 
     expect(sendPaymentMock).toHaveBeenCalledTimes(1)
-    sendPaymentMock.mockReset()
   })
 })
 
@@ -1950,7 +1958,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
         fireEvent.press(screen.getByTestId("slider"))
       })
 
-      expectInlineAndInSheet("route not found")
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.paymentMayStillLand())
       expect(outlineColor()).toBeUndefined()
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
@@ -2007,7 +2015,8 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
         fireEvent.press(screen.getByTestId("slider"))
       })
 
-      expect(screen.getByText(/Cannot transfer more than/)).toBeTruthy()
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.somethingWentWrong())
+      expect(screen.queryByText(/Cannot transfer more than/)).toBeNull()
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
       ).toBeNull()
@@ -2306,7 +2315,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       )
     })
 
-    it("offers Try again for a custodial failure a new amount can't fix (S4)", async () => {
+    it("goes Home for a custodial failure, never building a second payment (S4)", async () => {
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
         errorsMessage: "Unable to find a route for payment.",
@@ -2314,7 +2323,12 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.somethingWentWrong())
+      expect(screen.queryByText(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeNull()
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.home()))
+      expect(navigationDispatchMock).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "POP_TO_TOP" }),
+      )
     })
 
     it("goes Home for a self-custodial generic failure on every rail, the Lightning address included (S10, N21)", async () => {
@@ -2442,7 +2456,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      expectInlineAndInSheet("route not found")
+      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.somethingWentWrong())
       expect(screen.queryByText(/Total exceeds your balance/)).toBeNull()
     })
   })
@@ -2519,10 +2533,11 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
   })
 
   describe("closing", () => {
-    it("leaves the inline error when the sheet is closed, and opens again on the next failure", async () => {
-      sendPaymentMock
-        .mockResolvedValueOnce({ status: "FAILURE", errorsMessage: "route not found" })
-        .mockResolvedValueOnce({ status: "FAILURE", errorsMessage: "route not found" })
+    it("only hides the sheet on close: the inline error stays and the slider stays off", async () => {
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: "route not found",
+      })
       await renderReview(route)
       await slide()
       expect(errorSheet()).toBeTruthy()
@@ -2533,11 +2548,14 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       })
 
       expect(errorSheet()).toBeNull()
-      expect(screen.getByText("route not found")).toBeTruthy()
+      expect(
+        screen.getByText(LL.SendBitcoinConfirmationScreen.somethingWentWrong()),
+      ).toBeTruthy()
+      expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
 
-      // Same text, new failure: the sheet opens again.
+      // A second slide after closing sends nothing.
       await slide()
-      expect(errorSheet()).toBeTruthy()
+      expect(sendPaymentMock).toHaveBeenCalledTimes(1)
     })
 
     it("stays closed while the same fee failure holds", async () => {

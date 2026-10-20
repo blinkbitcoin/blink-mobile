@@ -5,7 +5,7 @@ import {
 import { IDEMPOTENCY_KEY_UNAVAILABLE } from "@app/screens/send-bitcoin-screen/use-send-payment"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
-const base = { canSetAmount: true, isSelfCustodial: false, outcome: "failed" } as const
+const base = { canSetAmount: true, outcome: "failed" } as const
 
 type Case = [
   name: string,
@@ -13,63 +13,56 @@ type Case = [
   expected: ErrorMsgAction,
 ]
 
+// Change amount and Try again both build a new payment: after anything that may have
+// sent, the only way out is Home.
 const cases: Case[] = [
   [
-    "custodial amount message",
+    "custodial amount message, which server text can't vouch for",
     { raw: "Cannot transfer more than $10 in 24 hours" },
-    "changeAmount",
+    "home",
   ],
-  ["custodial other failure", { raw: "Unable to find a route for payment." }, "tryAgain"],
-  ["custodial failure the backend reported", { raw: "network died" }, "tryAgain"],
+  ["custodial other failure", { raw: "Unable to find a route for payment." }, "home"],
+  ["custodial failure with no reason", { raw: undefined }, "home"],
   ["custodial thrown request", { raw: "network died", outcome: "unconfirmed" }, "home"],
   [
-    "custodial throw before a key existed",
+    "throw before a key existed, nothing sent",
     { raw: IDEMPOTENCY_KEY_UNAVAILABLE, outcome: "unconfirmed" },
     "tryAgain",
   ],
   [
-    "self-custodial amount code after a send",
-    { raw: SelfCustodialErrorCode.InsufficientFunds, isSelfCustodial: true },
+    "self-custodial amount code raised before the send",
+    { raw: SelfCustodialErrorCode.InsufficientFunds },
     "changeAmount",
   ],
   [
     "self-custodial amount code with a fixed amount",
-    {
-      raw: SelfCustodialErrorCode.BelowMinimum,
-      isSelfCustodial: true,
-      canSetAmount: false,
-    },
+    { raw: SelfCustodialErrorCode.BelowMinimum, canSetAmount: false },
     "tryAgain",
   ],
   [
     "self-custodial invalid input, nothing sent",
-    { raw: SelfCustodialErrorCode.InvalidInput, isSelfCustodial: true },
-    "tryAgain",
-  ],
-  [
-    "self-custodial missing idempotency key, nothing sent",
-    { raw: IDEMPOTENCY_KEY_UNAVAILABLE, isSelfCustodial: true, outcome: "unconfirmed" },
+    { raw: SelfCustodialErrorCode.InvalidInput },
     "tryAgain",
   ],
   [
     "self-custodial generic failure that may have landed",
-    { raw: SelfCustodialErrorCode.Generic, isSelfCustodial: true },
+    { raw: SelfCustodialErrorCode.Generic },
     "home",
   ],
   [
     "self-custodial network failure that may have landed",
-    { raw: SelfCustodialErrorCode.NetworkError, isSelfCustodial: true },
-    "home",
-  ],
-  [
-    "self-custodial thrown request",
-    { raw: "network died", isSelfCustodial: true, outcome: "unconfirmed" },
+    { raw: SelfCustodialErrorCode.NetworkError },
     "home",
   ],
   [
     "self-custodial generic failure before a send (fee quote)",
-    { raw: SelfCustodialErrorCode.Generic, isSelfCustodial: true, outcome: "notSent" },
+    { raw: SelfCustodialErrorCode.Generic, outcome: "notSent" },
     "tryAgain",
+  ],
+  [
+    "amount code before a send (fee quote)",
+    { raw: SelfCustodialErrorCode.BelowMinimum, outcome: "notSent" },
+    "changeAmount",
   ],
 ]
 

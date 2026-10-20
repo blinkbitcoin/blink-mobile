@@ -58,6 +58,7 @@ import {
 } from "./hooks/use-custodial-onchain-fee-tiers"
 import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { useHomeOnBackWhenSpent } from "./hooks/use-home-on-back-when-spent"
+import { useSendFailureCopy } from "./hooks/use-send-failure-copy"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { ReviewHighFeeSheet } from "./review/review-high-fee-sheet"
 import { SendReviewDestination } from "./review/send-review-destination"
@@ -69,11 +70,7 @@ import { useReviewErrorSheet } from "./hooks/use-review-error-sheet"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
 import useFee from "./use-fee"
-import {
-  IDEMPOTENCY_KEY_UNAVAILABLE,
-  PaymentSendCompletedStatus,
-  useSendPayment,
-} from "./use-send-payment"
+import { PaymentSendCompletedStatus, useSendPayment } from "./use-send-payment"
 import { useSaveLnAddressContact } from "./use-save-lnaddress-contact"
 import { formatDestination } from "./format-destination"
 
@@ -147,12 +144,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const usdBalanceMoneyAmount = toUsdMoneyAmount(usdWallet?.balance)
 
-  const btcPrimaryText = formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount })
   const usdPrimaryText = formatMoneyAmount({ moneyAmount: usdBalanceMoneyAmount })
   const [paymentFailure, setPaymentFailure] = useState<
     { message: string; canChangeAmount: boolean; action: ErrorMsgAction } | undefined
   >(undefined)
-  const paymentError = paymentFailure?.message
   const errorMsgActionFor = useErrorMsgAction(paymentDetail)
   /** Every send failure shows inline and opens the error message sheet on top. An
    *  explicit `action` is for failures whose outcome the raw text doesn't carry. */
@@ -169,6 +164,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const verifyPaymentSettled = useVerifyPaymentSettled()
   const { LL, locale } = useI18nContext()
   const translateSdkError = useTranslateSdkError()
+  const failureCopy = useSendFailureCopy()
   const { copyToClipboard } = useClipboard()
   const feeTierLabels = useFeeTierLabels()
   const {
@@ -453,11 +449,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
-      setPaymentError(
-        translateSdkError(errorsMessage) ||
-          LL.SendBitcoinConfirmationScreen.somethingWentWrong(),
-        errorsMessage,
-      )
+      setPaymentError(failureCopy(errorsMessage), errorsMessage)
       ReactNativeHapticFeedback.trigger("notificationError", {
         ignoreAndroidSystemSettings: true,
       })
@@ -502,7 +494,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
           // It may still land, so nothing here may start it again (#1273 N14).
           setPaymentError(
-            LL.SendBitcoinConfirmationScreen.paymentAlreadyAttempted(),
+            LL.SendBitcoinConfirmationScreen.paymentMayStillLand(),
             undefined,
             "home",
           )
@@ -512,12 +504,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           return
         }
 
+        // A throw leaves the outcome unknown: the request may have landed.
         setPaymentError(
-          err.message === IDEMPOTENCY_KEY_UNAVAILABLE
-            ? LL.SendBitcoinConfirmationScreen.somethingWentWrong()
-            : err.message || err.toString(),
+          failureCopy(err.message, { mayHaveSent: true }),
           err.message,
-          // A throw leaves the outcome unknown: the request may have landed.
           errorMsgActionFor(err.message, "unconfirmed"),
         )
       }
@@ -531,7 +521,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     destination,
     navigateToCompleted,
     verifyPaymentSettled,
-    translateSdkError,
+    failureCopy,
     errorMsgActionFor,
   ])
 
@@ -567,7 +557,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
     if (!validAmount) {
       invalidAmountErrorMessage = LL.SendBitcoinConfirmationScreen.totalExceed({
-        balance: btcPrimaryText,
+        balance: formatMoneyAmount({ moneyAmount: btcBalanceMoneyAmount }),
       })
     }
   }
@@ -667,7 +657,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** One slot under the card, first match wins: what blocks the send (red) before the
    *  high-fee advisory (warning). */
   const blockingError =
-    paymentError || invalidAmountErrorMessage || (isFeeFailed ? feeErrorText : "")
+    paymentFailure?.message ||
+    invalidAmountErrorMessage ||
+    (isFeeFailed ? feeErrorText : "")
   // Offered only when the error on show is about the amount; a network or invoice failure
   // is not fixed by going back to change it.
   const canChangeAmount = paymentFailure

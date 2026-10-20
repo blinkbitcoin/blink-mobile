@@ -1,12 +1,10 @@
 import { useCallback } from "react"
 
 import { WalletCurrency } from "@app/graphql/generated"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 import { isAmountFixableError } from "./amount-fixable-error"
 import { PaymentDetail } from "./payment-details/index.types"
-import { IDEMPOTENCY_KEY_UNAVAILABLE } from "./use-send-payment"
+import { isNothingSentFailure } from "./use-send-payment"
 
 /**
  * What the error message sheet on review offers (blink-wip#1278, provisional ruling
@@ -29,50 +27,36 @@ type FailureContext = {
   /** The raw failure: a self-custodial error code, or custodial message text. */
   raw: string | undefined
   canSetAmount: boolean
-  isSelfCustodial: boolean
   outcome: FailureOutcome
 }
-
-/** Failures raised before anything is sent, whatever the send reported. */
-const NOTHING_SENT: ReadonlySet<string> = new Set([
-  SelfCustodialErrorCode.InsufficientFunds,
-  SelfCustodialErrorCode.BelowMinimum,
-  SelfCustodialErrorCode.InvalidInput,
-  IDEMPOTENCY_KEY_UNAVAILABLE,
-])
 
 /**
  * The action for a failure the user can't fix on review.
  *
- * If a new amount can be expected to fix it, the sheet offers Change amount. Otherwise it
- * offers Try again when nothing can have been paid, and Home when the payment may still
- * land. Try again starts a new payment with a new idempotency key, so no rail dedupes
- * it against the first (#1273 N21, senior devs).
- *
- * A custodial `FAILURE` means nothing was paid. A self-custodial failure isn't trusted
- * that far unless its code says the SDK stopped before sending, and a send that threw
- * may have landed on either rail.
+ * Change amount and Try again both build a new payment, so they are offered only when
+ * nothing can have been sent: a failure before the send, or one classified as raised
+ * before it. Every other failure, a custodial FAILURE included, goes Home: the payment
+ * may still land, and a second one must never be possible (#1273 N18). Server text never
+ * picks the action.
  */
 export const errorMsgAction = ({
   raw,
   canSetAmount,
-  isSelfCustodial,
   outcome,
 }: FailureContext): ErrorMsgAction => {
+  const isNothingSent = outcome === "notSent" || isNothingSentFailure(raw)
+  if (!isNothingSent) return "home"
   if (canSetAmount && isAmountFixableError(raw)) return "changeAmount"
-  if (outcome === "notSent" || (raw && NOTHING_SENT.has(raw))) return "tryAgain"
-  if (outcome === "failed" && !isSelfCustodial) return "tryAgain"
-  return "home"
+  return "tryAgain"
 }
 
 /** `errorMsgAction` bound to the payment on review. */
 export const useErrorMsgAction = (paymentDetail: PaymentDetail<WalletCurrency>) => {
-  const { isSelfCustodial } = useActiveWallet()
   const { canSetAmount } = paymentDetail
 
   return useCallback(
     (raw: string | undefined, outcome: FailureOutcome = "failed") =>
-      errorMsgAction({ raw, canSetAmount, isSelfCustodial, outcome }),
-    [canSetAmount, isSelfCustodial],
+      errorMsgAction({ raw, canSetAmount, outcome }),
+    [canSetAmount],
   )
 }

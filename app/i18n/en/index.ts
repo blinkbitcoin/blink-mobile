@@ -2368,6 +2368,8 @@ const en: BaseTranslation = {
     somethingWentWrong: "Something went wrong",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
+    paymentMayStillLand:
+      "Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.",
     slideToConfirm: "Slide to Confirm",
     slideConfirming: "Confirming...",
     slideToSend: "Slide to send",

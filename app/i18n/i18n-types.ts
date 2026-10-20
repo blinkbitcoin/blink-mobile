@@ -7435,6 +7435,10 @@ type RootTranslation = {
 		 */
 		paymentAlreadyAttempted: string
 		/**
+		 * W​a​i​t​ ​a​ ​m​o​m​e​n​t​,​ ​i​t​ ​w​i​l​l​ ​p​r​o​b​a​b​l​y​ ​g​o​ ​t​h​r​o​u​g​h​ ​s​o​o​n​.​ ​Y​o​u​r​ ​m​o​n​e​y​ ​w​i​l​l​ ​a​r​r​i​v​e​ ​s​a​f​e​l​y​ ​o​r​ ​s​t​a​y​ ​w​i​t​h​ ​y​o​u​.
+		 */
+		paymentMayStillLand: string
+		/**
 		 * S​l​i​d​e​ ​t​o​ ​C​o​n​f​i​r​m
 		 */
 		slideToConfirm: string
@@ -21346,6 +21350,10 @@ export type TranslationFunctions = {
 	If you want to send this payment again, start from scratch.
 		 */
 		paymentAlreadyAttempted: () => LocalizedString
+		/**
+		 * Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.
+		 */
+		paymentMayStillLand: () => LocalizedString
 		/**
 		 * Slide to Confirm
 		 */
