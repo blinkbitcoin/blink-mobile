@@ -782,6 +782,115 @@ describe("migration-checkpoint-storage a confirmed start", () => {
   })
 })
 
+/** Before the server has started a run nothing has been drained, so the figure the
+ *  commit screen first saw is only a guess: a dollar balance converted from that same
+ *  screen moves the bitcoin it will send, and a stale zero reads as "nothing will ever
+ *  arrive", which swaps before the funds land (#4102). */
+describe("migration-checkpoint-storage a commit point the server has not started", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const unstartedCommitPoint = {
+    step: MigrationCheckpoint.BalancesOverview,
+    savedAt: Date.now(),
+    accountId: "sc-1",
+    custodialAccountId: "cust-1",
+    expectedReceiveSats: 0,
+  }
+
+  it("takes the fresh figure over the one it first saw", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(unstartedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 5000,
+      isServerFlowUnstarted: true,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 5000 }),
+    )
+  })
+
+  /** The save that carries the accepted start is the last one before the drain, so its
+   *  figure is the run's own and is kept from then on. */
+  it("takes it on the save that confirms the start too", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(unstartedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 5000,
+      isStartConfirmed: true,
+      isServerFlowUnstarted: true,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 5000, isStartConfirmed: true }),
+    )
+  })
+
+  /** A start this device saw accepted owns its figure, whatever a stale read of the
+   *  phase still says: the drain may already have emptied what the preview reads. */
+  it("keeps the figure of a run whose start was confirmed", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue({
+      ...unstartedCommitPoint,
+      expectedReceiveSats: 990,
+      isStartConfirmed: true,
+    })
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 0,
+      isServerFlowUnstarted: true,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 990 }),
+    )
+  })
+
+  /** A record from before the confirmed start existed, on a flow the server holds open:
+   *  the run may have drained already, so the live zero is the one to distrust. */
+  it("keeps the figure of an unconfirmed record whose flow is open", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue({
+      ...unstartedCommitPoint,
+      expectedReceiveSats: 990,
+    })
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 0,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 990 }),
+    )
+  })
+
+  it("does not write the server's answer into the record", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(unstartedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 5000,
+      isServerFlowUnstarted: true,
+    })
+
+    const [, saved] = mockSaveJson.mock.calls[0]
+    expect(saved).not.toHaveProperty("isServerFlowUnstarted")
+  })
+})
+
 /** The one rule the entry screen and the step routing both follow for a commit point. */
 describe("migration-checkpoint-storage resolveCommitPointRoute", () => {
   it("resumes an open flow, confirmed start or not", () => {

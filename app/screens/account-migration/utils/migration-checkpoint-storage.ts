@@ -162,6 +162,9 @@ export type CheckpointUpdate = {
   custodialAccountId?: string
   expectedReceiveSats?: number
   isStartConfirmed?: true
+  /** The server's answer as the caller read it, never stored: the account's migration has
+   *  not started, so this save's receive figure may replace the one the record holds. */
+  isServerFlowUnstarted?: true
 }
 
 /**
@@ -196,6 +199,14 @@ export const mergeCheckpoint = (
    *
    * The confirmed start belongs to the run the same way: kept across its steps, gone once
    * it restarts, since the new run has not started anything yet.
+   *
+   * Write-once only binds once there is a run to bind it to. While the server reports the
+   * migration not started and this record holds no accepted start, nothing has been
+   * drained and the live preview is the truth: a dollar balance converted from the commit
+   * screen itself moves the bitcoin it will send, and the zero it first saw would read as
+   * "nothing will ever arrive" and swap before the funds land. A record without the
+   * confirmation on a flow the server holds open is the opposite case (one written before
+   * the field existed, maybe already drained), so it keeps what it has.
    */
   const hasRestarted =
     isCommitPointCheckpoint(existing?.step ?? null) &&
@@ -203,10 +214,13 @@ export const mergeCheckpoint = (
   const inheritedExpectedReceiveSats = hasSameOwner
     ? existing?.expectedReceiveSats
     : undefined
-  const expectedReceiveSats = hasRestarted
-    ? undefined
-    : inheritedExpectedReceiveSats ?? update.expectedReceiveSats
   const inheritedStartConfirmation = hasSameOwner ? existing?.isStartConfirmed : undefined
+  const isReceiveFigureUnbound =
+    update.isServerFlowUnstarted === true && inheritedStartConfirmation !== true
+  const keptExpectedReceiveSats = isReceiveFigureUnbound
+    ? update.expectedReceiveSats ?? inheritedExpectedReceiveSats
+    : inheritedExpectedReceiveSats ?? update.expectedReceiveSats
+  const expectedReceiveSats = hasRestarted ? undefined : keptExpectedReceiveSats
   const isStartConfirmed = hasRestarted
     ? undefined
     : inheritedStartConfirmation ?? update.isStartConfirmed

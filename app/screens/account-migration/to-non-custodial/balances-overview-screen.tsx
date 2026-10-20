@@ -206,12 +206,22 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  start is written with it once it lands, the one thing that later tells a flow support
    *  cleared from one that never started, since the server reads not started for both. */
   const startConfirmation = migrationStart.isStarted ? true : undefined
-  /** What this focus already recorded: the figure and whether the write carried the
-   *  accepted start, since a change to either is a new record to write. A landed write
-   *  updates the very state that saveCheckpoint closes over, so without this the effect
-   *  below would fire a second, identical write on the one screen where the disk is the
-   *  thing in doubt. Cleared on blur so every focus still refreshes the record. */
-  const commitPointWriteKey = `${expectedReceiveSats}:${startConfirmation === true}`
+  /** Until the server starts a run, the figure is the preview's latest word rather than the
+   *  first one saved: converting dollars from this screen changes the bitcoin it will send.
+   *  An unanswered read keeps the stored figure, the safe side of the two. */
+  const serverFlowUnstarted =
+    migrationStatus === MigrationStatus.NotStarted ? true : undefined
+  /** What this focus already recorded: the figure, whether the write carried the accepted
+   *  start and whether it said the server had not started the run, since a change to any
+   *  of them is a new record to write. A landed write updates the very state that
+   *  saveCheckpoint closes over, so without this the effect below would fire a second,
+   *  identical write on the one screen where the disk is the thing in doubt. Cleared on
+   *  blur so every focus still refreshes the record. */
+  const commitPointWriteKey = [
+    expectedReceiveSats,
+    startConfirmation === true,
+    serverFlowUnstarted === true,
+  ].join(":")
   const recordedWriteKeyRef = useRef<string | null>(null)
   const recordCommitPoint = useCallback(async (): Promise<void> => {
     if (expectedReceiveSats === null) return
@@ -220,6 +230,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     const writeResult = await saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
       expectedReceiveSats,
       isStartConfirmed: startConfirmation,
+      isServerFlowUnstarted: serverFlowUnstarted,
     })
     /** Latched, never unlatched: this runs again on every focus, figure change and retry,
      *  and a later failure cannot un-record a write that already landed. The confirmation
@@ -234,7 +245,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
      *  lands late never puts a stale reason above the retry. */
     const isLatestWrite = writeId === latestCommitPointWriteRef.current
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
-  }, [expectedReceiveSats, startConfirmation, commitPointWriteKey, saveCheckpoint])
+  }, [
+    expectedReceiveSats,
+    startConfirmation,
+    serverFlowUnstarted,
+    commitPointWriteKey,
+    saveCheckpoint,
+  ])
   const hasCommitPointWriteFailed = lastCommitPointWrite?.isSaved === false
   /** The commit point and the accepted start are one record, not two: once the server has
    *  taken the start, a step written without it is the record a support-cleared flow is

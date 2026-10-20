@@ -1,5 +1,6 @@
 import React from "react"
 import { Linking } from "react-native"
+import { it } from "@jest/globals"
 import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
@@ -1148,6 +1149,96 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     for (const [, options] of mockSaveCheckpoint.mock.calls) {
       expect(options.isStartConfirmed).toBeUndefined()
     }
+  })
+
+  /** Until the server starts a run the figure is the preview's latest word: a dollar
+   *  balance converted from this screen changes the bitcoin it will send, and a stale zero
+   *  would let the swap skip waiting for funds still on their way. */
+  describe("before the server has started the migration", () => {
+    it("tells the store the server has not started it", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      renderScreen()
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({ isServerFlowUnstarted: true }),
+      )
+    })
+
+    it("writes again once a status read that had not answered says it never started", async () => {
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockMigrationStatus = MigrationStatus.NotStarted
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 990,
+          isServerFlowUnstarted: true,
+        }),
+      )
+    })
+
+    it("saves the new figure once converted dollars change the preview", async () => {
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 0,
+          feeSats: 0,
+          feeCoveredByBlink: true,
+          receiveSats: 0,
+        }),
+      )
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 5010,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 5000,
+        }),
+      )
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 5000,
+          isServerFlowUnstarted: true,
+        }),
+      )
+    })
+
+    /** A read that has not answered, or a flow the server holds open, keeps whatever the
+     *  record already has: the live preview may be the post-drain zero. */
+    const ANSWERS_THAT_KEEP_THE_FIGURE: {
+      label: string
+      status: MigrationStatus | null
+    }[] = [
+      { label: "an unanswered read", status: null },
+      { label: "an open flow", status: MigrationStatus.InProgress },
+    ]
+
+    it.each(ANSWERS_THAT_KEEP_THE_FIGURE)(
+      "never claims it for $label",
+      async ({ status }) => {
+        mockMigrationStatus = status
+        renderScreen()
+        await flushEffects()
+
+        expect(mockSaveCheckpoint).toHaveBeenCalled()
+        for (const [, options] of mockSaveCheckpoint.mock.calls) {
+          expect(options.isServerFlowUnstarted).toBeUndefined()
+        }
+      },
+    )
   })
 
   /** The step can land before the server accepts the start, so a write without the

@@ -1011,6 +1011,33 @@ describe("useMigrationCheckpoint a start the server accepted", () => {
     expect(result.current.isStartConfirmed).toBe(true)
   })
 
+  /** The receive gate reads the figure this hook holds, so the renewal the store applies
+   *  has to land here too, not only on disk. */
+  it("renews the figure of a run the server has not started, in the store and here", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+    })
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        expectedReceiveSats: 5000,
+        isServerFlowUnstarted: true,
+      })
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
+      "migrationCheckpoint_main",
+      expect.objectContaining({ expectedReceiveSats: 5000, isServerFlowUnstarted: true }),
+    )
+    expect(result.current.expectedReceiveSats).toBe(5000)
+  })
+
   /** The record keeps it for the run; re-sending it from memory would carry it into a
    *  run that restarted, where it no longer holds. */
   it("never re-sends a stored confirmation on a later save", async () => {

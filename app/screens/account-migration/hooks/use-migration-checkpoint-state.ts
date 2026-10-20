@@ -32,6 +32,9 @@ type SaveCheckpointOptions = {
    *  holds: the record keeps it for the run, and only the caller that saw the start may
    *  set it. */
   isStartConfirmed?: true
+  /** The server reports this account's migration not started, read by the caller just
+   *  before the save. Never re-sent either: an answer goes stale. */
+  isServerFlowUnstarted?: true
 }
 
 /**
@@ -133,6 +136,7 @@ export const useMigrationCheckpointState = () => {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
         isStartConfirmed: isStartConfirmedUpdate,
+        isServerFlowUnstarted,
       }: SaveCheckpointOptions = {},
     ): Promise<StorageWriteResult> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
@@ -146,6 +150,7 @@ export const useMigrationCheckpointState = () => {
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
         isStartConfirmed: isStartConfirmedUpdate,
+        isServerFlowUnstarted,
       }
       try {
         await saveCheckpointToStorage(storageKey, update)
