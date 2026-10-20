@@ -7721,6 +7721,10 @@ type RootTranslation = {
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
 		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​d​a​i​l​y​ ​l​i​m​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		limitsUnavailable: string
+		/**
 		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
 		 */
 		problemSheetTitle: string
@@ -21616,6 +21620,10 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * We couldn't check your daily limit. Try again in a moment.
+		 */
+		limitsUnavailable: () => LocalizedString
 		/**
 		 * A small problem
 		 */

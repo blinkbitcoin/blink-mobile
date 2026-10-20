@@ -195,7 +195,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     if (rebuilt) setPaymentDetail(rebuilt)
   }
 
-  const { data: withdrawalLimitsData } = useSendBitcoinWithdrawalLimitsQuery({
+  const {
+    data: withdrawalLimitsData,
+    error: withdrawalLimitsError,
+    refetch: refetchWithdrawalLimits,
+  } = useSendBitcoinWithdrawalLimitsQuery({
     fetchPolicy: "no-cache",
     skip:
       !useIsAuthed() ||
@@ -203,7 +207,11 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       paymentDetail.paymentType === "intraledger",
   })
 
-  const { data: intraledgerLimitsData } = useSendBitcoinInternalLimitsQuery({
+  const {
+    data: intraledgerLimitsData,
+    error: intraledgerLimitsError,
+    refetch: refetchIntraledgerLimits,
+  } = useSendBitcoinInternalLimitsQuery({
     fetchPolicy: "no-cache",
     skip:
       !useIsAuthed() ||
@@ -526,9 +534,17 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
    * selector quoted: leaving before it lands is leaving without the warning. The fee this
    * screen probed on mount used to stand in for it, which the picked tier's own fee replaced.
    */
+  /** Only one of the two limits queries runs for a payment, so at most one can fail. */
+  const retryLimits = withdrawalLimitsError
+    ? () => refetchWithdrawalLimits()
+    : intraledgerLimitsError
+      ? () => refetchIntraledgerLimits()
+      : undefined
+
   const isNextDisabled =
     !goToNextScreen ||
     !amountStatus.validAmount ||
+    Boolean(retryLimits) ||
     Boolean(lnurlBoundsErrorMessage) ||
     isFeeTierErrorBlocking ||
     isQuotingFees
@@ -611,6 +627,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
               })
             : undefined
         }
+        onRetryLimits={retryLimits}
         onRetry={goToNextScreen || undefined}
         onChangeAmount={clearAmount}
       />
