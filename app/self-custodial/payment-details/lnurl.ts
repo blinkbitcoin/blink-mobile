@@ -43,7 +43,7 @@ import {
 } from "../bridge"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
-import { feeFailure, findLostSend } from "./send-helpers"
+import { feeFailure, findLostSend, sendResultOf } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -263,9 +263,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const sendOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,
-    status: PaymentSendResult,
   ) => ({
-    status,
+    status: sendResultOf(payment),
     transaction: { createdAt: Number(payment.timestamp) },
     extraInfo: {
       preimage: extractPreimage(payment),
@@ -274,10 +273,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   })
 
   /** The wallet's own record of a send this detail made, reported as the send itself
-   *  would have reported it: the SDK hands a payment back as soon as it is dispatched,
-   *  pending or not, and every rail reports that as sent. */
+   *  would have reported it: sent once completed, pending while still in flight. */
   const foundOutcome = (found: Payment) =>
-    sendOutcome(found, extractProcessedSuccessAction(found), PaymentSendResult.Success)
+    sendOutcome(found, extractProcessedSuccessAction(found))
 
   const findThisSend = (startedAtMs: number, paymentHashes: ReadonlyArray<string>) =>
     findLostSend({
@@ -355,11 +353,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
           try {
             const result = await executeLnurl(sdk, prepared, sendIdempotencyKey)
             forgetLostAttempts()
-            return sendOutcome(
-              result.payment,
-              result.successAction,
-              PaymentSendResult.Success,
-            )
+            return sendOutcome(result.payment, result.successAction)
           } catch (err) {
             /** Not looked for now when a retry under the same key is refused as a
              *  duplicate by the SDK anyway, nor when the SDK refused the send on the

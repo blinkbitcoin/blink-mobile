@@ -57,6 +57,7 @@ import {
   feeTierFromPayoutSpeed,
 } from "./hooks/use-custodial-onchain-fee-tiers"
 import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
+import { useHomeOnBackWhenSpent } from "./hooks/use-home-on-back-when-spent"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { ReviewHighFeeSheet } from "./review/review-high-fee-sheet"
 import { SendReviewDestination } from "./review/send-review-destination"
@@ -224,7 +225,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
+    isSendSpent,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
+  useHomeOnBackWhenSpent(isSendSpent)
 
   // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
   // GraphQL text that is not fit to show, so only the former replaces the generic string.
@@ -344,12 +347,16 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       extraInfo?: PaymentSendExtraInfo
       transaction?: Partial<Transaction> | null
     }) => {
-      await saveLnAddressContact({
-        paymentType,
-        destination,
-        isMerchant:
-          paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
-      })
+      /** Started only once the outcome is on screen and never awaited by the send: a
+       *  contact that fails to save must not read as a payment that failed. */
+      const saveContact = () => {
+        saveLnAddressContact({
+          paymentType,
+          destination,
+          isMerchant:
+            paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
+        }).catch((err) => reportError("send-bitcoin-confirmation:save-contact", err))
+      }
 
       const isSuccess = status === "SUCCESS"
       const params: RootStackParamList["sendBitcoinCompleted"] = {
@@ -380,17 +387,18 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           ignoreAndroidSystemSettings: true,
         })
         sentReceiptRef.current = params
-        await playSent({
+        const sent = playSent({
           primaryAmount: heroPrimaryText,
           hasSecondaryAmount: Boolean(heroSecondaryText),
         })
+        saveContact()
+        await sent
         return
       }
 
+      /** Pending is not a success: no success haptic, and no Sent. */
       resetToCompleted(params)
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
+      saveContact()
     },
     [
       playSent,
@@ -792,7 +800,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               }
               onSwipe={handleSendPayment}
               disabled={
-                !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
+                !validAmount ||
+                !sendPayment ||
+                Boolean(paymentFailure) ||
+                feeUnavailable ||
+                dustNotEvaluable
               }
             />
           </Animated.View>

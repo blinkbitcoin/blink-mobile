@@ -17,6 +17,7 @@ import {
   Transaction,
 } from "@app/graphql/generated"
 import { getErrorMessages } from "@app/graphql/utils"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { reportError } from "@app/utils/error-logging"
 
 import {
@@ -46,6 +47,12 @@ type UseSendPaymentResult = {
    * sendPayment being defined.
    */
   hasAttemptedSend: boolean
+  /**
+   * The send went out, or may have, and no further attempt is allowed from this payment:
+   * the only way on is Home. False before the first attempt and after a failure raised
+   * before anything was sent.
+   */
+  isSendSpent: boolean
 }
 
 /**
@@ -54,6 +61,19 @@ type UseSendPaymentResult = {
  * weakness this header exists to close.
  */
 export const IDEMPOTENCY_KEY_UNAVAILABLE = "idempotency-key-unavailable"
+
+/** Failures raised before anything is sent, so the payment can be attempted again. */
+const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
+  SelfCustodialErrorCode.InsufficientFunds,
+  SelfCustodialErrorCode.BelowMinimum,
+  SelfCustodialErrorCode.InvalidInput,
+  IDEMPOTENCY_KEY_UNAVAILABLE,
+])
+
+/** True only for a failure classified as raised before the send. Server text, an
+ *  unclassified code or no reason at all may have moved money. */
+export const isNothingSentFailure = (raw: string | undefined): boolean =>
+  raw !== undefined && NOTHING_SENT_CODES.has(raw)
 
 gql`
   mutation intraLedgerPaymentSend($input: IntraLedgerPaymentSendInput!) {
@@ -240,10 +260,10 @@ export const useSendPayment = (
   // Sticky: money may have moved, so the caller must stop trusting its balance snapshot.
   const [hasAttemptedSend, setHasAttemptedSend] = useState(false)
   /**
-   * Whether a further attempt is barred. Kept apart from hasAttemptedSend because the two
-   * answer different questions: a send that failed or threw must be retryable (same key,
-   * so the backend refuses a true duplicate), while the balance check must stay off for
-   * the rest of the mount regardless.
+   * Whether a further attempt is barred. Set for good by the first attempt: a throw or a
+   * failure may have moved money, and not every rail dedupes a retry (self-custodial
+   * Lightning invoices and on-chain carry no key). Lifted only for a failure classified
+   * as raised before the send.
    */
   const [sendLocked, setSendLocked] = useState(false)
   // Tracks loading for mutations that bypass Apollo (e.g. self-custodial SDK calls)
@@ -335,15 +355,19 @@ export const useSendPayment = (
             if (errors) {
               errorsMessage = getErrorMessages(errors)
             }
-            if (status === PaymentSendResult.Failure) {
+            if (
+              status === PaymentSendResult.Failure &&
+              isNothingSentFailure(errorsMessage)
+            ) {
               setSendLocked(false)
             }
             return { status, errorsMessage, extraInfo, transaction }
           } catch (err) {
-            // A throw is precisely the ambiguous case — the request may have landed. Let
-            // the user attempt again under the same key, so a true duplicate comes back
-            // as a 409 the screen can resolve, instead of dead-ending on a live payment.
-            setSendLocked(false)
+            // A throw is the ambiguous case: the request may have landed, so the send
+            // stays locked unless the throw says nothing went out.
+            if (err instanceof Error && isNothingSentFailure(err.message)) {
+              setSendLocked(false)
+            }
             throw err
           } finally {
             setLocalLoading(false)
@@ -367,6 +391,7 @@ export const useSendPayment = (
 
   return {
     hasAttemptedSend,
+    isSendSpent: hasAttemptedSend && sendLocked,
     loading,
     sendPayment,
   }
