@@ -12,7 +12,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { IconHero } from "@app/components/icon-hero"
-import { SuccessBadge } from "@app/components/success-badge"
+import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success-badge"
 import { fonts } from "@app/rne-theme/fonts"
 import { testProps } from "@app/utils/testProps"
 
@@ -77,6 +77,8 @@ const SENT_ICON_EXTRA_GAP = 10
 const SENT_BADGE_SIZE = 49
 /** The badge starts drawing while the hero is still on its way to the middle. */
 const SENT_BADGE_DELAY_MS = 150
+/** When the badge has finished drawing, counted from the payment landing. */
+export const SENT_BADGE_END_MS = SENT_BADGE_DELAY_MS + SUCCESS_BADGE_DURATION_MS
 
 /** The sent amount takes amount entry's scale, so it lands at the size it was typed at. */
 const sentPrimaryFontSize = (amount: string): number => entryAmountFontSize(amount, false)
@@ -123,6 +125,9 @@ type SendHeroProps = {
   sentProgress?: SharedValue<number>
   /** The payment has landed: the sent badge mounts and draws itself in. */
   isSent?: boolean
+  /** Which play of the Sent timeline is on screen. A new one redraws the badge from the
+   *  start; 0 holds it back while a play is waiting to replay. */
+  sentPlay?: number
 }
 
 export const SendHero: React.FC<SendHeroProps> = ({
@@ -136,6 +141,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
   onCaptionLongPress,
   sentProgress,
   isSent = false,
+  sentPlay = 1,
 }) => {
   const styles = useStyles()
   const {
@@ -319,9 +325,13 @@ export const SendHero: React.FC<SendHeroProps> = ({
       <Animated.View style={sendingIconStyle}>
         <GaloyIcon name="send" size={ICON_SIZE} color={colors.primary} />
       </Animated.View>
-      {isSent ? (
+      {isSent && sentPlay ? (
         <View style={styles.badgeOverlay}>
-          <SuccessBadge size={SENT_BADGE_SIZE} delay={SENT_BADGE_DELAY_MS} />
+          <SuccessBadge
+            key={sentPlay}
+            size={SENT_BADGE_SIZE}
+            delay={SENT_BADGE_DELAY_MS}
+          />
         </View>
       ) : null}
     </View>
