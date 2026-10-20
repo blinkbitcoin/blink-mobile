@@ -5,6 +5,10 @@ import {
   MigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 import {
+  type CheckpointUpdate,
+  mergeCheckpoint,
+} from "@app/screens/account-migration/utils/migration-checkpoint-storage"
+import {
   StorageFailure,
   type StorageWriteResult,
 } from "@app/utils/storage/storage-failure"
@@ -72,7 +76,14 @@ const resetCheckpointMocks = () => {
   mockRefetchOwnerId.mockResolvedValue(undefined)
   mockFocusCallback = null
   mockLoadCheckpoint.mockResolvedValue(null)
-  mockSaveCheckpointToStorage.mockResolvedValue(undefined)
+  /** Answers with the record a real save writes: the update merged onto what the store
+   *  holds, which is what the hook now mirrors. */
+  mockSaveCheckpointToStorage.mockImplementation(
+    async (_key: string, update: CheckpointUpdate) => {
+      const existing = await Promise.resolve(mockLoadCheckpoint()).catch(() => null)
+      return mergeCheckpoint(existing ?? null, update)
+    },
+  )
   mockClearCheckpointFromStorage.mockResolvedValue(undefined)
 }
 
@@ -1009,6 +1020,30 @@ describe("useMigrationCheckpoint a start the server accepted", () => {
       expect.objectContaining({ isStartConfirmed: true }),
     )
     expect(result.current.isStartConfirmed).toBe(true)
+  })
+
+  /** Another instance on the same key can have written since this one last read it: the
+   *  store merges against the disk, so the hook takes what the store wrote rather than a
+   *  merge of its own older copy. */
+  it("holds the record the store wrote, not its own merge", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.accountId).toBeNull()
+
+    mockSaveCheckpointToStorage.mockResolvedValueOnce({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-written-elsewhere",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 990,
+    })
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        expectedReceiveSats: 990,
+      })
+    })
+
+    expect(result.current.accountId).toBe("sc-written-elsewhere")
   })
 
   /** The receive gate reads the figure this hook holds, so the renewal the store applies

@@ -17,7 +17,6 @@ import {
   getStorageKey,
   isCommitPointCheckpoint,
   loadCheckpoint,
-  mergeCheckpoint,
   saveCheckpointToStorage,
 } from "../utils/migration-checkpoint-storage"
 
@@ -153,11 +152,13 @@ export const useMigrationCheckpointState = () => {
         isServerFlowUnstarted,
       }
       try {
-        await saveCheckpointToStorage(storageKey, update)
-        /** Applied only once the disk has it. An optimistic update here would leave the
-         *  hook reporting a step the store refused, which is how a resume ends up looking
-         *  for an expected receive that was never written. */
-        setStored((existing) => mergeCheckpoint(existing, update))
+        const written = await saveCheckpointToStorage(storageKey, update)
+        /** Applied only once the disk has it, and as the disk has it. An optimistic update
+         *  here would leave the hook reporting a step the store refused, which is how a
+         *  resume ends up looking for an expected receive that was never written; and a
+         *  merge against this hook's own copy would drift from what another instance wrote
+         *  to the same key since this one last read it. */
+        setStored(written)
         return { isSaved: true, failure: null }
       } catch (err) {
         reportError("Checkpoint save", err)

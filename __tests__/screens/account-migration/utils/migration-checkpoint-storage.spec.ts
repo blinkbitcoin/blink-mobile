@@ -786,6 +786,125 @@ describe("migration-checkpoint-storage a confirmed start", () => {
  *  commit screen first saw is only a guess: a dollar balance converted from that same
  *  screen moves the bitcoin it will send, and a stale zero reads as "nothing will ever
  *  arrive", which swaps before the funds land (#4102). */
+/** A save reads the record and writes back a merge of it. Left to overlap, a later save
+ *  merges against the record from before an earlier one landed and writes over it; here a
+ *  read that answers late stands in for whatever lets two saves overlap. */
+describe("migration-checkpoint-storage writes to one key", () => {
+  let disk: unknown = null
+  const deferredReads: Array<() => void> = []
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    disk = null
+    deferredReads.length = 0
+    mockSaveJson.mockImplementation(async (_key: string, value: unknown) => {
+      disk = value
+    })
+    mockRemove.mockImplementation(async () => {
+      disk = null
+    })
+  })
+
+  /** The first read waits to be released; every later one answers at once. */
+  const holdFirstRead = () => {
+    mockLoadJsonOrThrow
+      .mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            deferredReads.push(() => resolve(disk))
+          }),
+      )
+      .mockImplementation(async () => disk)
+  }
+
+  /** A queued save starts a turn later, so its read is released once it has been issued
+   *  rather than the moment the save is called. */
+  const releaseHeldRead = async () => {
+    for (let turn = 0; turn < 50 && deferredReads.length === 0; turn += 1) {
+      await Promise.resolve()
+    }
+    const release = deferredReads.shift()
+    if (!release) throw new Error("the held read was never issued")
+    release()
+  }
+
+  it("keeps the accepted start when an earlier save would otherwise land on top", async () => {
+    holdFirstRead()
+
+    const stepSave = saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 990,
+    })
+    const confirmedSave = saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 990,
+      isStartConfirmed: true,
+    })
+    await releaseHeldRead()
+    await Promise.all([stepSave, confirmedSave])
+
+    expect(disk).toEqual(expect.objectContaining({ isStartConfirmed: true }))
+  })
+
+  it("does not bring back a checkpoint cleared while a save was in flight", async () => {
+    holdFirstRead()
+
+    const save = saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 990,
+    })
+    const clear = clearCheckpointFromStorage("test-key")
+    await releaseHeldRead()
+    await Promise.all([save, clear])
+
+    expect(disk).toBeNull()
+  })
+
+  /** A refused save passes the turn on: the next one still runs, and the refusal still
+   *  reaches its own caller. */
+  it("runs the next save after one that failed", async () => {
+    mockLoadJsonOrThrow
+      .mockRejectedValueOnce(new Error("Database Error"))
+      .mockImplementation(async () => disk)
+
+    const refused = saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+    })
+    const next = saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 990,
+    })
+
+    await expect(refused).rejects.toThrow("Database Error")
+    await expect(next).resolves.toEqual(
+      expect.objectContaining({ expectedReceiveSats: 990 }),
+    )
+  })
+
+  it("answers with the record it wrote", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue({
+      step: MigrationCheckpoint.BackupMethod,
+      savedAt: 1,
+      accountId: "sc-1",
+      custodialAccountId: "cust-1",
+    })
+
+    const written = await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 990,
+    })
+
+    expect(written).toEqual(disk)
+    expect(written).toEqual(expect.objectContaining({ accountId: "sc-1" }))
+  })
+})
+
 describe("migration-checkpoint-storage a commit point the server has not started", () => {
   beforeEach(() => {
     jest.clearAllMocks()

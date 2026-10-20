@@ -236,22 +236,53 @@ export const mergeCheckpoint = (
 }
 
 /**
+ * The writes to one checkpoint take turns. A save reads the record and writes back a merge
+ * of it, so two saves left to overlap both merge against the record from before either
+ * landed, and whichever writes second drops what the first added: the commit screen saves
+ * on every focus, figure change and retry, and the one it can least afford to lose is the
+ * accepted start. A clear queues behind them for the same reason, or a save still in
+ * flight lands after it and brings back the checkpoint a finished migration removed.
+ *
+ * Only the order is kept here. A task that fails passes the turn on without poisoning the
+ * queue, and its caller still sees the failure.
+ */
+const pendingWriteByKey = new Map<string, Promise<unknown>>()
+
+const onCheckpointKey = <T>(storageKey: string, task: () => Promise<T>): Promise<T> => {
+  const previous = pendingWriteByKey.get(storageKey) ?? Promise.resolve()
+  const result = previous.then(task)
+  const turnPassed = result.catch(() => undefined)
+  pendingWriteByKey.set(storageKey, turnPassed)
+  turnPassed.then(() => {
+    if (pendingWriteByKey.get(storageKey) === turnPassed) {
+      pendingWriteByKey.delete(storageKey)
+    }
+  })
+  return result
+}
+
+/**
  * Refuses rather than overwrites when the prior record cannot be read: merging against an
  * unreadable store would drop the accountId and expected receive it holds, and that save
  * is what turns a store the device could not read this once into progress genuinely lost.
  * The caller reports the throw and keeps the step unsaved, which is the recoverable half.
+ *
+ * Answers with the record it wrote, so a caller mirroring the checkpoint in memory holds
+ * what the disk holds rather than a merge of its own, possibly older, copy.
  */
-export const saveCheckpointToStorage = async (
+export const saveCheckpointToStorage = (
   storageKey: string,
   update: CheckpointUpdate,
-): Promise<void> => {
-  const existing = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
-  await saveJson(storageKey, mergeCheckpoint(existing, update))
-}
+): Promise<StoredCheckpoint> =>
+  onCheckpointKey(storageKey, async () => {
+    const existing = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
+    const merged = mergeCheckpoint(existing, update)
+    await saveJson(storageKey, merged)
+    return merged
+  })
 
-export const clearCheckpointFromStorage = async (storageKey: string): Promise<void> => {
-  await remove(storageKey)
-}
+export const clearCheckpointFromStorage = (storageKey: string): Promise<void> =>
+  onCheckpointKey(storageKey, () => remove(storageKey))
 
 /**
  * Wallets provisioned for a migration but not yet activated, keyed by the custodial
