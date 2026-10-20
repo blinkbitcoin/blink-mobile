@@ -7429,6 +7429,10 @@ type RootTranslation = {
 		 */
 		somethingWentWrong: string
 		/**
+		 * T​h​e​ ​p​r​i​c​e​ ​m​o​v​e​d​,​ ​s​o​ ​t​h​e​ ​a​m​o​u​n​t​s​ ​w​e​r​e​ ​u​p​d​a​t​e​d​.​ ​C​h​e​c​k​ ​t​h​e​m​ ​b​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d​.
+		 */
+		priceUpdated: string
+		/**
 		 * P​a​y​m​e​n​t​ ​a​l​r​e​a​d​y​ ​a​t​t​e​m​p​t​e​d​.​
 	​
 	​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​ ​a​g​a​i​n​,​ ​s​t​a​r​t​ ​f​r​o​m​ ​s​c​r​a​t​c​h​.
@@ -21306,6 +21310,10 @@ export type TranslationFunctions = {
 		 * Something went wrong
 		 */
 		somethingWentWrong: () => LocalizedString
+		/**
+		 * The price moved, so the amounts were updated. Check them before you send.
+		 */
+		priceUpdated: () => LocalizedString
 		/**
 		 * Payment already attempted.
 
