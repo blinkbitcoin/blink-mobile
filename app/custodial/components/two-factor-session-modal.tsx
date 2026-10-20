@@ -8,6 +8,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { testProps } from "@app/utils/testProps"
 
@@ -30,6 +31,11 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  /** Declining leads to leaving custody, so it is offered only while the self-custodial
+   *  stack is on: nothing may push the user toward it once it is switched off, and the
+   *  modal then asks for the authenticator alone. */
+  const isDeclineOffered = !useSelfCustodialDisabled()
+  const declineTitle = isDeclineOffered ? LL.TwoFactorEnforcement.dontWantTo() : undefined
 
   /** Either button makes way for the flow it opens, with no dismissal yet: the modal
    *  hides in the same frame as the push, since a native modal dismissed while a
@@ -82,7 +88,7 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
       }
       primaryButtonTitle={LL.TwoFactorEnforcement.setNow()}
       primaryButtonOnPress={handleSetNow}
-      secondaryButtonTitle={LL.TwoFactorEnforcement.dontWantTo()}
+      secondaryButtonTitle={declineTitle}
       secondaryButtonOnPress={handleDecline}
       {...testProps("two-factor-session-modal")}
     />

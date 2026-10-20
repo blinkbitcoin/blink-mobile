@@ -68,6 +68,11 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
+let mockIsSelfCustodialDisabled = false
+jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
+  useSelfCustodialDisabled: () => mockIsSelfCustodialDisabled,
+}))
+
 const mockLogTwoFactorPromptShown = jest.fn()
 const mockLogTwoFactorPromptDismissed = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
@@ -116,6 +121,7 @@ const renderModal = ({
 describe("TwoFactorSessionModal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsSelfCustodialDisabled = false
   })
 
   it("renders the title, both buttons and the reminder when visible", () => {
@@ -188,6 +194,29 @@ describe("TwoFactorSessionModal", () => {
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial", {
       origin: { prompt: "session_modal" },
     })
+  })
+
+  /** Declining leads to leaving custody, and nothing may push the user toward a
+   *  self-custodial stack that is switched off: the authenticator is then the one way
+   *  forward, with the X still counting the dismissal. */
+  it("offers no way to decline while the self-custodial stack is switched off", () => {
+    mockIsSelfCustodialDisabled = true
+    const onDismiss = jest.fn()
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { getByText, queryByTestId, queryByText, UNSAFE_getByType } = renderModal({
+      onDismiss,
+    })
+
+    expect(getByText("Set now")).toBeTruthy()
+    expect(queryByText("I don't want to")).toBeNull()
+    expect(queryByTestId("secondary-button")).toBeNull()
+
+    fireEvent.press(UNSAFE_getByType(TouchableOpacity))
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "twoFactorNonCustodial",
+      expect.anything(),
+    )
   })
 
   /** A native modal dismissed while the native-stack push runs can hang, so the modal
