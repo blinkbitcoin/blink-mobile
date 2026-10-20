@@ -127,8 +127,20 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   /** A migration the server already reports as FAILED skips arming and the re-point and
    *  hands straight over to support. */
-  const { status: migrationStatus } = useMigrationStatus()
+  const { status: migrationStatus, refetch: refetchMigrationStatus } =
+    useMigrationStatus()
   const isMigrationFailed = migrationStatus === MigrationStatus.Failed
+
+  /** Read once at mount, and again each time the user comes back to this screen: the
+   *  dollar conversion is reached from here, and the save on return can only take the
+   *  figure it raised once the server has answered. A read that failed at mount would
+   *  otherwise never answer, and the stale figure would ride into the run. */
+  const wasFocusedRef = useRef(isFocused)
+  useEffect(() => {
+    const isReturning = isFocused && !wasFocusedRef.current
+    wasFocusedRef.current = isFocused
+    if (isReturning) refetchMigrationStatus().catch(() => undefined)
+  }, [isFocused, refetchMigrationStatus])
 
   /** A remaining dollar balance goes to the in-app conversion first: the backend refuses a
    *  non-empty USD wallet and never converts it, so it is emptied before the start arms. */
@@ -462,8 +474,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     recordCommitPoint()
     refetchOwnerId().catch(() => undefined)
     refetchCheckpoint().catch(() => undefined)
+    refetchMigrationStatus().catch(() => undefined)
   }, [
     recordCommitPoint,
+    refetchMigrationStatus,
     retryPreview,
     retryMigrationStart,
     retryLnAddressTransfer,

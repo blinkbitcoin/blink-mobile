@@ -82,12 +82,13 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 let mockMigrationStatus: MigrationStatus | null = null
+const mockRefetchMigrationStatus = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: () => ({
     status: mockMigrationStatus,
     loading: false,
-    refetch: jest.fn(),
+    refetch: mockRefetchMigrationStatus,
   }),
 }))
 
@@ -266,6 +267,7 @@ const resetScreenMocks = () => {
   mockCheckpointStorageFailure = null
   mockRefetchOwnerId.mockResolvedValue(undefined)
   mockRefetchCheckpoint.mockResolvedValue(undefined)
+  mockRefetchMigrationStatus.mockResolvedValue(null)
   mockLnAddressTransfer = lnTransferWith(MigrationLnAddressOutcome.Transferred)
   mockIsFocused = true
   mockIsAuthed = true
@@ -1214,6 +1216,86 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
           isServerFlowUnstarted: true,
         }),
       )
+    })
+
+    /** The conversion is reached from this screen, so coming back to it is when a figure
+     *  can have moved; the mount read already covers the first focus. */
+    it("asks the server again each time the user comes back, not on the first focus", async () => {
+      const { rerender } = renderScreen()
+      await flushEffects()
+      expect(mockRefetchMigrationStatus).not.toHaveBeenCalled()
+
+      mockIsFocused = false
+      rerender(screenTree())
+      mockIsFocused = true
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
+    })
+
+    /** The status read failed at mount, so the first saves keep the stored zero; once the
+     *  read answers on the user's return, the figure the conversion raised gets through. */
+    it("lets a converted figure through once a failed status read recovers", async () => {
+      mockMigrationStatus = null
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 0,
+          feeSats: 0,
+          feeCoveredByBlink: true,
+          receiveSats: 0,
+        }),
+      )
+      const { rerender } = renderScreen()
+      await flushEffects()
+
+      mockIsFocused = false
+      rerender(screenTree())
+      mockMigrationStatus = MigrationStatus.NotStarted
+      mockUseMigrationQuery.mockReturnValue(
+        migrationQueryResult({
+          balanceSats: 5010,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 5000,
+        }),
+      )
+      mockIsFocused = true
+      rerender(screenTree())
+      await flushEffects()
+
+      expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
+      expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
+        MigrationCheckpoint.BalancesOverview,
+        expect.objectContaining({
+          expectedReceiveSats: 5000,
+          isServerFlowUnstarted: true,
+        }),
+      )
+    })
+
+    it("asks the server again from the shared retry", async () => {
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+      mockUseMigrationQuery.mockReturnValue({
+        ...migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 990,
+        }),
+        refetch: jest.fn(),
+      })
+      mockUseWalletOverviewScreenQuery.mockReturnValue({
+        ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+        refetch: jest.fn(),
+      })
+      renderScreen()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+      await flushEffects()
+
+      expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
     })
 
     /** A read that has not answered, or a flow the server holds open, keeps whatever the
