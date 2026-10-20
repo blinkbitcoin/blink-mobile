@@ -10,6 +10,7 @@ import MapComponent from "@app/components/map-component"
 import MapStyles from "@app/components/map-component/map-styles.json"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { getUserRegion } from "@app/screens/map-screen/functions"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 
 import { ContextForScreen } from "../../screens/helper"
 
@@ -283,6 +284,31 @@ const renderMap = (props: Partial<React.ComponentProps<typeof MapComponent>> = {
     </ContextForScreen>,
   )
 
+const Tab = createBottomTabNavigator()
+
+/** The map as the app mounts it: a tab whose bar is sized the way root-navigator.tsx sizes it. */
+const renderMapInTabs = () =>
+  render(
+    <ContextForScreen>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: { height: 60 + mockBottomInset, paddingBottom: mockBottomInset },
+        }}
+      >
+        <Tab.Screen name="Map">
+          {() => (
+            <MapComponent
+              userLocation={REGION}
+              setPermissionsStatus={jest.fn()}
+              alertOnLocationError={jest.fn()}
+            />
+          )}
+        </Tab.Screen>
+      </Tab.Navigator>
+    </ContextForScreen>,
+  )
+
 beforeEach(() => {
   jest.clearAllMocks()
   mockTabBarStyle = { backgroundColor: "light" }
@@ -391,9 +417,8 @@ describe("MapComponent", () => {
     })
   })
 
-  it("keeps the 20 past the top system bar, and adds no bottom or side inset the tab bar and Screen already took", async () => {
+  it("keeps the 20 past the top system bar, and adds no side inset Screen already took", async () => {
     mockTopInset = 47
-    mockBottomInset = 34
     mockLeftInset = 44
     const { getByTestId } = renderMap()
 
@@ -405,12 +430,37 @@ describe("MapComponent", () => {
     })
     expect(
       StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
-    ).toMatchObject({ bottom: 20, right: 20 })
-    // The map ends at the top of the tab bar, which is 60 + insets.bottom tall
-    // (root-navigator.tsx), so adding the inset here would leave a 54 gap.
+    ).toMatchObject({ right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      left: 20,
+    })
+  })
+
+  it("keeps the bottom controls 20 above the tab bar, which already took the system bar", async () => {
+    // Rendered in a real tab navigator, so the offset comes from the bar it
+    // actually sits on rather than from what the test assumes about it.
+    mockBottomInset = 34
+    const { getByTestId } = renderMapInTabs()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 20 })
     expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
       bottom: 20,
-      left: 20,
+    })
+  })
+
+  it("keeps the bottom controls 20 past the system bar where no tab bar is under the map", async () => {
+    mockBottomInset = 34
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 54 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 54,
     })
   })
 
