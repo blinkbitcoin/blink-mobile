@@ -58,6 +58,8 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
           completionTimeoutSecs: undefined,
         }
       : undefined,
+    // Only a send that converts dollars can see its quote move with the price.
+    quoteRef: isUsdSend ? {} : undefined,
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
