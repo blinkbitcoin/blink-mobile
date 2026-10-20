@@ -1,5 +1,5 @@
 import React from "react"
-import { Linking, Share, StyleSheet } from "react-native"
+import { Linking, Platform, Share, StyleSheet } from "react-native"
 import { getAnimatedStyle } from "react-native-reanimated"
 import {
   fireGestureHandler,
@@ -450,19 +450,51 @@ describe("PlaceSheet fallbacks", () => {
     expect(mockedOpenExternal).toHaveBeenCalledWith("https://x.com/satoshicoffee")
   })
 
-  it("navigates by coordinate when the place has no name to label the pin with", async () => {
-    // An empty label turns the maps: URL into a text search that finds nothing.
-    setDetails(details({ name: undefined }))
-    const { getByText } = renderSheet()
+  describe("Navigate", () => {
+    const APP_URL = "comgooglemaps://?daddr=51.5072,-0.1276"
+    const WEB_URL = "https://www.google.com/maps/dir/?api=1&destination=51.5072,-0.1276"
+    const originalOS = Platform.OS
 
-    await waitFor(() => expect(getByText("Navigate")).toBeTruthy())
-    fireEvent.press(getByText("Navigate"))
+    afterEach(() => {
+      Platform.OS = originalOS
+    })
 
-    // geo:/maps: must reach the OS — the in-app browser cannot open them.
-    const url = (Linking.openURL as jest.Mock).mock.calls[0][0] as string
-    expect(url).toContain("51.5072")
-    expect(url).not.toContain("()")
-    expect(url).not.toContain("@51.5072")
+    const pressNavigate = async () => {
+      const { getByText } = renderSheet()
+      await waitFor(() => expect(getByText("Navigate")).toBeTruthy())
+      fireEvent.press(getByText("Navigate"))
+    }
+
+    it("opens Google Maps rather than Apple Maps on iOS", async () => {
+      Platform.OS = "ios"
+      jest.spyOn(Linking, "canOpenURL").mockResolvedValue(true)
+
+      await pressNavigate()
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(APP_URL))
+    })
+
+    it("falls back to Google Maps on the web on iOS without the app", async () => {
+      Platform.OS = "ios"
+      jest.spyOn(Linking, "canOpenURL").mockResolvedValue(false)
+
+      await pressNavigate()
+
+      // Through the OS, not the in-app browser, like every other way out of it.
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(WEB_URL))
+      expect(mockedOpenExternal).not.toHaveBeenCalled()
+    })
+
+    it("hands Android the Google Maps link, which the app claims", async () => {
+      Platform.OS = "android"
+      const canOpen = jest.spyOn(Linking, "canOpenURL")
+
+      await pressNavigate()
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(WEB_URL))
+      expect(canOpen).not.toHaveBeenCalled()
+      expect(mockedOpenExternal).not.toHaveBeenCalled()
+    })
   })
 })
 

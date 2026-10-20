@@ -1,5 +1,5 @@
 import {
-  directionsUrl,
+  googleMapsDirections,
   hostOf,
   isWebUrl,
   mailtoUrl,
@@ -121,24 +121,12 @@ describe("merchantUrl", () => {
   })
 })
 
-describe("directionsUrl", () => {
-  const place = { latitude: 51.5072, longitude: -0.1276 }
-
-  it("labels the pin with the merchant's name", () => {
-    expect(directionsUrl(place, "Satoshi Coffee", "ios")).toBe(
-      "maps:0,0?q=Satoshi%20Coffee@51.5072,-0.1276",
-    )
-    expect(directionsUrl(place, "Satoshi Coffee", "android")).toBe(
-      "geo:51.5072,-0.1276?q=51.5072,-0.1276(Satoshi%20Coffee)",
-    )
-  })
-
-  it("drops to a bare coordinate when there is no name", () => {
-    // An empty label makes both platforms search for the literal string.
-    expect(directionsUrl(place, undefined, "ios")).toBe("maps:0,0?ll=51.5072,-0.1276")
-    expect(directionsUrl(place, undefined, "android")).toBe(
-      "geo:51.5072,-0.1276?q=51.5072,-0.1276",
-    )
+describe("googleMapsDirections", () => {
+  it("routes to the coordinate in the Google Maps app and on the web", () => {
+    expect(googleMapsDirections({ latitude: 51.5072, longitude: -0.1276 })).toEqual({
+      app: "comgooglemaps://?daddr=51.5072,-0.1276",
+      web: "https://www.google.com/maps/dir/?api=1&destination=51.5072,-0.1276",
+    })
   })
 })
 
