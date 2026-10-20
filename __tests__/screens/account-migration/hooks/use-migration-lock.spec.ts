@@ -24,6 +24,16 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   }),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+}))
+
+/** A phase the server may add after this build shipped; each test names its own, since
+ *  the hook reports a given phase only once per process. */
+const phaseFromANewerServer = (name: string) => name as unknown as MigrationStatus
+
 const serverReports = (
   status: MigrationStatus | null,
   loading = false,
@@ -237,6 +247,46 @@ describe("useMigrationLock", () => {
     /** A settled read with no migration on it is never the server's word for a cleared
      *  flow (that arrives as NOT_STARTED), so it must not route a commit point to the
      *  restart: only a status the server sent is an answer. */
+    /** An older build handed a newer phase must hold and ask again rather than resume or
+     *  restart a commit point on a guess, and must not lock on one either. */
+    it("has no answer for a phase this build does not know", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
+      )
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+      expect(result.current.isLocked).toBe(false)
+    })
+
+    it("reports a phase this build does not know, once", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(phaseFromANewerServer("AWAITING_COMPLIANCE")),
+      )
+
+      const { rerender } = renderHook(() => useMigrationLock())
+      rerender({})
+      renderHook(() => useMigrationLock())
+
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration status unknown to this build",
+        expect.objectContaining({
+          message: expect.stringContaining("AWAITING_COMPLIANCE"),
+        }),
+      )
+    })
+
+    it("reports nothing for the phases it knows", () => {
+      for (const status of Object.values(MigrationStatus)) {
+        mockUseMigrationStatus.mockReturnValue(serverReports(status))
+        renderHook(() => useMigrationLock())
+      }
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
+
     it("has no answer when a settled read carried no status", () => {
       mockUseMigrationStatus.mockReturnValue(serverReports(null))
 

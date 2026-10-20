@@ -1,7 +1,10 @@
+import { useEffect } from "react"
+
 import { MigrationStatus } from "@app/graphql/generated"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { ServerMigrationFlow } from "@app/types/migration"
 import { AccountType } from "@app/types/wallet"
+import { reportError } from "@app/utils/error-logging"
 
 import { useMigrationStatus } from "./use-migration-status"
 
@@ -32,6 +35,15 @@ const FLOW_BY_STATUS: Record<MigrationStatus, ServerMigrationFlow> = {
   [MigrationStatus.Completed]: ServerMigrationFlow.Completed,
 }
 
+/** The map is exhaustive only for the phases this build knows: the server's enum grows
+ *  without an app release, and an older build handed a newer phase would otherwise read
+ *  it as no flow at all and route on that guess. */
+const isKnownStatus = (status: MigrationStatus): boolean =>
+  Object.prototype.hasOwnProperty.call(FLOW_BY_STATUS, status)
+
+/** One report per phase this build has never heard of, however many screens read it. */
+const reportedUnknownStatuses = new Set<string>()
+
 /** A failed re-read can leave the previous answer in place, so a status is only an answer
  *  while the read that carries it is current. A null migration is never the server's
  *  word for a cleared flow: its resolver answers NOT_STARTED for an account with no record
@@ -43,6 +55,9 @@ const resolveServerFlow = (
 ): ServerMigrationFlow => {
   if (hasError) return ServerMigrationFlow.Unanswered
   if (status === null) return ServerMigrationFlow.Unanswered
+  /** A phase this build cannot place is not an answer it can act on: holding and asking
+   *  again is recoverable, a resume or restart on a guess is not. */
+  if (!isKnownStatus(status)) return ServerMigrationFlow.Unanswered
   return FLOW_BY_STATUS[status]
 }
 
@@ -64,6 +79,16 @@ export const useMigrationLock = (): MigrationLock => {
    *  on a self-custodial launch, whose result would be discarded anyway. */
   const isCustodial = activeAccount?.type === AccountType.Custodial
   const { status, loading, error, refetch } = useMigrationStatus({ skip: !isCustodial })
+
+  const unknownStatus = status !== null && !isKnownStatus(status) ? status : null
+  useEffect(() => {
+    if (unknownStatus === null || reportedUnknownStatuses.has(unknownStatus)) return
+    reportedUnknownStatuses.add(unknownStatus)
+    reportError(
+      "Migration status unknown to this build",
+      new Error(`Unknown migration status: ${unknownStatus}`),
+    )
+  }, [unknownStatus])
 
   /** Never asked, so never answered: a self-custodial session neither resumes nor
    *  restarts a custodial flow on the strength of a read that did not run. An unhydrated
