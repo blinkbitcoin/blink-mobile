@@ -106,28 +106,23 @@ export const merchantUrl = (
 ): string => `${BTCMAP_SITE_URL}/merchant/${details?.osmId ?? placeId}`
 
 /**
- * A platform maps URL for a coordinate. Without a name there is nothing to
- * label the pin with, and an empty label turns both platforms' URLs into a text
- * search that finds nothing — so the bare-coordinate form is used instead.
+ * Directions to a coordinate in Google Maps, which is what people reach for on
+ * both platforms — iOS users included, so Apple Maps is not the default there.
+ *
+ * `app` is the only way into the Google Maps app on iOS. `web` is the fallback
+ * there, and the URL to open on Android, where the Google Maps app claims it
+ * itself; without the app, it still gives directions in a browser.
  */
-export const directionsUrl = (
-  place: { latitude: number; longitude: number },
-  name: string | undefined,
-  platform: "ios" | "android",
-): string => {
-  const { latitude, longitude } = place
-  const label = name ? encodeURIComponent(name) : ""
-
-  if (platform === "ios") {
-    return label
-      ? `maps:0,0?q=${label}@${latitude},${longitude}`
-      : `maps:0,0?ll=${latitude},${longitude}`
+export const googleMapsDirections = (place: {
+  latitude: number
+  longitude: number
+}): { app: string; web: string } => {
+  const destination = `${place.latitude},${place.longitude}`
+  return {
+    app: `comgooglemaps://?daddr=${destination}`,
+    web: `https://www.google.com/maps/dir/?api=1&destination=${destination}`,
   }
-
-  return label
-    ? `geo:${latitude},${longitude}?q=${latitude},${longitude}(${label})`
-    : `geo:${latitude},${longitude}?q=${latitude},${longitude}`
 }
 
-/** Web links get the in-app browser; tel:, geo:/maps: and lightning: must not. */
+/** Web links get the in-app browser; tel:, mailto: and lightning: must not. */
 export const isWebUrl = (url: string): boolean => /^https?:\/\//i.test(url.trim())
