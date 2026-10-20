@@ -518,6 +518,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
       setGoToNextScreenWhenValid(false)
       navigation.navigate("sendBitcoinDetails", {
         paymentDestination: destinationState.destination,
+        sendingWalletId: route.params?.sendingWalletId,
       })
       return
     }
@@ -530,7 +531,13 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
         receiveDestination: destinationState.destination,
       })
     }
-  }, [destinationState, goToNextScreenWhenValid, navigation, setGoToNextScreenWhenValid])
+  }, [
+    destinationState,
+    goToNextScreenWhenValid,
+    navigation,
+    setGoToNextScreenWhenValid,
+    route.params?.sendingWalletId,
+  ])
 
   // setTimeout here allows for the main JS thread to update the UI before the long validateDestination call
   const waitAndValidateDestination = useCallback(

@@ -32,7 +32,9 @@ export const FeatureItem: React.FC<FeatureItemProps> = ({ feature }) => {
         style={styles.iconStyle}
         size={19}
       />
-      <Text type="p2">{feature.title}</Text>
+      <Text type="p2" style={styles.title}>
+        {feature.title}
+      </Text>
     </View>
   )
 }
@@ -52,6 +54,9 @@ const useStyles = makeStyles(() => {
       height: containerSize,
       alignItems: "center",
       justifyContent: "center",
+    },
+    title: {
+      flex: 1,
     },
   }
 })
