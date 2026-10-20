@@ -6,7 +6,7 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CenterLocationAndroid from "../../assets/icons/center-location-android.svg"
 
-import { MAP_CONTROL_INSET } from "./map-search-bar"
+import { MAP_CONTROL_INSET } from "./map-layout"
 
 // Round, so it reads as a floating action over the map rather than a card.
 const BUTTON_SIZE = 44
@@ -15,17 +15,14 @@ type Props = {
   requestPermissions: () => void
   centerOnUser: () => void
   permissionStatus?: PermissionStatus
-  // 0 when a sibling already owns the screen bottom. Otherwise the system bar.
-  bottomInset: number
 }
 
 export default function LocationButtonCopy({
   permissionStatus,
   centerOnUser,
   requestPermissions,
-  bottomInset,
 }: Props) {
-  const styles = useStyles({ bottomInset })
+  const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
@@ -43,13 +40,13 @@ export default function LocationButtonCopy({
   )
 }
 
-const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number }) => ({
+const useStyles = makeStyles(({ colors }) => ({
   button: {
-    // 20 past the obstruction, never instead of it. While the add-place form is
-    // open that obstruction is 0: the form is a sibling, so this edge is already
-    // its top, and adding the system bar would lift the button past 20.
+    // Measured from the bottom of the map, which is never the screen edge: it is
+    // the top of the tab bar, or of the add-place form while one is open. Both
+    // already pay for the system bar, so it is not added here.
     position: "absolute",
-    bottom: bottomInset + MAP_CONTROL_INSET,
+    bottom: MAP_CONTROL_INSET,
     right: MAP_CONTROL_INSET,
     zIndex: 99,
   },
