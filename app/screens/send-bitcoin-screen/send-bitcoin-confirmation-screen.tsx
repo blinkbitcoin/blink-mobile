@@ -40,7 +40,10 @@ import {
   ZeroUsdMoneyAmount,
 } from "@app/types/amounts"
 import { useSendDustWarning, useTranslateSdkError } from "@app/self-custodial/hooks"
-import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import {
+  isSelfCustodialErrorCode,
+  SelfCustodialErrorCode,
+} from "@app/self-custodial/sdk-error"
 import { logPaymentAttempt, logPaymentResult } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { CommonActions, RouteProp, useNavigation } from "@react-navigation/native"
@@ -64,7 +67,7 @@ import { SendHero } from "./send-hero"
 import { useSendBalances } from "./hooks/use-send-wallets"
 import { useVerifyPaymentSettled } from "./hooks/use-verify-payment-settled"
 import { PaymentSendExtraInfo } from "./payment-details/index.types"
-import useFee from "./use-fee"
+import { useReviewQuote } from "./review/use-review-quote"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
   PaymentSendCompletedStatus,
@@ -115,7 +118,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     paymentType,
     sendingWalletDescriptor,
     sendPaymentMutation,
-    getFee,
     settlementAmount,
     memo: note,
     unitOfAccountAmount,
@@ -166,7 +168,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     },
   } = useAppConfig()
 
-  const fee = useFee(getFee)
+  const { fee, recipientAmount, isAwaitingIncludedFee, requote } =
+    useReviewQuote(paymentDetail)
 
   const sentTransition = useSentTransition()
   /** Review is headerless and runs edge to edge, so the Sent glow can fill the whole
@@ -254,10 +257,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     })
   }
 
-  const displayAmount = paymentDetail.convertMoneyAmount(
-    settlementAmount,
-    DisplayCurrency,
-  )
+  // What the recipient gets: the amount less the fee, when the fee comes out of it.
+  const displayAmount = paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency)
 
   const currencyAmount = formatMoneyAmount({
     moneyAmount: displayAmount,
@@ -265,8 +266,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const secondaryAmount = getSecondaryAmountIfCurrencyIsDifferent({
     primaryAmount: displayAmount,
-    walletAmount: paymentDetail.convertMoneyAmount(settlementAmount, WalletCurrency.Btc),
-    displayAmount: paymentDetail.convertMoneyAmount(settlementAmount, DisplayCurrency),
+    walletAmount: paymentDetail.convertMoneyAmount(recipientAmount, WalletCurrency.Btc),
+    displayAmount: paymentDetail.convertMoneyAmount(recipientAmount, DisplayCurrency),
   })
 
   const satAmount = formatMoneyAmount({
@@ -276,7 +277,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   /** The hero pairs the display currency with the sending wallet's, the pair the keypad
    *  swaps between, led by whichever the sender typed in. */
   const heroWalletAmount = paymentDetail.convertMoneyAmount(
-    settlementAmount,
+    recipientAmount,
     sendingWalletDescriptor.currency,
   )
   const heroPrimaryAmount = leadsWithWalletCurrency ? heroWalletAmount : displayAmount
@@ -430,6 +431,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         return
       }
 
+      if (errorsMessage === SelfCustodialErrorCode.QuoteMoved) {
+        requote()
+        return
+      }
+
       if (status === "ALREADY_PAID") {
         setPaymentError(LL.SendBitcoinConfirmationScreen.invoiceAlreadyPaid())
         ReactNativeHapticFeedback.trigger("notificationError", {
@@ -510,6 +516,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     navigateToCompleted,
     verifyPaymentSettled,
     translateSdkError,
+    requote,
   ])
 
   let validAmount = true
@@ -526,9 +533,10 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     ? paymentDetail.convertMoneyAmount(fee.amount, settlementAmount.currency)
     : zeroSettlementAmount
 
+  // A fee taken out of the amount is already inside it.
   const totalAmount = addMoneyAmounts({
     a: settlementAmount,
-    b: feeInSettlementCurrency,
+    b: paymentDetail.isFeeIncluded ? zeroSettlementAmount : feeInSettlementCurrency,
   })
 
   const skipBalanceCheck = isSendingMax || hasAttemptedSend
@@ -777,6 +785,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 !validAmount ||
                 !sendPayment ||
                 Boolean(paymentFailure) ||
+                isAwaitingIncludedFee ||
                 feeUnavailable ||
                 dustNotEvaluable
               }

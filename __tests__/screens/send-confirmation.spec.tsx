@@ -220,7 +220,12 @@ jest.mock("@app/screens/send-bitcoin-screen/use-send-payment", () => ({
 const mockUseFee = jest.fn()
 jest.mock("@app/screens/send-bitcoin-screen/use-fee", () => ({
   __esModule: true,
-  default: () => mockUseFee(),
+  default: (...args: unknown[]) => mockUseFee(...args),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 const verifyPaymentSettledMock = jest.fn()
@@ -1963,6 +1968,62 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
       ).toBeNull()
+    })
+  })
+
+  describe("a fee taken out of the amount, and a quote that moved", () => {
+    const feeIncludedRoute = (sats: number) => {
+      const base = buildOnchainRoute(sats)
+      return {
+        ...base,
+        params: {
+          paymentDetail: { ...base.params.paymentDetail, isFeeIncluded: true },
+        },
+      } as unknown as ReturnType<typeof buildBtcSettlementRoute>
+    }
+
+    afterEach(() => {
+      mockPreferredAmountCurrency.current = undefined
+    })
+
+    it("leads with what the recipient gets: the amount less the fee", async () => {
+      mockPreferredAmountCurrency.current = PreferredAmountCurrency.Default
+      btcFee(100)
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children).toBe("900 SAT")
+    })
+
+    it("keeps the slider off until the fee it takes out is quoted", async () => {
+      // A max-fee estimate leaves the slider on for a fee paid on top; one taken out of
+      // the amount has to be the real quote.
+      mockUseFee.mockReturnValue({
+        status: "error",
+        amount: { amount: 100, currency: WalletCurrency.Btc, currencyCode: "BTC" },
+      })
+      await renderReview(feeIncludedRoute(1000))
+
+      expect(lastSliderProps().disabled).toBe(true)
+    })
+
+    it("quotes again with a toast, and no failure, when the quote moved before the slide", async () => {
+      btcFee(100)
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: SelfCustodialErrorCode.QuoteMoved,
+      })
+      await renderReview(buildBtcSettlementRoute(1000))
+      expect(mockUseFee).toHaveBeenLastCalledWith(expect.anything(), 0)
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ type: "warning" }),
+      )
+      expect(mockUseFee).toHaveBeenLastCalledWith(expect.anything(), 1)
+      expect(lastSliderProps().disabled).toBe(false)
     })
   })
 
