@@ -336,12 +336,16 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       extraInfo?: PaymentSendExtraInfo
       transaction?: Partial<Transaction> | null
     }) => {
-      await saveLnAddressContact({
-        paymentType,
-        destination,
-        isMerchant:
-          paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
-      })
+      /** Started only once the outcome is on screen and never awaited by the send: a
+       *  contact that fails to save must not read as a payment that failed. */
+      const saveContact = () => {
+        saveLnAddressContact({
+          paymentType,
+          destination,
+          isMerchant:
+            paymentDetail.paymentType === "lnurl" ? paymentDetail.isMerchant : undefined,
+        }).catch((err) => reportError("send-bitcoin-confirmation:save-contact", err))
+      }
 
       const isSuccess = status === "SUCCESS"
       const params: RootStackParamList["sendBitcoinCompleted"] = {
@@ -372,17 +376,18 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           ignoreAndroidSystemSettings: true,
         })
         sentReceiptRef.current = params
-        await playSent({
+        const sent = playSent({
           primaryAmount: heroPrimaryText,
           hasSecondaryAmount: Boolean(heroSecondaryText),
         })
+        saveContact()
+        await sent
         return
       }
 
+      /** Pending is not a success: no success haptic, and no Sent. */
       resetToCompleted(params)
-      ReactNativeHapticFeedback.trigger("notificationSuccess", {
-        ignoreAndroidSystemSettings: true,
-      })
+      saveContact()
     },
     [
       playSent,

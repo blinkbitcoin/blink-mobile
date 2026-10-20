@@ -1,4 +1,5 @@
 import React from "react"
+import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
 import {
@@ -518,6 +519,56 @@ describe("SendBitcoinConfirmationScreen", () => {
       paymentType: "lnurl",
       destination: defaultLightningParams.lnurl,
       isMerchant: false,
+    })
+  })
+
+  describe("a pending payment", () => {
+    const sendPending = async () => {
+      const { createLnurlPaymentDetails } = PaymentDetailsLightning
+      sendPaymentMock.mockResolvedValueOnce({ status: "PENDING", extraInfo: {} })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL
+            route={{
+              key: "sendBitcoinConfirmationScreen",
+              name: "sendBitcoinConfirmation",
+              params: {
+                paymentDetail: createLnurlPaymentDetails(defaultLightningParams),
+              },
+            }}
+          />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+    }
+
+    beforeEach(() => {
+      ;(ReactNativeHapticFeedback.trigger as jest.Mock).mockClear()
+      navigationDispatchMock.mockClear()
+    })
+
+    it("plays no success haptic, since it may still fail", async () => {
+      await sendPending()
+
+      expect(ReactNativeHapticFeedback.trigger).not.toHaveBeenCalledWith(
+        "notificationSuccess",
+        expect.anything(),
+      )
+      expect(navigationDispatchMock).toHaveBeenCalled()
+    })
+
+    it("still reaches its outcome when saving the contact fails", async () => {
+      saveLnAddressContactMock.mockRejectedValueOnce(new Error("contact boom"))
+
+      await sendPending()
+
+      expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+      expect(navigationDispatchMock).toHaveBeenCalled()
+      expect(screen.queryByText("contact boom")).toBeNull()
     })
   })
 
