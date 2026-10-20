@@ -2499,6 +2499,17 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       expect(sheet.getByText(LL.common.ok())).toBeTruthy()
     })
 
+    it("opens without the error haptic: it is a notice, not a failure", async () => {
+      ;(ReactNativeHapticFeedback.trigger as jest.Mock).mockClear()
+      await renderReview(buildUsdSettlementRoute(200))
+
+      expect(errorSheet()).toBeTruthy()
+      expect(ReactNativeHapticFeedback.trigger).not.toHaveBeenCalledWith(
+        "notificationError",
+        expect.anything(),
+      )
+    })
+
     it("closes on OK without leaving review, and the slider stays free to send", async () => {
       await renderReview(buildUsdSettlementRoute(200))
 

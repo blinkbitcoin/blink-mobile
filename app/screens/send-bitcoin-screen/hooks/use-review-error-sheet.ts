@@ -114,6 +114,7 @@ export const useReviewErrorSheet = ({
       title: LL.SendBitcoinConfirmationScreen.dustSweepSheetTitle(),
       message: lastNoticeText.current ?? "",
       button: { primaryLabel: LL.common.ok(), onPrimaryPress: sheet.dismiss },
+      hasHaptic: false,
       changeAmount: exits.changeAmount,
       dustSweepText,
     }
@@ -125,6 +126,7 @@ export const useReviewErrorSheet = ({
     title: LL.SendBitcoinScreen.problemSheetTitle(),
     message: shown?.message ?? "",
     button: exits.actionButton(shown?.action ?? "tryAgain"),
+    hasHaptic: true,
     changeAmount: exits.changeAmount,
     dustSweepText,
   }

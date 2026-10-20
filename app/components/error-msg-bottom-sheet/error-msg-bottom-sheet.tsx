@@ -19,6 +19,9 @@ type ErrorMsgBottomSheetProps = {
   /** A second way on, under the action, for a warning the user may accept. */
   secondaryLabel?: string
   onSecondaryPress?: () => void
+  /** False for a notice the user only acknowledges: nothing failed, so nothing buzzes.
+   *  Errors and warnings keep the error haptic. */
+  hasHaptic?: boolean
   testID?: string
 }
 
@@ -32,7 +35,7 @@ type ErrorMsgBottomSheetProps = {
  * down, pressing the scrim or Android back closes it without taking the action.
  *
  * Opening buzzes the error haptic, which makes the sheet the one buzz even when an inline
- * error appears with it.
+ * error appears with it. A notice opts out with `hasHaptic={false}`.
  */
 export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   isVisible,
@@ -43,6 +46,7 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   onPrimaryPress,
   secondaryLabel,
   onSecondaryPress,
+  hasHaptic = true,
   testID,
 }) => {
   const { bottom } = useSafeAreaInsets()
@@ -50,7 +54,7 @@ export const ErrorMsgBottomSheet: React.FC<ErrorMsgBottomSheetProps> = ({
   const {
     theme: { colors },
   } = useTheme()
-  useErrorHaptic(isVisible || undefined)
+  useErrorHaptic((hasHaptic && isVisible) || undefined)
 
   return (
     <BottomSheet

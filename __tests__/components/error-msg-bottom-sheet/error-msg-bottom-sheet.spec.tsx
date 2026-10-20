@@ -1,4 +1,5 @@
 import React from "react"
+import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import { StyleSheet } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
@@ -105,5 +106,26 @@ describe("ErrorMsgBottomSheet", () => {
       node = node.parent
     }
     expect(StyleSheet.flatten(node?.props.style).paddingBottom).toBe(HOME_INDICATOR + 20)
+  })
+
+  describe("haptic", () => {
+    beforeEach(() => {
+      ;(ReactNativeHapticFeedback.trigger as jest.Mock).mockClear()
+    })
+
+    it("buzzes the error haptic as it opens, for errors and warnings alike", () => {
+      renderSheet()
+
+      expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
+        "notificationError",
+        expect.anything(),
+      )
+    })
+
+    it("stays silent for a notice: nothing failed", () => {
+      renderSheet({ hasHaptic: false })
+
+      expect(ReactNativeHapticFeedback.trigger).not.toHaveBeenCalled()
+    })
   })
 })

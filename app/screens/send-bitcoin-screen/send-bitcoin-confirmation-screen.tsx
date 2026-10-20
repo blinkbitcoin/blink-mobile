@@ -807,6 +807,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         onClose={errorSheet.dismiss}
         title={errorSheet.title}
         body={errorSheet.message}
+        hasHaptic={errorSheet.hasHaptic}
         {...errorSheet.button}
         testID="review-error-msg-bottom-sheet"
       />
