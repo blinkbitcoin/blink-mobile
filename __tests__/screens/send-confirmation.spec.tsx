@@ -1012,7 +1012,14 @@ describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
       </ContextForScreen>,
     )
 
-    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expectInlineAndInSheet(/exceeds your balance/i)
   })
 })
 
@@ -1047,7 +1054,9 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       </ContextForScreen>,
     )
 
-    expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+    await flushEffects()
+
+    expectInlineAndInSheet(usdRemainderSweepMatcher)
   })
 
   it("does NOT render the warning when there is no amountAdjustment in the fee quote", async () => {
@@ -1207,7 +1216,14 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
       </ContextForScreen>,
     )
 
-    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+    await act(
+      () =>
+        new Promise((resolve) => {
+          setTimeout(resolve, 10)
+        }),
+    )
+
+    expectInlineAndInSheet(/exceeds your balance/i)
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 
@@ -2022,11 +2038,13 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(buildBtcSettlementRoute(1000))
 
       expect(outlineColor()).toBe(colors.light.error)
-      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expectInlineAndInSheet(/Total exceeds your balance/)
       expect(lastSliderProps().disabled).toBe(true)
 
-      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
-      expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
+      // The inline chip comes first; the sheet on top offers the same action.
+      const [chip] = screen.getAllByText(LL.SendBitcoinConfirmationScreen.changeAmount())
+      fireEvent.press(chip)
+      expectChangeAmountDispatched()
     })
 
     it("outlines the card in the warning colour and wraps the high-fee advice on-chain", async () => {
@@ -2047,7 +2065,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Fast }))
 
       expect(outlineColor()).toBe(colors.light.error)
-      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expectInlineAndInSheet(/Total exceeds your balance/)
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.lightningRecommended()),
       ).toBeNull()
@@ -2590,7 +2608,7 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
       await slide()
 
-      expectInlineAndInSheet(LL.SendBitcoinConfirmationScreen.somethingWentWrong())
+      expectInlineAndInSheet("route not found")
       expect(screen.queryByText(/Total exceeds your balance/)).toBeNull()
     })
   })

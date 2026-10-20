@@ -737,16 +737,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                   {"*" + LL.SendBitcoinConfirmationScreen.maxFeeSelected()}
                 </Text>
               ) : null}
-              {dustWarning.status === "visible" ? (
-                <WarningBanner>
-                  {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
-                    remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
-                    remainingSats: formatMoneyAmount({
-                      moneyAmount: dustWarning.remainingSats,
-                    }),
-                    minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
-                  })}
-                </WarningBanner>
+              {errorSheet.dustSweepText ? (
+                <WarningBanner>{errorSheet.dustSweepText}</WarningBanner>
               ) : null}
             </View>
           </Animated.View>
