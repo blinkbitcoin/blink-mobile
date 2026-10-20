@@ -6,6 +6,8 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { toastShow } from "@app/utils/toast"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -44,13 +46,29 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     })
   }
 
+  const resolveNotSavedMessage = (failure: StorageFailure | null): string => {
+    const { storageUnavailable } = LL.AccountMigration
+    if (failure === StorageFailure.OutOfSpace) {
+      return storageUnavailable.notSavedOutOfSpaceBody()
+    }
+    if (failure !== null) return storageUnavailable.notSavedBody()
+    return LL.errors.generic()
+  }
+
   const action = async () => {
     if (flow === "migration") {
       /** The acceptance is part of the migration's consent trail, so advance only once the
        *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
        *  user already accepted. */
-      const saved = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
-      if (!saved) return
+      const { isSaved, failure } = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
+      /** A Continue that answers a tap with nothing reads as a broken button. A store that
+       *  refused is named as the device's, a full disk most of all since the user can go
+       *  and fix it; a write turned away before it reached the store (no owner yet) is not
+       *  the device's fault and keeps the generic copy. */
+      if (!isSaved) {
+        toastShow({ message: resolveNotSavedMessage(failure), LL })
+        return
+      }
       navigation.navigate("selfCustodialBackupMethod")
       return
     }
