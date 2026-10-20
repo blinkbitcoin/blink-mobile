@@ -7435,6 +7435,10 @@ type RootTranslation = {
 		 */
 		paymentAlreadyAttempted: string
 		/**
+		 * W​a​i​t​ ​a​ ​m​o​m​e​n​t​,​ ​i​t​ ​w​i​l​l​ ​p​r​o​b​a​b​l​y​ ​g​o​ ​t​h​r​o​u​g​h​ ​s​o​o​n​.​ ​Y​o​u​r​ ​m​o​n​e​y​ ​w​i​l​l​ ​a​r​r​i​v​e​ ​s​a​f​e​l​y​ ​o​r​ ​s​t​a​y​ ​w​i​t​h​ ​y​o​u​.
+		 */
+		paymentMayStillLand: string
+		/**
 		 * S​l​i​d​e​ ​t​o​ ​C​o​n​f​i​r​m
 		 */
 		slideToConfirm: string
@@ -7532,6 +7536,10 @@ type RootTranslation = {
 		 * H​o​m​e
 		 */
 		home: string
+		/**
+		 * B​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d
+		 */
+		dustSweepSheetTitle: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -21343,6 +21351,10 @@ export type TranslationFunctions = {
 		 */
 		paymentAlreadyAttempted: () => LocalizedString
 		/**
+		 * Wait a moment, it will probably go through soon. Your money will arrive safely or stay with you.
+		 */
+		paymentMayStillLand: () => LocalizedString
+		/**
 		 * Slide to Confirm
 		 */
 		slideToConfirm: () => LocalizedString
@@ -21440,6 +21452,10 @@ export type TranslationFunctions = {
 		 * Home
 		 */
 		home: () => LocalizedString
+		/**
+		 * Before you send
+		 */
+		dustSweepSheetTitle: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */

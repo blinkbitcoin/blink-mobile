@@ -4,6 +4,7 @@ import Crypto from "react-native-quick-crypto"
 import { HomeAuthedDocument, PaymentSendResult } from "@app/graphql/generated"
 import { hasIdempotencyKey } from "@app/graphql/retry-policy"
 import { IdempotencyKeyRef } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
+import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import {
   IDEMPOTENCY_KEY_UNAVAILABLE,
   useSendPayment,
@@ -223,54 +224,84 @@ describe("useSendPayment attempt gating", () => {
     })
   })
 
-  it("reopens the send after a Failure and retries under the same key", async () => {
-    const idempotencyKeyRef: IdempotencyKeyRef = {}
-    const { result } = renderHook(() =>
-      useSendPayment(sendAllMutations(PaymentSendResult.Failure), idempotencyKeyRef),
-    )
+  it("stays locked after a Failure, so a second slide sends nothing", async () => {
+    const sendPaymentMutation = jest.fn(sendAllMutations(PaymentSendResult.Failure))
+    const { result } = renderHook(() => useSendPayment(sendPaymentMutation, {}))
 
     await invoke(result.current.sendPayment)
-    expect(result.current.sendPayment).toBeDefined()
-
     await invoke(result.current.sendPayment)
 
-    expect(randomUUIDMock).toHaveBeenCalledTimes(1)
-    expect(keysStampedOn("intraLedgerPaymentSend")).toEqual([KEY_A, KEY_A])
-    // Sticky even though the send reopened: the balance may already be debited.
-    expect(result.current.hasAttemptedSend).toBe(true)
+    expect(sendPaymentMutation).toHaveBeenCalledTimes(1)
+    expect(result.current.sendPayment).toBeUndefined()
+    expect(result.current.isSendSpent).toBe(true)
   })
 
-  it("reopens the send after a thrown mutation, rethrows, and retries under the same key", async () => {
-    // The ambiguous case: the request may have landed. A retry must be possible AND must
-    // carry the original key, so a true duplicate comes back as a 409 the screen resolves.
-    const idempotencyKeyRef: IdempotencyKeyRef = {}
-    const boom = new Error("network died")
-    const sendPaymentMutation = jest
-      .fn()
-      .mockImplementationOnce(async (fns) => {
-        await fns.intraLedgerPaymentSend({ variables: { input: {} } })
-        throw boom
-      })
-      .mockImplementationOnce(async (fns) => {
-        await fns.intraLedgerPaymentSend({ variables: { input: {} } })
-        return { status: PaymentSendResult.Success }
-      })
+  it("stays locked after a Failure whose reason is server text", async () => {
+    const sendPaymentMutation = jest.fn().mockResolvedValue({
+      status: PaymentSendResult.Failure,
+      errors: [{ message: "Payment amount '5000' sats exceeds balance '1000'" }],
+    })
+    const { result } = renderHook(() => useSendPayment(sendPaymentMutation, {}))
 
-    const { result } = renderHook(() =>
-      useSendPayment(sendPaymentMutation, idempotencyKeyRef),
-    )
+    await invoke(result.current.sendPayment)
+    await invoke(result.current.sendPayment)
+
+    expect(sendPaymentMutation).toHaveBeenCalledTimes(1)
+    expect(result.current.isSendSpent).toBe(true)
+  })
+
+  it("stays locked after a thrown mutation, which may have landed", async () => {
+    const sendPaymentMutation = jest.fn().mockImplementation(async (fns) => {
+      await fns.intraLedgerPaymentSend({ variables: { input: {} } })
+      throw new Error("network died")
+    })
+    const { result } = renderHook(() => useSendPayment(sendPaymentMutation, {}))
 
     await act(async () => {
       await expect(result.current.sendPayment?.()).rejects.toThrow("network died")
     })
+    await invoke(result.current.sendPayment)
 
-    expect(result.current.sendPayment).toBeDefined()
+    expect(sendPaymentMutation).toHaveBeenCalledTimes(1)
     expect(result.current.loading).toBe(false)
+    expect(result.current.sendPayment).toBeUndefined()
+    expect(result.current.isSendSpent).toBe(true)
+  })
+
+  const nothingSent: [string, string][] = [
+    ["InsufficientFunds", SelfCustodialErrorCode.InsufficientFunds],
+    ["BelowMinimum", SelfCustodialErrorCode.BelowMinimum],
+    ["InvalidInput", SelfCustodialErrorCode.InvalidInput],
+  ]
+
+  nothingSent.forEach(([label, code]) => {
+    it(`reopens the send after a ${label} failure, raised before anything was sent`, async () => {
+      const sendPaymentMutation = jest.fn().mockResolvedValue({
+        status: PaymentSendResult.Failure,
+        errors: [{ message: code }],
+      })
+      const { result } = renderHook(() => useSendPayment(sendPaymentMutation, {}))
+
+      await invoke(result.current.sendPayment)
+
+      expect(result.current.sendPayment).toBeDefined()
+      expect(result.current.isSendSpent).toBe(false)
+      // Sticky even though the send reopened: the balance check stays off.
+      expect(result.current.hasAttemptedSend).toBe(true)
+    })
+  })
+
+  it("stays locked after a self-custodial failure not classified as pre-send", async () => {
+    const sendPaymentMutation = jest.fn().mockResolvedValue({
+      status: PaymentSendResult.Failure,
+      errors: [{ message: SelfCustodialErrorCode.NetworkError }],
+    })
+    const { result } = renderHook(() => useSendPayment(sendPaymentMutation, {}))
 
     await invoke(result.current.sendPayment)
 
-    expect(randomUUIDMock).toHaveBeenCalledTimes(1)
-    expect(keysStampedOn("intraLedgerPaymentSend")).toEqual([KEY_A, KEY_A])
+    expect(result.current.sendPayment).toBeUndefined()
+    expect(result.current.isSendSpent).toBe(true)
   })
 
   it("sends nothing and does not lock out when the CSPRNG is unavailable", async () => {
