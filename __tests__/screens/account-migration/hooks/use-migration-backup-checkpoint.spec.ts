@@ -65,6 +65,21 @@ describe("useMigrationBackupCheckpoint", () => {
     )
   })
 
+  /** The save answers a failure today; one that ever throws is still reported rather than
+   *  left as an unhandled rejection. */
+  it("reports a save that throws", async () => {
+    const thrown = new Error("keystore locked")
+    mockSaveCheckpoint.mockRejectedValue(thrown)
+
+    renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration backup checkpoint save",
+      thrown,
+    )
+  })
+
   it("says nothing when the step is persisted", async () => {
     renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
     await flushEffects()

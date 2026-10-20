@@ -249,6 +249,28 @@ describe("useMigrationCheckpoint", () => {
     expect(result.current.hasError).toBe(true)
   })
 
+  /** The gate words a full disk apart from an unreadable store, and that wording comes
+   *  from the kind this read names. */
+  it("names a full disk as the reason the read failed", async () => {
+    mockLoadCheckpoint.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.storageFailure).toBe(StorageFailure.OutOfSpace)
+  })
+
+  it("names any other read failure as unknown", async () => {
+    mockLoadCheckpoint.mockRejectedValue(new Error("Database Error"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.storageFailure).toBe(StorageFailure.Unknown)
+  })
+
   it("recovers through refetch after a failed load", async () => {
     mockLoadCheckpoint.mockRejectedValueOnce(new Error("corrupt"))
     mockLoadCheckpoint.mockResolvedValue({

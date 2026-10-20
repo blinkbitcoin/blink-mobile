@@ -27,12 +27,16 @@ export const useMigrationBackupCheckpoint = (step: MigrationCheckpoint) => {
     /** The backup screens have nothing to hold back on a refused write — the phrase is on
      *  screen either way — but a resume that silently loses this step sends the user back
      *  through backup they already did, so the refusal is at least reported. */
-    saveCheckpoint(step).then(({ isSaved }) => {
-      if (isSaved) return
-      reportError(
-        "Migration backup checkpoint save",
-        new Error(`Backup step ${step} was not persisted`),
-      )
-    })
+    /** saveCheckpoint answers a failure rather than throwing today; the catch keeps this
+     *  report from becoming an unhandled rejection if that ever changes under it. */
+    saveCheckpoint(step)
+      .then(({ isSaved }) => {
+        if (isSaved) return
+        reportError(
+          "Migration backup checkpoint save",
+          new Error(`Backup step ${step} was not persisted`),
+        )
+      })
+      .catch((err) => reportError("Migration backup checkpoint save", err))
   }, [isFocused, loading, isSelfCustodial, hasResumableCheckpoint, saveCheckpoint, step])
 }
