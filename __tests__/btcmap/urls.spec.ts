@@ -1,5 +1,5 @@
 import {
-  googleMapsDirections,
+  directionsUrls,
   hostOf,
   isWebUrl,
   mailtoUrl,
@@ -121,12 +121,29 @@ describe("merchantUrl", () => {
   })
 })
 
-describe("googleMapsDirections", () => {
-  it("routes to the coordinate in the Google Maps app and on the web", () => {
-    expect(googleMapsDirections({ latitude: 51.5072, longitude: -0.1276 })).toEqual({
-      app: "comgooglemaps://?daddr=51.5072,-0.1276",
-      web: "https://www.google.com/maps/dir/?api=1&destination=51.5072,-0.1276",
+describe("directionsUrls", () => {
+  const LONDON = { latitude: 51.5072, longitude: -0.1276 }
+
+  it("tries the Google Maps app on iOS and falls back to Apple Maps, not the web", () => {
+    expect(directionsUrls(LONDON, "Satoshi Coffee", "ios")).toEqual({
+      probe: "comgooglemaps://?daddr=51.5072,-0.1276",
+      google: "comgooglemaps://?daddr=51.5072,-0.1276",
+      fallback: "maps://?daddr=51.5072,-0.1276",
     })
+  })
+
+  it("opens Google Maps' route on Android and falls back to the geo: chooser", () => {
+    expect(directionsUrls(LONDON, "Satoshi Coffee", "android")).toEqual({
+      probe: "google.navigation:q=51.5072,-0.1276",
+      google: "https://www.google.com/maps/dir/?api=1&destination=51.5072,-0.1276",
+      fallback: "geo:51.5072,-0.1276?q=51.5072,-0.1276(Satoshi%20Coffee)",
+    })
+  })
+
+  it("leaves the geo: label off an unnamed place rather than searching for nothing", () => {
+    expect(directionsUrls(LONDON, undefined, "android").fallback).toBe(
+      "geo:51.5072,-0.1276?q=51.5072,-0.1276",
+    )
   })
 })
 
