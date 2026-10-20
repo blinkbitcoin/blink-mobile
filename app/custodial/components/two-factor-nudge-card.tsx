@@ -6,7 +6,9 @@ import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 
 import { TwoFactorHomeCard } from "./two-factor-home-card"
 
-/** The nudge tier's card on the home, closed for good by its X. */
+/** The nudge tier's card on the home. Its X closes it for good at a tier the record
+ *  holds, and for the session when the tier comes from a balance the network has not
+ *  confirmed. */
 export const TwoFactorNudgeCard: React.FC = () => {
   const { LL } = useI18nContext()
   const { dismissNudgeCard } = useTwoFactorEnforcement()
