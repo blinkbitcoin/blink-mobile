@@ -9,6 +9,9 @@ export const SelfCustodialErrorCode = {
   NetworkError: "sc_network_error",
   InvalidInput: "sc_invalid_input",
   Generic: "sc_generic",
+  /** Not from the SDK: a dollar send whose fresh quote differs from the one on review.
+   *  Raised before anything is sent. */
+  QuoteMoved: "sc_quote_moved",
 } as const
 
 export type SelfCustodialErrorCode =

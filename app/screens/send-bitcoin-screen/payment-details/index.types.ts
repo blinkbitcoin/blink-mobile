@@ -162,6 +162,9 @@ type BasePaymentDetail<T extends WalletCurrency> = {
   setSendingWalletDescriptor: SetSendingWalletDescriptor<T>
   canSendMax?: boolean
   isSendingMax?: boolean
+  /** The fee comes out of the amount sent, so the recipient gets the amount less the fee:
+   *  a send-all, or a dollar send to a Lightning address. */
+  isFeeIncluded?: boolean
   setMemo?: SetMemo<T>
   canSetMemo: boolean
   setAmount?: SetAmount<T>

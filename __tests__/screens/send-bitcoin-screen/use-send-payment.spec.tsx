@@ -272,6 +272,7 @@ describe("useSendPayment attempt gating", () => {
     ["InsufficientFunds", SelfCustodialErrorCode.InsufficientFunds],
     ["BelowMinimum", SelfCustodialErrorCode.BelowMinimum],
     ["InvalidInput", SelfCustodialErrorCode.InvalidInput],
+    ["QuoteMoved", SelfCustodialErrorCode.QuoteMoved],
   ]
 
   nothingSent.forEach(([label, code]) => {

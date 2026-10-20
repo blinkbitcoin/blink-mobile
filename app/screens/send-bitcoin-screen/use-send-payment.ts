@@ -67,6 +67,7 @@ const NOTHING_SENT_CODES: ReadonlySet<string> = new Set([
   SelfCustodialErrorCode.InsufficientFunds,
   SelfCustodialErrorCode.BelowMinimum,
   SelfCustodialErrorCode.InvalidInput,
+  SelfCustodialErrorCode.QuoteMoved,
   IDEMPOTENCY_KEY_UNAVAILABLE,
 ])
 
