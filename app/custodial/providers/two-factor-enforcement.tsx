@@ -10,6 +10,10 @@ import React, {
 } from "react"
 
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
+import {
+  FreshAccountRead,
+  useFreshAccountRead,
+} from "@app/custodial/hooks/use-fresh-account-read"
 import { useSettingsScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
@@ -81,6 +85,8 @@ type SessionState = {
   /** Whether this session's start has read the wallets against their all-time highs,
    *  which it does once, when the fresh read lands. */
   isAllTimeHighRead: boolean
+  /** The nudge card closed for this session only, at a tier the record does not hold. */
+  isNudgeCardHidden: boolean
 }
 
 const INITIAL_SESSION: SessionState = {
@@ -89,6 +95,7 @@ const INITIAL_SESSION: SessionState = {
   countedTier: TwoFactorTier.None,
   dismissedTier: TwoFactorTier.None,
   isAllTimeHighRead: false,
+  isNudgeCardHidden: false,
 }
 
 type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
@@ -220,15 +227,13 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  from the same read the home shows the push from. */
   const migrateNowRemedy = useMigrateNowRemedy()
 
-  /** Each session reads the balances and the authenticator from the network: the
-   *  persisted cache can carry a session-old balance, and a prompt decided from it would
-   *  miss a threshold crossed elsewhere. Once answered, the session keeps the cached
-   *  copy. */
-  const { data, loading: isReadingAccount } = useSettingsScreenQuery({
-    skip: !isEnabled,
-    fetchPolicy: "cache-and-network",
-    nextFetchPolicy: "cache-first",
-  })
+  /** The account is read from the cache, which every reader shares; each session reads
+   *  it fresh from the network into that cache, and says whether it did. The persisted
+   *  cache can carry a session-old balance, and a prompt decided from it would miss a
+   *  threshold crossed elsewhere. */
+  const { data } = useSettingsScreenQuery({ skip: !isEnabled, fetchPolicy: "cache-only" })
+  const freshRead = useFreshAccountRead(isEnabled)
+  const isReadingAccount = freshRead === FreshAccountRead.Pending
   /** Read through the gate, not only the skip: a skipped query may still hand back the
    *  answer it last had, and that answer belongs to a session this one must not act on. */
   const me = isEnabled ? data?.me : undefined
@@ -239,6 +244,11 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  new ones land, since a reached tier never lowers. The fetch settles whether or not
    *  it succeeds. */
   const isAwaitingFreshRead = isReadingAccount || !isConfigFresh
+  /** A read that fails lands as what the account last read as: the session can decide
+   *  from it, but nothing is written from it, since a tier reached never lowers and a
+   *  high only rises. What the network has confirmed is what the record keeps. */
+  const isReadConfirmed = freshRead === FreshAccountRead.Confirmed
+  const isBalanceConfirmed = isConfigFresh && isReadConfirmed
 
   const commitStored = useCallback((next: StoredState) => {
     latestStoredRef.current = next
@@ -302,23 +312,36 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
    *  the previous one's tier must not leak into the context or the events. */
   const record = isLoadedForAccount ? stored.record : DEFAULT_TWO_FACTOR_ENFORCEMENT
   const wallets = me?.defaultAccount.wallets
-  /** No tier is read from the balance against thresholds that may be stale: until they
-   *  are fresh, the stored tier alone stands. */
-  const balanceTier = isConfigFresh
-    ? resolveBalanceTier(wallets, thresholds)
-    : TwoFactorTier.None
+  /** No tier is read from a balance or thresholds that may be stale: the persisted cache
+   *  answers before the network, and can hold a balance the account no longer has. A
+   *  tier raised from it, and the high seeded with it, would stay. Until the fresh read
+   *  lands, the stored tier alone stands; a read that fails lands as what the account
+   *  last read as, which is then all there is to decide from. */
+  const balanceTier = isAwaitingFreshRead
+    ? TwoFactorTier.None
+    : resolveBalanceTier(wallets, thresholds)
   const tier = balanceTier > record.highestTier ? balanceTier : record.highestTier
 
   /** The balance that raises the tier is also the first all-time high the recommended
    *  tier measures against, mid-session or not: a later session start below it is no
    *  new high, however far the balance fell in between. */
   useEffect(() => {
-    if (!isLoadedForAccount || balanceTier <= record.highestTier) return
+    const isRaised = balanceTier > record.highestTier
+    const isRaiseDue = isLoadedForAccount && isBalanceConfirmed && isRaised
+    if (!isRaiseDue) return
     const crossing = resolveEnforcedCrossing(wallets, thresholds)
     persist((current) =>
       withAllTimeHigh(withTierReached(current, balanceTier, crossing), wallets),
     )
-  }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, thresholds, persist])
+  }, [
+    isLoadedForAccount,
+    isBalanceConfirmed,
+    balanceTier,
+    record.highestTier,
+    wallets,
+    thresholds,
+    persist,
+  ])
 
   const hasAuthenticator = Boolean(me?.totpEnabled)
 
@@ -365,8 +388,8 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   /** The card belongs to the suggested tier alone: from the recommended tier on, that
    *  tier's own prompt asks instead, and the home never stacks two. The banner asks at
    *  every tier until the account holds an authenticator. */
-  const shouldShowNudgeCard =
-    unmetTier === TwoFactorTier.Suggested && !record.nudgeCardDismissed
+  const isNudgeCardClosed = record.nudgeCardDismissed || session.isNudgeCardHidden
+  const shouldShowNudgeCard = unmetTier === TwoFactorTier.Suggested && !isNudgeCardClosed
   const shouldShowSettingsBanner = unmetTier !== TwoFactorTier.None
 
   /** The reminder bulletin takes the card's place at the recommended tier, whether or not
@@ -405,11 +428,24 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     [accountId, tier],
   )
 
+  /** Closed for good at a tier this account's record holds. A card raised from a
+   *  balance the network never confirmed closes for the session only, as any prompt
+   *  does. A second press that lands before the card goes closes nothing more and
+   *  reports nothing. */
   const dismissNudgeCard = useCallback(() => {
-    const isDismissed = persist((current) => ({ ...current, nudgeCardDismissed: true }))
-    if (isDismissed)
-      logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.HomeCard })
-  }, [tier, persist])
+    const stored = latestStoredRef.current
+    const latest = latestSessionRef.current
+    const isAlreadyClosed = stored.record.nudgeCardDismissed || latest.isNudgeCardHidden
+    if (isAlreadyClosed) return
+    const isTierStored = stored.record.highestTier >= TwoFactorTier.Suggested
+    const isClosedForGood =
+      isTierStored && persist((current) => ({ ...current, nudgeCardDismissed: true }))
+    const isSessionAccount = accountId !== null && latest.accountId === accountId
+    const isClosable = isClosedForGood || isSessionAccount
+    if (!isClosable) return
+    if (!isClosedForGood) commitSession({ ...latest, isNudgeCardHidden: true })
+    logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.HomeCard })
+  }, [accountId, tier, persist, commitSession])
 
   const consumeSessionStart = useCallback(() => {
     commitSession({ ...latestSessionRef.current, isStartPending: false })
@@ -458,8 +494,16 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       const isBlockingStart =
         read.sessionPrompt === TwoFactorSessionPrompt.ProtectionRequired
       if (!isSessionAccount || isBlockingStart) return
+      /** Waved away for the session at any tier that counts one, so the prompt goes until
+       *  the next session start. Spent from the record only at a tier the record holds:
+       *  a prompt raised from a balance the network never confirmed must not spend the
+       *  dismissals of a tier the account may not have reached. */
+      const stored = latestStoredRef.current
+      const isStoredForAccount = stored.accountId === accountId
+      const isTierStored = isStoredForAccount && stored.record.highestTier >= promptTier
       const isCountable =
         promptTier >= TwoFactorTier.Recommended && promptTier > latest.countedTier
+      const isSpent = isCountable && isTierStored
       const isStartOwedToPrompt =
         read.isSessionStartDecided && promptTier >= read.unmetTier
       const isStartAwaitingRead = latest.isStartPending && read.isAwaitingFreshRead
@@ -468,7 +512,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
       const isHigherThanKept = promptTier > latest.dismissedTier
       const isKeptForRead = isStartAwaitingRead && isHigherThanKept
       if (!isCountable && !isStartTaken && !isKeptForRead) return
-      if (isCountable) persist((current) => withDismissal(current, promptTier))
+      if (isSpent) persist((current) => withDismissal(current, promptTier))
       commitSession({
         ...latest,
         isStartPending: latest.isStartPending && !isStartTaken,
@@ -522,7 +566,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   useEffect(() => {
     const latest = latestSessionRef.current
     const isSessionAccount = accountId !== null && latest.accountId === accountId
-    const isAccountRead = isLoadedForAccount && !isAwaitingFreshRead
+    const isAccountRead = isLoadedForAccount && isBalanceConfirmed
     const isHighDue = isSessionAccount && !latest.isAllTimeHighRead && isAccountRead
     if (!isHighDue) return
     const isTrackingHighs =
@@ -541,7 +585,7 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   }, [
     accountId,
     isLoadedForAccount,
-    isAwaitingFreshRead,
+    isBalanceConfirmed,
     tier,
     unmetTier,
     record,

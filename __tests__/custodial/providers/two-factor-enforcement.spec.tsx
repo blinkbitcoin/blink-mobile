@@ -22,6 +22,20 @@ jest.mock("@app/graphql/generated", () => ({
   useSettingsScreenQuery: (...args: unknown[]) => mockUseSettingsScreenQuery(...args),
 }))
 
+/** The session's network read, as the account helpers below set it: pending while the
+ *  account is loading, failed with an error, confirmed otherwise. */
+let mockFreshRead: string = "confirmed"
+jest.mock("@app/custodial/hooks/use-fresh-account-read", () => ({
+  ...jest.requireActual("@app/custodial/hooks/use-fresh-account-read"),
+  useFreshAccountRead: (isEnabled: boolean) => (isEnabled ? mockFreshRead : "idle"),
+}))
+
+const freshReadOf = (loading: boolean, error: Error | undefined): string => {
+  if (loading) return "pending"
+  if (error) return "failed"
+  return "confirmed"
+}
+
 let mockIsAuthed = true
 jest.mock("@app/graphql/is-authed-context", () => ({
   useIsAuthed: () => mockIsAuthed,
@@ -123,9 +137,8 @@ const setAccount = ({
   loading = false,
   error,
 }: MeOverrides = {}) => {
+  mockFreshRead = freshReadOf(loading, error)
   mockUseSettingsScreenQuery.mockReturnValue({
-    loading,
-    error,
     data: {
       me: {
         id: "user-1",
@@ -138,8 +151,7 @@ const setAccount = ({
   })
 }
 
-const setNoAccount = () =>
-  mockUseSettingsScreenQuery.mockReturnValue({ loading: false, data: undefined })
+const setNoAccount = () => mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
 
 const DEFAULT_RECORD: TwoFactorEnforcementRecord = {
   highestTier: TwoFactorTier.None,
@@ -210,16 +222,13 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     })
 
-    it("reads the account fresh from the network each session, then from the cache", async () => {
+    /** The account is read from the shared cache; the session's network read, apart,
+     *  says whether the network confirmed it. */
+    it("reads the account from the cache that the session's network read fills", async () => {
       await renderEnforcement()
 
-      expect(mockUseSettingsScreenQuery).toHaveBeenCalledWith(
-        expect.objectContaining({
-          skip: false,
-          fetchPolicy: "cache-and-network",
-          nextFetchPolicy: "cache-first",
-        }),
-      )
+      const options = mockUseSettingsScreenQuery.mock.calls.at(-1)?.[0]
+      expect(options).toEqual({ skip: false, fetchPolicy: "cache-only" })
     })
 
     it("shows nothing while the flag is off", async () => {
@@ -701,8 +710,11 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
     })
 
+    /** The local read is the stored tier, which never lowers: the cached balance is
+     *  not read until the fresh one lands. */
     it("is pending from the local read alone when it already owes a prompt, before the fresh read lands", async () => {
       setAccount({ sats: 5_000_000, loading: true })
+      storeRecord({ highestTier: TwoFactorTier.Enforced })
 
       const { result } = await renderEnforcement()
 
@@ -777,11 +789,8 @@ describe("TwoFactorEnforcementProvider", () => {
     })
 
     it("stays inert when the fresh read fails with nothing cached, without holding the home", async () => {
-      mockUseSettingsScreenQuery.mockReturnValue({
-        loading: false,
-        error: new Error("network down"),
-        data: undefined,
-      })
+      mockUseSettingsScreenQuery.mockReturnValue({ data: undefined })
+      mockFreshRead = "failed"
 
       const { result } = await renderEnforcement()
 
@@ -1312,6 +1321,22 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
       expect(mockReportError).not.toHaveBeenCalled()
     })
 
+    /** While the next account's record is still being read, the stored record is the
+     *  previous account's: closing the card then writes to neither. */
+    it("closes no card into another account's record while the next one is being read", async () => {
+      storeRecord({ highestTier: TwoFactorTier.Suggested, highestSats: 50_000 })
+      const { result, rerender } = await renderEnforcement()
+      mockSetItem.mockClear()
+      mockGetItem.mockReturnValue(new Promise<string | null>(() => {}))
+      setAccount({ accountId: "custodial-account-2", sats: 50_000 })
+      await act(async () => rerender({}))
+
+      act(() => result.current.dismissNudgeCard())
+
+      expect(mockSetItem).not.toHaveBeenCalled()
+      expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
+    })
+
     it("never applies the previous account's record to the next one", async () => {
       storeRecord({ highestTier: TwoFactorTier.Suggested, nudgeCardDismissed: true })
       const { result, rerender } = await renderEnforcement()
@@ -1428,6 +1453,149 @@ describe("TwoFactorEnforcementProvider dismissals and account switches", () => {
   })
 })
 
+/** What the record keeps comes from what the network confirmed: the persisted cache
+ *  answers first, and a read that fails leaves only the cache to decide from. */
+describe("TwoFactorEnforcementProvider fresh read", () => {
+  beforeEach(resetProviderMocks)
+
+  /** The persisted cache answers before the network and can hold a balance the account
+   *  no longer has; a tier raised from it would never come down. */
+  it("raises no tier, and seeds no high, from a cached balance the fresh read then lowers", async () => {
+    storeRecord({ highestTier: TwoFactorTier.Recommended, highestSats: 600_000 })
+    setAccount({ sats: 6_000_000, loading: true })
+    const { result, rerender } = await renderEnforcement()
+
+    expect(result.current.tier).toBe(TwoFactorTier.Recommended)
+    expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
+    expect(mockSetItem).not.toHaveBeenCalled()
+
+    setAccount({ sats: 100_000 })
+    await act(async () => rerender({}))
+
+    expect(result.current.tier).toBe(TwoFactorTier.Recommended)
+    const written = mockSetItem.mock.calls.map(
+      ([, value]): TwoFactorEnforcementRecord => JSON.parse(value),
+    )
+    expect(written.every((record) => record.highestTier !== TwoFactorTier.Enforced)).toBe(
+      true,
+    )
+    expect(written.every((record) => record.highestSats < 6_000_000)).toBe(true)
+  })
+
+  /** A read that fails, then another query writing the cache: the session decides from
+   *  the account as last read, as it would from any, and the modal it raises is waved
+   *  away for the session, but the record keeps only what the network confirmed: no
+   *  tier, no high, and no spent dismissal of a tier the record does not hold. The next
+   *  launch with a network reads the account as it is. */
+  it("decides the session from a cached balance when the fresh read fails, but writes nothing from it", async () => {
+    storeRecord({ highestTier: TwoFactorTier.Recommended, highestSats: 600_000 })
+    setAccount({ sats: 6_000_000, loading: true })
+    const offline = await renderEnforcement()
+
+    setAccount({ sats: 6_000_000, error: new Error("network down") })
+    await act(async () => offline.rerender({}))
+    expect(offline.result.current.tier).toBe(TwoFactorTier.Enforced)
+    expect(offline.result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.SessionModal)
+
+    setAccount({ sats: 6_000_000 })
+    mockFreshRead = "failed"
+    await act(async () => offline.rerender({}))
+    act(() =>
+      offline.result.current.registerDismissal(TwoFactorTier.Enforced, {
+        prompt: TwoFactorPrompt.SessionModal,
+      }),
+    )
+
+    expect(offline.result.current.isSessionStartPending).toBe(false)
+    expect(mockSetItem).not.toHaveBeenCalled()
+    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
+    offline.unmount()
+
+    setAccount({ sats: 100_000, loading: true })
+    const { result, rerender } = await renderEnforcement()
+    setAccount({ sats: 100_000 })
+    await act(async () => rerender({}))
+
+    expect(result.current.tier).toBe(TwoFactorTier.Recommended)
+    expect(result.current.sessionPrompt).toBe(TwoFactorSessionPrompt.None)
+  })
+
+  /** The X still puts the bulletin away for the session when the record does not hold
+   *  the tier a failed read raised it from; it only spends nothing. */
+  it("puts the bulletin away when waved off after a failed read, spending nothing", async () => {
+    storeRecord({ highestTier: TwoFactorTier.Suggested, highestSats: 50_000 })
+    setAccount({ sats: 600_000, error: new Error("network down") })
+    const { result } = await renderEnforcement()
+    act(() => result.current.consumeSessionStart())
+    expect(result.current.shouldShowReminderBulletin).toBe(true)
+
+    act(() => result.current.dismissReminderBulletin())
+
+    expect(result.current.shouldShowReminderBulletin).toBe(false)
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  /** The card closes for good only at a tier the record holds: raised from a balance
+   *  the network never confirmed, it closes for the session and is back at the next
+   *  one. */
+  it("closes a nudge card raised after a failed read for the session only", async () => {
+    setAccount({ sats: 60_000, error: new Error("network down") })
+    const offline = await renderEnforcement()
+    expect(offline.result.current.shouldShowNudgeCard).toBe(true)
+
+    act(() => offline.result.current.dismissNudgeCard())
+
+    expect(offline.result.current.shouldShowNudgeCard).toBe(false)
+    expect(mockSetItem).not.toHaveBeenCalled()
+    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
+    offline.unmount()
+
+    setAccount({ sats: 60_000 })
+    const { result } = await renderEnforcement()
+
+    expect(result.current.shouldShowNudgeCard).toBe(true)
+  })
+
+  /** Two presses that land before the card goes count as one close. */
+  it("reports a double tap on the card's X as one dismissal, whether closed for good or for the session", async () => {
+    const online = await renderEnforcement()
+    const { dismissNudgeCard: closeForGood } = online.result.current
+    act(() => {
+      closeForGood()
+      closeForGood()
+    })
+    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
+    expect(mockSetItem).toHaveBeenCalledTimes(2)
+    online.unmount()
+
+    mockLogTwoFactorPromptDismissed.mockClear()
+    mockGetItem.mockResolvedValue(null)
+    setAccount({ sats: 60_000, error: new Error("network down") })
+    const offline = await renderEnforcement()
+    const { dismissNudgeCard: closeForSession } = offline.result.current
+    act(() => {
+      closeForSession()
+      closeForSession()
+    })
+
+    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
+  })
+
+  /** A failure is final for the session; a fresh login is a new one. */
+  it("writes again from the network once a fresh login reads it, after a failed read", async () => {
+    setAccount({ sats: 600_000, error: new Error("network down") })
+    const { rerender } = await renderEnforcement()
+    expect(mockSetItem).not.toHaveBeenCalled()
+
+    setNoAccount()
+    await act(async () => rerender({}))
+    setAccount({ sats: 600_000 })
+    await act(async () => rerender({}))
+
+    expect(lastWrittenRecord().highestTier).toBe(TwoFactorTier.Recommended)
+  })
+})
+
 /** The recommended tier reminds on the home, never at the session start and never by
  *  blocking: three sessions, then only when a wallet rises above its all-time high. */
 describe("TwoFactorEnforcementProvider reminder bulletin", () => {
@@ -1508,6 +1676,7 @@ describe("TwoFactorEnforcementProvider reminder bulletin", () => {
   /** An authenticator added elsewhere is not in the cached copy, so the bulletin waits
    *  for the fresh read rather than flash for an account that no longer owes it. */
   it("waits for the fresh read of the account before showing the bulletin", async () => {
+    storeRecord({ highestTier: TwoFactorTier.Recommended })
     setAccount({ sats: 500_000, loading: true })
     const { result, rerender } = await renderEnforcement()
     expect(result.current.reminderReason).toBe(TwoFactorReminderReason.FirstSessions)
