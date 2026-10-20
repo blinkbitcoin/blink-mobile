@@ -15,14 +15,17 @@ type Props = {
   requestPermissions: () => void
   centerOnUser: () => void
   permissionStatus?: PermissionStatus
+  // 0 when a sibling already owns the screen bottom. Otherwise the system bar.
+  bottomInset: number
 }
 
 export default function LocationButtonCopy({
   permissionStatus,
   centerOnUser,
   requestPermissions,
+  bottomInset,
 }: Props) {
-  const styles = useStyles()
+  const styles = useStyles({ bottomInset })
   const {
     theme: { colors },
   } = useTheme()
@@ -40,13 +43,13 @@ export default function LocationButtonCopy({
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number }) => ({
   button: {
-    // Measured from the bottom of the map's own half of the screen, which is the
-    // top of the add-place form whenever one is open — so nothing has to raise
-    // this to keep it clear of one.
+    // 20 past the obstruction, never instead of it. While the add-place form is
+    // open that obstruction is 0: the form is a sibling, so this edge is already
+    // its top, and adding the system bar would lift the button past 20.
     position: "absolute",
-    bottom: MAP_CONTROL_INSET,
+    bottom: bottomInset + MAP_CONTROL_INSET,
     right: MAP_CONTROL_INSET,
     zIndex: 99,
   },

@@ -39,6 +39,19 @@ jest.mock("@app/screens/map-screen/functions", () => ({
   getUserRegion: jest.fn(),
 }))
 
+let mockTopInset = 0
+let mockBottomInset = 0
+let mockLeftInset = 0
+jest.mock("react-native-safe-area-context", () => ({
+  ...jest.requireActual("react-native-safe-area-context"),
+  useSafeAreaInsets: () => ({
+    top: mockTopInset,
+    bottom: mockBottomInset,
+    left: mockLeftInset,
+    right: 0,
+  }),
+}))
+
 jest.mock("react-native-permissions", () => ({
   request: jest.fn().mockResolvedValue("granted"),
   RESULTS: {
@@ -285,6 +298,9 @@ beforeEach(() => {
   mockIsSelfCustodialAccount = false
   mockIsAtLeastLevelTwo = true
   mockBtcMapPlacesEnabled = true
+  mockTopInset = 0
+  mockBottomInset = 0
+  mockLeftInset = 0
   setDevBuild(false)
   mockSubmitPlace.mockResolvedValue({ submitted: true })
   setPlaces()
@@ -373,6 +389,41 @@ describe("MapComponent", () => {
       bottom: 20,
       left: 20,
     })
+  })
+
+  it("keeps the 20 past the system bar, and does not add side insets Screen already took", async () => {
+    mockTopInset = 47
+    mockBottomInset = 34
+    mockLeftInset = 44
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(StyleSheet.flatten(getByTestId("map-search-bar").props.style)).toMatchObject({
+      top: 67,
+      left: 20,
+      right: 20,
+    })
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 54, right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 54,
+      left: 20,
+    })
+  })
+
+  it("does not lift the locate button past 20 while the add-place form owns the bottom", async () => {
+    mockBottomInset = 34
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() =>
+      expect(
+        StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+      ).toMatchObject({ bottom: 20 }),
+    )
   })
 
   it("draws a pin for each place the clusterer resolves", async () => {
