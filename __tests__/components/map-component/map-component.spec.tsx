@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { Region } from "react-native-maps"
 import { generateSecureRandom } from "react-native-securerandom"
 import { v4 as uuidv4 } from "uuid"
@@ -354,6 +355,24 @@ describe("MapComponent", () => {
     const { queryByText } = renderMap()
 
     await waitFor(() => expect(queryByText(/OpenStreetMap/)).toBeNull())
+  })
+
+  it("keeps the search bar, the locate and add-place buttons 20 in from the map's edges", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(StyleSheet.flatten(getByTestId("map-search-bar").props.style)).toMatchObject({
+      top: 20,
+      left: 20,
+      right: 20,
+    })
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 20, right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 20,
+      left: 20,
+    })
   })
 
   it("draws a pin for each place the clusterer resolves", async () => {
