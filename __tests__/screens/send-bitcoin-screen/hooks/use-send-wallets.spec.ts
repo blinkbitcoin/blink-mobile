@@ -20,7 +20,6 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockUseDollarBalanceRestricted(),
   useDollarBalanceGate: () => ({
     isGated: mockUseDollarBalanceRestricted(),
     isRegionPending: mockIsRegionPending(),

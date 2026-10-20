@@ -1,6 +1,7 @@
 import React from "react"
 import { it } from "@jest/globals"
 import { MockedResponse } from "@apollo/client/testing"
+import { GraphQLError } from "graphql"
 import { act, fireEvent, render, waitFor } from "@testing-library/react-native"
 import { RefreshControl, StyleSheet } from "react-native"
 import { SafeAreaView } from "react-native-safe-area-context"
@@ -10,6 +11,7 @@ import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 import {
   AccountLevel,
+  BulletinsDocument,
   HomeAuthedDocument,
   HomeUnauthedDocument,
   Network,
@@ -18,6 +20,7 @@ import {
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
   NormalizedTransaction,
@@ -85,10 +88,12 @@ const mockToggleBalanceMode = jest.fn()
 // eslint-disable-next-line prefer-const
 let mockBalanceModeValue: "btc" | "usd" = "usd"
 let mockDollarBalanceRestrictedOverride = false
+let mockDollarRegionDeterminedOverride = true
 let mockRegionPendingOverride = false
 let mockTransferBlockedOverride = false
 let mockTransferRegionPendingOverride = false
 let mockDollarBalanceModalVisible = false
+let mockDollarBalanceModalRegionUnknown = false
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () =>
@@ -154,16 +159,39 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => mockDollarBalanceRestrictedOverride,
+  useDollarBalanceRestriction: () => ({
+    isRestricted: mockDollarBalanceRestrictedOverride,
+    isRegionPending: mockRegionPendingOverride,
+    isRegionDetermined: mockDollarRegionDeterminedOverride,
+  }),
   useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
   useDollarBalanceGate: () => ({
     isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
+    reason: mockDollarGateReason(),
   }),
 }))
 
+/** The gate's own reading of a closed gate, mirrored so the modal's copy can be asserted. */
+const mockDollarGateReason = (): GateReason | null => {
+  if (mockIsAnonMode) return GateReason.Anon
+  if (!mockDollarBalanceRestrictedOverride) return null
+  return mockDollarRegionDeterminedOverride ? GateReason.Region : GateReason.UnknownRegion
+}
+
 jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
+}))
+
+const mockRefetchCustodialRestrictions = jest.fn()
+jest.mock("@app/custodial/providers/restrictions", () => ({
+  ...jest.requireActual("@app/custodial/providers/restrictions"),
+  useCustodialRestrictions: () => ({
+    verdict: {
+      status: jest.requireActual("@app/types/account").RestrictionVerdictStatus.Pending,
+    },
+    refetch: mockRefetchCustodialRestrictions,
+  }),
 }))
 
 const mockPromptEnhancedMode = jest.fn()
@@ -315,8 +343,15 @@ jest.mock("@app/components/dollar-balance-restriction-modal", () => {
   const ReactActual = jest.requireActual("react")
   const { Text } = jest.requireActual("react-native")
   return {
-    DollarBalanceRestrictionModal: ({ isVisible }: { isVisible: boolean }) => {
+    DollarBalanceRestrictionModal: ({
+      isVisible,
+      isRegionUnknown,
+    }: {
+      isVisible: boolean
+      isRegionUnknown: boolean
+    }) => {
       mockDollarBalanceModalVisible = isVisible
+      mockDollarBalanceModalRegionUnknown = isRegionUnknown
       return ReactActual.createElement(
         Text,
         { testID: "dollar-balance-restriction-modal" },
@@ -892,6 +927,7 @@ const resetHomeScreenMocks = () => {
   mockActiveWalletOverride = null
   mockActiveAccountOverride = null
   mockDollarBalanceRestrictedOverride = false
+  mockDollarRegionDeterminedOverride = true
   mockRegionPendingOverride = false
   mockTransferRegionPendingOverride = false
   mockMigratePromptVisible = false
@@ -902,6 +938,7 @@ const resetHomeScreenMocks = () => {
   mockReminderBulletinPhase = WindDownStatus.PreCutoff
   mockTransferBlockedOverride = false
   mockDollarBalanceModalVisible = false
+  mockDollarBalanceModalRegionUnknown = false
   mockForcedConversionParams = null
   mockIsAnonMode = false
   mockIsRestrictedRegion = false
@@ -1034,6 +1071,78 @@ describe("HomeScreen", () => {
     expect(queryByTestId("sc-convert-modal")).toBeNull()
 
     await flushEffects()
+  })
+
+  it("does not force the conversion when only an unknown region restricts the account", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockDollarRegionDeterminedOverride = false
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 5000,
+    })
+
+    const { queryByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    await flushEffects()
+
+    expect(mockForcedConversionParams?.isRestricted).toBe(false)
+    expect(queryByTestId("convert-modal")).toBeNull()
+  })
+
+  /** The disabled Transfer button is the user's way into the explanation. When the gate
+   *  closed without a region behind it, the explanation must say the check failed, not
+   *  that the region is restricted. */
+  it("opens the restriction modal as an unanswered check when only an unknown region gates", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    mockDollarRegionDeterminedOverride = false
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+    await flushEffects()
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalRegionUnknown).toBe(true)
+  })
+
+  it("opens the restriction modal as a decided region when the server restricted it", async () => {
+    mockDollarBalanceRestrictedOverride = true
+    currentMocks = generateHomeMock({
+      level: AccountLevel.One,
+      network: Network.Mainnet,
+      btcBalance: 1000,
+      usdBalance: 0,
+    })
+
+    const { getByTestId } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+    await flushEffects()
+
+    expect(mockDollarBalanceModalVisible).toBe(true)
+    expect(mockDollarBalanceModalRegionUnknown).toBe(false)
   })
 
   it("does not auto-open the convert modal when the restricted account has no Dollar balance", async () => {
@@ -2592,6 +2701,43 @@ describe("HomeScreen pull-to-refresh", () => {
     expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
   })
 
+  it("asks the server for the account's restrictions again on a pull", async () => {
+    mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await act(async () => {
+      await UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
+  })
+
+  /** The restrictions request has no transport timeout, so the pull must not wait on
+   *  it: the verdict lands whenever it lands. */
+  it("retracts the spinner without waiting for the restrictions verdict", async () => {
+    mockRefetchCustodialRestrictions.mockReturnValueOnce(new Promise(() => {}))
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    await act(async () => {
+      await UNSAFE_getByType(RefreshControl).props.onRefresh()
+    })
+
+    expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
+    expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
+  })
+
   it("spins only for the duration of a user-initiated refresh", async () => {
     // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getByType } = render(
@@ -2714,7 +2860,7 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0]).toEqual(
-      expect.objectContaining({ skip: false, variables: { first: 1 } }),
+      expect.objectContaining({ skip: false, variables: { first: 10 } }),
     )
   })
 
@@ -2733,6 +2879,100 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0].skip).toBe(true)
+  })
+})
+
+/**
+ * The real path from the home's query to a card on screen: the bulletin node comes from
+ * the mocked server, not from a hand-built object, so a field the query stops selecting
+ * breaks this rather than passing unnoticed.
+ */
+describe("bulletins from the server", () => {
+  const bulletinsResponse = (result: MockedResponse["result"]): MockedResponse => ({
+    request: { query: BulletinsDocument, variables: { first: 10 } },
+    result,
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: null,
+    })
+  })
+
+  afterEach(() => {
+    currentMocks = []
+  })
+
+  it("renders the bulletin the server sends", async () => {
+    currentMocks = [
+      bulletinsResponse({
+        data: {
+          me: {
+            __typename: "User",
+            id: "70df9822-efe0-419c-b864-c9efa99872ea",
+            unacknowledgedStatefulNotificationsWithBulletinEnabled: {
+              __typename: "StatefulNotificationConnection",
+              pageInfo: {
+                __typename: "PageInfo",
+                endCursor: null,
+                hasNextPage: false,
+                hasPreviousPage: false,
+                startCursor: null,
+              },
+              edges: [
+                {
+                  __typename: "StatefulNotificationEdge",
+                  cursor: "notif-home",
+                  node: {
+                    __typename: "StatefulNotification",
+                    id: "notif-home",
+                    title: "Scheduled maintenance tonight",
+                    body: "Payments may be slower for a few minutes.",
+                    createdAt: 1757800000,
+                    acknowledgedAt: null,
+                    bulletinEnabled: true,
+                    dismissible: true,
+                    icon: null,
+                    action: null,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      }),
+    ]
+
+    const { findByText } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+    expect(await findByText("Scheduled maintenance tonight")).toBeTruthy()
+  })
+
+  /** A server that rejects the query, as a backend without the fields the query names
+   *  does, leaves the home without bulletins and nothing else missing. */
+  it("shows no bulletin, and the rest of the home, when the query fails", async () => {
+    currentMocks = [
+      bulletinsResponse({
+        errors: [new GraphQLError('Cannot query field "dismissible"')],
+      }),
+    ]
+
+    const { getByTestId, queryByText } = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    expect(getByTestId("home-screen")).toBeTruthy()
+    expect(queryByText("Scheduled maintenance tonight")).toBeNull()
   })
 })
 

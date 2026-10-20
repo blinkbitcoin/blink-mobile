@@ -2587,7 +2587,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",
-    "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito"
+    "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito",
+    "unknownRegionWalletLabel": "tetusobodde kukebera oba kiriwo, sika wansi okuddamu okugezaako"
   },
   "AnonModeConvertModal": {
     "title": "Sooka okyuse ssente zo eza Doola",
@@ -2610,7 +2611,9 @@
     "contactSupport": "Tuukirira abayambi"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo"
+    "modalTitle": "Bbalansi ya doola teriiwo mu kitundu kyo",
+    "unknownRegionModalTitle": "Tetusobodde kukebera oba bbalansi ya doola eriwo",
+    "unknownRegionModalBody": "Tetusobodde kukebera oba bbalansi ya doola eriwo gy'oli. Sika wansi ku sikulini enkulu okuddamu okugezaako."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Bbalansi ya doola teriiwo mu kitundu kyo",
@@ -3687,6 +3690,67 @@
         "codingBackend": "...kukola backend",
         "buttonText": "Kirungi"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Tukusanyukidde okuba ekitundu kya Blink",
+          "paragraphs": {
+            "body1": "Nga tetunnaba kukungaanya ssente endala okuva mu bateekamusaako ab'obukugu, twasalawo okugaza okuyita eri ab'omuka wa Blink, abakozesa baffe abakulu n'abawagizi. Lwaki twandireetera abannaggwanga bwe tusobola okusooka okuyita omuntu ng'ogwe?",
+            "body2": "Kino kiyitira ky'obwannannyini. Tosaasaanya wadde okugabana mu lujjudde."
+          }
+        },
+        "buttonText": "Weyongere"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ssente mmeka z'oyagala okuteekawo?",
+        "percent": "ku ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Omuwendo gw'kkampuni",
+          "paragraphs": {
+            "body1": "Mu kuzuula kuno okw'okuteekawo, omuwendo gwa Blink nga temunnaba kufuna ssente guli $10 miliyoni.",
+            "body2": "Tusobola okukuŋŋaanya ssente ku bbeeyi ennene okuva mu VC. Naye tulaba ebirungi eby'okuwakana eby'ekiseera ekiwanvu mu kukola wamu n'abakozesa baffe abakugu. Kale, tukuwa omukisa guno ku mbeera ennungi."
+          }
+        },
+        "buttonText": "Kitegeeredwa"
+      },
+      "TermSheet": {
+        "title": "Olupapula lw'Amateeka",
+        "equitySection": {
+          "title": "Ekitundu mu Blink",
+          "investment": "Okuteekawo {amount: string}",
+          "valuation": "Ku muwendo gwa $10M nga temunnaba kufuna ssente",
+          "units": "Ofuna ebitundu {units: string} ~{percent: number}% ebya Blink"
+        },
+        "buttonText": "Weyongere Okusayina"
+      },
+      "TransferInvest": {
+        "title": "Sindika ebintu byo",
+        "paragraphs": {
+          "body1": "Osaainye endagaano ey'okuwandiisa ebitundu {units: string} mu Blink.",
+          "body2": "Kiseera okusindika ssente z'okuteekawo eza {amount: string}. Olisasula ne Bitcoin."
+        },
+        "buttonText": "Weyongere",
+        "paymentsUnavailable": "Okusasula kw'okuteekawo tekunnaggulwawo. Ddamu ogezeeko oluvannyuma."
+      },
+      "InsufficientBalance": {
+        "title": "Ssente tezimala",
+        "paragraphs": {
+          "balanceBitcoin": "Olina {balance: string} zokka ku akkaawunti yo eya Bitcoin.",
+          "balanceDollar": "Olina {balance: string} zokka ku akkaawunti yo eya Doola.",
+          "body2": "Teekamu ssente ezisukka {shortfall: string} ku akkaawunti yo osobole okutuuka ku muwendo gw'okusiga ogwa {investmentAmount: string}.",
+          "body3": "Kakasa nti omuwendo gwonna guli ku emu ku akkaawunti zo; Bitcoin oba Doola."
+        },
+        "buttonText": "Teekamu ssente",
+        "splitFunds": {
+          "title": "Ssente zo zaawukanye",
+          "body": "Olina ezimala okusiga, naye zaawukanye wakati wa akawunti ya Bitcoin ne ya Ddoola. Kyusa ssente zonna zibeere mu emu."
+        }
+      },
+      "DepositPending": {
+        "message": "Tulindirira ssente zo okumalirizibwa; tusaba olinde okukakasibwa emirundi 2 ku lujegere.",
+        "buttonText": "Kale"
+      },
       "PersonalInformation": {
         "title": "Olugendo olw'enkomerero",
         "fields": {
@@ -3864,6 +3928,7 @@
       "newBitcoinBalance": "Ssente za Bitcoin empya",
       "newDollarBalance": "Ssente za ddoola empya",
       "dollarBalanceNotAvailable": "tezeewo",
+      "lnAddressNotMoved": "Endagiriro yo eya Lightning tesobodde kujjulukuka. Ssente zo zijja kutwalibwa.",
       "networkFee": "Ssente z'omukutu: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ssente z'omukutu: <bold>{fee: string}</bold> (zisasulwa Blink)",
       "retryCta": "Ddamu ogezeeko",

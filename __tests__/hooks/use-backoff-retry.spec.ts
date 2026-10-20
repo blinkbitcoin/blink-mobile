@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-native"
 
-import { useBackoffRetry } from "@app/self-custodial/hooks/use-backoff-retry"
+import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 
 const DELAYS = [1000, 3000, 9000] as const
 
@@ -65,6 +65,23 @@ describe("useBackoffRetry", () => {
       jest.advanceTimersByTime(9000)
     })
     expect(retry).toHaveBeenCalledTimes(3)
+  })
+
+  it("reports whether each retry was scheduled", () => {
+    const { result } = renderHook(() => useBackoffRetry([1000]))
+    const scheduled: boolean[] = []
+
+    act(() => {
+      scheduled.push(result.current.schedule(jest.fn()))
+    })
+    act(() => {
+      jest.advanceTimersByTime(1000)
+    })
+    act(() => {
+      scheduled.push(result.current.schedule(jest.fn()))
+    })
+
+    expect(scheduled).toEqual([true, false])
   })
 
   it("becomes a no-op after the delay sequence is exhausted", () => {
