@@ -1417,6 +1417,47 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
 
     /** Refused before it reached the store, for want of an owner the lookup could not
      *  fetch: a network failure, so the network wording stands. */
+    /** A store that refused is reported where it refused; a write turned away for want of
+     *  an owner never reached the store, so the screen reports it, once however often the
+     *  user retries. */
+    it("reports a write refused for want of an owner, once", async () => {
+      mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+      mockUseMigrationQuery.mockReturnValue({
+        ...migrationQueryResult({
+          balanceSats: 1000,
+          feeSats: 10,
+          feeCoveredByBlink: false,
+          receiveSats: 990,
+        }),
+        refetch: jest.fn(),
+      })
+      mockUseWalletOverviewScreenQuery.mockReturnValue({
+        ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
+        refetch: jest.fn(),
+      })
+      renderScreen()
+      await flushEffects()
+      fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+      await flushEffects()
+
+      const ownerlessReports = mockReportError.mock.calls.filter(
+        ([operation]) => operation === "Migration commit point",
+      )
+      expect(ownerlessReports).toHaveLength(1)
+    })
+
+    it("does not report a refusal the store already reported", async () => {
+      mockSaveCheckpoint.mockResolvedValue({
+        isSaved: false,
+        failure: StorageFailure.OutOfSpace,
+      })
+      renderScreen()
+      await flushEffects()
+
+      const operations = mockReportError.mock.calls.map(([operation]) => operation)
+      expect(operations).not.toContain("Migration commit point")
+    })
+
     it("keeps the connection wording when the write carries no storage kind", async () => {
       mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
       renderScreen()

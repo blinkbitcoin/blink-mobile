@@ -213,6 +213,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const [lastCommitPointWrite, setLastCommitPointWrite] =
     useState<StorageWriteResult | null>(null)
   const latestCommitPointWriteRef = useRef(0)
+  const hasReportedOwnerlessWriteRef = useRef(false)
   /** The step is recorded as soon as the figures are ready, which can be before the server
    *  accepts the start (it waits on an emptied dollar balance, and can fail). The accepted
    *  start is written with it once it lands, the one thing that later tells a flow support
@@ -252,9 +253,20 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
       setIsStartConfirmationRecorded((wasRecorded) => wasRecorded || writeResult.isSaved)
     }
     if (writeResult.isSaved) recordedWriteKeyRef.current = commitPointWriteKey
-    /** Overlapping writes (a focus and a retry, or a figure change) can answer out of
-     *  order. Only the latest one issued speaks for the store now, so an older answer that
-     *  lands late never puts a stale reason above the retry. */
+    /** saveCheckpoint already reported a store that refused. One turned away for want of
+     *  an owner never reached the store and reported nothing; it repeats on every focus
+     *  and retry while the owner lookup is down, so it is reported once per visit. */
+    const isRefusedWithoutOwner = !writeResult.isSaved && writeResult.failure === null
+    if (isRefusedWithoutOwner && !hasReportedOwnerlessWriteRef.current) {
+      hasReportedOwnerlessWriteRef.current = true
+      reportError(
+        "Migration commit point",
+        new Error("Migration checkpoint save refused without an owner"),
+      )
+    }
+    /** The store takes its writes in turn, but a refusal for want of an owner answers at
+     *  once, ahead of a write still queued. Only the latest one issued speaks for the store
+     *  now, so an older answer that lands late never puts a stale reason above the retry. */
     const isLatestWrite = writeId === latestCommitPointWriteRef.current
     if (isLatestWrite) setLastCommitPointWrite(writeResult)
   }, [
