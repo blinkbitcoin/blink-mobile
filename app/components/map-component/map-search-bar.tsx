@@ -6,11 +6,12 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 const CONTROL_HEIGHT = 44
-const TOP_GAP = 12
+// The map's controls all keep this gap to the edges they sit against.
+export const MAP_CONTROL_INSET = 20
 
 /** Where the bar ends, for anything else that has to be drawn under it. */
 export const searchBarBottom = (topInset: number): number =>
-  topInset + TOP_GAP + CONTROL_HEIGHT
+  topInset + MAP_CONTROL_INSET + CONTROL_HEIGHT
 
 type Props = {
   // The screen hands the whole top edge to the map, so this bar reserves its own.
@@ -43,7 +44,7 @@ export const MapSearchBar: React.FC<Props> = ({
   const styles = useStyles({ topInset })
 
   return (
-    <View style={styles.bar} pointerEvents="box-none">
+    <View testID="map-search-bar" style={styles.bar} pointerEvents="box-none">
       <Pressable
         testID="open-place-search"
         style={styles.field}
@@ -82,9 +83,9 @@ export const MapSearchBar: React.FC<Props> = ({
 const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) => ({
   bar: {
     position: "absolute",
-    top: topInset + TOP_GAP,
-    left: 12,
-    right: 12,
+    top: topInset + MAP_CONTROL_INSET,
+    left: MAP_CONTROL_INSET,
+    right: MAP_CONTROL_INSET,
     flexDirection: "row",
     alignItems: "center",
     columnGap: 10,
