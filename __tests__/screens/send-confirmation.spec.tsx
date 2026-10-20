@@ -1399,14 +1399,10 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
   })
 
-  it("keeps the slider armed after an ambiguous throw, so the user can retry", async () => {
-    // A non-409 throw is the ambiguous case: the request may have landed. The hook
-    // reopens sendPayment under the same key (pinned in the hook spec); the screen's half
-    // of the contract is that the slider is gated by sendPayment alone, never by
-    // hasAttemptedSend, so a second swipe actually fires.
-    sendPaymentMock
-      .mockRejectedValueOnce(new Error("network died"))
-      .mockResolvedValueOnce({ status: "SUCCESS", extraInfo: {} })
+  it("disables the slider after an ambiguous throw, so a second swipe sends nothing", async () => {
+    // A non-409 throw may have landed. The hook stays locked (pinned in the hook spec);
+    // the screen's half is that the failure on show disables the slider too.
+    sendPaymentMock.mockRejectedValue(new Error("network died"))
 
     render(
       <ContextForScreen>
@@ -1420,13 +1416,14 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 
     expect(screen.getByText("network died")).toBeTruthy()
     expect(verifyPaymentSettledMock).not.toHaveBeenCalled()
-    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
 
     await act(async () => {
       fireEvent.press(screen.getByTestId("slider"))
     })
 
-    expect(sendPaymentMock).toHaveBeenCalledTimes(2)
+    expect(sendPaymentMock).toHaveBeenCalledTimes(1)
+    sendPaymentMock.mockReset()
   })
 })
 
@@ -1900,7 +1897,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       ).toBeNull()
     })
 
-    it("offers Change amount when the send fails over the 24 hour limit", async () => {
+    it("does not offer Change amount when a send fails, whatever the server text says", async () => {
       sendPaymentMock.mockResolvedValueOnce({
         status: "FAILURE",
         errorsMessage: "Cannot transfer more than $1000.00 in 24 hours",
@@ -1912,8 +1909,9 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       })
 
       expect(screen.getByText(/Cannot transfer more than/)).toBeTruthy()
-      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
-      expect(navigationGoBackMock).toHaveBeenCalledTimes(1)
+      expect(
+        screen.queryByText(LL.SendBitcoinConfirmationScreen.changeAmount()),
+      ).toBeNull()
     })
   })
 

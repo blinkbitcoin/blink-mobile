@@ -56,6 +56,7 @@ import {
   feeTierFromPayoutSpeed,
 } from "./hooks/use-custodial-onchain-fee-tiers"
 import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
+import { useHomeOnBackWhenSpent } from "./hooks/use-home-on-back-when-spent"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
 import { SendReviewDestination } from "./review/send-review-destination"
 import { useSentTransition } from "./review/use-sent-transition"
@@ -213,7 +214,9 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     loading: sendPaymentLoading,
     sendPayment,
     hasAttemptedSend,
+    isSendSpent,
   } = useSendPayment(sendPaymentMutation, paymentDetail.idempotencyKeyRef)
+  useHomeOnBackWhenSpent(isSendSpent)
 
   // Self-custodial fee failures carry a classified SDK code; custodial ones carry raw
   // GraphQL text that is not fit to show, so only the former replaces the generic string.
@@ -766,7 +769,11 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               }
               onSwipe={handleSendPayment}
               disabled={
-                !validAmount || !sendPayment || feeUnavailable || dustNotEvaluable
+                !validAmount ||
+                !sendPayment ||
+                Boolean(paymentFailure) ||
+                feeUnavailable ||
+                dustNotEvaluable
               }
             />
           </Animated.View>
