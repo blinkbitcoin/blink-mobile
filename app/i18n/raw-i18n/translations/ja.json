@@ -2588,7 +2588,8 @@
     },
     "StablesatsRestriction": {
         "walletLabel": "あなたの地域ではご利用いただけません",
-        "anonModeWalletLabel": "Incognito モードでは利用できません"
+        "anonModeWalletLabel": "Incognito モードでは利用できません",
+        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください"
     },
     "AnonModeConvertModal": {
         "title": "まずドル残高を移してください",
@@ -2611,7 +2612,9 @@
         "contactSupport": "サポートに問い合わせる"
     },
     "DollarBalanceRestriction": {
-        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません"
+        "modalTitle": "ドル残高はあなたの地域ではご利用いただけません",
+        "unknownRegionModalTitle": "ドル残高の利用可否を確認できませんでした",
+        "unknownRegionModalBody": "ドル残高がご利用いただけるかどうかを確認できませんでした。ホーム画面を下に引いて、もう一度お試しください。"
     },
     "ConvertDollarToBitcoinModal": {
         "title": "ドル残高はあなたの地域ではご利用いただけません",
@@ -3735,6 +3738,67 @@
                 "title": "申請を処理中",
                 "subtitle": "準備ができ次第、お知らせします",
                 "buttonText": "閉じる"
+            },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Blinkの一員になりませんか",
+                    "paragraphs": {
+                        "body1": "プロの投資家からさらに資金を調達する前に、Blinkファミリー、つまりスーパーユーザーやサポーターの皆さんに招待状をお送りすることにしました。あなたのような方を差し置いて、なぜ見知らぬ人を招くのでしょうか？",
+                        "body2": "これは個人的な招待です。転送や公開での共有はお控えください。"
+                    }
+                },
+                "buttonText": "続ける"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "いくら投資したいですか？",
+                "percent": "約{percent: number}%に相当"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "企業評価",
+                    "paragraphs": {
+                        "body1": "この投資ラウンドにおけるBlinkのプレマネー評価額は1,000万ドルです。",
+                        "body2": "私たちはVCからより高い価格で資金を調達することができます。しかし、スーパーユーザーの皆様とのパートナーシップに長期的な相互利益を見出しています。そのため、より良い条件でこのオファーをご提供しています。"
+                    }
+                },
+                "buttonText": "了解"
+            },
+            "TermSheet": {
+                "title": "条件概要書",
+                "equitySection": {
+                    "title": "Blinkの株式",
+                    "investment": "{amount: string}の投資",
+                    "valuation": "プレマネー評価額1,000万ドル",
+                    "units": "{units: string}ユニット（Blinkの約{percent: number}%）を受け取ります"
+                },
+                "buttonText": "署名に進む"
+            },
+            "TransferInvest": {
+                "title": "投資額を送金してください",
+                "paragraphs": {
+                    "body1": "Blinkの{units: string}ユニットに対するサブスクリプション契約に署名しました。",
+                    "body2": "{amount: string}の投資額を送金する時です。ビットコインでお支払いいただきます。"
+                },
+                "buttonText": "続ける",
+                "paymentsUnavailable": "投資の支払いはまだ受け付けていません。後でもう一度お試しください。"
+            },
+            "InsufficientBalance": {
+                "title": "残高が不足しています",
+                "paragraphs": {
+                    "balanceBitcoin": "Bitcoinアカウントには{balance: string}しかありません。",
+                    "balanceDollar": "ドルアカウントには{balance: string}しかありません。",
+                    "body2": "投資額の{investmentAmount: string}に達するには、アカウントに{shortfall: string}を超える金額を入金してください。",
+                    "body3": "全額がBitcoinまたはドルのいずれかのアカウントにあることを確認してください。"
+                },
+                "buttonText": "入金",
+                "splitFunds": {
+                    "title": "資金が分かれています",
+                    "body": "投資に十分な残高がありますが、ビットコイン口座とドル口座に分かれています。全額が一方に入るように変換してください。"
+                }
+            },
+            "DepositPending": {
+                "message": "入金の確定を待っています。チェーン上での承認が2回完了するまでお待ちください。",
+                "buttonText": "OK"
             }
         }
     },
@@ -3865,6 +3929,7 @@
             "newBitcoinBalance": "新しいビットコイン残高",
             "newDollarBalance": "新しいドル残高",
             "dollarBalanceNotAvailable": "利用不可",
+            "lnAddressNotMoved": "Lightningアドレスを移行できませんでした。資金は引き続き送金されます。",
             "networkFee": "ネットワーク手数料: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "ネットワーク手数料: <bold>{fee: string}</bold>（Blinkが負担）",
             "retryCta": "再試行",
