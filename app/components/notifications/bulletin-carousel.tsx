@@ -96,6 +96,30 @@ export const BulletinCarousel: React.FC<Props> = ({ items }) => {
 
   return (
     <View onLayout={(event) => setWidth(event.nativeEvent.layout.width)}>
+      {width > 0 && barWidth > 0 && (
+        <View
+          style={styles.indicators}
+          accessible
+          accessibilityRole="adjustable"
+          accessibilityLabel={LL.HomeScreen.bulletinPosition({
+            position: activeIndex + 1,
+            total: items.length,
+          })}
+          accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
+          onAccessibilityAction={onAccessibilityAction}
+        >
+          {items.map(({ key }, index) => (
+            <View
+              key={key}
+              style={[
+                styles.bar,
+                { width: barWidth },
+                index === activeIndex ? styles.barActive : styles.barInactive,
+              ]}
+            />
+          ))}
+        </View>
+      )}
       {width === 0 ? (
         items[0].node
       ) : (
@@ -124,30 +148,6 @@ export const BulletinCarousel: React.FC<Props> = ({ items }) => {
           </ScrollView>
         </View>
       )}
-      {barWidth > 0 && (
-        <View
-          style={styles.indicators}
-          accessible
-          accessibilityRole="adjustable"
-          accessibilityLabel={LL.HomeScreen.bulletinPosition({
-            position: activeIndex + 1,
-            total: items.length,
-          })}
-          accessibilityActions={[{ name: "increment" }, { name: "decrement" }]}
-          onAccessibilityAction={onAccessibilityAction}
-        >
-          {items.map(({ key }, index) => (
-            <View
-              key={key}
-              style={[
-                styles.bar,
-                { width: barWidth },
-                index === activeIndex ? styles.barActive : styles.barInactive,
-              ]}
-            />
-          ))}
-        </View>
-      )}
     </View>
   )
 }
@@ -164,7 +164,7 @@ const useStyles = makeStyles(({ colors }) => ({
     justifyContent: "center",
     flexWrap: "wrap",
     gap: INDICATOR_BAR.gap,
-    marginTop: 8,
+    marginBottom: 8,
   },
   bar: {
     height: INDICATOR_BAR.height,
