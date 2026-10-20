@@ -255,6 +255,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     stageRef,
     heroRef,
     isSent,
+    sentPlay,
     glowFrame,
     heroProgress,
     glowProgress,
@@ -265,7 +266,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   } = sentTransition
 
   /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
-  const sentReceiptRef = React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
+  const sentReceiptRef =
+    React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
 
   const resetToCompleted = React.useCallback(
     (params: RootStackParamList["sendBitcoinCompleted"]) =>
@@ -635,6 +637,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 secondaryAmount={heroSecondaryText}
                 sentProgress={heroProgress}
                 isSent={isSent}
+                sentPlay={sentPlay}
               />
             </Animated.View>
           </View>

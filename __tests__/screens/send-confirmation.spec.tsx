@@ -273,6 +273,8 @@ jest.mock("@react-navigation/native", () => ({
     navigate: jest.fn(),
     goBack: navigationGoBackMock,
     setOptions: jest.fn(),
+    isFocused: () => true,
+    addListener: () => () => {},
   }),
   useFocusEffect: (callback: () => undefined | (() => void)) => {
     const { useEffect } = jest.requireActual("react")
