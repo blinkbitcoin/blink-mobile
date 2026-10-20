@@ -153,6 +153,12 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => {
  */
 const mockWithdrawalAllowance = { remaining: 100_000_000 }
 
+/** The limits query's own failure, and its refetch, for the fail-closed tests. */
+const mockWithdrawalLimitsQuery: { error?: Error; refetch: jest.Mock } = {
+  error: undefined,
+  refetch: jest.fn(),
+}
+
 /**
  * The tier quote, answered per test rather than left to fall off the end of the mocked
  * responses. Held as one stable function because Apollo hands back a stable execute across
@@ -163,6 +169,8 @@ const mockQuoteFees = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useSendBitcoinWithdrawalLimitsQuery: () => ({
+    error: mockWithdrawalLimitsQuery.error,
+    refetch: mockWithdrawalLimitsQuery.refetch,
     data: {
       me: {
         defaultAccount: {
@@ -195,6 +203,8 @@ beforeEach(() => {
 
 afterEach(() => {
   mockWithdrawalAllowance.remaining = 100_000_000
+  mockWithdrawalLimitsQuery.error = undefined
+  mockWithdrawalLimitsQuery.refetch.mockClear()
 })
 
 jest.mock("@react-native-firebase/app-check", () => {
@@ -917,6 +927,66 @@ describe("onchain fee tier gating", () => {
 
     expect(errorSheet()).toBeNull()
     expect(screen.getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
+  })
+})
+
+describe("daily limit that could not be read", () => {
+  const renderOnchain = async () => {
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+  }
+
+  it("keeps Next off and opens the sheet, since nobody checked the limit", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+    expect(sheet.getByText(LL.SendBitcoinScreen.limitsUnavailable())).toBeTruthy()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
+  })
+
+  it("reads the limit again on Try again", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalLimitsQuery.error = new Error("limits unavailable")
+
+    await renderOnchain()
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    await act(async () => {
+      fireEvent.press(sheet.getByText(LL.SendBitcoinConfirmationScreen.tryAgain()))
+    })
+
+    expect(mockWithdrawalLimitsQuery.refetch).toHaveBeenCalledTimes(1)
+  })
+
+  it("treats a remaining limit of 0 as spent and opens the over-limit sheet", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+    mockWithdrawalAllowance.remaining = 0
+
+    await renderOnchain()
+    fireEvent.press(screen.getByTestId("Key 1"))
+    await flushAsync()
+    await flushAsync()
+
+    const sheet = within(await screen.findByTestId(ERROR_SHEET_TEST_ID))
+    expect(sheet.getByText(LL.SendBitcoinConfirmationScreen.changeAmount())).toBeTruthy()
+    expect(screen.getByTestId(LL.common.next()).props.accessibilityState?.disabled).toBe(
+      true,
+    )
   })
 })
 

@@ -7429,6 +7429,10 @@ type RootTranslation = {
 		 */
 		somethingWentWrong: string
 		/**
+		 * T​h​e​ ​p​r​i​c​e​ ​m​o​v​e​d​,​ ​s​o​ ​t​h​e​ ​a​m​o​u​n​t​s​ ​w​e​r​e​ ​u​p​d​a​t​e​d​.​ ​C​h​e​c​k​ ​t​h​e​m​ ​b​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d​.
+		 */
+		priceUpdated: string
+		/**
 		 * P​a​y​m​e​n​t​ ​a​l​r​e​a​d​y​ ​a​t​t​e​m​p​t​e​d​.​
 	​
 	​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​ ​a​g​a​i​n​,​ ​s​t​a​r​t​ ​f​r​o​m​ ​s​c​r​a​t​c​h​.
@@ -7720,6 +7724,10 @@ type RootTranslation = {
 		 * @param {string} limit
 		 */
 		amountExceedsLimit: RequiredParams<'limit'>
+		/**
+		 * W​e​ ​c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​y​o​u​r​ ​d​a​i​l​y​ ​l​i​m​i​t​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+		 */
+		limitsUnavailable: string
 		/**
 		 * A​ ​s​m​a​l​l​ ​p​r​o​b​l​e​m
 		 */
@@ -21345,6 +21353,10 @@ export type TranslationFunctions = {
 		 */
 		somethingWentWrong: () => LocalizedString
 		/**
+		 * The price moved, so the amounts were updated. Check them before you send.
+		 */
+		priceUpdated: () => LocalizedString
+		/**
 		 * Payment already attempted.
 
 	If you want to send this payment again, start from scratch.
@@ -21616,6 +21628,10 @@ export type TranslationFunctions = {
 		 * Amount exceeds your remaining daily limit of {limit}
 		 */
 		amountExceedsLimit: (arg: { limit: string }) => LocalizedString
+		/**
+		 * We couldn't check your daily limit. Try again in a moment.
+		 */
+		limitsUnavailable: () => LocalizedString
 		/**
 		 * A small problem
 		 */

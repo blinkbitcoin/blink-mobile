@@ -12,6 +12,9 @@ type Props = {
   lnurlError: LnurlInvoiceError | undefined
   /** The daily-limit message while the amount is over the limit (A3). */
   limitMessage: string | undefined
+  /** The daily limit could not be read, so nothing may go on until it is: Try again reads
+   *  it again. */
+  onRetryLimits: (() => void) | undefined
   onRetry: (() => void) | undefined
   onChangeAmount: () => void
 }
@@ -24,10 +27,13 @@ type Props = {
  * - A3, over the daily limit: Change amount empties the amount here. It opens by itself on
  *   crossing the limit, stays closed while the amount stays over, and opens again on the
  *   next crossing
+ * - the daily limit could not be read: Try again reads it again. Next stays off meanwhile,
+ *   since a limit nobody checked is not one the amount passed
  */
 export const AmountEntryErrorSheet: React.FC<Props> = ({
   lnurlError,
   limitMessage,
+  onRetryLimits,
   onRetry,
   onChangeAmount,
 }) => {
@@ -39,14 +45,33 @@ export const AmountEntryErrorSheet: React.FC<Props> = ({
     [limitMessage],
   )
 
+  const hasLimitsError = Boolean(onRetryLimits)
+  const limitsError = useMemo(
+    () =>
+      hasLimitsError
+        ? { message: LL.SendBitcoinScreen.limitsUnavailable(), isLimitsError: true }
+        : undefined,
+    [hasLimitsError, LL],
+  )
+
   const sheet = useDismissibleErrorMsg<{
     title?: string
     message: string
     canRetry?: boolean
-  }>(lnurlError ?? limitError)
+    isLimitsError?: boolean
+  }>(lnurlError ?? limitsError ?? limitError)
   const shown = sheet.shown
 
   const button = (() => {
+    if (shown?.isLimitsError && onRetryLimits) {
+      return {
+        primaryLabel: LL.SendBitcoinConfirmationScreen.tryAgain(),
+        onPrimaryPress: () => {
+          sheet.dismiss()
+          onRetryLimits()
+        },
+      }
+    }
     if (shown && "canRetry" in shown) {
       return shown.canRetry && onRetry
         ? {

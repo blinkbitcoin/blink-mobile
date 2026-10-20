@@ -695,6 +695,65 @@ describe("createSendMutation", () => {
   })
 })
 
+describe("a dollar send whose quote moved after review", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const quoteAt = (amountIn: number) => ({
+    paymentMethod: { tag: "Bolt11Invoice", inner: { lightningFeeSats: BigInt(10) } },
+    conversionEstimate: { amountIn: BigInt(amountIn), amountOut: BigInt(5000) },
+  })
+
+  const dollarSend = () => {
+    const params = {
+      sdk: mockSdk,
+      paymentRequest: "lnbc1...",
+      amount: undefined,
+      conversionOptions: {} as never,
+      quoteRef: {},
+    }
+    return { getFee: createGetFee(params), send: createSendMutation(params) }
+  }
+
+  it("sends nothing, and says so with a code raised before the send", async () => {
+    const { getFee, send } = dollarSend()
+    mockPrepareSendPayment.mockResolvedValueOnce(quoteAt(500))
+    await getFee()
+
+    mockPrepareSendPayment.mockResolvedValueOnce(quoteAt(510))
+    const result = await send()
+
+    expect(result.status).toBe(PaymentSendResult.Failure)
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockSendPayment).not.toHaveBeenCalled()
+  })
+
+  it("sends the quote review showed", async () => {
+    const { getFee, send } = dollarSend()
+    mockPrepareSendPayment.mockResolvedValue(quoteAt(500))
+    mockSendPayment.mockResolvedValue({ payment: { status: 0 } })
+    await getFee()
+
+    const result = await send()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves a bitcoin send alone, whatever its fresh quote", async () => {
+    const params = { sdk: mockSdk, paymentRequest: "lnbc1...", amount: undefined }
+    mockPrepareSendPayment.mockResolvedValueOnce(quoteAt(500))
+    await createGetFee(params)()
+    mockPrepareSendPayment.mockResolvedValueOnce(quoteAt(510))
+    mockSendPayment.mockResolvedValue({ payment: { status: 0 } })
+
+    await createSendMutation(params)()
+
+    expect(mockSendPayment).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe("createSendMutationOnchain", () => {
   beforeEach(() => {
     jest.clearAllMocks()
