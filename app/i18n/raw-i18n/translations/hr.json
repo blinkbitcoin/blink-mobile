@@ -2588,7 +2588,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nije dostupan u vašoj regiji",
-    "anonModeWalletLabel": "nije dostupno u Incognito načinu"
+    "anonModeWalletLabel": "nije dostupno u Incognito načinu",
+    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj"
   },
   "AnonModeConvertModal": {
     "title": "Najprije prenesite svoj dolarski saldo",
@@ -2611,7 +2612,9 @@
     "contactSupport": "Kontaktirajte podršku"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji"
+    "modalTitle": "Dolarski saldo nije dostupan u vašoj regiji",
+    "unknownRegionModalTitle": "Nije bilo moguće provjeriti dostupnost dolarskog salda",
+    "unknownRegionModalBody": "Nismo mogli provjeriti je li vam dolarski saldo dostupan. Povucite prema dolje na početnom zaslonu za ponovni pokušaj."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolarski saldo nije dostupan u vašoj regiji",
@@ -3688,6 +3691,67 @@
         "codingBackend": "...kodiramo backend",
         "buttonText": "Super"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Dobrodošli da postanete dio Blinka",
+          "paragraphs": {
+            "body1": "Prije nego što prikupimo više sredstava od profesionalnih investitora, odlučili smo proširiti pozivnicu obitelji Blink, našim superkorisnicima i podržavateljima. Zašto dovoditi strance kad prvo možemo pozvati nekoga poput vas?",
+            "body2": "Ovo je osobna pozivnica. Molimo ne prosljeđujte je i ne dijelite javno."
+          }
+        },
+        "buttonText": "Nastavi"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Koliko biste željeli uložiti?",
+        "percent": "za ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Procjena tvrtke",
+          "paragraphs": {
+            "body1": "U ovom investicijskom krugu, pre-money procjena Blinka je 10 milijuna dolara.",
+            "body2": "Mogli bismo prikupiti sredstva po višoj cijeni od VC-ova. Međutim, vidimo dugoročne obostrane koristi u partnerstvu s našim superkorisnicima. Stoga vam nudimo ovu ponudu pod boljim uvjetima."
+          }
+        },
+        "buttonText": "Razumijem"
+      },
+      "TermSheet": {
+        "title": "Uvjeti",
+        "equitySection": {
+          "title": "Udio u Blinku",
+          "investment": "Ulaganje od {amount: string}",
+          "valuation": "Uz pre-money procjenu od $10M",
+          "units": "Primate {units: string} jedinica ~{percent: number}% Blinka"
+        },
+        "buttonText": "Nastavi na Potpis"
+      },
+      "TransferInvest": {
+        "title": "Prenesite svoje ulaganje",
+        "paragraphs": {
+          "body1": "Potpisali ste ugovor o pretplati za {units: string} jedinica u Blinku.",
+          "body2": "Vrijeme je za prijenos iznosa ulaganja od {amount: string}. Platit ćete Bitcoinom."
+        },
+        "buttonText": "Nastavi",
+        "paymentsUnavailable": "Uplate za ulaganje još nisu otvorene. Pokušaj ponovno kasnije."
+      },
+      "InsufficientBalance": {
+        "title": "Nedovoljno sredstava",
+        "paragraphs": {
+          "balanceBitcoin": "Na svom Bitcoin računu imaš samo {balance: string}.",
+          "balanceDollar": "Na svom dolarskom računu imaš samo {balance: string}.",
+          "body2": "Uplati više od {shortfall: string} na svoj račun kako bi dosegnuo iznos ulaganja od {investmentAmount: string}.",
+          "body3": "Provjeri da je cijeli iznos na jednom od tvojih računa; Bitcoin ili dolar."
+        },
+        "buttonText": "Uplati",
+        "splitFunds": {
+          "title": "Vaša sredstva su podijeljena",
+          "body": "Imate dovoljno za ulaganje, ali je podijeljeno između Bitcoin i Dolar računa. Pretvorite kako bi cijeli iznos bio na jednom od njih."
+        }
+      },
+      "DepositPending": {
+        "message": "Čeka se namira tvog pologa; pričekaj 2 potvrde na lancu.",
+        "buttonText": "U redu"
+      },
       "PersonalInformation": {
         "title": "Posljednji korak",
         "fields": {
@@ -3865,6 +3929,7 @@
       "newBitcoinBalance": "Novi Bitcoin saldo",
       "newDollarBalance": "Novi dolarski saldo",
       "dollarBalanceNotAvailable": "nije dostupno",
+      "lnAddressNotMoved": "Vaša Lightning adresa nije se mogla premjestiti. Vaša sredstva svejedno će biti prenesena.",
       "networkFee": "Mrežna naknada: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Mrežna naknada: <bold>{fee: string}</bold> (snosi Blink)",
       "retryCta": "Pokušaj ponovno",

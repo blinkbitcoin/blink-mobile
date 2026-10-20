@@ -1,7 +1,14 @@
 import React from "react"
 import { StyleSheet, TouchableOpacity, Text } from "react-native"
 import { Satoshis } from "lnurl-pay"
-import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
+import {
+  act,
+  fireEvent,
+  render,
+  screen,
+  waitFor,
+  within,
+} from "@testing-library/react-native"
 
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
@@ -17,6 +24,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import * as colors from "@app/rne-theme/colors"
+import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 import { INFO_SECTION_OUTLINE_TEST_ID } from "@app/components/card-screen/info-section"
@@ -225,15 +233,18 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
   useSendBalances: () => mockUseSendBalances(),
 }))
 
-const mockDefaultConversionLimits = {
+type ConversionLimitsResult = ReturnType<typeof useNonCustodialConversionLimits>
+
+const defaultConversionLimits: ConversionLimitsResult = {
   limits: { minFromAmount: 800, minToAmount: null },
   loading: false,
   error: null,
 }
-const mockUseNonCustodialConversionLimits = jest.fn()
+const mockUseNonCustodialConversionLimits = jest.fn(
+  (): ConversionLimitsResult => defaultConversionLimits,
+)
 jest.mock("@app/self-custodial/hooks/use-non-custodial-conversion-limits", () => ({
-  useNonCustodialConversionLimits: () =>
-    mockUseNonCustodialConversionLimits() ?? mockDefaultConversionLimits,
+  useNonCustodialConversionLimits: () => mockUseNonCustodialConversionLimits(),
 }))
 
 const useActiveWalletMock = jest.fn(() => ({
@@ -257,6 +268,8 @@ jest.mock("@react-navigation/native", () => ({
     navigate: jest.fn(),
     goBack: navigationGoBackMock,
     setOptions: jest.fn(),
+    isFocused: () => true,
+    addListener: () => () => {},
   }),
 }))
 
@@ -284,6 +297,11 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
     disabled?: boolean
   }
 
+  /**
+   * `disabled` is wired to the prop as well as to accessibilityState: without it a press
+   * still fires onSwipe, so a regression that disabled the slider outright would slip
+   * past every case that swipes and only be caught by the ones that read the state.
+   */
   const MockGaloySliderButton = (props: Props) => {
     mockSliderProps(props)
     const {
@@ -297,6 +315,7 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
       <TouchableOpacity
         testID={testID}
         onPress={onSwipe}
+        disabled={disabled}
         accessibilityState={{ disabled }}
       >
         <Text>{disabled ? disabledText ?? initialText : initialText}</Text>
@@ -308,6 +327,90 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
 })
 
 const lastSliderProps = () => mockSliderProps.mock.calls.at(-1)?.[0]
+/**
+ * Every describe in this file renders the screen, so the mocks that render reads are
+ * defaulted here rather than inside the one describe that happens to run first. Left
+ * there, the later describes only worked because the first one's values leaked into
+ * them: none of them could be run on its own, and a case that re-pointed a mock changed
+ * what its neighbours saw.
+ */
+beforeEach(() => {
+  jest.clearAllMocks()
+  loadLocale("en")
+
+  mockUseNonCustodialConversionLimits.mockReturnValue(defaultConversionLimits)
+  useActiveWalletMock.mockReturnValue({
+    isSelfCustodial: false,
+    isReady: true,
+    needsBackendAuth: false,
+    wallets: [],
+    status: "ready",
+    accountType: "Custodial",
+  })
+  mockUseSendPayment.mockReturnValue({
+    loading: false,
+    hasAttemptedSend: false,
+    sendPayment: sendPaymentMock,
+  })
+  mockUseFee.mockReturnValue({
+    status: "set",
+    amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+  })
+  mockUseSendBalances.mockReturnValue({
+    btcWallet: {
+      id: "btc-wallet-id",
+      balance: 500000,
+      walletCurrency: WalletCurrency.Btc,
+    },
+    usdWallet: {
+      id: "usd-wallet-id",
+      balance: 10000,
+      walletCurrency: WalletCurrency.Usd,
+    },
+  })
+})
+
+/**
+ * A settled fee reads like "₦0 ($0.00)", and both halves of that shape are load-bearing.
+ * The ₦ symbol arrives with the currency list; the whole-number NGN amount arrives only
+ * once the realtime price has, because until then useDisplayCurrency assumes the minor
+ * unit is significant and prints "₦0.00" instead. The dust check reads that same price,
+ * so matching this is what proves its verdict is final rather than still `pending`.
+ */
+const settledFeeMatcher = /₦[\d,]+ \(/
+
+/**
+ * Scoped by label rather than read off `.children`, so the assertion survives the fee
+ * cell gaining a nested element such as the max-fee marker.
+ */
+const feeRow = () => within(screen.getByLabelText("Successful Fee"))
+
+/**
+ * waitFor's own default is 1s, well under the 20s testTimeout this repo raised for
+ * CPU-starved runners (issue #3815). Left at the default, a slow runner would fail
+ * inside the helper rather than at the assertion the case is actually about.
+ */
+const SETTLE_TIMEOUT_MS = 10_000
+
+/**
+ * Render and wait until the display-currency conversion has landed.
+ *
+ * That conversion is the screen's last async read: until it arrives the fee cell shows a
+ * sync-issue notice rather than an amount, and the dust check reports `pending`. Waiting
+ * on the converted fee is therefore the one signal that every row has settled, which is
+ * what lets a case assert an absence ("no warning", "no second placeholder") and have it
+ * mean "never" rather than "not yet".
+ */
+const renderSettled = async (ui: React.ReactElement): Promise<void> => {
+  render(ui)
+
+  await waitFor(
+    () => {
+      expect(feeRow().getByText(settledFeeMatcher)).toBeTruthy()
+    },
+    { timeout: SETTLE_TIMEOUT_MS },
+  )
+}
 
 const ERROR_SHEET_TEST_ID = "review-error-msg-bottom-sheet"
 
@@ -339,59 +442,17 @@ describe("SendBitcoinConfirmationScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    useActiveWalletMock.mockReturnValue({
-      isSelfCustodial: false,
-      isReady: true,
-      needsBackendAuth: false,
-      wallets: [],
-      status: "ready",
-      accountType: "Custodial",
-    })
-    loadLocale("en")
     LL = i18nObject("en")
-
-    mockUseSendPayment.mockReturnValue({
-      loading: false,
-      hasAttemptedSend: false,
-      sendPayment: sendPaymentMock,
-    })
-    mockUseFee.mockReturnValue({
-      status: "set",
-      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
-    })
-    mockUseSendBalances.mockReturnValue({
-      btcWallet: {
-        id: "btc-wallet-id",
-        balance: 500000,
-        walletCurrency: WalletCurrency.Btc,
-      },
-      usdWallet: {
-        id: "usd-wallet-id",
-        balance: 10000,
-        walletCurrency: WalletCurrency.Usd,
-      },
-    })
   })
 
   it("Send Screen Confirmation - Intraledger Payment", async () => {
-    const { findByLabelText } = render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={route} />
       </ContextForScreen>,
     )
 
-    // it seems we need multiple act because the component re-render multiple times
-    // probably this could be debug with why-did-you-render
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
-    )
-
-    const { children } = await findByLabelText("Successful Fee")
-    expect(children).toEqual(["₦0 ($0.00)"])
+    expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
   })
 
   it("Send Screen Confirmation - Lightning lnurl Payment", async () => {
@@ -408,17 +469,10 @@ describe("SendBitcoinConfirmationScreen", () => {
 
     const lnurl = "lnurl1dp68gurn8ghj7mr..."
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <LightningLnURL route={route} />
       </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
     )
 
     expect(screen.getByText(lnurl)).toBeTruthy()
@@ -782,17 +836,10 @@ describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
       amount: { amount: 50, currency: WalletCurrency.Btc, currencyCode: "BTC" },
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(999)} />
       </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
     )
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
@@ -805,7 +852,7 @@ describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
       amount: { amount: 500, currency: WalletCurrency.Btc, currencyCode: "BTC" },
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(999)} />
       </ContextForScreen>,
@@ -847,7 +894,7 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
@@ -864,13 +911,11 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
-
-    await flushEffects()
 
     expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
   })
@@ -882,13 +927,11 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(1000)} />
       </ContextForScreen>,
     )
-
-    await flushEffects()
 
     expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
   })
@@ -900,13 +943,11 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       amountAdjustment: ConvertAmountAdjustment.FlooredToMin,
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
-
-    await flushEffects()
 
     expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
   })
@@ -930,15 +971,66 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
       amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildBtcSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
+  })
+
+  it("disables the slider until the dust check resolves, so the user cannot sweep unwarned", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+
+    render(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
+
+    /**
+     * Read before settling on purpose: the price conversion the dust check needs has not
+     * landed yet, so the warning cannot be computed and the screen has to fail closed
+     * rather than offer a swipe it is unable to warn about. The second read proves the
+     * gate is that pending state and not a permanent condition of this input.
+     */
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
+
+    await waitFor(
+      () => {
+        expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+      },
+      { timeout: SETTLE_TIMEOUT_MS },
+    )
+
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
+  })
+
+  it("keeps the slider disabled when the conversion limits cannot be read, rather than sending unwarned", async () => {
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: new Error("conversion limits unavailable"),
+    })
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={buildUsdSettlementRoute(200)} />
+      </ContextForScreen>,
+    )
 
     expect(screen.queryByText(usdRemainderSweepMatcher)).toBeNull()
+    expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 })
 
@@ -964,7 +1056,7 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   })
 
   it("(isSendingMax=false, hasAttemptedSend=false) over balance — slider disabled + amountExceed shown", async () => {
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(1100)} />
       </ContextForScreen>,
@@ -982,17 +1074,10 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   })
 
   it("(isSendingMax=true, hasAttemptedSend=false) over balance — slider enabled + no error", async () => {
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(1100, { isSendingMax: true })} />
       </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
     )
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
@@ -1010,17 +1095,10 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
       sendPayment: sendPaymentMock,
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(1100)} />
       </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
     )
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
@@ -1035,17 +1113,10 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
       sendPayment: undefined,
     })
 
-    render(
+    await renderSettled(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(1100)} />
       </ContextForScreen>,
-    )
-
-    await act(
-      () =>
-        new Promise((resolve) => {
-          setTimeout(resolve, 10)
-        }),
     )
 
     expect(screen.queryByText(/exceeds your balance/i)).toBeNull()
@@ -1405,8 +1476,8 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
 // has to be compared against a balance, so hide-balance applies here the way
 // it does on the home screen. The amount being authorised stays readable.
 describe("hide balance", () => {
-  const renderWithHideAmount = (hideAmount: boolean) =>
-    render(
+  const renderSettledWithHideAmount = (hideAmount: boolean) =>
+    renderSettled(
       <ContextForScreen>
         <HideAmountContextProvider value={{ hideAmount, toggleHideAmount: jest.fn() }}>
           <Intraledger route={route} />
@@ -1415,25 +1486,28 @@ describe("hide balance", () => {
     )
 
   it("masks the From balance while hide-balance is on", async () => {
-    renderWithHideAmount(true)
-    await flushEffects()
+    await renderSettledWithHideAmount(true)
 
-    // Exactly one placeholder: the From block. A second would mean the
-    // amount or fee field had been masked too, which is not the intent.
+    /**
+     * Exactly one placeholder: the From block. A second would mean the amount or fee
+     * field had been masked too, which is not the intent. Counted on the settled tree so
+     * that a placeholder leaking in once the display currency resolves still fails here.
+     */
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(1)
   })
 
-  it("leaves the amount being sent readable while hide-balance is on", async () => {
-    renderWithHideAmount(true)
-    await flushEffects()
+  it("leaves the amount and fee readable while hide-balance is on", async () => {
+    await renderSettledWithHideAmount(true)
 
-    const { children } = await screen.findByLabelText("Successful Fee")
-    expect(children).toEqual(["₦0 ($0.00)"])
+    expect([
+      screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children,
+      screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID).props.children,
+    ]).toEqual(["₦1", "$1.00"])
+    expect(feeRow().getByText("₦0 ($0.00)")).toBeTruthy()
   })
 
   it("shows the From balance when balances are visible", async () => {
-    renderWithHideAmount(false)
-    await flushEffects()
+    await renderSettledWithHideAmount(false)
 
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
   })
@@ -1443,31 +1517,7 @@ describe("SendBitcoinConfirmationScreen — slide to send", () => {
   let LL: ReturnType<typeof i18nObject>
 
   beforeEach(() => {
-    jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
-    loadLocale("en")
     LL = i18nObject("en")
-    mockUseSendPayment.mockReturnValue({
-      loading: false,
-      hasAttemptedSend: false,
-      sendPayment: sendPaymentMock,
-    })
-    mockUseFee.mockReturnValue({
-      status: "set",
-      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
-    })
-    mockUseSendBalances.mockReturnValue({
-      btcWallet: {
-        id: "btc-wallet-id",
-        balance: 500000,
-        walletCurrency: WalletCurrency.Btc,
-      },
-      usdWallet: {
-        id: "usd-wallet-id",
-        balance: 10000,
-        walletCurrency: WalletCurrency.Usd,
-      },
-    })
   })
 
   const renderRoute = async (
@@ -1652,7 +1702,6 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockUseNonCustodialConversionLimits.mockReturnValue(undefined)
     loadLocale("en")
     LL = i18nObject("en")
     mockUseSendPayment.mockReturnValue({

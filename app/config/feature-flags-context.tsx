@@ -36,6 +36,7 @@ const CardMaxOverdraftUsdKey = "cardMaxOverdraftUsd"
 const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
+const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
@@ -55,6 +56,7 @@ const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
+const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -103,6 +105,7 @@ type RemoteConfig = {
   [CardLateRepaymentFeeUsdKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
+  [CardInvestmentDepositBtcWalletIdKey]: string
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [BackupNudgeModalCooldownMsKey]: number
@@ -121,6 +124,7 @@ type RemoteConfig = {
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
   [MigrationReceiveDelayedNoticeMsKey]: number
   [MigrationDelayedRedirectEnabledKey]: boolean
+  [PersistentBulletinsEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -211,6 +215,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardLateRepaymentFeeUsd: 25,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
+  /** The receiving account's BITCOIN wallet, named by id so a rename cannot redirect the
+   *  money. A dollar wallet is refused by the API and reads as a failed invoice. Empty
+   *  until that account is decided, and the transfer step cannot pay while it is. */
+  cardInvestmentDepositBtcWalletId: "",
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   /** How long the self-custodial backup modal stays dismissed after the user closes it.
@@ -241,6 +249,11 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  releases the redirect once the notice window elapses instead of holding the swap
    *  until the receive confirms. Off by default — waiting is the product decision. */
   migrationDelayedRedirectEnabled: false,
+  /** Whether the home honours a bulletin the server marks as not dismissible. Off by
+   *  default, so every bulletin keeps its close control, as before the flag existed; on,
+   *  such a bulletin stays until the server retires it. A console toggle, so a bulletin
+   *  stuck on every home by mistake can be made closable again without a release. */
+  persistentBulletinsEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -383,6 +396,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(SparkCompatibleWalletsUrlKey)
           .asString()
 
+        const cardInvestmentDepositBtcWalletId = remoteConfigInstance()
+          .getValue(CardInvestmentDepositBtcWalletIdKey)
+          .asString()
+
         const backupNudgeBannerThreshold = remoteConfigInstance()
           .getValue(BackupNudgeBannerThresholdKey)
           .asNumber()
@@ -477,6 +494,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(MigrationDelayedRedirectEnabledKey)
           .asBoolean()
 
+        const persistentBulletinsEnabled = remoteConfigInstance()
+          .getValue(PersistentBulletinsEnabledKey)
+          .asBoolean()
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -505,6 +526,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           cardLateRepaymentFeeUsd,
           replaceCardDeliveryConfig,
           sparkCompatibleWalletsUrl,
+          cardInvestmentDepositBtcWalletId,
           backupNudgeBannerThreshold,
           backupNudgeModalThreshold,
           backupNudgeModalCooldownMs,
@@ -523,6 +545,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           selfCustodialDepositClaimLeewayVbyte,
           migrationReceiveDelayedNoticeMs,
           migrationDelayedRedirectEnabled,
+          persistentBulletinsEnabled,
           feeRatesConfig,
         })
       } catch (err) {

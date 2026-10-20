@@ -40,6 +40,10 @@ const POP_SCALE = 1.08
 const POP_UP_MS = 140
 const POP_SETTLE_MS = 200
 
+/** From the start of the drawing to the pop settling, not counting `delay`. */
+export const SUCCESS_BADGE_DURATION_MS =
+  CHECK_DELAY_MS + CHECK_DRAW_MS + POP_UP_MS + POP_SETTLE_MS
+
 const dashArray = (length: number) => [length, length + 2 * CAP_CLEARANCE]
 
 type SuccessBadgeProps = {

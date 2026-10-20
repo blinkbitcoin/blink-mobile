@@ -12,6 +12,7 @@ import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migr
 import { IconHero } from "@app/components/icon-hero"
 import { RichText } from "@app/components/rich-text"
 import { Screen } from "@app/components/screen"
+import { WarningBanner } from "@app/components/warning-banner"
 import { MigrationStatus } from "@app/graphql/generated"
 import { useContactSupport } from "@app/hooks/use-contact-support"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -28,7 +29,11 @@ import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
-import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
+import {
+  MigrationLnAddressOutcome,
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+} from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 
@@ -102,11 +107,25 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  moves the address irreversibly. It needs the custodial session the completion swap
    *  discards, so this is the last place it can fire, and Approve waits on it. */
   const isLnRepointBlocked = !preview.isReady || !migrationStart.isStarted
-  const lnAddressTransfer = useMigrationLnAddressTransfer({
-    custodialAccountId: ownerId,
-    selfCustodialAccountId,
-    skip: isLnRepointBlocked,
-  })
+  const { outcome: lnAddressOutcome, retry: retryLnAddressTransfer } =
+    useMigrationLnAddressTransfer({
+      custodialAccountId: ownerId,
+      selfCustodialAccountId,
+      skip: isLnRepointBlocked,
+    })
+
+  /** Each kind earns a different answer below, so each is named where it is read rather
+   *  than compared inline: the address moved, the server refused it, the device has no key
+   *  for the account, the proof could not be built, or the network dropped the attempt. */
+  const isLnAddressTransferred =
+    lnAddressOutcome === MigrationLnAddressOutcome.Transferred
+  const isLnAddressRejected = lnAddressOutcome === MigrationLnAddressOutcome.Rejected
+  const isLnAddressAccountMissing =
+    lnAddressOutcome === MigrationLnAddressOutcome.AccountMissing
+  const isLnAddressProofFailed =
+    lnAddressOutcome === MigrationLnAddressOutcome.ProofFailed
+  const hasLnAddressConnectionIssue =
+    lnAddressOutcome === MigrationLnAddressOutcome.ConnectionIssue
 
   /** The checkpoint only remembers which screen to resume on — plus the preview's
    *  receive figure, which the transfer's receive gate needs and which is knowable only
@@ -121,26 +140,46 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   }, [isFocused, checkpointLoading, expectedReceiveSats, saveCheckpoint])
 
   /**
-   * The ways this screen ends without an Approve to offer, as one value: the preview
-   * settled empty, the wallet query failed, the server refused to start, or the
-   * lightning-address re-point failed. Each strands the user here where the hardware back
-   * is swallowed, and each is as final as the others, so support takes over rather than
-   * leaving an Approve that would commit into a flow the backend already declined. A
-   * re-point still waiting on its account ids only keeps Approve off (never a false
-   * handover on a transient skip); the always-present contact-support button is its escape.
-   * Null means none of them.
+   * The ways this screen ends without an Approve to offer, as one value: the preview settled
+   * empty, the wallet query failed, the server refused to start, the re-point found no
+   * device key, or the proof it signs could not be built. Each strands the user here where
+   * the hardware back is swallowed, and each is as final as the others, so support takes
+   * over rather than leaving an Approve that would commit into a flow the backend already
+   * declined.
+   *
+   * An address the server REFUSED is deliberately not one of them: it breaks nothing the
+   * commit needs, so it draws the banner below and the migration carries on. A re-point
+   * still waiting on its account ids only keeps Approve off (never a false handover on a
+   * transient skip); the always-present contact-support button is its escape. Null means
+   * none of them.
    */
   const startFailureReason = migrationStart.isRejected
     ? MigrationSupportReason.StartRefused
     : null
-  /** A missing device key is the same cause the commit reports; anything else is generic. */
-  const lnAddressMissingReason = lnAddressTransfer.isAccountMissing
+  /** The two re-point outcomes that still hand over, both of them failures of the device
+   *  rather than of the address: a missing device key is the same cause the commit reports,
+   *  and a proof that could not be built breaks the commit the same way, since it signs the
+   *  same proof through the same SDK chain. */
+  const lnAddressMissingReason = isLnAddressAccountMissing
     ? MigrationSupportReason.SelfCustodialAccountMissing
     : null
-  const lnAddressRejectedReason = lnAddressTransfer.isRejected
+  const lnAddressProofFailureReason = isLnAddressProofFailed
     ? MigrationSupportReason.LnAddressTransferFailed
     : null
-  const lnAddressFailureReason = lnAddressMissingReason ?? lnAddressRejectedReason
+
+  /**
+   * The re-point is done as far as the commit is concerned: the address either moved or was
+   * refused, and neither leaves anything else to wait for.
+   *
+   * A refusal used to end the migration here. It must not: the address is a convenience and
+   * the funds are not, so a user whose address cannot move is left with an account locked
+   * server-side and no way to reach their money (blink-wip#1211). An interrupted migration
+   * that resumes does NOT ordinarily land here — it reuses the pending wallet, so the same
+   * pubkey comes back already transferred — but one that provisions a fresh account does:
+   * the address is parked on the pubkey of the attempt that failed, which the user no longer
+   * holds, and the lnurl server will refuse to move it again.
+   */
+  const isLnAddressSettled = isLnAddressTransferred || isLnAddressRejected
 
   /**
    * The re-point fires for neither id, and reports nothing when it does not fire, so an id
@@ -177,7 +216,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    *  done their work, and the session that carried them is about to be discarded by the
    *  completion swap: judging them past that point would hand a finished re-point to
    *  support. */
-  const areTransferIdsNeeded = !lnAddressTransfer.isTransferred
+  const areTransferIdsNeeded = !isLnAddressSettled
   const isMissingOwnerJudgeable =
     !isLnRepointBlocked && !isOwnerIdUnanswered && areTransferIdsNeeded
   const missingOwnerFailureReason = isMissingOwnerJudgeable
@@ -190,7 +229,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const handoverReason =
     failedReason ??
     startFailureReason ??
-    lnAddressFailureReason ??
+    lnAddressMissingReason ??
+    lnAddressProofFailureReason ??
     missingOwnerFailureReason ??
     preview.unavailableReason
 
@@ -234,12 +274,11 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const isRetryable =
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
-    lnAddressTransfer.hasConnectionIssue ||
+    hasLnAddressConnectionIssue ||
     isIdSourceRetryable
 
   const { retry: retryPreview } = preview
   const { retry: retryMigrationStart } = migrationStart
-  const { retry: retryLnAddressTransfer } = lnAddressTransfer
 
   /** The owner and the checkpoint join the shared retry because the re-point cannot fire
    *  without the ids they carry: refreshing everything else around a lookup that failed
@@ -268,7 +307,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     !preview.isReady ||
     preview.isDollarRegionPending ||
     !migrationStart.isStarted ||
-    !lnAddressTransfer.isTransferred
+    !isLnAddressSettled
 
   return (
     <Screen preset="fixed" headerShown={false}>
@@ -307,6 +346,17 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
               isDollarValueMuted={preview.isNewDollarBalanceUnavailable}
               isDollarValuePending={preview.isDollarRegionPending}
             />
+
+            {/** After the figures, not inside them: the before/after pair reads as one unit,
+             *  and the caveat belongs next to the button that acts on it. The wrapper is
+             *  only a test handle, which the banner takes no prop for; it carries no width,
+             *  because the banner's own flex text already fills the content width under this
+             *  body's centring (checked on device at both string lengths). */}
+            {isLnAddressRejected ? (
+              <View {...testProps("migration-balances-overview-ln-address-warning")}>
+                <WarningBanner>{LLOverview.lnAddressNotMoved()}</WarningBanner>
+              </View>
+            ) : null}
           </ScrollView>
         ) : (
           <View style={styles.loadingContainer}>
