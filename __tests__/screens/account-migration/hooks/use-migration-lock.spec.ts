@@ -147,6 +147,15 @@ describe("useMigrationLock", () => {
     expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: false })
   })
 
+  /** A caller that only reads the answer in some states does not pay for it in others. */
+  it("does not query the phase for a caller that skips it", () => {
+    mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+    renderHook(() => useMigrationLock({ skip: true }))
+
+    expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: true })
+  })
+
   /**
    * An unknown lock is not an unlocked one. Without this a caller cannot tell the two
    * apart and renders as if the answer had arrived, which is what made the gate flash

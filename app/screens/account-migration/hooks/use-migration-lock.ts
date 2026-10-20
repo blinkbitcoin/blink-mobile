@@ -72,13 +72,24 @@ const resolveServerFlow = (
  * the server actually reported locks, because locking every offline launch into a
  * migration is far worse than letting a locked user browse until the next successful read.
  */
-export const useMigrationLock = (): MigrationLock => {
+type UseMigrationLockOptions = {
+  /** For a caller that only reads the answer in some states, so the uncached read is not
+   *  paid for (nor waited on) where its answer is never used. A skipped lock answers
+   *  nothing and is not loading. */
+  skip?: boolean
+}
+
+export const useMigrationLock = ({
+  skip = false,
+}: UseMigrationLockOptions = {}): MigrationLock => {
   const { activeAccount, loading: registryLoading } = useAccountRegistry()
 
   /** Only a custodial account can be mid-migration, so the phase is never even asked for
    *  on a self-custodial launch, whose result would be discarded anyway. */
   const isCustodial = activeAccount?.type === AccountType.Custodial
-  const { status, loading, error, refetch } = useMigrationStatus({ skip: !isCustodial })
+  const { status, loading, error, refetch } = useMigrationStatus({
+    skip: !isCustodial || skip,
+  })
 
   const unknownStatus = status !== null && !isKnownStatus(status) ? status : null
   useEffect(() => {

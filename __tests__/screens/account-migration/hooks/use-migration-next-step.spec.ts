@@ -34,12 +34,16 @@ const mockGenericErrorCopy = "There was an error"
 const mockFundsOnTheirWayCopy = "Your funds are on their way"
 const mockTakingLongerCopy = "This is taking longer than usual"
 
+const mockUseMigrationLock = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-migration-lock", () => ({
-  useMigrationLock: () => ({
-    flow: mockFlow,
-    loading: mockLockLoading,
-    refetch: mockRefetchLock,
-  }),
+  useMigrationLock: (options: unknown) => {
+    mockUseMigrationLock(options)
+    return {
+      flow: mockFlow,
+      loading: mockLockLoading,
+      refetch: mockRefetchLock,
+    }
+  },
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -99,6 +103,17 @@ describe("useMigrationNextStep", () => {
     mockIsSupportDue = false
     mockIsOverdue = false
     mockRefetchLock.mockResolvedValue(null)
+  })
+
+  /** Only a commit point reads the server's answer, so the steps before it never hold
+   *  their Continue on a round trip they do not use. */
+  it("asks the server only at the commit point", () => {
+    renderHook(() => useMigrationNextStep())
+    expect(mockUseMigrationLock).toHaveBeenLastCalledWith({ skip: true })
+
+    mockIsAtCommitPoint = true
+    renderHook(() => useMigrationNextStep())
+    expect(mockUseMigrationLock).toHaveBeenLastCalledWith({ skip: false })
   })
 
   it("offers the history download to a fresh migration with history", () => {
@@ -398,6 +413,25 @@ describe("useMigrationNextStep", () => {
         reason: MigrationSupportReason.ReceiveDelayed,
         origin: MigrationSupportOrigin.Resume,
       })
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    /** The history step's Skip and Continue both land here: an overdue receive must not
+     *  be walked past the step it is waiting behind. */
+    it("hands the history step's continue to support the same way", () => {
+      arriveAwaitingSwap()
+      mockIsSupportDue = true
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.continuePastHistory()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+        reason: MigrationSupportReason.ReceiveDelayed,
+        origin: MigrationSupportOrigin.Resume,
+      })
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 

@@ -62,7 +62,13 @@ export const useMigrationNextStep = () => {
     isStartConfirmed,
     loading: checkpointLoading,
   } = useMigrationCheckpoint()
-  const { flow, loading: lockLoading, refetch: refetchLock } = useMigrationLock()
+  /** Only a commit point reads the server's answer, so only a commit point asks for it:
+   *  every other step would otherwise hold its Continue on a round trip it never uses. */
+  const {
+    flow,
+    loading: lockLoading,
+    refetch: refetchLock,
+  } = useMigrationLock({ skip: !isAtCommitPoint })
 
   /**
    * The checkpoint says WHICH screen the device left off on; the server says WHETHER that
@@ -133,8 +139,8 @@ export const useMigrationNextStep = () => {
       /** Funds past the notice window, and still missing on a check taken since the app
        *  came back, are genuinely late: support takes over instead of another "on its
        *  way". */
-      const isReceiveOverdue = !isAskingAgain && isMigrationReceiveSupportDue()
-      if (isReceiveOverdue) {
+      const isSupportDue = !isAskingAgain && isMigrationReceiveSupportDue()
+      if (isSupportDue) {
         if (isSkipGuard) {
           navigation.replace("accountMigrationContactSupport", OVERDUE_RECEIVE_SUPPORT)
         } else {
