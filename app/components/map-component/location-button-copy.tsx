@@ -15,12 +15,15 @@ type Props = {
   requestPermissions: () => void
   centerOnUser: () => void
   permissionStatus?: PermissionStatus
+  // From the bottom of the map; MapComponent works out who owns the system bar.
+  bottom: number
 }
 
 export default function LocationButtonCopy({
   permissionStatus,
   centerOnUser,
   requestPermissions,
+  bottom,
 }: Props) {
   const styles = useStyles()
   const {
@@ -28,7 +31,7 @@ export default function LocationButtonCopy({
   } = useTheme()
 
   return (
-    <View testID="location-button-anchor" style={styles.button}>
+    <View testID="location-button-anchor" style={[styles.button, { bottom }]}>
       <TouchableOpacity
         testID="location-button"
         style={styles.android}
@@ -42,11 +45,7 @@ export default function LocationButtonCopy({
 
 const useStyles = makeStyles(({ colors }) => ({
   button: {
-    // Measured from the bottom of the map, which is never the screen edge: it is
-    // the top of the tab bar, or of the add-place form while one is open. Both
-    // already pay for the system bar, so it is not added here.
     position: "absolute",
-    bottom: MAP_CONTROL_INSET,
     right: MAP_CONTROL_INSET,
     zIndex: 99,
   },
