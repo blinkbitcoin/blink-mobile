@@ -1,14 +1,25 @@
 import React from "react"
-import { StyleSheet, TextStyle } from "react-native"
+import { Platform, StyleSheet, TextStyle } from "react-native"
 import { ReactTestInstance } from "react-test-renderer"
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
 import { GaloyToast } from "@app/components/galoy-toast/galoy-toast"
 import { dark, light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 
-type ToastRenderer = (params: { text1?: string; text2?: string }) => React.ReactNode
+const mockWindow = { width: 360, height: 800, scale: 2, fontScale: 1 }
+jest.mock("react-native/Libraries/Utilities/useWindowDimensions", () => ({
+  __esModule: true,
+  default: () => mockWindow,
+}))
+
+type ToastRenderer = (params: {
+  text1?: string
+  text2?: string
+  onPress?: () => void
+  hide?: () => void
+}) => React.ReactNode
 
 const mockToastProps: {
   config?: Record<string, ToastRenderer>
@@ -68,8 +79,18 @@ const flatStyle = (element: ReactTestInstance): TextStyle =>
   StyleSheet.flatten(element.props.style)
 
 describe("GaloyToast", () => {
+  const platform = Platform.OS
+
   beforeEach(() => {
     mockInsets.top = 24
+    mockInsets.left = 0
+    mockInsets.right = 0
+    mockWindow.width = 360
+    Platform.OS = platform
+  })
+
+  afterAll(() => {
+    Platform.OS = platform
   })
 
   it("renders without crashing", () => {
@@ -99,6 +120,62 @@ describe("GaloyToast", () => {
         render(<GaloyToast />)
         expect(mockToastProps.topOffset).toBe(expected)
       })
+    })
+  })
+
+  it("does not add the status bar again inside an Android modal", () => {
+    mockInsets.top = 24
+    Platform.OS = "android"
+    render(<GaloyToast inModal />)
+    expect(mockToastProps.topOffset).toBe(40)
+  })
+
+  it("pulls a modal toast out to the window so the inset is not the modal's percent margin", () => {
+    const { getByTestId } = render(<GaloyToast inModal />)
+
+    expect(flatStyle(getByTestId("toast-host"))).toMatchObject({
+      position: "absolute",
+      top: -18,
+      left: -18,
+      right: -18,
+      bottom: -18,
+    })
+    expect(getByTestId("toast-host").props.pointerEvents).toBe("box-none")
+  })
+
+  it("dismisses when the row is pressed", () => {
+    const hide = jest.fn()
+    const onPress = jest.fn()
+    render(<GaloyToast />)
+    const { getByTestId } = render(
+      <ThemeProvider theme={createTheme({ ...theme, mode: "dark" })}>
+        {mockToastProps.config?.success({
+          text1: "Title",
+          text2: MESSAGE,
+          hide,
+          onPress,
+        })}
+      </ThemeProvider>,
+    )
+
+    fireEvent.press(getByTestId("toast-success"))
+
+    expect(onPress).toHaveBeenCalledTimes(1)
+    expect(hide).toHaveBeenCalledTimes(1)
+  })
+
+  it("caps and centres the row on a tablet", () => {
+    mockWindow.width = 768
+    render(<GaloyToast />)
+    const { getByTestId } = render(
+      <ThemeProvider theme={createTheme({ ...theme, mode: "dark" })}>
+        {mockToastProps.config?.success({ text1: "Title", text2: MESSAGE })}
+      </ThemeProvider>,
+    )
+
+    expect(flatStyle(getByTestId("toast-success"))).toMatchObject({
+      marginLeft: 144,
+      marginRight: 144,
     })
   })
 
@@ -172,7 +249,8 @@ describe("GaloyToast", () => {
           alignItems: "center",
           alignSelf: "stretch",
           gap: 12,
-          marginHorizontal: 20,
+          marginLeft: 20,
+          marginRight: 20,
           paddingHorizontal: 12,
           paddingVertical: 14,
           borderWidth: 1,

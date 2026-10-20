@@ -14,9 +14,16 @@ jest.mock("react-native-modal", () =>
   jest.requireActual("@mocks/react-native-modal-mock"),
 )
 
+const toastMounts: { inModal?: boolean }[] = []
+
 jest.mock("@app/components/galoy-toast", () => {
   const { View } = jest.requireActual("react-native")
-  return { GaloyToast: () => <View testID="toast" /> }
+  return {
+    GaloyToast: (props: { inModal?: boolean }) => {
+      toastMounts.push(props)
+      return <View testID="toast" />
+    },
+  }
 })
 
 jest.mock("@app/i18n/i18n-react", () => {
@@ -70,10 +77,12 @@ const renderModal = (Modal: (typeof modals)[number]["Modal"], isVisible: boolean
 describe("GaloyToast mounts inside modals", () => {
   modals.forEach(({ name, Modal }) => {
     describe(name, () => {
-      it("mounts its own toast inside the open modal", () => {
+      it("mounts its own toast inside the open modal, in the window not the padded box", () => {
+        toastMounts.length = 0
         const { getByTestId } = renderModal(Modal, true)
 
         expect(within(getByTestId("modal")).getByTestId("toast")).toBeTruthy()
+        expect(toastMounts.at(-1)).toEqual({ inModal: true })
       })
 
       it("mounts no toast while closed", () => {
