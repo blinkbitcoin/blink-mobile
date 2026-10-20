@@ -301,6 +301,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     stageRef,
     heroRef,
     isSent,
+    sentPlay,
     glowFrame,
     heroProgress,
     glowProgress,
@@ -688,6 +689,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                 secondaryAmount={heroSecondaryText}
                 sentProgress={heroProgress}
                 isSent={isSent}
+                sentPlay={sentPlay}
               />
             </Animated.View>
           </View>
