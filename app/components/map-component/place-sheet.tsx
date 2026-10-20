@@ -33,10 +33,10 @@ import {
   OSM_COPYRIGHT_URL,
   OpeningState,
   VerificationState,
-  directionsUrl,
   formatSurveyDate,
   hostOf,
   isBoosted,
+  googleMapsDirections,
   isWebUrl,
   mailtoUrl,
   merchantUrl,
@@ -297,15 +297,23 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   const verification = verificationStateAt(details?.verifiedAt, now)
 
   // Web destinations get the in-app browser the rest of the app uses, so a tap
-  // on a merchant's site does not strand the user in Safari. tel:, geo:/maps:
-  // and lightning: have to reach the OS instead — InAppBrowser cannot open them.
+  // on a merchant's site does not strand the user in Safari. tel:, mailto: and
+  // lightning: have to reach the OS instead — InAppBrowser cannot open them.
   const openUrl = (url: string) => {
     const open = isWebUrl(url) ? openExternalUrl(url) : Linking.openURL(url)
     open.catch(() => toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }))
   }
 
-  const navigate = () =>
-    openUrl(directionsUrl(shown, name, Platform.OS === "ios" ? "ios" : "android"))
+  // Straight to the OS rather than through openUrl: in the in-app browser the
+  // web URL would stay a web page, where the OS hands it to Google Maps.
+  const navigate = async () => {
+    const { app, web } = googleMapsDirections(shown)
+    const hasApp =
+      Platform.OS === "ios" && (await Linking.canOpenURL(app).catch(() => false))
+    Linking.openURL(hasApp ? app : web).catch(() =>
+      toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }),
+    )
+  }
 
   const share = () => {
     // A dismissed share sheet resolves; a rejection is the OS refusing, which
