@@ -43,7 +43,8 @@ import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
-import { MAP_CONTROL_INSET, MapSearchBar, searchBarBottom } from "./map-search-bar"
+import { MAP_CONTROL_INSET, searchBarBottom } from "./map-layout"
+import { MapSearchBar } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
@@ -88,7 +89,7 @@ export default function MapComponent({
     theme: { colors, mode: themeMode },
   } = useTheme()
   const insets = useSafeAreaInsets()
-  const styles = useStyles({ topInset: insets.top, bottomInset: insets.bottom })
+  const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
   const { LL } = useI18nContext()
 
@@ -587,10 +588,10 @@ export default function MapComponent({
           permissionsStatus !== RESULTS.LIMITED && (
             // Centring on yourself and then nudging the pin onto your own shop is
             // the common way to place one, so this stays on the map throughout.
-            // The form is a sibling, so while it is open this edge is already its
-            // top — the system bar is not ours to add, or the button jumps past 20.
+            // It needs no lifting to clear the form: the form is the map's
+            // sibling rather than something over it, so the bottom this is
+            // measured from is already the top of the form.
             <LocationButtonCopy
-              bottomInset={isAddingPlace ? 0 : insets.bottom}
               requestPermissions={requestLocationPermission}
               permissionStatus={permissionsStatus}
               centerOnUser={centerOnUser}
@@ -635,65 +636,63 @@ export default function MapComponent({
   )
 }
 
-const useStyles = makeStyles(
-  ({ colors }, { topInset, bottomInset }: { topInset: number; bottomInset: number }) => ({
-    map: {
-      height: "100%",
-      width: "100%",
-    },
+const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) => ({
+  map: {
+    height: "100%",
+    width: "100%",
+  },
 
-    viewContainer: { flex: 1 },
+  viewContainer: { flex: 1 },
 
-    // Everything drawn on the map is positioned inside this rather than over the
-    // whole screen, so that "the bottom of the map" means the top of the form
-    // while one is open and the bottom of the screen when none is. The pin's
-    // centre — which is the coordinate being submitted — comes out right for the
-    // same reason: it is the centre of the map view, whatever height that view
-    // currently has.
-    mapArea: { flex: 1 },
+  // Everything drawn on the map is positioned inside this rather than over the
+  // whole screen, so that "the bottom of the map" means the top of the form
+  // while one is open and the top of the tab bar when none is. The pin's
+  // centre — which is the coordinate being submitted — comes out right for the
+  // same reason: it is the centre of the map view, whatever height that view
+  // currently has.
+  mapArea: { flex: 1 },
 
-    statusPill: {
-      position: "absolute",
-      // Under the search bar, which now owns the top edge of the map.
-      top: searchBarBottom(topInset) + 10,
-      alignSelf: "center",
-      flexDirection: "row",
-      alignItems: "center",
-      columnGap: 8,
-      backgroundColor: colors.white,
-      borderRadius: 20,
-      paddingHorizontal: 14,
-      paddingVertical: 8,
-      maxWidth: "90%",
-    },
-    statusText: {
-      fontSize: 13,
-      color: colors.black,
-      flexShrink: 1,
-    },
-    retryText: {
-      fontSize: 13,
-      fontWeight: "600",
-      color: colors.primary,
-    },
-    addPlace: {
-      position: "absolute",
-      left: MAP_CONTROL_INSET,
-      // Only mounted while the form is closed, so this edge is the screen edge.
-      bottom: bottomInset + MAP_CONTROL_INSET,
-      zIndex: 99,
-      flexDirection: "row",
-      alignItems: "center",
-      columnGap: 6,
-      backgroundColor: colors.white,
-      borderRadius: 20,
-      paddingHorizontal: 14,
-      paddingVertical: 11,
-    },
-    addPlaceText: {
-      fontSize: 14,
-      fontWeight: "700",
-      color: colors.black,
-    },
-  }),
-)
+  statusPill: {
+    position: "absolute",
+    // Under the search bar, which now owns the top edge of the map.
+    top: searchBarBottom(topInset) + 10,
+    alignSelf: "center",
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 8,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 8,
+    maxWidth: "90%",
+  },
+  statusText: {
+    fontSize: 13,
+    color: colors.black,
+    flexShrink: 1,
+  },
+  retryText: {
+    fontSize: 13,
+    fontWeight: "600",
+    color: colors.primary,
+  },
+  addPlace: {
+    position: "absolute",
+    left: MAP_CONTROL_INSET,
+    // The top of the tab bar, which already pays for the system bar.
+    bottom: MAP_CONTROL_INSET,
+    zIndex: 99,
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 6,
+    backgroundColor: colors.white,
+    borderRadius: 20,
+    paddingHorizontal: 14,
+    paddingVertical: 11,
+  },
+  addPlaceText: {
+    fontSize: 14,
+    fontWeight: "700",
+    color: colors.black,
+  },
+}))

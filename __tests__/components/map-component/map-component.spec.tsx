@@ -367,7 +367,7 @@ describe("MapComponent", () => {
     })
   })
 
-  it("keeps the 20 past the system bar, and does not add side insets Screen already took", async () => {
+  it("keeps the 20 past the top system bar, and adds no bottom or side inset the tab bar and Screen already took", async () => {
     mockTopInset = 47
     mockBottomInset = 34
     mockLeftInset = 44
@@ -381,9 +381,11 @@ describe("MapComponent", () => {
     })
     expect(
       StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
-    ).toMatchObject({ bottom: 54, right: 20 })
+    ).toMatchObject({ bottom: 20, right: 20 })
+    // The map ends at the top of the tab bar, which is 60 + insets.bottom tall
+    // (root-navigator.tsx), so adding the inset here would leave a 54 gap.
     expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
-      bottom: 54,
+      bottom: 20,
       left: 20,
     })
   })
