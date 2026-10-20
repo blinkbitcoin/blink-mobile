@@ -625,9 +625,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
 
   const errorSheet = useReviewErrorSheet({
     paymentFailure,
+    amountError: invalidAmountErrorMessage || undefined,
+    canSetAmount: paymentDetail.canSetAmount,
     isFeeFailed,
     feeErrorCode,
     feeErrorText,
+    dustWarning,
     errorMsgActionFor,
   })
 
@@ -758,16 +761,8 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
                   {"*" + LL.SendBitcoinConfirmationScreen.maxFeeSelected()}
                 </Text>
               ) : null}
-              {dustWarning.status === "visible" ? (
-                <WarningBanner>
-                  {LL.SendBitcoinConfirmationScreen.usdRemainderSweep({
-                    remaining: formatMoneyAmount({ moneyAmount: dustWarning.remaining }),
-                    remainingSats: formatMoneyAmount({
-                      moneyAmount: dustWarning.remainingSats,
-                    }),
-                    minimum: formatMoneyAmount({ moneyAmount: dustWarning.minimum }),
-                  })}
-                </WarningBanner>
+              {errorSheet.dustSweepText ? (
+                <WarningBanner>{errorSheet.dustSweepText}</WarningBanner>
               ) : null}
             </View>
           </Animated.View>
@@ -815,7 +810,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       <ErrorMsgBottomSheet
         isVisible={errorSheet.isVisible}
         onClose={errorSheet.dismiss}
-        title={LL.SendBitcoinScreen.problemSheetTitle()}
+        title={errorSheet.title}
         body={errorSheet.message}
         {...errorSheet.button}
         testID="review-error-msg-bottom-sheet"

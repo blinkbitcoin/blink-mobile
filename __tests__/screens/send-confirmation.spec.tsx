@@ -818,7 +818,7 @@ describe("SendBitcoinConfirmationScreen — fee-currency conversion", () => {
         }),
     )
 
-    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+    expectInlineAndInSheet(/exceeds your balance/i)
   })
 })
 
@@ -855,7 +855,7 @@ describe("SendBitcoinConfirmationScreen — USD remainder sweep warning", () => 
 
     await flushEffects()
 
-    expect(screen.getByText(usdRemainderSweepMatcher)).toBeTruthy()
+    expectInlineAndInSheet(usdRemainderSweepMatcher)
   })
 
   it("does NOT render the warning when there is no amountAdjustment in the fee quote", async () => {
@@ -977,7 +977,7 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
         }),
     )
 
-    expect(screen.getByText(/exceeds your balance/i)).toBeTruthy()
+    expectInlineAndInSheet(/exceeds your balance/i)
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
 
@@ -1812,10 +1812,12 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(buildBtcSettlementRoute(1000))
 
       expect(outlineColor()).toBe(colors.light.error)
-      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expectInlineAndInSheet(/Total exceeds your balance/)
       expect(lastSliderProps().disabled).toBe(true)
 
-      fireEvent.press(screen.getByText(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      // The inline chip comes first; the sheet on top offers the same action.
+      const [chip] = screen.getAllByText(LL.SendBitcoinConfirmationScreen.changeAmount())
+      fireEvent.press(chip)
       expectChangeAmountDispatched()
     })
 
@@ -1837,7 +1839,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Fast }))
 
       expect(outlineColor()).toBe(colors.light.error)
-      expect(screen.getByText(/Total exceeds your balance/)).toBeTruthy()
+      expectInlineAndInSheet(/Total exceeds your balance/)
       expect(
         screen.queryByText(LL.SendBitcoinConfirmationScreen.lightningRecommended()),
       ).toBeNull()
@@ -2304,6 +2306,120 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
 
       fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.changeAmount()))
       expectChangeAmountDispatched()
+    })
+  })
+
+  describe("total over the balance (R4)", () => {
+    it("opens with Change amount when the total exceeds the balance", async () => {
+      await renderReview(buildUsdSettlementRoute(20000))
+
+      expectInlineAndInSheet(/Total exceeds your balance/)
+      const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+      expect(sheet.getByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeTruthy()
+
+      fireEvent.press(sheetButton(LL.SendBitcoinConfirmationScreen.changeAmount()))
+      expectChangeAmountDispatched()
+    })
+
+    it("offers Try again instead when the invoice fixes the amount", async () => {
+      const overBalance = buildUsdSettlementRoute(20000)
+      const fixedAmountRoute = {
+        ...overBalance,
+        params: {
+          paymentDetail: { ...overBalance.params.paymentDetail, canSetAmount: false },
+        },
+      } as unknown as typeof overBalance
+      await renderReview(fixedAmountRoute)
+
+      expect(sheetButton(LL.SendBitcoinConfirmationScreen.tryAgain())).toBeTruthy()
+    })
+
+    it("gives way to a send failure", async () => {
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "FAILURE",
+        errorsMessage: "route not found",
+      })
+      mockUseSendPayment.mockReturnValue({
+        loading: false,
+        hasAttemptedSend: false,
+        sendPayment: sendPaymentMock,
+      })
+      await renderReview(route)
+      await slide()
+
+      expectInlineAndInSheet("route not found")
+      expect(screen.queryByText(/Total exceeds your balance/)).toBeNull()
+    })
+  })
+
+  describe("USD dust sweep notice (R5)", () => {
+    const sweep = /will be converted to Bitcoin\. USD minimum:/i
+
+    const usdBalance = (cents: number) =>
+      mockUseSendBalances.mockReturnValue({
+        btcWallet: {
+          id: "btc-wallet-id",
+          balance: 0,
+          walletCurrency: WalletCurrency.Btc,
+        },
+        usdWallet: {
+          id: "usd-wallet-id",
+          balance: cents,
+          walletCurrency: WalletCurrency.Usd,
+        },
+      })
+
+    beforeEach(() => {
+      usdBalance(1000)
+      mockUseFee.mockReturnValue({
+        status: "set",
+        amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+        amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+      })
+    })
+
+    it("opens titled 'Before you send' with OK, over the banner", async () => {
+      await renderReview(buildUsdSettlementRoute(200))
+
+      expectInlineAndInSheet(sweep)
+      const sheet = within(screen.getByTestId(ERROR_SHEET_TEST_ID))
+      expect(
+        sheet.getByText(LL.SendBitcoinConfirmationScreen.dustSweepSheetTitle()),
+      ).toBeTruthy()
+      expect(sheet.queryByText(LL.SendBitcoinScreen.problemSheetTitle())).toBeNull()
+      expect(sheet.getByText(LL.common.ok())).toBeTruthy()
+    })
+
+    it("closes on OK without leaving review, and the slider stays free to send", async () => {
+      await renderReview(buildUsdSettlementRoute(200))
+
+      await act(async () => {
+        fireEvent.press(sheetButton(LL.common.ok()))
+      })
+      await flushEffects()
+
+      expect(errorSheet()).toBeNull()
+      expect(screen.getByText(sweep)).toBeTruthy()
+      expect(navigationDispatchMock).not.toHaveBeenCalled()
+      expect(lastSliderProps().disabled).toBe(false)
+    })
+
+    it("stays closed once dismissed when the amounts in it change", async () => {
+      await renderReview(buildUsdSettlementRoute(200))
+      await act(async () => {
+        fireEvent.press(sheetButton(LL.common.ok()))
+      })
+
+      usdBalance(1100)
+      screen.rerender(
+        <ContextForScreen>
+          <Intraledger route={buildUsdSettlementRoute(200)} />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(screen.getByText(sweep)).toBeTruthy()
+      expect(errorSheet()).toBeNull()
     })
   })
 

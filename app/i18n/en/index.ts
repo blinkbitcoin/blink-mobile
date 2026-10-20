@@ -2394,6 +2394,7 @@ const en: BaseTranslation = {
     changeAmount: "Change amount",
     tryAgain: "Try again",
     home: "Home",
+    dustSweepSheetTitle: "Before you send",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
