@@ -706,3 +706,74 @@ describe("onchain address rotation", () => {
     })
   })
 })
+
+describe("generateNewOnchainAddress", () => {
+  it("rotates on request even with no evidence the address was used", async () => {
+    mockLoadIssuedOnchainAddress.mockResolvedValue({
+      address: "bc1qfirst...",
+      depositMarker: null,
+    })
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockResolvedValueOnce({ address: "bc1qfresh..." })
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
+
+    let ok: boolean | undefined
+    await act(async () => {
+      ok = await result.current?.generateNewOnchainAddress?.()
+    })
+
+    expect(ok).toBe(true)
+    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+    expect(result.current?.onchainAddress).toBe("bc1qfresh...")
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith(
+      "sc-account-1",
+      expect.objectContaining({ address: "bc1qfresh..." }),
+    )
+  })
+
+  it("keeps the current address and reports false when the SDK returns none", async () => {
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockResolvedValueOnce({ errors: [{ message: "sdk down" }] })
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+
+    let ok: boolean | undefined
+    await act(async () => {
+      ok = await result.current?.generateNewOnchainAddress?.()
+    })
+
+    expect(ok).toBe(false)
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    expect(mockRecordAppError).toHaveBeenCalled()
+  })
+
+  it("reports false instead of throwing when the request rejects", async () => {
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockRejectedValueOnce(new Error("bridge exploded"))
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+
+    let ok: boolean | undefined
+    await act(async () => {
+      ok = await result.current?.generateNewOnchainAddress?.()
+    })
+
+    expect(ok).toBe(false)
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    expect(mockRecordAppError).toHaveBeenCalledWith(new Error("bridge exploded"))
+  })
+})

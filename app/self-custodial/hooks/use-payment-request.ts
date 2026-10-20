@@ -393,74 +393,83 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   // after the one that replaced it and show a superseded address.
   const onchainRequestIdRef = useRef(0)
 
-  const issueOnchainAddress = useCallback(async () => {
-    if (!sdk) return
-    const pendingIds = pendingDepositIdsRef.current
-    onchainRequestIdRef.current += 1
-    const requestId = onchainRequestIdRef.current
+  // Resolves true once an address is on screen. `forceNew` is the user asking for a
+  // fresh one: earlier addresses stay valid, so it skips the reuse checks and no more.
+  const issueOnchainAddress = useCallback(
+    async (forceNew = false) => {
+      if (!sdk) return false
+      const pendingIds = pendingDepositIdsRef.current
+      onchainRequestIdRef.current += 1
+      const requestId = onchainRequestIdRef.current
 
-    const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
+      const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
 
-    // Rotating is only worth anything if we can record that we did: without an account
-    // id there is nowhere to write, so every run would rotate again and remember
-    // nothing — a fresh address per render, and still no reuse detection. Serve the
-    // SDK's existing address instead and leave the tracking to the next run that has
-    // an account to key on. This state is transient, an account switch mid-render.
-    const canTrackReuse = selfCustodialAccountId !== null
-    const issued = canTrackReuse
-      ? await loadIssuedOnchainAddress(selfCustodialAccountId)
-      : null
-    const seenPendingIds = issued?.seenPendingDepositIds ?? []
+      // Rotating is only worth anything if we can record that we did: without an account
+      // id there is nowhere to write, so every run would rotate again and remember
+      // nothing — a fresh address per render, and still no reuse detection. Serve the
+      // SDK's existing address instead and leave the tracking to the next run that has
+      // an account to key on. This state is transient, an account switch mid-render.
+      const canTrackReuse = selfCustodialAccountId !== null
+      const issued = canTrackReuse
+        ? await loadIssuedOnchainAddress(selfCustodialAccountId)
+        : null
+      const seenPendingIds = issued?.seenPendingDepositIds ?? []
 
-    /**
-     * Rotate only on positive evidence that this address has been used:
-     *
-     * - a `null` marker means neither the loaded history nor the SDK lookback behind
-     *   it could name an on-chain receipt (cold start, a reconnect, a failed refresh)
-     *   — "we do not know yet" is not "nothing has arrived", and treating it as such
-     *   rotated on every offline visit;
-     * - no stored record at all with receipts present is the first run after
-     *   upgrade, where the SDK's current address may well be the paid one, so we
-     *   rotate once rather than adopting it;
-     * - an unclaimed deposit we have not recorded means money is sitting on the
-     *   displayed address even though no payment exists for it yet.
-     */
-    const markerMoved = marker !== null && issued?.depositMarker !== marker
-    const hasUnseenPendingDeposit = pendingIds.some((id) => !seenPendingIds.includes(id))
-    const shouldRotate = canTrackReuse && (markerMoved || hasUnseenPendingDeposit)
-
-    const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
-    if (!result.address) {
-      // The adapter reports failures as an error-only result rather than throwing,
-      // so without this the address request would fail in complete silence.
-      recordAppError(
-        new Error(
-          `Self-custodial onchain address request returned no address: ${JSON.stringify(
-            result.errors ?? [],
-          )}`,
-        ),
+      /**
+       * Rotate only on positive evidence that this address has been used:
+       *
+       * - a `null` marker means neither the loaded history nor the SDK lookback behind
+       *   it could name an on-chain receipt (cold start, a reconnect, a failed refresh)
+       *   — "we do not know yet" is not "nothing has arrived", and treating it as such
+       *   rotated on every offline visit;
+       * - no stored record at all with receipts present is the first run after
+       *   upgrade, where the SDK's current address may well be the paid one, so we
+       *   rotate once rather than adopting it;
+       * - an unclaimed deposit we have not recorded means money is sitting on the
+       *   displayed address even though no payment exists for it yet.
+       */
+      const markerMoved = marker !== null && issued?.depositMarker !== marker
+      const hasUnseenPendingDeposit = pendingIds.some(
+        (id) => !seenPendingIds.includes(id),
       )
-      return
-    }
-    if (requestId !== onchainRequestIdRef.current) return
+      const shouldRotate =
+        forceNew || (canTrackReuse && (markerMoved || hasUnseenPendingDeposit))
 
-    setOnchainAddress(result.address)
-    if (!canTrackReuse) return
-    await saveIssuedOnchainAddress(selfCustodialAccountId, {
-      address: result.address,
-      // Never let a snapshot that has not loaded erase a marker we already had:
-      // the next refresh would otherwise read it back as a fresh deposit.
-      depositMarker: marker ?? issued?.depositMarker ?? null,
-      // Accepted cost: once this deposit is claimed it becomes a payment, the marker
-      // moves, and we rotate a second time — away from an address that was never
-      // used. One spare address, versus threading the deposit txid onto the shared
-      // transaction type to recognise the two views of the same deposit.
-      seenPendingDepositIds: mergeSeenPendingDepositIds(
-        issued?.seenPendingDepositIds,
-        pendingIds,
-      ),
-    })
-  }, [sdk, selfCustodialAccountId])
+      const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
+      if (!result.address) {
+        // The adapter reports failures as an error-only result rather than throwing,
+        // so without this the address request would fail in complete silence.
+        recordAppError(
+          new Error(
+            `Self-custodial onchain address request returned no address: ${JSON.stringify(
+              result.errors ?? [],
+            )}`,
+          ),
+        )
+        return false
+      }
+      if (requestId !== onchainRequestIdRef.current) return false
+
+      setOnchainAddress(result.address)
+      if (!canTrackReuse) return true
+      await saveIssuedOnchainAddress(selfCustodialAccountId, {
+        address: result.address,
+        // Never let a snapshot that has not loaded erase a marker we already had:
+        // the next refresh would otherwise read it back as a fresh deposit.
+        depositMarker: marker ?? issued?.depositMarker ?? null,
+        // Accepted cost: once this deposit is claimed it becomes a payment, the marker
+        // moves, and we rotate a second time — away from an address that was never
+        // used. One spare address, versus threading the deposit txid onto the shared
+        // transaction type to recognise the two views of the same deposit.
+        seenPendingDepositIds: mergeSeenPendingDepositIds(
+          issued?.seenPendingDepositIds,
+          pendingIds,
+        ),
+      })
+      return true
+    },
+    [sdk, selfCustodialAccountId],
+  )
 
   // Runs on mount and again whenever an on-chain receipt or an unclaimed deposit
   // lands — covering both "the deposit arrived while the QR was on screen" and "it
@@ -475,6 +484,19 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       )
     })
   }, [sdk, issueOnchainAddress, loadedDepositMarker, pendingDepositKey])
+
+  const generateNewOnchainAddress = useCallback(async (): Promise<boolean> => {
+    try {
+      return await issueOnchainAddress(true)
+    } catch (err) {
+      recordAppError(
+        err instanceof Error
+          ? err
+          : new Error(`Self-custodial new onchain address failed: ${err}`),
+      )
+      return false
+    }
+  }, [issueOnchainAddress])
 
   useEffect(() => {
     if (!sdk) return
@@ -620,6 +642,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     info: invoiceData ? { data: invoiceData } : undefined,
     onchainAddress,
     getOnchainFullUriFn,
+    generateNewOnchainAddress,
     pr: {
       state: requestState,
       info: { data: invoiceData },

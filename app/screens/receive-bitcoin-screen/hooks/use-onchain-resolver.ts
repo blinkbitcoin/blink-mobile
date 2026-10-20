@@ -28,6 +28,8 @@ export const useOnchainResolver = (
       address: requestState.onchainAddress ?? null,
       loading: !requestState.onchainAddress,
       getFullUriFn: requestState.getOnchainFullUriFn,
+      generateNewAddress:
+        requestState.generateNewOnchainAddress ?? (() => Promise.resolve(false)),
     }
   }
 
@@ -35,5 +37,6 @@ export const useOnchainResolver = (
     address: custodialOnchain.address,
     loading: custodialOnchain.loading,
     getFullUriFn: custodialOnchain.getFullUriFn,
+    generateNewAddress: custodialOnchain.generateNewAddress,
   }
 }
