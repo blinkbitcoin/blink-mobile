@@ -55,6 +55,8 @@ export type ReceivePaymentRequestState = {
   info?: { data?: ReceiveInvoiceInfo }
   onchainAddress?: string
   getOnchainFullUriFn?: (params: UriParams) => string
+  /** Self-custodial only; the custodial screen asks the API for its new address. */
+  generateNewOnchainAddress?: () => Promise<boolean>
   pr: {
     state?: PaymentRequestStateType
     info?: { data?: ReceiveInvoiceInfo }

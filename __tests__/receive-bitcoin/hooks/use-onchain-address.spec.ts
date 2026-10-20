@@ -1,12 +1,14 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { flushEffects } from "../../helpers/flush-effects"
 import { useOnChainAddress } from "@app/screens/receive-bitcoin-screen/hooks/use-onchain-address"
 
 const mockMutationFn = jest.fn()
+const mockCreateFn = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
   useOnChainAddressCurrentMutation: () => [mockMutationFn],
+  useOnChainAddressCreateMutation: () => [mockCreateFn],
 }))
 
 const mockLL = {}
@@ -219,5 +221,64 @@ describe("useOnChainAddress", () => {
     })
 
     expect(result.current.error).toBeNull()
+  })
+
+  describe("generateNewAddress", () => {
+    beforeEach(() => {
+      mockMutationFn.mockResolvedValue({
+        data: { onChainAddressCurrent: { address: "bc1qcurrent" } },
+      })
+    })
+
+    it("replaces the address with a freshly created one", async () => {
+      mockCreateFn.mockResolvedValue({
+        data: { onChainAddressCreate: { address: "bc1qfresh" } },
+      })
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
+
+      let ok = false
+      await act(async () => {
+        ok = await result.current.generateNewAddress()
+      })
+
+      expect(ok).toBe(true)
+      expect(mockCreateFn).toHaveBeenCalledWith({
+        variables: { input: { walletId: "wallet-123" } },
+      })
+      expect(result.current.address).toBe("bc1qfresh")
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("keeps the current address when creation fails", async () => {
+      mockCreateFn.mockRejectedValue(new Error("network"))
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
+
+      let ok = true
+      await act(async () => {
+        ok = await result.current.generateNewAddress()
+      })
+
+      expect(ok).toBe(false)
+      expect(result.current.address).toBe("bc1qcurrent")
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("keeps the current address when the API returns none", async () => {
+      mockCreateFn.mockResolvedValue({
+        data: { onChainAddressCreate: { address: null, errors: [{ message: "x" }] } },
+      })
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
+
+      let ok = true
+      await act(async () => {
+        ok = await result.current.generateNewAddress()
+      })
+
+      expect(ok).toBe(false)
+      expect(result.current.address).toBe("bc1qcurrent")
+    })
   })
 })

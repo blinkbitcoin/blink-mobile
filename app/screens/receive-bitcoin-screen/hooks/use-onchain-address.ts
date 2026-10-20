@@ -1,7 +1,10 @@
-import { useEffect, useMemo, useState } from "react"
+import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { gql } from "@apollo/client"
-import { useOnChainAddressCurrentMutation } from "@app/graphql/generated"
+import {
+  useOnChainAddressCreateMutation,
+  useOnChainAddressCurrentMutation,
+} from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { toastShow } from "@app/utils/toast"
 
@@ -11,6 +14,15 @@ import { GetFullUriFn, Invoice } from "../payment/index.types"
 gql`
   mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
     onChainAddressCurrent(input: $input) {
+      errors {
+        message
+      }
+      address
+    }
+  }
+
+  mutation onChainAddressCreate($input: OnChainAddressCreateInput!) {
+    onChainAddressCreate(input: $input) {
       errors {
         message
       }
@@ -29,6 +41,7 @@ export const useOnChainAddress = (
   { amount, memo }: UseOnChainAddressOptions = {},
 ) => {
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
+  const [onChainAddressCreate] = useOnChainAddressCreateMutation()
   const { LL } = useI18nContext()
 
   const [address, setAddress] = useState<string | null>(null)
@@ -57,6 +70,25 @@ export const useOnChainAddress = (
       })
   }, [walletId, onChainAddressCurrent, LL])
 
+  /** Resolves true once a fresh address is on screen; the old one keeps working. */
+  const generateNewAddress = useCallback(async (): Promise<boolean> => {
+    if (!walletId) return false
+    setLoading(true)
+    try {
+      const result = await onChainAddressCreate({
+        variables: { input: { walletId } },
+      })
+      const addr = result.data?.onChainAddressCreate?.address
+      if (!addr) return false
+      setAddress(addr)
+      return true
+    } catch {
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }, [walletId, onChainAddressCreate])
+
   const getFullUriFn = useMemo<GetFullUriFn | undefined>(() => {
     if (!address) return undefined
     return ({ uppercase, prefix }) =>
@@ -70,5 +102,5 @@ export const useOnChainAddress = (
       })
   }, [address, amount, memo])
 
-  return { address, loading, error, getFullUriFn }
+  return { address, loading, error, getFullUriFn, generateNewAddress }
 }
