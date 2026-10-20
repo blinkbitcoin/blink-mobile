@@ -4,6 +4,10 @@ import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 const amountErrors = [
   SelfCustodialErrorCode.InsufficientFunds,
   SelfCustodialErrorCode.BelowMinimum,
+]
+
+// Server text never picks the action, however much it reads like an amount problem.
+const serverText = [
   "Payment amount '5000' sats exceeds balance '1000'",
   "No balance left to send.",
   "Cannot transfer more than $1000.00 in 24 hours",
@@ -12,6 +16,7 @@ const amountErrors = [
 ]
 
 const otherErrors = [
+  ...serverText,
   undefined,
   "",
   SelfCustodialErrorCode.NetworkError,
