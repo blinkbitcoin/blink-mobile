@@ -19,7 +19,7 @@ jest.mock("@rn-vui/themed", () => {
         },
       },
     }),
-    makeStyles: () => () => ({ container: {}, pressed: {}, label: {} }),
+    makeStyles: () => () => ({ container: {}, pressed: {}, disabled: {}, label: {} }),
   }
 })
 
@@ -70,5 +70,20 @@ describe("ActionButton", () => {
     )
 
     expect(getByTestId("icon-share")).toBeTruthy()
+  })
+
+  it("ignores presses and reports itself disabled while disabled", () => {
+    const { getByRole, getByText } = render(<ActionButton {...defaultProps} disabled />)
+
+    fireEvent.press(getByText("Copy"))
+
+    expect(defaultProps.onPress).not.toHaveBeenCalled()
+    expect(getByRole("button").props.accessibilityState).toEqual({ disabled: true })
+  })
+
+  it("keeps the label to one line so long translations ellipsize", () => {
+    const { getByText } = render(<ActionButton {...defaultProps} />)
+
+    expect(getByText("Copy").props.numberOfLines).toBe(1)
   })
 })
