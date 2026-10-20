@@ -5,6 +5,7 @@ import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
@@ -39,7 +40,6 @@ import {
   mergeOrderedTransactions,
 } from "../providers/wallet-snapshot"
 
-import { useBackoffRetry } from "./use-backoff-retry"
 import { useSparkNetwork } from "./use-spark-network"
 
 type SdkLifecycleState = {

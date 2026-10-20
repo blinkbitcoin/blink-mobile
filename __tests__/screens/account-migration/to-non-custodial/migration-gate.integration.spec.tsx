@@ -128,7 +128,11 @@ jest.mock("@app/hooks/use-transfer-blocked", () => ({
 }))
 
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceRestricted: () => false,
+  useDollarBalanceRestriction: () => ({
+    isRestricted: false,
+    isRegionPending: false,
+    isRegionDetermined: false,
+  }),
 }))
 
 jest.mock("@app/components/dollar-balance-migration-modal", () => ({
