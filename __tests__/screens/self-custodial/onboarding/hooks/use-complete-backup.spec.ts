@@ -85,6 +85,7 @@ describe("useCompleteBackup", () => {
         accountId: "migration-uuid",
       },
     })
+    expect(reportError).not.toHaveBeenCalled()
   })
 
   /** The mode screen is not a commit point, so a resume routes to the explainer with or
@@ -107,6 +108,11 @@ describe("useCompleteBackup", () => {
         accountId: "migration-uuid",
       },
     })
+    /** Not gated on, but reported: it is the same store the commit point depends on. */
+    expect(reportError).toHaveBeenCalledWith(
+      "Migration choose-experience checkpoint save",
+      expect.any(Error),
+    )
   })
 
   /** Not gated on, but not silent either: a store refusing this write is the same store
