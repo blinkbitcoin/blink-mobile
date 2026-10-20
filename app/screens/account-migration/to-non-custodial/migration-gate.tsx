@@ -124,7 +124,17 @@ export const MigrationGate: React.FC = () => {
     navigation.navigate("conversionDetails")
   }, [navigation])
 
-  const hasResumeDataError = checkpointError || pendingWalletError
+  /**
+   * The pending wallet is the fallback for a checkpoint that is gone, so its read only
+   * matters once the checkpoint has answered without one. A resumable checkpoint routes on
+   * its own (and ensureAccount reuses its id before looking at the pending record), so a
+   * failed pending read under it must not hold the user on a retry, or hand them to support
+   * after three, over an answer that changes nothing. While the checkpoint is still loading
+   * the gate shows its spinner rather than an error that may not apply.
+   */
+  const isPendingWalletNeeded = !checkpointLoading && !hasResumableCheckpoint
+  const hasBlockingPendingWalletError = pendingWalletError && isPendingWalletNeeded
+  const hasResumeDataError = checkpointError || hasBlockingPendingWalletError
 
   /** Named for what it tests, not for one of its causes: any of the three server-backed
    *  reads failing, GraphQL and auth errors included. It drives a user-facing decision —

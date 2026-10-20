@@ -788,6 +788,55 @@ describe("MigrationGate", () => {
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
   })
 
+  /** A checkpoint that answered with somewhere to resume decides the route alone: the
+   *  pending wallet is only the fallback for a checkpoint that is gone, so a failed read of
+   *  it must not hold this user on a retry, or hand them to support after three. */
+  it("resumes from a good checkpoint when only the pending-wallet read fails", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = true
+    mockPendingWalletError = true
+
+    const { queryByTestId } = render(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** Until the checkpoint has answered, nobody knows yet whether the pending read matters,
+   *  so the gate waits on its spinner rather than flashing the error screen first. */
+  it("waits for the checkpoint before letting a failed pending-wallet read block", () => {
+    mockIsMigrationLocked = true
+    mockCheckpointLoading = true
+    mockHasResumableCheckpoint = false
+    mockPendingWalletError = true
+
+    const { getByTestId, queryByTestId, rerender } = render(<MigrationGate />)
+
+    expect(getByTestId("migration-gate-loading")).toBeTruthy()
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+
+    mockCheckpointLoading = false
+    mockHasResumableCheckpoint = true
+    rerender(<MigrationGate />)
+
+    expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1)
+    expect(queryByTestId("gate-retry-button")).toBeNull()
+  })
+
+  /** The checkpoint's own failure still blocks whatever it last held: a refetch that fails
+   *  after an earlier good read leaves the old record in state, and that is no answer. */
+  it("still blocks on a failed checkpoint read even with a resumable record in state", () => {
+    mockIsMigrationLocked = true
+    mockHasResumableCheckpoint = true
+    mockCheckpointError = true
+
+    const { getByTestId } = render(<MigrationGate />)
+
+    expect(getByTestId("gate-retry-button")).toBeTruthy()
+    expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+  })
+
   /** The once-per-mount claim must not be spent while the reads are in error: a retry that
    *  then succeeds still owes the user its resume-or-handover decision. */
   it("still decides after a retry recovers from a failed checkpoint read", () => {
