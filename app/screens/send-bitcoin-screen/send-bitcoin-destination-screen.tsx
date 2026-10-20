@@ -33,13 +33,13 @@ import { SearchBar } from "@rn-vui/base"
 import { makeStyles, useTheme, Text, ListItem } from "@rn-vui/themed"
 
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useErrorHaptic } from "@app/hooks/use-error-haptic"
 import { useScanContext } from "@app/hooks/use-scan-context"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-contact-list"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
+import { useDestinationErrorFeedback } from "./hooks/use-destination-error-feedback"
 import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"
 import { ConfirmDestinationModal } from "./confirm-destination-modal"
@@ -101,14 +101,6 @@ export const defaultDestinationState: SendBitcoinDestinationState = {
   unparsedDestination: "",
   destinationState: DestinationState.Entering,
 }
-
-/** A destination that didn't check out. Next stays off, and each failed check buzzes the
- *  light refusal: editing the text leaves the state, so the next failure buzzes again. */
-const DESTINATION_ERROR_STATES: ReadonlySet<string> = new Set([
-  DestinationState.Invalid,
-  DestinationState.PhoneInvalid,
-  DestinationState.PhoneNotAllowed,
-])
 
 type Props = {
   route: RouteProp<RootStackParamList, "sendBitcoinDestination">
@@ -716,19 +708,15 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     ],
   )
 
-  useErrorHaptic(
-    DESTINATION_ERROR_STATES.has(destinationState.destinationState)
-      ? destinationState.destinationState
-      : undefined,
-    "reject",
+  const isDestinationError = useDestinationErrorFeedback(
+    destinationState.destinationState,
   )
 
   const inputContainerStyle = useMemo(() => {
+    if (isDestinationError) return styles.errorInputContainer
     switch (destinationState.destinationState) {
       case DestinationState.Validating:
         return styles.enteringInputContainer
-      case DestinationState.Invalid:
-        return styles.errorInputContainer
       case DestinationState.RequiresUsernameConfirmation:
         return styles.warningInputContainer
       case DestinationState.Valid:
@@ -736,14 +724,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           return styles.validInputContainer
         }
         return styles.warningInputContainer
-      case DestinationState.PhoneInvalid:
-        return styles.errorInputContainer
-      case DestinationState.PhoneNotAllowed:
-        return styles.errorInputContainer
       default:
         return {}
     }
   }, [
+    isDestinationError,
     destinationState.destinationState,
     destinationState.confirmationUsernameType,
     styles,
@@ -905,7 +890,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             }
             loading={destinationState.destinationState === DestinationState.Validating}
             disabled={
-              DESTINATION_ERROR_STATES.has(destinationState.destinationState) ||
+              isDestinationError ||
               !destinationState.unparsedDestination ||
               (activeInputRef.current === InputType.Phone && rawPhoneNumber === "")
             }
