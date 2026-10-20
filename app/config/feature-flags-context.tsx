@@ -57,6 +57,7 @@ const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeeway
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
+const BulletinsShownSinceKey = "bulletinsShownSince"
 const FeeRatesConfigKey = "feeRatesConfig"
 
 type DeliveryOptionConfig = {
@@ -125,6 +126,7 @@ type RemoteConfig = {
   [MigrationReceiveDelayedNoticeMsKey]: number
   [MigrationDelayedRedirectEnabledKey]: boolean
   [PersistentBulletinsEnabledKey]: boolean
+  [BulletinsShownSinceKey]: number
   [FeeRatesConfigKey]: FeeRatesConfig
 }
 
@@ -254,6 +256,11 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  such a bulletin stays until the server retires it. A console toggle, so a bulletin
    *  stuck on every home by mistake can be made closable again without a release. */
   persistentBulletinsEnabled: false,
+  /** The release cutoff of the home bulletin carousel, as a Unix timestamp in seconds.
+   *  A closable bulletin sent before it is never shown, so the carousel does not bring
+   *  back the unacknowledged bulletins the single-card home used to hide behind newer
+   *  ones. A bulletin the user cannot close is exempt: the home already pins it. */
+  bulletinsShownSince: Date.UTC(2026, 9, 20) / 1000,
   feeRatesConfig: defaultFeeRatesConfig,
 }
 
@@ -498,6 +505,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(PersistentBulletinsEnabledKey)
           .asBoolean()
 
+        const bulletinsShownSince = getRemoteConfigPositiveNumber(
+          BulletinsShownSinceKey,
+          defaultRemoteConfig.bulletinsShownSince,
+        )
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -546,6 +558,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           migrationReceiveDelayedNoticeMs,
           migrationDelayedRedirectEnabled,
           persistentBulletinsEnabled,
+          bulletinsShownSince,
           feeRatesConfig,
         })
       } catch (err) {
