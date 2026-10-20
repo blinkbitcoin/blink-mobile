@@ -9,10 +9,10 @@ import {
   OSM_COPYRIGHT_URL,
   OpeningState,
   VerificationState,
+  directionsUrls,
   formatSurveyDate,
   hostOf,
   isBoosted,
-  googleMapsDirections,
   isWebUrl,
   mailtoUrl,
   merchantUrl,
@@ -126,6 +126,10 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
     return () => clearInterval(timer)
   }, [place, isTimeSensitive])
 
+  // Navigate awaits the OS before it opens anything, so a second tap in that
+  // gap would open the maps app twice.
+  const isNavigating = React.useRef(false)
+
   const boosted = isBoosted(details?.boostedUntil ?? shown?.boostedUntil, now)
   const styles = useStyles({ bottomInset: insets.bottom })
 
@@ -148,14 +152,23 @@ export const PlaceSheet: React.FC<Props> = ({ place, userLocation, onClose }) =>
   }
 
   // Straight to the OS rather than through openUrl: in the in-app browser the
-  // web URL would stay a web page, where the OS hands it to Google Maps.
-  const navigate = async () => {
-    const { app, web } = googleMapsDirections(shown)
-    const hasApp =
-      Platform.OS === "ios" && (await Linking.canOpenURL(app).catch(() => false))
-    Linking.openURL(hasApp ? app : web).catch(() =>
-      toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }),
+  // Android Google Maps link would stay a web page, where the OS hands it to
+  // the app.
+  const navigate = () => {
+    if (isNavigating.current) return
+    isNavigating.current = true
+    const { probe, google, fallback } = directionsUrls(
+      shown,
+      name,
+      Platform.OS === "ios" ? "ios" : "android",
     )
+    Linking.canOpenURL(probe)
+      .catch(() => false)
+      .then((hasGoogleMaps) => Linking.openURL(hasGoogleMaps ? google : fallback))
+      .catch(() => toastShow({ message: LL.MapScreen.cannotOpenLink(), LL }))
+      .finally(() => {
+        isNavigating.current = false
+      })
   }
 
   const share = () => {
