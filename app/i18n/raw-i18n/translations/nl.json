@@ -2172,7 +2172,9 @@
     "updateAvailable": "Een update is beschikbaar. \nClick om nu te updaten",
     "useLightning": "We gebruiken het Lightning Netwerk.",
     "myAccounts": "Saldi",
-    "walletCountNotTwo": "Wallet-aantal is niet 2. Gebruik het dashboard om alle wallets en fondsen van dit account te bekijken"
+    "walletCountNotTwo": "Wallet-aantal is niet 2. Gebruik het dashboard om alle wallets en fondsen van dit account te bekijken",
+    "bulletinPosition": "Melding {position: number} van {total: number}",
+    "bulletinReadMore": "Lees meer"
   },
   "PinScreen": {
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",

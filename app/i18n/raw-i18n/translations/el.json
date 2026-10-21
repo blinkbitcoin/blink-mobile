@@ -2172,7 +2172,9 @@
     "updateAvailable": "Μια ενημέρωση είναι διαθέσιμη.\nΠατήστε για ενημέρωση τώρα",
     "useLightning": "Χρησιμοποιούμε το Lightning Network.",
     "myAccounts": "Υπόλοιπα",
-    "walletCountNotTwo": "Ο αριθμός πορτοφολιών δεν είναι 2. Χρησιμοποιήστε το ταμπλό για να δείτε όλα τα πορτοφόλια και τα χρήματα αυτού του λογαριασμού."
+    "walletCountNotTwo": "Ο αριθμός πορτοφολιών δεν είναι 2. Χρησιμοποιήστε το ταμπλό για να δείτε όλα τα πορτοφόλια και τα χρήματα αυτού του λογαριασμού.",
+    "bulletinPosition": "Ειδοποίηση {position: number} από {total: number}",
+    "bulletinReadMore": "Διάβασε περισσότερα"
   },
   "PinScreen": {
     "attemptsRemaining": "Λανθασμένο PIN. {attemptsRemaining: number} προσπάθειες που απομένουν.",

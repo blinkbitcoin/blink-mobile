@@ -2172,7 +2172,9 @@
     "updateAvailable": "Pembaruan tersedia.\nKetuk untuk memperbarui sekarang",
     "useLightning": "Kami menggunakan Jaringan Lightning.",
     "myAccounts": "Saldo",
-    "walletCountNotTwo": "Jumlah dompet bukan 2. Silakan gunakan dasbor untuk melihat semua dompet dan dana akun ini"
+    "walletCountNotTwo": "Jumlah dompet bukan 2. Silakan gunakan dasbor untuk melihat semua dompet dan dana akun ini",
+    "bulletinPosition": "Notifikasi {position: number} dari {total: number}",
+    "bulletinReadMore": "Baca selengkapnya"
   },
   "PinScreen": {
     "attemptsRemaining": "PIN salah. {attemptsRemaining: number} percobaan tersisa.",
