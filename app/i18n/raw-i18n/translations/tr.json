@@ -4052,6 +4052,17 @@
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
   },
+  "TwoFactorEnforcement": {
+    "title": "İki aşamalı doğrulamayı ayarlayın",
+    "cardDescription": "Hesabınızı yetkisiz erişime karşı koruyun.",
+    "cardCta": "Ayarla",
+    "settingsDescription": "Hesabınızı yetkisiz erişime karşı korumak için bunu ayarlayın.",
+    "setupTitle": "İki aşamalı doğrulamayı şimdi ayarlayın",
+    "setupDescription": "Hesabınıza yetkisiz erişimi önlemek için şimdi iki aşamalı doğrulama ekleyin.",
+    "addEmail": "E-posta ekle",
+    "addPhoneNumber": "Telefon numarası ekle",
+    "setAuthenticator": "Doğrulayıcı ayarla"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

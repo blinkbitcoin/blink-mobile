@@ -4052,6 +4052,17 @@
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
   },
+  "TwoFactorEnforcement": {
+    "title": "Configura l'autenticació de dos factors",
+    "cardDescription": "Protegeix el teu compte de l'accés no autoritzat.",
+    "cardCta": "Configura",
+    "settingsDescription": "Protegeix el teu compte de l'accés no autoritzat configurant-la.",
+    "setupTitle": "Configura ara l'autenticació de dos factors",
+    "setupDescription": "Per evitar l'accés no autoritzat al teu compte, afegeix ara l'autenticació de dos factors.",
+    "addEmail": "Afegeix correu electrònic",
+    "addPhoneNumber": "Afegeix número de telèfon",
+    "setAuthenticator": "Configura l'autenticador"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

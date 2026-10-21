@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import React, { useEffect, useState } from "react"
 import { ActivityIndicator, Alert, View } from "react-native"
 
 import { gql } from "@apollo/client"
@@ -12,7 +12,7 @@ import {
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useNavigation } from "@react-navigation/native"
+import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles } from "@rn-vui/base"
 import { Text, useTheme } from "@rn-vui/themed"
@@ -48,11 +48,17 @@ gql`
   }
 `
 
-export const TotpRegistrationInitiateScreen = () => {
+type Props = {
+  route: RouteProp<RootStackParamList, "totpRegistrationInitiate">
+}
+
+export const TotpRegistrationInitiateScreen: React.FC<Props> = ({ route }) => {
   const navigation =
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "totpRegistrationInitiate">
     >()
+  /** Handed on to the code screen, which is the one that decides where to go next. */
+  const { returnTo } = route.params ?? {}
 
   const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation()
 
@@ -120,7 +126,10 @@ export const TotpRegistrationInitiateScreen = () => {
               containerStyle={styles.buttonContainer}
               title={LL.common.next()}
               onPress={() =>
-                navigation.navigate("totpRegistrationValidate", { totpRegistrationId })
+                navigation.navigate("totpRegistrationValidate", {
+                  totpRegistrationId,
+                  returnTo,
+                })
               }
             />
           </View>

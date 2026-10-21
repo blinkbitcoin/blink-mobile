@@ -4052,6 +4052,17 @@
     "modalDescription": "Ons beveel sterk aan dat u u beursie rugsteun om 'n algehele verlies van fondse te voorkom indien u hierdie toestel verloor.",
     "secureMe": "Beveilig beursie"
   },
+  "TwoFactorEnforcement": {
+    "title": "Stel twee-faktor-verifikasie op",
+    "cardDescription": "Beskerm jou rekening teen ongemagtigde toegang.",
+    "cardCta": "Stel op",
+    "settingsDescription": "Beskerm jou rekening teen ongemagtigde toegang deur dit op te stel.",
+    "setupTitle": "Stel nou twee-faktor-verifikasie op",
+    "setupDescription": "Om ongemagtigde toegang tot jou rekening te voorkom, voeg nou twee-faktor-verifikasie by.",
+    "addEmail": "Voeg e-pos by",
+    "addPhoneNumber": "Voeg telefoonnommer by",
+    "setAuthenticator": "Stel authenticator op"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

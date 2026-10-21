@@ -4052,6 +4052,17 @@
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
     "secureMe": "Lindungi dompet"
   },
+  "TwoFactorEnforcement": {
+    "title": "Tetapkan pengesahan dua faktor",
+    "cardDescription": "Lindungi akaun anda daripada akses tanpa kebenaran.",
+    "cardCta": "Tetapkan",
+    "settingsDescription": "Lindungi akaun anda daripada akses tanpa kebenaran dengan menetapkannya.",
+    "setupTitle": "Tetapkan pengesahan dua faktor sekarang",
+    "setupDescription": "Untuk mengelakkan akses tanpa kebenaran ke akaun anda, tambah pengesahan dua faktor sekarang.",
+    "addEmail": "Tambah e-mel",
+    "addPhoneNumber": "Tambah nombor telefon",
+    "setAuthenticator": "Tetapkan authenticator"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
