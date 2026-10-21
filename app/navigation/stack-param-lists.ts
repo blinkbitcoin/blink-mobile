@@ -16,7 +16,7 @@ import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conver
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { TwoFactorPrompt, TwoFactorPromptOrigin } from "@app/types/two-factor-enforcement"
+import { TwoFactorFlowParams } from "@app/types/two-factor-enforcement"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
@@ -63,19 +63,6 @@ export const canGoBackFromChooseExperience = (
   return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
 }
 
-/** Where the authenticator flow goes on success when it was opened from a two-factor
- *  prompt, instead of the destination the flow has on its own: back into the setup
- *  route, or back to the home when a prompt stood in for it at a session start. */
-export const RegistrationReturnRoute = {
-  TwoFactorSetup: "twoFactorSetup",
-  Primary: "Primary",
-} as const
-export type RegistrationReturnRoute =
-  (typeof RegistrationReturnRoute)[keyof typeof RegistrationReturnRoute]
-
-const isRegistrationReturnRoute = (value: unknown): value is RegistrationReturnRoute =>
-  Object.values(RegistrationReturnRoute).some((route) => route === value)
-
 const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
 
 /** Whether a removal is one the user's own back press dispatched: the header arrow and
@@ -85,19 +72,6 @@ const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
  *  blocking those is how a hold meant to protect the user ends up trapping them. */
 export const isBackwardAction = (action: { type: string }): boolean =>
   BACKWARD_ACTIONS.includes(action.type)
-
-type RouteStack = { routes: ReadonlyArray<{ name: string }> }
-
-/** The authenticator flow may return only to one of the routes above, and only while
- *  its stack holds it. The param reaches its screens through deep links as well, where
- *  it is any string: a route the flow may not return to, a name the stack never had, or
- *  a route already left, all fall back to the flow's own destination. */
-export const canReturnToRoute = (
-  stack: RouteStack | undefined,
-  returnTo: string | undefined,
-): returnTo is RegistrationReturnRoute =>
-  isRegistrationReturnRoute(returnTo) &&
-  Boolean(stack?.routes.some(({ name }) => name === returnTo))
 
 export type RootStackParamList = {
   getStarted: undefined
@@ -251,25 +225,21 @@ export type RootStackParamList = {
   }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }
-  /** `prompt` is the two-factor prompt that led to the registration, none when it was
-   *  started from the settings: what the completed setup is reported under. */
-  totpRegistrationInitiate?: {
-    returnTo?: RegistrationReturnRoute
-    prompt?: TwoFactorPrompt
-  }
-  totpRegistrationValidate: {
-    totpRegistrationId: string
-    returnTo?: RegistrationReturnRoute
-    prompt?: TwoFactorPrompt
-  }
+  /** The authenticator onboarding: why, then which app, then the setup key. Opened by
+   *  every prompt's Set authenticator. */
+  totpRegistrationIntro: TwoFactorFlowParams | undefined
+  totpRegistrationApps: undefined
+  totpRegistrationInitiate: undefined
+  /** The setup key travels on to the backup, the only screens that ever show it, and
+   *  goes with them once the flow is left. Neither route is deep-linkable, so the key
+   *  cannot arrive from outside the app (asserted over DEEP_LINK_SCREENS). */
+  totpRegistrationValidate: { totpRegistrationId: string; secret: string }
+  /** The user id names the account in the backup for an account with no username yet. */
+  totpRegistrationBackup: { secret: string; userId: string }
+  totpRegistrationDone: undefined
   totpLoginValidate: { authToken: string }
-  twoFactorSetup: TwoFactorPromptOrigin | undefined
-  /** Opened from a prompt, whose dismissal backing out of it is, or from the setup,
-   *  which stays under it and counts its own. */
-  twoFactorNonCustodial?: {
-    origin?: TwoFactorPromptOrigin
-    isOpenedFromSetupScreen?: boolean
-  }
+  twoFactorSetup: TwoFactorFlowParams | undefined
+  twoFactorNonCustodial: TwoFactorFlowParams | undefined
   webView: {
     url: string
     initialTitle?: string

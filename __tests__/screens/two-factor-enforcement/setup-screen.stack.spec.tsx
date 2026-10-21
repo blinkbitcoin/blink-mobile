@@ -1,5 +1,5 @@
 import React from "react"
-import { Alert, AlertButton, BackHandler, Pressable, Text } from "react-native"
+import { BackHandler, Pressable, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import {
   createNavigationContainerRef,
@@ -18,7 +18,13 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import theme from "@app/rne-theme/theme"
-import { TotpRegistrationValidateScreen } from "@app/screens/totp-screen/totp-registration-validate"
+import {
+  AuthenticatorAppsScreen,
+  AuthenticatorIntroScreen,
+  AuthenticatorProtectedScreen,
+  SetupKeyBackupScreen,
+  TotpRegistrationValidateScreen,
+} from "@app/screens/totp-screen"
 import {
   TwoFactorNonCustodialScreen,
   TwoFactorSetupScreen,
@@ -32,8 +38,8 @@ import {
 /**
  * The setup on a real stack: the sibling spec mocks the navigator and the hardware
  * back module-wide, so it can say which handler the screen installed but not what the
- * navigator does with a press, nor where the authenticator flow's `popTo` lands. Those
- * are the contracts here.
+ * navigator does with a press, nor where the authenticator onboarding's exits land.
+ * Those are the contracts here.
  */
 
 loadLocale("en")
@@ -70,6 +76,18 @@ jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupCompleted: jest.fn(),
   logTwoFactorPromptShown: jest.fn(),
   logTwoFactorNonCustodialChosen: jest.fn(),
+  logAuthenticatorEducationStarted: jest.fn(),
+  logAuthenticatorAppSelected: jest.fn(),
+  logAuthenticatorEducationCompleted: jest.fn(),
+}))
+
+/** The backup's own collaborators are its spec's to cover; here it only has to be a
+ *  screen on the stack. */
+jest.mock("@app/screens/totp-screen/hooks/use-setup-key-backup", () => ({
+  useSetupKeyBackup: () => ({
+    saveToPasswordManager: jest.fn(),
+    reportManualCopy: jest.fn(),
+  }),
 }))
 
 /** The code screen's own collaborators, as its sibling spec mocks them. */
@@ -98,13 +116,6 @@ jest.mock("@app/components/code-input", () => {
   }
 })
 
-/** The success alert is what moves on: its OK button carries the navigation. */
-const alertSpy = jest.spyOn(Alert, "alert")
-const pressSuccessOk = () => {
-  const buttons = alertSpy.mock.calls.at(-1)?.[2] as AlertButton[] | undefined
-  buttons?.[0]?.onPress?.()
-}
-
 const CARD_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.HomeCard }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
@@ -115,25 +126,24 @@ const HomeStub = () => {
   return (
     <Pressable
       testID="open-setup"
-      onPress={() => navigation.navigate("twoFactorSetup", CARD_ORIGIN)}
+      onPress={() => navigation.navigate("twoFactorSetup", { origin: CARD_ORIGIN })}
     >
       <Text>home</Text>
     </Pressable>
   )
 }
 
-/** Stands in for the QR step, which hands the code screen the route it was told to
- *  return to, the way the real one does. */
+/** Stands in for the setup key step, which hands the code screen the registration and
+ *  its key, the way the real one does. */
 const TotpInitiateStub = ({
   navigation,
-  route,
 }: NativeStackScreenProps<RootStackParamList, "totpRegistrationInitiate">) => (
   <Pressable
     testID="to-code"
     onPress={() =>
       navigation.navigate("totpRegistrationValidate", {
         totpRegistrationId: "registration-id",
-        returnTo: route.params?.returnTo,
+        secret: "SECRET",
       })
     }
   >
@@ -155,10 +165,27 @@ const renderStack = async () => {
               component={TwoFactorSetupScreen}
               options={{ headerShown: true }}
             />
+            <Stack.Screen
+              name="totpRegistrationIntro"
+              component={AuthenticatorIntroScreen}
+              options={{ headerShown: true }}
+            />
+            <Stack.Screen
+              name="totpRegistrationApps"
+              component={AuthenticatorAppsScreen}
+            />
             <Stack.Screen name="totpRegistrationInitiate" component={TotpInitiateStub} />
             <Stack.Screen
               name="totpRegistrationValidate"
               component={TotpRegistrationValidateScreen}
+            />
+            <Stack.Screen
+              name="totpRegistrationBackup"
+              component={SetupKeyBackupScreen}
+            />
+            <Stack.Screen
+              name="totpRegistrationDone"
+              component={AuthenticatorProtectedScreen}
             />
             <Stack.Screen
               name="twoFactorNonCustodial"
@@ -173,12 +200,29 @@ const renderStack = async () => {
 }
 
 const currentRoute = () => navigationRef.getCurrentRoute()?.name
+const stackRouteNames = () => navigationRef.getRootState().routes.map(({ name }) => name)
+
+const press = async (element: Parameters<typeof fireEvent.press>[0]) => {
+  await act(async () => {
+    fireEvent.press(element)
+  })
+}
 
 const openSetup = async () => {
-  await act(async () => {
-    fireEvent.press(screen.getByTestId("open-setup"))
-  })
+  await press(screen.getByTestId("open-setup"))
   expect(currentRoute()).toBe("twoFactorSetup")
+}
+
+/** From the setup to the code screen, through every step of the onboarding. */
+const walkToCode = async () => {
+  await press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
+  expect(currentRoute()).toBe("totpRegistrationIntro")
+  await press(screen.getByText(LL.AuthenticatorOnboarding.getStarted()))
+  expect(currentRoute()).toBe("totpRegistrationApps")
+  await press(screen.getByText(LL.AuthenticatorOnboarding.haveAnApp()))
+  expect(currentRoute()).toBe("totpRegistrationInitiate")
+  await press(screen.getByTestId("to-code"))
+  expect(currentRoute()).toBe("totpRegistrationValidate")
 }
 
 describe("TwoFactorSetupScreen in a stack", () => {
@@ -196,38 +240,60 @@ describe("TwoFactorSetupScreen in a stack", () => {
     })
   })
 
-  it("lands back on the home once the authenticator flow it opened succeeds", async () => {
+  /** Once the code is accepted, the onboarding and the setup key have nothing left to
+   *  offer, and the key they showed must not be reachable by going back. */
+  it("puts the backup in place of the onboarding once the code is accepted", async () => {
     await renderStack()
     await openSetup()
+    await walkToCode()
 
-    await act(async () => {
-      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
-    })
-    expect(currentRoute()).toBe("totpRegistrationInitiate")
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("to-code"))
-    })
-    expect(currentRoute()).toBe("totpRegistrationValidate")
+    await press(screen.getByTestId("submit-code"))
 
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("submit-code"))
-    })
+    expect(currentRoute()).toBe("totpRegistrationBackup")
+    expect(stackRouteNames()).toEqual([
+      "Primary",
+      "twoFactorSetup",
+      "totpRegistrationBackup",
+    ])
+  })
+
+  it("lands back on the home once the onboarding it opened is done", async () => {
+    await renderStack()
+    await openSetup()
+    await walkToCode()
+    await press(screen.getByTestId("submit-code"))
     /** What the account reads as once the authenticator is registered. */
     mockEnforcement.hasAuthenticator = true
-    await act(async () => {
-      pressSuccessOk()
-    })
+
+    await press(screen.getByText(LL.AuthenticatorOnboarding.savedIt()))
+    expect(currentRoute()).toBe("totpRegistrationDone")
+    await press(screen.getByText(LL.AuthenticatorOnboarding.done()))
 
     expect(currentRoute()).toBe("Primary")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+
+  /** The setup stays under the onboarding: backing out of it lands back on the setup,
+   *  and only leaving the setup counts. */
+  it("lands back on the setup when the onboarding is backed out of, charging nothing", async () => {
+    await renderStack()
+    await openSetup()
+    await press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
+    expect(currentRoute()).toBe("totpRegistrationIntro")
+
+    await act(async () => {
+      pressHardwareBack()
+    })
+
+    expect(currentRoute()).toBe("twoFactorSetup")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   it("opens the screen that explains leaving custody over the setup", async () => {
     await renderStack()
     await openSetup()
 
-    await act(async () => {
-      fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
-    })
+    await press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
 
     expect(currentRoute()).toBe("twoFactorNonCustodial")
   })
@@ -237,13 +303,9 @@ describe("TwoFactorSetupScreen in a stack", () => {
   it("lands back on the setup when leaving custody is backed out of, charging nothing", async () => {
     await renderStack()
     await openSetup()
-    await act(async () => {
-      fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
-    })
+    await press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
 
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
-    })
+    await press(screen.getByTestId("two-factor-non-custodial-cancel"))
 
     expect(currentRoute()).toBe("twoFactorSetup")
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
@@ -253,9 +315,7 @@ describe("TwoFactorSetupScreen in a stack", () => {
     await renderStack()
     await openSetup()
 
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("icon-close"))
-    })
+    await press(screen.getByTestId("icon-close"))
 
     expect(currentRoute()).toBe("Primary")
     expect(mockRegisterDismissal).toHaveBeenCalledWith(

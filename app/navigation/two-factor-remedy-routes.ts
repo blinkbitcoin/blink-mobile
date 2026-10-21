@@ -2,6 +2,10 @@ import { isMigrationRoute, MigrationRouteName } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
 import { isUnlockInProgress } from "./unlock-routes"
 
+/** Every screen of the authenticator registration, from the onboarding to its done
+ *  screen, carries this prefix. */
+const TOTP_REGISTRATION_PREFIX = "totpRegistration"
+
 /**
  * The routes the two-factor gate opens itself, or that its remedies start on: the setup
  * and the non-custodial screens, the authenticator registration and the migration. The
@@ -12,7 +16,7 @@ import { isUnlockInProgress } from "./unlock-routes"
  * prefix, as the migration flow is, so a step a flow adds under its own name is covered
  * without being listed.
  */
-const TWO_FACTOR_REMEDY_ROUTE_PREFIXES = ["twoFactor", "totpRegistration"] as const
+const TWO_FACTOR_REMEDY_ROUTE_PREFIXES = ["twoFactor", TOTP_REGISTRATION_PREFIX] as const
 
 type RemedyRoutePrefix = (typeof TWO_FACTOR_REMEDY_ROUTE_PREFIXES)[number]
 
@@ -26,7 +30,25 @@ export const isTwoFactorRemedyRoute = (name: string): name is TwoFactorRemedyRou
 
 const HOME_ROUTE = "Primary" satisfies keyof RootStackParamList
 
+export const isTotpRegistrationRoute = (name: string): boolean =>
+  name.startsWith(TOTP_REGISTRATION_PREFIX)
+
 type StackRoute = { name: string }
+
+/** Where the authenticator registration that runs up to `lastIndex`, the top of the
+ *  stack unless told otherwise, begins: the index of its first screen, or the one past
+ *  `lastIndex` when that route is no part of one. What lies below it is where the
+ *  registration was started from. */
+export const totpRegistrationStart = (
+  routes: ReadonlyArray<StackRoute>,
+  lastIndex = routes.length - 1,
+): number => {
+  const routesToLast = routes.slice(0, lastIndex + 1)
+  const registrationDepth = [...routesToLast]
+    .reverse()
+    .findIndex((route) => !isTotpRegistrationRoute(route.name))
+  return registrationDepth === -1 ? 0 : routesToLast.length - registrationDepth
+}
 
 /** Whether a screen of the user's own sits between the home and the gate's remedies: a
  *  payment, a scan, the settings, anything that is not the unlock that covers the app.

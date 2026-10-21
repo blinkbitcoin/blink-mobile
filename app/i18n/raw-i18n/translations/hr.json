@@ -2616,14 +2616,11 @@
     "youGet": "Dobivate"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Dvofaktorska autentifikacija",
-    "secret": "Tajni ključ/sigurnosna kopija",
-    "content": "Skenirajte ovaj QR kod pomoću aplikacije za autentifikaciju. Alternativno, možete ručno kopirati/zalijepiti tajnu u svoju aplikaciju autentifikatora."
+    "title": "Dvofaktorska autentifikacija"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Dvofaktorska autentifikacija",
-    "enter6digitCode": "Unesite 6-znamenkasti kod iz svoje aplikacije za provjeru autentičnosti kako biste potvrdili svoju dvofaktorsku provjeru autentičnosti.",
-    "success": "Omogućena je dvostruka autentifikacija. Sada ćete se moći ponovno prijaviti svojim telefonom ili e-poštom I dvofaktorskom autentifikacijom.\n\nSamo puni KYC računi mogu se oporaviti u slučaju da je korisnik izgubio pristup svojoj dvofaktorskoj autentifikaciji."
+    "enter6digitCode": "Unesite 6-znamenkasti kod iz svoje aplikacije za provjeru autentičnosti kako biste potvrdili svoju dvofaktorsku provjeru autentičnosti."
   },
   "TotpLoginValidateScreen": {
     "title": "Dvofaktorska autentifikacija",
@@ -4075,6 +4072,37 @@
     "protectionRequiredBody": "Što više sredstava imate, to je bolja sigurnost važnija. Molimo dodajte autentifikator kako biste nastavili koristiti Blink.",
     "nonCustodialTitle": "Ako ne želite postaviti dvofaktorsku autentifikaciju",
     "nonCustodialBody": "Druga je mogućnost prijeći na neskrbnički način. Tada ste sami odgovorni za svoja sredstva."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Zaštitite svoja sredstva autentifikatorom",
+    "introDescription": "Aplikacija za autentifikaciju svakih 30 sekundi stvara novi 6-znamenkasti kod.",
+    "takeoversTitle": "Sprječava preuzimanje računa",
+    "takeoversDescription": "Kod postoji samo na vašem telefonu",
+    "stolenNumberTitle": "Budite sigurni čak i ako vam ukradu broj",
+    "stolenNumberDescription": "Čak i ako netko dođe do vaše e-pošte ili broja telefona, neće se moći prijaviti",
+    "durationTitle": "Traje oko 2 minute",
+    "durationDescription": "Vodit ćemo vas korak po korak",
+    "getStarted": "Započni",
+    "appsTitle": "Nabavite aplikaciju za autentifikaciju",
+    "appsDescription": "Radi bilo koja aplikacija za autentifikaciju. Ove su besplatne i pouzdane:",
+    "googleAuthenticatorDescription": "Jednostavna i široko korištena. Neobavezna sigurnosna kopija na vaš Google račun.",
+    "protonAuthenticatorDescription": "Otvoreni kod. Sveobuhvatno šifrirana sigurnosna kopija i sinkronizacija.",
+    "twoFasAuthDescription": "Otvoreni kod. Nije potreban račun.",
+    "get": "Preuzmi",
+    "storeNote": "„Preuzmi“ otvara App Store ili Google Play. Vratite se u Blink kada se aplikacija instalira.",
+    "haveAnApp": "Imam aplikaciju",
+    "keyInstruction": "Kopirajte ovaj ključ za postavljanje u svoju aplikaciju za autentifikaciju.",
+    "qrInstruction": "Koristite drugi uređaj?\nUmjesto toga skenirajte ovaj QR kod.",
+    "backupTitle": "Napravite sigurnosnu kopiju ključa",
+    "backupDescription": "Ako izgubite telefon, ovaj ključ omogućuje vam da ponovno postavite autentifikator. Spremite ga negdje drugdje, a ne na ovaj telefon.",
+    "saveToPasswordManager": "Spremi u upravitelj lozinki",
+    "copyForManualBackup": "Kopiraj za ručnu sigurnosnu kopiju",
+    "savedIt": "Spremio sam ga",
+    "keyBackupText": "Blink ključ za postavljanje autentifikatora\n\nRačun: {account}\nKljuč za postavljanje: {key}\n\nAko izgubite telefon, dodajte ovaj ključ za postavljanje u aplikaciju za autentifikaciju kako biste vratili svoje Blink kodove za prijavu. Svatko s ovim ključem može stvarati vaše kodove, zato ga čuvajte u tajnosti.",
+    "protectedTitle": "Vaš je račun sada zaštićen",
+    "protectedDescription": "Od sada je za prijavu potreban jednokratni kod iz vaše aplikacije za autentifikaciju.",
+    "newPhoneTip": "Ako nabavite novi telefon, prebacite autentifikator na njega <bold>prije</bold> nego što resetirate stari.",
+    "done": "Gotovo"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

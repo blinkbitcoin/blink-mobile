@@ -16,6 +16,7 @@ export const TwoFactorNudgeCard: React.FC = () => {
   return (
     <TwoFactorHomeCard
       prompt={TwoFactorPrompt.HomeCard}
+      destination="twoFactorSetup"
       title={LL.TwoFactorEnforcement.title()}
       text={LL.TwoFactorEnforcement.cardDescription()}
       buttonLabel={LL.TwoFactorEnforcement.cardCta()}

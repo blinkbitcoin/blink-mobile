@@ -2616,14 +2616,11 @@
     "youGet": "Kapsz"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Kétlépcsős azonosítás",
-    "secret": "Titkos kulcs/biztonsági mentés",
-    "content": "Olvasd be ezt a QR kódot az azonosító alkalmazásoddal. Vagy másold / illeszd be manuálisan a kódot az azonosító alkalmazásodba."
+    "title": "Kétlépcsős azonosítás"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Kétlépcsős azonosítás",
-    "enter6digitCode": "Írd be az azonosító alkalmazásodból származó 6 jegyű kódot a kétlépcsős azonosításod érvényesítéséhez.",
-    "success": "A kétlépcsős azonosítást aktiváltuk. Mostantól csak a telefonszámod vagy az email címed ÉS a kétlépcsős azonosítás segítségével tudsz visszajelentkezni.\n\nAzokról az eszközökről, amelyekről nem történt még kétlépcsős bejelentkezés, újra be kell jelentkezned.\n\nKétlépcsős azonosítás beállítása esetén, amennyiben a számládat nem tudnád elérni, annak visszaállításában az ügyfélszolgálat csak akkor tud segíteni ha 2. szintű számlára váltottál."
+    "enter6digitCode": "Írd be az azonosító alkalmazásodból származó 6 jegyű kódot a kétlépcsős azonosításod érvényesítéséhez."
   },
   "TotpLoginValidateScreen": {
     "title": "Kétlépcsős azonosítás",
@@ -4075,6 +4072,37 @@
     "protectionRequiredBody": "Minél több pénzed van, annál fontosabb a jobb biztonság. Kérjük, adj hozzá hitelesítőt a Blink további használatához.",
     "nonCustodialTitle": "Ha nem szeretnél kétlépcsős azonosítást beállítani",
     "nonCustodialBody": "A másik lehetőség az átállás nem letétkezelt módra. Akkor te felelsz a saját pénzedért."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Védd a pénzed egy hitelesítővel",
+    "introDescription": "Egy hitelesítő alkalmazás 30 másodpercenként új, 6 jegyű kódot hoz létre.",
+    "takeoversTitle": "Megakadályozza a fiók eltérítését",
+    "takeoversDescription": "A kód csak a telefonodon létezik",
+    "stolenNumberTitle": "Biztonságban vagy akkor is, ha ellopják a számodat",
+    "stolenNumberDescription": "Még ha valaki hozzá is fér az e-mail-címedhez vagy a telefonszámodhoz, akkor sem tud bejelentkezni",
+    "durationTitle": "Nagyjából 2 percet vesz igénybe",
+    "durationDescription": "Lépésről lépésre végigvezetünk",
+    "getStarted": "Kezdjük",
+    "appsTitle": "Szerezz be egy hitelesítő alkalmazást",
+    "appsDescription": "Bármelyik hitelesítő alkalmazás megfelel. Ezek ingyenesek és megbízhatók:",
+    "googleAuthenticatorDescription": "Egyszerű és széles körben használt. Opcionális biztonsági mentés a Google-fiókodba.",
+    "protonAuthenticatorDescription": "Nyílt forráskódú. Végponttól végpontig titkosított biztonsági mentés és szinkronizálás.",
+    "twoFasAuthDescription": "Nyílt forráskódú. Nem kell hozzá fiók.",
+    "get": "Letöltés",
+    "storeNote": "A „Letöltés” megnyitja az App Store-t vagy a Google Playt. Ha telepítetted, gyere vissza a Blinkbe.",
+    "haveAnApp": "Már van alkalmazásom",
+    "keyInstruction": "Másold be ezt a beállítási kulcsot a hitelesítő alkalmazásodba.",
+    "qrInstruction": "Másik eszközt használsz?\nOlvasd be inkább ezt a QR-kódot.",
+    "backupTitle": "Mentsd el a kulcsodat",
+    "backupDescription": "Ha elveszíted a telefonodat, ezzel a kulccsal újra beállíthatod a hitelesítődet. Ne ezen a telefonon tárold, hanem valahol máshol.",
+    "saveToPasswordManager": "Mentés jelszókezelőbe",
+    "copyForManualBackup": "Másolás kézi mentéshez",
+    "savedIt": "Elmentettem",
+    "keyBackupText": "Blink hitelesítő beállítási kulcs\n\nFiók: {account}\nBeállítási kulcs: {key}\n\nHa elveszíted a telefonodat, add hozzá ezt a beállítási kulcsot egy hitelesítő alkalmazáshoz, hogy visszakapd a Blink bejelentkezési kódjaidat. Bárki, akinél ez a kulcs van, elő tudja állítani a kódjaidat, ezért tartsd titokban.",
+    "protectedTitle": "A fiókod most már védett",
+    "protectedDescription": "Mostantól a bejelentkezéshez egy egyszer használatos kódra lesz szükség a hitelesítő alkalmazásodból.",
+    "newPhoneTip": "Ha új telefont kapsz, vidd át rá a hitelesítődet, <bold>mielőtt</bold> visszaállítod a régit.",
+    "done": "Kész"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

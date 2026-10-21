@@ -58,7 +58,9 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
 
   const handleSetNow = useCallback(() => {
     setIsLeavingForFlow(true)
-    navigation.navigate("twoFactorSetup", { prompt: TwoFactorPrompt.SessionModal })
+    navigation.navigate("totpRegistrationIntro", {
+      origin: { prompt: TwoFactorPrompt.SessionModal },
+    })
   }, [navigation])
 
   const handleDecline = useCallback(() => {

@@ -6,6 +6,7 @@ import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import {
   ConversionConfirmationScreen,
   ConversionDetailsScreen,
@@ -49,6 +50,10 @@ import { ThemeScreen } from "@app/screens/settings-screen/theme-screen"
 import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { TransactionLimitsScreen } from "@app/screens/settings-screen/transaction-limits-screen"
 import {
+  AuthenticatorAppsScreen,
+  AuthenticatorIntroScreen,
+  AuthenticatorProtectedScreen,
+  SetupKeyBackupScreen,
   TotpLoginValidateScreen,
   TotpRegistrationInitiateScreen,
   TotpRegistrationValidateScreen,
@@ -330,6 +335,50 @@ const twoFactorEnforcementScreens = () => (
       name="twoFactorNonCustodial"
       component={TwoFactorNonCustodialScreen}
       options={{ headerShown: false, gestureEnabled: false }}
+    />
+  </>
+)
+
+/** The authenticator registration, from the onboarding to the key's backup, out of
+ *  RootStack for the same line limit. Every route shares the totpRegistration prefix,
+ *  which is how the flow finds where it began and the gate tells a remedy apart. The
+ *  backup takes no swipe: it is the one chance to keep the key, which an accidental
+ *  swipe would close for good; its back arrow still leaves. */
+const totpRegistrationScreens = (LL: TranslationFunctions) => (
+  <>
+    <RootNavigator.Screen
+      name="totpRegistrationIntro"
+      component={AuthenticatorIntroScreen}
+      options={{ title: "", gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationApps"
+      component={AuthenticatorAppsScreen}
+      options={{ title: "" }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationInitiate"
+      component={TotpRegistrationInitiateScreen}
+      options={{
+        title: LL.TotpRegistrationInitiateScreen.title(),
+      }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationValidate"
+      component={TotpRegistrationValidateScreen}
+      options={{
+        title: LL.TotpRegistrationValidateScreen.title(),
+      }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationBackup"
+      component={SetupKeyBackupScreen}
+      options={{ title: "", gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationDone"
+      component={AuthenticatorProtectedScreen}
+      options={{ title: "" }}
     />
   </>
 )
@@ -722,20 +771,7 @@ export const RootStack = () => {
         }}
       />
       {twoFactorEnforcementScreens()}
-      <RootNavigator.Screen
-        name="totpRegistrationInitiate"
-        component={TotpRegistrationInitiateScreen}
-        options={{
-          title: LL.TotpRegistrationInitiateScreen.title(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="totpRegistrationValidate"
-        component={TotpRegistrationValidateScreen}
-        options={{
-          title: LL.TotpRegistrationValidateScreen.title(),
-        }}
-      />
+      {totpRegistrationScreens(LL)}
       <RootNavigator.Screen
         name="totpLoginValidate"
         component={TotpLoginValidateScreen}

@@ -2616,14 +2616,11 @@
     "youGet": "คุณจะได้รับ"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "รหัสลับ/สำรอง",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -4075,6 +4072,37 @@
     "protectionRequiredBody": "ยิ่งคุณมีเงินมากเท่าไร ความปลอดภัยที่ดีกว่าก็ยิ่งสำคัญมากขึ้น โปรดเพิ่มแอปยืนยันตัวตนเพื่อใช้ Blink ต่อไป",
     "nonCustodialTitle": "หากคุณไม่ต้องการตั้งค่าการยืนยันตัวตนสองขั้นตอน",
     "nonCustodialBody": "อีกทางเลือกหนึ่งคือย้ายไปใช้แบบไม่ฝากดูแล ซึ่งคุณจะต้องรับผิดชอบเงินของคุณเอง"
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "ปกป้องเงินของคุณด้วยแอปยืนยันตัวตน",
+    "introDescription": "แอปยืนยันตัวตนจะสร้างรหัส 6 หลักใหม่ทุก 30 วินาที",
+    "takeoversTitle": "ป้องกันการยึดบัญชี",
+    "takeoversDescription": "รหัสอยู่ในโทรศัพท์ของคุณเท่านั้น",
+    "stolenNumberTitle": "ปลอดภัยแม้หมายเลขของคุณจะถูกขโมย",
+    "stolenNumberDescription": "แม้จะมีคนเข้าถึงอีเมลหรือหมายเลขโทรศัพท์ของคุณได้ ก็ไม่สามารถเข้าสู่ระบบได้",
+    "durationTitle": "ใช้เวลาประมาณ 2 นาที",
+    "durationDescription": "เราจะแนะนำคุณทีละขั้นตอน",
+    "getStarted": "เริ่มต้นใช้งาน",
+    "appsTitle": "ดาวน์โหลดแอปยืนยันตัวตน",
+    "appsDescription": "ใช้แอปยืนยันตัวตนใดก็ได้ แอปเหล่านี้ฟรีและเชื่อถือได้:",
+    "googleAuthenticatorDescription": "ใช้งานง่ายและเป็นที่นิยม สำรองข้อมูลไปยังบัญชี Google ได้ตามต้องการ",
+    "protonAuthenticatorDescription": "โอเพนซอร์ส สำรองข้อมูลและซิงค์แบบเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง",
+    "twoFasAuthDescription": "โอเพนซอร์ส ไม่ต้องมีบัญชี",
+    "get": "ดาวน์โหลด",
+    "storeNote": "“ดาวน์โหลด” จะเปิด App Store หรือ Google Play กลับมาที่ Blink เมื่อติดตั้งเสร็จแล้ว",
+    "haveAnApp": "ฉันมีแอปแล้ว",
+    "keyInstruction": "คัดลอกคีย์ตั้งค่านี้ไปยังแอปยืนยันตัวตนของคุณ",
+    "qrInstruction": "ใช้อุปกรณ์เครื่องอื่นอยู่ใช่ไหม\nสแกนรหัส QR นี้แทน",
+    "backupTitle": "สำรองคีย์ของคุณ",
+    "backupDescription": "หากคุณทำโทรศัพท์หาย คีย์นี้จะช่วยให้คุณตั้งค่าแอปยืนยันตัวตนได้อีกครั้ง โปรดบันทึกไว้ในที่อื่นที่ไม่ใช่โทรศัพท์เครื่องนี้",
+    "saveToPasswordManager": "บันทึกลงตัวจัดการรหัสผ่าน",
+    "copyForManualBackup": "คัดลอกเพื่อสำรองด้วยตนเอง",
+    "savedIt": "ฉันบันทึกแล้ว",
+    "keyBackupText": "คีย์ตั้งค่าแอปยืนยันตัวตนของ Blink\n\nบัญชี: {account}\nคีย์ตั้งค่า: {key}\n\nหากคุณทำโทรศัพท์หาย ให้เพิ่มคีย์ตั้งค่านี้ลงในแอปยืนยันตัวตนเพื่อรับรหัสเข้าสู่ระบบ Blink ของคุณกลับคืนมา ใครก็ตามที่มีคีย์นี้สามารถสร้างรหัสของคุณได้ จึงควรเก็บไว้เป็นความลับ",
+    "protectedTitle": "บัญชีของคุณได้รับการปกป้องแล้ว",
+    "protectedDescription": "นับจากนี้ การเข้าสู่ระบบต้องใช้รหัสแบบใช้ครั้งเดียวจากแอปยืนยันตัวตนของคุณ",
+    "newPhoneTip": "หากคุณเปลี่ยนโทรศัพท์เครื่องใหม่ ให้ย้ายแอปยืนยันตัวตนไปยังเครื่องใหม่<bold>ก่อน</bold>รีเซ็ตเครื่องเก่า",
+    "done": "เสร็จสิ้น"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -2616,14 +2616,11 @@
     "youGet": "Добијате"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Тајна/резервна копија",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -4075,6 +4072,37 @@
     "protectionRequiredBody": "Што више средстава имате, то је боља безбедност важнија. Молимо додајте аутентификатор да бисте наставили да користите Blink.",
     "nonCustodialTitle": "Ако не желите да подесите двофакторску аутентификацију",
     "nonCustodialBody": "Друга опција је прелазак на некастодијални режим. Тада сте сами одговорни за своја средства."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Заштитите своја средства аутентификатором",
+    "introDescription": "Апликација за аутентификацију прави нови шестоцифрени код на сваких 30 секунди.",
+    "takeoversTitle": "Спречава преузимање налога",
+    "takeoversDescription": "Код постоји само на вашем телефону",
+    "stolenNumberTitle": "Будите безбедни чак и ако вам украду број",
+    "stolenNumberDescription": "Чак и ако неко дође до вашег имејла или броја телефона, неће моћи да се пријави",
+    "durationTitle": "Траје око 2 минута",
+    "durationDescription": "Водићемо вас корак по корак",
+    "getStarted": "Започни",
+    "appsTitle": "Набавите апликацију за аутентификацију",
+    "appsDescription": "Ради било која апликација за аутентификацију. Ове су бесплатне и поуздане:",
+    "googleAuthenticatorDescription": "Једноставна и широко коришћена. Опциона резервна копија на ваш Google налог.",
+    "protonAuthenticatorDescription": "Отвореног кода. Резервна копија и синхронизација са шифровањем с краја на крај.",
+    "twoFasAuthDescription": "Отвореног кода. Није потребан налог.",
+    "get": "Преузми",
+    "storeNote": "„Преузми“ отвара App Store или Google Play. Вратите се у Blink када се апликација инсталира.",
+    "haveAnApp": "Имам апликацију",
+    "keyInstruction": "Копирајте овај кључ за подешавање у своју апликацију за аутентификацију.",
+    "qrInstruction": "Користите други уређај?\nУместо тога скенирајте овај QR код.",
+    "backupTitle": "Направите резервну копију кључа",
+    "backupDescription": "Ако изгубите телефон, овај кључ вам омогућава да поново подесите аутентификатор. Сачувајте га негде другде, а не на овом телефону.",
+    "saveToPasswordManager": "Сачувај у менаџер лозинки",
+    "copyForManualBackup": "Копирај за ручну резервну копију",
+    "savedIt": "Сачувао сам га",
+    "keyBackupText": "Blink кључ за подешавање аутентификатора\n\nНалог: {account}\nКључ за подешавање: {key}\n\nАко изгубите телефон, додајте овај кључ за подешавање у апликацију за аутентификацију да бисте повратили своје Blink кодове за пријаву. Свако ко има овај кључ може да прави ваше кодове, зато га чувајте у тајности.",
+    "protectedTitle": "Ваш налог је сада заштићен",
+    "protectedDescription": "Од сада је за пријаву потребан једнократни код из ваше апликације за аутентификацију.",
+    "newPhoneTip": "Ако набавите нови телефон, пребаците аутентификатор на њега <bold>пре</bold> него што ресетујете стари.",
+    "done": "Готово"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

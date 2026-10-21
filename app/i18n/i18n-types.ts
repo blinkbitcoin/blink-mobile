@@ -8489,14 +8489,6 @@ type RootTranslation = {
 		 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
 		 */
 		title: string
-		/**
-		 * S​e​c​r​e​t​/​b​a​c​k​u​p
-		 */
-		secret: string
-		/**
-		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​.
-		 */
-		content: string
 	}
 	TotpRegistrationValidateScreen: {
 		/**
@@ -8507,14 +8499,6 @@ type RootTranslation = {
 		 * E​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​v​a​l​i​d​a​t​e​ ​y​o​u​r​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
 		 */
 		enter6digitCode: string
-		/**
-		 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​h​a​s​ ​b​e​e​n​ ​e​n​a​b​l​e​d​.​ ​Y​o​u​ ​w​i​l​l​ ​n​o​w​ ​o​n​l​y​ ​b​e​ ​a​b​l​e​ ​t​o​ ​l​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h​ ​y​o​u​r​ ​p​h​o​n​e​ ​o​r​ ​e​m​a​i​l​ ​A​N​D​ ​y​o​u​r​ ​t​w​o​ ​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.​
-	​
-	​D​e​v​i​c​e​s​ ​o​n​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​h​i​c​h​ ​a​r​e​ ​n​o​t​ ​l​o​g​g​e​d​ ​i​n​ ​w​i​t​h​ ​2​F​A​ ​w​i​l​l​ ​n​e​e​d​ ​t​o​ ​l​o​g​ ​b​a​c​k​ ​i​n​.​
-	​
-	​O​n​l​y​ ​l​e​v​e​l​ ​2​ ​a​c​c​o​u​n​t​s​ ​c​a​n​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​b​y​ ​c​u​s​t​o​m​e​r​ ​s​u​p​p​o​r​t​ ​i​n​ ​t​h​e​ ​e​v​e​n​t​ ​o​f​ ​l​o​s​t​ ​2​F​A​ ​a​c​c​e​s​s​.
-		 */
-		success: string
 	}
 	TotpLoginValidateScreen: {
 		/**
@@ -13608,6 +13592,132 @@ type RootTranslation = {
 		 * T​h​e​ ​o​t​h​e​r​ ​o​p​t​i​o​n​ ​i​s​ ​t​o​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​.​ ​T​h​e​n​ ​y​o​u​ ​a​r​e​ ​r​e​s​p​o​n​s​i​b​l​e​ ​f​o​r​ ​y​o​u​r​ ​o​w​n​ ​f​u​n​d​s​.
 		 */
 		nonCustodialBody: string
+	}
+	AuthenticatorOnboarding: {
+		/**
+		 * P​r​o​t​e​c​t​ ​y​o​u​r​ ​f​u​n​d​s​ ​w​i​t​h​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
+		 */
+		introTitle: string
+		/**
+		 * A​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​m​a​k​e​s​ ​a​ ​n​e​w​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​e​v​e​r​y​ ​3​0​ ​s​e​c​o​n​d​s​.
+		 */
+		introDescription: string
+		/**
+		 * S​t​o​p​s​ ​a​c​c​o​u​n​t​ ​t​a​k​e​o​v​e​r​s
+		 */
+		takeoversTitle: string
+		/**
+		 * T​h​e​ ​c​o​d​e​ ​l​i​v​e​s​ ​o​n​l​y​ ​o​n​ ​y​o​u​r​ ​p​h​o​n​e
+		 */
+		takeoversDescription: string
+		/**
+		 * B​e​ ​s​a​f​e​ ​e​v​e​n​ ​i​f​ ​y​o​u​r​ ​n​u​m​b​e​r​ ​i​s​ ​s​t​o​l​e​n
+		 */
+		stolenNumberTitle: string
+		/**
+		 * E​v​e​n​ ​i​f​ ​s​o​m​e​o​n​e​ ​g​e​t​s​ ​i​n​t​o​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​t​h​e​y​ ​c​a​n​'​t​ ​l​o​g​ ​i​n
+		 */
+		stolenNumberDescription: string
+		/**
+		 * T​a​k​e​s​ ​a​b​o​u​t​ ​2​ ​m​i​n​u​t​e​s
+		 */
+		durationTitle: string
+		/**
+		 * W​e​'​l​l​ ​g​u​i​d​e​ ​y​o​u​ ​s​t​e​p​ ​b​y​ ​s​t​e​p
+		 */
+		durationDescription: string
+		/**
+		 * G​e​t​ ​s​t​a​r​t​e​d
+		 */
+		getStarted: string
+		/**
+		 * G​e​t​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p
+		 */
+		appsTitle: string
+		/**
+		 * A​n​y​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​w​o​r​k​s​.​ ​T​h​e​s​e​ ​a​r​e​ ​f​r​e​e​ ​a​n​d​ ​t​r​u​s​t​e​d​:
+		 */
+		appsDescription: string
+		/**
+		 * S​i​m​p​l​e​ ​a​n​d​ ​w​i​d​e​l​y​ ​u​s​e​d​.​ ​O​p​t​i​o​n​a​l​ ​b​a​c​k​u​p​ ​t​o​ ​y​o​u​r​ ​G​o​o​g​l​e​ ​a​c​c​o​u​n​t​.
+		 */
+		googleAuthenticatorDescription: string
+		/**
+		 * O​p​e​n​ ​s​o​u​r​c​e​.​ ​E​n​d​-​t​o​-​e​n​d​ ​e​n​c​r​y​p​t​e​d​ ​b​a​c​k​u​p​ ​a​n​d​ ​s​y​n​c​.
+		 */
+		protonAuthenticatorDescription: string
+		/**
+		 * O​p​e​n​ ​s​o​u​r​c​e​.​ ​N​o​ ​a​c​c​o​u​n​t​ ​n​e​e​d​e​d​.
+		 */
+		twoFasAuthDescription: string
+		/**
+		 * G​e​t
+		 */
+		get: string
+		/**
+		 * "​G​e​t​"​ ​o​p​e​n​s​ ​t​h​e​ ​A​p​p​ ​S​t​o​r​e​ ​o​r​ ​G​o​o​g​l​e​ ​P​l​a​y​.​ ​C​o​m​e​ ​b​a​c​k​ ​t​o​ ​B​l​i​n​k​ ​w​h​e​n​ ​i​t​'​s​ ​i​n​s​t​a​l​l​e​d​.
+		 */
+		storeNote: string
+		/**
+		 * I​ ​h​a​v​e​ ​a​n​ ​a​p​p
+		 */
+		haveAnApp: string
+		/**
+		 * C​o​p​y​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		keyInstruction: string
+		/**
+		 * U​s​i​n​g​ ​a​n​o​t​h​e​r​ ​d​e​v​i​c​e​?​
+	​S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​i​n​s​t​e​a​d​.
+		 */
+		qrInstruction: string
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​k​e​y
+		 */
+		backupTitle: string
+		/**
+		 * I​f​ ​y​o​u​ ​l​o​s​e​ ​y​o​u​r​ ​p​h​o​n​e​,​ ​t​h​i​s​ ​k​e​y​ ​l​e​t​s​ ​y​o​u​ ​s​e​t​ ​u​p​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​g​a​i​n​.​ ​S​a​v​e​ ​i​t​ ​s​o​m​e​w​h​e​r​e​ ​o​t​h​e​r​ ​t​h​a​n​ ​t​h​i​s​ ​p​h​o​n​e​.
+		 */
+		backupDescription: string
+		/**
+		 * S​a​v​e​ ​t​o​ ​a​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+		 */
+		saveToPasswordManager: string
+		/**
+		 * C​o​p​y​ ​f​o​r​ ​m​a​n​u​a​l​ ​b​a​c​k​u​p
+		 */
+		copyForManualBackup: string
+		/**
+		 * I​'​v​e​ ​s​a​v​e​d​ ​i​t
+		 */
+		savedIt: string
+		/**
+		 * B​l​i​n​k​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​s​e​t​u​p​ ​k​e​y​
+	​
+	​A​c​c​o​u​n​t​:​ ​{​a​c​c​o​u​n​t​}​
+	​S​e​t​u​p​ ​k​e​y​:​ ​{​k​e​y​}​
+	​
+	​I​f​ ​y​o​u​ ​l​o​s​e​ ​y​o​u​r​ ​p​h​o​n​e​,​ ​a​d​d​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​t​o​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​g​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​l​o​g​i​n​ ​c​o​d​e​s​ ​b​a​c​k​.​ ​A​n​y​o​n​e​ ​w​i​t​h​ ​t​h​i​s​ ​k​e​y​ ​c​a​n​ ​m​a​k​e​ ​y​o​u​r​ ​c​o​d​e​s​,​ ​s​o​ ​k​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
+		 * @param {string} account
+		 * @param {string} key
+		 */
+		keyBackupText: RequiredParams<'account' | 'key'>
+		/**
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​w​ ​p​r​o​t​e​c​t​e​d
+		 */
+		protectedTitle: string
+		/**
+		 * F​r​o​m​ ​n​o​w​ ​o​n​,​ ​l​o​g​g​i​n​g​ ​i​n​ ​n​e​e​d​s​ ​a​ ​o​n​e​-​t​i​m​e​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		protectedDescription: string
+		/**
+		 * I​f​ ​y​o​u​ ​g​e​t​ ​a​ ​n​e​w​ ​p​h​o​n​e​,​ ​m​o​v​e​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​i​t​ ​<​b​o​l​d​>​b​e​f​o​r​e​<​/​b​o​l​d​>​ ​y​o​u​ ​r​e​s​e​t​ ​t​h​e​ ​o​l​d​ ​o​n​e​.
+		 */
+		newPhoneTip: string
+		/**
+		 * D​o​n​e
+		 */
+		done: string
 	}
 	BackupRequired: {
 		/**
@@ -22390,14 +22500,6 @@ export type TranslationFunctions = {
 		 * Two-factor authentication
 		 */
 		title: () => LocalizedString
-		/**
-		 * Secret/backup
-		 */
-		secret: () => LocalizedString
-		/**
-		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.
-		 */
-		content: () => LocalizedString
 	}
 	TotpRegistrationValidateScreen: {
 		/**
@@ -22408,14 +22510,6 @@ export type TranslationFunctions = {
 		 * Enter the 6-digit code from your authenticator app to validate your two-factor authentication.
 		 */
 		enter6digitCode: () => LocalizedString
-		/**
-		 * Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.
-
-	Devices on this account which are not logged in with 2FA will need to log back in.
-
-	Only level 2 accounts can be recovered by customer support in the event of lost 2FA access.
-		 */
-		success: () => LocalizedString
 	}
 	TotpLoginValidateScreen: {
 		/**
@@ -27411,6 +27505,130 @@ export type TranslationFunctions = {
 		 * The other option is to move to non-custodial. Then you are responsible for your own funds.
 		 */
 		nonCustodialBody: () => LocalizedString
+	}
+	AuthenticatorOnboarding: {
+		/**
+		 * Protect your funds with an authenticator
+		 */
+		introTitle: () => LocalizedString
+		/**
+		 * An authenticator app makes a new 6-digit code every 30 seconds.
+		 */
+		introDescription: () => LocalizedString
+		/**
+		 * Stops account takeovers
+		 */
+		takeoversTitle: () => LocalizedString
+		/**
+		 * The code lives only on your phone
+		 */
+		takeoversDescription: () => LocalizedString
+		/**
+		 * Be safe even if your number is stolen
+		 */
+		stolenNumberTitle: () => LocalizedString
+		/**
+		 * Even if someone gets into your email or phone number, they can't log in
+		 */
+		stolenNumberDescription: () => LocalizedString
+		/**
+		 * Takes about 2 minutes
+		 */
+		durationTitle: () => LocalizedString
+		/**
+		 * We'll guide you step by step
+		 */
+		durationDescription: () => LocalizedString
+		/**
+		 * Get started
+		 */
+		getStarted: () => LocalizedString
+		/**
+		 * Get an authenticator app
+		 */
+		appsTitle: () => LocalizedString
+		/**
+		 * Any authenticator app works. These are free and trusted:
+		 */
+		appsDescription: () => LocalizedString
+		/**
+		 * Simple and widely used. Optional backup to your Google account.
+		 */
+		googleAuthenticatorDescription: () => LocalizedString
+		/**
+		 * Open source. End-to-end encrypted backup and sync.
+		 */
+		protonAuthenticatorDescription: () => LocalizedString
+		/**
+		 * Open source. No account needed.
+		 */
+		twoFasAuthDescription: () => LocalizedString
+		/**
+		 * Get
+		 */
+		get: () => LocalizedString
+		/**
+		 * "Get" opens the App Store or Google Play. Come back to Blink when it's installed.
+		 */
+		storeNote: () => LocalizedString
+		/**
+		 * I have an app
+		 */
+		haveAnApp: () => LocalizedString
+		/**
+		 * Copy this setup key into your authenticator app.
+		 */
+		keyInstruction: () => LocalizedString
+		/**
+		 * Using another device?
+	Scan this QR code instead.
+		 */
+		qrInstruction: () => LocalizedString
+		/**
+		 * Back up your key
+		 */
+		backupTitle: () => LocalizedString
+		/**
+		 * If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.
+		 */
+		backupDescription: () => LocalizedString
+		/**
+		 * Save to a password manager
+		 */
+		saveToPasswordManager: () => LocalizedString
+		/**
+		 * Copy for manual backup
+		 */
+		copyForManualBackup: () => LocalizedString
+		/**
+		 * I've saved it
+		 */
+		savedIt: () => LocalizedString
+		/**
+		 * Blink authenticator setup key
+
+	Account: {account}
+	Setup key: {key}
+
+	If you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.
+		 */
+		keyBackupText: (arg: { account: string, key: string }) => LocalizedString
+		/**
+		 * Your account is now protected
+		 */
+		protectedTitle: () => LocalizedString
+		/**
+		 * From now on, logging in needs a one-time code from your authenticator app.
+		 */
+		protectedDescription: () => LocalizedString
+		/**
+		 * If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.
+		 */
+		newPhoneTip: () => LocalizedString
+		/**
+		 * Done
+		 */
+		done: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

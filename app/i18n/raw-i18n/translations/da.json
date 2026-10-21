@@ -2616,14 +2616,11 @@
     "youGet": "Du får"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "To-faktor godkendelse",
-    "secret": "Hemmelighed/backup",
-    "content": "Scan denne QR-kode med din autentificeringsapp. Alternativt kan du manuelt kopiere/indsætte den hemmelige nøgle i din autentificeringsapp."
+    "title": "To-faktor godkendelse"
   },
   "TotpRegistrationValidateScreen": {
     "title": "To-faktor godkendelse",
-    "enter6digitCode": "Indtast den 6-cifrede kode fra din autentificeringsapp for at bekræfte din to-faktor godkendelse.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nDevices on this account which are not logged in with 2FA will need to log back in.\n\nOnly level 2 accounts can be recovered by customer support in the event of lost 2FA access."
+    "enter6digitCode": "Indtast den 6-cifrede kode fra din autentificeringsapp for at bekræfte din to-faktor godkendelse."
   },
   "TotpLoginValidateScreen": {
     "title": "To-faktor godkendelse",
@@ -4075,6 +4072,37 @@
     "protectionRequiredBody": "Jo flere midler du har, jo vigtigere er bedre sikkerhed. Tilføj venligst en authenticator for at fortsætte med at bruge Blink.",
     "nonCustodialTitle": "Hvis du ikke vil opsætte to-faktor godkendelse",
     "nonCustodialBody": "Den anden mulighed er at skifte til ikke-depot. Så er du selv ansvarlig for dine midler."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Beskyt dine midler med en authenticator",
+    "introDescription": "En authenticator-app laver en ny 6-cifret kode hvert 30. sekund.",
+    "takeoversTitle": "Stopper kontoovertagelser",
+    "takeoversDescription": "Koden findes kun på din telefon",
+    "stolenNumberTitle": "Vær sikker, selv hvis dit nummer bliver stjålet",
+    "stolenNumberDescription": "Selv hvis nogen får adgang til din e-mail eller dit telefonnummer, kan de ikke logge ind",
+    "durationTitle": "Tager cirka 2 minutter",
+    "durationDescription": "Vi guider dig trin for trin",
+    "getStarted": "Kom i gang",
+    "appsTitle": "Hent en authenticator-app",
+    "appsDescription": "Alle authenticator-apps virker. Disse er gratis og pålidelige:",
+    "googleAuthenticatorDescription": "Enkel og udbredt. Valgfri backup til din Google-konto.",
+    "protonAuthenticatorDescription": "Åben kildekode. End-to-end-krypteret backup og synkronisering.",
+    "twoFasAuthDescription": "Åben kildekode. Ingen konto nødvendig.",
+    "get": "Hent",
+    "storeNote": "»Hent« åbner App Store eller Google Play. Vend tilbage til Blink, når appen er installeret.",
+    "haveAnApp": "Jeg har en app",
+    "keyInstruction": "Kopiér denne opsætningsnøgle ind i din authenticator-app.",
+    "qrInstruction": "Bruger du en anden enhed?\nScan denne QR-kode i stedet.",
+    "backupTitle": "Sikkerhedskopiér din nøgle",
+    "backupDescription": "Hvis du mister din telefon, kan du med denne nøgle opsætte din authenticator igen. Gem den et andet sted end på denne telefon.",
+    "saveToPasswordManager": "Gem i en adgangskodeadministrator",
+    "copyForManualBackup": "Kopiér til manuel backup",
+    "savedIt": "Jeg har gemt den",
+    "keyBackupText": "Opsætningsnøgle til Blink-authenticator\n\nKonto: {account}\nOpsætningsnøgle: {key}\n\nHvis du mister din telefon, kan du tilføje denne opsætningsnøgle til en authenticator-app for at få dine Blink-loginkoder tilbage. Alle med denne nøgle kan lave dine koder, så hold den privat.",
+    "protectedTitle": "Din konto er nu beskyttet",
+    "protectedDescription": "Fra nu af kræver login en engangskode fra din authenticator-app.",
+    "newPhoneTip": "Hvis du får en ny telefon, så flyt din authenticator over på den, <bold>før</bold> du nulstiller den gamle.",
+    "done": "Færdig"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
