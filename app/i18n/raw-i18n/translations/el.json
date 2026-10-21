@@ -2358,6 +2358,8 @@
     "copiedDestination": "Αντιγραφή προορισμού στο πρόχειρο",
     "lightningRecommended": "Υψηλή τέλη. Συνιστούμε το Lightning.",
     "sending": "Αποστολή",
+    "sent": "Εστάλη",
+    "receipt": "Απόδειξη",
     "fromBalance": "Από το υπόλοιπο",
     "details": "Λεπτομέρειες",
     "changeAmount": "Αλλαγή ποσού",

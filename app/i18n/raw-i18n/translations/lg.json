@@ -2358,6 +2358,8 @@
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "lightningRecommended": "Ebisale ebingi. Tukukubiriza okukozesa Lightning.",
     "sending": "Okusindika",
+    "sent": "Kisindikiddwa",
+    "receipt": "Lisiiti",
     "fromBalance": "Okuva ku Balance",
     "details": "Ebisingawo",
     "changeAmount": "Kyusa omuwendo",

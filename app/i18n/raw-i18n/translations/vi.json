@@ -2358,6 +2358,8 @@
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
     "lightningRecommended": "Phí cao. Chúng tôi khuyên bạn nên dùng Lightning.",
     "sending": "Đang gửi",
+    "sent": "Đã gửi",
+    "receipt": "Biên nhận",
     "fromBalance": "Từ số dư",
     "details": "Chi tiết",
     "changeAmount": "Đổi số tiền",

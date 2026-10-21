@@ -2358,6 +2358,8 @@
     "copiedDestination": "Destinació copiada al porta-retalls",
     "lightningRecommended": "Comissió alta. Recomanem utilitzar Lightning.",
     "sending": "Enviant",
+    "sent": "Enviat",
+    "receipt": "Rebut",
     "fromBalance": "Des del saldo",
     "details": "Detalls",
     "changeAmount": "Canvia l'import",

@@ -2358,6 +2358,8 @@
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
     "sending": "Ուղարկվում է",
+    "sent": "Ուղարկված է",
+    "receipt": "Անդորրագիր",
     "fromBalance": "Հաշվեկշռից",
     "details": "Մանրամասներ",
     "changeAmount": "Փոխել գումարը",

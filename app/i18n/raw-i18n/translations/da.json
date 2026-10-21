@@ -2358,6 +2358,8 @@
     "copiedDestination": "Copied destination to clipboard",
     "lightningRecommended": "High fee. We recommend Lightning.",
     "sending": "Sender",
+    "sent": "Sendt",
+    "receipt": "Kvittering",
     "fromBalance": "Fra saldo",
     "details": "Detaljer",
     "changeAmount": "Skift beløb",

@@ -2358,6 +2358,8 @@
         "copiedDestination": "Destinazione copiata negli appunti",
         "lightningRecommended": "Tariffa elevata. Consigliamo Lightning",
         "sending": "Invio",
+        "sent": "Inviato",
+        "receipt": "Ricevuta",
         "fromBalance": "Dal saldo",
         "details": "Dettagli",
         "changeAmount": "Modifica importo",

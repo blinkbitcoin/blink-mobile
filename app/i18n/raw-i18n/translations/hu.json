@@ -2358,6 +2358,8 @@
     "copiedDestination": "Címzett a vágólapra másolva",
     "lightningRecommended": "Magas díj. Lightning használata ajánlott.",
     "sending": "Küldés",
+    "sent": "Elküldve",
+    "receipt": "Nyugta",
     "fromBalance": "Egyenlegről",
     "details": "Részletek",
     "changeAmount": "Összeg módosítása",

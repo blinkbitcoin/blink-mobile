@@ -2358,6 +2358,8 @@
         "copiedDestination": "Destination copiée dans le presse-papiers",
         "lightningRecommended": "Frais élevés. Nous recommandons Lightning.",
         "sending": "Envoi en cours",
+        "sent": "Envoyé",
+        "receipt": "Reçu",
         "fromBalance": "Depuis le solde",
         "details": "Détails",
         "changeAmount": "Modifier le montant",

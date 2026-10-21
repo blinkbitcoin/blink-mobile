@@ -2358,6 +2358,8 @@
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
         "lightningRecommended": "Hohe Gebühr. Wir empfehlen Lightning.",
         "sending": "Wird gesendet",
+        "sent": "Gesendet",
+        "receipt": "Beleg",
         "fromBalance": "Vom Guthaben",
         "details": "Details",
         "changeAmount": "Betrag ändern",

@@ -33,6 +33,16 @@ export const slideSlider = async () => {
   await slider.swipe("right", "fast", 0.9, 0.5, 0.5)
 }
 
+/** A landed send holds on Sent until the sender closes it; one still pending goes on to
+ *  the receipt, which keeps its own way out. */
+export const leaveSendOutcome = async (LL: TranslationFunctions) => {
+  try {
+    await tap(by.id(LL.common.close()))
+  } catch {
+    await tap(by.id(LL.common.back()))
+  }
+}
+
 export const verifyTextPresent = async (text: string, waitTime?: number) => {
   const el = element(by.text(text))
   await waitFor(el)

@@ -2358,6 +2358,8 @@
         "copiedDestination": "Destino copiado al portapapeles",
         "lightningRecommended": "Tasa elevada. Recomendamos Lightning.",
         "sending": "Enviando",
+        "sent": "Enviado",
+        "receipt": "Recibo",
         "fromBalance": "Desde el saldo",
         "details": "Detalles",
         "changeAmount": "Cambiar cantidad",

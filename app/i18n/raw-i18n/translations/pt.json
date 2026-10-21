@@ -2358,6 +2358,8 @@
         "copiedDestination": "Copiado destino para a área de transferência",
         "lightningRecommended": "Alta taxa. Recomendamos Lightning.",
         "sending": "Enviando",
+        "sent": "Enviado",
+        "receipt": "Comprovante",
         "fromBalance": "Do saldo",
         "details": "Detalhes",
         "changeAmount": "Alterar valor",

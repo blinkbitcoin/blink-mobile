@@ -2358,6 +2358,8 @@
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "lightningRecommended": "Ada kubwa. Tunapendekeza Umeme.",
     "sending": "Inatuma",
+    "sent": "Imetumwa",
+    "receipt": "Risiti",
     "fromBalance": "Kutoka Salio",
     "details": "Maelezo",
     "changeAmount": "Badilisha kiasi",

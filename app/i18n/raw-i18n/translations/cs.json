@@ -2358,6 +2358,8 @@
     "copiedDestination": "Cíl zkopírován do schránky",
     "lightningRecommended": "Vysoký poplatek. Doporučujeme Lightning.",
     "sending": "Odesílání",
+    "sent": "Odesláno",
+    "receipt": "Účtenka",
     "fromBalance": "Ze zůstatku",
     "details": "Podrobnosti",
     "changeAmount": "Změnit částku",

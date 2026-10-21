@@ -2358,6 +2358,8 @@
     "copiedDestination": "Odredište kopirano u međuspremnik",
     "lightningRecommended": "Visoka naknada. Preporučujemo Lightning.",
     "sending": "Slanje",
+    "sent": "Poslano",
+    "receipt": "Potvrda",
     "fromBalance": "Sa salda",
     "details": "Detalji",
     "changeAmount": "Promijeni iznos",

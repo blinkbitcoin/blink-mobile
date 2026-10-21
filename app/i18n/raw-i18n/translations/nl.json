@@ -2358,6 +2358,8 @@
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "lightningRecommended": "Hoge kosten. We raden Lightning aan.",
     "sending": "Verzenden",
+    "sent": "Verzonden",
+    "receipt": "Bon",
     "fromBalance": "Van saldo",
     "details": "Details",
     "changeAmount": "Bedrag wijzigen",

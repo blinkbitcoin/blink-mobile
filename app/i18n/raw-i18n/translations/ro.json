@@ -2358,6 +2358,8 @@
     "copiedDestination": "Destinație copiată în clipboard",
     "lightningRecommended": "Taxă mare. Vă recomandăm Lightning.",
     "sending": "Trimitere",
+    "sent": "Trimis",
+    "receipt": "Chitanță",
     "fromBalance": "Din sold",
     "details": "Detalii",
     "changeAmount": "Schimbă suma",

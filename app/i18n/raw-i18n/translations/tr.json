@@ -2358,6 +2358,8 @@
     "copiedDestination": "Hedefi panoya kopyalama",
     "lightningRecommended": "Yüksek komisyon. Lightning kullanmanızı öneriyoruz.",
     "sending": "Gönderiliyor",
+    "sent": "Gönderildi",
+    "receipt": "Makbuz",
     "fromBalance": "Bakiyeden",
     "details": "Detaylar",
     "changeAmount": "Tutarı değiştir",

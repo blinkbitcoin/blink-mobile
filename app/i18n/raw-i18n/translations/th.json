@@ -2358,6 +2358,8 @@
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
     "lightningRecommended": "ค่าธรรมเนียมสูง แนะนำให้ใช้ Lightning",
     "sending": "กำลังส่ง",
+    "sent": "ส่งแล้ว",
+    "receipt": "ใบเสร็จ",
     "fromBalance": "จากยอดคงเหลือ",
     "details": "รายละเอียด",
     "changeAmount": "เปลี่ยนจำนวนเงิน",

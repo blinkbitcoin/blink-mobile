@@ -2358,6 +2358,8 @@
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
     "lightningRecommended": "رسوم مرتفعة. نوصي باستخدام Lightning.",
     "sending": "جارٍ الإرسال",
+    "sent": "تم الإرسال",
+    "receipt": "الإيصال",
     "fromBalance": "من الرصيد",
     "details": "التفاصيل",
     "changeAmount": "تغيير المبلغ",

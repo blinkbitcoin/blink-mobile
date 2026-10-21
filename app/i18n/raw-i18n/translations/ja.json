@@ -2358,6 +2358,8 @@
         "copiedDestination": "送信先をクリップボードにコピーしました",
         "lightningRecommended": "手数料が高額です。Lightningをお勧めします。",
         "sending": "送信中",
+        "sent": "送金済み",
+        "receipt": "領収書",
         "fromBalance": "送金元の残高",
         "details": "詳細",
         "changeAmount": "金額を変更",

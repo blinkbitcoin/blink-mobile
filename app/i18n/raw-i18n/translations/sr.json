@@ -2358,6 +2358,8 @@
     "copiedDestination": "Одредиште је копирано у клипборд",
     "lightningRecommended": "Висока провизија. Препоручујемо Lightning.",
     "sending": "Слање",
+    "sent": "Послато",
+    "receipt": "Потврда",
     "fromBalance": "Са салда",
     "details": "Детаљи",
     "changeAmount": "Промени износ",
