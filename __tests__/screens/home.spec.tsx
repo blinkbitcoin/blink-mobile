@@ -20,6 +20,8 @@ import {
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import { IsAuthedContextProvider } from "@app/graphql/is-authed-context"
 import { mockCurrencyList } from "@app/graphql/mocks"
+import { BulletinCarousel } from "@app/components/notifications/bulletin-carousel"
+import { defaultRemoteConfig } from "@app/config/feature-flags-context"
 import { GateReason } from "@app/types/account"
 import { ConvertDirection } from "@app/types/payment"
 import {
@@ -2860,7 +2862,7 @@ describe("bulletins auth gating", () => {
 
     expect(mockUseBulletinsQuery).toHaveBeenCalled()
     expect(mockUseBulletinsQuery.mock.lastCall[0]).toEqual(
-      expect.objectContaining({ skip: false, variables: { first: 10 } }),
+      expect.objectContaining({ skip: false, variables: { first: 50 } }),
     )
   })
 
@@ -2889,7 +2891,7 @@ describe("bulletins auth gating", () => {
  */
 describe("bulletins from the server", () => {
   const bulletinsResponse = (result: MockedResponse["result"]): MockedResponse => ({
-    request: { query: BulletinsDocument, variables: { first: 10 } },
+    request: { query: BulletinsDocument, variables: { first: 50 } },
     result,
   })
 
@@ -2904,6 +2906,7 @@ describe("bulletins from the server", () => {
 
   afterEach(() => {
     currentMocks = []
+    mockReminderBulletinVisible = false
   })
 
   it("renders the bulletin the server sends", async () => {
@@ -2931,7 +2934,7 @@ describe("bulletins from the server", () => {
                     id: "notif-home",
                     title: "Scheduled maintenance tonight",
                     body: "Payments may be slower for a few minutes.",
-                    createdAt: 1757800000,
+                    createdAt: defaultRemoteConfig.bulletinsShownSince + 3600,
                     acknowledgedAt: null,
                     bulletinEnabled: true,
                     dismissible: true,
@@ -2953,6 +2956,73 @@ describe("bulletins from the server", () => {
     )
 
     expect(await findByText("Scheduled maintenance tonight")).toBeTruthy()
+  })
+
+  /** One carousel for every home bulletin: the server's first, then the app's own. */
+  it("puts the server bulletin ahead of the app's own in one carousel", async () => {
+    mockReminderBulletinVisible = true
+    currentMocks = [
+      bulletinsResponse({
+        data: {
+          me: {
+            __typename: "User",
+            id: "70df9822-efe0-419c-b864-c9efa99872ea",
+            unacknowledgedStatefulNotificationsWithBulletinEnabled: {
+              __typename: "StatefulNotificationConnection",
+              pageInfo: {
+                __typename: "PageInfo",
+                endCursor: null,
+                hasNextPage: false,
+                hasPreviousPage: false,
+                startCursor: null,
+              },
+              edges: [
+                {
+                  __typename: "StatefulNotificationEdge",
+                  cursor: "notif-home",
+                  node: {
+                    __typename: "StatefulNotification",
+                    id: "notif-home",
+                    title: "Scheduled maintenance tonight",
+                    body: "Payments may be slower for a few minutes.",
+                    createdAt: defaultRemoteConfig.bulletinsShownSince + 3600,
+                    acknowledgedAt: null,
+                    bulletinEnabled: true,
+                    dismissible: true,
+                    icon: null,
+                    action: null,
+                  },
+                },
+              ],
+            },
+          },
+        },
+      }),
+    ]
+
+    const screen = render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await screen.findByText("Scheduled maintenance tonight")
+    fireEvent(screen.UNSAFE_getByType(BulletinCarousel).children[0] as never, "layout", {
+      nativeEvent: { layout: { width: 360, height: 0 } },
+    })
+
+    /** Depth-first, so the order found is the order of the pages. */
+    const order = screen
+      .getByTestId("bulletin-carousel")
+      .findAll(
+        (node) =>
+          node.props.testID === "migration-reminder-bulletin" ||
+          node.props.children === "Scheduled maintenance tonight",
+      )
+      .map((node) => node.props.testID ?? "server")
+    expect(order[0]).toBe("server")
+    expect(order[order.length - 1]).toBe("migration-reminder-bulletin")
+    /** One indicator bar per card, so both sit in the same carousel. */
+    expect(React.Children.count(screen.getByRole("adjustable").props.children)).toBe(2)
   })
 
   /** A server that rejects the query, as a backend without the fields the query names
