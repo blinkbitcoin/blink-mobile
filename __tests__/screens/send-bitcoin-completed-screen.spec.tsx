@@ -204,6 +204,58 @@ const renderSuccess = () => {
   screen.getByTestId("Success Text")
 }
 
+describe("SendBitcoinCompletedScreen actions", () => {
+  let LL: ReturnType<typeof i18nObject>
+  const receiptRoute = {
+    key: "sendBitcoinCompleted",
+    name: "sendBitcoinCompleted",
+    params: {
+      status: "SUCCESS",
+      currencyAmount: "$0.03",
+      satAmount: "25 SAT",
+      currencyFeeAmount: "$0.00",
+      satFeeAmount: "0 SAT",
+      destination: "alice",
+      paymentType: "intraledger",
+      createdAt: 1747691078,
+    },
+  } as const
+
+  const renderReceipt = () => {
+    render(
+      <ContextForScreen>
+        <MockedScreen route={receiptRoute} />
+      </ContextForScreen>,
+    )
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    LL = i18nObject("en")
+    screenshotState.isTakingScreenshot = false
+  })
+
+  it("goes home from the Close button under Share", () => {
+    renderReceipt()
+
+    expect(screen.getByText(LL.common.share())).toBeTruthy()
+    fireEvent.press(screen.getByText(LL.common.close()))
+
+    expect(mockPopToTop).toHaveBeenCalledTimes(1)
+  })
+
+  it("keeps Close out of the shared receipt image", () => {
+    screenshotState.isTakingScreenshot = true
+    renderReceipt()
+
+    expect(screen.queryByText(LL.common.close())).toBeNull()
+  })
+})
+
 describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
