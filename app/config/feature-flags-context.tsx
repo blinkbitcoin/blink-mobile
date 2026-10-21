@@ -58,6 +58,7 @@ const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
+const InactivityFeeEnabledKey = "inactivityFeeEnabled"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -73,8 +74,6 @@ export type FeeRatesConfig = {
   onchainStandardBps: number
   onchainEconomyBps: number
   transferBps: number
-  inactivityBitcoinUsdPerMonth: number
-  inactivityDollarUsdPerMonth: number
 }
 
 type FeatureFlags = {
@@ -128,6 +127,7 @@ type RemoteConfig = {
   [MigrationDelayedRedirectEnabledKey]: boolean
   [PersistentBulletinsEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
+  [InactivityFeeEnabledKey]: boolean
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -145,18 +145,12 @@ const defaultReplaceCardDeliveryConfig = {
 // the send screen's tier selector shows. All three ship visible — quoting only
 // Priority reads as one flat onchain rate and overstates what a Standard or
 // Economy send costs.
-//
-// The inactivity fees are flat USD amounts per custodial balance per month,
-// not basis points, charged once an account has gone 12 months without a user
-// action (blink-wip#1200).
 export const defaultFeeRatesConfig: FeeRatesConfig = {
   lightningSendBps: 0,
   onchainPriorityBps: 90,
   onchainStandardBps: 60,
   onchainEconomyBps: 40,
   transferBps: 50,
-  inactivityBitcoinUsdPerMonth: 1,
-  inactivityDollarUsdPerMonth: 1,
 }
 
 /** Default transfer/swap block, read by both account types. */
@@ -263,6 +257,10 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  stuck on every home by mistake can be made closable again without a release. */
   persistentBulletinsEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
+  /** Whether the fee rates screen lists the inactivity fee. Visibility only: the
+   *  amount comes from `globals.feesInformation.inactivityFee`, the same config the
+   *  backend charges from, so it is never priced here (blink-wip#1200). */
+  inactivityFeeEnabled: true,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -511,6 +509,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultFeeRatesConfig,
         )
 
+        const inactivityFeeEnabled = remoteConfigInstance()
+          .getValue(InactivityFeeEnabledKey)
+          .asBoolean()
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -555,6 +557,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           migrationDelayedRedirectEnabled,
           persistentBulletinsEnabled,
           feeRatesConfig,
+          inactivityFeeEnabled,
         })
       } catch (err) {
         logError({

@@ -24,6 +24,9 @@ gql`
             amount
           }
         }
+        inactivityFee {
+          usdCentsPerMonth
+        }
       }
     }
   }
@@ -65,11 +68,13 @@ const LIGHTNING_FREE_BELOW_SATS = 100
 const INACTIVITY_THRESHOLD_MONTHS = 12
 
 // Whole dollars render bare ("$1"), anything else to the cent ("$1.50").
-const formatUsd = (usd: number): string =>
-  `$${usd.toLocaleString("en-US", {
+const formatUsdCents = (cents: number): string => {
+  const usd = cents / 100
+  return `$${usd.toLocaleString("en-US", {
     minimumFractionDigits: Number.isInteger(usd) ? 0 : 2,
     maximumFractionDigits: 2,
   })}`
+}
 
 type FeeRateRowProps = {
   label: string
@@ -125,7 +130,7 @@ const ErrorRow: React.FC<ErrorRowProps> = ({ onRetry }) => {
 export const FeeRatesScreen: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const { feeRatesConfig } = useRemoteConfig()
+  const { feeRatesConfig, inactivityFeeEnabled } = useRemoteConfig()
 
   const { data, loading, error, refetch } = useFeeRatesQuery({
     fetchPolicy: "cache-and-network",
@@ -133,6 +138,8 @@ export const FeeRatesScreen: React.FC = () => {
   })
 
   const deposit = data?.globals?.feesInformation.deposit
+  const inactivityUsdCentsPerMonth =
+    data?.globals?.feesInformation.inactivityFee.usdCentsPerMonth
 
   // The hook's error state already surfaces a failed retry; the catch only
   // prevents an unhandled promise rejection.
@@ -268,35 +275,26 @@ export const FeeRatesScreen: React.FC = () => {
     ]
   }, [LL, feeRatesConfig])
 
+  // The backend charges one amount per balance, so both rows quote the same
+  // value. Hidden until it loads: the Receive section already surfaces the
+  // query's loading and error states.
   const inactivityItems = useMemo(() => {
-    const monthlyValue = (usd: number) =>
-      usd === 0
+    if (!inactivityFeeEnabled || inactivityUsdCentsPerMonth === undefined) return []
+    const value =
+      inactivityUsdCentsPerMonth === 0
         ? LL.FeeRatesScreen.noFee()
-        : LL.FeeRatesScreen.usdPerMonth({ amount: formatUsd(usd) })
-
-    const items: React.FC[] = []
-    if (isRowVisible(feeRatesConfig.inactivityBitcoinUsdPerMonth)) {
-      items.push(function InactivityBitcoinRow() {
-        return (
-          <FeeRateRow
-            label={LL.common.btcAccount()}
-            value={monthlyValue(feeRatesConfig.inactivityBitcoinUsdPerMonth)}
-          />
-        )
-      })
-    }
-    if (isRowVisible(feeRatesConfig.inactivityDollarUsdPerMonth)) {
-      items.push(function InactivityDollarRow() {
-        return (
-          <FeeRateRow
-            label={LL.common.usdAccount()}
-            value={monthlyValue(feeRatesConfig.inactivityDollarUsdPerMonth)}
-          />
-        )
-      })
-    }
-    return items
-  }, [LL, feeRatesConfig])
+        : LL.FeeRatesScreen.usdPerMonth({
+            amount: formatUsdCents(inactivityUsdCentsPerMonth),
+          })
+    return [
+      function InactivityBitcoinRow() {
+        return <FeeRateRow label={LL.common.btcAccount()} value={value} />
+      },
+      function InactivityDollarRow() {
+        return <FeeRateRow label={LL.common.usdAccount()} value={value} />
+      },
+    ]
+  }, [LL, inactivityFeeEnabled, inactivityUsdCentsPerMonth])
 
   return (
     <Screen preset="scroll">
