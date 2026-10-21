@@ -27,6 +27,7 @@ import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
+import { isTotpRegistrationRoute } from "./two-factor-remedy-routes"
 import { isUnlockInProgress } from "./unlock-routes"
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
@@ -253,16 +254,35 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     resetToBlocker("gate-armed")
   }, [isBlockerVisible, resetToBlocker])
 
+  /** The authenticator registration outlives the prompt that opened it: the accepted
+   *  code ends the prompt, and a link opened then could close the key's backup, the one
+   *  chance to keep the key. A link the prompt held waits for the registration to be
+   *  left as well; one that waited only for the unlock or the sign-in does not. Read
+   *  from the whole stack, not the focused route, so the unlock that covers the
+   *  registration on a return does not let it through. */
+  const [isTotpRegistrationOpen, setIsTotpRegistrationOpen] = React.useState(false)
+  const promptHeldUrlRef = useRef<string | null>(null)
+  useEffect(() => {
+    if (isTwoFactorHoldingLinks && urlAfterUnlockAndAuth) {
+      promptHeldUrlRef.current = urlAfterUnlockAndAuth
+    }
+  }, [isTwoFactorHoldingLinks, urlAfterUnlockAndAuth])
+  const isPromptHeldLink =
+    urlAfterUnlockAndAuth !== null && promptHeldUrlRef.current === urlAfterUnlockAndAuth
+  const isHeldForRegistration = isTotpRegistrationOpen && isPromptHeldLink
+  const isQueuedLinkWaiting = isTwoFactorHoldingLinks || isHeldForRegistration
+
   /** A link that waited for the unlock, the sign-in or the two-factor prompts opens
    *  once all of them are out of the way; the migration link, which the prompts let
    *  through live, goes through here as well. */
   const isQueuedLinkHeld =
-    isTwoFactorHoldingLinks &&
+    isQueuedLinkWaiting &&
     urlAfterUnlockAndAuth !== null &&
     !isMigrationDeeplink(urlAfterUnlockAndAuth)
   const canOpenQueuedUrl = canHandlePayments && !isAppLocked && !isQueuedLinkHeld
   useEffect(() => {
     if (canOpenQueuedUrl && urlAfterUnlockAndAuth) {
+      promptHeldUrlRef.current = null
       Linking.openURL(urlAfterUnlockAndAuth)
       setUrlAfterUnlockAndAuth(null)
     }
@@ -375,6 +395,10 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
+          const rootRoutes = state?.routes ?? []
+          setIsTotpRegistrationOpen(
+            rootRoutes.some((route) => isTotpRegistrationRoute(route.name)),
+          )
 
           if (routeName.current !== currentRouteName && currentRouteName) {
             /* eslint-disable camelcase */
