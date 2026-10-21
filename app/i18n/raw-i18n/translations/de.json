@@ -2337,6 +2337,7 @@
         "maxFeeSelected": "Dies ist die maximale Transaktionsgebühr. Die tatsächlich gezahlte Gebühr kann weniger betragen.",
         "invoiceAlreadyPaid": "Diese Invoice ist bereits bezahlt worden",
         "somethingWentWrong": "Etwas ist schief gegeangen",
+        "priceUpdated": "Der Preis hat sich geändert, deshalb wurden die Beträge aktualisiert. Prüfe sie vor dem Senden.",
         "paymentAlreadyAttempted": "Die Zahlung wurde bereits versucht.\n\nWenn Sie diese Zahlung erneut senden möchten, beginnen Sie von vorne.",
         "slideToConfirm": "Schiebe zur Bestätigung",
         "slideConfirming": "Bestätigend…",

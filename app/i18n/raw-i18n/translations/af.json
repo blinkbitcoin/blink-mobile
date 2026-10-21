@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Hierdie is die maksimum fooi wat jy sal betaal vir hierdie transaksie. Dit mag dalk minder wees as die betaling voltooi is.",
     "invoiceAlreadyPaid": "Hierdie faktuur is reeds betaal",
     "somethingWentWrong": "Iets het verkeerd geloop",
+    "priceUpdated": "Die prys het geskuif, so die bedrae is opgedateer. Gaan dit na voordat jy stuur.",
     "paymentAlreadyAttempted": "Betaling reeds geprobeer.\n\nAs jy hierdie betaling weer wil stuur, begin van voor af.",
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",

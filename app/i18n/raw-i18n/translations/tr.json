@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Bu, bu işlem için sizden tahsil edilecek maksimum ücrettir. Ödeme yapıldıktan sonra daha az olabilir.",
     "invoiceAlreadyPaid": "Bu fatura zaten ödenmiştir",
     "somethingWentWrong": "Bir şeyler ters gitti",
+    "priceUpdated": "Fiyat değişti, bu yüzden tutarlar güncellendi. Göndermeden önce kontrol edin.",
     "paymentAlreadyAttempted": "Ödeme zaten denendi.\n\nBu ödemeyi tekrar göndermek istiyorsanız, sıfırdan başlayın.",
     "slideToConfirm": "Onaylamak için kaydırın",
     "slideConfirming": "Onaylanıyor...",

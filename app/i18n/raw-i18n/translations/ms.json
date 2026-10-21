@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Ini adalah cas bayaran maksimum yang akan dikenakan untuk transaksi ini. Tapi cas ni mungkin akan lagi rendah bila bayaran telah dibuat.",
     "invoiceAlreadyPaid": "Invois ini telah pun dibayar",
     "somethingWentWrong": "Sesuatu tidak kena",
+    "priceUpdated": "Harga berubah, jadi jumlah telah dikemas kini. Semak sebelum anda hantar.",
     "paymentAlreadyAttempted": "Bayaran telah pun dicuba.\n\nJika anda mahu menghantar bayaran ini semula, mulakan dari awal.",
     "slideToConfirm": "Leret untuk Sahkan",
     "slideConfirming": "Mengesahkan...",

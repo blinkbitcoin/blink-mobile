@@ -2337,6 +2337,7 @@
         "maxFeeSelected": "これは今回のトランザクションで請求される手数料の上限です。 お取引完了後に、手数料は少なくなる場合があります。",
         "invoiceAlreadyPaid": "このインボイスは既に支払い済みです",
         "somethingWentWrong": "エラーが発生しました",
+        "priceUpdated": "価格が変動したため、金額を更新しました。送金前にご確認ください。",
         "paymentAlreadyAttempted": "支払いは既に試行済みです。\n\nこの支払いを再度送信する場合は、最初からやり直してください。",
         "slideToConfirm": "スライドして確認",
         "slideConfirming": "確認中...",

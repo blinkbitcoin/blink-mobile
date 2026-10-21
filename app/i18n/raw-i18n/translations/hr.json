@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Ovo je najveća naknada koja će vam biti naplaćena za ovu transakciju. Nakon izvršenja plaćanja može ispasti manje.",
     "invoiceAlreadyPaid": "Ovaj račun je već plaćen",
     "somethingWentWrong": "Nešto je pošlo po zlu",
+    "priceUpdated": "Cijena se promijenila pa su iznosi ažurirani. Provjerite ih prije slanja.",
     "paymentAlreadyAttempted": "Plaćanje je već pokušano.\n\nAko želite ponovo poslati ovo plaćanje, počnite ispočetka.",
     "slideToConfirm": "Povucite za potvrdu",
     "slideConfirming": "Potvrđivanje...",

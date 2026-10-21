@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Ez a maximális díj, amit ezen tranzakcióért felszámíthatunk. Lehet, hogy kevesebb lesz, miután a fizetés megtörtént.",
     "invoiceAlreadyPaid": "Ez a fizetési kérelem már kifizetésre került",
     "somethingWentWrong": "Valami hiba történt",
+    "priceUpdated": "Az ár megváltozott, ezért az összegek frissültek. Küldés előtt ellenőrizd őket.",
     "paymentAlreadyAttempted": "A fizetés kisérlet már megtörtént.\n\nHa újra szeretnéd küldeni ezt a fizetést, kezdd elölről.",
     "slideToConfirm": "Húzd el a megerősítéshez",
     "slideConfirming": "Megerősítés...",

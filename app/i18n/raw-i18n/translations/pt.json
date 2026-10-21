@@ -2337,6 +2337,7 @@
         "maxFeeSelected": "Esta é a taxa máxima que será cobrada por esta transação. Pode acabar sendo menor uma vez que o pagamento foi feito.",
         "invoiceAlreadyPaid": "Esta fatura já foi paga",
         "somethingWentWrong": "Algo deu errado",
+        "priceUpdated": "O preço mudou, então os valores foram atualizados. Confira antes de enviar.",
         "paymentAlreadyAttempted": "Pagamento já tentado.\n\nSe você deseja enviar esse pagamento novamente, comece do zero.",
         "slideToConfirm": "Deslize para Confirmar",
         "slideConfirming": "Confirmando...",

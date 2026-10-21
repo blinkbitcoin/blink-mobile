@@ -2337,6 +2337,7 @@
         "maxFeeSelected": "Questa è la commissione massima che ti verrà addebitata per questa transazione. Una volta effettuato il pagamento, il costo potrebbe risultare inferiore.",
         "invoiceAlreadyPaid": "Questa fattura è già stata pagata",
         "somethingWentWrong": "Qualcosa è andato storto",
+        "priceUpdated": "Il prezzo è cambiato, quindi gli importi sono stati aggiornati. Controllali prima di inviare.",
         "paymentAlreadyAttempted": "Pagamento già tentato.\n\nSe vuoi inviare di nuovo questo pagamento, ricomincia da zero.",
         "slideToConfirm": "Scorri per confermare",
         "slideConfirming": "Confermando...",

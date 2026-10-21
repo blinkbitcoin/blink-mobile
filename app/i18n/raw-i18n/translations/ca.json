@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Aquesta és la comissió màxima que se't cobrarà per aquesta transacció. Pot acabar sent inferior un cop s'hagi realitzat el pagament.",
     "invoiceAlreadyPaid": "Aquesta factura ja ha estat pagada",
     "somethingWentWrong": "Alguna cosa ha anat malament",
+    "priceUpdated": "El preu ha canviat, així que els imports s'han actualitzat. Revisa'ls abans d'enviar.",
     "paymentAlreadyAttempted": "Pagament ja intentat.\n\nSi vols enviar aquest pagament de nou, comença des de zero.",
     "slideToConfirm": "Llisca per confirmar",
     "slideConfirming": "Confirmant...",

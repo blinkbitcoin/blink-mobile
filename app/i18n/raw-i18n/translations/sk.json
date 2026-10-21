@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Ide o maximálny poplatok, ktorý vám bude účtovaný za túto transakciu. Po jej vykonaní môže byť poplatok nižší.",
     "invoiceAlreadyPaid": "Táto faktúra už bola uhradená",
     "somethingWentWrong": "Niečo sa pokazilo",
+    "priceUpdated": "Cena sa zmenila, preto boli sumy aktualizované. Pred odoslaním ich skontrolujte.",
     "paymentAlreadyAttempted": "Platba už bola vykonaná.\n\nAk chcete túto platbu odoslať znova, začnite od začiatku.",
     "slideToConfirm": "Posunutím potvrďte",
     "slideConfirming": "Potvrdzovanie...",

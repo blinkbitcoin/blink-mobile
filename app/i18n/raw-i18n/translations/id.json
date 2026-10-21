@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Ini adalah biaya maksimum yang akan dikenakan untuk transaksi ini. Biaya mungkin lebih rendah setelah pembayaran dilakukan.",
     "invoiceAlreadyPaid": "Faktur ini telah dibayar",
     "somethingWentWrong": "Terjadi kesalahan",
+    "priceUpdated": "Harga berubah, jadi jumlahnya diperbarui. Periksa sebelum mengirim.",
     "paymentAlreadyAttempted": "Pembayaran telah dicoba sebelumnya.\n\nJika Anda ingin mengirim pembayaran ini lagi, mulailah dari awal.",
     "slideToConfirm": "Geser untuk Konfirmasi",
     "slideConfirming": "Mengkonfirmasi...",

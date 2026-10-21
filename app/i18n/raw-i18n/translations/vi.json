@@ -2337,6 +2337,7 @@
     "maxFeeSelected": "Đây là mức phí tối đa bạn sẽ phải trả cho giao dịch này. Nó có thể sẽ ít hơn sau khi thanh toán được thực hiện.",
     "invoiceAlreadyPaid": "Hóa đơn này đã được thanh toán",
     "somethingWentWrong": "Đã xảy ra sự cố",
+    "priceUpdated": "Giá đã thay đổi nên số tiền đã được cập nhật. Hãy kiểm tra trước khi gửi.",
     "paymentAlreadyAttempted": "Thanh toán đã được thử.\n\nNếu bạn muốn gửi lại khoản thanh toán này, hãy bắt đầu lại từ đầu.",
     "slideToConfirm": "Vuốt để Xác nhận",
     "slideConfirming": "Đang xác nhận...",
