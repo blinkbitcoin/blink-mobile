@@ -2340,6 +2340,20 @@
     "paymentAlreadyAttempted": "تمت محاولة الدفع بالفعل.\n\nإذا أردت إرسال هذه الدفعة مرة أخرى، ابدأ من جديد.",
     "slideToConfirm": "اسحب للتأكيد",
     "slideConfirming": "جارٍ التأكيد...",
+    "slideToSend": "اسحب للإرسال",
+    "calculatingFee": "جارٍ حساب العمولة…",
+    "sendProgress": {
+      "reviewing": "جارٍ المراجعة",
+      "signing": "جارٍ التوقيع",
+      "findingRoute": "جارٍ البحث عن مسار",
+      "broadcasting": "جارٍ البث",
+      "checkingDelivery": "جارٍ التحقق من التسليم",
+      "retrying": "جارٍ إعادة المحاولة",
+      "almostThere": "أوشكنا على الانتهاء",
+      "anyTimeNow": "في أي لحظة الآن",
+      "ohOh": "أوه أوه",
+      "tryingAgain": "نحاول مرة أخرى"
+    },
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
     "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
     "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."

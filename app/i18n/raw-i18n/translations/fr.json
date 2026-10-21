@@ -2340,6 +2340,20 @@
         "paymentAlreadyAttempted": "Paiement déjà tenté.\n\nSi vous souhaitez renvoyer ce paiement, recommencez depuis le début.",
         "slideToConfirm": "Glissez pour confirmer",
         "slideConfirming": "Confirmation en cours…",
+        "slideToSend": "Glissez pour envoyer",
+        "calculatingFee": "Calcul des frais…",
+        "sendProgress": {
+            "reviewing": "Vérification",
+            "signing": "Signature",
+            "findingRoute": "Recherche d'un itinéraire",
+            "broadcasting": "Diffusion",
+            "checkingDelivery": "Vérification de la livraison",
+            "retrying": "Nouvelle tentative",
+            "almostThere": "Presque fini",
+            "anyTimeNow": "D'un instant à l'autre",
+            "ohOh": "Oh oh",
+            "tryingAgain": "On réessaie"
+        },
         "copiedDestination": "Destination copiée dans le presse-papiers",
         "lightningRecommended": "Frais élevés ! Nous recommandons Lightning.",
         "usdRemainderSweep": "Solde restant {remaining: string} ({remainingSats: string}) sera converti en Bitcoin. Minimum en USD : {minimum: string}."
