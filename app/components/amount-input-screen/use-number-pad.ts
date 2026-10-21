@@ -90,10 +90,20 @@ export const useNumberPad = ({
   )
 
   /** Mirrors an amount set from outside the pad (a chip, a wallet switch) without
-   *  reporting it back, so the caller's exact amount is never replaced by the rounded one. */
+   *  reporting it back, so the caller's exact amount is never replaced by the rounded one.
+   *  A change of currency is saved as the preference, whoever makes it, because review
+   *  leads with the preferred currency and must read the amount the way the pad showed it. */
   const showAmount = useCallback(
     (amount: MoneyAmount<WalletOrDisplayCurrency>, currency = padState.currency) => {
       if (!convertMoneyAmount) return
+      if (currency !== padState.currency) {
+        savePreferredAmountCurrency(
+          client,
+          currency === DisplayCurrency
+            ? PreferredAmountCurrency.Display
+            : PreferredAmountCurrency.Default,
+        )
+      }
       setPadState(
         moneyAmountToNumberPadReducerState({
           moneyAmount: convertMoneyAmount(amount, currency),
@@ -101,24 +111,23 @@ export const useNumberPad = ({
         }),
       )
     },
-    [padState.currency, convertMoneyAmount, currencyInfo],
+    [client, padState.currency, convertMoneyAmount, currencyInfo],
   )
 
   const padAmount = toMoneyAmount(padState)
 
-  /** Swaps the typed currency between display and wallet, keeping the value. */
+  /** Swaps the typed currency between display and wallet. Converts the caller's amount of
+   *  record, not the pad's rounded mirror of it, so swapping back and forth never drifts
+   *  the shown amount away from the one that will be sent. */
   const toggleCurrency = useCallback(
-    (currency: WalletOrDisplayCurrency) => {
+    (
+      currency: WalletOrDisplayCurrency,
+      amountOfRecord: MoneyAmount<WalletOrDisplayCurrency>,
+    ) => {
       if (currency === padState.currency) return
-      savePreferredAmountCurrency(
-        client,
-        currency === DisplayCurrency
-          ? PreferredAmountCurrency.Display
-          : PreferredAmountCurrency.Default,
-      )
-      showAmount(padAmount, currency)
+      showAmount(amountOfRecord, currency)
     },
-    [client, padState.currency, padAmount, showAmount],
+    [padState.currency, showAmount],
   )
 
   const disabledKeys = useMemo(() => getDisabledKeys(padState), [padState])
