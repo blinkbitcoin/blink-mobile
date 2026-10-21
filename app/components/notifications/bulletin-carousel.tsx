@@ -73,6 +73,9 @@ export const BulletinCarousel: React.FC<Props> = ({ items }) => {
     const key = items[index]?.key
     if (!key || !width) return
     scrollRef.current?.scrollTo({ x: index * width, animated: true })
+    /** Recorded up front: the effect that realigns the scroll runs before the first
+     *  scroll event, and would otherwise cut the animation short with a jump. */
+    scrollX.current = index * width
     setActiveKey(key)
   }
 
