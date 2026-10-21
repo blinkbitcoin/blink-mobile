@@ -437,8 +437,8 @@ export const RootStack = () => {
         options={({ route }) => ({
           title: LL.SendBitcoinScreen.title(),
           headerShown: false,
-          // Sent already holds on review, so the receipt fades in over it.
-          animation: route.params.hasShownSuccess ? "fade" : "default",
+          // Sent already played on review, so the receipt replaces it in one cut.
+          animation: route.params.hasShownSuccess ? "none" : "default",
         })}
       />
       <RootNavigator.Screen
