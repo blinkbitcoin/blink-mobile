@@ -2,6 +2,7 @@ import { AppState, AppStateStatus } from "react-native"
 import { act, renderHook } from "@testing-library/react-native"
 
 import {
+  SENT_HOLD_MS,
   SENT_TIMELINE_MS,
   useSentTransition,
 } from "@app/screens/send-bitcoin-screen/review/use-sent-transition"
@@ -13,7 +14,8 @@ const mockNavigation = {
   isFocused: jest.fn(() => true),
   listeners: {} as Record<string, Listener[]>,
   addListener: jest.fn((event: string, listener: Listener) => {
-    const listeners = (mockNavigation.listeners[event] ??= [])
+    mockNavigation.listeners[event] = mockNavigation.listeners[event] ?? []
+    const listeners = mockNavigation.listeners[event]
     listeners.push(listener)
     return () => listeners.splice(listeners.indexOf(listener), 1)
   }),
@@ -180,5 +182,59 @@ describe("useSentTransition", () => {
     emitNavigation("blur")
     expect(result.current.sentPlay).toBe(0)
     expect(progressOf(result.current)).toEqual({ hero: 0, glow: 0 })
+  })
+
+  describe("hand-over to the receipt", () => {
+    const renderWithHold = () => {
+      const onHoldEnd = jest.fn()
+      const rendered = renderHook(() => useSentTransition({ onHoldEnd }))
+      return { ...rendered, onHoldEnd }
+    }
+
+    it("opens the receipt once a settled Sent has held for the hold time", async () => {
+      const { result, onHoldEnd } = renderWithHold()
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS + SENT_HOLD_MS - 1)
+      expect(onHoldEnd).not.toHaveBeenCalled()
+
+      advance(1)
+      expect(onHoldEnd).toHaveBeenCalledTimes(1)
+    })
+
+    it("stops the hold while the app is away, and starts it over on return", async () => {
+      const { result, onHoldEnd } = renderWithHold()
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS + SENT_HOLD_MS / 2)
+
+      setAppState("background")
+      advance(SENT_HOLD_MS * 4)
+      expect(onHoldEnd).not.toHaveBeenCalled()
+
+      setAppState("active")
+      advance(SENT_HOLD_MS - 1)
+      expect(onHoldEnd).not.toHaveBeenCalled()
+
+      advance(1)
+      expect(onHoldEnd).toHaveBeenCalledTimes(1)
+    })
+
+    it("stops the hold under the lock screen", async () => {
+      const { result, onHoldEnd } = renderWithHold()
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS)
+
+      mockNavigation.isFocused.mockReturnValue(false)
+      emitNavigation("blur")
+      advance(SENT_HOLD_MS * 2)
+      expect(onHoldEnd).not.toHaveBeenCalled()
+
+      mockNavigation.isFocused.mockReturnValue(true)
+      emitNavigation("focus")
+      advance(SENT_HOLD_MS)
+      expect(onHoldEnd).toHaveBeenCalledTimes(1)
+    })
   })
 })
