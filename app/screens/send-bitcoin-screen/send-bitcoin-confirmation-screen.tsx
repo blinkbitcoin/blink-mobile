@@ -171,7 +171,29 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const { fee, recipientAmount, isAwaitingIncludedFee, requote } =
     useReviewQuote(paymentDetail)
 
-  const sentTransition = useSentTransition()
+  /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
+  const sentReceiptRef =
+    React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
+
+  const resetToCompleted = React.useCallback(
+    (params: RootStackParamList["sendBitcoinCompleted"]) =>
+      navigation.dispatch((state) => {
+        const routes = [{ name: "Primary" }, { name: "sendBitcoinCompleted", params }]
+        return CommonActions.reset({
+          ...state,
+          routes,
+          index: routes.length - 1,
+        })
+      }),
+    [navigation],
+  )
+
+  const handleOpenReceipt = React.useCallback(() => {
+    if (sentReceiptRef.current) resetToCompleted(sentReceiptRef.current)
+  }, [resetToCompleted])
+
+  /** Sent hands over to the receipt on its own once it has held long enough. */
+  const sentTransition = useSentTransition({ onHoldEnd: handleOpenReceipt })
   /** Review is headerless and runs edge to edge, so the Sent glow can fill the whole
    *  screen; the stage pads the content back clear of the system bars. */
   const { top: topInset, bottom: bottomInset } = useSafeAreaInsets()
@@ -303,27 +325,6 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     actionsStyle,
     playSent,
   } = sentTransition
-
-  /** The receipt a landed payment opens from Sent, kept until the sender asks for it. */
-  const sentReceiptRef =
-    React.useRef<RootStackParamList["sendBitcoinCompleted"]>(undefined)
-
-  const resetToCompleted = React.useCallback(
-    (params: RootStackParamList["sendBitcoinCompleted"]) =>
-      navigation.dispatch((state) => {
-        const routes = [{ name: "Primary" }, { name: "sendBitcoinCompleted", params }]
-        return CommonActions.reset({
-          ...state,
-          routes,
-          index: routes.length - 1,
-        })
-      }),
-    [navigation],
-  )
-
-  const handleOpenReceipt = React.useCallback(() => {
-    if (sentReceiptRef.current) resetToCompleted(sentReceiptRef.current)
-  }, [resetToCompleted])
 
   const handleClose = React.useCallback(() => navigation.popToTop(), [navigation])
 

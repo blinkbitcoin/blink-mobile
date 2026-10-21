@@ -28,6 +28,8 @@ export const SENT_TIMELINE_MS = Math.max(
   ACTIONS_DELAY_MS + ACTIONS_FADE_MS,
   SENT_BADGE_END_MS,
 )
+/** How long a settled Sent stays on screen before it hands over to the receipt. */
+export const SENT_HOLD_MS = 4000
 
 type Frame = { x: number; y: number; width: number; height: number }
 
@@ -47,7 +49,9 @@ type SentAmounts = { primaryAmount: string; hasSecondaryAmount: boolean }
 /**
  * Review turns into the Sent screen in place: the details and slider dissolve, the hero
  * travels to the middle of the screen as it grows, and a glow blooms behind it. The Sent
- * state then holds until the sender opens the receipt or closes.
+ * state then holds for `SENT_HOLD_MS` and calls `onHoldEnd` (review opens the receipt), unless
+ * the sender opens the receipt or closes first. The hold only counts while Sent can be seen:
+ * leaving the app or covering review stops it, and it starts over on return.
  *
  * The timeline only ever plays where it can be seen. Reanimated stops drawing frames while
  * the app is in the background, and a play cut off there, or started there by a payment
@@ -57,8 +61,11 @@ type SentAmounts = { primaryAmount: string; hasSecondaryAmount: boolean }
  * up over review) is rewound to the start, and plays again in full once review is in front
  * of the sender again.
  */
-export const useSentTransition = () => {
+export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}) => {
   const navigation = useNavigation()
+
+  const onHoldEndRef = useRef(onHoldEnd)
+  onHoldEndRef.current = onHoldEnd
 
   const stageRef = useRef<View>(null)
   const heroRef = useRef<View>(null)
@@ -67,6 +74,8 @@ export const useSentTransition = () => {
   const [glowFrame, setGlowFrame] = useState<SentGlowFrame>()
   /** The play on screen, numbered so a replay redraws the badge; 0 while one waits. */
   const [sentPlay, setSentPlay] = useState(0)
+  /** Whether review is in front of the sender; the hold only counts while it is. */
+  const [isInView, setIsInView] = useState(true)
 
   const amountsRef = useRef<SentAmounts>(undefined)
   /** Bumped by every play and every rewind, so a play still measuring knows it lost. */
@@ -184,18 +193,35 @@ export const useSentTransition = () => {
   }, [canBeSeen, play])
 
   useEffect(() => {
+    const leave = () => {
+      setIsInView(false)
+      interrupt()
+    }
+    const comeBack = () => {
+      setIsInView(canBeSeen())
+      replayIfPending()
+    }
     const appStateSubscription = AppState.addEventListener("change", (state) => {
-      if (state === "background") interrupt()
-      if (state === "active") replayIfPending()
+      if (state === "background") leave()
+      if (state === "active") comeBack()
     })
-    const removeBlurListener = navigation.addListener("blur", interrupt)
-    const removeFocusListener = navigation.addListener("focus", replayIfPending)
+    const removeBlurListener = navigation.addListener("blur", leave)
+    const removeFocusListener = navigation.addListener("focus", comeBack)
     return () => {
       appStateSubscription.remove()
       removeBlurListener()
       removeFocusListener()
     }
-  }, [navigation, interrupt, replayIfPending])
+  }, [navigation, interrupt, replayIfPending, canBeSeen])
+
+  /** Counts the hold from the moment the play settles, or from now if it already has. */
+  useEffect(() => {
+    if (!sentPlay || !isInView) return
+    const startedAt = playStartedAtRef.current ?? Date.now()
+    const timelineLeft = Math.max(0, SENT_TIMELINE_MS - (Date.now() - startedAt))
+    const timer = setTimeout(() => onHoldEndRef.current?.(), timelineLeft + SENT_HOLD_MS)
+    return () => clearTimeout(timer)
+  }, [sentPlay, isInView])
 
   const playSent = useCallback(
     async (amounts: SentAmounts) => {
