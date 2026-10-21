@@ -7,7 +7,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorProtectionRequiredScreen } from "@app/screens/two-factor-enforcement"
-import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
+import { TwoFactorPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -42,11 +42,9 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 }))
 
 const mockLogTwoFactorPromptShown = jest.fn()
-const mockLogTwoFactorSetupStarted = jest.fn()
 const mockLogTwoFactorNonCustodialChosen = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorPromptShown: (...args: unknown[]) => mockLogTwoFactorPromptShown(...args),
-  logTwoFactorSetupStarted: (...args: unknown[]) => mockLogTwoFactorSetupStarted(...args),
   logTwoFactorNonCustodialChosen: (...args: unknown[]) =>
     mockLogTwoFactorNonCustodialChosen(...args),
 }))
@@ -183,18 +181,15 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     })
   })
 
-  it("opens the authenticator setup and logs it, returning to the home", async () => {
+  /** The onboarding reports the setup as started, and closes back to the home this
+   *  screen stands in for. */
+  it("opens the authenticator onboarding, telling it the blocking screen opened it", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
 
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.HighBalance,
-      method: TwoFactorMethod.Authenticator,
-    })
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
-      returnTo: "Primary",
-      prompt: "protection_required_screen",
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
+      origin: { prompt: TwoFactorPrompt.ProtectionRequiredScreen },
     })
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })

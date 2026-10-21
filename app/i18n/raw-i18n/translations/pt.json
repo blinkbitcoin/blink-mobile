@@ -2616,14 +2616,11 @@
         "youGet": "Você recebe"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Autenticação de dois fatores",
-        "secret": "Segredo/backup",
-        "content": "Digitalize este código QR com o seu aplicativo autenticador. Alternativamente, você pode copiar/colar manualmente o segredo no seu aplicativo autenticador."
+        "title": "Autenticação de dois fatores"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticação de dois fatores",
-        "enter6digitCode": "Digite o código de 6 dígitos do seu aplicativo autenticador para validar sua autenticação de dois fatores.",
-        "success": "A autenticação de dois fatores foi ativada. Agora você só poderá fazer login novamente com seu telefone ou e-mail E sua autenticação de dois fatores.\n\nDispositivos nesta conta que não estão conectados com 2FA precisarão fazer login novamente.\n\nApenas contas de nível 2 podem ser recuperadas pelo suporte ao cliente em caso de perda de acesso ao 2FA."
+        "enter6digitCode": "Digite o código de 6 dígitos do seu aplicativo autenticador para validar sua autenticação de dois fatores."
     },
     "TotpLoginValidateScreen": {
         "title": "Autenticação de dois fatores",
@@ -4073,6 +4070,37 @@
         "protectionRequiredBody": "Quanto mais fundos você tem, mais importante é uma segurança melhor. Por favor, adicione um autenticador para continuar usando o Blink.",
         "nonCustodialTitle": "Se você não quiser configurar a autenticação de dois fatores",
         "nonCustodialBody": "A outra opção é mudar para não custodial. Nesse caso, você é responsável pelos seus próprios fundos."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Proteja seus fundos com um autenticador",
+        "introDescription": "Um aplicativo autenticador gera um novo código de 6 dígitos a cada 30 segundos.",
+        "takeoversTitle": "Impede invasões de conta",
+        "takeoversDescription": "O código fica apenas no seu telefone",
+        "stolenNumberTitle": "Fique seguro mesmo se roubarem seu número",
+        "stolenNumberDescription": "Mesmo que alguém acesse seu e-mail ou número de telefone, não conseguirá fazer login",
+        "durationTitle": "Leva cerca de 2 minutos",
+        "durationDescription": "Vamos guiar você passo a passo",
+        "getStarted": "Começar",
+        "appsTitle": "Obtenha um aplicativo autenticador",
+        "appsDescription": "Qualquer aplicativo autenticador funciona. Estes são gratuitos e confiáveis:",
+        "googleAuthenticatorDescription": "Simples e amplamente usado. Backup opcional na sua conta Google.",
+        "protonAuthenticatorDescription": "Código aberto. Backup e sincronização com criptografia de ponta a ponta.",
+        "twoFasAuthDescription": "Código aberto. Não precisa de conta.",
+        "get": "Baixar",
+        "storeNote": "“Baixar” abre a App Store ou o Google Play. Volte ao Blink quando o aplicativo estiver instalado.",
+        "haveAnApp": "Já tenho um aplicativo",
+        "keyInstruction": "Copie esta chave de configuração para o seu aplicativo autenticador.",
+        "qrInstruction": "Está usando outro dispositivo?\nEscaneie este código QR em vez disso.",
+        "backupTitle": "Faça backup da sua chave",
+        "backupDescription": "Se você perder seu telefone, esta chave permite configurar seu autenticador novamente. Guarde-a em outro lugar que não seja este telefone.",
+        "saveToPasswordManager": "Salvar em um gerenciador de senhas",
+        "copyForManualBackup": "Copiar para backup manual",
+        "savedIt": "Já salvei",
+        "keyBackupText": "Chave de configuração do autenticador do Blink\n\nConta: {account}\nChave de configuração: {key}\n\nSe você perder seu telefone, adicione esta chave de configuração a um aplicativo autenticador para recuperar seus códigos de login do Blink. Qualquer pessoa com esta chave pode gerar seus códigos, então mantenha-a em sigilo.",
+        "protectedTitle": "Sua conta agora está protegida",
+        "protectedDescription": "A partir de agora, para fazer login você precisará de um código de uso único do seu aplicativo autenticador.",
+        "newPhoneTip": "Se você trocar de telefone, transfira seu autenticador para o novo <bold>antes</bold> de redefinir o antigo.",
+        "done": "Concluído"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

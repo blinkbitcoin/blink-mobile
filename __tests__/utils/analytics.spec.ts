@@ -1,6 +1,9 @@
 /* eslint-disable camelcase */
 import {
   logAddPhoneAttempt,
+  logAuthenticatorAppSelected,
+  logAuthenticatorEducationCompleted,
+  logAuthenticatorEducationStarted,
   logAttemptCreateDeviceAccount,
   logConversionAttempt,
   logConversionResult,
@@ -15,6 +18,7 @@ import {
   logPaymentAttempt,
   logPaymentResult,
   logRequestAuthCode,
+  logSetupKeyBackupOptionSelected,
   logStartCaptcha,
   logToastShown,
   logTwoFactorNonCustodialChosen,
@@ -355,6 +359,37 @@ describe("analytics helpers", () => {
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_non_custodial_chosen", {
         tier: 2,
+      })
+    })
+  })
+
+  describe("authenticator onboarding events", () => {
+    it("emits 'education_started' with nothing else", () => {
+      logAuthenticatorEducationStarted()
+
+      expect(mockLogEvent).toHaveBeenCalledWith("education_started")
+    })
+
+    it("emits 'education_app_selected' with the app", () => {
+      logAuthenticatorAppSelected({ app: "proton_authenticator" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("education_app_selected", {
+        app: "proton_authenticator",
+      })
+    })
+
+    it("emits 'education_completed' with nothing else", () => {
+      logAuthenticatorEducationCompleted()
+
+      expect(mockLogEvent).toHaveBeenCalledWith("education_completed")
+    })
+
+    /** The option, never the key it saved. */
+    it("emits 'backup_option_selected' with the option alone", () => {
+      logSetupKeyBackupOptionSelected({ option: "password_manager" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("backup_option_selected", {
+        option: "password_manager",
       })
     })
   })

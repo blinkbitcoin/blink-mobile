@@ -2616,14 +2616,11 @@
     "youGet": "Alacağınız"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "İki aşamalı doğrulama",
-    "secret": "Gizli anahtar/yedek",
-    "content": "Bu QR kodunu kimlik doğrulayıcı uygulamanızla tarayın. Alternatif olarak, sırrı kimlik doğrulayıcı uygulamanıza manuel olarak kopyalayıp yapıştırabilirsiniz."
+    "title": "İki aşamalı doğrulama"
   },
   "TotpRegistrationValidateScreen": {
     "title": "İki aşamalı doğrulama",
-    "enter6digitCode": "İki aşamalı doğrulamayı başlatmak için doğrulama uygulamanıza gelen 6 haneli kodu girin.",
-    "success": "İki faktörlü kimlik doğrulama etkinleştirildi. Artık yalnızca telefonunuz veya e-postanız VE iki faktörlü kimlik doğrulamanız ile tekrar giriş yapabileceksiniz.\n\nBu hesapta 2FA ile oturum açmamış cihazların tekrar oturum açması gerekecektir.\n\n2FA erişiminin kaybedilmesi durumunda müşteri desteği tarafından yalnızca 2. seviye hesaplar kurtarılabilir."
+    "enter6digitCode": "İki aşamalı doğrulamayı başlatmak için doğrulama uygulamanıza gelen 6 haneli kodu girin."
   },
   "TotpLoginValidateScreen": {
     "title": "İki aşamalı doğrulama",
@@ -4073,6 +4070,37 @@
     "protectionRequiredBody": "Ne kadar çok varlığınız varsa, daha iyi güvenlik o kadar önemlidir. Blink'i kullanmaya devam etmek için lütfen bir doğrulayıcı ekleyin.",
     "nonCustodialTitle": "İki aşamalı doğrulamayı ayarlamak istemiyorsanız",
     "nonCustodialBody": "Diğer seçenek saklama dışı moda geçmektir. O zaman kendi varlıklarınızdan siz sorumlu olursunuz."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Varlıklarınızı bir doğrulayıcıyla koruyun",
+    "introDescription": "Doğrulayıcı uygulaması her 30 saniyede bir yeni 6 haneli kod üretir.",
+    "takeoversTitle": "Hesabın ele geçirilmesini önler",
+    "takeoversDescription": "Kod yalnızca telefonunuzda bulunur",
+    "stolenNumberTitle": "Numaranız çalınsa bile güvende olun",
+    "stolenNumberDescription": "Biri e-postanıza veya telefon numaranıza erişse bile giriş yapamaz",
+    "durationTitle": "Yaklaşık 2 dakika sürer",
+    "durationDescription": "Size adım adım rehberlik edeceğiz",
+    "getStarted": "Başla",
+    "appsTitle": "Bir doğrulayıcı uygulaması edinin",
+    "appsDescription": "Her doğrulayıcı uygulaması çalışır. Bunlar ücretsiz ve güvenilirdir:",
+    "googleAuthenticatorDescription": "Basit ve yaygın olarak kullanılır. Google hesabınıza isteğe bağlı yedekleme.",
+    "protonAuthenticatorDescription": "Açık kaynak. Uçtan uca şifreli yedekleme ve senkronizasyon.",
+    "twoFasAuthDescription": "Açık kaynak. Hesap gerekmez.",
+    "get": "İndir",
+    "storeNote": "“İndir” App Store'u veya Google Play'i açar. Yüklendikten sonra Blink'e geri dönün.",
+    "haveAnApp": "Bir uygulamam var",
+    "keyInstruction": "Bu kurulum anahtarını doğrulayıcı uygulamanıza kopyalayın.",
+    "qrInstruction": "Başka bir cihaz mı kullanıyorsunuz?\nBunun yerine bu QR kodunu tarayın.",
+    "backupTitle": "Anahtarınızı yedekleyin",
+    "backupDescription": "Telefonunuzu kaybederseniz bu anahtar, doğrulayıcınızı yeniden kurmanızı sağlar. Bu telefondan başka bir yere kaydedin.",
+    "saveToPasswordManager": "Bir şifre yöneticisine kaydet",
+    "copyForManualBackup": "Manuel yedekleme için kopyala",
+    "savedIt": "Kaydettim",
+    "keyBackupText": "Blink doğrulayıcı kurulum anahtarı\n\nHesap: {account}\nKurulum anahtarı: {key}\n\nTelefonunuzu kaybederseniz, Blink giriş kodlarınızı geri almak için bu kurulum anahtarını bir doğrulayıcı uygulamasına ekleyin. Bu anahtara sahip olan herkes kodlarınızı üretebilir, bu yüzden gizli tutun.",
+    "protectedTitle": "Hesabınız artık korunuyor",
+    "protectedDescription": "Bundan sonra giriş yapmak için doğrulayıcı uygulamanızdan tek kullanımlık bir kod gerekecek.",
+    "newPhoneTip": "Yeni bir telefon alırsanız, eskisini sıfırlamadan <bold>önce</bold> doğrulayıcınızı yeni telefona taşıyın.",
+    "done": "Tamam"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

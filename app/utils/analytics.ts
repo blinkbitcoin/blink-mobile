@@ -9,6 +9,8 @@ import { ValidatePhoneCodeErrorsType } from "@app/screens/phone-auth-screen"
 import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import {
+  AuthenticatorApp,
+  SetupKeyBackupOption,
   TwoFactorMethod,
   TwoFactorPrompt,
   TwoFactorReminderReason,
@@ -248,4 +250,36 @@ export const logTwoFactorSetupCompleted = (params: LogTwoFactorSetupCompletedPar
     is_enforced: params.isEnforced,
     ...promptParams,
   })
+}
+
+/** The authenticator onboarding opened, from any prompt that asks for one. */
+export const logAuthenticatorEducationStarted = () => {
+  analytics().logEvent("education_started")
+}
+
+type LogAuthenticatorAppSelectedParams = {
+  app: AuthenticatorApp
+}
+
+/** A recommended authenticator app opened in its store. */
+export const logAuthenticatorAppSelected = (
+  params: LogAuthenticatorAppSelectedParams,
+) => {
+  analytics().logEvent("education_app_selected", { app: params.app })
+}
+
+/** The onboarding left for the setup itself, with an app at hand. */
+export const logAuthenticatorEducationCompleted = () => {
+  analytics().logEvent("education_completed")
+}
+
+type LogSetupKeyBackupOptionSelectedParams = {
+  option: SetupKeyBackupOption
+}
+
+/** A backup option used for a new authenticator's setup key. Never the key itself. */
+export const logSetupKeyBackupOptionSelected = (
+  params: LogSetupKeyBackupOptionSelectedParams,
+) => {
+  analytics().logEvent("backup_option_selected", { option: params.option })
 }

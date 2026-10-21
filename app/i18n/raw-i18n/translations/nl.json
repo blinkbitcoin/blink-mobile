@@ -2616,14 +2616,11 @@
     "youGet": "Je krijgt"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Tweefactorauthenticatie",
-    "secret": "Geheim/back-up",
-    "content": "Scan deze QR-code met uw authenticator-app. Als alternatief kunt u het geheim handmatig in uw authenticator-app kopiëren/plakken."
+    "title": "Tweefactorauthenticatie"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Tweefactorauthenticatie",
-    "enter6digitCode": "Voer de 6-cijferige code van uw authenticator-app in om uw tweefactorauthenticatie te valideren.",
-    "success": "Tweefactorauthenticatie is ingeschakeld. U kunt nu alleen weer inloggen met uw telefoon of e-mailadres EN uw tweefactorauthenticatie.\n\nAlleen volledige KYC-accounts kunnen worden hersteld als een gebruiker de toegang tot zijn tweefactorauthenticatie heeft verloren."
+    "enter6digitCode": "Voer de 6-cijferige code van uw authenticator-app in om uw tweefactorauthenticatie te valideren."
   },
   "TotpLoginValidateScreen": {
     "title": "Tweefactorauthenticatie",
@@ -4073,6 +4070,37 @@
     "protectionRequiredBody": "Hoe meer tegoed je hebt, hoe belangrijker betere beveiliging is. Voeg een authenticator toe om Blink te blijven gebruiken.",
     "nonCustodialTitle": "Als je geen tweefactorauthenticatie wilt instellen",
     "nonCustodialBody": "De andere optie is overstappen naar non-custodial. Dan ben je zelf verantwoordelijk voor je tegoed."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Bescherm je tegoed met een authenticator",
+    "introDescription": "Een authenticator-app maakt elke 30 seconden een nieuwe 6-cijferige code.",
+    "takeoversTitle": "Voorkomt accountovername",
+    "takeoversDescription": "De code staat alleen op je telefoon",
+    "stolenNumberTitle": "Veilig, zelfs als je nummer wordt gestolen",
+    "stolenNumberDescription": "Zelfs als iemand toegang krijgt tot je e-mail of telefoonnummer, kan diegene niet inloggen",
+    "durationTitle": "Duurt ongeveer 2 minuten",
+    "durationDescription": "We begeleiden je stap voor stap",
+    "getStarted": "Aan de slag",
+    "appsTitle": "Installeer een authenticator-app",
+    "appsDescription": "Elke authenticator-app werkt. Deze zijn gratis en betrouwbaar:",
+    "googleAuthenticatorDescription": "Eenvoudig en veelgebruikt. Optionele back-up naar je Google-account.",
+    "protonAuthenticatorDescription": "Opensource. End-to-end versleutelde back-up en synchronisatie.",
+    "twoFasAuthDescription": "Opensource. Geen account nodig.",
+    "get": "Downloaden",
+    "storeNote": "“Downloaden” opent de App Store of Google Play. Kom terug naar Blink zodra de app is geïnstalleerd.",
+    "haveAnApp": "Ik heb al een app",
+    "keyInstruction": "Kopieer deze configuratiesleutel naar je authenticator-app.",
+    "qrInstruction": "Gebruik je een ander apparaat?\nScan dan deze QR-code.",
+    "backupTitle": "Maak een back-up van je sleutel",
+    "backupDescription": "Als je je telefoon verliest, kun je met deze sleutel je authenticator opnieuw instellen. Bewaar hem ergens anders dan op deze telefoon.",
+    "saveToPasswordManager": "Opslaan in een wachtwoordbeheerder",
+    "copyForManualBackup": "Kopiëren voor handmatige back-up",
+    "savedIt": "Ik heb hem opgeslagen",
+    "keyBackupText": "Configuratiesleutel voor Blink-authenticator\n\nAccount: {account}\nConfiguratiesleutel: {key}\n\nAls je je telefoon verliest, voeg dan deze configuratiesleutel toe aan een authenticator-app om je Blink-inlogcodes terug te krijgen. Iedereen met deze sleutel kan je codes maken, dus houd hem privé.",
+    "protectedTitle": "Je account is nu beveiligd",
+    "protectedDescription": "Vanaf nu heb je om in te loggen een eenmalige code uit je authenticator-app nodig.",
+    "newPhoneTip": "Als je een nieuwe telefoon krijgt, verplaats je authenticator er dan naartoe <bold>voordat</bold> je de oude reset.",
+    "done": "Klaar"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

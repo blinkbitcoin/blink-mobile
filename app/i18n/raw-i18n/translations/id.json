@@ -2616,14 +2616,11 @@
     "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Otentikasi dua faktor",
-    "secret": "Rahasia/cadangan",
-    "content": "Pindai kode QR ini dengan aplikasi autentikator Anda. Sebagai alternatif, Anda dapat menyalin/tempelkan kode rahasia secara manual ke aplikasi autentikator Anda."
+    "title": "Otentikasi dua faktor"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Otentikasi dua faktor",
-    "enter6digitCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk memvalidasi otentikasi dua faktor Anda.",
-    "success": "Otentikasi dua faktor telah diaktifkan. Anda sekarang hanya dapat masuk kembali dengan ponsel atau email DAN autentikasi dua faktor Anda.\n\nPerangkat di akun ini yang belum masuk dengan 2FA harus masuk kembali.\n\nHanya akun level 2 yang dapat dipulihkan oleh dukungan pelanggan jika akses 2FA hilang."
+    "enter6digitCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk memvalidasi otentikasi dua faktor Anda."
   },
   "TotpLoginValidateScreen": {
     "title": "Otentikasi dua faktor",
@@ -4073,6 +4070,37 @@
     "protectionRequiredBody": "Semakin banyak dana yang Anda miliki, semakin penting keamanan yang lebih baik. Harap tambahkan authenticator untuk terus menggunakan Blink.",
     "nonCustodialTitle": "Jika Anda tidak ingin mengatur otentikasi dua faktor",
     "nonCustodialBody": "Pilihan lainnya adalah beralih ke non-kustodial. Maka Anda bertanggung jawab atas dana Anda sendiri."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Lindungi dana Anda dengan authenticator",
+    "introDescription": "Aplikasi authenticator membuat kode 6 digit baru setiap 30 detik.",
+    "takeoversTitle": "Mencegah pengambilalihan akun",
+    "takeoversDescription": "Kode hanya ada di ponsel Anda",
+    "stolenNumberTitle": "Tetap aman meski nomor Anda dicuri",
+    "stolenNumberDescription": "Meskipun seseorang berhasil mengakses email atau nomor telepon Anda, mereka tidak bisa masuk",
+    "durationTitle": "Hanya sekitar 2 menit",
+    "durationDescription": "Kami akan memandu Anda langkah demi langkah",
+    "getStarted": "Mulai",
+    "appsTitle": "Dapatkan aplikasi authenticator",
+    "appsDescription": "Aplikasi authenticator apa pun bisa digunakan. Yang berikut ini gratis dan tepercaya:",
+    "googleAuthenticatorDescription": "Sederhana dan banyak digunakan. Cadangan opsional ke akun Google Anda.",
+    "protonAuthenticatorDescription": "Sumber terbuka. Cadangan dan sinkronisasi terenkripsi ujung ke ujung.",
+    "twoFasAuthDescription": "Sumber terbuka. Tidak perlu akun.",
+    "get": "Unduh",
+    "storeNote": "“Unduh” membuka App Store atau Google Play. Kembali ke Blink setelah aplikasi terpasang.",
+    "haveAnApp": "Saya sudah punya aplikasi",
+    "keyInstruction": "Salin kunci penyiapan ini ke aplikasi authenticator Anda.",
+    "qrInstruction": "Menggunakan perangkat lain?\nPindai kode QR ini sebagai gantinya.",
+    "backupTitle": "Cadangkan kunci Anda",
+    "backupDescription": "Jika ponsel Anda hilang, kunci ini memungkinkan Anda menyiapkan kembali authenticator Anda. Simpan di tempat selain ponsel ini.",
+    "saveToPasswordManager": "Simpan ke pengelola kata sandi",
+    "copyForManualBackup": "Salin untuk cadangan manual",
+    "savedIt": "Saya sudah menyimpannya",
+    "keyBackupText": "Kunci penyiapan authenticator Blink\n\nAkun: {account}\nKunci penyiapan: {key}\n\nJika ponsel Anda hilang, tambahkan kunci penyiapan ini ke aplikasi authenticator untuk mendapatkan kembali kode masuk Blink Anda. Siapa pun yang memiliki kunci ini dapat membuat kode Anda, jadi rahasiakan kunci ini.",
+    "protectedTitle": "Akun Anda kini terlindungi",
+    "protectedDescription": "Mulai sekarang, untuk masuk diperlukan kode sekali pakai dari aplikasi authenticator Anda.",
+    "newPhoneTip": "Jika Anda mendapat ponsel baru, pindahkan authenticator ke ponsel tersebut <bold>sebelum</bold> Anda mengatur ulang ponsel lama.",
+    "done": "Selesai"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -2616,14 +2616,11 @@
         "youGet": "受取額"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "2要素認証（2FA）",
-        "secret": "シークレット/バックアップ",
-        "content": "二段階認証アプリでこの QR コードをスキャンします。 または、シークレットコードを手動でコピーして認証アプリに貼り付けるコードできます。"
+        "title": "2要素認証（2FA）"
     },
     "TotpRegistrationValidateScreen": {
         "title": "2要素認証（2FA）",
-        "enter6digitCode": "2要素認証（2FA）アプリから 6 桁のコードを入力し、承認してください。",
-        "success": "2要素認証（2FA）が有効になりました。 電話番号またはメールアドレスと2要素認証を使用してのみ再ログインできるようになります。\n\nあなたが2要素認証へのアクセスを失った場合、完全なKYCウォレットのみ再ログインできます。"
+        "enter6digitCode": "2要素認証（2FA）アプリから 6 桁のコードを入力し、承認してください。"
     },
     "TotpLoginValidateScreen": {
         "title": "2要素認証（2FA）",
@@ -4073,6 +4070,37 @@
         "protectionRequiredBody": "資金が多いほど、より高いセキュリティが重要になります。Blinkを引き続き利用するには認証アプリを追加してください。",
         "nonCustodialTitle": "2要素認証を設定しない場合",
         "nonCustodialBody": "もう一つの選択肢はノンカストディアルへの移行です。その場合、資金の管理はご自身の責任となります。"
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "認証アプリで資金を守りましょう",
+        "introDescription": "認証アプリは30秒ごとに新しい6桁のコードを生成します。",
+        "takeoversTitle": "アカウントの乗っ取りを防止",
+        "takeoversDescription": "コードはあなたのスマートフォンにしか存在しません",
+        "stolenNumberTitle": "電話番号が盗まれても安全",
+        "stolenNumberDescription": "誰かにメールや電話番号を乗っ取られても、ログインされることはありません",
+        "durationTitle": "所要時間は約2分",
+        "durationDescription": "手順に沿ってご案内します",
+        "getStarted": "始める",
+        "appsTitle": "認証アプリを入手",
+        "appsDescription": "どの認証アプリでも使えます。以下は無料で信頼できるアプリです：",
+        "googleAuthenticatorDescription": "シンプルで広く使われています。Googleアカウントへのバックアップも可能です（任意）。",
+        "protonAuthenticatorDescription": "オープンソース。エンドツーエンドで暗号化されたバックアップと同期。",
+        "twoFasAuthDescription": "オープンソース。アカウント不要。",
+        "get": "入手",
+        "storeNote": "「入手」を押すとApp StoreまたはGoogle Playが開きます。インストールが終わったらBlinkに戻ってください。",
+        "haveAnApp": "アプリを持っています",
+        "keyInstruction": "このセットアップキーを認証アプリにコピーしてください。",
+        "qrInstruction": "別のデバイスを使っていますか？\n代わりにこのQRコードをスキャンしてください。",
+        "backupTitle": "キーをバックアップ",
+        "backupDescription": "スマートフォンを紛失しても、このキーがあれば認証アプリを再設定できます。このスマートフォン以外の場所に保存してください。",
+        "saveToPasswordManager": "パスワードマネージャーに保存",
+        "copyForManualBackup": "手動バックアップ用にコピー",
+        "savedIt": "保存しました",
+        "keyBackupText": "Blink認証アプリのセットアップキー\n\nアカウント：{account}\nセットアップキー：{key}\n\nスマートフォンを紛失した場合は、このセットアップキーを認証アプリに追加すると、Blinkのログインコードを再び取得できます。このキーがあれば誰でもあなたのコードを生成できるため、他人に知られないよう保管してください。",
+        "protectedTitle": "アカウントが保護されました",
+        "protectedDescription": "今後のログインには、認証アプリのワンタイムコードが必要です。",
+        "newPhoneTip": "新しいスマートフォンに機種変更する場合は、古い端末をリセットする<bold>前に</bold>認証アプリを移行してください。",
+        "done": "完了"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
