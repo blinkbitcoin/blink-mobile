@@ -4061,7 +4061,17 @@
     "setupDescription": "Cuentaykiman mana saqisqa yaykuyta harkanaykipaq, kunan iskay rakiypi riqsichiyta yapay.",
     "addEmail": "Correo electrónicota yapay",
     "addPhoneNumber": "Teléfono yupayta yapay",
-    "setAuthenticator": "Autenticadorta churay"
+    "setAuthenticator": "Autenticadorta churay",
+    "modalReminder": "Kunan saqispaykiqa, usqhaylla chayta qallarichiy.",
+    "dismissTwoMore": "Kayta iskay kutita saqiyta atinkiraq.",
+    "dismissOneMore": "Kayta huk kutita saqiyta atinkiraq.",
+    "dismissLast": "Kayqa qhipa kuti kayta saqiyta atinki.",
+    "setNow": "Kunan churay",
+    "dontWantTo": "Mana munanichu",
+    "highBalanceTitle": "{amount} masta kapusunki, ama hina kaspa aswan harkayta yapay",
+    "protectionRequiredBody": "Aswan qullqiyuq kaspaykiqa, aswan allin harkay aswan chaninmi. Ama hina kaspa autenticadorta yapay Blinkta llamk'achinaykipaq.",
+    "nonCustodialTitle": "Mana iskay rakiypi riqsichiyta churayta munaspaykiqa",
+    "nonCustodialBody": "Huk akllayqa non-custodialman pasaymi. Chaypiqa qam kikiyki qullqiykimanta ruwaq kanki."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

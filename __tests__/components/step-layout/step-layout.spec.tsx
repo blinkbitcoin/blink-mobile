@@ -2,19 +2,19 @@ import React from "react"
 import { ScrollView, StyleSheet, Text, type ViewStyle } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import type { ReactTestInstance } from "react-test-renderer"
+import { ThemeProvider } from "@rn-vui/themed"
 
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
-import { ContextForScreen } from "../helper"
+import { StepLayout } from "@app/components/step-layout"
+import theme from "@app/rne-theme/theme"
 
-const renderLayout = (
-  props: Partial<React.ComponentProps<typeof MigrationStepLayout>> = {},
-) =>
+/** A pure layout: the theme is all it reads. */
+const renderLayout = (props: Partial<React.ComponentProps<typeof StepLayout>> = {}) =>
   render(
-    <ContextForScreen>
-      <MigrationStepLayout footer={<Text>footer action</Text>} {...props}>
+    <ThemeProvider theme={theme}>
+      <StepLayout footer={<Text>footer action</Text>} {...props}>
         <Text>step content</Text>
-      </MigrationStepLayout>
-    </ContextForScreen>,
+      </StepLayout>
+    </ThemeProvider>,
   )
 
 const getScrollView = () => screen.UNSAFE_getByType(ScrollView)
@@ -36,7 +36,7 @@ const isInside = (node: ReactTestInstance, ancestor: ReactTestInstance): boolean
   return false
 }
 
-describe("MigrationStepLayout", () => {
+describe("StepLayout", () => {
   it("renders the step content inside a scroll view", () => {
     renderLayout()
 

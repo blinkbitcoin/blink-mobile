@@ -4061,7 +4061,17 @@
     "setupDescription": "Voeg nu tweefactorauthenticatie toe om ongeautoriseerde toegang tot je account te voorkomen.",
     "addEmail": "E-mail toevoegen",
     "addPhoneNumber": "Telefoonnummer toevoegen",
-    "setAuthenticator": "Authenticator instellen"
+    "setAuthenticator": "Authenticator instellen",
+    "modalReminder": "Als je dit nu wegklikt, zorg dan dat je het zo snel mogelijk inschakelt.",
+    "dismissTwoMore": "Je kunt dit nog twee keer wegklikken.",
+    "dismissOneMore": "Je kunt dit nog één keer wegklikken.",
+    "dismissLast": "Dit is de laatste keer dat je dit kunt wegklikken.",
+    "setNow": "Nu instellen",
+    "dontWantTo": "Ik wil niet",
+    "highBalanceTitle": "Je hebt meer dan {amount}, voeg extra bescherming toe",
+    "protectionRequiredBody": "Hoe meer tegoed je hebt, hoe belangrijker betere beveiliging is. Voeg een authenticator toe om Blink te blijven gebruiken.",
+    "nonCustodialTitle": "Als je geen tweefactorauthenticatie wilt instellen",
+    "nonCustodialBody": "De andere optie is overstappen naar non-custodial. Dan ben je zelf verantwoordelijk voor je tegoed."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

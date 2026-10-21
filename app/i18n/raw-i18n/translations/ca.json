@@ -4061,7 +4061,17 @@
     "setupDescription": "Per evitar l'accés no autoritzat al teu compte, afegeix ara l'autenticació de dos factors.",
     "addEmail": "Afegeix correu electrònic",
     "addPhoneNumber": "Afegeix número de telèfon",
-    "setAuthenticator": "Configura l'autenticador"
+    "setAuthenticator": "Configura l'autenticador",
+    "modalReminder": "Si ho descartes ara, assegura't d'activar-ho tan aviat com puguis.",
+    "dismissTwoMore": "Pots descartar això dues vegades més.",
+    "dismissOneMore": "Pots descartar això una vegada més.",
+    "dismissLast": "Aquesta és l'última vegada que pots descartar això.",
+    "setNow": "Configura ara",
+    "dontWantTo": "No vull",
+    "highBalanceTitle": "Tens més de {amount}, afegeix protecció addicional",
+    "protectionRequiredBody": "Com més fons tens, més important és una millor seguretat. Afegeix un autenticador per continuar fent servir Blink.",
+    "nonCustodialTitle": "Si no vols configurar l'autenticació de dos factors",
+    "nonCustodialBody": "L'altra opció és passar a no custodiat. Llavors ets responsable dels teus propis fons."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -4074,7 +4074,17 @@
         "setupDescription": "To prevent unauthorized access to your account, add two-factor authentication now.",
         "addEmail": "Add email",
         "addPhoneNumber": "Add phone number",
-        "setAuthenticator": "Set authenticator"
+        "setAuthenticator": "Set authenticator",
+        "modalReminder": "If you dismiss now, make sure to enable it as soon as possible.",
+        "dismissTwoMore": "You can dismiss this two more times.",
+        "dismissOneMore": "You can dismiss this one more time.",
+        "dismissLast": "This is the last time you can dismiss this.",
+        "setNow": "Set now",
+        "dontWantTo": "I don't want to",
+        "highBalanceTitle": "You have over {amount: string}, please add additional protection",
+        "protectionRequiredBody": "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",
+        "nonCustodialTitle": "If you don't want to set two-factor authentication",
+        "nonCustodialBody": "The other option is to move to non-custodial. Then you are responsible for your own funds."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

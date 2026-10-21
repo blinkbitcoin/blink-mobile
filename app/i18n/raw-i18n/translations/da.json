@@ -4061,7 +4061,17 @@
     "setupDescription": "For at forhindre uautoriseret adgang til din konto skal du tilføje to-faktor godkendelse nu.",
     "addEmail": "Tilføj e-mail",
     "addPhoneNumber": "Tilføj telefonnummer",
-    "setAuthenticator": "Opsæt authenticator"
+    "setAuthenticator": "Opsæt authenticator",
+    "modalReminder": "Hvis du afviser nu, så sørg for at slå det til hurtigst muligt.",
+    "dismissTwoMore": "Du kan afvise dette to gange mere.",
+    "dismissOneMore": "Du kan afvise dette én gang mere.",
+    "dismissLast": "Dette er sidste gang, du kan afvise dette.",
+    "setNow": "Opsæt nu",
+    "dontWantTo": "Det vil jeg ikke",
+    "highBalanceTitle": "Du har over {amount}, tilføj venligst ekstra beskyttelse",
+    "protectionRequiredBody": "Jo flere midler du har, jo vigtigere er bedre sikkerhed. Tilføj venligst en authenticator for at fortsætte med at bruge Blink.",
+    "nonCustodialTitle": "Hvis du ikke vil opsætte to-faktor godkendelse",
+    "nonCustodialBody": "Den anden mulighed er at skifte til ikke-depot. Så er du selv ansvarlig for dine midler."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

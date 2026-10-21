@@ -4061,7 +4061,17 @@
     "setupDescription": "Hesabınıza yetkisiz erişimi önlemek için şimdi iki aşamalı doğrulama ekleyin.",
     "addEmail": "E-posta ekle",
     "addPhoneNumber": "Telefon numarası ekle",
-    "setAuthenticator": "Doğrulayıcı ayarla"
+    "setAuthenticator": "Doğrulayıcı ayarla",
+    "modalReminder": "Şimdi reddederseniz, en kısa sürede etkinleştirdiğinizden emin olun.",
+    "dismissTwoMore": "Bunu iki kez daha reddedebilirsiniz.",
+    "dismissOneMore": "Bunu bir kez daha reddedebilirsiniz.",
+    "dismissLast": "Bu, bunu reddedebileceğiniz son seferdir.",
+    "setNow": "Şimdi ayarla",
+    "dontWantTo": "İstemiyorum",
+    "highBalanceTitle": "{amount} üzerinde varlığınız var, lütfen ek koruma ekleyin",
+    "protectionRequiredBody": "Ne kadar çok varlığınız varsa, daha iyi güvenlik o kadar önemlidir. Blink'i kullanmaya devam etmek için lütfen bir doğrulayıcı ekleyin.",
+    "nonCustodialTitle": "İki aşamalı doğrulamayı ayarlamak istemiyorsanız",
+    "nonCustodialBody": "Diğer seçenek saklama dışı moda geçmektir. O zaman kendi varlıklarınızdan siz sorumlu olursunuz."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
