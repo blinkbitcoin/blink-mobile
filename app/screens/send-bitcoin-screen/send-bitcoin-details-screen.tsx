@@ -534,6 +534,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const swapTypedCurrency = () =>
     amountPad.toggleCurrency(
       amountPad.padCurrency === DisplayCurrency ? walletCurrency : DisplayCurrency,
+      paymentDetail.unitOfAccountAmount,
     )
 
   const hasAmount = paymentDetail.unitOfAccountAmount.amount > 0
