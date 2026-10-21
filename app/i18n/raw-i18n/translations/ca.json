@@ -2697,7 +2697,9 @@
     "noFee": "sense comissió",
     "fromApprox": "des de ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "No es poden obtenir les comissions en aquest moment"
+    "error": "No es poden obtenir les comissions en aquest moment",
+    "inactivity": "Inactivitat >{months: number} mesos",
+    "usdPerMonth": "{amount: string}/mes"
   },
   "TransactionLimitsScreen": {
     "receive": "Rebre",

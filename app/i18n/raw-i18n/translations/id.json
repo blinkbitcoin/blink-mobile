@@ -2697,7 +2697,9 @@
     "noFee": "tanpa biaya",
     "fromApprox": "mulai ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Tidak dapat mengambil biaya saat ini"
+    "error": "Tidak dapat mengambil biaya saat ini",
+    "inactivity": "Tidak aktif >{months: number} bulan",
+    "usdPerMonth": "{amount: string}/bulan"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",

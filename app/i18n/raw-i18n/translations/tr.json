@@ -2697,7 +2697,9 @@
     "noFee": "ücretsiz",
     "fromApprox": "en az ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Şu an için ücretlere ulaşamıyoruz"
+    "error": "Şu an için ücretlere ulaşamıyoruz",
+    "inactivity": "Hareketsizlik >{months: number} ay",
+    "usdPerMonth": "{amount: string}/ay"
   },
   "TransactionLimitsScreen": {
     "receive": "Al",

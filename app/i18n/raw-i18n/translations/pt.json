@@ -2697,7 +2697,9 @@
         "noFee": "sem taxa",
         "fromApprox": "a partir de ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Incapaz de obter as taxas agora"
+        "error": "Incapaz de obter as taxas agora",
+        "inactivity": "Inatividade >{months: number} meses",
+        "usdPerMonth": "{amount: string}/mês"
     },
     "TransactionLimitsScreen": {
         "receive": "Receber",

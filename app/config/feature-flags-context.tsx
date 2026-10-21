@@ -73,6 +73,8 @@ export type FeeRatesConfig = {
   onchainStandardBps: number
   onchainEconomyBps: number
   transferBps: number
+  inactivityBitcoinUsdPerMonth: number
+  inactivityDollarUsdPerMonth: number
 }
 
 type FeatureFlags = {
@@ -143,12 +145,18 @@ const defaultReplaceCardDeliveryConfig = {
 // the send screen's tier selector shows. All three ship visible — quoting only
 // Priority reads as one flat onchain rate and overstates what a Standard or
 // Economy send costs.
+//
+// The inactivity fees are flat USD amounts per custodial balance per month,
+// not basis points, charged once an account has gone 12 months without a user
+// action (blink-wip#1200).
 export const defaultFeeRatesConfig: FeeRatesConfig = {
   lightningSendBps: 0,
   onchainPriorityBps: 90,
   onchainStandardBps: 60,
   onchainEconomyBps: 40,
   transferBps: 50,
+  inactivityBitcoinUsdPerMonth: 1,
+  inactivityDollarUsdPerMonth: 1,
 }
 
 /** Default transfer/swap block, read by both account types. */

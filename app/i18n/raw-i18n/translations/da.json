@@ -2697,7 +2697,9 @@
     "noFee": "intet gebyr",
     "fromApprox": "fra ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Kunne ikke hente gebyrer i øjeblikket"
+    "error": "Kunne ikke hente gebyrer i øjeblikket",
+    "inactivity": "Inaktivitet >{months: number} måneder",
+    "usdPerMonth": "{amount: string}/måned"
   },
   "TransactionLimitsScreen": {
     "receive": "Modtag",

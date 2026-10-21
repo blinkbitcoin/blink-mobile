@@ -215,6 +215,88 @@ describe("FeeRatesScreen", () => {
     await findByText("2,500 SAT")
   })
 
+  it("renders the inactivity fee per custodial balance as a monthly USD amount", async () => {
+    const { getAllByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    // Labels and values render in tree order, so each row's value is the
+    // entry immediately after its label.
+    const cells = getAllByText(
+      /^(Inactivity >12 months|Bitcoin Balance|Dollar Balance|\$1\/month)$/,
+    ).map((node) => node.children.join(""))
+
+    expect(cells).toEqual([
+      "Inactivity >12 months",
+      "Bitcoin Balance",
+      "$1/month",
+      "Dollar Balance",
+      "$1/month",
+    ])
+
+    await findByText("2,500 SAT")
+  })
+
+  it("reprices each inactivity fee independently from remote config", async () => {
+    mockFeeRatesConfig = {
+      ...defaultFeeRatesConfig,
+      inactivityBitcoinUsdPerMonth: 1.5,
+      inactivityDollarUsdPerMonth: 0,
+    }
+
+    const { getByText, getAllByText, queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    // Fractional amounts are quoted to the cent.
+    expect(getByText("$1.50/month")).toBeTruthy()
+    expect(queryByText("$1/month")).toBeNull()
+    // Zero is free, not hidden: the row stays and reads "no fee".
+    expect(getByText("Dollar Balance")).toBeTruthy()
+    expect(getAllByText("no fee")).toHaveLength(5)
+
+    await findByText("2,500 SAT")
+  })
+
+  it("hides only the inactivity rows remote config sets negative", async () => {
+    mockFeeRatesConfig = { ...defaultFeeRatesConfig, inactivityDollarUsdPerMonth: -1 }
+
+    const { getByText, queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Dollar Balance")).toBeNull()
+    expect(getByText("Inactivity >12 months")).toBeTruthy()
+    expect(getByText("Bitcoin Balance")).toBeTruthy()
+
+    await findByText("2,500 SAT")
+  })
+
+  it("hides the whole Inactivity section when both balances are set negative", async () => {
+    mockFeeRatesConfig = {
+      ...defaultFeeRatesConfig,
+      inactivityBitcoinUsdPerMonth: -1,
+      inactivityDollarUsdPerMonth: -1,
+    }
+
+    const { queryByText, findByText } = render(
+      <ContextForScreen>
+        <FeeRatesScreen />
+      </ContextForScreen>,
+    )
+
+    expect(queryByText("Inactivity >12 months")).toBeNull()
+    expect(queryByText("Bitcoin Balance")).toBeNull()
+
+    await findByText("2,500 SAT")
+  })
+
   it("renders onchain receive fees from the API", async () => {
     const { findByText } = render(
       <ContextForScreen>

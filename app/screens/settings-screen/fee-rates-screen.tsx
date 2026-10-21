@@ -60,6 +60,17 @@ const isRowVisible = (bps: number): boolean => bps >= 0
 // the remote config if it ever needs to change without an app release.
 const LIGHTNING_FREE_BELOW_SATS = 100
 
+// The inactivity fee applies after this many months without a user action.
+// Set by the fee terms, not priced, so it is a constant like the one above.
+const INACTIVITY_THRESHOLD_MONTHS = 12
+
+// Whole dollars render bare ("$1"), anything else to the cent ("$1.50").
+const formatUsd = (usd: number): string =>
+  `$${usd.toLocaleString("en-US", {
+    minimumFractionDigits: Number.isInteger(usd) ? 0 : 2,
+    maximumFractionDigits: 2,
+  })}`
+
 type FeeRateRowProps = {
   label: string
   value: string
@@ -257,6 +268,36 @@ export const FeeRatesScreen: React.FC = () => {
     ]
   }, [LL, feeRatesConfig])
 
+  const inactivityItems = useMemo(() => {
+    const monthlyValue = (usd: number) =>
+      usd === 0
+        ? LL.FeeRatesScreen.noFee()
+        : LL.FeeRatesScreen.usdPerMonth({ amount: formatUsd(usd) })
+
+    const items: React.FC[] = []
+    if (isRowVisible(feeRatesConfig.inactivityBitcoinUsdPerMonth)) {
+      items.push(function InactivityBitcoinRow() {
+        return (
+          <FeeRateRow
+            label={LL.common.btcAccount()}
+            value={monthlyValue(feeRatesConfig.inactivityBitcoinUsdPerMonth)}
+          />
+        )
+      })
+    }
+    if (isRowVisible(feeRatesConfig.inactivityDollarUsdPerMonth)) {
+      items.push(function InactivityDollarRow() {
+        return (
+          <FeeRateRow
+            label={LL.common.usdAccount()}
+            value={monthlyValue(feeRatesConfig.inactivityDollarUsdPerMonth)}
+          />
+        )
+      })
+    }
+    return items
+  }, [LL, feeRatesConfig])
+
   return (
     <Screen preset="scroll">
       <View style={styles.content}>
@@ -281,6 +322,18 @@ export const FeeRatesScreen: React.FC = () => {
             <Text style={styles.sectionTitle}>{LL.FeeRatesScreen.transfer()}</Text>
             <SettingsGroup
               items={transferItems}
+              containerStyle={styles.groupCard}
+              dividerStyle={styles.hiddenDivider}
+            />
+          </View>
+        )}
+        {inactivityItems.length > 0 && (
+          <View style={styles.section}>
+            <Text style={styles.sectionTitle}>
+              {LL.FeeRatesScreen.inactivity({ months: INACTIVITY_THRESHOLD_MONTHS })}
+            </Text>
+            <SettingsGroup
+              items={inactivityItems}
               containerStyle={styles.groupCard}
               dividerStyle={styles.hiddenDivider}
             />

@@ -2697,7 +2697,9 @@
         "noFee": "nessuna commissione",
         "fromApprox": "da ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Impossibile recuperare le commissioni al momento"
+        "error": "Impossibile recuperare le commissioni al momento",
+        "inactivity": "Inattività >{months: number} mesi",
+        "usdPerMonth": "{amount: string}/mese"
     },
     "TransactionLimitsScreen": {
         "receive": "Ricevi",
