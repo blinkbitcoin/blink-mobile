@@ -11,6 +11,7 @@ import { toastShow } from "@app/utils/toast"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -41,6 +42,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
    *  lookup is down, so it is reported once for as long as the screen is mounted, as the
    *  commit screen does: one failure is one event, however many taps it costs. */
   const hasReportedOwnerlessSaveRef = React.useRef(false)
+  /** The guard holds a second tap before React has committed the disabled button; the
+   *  state is what shows the button busy. Without either, two taps issue two saves and
+   *  both answers navigate. */
+  const { run: runExclusively } = useInFlightGuard()
+  const [isSavingTerms, setIsSavingTerms] = React.useState(false)
 
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
@@ -61,11 +67,12 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     return LL.errors.generic()
   }
 
-  const action = async () => {
-    if (flow === "migration") {
-      /** The acceptance is part of the migration's consent trail, so advance only once the
-       *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
-       *  user already accepted. */
+  /** The acceptance is part of the migration's consent trail, so advance only once the
+   *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
+   *  user already accepted. */
+  const acceptMigrationTerms = async () => {
+    setIsSavingTerms(true)
+    try {
       const { isSaved, failure } = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
       /** A Continue that answers a tap with nothing reads as a broken button. A store that
        *  refused is named as the device's, a full disk most of all since the user can go
@@ -84,6 +91,14 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
         return
       }
       navigation.navigate("selfCustodialBackupMethod")
+    } finally {
+      setIsSavingTerms(false)
+    }
+  }
+
+  const action = async () => {
+    if (flow === "migration") {
+      await runExclusively(acceptMigrationTerms)
       return
     }
 
@@ -134,8 +149,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.AcceptTermsAndConditionsScreen.accept()}
             onPress={action}
-            loading={loading}
-            disabled={loading}
+            loading={loading || isSavingTerms}
+            disabled={loading || isSavingTerms}
           />
         </View>
       </View>

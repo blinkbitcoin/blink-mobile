@@ -1,5 +1,7 @@
 import React from "react"
-import { render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
+
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -98,6 +100,58 @@ describe("AcceptTermsAndConditionsScreen", () => {
     )
   })
 
+  /** Two taps landing before React commits the busy button: the second must not issue a
+   *  second save, whose answer would navigate a second time. */
+  describe("while the acceptance is being saved", () => {
+    let landSave: () => void = () => undefined
+    beforeEach(() => {
+      mockSaveCheckpoint.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            landSave = () => resolve({ isSaved: true, failure: null })
+          }),
+      )
+    })
+
+    it("saves and advances once however fast the taps come", async () => {
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      const { onPress } = screen.UNSAFE_getByType(GaloyPrimaryButton).props
+      await act(async () => {
+        onPress()
+        onPress()
+      })
+      await act(async () => landSave())
+      await flushEffects()
+
+      expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+      expect(mockNavigate).toHaveBeenCalledTimes(1)
+    })
+
+    it("shows the button busy until the save answers", async () => {
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(true)
+
+      await act(async () => landSave())
+      await flushEffects()
+
+      expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.disabled).toBe(false)
+    })
+  })
+
   it("does not advance past the terms when the checkpoint write fails", async () => {
     mockSaveCheckpoint.mockResolvedValue({
       isSaved: false,
@@ -171,10 +225,9 @@ describe("AcceptTermsAndConditionsScreen", () => {
     )
     await flushEffects()
 
-    const accept = screen.getByText(LL.AcceptTermsAndConditionsScreen.accept())
-    fireEvent.press(accept)
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
     await flushEffects()
-    fireEvent.press(accept)
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
     await flushEffects()
 
     expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
