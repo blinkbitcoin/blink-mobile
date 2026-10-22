@@ -89,10 +89,13 @@ describe("useTotpRegistrationFlow", () => {
       })
     })
 
-    it("does nothing once the user has left the code screen", () => {
+    /** Whatever the user went to, another account or the lock, never gets the key
+     *  shown over it; the code screen holds the user's ways back while the code is
+     *  checked, and the key is in the authenticator app the code came from. */
+    it("does nothing once the code screen is gone", () => {
       mockRoutes = stackOf("Primary", "totpRegistrationValidate")
       const { result } = renderIn("totpRegistrationValidate")
-      mockRoutes = stackOf("Primary")
+      mockRoutes = stackOf("Primary", "settings")
 
       act(() => result.current.showBackup(BACKUP_PARAMS))
 
