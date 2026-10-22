@@ -6,6 +6,12 @@ import {
   MigrationSupportReason,
   ServerMigrationFlow,
 } from "@app/types/migration"
+import {
+  markAppForegrounded,
+  markMigrationReceiveChecked,
+  resetMigrationReceiveWait,
+  setMigrationReceiveOverdue,
+} from "@app/screens/account-migration/utils/migration-receive-wait"
 
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
@@ -22,13 +28,19 @@ let mockTransactionsLoading = false
 let mockFlow: ServerMigrationFlow = ServerMigrationFlow.Open
 let mockLockLoading = false
 const mockRefetchLock = jest.fn()
-let mockIsSupportDue = false
-let mockIsOverdue = false
-jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
-  ...jest.requireActual("@app/screens/account-migration/utils/migration-receive-wait"),
-  isMigrationReceiveSupportDue: () => mockIsSupportDue,
-  isMigrationReceiveOverdue: () => mockIsOverdue,
-}))
+/** The real receive-wait module, seeded the way the background resume publishes to it, so
+ *  the routing is checked against the module's own rule rather than a stand-in for it. */
+const makeReceiveOverdue = (): void => {
+  setMigrationReceiveOverdue(true)
+}
+
+/** Overdue, and a check that started after the app last came back has looked and found
+ *  nothing. */
+const makeReceiveSupportDue = (): void => {
+  setMigrationReceiveOverdue(true)
+  markAppForegrounded(1_000)
+  markMigrationReceiveChecked(2_000)
+}
 
 const mockToastShow = jest.fn()
 const mockGenericErrorCopy = "There was an error"
@@ -103,8 +115,7 @@ describe("useMigrationNextStep", () => {
     mockFlow = ServerMigrationFlow.Open
     mockLockLoading = false
     mockCanGoBack = true
-    mockIsSupportDue = false
-    mockIsOverdue = false
+    resetMigrationReceiveWait()
     mockRefetchLock.mockResolvedValue(null)
   })
 
@@ -388,7 +399,7 @@ describe("useMigrationNextStep", () => {
      *  missing: the user stays, told the wait is unusual rather than seconds old. */
     it("says the wait is taking longer while the overdue receive awaits a fresh check", () => {
       arriveAwaitingSwap()
-      mockIsOverdue = true
+      makeReceiveOverdue()
 
       const { result } = renderHook(() => useMigrationNextStep())
       act(() => {
@@ -405,7 +416,7 @@ describe("useMigrationNextStep", () => {
      *  the funds are genuinely late: support takes over instead of another "on its way". */
     it("hands a receive that is genuinely late to support instead", () => {
       arriveAwaitingSwap()
-      mockIsSupportDue = true
+      makeReceiveSupportDue()
 
       const { result } = renderHook(() => useMigrationNextStep())
       act(() => {
@@ -424,7 +435,7 @@ describe("useMigrationNextStep", () => {
      *  be walked past the step it is waiting behind. */
     it("hands the history step's continue to support the same way", () => {
       arriveAwaitingSwap()
-      mockIsSupportDue = true
+      makeReceiveSupportDue()
 
       const { result } = renderHook(() => useMigrationNextStep())
       act(() => {
@@ -442,7 +453,7 @@ describe("useMigrationNextStep", () => {
 
     it("replaces a skip guard with support rather than pushing it", () => {
       arriveAwaitingSwap()
-      mockIsSupportDue = true
+      makeReceiveSupportDue()
 
       const { result } = renderHook(() => useMigrationNextStep())
       act(() => {
@@ -588,7 +599,7 @@ describe("useMigrationNextStep", () => {
     /** No answer is not a late receive: it asks again, whatever the receive record says. */
     it("never hands an unanswered read to support", () => {
       arriveUnanswered()
-      mockIsSupportDue = true
+      makeReceiveSupportDue()
 
       const { result } = renderHook(() => useMigrationNextStep())
       act(() => {

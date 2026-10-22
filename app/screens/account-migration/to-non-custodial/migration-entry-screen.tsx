@@ -14,9 +14,8 @@ import {
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { resolveCommitPointRoute } from "@app/screens/account-migration/utils/migration-checkpoint-storage"
 import {
-  isMigrationReceiveOverdue,
-  isMigrationReceiveSupportDue,
   overdueReceiveSupport,
+  resolveAwaitedReceiveAnswer,
 } from "@app/screens/account-migration/utils/migration-receive-wait"
 import {
   CommitPointRoute,
@@ -96,25 +95,17 @@ export const MigrationEntryScreen: React.FC = () => {
     }
 
     if (isAwaitingSwap) {
-      /** Past the notice window, and still missing on a check taken since the app came
-       *  back, the funds are genuinely late: support, not another "on its way". Overdue
-       *  but awaiting that check, the wait is unusual and the toast says so; otherwise it
-       *  is usually seconds old and says only that the funds are on their way. */
-      if (isMigrationReceiveSupportDue()) {
+      /** Genuinely late funds go to support, anything sooner gets a notice: the step
+       *  routing's rule, so a tap here and a tap on a step never disagree. */
+      const answer = resolveAwaitedReceiveAnswer(LL)
+      if (answer.kind === "support") {
         navigation.replace(
           "accountMigrationContactSupport",
           overdueReceiveSupport(checkpointOwnerId),
         )
         return
       }
-      const LLTransfer = isMigrationReceiveOverdue()
-        ? LL.AccountMigration.transferDelayed
-        : LL.AccountMigration.transferInProgress
-      toastShow({
-        message: LLTransfer.body(),
-        LL,
-        type: "warning",
-      })
+      toastShow({ message: answer.message, LL, type: "warning" })
       leave()
       return
     }

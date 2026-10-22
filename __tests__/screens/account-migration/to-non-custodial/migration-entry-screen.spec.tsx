@@ -10,6 +10,12 @@ import {
   MigrationSupportReason,
   ServerMigrationFlow,
 } from "@app/types/migration"
+import {
+  markAppForegrounded,
+  markMigrationReceiveChecked,
+  resetMigrationReceiveWait,
+  setMigrationReceiveOverdue,
+} from "@app/screens/account-migration/utils/migration-receive-wait"
 import { AccountType } from "@app/types/wallet"
 
 const mockReplace = jest.fn()
@@ -65,13 +71,19 @@ jest.mock("@app/i18n/i18n-react", () => ({
 }))
 const mockLL = LL
 
-let mockIsSupportDue = false
-let mockIsOverdue = false
-jest.mock("@app/screens/account-migration/utils/migration-receive-wait", () => ({
-  ...jest.requireActual("@app/screens/account-migration/utils/migration-receive-wait"),
-  isMigrationReceiveSupportDue: () => mockIsSupportDue,
-  isMigrationReceiveOverdue: () => mockIsOverdue,
-}))
+/** The real receive-wait module, seeded the way the background resume publishes to it, so
+ *  the routing is checked against the module's own rule rather than a stand-in for it. */
+const makeReceiveOverdue = (): void => {
+  setMigrationReceiveOverdue(true)
+}
+
+/** Overdue, and a check that started after the app last came back has looked and found
+ *  nothing. */
+const makeReceiveSupportDue = (): void => {
+  setMigrationReceiveOverdue(true)
+  markAppForegrounded(1_000)
+  markMigrationReceiveChecked(2_000)
+}
 
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
@@ -114,8 +126,7 @@ describe("MigrationEntryScreen", () => {
     mockHasResumableCheckpoint = false
     mockIsStartConfirmed = false
     mockCheckpointOwnerId = "owner-1"
-    mockIsSupportDue = false
-    mockIsOverdue = false
+    resetMigrationReceiveWait()
     mockCheckpointLoading = false
     mockSelfCustodialDisabled = false
     mockFlow = ServerMigrationFlow.NotStarted
@@ -271,7 +282,7 @@ describe("MigrationEntryScreen", () => {
        *  user still goes back, told the wait is unusual rather than seconds old. */
       it("says the wait is taking longer while the overdue receive awaits a fresh check", () => {
         arriveAwaitingSwap()
-        mockIsOverdue = true
+        makeReceiveOverdue()
 
         render(<MigrationEntryScreen />)
 
@@ -281,6 +292,24 @@ describe("MigrationEntryScreen", () => {
           }),
         )
         expect(mockGoBack).toHaveBeenCalledTimes(1)
+      })
+
+      /** The look that found nothing began before the app came back: it says nothing about
+       *  the funds now (timers stop in the background), so the user is told, not handed over. */
+      it("keeps the notice while the only empty look predates the return to the app", () => {
+        arriveAwaitingSwap()
+        setMigrationReceiveOverdue(true)
+        markMigrationReceiveChecked(1_000)
+        markAppForegrounded(2_000)
+
+        render(<MigrationEntryScreen />)
+
+        expect(mockToastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.AccountMigration.transferDelayed.body(),
+          }),
+        )
+        expect(mockReplace).not.toHaveBeenCalled()
       })
 
       it("goes home when there is nothing to go back to", () => {
@@ -297,7 +326,7 @@ describe("MigrationEntryScreen", () => {
        *  back, the funds are genuinely late: support takes over, with the delayed reason. */
       it("hands a receive that is genuinely late to support instead", () => {
         arriveAwaitingSwap()
-        mockIsSupportDue = true
+        makeReceiveSupportDue()
 
         render(<MigrationEntryScreen />)
 

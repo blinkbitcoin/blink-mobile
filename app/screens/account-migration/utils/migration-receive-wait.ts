@@ -1,3 +1,4 @@
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 /**
@@ -72,4 +73,25 @@ export const isMigrationReceiveSupportDue = (): boolean => {
   if (!isReceiveOverdue) return false
   if (lastAnsweredCheckStartedAt === null) return false
   return lastAnsweredCheckStartedAt >= foregroundedAt
+}
+
+/** What a tap earns on a receive the server has paid out and the wallet has yet to show. */
+export type AwaitedReceiveAnswer =
+  | { kind: "support" }
+  | { kind: "notice"; message: string }
+
+/**
+ * The one rule for that tap, read by the entry screen and the step routing alike, which
+ * differ only in how they navigate. Support once the receive is genuinely late; otherwise a
+ * notice, saying "taking longer than usual" only once the wait has earned it, since the
+ * swap is usually seconds from done when a tap lands here.
+ */
+export const resolveAwaitedReceiveAnswer = (
+  LL: TranslationFunctions,
+): AwaitedReceiveAnswer => {
+  if (isMigrationReceiveSupportDue()) return { kind: "support" }
+  const notice = isReceiveOverdue
+    ? LL.AccountMigration.transferDelayed
+    : LL.AccountMigration.transferInProgress
+  return { kind: "notice", message: notice.body() }
 }

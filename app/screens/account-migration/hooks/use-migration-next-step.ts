@@ -17,9 +17,8 @@ import {
   resolveCommitPointRoute,
 } from "../utils/migration-checkpoint-storage"
 import {
-  isMigrationReceiveOverdue,
-  isMigrationReceiveSupportDue,
   overdueReceiveSupport,
+  resolveAwaitedReceiveAnswer,
 } from "../utils/migration-receive-wait"
 
 import { useHasTransactions } from "./use-has-transactions"
@@ -146,25 +145,22 @@ export const useMigrationNextStep = () => {
    */
   const hold = useCallback(
     (route: HoldRoute, isSkipGuard: boolean) => {
-      const isAskingAgain = route === CommitPointRoute.AskAgain
-      /** Funds past the notice window, and still missing on a check taken since the app
-       *  came back, are genuinely late: support takes over instead of another "on its
-       *  way". */
-      const isSupportDue = !isAskingAgain && isMigrationReceiveSupportDue()
-      if (isSupportDue) {
-        const params = overdueReceiveSupport(checkpointOwnerId)
-        if (isSkipGuard) navigation.replace("accountMigrationContactSupport", params)
-        else navigation.navigate("accountMigrationContactSupport", params)
-        return
+      if (route === CommitPointRoute.AskAgain) {
+        retryLockRead()
+        toastShow({ message: LL.errors.generic(), LL, type: "warning" })
+      } else {
+        /** Funds past the notice window, and still missing on a check taken since the app
+         *  came back, are genuinely late: support takes over instead of another "on its
+         *  way". The rule is the entry screen's too. */
+        const answer = resolveAwaitedReceiveAnswer(LL)
+        if (answer.kind === "support") {
+          const params = overdueReceiveSupport(checkpointOwnerId)
+          if (isSkipGuard) navigation.replace("accountMigrationContactSupport", params)
+          else navigation.navigate("accountMigrationContactSupport", params)
+          return
+        }
+        toastShow({ message: answer.message, LL, type: "warning" })
       }
-      if (isAskingAgain) retryLockRead()
-      /** "Longer than usual" only once the wait has earned it: the swap is usually seconds
-       *  from done when a tap lands here. */
-      const transferMessage = isMigrationReceiveOverdue()
-        ? LL.AccountMigration.transferDelayed.body()
-        : LL.AccountMigration.transferInProgress.body()
-      const message = isAskingAgain ? LL.errors.generic() : transferMessage
-      toastShow({ message, LL, type: "warning" })
       if (!isSkipGuard) return
       /** Home when there is nothing to step back to, as the entry screen does: a skip guard
        *  left where it is would render nothing with nothing on it to tap. */
