@@ -246,8 +246,36 @@ export const mergeCheckpoint = (
  *
  * Only the order is kept here. A task that fails passes the turn on without poisoning the
  * queue, and its caller still sees the failure.
+ *
+ * The wait a caller is given is bounded; the order is not. A turn that never settles (the
+ * native store runs its calls one after another, so one that hangs holds every later call
+ * too) answers its caller, and each caller queued behind it, with a failure once
+ * CHECKPOINT_WRITE_TIMEOUT_MS passes, so a screen holding on the write can offer its retry
+ * instead of a button that never wakes. The turn itself is not given up: the next write
+ * still waits for it, because one that landed late, after a newer write, would overwrite
+ * it, which is the overlap the queue exists to prevent.
  */
+export const CHECKPOINT_WRITE_TIMEOUT_MS = 15_000
+
 const pendingWriteByKey = new Map<string, Promise<unknown>>()
+
+const answerWithin = <T>(work: Promise<T>, timeoutMs: number): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error(`Checkpoint write did not settle within ${timeoutMs}ms`)),
+      timeoutMs,
+    )
+    work.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (err) => {
+        clearTimeout(timer)
+        reject(err)
+      },
+    )
+  })
 
 const onCheckpointKey = <T>(storageKey: string, task: () => Promise<T>): Promise<T> => {
   const previous = pendingWriteByKey.get(storageKey) ?? Promise.resolve()
@@ -259,7 +287,7 @@ const onCheckpointKey = <T>(storageKey: string, task: () => Promise<T>): Promise
       pendingWriteByKey.delete(storageKey)
     }
   })
-  return result
+  return answerWithin(result, CHECKPOINT_WRITE_TIMEOUT_MS)
 }
 
 /**

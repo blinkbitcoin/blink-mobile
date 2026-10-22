@@ -1,4 +1,5 @@
 import {
+  CHECKPOINT_WRITE_TIMEOUT_MS,
   MigrationCheckpoint,
   clearCheckpointFromStorage,
   getStorageKey,
@@ -902,6 +903,102 @@ describe("migration-checkpoint-storage writes to one key", () => {
 
     expect(written).toEqual(disk)
     expect(written).toEqual(expect.objectContaining({ accountId: "sc-1" }))
+  })
+
+  /** A native call that never settles would otherwise hold every caller forever: the commit
+   *  screen's Approve waits on the write, and with no answer there is no retry to offer. */
+  describe("a turn that never settles", () => {
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    /** Its own key, released before the test ends: the queue is module state, and a turn
+     *  left hanging would hold every later test's writes to the same key. */
+    const HUNG_KEY = "hung-key"
+
+    it("answers its caller with a failure once the wait runs out", async () => {
+      holdFirstRead()
+
+      const save = saveCheckpointToStorage(HUNG_KEY, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 990,
+      })
+      const outcome = save.then(
+        () => "saved",
+        (err: Error) => err.message,
+      )
+      jest.advanceTimersByTime(CHECKPOINT_WRITE_TIMEOUT_MS)
+
+      await expect(outcome).resolves.toContain("did not settle")
+      await releaseHeldRead()
+    })
+
+    it("answers in time when the write lands in time", async () => {
+      holdFirstRead()
+
+      const save = saveCheckpointToStorage(HUNG_KEY, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 990,
+      })
+      jest.advanceTimersByTime(CHECKPOINT_WRITE_TIMEOUT_MS - 1)
+      await releaseHeldRead()
+
+      await expect(save).resolves.toEqual(
+        expect.objectContaining({ expectedReceiveSats: 990 }),
+      )
+    })
+
+    /** The caller is told, but the turn is not given up. The stalled call here is the
+     *  write itself, holding a merge made before the next save: let the next one past it,
+     *  and the stalled one lands on top and drops the accepted start. */
+    it("keeps the next write behind the stalled one until it lands", async () => {
+      mockLoadJsonOrThrow.mockImplementation(async () => disk)
+      let landStalledWrite: () => void = () => {
+        throw new Error("the stalled write was never issued")
+      }
+      mockSaveJson.mockImplementationOnce(
+        (_key: string, value: unknown) =>
+          new Promise<void>((resolve) => {
+            landStalledWrite = () => {
+              disk = value
+              resolve()
+            }
+          }),
+      )
+      const flushTurns = async () => {
+        for (let turn = 0; turn < 50; turn += 1) await Promise.resolve()
+      }
+
+      const stalled = saveCheckpointToStorage(HUNG_KEY, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 990,
+      }).catch(() => undefined)
+      const next = saveCheckpointToStorage(HUNG_KEY, {
+        step: MigrationCheckpoint.BalancesOverview,
+        custodialAccountId: "cust-1",
+        expectedReceiveSats: 990,
+        isStartConfirmed: true,
+      }).catch(() => undefined)
+      await flushTurns()
+      jest.advanceTimersByTime(CHECKPOINT_WRITE_TIMEOUT_MS)
+      await Promise.all([stalled, next])
+      await flushTurns()
+
+      expect(mockSaveJson).toHaveBeenCalledTimes(1)
+
+      landStalledWrite()
+      await flushTurns()
+
+      expect(mockSaveJson).toHaveBeenCalledTimes(2)
+      expect(disk).toEqual(expect.objectContaining({ isStartConfirmed: true }))
+    })
   })
 })
 
