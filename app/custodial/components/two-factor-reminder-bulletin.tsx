@@ -7,8 +7,8 @@ import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { TwoFactorHomeCard } from "./two-factor-home-card"
 
 /**
- * The recommended tier's bulletin on the home: the card, outlined so it reads as more
- * than the nudge, and always the same, whether it is one of the first sessions or a new
+ * The recommended tier's bulletin on the home: the card, styled as every other home
+ * bulletin, and always the same, whether it is one of the first sessions or a new
  * all-time high that brought it back. It never says how often it comes back. Its button
  * opens the setup, where leaving unfinished is the session's dismissal, as the X here
  * is. With no reason to be up, it is not.
@@ -27,7 +27,6 @@ export const TwoFactorReminderBulletin: React.FC = () => {
       text={LL.TwoFactorEnforcement.reminderDescription()}
       buttonLabel={LL.TwoFactorEnforcement.setAuthenticator()}
       onDismiss={dismissReminderBulletin}
-      isHighlighted
     />
   )
 }
