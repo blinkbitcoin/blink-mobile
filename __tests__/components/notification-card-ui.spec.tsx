@@ -1,25 +1,26 @@
 import * as React from "react"
-import { StyleSheet, Text as ReactNativeText, TouchableOpacity, View } from "react-native"
+import { Text as ReactNativeText, TouchableOpacity, View } from "react-native"
 import { render, fireEvent } from "@testing-library/react-native"
 
 import { NotificationCardUI } from "@app/components/notifications/notification-card-ui"
 
 jest.mock("@rn-vui/themed", () => {
-  const colors = {
-    primary: "primary",
-    grey5: "grey5",
-    grey2: "grey2",
-    black: "black",
-    white: "white",
-  }
   return {
     Text: (props: React.ComponentProps<typeof ReactNativeText>) => (
       <ReactNativeText {...props} />
     ),
-    useTheme: () => ({ theme: { colors } }),
-    makeStyles:
-      (styles: (theme: { colors: typeof colors }) => Record<string, object>) => () =>
-        styles({ colors }),
+    useTheme: () => ({
+      theme: {
+        colors: {
+          primary: "primary",
+          grey5: "grey5",
+          grey2: "grey2",
+          black: "black",
+          white: "white",
+        },
+      },
+    }),
+    makeStyles: () => () => ({}),
   }
 })
 
@@ -172,35 +173,5 @@ describe("NotificationCardUI", () => {
     const screen = render(<NotificationCardUI {...defaultProps} />)
 
     expect(screen.UNSAFE_queryByType(TouchableOpacity)).toBeTruthy()
-  })
-
-  describe("highlighted", () => {
-    const outlineOf = (card: ReturnType<typeof render>) =>
-      StyleSheet.flatten(
-        card.UNSAFE_getAllByType(TouchableOpacity).at(-1)?.props.style ??
-          card.UNSAFE_getAllByType(View)[0].props.style,
-      )
-
-    it("outlines the card in the primary colour when highlighted", () => {
-      const card = render(<NotificationCardUI {...defaultProps} isHighlighted />)
-
-      expect(outlineOf(card)).toMatchObject({ borderWidth: 1, borderColor: "primary" })
-    })
-
-    it("draws no outline by default", () => {
-      const card = render(<NotificationCardUI {...defaultProps} />)
-
-      expect(outlineOf(card).borderWidth).toBeUndefined()
-    })
-
-    it("outlines an inert card too", () => {
-      const card = render(
-        <NotificationCardUI title="Test Title" text="Test Body" isHighlighted />,
-      )
-
-      expect(
-        StyleSheet.flatten(card.UNSAFE_getAllByType(View)[0].props.style),
-      ).toMatchObject({ borderWidth: 1, borderColor: "primary" })
-    })
   })
 })

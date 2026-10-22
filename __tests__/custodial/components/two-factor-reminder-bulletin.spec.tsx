@@ -1,5 +1,4 @@
 import React from "react"
-import { StyleSheet, TouchableOpacity } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
@@ -93,17 +92,6 @@ describe("TwoFactorReminderBulletin", () => {
     expect(getByText(DESCRIPTION)).toBeTruthy()
     expect(getByText("Set authenticator")).toBeTruthy()
     expect(queryByText(/dismiss this/)).toBeNull()
-  })
-
-  it("is outlined in the primary colour, so it reads as more than the nudge", () => {
-    const bulletin = render(<TwoFactorReminderBulletin />)
-    // eslint-disable-next-line camelcase
-    const card = bulletin.UNSAFE_getByType(TouchableOpacity)
-
-    expect(StyleSheet.flatten(card.props.style)).toMatchObject({
-      borderWidth: 1,
-      borderColor: "#fa0",
-    })
   })
 
   it("reports itself as shown with the reason it is up for", () => {

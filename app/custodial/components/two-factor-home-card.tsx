@@ -20,14 +20,13 @@ type TwoFactorHomeCardProps = {
   buttonLabel: string
   /** The prompt's own dismissal, which the X hands to. */
   onDismiss: () => void
-  isHighlighted?: boolean
 }
 
 /**
  * A two-factor prompt on the home, as a card: it reports itself as shown to the
  * enforcement, which counts the impressions, and its button opens the setup, told which
  * prompt opened it and why it was up. What sets one prompt apart from another is its
- * copy, its outline and its dismissal.
+ * copy and its dismissal.
  */
 export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
   prompt,
@@ -36,7 +35,6 @@ export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
   text,
   buttonLabel,
   onDismiss,
-  isHighlighted = false,
 }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { markPromptShown } = useTwoFactorEnforcement()
@@ -56,7 +54,6 @@ export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
       action={handleSet}
       dismissAction={onDismiss}
       buttonLabel={buttonLabel}
-      isHighlighted={isHighlighted}
     />
   )
 }
