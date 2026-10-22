@@ -24,6 +24,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 
 import {
   MigrationCheckpoint,
+  clearCheckpointFromStorage,
   clearPendingProvisionedAccount,
   loadCheckpoint,
   loadPendingProvisionedAccounts,
@@ -230,5 +231,24 @@ describe("an unreadable store is not an empty one", () => {
       accountId: PROVISIONED_ACCOUNT_ID,
       expectedReceiveSats: 36726,
     })
+  })
+})
+
+/** The same seam for the removal: the wrapper's best-effort remove logs a failure and
+ *  answers as if it worked, so a clear built on it could never reach the caller's report. */
+describe("a removal the store refused is a failure, not a clear", () => {
+  it("rejects when the store refuses to remove the checkpoint", async () => {
+    mockRemoveItem.mockRejectedValueOnce(new Error("Database Error"))
+
+    await expect(clearCheckpointFromStorage(STORAGE_KEY)).rejects.toThrow(
+      "Database Error",
+    )
+    expect(storedCheckpoint()).toMatchObject({ accountId: PROVISIONED_ACCOUNT_ID })
+  })
+
+  it("clears the checkpoint once the store answers", async () => {
+    await clearCheckpointFromStorage(STORAGE_KEY)
+
+    expect(disk[STORAGE_KEY]).toBeUndefined()
   })
 })

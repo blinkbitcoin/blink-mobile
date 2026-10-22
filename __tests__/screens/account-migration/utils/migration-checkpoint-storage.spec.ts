@@ -25,7 +25,7 @@ const mockRemove = jest.fn()
 jest.mock("@app/utils/storage", () => ({
   loadJsonOrThrow: (...args: readonly unknown[]) => mockLoadJsonOrThrow(...args),
   saveJson: (...args: readonly unknown[]) => mockSaveJson(...args),
-  remove: (...args: readonly unknown[]) => mockRemove(...args),
+  removeOrThrow: (...args: readonly unknown[]) => mockRemove(...args),
 }))
 
 describe("migration-checkpoint-storage", () => {

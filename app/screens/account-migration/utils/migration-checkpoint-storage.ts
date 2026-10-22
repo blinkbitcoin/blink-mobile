@@ -1,5 +1,5 @@
 import { CommitPointRoute, ServerMigrationFlow } from "@app/types/migration"
-import { loadJsonOrThrow, remove, saveJson } from "@app/utils/storage"
+import { loadJsonOrThrow, removeOrThrow, saveJson } from "@app/utils/storage"
 
 /** Values are persisted to AsyncStorage: do not rename them. */
 export enum MigrationCheckpoint {
@@ -310,8 +310,10 @@ export const saveCheckpointToStorage = (
     return merged
   })
 
+/** Propagates a removal that failed, so the caller's report fires: a checkpoint a finished
+ *  migration could not remove would otherwise linger with nothing said about it. */
 export const clearCheckpointFromStorage = (storageKey: string): Promise<void> =>
-  onCheckpointKey(storageKey, () => remove(storageKey))
+  onCheckpointKey(storageKey, () => removeOrThrow(storageKey))
 
 /**
  * Wallets provisioned for a migration but not yet activated, keyed by the custodial
