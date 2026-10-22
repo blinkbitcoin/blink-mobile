@@ -140,6 +140,7 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
       returnTo: "twoFactorSetup",
+      prompt: TwoFactorPrompt.ReminderBulletin,
     })
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
       tier: TwoFactorTier.Recommended,
@@ -218,6 +219,18 @@ describe("TwoFactorSetupScreen", () => {
       TwoFactorTier.Recommended,
       BANNER_ORIGIN,
     )
+  })
+
+  it("tells the authenticator flow which prompt led to it", async () => {
+    mockRouteParams = BANNER_ORIGIN
+    await renderScreen()
+
+    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
+
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
+      returnTo: "twoFactorSetup",
+      prompt: TwoFactorPrompt.SettingsBanner,
+    })
   })
 
   /** The authenticator flow's return to this route replaces its params. */

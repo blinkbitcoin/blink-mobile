@@ -77,7 +77,10 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
    *  with the authenticator just added. */
   const handleSetAuthenticator = useCallback(() => {
     logTwoFactorSetupStarted({ tier: unmetTier, method: TwoFactorMethod.Authenticator })
-    navigation.navigate("totpRegistrationInitiate", { returnTo: GATE_RETURN_ROUTE })
+    navigation.navigate("totpRegistrationInitiate", {
+      returnTo: GATE_RETURN_ROUTE,
+      prompt: TwoFactorPrompt.ProtectionRequiredScreen,
+    })
   }, [navigation, unmetTier])
 
   const handleMove = useCallback(() => {

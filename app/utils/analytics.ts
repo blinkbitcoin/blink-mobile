@@ -232,12 +232,20 @@ export const logTwoFactorNonCustodialChosen = (
 
 type LogTwoFactorSetupCompletedParams = {
   tier: TwoFactorTier
+  /** Whether the prompts applied to the account: off, its tier says nothing about a
+   *  balance, since nothing was asked of it. */
+  isEnforced: boolean
+  /** The prompt that led to the setup, none when it was started from the settings. */
+  prompt?: TwoFactorPrompt
 }
 
 /** An authenticator added to the account, from a prompt or from the settings alike: the
- *  adoption the prompts are measured by. */
+ *  adoption the prompts are measured by, joinable to the prompt that led to it. */
 export const logTwoFactorSetupCompleted = (params: LogTwoFactorSetupCompletedParams) => {
+  const promptParams = params.prompt === undefined ? {} : { prompt: params.prompt }
   analytics().logEvent("two_factor_setup_completed", {
     tier: params.tier,
+    is_enforced: params.isEnforced,
+    ...promptParams,
   })
 }

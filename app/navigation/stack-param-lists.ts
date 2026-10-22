@@ -16,7 +16,7 @@ import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conver
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { TwoFactorPromptOrigin } from "@app/types/two-factor-enforcement"
+import { TwoFactorPrompt, TwoFactorPromptOrigin } from "@app/types/two-factor-enforcement"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
@@ -251,10 +251,16 @@ export type RootStackParamList = {
   }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }
-  totpRegistrationInitiate?: { returnTo?: RegistrationReturnRoute }
+  /** `prompt` is the two-factor prompt that led to the registration, none when it was
+   *  started from the settings: what the completed setup is reported under. */
+  totpRegistrationInitiate?: {
+    returnTo?: RegistrationReturnRoute
+    prompt?: TwoFactorPrompt
+  }
   totpRegistrationValidate: {
     totpRegistrationId: string
     returnTo?: RegistrationReturnRoute
+    prompt?: TwoFactorPrompt
   }
   totpLoginValidate: { authToken: string }
   twoFactorSetup: TwoFactorPromptOrigin | undefined

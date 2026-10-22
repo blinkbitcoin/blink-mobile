@@ -318,11 +318,26 @@ describe("analytics helpers", () => {
       })
     })
 
-    it("emits 'two_factor_setup_completed' with the tier", () => {
-      logTwoFactorSetupCompleted({ tier: 2 })
+    it("emits 'two_factor_setup_completed' with the tier, whether it was enforced and the prompt", () => {
+      logTwoFactorSetupCompleted({
+        tier: 2,
+        isEnforced: true,
+        prompt: "tier2_bulletin",
+      })
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
         tier: 2,
+        is_enforced: true,
+        prompt: "tier2_bulletin",
+      })
+    })
+
+    it("emits 'two_factor_setup_completed' without a prompt for a setup from the settings", () => {
+      logTwoFactorSetupCompleted({ tier: 0, isEnforced: false })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
+        tier: 0,
+        is_enforced: false,
       })
     })
 

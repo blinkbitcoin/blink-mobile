@@ -178,6 +178,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     })
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
       returnTo: "Primary",
+      prompt: "protection_required_screen",
     })
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })

@@ -83,8 +83,9 @@ export const TwoFactorSetupScreen: React.FC = () => {
     logTwoFactorSetupStarted({ tier: promptTier, method: TwoFactorMethod.Authenticator })
     navigation.navigate("totpRegistrationInitiate", {
       returnTo: RegistrationReturnRoute.TwoFactorSetup,
+      prompt: origin?.prompt,
     })
-  }, [navigation, promptTier])
+  }, [navigation, promptTier, origin])
 
   /** The setup stays under the explanation, so backing out of it lands back here. */
   const handleMove = useCallback(() => {
