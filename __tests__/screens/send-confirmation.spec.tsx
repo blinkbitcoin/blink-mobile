@@ -266,6 +266,52 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 const navigationDispatchMock = jest.fn()
+
+/** Sent measures the screen before it plays, and jest's native views never answer a
+ *  measurement on their own. Answering them lets Sent play, so the test can open the
+ *  receipt the way a sender does instead of waiting out the hold. */
+const slideAndOpenReceipt = async () => {
+  screen.UNSAFE_root.findAll((node) =>
+    jest.isMockFunction(node.instance?.measureInWindow),
+  ).forEach((node) =>
+    node.instance.measureInWindow.mockImplementation(
+      (callback: (x: number, y: number, width: number, height: number) => void) =>
+        callback(0, 0, 360, 780),
+    ),
+  )
+  await act(async () => {
+    fireEvent.press(screen.getByTestId("slider"))
+  })
+  await act(async () => {
+    fireEvent.press(
+      screen.getByText(i18nObject("en").SendBitcoinConfirmationScreen.receipt()),
+    )
+  })
+}
+
+/** The screen's text in render order. `JSON.stringify` can't be used on the tree: review
+ *  hands a view a `forwardedRef` prop, and the instance it points at refers back up the
+ *  tree. */
+const renderedTexts = (): string[] => {
+  const texts: string[] = []
+  const walk = (node: unknown): void => {
+    if (node === null || node === undefined) return
+    if (typeof node === "string") {
+      texts.push(node)
+      return
+    }
+    if (Array.isArray(node)) {
+      node.forEach(walk)
+      return
+    }
+    walk((node as { children?: unknown }).children)
+  }
+  walk(screen.toJSON())
+  return texts
+}
+
+const textPosition = (prefix: string) =>
+  renderedTexts().findIndex((text) => text.startsWith(prefix))
 const navigationGoBackMock = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -733,9 +779,7 @@ describe("SendBitcoinConfirmationScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {
-        fireEvent.press(screen.getByTestId("slider"))
-      })
+      await slideAndOpenReceipt()
 
       const params = findCompletedRouteParams()
       expect(params.successAction).toEqual(extraInfoSuccessAction)
@@ -761,9 +805,7 @@ describe("SendBitcoinConfirmationScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {
-        fireEvent.press(screen.getByTestId("slider"))
-      })
+      await slideAndOpenReceipt()
 
       const params = findCompletedRouteParams()
       expect(params.successAction).toEqual(successActionMessageMock)
@@ -793,9 +835,7 @@ describe("SendBitcoinConfirmationScreen", () => {
         </ContextForScreen>,
       )
 
-      await act(async () => {
-        fireEvent.press(screen.getByTestId("slider"))
-      })
+      await slideAndOpenReceipt()
 
       const params = findCompletedRouteParams()
       expect(params.note).toBe(memo)
@@ -1386,9 +1426,7 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
       </ContextForScreen>,
     )
 
-    await act(async () => {
-      fireEvent.press(screen.getByTestId("slider"))
-    })
+    await slideAndOpenReceipt()
 
     expect(verifyPaymentSettledMock).toHaveBeenCalledWith({
       walletId: btcSendingWalletDescriptor.id,
@@ -1778,7 +1816,6 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
     it("renders the hero, Destination, From Balance and Details in that order", async () => {
       await renderReview(buildBtcSettlementRoute(1000))
 
-      const json = JSON.stringify(screen.toJSON())
       const positions = [
         LL.SendBitcoinConfirmationScreen.sending(),
         `${LL.SendBitcoinScreen.destination()}`,
@@ -1786,7 +1823,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
         LL.SendBitcoinConfirmationScreen.details(),
         // The destination label carries its payment type ("Destination - Intraledger"), so
         // each section is found by the start of its string rather than the whole of it.
-      ].map((text) => json.indexOf(`"${text}`))
+      ].map(textPosition)
 
       expect(positions.every((position) => position >= 0)).toBe(true)
       expect([...positions].sort((a, b) => a - b)).toEqual(positions)
@@ -1799,9 +1836,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       const primary = screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children
       const secondary = screen.getByTestId(SEND_HERO_SECONDARY_TEST_ID).props.children
 
-      await act(async () => {
-        fireEvent.press(screen.getByTestId("slider"))
-      })
+      await slideAndOpenReceipt()
 
       const reducer = navigationDispatchMock.mock.calls
         .map(([action]) => action)
@@ -1855,9 +1890,8 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       mockUseFee.mockReturnValue({ status: "error" })
       await renderReview(buildBtcSettlementRoute(1000))
 
-      const json = JSON.stringify(screen.toJSON())
-      expect(json.indexOf(`"${LL.common.feeError()}"`)).toBeGreaterThan(
-        json.indexOf(`"${LL.SendBitcoinConfirmationScreen.feeLabel()}"`),
+      expect(textPosition(LL.common.feeError())).toBeGreaterThan(
+        textPosition(LL.SendBitcoinConfirmationScreen.feeLabel()),
       )
       expect(screen.getByText("—")).toBeTruthy()
       expect(outlineColor()).toBe(colors.light.error)
