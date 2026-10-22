@@ -27,6 +27,12 @@ jest.mock("@react-navigation/native", () => ({
 
 const mockSaveCheckpoint = jest.fn()
 const mockToastShow = jest.fn()
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
 
 jest.mock("@app/utils/toast", () => ({
   ...jest.requireActual("@app/utils/toast"),
@@ -152,6 +158,50 @@ describe("AcceptTermsAndConditionsScreen", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ message: LL.errors.generic() }),
     )
+  })
+
+  /** saveCheckpoint stays silent about a save it turned away before the store, so the
+   *  screen reports it: once, however many taps the dropped owner lookup costs. */
+  it("reports a save refused for want of an owner, once", async () => {
+    mockSaveCheckpoint.mockResolvedValue({ isSaved: false, failure: null })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    const accept = screen.getByText(LL.AcceptTermsAndConditionsScreen.accept())
+    fireEvent.press(accept)
+    await flushEffects()
+    fireEvent.press(accept)
+    await flushEffects()
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(2)
+    const ownerlessReports = mockReportError.mock.calls.filter(
+      ([operation]) => operation === "Migration terms",
+    )
+    expect(ownerlessReports).toHaveLength(1)
+  })
+
+  /** The store already reported its own refusal; a second report would double the event. */
+  it("leaves a refusal the store reported to the store's report", async () => {
+    mockSaveCheckpoint.mockResolvedValue({
+      isSaved: false,
+      failure: StorageFailure.Unknown,
+    })
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
+
+    expect(mockToastShow).toHaveBeenCalledTimes(1)
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   /** The one failure the user can go and fix gets its own words. */

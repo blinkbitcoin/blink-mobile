@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
@@ -35,6 +36,11 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
   const { flow, mode } = route.params || { flow: "phone" }
   const { saveCheckpoint } = useMigrationCheckpoint()
+  /** saveCheckpoint reports a store that refused, but not a save it turned away for want of
+   *  an owner, which never reached the store. That one repeats on every tap while the owner
+   *  lookup is down, so it is reported once for as long as the screen is mounted, as the
+   *  commit screen does: one failure is one event, however many taps it costs. */
+  const hasReportedOwnerlessSaveRef = React.useRef(false)
 
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
@@ -66,6 +72,14 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
        *  and fix it; a write turned away before it reached the store (no owner yet) is not
        *  the device's fault and keeps the generic copy. */
       if (!isSaved) {
+        const isRefusedWithoutOwner = failure === null
+        if (isRefusedWithoutOwner && !hasReportedOwnerlessSaveRef.current) {
+          hasReportedOwnerlessSaveRef.current = true
+          reportError(
+            "Migration terms",
+            new Error("Migration checkpoint save refused without an owner"),
+          )
+        }
         toastShow({ message: resolveNotSavedMessage(failure), LL })
         return
       }
