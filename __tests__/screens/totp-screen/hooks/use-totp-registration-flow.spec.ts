@@ -3,7 +3,7 @@ import { CommonActions, NavigationState } from "@react-navigation/native"
 
 import { useTotpRegistrationFlow } from "@app/screens/totp-screen/hooks/use-totp-registration-flow"
 
-type Route = { key: string; name: string }
+type Route = { key: string; name: string; params?: object }
 
 const mockPop = jest.fn()
 const mockDispatch = jest.fn()
@@ -131,6 +131,65 @@ describe("useTotpRegistrationFlow", () => {
       act(() => result.current.leave())
 
       expect(mockPop).toHaveBeenCalledWith(2)
+    })
+  })
+
+  describe("registrationPrompt", () => {
+    it("is the prompt the onboarding was opened from", () => {
+      mockRoutes = [
+        { key: "Primary-0", name: "Primary" },
+        {
+          key: "totpRegistrationIntro-1",
+          name: "totpRegistrationIntro",
+          params: { origin: { prompt: "tier2_bulletin" } },
+        },
+        { key: "totpRegistrationApps-2", name: "totpRegistrationApps" },
+        { key: "totpRegistrationInitiate-3", name: "totpRegistrationInitiate" },
+        { key: "totpRegistrationValidate-4", name: "totpRegistrationValidate" },
+      ]
+      const { result } = renderIn("totpRegistrationValidate")
+
+      expect(result.current.registrationPrompt()).toBe("tier2_bulletin")
+    })
+
+    /** The setup hands the onboarding the prompt that opened the setup. */
+    it("is the setup's prompt when the setup opened the onboarding", () => {
+      mockRoutes = [
+        { key: "Primary-0", name: "Primary" },
+        { key: "twoFactorSetup-1", name: "twoFactorSetup" },
+        {
+          key: "totpRegistrationIntro-2",
+          name: "totpRegistrationIntro",
+          params: { isFromSetup: true, origin: { prompt: "session_modal" } },
+        },
+        { key: "totpRegistrationValidate-3", name: "totpRegistrationValidate" },
+      ]
+      const { result } = renderIn("totpRegistrationValidate")
+
+      expect(result.current.registrationPrompt()).toBe("session_modal")
+    })
+
+    it("is none for an onboarding opened from the settings, with no prompt", () => {
+      mockRoutes = stackOf(
+        "Primary",
+        "accountScreen",
+        "totpRegistrationIntro",
+        "totpRegistrationValidate",
+      )
+      const { result } = renderIn("totpRegistrationValidate")
+
+      expect(result.current.registrationPrompt()).toBeUndefined()
+    })
+
+    it("is none for a registration that did not start at the onboarding", () => {
+      mockRoutes = stackOf(
+        "Primary",
+        "totpRegistrationInitiate",
+        "totpRegistrationValidate",
+      )
+      const { result } = renderIn("totpRegistrationValidate")
+
+      expect(result.current.registrationPrompt()).toBeUndefined()
     })
   })
 })
