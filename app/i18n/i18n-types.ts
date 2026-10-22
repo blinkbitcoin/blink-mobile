@@ -7002,6 +7002,10 @@ type RootTranslation = {
 		 */
 		newAddressFailed: string
 		/**
+		 * T​o​o​ ​m​a​n​y​ ​n​e​w​ ​a​d​d​r​e​s​s​e​s​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​w​h​i​l​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressRateLimited: string
+		/**
 		 * R​e​q​u​e​s​t​ ​S​p​e​c​i​f​i​c​ ​A​m​o​u​n​t
 		 */
 		addAmount: string
@@ -21266,6 +21270,10 @@ export type TranslationFunctions = {
 		 * Couldn't generate a new address. Please try again.
 		 */
 		newAddressFailed: () => LocalizedString
+		/**
+		 * Too many new addresses. Please wait a while and try again.
+		 */
+		newAddressRateLimited: () => LocalizedString
 		/**
 		 * Request Specific Amount
 		 */

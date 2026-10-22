@@ -2,6 +2,10 @@ import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { flushEffects } from "../../helpers/flush-effects"
 import { useOnChainAddress } from "@app/screens/receive-bitcoin-screen/hooks/use-onchain-address"
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+} from "@app/screens/receive-bitcoin-screen/payment/request-state.types"
 
 const mockMutationFn = jest.fn()
 const mockCreateFn = jest.fn()
@@ -232,17 +236,17 @@ describe("useOnChainAddress", () => {
 
     it("replaces the address with a freshly created one", async () => {
       mockCreateFn.mockResolvedValue({
-        data: { onChainAddressCreate: { address: "bc1qfresh" } },
+        data: { onChainAddressCreate: { address: "bc1qfresh", errors: [] } },
       })
       const { result } = renderHook(() => useOnChainAddress("wallet-123"))
       await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
 
-      let ok = false
+      let outcome: NewOnchainAddressResultType | undefined
       await act(async () => {
-        ok = await result.current.generateNewAddress()
+        outcome = await result.current.generateNewAddress()
       })
 
-      expect(ok).toBe(true)
+      expect(outcome).toBe(NewOnchainAddressResult.Created)
       expect(mockCreateFn).toHaveBeenCalledWith({
         variables: { input: { walletId: "wallet-123" } },
       })
@@ -255,12 +259,12 @@ describe("useOnChainAddress", () => {
       const { result } = renderHook(() => useOnChainAddress("wallet-123"))
       await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
 
-      let ok = true
+      let outcome: NewOnchainAddressResultType | undefined
       await act(async () => {
-        ok = await result.current.generateNewAddress()
+        outcome = await result.current.generateNewAddress()
       })
 
-      expect(ok).toBe(false)
+      expect(outcome).toBe(NewOnchainAddressResult.Failed)
       expect(result.current.address).toBe("bc1qcurrent")
       expect(result.current.loading).toBe(false)
     })
@@ -272,13 +276,35 @@ describe("useOnChainAddress", () => {
       const { result } = renderHook(() => useOnChainAddress("wallet-123"))
       await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
 
-      let ok = true
+      let outcome: NewOnchainAddressResultType | undefined
       await act(async () => {
-        ok = await result.current.generateNewAddress()
+        outcome = await result.current.generateNewAddress()
       })
 
-      expect(ok).toBe(false)
+      expect(outcome).toBe(NewOnchainAddressResult.Failed)
       expect(result.current.address).toBe("bc1qcurrent")
+    })
+
+    it("reports the rate limit apart from other failures", async () => {
+      mockCreateFn.mockResolvedValue({
+        data: {
+          onChainAddressCreate: {
+            address: null,
+            errors: [{ message: "Too many", code: "TOO_MANY_REQUEST" }],
+          },
+        },
+      })
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
+
+      let outcome: NewOnchainAddressResultType | undefined
+      await act(async () => {
+        outcome = await result.current.generateNewAddress()
+      })
+
+      expect(outcome).toBe(NewOnchainAddressResult.RateLimited)
+      expect(result.current.address).toBe("bc1qcurrent")
+      expect(result.current.loading).toBe(false)
     })
   })
 })
