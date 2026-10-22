@@ -129,18 +129,6 @@ export const useResumeCompletedMigration = (): void => {
   }, [isReceiveDelayed])
   useEffect(() => () => resetMigrationReceiveWait(), [])
 
-  /** And when the app comes back, with a fresh look at the wallet asked for on the spot:
-   *  the scheduled one can be half a minute out once the wait is overdue, and the overdue
-   *  flag is only acted on after a check taken since. Marked first, so that check counts. */
-  useEffect(() => {
-    const subscription = AppState.addEventListener("change", (nextAppState) => {
-      if (nextAppState !== "active") return
-      markAppForegrounded()
-      recheck()
-    })
-    return () => subscription.remove()
-  }, [recheck])
-
   /** Blocks the effect from re-entering once the user has been handed to support, so a
    *  terminal outcome hands over exactly once. */
   const hasHandedOverRef = useRef(false)
@@ -156,21 +144,30 @@ export const useResumeCompletedMigration = (): void => {
   )
   const timedCloseRetriesRef = useRef(0)
 
-  /** Foregrounding is the cheapest signal that the connection may be back, and the only one
-   *  this hook can watch without a screen: it is mounted under the tab navigator with no UI
-   *  of its own, so nothing else here ever tells it to look again. */
+  /**
+   * Foregrounding is the cheapest signal that the connection may be back, and the only one
+   * this hook can watch without a screen: it is mounted under the tab navigator with no UI
+   * of its own, so nothing else here ever tells it to look again. One listener serves both
+   * of its uses, in the order they need:
+   * - the receive: a fresh look at the wallet on the spot, since the scheduled one can be
+   *   half a minute out once the wait is overdue and the overdue flag is only acted on
+   *   after a check taken since. The foreground is marked first, so that check counts;
+   * - a close deferred for a dropped connection: its one retry for this foreground.
+   */
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
-      const isDeferredCloseWaiting =
-        nextAppState === "active" && hasDeferredCloseRef.current
-      if (!isDeferredCloseWaiting) return
+      if (nextAppState !== "active") return
+      markAppForegrounded()
+      recheck()
+
+      if (!hasDeferredCloseRef.current) return
       hasDeferredCloseRef.current = false
       clearTimeout(deferredCloseTimerRef.current)
       setCloseRetryCount((previous) => previous + 1)
     })
 
     return () => subscription.remove()
-  }, [])
+  }, [recheck])
 
   const scheduleDeferredCloseRetry = useCallback(() => {
     if (timedCloseRetriesRef.current >= MAX_DEFERRED_CLOSE_TIMER_RETRIES) return

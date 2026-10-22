@@ -724,6 +724,15 @@ describe("useResumeCompletedMigration", () => {
       expect(markedAt).toBeLessThan(recheckedAt)
     })
 
+    /** One listener for the receive and the deferred close: two would each have to repeat
+     *  the "became active" filter, and the order between them would be nobody's to keep. */
+    it("watches the foreground through one listener", async () => {
+      renderHook(() => useResumeCompletedMigration())
+      await flushEffects()
+
+      expect(mockAppStateListeners).toHaveLength(1)
+    })
+
     it("records each return to the foreground", async () => {
       renderHook(() => useResumeCompletedMigration())
       await flushEffects()
