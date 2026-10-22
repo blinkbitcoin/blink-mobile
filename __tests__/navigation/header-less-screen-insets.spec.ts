@@ -125,6 +125,9 @@ const headerLessScreens = (): HeaderLessScreen[] => {
  * list may shrink but should not grow without a reason recorded here.
  */
 const HANDLES_ITS_OWN_INSETS = new Set([
+  // Send review runs edge to edge so the Sent glow can fill the screen; its stage pads
+  // the content clear of the system bars with useSafeAreaInsets.
+  "SendBitcoinConfirmationGated",
   // Full-bleed camera preview; the controls read useSafeAreaInsets directly.
   "ScanningQRCodeGated",
   // Full-bleed detail sheet; reads useSafeAreaInsets directly.
