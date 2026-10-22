@@ -27,8 +27,6 @@ const KNOWN_LONG_LABELS = new Set([
   "pt.json:shareInvoice",
   "qu.json:shareInvoice",
   "sk.json:copyInvoice",
-  "xh.json:copyInvoice",
-  "xh.json:shareInvoice",
 ])
 
 loadLocale("en")
