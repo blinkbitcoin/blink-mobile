@@ -16,7 +16,7 @@ import { resolveCommitPointRoute } from "@app/screens/account-migration/utils/mi
 import {
   isMigrationReceiveOverdue,
   isMigrationReceiveSupportDue,
-  OVERDUE_RECEIVE_SUPPORT,
+  overdueReceiveSupport,
 } from "@app/screens/account-migration/utils/migration-receive-wait"
 import {
   CommitPointRoute,
@@ -101,7 +101,10 @@ export const MigrationEntryScreen: React.FC = () => {
        *  but awaiting that check, the wait is unusual and the toast says so; otherwise it
        *  is usually seconds old and says only that the funds are on their way. */
       if (isMigrationReceiveSupportDue()) {
-        navigation.replace("accountMigrationContactSupport", OVERDUE_RECEIVE_SUPPORT)
+        navigation.replace(
+          "accountMigrationContactSupport",
+          overdueReceiveSupport(checkpointOwnerId),
+        )
         return
       }
       const LLTransfer = isMigrationReceiveOverdue()

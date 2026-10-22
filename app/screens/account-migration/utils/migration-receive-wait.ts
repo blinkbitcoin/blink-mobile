@@ -19,11 +19,15 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
 
 /** Where an overdue receive hands over, from the entry and the steps alike: the delayed
  *  reason support already knows, raised from the resume path, whose Back returns to the
- *  screen the user came from. */
-export const OVERDUE_RECEIVE_SUPPORT = {
-  reason: MigrationSupportReason.ReceiveDelayed,
-  origin: MigrationSupportOrigin.Resume,
-} as const
+ *  screen the user came from. The account travels with it, named by the caller from the
+ *  checkpoint's owner: the support screen otherwise falls back to a live `me` query, and a
+ *  user whose receive is late on a flaky connection is the one whose query fails too. */
+export const overdueReceiveSupport = (custodialAccountId: string | null) =>
+  ({
+    reason: MigrationSupportReason.ReceiveDelayed,
+    origin: MigrationSupportOrigin.Resume,
+    custodialAccountId: custodialAccountId ?? undefined,
+  }) as const
 
 let isReceiveOverdue = false
 let foregroundedAt = Date.now()

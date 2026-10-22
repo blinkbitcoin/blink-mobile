@@ -3,7 +3,7 @@ import {
   isMigrationReceiveSupportDue,
   markAppForegrounded,
   markMigrationReceiveChecked,
-  OVERDUE_RECEIVE_SUPPORT,
+  overdueReceiveSupport,
   resetMigrationReceiveWait,
   setMigrationReceiveOverdue,
 } from "@app/screens/account-migration/utils/migration-receive-wait"
@@ -93,9 +93,15 @@ describe("migration-receive-wait", () => {
   })
 
   it("hands over with the delayed reason, backing out to the screen beneath", () => {
-    expect(OVERDUE_RECEIVE_SUPPORT).toEqual({
+    expect(overdueReceiveSupport("owner-1")).toEqual({
       reason: MigrationSupportReason.ReceiveDelayed,
       origin: MigrationSupportOrigin.Resume,
+      custodialAccountId: "owner-1",
     })
+  })
+
+  /** A checkpoint saved before owners existed names none; the support screen asks. */
+  it("names no account when the checkpoint has no owner", () => {
+    expect(overdueReceiveSupport(null).custodialAccountId).toBeUndefined()
   })
 })

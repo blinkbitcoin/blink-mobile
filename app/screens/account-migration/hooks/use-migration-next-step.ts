@@ -19,7 +19,7 @@ import {
 import {
   isMigrationReceiveOverdue,
   isMigrationReceiveSupportDue,
-  OVERDUE_RECEIVE_SUPPORT,
+  overdueReceiveSupport,
 } from "../utils/migration-receive-wait"
 
 import { useHasTransactions } from "./use-has-transactions"
@@ -152,11 +152,9 @@ export const useMigrationNextStep = () => {
        *  way". */
       const isSupportDue = !isAskingAgain && isMigrationReceiveSupportDue()
       if (isSupportDue) {
-        if (isSkipGuard) {
-          navigation.replace("accountMigrationContactSupport", OVERDUE_RECEIVE_SUPPORT)
-        } else {
-          navigation.navigate("accountMigrationContactSupport", OVERDUE_RECEIVE_SUPPORT)
-        }
+        const params = overdueReceiveSupport(checkpointOwnerId)
+        if (isSkipGuard) navigation.replace("accountMigrationContactSupport", params)
+        else navigation.navigate("accountMigrationContactSupport", params)
         return
       }
       if (isAskingAgain) retryLockRead()
@@ -176,7 +174,7 @@ export const useMigrationNextStep = () => {
       }
       navigation.replace("Primary")
     },
-    [retryLockRead, LL, navigation],
+    [retryLockRead, LL, navigation, checkpointOwnerId],
   )
 
   const followStep = useCallback(

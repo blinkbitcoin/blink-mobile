@@ -304,6 +304,7 @@ describe("MigrationEntryScreen", () => {
         expect(mockReplace).toHaveBeenCalledWith("accountMigrationContactSupport", {
           reason: MigrationSupportReason.ReceiveDelayed,
           origin: MigrationSupportOrigin.Resume,
+          custodialAccountId: "owner-1",
         })
         expect(mockToastShow).not.toHaveBeenCalled()
         expect(mockGoBack).not.toHaveBeenCalled()

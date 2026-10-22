@@ -415,6 +415,7 @@ describe("useMigrationNextStep", () => {
       expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
         reason: MigrationSupportReason.ReceiveDelayed,
         origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: "owner-1",
       })
       expect(mockToastShow).not.toHaveBeenCalled()
     })
@@ -433,6 +434,7 @@ describe("useMigrationNextStep", () => {
       expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
         reason: MigrationSupportReason.ReceiveDelayed,
         origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: "owner-1",
       })
       expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
       expect(mockToastShow).not.toHaveBeenCalled()
@@ -450,6 +452,7 @@ describe("useMigrationNextStep", () => {
       expect(mockReplace).toHaveBeenCalledWith("accountMigrationContactSupport", {
         reason: MigrationSupportReason.ReceiveDelayed,
         origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: "owner-1",
       })
       expect(mockGoBack).not.toHaveBeenCalled()
     })
