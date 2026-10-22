@@ -34,8 +34,9 @@ export const resolveServerFlow = (
 ): ServerMigrationFlow => {
   if (hasError) return ServerMigrationFlow.Unanswered
   if (status === null) return ServerMigrationFlow.Unanswered
-  /** A phase this build cannot place is not an answer it can act on: holding and asking
-   *  again is recoverable, a resume or restart on a guess is not. */
-  if (!isKnownMigrationStatus(status)) return ServerMigrationFlow.Unanswered
+  /** A phase this build cannot place is not an answer it can act on: a resume or restart
+   *  on a guess is not recoverable. Nor is it unanswered, since asking again only gets the
+   *  same phase back, so it is named for the routing to hand over instead. */
+  if (!isKnownMigrationStatus(status)) return ServerMigrationFlow.Unrecognised
   return FLOW_BY_STATUS[status]
 }

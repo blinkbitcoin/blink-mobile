@@ -124,6 +124,7 @@ const COMMIT_POINT_ROUTE_BY_FLOW: Record<
   [ServerMigrationFlow.Open]: CommitPointRoute.Resume,
   [ServerMigrationFlow.Completed]: CommitPointRoute.AwaitSwap,
   [ServerMigrationFlow.Unanswered]: CommitPointRoute.AskAgain,
+  [ServerMigrationFlow.Unrecognised]: CommitPointRoute.HandOver,
 }
 
 /**

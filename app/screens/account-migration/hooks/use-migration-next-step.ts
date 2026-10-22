@@ -5,7 +5,11 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { CommitPointRoute } from "@app/types/migration"
+import {
+  CommitPointRoute,
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+} from "@app/types/migration"
 import { toastShow } from "@app/utils/toast"
 
 import {
@@ -32,6 +36,7 @@ type NextStep =
     }
   | { kind: "checkpoint" }
   | { kind: "hold"; route: HoldRoute }
+  | { kind: "support" }
 
 const HOLD_ROUTES: ReadonlySet<CommitPointRoute> = new Set([
   CommitPointRoute.AwaitSwap,
@@ -60,6 +65,7 @@ export const useMigrationNextStep = () => {
     replaceToCheckpoint,
     isAtCommitPoint,
     isStartConfirmed,
+    checkpointOwnerId,
     loading: checkpointLoading,
   } = useMigrationCheckpoint()
   /** Only a commit point reads the server's answer, so only a commit point asks for it:
@@ -79,7 +85,9 @@ export const useMigrationNextStep = () => {
    * - await the swap: the funds moved and this device is finishing on its own. Resuming
    *   would ask the server to start a migration it already finished and hand the user to
    *   support; starting over would drop the expected receive the swap is waiting on;
-   * - ask again: no answer. Picking a direction on a guess risks the same drop.
+   * - ask again: no answer. Picking a direction on a guess risks the same drop;
+   * - hand over: an answer this build does not know. Asking again would only get it back,
+   *   so support takes over rather than a "try again" that can never succeed.
    */
   const commitPointRoute = isAtCommitPoint
     ? resolveCommitPointRoute(flow, isStartConfirmed)
@@ -87,6 +95,7 @@ export const useMigrationNextStep = () => {
   const isResumable = commitPointRoute === CommitPointRoute.Resume
   const isClosedCommitPoint = commitPointRoute === CommitPointRoute.Restart
   const commitPointHold = isHoldRoute(commitPointRoute) ? commitPointRoute : null
+  const isHandedOver = commitPointRoute === CommitPointRoute.HandOver
 
   /** A restarted flow is offered the download again (#4109): it replays every step, and
    *  only the commit point still skips ahead to its checkpoint. */
@@ -99,18 +108,20 @@ export const useMigrationNextStep = () => {
    * preconditions (API keys, a dollar balance, the kill-switch) already ran on the way in.
    */
   const resolvePastHistory = useCallback((): NextStep => {
+    if (isHandedOver) return { kind: "support" }
     if (commitPointHold) return { kind: "hold", route: commitPointHold }
     if (isClosedCommitPoint) return { kind: "route", name: RESTART_ROUTE }
     return { kind: "checkpoint" }
-  }, [commitPointHold, isClosedCommitPoint])
+  }, [isHandedOver, commitPointHold, isClosedCommitPoint])
 
   const resolveNextStep = useCallback((): NextStep => {
+    if (isHandedOver) return { kind: "support" }
     if (commitPointHold) return { kind: "hold", route: commitPointHold }
     if (shouldOfferHistoryDownload) {
       return { kind: "route", name: "accountMigrationDownloadHistory" }
     }
     return resolvePastHistory()
-  }, [commitPointHold, shouldOfferHistoryDownload, resolvePastHistory])
+  }, [isHandedOver, commitPointHold, shouldOfferHistoryDownload, resolvePastHistory])
 
   /** One re-read at a time: the status query does not report a refetch as loading, so
    *  without this every tap on a held button would stack another request. */
@@ -174,6 +185,16 @@ export const useMigrationNextStep = () => {
         hold(step.route, isSkipGuard)
         return
       }
+      if (step.kind === "support") {
+        const params = {
+          reason: MigrationSupportReason.StatusUnrecognised,
+          origin: MigrationSupportOrigin.Resume,
+          custodialAccountId: checkpointOwnerId ?? undefined,
+        }
+        if (isSkipGuard) navigation.replace("accountMigrationContactSupport", params)
+        else navigation.navigate("accountMigrationContactSupport", params)
+        return
+      }
       if (step.kind === "route") {
         if (isSkipGuard) navigation.replace(step.name)
         else navigation.navigate(step.name)
@@ -182,7 +203,7 @@ export const useMigrationNextStep = () => {
       if (isSkipGuard) replaceToCheckpoint()
       else navigateToCheckpoint()
     },
-    [hold, navigation, replaceToCheckpoint, navigateToCheckpoint],
+    [hold, navigation, checkpointOwnerId, replaceToCheckpoint, navigateToCheckpoint],
   )
 
   const goToNextStep = useCallback(

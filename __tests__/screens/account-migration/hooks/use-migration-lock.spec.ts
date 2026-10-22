@@ -256,17 +256,30 @@ describe("useMigrationLock", () => {
     /** A settled read with no migration on it is never the server's word for a cleared
      *  flow (that arrives as NOT_STARTED), so it must not route a commit point to the
      *  restart: only a status the server sent is an answer. */
-    /** An older build handed a newer phase must hold and ask again rather than resume or
-     *  restart a commit point on a guess, and must not lock on one either. */
-    it("has no answer for a phase this build does not know", () => {
+    /** An older build handed a newer phase must neither resume nor restart a commit point
+     *  on a guess, nor lock on one. Nor is it "no answer": asking again gets it back, so it
+     *  is named for the routing to hand over. */
+    it("names a phase this build does not know as unrecognised", () => {
       mockUseMigrationStatus.mockReturnValue(
         serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
       )
 
       const { result } = renderHook(() => useMigrationLock())
 
-      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unrecognised)
       expect(result.current.isLocked).toBe(false)
+    })
+
+    /** A failed re-read outranks whatever phase it left behind, an unknown one included. */
+    it("has no answer for an unknown phase left behind by a failed read", () => {
+      mockUseMigrationStatus.mockReturnValue({
+        ...serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
+        error: new Error("Network request failed"),
+      })
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
     })
 
     it("reports a phase this build does not know, once", () => {

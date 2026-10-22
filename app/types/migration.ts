@@ -74,6 +74,10 @@ export const MigrationSupportReason = {
   /** The server refused to close the emptied custodial account for good (the phone-deletion
    *  cap). The migration itself finished; the account stays open until support removes it. */
   CustodialAccountCloseRefused: "custodial-account-close-refused",
+  /** The server answered with a migration phase this build does not know (its enum grew
+   *  without an app release). Nothing on the device can act on it and asking again gets
+   *  the same answer, so support takes over rather than an endless "try again". */
+  StatusUnrecognised: "status-unrecognised",
   /** The funds landed, but finishing on this device threw: the session discard, the
    *  checkpoint clear or the pending-wallet write. Distinct from a transfer failure so
    *  support does not go looking for money that never moved. */
@@ -202,6 +206,9 @@ export const ServerMigrationFlow = {
   Completed: "completed",
   /** No answer to act on: the read failed, never ran, or is still on its way. */
   Unanswered: "unanswered",
+  /** An answer, but a phase this build does not know. Unlike the one above it never
+   *  changes by asking again, so it is kept apart rather than held on forever. */
+  Unrecognised: "unrecognised",
 } as const
 
 export type ServerMigrationFlow =
@@ -218,6 +225,8 @@ export const CommitPointRoute = {
   AwaitSwap: "await-swap",
   /** No answer to act on: stay put and ask the server again. */
   AskAgain: "ask-again",
+  /** An answer this build cannot act on: hand the user to support. */
+  HandOver: "hand-over",
 } as const
 
 export type CommitPointRoute = (typeof CommitPointRoute)[keyof typeof CommitPointRoute]

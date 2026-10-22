@@ -1071,4 +1071,14 @@ describe("migration-checkpoint-storage resolveCommitPointRoute", () => {
       CommitPointRoute.AskAgain,
     )
   })
+
+  /** Asking again would only get the same unknown phase back. */
+  it("hands over when the server answered with a phase this build does not know", () => {
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Unrecognised, true)).toBe(
+      CommitPointRoute.HandOver,
+    )
+    expect(resolveCommitPointRoute(ServerMigrationFlow.Unrecognised, false)).toBe(
+      CommitPointRoute.HandOver,
+    )
+  })
 })

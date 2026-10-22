@@ -41,6 +41,7 @@ let mockIsAtCommitPoint = false
  *  instead of silently resuming a pre-commit checkpoint again (#4109). */
 let mockHasResumableCheckpoint = false
 let mockIsStartConfirmed = false
+let mockCheckpointOwnerId: string | null = "owner-1"
 let mockCheckpointLoading = false
 let mockSelfCustodialDisabled = false
 /** Unlocked and not started by default, the state a fresh migration really reads; a test
@@ -84,6 +85,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     isAtCommitPoint: mockIsAtCommitPoint,
     hasResumableCheckpoint: mockHasResumableCheckpoint,
     isStartConfirmed: mockIsStartConfirmed,
+    checkpointOwnerId: mockCheckpointOwnerId,
   }),
   useSelfCustodialDisabled: () => mockSelfCustodialDisabled,
 }))
@@ -111,6 +113,7 @@ describe("MigrationEntryScreen", () => {
     mockIsAtCommitPoint = false
     mockHasResumableCheckpoint = false
     mockIsStartConfirmed = false
+    mockCheckpointOwnerId = "owner-1"
     mockIsSupportDue = false
     mockIsOverdue = false
     mockCheckpointLoading = false
@@ -351,6 +354,32 @@ describe("MigrationEntryScreen", () => {
 
       expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
       expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    /** Unlike a failed read, a phase this build does not know comes back the same on every
+     *  retry, and the gate would only walk the user to the same dead end: support. */
+    it("hands a phase this build does not know to support", () => {
+      arriveWithCommitPointCheckpoint()
+      mockFlow = ServerMigrationFlow.Unrecognised
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationContactSupport", {
+        reason: MigrationSupportReason.StatusUnrecognised,
+        origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: "owner-1",
+      })
+      expect(mockReplace).not.toHaveBeenCalledWith("accountMigrationStart")
+      expect(mockReplaceToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    /** Before the commit point there is no run for the phase to say anything about. */
+    it("starts a pre-commit flow at the gate whatever phase the server reports", () => {
+      mockFlow = ServerMigrationFlow.Unrecognised
+
+      render(<MigrationEntryScreen />)
+
+      expect(mockReplace).toHaveBeenCalledWith("accountMigrationStart")
     })
   })
 })

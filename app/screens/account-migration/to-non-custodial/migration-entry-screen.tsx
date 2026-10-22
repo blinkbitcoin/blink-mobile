@@ -18,7 +18,11 @@ import {
   isMigrationReceiveSupportDue,
   OVERDUE_RECEIVE_SUPPORT,
 } from "@app/screens/account-migration/utils/migration-receive-wait"
-import { CommitPointRoute } from "@app/types/migration"
+import {
+  CommitPointRoute,
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+} from "@app/types/migration"
 import { AccountType } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 
@@ -29,8 +33,13 @@ import { toastShow } from "@app/utils/toast"
 export const MigrationEntryScreen: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount, loading: registryLoading } = useAccountRegistry()
-  const { loading, replaceToCheckpoint, isAtCommitPoint, isStartConfirmed } =
-    useMigrationCheckpoint()
+  const {
+    loading,
+    replaceToCheckpoint,
+    isAtCommitPoint,
+    isStartConfirmed,
+    checkpointOwnerId,
+  } = useMigrationCheckpoint()
   const { flow, loading: lockLoading } = useMigrationLock()
   const { LL } = useI18nContext()
   const isSelfCustodialDisabled = useSelfCustodialDisabled()
@@ -52,14 +61,18 @@ export const MigrationEntryScreen: React.FC = () => {
    *    own: leave the flow alone. Resuming would ask the server to start a migration it
    *    already finished and hand the user to support; the gate would walk them into a new
    *    run that drops the figure the swap waits on;
+   *  - hand over when the server answered with a phase this build does not know: asking
+   *    again only gets it back, and the gate would walk the user into the same dead end;
    *  - anything else goes to the gate: a flow support cleared starts over there, and an
    *    unanswered read blocks there with a retry. */
   const commitPointRoute = resolveCommitPointRoute(flow, isStartConfirmed)
   const isCommitPointActive = !isSelfCustodialDisabled && isAtCommitPoint
   const isResumeRoute = commitPointRoute === CommitPointRoute.Resume
   const isAwaitSwapRoute = commitPointRoute === CommitPointRoute.AwaitSwap
+  const isHandOverRoute = commitPointRoute === CommitPointRoute.HandOver
   const shouldResume = isCommitPointActive && isResumeRoute
   const isAwaitingSwap = isCommitPointActive && isAwaitSwapRoute
+  const isHandedOver = isCommitPointActive && isHandOverRoute
 
   useEffect(() => {
     /** Wait for the account list and the flag too, not just the checkpoint: an unhydrated
@@ -103,6 +116,15 @@ export const MigrationEntryScreen: React.FC = () => {
       return
     }
 
+    if (isHandedOver) {
+      navigation.replace("accountMigrationContactSupport", {
+        reason: MigrationSupportReason.StatusUnrecognised,
+        origin: MigrationSupportOrigin.Resume,
+        custodialAccountId: checkpointOwnerId ?? undefined,
+      })
+      return
+    }
+
     if (shouldResume) {
       replaceToCheckpoint()
       return
@@ -116,6 +138,8 @@ export const MigrationEntryScreen: React.FC = () => {
     remoteConfigReady,
     isSelfCustodialAccount,
     isAwaitingSwap,
+    isHandedOver,
+    checkpointOwnerId,
     shouldResume,
     replaceToCheckpoint,
     navigation,

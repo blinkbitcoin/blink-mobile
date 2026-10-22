@@ -15,6 +15,7 @@ const mockNavigateToCheckpoint = jest.fn()
 const mockReplaceToCheckpoint = jest.fn()
 let mockIsAtCommitPoint = false
 let mockIsStartConfirmed = false
+let mockCheckpointOwnerId: string | null = "owner-1"
 let mockCheckpointLoading = false
 let mockHasTransactions = false
 let mockTransactionsLoading = false
@@ -78,6 +79,7 @@ jest.mock("@app/screens/account-migration/hooks/use-migration-checkpoint", () =>
     replaceToCheckpoint: mockReplaceToCheckpoint,
     isAtCommitPoint: mockIsAtCommitPoint,
     isStartConfirmed: mockIsStartConfirmed,
+    checkpointOwnerId: mockCheckpointOwnerId,
     loading: mockCheckpointLoading,
   }),
 }))
@@ -94,6 +96,7 @@ describe("useMigrationNextStep", () => {
     jest.clearAllMocks()
     mockIsAtCommitPoint = false
     mockIsStartConfirmed = false
+    mockCheckpointOwnerId = "owner-1"
     mockCheckpointLoading = false
     mockHasTransactions = false
     mockTransactionsLoading = false
@@ -612,6 +615,69 @@ describe("useMigrationNextStep", () => {
       const { result } = renderHook(() => useMigrationNextStep())
 
       expect(result.current.loading).toBe(true)
+    })
+  })
+
+  /** A phase this build does not know is an answer that asking again only repeats, so the
+   *  generic "try again" would never end: support takes over, with the account the ticket
+   *  is about, from every tap that reaches the commit point. */
+  describe("a commit point the server answered with an unknown phase for", () => {
+    const UNRECOGNISED_SUPPORT = {
+      reason: MigrationSupportReason.StatusUnrecognised,
+      origin: MigrationSupportOrigin.Resume,
+      custodialAccountId: "owner-1",
+    }
+    const arriveUnrecognised = (): void => {
+      mockIsAtCommitPoint = true
+      mockFlow = ServerMigrationFlow.Unrecognised
+    }
+
+    it("hands the tap to support instead of asking again", () => {
+      arriveUnrecognised()
+      mockHasTransactions = true
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.goToNextStep()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "accountMigrationContactSupport",
+        UNRECOGNISED_SUPPORT,
+      )
+      expect(mockRefetchLock).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("hands the history step's continue over the same way", () => {
+      arriveUnrecognised()
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.continuePastHistory()
+      })
+
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "accountMigrationContactSupport",
+        UNRECOGNISED_SUPPORT,
+      )
+      expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+    })
+
+    it("replaces a skip guard with support rather than pushing it", () => {
+      arriveUnrecognised()
+
+      const { result } = renderHook(() => useMigrationNextStep())
+      act(() => {
+        result.current.replaceToNextStep()
+      })
+
+      expect(mockReplace).toHaveBeenCalledWith(
+        "accountMigrationContactSupport",
+        UNRECOGNISED_SUPPORT,
+      )
+      expect(mockNavigate).not.toHaveBeenCalled()
     })
   })
 })

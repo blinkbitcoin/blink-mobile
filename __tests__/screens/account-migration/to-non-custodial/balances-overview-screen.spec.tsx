@@ -516,6 +516,21 @@ describe("MigrationBalancesOverviewScreen", () => {
     expect(mockMigrationStart).not.toHaveBeenCalled()
   })
 
+  /** A phase this build does not know is no run to start on, and asking again only gets
+   *  it back: the start is held and support takes over, as for a failed migration. */
+  it("hands over to support when the server reports a phase this build does not know", async () => {
+    mockMigrationStatus = "PAUSED_FOR_REVIEW" as unknown as MigrationStatus
+
+    renderScreen()
+    await flushEffects()
+
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
+      reason: "status-unrecognised",
+      origin: "commit",
+    })
+    expect(mockMigrationStart).not.toHaveBeenCalled()
+  })
+
   it("tells support the preview never arrived", async () => {
     mockUseMigrationQuery.mockReturnValue({ data: { migration: null }, loading: false })
     renderScreen()

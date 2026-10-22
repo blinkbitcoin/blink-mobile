@@ -138,7 +138,12 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   /** Read through the lock's own rule, so this screen and the routing never disagree on
    *  what counts as the server's answer: a stale phase under a failed re-read is none. */
   const serverFlow = resolveServerFlow(migrationStatus, Boolean(migrationStatusError))
-  const isServerFlowUnanswered = serverFlow === ServerMigrationFlow.Unanswered
+  /** A phase this build does not know is an answer, but not one to start a run on: the
+   *  start waits on it like on no answer, and the handover below takes the user to support. */
+  const isServerFlowUnrecognised = serverFlow === ServerMigrationFlow.Unrecognised
+  /** What the start waits out: no answer yet, or one this build cannot start a run on. */
+  const isPhaseUnactionable =
+    serverFlow === ServerMigrationFlow.Unanswered || isServerFlowUnrecognised
 
   /** Read once at mount, and again each time the user comes back to this instance (from
    *  the support screen it hands over to): a read that failed at mount would otherwise
@@ -176,7 +181,7 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    */
   const migrationStart = useEnsureMigrationStarted({
     skip:
-      !preview.isReady || isMigrationFailed || hasDollarBalance || isServerFlowUnanswered,
+      !preview.isReady || isMigrationFailed || hasDollarBalance || isPhaseUnactionable,
   })
 
   const {
@@ -419,8 +424,13 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   /** A migration already failed server-side leads the handover: nothing else on this screen
    *  matters once the phase is FAILED. */
   const failedReason = isMigrationFailed ? MigrationSupportReason.TransferFailed : null
+  /** Asking again only gets the same unknown phase back, so this ends here like a failure. */
+  const unrecognisedPhaseReason = isServerFlowUnrecognised
+    ? MigrationSupportReason.StatusUnrecognised
+    : null
   const handoverReason =
     failedReason ??
+    unrecognisedPhaseReason ??
     startFailureReason ??
     lnAddressMissingReason ??
     lnAddressProofFailureReason ??
