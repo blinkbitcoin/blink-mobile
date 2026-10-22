@@ -285,6 +285,97 @@ describe("useOnChainAddress", () => {
       expect(result.current.address).toBe("bc1qcurrent")
     })
 
+    describe("when the wallet changes while a request is pending", () => {
+      type Deferred = { promise: Promise<unknown>; resolve: (value: unknown) => void }
+      const deferred = (): Deferred => {
+        let resolve: (value: unknown) => void = () => {}
+        const promise = new Promise((res) => {
+          resolve = res
+        })
+        return { promise, resolve }
+      }
+      const current = (address: string) => ({
+        data: { onChainAddressCurrent: { address } },
+      })
+      const created = (address: string) => ({
+        data: { onChainAddressCreate: { address, errors: [] } },
+      })
+
+      const renderOnWallet1 = async () => {
+        const hook = renderHook(
+          ({ walletId }: { walletId: string }) => useOnChainAddress(walletId),
+          { initialProps: { walletId: "wallet-1" } },
+        )
+        await waitFor(() => expect(hook.result.current.address).toBe("bc1qcurrent"))
+        return hook
+      }
+
+      it("ignores a create that lands after the new wallet's address", async () => {
+        const create = deferred()
+        const fetchWallet2 = deferred()
+        mockCreateFn.mockReturnValueOnce(create.promise)
+        const { result, rerender } = await renderOnWallet1()
+
+        let outcome: Promise<NewOnchainAddressResultType> | undefined
+        act(() => {
+          outcome = result.current.generateNewAddress()
+        })
+        mockMutationFn.mockReturnValueOnce(fetchWallet2.promise)
+        rerender({ walletId: "wallet-2" })
+
+        await act(async () => fetchWallet2.resolve(current("bc1qwallet2")))
+        await waitFor(() => expect(result.current.address).toBe("bc1qwallet2"))
+
+        await act(async () => create.resolve(created("bc1qstale")))
+
+        await expect(outcome).resolves.toBe(NewOnchainAddressResult.Failed)
+        expect(result.current.address).toBe("bc1qwallet2")
+        expect(result.current.loading).toBe(false)
+      })
+
+      it("keeps loading when a stale create lands before the new wallet's address", async () => {
+        const create = deferred()
+        const fetchWallet2 = deferred()
+        mockCreateFn.mockReturnValueOnce(create.promise)
+        const { result, rerender } = await renderOnWallet1()
+
+        let outcome: Promise<NewOnchainAddressResultType> | undefined
+        act(() => {
+          outcome = result.current.generateNewAddress()
+        })
+        mockMutationFn.mockReturnValueOnce(fetchWallet2.promise)
+        rerender({ walletId: "wallet-2" })
+
+        await act(async () => create.resolve(created("bc1qstale")))
+
+        await expect(outcome).resolves.toBe(NewOnchainAddressResult.Failed)
+        expect(result.current.address).toBe("bc1qcurrent")
+        expect(result.current.loading).toBe(true)
+
+        await act(async () => fetchWallet2.resolve(current("bc1qwallet2")))
+        await waitFor(() => expect(result.current.address).toBe("bc1qwallet2"))
+        expect(result.current.loading).toBe(false)
+      })
+
+      it("ignores the previous wallet's address when it lands last", async () => {
+        const fetchWallet1 = deferred()
+        mockMutationFn.mockReturnValueOnce(fetchWallet1.promise)
+        const { result, rerender } = renderHook(
+          ({ walletId }: { walletId: string }) => useOnChainAddress(walletId),
+          { initialProps: { walletId: "wallet-1" } },
+        )
+
+        mockMutationFn.mockResolvedValueOnce(current("bc1qwallet2"))
+        rerender({ walletId: "wallet-2" })
+        await waitFor(() => expect(result.current.address).toBe("bc1qwallet2"))
+
+        await act(async () => fetchWallet1.resolve(current("bc1qwallet1")))
+
+        expect(result.current.address).toBe("bc1qwallet2")
+        expect(result.current.loading).toBe(false)
+      })
+    })
+
     it("reports the rate limit apart from other failures", async () => {
       mockCreateFn.mockResolvedValue({
         data: {
