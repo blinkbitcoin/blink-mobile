@@ -1525,11 +1525,18 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
         ...walletOverviewQueryResult({ btcBalance: 1000, usdBalance: 0 }),
         refetch: jest.fn(),
       })
-      renderScreen()
+      const { rerender } = renderScreen()
       await flushEffects()
       fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
       await flushEffects()
+      /** And across a visit: leaving and coming back is the same failure, not a new one. */
+      mockIsFocused = false
+      rerender(screenTree())
+      mockIsFocused = true
+      rerender(screenTree())
+      await flushEffects()
 
+      expect(mockSaveCheckpoint.mock.calls.length).toBeGreaterThanOrEqual(3)
       const ownerlessReports = mockReportError.mock.calls.filter(
         ([operation]) => operation === "Migration commit point",
       )

@@ -279,7 +279,9 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     if (writeResult.isSaved) recordedWriteKeyRef.current = commitPointWriteKey
     /** saveCheckpoint already reported a store that refused. One turned away for want of
      *  an owner never reached the store and reported nothing; it repeats on every focus
-     *  and retry while the owner lookup is down, so it is reported once per visit. */
+     *  and retry while the owner lookup is down, so it is reported once for as long as the
+     *  screen is mounted, by the same rule as the handover below: one failure is one event,
+     *  however many times the user comes back to it. */
     const isRefusedWithoutOwner = !writeResult.isSaved && writeResult.failure === null
     if (isRefusedWithoutOwner && !hasReportedOwnerlessWriteRef.current) {
       hasReportedOwnerlessWriteRef.current = true
