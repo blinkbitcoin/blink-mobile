@@ -104,7 +104,7 @@ export const AuthenticatorIntroScreen: React.FC = () => {
           </Text>
         }
       />
-      <View style={styles.benefitsCard}>
+      <View style={styles.benefitsCard} {...testProps("authenticator-intro-benefits")}>
         {benefits.map((benefit, index) => (
           <React.Fragment key={benefit.icon}>
             {index > 0 && (
@@ -134,10 +134,11 @@ const useStyles = makeStyles(({ colors }) => ({
     color: colors.grey1,
     textAlign: "center",
   },
+  /** On the static card surface: the benefits are read, never pressed. */
   benefitsCard: {
     marginTop: 30,
     marginHorizontal: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.grey7,
     borderRadius: 8,
     overflow: "hidden",
   },
