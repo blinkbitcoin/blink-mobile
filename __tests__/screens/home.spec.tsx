@@ -85,7 +85,7 @@ const mockTwoFactorEnforcement = {
   sessionPrompt: "none",
   isSessionStartPending: false,
   shouldShowNudgeCard: false,
-  shouldShowReminderBulletin: false,
+  reminderBulletinReason: null as string | null,
   shouldShowSettingsBanner: false,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
@@ -102,9 +102,12 @@ jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
   TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
 }))
 
-const mockTwoFactorReminderBulletin = jest.fn<null, [Record<string, never>]>(() => null)
+type TwoFactorReminderBulletinProps = { reason: string }
+const mockTwoFactorReminderBulletin = jest.fn<null, [TwoFactorReminderBulletinProps]>(
+  () => null,
+)
 jest.mock("@app/custodial/components/two-factor-reminder-bulletin", () => ({
-  TwoFactorReminderBulletin: (props: Record<string, never>) =>
+  TwoFactorReminderBulletin: (props: TwoFactorReminderBulletinProps) =>
     mockTwoFactorReminderBulletin(props),
 }))
 
@@ -2182,11 +2185,11 @@ describe("TwoFactorNudgeCard gating", () => {
 describe("TwoFactorReminderBulletin gating", () => {
   beforeEach(() => {
     resetHomeScreenMocks()
-    mockTwoFactorEnforcement.shouldShowReminderBulletin = false
+    mockTwoFactorEnforcement.reminderBulletinReason = null
   })
 
   afterEach(() => {
-    mockTwoFactorEnforcement.shouldShowReminderBulletin = false
+    mockTwoFactorEnforcement.reminderBulletinReason = null
   })
 
   const renderHome = () =>
@@ -2196,13 +2199,13 @@ describe("TwoFactorReminderBulletin gating", () => {
       </ContextForScreen>,
     )
 
-  it("renders the bulletin when the enforcement says it is due", async () => {
-    mockTwoFactorEnforcement.shouldShowReminderBulletin = true
+  it("renders the bulletin with its reason when the enforcement gives one", async () => {
+    mockTwoFactorEnforcement.reminderBulletinReason = "new_ath"
 
     renderHome()
     await flushEffects()
 
-    expect(mockTwoFactorReminderBulletin).toHaveBeenCalled()
+    expect(mockTwoFactorReminderBulletin).toHaveBeenCalledWith({ reason: "new_ath" })
   })
 
   it("does not render the bulletin otherwise", async () => {

@@ -2,15 +2,18 @@ import { defaultTwoFactorThresholds } from "@app/config/feature-flags-context"
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
   isAboveAllTimeHigh,
+  isHoldingEnforcedThreshold,
+  isSessionStartHighChange,
   isUsableThresholdSet,
   normalizeStoredRecord,
-  quotedEnforcedThreshold,
   remainingDismissals,
   resolveBalanceTier,
   resolveEnforcedCrossing,
   resolveReminderReason,
   resolveSessionPrompt,
   resolveUnmetTier,
+  thresholdsFromConsole,
+  toWalletThresholds,
   withAllTimeHigh,
   withDismissal,
   withSessionStartHigh,
@@ -36,25 +39,107 @@ const recordWith = (
 ): TwoFactorEnforcementRecord => ({ ...DEFAULT_TWO_FACTOR_ENFORCEMENT, ...overrides })
 
 describe("isUsableThresholdSet", () => {
+  const isUsable = (thresholds: typeof THRESHOLDS) =>
+    isUsableThresholdSet(thresholds, THRESHOLDS)
+
   it("takes the shipped set", () => {
-    expect(isUsableThresholdSet(THRESHOLDS)).toBe(true)
+    expect(isUsable(THRESHOLDS)).toBe(true)
   })
 
   /** A tier reached never lowers, so a higher tier set below a lower one would keep
    *  accounts escalated after the console is fixed. */
   it("refuses a set whose bitcoin tiers do not rise", () => {
-    expect(isUsableThresholdSet({ ...THRESHOLDS, enforcedSats: 400_000 })).toBe(false)
+    expect(isUsable({ ...THRESHOLDS, enforcedSats: 400_000 })).toBe(false)
   })
 
   it("refuses a set whose dollar tiers do not rise", () => {
-    expect(isUsableThresholdSet({ ...THRESHOLDS, suggestedUsdCents: 60_000 })).toBe(false)
+    expect(isUsable({ ...THRESHOLDS, suggestedUsdCents: 60_000 })).toBe(false)
   })
 
-  /** Sats and cents have no fractions, and a crossed threshold is kept as one. */
-  it("refuses a set that holds a fraction of a sat or a cent", () => {
-    expect(isUsableThresholdSet({ ...THRESHOLDS, enforcedUsdCents: 250_000.5 })).toBe(
+  /** Equal thresholds leave the lower tier unreachable: the higher one is found first. */
+  it("refuses a set where two tiers start at the same balance", () => {
+    expect(isUsable({ ...THRESHOLDS, recommendedSats: THRESHOLDS.enforcedSats })).toBe(
       false,
     )
+    expect(
+      isUsable({ ...THRESHOLDS, recommendedUsdCents: THRESHOLDS.enforcedUsdCents }),
+    ).toBe(false)
+    expect(isUsable({ ...THRESHOLDS, suggestedSats: THRESHOLDS.recommendedSats })).toBe(
+      false,
+    )
+    expect(
+      isUsable({ ...THRESHOLDS, suggestedUsdCents: THRESHOLDS.recommendedUsdCents }),
+    ).toBe(false)
+  })
+
+  it("takes a set moved within a factor of ten of the shipped one", () => {
+    expect(
+      isUsable({
+        suggestedSats: 5_000,
+        suggestedUsdCents: 500,
+        recommendedSats: 400_000,
+        recommendedUsdCents: 40_000,
+        enforcedSats: 50_000_000,
+        enforcedUsdCents: 5_000_000,
+      }),
+    ).toBe(true)
+  })
+
+  /** Read as dollars, cents rise tier by tier like any set, and would raise every
+   *  account above $50 to the enforced tier for good. */
+  it("refuses a set that reads cents as dollars", () => {
+    expect(
+      isUsable({
+        ...THRESHOLDS,
+        suggestedUsdCents: 50,
+        recommendedUsdCents: 500,
+        enforcedUsdCents: 5_000,
+      }),
+    ).toBe(false)
+  })
+
+  it("refuses a threshold below a tenth of its default, or above ten times it", () => {
+    expect(isUsable({ ...THRESHOLDS, suggestedSats: 4_999 })).toBe(false)
+    expect(isUsable({ ...THRESHOLDS, enforcedSats: 50_000_001 })).toBe(false)
+  })
+
+  it("refuses a zero or a negative threshold", () => {
+    expect(isUsable({ ...THRESHOLDS, suggestedSats: 0 })).toBe(false)
+    expect(isUsable({ ...THRESHOLDS, suggestedUsdCents: -1 })).toBe(false)
+  })
+})
+
+describe("thresholdsFromConsole", () => {
+  const CONSOLE = {
+    suggestedSats: 50_000,
+    suggestedUsd: 50,
+    recommendedSats: 500_000,
+    recommendedUsd: 500,
+    enforcedSats: 5_000_000,
+    enforcedUsd: 5_000,
+  }
+
+  it("reads the dollars the console writes as the cents the dollar wallet reports", () => {
+    expect(thresholdsFromConsole(CONSOLE)).toEqual(THRESHOLDS)
+    expect(toWalletThresholds(CONSOLE)).toEqual(THRESHOLDS)
+  })
+
+  /** A set is only usable whole: filling the gap with a default would mix two sets. */
+  it("reads nothing from a set with a key missing or misspelled", () => {
+    const { enforcedUsd, ...missing } = CONSOLE
+    expect(enforcedUsd).toBe(5_000)
+    expect(thresholdsFromConsole(missing)).toBeNull()
+    expect(thresholdsFromConsole({ ...missing, enforcedUSD: 5_000 })).toBeNull()
+  })
+
+  it("reads nothing from a set whose dollars or sats are not whole", () => {
+    expect(thresholdsFromConsole({ ...CONSOLE, enforcedUsd: 4_999.5 })).toBeNull()
+    expect(thresholdsFromConsole({ ...CONSOLE, suggestedSats: 50_000.5 })).toBeNull()
+  })
+
+  it("reads nothing from a set that holds something other than a number", () => {
+    expect(thresholdsFromConsole({ ...CONSOLE, recommendedSats: "500000" })).toBeNull()
+    expect(thresholdsFromConsole({ ...CONSOLE, recommendedUsd: null })).toBeNull()
   })
 })
 
@@ -193,30 +278,35 @@ describe("withTierReached", () => {
   })
 })
 
-describe("quotedEnforcedThreshold", () => {
-  /** The console can move the threshold after the account crossed it; the tier stays,
-   *  so the copy keeps quoting the amount that raised it. */
-  it("quotes the threshold the account crossed, not the one configured now", () => {
-    const raised = { ...THRESHOLDS, enforcedSats: 8_000_000 }
-
-    expect(
-      quotedEnforcedThreshold(recordWith({ enforcedThreshold: 5_000_000 }), raised),
-    ).toBe(5_000_000)
+describe("isHoldingEnforcedThreshold", () => {
+  const SATS_CROSSED = recordWith({ enforcedThreshold: 5_000_000 })
+  const USD_CROSSED = recordWith({
+    enforcedCurrency: WalletCurrency.Usd,
+    enforcedThreshold: 500_000,
   })
 
-  it("quotes the configured sats for a record from before the crossing was kept", () => {
-    expect(quotedEnforcedThreshold(DEFAULT_TWO_FACTOR_ENFORCEMENT, THRESHOLDS)).toBe(
-      THRESHOLDS.enforcedSats,
+  it("holds while the wallet that crossed is at or above the threshold it crossed", () => {
+    expect(isHoldingEnforcedThreshold(SATS_CROSSED, walletsWith(5_000_000, 0))).toBe(true)
+    expect(isHoldingEnforcedThreshold(USD_CROSSED, walletsWith(0, 600_000))).toBe(true)
+  })
+
+  /** The tier stays once reached; the balance the copy would state does not. */
+  it("no longer holds once that wallet fell below it", () => {
+    expect(isHoldingEnforcedThreshold(SATS_CROSSED, walletsWith(4_999_999, 0))).toBe(
+      false,
+    )
+    expect(isHoldingEnforcedThreshold(USD_CROSSED, walletsWith(0, 499_999))).toBe(false)
+  })
+
+  /** A record with no crossed threshold kept has no amount to state. */
+  it("does not hold a threshold the record never kept", () => {
+    expect(isHoldingEnforcedThreshold(recordWith({}), walletsWith(9_000_000, 0))).toBe(
+      false,
     )
   })
 
-  it("quotes the configured dollars when such a record names the dollar wallet", () => {
-    expect(
-      quotedEnforcedThreshold(
-        recordWith({ enforcedCurrency: WalletCurrency.Usd }),
-        THRESHOLDS,
-      ),
-    ).toBe(THRESHOLDS.enforcedUsdCents)
+  it("measures only the wallet that crossed", () => {
+    expect(isHoldingEnforcedThreshold(USD_CROSSED, walletsWith(9_000_000, 0))).toBe(false)
   })
 })
 
@@ -298,6 +388,15 @@ describe("dismissals", () => {
     )
   })
 
+  /** The modal stays dismissible while leaving custody is switched off, past the
+   *  allowance: what it counts must not run past it. */
+  it("never counts past the tier's allowance, handing the same record back", () => {
+    const spent = recordWith({ recommendedDismissals: 3, enforcedDismissals: 3 })
+
+    expect(withDismissal(spent, TwoFactorTier.Enforced)).toBe(spent)
+    expect(withDismissal(spent, TwoFactorTier.Recommended)).toBe(spent)
+  })
+
   it("never reports fewer than zero remaining", () => {
     expect(
       remainingDismissals(
@@ -314,12 +413,14 @@ describe("resolveSessionPrompt", () => {
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Suggested,
         record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.None)
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.None,
         record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.None)
   })
@@ -330,12 +431,14 @@ describe("resolveSessionPrompt", () => {
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Recommended,
         record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.None)
     expect(
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Recommended,
         record: recordWith({ recommendedDismissals: 3 }),
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.None)
   })
@@ -345,6 +448,7 @@ describe("resolveSessionPrompt", () => {
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Enforced,
         record: recordWith({ enforcedDismissals: 2 }),
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.SessionModal)
   })
@@ -354,6 +458,7 @@ describe("resolveSessionPrompt", () => {
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Enforced,
         record: recordWith({ recommendedDismissals: 3 }),
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.SessionModal)
   })
@@ -363,8 +468,31 @@ describe("resolveSessionPrompt", () => {
       resolveSessionPrompt({
         unmetTier: TwoFactorTier.Enforced,
         record: recordWith({ enforcedDismissals: 3 }),
+        isCustodyExitOffered: true,
       }),
     ).toBe(TwoFactorSessionPrompt.ProtectionRequired)
+  })
+
+  /** The blocking screen's other way forward is gone: a wall with one door would hold
+   *  an account without an authenticator app. */
+  it("keeps the modal once dismissals are spent while leaving custody is not on offer", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Enforced,
+        record: recordWith({ enforcedDismissals: 3 }),
+        isCustodyExitOffered: false,
+      }),
+    ).toBe(TwoFactorSessionPrompt.SessionModal)
+  })
+
+  it("owes nothing below the enforced tier while leaving custody is not on offer", () => {
+    expect(
+      resolveSessionPrompt({
+        unmetTier: TwoFactorTier.Recommended,
+        record: recordWith({ recommendedDismissals: 3 }),
+        isCustodyExitOffered: false,
+      }),
+    ).toBe(TwoFactorSessionPrompt.None)
   })
 })
 
@@ -382,6 +510,40 @@ describe("all-time highs", () => {
     expect(isAboveAllTimeHigh(highs, undefined)).toBe(false)
   })
 
+  /** A conversion moves funds between the wallets and adds none. */
+  it("reads no new high from a rise in one wallet while the other fell since the last session start", () => {
+    const lastSession = recordWith({
+      highestSats: 800_000,
+      highestUsdCents: 0,
+      lastSessionSats: 800_000,
+      lastSessionUsdCents: 0,
+    })
+
+    expect(isAboveAllTimeHigh(lastSession, walletsWith(600_000, 20_000))).toBe(false)
+    expect(
+      isAboveAllTimeHigh(
+        recordWith({
+          ...lastSession,
+          lastSessionUsdCents: 30_000,
+          highestUsdCents: 30_000,
+        }),
+        walletsWith(900_000, 10_000),
+      ),
+    ).toBe(false)
+  })
+
+  it("reads a new high from a rise in one wallet while the other held or rose", () => {
+    const lastSession = recordWith({
+      highestSats: 800_000,
+      highestUsdCents: 20_000,
+      lastSessionSats: 700_000,
+      lastSessionUsdCents: 20_000,
+    })
+
+    expect(isAboveAllTimeHigh(lastSession, walletsWith(900_000, 20_000))).toBe(true)
+    expect(isAboveAllTimeHigh(lastSession, walletsWith(700_000, 30_000))).toBe(true)
+  })
+
   it("raises each high to its wallet's balance only where the balance is above it", () => {
     expect(withAllTimeHigh(highs, walletsWith(900_000, 10_000))).toMatchObject({
       highestSats: 900_000,
@@ -393,6 +555,39 @@ describe("all-time highs", () => {
     expect(
       withSessionStartHigh(highs, walletsWith(900_000, 0), TwoFactorTier.Recommended),
     ).toMatchObject({ highestSats: 900_000, isNewHighPending: true })
+  })
+
+  it("keeps the balances it read for the next session start", () => {
+    expect(
+      withSessionStartHigh(
+        highs,
+        walletsWith(700_000, 50_000),
+        TwoFactorTier.Recommended,
+      ),
+    ).toMatchObject({ lastSessionSats: 700_000, lastSessionUsdCents: 50_000 })
+  })
+
+  it("raises the high a conversion reached without leaving a new high pending", () => {
+    const converted = recordWith({
+      highestSats: 800_000,
+      highestUsdCents: 0,
+      lastSessionSats: 800_000,
+      lastSessionUsdCents: 0,
+    })
+
+    expect(
+      withSessionStartHigh(
+        converted,
+        walletsWith(600_000, 20_000),
+        TwoFactorTier.Recommended,
+      ),
+    ).toMatchObject({
+      highestSats: 800_000,
+      highestUsdCents: 20_000,
+      lastSessionSats: 600_000,
+      lastSessionUsdCents: 20_000,
+      isNewHighPending: false,
+    })
   })
 
   it("keeps a new high pending from an earlier session while the recommended tier is owed", () => {
@@ -436,6 +631,56 @@ describe("all-time highs", () => {
     expect(
       withSessionStartHigh(highs, walletsWith(900_000, 0), TwoFactorTier.None),
     ).toMatchObject({ highestSats: 900_000, isNewHighPending: false })
+  })
+})
+
+describe("isSessionStartHighChange", () => {
+  const read = recordWith({
+    highestSats: 800_000,
+    highestUsdCents: 60_000,
+    lastSessionSats: 700_000,
+    lastSessionUsdCents: 60_000,
+  })
+
+  it("changes nothing when the balances are the ones the last session start kept", () => {
+    expect(
+      isSessionStartHighChange(
+        read,
+        walletsWith(700_000, 60_000),
+        TwoFactorTier.Recommended,
+      ),
+    ).toBe(false)
+  })
+
+  it("changes the record for a wallet above its high, whatever moved it", () => {
+    expect(
+      isSessionStartHighChange(read, walletsWith(900_000, 0), TwoFactorTier.Recommended),
+    ).toBe(true)
+  })
+
+  it("changes the record when the balances moved below the highs", () => {
+    expect(
+      isSessionStartHighChange(
+        read,
+        walletsWith(600_000, 60_000),
+        TwoFactorTier.Recommended,
+      ),
+    ).toBe(true)
+  })
+
+  it("changes the record to settle a pending new high the account no longer owes", () => {
+    const pending = recordWith({ ...read, isNewHighPending: true })
+
+    expect(
+      isSessionStartHighChange(pending, walletsWith(700_000, 60_000), TwoFactorTier.None),
+    ).toBe(true)
+    expect(
+      isSessionStartHighChange(
+        pending,
+        walletsWith(700_000, 60_000),
+        TwoFactorTier.Recommended,
+      ),
+    ).toBe(false)
   })
 })
 
@@ -491,6 +736,8 @@ describe("normalizeStoredRecord", () => {
       highestSats: 800_000,
       highestUsdCents: 60_000,
       enforcedThreshold: 500_000,
+      lastSessionSats: 700_000,
+      lastSessionUsdCents: 50_000,
       isNewHighPending: true,
     }
 
@@ -534,7 +781,12 @@ describe("normalizeStoredRecord", () => {
     )
   })
 
-  /** Dropped, the copy quotes the threshold configured now instead. */
+  it("drops a balance kept for the next session start that is not a whole, non-negative one", () => {
+    expect(
+      normalizeStoredRecord({ lastSessionSats: -1, lastSessionUsdCents: "50" }),
+    ).toEqual(DEFAULT_TWO_FACTOR_ENFORCEMENT)
+  })
+
   it("drops a crossed threshold that is not a whole, non-negative amount", () => {
     expect(normalizeStoredRecord({ enforcedThreshold: 2.5 })).toEqual(
       DEFAULT_TWO_FACTOR_ENFORCEMENT,

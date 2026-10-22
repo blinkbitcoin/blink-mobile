@@ -1,18 +1,24 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import remoteConfigInstance from "@react-native-firebase/remote-config"
 
-import { isUsableThresholdSet } from "@app/custodial/two-factor-enforcement"
+import {
+  isUsableThresholdSet,
+  thresholdsFromConsole,
+  toWalletThresholds,
+} from "@app/custodial/two-factor-enforcement"
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
-import { TwoFactorThresholds } from "@app/types/two-factor-enforcement"
+import {
+  TwoFactorConsoleThresholds,
+  TwoFactorThresholds,
+} from "@app/types/two-factor-enforcement"
 import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigPositiveNumber,
-  getRemoteConfigPositiveNumericObject,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
@@ -86,6 +92,10 @@ type FeatureFlags = {
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
   remoteConfigReady: boolean
+  /** Whether `nonCustodialEnabled` is the console's: fetched on this launch, or
+   *  activated on an earlier one and read before this launch's fetch settles. Off, it is
+   *  the shipped default, which says nothing about what the console set. */
+  isNonCustodialFlagSettled: boolean
 }
 
 type RemoteConfig = {
@@ -160,18 +170,22 @@ export const defaultFeeRatesConfig: FeeRatesConfig = {
   transferBps: 50,
 }
 
-/** The two-factor tiers as shipped: 50,000 sats or $50 for the suggested tier, 500,000
- *  sats or $500 for the recommended tier, 5,000,000 sats or $5,000 for the enforced
- *  tier. Dollars are in cents, the unit the dollar wallet reports its balance in. A
- *  value the console sets that is not above zero falls back to its default here. */
-export const defaultTwoFactorThresholds: TwoFactorThresholds = {
+/** The two-factor tiers as shipped, as the console writes them: 50,000 sats or $50 for
+ *  the suggested tier, 500,000 sats or $500 for the recommended tier, 5,000,000 sats or
+ *  $5,000 for the enforced tier. */
+export const defaultTwoFactorConsoleThresholds: TwoFactorConsoleThresholds = {
   suggestedSats: 50_000,
-  suggestedUsdCents: 5_000,
+  suggestedUsd: 50,
   recommendedSats: 500_000,
-  recommendedUsdCents: 50_000,
+  recommendedUsd: 500,
   enforcedSats: 5_000_000,
-  enforcedUsdCents: 500_000,
+  enforcedUsd: 5_000,
 }
+
+/** The same tiers in the wallets' own units, dollars in cents. */
+export const defaultTwoFactorThresholds: TwoFactorThresholds = toWalletThresholds(
+  defaultTwoFactorConsoleThresholds,
+)
 
 /** Default transfer/swap block, read by both account types. */
 // prettier-ignore
@@ -293,34 +307,47 @@ const defaultFeatureFlags: FeatureFlags = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   remoteConfigReady: false,
+  isNonCustodialFlagSettled: false,
 }
 
-remoteConfigInstance().setDefaults({
-  ...defaultRemoteConfig,
-  replaceCardDeliveryConfig: serializeRemoteConfigDefault(
-    defaultReplaceCardDeliveryConfig,
-  ),
-  custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
-    custodialFirstSignupBlockedDefault,
-  ),
-  selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
-  ),
-  selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-  ),
-  selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.selfCustodialCreationBlockedCountries,
-  ),
-  offboardOnlyCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.offboardOnlyCountries,
-  ),
-  custodialTwoFactorThresholds: serializeRemoteConfigDefault(defaultTwoFactorThresholds),
-  feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
-})
+/** Applied asynchronously: until it lands Firebase reports every key as static, values it
+ *  activated on an earlier launch included. */
+const defaultsApplied = Promise.resolve(
+  remoteConfigInstance().setDefaults({
+    ...defaultRemoteConfig,
+    replaceCardDeliveryConfig: serializeRemoteConfigDefault(
+      defaultReplaceCardDeliveryConfig,
+    ),
+    custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
+      custodialFirstSignupBlockedDefault,
+    ),
+    selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
+    ),
+    selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+    ),
+    selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+    ),
+    offboardOnlyCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.offboardOnlyCountries,
+    ),
+    custodialTwoFactorThresholds: serializeRemoteConfigDefault(
+      defaultTwoFactorConsoleThresholds,
+    ),
+    feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
+  }),
+)
+
+/** A fetch that has not answered in this long settles as failed, and the app goes on
+ *  with what an earlier launch activated: what waits on the fetch, as the two-factor
+ *  tiers do, must not wait out Firebase's own minute on a weak connection. */
+const FETCH_TIMEOUT_MS = 10_000
 
 remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,
+  fetchTimeMillis: FETCH_TIMEOUT_MS,
 })
 
 /** A value Firebase holds for the key, or none while it holds only the static empty
@@ -340,18 +367,28 @@ const readNumber = (key: string, fallback: number): number =>
 const readString = (key: string, fallback: string): string =>
   activatedValue(key)?.asString() ?? fallback
 
-/** The tier thresholds as the console sets them, read as one set: a set the two-factor
- *  rules cannot use falls back to the shipped one as a whole, and is reported. */
+/** Whether Firebase holds a value the console set for the key, activated on this
+ *  launch or an earlier one, rather than the shipped default. */
+const isFromConsole = (key: string): boolean =>
+  remoteConfigInstance().getValue(key).getSource() === "remote"
+
+/** The tier thresholds as the console sets them, read and checked once, as a set: a
+ *  set the two-factor rules cannot use, incomplete or out of bounds, falls back to the
+ *  shipped one as a whole, and is reported. Mixing a console value with a shipped one
+ *  could pass every check and still not be a set anyone wrote. */
 const readTwoFactorThresholds = (): TwoFactorThresholds => {
-  const thresholds = getRemoteConfigPositiveNumericObject(
+  const value = getRemoteConfigObject<Record<string, unknown>>(
     CustodialTwoFactorThresholdsKey,
-    defaultTwoFactorThresholds,
+    defaultTwoFactorConsoleThresholds,
   )
-  if (isUsableThresholdSet(thresholds)) return thresholds
+  const thresholds = thresholdsFromConsole(value)
+  const isUsable =
+    thresholds !== null && isUsableThresholdSet(thresholds, defaultTwoFactorThresholds)
+  if (isUsable) return thresholds
   logError({
     scope: "remote-config",
     error: new Error(`Thresholds in "${CustodialTwoFactorThresholdsKey}" are not usable`),
-    context: { key: CustodialTwoFactorThresholdsKey, thresholds },
+    context: { key: CustodialTwoFactorThresholdsKey, value },
   })
   return defaultTwoFactorThresholds
 }
@@ -660,6 +697,13 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
+  /** Whether `nonCustodialEnabled` is the console's: activated on an earlier launch,
+   *  which cannot change before this launch's fetch settles and is readable once the
+   *  shipped defaults land, or by that fetch. A fetch that fails with nothing activated
+   *  before leaves the shipped default, which says nothing about the console. */
+  const [isNonCustodialFlagSettled, setIsNonCustodialFlagSettled] = useState(() =>
+    isFromConsole(NonCustodialEnabledKey),
+  )
   const rolloutLoggedRef = useRef(false)
 
   const {
@@ -671,9 +715,33 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
    *  leaves Firebase holding what the device activated on an earlier launch, which the
    *  first read could not see while the shipped defaults were still being applied. */
   useEffect(() => {
+    let isMounted = true
+    /** Once the shipped defaults land, what an earlier launch activated is readable:
+     *  the config is read again from it, so the flag that says it is the console's
+     *  never runs ahead of the values it vouches for. */
+    defaultsApplied
+      .then(() => {
+        if (!isMounted) return
+        setRemoteConfig(readRemoteConfig())
+        if (isFromConsole(NonCustodialEnabledKey)) setIsNonCustodialFlagSettled(true)
+      })
+      .catch((err) =>
+        logError({
+          scope: "remote-config",
+          error: err,
+          context: { stage: "setDefaults" },
+        }),
+      )
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
+  useEffect(() => {
     ;(async () => {
       try {
         await remoteConfigInstance().fetchAndActivate()
+        setIsNonCustodialFlagSettled(true)
       } catch (err) {
         logError({
           scope: "remote-config",
@@ -684,6 +752,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
       } finally {
         setRemoteConfig(readRemoteConfig())
         setRemoteConfigReady(true)
+        if (isFromConsole(NonCustodialEnabledKey)) setIsNonCustodialFlagSettled(true)
       }
     })()
   }, [])
@@ -695,6 +764,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
     remoteConfigReady,
+    isNonCustodialFlagSettled,
   }
 
   useEffect(() => {

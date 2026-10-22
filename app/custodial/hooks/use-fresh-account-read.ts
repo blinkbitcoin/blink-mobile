@@ -20,6 +20,9 @@ type ReadState = {
 
 const IDLE: ReadState = { client: null, status: FreshAccountRead.Idle }
 
+/** How long the read may stay out before it counts as failed. */
+const FRESH_READ_TIMEOUT_MS = 10_000
+
 /**
  * The session's read of the account from the network, apart from the cache the screens
  * read. The persisted cache answers first, and a cache-and-network query reports the
@@ -29,7 +32,11 @@ const IDLE: ReadState = { client: null, status: FreshAccountRead.Idle }
  * client, whose answer lands in the cache for every reader; its status says whether the
  * account on hand is one the network confirmed. A read that fails stays failed for the
  * session: other queries may write the cache again, but the network never confirmed it
- * for this one.
+ * for this one. A read still out after a while counts as failed too, so a network that
+ * never answers holds nothing that waits on it for the whole session, and an answer that
+ * lands after that is no read of this session's start: the session has been decided
+ * without it, and what it would write waits for the next one. Whichever settles first
+ * decides.
  */
 export const useFreshAccountRead = (isEnabled: boolean): FreshAccountRead => {
   const client = useApolloClient()
@@ -41,17 +48,24 @@ export const useFreshAccountRead = (isEnabled: boolean): FreshAccountRead => {
       return
     }
     let isCurrent = true
+    const settle = (status: FreshAccountRead) => {
+      if (!isCurrent) return
+      isCurrent = false
+      setRead({ client, status })
+    }
+    const timeout = setTimeout(
+      () => settle(FreshAccountRead.Failed),
+      FRESH_READ_TIMEOUT_MS,
+    )
     setRead({ client, status: FreshAccountRead.Pending })
     client
       .query({ query: SettingsScreenDocument, fetchPolicy: "network-only" })
-      .then(() => {
-        if (isCurrent) setRead({ client, status: FreshAccountRead.Confirmed })
-      })
-      .catch(() => {
-        if (isCurrent) setRead({ client, status: FreshAccountRead.Failed })
-      })
+      .then(() => settle(FreshAccountRead.Confirmed))
+      .catch(() => settle(FreshAccountRead.Failed))
+      .finally(() => clearTimeout(timeout))
     return () => {
       isCurrent = false
+      clearTimeout(timeout)
     }
   }, [client, isEnabled])
 

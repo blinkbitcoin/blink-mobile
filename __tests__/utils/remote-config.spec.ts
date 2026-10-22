@@ -3,7 +3,6 @@ import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigPositiveNumber,
-  getRemoteConfigPositiveNumericObject,
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
@@ -303,51 +302,6 @@ describe("getRemoteConfigNumericObject", () => {
         context: expect.objectContaining({ actualShape: "array" }),
       }),
     )
-  })
-})
-
-describe("getRemoteConfigPositiveNumericObject", () => {
-  const defaults = { suggestedSats: 50_000, suggestedUsdCents: 5_000 }
-
-  beforeEach(() => {
-    jest.clearAllMocks()
-  })
-
-  it("merges positive values over the defaults", () => {
-    mockAsString.mockReturnValue('{"suggestedSats":40000}')
-
-    expect(getRemoteConfigPositiveNumericObject("thresholds-key", defaults)).toEqual({
-      suggestedSats: 40_000,
-      suggestedUsdCents: 5_000,
-    })
-    expect(mockLogError).not.toHaveBeenCalled()
-  })
-
-  /** A zero threshold would hold every balance over it. */
-  it("drops a zero or a negative value, keeps its default and logs the dropped keys", () => {
-    mockAsString.mockReturnValue('{"suggestedSats":0,"suggestedUsdCents":-1}')
-
-    expect(getRemoteConfigPositiveNumericObject("thresholds-key", defaults)).toEqual(
-      defaults,
-    )
-    expect(mockLogError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        scope: "remote-config",
-        context: {
-          key: "thresholds-key",
-          droppedKeys: ["suggestedSats", "suggestedUsdCents"],
-        },
-      }),
-    )
-  })
-
-  it("returns the defaults themselves when nothing usable is set", () => {
-    mockAsString.mockReturnValue("")
-
-    expect(getRemoteConfigPositiveNumericObject("thresholds-key", defaults)).toBe(
-      defaults,
-    )
-    expect(mockLogError).not.toHaveBeenCalled()
   })
 })
 

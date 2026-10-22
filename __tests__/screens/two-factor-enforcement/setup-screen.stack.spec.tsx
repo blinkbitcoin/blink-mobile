@@ -44,6 +44,8 @@ const mockEnforcement = {
   tier: TwoFactorTier.Suggested as TwoFactorTier,
   unmetTier: TwoFactorTier.Suggested as TwoFactorTier,
   hasAuthenticator: false,
+  isEnforced: true,
+  isCustodyExitOffered: true,
   remainingDismissals: 3,
   shouldShowNudgeCard: true,
   shouldShowSettingsBanner: true,

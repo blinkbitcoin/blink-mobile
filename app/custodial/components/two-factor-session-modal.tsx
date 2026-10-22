@@ -7,8 +7,8 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import CustomModal from "@app/components/custom-modal/custom-modal"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { testProps } from "@app/utils/testProps"
 
@@ -32,10 +32,19 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   /** Declining leads to leaving custody, so it is offered only while the self-custodial
-   *  stack is on: nothing may push the user toward it once it is switched off, and the
-   *  modal then asks for the authenticator alone. */
-  const isDeclineOffered = !useSelfCustodialDisabled()
-  const declineTitle = isDeclineOffered ? LL.TwoFactorEnforcement.dontWantTo() : undefined
+   *  stack is known to be on: nothing may push the user toward it once it is switched
+   *  off, and the modal then asks for the authenticator alone. */
+  const { isCustodyExitOffered, isCustodyExitOff } = useTwoFactorEnforcement()
+  const declineTitle = isCustodyExitOffered
+    ? LL.TwoFactorEnforcement.dontWantTo()
+    : undefined
+  /** The countdown leads to the blocking screen, which does not stand while leaving
+   *  custody is switched off: the modal then stays dismissible and spends nothing, and
+   *  a countdown would promise an end that does not come. */
+  const countdown = isCustodyExitOff ? null : countdownCopy(LL, remainingDismissals)
+  const description = countdown
+    ? `${LL.TwoFactorEnforcement.cardDescription()} ${countdown}`
+    : LL.TwoFactorEnforcement.cardDescription()
 
   /** Either button makes way for the flow it opens, with no dismissal yet: the modal
    *  hides in the same frame as the push, since a native modal dismissed while a
@@ -77,10 +86,7 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
       title={LL.TwoFactorEnforcement.title()}
       body={
         <>
-          <Text style={styles.description}>
-            {LL.TwoFactorEnforcement.cardDescription()}{" "}
-            {countdownCopy(LL, remainingDismissals)}
-          </Text>
+          <Text style={styles.description}>{description}</Text>
           <Text style={styles.description}>
             {LL.TwoFactorEnforcement.modalReminder()}
           </Text>
@@ -97,11 +103,13 @@ export const TwoFactorSessionModal: React.FC<TwoFactorSessionModalProps> = ({
 
 type Translations = ReturnType<typeof useI18nContext>["LL"]
 
-/** The body counts down what is left after the dismissal the user is looking at. */
-const countdownCopy = (LL: Translations, remainingDismissals: number): string => {
+/** The body counts down what is left after the dismissal the user is looking at, and
+ *  says nothing once none is left. */
+const countdownCopy = (LL: Translations, remainingDismissals: number): string | null => {
   if (remainingDismissals >= 3) return LL.TwoFactorEnforcement.dismissTwoMore()
   if (remainingDismissals === 2) return LL.TwoFactorEnforcement.dismissOneMore()
-  return LL.TwoFactorEnforcement.dismissLast()
+  if (remainingDismissals === 1) return LL.TwoFactorEnforcement.dismissLast()
+  return null
 }
 
 const useStyles = makeStyles(({ colors }) => ({

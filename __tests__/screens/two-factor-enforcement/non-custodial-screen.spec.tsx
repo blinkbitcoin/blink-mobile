@@ -18,6 +18,7 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+let mockIsFocused = true
 let mockRouteParams: { origin?: TwoFactorPromptOrigin; isFromSetup?: boolean } | undefined
 
 const MODAL_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.SessionModal }
@@ -26,6 +27,7 @@ jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
   useRoute: () => ({ params: mockRouteParams }),
+  useIsFocused: () => mockIsFocused,
 }))
 
 const mockUseHardwareBackGuard = jest.fn()
@@ -34,9 +36,11 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 }))
 
 const mockRegisterDismissal = jest.fn()
+let mockIsCustodyExitOffered = true
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => ({
     unmetTier: 3,
+    isCustodyExitOffered: mockIsCustodyExitOffered,
     registerDismissal: mockRegisterDismissal,
   }),
 }))
@@ -63,6 +67,8 @@ describe("TwoFactorNonCustodialScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockRouteParams = { origin: MODAL_ORIGIN }
+    mockIsCustodyExitOffered = true
+    mockIsFocused = true
   })
 
   it("renders the key hero with the non-custodial copy and logs it as shown once", async () => {
@@ -138,5 +144,32 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
     expect(mockGoBack).toHaveBeenCalledTimes(2)
+  })
+
+  /** Every way here is hidden while leaving custody is off; a navigation already on its
+   *  way steps aside, and the user declined nothing. */
+  it("steps aside at once, charging nothing, while leaving custody is not on offer", async () => {
+    mockIsCustodyExitOffered = false
+    await renderScreen()
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
+  })
+
+  /** Under the migration it led to, going back would close that flow. */
+  it("stays put while another screen is on top, even with leaving custody off", async () => {
+    mockIsCustodyExitOffered = false
+    mockIsFocused = false
+    await renderScreen()
+
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("stays while leaving custody is on offer", async () => {
+    await renderScreen()
+
+    expect(mockGoBack).not.toHaveBeenCalled()
   })
 })

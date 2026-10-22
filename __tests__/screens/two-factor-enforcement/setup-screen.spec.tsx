@@ -35,11 +35,6 @@ jest.mock("@react-navigation/native", () => ({
   useRoute: () => ({ params: mockRouteParams }),
 }))
 
-let mockIsSelfCustodialDisabled = false
-jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
-  useSelfCustodialDisabled: () => mockIsSelfCustodialDisabled,
-}))
-
 const mockUseHardwareBackGuard = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => ({
   useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
@@ -55,6 +50,7 @@ const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.Suggested as TwoFactorTier,
   hasAuthenticator: false,
+  isCustodyExitOffered: true,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
   registerDismissal: mockRegisterDismissal,
@@ -103,8 +99,8 @@ describe("TwoFactorSetupScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockIsFocused = true
-    mockRouteParams = BANNER_ORIGIN
-    mockIsSelfCustodialDisabled = false
+    mockRouteParams = BULLETIN_ORIGIN
+    mockEnforcement.isCustodyExitOffered = true
     mockEnforcement.unmetTier = TwoFactorTier.Suggested
     mockEnforcement.hasAuthenticator = false
   })
@@ -128,8 +124,8 @@ describe("TwoFactorSetupScreen", () => {
   })
 
   /** With the self-custodial stack switched off there is nothing to move toward. */
-  it("offers the authenticator alone while the self-custodial stack is switched off", async () => {
-    mockIsSelfCustodialDisabled = true
+  it("offers the authenticator alone while leaving custody is not on offer", async () => {
+    mockEnforcement.isCustodyExitOffered = false
     await renderScreen()
 
     expect(primaryButton().props.title).toBe(LL.TwoFactorEnforcement.setAuthenticator())
@@ -176,7 +172,7 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BANNER_ORIGIN,
+      BULLETIN_ORIGIN,
     )
   })
 
@@ -190,7 +186,7 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BANNER_ORIGIN,
+      BULLETIN_ORIGIN,
     )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
@@ -203,23 +199,24 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BANNER_ORIGIN,
+      BULLETIN_ORIGIN,
     )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   /** Leaving the setup unfinished is the dismissal of the prompt that opened it, which
-   *  the enforcement reports once it counts it. */
-  it("charges an exit to the prompt that opened it, with the reason it was up", async () => {
+   *  the enforcement reports once it counts it, and which it ignores for the Settings
+   *  banner, a prompt with no dismissal. */
+  it("hands an exit to the enforcement with the prompt that opened it", async () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
-    mockRouteParams = BULLETIN_ORIGIN
+    mockRouteParams = BANNER_ORIGIN
     await renderScreen()
 
     pressHardwareBack()
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BULLETIN_ORIGIN,
+      BANNER_ORIGIN,
     )
   })
 

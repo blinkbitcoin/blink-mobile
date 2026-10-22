@@ -52,11 +52,8 @@ jest.mock("@app/components/atomic/galoy-primary-button", () => ({
 
 const mockMarkPromptShown = jest.fn()
 const mockDismissReminderBulletin = jest.fn()
-let mockReminderReason: TwoFactorReminderReason | null =
-  TwoFactorReminderReason.FirstSessions
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => ({
-    reminderReason: mockReminderReason,
     markPromptShown: mockMarkPromptShown,
     dismissReminderBulletin: mockDismissReminderBulletin,
   }),
@@ -82,11 +79,12 @@ jest.mock("@app/i18n/i18n-react", () => ({
 describe("TwoFactorReminderBulletin", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockReminderReason = TwoFactorReminderReason.FirstSessions
   })
 
   it("renders the title, the text and Set authenticator, with no amount and no countdown", () => {
-    const { getByText, queryByText } = render(<TwoFactorReminderBulletin />)
+    const { getByText, queryByText } = render(
+      <TwoFactorReminderBulletin reason={TwoFactorReminderReason.FirstSessions} />,
+    )
 
     expect(getByText(TITLE)).toBeTruthy()
     expect(getByText(DESCRIPTION)).toBeTruthy()
@@ -95,8 +93,7 @@ describe("TwoFactorReminderBulletin", () => {
   })
 
   it("reports itself as shown with the reason it is up for", () => {
-    mockReminderReason = TwoFactorReminderReason.NewAllTimeHigh
-    render(<TwoFactorReminderBulletin />)
+    render(<TwoFactorReminderBulletin reason={TwoFactorReminderReason.NewAllTimeHigh} />)
 
     expect(mockMarkPromptShown).toHaveBeenCalledTimes(1)
     expect(mockMarkPromptShown).toHaveBeenCalledWith(
@@ -105,16 +102,10 @@ describe("TwoFactorReminderBulletin", () => {
     )
   })
 
-  it("is not up, and reports nothing, while it has no reason to be", () => {
-    mockReminderReason = null
-    const { queryByText } = render(<TwoFactorReminderBulletin />)
-
-    expect(queryByText(TITLE)).toBeNull()
-    expect(mockMarkPromptShown).not.toHaveBeenCalled()
-  })
-
   it("opens the setup from Set authenticator, telling it the bulletin opened it and why", () => {
-    const { getByTestId } = render(<TwoFactorReminderBulletin />)
+    const { getByTestId } = render(
+      <TwoFactorReminderBulletin reason={TwoFactorReminderReason.FirstSessions} />,
+    )
 
     fireEvent.press(getByTestId("cta-button"))
 
@@ -125,7 +116,9 @@ describe("TwoFactorReminderBulletin", () => {
   })
 
   it("hands the X to the enforcement's dismissal", () => {
-    const { getByTestId } = render(<TwoFactorReminderBulletin />)
+    const { getByTestId } = render(
+      <TwoFactorReminderBulletin reason={TwoFactorReminderReason.FirstSessions} />,
+    )
 
     fireEvent.press(getByTestId("dismiss-button"))
 

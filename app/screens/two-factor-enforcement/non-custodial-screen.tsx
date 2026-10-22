@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import {
+  RouteProp,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -33,19 +38,13 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
     >()
   const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorNonCustodial">>()
   const isFromSetup = params?.isFromSetup ?? false
-  const { unmetTier, registerDismissal } = useTwoFactorEnforcement()
+  const isFocused = useIsFocused()
+  const { unmetTier, isCustodyExitOffered, registerDismissal } = useTwoFactorEnforcement()
   /** The tier this screen was opened for: what it reports, and what backing out of it
    *  is charged to, even if the balance moves while it is open. */
   const [promptTier] = useState(unmetTier)
   /** The prompt that opened it, whose dismissal backing out is. */
   const [origin] = useState(params?.origin)
-
-  useEffect(() => {
-    logTwoFactorPromptShown({
-      tier: promptTier,
-      prompt: TwoFactorPrompt.NonCustodialScreen,
-    })
-  }, [promptTier])
 
   /** Backing out here, by Cancel, the X or the hardware back, is the dismissal the modal
    *  deferred. The swipe is off for this route, so no exit skips the count. Opened from
@@ -57,6 +56,24 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
   }, [isFromSetup, registerDismissal, promptTier, origin, navigation])
 
   useHardwareBackGuard(handleCancel)
+
+  /** Every way here is hidden while the self-custodial stack is switched off, but a
+   *  navigation already on its way can still land: the screen then steps aside at once,
+   *  with no dismissal, since the user never got to decline anything. Only while
+   *  focused: going back from under the migration it led to would close that flow. */
+  const isStale = isFocused && !isCustodyExitOffered
+  useEffect(() => {
+    if (isStale) navigation.goBack()
+  }, [isStale, navigation])
+
+  /** A screen that steps aside at once was never seen, so it is no impression. */
+  useEffect(() => {
+    if (isStale) return
+    logTwoFactorPromptShown({
+      tier: promptTier,
+      prompt: TwoFactorPrompt.NonCustodialScreen,
+    })
+  }, [promptTier, isStale])
 
   const handleMove = useCallback(() => {
     logTwoFactorNonCustodialChosen({ tier: promptTier })
