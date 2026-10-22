@@ -23,12 +23,25 @@ type MigrationLock = {
   /** A failed read is not an unlocked account either: it travels too, so the gate can block
    *  with a retry instead of silently re-pitching the intro to a locked user. */
   hasError: boolean
-  /** Re-runs the read behind the gate's retry control. */
-  refetch: () => Promise<unknown>
+  /** Re-runs the read behind the gate's retry control, answering with the fresh phase. */
+  refetch: () => Promise<MigrationStatus | null>
+}
+
+type UseMigrationLockOptions = {
+  /** For a caller that only reads the answer in some states, so the uncached read is not
+   *  paid for (nor waited on) where its answer is never used. A skipped lock answers
+   *  nothing and is not loading. */
+  skip?: boolean
 }
 
 /** One report per phase this build has never heard of, however many screens read it. */
 const reportedUnknownStatuses = new Set<string>()
+
+/** Forgets which phases were reported, for test isolation: the set lives as long as the
+ *  process, so a test reusing a phase name would otherwise see no report at all. */
+export const resetReportedUnknownMigrationStatuses = (): void => {
+  reportedUnknownStatuses.clear()
+}
 
 /**
  * Whether the ACTIVE account is past the migration's point of no return, as the server
@@ -41,13 +54,6 @@ const reportedUnknownStatuses = new Set<string>()
  * the server actually reported locks, because locking every offline launch into a
  * migration is far worse than letting a locked user browse until the next successful read.
  */
-type UseMigrationLockOptions = {
-  /** For a caller that only reads the answer in some states, so the uncached read is not
-   *  paid for (nor waited on) where its answer is never used. A skipped lock answers
-   *  nothing and is not loading. */
-  skip?: boolean
-}
-
 export const useMigrationLock = ({
   skip = false,
 }: UseMigrationLockOptions = {}): MigrationLock => {

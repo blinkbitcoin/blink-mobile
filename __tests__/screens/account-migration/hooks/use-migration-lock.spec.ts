@@ -1,7 +1,10 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
-import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
+import {
+  resetReportedUnknownMigrationStatuses,
+  useMigrationLock,
+} from "@app/screens/account-migration/hooks/use-migration-lock"
 import { ServerMigrationFlow } from "@app/types/migration"
 import { AccountType } from "@app/types/wallet"
 
@@ -30,8 +33,8 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (operation: string, err: unknown) => mockReportError(operation, err),
 }))
 
-/** A phase the server may add after this build shipped; each test names its own, since
- *  the hook reports a given phase only once per process. */
+/** A phase the server may add after this build shipped. The hook reports a given phase
+ *  only once per process, so every test starts from a forgotten set. */
 const phaseFromANewerServer = (name: string) => name as unknown as MigrationStatus
 
 const serverReports = (
@@ -43,6 +46,7 @@ const serverReports = (
 describe("useMigrationLock", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetReportedUnknownMigrationStatuses()
     mockActiveAccountType = AccountType.Custodial
     mockRegistryLoading = false
   })
@@ -284,7 +288,7 @@ describe("useMigrationLock", () => {
 
     it("reports a phase this build does not know, once", () => {
       mockUseMigrationStatus.mockReturnValue(
-        serverReports(phaseFromANewerServer("AWAITING_COMPLIANCE")),
+        serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
       )
 
       const { rerender } = renderHook(() => useMigrationLock())
@@ -295,7 +299,7 @@ describe("useMigrationLock", () => {
       expect(mockReportError).toHaveBeenCalledWith(
         "Migration status unknown to this build",
         expect.objectContaining({
-          message: expect.stringContaining("AWAITING_COMPLIANCE"),
+          message: expect.stringContaining("PAUSED_FOR_REVIEW"),
         }),
       )
     })
