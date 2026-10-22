@@ -1,4 +1,5 @@
 import React from "react"
+import { Alert } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
@@ -90,6 +91,44 @@ describe("TotpRegistrationInitiateScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationValidate", {
       totpRegistrationId: "reg",
       returnTo: "twoFactorSetup",
+    })
+  })
+
+  it("says so, and offers no next step, when the registration comes back without an id", async () => {
+    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => {})
+    mockTotpInitiate.mockResolvedValue({
+      data: { userTotpRegistrationInitiate: { errors: null, totpSecret: "SECRET" } },
+    })
+
+    await renderScreen(undefined)
+
+    expect(alert).toHaveBeenCalledWith(LL.common.error())
+    expect(screen.queryByText(LL.common.next())).toBeNull()
+    alert.mockRestore()
+  })
+
+  it("says so, and offers no next step, when the registration comes back without a secret", async () => {
+    const alert = jest.spyOn(Alert, "alert").mockImplementation(() => {})
+    mockTotpInitiate.mockResolvedValue({
+      data: { userTotpRegistrationInitiate: { errors: null, totpRegistrationId: "reg" } },
+    })
+
+    await renderScreen(undefined)
+
+    expect(alert).toHaveBeenCalledWith(LL.common.error())
+    expect(screen.queryByText(LL.common.next())).toBeNull()
+    alert.mockRestore()
+  })
+
+  it("passes on the prompt that led to the registration, for the setup it reports", async () => {
+    await renderScreen({ returnTo: "Primary", prompt: "protection_required_screen" })
+
+    fireEvent.press(screen.getByText(LL.common.next()))
+
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationValidate", {
+      totpRegistrationId: "reg",
+      returnTo: "Primary",
+      prompt: "protection_required_screen",
     })
   })
 })

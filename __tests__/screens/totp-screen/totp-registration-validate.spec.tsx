@@ -36,10 +36,12 @@ jest.mock("@app/graphql/generated", () => ({
   useUserTotpRegistrationValidateMutation: () => [mockTotpValidate, { loading: false }],
 }))
 
-/** The account's balance tier, as the two-factor enforcement reads it. */
+/** The account's balance tier, as the two-factor enforcement reads it, and whether the
+ *  prompts apply to it. */
 let mockTier = 2
+let mockIsEnforced = true
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
-  useTwoFactorEnforcement: () => ({ tier: mockTier }),
+  useTwoFactorEnforcement: () => ({ tier: mockTier, isEnforced: mockIsEnforced }),
 }))
 
 const mockLogTwoFactorSetupCompleted = jest.fn()
@@ -111,6 +113,7 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
     mockStackRouteNames = ["Primary", "settings", "totpRegistrationInitiate"]
     mockTotpValidate.mockResolvedValue(enabledResponse)
     mockTier = 2
+    mockIsEnforced = true
   })
 
   it("resets to the account screen when the flow was opened from Settings", async () => {
@@ -174,12 +177,34 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
 
   /** Measured one week after the release: how many accounts added the authenticator,
    *  and at which tier. */
-  it("reports the setup as completed, with the account's tier, once the authenticator is on", async () => {
+  it("reports the setup as completed, with the account's tier and the prompt that led to it, once the authenticator is on", async () => {
     mockTier = 3
-    await submitCode({ totpRegistrationId: "reg" })
+    await submitCode({
+      totpRegistrationId: "reg",
+      returnTo: "twoFactorSetup",
+      prompt: "session_modal",
+    })
 
     expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledTimes(1)
-    expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith({ tier: 3 })
+    expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith({
+      tier: 3,
+      isEnforced: true,
+      prompt: "session_modal",
+    })
+  })
+
+  /** Started from the settings with the prompts switched off: the tier then says
+   *  nothing about a balance, which the event tells apart. */
+  it("reports a setup from the settings with no prompt, and whether the prompts applied", async () => {
+    mockTier = 0
+    mockIsEnforced = false
+    await submitCode({ totpRegistrationId: "reg" })
+
+    expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith({
+      tier: 0,
+      isEnforced: false,
+      prompt: undefined,
+    })
   })
 
   it("reports nothing when the code is refused", async () => {
