@@ -13542,17 +13542,17 @@ type RootTranslation = {
 		 */
 		setupDescription: string
 		/**
-		 * A​d​d​ ​e​m​a​i​l
-		 */
-		addEmail: string
-		/**
-		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
-		 */
-		addPhoneNumber: string
-		/**
 		 * S​e​t​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
 		 */
 		setAuthenticator: string
+		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​p​r​o​t​e​c​t​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		reminderTitle: string
+		/**
+		 * Y​o​u​r​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​g​r​o​w​n​.​ ​A​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​k​e​e​p​s​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​s​a​f​e​,​ ​e​v​e​n​ ​i​f​ ​s​o​m​e​o​n​e​ ​g​e​t​s​ ​h​o​l​d​ ​o​f​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​.
+		 */
+		reminderDescription: string
 		/**
 		 * I​f​ ​y​o​u​ ​d​i​s​m​i​s​s​ ​n​o​w​,​ ​m​a​k​e​ ​s​u​r​e​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​ ​a​s​ ​s​o​o​n​ ​a​s​ ​p​o​s​s​i​b​l​e​.
 		 */
@@ -13582,6 +13582,10 @@ type RootTranslation = {
 		 * @param {string} amount
 		 */
 		highBalanceTitle: RequiredParams<'amount'>
+		/**
+		 * P​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n​ ​t​o​ ​k​e​e​p​ ​u​s​i​n​g​ ​B​l​i​n​k
+		 */
+		protectionRequiredTitle: string
 		/**
 		 * T​h​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​y​o​u​ ​h​a​v​e​,​ ​t​h​e​ ​m​o​r​e​ ​i​m​p​o​r​t​a​n​t​ ​i​t​ ​i​s​ ​w​i​t​h​ ​b​e​t​t​e​r​ ​s​e​c​u​r​i​t​y​.​ ​P​l​e​a​s​e​ ​a​d​d​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​.
 		 */
@@ -27334,17 +27338,17 @@ export type TranslationFunctions = {
 		 */
 		setupDescription: () => LocalizedString
 		/**
-		 * Add email
-		 */
-		addEmail: () => LocalizedString
-		/**
-		 * Add phone number
-		 */
-		addPhoneNumber: () => LocalizedString
-		/**
 		 * Set authenticator
 		 */
 		setAuthenticator: () => LocalizedString
+		/**
+		 * Add an authenticator to protect your funds
+		 */
+		reminderTitle: () => LocalizedString
+		/**
+		 * Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.
+		 */
+		reminderDescription: () => LocalizedString
 		/**
 		 * If you dismiss now, make sure to enable it as soon as possible.
 		 */
@@ -27373,6 +27377,10 @@ export type TranslationFunctions = {
 		 * You have over {amount}, please add additional protection
 		 */
 		highBalanceTitle: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Please add additional protection to keep using Blink
+		 */
+		protectionRequiredTitle: () => LocalizedString
 		/**
 		 * The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.
 		 */

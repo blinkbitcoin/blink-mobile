@@ -1,6 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react"
 
-import { useNavigation } from "@react-navigation/native"
+import {
+  RouteProp,
+  useIsFocused,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -31,26 +36,44 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "twoFactorNonCustodial">
     >()
-  const { unmetTier, registerDismissal } = useTwoFactorEnforcement()
+  const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorNonCustodial">>()
+  const isFromSetup = params?.isFromSetup ?? false
+  const isFocused = useIsFocused()
+  const { unmetTier, isCustodyExitOffered, registerDismissal } = useTwoFactorEnforcement()
   /** The tier this screen was opened for: what it reports, and what backing out of it
    *  is charged to, even if the balance moves while it is open. */
   const [promptTier] = useState(unmetTier)
+  /** The prompt that opened it, whose dismissal backing out is. */
+  const [origin] = useState(params?.origin)
 
+  /** Backing out here, by Cancel, the X or the hardware back, is the dismissal the modal
+   *  deferred. The swipe is off for this route, so no exit skips the count. Opened from
+   *  the setup, it only returns there: the setup is still up, and leaving it is what
+   *  counts. */
+  const handleCancel = useCallback(() => {
+    if (!isFromSetup) registerDismissal(promptTier, origin)
+    navigation.goBack()
+  }, [isFromSetup, registerDismissal, promptTier, origin, navigation])
+
+  useHardwareBackGuard(handleCancel)
+
+  /** Every way here is hidden while the self-custodial stack is switched off, but a
+   *  navigation already on its way can still land: the screen then steps aside at once,
+   *  with no dismissal, since the user never got to decline anything. Only while
+   *  focused: going back from under the migration it led to would close that flow. */
+  const isStale = isFocused && !isCustodyExitOffered
   useEffect(() => {
+    if (isStale) navigation.goBack()
+  }, [isStale, navigation])
+
+  /** A screen that steps aside at once was never seen, so it is no impression. */
+  useEffect(() => {
+    if (isStale) return
     logTwoFactorPromptShown({
       tier: promptTier,
       prompt: TwoFactorPrompt.NonCustodialScreen,
     })
-  }, [promptTier])
-
-  /** Backing out here, by Cancel, the X or the hardware back, is the dismissal the modal
-   *  deferred. The swipe is off for this route, so no exit skips the count. */
-  const handleCancel = useCallback(() => {
-    registerDismissal(promptTier)
-    navigation.goBack()
-  }, [registerDismissal, promptTier, navigation])
-
-  useHardwareBackGuard(handleCancel)
+  }, [promptTier, isStale])
 
   const handleMove = useCallback(() => {
     logTwoFactorNonCustodialChosen({ tier: promptTier })

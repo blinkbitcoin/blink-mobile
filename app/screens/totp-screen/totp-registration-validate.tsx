@@ -3,6 +3,7 @@ import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import {
   SettingsScreenDocument,
   useUserTotpRegistrationValidateMutation,
@@ -10,6 +11,7 @@ import {
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { canReturnToRoute, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { logTwoFactorSetupCompleted } from "@app/utils/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -47,12 +49,15 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
   const [errorMessage, setErrorMessage] = useState<string>("")
 
   const [loading, setLoading] = useState(false)
-  const { totpRegistrationId, returnTo } = route.params
+  const { totpRegistrationId, returnTo, prompt } = route.params
 
   const { appConfig } = useAppConfig()
   const authToken = appConfig.token
 
   const { LL } = useI18nContext()
+  /** Read before the registration lands: once it does, the account owes nothing, and
+   *  what the event measures is the tier the setup answered. */
+  const { tier, isEnforced } = useTwoFactorEnforcement()
 
   const send = useCallback(
     async (code: string) => {
@@ -71,6 +76,7 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         }
 
         if (res.data?.userTotpRegistrationValidate.me?.totpEnabled) {
+          logTwoFactorSetupCompleted({ tier, isEnforced, prompt })
           Alert.alert(LL.common.success(), LL.TotpRegistrationValidateScreen.success(), [
             {
               text: LL.common.ok(),
@@ -100,7 +106,17 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         setLoading(false)
       }
     },
-    [navigation, LL, totpRegistrationId, returnTo, authToken, totpRegistrationValidate],
+    [
+      navigation,
+      LL,
+      tier,
+      isEnforced,
+      prompt,
+      totpRegistrationId,
+      returnTo,
+      authToken,
+      totpRegistrationValidate,
+    ],
   )
 
   const header = LL.TotpRegistrationValidateScreen.enter6digitCode()

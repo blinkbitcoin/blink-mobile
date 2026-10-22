@@ -4,7 +4,11 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorNonCustodialScreen } from "@app/screens/two-factor-enforcement"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
+import {
+  TwoFactorPrompt,
+  TwoFactorPromptOrigin,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -14,10 +18,16 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+let mockIsFocused = true
+let mockRouteParams: { origin?: TwoFactorPromptOrigin; isFromSetup?: boolean } | undefined
+
+const MODAL_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.SessionModal }
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
+  useRoute: () => ({ params: mockRouteParams }),
+  useIsFocused: () => mockIsFocused,
 }))
 
 const mockUseHardwareBackGuard = jest.fn()
@@ -26,9 +36,11 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
 }))
 
 const mockRegisterDismissal = jest.fn()
+let mockIsCustodyExitOffered = true
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => ({
-    unmetTier: 2,
+    unmetTier: 3,
+    isCustodyExitOffered: mockIsCustodyExitOffered,
     registerDismissal: mockRegisterDismissal,
   }),
 }))
@@ -54,6 +66,9 @@ describe("TwoFactorNonCustodialScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockRouteParams = { origin: MODAL_ORIGIN }
+    mockIsCustodyExitOffered = true
+    mockIsFocused = true
   })
 
   it("renders the key hero with the non-custodial copy and logs it as shown once", async () => {
@@ -64,7 +79,7 @@ describe("TwoFactorNonCustodialScreen", () => {
     expect(screen.getByText(LL.TwoFactorEnforcement.nonCustodialBody())).toBeTruthy()
     expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
     expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.HighBalance,
       prompt: "non_custodial_screen",
     })
   })
@@ -75,18 +90,21 @@ describe("TwoFactorNonCustodialScreen", () => {
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-move"))
 
     expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.HighBalance,
     })
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
-  it("charges Cancel to the tier it opened for and goes back", async () => {
+  it("charges Cancel to the tier it opened for, as the dismissal of the prompt that opened it, and goes back", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.HighBalance,
+      MODAL_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -95,7 +113,10 @@ describe("TwoFactorNonCustodialScreen", () => {
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-close"))
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.HighBalance,
+      MODAL_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
@@ -105,7 +126,50 @@ describe("TwoFactorNonCustodialScreen", () => {
     const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
     onBack()
 
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Required)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(
+      TwoFactorTier.HighBalance,
+      MODAL_ORIGIN,
+    )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  /** The setup is still up under it, and leaving the setup is what counts. */
+  it("only returns to the setup it was opened from, charging nothing", async () => {
+    mockRouteParams = { isFromSetup: true }
+    await renderScreen()
+
+    fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
+    const onBack = mockUseHardwareBackGuard.mock.calls.at(-1)?.[0]
+    onBack()
+
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(2)
+  })
+
+  /** Every way here is hidden while leaving custody is off; a navigation already on its
+   *  way steps aside, and the user declined nothing. */
+  it("steps aside at once, charging nothing, while leaving custody is not on offer", async () => {
+    mockIsCustodyExitOffered = false
+    await renderScreen()
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockLogTwoFactorPromptShown).not.toHaveBeenCalled()
+  })
+
+  /** Under the migration it led to, going back would close that flow. */
+  it("stays put while another screen is on top, even with leaving custody off", async () => {
+    mockIsCustodyExitOffered = false
+    mockIsFocused = false
+    await renderScreen()
+
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
+  it("stays while leaving custody is on offer", async () => {
+    await renderScreen()
+
+    expect(mockGoBack).not.toHaveBeenCalled()
   })
 })

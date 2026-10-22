@@ -158,7 +158,7 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
    *  gate itself never pops anything: it arms on the home once the user is back there.
    *  The linking listener closes over stale values, so the flag lives in a ref. */
   const twoFactor = useTwoFactorEnforcement()
-  const isTwoFactorPromptOwed = twoFactor.requiredPrompt !== TwoFactorSessionPrompt.None
+  const isTwoFactorPromptOwed = twoFactor.sessionPrompt !== TwoFactorSessionPrompt.None
   const isTwoFactorStartHeldByPrompt =
     twoFactor.isSessionStartPending && isTwoFactorPromptOwed
   const isTwoFactorHoldingLinks =

@@ -11,6 +11,7 @@ import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment
 import {
   TwoFactorMethod,
   TwoFactorPrompt,
+  TwoFactorReminderReason,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
 import { PaymentType as ParsedPaymentType } from "@blinkbitcoin/blink-client"
@@ -185,20 +186,24 @@ export const logToastShown = (params: LogToastShownParams) => {
 type LogTwoFactorPromptParams = {
   tier: TwoFactorTier
   prompt: TwoFactorPrompt
+  /** Why the reminder bulletin was shown; the other prompts have no reason to report. */
+  reason?: TwoFactorReminderReason
 }
 
+/** The prompt's event parameters, with the reason only where there is one. */
+const twoFactorPromptEventParams = ({
+  tier,
+  prompt,
+  reason,
+}: LogTwoFactorPromptParams) =>
+  reason === undefined ? { tier, prompt } : { tier, prompt, reason }
+
 export const logTwoFactorPromptShown = (params: LogTwoFactorPromptParams) => {
-  analytics().logEvent("two_factor_prompt_shown", {
-    tier: params.tier,
-    prompt: params.prompt,
-  })
+  analytics().logEvent("two_factor_prompt_shown", twoFactorPromptEventParams(params))
 }
 
 export const logTwoFactorPromptDismissed = (params: LogTwoFactorPromptParams) => {
-  analytics().logEvent("two_factor_prompt_dismissed", {
-    tier: params.tier,
-    prompt: params.prompt,
-  })
+  analytics().logEvent("two_factor_prompt_dismissed", twoFactorPromptEventParams(params))
 }
 
 type LogTwoFactorSetupStartedParams = {
@@ -222,5 +227,25 @@ export const logTwoFactorNonCustodialChosen = (
 ) => {
   analytics().logEvent("two_factor_non_custodial_chosen", {
     tier: params.tier,
+  })
+}
+
+type LogTwoFactorSetupCompletedParams = {
+  tier: TwoFactorTier
+  /** Whether the prompts applied to the account: off, its tier says nothing about a
+   *  balance, since nothing was asked of it. */
+  isEnforced: boolean
+  /** The prompt that led to the setup, none when it was started from the settings. */
+  prompt?: TwoFactorPrompt
+}
+
+/** An authenticator added to the account, from a prompt or from the settings alike: the
+ *  adoption the prompts are measured by, joinable to the prompt that led to it. */
+export const logTwoFactorSetupCompleted = (params: LogTwoFactorSetupCompletedParams) => {
+  const promptParams = params.prompt === undefined ? {} : { prompt: params.prompt }
+  analytics().logEvent("two_factor_setup_completed", {
+    tier: params.tier,
+    is_enforced: params.isEnforced,
+    ...promptParams,
   })
 }

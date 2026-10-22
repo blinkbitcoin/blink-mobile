@@ -11,31 +11,22 @@ import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
-import { AUTHENTICATOR_THRESHOLD } from "@app/custodial/two-factor-enforcement"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
-import { useEmailReverification } from "@app/hooks/use-email-reverification"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   RegistrationReturnRoute,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
-import {
-  TwoFactorMethod,
-  TwoFactorPrompt,
-  TwoFactorTier,
-} from "@app/types/two-factor-enforcement"
+import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
+import { TwoFactorMethod, TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import {
   logTwoFactorNonCustodialChosen,
-  logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
   logTwoFactorSetupStarted,
 } from "@app/utils/analytics"
-import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
-
-import { TwoFactorSetupContent } from "./setup-content"
 
 /** The gate stands in for the home, so its flows come back to the home. */
 const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
@@ -45,19 +36,21 @@ const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 const highBalanceIcon = (currency: WalletCurrency): IconNamesType =>
   currency === WalletCurrency.Usd ? "dollar" : "warning"
 
-/** The threshold the title quotes, in the wallet that crossed it. */
-const highBalanceThreshold = (currency: WalletCurrency) =>
+/** The threshold the title quotes, as an amount of the wallet that crossed it. */
+const highBalanceAmount = (currency: WalletCurrency, threshold: number) =>
   currency === WalletCurrency.Usd
-    ? toUsdMoneyAmount(AUTHENTICATOR_THRESHOLD.usdCents)
-    : toBtcMoneyAmount(AUTHENTICATOR_THRESHOLD.sats)
+    ? toUsdMoneyAmount(threshold)
+    : toBtcMoneyAmount(threshold)
 
 /**
- * The full-screen prompt of the tiers that stop asking nicely, standing in for the home
- * at the session start that owes it, so the home is never seen first. The required
- * tier, once its dismissals are spent, shows the setup itself with no way to close it:
- * the only exits are the factors it offers. The authenticator tier shows the
- * high-balance screen, with an X while it still has dismissals left and none after, and
- * offers exactly two ways forward. Neither takes the swipe or the hardware back.
+ * The blocking screen of the high-balance tier, standing in for the home at every
+ * session start once the tier's modal has spent its dismissals, so the home is never
+ * seen first. It names the threshold of the wallet that crossed it while that wallet
+ * still holds it, and offers two ways forward, an authenticator or leaving custody, with
+ * no close control: it takes neither the swipe nor the hardware back. Only this tier
+ * blocks. It stands only while the self-custodial stack is known to be on; otherwise
+ * the modal stays in its place, and should the stack go off while it is up, its move
+ * goes with it.
  */
 export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -67,16 +60,13 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
-  const { unmetTier, remainingDismissals, highBalanceCurrency, registerDismissal } =
-    useTwoFactorEnforcement()
-  const { promptReverification, spinner: isReverifying } = useEmailReverification({
-    returnTo: GATE_RETURN_ROUTE,
-  })
-  /** The gate mounts this screen anew for each tier it is raised for, so the tier it
-   *  reports and charges its X to is the one it was raised for, for as long as it is
-   *  open. */
-  const isAuthenticatorTier = unmetTier === TwoFactorTier.Authenticator
-  const isDismissible = isAuthenticatorTier && remainingDismissals > 0
+  const {
+    unmetTier,
+    highBalanceCurrency,
+    highBalanceThreshold,
+    isHoldingHighBalance,
+    isCustodyExitOffered,
+  } = useTwoFactorEnforcement()
 
   useEffect(() => {
     logTwoFactorPromptShown({
@@ -85,25 +75,18 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     })
   }, [unmetTier])
 
-  /** Charging the dismissal is what lets the home in: it takes the session start, and
-   *  the screen stands in for the home only while that start is still owed. */
-  const handleDismiss = useCallback(() => {
-    logTwoFactorPromptDismissed({
-      tier: unmetTier,
-      prompt: TwoFactorPrompt.ProtectionRequiredScreen,
-    })
-    registerDismissal(unmetTier)
-  }, [unmetTier, registerDismissal])
-
-  /** The hardware back is the X while there is one, and nothing at all once there is
-   *  none: a blocking screen swallows it rather than letting the app go. */
-  useHardwareBackGuard(isDismissible ? handleDismiss : undefined)
+  /** No handler: a blocking screen swallows the hardware back rather than letting the
+   *  app go. */
+  useHardwareBackGuard(undefined)
 
   /** A flow started from the gate returns to the home, where the gate decides again
-   *  with the factor just added. */
+   *  with the authenticator just added. */
   const handleSetAuthenticator = useCallback(() => {
     logTwoFactorSetupStarted({ tier: unmetTier, method: TwoFactorMethod.Authenticator })
-    navigation.navigate("totpRegistrationInitiate", { returnTo: GATE_RETURN_ROUTE })
+    navigation.navigate("totpRegistrationInitiate", {
+      returnTo: GATE_RETURN_ROUTE,
+      prompt: TwoFactorPrompt.ProtectionRequiredScreen,
+    })
   }, [navigation, unmetTier])
 
   const handleMove = useCallback(() => {
@@ -111,32 +94,24 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     navigation.navigate("accountMigrationEntry")
   }, [navigation, unmetTier])
 
-  /** The setup keeps the header row its route draws, empty: the hero then sits where
-   *  it does on every other screen of the flow, instead of climbing into the gap. */
-  if (!isAuthenticatorTier) {
-    return (
-      <TwoFactorSetupContent
-        promptTier={unmetTier}
-        returnTo={GATE_RETURN_ROUTE}
-        promptReverification={promptReverification}
-        isReverifying={isReverifying}
-        headerShown={false}
-        header={<CloseHeader isHidden testID="two-factor-protection-close" />}
-      />
-    )
-  }
+  /** The amount is stated only while the account still holds it: the tier stays once
+   *  reached, and a title that claims a balance the account no longer has is wrong. */
+  const title = isHoldingHighBalance
+    ? LL.TwoFactorEnforcement.highBalanceTitle({
+        amount: formatMoneyAmount({
+          moneyAmount: highBalanceAmount(highBalanceCurrency, highBalanceThreshold),
+          noFractionDigits: true,
+        }),
+      })
+    : LL.TwoFactorEnforcement.protectionRequiredTitle()
 
+  /** The header row is kept, empty, so the hero sits where it does on every other
+   *  screen of the flow instead of climbing into the gap. */
   return (
     <StepLayout
       headerShown={false}
       contentStyle={styles.content}
-      header={
-        <CloseHeader
-          onClose={handleDismiss}
-          isHidden={!isDismissible}
-          testID="two-factor-protection-close"
-        />
-      }
+      header={<CloseHeader isHidden testID="two-factor-protection-close" />}
       footer={
         <>
           <GaloyPrimaryButton
@@ -144,23 +119,20 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
             onPress={handleSetAuthenticator}
             {...testProps("two-factor-protection-authenticator")}
           />
-          <GaloySecondaryButton
-            title={LL.AccountMigration.moveToNonCustodial()}
-            onPress={handleMove}
-            {...testProps("two-factor-protection-move")}
-          />
+          {isCustodyExitOffered && (
+            <GaloySecondaryButton
+              title={LL.AccountMigration.moveToNonCustodial()}
+              onPress={handleMove}
+              {...testProps("two-factor-protection-move")}
+            />
+          )}
         </>
       }
     >
       <IconHero
         icon={highBalanceIcon(highBalanceCurrency)}
         iconColor={colors.primary}
-        title={LL.TwoFactorEnforcement.highBalanceTitle({
-          amount: formatMoneyAmount({
-            moneyAmount: highBalanceThreshold(highBalanceCurrency),
-            noFractionDigits: true,
-          }),
-        })}
+        title={title}
         subtitle={
           <Text type="p3" style={styles.description}>
             {LL.TwoFactorEnforcement.protectionRequiredBody()}

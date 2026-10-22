@@ -3,7 +3,6 @@ import { TouchableOpacity } from "react-native"
 import { fireEvent, render } from "@testing-library/react-native"
 
 import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
-import { TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 const mockNavigate = jest.fn()
 
@@ -69,6 +68,15 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
+let mockIsCustodyExitOffered = true
+let mockIsCustodyExitOff = false
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => ({
+    isCustodyExitOffered: mockIsCustodyExitOffered,
+    isCustodyExitOff: mockIsCustodyExitOff,
+  }),
+}))
+
 const mockLogTwoFactorPromptShown = jest.fn()
 const mockLogTwoFactorPromptDismissed = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
@@ -109,7 +117,6 @@ const renderModal = ({
   render(
     <TwoFactorSessionModal
       isVisible={isVisible}
-      tier={TwoFactorTier.Required}
       remainingDismissals={remainingDismissals}
       onDismiss={onDismiss}
     />,
@@ -118,6 +125,8 @@ const renderModal = ({
 describe("TwoFactorSessionModal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsCustodyExitOffered = true
+    mockIsCustodyExitOff = false
   })
 
   it("renders the title, both buttons and the reminder when visible", () => {
@@ -153,7 +162,16 @@ describe("TwoFactorSessionModal", () => {
     })
   })
 
-  it("counts the X as the dismissal and logs it", () => {
+  it("counts nothing down with no dismissals left", () => {
+    const { getByText, queryByText } = renderModal({ remainingDismissals: 0 })
+
+    expect(getByText("Protect your account from unauthorized access.")).toBeTruthy()
+    expect(queryByText(/dismiss this/)).toBeNull()
+  })
+
+  /** The dismissal reports itself once it counts, so a second press during the exit
+   *  animation reports nothing: the modal logs nothing of its own. */
+  it("hands the X to the dismissal, leaving the report to it", () => {
     const onDismiss = jest.fn()
     // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { UNSAFE_getByType } = renderModal({ onDismiss })
@@ -161,10 +179,7 @@ describe("TwoFactorSessionModal", () => {
     fireEvent.press(UNSAFE_getByType(TouchableOpacity))
 
     expect(onDismiss).toHaveBeenCalledTimes(1)
-    expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
-      prompt: "session_modal",
-    })
+    expect(mockLogTwoFactorPromptDismissed).not.toHaveBeenCalled()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
@@ -175,17 +190,68 @@ describe("TwoFactorSessionModal", () => {
     fireEvent.press(getByTestId("primary-button"))
 
     expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
+      prompt: "session_modal",
+    })
   })
 
-  it("makes way for the non-custodial screen from I don't want to", () => {
+  /** Backing out of that screen is the modal's dismissal, which it is told. */
+  it("makes way for the non-custodial screen from I don't want to, telling it the modal opened it", () => {
     const onDismiss = jest.fn()
     const { getByTestId } = renderModal({ onDismiss })
 
     fireEvent.press(getByTestId("secondary-button"))
 
     expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial")
+    expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial", {
+      origin: { prompt: "session_modal" },
+    })
+  })
+
+  /** Declining leads to leaving custody, and nothing may push the user toward a
+   *  self-custodial stack that is switched off: the authenticator is then the one way
+   *  forward, with the X still counting the dismissal. */
+  /** The countdown leads to the blocking screen, which does not stand while leaving
+   *  custody is off: the modal then stays dismissible. */
+  it("counts nothing down while leaving custody is known to be off", () => {
+    mockIsCustodyExitOffered = false
+    mockIsCustodyExitOff = true
+    const { getByText, queryByText } = renderModal({ remainingDismissals: 1 })
+
+    expect(getByText("Protect your account from unauthorized access.")).toBeTruthy()
+    expect(queryByText(/dismiss this/)).toBeNull()
+  })
+
+  /** Not yet known, the allowance still runs, so the countdown says so. */
+  it("counts down while it is not yet known whether leaving custody is on", () => {
+    mockIsCustodyExitOffered = false
+    const { getByText } = renderModal({ remainingDismissals: 1 })
+
+    expect(
+      getByText(
+        "Protect your account from unauthorized access. This is the last time you can dismiss this.",
+      ),
+    ).toBeTruthy()
+  })
+
+  it("offers no way to decline while leaving custody is not on offer", () => {
+    mockIsCustodyExitOffered = false
+    const onDismiss = jest.fn()
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { getByText, queryByTestId, queryByText, UNSAFE_getByType } = renderModal({
+      onDismiss,
+    })
+
+    expect(getByText("Set now")).toBeTruthy()
+    expect(queryByText("I don't want to")).toBeNull()
+    expect(queryByTestId("secondary-button")).toBeNull()
+
+    fireEvent.press(UNSAFE_getByType(TouchableOpacity))
+    expect(onDismiss).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "twoFactorNonCustodial",
+      expect.anything(),
+    )
   })
 
   /** A native modal dismissed while the native-stack push runs can hang, so the modal
@@ -199,7 +265,6 @@ describe("TwoFactorSessionModal", () => {
     rerender(
       <TwoFactorSessionModal
         isVisible={false}
-        tier={TwoFactorTier.Required}
         remainingDismissals={3}
         onDismiss={jest.fn()}
       />,
@@ -207,7 +272,6 @@ describe("TwoFactorSessionModal", () => {
     rerender(
       <TwoFactorSessionModal
         isVisible={true}
-        tier={TwoFactorTier.Required}
         remainingDismissals={3}
         onDismiss={jest.fn()}
       />,

@@ -4269,9 +4269,10 @@ const en: BaseTranslation = {
     setupTitle: "Set two-factor authentication now",
     setupDescription:
       "To prevent unauthorized access to your account, add two-factor authentication now.",
-    addEmail: "Add email",
-    addPhoneNumber: "Add phone number",
     setAuthenticator: "Set authenticator",
+    reminderTitle: "Add an authenticator to protect your funds",
+    reminderDescription:
+      "Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.",
     modalReminder: "If you dismiss now, make sure to enable it as soon as possible.",
     dismissTwoMore: "You can dismiss this two more times.",
     dismissOneMore: "You can dismiss this one more time.",
@@ -4279,6 +4280,7 @@ const en: BaseTranslation = {
     setNow: "Set now",
     dontWantTo: "I don't want to",
     highBalanceTitle: "You have over {amount: string}, please add additional protection",
+    protectionRequiredTitle: "Please add additional protection to keep using Blink",
     protectionRequiredBody:
       "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",
     nonCustodialTitle: "If you don't want to set two-factor authentication",

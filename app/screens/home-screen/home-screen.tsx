@@ -44,6 +44,7 @@ import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-cont
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
+import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
 import { TwoFactorSessionModal } from "@app/custodial/components/two-factor-session-modal"
 import { BackupNudgeModal } from "@app/components/backup-nudge-modal"
 import { NetworkStatusBanner } from "@app/components/network-status-banner"
@@ -74,6 +75,7 @@ import {
 } from "@app/self-custodial/hooks"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { ConvertDirection, DepositStatus } from "@app/types/payment"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
@@ -249,6 +251,7 @@ export const HomeScreen: React.FC = () => {
   } = useSelfCustodialInfoBulletinState()
   const {
     shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
+    reminderBulletinReason: twoFactorReminderReason,
     remainingDismissals: twoFactorRemainingDismissals,
     isSessionStartPending: isTwoFactorStartPending,
     registerDismissal: registerTwoFactorDismissal,
@@ -572,7 +575,9 @@ export const HomeScreen: React.FC = () => {
     useTwoFactorSessionPrompt({ isBlocked: isTwoFactorPromptBlocked })
   /** The dismissal takes the session start, which is what brings the modal down. */
   const dismissTwoFactorModal = useCallback(() => {
-    registerTwoFactorDismissal(twoFactorPromptTier)
+    registerTwoFactorDismissal(twoFactorPromptTier, {
+      prompt: TwoFactorPrompt.SessionModal,
+    })
   }, [registerTwoFactorDismissal, twoFactorPromptTier])
   const isTwoFactorModalVisible = isTwoFactorModalOpen && isFocused
   /** Only while the home is in front: a screen the two-factor prompt pushed must not
@@ -1010,6 +1015,9 @@ export const HomeScreen: React.FC = () => {
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
+        {twoFactorReminderReason && (
+          <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
+        )}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin
@@ -1040,7 +1048,6 @@ export const HomeScreen: React.FC = () => {
       <BackupNudgeModal isVisible={shouldShowModal && isFocused} onClose={dismissModal} />
       <TwoFactorSessionModal
         isVisible={isTwoFactorModalVisible}
-        tier={twoFactorPromptTier}
         remainingDismissals={twoFactorRemainingDismissals}
         onDismiss={dismissTwoFactorModal}
       />

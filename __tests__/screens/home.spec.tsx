@@ -79,14 +79,13 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
 const mockTwoFactorEnforcement = {
   tier: 0,
   unmetTier: 0,
-  hasTwoFactor: false,
-  missingMethod: "email",
-  unverifiedEmail: null,
+  hasAuthenticator: false,
   highBalanceCurrency: "BTC",
   remainingDismissals: 3,
-  requiredPrompt: "none",
+  sessionPrompt: "none",
   isSessionStartPending: false,
   shouldShowNudgeCard: false,
+  reminderBulletinReason: null as string | null,
   shouldShowSettingsBanner: false,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
@@ -101,6 +100,15 @@ type TwoFactorNudgeCardProps = Record<string, never>
 const mockTwoFactorNudgeCard = jest.fn<null, [TwoFactorNudgeCardProps]>(() => null)
 jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
   TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
+}))
+
+type TwoFactorReminderBulletinProps = { reason: string }
+const mockTwoFactorReminderBulletin = jest.fn<null, [TwoFactorReminderBulletinProps]>(
+  () => null,
+)
+jest.mock("@app/custodial/components/two-factor-reminder-bulletin", () => ({
+  TwoFactorReminderBulletin: (props: TwoFactorReminderBulletinProps) =>
+    mockTwoFactorReminderBulletin(props),
 }))
 
 const mockTwoFactorSessionPrompt = {
@@ -2174,6 +2182,40 @@ describe("TwoFactorNudgeCard gating", () => {
   })
 })
 
+describe("TwoFactorReminderBulletin gating", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorEnforcement.reminderBulletinReason = null
+  })
+
+  afterEach(() => {
+    mockTwoFactorEnforcement.reminderBulletinReason = null
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("renders the bulletin with its reason when the enforcement gives one", async () => {
+    mockTwoFactorEnforcement.reminderBulletinReason = "new_ath"
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorReminderBulletin).toHaveBeenCalledWith({ reason: "new_ath" })
+  })
+
+  it("does not render the bulletin otherwise", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorReminderBulletin).not.toHaveBeenCalled()
+  })
+})
+
 describe("TwoFactorSessionModal wiring", () => {
   beforeEach(() => {
     resetHomeScreenMocks()
@@ -2202,14 +2244,14 @@ describe("TwoFactorSessionModal wiring", () => {
     return call[0]
   }
 
-  it("shows the modal for the prompt's tier with the countdown while the home says it is open", async () => {
+  it("shows the modal with the countdown while the home says it is open", async () => {
     mockTwoFactorSessionPrompt.isModalOpen = true
 
     renderHome()
     await flushEffects()
 
     expect(lastModalProps()).toEqual(
-      expect.objectContaining({ isVisible: true, tier: 2, remainingDismissals: 2 }),
+      expect.objectContaining({ isVisible: true, remainingDismissals: 2 }),
     )
   })
 
@@ -2274,14 +2316,16 @@ describe("TwoFactorSessionModal wiring", () => {
     expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(false)
   })
 
-  it("charges the dismissal to the prompt's tier when the modal is waved away", async () => {
+  it("charges the dismissal to the prompt's tier, as the modal's, when the modal is waved away", async () => {
     mockTwoFactorSessionPrompt.isModalOpen = true
     renderHome()
     await flushEffects()
 
     act(() => lastModalProps().onDismiss())
 
-    expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2)
+    expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2, {
+      prompt: "session_modal",
+    })
   })
 })
 

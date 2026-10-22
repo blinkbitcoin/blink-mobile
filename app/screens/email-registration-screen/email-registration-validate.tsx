@@ -7,7 +7,7 @@ import { gql } from "@apollo/client"
 import { CodeInput } from "@app/components/code-input"
 import { useUserEmailRegistrationValidateMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { canReturnToRoute, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -50,13 +50,7 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
 
   const [loading, setLoading] = useState(false)
   const [showSuccess, setShowSuccess] = useState(false)
-  const {
-    emailRegistrationId,
-    email,
-    onboarding,
-    hasUsername = false,
-    returnTo,
-  } = route.params
+  const { emailRegistrationId, email, onboarding, hasUsername = false } = route.params
 
   const onboardingNavigate = useCallback(() => {
     if (hasUsername) {
@@ -112,12 +106,6 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
         onboardingNavigate()
         return
       }
-      /** A flow opened from the two-factor setup returns into it; the setup then
-       *  steps aside to wherever it was opened from. */
-      if (canReturnToRoute(navigation.getState(), returnTo)) {
-        navigation.popTo(returnTo)
-        return
-      }
       navigation.popTo("settings")
     }, SUCCESS_DELAY)
 
@@ -126,7 +114,6 @@ export const EmailRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
     showSuccess,
     onboarding,
     onboardingNavigate,
-    returnTo,
     LL.common,
     LL.EmailRegistrationValidateScreen,
     email,

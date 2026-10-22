@@ -9,10 +9,7 @@ import {
 } from "@app/graphql/generated"
 import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  RegistrationReturnRoute,
-  RootStackParamList,
-} from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { resolveSessionKey } from "@app/store/persistent-state/account-key"
 import { useNavigation } from "@react-navigation/native"
@@ -69,9 +66,7 @@ type Sequence = {
  *  for the life of the process: at the deadline the sequence is over for them and a
  *  later answer is dropped. The requests keep their place until they settle, and a
  *  late delete is still followed by its register, as a second delete over one still on
- *  its way, or a delete left alone, could end with no address at all. The one deadline
- *  for a screen that holds the user while the sequence runs, which it reads from the
- *  running state rather than keep a clock of its own. */
+ *  its way, or a delete left alone, could end with no address at all. */
 const SEQUENCE_DEADLINE_MS = 60_000
 
 /** The sequence in flight, if any: one runs at a time, and whoever asks meanwhile joins
@@ -128,23 +123,16 @@ type PromptContext = {
   owedSequenceId: number | undefined
 }
 
-type EmailReverificationOptions = {
-  /** Where the code screen goes on success instead of its own destination, for a
-   *  screen the flow has to return into. */
-  returnTo?: RegistrationReturnRoute
-}
-
 /**
  * Re-verification for an address the account already holds. The registration
  * flow can't be re-run as-is — the backend refuses to initiate while any email
  * sits on the identity — so the stale one is deleted and set again in one go.
- * Shared by the account settings row, the security score card and the two-factor
- * setup, which all land on this state and must behave the same way. The code
- * screen is shown once per sequence, by the screen in front when it is done, with
- * that screen's own return route; a screen covered at that moment shows it once it is
- * back in front, and one the user has left shows nothing.
+ * Shared by the account settings row and the security score card, which both land on
+ * this state and must behave the same way. The code screen is shown once per
+ * sequence, by the screen in front when it is done; a screen covered at that moment
+ * shows it once it is back in front, and one the user has left shows nothing.
  */
-export const useEmailReverification = ({ returnTo }: EmailReverificationOptions = {}) => {
+export const useEmailReverification = () => {
   const { LL } = useI18nContext()
   const { persistentState } = usePersistentStateContext()
   const { galoyAuthToken, activeAccountId } = persistentState
@@ -159,11 +147,8 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
 
   /** What callers render: spans the sequence from before its first request to after
-   *  its last, rather than following each mutation's own loading flag. Whether the
-   *  sequence was asked for from this screen is told apart, for a screen that holds
-   *  the user for its own request and must not for one joined from elsewhere. */
+   *  its last, rather than following each mutation's own loading flag. */
   const [isSequenceRunning, setIsSequenceRunning] = useState(false)
-  const [isAskedHere, setIsAskedHere] = useState(false)
   /** The sequence this screen already waits on: a prompt's buttons close over the
    *  render that raised them, and two prompts answered before either is done must wait
    *  once, not twice. A ref, since a state would be unset in both closures. */
@@ -173,8 +158,6 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
    *  a switch can happen under a screen without unmounting it. */
   const sessionKeyRef = useRef(sessionKey)
   sessionKeyRef.current = sessionKey
-  const returnToRef = useRef(returnTo)
-  returnToRef.current = returnTo
 
   /** Deletes the address and registers it again under the session that asked. The
    *  requests go through the client of the moment, so on a session switch between the
@@ -242,7 +225,6 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
         navigation.navigate("emailRegistrationValidate", {
           emailRegistrationId,
           email: sequence.email,
-          returnTo: returnToRef.current,
         })
       }
       if (!isMounted()) return
@@ -265,18 +247,13 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
   )
 
   /** The running state follows the sequence this screen waits on now: a sequence it
-   *  waited on earlier, answering late, must not clear it for a newer one. A press on
-   *  this screen for a sequence it had joined from elsewhere makes it this screen's. */
+   *  waited on earlier, answering late, must not clear it for a newer one. */
   const waitOnSequence = useCallback(
-    async (sequence: Sequence, isAskedFromHere: boolean) => {
+    async (sequence: Sequence) => {
       const isAlreadyAwaited = awaitedSequenceRef.current === sequence
-      if (isAlreadyAwaited) {
-        if (isAskedFromHere) setIsAskedHere(true)
-        return
-      }
+      if (isAlreadyAwaited) return
       awaitedSequenceRef.current = sequence
       setIsSequenceRunning(true)
-      setIsAskedHere(isAskedFromHere)
       try {
         const emailRegistrationId = await sequence.result
         if (emailRegistrationId !== null) moveOnWhenInFront(sequence, emailRegistrationId)
@@ -285,10 +262,7 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
         if (isStillAwaited) {
           // eslint-disable-next-line require-atomic-updates -- single writer per sequence; the check above keeps a newer wait's own entry
           awaitedSequenceRef.current = null
-          if (isMounted()) {
-            setIsSequenceRunning(false)
-            setIsAskedHere(false)
-          }
+          if (isMounted()) setIsSequenceRunning(false)
         }
       }
     },
@@ -315,7 +289,7 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
       const running = sequenceInFlight
       if (running === null) return
       const isOurs = running.sessionKey === sessionKey
-      if (isOurs) waitOnSequence(running, false)
+      if (isOurs) waitOnSequence(running)
     }
     joinSequenceInFlight()
     return navigation.addListener("focus", joinSequenceInFlight)
@@ -335,13 +309,13 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
       const isSequenceOfAnotherSession =
         running !== null && running.sessionKey !== askedUnder
       if (isSequenceOfAnotherSession) return
-      if (running !== null) return waitOnSequence(running, true)
+      if (running !== null) return waitOnSequence(running)
       const isPromptOvertaken =
         sequenceCount !== prompt.sequenceCount ||
         owedCodeScreenBySession.get(askedUnder) !== prompt.owedSequenceId
       if (isPromptOvertaken) return
       const request = { sessionKey: askedUnder, email }
-      return waitOnSequence(startSequence(request, runSequence), true)
+      return waitOnSequence(startSequence(request, runSequence))
     },
     [isMounted, waitOnSequence, runSequence],
   )
@@ -369,5 +343,5 @@ export const useEmailReverification = ({ returnTo }: EmailReverificationOptions 
     [LL, confirmEmailAgain],
   )
 
-  return { promptReverification, spinner: isSequenceRunning, isAskedHere }
+  return { promptReverification, spinner: isSequenceRunning }
 }

@@ -1,8 +1,7 @@
 import React from "react"
-import { BackHandler, Pressable, Text } from "react-native"
+import { Alert, AlertButton, BackHandler, Pressable, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import {
-  CommonActions,
   createNavigationContainerRef,
   NavigationContainer,
   useNavigation,
@@ -19,15 +18,22 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import theme from "@app/rne-theme/theme"
-import { EmailRegistrationValidateScreen } from "@app/screens/email-registration-screen/email-registration-validate"
-import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
-import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
+import { TotpRegistrationValidateScreen } from "@app/screens/totp-screen/totp-registration-validate"
+import {
+  TwoFactorNonCustodialScreen,
+  TwoFactorSetupScreen,
+} from "@app/screens/two-factor-enforcement"
+import {
+  TwoFactorPrompt,
+  TwoFactorPromptOrigin,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 
 /**
  * The setup on a real stack: the sibling spec mocks the navigator and the hardware
  * back module-wide, so it can say which handler the screen installed but not what the
- * navigator does with a press, nor where a flow's `popTo` lands. Those are the
- * contracts here.
+ * navigator does with a press, nor where the authenticator flow's `popTo` lands. Those
+ * are the contracts here.
  */
 
 loadLocale("en")
@@ -37,9 +43,9 @@ const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   tier: TwoFactorTier.Nudge as TwoFactorTier,
   unmetTier: TwoFactorTier.Nudge as TwoFactorTier,
-  hasTwoFactor: false,
-  missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
-  unverifiedEmail: null as string | null,
+  hasAuthenticator: false,
+  isEnforced: true,
+  isCustodyExitOffered: true,
   remainingDismissals: 3,
   shouldShowNudgeCard: true,
   shouldShowSettingsBanner: true,
@@ -59,40 +65,24 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
 }))
 
-/** Whether a re-verification asked for from the setup is in flight. */
-let mockIsReverifyingFromHere = false
-jest.mock("@app/hooks/use-email-reverification", () => ({
-  useEmailReverification: () => ({
-    promptReverification: jest.fn(),
-    spinner: mockIsReverifyingFromHere,
-    isAskedHere: mockIsReverifyingFromHere,
-  }),
-}))
-
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: jest.fn(),
+  logTwoFactorSetupCompleted: jest.fn(),
+  logTwoFactorPromptShown: jest.fn(),
+  logTwoFactorNonCustodialChosen: jest.fn(),
 }))
 
 /** The code screen's own collaborators, as its sibling spec mocks them. */
-const mockEmailVerify = jest.fn()
+const mockTotpValidate = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useUserEmailRegistrationValidateMutation: () => [mockEmailVerify, { loading: false }],
+  useUserTotpRegistrationValidateMutation: () => [mockTotpValidate, { loading: false }],
 }))
 
-jest.mock("@app/hooks/use-save-session-profile", () => ({
-  useSaveSessionProfile: () => ({
-    updateCurrentProfile: jest.fn().mockResolvedValue(undefined),
-  }),
+jest.mock("@app/hooks", () => ({
+  ...jest.requireActual("@app/hooks"),
+  useAppConfig: () => ({ appConfig: { token: "session-token" } }),
 }))
-
-jest.mock("@app/components/success-animation", () => {
-  const ReactActual = jest.requireActual("react")
-  return {
-    SuccessIconAnimation: ({ children }: { children: React.ReactNode }) =>
-      ReactActual.createElement(ReactActual.Fragment, null, children),
-  }
-})
 
 jest.mock("@app/components/code-input", () => {
   const ReactActual = jest.requireActual("react")
@@ -108,7 +98,14 @@ jest.mock("@app/components/code-input", () => {
   }
 })
 
-const SUCCESS_DELAY = 2000
+/** The success alert is what moves on: its OK button carries the navigation. */
+const alertSpy = jest.spyOn(Alert, "alert")
+const pressSuccessOk = () => {
+  const buttons = alertSpy.mock.calls.at(-1)?.[2] as AlertButton[] | undefined
+  buttons?.[0]?.onPress?.()
+}
+
+const CARD_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.HomeCard }
 
 const Stack = createNativeStackNavigator<RootStackParamList>()
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
@@ -116,29 +113,31 @@ const navigationRef = createNavigationContainerRef<RootStackParamList>()
 const HomeStub = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   return (
-    <Pressable testID="open-setup" onPress={() => navigation.navigate("twoFactorSetup")}>
+    <Pressable
+      testID="open-setup"
+      onPress={() => navigation.navigate("twoFactorSetup", CARD_ORIGIN)}
+    >
       <Text>home</Text>
     </Pressable>
   )
 }
 
-/** Stands in for the address step, which hands the code screen the route it was told
- *  to return to, the way the real one does. */
-const EmailInitiateStub = ({
+/** Stands in for the QR step, which hands the code screen the route it was told to
+ *  return to, the way the real one does. */
+const TotpInitiateStub = ({
   navigation,
   route,
-}: NativeStackScreenProps<RootStackParamList, "emailRegistrationInitiate">) => (
+}: NativeStackScreenProps<RootStackParamList, "totpRegistrationInitiate">) => (
   <Pressable
-    testID="send-code"
+    testID="to-code"
     onPress={() =>
-      navigation.navigate("emailRegistrationValidate", {
-        emailRegistrationId: "registration-id",
-        email: "someone@example.com",
+      navigation.navigate("totpRegistrationValidate", {
+        totpRegistrationId: "registration-id",
         returnTo: route.params?.returnTo,
       })
     }
   >
-    <Text>send code</Text>
+    <Text>to code</Text>
   </Pressable>
 )
 
@@ -156,13 +155,14 @@ const renderStack = async () => {
               component={TwoFactorSetupScreen}
               options={{ headerShown: true }}
             />
+            <Stack.Screen name="totpRegistrationInitiate" component={TotpInitiateStub} />
             <Stack.Screen
-              name="emailRegistrationInitiate"
-              component={EmailInitiateStub}
+              name="totpRegistrationValidate"
+              component={TotpRegistrationValidateScreen}
             />
             <Stack.Screen
-              name="emailRegistrationValidate"
-              component={EmailRegistrationValidateScreen}
+              name="twoFactorNonCustodial"
+              component={TwoFactorNonCustodialScreen}
             />
           </Stack.Navigator>
         </NavigationContainer>
@@ -184,75 +184,84 @@ const openSetup = async () => {
 describe("TwoFactorSetupScreen in a stack", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    jest.useFakeTimers()
     loadLocale("en")
-    mockIsReverifyingFromHere = false
-    mockEnforcement.hasTwoFactor = false
-    mockEnforcement.missingMethod = TwoFactorMethod.Email
-    mockEnforcement.unverifiedEmail = null
-    mockEmailVerify.mockResolvedValue({
+    mockEnforcement.hasAuthenticator = false
+    mockTotpValidate.mockResolvedValue({
       data: {
-        userEmailRegistrationValidate: {
+        userTotpRegistrationValidate: {
           errors: null,
-          me: { id: "1", email: { address: "someone@example.com", verified: true } },
+          me: { id: "1", totpEnabled: true },
         },
       },
     })
   })
 
-  afterEach(() => {
-    jest.useRealTimers()
-  })
-
-  it("lands back on the home once the email flow it opened succeeds", async () => {
+  it("lands back on the home once the authenticator flow it opened succeeds", async () => {
     await renderStack()
     await openSetup()
 
     await act(async () => {
-      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.addEmail()))
+      fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
     })
-    expect(currentRoute()).toBe("emailRegistrationInitiate")
+    expect(currentRoute()).toBe("totpRegistrationInitiate")
     await act(async () => {
-      fireEvent.press(screen.getByTestId("send-code"))
+      fireEvent.press(screen.getByTestId("to-code"))
     })
-    expect(currentRoute()).toBe("emailRegistrationValidate")
+    expect(currentRoute()).toBe("totpRegistrationValidate")
 
-    /** What the account reads as once the address is verified. */
-    mockEnforcement.hasTwoFactor = true
     await act(async () => {
       fireEvent.press(screen.getByTestId("submit-code"))
     })
+    /** What the account reads as once the authenticator is registered. */
+    mockEnforcement.hasAuthenticator = true
     await act(async () => {
-      jest.advanceTimersByTime(SUCCESS_DELAY)
+      pressSuccessOk()
     })
 
     expect(currentRoute()).toBe("Primary")
   })
 
-  it("refuses the close control and the hardware back while it holds, and lets a reset through", async () => {
-    mockIsReverifyingFromHere = true
+  it("opens the screen that explains leaving custody over the setup", async () => {
+    await renderStack()
+    await openSetup()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
+    })
+
+    expect(currentRoute()).toBe("twoFactorNonCustodial")
+  })
+
+  /** The setup stays under the explanation: backing out of it lands back on the setup,
+   *  and only leaving the setup counts. */
+  it("lands back on the setup when leaving custody is backed out of, charging nothing", async () => {
+    await renderStack()
+    await openSetup()
+    await act(async () => {
+      fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
+    })
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
+    })
+
+    expect(currentRoute()).toBe("twoFactorSetup")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+
+  it("lets the close control out, charging the exit to the tier", async () => {
     await renderStack()
     await openSetup()
 
     await act(async () => {
       fireEvent.press(screen.getByTestId("icon-close"))
     })
-    expect(currentRoute()).toBe("twoFactorSetup")
-    await act(async () => {
-      pressHardwareBack()
-    })
-    expect(currentRoute()).toBe("twoFactorSetup")
-    expect(mockRegisterDismissal).not.toHaveBeenCalled()
 
-    await act(async () => {
-      navigationRef.dispatch(
-        CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
-      )
-    })
     expect(currentRoute()).toBe("Primary")
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Nudge, CARD_ORIGIN)
   })
 
-  it("lets the hardware back out while nothing is in flight, charging the exit to the tier", async () => {
+  it("lets the hardware back out, charging the exit to the tier", async () => {
     await renderStack()
     await openSetup()
 
@@ -261,6 +270,6 @@ describe("TwoFactorSetupScreen in a stack", () => {
     })
 
     expect(currentRoute()).toBe("Primary")
-    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Nudge)
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Nudge, CARD_ORIGIN)
   })
 })

@@ -20,9 +20,20 @@ describe("hasWorkingScreenAboveHome", () => {
       hasWorkingScreenAboveHome([
         home,
         { name: "twoFactorSetup" },
-        { name: "emailRegistrationInitiate" },
+        { name: "totpRegistrationInitiate" },
       ]),
     ).toBe(false)
+  })
+
+  /** Neither is a second factor, so neither is a remedy the gate opened: one of them
+   *  above the home, from a deep link or otherwise, is the user's own. */
+  it("sees an email or phone registration above the home as the user's own screen", () => {
+    expect(hasWorkingScreenAboveHome([home, { name: "emailRegistrationInitiate" }])).toBe(
+      true,
+    )
+    expect(hasWorkingScreenAboveHome([home, { name: "phoneRegistrationInitiate" }])).toBe(
+      true,
+    )
   })
 
   /** The migration a remedy leads into pushes steps under names of its own. */
@@ -43,7 +54,7 @@ describe("hasWorkingScreenAboveHome", () => {
       hasWorkingScreenAboveHome([
         home,
         { name: "settings" },
-        { name: "emailRegistrationInitiate" },
+        { name: "totpRegistrationInitiate" },
       ]),
     ).toBe(true)
   })
@@ -62,12 +73,11 @@ describe("hasWorkingScreenAboveHome", () => {
 })
 
 describe("isTwoFactorRemedyRoute", () => {
-  it("recognises the setup, the non-custodial screen, the factor registrations and the migration", () => {
+  it("recognises the setup, the non-custodial screen, the authenticator registration and the migration", () => {
     expect(isTwoFactorRemedyRoute("twoFactorSetup")).toBe(true)
     expect(isTwoFactorRemedyRoute("twoFactorNonCustodial")).toBe(true)
-    expect(isTwoFactorRemedyRoute("emailRegistrationValidate")).toBe(true)
-    expect(isTwoFactorRemedyRoute("phoneRegistrationInitiate")).toBe(true)
     expect(isTwoFactorRemedyRoute("totpRegistrationInitiate")).toBe(true)
+    expect(isTwoFactorRemedyRoute("totpRegistrationValidate")).toBe(true)
     expect(isTwoFactorRemedyRoute("accountMigrationEntry")).toBe(true)
   })
 
@@ -75,5 +85,7 @@ describe("isTwoFactorRemedyRoute", () => {
     expect(isTwoFactorRemedyRoute("sendBitcoinDestination")).toBe(false)
     expect(isTwoFactorRemedyRoute("settings")).toBe(false)
     expect(isTwoFactorRemedyRoute("Primary")).toBe(false)
+    expect(isTwoFactorRemedyRoute("emailRegistrationValidate")).toBe(false)
+    expect(isTwoFactorRemedyRoute("phoneRegistrationInitiate")).toBe(false)
   })
 })
