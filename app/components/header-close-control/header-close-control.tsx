@@ -10,28 +10,20 @@ import { headerRightNoGlass } from "../header-no-glass"
 
 type HeaderCloseControlParams = {
   navigateTo?: keyof RootStackParamList
-  /** Replaces the navigation, for a screen that closes back to wherever it was opened
-   *  from rather than to a fixed route. */
-  onPress?: () => void
 }
 
-/** The options above resolve the route, so the button itself takes no default. */
-type HeaderCloseButtonProps = HeaderCloseControlParams & {
-  navigateTo: keyof RootStackParamList
-}
-
-const HeaderCloseButton: React.FC<HeaderCloseButtonProps> = ({ navigateTo, onPress }) => {
+const HeaderCloseButton: React.FC<HeaderCloseControlParams> = ({
+  navigateTo = "Primary",
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const handlePress = onPress ?? (() => navigation.navigate(navigateTo as never))
-
   return (
     <GaloyIconButton
-      onPress={handlePress}
+      onPress={() => navigation.navigate(navigateTo as never)}
       size="medium"
       name="close"
       backgroundColor={colors.grey5}
@@ -45,11 +37,8 @@ const HeaderCloseButton: React.FC<HeaderCloseButtonProps> = ({ navigateTo, onPre
 // export: a bare `headerRight: <close button>` would get the glass capsule back.
 export const headerCloseControlOptions = ({
   navigateTo = "Primary",
-  onPress,
 }: HeaderCloseControlParams = {}) =>
-  headerRightNoGlass(() => (
-    <HeaderCloseButton navigateTo={navigateTo} onPress={onPress} />
-  ))
+  headerRightNoGlass(() => <HeaderCloseButton navigateTo={navigateTo} />)
 
 const useStyles = makeStyles(() => ({
   headerCloseButton: {
