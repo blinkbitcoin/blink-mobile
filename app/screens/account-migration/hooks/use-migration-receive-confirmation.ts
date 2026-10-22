@@ -35,6 +35,12 @@ type UseMigrationReceiveConfirmationArgs = {
    *  where the funds are. Read through a ref, so a caller passing a fresh function each
    *  render never re-arms the polling (a re-armed effect fires an extra check at once). */
   onWalletChecked?: (startedAt: number) => void
+  /** An earlier watch of this same receive already ran past the notice window (the app was
+   *  relaunched mid-wait), so the window is not started over: a receive that was late
+   *  before the relaunch is late now. With the delayed-redirect flag on, that releases the
+   *  gate at once, as the elapsed window would have. Read once it is known, so a caller
+   *  that learns it after the watch began still cuts the window short. */
+  wasDelayedEarlier?: boolean
 }
 
 type UseMigrationReceiveConfirmation = {
@@ -72,6 +78,7 @@ export const useMigrationReceiveConfirmation = ({
   expectedReceiveSats,
   skip,
   onWalletChecked,
+  wasDelayedEarlier = false,
 }: UseMigrationReceiveConfirmationArgs): UseMigrationReceiveConfirmation => {
   const network = useSparkNetwork()
   const {
@@ -233,14 +240,21 @@ export const useMigrationReceiveConfirmation = ({
     }
 
     const elapsed = Date.now() - watchStartedAtRef.current
-    const remaining = Math.max(migrationReceiveDelayedNoticeMs - elapsed, 0)
+    const remaining = wasDelayedEarlier
+      ? 0
+      : Math.max(migrationReceiveDelayedNoticeMs - elapsed, 0)
 
     const timer = setTimeout(() => {
       isReceiveDelayedRef.current = true
       setIsReceiveDelayed(true)
     }, remaining)
     return () => clearTimeout(timer)
-  }, [isWatching, selfCustodialAccountId, migrationReceiveDelayedNoticeMs])
+  }, [
+    isWatching,
+    selfCustodialAccountId,
+    migrationReceiveDelayedNoticeMs,
+    wasDelayedEarlier,
+  ])
 
   const recheck = useCallback(() => recheckRef.current?.(), [])
 

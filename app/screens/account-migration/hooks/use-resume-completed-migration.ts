@@ -14,6 +14,10 @@ import {
 import { reportError } from "@app/utils/error-logging"
 
 import {
+  loadReceiveDelayedSince,
+  saveReceiveDelayedSince,
+} from "../utils/migration-receive-delay-storage"
+import {
   markAppForegrounded,
   markMigrationReceiveChecked,
   resetMigrationReceiveWait,
@@ -61,6 +65,28 @@ export const useResumeCompletedMigration = (): void => {
   const isServerCompleted =
     status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
 
+  /** A receive this device already watched run past the notice window, in a session
+   *  before this one. Without it every launch starts the window over, and a receive stuck
+   *  for days spends the first minute of each on "on its way" instead of support. */
+  /** Null until the store has answered, so the record below is never written over an
+   *  earlier one it has not read yet. */
+  const [delayedSince, setDelayedSince] = useState<number | null | undefined>(undefined)
+  useEffect(() => {
+    setDelayedSince(undefined)
+    if (!migrationAccountId) return
+    let isActive = true
+    loadReceiveDelayedSince(migrationAccountId)
+      .then((stored) => {
+        if (isActive) setDelayedSince(stored)
+      })
+      .catch(() => undefined)
+    return () => {
+      isActive = false
+    }
+  }, [migrationAccountId])
+  const wasDelayedEarlier = typeof delayedSince === "number"
+  const hasReadEarlierDelay = delayedSince !== undefined
+
   /** The same receive gate as the transfer screen: a relaunch mid-transfer must not close
    *  the custodial account, nor swap into a wallet whose funds are still in transit
    *  (#4102). Unconfirmed simply means no swap this session — the custodial session stays
@@ -71,7 +97,15 @@ export const useResumeCompletedMigration = (): void => {
       expectedReceiveSats: migrationExpectedReceiveSats,
       skip: !isServerCompleted,
       onWalletChecked: markMigrationReceiveChecked,
+      wasDelayedEarlier,
     })
+
+  /** Recorded the first time the window runs out, for the next launch to pick up. */
+  useEffect(() => {
+    const isFirstDelay = hasReadEarlierDelay && !wasDelayedEarlier
+    if (!isReceiveDelayed || !isFirstDelay || !migrationAccountId) return
+    saveReceiveDelayedSince(migrationAccountId, Date.now()).catch(() => undefined)
+  }, [isReceiveDelayed, hasReadEarlierDelay, wasDelayedEarlier, migrationAccountId])
 
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
    *  least reported: a receive that never lands would otherwise be invisible, the user

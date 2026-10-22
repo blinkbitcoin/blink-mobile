@@ -121,6 +121,27 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current.isReceiveDelayed).toBe(true)
   })
 
+  /** A relaunch mid-wait: an earlier session already watched this receive run past the
+   *  window, so it is late now rather than a full window from now. */
+  it("raises the notice at once for a receive an earlier session saw run late", async () => {
+    const { result } = renderGate({ wasDelayedEarlier: true })
+    await advance(0)
+
+    expect(result.current.isReceiveDelayed).toBe(true)
+  })
+
+  /** The caller reads the earlier delay from storage, so it can arrive after the watch. */
+  it("cuts the window short when the earlier delay is learned after the watch began", async () => {
+    const { result, rerender } = renderGate()
+    await advance(DELAYED_NOTICE_MS / 2)
+    expect(result.current.isReceiveDelayed).toBe(false)
+
+    rerender({ wasDelayedEarlier: true })
+    await advance(0)
+
+    expect(result.current.isReceiveDelayed).toBe(true)
+  })
+
   /** The reverse ordering of "confirms in time": the notice has already fired when the
    *  funds land. The screen must swap at once, not keep the "taking longer" copy up. */
   it("withdraws the delayed notice when the receive lands after it fired", async () => {
