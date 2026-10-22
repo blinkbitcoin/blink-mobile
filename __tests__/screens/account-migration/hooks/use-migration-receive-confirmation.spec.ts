@@ -581,6 +581,25 @@ describe("useMigrationReceiveConfirmation", () => {
       expect(onWalletChecked).toHaveBeenLastCalledWith(1_000_000 + RECEIVE_CHECK_RETRY_MS)
     })
 
+    /** A caller passing a fresh function each render is told on the newest one, without
+     *  the polling re-arming (a re-armed watch fires an extra check at once). */
+    it("tells the latest callback without starting another check", async () => {
+      const first = jest.fn()
+      const latest = jest.fn()
+
+      const { rerender } = renderGate({ onWalletChecked: first })
+      await flushCheck()
+      rerender({ onWalletChecked: latest })
+      await flushCheck()
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      await advance(RECEIVE_CHECK_RETRY_MS)
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(2)
+      expect(first).toHaveBeenCalledTimes(1)
+      expect(latest).toHaveBeenCalledTimes(1)
+    })
+
     /** Funds that landed confirm the gate, which withdraws the notice itself; the report
      *  still goes out so the caller's record of the latest look stays true. */
     it("reports the look that confirms the receive too", async () => {

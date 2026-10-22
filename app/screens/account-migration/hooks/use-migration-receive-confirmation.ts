@@ -112,8 +112,13 @@ export const useMigrationReceiveConfirmation = ({
    *  current cadence without re-arming (a re-armed effect fires an extra check at once). */
   const isReceiveDelayedRef = useRef(false)
 
+  /** The latest callback, refreshed after each commit rather than during render, where a
+   *  render React throws away would still have written it. Declared ahead of the polling
+   *  effect, so the first check already sees the current one. */
   const onWalletCheckedRef = useRef(onWalletChecked)
-  onWalletCheckedRef.current = onWalletChecked
+  useEffect(() => {
+    onWalletCheckedRef.current = onWalletChecked
+  }, [onWalletChecked])
 
   /** Set by the polling effect while it runs; the effect owns the timer and the in-flight
    *  check the recheck has to coordinate with. */
