@@ -251,7 +251,7 @@ export const HomeScreen: React.FC = () => {
   } = useSelfCustodialInfoBulletinState()
   const {
     shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
-    shouldShowReminderBulletin: shouldShowTwoFactorReminderBulletin,
+    reminderBulletinReason: twoFactorReminderReason,
     remainingDismissals: twoFactorRemainingDismissals,
     isSessionStartPending: isTwoFactorStartPending,
     registerDismissal: registerTwoFactorDismissal,
@@ -1015,7 +1015,9 @@ export const HomeScreen: React.FC = () => {
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
         {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
-        {shouldShowTwoFactorReminderBulletin && <TwoFactorReminderBulletin />}
+        {twoFactorReminderReason && (
+          <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
+        )}
         {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
         {reminderBulletin.isVisible && (
           <MigrationReminderBulletin

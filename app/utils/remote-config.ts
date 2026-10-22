@@ -151,30 +151,3 @@ export const getRemoteConfigNumericObject = <T extends Record<string, number>>(
   }
   return merged as T
 }
-
-/**
- * Reads a JSON object of numbers that only make sense above zero, merging it over
- * `defaults` as `getRemoteConfigNumericObject` does. A zero or a negative value is
- * dropped too, and logged: for a threshold, a zero would hold every balance over it.
- */
-export const getRemoteConfigPositiveNumericObject = <T extends Record<string, number>>(
-  key: string,
-  defaults: T,
-): T => {
-  const merged = getRemoteConfigNumericObject(key, defaults)
-  if (merged === defaults) return defaults
-
-  const positive: Record<string, number> = { ...merged }
-  const droppedKeys = Object.keys(defaults).filter((entryKey) => positive[entryKey] <= 0)
-  for (const entryKey of droppedKeys) positive[entryKey] = defaults[entryKey]
-  if (droppedKeys.length > 0) {
-    logError({
-      scope: SCOPE,
-      error: new Error(
-        `Dropped ${droppedKeys.length} non-positive entries from "${key}"`,
-      ),
-      context: { key, droppedKeys },
-    })
-  }
-  return positive as T
-}

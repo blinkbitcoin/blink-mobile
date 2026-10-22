@@ -216,6 +216,99 @@ describe("useFreshAccountRead", () => {
     expect(result.current).toBe(FreshAccountRead.Confirmed)
   })
 
+  /** A status a client already confirmed must not leak onto the next client for the
+   *  render before the read resets it: that render would decide from a read this
+   *  client never made. */
+  it("is pending on the very render that brings a new client, after the last one confirmed", async () => {
+    const firstNetwork = makeNetwork()
+    const firstClient = makeClient(firstNetwork.link, 6_000_000)
+    const secondNetwork = makeNetwork()
+    const secondClient = makeClient(secondNetwork.link, 6_000_000)
+    /** Every status the hook rendered with the client it rendered under: a rerender
+     *  flushes the effects before the test can look, so only this sees the first one. */
+    const rendered: Array<{ client: ApolloClient<object>; status: FreshAccountRead }> = []
+    currentClient = firstClient
+    const { rerender } = renderHook(
+      () => {
+        const status = useFreshAccountRead(true)
+        rendered.push({ client: currentClient, status })
+        return status
+      },
+      { wrapper: ClientWrapper },
+    )
+    await act(async () => {})
+    await firstNetwork.answer({ data: meWith(100_000) })
+    expect(rendered.at(-1)?.status).toBe(FreshAccountRead.Confirmed)
+
+    currentClient = secondClient
+    rerender({})
+
+    const underSecondClient = rendered.filter(({ client }) => client === secondClient)
+    expect(underSecondClient.length).toBeGreaterThan(0)
+    expect(underSecondClient.map(({ status }) => status)).not.toContain(
+      FreshAccountRead.Confirmed,
+    )
+  })
+
+  describe("a network that never answers", () => {
+    beforeEach(() => {
+      jest.useFakeTimers({ doNotFake: ["nextTick", "queueMicrotask", "setImmediate"] })
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    /** Nothing that waits on the read may wait for the whole session. */
+    it("counts the read as failed after ten seconds, and keeps it failed when the answer lands late", async () => {
+      const network = makeNetwork()
+      const client = makeClient(network.link, 6_000_000)
+      const { result } = renderRead({ client, isEnabled: true })
+      await act(async () => {})
+
+      await act(async () => {
+        jest.advanceTimersByTime(9_999)
+      })
+      expect(result.current).toBe(FreshAccountRead.Pending)
+
+      await act(async () => {
+        jest.advanceTimersByTime(1)
+      })
+      expect(result.current).toBe(FreshAccountRead.Failed)
+
+      await network.answer({ data: meWith(100_000) })
+      expect(result.current).toBe(FreshAccountRead.Failed)
+    })
+
+    it("keeps a late failure failed", async () => {
+      const network = makeNetwork()
+      const client = makeClient(network.link, 6_000_000)
+      const { result } = renderRead({ client, isEnabled: true })
+      await act(async () => {})
+      await act(async () => {
+        jest.advanceTimersByTime(10_000)
+      })
+
+      await network.answer({ fails: true })
+
+      expect(result.current).toBe(FreshAccountRead.Failed)
+    })
+
+    it("keeps an answer that lands in time, whatever the timer does after", async () => {
+      const network = makeNetwork()
+      const client = makeClient(network.link, 6_000_000)
+      const { result } = renderRead({ client, isEnabled: true })
+      await act(async () => {})
+
+      await network.answer({ data: meWith(100_000) })
+      await act(async () => {
+        jest.advanceTimersByTime(10_000)
+      })
+
+      expect(result.current).toBe(FreshAccountRead.Confirmed)
+    })
+  })
+
   it("ignores an answer that lands after the read was disabled", async () => {
     const network = makeNetwork()
     const client = makeClient(network.link, 6_000_000)

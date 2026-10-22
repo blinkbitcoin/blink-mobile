@@ -12,7 +12,9 @@ export const TwoFactorTier = {
 export type TwoFactorTier = (typeof TwoFactorTier)[keyof typeof TwoFactorTier]
 
 /** The factor a setup started from a two-factor prompt adds: the authenticator, the
- *  only one the prompts ask for. Reported with the setup's start. */
+ *  only one the prompts ask for. Reported with the setup's start, where it has a single
+ *  value now: the parameter stays so the setup events read the same on the dashboards
+ *  as they did when an email and a phone were offered too. */
 export const TwoFactorMethod = {
   Authenticator: "authenticator",
 } as const
@@ -57,7 +59,8 @@ export type TwoFactorSessionPrompt =
   (typeof TwoFactorSessionPrompt)[keyof typeof TwoFactorSessionPrompt]
 
 /** The balance each tier starts at, per wallet in its own unit and never converted:
- *  configuration, so the tiers can follow the bitcoin price without a release. */
+ *  configuration, so the tiers can follow the bitcoin price without a release. The
+ *  dollar amounts are in cents, the unit the dollar wallet reports its balance in. */
 export type TwoFactorThresholds = {
   nudgeSats: number
   nudgeUsdCents: number
@@ -67,8 +70,20 @@ export type TwoFactorThresholds = {
   highBalanceUsdCents: number
 }
 
-/** What the device remembers per account. The field names are the stored keys, kept as
- *  first written: renaming one would read every record already on a device as unset. */
+/** The thresholds as the console writes them: sats for the bitcoin wallet and whole
+ *  dollars for the dollar wallet, the units a person reads them in. Cents there read as
+ *  dollars to whoever edits them, and a slip of a factor of a hundred is what that
+ *  costs. */
+export type TwoFactorConsoleThresholds = {
+  nudgeSats: number
+  nudgeUsd: number
+  reminderSats: number
+  reminderUsd: number
+  highBalanceSats: number
+  highBalanceUsd: number
+}
+
+/** What the device remembers per account; the field names are the stored keys. */
 export type TwoFactorEnforcementRecord = {
   highestTier: TwoFactorTier
   /** The wallet that carried the account over the high-balance threshold, for the copy
@@ -76,18 +91,21 @@ export type TwoFactorEnforcementRecord = {
   highBalanceCurrency: WalletCurrency
   /** The threshold that wallet crossed, in its own unit, for the same copy: the tier
    *  stays once reached, so the copy quotes what was crossed, not what the threshold
-   *  has since been set to. Zero for a record from before it was kept. */
+   *  has since been set to. Zero below the high-balance tier. */
   highBalanceThreshold: number
   nudgeCardDismissed: boolean
-  /** Dismissals counted at the reminder tier. */
-  requiredDismissals: number
-  /** Dismissals counted at the high-balance tier. */
-  authenticatorDismissals: number
+  reminderDismissals: number
+  highBalanceDismissals: number
   /** The bitcoin wallet's all-time high, in sats: the highest balance seen at a session
    *  start at the nudge or reminder tier, or when the balance raised the tier. */
   highestSats: number
   /** The dollar wallet's all-time high, in cents, kept the same way. */
   highestUsdCents: number
+  /** The bitcoin wallet's balance when the highs were last read, at a session start or
+   *  a tier raise, in sats: what tells a transfer between the wallets from new funds. */
+  lastSessionSats: number
+  /** The dollar wallet's balance then, in cents. */
+  lastSessionUsdCents: number
   /** A session start owing the reminder tier found a wallet above its all-time high, and
    *  the bulletin that brought back has not been closed since: it comes back at every
    *  session start until it is. */

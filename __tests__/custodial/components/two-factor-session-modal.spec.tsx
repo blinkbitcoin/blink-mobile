@@ -68,9 +68,13 @@ jest.mock("@app/utils/testProps", () => ({
   testProps: (id: string) => ({ testID: id }),
 }))
 
-let mockIsSelfCustodialDisabled = false
-jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
-  useSelfCustodialDisabled: () => mockIsSelfCustodialDisabled,
+let mockIsCustodyExitOffered = true
+let mockIsCustodyExitOff = false
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => ({
+    isCustodyExitOffered: mockIsCustodyExitOffered,
+    isCustodyExitOff: mockIsCustodyExitOff,
+  }),
 }))
 
 const mockLogTwoFactorPromptShown = jest.fn()
@@ -121,7 +125,8 @@ const renderModal = ({
 describe("TwoFactorSessionModal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockIsSelfCustodialDisabled = false
+    mockIsCustodyExitOffered = true
+    mockIsCustodyExitOff = false
   })
 
   it("renders the title, both buttons and the reminder when visible", () => {
@@ -155,6 +160,13 @@ describe("TwoFactorSessionModal", () => {
         getByText(`Protect your account from unauthorized access. ${copy}`),
       ).toBeTruthy()
     })
+  })
+
+  it("counts nothing down with no dismissals left", () => {
+    const { getByText, queryByText } = renderModal({ remainingDismissals: 0 })
+
+    expect(getByText("Protect your account from unauthorized access.")).toBeTruthy()
+    expect(queryByText(/dismiss this/)).toBeNull()
   })
 
   /** The dismissal reports itself once it counts, so a second press during the exit
@@ -199,8 +211,31 @@ describe("TwoFactorSessionModal", () => {
   /** Declining leads to leaving custody, and nothing may push the user toward a
    *  self-custodial stack that is switched off: the authenticator is then the one way
    *  forward, with the X still counting the dismissal. */
-  it("offers no way to decline while the self-custodial stack is switched off", () => {
-    mockIsSelfCustodialDisabled = true
+  /** The countdown leads to the blocking screen, which does not stand while leaving
+   *  custody is off: the modal then stays dismissible. */
+  it("counts nothing down while leaving custody is known to be off", () => {
+    mockIsCustodyExitOffered = false
+    mockIsCustodyExitOff = true
+    const { getByText, queryByText } = renderModal({ remainingDismissals: 1 })
+
+    expect(getByText("Protect your account from unauthorized access.")).toBeTruthy()
+    expect(queryByText(/dismiss this/)).toBeNull()
+  })
+
+  /** Not yet known, the allowance still runs, so the countdown says so. */
+  it("counts down while it is not yet known whether leaving custody is on", () => {
+    mockIsCustodyExitOffered = false
+    const { getByText } = renderModal({ remainingDismissals: 1 })
+
+    expect(
+      getByText(
+        "Protect your account from unauthorized access. This is the last time you can dismiss this.",
+      ),
+    ).toBeTruthy()
+  })
+
+  it("offers no way to decline while leaving custody is not on offer", () => {
+    mockIsCustodyExitOffered = false
     const onDismiss = jest.fn()
     // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
     const { getByText, queryByTestId, queryByText, UNSAFE_getByType } = renderModal({

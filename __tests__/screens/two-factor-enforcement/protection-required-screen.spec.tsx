@@ -27,17 +27,13 @@ jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => 
   useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
 }))
 
-let mockIsSelfCustodialDisabled = false
-jest.mock("@app/screens/account-migration/hooks/use-self-custodial-disabled", () => ({
-  useSelfCustodialDisabled: () => mockIsSelfCustodialDisabled,
-}))
-
 const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   unmetTier: TwoFactorTier.HighBalance as TwoFactorTier,
   remainingDismissals: 0,
   highBalanceCurrency: WalletCurrency.Btc as WalletCurrency,
   highBalanceThreshold: 5_000_000,
+  isCustodyExitOffered: true,
   registerDismissal: mockRegisterDismissal,
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
@@ -83,7 +79,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.highBalanceCurrency = WalletCurrency.Btc
     mockEnforcement.highBalanceThreshold = 5_000_000
-    mockIsSelfCustodialDisabled = false
+    mockEnforcement.isCustodyExitOffered = true
   })
 
   it("names the sats threshold under a warning sign, with no close control", async () => {
@@ -140,18 +136,18 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     )
   })
 
-  /** A blocking screen swallows the hardware back rather than letting the app go, and
-   *  nothing on it is a dismissal. */
-  /** With the self-custodial stack switched off there is nothing to move toward, so
-   *  the authenticator is the one way forward. */
-  it("offers the authenticator alone while the self-custodial stack is switched off", async () => {
-    mockIsSelfCustodialDisabled = true
+  /** Until this launch knows the self-custodial stack is on there is nothing to move
+   *  toward, so the authenticator is the one way forward. */
+  it("offers the authenticator alone while leaving custody is not on offer", async () => {
+    mockEnforcement.isCustodyExitOffered = false
     await renderScreen()
 
     expect(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator())).toBeTruthy()
     expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
   })
 
+  /** A blocking screen swallows the hardware back rather than letting the app go, and
+   *  nothing on it is a dismissal. */
   it("swallows the hardware back and charges no dismissal", async () => {
     await renderScreen()
 

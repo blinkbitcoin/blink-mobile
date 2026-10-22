@@ -1,6 +1,7 @@
 import { WalletCurrency } from "@app/graphql/generated"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import {
+  TwoFactorConsoleThresholds,
   TwoFactorEnforcementRecord,
   TwoFactorReminderReason,
   TwoFactorSessionPrompt,
@@ -56,19 +57,81 @@ const isAscending = ({
   return isSatsAscending && isUsdAscending
 }
 
-/** Whether every threshold is a whole amount: sats and cents have no fractions, and a
- *  crossed threshold is kept on the device as one. */
-const hasWholeAmounts = (thresholds: TwoFactorThresholds): boolean =>
-  Object.values(thresholds).every(Number.isInteger)
+/** How far a threshold may sit from its shipped default, either way. */
+const THRESHOLD_BAND_FACTOR = 10
+
+const TIER_THRESHOLD_KEYS: readonly (keyof TwoFactorThresholds)[] = [
+  "nudgeSats",
+  "nudgeUsdCents",
+  "reminderSats",
+  "reminderUsdCents",
+  "highBalanceSats",
+  "highBalanceUsdCents",
+]
+
+/** Whether every threshold sits within the band around its shipped default: a slip of
+ *  a unit, cents for dollars or a zero too many, lands outside it. */
+const isWithinDefaultBand = (
+  thresholds: TwoFactorThresholds,
+  defaults: TwoFactorThresholds,
+): boolean =>
+  TIER_THRESHOLD_KEYS.every((key) => {
+    const value = thresholds[key]
+    const fallback = defaults[key]
+    const isAboveFloor = value >= fallback / THRESHOLD_BAND_FACTOR
+    const isBelowCeiling = value <= fallback * THRESHOLD_BAND_FACTOR
+    return isAboveFloor && isBelowCeiling
+  })
 
 /**
- * Whether a set of thresholds can drive the tiers: whole amounts that rise tier by tier
- * for both wallets. Anything else is a typo, and a typo here is costly: a tier reached
- * never lowers, so a high-balance threshold set below the reminder one would hold
- * accounts at the blocking screen even after the console is fixed.
+ * Whether a set of thresholds can drive the tiers: amounts that rise tier by tier for
+ * both wallets, each within a factor of ten of its shipped default. Anything else is a
+ * typo, and a typo here is costly: a tier reached never lowers, so a set that reads
+ * cents as dollars would hold accounts at the blocking screen even after the console
+ * is fixed.
  */
-export const isUsableThresholdSet = (thresholds: TwoFactorThresholds): boolean =>
-  hasWholeAmounts(thresholds) && isAscending(thresholds)
+export const isUsableThresholdSet = (
+  thresholds: TwoFactorThresholds,
+  defaults: TwoFactorThresholds,
+): boolean => isAscending(thresholds) && isWithinDefaultBand(thresholds, defaults)
+
+const CENTS_PER_USD = 100
+
+const CONSOLE_THRESHOLD_KEYS: readonly (keyof TwoFactorConsoleThresholds)[] = [
+  "nudgeSats",
+  "nudgeUsd",
+  "reminderSats",
+  "reminderUsd",
+  "highBalanceSats",
+  "highBalanceUsd",
+]
+
+/** Whether the console's value holds every threshold, each as a whole amount: sats
+ *  have no fractions, and the dollars are whole by contract. */
+const isConsoleThresholdSet = (
+  value: Record<string, unknown>,
+): value is TwoFactorConsoleThresholds =>
+  CONSOLE_THRESHOLD_KEYS.every((key) => Number.isInteger(value[key]))
+
+/** The console's thresholds in the wallets' own units: dollars become cents. */
+export const toWalletThresholds = (
+  thresholds: TwoFactorConsoleThresholds,
+): TwoFactorThresholds => ({
+  nudgeSats: thresholds.nudgeSats,
+  nudgeUsdCents: thresholds.nudgeUsd * CENTS_PER_USD,
+  reminderSats: thresholds.reminderSats,
+  reminderUsdCents: thresholds.reminderUsd * CENTS_PER_USD,
+  highBalanceSats: thresholds.highBalanceSats,
+  highBalanceUsdCents: thresholds.highBalanceUsd * CENTS_PER_USD,
+})
+
+/** The thresholds the console sets, in the wallets' own units, or null when its value
+ *  is not a whole set: a key missing or misspelled leaves the set incomplete, and a set
+ *  is only usable whole. */
+export const thresholdsFromConsole = (
+  value: Record<string, unknown>,
+): TwoFactorThresholds | null =>
+  isConsoleThresholdSet(value) ? toWalletThresholds(value) : null
 
 type WalletBalances = {
   sats: number
@@ -133,16 +196,19 @@ export const withTierReached = (
   }
 }
 
-/** The threshold the high-balance copy quotes: the one the account crossed, or, for a
- *  record from before that was kept, the one configured now for the wallet it names. */
-export const quotedHighBalanceThreshold = (
+/** Whether the wallet that crossed into the high-balance tier still holds the threshold
+ *  it crossed: the tier stays once reached, but the copy only states a balance the
+ *  account still has. A record with no crossed threshold kept has no amount to state. */
+export const isHoldingHighBalance = (
   record: TwoFactorEnforcementRecord,
-  thresholds: TwoFactorThresholds,
-): number => {
-  if (record.highBalanceThreshold > 0) return record.highBalanceThreshold
-  return record.highBalanceCurrency === WalletCurrency.Usd
-    ? thresholds.highBalanceUsdCents
-    : thresholds.highBalanceSats
+  wallets: readonly WalletBalance[] | undefined,
+): boolean => {
+  const { sats, usdCents } = balancesOf(wallets)
+  const isUsdCrossing = record.highBalanceCurrency === WalletCurrency.Usd
+  const balance = isUsdCrossing ? usdCents : sats
+  const hasCrossedThreshold = record.highBalanceThreshold > 0
+  const isAtThreshold = balance >= record.highBalanceThreshold
+  return hasCrossedThreshold && isAtThreshold
 }
 
 type UnmetTierInputs = {
@@ -163,31 +229,39 @@ const MAX_DISMISSALS_PER_TIER = 3
 
 const dismissalsOf = (record: TwoFactorEnforcementRecord, tier: TwoFactorTier): number =>
   tier === TwoFactorTier.HighBalance
-    ? record.authenticatorDismissals
-    : record.requiredDismissals
+    ? record.highBalanceDismissals
+    : record.reminderDismissals
 
 export const remainingDismissals = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
 ): number => Math.max(0, MAX_DISMISSALS_PER_TIER - dismissalsOf(record, tier))
 
+/** One more dismissal, never past the tier's allowance: a modal that stays dismissible
+ *  once the allowance is spent counts nothing more. */
+const counted = (dismissals: number): number =>
+  Math.min(MAX_DISMISSALS_PER_TIER, dismissals + 1)
+
 /** Each tier counts its own dismissals: the high-balance tier starts from zero however
  *  many times the reminder tier's bulletin was waved away. The nudge tier's card is
  *  closed for good instead, so a dismissal of it leaves the counts untouched. A
- *  reminder dismissal is also the close that settles a pending new high. */
+ *  reminder dismissal is also the close that settles a pending new high. A dismissal
+ *  that changes nothing, past the allowance, hands the same record back, so nothing is
+ *  written for it. */
 export const withDismissal = (
   record: TwoFactorEnforcementRecord,
   tier: TwoFactorTier,
 ): TwoFactorEnforcementRecord => {
   if (tier === TwoFactorTier.HighBalance) {
-    return { ...record, authenticatorDismissals: record.authenticatorDismissals + 1 }
+    const highBalanceDismissals = counted(record.highBalanceDismissals)
+    const isCounted = highBalanceDismissals !== record.highBalanceDismissals
+    return isCounted ? { ...record, highBalanceDismissals } : record
   }
   if (tier === TwoFactorTier.Reminder) {
-    return {
-      ...record,
-      requiredDismissals: record.requiredDismissals + 1,
-      isNewHighPending: false,
-    }
+    const reminderDismissals = counted(record.reminderDismissals)
+    const isCounted = reminderDismissals !== record.reminderDismissals
+    const isChanged = isCounted || record.isNewHighPending
+    return isChanged ? { ...record, reminderDismissals, isNewHighPending: false } : record
   }
   return record
 }
@@ -195,30 +269,91 @@ export const withDismissal = (
 type SessionPromptInputs = {
   unmetTier: TwoFactorTier
   record: TwoFactorEnforcementRecord
+  /** Whether leaving custody, the blocking screen's other way forward, is on offer. */
+  isCustodyExitOffered: boolean
 }
 
 /** Only the high-balance tier asks at the session start: its modal while dismissals
- *  remain, then the blocking screen. The reminder tier reminds on the home and never
- *  blocks, and the nudge tier only nudges. */
+ *  remain, then the blocking screen. The blocking screen asks for an authenticator or
+ *  for leaving custody, so while leaving custody is not on offer, switched off or not
+ *  yet known to be on, the modal stays instead, dismissible: a wall with one way forward
+ *  is one an account without an authenticator app cannot get past. The reminder tier
+ *  reminds on the home and never blocks, and the nudge tier only nudges. */
 export const resolveSessionPrompt = ({
   unmetTier,
   record,
+  isCustodyExitOffered,
 }: SessionPromptInputs): TwoFactorSessionPrompt => {
   if (unmetTier !== TwoFactorTier.HighBalance) return TwoFactorSessionPrompt.None
   const hasDismissalsLeft = remainingDismissals(record, unmetTier) > 0
-  return hasDismissalsLeft
+  const isModalDue = hasDismissalsLeft || !isCustodyExitOffered
+  return isModalDue
     ? TwoFactorSessionPrompt.SessionModal
     : TwoFactorSessionPrompt.ProtectionRequired
 }
 
-/** Whether either wallet now holds more than its all-time high. Each wallet is measured
- *  in its own unit, so a move in the bitcoin price never reads as a new high. */
+/** Whether a wallet now holds more than its all-time high from new funds. Each wallet
+ *  is measured in its own unit, so a move in the bitcoin price never reads as a new
+ *  high. A rise in one wallet while the other fell since the balances were last kept is
+ *  a transfer between them, a conversion, and no new funds: it raises the high without
+ *  reading as one. New funds that land while the other wallet is spent from read the
+ *  same way, and wait for the next high; telling them apart would take the bitcoin
+ *  price, which moves on its own. A record that never kept those balances reads them as
+ *  zero, so nothing it holds reads as a fall. */
 export const isAboveAllTimeHigh = (
   record: TwoFactorEnforcementRecord,
   wallets: readonly WalletBalance[] | undefined,
 ): boolean => {
   const { sats, usdCents } = balancesOf(wallets)
+  const isSatsAboveHigh = sats > record.highestSats
+  const isUsdAboveHigh = usdCents > record.highestUsdCents
+  const hasSatsFallen = sats < record.lastSessionSats
+  const hasUsdFallen = usdCents < record.lastSessionUsdCents
+  const isSatsHighNew = isSatsAboveHigh && !hasUsdFallen
+  const isUsdHighNew = isUsdAboveHigh && !hasSatsFallen
+  return isSatsHighNew || isUsdHighNew
+}
+
+/** Whether either wallet now holds more than its all-time high, whatever moved it. */
+const isAboveRecordedHigh = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+): boolean => {
+  const { sats, usdCents } = balancesOf(wallets)
   return sats > record.highestSats || usdCents > record.highestUsdCents
+}
+
+/** Whether the balances differ from the ones the last session start kept. */
+const hasMovedSinceLastSession = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+): boolean => {
+  const { sats, usdCents } = balancesOf(wallets)
+  return sats !== record.lastSessionSats || usdCents !== record.lastSessionUsdCents
+}
+
+/** Whether a session start's read of the highs changes the record: a high to raise, a
+ *  pending new high to settle, or balances that moved since the last session start. */
+export const isSessionStartHighChange = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+  unmetTier: TwoFactorTier,
+): boolean => {
+  const isReminderOwed = unmetTier === TwoFactorTier.Reminder
+  const isPendingSettled = record.isNewHighPending && !isReminderOwed
+  const isAboveHigh = isAboveRecordedHigh(record, wallets)
+  const hasMoved = hasMovedSinceLastSession(record, wallets)
+  const isChanged = isAboveHigh || isPendingSettled || hasMoved
+  return isChanged
+}
+
+/** Keeps the balances as the ones the next session start tells a transfer by. */
+export const withLastBalances = (
+  record: TwoFactorEnforcementRecord,
+  wallets: readonly WalletBalance[] | undefined,
+): TwoFactorEnforcementRecord => {
+  const { sats, usdCents } = balancesOf(wallets)
+  return { ...record, lastSessionSats: sats, lastSessionUsdCents: usdCents }
 }
 
 /** Raises each wallet's all-time high to its balance where the balance is above it. */
@@ -235,9 +370,10 @@ export const withAllTimeHigh = (
 }
 
 /** What a session start's read of the highs leaves: the highs raised to any balance
- *  above them, and a new high pending for the reminder bulletin while the reminder tier
- *  is owed, whether found now or still unclosed from an earlier session. An account that
- *  owes it no longer, with an authenticator, settles it. A record with no highs yet has
+ *  above them, the balances kept for the next session start to tell a transfer by, and
+ *  a new high pending for the reminder bulletin while the reminder tier is owed,
+ *  whether found now or still unclosed from an earlier session. An account that owes
+ *  it no longer, with an authenticator, settles it. A record with no highs yet has
  *  nothing to measure against: its first read seeds them, and finds no new high. */
 export const withSessionStartHigh = (
   record: TwoFactorEnforcementRecord,
@@ -249,7 +385,7 @@ export const withSessionStartHigh = (
   const isReminderOwed = unmetTier === TwoFactorTier.Reminder
   const isPending = record.isNewHighPending || isNewHigh
   return {
-    ...withAllTimeHigh(record, wallets),
+    ...withLastBalances(withAllTimeHigh(record, wallets), wallets),
     isNewHighPending: isReminderOwed && isPending,
   }
 }
@@ -278,10 +414,12 @@ export const DEFAULT_TWO_FACTOR_ENFORCEMENT: TwoFactorEnforcementRecord = {
   highBalanceCurrency: WalletCurrency.Btc,
   highBalanceThreshold: 0,
   nudgeCardDismissed: false,
-  requiredDismissals: 0,
-  authenticatorDismissals: 0,
+  reminderDismissals: 0,
+  highBalanceDismissals: 0,
   highestSats: 0,
   highestUsdCents: 0,
+  lastSessionSats: 0,
+  lastSessionUsdCents: 0,
   isNewHighPending: false,
 }
 
@@ -317,17 +455,23 @@ export const normalizeStoredRecord = (
     ? stored.highBalanceThreshold
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.highBalanceThreshold,
   nudgeCardDismissed: stored?.nudgeCardDismissed === true,
-  requiredDismissals: isWholeCount(stored?.requiredDismissals)
-    ? stored.requiredDismissals
-    : DEFAULT_TWO_FACTOR_ENFORCEMENT.requiredDismissals,
-  authenticatorDismissals: isWholeCount(stored?.authenticatorDismissals)
-    ? stored.authenticatorDismissals
-    : DEFAULT_TWO_FACTOR_ENFORCEMENT.authenticatorDismissals,
+  reminderDismissals: isWholeCount(stored?.reminderDismissals)
+    ? stored.reminderDismissals
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.reminderDismissals,
+  highBalanceDismissals: isWholeCount(stored?.highBalanceDismissals)
+    ? stored.highBalanceDismissals
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.highBalanceDismissals,
   highestSats: isWholeCount(stored?.highestSats)
     ? stored.highestSats
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.highestSats,
   highestUsdCents: isWholeCount(stored?.highestUsdCents)
     ? stored.highestUsdCents
     : DEFAULT_TWO_FACTOR_ENFORCEMENT.highestUsdCents,
+  lastSessionSats: isWholeCount(stored?.lastSessionSats)
+    ? stored.lastSessionSats
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.lastSessionSats,
+  lastSessionUsdCents: isWholeCount(stored?.lastSessionUsdCents)
+    ? stored.lastSessionUsdCents
+    : DEFAULT_TWO_FACTOR_ENFORCEMENT.lastSessionUsdCents,
   isNewHighPending: stored?.isNewHighPending === true,
 })

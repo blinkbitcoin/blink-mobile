@@ -21,7 +21,6 @@ import {
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
-import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
 import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
@@ -32,7 +31,7 @@ import { testProps } from "@app/utils/testProps"
  * number added to the one it logs in with protects nothing, since an attacker who takes
  * the account over can change both. The alternative is to leave custody, through the
  * screen that explains what that means, offered only while the self-custodial stack is
- * on: nothing may push the user toward it once it is switched off.
+ * known to be on: nothing may push the user toward it once it is switched off.
  *
  * Reached from the home card, the reminder bulletin, the Settings banner and the
  * session modal, and closable from the close control it draws, on the same margin as
@@ -52,8 +51,8 @@ export const TwoFactorSetupScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
-  const isMoveOffered = !useSelfCustodialDisabled()
-  const { unmetTier, hasAuthenticator, registerDismissal } = useTwoFactorEnforcement()
+  const { unmetTier, hasAuthenticator, isCustodyExitOffered, registerDismissal } =
+    useTwoFactorEnforcement()
   /** The tier this screen was opened for: what it reports, and what leaving it unfinished
    *  is charged to, even if the balance moves while it is open. */
   const [promptTier] = useState(unmetTier)
@@ -104,7 +103,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
             onPress={handleSetAuthenticator}
             {...testProps("two-factor-setup-authenticator")}
           />
-          {isMoveOffered && (
+          {isCustodyExitOffered && (
             <GaloySecondaryButton
               title={LL.AccountMigration.moveToNonCustodial()}
               onPress={handleMove}
