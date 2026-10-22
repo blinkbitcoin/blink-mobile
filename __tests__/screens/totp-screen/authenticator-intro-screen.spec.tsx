@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 import {
   DefaultTheme as navigationDefaultTheme,
@@ -8,6 +9,7 @@ import { ThemeProvider } from "@rn-vui/themed"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { light } from "@app/rne-theme/colors"
 import theme from "@app/rne-theme/theme"
 import { AuthenticatorIntroScreen } from "@app/screens/totp-screen"
 import {
@@ -109,6 +111,15 @@ describe("AuthenticatorIntroScreen", () => {
   })
 
   /** Every Set authenticator lands here, so this is where the setup starts. */
+  /** Nothing in the card is pressed, so it sits on the static card surface rather than
+   *  the one tappable rows use. */
+  it("draws the benefits on the static card surface", async () => {
+    await renderScreen()
+
+    const card = screen.getByTestId("authenticator-intro-benefits")
+    expect(StyleSheet.flatten(card.props.style).backgroundColor).toBe(light.grey7)
+  })
+
   it("reports the setup and the onboarding as started, once, under the tier it opened for", async () => {
     await renderScreen()
 
