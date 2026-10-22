@@ -953,6 +953,25 @@ describe("migration-checkpoint-storage a commit point the server has not started
     )
   })
 
+  /** The merge the commit screen's held start exists for: a save that confirms the start
+   *  without the server's answer binds the figure already stored, so a start allowed to
+   *  land before the phase read would keep the pre-conversion zero for the whole run. */
+  it("binds the stored figure on a save that confirms the start without the answer", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(unstartedCommitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+      expectedReceiveSats: 5000,
+      isStartConfirmed: true,
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledWith(
+      "test-key",
+      expect.objectContaining({ expectedReceiveSats: 0, isStartConfirmed: true }),
+    )
+  })
+
   /** A start this device saw accepted owns its figure, whatever a stale read of the
    *  phase still says: the drain may already have emptied what the preview reads. */
   it("keeps the figure of a run whose start was confirmed", async () => {

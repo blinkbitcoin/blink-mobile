@@ -30,10 +30,12 @@ import { useEnsureMigrationStarted } from "@app/screens/account-migration/hooks/
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useMigrationLnAddressTransfer } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { useMigrationStatus } from "@app/screens/account-migration/hooks/use-migration-status"
+import { resolveServerFlow } from "@app/screens/account-migration/utils/server-migration-flow"
 import {
   MigrationLnAddressOutcome,
   MigrationSupportOrigin,
   MigrationSupportReason,
+  ServerMigrationFlow,
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 import {
@@ -127,14 +129,21 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
 
   /** A migration the server already reports as FAILED skips arming and the re-point and
    *  hands straight over to support. */
-  const { status: migrationStatus, refetch: refetchMigrationStatus } =
-    useMigrationStatus()
+  const {
+    status: migrationStatus,
+    error: migrationStatusError,
+    refetch: refetchMigrationStatus,
+  } = useMigrationStatus()
   const isMigrationFailed = migrationStatus === MigrationStatus.Failed
+  /** Read through the lock's own rule, so this screen and the routing never disagree on
+   *  what counts as the server's answer: a stale phase under a failed re-read is none. */
+  const serverFlow = resolveServerFlow(migrationStatus, Boolean(migrationStatusError))
+  const isServerFlowUnanswered = serverFlow === ServerMigrationFlow.Unanswered
 
-  /** Read once at mount, and again each time the user comes back to this screen: the
-   *  dollar conversion is reached from here, and the save on return can only take the
-   *  figure it raised once the server has answered. A read that failed at mount would
-   *  otherwise never answer, and the stale figure would ride into the run. */
+  /** Read once at mount, and again each time the user comes back to this instance (from
+   *  the support screen it hands over to): a read that failed at mount would otherwise
+   *  never answer, and the start waits on it. A dollar conversion does not come back here:
+   *  it re-enters through the entry screen onto a fresh instance, whose own mount reads. */
   const wasFocusedRef = useRef(isFocused)
   useEffect(() => {
     const isReturning = isFocused && !wasFocusedRef.current
@@ -156,9 +165,18 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
    * reinstall, where the checkpoint below only remembers which screen to resume on. It
    * waits for the figures because a screen that cannot show what is being migrated has no
    * business claiming the user consented to migrating it.
+   *
+   * It waits for the server's phase too. The accepted start binds the receive figure for
+   * the run (mergeCheckpoint), and only a save that knows the run has not started may
+   * replace the one already stored: this screen is mounted afresh after a dollar
+   * conversion, and a start that lands before that instance's phase read would bind the
+   * figure from before the conversion, which the receive gate then reads as "nothing will
+   * arrive" while the converted funds are still in transit (#4102). Held, the save that
+   * may replace the figure is queued ahead of the one carrying the start.
    */
   const migrationStart = useEnsureMigrationStarted({
-    skip: !preview.isReady || isMigrationFailed || hasDollarBalance,
+    skip:
+      !preview.isReady || isMigrationFailed || hasDollarBalance || isServerFlowUnanswered,
   })
 
   const {
@@ -221,9 +239,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
   const startConfirmation = migrationStart.isStarted ? true : undefined
   /** Until the server starts a run, the figure is the preview's latest word rather than the
    *  first one saved: converting dollars from this screen changes the bitcoin it will send.
-   *  An unanswered read keeps the stored figure, the safe side of the two. */
+   *  An unanswered read keeps the stored figure, which is only the safe side of the two
+   *  because the start above waits for the answer. */
   const serverFlowUnstarted =
-    migrationStatus === MigrationStatus.NotStarted ? true : undefined
+    serverFlow === ServerMigrationFlow.NotStarted ? true : undefined
   /** What this focus already recorded: the figure, whether the write carried the accepted
    *  start and whether it said the server had not started the run, since a change to any
    *  of them is a new record to write. A landed write updates the very state that
@@ -449,6 +468,10 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     isProvisionedAccountMissing && !hasCheckpointError
   const hasIdLookupFailure =
     areTransferIdsNeeded && (hasOwnerIdError || isProvisionedAccountUnresolved)
+  /** The start waits on the phase read, so a read that fails would otherwise leave Approve
+   *  off with nothing to tap. Only until the start lands: past it the phase holds nothing
+   *  back, and a retry over it would hide the Approve the user is ready to press. */
+  const hasStatusReadFailure = Boolean(migrationStatusError) && !migrationStart.isStarted
   /** A refused commit-point write joins the retry rather than leaving the Approve it
    *  holds off dead: this screen swallows the hardware back, so a disabled button with
    *  nothing beside it is the one dead end it must never present. */
@@ -457,7 +480,8 @@ export const MigrationBalancesOverviewScreen: React.FC = () => {
     preview.isRetryable ||
     migrationStart.hasConnectionIssue ||
     hasLnAddressConnectionIssue ||
-    hasIdLookupFailure
+    hasIdLookupFailure ||
+    hasStatusReadFailure
   const isRetryable =
     hasNetworkFailure || hasCheckpointReadFailure || isCommitPointWriteRetryable
 

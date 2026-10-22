@@ -82,12 +82,14 @@ jest.mock("@app/graphql/generated", () => ({
 }))
 
 let mockMigrationStatus: MigrationStatus | null = null
+let mockMigrationStatusError: Error | undefined
 const mockRefetchMigrationStatus = jest.fn()
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: () => ({
     status: mockMigrationStatus,
     loading: false,
+    error: mockMigrationStatusError,
     refetch: mockRefetchMigrationStatus,
   }),
 }))
@@ -283,7 +285,11 @@ const resetScreenMocks = () => {
     }),
   )
   mockMigrationStart.mockResolvedValue(acceptedMigrationStart)
-  mockMigrationStatus = null
+  /** An answered phase, because the start waits for one: the tests about the phase read
+   *  itself set their own. In progress rather than not started, so no write claims the
+   *  figure unless a test asks for it. */
+  mockMigrationStatus = MigrationStatus.InProgress
+  mockMigrationStatusError = undefined
   jest.spyOn(Linking, "openURL").mockImplementation(() => Promise.resolve())
 }
 
@@ -1169,6 +1175,7 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
     })
 
     it("writes again once a status read that had not answered says it never started", async () => {
+      mockMigrationStatus = null
       const { rerender } = renderScreen()
       await flushEffects()
 
@@ -1218,8 +1225,9 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
       )
     })
 
-    /** The conversion is reached from this screen, so coming back to it is when a figure
-     *  can have moved; the mount read already covers the first focus. */
+    /** Coming back from the support screen returns to this same instance; the mount read
+     *  already covers the first focus. (A conversion does not come back here: it re-enters
+     *  through the entry screen onto a fresh instance, which reads on its own mount.) */
     it("asks the server again each time the user comes back, not on the first focus", async () => {
       const { rerender } = renderScreen()
       await flushEffects()
@@ -1234,44 +1242,111 @@ describe("MigrationBalancesOverviewScreen commit-point write", () => {
       expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
     })
 
-    /** The status read failed at mount, so the first saves keep the stored zero; once the
-     *  read answers on the user's return, the figure the conversion raised gets through. */
-    it("lets a converted figure through once a failed status read recovers", async () => {
-      mockMigrationStatus = null
-      mockUseMigrationQuery.mockReturnValue(
-        migrationQueryResult({
-          balanceSats: 0,
-          feeSats: 0,
-          feeCoveredByBlink: true,
-          receiveSats: 0,
-        }),
-      )
+    /**
+     * The instance a conversion lands on: the record still holds the zero saved before it,
+     * and the preview now says what the converted dollars will send. The accepted start
+     * binds the figure for the run, so it must wait for the phase: a start that landed
+     * first would keep the zero, and the receive gate would swap past funds in transit.
+     */
+    describe("on the instance a dollar conversion lands on", () => {
+      const arriveAfterConversion = () => {
+        mockStoredCheckpoint = MigrationCheckpoint.BalancesOverview
+        mockStoredExpectedReceiveSats = 0
+        mockMigrationStatus = null
+        mockUseMigrationQuery.mockReturnValue({
+          ...migrationQueryResult({
+            balanceSats: 5010,
+            feeSats: 10,
+            feeCoveredByBlink: false,
+            receiveSats: 5000,
+          }),
+          refetch: jest.fn(),
+        })
+        mockUseWalletOverviewScreenQuery.mockReturnValue({
+          ...walletOverviewQueryResult({ btcBalance: 5010, usdBalance: 0 }),
+          refetch: jest.fn(),
+        })
+      }
+
+      it("holds the start while the phase read has not answered", async () => {
+        arriveAfterConversion()
+        renderScreen()
+        await flushEffects()
+
+        expect(mockMigrationStart).not.toHaveBeenCalled()
+        expect(screen.getByTestId("migration-balances-overview-approve")).toBeDisabled()
+        for (const [, options] of mockSaveCheckpoint.mock.calls) {
+          expect(options.isStartConfirmed).toBeUndefined()
+        }
+      })
+
+      it("issues the write that replaces the figure before the one carrying the start", async () => {
+        arriveAfterConversion()
+        const { rerender } = renderScreen()
+        await flushEffects()
+
+        mockMigrationStatus = MigrationStatus.NotStarted
+        rerender(screenTree())
+        await flushEffects()
+
+        expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+        const writes = mockSaveCheckpoint.mock.calls.map(([, options]) => options)
+        const replacing = writes.findIndex(
+          (options) =>
+            options.isServerFlowUnstarted === true &&
+            options.expectedReceiveSats === 5000,
+        )
+        const confirming = writes.findIndex(
+          (options) => options.isStartConfirmed === true,
+        )
+        expect(replacing).toBeGreaterThanOrEqual(0)
+        expect(confirming).toBeGreaterThan(replacing)
+      })
+
+      it("offers the retry, worded as the connection, when the phase read fails", async () => {
+        arriveAfterConversion()
+        mockMigrationStatusError = new Error("Network request failed")
+        renderScreen()
+        await flushEffects()
+
+        expect(mockMigrationStart).not.toHaveBeenCalled()
+        expect(screen.getByText(LL.errors.network.connection())).toBeTruthy()
+
+        fireEvent.press(screen.getByTestId("migration-balances-overview-retry"))
+        await flushEffects()
+
+        expect(mockRefetchMigrationStatus).toHaveBeenCalled()
+      })
+
+      /** A stale phase left under a failed re-read is no answer either: the lock's own
+       *  rule, which this screen now shares. */
+      it("does not take a phase left behind by a failed re-read as the answer", async () => {
+        arriveAfterConversion()
+        mockMigrationStatus = MigrationStatus.NotStarted
+        mockMigrationStatusError = new Error("Network request failed")
+        renderScreen()
+        await flushEffects()
+
+        expect(mockMigrationStart).not.toHaveBeenCalled()
+        for (const [, options] of mockSaveCheckpoint.mock.calls) {
+          expect(options.isServerFlowUnstarted).toBeUndefined()
+        }
+      })
+    })
+
+    /** Past the start the phase holds nothing back, so a re-read that fails must not swap
+     *  the Approve the user is about to press for a retry. */
+    it("keeps Approve once the start has landed, whatever a later phase read does", async () => {
       const { rerender } = renderScreen()
       await flushEffects()
+      expect(mockMigrationStart).toHaveBeenCalledTimes(1)
 
-      mockIsFocused = false
-      rerender(screenTree())
-      mockMigrationStatus = MigrationStatus.NotStarted
-      mockUseMigrationQuery.mockReturnValue(
-        migrationQueryResult({
-          balanceSats: 5010,
-          feeSats: 10,
-          feeCoveredByBlink: false,
-          receiveSats: 5000,
-        }),
-      )
-      mockIsFocused = true
+      mockMigrationStatusError = new Error("Network request failed")
       rerender(screenTree())
       await flushEffects()
 
-      expect(mockRefetchMigrationStatus).toHaveBeenCalledTimes(1)
-      expect(mockSaveCheckpoint).toHaveBeenLastCalledWith(
-        MigrationCheckpoint.BalancesOverview,
-        expect.objectContaining({
-          expectedReceiveSats: 5000,
-          isServerFlowUnstarted: true,
-        }),
-      )
+      expect(screen.queryByTestId("migration-balances-overview-retry")).toBeNull()
+      expect(screen.getByTestId("migration-balances-overview-approve")).toBeEnabled()
     })
 
     it("asks the server again from the shared retry", async () => {
