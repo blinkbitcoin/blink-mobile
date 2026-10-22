@@ -234,9 +234,12 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     ? onchainAmountRowCurrency
     : requestState.receivingWalletDescriptor.currency
 
-  const canToggleWallet = isSelfCustodial
-    ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
-    : !isDollarBalanceGated
+  // Switching wallets mid-create would put the old wallet's new address on the new wallet's page.
+  const canToggleWallet =
+    !isGeneratingAddress &&
+    (isSelfCustodial
+      ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
+      : !isDollarBalanceGated)
 
   return (
     <Screen

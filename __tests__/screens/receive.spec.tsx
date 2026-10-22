@@ -1470,6 +1470,57 @@ describe("ReceiveScreen new on-chain address", () => {
     expect(onChainAddressCreateMock).toHaveBeenCalledTimes(1)
   })
 
+  it("locks the wallet toggle until the new address arrives", async () => {
+    type CreateResponse = Awaited<ReturnType<typeof onChainAddressCreateMock>>
+    let resolveCreate: (value: CreateResponse) => void = () => {}
+    onChainAddressCreateMock.mockImplementationOnce(
+      () =>
+        new Promise<CreateResponse>((resolve) => {
+          resolveCreate = resolve
+        }),
+    )
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    // The toggle ignores taps until the lightning request is ready.
+    await waitFor(() => {
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+    })
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await waitFor(() => {
+      expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
+    })
+    const usdFetch = { variables: { input: { walletId: "usd-wallet-id" } } }
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(onChainAddressCurrentMock).not.toHaveBeenCalledWith(usdFetch)
+
+    resolveCreate({
+      data: {
+        onChainAddressCreate: {
+          errors: [],
+          address: "tb1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxx9fresh",
+        },
+      },
+    })
+    await waitFor(() => {
+      expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(onChainAddressCurrentMock).toHaveBeenCalledWith(usdFetch)
+  })
+
   it("keeps the current address and reports the failure", async () => {
     onChainAddressCreateMock.mockImplementationOnce(() =>
       Promise.reject(new Error("network")),
