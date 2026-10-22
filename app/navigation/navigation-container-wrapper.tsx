@@ -55,6 +55,14 @@ const BLOCKER_ROUTE = "Primary" satisfies keyof RootStackParamList
 /** Where a still-locked session has to pass through first. */
 const UNLOCK_ENTRY_ROUTE = "authenticationCheck" satisfies keyof RootStackParamList
 
+/** The screens of the authenticator registration where its setup key is at stake: the
+ *  code, whose answer brings up the backup only while the code screen is there, and the
+ *  backup, the key's one chance to be kept. A link must not close either. */
+const KEY_AT_STAKE_ROUTES: ReadonlyArray<string> = [
+  "totpRegistrationValidate",
+  "totpRegistrationBackup",
+] satisfies ReadonlyArray<keyof RootStackParamList>
+
 /** The armed-gate reset is lock-aware: while the app is still locked it must land on
  *  authenticationCheck so the PIN/biometric unlock is never skipped. Jumping straight to
  *  Primary would strand isAppLocked at true, hiding the gate behind an app that never
@@ -261,6 +269,14 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
    *  from the whole stack, not the focused route, so the unlock that covers the
    *  registration on a return does not let it through. */
   const [isTotpRegistrationOpen, setIsTotpRegistrationOpen] = React.useState(false)
+  /** While the code or the key's backup is the registration's top screen, any link,
+   *  fresh or queued, the migration's too, waits for it to be left: one that lands on a
+   *  screen below, the home among them, would close it before the key is kept. A link
+   *  that arrives while the user is still on the code screen opens once the
+   *  registration moves on or is left. The state reopens a queued link then; the linking
+   *  listener closes over stale values, so it reads the ref. */
+  const [isKeyAtStake, setIsKeyAtStake] = React.useState(false)
+  const isKeyAtStakeRef = useRef(false)
   const promptHeldUrlRef = useRef<string | null>(null)
   useEffect(() => {
     if (isTwoFactorHoldingLinks && urlAfterUnlockAndAuth) {
@@ -275,10 +291,11 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   /** A link that waited for the unlock, the sign-in or the two-factor prompts opens
    *  once all of them are out of the way; the migration link, which the prompts let
    *  through live, goes through here as well. */
-  const isQueuedLinkHeld =
+  const isQueuedLinkHeldByPrompts =
     isQueuedLinkWaiting &&
     urlAfterUnlockAndAuth !== null &&
     !isMigrationDeeplink(urlAfterUnlockAndAuth)
+  const isQueuedLinkHeld = isQueuedLinkHeldByPrompts || isKeyAtStake
   const canOpenQueuedUrl = canHandlePayments && !isAppLocked && !isQueuedLinkHeld
   useEffect(() => {
     if (canOpenQueuedUrl && urlAfterUnlockAndAuth) {
@@ -356,8 +373,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         const isGateRemedyLink = isMigrationDeeplink(url)
         if (isBlockerVisibleRef.current && !isGateRemedyLink) return
         const isHeldByTwoFactor = isTwoFactorHoldingLinksRef.current && !isGateRemedyLink
+        const isHeld = isHeldByTwoFactor || isKeyAtStakeRef.current
 
-        const canOpenNow = !isAppLocked && canHandlePayments && !isHeldByTwoFactor
+        const canOpenNow = !isAppLocked && canHandlePayments && !isHeld
         if (canOpenNow) {
           const maybeAction = processLinkForAction(url)
           if (maybeAction) {
@@ -399,6 +417,16 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
           setIsTotpRegistrationOpen(
             rootRoutes.some((route) => isTotpRegistrationRoute(route.name)),
           )
+          /** The registration's own top screen, whatever covers it: the backup stays under
+           *  the screen that follows it, where the key is already kept. */
+          const registrationTop = [...rootRoutes]
+            .reverse()
+            .find((route) => isTotpRegistrationRoute(route.name))
+          const isKeyScreenOnTop = KEY_AT_STAKE_ROUTES.some(
+            (name) => name === registrationTop?.name,
+          )
+          isKeyAtStakeRef.current = isKeyScreenOnTop
+          setIsKeyAtStake(isKeyScreenOnTop)
 
           if (routeName.current !== currentRouteName && currentRouteName) {
             /* eslint-disable camelcase */
