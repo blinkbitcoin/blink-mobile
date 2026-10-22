@@ -68,6 +68,10 @@ describe("shouldRetryOperation", () => {
     expect(shouldRetryOperation(networkError, "btcMapPlaceSubmit")).toBe(true)
   })
 
+  it("does not resend a new on-chain address request, which mints one per landing", () => {
+    expect(shouldRetryOperation(networkError, "onChainAddressCreate")).toBe(false)
+  })
+
   it("does not retry an on-chain send-all", () => {
     expect(shouldRetryOperation(networkError, "onChainPaymentSendAll")).toBe(false)
   })
@@ -112,6 +116,10 @@ describe("shouldRetryUnauthorized", () => {
     // Same reasoning as the transport retry: the resent request carries the
     // attempt's submissionId, so the backend deduplicates it.
     expect(shouldRetryUnauthorized(unauthorizedError, "btcMapPlaceSubmit")).toBe(true)
+  })
+
+  it("does not retry a 401 on a new on-chain address request", () => {
+    expect(shouldRetryUnauthorized(unauthorizedError, "onChainAddressCreate")).toBe(false)
   })
 
   IRREVERSIBLE_OPERATIONS.forEach((operationName) => {
