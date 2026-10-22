@@ -3792,7 +3792,7 @@ export type OnChainAddressCreateMutationVariables = Exact<{
 }>;
 
 
-export type OnChainAddressCreateMutation = { readonly __typename: 'Mutation', readonly onChainAddressCreate: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
+export type OnChainAddressCreateMutation = { readonly __typename: 'Mutation', readonly onChainAddressCreate: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
 export type LnNoAmountInvoiceCreateMutationVariables = Exact<{
   input: LnNoAmountInvoiceCreateInput;
@@ -7853,6 +7853,7 @@ export const OnChainAddressCreateDocument = gql`
   onChainAddressCreate(input: $input) {
     errors {
       message
+      code
     }
     address
   }

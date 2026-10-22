@@ -2223,6 +2223,7 @@
     "newAddressHint": "Yenza idilesi entsha yeBitcoin. Iidilesi zangaphambili zisasebenza.",
     "newAddressGenerated": "Idilesi entsha ilungile. Iidilesi zangaphambili zisasebenza.",
     "newAddressFailed": "Ayikwazanga ukwenza idilesi entsha. Nceda uzame kwakhona.",
+    "newAddressRateLimited": "Zininzi kakhulu iidilesi ezintsha. Nceda ulinde kancinci uze uzame kwakhona.",
     "addAmount": "Cela Isixa esithile",
     "expired": "I-invoyisi iphelelwe lixesha",
     "expiresIn": "Iphelelwa",

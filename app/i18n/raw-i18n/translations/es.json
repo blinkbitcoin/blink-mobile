@@ -2223,6 +2223,7 @@
         "newAddressHint": "Genera una nueva dirección de Bitcoin. Las direcciones anteriores siguen funcionando.",
         "newAddressGenerated": "Nueva dirección lista. Las direcciones anteriores siguen funcionando.",
         "newAddressFailed": "No se pudo generar una nueva dirección. Inténtalo de nuevo.",
+        "newAddressRateLimited": "Demasiadas direcciones nuevas. Espera un rato e inténtalo de nuevo.",
         "addAmount": "Solicitar una cantidad específica",
         "expired": "La factura ha caducado",
         "expiresIn": "Expira en",

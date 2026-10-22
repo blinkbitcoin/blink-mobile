@@ -1,5 +1,8 @@
 import { WalletCurrency } from "@app/graphql/generated"
-import type { ReceivePaymentRequestState } from "../payment/request-state.types"
+import {
+  NewOnchainAddressResult,
+  type ReceivePaymentRequestState,
+} from "../payment/request-state.types"
 
 import { useOnChainAddress } from "./use-onchain-address"
 
@@ -29,7 +32,8 @@ export const useOnchainResolver = (
       loading: !requestState.onchainAddress,
       getFullUriFn: requestState.getOnchainFullUriFn,
       generateNewAddress:
-        requestState.generateNewOnchainAddress ?? (() => Promise.resolve(false)),
+        requestState.generateNewOnchainAddress ??
+        (() => Promise.resolve(NewOnchainAddressResult.Failed)),
     }
   }
 

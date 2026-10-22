@@ -2223,6 +2223,7 @@
     "newAddressHint": "Új Bitcoin-címet hoz létre. A korábbi címek továbbra is működnek.",
     "newAddressGenerated": "Az új cím elkészült. A korábbi címek továbbra is működnek.",
     "newAddressFailed": "Nem sikerült új címet létrehozni. Kérjük, próbáld újra.",
+    "newAddressRateLimited": "Túl sok új cím. Várj egy kicsit, majd próbáld újra.",
     "addAmount": "Konkrét összeg igénylése",
     "expired": "A számla lejárt",
     "expiresIn": "Lejár",

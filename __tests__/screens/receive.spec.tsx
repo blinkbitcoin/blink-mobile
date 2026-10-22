@@ -93,8 +93,8 @@ const onChainAddressCreateMock = jest.fn(() =>
   Promise.resolve({
     data: {
       onChainAddressCreate: {
-        errors: [],
-        address: "tb1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxx9fresh",
+        errors: [] as { message: string; code?: string }[],
+        address: "tb1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxx9fresh" as string | null,
       },
     },
   }),
@@ -1482,6 +1482,32 @@ describe("ReceiveScreen new on-chain address", () => {
       expect(toastShow).toHaveBeenCalledWith(
         expect.objectContaining({
           message: LL.ReceiveScreen.newAddressFailed(),
+          type: "error",
+        }),
+      )
+    })
+    expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
+  })
+
+  it("tells the user to wait when the API rate-limits new addresses", async () => {
+    onChainAddressCreateMock.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: {
+          onChainAddressCreate: {
+            errors: [{ message: "Too many", code: "TOO_MANY_REQUEST" }],
+            address: null,
+          },
+        },
+      }),
+    )
+    await renderOnOnchainPage()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+    await waitFor(() => {
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressRateLimited(),
           type: "error",
         }),
       )

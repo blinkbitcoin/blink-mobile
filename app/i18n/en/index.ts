@@ -2236,6 +2236,7 @@ const en: BaseTranslation = {
     newAddressHint: "Generates a new Bitcoin address. Previous addresses keep working.",
     newAddressGenerated: "New address ready. Previous addresses still work.",
     newAddressFailed: "Couldn't generate a new address. Please try again.",
+    newAddressRateLimited: "Too many new addresses. Please wait a while and try again.",
     addAmount: "Request Specific Amount",
     expired: "The invoice has expired",
     expiresIn: "Expires in",

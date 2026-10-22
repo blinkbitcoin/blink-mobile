@@ -23,7 +23,11 @@ import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
-import type { ReceivePaymentRequestState } from "./payment/request-state.types"
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+  type ReceivePaymentRequestState,
+} from "./payment/request-state.types"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
@@ -138,14 +142,18 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     () =>
       runNewAddressOnce(async () => {
         setIsGeneratingAddress(true)
-        const ok = await generateNewAddress()
+        const result = await generateNewAddress()
         setIsGeneratingAddress(false)
+        const created = result === NewOnchainAddressResult.Created
+        const toastMessages: Record<NewOnchainAddressResultType, string> = {
+          [NewOnchainAddressResult.Created]: LL.ReceiveScreen.newAddressGenerated(),
+          [NewOnchainAddressResult.Failed]: LL.ReceiveScreen.newAddressFailed(),
+          [NewOnchainAddressResult.RateLimited]: LL.ReceiveScreen.newAddressRateLimited(),
+        }
         toastShow({
-          message: ok
-            ? LL.ReceiveScreen.newAddressGenerated()
-            : LL.ReceiveScreen.newAddressFailed(),
+          message: toastMessages[result],
           LL,
-          type: ok ? "success" : "error",
+          type: created ? "success" : "error",
         })
       }),
     [runNewAddressOnce, generateNewAddress, LL],

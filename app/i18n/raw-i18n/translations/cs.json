@@ -2223,6 +2223,7 @@
     "newAddressHint": "Vygeneruje novou bitcoinovou adresu. Předchozí adresy fungují dál.",
     "newAddressGenerated": "Nová adresa je připravena. Předchozí adresy stále fungují.",
     "newAddressFailed": "Novou adresu se nepodařilo vygenerovat. Zkuste to prosím znovu.",
+    "newAddressRateLimited": "Příliš mnoho nových adres. Chvíli počkejte a zkuste to znovu.",
     "addAmount": "Požadovat konkrétní částku",
     "expired": "Platnost faktury vypršela",
     "expiresIn": "Platnost končí za",

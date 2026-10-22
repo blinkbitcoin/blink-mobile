@@ -19,9 +19,11 @@ import {
   PaymentRequestState,
   PaymentRequestStateType,
 } from "@app/screens/receive-bitcoin-screen/payment/index.types"
-import type {
-  ReceiveInvoiceInfo,
-  ReceivePaymentRequestState,
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+  type ReceiveInvoiceInfo,
+  type ReceivePaymentRequestState,
 } from "@app/screens/receive-bitcoin-screen/payment/request-state.types"
 import {
   MoneyAmount,
@@ -393,7 +395,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   // after the one that replaced it and show a superseded address.
   const onchainRequestIdRef = useRef(0)
 
-  // Resolves true once an address is on screen. `forceNew` is the user asking for a
+  // Resolves true once the SDK has issued an address. `forceNew` is the user asking for a
   // fresh one: earlier addresses stay valid, so it skips the reuse checks and no more.
   const issueOnchainAddress = useCallback(
     async (forceNew = false) => {
@@ -448,7 +450,9 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         )
         return false
       }
-      if (requestId !== onchainRequestIdRef.current) return false
+      // A newer request owns the screen now. The SDK still issued this address, and
+      // the newer request shows it or one issued after it, so a user tap succeeded.
+      if (requestId !== onchainRequestIdRef.current) return true
 
       setOnchainAddress(result.address)
       if (!canTrackReuse) return true
@@ -485,18 +489,20 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     })
   }, [sdk, issueOnchainAddress, loadedDepositMarker, pendingDepositKey])
 
-  const generateNewOnchainAddress = useCallback(async (): Promise<boolean> => {
-    try {
-      return await issueOnchainAddress(true)
-    } catch (err) {
-      recordAppError(
-        err instanceof Error
-          ? err
-          : new Error(`Self-custodial new onchain address failed: ${err}`),
-      )
-      return false
-    }
-  }, [issueOnchainAddress])
+  const generateNewOnchainAddress =
+    useCallback(async (): Promise<NewOnchainAddressResultType> => {
+      try {
+        const created = await issueOnchainAddress(true)
+        return created ? NewOnchainAddressResult.Created : NewOnchainAddressResult.Failed
+      } catch (err) {
+        recordAppError(
+          err instanceof Error
+            ? err
+            : new Error(`Self-custodial new onchain address failed: ${err}`),
+        )
+        return NewOnchainAddressResult.Failed
+      }
+    }, [issueOnchainAddress])
 
   useEffect(() => {
     if (!sdk) return

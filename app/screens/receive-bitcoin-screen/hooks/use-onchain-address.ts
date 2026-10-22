@@ -10,6 +10,10 @@ import { toastShow } from "@app/utils/toast"
 
 import { getPaymentRequestFullUri } from "../payment/helpers"
 import { GetFullUriFn, Invoice } from "../payment/index.types"
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+} from "../payment/request-state.types"
 
 gql`
   mutation onChainAddressCurrent($input: OnChainAddressCurrentInput!) {
@@ -25,6 +29,7 @@ gql`
     onChainAddressCreate(input: $input) {
       errors {
         message
+        code
       }
       address
     }
@@ -70,24 +75,29 @@ export const useOnChainAddress = (
       })
   }, [walletId, onChainAddressCurrent, LL])
 
-  /** Resolves true once a fresh address is on screen; the old one keeps working. */
-  const generateNewAddress = useCallback(async (): Promise<boolean> => {
-    if (!walletId) return false
-    setLoading(true)
-    try {
-      const result = await onChainAddressCreate({
-        variables: { input: { walletId } },
-      })
-      const addr = result.data?.onChainAddressCreate?.address
-      if (!addr) return false
-      setAddress(addr)
-      return true
-    } catch {
-      return false
-    } finally {
-      setLoading(false)
-    }
-  }, [walletId, onChainAddressCreate])
+  /** Resolves Created once a fresh address is on screen; the old one keeps working. */
+  const generateNewAddress =
+    useCallback(async (): Promise<NewOnchainAddressResultType> => {
+      if (!walletId) return NewOnchainAddressResult.Failed
+      setLoading(true)
+      try {
+        const result = await onChainAddressCreate({
+          variables: { input: { walletId } },
+        })
+        const payload = result.data?.onChainAddressCreate
+        if (payload?.errors.some((err) => err.code === "TOO_MANY_REQUEST")) {
+          return NewOnchainAddressResult.RateLimited
+        }
+        const addr = payload?.address
+        if (!addr) return NewOnchainAddressResult.Failed
+        setAddress(addr)
+        return NewOnchainAddressResult.Created
+      } catch {
+        return NewOnchainAddressResult.Failed
+      } finally {
+        setLoading(false)
+      }
+    }, [walletId, onChainAddressCreate])
 
   const getFullUriFn = useMemo<GetFullUriFn | undefined>(() => {
     if (!address) return undefined

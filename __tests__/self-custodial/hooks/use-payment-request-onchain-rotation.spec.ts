@@ -8,6 +8,10 @@ import {
   pendingDeposit,
 } from "../../helpers/self-custodial-payment-request"
 import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+} from "@app/screens/receive-bitcoin-screen/payment/request-state.types"
 
 /**
  * The on-chain deposit address must not be reused once it has been paid.
@@ -723,12 +727,12 @@ describe("generateNewOnchainAddress", () => {
     })
     expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
 
-    let ok: boolean | undefined
+    let outcome: NewOnchainAddressResultType | undefined
     await act(async () => {
-      ok = await result.current?.generateNewOnchainAddress?.()
+      outcome = await result.current?.generateNewOnchainAddress?.()
     })
 
-    expect(ok).toBe(true)
+    expect(outcome).toBe(NewOnchainAddressResult.Created)
     expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
     expect(result.current?.onchainAddress).toBe("bc1qfresh...")
     expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith(
@@ -737,7 +741,7 @@ describe("generateNewOnchainAddress", () => {
     )
   })
 
-  it("keeps the current address and reports false when the SDK returns none", async () => {
+  it("keeps the current address and reports a failure when the SDK returns none", async () => {
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
       .mockResolvedValueOnce({ errors: [{ message: "sdk down" }] })
@@ -747,17 +751,17 @@ describe("generateNewOnchainAddress", () => {
       expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     })
 
-    let ok: boolean | undefined
+    let outcome: NewOnchainAddressResultType | undefined
     await act(async () => {
-      ok = await result.current?.generateNewOnchainAddress?.()
+      outcome = await result.current?.generateNewOnchainAddress?.()
     })
 
-    expect(ok).toBe(false)
+    expect(outcome).toBe(NewOnchainAddressResult.Failed)
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     expect(mockRecordAppError).toHaveBeenCalled()
   })
 
-  it("reports false instead of throwing when the request rejects", async () => {
+  it("reports a failure instead of throwing when the request rejects", async () => {
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
       .mockRejectedValueOnce(new Error("bridge exploded"))
@@ -767,13 +771,56 @@ describe("generateNewOnchainAddress", () => {
       expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     })
 
-    let ok: boolean | undefined
+    let outcome: NewOnchainAddressResultType | undefined
     await act(async () => {
-      ok = await result.current?.generateNewOnchainAddress?.()
+      outcome = await result.current?.generateNewOnchainAddress?.()
     })
 
-    expect(ok).toBe(false)
+    expect(outcome).toBe(NewOnchainAddressResult.Failed)
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
     expect(mockRecordAppError).toHaveBeenCalledWith(new Error("bridge exploded"))
+  })
+
+  it("reports success when a deposit rotation replaces the request mid-flight", async () => {
+    // The tap's address was issued, and the deposit rotation that overtook it puts a
+    // fresh address on screen too, so the user must not be told the tap failed.
+    let resolveTap: (value: { address: string }) => void = () => {}
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockReturnValueOnce(
+        new Promise<{ address: string }>((resolve) => {
+          resolveTap = resolve
+        }),
+      )
+      .mockResolvedValueOnce({ address: "bc1qrotated..." })
+
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+
+    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+    await act(async () => {
+      tap = result.current?.generateNewOnchainAddress?.()
+      await flushEffects()
+    })
+
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      lastReceivedPaymentId: null,
+      allTransactions: [onchainReceipt("deposit-1")],
+    })
+    rerender({})
+    await flushEffects()
+    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+
+    let outcome: NewOnchainAddressResultType | undefined
+    await act(async () => {
+      resolveTap({ address: "bc1qtapped..." })
+      outcome = await tap
+    })
+
+    expect(outcome).toBe(NewOnchainAddressResult.Created)
+    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
   })
 })

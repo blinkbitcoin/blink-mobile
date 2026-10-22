@@ -2223,6 +2223,7 @@
     "newAddressHint": "Tạo một địa chỉ Bitcoin mới. Các địa chỉ trước vẫn hoạt động.",
     "newAddressGenerated": "Địa chỉ mới đã sẵn sàng. Các địa chỉ trước vẫn hoạt động.",
     "newAddressFailed": "Không thể tạo địa chỉ mới. Vui lòng thử lại.",
+    "newAddressRateLimited": "Quá nhiều địa chỉ mới. Vui lòng đợi một lúc rồi thử lại.",
     "addAmount": "Yêu cầu số tiền cụ thể",
     "expired": "Hóa đơn đã hết hạn",
     "expiresIn": "Hết hạn trong",

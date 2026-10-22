@@ -2223,6 +2223,7 @@
     "newAddressHint": "Generează o adresă Bitcoin nouă. Adresele anterioare funcționează în continuare.",
     "newAddressGenerated": "Adresa nouă este gata. Adresele anterioare funcționează în continuare.",
     "newAddressFailed": "Nu s-a putut genera o adresă nouă. Încercați din nou.",
+    "newAddressRateLimited": "Prea multe adrese noi. Așteaptă puțin și încearcă din nou.",
     "addAmount": "Specificați suma solicitată",
     "expired": "Factura a expirat",
     "expiresIn": "Expiră în",

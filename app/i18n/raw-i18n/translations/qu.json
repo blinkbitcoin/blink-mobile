@@ -2223,6 +2223,7 @@
     "newAddressHint": "Musuq Bitcoin tiyanata ruran. Ñawpaq tiyanakunaqa llamk'allanmi.",
     "newAddressGenerated": "Musuq tiyana listoñam. Ñawpaq tiyanakunaqa llamk'allanmi.",
     "newAddressFailed": "Manam musuq tiyanata ruraytachu atikurqan. Huktawan kallpachakuy.",
+    "newAddressRateLimited": "Nisyu musuq tiyanakuna. Asllata suyay, huktawan kallpachakuy.",
     "addAmount": "Ch'usaq kayniyta sutichaq",
     "expired": "Qillqa chhikan",
     "expiresIn": "Munanpi chhikan",

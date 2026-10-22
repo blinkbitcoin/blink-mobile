@@ -625,6 +625,7 @@ mutation onChainAddressCreate($input: OnChainAddressCreateInput!) {
   onChainAddressCreate(input: $input) {
     errors {
       message
+      code
       __typename
     }
     address

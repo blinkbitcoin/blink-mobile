@@ -2223,6 +2223,7 @@
     "newAddressHint": "Stvara novu Bitcoin adresu. Prethodne adrese i dalje rade.",
     "newAddressGenerated": "Nova adresa je spremna. Prethodne adrese i dalje rade.",
     "newAddressFailed": "Nije moguće stvoriti novu adresu. Pokušajte ponovno.",
+    "newAddressRateLimited": "Previše novih adresa. Pričekajte malo i pokušajte ponovno.",
     "addAmount": "Zatraži određeni iznos",
     "expired": "Faktura je istekla",
     "expiresIn": "Istječe za",

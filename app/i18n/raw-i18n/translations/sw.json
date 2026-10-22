@@ -2223,6 +2223,7 @@
     "newAddressHint": "Huunda anwani mpya ya Bitcoin. Anwani za awali bado zinafanya kazi.",
     "newAddressGenerated": "Anwani mpya iko tayari. Anwani za awali bado zinafanya kazi.",
     "newAddressFailed": "Imeshindwa kuunda anwani mpya. Tafadhali jaribu tena.",
+    "newAddressRateLimited": "Anwani mpya nyingi mno. Subiri kidogo kisha ujaribu tena.",
     "addAmount": "Omba Kiasi Maalum",
     "expired": "Bili imeisha muda wake",
     "expiresIn": "Inamalizika ndani ya",

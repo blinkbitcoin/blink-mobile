@@ -2223,6 +2223,7 @@
     "newAddressHint": "Genera una nova adreça de Bitcoin. Les adreces anteriors continuen funcionant.",
     "newAddressGenerated": "Nova adreça a punt. Les adreces anteriors continuen funcionant.",
     "newAddressFailed": "No s'ha pogut generar una nova adreça. Torna-ho a provar.",
+    "newAddressRateLimited": "Massa adreces noves. Espera una estona i torna-ho a provar.",
     "addAmount": "Demana l'import específic",
     "expired": "La factura ha caducat",
     "expiresIn": "Caduca en",
