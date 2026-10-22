@@ -1,12 +1,10 @@
 import React from "react"
 import { fireEvent, render, screen } from "@testing-library/react-native"
-import { ThemeProvider } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import theme from "@app/rne-theme/theme"
 import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
 import {
   TwoFactorMethod,
@@ -24,7 +22,6 @@ const LL = i18nObject("en")
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
-const mockSetOptions = jest.fn()
 let mockIsFocused = true
 let mockRouteParams: TwoFactorPromptOrigin | undefined
 
@@ -33,7 +30,6 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
     goBack: mockGoBack,
-    setOptions: mockSetOptions,
   }),
   useIsFocused: () => mockIsFocused,
   useRoute: () => ({ params: mockRouteParams }),
@@ -101,15 +97,6 @@ const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
 const primaryButton = () => screen.UNSAFE_getByType(GaloyPrimaryButton)
 // eslint-disable-next-line camelcase
 const secondaryButton = () => screen.UNSAFE_getByType(GaloySecondaryButton)
-
-/** The control as the navigator shows it now, rendered on its own: the navigation it
- *  needs is the mock above, and the screen providers would only add async account
- *  loads that outlive the test. */
-const renderInstalledCloseControl = () => {
-  const latestOptions = mockSetOptions.mock.calls.at(-1)?.[0] ?? {}
-  const { headerRight } = latestOptions
-  render(<ThemeProvider theme={theme}>{headerRight({ canGoBack: true })}</ThemeProvider>)
-}
 
 describe("TwoFactorSetupScreen", () => {
   beforeEach(() => {
@@ -193,12 +180,13 @@ describe("TwoFactorSetupScreen", () => {
     )
   })
 
-  it("installs a close control that charges the exit to the tier it opened for", async () => {
+  /** Drawn in the screen, on the same margin as every other two-factor screen, rather
+   *  than by the native header. */
+  it("draws a close control that charges the exit to the tier it opened for", async () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     await renderScreen()
 
-    renderInstalledCloseControl()
-    fireEvent.press(screen.getByTestId("icon-close"))
+    fireEvent.press(screen.getByTestId("two-factor-setup-close"))
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,

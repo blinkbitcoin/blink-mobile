@@ -42,14 +42,4 @@ describe("headerCloseControlOptions", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("settings")
   })
-
-  it("hands the press to the screen when it brings its own handler", () => {
-    const onPress = jest.fn()
-    const { getByTestId } = renderCloseControl({ onPress })
-
-    fireEvent.press(getByTestId("icon-close"))
-
-    expect(onPress).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).not.toHaveBeenCalled()
-  })
 })

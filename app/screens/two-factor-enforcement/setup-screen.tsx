@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useLayoutEffect, useState } from "react"
+import React, { useCallback, useEffect, useState } from "react"
 
 import {
   RouteProp,
@@ -11,7 +11,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
-import { headerCloseControlOptions } from "@app/components/header-close-control"
+import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
@@ -35,7 +35,8 @@ import { testProps } from "@app/utils/testProps"
  * on: nothing may push the user toward it once it is switched off.
  *
  * Reached from the home card, the reminder bulletin, the Settings banner and the
- * session modal, and closable from its header. Leaving it without an authenticator
+ * session modal, and closable from the close control it draws, on the same margin as
+ * every other screen of the two-factor flows. Leaving it without an authenticator
  * counts as the session's dismissal for the tiers that count one, reported as the
  * dismissal of the prompt that opened it. The authenticator
  * flow returns into it on success, and it then steps aside to wherever it was opened
@@ -70,10 +71,6 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   useHardwareBackGuard(handleClose)
 
-  useLayoutEffect(() => {
-    navigation.setOptions(headerCloseControlOptions({ onPress: handleClose }))
-  }, [navigation, handleClose])
-
   /** The authenticator flow returns into this screen. Once the account holds an
    *  authenticator there is nothing left to offer, so it steps aside rather than asking
    *  for one the account just added. Only while focused: a screen lower in the stack
@@ -97,7 +94,9 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   return (
     <StepLayout
+      headerShown={false}
       contentStyle={styles.content}
+      header={<CloseHeader onClose={handleClose} testID="two-factor-setup-close" />}
       footer={
         <>
           <GaloyPrimaryButton

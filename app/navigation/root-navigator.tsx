@@ -324,11 +324,7 @@ const twoFactorEnforcementScreens = () => (
     <RootNavigator.Screen
       name="twoFactorSetup"
       component={TwoFactorSetupScreen}
-      options={{
-        title: "",
-        headerLeft: headerBackControl({ canGoBack: false }),
-        gestureEnabled: false,
-      }}
+      options={{ headerShown: false, gestureEnabled: false }}
     />
     <RootNavigator.Screen
       name="twoFactorNonCustodial"
