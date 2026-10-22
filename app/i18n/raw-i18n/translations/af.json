@@ -4069,6 +4069,7 @@
     "setNow": "Stel nou op",
     "dontWantTo": "Ek wil nie",
     "highBalanceTitle": "Jy het meer as {amount}, voeg asseblief bykomende beskerming by",
+    "protectionRequiredTitle": "Voeg asseblief bykomende beskerming by om Blink te bly gebruik",
     "protectionRequiredBody": "Hoe meer fondse jy het, hoe belangriker is beter sekuriteit. Voeg asseblief 'n authenticator by om Blink te bly gebruik.",
     "nonCustodialTitle": "As jy nie twee-faktor-verifikasie wil opstel nie",
     "nonCustodialBody": "Die ander opsie is om na nie-bewaring te skuif. Dan is jy self verantwoordelik vir jou fondse."

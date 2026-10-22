@@ -4069,6 +4069,7 @@
     "setNow": "Nastaviť teraz",
     "dontWantTo": "Nechcem",
     "highBalanceTitle": "Máte viac ako {amount}, pridajte prosím dodatočnú ochranu",
+    "protectionRequiredTitle": "Pridajte prosím dodatočnú ochranu, aby ste mohli Blink ďalej používať",
     "protectionRequiredBody": "Čím viac prostriedkov máte, tým dôležitejšie je lepšie zabezpečenie. Na ďalšie používanie Blinku prosím pridajte autentifikátor.",
     "nonCustodialTitle": "Ak nechcete nastaviť dvojfaktorové overenie",
     "nonCustodialBody": "Druhou možnosťou je prejsť na nesprávcovský režim. Potom za svoje prostriedky zodpovedáte sami."

@@ -4069,6 +4069,7 @@
     "setNow": "Configurează acum",
     "dontWantTo": "Nu vreau",
     "highBalanceTitle": "Ai peste {amount}, te rugăm să adaugi protecție suplimentară",
+    "protectionRequiredTitle": "Te rugăm să adaugi protecție suplimentară pentru a folosi Blink în continuare",
     "protectionRequiredBody": "Cu cât ai mai multe fonduri, cu atât o securitate mai bună este mai importantă. Te rugăm să adaugi un autentificator pentru a continua să folosești Blink.",
     "nonCustodialTitle": "Dacă nu vrei să configurezi autentificarea cu doi factori",
     "nonCustodialBody": "Cealaltă opțiune este să treci la non-custodial. Atunci ești responsabil pentru propriile fonduri."

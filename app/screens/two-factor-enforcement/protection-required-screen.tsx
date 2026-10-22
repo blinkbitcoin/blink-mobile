@@ -45,11 +45,12 @@ const highBalanceAmount = (currency: WalletCurrency, threshold: number) =>
 /**
  * The blocking screen of the high-balance tier, standing in for the home at every
  * session start once the tier's modal has spent its dismissals, so the home is never
- * seen first. It names the threshold of the wallet that crossed it and offers two ways
- * forward, an authenticator or leaving custody, with no close control: it takes neither
- * the swipe nor the hardware back. Only this tier blocks. It stands only while the
- * self-custodial stack is known to be on; otherwise the modal stays in its place, and
- * should the stack go off while it is up, its move goes with it.
+ * seen first. It names the threshold of the wallet that crossed it while that wallet
+ * still holds it, and offers two ways forward, an authenticator or leaving custody, with
+ * no close control: it takes neither the swipe nor the hardware back. Only this tier
+ * blocks. It stands only while the self-custodial stack is known to be on; otherwise
+ * the modal stays in its place, and should the stack go off while it is up, its move
+ * goes with it.
  */
 export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -59,8 +60,13 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
   } = useTheme()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { formatMoneyAmount } = useDisplayCurrency()
-  const { unmetTier, highBalanceCurrency, highBalanceThreshold, isCustodyExitOffered } =
-    useTwoFactorEnforcement()
+  const {
+    unmetTier,
+    highBalanceCurrency,
+    highBalanceThreshold,
+    isHoldingHighBalance,
+    isCustodyExitOffered,
+  } = useTwoFactorEnforcement()
 
   useEffect(() => {
     logTwoFactorPromptShown({
@@ -87,6 +93,17 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
     logTwoFactorNonCustodialChosen({ tier: unmetTier })
     navigation.navigate("accountMigrationEntry")
   }, [navigation, unmetTier])
+
+  /** The amount is stated only while the account still holds it: the tier stays once
+   *  reached, and a title that claims a balance the account no longer has is wrong. */
+  const title = isHoldingHighBalance
+    ? LL.TwoFactorEnforcement.highBalanceTitle({
+        amount: formatMoneyAmount({
+          moneyAmount: highBalanceAmount(highBalanceCurrency, highBalanceThreshold),
+          noFractionDigits: true,
+        }),
+      })
+    : LL.TwoFactorEnforcement.protectionRequiredTitle()
 
   /** The header row is kept, empty, so the hero sits where it does on every other
    *  screen of the flow instead of climbing into the gap. */
@@ -115,12 +132,7 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
       <IconHero
         icon={highBalanceIcon(highBalanceCurrency)}
         iconColor={colors.primary}
-        title={LL.TwoFactorEnforcement.highBalanceTitle({
-          amount: formatMoneyAmount({
-            moneyAmount: highBalanceAmount(highBalanceCurrency, highBalanceThreshold),
-            noFractionDigits: true,
-          }),
-        })}
+        title={title}
         subtitle={
           <Text type="p3" style={styles.description}>
             {LL.TwoFactorEnforcement.protectionRequiredBody()}

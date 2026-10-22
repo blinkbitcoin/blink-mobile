@@ -13583,6 +13583,10 @@ type RootTranslation = {
 		 */
 		highBalanceTitle: RequiredParams<'amount'>
 		/**
+		 * P​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n​ ​t​o​ ​k​e​e​p​ ​u​s​i​n​g​ ​B​l​i​n​k
+		 */
+		protectionRequiredTitle: string
+		/**
 		 * T​h​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​y​o​u​ ​h​a​v​e​,​ ​t​h​e​ ​m​o​r​e​ ​i​m​p​o​r​t​a​n​t​ ​i​t​ ​i​s​ ​w​i​t​h​ ​b​e​t​t​e​r​ ​s​e​c​u​r​i​t​y​.​ ​P​l​e​a​s​e​ ​a​d​d​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​.
 		 */
 		protectionRequiredBody: string
@@ -27373,6 +27377,10 @@ export type TranslationFunctions = {
 		 * You have over {amount}, please add additional protection
 		 */
 		highBalanceTitle: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Please add additional protection to keep using Blink
+		 */
+		protectionRequiredTitle: () => LocalizedString
 		/**
 		 * The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.
 		 */

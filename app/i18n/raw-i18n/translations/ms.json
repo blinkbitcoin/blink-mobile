@@ -4069,6 +4069,7 @@
     "setNow": "Tetapkan sekarang",
     "dontWantTo": "Saya tidak mahu",
     "highBalanceTitle": "Anda mempunyai lebih daripada {amount}, sila tambah perlindungan tambahan",
+    "protectionRequiredTitle": "Sila tambah perlindungan tambahan untuk terus menggunakan Blink",
     "protectionRequiredBody": "Semakin banyak dana yang anda ada, semakin penting keselamatan yang lebih baik. Sila tambah authenticator untuk terus menggunakan Blink.",
     "nonCustodialTitle": "Jika anda tidak mahu menetapkan pengesahan dua faktor",
     "nonCustodialBody": "Pilihan lain ialah beralih kepada bukan kustodian. Maka anda bertanggungjawab ke atas dana anda sendiri."

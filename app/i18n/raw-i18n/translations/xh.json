@@ -4069,6 +4069,7 @@
     "setNow": "Misela ngoku",
     "dontWantTo": "Andifuni",
     "highBalanceTitle": "Unengaphezu kwe-{amount}, nceda wongeze ukhuseleko olongezelelekileyo",
+    "protectionRequiredTitle": "Nceda wongeze ukhuseleko olongezelelekileyo ukuze uqhubeke usebenzisa i-Blink",
     "protectionRequiredBody": "Okukhona unemali eninzi, kokukhona ukhuseleko olungcono lubaluleke ngakumbi. Nceda wongeze i-authenticator ukuze uqhubeke usebenzisa i-Blink.",
     "nonCustodialTitle": "Ukuba awufuni ukumisela uqinisekiso lwezinto ezimbini",
     "nonCustodialBody": "Olunye ukhetho kukufudukela kwi-non-custodial. Emva koko uyena onoxanduva lwemali yakho."

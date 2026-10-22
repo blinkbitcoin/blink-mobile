@@ -4069,6 +4069,7 @@
     "setNow": "Nu instellen",
     "dontWantTo": "Ik wil niet",
     "highBalanceTitle": "Je hebt meer dan {amount}, voeg extra bescherming toe",
+    "protectionRequiredTitle": "Voeg extra bescherming toe om Blink te blijven gebruiken",
     "protectionRequiredBody": "Hoe meer tegoed je hebt, hoe belangrijker betere beveiliging is. Voeg een authenticator toe om Blink te blijven gebruiken.",
     "nonCustodialTitle": "Als je geen tweefactorauthenticatie wilt instellen",
     "nonCustodialBody": "De andere optie is overstappen naar non-custodial. Dan ben je zelf verantwoordelijk voor je tegoed."
