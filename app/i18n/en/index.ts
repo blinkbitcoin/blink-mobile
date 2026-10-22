@@ -4282,6 +4282,7 @@ const en: BaseTranslation = {
     setNow: "Set now",
     dontWantTo: "I don't want to",
     highBalanceTitle: "You have over {amount: string}, please add additional protection",
+    protectionRequiredTitle: "Please add additional protection to keep using Blink",
     protectionRequiredBody:
       "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",
     nonCustodialTitle: "If you don't want to set two-factor authentication",

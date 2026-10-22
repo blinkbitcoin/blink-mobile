@@ -4071,6 +4071,7 @@
     "setNow": "Opsæt nu",
     "dontWantTo": "Det vil jeg ikke",
     "highBalanceTitle": "Du har over {amount}, tilføj venligst ekstra beskyttelse",
+    "protectionRequiredTitle": "Tilføj venligst ekstra beskyttelse for at fortsætte med at bruge Blink",
     "protectionRequiredBody": "Jo flere midler du har, jo vigtigere er bedre sikkerhed. Tilføj venligst en authenticator for at fortsætte med at bruge Blink.",
     "nonCustodialTitle": "Hvis du ikke vil opsætte to-faktor godkendelse",
     "nonCustodialBody": "Den anden mulighed er at skifte til ikke-depot. Så er du selv ansvarlig for dine midler."

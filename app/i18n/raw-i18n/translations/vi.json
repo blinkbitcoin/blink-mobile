@@ -4071,6 +4071,7 @@
     "setNow": "Thiết lập ngay",
     "dontWantTo": "Tôi không muốn",
     "highBalanceTitle": "Bạn có hơn {amount}, vui lòng thêm lớp bảo vệ bổ sung",
+    "protectionRequiredTitle": "Vui lòng thêm lớp bảo vệ bổ sung để tiếp tục sử dụng Blink",
     "protectionRequiredBody": "Bạn càng có nhiều tiền, bảo mật tốt hơn càng quan trọng. Vui lòng thêm ứng dụng xác thực để tiếp tục sử dụng Blink.",
     "nonCustodialTitle": "Nếu bạn không muốn thiết lập xác thực hai yếu tố",
     "nonCustodialBody": "Lựa chọn khác là chuyển sang không lưu ký. Khi đó bạn tự chịu trách nhiệm về tiền của mình."

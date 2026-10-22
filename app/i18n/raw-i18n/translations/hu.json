@@ -4071,6 +4071,7 @@
     "setNow": "Beállítás most",
     "dontWantTo": "Nem szeretném",
     "highBalanceTitle": "Több mint {amount} van nálad, kérjük, adj hozzá további védelmet",
+    "protectionRequiredTitle": "Kérjük, adj hozzá további védelmet a Blink további használatához",
     "protectionRequiredBody": "Minél több pénzed van, annál fontosabb a jobb biztonság. Kérjük, adj hozzá hitelesítőt a Blink további használatához.",
     "nonCustodialTitle": "Ha nem szeretnél kétlépcsős azonosítást beállítani",
     "nonCustodialBody": "A másik lehetőség az átállás nem letétkezelt módra. Akkor te felelsz a saját pénzedért."

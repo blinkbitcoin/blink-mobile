@@ -4071,6 +4071,7 @@
     "setNow": "Teekawo kati",
     "dontWantTo": "Sagala",
     "highBalanceTitle": "Olina okusinga {amount}, tukusaba oyongereko obukuumi obulala",
+    "protectionRequiredTitle": "Tukusaba oyongereko obukuumi obulala okusobola okweyongera okukozesa Blink",
     "protectionRequiredBody": "Gy'olina ssente ennyingi, gye bukoma okuba obukulu okuba n'obukuumi obusinga. Tukusaba oyongereko authenticator osobole okweyongera okukozesa Blink.",
     "nonCustodialTitle": "Bw'oba tooyagala kuteekawo kukakasa mirundi ebiri",
     "nonCustodialBody": "Ekirala kye kudda mu non-custodial. Olwo ggwe ovunaanyizibwa ku ssente zo."

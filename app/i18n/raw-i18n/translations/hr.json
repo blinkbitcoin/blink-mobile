@@ -4071,6 +4071,7 @@
     "setNow": "Postavi sada",
     "dontWantTo": "Ne želim",
     "highBalanceTitle": "Imate više od {amount}, molimo dodajte dodatnu zaštitu",
+    "protectionRequiredTitle": "Molimo dodajte dodatnu zaštitu kako biste nastavili koristiti Blink",
     "protectionRequiredBody": "Što više sredstava imate, to je bolja sigurnost važnija. Molimo dodajte autentifikator kako biste nastavili koristiti Blink.",
     "nonCustodialTitle": "Ako ne želite postaviti dvofaktorsku autentifikaciju",
     "nonCustodialBody": "Druga je mogućnost prijeći na neskrbnički način. Tada ste sami odgovorni za svoja sredstva."

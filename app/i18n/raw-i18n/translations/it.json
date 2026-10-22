@@ -4071,6 +4071,7 @@
         "setNow": "Imposta ora",
         "dontWantTo": "Non voglio",
         "highBalanceTitle": "Hai più di {amount}, aggiungi una protezione aggiuntiva",
+        "protectionRequiredTitle": "Aggiungi una protezione aggiuntiva per continuare a usare Blink",
         "protectionRequiredBody": "Più fondi hai, più è importante una sicurezza migliore. Aggiungi un autenticatore per continuare a usare Blink.",
         "nonCustodialTitle": "Se non vuoi impostare l'autenticazione a due fattori",
         "nonCustodialBody": "L'altra opzione è passare al non-custodial. In quel caso sei responsabile dei tuoi fondi."

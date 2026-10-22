@@ -33,6 +33,7 @@ const mockEnforcement = {
   remainingDismissals: 0,
   enforcedCurrency: WalletCurrency.Btc as WalletCurrency,
   enforcedThreshold: 5_000_000,
+  isHoldingEnforcedThreshold: true,
   isCustodyExitOffered: true,
   registerDismissal: mockRegisterDismissal,
 }
@@ -79,6 +80,7 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     mockEnforcement.remainingDismissals = 0
     mockEnforcement.enforcedCurrency = WalletCurrency.Btc
     mockEnforcement.enforcedThreshold = 5_000_000
+    mockEnforcement.isHoldingEnforcedThreshold = true
     mockEnforcement.isCustodyExitOffered = true
   })
 
@@ -134,6 +136,20 @@ describe("TwoFactorProtectionRequiredScreen", () => {
     expect(screen.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe(
       LL.AccountMigration.moveToNonCustodial(),
     )
+  })
+
+  /** The tier stays once reached; a balance the account no longer holds is not stated. */
+  it("states no amount once the wallet that crossed no longer holds it", async () => {
+    mockEnforcement.isHoldingEnforcedThreshold = false
+    await renderScreen()
+
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.protectionRequiredTitle()),
+    ).toBeTruthy()
+    expect(screen.queryByText(/You have over/)).toBeNull()
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
+    ).toBeTruthy()
   })
 
   /** Until this launch knows the self-custodial stack is on there is nothing to move

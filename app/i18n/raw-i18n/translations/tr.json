@@ -4071,6 +4071,7 @@
     "setNow": "Şimdi ayarla",
     "dontWantTo": "İstemiyorum",
     "highBalanceTitle": "{amount} üzerinde varlığınız var, lütfen ek koruma ekleyin",
+    "protectionRequiredTitle": "Blink'i kullanmaya devam etmek için lütfen ek koruma ekleyin",
     "protectionRequiredBody": "Ne kadar çok varlığınız varsa, daha iyi güvenlik o kadar önemlidir. Blink'i kullanmaya devam etmek için lütfen bir doğrulayıcı ekleyin.",
     "nonCustodialTitle": "İki aşamalı doğrulamayı ayarlamak istemiyorsanız",
     "nonCustodialBody": "Diğer seçenek saklama dışı moda geçmektir. O zaman kendi varlıklarınızdan siz sorumlu olursunuz."
