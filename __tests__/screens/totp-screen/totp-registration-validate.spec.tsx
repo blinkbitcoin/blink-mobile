@@ -8,6 +8,35 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
+
+const mockSetOptions = jest.fn()
+const mockUnsubscribe = jest.fn()
+/** The screen's `beforeRemove` listener, as the navigator would hold it. */
+let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | undefined
+/** One navigation object for every render, as the navigator hands a screen. */
+const mockNavigation = {
+  setOptions: (...args: unknown[]) => mockSetOptions(...args),
+  addListener: (_name: string, listener: (event: BeforeRemoveEvent) => void) => {
+    mockBeforeRemove = listener
+    return mockUnsubscribe
+  },
+}
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => mockNavigation,
+}))
+
+/** A removal of the screen by the given action, and whether the screen refused it. */
+const isRemovalRefused = (type: string): boolean => {
+  const preventDefault = jest.fn()
+  mockBeforeRemove?.({ data: { action: { type } }, preventDefault })
+  return preventDefault.mock.calls.length > 0
+}
+
 const mockShowBackup = jest.fn()
 /** The prompt the registration was started from, as the flow reads it off the stack. */
 let mockRegistrationPrompt: string | undefined
@@ -113,6 +142,7 @@ describe("TotpRegistrationValidateScreen", () => {
     mockTier = 2
     mockIsEnforced = true
     mockRegistrationPrompt = undefined
+    mockBeforeRemove = undefined
   })
 
   it("moves on to the backup of the setup key once the authenticator is on", async () => {
@@ -193,5 +223,107 @@ describe("TotpRegistrationValidateScreen", () => {
     expect(mockShowBackup).not.toHaveBeenCalled()
     expect(Alert.alert).toHaveBeenCalledTimes(1)
     consoleError.mockRestore()
+  })
+
+  describe("while the code is checked", () => {
+    /** A code accepted after the user left would enable the authenticator with its
+     *  setup key gone: the backup is the key's only safekeeping. */
+    it("refuses the user's own ways back and switches the swipe off", async () => {
+      let answer: (value: typeof enabledResponse) => void = () => {}
+      mockTotpValidate.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: false })
+      expect(isRemovalRefused("GO_BACK")).toBe(true)
+      expect(isRemovalRefused("POP")).toBe(true)
+
+      await act(async () => {
+        answer(enabledResponse)
+      })
+
+      expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
+      expect(mockUnsubscribe).toHaveBeenCalledTimes(1)
+      expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: true })
+    })
+
+    /** A logout or an account switch the app dispatches itself must still go through. */
+    it("lets a reset the app dispatched take the screen", async () => {
+      mockTotpValidate.mockReturnValue(new Promise(() => {}))
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      expect(isRemovalRefused("RESET")).toBe(false)
+    })
+
+    /** A request that never settles must not keep the user on the screen for good. */
+    it("gives the ways back again once a check has taken too long", async () => {
+      jest.useFakeTimers({ doNotFake: ["nextTick", "queueMicrotask", "setImmediate"] })
+      try {
+        mockTotpValidate.mockReturnValue(new Promise(() => {}))
+        const { getByTestId } = render(
+          wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+        )
+        await act(async () => {
+          fireEvent.press(getByTestId("submit-code"))
+        })
+        expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: false })
+
+        await act(async () => {
+          jest.advanceTimersByTime(20_000)
+        })
+
+        expect(mockUnsubscribe).toHaveBeenCalledTimes(1)
+        expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: true })
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    /** An answer can land once the registration is off the stack: the prompt it was
+     *  started from is read before. */
+    it("reports the prompt the registration was started from, read before the answer", async () => {
+      let answer: (value: typeof enabledResponse) => void = () => {}
+      mockTotpValidate.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+      mockRegistrationPrompt = "session_modal"
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+      mockRegistrationPrompt = undefined
+
+      await act(async () => {
+        answer(enabledResponse)
+      })
+
+      expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith(
+        expect.objectContaining({ prompt: "session_modal" }),
+      )
+    })
+
+    it("leaves the ways back alone before a code is sent", () => {
+      render(wrap(<TotpRegistrationValidateScreen route={makeRoute()} />))
+
+      expect(mockBeforeRemove).toBeUndefined()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+    })
   })
 })

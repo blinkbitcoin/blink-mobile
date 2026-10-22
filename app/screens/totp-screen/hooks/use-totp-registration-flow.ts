@@ -48,7 +48,11 @@ export const useTotpRegistrationFlow = (): TotpRegistrationFlow => {
       /** The answer can land after the user left the registration, or under a screen
        *  pushed meanwhile, such as the app lock on a return from the background. The
        *  backup replaces this screen and the ones before it, never what is above it, and
-       *  not at all once this screen is gone. */
+       *  not at all once this screen is gone: it never shows over whatever the user went
+       *  to, which may be another account or the lock. The code screen holds the user's
+       *  ways back while the code is checked, so only a check that ran too long, or a
+       *  reset the app dispatched, gets there; the key is in the authenticator app by
+       *  then, which the code came from. */
       const isScreenOpen = navigation
         .getState()
         .routes.some((route) => route.key === screenKey)
