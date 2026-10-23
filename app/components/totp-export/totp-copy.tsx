@@ -1,5 +1,6 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect, useRef } from "react"
 import { TouchableOpacity } from "react-native"
+import Clipboard from "@react-native-clipboard/clipboard"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
@@ -34,6 +35,18 @@ export const CopySecretComponent: React.FC<Props> = ({
    *  copied the code their authenticator made, so iOS would stop the registration with
    *  a paste permission prompt naming the authenticator app. */
   const { copyToClipboard } = useClipboard()
+  /** The key would otherwise sit in the clipboard, and in whatever the system hands it
+   *  on to, long after the registration, and it is the one string that recreates the
+   *  second factor. So once the field is gone, a copy it made is wiped blind: a write
+   *  alone raises no paste prompt, and whatever was copied after it goes too. A
+   *  keyboard's own clipboard history keeps what it already took. */
+  const hasCopiedRef = useRef(false)
+  useEffect(
+    () => () => {
+      if (hasCopiedRef.current) Clipboard.setString("")
+    },
+    [],
+  )
   const styles = useStyles({ isHighlighted })
   const {
     theme: { colors },
@@ -44,6 +57,7 @@ export const CopySecretComponent: React.FC<Props> = ({
       content: compactSetupKey(secret),
       message: LL.CopySecretComponent.toastMessage(),
     })
+    hasCopiedRef.current = true
     onCopy?.()
   }, [copyToClipboard, secret, LL, onCopy])
 

@@ -22,6 +22,13 @@ jest.mock("@app/hooks", () => ({
   },
 }))
 
+const mockSetClipboard = jest.fn()
+const mockGetClipboard = jest.fn()
+jest.mock("@react-native-clipboard/clipboard", () => ({
+  setString: (...args: unknown[]) => mockSetClipboard(...args),
+  getString: () => mockGetClipboard(),
+}))
+
 const SECRET = "ABCD EFGH IJKL"
 
 const renderField = (props: Partial<React.ComponentProps<typeof CopySecretComponent>>) =>
@@ -70,6 +77,25 @@ describe("CopySecretComponent", () => {
     renderField({})
 
     expect(mockUseClipboard).toHaveBeenCalledWith(undefined)
+  })
+
+  /** Reading it back first would raise the paste prompt on iOS. */
+  it("wipes the clipboard blind once it is gone, after a copy", () => {
+    const { unmount } = renderField({})
+    fireEvent.press(screen.getByTestId("setup-key-copy"))
+
+    unmount()
+
+    expect(mockSetClipboard).toHaveBeenCalledWith("")
+    expect(mockGetClipboard).not.toHaveBeenCalled()
+  })
+
+  it("leaves the clipboard alone once it is gone, when nothing was copied", () => {
+    const { unmount } = renderField({})
+
+    unmount()
+
+    expect(mockSetClipboard).not.toHaveBeenCalled()
   })
 
   it("tells the screen after each copy", () => {
