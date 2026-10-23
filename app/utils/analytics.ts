@@ -281,3 +281,19 @@ export const logSetupKeyBackupOptionSelected = (
     option: params.option,
   })
 }
+
+type LogTwoFactorTurnOffParams = {
+  tier: TwoFactorTier
+}
+
+/** Turning the authenticator off was asked for from the settings, at the tier the
+ *  account reached. */
+export const logTwoFactorDisableAttempted = (params: LogTwoFactorTurnOffParams) => {
+  analytics().logEvent("two_factor_disable_attempted", { tier: params.tier })
+}
+
+/** Turning the authenticator off was refused: the account reached the high-balance
+ *  tier, or the server found a balance that high. */
+export const logTwoFactorDisableBlocked = (params: LogTwoFactorTurnOffParams) => {
+  analytics().logEvent("two_factor_disable_blocked", { tier: params.tier })
+}
