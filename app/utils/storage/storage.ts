@@ -120,7 +120,7 @@ export const remove = async (key: string): Promise<void> => {
 }
 
 /**
- * Removes something from storage, propagating the error instead of logging it — the
+ * Removes something from storage, propagating the error instead of logging it: the
  * removal counterpart of saveJson, for a caller that has to know a removal did not happen.
  *
  * @param key The key to kill.
