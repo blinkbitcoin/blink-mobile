@@ -20,7 +20,9 @@ export const TwoFactorBanner: React.FC = () => {
   }, [markPromptShown])
 
   const handlePress = useCallback(() => {
-    navigation.navigate("twoFactorSetup", { prompt: TwoFactorPrompt.SettingsBanner })
+    navigation.navigate("twoFactorSetup", {
+      origin: { prompt: TwoFactorPrompt.SettingsBanner },
+    })
   }, [navigation])
 
   return (

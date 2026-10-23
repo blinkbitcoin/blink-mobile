@@ -1050,6 +1050,173 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
   })
 
+  /** The accepted code ends the prompt while the key's backup is still up; a link let
+   *  through then could close it before the key is kept. */
+  it("keeps holding a link the prompt held while the key's backup is open, after the prompt ends", async () => {
+    mockTwoFactorStartPending = true
+    const rendered = await renderUnlocked()
+    rerenderWrapper(rendered, <UnlockProbe />)
+    const { receive } = subscribeToLinks()
+    receive(PAYMENT_DEEPLINK)
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationBackup" }],
+    })
+    /** The unlock that covers the backup on a return from the background. */
+    navigateTo({
+      index: 2,
+      routes: [
+        { name: "Primary" },
+        { name: "totpRegistrationBackup" },
+        { name: "authenticationCheck" },
+      ],
+    })
+
+    mockTwoFactorStartPending = false
+    rerenderWrapper(rendered, <UnlockProbe />)
+    await waitFor(() => expect(screen.getByTestId("lock-state")).toBeTruthy())
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    navigateTo(STACK_AT_BLOCKER)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  /** A link to a screen below the backup, the home among them, would close it before
+   *  the key is kept: a fresh one waits for the backup to be left. */
+  it("holds a link that arrives while the key's backup is open, and opens it once left", async () => {
+    await renderUnlocked()
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationBackup" }],
+    })
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    navigateTo(STACK_AT_BLOCKER)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  /** The code's answer brings up the backup only while the code screen is there: a
+   *  link that popped it to the home first would leave the key with no backup. */
+  it("holds a link that arrives while a code is checked, and opens it once the check is answered", async () => {
+    await renderUnlocked()
+    navigateTo({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        { name: "totpRegistrationValidate", params: { isChecking: true } },
+      ],
+    })
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    navigateTo({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        { name: "totpRegistrationValidate", params: { isChecking: false } },
+      ],
+    })
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  /** Before a code is sent no authenticator is on, and a link costs only the progress. */
+  it("opens a link that arrives on the code screen before a code is sent", async () => {
+    await renderUnlocked()
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationValidate" }],
+    })
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+
+    expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK)
+  })
+
+  /** The migration link passes the prompts, but not the key's backup: it waits like any
+   *  other, once, rather than going round between the queue and the listener. */
+  it("holds the migration link while the key's backup is open, and opens it once left", async () => {
+    await renderUnlocked()
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationBackup" }],
+    })
+    const { listener, receive } = subscribeToLinks()
+
+    receive(MIGRATION_DEEPLINK)
+    await act(async () => {})
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    navigateTo(STACK_AT_BLOCKER)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(MIGRATION_DEEPLINK))
+    expect(Linking.openURL).toHaveBeenCalledTimes(1)
+  })
+
+  /** The done screen takes the backup's place once the key is kept. */
+  it("opens a link on the screen that follows the key's backup", async () => {
+    await renderUnlocked()
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationDone" }],
+    })
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+
+    expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK)
+  })
+
+  it("keeps a link that waited only for the unlock until the key's backup is left", async () => {
+    const rendered = renderWrapper(<UnlockProbe />)
+    const { receive } = subscribeToLinks()
+    receive(PAYMENT_DEEPLINK)
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationBackup" }],
+    })
+
+    unlock()
+    rerenderWrapper(rendered, <UnlockProbe />)
+    await waitFor(() =>
+      expect(screen.getByTestId("lock-state").props.children).toBe("unlocked"),
+    )
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    navigateTo(STACK_AT_BLOCKER)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  /** A registration opened from the settings owes no prompt: a link that waited only
+   *  for the unlock opens with it, as on any other screen. */
+  it("opens a link that waited only for the unlock over an open registration", async () => {
+    const rendered = renderWrapper(<UnlockProbe />)
+    const { receive } = subscribeToLinks()
+    receive(PAYMENT_DEEPLINK)
+    navigateTo({
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationInitiate" }],
+    })
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    unlock()
+    rerenderWrapper(rendered, <UnlockProbe />)
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
   it("holds a link while the session start is still being decided, and opens it once it is", async () => {
     mockTwoFactorStartPreparing = true
     const rendered = renderWrapper(<UnlockProbe />)

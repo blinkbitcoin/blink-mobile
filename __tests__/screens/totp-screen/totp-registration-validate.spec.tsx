@@ -1,27 +1,55 @@
 import React from "react"
-import { Alert, AlertButton } from "react-native"
+import { Alert } from "react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import {
-  RegistrationReturnRoute,
-  RootStackParamList,
-} from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
-const mockPopTo = jest.fn()
-const mockReset = jest.fn()
-/** The routes under this screen, as the navigator would report them. */
-let mockStackRouteNames: string[] = []
+type BeforeRemoveEvent = {
+  data: { action: { type: string } }
+  preventDefault: () => void
+}
 
+const mockSetOptions = jest.fn()
+const mockSetParams = jest.fn()
+const mockUnsubscribe = jest.fn()
+/** The stack the screen sits on, the code screen itself unless a test takes it off. */
+let mockStackRoutes = [{ key: "totpRegistrationValidate" }]
+/** The screen's `beforeRemove` listener, as the navigator would hold it. */
+let mockBeforeRemove: ((event: BeforeRemoveEvent) => void) | undefined
+/** One navigation object for every render, as the navigator hands a screen. */
+const mockNavigation = {
+  setOptions: (...args: unknown[]) => mockSetOptions(...args),
+  setParams: (...args: unknown[]) => mockSetParams(...args),
+  getState: () => ({ routes: mockStackRoutes }),
+  addListener: (_name: string, listener: (event: BeforeRemoveEvent) => void) => {
+    mockBeforeRemove = listener
+    return mockUnsubscribe
+  },
+}
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({
-    popTo: mockPopTo,
-    reset: mockReset,
-    getState: () => ({ routes: mockStackRouteNames.map((name) => ({ name })) }),
+  useNavigation: () => mockNavigation,
+}))
+
+/** A removal of the screen by the given action, and whether the screen refused it. */
+const isRemovalRefused = (type: string): boolean => {
+  const preventDefault = jest.fn()
+  mockBeforeRemove?.({ data: { action: { type } }, preventDefault })
+  return preventDefault.mock.calls.length > 0
+}
+
+const mockShowBackup = jest.fn()
+/** The prompt the registration was started from, as the flow reads it off the stack. */
+let mockRegistrationPrompt: string | undefined
+jest.mock("@app/screens/totp-screen/hooks/use-totp-registration-flow", () => ({
+  useTotpRegistrationFlow: () => ({
+    showBackup: mockShowBackup,
+    leave: jest.fn(),
+    registrationPrompt: () => mockRegistrationPrompt,
   }),
 }))
 
@@ -31,9 +59,15 @@ jest.mock("@app/hooks", () => ({
 }))
 
 const mockTotpValidate = jest.fn()
+const mockReadRegistrationState = jest.fn()
+const mockUseRegistrationStateQuery = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useUserTotpRegistrationValidateMutation: () => [mockTotpValidate, { loading: false }],
+  useTotpRegistrationStateLazyQuery: (options: unknown) => {
+    mockUseRegistrationStateQuery(options)
+    return [mockReadRegistrationState]
+  },
 }))
 
 /** The account's balance tier, as the two-factor enforcement reads it, and whether the
@@ -50,16 +84,25 @@ jest.mock("@app/utils/analytics", () => ({
     mockLogTwoFactorSetupCompleted(...args),
 }))
 
+const mockCodeInputError = jest.fn()
 jest.mock("@app/components/code-input", () => {
   const ReactActual = jest.requireActual("react")
   const { Pressable, Text } = jest.requireActual("react-native")
   return {
-    CodeInput: ({ send }: { send: (code: string) => void }) =>
-      ReactActual.createElement(
+    CodeInput: ({
+      send,
+      errorMessage,
+    }: {
+      send: (code: string) => void
+      errorMessage: string
+    }) => {
+      mockCodeInputError(errorMessage)
+      return ReactActual.createElement(
         Pressable,
         { testID: "submit-code", onPress: () => send("123456") },
         ReactActual.createElement(Text, null, "submit"),
-      ),
+      )
+    },
   }
 })
 
@@ -73,13 +116,20 @@ const wrap = (ui: React.ReactElement) => (
   </ThemeProvider>
 )
 
-const makeRoute = (
-  params: RootStackParamList["totpRegistrationValidate"],
-): RouteProp<RootStackParamList, "totpRegistrationValidate"> => ({
+/** A registration of its own for each test: the screen keeps, by registration, the
+ *  ones whose answer was lost. */
+let registrationCount = 0
+let mockRegistrationId = "reg"
+
+const makeRoute = (): RouteProp<RootStackParamList, "totpRegistrationValidate"> => ({
   key: "totpRegistrationValidate",
   name: "totpRegistrationValidate",
-  params,
+  params: { totpRegistrationId: mockRegistrationId, secret: "SECRET" },
 })
+
+/** A request that may have reached the server, with no answer back. */
+const lostAnswer = () =>
+  Object.assign(new Error("network down"), { networkError: new Error("offline") })
 
 const enabledResponse = {
   data: {
@@ -90,84 +140,58 @@ const enabledResponse = {
   },
 }
 
-/** The success alert is what moves on: its OK button carries the navigation. */
-const pressSuccessOk = () => {
-  const [, , buttons] = jest.mocked(Alert.alert).mock.calls[0]
-  const ok = (buttons as AlertButton[])[0]
-  ok.onPress?.()
+/** The account as the server reads it back. */
+const accountRead = (totpEnabled: boolean) => ({ data: { me: { id: "1", totpEnabled } } })
+
+const refusedResponse = {
+  data: {
+    userTotpRegistrationValidate: {
+      errors: [{ message: "invalid code" }],
+      me: { id: "1", totpEnabled: false },
+    },
+  },
 }
 
-const submitCode = async (params: RootStackParamList["totpRegistrationValidate"]) => {
+const submitCode = async () => {
   const { getByTestId } = render(
-    wrap(<TotpRegistrationValidateScreen route={makeRoute(params)} />),
+    wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
   )
   await act(async () => {
     fireEvent.press(getByTestId("submit-code"))
   })
 }
 
-describe("TotpRegistrationValidateScreen — navigation after success", () => {
+describe("TotpRegistrationValidateScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
-    mockStackRouteNames = ["Primary", "settings", "totpRegistrationInitiate"]
+    registrationCount += 1
+    mockRegistrationId = `reg-${registrationCount}`
     mockTotpValidate.mockResolvedValue(enabledResponse)
+    mockReadRegistrationState.mockResolvedValue(accountRead(false))
+    mockStackRoutes = [{ key: "totpRegistrationValidate" }]
     mockTier = 2
     mockIsEnforced = true
+    mockRegistrationPrompt = undefined
+    mockBeforeRemove = undefined
   })
 
-  it("resets to the account screen when the flow was opened from Settings", async () => {
-    await submitCode({ totpRegistrationId: "reg" })
-    pressSuccessOk()
+  it("moves on to the backup of the setup key once the authenticator is on", async () => {
+    await submitCode()
 
-    expect(mockReset).toHaveBeenCalledWith({
-      routes: [{ name: "Primary" }, { name: "accountScreen" }],
-    })
-    expect(mockPopTo).not.toHaveBeenCalled()
-  })
-
-  it("pops back into the two-factor setup when the flow was opened from it", async () => {
-    mockStackRouteNames = ["Primary", "twoFactorSetup", "totpRegistrationInitiate"]
-    await submitCode({ totpRegistrationId: "reg", returnTo: "twoFactorSetup" })
-    pressSuccessOk()
-
-    expect(mockPopTo).toHaveBeenCalledWith("twoFactorSetup")
-    expect(mockReset).not.toHaveBeenCalled()
-  })
-
-  it("ignores a return route the stack does not hold, as a deep link could name one", async () => {
-    mockStackRouteNames = ["Primary", "totpRegistrationInitiate"]
-    await submitCode({ totpRegistrationId: "reg", returnTo: "twoFactorSetup" })
-    pressSuccessOk()
-
-    expect(mockReset).toHaveBeenCalledWith({
-      routes: [{ name: "Primary" }, { name: "accountScreen" }],
-    })
-    expect(mockPopTo).not.toHaveBeenCalled()
-  })
-
-  it("ignores a return route a flow may not return to, even one the stack holds, as a deep link could name it", async () => {
-    mockStackRouteNames = ["Primary", "totpRegistrationInitiate"]
-    /** What a crafted link hands the screen: a string the type never admits. */
-    const returnTo = "totpRegistrationInitiate" as RegistrationReturnRoute
-    await submitCode({ totpRegistrationId: "reg", returnTo })
-    pressSuccessOk()
-
-    expect(mockReset).toHaveBeenCalledWith({
-      routes: [{ name: "Primary" }, { name: "accountScreen" }],
-    })
-    expect(mockPopTo).not.toHaveBeenCalled()
+    expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
+    expect(Alert.alert).not.toHaveBeenCalled()
   })
 
   it("sends the code with the registration id and the session token", async () => {
-    await submitCode({ totpRegistrationId: "reg" })
+    await submitCode()
 
     expect(mockTotpValidate).toHaveBeenCalledWith(
       expect.objectContaining({
         variables: {
           input: {
             totpCode: "123456",
-            totpRegistrationId: "reg",
+            totpRegistrationId: mockRegistrationId,
             authToken: "session-token",
           },
         },
@@ -179,11 +203,8 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
    *  and at which tier. */
   it("reports the setup as completed, with the account's tier and the prompt that led to it, once the authenticator is on", async () => {
     mockTier = 3
-    await submitCode({
-      totpRegistrationId: "reg",
-      returnTo: "twoFactorSetup",
-      prompt: "session_modal",
-    })
+    mockRegistrationPrompt = "session_modal"
+    await submitCode()
 
     expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledTimes(1)
     expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith({
@@ -198,7 +219,7 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
   it("reports a setup from the settings with no prompt, and whether the prompts applied", async () => {
     mockTier = 0
     mockIsEnforced = false
-    await submitCode({ totpRegistrationId: "reg" })
+    await submitCode()
 
     expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith({
       tier: 0,
@@ -207,28 +228,325 @@ describe("TotpRegistrationValidateScreen — navigation after success", () => {
     })
   })
 
-  it("reports nothing when the code is refused", async () => {
-    mockTotpValidate.mockResolvedValue({
-      data: {
-        userTotpRegistrationValidate: {
-          errors: [{ message: "invalid code" }],
-          me: { id: "1", totpEnabled: false },
-        },
-      },
-    })
-    await submitCode({ totpRegistrationId: "reg" })
+  it("shows the refusal and stays on the code when the code is refused", async () => {
+    mockTotpValidate.mockResolvedValue(refusedResponse)
+    await submitCode()
 
+    expect(mockCodeInputError).toHaveBeenLastCalledWith("invalid code")
     expect(mockLogTwoFactorSetupCompleted).not.toHaveBeenCalled()
+    expect(mockShowBackup).not.toHaveBeenCalled()
   })
 
   it("reports nothing and says so when the request fails", async () => {
     const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
-    mockTotpValidate.mockRejectedValue(new Error("network down"))
+    mockTotpValidate.mockRejectedValue(lostAnswer())
 
-    await submitCode({ totpRegistrationId: "reg" })
+    await submitCode()
 
     expect(mockLogTwoFactorSetupCompleted).not.toHaveBeenCalled()
+    expect(mockShowBackup).not.toHaveBeenCalled()
     expect(Alert.alert).toHaveBeenCalledTimes(1)
     consoleError.mockRestore()
+  })
+
+  describe("when the answer does not say the authenticator is on", () => {
+    /** The cache may still hold the account from before the code was sent. */
+    it("reads the account back from the server after a lost answer", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate.mockRejectedValue(lostAnswer())
+      await submitCode()
+
+      expect(mockUseRegistrationStateQuery).toHaveBeenCalledWith({
+        fetchPolicy: "network-only",
+      })
+      expect(mockReadRegistrationState).toHaveBeenCalledTimes(1)
+      consoleError.mockRestore()
+    })
+
+    /** An authenticator another registration turned on holds another key than this
+     *  screen's, which must not be backed up as if it were the one. */
+    it("takes a refusal as it comes when no answer was lost before", async () => {
+      mockTotpValidate.mockResolvedValue(refusedResponse)
+      mockReadRegistrationState.mockResolvedValue(accountRead(true))
+      await submitCode()
+
+      expect(mockReadRegistrationState).not.toHaveBeenCalled()
+      expect(mockShowBackup).not.toHaveBeenCalled()
+      expect(mockCodeInputError).toHaveBeenLastCalledWith("invalid code")
+    })
+
+    /** The answer was lost on the way back, though the server took the code. */
+    it("moves on to the backup when a failed request had turned the authenticator on", async () => {
+      mockTotpValidate.mockRejectedValue(lostAnswer())
+      mockReadRegistrationState.mockResolvedValue(accountRead(true))
+      mockRegistrationPrompt = "tier2_bulletin"
+
+      await submitCode()
+
+      expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
+      expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith({
+        tier: 2,
+        isEnforced: true,
+        prompt: "tier2_bulletin",
+      })
+      expect(Alert.alert).not.toHaveBeenCalled()
+    })
+
+    /** A second try after a lost answer is refused, its registration spent. */
+    it("moves on to the backup when a refused second try finds the authenticator on", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate
+        .mockRejectedValueOnce(lostAnswer())
+        .mockResolvedValueOnce(refusedResponse)
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+      expect(mockShowBackup).not.toHaveBeenCalled()
+      mockReadRegistrationState.mockResolvedValue(accountRead(true))
+
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
+      expect(mockCodeInputError).not.toHaveBeenCalledWith("invalid code")
+      consoleError.mockRestore()
+    })
+
+    /** The setup key's Next opens a new code screen for the same registration. */
+    it("remembers a lost answer for the registration, on a new code screen", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate
+        .mockRejectedValueOnce(lostAnswer())
+        .mockResolvedValueOnce(refusedResponse)
+      const first = render(wrap(<TotpRegistrationValidateScreen route={makeRoute()} />))
+      await act(async () => {
+        fireEvent.press(first.getByTestId("submit-code"))
+      })
+      first.unmount()
+      mockReadRegistrationState.mockResolvedValue(accountRead(true))
+
+      await submitCode()
+
+      expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
+      consoleError.mockRestore()
+    })
+
+    /** An error the server answered with means it took no code. */
+    it("reads nothing back after an error the server answered with", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate.mockRejectedValue(new Error("rate limited"))
+      mockReadRegistrationState.mockResolvedValue(accountRead(true))
+
+      await submitCode()
+
+      expect(mockReadRegistrationState).not.toHaveBeenCalled()
+      expect(mockShowBackup).not.toHaveBeenCalled()
+      expect(Alert.alert).toHaveBeenCalledTimes(1)
+      consoleError.mockRestore()
+    })
+
+    it("forgets the lost answer once the registration completes", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate.mockRejectedValueOnce(lostAnswer())
+      mockReadRegistrationState.mockResolvedValue(accountRead(true))
+      const first = render(wrap(<TotpRegistrationValidateScreen route={makeRoute()} />))
+      await act(async () => {
+        fireEvent.press(first.getByTestId("submit-code"))
+      })
+      expect(mockShowBackup).toHaveBeenCalledTimes(1)
+      first.unmount()
+      mockReadRegistrationState.mockClear()
+      mockTotpValidate.mockResolvedValueOnce(refusedResponse)
+
+      await submitCode()
+
+      expect(mockReadRegistrationState).not.toHaveBeenCalled()
+      consoleError.mockRestore()
+    })
+
+    it("shows the refusal of a second try when the authenticator is still off", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate
+        .mockRejectedValueOnce(lostAnswer())
+        .mockResolvedValueOnce(refusedResponse)
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      expect(mockReadRegistrationState).toHaveBeenCalledTimes(2)
+      expect(mockShowBackup).not.toHaveBeenCalled()
+      expect(mockCodeInputError).toHaveBeenLastCalledWith("invalid code")
+      consoleError.mockRestore()
+    })
+
+    it("says the request failed when the account cannot be read back either", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockTotpValidate.mockRejectedValue(lostAnswer())
+      mockReadRegistrationState.mockRejectedValue(new Error("still down"))
+
+      await submitCode()
+
+      expect(mockShowBackup).not.toHaveBeenCalled()
+      expect(Alert.alert).toHaveBeenCalledTimes(1)
+      consoleError.mockRestore()
+    })
+  })
+
+  describe("while the code is checked", () => {
+    /** A code accepted after the user left would enable the authenticator with its
+     *  setup key gone: the backup is the key's only safekeeping. */
+    it("refuses the user's own ways back and switches the swipe off", async () => {
+      let answer: (value: typeof enabledResponse) => void = () => {}
+      mockTotpValidate.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: false })
+      expect(isRemovalRefused("GO_BACK")).toBe(true)
+      expect(isRemovalRefused("POP")).toBe(true)
+
+      await act(async () => {
+        answer(enabledResponse)
+      })
+
+      expect(mockShowBackup).toHaveBeenCalledWith({ secret: "SECRET", userId: "1" })
+      expect(mockUnsubscribe).toHaveBeenCalledTimes(1)
+      expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: true })
+    })
+
+    /** What holds links while the setup key is at stake. */
+    it("tells the stack while the code is out", async () => {
+      let answer: (value: typeof refusedResponse) => void = () => {}
+      mockTotpValidate.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+      expect(mockSetParams).toHaveBeenLastCalledWith({ isChecking: true })
+
+      await act(async () => {
+        answer(refusedResponse)
+      })
+
+      expect(mockSetParams).toHaveBeenLastCalledWith({ isChecking: false })
+    })
+
+    /** The navigator would find no route to take the params. */
+    it("says nothing more to a stack the answer has already taken the screen off", async () => {
+      let answer: (value: typeof enabledResponse) => void = () => {}
+      mockTotpValidate.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+      mockShowBackup.mockImplementation(() => {
+        mockStackRoutes = [{ key: "totpRegistrationBackup" }]
+      })
+      await submitCode()
+
+      await act(async () => {
+        answer(enabledResponse)
+      })
+
+      expect(mockSetParams).toHaveBeenCalledTimes(1)
+      expect(mockSetParams).toHaveBeenCalledWith({ isChecking: true })
+    })
+
+    /** A logout or an account switch the app dispatches itself must still go through. */
+    it("lets a reset the app dispatched take the screen", async () => {
+      mockTotpValidate.mockReturnValue(new Promise(() => {}))
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+
+      expect(isRemovalRefused("RESET")).toBe(false)
+    })
+
+    /** A request that never settles must not keep the user on the screen for good. */
+    it("gives the ways back again once a check has taken too long", async () => {
+      jest.useFakeTimers({ doNotFake: ["nextTick", "queueMicrotask", "setImmediate"] })
+      try {
+        mockTotpValidate.mockReturnValue(new Promise(() => {}))
+        const { getByTestId } = render(
+          wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+        )
+        await act(async () => {
+          fireEvent.press(getByTestId("submit-code"))
+        })
+        expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: false })
+
+        await act(async () => {
+          jest.advanceTimersByTime(20_000)
+        })
+
+        expect(mockUnsubscribe).toHaveBeenCalledTimes(1)
+        expect(mockSetOptions).toHaveBeenLastCalledWith({ gestureEnabled: true })
+      } finally {
+        jest.useRealTimers()
+      }
+    })
+
+    /** An answer can land once the registration is off the stack: the prompt it was
+     *  started from is read before. */
+    it("reports the prompt the registration was started from, read before the answer", async () => {
+      let answer: (value: typeof enabledResponse) => void = () => {}
+      mockTotpValidate.mockReturnValue(
+        new Promise((resolve) => {
+          answer = resolve
+        }),
+      )
+      mockRegistrationPrompt = "session_modal"
+      const { getByTestId } = render(
+        wrap(<TotpRegistrationValidateScreen route={makeRoute()} />),
+      )
+      await act(async () => {
+        fireEvent.press(getByTestId("submit-code"))
+      })
+      mockRegistrationPrompt = undefined
+
+      await act(async () => {
+        answer(enabledResponse)
+      })
+
+      expect(mockLogTwoFactorSetupCompleted).toHaveBeenCalledWith(
+        expect.objectContaining({ prompt: "session_modal" }),
+      )
+    })
+
+    it("leaves the ways back alone before a code is sent", () => {
+      render(wrap(<TotpRegistrationValidateScreen route={makeRoute()} />))
+
+      expect(mockBeforeRemove).toBeUndefined()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+      expect(mockSetParams).not.toHaveBeenCalled()
+    })
   })
 })

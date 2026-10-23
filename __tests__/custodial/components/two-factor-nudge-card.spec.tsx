@@ -94,8 +94,7 @@ describe("TwoFactorNudgeCard", () => {
     fireEvent.press(getByTestId("cta-button"))
 
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
-      prompt: "home_card",
-      reason: undefined,
+      origin: { prompt: "home_card", reason: undefined },
     })
   })
 

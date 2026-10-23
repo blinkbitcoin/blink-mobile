@@ -47,6 +47,39 @@ export type TwoFactorPromptOrigin = {
   reason?: TwoFactorReminderReason
 }
 
+/** How a two-factor flow was opened: by a prompt, whose dismissal leaving it unfinished
+ *  is, or from the setup, which stays under it and counts its own. A registration that
+ *  could not start marks it, and leaving it is then no dismissal: the user was not
+ *  waving the prompt away. */
+export type TwoFactorFlowParams = {
+  origin?: TwoFactorPromptOrigin
+  isFromSetup?: boolean
+  hasFailedStart?: boolean
+}
+
+/** The code screen says while a code is checked, so that what reads the stack knows
+ *  the setup key is at stake. */
+export type TotpCodeCheckParams = {
+  isChecking?: boolean
+}
+
+/** The authenticator apps the onboarding recommends, as its events report them. */
+export const AuthenticatorApp = {
+  GoogleAuthenticator: "google_authenticator",
+  ProtonAuthenticator: "proton_authenticator",
+  TwoFasAuth: "2fas_auth",
+} as const
+export type AuthenticatorApp = (typeof AuthenticatorApp)[keyof typeof AuthenticatorApp]
+
+/** Where a new authenticator's setup key was saved for safekeeping, as its event
+ *  reports it. */
+export const SetupKeyBackupOption = {
+  PasswordManager: "password_manager",
+  ManualCopy: "manual_copy",
+} as const
+export type SetupKeyBackupOption =
+  (typeof SetupKeyBackupOption)[keyof typeof SetupKeyBackupOption]
+
 /** What a session start owes the account: at the high-balance tier, the countdown
  *  modal while dismissals remain and the blocking screen once they are spent; below it,
  *  nothing. */

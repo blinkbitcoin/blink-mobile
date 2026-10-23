@@ -11,8 +11,16 @@ import {
   TwoFactorReminderReason,
 } from "@app/types/two-factor-enforcement"
 
+/** Where a card's button goes: the setup, which offers both ways forward, or straight
+ *  to the authenticator onboarding, for a card whose button names the authenticator. */
+type TwoFactorHomeCardDestination = Extract<
+  keyof RootStackParamList,
+  "twoFactorSetup" | "totpRegistrationIntro"
+>
+
 type TwoFactorHomeCardProps = {
   prompt: TwoFactorPrompt
+  destination: TwoFactorHomeCardDestination
   /** Why the card is up, for the prompt that reports one. */
   reason?: TwoFactorReminderReason
   title: string
@@ -24,12 +32,13 @@ type TwoFactorHomeCardProps = {
 
 /**
  * A two-factor prompt on the home, as a card: it reports itself as shown to the
- * enforcement, which counts the impressions, and its button opens the setup, told which
- * prompt opened it and why it was up. What sets one prompt apart from another is its
- * copy and its dismissal.
+ * enforcement, which counts the impressions, and its button opens its destination, told
+ * which prompt opened it and why it was up. What sets one prompt apart from another is
+ * its copy, its destination and its dismissal.
  */
 export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
   prompt,
+  destination,
   reason,
   title,
   text,
@@ -44,8 +53,8 @@ export const TwoFactorHomeCard: React.FC<TwoFactorHomeCardProps> = ({
   }, [markPromptShown, prompt, reason])
 
   const handleSet = useCallback(() => {
-    navigation.navigate("twoFactorSetup", { prompt, reason })
-  }, [navigation, prompt, reason])
+    navigation.navigate(destination, { origin: { prompt, reason } })
+  }, [navigation, destination, prompt, reason])
 
   return (
     <NotificationCardUI

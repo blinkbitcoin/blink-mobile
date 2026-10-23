@@ -183,15 +183,15 @@ describe("TwoFactorSessionModal", () => {
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
-  it("makes way for the setup from Set now without a dismissal", () => {
+  it("makes way for the authenticator onboarding from Set now without a dismissal", () => {
     const onDismiss = jest.fn()
     const { getByTestId } = renderModal({ onDismiss })
 
     fireEvent.press(getByTestId("primary-button"))
 
     expect(onDismiss).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
-      prompt: "session_modal",
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
+      origin: { prompt: "session_modal" },
     })
   })
 

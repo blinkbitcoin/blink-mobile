@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect } from "react"
 
 import {
   RouteProp,
@@ -14,15 +14,11 @@ import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-but
 import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
 import { StepLayout } from "@app/components/step-layout"
+import { useTwoFactorFlowExit } from "@app/custodial/hooks/use-two-factor-flow-exit"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  RegistrationReturnRoute,
-  RootStackParamList,
-} from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
-import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
-import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -33,12 +29,13 @@ import { testProps } from "@app/utils/testProps"
  * screen that explains what that means, offered only while the self-custodial stack is
  * known to be on: nothing may push the user toward it once it is switched off.
  *
- * Reached from the home card, the reminder bulletin, the Settings banner and the
- * session modal, and closable from the close control it draws, on the same margin as
+ * Reached from the home card and the Settings banner, the reminder bulletin and the
+ * session modal opening the authenticator onboarding directly, and closable from the
+ * close control it draws, on the same margin as
  * every other screen of the two-factor flows. Leaving it without an authenticator
  * counts as the session's dismissal for the tiers that count one, reported as the
- * dismissal of the prompt that opened it. The authenticator
- * flow returns into it on success, and it then steps aside to wherever it was opened
+ * dismissal of the prompt that opened it. The authenticator onboarding opens above it
+ * and, once done, closes back into it, which then steps aside to wherever it was opened
  * from.
  */
 export const TwoFactorSetupScreen: React.FC = () => {
@@ -51,26 +48,15 @@ export const TwoFactorSetupScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "twoFactorSetup">>()
   const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorSetup">>()
   const isFocused = useIsFocused()
-  const { unmetTier, hasAuthenticator, isCustodyExitOffered, registerDismissal } =
-    useTwoFactorEnforcement()
-  /** The tier this screen was opened for: what it reports, and what leaving it unfinished
-   *  is charged to, even if the balance moves while it is open. */
-  const [promptTier] = useState(unmetTier)
-  /** The prompt that opened it, kept from the first render: the authenticator flow's
-   *  return replaces the route's params. */
-  const [origin] = useState(params)
+  const { hasAuthenticator, isCustodyExitOffered } = useTwoFactorEnforcement()
+  /** Leaving without an authenticator is the dismissal of the prompt that opened it. The
+   *  hardware back leaves the same way, and the swipe is off for this route, so no exit
+   *  skips the count. */
+  const { leave } = useTwoFactorFlowExit(params)
 
-  /** Leaving without an authenticator is a dismissal for the tiers that count one; the
-   *  provider ignores it below them. The hardware back leaves the same way, and the
-   *  swipe is off for this route, so no exit skips the count. */
-  const handleClose = useCallback(() => {
-    registerDismissal(promptTier, origin)
-    navigation.goBack()
-  }, [registerDismissal, promptTier, origin, navigation])
+  useHardwareBackGuard(leave)
 
-  useHardwareBackGuard(handleClose)
-
-  /** The authenticator flow returns into this screen. Once the account holds an
+  /** The authenticator onboarding closes back into this screen. Once the account holds an
    *  authenticator there is nothing left to offer, so it steps aside rather than asking
    *  for one the account just added. Only while focused: a screen lower in the stack
    *  going back would pop whichever screen is on top instead of itself. */
@@ -79,15 +65,15 @@ export const TwoFactorSetupScreen: React.FC = () => {
     if (isSetupComplete) navigation.goBack()
   }, [isSetupComplete, navigation])
 
+  /** The setup stays under the onboarding and the explanation, so backing out of either
+   *  lands back here, and leaving the setup is what counts. */
   const handleSetAuthenticator = useCallback(() => {
-    logTwoFactorSetupStarted({ tier: promptTier, method: TwoFactorMethod.Authenticator })
-    navigation.navigate("totpRegistrationInitiate", {
-      returnTo: RegistrationReturnRoute.TwoFactorSetup,
-      prompt: origin?.prompt,
+    navigation.navigate("totpRegistrationIntro", {
+      isFromSetup: true,
+      origin: params?.origin,
     })
-  }, [navigation, promptTier, origin])
+  }, [navigation, params])
 
-  /** The setup stays under the explanation, so backing out of it lands back here. */
   const handleMove = useCallback(() => {
     navigation.navigate("twoFactorNonCustodial", { isFromSetup: true })
   }, [navigation])
@@ -96,7 +82,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
     <StepLayout
       headerShown={false}
       contentStyle={styles.content}
-      header={<CloseHeader onClose={handleClose} testID="two-factor-setup-close" />}
+      header={<CloseHeader onClose={leave} testID="two-factor-setup-close" />}
       footer={
         <>
           <GaloyPrimaryButton

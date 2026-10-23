@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useEffect } from "react"
 
 import {
   RouteProp,
@@ -13,6 +13,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { IconHero } from "@app/components/icon-hero"
+import { useTwoFactorFlowExit } from "@app/custodial/hooks/use-two-factor-flow-exit"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -37,23 +38,12 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
       NativeStackNavigationProp<RootStackParamList, "twoFactorNonCustodial">
     >()
   const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorNonCustodial">>()
-  const isFromSetup = params?.isFromSetup ?? false
   const isFocused = useIsFocused()
-  const { unmetTier, isCustodyExitOffered, registerDismissal } = useTwoFactorEnforcement()
-  /** The tier this screen was opened for: what it reports, and what backing out of it
-   *  is charged to, even if the balance moves while it is open. */
-  const [promptTier] = useState(unmetTier)
-  /** The prompt that opened it, whose dismissal backing out is. */
-  const [origin] = useState(params?.origin)
-
+  const { isCustodyExitOffered } = useTwoFactorEnforcement()
   /** Backing out here, by Cancel, the X or the hardware back, is the dismissal the modal
    *  deferred. The swipe is off for this route, so no exit skips the count. Opened from
-   *  the setup, it only returns there: the setup is still up, and leaving it is what
-   *  counts. */
-  const handleCancel = useCallback(() => {
-    if (!isFromSetup) registerDismissal(promptTier, origin)
-    navigation.goBack()
-  }, [isFromSetup, registerDismissal, promptTier, origin, navigation])
+   *  the setup, it only returns there. */
+  const { promptTier, leave: handleCancel } = useTwoFactorFlowExit(params)
 
   useHardwareBackGuard(handleCancel)
 

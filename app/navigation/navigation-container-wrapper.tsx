@@ -27,6 +27,7 @@ import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
+import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
 import { isUnlockInProgress } from "./unlock-routes"
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
@@ -253,13 +254,24 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     resetToBlocker("gate-armed")
   }, [isBlockerVisible, resetToBlocker])
 
+  /** While the authenticator's setup key is at stake, any link, fresh or queued, the
+   *  migration's too, waits: one that lands on a screen below, the home among them,
+   *  would close the code check or the backup before the key is kept. Read from the
+   *  whole stack, not the focused route, so the unlock that covers the registration on a
+   *  return does not let one through. The state reopens a queued link once the key is
+   *  kept or the registration left; the linking listener closes over stale values, so it
+   *  reads the ref. */
+  const [isKeyAtStake, setIsKeyAtStake] = React.useState(false)
+  const isKeyAtStakeRef = useRef(false)
+
   /** A link that waited for the unlock, the sign-in or the two-factor prompts opens
    *  once all of them are out of the way; the migration link, which the prompts let
    *  through live, goes through here as well. */
-  const isQueuedLinkHeld =
+  const isQueuedLinkHeldByPrompts =
     isTwoFactorHoldingLinks &&
     urlAfterUnlockAndAuth !== null &&
     !isMigrationDeeplink(urlAfterUnlockAndAuth)
+  const isQueuedLinkHeld = isQueuedLinkHeldByPrompts || isKeyAtStake
   const canOpenQueuedUrl = canHandlePayments && !isAppLocked && !isQueuedLinkHeld
   useEffect(() => {
     if (canOpenQueuedUrl && urlAfterUnlockAndAuth) {
@@ -336,8 +348,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         const isGateRemedyLink = isMigrationDeeplink(url)
         if (isBlockerVisibleRef.current && !isGateRemedyLink) return
         const isHeldByTwoFactor = isTwoFactorHoldingLinksRef.current && !isGateRemedyLink
+        const isHeld = isHeldByTwoFactor || isKeyAtStakeRef.current
 
-        const canOpenNow = !isAppLocked && canHandlePayments && !isHeldByTwoFactor
+        const canOpenNow = !isAppLocked && canHandlePayments && !isHeld
         if (canOpenNow) {
           const maybeAction = processLinkForAction(url)
           if (maybeAction) {
@@ -375,6 +388,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
+          const isKeyAtStakeNow = isSetupKeyAtStake(state?.routes ?? [])
+          isKeyAtStakeRef.current = isKeyAtStakeNow
+          setIsKeyAtStake(isKeyAtStakeNow)
 
           if (routeName.current !== currentRouteName && currentRouteName) {
             /* eslint-disable camelcase */
