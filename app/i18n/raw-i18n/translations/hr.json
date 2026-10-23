@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Ručno resetiranje 2FA",
     "manualResetBody": "Radi vaše zaštite ne dopuštamo uklanjanje 2FA unutar aplikacije. Ako trebate resetirati 2FA, obratite se našoj <support>podršci</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Promijeni e-poštu",
+    "changePhoneTitle": "Promijeni broj telefona",
+    "addEmailTitle": "Dodaj e-poštu",
+    "addPhoneTitle": "Dodaj broj telefona",
+    "changeEmailCode": "Za promjenu e-pošte unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju.",
+    "changePhoneCode": "Za promjenu broja telefona unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju.",
+    "addEmailCode": "Za dodavanje e-pošte unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju.",
+    "addPhoneCode": "Za dodavanje broja telefona unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju.",
+    "needsAuthenticatorEmailTitle": "Dodajte autentifikator kako biste promijenili e-poštu",
+    "needsAuthenticatorPhoneTitle": "Dodajte autentifikator kako biste promijenili broj telefona",
+    "needsAuthenticatorBody": "Radi sigurnosti vašeg računa, promjena e-pošte ili broja telefona zahtijeva kôd iz aplikacije za autentifikaciju.",
+    "needsAuthenticatorTime": "Traje oko 2 minute. Kad ga postavite, vratit ćete se ovdje da napravite promjenu.",
+    "codeInvalid": "Taj kôd nije točan. Unesite trenutačni kôd iz aplikacije za autentifikaciju.",
+    "tooManyAttempts": "Previše pokušaja. Pokušajte ponovno za sat vremena."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4112,6 +4112,22 @@
         "manualResetTitle": "Reimpostazione manuale della 2FA",
         "manualResetBody": "Per la tua protezione non consentiamo di rimuovere la 2FA dall'app. Se hai bisogno di reimpostarla, contatta il nostro <support>Supporto</support>."
     },
+    "ContactChange": {
+        "changeEmailTitle": "Cambia email",
+        "changePhoneTitle": "Cambia numero di telefono",
+        "addEmailTitle": "Aggiungi email",
+        "addPhoneTitle": "Aggiungi numero di telefono",
+        "changeEmailCode": "Per cambiare la tua email, inserisci il codice a 6 cifre della tua app di autenticazione.",
+        "changePhoneCode": "Per cambiare il tuo numero di telefono, inserisci il codice a 6 cifre della tua app di autenticazione.",
+        "addEmailCode": "Per aggiungere la tua email, inserisci il codice a 6 cifre della tua app di autenticazione.",
+        "addPhoneCode": "Per aggiungere il tuo numero di telefono, inserisci il codice a 6 cifre della tua app di autenticazione.",
+        "needsAuthenticatorEmailTitle": "Aggiungi un autenticatore per cambiare la tua email",
+        "needsAuthenticatorPhoneTitle": "Aggiungi un autenticatore per cambiare il tuo numero di telefono",
+        "needsAuthenticatorBody": "Per proteggere il tuo account, cambiare email o numero di telefono richiede un codice da un'app di autenticazione.",
+        "needsAuthenticatorTime": "Ci vogliono circa 2 minuti. Una volta configurato, tornerai qui per completare la modifica.",
+        "codeInvalid": "Il codice non è corretto. Inserisci il codice attuale della tua app di autenticazione.",
+        "tooManyAttempts": "Troppi tentativi. Riprova tra un'ora."
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

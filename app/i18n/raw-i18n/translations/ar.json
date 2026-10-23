@@ -4112,6 +4112,22 @@
     "manualResetTitle": "إعادة تعيين المصادقة الثنائية يدويًا",
     "manualResetBody": "لحمايتك، لا نسمح بإزالة المصادقة الثنائية داخل التطبيق. إذا كنت بحاجة إلى إعادة تعيينها، تواصل مع <support>الدعم</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "تغيير البريد الإلكتروني",
+    "changePhoneTitle": "تغيير رقم الهاتف",
+    "addEmailTitle": "إضافة بريد إلكتروني",
+    "addPhoneTitle": "إضافة رقم هاتف",
+    "changeEmailCode": "لتغيير بريدك الإلكتروني، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "changePhoneCode": "لتغيير رقم هاتفك، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "addEmailCode": "لإضافة بريدك الإلكتروني، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "addPhoneCode": "لإضافة رقم هاتفك، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "needsAuthenticatorEmailTitle": "أضف تطبيق مصادقة لتغيير بريدك الإلكتروني",
+    "needsAuthenticatorPhoneTitle": "أضف تطبيق مصادقة لتغيير رقم هاتفك",
+    "needsAuthenticatorBody": "للحفاظ على أمان حسابك، يتطلب تغيير بريدك الإلكتروني أو رقم هاتفك رمزًا من تطبيق المصادقة.",
+    "needsAuthenticatorTime": "يستغرق ذلك حوالي دقيقتين. عند إعداده، ستعود إلى هنا لإجراء التغيير.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4112,6 +4112,22 @@
         "manualResetTitle": "Redefinição manual da 2FA",
         "manualResetBody": "Para sua proteção, não permitimos remover a 2FA dentro do app. Se você precisar redefinir a 2FA, entre em contato com o nosso <support>Suporte</support>."
     },
+    "ContactChange": {
+        "changeEmailTitle": "Alterar e-mail",
+        "changePhoneTitle": "Alterar número de telefone",
+        "addEmailTitle": "Adicionar e-mail",
+        "addPhoneTitle": "Adicionar número de telefone",
+        "changeEmailCode": "Para alterar seu e-mail, digite o código de 6 dígitos do seu app autenticador.",
+        "changePhoneCode": "Para alterar seu número de telefone, digite o código de 6 dígitos do seu app autenticador.",
+        "addEmailCode": "Para adicionar seu e-mail, digite o código de 6 dígitos do seu app autenticador.",
+        "addPhoneCode": "Para adicionar seu número de telefone, digite o código de 6 dígitos do seu app autenticador.",
+        "needsAuthenticatorEmailTitle": "Adicione um autenticador para alterar seu e-mail",
+        "needsAuthenticatorPhoneTitle": "Adicione um autenticador para alterar seu número de telefone",
+        "needsAuthenticatorBody": "Para manter sua conta segura, alterar o e-mail ou o número de telefone exige um código de um app autenticador.",
+        "needsAuthenticatorTime": "Leva cerca de 2 minutos. Quando estiver configurado, você voltará aqui para fazer a alteração.",
+        "codeInvalid": "Esse código está incorreto. Digite o código atual do seu app autenticador.",
+        "tooManyAttempts": "Muitas tentativas. Tente novamente em uma hora."
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

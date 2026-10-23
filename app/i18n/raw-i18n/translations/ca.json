@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Restabliment manual de la 2FA",
     "manualResetBody": "Per a la teva protecció, no permetem eliminar la 2FA des de l'app. Si necessites restablir la 2FA, contacta amb el nostre <support>Suport</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Canvia el correu",
+    "changePhoneTitle": "Canvia el número de telèfon",
+    "addEmailTitle": "Afegeix un correu",
+    "addPhoneTitle": "Afegeix un número de telèfon",
+    "changeEmailCode": "Per canviar el teu correu, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "changePhoneCode": "Per canviar el teu número de telèfon, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "addEmailCode": "Per afegir el teu correu, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "addPhoneCode": "Per afegir el teu número de telèfon, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "needsAuthenticatorEmailTitle": "Afegeix un autenticador per canviar el teu correu",
+    "needsAuthenticatorPhoneTitle": "Afegeix un autenticador per canviar el teu número de telèfon",
+    "needsAuthenticatorBody": "Per mantenir el teu compte segur, canviar el correu o el número de telèfon requereix un codi d'una app d'autenticació.",
+    "needsAuthenticatorTime": "Triga uns 2 minuts. Quan estigui configurat, tornaràs aquí per fer el canvi.",
+    "codeInvalid": "Aquest codi és incorrecte. Introdueix el codi actual de la teva app d'autenticació.",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a una hora."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

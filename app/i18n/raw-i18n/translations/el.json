@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Χειροκίνητη επαναφορά 2FA",
     "manualResetBody": "Για την προστασία σας, δεν επιτρέπουμε την αφαίρεση του 2FA μέσα από την εφαρμογή. Αν χρειάζεστε επαναφορά του 2FA, επικοινωνήστε με την <support>Υποστήριξη</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Αλλαγή email",
+    "changePhoneTitle": "Αλλαγή αριθμού τηλεφώνου",
+    "addEmailTitle": "Προσθήκη email",
+    "addPhoneTitle": "Προσθήκη αριθμού τηλεφώνου",
+    "changeEmailCode": "Για να αλλάξετε το email σας, εισαγάγετε τον 6ψήφιο κωδικό από την εφαρμογή ελέγχου ταυτότητας.",
+    "changePhoneCode": "Για να αλλάξετε τον αριθμό τηλεφώνου σας, εισαγάγετε τον 6ψήφιο κωδικό από την εφαρμογή ελέγχου ταυτότητας.",
+    "addEmailCode": "Για να προσθέσετε το email σας, εισαγάγετε τον 6ψήφιο κωδικό από την εφαρμογή ελέγχου ταυτότητας.",
+    "addPhoneCode": "Για να προσθέσετε τον αριθμό τηλεφώνου σας, εισαγάγετε τον 6ψήφιο κωδικό από την εφαρμογή ελέγχου ταυτότητας.",
+    "needsAuthenticatorEmailTitle": "Προσθέστε έναν authenticator για να αλλάξετε το email σας",
+    "needsAuthenticatorPhoneTitle": "Προσθέστε έναν authenticator για να αλλάξετε τον αριθμό τηλεφώνου σας",
+    "needsAuthenticatorBody": "Για την ασφάλεια του λογαριασμού σας, η αλλαγή του email ή του αριθμού τηλεφώνου απαιτεί κωδικό από εφαρμογή ελέγχου ταυτότητας.",
+    "needsAuthenticatorTime": "Χρειάζεται περίπου 2 λεπτά. Μόλις ρυθμιστεί, θα επιστρέψετε εδώ για να κάνετε την αλλαγή.",
+    "codeInvalid": "Αυτός ο κωδικός είναι λάθος. Εισαγάγετε τον τρέχοντα κωδικό από την εφαρμογή ελέγχου ταυτότητας.",
+    "tooManyAttempts": "Πάρα πολλές προσπάθειες. Δοκιμάστε ξανά σε μία ώρα."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Resetare manuală 2FA",
     "manualResetBody": "Pentru protecția ta, nu permitem eliminarea 2FA din aplicație. Dacă ai nevoie de resetarea 2FA, contactează <support>Asistența</support> noastră."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Schimbă e-mailul",
+    "changePhoneTitle": "Schimbă numărul de telefon",
+    "addEmailTitle": "Adaugă e-mail",
+    "addPhoneTitle": "Adaugă număr de telefon",
+    "changeEmailCode": "Pentru a schimba e-mailul, introdu codul de 6 cifre din aplicația de autentificare.",
+    "changePhoneCode": "Pentru a schimba numărul de telefon, introdu codul de 6 cifre din aplicația de autentificare.",
+    "addEmailCode": "Pentru a adăuga e-mailul, introdu codul de 6 cifre din aplicația de autentificare.",
+    "addPhoneCode": "Pentru a adăuga numărul de telefon, introdu codul de 6 cifre din aplicația de autentificare.",
+    "needsAuthenticatorEmailTitle": "Adaugă un autentificator pentru a schimba e-mailul",
+    "needsAuthenticatorPhoneTitle": "Adaugă un autentificator pentru a schimba numărul de telefon",
+    "needsAuthenticatorBody": "Pentru siguranța contului tău, schimbarea e-mailului sau a numărului de telefon necesită un cod dintr-o aplicație de autentificare.",
+    "needsAuthenticatorTime": "Durează cam 2 minute. După ce îl configurezi, revii aici pentru a face schimbarea.",
+    "codeInvalid": "Codul este greșit. Introdu codul actual din aplicația de autentificare.",
+    "tooManyAttempts": "Prea multe încercări. Încearcă din nou peste o oră."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4112,6 +4112,22 @@
         "manualResetTitle": "Réinitialisation manuelle de la 2FA",
         "manualResetBody": "Pour votre protection, la 2FA ne peut pas être supprimée dans l'application. Si vous avez besoin de la réinitialiser, contactez notre <support>Assistance</support>."
     },
+    "ContactChange": {
+        "changeEmailTitle": "Modifier l'e-mail",
+        "changePhoneTitle": "Modifier le numéro de téléphone",
+        "addEmailTitle": "Ajouter un e-mail",
+        "addPhoneTitle": "Ajouter un numéro de téléphone",
+        "changeEmailCode": "Pour modifier votre e-mail, saisissez le code à 6 chiffres de votre application d'authentification.",
+        "changePhoneCode": "Pour modifier votre numéro de téléphone, saisissez le code à 6 chiffres de votre application d'authentification.",
+        "addEmailCode": "Pour ajouter votre e-mail, saisissez le code à 6 chiffres de votre application d'authentification.",
+        "addPhoneCode": "Pour ajouter votre numéro de téléphone, saisissez le code à 6 chiffres de votre application d'authentification.",
+        "needsAuthenticatorEmailTitle": "Ajoutez un authentificateur pour modifier votre e-mail",
+        "needsAuthenticatorPhoneTitle": "Ajoutez un authentificateur pour modifier votre numéro de téléphone",
+        "needsAuthenticatorBody": "Pour protéger votre compte, modifier votre e-mail ou votre numéro de téléphone nécessite un code d'une application d'authentification.",
+        "needsAuthenticatorTime": "Cela prend environ 2 minutes. Une fois configuré, vous reviendrez ici pour effectuer la modification.",
+        "codeInvalid": "Ce code est incorrect. Saisissez le code actuel de votre application d'authentification.",
+        "tooManyAttempts": "Trop de tentatives. Réessayez dans une heure."
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

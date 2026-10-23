@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Handmatige reset van 2FA",
     "manualResetBody": "Voor je bescherming kan 2FA niet in de app worden verwijderd. Heb je een reset van 2FA nodig, neem dan contact op met onze <support>Support</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "E-mail wijzigen",
+    "changePhoneTitle": "Telefoonnummer wijzigen",
+    "addEmailTitle": "E-mail toevoegen",
+    "addPhoneTitle": "Telefoonnummer toevoegen",
+    "changeEmailCode": "Voer de 6-cijferige code uit je authenticator-app in om je e-mail te wijzigen.",
+    "changePhoneCode": "Voer de 6-cijferige code uit je authenticator-app in om je telefoonnummer te wijzigen.",
+    "addEmailCode": "Voer de 6-cijferige code uit je authenticator-app in om je e-mail toe te voegen.",
+    "addPhoneCode": "Voer de 6-cijferige code uit je authenticator-app in om je telefoonnummer toe te voegen.",
+    "needsAuthenticatorEmailTitle": "Voeg een authenticator toe om je e-mail te wijzigen",
+    "needsAuthenticatorPhoneTitle": "Voeg een authenticator toe om je telefoonnummer te wijzigen",
+    "needsAuthenticatorBody": "Om je account veilig te houden, is voor het wijzigen van je e-mail of telefoonnummer een code uit een authenticator-app nodig.",
+    "needsAuthenticatorTime": "Het duurt ongeveer 2 minuten. Zodra hij is ingesteld, kom je hier terug om de wijziging te maken.",
+    "codeInvalid": "Die code is onjuist. Voer de huidige code uit je authenticator-app in.",
+    "tooManyAttempts": "Te veel pogingen. Probeer het over een uur opnieuw."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

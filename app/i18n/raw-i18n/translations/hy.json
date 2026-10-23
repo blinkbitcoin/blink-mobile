@@ -4112,6 +4112,22 @@
     "manualResetTitle": "2FA-ի ձեռքով վերակայում",
     "manualResetBody": "Ձեր պաշտպանության համար թույլ չենք տալիս հեռացնել 2FA-ն հավելվածում։ Եթե 2FA-ի վերակայման կարիք ունեք, կապվեք մեր <support>աջակցման ծառայության</support> հետ։"
   },
+  "ContactChange": {
+    "changeEmailTitle": "Փոխել էլ. փոստը",
+    "changePhoneTitle": "Փոխել հեռախոսահամարը",
+    "addEmailTitle": "Ավելացնել էլ. փոստ",
+    "addPhoneTitle": "Ավելացնել հեռախոսահամար",
+    "changeEmailCode": "Էլ. փոստը փոխելու համար մուտքագրեք նույնականացման հավելվածի 6 նիշանոց կոդը։",
+    "changePhoneCode": "Հեռախոսահամարը փոխելու համար մուտքագրեք նույնականացման հավելվածի 6 նիշանոց կոդը։",
+    "addEmailCode": "Էլ. փոստ ավելացնելու համար մուտքագրեք նույնականացման հավելվածի 6 նիշանոց կոդը։",
+    "addPhoneCode": "Հեռախոսահամար ավելացնելու համար մուտքագրեք նույնականացման հավելվածի 6 նիշանոց կոդը։",
+    "needsAuthenticatorEmailTitle": "Ավելացրեք նույնականացուցիչ՝ էլ. փոստը փոխելու համար",
+    "needsAuthenticatorPhoneTitle": "Ավելացրեք նույնականացուցիչ՝ հեռախոսահամարը փոխելու համար",
+    "needsAuthenticatorBody": "Ձեր հաշիվը պաշտպանված պահելու համար էլ. փոստի կամ հեռախոսահամարի փոփոխության համար անհրաժեշտ է նույնականացման հավելվածի կոդ։",
+    "needsAuthenticatorTime": "Դա տևում է մոտ 2 րոպե։ Կարգավորելուց հետո կվերադառնաք այստեղ՝ փոփոխությունը կատարելու համար։",
+    "codeInvalid": "Այդ կոդը սխալ է։ Մուտքագրեք նույնականացման հավելվածի ընթացիկ կոդը։",
+    "tooManyAttempts": "Չափազանց շատ փորձեր։ Կրկին փորձեք մեկ ժամից։"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

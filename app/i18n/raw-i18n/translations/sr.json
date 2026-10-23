@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Ручно ресетовање 2FA",
     "manualResetBody": "Ради ваше заштите не дозвољавамо уклањање 2FA у апликацији. Ако вам је потребно ресетовање 2FA, обратите се нашој <support>подршци</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Промени имејл",
+    "changePhoneTitle": "Промени број телефона",
+    "addEmailTitle": "Додај имејл",
+    "addPhoneTitle": "Додај број телефона",
+    "changeEmailCode": "Да бисте променили имејл, унесите 6-цифрени код из апликације за аутентификацију.",
+    "changePhoneCode": "Да бисте променили број телефона, унесите 6-цифрени код из апликације за аутентификацију.",
+    "addEmailCode": "Да бисте додали имејл, унесите 6-цифрени код из апликације за аутентификацију.",
+    "addPhoneCode": "Да бисте додали број телефона, унесите 6-цифрени код из апликације за аутентификацију.",
+    "needsAuthenticatorEmailTitle": "Додајте аутентификатор да бисте променили имејл",
+    "needsAuthenticatorPhoneTitle": "Додајте аутентификатор да бисте променили број телефона",
+    "needsAuthenticatorBody": "Ради безбедности вашег налога, промена имејла или броја телефона захтева код из апликације за аутентификацију.",
+    "needsAuthenticatorTime": "Траје око 2 минута. Када га подесите, вратићете се овде да извршите промену.",
+    "codeInvalid": "Тај код није тачан. Унесите тренутни код из апликације за аутентификацију.",
+    "tooManyAttempts": "Превише покушаја. Покушајте поново за сат времена."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

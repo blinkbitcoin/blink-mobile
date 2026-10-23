@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Ukusetha kwakhona i-2FA ngesandla",
     "manualResetBody": "Ukuze ukhuseleke, asivumeli ukususwa kwe-2FA ngaphakathi kwi-app. Ukuba ufuna ukusetha kwakhona i-2FA, qhagamshelana <support>neNkxaso</support> yethu."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Tshintsha i-imeyile",
+    "changePhoneTitle": "Tshintsha inombolo yefowuni",
+    "addEmailTitle": "Yongeza i-imeyile",
+    "addPhoneTitle": "Yongeza inombolo yefowuni",
+    "changeEmailCode": "Ukuze utshintshe i-imeyile yakho, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "changePhoneCode": "Ukuze utshintshe inombolo yakho yefowuni, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "addEmailCode": "Ukuze wongeze i-imeyile yakho, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "addPhoneCode": "Ukuze wongeze inombolo yakho yefowuni, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "needsAuthenticatorEmailTitle": "Yongeza i-app yokuqinisekisa ukuze utshintshe i-imeyile yakho",
+    "needsAuthenticatorPhoneTitle": "Yongeza i-app yokuqinisekisa ukuze utshintshe inombolo yakho yefowuni",
+    "needsAuthenticatorBody": "Ukugcina iakhawunti yakho ikhuselekile, ukutshintsha i-imeyile okanye inombolo yefowuni kufuna ikhowudi evela kwi-app yokuqinisekisa.",
+    "needsAuthenticatorTime": "Kuthatha malunga nemizuzu emi-2. Xa sele isetiwe, uya kubuyela apha ukwenza utshintsho.",
+    "codeInvalid": "Loo khowudi ayichanekanga. Faka ikhowudi yangoku evela kwi-app yakho yokuqinisekisa.",
+    "tooManyAttempts": "Iinzame ezininzi kakhulu. Zama kwakhona emva kweyure enye."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

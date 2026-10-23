@@ -4112,6 +4112,22 @@
     "manualResetTitle": "2FA kézi visszaállítása",
     "manualResetBody": "A védelmed érdekében a 2FA nem távolítható el az alkalmazásban. Ha vissza kell állítani a 2FA-t, fordulj az <support>ügyfélszolgálatunkhoz</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "E-mail módosítása",
+    "changePhoneTitle": "Telefonszám módosítása",
+    "addEmailTitle": "E-mail hozzáadása",
+    "addPhoneTitle": "Telefonszám hozzáadása",
+    "changeEmailCode": "Az e-mail módosításához add meg a hitelesítő alkalmazásod 6 jegyű kódját.",
+    "changePhoneCode": "A telefonszám módosításához add meg a hitelesítő alkalmazásod 6 jegyű kódját.",
+    "addEmailCode": "Az e-mail hozzáadásához add meg a hitelesítő alkalmazásod 6 jegyű kódját.",
+    "addPhoneCode": "A telefonszám hozzáadásához add meg a hitelesítő alkalmazásod 6 jegyű kódját.",
+    "needsAuthenticatorEmailTitle": "Adj hozzá egy hitelesítőt az e-mail módosításához",
+    "needsAuthenticatorPhoneTitle": "Adj hozzá egy hitelesítőt a telefonszám módosításához",
+    "needsAuthenticatorBody": "A fiókod biztonsága érdekében az e-mail vagy a telefonszám módosításához egy hitelesítő alkalmazás kódja szükséges.",
+    "needsAuthenticatorTime": "Körülbelül 2 percet vesz igénybe. Ha beállítottad, visszatérsz ide a módosításhoz.",
+    "codeInvalid": "Ez a kód hibás. Add meg a hitelesítő alkalmazásod aktuális kódját.",
+    "tooManyAttempts": "Túl sok próbálkozás. Próbáld újra egy óra múlva."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

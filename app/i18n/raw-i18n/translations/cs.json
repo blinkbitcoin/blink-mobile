@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Ruční reset 2FA",
     "manualResetBody": "Pro vaši ochranu nepovolujeme odebrání 2FA v aplikaci. Pokud potřebujete reset 2FA, kontaktujte naši <support>podporu</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Změnit e-mail",
+    "changePhoneTitle": "Změnit telefonní číslo",
+    "addEmailTitle": "Přidat e-mail",
+    "addPhoneTitle": "Přidat telefonní číslo",
+    "changeEmailCode": "Pro změnu e-mailu zadejte 6místný kód z ověřovací aplikace.",
+    "changePhoneCode": "Pro změnu telefonního čísla zadejte 6místný kód z ověřovací aplikace.",
+    "addEmailCode": "Pro přidání e-mailu zadejte 6místný kód z ověřovací aplikace.",
+    "addPhoneCode": "Pro přidání telefonního čísla zadejte 6místný kód z ověřovací aplikace.",
+    "needsAuthenticatorEmailTitle": "Přidejte ověřovací aplikaci, abyste mohli změnit e-mail",
+    "needsAuthenticatorPhoneTitle": "Přidejte ověřovací aplikaci, abyste mohli změnit telefonní číslo",
+    "needsAuthenticatorBody": "Kvůli bezpečnosti vašeho účtu vyžaduje změna e-mailu nebo telefonního čísla kód z ověřovací aplikace.",
+    "needsAuthenticatorTime": "Zabere to asi 2 minuty. Až bude nastavena, vrátíte se sem a změnu dokončíte.",
+    "codeInvalid": "Tento kód není správný. Zadejte aktuální kód z ověřovací aplikace.",
+    "tooManyAttempts": "Příliš mnoho pokusů. Zkuste to znovu za hodinu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
