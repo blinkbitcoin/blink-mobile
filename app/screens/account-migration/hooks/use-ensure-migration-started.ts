@@ -58,6 +58,20 @@ export const useEnsureMigrationStarted = ({
    */
   const firedAttemptRef = useRef(-1)
 
+  /**
+   * Whether an answer still speaks for the screen: only an unmount or a newer attempt
+   * retires one. A change to skip does not, since skip only holds the next attempt back:
+   * an accepted start dropped because one of its inputs flipped while it was out would
+   * leave the lock armed server-side with nothing here to fire the start again.
+   */
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   /** A settled outcome stays settled however often the caller asks: retrying a refusal only
    *  replays the same answer, and re-firing an accepted start would re-arm an armed lock. */
   const retry = useCallback(() => {
@@ -66,12 +80,15 @@ export const useEnsureMigrationStarted = ({
     setAttempt((previous) => previous + 1)
   }, [isRejected, isStarted])
 
+  /** A settled outcome also keeps a retry asked for before it settled from firing: an
+   *  accepted start answering after the caller requested another needs no second one. */
+  const isSettled = isStarted || isRejected
+
   useEffect(() => {
-    if (skip || firedAttemptRef.current === attempt) return
+    if (skip || isSettled || firedAttemptRef.current === attempt) return
 
     firedAttemptRef.current = attempt
-
-    let isActive = true
+    const isCurrent = () => isMountedRef.current && firedAttemptRef.current === attempt
 
     const run = async () => {
       try {
@@ -86,7 +103,7 @@ export const useEnsureMigrationStarted = ({
             "Migration start empty payload",
             new Error("migrationStart returned no payload"),
           )
-          if (!isActive) return
+          if (!isCurrent()) return
           setHasConnectionIssue(true)
           return
         }
@@ -94,7 +111,10 @@ export const useEnsureMigrationStarted = ({
         const [rejection] = payload.errors ?? []
         if (rejection)
           reportError("Migration start rejected", new Error(rejection.message))
-        if (!isActive) return
+        if (!isCurrent()) return
+        /** An answer settles the connection question too: an earlier attempt's dropped
+         *  request may have raised it after the caller asked for this one. */
+        setHasConnectionIssue(false)
         setIsRejected(Boolean(rejection))
         setIsStarted(!rejection)
       } catch (err) {
@@ -104,18 +124,14 @@ export const useEnsureMigrationStarted = ({
          *  about it; the caller's retry is what sends the next one. */
         if (!isRetryable) reportError("Migration start failed", err)
 
-        if (!isActive) return
+        if (!isCurrent()) return
         setHasConnectionIssue(isRetryable)
         setIsRejected(!isRetryable)
       }
     }
 
     run()
-
-    return () => {
-      isActive = false
-    }
-  }, [skip, attempt, startMigration])
+  }, [skip, isSettled, attempt, startMigration])
 
   return { isStarted, isRejected, hasConnectionIssue, retry }
 }
