@@ -16,10 +16,11 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 gql`
-  mutation userEmailDelete {
-    userEmailDelete {
+  mutation userEmailDelete($input: UserEmailDeleteInput) {
+    userEmailDelete(input: $input) {
       errors {
         message
+        code
       }
       me {
         id
@@ -37,6 +38,7 @@ gql`
     userEmailRegistrationInitiate(input: $input) {
       errors {
         message
+        code
       }
       emailRegistrationId
       me {

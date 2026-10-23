@@ -3477,17 +3477,19 @@ export type CurrencyListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type CurrencyListQuery = { readonly __typename: 'Query', readonly currencyList: ReadonlyArray<{ readonly __typename: 'Currency', readonly id: string, readonly flag: string, readonly name: string, readonly symbol: string, readonly fractionDigits: number }> };
 
-export type UserEmailDeleteMutationVariables = Exact<{ [key: string]: never; }>;
+export type UserEmailDeleteMutationVariables = Exact<{
+  input?: InputMaybe<UserEmailDeleteInput>;
+}>;
 
 
-export type UserEmailDeleteMutation = { readonly __typename: 'Mutation', readonly userEmailDelete: { readonly __typename: 'UserEmailDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+export type UserEmailDeleteMutation = { readonly __typename: 'Mutation', readonly userEmailDelete: { readonly __typename: 'UserEmailDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type UserEmailRegistrationInitiateMutationVariables = Exact<{
   input: UserEmailRegistrationInitiateInput;
 }>;
 
 
-export type UserEmailRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationInitiate: { readonly __typename: 'UserEmailRegistrationInitiatePayload', readonly emailRegistrationId?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+export type UserEmailRegistrationInitiateMutation = { readonly __typename: 'Mutation', readonly userEmailRegistrationInitiate: { readonly __typename: 'UserEmailRegistrationInitiatePayload', readonly emailRegistrationId?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type CaptchaCreateChallengeMutationVariables = Exact<{ [key: string]: never; }>;
 
@@ -4053,10 +4055,12 @@ export type AccountDeleteMutationVariables = Exact<{ [key: string]: never; }>;
 
 export type AccountDeleteMutation = { readonly __typename: 'Mutation', readonly accountDelete: { readonly __typename: 'AccountDeletePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
 
-export type UserPhoneDeleteMutationVariables = Exact<{ [key: string]: never; }>;
+export type UserPhoneDeleteMutationVariables = Exact<{
+  input?: InputMaybe<UserPhoneDeleteInput>;
+}>;
 
 
-export type UserPhoneDeleteMutation = { readonly __typename: 'Mutation', readonly userPhoneDelete: { readonly __typename: 'UserPhoneDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
+export type UserPhoneDeleteMutation = { readonly __typename: 'Mutation', readonly userPhoneDelete: { readonly __typename: 'UserPhoneDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type WarningSecureAccountQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -5456,10 +5460,11 @@ export type CurrencyListLazyQueryHookResult = ReturnType<typeof useCurrencyListL
 export type CurrencyListSuspenseQueryHookResult = ReturnType<typeof useCurrencyListSuspenseQuery>;
 export type CurrencyListQueryResult = Apollo.QueryResult<CurrencyListQuery, CurrencyListQueryVariables>;
 export const UserEmailDeleteDocument = gql`
-    mutation userEmailDelete {
-  userEmailDelete {
+    mutation userEmailDelete($input: UserEmailDeleteInput) {
+  userEmailDelete(input: $input) {
     errors {
       message
+      code
     }
     me {
       id
@@ -5488,6 +5493,7 @@ export type UserEmailDeleteMutationFn = Apollo.MutationFunction<UserEmailDeleteM
  * @example
  * const [userEmailDeleteMutation, { data, loading, error }] = useUserEmailDeleteMutation({
  *   variables: {
+ *      input: // value for 'input'
  *   },
  * });
  */
@@ -5503,6 +5509,7 @@ export const UserEmailRegistrationInitiateDocument = gql`
   userEmailRegistrationInitiate(input: $input) {
     errors {
       message
+      code
     }
     emailRegistrationId
     me {
@@ -9418,10 +9425,11 @@ export type AccountDeleteMutationHookResult = ReturnType<typeof useAccountDelete
 export type AccountDeleteMutationResult = Apollo.MutationResult<AccountDeleteMutation>;
 export type AccountDeleteMutationOptions = Apollo.BaseMutationOptions<AccountDeleteMutation, AccountDeleteMutationVariables>;
 export const UserPhoneDeleteDocument = gql`
-    mutation userPhoneDelete {
-  userPhoneDelete {
+    mutation userPhoneDelete($input: UserPhoneDeleteInput) {
+  userPhoneDelete(input: $input) {
     errors {
       message
+      code
     }
     me {
       id
@@ -9450,6 +9458,7 @@ export type UserPhoneDeleteMutationFn = Apollo.MutationFunction<UserPhoneDeleteM
  * @example
  * const [userPhoneDeleteMutation, { data, loading, error }] = useUserPhoneDeleteMutation({
  *   variables: {
+ *      input: // value for 'input'
  *   },
  * });
  */

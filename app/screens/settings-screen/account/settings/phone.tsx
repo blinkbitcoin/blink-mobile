@@ -16,10 +16,11 @@ import { useTheme } from "@rn-vui/themed"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
 gql`
-  mutation userPhoneDelete {
-    userPhoneDelete {
+  mutation userPhoneDelete($input: UserPhoneDeleteInput) {
+    userPhoneDelete(input: $input) {
       errors {
         message
+        code
       }
       me {
         id
