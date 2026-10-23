@@ -732,10 +732,11 @@ mutation userContactUpdateAlias($input: UserContactUpdateAliasInput!) {
   }
 }
 
-mutation userEmailDelete {
-  userEmailDelete {
+mutation userEmailDelete($input: UserEmailDeleteInput) {
+  userEmailDelete(input: $input) {
     errors {
       message
+      code
       __typename
     }
     me {
@@ -757,6 +758,7 @@ mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInpu
   userEmailRegistrationInitiate(input: $input) {
     errors {
       message
+      code
       __typename
     }
     emailRegistrationId
@@ -837,10 +839,11 @@ mutation userLogout($input: UserLogoutInput!) {
   }
 }
 
-mutation userPhoneDelete {
-  userPhoneDelete {
+mutation userPhoneDelete($input: UserPhoneDeleteInput) {
+  userPhoneDelete(input: $input) {
     errors {
       message
+      code
       __typename
     }
     me {
