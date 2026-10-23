@@ -54,6 +54,7 @@ import {
   AuthenticatorIntroScreen,
   AuthenticatorProtectedScreen,
   SetupKeyBackupScreen,
+  TotpDeleteValidateScreen,
   TotpLoginValidateScreen,
   TotpRegistrationInitiateScreen,
   TotpRegistrationValidateScreen,
@@ -778,6 +779,11 @@ export const RootStack = () => {
         options={{
           title: LL.TotpLoginValidateScreen.title(),
         }}
+      />
+      <RootNavigator.Screen
+        name="totpDeleteValidate"
+        component={TotpDeleteValidateScreen}
+        options={{ title: LL.AccountScreen.totp() }}
       />
       <RootNavigator.Screen
         name="webView"

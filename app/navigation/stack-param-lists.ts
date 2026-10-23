@@ -243,6 +243,8 @@ export type RootStackParamList = {
   /** The user id names the account in the backup for an account with no username yet. */
   totpRegistrationBackup: { secret: string; userId: string }
   totpRegistrationDone: undefined
+  /** The authenticator's code, which turns it off. */
+  totpDeleteValidate: undefined
   totpLoginValidate: { authToken: string }
   twoFactorSetup: TwoFactorFlowParams | undefined
   twoFactorNonCustodial: TwoFactorFlowParams | undefined
