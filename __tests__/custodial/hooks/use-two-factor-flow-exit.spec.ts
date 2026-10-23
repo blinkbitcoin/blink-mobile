@@ -74,6 +74,17 @@ describe("useTwoFactorFlowExit", () => {
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
+  /** The user was not waving the prompt away: the registration never started. */
+  it("only goes back, charging nothing, once the registration could not start", () => {
+    const { result, rerender } = renderExit({ origin: MODAL_ORIGIN })
+
+    rerender({ flowParams: { origin: MODAL_ORIGIN, hasRegistrationFailedToStart: true } })
+    act(() => result.current.leave())
+
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
   /** A code the server accepted after its screen was left still adds the factor. */
   it("charges nothing once the account holds an authenticator", () => {
     const { result, rerender } = renderExit({ origin: MODAL_ORIGIN })

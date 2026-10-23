@@ -3,7 +3,11 @@ import { StyleSheet } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
-import { compactSetupKey, CopySecretComponent } from "@app/components/totp-export"
+import {
+  authenticatorAccountLabel,
+  compactSetupKey,
+  CopySecretComponent,
+} from "@app/components/totp-export"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -46,6 +50,18 @@ const fieldBorderColor = () =>
 describe("compactSetupKey", () => {
   it("drops every space the key is shown or typed with", () => {
     expect(compactSetupKey(" ABCD EFGH\tIJKL ")).toBe("ABCDEFGHIJKL")
+  })
+})
+
+describe("authenticatorAccountLabel", () => {
+  it("names the account by its username", () => {
+    expect(authenticatorAccountLabel({ id: "user-id", username: "someone" })).toBe(
+      "someone",
+    )
+  })
+
+  it("names an account without one by its user id", () => {
+    expect(authenticatorAccountLabel({ id: "user-id", username: null })).toBe("user-id")
   })
 })
 

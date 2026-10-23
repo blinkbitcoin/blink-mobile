@@ -28,13 +28,28 @@ jest.mock("@app/hooks", () => ({
   useAppConfig: () => ({ appConfig: { galoyInstance: { name: mockInstanceName } } }),
 }))
 
-/** The username the account has, as the screen's query returns it. */
+/** The account, as the screen's query returns it: none while it is read, and an error
+ *  when the read failed. */
 let mockUsername: string | null = "someone"
+let mockIsAccountRead = true
+let mockAccountReadError: Error | undefined
+const mockRereadAccount = jest.fn()
 const mockTotpInitiate = jest.fn()
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
-  useTotpRegistrationScreenQuery: () => ({ data: { me: { username: mockUsername } } }),
+  useTotpRegistrationScreenQuery: () => ({
+    data: mockIsAccountRead
+      ? { me: { id: "user-id", username: mockUsername } }
+      : undefined,
+    error: mockAccountReadError,
+    refetch: mockRereadAccount,
+  }),
   useUserTotpRegistrationInitiateMutation: () => [mockTotpInitiate, { loading: false }],
+}))
+
+const mockMarkStart = jest.fn()
+jest.mock("@app/screens/totp-screen/hooks/use-totp-registration-flow", () => ({
+  useTotpRegistrationFlow: () => ({ markStart: mockMarkStart }),
 }))
 
 const mockEnableScreenSecurity = jest.fn()
@@ -54,6 +69,7 @@ jest.mock("@app/utils/error-logging", () => ({
 const mockCopySecret = jest.fn()
 const mockQrCode = jest.fn()
 jest.mock("@app/components/totp-export", () => ({
+  ...jest.requireActual("@app/components/totp-export"),
   QrCodeComponent: (props: unknown) => {
     mockQrCode(props)
     return null
@@ -95,6 +111,9 @@ describe("TotpRegistrationInitiateScreen", () => {
     jest.clearAllMocks()
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
     mockUsername = "someone"
+    mockIsAccountRead = true
+    mockAccountReadError = undefined
+    mockRereadAccount.mockResolvedValue({})
     mockInstanceName = "Blink"
     mockWindow.width = 360
     mockTotpInitiate.mockResolvedValue(initiatedResponse)
@@ -166,14 +185,43 @@ describe("TotpRegistrationInitiateScreen", () => {
     )
   })
 
-  it("labels an account without a username as blink", async () => {
+  /** The backup names it the same way, so the saved key matches its entry. */
+  it("labels an account without a username by its user id", async () => {
     mockUsername = null
     await renderScreen()
 
     expect(mockQrCode).toHaveBeenLastCalledWith(
       expect.objectContaining({
-        value: "otpauth://totp/Blink:blink?secret=SECRET&issuer=Blink",
+        value: "otpauth://totp/Blink:user-id?secret=SECRET&issuer=Blink",
       }),
+    )
+  })
+
+  /** Every screen that shows, copies, encodes or passes the key on has the same one. */
+  it("takes the key without its spaces, once, as it arrives", async () => {
+    mockTotpInitiate.mockResolvedValue({
+      data: {
+        userTotpRegistrationInitiate: {
+          errors: null,
+          totpRegistrationId: "reg",
+          totpSecret: "SEC RET",
+        },
+      },
+    })
+    await renderScreen()
+
+    expect(mockCopySecret).toHaveBeenLastCalledWith(
+      expect.objectContaining({ secret: "SECRET" }),
+    )
+    expect(mockQrCode).toHaveBeenLastCalledWith(
+      expect.objectContaining({
+        value: "otpauth://totp/Blink:someone?secret=SECRET&issuer=Blink",
+      }),
+    )
+    fireEvent.press(screen.getByText(LL.common.next()))
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "totpRegistrationValidate",
+      expect.objectContaining({ secret: "SECRET" }),
     )
   })
 
@@ -183,6 +231,96 @@ describe("TotpRegistrationInitiateScreen", () => {
 
     expect(screen.queryByText(LL.common.next())).toBeNull()
     expect(mockCopySecret).not.toHaveBeenCalled()
+    expect(mockMarkStart).not.toHaveBeenCalled()
+  })
+
+  it("tells the onboarding the registration started", async () => {
+    await renderScreen()
+
+    expect(mockMarkStart).toHaveBeenCalledWith(false)
+    expect(mockMarkStart).not.toHaveBeenCalledWith(true)
+  })
+
+  it("shows a spinner, and no key, until the account is read", async () => {
+    mockIsAccountRead = false
+    await renderScreen()
+
+    expect(screen.queryByText(LL.common.next())).toBeNull()
+    expect(mockQrCode).not.toHaveBeenCalled()
+  })
+
+  describe("when the registration cannot start", () => {
+    beforeEach(() => {
+      mockTotpInitiate.mockRejectedValueOnce(new Error("network down"))
+    })
+
+    /** On the screen, rather than in an alert over it as well. */
+    it("offers to try again rather than a spinner for good", async () => {
+      await renderScreen()
+
+      expect(screen.getByText(LL.common.tryAgain())).toBeTruthy()
+      expect(Alert.alert).not.toHaveBeenCalled()
+    })
+
+    /** Leaving it is then no dismissal of the prompt that opened the onboarding. */
+    it("tells the onboarding the registration could not start", async () => {
+      await renderScreen()
+
+      expect(mockMarkStart).toHaveBeenLastCalledWith(true)
+    })
+
+    /** Leaving counts again once a try works. */
+    it("starts the registration again from Try again, shows its key, and tells the onboarding", async () => {
+      await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(screen.getByText(LL.common.tryAgain()))
+      })
+
+      expect(mockTotpInitiate).toHaveBeenCalledTimes(2)
+      expect(mockCopySecret).toHaveBeenLastCalledWith(
+        expect.objectContaining({ secret: "SECRET" }),
+      )
+      expect(mockRereadAccount).not.toHaveBeenCalled()
+      expect(mockMarkStart).toHaveBeenLastCalledWith(false)
+    })
+  })
+
+  describe("when the account cannot be read", () => {
+    beforeEach(() => {
+      mockIsAccountRead = false
+      mockAccountReadError = new Error("network down")
+    })
+
+    it("offers to try again, and tells the onboarding", async () => {
+      await renderScreen()
+
+      expect(screen.getByText(LL.common.tryAgain())).toBeTruthy()
+      expect(mockMarkStart).toHaveBeenLastCalledWith(true)
+    })
+
+    it("reads the account again from Try again, leaving the started registration alone", async () => {
+      await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(screen.getByText(LL.common.tryAgain()))
+      })
+
+      expect(mockRereadAccount).toHaveBeenCalledTimes(1)
+      expect(mockTotpInitiate).toHaveBeenCalledTimes(1)
+    })
+
+    /** The query's own error says so; the retry's rejection has nothing to add. */
+    it("swallows a read that fails again", async () => {
+      mockRereadAccount.mockRejectedValue(new Error("still down"))
+      await renderScreen()
+
+      await act(async () => {
+        fireEvent.press(screen.getByText(LL.common.tryAgain()))
+      })
+
+      expect(screen.getByText(LL.common.tryAgain())).toBeTruthy()
+    })
   })
 
   it("says so, and shows no key, when the registration comes back without an id", async () => {
@@ -191,7 +329,7 @@ describe("TotpRegistrationInitiateScreen", () => {
     })
     await renderScreen()
 
-    expect(Alert.alert).toHaveBeenCalledWith(LL.common.error())
+    expect(screen.getByText(LL.common.error())).toBeTruthy()
     expect(screen.queryByText(LL.common.next())).toBeNull()
   })
 
@@ -200,10 +338,29 @@ describe("TotpRegistrationInitiateScreen", () => {
     mockTotpInitiate.mockRejectedValue(failure)
     await renderScreen()
 
-    expect(Alert.alert).toHaveBeenCalledWith(LL.common.error())
+    expect(screen.getByText(LL.common.error())).toBeTruthy()
     expect(mockReportError).toHaveBeenCalledWith(
       "Authenticator registration start",
       failure,
+    )
+    expect(screen.queryByText(LL.common.next())).toBeNull()
+  })
+
+  it("reports a registration the server refused", async () => {
+    mockTotpInitiate.mockResolvedValue({
+      data: {
+        userTotpRegistrationInitiate: {
+          errors: [{ message: "refused" }],
+          totpRegistrationId: null,
+          totpSecret: null,
+        },
+      },
+    })
+    await renderScreen()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Authenticator registration start",
+      expect.any(Error),
     )
     expect(screen.queryByText(LL.common.next())).toBeNull()
   })
@@ -214,7 +371,7 @@ describe("TotpRegistrationInitiateScreen", () => {
     })
     await renderScreen()
 
-    expect(Alert.alert).toHaveBeenCalledWith(LL.common.error())
+    expect(screen.getByText(LL.common.error())).toBeTruthy()
     expect(screen.queryByText(LL.common.next())).toBeNull()
   })
 })

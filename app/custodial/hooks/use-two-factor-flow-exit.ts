@@ -21,6 +21,7 @@ type TwoFactorFlowExit = {
 export const useTwoFactorFlowExit = ({
   origin,
   isOpenedFromSetupScreen = false,
+  hasRegistrationFailedToStart = false,
 }: TwoFactorFlowParams = {}): TwoFactorFlowExit => {
   const navigation = useNavigation()
   const { unmetTier, hasAuthenticator, registerDismissal } = useTwoFactorEnforcement()
@@ -29,8 +30,10 @@ export const useTwoFactorFlowExit = ({
   const [openedFrom] = useState(origin)
 
   /** An authenticator added meanwhile, from a code accepted after its screen was left,
-   *  leaves the prompt nothing to be dismissed for. */
-  const isDismissal = !isOpenedFromSetupScreen && !hasAuthenticator
+   *  leaves the prompt nothing to be dismissed for, and a registration that could not
+   *  start is no answer to it. */
+  const isDismissal =
+    !isOpenedFromSetupScreen && !hasAuthenticator && !hasRegistrationFailedToStart
 
   const leave = useCallback(() => {
     if (isDismissal) registerDismissal(promptTier, openedFrom)

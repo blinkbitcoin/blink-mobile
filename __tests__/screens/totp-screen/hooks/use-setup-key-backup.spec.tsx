@@ -10,9 +10,8 @@ import { useSetupKeyBackup } from "@app/screens/totp-screen/hooks/use-setup-key-
 loadLocale("en")
 const LL = i18nObject("en")
 
-/** As the authenticator shows it: groups of four, which the backup must not keep. */
-const SECRET = "ABCD EFGH IJKL"
-const KEY = "ABCDEFGHIJKL"
+/** Without spaces, as the setup key's screen takes it in. */
+const SECRET = "ABCDEFGHIJKL"
 
 let mockMe: { id: string; username: string | null } | undefined = {
   id: "user-id",
@@ -41,7 +40,7 @@ const renderBackup = () =>
   renderHook(() => useSetupKeyBackup({ secret: SECRET, userId: "user-id" }), { wrapper })
 
 const backupTextFor = (account: string) =>
-  LL.AuthenticatorOnboarding.keyBackupText({ account, key: KEY })
+  LL.AuthenticatorOnboarding.keyBackupText({ account, key: SECRET })
 
 describe("useSetupKeyBackup", () => {
   beforeEach(() => {
@@ -50,7 +49,7 @@ describe("useSetupKeyBackup", () => {
   })
 
   /** The text names the account, so the saved entry says which one it is for. */
-  it("hands the key, without its spaces and with its account, to the share sheet for a password manager", async () => {
+  it("hands the key, with its account, to the share sheet for a password manager", async () => {
     const share = jest.spyOn(Share, "share").mockResolvedValue({ action: "sharedAction" })
     const { result } = renderBackup()
 

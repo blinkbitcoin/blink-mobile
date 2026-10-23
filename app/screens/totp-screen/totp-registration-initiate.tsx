@@ -1,11 +1,17 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { ActivityIndicator, Alert, useWindowDimensions, View } from "react-native"
+import { ActivityIndicator, useWindowDimensions, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { StepLayout } from "@app/components/step-layout"
-import { CopySecretComponent, QrCodeComponent } from "@app/components/totp-export"
+import {
+  authenticatorAccountLabel,
+  compactSetupKey,
+  CopySecretComponent,
+  QrCodeComponent,
+} from "@app/components/totp-export"
 import {
   useTotpRegistrationScreenQuery,
   useUserTotpRegistrationInitiateMutation,
@@ -19,6 +25,8 @@ import { testProps } from "@app/utils/testProps"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { useTotpRegistrationFlow } from "./hooks/use-totp-registration-flow"
 
 const generateOtpAuthURI = (
   accountName: string,
@@ -86,53 +94,88 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
 
   const styles = useStyles()
 
-  const { data } = useTotpRegistrationScreenQuery()
-  const username = data?.me?.username || "blink"
+  const { markStart } = useTotpRegistrationFlow()
+
+  const {
+    data,
+    error: accountReadError,
+    refetch: rereadAccount,
+  } = useTotpRegistrationScreenQuery()
+  const me = data?.me
+  const account = me ? authenticatorAccountLabel(me) : undefined
 
   const [secret, setSecret] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
   const [totpRegistrationId, setTotpRegistrationId] = useState("")
+  const [hasRegistrationFailed, setHasRegistrationFailed] = useState(false)
 
   const { appConfig } = useAppConfig()
   const service = appConfig.galoyInstance.name
 
   const { width: screenWidth } = useWindowDimensions()
 
-  const otpauth = generateOtpAuthURI(username, service, secret)
-
-  useEffect(() => {
-    const fn = async () => {
+  /** A request that never reaches the server is told apart from a refused one by
+   *  neither: both leave the screen saying so, with a way to try again, rather than the
+   *  spinner up for good. */
+  const startRegistration = useCallback(async () => {
+    setHasRegistrationFailed(false)
+    try {
       const res = await totpRegistrationInitiate()
       const payload = res.data?.userTotpRegistrationInitiate
       const registrationId = payload?.totpRegistrationId
       const setupKey = payload?.totpSecret
-
-      if (!registrationId) {
-        Alert.alert(LL.common.error())
-        return
-      }
-      if (!setupKey) {
-        Alert.alert(LL.common.error())
-        return
-      }
+      if (!registrationId) throw new Error("Registration refused")
+      if (!setupKey) throw new Error("Registration started without its key")
 
       setTotpRegistrationId(registrationId)
-      setSecret(setupKey)
-      setIsLoading(false)
-    }
-    /** A request that never reaches the server says so as a refused one does, rather
-     *  than leaving the spinner up with nothing said. */
-    fn().catch((err) => {
+      /** Once, as it arrives, so every screen that shows, copies or shares the key has
+       *  the same string. */
+      setSecret(compactSetupKey(setupKey))
+    } catch (err) {
       reportError("Authenticator registration start", err)
-      Alert.alert(LL.common.error())
-    })
-  }, [totpRegistrationInitiate, LL])
+      setHasRegistrationFailed(true)
+    }
+  }, [totpRegistrationInitiate])
+
+  useEffect(() => {
+    startRegistration()
+  }, [startRegistration])
+
+  const hasStartFailed = hasRegistrationFailed || Boolean(accountReadError)
+  const isStarted = Boolean(secret && account)
+  /** Said once either way is known, so a try that works after one that failed makes
+   *  leaving count again. */
+  const isStartSettled = hasStartFailed || isStarted
+  useEffect(() => {
+    if (isStartSettled) markStart(hasStartFailed)
+  }, [isStartSettled, hasStartFailed, markStart])
+
+  const retry = useCallback(() => {
+    if (hasRegistrationFailed) startRegistration()
+    /** A failed read says so through the query's own error. */
+    if (accountReadError) rereadAccount().catch(() => {})
+  }, [hasRegistrationFailed, accountReadError, startRegistration, rereadAccount])
 
   const handleNext = useCallback(() => {
     navigation.navigate("totpRegistrationValidate", { totpRegistrationId, secret })
   }, [navigation, totpRegistrationId, secret])
 
-  if (isLoading) {
+  if (hasStartFailed) {
+    return (
+      <StepLayout
+        footer={
+          <GaloyPrimaryButton
+            title={LL.common.tryAgain()}
+            onPress={retry}
+            {...testProps("totp-registration-retry")}
+          />
+        }
+      >
+        <IconHero icon="warning" iconColor={colors.error} title={LL.common.error()} />
+      </StepLayout>
+    )
+  }
+
+  if (!secret || !account) {
     return (
       <Screen>
         <View style={styles.loadingContainer}>
@@ -141,6 +184,8 @@ export const TotpRegistrationInitiateScreen: React.FC = () => {
       </Screen>
     )
   }
+
+  const otpauth = generateOtpAuthURI(account, service, secret)
 
   return (
     <StepLayout
