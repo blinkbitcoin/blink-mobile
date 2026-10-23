@@ -2562,8 +2562,6 @@
         "emailUnverifiedContent": "Stellen Sie sicher, dass Sie sich wieder bei Ihrem Konto anmelden können, indem Sie Ihre E-Mail verifizieren. Möchten Sie die Verifizierung jetzt durchführen?",
         "totp": "Zwei-Faktor Authentifizierung",
         "totpDeactivated": "Zwei-Faktor Authentifizierung wurde deaktiviert",
-        "totpDeleteAlertTitle": "Zwei-Faktor Authentifizierung löschen",
-        "totpDeleteAlertContent": "Bist Du sicher, dass du Deine Zwei-Faktor Authentifizierung löschen möchtest?",
         "copiedAccountId": "Kopieren Sie Ihre Konto-ID in die Zwischenablage",
         "yourAccountId": "Deine Konto ID",
         "accountId": "Konto ID",

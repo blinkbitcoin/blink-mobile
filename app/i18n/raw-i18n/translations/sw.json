@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Hakikisha unaweza kuingia kwenye akaunti yako kwa kuthibitisha anwani yako ya barua pepe. Je, ungependa kufanya uthibitisho sasa?",
     "totp": "uthibitishaji wa hatua mbili",
     "totpDeactivated": "Uthibitishaji wa hatua mbili umefutwa",
-    "totpDeleteAlertTitle": "Futa uthibitishaji wa hatua mbili",
-    "totpDeleteAlertContent": "Una uhakika unataka kufuta uthibitishaji wako wa hatua mbili?",
     "copiedAccountId": "Imeakiliwa ID ya akaunti yako kwenye ubao wa kunakili",
     "yourAccountId": "ID ya Akaunti Yako",
     "accountId": "Kitambulisho cha Akaunti",

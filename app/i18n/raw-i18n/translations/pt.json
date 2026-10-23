@@ -2562,8 +2562,6 @@
         "emailUnverifiedContent": "Certifique-se de que pode fazer login novamente na sua conta verificando o seu e-mail. Deseja fazer a verificação agora?",
         "totp": "Autenticação de dois fatores",
         "totpDeactivated": "A autenticação de dois fatores foi desativada",
-        "totpDeleteAlertTitle": "Excluir autenticação de dois fatores",
-        "totpDeleteAlertContent": "Você tem certeza de que deseja excluir sua autenticação de dois fatores?",
         "copiedAccountId": "Copiou o ID da sua conta para a área de transferência",
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",

@@ -2562,8 +2562,6 @@
         "emailUnverifiedContent": "Assurez-vous que vous pouvez vous reconnecter à votre compte en validant votre e-mail. Souhaitez-vous faire la validation maintenant ?",
         "totp": "Authentification à deux facteurs",
         "totpDeactivated": "L’authentification à deux facteurs a été désactivée.",
-        "totpDeleteAlertTitle": "Supprimer l’authentification à deux facteurs",
-        "totpDeleteAlertContent": "Êtes-vous sûr de vouloir supprimer votre authentification à deux facteurs ?",
         "copiedAccountId": "Copier votre identifiant de compte dans le presse-papiers",
         "yourAccountId": "Votre identifiant de compte",
         "accountId": "Identifiant du compte",

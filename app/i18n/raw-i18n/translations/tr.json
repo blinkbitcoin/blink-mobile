@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "E-postanızı doğrulayarak hesabınıza tekrar giriş yapabildiğinizden emin olun. Doğrulamayı şimdi yapmak istiyor musunuz?",
     "totp": "İki aşamalı doğrulama",
     "totpDeactivated": "İki aşamalı doğrulama kapatıldı",
-    "totpDeleteAlertTitle": "İki aşamalı doğrulamayı sil",
-    "totpDeleteAlertContent": "İki aşamalı doğrulamanızı silmek istediğinize emin misiniz?",
     "copiedAccountId": "Hesap kimliğiniz panoya kopyalandı",
     "yourAccountId": "Hesap Kimliğiniz",
     "accountId": "Hesap Kimliği",

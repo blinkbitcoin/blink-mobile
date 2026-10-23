@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Assegura't que vols tornar a iniciar sessió al teu compte verificant el teu correu electrònic. Vols fer la verificació ara?",
     "totp": "Autentificació de dos factors",
     "totpDeactivated": "L'autentificació de dos factors ha estat desactivada",
-    "totpDeleteAlertTitle": "Esborra l'autentificació de dos factors",
-    "totpDeleteAlertContent": "Estàs segur que vols suprimir la teva autenticació de dos factors?",
     "copiedAccountId": "S'ha copiat l'identificador del teu compte al porta-retalls",
     "yourAccountId": "La ID del teu compte",
     "accountId": "ID del compte",

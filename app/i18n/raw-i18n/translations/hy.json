@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Համոզվեք, որ կարող եք մուտք գործել Ձեր հաշիվ Ձեր էլ․ հասցեն հաստատելով։ Դուք ցանկանու՞մ եք կատարել հաստատումը հիմա։ ",
     "totp": "Երկգործոն նույնականացում",
     "totpDeactivated": "Երկգործոն նույնականացումը դեակտիվացվել է",
-    "totpDeleteAlertTitle": "Ջնջել երկգործոն նույնականացումը",
-    "totpDeleteAlertContent": "Դուք վստա՞հ եք, որ ցանկանում եք ջնջել Ձեր երկգործոն նույնականացումը։ ",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Հաշվի ID",

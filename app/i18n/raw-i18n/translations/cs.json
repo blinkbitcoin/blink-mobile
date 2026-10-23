@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Ověřením e-mailu zajistěte, abyste se mohli znovu přihlásit ke svému účtu. Chcete provést ověření nyní?",
     "totp": "Dvoufaktorové ověření",
     "totpDeactivated": "Dvoufaktorové ověřování bylo deaktivováno",
-    "totpDeleteAlertTitle": "Zmazat dvoufaktorové ověřování",
-    "totpDeleteAlertContent": "Opravdu chcete odstranit dvoufaktorové ověřování?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID účtu",

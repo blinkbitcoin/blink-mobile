@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Győződj meg róla, hogy újra be tudsz jelentkezni a számládba az email címed megerősítésével. Szeretnéd most elvégezni a megerősítést?",
     "totp": "Kétlépcsős azonosítás",
     "totpDeactivated": "A kétlépcsős azonosítás letiltva",
-    "totpDeleteAlertTitle": "Kétlépcsős azonosítás törlése",
-    "totpDeleteAlertContent": "Biztosan törölni szeretnéd a kétlépcsős azonosítást?",
     "copiedAccountId": "A felhasználói fiók azonosítód a vágólapra másolva",
     "yourAccountId": "A felhasználói fiók azonosítód",
     "accountId": "Felhasználói fiók azonosító",

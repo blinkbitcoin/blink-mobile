@@ -2562,8 +2562,6 @@
         "emailUnverifiedContent": "Assicurati di poter accedere nuovamente al tuo account verificando la tua email. Vuoi effettuare la verifica ora?",
         "totp": "Autenticazione a due fattori",
         "totpDeactivated": "L'autenticazione a due fattori è stata disattivata",
-        "totpDeleteAlertTitle": "Eliminare l'autenticazione a due fattori",
-        "totpDeleteAlertContent": "Vuoi davvero eliminare l'autenticazione a due fattori?",
         "copiedAccountId": "Copiato l'ID del tuo account negli appunti",
         "yourAccountId": "Il tuo ID account",
         "accountId": "ID account",
