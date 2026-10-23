@@ -16,7 +16,10 @@ import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conver
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
-import { TwoFactorFlowParams } from "@app/types/two-factor-enforcement"
+import {
+  TotpCodeCheckParams,
+  TwoFactorFlowParams,
+} from "@app/types/two-factor-enforcement"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
@@ -233,7 +236,10 @@ export type RootStackParamList = {
   /** The setup key travels on to the backup, the only screens that ever show it, and
    *  goes with them once the flow is left. Neither route is deep-linkable, so the key
    *  cannot arrive from outside the app (asserted over DEEP_LINK_SCREENS). */
-  totpRegistrationValidate: { totpRegistrationId: string; secret: string }
+  totpRegistrationValidate: {
+    totpRegistrationId: string
+    secret: string
+  } & TotpCodeCheckParams
   /** The user id names the account in the backup for an account with no username yet. */
   totpRegistrationBackup: { secret: string; userId: string }
   totpRegistrationDone: undefined

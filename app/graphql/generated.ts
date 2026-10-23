@@ -4177,6 +4177,11 @@ export type UserTotpRegistrationValidateMutationVariables = Exact<{
 
 export type UserTotpRegistrationValidateMutation = { readonly __typename: 'Mutation', readonly userTotpRegistrationValidate: { readonly __typename: 'UserTotpRegistrationValidatePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly totpEnabled: boolean, readonly phone?: string | null, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
+export type TotpRegistrationStateQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type TotpRegistrationStateQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly totpEnabled: boolean } | null };
+
 export type TransactionListForDefaultAccountQueryVariables = Exact<{
   first?: InputMaybe<Scalars['Int']['input']>;
   after?: InputMaybe<Scalars['String']['input']>;
@@ -10455,6 +10460,46 @@ export function useUserTotpRegistrationValidateMutation(baseOptions?: Apollo.Mut
 export type UserTotpRegistrationValidateMutationHookResult = ReturnType<typeof useUserTotpRegistrationValidateMutation>;
 export type UserTotpRegistrationValidateMutationResult = Apollo.MutationResult<UserTotpRegistrationValidateMutation>;
 export type UserTotpRegistrationValidateMutationOptions = Apollo.BaseMutationOptions<UserTotpRegistrationValidateMutation, UserTotpRegistrationValidateMutationVariables>;
+export const TotpRegistrationStateDocument = gql`
+    query totpRegistrationState {
+  me {
+    id
+    totpEnabled
+  }
+}
+    `;
+
+/**
+ * __useTotpRegistrationStateQuery__
+ *
+ * To run a query within a React component, call `useTotpRegistrationStateQuery` and pass it any options that fit your needs.
+ * When your component renders, `useTotpRegistrationStateQuery` returns an object from Apollo Client that contains loading, error, and data properties
+ * you can use to render your UI.
+ *
+ * @param baseOptions options that will be passed into the query, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options;
+ *
+ * @example
+ * const { data, loading, error } = useTotpRegistrationStateQuery({
+ *   variables: {
+ *   },
+ * });
+ */
+export function useTotpRegistrationStateQuery(baseOptions?: Apollo.QueryHookOptions<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useQuery<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>(TotpRegistrationStateDocument, options);
+      }
+export function useTotpRegistrationStateLazyQuery(baseOptions?: Apollo.LazyQueryHookOptions<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useLazyQuery<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>(TotpRegistrationStateDocument, options);
+        }
+export function useTotpRegistrationStateSuspenseQuery(baseOptions?: Apollo.SuspenseQueryHookOptions<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>) {
+          const options = {...defaultOptions, ...baseOptions}
+          return Apollo.useSuspenseQuery<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>(TotpRegistrationStateDocument, options);
+        }
+export type TotpRegistrationStateQueryHookResult = ReturnType<typeof useTotpRegistrationStateQuery>;
+export type TotpRegistrationStateLazyQueryHookResult = ReturnType<typeof useTotpRegistrationStateLazyQuery>;
+export type TotpRegistrationStateSuspenseQueryHookResult = ReturnType<typeof useTotpRegistrationStateSuspenseQuery>;
+export type TotpRegistrationStateQueryResult = Apollo.QueryResult<TotpRegistrationStateQuery, TotpRegistrationStateQueryVariables>;
 export const TransactionListForDefaultAccountDocument = gql`
     query transactionListForDefaultAccount($first: Int, $after: String, $walletIds: [WalletId!]) {
   me {

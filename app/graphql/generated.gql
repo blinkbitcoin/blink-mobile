@@ -2121,6 +2121,14 @@ query totpRegistrationScreen {
   }
 }
 
+query totpRegistrationState {
+  me {
+    id
+    totpEnabled
+    __typename
+  }
+}
+
 query transactionByIdForWallet($walletId: WalletId!, $txId: ID!) {
   me {
     id
