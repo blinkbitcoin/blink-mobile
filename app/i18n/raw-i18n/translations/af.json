@@ -2697,7 +2697,9 @@
     "noFee": "geen fooi",
     "fromApprox": "vanaf ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Kan nie nou fooie verkry nie"
+    "error": "Kan nie nou fooie verkry nie",
+    "inactivity": "Onaktiwiteit >{months: number} maande",
+    "usdPerMonth": "{amount: string}/maand"
   },
   "TransactionLimitsScreen": {
     "receive": "Ontvang",

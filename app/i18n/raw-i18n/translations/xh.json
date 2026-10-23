@@ -2697,7 +2697,9 @@
     "noFee": "akukho mrhumo",
     "fromApprox": "ukusuka ku-~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Ayikwazanga kufumana imirhumo ngeli xesha"
+    "error": "Ayikwazanga kufumana imirhumo ngeli xesha",
+    "inactivity": "Ukungasebenzi >iinyanga ezi-{months: number}",
+    "usdPerMonth": "{amount: string}/ngenyanga"
   },
   "TransactionLimitsScreen": {
     "receive": "Yamkela",

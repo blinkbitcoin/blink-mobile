@@ -2697,7 +2697,9 @@
     "noFee": "χωρίς τέλη",
     "fromApprox": "από ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Δεν είναι δυνατή η λήψη των τελών αυτή τη στιγμή"
+    "error": "Δεν είναι δυνατή η λήψη των τελών αυτή τη στιγμή",
+    "inactivity": "Αδράνεια >{months: number} μήνες",
+    "usdPerMonth": "{amount: string}/μήνα"
   },
   "TransactionLimitsScreen": {
     "receive": "Λήψη",

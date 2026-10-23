@@ -2697,7 +2697,9 @@
     "noFee": "بدون رسوم",
     "fromApprox": "من ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "لم يُستطَع الحصول على الرسوم الآن"
+    "error": "لم يُستطَع الحصول على الرسوم الآن",
+    "inactivity": "عدم النشاط >{months: number} شهرًا",
+    "usdPerMonth": "{amount: string}/شهر"
   },
   "TransactionLimitsScreen": {
     "receive": "استقبال",

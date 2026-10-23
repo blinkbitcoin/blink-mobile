@@ -2697,7 +2697,9 @@
     "noFee": "bez naknade",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Trenutačno nije moguće dohvatiti naknade"
+    "error": "Trenutačno nije moguće dohvatiti naknade",
+    "inactivity": "Neaktivnost >{months: number} mjeseci",
+    "usdPerMonth": "{amount: string}/mjesečno"
   },
   "TransactionLimitsScreen": {
     "receive": "Primi",

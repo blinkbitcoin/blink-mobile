@@ -2697,7 +2697,9 @@
     "noFee": "geen kosten",
     "fromApprox": "vanaf ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Kan momenteel geen kosten ophalen"
+    "error": "Kan momenteel geen kosten ophalen",
+    "inactivity": "Inactiviteit >{months: number} maanden",
+    "usdPerMonth": "{amount: string}/maand"
   },
   "TransactionLimitsScreen": {
     "receive": "Ontvang",

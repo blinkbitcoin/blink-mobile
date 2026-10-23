@@ -2697,7 +2697,9 @@
     "noFee": "առանց վճարի",
     "fromApprox": "սկսած ~{fee: string}-ից",
     "satAmount": "{amount: string} SAT",
-    "error": "Չհաջողվեց ստանալ վճարներն այս պահին"
+    "error": "Չհաջողվեց ստանալ վճարներն այս պահին",
+    "inactivity": "Անգործություն >{months: number} ամիս",
+    "usdPerMonth": "{amount: string}/ամիս"
   },
   "TransactionLimitsScreen": {
     "receive": "Ստանալ",

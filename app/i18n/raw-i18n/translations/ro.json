@@ -2697,7 +2697,9 @@
     "noFee": "fără taxă",
     "fromApprox": "de la ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Nu se pot obține taxele în acest moment"
+    "error": "Nu se pot obține taxele în acest moment",
+    "inactivity": "Inactivitate >{months: number} luni",
+    "usdPerMonth": "{amount: string}/lună"
   },
   "TransactionLimitsScreen": {
     "receive": "Primește",

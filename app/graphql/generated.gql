@@ -1407,6 +1407,10 @@ query feeRates {
         }
         __typename
       }
+      inactivityFee {
+        usdCentsPerMonth
+        __typename
+      }
       __typename
     }
     __typename

@@ -58,6 +58,7 @@ const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
+const InactivityFeeEnabledKey = "inactivityFeeEnabled"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -126,6 +127,7 @@ type RemoteConfig = {
   [MigrationDelayedRedirectEnabledKey]: boolean
   [PersistentBulletinsEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
+  [InactivityFeeEnabledKey]: boolean
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -255,6 +257,10 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  stuck on every home by mistake can be made closable again without a release. */
   persistentBulletinsEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
+  /** Whether the fee rates screen lists the inactivity fee. Visibility only: the
+   *  amount comes from `globals.feesInformation.inactivityFee`, the same config the
+   *  backend charges from, so it is never priced here (blink-wip#1200). */
+  inactivityFeeEnabled: true,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -503,6 +509,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           defaultFeeRatesConfig,
         )
 
+        const inactivityFeeEnabled = remoteConfigInstance()
+          .getValue(InactivityFeeEnabledKey)
+          .asBoolean()
+
         setRemoteConfig({
           deviceAccountEnabledRestAuth,
           balanceLimitToTriggerUpgradeModal,
@@ -547,6 +557,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           migrationDelayedRedirectEnabled,
           persistentBulletinsEnabled,
           feeRatesConfig,
+          inactivityFeeEnabled,
         })
       } catch (err) {
         logError({

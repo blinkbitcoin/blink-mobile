@@ -470,6 +470,10 @@ const mocks = [
                 },
               ],
             },
+            inactivityFee: {
+              __typename: "InactivityFeeInformation",
+              usdCentsPerMonth: 100,
+            },
           },
         },
       },

@@ -2697,7 +2697,9 @@
     "noFee": "без накнаде",
     "fromApprox": "од ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Тренутно није могуће преузети накнаде"
+    "error": "Тренутно није могуће преузети накнаде",
+    "inactivity": "Неактивност >{months: number} месеци",
+    "usdPerMonth": "{amount: string}/месечно"
   },
   "TransactionLimitsScreen": {
     "receive": "Прими",
