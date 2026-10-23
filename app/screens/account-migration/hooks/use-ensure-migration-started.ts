@@ -84,6 +84,16 @@ export const useEnsureMigrationStarted = ({
    *  accepted start answering after the caller requested another needs no second one. */
   const isSettled = isStarted || isRejected
 
+  /**
+   * Whether any attempt has been accepted. An acceptance is never stale: the server has
+   * the run, whichever request carried it. So it settles the start even when a newer
+   * attempt has gone out since (the shared retry can send one while the first is still
+   * out), and nothing that answers afterwards undoes it: the repeat's refusal, or its
+   * dropped connection, is about a start the server already holds. Read through a ref
+   * because those later answers land in closures from before the acceptance.
+   */
+  const isAcceptedRef = useRef(false)
+
   useEffect(() => {
     if (skip || isSettled || firedAttemptRef.current === attempt) return
 
@@ -103,20 +113,27 @@ export const useEnsureMigrationStarted = ({
             "Migration start empty payload",
             new Error("migrationStart returned no payload"),
           )
-          if (!isCurrent()) return
+          if (!isCurrent() || isAcceptedRef.current) return
           setHasConnectionIssue(true)
           return
         }
 
         const [rejection] = payload.errors ?? []
-        if (rejection)
-          reportError("Migration start rejected", new Error(rejection.message))
-        if (!isCurrent()) return
-        /** An answer settles the connection question too: an earlier attempt's dropped
-         *  request may have raised it after the caller asked for this one. */
+        if (!rejection) {
+          if (!isMountedRef.current) return
+          isAcceptedRef.current = true
+          /** An answer settles the connection question too: an earlier attempt's dropped
+           *  request may have raised it after the caller asked for this one. */
+          setHasConnectionIssue(false)
+          setIsRejected(false)
+          setIsStarted(true)
+          return
+        }
+
+        reportError("Migration start rejected", new Error(rejection.message))
+        if (!isCurrent() || isAcceptedRef.current) return
         setHasConnectionIssue(false)
-        setIsRejected(Boolean(rejection))
-        setIsStarted(!rejection)
+        setIsRejected(true)
       } catch (err) {
         const isRetryable = isNetworkFailure(err)
 
@@ -124,7 +141,7 @@ export const useEnsureMigrationStarted = ({
          *  about it; the caller's retry is what sends the next one. */
         if (!isRetryable) reportError("Migration start failed", err)
 
-        if (!isCurrent()) return
+        if (!isCurrent() || isAcceptedRef.current) return
         setHasConnectionIssue(isRetryable)
         setIsRejected(!isRetryable)
       }

@@ -401,4 +401,96 @@ describe("useEnsureMigrationStarted", () => {
     expect(result.current.isStarted).toBe(true)
     expect(result.current.hasConnectionIssue).toBe(false)
   })
+
+  /**
+   * The shared retry can send a second start while the first is still out. The server
+   * has the run once either is accepted, so a refusal or a dropped connection on the other
+   * request must not undo that: read as refused, the screen would hand the user to support
+   * over a run the server is holding.
+   */
+  describe("when a repeat goes out before the first start answers", () => {
+    let answerFirst: (value: unknown) => void = () => undefined
+    let answerSecond: (value: unknown) => void = () => undefined
+    let failSecond: (reason: unknown) => void = () => undefined
+
+    const sendRepeat = async () => {
+      mockMigrationStart
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            answerFirst = resolve
+          }),
+        )
+        .mockReturnValueOnce(
+          new Promise((resolve, reject) => {
+            answerSecond = resolve
+            failSecond = reject
+          }),
+        )
+      const hook = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+      await flushEffects()
+      await act(async () => {
+        hook.result.current.retry()
+      })
+      expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+      return hook
+    }
+
+    it("keeps the first start's acceptance when the repeat is refused after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        answerSecond(refusedWith("MIGRATION_STATE_CONFLICT"))
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isRejected).toBe(false)
+    })
+
+    it("takes the first start's acceptance over a refusal of the repeat that came first", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerSecond(refusedWith("MIGRATION_STATE_CONFLICT"))
+      })
+      expect(result.current.isRejected).toBe(true)
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isRejected).toBe(false)
+    })
+
+    it("keeps the acceptance when the repeat answers with no payload after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        answerSecond({ data: { migrationStart: null } })
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.hasConnectionIssue).toBe(false)
+    })
+
+    it("keeps the acceptance when the repeat's connection drops after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        failSecond(networkFailure())
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.hasConnectionIssue).toBe(false)
+    })
+  })
 })
