@@ -4112,6 +4112,22 @@
     "manualResetTitle": "2FA handmatige terugstelling",
     "manualResetBody": "Vir jou beskerming laat ons nie toe dat 2FA in die app verwyder word nie. As jy 'n 2FA-terugstelling nodig het, kontak ons <support>Ondersteuning</support>."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Verander e-pos",
+    "changePhoneTitle": "Verander foonnommer",
+    "addEmailTitle": "Voeg e-pos by",
+    "addPhoneTitle": "Voeg foonnommer by",
+    "changeEmailCode": "Voer die 6-syfer-kode van jou verifikasie-app in om jou e-pos te verander.",
+    "changePhoneCode": "Voer die 6-syfer-kode van jou verifikasie-app in om jou foonnommer te verander.",
+    "addEmailCode": "Voer die 6-syfer-kode van jou verifikasie-app in om jou e-pos by te voeg.",
+    "addPhoneCode": "Voer die 6-syfer-kode van jou verifikasie-app in om jou foonnommer by te voeg.",
+    "needsAuthenticatorEmailTitle": "Voeg 'n verifikasie-app by om jou e-pos te verander",
+    "needsAuthenticatorPhoneTitle": "Voeg 'n verifikasie-app by om jou foonnommer te verander",
+    "needsAuthenticatorBody": "Om jou rekening veilig te hou, het die verandering van jou e-pos of foonnommer 'n kode van 'n verifikasie-app nodig.",
+    "needsAuthenticatorTime": "Dit neem sowat 2 minute. Wanneer dit opgestel is, kom jy hierheen terug om die verandering te maak.",
+    "codeInvalid": "Daardie kode is verkeerd. Voer die huidige kode van jou verifikasie-app in.",
+    "tooManyAttempts": "Te veel pogings. Probeer weer oor 'n uur."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

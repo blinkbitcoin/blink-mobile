@@ -13743,6 +13743,64 @@ type RootTranslation = {
 		 */
 		manualResetBody: string
 	}
+	ContactChange: {
+		/**
+		 * C​h​a​n​g​e​ ​e​m​a​i​l
+		 */
+		changeEmailTitle: string
+		/**
+		 * C​h​a​n​g​e​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		changePhoneTitle: string
+		/**
+		 * A​d​d​ ​e​m​a​i​l
+		 */
+		addEmailTitle: string
+		/**
+		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		addPhoneTitle: string
+		/**
+		 * T​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​e​m​a​i​l​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		changeEmailCode: string
+		/**
+		 * T​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		changePhoneCode: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​e​m​a​i​l​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addEmailCode: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addPhoneCode: string
+		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​e​m​a​i​l
+		 */
+		needsAuthenticatorEmailTitle: string
+		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		needsAuthenticatorPhoneTitle: string
+		/**
+		 * T​o​ ​k​e​e​p​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​s​a​f​e​,​ ​c​h​a​n​g​i​n​g​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​ ​n​e​e​d​s​ ​a​ ​c​o​d​e​ ​f​r​o​m​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		needsAuthenticatorBody: string
+		/**
+		 * I​t​ ​t​a​k​e​s​ ​a​b​o​u​t​ ​2​ ​m​i​n​u​t​e​s​.​ ​W​h​e​n​ ​i​t​'​s​ ​s​e​t​,​ ​y​o​u​'​l​l​ ​c​o​m​e​ ​b​a​c​k​ ​h​e​r​e​ ​t​o​ ​m​a​k​e​ ​t​h​e​ ​c​h​a​n​g​e​.
+		 */
+		needsAuthenticatorTime: string
+		/**
+		 * T​h​a​t​ ​c​o​d​e​ ​i​s​ ​i​n​c​o​r​r​e​c​t​.​ ​E​n​t​e​r​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		codeInvalid: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​n​ ​h​o​u​r​.
+		 */
+		tooManyAttempts: string
+	}
 	BackupRequired: {
 		/**
 		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​i​r​s​t
@@ -27679,6 +27737,64 @@ export type TranslationFunctions = {
 		 * For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.
 		 */
 		manualResetBody: () => LocalizedString
+	}
+	ContactChange: {
+		/**
+		 * Change email
+		 */
+		changeEmailTitle: () => LocalizedString
+		/**
+		 * Change phone number
+		 */
+		changePhoneTitle: () => LocalizedString
+		/**
+		 * Add email
+		 */
+		addEmailTitle: () => LocalizedString
+		/**
+		 * Add phone number
+		 */
+		addPhoneTitle: () => LocalizedString
+		/**
+		 * To change your email, enter the 6-digit code from your authenticator app.
+		 */
+		changeEmailCode: () => LocalizedString
+		/**
+		 * To change your phone number, enter the 6-digit code from your authenticator app.
+		 */
+		changePhoneCode: () => LocalizedString
+		/**
+		 * To add your email, enter the 6-digit code from your authenticator app.
+		 */
+		addEmailCode: () => LocalizedString
+		/**
+		 * To add your phone number, enter the 6-digit code from your authenticator app.
+		 */
+		addPhoneCode: () => LocalizedString
+		/**
+		 * Add an authenticator to change your email
+		 */
+		needsAuthenticatorEmailTitle: () => LocalizedString
+		/**
+		 * Add an authenticator to change your phone number
+		 */
+		needsAuthenticatorPhoneTitle: () => LocalizedString
+		/**
+		 * To keep your account safe, changing your email or phone number needs a code from an authenticator app.
+		 */
+		needsAuthenticatorBody: () => LocalizedString
+		/**
+		 * It takes about 2 minutes. When it's set, you'll come back here to make the change.
+		 */
+		needsAuthenticatorTime: () => LocalizedString
+		/**
+		 * That code is incorrect. Enter the current code from your authenticator app.
+		 */
+		codeInvalid: () => LocalizedString
+		/**
+		 * Too many attempts. Try again in an hour.
+		 */
+		tooManyAttempts: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

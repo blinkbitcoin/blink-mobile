@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Kuweka upya 2FA kwa mkono",
     "manualResetBody": "Kwa ulinzi wako, hatuuruhusu 2FA kuondolewa ndani ya programu. Ikiwa unahitaji kuweka upya 2FA, wasiliana na <support>Usaidizi</support> wetu."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Badilisha barua pepe",
+    "changePhoneTitle": "Badilisha nambari ya simu",
+    "addEmailTitle": "Ongeza barua pepe",
+    "addPhoneTitle": "Ongeza nambari ya simu",
+    "changeEmailCode": "Ili kubadilisha barua pepe yako, weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji.",
+    "changePhoneCode": "Ili kubadilisha nambari yako ya simu, weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji.",
+    "addEmailCode": "Ili kuongeza barua pepe yako, weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji.",
+    "addPhoneCode": "Ili kuongeza nambari yako ya simu, weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji.",
+    "needsAuthenticatorEmailTitle": "Ongeza programu ya uthibitishaji ili kubadilisha barua pepe yako",
+    "needsAuthenticatorPhoneTitle": "Ongeza programu ya uthibitishaji ili kubadilisha nambari yako ya simu",
+    "needsAuthenticatorBody": "Ili akaunti yako iwe salama, kubadilisha barua pepe au nambari ya simu kunahitaji msimbo kutoka programu ya uthibitishaji.",
+    "needsAuthenticatorTime": "Inachukua takriban dakika 2. Ikishawekwa, utarudi hapa kufanya mabadiliko.",
+    "codeInvalid": "Msimbo huo si sahihi. Weka msimbo wa sasa kutoka programu yako ya uthibitishaji.",
+    "tooManyAttempts": "Majaribio mengi mno. Jaribu tena baada ya saa moja."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

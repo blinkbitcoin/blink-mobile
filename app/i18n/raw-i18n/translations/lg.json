@@ -4112,6 +4112,22 @@
     "manualResetTitle": "Okuddamu okuteekawo 2FA mu ngalo",
     "manualResetBody": "Olw'obukuumi bwo, tetukkiriza 2FA kuggibwako mu app. Bw'oba weetaaga okuddamu okuteekawo 2FA, tuukirira <support>Obuyambi</support> bwaffe."
   },
+  "ContactChange": {
+    "changeEmailTitle": "Kyusa email",
+    "changePhoneTitle": "Kyusa ennamba y'essimu",
+    "addEmailTitle": "Gattako email",
+    "addPhoneTitle": "Gattako ennamba y'essimu",
+    "changeEmailCode": "Okukyusa email yo, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "changePhoneCode": "Okukyusa ennamba yo ey'essimu, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "addEmailCode": "Okugattako email yo, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "addPhoneCode": "Okugattako ennamba yo ey'essimu, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "needsAuthenticatorEmailTitle": "Gattako app ey'okukakasa okukyusa email yo",
+    "needsAuthenticatorPhoneTitle": "Gattako app ey'okukakasa okukyusa ennamba yo ey'essimu",
+    "needsAuthenticatorBody": "Okukuuma akawunti yo nga nnungi, okukyusa email oba ennamba y'essimu kwetaaga koodi okuva mu app ey'okukakasa.",
+    "needsAuthenticatorTime": "Kitwala eddakiika nga 2. Bw'emala okugiteekawo, ojja kudda wano okukola enkyukakyuka.",
+    "codeInvalid": "Koodi eyo si ntuufu. Yingiza koodi ey'kaakati okuva mu app yo ey'okukakasa.",
+    "tooManyAttempts": "Ogezezzaako emirundi mingi nnyo. Ddamu okugezaako oluvannyuma lw'essaawa emu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
