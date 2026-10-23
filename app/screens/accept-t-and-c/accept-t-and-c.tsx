@@ -96,6 +96,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     }
   }
 
+  const isAcceptBusy = loading || isSavingTerms
+
   const action = async () => {
     if (flow === "migration") {
       await runExclusively(acceptMigrationTerms)
@@ -149,8 +151,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.AcceptTermsAndConditionsScreen.accept()}
             onPress={action}
-            loading={loading || isSavingTerms}
-            disabled={loading || isSavingTerms}
+            loading={isAcceptBusy}
+            disabled={isAcceptBusy}
           />
         </View>
       </View>
