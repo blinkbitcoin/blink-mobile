@@ -61,10 +61,8 @@ jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
 }))
 
 const mockLogTwoFactorSetupStarted = jest.fn()
-const mockLogEducationStarted = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
   logTwoFactorSetupStarted: (...args: unknown[]) => mockLogTwoFactorSetupStarted(...args),
-  logAuthenticatorEducationStarted: () => mockLogEducationStarted(),
 }))
 
 const BULLETIN_ORIGIN: TwoFactorPromptOrigin = {
@@ -110,7 +108,6 @@ describe("AuthenticatorIntroScreen", () => {
     expect(screen.getByText(LL.AuthenticatorOnboarding.durationTitle())).toBeTruthy()
   })
 
-  /** Every Set authenticator lands here, so this is where the setup starts. */
   /** Nothing in the card is pressed, so it sits on the static card surface rather than
    *  the one tappable rows use. */
   it("draws the benefits on the static card surface", async () => {
@@ -120,7 +117,8 @@ describe("AuthenticatorIntroScreen", () => {
     expect(StyleSheet.flatten(card.props.style).backgroundColor).toBe(light.grey7)
   })
 
-  it("reports the setup and the onboarding as started, once, under the tier it opened for", async () => {
+  /** Every Set authenticator lands here, so this is where the setup starts. */
+  it("reports the setup as started, once, under the tier it opened for", async () => {
     await renderScreen()
 
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledTimes(1)
@@ -128,7 +126,6 @@ describe("AuthenticatorIntroScreen", () => {
       tier: TwoFactorTier.Reminder,
       method: "authenticator",
     })
-    expect(mockLogEducationStarted).toHaveBeenCalledTimes(1)
   })
 
   it("moves on to the apps from Get started", async () => {

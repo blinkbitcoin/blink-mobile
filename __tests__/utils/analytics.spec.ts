@@ -3,7 +3,6 @@ import {
   logAddPhoneAttempt,
   logAuthenticatorAppSelected,
   logAuthenticatorEducationCompleted,
-  logAuthenticatorEducationStarted,
   logAttemptCreateDeviceAccount,
   logConversionAttempt,
   logConversionResult,
@@ -364,31 +363,25 @@ describe("analytics helpers", () => {
   })
 
   describe("authenticator onboarding events", () => {
-    it("emits 'education_started' with nothing else", () => {
-      logAuthenticatorEducationStarted()
-
-      expect(mockLogEvent).toHaveBeenCalledWith("education_started")
-    })
-
-    it("emits 'education_app_selected' with the app", () => {
+    it("emits 'two_factor_education_app_selected' with the app", () => {
       logAuthenticatorAppSelected({ app: "proton_authenticator" })
 
-      expect(mockLogEvent).toHaveBeenCalledWith("education_app_selected", {
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_education_app_selected", {
         app: "proton_authenticator",
       })
     })
 
-    it("emits 'education_completed' with nothing else", () => {
+    it("emits 'two_factor_education_completed' with nothing else", () => {
       logAuthenticatorEducationCompleted()
 
-      expect(mockLogEvent).toHaveBeenCalledWith("education_completed")
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_education_completed")
     })
 
     /** The option, never the key it saved. */
-    it("emits 'backup_option_selected' with the option alone", () => {
+    it("emits 'two_factor_key_backup_option_selected' with the option alone", () => {
       logSetupKeyBackupOptionSelected({ option: "password_manager" })
 
-      expect(mockLogEvent).toHaveBeenCalledWith("backup_option_selected", {
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_key_backup_option_selected", {
         option: "password_manager",
       })
     })
