@@ -10,7 +10,8 @@ import {
 type TwoFactorTurnOff = {
   /** Whether the app refuses turning the authenticator off: the account reached the
    *  enforced tier, where it is mandatory, even if the balance has since dropped.
-   *  Only while the prompts apply; the server still refuses a balance that high. */
+   *  Only while the prompts apply. The server refuses a balance that high on its own,
+   *  once its step-up check is on (`twoFactor.stepUpEnabled`). */
   isTurnOffBlocked: boolean
   /** Whether that is known yet: the tier reached is read from the device after a launch
    *  or an account switch, and until then a tier-three account would read as allowed. */
