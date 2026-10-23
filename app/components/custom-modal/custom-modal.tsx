@@ -34,6 +34,8 @@ export type CustomModalProps = {
   secondaryButtonLoading?: boolean
   showCloseIconButton?: boolean
   dismissable?: boolean
+  /** Once the modal is off the screen, for what must not run while it closes. */
+  onModalHide?: () => void
   minHeight?: DimensionValue
   titleMaxWidth?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
@@ -63,6 +65,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonLoading,
   showCloseIconButton = true,
   dismissable = true,
+  onModalHide,
   backgroundModalColor,
   titleFontSize,
 }) => {
@@ -89,6 +92,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       avoidKeyboard={true}
       onBackdropPress={dismissable ? toggleModal : undefined}
       onBackButtonPress={dismissable ? toggleModal : undefined}
+      onModalHide={onModalHide}
     >
       <View style={styles.container}>
         <View style={styles.headerContainer}>
