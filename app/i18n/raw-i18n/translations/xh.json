@@ -4106,6 +4106,18 @@
     "newPhoneTip": "Ukuba ufumana ifowuni entsha, dlulisela i-authenticator yakho kuyo <bold>ngaphambi</bold> kokuba usete kwakhona endala.",
     "done": "Kwenziwe"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ivuliwe",
+    "statusDisabled": "2FA: Icinyiwe",
+    "modalTitle": "Asicebisi ukuba ucime i-2FA",
+    "modalBody": "Oku kungathoba ukhuseleko lweakhawunti yakho kwaye kwenze kube lula ukuba omnye umntu angene kwiakhawunti yakho ngaphandle kwemvume yakho.",
+    "keepProtected": "Ndigcine ndikhuselekile",
+    "codeInstruction": "Faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa ukuze ucime ukuqinisekisa ngezinto ezimbini.",
+    "codeInvalid": "Loo khowudi ayichanekanga. Faka ikhowudi yangoku evela kwi-app yakho yokuqinisekisa.",
+    "tooManyAttempts": "Iinzame ezininzi kakhulu. Zama kwakhona emva kweyure enye.",
+    "manualResetTitle": "Ukusetha kwakhona i-2FA ngesandla",
+    "manualResetBody": "Ukuze ukhuseleke, asivumeli ukususwa kwe-2FA ngaphakathi kwi-app. Ukuba ufuna ukusetha kwakhona i-2FA, qhagamshelana <support>neNkxaso</support> yethu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

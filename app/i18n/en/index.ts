@@ -4325,6 +4325,22 @@ const en: BaseTranslation = {
       "If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.",
     done: "Done",
   },
+  TwoFactorTurnOff: {
+    statusEnabled: "2FA: Enabled",
+    statusDisabled: "2FA: Disabled",
+    modalTitle: "We don't recommend disabling 2FA",
+    modalBody:
+      "This would lower your account's security and make it easier for a third party to access your account without your permission.",
+    keepProtected: "Keep me protected",
+    codeInstruction:
+      "Enter the 6-digit code from your authenticator app to turn off two-factor authentication.",
+    codeInvalid:
+      "That code is incorrect. Enter the current code from your authenticator app.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
+    manualResetTitle: "2FA manual reset",
+    manualResetBody:
+      "For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.",
+  },
   BackupRequired: {
     modalTitle: "Back up your wallet first",
     modalDescription:

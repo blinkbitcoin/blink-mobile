@@ -4106,6 +4106,18 @@
     "newPhoneTip": "Musuq telefonota hap'ispaykiqa, autenticadorniykita chayman apay, <bold>manaraq</bold> mawk'a telefonota kutichichkaspa.",
     "done": "Tukusqa"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Kawsachisqa",
+    "statusDisabled": "2FA: Wañuchisqa",
+    "modalTitle": "Manam 2FA wañuchiyta yuyaychaykuchu",
+    "modalBody": "Kayqa cuentaykiq waqaychasqa kayninta pisiyachinman, hukkunataq mana munasqaykiwan cuentaykiman yaykunankupaq facilchanman.",
+    "keepProtected": "Waqaychasqa kachun",
+    "codeInstruction": "Autenticador appaykimanta 6 yupayniyuq códigota qillqay iskay factor autenticación wañuchinaykipaq.",
+    "codeInvalid": "Chay códigoqa manam allinchu. Autenticador appaykimanta kunan códigota qillqay.",
+    "tooManyAttempts": "Achka kutitam kallpachakunki. Huk horamanta wakmanta kallpachakuy.",
+    "manualResetTitle": "2FA makiwan kutichiy",
+    "manualResetBody": "Waqaychasqa kanaykipaq, manam 2FA appllapi qichuyta saqinchikchu. 2FA kutichiyta munaspaqa, <support>Yanapaqninchikwan</support> rimay."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4106,6 +4106,18 @@
     "newPhoneTip": "As jy 'n nuwe foon kry, skuif jou authenticator daarheen <bold>voordat</bold> jy die oue terugstel.",
     "done": "Klaar"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Aan",
+    "statusDisabled": "2FA: Af",
+    "modalTitle": "Ons beveel nie aan dat jy 2FA afskakel nie",
+    "modalBody": "Dit sal jou rekening se sekuriteit verlaag en dit vir 'n derde party makliker maak om sonder jou toestemming toegang tot jou rekening te kry.",
+    "keepProtected": "Hou my beskerm",
+    "codeInstruction": "Voer die 6-syfer-kode van jou verifikasie-app in om tweefaktor-verifikasie af te skakel.",
+    "codeInvalid": "Daardie kode is verkeerd. Voer die huidige kode van jou verifikasie-app in.",
+    "tooManyAttempts": "Te veel pogings. Probeer weer oor 'n uur.",
+    "manualResetTitle": "2FA handmatige terugstelling",
+    "manualResetBody": "Vir jou beskerming laat ons nie toe dat 2FA in die app verwyder word nie. As jy 'n 2FA-terugstelling nodig het, kontak ons <support>Ondersteuning</support>."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

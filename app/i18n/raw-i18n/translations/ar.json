@@ -4106,6 +4106,18 @@
     "newPhoneTip": "إذا حصلت على هاتف جديد، انقل تطبيق المصادقة إليه <bold>قبل</bold> إعادة ضبط الهاتف القديم.",
     "done": "تم"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "المصادقة الثنائية: مفعّلة",
+    "statusDisabled": "المصادقة الثنائية: معطّلة",
+    "modalTitle": "لا ننصح بتعطيل المصادقة الثنائية",
+    "modalBody": "سيؤدي ذلك إلى تقليل أمان حسابك وتسهيل وصول طرف ثالث إلى حسابك دون إذنك.",
+    "keepProtected": "أبقني محميًا",
+    "codeInstruction": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة لإيقاف المصادقة الثنائية.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة.",
+    "manualResetTitle": "إعادة تعيين المصادقة الثنائية يدويًا",
+    "manualResetBody": "لحمايتك، لا نسمح بإزالة المصادقة الثنائية داخل التطبيق. إذا كنت بحاجة إلى إعادة تعيينها، تواصل مع <support>الدعم</support>."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

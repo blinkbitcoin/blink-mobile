@@ -4106,6 +4106,18 @@
     "newPhoneTip": "Ha új telefont kapsz, vidd át rá a hitelesítődet, <bold>mielőtt</bold> visszaállítod a régit.",
     "done": "Kész"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Bekapcsolva",
+    "statusDisabled": "2FA: Kikapcsolva",
+    "modalTitle": "Nem javasoljuk a 2FA kikapcsolását",
+    "modalBody": "Ez csökkentené a fiókod biztonságát, és megkönnyítené, hogy valaki az engedélyed nélkül hozzáférjen.",
+    "keepProtected": "Maradjak védve",
+    "codeInstruction": "Add meg a hitelesítő alkalmazásod 6 jegyű kódját a kétlépcsős azonosítás kikapcsolásához.",
+    "codeInvalid": "Ez a kód hibás. Add meg a hitelesítő alkalmazásod aktuális kódját.",
+    "tooManyAttempts": "Túl sok próbálkozás. Próbáld újra egy óra múlva.",
+    "manualResetTitle": "2FA kézi visszaállítása",
+    "manualResetBody": "A védelmed érdekében a 2FA nem távolítható el az alkalmazásban. Ha vissza kell állítani a 2FA-t, fordulj az <support>ügyfélszolgálatunkhoz</support>."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

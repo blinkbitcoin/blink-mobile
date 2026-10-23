@@ -4106,6 +4106,18 @@
     "newPhoneTip": "Pokud si pořídíte nový telefon, přeneste na něj autentikátor <bold>předtím</bold>, než resetujete ten starý.",
     "done": "Hotovo"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Zapnuto",
+    "statusDisabled": "2FA: Vypnuto",
+    "modalTitle": "Nedoporučujeme vypínat 2FA",
+    "modalBody": "Snížilo by to zabezpečení vašeho účtu a usnadnilo třetí straně přístup k vašemu účtu bez vašeho svolení.",
+    "keepProtected": "Chci zůstat chráněn",
+    "codeInstruction": "Zadejte 6místný kód z ověřovací aplikace, abyste vypnuli dvoufázové ověření.",
+    "codeInvalid": "Tento kód není správný. Zadejte aktuální kód z ověřovací aplikace.",
+    "tooManyAttempts": "Příliš mnoho pokusů. Zkuste to znovu za hodinu.",
+    "manualResetTitle": "Ruční reset 2FA",
+    "manualResetBody": "Pro vaši ochranu nepovolujeme odebrání 2FA v aplikaci. Pokud potřebujete reset 2FA, kontaktujte naši <support>podporu</support>."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

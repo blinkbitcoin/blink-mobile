@@ -4106,6 +4106,18 @@
         "newPhoneTip": "Wenn du ein neues Telefon bekommst, übertrage deinen Authenticator darauf, <bold>bevor</bold> du das alte zurücksetzt.",
         "done": "Fertig"
     },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Aktiviert",
+        "statusDisabled": "2FA: Deaktiviert",
+        "modalTitle": "Wir raten davon ab, 2FA zu deaktivieren",
+        "modalBody": "Dadurch würde die Sicherheit deines Kontos sinken und Dritte könnten leichter ohne deine Erlaubnis auf dein Konto zugreifen.",
+        "keepProtected": "Geschützt bleiben",
+        "codeInstruction": "Gib den 6-stelligen Code aus deiner Authenticator-App ein, um die Zwei-Faktor-Authentifizierung zu deaktivieren.",
+        "codeInvalid": "Dieser Code ist falsch. Gib den aktuellen Code aus deiner Authenticator-App ein.",
+        "tooManyAttempts": "Zu viele Versuche. Versuche es in einer Stunde erneut.",
+        "manualResetTitle": "Manuelles Zurücksetzen der 2FA",
+        "manualResetBody": "Zu deinem Schutz kann 2FA nicht in der App entfernt werden. Wenn du 2FA zurücksetzen musst, kontaktiere unseren <support>Support</support>."
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

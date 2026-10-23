@@ -4106,6 +4106,18 @@
     "newPhoneTip": "Ukipata simu mpya, hamishia kithibitishaji chako kwenye simu hiyo <bold>kabla</bold> ya kuweka upya ile ya zamani.",
     "done": "Imekamilika"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Imewashwa",
+    "statusDisabled": "2FA: Imezimwa",
+    "modalTitle": "Hatupendekezi kuzima 2FA",
+    "modalBody": "Hii ingepunguza usalama wa akaunti yako na kurahisisha mtu mwingine kuingia kwenye akaunti yako bila ruhusa yako.",
+    "keepProtected": "Niendelee kulindwa",
+    "codeInstruction": "Weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji ili kuzima uthibitishaji wa vipengele viwili.",
+    "codeInvalid": "Msimbo huo si sahihi. Weka msimbo wa sasa kutoka programu yako ya uthibitishaji.",
+    "tooManyAttempts": "Majaribio mengi mno. Jaribu tena baada ya saa moja.",
+    "manualResetTitle": "Kuweka upya 2FA kwa mkono",
+    "manualResetBody": "Kwa ulinzi wako, hatuuruhusu 2FA kuondolewa ndani ya programu. Ikiwa unahitaji kuweka upya 2FA, wasiliana na <support>Usaidizi</support> wetu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

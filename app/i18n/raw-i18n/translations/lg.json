@@ -4106,6 +4106,18 @@
     "newPhoneTip": "Bw'ofuna essimu empya, kyusiza authenticator yo ku yo <bold>nga tonnaba</bold> kusangula ssimu enkadde.",
     "done": "Kimaze"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ekoleddwa",
+    "statusDisabled": "2FA: Teekoleddwa",
+    "modalTitle": "Tetukuwa magezi kuggyako 2FA",
+    "modalBody": "Kino kyandikendeezezza obukuumi bwa akawunti yo era kyandyanguyiza omuntu omulala okuyingira mu akawunti yo nga tokkirizza.",
+    "keepProtected": "Nkuuma nga ndi mukuumi",
+    "codeInstruction": "Yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa okuggyako okukakasa okw'emitendera ebiri.",
+    "codeInvalid": "Koodi eyo si ntuufu. Yingiza koodi ey'kaakati okuva mu app yo ey'okukakasa.",
+    "tooManyAttempts": "Ogezezzaako emirundi mingi nnyo. Ddamu okugezaako oluvannyuma lw'essaawa emu.",
+    "manualResetTitle": "Okuddamu okuteekawo 2FA mu ngalo",
+    "manualResetBody": "Olw'obukuumi bwo, tetukkiriza 2FA kuggibwako mu app. Bw'oba weetaaga okuddamu okuteekawo 2FA, tuukirira <support>Obuyambi</support> bwaffe."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
