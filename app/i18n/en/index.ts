@@ -2660,9 +2660,6 @@ const en: BaseTranslation = {
       "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     totp: "Two-factor authentication",
     totpDeactivated: "Two-factor authentication has been deactivated",
-    totpDeleteAlertTitle: "Delete two-factor authentication",
-    totpDeleteAlertContent:
-      "Are you sure you want to delete your two-factor authentication?",
     copiedAccountId: "Copied your account ID to clipboard",
     yourAccountId: "Your Account ID",
     accountId: "Account ID",

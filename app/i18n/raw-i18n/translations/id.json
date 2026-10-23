@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Pastikan Anda dapat masuk kembali ke akun Anda dengan memverifikasi email. Apakah Anda ingin melakukan verifikasi sekarang?",
     "totp": "Otentikasi dua faktor",
     "totpDeactivated": "Otentikasi dua faktor telah dinonaktifkan",
-    "totpDeleteAlertTitle": "Hapus otentikasi dua faktor",
-    "totpDeleteAlertContent": "Apakah Anda yakin ingin menghapus otentikasi dua faktor Anda?",
     "copiedAccountId": "ID akun Anda telah disalin ke papan klip",
     "yourAccountId": "ID Akun Anda",
     "accountId": "ID Akun",

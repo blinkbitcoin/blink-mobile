@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Sørg for, at du kan logge tilbage ind på din konto ved at verificere din e-mail. Vil du udføre verifikationen nu?",
     "totp": "To-faktor godkendelse",
     "totpDeactivated": "To-faktor godkendelse er blevet deaktiveret",
-    "totpDeleteAlertTitle": "Slet to-faktor godkendelse",
-    "totpDeleteAlertContent": "Er du sikker på, at du vil slette din to-faktor godkendelse?",
     "copiedAccountId": "Dit konto ID er kopieret til udklipsholderen",
     "yourAccountId": "Dit konto ID",
     "accountId": "Konto-ID",

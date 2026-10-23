@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Maak seker dat jy kan inteken in jou rekening deur jou epos te verifieer. Wil jy dit nou doen?",
     "totp": "Twee-faktor-verifikasie",
     "totpDeactivated": "Twee-faktor-verifikasie is gedeaktiveer",
-    "totpDeleteAlertTitle": "Verwyder twee-faktor-verifikasie",
-    "totpDeleteAlertContent": "Is jy seker jy wil twee-faktor-verifikasie verwyder?",
     "copiedAccountId": "Jou rekening ID is oorgedra na die knipbord ",
     "yourAccountId": "Jou Rekening ID",
     "accountId": "Rekening-ID",

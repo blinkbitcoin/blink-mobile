@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Qinisekisa ukuba ungaphinda ungene kwi-akhawunti yakho ngokuqinisekisa i-imeyile yakho. Ufuna ukwenza ukuqinisekisa ngoku?",
     "totp": "Uqinisekiso lwezinto ezimbini",
     "totpDeactivated": "Uqinisekiso lwezinto ezimbini lucinyiwe",
-    "totpDeleteAlertTitle": "Cima uqinisekiso lwezinto ezimbini",
-    "totpDeleteAlertContent": "Uqinisekile ukuba ufuna ukucima uqinisekiso lwezinto ezimbini?",
     "copiedAccountId": "I-ID ye-akhawunti yakho ikopishwe kwibhodi eqhotyoshwayo",
     "yourAccountId": "I-ID Ye-akhawunti Yakho",
     "accountId": "I-ID ye-akhawunti",

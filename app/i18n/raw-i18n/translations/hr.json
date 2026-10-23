@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Provjerite možete li se ponovno prijaviti na svoj račun tako da potvrdite svoju e-poštu. Želite li sada izvršiti provjeru?",
     "totp": "Dvofaktorska autentifikacija",
     "totpDeactivated": "Dvofaktorska autentifikacija je deaktivirana",
-    "totpDeleteAlertTitle": "Izbriši dvofaktorsku provjeru autentičnosti",
-    "totpDeleteAlertContent": "Jeste li sigurni da želite izbrisati svoju dvofaktorsku provjeru autentičnosti?",
     "copiedAccountId": "ID vašeg računa kopiran je u međuspremnik",
     "yourAccountId": "ID tvog računa",
     "accountId": "ID računa",

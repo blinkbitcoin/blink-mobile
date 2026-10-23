@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Sila pastikan anda boleh log masuk kembali ke akaun anda dengan mengesahkan emel. Anda mahu laksanakan pengesahan sekarang? ",
     "totp": "Pengesahan dua kali",
     "totpDeactivated": "Pengesahan dua kali telah pun diaktifkan",
-    "totpDeleteAlertTitle": "Buang pengesahan dua kali",
-    "totpDeleteAlertContent": "Adakah anda pasti mahu membuang pengesahan dua kali ini?",
     "copiedAccountId": "Akaun ID anda telah disalin ke dalam papan klip",
     "yourAccountId": "ID akaun anda",
     "accountId": "ID Akaun",

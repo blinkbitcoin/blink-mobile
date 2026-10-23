@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Asigurați-vă că vă puteți conecta din nou la contul dvs. verificându-vă adresa de e-mail. Doriți să faceți verificarea acum?",
     "totp": "Autentificare cu doi factori",
     "totpDeactivated": "Autentificarea cu doi factori a fost dezactivată",
-    "totpDeleteAlertTitle": "Ștergeți autentificarea cu doi factori",
-    "totpDeleteAlertContent": "Sigur doriți să ștergeți autentificarea cu doi factori?",
     "copiedAccountId": "Ați copiat ID-ul contului în clipboard",
     "yourAccountId": "ID-ul contului dvs.",
     "accountId": "ID-ul contului",

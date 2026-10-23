@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Zorg ervoor dat u weer kunt inloggen op uw account door uw e-mailadres te verifiëren. Wilt u de verificatie nu uitvoeren?",
     "totp": "Tweefactorauthenticatie",
     "totpDeactivated": "Tweefactorauthenticatie is uitgeschakeld",
-    "totpDeleteAlertTitle": "Verwijder tweefactorauthenticatie",
-    "totpDeleteAlertContent": "Weet u zeker dat u uw tweefactorauthenticatie wilt verwijderen?",
     "copiedAccountId": "Uw account-ID naar het klembord gekopieerd",
     "yourAccountId": "Uw account-ID",
     "accountId": "Account-ID",

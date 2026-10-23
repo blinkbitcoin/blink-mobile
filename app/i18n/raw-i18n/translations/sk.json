@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Overením e-mailu zabezpečíte, že sa budete môcť znovu prihlásiť do svojho účtu. Chcete vykonať overenie teraz?",
     "totp": "Dvojfaktorové overenie",
     "totpDeactivated": "Dvojfaktorové overenie bolo deaktivované",
-    "totpDeleteAlertTitle": "Odstrániť dvojfaktorové overenie",
-    "totpDeleteAlertContent": "Naozaj chcete odstrániť dvojfaktorové overenie?",
     "copiedAccountId": "ID účtu bolo skopírované do schránky",
     "yourAccountId": "Vaše ID účtu",
     "accountId": "ID účtu",

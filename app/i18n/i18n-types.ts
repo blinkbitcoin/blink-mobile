@@ -8425,14 +8425,6 @@ type RootTranslation = {
 		 */
 		totpDeactivated: string
 		/**
-		 * D​e​l​e​t​e​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
-		 */
-		totpDeleteAlertTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​?
-		 */
-		totpDeleteAlertContent: string
-		/**
 		 * C​o​p​i​e​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​I​D​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedAccountId: string
@@ -22468,14 +22460,6 @@ export type TranslationFunctions = {
 		 * Two-factor authentication has been deactivated
 		 */
 		totpDeactivated: () => LocalizedString
-		/**
-		 * Delete two-factor authentication
-		 */
-		totpDeleteAlertTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your two-factor authentication?
-		 */
-		totpDeleteAlertContent: () => LocalizedString
 		/**
 		 * Copied your account ID to clipboard
 		 */
