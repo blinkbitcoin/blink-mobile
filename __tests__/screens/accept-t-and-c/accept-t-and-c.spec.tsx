@@ -1,4 +1,5 @@
 import React from "react"
+import { Alert } from "react-native"
 import { act, render, screen, fireEvent, waitFor } from "@testing-library/react-native"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -6,8 +7,10 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c/accept-t-and-c"
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
+import { PhoneLoginInitiateType } from "@app/screens/phone-auth-screen"
 import { AccountMode } from "@app/types/account"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 
@@ -20,11 +23,14 @@ const LL = i18nObject("en")
 const mockNavigate = jest.fn()
 let mockFlow = "migration"
 let mockMode: string | undefined
+let mockHasRouteParams = true
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ navigate: mockNavigate }),
-  useRoute: () => ({ params: { flow: mockFlow, mode: mockMode } }),
+  useRoute: () => ({
+    params: mockHasRouteParams ? { flow: mockFlow, mode: mockMode } : undefined,
+  }),
 }))
 
 const mockSaveCheckpoint = jest.fn()
@@ -64,16 +70,24 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({ deviceAccountEnabled: false }),
 }))
 
+let mockAppCheckToken: string | undefined
 jest.mock("@app/screens/get-started-screen/use-device-token", () => ({
   __esModule: true,
-  default: () => undefined,
+  default: () => mockAppCheckToken,
 }))
 
+const mockCreateDeviceAccountAndLogin = jest.fn()
 jest.mock("@app/screens/get-started-screen/use-create-device-account", () => ({
   useCreateDeviceAccount: () => ({
-    createDeviceAccountAndLogin: jest.fn(),
+    createDeviceAccountAndLogin: mockCreateDeviceAccountAndLogin,
     loading: false,
   }),
+}))
+
+const mockOpenInAppBrowser = jest.fn()
+jest.mock("react-native-inappbrowser-reborn", () => ({
+  __esModule: true,
+  default: { open: (...args: unknown[]) => mockOpenInAppBrowser(...args) },
 }))
 
 describe("AcceptTermsAndConditionsScreen", () => {
@@ -82,6 +96,9 @@ describe("AcceptTermsAndConditionsScreen", () => {
     mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
     mockFlow = "migration"
     mockMode = undefined
+    mockAppCheckToken = undefined
+    mockHasRouteParams = true
+    mockCreateDeviceAccountAndLogin.mockResolvedValue(undefined)
     loadLocale("en")
   })
 
@@ -305,6 +322,7 @@ describe("AcceptTermsAndConditionsScreen", () => {
     expect(mockSaveCheckpoint).not.toHaveBeenCalled()
 
     fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+    await flushEffects()
 
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BackupMethod)
   })
@@ -326,5 +344,104 @@ describe("AcceptTermsAndConditionsScreen", () => {
         mode: AccountMode.Enhanced,
       }),
     )
+  })
+
+  describe("outside the migration", () => {
+    const renderAndAccept = async () => {
+      render(
+        <ContextForScreen>
+          <AcceptTermsAndConditionsScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      fireEvent.press(screen.getByText(LL.AcceptTermsAndConditionsScreen.accept()))
+      await flushEffects()
+    }
+
+    it("sends the phone flow to the phone login", async () => {
+      mockFlow = "phone"
+
+      await renderAndAccept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("treats a screen opened without params as the phone flow", async () => {
+      mockHasRouteParams = false
+
+      await renderAndAccept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("sends a trial without an app check token to the phone login", async () => {
+      mockFlow = "trial"
+
+      await renderAndAccept()
+
+      expect(mockCreateDeviceAccountAndLogin).not.toHaveBeenCalled()
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("creates a device account for a trial with an app check token", async () => {
+      mockFlow = "trial"
+      mockAppCheckToken = "app-check-token"
+
+      await renderAndAccept()
+
+      expect(mockCreateDeviceAccountAndLogin).toHaveBeenCalledWith("app-check-token")
+      expect(mockNavigate).not.toHaveBeenCalled()
+    })
+
+    it("falls back to the phone login when the device account cannot be created", async () => {
+      mockFlow = "trial"
+      mockAppCheckToken = "app-check-token"
+      mockCreateDeviceAccountAndLogin.mockRejectedValue(new Error("refused"))
+
+      await renderAndAccept()
+
+      expect(mockNavigate).toHaveBeenCalledWith("login", {
+        type: PhoneLoginInitiateType.CreateAccount,
+      })
+    })
+
+    it("flags a flow it does not know", async () => {
+      const alert = jest.spyOn(Alert, "alert").mockImplementation(() => undefined)
+      mockFlow = "unexpected"
+      mockAppCheckToken = "app-check-token"
+
+      await renderAndAccept()
+
+      expect(alert).toHaveBeenCalledWith("unknown flow")
+      alert.mockRestore()
+    })
+  })
+
+  it("opens the terms and the blocked-countries page in the in-app browser", async () => {
+    render(
+      <ContextForScreen>
+        <AcceptTermsAndConditionsScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+
+    fireEvent.press(
+      screen.getByText(LL.AcceptTermsAndConditionsScreen.termsAndConditions()),
+    )
+    fireEvent.press(
+      screen.getByText(LL.AcceptTermsAndConditionsScreen.prohibitedCountry()),
+    )
+
+    expect(mockOpenInAppBrowser).toHaveBeenNthCalledWith(
+      1,
+      "https://www.blink.sv/en/terms-conditions",
+    )
+    expect(mockOpenInAppBrowser).toHaveBeenNthCalledWith(2, BLOCKED_COUNTRIES_FAQ_LINK)
   })
 })
