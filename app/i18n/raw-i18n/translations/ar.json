@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
   },
   "PinScreen": {
-    "attemptUnrecorded": "تعذّر تسجيل المحاولة الفاشلة بشكل آمن. يتم تسجيل الخروج.",
+    "attemptUnrecorded": "تعذّر تسجيل المحاولة بشكل آمن.",
+    "attemptsLeft": "بقي {attemptsRemaining: string} محاولات.",
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
     "enterPin": "أدخل رمز PIN الخاص بك",
+    "oneAttemptLeft": "بقيت محاولة واحدة.",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
     "pinUnreadable": "تعذّر التحقق من رمزك الشخصي. يرجى المحاولة مرة أخرى.",
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
     "storePinFailed": "غير قادر على تخزين ال PIN الخاص بك.",
-    "tooManyAttempts": "الكثير من المحاولات الفاشلة. \nيتم تسجيل الخروج.",
+    "tooManyAttempts": "الكثير من المحاولات الفاشلة.",
+    "tryAgainIn": "حاول مرة أخرى بعد {time: string}.",
     "verifyPin": "تحقق من رمز PIN الخاص بك"
   },
   "PriceHistoryScreen": {

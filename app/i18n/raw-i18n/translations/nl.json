@@ -2175,15 +2175,18 @@
     "walletCountNotTwo": "Wallet-aantal is niet 2. Gebruik het dashboard om alle wallets en fondsen van dit account te bekijken"
   },
   "PinScreen": {
-    "attemptUnrecorded": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
+    "attemptUnrecorded": "Kon de poging niet veilig vastleggen.",
+    "attemptsLeft": "{attemptsRemaining: number} resterende pogingen.",
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
     "enterPin": "Voer uw pincode in",
+    "oneAttemptLeft": "1 poging over.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",
     "setPin": "Stel uw PIN code in",
     "setPinFailedMatch": "Pincodes komen niet overeen - Stel uw pincode in",
     "storePinFailed": "Kan je pincode niet opslaan.",
-    "tooManyAttempts": "Teveel mislukte pogingen. Uitloggen.",
+    "tooManyAttempts": "Teveel mislukte pogingen.",
+    "tryAgainIn": "Probeer het over {time: string} opnieuw.",
     "verifyPin": "Verifieer uw pincode"
   },
   "PriceHistoryScreen": {
