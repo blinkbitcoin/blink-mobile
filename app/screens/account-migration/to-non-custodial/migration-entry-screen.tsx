@@ -17,11 +17,8 @@ import {
   overdueReceiveSupport,
   resolveAwaitedReceiveAnswer,
 } from "@app/screens/account-migration/utils/migration-receive-wait"
-import {
-  CommitPointRoute,
-  MigrationSupportOrigin,
-  MigrationSupportReason,
-} from "@app/types/migration"
+import { statusUnrecognisedSupport } from "@app/screens/account-migration/utils/server-migration-flow"
+import { CommitPointRoute } from "@app/types/migration"
 import { AccountType } from "@app/types/wallet"
 import { toastShow } from "@app/utils/toast"
 
@@ -111,11 +108,10 @@ export const MigrationEntryScreen: React.FC = () => {
     }
 
     if (isHandedOver) {
-      navigation.replace("accountMigrationContactSupport", {
-        reason: MigrationSupportReason.StatusUnrecognised,
-        origin: MigrationSupportOrigin.Resume,
-        custodialAccountId: checkpointOwnerId ?? undefined,
-      })
+      navigation.replace(
+        "accountMigrationContactSupport",
+        statusUnrecognisedSupport(checkpointOwnerId),
+      )
       return
     }
 

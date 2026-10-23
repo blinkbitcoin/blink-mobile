@@ -1,5 +1,9 @@
 import { MigrationStatus } from "@app/graphql/generated"
-import { ServerMigrationFlow } from "@app/types/migration"
+import {
+  MigrationSupportOrigin,
+  MigrationSupportReason,
+  ServerMigrationFlow,
+} from "@app/types/migration"
 
 /** Exhaustive on purpose: a phase the server adds has no entry here and fails to compile,
  *  so it is decided deliberately rather than falling into whichever branch is nearest. */
@@ -40,3 +44,13 @@ export const resolveServerFlow = (
   if (!isKnownMigrationStatus(status)) return ServerMigrationFlow.Unrecognised
   return FLOW_BY_STATUS[status]
 }
+
+/** Where a phase this build does not know hands over, from the entry and the steps alike:
+ *  Back returns to the screen the user came from, and the account travels with it, named
+ *  by the caller from the checkpoint's owner, as for a late receive. */
+export const statusUnrecognisedSupport = (custodialAccountId: string | null) =>
+  ({
+    reason: MigrationSupportReason.StatusUnrecognised,
+    origin: MigrationSupportOrigin.Resume,
+    custodialAccountId: custodialAccountId ?? undefined,
+  }) as const

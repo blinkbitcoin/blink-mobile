@@ -5,11 +5,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import {
-  CommitPointRoute,
-  MigrationSupportOrigin,
-  MigrationSupportReason,
-} from "@app/types/migration"
+import { CommitPointRoute } from "@app/types/migration"
 import { toastShow } from "@app/utils/toast"
 
 import {
@@ -20,6 +16,7 @@ import {
   overdueReceiveSupport,
   resolveAwaitedReceiveAnswer,
 } from "../utils/migration-receive-wait"
+import { statusUnrecognisedSupport } from "../utils/server-migration-flow"
 
 import { useHasTransactions } from "./use-has-transactions"
 import { useMigrationCheckpoint } from "./use-migration-checkpoint"
@@ -180,11 +177,7 @@ export const useMigrationNextStep = () => {
         return
       }
       if (step.kind === "support") {
-        const params = {
-          reason: MigrationSupportReason.StatusUnrecognised,
-          origin: MigrationSupportOrigin.Resume,
-          custodialAccountId: checkpointOwnerId ?? undefined,
-        }
+        const params = statusUnrecognisedSupport(checkpointOwnerId)
         if (isSkipGuard) navigation.replace("accountMigrationContactSupport", params)
         else navigation.navigate("accountMigrationContactSupport", params)
         return
