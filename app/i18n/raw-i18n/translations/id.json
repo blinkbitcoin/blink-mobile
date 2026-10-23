@@ -4102,6 +4102,18 @@
     "newPhoneTip": "Jika Anda mendapat ponsel baru, pindahkan authenticator ke ponsel tersebut <bold>sebelum</bold> Anda mengatur ulang ponsel lama.",
     "done": "Selesai"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Aktif",
+    "statusDisabled": "2FA: Nonaktif",
+    "modalTitle": "Kami tidak menyarankan menonaktifkan 2FA",
+    "modalBody": "Ini akan menurunkan keamanan akun Anda dan memudahkan pihak ketiga mengakses akun Anda tanpa izin Anda.",
+    "keepProtected": "Tetap lindungi saya",
+    "codeInstruction": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk menonaktifkan autentikasi dua faktor.",
+    "codeInvalid": "Kode itu salah. Masukkan kode terbaru dari aplikasi autentikator Anda.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Coba lagi dalam satu jam.",
+    "manualResetTitle": "Reset 2FA manual",
+    "manualResetBody": "Demi perlindungan Anda, kami tidak mengizinkan penghapusan 2FA di dalam aplikasi. Jika Anda perlu mereset 2FA, hubungi <support>Dukungan</support> kami."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

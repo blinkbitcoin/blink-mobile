@@ -4102,6 +4102,18 @@
     "newPhoneTip": "หากคุณเปลี่ยนโทรศัพท์เครื่องใหม่ ให้ย้ายแอปยืนยันตัวตนไปยังเครื่องใหม่<bold>ก่อน</bold>รีเซ็ตเครื่องเก่า",
     "done": "เสร็จสิ้น"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: เปิดอยู่",
+    "statusDisabled": "2FA: ปิดอยู่",
+    "modalTitle": "เราไม่แนะนำให้ปิด 2FA",
+    "modalBody": "การปิดจะลดความปลอดภัยของบัญชีและทำให้บุคคลอื่นเข้าถึงบัญชีของคุณได้ง่ายขึ้นโดยไม่ได้รับอนุญาต",
+    "keepProtected": "ให้ฉันได้รับการปกป้องต่อไป",
+    "codeInstruction": "ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนเพื่อปิดการยืนยันตัวตนแบบสองขั้นตอน",
+    "codeInvalid": "รหัสไม่ถูกต้อง ป้อนรหัสปัจจุบันจากแอปยืนยันตัวตนของคุณ",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป โปรดลองอีกครั้งในอีกหนึ่งชั่วโมง",
+    "manualResetTitle": "รีเซ็ต 2FA ด้วยตนเอง",
+    "manualResetBody": "เพื่อปกป้องคุณ เราไม่อนุญาตให้ลบ 2FA ภายในแอป หากต้องการรีเซ็ต 2FA โปรดติดต่อ<support>ฝ่ายสนับสนุน</support>ของเรา"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

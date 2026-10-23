@@ -4102,6 +4102,18 @@
     "newPhoneTip": "Yeni bir telefon alırsanız, eskisini sıfırlamadan <bold>önce</bold> doğrulayıcınızı yeni telefona taşıyın.",
     "done": "Tamam"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Açık",
+    "statusDisabled": "2FA: Kapalı",
+    "modalTitle": "2FA'yı kapatmanızı önermiyoruz",
+    "modalBody": "Bu, hesabınızın güvenliğini azaltır ve üçüncü bir kişinin izniniz olmadan hesabınıza erişmesini kolaylaştırır.",
+    "keepProtected": "Korumada kalayım",
+    "codeInstruction": "İki faktörlü kimlik doğrulamayı kapatmak için doğrulayıcı uygulamanızdaki 6 haneli kodu girin.",
+    "codeInvalid": "Bu kod yanlış. Doğrulayıcı uygulamanızdaki güncel kodu girin.",
+    "tooManyAttempts": "Çok fazla deneme. Bir saat sonra tekrar deneyin.",
+    "manualResetTitle": "2FA manuel sıfırlama",
+    "manualResetBody": "Güvenliğiniz için 2FA'nın uygulama içinden kaldırılmasına izin vermiyoruz. 2FA sıfırlamaya ihtiyacınız varsa <support>Destek</support> ekibimizle iletişime geçin."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

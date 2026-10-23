@@ -4102,6 +4102,18 @@
     "newPhoneTip": "Hvis du får en ny telefon, så flyt din authenticator over på den, <bold>før</bold> du nulstiller den gamle.",
     "done": "Færdig"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Slået til",
+    "statusDisabled": "2FA: Slået fra",
+    "modalTitle": "Vi anbefaler ikke at slå 2FA fra",
+    "modalBody": "Det ville sænke din kontos sikkerhed og gøre det lettere for en tredjepart at få adgang til din konto uden din tilladelse.",
+    "keepProtected": "Hold mig beskyttet",
+    "codeInstruction": "Indtast den 6-cifrede kode fra din godkendelsesapp for at slå totrinsgodkendelse fra.",
+    "codeInvalid": "Den kode er forkert. Indtast den aktuelle kode fra din godkendelsesapp.",
+    "tooManyAttempts": "For mange forsøg. Prøv igen om en time.",
+    "manualResetTitle": "Manuel nulstilling af 2FA",
+    "manualResetBody": "Af hensyn til din beskyttelse tillader vi ikke, at 2FA fjernes i appen. Hvis du har brug for at nulstille 2FA, så kontakt vores <support>support</support>."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

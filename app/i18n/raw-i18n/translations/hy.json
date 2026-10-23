@@ -4102,6 +4102,18 @@
     "newPhoneTip": "Եթե նոր հեռախոս ձեռք բերեք, տեղափոխեք ձեր նույնականացուցիչը դրա վրա՝ <bold>նախքան</bold> հինը վերակայելը։",
     "done": "Պատրաստ է"
   },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA՝ միացված",
+    "statusDisabled": "2FA՝ անջատված",
+    "modalTitle": "Խորհուրդ չենք տալիս անջատել 2FA-ն",
+    "modalBody": "Դա կնվազեցնի ձեր հաշվի անվտանգությունը և երրորդ կողմին կհեշտացնի մուտք գործել ձեր հաշիվ առանց ձեր թույլտվության։",
+    "keepProtected": "Թող պաշտպանված մնամ",
+    "codeInstruction": "Մուտքագրեք նույնականացման հավելվածի 6 նիշանոց կոդը՝ երկգործոն նույնականացումն անջատելու համար։",
+    "codeInvalid": "Այդ կոդը սխալ է։ Մուտքագրեք նույնականացման հավելվածի ընթացիկ կոդը։",
+    "tooManyAttempts": "Չափազանց շատ փորձեր։ Կրկին փորձեք մեկ ժամից։",
+    "manualResetTitle": "2FA-ի ձեռքով վերակայում",
+    "manualResetBody": "Ձեր պաշտպանության համար թույլ չենք տալիս հեռացնել 2FA-ն հավելվածում։ Եթե 2FA-ի վերակայման կարիք ունեք, կապվեք մեր <support>աջակցման ծառայության</support> հետ։"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
