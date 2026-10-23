@@ -26,11 +26,12 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 let mockTotpEnabled = true
+let mockIsAccountLoading = false
 jest.mock("@app/graphql/generated", () => ({
   ...jest.requireActual("@app/graphql/generated"),
   useSettingsScreenQuery: () => ({
     data: { me: { totpEnabled: mockTotpEnabled } },
-    loading: false,
+    loading: mockIsAccountLoading,
   }),
 }))
 
@@ -74,6 +75,7 @@ describe("TotpSetting", () => {
     jest.clearAllMocks()
     mockAccountType = AccountType.Custodial
     mockTotpEnabled = true
+    mockIsAccountLoading = false
     mockIsTurnOffBlocked = false
     mockIsTurnOffDecided = true
   })
@@ -99,6 +101,14 @@ describe("TotpSetting", () => {
    *  still being read. */
   it("offers no way to turn it off until the tier reached is known", async () => {
     mockIsTurnOffDecided = false
+    await renderRow()
+
+    expect(closeIcons()).toHaveLength(0)
+    expect(screen.queryByText(LL.TwoFactorTurnOff.statusEnabled())).toBeNull()
+  })
+
+  it("offers nothing while the account is still read", async () => {
+    mockIsAccountLoading = true
     await renderRow()
 
     expect(closeIcons()).toHaveLength(0)
