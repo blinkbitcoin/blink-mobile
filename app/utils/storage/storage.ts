@@ -120,6 +120,16 @@ export const remove = async (key: string): Promise<void> => {
 }
 
 /**
+ * Removes something from storage, propagating the error instead of logging it: the
+ * removal counterpart of saveJson, for a caller that has to know a removal did not happen.
+ *
+ * @param key The key to kill.
+ */
+export const removeOrThrow = async (key: string): Promise<void> => {
+  await AsyncStorage.removeItem(key)
+}
+
+/**
  * Burn it all to the ground.
  */
 export const clear = async (): Promise<void> => {

@@ -3973,6 +3973,9 @@
     "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
     "explainerCta": "Ntegedde",
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono.",
+    "transferInProgress": {
+      "body": "Ssente zo ziri mu kkubo okutuuka ku akaawunti yo empya. Leka app ng'eggule, tujja kukimaliriza kyokka."
+    },
     "transferDelayed": {
       "body": "Ssente zo ziri mu kkubo okutuuka ku akaawunti yo empya. Kino kitwala ebbanga okusinga bulijjo — leka app ng'eggule, tujja kukimaliriza kyokka.",
       "contactSupportCta": "Tuukirira abayambi"

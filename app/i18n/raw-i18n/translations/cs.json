@@ -3973,6 +3973,9 @@
     "explainerCheck5": "Z tvého účtu bude stržen síťový poplatek Spark",
     "explainerCta": "Rozumím",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund.",
+    "transferInProgress": {
+      "body": "Vaše prostředky jsou na cestě do vašeho nového účtu. Nechte aplikaci otevřenou a dokončíme to automaticky."
+    },
     "transferDelayed": {
       "body": "Vaše prostředky jsou na cestě do vašeho nového účtu. Trvá to déle než obvykle — nechte aplikaci otevřenou a dokončíme to automaticky.",
       "contactSupportCta": "Kontaktovat podporu"

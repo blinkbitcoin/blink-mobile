@@ -3973,6 +3973,9 @@
     "explainerCheck5": "Akawuntiykimanta Spark red pagota qichunqaku",
     "explainerCta": "Entiendini",
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa.",
+    "transferInProgress": {
+      "body": "Qullqiykiqa musuq cuentaykiman chayachkanña. App kichasqata saqiy, ñuqayku kikillanmanta tukuchisaqku."
+    },
     "transferDelayed": {
       "body": "Qullqiykiqa musuq cuentaykiman chayachkanña. Aswan unayta ruwakuchkan — app kichasqata saqiy, ñuqayku kikillanmanta tukuchisaqku.",
       "contactSupportCta": "Yanapakuqkunawan rimanakuy"

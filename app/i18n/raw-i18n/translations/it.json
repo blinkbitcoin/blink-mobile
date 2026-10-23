@@ -3973,6 +3973,9 @@
         "explainerCheck5": "Verrà addebitata una commissione di rete Spark sul tuo account",
         "explainerCta": "Ho capito",
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi.",
+        "transferInProgress": {
+            "body": "I tuoi fondi sono in viaggio verso il tuo nuovo conto. Tieni l'app aperta e completeremo automaticamente."
+        },
         "transferDelayed": {
             "body": "I tuoi fondi sono in viaggio verso il tuo nuovo conto. Sta richiedendo più tempo del solito — tieni l'app aperta e completeremo automaticamente.",
             "contactSupportCta": "Contatta l'assistenza"

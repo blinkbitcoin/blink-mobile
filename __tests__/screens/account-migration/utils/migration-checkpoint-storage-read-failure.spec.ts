@@ -24,6 +24,7 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
 
 import {
   MigrationCheckpoint,
+  clearCheckpointFromStorage,
   clearPendingProvisionedAccount,
   loadCheckpoint,
   loadPendingProvisionedAccounts,
@@ -178,18 +179,13 @@ describe("an unreadable store is not an empty one", () => {
     await expect(loadPendingProvisionedAccounts(PENDING_KEY)).resolves.toEqual({})
   })
 
-  /** The read answered and the answer is "nothing resumable"; only the housekeeping
-   *  failed. Surfacing that as an unreadable store would show a locked user a retry that
-   *  fails identically every time over a record that was merely stale. */
-  it("answers an expired record as absent even when removing it fails", async () => {
-    const consoleError = jest.spyOn(console, "error").mockImplementation(() => undefined)
+  it("answers an old record as it is, without removing it", async () => {
     disk[STORAGE_KEY] = JSON.stringify({ ...healthyCheckpoint, savedAt: 0 })
-    mockRemoveItem.mockRejectedValue(new Error("database or disk is full"))
 
-    await expect(loadCheckpoint(STORAGE_KEY)).resolves.toBeNull()
-
-    expect(mockRemoveItem).toHaveBeenCalledWith(STORAGE_KEY)
-    consoleError.mockRestore()
+    await expect(loadCheckpoint(STORAGE_KEY)).resolves.toMatchObject({
+      accountId: PROVISIONED_ACCOUNT_ID,
+    })
+    expect(mockRemoveItem).not.toHaveBeenCalled()
   })
 
   it("reads a truncated checkpoint as absent instead of stranding the key", async () => {
@@ -235,5 +231,24 @@ describe("an unreadable store is not an empty one", () => {
       accountId: PROVISIONED_ACCOUNT_ID,
       expectedReceiveSats: 36726,
     })
+  })
+})
+
+/** The same seam for the removal: the wrapper's best-effort remove logs a failure and
+ *  answers as if it worked, so a clear built on it could never reach the caller's report. */
+describe("a removal the store refused is a failure, not a clear", () => {
+  it("rejects when the store refuses to remove the checkpoint", async () => {
+    mockRemoveItem.mockRejectedValueOnce(new Error("Database Error"))
+
+    await expect(clearCheckpointFromStorage(STORAGE_KEY)).rejects.toThrow(
+      "Database Error",
+    )
+    expect(storedCheckpoint()).toMatchObject({ accountId: PROVISIONED_ACCOUNT_ID })
+  })
+
+  it("clears the checkpoint once the store answers", async () => {
+    await clearCheckpointFromStorage(STORAGE_KEY)
+
+    expect(disk[STORAGE_KEY]).toBeUndefined()
   })
 })
