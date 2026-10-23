@@ -390,19 +390,27 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   pendingDepositIdsRef.current = pendingDepositIds
   const pendingDepositKey = pendingDepositIds.join(",")
 
-  // Only the newest request may publish its address: this runs again whenever the
-  // marker or the pending-deposit list changes, so a slow request can otherwise land
-  // after the one that replaced it and show a superseded address.
+  /**
+   * Address requests run one at a time, in the order they were made. The SDK answers
+   * `newAddress: false` with whatever address is current when the call reaches it, so
+   * a request overlapping a rotation can come back with the address it replaced and
+   * put it back on screen. Run in order, each request starts from the one before it.
+   *
+   * Only the newest request may publish, unless it was the user asking for a fresh
+   * address: a background request queued behind another adds nothing the later one
+   * will not redo, but a tap must show the address it created.
+   */
+  const onchainQueueRef = useRef<Promise<unknown>>(Promise.resolve())
   const onchainRequestIdRef = useRef(0)
 
   // Resolves true once the SDK has issued an address. `forceNew` is the user asking for a
   // fresh one: earlier addresses stay valid, so it skips the reuse checks and no more.
-  const issueOnchainAddress = useCallback(
-    async (forceNew = false) => {
+  const requestOnchainAddress = useCallback(
+    async (requestId: number, forceNew: boolean) => {
       if (!sdk) return false
+      const isSuperseded = () => !forceNew && requestId !== onchainRequestIdRef.current
+      if (isSuperseded()) return true
       const pendingIds = pendingDepositIdsRef.current
-      onchainRequestIdRef.current += 1
-      const requestId = onchainRequestIdRef.current
 
       const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
 
@@ -450,9 +458,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         )
         return false
       }
-      // A newer request owns the screen now. The SDK still issued this address, and
-      // the newer request shows it or one issued after it, so a user tap succeeded.
-      if (requestId !== onchainRequestIdRef.current) return true
+      // A newer request is queued behind this one and will publish from where it ends.
+      if (isSuperseded()) return true
 
       setOnchainAddress(result.address)
       if (!canTrackReuse) return true
@@ -473,6 +480,20 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       return true
     },
     [sdk, selfCustodialAccountId],
+  )
+
+  const issueOnchainAddress = useCallback(
+    (forceNew = false): Promise<boolean> => {
+      onchainRequestIdRef.current += 1
+      const requestId = onchainRequestIdRef.current
+      const request = onchainQueueRef.current.then(() =>
+        requestOnchainAddress(requestId, forceNew),
+      )
+      // A failed request must not stall the ones queued behind it.
+      onchainQueueRef.current = request.catch(() => undefined)
+      return request
+    },
+    [requestOnchainAddress],
   )
 
   // Runs on mount and again whenever an on-chain receipt or an unclaimed deposit

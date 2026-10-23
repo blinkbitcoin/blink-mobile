@@ -395,10 +395,10 @@ describe("onchain address rotation", () => {
     })
   })
 
-  it("ignores a slow initial fetch that resolves after the deposit rotation", async () => {
-    // A deposit landing while the first request is still in flight starts a second
-    // one. Without the request-sequence guard the stale response would overwrite the
-    // freshly rotated address, silently putting the used address back on screen.
+  it("rotates after a slow initial fetch without ever showing its address", async () => {
+    // A deposit landing while the first request is still in flight queues a second
+    // one. The first must neither publish nor record the address the deposit just
+    // used, or the used address would sit on screen until the rotation lands.
     let resolveInitial: (value: { address: string }) => void = () => {}
     mockReceiveOnchain
       .mockReturnValueOnce(
@@ -415,13 +415,15 @@ describe("onchain address rotation", () => {
     mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
     rerender({})
     await flushEffects()
-    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+    // The rotation waits its turn instead of racing the request ahead of it.
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(1)
 
     await act(async () => {
       resolveInitial({ address: "bc1qstale..." })
       await flushEffects()
     })
 
+    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
     expect(result.current?.onchainAddress).toBe("bc1qrotated...")
     expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalledWith(
       "sc-account-1",
@@ -781,46 +783,130 @@ describe("generateNewOnchainAddress", () => {
     expect(mockRecordAppError).toHaveBeenCalledWith(new Error("bridge exploded"))
   })
 
-  it("reports success when a deposit rotation replaces the request mid-flight", async () => {
-    // The tap's address was issued, and the deposit rotation that overtook it puts a
-    // fresh address on screen too, so the user must not be told the tap failed.
-    let resolveTap: (value: { address: string }) => void = () => {}
-    mockReceiveOnchain
-      .mockResolvedValueOnce({ address: "bc1qfirst..." })
-      .mockReturnValueOnce(
-        new Promise<{ address: string }>((resolve) => {
-          resolveTap = resolve
-        }),
-      )
-      .mockResolvedValueOnce({ address: "bc1qrotated..." })
-
-    const { result, rerender } = renderHook(() => usePaymentRequest())
-    await waitFor(() => {
-      expect(result.current?.onchainAddress).toBe("bc1qfirst...")
-    })
-
-    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
-    await act(async () => {
-      tap = result.current?.generateNewOnchainAddress?.()
-      await flushEffects()
-    })
-
-    mockSelfCustodialWallet.mockReturnValue({
+  describe("when a background request lands during the tap", () => {
+    const walletWith = (transactions: unknown[]) => ({
       sdk: mockSdk,
       lastReceivedPaymentId: null,
-      allTransactions: [onchainReceipt("deposit-1")],
-    })
-    rerender({})
-    await flushEffects()
-    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
-
-    let outcome: NewOnchainAddressResultType | undefined
-    await act(async () => {
-      resolveTap({ address: "bc1qtapped..." })
-      outcome = await tap
+      allTransactions: transactions,
     })
 
-    expect(outcome).toBe(NewOnchainAddressResult.Created)
-    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+    const deferredTap = () => {
+      let resolve: (value: { address: string }) => void = () => {}
+      const promise = new Promise<{ address: string }>((r) => {
+        resolve = r
+      })
+      return { promise, resolve }
+    }
+
+    // Starts a tap whose SDK call stays open until the returned resolver is called.
+    const tapAndHold = async (result: {
+      current: ReturnType<typeof usePaymentRequest>
+    }) => {
+      let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+      await act(async () => {
+        tap = result.current?.generateNewOnchainAddress?.()
+        await flushEffects()
+      })
+      return () => tap
+    }
+
+    it("shows the tapped address, then the deposit rotation queued behind it", async () => {
+      const tapCall = deferredTap()
+      mockReceiveOnchain
+        .mockResolvedValueOnce({ address: "bc1qfirst..." })
+        .mockReturnValueOnce(tapCall.promise)
+        .mockResolvedValueOnce({ address: "bc1qrotated..." })
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+      })
+      const tap = await tapAndHold(result)
+
+      mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+      rerender({})
+      await flushEffects()
+      expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+
+      let outcome: NewOnchainAddressResultType | undefined
+      await act(async () => {
+        tapCall.resolve({ address: "bc1qtapped..." })
+        outcome = await tap()
+      })
+      expect(outcome).toBe(NewOnchainAddressResult.Created)
+
+      await flushEffects()
+      expect(result.current?.onchainAddress).toBe("bc1qrotated...")
+    })
+
+    it("keeps the tapped address when the rotation queued behind it fails", async () => {
+      // Regression: the tap used to defer to the newer request and report success
+      // without publishing, so a failing rotation left the old address on screen
+      // under a "New address ready" toast.
+      const tapCall = deferredTap()
+      mockReceiveOnchain
+        .mockResolvedValueOnce({ address: "bc1qfirst..." })
+        .mockReturnValueOnce(tapCall.promise)
+        .mockResolvedValueOnce({ errors: [{ message: "sdk down" }] })
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+      })
+      const tap = await tapAndHold(result)
+
+      mockPendingDeposits.mockReturnValue({ deposits: [pendingDeposit("txid-1")] })
+      rerender({})
+      await flushEffects()
+
+      let outcome: NewOnchainAddressResultType | undefined
+      await act(async () => {
+        tapCall.resolve({ address: "bc1qtapped..." })
+        outcome = await tap()
+      })
+      await flushEffects()
+
+      expect(outcome).toBe(NewOnchainAddressResult.Created)
+      expect(result.current?.onchainAddress).toBe("bc1qtapped...")
+    })
+
+    it("does not let a request that reads the current address undo the tap", async () => {
+      // Regression: the wallet snapshot landing mid-tap re-runs the address request
+      // without rotating. Overlapping the tap, the SDK answered it with the address
+      // the tap was replacing, and that answer won.
+      mockLoadIssuedOnchainAddress.mockResolvedValue({
+        address: "bc1qfirst...",
+        depositMarker: "deposit-1",
+      })
+      let sdkCurrentAddress = "bc1qfirst..."
+      const tapCall = deferredTap()
+      mockReceiveOnchain
+        .mockResolvedValueOnce({ address: "bc1qfirst..." })
+        .mockReturnValueOnce(tapCall.promise)
+        .mockImplementation(() => Promise.resolve({ address: sdkCurrentAddress }))
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+      })
+      const tap = await tapAndHold(result)
+
+      mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
+      rerender({})
+      await flushEffects()
+      expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+
+      let outcome: NewOnchainAddressResultType | undefined
+      await act(async () => {
+        sdkCurrentAddress = "bc1qtapped..."
+        tapCall.resolve({ address: "bc1qtapped..." })
+        outcome = await tap()
+      })
+      await flushEffects()
+
+      expect(outcome).toBe(NewOnchainAddressResult.Created)
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
+      expect(result.current?.onchainAddress).toBe("bc1qtapped...")
+    })
   })
 })
