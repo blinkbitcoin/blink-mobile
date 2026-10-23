@@ -55,6 +55,10 @@ const noRetryOperations = [
   // Spends its registration: a resend after a lost answer is refused even when the first
   // attempt turned the authenticator on. The code screen reads the account back instead.
   "userTotpRegistrationValidate",
+
+  // Each code check spends one of the hourly attempts the server allows, and a removal
+  // that landed leaves nothing for a resend to remove.
+  "userTotpDelete",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
