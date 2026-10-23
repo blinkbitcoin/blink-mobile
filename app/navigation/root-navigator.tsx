@@ -54,6 +54,8 @@ import {
   AuthenticatorIntroScreen,
   AuthenticatorProtectedScreen,
   SetupKeyBackupScreen,
+  ContactChangeCodeScreen,
+  contactChangeCopy,
   TotpDeleteValidateScreen,
   TotpLoginValidateScreen,
   TotpRegistrationInitiateScreen,
@@ -784,6 +786,13 @@ export const RootStack = () => {
         name="totpDeleteValidate"
         component={TotpDeleteValidateScreen}
         options={{ title: LL.AccountScreen.totp() }}
+      />
+      <RootNavigator.Screen
+        name="contactChangeCode"
+        component={ContactChangeCodeScreen}
+        options={({ route }) => ({
+          title: contactChangeCopy(LL, route.params.step).title,
+        })}
       />
       <RootNavigator.Screen
         name="webView"

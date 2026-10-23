@@ -17,6 +17,8 @@ import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/ac
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import {
+  ContactChangeStepParams,
+  ContactField,
   TotpCodeCheckParams,
   TwoFactorFlowParams,
 } from "@app/types/two-factor-enforcement"
@@ -241,10 +243,13 @@ export type RootStackParamList = {
     secret: string
   } & TotpCodeCheckParams
   /** The user id names the account in the backup for an account with no username yet. */
-  totpRegistrationBackup: { secret: string; userId: string }
-  totpRegistrationDone: undefined
+  totpRegistrationBackup: { secret: string; userId: string; contactChange?: ContactField }
+  /** A registration opened to change a login method goes on to that change. */
+  totpRegistrationDone: { contactChange?: ContactField } | undefined
   /** The authenticator's code, which turns it off. */
   totpDeleteValidate: undefined
+  /** The authenticator's code for a step of a login method change. */
+  contactChangeCode: ContactChangeStepParams
   totpLoginValidate: { authToken: string }
   twoFactorSetup: TwoFactorFlowParams | undefined
   twoFactorNonCustodial: TwoFactorFlowParams | undefined

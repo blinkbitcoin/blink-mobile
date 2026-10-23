@@ -1,7 +1,6 @@
 import React from "react"
 import { Alert } from "react-native"
 
-import { gql } from "@apollo/client"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useUserPhoneDeleteMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -14,26 +13,6 @@ import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
 import { useTheme } from "@rn-vui/themed"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
-
-gql`
-  mutation userPhoneDelete($input: UserPhoneDeleteInput) {
-    userPhoneDelete(input: $input) {
-      errors {
-        message
-        code
-      }
-      me {
-        id
-        phone
-        totpEnabled
-        email {
-          address
-          verified
-        }
-      }
-    }
-  }
-`
 
 export const PhoneSetting: React.FC = () => {
   const { LL } = useI18nContext()
