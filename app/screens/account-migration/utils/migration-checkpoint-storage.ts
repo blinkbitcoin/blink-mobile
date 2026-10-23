@@ -1,6 +1,8 @@
 import { CommitPointRoute, ServerMigrationFlow } from "@app/types/migration"
 import { loadJsonOrThrow, removeOrThrow, saveJson } from "@app/utils/storage"
 
+import { clearReceiveDelayedSince } from "./migration-receive-delay-storage"
+
 /** Values are persisted to AsyncStorage: do not rename them. */
 export enum MigrationCheckpoint {
   TermsAndConditions = "termsAndConditions",
@@ -168,6 +170,14 @@ export type CheckpointUpdate = {
   isServerFlowUnstarted?: true
 }
 
+/** A run ends when its step falls back behind the commit point, which only a restart the
+ *  server confirmed does (see mergeCheckpoint). One rule for everything the run owns. */
+const hasRunRestarted = (
+  existing: StoredCheckpoint | null,
+  update: CheckpointUpdate,
+): boolean =>
+  isCommitPointCheckpoint(existing?.step ?? null) && !isCommitPointCheckpoint(update.step)
+
 /**
  * Builds the record for a step update: the provisioned accountId survives step-to-step
  * for resume, but never across a different custodial owner, so another profile's fresh
@@ -209,9 +219,7 @@ export const mergeCheckpoint = (
    * confirmation on a flow the server holds open is the opposite case (one written before
    * the field existed, maybe already drained), so it keeps what it has.
    */
-  const hasRestarted =
-    isCommitPointCheckpoint(existing?.step ?? null) &&
-    !isCommitPointCheckpoint(update.step)
+  const hasRestarted = hasRunRestarted(existing, update)
   const inheritedExpectedReceiveSats = hasSameOwner
     ? existing?.expectedReceiveSats
     : undefined
@@ -307,6 +315,16 @@ export const saveCheckpointToStorage = (
     const existing = validateStoredCheckpoint(await loadJsonOrThrow(storageKey))
     const merged = mergeCheckpoint(existing, update)
     await saveJson(storageKey, merged)
+    /** The late-receive record belongs to the run as well, and goes where the run's figure
+     *  and confirmed start go. A restarted run reuses the same wallet, so a record left
+     *  behind would make the new run's receive late from its first second: with the
+     *  delayed-redirect flag on, that releases the swap the moment the server completes,
+     *  on a receive nobody has seen land. Only once the restart is on the disk, so a save
+     *  the store refused leaves the run, and its record, as they were. */
+    const endedRunWalletId = hasRunRestarted(existing, update)
+      ? existing?.accountId
+      : null
+    if (endedRunWalletId) await clearReceiveDelayedSince(endedRunWalletId)
     return merged
   })
 

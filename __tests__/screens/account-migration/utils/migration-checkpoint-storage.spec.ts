@@ -28,6 +28,13 @@ jest.mock("@app/utils/storage", () => ({
   removeOrThrow: (...args: readonly unknown[]) => mockRemove(...args),
 }))
 
+const mockClearReceiveDelayedSince = jest.fn()
+
+jest.mock("@app/screens/account-migration/utils/migration-receive-delay-storage", () => ({
+  clearReceiveDelayedSince: (accountId: string) =>
+    mockClearReceiveDelayedSince(accountId),
+}))
+
 describe("migration-checkpoint-storage", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -1127,6 +1134,83 @@ describe("migration-checkpoint-storage a commit point the server has not started
 })
 
 /** The one rule the entry screen and the step routing both follow for a commit point. */
+/** The late-receive record is the run's, like its figure and its confirmed start: a
+ *  restarted run reuses the wallet, and must not begin its receive already "late". */
+describe("migration-checkpoint-storage a restart and the late-receive record", () => {
+  const commitPoint = {
+    step: MigrationCheckpoint.BalancesOverview,
+    savedAt: 1,
+    accountId: "sc-1",
+    custodialAccountId: "cust-1",
+    expectedReceiveSats: 990,
+    isStartConfirmed: true,
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSaveJson.mockResolvedValue(undefined)
+    mockClearReceiveDelayedSince.mockResolvedValue(undefined)
+  })
+
+  it("forgets the ended run's late receive once the restart is saved", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(commitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.TermsAndConditions,
+      custodialAccountId: "cust-1",
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledTimes(1)
+    expect(mockClearReceiveDelayedSince).toHaveBeenCalledWith("sc-1")
+    const [savedAt] = mockSaveJson.mock.invocationCallOrder
+    const [clearedAt] = mockClearReceiveDelayedSince.mock.invocationCallOrder
+    expect(savedAt).toBeLessThan(clearedAt)
+  })
+
+  it("keeps it on a save that stays at the commit point", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(commitPoint)
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.BalancesOverview,
+      custodialAccountId: "cust-1",
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledTimes(1)
+    expect(mockClearReceiveDelayedSince).not.toHaveBeenCalled()
+  })
+
+  it("keeps it on a step saved before any run reached the commit point", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue({
+      ...commitPoint,
+      step: MigrationCheckpoint.BackupMethod,
+    })
+
+    await saveCheckpointToStorage("test-key", {
+      step: MigrationCheckpoint.TermsAndConditions,
+      custodialAccountId: "cust-1",
+    })
+
+    expect(mockSaveJson).toHaveBeenCalledTimes(1)
+    expect(mockClearReceiveDelayedSince).not.toHaveBeenCalled()
+  })
+
+  /** A refused save leaves the run on the disk at its commit point, record and all. */
+  it("keeps it when the store refuses the restart", async () => {
+    mockLoadJsonOrThrow.mockResolvedValue(commitPoint)
+    mockSaveJson.mockRejectedValue(new Error("database or disk is full"))
+
+    await expect(
+      saveCheckpointToStorage("test-key", {
+        step: MigrationCheckpoint.TermsAndConditions,
+        custodialAccountId: "cust-1",
+      }),
+    ).rejects.toThrow("disk is full")
+
+    expect(mockSaveJson).toHaveBeenCalledTimes(1)
+    expect(mockClearReceiveDelayedSince).not.toHaveBeenCalled()
+  })
+})
+
 describe("migration-checkpoint-storage resolveCommitPointRoute", () => {
   it("resumes an open flow, confirmed start or not", () => {
     expect(resolveCommitPointRoute(ServerMigrationFlow.Open, true)).toBe(
