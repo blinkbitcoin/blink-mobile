@@ -1,78 +1,55 @@
 import React from "react"
-import { Alert } from "react-native"
 
-import { GaloyIcon } from "@app/components/atomic/galoy-icon"
-import { useUserPhoneDeleteMutation } from "@app/graphql/generated"
+import { IconNamesType } from "@app/components/atomic/galoy-icon"
+import { ContactChangeNeedsAuthenticatorModal } from "@app/custodial/components/contact-change-needs-authenticator-modal"
+import { useContactChange } from "@app/custodial/hooks/use-contact-change"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { toastShow } from "@app/utils/toast"
+import { ContactField } from "@app/types/two-factor-enforcement"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsRow } from "../../row"
 import { useLoginMethods } from "../login-methods-hook"
-import { useTheme } from "@rn-vui/themed"
-import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 
+/**
+ * The login phone number: added from the row, and changed from its pen while the email
+ * keeps the account reachable, since the server changes it by removing it and adding
+ * the new one. Nothing is offered on it while it is the account's only login method.
+ */
 export const PhoneSetting: React.FC = () => {
   const { LL } = useI18nContext()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
-  const { loading, phone, emailVerified, phoneVerified } = useLoginMethods()
-  const { updateCurrentProfile } = useSaveSessionProfile()
+  const { loading, phone, phoneVerified, bothEmailAndPhoneVerified, hasAuthenticator } =
+    useLoginMethods()
+  const change = useContactChange(ContactField.Phone, hasAuthenticator)
 
-  const [phoneDeleteMutation, { loading: phoneDeleteLoading }] =
-    useUserPhoneDeleteMutation()
+  const addPhone = () => navigate("phoneRegistrationInitiate")
 
-  const deletePhone = async () => {
-    try {
-      await phoneDeleteMutation()
-      await updateCurrentProfile()
-      toastShow({
-        message: LL.AccountScreen.phoneDeletedSuccessfully(),
-        LL,
-        type: "success",
-      })
-    } catch (err) {
-      Alert.alert(LL.common.error(), err instanceof Error ? err.message : "")
-    }
-  }
-  const deletePhonePrompt = async () => {
-    Alert.alert(
-      LL.AccountScreen.deletePhonePromptTitle(),
-      LL.AccountScreen.deletePhonePromptContent(),
-      [
-        { text: LL.common.cancel(), onPress: () => {} },
-        {
-          text: LL.common.yes(),
-          onPress: async () => {
-            deletePhone()
-          },
-        },
-      ],
-    )
-  }
+  const title = phoneVerified ? phone || "" : LL.AccountScreen.tapToAddPhoneNumber()
+  const rowAction = phoneVerified ? null : addPhone
+  const changeIcon: IconNamesType | null = bothEmailAndPhoneVerified ? "pencil" : null
+  const rightIcon = phoneVerified ? changeIcon : "caret-right"
+  const rightIconAction = bothEmailAndPhoneVerified ? change.startChange : undefined
 
   return (
-    <SettingsRow
-      loading={loading}
-      title={phoneVerified ? phone || "" : LL.AccountScreen.tapToAddPhoneNumber()}
-      leftGaloyIcon="phone"
-      action={phoneVerified ? null : () => navigate("phoneRegistrationInitiate")}
-      spinner={phoneDeleteLoading}
-      rightIcon={
-        phoneVerified ? (
-          emailVerified ? (
-            <GaloyIcon name="close" size={20} color={colors.red} />
-          ) : null
-        ) : (
-          "caret-right"
-        )
-      }
-      rightIconAction={phoneVerified && emailVerified ? deletePhonePrompt : undefined}
-    />
+    <>
+      <SettingsRow
+        loading={loading}
+        title={title}
+        leftGaloyIcon="phone"
+        action={rowAction}
+        rightIcon={rightIcon}
+        rightIconAction={rightIconAction}
+      />
+      <ContactChangeNeedsAuthenticatorModal
+        field={ContactField.Phone}
+        isVisible={change.isNeedsAuthenticatorVisible}
+        onClose={change.closeNeedsAuthenticator}
+        onSetAuthenticator={change.setAuthenticator}
+        onHidden={change.openRequestedOnboarding}
+      />
+    </>
   )
 }
