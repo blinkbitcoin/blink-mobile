@@ -2562,8 +2562,6 @@
         "emailUnverifiedContent": "Assicurati di poter accedere nuovamente al tuo account verificando la tua email. Vuoi effettuare la verifica ora?",
         "totp": "Autenticazione a due fattori",
         "totpDeactivated": "L'autenticazione a due fattori è stata disattivata",
-        "totpDeleteAlertTitle": "Eliminare l'autenticazione a due fattori",
-        "totpDeleteAlertContent": "Vuoi davvero eliminare l'autenticazione a due fattori?",
         "copiedAccountId": "Copiato l'ID del tuo account negli appunti",
         "yourAccountId": "Il tuo ID account",
         "accountId": "ID account",
@@ -4101,6 +4099,18 @@
         "protectedDescription": "D'ora in poi, per accedere servirà un codice monouso dalla tua app di autenticazione.",
         "newPhoneTip": "Se prendi un nuovo telefono, trasferisci l'autenticatore sul nuovo <bold>prima</bold> di ripristinare quello vecchio.",
         "done": "Fatto"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Attiva",
+        "statusDisabled": "2FA: Disattivata",
+        "modalTitle": "Sconsigliamo di disattivare la 2FA",
+        "modalBody": "Ridurrebbe la sicurezza del tuo account e renderebbe più facile a terzi accedervi senza il tuo permesso.",
+        "keepProtected": "Voglio restare protetto",
+        "codeInstruction": "Inserisci il codice a 6 cifre della tua app di autenticazione per disattivare l'autenticazione a due fattori.",
+        "codeInvalid": "Il codice non è corretto. Inserisci il codice attuale della tua app di autenticazione.",
+        "tooManyAttempts": "Troppi tentativi. Riprova tra un'ora.",
+        "manualResetTitle": "Reimpostazione manuale della 2FA",
+        "manualResetBody": "Per la tua protezione non consentiamo di rimuovere la 2FA dall'app. Se hai bisogno di reimpostarla, contatta il nostro <support>Supporto</support>."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

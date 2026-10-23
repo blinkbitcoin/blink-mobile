@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Overením e-mailu zabezpečíte, že sa budete môcť znovu prihlásiť do svojho účtu. Chcete vykonať overenie teraz?",
     "totp": "Dvojfaktorové overenie",
     "totpDeactivated": "Dvojfaktorové overenie bolo deaktivované",
-    "totpDeleteAlertTitle": "Odstrániť dvojfaktorové overenie",
-    "totpDeleteAlertContent": "Naozaj chcete odstrániť dvojfaktorové overenie?",
     "copiedAccountId": "ID účtu bolo skopírované do schránky",
     "yourAccountId": "Vaše ID účtu",
     "accountId": "ID účtu",
@@ -4101,6 +4099,18 @@
     "protectedDescription": "Odteraz budete na prihlásenie potrebovať jednorazový kód z autentifikačnej aplikácie.",
     "newPhoneTip": "Ak si zaobstaráte nový telefón, preneste naň autentifikátor <bold>predtým</bold>, ako resetujete ten starý.",
     "done": "Hotovo"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Zapnuté",
+    "statusDisabled": "2FA: Vypnuté",
+    "modalTitle": "Neodporúčame vypínať 2FA",
+    "modalBody": "Znížilo by to zabezpečenie vášho účtu a uľahčilo tretej strane prístup k vášmu účtu bez vášho súhlasu.",
+    "keepProtected": "Chcem zostať chránený",
+    "codeInstruction": "Zadajte 6-miestny kód z overovacej aplikácie, aby ste vypli dvojfaktorové overenie.",
+    "codeInvalid": "Tento kód nie je správny. Zadajte aktuálny kód z overovacej aplikácie.",
+    "tooManyAttempts": "Príliš veľa pokusov. Skúste to znova o hodinu.",
+    "manualResetTitle": "Manuálny reset 2FA",
+    "manualResetBody": "Kvôli vašej ochrane nepovoľujeme odstránenie 2FA v aplikácii. Ak potrebujete reset 2FA, kontaktujte našu <support>podporu</support>."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -8425,14 +8425,6 @@ type RootTranslation = {
 		 */
 		totpDeactivated: string
 		/**
-		 * D​e​l​e​t​e​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
-		 */
-		totpDeleteAlertTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​?
-		 */
-		totpDeleteAlertContent: string
-		/**
 		 * C​o​p​i​e​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​I​D​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedAccountId: string
@@ -13708,6 +13700,48 @@ type RootTranslation = {
 		 * D​o​n​e
 		 */
 		done: string
+	}
+	TwoFactorTurnOff: {
+		/**
+		 * 2​F​A​:​ ​E​n​a​b​l​e​d
+		 */
+		statusEnabled: string
+		/**
+		 * 2​F​A​:​ ​D​i​s​a​b​l​e​d
+		 */
+		statusDisabled: string
+		/**
+		 * W​e​ ​d​o​n​'​t​ ​r​e​c​o​m​m​e​n​d​ ​d​i​s​a​b​l​i​n​g​ ​2​F​A
+		 */
+		modalTitle: string
+		/**
+		 * T​h​i​s​ ​w​o​u​l​d​ ​l​o​w​e​r​ ​y​o​u​r​ ​a​c​c​o​u​n​t​'​s​ ​s​e​c​u​r​i​t​y​ ​a​n​d​ ​m​a​k​e​ ​i​t​ ​e​a​s​i​e​r​ ​f​o​r​ ​a​ ​t​h​i​r​d​ ​p​a​r​t​y​ ​t​o​ ​a​c​c​e​s​s​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​t​h​o​u​t​ ​y​o​u​r​ ​p​e​r​m​i​s​s​i​o​n​.
+		 */
+		modalBody: string
+		/**
+		 * K​e​e​p​ ​m​e​ ​p​r​o​t​e​c​t​e​d
+		 */
+		keepProtected: string
+		/**
+		 * E​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​t​u​r​n​ ​o​f​f​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
+		 */
+		codeInstruction: string
+		/**
+		 * T​h​a​t​ ​c​o​d​e​ ​i​s​ ​i​n​c​o​r​r​e​c​t​.​ ​E​n​t​e​r​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		codeInvalid: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​n​ ​h​o​u​r​.
+		 */
+		tooManyAttempts: string
+		/**
+		 * 2​F​A​ ​m​a​n​u​a​l​ ​r​e​s​e​t
+		 */
+		manualResetTitle: string
+		/**
+		 * F​o​r​ ​y​o​u​r​ ​p​r​o​t​e​c​t​i​o​n​,​ ​w​e​ ​d​o​n​'​t​ ​a​l​l​o​w​ ​r​e​m​o​v​a​l​ ​o​f​ ​2​F​A​ ​i​n​s​i​d​e​ ​t​h​e​ ​a​p​p​.​ ​I​f​ ​y​o​u​ ​n​e​e​d​ ​a​ ​2​F​A​ ​r​e​s​e​t​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​<​s​u​p​p​o​r​t​>​S​u​p​p​o​r​t​<​/​s​u​p​p​o​r​t​>​.
+		 */
+		manualResetBody: string
 	}
 	BackupRequired: {
 		/**
@@ -22427,14 +22461,6 @@ export type TranslationFunctions = {
 		 */
 		totpDeactivated: () => LocalizedString
 		/**
-		 * Delete two-factor authentication
-		 */
-		totpDeleteAlertTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your two-factor authentication?
-		 */
-		totpDeleteAlertContent: () => LocalizedString
-		/**
 		 * Copied your account ID to clipboard
 		 */
 		copiedAccountId: () => LocalizedString
@@ -27611,6 +27637,48 @@ export type TranslationFunctions = {
 		 * Done
 		 */
 		done: () => LocalizedString
+	}
+	TwoFactorTurnOff: {
+		/**
+		 * 2FA: Enabled
+		 */
+		statusEnabled: () => LocalizedString
+		/**
+		 * 2FA: Disabled
+		 */
+		statusDisabled: () => LocalizedString
+		/**
+		 * We don't recommend disabling 2FA
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * This would lower your account's security and make it easier for a third party to access your account without your permission.
+		 */
+		modalBody: () => LocalizedString
+		/**
+		 * Keep me protected
+		 */
+		keepProtected: () => LocalizedString
+		/**
+		 * Enter the 6-digit code from your authenticator app to turn off two-factor authentication.
+		 */
+		codeInstruction: () => LocalizedString
+		/**
+		 * That code is incorrect. Enter the current code from your authenticator app.
+		 */
+		codeInvalid: () => LocalizedString
+		/**
+		 * Too many attempts. Try again in an hour.
+		 */
+		tooManyAttempts: () => LocalizedString
+		/**
+		 * 2FA manual reset
+		 */
+		manualResetTitle: () => LocalizedString
+		/**
+		 * For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.
+		 */
+		manualResetBody: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

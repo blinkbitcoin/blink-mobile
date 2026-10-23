@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Qinisekisa ukuba ungaphinda ungene kwi-akhawunti yakho ngokuqinisekisa i-imeyile yakho. Ufuna ukwenza ukuqinisekisa ngoku?",
     "totp": "Uqinisekiso lwezinto ezimbini",
     "totpDeactivated": "Uqinisekiso lwezinto ezimbini lucinyiwe",
-    "totpDeleteAlertTitle": "Cima uqinisekiso lwezinto ezimbini",
-    "totpDeleteAlertContent": "Uqinisekile ukuba ufuna ukucima uqinisekiso lwezinto ezimbini?",
     "copiedAccountId": "I-ID ye-akhawunti yakho ikopishwe kwibhodi eqhotyoshwayo",
     "yourAccountId": "I-ID Ye-akhawunti Yakho",
     "accountId": "I-ID ye-akhawunti",
@@ -4101,6 +4099,18 @@
     "protectedDescription": "Ukususela ngoku, ukungena kufuna ikhowudi yexesha elinye evela kwi-app yakho ye-authenticator.",
     "newPhoneTip": "Ukuba ufumana ifowuni entsha, dlulisela i-authenticator yakho kuyo <bold>ngaphambi</bold> kokuba usete kwakhona endala.",
     "done": "Kwenziwe"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ivuliwe",
+    "statusDisabled": "2FA: Icinyiwe",
+    "modalTitle": "Asicebisi ukuba ucime i-2FA",
+    "modalBody": "Oku kungathoba ukhuseleko lweakhawunti yakho kwaye kwenze kube lula ukuba omnye umntu angene kwiakhawunti yakho ngaphandle kwemvume yakho.",
+    "keepProtected": "Ndigcine ndikhuselekile",
+    "codeInstruction": "Faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa ukuze ucime ukuqinisekisa ngezinto ezimbini.",
+    "codeInvalid": "Loo khowudi ayichanekanga. Faka ikhowudi yangoku evela kwi-app yakho yokuqinisekisa.",
+    "tooManyAttempts": "Iinzame ezininzi kakhulu. Zama kwakhona emva kweyure enye.",
+    "manualResetTitle": "Ukusetha kwakhona i-2FA ngesandla",
+    "manualResetBody": "Ukuze ukhuseleke, asivumeli ukususwa kwe-2FA ngaphakathi kwi-app. Ukuba ufuna ukusetha kwakhona i-2FA, qhagamshelana <support>neNkxaso</support> yethu."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

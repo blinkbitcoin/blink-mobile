@@ -2003,6 +2003,11 @@ export type MutationUserContactUpdateAliasArgs = {
 };
 
 
+export type MutationUserEmailDeleteArgs = {
+  input?: InputMaybe<UserEmailDeleteInput>;
+};
+
+
 export type MutationUserEmailRegistrationInitiateArgs = {
   input: UserEmailRegistrationInitiateInput;
 };
@@ -2033,6 +2038,11 @@ export type MutationUserLogoutArgs = {
 };
 
 
+export type MutationUserPhoneDeleteArgs = {
+  input?: InputMaybe<UserPhoneDeleteInput>;
+};
+
+
 export type MutationUserPhoneRegistrationInitiateArgs = {
   input: UserPhoneRegistrationInitiateInput;
 };
@@ -2040,6 +2050,11 @@ export type MutationUserPhoneRegistrationInitiateArgs = {
 
 export type MutationUserPhoneRegistrationValidateArgs = {
   input: UserPhoneRegistrationValidateInput;
+};
+
+
+export type MutationUserTotpDeleteArgs = {
+  input?: InputMaybe<UserTotpDeleteInput>;
 };
 
 
@@ -3040,6 +3055,10 @@ export type UserContactUpdateAliasPayload = {
   readonly errors: ReadonlyArray<Error>;
 };
 
+export type UserEmailDeleteInput = {
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
+};
+
 export type UserEmailDeletePayload = {
   readonly __typename: 'UserEmailDeletePayload';
   readonly errors: ReadonlyArray<Error>;
@@ -3048,6 +3067,7 @@ export type UserEmailDeletePayload = {
 
 export type UserEmailRegistrationInitiateInput = {
   readonly email: Scalars['EmailAddress']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserEmailRegistrationInitiatePayload = {
@@ -3087,6 +3107,10 @@ export type UserLogoutInput = {
   readonly deviceToken: Scalars['String']['input'];
 };
 
+export type UserPhoneDeleteInput = {
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
+};
+
 export type UserPhoneDeletePayload = {
   readonly __typename: 'UserPhoneDeletePayload';
   readonly errors: ReadonlyArray<Error>;
@@ -3101,12 +3125,17 @@ export type UserPhoneRegistrationInitiateInput = {
 export type UserPhoneRegistrationValidateInput = {
   readonly code: Scalars['OneTimeAuthCode']['input'];
   readonly phone: Scalars['Phone']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserPhoneRegistrationValidatePayload = {
   readonly __typename: 'UserPhoneRegistrationValidatePayload';
   readonly errors: ReadonlyArray<Error>;
   readonly me?: Maybe<User>;
+};
+
+export type UserTotpDeleteInput = {
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserTotpDeletePayload = {
@@ -4132,11 +4161,6 @@ export type SettingsScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type SettingsScreenQuery = { readonly __typename: 'Query', readonly me?: { readonly __typename: 'User', readonly id: string, readonly username?: string | null, readonly language: string, readonly totpEnabled: boolean, readonly phone?: string | null, readonly defaultAccount: { readonly __typename: 'ConsumerAccount', readonly id: string, readonly defaultWalletId: string, readonly wallets: ReadonlyArray<{ readonly __typename: 'BTCWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency } | { readonly __typename: 'UsdWallet', readonly id: string, readonly balance: number, readonly walletCurrency: WalletCurrency }> }, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null };
 
-export type UserTotpDeleteMutationVariables = Exact<{ [key: string]: never; }>;
-
-
-export type UserTotpDeleteMutation = { readonly __typename: 'Mutation', readonly userTotpDelete: { readonly __typename: 'UserTotpDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
-
 export type AccountLimitsQueryVariables = Exact<{ [key: string]: never; }>;
 
 
@@ -4148,6 +4172,13 @@ export type UserLoginUpgradeTelegramMutationVariables = Exact<{
 
 
 export type UserLoginUpgradeTelegramMutation = { readonly __typename: 'Mutation', readonly userLoginUpgradeTelegram: { readonly __typename: 'UpgradePayload', readonly success: boolean, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
+
+export type UserTotpDeleteMutationVariables = Exact<{
+  input?: InputMaybe<UserTotpDeleteInput>;
+}>;
+
+
+export type UserTotpDeleteMutation = { readonly __typename: 'Mutation', readonly userTotpDelete: { readonly __typename: 'UserTotpDeletePayload', readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }>, readonly me?: { readonly __typename: 'User', readonly id: string, readonly phone?: string | null, readonly totpEnabled: boolean, readonly email?: { readonly __typename: 'Email', readonly address?: string | null, readonly verified?: boolean | null } | null } | null } };
 
 export type TotpRegistrationScreenQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -10187,49 +10218,6 @@ export type SettingsScreenQueryHookResult = ReturnType<typeof useSettingsScreenQ
 export type SettingsScreenLazyQueryHookResult = ReturnType<typeof useSettingsScreenLazyQuery>;
 export type SettingsScreenSuspenseQueryHookResult = ReturnType<typeof useSettingsScreenSuspenseQuery>;
 export type SettingsScreenQueryResult = Apollo.QueryResult<SettingsScreenQuery, SettingsScreenQueryVariables>;
-export const UserTotpDeleteDocument = gql`
-    mutation userTotpDelete {
-  userTotpDelete {
-    errors {
-      message
-    }
-    me {
-      id
-      phone
-      totpEnabled
-      email {
-        address
-        verified
-      }
-    }
-  }
-}
-    `;
-export type UserTotpDeleteMutationFn = Apollo.MutationFunction<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>;
-
-/**
- * __useUserTotpDeleteMutation__
- *
- * To run a mutation, you first call `useUserTotpDeleteMutation` within a React component and pass it any options that fit your needs.
- * When your component renders, `useUserTotpDeleteMutation` returns a tuple that includes:
- * - A mutate function that you can call at any time to execute the mutation
- * - An object with fields that represent the current status of the mutation's execution
- *
- * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
- *
- * @example
- * const [userTotpDeleteMutation, { data, loading, error }] = useUserTotpDeleteMutation({
- *   variables: {
- *   },
- * });
- */
-export function useUserTotpDeleteMutation(baseOptions?: Apollo.MutationHookOptions<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>) {
-        const options = {...defaultOptions, ...baseOptions}
-        return Apollo.useMutation<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>(UserTotpDeleteDocument, options);
-      }
-export type UserTotpDeleteMutationHookResult = ReturnType<typeof useUserTotpDeleteMutation>;
-export type UserTotpDeleteMutationResult = Apollo.MutationResult<UserTotpDeleteMutation>;
-export type UserTotpDeleteMutationOptions = Apollo.BaseMutationOptions<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>;
 export const AccountLimitsDocument = gql`
     query accountLimits {
   me {
@@ -10326,6 +10314,51 @@ export function useUserLoginUpgradeTelegramMutation(baseOptions?: Apollo.Mutatio
 export type UserLoginUpgradeTelegramMutationHookResult = ReturnType<typeof useUserLoginUpgradeTelegramMutation>;
 export type UserLoginUpgradeTelegramMutationResult = Apollo.MutationResult<UserLoginUpgradeTelegramMutation>;
 export type UserLoginUpgradeTelegramMutationOptions = Apollo.BaseMutationOptions<UserLoginUpgradeTelegramMutation, UserLoginUpgradeTelegramMutationVariables>;
+export const UserTotpDeleteDocument = gql`
+    mutation userTotpDelete($input: UserTotpDeleteInput) {
+  userTotpDelete(input: $input) {
+    errors {
+      message
+      code
+    }
+    me {
+      id
+      phone
+      totpEnabled
+      email {
+        address
+        verified
+      }
+    }
+  }
+}
+    `;
+export type UserTotpDeleteMutationFn = Apollo.MutationFunction<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>;
+
+/**
+ * __useUserTotpDeleteMutation__
+ *
+ * To run a mutation, you first call `useUserTotpDeleteMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useUserTotpDeleteMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [userTotpDeleteMutation, { data, loading, error }] = useUserTotpDeleteMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useUserTotpDeleteMutation(baseOptions?: Apollo.MutationHookOptions<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>(UserTotpDeleteDocument, options);
+      }
+export type UserTotpDeleteMutationHookResult = ReturnType<typeof useUserTotpDeleteMutation>;
+export type UserTotpDeleteMutationResult = Apollo.MutationResult<UserTotpDeleteMutation>;
+export type UserTotpDeleteMutationOptions = Apollo.BaseMutationOptions<UserTotpDeleteMutation, UserTotpDeleteMutationVariables>;
 export const TotpRegistrationScreenDocument = gql`
     query totpRegistrationScreen {
   me {
@@ -10989,6 +11022,7 @@ export type ResolversTypes = {
   UserContact: ResolverTypeWrapper<UserContact>;
   UserContactUpdateAliasInput: UserContactUpdateAliasInput;
   UserContactUpdateAliasPayload: ResolverTypeWrapper<UserContactUpdateAliasPayload>;
+  UserEmailDeleteInput: UserEmailDeleteInput;
   UserEmailDeletePayload: ResolverTypeWrapper<UserEmailDeletePayload>;
   UserEmailRegistrationInitiateInput: UserEmailRegistrationInitiateInput;
   UserEmailRegistrationInitiatePayload: ResolverTypeWrapper<UserEmailRegistrationInitiatePayload>;
@@ -10998,10 +11032,12 @@ export type ResolversTypes = {
   UserLoginUpgradeInput: UserLoginUpgradeInput;
   UserLoginUpgradeTelegramInput: UserLoginUpgradeTelegramInput;
   UserLogoutInput: UserLogoutInput;
+  UserPhoneDeleteInput: UserPhoneDeleteInput;
   UserPhoneDeletePayload: ResolverTypeWrapper<UserPhoneDeletePayload>;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: ResolverTypeWrapper<UserPhoneRegistrationValidatePayload>;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: ResolverTypeWrapper<UserTotpDeletePayload>;
   UserTotpRegistrationInitiatePayload: ResolverTypeWrapper<UserTotpRegistrationInitiatePayload>;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -11278,6 +11314,7 @@ export type ResolversParentTypes = {
   UserContact: UserContact;
   UserContactUpdateAliasInput: UserContactUpdateAliasInput;
   UserContactUpdateAliasPayload: UserContactUpdateAliasPayload;
+  UserEmailDeleteInput: UserEmailDeleteInput;
   UserEmailDeletePayload: UserEmailDeletePayload;
   UserEmailRegistrationInitiateInput: UserEmailRegistrationInitiateInput;
   UserEmailRegistrationInitiatePayload: UserEmailRegistrationInitiatePayload;
@@ -11287,10 +11324,12 @@ export type ResolversParentTypes = {
   UserLoginUpgradeInput: UserLoginUpgradeInput;
   UserLoginUpgradeTelegramInput: UserLoginUpgradeTelegramInput;
   UserLogoutInput: UserLogoutInput;
+  UserPhoneDeleteInput: UserPhoneDeleteInput;
   UserPhoneDeletePayload: UserPhoneDeletePayload;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: UserPhoneRegistrationValidatePayload;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: UserTotpDeletePayload;
   UserTotpRegistrationInitiatePayload: UserTotpRegistrationInitiatePayload;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -12149,17 +12188,17 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   supportChatMessageAdd?: Resolver<ResolversTypes['SupportChatMessageAddPayload'], ParentType, ContextType, RequireFields<MutationSupportChatMessageAddArgs, 'input'>>;
   supportChatReset?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType>;
   userContactUpdateAlias?: Resolver<ResolversTypes['UserContactUpdateAliasPayload'], ParentType, ContextType, RequireFields<MutationUserContactUpdateAliasArgs, 'input'>>;
-  userEmailDelete?: Resolver<ResolversTypes['UserEmailDeletePayload'], ParentType, ContextType>;
+  userEmailDelete?: Resolver<ResolversTypes['UserEmailDeletePayload'], ParentType, ContextType, Partial<MutationUserEmailDeleteArgs>>;
   userEmailRegistrationInitiate?: Resolver<ResolversTypes['UserEmailRegistrationInitiatePayload'], ParentType, ContextType, RequireFields<MutationUserEmailRegistrationInitiateArgs, 'input'>>;
   userEmailRegistrationValidate?: Resolver<ResolversTypes['UserEmailRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserEmailRegistrationValidateArgs, 'input'>>;
   userLogin?: Resolver<ResolversTypes['AuthTokenPayload'], ParentType, ContextType, RequireFields<MutationUserLoginArgs, 'input'>>;
   userLoginUpgrade?: Resolver<ResolversTypes['UpgradePayload'], ParentType, ContextType, RequireFields<MutationUserLoginUpgradeArgs, 'input'>>;
   userLoginUpgradeTelegram?: Resolver<ResolversTypes['UpgradePayload'], ParentType, ContextType, RequireFields<MutationUserLoginUpgradeTelegramArgs, 'input'>>;
   userLogout?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, Partial<MutationUserLogoutArgs>>;
-  userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType>;
+  userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType, Partial<MutationUserPhoneDeleteArgs>>;
   userPhoneRegistrationInitiate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationInitiateArgs, 'input'>>;
   userPhoneRegistrationValidate?: Resolver<ResolversTypes['UserPhoneRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationValidateArgs, 'input'>>;
-  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType>;
+  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType, Partial<MutationUserTotpDeleteArgs>>;
   userTotpRegistrationInitiate?: Resolver<ResolversTypes['UserTotpRegistrationInitiatePayload'], ParentType, ContextType>;
   userTotpRegistrationValidate?: Resolver<ResolversTypes['UserTotpRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserTotpRegistrationValidateArgs, 'input'>>;
   userUpdateLanguage?: Resolver<ResolversTypes['UserUpdateLanguagePayload'], ParentType, ContextType, RequireFields<MutationUserUpdateLanguageArgs, 'input'>>;

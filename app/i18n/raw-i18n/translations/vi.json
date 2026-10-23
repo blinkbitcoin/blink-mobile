@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Mã Tài khoản",
@@ -4101,6 +4099,18 @@
     "protectedDescription": "Từ giờ trở đi, việc đăng nhập cần mã dùng một lần từ ứng dụng xác thực của bạn.",
     "newPhoneTip": "Nếu bạn đổi sang điện thoại mới, hãy chuyển ứng dụng xác thực sang máy mới <bold>trước khi</bold> đặt lại máy cũ.",
     "done": "Xong"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Đã bật",
+    "statusDisabled": "2FA: Đã tắt",
+    "modalTitle": "Chúng tôi không khuyến nghị tắt 2FA",
+    "modalBody": "Việc này sẽ làm giảm bảo mật tài khoản và khiến bên thứ ba dễ truy cập tài khoản của bạn hơn mà không cần sự cho phép của bạn.",
+    "keepProtected": "Giữ tôi được bảo vệ",
+    "codeInstruction": "Nhập mã 6 chữ số từ ứng dụng xác thực để tắt xác thực hai yếu tố.",
+    "codeInvalid": "Mã đó không đúng. Nhập mã hiện tại từ ứng dụng xác thực của bạn.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy thử lại sau một giờ.",
+    "manualResetTitle": "Đặt lại 2FA thủ công",
+    "manualResetBody": "Để bảo vệ bạn, chúng tôi không cho phép gỡ 2FA trong ứng dụng. Nếu bạn cần đặt lại 2FA, hãy liên hệ <support>Bộ phận hỗ trợ</support> của chúng tôi."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

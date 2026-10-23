@@ -890,10 +890,11 @@ mutation userPhoneRegistrationValidate($input: UserPhoneRegistrationValidateInpu
   }
 }
 
-mutation userTotpDelete {
-  userTotpDelete {
+mutation userTotpDelete($input: UserTotpDeleteInput) {
+  userTotpDelete(input: $input) {
     errors {
       message
+      code
       __typename
     }
     me {

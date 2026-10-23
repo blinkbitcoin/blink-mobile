@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "معرّف الحساب",
@@ -4101,6 +4099,18 @@
     "protectedDescription": "من الآن فصاعدًا، يتطلب تسجيل الدخول رمزًا لمرة واحدة من تطبيق المصادقة.",
     "newPhoneTip": "إذا حصلت على هاتف جديد، انقل تطبيق المصادقة إليه <bold>قبل</bold> إعادة ضبط الهاتف القديم.",
     "done": "تم"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "المصادقة الثنائية: مفعّلة",
+    "statusDisabled": "المصادقة الثنائية: معطّلة",
+    "modalTitle": "لا ننصح بتعطيل المصادقة الثنائية",
+    "modalBody": "سيؤدي ذلك إلى تقليل أمان حسابك وتسهيل وصول طرف ثالث إلى حسابك دون إذنك.",
+    "keepProtected": "أبقني محميًا",
+    "codeInstruction": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة لإيقاف المصادقة الثنائية.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة.",
+    "manualResetTitle": "إعادة تعيين المصادقة الثنائية يدويًا",
+    "manualResetBody": "لحمايتك، لا نسمح بإزالة المصادقة الثنائية داخل التطبيق. إذا كنت بحاجة إلى إعادة تعيينها، تواصل مع <support>الدعم</support>."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

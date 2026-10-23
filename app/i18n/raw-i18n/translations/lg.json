@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Kakasa nti osobola okuddamu okuyingira mu akawunti yo ng'okakasa email yo. Oyagala okukola okukakasa kati?",
     "totp": "Okukakasa emirundi ebiri",
     "totpDeactivated": "Okukakasa emirundi ebiri kuggyidwawo",
-    "totpDeleteAlertTitle": "Ggyawo okukakasa emirundi ebiri",
-    "totpDeleteAlertContent": "Okakasa oyagala kuggyawo okukakasa kw'emirundi ebiri?",
     "copiedAccountId": "Wandukulula ID ya akawunti yo ku lutimbe",
     "yourAccountId": "ID ya Akawunti yo",
     "accountId": "ID ya Akawunti",
@@ -4101,6 +4099,18 @@
     "protectedDescription": "Okuva kati, okuyingira kwetaaga koodi ey'omulundi gumu okuva mu app yo eya authenticator.",
     "newPhoneTip": "Bw'ofuna essimu empya, kyusiza authenticator yo ku yo <bold>nga tonnaba</bold> kusangula ssimu enkadde.",
     "done": "Kimaze"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ekoleddwa",
+    "statusDisabled": "2FA: Teekoleddwa",
+    "modalTitle": "Tetukuwa magezi kuggyako 2FA",
+    "modalBody": "Kino kyandikendeezezza obukuumi bwa akawunti yo era kyandyanguyiza omuntu omulala okuyingira mu akawunti yo nga tokkirizza.",
+    "keepProtected": "Nkuuma nga ndi mukuumi",
+    "codeInstruction": "Yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa okuggyako okukakasa okw'emitendera ebiri.",
+    "codeInvalid": "Koodi eyo si ntuufu. Yingiza koodi ey'kaakati okuva mu app yo ey'okukakasa.",
+    "tooManyAttempts": "Ogezezzaako emirundi mingi nnyo. Ddamu okugezaako oluvannyuma lw'essaawa emu.",
+    "manualResetTitle": "Okuddamu okuteekawo 2FA mu ngalo",
+    "manualResetBody": "Olw'obukuumi bwo, tetukkiriza 2FA kuggibwako mu app. Bw'oba weetaaga okuddamu okuteekawo 2FA, tuukirira <support>Obuyambi</support> bwaffe."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

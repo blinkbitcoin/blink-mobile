@@ -57,6 +57,16 @@ export type TwoFactorFlowParams = {
   hasFailedStart?: boolean
 }
 
+/** What the server answers a change that needs the authenticator's code with, when it
+ *  refuses it. */
+export const TotpStepUpErrorCode = {
+  CodeInvalid: "TOTP_CODE_INVALID",
+  RemovalBalanceTooHigh: "TOTP_REMOVAL_BALANCE_TOO_HIGH",
+  TooManyAttempts: "TOO_MANY_REQUEST",
+} as const
+export type TotpStepUpErrorCode =
+  (typeof TotpStepUpErrorCode)[keyof typeof TotpStepUpErrorCode]
+
 /** The code screen says while a code is checked, so that what reads the stack knows
  *  the setup key is at stake. */
 export type TotpCodeCheckParams = {

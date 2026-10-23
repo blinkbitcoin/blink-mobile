@@ -2562,8 +2562,6 @@
     "emailUnverifiedContent": "Asigurați-vă că vă puteți conecta din nou la contul dvs. verificându-vă adresa de e-mail. Doriți să faceți verificarea acum?",
     "totp": "Autentificare cu doi factori",
     "totpDeactivated": "Autentificarea cu doi factori a fost dezactivată",
-    "totpDeleteAlertTitle": "Ștergeți autentificarea cu doi factori",
-    "totpDeleteAlertContent": "Sigur doriți să ștergeți autentificarea cu doi factori?",
     "copiedAccountId": "Ați copiat ID-ul contului în clipboard",
     "yourAccountId": "ID-ul contului dvs.",
     "accountId": "ID-ul contului",
@@ -4101,6 +4099,18 @@
     "protectedDescription": "De acum înainte, conectarea necesită un cod unic din aplicația ta de autentificare.",
     "newPhoneTip": "Dacă îți iei un telefon nou, mută autentificatorul pe el <bold>înainte</bold> să-l resetezi pe cel vechi.",
     "done": "Gata"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Activată",
+    "statusDisabled": "2FA: Dezactivată",
+    "modalTitle": "Nu recomandăm dezactivarea 2FA",
+    "modalBody": "Acest lucru ar reduce securitatea contului tău și ar face mai ușor ca o terță parte să-l acceseze fără permisiunea ta.",
+    "keepProtected": "Vreau să rămân protejat",
+    "codeInstruction": "Introdu codul de 6 cifre din aplicația de autentificare pentru a dezactiva autentificarea în doi pași.",
+    "codeInvalid": "Codul este greșit. Introdu codul actual din aplicația de autentificare.",
+    "tooManyAttempts": "Prea multe încercări. Încearcă din nou peste o oră.",
+    "manualResetTitle": "Resetare manuală 2FA",
+    "manualResetBody": "Pentru protecția ta, nu permitem eliminarea 2FA din aplicație. Dacă ai nevoie de resetarea 2FA, contactează <support>Asistența</support> noastră."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -2562,8 +2562,6 @@
         "emailUnverifiedContent": "Asegúrese de que puede volver a iniciar sesión en su cuenta verificando su correo electrónico.\n ¿Quieres hacer la verificación ahora?",
         "totp": "Autenticación de dos factores",
         "totpDeactivated": "La autenticación de dos factores ha sido desactivada",
-        "totpDeleteAlertTitle": "Eliminar la autenticación de dos factores",
-        "totpDeleteAlertContent": "¿Está seguro de que desea eliminar su autenticación de dos factores?",
         "copiedAccountId": "Copiaste la ID de tu cuenta al portapapeles",
         "yourAccountId": "ID de tu cuenta",
         "accountId": "ID de cuenta",
@@ -4101,6 +4099,18 @@
         "protectedDescription": "A partir de ahora, para iniciar sesión necesitarás un código de un solo uso de tu aplicación de autenticación.",
         "newPhoneTip": "Si cambias de teléfono, pasa tu autenticador al nuevo <bold>antes</bold> de restablecer el anterior.",
         "done": "Listo"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Activada",
+        "statusDisabled": "2FA: Desactivada",
+        "modalTitle": "No te recomendamos desactivar la 2FA",
+        "modalBody": "Esto reduciría la seguridad de tu cuenta y facilitaría que un tercero accediera a ella sin tu permiso.",
+        "keepProtected": "Mantenerme protegido",
+        "codeInstruction": "Ingresa el código de 6 dígitos de tu app de autenticación para desactivar la autenticación de dos factores.",
+        "codeInvalid": "Ese código es incorrecto. Ingresa el código actual de tu app de autenticación.",
+        "tooManyAttempts": "Demasiados intentos. Vuelve a intentarlo en una hora.",
+        "manualResetTitle": "Restablecimiento manual de la 2FA",
+        "manualResetBody": "Por tu protección, no permitimos eliminar la 2FA desde la app. Si necesitas restablecer la 2FA, contacta a nuestro <support>Soporte</support>."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
