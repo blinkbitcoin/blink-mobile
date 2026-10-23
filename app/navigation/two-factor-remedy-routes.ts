@@ -1,3 +1,5 @@
+import { TotpCodeCheckParams } from "@app/types/two-factor-enforcement"
+
 import { isMigrationRoute, MigrationRouteName } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
 import { isUnlockInProgress } from "./unlock-routes"
@@ -34,6 +36,28 @@ export const isTotpRegistrationRoute = (name: string): boolean =>
   name.startsWith(TOTP_REGISTRATION_PREFIX)
 
 type StackRoute = { name: string }
+
+const CODE_ROUTE = "totpRegistrationValidate" satisfies keyof RootStackParamList
+const SETUP_KEY_BACKUP_ROUTE = "totpRegistrationBackup" satisfies keyof RootStackParamList
+
+/**
+ * Whether the authenticator's setup key is at stake: the registration's own top screen,
+ * whatever covers it, is the code screen while a code is checked, whose answer brings up
+ * the backup only while that screen is there, or the backup, the key's one chance to be
+ * kept. Nothing may close either. Before a code is sent nothing is at stake: no
+ * authenticator is on yet.
+ */
+export const isSetupKeyAtStake = (
+  routes: ReadonlyArray<StackRoute & { params?: object }>,
+): boolean => {
+  const registrationTop = [...routes]
+    .reverse()
+    .find((route) => isTotpRegistrationRoute(route.name))
+  if (registrationTop?.name === SETUP_KEY_BACKUP_ROUTE) return true
+  if (registrationTop?.name !== CODE_ROUTE) return false
+  const params: TotpCodeCheckParams | undefined = registrationTop.params
+  return params?.isChecking === true
+}
 
 /** Where the authenticator registration that runs up to `lastIndex`, the top of the
  *  stack unless told otherwise, begins: the index of its first screen, or the one past
