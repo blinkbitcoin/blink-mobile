@@ -192,4 +192,38 @@ describe("useTotpRegistrationFlow", () => {
       expect(result.current.registrationPrompt()).toBeUndefined()
     })
   })
+
+  describe("markStart", () => {
+    it("tells the onboarding the registration began at whether it could start", () => {
+      mockRoutes = stackOf(
+        "Primary",
+        "totpRegistrationIntro",
+        "totpRegistrationApps",
+        "totpRegistrationInitiate",
+      )
+      const { result } = renderIn("totpRegistrationInitiate")
+
+      act(() => result.current.markStart(true))
+      expect(mockDispatch).toHaveBeenLastCalledWith({
+        ...CommonActions.setParams({ hasFailedStart: true }),
+        source: "totpRegistrationIntro-1",
+      })
+
+      act(() => result.current.markStart(false))
+      expect(mockDispatch).toHaveBeenLastCalledWith({
+        ...CommonActions.setParams({ hasFailedStart: false }),
+        source: "totpRegistrationIntro-1",
+      })
+    })
+
+    /** Opened from the settings, no prompt waits on the registration. */
+    it("tells nothing to a registration that did not begin at the onboarding", () => {
+      mockRoutes = stackOf("Primary", "accountScreen", "totpRegistrationInitiate")
+      const { result } = renderIn("totpRegistrationInitiate")
+
+      act(() => result.current.markStart(true))
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+  })
 })

@@ -1,7 +1,7 @@
 import { useCallback } from "react"
 import { Share } from "react-native"
 
-import { compactSetupKey } from "@app/components/totp-export"
+import { authenticatorAccountLabel } from "@app/components/totp-export"
 import { useTotpRegistrationScreenQuery } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -26,23 +26,22 @@ export const useSetupKeyBackup = ({
   userId,
 }: RootStackParamList["totpRegistrationBackup"]): SetupKeyBackup => {
   const { LL } = useI18nContext()
-  const key = compactSetupKey(secret)
-  /** The username, read from the cache the setup key's screen filled, or the user id
-   *  for an account without one. */
+  /** The username, read from the cache the setup key's screen filled, named as the
+   *  authenticator's entry names it. */
   const { data } = useTotpRegistrationScreenQuery()
-  const account = data?.me?.username || userId
+  const account = authenticatorAccountLabel({ id: userId, username: data?.me?.username })
 
   /** The key with the account it is for, so the saved entry says which one it is. */
   const saveToPasswordManager = useCallback(async () => {
     logSetupKeyBackupOptionSelected({ option: SetupKeyBackupOption.PasswordManager })
     try {
       await Share.share({
-        message: LL.AuthenticatorOnboarding.keyBackupText({ account, key }),
+        message: LL.AuthenticatorOnboarding.keyBackupText({ account, key: secret }),
       })
     } catch (err) {
       reportError("Setup key share", err)
     }
-  }, [account, key, LL])
+  }, [account, secret, LL])
 
   const reportManualCopy = useCallback(() => {
     logSetupKeyBackupOptionSelected({ option: SetupKeyBackupOption.ManualCopy })

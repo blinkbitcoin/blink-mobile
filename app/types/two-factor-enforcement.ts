@@ -48,10 +48,19 @@ export type TwoFactorPromptOrigin = {
 }
 
 /** How a two-factor flow was opened: by a prompt, whose dismissal leaving it unfinished
- *  is, or from the setup, which stays under it and counts its own. */
+ *  is, or from the setup, which stays under it and counts its own. A registration that
+ *  could not start marks it, and leaving it is then no dismissal: the user was not
+ *  waving the prompt away. */
 export type TwoFactorFlowParams = {
   origin?: TwoFactorPromptOrigin
   isFromSetup?: boolean
+  hasFailedStart?: boolean
+}
+
+/** The code screen says while a code is checked, so that what reads the stack knows
+ *  the setup key is at stake. */
+export type TotpCodeCheckParams = {
+  isChecking?: boolean
 }
 
 /** The authenticator apps the onboarding recommends, as its events report them. */

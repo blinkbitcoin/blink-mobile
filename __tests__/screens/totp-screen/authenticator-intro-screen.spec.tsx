@@ -172,4 +172,15 @@ describe("AuthenticatorIntroScreen", () => {
     expect(mockRegisterDismissal).not.toHaveBeenCalled()
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
+
+  /** The registration never started, so backing out waves nothing away. */
+  it("only goes back, charging nothing, once the registration could not start", async () => {
+    mockRouteParams = { origin: BULLETIN_ORIGIN, hasFailedStart: true }
+    await renderScreen()
+
+    pressHardwareBack()
+
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
 })

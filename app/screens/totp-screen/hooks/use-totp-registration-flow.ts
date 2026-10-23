@@ -17,6 +17,10 @@ type TotpRegistrationFlow = {
   /** The two-factor prompt the registration was started from, as its onboarding was
    *  told, none when it was started from the settings. */
   registrationPrompt: () => TwoFactorPrompt | undefined
+  /** Tells the onboarding whether the registration could start: while it could not,
+   *  leaving it is no dismissal of the prompt that opened it, and once a try does, it
+   *  is again. */
+  markStart: (hasFailed: boolean) => void
 }
 
 const ONBOARDING_ROUTE = "totpRegistrationIntro" satisfies keyof RootStackParamList
@@ -78,11 +82,27 @@ export const useTotpRegistrationFlow = (): TotpRegistrationFlow => {
     navigation.pop(routes.length - totpRegistrationStart(routes))
   }, [navigation])
 
-  const registrationPrompt = useCallback(() => {
+  /** The registration's first screen, up to this one. */
+  const registrationStartRoute = useCallback(() => {
     const { routes } = navigation.getState()
     const screenIndex = routes.findIndex((route) => route.key === screenKey)
-    return onboardingPromptOf(routes[totpRegistrationStart(routes, screenIndex)])
+    return routes[totpRegistrationStart(routes, screenIndex)]
   }, [navigation, screenKey])
 
-  return { showBackup, leave, registrationPrompt }
+  const registrationPrompt = useCallback(
+    () => onboardingPromptOf(registrationStartRoute()),
+    [registrationStartRoute],
+  )
+
+  const markStart = useCallback(
+    (hasFailed: boolean) => {
+      const startRoute = registrationStartRoute()
+      if (startRoute?.name !== ONBOARDING_ROUTE) return
+      const params: TwoFactorFlowParams = { hasFailedStart: hasFailed }
+      navigation.dispatch({ ...CommonActions.setParams(params), source: startRoute.key })
+    },
+    [navigation, registrationStartRoute],
+  )
+
+  return { showBackup, leave, registrationPrompt, markStart }
 }

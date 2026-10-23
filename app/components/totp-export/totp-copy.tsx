@@ -24,6 +24,15 @@ type StyleProps = {
  *  or typed with. */
 export const compactSetupKey = (secret: string): string => secret.replace(/\s/g, "")
 
+type AuthenticatorAccount = { id: string; username?: string | null }
+
+/** The name the authenticator's entry and the key's backup give the account, so the two
+ *  always match: its username, or its user id for an account without one. */
+export const authenticatorAccountLabel = ({
+  id,
+  username,
+}: AuthenticatorAccount): string => username || id
+
 /** An authenticator's setup key, copied whole with a tap on the field or its icon. */
 export const CopySecretComponent: React.FC<Props> = ({
   secret,
