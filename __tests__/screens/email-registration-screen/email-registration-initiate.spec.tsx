@@ -21,6 +21,12 @@ jest.mock("@app/graphql/generated", () => ({
   useUserEmailRegistrationInitiateMutation: () => [mockEmailInitiate, { loading: false }],
 }))
 
+let mockHasAuthenticator = false
+jest.mock("@app/screens/settings-screen/account/login-methods-hook", () => ({
+  useLoginMethods: () => ({ hasAuthenticator: mockHasAuthenticator }),
+}))
+
+import { ContactChangeStep } from "@app/types/two-factor-enforcement"
 import { EmailRegistrationInitiateScreen } from "@app/screens/email-registration-screen/email-registration-initiate"
 
 loadLocale("en")
@@ -62,6 +68,7 @@ const submitEmail = async (params: RootStackParamList["emailRegistrationInitiate
 describe("EmailRegistrationInitiateScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockHasAuthenticator = false
     mockEmailInitiate.mockResolvedValue(initiatedResponse)
   })
 
@@ -77,5 +84,39 @@ describe("EmailRegistrationInitiateScreen", () => {
       onboarding: false,
       hasUsername: false,
     })
+  })
+
+  it("asks for the authenticator's code first on an account that has one", async () => {
+    mockHasAuthenticator = true
+
+    await submitEmail(undefined)
+
+    expect(mockEmailInitiate).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("contactChangeCode", {
+      step: ContactChangeStep.EmailAdd,
+      email: EMAIL,
+    })
+  })
+
+  it("asks for the code when the server wants one the account did not show yet", async () => {
+    mockEmailInitiate.mockResolvedValue({
+      data: {
+        userEmailRegistrationInitiate: {
+          errors: [{ message: "required", code: "TOTP_CODE_REQUIRED" }],
+          emailRegistrationId: null,
+        },
+      },
+    })
+
+    await submitEmail(undefined)
+
+    expect(mockNavigate).toHaveBeenCalledWith("contactChangeCode", {
+      step: ContactChangeStep.EmailAdd,
+      email: EMAIL,
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "emailRegistrationValidate",
+      expect.anything(),
+    )
   })
 })
