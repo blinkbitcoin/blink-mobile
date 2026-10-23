@@ -2697,7 +2697,9 @@
         "noFee": "keine Gebühr",
         "fromApprox": "ab ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Gebühren können aktuell nicht abgerufen werden"
+        "error": "Gebühren können aktuell nicht abgerufen werden",
+        "inactivity": "Inaktivität >{months: number} Monate",
+        "usdPerMonth": "{amount: string}/Monat"
     },
     "TransactionLimitsScreen": {
         "receive": "Erhalten",

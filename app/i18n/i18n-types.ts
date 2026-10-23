@@ -8922,6 +8922,16 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​f​e​t​c​h​ ​f​e​e​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e
 		 */
 		error: string
+		/**
+		 * I​n​a​c​t​i​v​i​t​y​ ​>​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+		 * @param {number} months
+		 */
+		inactivity: RequiredParams<'months'>
+		/**
+		 * {​a​m​o​u​n​t​}​/​m​o​n​t​h
+		 * @param {string} amount
+		 */
+		usdPerMonth: RequiredParams<'amount'>
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -22723,6 +22733,14 @@ export type TranslationFunctions = {
 		 * Unable to fetch fees at this time
 		 */
 		error: () => LocalizedString
+		/**
+		 * Inactivity >{months} months
+		 */
+		inactivity: (arg: { months: number }) => LocalizedString
+		/**
+		 * {amount}/month
+		 */
+		usdPerMonth: (arg: { amount: string }) => LocalizedString
 	}
 	TransactionLimitsScreen: {
 		/**

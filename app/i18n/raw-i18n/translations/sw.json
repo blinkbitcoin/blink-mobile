@@ -2697,7 +2697,9 @@
     "noFee": "hakuna ada",
     "fromApprox": "kuanzia ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Hatuwezi kupata ada kwa wakati huu"
+    "error": "Hatuwezi kupata ada kwa wakati huu",
+    "inactivity": "Kutotumika >miezi {months: number}",
+    "usdPerMonth": "{amount: string}/mwezi"
   },
   "TransactionLimitsScreen": {
     "receive": "Pokea",

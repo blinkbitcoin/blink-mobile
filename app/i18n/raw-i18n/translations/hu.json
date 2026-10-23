@@ -2697,7 +2697,9 @@
     "noFee": "díjmentes",
     "fromApprox": "~{fee: string}-tól",
     "satAmount": "{amount: string} SAT",
-    "error": "Jelenleg nem lehet lekérdezni a díjakat"
+    "error": "Jelenleg nem lehet lekérdezni a díjakat",
+    "inactivity": "Inaktivitás >{months: number} hónap",
+    "usdPerMonth": "{amount: string}/hó"
   },
   "TransactionLimitsScreen": {
     "receive": "Fogadás",

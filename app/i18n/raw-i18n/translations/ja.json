@@ -2697,7 +2697,9 @@
         "noFee": "手数料なし",
         "fromApprox": "~{fee: string} から",
         "satAmount": "{amount: string} SAT",
-        "error": "現時点では手数料を取得できません"
+        "error": "現時点では手数料を取得できません",
+        "inactivity": "休眠 >{months: number}か月",
+        "usdPerMonth": "{amount: string}/月"
     },
     "TransactionLimitsScreen": {
         "receive": "受金",

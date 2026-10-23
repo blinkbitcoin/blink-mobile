@@ -2697,7 +2697,9 @@
     "noFee": "tewali kisale",
     "fromApprox": "okuva ku ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Tetusobodde kufuna bisale mu kiseera kino"
+    "error": "Tetusobodde kufuna bisale mu kiseera kino",
+    "inactivity": "Obutakozesa >emyezi {months: number}",
+    "usdPerMonth": "{amount: string}/omwezi"
   },
   "TransactionLimitsScreen": {
     "receive": "Funa",

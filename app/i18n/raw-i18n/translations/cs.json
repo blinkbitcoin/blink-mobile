@@ -2697,7 +2697,9 @@
     "noFee": "bez poplatku",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "V tuto chvíli nelze načíst poplatky"
+    "error": "V tuto chvíli nelze načíst poplatky",
+    "inactivity": "Neaktivita >{months: number} měsíců",
+    "usdPerMonth": "{amount: string}/měsíc"
   },
   "TransactionLimitsScreen": {
     "receive": "Přijmout",

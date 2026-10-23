@@ -2697,7 +2697,9 @@
     "noFee": "ไม่มีค่าธรรมเนียม",
     "fromApprox": "เริ่มต้น ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้"
+    "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้",
+    "inactivity": "ไม่มีการใช้งาน >{months: number} เดือน",
+    "usdPerMonth": "{amount: string}/เดือน"
   },
   "TransactionLimitsScreen": {
     "receive": "รับเงิน",

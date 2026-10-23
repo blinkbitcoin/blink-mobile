@@ -4075,7 +4075,7 @@ export type AccountUpdateDisplayCurrencyMutation = { readonly __typename: 'Mutat
 export type FeeRatesQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> } } } | null };
+export type FeeRatesQuery = { readonly __typename: 'Query', readonly globals?: { readonly __typename: 'Globals', readonly feesInformation: { readonly __typename: 'FeesInformation', readonly deposit: { readonly __typename: 'DepositFeesInformation', readonly minBankFee: string, readonly minBankFeeThreshold: string, readonly tiers: ReadonlyArray<{ readonly __typename: 'DepositFeeTier', readonly maxAmount?: string | null, readonly amount: string }> }, readonly inactivityFee: { readonly __typename: 'InactivityFeeInformation', readonly usdCentsPerMonth: number } } } | null };
 
 export type LanguageQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -9746,6 +9746,9 @@ export const FeeRatesDocument = gql`
           maxAmount
           amount
         }
+      }
+      inactivityFee {
+        usdCentsPerMonth
       }
     }
   }

@@ -2697,7 +2697,9 @@
     "noFee": "tiada caj",
     "fromApprox": "dari ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Tak dapat mendapatkan caj buat masa ini"
+    "error": "Tak dapat mendapatkan caj buat masa ini",
+    "inactivity": "Tidak aktif >{months: number} bulan",
+    "usdPerMonth": "{amount: string}/bulan"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",

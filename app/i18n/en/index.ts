@@ -2820,6 +2820,8 @@ const en: BaseTranslation = {
     fromApprox: "from ~{fee: string}",
     satAmount: "{amount: string} SAT",
     error: "Unable to fetch fees at this time",
+    inactivity: "Inactivity >{months: number} months",
+    usdPerMonth: "{amount: string}/month",
   },
   TransactionLimitsScreen: {
     receive: "Receive",

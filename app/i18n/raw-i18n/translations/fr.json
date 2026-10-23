@@ -2697,7 +2697,9 @@
         "noFee": "aucuns frais",
         "fromApprox": "à partir de ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Impossible de récupérer les frais pour le moment"
+        "error": "Impossible de récupérer les frais pour le moment",
+        "inactivity": "Inactivité >{months: number} mois",
+        "usdPerMonth": "{amount: string}/mois"
     },
     "TransactionLimitsScreen": {
         "receive": "Recevoir",

@@ -2697,7 +2697,9 @@
     "noFee": "miễn phí",
     "fromApprox": "từ ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Không thể lấy thông tin phí tại thời điểm này"
+    "error": "Không thể lấy thông tin phí tại thời điểm này",
+    "inactivity": "Không hoạt động >{months: number} tháng",
+    "usdPerMonth": "{amount: string}/tháng"
   },
   "TransactionLimitsScreen": {
     "receive": "Nhận",

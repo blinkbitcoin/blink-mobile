@@ -2697,7 +2697,9 @@
     "noFee": "mana chaniyuq",
     "fromApprox": "~{fee: string}manta",
     "satAmount": "{amount: string} SAT",
-    "error": "Kunanqa mana chaninkunata chaskiyta atinchikchu"
+    "error": "Kunanqa mana chaninkunata chaskiyta atinchikchu",
+    "inactivity": "Mana llamk'achiy >{months: number} killa",
+    "usdPerMonth": "{amount: string}/killa"
   },
   "TransactionLimitsScreen": {
     "receive": "Allinmi",
