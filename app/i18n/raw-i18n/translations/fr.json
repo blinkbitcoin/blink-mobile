@@ -31,6 +31,8 @@
         "createError": "Impossible de créer la clé API. Veuillez réessayer.",
         "revokeError": "Impossible de révoquer la clé API. Veuillez réessayer.",
         "loadError": "Impossible de charger vos clés API. Veuillez réessayer plus tard.",
+        "discardSecretTitle": "Abandonner cette clé API ?",
+        "discardSecretBody": "C'est la seule fois où le secret est affiché. Si vous quittez maintenant, la clé ne pourra pas être récupérée et vous devrez en créer une nouvelle.",
         "done": "Terminé"
     },
     "GaloyAddressScreen": {
