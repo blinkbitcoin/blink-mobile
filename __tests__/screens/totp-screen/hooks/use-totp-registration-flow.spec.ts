@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 import { CommonActions, NavigationState } from "@react-navigation/native"
 
 import { useTotpRegistrationFlow } from "@app/screens/totp-screen/hooks/use-totp-registration-flow"
+import { ContactField } from "@app/types/two-factor-enforcement"
 
 type Route = { key: string; name: string; params?: object }
 
@@ -87,6 +88,41 @@ describe("useTotpRegistrationFlow", () => {
         index: 2,
         routes: [mockRoutes[0], BACKUP_ROUTE, mockRoutes[3]],
       })
+    })
+
+    /** The onboarding is taken off the stack here, and with it the change it was
+     *  opened for, which the backup carries on to the done screen. */
+    it("hands the backup the login method change the onboarding was opened for", () => {
+      mockRoutes = [
+        { key: "Primary-0", name: "Primary" },
+        {
+          key: "totpRegistrationIntro-1",
+          name: "totpRegistrationIntro",
+          params: { contactChange: ContactField.Phone },
+        },
+        { key: "totpRegistrationValidate-2", name: "totpRegistrationValidate" },
+      ]
+      const { result } = renderIn("totpRegistrationValidate")
+
+      act(() => result.current.showBackup(BACKUP_PARAMS))
+
+      expect(resetOfStack().payload.routes[1]).toEqual({
+        name: "totpRegistrationBackup",
+        params: { ...BACKUP_PARAMS, contactChange: ContactField.Phone },
+      })
+    })
+
+    it("hands the backup no change for a registration that did not begin at the onboarding", () => {
+      mockRoutes = stackOf(
+        "Primary",
+        "totpRegistrationInitiate",
+        "totpRegistrationValidate",
+      )
+      const { result } = renderIn("totpRegistrationValidate")
+
+      act(() => result.current.showBackup(BACKUP_PARAMS))
+
+      expect(resetOfStack().payload.routes[1].params.contactChange).toBeUndefined()
     })
 
     /** Whatever the user went to, another account or the lock, never gets the key

@@ -46,8 +46,8 @@ export const SetupKeyBackupScreen: React.FC = () => {
   /** The done screen takes this one's place: once the user says the key is kept, no way
    *  back from there shows it again. */
   const handleSaved = useCallback(() => {
-    navigation.replace("totpRegistrationDone")
-  }, [navigation])
+    navigation.replace("totpRegistrationDone", { contactChange: params.contactChange })
+  }, [navigation, params.contactChange])
 
   return (
     <StepLayout
