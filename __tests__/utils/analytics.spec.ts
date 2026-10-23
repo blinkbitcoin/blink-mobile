@@ -23,6 +23,9 @@ import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorDisableAttempted,
   logTwoFactorDisableBlocked,
+  logContactChangeStarted,
+  logContactChangeNeeds2faShown,
+  logContactChangeCodeFailed,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
   logTwoFactorSetupCompleted,
@@ -403,6 +406,33 @@ describe("analytics helpers", () => {
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_disable_blocked", {
         tier: 3,
+      })
+    })
+  })
+
+  describe("changing a login method", () => {
+    it("emits 'contact_change_started' with the field and whether there is an authenticator", () => {
+      logContactChangeStarted({ field: "email", hasAuthenticator: true })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("contact_change_started", {
+        field: "email",
+        has_authenticator: true,
+      })
+    })
+
+    it("emits 'contact_change_needs_2fa_shown' with the field", () => {
+      logContactChangeNeeds2faShown({ field: "phone" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("contact_change_needs_2fa_shown", {
+        field: "phone",
+      })
+    })
+
+    it("emits 'contact_change_code_failed' with the field", () => {
+      logContactChangeCodeFailed({ field: "email" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("contact_change_code_failed", {
+        field: "email",
       })
     })
   })

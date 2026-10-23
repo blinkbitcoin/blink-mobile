@@ -10,6 +10,7 @@ import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.t
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import {
   AuthenticatorApp,
+  ContactField,
   SetupKeyBackupOption,
   TwoFactorMethod,
   TwoFactorPrompt,
@@ -296,4 +297,31 @@ export const logTwoFactorDisableAttempted = (params: LogTwoFactorTurnOffParams) 
  *  tier, or the server found a balance that high. */
 export const logTwoFactorDisableBlocked = (params: LogTwoFactorTurnOffParams) => {
   analytics().logEvent("two_factor_disable_blocked", { tier: params.tier })
+}
+
+type LogContactChangeStartedParams = {
+  field: ContactField
+  hasAuthenticator: boolean
+}
+
+/** A change of the email or the phone number asked for from the settings. */
+export const logContactChangeStarted = (params: LogContactChangeStartedParams) => {
+  analytics().logEvent("contact_change_started", {
+    field: params.field,
+    has_authenticator: params.hasAuthenticator,
+  })
+}
+
+type LogContactChangeFieldParams = {
+  field: ContactField
+}
+
+/** A change asked for without an authenticator, told it needs one first. */
+export const logContactChangeNeeds2faShown = (params: LogContactChangeFieldParams) => {
+  analytics().logEvent("contact_change_needs_2fa_shown", { field: params.field })
+}
+
+/** The authenticator's code for a change refused as wrong. */
+export const logContactChangeCodeFailed = (params: LogContactChangeFieldParams) => {
+  analytics().logEvent("contact_change_code_failed", { field: params.field })
 }
