@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useState } from "react"
 import { Alert } from "react-native"
 
 import { gql } from "@apollo/client"
@@ -11,8 +11,9 @@ import {
 } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/transport-error"
 import { useAppConfig } from "@app/hooks"
+import { useCodeCheckHold } from "@app/hooks/use-code-check-hold"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { isBackwardAction, RootStackParamList } from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { logTwoFactorSetupCompleted } from "@app/utils/analytics"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -48,10 +49,6 @@ gql`
 type Props = {
   route: RouteProp<RootStackParamList, "totpRegistrationValidate">
 }
-
-/** How long a code check may hold the user's ways back: a request that never settles
- *  must not keep them on the screen for good. */
-const CODE_CHECK_HOLD_MS = 20_000
 
 /** The registrations a code was sent for whose answer never came back: the server may
  *  have taken it. Kept by registration rather than by screen, since the setup key's Next
@@ -169,40 +166,22 @@ export const TotpRegistrationValidateScreen: React.FC<Props> = ({ route }) => {
 
   /**
    * A code accepted after the user left would enable the authenticator with the setup
-   * key's backup gone with the screen. While the code is checked, the user's own ways
-   * back are refused: the header arrow and the hardware back through the navigator, and
-   * the swipe, which the native stack cannot refuse, switched off. A reset the app
-   * dispatches itself, a logout or an account switch, still goes through, and so does
-   * the user once a check has taken too long to answer. The route says so for as long,
-   * which is what holds links meanwhile.
+   * key's backup gone with the screen, so the user's ways back are held while the code
+   * is checked. The route says so for as long, which is what holds links meanwhile.
    */
-  useEffect(() => {
-    if (!loading) return
-    navigation.setOptions({ gestureEnabled: false })
-    navigation.setParams({ isChecking: true })
-    const unsubscribe = navigation.addListener("beforeRemove", (event) => {
-      if (!isBackwardAction(event.data.action)) return
-      event.preventDefault()
-    })
-    let isHeld = true
-    const release = () => {
-      if (!isHeld) return
-      isHeld = false
-      unsubscribe()
-      navigation.setOptions({ gestureEnabled: true })
-      /** Not on a screen the answer already took off the stack: no navigator is left to
-       *  take the params. */
-      const isScreenOpen = navigation
-        .getState()
-        .routes.some((stackRoute) => stackRoute.key === route.key)
-      if (isScreenOpen) navigation.setParams({ isChecking: false })
-    }
-    const timeout = setTimeout(release, CODE_CHECK_HOLD_MS)
-    return () => {
-      clearTimeout(timeout)
-      release()
-    }
-  }, [loading, navigation, route.key])
+  const markChecking = useCallback(
+    () => navigation.setParams({ isChecking: true }),
+    [navigation],
+  )
+  const unmarkChecking = useCallback(() => {
+    /** Not on a screen the answer already took off the stack: no navigator is left to
+     *  take the params. */
+    const isScreenOpen = navigation
+      .getState()
+      .routes.some((stackRoute) => stackRoute.key === route.key)
+    if (isScreenOpen) navigation.setParams({ isChecking: false })
+  }, [navigation, route.key])
+  useCodeCheckHold(loading, { onHold: markChecking, onRelease: unmarkChecking })
 
   const header = LL.TotpRegistrationValidateScreen.enter6digitCode()
 
