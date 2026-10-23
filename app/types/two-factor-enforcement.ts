@@ -47,19 +47,63 @@ export type TwoFactorPromptOrigin = {
   reason?: TwoFactorReminderReason
 }
 
+/** A login method of the account, as a change of it names it. */
+export const ContactField = {
+  Email: "email",
+  Phone: "phone",
+} as const
+export type ContactField = (typeof ContactField)[keyof typeof ContactField]
+
 /** How a two-factor flow was opened: by a prompt, whose dismissal leaving it unfinished
  *  is, or from the setup, which stays under it and counts its own. A registration that
  *  could not start marks it, and leaving it is then no dismissal: the user was not
- *  waving the prompt away. */
+ *  waving the prompt away. One opened to change a login method names it, is no prompt
+ *  either, and goes on to that change once the authenticator is added. */
 export type TwoFactorFlowParams = {
   origin?: TwoFactorPromptOrigin
   isFromSetup?: boolean
   hasFailedStart?: boolean
+  contactChange?: ContactField
 }
+
+/** The steps of adding, removing or confirming again a login method that the server
+ *  guards with the authenticator's code, with what each needs to run. A change is a
+ *  removal followed by an addition, as the server has no change of its own. */
+export const ContactChangeStep = {
+  EmailRemove: "email_remove",
+  EmailAdd: "email_add",
+  EmailReverify: "email_reverify",
+  PhoneRemove: "phone_remove",
+  PhoneAdd: "phone_add",
+} as const
+export type ContactChangeStep = (typeof ContactChangeStep)[keyof typeof ContactChangeStep]
+
+export type ContactChangeStepParams =
+  | { step: typeof ContactChangeStep.EmailRemove }
+  | { step: typeof ContactChangeStep.PhoneRemove }
+  | { step: typeof ContactChangeStep.EmailAdd; email: string }
+  | { step: typeof ContactChangeStep.EmailReverify; email: string }
+  | { step: typeof ContactChangeStep.PhoneAdd; phone: string; smsCode: string }
+
+/** The login method each step is for. */
+export const contactFieldOf = (step: ContactChangeStep): ContactField => {
+  const isEmailStep =
+    step === ContactChangeStep.EmailRemove ||
+    step === ContactChangeStep.EmailAdd ||
+    step === ContactChangeStep.EmailReverify
+  return isEmailStep ? ContactField.Email : ContactField.Phone
+}
+
+/** The step a change of the login method begins with: removing the one it has. */
+export const contactRemoveStepOf = (field: ContactField) =>
+  field === ContactField.Email
+    ? ContactChangeStep.EmailRemove
+    : ContactChangeStep.PhoneRemove
 
 /** What the server answers a change that needs the authenticator's code with, when it
  *  refuses it. */
 export const TotpStepUpErrorCode = {
+  CodeRequired: "TOTP_CODE_REQUIRED",
   CodeInvalid: "TOTP_CODE_INVALID",
   RemovalBalanceTooHigh: "TOTP_REMOVAL_BALANCE_TOO_HIGH",
   TooManyAttempts: "TOO_MANY_REQUEST",
