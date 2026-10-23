@@ -21,6 +21,8 @@ import {
   logStartCaptcha,
   logToastShown,
   logTwoFactorNonCustodialChosen,
+  logTwoFactorDisableAttempted,
+  logTwoFactorDisableBlocked,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
   logTwoFactorSetupCompleted,
@@ -383,6 +385,24 @@ describe("analytics helpers", () => {
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_key_backup_option_selected", {
         option: "password_manager",
+      })
+    })
+  })
+
+  describe("turning the authenticator off", () => {
+    it("emits 'two_factor_disable_attempted' with the tier reached", () => {
+      logTwoFactorDisableAttempted({ tier: 2 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_disable_attempted", {
+        tier: 2,
+      })
+    })
+
+    it("emits 'two_factor_disable_blocked' with the tier reached", () => {
+      logTwoFactorDisableBlocked({ tier: 3 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_disable_blocked", {
+        tier: 3,
       })
     })
   })
