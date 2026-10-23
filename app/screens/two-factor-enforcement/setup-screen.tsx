@@ -29,8 +29,9 @@ import { testProps } from "@app/utils/testProps"
  * screen that explains what that means, offered only while the self-custodial stack is
  * known to be on: nothing may push the user toward it once it is switched off.
  *
- * Reached from the home card, the reminder bulletin, the Settings banner and the
- * session modal, and closable from the close control it draws, on the same margin as
+ * Reached from the home card and the Settings banner, the reminder bulletin and the
+ * session modal opening the authenticator onboarding directly, and closable from the
+ * close control it draws, on the same margin as
  * every other screen of the two-factor flows. Leaving it without an authenticator
  * counts as the session's dismissal for the tiers that count one, reported as the
  * dismissal of the prompt that opened it. The authenticator onboarding opens above it
