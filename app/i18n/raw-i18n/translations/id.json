@@ -4054,6 +4054,17 @@
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
   },
+  "TwoFactorEnforcement": {
+    "title": "Atur otentikasi dua faktor",
+    "cardDescription": "Lindungi akun Anda dari akses yang tidak sah.",
+    "cardCta": "Atur",
+    "settingsDescription": "Lindungi akun Anda dari akses yang tidak sah dengan mengaturnya.",
+    "setupTitle": "Atur otentikasi dua faktor sekarang",
+    "setupDescription": "Untuk mencegah akses yang tidak sah ke akun Anda, tambahkan otentikasi dua faktor sekarang.",
+    "addEmail": "Tambah email",
+    "addPhoneNumber": "Tambah nomor telepon",
+    "setAuthenticator": "Atur authenticator"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

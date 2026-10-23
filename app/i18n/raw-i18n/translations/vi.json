@@ -4054,6 +4054,17 @@
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
   },
+  "TwoFactorEnforcement": {
+    "title": "Thiết lập xác thực hai yếu tố",
+    "cardDescription": "Bảo vệ tài khoản của bạn khỏi truy cập trái phép.",
+    "cardCta": "Thiết lập",
+    "settingsDescription": "Bảo vệ tài khoản của bạn khỏi truy cập trái phép bằng cách thiết lập nó.",
+    "setupTitle": "Thiết lập xác thực hai yếu tố ngay",
+    "setupDescription": "Để ngăn truy cập trái phép vào tài khoản của bạn, hãy thêm xác thực hai yếu tố ngay.",
+    "addEmail": "Thêm email",
+    "addPhoneNumber": "Thêm số điện thoại",
+    "setAuthenticator": "Thiết lập ứng dụng xác thực"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

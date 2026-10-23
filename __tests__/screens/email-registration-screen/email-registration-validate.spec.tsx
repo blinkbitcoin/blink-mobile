@@ -4,12 +4,17 @@ import { act, fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  RegistrationReturnRoute,
+  RootStackParamList,
+} from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
 const mockPopTo = jest.fn()
 const mockReplace = jest.fn()
 const mockNavigate = jest.fn()
+/** The routes under this screen, as the navigator would report them. */
+let mockStackRouteNames: string[] = []
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -17,6 +22,7 @@ jest.mock("@react-navigation/native", () => ({
     popTo: mockPopTo,
     replace: mockReplace,
     navigate: mockNavigate,
+    getState: () => ({ routes: mockStackRouteNames.map((name) => ({ name })) }),
   }),
 }))
 
@@ -86,6 +92,7 @@ const verifiedResponse = {
 describe("EmailRegistrationValidateScreen — navigation after success", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockStackRouteNames = ["Primary", "settings", "emailRegistrationInitiate"]
     mockEmailVerify.mockResolvedValue(verifiedResponse)
     mockUpdateCurrentProfile.mockResolvedValue(undefined)
   })
@@ -108,6 +115,80 @@ describe("EmailRegistrationValidateScreen — navigation after success", () => {
 
     expect(mockPopTo).toHaveBeenCalledWith("settings")
     expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("pops back into the two-factor setup when the flow was opened from it", async () => {
+    mockStackRouteNames = ["Primary", "twoFactorSetup", "emailRegistrationInitiate"]
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({
+            emailRegistrationId: "id",
+            email: "a@b.com",
+            returnTo: "twoFactorSetup",
+          })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockPopTo).toHaveBeenCalledWith("twoFactorSetup")
+    expect(mockPopTo).not.toHaveBeenCalledWith("settings")
+    expect(mockReplace).not.toHaveBeenCalled()
+  })
+
+  it("ignores a return route the stack does not hold, as a deep link could name one", async () => {
+    mockStackRouteNames = ["Primary", "emailRegistrationInitiate"]
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({
+            emailRegistrationId: "id",
+            email: "a@b.com",
+            returnTo: "twoFactorSetup",
+          })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockPopTo).toHaveBeenCalledWith("settings")
+    expect(mockPopTo).not.toHaveBeenCalledWith("twoFactorSetup")
+  })
+
+  it("ignores a return route a flow may not return to, even one the stack holds, as a deep link could name it", async () => {
+    mockStackRouteNames = ["Primary", "emailRegistrationInitiate"]
+    /** What a crafted link hands the screen: a string the type never admits. */
+    const returnTo = "Primary" as RegistrationReturnRoute
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({ emailRegistrationId: "id", email: "a@b.com", returnTo })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockPopTo).toHaveBeenCalledWith("settings")
+    expect(mockPopTo).not.toHaveBeenCalledWith("Primary")
   })
 
   it("replaces with the onboarding flow (not Settings) when started from onboarding", async () => {
@@ -134,6 +215,34 @@ describe("EmailRegistrationValidateScreen — navigation after success", () => {
       screen: "lightningBenefits",
       params: { onboarding: true, canGoBack: false },
     })
+    expect(mockPopTo).not.toHaveBeenCalled()
+  })
+
+  /** A deep link can carry both params; the onboarding, which the setup never starts,
+   *  comes first. */
+  it("lets the onboarding flow outrank a return route when a link carries both", async () => {
+    mockStackRouteNames = ["Primary", "twoFactorSetup", "emailRegistrationInitiate"]
+    const { getByTestId } = render(
+      wrap(
+        <EmailRegistrationValidateScreen
+          route={makeRoute({
+            emailRegistrationId: "id",
+            email: "a@b.com",
+            onboarding: true,
+            returnTo: "twoFactorSetup",
+          })}
+        />,
+      ),
+    )
+
+    await act(async () => {
+      fireEvent.press(getByTestId("submit-code"))
+    })
+    act(() => {
+      jest.advanceTimersByTime(SUCCESS_DELAY)
+    })
+
+    expect(mockReplace).toHaveBeenCalledWith("onboarding", expect.anything())
     expect(mockPopTo).not.toHaveBeenCalled()
   })
 })

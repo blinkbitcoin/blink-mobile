@@ -62,6 +62,38 @@ export const canGoBackFromChooseExperience = (
   return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
 }
 
+/** Where a registration flow goes on success when it was opened from the two-factor
+ *  setup: back into the setup, instead of the destination the flow has on its own. */
+export const RegistrationReturnRoute = { TwoFactorSetup: "twoFactorSetup" } as const
+export type RegistrationReturnRoute =
+  (typeof RegistrationReturnRoute)[keyof typeof RegistrationReturnRoute]
+
+const isRegistrationReturnRoute = (value: unknown): value is RegistrationReturnRoute =>
+  Object.values(RegistrationReturnRoute).some((route) => route === value)
+
+const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
+
+/** Whether a removal is one the user's own back press dispatched: the header arrow and
+ *  the Android hardware back raise GO_BACK, the swipe raises POP. A screen that holds
+ *  the user refuses only these. A removal the app dispatches on its own, a reset for a
+ *  logout or a gate, or a navigation for a profile switch, has to keep working, and
+ *  blocking those is how a hold meant to protect the user ends up trapping them. */
+export const isBackwardAction = (action: { type: string }): boolean =>
+  BACKWARD_ACTIONS.includes(action.type)
+
+type RouteStack = { routes: ReadonlyArray<{ name: string }> }
+
+/** A registration flow may return only to one of the routes above, and only while its
+ *  stack holds it. The param reaches these screens through deep links as well, where it
+ *  is any string: a route a flow may not return to, a name the stack never had, or a
+ *  route already left, all fall back to the flow's own destination. */
+export const canReturnToRoute = (
+  stack: RouteStack | undefined,
+  returnTo: string | undefined,
+): returnTo is RegistrationReturnRoute =>
+  isRegistrationReturnRoute(returnTo) &&
+  Boolean(stack?.routes.some(({ name }) => name === returnTo))
+
 export type RootStackParamList = {
   getStarted: undefined
   accountTypeSelection: { mode: AccountTypeMode }
@@ -202,18 +234,27 @@ export type RootStackParamList = {
   transactionLimitsScreen: undefined
   feeRatesScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
-  emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }
+  emailRegistrationInitiate?: {
+    onboarding?: boolean
+    hasUsername?: boolean
+    returnTo?: RegistrationReturnRoute
+  }
   emailRegistrationValidate: {
     email: string
     emailRegistrationId: string
     onboarding?: boolean
     hasUsername?: boolean
+    returnTo?: RegistrationReturnRoute
   }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }
-  totpRegistrationInitiate: undefined
-  totpRegistrationValidate: { totpRegistrationId: string }
+  totpRegistrationInitiate?: { returnTo?: RegistrationReturnRoute }
+  totpRegistrationValidate: {
+    totpRegistrationId: string
+    returnTo?: RegistrationReturnRoute
+  }
   totpLoginValidate: { authToken: string }
+  twoFactorSetup: undefined
   webView: {
     url: string
     initialTitle?: string
