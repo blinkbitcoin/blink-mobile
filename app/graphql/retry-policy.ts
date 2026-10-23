@@ -36,6 +36,10 @@ const noRetryOperations = [
   "onChainUsdTxFeeBySpeed",
   "onChainUsdTxFeeAsBtcDenominatedBySpeed",
 
+  // Each landing mints an address and spends one of the hourly creates; the user taps
+  // New again instead.
+  "onChainAddressCreate",
+
   // no need to retry to upload the token
   // specially as it's running on app start
   // and can create some unwanted loop when token is not valid

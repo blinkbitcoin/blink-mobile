@@ -11,6 +11,7 @@ type ActionButtonProps = {
   icon: IconNamesType
   onPress: () => void
   accessibilityHint: string
+  disabled?: boolean
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = ({
@@ -18,6 +19,7 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   icon,
   onPress,
   accessibilityHint,
+  disabled = false,
 }) => {
   const styles = useStyles()
   const {
@@ -27,12 +29,21 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   return (
     <Pressable
       {...testProps(label)}
-      style={({ pressed }) => [styles.container, pressed && styles.pressed]}
+      style={({ pressed }) => [
+        styles.container,
+        pressed && styles.pressed,
+        disabled && styles.disabled,
+      ]}
       onPress={onPress}
+      disabled={disabled}
       accessibilityRole="button"
       accessibilityHint={accessibilityHint}
+      accessibilityState={{ disabled }}
     >
-      <Text style={styles.label}>{label}</Text>
+      {/* One line, always: a long translation ellipsizes instead of growing the row. */}
+      <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
+        {label}
+      </Text>
       <GaloyIcon name={icon} size={16} color={colors.primary} />
     </Pressable>
   )
@@ -47,11 +58,17 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingHorizontal: 14,
     paddingVertical: 12,
     borderRadius: 8,
+    flexShrink: 1,
+    minWidth: 0,
   },
   pressed: {
     backgroundColor: colors.grey6,
   },
+  disabled: {
+    opacity: 0.5,
+  },
   label: {
+    flexShrink: 1,
     fontSize: 14,
     fontWeight: "400",
     color: colors.black,

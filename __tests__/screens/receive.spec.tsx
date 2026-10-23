@@ -10,6 +10,8 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
 
+import { toastShow } from "@app/utils/toast"
+
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
 
@@ -87,6 +89,17 @@ const onChainAddressCurrentMock = jest.fn(() =>
   }),
 )
 
+const onChainAddressCreateMock = jest.fn(() =>
+  Promise.resolve({
+    data: {
+      onChainAddressCreate: {
+        errors: [] as { message: string; code?: string }[],
+        address: "tb1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxx9fresh" as string | null,
+      },
+    },
+  }),
+)
+
 const lnInvoiceCreateMock = jest.fn(() =>
   Promise.resolve({
     data: {
@@ -131,6 +144,7 @@ jest.mock("@app/graphql/generated", () => {
     useLnInvoiceCreateMutation: () => [lnInvoiceCreateMock],
     useLnUsdInvoiceCreateMutation: () => [lnUsdInvoiceCreateMock],
     useOnChainAddressCurrentMutation: () => [onChainAddressCurrentMock],
+    useOnChainAddressCreateMutation: () => [onChainAddressCreateMock],
     useMyLnUpdatesSubscription: () => ({ data: null }),
   }
 })
@@ -1377,5 +1391,208 @@ describe("Amount modal lifecycle", () => {
     })
 
     expect(lnInvoiceCreateMock).toHaveBeenCalled()
+  })
+})
+
+describe("ReceiveScreen new on-chain address", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    LL = i18nObject("en")
+  })
+
+  const renderOnOnchainPage = async () => {
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await waitFor(() => {
+      expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
+    })
+  }
+
+  it("is only offered on the on-chain page", async () => {
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+
+    expect(screen.queryByText(LL.ReceiveScreen.newAddress())).toBeNull()
+
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+
+    await waitFor(() => {
+      expect(screen.getByText(LL.ReceiveScreen.newAddress())).toBeTruthy()
+    })
+  })
+
+  it("shows the freshly created address and confirms it", async () => {
+    await renderOnOnchainPage()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+    await waitFor(() => {
+      expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
+    })
+    expect(onChainAddressCreateMock).toHaveBeenCalledWith({
+      variables: { input: { walletId: "btc-wallet-id" } },
+    })
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.ReceiveScreen.newAddressGenerated(),
+        type: "success",
+      }),
+    )
+  })
+
+  it("creates one address for a double tap", async () => {
+    await renderOnOnchainPage()
+
+    const newButton = screen.getByText(LL.ReceiveScreen.newAddress())
+    fireEvent.press(newButton)
+    fireEvent.press(newButton)
+
+    await waitFor(() => {
+      expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
+    })
+    expect(onChainAddressCreateMock).toHaveBeenCalledTimes(1)
+  })
+
+  it("locks the wallet toggle until the new address arrives", async () => {
+    type CreateResponse = Awaited<ReturnType<typeof onChainAddressCreateMock>>
+    let resolveCreate: (value: CreateResponse) => void = () => {}
+    onChainAddressCreateMock.mockImplementationOnce(
+      () =>
+        new Promise<CreateResponse>((resolve) => {
+          resolveCreate = resolve
+        }),
+    )
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    // The toggle ignores taps until the lightning request is ready.
+    await waitFor(() => {
+      expect(screen.getByText(/test1@/)).toBeTruthy()
+    })
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await waitFor(() => {
+      expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
+    })
+    const usdFetch = { variables: { input: { walletId: "usd-wallet-id" } } }
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(onChainAddressCurrentMock).not.toHaveBeenCalledWith(usdFetch)
+
+    resolveCreate({
+      data: {
+        onChainAddressCreate: {
+          errors: [],
+          address: "tb1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxx9fresh",
+        },
+      },
+    })
+    await waitFor(() => {
+      expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
+    })
+
+    fireEvent.press(screen.getByLabelText("Toggle wallet"))
+    await flushAsync()
+    await flushAsync()
+
+    expect(onChainAddressCurrentMock).toHaveBeenCalledWith(usdFetch)
+  })
+
+  it("keeps the current address and reports the failure", async () => {
+    onChainAddressCreateMock.mockImplementationOnce(() =>
+      Promise.reject(new Error("network")),
+    )
+    await renderOnOnchainPage()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+    await waitFor(() => {
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressFailed(),
+          type: "error",
+        }),
+      )
+    })
+    expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
+  })
+
+  it("offers only New after the current address failed to load, and recovers", async () => {
+    onChainAddressCurrentMock.mockImplementationOnce(() =>
+      Promise.reject(new Error("network")),
+    )
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await flushAsync()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
+    expect(Clipboard.setString).not.toHaveBeenCalled()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+    await waitFor(() => {
+      expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
+    })
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.ReceiveScreen.newAddressGenerated(),
+        type: "success",
+      }),
+    )
+  })
+
+  it("tells the user to wait when the API rate-limits new addresses", async () => {
+    onChainAddressCreateMock.mockImplementationOnce(() =>
+      Promise.resolve({
+        data: {
+          onChainAddressCreate: {
+            errors: [{ message: "Too many", code: "TOO_MANY_REQUEST" }],
+            address: null,
+          },
+        },
+      }),
+    )
+    await renderOnOnchainPage()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+    await waitFor(() => {
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressRateLimited(),
+          type: "error",
+        }),
+      )
+    })
+    expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
   })
 })

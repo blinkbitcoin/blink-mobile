@@ -3787,6 +3787,13 @@ export type OnChainAddressCurrentMutationVariables = Exact<{
 
 export type OnChainAddressCurrentMutation = { readonly __typename: 'Mutation', readonly onChainAddressCurrent: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string }> } };
 
+export type OnChainAddressCreateMutationVariables = Exact<{
+  input: OnChainAddressCreateInput;
+}>;
+
+
+export type OnChainAddressCreateMutation = { readonly __typename: 'Mutation', readonly onChainAddressCreate: { readonly __typename: 'OnChainAddressPayload', readonly address?: string | null, readonly errors: ReadonlyArray<{ readonly __typename: 'GraphQLApplicationError', readonly message: string, readonly code?: string | null }> } };
+
 export type LnNoAmountInvoiceCreateMutationVariables = Exact<{
   input: LnNoAmountInvoiceCreateInput;
 }>;
@@ -7841,6 +7848,43 @@ export function useOnChainAddressCurrentMutation(baseOptions?: Apollo.MutationHo
 export type OnChainAddressCurrentMutationHookResult = ReturnType<typeof useOnChainAddressCurrentMutation>;
 export type OnChainAddressCurrentMutationResult = Apollo.MutationResult<OnChainAddressCurrentMutation>;
 export type OnChainAddressCurrentMutationOptions = Apollo.BaseMutationOptions<OnChainAddressCurrentMutation, OnChainAddressCurrentMutationVariables>;
+export const OnChainAddressCreateDocument = gql`
+    mutation onChainAddressCreate($input: OnChainAddressCreateInput!) {
+  onChainAddressCreate(input: $input) {
+    errors {
+      message
+      code
+    }
+    address
+  }
+}
+    `;
+export type OnChainAddressCreateMutationFn = Apollo.MutationFunction<OnChainAddressCreateMutation, OnChainAddressCreateMutationVariables>;
+
+/**
+ * __useOnChainAddressCreateMutation__
+ *
+ * To run a mutation, you first call `useOnChainAddressCreateMutation` within a React component and pass it any options that fit your needs.
+ * When your component renders, `useOnChainAddressCreateMutation` returns a tuple that includes:
+ * - A mutate function that you can call at any time to execute the mutation
+ * - An object with fields that represent the current status of the mutation's execution
+ *
+ * @param baseOptions options that will be passed into the mutation, supported options are listed on: https://www.apollographql.com/docs/react/api/react-hooks/#options-2;
+ *
+ * @example
+ * const [onChainAddressCreateMutation, { data, loading, error }] = useOnChainAddressCreateMutation({
+ *   variables: {
+ *      input: // value for 'input'
+ *   },
+ * });
+ */
+export function useOnChainAddressCreateMutation(baseOptions?: Apollo.MutationHookOptions<OnChainAddressCreateMutation, OnChainAddressCreateMutationVariables>) {
+        const options = {...defaultOptions, ...baseOptions}
+        return Apollo.useMutation<OnChainAddressCreateMutation, OnChainAddressCreateMutationVariables>(OnChainAddressCreateDocument, options);
+      }
+export type OnChainAddressCreateMutationHookResult = ReturnType<typeof useOnChainAddressCreateMutation>;
+export type OnChainAddressCreateMutationResult = Apollo.MutationResult<OnChainAddressCreateMutation>;
+export type OnChainAddressCreateMutationOptions = Apollo.BaseMutationOptions<OnChainAddressCreateMutation, OnChainAddressCreateMutationVariables>;
 export const LnNoAmountInvoiceCreateDocument = gql`
     mutation lnNoAmountInvoiceCreate($input: LnNoAmountInvoiceCreateInput!) {
   lnNoAmountInvoiceCreate(input: $input) {

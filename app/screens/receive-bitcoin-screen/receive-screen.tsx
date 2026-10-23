@@ -19,12 +19,18 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDollarBalanceGated } from "@app/hooks/use-dollar-balance-restricted"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
-import type { ReceivePaymentRequestState } from "./payment/request-state.types"
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+  type ReceivePaymentRequestState,
+} from "./payment/request-state.types"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
 import { NfcHeaderButton } from "./nfc-header-button"
 import { QRView } from "./qr-view"
@@ -128,6 +134,31 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     carousel.onchainWalletCurrency,
   )
 
+  const [isGeneratingAddress, setIsGeneratingAddress] = useState(false)
+  // A second tap can land before the disabled state renders; each one would burn an address.
+  const { run: runNewAddressOnce } = useInFlightGuard()
+  const { generateNewAddress } = onchain
+  const handleNewAddress = useCallback(
+    () =>
+      runNewAddressOnce(async () => {
+        setIsGeneratingAddress(true)
+        const result = await generateNewAddress()
+        setIsGeneratingAddress(false)
+        const created = result === NewOnchainAddressResult.Created
+        const toastMessages: Record<NewOnchainAddressResultType, string> = {
+          [NewOnchainAddressResult.Created]: LL.ReceiveScreen.newAddressGenerated(),
+          [NewOnchainAddressResult.Failed]: LL.ReceiveScreen.newAddressFailed(),
+          [NewOnchainAddressResult.RateLimited]: LL.ReceiveScreen.newAddressRateLimited(),
+        }
+        toastShow({
+          message: toastMessages[result],
+          LL,
+          type: created ? "success" : "error",
+        })
+      }),
+    [runNewAddressOnce, generateNewAddress, LL],
+  )
+
   const {
     handleSetAmount,
     handleMemoBlur,
@@ -142,11 +173,12 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     onchainAddress: onchain.address,
   })
 
-  const { displayPaymentRequest, showActions } = useDisplayPaymentRequest(
-    requestState,
-    carousel.isOnChainPage,
-    onchain.address,
-  )
+  const { displayPaymentRequest, showActions: hasPaymentRequestActions } =
+    useDisplayPaymentRequest(requestState, carousel.isOnChainPage, onchain.address)
+  // A failed on-chain request keeps the row so New can retry it; there is nothing to copy.
+  const onchainFailed = carousel.isOnChainPage && onchain.failed
+  const showActions = hasPaymentRequestActions || onchainFailed
+  const hasNothingToShare = carousel.isOnChainPage && !onchain.address
 
   const {
     displayReceiveNfc,
@@ -203,9 +235,12 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     ? onchainAmountRowCurrency
     : requestState.receivingWalletDescriptor.currency
 
-  const canToggleWallet = isSelfCustodial
-    ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
-    : !isDollarBalanceGated
+  // Switching wallets mid-create would put the old wallet's new address on the new wallet's page.
+  const canToggleWallet =
+    !isGeneratingAddress &&
+    (isSelfCustodial
+      ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
+      : !isDollarBalanceGated)
 
   return (
     <Screen
@@ -241,7 +276,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           <QRView
             type={Invoice.OnChain}
             getFullUri={onchain.getFullUriFn}
-            loading={onchain.loading}
+            loading={onchain.loading || isGeneratingAddress}
             completed={requestState.state === PaymentRequestState.Paid}
             converting={isConverting}
             err=""
@@ -317,6 +352,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
               label={LL.ReceiveScreen.copyInvoice()}
               icon="copy-paste"
               onPress={handleCopy}
+              disabled={hasNothingToShare}
               accessibilityHint={
                 carousel.isOnChainPage
                   ? LL.ReceiveScreen.copyClipboardBitcoin()
@@ -327,12 +363,22 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
               label={LL.ReceiveScreen.shareInvoice()}
               icon="share"
               onPress={handleShare}
+              disabled={hasNothingToShare}
               accessibilityHint={
                 carousel.isOnChainPage
                   ? LL.common.shareBitcoin()
                   : LL.common.shareLightning()
               }
             />
+            {carousel.isOnChainPage && (
+              <ActionButton
+                label={LL.ReceiveScreen.newAddress()}
+                icon="refresh"
+                onPress={handleNewAddress}
+                disabled={isGeneratingAddress || onchain.loading}
+                accessibilityHint={LL.ReceiveScreen.newAddressHint()}
+              />
+            )}
           </View>
         )}
 

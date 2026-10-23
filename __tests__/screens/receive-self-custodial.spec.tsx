@@ -15,6 +15,7 @@
  *   - Stable balance ON locks Dollar
  *   - Lightning address copied/shown as payment identifier
  *   - Set amount switches to Lightning invoice with the amount
+ *   - New on-chain address: offered on the on-chain page, rotates once per tap
  */
 import React from "react"
 import { it } from "@jest/globals"
@@ -25,6 +26,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
+import { toastShow } from "@app/utils/toast"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -106,6 +108,7 @@ jest.mock("@app/graphql/generated", () => {
     useLnInvoiceCreateMutation: () => [jest.fn()],
     useLnUsdInvoiceCreateMutation: () => [jest.fn()],
     useOnChainAddressCurrentMutation: () => [jest.fn()],
+    useOnChainAddressCreateMutation: () => [jest.fn()],
     useMyLnUpdatesSubscription: () => mockUseMyLnUpdatesSubscription(),
   }
 })
@@ -627,6 +630,129 @@ describe("ReceiveScreen — self-custodial", () => {
       fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
 
       expect(Clipboard.setString).toHaveBeenCalledWith("alice@spark.tips")
+    })
+  })
+
+  describe("new on-chain address", () => {
+    const currentAddress = "bc1qcurrentaddressxxxxxxxxxxxxxxxxxxxxx1current"
+    const freshAddress = "bc1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxxxx9fresh"
+    const shown = (address: string) => `${address.slice(0, 10)}...${address.slice(-10)}`
+
+    beforeEach(() => {
+      mockReceiveOnchain.mockImplementation((params?: { newAddress?: boolean }) =>
+        Promise.resolve({ address: params?.newAddress ? freshAddress : currentAddress }),
+      )
+    })
+
+    const renderOnOnchainPage = async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await waitFor(() => {
+        expect(screen.getByText(shown(currentAddress))).toBeTruthy()
+      })
+    }
+
+    it("is only offered on the on-chain page", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+
+      expect(screen.queryByText(LL.ReceiveScreen.newAddress())).toBeNull()
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.ReceiveScreen.newAddress())).toBeTruthy()
+      })
+    })
+
+    it("asks the SDK for a fresh address, shows it and confirms it", async () => {
+      await renderOnOnchainPage()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressGenerated(),
+          type: "success",
+        }),
+      )
+    })
+
+    it("rotates once for a double tap", async () => {
+      await renderOnOnchainPage()
+
+      const newButton = screen.getByText(LL.ReceiveScreen.newAddress())
+      fireEvent.press(newButton)
+      fireEvent.press(newButton)
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      const rotations = mockReceiveOnchain.mock.calls.filter(
+        ([params]) => params?.newAddress === true,
+      )
+      expect(rotations).toHaveLength(1)
+    })
+
+    it("keeps the current address and reports the failure", async () => {
+      await renderOnOnchainPage()
+      mockReceiveOnchain.mockResolvedValueOnce({ errors: [{ message: "sdk down" }] })
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(toastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.ReceiveScreen.newAddressFailed(),
+            type: "error",
+          }),
+        )
+      })
+      expect(screen.getByText(shown(currentAddress))).toBeTruthy()
+    })
+
+    it("retries from New after the first address request failed", async () => {
+      mockReceiveOnchain.mockResolvedValueOnce({ errors: [{ message: "offline" }] })
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+      expect(screen.queryByText(shown(currentAddress))).toBeNull()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
+      expect(Clipboard.setString).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressGenerated(),
+          type: "success",
+        }),
+      )
     })
   })
 })

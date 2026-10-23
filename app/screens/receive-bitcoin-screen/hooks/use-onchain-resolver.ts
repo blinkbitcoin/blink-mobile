@@ -1,5 +1,8 @@
 import { WalletCurrency } from "@app/graphql/generated"
-import type { ReceivePaymentRequestState } from "../payment/request-state.types"
+import {
+  NewOnchainAddressResult,
+  type ReceivePaymentRequestState,
+} from "../payment/request-state.types"
 
 import { useOnChainAddress } from "./use-onchain-address"
 
@@ -15,25 +18,38 @@ export const useOnchainResolver = (
     [WalletCurrency.Usd]: requestState.usdWalletId,
   }
 
-  const custodialOnchain = useOnChainAddress(
-    isSelfCustodial ? undefined : onchainWalletIds[onchainWalletCurrency],
-    {
-      amount: requestState.settlementAmount?.amount,
-      memo: requestState.memo || undefined,
-    },
-  )
+  const custodialWalletId = isSelfCustodial
+    ? undefined
+    : onchainWalletIds[onchainWalletCurrency]
+  const custodialOnchain = useOnChainAddress(custodialWalletId, {
+    amount: requestState.settlementAmount?.amount,
+    memo: requestState.memo || undefined,
+  })
 
+  // `failed` is a request that settled without an address: nothing more is coming,
+  // so the screen offers New as the way to retry instead of waiting on a spinner.
   if (isSelfCustodial) {
+    const failed =
+      !requestState.onchainAddress && Boolean(requestState.onchainAddressFailed)
     return {
       address: requestState.onchainAddress ?? null,
-      loading: !requestState.onchainAddress,
+      loading: !requestState.onchainAddress && !failed,
+      failed,
       getFullUriFn: requestState.getOnchainFullUriFn,
+      generateNewAddress:
+        requestState.generateNewOnchainAddress ??
+        (() => Promise.resolve(NewOnchainAddressResult.Failed)),
     }
   }
 
   return {
     address: custodialOnchain.address,
     loading: custodialOnchain.loading,
+    failed:
+      Boolean(custodialWalletId) &&
+      !custodialOnchain.loading &&
+      !custodialOnchain.address,
     getFullUriFn: custodialOnchain.getFullUriFn,
+    generateNewAddress: custodialOnchain.generateNewAddress,
   }
 }

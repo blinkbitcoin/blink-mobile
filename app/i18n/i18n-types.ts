@@ -6953,6 +6953,26 @@ type RootTranslation = {
 		 */
 		shareInvoice: string
 		/**
+		 * N​e​w
+		 */
+		newAddress: string
+		/**
+		 * G​e​n​e​r​a​t​e​s​ ​a​ ​n​e​w​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.​ ​P​r​e​v​i​o​u​s​ ​a​d​d​r​e​s​s​e​s​ ​k​e​e​p​ ​w​o​r​k​i​n​g​.
+		 */
+		newAddressHint: string
+		/**
+		 * N​e​w​ ​a​d​d​r​e​s​s​ ​r​e​a​d​y​.​ ​P​r​e​v​i​o​u​s​ ​a​d​d​r​e​s​s​e​s​ ​s​t​i​l​l​ ​w​o​r​k​.
+		 */
+		newAddressGenerated: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​g​e​n​e​r​a​t​e​ ​a​ ​n​e​w​ ​a​d​d​r​e​s​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressFailed: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​n​e​w​ ​a​d​d​r​e​s​s​e​s​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​w​h​i​l​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressRateLimited: string
+		/**
 		 * R​e​q​u​e​s​t​ ​S​p​e​c​i​f​i​c​ ​A​m​o​u​n​t
 		 */
 		addAmount: string
@@ -20831,6 +20851,26 @@ export type TranslationFunctions = {
 		 * Share
 		 */
 		shareInvoice: () => LocalizedString
+		/**
+		 * New
+		 */
+		newAddress: () => LocalizedString
+		/**
+		 * Generates a new Bitcoin address. Previous addresses keep working.
+		 */
+		newAddressHint: () => LocalizedString
+		/**
+		 * New address ready. Previous addresses still work.
+		 */
+		newAddressGenerated: () => LocalizedString
+		/**
+		 * Couldn't generate a new address. Please try again.
+		 */
+		newAddressFailed: () => LocalizedString
+		/**
+		 * Too many new addresses. Please wait a while and try again.
+		 */
+		newAddressRateLimited: () => LocalizedString
 		/**
 		 * Request Specific Amount
 		 */
