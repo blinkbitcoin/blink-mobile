@@ -63,6 +63,8 @@ export type ReceivePaymentRequestState = {
   feesInformation: { deposit: DepositFeesInformation } | undefined
   info?: { data?: ReceiveInvoiceInfo }
   onchainAddress?: string
+  /** Self-custodial only: no address arrived and none is on the way. */
+  onchainAddressFailed?: boolean
   getOnchainFullUriFn?: (params: UriParams) => string
   /** Self-custodial only; the custodial screen asks the API for its new address. */
   generateNewOnchainAddress?: () => Promise<NewOnchainAddressResultType>

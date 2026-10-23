@@ -173,11 +173,12 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     onchainAddress: onchain.address,
   })
 
-  const { displayPaymentRequest, showActions } = useDisplayPaymentRequest(
-    requestState,
-    carousel.isOnChainPage,
-    onchain.address,
-  )
+  const { displayPaymentRequest, showActions: hasPaymentRequestActions } =
+    useDisplayPaymentRequest(requestState, carousel.isOnChainPage, onchain.address)
+  // A failed on-chain request keeps the row so New can retry it; there is nothing to copy.
+  const onchainFailed = carousel.isOnChainPage && onchain.failed
+  const showActions = hasPaymentRequestActions || onchainFailed
+  const hasNothingToShare = carousel.isOnChainPage && !onchain.address
 
   const {
     displayReceiveNfc,
@@ -351,6 +352,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
               label={LL.ReceiveScreen.copyInvoice()}
               icon="copy-paste"
               onPress={handleCopy}
+              disabled={hasNothingToShare}
               accessibilityHint={
                 carousel.isOnChainPage
                   ? LL.ReceiveScreen.copyClipboardBitcoin()
@@ -361,6 +363,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
               label={LL.ReceiveScreen.shareInvoice()}
               icon="share"
               onPress={handleShare}
+              disabled={hasNothingToShare}
               accessibilityHint={
                 carousel.isOnChainPage
                   ? LL.common.shareBitcoin()

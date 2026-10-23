@@ -725,5 +725,34 @@ describe("ReceiveScreen — self-custodial", () => {
       })
       expect(screen.getByText(shown(currentAddress))).toBeTruthy()
     })
+
+    it("retries from New after the first address request failed", async () => {
+      mockReceiveOnchain.mockResolvedValueOnce({ errors: [{ message: "offline" }] })
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+      expect(screen.queryByText(shown(currentAddress))).toBeNull()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
+      expect(Clipboard.setString).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressGenerated(),
+          type: "success",
+        }),
+      )
+    })
   })
 })
