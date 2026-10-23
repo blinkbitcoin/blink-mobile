@@ -1248,3 +1248,73 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
     ])
   })
 })
+
+/**
+ * The lock is one thing made of three slots. Every caller that may erase it erases the same
+ * three, and this is where that list lives so a second copy cannot miss one.
+ */
+describe("KeyStoreWrapper clearAppLock", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const spyOnSlots = (results: {
+    biometrics: boolean
+    pin: boolean
+    budget: boolean
+  }) => {
+    jest
+      .spyOn(KeyStoreWrapper, "removeIsBiometricsEnabled")
+      .mockResolvedValue(results.biometrics)
+    jest.spyOn(KeyStoreWrapper, "removePin").mockResolvedValue(results.pin)
+    jest.spyOn(KeyStoreWrapper, "clearPinFailureState").mockResolvedValue(results.budget)
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it("erases all three slots and reports the lock gone", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(true)
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.removePin).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.clearPinFailureState).toHaveBeenCalledTimes(1)
+  })
+
+  /** A PIN without its spent attempt count hands the next round a fresh budget against a
+   *  secret that no longer expires, so a half-erased lock is still a lock. */
+  it("reports the lock kept when the spent budget will not clear", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: false })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  it("reports the lock kept when the PIN will not erase", async () => {
+    spyOnSlots({ biometrics: true, pin: false, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  /** A PIN without the biometrics flag routes every later unlock to the keypad instead of
+   *  to the prompt its owner chose. */
+  it("reports the lock kept when the biometrics flag will not erase", async () => {
+    spyOnSlots({ biometrics: false, pin: true, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  /** Sequential, so a slot that throws stops the ones behind it rather than leaving the
+   *  caller to guess which went. */
+  it("stops at a slot that throws", async () => {
+    jest.spyOn(KeyStoreWrapper, "removeIsBiometricsEnabled").mockResolvedValue(true)
+    jest
+      .spyOn(KeyStoreWrapper, "removePin")
+      .mockRejectedValue(new Error("keystore locked"))
+    jest.spyOn(KeyStoreWrapper, "clearPinFailureState").mockResolvedValue(true)
+
+    await expect(KeyStoreWrapper.clearAppLock()).rejects.toThrow("keystore locked")
+    expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+  })
+})

@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { act, renderHook } from "@testing-library/react-native"
 
 import {
@@ -88,6 +89,23 @@ describe("usePinAttempts", () => {
 
       expect(result.current.attemptsRemaining).toBe(1)
     })
+
+    /** A lock that outlives the logout it triggered keeps its spent count, and every
+     *  round after that adds one to it, so the count climbs past the cap. A clear that
+     *  could not land leaves one above it too. All of them hydrate into a live keypad
+     *  where the next wrong entry ends the session, which is what one attempt remaining
+     *  says and zero would contradict. */
+    it.each([MAX_PIN_ATTEMPTS, MAX_PIN_ATTEMPTS + 1, MAX_PIN_ATTEMPTS + 3])(
+      "floors a stored count of %i to one attempt, never zero",
+      async (stored) => {
+        mockedReadPinAttempts.mockResolvedValue(readableState(stored))
+
+        const { result } = renderAttempts()
+        await flushEffects()
+
+        expect(result.current.attemptsRemaining).toBe(1)
+      },
+    )
 
     it("reports no attempts spent on a clean slate", async () => {
       const { result } = renderAttempts()

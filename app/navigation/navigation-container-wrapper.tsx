@@ -87,13 +87,19 @@ const isResetWarranted = (
 /** Why the stack is being judged. The triggers differ on WHETHER a reset is owed, not on
  *  where one lands: arming owns both of the jobs above, while a retry exists only to finish
  *  the pop an unlock stood in front of, so it must not reset a session it finds already at
- *  the blocker on the strength of a lock its own flow never lowered (the three-strikes
- *  logout resets the stack without unlocking). Where a reset that IS owed lands is the
- *  lock's call and no trigger's: see mustRouteThroughUnlock below. */
+ *  the blocker on the strength of a lock its own flow never lowered. Where a reset that IS
+ *  owed lands is the lock's call and no trigger's: see mustRouteThroughUnlock below. */
 type ResetTrigger = "gate-armed" | "unlock-cleared"
 
 export type AuthenticationContextType = {
   isAppLocked: boolean
+  /**
+   * The same answer without waiting for a commit, for the callers that read it outside a
+   * render: a lock raised during an awaited piece of work is already true here while the
+   * state, and any mirror of it, is still a commit behind. Written by the two setters, so
+   * it is never the stale one.
+   */
+  readIsAppLocked: () => boolean
   setAppUnlocked: () => void
   setAppLocked: () => void
 }
@@ -177,9 +183,11 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     const isArming = trigger === "gate-armed"
 
     /** Resetting a stack with nothing above the blocker, purely to route a locked session
-     *  through the unlock, is arming's job alone. A retry doing it would bounce the
-     *  three-strikes logout, which resets to the blocker itself without ever unlocking,
-     *  back onto a PIN its own flow never owed.
+     *  through the unlock, is arming's job alone. A retry doing it would bounce a session
+     *  that reached the blocker with the lock still up onto a PIN its own flow never owed.
+     *  Nothing reaches it that way while every way out of a lock screen either lowers the
+     *  lock or goes back to the gate (see useReturnToGate), and this is what keeps a retry
+     *  harmless for one that does not.
      *
      *  Judged before the unlock is: a reset that would achieve nothing has nothing to come
      *  back for either, so it must not leave a retry armed behind it. */
@@ -236,6 +244,8 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
       setUrlAfterUnlockAndAuth(null)
     }
   }, [canHandlePayments, isAppLocked, urlAfterUnlockAndAuth])
+
+  const readIsAppLocked = React.useCallback(() => isAppLockedRef.current, [])
 
   const setAppUnlocked = React.useMemo(
     () => async () => {
@@ -322,7 +332,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
   }
 
   return (
-    <AuthenticationContextProvider value={{ isAppLocked, setAppUnlocked, setAppLocked }}>
+    <AuthenticationContextProvider
+      value={{ isAppLocked, readIsAppLocked, setAppUnlocked, setAppLocked }}
+    >
       <NavigationContainer
         ref={navigationRef}
         {...(mode === "dark" ? { theme: DarkTheme } : {})}

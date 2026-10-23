@@ -25,6 +25,16 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
+/** Whether the app lock is up when the session dies. The real context pulls in native
+ *  boot code this hook never touches, so only the flag is stood in for. */
+let mockIsAppLocked = false
+
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  /** The lock's own synchronous read, which answers at once rather than a commit later:
+   *  that is the whole point of the switch asking it after its awaits. */
+  useAuthenticationContext: () => ({ readIsAppLocked: () => mockIsAppLocked }),
+}))
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: { ProfileScreen: { switchAccount: () => "Switched" } },
@@ -56,8 +66,94 @@ const profileB = { token: "tok-b", username: "bob", accountId: "acct-b" }
 describe("useSwitchToNextProfile", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockIsAppLocked = false
     mockLogout.mockResolvedValue(undefined)
     mockSaveToken.mockResolvedValue(undefined)
+  })
+
+  it("switches the session behind an unanswered lock without opening the home screen", async () => {
+    /** A session can die while the lock screen is the one on show. The home screen
+     *  pushed from here would sit on top of it; answering the lock is what lands on
+     *  home, on the session this switch left waiting. */
+    mockIsAppLocked = true
+    storeProfiles([profileA, profileB])
+
+    const { result } = renderHook(() => useSwitchToNextProfile())
+    let switchResult
+    await act(async () => {
+      switchResult = await result.current.switchToNextProfile("tok-a")
+    })
+
+    expect(switchResult).toBe(SwitchProfileOutcome.Switched)
+    expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The switch reads the lock long after it started. Backgrounding the app during the
+   * token save raises the lock, and a value captured when the switch began still says
+   * unlocked: navigating on that one puts this session on top of the lock screen it just
+   * raised, with the lock flag still set.
+   */
+  it("opens no home screen when the lock is raised while the switch is still in flight", async () => {
+    storeProfiles([profileA, profileB])
+
+    let resolveSaveToken: () => void = () => {}
+    mockSaveToken.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSaveToken = resolve
+      }),
+    )
+
+    const { result } = renderHook(() => useSwitchToNextProfile())
+
+    let switchDone: Promise<SwitchProfileOutcome> | undefined
+    act(() => {
+      switchDone = result.current.switchToNextProfile("tok-a")
+    })
+
+    /** The resume relock lands while the save is still pending. No rerender: the lock's
+     *  own ref answers at once, which is what a mirror of it could not promise. */
+    mockIsAppLocked = true
+
+    await act(async () => {
+      resolveSaveToken()
+      await switchDone
+    })
+
+    expect(await switchDone).toBe(SwitchProfileOutcome.Switched)
+    expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The mirror has to follow the lock down as well, or a switch after an answered lock
+   *  would stop landing on home. */
+  it("opens the home screen when the lock is answered while the switch is in flight", async () => {
+    mockIsAppLocked = true
+    storeProfiles([profileA, profileB])
+
+    let resolveSaveToken: () => void = () => {}
+    mockSaveToken.mockReturnValue(
+      new Promise<void>((resolve) => {
+        resolveSaveToken = resolve
+      }),
+    )
+
+    const { result } = renderHook(() => useSwitchToNextProfile())
+
+    let switchDone: Promise<SwitchProfileOutcome> | undefined
+    act(() => {
+      switchDone = result.current.switchToNextProfile("tok-a")
+    })
+
+    mockIsAppLocked = false
+
+    await act(async () => {
+      resolveSaveToken()
+      await switchDone
+    })
+
+    expect(mockNavigate).toHaveBeenCalledWith("Primary")
   })
 
   it("deactivates the old token before saving the next profile's token", async () => {

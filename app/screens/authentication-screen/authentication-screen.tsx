@@ -9,12 +9,14 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
+import { PinErrorKey } from "./pin-verification"
 import { useUnlockScreen } from "./unlock-screen"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
 import AppLogoLightMode from "../../assets/logo/blink-logo-light.svg"
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
+import { useLogoutAndRoute } from "../../hooks/use-logout-and-route"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import BiometricWrapper from "../../utils/biometricAuthentication"
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../../utils/enum"
@@ -37,6 +39,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   const { logout } = useLogout()
   const { screenPurpose, isPinEnabled, isResume = false } = route.params
   const { completeUnlock } = useUnlockScreen({ isResume })
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { LL } = useI18nContext()
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
@@ -48,13 +51,13 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       if (!(await KeyStoreWrapper.clearPinFailureState())) {
         recordAppError(new Error("PIN attempt count could not be cleared"), {
           alwaysRecord: true,
-          dedupKey: "pin-attempts-clear",
+          dedupKey: PinErrorKey.AttemptsClear,
         })
       }
     } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
       KeyStoreWrapper.setIsBiometricsEnabled()
     }
-    completeUnlock(() => navigation.replace("Primary"))
+    completeUnlock((coldStartRoute) => navigation.replace(coldStartRoute))
   }, [navigation, screenPurpose, completeUnlock])
 
   const attemptAuthentication = React.useCallback(() => {
@@ -74,17 +77,15 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [])
 
-  const logoutAndNavigateToLanding = async () => {
-    await logout()
+  const logoutFromLock = async () => {
+    const { isAppLockKept } = await logout()
     Alert.alert(LL.common.logout(), LL.common.loggedOut(), [
       {
         text: LL.common.ok(),
-        onPress: () => {
-          /** Reset, not replace: a resume relock pushes this screen on top of the live
-           *  stack, and anything left beneath would still be reachable — and advertised,
-           *  now that the splash header follows `canGoBack()`. */
-          navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
-        },
+        /** Both ways out live in the shared logout route: a lock the logout kept is owed
+         *  an answer and goes back through the gate, and one that went takes the flag with
+         *  it and lands on the landing screen. */
+        onPress: () => routeAfterLogout(isAppLockKept),
       },
     ])
   }
@@ -96,7 +97,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
       },
       {
         text: LL.common.confirm(),
-        onPress: logoutAndNavigateToLanding,
+        onPress: logoutFromLock,
       },
     ])
   }
