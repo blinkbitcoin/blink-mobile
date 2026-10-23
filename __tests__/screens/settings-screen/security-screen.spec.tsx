@@ -666,7 +666,7 @@ describe("SecurityScreen — turning the PIN off", () => {
     return rendered
   }
 
-  it("clears the lockout along with the PIN", async () => {
+  it("clears the attempt budget along with the PIN", async () => {
     // Otherwise a lock outlives the PIN that produced it and greets the next
     // PIN the user sets.
     const { getByTestId } = await renderWithPinOn()
@@ -679,7 +679,7 @@ describe("SecurityScreen — turning the PIN off", () => {
     expect(mockClearPinFailureState).toHaveBeenCalledTimes(1)
   })
 
-  it("leaves the lockout in place when the PIN itself could not be removed", async () => {
+  it("leaves the attempt budget in place when the PIN itself could not be removed", async () => {
     mockRemovePin.mockResolvedValue(false)
     const { getByTestId } = await renderWithPinOn()
 

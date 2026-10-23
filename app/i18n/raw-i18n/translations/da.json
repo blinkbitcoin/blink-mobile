@@ -2175,16 +2175,15 @@
     "walletCountNotTwo": "Antallet af tegnebøger er ikke 2. Brug venligst kontrolpanelet for at se alle tegnebøger og midler på denne konto"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Det mislykkede forsøg kunne ikke registreres sikkert. Logger ud.",
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
     "enterPin": "Indtast din PIN-kode",
-    "lockoutUnavailable": "Det mislykkede forsøg kunne ikke registreres sikkert. Logger ud.",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
     "pinUnreadable": "Din PIN-kode kunne ikke kontrolleres. Prøv venligst igen.",
     "setPin": "Vælg din PIN-kode.",
     "setPinFailedMatch": "PIN-koderne matcher ikke - Vælg din PIN-kode.",
     "storePinFailed": "Kunne ikke gemme din PIN-kode",
     "tooManyAttempts": "For mange fejlede forsøg. Logger ud.",
-    "tryAgainIn": "Prøv igen om {seconds: number} s.",
     "verifyPin": "Bekræft din PIN-kode"
   },
   "PriceHistoryScreen": {
