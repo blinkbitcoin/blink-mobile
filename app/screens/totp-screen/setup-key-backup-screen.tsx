@@ -43,8 +43,10 @@ export const SetupKeyBackupScreen: React.FC = () => {
   const { params } = useRoute<RouteProp<RootStackParamList, "totpRegistrationBackup">>()
   const { saveToPasswordManager, reportManualCopy } = useSetupKeyBackup(params)
 
+  /** The done screen takes this one's place: once the user says the key is kept, no way
+   *  back from there shows it again. */
   const handleSaved = useCallback(() => {
-    navigation.navigate("totpRegistrationDone")
+    navigation.replace("totpRegistrationDone")
   }, [navigation])
 
   return (

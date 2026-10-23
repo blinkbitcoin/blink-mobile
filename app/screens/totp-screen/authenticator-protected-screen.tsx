@@ -14,7 +14,8 @@ import { useTotpRegistrationFlow } from "./hooks/use-totp-registration-flow"
 /**
  * The onboarding's last screen: the account is protected, with a reminder to move the
  * authenticator before changing phones. Done closes the whole registration, back to
- * wherever it was started from.
+ * wherever it was started from, as its back controls do, since it took the backup's
+ * place.
  */
 export const AuthenticatorProtectedScreen: React.FC = () => {
   const { LL } = useI18nContext()

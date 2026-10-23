@@ -13,10 +13,10 @@ const LL = i18nObject("en")
 
 const SECRET = "ABCD EFGH IJKL"
 
-const mockNavigate = jest.fn()
+const mockReplace = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ replace: mockReplace }),
   useRoute: () => ({ params: { secret: "ABCD EFGH IJKL", userId: "user-id" } }),
 }))
 
@@ -93,7 +93,8 @@ describe("SetupKeyBackupScreen", () => {
     expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
   })
 
-  /** The guard with no handler swallows the system back, edge swipes included. */
+  /** The guard with no handler swallows the system back, edge swipes included; what
+   *  the press does on a real stack is pinned in the setup's stack spec. */
   it("swallows the system back, the one chance to keep the key", async () => {
     await renderScreen()
 
@@ -119,11 +120,12 @@ describe("SetupKeyBackupScreen", () => {
     expect(mockReportManualCopy).toHaveBeenCalledTimes(1)
   })
 
-  it("moves on to the done screen from I've saved it, whether or not an option was used", async () => {
+  /** In its place, so no way back from the done screen shows the key again. */
+  it("puts the done screen in its place from I've saved it, whether or not an option was used", async () => {
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.savedIt()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationDone")
+    expect(mockReplace).toHaveBeenCalledWith("totpRegistrationDone")
   })
 })
