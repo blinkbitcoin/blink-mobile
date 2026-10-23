@@ -15,10 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
 import { TwoFactorMethod } from "@app/types/two-factor-enforcement"
-import {
-  logAuthenticatorEducationStarted,
-  logTwoFactorSetupStarted,
-} from "@app/utils/analytics"
+import { logTwoFactorSetupStarted } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
 
 type Benefit = {
@@ -59,7 +56,6 @@ export const AuthenticatorIntroScreen: React.FC = () => {
   /** Every Set authenticator lands here, so this is where the setup starts. */
   useEffect(() => {
     logTwoFactorSetupStarted({ tier: promptTier, method: TwoFactorMethod.Authenticator })
-    logAuthenticatorEducationStarted()
   }, [promptTier])
 
   const handleGetStarted = useCallback(() => {

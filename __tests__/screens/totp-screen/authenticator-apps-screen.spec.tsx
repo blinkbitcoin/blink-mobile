@@ -120,4 +120,16 @@ describe("AuthenticatorAppsScreen", () => {
     expect(mockLogEducationCompleted).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate")
   })
+
+  /** The screen stays under the setup key, so a tap after a back is the same
+   *  registration's. */
+  it("reports the onboarding done once, however often I have an app is tapped", async () => {
+    await renderScreen()
+
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.haveAnApp()))
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.haveAnApp()))
+
+    expect(mockLogEducationCompleted).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledTimes(2)
+  })
 })

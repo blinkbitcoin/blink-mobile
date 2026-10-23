@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useRef } from "react"
 import { Linking, Platform, TouchableOpacity, View } from "react-native"
 import { SvgProps } from "react-native-svg"
 import { useNavigation } from "@react-navigation/native"
@@ -87,8 +87,14 @@ export const AuthenticatorAppsScreen: React.FC = () => {
     )
   }, [])
 
+  /** The screen stays under the setup key, so a tap after a back is the same
+   *  registration's, already reported. */
+  const isEducationReportedRef = useRef(false)
   const handleHaveAnApp = useCallback(() => {
-    logAuthenticatorEducationCompleted()
+    if (!isEducationReportedRef.current) {
+      isEducationReportedRef.current = true
+      logAuthenticatorEducationCompleted()
+    }
     navigation.navigate("totpRegistrationInitiate")
   }, [navigation])
 

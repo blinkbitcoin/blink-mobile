@@ -252,11 +252,6 @@ export const logTwoFactorSetupCompleted = (params: LogTwoFactorSetupCompletedPar
   })
 }
 
-/** The authenticator onboarding opened, from any prompt that asks for one. */
-export const logAuthenticatorEducationStarted = () => {
-  analytics().logEvent("education_started")
-}
-
 type LogAuthenticatorAppSelectedParams = {
   app: AuthenticatorApp
 }
@@ -265,12 +260,13 @@ type LogAuthenticatorAppSelectedParams = {
 export const logAuthenticatorAppSelected = (
   params: LogAuthenticatorAppSelectedParams,
 ) => {
-  analytics().logEvent("education_app_selected", { app: params.app })
+  analytics().logEvent("two_factor_education_app_selected", { app: params.app })
 }
 
-/** The onboarding left for the setup itself, with an app at hand. */
+/** The onboarding left for the setup itself, with an app at hand, once per
+ *  registration. */
 export const logAuthenticatorEducationCompleted = () => {
-  analytics().logEvent("education_completed")
+  analytics().logEvent("two_factor_education_completed")
 }
 
 type LogSetupKeyBackupOptionSelectedParams = {
@@ -281,5 +277,7 @@ type LogSetupKeyBackupOptionSelectedParams = {
 export const logSetupKeyBackupOptionSelected = (
   params: LogSetupKeyBackupOptionSelectedParams,
 ) => {
-  analytics().logEvent("backup_option_selected", { option: params.option })
+  analytics().logEvent("two_factor_key_backup_option_selected", {
+    option: params.option,
+  })
 }
