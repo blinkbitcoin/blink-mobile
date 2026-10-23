@@ -4,6 +4,7 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { SetupKeyBackupScreen } from "@app/screens/totp-screen"
+import { ContactField } from "@app/types/two-factor-enforcement"
 
 import { ContextForScreen } from "../helper"
 import { flushEffects } from "../../helpers/flush-effects"
@@ -14,10 +15,11 @@ const LL = i18nObject("en")
 const SECRET = "ABCD EFGH IJKL"
 
 const mockReplace = jest.fn()
+let mockRouteParams: Record<string, unknown> = {}
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({ replace: mockReplace }),
-  useRoute: () => ({ params: { secret: "ABCD EFGH IJKL", userId: "user-id" } }),
+  useRoute: () => ({ params: mockRouteParams }),
 }))
 
 const mockEnableScreenSecurity = jest.fn()
@@ -67,6 +69,7 @@ describe("SetupKeyBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    mockRouteParams = { secret: SECRET, userId: "user-id" }
   })
 
   it("asks to keep the key off this phone, with every way to do it", async () => {
@@ -126,6 +129,23 @@ describe("SetupKeyBackupScreen", () => {
 
     fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.savedIt()))
 
-    expect(mockReplace).toHaveBeenCalledWith("totpRegistrationDone")
+    expect(mockReplace).toHaveBeenCalledWith("totpRegistrationDone", {
+      contactChange: undefined,
+    })
+  })
+
+  it("tells the done screen which login method change the authenticator was added for", async () => {
+    mockRouteParams = {
+      secret: SECRET,
+      userId: "user-id",
+      contactChange: ContactField.Phone,
+    }
+    await renderScreen()
+
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.savedIt()))
+
+    expect(mockReplace).toHaveBeenCalledWith("totpRegistrationDone", {
+      contactChange: ContactField.Phone,
+    })
   })
 })
