@@ -147,6 +147,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   const [amount, setAmountState] = useState<MoneyAmount<WalletOrDisplayCurrency>>()
   const [paymentRequest, setPaymentRequest] = useState<string>()
   const [onchainAddress, setOnchainAddress] = useState<string>()
+  // The newest request settled without an address, so the screen stops waiting for one.
+  const [onchainAddressFailed, setOnchainAddressFailed] = useState(false)
   const [requestState, setRequestState] = useState<PaymentRequestStateType>(
     PaymentRequestState.Idle,
   )
@@ -462,6 +464,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       if (isSuperseded()) return true
 
       setOnchainAddress(result.address)
+      setOnchainAddressFailed(false)
       if (!canTrackReuse) return true
       await saveIssuedOnchainAddress(selfCustodialAccountId, {
         address: result.address,
@@ -486,9 +489,19 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     (forceNew = false): Promise<boolean> => {
       onchainRequestIdRef.current += 1
       const requestId = onchainRequestIdRef.current
-      const request = onchainQueueRef.current.then(() =>
-        requestOnchainAddress(requestId, forceNew),
-      )
+      const markFailed = () => {
+        if (requestId === onchainRequestIdRef.current) setOnchainAddressFailed(true)
+      }
+      const request = onchainQueueRef.current.then(async () => {
+        try {
+          const issued = await requestOnchainAddress(requestId, forceNew)
+          if (!issued) markFailed()
+          return issued
+        } catch (err) {
+          markFailed()
+          throw err
+        }
+      })
       // A failed request must not stall the ones queued behind it.
       onchainQueueRef.current = request.catch(() => undefined)
       return request
@@ -668,6 +681,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     feesInformation: undefined,
     info: invoiceData ? { data: invoiceData } : undefined,
     onchainAddress,
+    onchainAddressFailed,
     getOnchainFullUriFn,
     generateNewOnchainAddress,
     pr: {

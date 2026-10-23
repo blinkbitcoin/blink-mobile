@@ -783,6 +783,39 @@ describe("generateNewOnchainAddress", () => {
     expect(mockRecordAppError).toHaveBeenCalledWith(new Error("bridge exploded"))
   })
 
+  it("stops waiting after a failed first request and recovers on request", async () => {
+    // The screen reads "no address yet" as loading; without a settled-failure signal
+    // it would wait, with New disabled, for a request that is never coming.
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ errors: [{ message: "offline" }] })
+      .mockResolvedValueOnce({ address: "bc1qfresh..." })
+
+    const { result } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(result.current?.onchainAddressFailed).toBe(true)
+    })
+    expect(result.current?.onchainAddress).toBeUndefined()
+
+    let outcome: NewOnchainAddressResultType | undefined
+    await act(async () => {
+      outcome = await result.current?.generateNewOnchainAddress?.()
+    })
+
+    expect(outcome).toBe(NewOnchainAddressResult.Created)
+    expect(result.current?.onchainAddress).toBe("bc1qfresh...")
+    expect(result.current?.onchainAddressFailed).toBe(false)
+  })
+
+  it("flags a first request that rejects as settled too", async () => {
+    mockReceiveOnchain.mockRejectedValueOnce(new Error("bridge exploded"))
+
+    const { result } = renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(result.current?.onchainAddressFailed).toBe(true)
+    })
+  })
+
   describe("when a background request lands during the tap", () => {
     const walletWith = (transactions: unknown[]) => ({
       sdk: mockSdk,

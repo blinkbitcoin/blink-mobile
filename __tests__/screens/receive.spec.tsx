@@ -1540,6 +1540,36 @@ describe("ReceiveScreen new on-chain address", () => {
     expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
   })
 
+  it("offers only New after the current address failed to load, and recovers", async () => {
+    onChainAddressCurrentMock.mockImplementationOnce(() =>
+      Promise.reject(new Error("network")),
+    )
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await flushAsync()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
+    expect(Clipboard.setString).not.toHaveBeenCalled()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+    await waitFor(() => {
+      expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
+    })
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.ReceiveScreen.newAddressGenerated(),
+        type: "success",
+      }),
+    )
+  })
+
   it("tells the user to wait when the API rate-limits new addresses", async () => {
     onChainAddressCreateMock.mockImplementationOnce(() =>
       Promise.resolve({
