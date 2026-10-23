@@ -11,17 +11,24 @@ import {
   useUserPhoneRegistrationValidateMutation,
 } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logAddPhoneAttempt, logValidateAuthCodeFailure } from "@app/utils/analytics"
 import { reportError } from "@app/utils/error-logging"
 import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import { ContactChangeStep, TotpStepUpErrorCode } from "@app/types/two-factor-enforcement"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
 import { parseTimer } from "../../utils/timer"
+import {
+  mapGqlErrorsToValidatePhoneCodeErrors,
+  mapValidatePhoneCodeErrorsToMessage,
+  ValidatePhoneCodeErrors,
+  ValidatePhoneCodeErrorsType,
+} from "./phone-registration-validation-errors"
 import { PhoneCodeChannelToFriendlyName } from "./request-phone-code-login"
 
 gql`
@@ -57,99 +64,6 @@ const ValidatePhoneCodeStatus = {
 type ValidatePhoneCodeStatusType =
   (typeof ValidatePhoneCodeStatus)[keyof typeof ValidatePhoneCodeStatus]
 
-const ValidatePhoneCodeErrors = {
-  InvalidCode: "InvalidCode",
-  TooManyAttempts: "TooManyAttempts",
-  CannotUpgradeToExistingAccount: "CannotUpgradeToExistingAccount",
-  IpNotAllowed: "IpNotAllowed",
-  PhoneNotAllowed: "PhoneNotAllowed",
-  UnknownError: "UnknownError",
-} as const
-
-const mapGqlErrorsToValidatePhoneCodeErrors = (
-  errors: readonly {
-    code?: string | null | undefined
-    message: string
-  }[],
-):
-  | {
-      type: ValidatePhoneCodeErrorsType
-      msg?: string
-    }
-  | undefined => {
-  if (errors.some((error) => error.code === "PHONE_CODE_ERROR")) {
-    return {
-      type: ValidatePhoneCodeErrors.InvalidCode,
-    }
-  }
-
-  if (errors.some((error) => error.code === "TOO_MANY_REQUEST")) {
-    return {
-      type: ValidatePhoneCodeErrors.TooManyAttempts,
-    }
-  }
-
-  if (errors.some((error) => error.code === "PHONE_NOT_ALLOWED_TO_ONBOARD_ERROR")) {
-    return {
-      type: ValidatePhoneCodeErrors.PhoneNotAllowed,
-    }
-  }
-
-  if (errors.some((error) => error.code === "IP_NOT_ALLOWED_TO_ONBOARD_ERROR")) {
-    return {
-      type: ValidatePhoneCodeErrors.IpNotAllowed,
-    }
-  }
-
-  if (
-    errors.some(
-      (error) =>
-        error.code === "PHONE_ACCOUNT_ALREADY_EXISTS_ERROR" ||
-        error.code === "PHONE_ACCOUNT_ALREADY_EXISTS_NEED_TO_SWEEP_FUNDS_ERROR",
-    )
-  ) {
-    return {
-      type: ValidatePhoneCodeErrors.CannotUpgradeToExistingAccount,
-    }
-  }
-
-  if (errors.length > 0) {
-    return {
-      type: ValidatePhoneCodeErrors.UnknownError,
-      msg: errors[0].message,
-    }
-  }
-
-  return undefined
-}
-
-const mapValidatePhoneCodeErrorsToMessage = (
-  error: {
-    type: ValidatePhoneCodeErrorsType
-    msg?: string
-  },
-  LL: TranslationFunctions,
-): string => {
-  switch (error.type) {
-    case ValidatePhoneCodeErrors.InvalidCode:
-      return LL.PhoneLoginValidationScreen.errorLoggingIn()
-    case ValidatePhoneCodeErrors.TooManyAttempts:
-      return LL.PhoneLoginValidationScreen.errorTooManyAttempts()
-    case ValidatePhoneCodeErrors.CannotUpgradeToExistingAccount:
-      return LL.PhoneLoginValidationScreen.errorCannotUpgradeToExistingAccount()
-    case ValidatePhoneCodeErrors.IpNotAllowed:
-      return LL.PhoneLoginValidationScreen.errorIpNotAllowed()
-    case ValidatePhoneCodeErrors.PhoneNotAllowed:
-      return LL.PhoneLoginValidationScreen.errorPhoneNotAllowed()
-    case ValidatePhoneCodeErrors.UnknownError:
-    default:
-      return LL.errors.generic() + (error.msg ? `: ${error.msg}` : "")
-  }
-}
-
-export type ValidatePhoneCodeErrorsType =
-  (typeof ValidatePhoneCodeErrors)[keyof typeof ValidatePhoneCodeErrors]
-
 export const PhoneRegistrationValidateScreen: React.FC<
   PhoneRegistrationValidateScreenProps
 > = ({ route }) => {
@@ -174,6 +88,8 @@ export const PhoneRegistrationValidateScreen: React.FC<
   const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [phoneValidate] = useUserPhoneRegistrationValidateMutation()
+  /** With an authenticator, the server asks for its code with the SMS one. */
+  const { hasAuthenticator } = useLoginMethods()
 
   const [code, _setCode] = useState("")
   // Wait 2.5 minutes before allowing another code request
@@ -184,9 +100,28 @@ export const PhoneRegistrationValidateScreen: React.FC<
     theme: { colors },
   } = useTheme()
 
+  /** The SMS code goes on with the authenticator's, sent together on the next screen.
+   *  The field is cleared, as a code that comes back here was refused. */
+  const askForAuthenticatorCode = useCallback(
+    (smsCode: string) => {
+      _setCode("")
+      setStatus(ValidatePhoneCodeStatus.WaitingForCode)
+      navigation.navigate("contactChangeCode", {
+        step: ContactChangeStep.PhoneAdd,
+        phone,
+        smsCode,
+      })
+    },
+    [navigation, phone],
+  )
+
   const send = useCallback(
     async (code: string) => {
       if (status === ValidatePhoneCodeStatus.LoadingAuthResult) {
+        return
+      }
+      if (hasAuthenticator) {
+        askForAuthenticatorCode(code)
         return
       }
 
@@ -198,6 +133,13 @@ export const PhoneRegistrationValidateScreen: React.FC<
         })
 
         const errors = data?.userPhoneRegistrationValidate?.errors || []
+        /** An authenticator added on another device since the account was last read:
+         *  the SMS code is not spent by this refusal. */
+        const isCodeRequired = errors[0]?.code === TotpStepUpErrorCode.CodeRequired
+        if (isCodeRequired) {
+          askForAuthenticatorCode(code)
+          return
+        }
 
         const error = mapGqlErrorsToValidatePhoneCodeErrors(errors)
 
@@ -230,7 +172,17 @@ export const PhoneRegistrationValidateScreen: React.FC<
         setStatus(ValidatePhoneCodeStatus.ReadyToRegenerate)
       }
     },
-    [status, phoneValidate, phone, _setCode, navigation, LL, updateCurrentProfile],
+    [
+      status,
+      hasAuthenticator,
+      askForAuthenticatorCode,
+      phoneValidate,
+      phone,
+      _setCode,
+      navigation,
+      LL,
+      updateCurrentProfile,
+    ],
   )
 
   const setCode = (code: string) => {

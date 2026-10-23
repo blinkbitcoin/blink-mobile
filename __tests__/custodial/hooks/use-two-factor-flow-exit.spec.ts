@@ -2,6 +2,7 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { useTwoFactorFlowExit } from "@app/custodial/hooks/use-two-factor-flow-exit"
 import {
+  ContactField,
   TwoFactorFlowParams,
   TwoFactorPrompt,
   TwoFactorPromptOrigin,
@@ -76,6 +77,16 @@ describe("useTwoFactorFlowExit", () => {
     const { result, rerender } = renderExit({ origin: MODAL_ORIGIN })
 
     rerender({ flowParams: { origin: MODAL_ORIGIN, hasFailedStart: true } })
+    act(() => result.current.leave())
+
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  /** No prompt opened it: the user asked to change a login method. */
+  it("only goes back, charging nothing, when opened to change a login method", () => {
+    const { result } = renderExit({ contactChange: ContactField.Email })
+
     act(() => result.current.leave())
 
     expect(mockRegisterDismissal).not.toHaveBeenCalled()

@@ -8247,10 +8247,6 @@ type RootTranslation = {
 		 */
 		dangerZone: string
 		/**
-		 * P​h​o​n​e​ ​d​e​l​e​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
-		 */
-		phoneDeletedSuccessfully: string
-		/**
 		 * P​h​o​n​e​ ​N​u​m​b​e​r
 		 */
 		phoneNumber: string
@@ -8349,29 +8345,9 @@ type RootTranslation = {
 		 */
 		email: string
 		/**
-		 * E​m​a​i​l​ ​d​e​l​e​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
-		 */
-		emailDeletedSuccessfully: string
-		/**
 		 * U​n​v​e​r​i​f​i​e​d​ ​e​m​a​i​l​s​ ​c​a​n​'​t​ ​b​e​ ​u​s​e​d​ ​t​o​ ​l​o​g​i​n​.​ ​Y​o​u​ ​s​h​o​u​l​d​ ​r​e​-​v​e​r​i​f​y​ ​y​o​u​r​ ​e​m​a​i​l​ ​a​d​d​r​e​s​s​.
 		 */
 		unverifiedEmailAdvice: string
-		/**
-		 * D​e​l​e​t​e​ ​e​m​a​i​l
-		 */
-		deleteEmailPromptTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​e​m​a​i​l​ ​a​d​d​r​e​s​s​?​ ​y​o​u​ ​w​i​l​l​ ​o​n​l​y​ ​b​e​ ​a​b​l​e​ ​t​o​ ​l​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​.
-		 */
-		deleteEmailPromptContent: string
-		/**
-		 * D​e​l​e​t​e​ ​p​h​o​n​e
-		 */
-		deletePhonePromptTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​?​ ​y​o​u​ ​w​i​l​l​ ​o​n​l​y​ ​b​e​ ​a​b​l​e​ ​t​o​ ​l​o​g​ ​i​n​ ​b​a​c​k​ ​w​i​t​h​ ​y​o​u​r​ ​e​m​a​i​l​.
-		 */
-		deletePhonePromptContent: string
 		/**
 		 * A​d​d​ ​a​n​ ​e​m​a​i​l​ ​f​i​r​s​t
 		 */
@@ -13742,6 +13718,64 @@ type RootTranslation = {
 		 * F​o​r​ ​y​o​u​r​ ​p​r​o​t​e​c​t​i​o​n​,​ ​w​e​ ​d​o​n​'​t​ ​a​l​l​o​w​ ​r​e​m​o​v​a​l​ ​o​f​ ​2​F​A​ ​i​n​s​i​d​e​ ​t​h​e​ ​a​p​p​.​ ​I​f​ ​y​o​u​ ​n​e​e​d​ ​a​ ​2​F​A​ ​r​e​s​e​t​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​<​s​u​p​p​o​r​t​>​S​u​p​p​o​r​t​<​/​s​u​p​p​o​r​t​>​.
 		 */
 		manualResetBody: string
+	}
+	ContactChange: {
+		/**
+		 * C​h​a​n​g​e​ ​e​m​a​i​l
+		 */
+		changeEmailTitle: string
+		/**
+		 * C​h​a​n​g​e​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		changePhoneTitle: string
+		/**
+		 * A​d​d​ ​e​m​a​i​l
+		 */
+		addEmailTitle: string
+		/**
+		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		addPhoneTitle: string
+		/**
+		 * T​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​e​m​a​i​l​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		changeEmailCode: string
+		/**
+		 * T​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		changePhoneCode: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​e​m​a​i​l​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addEmailCode: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addPhoneCode: string
+		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​e​m​a​i​l
+		 */
+		needsAuthenticatorEmailTitle: string
+		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​h​a​n​g​e​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		needsAuthenticatorPhoneTitle: string
+		/**
+		 * T​o​ ​k​e​e​p​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​s​a​f​e​,​ ​c​h​a​n​g​i​n​g​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​ ​n​e​e​d​s​ ​a​ ​c​o​d​e​ ​f​r​o​m​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		needsAuthenticatorBody: string
+		/**
+		 * I​t​ ​t​a​k​e​s​ ​a​b​o​u​t​ ​2​ ​m​i​n​u​t​e​s​.​ ​W​h​e​n​ ​i​t​'​s​ ​s​e​t​,​ ​y​o​u​'​l​l​ ​c​o​m​e​ ​b​a​c​k​ ​h​e​r​e​ ​t​o​ ​m​a​k​e​ ​t​h​e​ ​c​h​a​n​g​e​.
+		 */
+		needsAuthenticatorTime: string
+		/**
+		 * T​h​a​t​ ​c​o​d​e​ ​i​s​ ​i​n​c​o​r​r​e​c​t​.​ ​E​n​t​e​r​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		codeInvalid: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​n​ ​h​o​u​r​.
+		 */
+		tooManyAttempts: string
 	}
 	BackupRequired: {
 		/**
@@ -22290,10 +22324,6 @@ export type TranslationFunctions = {
 		 */
 		dangerZone: () => LocalizedString
 		/**
-		 * Phone deleted successfully
-		 */
-		phoneDeletedSuccessfully: () => LocalizedString
-		/**
 		 * Phone Number
 		 */
 		phoneNumber: () => LocalizedString
@@ -22385,29 +22415,9 @@ export type TranslationFunctions = {
 		 */
 		email: () => LocalizedString
 		/**
-		 * Email deleted successfully
-		 */
-		emailDeletedSuccessfully: () => LocalizedString
-		/**
 		 * Unverified emails can't be used to login. You should re-verify your email address.
 		 */
 		unverifiedEmailAdvice: () => LocalizedString
-		/**
-		 * Delete email
-		 */
-		deleteEmailPromptTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your email address? you will only be able to log back in with your phone number.
-		 */
-		deleteEmailPromptContent: () => LocalizedString
-		/**
-		 * Delete phone
-		 */
-		deletePhonePromptTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your phone number? you will only be able to log in back with your email.
-		 */
-		deletePhonePromptContent: () => LocalizedString
 		/**
 		 * Add an email first
 		 */
@@ -27679,6 +27689,64 @@ export type TranslationFunctions = {
 		 * For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.
 		 */
 		manualResetBody: () => LocalizedString
+	}
+	ContactChange: {
+		/**
+		 * Change email
+		 */
+		changeEmailTitle: () => LocalizedString
+		/**
+		 * Change phone number
+		 */
+		changePhoneTitle: () => LocalizedString
+		/**
+		 * Add email
+		 */
+		addEmailTitle: () => LocalizedString
+		/**
+		 * Add phone number
+		 */
+		addPhoneTitle: () => LocalizedString
+		/**
+		 * To change your email, enter the 6-digit code from your authenticator app.
+		 */
+		changeEmailCode: () => LocalizedString
+		/**
+		 * To change your phone number, enter the 6-digit code from your authenticator app.
+		 */
+		changePhoneCode: () => LocalizedString
+		/**
+		 * To add your email, enter the 6-digit code from your authenticator app.
+		 */
+		addEmailCode: () => LocalizedString
+		/**
+		 * To add your phone number, enter the 6-digit code from your authenticator app.
+		 */
+		addPhoneCode: () => LocalizedString
+		/**
+		 * Add an authenticator to change your email
+		 */
+		needsAuthenticatorEmailTitle: () => LocalizedString
+		/**
+		 * Add an authenticator to change your phone number
+		 */
+		needsAuthenticatorPhoneTitle: () => LocalizedString
+		/**
+		 * To keep your account safe, changing your email or phone number needs a code from an authenticator app.
+		 */
+		needsAuthenticatorBody: () => LocalizedString
+		/**
+		 * It takes about 2 minutes. When it's set, you'll come back here to make the change.
+		 */
+		needsAuthenticatorTime: () => LocalizedString
+		/**
+		 * That code is incorrect. Enter the current code from your authenticator app.
+		 */
+		codeInvalid: () => LocalizedString
+		/**
+		 * Too many attempts. Try again in an hour.
+		 */
+		tooManyAttempts: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

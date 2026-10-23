@@ -27,14 +27,18 @@ const ONBOARDING_ROUTE = "totpRegistrationIntro" satisfies keyof RootStackParamL
 
 type StackRoute = { name: string; params?: object }
 
-/** The prompt the onboarding was opened with, when the registration began there. */
-const onboardingPromptOf = (
+/** What the onboarding was opened with, when the registration began there. */
+const onboardingParamsOf = (
   route: StackRoute | undefined,
-): TwoFactorPrompt | undefined => {
+): TwoFactorFlowParams | undefined => {
   if (route?.name !== ONBOARDING_ROUTE) return undefined
   const params: TwoFactorFlowParams | undefined = route.params
-  return params?.origin?.prompt
+  return params
 }
+
+/** The prompt the onboarding was opened with, when the registration began there. */
+const onboardingPromptOf = (route: StackRoute | undefined): TwoFactorPrompt | undefined =>
+  onboardingParamsOf(route)?.origin?.prompt
 
 /**
  * The authenticator registration's way through, wherever it was started from: a prompt,
@@ -66,9 +70,12 @@ export const useTotpRegistrationFlow = (): TotpRegistrationFlow => {
       navigation.dispatch((state) => {
         const screenIndex = state.routes.findIndex((route) => route.key === screenKey)
         const start = totpRegistrationStart(state.routes, screenIndex)
+        /** A login method change the onboarding was opened for goes on with the
+         *  registration, as the onboarding itself is taken off the stack here. */
+        const contactChange = onboardingParamsOf(state.routes[start])?.contactChange
         const routes = [
           ...state.routes.slice(0, start),
-          { name: "totpRegistrationBackup", params },
+          { name: "totpRegistrationBackup", params: { ...params, contactChange } },
           ...state.routes.slice(screenIndex + 1),
         ]
         return CommonActions.reset({ ...state, routes, index: routes.length - 1 })

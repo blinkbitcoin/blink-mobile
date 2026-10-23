@@ -59,6 +59,13 @@ const noRetryOperations = [
   // Each code check spends one of the hourly attempts the server allows, and a removal
   // that landed leaves nothing for a resend to remove.
   "userTotpDelete",
+
+  // The login method changes the authenticator guards: each spends one of those
+  // attempts, the phone's also its SMS code, and one that landed refuses a resend.
+  "userEmailDelete",
+  "userEmailRegistrationInitiate",
+  "userPhoneDelete",
+  "userPhoneRegistrationValidate",
 ]
 
 const IDEMPOTENCY_KEY_HEADER = "x-idempotency-key"
