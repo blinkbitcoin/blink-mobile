@@ -27,7 +27,7 @@ import { TwoFactorSessionPrompt } from "@app/types/two-factor-enforcement"
 import { DEEP_LINK_SCREENS } from "./deep-link-screens"
 import { isMigrationRoute } from "./migration-routes"
 import { RootStackParamList } from "./stack-param-lists"
-import { isTotpRegistrationRoute } from "./two-factor-remedy-routes"
+import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
 import { isUnlockInProgress } from "./unlock-routes"
 
 const navigationRef = createNavigationContainerRef<RootStackParamList>()
@@ -54,14 +54,6 @@ const BLOCKER_ROUTE = "Primary" satisfies keyof RootStackParamList
 
 /** Where a still-locked session has to pass through first. */
 const UNLOCK_ENTRY_ROUTE = "authenticationCheck" satisfies keyof RootStackParamList
-
-/** The screens of the authenticator registration where its setup key is at stake: the
- *  code, whose answer brings up the backup only while the code screen is there, and the
- *  backup, the key's one chance to be kept. A link must not close either. */
-const KEY_AT_STAKE_ROUTES: ReadonlyArray<string> = [
-  "totpRegistrationValidate",
-  "totpRegistrationBackup",
-] satisfies ReadonlyArray<keyof RootStackParamList>
 
 /** The armed-gate reset is lock-aware: while the app is still locked it must land on
  *  authenticationCheck so the PIN/biometric unlock is never skipped. Jumping straight to
@@ -262,44 +254,27 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
     resetToBlocker("gate-armed")
   }, [isBlockerVisible, resetToBlocker])
 
-  /** The authenticator registration outlives the prompt that opened it: the accepted
-   *  code ends the prompt, and a link opened then could close the key's backup, the one
-   *  chance to keep the key. A link the prompt held waits for the registration to be
-   *  left as well; one that waited only for the unlock or the sign-in does not. Read
-   *  from the whole stack, not the focused route, so the unlock that covers the
-   *  registration on a return does not let it through. */
-  const [isTotpRegistrationOpen, setIsTotpRegistrationOpen] = React.useState(false)
-  /** While the code or the key's backup is the registration's top screen, any link,
-   *  fresh or queued, the migration's too, waits for it to be left: one that lands on a
-   *  screen below, the home among them, would close it before the key is kept. A link
-   *  that arrives while the user is still on the code screen opens once the
-   *  registration moves on or is left. The state reopens a queued link then; the linking
-   *  listener closes over stale values, so it reads the ref. */
+  /** While the authenticator's setup key is at stake, any link, fresh or queued, the
+   *  migration's too, waits: one that lands on a screen below, the home among them,
+   *  would close the code check or the backup before the key is kept. Read from the
+   *  whole stack, not the focused route, so the unlock that covers the registration on a
+   *  return does not let one through. The state reopens a queued link once the key is
+   *  kept or the registration left; the linking listener closes over stale values, so it
+   *  reads the ref. */
   const [isKeyAtStake, setIsKeyAtStake] = React.useState(false)
   const isKeyAtStakeRef = useRef(false)
-  const promptHeldUrlRef = useRef<string | null>(null)
-  useEffect(() => {
-    if (isTwoFactorHoldingLinks && urlAfterUnlockAndAuth) {
-      promptHeldUrlRef.current = urlAfterUnlockAndAuth
-    }
-  }, [isTwoFactorHoldingLinks, urlAfterUnlockAndAuth])
-  const isPromptHeldLink =
-    urlAfterUnlockAndAuth !== null && promptHeldUrlRef.current === urlAfterUnlockAndAuth
-  const isHeldForRegistration = isTotpRegistrationOpen && isPromptHeldLink
-  const isQueuedLinkWaiting = isTwoFactorHoldingLinks || isHeldForRegistration
 
   /** A link that waited for the unlock, the sign-in or the two-factor prompts opens
    *  once all of them are out of the way; the migration link, which the prompts let
    *  through live, goes through here as well. */
   const isQueuedLinkHeldByPrompts =
-    isQueuedLinkWaiting &&
+    isTwoFactorHoldingLinks &&
     urlAfterUnlockAndAuth !== null &&
     !isMigrationDeeplink(urlAfterUnlockAndAuth)
   const isQueuedLinkHeld = isQueuedLinkHeldByPrompts || isKeyAtStake
   const canOpenQueuedUrl = canHandlePayments && !isAppLocked && !isQueuedLinkHeld
   useEffect(() => {
     if (canOpenQueuedUrl && urlAfterUnlockAndAuth) {
-      promptHeldUrlRef.current = null
       Linking.openURL(urlAfterUnlockAndAuth)
       setUrlAfterUnlockAndAuth(null)
     }
@@ -413,20 +388,9 @@ export const NavigationContainerWrapper: React.FC<React.PropsWithChildren> = ({
         }}
         onStateChange={(state) => {
           const currentRouteName = getActiveRouteName(state)
-          const rootRoutes = state?.routes ?? []
-          setIsTotpRegistrationOpen(
-            rootRoutes.some((route) => isTotpRegistrationRoute(route.name)),
-          )
-          /** The registration's own top screen, whatever covers it: the backup stays under
-           *  the screen that follows it, where the key is already kept. */
-          const registrationTop = [...rootRoutes]
-            .reverse()
-            .find((route) => isTotpRegistrationRoute(route.name))
-          const isKeyScreenOnTop = KEY_AT_STAKE_ROUTES.some(
-            (name) => name === registrationTop?.name,
-          )
-          isKeyAtStakeRef.current = isKeyScreenOnTop
-          setIsKeyAtStake(isKeyScreenOnTop)
+          const isKeyAtStakeNow = isSetupKeyAtStake(state?.routes ?? [])
+          isKeyAtStakeRef.current = isKeyAtStakeNow
+          setIsKeyAtStake(isKeyAtStakeNow)
 
           if (routeName.current !== currentRouteName && currentRouteName) {
             /* eslint-disable camelcase */

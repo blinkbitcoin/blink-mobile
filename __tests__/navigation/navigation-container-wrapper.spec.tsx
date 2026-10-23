@@ -1052,7 +1052,7 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
   /** The accepted code ends the prompt while the key's backup is still up; a link let
    *  through then could close it before the key is kept. */
-  it("keeps holding a link the prompt held until the authenticator registration is left", async () => {
+  it("keeps holding a link the prompt held while the key's backup is open, after the prompt ends", async () => {
     mockTwoFactorStartPending = true
     const rendered = await renderUnlocked()
     rerenderWrapper(rendered, <UnlockProbe />)
@@ -1103,7 +1103,34 @@ describe("NavigationContainerWrapper two-factor gate", () => {
 
   /** The code's answer brings up the backup only while the code screen is there: a
    *  link that popped it to the home first would leave the key with no backup. */
-  it("holds a link that arrives on the code screen, and opens it once the registration is left", async () => {
+  it("holds a link that arrives while a code is checked, and opens it once the check is answered", async () => {
+    await renderUnlocked()
+    navigateTo({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        { name: "totpRegistrationValidate", params: { isChecking: true } },
+      ],
+    })
+    const { listener, receive } = subscribeToLinks()
+
+    receive(PAYMENT_DEEPLINK)
+    expect(listener).not.toHaveBeenCalled()
+    expect(Linking.openURL).not.toHaveBeenCalled()
+
+    navigateTo({
+      index: 1,
+      routes: [
+        { name: "Primary" },
+        { name: "totpRegistrationValidate", params: { isChecking: false } },
+      ],
+    })
+
+    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+  })
+
+  /** Before a code is sent no authenticator is on, and a link costs only the progress. */
+  it("opens a link that arrives on the code screen before a code is sent", async () => {
     await renderUnlocked()
     navigateTo({
       index: 1,
@@ -1112,12 +1139,8 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     const { listener, receive } = subscribeToLinks()
 
     receive(PAYMENT_DEEPLINK)
-    expect(listener).not.toHaveBeenCalled()
-    expect(Linking.openURL).not.toHaveBeenCalled()
 
-    navigateTo(STACK_AT_BLOCKER)
-
-    await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(PAYMENT_DEEPLINK))
+    expect(listener).toHaveBeenCalledWith(PAYMENT_DEEPLINK)
   })
 
   /** The migration link passes the prompts, but not the key's backup: it waits like any
@@ -1141,16 +1164,12 @@ describe("NavigationContainerWrapper two-factor gate", () => {
     expect(Linking.openURL).toHaveBeenCalledTimes(1)
   })
 
-  /** The backup stays under the screen that follows it, where the key is already kept. */
+  /** The done screen takes the backup's place once the key is kept. */
   it("opens a link on the screen that follows the key's backup", async () => {
     await renderUnlocked()
     navigateTo({
-      index: 2,
-      routes: [
-        { name: "Primary" },
-        { name: "totpRegistrationBackup" },
-        { name: "totpRegistrationDone" },
-      ],
+      index: 1,
+      routes: [{ name: "Primary" }, { name: "totpRegistrationDone" }],
     })
     const { listener, receive } = subscribeToLinks()
 
