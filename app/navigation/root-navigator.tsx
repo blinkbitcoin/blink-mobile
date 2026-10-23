@@ -159,6 +159,7 @@ import {
   RestorePhraseScreen,
   CloudRestoreScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
+import { RecoveryBackupScreen } from "@app/screens/self-custodial/recovery-backup"
 import {
   MigrationBalancesOverviewScreen,
   MigrationContactSupportScreen,
@@ -979,6 +980,11 @@ export const RootStack = () => {
         name="selfCustodialWalletCreation"
         component={WalletCreationScreen}
         options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialRecoveryBackup"
+        component={RecoveryBackupScreen}
+        options={{ title: LL.RecoveryBundleScreen.settingsTitle() }}
       />
       <RootNavigator.Screen
         name="stableBalanceSettings"
