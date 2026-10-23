@@ -110,15 +110,18 @@ export const useResumeCompletedMigration = (): void => {
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
    *  least reported: a receive that never lands would otherwise be invisible, the user
    *  sitting on a normal home with nothing pending anywhere. */
-  const hasReportedDelayRef = useRef(false)
+  /** Once per wallet rather than once per mount: this hook outlives an account switch, and
+   *  a second migration's late receive is a story of its own. */
+  const reportedDelayForRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!isReceiveDelayed || hasReportedDelayRef.current) return
-    hasReportedDelayRef.current = true
+    if (!isReceiveDelayed || !migrationAccountId) return
+    if (reportedDelayForRef.current === migrationAccountId) return
+    reportedDelayForRef.current = migrationAccountId
     reportError(
       "Migration resume receive delayed",
       new Error("Receive has not landed within the notice window"),
     )
-  }, [isReceiveDelayed])
+  }, [isReceiveDelayed, migrationAccountId])
 
   /** The migration entry and step screens cannot see this hook, so the overdue receive is
    *  published for them: past the notice window a tap there offers support instead of

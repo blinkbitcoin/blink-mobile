@@ -86,8 +86,20 @@ export const useMigrationReceiveConfirmation = ({
     migrationReceiveDelayedNoticeMs,
     migrationDelayedRedirectEnabled,
   } = useRemoteConfig()
-  const [isReceiveConfirmed, setIsReceiveConfirmed] = useState(false)
-  const [isReceiveDelayed, setIsReceiveDelayed] = useState(false)
+  /**
+   * Each answer is kept with the wallet it is about. The gate outlives the wallet it
+   * watches (the background resume is mounted under the tab navigator, which an account
+   * switch keeps), so a bare "confirmed" from one migration would stand as proof for the
+   * next: the gate would never look at the second wallet, and the completion would close
+   * its custodial account on a receive nobody saw land. A delay kept bare would do the
+   * same through the timeout release.
+   */
+  const [confirmedAccountId, setConfirmedAccountId] = useState<string | null>(null)
+  const [delayedAccountId, setDelayedAccountId] = useState<string | null>(null)
+  const isReceiveConfirmed =
+    selfCustodialAccountId !== null && confirmedAccountId === selfCustodialAccountId
+  const isReceiveDelayed =
+    selfCustodialAccountId !== null && delayedAccountId === selfCustodialAccountId
 
   /** A zero-receive migration (balance at or under an uncovered fee) gets no payment, so
    *  the gate opens without ever touching the SDK; waiting would strand the user forever. */
@@ -195,7 +207,7 @@ export const useMigrationReceiveConfirmation = ({
       }
 
       if (result.status === MigrationSdkStatus.Ok && result.value.hasReceived) {
-        setIsReceiveConfirmed(true)
+        setConfirmedAccountId(accountId)
         return
       }
 
@@ -240,8 +252,10 @@ export const useMigrationReceiveConfirmation = ({
     if (watchedAccountIdRef.current !== selfCustodialAccountId) {
       watchedAccountIdRef.current = selfCustodialAccountId
       watchStartedAtRef.current = Date.now()
+      /** The answers already belong to their wallet; these two mirrors do not, so they
+       *  start over with it: the cadence, and the one failure report per receive. */
       isReceiveDelayedRef.current = false
-      setIsReceiveDelayed(false)
+      hasReportedFailureRef.current = false
     }
 
     const elapsed = Date.now() - watchStartedAtRef.current
@@ -249,9 +263,10 @@ export const useMigrationReceiveConfirmation = ({
       ? 0
       : Math.max(migrationReceiveDelayedNoticeMs - elapsed, 0)
 
+    const delayedWalletId = selfCustodialAccountId
     const timer = setTimeout(() => {
       isReceiveDelayedRef.current = true
-      setIsReceiveDelayed(true)
+      setDelayedAccountId(delayedWalletId)
     }, remaining)
     return () => clearTimeout(timer)
   }, [

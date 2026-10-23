@@ -752,3 +752,85 @@ describe("useMigrationReceiveConfirmation", () => {
     })
   })
 })
+
+/**
+ * The background resume keeps one gate for the whole session, and an account switch
+ * does not remount it: one migration's proof must not stand for the next. A second
+ * wallet starts unconfirmed, is looked at, and is proven only by its own look.
+ */
+describe("useMigrationReceiveConfirmation pointed at another wallet after one was settled", () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.clearAllMocks()
+    mockRemoteConfig = { ...defaultRemoteConfig }
+    mockCheckReceiveLanded.mockResolvedValue(ok(stillEmpty))
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  const checkedWallets = () =>
+    mockCheckReceiveLanded.mock.calls.map(
+      ([args]) => (args as { accountId: string }).accountId,
+    )
+
+  it("proves nothing for the second wallet on the first one's look", async () => {
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+    const { result, rerender } = renderGate({ selfCustodialAccountId: "sc-A" })
+    await flushCheck()
+    expect(result.current.isReceiveProven).toBe(true)
+
+    mockCheckReceiveLanded.mockResolvedValue(ok(stillEmpty))
+    rerender({ selfCustodialAccountId: null, skip: true })
+    await flushCheck()
+    rerender({ selfCustodialAccountId: "sc-B" })
+    await flushCheck()
+
+    expect(result.current.isReceiveConfirmed).toBe(false)
+    expect(result.current.isReceiveProven).toBe(false)
+    expect(checkedWallets()).toEqual(["sc-A", "sc-B"])
+
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+    await advance(RECEIVE_CHECK_RETRY_MS)
+
+    expect(result.current.isReceiveProven).toBe(true)
+  })
+
+  /** One report per receive, not per session: the second wallet's failing check is
+   *  its own story, and swallowing it as the first one's would hide it. */
+  it("reports the second wallet's failing check too", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({
+      status: MigrationSdkStatus.Failed,
+      error: new Error("sdk down"),
+    })
+    const { rerender } = renderGate({ selfCustodialAccountId: "sc-A" })
+    await flushCheck()
+    rerender({ selfCustodialAccountId: "sc-B" })
+    await flushCheck()
+
+    expect(checkedWallets()).toEqual(["sc-A", "sc-B"])
+    expect(mockReportError).toHaveBeenCalledTimes(2)
+  })
+
+  /** With the delayed-redirect flag on, an elapsed window releases the gate; the first
+   *  wallet's window must not release the second before it has waited one of its own. */
+  it("does not release the second wallet on the first one's window", async () => {
+    mockRemoteConfig = { ...defaultRemoteConfig, migrationDelayedRedirectEnabled: true }
+    const { result, rerender } = renderGate({ selfCustodialAccountId: "sc-A" })
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveConfirmed).toBe(true)
+    expect(result.current.isReceiveProven).toBe(false)
+
+    rerender({ selfCustodialAccountId: "sc-B" })
+    await flushCheck()
+
+    expect(result.current.isReceiveConfirmed).toBe(false)
+    expect(checkedWallets()).toContain("sc-B")
+
+    await advance(DELAYED_NOTICE_MS)
+
+    expect(result.current.isReceiveConfirmed).toBe(true)
+  })
+})

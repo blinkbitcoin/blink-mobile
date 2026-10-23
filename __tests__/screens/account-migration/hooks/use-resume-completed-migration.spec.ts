@@ -292,6 +292,23 @@ describe("useResumeCompletedMigration", () => {
     expect(mockReportError).toHaveBeenCalledTimes(1)
   })
 
+  /** The hook outlives an account switch, so a second migration's late receive in the same
+   *  session is reported as its own. */
+  it("reports another wallet's delayed receive as well", async () => {
+    mockReceiveConfirmation = { isReceiveConfirmed: false, isReceiveDelayed: true }
+    const { rerender } = renderHook(() => useResumeCompletedMigration())
+    await flushEffects()
+
+    mockMigrationAccountId = "sc-account-2"
+    rerender({})
+    await flushEffects()
+
+    const delayReports = mockReportError.mock.calls.filter(
+      ([operation]) => operation === "Migration resume receive delayed",
+    )
+    expect(delayReports).toHaveLength(2)
+  })
+
   /** A relaunch mid-wait picks the wait up where the last session left it, rather than
    *  spending another full window on "on its way". */
   describe("a receive an earlier session already saw run late", () => {
