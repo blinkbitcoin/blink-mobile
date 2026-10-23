@@ -1,4 +1,5 @@
 import React from "react"
+import { StyleSheet } from "react-native"
 import { Region } from "react-native-maps"
 import { generateSecureRandom } from "react-native-securerandom"
 import { v4 as uuidv4 } from "uuid"
@@ -9,6 +10,7 @@ import MapComponent from "@app/components/map-component"
 import MapStyles from "@app/components/map-component/map-styles.json"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { getUserRegion } from "@app/screens/map-screen/functions"
+import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
 
 import { ContextForScreen } from "../../screens/helper"
 
@@ -21,6 +23,19 @@ jest.mock("@app/btcmap/use-place-names", () => ({ useBtcMapPlaceNames: jest.fn()
 jest.mock("@app/screens/map-screen/functions", () => ({
   LOCATION_PERMISSION: "LOCATION",
   getUserRegion: jest.fn(),
+}))
+
+let mockTopInset = 0
+let mockBottomInset = 0
+let mockLeftInset = 0
+jest.mock("react-native-safe-area-context", () => ({
+  ...jest.requireActual("react-native-safe-area-context"),
+  useSafeAreaInsets: () => ({
+    top: mockTopInset,
+    bottom: mockBottomInset,
+    left: mockLeftInset,
+    right: 0,
+  }),
 }))
 
 jest.mock("react-native-permissions", () => ({
@@ -246,6 +261,31 @@ const renderMap = (props: Partial<React.ComponentProps<typeof MapComponent>> = {
     </ContextForScreen>,
   )
 
+const Tab = createBottomTabNavigator()
+
+/** The map as the app mounts it: a tab whose bar is sized the way root-navigator.tsx sizes it. */
+const renderMapInTabs = () =>
+  render(
+    <ContextForScreen>
+      <Tab.Navigator
+        screenOptions={{
+          headerShown: false,
+          tabBarStyle: { height: 60 + mockBottomInset, paddingBottom: mockBottomInset },
+        }}
+      >
+        <Tab.Screen name="Map">
+          {() => (
+            <MapComponent
+              userLocation={REGION}
+              setPermissionsStatus={jest.fn()}
+              alertOnLocationError={jest.fn()}
+            />
+          )}
+        </Tab.Screen>
+      </Tab.Navigator>
+    </ContextForScreen>,
+  )
+
 beforeEach(() => {
   jest.clearAllMocks()
   loadLocale("en")
@@ -260,6 +300,9 @@ beforeEach(() => {
   mockIsSelfCustodialAccount = false
   mockIsAtLeastLevelTwo = true
   mockBtcMapPlacesEnabled = true
+  mockTopInset = 0
+  mockBottomInset = 0
+  mockLeftInset = 0
   setDevBuild(false)
   mockSubmitPlace.mockResolvedValue({ submitted: true })
   setPlaces()
@@ -330,6 +373,85 @@ describe("MapComponent", () => {
     const { queryByText } = renderMap()
 
     await waitFor(() => expect(queryByText(/OpenStreetMap/)).toBeNull())
+  })
+
+  it("keeps the search bar, the locate and add-place buttons 20 in from the map's edges", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(StyleSheet.flatten(getByTestId("map-search-bar").props.style)).toMatchObject({
+      top: 20,
+      left: 20,
+      right: 20,
+    })
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 20, right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 20,
+      left: 20,
+    })
+  })
+
+  it("keeps the 20 past the top system bar, and adds no side inset Screen already took", async () => {
+    mockTopInset = 47
+    mockLeftInset = 44
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(StyleSheet.flatten(getByTestId("map-search-bar").props.style)).toMatchObject({
+      top: 67,
+      left: 20,
+      right: 20,
+    })
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ right: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      left: 20,
+    })
+  })
+
+  it("keeps the bottom controls 20 above the tab bar, which already took the system bar", async () => {
+    // Rendered in a real tab navigator, so the offset comes from the bar it
+    // actually sits on rather than from what the test assumes about it.
+    mockBottomInset = 34
+    const { getByTestId } = renderMapInTabs()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 20 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 20,
+    })
+  })
+
+  it("keeps the bottom controls 20 past the system bar where no tab bar is under the map", async () => {
+    mockBottomInset = 34
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button-anchor")).toBeTruthy())
+    expect(
+      StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+    ).toMatchObject({ bottom: 54 })
+    expect(StyleSheet.flatten(getByTestId("open-add-place").props.style)).toMatchObject({
+      bottom: 54,
+    })
+  })
+
+  it("does not lift the locate button past 20 while the add-place form owns the bottom", async () => {
+    mockBottomInset = 34
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("open-add-place")).toBeTruthy())
+    fireEvent.press(getByTestId("open-add-place"))
+
+    await waitFor(() =>
+      expect(
+        StyleSheet.flatten(getByTestId("location-button-anchor").props.style),
+      ).toMatchObject({ bottom: 20 }),
+    )
   })
 
   it("draws a pin for each place the clusterer resolves", async () => {

@@ -1,5 +1,5 @@
 import React from "react"
-import { Linking, Share, StyleSheet } from "react-native"
+import { Linking, Platform, Share, StyleSheet } from "react-native"
 import type { ReactTestInstance } from "react-test-renderer"
 import { getAnimatedStyle } from "react-native-reanimated"
 import { act, render, fireEvent, waitFor, within } from "@testing-library/react-native"
@@ -19,6 +19,11 @@ jest.mock("@app/btcmap/use-place-details", () => ({
 }))
 
 jest.mock("@app/utils/external", () => ({ openExternalUrl: jest.fn() }))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (args: unknown) => mockToastShow(args),
+}))
 
 // Read lazily so a test can raise the home-indicator inset before rendering.
 let mockBottomInset = 0
@@ -395,19 +400,116 @@ describe("PlaceSheet fallbacks", () => {
     expect(mockedOpenExternal).toHaveBeenCalledWith("https://x.com/satoshicoffee")
   })
 
-  it("navigates by coordinate when the place has no name to label the pin with", async () => {
-    // An empty label turns the maps: URL into a text search that finds nothing.
-    setDetails(details({ name: undefined }))
-    const { getByText } = renderSheet()
+  describe("Navigate", () => {
+    const GOOGLE_IOS = "comgooglemaps://?daddr=51.5072,-0.1276"
+    const APPLE_MAPS = "maps://?daddr=51.5072,-0.1276"
+    const GOOGLE_PROBE_ANDROID = "google.navigation:q=51.5072,-0.1276"
+    const GOOGLE_ANDROID =
+      "https://www.google.com/maps/dir/?api=1&destination=51.5072,-0.1276"
+    const GEO = "geo:51.5072,-0.1276?q=51.5072,-0.1276(Satoshi%20Coffee)"
+    const originalOS = Platform.OS
+    let canOpen: jest.SpyInstance
 
-    await waitFor(() => expect(getByText("Navigate")).toBeTruthy())
-    fireEvent.press(getByText("Navigate"))
+    beforeEach(() => {
+      canOpen = jest.spyOn(Linking, "canOpenURL")
+    })
 
-    // geo:/maps: must reach the OS — the in-app browser cannot open them.
-    const url = (Linking.openURL as jest.Mock).mock.calls[0][0] as string
-    expect(url).toContain("51.5072")
-    expect(url).not.toContain("()")
-    expect(url).not.toContain("@51.5072")
+    afterEach(() => {
+      Platform.OS = originalOS
+      canOpen.mockRestore()
+    })
+
+    const pressNavigate = async () => {
+      const sheet = renderSheet()
+      await waitFor(() => expect(sheet.getByText("Navigate")).toBeTruthy())
+      fireEvent.press(sheet.getByText("Navigate"))
+      return sheet
+    }
+
+    it("opens the Google Maps app on iOS when it is installed", async () => {
+      Platform.OS = "ios"
+      canOpen.mockResolvedValue(true)
+
+      await pressNavigate()
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(GOOGLE_IOS))
+      expect(canOpen).toHaveBeenCalledWith(GOOGLE_IOS)
+    })
+
+    it("falls back to Apple Maps on iOS without Google Maps, not a web page", async () => {
+      Platform.OS = "ios"
+      canOpen.mockResolvedValue(false)
+
+      await pressNavigate()
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(APPLE_MAPS))
+      expect(mockedOpenExternal).not.toHaveBeenCalled()
+    })
+
+    it("still navigates when the OS refuses to say what is installed", async () => {
+      Platform.OS = "ios"
+      canOpen.mockRejectedValue(new Error("not allowed"))
+
+      await pressNavigate()
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(APPLE_MAPS))
+    })
+
+    it("hands Android the Google Maps link when the app is installed", async () => {
+      Platform.OS = "android"
+      canOpen.mockResolvedValue(true)
+
+      await pressNavigate()
+
+      // Through the OS, not the in-app browser, so the app can claim it.
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(GOOGLE_ANDROID))
+      expect(canOpen).toHaveBeenCalledWith(GOOGLE_PROBE_ANDROID)
+      expect(mockedOpenExternal).not.toHaveBeenCalled()
+    })
+
+    it("offers Android's geo: chooser, with the name, without Google Maps", async () => {
+      Platform.OS = "android"
+      canOpen.mockResolvedValue(false)
+
+      await pressNavigate()
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(GEO))
+      expect(mockedOpenExternal).not.toHaveBeenCalled()
+    })
+
+    it("says so when nothing on the device can open the directions", async () => {
+      Platform.OS = "android"
+      canOpen.mockResolvedValue(false)
+      jest.spyOn(Linking, "openURL").mockRejectedValue(new Error("no handler"))
+
+      await pressNavigate()
+
+      await waitFor(() =>
+        expect(mockToastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: "Nothing on this phone can open that link",
+          }),
+        ),
+      )
+    })
+
+    it("opens the maps app once however fast Navigate is tapped twice", async () => {
+      Platform.OS = "ios"
+      let answer: (installed: boolean) => void = () => {}
+      canOpen.mockReturnValue(
+        new Promise<boolean>((resolve) => {
+          answer = resolve
+        }),
+      )
+
+      const { getByText } = await pressNavigate()
+      fireEvent.press(getByText("Navigate"))
+      answer(true)
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledWith(GOOGLE_IOS))
+      expect(canOpen).toHaveBeenCalledTimes(1)
+      expect(Linking.openURL).toHaveBeenCalledTimes(1)
+    })
   })
 })
 

@@ -5,12 +5,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-const CONTROL_HEIGHT = 44
-const TOP_GAP = 12
-
-/** Where the bar ends, for anything else that has to be drawn under it. */
-export const searchBarBottom = (topInset: number): number =>
-  topInset + TOP_GAP + CONTROL_HEIGHT
+import { MAP_CONTROL_INSET, SEARCH_BAR_HEIGHT } from "./map-layout"
 
 type Props = {
   // The screen hands the whole top edge to the map, so this bar reserves its own.
@@ -43,7 +38,7 @@ export const MapSearchBar: React.FC<Props> = ({
   const styles = useStyles({ topInset })
 
   return (
-    <View style={styles.bar} pointerEvents="box-none">
+    <View testID="map-search-bar" style={styles.bar} pointerEvents="box-none">
       <Pressable
         testID="open-place-search"
         style={styles.field}
@@ -82,9 +77,9 @@ export const MapSearchBar: React.FC<Props> = ({
 const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) => ({
   bar: {
     position: "absolute",
-    top: topInset + TOP_GAP,
-    left: 12,
-    right: 12,
+    top: topInset + MAP_CONTROL_INSET,
+    left: MAP_CONTROL_INSET,
+    right: MAP_CONTROL_INSET,
     flexDirection: "row",
     alignItems: "center",
     columnGap: 10,
@@ -96,9 +91,9 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     flexDirection: "row",
     alignItems: "center",
     columnGap: 10,
-    minHeight: CONTROL_HEIGHT,
+    minHeight: SEARCH_BAR_HEIGHT,
     paddingHorizontal: 16,
-    borderRadius: CONTROL_HEIGHT / 2,
+    borderRadius: SEARCH_BAR_HEIGHT / 2,
     backgroundColor: colors.white,
     shadowColor: colors._black,
     shadowOffset: { width: 0, height: 2 },
@@ -112,11 +107,11 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
     color: colors.grey2,
   },
   filter: {
-    width: CONTROL_HEIGHT,
-    height: CONTROL_HEIGHT,
+    width: SEARCH_BAR_HEIGHT,
+    height: SEARCH_BAR_HEIGHT,
     // A circle, on the same radius rule as the field beside it, so the pair
     // reads as two controls of one family rather than a pill and a tile.
-    borderRadius: CONTROL_HEIGHT / 2,
+    borderRadius: SEARCH_BAR_HEIGHT / 2,
     alignItems: "center",
     justifyContent: "center",
     backgroundColor: colors.white,

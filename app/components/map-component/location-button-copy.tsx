@@ -6,28 +6,24 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CenterLocationAndroid from "../../assets/icons/center-location-android.svg"
 
+import { MAP_CONTROL_INSET } from "./map-layout"
+
 // Round, so it reads as a floating action over the map rather than a card.
 const BUTTON_SIZE = 44
-
-// Sits above the ODbL credit, which shares this corner. The gap is bigger than
-// the credit needs at default text size so that scaling it up — it is an
-// attribution we are obliged to keep legible — moves it behind nothing.
-//
-// Measured from the bottom of the map's own half of the screen, which is the
-// top of the add-place form whenever one is open — so nothing has to raise this
-// to keep it clear of one.
-const BOTTOM = 48
 
 type Props = {
   requestPermissions: () => void
   centerOnUser: () => void
   permissionStatus?: PermissionStatus
+  // From the bottom of the map; MapComponent works out who owns the system bar.
+  bottom: number
 }
 
 export default function LocationButtonCopy({
   permissionStatus,
   centerOnUser,
   requestPermissions,
+  bottom,
 }: Props) {
   const styles = useStyles()
   const {
@@ -35,7 +31,7 @@ export default function LocationButtonCopy({
   } = useTheme()
 
   return (
-    <View style={styles.button}>
+    <View testID="location-button-anchor" style={[styles.button, { bottom }]}>
       <TouchableOpacity
         testID="location-button"
         style={styles.android}
@@ -50,8 +46,7 @@ export default function LocationButtonCopy({
 const useStyles = makeStyles(({ colors }) => ({
   button: {
     position: "absolute",
-    bottom: BOTTOM,
-    right: 8,
+    right: MAP_CONTROL_INSET,
     zIndex: 99,
   },
   android: {
