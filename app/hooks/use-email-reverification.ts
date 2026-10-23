@@ -10,8 +10,10 @@ import {
 import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { resolveSessionKey } from "@app/store/persistent-state/account-key"
+import { ContactChangeStep } from "@app/types/two-factor-enforcement"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -125,6 +127,11 @@ type PromptContext = {
   owedSequenceId: number | undefined
 }
 
+/** A sequence started, or a code screen shown, since the prompt was raised. */
+const isPromptOvertaken = (prompt: PromptContext): boolean =>
+  sequenceCount !== prompt.sequenceCount ||
+  owedCodeScreenBySession.get(prompt.sessionKey) !== prompt.owedSequenceId
+
 /**
  * Re-verification for an address the account already holds. The registration
  * flow can't be re-run as-is — the backend refuses to initiate while any email
@@ -147,6 +154,9 @@ export const useEmailReverification = () => {
 
   const [emailDeleteMutation] = useUserEmailDeleteMutation()
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
+  /** With an authenticator, the server asks for its code to remove and register the
+   *  address, so the screen that takes it runs both instead of the sequence. */
+  const { hasAuthenticator } = useLoginMethods()
 
   /** What callers render: spans the sequence from before its first request to after
    *  its last, rather than following each mutation's own loading flag. */
@@ -176,11 +186,19 @@ export const useEmailReverification = () => {
     }: SequenceRequest): Promise<string | null> => {
       const isSessionSwitched = () => sessionKeyRef.current !== askedUnder
       try {
-        await emailDeleteMutation({
+        const deleted = await emailDeleteMutation({
           // to avoid flacky behavior
           // this could lead to inconsistent state if delete works but set fails
           fetchPolicy: "no-cache",
         })
+
+        /** A removal refused, as one an authenticator added since needs its code for,
+         *  leaves the address in place, and registering it again would be refused too. */
+        const deleteRefusal = deleted?.data?.userEmailDelete?.errors?.[0]
+        if (deleteRefusal) {
+          if (!isSessionSwitched()) Alert.alert(deleteRefusal.message)
+          return null
+        }
 
         if (isSessionSwitched()) {
           console.warn("session switched during email re-verification")
@@ -312,14 +330,30 @@ export const useEmailReverification = () => {
         running !== null && running.sessionKey !== askedUnder
       if (isSequenceOfAnotherSession) return
       if (running !== null) return waitOnSequence(running)
-      const isPromptOvertaken =
-        sequenceCount !== prompt.sequenceCount ||
-        owedCodeScreenBySession.get(askedUnder) !== prompt.owedSequenceId
-      if (isPromptOvertaken) return
+      if (isPromptOvertaken(prompt)) return
       const request = { sessionKey: askedUnder, email }
       return waitOnSequence(startSequence(request, runSequence))
     },
     [isMounted, waitOnSequence, runSequence],
+  )
+
+  /** With an authenticator, the code screen removes and registers the address itself.
+   *  The same prompts as the sequence's start nothing: one outdated, one raised over a
+   *  sequence still running, whose register may yet land, and one overtaken, as its
+   *  removal would take the address from under a code screen shown since. */
+  const askForCodeToConfirmAgain = useCallback(
+    (email: string, prompt: PromptContext) => {
+      const isPromptOutdated = prompt.sessionKey !== sessionKeyRef.current || !isMounted()
+      if (isPromptOutdated) return
+      const isSequenceRunning = sequenceInFlight !== null
+      if (isSequenceRunning) return
+      if (isPromptOvertaken(prompt)) return
+      navigation.navigate("contactChangeCode", {
+        step: ContactChangeStep.EmailReverify,
+        email,
+      })
+    },
+    [isMounted, navigation],
   )
 
   const promptReverification = useCallback(
@@ -337,12 +371,18 @@ export const useEmailReverification = () => {
           { text: LL.common.cancel(), onPress: () => {} },
           {
             text: LL.common.ok(),
-            onPress: () => confirmEmailAgain(email, prompt),
+            onPress: () => {
+              if (hasAuthenticator) {
+                askForCodeToConfirmAgain(email, prompt)
+                return
+              }
+              confirmEmailAgain(email, prompt)
+            },
           },
         ],
       )
     },
-    [LL, confirmEmailAgain],
+    [LL, confirmEmailAgain, hasAuthenticator, askForCodeToConfirmAgain],
   )
 
   return { promptReverification, spinner: isSequenceRunning }
