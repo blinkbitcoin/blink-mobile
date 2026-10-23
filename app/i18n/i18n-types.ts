@@ -8247,10 +8247,6 @@ type RootTranslation = {
 		 */
 		dangerZone: string
 		/**
-		 * P​h​o​n​e​ ​d​e​l​e​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
-		 */
-		phoneDeletedSuccessfully: string
-		/**
 		 * P​h​o​n​e​ ​N​u​m​b​e​r
 		 */
 		phoneNumber: string
@@ -8349,29 +8345,9 @@ type RootTranslation = {
 		 */
 		email: string
 		/**
-		 * E​m​a​i​l​ ​d​e​l​e​t​e​d​ ​s​u​c​c​e​s​s​f​u​l​l​y
-		 */
-		emailDeletedSuccessfully: string
-		/**
 		 * U​n​v​e​r​i​f​i​e​d​ ​e​m​a​i​l​s​ ​c​a​n​'​t​ ​b​e​ ​u​s​e​d​ ​t​o​ ​l​o​g​i​n​.​ ​Y​o​u​ ​s​h​o​u​l​d​ ​r​e​-​v​e​r​i​f​y​ ​y​o​u​r​ ​e​m​a​i​l​ ​a​d​d​r​e​s​s​.
 		 */
 		unverifiedEmailAdvice: string
-		/**
-		 * D​e​l​e​t​e​ ​e​m​a​i​l
-		 */
-		deleteEmailPromptTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​e​m​a​i​l​ ​a​d​d​r​e​s​s​?​ ​y​o​u​ ​w​i​l​l​ ​o​n​l​y​ ​b​e​ ​a​b​l​e​ ​t​o​ ​l​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​.
-		 */
-		deleteEmailPromptContent: string
-		/**
-		 * D​e​l​e​t​e​ ​p​h​o​n​e
-		 */
-		deletePhonePromptTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​?​ ​y​o​u​ ​w​i​l​l​ ​o​n​l​y​ ​b​e​ ​a​b​l​e​ ​t​o​ ​l​o​g​ ​i​n​ ​b​a​c​k​ ​w​i​t​h​ ​y​o​u​r​ ​e​m​a​i​l​.
-		 */
-		deletePhonePromptContent: string
 		/**
 		 * A​d​d​ ​a​n​ ​e​m​a​i​l​ ​f​i​r​s​t
 		 */
@@ -22348,10 +22324,6 @@ export type TranslationFunctions = {
 		 */
 		dangerZone: () => LocalizedString
 		/**
-		 * Phone deleted successfully
-		 */
-		phoneDeletedSuccessfully: () => LocalizedString
-		/**
 		 * Phone Number
 		 */
 		phoneNumber: () => LocalizedString
@@ -22443,29 +22415,9 @@ export type TranslationFunctions = {
 		 */
 		email: () => LocalizedString
 		/**
-		 * Email deleted successfully
-		 */
-		emailDeletedSuccessfully: () => LocalizedString
-		/**
 		 * Unverified emails can't be used to login. You should re-verify your email address.
 		 */
 		unverifiedEmailAdvice: () => LocalizedString
-		/**
-		 * Delete email
-		 */
-		deleteEmailPromptTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your email address? you will only be able to log back in with your phone number.
-		 */
-		deleteEmailPromptContent: () => LocalizedString
-		/**
-		 * Delete phone
-		 */
-		deletePhonePromptTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your phone number? you will only be able to log in back with your email.
-		 */
-		deletePhonePromptContent: () => LocalizedString
 		/**
 		 * Add an email first
 		 */
