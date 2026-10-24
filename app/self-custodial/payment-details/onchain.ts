@@ -90,6 +90,7 @@ export const createSelfCustodialOnchainPaymentDetails = <T extends WalletCurrenc
     convertMoneyAmount,
     setConvertMoneyAmount,
     paymentType: PaymentType.Onchain,
+    feeTier,
     settlementAmount,
     settlementAmountIsEstimated: false,
     unitOfAccountAmount,
