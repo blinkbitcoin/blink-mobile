@@ -2454,6 +2454,7 @@
     "activated": "Aktiveret",
     "addressScreen": "Måder at modtage betaling",
     "nonCustodialAccount": "Ikke-depotkonto",
+    "custodialAccount": "Depotkonto",
     "tapUserName": "Tryk for at indstille brugernavn",
     "notifications": "Notifikationer",
     "title": "Indstillinger",
