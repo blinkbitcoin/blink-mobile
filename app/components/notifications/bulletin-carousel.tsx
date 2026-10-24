@@ -140,7 +140,17 @@ export const BulletinCarousel: React.FC<Props> = ({ items }) => {
             {...testProps("bulletin-carousel")}
           >
             {items.map(({ key, node }, index) => (
-              <View key={key} style={{ width }} onLayout={onPageLayout(key)}>
+              /** Only the card in view reaches a screen reader: the others are off screen,
+               *  and the indicator above is how it moves between them. */
+              <View
+                key={key}
+                style={{ width }}
+                onLayout={onPageLayout(key)}
+                accessibilityElementsHidden={index !== activeIndex}
+                importantForAccessibility={
+                  index === activeIndex ? "auto" : "no-hide-descendants"
+                }
+              >
                 <BulletinCarouselItemContext.Provider
                   value={{ isActive: index === activeIndex }}
                 >
