@@ -2172,7 +2172,9 @@
         "updateAvailable": "Une mise à jour est disponible. Appuyez pour mettre à jour maintenant",
         "useLightning": "Nous utilisons le réseau Lightning.",
         "myAccounts": "Soldes",
-        "walletCountNotTwo": "Le nombre de portefeuilles n'est pas 2. Veuillez utiliser le tableau de bord pour voir tous les portefeuilles et les fonds de ce compte"
+        "walletCountNotTwo": "Le nombre de portefeuilles n'est pas 2. Veuillez utiliser le tableau de bord pour voir tous les portefeuilles et les fonds de ce compte",
+        "bulletinPosition": "Notification {position: number} sur {total: number}",
+        "bulletinReadMore": "Lire la suite"
     },
     "PinScreen": {
         "attemptsRemaining": "NIP incorrect. {attemptsRemaining: number} tentatives restantes.",

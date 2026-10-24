@@ -2172,7 +2172,9 @@
     "updateAvailable": "Ekipya wekiri.\nKoona wano okufuna ekipya kati",
     "useLightning": "Tukozesa Lightning Network.",
     "myAccounts": "Bbalansi",
-    "walletCountNotTwo": "Embala ya waleti teri 2. Nsaba okozese dashboard olabe waleti zonna ne ssente za akawunti eno"
+    "walletCountNotTwo": "Embala ya waleti teri 2. Nsaba okozese dashboard olabe waleti zonna ne ssente za akawunti eno",
+    "bulletinPosition": "Ekilango {position: number} ku {total: number}",
+    "bulletinReadMore": "Soma ebisingawo"
   },
   "PinScreen": {
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",

@@ -1,11 +1,10 @@
 import React from "react"
-import { Animated, Linking } from "react-native"
+import { Linking } from "react-native"
 import { useApolloClient } from "@apollo/client"
 
 import { useNotifications } from "."
 import { NotificationCardUI } from "./notification-card-ui"
 import { testBulletinsStore, useTestBulletins } from "./test-bulletins-store"
-import { useDropInOutAnimation } from "@app/components/animations"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import {
   BulletinsDocument,
@@ -14,15 +13,13 @@ import {
 } from "@app/graphql/generated"
 import { BLINK_DEEP_LINK_PREFIX } from "@app/config"
 import { IconNamesType } from "../atomic/galoy-icon"
+import { CarouselItem } from "./bulletin-carousel"
+import { Bulletin, selectCarouselBulletins } from "./select-carousel-bulletins"
 
 type Props = {
   loading: boolean
   bulletins: BulletinsQuery | undefined
 }
-
-type Bulletin = NonNullable<
-  BulletinsQuery["me"]
->["unacknowledgedStatefulNotificationsWithBulletinEnabled"]["edges"][number]["node"]
 
 /** The address a bulletin's action opens, or null when it has none. */
 const linkOf = (action: Bulletin["action"]): string | null => {
@@ -34,137 +31,88 @@ const linkOf = (action: Bulletin["action"]): string | null => {
 }
 
 /**
- * The bulletins the home shows out of the page the server sent: the newest one the user
- * cannot close, if any, on top, where it stays however many closable ones arrive after
- * it, and under it the newest one they can close. Closable ones do not stack. With
- * persistent bulletins switched off every bulletin reads as closable, so only the newest
- * one shows, as it always did.
+ * The server bulletins as carousel cards, newest first, followed in development by the
+ * test bulletins. With no server bulletin, the card queued through `notifyCard`, if any,
+ * takes their place, as before the carousel.
  */
-const selectShownBulletins = (
-  bulletins: readonly Bulletin[],
-  isPersistenceOn: boolean,
-): { bulletin: Bulletin; canClose: boolean }[] => {
-  const canClose = (bulletin: Bulletin): boolean =>
-    !isPersistenceOn || bulletin.dismissible
-  const newestKept = bulletins.find((bulletin) => !canClose(bulletin))
-  const newestClosable = bulletins.find(canClose)
-  return [newestKept, newestClosable]
-    .filter((bulletin): bulletin is Bulletin => bulletin !== undefined)
-    .map((bulletin) => ({ bulletin, canClose: canClose(bulletin) }))
-}
-
-const BULLETIN_ANIMATION = {
-  delay: 300,
-  distance: 50,
-  durationIn: 200,
-  durationOut: 120,
-}
-
-export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
+export const useServerBulletinItems = ({ loading, bulletins }: Props): CarouselItem[] => {
   const { cardInfo } = useNotifications()
-  const [dismissing, setDismissing] = React.useState(false)
   const client = useApolloClient()
   const testBulletins = useTestBulletins()
-  const { persistentBulletinsEnabled } = useRemoteConfig()
+  const { persistentBulletinsEnabled, bulletinsShownSince } = useRemoteConfig()
 
   const [ack] = useStatefulNotificationAcknowledgeMutation()
-  /** The bulletin whose acknowledgement is in flight: its card alone shows the spinner,
-   *  so closing one does not blank the others. */
+  /** The bulletin whose acknowledgement is in flight: its card alone shows the spinner. */
   const [acknowledgingId, setAcknowledgingId] = React.useState<string | null>(null)
 
-  /**
-   * Acknowledges a bulletin and takes it off the home. The list animates out only when
-   * the card closed was the last one it shows; with another card staying, the list stays
-   * up and is refetched at once, so the card that stays does not leave and come back.
-   */
-  const dismissWithAnimation = React.useCallback(
-    async (notificationId: string, isLastShown: boolean) => {
+  /** Acknowledges a bulletin, then refetches, which takes its card out of the carousel. */
+  const dismiss = React.useCallback(
+    async (notificationId: string) => {
       setAcknowledgingId(notificationId)
       try {
         await ack({ variables: { input: { notificationId } } })
+        await client.refetchQueries({ include: [BulletinsDocument] })
       } catch (e) {
         console.error("Failed to acknowledge notification", e)
-        return
       } finally {
         setAcknowledgingId(null)
       }
-      if (!isLastShown) {
-        client.refetchQueries({ include: [BulletinsDocument] })
-        return
-      }
-      setDismissing(true)
-      setTimeout(() => {
-        client.refetchQueries({ include: [BulletinsDocument] })
-        setDismissing(false)
-      }, BULLETIN_ANIMATION.durationOut)
     },
     [ack, client],
   )
 
-  const shownBulletins = selectShownBulletins(
-    (
+  if (loading) return []
+
+  const shownBulletins = selectCarouselBulletins({
+    bulletins: (
       bulletins?.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges ?? []
     ).map(({ node }) => node),
-    persistentBulletinsEnabled,
-  )
-  const hasBulletins = !loading && shownBulletins.length > 0
-
-  const hasTestBulletins = __DEV__ && testBulletins.length > 0
-
-  const { opacity, translateY } = useDropInOutAnimation({
-    visible: (Boolean(hasBulletins) || hasTestBulletins) && !dismissing,
-    ...BULLETIN_ANIMATION,
+    isPersistenceOn: persistentBulletinsEnabled,
+    shownSince: bulletinsShownSince,
   })
 
-  if (loading) return null
+  const serverItems = shownBulletins.map(({ bulletin, canClose }): CarouselItem => {
+    /**
+     * A bulletin the server marks as not dismissible stays until the server retires it:
+     * it gets no close control, and opening its link does not acknowledge it either.
+     * Only the X or opening the link closes a bulletin, so a card without a link is not
+     * a button.
+     */
+    const close = canClose ? () => dismiss(bulletin.id) : undefined
+    const link = linkOf(bulletin.action)
+    const openBulletin = link
+      ? async () => {
+          Linking.openURL(link)
+          if (close) await close()
+        }
+      : undefined
 
-  if (hasBulletins || hasTestBulletins) {
-    return (
-      <Animated.View style={{ opacity, transform: [{ translateY }] }}>
-        {shownBulletins.map(({ bulletin, canClose }) => {
-          /**
-           * A bulletin the server marks as not dismissible stays until the server retires
-           * it: it gets no close control, and opening its link does not acknowledge it
-           * either. The server would take the acknowledgement, which is what keeps older
-           * apps working, but this app withholds it on purpose: such a bulletin is retired
-           * once what it asks for is done, not when it is opened.
-           */
-          const isLastShown = shownBulletins.length === 1
-          const dismiss = canClose
-            ? () => dismissWithAnimation(bulletin.id, isLastShown)
-            : undefined
-          const link = linkOf(bulletin.action)
-          /** With nothing to open and nothing to acknowledge, the card is inert rather
-           *  than a button that does nothing. */
-          const hasSomethingToDo = link !== null || canClose
-          const openBulletin = async () => {
-            if (link) Linking.openURL(link)
-            if (dismiss) await dismiss()
+    return {
+      key: `server-${bulletin.id}`,
+      node: (
+        <NotificationCardUI
+          icon={
+            bulletin.icon
+              ? (bulletin.icon.toLowerCase().replace(/_/g, "-") as IconNamesType)
+              : undefined
           }
-          const pressAction = hasSomethingToDo ? openBulletin : undefined
-          const isAcknowledging = acknowledgingId === bulletin.id
+          title={bulletin.title}
+          text={bulletin.body}
+          action={openBulletin}
+          dismissAction={close}
+          loading={acknowledgingId === bulletin.id}
+          buttonLabel={bulletin.action?.label ?? undefined}
+        />
+      ),
+    }
+  })
 
-          return (
+  const testItems = __DEV__
+    ? testBulletins.map(
+        (bulletin): CarouselItem => ({
+          key: `test-${bulletin.id}`,
+          node: (
             <NotificationCardUI
-              icon={
-                bulletin.icon
-                  ? (bulletin.icon.toLowerCase().replace(/_/g, "-") as IconNamesType)
-                  : undefined
-              }
-              key={bulletin.id}
-              title={bulletin.title}
-              text={bulletin.body}
-              action={pressAction}
-              dismissAction={dismiss}
-              loading={isAcknowledging}
-              buttonLabel={bulletin.action?.label ?? undefined}
-            />
-          )
-        })}
-        {hasTestBulletins &&
-          testBulletins.map((bulletin) => (
-            <NotificationCardUI
-              key={bulletin.id}
               title={bulletin.title}
               text={bulletin.body}
               icon={bulletin.icon}
@@ -176,23 +124,27 @@ export const BulletinsCard: React.FC<Props> = ({ loading, bulletins }) => {
               }}
               dismissAction={() => testBulletinsStore.remove(bulletin.id)}
             />
-          ))}
-      </Animated.View>
-    )
-  }
+          ),
+        }),
+      )
+    : []
 
-  if (!cardInfo) {
-    return null
-  }
+  const items = [...serverItems, ...testItems]
+  if (items.length > 0 || !cardInfo) return items
 
-  return (
-    <NotificationCardUI
-      title={cardInfo.title}
-      text={cardInfo.text}
-      icon={cardInfo.icon}
-      action={cardInfo.action}
-      loading={cardInfo.loading}
-      dismissAction={cardInfo.dismissAction}
-    />
-  )
+  return [
+    {
+      key: "notify-card",
+      node: (
+        <NotificationCardUI
+          title={cardInfo.title}
+          text={cardInfo.text}
+          icon={cardInfo.icon}
+          action={cardInfo.action}
+          loading={cardInfo.loading}
+          dismissAction={cardInfo.dismissAction}
+        />
+      ),
+    },
+  ]
 }

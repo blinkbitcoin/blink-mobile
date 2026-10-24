@@ -2172,7 +2172,9 @@
     "updateAvailable": "K dispozícii je aktualizácia.\nKliknite na aktualizáciu",
     "useLightning": "Používame Lightning Network.",
     "myAccounts": "Zostatky",
-    "walletCountNotTwo": "Počet peňaženiek nie je 2. Na zobrazenie všetkých peňaženiek a prostriedkov tohto účtu použite informačný panel"
+    "walletCountNotTwo": "Počet peňaženiek nie je 2. Na zobrazenie všetkých peňaženiek a prostriedkov tohto účtu použite informačný panel",
+    "bulletinPosition": "Upozornenie {position: number} z {total: number}",
+    "bulletinReadMore": "Čítať ďalej"
   },
   "PinScreen": {
     "attemptsRemaining": "Nesprávny PIN kód. Zostávajú {attemptsRemaining: number} pokusy.",

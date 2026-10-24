@@ -6790,6 +6790,16 @@ type RootTranslation = {
 		 * W​a​l​l​e​t​ ​c​o​u​n​t​ ​i​s​ ​n​o​t​ ​2​.​ ​P​l​e​a​s​e​ ​u​s​e​ ​t​h​e​ ​d​a​s​h​b​o​a​r​d​ ​t​o​ ​s​e​e​ ​a​l​l​ ​t​h​e​ ​w​a​l​l​e​t​s​ ​a​n​d​ ​f​u​n​d​s​ ​o​f​ ​t​h​i​s​ ​a​c​c​o​u​n​t
 		 */
 		walletCountNotTwo: string
+		/**
+		 * N​o​t​i​f​i​c​a​t​i​o​n​ ​{​p​o​s​i​t​i​o​n​}​ ​o​f​ ​{​t​o​t​a​l​}
+		 * @param {number} position
+		 * @param {number} total
+		 */
+		bulletinPosition: RequiredParams<'position' | 'total'>
+		/**
+		 * R​e​a​d​ ​m​o​r​e
+		 */
+		bulletinReadMore: string
 	}
 	PinScreen: {
 		/**
@@ -20671,6 +20681,14 @@ export type TranslationFunctions = {
 		 * Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account
 		 */
 		walletCountNotTwo: () => LocalizedString
+		/**
+		 * Notification {position} of {total}
+		 */
+		bulletinPosition: (arg: { position: number, total: number }) => LocalizedString
+		/**
+		 * Read more
+		 */
+		bulletinReadMore: () => LocalizedString
 	}
 	PinScreen: {
 		/**

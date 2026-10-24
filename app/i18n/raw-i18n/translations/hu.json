@@ -2172,7 +2172,9 @@
     "updateAvailable": "Frissítés elérhető.\nKoppints a frissítéshez most",
     "useLightning": "Mi a Lightning Hálózatot használjuk.",
     "myAccounts": "Egyenlegek",
-    "walletCountNotTwo": "A tárca száma nem 2. Kérlek használd az irányítópultot az összes tárca és azok egyenlegeinek megtekintéséhez."
+    "walletCountNotTwo": "A tárca száma nem 2. Kérlek használd az irányítópultot az összes tárca és azok egyenlegeinek megtekintéséhez.",
+    "bulletinPosition": "Értesítés: {position: number}/{total: number}",
+    "bulletinReadMore": "Bővebben"
   },
   "PinScreen": {
     "attemptsRemaining": "Helytelen PIN. {attemptsRemaining: number} próbálkozás maradt.",

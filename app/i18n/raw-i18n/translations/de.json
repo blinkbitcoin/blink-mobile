@@ -2172,7 +2172,9 @@
         "updateAvailable": "Ein Update ist verfügbar. \nKlicke, um zu updaten",
         "useLightning": "Wir nutzen das Lightning Netzwerk.",
         "myAccounts": "Guthaben",
-        "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
+        "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen",
+        "bulletinPosition": "Benachrichtigung {position: number} von {total: number}",
+        "bulletinReadMore": "Weiterlesen"
     },
     "PinScreen": {
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
