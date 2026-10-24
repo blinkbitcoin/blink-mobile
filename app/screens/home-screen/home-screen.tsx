@@ -598,10 +598,15 @@ export const HomeScreen: React.FC = () => {
       node: <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />,
     },
   ]
-  const bulletinItems = [
-    ...serverBulletinItems,
-    ...appBulletinCandidates.filter((item): item is CarouselItem => item !== false),
-  ]
+  /** Held back until the server bulletins settle, so the carousel opens on the newest
+   *  of them. Built from the app's cards alone, it would open on one of those, and keep
+   *  it in view once the server cards arrive ahead of it, as it does after a refetch. */
+  const bulletinItems = bulletinsLoading
+    ? []
+    : [
+        ...serverBulletinItems,
+        ...appBulletinCandidates.filter((item): item is CarouselItem => item !== false),
+      ]
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
