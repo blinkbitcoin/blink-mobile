@@ -22,6 +22,7 @@ import { PaymentSendCompletedStatus } from "./use-send-payment"
 import LogoLightMode from "@app/assets/logo/blink-logo-light.svg"
 import LogoDarkMode from "@app/assets/logo/app-logo-dark.svg"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { SuccessActionTag } from "@app/components/success-action/success-action"
 import { LNURLPaySuccessAction, utils } from "lnurl-pay"
 import { formatUnixTimestampYMDHM } from "@app/utils/date"
@@ -394,12 +395,17 @@ const SendBitcoinCompletedScreen: React.FC<Props> = ({ route }) => {
           </View>
 
           {!isTakingScreenshot && (
-            <GaloyPrimaryButton
-              style={styles.shareButton}
-              onPress={captureAndShare}
-              title={LL.common.share()}
-              underlayColor="transparent"
-            />
+            <View style={styles.actions}>
+              <GaloyPrimaryButton
+                onPress={captureAndShare}
+                title={LL.common.share()}
+                underlayColor="transparent"
+              />
+              <GaloySecondaryButton
+                title={LL.common.close()}
+                onPress={handleNavigateHome}
+              />
+            </View>
           )}
         </View>
       </ViewShot>
@@ -434,14 +440,15 @@ const useStyles = makeStyles(({ colors }) => ({
     alignItems: "center",
     marginTop: 20,
   },
-  shareButton: {
+  actions: {
+    gap: 10,
     marginTop: 10,
     marginBottom: 20,
   },
   successActionFieldContainer: {
     overflow: "hidden",
     gap: 20,
-    backgroundColor: colors.grey5,
+    backgroundColor: colors.grey7,
     borderRadius: 10,
     alignItems: "center",
     paddingHorizontal: 10,
