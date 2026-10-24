@@ -206,7 +206,8 @@ gql`
 /**
  * A page of bulletins rather than one: the carousel shows every bulletin sent since the
  * release cutoff, and the page also carries the older unacknowledged ones that the cutoff
- * filters out on the device. Bulletins are few, so one page holds them all.
+ * filters out on the device. One page is enough by design: no more than 50 bulletins are
+ * ever active at once, and usually fewer than 5, so the home does not follow the cursor.
  */
 const BULLETINS_PAGE_SIZE = 50
 
