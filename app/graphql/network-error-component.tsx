@@ -27,6 +27,19 @@ export const NetworkErrorComponent: React.FC = () => {
   const { switchToNextProfile } = useSwitchToNextProfile()
   const { isSelfCustodial: isSelfCustodialActive } = useActiveWallet()
 
+  /**
+   * A self-custodial session does not toast for a backend it does not need. Every query
+   * still reaching the backend from such a session is one the user did not ask for —
+   * an app-version check, a scan context that is discarded, a price the SDK already
+   * supplied — so a toast per failure is a stream of alarms about nothing the user can
+   * act on, while their wallet goes on working.
+   *
+   * Only the two generic transport toasts are suppressed. An authentication failure
+   * still routes to `handleTokenExpiry`, and a request the user actually made reports
+   * its own failure at the screen that made it.
+   */
+  const suppressTransportToasts = isSelfCustodialActive
+
   const [showedAlert, setShowedAlert] = useState(false)
   const isHandlingTokenExpiry = useRef(false)
 
@@ -125,11 +138,13 @@ export const NetworkErrorComponent: React.FC = () => {
 
     if ("statusCode" in networkError) {
       if (networkError.statusCode >= 500) {
-        // TODO translation
-        toastShow({
-          message: (translations) => translations.errors.network.server(),
-          LL,
-        })
+        if (!suppressTransportToasts) {
+          // TODO translation
+          toastShow({
+            message: (translations) => translations.errors.network.server(),
+            LL,
+          })
+        }
         clearNetworkError()
         return
       }
@@ -156,14 +171,16 @@ export const NetworkErrorComponent: React.FC = () => {
             break
 
           default:
-            // TODO translation
-            toastShow({
-              message: (translations) =>
-                `StatusCode: ${
-                  networkError.statusCode
-                }\nError code: ${errorCode}\n${translations.errors.network.request()}`,
-              LL,
-            })
+            if (!suppressTransportToasts) {
+              // TODO translation
+              toastShow({
+                message: (translations) =>
+                  `StatusCode: ${
+                    networkError.statusCode
+                  }\nError code: ${errorCode}\n${translations.errors.network.request()}`,
+                LL,
+              })
+            }
             break
         }
 
@@ -173,14 +190,16 @@ export const NetworkErrorComponent: React.FC = () => {
     }
 
     if ("message" in networkError && networkError.message === "Network request failed") {
-      // TODO translation
-      toastShow({
-        message: (translations) => translations.errors.network.connection(),
-        LL,
-      })
+      if (!suppressTransportToasts) {
+        // TODO translation
+        toastShow({
+          message: (translations) => translations.errors.network.connection(),
+          LL,
+        })
+      }
       clearNetworkError()
     }
-  }, [networkError, clearNetworkError, LL, handleTokenExpiry])
+  }, [networkError, clearNetworkError, LL, handleTokenExpiry, suppressTransportToasts])
 
   return <></>
 }

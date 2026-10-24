@@ -15,6 +15,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
+import { useLnurlServer } from "@app/self-custodial/hooks/use-lnurl-server"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import {
   BackupMethod,
@@ -49,6 +50,7 @@ export const useRestoreWallet = () => {
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
   const guard = useInFlightGuard()
   const network = useSparkNetwork()
+  const lnurlServer = useLnurlServer()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
 
   const activateAccount = useCallback(
@@ -104,6 +106,7 @@ export const useRestoreWallet = () => {
             mnemonic: normalized,
             network,
             leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
+            lnurlServer,
           })
           await markBackupCompletedFor(accountId, BackupMethod.Manual)
           await reloadSelfCustodialAccounts()
@@ -144,6 +147,7 @@ export const useRestoreWallet = () => {
       LL,
       network,
       selfCustodialDepositClaimLeewayVbyte,
+      lnurlServer,
     ],
   )
 

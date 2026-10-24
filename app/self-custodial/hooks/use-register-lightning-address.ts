@@ -11,6 +11,7 @@ import {
 } from "@app/self-custodial/bridge"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { classifySdkError, SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 type UseRegisterLightningAddress = {
   lnAddress: string
@@ -61,8 +62,18 @@ export const useRegisterLightningAddress = (
         await registerLightningAddress(sdk, lnAddress)
         await updateCurrentSelfCustodialAccount()
         onRegistered()
-      } catch {
-        setError(SetUsernameError.UNKNOWN_ERROR)
+      } catch (err) {
+        /**
+         * A server that did not answer is not a name that is taken, and not an unknown
+         * fault either. Collapsing it into UNKNOWN_ERROR told the user to "try again
+         * later" with no hint that their chosen address is still free, which is the one
+         * thing they want to know before going off to pick another.
+         */
+        setError(
+          classifySdkError(err) === SelfCustodialErrorCode.NetworkError
+            ? SetUsernameError.SERVER_UNREACHABLE
+            : SetUsernameError.UNKNOWN_ERROR,
+        )
       } finally {
         setLoading(false)
       }

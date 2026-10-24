@@ -125,6 +125,11 @@ describe("useRestoreWallet", () => {
       mnemonic: "word1 word2 word3",
       network: mockSparkNetwork.Regtest,
       leewaySatPerVbyte: 5,
+      // The real resolver runs here, and this spec's network mock is regtest.
+      lnurlServer: {
+        serverUrl: "https://staging.blink.sv",
+        domain: "staging.blink.sv",
+      },
     })
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockUpdateState).toHaveBeenCalledTimes(2)
@@ -158,7 +163,7 @@ describe("useRestoreWallet", () => {
    */
   describe("the mode a restored wallet comes back with", () => {
     const baseState: PersistentState = {
-      schemaVersion: 21,
+      schemaVersion: 23,
       galoyInstance: { id: "Main" },
       galoyAuthToken: "",
       activeAccountId: TEST_ACCOUNT_ID,
