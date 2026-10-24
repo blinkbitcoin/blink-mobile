@@ -1293,6 +1293,17 @@ query cardEncryptionPublicKey {
   cardEncryptionPublicKey
 }
 
+query cardInvestmentAccount {
+  me {
+    id
+    defaultAccount {
+      id
+      __typename
+    }
+    __typename
+  }
+}
+
 query cardTransactionsPaginated($cardId: ID!, $first: Int!, $after: String) {
   cardTransactionsPaginated(cardId: $cardId, first: $first, after: $after) {
     edges {
