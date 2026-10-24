@@ -2667,7 +2667,7 @@
     "TransactionDetailScreen": {
         "paid": "Payé à/de",
         "received": "Vous avez reçu",
-        "spent": "Vous avez dépensé",
+        "sent": "Vous avez envoyé",
         "sending": "Envoi en cours",
         "receivingAccount": "Solde destinataire",
         "sendingAccount": "Solde expéditeur",

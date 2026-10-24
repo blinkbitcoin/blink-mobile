@@ -107,6 +107,23 @@ const queuedOnChainSend = {
   initiationVia: { __typename: "InitiationViaOnChain", address: "bc1qexample" },
 }
 
+// Once the transaction hash is known the same onchain send has left the queue.
+const broadcastOnChainSend = {
+  ...queuedOnChainSend,
+  settlementVia: {
+    ...queuedOnChainSend.settlementVia,
+    transactionHash: "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b",
+  },
+}
+
+// A transfer to yourself pays no one, which is why the heading says "sent" and not "spent".
+const selfTransfer = {
+  ...lightningSend,
+  memo: null,
+  settlementVia: { __typename: "SettlementViaIntraLedger", counterPartyUsername: null },
+  initiationVia: { __typename: "InitiationViaIntraLedger", counterPartyUsername: null },
+}
+
 const renderHeading = (tx: unknown) => {
   mockUseFragment.mockReturnValue({ data: tx })
   const tree = render(<TransactionDetailScreen route={route} />)
@@ -127,13 +144,15 @@ describe("TransactionDetailScreen heading", () => {
   beforeEach(() => jest.clearAllMocks())
 
   const cases: Array<{ name: string; tx: unknown; copy: string }> = [
-    { name: "spend", tx: lightningSend, copy: "You spent" },
+    { name: "send", tx: lightningSend, copy: "You sent" },
+    { name: "self-transfer", tx: selfTransfer, copy: "You sent" },
     {
       name: "receive",
       tx: { ...lightningSend, direction: "RECEIVE", settlementAmount: 23 },
       copy: "You received",
     },
     { name: "queued onchain send", tx: queuedOnChainSend, copy: "Sending" },
+    { name: "broadcast onchain send", tx: broadcastOnChainSend, copy: "You sent" },
   ]
 
   cases.forEach(({ name, tx, copy }) => {

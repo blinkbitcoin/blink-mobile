@@ -2667,7 +2667,7 @@
     "TransactionDetailScreen": {
         "paid": "Pagato a/da",
         "received": "Hai ricevuto",
-        "spent": "Hai speso",
+        "sent": "Hai inviato",
         "sending": "Invio",
         "receivingAccount": "Conto di ricezione",
         "sendingAccount": "Invio dell'account",

@@ -2667,7 +2667,7 @@
     "TransactionDetailScreen": {
         "paid": "Gezahlt an/von",
         "received": "Du erhieltst",
-        "spent": "Du zahltest",
+        "sent": "Du sendetest",
         "sending": "Sendend",
         "receivingAccount": "Empfangendes Guthaben",
         "sendingAccount": "Sendendes Guthaben",
