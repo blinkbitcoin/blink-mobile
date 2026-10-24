@@ -39,6 +39,7 @@ import { useSelfCustodialContactList } from "@app/self-custodial/hooks/use-conta
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
+import { useDestinationErrorFeedback } from "./hooks/use-destination-error-feedback"
 import { toWalletBalances } from "./hooks/use-send-wallets"
 import { testProps } from "../../utils/testProps"
 import { ConfirmDestinationModal } from "./confirm-destination-modal"
@@ -707,12 +708,15 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
     ],
   )
 
+  const isDestinationError = useDestinationErrorFeedback(
+    destinationState.destinationState,
+  )
+
   const inputContainerStyle = useMemo(() => {
+    if (isDestinationError) return styles.errorInputContainer
     switch (destinationState.destinationState) {
       case DestinationState.Validating:
         return styles.enteringInputContainer
-      case DestinationState.Invalid:
-        return styles.errorInputContainer
       case DestinationState.RequiresUsernameConfirmation:
         return styles.warningInputContainer
       case DestinationState.Valid:
@@ -720,14 +724,11 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
           return styles.validInputContainer
         }
         return styles.warningInputContainer
-      case DestinationState.PhoneInvalid:
-        return styles.errorInputContainer
-      case DestinationState.PhoneNotAllowed:
-        return styles.errorInputContainer
       default:
         return {}
     }
   }, [
+    isDestinationError,
     destinationState.destinationState,
     destinationState.confirmationUsernameType,
     styles,
@@ -889,9 +890,7 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
             }
             loading={destinationState.destinationState === DestinationState.Validating}
             disabled={
-              destinationState.destinationState === DestinationState.Invalid ||
-              destinationState.destinationState === DestinationState.PhoneInvalid ||
-              destinationState.destinationState === DestinationState.PhoneNotAllowed ||
+              isDestinationError ||
               !destinationState.unparsedDestination ||
               (activeInputRef.current === InputType.Phone && rawPhoneNumber === "")
             }
