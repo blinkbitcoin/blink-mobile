@@ -7429,6 +7429,10 @@ type RootTranslation = {
 		 */
 		somethingWentWrong: string
 		/**
+		 * T​h​e​ ​p​r​i​c​e​ ​m​o​v​e​d​,​ ​s​o​ ​t​h​e​ ​a​m​o​u​n​t​s​ ​w​e​r​e​ ​u​p​d​a​t​e​d​.​ ​C​h​e​c​k​ ​t​h​e​m​ ​b​e​f​o​r​e​ ​y​o​u​ ​s​e​n​d​.
+		 */
+		priceUpdated: string
+		/**
 		 * P​a​y​m​e​n​t​ ​a​l​r​e​a​d​y​ ​a​t​t​e​m​p​t​e​d​.​
 	​
 	​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​s​e​n​d​ ​t​h​i​s​ ​p​a​y​m​e​n​t​ ​a​g​a​i​n​,​ ​s​t​a​r​t​ ​f​r​o​m​ ​s​c​r​a​t​c​h​.
@@ -7443,13 +7447,87 @@ type RootTranslation = {
 		 */
 		slideConfirming: string
 		/**
+		 * S​l​i​d​e​ ​t​o​ ​s​e​n​d
+		 */
+		slideToSend: string
+		/**
+		 * C​a​l​c​u​l​a​t​i​n​g​ ​f​e​e​…
+		 */
+		calculatingFee: string
+		sendProgress: {
+			/**
+			 * R​e​v​i​e​w​i​n​g
+			 */
+			reviewing: string
+			/**
+			 * S​i​g​n​i​n​g
+			 */
+			signing: string
+			/**
+			 * F​i​n​d​i​n​g​ ​r​o​u​t​e
+			 */
+			findingRoute: string
+			/**
+			 * B​r​o​a​d​c​a​s​t​i​n​g
+			 */
+			broadcasting: string
+			/**
+			 * C​h​e​c​k​i​n​g​ ​d​e​l​i​v​e​r​y
+			 */
+			checkingDelivery: string
+			/**
+			 * R​e​-​t​r​y​i​n​g
+			 */
+			retrying: string
+			/**
+			 * A​l​m​o​s​t​ ​t​h​e​r​e
+			 */
+			almostThere: string
+			/**
+			 * A​n​y​ ​t​i​m​e​ ​n​o​w
+			 */
+			anyTimeNow: string
+			/**
+			 * O​h​ ​o​h
+			 */
+			ohOh: string
+			/**
+			 * T​r​y​i​n​g​ ​a​g​a​i​n
+			 */
+			tryingAgain: string
+		}
+		/**
 		 * C​o​p​i​e​d​ ​d​e​s​t​i​n​a​t​i​o​n​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedDestination: string
 		/**
-		 * H​i​g​h​ ​f​e​e​!​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
+		 * H​i​g​h​ ​f​e​e​.​ ​W​e​ ​r​e​c​o​m​m​e​n​d​ ​L​i​g​h​t​n​i​n​g​.
 		 */
 		lightningRecommended: string
+		/**
+		 * S​e​n​d​i​n​g
+		 */
+		sending: string
+		/**
+		 * S​e​n​t
+		 */
+		sent: string
+		/**
+		 * R​e​c​e​i​p​t
+		 */
+		receipt: string
+		/**
+		 * F​r​o​m​ ​B​a​l​a​n​c​e
+		 */
+		fromBalance: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * C​h​a​n​g​e​ ​a​m​o​u​n​t
+		 */
+		changeAmount: string
 		/**
 		 * R​e​m​a​i​n​i​n​g​ ​{​r​e​m​a​i​n​i​n​g​}​ ​(​{​r​e​m​a​i​n​i​n​g​S​a​t​s​}​)​ ​w​i​l​l​ ​b​e​ ​c​o​n​v​e​r​t​e​d​ ​t​o​ ​B​i​t​c​o​i​n​.​ ​U​S​D​ ​m​i​n​i​m​u​m​:​ ​{​m​i​n​i​m​u​m​}​.
 		 * @param {string} minimum
@@ -7612,6 +7690,14 @@ type RootTranslation = {
 		 * A​m​o​u​n​t
 		 */
 		amount: string
+		/**
+		 * A​d​d​ ​a​m​o​u​n​t
+		 */
+		addAmount: string
+		/**
+		 * L​o​w​ ​f​u​n​d​s
+		 */
+		lowFunds: string
 		/**
 		 * A​m​o​u​n​t​ ​e​x​c​e​e​d​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}
 		 * @param {string} balance
@@ -7789,15 +7875,15 @@ type RootTranslation = {
 		 */
 		feeTier: string
 		/**
-		 * F​a​s​t
+		 * P​r​i​o​r​i​t​y
 		 */
 		fast: string
 		/**
-		 * M​e​d​i​u​m
+		 * S​t​a​n​d​a​r​d
 		 */
 		medium: string
 		/**
-		 * S​l​o​w
+		 * E​c​o​n​o​m​y
 		 */
 		slow: string
 		/**
@@ -13678,21 +13764,6 @@ type RootTranslation = {
 		 * N​e​t​w​o​r​k​ ​f​e​e
 		 */
 		feeRate: string
-		/**
-		 * F​a​s​t​e​s​t​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​1​0​ ​m​i​n
-		 * @param {unknown} sats
-		 */
-		feeRateFastest: RequiredParams<'sats'>
-		/**
-		 * N​o​r​m​a​l​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​3​0​ ​m​i​n
-		 * @param {unknown} sats
-		 */
-		feeRateHalfHour: RequiredParams<'sats'>
-		/**
-		 * E​c​o​n​o​m​y​ ​(​~​{​s​a​t​s​}​ ​s​a​t​s​)​ ​~​6​0​ ​m​i​n
-		 * @param {unknown} sats
-		 */
-		feeRateHour: RequiredParams<'sats'>
 		/**
 		 * {​r​a​t​e​}​ ​s​a​t​/​v​B
 		 * @param {unknown} rate
@@ -21280,6 +21351,10 @@ export type TranslationFunctions = {
 		 */
 		somethingWentWrong: () => LocalizedString
 		/**
+		 * The price moved, so the amounts were updated. Check them before you send.
+		 */
+		priceUpdated: () => LocalizedString
+		/**
 		 * Payment already attempted.
 
 	If you want to send this payment again, start from scratch.
@@ -21294,13 +21369,87 @@ export type TranslationFunctions = {
 		 */
 		slideConfirming: () => LocalizedString
 		/**
+		 * Slide to send
+		 */
+		slideToSend: () => LocalizedString
+		/**
+		 * Calculating fee…
+		 */
+		calculatingFee: () => LocalizedString
+		sendProgress: {
+			/**
+			 * Reviewing
+			 */
+			reviewing: () => LocalizedString
+			/**
+			 * Signing
+			 */
+			signing: () => LocalizedString
+			/**
+			 * Finding route
+			 */
+			findingRoute: () => LocalizedString
+			/**
+			 * Broadcasting
+			 */
+			broadcasting: () => LocalizedString
+			/**
+			 * Checking delivery
+			 */
+			checkingDelivery: () => LocalizedString
+			/**
+			 * Re-trying
+			 */
+			retrying: () => LocalizedString
+			/**
+			 * Almost there
+			 */
+			almostThere: () => LocalizedString
+			/**
+			 * Any time now
+			 */
+			anyTimeNow: () => LocalizedString
+			/**
+			 * Oh oh
+			 */
+			ohOh: () => LocalizedString
+			/**
+			 * Trying again
+			 */
+			tryingAgain: () => LocalizedString
+		}
+		/**
 		 * Copied destination to clipboard
 		 */
 		copiedDestination: () => LocalizedString
 		/**
-		 * High fee! We recommend Lightning.
+		 * High fee. We recommend Lightning.
 		 */
 		lightningRecommended: () => LocalizedString
+		/**
+		 * Sending
+		 */
+		sending: () => LocalizedString
+		/**
+		 * Sent
+		 */
+		sent: () => LocalizedString
+		/**
+		 * Receipt
+		 */
+		receipt: () => LocalizedString
+		/**
+		 * From Balance
+		 */
+		fromBalance: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Change amount
+		 */
+		changeAmount: () => LocalizedString
 		/**
 		 * Remaining {remaining} ({remainingSats}) will be converted to Bitcoin. USD minimum: {minimum}.
 		 */
@@ -21445,6 +21594,14 @@ export type TranslationFunctions = {
 		 * Amount
 		 */
 		amount: () => LocalizedString
+		/**
+		 * Add amount
+		 */
+		addAmount: () => LocalizedString
+		/**
+		 * Low funds
+		 */
+		lowFunds: () => LocalizedString
 		/**
 		 * Amount exceeds your balance of {balance}
 		 */
@@ -21620,15 +21777,15 @@ export type TranslationFunctions = {
 		 */
 		feeTier: () => LocalizedString
 		/**
-		 * Fast
+		 * Priority
 		 */
 		fast: () => LocalizedString
 		/**
-		 * Medium
+		 * Standard
 		 */
 		medium: () => LocalizedString
 		/**
-		 * Slow
+		 * Economy
 		 */
 		slow: () => LocalizedString
 		/**
@@ -27390,18 +27547,6 @@ export type TranslationFunctions = {
 		 * Network fee
 		 */
 		feeRate: () => LocalizedString
-		/**
-		 * Fastest (~{sats} sats) ~10 min
-		 */
-		feeRateFastest: (arg: { sats: unknown }) => LocalizedString
-		/**
-		 * Normal (~{sats} sats) ~30 min
-		 */
-		feeRateHalfHour: (arg: { sats: unknown }) => LocalizedString
-		/**
-		 * Economy (~{sats} sats) ~60 min
-		 */
-		feeRateHour: (arg: { sats: unknown }) => LocalizedString
 		/**
 		 * {rate} sat/vB
 		 */

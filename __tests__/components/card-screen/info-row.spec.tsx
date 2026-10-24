@@ -1,6 +1,6 @@
 import React from "react"
-import { StyleSheet, Text as RNText } from "react-native"
-import { render } from "@testing-library/react-native"
+import { ActivityIndicator, StyleSheet, Text as RNText } from "react-native"
+import { render, screen } from "@testing-library/react-native"
 
 import { InfoRow } from "@app/components/card-screen/info-row"
 
@@ -25,6 +25,9 @@ jest.mock("@rn-vui/themed", () => ({
     value: { fontWeight: "700" },
     mutedValue: { color: "#666666", fontWeight: "400" },
     secondaryValue: { fontWeight: "400" },
+    loadingSlot: { flex: 1 },
+    hidden: { opacity: 0 },
+    spinner: { position: "absolute" },
   }),
 }))
 
@@ -188,6 +191,44 @@ describe("InfoRow", () => {
       )
 
       expect(getByText("21,493 SAT ($22.42)")).toBeTruthy()
+    })
+  })
+
+  describe("with loading", () => {
+    it("shows a spinner in place of the value", () => {
+      const { queryByText } = render(<InfoRow label="Fee" value="$0.10" loading />)
+
+      expect(queryByText("$0.10")).toBeNull()
+      expect(screen.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(1)
+    })
+
+    /** An invisible line of value text holds the row's height, so the row doesn't jump
+     *  when the value replaces the spinner. */
+    it("keeps a hidden line of value text to hold the row height", () => {
+      render(<InfoRow label="Fee" value="$0.10" loading />)
+
+      const spacer = screen
+        .UNSAFE_getAllByType(RNText)
+        .find((node) => StyleSheet.flatten(node.props.style)?.opacity === 0)
+      expect(spacer).toBeDefined()
+      expect(StyleSheet.flatten(spacer?.props.style).fontWeight).toBe("700")
+    })
+
+    it("shows the value and no spinner when not loading", () => {
+      const { getByText } = render(<InfoRow label="Fee" value="$0.10" />)
+
+      expect(getByText("$0.10")).toBeTruthy()
+      expect(screen.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
+    })
+  })
+
+  describe("with valueTestId", () => {
+    it("tags the value text", () => {
+      const { getByTestId } = render(
+        <InfoRow label="Fee" value="$0.10" valueTestId="Successful Fee" />,
+      )
+
+      expect(getByTestId("Successful Fee").props.children).toContain("$0.10")
     })
   })
 })

@@ -153,6 +153,8 @@ export type RootStackParamList = {
     destination?: string
     paymentType?: string
     createdAt?: number
+    /** Review already played Sent, so the receipt opens straight away. */
+    hasShownSuccess?: boolean
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined
