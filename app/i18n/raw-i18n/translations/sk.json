@@ -2340,6 +2340,20 @@
     "paymentAlreadyAttempted": "Platba už bola vykonaná.\n\nAk chcete túto platbu odoslať znova, začnite od začiatku.",
     "slideToConfirm": "Posunutím potvrďte",
     "slideConfirming": "Potvrdzovanie...",
+    "slideToSend": "Posunutím odošlite",
+    "calculatingFee": "Výpočet poplatku…",
+    "sendProgress": {
+      "reviewing": "Kontrola",
+      "signing": "Podpisovanie",
+      "findingRoute": "Hľadanie trasy",
+      "broadcasting": "Vysielanie",
+      "checkingDelivery": "Overovanie doručenia",
+      "retrying": "Opakovanie",
+      "almostThere": "Takmer hotovo",
+      "anyTimeNow": "Každú chvíľu",
+      "ohOh": "Ojoj",
+      "tryingAgain": "Skúšame znova"
+    },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
     "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning.",
     "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}."

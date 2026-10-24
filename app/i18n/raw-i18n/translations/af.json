@@ -2340,6 +2340,20 @@
     "paymentAlreadyAttempted": "Betaling reeds geprobeer.\n\nAs jy hierdie betaling weer wil stuur, begin van voor af.",
     "slideToConfirm": "Gly om te bevestig",
     "slideConfirming": "Besig om te bevestig...",
+    "slideToSend": "Gly om te stuur",
+    "calculatingFee": "Bereken fooi…",
+    "sendProgress": {
+      "reviewing": "Hersien",
+      "signing": "Teken",
+      "findingRoute": "Soek roete",
+      "broadcasting": "Saai uit",
+      "checkingDelivery": "Kontroleer aflewering",
+      "retrying": "Probeer weer",
+      "almostThere": "Amper daar",
+      "anyTimeNow": "Enige oomblik nou",
+      "ohOh": "O jee",
+      "tryingAgain": "Probeer nog 'n keer"
+    },
     "copiedDestination": "Bestemming na knipbord oorgedra",
     "lightningRecommended": "Hoë fooi! Ons beveel Lightning aan.",
     "usdRemainderSweep": "Oorblywende {remaining: string} ({remainingSats: string}) sal na Bitcoin omgeskakel word. USD-minimum: {minimum: string}."

@@ -2340,6 +2340,20 @@
     "paymentAlreadyAttempted": "Okusasula kwagezaako dda.\n\nBw’oba ​​oyagala okuddamu okusindika ssente zino, tandika okuva ku ntobo.",
     "slideToConfirm": "Seereza Okukakasa",
     "slideConfirming": "Okukakasa",
+    "slideToSend": "Seereza Okusindika",
+    "calculatingFee": "Kubala ssente…",
+    "sendProgress": {
+      "reviewing": "Okwekebejja",
+      "signing": "Okussaako omukono",
+      "findingRoute": "Okunoonya ekkubo",
+      "broadcasting": "Okusaasaanya",
+      "checkingDelivery": "Okukebera okutuuka",
+      "retrying": "Okuddamu",
+      "almostThere": "Kumpi tutuuse",
+      "anyTimeNow": "Essaawa yonna kati",
+      "ohOh": "Woowe",
+      "tryingAgain": "Tuddamu ogezaako"
+    },
     "copiedDestination": "Gy'eziraga wawanduukuluddwa ku lutimbe",
     "lightningRecommended": "Ebisale ebingi! Tukukubiriza okukozesa Lightning.",
     "usdRemainderSweep": "Ekisigaddewo {remaining: string} ({remainingSats: string}) kijja kufuulibwa Bitcoin. Ekitundu ekisembayo eky'USD: {minimum: string}."

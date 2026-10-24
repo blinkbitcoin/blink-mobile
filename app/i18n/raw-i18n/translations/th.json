@@ -2340,6 +2340,20 @@
     "paymentAlreadyAttempted": "มีการพยายามชำระเงินแล้ว\n\nหากคุณต้องการส่งการชำระเงินนี้อีกครั้ง กรุณาเริ่มต้นใหม่",
     "slideToConfirm": "เลื่อนเพื่อยืนยัน",
     "slideConfirming": "กำลังยืนยัน...",
+    "slideToSend": "เลื่อนเพื่อส่ง",
+    "calculatingFee": "กำลังคำนวณค่าธรรมเนียม…",
+    "sendProgress": {
+      "reviewing": "กำลังตรวจสอบ",
+      "signing": "กำลังลงนาม",
+      "findingRoute": "กำลังหาเส้นทาง",
+      "broadcasting": "กำลังเผยแพร่",
+      "checkingDelivery": "กำลังตรวจสอบการส่งถึง",
+      "retrying": "กำลังลองใหม่",
+      "almostThere": "ใกล้เสร็จแล้ว",
+      "anyTimeNow": "อีกไม่นาน",
+      "ohOh": "อุ๊ย",
+      "tryingAgain": "ลองอีกครั้ง"
+    },
     "copiedDestination": "คัดลอกปลายทางไปยังคลิปบอร์ดแล้ว",
     "lightningRecommended": "ค่าธรรมเนียมสูง! แนะนำให้ใช้ Lightning",
     "usdRemainderSweep": "ยอดคงเหลือ {remaining: string} ({remainingSats: string}) จะถูกแปลงเป็น Bitcoin ขั้นต่ำของ USD: {minimum: string}"

@@ -22,6 +22,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import * as colors from "@app/rne-theme/colors"
 import type { useNonCustodialConversionLimits } from "@app/self-custodial/hooks/use-non-custodial-conversion-limits"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
@@ -262,11 +263,13 @@ jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder
   return { HiddenBalancePlaceholder: MockHiddenBalancePlaceholder }
 })
 
+const mockSliderProps = jest.fn()
 jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () => {
   type Props = {
     onSwipe: () => void
     testID?: string
     initialText?: string
+    disabledText?: string
     disabled?: boolean
   }
 
@@ -275,25 +278,31 @@ jest.mock("@app/components/atomic/galoy-slider-button/galoy-slider-button", () =
    * still fires onSwipe, so a regression that disabled the slider outright would slip
    * past every case that swipes and only be caught by the ones that read the state.
    */
-  const MockGaloySliderButton = ({
-    onSwipe,
-    testID = "slider",
-    initialText = "Slide",
-    disabled = false,
-  }: Props) => (
-    <TouchableOpacity
-      testID={testID}
-      onPress={onSwipe}
-      disabled={disabled}
-      accessibilityState={{ disabled }}
-    >
-      <Text>{initialText}</Text>
-    </TouchableOpacity>
-  )
+  const MockGaloySliderButton = (props: Props) => {
+    mockSliderProps(props)
+    const {
+      onSwipe,
+      testID = "slider",
+      initialText = "Slide",
+      disabledText,
+      disabled = false,
+    } = props
+    return (
+      <TouchableOpacity
+        testID={testID}
+        onPress={onSwipe}
+        disabled={disabled}
+        accessibilityState={{ disabled }}
+      >
+        <Text>{disabled ? disabledText ?? initialText : initialText}</Text>
+      </TouchableOpacity>
+    )
+  }
 
   return { __esModule: true, default: MockGaloySliderButton }
 })
 
+const lastSliderProps = () => mockSliderProps.mock.calls.at(-1)?.[0]
 /**
  * Every describe in this file renders the screen, so the mocks that render reads are
  * defaulted here rather than inside the one describe that happens to run first. Left
@@ -419,7 +428,7 @@ describe("SendBitcoinConfirmationScreen", () => {
     expect(screen.getByText(lnurl)).toBeTruthy()
     expect(screen.getByText("$0.05 (₦100)")).toBeTruthy()
     expect(screen.getByTestId("slider")).toBeTruthy()
-    expect(LL.SendBitcoinConfirmationScreen.slideToConfirm()).toBeTruthy()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
   })
 
   it("Calls saveLnAddressContact when LNURL payment is SUCCESS", async () => {
@@ -1265,6 +1274,34 @@ describe("SendBitcoinConfirmationScreen — 409 idempotency conflict recovery", 
     expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
   })
 
+  it("keeps the slider busy while the 409 is verified, with no sheet or error (S6)", async () => {
+    let settleVerify: (value: undefined) => void = () => {}
+    sendPaymentMock.mockRejectedValueOnce(conflictError)
+    verifyPaymentSettledMock.mockReturnValueOnce(
+      new Promise((resolve) => {
+        settleVerify = resolve
+      }),
+    )
+
+    render(
+      <ContextForScreen>
+        <LightningLnURL route={buildLnurlRoute()} />
+      </ContextForScreen>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+
+    expect(verifyPaymentSettledMock).toHaveBeenCalledTimes(1)
+    expect(mockSliderProps.mock.calls.at(-1)?.[0].isLoading).toBe(true)
+    expect(screen.queryByText(/Payment already attempted/i)).toBeNull()
+
+    await act(async () => settleVerify(undefined))
+
+    expect(mockSliderProps.mock.calls.at(-1)?.[0].isLoading).toBe(false)
+  })
+
   it("falls back to the already-attempted message when settlement cannot be confirmed", async () => {
     sendPaymentMock.mockRejectedValueOnce(conflictError)
     verifyPaymentSettledMock.mockResolvedValueOnce(undefined)
@@ -1404,5 +1441,134 @@ describe("hide balance", () => {
     await renderSettledWithHideAmount(false)
 
     expect(screen.queryAllByTestId("hidden-balance-placeholder")).toHaveLength(0)
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — slide to send", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+  })
+
+  const renderRoute = async (
+    paymentRoute: ReturnType<
+      typeof buildUsdSettlementRoute | typeof buildBtcSettlementRoute
+    >,
+  ) => {
+    render(
+      <ContextForScreen>
+        <Intraledger route={paymentRoute} />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+  }
+
+  it("reads 'Slide to send' once the fee has resolved", async () => {
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
+    expect(lastSliderProps().disabled).toBe(false)
+  })
+
+  it("reads 'Calculating fee…' while the fee quote is loading", async () => {
+    mockUseFee.mockReturnValue({ status: "loading" })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeTruthy()
+    expect(lastSliderProps().disabled).toBe(true)
+  })
+
+  it("reads 'Calculating fee…' when the fee quote failed without an amount", async () => {
+    mockUseFee.mockReturnValue({ status: "error" })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeTruthy()
+  })
+
+  it("reads 'Calculating fee…' while the dust check is pending", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: true,
+      error: null,
+    })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(
+      screen.getByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeTruthy()
+    expect(lastSliderProps().disabled).toBe(true)
+  })
+
+  it("stays disabled without claiming to calculate when the dust check is blocked (N1 deferred)", async () => {
+    mockUseFee.mockReturnValue({
+      status: "set",
+      amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
+      amountAdjustment: ConvertAmountAdjustment.IncreasedToAvoidDust,
+    })
+    mockUseNonCustodialConversionLimits.mockReturnValue({
+      limits: null,
+      loading: false,
+      error: new Error("limits failed"),
+    })
+
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(lastSliderProps().disabled).toBe(true)
+    expect(lastSliderProps().disabledText).toBeUndefined()
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.slideToSend())).toBeTruthy()
+  })
+
+  it("does not claim to calculate when the amount is over balance", async () => {
+    await renderRoute(buildUsdSettlementRoute(11000))
+
+    expect(lastSliderProps().disabled).toBe(true)
+    expect(
+      screen.queryByText(LL.SendBitcoinConfirmationScreen.calculatingFee()),
+    ).toBeNull()
+  })
+
+  it("uses the Dollar accent for a Dollar send", async () => {
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    expect(lastSliderProps().accentColor).toBe(colors.dark._green)
+  })
+
+  it("uses the primary accent for a Bitcoin send", async () => {
+    await renderRoute(buildBtcSettlementRoute(1000))
+
+    expect([colors.light.primary, colors.dark.primary]).toContain(
+      lastSliderProps().accentColor,
+    )
+  })
+
+  it("rotates the send progress labels in the ticket's order", async () => {
+    await renderRoute(buildUsdSettlementRoute(200))
+
+    const progress = LL.SendBitcoinConfirmationScreen.sendProgress
+    expect(lastSliderProps().busyLabels).toEqual([
+      progress.reviewing(),
+      progress.signing(),
+      progress.findingRoute(),
+      progress.broadcasting(),
+      progress.checkingDelivery(),
+      progress.retrying(),
+      progress.almostThere(),
+      progress.anyTimeNow(),
+      progress.ohOh(),
+      progress.tryingAgain(),
+    ])
   })
 })
