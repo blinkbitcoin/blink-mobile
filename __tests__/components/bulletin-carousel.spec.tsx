@@ -1,5 +1,5 @@
 import * as React from "react"
-import { ScrollView, StyleSheet, Text, View, ViewStyle } from "react-native"
+import { Pressable, ScrollView, StyleSheet, Text, View, ViewStyle } from "react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import {
@@ -130,7 +130,7 @@ describe("BulletinCarousel", () => {
       "primary",
     ])
     expect(rendered.getByLabelText("Notification 3 of 3")).toBeTruthy()
-    expect(rendered.getByText("a:inactive")).toBeTruthy()
+    expect(rendered.getByText("a:inactive", { includeHiddenElements: true })).toBeTruthy()
     expect(rendered.getByText("c:active")).toBeTruthy()
   })
 
@@ -186,6 +186,29 @@ describe("BulletinCarousel", () => {
       adjust("increment")
       adjust("increment")
       expect(indicator(rendered).props.accessibilityLabel).toBe("Notification 2 of 2")
+    })
+
+    it("reach the card in view alone, and follow a swipe to the next", () => {
+      const rendered = renderCarousel([
+        {
+          key: "a",
+          node: <Pressable accessibilityRole="button" accessibilityLabel="Open a" />,
+        },
+        {
+          key: "b",
+          node: <Pressable accessibilityRole="button" accessibilityLabel="Open b" />,
+        },
+      ])
+      const exposed = () =>
+        rendered.queryAllByRole("button").map(({ props }) => props.accessibilityLabel)
+
+      expect(exposed()).toEqual(["Open a"])
+
+      fireEvent(indicator(rendered), "accessibilityAction", {
+        nativeEvent: { actionName: "increment" },
+      })
+
+      expect(exposed()).toEqual(["Open b"])
     })
   })
 
@@ -248,9 +271,13 @@ describe("BulletinCarousel", () => {
   describe("height", () => {
     const measure = (rendered: Rendered, id: string, height: number) =>
       act(() => {
-        fireEvent(rendered.getByTestId(`card-${id}`), "layout", {
-          nativeEvent: { layout: { width: WIDTH, height } },
-        })
+        fireEvent(
+          rendered.getByTestId(`card-${id}`, { includeHiddenElements: true }),
+          "layout",
+          {
+            nativeEvent: { layout: { width: WIDTH, height } },
+          },
+        )
       })
 
     it("takes the height of the card in view, and follows a swipe", () => {
