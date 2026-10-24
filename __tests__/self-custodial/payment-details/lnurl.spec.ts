@@ -561,7 +561,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
     it("returns Success with successAction in extraInfo on success (Message)", async () => {
       mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockResolvedValue({
-        payment: { id: "p1" },
+        payment: { id: "p1", status: 0 /* PaymentStatus.Completed */ },
         successAction: { tag: "Message", inner: { data: { message: "Thanks!" } } },
       })
       const detail = createSelfCustodialLnurlPaymentDetails(createParams())
@@ -673,6 +673,7 @@ describe("createSelfCustodialLnurlPaymentDetails", () => {
       mockExecuteLnurl.mockResolvedValue({
         payment: {
           id: "p1",
+          status: 0 /* PaymentStatus.Completed */,
           timestamp: BigInt(1747691078),
           details: {
             tag: "Lightning",
@@ -1135,14 +1136,13 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     expect(result.errors).toBeUndefined()
   })
 
-  /** Reported as the send itself would have reported it: the SDK hands a payment back
-   *  as soon as it is dispatched, pending or not, and every rail reports that as sent. */
-  it("reports it as sent when the wallet still shows it in flight, as the send would have", async () => {
+  /** Reported as the send itself would have reported it: in flight is pending, not sent. */
+  it("reports it as pending when the wallet still shows it in flight, as the send would have", async () => {
     mockFindLostSend.mockResolvedValue(found(paymentOf(QUOTED_HASH, PENDING)))
 
     const result = await sendFromDollars()
 
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Pending)
     expect(result.transaction?.createdAt).toBe(1747691078)
     expect(result.extraInfo?.preimage).toBe("found-preimage")
     expect(result.extraInfo?.successAction).toBeUndefined()
@@ -1497,7 +1497,7 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
 
       const result = await sendFromDollars()
 
-      expect(result.status).toBe(PaymentSendResult.Success)
+      expect(result.status).toBe(PaymentSendResult.Pending)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
@@ -1514,7 +1514,7 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       })
       const retry = await detail.sendPaymentMutation({} as never)
 
-      expect(retry.status).toBe(PaymentSendResult.Success)
+      expect(retry.status).toBe(PaymentSendResult.Pending)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
@@ -1527,7 +1527,7 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       historyShows(lostSendRecord(QUOTED_HASH))
       const retry = await detail.sendPaymentMutation({} as never)
 
-      expect(retry.status).toBe(PaymentSendResult.Success)
+      expect(retry.status).toBe(PaymentSendResult.Pending)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
 
@@ -1556,5 +1556,61 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails dollar send whose quote moved after review", () => {
+  const dollarDetail = () =>
+    createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w-usd", currency: WalletCurrency.Usd },
+        unitOfAccountAmount: {
+          amount: 100,
+          currency: WalletCurrency.Usd,
+          currencyCode: "USD",
+        },
+      }),
+    )
+
+  const quoteAt = (amountOut: number) => ({
+    ...quote(),
+    conversionEstimate: { amountIn: BigInt(100), amountOut: BigInt(amountOut) },
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockExtractLnurlFee.mockReturnValue(5)
+    mockExecuteLnurl.mockResolvedValue({
+      payment: { id: "p1" },
+      successAction: undefined,
+    })
+  })
+
+  it("takes the fee out of the amount", () => {
+    expect(dollarDetail().isFeeIncluded).toBe(true)
+  })
+
+  it("pays nothing when the conversion moved since review", async () => {
+    const detail = dollarDetail()
+    if (!detail.canGetFee || !detail.canSendPayment) throw new Error("expected a send")
+    mockPrepareLnurl.mockResolvedValueOnce(quoteAt(4000))
+    await detail.getFee({} as never)
+
+    mockPrepareLnurl.mockResolvedValueOnce(quoteAt(3900))
+    const result = await detail.sendPaymentMutation({} as never)
+
+    expect(result.errors?.[0]?.message).toBe(SelfCustodialErrorCode.QuoteMoved)
+    expect(mockExecuteLnurl).not.toHaveBeenCalled()
+  })
+
+  it("pays the quote review showed", async () => {
+    const detail = dollarDetail()
+    if (!detail.canGetFee || !detail.canSendPayment) throw new Error("expected a send")
+    mockPrepareLnurl.mockResolvedValue(quoteAt(4000))
+    await detail.getFee({} as never)
+
+    await detail.sendPaymentMutation({} as never)
+
+    expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
   })
 })
