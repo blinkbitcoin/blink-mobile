@@ -5,7 +5,7 @@ import {
   fireGestureHandler,
   getByGestureTestId,
 } from "react-native-gesture-handler/jest-utils"
-import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { act, configure, fireEvent, render, screen } from "@testing-library/react-native"
 
 import GaloySliderButton, {
   SLIDER_PAN_TEST_ID,
@@ -20,6 +20,10 @@ jest.mock("react-native-reanimated", () => ({
   ...jest.requireActual("react-native-reanimated"),
   useFrameCallback: jest.fn(),
 }))
+
+// The track's labels are drawn for sight and hidden from screen readers (the handle speaks
+// for them), so text queries here must reach hidden elements.
+configure({ defaultIncludeHiddenElements: true })
 
 const TRACK_WIDTH = 350
 const HANDLE_SIZE = 60
@@ -231,6 +235,55 @@ describe("GaloySliderButton", () => {
       await act(async () => settle())
       expect(screen.getByText("Slide to send")).toBeTruthy()
       expect(screen.queryByText("Confirming")).toBeNull()
+    })
+  })
+
+  /** A screen reader, Switch Control or Voice Control can't drag the handle. */
+  describe("screen reader", () => {
+    const handle = () => screen.getByTestId("slider")
+    const activate = () =>
+      act(async () => {
+        fireEvent(handle(), "accessibilityAction", {
+          nativeEvent: { actionName: "activate" },
+        })
+      })
+
+    it("reads the handle as a button named for the track's label", async () => {
+      await renderSlider()
+
+      expect(handle().props.accessibilityRole).toBe("button")
+      expect(handle().props.accessibilityLabel).toBe("Slide to send")
+      expect(handle().props.accessibilityActions).toEqual([{ name: "activate" }])
+    })
+
+    it("turns busy on activate, as a full slide does", async () => {
+      await renderSlider({ onSwipe: () => new Promise<void>(() => {}) })
+
+      await activate()
+
+      expect(handle().props.accessibilityLabel).toBe("Confirming")
+      expect(handle().props.accessibilityState).toEqual({ disabled: true, busy: true })
+    })
+
+    it("counts one send for repeated activates", async () => {
+      const onSwipe = jest.fn(() => new Promise<void>(() => {}))
+      await renderSlider({ onSwipe })
+
+      await activate()
+      await activate()
+
+      expect(onSwipe).toHaveBeenCalledTimes(1)
+    })
+
+    it("ignores activate while disabled and says so", async () => {
+      const onSwipe = jest.fn()
+      await renderSlider({ onSwipe, disabled: true, disabledText: "Calculating fee" })
+
+      await activate()
+
+      expect(onSwipe).not.toHaveBeenCalled()
+      expect(handle().props.accessibilityLabel).toBe("Calculating fee")
+      expect(handle().props.accessibilityState).toEqual({ disabled: true, busy: false })
     })
   })
 })

@@ -1,5 +1,11 @@
 import React, { useCallback, useEffect, useState } from "react"
-import { I18nManager, LayoutChangeEvent, View } from "react-native"
+import {
+  AccessibilityActionEvent,
+  AccessibilityInfo,
+  I18nManager,
+  LayoutChangeEvent,
+  View,
+} from "react-native"
 import { Gesture, GestureDetector } from "react-native-gesture-handler"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
 import Animated, {
@@ -158,6 +164,21 @@ const GaloySliderButton = ({
   )
 
   const idleLabel = disabled ? disabledText ?? initialText : initialText
+  const busyLabel = busyLabels?.[0] ?? loadingText
+
+  /** A screen reader, Switch Control or Voice Control can't drag: their activate (a double
+   *  tap) sends the same way a full slide does. */
+  const onAccessibilityAction = (event: AccessibilityActionEvent) => {
+    if (event.nativeEvent.actionName !== "activate") return
+    if (busy || disabled || hasCommitted.value) return
+    hasCommitted.value = true
+    X.value = withTiming(travel, {
+      duration: COMPLETE_DURATION_MS,
+      easing: Easing.out(Easing.cubic),
+    })
+    AccessibilityInfo.announceForAccessibility(busyLabel)
+    commit()
+  }
 
   return (
     <View
@@ -172,6 +193,8 @@ const GaloySliderButton = ({
             entering={FadeIn.duration(250).delay(COMPLETE_DURATION_MS)}
             style={styles.labelContainer}
             pointerEvents="none"
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
           >
             {busyLabels?.length ? (
               <RotatingLabel labels={busyLabels} />
@@ -181,7 +204,12 @@ const GaloySliderButton = ({
           </Animated.View>
         </>
       ) : (
-        <Animated.View style={[styles.labelContainer, labelStyle]} pointerEvents="none">
+        <Animated.View
+          style={[styles.labelContainer, labelStyle]}
+          pointerEvents="none"
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           <Text style={styles.idleText} numberOfLines={1}>
             {idleLabel}
           </Text>
@@ -196,6 +224,13 @@ const GaloySliderButton = ({
           ]}
           pointerEvents={busy ? "none" : "auto"}
           {...testProps("slider")}
+          /* The handle is the one element a screen reader reaches, named for the label on
+             the track (which it hides) and sent by an activate. */
+          accessibilityRole="button"
+          accessibilityLabel={busy ? busyLabel : idleLabel}
+          accessibilityState={{ disabled: disabled || busy, busy }}
+          accessibilityActions={[{ name: "activate" }]}
+          onAccessibilityAction={onAccessibilityAction}
         >
           <GaloyIcon
             size={30}
