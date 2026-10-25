@@ -25,7 +25,6 @@ import Animated, {
   withTiming,
 } from "react-native-reanimated"
 
-import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles } from "@rn-vui/themed"
 
 // A scrim has to darken in both themes; the theme's backdrop tokens invert and
@@ -58,6 +57,7 @@ export const BOTTOM_OVERHANG = 1
 
 /** @see `bottom-sheet.spec` — the drag is only reachable from a test by name. */
 export const PAN_TEST_ID = "bottom-sheet-pan"
+export const SCRIM_TEST_ID = "bottom-sheet-scrim"
 
 type SharedProps = {
   isVisible: boolean
@@ -172,7 +172,6 @@ export const BottomSheet: React.FC<Props> = ({
   scrollTestID,
   testID,
 }) => {
-  const { LL } = useI18nContext()
   const styles = useStyles()
   const { height: windowHeight } = useWindowDimensions()
 
@@ -465,6 +464,10 @@ export const BottomSheet: React.FC<Props> = ({
             : undefined
         }
         testID={testID}
+        // A screen reader stays inside the sheet, and its escape gesture closes it the way
+        // the scrim and Android back do.
+        accessibilityViewIsModal
+        onAccessibilityEscape={onClose}
       >
         <View style={styles.handle} />
 
@@ -520,11 +523,14 @@ export const BottomSheet: React.FC<Props> = ({
           app.tsx does not reach into a separate window. */}
       <GestureHandlerRootView style={styles.root}>
         <Animated.View style={[styles.backdrop, backdropStyle]}>
+          {/* Touch only: read first, a full-screen "Close" stood between a screen reader
+              and the sheet's message. Its escape gesture closes the sheet instead. */}
           <Pressable
             style={styles.backdropPress}
             onPress={onClose}
-            accessibilityRole="button"
-            accessibilityLabel={LL.common.close()}
+            testID={SCRIM_TEST_ID}
+            accessibilityElementsHidden
+            importantForAccessibility="no-hide-descendants"
           />
         </Animated.View>
 

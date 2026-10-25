@@ -2,6 +2,7 @@ import React from "react"
 import { StyleSheet } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
+import { SCRIM_TEST_ID } from "@app/components/bottom-sheet"
 import { ErrorMsgBottomSheet } from "@app/components/error-msg-bottom-sheet"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -63,7 +64,7 @@ describe("ErrorMsgBottomSheet", () => {
     const { onClose, onPrimaryPress } = renderSheet()
 
     await act(async () => {
-      fireEvent.press(screen.getByLabelText(i18nObject("en").common.close()))
+      fireEvent.press(screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }))
     })
 
     expect(onClose).toHaveBeenCalledTimes(1)
@@ -105,5 +106,29 @@ describe("ErrorMsgBottomSheet", () => {
       node = node.parent
     }
     expect(StyleSheet.flatten(node?.props.style).paddingBottom).toBe(HOME_INDICATOR + 20)
+  })
+
+  describe("screen reader", () => {
+    /** Read first, a full-screen "Close" stood between a screen reader and the message. */
+    it("keeps the scrim out of reach, so the title is read first", () => {
+      renderSheet()
+
+      expect(screen.queryByTestId(SCRIM_TEST_ID)).toBeNull()
+      expect(screen.queryByLabelText(i18nObject("en").common.close())).toBeNull()
+      expect(screen.getByRole("header", { name: "A small problem" })).toBeTruthy()
+    })
+
+    it("holds a screen reader inside the sheet and closes on its escape gesture", async () => {
+      const { onClose, onPrimaryPress } = renderSheet()
+      const sheet = screen.getByTestId(SHEET_TEST_ID)
+
+      expect(sheet.props.accessibilityViewIsModal).toBe(true)
+      await act(async () => {
+        fireEvent(sheet, "accessibilityEscape")
+      })
+
+      expect(onClose).toHaveBeenCalledTimes(1)
+      expect(onPrimaryPress).not.toHaveBeenCalled()
+    })
   })
 })

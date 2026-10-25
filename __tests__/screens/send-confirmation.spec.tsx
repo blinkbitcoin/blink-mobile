@@ -17,6 +17,7 @@ import {
   within,
 } from "@testing-library/react-native"
 
+import { SCRIM_TEST_ID } from "@app/components/bottom-sheet"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
@@ -2648,7 +2649,9 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
 
       // The scrim behind the sheet is the close control.
       await act(async () => {
-        fireEvent.press(screen.getByLabelText(LL.common.close()))
+        fireEvent.press(
+          screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }),
+        )
       })
 
       expect(errorSheet()).toBeNull()
@@ -2668,7 +2671,9 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
 
       await act(async () => {
-        fireEvent.press(screen.getByLabelText(LL.common.close()))
+        fireEvent.press(
+          screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }),
+        )
       })
       await flushEffects()
 
