@@ -37,6 +37,7 @@ gql`
     userEmailRegistrationInitiate(input: $input) {
       errors {
         message
+        code
       }
       emailRegistrationId
       me {

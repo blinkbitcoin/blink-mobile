@@ -757,6 +757,7 @@ mutation userEmailRegistrationInitiate($input: UserEmailRegistrationInitiateInpu
   userEmailRegistrationInitiate(input: $input) {
     errors {
       message
+      code
       __typename
     }
     emailRegistrationId
