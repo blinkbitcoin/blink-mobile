@@ -427,6 +427,16 @@ describe("ApiScreen", () => {
       }
     })
 
+    it("drops the empty state when every key is inactive", async () => {
+      apiKeysQueryMock.mockReturnValue(makeQueryResult([revokedKey, expiredKey]))
+
+      renderScreen()
+
+      expect(await screen.findByTestId(INACTIVE_TOGGLE)).toBeTruthy()
+      expect(screen.queryByText(LL.ApiScreen.noKeys())).toBeNull()
+      expect(screen.getByText(LL.ApiScreen.createKey())).toBeTruthy()
+    })
+
     it("hides the section when there are no inactive keys", async () => {
       apiKeysQueryMock.mockReturnValue(makeQueryResult([activeKey]))
 

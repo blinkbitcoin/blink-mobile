@@ -69,7 +69,7 @@ export const ApiScreen: React.FC = () => {
   const apiKeyItems: React.FC[] = [
     ...(loading
       ? [() => <SettingsRow title="" action={null} loading />]
-      : activeKeys.length === 0
+      : activeKeys.length === 0 && inactiveKeys.length === 0
         ? [
             () => (
               <SettingsRow title={LL.ApiScreen.noKeys()} action={null} rightIcon={null} />
