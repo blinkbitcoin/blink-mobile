@@ -28,6 +28,7 @@ import { useCustodialOwnerId } from "./use-custodial-owner-id"
 type SaveCheckpointOptions = {
   provisionedAccountId?: string
   expectedReceiveSats?: number
+  sparkInvoice?: string
 }
 
 /**
@@ -113,6 +114,9 @@ export const useMigrationCheckpointState = () => {
   const expectedReceiveSats = isOwnedByActiveAccount
     ? stored?.expectedReceiveSats ?? null
     : null
+  /** Null on a record written before the field existed, which the receive check reads as
+   *  "this describes a provisioned wallet" and answers by balance, as it always did. */
+  const sparkInvoice = isOwnedByActiveAccount ? stored?.sparkInvoice ?? null : null
 
   /** Answers `isSaved: false` when the write fails, so callers can stop the flow instead of
    *  advancing on a checkpoint that only exists in memory, and carries the kind of failure
@@ -125,6 +129,7 @@ export const useMigrationCheckpointState = () => {
       {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
+        sparkInvoice: sparkInvoiceUpdate,
       }: SaveCheckpointOptions = {},
     ): Promise<StorageWriteResult> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
@@ -137,6 +142,7 @@ export const useMigrationCheckpointState = () => {
         custodialAccountId: ownerId,
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
+        sparkInvoice: sparkInvoiceUpdate ?? sparkInvoice ?? undefined,
       }
       try {
         await saveCheckpointToStorage(storageKey, update)
@@ -150,7 +156,7 @@ export const useMigrationCheckpointState = () => {
         return { isSaved: false, failure: classifyStorageFailure(err) }
       }
     },
-    [storageKey, ownerId, accountId, expectedReceiveSats],
+    [storageKey, ownerId, accountId, expectedReceiveSats, sparkInvoice],
   )
 
   const clearCheckpoint = useCallback(() => {
@@ -172,6 +178,7 @@ export const useMigrationCheckpointState = () => {
     checkpoint,
     accountId,
     expectedReceiveSats,
+    sparkInvoice,
     /** The owner the record was actually saved under, null on one written before owners
      *  existed. Read by consumers that spend something irreversible, since the ownership
      *  flag above claims an owner-less record for whoever is active. */
