@@ -23,6 +23,7 @@ import Animated, {
 } from "react-native-reanimated"
 import Svg, { Rect } from "react-native-svg"
 
+import { haptics } from "@app/utils/haptics"
 import { testProps } from "@app/utils/testProps"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
@@ -117,6 +118,11 @@ const GaloySliderButton = ({
   const panGesture = Gesture.Pan()
     .withTestId(SLIDER_PAN_TEST_ID)
     .enabled(!busy && !disabled && travel > 0)
+    /** A light buzz as the finger lands on the handle, before it moves: it has the
+     *  handle and can slide. Silent while disabled or busy, when the pan is off. */
+    .onBegin(() => {
+      runOnJS(haptics.grab)()
+    })
     .onUpdate((e) => {
       if (hasCommitted.value) return
       const distance = isRTL ? -e.translationX : e.translationX

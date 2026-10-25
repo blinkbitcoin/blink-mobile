@@ -12,6 +12,8 @@ import GaloySliderButton, {
   SLIDER_TRACK_TEST_ID,
 } from "@app/components/atomic/galoy-slider-button/galoy-slider-button"
 
+import { haptics } from "@app/utils/haptics"
+
 import { ContextForScreen } from "../../../screens/helper"
 
 // The busy border's frame loop crashes against fake timers; the arc is not under test.
@@ -24,6 +26,8 @@ jest.mock("react-native-reanimated", () => ({
 // The track's labels are drawn for sight and hidden from screen readers (the handle speaks
 // for them), so text queries here must reach hidden elements.
 configure({ defaultIncludeHiddenElements: true })
+
+jest.mock("@app/utils/haptics", () => ({ haptics: { grab: jest.fn() } }))
 
 const TRACK_WIDTH = 350
 const HANDLE_SIZE = 60
@@ -284,6 +288,37 @@ describe("GaloySliderButton", () => {
       expect(onSwipe).not.toHaveBeenCalled()
       expect(handle().props.accessibilityLabel).toBe("Calculating fee")
       expect(handle().props.accessibilityState).toEqual({ disabled: true, busy: false })
+    })
+  })
+
+  /** Someone who can't see the handle needs to know they have it before they slide. */
+  describe("grab haptic", () => {
+    beforeEach(() => {
+      jest.mocked(haptics.grab).mockClear()
+    })
+
+    it("buzzes once as the finger lands on the handle, before it moves", async () => {
+      await renderSlider()
+
+      await pan([{ state: State.BEGAN, translationX: 0 }])
+
+      expect(haptics.grab).toHaveBeenCalledTimes(1)
+    })
+
+    it("buzzes once for a whole slide, not on every step", async () => {
+      await renderSlider({ onSwipe: () => new Promise<void>(() => {}) })
+
+      await drag(TRAVEL)
+
+      expect(haptics.grab).toHaveBeenCalledTimes(1)
+    })
+
+    it("stays silent while the slider is disabled", async () => {
+      await renderSlider({ disabled: true })
+
+      await pan([{ state: State.BEGAN, translationX: 0 }])
+
+      expect(haptics.grab).not.toHaveBeenCalled()
     })
   })
 })
