@@ -1,6 +1,12 @@
 import React from "react"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
-import { StyleSheet, TouchableOpacity, Text } from "react-native"
+import {
+  AccessibilityInfo,
+  AppState,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from "react-native"
 import { Satoshis } from "lnurl-pay"
 import {
   act,
@@ -270,7 +276,7 @@ const navigationDispatchMock = jest.fn()
 /** Sent measures the screen before it plays, and jest's native views never answer a
  *  measurement on their own. Answering them lets Sent play, so the test can open the
  *  receipt the way a sender does instead of waiting out the hold. */
-const slideAndOpenReceipt = async () => {
+const answerMeasurements = () =>
   screen.UNSAFE_root.findAll((node) =>
     jest.isMockFunction(node.instance?.measureInWindow),
   ).forEach((node) =>
@@ -279,6 +285,9 @@ const slideAndOpenReceipt = async () => {
         callback(0, 0, 360, 780),
     ),
   )
+
+const slideAndOpenReceipt = async () => {
+  answerMeasurements()
   await act(async () => {
     fireEvent.press(screen.getByTestId("slider"))
   })
@@ -2148,5 +2157,55 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
           ?.disabled,
       ).toBe(true)
     })
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — Sent and the screen reader", () => {
+  let LL: ReturnType<typeof i18nObject>
+  /** React Native's jest mock leaves `currentState` a function, never "active". */
+  const mockedAppState = AppState as { currentState: unknown }
+  const originalAppState = mockedAppState.currentState
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    // Sent only plays where it can be seen; elsewhere it waits for the sender to return.
+    mockedAppState.currentState = "active"
+    jest.spyOn(AccessibilityInfo, "announceForAccessibility").mockImplementation(() => {})
+    jest.mocked(AccessibilityInfo.announceForAccessibility).mockClear()
+  })
+
+  afterEach(() => {
+    mockedAppState.currentState = originalAppState
+    jest.restoreAllMocks()
+  })
+
+  /** Review turns into Sent in place: no new screen takes focus, and what dissolved is
+   *  only invisible. */
+  it("speaks Sent with the amount, and keeps a screen reader off what dissolved", async () => {
+    sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+    const amount = screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children
+
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+    // The announcement goes out on the next tick.
+    await act(async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0)
+      })
+    })
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
+      `${LL.SendBitcoinConfirmationScreen.sent()}, ${amount}`,
+    )
+    expect(screen.queryByTestId("slider")).toBeNull()
+    expect(screen.getByTestId("slider", { includeHiddenElements: true })).toBeTruthy()
   })
 })
