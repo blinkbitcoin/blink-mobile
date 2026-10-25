@@ -983,6 +983,7 @@ export type FeedbackSubmitInput = {
 export type FeesInformation = {
   readonly __typename: 'FeesInformation';
   readonly deposit: DepositFeesInformation;
+  readonly inactivityFee: InactivityFeeInformation;
 };
 
 /** Provides global settings for the application which might have an impact for the user. */
@@ -1070,6 +1071,14 @@ export const Icon = {
 } as const;
 
 export type Icon = typeof Icon[keyof typeof Icon];
+export type InactivityFeeInformation = {
+  readonly __typename: 'InactivityFeeInformation';
+  /** first date the inactivity fee applies */
+  readonly effectiveFrom: Scalars['Timestamp']['output'];
+  /** monthly fee per balance for an account with no activity for 12 months, in USD cents */
+  readonly usdCentsPerMonth: Scalars['CentAmount']['output'];
+};
+
 export type InitiationVia = InitiationViaIntraLedger | InitiationViaLn | InitiationViaOnChain;
 
 export type InitiationViaIntraLedger = {
@@ -2034,6 +2043,11 @@ export type MutationUserPhoneRegistrationValidateArgs = {
 };
 
 
+export type MutationUserTotpDeleteArgs = {
+  input?: InputMaybe<UserTotpDeleteInput>;
+};
+
+
 export type MutationUserTotpRegistrationValidateArgs = {
   input: UserTotpRegistrationValidateInput;
 };
@@ -2647,8 +2661,12 @@ export type StatefulNotification = {
   readonly action?: Maybe<NotificationAction>;
   readonly body: Scalars['String']['output'];
   readonly bulletinEnabled: Scalars['Boolean']['output'];
+  /** Groups bulletins so that at most one bulletin per key is active at a time */
+  readonly bulletinKey?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['Timestamp']['output'];
   readonly deepLink?: Maybe<Scalars['String']['output']>;
+  /** Whether the user can close the bulletin from the app */
+  readonly dismissible: Scalars['Boolean']['output'];
   readonly icon?: Maybe<Icon>;
   readonly id: Scalars['ID']['output'];
   readonly title: Scalars['String']['output'];
@@ -3035,6 +3053,7 @@ export type UserEmailDeletePayload = {
 
 export type UserEmailRegistrationInitiateInput = {
   readonly email: Scalars['EmailAddress']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserEmailRegistrationInitiatePayload = {
@@ -3088,12 +3107,17 @@ export type UserPhoneRegistrationInitiateInput = {
 export type UserPhoneRegistrationValidateInput = {
   readonly code: Scalars['OneTimeAuthCode']['input'];
   readonly phone: Scalars['Phone']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserPhoneRegistrationValidatePayload = {
   readonly __typename: 'UserPhoneRegistrationValidatePayload';
   readonly errors: ReadonlyArray<Error>;
   readonly me?: Maybe<User>;
+};
+
+export type UserTotpDeleteInput = {
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserTotpDeletePayload = {
@@ -10718,6 +10742,7 @@ export type ResolversTypes = {
   GraphQLApplicationError: ResolverTypeWrapper<GraphQlApplicationError>;
   Hex32Bytes: ResolverTypeWrapper<Scalars['Hex32Bytes']['output']>;
   Icon: Icon;
+  InactivityFeeInformation: ResolverTypeWrapper<InactivityFeeInformation>;
   InitiationVia: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['InitiationVia']>;
   InitiationViaIntraLedger: ResolverTypeWrapper<InitiationViaIntraLedger>;
   InitiationViaLn: ResolverTypeWrapper<InitiationViaLn>;
@@ -10897,6 +10922,7 @@ export type ResolversTypes = {
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: ResolverTypeWrapper<UserPhoneRegistrationValidatePayload>;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: ResolverTypeWrapper<UserTotpDeletePayload>;
   UserTotpRegistrationInitiatePayload: ResolverTypeWrapper<UserTotpRegistrationInitiatePayload>;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -11026,6 +11052,7 @@ export type ResolversParentTypes = {
   Globals: Globals;
   GraphQLApplicationError: GraphQlApplicationError;
   Hex32Bytes: Scalars['Hex32Bytes']['output'];
+  InactivityFeeInformation: InactivityFeeInformation;
   InitiationVia: ResolversUnionTypes<ResolversParentTypes>['InitiationVia'];
   InitiationViaIntraLedger: InitiationViaIntraLedger;
   InitiationViaLn: InitiationViaLn;
@@ -11185,6 +11212,7 @@ export type ResolversParentTypes = {
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: UserPhoneRegistrationValidatePayload;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: UserTotpDeletePayload;
   UserTotpRegistrationInitiatePayload: UserTotpRegistrationInitiatePayload;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -11736,6 +11764,7 @@ export interface FeedbackScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 
 export type FeesInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['FeesInformation'] = ResolversParentTypes['FeesInformation']> = {
   deposit?: Resolver<ResolversTypes['DepositFeesInformation'], ParentType, ContextType>;
+  inactivityFee?: Resolver<ResolversTypes['InactivityFeeInformation'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11762,6 +11791,12 @@ export type GraphQlApplicationErrorResolvers<ContextType = any, ParentType exten
 export interface Hex32BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Hex32Bytes'], any> {
   name: 'Hex32Bytes';
 }
+
+export type InactivityFeeInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['InactivityFeeInformation'] = ResolversParentTypes['InactivityFeeInformation']> = {
+  effectiveFrom?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  usdCentsPerMonth?: Resolver<ResolversTypes['CentAmount'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type InitiationViaResolvers<ContextType = any, ParentType extends ResolversParentTypes['InitiationVia'] = ResolversParentTypes['InitiationVia']> = {
   __resolveType: TypeResolveFn<'InitiationViaIntraLedger' | 'InitiationViaLn' | 'InitiationViaOnChain', ParentType, ContextType>;
@@ -12046,7 +12081,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType>;
   userPhoneRegistrationInitiate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationInitiateArgs, 'input'>>;
   userPhoneRegistrationValidate?: Resolver<ResolversTypes['UserPhoneRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationValidateArgs, 'input'>>;
-  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType>;
+  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType, Partial<MutationUserTotpDeleteArgs>>;
   userTotpRegistrationInitiate?: Resolver<ResolversTypes['UserTotpRegistrationInitiatePayload'], ParentType, ContextType>;
   userTotpRegistrationValidate?: Resolver<ResolversTypes['UserTotpRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserTotpRegistrationValidateArgs, 'input'>>;
   userUpdateLanguage?: Resolver<ResolversTypes['UserUpdateLanguagePayload'], ParentType, ContextType, RequireFields<MutationUserUpdateLanguageArgs, 'input'>>;
@@ -12411,8 +12446,10 @@ export type StatefulNotificationResolvers<ContextType = any, ParentType extends 
   action?: Resolver<Maybe<ResolversTypes['NotificationAction']>, ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bulletinEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  bulletinKey?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   deepLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  dismissible?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   icon?: Resolver<Maybe<ResolversTypes['Icon']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -12769,6 +12806,7 @@ export type Resolvers<ContextType = any> = {
   Globals?: GlobalsResolvers<ContextType>;
   GraphQLApplicationError?: GraphQlApplicationErrorResolvers<ContextType>;
   Hex32Bytes?: GraphQLScalarType;
+  InactivityFeeInformation?: InactivityFeeInformationResolvers<ContextType>;
   InitiationVia?: InitiationViaResolvers<ContextType>;
   InitiationViaIntraLedger?: InitiationViaIntraLedgerResolvers<ContextType>;
   InitiationViaLn?: InitiationViaLnResolvers<ContextType>;
