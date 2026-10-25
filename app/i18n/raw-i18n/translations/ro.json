@@ -3143,7 +3143,9 @@
     "deleteKey": "Șterge",
     "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
     "switchWalletHint": "Trece la celălalt portofel",
-    "copy": "Copiați"
+    "copy": "Copiați",
+    "balanceHidden": "Sold ascuns",
+    "revealBalanceHint": "Afișează soldul pe acest ecran"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",

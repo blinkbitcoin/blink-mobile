@@ -23,6 +23,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       SendBitcoinScreen: { destination: () => "Destination" },
+      Accessibility: { copy: () => "Copy" },
       common: {
         intraledger: () => "Intraledger",
         onchain: () => "Onchain",
@@ -108,5 +109,13 @@ describe("SendReviewDestination", () => {
     fireEvent.press(field)
 
     expect(onCopy).toHaveBeenCalledTimes(1)
+  })
+
+  it("tells a screen reader that the field copies the destination", () => {
+    renderDestination("lightning", "alice@blink.sv")
+
+    expect(screen.getByTestId(SEND_REVIEW_COPY_TEST_ID).props.accessibilityHint).toBe(
+      "Copy",
+    )
   })
 })

@@ -92,10 +92,16 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole={onPress ? "button" : undefined}
-      accessibilityLabel={
-        isBalanceHidden ? walletName : `${walletName}, ${balancePrimary}`
+      accessibilityLabel={`${walletName}, ${
+        isBalanceHidden ? LL.Accessibility.balanceHidden() : balancePrimary
+      }`}
+      accessibilityHint={
+        onSwitch
+          ? LL.Accessibility.switchWalletHint()
+          : onReveal
+            ? LL.Accessibility.revealBalanceHint()
+            : undefined
       }
-      accessibilityHint={onSwitch ? LL.Accessibility.switchWalletHint() : undefined}
     >
       <View style={styles.balances}>
         {/* An invisible two-line copy sets the height, so the card is the same size with or
