@@ -148,4 +148,29 @@ describe("FeeTierSelector", () => {
     // No element rendering the detail because it's an empty string.
     expect(queryAllByText("")).toHaveLength(0)
   })
+
+  describe("screen reader", () => {
+    it("reads the row as its heading and the chosen tier", () => {
+      const { getByLabelText } = renderSelector()
+
+      expect(
+        getByLabelText("Network fee, Standard 20 sat/vB").props.accessibilityRole,
+      ).toBe("button")
+    })
+
+    /** The green check is the only visual mark of the choice. */
+    it("reads the tiers as radios with the chosen one checked", () => {
+      const { getByLabelText, getByTestId } = renderSelector()
+      fireEvent.press(getByTestId("fee-tier-dropdown"))
+
+      const standard = getByLabelText("Standard, 20 sat/vB")
+      const economy = getByLabelText("Economy, 10 sat/vB")
+      expect(standard.props.accessibilityRole).toBe("radio")
+      expect(standard.props.accessibilityState).toEqual({ checked: true, selected: true })
+      expect(economy.props.accessibilityState).toEqual({
+        checked: false,
+        selected: false,
+      })
+    })
+  })
 })

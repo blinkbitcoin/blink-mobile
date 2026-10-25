@@ -48,6 +48,8 @@ export const FeeTierSelector = <T extends string>({
       <TouchableWithoutFeedback
         onPress={() => setModalVisible(true)}
         {...testProps("fee-tier-dropdown")}
+        accessibilityRole="button"
+        accessibilityLabel={[title, selectedValue].filter(Boolean).join(", ")}
       >
         <View style={styles.row}>
           <Text style={styles.title}>{title}</Text>
@@ -77,6 +79,13 @@ export const FeeTierSelector = <T extends string>({
                   setModalVisible(false)
                 }}
                 {...testProps(`fee-tier-${option.id}`)}
+                /* The green check is the only visual mark of the choice, so it is
+                   spoken as the radio's state. */
+                accessibilityRole="radio"
+                accessibilityState={{ checked: isSelected, selected: isSelected }}
+                accessibilityLabel={[option.label, option.detail]
+                  .filter(Boolean)
+                  .join(", ")}
               >
                 <View style={[styles.optionRow, isSelected && styles.optionRowSelected]}>
                   <View style={styles.optionContent}>

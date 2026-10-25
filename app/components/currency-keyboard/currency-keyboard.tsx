@@ -3,6 +3,7 @@ import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
 import { radius } from "@app/rne-theme/radius"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { Key as KeyType } from "../amount-input-screen/number-pad-reducer"
@@ -67,6 +68,7 @@ const Key = ({
   disabled?: boolean
 }) => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const isBackspace = numberPadKey === KeyType.Backspace
 
   const [timerId, setTimerId] = useState<NodeJS.Timeout | null>(null)
@@ -107,6 +109,9 @@ const Key = ({
       onPress={() => handleKeyPress(numberPadKey)}
       onPressOut={handleBackSpacePressOut}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
+      accessibilityRole="button"
+      accessibilityLabel={isBackspace ? LL.Accessibility.deleteKey() : numberPadKey}
+      accessibilityState={{ disabled }}
     >
       {isBackspace ? (
         <GaloyIcon name="back-space" size={28} color={styles.backspaceIcon.color} />

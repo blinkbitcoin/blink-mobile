@@ -268,4 +268,21 @@ describe("PercentageSelector", () => {
     expect(StyleSheet.flatten(getByText("50%").props.style).color).toBe("textOnAccent")
     expect(StyleSheet.flatten(getByText("25%").props.style).color).toBe("accent")
   })
+
+  /** Each chip used to be read as its test-ID prefix ("send", "convert"). */
+  it("reads each chip as its percentage", () => {
+    const { getByLabelText, queryByLabelText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        testIdPrefix="send"
+      />,
+    )
+
+    ;["25%", "50%", "75%", "100%"].forEach((label) => {
+      expect(getByLabelText(label).props.accessibilityRole).toBe("button")
+    })
+    expect(queryByLabelText("send")).toBeNull()
+  })
 })
