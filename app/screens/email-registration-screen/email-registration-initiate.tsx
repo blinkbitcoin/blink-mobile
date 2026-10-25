@@ -15,6 +15,11 @@ import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { useUserEmailRegistrationInitiateMutation } from "@app/graphql/generated"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import {
+  LoginMethodAddition,
+  TotpStepUpErrorCode,
+} from "@app/types/two-factor-enforcement"
 
 const useStyles = makeStyles(({ colors }) => ({
   screenStyle: {
@@ -94,10 +99,22 @@ export const EmailRegistrationInitiateScreen: React.FC<
 
   const { LL } = useI18nContext()
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
+  /** With an authenticator, the server asks for its code to add the address. */
+  const { hasAuthenticator } = useLoginMethods()
+
+  const askForCode = () =>
+    navigation.navigate("loginMethodCode", {
+      addition: LoginMethodAddition.Email,
+      email: emailInput,
+    })
 
   const submit = async () => {
     if (!validator.isEmail(emailInput)) {
       setErrorMessage(LL.EmailRegistrationInitiateScreen.invalidEmail())
+      return
+    }
+    if (hasAuthenticator) {
+      askForCode()
       return
     }
 
@@ -109,6 +126,12 @@ export const EmailRegistrationInitiateScreen: React.FC<
       })
 
       const errors = data?.userEmailRegistrationInitiate.errors
+      /** An authenticator added on another device since the account was last read. */
+      const isCodeRequired = errors?.[0]?.code === TotpStepUpErrorCode.CodeRequired
+      if (isCodeRequired) {
+        askForCode()
+        return
+      }
       if (errors && errors.length > 0) {
         console.log(errors, "errors")
         setErrorMessage(errors[0].message)

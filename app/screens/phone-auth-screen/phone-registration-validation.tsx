@@ -17,6 +17,11 @@ import { RouteProp, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Input, Text, makeStyles, useTheme } from "@rn-vui/themed"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
+import {
+  LoginMethodAddition,
+  TotpStepUpErrorCode,
+} from "@app/types/two-factor-enforcement"
 
 import { Screen } from "../../components/screen"
 import type { RootStackParamList } from "../../navigation/stack-param-lists"
@@ -86,6 +91,8 @@ export const PhoneRegistrationValidateScreen: React.FC<
   const { updateCurrentProfile } = useSaveSessionProfile()
 
   const [phoneValidate] = useUserPhoneRegistrationValidateMutation()
+  /** With an authenticator, the server asks for its code with the SMS one. */
+  const { hasAuthenticator } = useLoginMethods()
 
   const [code, _setCode] = useState("")
   // Wait 2.5 minutes before allowing another code request
@@ -96,9 +103,28 @@ export const PhoneRegistrationValidateScreen: React.FC<
     theme: { colors },
   } = useTheme()
 
+  /** The SMS code goes on with the authenticator's, sent together on the next screen.
+   *  The field is cleared, as a code that comes back here was refused. */
+  const askForAuthenticatorCode = useCallback(
+    (smsCode: string) => {
+      _setCode("")
+      setStatus(ValidatePhoneCodeStatus.WaitingForCode)
+      navigation.navigate("loginMethodCode", {
+        addition: LoginMethodAddition.Phone,
+        phone,
+        smsCode,
+      })
+    },
+    [navigation, phone],
+  )
+
   const send = useCallback(
     async (code: string) => {
       if (status === ValidatePhoneCodeStatus.LoadingAuthResult) {
+        return
+      }
+      if (hasAuthenticator) {
+        askForAuthenticatorCode(code)
         return
       }
 
@@ -110,6 +136,13 @@ export const PhoneRegistrationValidateScreen: React.FC<
         })
 
         const errors = data?.userPhoneRegistrationValidate?.errors || []
+        /** An authenticator added on another device since the account was last read:
+         *  the SMS code is not spent by this refusal. */
+        const isCodeRequired = errors[0]?.code === TotpStepUpErrorCode.CodeRequired
+        if (isCodeRequired) {
+          askForAuthenticatorCode(code)
+          return
+        }
 
         const error = mapGqlErrorsToValidatePhoneCodeErrors(errors)
 
@@ -142,7 +175,17 @@ export const PhoneRegistrationValidateScreen: React.FC<
         setStatus(ValidatePhoneCodeStatus.ReadyToRegenerate)
       }
     },
-    [status, phoneValidate, phone, _setCode, navigation, LL, updateCurrentProfile],
+    [
+      status,
+      hasAuthenticator,
+      askForAuthenticatorCode,
+      phoneValidate,
+      phone,
+      _setCode,
+      navigation,
+      LL,
+      updateCurrentProfile,
+    ],
   )
 
   const setCode = (code: string) => {
