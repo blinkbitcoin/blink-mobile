@@ -2003,11 +2003,6 @@ export type MutationUserContactUpdateAliasArgs = {
 };
 
 
-export type MutationUserEmailDeleteArgs = {
-  input?: InputMaybe<UserEmailDeleteInput>;
-};
-
-
 export type MutationUserEmailRegistrationInitiateArgs = {
   input: UserEmailRegistrationInitiateInput;
 };
@@ -2035,11 +2030,6 @@ export type MutationUserLoginUpgradeTelegramArgs = {
 
 export type MutationUserLogoutArgs = {
   input?: InputMaybe<UserLogoutInput>;
-};
-
-
-export type MutationUserPhoneDeleteArgs = {
-  input?: InputMaybe<UserPhoneDeleteInput>;
 };
 
 
@@ -3055,10 +3045,6 @@ export type UserContactUpdateAliasPayload = {
   readonly errors: ReadonlyArray<Error>;
 };
 
-export type UserEmailDeleteInput = {
-  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
-};
-
 export type UserEmailDeletePayload = {
   readonly __typename: 'UserEmailDeletePayload';
   readonly errors: ReadonlyArray<Error>;
@@ -3105,10 +3091,6 @@ export type UserLoginUpgradeTelegramInput = {
 
 export type UserLogoutInput = {
   readonly deviceToken: Scalars['String']['input'];
-};
-
-export type UserPhoneDeleteInput = {
-  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserPhoneDeletePayload = {
@@ -11025,7 +11007,6 @@ export type ResolversTypes = {
   UserContact: ResolverTypeWrapper<UserContact>;
   UserContactUpdateAliasInput: UserContactUpdateAliasInput;
   UserContactUpdateAliasPayload: ResolverTypeWrapper<UserContactUpdateAliasPayload>;
-  UserEmailDeleteInput: UserEmailDeleteInput;
   UserEmailDeletePayload: ResolverTypeWrapper<UserEmailDeletePayload>;
   UserEmailRegistrationInitiateInput: UserEmailRegistrationInitiateInput;
   UserEmailRegistrationInitiatePayload: ResolverTypeWrapper<UserEmailRegistrationInitiatePayload>;
@@ -11035,7 +11016,6 @@ export type ResolversTypes = {
   UserLoginUpgradeInput: UserLoginUpgradeInput;
   UserLoginUpgradeTelegramInput: UserLoginUpgradeTelegramInput;
   UserLogoutInput: UserLogoutInput;
-  UserPhoneDeleteInput: UserPhoneDeleteInput;
   UserPhoneDeletePayload: ResolverTypeWrapper<UserPhoneDeletePayload>;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
@@ -11317,7 +11297,6 @@ export type ResolversParentTypes = {
   UserContact: UserContact;
   UserContactUpdateAliasInput: UserContactUpdateAliasInput;
   UserContactUpdateAliasPayload: UserContactUpdateAliasPayload;
-  UserEmailDeleteInput: UserEmailDeleteInput;
   UserEmailDeletePayload: UserEmailDeletePayload;
   UserEmailRegistrationInitiateInput: UserEmailRegistrationInitiateInput;
   UserEmailRegistrationInitiatePayload: UserEmailRegistrationInitiatePayload;
@@ -11327,7 +11306,6 @@ export type ResolversParentTypes = {
   UserLoginUpgradeInput: UserLoginUpgradeInput;
   UserLoginUpgradeTelegramInput: UserLoginUpgradeTelegramInput;
   UserLogoutInput: UserLogoutInput;
-  UserPhoneDeleteInput: UserPhoneDeleteInput;
   UserPhoneDeletePayload: UserPhoneDeletePayload;
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
@@ -12191,14 +12169,14 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   supportChatMessageAdd?: Resolver<ResolversTypes['SupportChatMessageAddPayload'], ParentType, ContextType, RequireFields<MutationSupportChatMessageAddArgs, 'input'>>;
   supportChatReset?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType>;
   userContactUpdateAlias?: Resolver<ResolversTypes['UserContactUpdateAliasPayload'], ParentType, ContextType, RequireFields<MutationUserContactUpdateAliasArgs, 'input'>>;
-  userEmailDelete?: Resolver<ResolversTypes['UserEmailDeletePayload'], ParentType, ContextType, Partial<MutationUserEmailDeleteArgs>>;
+  userEmailDelete?: Resolver<ResolversTypes['UserEmailDeletePayload'], ParentType, ContextType>;
   userEmailRegistrationInitiate?: Resolver<ResolversTypes['UserEmailRegistrationInitiatePayload'], ParentType, ContextType, RequireFields<MutationUserEmailRegistrationInitiateArgs, 'input'>>;
   userEmailRegistrationValidate?: Resolver<ResolversTypes['UserEmailRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserEmailRegistrationValidateArgs, 'input'>>;
   userLogin?: Resolver<ResolversTypes['AuthTokenPayload'], ParentType, ContextType, RequireFields<MutationUserLoginArgs, 'input'>>;
   userLoginUpgrade?: Resolver<ResolversTypes['UpgradePayload'], ParentType, ContextType, RequireFields<MutationUserLoginUpgradeArgs, 'input'>>;
   userLoginUpgradeTelegram?: Resolver<ResolversTypes['UpgradePayload'], ParentType, ContextType, RequireFields<MutationUserLoginUpgradeTelegramArgs, 'input'>>;
   userLogout?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, Partial<MutationUserLogoutArgs>>;
-  userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType, Partial<MutationUserPhoneDeleteArgs>>;
+  userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType>;
   userPhoneRegistrationInitiate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationInitiateArgs, 'input'>>;
   userPhoneRegistrationValidate?: Resolver<ResolversTypes['UserPhoneRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationValidateArgs, 'input'>>;
   userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType, Partial<MutationUserTotpDeleteArgs>>;
