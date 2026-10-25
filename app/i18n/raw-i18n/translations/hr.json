@@ -3111,6 +3111,14 @@
   "AmountInputButton": {
     "tapToSetAmount": "Postavite iznos"
   },
+  "Accessibility": {
+    "deleteKey": "Izbriši",
+    "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
+    "switchWalletHint": "Prebacuje na vaš drugi novčanik",
+    "copy": "Kopiraj",
+    "balanceHidden": "Stanje skriveno",
+    "revealBalanceHint": "Prikazuje vaše stanje na ovom zaslonu"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",
     "versionNotSupported": "Ova mobilna verzija više nije podržana",

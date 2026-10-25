@@ -3,6 +3,8 @@ import { View } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
+
 import { GaloyIcon } from "../galoy-icon"
 
 type GaloyErrorBoxProps = {
@@ -22,6 +24,8 @@ export const GaloyErrorBox: React.FC<GaloyErrorBoxProps> = ({
     theme: { colors, mode },
   } = useTheme()
   const styles = useStyles()
+  /** An error appears without moving focus, so a screen reader would never read it. */
+  useAccessibilityAnnouncement(errorMessage)
 
   if (!filled) {
     return (

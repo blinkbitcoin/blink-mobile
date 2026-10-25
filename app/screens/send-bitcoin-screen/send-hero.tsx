@@ -13,14 +13,17 @@ import { makeStyles, useTheme } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { IconHero } from "@app/components/icon-hero"
 import { SUCCESS_BADGE_DURATION_MS, SuccessBadge } from "@app/components/success-badge"
+import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { fonts } from "@app/rne-theme/fonts"
-import { testProps } from "@app/utils/testProps"
 
 export const SEND_HERO_CAPTION_TEST_ID = "send-hero-caption"
 export const SEND_HERO_PRIMARY_TEST_ID = "send-hero-amount-primary"
 export const SEND_HERO_SECONDARY_TEST_ID = "send-hero-amount-secondary"
 
 const ICON_SIZE = 32
+/** How long typing pauses before the screen reader speaks the new amount. */
+const AMOUNT_ANNOUNCE_DELAY_MS = 600
 
 /**
  * Amount entry leads with the amount being typed, review reads it back at heading size.
@@ -147,6 +150,15 @@ export const SendHero: React.FC<SendHeroProps> = ({
   const {
     theme: { colors },
   } = useTheme()
+  const { LL } = useI18nContext()
+
+  /** The amount as one phrase: the screen reader reads the hero as a single element. */
+  const amountLabel = [primaryAmount, secondaryAmount].filter(Boolean).join(", ")
+  /** Typing moves no focus, so the amount is spoken once the keys pause. */
+  useAccessibilityAnnouncement(active ? amountLabel : undefined, {
+    delayMs: AMOUNT_ANNOUNCE_DELAY_MS,
+    skipInitial: true,
+  })
 
   const entryPrimarySize = entryAmountFontSize(primaryAmount, isEmpty)
   const primarySize = active
@@ -264,12 +276,23 @@ export const SendHero: React.FC<SendHeroProps> = ({
   const isMorphing = Boolean(sentProgress) && !active
 
   const captionNode = (
-    <Pressable onLongPress={onCaptionLongPress} disabled={!onCaptionLongPress}>
+    <Pressable
+      onLongPress={onCaptionLongPress}
+      disabled={!onCaptionLongPress}
+      accessibilityLabel={caption}
+      /* A long press can't be found by ear, so the copy is offered as an action. */
+      accessibilityActions={
+        onCaptionLongPress
+          ? [{ name: "longpress", label: LL.Accessibility.copy() }]
+          : undefined
+      }
+      onAccessibilityAction={onCaptionLongPress}
+    >
       <Animated.Text
         numberOfLines={1}
         ellipsizeMode="middle"
         style={[styles.caption, isMorphing && sentCaptionStyle]}
-        {...testProps(SEND_HERO_CAPTION_TEST_ID)}
+        testID={SEND_HERO_CAPTION_TEST_ID}
       >
         {caption}
       </Animated.Text>
@@ -281,6 +304,12 @@ export const SendHero: React.FC<SendHeroProps> = ({
       onPress={onSwapCurrency}
       disabled={!onSwapCurrency || !secondaryAmount}
       accessibilityRole={onSwapCurrency ? "button" : undefined}
+      accessibilityLabel={amountLabel}
+      accessibilityHint={
+        onSwapCurrency && secondaryAmount
+          ? LL.Accessibility.swapCurrencyHint()
+          : undefined
+      }
     >
       <Animated.Text
         style={[
@@ -294,7 +323,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
         ]}
         adjustsFontSizeToFit
         numberOfLines={1}
-        {...testProps(SEND_HERO_PRIMARY_TEST_ID)}
+        testID={SEND_HERO_PRIMARY_TEST_ID}
       >
         {primaryAmount}
       </Animated.Text>
@@ -312,7 +341,7 @@ export const SendHero: React.FC<SendHeroProps> = ({
             isMorphing && sentSecondaryStyle,
           ]}
           numberOfLines={1}
-          {...testProps(SEND_HERO_SECONDARY_TEST_ID)}
+          testID={SEND_HERO_SECONDARY_TEST_ID}
         >
           {secondaryAmount}
         </Animated.Text>
