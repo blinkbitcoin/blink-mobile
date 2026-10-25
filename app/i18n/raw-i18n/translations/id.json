@@ -3086,6 +3086,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan jumlah"
   },
+  "Accessibility": {
+    "deleteKey": "Hapus",
+    "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
+    "switchWalletHint": "Beralih ke dompet Anda yang lain",
+    "copy": "Salin"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",
     "versionNotSupported": "Versi seluler ini tidak lagi didukung.",

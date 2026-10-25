@@ -2,6 +2,7 @@ import React, { useCallback, useEffect, useRef } from "react"
 import { makeStyles, Text } from "@rn-vui/themed"
 import { Pressable, View } from "react-native"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { haptics } from "@app/utils/haptics"
 import { testProps } from "@app/utils/testProps"
 import { GaloyIcon } from "../atomic/galoy-icon"
@@ -69,6 +70,7 @@ const Key = ({
   disabled?: boolean
 }) => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const isBackspace = numberPadKey === KeyType.Backspace
 
   /** Latest handler, not the one from the render the hold began in: a pad's handler closes
@@ -124,6 +126,9 @@ const Key = ({
       onPress={() => press(numberPadKey)}
       onPressOut={stopRepeat}
       {...testProps(`${KEY_TEST_ID_PREFIX} ${numberPadKey}`)}
+      accessibilityRole="button"
+      accessibilityLabel={isBackspace ? LL.Accessibility.deleteKey() : numberPadKey}
+      accessibilityState={{ disabled }}
     >
       {isBackspace ? (
         <GaloyIcon name="back-space" size={28} color={styles.backspaceIcon.color} />

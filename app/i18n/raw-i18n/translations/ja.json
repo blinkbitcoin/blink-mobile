@@ -3086,6 +3086,12 @@
     "AmountInputButton": {
         "tapToSetAmount": "金額を設定する"
     },
+    "Accessibility": {
+        "deleteKey": "削除",
+        "swapCurrencyHint": "金額を入力する通貨を切り替えます",
+        "switchWalletHint": "もう一方のウォレットに切り替えます",
+        "copy": "コピー"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
         "versionNotSupported": "このモバイル版のサポートは終了しました",

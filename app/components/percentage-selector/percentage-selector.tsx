@@ -63,7 +63,8 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
             ]}
             disabled={isDisabled}
             onPress={() => onSelect(p)}
-            accessibilityLabel={testIdPrefix}
+            accessibilityRole="button"
+            accessibilityLabel={`${p}%`}
             accessibilityState={{ selected: isSelected, disabled: isDisabled }}
           >
             {/* The label keeps its space under the spinner so the chip doesn't resize. */}

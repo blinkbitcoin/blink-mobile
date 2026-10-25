@@ -3086,6 +3086,12 @@
     "AmountInputButton": {
         "tapToSetAmount": "Setze Betrag"
     },
+    "Accessibility": {
+        "deleteKey": "Löschen",
+        "swapCurrencyHint": "Wechselt die Währung für die Betragseingabe",
+        "switchWalletHint": "Wechselt zur anderen Wallet",
+        "copy": "Kopieren"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Ich muss meine App auf die neuste Version updaten. Ich nutze die {os: string} App mit Version {version: string}.",
         "versionNotSupported": "Diese mobile Version wird nicht mehr unterstützt",

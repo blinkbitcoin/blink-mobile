@@ -196,4 +196,21 @@ describe("PercentageSelector", () => {
     fireEvent.press(getByText("100%"))
     expect(mockOnSelect).toHaveBeenCalledWith(100)
   })
+
+  /** Each chip used to be read as its test-ID prefix ("send", "convert"). */
+  it("reads each chip as its percentage", () => {
+    const { getByLabelText, queryByLabelText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        testIdPrefix="send"
+      />,
+    )
+
+    ;["25%", "50%", "75%", "100%"].forEach((label) => {
+      expect(getByLabelText(label).props.accessibilityRole).toBe("button")
+    })
+    expect(queryByLabelText("send")).toBeNull()
+  })
 })

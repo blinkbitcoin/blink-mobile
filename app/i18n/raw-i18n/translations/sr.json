@@ -3086,6 +3086,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "deleteKey": "Обриши",
+    "swapCurrencyHint": "Мења валуту у којој уносите износ",
+    "switchWalletHint": "Прелази на ваш други новчаник",
+    "copy": "Копирај"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Морам да ажурирам апликацију на најновију верзију. Користим {os: string} апликацију са верзијом {version: string}.",
     "versionNotSupported": "Ова верзија мобилне апликације више није подржана",
