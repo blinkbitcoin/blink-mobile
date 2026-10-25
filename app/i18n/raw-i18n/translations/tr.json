@@ -3112,7 +3112,9 @@
     "deleteKey": "Sil",
     "swapCurrencyHint": "Tutarı girdiğiniz para birimini değiştirir",
     "switchWalletHint": "Diğer cüzdanınıza geçer",
-    "copy": "Kopyala"
+    "copy": "Kopyala",
+    "balanceHidden": "Bakiye gizli",
+    "revealBalanceHint": "Bakiyenizi bu ekranda gösterir"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Uygulamamı en son sürüme güncellemem gerekiyor. {os: string} uygulamasının {version: string} sürümünü kullanıyorum.",

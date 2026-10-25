@@ -3112,7 +3112,9 @@
     "deleteKey": "ลบ",
     "swapCurrencyHint": "สลับสกุลเงินที่คุณใช้พิมพ์จำนวน",
     "switchWalletHint": "สลับไปยังกระเป๋าอีกใบของคุณ",
-    "copy": "คัดลอก"
+    "copy": "คัดลอก",
+    "balanceHidden": "ซ่อนยอดเงินอยู่",
+    "revealBalanceHint": "แสดงยอดเงินของคุณบนหน้าจอนี้"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

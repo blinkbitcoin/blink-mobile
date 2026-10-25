@@ -231,4 +231,29 @@ describe("InfoRow", () => {
       expect(getByTestId("Successful Fee").props.children).toContain("$0.10")
     })
   })
+
+  describe("screen reader", () => {
+    /** Read as one row, not a label and a test-ID-named value. */
+    it("reads the label and value together", () => {
+      render(
+        <InfoRow
+          label="Fee"
+          value="12 SAT"
+          secondaryValue="($0.01)"
+          valueTestId="Successful Fee"
+        />,
+      )
+
+      expect(screen.getByLabelText("Fee, 12 SAT, ($0.01)")).toBeTruthy()
+      expect(screen.queryByLabelText("Successful Fee")).toBeNull()
+    })
+
+    it("reads only the label, and busy, while the value loads", () => {
+      render(<InfoRow label="Fee" value="" loading />)
+
+      expect(screen.getByLabelText("Fee").props.accessibilityState).toEqual({
+        busy: true,
+      })
+    })
+  })
 })

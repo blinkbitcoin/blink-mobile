@@ -3112,7 +3112,9 @@
     "deleteKey": "Wissen",
     "swapCurrencyHint": "Wisselt de valuta waarin je het bedrag invoert",
     "switchWalletHint": "Schakelt over naar je andere wallet",
-    "copy": "Kopiëren"
+    "copy": "Kopiëren",
+    "balanceHidden": "Saldo verborgen",
+    "revealBalanceHint": "Toont je saldo op dit scherm"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ik moet mijn app bijwerken naar de nieuwste versie. Ik gebruik de app {os: string} met versie {version: string}.",

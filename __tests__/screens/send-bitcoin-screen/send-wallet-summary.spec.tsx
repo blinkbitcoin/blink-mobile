@@ -26,7 +26,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: { bitcoin: () => "Bitcoin", dollar: () => "Dollar" },
-      Accessibility: { switchWalletHint: () => "Switches to your other wallet" },
+      Accessibility: {
+        balanceHidden: () => "Balance hidden",
+        revealBalanceHint: () => "Shows your balance on this screen",
+        switchWalletHint: () => "Switches to your other wallet",
+      },
     },
   }),
 }))
@@ -147,12 +151,20 @@ describe("SendWalletSummary", () => {
       expect(screen.queryByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeNull()
     })
 
-    it("keeps the balance out of the accessibility label", () => {
+    it("keeps the balance out of the accessibility label, saying it is hidden", () => {
       render(hiddenCard())
 
       expect(
         screen.getByTestId("choose-wallet-to-send-from").props.accessibilityLabel,
-      ).toBe("Bitcoin")
+      ).toBe("Bitcoin, Balance hidden")
+    })
+
+    it("says a tap reveals the balance where it does", () => {
+      render(hiddenCard(jest.fn()))
+
+      expect(
+        screen.getByTestId("choose-wallet-to-send-from").props.accessibilityHint,
+      ).toBe("Shows your balance on this screen")
     })
 
     it("calls onReveal when the card is tapped", () => {

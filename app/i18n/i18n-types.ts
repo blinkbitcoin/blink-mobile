@@ -10392,6 +10392,10 @@ type RootTranslation = {
 	}
 	Accessibility: {
 		/**
+		 * B​a​l​a​n​c​e​ ​h​i​d​d​e​n
+		 */
+		balanceHidden: string
+		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -10399,6 +10403,10 @@ type RootTranslation = {
 		 * D​e​l​e​t​e
 		 */
 		deleteKey: string
+		/**
+		 * S​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​n​ ​t​h​i​s​ ​s​c​r​e​e​n
+		 */
+		revealBalanceHint: string
 		/**
 		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
 		 */
@@ -24215,6 +24223,10 @@ export type TranslationFunctions = {
 	}
 	Accessibility: {
 		/**
+		 * Balance hidden
+		 */
+		balanceHidden: () => LocalizedString
+		/**
 		 * Copy
 		 */
 		copy: () => LocalizedString
@@ -24222,6 +24234,10 @@ export type TranslationFunctions = {
 		 * Delete
 		 */
 		deleteKey: () => LocalizedString
+		/**
+		 * Shows your balance on this screen
+		 */
+		revealBalanceHint: () => LocalizedString
 		/**
 		 * Switches the currency you type the amount in
 		 */

@@ -3112,7 +3112,9 @@
         "deleteKey": "Borrar",
         "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
         "switchWalletHint": "Cambia a tu otra billetera",
-        "copy": "Copiar"
+        "copy": "Copiar",
+        "balanceHidden": "Saldo oculto",
+        "revealBalanceHint": "Muestra tu saldo en esta pantalla"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Necesito actualizar la aplicación a la última versión. Utilizo la aplicación para {os: string} con la versión {version: string}.",

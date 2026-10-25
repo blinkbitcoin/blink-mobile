@@ -2,8 +2,6 @@ import React from "react"
 import { ActivityIndicator, View } from "react-native"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
-import { testProps } from "@app/utils/testProps"
-
 type InfoRowProps = {
   label: string
   value: string
@@ -38,7 +36,15 @@ export const InfoRow: React.FC<InfoRowProps> = ({
     : [styles.value, { color: valueColor ?? colors.black }]
 
   return (
-    <View style={styles.container}>
+    // One element for a screen reader, label and value together, as a row of a list reads.
+    <View
+      style={styles.container}
+      accessible
+      accessibilityLabel={
+        loading ? label : [label, value, secondaryValue].filter(Boolean).join(", ")
+      }
+      accessibilityState={{ busy: loading }}
+    >
       <Text style={labelStyle}>{label}</Text>
       {loading ? (
         <View style={styles.loadingSlot}>
@@ -48,11 +54,11 @@ export const InfoRow: React.FC<InfoRowProps> = ({
             size="small"
             color={colors.grey2}
             style={styles.spinner}
-            {...testProps(`${label} loading`)}
+            testID={`${label} loading`}
           />
         </View>
       ) : (
-        <Text style={valueStyle} {...(valueTestId ? testProps(valueTestId) : {})}>
+        <Text style={valueStyle} testID={valueTestId}>
           {value}
           {secondaryValue ? (
             <Text style={styles.secondaryValue}>{secondaryValue}</Text>

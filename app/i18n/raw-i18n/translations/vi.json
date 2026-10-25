@@ -3112,7 +3112,9 @@
     "deleteKey": "Xóa",
     "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
     "switchWalletHint": "Chuyển sang ví còn lại của bạn",
-    "copy": "Sao chép"
+    "copy": "Sao chép",
+    "balanceHidden": "Số dư đang ẩn",
+    "revealBalanceHint": "Hiển thị số dư của bạn trên màn hình này"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

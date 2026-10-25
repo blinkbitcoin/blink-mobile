@@ -3261,8 +3261,10 @@ const en: BaseTranslation = {
     tapToSetAmount: "Set amount",
   },
   Accessibility: {
+    balanceHidden: "Balance hidden",
     copy: "Copy",
     deleteKey: "Delete",
+    revealBalanceHint: "Shows your balance on this screen",
     swapCurrencyHint: "Switches the currency you type the amount in",
     switchWalletHint: "Switches to your other wallet",
   },

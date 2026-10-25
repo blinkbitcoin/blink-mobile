@@ -3112,7 +3112,9 @@
     "deleteKey": "Padam",
     "swapCurrencyHint": "Menukar mata wang untuk menaip amaun",
     "switchWalletHint": "Bertukar ke dompet anda yang lain",
-    "copy": "Salin"
+    "copy": "Salin",
+    "balanceHidden": "Baki disembunyikan",
+    "revealBalanceHint": "Menunjukkan baki anda pada skrin ini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {version: string}",

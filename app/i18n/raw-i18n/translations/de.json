@@ -3112,7 +3112,9 @@
         "deleteKey": "Löschen",
         "swapCurrencyHint": "Wechselt die Währung für die Betragseingabe",
         "switchWalletHint": "Wechselt zur anderen Wallet",
-        "copy": "Kopieren"
+        "copy": "Kopieren",
+        "balanceHidden": "Guthaben ausgeblendet",
+        "revealBalanceHint": "Zeigt das Guthaben auf diesem Bildschirm"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Ich muss meine App auf die neuste Version updaten. Ich nutze die {os: string} App mit Version {version: string}.",

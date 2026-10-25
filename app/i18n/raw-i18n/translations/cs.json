@@ -3112,7 +3112,9 @@
     "deleteKey": "Smazat",
     "swapCurrencyHint": "Přepne měnu, ve které zadáváte částku",
     "switchWalletHint": "Přepne na vaši druhou peněženku",
-    "copy": "Kopírovat"
+    "copy": "Kopírovat",
+    "balanceHidden": "Zůstatek skrytý",
+    "revealBalanceHint": "Zobrazí váš zůstatek na této obrazovce"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potřebuji aktualizovat aplikaci na nejnovější verzi. Používám aplikaci {os: string} s verzí {version: string}.",

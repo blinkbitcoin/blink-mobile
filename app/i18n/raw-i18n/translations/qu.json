@@ -3112,7 +3112,9 @@
     "deleteKey": "Pichay",
     "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
     "switchWalletHint": "Huk qipiykiman tikran",
-    "copy": "Kopiay"
+    "copy": "Kopiay",
+    "balanceHidden": "Puchuq qullqi pakasqa",
+    "revealBalanceHint": "Kay pantallapi puchuq qullqiykita rikuchin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",

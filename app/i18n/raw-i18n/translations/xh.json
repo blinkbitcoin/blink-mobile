@@ -3112,7 +3112,9 @@
     "deleteKey": "Cima",
     "swapCurrencyHint": "Itshintsha imali obhala ngayo isixa",
     "switchWalletHint": "Itshintshela kwesinye isipaji sakho",
-    "copy": "Khuphela"
+    "copy": "Khuphela",
+    "balanceHidden": "Ibhalansi ifihliwe",
+    "revealBalanceHint": "Ibonisa ibhalansi yakho kwesi skrini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
