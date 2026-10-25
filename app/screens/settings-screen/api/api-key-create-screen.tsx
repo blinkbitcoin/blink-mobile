@@ -89,6 +89,7 @@ export const ApiKeyCreateScreen: React.FC = () => {
           rightIcon="pencil"
           valueStyle="regular"
           maxLength={MAX_KEY_NAME_LENGTH}
+          reserveHelperLine={false}
           value={name}
           onChangeText={setName}
         />

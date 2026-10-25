@@ -49,6 +49,9 @@ type InputFieldProps = {
   disabled?: boolean
   keyboardType?: KeyboardTypeOptions
   maxLength?: number
+  /** Keeps a line under the field for helper or error text, so the layout doesn't jump
+   *  when one appears. Turn it off for a field that never shows either. */
+  reserveHelperLine?: boolean
   formatDisplay?: (value: string) => string
   testID?: string
 } & IconProps
@@ -79,6 +82,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   disabled = false,
   keyboardType,
   maxLength,
+  reserveHelperLine = true,
   formatDisplay,
   testID,
 }) => {
@@ -170,18 +174,20 @@ export const InputField: React.FC<InputFieldProps> = ({
             rightIconElement
           )}
         </View>
-        <View style={styles.helperTextContainer}>
-          {displayHelperText ? (
-            <View style={styles.helperTextRow}>
-              {isError && (
-                <GaloyIcon name="warning-circle" size={12} color={colors.error} />
-              )}
-              <Text style={[styles.helperText, isError && styles.helperTextError]}>
-                {displayHelperText}
-              </Text>
-            </View>
-          ) : null}
-        </View>
+        {reserveHelperLine && (
+          <View style={styles.helperTextContainer}>
+            {displayHelperText ? (
+              <View style={styles.helperTextRow}>
+                {isError && (
+                  <GaloyIcon name="warning-circle" size={12} color={colors.error} />
+                )}
+                <Text style={[styles.helperText, isError && styles.helperTextError]}>
+                  {displayHelperText}
+                </Text>
+              </View>
+            ) : null}
+          </View>
+        )}
       </View>
     )
   }

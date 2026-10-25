@@ -187,6 +187,14 @@ describe("InputField", () => {
       expect(tree).toContain('"minHeight":13')
       expect(tree).not.toContain("Max $10,000 per day")
     })
+
+    it("drops the reserved helper line when reserveHelperLine is false", () => {
+      const { toJSON } = render(
+        <InputField label="Key name" value="" editable reserveHelperLine={false} />,
+      )
+
+      expect(JSON.stringify(toJSON())).not.toContain('"minHeight":13')
+    })
   })
 
   describe("helper text", () => {
