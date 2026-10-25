@@ -457,6 +457,28 @@ export type BlockInfo = {
   readonly blockHeight?: Maybe<Scalars['Int']['output']>;
 };
 
+export type BtcMapPlace = {
+  readonly __typename: 'BtcMapPlace';
+  readonly externalId: Scalars['String']['output'];
+  readonly id: Scalars['ID']['output'];
+  readonly origin: Scalars['String']['output'];
+};
+
+export type BtcMapPlacePayload = {
+  readonly __typename: 'BtcMapPlacePayload';
+  readonly errors: ReadonlyArray<Error>;
+  readonly place?: Maybe<BtcMapPlace>;
+};
+
+export type BtcMapPlaceSubmitInput = {
+  readonly category: Scalars['String']['input'];
+  readonly latitude: Scalars['Float']['input'];
+  readonly longitude: Scalars['Float']['input'];
+  readonly name: Scalars['String']['input'];
+  /** Client-generated UUID identifying this submission. Reuse the same value when retrying after a failed or ambiguous request so the retry does not create a duplicate place. Resubmitting with the same submissionId and different place fields updates the original submission instead. */
+  readonly submissionId: Scalars['ID']['input'];
+};
+
 export type BuildInformation = {
   readonly __typename: 'BuildInformation';
   readonly commitHash?: Maybe<Scalars['String']['output']>;
@@ -961,6 +983,7 @@ export type FeedbackSubmitInput = {
 export type FeesInformation = {
   readonly __typename: 'FeesInformation';
   readonly deposit: DepositFeesInformation;
+  readonly inactivityFee: InactivityFeeInformation;
 };
 
 /** Provides global settings for the application which might have an impact for the user. */
@@ -1048,6 +1071,14 @@ export const Icon = {
 } as const;
 
 export type Icon = typeof Icon[keyof typeof Icon];
+export type InactivityFeeInformation = {
+  readonly __typename: 'InactivityFeeInformation';
+  /** first date the inactivity fee applies */
+  readonly effectiveFrom: Scalars['Timestamp']['output'];
+  /** monthly fee per balance for an account with no activity for 12 months, in USD cents */
+  readonly usdCentsPerMonth: Scalars['CentAmount']['output'];
+};
+
 export type InitiationVia = InitiationViaIntraLedger | InitiationViaLn | InitiationViaOnChain;
 
 export type InitiationViaIntraLedger = {
@@ -1520,6 +1551,8 @@ export type Mutation = {
   readonly apiKeyRemoveLimit: ApiKeySetLimitPayload;
   readonly apiKeyRevoke: ApiKeyRevokePayload;
   readonly apiKeySetLimit: ApiKeySetLimitPayload;
+  /** Submit a place to BTC Map. Submissions from trusted sources appear on BTC Map right away; BTC Map editors process them later for eventual inclusion in OpenStreetMap. */
+  readonly btcMapPlaceSubmit: BtcMapPlacePayload;
   readonly callbackEndpointAdd: CallbackEndpointAddPayload;
   readonly callbackEndpointDelete: SuccessPayload;
   readonly captchaCreateChallenge: CaptchaCreateChallengePayload;
@@ -1707,6 +1740,11 @@ export type MutationApiKeyRevokeArgs = {
 
 export type MutationApiKeySetLimitArgs = {
   input: ApiKeySetLimitInput;
+};
+
+
+export type MutationBtcMapPlaceSubmitArgs = {
+  input: BtcMapPlaceSubmitInput;
 };
 
 
@@ -2002,6 +2040,11 @@ export type MutationUserPhoneRegistrationInitiateArgs = {
 
 export type MutationUserPhoneRegistrationValidateArgs = {
   input: UserPhoneRegistrationValidateInput;
+};
+
+
+export type MutationUserTotpDeleteArgs = {
+  input?: InputMaybe<UserTotpDeleteInput>;
 };
 
 
@@ -2618,8 +2661,12 @@ export type StatefulNotification = {
   readonly action?: Maybe<NotificationAction>;
   readonly body: Scalars['String']['output'];
   readonly bulletinEnabled: Scalars['Boolean']['output'];
+  /** Groups bulletins so that at most one bulletin per key is active at a time */
+  readonly bulletinKey?: Maybe<Scalars['String']['output']>;
   readonly createdAt: Scalars['Timestamp']['output'];
   readonly deepLink?: Maybe<Scalars['String']['output']>;
+  /** Whether the user can close the bulletin from the app */
+  readonly dismissible: Scalars['Boolean']['output'];
   readonly icon?: Maybe<Icon>;
   readonly id: Scalars['ID']['output'];
   readonly title: Scalars['String']['output'];
@@ -3006,6 +3053,7 @@ export type UserEmailDeletePayload = {
 
 export type UserEmailRegistrationInitiateInput = {
   readonly email: Scalars['EmailAddress']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserEmailRegistrationInitiatePayload = {
@@ -3059,12 +3107,17 @@ export type UserPhoneRegistrationInitiateInput = {
 export type UserPhoneRegistrationValidateInput = {
   readonly code: Scalars['OneTimeAuthCode']['input'];
   readonly phone: Scalars['Phone']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserPhoneRegistrationValidatePayload = {
   readonly __typename: 'UserPhoneRegistrationValidatePayload';
   readonly errors: ReadonlyArray<Error>;
   readonly me?: Maybe<User>;
+};
+
+export type UserTotpDeleteInput = {
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserTotpDeletePayload = {
@@ -10567,6 +10620,10 @@ export type ResolversTypes = {
   Authorization: ResolverTypeWrapper<Authorization>;
   BTCWallet: ResolverTypeWrapper<BtcWallet>;
   BlockInfo: ResolverTypeWrapper<BlockInfo>;
+  BtcMapPlace: ResolverTypeWrapper<BtcMapPlace>;
+  BtcMapPlacePayload: ResolverTypeWrapper<BtcMapPlacePayload>;
+  BtcMapPlaceSubmitInput: BtcMapPlaceSubmitInput;
+  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   BuildInformation: ResolverTypeWrapper<BuildInformation>;
   CallbackEndpoint: ResolverTypeWrapper<CallbackEndpoint>;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -10586,7 +10643,6 @@ export type ResolversTypes = {
   CardCreateInput: CardCreateInput;
   CardHolder: ResolverTypeWrapper<CardHolder>;
   CardMerchant: ResolverTypeWrapper<CardMerchant>;
-  Float: ResolverTypeWrapper<Scalars['Float']['output']>;
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: ResolverTypeWrapper<CardSecretsEncrypted>;
@@ -10641,6 +10697,7 @@ export type ResolversTypes = {
   GraphQLApplicationError: ResolverTypeWrapper<GraphQlApplicationError>;
   Hex32Bytes: ResolverTypeWrapper<Scalars['Hex32Bytes']['output']>;
   Icon: Icon;
+  InactivityFeeInformation: ResolverTypeWrapper<InactivityFeeInformation>;
   InitiationVia: ResolverTypeWrapper<ResolversUnionTypes<ResolversTypes>['InitiationVia']>;
   InitiationViaIntraLedger: ResolverTypeWrapper<InitiationViaIntraLedger>;
   InitiationViaLn: ResolverTypeWrapper<InitiationViaLn>;
@@ -10820,6 +10877,7 @@ export type ResolversTypes = {
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: ResolverTypeWrapper<UserPhoneRegistrationValidatePayload>;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: ResolverTypeWrapper<UserTotpDeletePayload>;
   UserTotpRegistrationInitiatePayload: ResolverTypeWrapper<UserTotpRegistrationInitiatePayload>;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -10877,6 +10935,10 @@ export type ResolversParentTypes = {
   Authorization: Authorization;
   BTCWallet: BtcWallet;
   BlockInfo: BlockInfo;
+  BtcMapPlace: BtcMapPlace;
+  BtcMapPlacePayload: BtcMapPlacePayload;
+  BtcMapPlaceSubmitInput: BtcMapPlaceSubmitInput;
+  Float: Scalars['Float']['output'];
   BuildInformation: BuildInformation;
   CallbackEndpoint: CallbackEndpoint;
   CallbackEndpointAddInput: CallbackEndpointAddInput;
@@ -10896,7 +10958,6 @@ export type ResolversParentTypes = {
   CardCreateInput: CardCreateInput;
   CardHolder: CardHolder;
   CardMerchant: CardMerchant;
-  Float: Scalars['Float']['output'];
   CardPinUpdateInput: CardPinUpdateInput;
   CardReplaceInput: CardReplaceInput;
   CardSecretsEncrypted: CardSecretsEncrypted;
@@ -10946,6 +11007,7 @@ export type ResolversParentTypes = {
   Globals: Globals;
   GraphQLApplicationError: GraphQlApplicationError;
   Hex32Bytes: Scalars['Hex32Bytes']['output'];
+  InactivityFeeInformation: InactivityFeeInformation;
   InitiationVia: ResolversUnionTypes<ResolversParentTypes>['InitiationVia'];
   InitiationViaIntraLedger: InitiationViaIntraLedger;
   InitiationViaLn: InitiationViaLn;
@@ -11105,6 +11167,7 @@ export type ResolversParentTypes = {
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: UserPhoneRegistrationValidatePayload;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: UserTotpDeletePayload;
   UserTotpRegistrationInitiatePayload: UserTotpRegistrationInitiatePayload;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -11300,6 +11363,19 @@ export type BtcWalletResolvers<ContextType = any, ParentType extends ResolversPa
 export type BlockInfoResolvers<ContextType = any, ParentType extends ResolversParentTypes['BlockInfo'] = ResolversParentTypes['BlockInfo']> = {
   blockHash?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   blockHeight?: Resolver<Maybe<ResolversTypes['Int']>, ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BtcMapPlaceResolvers<ContextType = any, ParentType extends ResolversParentTypes['BtcMapPlace'] = ResolversParentTypes['BtcMapPlace']> = {
+  externalId?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
+  origin?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
+
+export type BtcMapPlacePayloadResolvers<ContextType = any, ParentType extends ResolversParentTypes['BtcMapPlacePayload'] = ResolversParentTypes['BtcMapPlacePayload']> = {
+  errors?: Resolver<ReadonlyArray<ResolversTypes['Error']>, ParentType, ContextType>;
+  place?: Resolver<Maybe<ResolversTypes['BtcMapPlace']>, ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11643,6 +11719,7 @@ export interface FeedbackScalarConfig extends GraphQLScalarTypeConfig<ResolversT
 
 export type FeesInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['FeesInformation'] = ResolversParentTypes['FeesInformation']> = {
   deposit?: Resolver<ResolversTypes['DepositFeesInformation'], ParentType, ContextType>;
+  inactivityFee?: Resolver<ResolversTypes['InactivityFeeInformation'], ParentType, ContextType>;
   __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
 };
 
@@ -11669,6 +11746,12 @@ export type GraphQlApplicationErrorResolvers<ContextType = any, ParentType exten
 export interface Hex32BytesScalarConfig extends GraphQLScalarTypeConfig<ResolversTypes['Hex32Bytes'], any> {
   name: 'Hex32Bytes';
 }
+
+export type InactivityFeeInformationResolvers<ContextType = any, ParentType extends ResolversParentTypes['InactivityFeeInformation'] = ResolversParentTypes['InactivityFeeInformation']> = {
+  effectiveFrom?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
+  usdCentsPerMonth?: Resolver<ResolversTypes['CentAmount'], ParentType, ContextType>;
+  __isTypeOf?: IsTypeOfResolverFn<ParentType, ContextType>;
+};
 
 export type InitiationViaResolvers<ContextType = any, ParentType extends ResolversParentTypes['InitiationVia'] = ResolversParentTypes['InitiationVia']> = {
   __resolveType: TypeResolveFn<'InitiationViaIntraLedger' | 'InitiationViaLn' | 'InitiationViaOnChain', ParentType, ContextType>;
@@ -11888,6 +11971,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   apiKeyRemoveLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeyRemoveLimitArgs, 'input'>>;
   apiKeyRevoke?: Resolver<ResolversTypes['ApiKeyRevokePayload'], ParentType, ContextType, RequireFields<MutationApiKeyRevokeArgs, 'input'>>;
   apiKeySetLimit?: Resolver<ResolversTypes['ApiKeySetLimitPayload'], ParentType, ContextType, RequireFields<MutationApiKeySetLimitArgs, 'input'>>;
+  btcMapPlaceSubmit?: Resolver<ResolversTypes['BtcMapPlacePayload'], ParentType, ContextType, RequireFields<MutationBtcMapPlaceSubmitArgs, 'input'>>;
   callbackEndpointAdd?: Resolver<ResolversTypes['CallbackEndpointAddPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointAddArgs, 'input'>>;
   callbackEndpointDelete?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationCallbackEndpointDeleteArgs, 'input'>>;
   captchaCreateChallenge?: Resolver<ResolversTypes['CaptchaCreateChallengePayload'], ParentType, ContextType>;
@@ -11952,7 +12036,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType>;
   userPhoneRegistrationInitiate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationInitiateArgs, 'input'>>;
   userPhoneRegistrationValidate?: Resolver<ResolversTypes['UserPhoneRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationValidateArgs, 'input'>>;
-  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType>;
+  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType, Partial<MutationUserTotpDeleteArgs>>;
   userTotpRegistrationInitiate?: Resolver<ResolversTypes['UserTotpRegistrationInitiatePayload'], ParentType, ContextType>;
   userTotpRegistrationValidate?: Resolver<ResolversTypes['UserTotpRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserTotpRegistrationValidateArgs, 'input'>>;
   userUpdateLanguage?: Resolver<ResolversTypes['UserUpdateLanguagePayload'], ParentType, ContextType, RequireFields<MutationUserUpdateLanguageArgs, 'input'>>;
@@ -12317,8 +12401,10 @@ export type StatefulNotificationResolvers<ContextType = any, ParentType extends 
   action?: Resolver<Maybe<ResolversTypes['NotificationAction']>, ParentType, ContextType>;
   body?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
   bulletinEnabled?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
+  bulletinKey?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
   createdAt?: Resolver<ResolversTypes['Timestamp'], ParentType, ContextType>;
   deepLink?: Resolver<Maybe<ResolversTypes['String']>, ParentType, ContextType>;
+  dismissible?: Resolver<ResolversTypes['Boolean'], ParentType, ContextType>;
   icon?: Resolver<Maybe<ResolversTypes['Icon']>, ParentType, ContextType>;
   id?: Resolver<ResolversTypes['ID'], ParentType, ContextType>;
   title?: Resolver<ResolversTypes['String'], ParentType, ContextType>;
@@ -12622,6 +12708,8 @@ export type Resolvers<ContextType = any> = {
   Authorization?: AuthorizationResolvers<ContextType>;
   BTCWallet?: BtcWalletResolvers<ContextType>;
   BlockInfo?: BlockInfoResolvers<ContextType>;
+  BtcMapPlace?: BtcMapPlaceResolvers<ContextType>;
+  BtcMapPlacePayload?: BtcMapPlacePayloadResolvers<ContextType>;
   BuildInformation?: BuildInformationResolvers<ContextType>;
   CallbackEndpoint?: CallbackEndpointResolvers<ContextType>;
   CallbackEndpointAddPayload?: CallbackEndpointAddPayloadResolvers<ContextType>;
@@ -12673,6 +12761,7 @@ export type Resolvers<ContextType = any> = {
   Globals?: GlobalsResolvers<ContextType>;
   GraphQLApplicationError?: GraphQlApplicationErrorResolvers<ContextType>;
   Hex32Bytes?: GraphQLScalarType;
+  InactivityFeeInformation?: InactivityFeeInformationResolvers<ContextType>;
   InitiationVia?: InitiationViaResolvers<ContextType>;
   InitiationViaIntraLedger?: InitiationViaIntraLedgerResolvers<ContextType>;
   InitiationViaLn?: InitiationViaLnResolvers<ContextType>;
