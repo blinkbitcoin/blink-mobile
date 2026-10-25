@@ -2043,6 +2043,11 @@ export type MutationUserPhoneRegistrationValidateArgs = {
 };
 
 
+export type MutationUserTotpDeleteArgs = {
+  input?: InputMaybe<UserTotpDeleteInput>;
+};
+
+
 export type MutationUserTotpRegistrationValidateArgs = {
   input: UserTotpRegistrationValidateInput;
 };
@@ -3048,6 +3053,7 @@ export type UserEmailDeletePayload = {
 
 export type UserEmailRegistrationInitiateInput = {
   readonly email: Scalars['EmailAddress']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserEmailRegistrationInitiatePayload = {
@@ -3101,12 +3107,17 @@ export type UserPhoneRegistrationInitiateInput = {
 export type UserPhoneRegistrationValidateInput = {
   readonly code: Scalars['OneTimeAuthCode']['input'];
   readonly phone: Scalars['Phone']['input'];
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserPhoneRegistrationValidatePayload = {
   readonly __typename: 'UserPhoneRegistrationValidatePayload';
   readonly errors: ReadonlyArray<Error>;
   readonly me?: Maybe<User>;
+};
+
+export type UserTotpDeleteInput = {
+  readonly totpCode?: InputMaybe<Scalars['TotpCode']['input']>;
 };
 
 export type UserTotpDeletePayload = {
@@ -10960,6 +10971,7 @@ export type ResolversTypes = {
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: ResolverTypeWrapper<UserPhoneRegistrationValidatePayload>;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: ResolverTypeWrapper<UserTotpDeletePayload>;
   UserTotpRegistrationInitiatePayload: ResolverTypeWrapper<UserTotpRegistrationInitiatePayload>;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -11249,6 +11261,7 @@ export type ResolversParentTypes = {
   UserPhoneRegistrationInitiateInput: UserPhoneRegistrationInitiateInput;
   UserPhoneRegistrationValidateInput: UserPhoneRegistrationValidateInput;
   UserPhoneRegistrationValidatePayload: UserPhoneRegistrationValidatePayload;
+  UserTotpDeleteInput: UserTotpDeleteInput;
   UserTotpDeletePayload: UserTotpDeletePayload;
   UserTotpRegistrationInitiatePayload: UserTotpRegistrationInitiatePayload;
   UserTotpRegistrationValidateInput: UserTotpRegistrationValidateInput;
@@ -12117,7 +12130,7 @@ export type MutationResolvers<ContextType = any, ParentType extends ResolversPar
   userPhoneDelete?: Resolver<ResolversTypes['UserPhoneDeletePayload'], ParentType, ContextType>;
   userPhoneRegistrationInitiate?: Resolver<ResolversTypes['SuccessPayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationInitiateArgs, 'input'>>;
   userPhoneRegistrationValidate?: Resolver<ResolversTypes['UserPhoneRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserPhoneRegistrationValidateArgs, 'input'>>;
-  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType>;
+  userTotpDelete?: Resolver<ResolversTypes['UserTotpDeletePayload'], ParentType, ContextType, Partial<MutationUserTotpDeleteArgs>>;
   userTotpRegistrationInitiate?: Resolver<ResolversTypes['UserTotpRegistrationInitiatePayload'], ParentType, ContextType>;
   userTotpRegistrationValidate?: Resolver<ResolversTypes['UserTotpRegistrationValidatePayload'], ParentType, ContextType, RequireFields<MutationUserTotpRegistrationValidateArgs, 'input'>>;
   userUpdateLanguage?: Resolver<ResolversTypes['UserUpdateLanguagePayload'], ParentType, ContextType, RequireFields<MutationUserUpdateLanguageArgs, 'input'>>;
