@@ -142,7 +142,6 @@ describe("ErrorMsgBottomSheet", () => {
       expect(onPrimaryPress).not.toHaveBeenCalled()
     })
   })
-
   describe("haptic", () => {
     beforeEach(() => {
       ;(ReactNativeHapticFeedback.trigger as jest.Mock).mockClear()
