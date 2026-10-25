@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react"
-import { AppState, BackHandler, View } from "react-native"
+import { AccessibilityInfo, AppState, BackHandler, View } from "react-native"
 import {
   cancelAnimation,
   Easing,
@@ -76,6 +76,9 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
   const [sentPlay, setSentPlay] = useState(0)
   /** Whether review is in front of the sender; the hold only counts while it is. */
   const [isInView, setIsInView] = useState(true)
+  /** With a screen reader on, Sent holds until the sender taps: a timer would move the
+   *  screen away while they are still finding Receipt and Close. */
+  const [isScreenReaderOn, setIsScreenReaderOn] = useState(false)
 
   const amountsRef = useRef<SentAmounts>(undefined)
   /** Bumped by every play and every rewind, so a play still measuring knows it lost. */
@@ -214,14 +217,29 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     }
   }, [navigation, interrupt, replayIfPending, canBeSeen])
 
+  useEffect(() => {
+    let isMounted = true
+    AccessibilityInfo.isScreenReaderEnabled().then((isOn) => {
+      if (isMounted) setIsScreenReaderOn(isOn)
+    })
+    const subscription = AccessibilityInfo.addEventListener(
+      "screenReaderChanged",
+      setIsScreenReaderOn,
+    )
+    return () => {
+      isMounted = false
+      subscription.remove()
+    }
+  }, [])
+
   /** Counts the hold from the moment the play settles, or from now if it already has. */
   useEffect(() => {
-    if (!sentPlay || !isInView) return
+    if (!sentPlay || !isInView || isScreenReaderOn) return
     const startedAt = playStartedAtRef.current ?? Date.now()
     const timelineLeft = Math.max(0, SENT_TIMELINE_MS - (Date.now() - startedAt))
     const timer = setTimeout(() => onHoldEndRef.current?.(), timelineLeft + SENT_HOLD_MS)
     return () => clearTimeout(timer)
-  }, [sentPlay, isInView])
+  }, [sentPlay, isInView, isScreenReaderOn])
 
   const playSent = useCallback(
     async (amounts: SentAmounts) => {
@@ -237,6 +255,12 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     [canBeSeen, play],
   )
 
+  /** What dissolves into Sent is only invisible, so a screen reader is kept off it too. */
+  const goneWhenSent = {
+    accessibilityElementsHidden: isSent,
+    importantForAccessibility: isSent ? "no-hide-descendants" : "auto",
+  } as const
+
   return {
     stageRef,
     heroRef,
@@ -246,6 +270,7 @@ export const useSentTransition = ({ onHoldEnd }: { onHoldEnd?: () => void } = {}
     heroProgress,
     glowProgress,
     detailsStyle,
+    goneWhenSent,
     heroStyle,
     actionsStyle,
     playSent,

@@ -735,6 +735,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
           title={nextButtonTitle}
           containerStyle={styles.next}
           {...testProps(LL.common.next())}
+          accessibilityLabel={nextButtonTitle}
         />
       </View>
     </Screen>

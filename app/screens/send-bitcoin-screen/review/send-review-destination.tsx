@@ -53,6 +53,7 @@ export const SendReviewDestination: React.FC<SendReviewDestinationProps> = ({
       iconSize={16}
       numberOfLines={1}
       onAction={onCopy}
+      actionHint={LL.Accessibility.copy()}
       testID={SEND_REVIEW_COPY_TEST_ID}
       valueTestID={SEND_REVIEW_DESTINATION_TEST_ID}
     />

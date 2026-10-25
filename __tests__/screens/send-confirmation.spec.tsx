@@ -1,6 +1,12 @@
 import React from "react"
 import ReactNativeHapticFeedback from "react-native-haptic-feedback"
-import { StyleSheet, TouchableOpacity, Text } from "react-native"
+import {
+  AccessibilityInfo,
+  AppState,
+  StyleSheet,
+  TouchableOpacity,
+  Text,
+} from "react-native"
 import { Satoshis } from "lnurl-pay"
 import {
   act,
@@ -11,6 +17,7 @@ import {
   within,
 } from "@testing-library/react-native"
 
+import { SCRIM_TEST_ID } from "@app/components/bottom-sheet"
 import { DisplayCurrency, toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
@@ -270,7 +277,7 @@ const navigationDispatchMock = jest.fn()
 /** Sent measures the screen before it plays, and jest's native views never answer a
  *  measurement on their own. Answering them lets Sent play, so the test can open the
  *  receipt the way a sender does instead of waiting out the hold. */
-const slideAndOpenReceipt = async () => {
+const answerMeasurements = () =>
   screen.UNSAFE_root.findAll((node) =>
     jest.isMockFunction(node.instance?.measureInWindow),
   ).forEach((node) =>
@@ -279,6 +286,9 @@ const slideAndOpenReceipt = async () => {
         callback(0, 0, 360, 780),
     ),
   )
+
+const slideAndOpenReceipt = async () => {
+  answerMeasurements()
   await act(async () => {
     fireEvent.press(screen.getByTestId("slider"))
   })
@@ -435,7 +445,7 @@ const settledFeeMatcher = /₦[\d,]+ \(/
  * Scoped by label rather than read off `.children`, so the assertion survives the fee
  * cell gaining a nested element such as the max-fee marker.
  */
-const feeRow = () => within(screen.getByLabelText("Successful Fee"))
+const feeRow = () => within(screen.getByTestId("Successful Fee"))
 
 /**
  * waitFor's own default is 1s, well under the 20s testTimeout this repo raised for
@@ -1881,9 +1891,9 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(buildBtcSettlementRoute(1000))
 
       expect(
-        screen.getByLabelText(`${LL.SendBitcoinConfirmationScreen.feeLabel()} loading`),
+        screen.getByTestId(`${LL.SendBitcoinConfirmationScreen.feeLabel()} loading`),
       ).toBeTruthy()
-      expect(screen.queryByLabelText("Successful Fee")).toBeNull()
+      expect(screen.queryByTestId("Successful Fee")).toBeNull()
     })
 
     it("shows the fee error under the card, not in the Fee row, and outlines the card red when the quote fails", async () => {
@@ -2124,7 +2134,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       screen.queryByTestId(SEND_HERO_SECONDARY_TEST_ID)?.props.children,
     ]
     const feeRow = () =>
-      [screen.getByLabelText("Successful Fee").props.children].flat().join("")
+      [screen.getByTestId("Successful Fee").props.children].flat().join("")
 
     afterEach(() => {
       mockPreferredAmountCurrency.current = undefined
@@ -2650,7 +2660,9 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
 
       // The scrim behind the sheet is the close control.
       await act(async () => {
-        fireEvent.press(screen.getByLabelText(LL.common.close()))
+        fireEvent.press(
+          screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }),
+        )
       })
 
       expect(errorSheet()).toBeNull()
@@ -2670,7 +2682,9 @@ describe("SendBitcoinConfirmationScreen — error message sheet", () => {
       await renderReview(route)
 
       await act(async () => {
-        fireEvent.press(screen.getByLabelText(LL.common.close()))
+        fireEvent.press(
+          screen.getByTestId(SCRIM_TEST_ID, { includeHiddenElements: true }),
+        )
       })
       await flushEffects()
 
@@ -2841,5 +2855,55 @@ describe("SendBitcoinConfirmationScreen — high-fee sheet (blink-wip#1323)", ()
     await renderReview()
 
     expect(highFeeSheet()).toBeNull()
+  })
+})
+
+describe("SendBitcoinConfirmationScreen — Sent and the screen reader", () => {
+  let LL: ReturnType<typeof i18nObject>
+  /** React Native's jest mock leaves `currentState` a function, never "active". */
+  const mockedAppState = AppState as { currentState: unknown }
+  const originalAppState = mockedAppState.currentState
+
+  beforeEach(() => {
+    LL = i18nObject("en")
+    // Sent only plays where it can be seen; elsewhere it waits for the sender to return.
+    mockedAppState.currentState = "active"
+    jest.spyOn(AccessibilityInfo, "announceForAccessibility").mockImplementation(() => {})
+    jest.mocked(AccessibilityInfo.announceForAccessibility).mockClear()
+  })
+
+  afterEach(() => {
+    mockedAppState.currentState = originalAppState
+    jest.restoreAllMocks()
+  })
+
+  /** Review turns into Sent in place: no new screen takes focus, and what dissolved is
+   *  only invisible. */
+  it("speaks Sent with the amount, and keeps a screen reader off what dissolved", async () => {
+    sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+    await renderSettled(
+      <ContextForScreen>
+        <Intraledger route={route} />
+      </ContextForScreen>,
+    )
+    const amount = screen.getByTestId(SEND_HERO_PRIMARY_TEST_ID).props.children
+
+    answerMeasurements()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("slider"))
+    })
+    expect(screen.getByText(LL.SendBitcoinConfirmationScreen.receipt())).toBeTruthy()
+    // The announcement goes out on the next tick.
+    await act(async () => {
+      await new Promise((resolve) => {
+        setTimeout(resolve, 0)
+      })
+    })
+
+    expect(AccessibilityInfo.announceForAccessibility).toHaveBeenCalledWith(
+      `${LL.SendBitcoinConfirmationScreen.sent()}, ${amount}`,
+    )
+    expect(screen.queryByTestId("slider")).toBeNull()
+    expect(screen.getByTestId("slider", { includeHiddenElements: true })).toBeTruthy()
   })
 })

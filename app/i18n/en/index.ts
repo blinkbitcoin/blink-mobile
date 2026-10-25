@@ -3271,6 +3271,14 @@ const en: BaseTranslation = {
   AmountInputButton: {
     tapToSetAmount: "Set amount",
   },
+  Accessibility: {
+    balanceHidden: "Balance hidden",
+    copy: "Copy",
+    deleteKey: "Delete",
+    revealBalanceHint: "Shows your balance on this screen",
+    swapCurrencyHint: "Switches the currency you type the amount in",
+    switchWalletHint: "Switches to your other wallet",
+  },
   AppUpdate: {
     needToUpdateSupportMessage:
       "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
