@@ -24,7 +24,10 @@ jest.mock("@app/components/hidden-balance-placeholder/hidden-balance-placeholder
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
-    LL: { common: { bitcoin: () => "Bitcoin", dollar: () => "Dollar" } },
+    LL: {
+      common: { bitcoin: () => "Bitcoin", dollar: () => "Dollar" },
+      Accessibility: { switchWalletHint: () => "Switches to your other wallet" },
+    },
   }),
 }))
 
@@ -160,5 +163,25 @@ describe("SendWalletSummary", () => {
 
       expect(onReveal).toHaveBeenCalledTimes(1)
     })
+  })
+
+  it("says the card switches wallets only where it does", () => {
+    const { rerender } = render(
+      <ThemeProvider theme={theme}>
+        <SendWalletSummary
+          currency={WalletCurrency.Btc}
+          balancePrimary="741 SAT"
+          onSwitch={jest.fn()}
+        />
+      </ThemeProvider>,
+    )
+    expect(screen.getByLabelText("Bitcoin, 741 SAT").props.accessibilityHint).toBe(
+      "Switches to your other wallet",
+    )
+
+    rerender(bitcoinCard)
+    expect(
+      screen.getByLabelText("Bitcoin, 741 SAT").props.accessibilityHint,
+    ).toBeUndefined()
   })
 })

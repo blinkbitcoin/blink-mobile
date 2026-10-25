@@ -317,6 +317,8 @@ describe("free amount", () => {
     expect(screen.getByTestId("Key 1")).toBeTruthy()
     expect(screen.getByTestId("send-25%")).toBeTruthy()
     expect(within(nextButton()).getByText(LL.SendBitcoinScreen.addAmount())).toBeTruthy()
+    // Read as what it shows, not as its test ID "Next".
+    expect(nextButton().props.accessibilityLabel).toBe(LL.SendBitcoinScreen.addAmount())
     expect(isNextDisabled()).toBe(true)
   })
 
@@ -402,6 +404,7 @@ describe("free amount", () => {
     await settle()
 
     expect(within(nextButton()).getByText(LL.SendBitcoinScreen.lowFunds())).toBeTruthy()
+    expect(nextButton().props.accessibilityLabel).toBe(LL.SendBitcoinScreen.lowFunds())
     expect(isNextDisabled()).toBe(true)
     expect(cardBorder()).not.toBe(borderBefore)
   })
