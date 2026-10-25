@@ -100,6 +100,7 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
             testID="api-key-secret"
             value={ellipsizeMiddle(secret, SECRET_PREVIEW)}
             icon="copy-paste"
+            accessibilityLabel={LL.CopySecretComponent.button()}
             onAction={copySecret}
           />
         </View>

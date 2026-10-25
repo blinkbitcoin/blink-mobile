@@ -18,8 +18,9 @@ const MAX_KEY_NAME_LENGTH = 64
 
 /** The expiry chips take numbers, so "never" rides as 0 and goes out as null. */
 const NEVER_EXPIRES = 0
-const EXPIRY_OPTIONS = [30, 90, NEVER_EXPIRES] as const
-const DEFAULT_EXPIRY = 90
+type ExpiryOption = 30 | 90 | typeof NEVER_EXPIRES
+const EXPIRY_OPTIONS: readonly ExpiryOption[] = [30, 90, NEVER_EXPIRES]
+const DEFAULT_EXPIRY: ExpiryOption = 90
 
 export const ApiKeyCreateScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -31,7 +32,7 @@ export const ApiKeyCreateScreen: React.FC = () => {
   const [name, setName] = React.useState("")
   const [readEnabled, setReadEnabled] = React.useState(true)
   const [receiveEnabled, setReceiveEnabled] = React.useState(true)
-  const [expireInDays, setExpireInDays] = React.useState<number>(DEFAULT_EXPIRY)
+  const [expireInDays, setExpireInDays] = React.useState<ExpiryOption>(DEFAULT_EXPIRY)
   const [secret, setSecret] = React.useState<string | null>(null)
   const [hasError, setHasError] = React.useState(false)
 
@@ -39,9 +40,10 @@ export const ApiKeyCreateScreen: React.FC = () => {
     refetchQueries: [{ query: ApiKeysDocument }],
   })
 
-  const expiryLabel = (days: number) => {
-    if (days === NEVER_EXPIRES) return LL.ApiScreen.expiryNever()
-    return days === 30 ? LL.ApiScreen.expiry30Days() : LL.ApiScreen.expiry90Days()
+  const expiryLabels: Record<ExpiryOption, string> = {
+    30: LL.ApiScreen.expiry30Days(),
+    90: LL.ApiScreen.expiry90Days(),
+    [NEVER_EXPIRES]: LL.ApiScreen.expiryNever(),
   }
 
   const hasName = name.trim().length > 0
@@ -126,7 +128,7 @@ export const ApiKeyCreateScreen: React.FC = () => {
             options={EXPIRY_OPTIONS}
             selectedPercent={expireInDays}
             onSelect={setExpireInDays}
-            formatLabel={expiryLabel}
+            formatLabel={(days) => expiryLabels[days]}
             isLocked={loading}
             loadingPercent={null}
             containerStyle={styles.expiryOptions}

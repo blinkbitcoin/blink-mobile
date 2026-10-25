@@ -155,6 +155,21 @@ describe("ApiKeyCreateScreen", () => {
     )
   })
 
+  it("announces each expiry chip by its own label to screen readers", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(screen.getByTestId("api-key-expiry-30%").props.accessibilityLabel).toBe(
+      LL.ApiScreen.expiry30Days(),
+    )
+    expect(screen.getByTestId("api-key-expiry-90%").props.accessibilityLabel).toBe(
+      LL.ApiScreen.expiry90Days(),
+    )
+    expect(screen.getByTestId("api-key-expiry-0%").props.accessibilityLabel).toBe(
+      LL.ApiScreen.expiryNever(),
+    )
+  })
+
   it("caps the key name at 64 characters", async () => {
     renderScreen()
     await flushEffects()

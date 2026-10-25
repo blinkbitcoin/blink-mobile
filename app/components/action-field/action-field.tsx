@@ -11,6 +11,8 @@ type ActionFieldProps = {
   onAction?: () => void
   icon: IconNamesType
   label?: string
+  /** What pressing does, for screen readers; without it they read the shown value. */
+  accessibilityLabel?: string
   testID?: string
 }
 
@@ -19,6 +21,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   onAction,
   icon,
   label,
+  accessibilityLabel,
   testID,
 }) => {
   const styles = useStyles()
@@ -37,6 +40,9 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         disabled={!hasValue}
         style={styles.valueContainer}
         testID={testID}
+        accessibilityRole="button"
+        accessibilityLabel={accessibilityLabel}
+        accessibilityState={{ disabled: !hasValue }}
       >
         <Text style={styles.value}>{value ?? PLACEHOLDER}</Text>
         <View style={styles.actionButton}>

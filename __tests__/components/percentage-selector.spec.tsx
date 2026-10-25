@@ -81,6 +81,47 @@ describe("PercentageSelector", () => {
     expect(queryByText("30%")).toBeNull()
   })
 
+  it("labels each chip for screen readers with its visible label, not the test ID", () => {
+    const { getByTestId, getByLabelText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        options={[30, 0]}
+        formatLabel={(days) => (days === 0 ? "Never" : `${days} days`)}
+        testIdPrefix="expiry"
+      />,
+    )
+
+    expect(getByTestId("expiry-30%").props.accessibilityLabel).toBe("30 days")
+    expect(getByTestId("expiry-0%").props.accessibilityLabel).toBe("Never")
+    expect(getByTestId("expiry-0%").props.accessibilityRole).toBe("button")
+
+    fireEvent.press(getByLabelText("Never"))
+    expect(mockOnSelect).toHaveBeenCalledWith(0)
+  })
+
+  it("labels default chips as percentages for screen readers", () => {
+    const { getByTestId } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+      />,
+    )
+
+    expect(getByTestId("convert-25%").props.accessibilityLabel).toBe("25%")
+  })
+
+  it("marks a loading chip as busy", () => {
+    const { getByTestId } = render(
+      <PercentageSelector isLocked={false} loadingPercent={75} onSelect={mockOnSelect} />,
+    )
+
+    expect(getByTestId("convert-75%").props.accessibilityState.busy).toBe(true)
+    expect(getByTestId("convert-25%").props.accessibilityState.busy).toBe(false)
+  })
+
   it("calls onSelect when a percentage button is pressed", () => {
     const { getByText } = render(
       <PercentageSelector

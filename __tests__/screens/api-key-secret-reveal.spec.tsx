@@ -122,6 +122,14 @@ describe("ApiKeySecretReveal", () => {
     expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)
   })
 
+  it("announces the key field as a copy button, not the shortened key", () => {
+    renderReveal()
+
+    const field = screen.getByTestId("api-key-secret")
+    expect(field.props.accessibilityRole).toBe("button")
+    expect(field.props.accessibilityLabel).toBe(LL.CopySecretComponent.button())
+  })
+
   it("names the key above its one-time warning", () => {
     renderReveal()
 
