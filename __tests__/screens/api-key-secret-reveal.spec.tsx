@@ -1,5 +1,5 @@
 import React from "react"
-import { fireEvent, render, screen } from "@testing-library/react-native"
+import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
@@ -68,12 +68,28 @@ describe("ApiKeySecretReveal", () => {
     beforeRemoveListeners.length = 0
   })
 
-  it("hides the header back button and disables the swipe-back gesture", () => {
+  it("disables the swipe-back gesture", () => {
     renderReveal()
 
     expect(mockSetOptions).toHaveBeenCalledWith(
-      expect.objectContaining({ headerBackVisible: false, gestureEnabled: false }),
+      expect.objectContaining({ gestureEnabled: false }),
     )
+  })
+
+  it("leaves through the header back arrow, the same way as Done", async () => {
+    renderReveal()
+
+    const { headerLeft } = mockSetOptions.mock.calls.at(-1)[0]
+    render(
+      <ContextForScreen>
+        {headerLeft({ canGoBack: true, tintColor: undefined, label: undefined })}
+      </ContextForScreen>,
+    )
+    fireEvent.press(screen.getByLabelText("Go back"))
+
+    await waitFor(() => expect(mockGoBack).toHaveBeenCalled())
+    const event = emitBeforeRemove()
+    expect(event.preventDefault).not.toHaveBeenCalled()
   })
 
   it("blocks hardware and system back navigation", () => {

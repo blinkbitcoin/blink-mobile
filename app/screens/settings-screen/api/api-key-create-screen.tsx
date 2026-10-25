@@ -211,6 +211,5 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "flex-end",
     marginTop: 32,
-    paddingBottom: 20,
   },
 }))

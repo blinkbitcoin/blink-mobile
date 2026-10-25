@@ -7,6 +7,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { headerBackControl } from "@app/components/header-back-control/header-back-control"
 import { Screen } from "@app/components/screen"
 import { QrCodeComponent } from "@app/components/totp-export"
 import { useClipboard } from "@app/hooks"
@@ -35,17 +36,24 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const allowLeaveRef = React.useRef(false)
 
+  const finish = React.useCallback(() => {
+    allowLeaveRef.current = true
+    navigation.goBack()
+  }, [navigation])
+
+  // the header back arrow takes the same exit as Done; only the swipe and the
+  // system back stay blocked
   React.useEffect(() => {
     navigation.setOptions({
       title: LL.ApiScreen.keyCreatedTitle(),
-      headerBackVisible: false,
+      headerLeft: headerBackControl({ onPress: finish }),
       gestureEnabled: false,
     })
-  }, [navigation, LL])
+  }, [navigation, LL, finish])
 
-  // headerBackVisible/gestureEnabled don't cover the Android system back
-  // button — block every removal not initiated by the Done button so the
-  // one-time secret can't be dismissed accidentally
+  // gestureEnabled doesn't cover the Android system back button — block every
+  // removal not initiated by Done or the header arrow so the one-time secret
+  // can't be dismissed accidentally
   React.useEffect(
     () =>
       navigation.addListener("beforeRemove", (e) => {
@@ -53,11 +61,6 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
       }),
     [navigation],
   )
-
-  const finish = () => {
-    allowLeaveRef.current = true
-    navigation.goBack()
-  }
 
   const copySecret = () =>
     copyToClipboard({ content: secret, message: LL.ApiScreen.secretCopied() })
@@ -165,6 +168,5 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "flex-end",
     marginTop: 20,
-    paddingBottom: 20,
   },
 }))
