@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "deleteKey": "Pichay",
+    "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
+    "switchWalletHint": "Huk qipiykiman tikran",
+    "copy": "Kopiay"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",
     "versionNotSupported": "Kay warmi versiónqa kanmanmi kaypiyta munanki",

@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Ορίστε ποσό"
   },
+  "Accessibility": {
+    "deleteKey": "Διαγραφή",
+    "swapCurrencyHint": "Αλλάζει το νόμισμα στο οποίο πληκτρολογείτε το ποσό",
+    "switchWalletHint": "Μεταβαίνει στο άλλο σας πορτοφόλι",
+    "copy": "Αντιγραφή"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Πρέπει να ενημερώσω την εφαρμογή μου με την τελευταία έκδοση. Χρησιμοποιώ την εφαρμογή {os: string} με έκδοση {version: string}.",
     "versionNotSupported": "Αυτή η έκδοση για κινητά δεν υποστηρίζεται πλέον",

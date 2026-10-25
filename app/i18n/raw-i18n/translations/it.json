@@ -3108,6 +3108,12 @@
     "AmountInputButton": {
         "tapToSetAmount": "Imposta importo"
     },
+    "Accessibility": {
+        "deleteKey": "Cancella",
+        "swapCurrencyHint": "Cambia la valuta in cui digiti l'importo",
+        "switchWalletHint": "Passa all'altro tuo wallet",
+        "copy": "Copia"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Devo aggiornare la mia app all'ultima versione. Sto usando l'app {os: string} con la versione {version: string}.",
         "versionNotSupported": "Questa versione mobile non è più supportata",

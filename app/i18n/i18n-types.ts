@@ -10390,6 +10390,24 @@ type RootTranslation = {
 		 */
 		tapToSetAmount: string
 	}
+	Accessibility: {
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * D​e​l​e​t​e
+		 */
+		deleteKey: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
+		 */
+		swapCurrencyHint: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​o​ ​y​o​u​r​ ​o​t​h​e​r​ ​w​a​l​l​e​t
+		 */
+		switchWalletHint: string
+	}
 	AppUpdate: {
 		/**
 		 * I​ ​n​e​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​m​y​ ​a​p​p​ ​t​o​ ​t​h​e​ ​l​a​t​e​s​t​ ​v​e​r​s​i​o​n​.​ ​I​'​m​ ​u​s​i​n​g​ ​t​h​e​ ​{​o​s​}​ ​a​p​p​ ​w​i​t​h​ ​v​e​r​s​i​o​n​ ​{​v​e​r​s​i​o​n​}​.
@@ -24194,6 +24212,24 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		tapToSetAmount: () => LocalizedString
+	}
+	Accessibility: {
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Delete
+		 */
+		deleteKey: () => LocalizedString
+		/**
+		 * Switches the currency you type the amount in
+		 */
+		swapCurrencyHint: () => LocalizedString
+		/**
+		 * Switches to your other wallet
+		 */
+		switchWalletHint: () => LocalizedString
 	}
 	AppUpdate: {
 		/**

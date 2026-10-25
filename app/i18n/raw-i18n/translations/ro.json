@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Setați suma"
   },
+  "Accessibility": {
+    "deleteKey": "Șterge",
+    "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
+    "switchWalletHint": "Trece la celălalt portofel",
+    "copy": "Copiați"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",
     "versionNotSupported": "Această versiune mobilă nu mai este acceptată",

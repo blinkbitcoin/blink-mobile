@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Nastaviť sumu"
   },
+  "Accessibility": {
+    "deleteKey": "Vymazať",
+    "swapCurrencyHint": "Prepne menu, v ktorej zadávate sumu",
+    "switchWalletHint": "Prepne na vašu druhú peňaženku",
+    "copy": "Kopírovať"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potrebujem aktualizovať aplikáciu na najnovšiu verziu. Používam aplikáciu {os: string} s verziou {version: string}.",
     "versionNotSupported": "Táto mobilná verzia už nie je podporovaná",

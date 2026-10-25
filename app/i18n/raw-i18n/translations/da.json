@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Vælg beløb"
   },
+  "Accessibility": {
+    "deleteKey": "Slet",
+    "swapCurrencyHint": "Skifter den valuta, du skriver beløbet i",
+    "switchWalletHint": "Skifter til din anden tegnebog",
+    "copy": "Kopier"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Jeg skal opdatere min app til den nyeste version. Jeg bruger {os: string} app med version {version: string}.",
     "versionNotSupported": "Denne mobilversion understøttes ikke længere",

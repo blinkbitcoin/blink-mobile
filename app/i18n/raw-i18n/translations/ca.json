@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Estableix l'import"
   },
+  "Accessibility": {
+    "deleteKey": "Esborra",
+    "swapCurrencyHint": "Canvia la moneda en què escrius l'import",
+    "switchWalletHint": "Canvia a l'altre moneder",
+    "copy": "Copiar"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os: string} versió {version: string}.",
     "versionNotSupported": "Aquesta versió per a mòbils ja no s'admet",

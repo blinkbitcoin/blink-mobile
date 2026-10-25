@@ -43,7 +43,6 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
           key={p}
           label={`${p}%`}
           testID={`${testIdPrefix}-${p}%`}
-          accessibilityLabel={testIdPrefix}
           loading={loadingPercent === p}
           selected={selectedPercent === p}
           disabled={isLocked || (disabledOptions?.includes(p) ?? false)}

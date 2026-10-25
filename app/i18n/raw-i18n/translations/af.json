@@ -3108,6 +3108,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag "
   },
+  "Accessibility": {
+    "deleteKey": "Vee uit",
+    "swapCurrencyHint": "Wissel die geldeenheid waarin jy die bedrag tik",
+    "switchWalletHint": "Skakel oor na jou ander beursie",
+    "copy": "Kopieer"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ek moet opgradeer na die nuutste weergawe. Ek gebruik tans die {os: string} toepassing met die weergawe {version: string}.",
     "versionNotSupported": "Die sellulêre weergawe word nie meer ondersteun nie. ",
