@@ -3110,6 +3110,14 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "deleteKey": "Ջնջել",
+    "swapCurrencyHint": "Փոխում է արժույթը, որով մուտքագրում եք գումարը",
+    "switchWalletHint": "Անցնում է ձեր մյուս դրամապանակին",
+    "copy": "Պատճենել",
+    "balanceHidden": "Մնացորդը թաքցված է",
+    "revealBalanceHint": "Ցույց է տալիս ձեր մնացորդը այս էկրանին"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ես պետք է թարմացնել հավելվածը։ Ես օգտագործում եմ {os: string} հավելվածը {version: string} տարբերակով։ ",
     "versionNotSupported": "Բջջային տարբերակն այլևս չի աջակցվում։ ",

@@ -73,7 +73,12 @@ export const IconHero: React.FC<IconHeroProps> = ({
       <View style={[styles.textContainer, compact && styles.textContainerCompact]}>
         {caption}
         {isPlainTextTitle ? (
-          <Text style={styles.title} numberOfLines={titleLines} ellipsizeMode="middle">
+          <Text
+            style={styles.title}
+            numberOfLines={titleLines}
+            ellipsizeMode="middle"
+            accessibilityRole="header"
+          >
             {title}
           </Text>
         ) : (

@@ -435,7 +435,7 @@ const settledFeeMatcher = /₦[\d,]+ \(/
  * Scoped by label rather than read off `.children`, so the assertion survives the fee
  * cell gaining a nested element such as the max-fee marker.
  */
-const feeRow = () => within(screen.getByLabelText("Successful Fee"))
+const feeRow = () => within(screen.getByTestId("Successful Fee"))
 
 /**
  * waitFor's own default is 1s, well under the 20s testTimeout this repo raised for
@@ -1831,9 +1831,9 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       await renderReview(buildBtcSettlementRoute(1000))
 
       expect(
-        screen.getByLabelText(`${LL.SendBitcoinConfirmationScreen.feeLabel()} loading`),
+        screen.getByTestId(`${LL.SendBitcoinConfirmationScreen.feeLabel()} loading`),
       ).toBeTruthy()
-      expect(screen.queryByLabelText("Successful Fee")).toBeNull()
+      expect(screen.queryByTestId("Successful Fee")).toBeNull()
     })
 
     it("shows the fee error under the card, not in the Fee row, and outlines the card red when the quote fails", async () => {
@@ -2067,7 +2067,7 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       screen.queryByTestId(SEND_HERO_SECONDARY_TEST_ID)?.props.children,
     ]
     const feeRow = () =>
-      [screen.getByLabelText("Successful Fee").props.children].flat().join("")
+      [screen.getByTestId("Successful Fee").props.children].flat().join("")
 
     afterEach(() => {
       mockPreferredAmountCurrency.current = undefined

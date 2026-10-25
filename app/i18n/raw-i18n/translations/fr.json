@@ -3110,6 +3110,14 @@
     "AmountInputButton": {
         "tapToSetAmount": "Fixer le montant"
     },
+    "Accessibility": {
+        "deleteKey": "Effacer",
+        "swapCurrencyHint": "Change la devise dans laquelle vous saisissez le montant",
+        "switchWalletHint": "Passe à votre autre portefeuille",
+        "copy": "Copier",
+        "balanceHidden": "Solde masqué",
+        "revealBalanceHint": "Affiche votre solde sur cet écran"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "J’ai besoin de mettre à jour la dernière version sur mon app. J’utilise l’app {os: string} avec la version {version: string}.",
         "versionNotSupported": "La version mobile n’est plus supportée",

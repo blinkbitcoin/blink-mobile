@@ -4,7 +4,6 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { fonts } from "@app/rne-theme/fonts"
-import { testProps } from "@app/utils/testProps"
 
 const PLACEHOLDER = "—"
 
@@ -20,6 +19,8 @@ type ActionFieldProps = {
    *  middle on this many lines instead of wrapping. */
   numberOfLines?: number
   iconSize?: number
+  /** What the action does, for a screen reader: the icon alone says nothing to it. */
+  actionHint?: string
 }
 
 export const ActionField: React.FC<ActionFieldProps> = ({
@@ -31,6 +32,7 @@ export const ActionField: React.FC<ActionFieldProps> = ({
   valueTestID,
   numberOfLines,
   iconSize = 20,
+  actionHint,
 }) => {
   const styles = useStyles()
   const {
@@ -48,12 +50,17 @@ export const ActionField: React.FC<ActionFieldProps> = ({
         disabled={!hasValue}
         style={styles.valueContainer}
         testID={testID}
+        accessibilityRole="button"
+        /* The label above is read just before it, so the button is named by its value. */
+        accessibilityLabel={value ?? PLACEHOLDER}
+        accessibilityHint={hasValue ? actionHint : undefined}
+        accessibilityState={{ disabled: !hasValue }}
       >
         <Text
           style={styles.value}
           numberOfLines={numberOfLines}
           ellipsizeMode={numberOfLines ? "middle" : undefined}
-          {...(valueTestID ? testProps(valueTestID) : {})}
+          testID={valueTestID}
         >
           {value ?? PLACEHOLDER}
         </Text>

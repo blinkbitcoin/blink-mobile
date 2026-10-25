@@ -92,8 +92,15 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole={onPress ? "button" : undefined}
-      accessibilityLabel={
-        isBalanceHidden ? walletName : `${walletName}, ${balancePrimary}`
+      accessibilityLabel={`${walletName}, ${
+        isBalanceHidden ? LL.Accessibility.balanceHidden() : balancePrimary
+      }`}
+      accessibilityHint={
+        onSwitch
+          ? LL.Accessibility.switchWalletHint()
+          : onReveal
+            ? LL.Accessibility.revealBalanceHint()
+            : undefined
       }
     >
       <View style={styles.balances}>

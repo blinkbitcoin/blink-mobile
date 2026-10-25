@@ -3110,6 +3110,14 @@
     "AmountInputButton": {
         "tapToSetAmount": "Defina a quantidade"
     },
+    "Accessibility": {
+        "deleteKey": "Apagar",
+        "swapCurrencyHint": "Troca a moeda em que escreve o montante",
+        "switchWalletHint": "Muda para a sua outra carteira",
+        "copy": "Copiar",
+        "balanceHidden": "Saldo oculto",
+        "revealBalanceHint": "Mostra o seu saldo neste ecrã"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Eu tenho que atualizar o meu app para a última versão. Eu estou usando a {os: string} app com a versão {version: string}.",
         "versionNotSupported": "Esta versão não é mais compatível",

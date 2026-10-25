@@ -3110,6 +3110,14 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "deleteKey": "حذف",
+    "swapCurrencyHint": "يبدّل العملة التي تكتب بها المبلغ",
+    "switchWalletHint": "ينتقل إلى محفظتك الأخرى",
+    "copy": "نسخ",
+    "balanceHidden": "الرصيد مخفي",
+    "revealBalanceHint": "يعرض رصيدك في هذه الشاشة"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "أحتاج إلى تحديث تطبيقي إلى أحدث إصدار. أنا أستخدم تطبيق {os: string} مع الإصدار {version: string}.",
     "versionNotSupported": "لم يعد إصدار جوالك هذا مدعومًا",
