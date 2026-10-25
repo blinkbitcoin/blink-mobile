@@ -48,11 +48,17 @@ export const NoteInput: React.FC<NoteInputProps> = ({
     }
   }
   return (
-    // The whole field focuses the input, since the input itself is only one line tall.
-    <Pressable style={[styles.fieldBackground, style]} onPress={focusTextInput}>
+    // The whole field focuses the input, since the input itself is only one line tall. Not
+    // an element of its own for a screen reader, which reaches the input directly.
+    <Pressable
+      style={[styles.fieldBackground, style]}
+      onPress={focusTextInput}
+      accessible={false}
+    >
       <View style={styles.noteContainer}>
         <TextInput
           {...testProps("add-note")}
+          accessibilityLabel={LL.NoteInput.addNote()}
           style={[styles.noteInput, { fontSize }]}
           placeholder={LL.NoteInput.addNote()}
           placeholderTextColor={colors.black}
@@ -64,7 +70,13 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           maxLength={500}
           ref={textInputRef}
         />
-        <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
+        {/* The same target as the field, so a screen reader skips it. */}
+        <TouchableOpacity
+          style={styles.noteIconContainer}
+          onPress={focusTextInput}
+          accessibilityElementsHidden
+          importantForAccessibility="no-hide-descendants"
+        >
           <GaloyIcon name={"pencil"} size={iconSize} color={colors.primary} />
         </TouchableOpacity>
       </View>

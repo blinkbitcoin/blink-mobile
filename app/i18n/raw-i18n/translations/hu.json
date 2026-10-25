@@ -3086,6 +3086,12 @@
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
   },
+  "Accessibility": {
+    "deleteKey": "Törlés",
+    "swapCurrencyHint": "Átváltja a pénznemet, amelyben az összeget megadja",
+    "switchWalletHint": "Átvált a másik pénztárcájára",
+    "copy": "Másol"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",
     "versionNotSupported": "Ez a mobil verzió már nem támogatott",
