@@ -1,4 +1,4 @@
-import { AppState, AppStateStatus } from "react-native"
+import { AccessibilityInfo, AppState, AppStateStatus } from "react-native"
 import { act, renderHook } from "@testing-library/react-native"
 
 import {
@@ -235,6 +235,38 @@ describe("useSentTransition", () => {
       emitNavigation("focus")
       advance(SENT_HOLD_MS)
       expect(onHoldEnd).toHaveBeenCalledTimes(1)
+    })
+
+    /** A timer would move the screen away while a screen-reader user finds Receipt and
+     *  Close, so Sent holds until they tap. */
+    it("holds for good while a screen reader is on", async () => {
+      jest.spyOn(AccessibilityInfo, "isScreenReaderEnabled").mockResolvedValue(true)
+      const { result, onHoldEnd } = renderWithHold()
+      await act(async () => {})
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS + SENT_HOLD_MS * 10)
+
+      expect(onHoldEnd).not.toHaveBeenCalled()
+    })
+
+    it("stops the hold when a screen reader is turned on during it", async () => {
+      let onScreenReaderChanged: (isOn: boolean) => void = () => {}
+      jest.spyOn(AccessibilityInfo, "addEventListener").mockImplementation(((
+        event: string,
+        listener: (isOn: boolean) => void,
+      ) => {
+        if (event === "screenReaderChanged") onScreenReaderChanged = listener
+        return { remove: jest.fn() }
+      }) as unknown as typeof AccessibilityInfo.addEventListener)
+      const { result, onHoldEnd } = renderWithHold()
+
+      await playSent(result)
+      advance(SENT_TIMELINE_MS + SENT_HOLD_MS / 2)
+      act(() => onScreenReaderChanged(true))
+      advance(SENT_HOLD_MS * 10)
+
+      expect(onHoldEnd).not.toHaveBeenCalled()
     })
   })
 })

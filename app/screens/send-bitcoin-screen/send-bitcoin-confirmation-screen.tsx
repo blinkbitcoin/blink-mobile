@@ -25,6 +25,7 @@ import {
 import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { isIdempotencyConflict } from "@app/graphql/is-idempotency-conflict"
 import { useAppConfig, useClipboard, useDisplayCurrency } from "@app/hooks"
+import { useAccessibilityAnnouncement } from "@app/hooks/use-accessibility-announcement"
 import { useInitialAccessibilityFocus } from "@app/hooks/use-initial-accessibility-focus"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -282,10 +283,19 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
     heroProgress,
     glowProgress,
     detailsStyle,
+    goneWhenSent,
     heroStyle,
     actionsStyle,
     playSent,
   } = sentTransition
+
+  /** Review turns into Sent in place, with no new screen to land focus on, so the result
+   *  is spoken; a replay of the same send stays quiet. */
+  useAccessibilityAnnouncement(
+    sentPlay
+      ? `${LL.SendBitcoinConfirmationScreen.sent()}, ${heroPrimaryText}`
+      : undefined,
+  )
 
   const handleClose = React.useCallback(() => navigation.popToTop(), [navigation])
 
@@ -623,6 +633,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
         <Animated.View
           style={[styles.headerRow, detailsStyle]}
           pointerEvents={isSent ? "none" : "auto"}
+          {...goneWhenSent}
         >
           <HeaderBackButtonWithTheme />
         </Animated.View>
@@ -650,6 +661,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           <Animated.View
             style={[styles.details, detailsStyle]}
             pointerEvents={isSent ? "none" : "auto"}
+            {...goneWhenSent}
           >
             <SendReviewDestination
               destination={destination}
@@ -720,6 +732,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
           <Animated.View
             style={[styles.sliderContainer, detailsStyle]}
             pointerEvents={isSent ? "none" : "auto"}
+            {...goneWhenSent}
           >
             <GaloySliderButton
               isLoading={sendPaymentLoading || isVerifying}
