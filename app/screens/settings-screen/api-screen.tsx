@@ -38,8 +38,12 @@ export const ApiScreen: React.FC = () => {
 
   const [keyToRevoke, setKeyToRevoke] = React.useState<ApiKeyItem | null>(null)
   const [revoking, setRevoking] = React.useState(false)
+  // state lags a double tap, so the guard is a ref
+  const revokingRef = React.useRef(false)
 
   const revokeApiKey = async (apiKey: ApiKeyItem) => {
+    if (revokingRef.current) return
+    revokingRef.current = true
     setRevoking(true)
     try {
       await apiKeyRevoke({ variables: { input: { id: apiKey.id } } })
@@ -47,8 +51,10 @@ export const ApiScreen: React.FC = () => {
     } catch {
       toastShow({ type: "error", message: LL.ApiScreen.revokeError(), LL })
     } finally {
+      revokingRef.current = false // eslint-disable-line require-atomic-updates
       setRevoking(false)
-      setKeyToRevoke(null)
+      // only close the modal if it still shows the key this revoke was for
+      setKeyToRevoke((current) => (current?.id === apiKey.id ? null : current))
     }
   }
 

@@ -16,7 +16,8 @@ type Props = {
   onRevoke: (apiKey: ApiKeyItem) => void
 }
 
-/** Going back is the primary action; revoking can't be undone, so it's the quieter one. */
+/** Going back is the primary action; revoking can't be undone, so it's the quieter one.
+ *  Once a revoke is sent nothing closes the modal, since going back can't stop it. */
 export const RevokeApiKeyModal: React.FC<Props> = ({
   apiKey,
   revoking,
@@ -37,7 +38,9 @@ export const RevokeApiKeyModal: React.FC<Props> = ({
     <CustomModal
       isVisible={Boolean(apiKey)}
       toggleModal={onClose}
+      dismissable={!revoking}
       showCloseIconButton={true}
+      closeIconButtonAccessibilityLabel={LL.common.close()}
       image={<GaloyIcon name="info" size={52} color={colors.primary} />}
       title={LL.ApiScreen.revokeTitle()}
       body={
@@ -47,6 +50,7 @@ export const RevokeApiKeyModal: React.FC<Props> = ({
       }
       primaryButtonTitle={LL.ApiScreen.revokeGoBack()}
       primaryButtonOnPress={onClose}
+      primaryButtonDisabled={revoking}
       secondaryButtonTitle={LL.ApiScreen.revoke()}
       secondaryButtonOnPress={() => apiKey && onRevoke(apiKey)}
       secondaryButtonLoading={revoking}

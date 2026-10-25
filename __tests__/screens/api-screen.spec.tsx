@@ -1,12 +1,13 @@
 import React from "react"
 import { StyleSheet } from "react-native"
 import Modal from "react-native-modal"
-import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { Scope } from "@app/graphql/generated"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ApiScreen } from "@app/screens/settings-screen/api-screen"
+import { RevokeApiKeyModal } from "@app/screens/settings-screen/api/revoke-api-key-modal"
 import { toastShow } from "@app/utils/toast"
 
 import { ContextForScreen } from "./helper"
@@ -68,6 +69,21 @@ const renderScreen = () =>
       <ApiScreen />
     </ContextForScreen>,
   )
+
+/** Holds apiKeyRevoke open until the returned finish() is called. */
+const deferRevoke = () => {
+  let finish = () => {}
+  apiKeyRevokeMock.mockImplementationOnce(
+    () =>
+      new Promise((resolve) => {
+        finish = () =>
+          resolve({
+            data: { apiKeyRevoke: { apiKey: makeApiKey({ revoked: true }) } },
+          })
+      }),
+  )
+  return () => finish()
+}
 
 const openRevokeModal = async (name = "BTCPay") => {
   await screen.findByText(name)
@@ -234,6 +250,84 @@ describe("ApiScreen", () => {
         }),
       ),
     )
+  })
+
+  it("keeps the modal open and its actions disabled while a revoke is in flight", async () => {
+    const finishRevoke = deferRevoke()
+
+    renderScreen()
+    await openRevokeModal()
+    fireEvent.press(screen.getByText(LL.ApiScreen.revoke()))
+    await waitFor(() => expect(apiKeyRevokeMock).toHaveBeenCalledTimes(1))
+
+    const goBack = screen.getByTestId(LL.ApiScreen.revokeGoBack())
+    const closeIcon = screen.getByLabelText(LL.common.close())
+    expect(goBack.props.accessibilityState).toEqual(
+      expect.objectContaining({ disabled: true }),
+    )
+    expect(closeIcon.props.accessibilityState).toEqual({ disabled: true })
+
+    fireEvent.press(goBack)
+    fireEvent.press(closeIcon)
+    act(() => {
+      screen.UNSAFE_getByType(Modal).props.onBackdropPress()
+      screen.UNSAFE_getByType(Modal).props.onBackButtonPress()
+    })
+    expect(screen.UNSAFE_getByType(Modal).props.isVisible).toBe(true)
+
+    finishRevoke()
+
+    await waitFor(() =>
+      expect(screen.UNSAFE_getByType(Modal).props.isVisible).toBe(false),
+    )
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success", message: LL.ApiScreen.revokeSuccess() }),
+    )
+  })
+
+  it("sends one revoke when it is confirmed twice before the first lands", async () => {
+    const finishRevoke = deferRevoke()
+
+    renderScreen()
+    await openRevokeModal()
+    const { onRevoke, apiKey } = screen.UNSAFE_getByType(RevokeApiKeyModal).props
+    await act(async () => {
+      onRevoke(apiKey)
+      onRevoke(apiKey)
+    })
+
+    expect(apiKeyRevokeMock).toHaveBeenCalledTimes(1)
+
+    finishRevoke()
+    await waitFor(() =>
+      expect(screen.UNSAFE_getByType(Modal).props.isVisible).toBe(false),
+    )
+    expect(toastShow).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves another key's modal open when an earlier revoke lands", async () => {
+    apiKeysQueryMock.mockReturnValue(
+      makeQueryResult([
+        makeApiKey({ id: "key-a", name: "Shop A" }),
+        makeApiKey({ id: "key-b", name: "Shop B" }),
+      ]),
+    )
+    const finishRevoke = deferRevoke()
+
+    renderScreen()
+    await openRevokeModal("Shop A")
+    fireEvent.press(screen.getByText(LL.ApiScreen.revoke()))
+    await waitFor(() => expect(apiKeyRevokeMock).toHaveBeenCalledTimes(1))
+
+    act(() => screen.UNSAFE_getByType(RevokeApiKeyModal).props.onClose())
+    fireEvent.press(screen.getByTestId("Shop B-right"))
+    expect(screen.UNSAFE_getByType(RevokeApiKeyModal).props.apiKey.id).toBe("key-b")
+
+    finishRevoke()
+
+    await waitFor(() => expect(toastShow).toHaveBeenCalledTimes(1))
+    expect(screen.UNSAFE_getByType(RevokeApiKeyModal).props.apiKey.id).toBe("key-b")
+    expect(screen.UNSAFE_getByType(Modal).props.isVisible).toBe(true)
   })
 
   it("shows an error toast when revoking fails", async () => {
