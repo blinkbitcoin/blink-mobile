@@ -47,6 +47,13 @@ export type TwoFactorPromptOrigin = {
   reason?: TwoFactorReminderReason
 }
 
+/** A login method of the account: an email or a phone number. */
+export const LoginMethod = {
+  Email: "email",
+  Phone: "phone",
+} as const
+export type LoginMethod = (typeof LoginMethod)[keyof typeof LoginMethod]
+
 /** The route params of a screen in the two-factor flow. */
 export type TwoFactorFlowParams = {
   /** The prompt that opened the flow, such as the home card or the session modal. */
@@ -58,9 +65,39 @@ export type TwoFactorFlowParams = {
   hasRegistrationFailedToStart?: boolean
 }
 
+/** The ways to add a login method, which the server guards with the authenticator's
+ *  code, with what each needs to run. Removing one needs no code; confirming an email
+ *  again removes it right before it is registered again, as the server refuses a
+ *  second address. */
+export const LoginMethodAddition = {
+  Email: "email",
+  EmailReverify: "email_reverify",
+  Phone: "phone",
+} as const
+export type LoginMethodAddition =
+  (typeof LoginMethodAddition)[keyof typeof LoginMethodAddition]
+
+export type LoginMethodAdditionParams =
+  | { addition: typeof LoginMethodAddition.Email; email: string }
+  | { addition: typeof LoginMethodAddition.EmailReverify; email: string }
+  | { addition: typeof LoginMethodAddition.Phone; phone: string; smsCode: string }
+
+/** The login method each addition is for. */
+export const loginMethodOf = (addition: LoginMethodAddition): LoginMethod => {
+  const isPhoneAddition = addition === LoginMethodAddition.Phone
+  return isPhoneAddition ? LoginMethod.Phone : LoginMethod.Email
+}
+
+/** Why the server refused an addition or a removal, as its payload says it. */
+export type LoginMethodRefusal = {
+  code?: string | null
+  message?: string
+}
+
 /** What the server answers a change that needs the authenticator's code with, when it
  *  refuses it. */
 export const TotpStepUpErrorCode = {
+  CodeRequired: "TOTP_CODE_REQUIRED",
   CodeInvalid: "TOTP_CODE_INVALID",
   RemovalBalanceTooHigh: "TOTP_REMOVAL_BALANCE_TOO_HIGH",
   TooManyAttempts: "TOO_MANY_REQUEST",
