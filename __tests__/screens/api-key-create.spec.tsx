@@ -109,8 +109,11 @@ describe("ApiKeyCreateScreen", () => {
     await flushEffects()
 
     typeName("CI bot")
-    fireEvent(screen.getByTestId("scope-read-switch"), "pressIn")
-    fireEvent(screen.getByTestId("scope-receive-switch"), "pressIn")
+    fireEvent(screen.getByRole("switch", { name: LL.ApiScreen.scopeRead() }), "pressIn")
+    fireEvent(
+      screen.getByRole("switch", { name: LL.ApiScreen.scopeReceive() }),
+      "pressIn",
+    )
 
     pressCreate()
     expect(apiKeyCreateMock).not.toHaveBeenCalled()
@@ -120,8 +123,11 @@ describe("ApiKeyCreateScreen", () => {
     renderScreen()
 
     typeName("CI bot")
-    fireEvent(screen.getByTestId("scope-receive-switch"), "pressIn")
-    fireEvent.press(screen.getByTestId(LL.ApiScreen.expiryNever()))
+    fireEvent(
+      screen.getByRole("switch", { name: LL.ApiScreen.scopeReceive() }),
+      "pressIn",
+    )
+    fireEvent.press(screen.getByText(LL.ApiScreen.expiryNever()))
 
     pressCreate()
 
@@ -132,6 +138,30 @@ describe("ApiKeyCreateScreen", () => {
         },
       }),
     )
+  })
+
+  it("offers 30 days, 90 days and never, with 90 days selected", async () => {
+    renderScreen()
+    await flushEffects()
+
+    const labels = [
+      LL.ApiScreen.expiry30Days(),
+      LL.ApiScreen.expiry90Days(),
+      LL.ApiScreen.expiryNever(),
+    ]
+    labels.forEach((label) => expect(screen.getByText(label)).toBeTruthy())
+    expect(screen.getByTestId("api-key-expiry-90%").props.accessibilityState).toEqual(
+      expect.objectContaining({ selected: true }),
+    )
+  })
+
+  it("caps the key name at 64 characters", async () => {
+    renderScreen()
+    await flushEffects()
+
+    expect(
+      screen.getByPlaceholderText(LL.ApiScreen.keyNamePlaceholder()).props.maxLength,
+    ).toBe(64)
   })
 
   it("defaults to both scopes and 90 days expiry", async () => {

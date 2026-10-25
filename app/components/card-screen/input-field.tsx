@@ -48,6 +48,7 @@ type InputFieldProps = {
   loading?: boolean
   disabled?: boolean
   keyboardType?: KeyboardTypeOptions
+  maxLength?: number
   formatDisplay?: (value: string) => string
   testID?: string
 } & IconProps
@@ -77,6 +78,7 @@ export const InputField: React.FC<InputFieldProps> = ({
   loading = false,
   disabled = false,
   keyboardType,
+  maxLength,
   formatDisplay,
   testID,
 }) => {
@@ -153,6 +155,7 @@ export const InputField: React.FC<InputFieldProps> = ({
             selectionColor={colors.primary}
             accessibilityLabel={label}
             keyboardType={keyboardType}
+            maxLength={maxLength}
             editable={!disabled}
             onFocus={() => setIsFocused(true)}
             onBlur={() => {

@@ -1,21 +1,25 @@
 import * as React from "react"
-import { Pressable, View } from "react-native"
+import { View } from "react-native"
 
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
-import { GaloyInput } from "@app/components/atomic/galoy-input"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { Switch } from "@app/components/atomic/switch"
+import { InputField, SwitchRow } from "@app/components/card-screen"
+import { PercentageSelector } from "@app/components/percentage-selector"
 import { Screen } from "@app/components/screen"
 import { ApiKeysDocument, Scope, useApiKeyCreateMutation } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
+import { SettingsGroup } from "../group"
 import { ApiKeySecretReveal } from "./api-key-secret-reveal"
 
 const MAX_KEY_NAME_LENGTH = 64
 
-type ExpiryPreset = 30 | 90 | null
+/** The expiry chips take numbers, so "never" rides as 0 and goes out as null. */
+const NEVER_EXPIRES = 0
+const EXPIRY_OPTIONS = [30, 90, NEVER_EXPIRES] as const
+const DEFAULT_EXPIRY = 90
 
 export const ApiKeyCreateScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -27,7 +31,7 @@ export const ApiKeyCreateScreen: React.FC = () => {
   const [name, setName] = React.useState("")
   const [readEnabled, setReadEnabled] = React.useState(true)
   const [receiveEnabled, setReceiveEnabled] = React.useState(true)
-  const [expireInDays, setExpireInDays] = React.useState<ExpiryPreset>(90)
+  const [expireInDays, setExpireInDays] = React.useState<number>(DEFAULT_EXPIRY)
   const [secret, setSecret] = React.useState<string | null>(null)
   const [hasError, setHasError] = React.useState(false)
 
@@ -35,11 +39,10 @@ export const ApiKeyCreateScreen: React.FC = () => {
     refetchQueries: [{ query: ApiKeysDocument }],
   })
 
-  const expiryOptions: { label: string; value: ExpiryPreset }[] = [
-    { label: LL.ApiScreen.expiry30Days(), value: 30 },
-    { label: LL.ApiScreen.expiry90Days(), value: 90 },
-    { label: LL.ApiScreen.expiryNever(), value: null },
-  ]
+  const expiryLabel = (days: number) => {
+    if (days === NEVER_EXPIRES) return LL.ApiScreen.expiryNever()
+    return days === 30 ? LL.ApiScreen.expiry30Days() : LL.ApiScreen.expiry90Days()
+  }
 
   const hasName = name.trim().length > 0
   const hasScope = readEnabled || receiveEnabled
@@ -53,7 +56,13 @@ export const ApiKeyCreateScreen: React.FC = () => {
     ]
     try {
       const { data } = await apiKeyCreate({
-        variables: { input: { name: name.trim(), scopes, expireInDays } },
+        variables: {
+          input: {
+            name: name.trim(),
+            scopes,
+            expireInDays: expireInDays === NEVER_EXPIRES ? null : expireInDays,
+          },
+        },
       })
       const apiKeySecret = data?.apiKeyCreate.apiKeySecret
       if (apiKeySecret) {
@@ -72,77 +81,59 @@ export const ApiKeyCreateScreen: React.FC = () => {
 
   return (
     <Screen style={styles.container} preset="scroll" keyboardShouldPersistTaps="handled">
-      <GaloyInput
-        {...testProps(LL.ApiScreen.keyName())}
-        label={LL.ApiScreen.keyName()}
-        placeholder={LL.ApiScreen.keyNamePlaceholder()}
-        autoFocus
-        maxLength={MAX_KEY_NAME_LENGTH}
-        value={name}
-        onChangeText={setName}
-      />
+      <View style={styles.body}>
+        <InputField
+          testID="api-key-name"
+          label={LL.ApiScreen.keyName()}
+          placeholder={LL.ApiScreen.keyNamePlaceholder()}
+          rightIcon="pencil"
+          valueStyle="regular"
+          maxLength={MAX_KEY_NAME_LENGTH}
+          value={name}
+          onChangeText={setName}
+        />
 
-      <View style={styles.scopeCard}>
-        <View style={styles.scopeRow}>
-          <View style={styles.scopeText}>
-            <Text type="p2">{LL.ApiScreen.scopeRead()}</Text>
-            <Text type="p4" color={colors.grey2}>
-              {LL.ApiScreen.scopeReadDescription()}
-            </Text>
-          </View>
-          <Switch
-            testID="scope-read-switch"
-            value={readEnabled}
-            onValueChange={setReadEnabled}
+        <SettingsGroup
+          containerStyle={styles.scopeCard}
+          items={[
+            () => (
+              <SwitchRow
+                title={LL.ApiScreen.scopeRead()}
+                description={LL.ApiScreen.scopeReadDescription()}
+                value={readEnabled}
+                onValueChange={setReadEnabled}
+              />
+            ),
+            () => (
+              <SwitchRow
+                title={LL.ApiScreen.scopeReceive()}
+                description={LL.ApiScreen.scopeReceiveDescription()}
+                value={receiveEnabled}
+                onValueChange={setReceiveEnabled}
+              />
+            ),
+          ]}
+        />
+        <Text type="p3" color={colors.grey2}>
+          {LL.ApiScreen.writeScopeDashboardOnly()}
+        </Text>
+
+        <View style={styles.expiry}>
+          <Text type="p3">{LL.ApiScreen.expiry()}</Text>
+          <PercentageSelector
+            testIdPrefix="api-key-expiry"
+            options={EXPIRY_OPTIONS}
+            selectedPercent={expireInDays}
+            onSelect={setExpireInDays}
+            formatLabel={expiryLabel}
+            isLocked={loading}
+            loadingPercent={null}
+            containerStyle={styles.expiryOptions}
           />
         </View>
-        <View style={styles.scopeRow}>
-          <View style={styles.scopeText}>
-            <Text type="p2">{LL.ApiScreen.scopeReceive()}</Text>
-            <Text type="p4" color={colors.grey2}>
-              {LL.ApiScreen.scopeReceiveDescription()}
-            </Text>
-          </View>
-          <Switch
-            testID="scope-receive-switch"
-            value={receiveEnabled}
-            onValueChange={setReceiveEnabled}
-          />
-        </View>
-      </View>
-      <Text type="p4" color={colors.grey2} style={styles.footnote}>
-        {LL.ApiScreen.writeScopeDashboardOnly()}
-      </Text>
 
-      <Text type="p2" style={styles.expiryLabel}>
-        {LL.ApiScreen.expiry()}
-      </Text>
-      <View style={styles.expiryRow}>
-        {expiryOptions.map((option) => (
-          <Pressable
-            key={option.label}
-            {...testProps(option.label)}
-            style={[
-              styles.expiryPill,
-              option.value === expireInDays && styles.expiryPillSelected,
-            ]}
-            onPress={() => setExpireInDays(option.value)}
-          >
-            <Text
-              type="p2"
-              color={option.value === expireInDays ? colors.primary : colors.grey1}
-            >
-              {option.label}
-            </Text>
-          </Pressable>
-        ))}
+        {hasError && <GaloyErrorBox errorMessage={LL.ApiScreen.createError()} />}
       </View>
-
-      {hasError && (
-        <View style={styles.errorContainer}>
-          <GaloyErrorBox errorMessage={LL.ApiScreen.createError()} />
-        </View>
-      )}
 
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -157,55 +148,26 @@ export const ApiKeyCreateScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   container: {
-    paddingHorizontal: 12,
-    paddingVertical: 20,
+    paddingHorizontal: 20,
+    paddingTop: 10,
+    paddingBottom: 20,
     flexGrow: 1,
   },
+  body: {
+    rowGap: 20,
+  },
   scopeCard: {
-    backgroundColor: colors.grey5,
-    borderRadius: 12,
-    paddingHorizontal: 14,
-    rowGap: 4,
-  },
-  scopeRow: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    columnGap: 16,
-    paddingVertical: 12,
-  },
-  scopeText: {
-    flex: 1,
-    rowGap: 2,
-  },
-  footnote: {
-    marginTop: 8,
-    marginHorizontal: 4,
-  },
-  expiryLabel: {
-    marginTop: 20,
-    marginBottom: 8,
-    marginHorizontal: 4,
-  },
-  expiryRow: {
-    flexDirection: "row",
-    columnGap: 10,
-  },
-  expiryPill: {
-    flex: 1,
-    alignItems: "center",
-    paddingVertical: 12,
+    marginTop: 0,
     borderRadius: 8,
-    backgroundColor: colors.grey5,
   },
-  expiryPillSelected: {
-    borderWidth: 1,
-    borderColor: colors.primary,
+  expiry: {
+    rowGap: 5,
   },
-  errorContainer: {
-    marginTop: 16,
+  expiryOptions: {
+    justifyContent: "flex-start",
+    columnGap: 10,
   },
   buttonsContainer: {
     flex: 1,

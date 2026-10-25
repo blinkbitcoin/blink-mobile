@@ -65,6 +65,22 @@ describe("PercentageSelector", () => {
     expect(queryByText("25%")).toBeNull()
   })
 
+  it("labels options with formatLabel instead of a percentage", () => {
+    const { getByText, queryByText } = render(
+      <PercentageSelector
+        isLocked={false}
+        loadingPercent={null}
+        onSelect={mockOnSelect}
+        options={[30, 90]}
+        formatLabel={(days) => `${days} days`}
+      />,
+    )
+
+    expect(getByText("30 days")).toBeTruthy()
+    expect(getByText("90 days")).toBeTruthy()
+    expect(queryByText("30%")).toBeNull()
+  })
+
   it("calls onSelect when a percentage button is pressed", () => {
     const { getByText } = render(
       <PercentageSelector

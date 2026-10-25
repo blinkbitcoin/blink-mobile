@@ -7,7 +7,7 @@ import { ApiKeySecretReveal } from "@app/screens/settings-screen/api/api-key-sec
 
 import { ContextForScreen } from "./helper"
 
-const API_KEY_SECRET = "blink_S3CR3TS3CR3TS3CR3T"
+const API_KEY_SECRET = "blink_S3CR3TS3CR3TS3CR3TS3CR3TS3CR3TS3CR3T"
 
 type BeforeRemoveEvent = { preventDefault: jest.Mock }
 type BeforeRemoveListener = (event: BeforeRemoveEvent) => void
@@ -108,5 +108,24 @@ describe("ApiKeySecretReveal", () => {
     expect(mockGoBack).toHaveBeenCalled()
     const event = emitBeforeRemove()
     expect(event.preventDefault).not.toHaveBeenCalled()
+  })
+
+  it("shows both ends of the key, and copies all of it", () => {
+    const Clipboard = jest.requireMock("@react-native-clipboard/clipboard")
+    renderReveal()
+
+    expect(screen.getByText("blink_S3CR3TS3C...R3TS3CR3T")).toBeTruthy()
+    expect(screen.queryByText(API_KEY_SECRET)).toBeNull()
+
+    fireEvent.press(screen.getByTestId("api-key-secret"))
+
+    expect(Clipboard.setString).toHaveBeenCalledWith(API_KEY_SECRET)
+  })
+
+  it("names the key above its one-time warning", () => {
+    renderReveal()
+
+    expect(screen.getByText("CI bot")).toBeTruthy()
+    expect(screen.getByText(LL.ApiScreen.secretWarning())).toBeTruthy()
   })
 })

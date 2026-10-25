@@ -117,6 +117,14 @@ describe("InputField", () => {
       expect(onChangeText).toHaveBeenCalledWith("Nakamoto")
     })
 
+    it("caps the input at maxLength", () => {
+      const { getByLabelText } = render(
+        <InputField label="Key name" value="" onChangeText={jest.fn()} maxLength={64} />,
+      )
+
+      expect(getByLabelText("Key name").props.maxLength).toBe(64)
+    })
+
     it("displays the label in editable mode", () => {
       const { getByText } = render(
         <InputField label="Address" value="123 Main St" editable />,

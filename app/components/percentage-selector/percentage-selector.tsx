@@ -24,6 +24,8 @@ export type PercentageSelectorProps = {
   disabledOptions?: Readonly<number[]>
   testIdPrefix?: string
   containerStyle?: StyleProp<ViewStyle>
+  /** For chips that aren't percentages, such as day counts. */
+  formatLabel?: (option: number) => string
 }
 
 export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
@@ -35,6 +37,7 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
   disabledOptions,
   testIdPrefix = DEFAULT_TEST_ID_PREFIX,
   containerStyle,
+  formatLabel = (option) => `${option}%`,
 }) => {
   const {
     theme: { colors },
@@ -69,7 +72,7 @@ export const PercentageSelector: React.FC<PercentageSelectorProps> = ({
               <ActivityIndicator color={colors.primary} />
             ) : (
               <Text style={[styles.chipText, isSelected && styles.chipTextSelected]}>
-                {p}%
+                {formatLabel(p)}
               </Text>
             )}
           </TouchableOpacity>

@@ -1,23 +1,30 @@
 import * as React from "react"
-import { Alert, Share, TouchableOpacity, View } from "react-native"
+import { Alert, Share, View } from "react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { ActionField } from "@app/components/action-field"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { GaloyTertiaryButton } from "@app/components/atomic/galoy-tertiary-button"
 import { headerBackControl } from "@app/components/header-back-control/header-back-control"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
 import { QrCodeComponent } from "@app/components/totp-export"
 import { useClipboard } from "@app/hooks"
 import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { ellipsizeMiddle } from "@app/utils/helper"
 import { testProps } from "@app/utils/testProps"
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 const CLIPBOARD_CLEAR_MS = 60_000
+const SHARE_ICON_SIZE = 16
+const SHARE_HIT_SLOP = { top: 8, bottom: 8, left: 20, right: 20 }
+/** Both ends of the key stay readable, as on the design: blink_dHWO28fQO...3JU4Nc49C */
+const SECRET_PREVIEW = { maxLength: 30, maxResultLeft: 15, maxResultRight: 9 }
 
 type Props = {
   secret: string
@@ -78,43 +85,38 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
 
   return (
     <Screen style={styles.container} preset="scroll">
-      <View style={styles.header}>
-        <GaloyIcon name="check-circle" size={40} color={colors.primary} />
-        <Text type="p1" style={styles.name}>
-          {name}
-        </Text>
-        <Text type="p3" color={colors.grey2} style={styles.warning}>
-          {LL.ApiScreen.secretWarning()}
-        </Text>
-      </View>
+      <View style={styles.body}>
+        <IconHero
+          icon="check-badge"
+          iconColor={colors._green}
+          title={name}
+          subtitle={LL.ApiScreen.secretWarning()}
+        />
 
-      <View style={styles.qrContainer}>
         <QrCodeComponent value={secret} />
+
+        <View style={styles.secret}>
+          <ActionField
+            testID="api-key-secret"
+            value={ellipsizeMiddle(secret, SECRET_PREVIEW)}
+            icon="copy-paste"
+            onAction={copySecret}
+          />
+        </View>
+
+        <GaloyTertiaryButton
+          {...testProps(LL.common.share())}
+          clear
+          title={LL.common.share()}
+          icon={
+            <View style={styles.shareIcon}>
+              <GaloyIcon name="share" size={SHARE_ICON_SIZE} color={colors.primary} />
+            </View>
+          }
+          hitSlop={SHARE_HIT_SLOP}
+          onPress={shareSecret}
+        />
       </View>
-
-      <TouchableOpacity
-        {...testProps("api-key-secret")}
-        style={styles.secretContainer}
-        onPress={copySecret}
-        activeOpacity={0.7}
-      >
-        <Text
-          type="p2"
-          style={styles.secretText}
-          numberOfLines={1}
-          ellipsizeMode="middle"
-        >
-          {secret}
-        </Text>
-        <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
-      </TouchableOpacity>
-
-      <GaloySecondaryButton
-        {...testProps(LL.common.share())}
-        title={LL.common.share()}
-        iconName="share"
-        onPress={shareSecret}
-      />
 
       <View style={styles.buttonsContainer}>
         <GaloyPrimaryButton
@@ -127,42 +129,21 @@ export const ApiKeySecretReveal: React.FC<Props> = ({ secret, name }) => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   container: {
     paddingHorizontal: 20,
-    paddingVertical: 20,
+    paddingBottom: 20,
     flexGrow: 1,
   },
-  header: {
+  body: {
     alignItems: "center",
-    rowGap: 8,
+    rowGap: 14,
   },
-  name: {
-    fontWeight: "bold",
+  secret: {
+    alignSelf: "stretch",
   },
-  warning: {
-    textAlign: "center",
-  },
-  qrContainer: {
-    alignItems: "center",
-    marginVertical: 20,
-  },
-  secretContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
-    borderRadius: 8,
-    gap: 12,
-    backgroundColor: colors.grey5,
-    marginBottom: 16,
-  },
-  secretText: {
-    flex: 1,
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
-    color: colors.grey0,
+  shareIcon: {
+    marginLeft: 8,
   },
   buttonsContainer: {
     flex: 1,
