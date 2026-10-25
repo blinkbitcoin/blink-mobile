@@ -36,6 +36,12 @@ const INTENTS = {
     type: pick("selection", "impactLight"),
     ignoreAndroidSystemSettings: false,
   },
+  /** Slide-to-send's handle taken: the drag can start. Tells someone who can't see the
+   *  handle (a screen reader's double-tap-and-hold, or low vision) that they have it. */
+  grab: {
+    type: pick("selection", "impactLight"),
+    ignoreAndroidSystemSettings: false,
+  },
   /** A press the app refused. */
   reject: {
     type: "rigid",
@@ -64,6 +70,7 @@ const fire = ({ type, ignoreAndroidSystemSettings }: HapticIntent) =>
 export const haptics = {
   tap: () => fire(INTENTS.tap),
   select: () => fire(INTENTS.select),
+  grab: () => fire(INTENTS.grab),
   reject: () => fire(INTENTS.reject),
   commit: () => fire(INTENTS.commit),
   success: () => fire(INTENTS.success),
