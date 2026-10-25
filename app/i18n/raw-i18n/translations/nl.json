@@ -4116,6 +4116,14 @@
     "manualResetTitle": "Handmatige reset van 2FA",
     "manualResetBody": "Voor je bescherming kan 2FA niet in de app worden verwijderd. Heb je een reset van 2FA nodig, neem dan contact op met onze <support>Support</support>."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "E-mail toevoegen",
+    "addPhoneTitle": "Telefoonnummer toevoegen",
+    "addEmailCode": "Voer de 6-cijferige code uit je authenticator-app in om je e-mail toe te voegen.",
+    "addPhoneCode": "Voer de 6-cijferige code uit je authenticator-app in om je telefoonnummer toe te voegen.",
+    "codeInvalid": "Die code is onjuist. Voer de huidige code uit je authenticator-app in.",
+    "tooManyAttempts": "Te veel pogingen. Probeer het over een uur opnieuw."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

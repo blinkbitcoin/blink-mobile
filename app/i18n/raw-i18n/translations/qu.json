@@ -4116,6 +4116,14 @@
     "manualResetTitle": "2FA makiwan kutichiy",
     "manualResetBody": "Waqaychasqa kanaykipaq, manam 2FA appllapi qichuyta saqinchikchu. 2FA kutichiyta munaspaqa, <support>Yanapaqninchikwan</support> rimay."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Correota yapay",
+    "addPhoneTitle": "Telefono yupayta yapay",
+    "addEmailCode": "Correoykita yapanaykipaq, autenticador appaykimanta 6 yupayniyuq códigota qillqay.",
+    "addPhoneCode": "Telefono yupayniykita yapanaykipaq, autenticador appaykimanta 6 yupayniyuq códigota qillqay.",
+    "codeInvalid": "Chay códigoqa manam allinchu. Autenticador appaykimanta kunan códigota qillqay.",
+    "tooManyAttempts": "Achka kutitam kallpachakunki. Huk horamanta wakmanta kallpachakuy."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

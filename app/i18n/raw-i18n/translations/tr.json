@@ -4116,6 +4116,14 @@
     "manualResetTitle": "2FA manuel sıfırlama",
     "manualResetBody": "Güvenliğiniz için 2FA'nın uygulama içinden kaldırılmasına izin vermiyoruz. 2FA sıfırlamaya ihtiyacınız varsa <support>Destek</support> ekibimizle iletişime geçin."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "E-posta ekle",
+    "addPhoneTitle": "Telefon numarası ekle",
+    "addEmailCode": "E-postanı eklemek için doğrulayıcı uygulamandaki 6 haneli kodu gir.",
+    "addPhoneCode": "Telefon numaranı eklemek için doğrulayıcı uygulamandaki 6 haneli kodu gir.",
+    "codeInvalid": "Bu kod yanlış. Doğrulayıcı uygulamanızdaki güncel kodu girin.",
+    "tooManyAttempts": "Çok fazla deneme. Bir saat sonra tekrar deneyin."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

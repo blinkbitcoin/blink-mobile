@@ -4116,6 +4116,14 @@
     "manualResetTitle": "Đặt lại 2FA thủ công",
     "manualResetBody": "Để bảo vệ bạn, chúng tôi không cho phép gỡ 2FA trong ứng dụng. Nếu bạn cần đặt lại 2FA, hãy liên hệ <support>Bộ phận hỗ trợ</support> của chúng tôi."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Thêm email",
+    "addPhoneTitle": "Thêm số điện thoại",
+    "addEmailCode": "Để thêm email, hãy nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+    "addPhoneCode": "Để thêm số điện thoại, hãy nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+    "codeInvalid": "Mã đó không đúng. Nhập mã hiện tại từ ứng dụng xác thực của bạn.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy thử lại sau một giờ."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

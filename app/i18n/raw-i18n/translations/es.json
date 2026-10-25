@@ -4116,6 +4116,14 @@
         "manualResetTitle": "Restablecimiento manual de la 2FA",
         "manualResetBody": "Por tu protección, no permitimos eliminar la 2FA desde la app. Si necesitas restablecer la 2FA, contacta a nuestro <support>Soporte</support>."
     },
+    "LoginMethodCode": {
+        "addEmailTitle": "Agregar correo",
+        "addPhoneTitle": "Agregar número de teléfono",
+        "addEmailCode": "Para agregar tu correo, ingresa el código de 6 dígitos de tu app de autenticación.",
+        "addPhoneCode": "Para agregar tu número de teléfono, ingresa el código de 6 dígitos de tu app de autenticación.",
+        "codeInvalid": "Ese código es incorrecto. Ingresa el código actual de tu app de autenticación.",
+        "tooManyAttempts": "Demasiados intentos. Vuelve a intentarlo en una hora."
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

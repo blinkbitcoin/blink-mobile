@@ -4116,6 +4116,14 @@
     "manualResetTitle": "Okuddamu okuteekawo 2FA mu ngalo",
     "manualResetBody": "Olw'obukuumi bwo, tetukkiriza 2FA kuggibwako mu app. Bw'oba weetaaga okuddamu okuteekawo 2FA, tuukirira <support>Obuyambi</support> bwaffe."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Gattako email",
+    "addPhoneTitle": "Gattako ennamba y'essimu",
+    "addEmailCode": "Okugattako email yo, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "addPhoneCode": "Okugattako ennamba yo ey'essimu, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "codeInvalid": "Koodi eyo si ntuufu. Yingiza koodi ey'kaakati okuva mu app yo ey'okukakasa.",
+    "tooManyAttempts": "Ogezezzaako emirundi mingi nnyo. Ddamu okugezaako oluvannyuma lw'essaawa emu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

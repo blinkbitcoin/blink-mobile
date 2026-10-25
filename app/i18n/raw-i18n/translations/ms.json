@@ -4116,6 +4116,14 @@
     "manualResetTitle": "Tetapan semula 2FA secara manual",
     "manualResetBody": "Demi perlindungan anda, kami tidak membenarkan 2FA dibuang dalam aplikasi. Jika anda perlu menetapkan semula 2FA, hubungi <support>Sokongan</support> kami."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Tambah e-mel",
+    "addPhoneTitle": "Tambah nombor telefon",
+    "addEmailCode": "Untuk menambah e-mel anda, masukkan kod 6 digit daripada aplikasi pengesah anda.",
+    "addPhoneCode": "Untuk menambah nombor telefon anda, masukkan kod 6 digit daripada aplikasi pengesah anda.",
+    "codeInvalid": "Kod itu salah. Masukkan kod semasa daripada aplikasi pengesah anda.",
+    "tooManyAttempts": "Terlalu banyak percubaan. Cuba lagi dalam satu jam."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

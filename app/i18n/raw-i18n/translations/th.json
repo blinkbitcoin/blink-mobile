@@ -4116,6 +4116,14 @@
     "manualResetTitle": "รีเซ็ต 2FA ด้วยตนเอง",
     "manualResetBody": "เพื่อปกป้องคุณ เราไม่อนุญาตให้ลบ 2FA ภายในแอป หากต้องการรีเซ็ต 2FA โปรดติดต่อ<support>ฝ่ายสนับสนุน</support>ของเรา"
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "เพิ่มอีเมล",
+    "addPhoneTitle": "เพิ่มหมายเลขโทรศัพท์",
+    "addEmailCode": "หากต้องการเพิ่มอีเมล ให้ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนของคุณ",
+    "addPhoneCode": "หากต้องการเพิ่มหมายเลขโทรศัพท์ ให้ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนของคุณ",
+    "codeInvalid": "รหัสไม่ถูกต้อง ป้อนรหัสปัจจุบันจากแอปยืนยันตัวตนของคุณ",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป โปรดลองอีกครั้งในอีกหนึ่งชั่วโมง"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

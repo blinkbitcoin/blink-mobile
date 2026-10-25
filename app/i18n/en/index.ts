@@ -4338,6 +4338,16 @@ const en: BaseTranslation = {
     manualResetBody:
       "For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.",
   },
+  LoginMethodCode: {
+    addEmailTitle: "Add email",
+    addPhoneTitle: "Add phone number",
+    addEmailCode: "To add your email, enter the 6-digit code from your authenticator app.",
+    addPhoneCode:
+      "To add your phone number, enter the 6-digit code from your authenticator app.",
+    codeInvalid:
+      "That code is incorrect. Enter the current code from your authenticator app.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
+  },
   BackupRequired: {
     modalTitle: "Back up your wallet first",
     modalDescription:
