@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API llavekuna",
+    "inactiveKeys": "Mana llamk'aq llavekuna ({count})",
     "noKeys": "Manaraq API llavekuna kanchu",
     "createKey": "API llaveta ruray",
     "createTitle": "Musuq API llave",
@@ -27,6 +28,7 @@
     "revokeTitle": "API llaveta chinkachiyta munankichu?",
     "revokeBody": "\"{name: string}\" utqaylla mana llamk'anqañachu. Kayqa mana kutichiy atinchu.",
     "revoke": "Chinkachiy",
+    "revokeGoBack": "Kutiy",
     "revokeSuccess": "API llave chinkachisqa",
     "createError": "API llave mana rurayta atikurqanchu. Yapamanta ruray.",
     "revokeError": "API llave mana chinkachiyta atikurqanchu. Yapamanta ruray.",

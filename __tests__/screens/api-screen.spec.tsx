@@ -1,5 +1,6 @@
 import React from "react"
-import { Alert, AlertButton } from "react-native"
+import { StyleSheet } from "react-native"
+import Modal from "react-native-modal"
 import { fireEvent, render, screen, waitFor } from "@testing-library/react-native"
 
 import { Scope } from "@app/graphql/generated"
@@ -59,6 +60,21 @@ jest.mock("@app/utils/toast", () => ({
 loadLocale("en")
 const LL = i18nObject("en")
 
+const INACTIVE_TOGGLE = "inactive-keys-toggle"
+
+const renderScreen = () =>
+  render(
+    <ContextForScreen>
+      <ApiScreen />
+    </ContextForScreen>,
+  )
+
+const openRevokeModal = async (name = "BTCPay") => {
+  await screen.findByText(name)
+  fireEvent.press(screen.getByTestId(`${name}-right`))
+  await screen.findByText(LL.ApiScreen.revokeTitle())
+}
+
 describe("ApiScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -104,18 +120,14 @@ describe("ApiScreen", () => {
       ]),
     )
 
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+    renderScreen()
+    fireEvent.press(await screen.findByTestId(INACTIVE_TOGGLE))
 
     expect(await screen.findByText(new RegExp(LL.ApiScreen.revoked()))).toBeTruthy()
     expect(screen.getByText(/Expired/)).toBeTruthy()
 
-    const alertSpy = jest.spyOn(Alert, "alert")
     fireEvent.press(screen.getByTestId("Old key-right"))
-    expect(alertSpy).not.toHaveBeenCalled()
+    expect(screen.queryByText(LL.ApiScreen.revokeTitle())).toBeNull()
   })
 
   it("renders an expired key without inventing a date when expiresAt is missing", async () => {
@@ -125,11 +137,8 @@ describe("ApiScreen", () => {
       ]),
     )
 
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+    renderScreen()
+    fireEvent.press(await screen.findByTestId(INACTIVE_TOGGLE))
 
     expect(
       await screen.findByText(`Read, Receive · ${LL.ApiScreen.expiredNoDate()}`),
@@ -148,11 +157,8 @@ describe("ApiScreen", () => {
       ]),
     )
 
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+    renderScreen()
+    fireEvent.press(await screen.findByTestId(INACTIVE_TOGGLE))
 
     const expectedDate = new Date(1897776000 * 1000).toLocaleDateString()
     expect(
@@ -187,28 +193,33 @@ describe("ApiScreen", () => {
     expect(screen.getByText(LL.ApiScreen.createKey())).toBeTruthy()
   })
 
-  it("revokes a key after confirming the alert", async () => {
-    const alertSpy = jest.spyOn(Alert, "alert")
+  it("asks before revoking in a modal, with the key's name", async () => {
+    renderScreen()
 
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+    await openRevokeModal()
 
-    await screen.findByText("BTCPay")
-    fireEvent.press(screen.getByTestId("BTCPay-right"))
+    expect(screen.getByText(LL.ApiScreen.revokeBody({ name: "BTCPay" }))).toBeTruthy()
+    expect(screen.getByText(LL.ApiScreen.revokeGoBack())).toBeTruthy()
+    expect(screen.getByText(LL.ApiScreen.revoke())).toBeTruthy()
+  })
 
-    expect(alertSpy).toHaveBeenCalledWith(
-      LL.ApiScreen.revokeTitle(),
-      LL.ApiScreen.revokeBody({ name: "BTCPay" }),
-      expect.any(Array),
-    )
+  it("revokes nothing when going back from the modal", async () => {
+    renderScreen()
+    await openRevokeModal()
 
-    const buttons = alertSpy.mock.calls[0][2] as AlertButton[]
-    const revokeButton = buttons.find((button) => button.style === "destructive")
-    expect(revokeButton).toBeTruthy()
-    revokeButton?.onPress?.()
+    fireEvent.press(screen.getByText(LL.ApiScreen.revokeGoBack()))
+
+    expect(screen.UNSAFE_getByType(Modal).props.isVisible).toBe(false)
+    // the name stays put while the modal fades out
+    expect(screen.getByText(LL.ApiScreen.revokeBody({ name: "BTCPay" }))).toBeTruthy()
+    expect(apiKeyRevokeMock).not.toHaveBeenCalled()
+  })
+
+  it("revokes a key after confirming in the modal", async () => {
+    renderScreen()
+    await openRevokeModal()
+
+    fireEvent.press(screen.getByText(LL.ApiScreen.revoke()))
 
     await waitFor(() =>
       expect(apiKeyRevokeMock).toHaveBeenCalledWith({
@@ -227,19 +238,10 @@ describe("ApiScreen", () => {
 
   it("shows an error toast when revoking fails", async () => {
     apiKeyRevokeMock.mockRejectedValueOnce(new Error("boom"))
-    const alertSpy = jest.spyOn(Alert, "alert")
 
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
-
-    await screen.findByText("BTCPay")
-    fireEvent.press(screen.getByTestId("BTCPay-right"))
-
-    const buttons = alertSpy.mock.calls[0][2] as AlertButton[]
-    buttons.find((button) => button.style === "destructive")?.onPress?.()
+    renderScreen()
+    await openRevokeModal()
+    fireEvent.press(screen.getByText(LL.ApiScreen.revoke()))
 
     await waitFor(() =>
       expect(toastShow).toHaveBeenCalledWith(
@@ -265,5 +267,109 @@ describe("ApiScreen", () => {
     )
 
     expect(await screen.findByText(LL.ApiScreen.loadError())).toBeTruthy()
+  })
+
+  describe("inactive keys section", () => {
+    const activeKey = makeApiKey({
+      id: "key-a",
+      name: "Live shop",
+      createdAt: 1700000100,
+    })
+    const revokedKey = makeApiKey({
+      id: "key-r",
+      name: "Old test",
+      revoked: true,
+      createdAt: 1700000300,
+    })
+    const expiredKey = makeApiKey({
+      id: "key-e",
+      name: "Old bot",
+      expired: true,
+      createdAt: 1700000200,
+    })
+
+    beforeEach(() => {
+      apiKeysQueryMock.mockReturnValue(
+        makeQueryResult([expiredKey, activeKey, revokedKey]),
+      )
+    })
+
+    it("lists only active keys, with the inactive ones collapsed under a count", async () => {
+      renderScreen()
+
+      expect(await screen.findByText(activeKey.name)).toBeTruthy()
+      expect(screen.getByText(LL.ApiScreen.inactiveKeys({ count: 2 }))).toBeTruthy()
+      expect(screen.queryByText(revokedKey.name)).toBeNull()
+      expect(screen.queryByText(expiredKey.name)).toBeNull()
+    })
+
+    it("expands newest first and collapses again", async () => {
+      renderScreen()
+
+      const toggle = await screen.findByTestId(INACTIVE_TOGGLE)
+      expect(toggle.props.accessibilityState).toEqual({ expanded: false })
+
+      fireEvent.press(toggle)
+      expect(screen.getByTestId(INACTIVE_TOGGLE).props.accessibilityState).toEqual({
+        expanded: true,
+      })
+      const names = screen
+        .getAllByText(/^Old (test|bot)$/)
+        .map((node) => node.props.children)
+      expect(names).toEqual([revokedKey.name, expiredKey.name])
+
+      fireEvent.press(screen.getByTestId(INACTIVE_TOGGLE))
+      expect(screen.queryByText(revokedKey.name)).toBeNull()
+    })
+
+    it("draws inactive keys at full opacity", async () => {
+      renderScreen()
+      fireEvent.press(await screen.findByTestId(INACTIVE_TOGGLE))
+
+      let node = screen.getByText(revokedKey.name).parent
+      while (node) {
+        expect(StyleSheet.flatten(node.props.style)?.opacity ?? 1).toBe(1)
+        node = node.parent
+      }
+    })
+
+    it("hides the section when there are no inactive keys", async () => {
+      apiKeysQueryMock.mockReturnValue(makeQueryResult([activeKey]))
+
+      renderScreen()
+
+      expect(await screen.findByText(activeKey.name)).toBeTruthy()
+      expect(screen.queryByTestId(INACTIVE_TOGGLE)).toBeNull()
+    })
+
+    it("hides the section while the key list is loading", async () => {
+      apiKeysQueryMock.mockReturnValue({
+        loading: true,
+        error: undefined,
+        data: undefined,
+      })
+
+      renderScreen()
+
+      expect(await screen.findByText(LL.ApiScreen.createKey())).toBeTruthy()
+      expect(screen.queryByTestId(INACTIVE_TOGGLE)).toBeNull()
+    })
+
+    it("moves a key into the section once it's revoked", async () => {
+      const { rerender } = renderScreen()
+      await screen.findByText(activeKey.name)
+
+      apiKeysQueryMock.mockReturnValue(
+        makeQueryResult([expiredKey, { ...activeKey, revoked: true }, revokedKey]),
+      )
+      rerender(
+        <ContextForScreen>
+          <ApiScreen />
+        </ContextForScreen>,
+      )
+
+      expect(screen.getByText(LL.ApiScreen.inactiveKeys({ count: 3 }))).toBeTruthy()
+      expect(screen.queryByText(activeKey.name)).toBeNull()
+    })
   })
 })

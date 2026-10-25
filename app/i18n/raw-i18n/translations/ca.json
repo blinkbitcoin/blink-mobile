@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Claus API",
+    "inactiveKeys": "Claus inactives ({count})",
     "noKeys": "Encara no hi ha cap clau API",
     "createKey": "Crea una clau API",
     "createTitle": "Nova clau API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Voleu revocar la clau API?",
     "revokeBody": "\"{name: string}\" deixarà de funcionar immediatament. Això no es pot desfer.",
     "revoke": "Revoca",
+    "revokeGoBack": "Tornar",
     "revokeSuccess": "Clau API revocada",
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",

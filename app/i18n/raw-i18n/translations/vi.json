@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Khóa API",
+    "inactiveKeys": "Khóa không hoạt động ({count})",
     "noKeys": "Chưa có khóa API nào",
     "createKey": "Tạo khóa API",
     "createTitle": "Khóa API mới",
@@ -27,6 +28,7 @@
     "revokeTitle": "Thu hồi khóa API?",
     "revokeBody": "\"{name: string}\" sẽ ngừng hoạt động ngay lập tức. Không thể hoàn tác thao tác này.",
     "revoke": "Thu hồi",
+    "revokeGoBack": "Quay lại",
     "revokeSuccess": "Đã thu hồi khóa API",
     "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
     "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",

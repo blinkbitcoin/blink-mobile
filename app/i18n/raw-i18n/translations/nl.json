@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Inactieve sleutels ({count})",
     "noKeys": "Nog geen API-sleutels",
     "createKey": "API-sleutel aanmaken",
     "createTitle": "Nieuwe API-sleutel",
@@ -27,6 +28,7 @@
     "revokeTitle": "API-sleutel intrekken?",
     "revokeBody": "\"{name: string}\" stopt onmiddellijk met werken. Dit kan niet ongedaan worden gemaakt.",
     "revoke": "Intrekken",
+    "revokeGoBack": "Terug",
     "revokeSuccess": "API-sleutel ingetrokken",
     "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
     "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",

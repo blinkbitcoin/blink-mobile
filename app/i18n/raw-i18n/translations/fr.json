@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Clés API",
+        "inactiveKeys": "Clés inactives ({count})",
         "noKeys": "Aucune clé API pour l'instant",
         "createKey": "Créer une clé API",
         "createTitle": "Nouvelle clé API",
@@ -27,6 +28,7 @@
         "revokeTitle": "Révoquer la clé API ?",
         "revokeBody": "\"{name: string}\" cessera immédiatement de fonctionner. Cette action est irréversible.",
         "revoke": "Révoquer",
+        "revokeGoBack": "Retour",
         "revokeSuccess": "Clé API révoquée",
         "createError": "Impossible de créer la clé API. Veuillez réessayer.",
         "revokeError": "Impossible de révoquer la clé API. Veuillez réessayer.",

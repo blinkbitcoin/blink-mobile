@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API кључеви",
+    "inactiveKeys": "Неактивни кључеви ({count})",
     "noKeys": "Још нема API кључева",
     "createKey": "Направи API кључ",
     "createTitle": "Нови API кључ",
@@ -27,6 +28,7 @@
     "revokeTitle": "Опозвати API кључ?",
     "revokeBody": "\"{name: string}\" ће одмах престати да ради. Ово се не може опозвати.",
     "revoke": "Опозови",
+    "revokeGoBack": "Назад",
     "revokeSuccess": "API кључ је опозван",
     "createError": "Није могуће направити API кључ. Покушајте поново.",
     "revokeError": "Није могуће опозвати API кључ. Покушајте поново.",

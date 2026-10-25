@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "Chaves de API",
+        "inactiveKeys": "Chaves inativas ({count})",
         "noKeys": "Ainda não há chaves de API",
         "createKey": "Criar chave de API",
         "createTitle": "Nova chave de API",
@@ -27,6 +28,7 @@
         "revokeTitle": "Revogar a chave de API?",
         "revokeBody": "\"{name: string}\" deixará de funcionar imediatamente. Isto não pode ser desfeito.",
         "revoke": "Revogar",
+        "revokeGoBack": "Voltar",
         "revokeSuccess": "Chave de API revogada",
         "createError": "Não foi possível criar a chave de API. Tente novamente.",
         "revokeError": "Não foi possível revogar a chave de API. Tente novamente.",

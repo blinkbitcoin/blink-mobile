@@ -2488,6 +2488,7 @@ const en: BaseTranslation = {
   },
   ApiScreen: {
     keysGroupTitle: "API keys",
+    inactiveKeys: "Inactive keys ({count: number})",
     noKeys: "No API keys yet",
     createKey: "Create API key",
     createTitle: "New API key",
@@ -2517,6 +2518,7 @@ const en: BaseTranslation = {
     revokeBody:
       "\"{name: string}\" will stop working immediately. This cannot be undone.",
     revoke: "Revoke",
+    revokeGoBack: "Go back",
     revokeSuccess: "API key revoked",
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",

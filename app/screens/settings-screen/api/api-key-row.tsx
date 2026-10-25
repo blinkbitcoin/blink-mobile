@@ -1,8 +1,5 @@
 import * as React from "react"
-import { View } from "react-native"
-
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { makeStyles } from "@rn-vui/themed"
 
 import { SettingsRow } from "../row"
 import { ApiKeyItem, apiKeyStatus, formatScopes } from "./use-api-keys"
@@ -17,7 +14,6 @@ type Props = {
 
 export const ApiKeyRow: React.FC<Props> = ({ apiKey, onRevoke }) => {
   const { LL } = useI18nContext()
-  const styles = useStyles()
 
   const status = apiKeyStatus(apiKey)
 
@@ -29,15 +25,13 @@ export const ApiKeyRow: React.FC<Props> = ({ apiKey, onRevoke }) => {
           ? LL.ApiScreen.expired({ date: formatDate(apiKey.expiresAt) })
           : LL.ApiScreen.expiredNoDate()
     return (
-      <View style={styles.inactive}>
-        <SettingsRow
-          title={apiKey.name}
-          subtitle={`${formatScopes(apiKey.scopes, LL)} · ${statusLabel}`}
-          subtitleShorter
-          action={null}
-          rightIcon={null}
-        />
-      </View>
+      <SettingsRow
+        title={apiKey.name}
+        subtitle={`${formatScopes(apiKey.scopes, LL)} · ${statusLabel}`}
+        subtitleShorter
+        action={null}
+        rightIcon={null}
+      />
     )
   }
 
@@ -56,9 +50,3 @@ export const ApiKeyRow: React.FC<Props> = ({ apiKey, onRevoke }) => {
     />
   )
 }
-
-const useStyles = makeStyles(() => ({
-  inactive: {
-    opacity: 0.5,
-  },
-}))

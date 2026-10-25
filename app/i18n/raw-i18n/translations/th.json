@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "คีย์ API",
+    "inactiveKeys": "คีย์ที่ไม่ได้ใช้งาน ({count})",
     "noKeys": "ยังไม่มีคีย์ API",
     "createKey": "สร้างคีย์ API",
     "createTitle": "คีย์ API ใหม่",
@@ -27,6 +28,7 @@
     "revokeTitle": "เพิกถอนคีย์ API หรือไม่?",
     "revokeBody": "\"{name: string}\" จะหยุดทำงานทันที การกระทำนี้ไม่สามารถเลิกทำได้",
     "revoke": "เพิกถอน",
+    "revokeGoBack": "ย้อนกลับ",
     "revokeSuccess": "เพิกถอนคีย์ API แล้ว",
     "createError": "ไม่สามารถสร้างคีย์ API ได้ โปรดลองอีกครั้ง",
     "revokeError": "ไม่สามารถเพิกถอนคีย์ API ได้ โปรดลองอีกครั้ง",

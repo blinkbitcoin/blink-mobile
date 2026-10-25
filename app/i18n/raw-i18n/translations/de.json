@@ -1,6 +1,7 @@
 {
     "ApiScreen": {
         "keysGroupTitle": "API-Schlüssel",
+        "inactiveKeys": "Inaktive Schlüssel ({count})",
         "noKeys": "Noch keine API-Schlüssel",
         "createKey": "API-Schlüssel erstellen",
         "createTitle": "Neuer API-Schlüssel",
@@ -27,6 +28,7 @@
         "revokeTitle": "API-Schlüssel widerrufen?",
         "revokeBody": "\"{name: string}\" funktioniert sofort nicht mehr. Dies kann nicht rückgängig gemacht werden.",
         "revoke": "Widerrufen",
+        "revokeGoBack": "Zurück",
         "revokeSuccess": "API-Schlüssel widerrufen",
         "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
         "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",

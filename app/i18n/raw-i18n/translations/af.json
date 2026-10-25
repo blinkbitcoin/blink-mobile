@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "API-sleutels",
+    "inactiveKeys": "Onaktiewe sleutels ({count})",
     "noKeys": "Nog geen API-sleutels nie",
     "createKey": "Skep API-sleutel",
     "createTitle": "Nuwe API-sleutel",
@@ -27,6 +28,7 @@
     "revokeTitle": "Herroep API-sleutel?",
     "revokeBody": "\"{name: string}\" sal onmiddellik ophou werk. Dit kan nie ongedaan gemaak word nie.",
     "revoke": "Herroep",
+    "revokeGoBack": "Gaan terug",
     "revokeSuccess": "API-sleutel herroep",
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",

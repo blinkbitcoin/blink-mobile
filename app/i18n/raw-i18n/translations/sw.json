@@ -1,6 +1,7 @@
 {
   "ApiScreen": {
     "keysGroupTitle": "Funguo za API",
+    "inactiveKeys": "Funguo zisizotumika ({count})",
     "noKeys": "Bado hakuna funguo za API",
     "createKey": "Unda ufunguo wa API",
     "createTitle": "Ufunguo mpya wa API",
@@ -27,6 +28,7 @@
     "revokeTitle": "Batilisha ufunguo wa API?",
     "revokeBody": "\"{name: string}\" utaacha kufanya kazi mara moja. Kitendo hiki hakiwezi kutenduliwa.",
     "revoke": "Batilisha",
+    "revokeGoBack": "Rudi nyuma",
     "revokeSuccess": "Ufunguo wa API umebatilishwa",
     "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
     "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
