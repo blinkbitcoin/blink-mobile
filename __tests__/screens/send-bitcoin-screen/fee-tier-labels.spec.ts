@@ -10,6 +10,8 @@ import {
 import { CUSTODIAL_PAYOUT_ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 
+import retiredTierCopy from "../../i18n/retired-tier-copy.json"
+
 /**
  * The source file is typed as the loose BaseTranslation; the generated shape is the real
  * one. Narrowed to the two sections this spec reads, so the reads below stay type-checked.
@@ -31,13 +33,23 @@ const labels = {
 }
 
 /** Words these tiers have been called before. None of them may reach a screen again. */
-const SUPERSEDED_TIER_NAMES = ["Fast", "Medium", "Slow", "Fastest", "Normal", "Half hour"]
+const SUPERSEDED_TIER_NAMES = retiredTierCopy.en.retired
+
+const escapeRegExp = (value: string): string =>
+  value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
 
 /** Whole-word so "Fast" does not match "Fastest" only by accident, and vice versa. */
 const survivingTierNames = (copy: string[]): string[] =>
   SUPERSEDED_TIER_NAMES.filter((name) =>
-    copy.some((line) => new RegExp(`\\b${name}\\b`, "i").test(line)),
+    copy.some((line) => new RegExp(`\\b${escapeRegExp(name)}\\b`, "i").test(line)),
   )
+
+/**
+ * Only the copy that names a tier or a fee rate. Elsewhere in these sections "fast" and
+ * "slow" are ordinary words a sentence about confirmation times may need.
+ */
+const isTierCopyKey = (key: string): boolean =>
+  /feeRate|tier/i.test(key) || ["fast", "medium", "slow"].includes(key)
 
 const presentTiers = (etaMinutes: Record<FeeTierOption, number>) =>
   buildFeeTierOptions({
@@ -102,10 +114,13 @@ describe("on-chain fee tier presentation", () => {
 
   describe("the copy around the tiers", () => {
     it("leaves no superseded tier name standing in the on-chain copy", () => {
-      const onchainCopy = Object.values({
+      const onchainCopy = Object.entries({
         ...sendScreen,
         ...en.UnclaimedDeposit,
-      }).filter((value): value is string => typeof value === "string")
+      })
+        .filter(([key]) => isTierCopyKey(key))
+        .map(([, value]) => value)
+        .filter((value): value is string => typeof value === "string")
 
       expect(survivingTierNames(onchainCopy)).toEqual([])
     })
