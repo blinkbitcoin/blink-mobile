@@ -6,7 +6,13 @@ import {
   View,
   Linking,
 } from "react-native"
-import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
+import {
+  render,
+  renderHook,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react-native"
 
 import { flushEffects } from "../helpers/flush-effects"
 
@@ -15,7 +21,8 @@ import { testBulletinsStore } from "@app/components/notifications/test-bulletins
 import { defaultRemoteConfig } from "@app/config/feature-flags-context"
 import { BulletinsDocument, BulletinsQuery, Icon } from "@app/graphql/generated"
 
-const mockAck = jest.fn(() => Promise.resolve())
+type AckOptions = { variables: { input: { notificationId: string } } }
+const mockAck = jest.fn<Promise<void>, [AckOptions]>(() => Promise.resolve())
 const mockRefetchQueries = jest.fn(() => Promise.resolve())
 
 jest.mock("@apollo/client", () => ({
@@ -148,7 +155,7 @@ type HarnessProps = { loading?: boolean; bulletins: BulletinsQuery | undefined }
 
 /** Every card the hook returns, in order, each tagged with its carousel key. */
 const Harness: React.FC<HarnessProps> = ({ loading = false, bulletins }) => {
-  const items = useServerBulletinItems({ loading, bulletins })
+  const { items } = useServerBulletinItems({ loading, bulletins })
   return (
     <>
       {items.map(({ key, node }) => (
@@ -187,11 +194,19 @@ beforeEach(() => {
 })
 
 describe("useServerBulletinItems", () => {
-  it("returns no card while the bulletins load", () => {
-    mockCardInfo.current = { title: "Local card", text: "Shown by the app" }
+  /** `cache-and-network` hands back the cached bulletins with `loading` still true: they
+   *  stay on screen while the request is in flight. */
+  it("keeps the cached bulletins while a request is in flight", () => {
     const rendered = renderItems([makeBulletin()], true)
 
-    expect(itemKeys(rendered)).toEqual([])
+    expect(itemKeys(rendered)).toEqual(["server-notif-1"])
+  })
+
+  it("keeps the app's queued card while the first request is in flight", () => {
+    mockCardInfo.current = { title: "Local card", text: "Shown by the app" }
+    const rendered = renderItems(undefined, true)
+
+    expect(itemKeys(rendered)).toEqual(["notify-card"])
   })
 
   it("renders a card with the bulletin's title and body, keyed by its id", () => {
@@ -616,5 +631,67 @@ describe("useServerBulletinItems", () => {
         expect(testBulletinsStore.getSnapshot()).toEqual([])
       })
     })
+  })
+})
+
+/** The carousel remounts once, so a cold load opens on the newest server bulletin rather
+ *  than on the app card it was first built from; never again after that. */
+describe("the carousel key", () => {
+  type HookProps = Parameters<typeof useServerBulletinItems>[0]
+  const renderKey = (initial: HookProps) =>
+    renderHook((props: HookProps) => useServerBulletinItems(props).carouselKey, {
+      initialProps: initial,
+    })
+
+  it("changes when the first response brings server bulletins the carousel opened without", () => {
+    const hook = renderKey({ loading: true, bulletins: undefined })
+    const opened = hook.result.current
+
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([makeBulletin()]) })
+
+    expect(hook.result.current).not.toBe(opened)
+  })
+
+  it("keeps it across later refetches, whatever they bring", () => {
+    const hook = renderKey({ loading: true, bulletins: undefined })
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([makeBulletin()]) })
+    const settled = hook.result.current
+
+    hook.rerender({ loading: true, bulletins: makeBulletinsQuery([makeBulletin()]) })
+    hook.rerender({
+      loading: false,
+      bulletins: makeBulletinsQuery([
+        makeBulletin({ id: "newer", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin(),
+      ]),
+    })
+
+    expect(hook.result.current).toBe(settled)
+  })
+
+  it("keeps it when the carousel opened on cached server bulletins", () => {
+    const cached = makeBulletinsQuery([makeBulletin()])
+    const hook = renderKey({ loading: true, bulletins: cached })
+    const opened = hook.result.current
+
+    hook.rerender({
+      loading: false,
+      bulletins: makeBulletinsQuery([
+        makeBulletin({ id: "newer", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin(),
+      ]),
+    })
+
+    expect(hook.result.current).toBe(opened)
+  })
+
+  it("keeps it when the first response brings no server bulletin, and after", () => {
+    const hook = renderKey({ loading: true, bulletins: undefined })
+    const opened = hook.result.current
+
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([]) })
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([makeBulletin()]) })
+
+    expect(hook.result.current).toBe(opened)
   })
 })

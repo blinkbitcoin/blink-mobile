@@ -311,7 +311,7 @@ export const HomeScreen: React.FC = () => {
     fetchPolicy: "cache-and-network",
     variables: { first: BULLETINS_PAGE_SIZE },
   })
-  const serverBulletinItems = useServerBulletinItems({
+  const { items: serverBulletinItems, carouselKey } = useServerBulletinItems({
     loading: bulletinsLoading,
     bulletins,
   })
@@ -599,15 +599,13 @@ export const HomeScreen: React.FC = () => {
       node: <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />,
     },
   ]
-  /** Held back until the server bulletins settle, so the carousel opens on the newest
-   *  of them. Built from the app's cards alone, it would open on one of those, and keep
-   *  it in view once the server cards arrive ahead of it, as it does after a refetch. */
-  const bulletinItems = bulletinsLoading
-    ? []
-    : [
-        ...serverBulletinItems,
-        ...appBulletinCandidates.filter((item): item is CarouselItem => item !== false),
-      ]
+  /** Shown at once, the app's cards and any cached server bulletins alike, while the
+   *  request is in flight. `carouselKey` remounts the carousel on the newest server
+   *  bulletin when the first response puts some ahead of the card it opened on. */
+  const bulletinItems = [
+    ...serverBulletinItems,
+    ...appBulletinCandidates.filter((item): item is CarouselItem => item !== false),
+  ]
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
@@ -1027,7 +1025,7 @@ export const HomeScreen: React.FC = () => {
           ))}
         </View>
         <NetworkStatusBanner />
-        <BulletinCarousel items={bulletinItems} />
+        <BulletinCarousel key={carouselKey} items={bulletinItems} />
         <AppUpdate />
         <SetDefaultAccountModal
           isVisible={setDefaultAccountModalVisible}

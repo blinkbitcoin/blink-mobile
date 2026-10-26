@@ -2990,9 +2990,10 @@ describe("bulletins from the server", () => {
     expect(React.Children.count(screen.getByRole("adjustable").props.children)).toBe(2)
   })
 
-  /** The app's card is ready before the server answers; the carousel still opens on
-   *  the server's, not on the one it was first built from. */
-  it("opens on the server bulletin when an app card is ready before it", async () => {
+  /** The app's card shows while the server request is in flight, and is not held back
+   *  for it; once the server answers, the carousel opens on the server's card, not on
+   *  the one it was first built from. */
+  it("shows the app card while the request is in flight, then opens on the server bulletin", async () => {
     mockReminderBulletinVisible = true
     currentMocks = [maintenanceBulletin()]
 
@@ -3001,6 +3002,9 @@ describe("bulletins from the server", () => {
         <HomeScreen />
       </ContextForScreen>,
     )
+    expect(screen.getByTestId("migration-reminder-bulletin")).toBeTruthy()
+    expect(screen.queryByText("Scheduled maintenance tonight")).toBeNull()
+
     await screen.findByText("Scheduled maintenance tonight")
     fireEvent(screen.UNSAFE_getByType(BulletinCarousel).children[0] as never, "layout", {
       nativeEvent: { layout: { width: 360, height: 0 } },
