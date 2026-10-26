@@ -4,7 +4,7 @@ import {
   Satoshis,
   LnUrlPayServiceResponse,
 } from "lnurl-pay"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -25,11 +25,13 @@ import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
 } from "@blinkbitcoin/blink-client"
+import { HeaderHeightContext } from "@react-navigation/elements"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -139,6 +141,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     useDisplayCurrency()
   const { LL } = useI18nContext()
   const { copyToClipboard } = useClipboard()
+  const headerHeight = useContext(HeaderHeightContext)
+  /** The note is the only text field here, so a raised keyboard means the note is being
+   *  typed: the system keyboard takes the keypad's place, and the bottom inset goes, since
+   *  the keyboard covers it. */
+  const isKeyboardVisible = useKeyboardVisible()
+  const scrollRef = useRef<ScrollView>(null)
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },
@@ -550,6 +558,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       (amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance ||
         amountStatus.invalidReason === AmountInvalidReason.InsufficientLimit))
 
+  /** The note is the last field, so while it is being typed the end of the scroll is the
+   *  note: follow it as the screen shrinks over the keyboard and as the note grows. */
+  const scrollNoteIntoView = () => {
+    if (isKeyboardVisible) scrollRef.current?.scrollToEnd({ animated: true })
+  }
+
   const nextButtonTitle = (() => {
     if (paymentDetail.canSetAmount && !hasAmount) return LL.SendBitcoinScreen.addAmount()
     if (isLowFunds) return LL.SendBitcoinScreen.lowFunds()
@@ -557,7 +571,13 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   })()
 
   return (
-    <Screen preset="fixed" keyboardOffset="navigationHeader">
+    <Screen
+      preset="fixed"
+      keyboardOffset="navigationHeader"
+      keyboardVerticalOffset={headerHeight}
+      avoidKeyboardOnAndroid
+      edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
+    >
       <ConfirmFeesModal
         action={() => {
           setModalHighFeesVisible(false)
@@ -567,9 +587,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         cancel={() => setModalHighFeesVisible(false)}
       />
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        onLayout={scrollNoteIntoView}
+        onContentSizeChange={scrollNoteIntoView}
       >
         <SendHero
           active
@@ -631,7 +654,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         </View>
       </ScrollView>
       <View style={styles.bottom}>
-        {paymentDetail.canSetAmount && (
+        {paymentDetail.canSetAmount && !isKeyboardVisible && (
           <View style={styles.pad}>
             <PercentageSelector
               isLocked={false}
