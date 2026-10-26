@@ -10121,6 +10121,16 @@ type RootTranslation = {
 		​V​e​r​i​f​y​ ​y​o​u​r​ ​i​n​t​e​r​n​e​t​ ​c​o​n​n​e​c​t​i​o​n
 			 */
 			connection: string
+			/**
+			 * S​t​a​t​u​s​ ​c​o​d​e​:​ ​{​s​t​a​t​u​s​C​o​d​e​}
+			 * @param {number} statusCode
+			 */
+			statusCode: RequiredParams<'statusCode'>
+			/**
+			 * E​r​r​o​r​ ​c​o​d​e​:​ ​{​e​r​r​o​r​C​o​d​e​}
+			 * @param {string} errorCode
+			 */
+			errorCode: RequiredParams<'errorCode'>
 		}
 		/**
 		 * U​n​e​x​p​e​c​t​e​d​ ​e​r​r​o​r​ ​o​c​c​u​r​r​e​d
@@ -23911,6 +23921,14 @@ export type TranslationFunctions = {
 		Verify your internet connection
 			 */
 			connection: () => LocalizedString
+			/**
+			 * Status code: {statusCode}
+			 */
+			statusCode: (arg: { statusCode: number }) => LocalizedString
+			/**
+			 * Error code: {errorCode}
+			 */
+			errorCode: (arg: { errorCode: string }) => LocalizedString
 		}
 		/**
 		 * Unexpected error occurred

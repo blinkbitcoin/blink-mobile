@@ -61,6 +61,9 @@ beforeEach(() => {
           server: () => "Server error",
           request: () => "Request failed",
           connection: () => "No connection",
+          statusCode: ({ statusCode }: { statusCode: number }) =>
+            `Status code: ${statusCode}`,
+          errorCode: ({ errorCode }: { errorCode: string }) => `Error code: ${errorCode}`,
         },
       },
     },
@@ -126,6 +129,41 @@ describe("NetworkErrorComponent", () => {
         expect(mockClearNetworkError).toHaveBeenCalled()
       },
       { timeout: 1000 },
+    )
+  })
+
+  it("builds the client error toast from translations, skipping a missing error code", async () => {
+    const { rerender } = render(<NetworkErrorComponent />)
+
+    ;(useNetworkError as jest.Mock).mockReturnValue({
+      networkError: { statusCode: 403 },
+      clearNetworkError: mockClearNetworkError,
+    })
+
+    rerender(<NetworkErrorComponent />)
+
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
+    const { message, LL } = mockToastShow.mock.calls[0][0]
+    expect(message(LL)).toBe("Status code: 403\nRequest failed")
+  })
+
+  it("names the server error code in the client error toast", async () => {
+    const { rerender } = render(<NetworkErrorComponent />)
+
+    ;(useNetworkError as jest.Mock).mockReturnValue({
+      networkError: {
+        statusCode: 429,
+        result: { errors: [{ code: "TOO_MANY_REQUEST" }] },
+      },
+      clearNetworkError: mockClearNetworkError,
+    })
+
+    rerender(<NetworkErrorComponent />)
+
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalled())
+    const { message, LL } = mockToastShow.mock.calls[0][0]
+    expect(message(LL)).toBe(
+      "Status code: 429\nError code: TOO_MANY_REQUEST\nRequest failed",
     )
   })
 
