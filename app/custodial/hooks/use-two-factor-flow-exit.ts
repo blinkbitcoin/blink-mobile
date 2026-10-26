@@ -5,18 +5,15 @@ import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enf
 import { TwoFactorFlowParams, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 type TwoFactorFlowExit = {
-  /** The tier the screen was opened for: what it reports, and what leaving it unfinished
-   *  is charged to, even if the balance moves while it is open. */
+  /** The tier when the screen opened. */
   promptTier: TwoFactorTier
-  /** Backs out of the screen, as the dismissal of the prompt that opened it. */
+  /** Goes back, and records a skip if the user skipped the prompt. */
   leave: () => void
 }
 
 /**
- * The way out of a screen a two-factor prompt opens. Leaving it unfinished is that
- * prompt's dismissal, charged to the tier and reported under the prompt it was opened
- * from; the provider ignores it below the tiers that count one. Opened from the setup,
- * it only goes back there: the setup is still up, and leaving it is what counts.
+ * Lets the user leave a two-factor screen. Leaving without adding an
+ * authenticator counts as skipping the prompt that opened the screen.
  */
 export const useTwoFactorFlowExit = ({
   origin,
@@ -25,20 +22,26 @@ export const useTwoFactorFlowExit = ({
 }: TwoFactorFlowParams = {}): TwoFactorFlowExit => {
   const navigation = useNavigation()
   const { unmetTier, hasAuthenticator, registerDismissal } = useTwoFactorEnforcement()
-  const [promptTier] = useState(unmetTier)
-  /** The prompt that opened the screen, whose dismissal leaving it is. */
-  const [openedFrom] = useState(origin)
 
-  /** An authenticator added meanwhile, from a code accepted after its screen was left,
-   *  leaves the prompt nothing to be dismissed for, and a registration that could not
-   *  start is no answer to it. */
-  const isDismissal =
+  /**
+   * Save the tier and the origin from the first render. useState ignores the
+   * value on later renders, so these stay the same even if the balance changes
+   * while the screen is open.
+   */
+  const [tierWhenOpened] = useState(unmetTier)
+  const [originWhenOpened] = useState(origin)
+
+  /**
+   * The setup screen records its own skip, and there is nothing to skip if
+   * the user already has an authenticator or the registration never started.
+   */
+  const isSkip =
     !isOpenedFromSetupScreen && !hasAuthenticator && !hasRegistrationFailedToStart
 
   const leave = useCallback(() => {
-    if (isDismissal) registerDismissal(promptTier, openedFrom)
+    if (isSkip) registerDismissal(tierWhenOpened, originWhenOpened)
     navigation.goBack()
-  }, [isDismissal, registerDismissal, promptTier, openedFrom, navigation])
+  }, [isSkip, registerDismissal, tierWhenOpened, originWhenOpened, navigation])
 
-  return { promptTier, leave }
+  return { promptTier: tierWhenOpened, leave }
 }

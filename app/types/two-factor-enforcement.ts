@@ -47,13 +47,14 @@ export type TwoFactorPromptOrigin = {
   reason?: TwoFactorReminderReason
 }
 
-/** How a two-factor flow was opened: by a prompt, whose dismissal leaving it unfinished
- *  is, or from the setup, which stays under it and counts its own. A registration that
- *  could not start marks it, and leaving it is then no dismissal: the user was not
- *  waving the prompt away. */
+/** The route params of a screen in the two-factor flow. */
 export type TwoFactorFlowParams = {
+  /** The prompt that opened the flow, such as the home card or the session modal. */
   origin?: TwoFactorPromptOrigin
+  /** True when the setup screen opened this one and is still behind it. */
   isOpenedFromSetupScreen?: boolean
+  /** True when the authenticator registration could not start, so the user had
+   *  nothing to answer and leaving is not a skip. */
   hasRegistrationFailedToStart?: boolean
 }
 
