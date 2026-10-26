@@ -1,23 +1,19 @@
 import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
-import { signIn, signUpWithPassword } from "react-native-credentials-manager"
+import { signIn } from "react-native-credentials-manager"
 import * as Keychain from "react-native-keychain"
 
 import { BLINK_DOMAIN } from "@app/config/appinfo"
+import {
+  CredentialError,
+  CredentialSaveResult,
+  mapCredentialError,
+  savePasswordCredential,
+} from "@app/utils/credential-manager"
 
-export const CredentialError = {
-  NoProvider: "no-provider",
-  UserCancelled: "user-cancelled",
-  Unsupported: "unsupported",
-  Unknown: "unknown",
-} as const
-
-export type CredentialError = (typeof CredentialError)[keyof typeof CredentialError]
-
-export type CredentialSaveResult =
-  | { success: true }
-  | { success: false; error: CredentialError }
+export { CredentialError }
+export type { CredentialSaveResult }
 
 export type CredentialReadResult =
   | { success: true; walletIdentifier: string; mnemonic: string }
@@ -35,27 +31,6 @@ export type UseCredentialBackupReturn = {
  */
 export const isCredentialBackupAvailable = (existingAccountCount: number): boolean =>
   Platform.OS !== "ios" || existingAccountCount <= 1
-
-const classify = (message: string): CredentialError => {
-  if (message.includes("CANCEL")) return CredentialError.UserCancelled
-  if (message.includes("NO_CREDENTIAL_AVAILABLE")) return CredentialError.NoProvider
-  return CredentialError.Unknown
-}
-
-const mapCredentialError = (err: unknown): CredentialError =>
-  err instanceof Error ? classify(err.message) : CredentialError.Unknown
-
-const saveAndroid = async (
-  walletIdentifier: string,
-  mnemonic: string,
-): Promise<CredentialSaveResult> => {
-  try {
-    await signUpWithPassword({ username: walletIdentifier, password: mnemonic })
-    return { success: true }
-  } catch (err) {
-    return { success: false, error: mapCredentialError(err) }
-  }
-}
 
 const saveIOS = async (
   walletIdentifier: string,
@@ -114,7 +89,7 @@ export const useCredentialBackup = (): UseCredentialBackupReturn => {
       try {
         switch (Platform.OS) {
           case "android":
-            return await saveAndroid(walletIdentifier, mnemonic)
+            return await savePasswordCredential(walletIdentifier, mnemonic)
           case "ios":
             return await saveIOS(walletIdentifier, mnemonic)
           default:

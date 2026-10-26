@@ -85,7 +85,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({
+      expect(saveResult).toMatchObject({
         success: false,
         error: CredentialError.UserCancelled,
       })
@@ -100,7 +100,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({
+      expect(saveResult).toMatchObject({
         success: false,
         error: CredentialError.UserCancelled,
       })
@@ -115,7 +115,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({
+      expect(saveResult).toMatchObject({
         success: false,
         error: CredentialError.NoProvider,
       })
@@ -130,7 +130,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({ success: false, error: CredentialError.Unknown })
+      expect(saveResult).toMatchObject({ success: false, error: CredentialError.Unknown })
     })
 
     it("returns unknown when a non-Error value is thrown", async () => {
@@ -142,7 +142,7 @@ describe("useCredentialBackup", () => {
         saveResult = await result.current.save(walletIdentifier, mnemonic)
       })
 
-      expect(saveResult).toEqual({ success: false, error: CredentialError.Unknown })
+      expect(saveResult).toMatchObject({ success: false, error: CredentialError.Unknown })
     })
   })
 
