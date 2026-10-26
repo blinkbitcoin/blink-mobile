@@ -2478,10 +2478,12 @@ const en: BaseTranslation = {
     feeTier: "Transaction priority",
     /**
      * Shared by two rails with different windows: the custodial payout queues
-     * (10m / 4h / 24h, use-onchain-fee-tier-options.ts) and the self-custodial refund's
-     * mempool fee rates (10m / 30m / 60m, unclaimed-deposits-screen.tsx). They name the
-     * relative speed within a rail, not an absolute time — don't tune either one for a
-     * single rail's window without splitting the keys per domain first.
+     * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
+     * rates (10m / 30m / 60m, FEE_TIER_ETA_MINUTES). They name the relative speed within a
+     * rail, not an absolute time — don't tune either one for a single rail's window without
+     * splitting the keys per domain first. The feeTier heading above reads "Transaction
+     * priority" directly over the "Priority" option; that repetition is known and left for
+     * design to settle.
      */
     fast: "Priority",
     medium: "Standard",
