@@ -21,11 +21,12 @@ module.exports = {
   // absorbs slow-runner tails without letting real hangs sit for a minute.
   testTimeout: 20000,
   transform: {
+    // Transpile only: a type-checking program costs ~1.5 GB of heap; `yarn tsc:check` covers types.
     "\\.(ts|tsx)$": [
       "ts-jest",
       {
-        compiler: "ttsc",
-        tsconfig: "<rootDir>/tsconfig.jest.json",
+        isolatedModules: true,
+        tsconfig: "<rootDir>/tsconfig.jest-transpile.json",
       },
     ],
     "\\.js$": "babel-jest",
