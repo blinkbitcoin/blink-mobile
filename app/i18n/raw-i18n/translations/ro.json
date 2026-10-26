@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
-    "createAddress": "Creează adresă",
+    "createAddress": "Creează adresă Lightning",
     "addressDisabled": "(dezactivat)",
     "donationButton": "Buton de donare",
     "btcpayServer": "BTCPay Server",
