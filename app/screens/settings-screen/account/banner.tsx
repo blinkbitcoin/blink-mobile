@@ -78,7 +78,9 @@ const CustodialAccountBanner: React.FC = () => {
           <AccountIcon size={25} />
         </View>
         <View style={styles.textContainer}>
-          <Text type="p2" numberOfLines={1} ellipsizeMode="middle">
+          {/* The address shares the row with the subtitle, so it gets one line and a tail
+              ellipsis; the logged-out sentence has no subtitle and keeps its room to wrap. */}
+          <Text type="p2" numberOfLines={isUserLoggedIn ? 1 : undefined}>
             {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
           </Text>
           {isUserLoggedIn && (

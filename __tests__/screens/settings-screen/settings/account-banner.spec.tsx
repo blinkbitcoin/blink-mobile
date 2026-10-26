@@ -128,6 +128,16 @@ describe("AccountBanner (custodial)", () => {
     expect(screen.getByText("Custodial account")).toBeTruthy()
   })
 
+  it("caps the lightning address to one line with a tail ellipsis, never a middle one", () => {
+    setCustodialAccount("alice")
+
+    render(<AccountBanner />)
+
+    const title = screen.getByText("alice@blink.sv")
+    expect(title.props.numberOfLines).toBe(1)
+    expect(title.props.ellipsizeMode).toBeUndefined()
+  })
+
   it("falls back to Blink User with a Custodial account subtitle when no username is set", () => {
     render(<AccountBanner />)
 
@@ -135,12 +145,14 @@ describe("AccountBanner (custodial)", () => {
     expect(screen.getByText("Custodial account")).toBeTruthy()
   })
 
-  it("keeps the logged-out state single-line and hides the custody label", () => {
+  it("lets the logged-out call to action wrap and hides the custody label", () => {
     mockCurrentLevel = "NonAuth"
 
     render(<AccountBanner />)
 
-    expect(screen.getByText("Log in or create account")).toBeTruthy()
+    const title = screen.getByText("Log in or create account")
+    expect(title.props.numberOfLines).toBeUndefined()
+    expect(title.props.ellipsizeMode).toBeUndefined()
     expect(screen.queryByText("Custodial account")).toBeNull()
   })
 })
