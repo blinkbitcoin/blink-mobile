@@ -1,10 +1,11 @@
 import React from "react"
-import { StyleSheet } from "react-native"
+import { Keyboard, ScrollView, StyleSheet } from "react-native"
 
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { Screen } from "@app/components/screen"
 import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import SendBitcoinDetailsScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-details-screen"
@@ -35,6 +36,18 @@ jest.mock("@react-navigation/native", () => ({
     setOptions: jest.fn(),
   }),
 }))
+
+const mockIsIos = { current: true }
+
+jest.mock("@app/utils/helper", () => {
+  const actual = jest.requireActual("@app/utils/helper")
+  return {
+    ...actual,
+    get isIos() {
+      return mockIsIos.current
+    },
+  }
+})
 
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
@@ -512,5 +525,123 @@ describe("wallet summary under hide-balance", () => {
     renderScreen(intraledgerDestination(), { hideAmount: true })
     await settle()
     expectBalanceShown()
+  })
+})
+
+/** The note is the screen's only text field, so these drive the keyboard listeners the
+ *  way typing a note would: will events for iOS, did events for Android. */
+describe("while the note is typed", () => {
+  const keyboardListeners: Record<string, Array<() => void>> = {}
+  const emitKeyboard = (event: string) =>
+    act(() => (keyboardListeners[event] ?? []).forEach((listener) => listener()))
+  const showKeyboard = () => {
+    emitKeyboard("keyboardWillShow")
+    emitKeyboard("keyboardDidShow")
+  }
+  const hideKeyboard = () => {
+    emitKeyboard("keyboardWillHide")
+    emitKeyboard("keyboardDidHide")
+  }
+
+  beforeEach(() => {
+    jest.spyOn(Keyboard, "isVisible").mockReturnValue(false)
+    jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
+      ;(keyboardListeners[event] ??= []).push(listener as () => void)
+      return { remove: jest.fn() } as unknown as ReturnType<typeof Keyboard.addListener>
+    })
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    Object.keys(keyboardListeners).forEach((event) => delete keyboardListeners[event])
+    mockIsIos.current = true
+  })
+
+  const screenProps = () => screen.UNSAFE_getByType(Screen).props
+  const scrollView = () =>
+    screen
+      .UNSAFE_getAllByType(ScrollView)
+      .find((node) => node.props.keyboardShouldPersistTaps === "handled")!
+
+  it("hands the keypad's place to the system keyboard, and takes it back", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    showKeyboard()
+    expect(screen.queryByTestId("Key 1")).toBeNull()
+    expect(screen.queryByTestId("send-25%")).toBeNull()
+    expect(nextButton()).toBeTruthy()
+
+    hideKeyboard()
+    expect(screen.getByTestId("Key 1")).toBeTruthy()
+    expect(screen.getByTestId("send-25%")).toBeTruthy()
+  })
+
+  /** Android reports a closed keyboard as a keyboard change, which left a stale lift. */
+  it("lifts the screen on Android only while the keyboard is up", async () => {
+    mockIsIos.current = false
+    renderScreen(intraledgerDestination())
+    await settle()
+    expect(screenProps().avoidKeyboardOnAndroid).toBe(true)
+    expect(screenProps().avoidKeyboardEnabled).toBe(false)
+
+    showKeyboard()
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+
+    hideKeyboard()
+    expect(screenProps().avoidKeyboardEnabled).toBe(false)
+  })
+
+  /** iOS settles back by itself and needs the lift on as the keyboard starts to move. */
+  it("keeps the lift on for iOS", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+    showKeyboard()
+    hideKeyboard()
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+  })
+
+  it("drops the bottom inset the keyboard covers", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    expect(screenProps().edges).toEqual(["left", "right", "bottom"])
+
+    showKeyboard()
+    expect(screenProps().edges).toEqual(["left", "right"])
+
+    hideKeyboard()
+    expect(screenProps().edges).toEqual(["left", "right", "bottom"])
+  })
+
+  it("scrolls to the note as the screen shrinks and the note grows", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const scrollToEnd = scrollView().instance.scrollToEnd as jest.Mock
+    scrollToEnd.mockClear()
+
+    fireEvent(scrollView(), "layout", { nativeEvent: { layout: { height: 600 } } })
+    expect(scrollToEnd).not.toHaveBeenCalled()
+
+    showKeyboard()
+    fireEvent(scrollView(), "layout", { nativeEvent: { layout: { height: 300 } } })
+    fireEvent(scrollView(), "contentSizeChange", 360, 520)
+    expect(scrollToEnd).toHaveBeenCalledTimes(2)
+  })
+
+  /** A fixed amount has no keypad to hand over, but the note still rides the keyboard. */
+  it("keeps the note in view for a fixed amount too", async () => {
+    renderScreen(invoiceDestination)
+    await settle()
+    const scrollToEnd = scrollView().instance.scrollToEnd as jest.Mock
+    scrollToEnd.mockClear()
+
+    showKeyboard()
+    fireEvent(scrollView(), "layout", { nativeEvent: { layout: { height: 300 } } })
+
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+    expect(scrollToEnd).toHaveBeenCalledTimes(1)
+    expect(within(nextButton()).getByText(LL.common.next())).toBeTruthy()
   })
 })
