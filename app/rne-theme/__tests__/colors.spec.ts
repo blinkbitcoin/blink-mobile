@@ -1,3 +1,6 @@
+import fs from "fs"
+import path from "path"
+
 import { light, dark } from "../colors"
 
 // During the token migration (see app/rne-theme/colors.ts), every legacy color
@@ -63,5 +66,26 @@ describe("color token aliases", () => {
 
   it("keeps light and dark key sets identical", () => {
     expect(Object.keys(light).sort()).toEqual(Object.keys(dark).sort())
+  })
+})
+
+describe("static token lint guard", () => {
+  // .eslintrc.json is JSON with comments, so read the restricted names as text
+  // instead of parsing the file.
+  const eslintrc = fs.readFileSync(
+    path.resolve(__dirname, "../../../.eslintrc.json"),
+    "utf8",
+  )
+
+  it("errors on every static token outside the allowlist", () => {
+    const rule = eslintrc.match(/"no-restricted-properties": \[\s*"error",([\s\S]*?)\]/)
+    expect(rule).not.toBeNull()
+
+    const restricted = [...(rule?.[1] ?? "").matchAll(/"property": "(\w+)"/g)].map(
+      ([, name]) => name,
+    )
+    const staticKeys = Object.keys(light).filter((key) => key.startsWith("static"))
+
+    expect(restricted.sort()).toEqual(staticKeys.sort())
   })
 })
