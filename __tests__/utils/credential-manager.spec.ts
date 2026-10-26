@@ -94,10 +94,17 @@ describe("mapCredentialError", () => {
 
 describe("setup key entries", () => {
   it("names the entry after its account, and tells it from a wallet backup", () => {
-    const name = setupKeyCredentialName("someone")
+    const name = setupKeyCredentialName("someone", { id: "Main", name: "Blink" })
 
     expect(name).toBe("someone (2FA)")
     expect(isSetupKeyCredential(name)).toBe(true)
     expect(isSetupKeyCredential("wallet-identifier")).toBe(false)
+  })
+
+  it("leads with the instance's name outside production, still told from a wallet backup", () => {
+    const name = setupKeyCredentialName("someone", { id: "Staging", name: "Staging" })
+
+    expect(name).toBe("Staging: someone (2FA)")
+    expect(isSetupKeyCredential(name)).toBe(true)
   })
 })

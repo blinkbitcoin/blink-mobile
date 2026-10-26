@@ -22,6 +22,11 @@ jest.mock("@app/graphql/generated", () => ({
   useTotpRegistrationScreenQuery: () => ({ data: mockMe ? { me: mockMe } : undefined }),
 }))
 
+let mockGaloyInstance = { id: "Main", name: "Blink" }
+jest.mock("@app/hooks", () => ({
+  useAppConfig: () => ({ appConfig: { galoyInstance: mockGaloyInstance } }),
+}))
+
 const mockLogBackupOption = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
   logSetupKeyBackupOptionSelected: (...args: unknown[]) => mockLogBackupOption(...args),
@@ -63,6 +68,7 @@ describe("useSetupKeyBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMe = { id: "user-id", username: "someone" }
+    mockGaloyInstance = { id: "Main", name: "Blink" }
     jest.replaceProperty(Platform, "OS", "android")
     mockSavePasswordCredential.mockResolvedValue({ success: true })
   })
@@ -103,6 +109,18 @@ describe("useSetupKeyBackup", () => {
     await saveWith()
 
     expect(mockSavePasswordCredential).toHaveBeenCalledWith("user-id (2FA)", SECRET)
+  })
+
+  /** A staging account's key is never taken for the production account's. */
+  it("names the instance the account is on outside production", async () => {
+    mockGaloyInstance = { id: "Staging", name: "Staging" }
+
+    await saveWith()
+
+    expect(mockSavePasswordCredential).toHaveBeenCalledWith(
+      "Staging: someone (2FA)",
+      SECRET,
+    )
   })
 
   /** The user id comes with the accepted code, so the account never goes unnamed. */

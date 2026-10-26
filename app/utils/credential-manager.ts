@@ -1,5 +1,7 @@
 import { signUpWithPassword } from "react-native-credentials-manager"
 
+import { GaloyInstance } from "@app/config"
+
 export const CredentialError = {
   NoProvider: "no-provider",
   UserCancelled: "user-cancelled",
@@ -39,9 +41,17 @@ export const mapCredentialError = (err: unknown): CredentialError => {
  *  backups the same password manager holds for Blink. */
 const SETUP_KEY_CREDENTIAL_SUFFIX = " (2FA)"
 
-/** The name a two-factor setup key is saved under: its account, and what it is for. */
-export const setupKeyCredentialName = (account: string): string =>
-  `${account}${SETUP_KEY_CREDENTIAL_SUFFIX}`
+/** The name a two-factor setup key is saved under: its account, and what it is for. A key
+ *  for any instance but production leads with that instance's name, as its authenticator
+ *  entry does, so it is never taken for the production account's. */
+export const setupKeyCredentialName = (
+  account: string,
+  { id, name }: Pick<GaloyInstance, "id" | "name">,
+): string => {
+  const isProductionInstance = id === "Main"
+  if (isProductionInstance) return `${account}${SETUP_KEY_CREDENTIAL_SUFFIX}`
+  return `${name}: ${account}${SETUP_KEY_CREDENTIAL_SUFFIX}`
+}
 
 /** Whether a saved entry is a two-factor setup key rather than a wallet backup: reading
  *  Blink's passwords back offers both. */

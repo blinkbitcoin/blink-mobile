@@ -3,6 +3,7 @@ import { Platform } from "react-native"
 
 import { authenticatorAccountLabel, compactSetupKey } from "@app/components/totp-export"
 import { useTotpRegistrationScreenQuery } from "@app/graphql/generated"
+import { useAppConfig } from "@app/hooks"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -73,16 +74,19 @@ export const useSetupKeyBackup = ({
    *  authenticator's entry names it. */
   const { data } = useTotpRegistrationScreenQuery()
   const account = authenticatorAccountLabel({ id: userId, username: data?.me?.username })
+  const {
+    appConfig: { galoyInstance },
+  } = useAppConfig()
 
-  /** Saved as a password whose username names the account and what it is for, apart
-   *  from the wallet backups the same manager may hold, and whose password is the key as
-   *  an authenticator takes it in. */
+  /** Saved as a password whose username names the account, its instance outside
+   *  production, and what it is for, apart from the wallet backups the same manager may
+   *  hold, and whose password is the key as an authenticator takes it in. */
   const save = useCallback(async () => {
     logSetupKeyBackupOptionSelected({ option: SetupKeyBackupOption.PasswordManager })
     const canRaiseSaveSheet = Platform.OS === "android"
     const result = canRaiseSaveSheet
       ? await savePasswordCredential(
-          setupKeyCredentialName(account),
+          setupKeyCredentialName(account, galoyInstance),
           compactSetupKey(secret),
         )
       : UNSUPPORTED
@@ -95,7 +99,7 @@ export const useSetupKeyBackup = ({
       type: "success",
       LL,
     })
-  }, [account, secret, LL])
+  }, [account, galoyInstance, secret, LL])
 
   /** A second tap while the sheet is coming up would raise another. */
   const { run } = useInFlightGuard()
