@@ -1864,7 +1864,7 @@ const mocks = [
   {
     request: {
       query: BulletinsDocument,
-      variables: { first: 10 },
+      variables: { first: 50 },
     },
     result: {
       data: {
