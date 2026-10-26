@@ -92,9 +92,9 @@ const encodeQueryNodesResponse = (nodes: TestNode[], offset = 0): Uint8Array => 
       new ProtoWriter().string(1, node.id).bytes(2, encodeTreeNode(node)).finish(),
     )
   }
-  // offset omitted (0) terminates the exporter's paging loop; a positive
-  // offset (field 2 varint, mirroring decodeQueryNodesResponse) signals
-  // another page
+  // -1 or an omitted offset (0) ends the exporter's paging loop; a positive
+  // offset (field 2 varint, mirroring decodeQueryNodesResponse) is where the
+  // next owner page starts
   return writer.varint(2, offset).finish()
 }
 
@@ -121,6 +121,25 @@ const encodeVerifyResponse = (): Uint8Array =>
 
 type OwnerQueryPage = { nodes: TestNode[]; offset: number }
 
+const LAST_PAGE_OFFSET = -1
+
+/**
+ * Owner pages served the way the operator's query_nodes handler builds them:
+ * the owned rows are sliced by offset and limit, their ancestors are merged
+ * into the same page, and the next offset counts owned rows only, or is -1
+ * once a page comes back short.
+ */
+const operatorOwnerPages =
+  (ownedNodes: TestNode[], ancestorsOf: (node: TestNode) => TestNode[]) =>
+  (requestOffset: number, requestLimit: number): OwnerQueryPage => {
+    const owned = ownedNodes.slice(requestOffset, requestOffset + requestLimit)
+    const isShortPage = owned.length < requestLimit
+    return {
+      nodes: [...owned, ...owned.flatMap(ancestorsOf)],
+      offset: isShortPage ? LAST_PAGE_OFFSET : requestOffset + owned.length,
+    }
+  }
+
 /** Mounts a fake operator behind global.fetch. */
 const mockOperator = ({
   ownerQueryNodes,
@@ -128,8 +147,8 @@ const mockOperator = ({
   byIdNodes,
 }: {
   ownerQueryNodes?: TestNode[]
-  /** Per-request owner-query pages, keyed by the offset the request carried. */
-  ownerQueryPage?: (requestOffset: number) => OwnerQueryPage
+  /** Per-request owner-query pages, keyed by the offset and limit the request carried. */
+  ownerQueryPage?: (requestOffset: number, requestLimit: number) => OwnerQueryPage
   byIdNodes: Record<string, TestNode>
 }) => {
   const byIdRequests: string[][] = []
@@ -171,10 +190,11 @@ const mockOperator = ({
       const nodeIdsField = lastField(request, 2)
       if (!nodeIdsField?.bytes) {
         const requestOffset = Number(lastField(request, 5)?.varint ?? 0n)
+        const requestLimit = Number(lastField(request, 4)?.varint ?? 0n)
         ownerQueryOffsets.push(requestOffset)
         const page = ownerQueryPage
-          ? ownerQueryPage(requestOffset)
-          : { nodes: ownerQueryNodes ?? [], offset: 0 }
+          ? ownerQueryPage(requestOffset, requestLimit)
+          : { nodes: ownerQueryNodes ?? [], offset: LAST_PAGE_OFFSET }
         return respond(encodeQueryNodesResponse(page.nodes, page.offset))
       }
       const requestedIds = decodeFields(nodeIdsField.bytes).map((f) =>
@@ -408,26 +428,29 @@ describe("fetchRecoveryBundle", () => {
     expect(bundle.leaves.map((l) => l.status)).toEqual(["AVAILABLE", "AVAILABLE"])
   })
 
-  it("pages through the owner query until the operator returns offset 0", async () => {
-    const pageOneLeaf: TestNode = {
-      id: "leaf-page-1",
-      valueSats: 100,
-      owner: identity,
-      available: true,
-    }
-    const pageTwoLeaf: TestNode = {
-      id: "leaf-page-2",
-      valueSats: 200,
-      owner: identity,
-      available: true,
-    }
+  it("resumes each owner page at the operator's offset when ancestors share the page", async () => {
+    const rootIdOf = (leafId: string) => leafId.replace("leaf", "root")
+    const leaves = Array.from({ length: 150 }, (_, index): TestNode => {
+      const id = `leaf-${String(index).padStart(3, "0")}`
+      return {
+        id,
+        valueSats: 1000,
+        parentNodeId: rootIdOf(id),
+        owner: identity,
+        available: true,
+      }
+    })
+    const rootOf = (leaf: TestNode): TestNode[] => [
+      {
+        id: rootIdOf(leaf.id),
+        valueSats: leaf.valueSats,
+        owner: otherOwner,
+        available: false,
+      },
+    ]
 
-    // Positive response offset means more pages; 0 means this page is the last
-    const { ownerQueryOffsets } = mockOperator({
-      ownerQueryPage: (requestOffset) =>
-        requestOffset === 0
-          ? { nodes: [pageOneLeaf], offset: 100 }
-          : { nodes: [pageTwoLeaf], offset: 0 },
+    const { ownerQueryOffsets, byIdRequests } = mockOperator({
+      ownerQueryPage: operatorOwnerPages(leaves, rootOf),
       byIdNodes: {},
     })
 
@@ -437,44 +460,55 @@ describe("fetchRecoveryBundle", () => {
       appVersion: "1.0.1-test",
     })
 
-    // The next request skips exactly the nodes already returned (1), not the
-    // requested limit: a short page must re-request its unreturned tail.
-    expect(ownerQueryOffsets).toEqual([0, 1])
-    expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-page-1", "leaf-page-2"])
-    expect(bundle.balances.btcSats).toBe("300")
+    expect(ownerQueryOffsets).toEqual([0, 100])
+    expect(byIdRequests).toEqual([])
+    expect(bundle.leaves).toHaveLength(150)
+    expect(bundle.nodes).toHaveLength(300)
+    expect(bundle.balances.btcSats).toBe("150000")
   })
 
-  it("does not skip nodes when a page is shorter than the requested limit", async () => {
-    // 60 leaves on the first page with a positive offset ("more pages"), the
-    // remaining 40 only reachable at request offset 60. Advancing by the
-    // limit (100) would skip them and persist an incomplete bundle.
-    const makeLeaf = (index: number): TestNode => ({
-      id: `leaf-${String(index).padStart(3, "0")}`,
-      valueSats: 10,
+  it("refuses an owner offset that does not move forward", async () => {
+    const leaf: TestNode = {
+      id: "leaf-stalled",
+      valueSats: 1,
       owner: identity,
       available: true,
-    })
-    const firstBatch = Array.from({ length: 60 }, (_, i) => makeLeaf(i))
-    const secondBatch = Array.from({ length: 40 }, (_, i) => makeLeaf(60 + i))
-
+    }
     const { ownerQueryOffsets } = mockOperator({
-      ownerQueryPage: (requestOffset) => {
-        if (requestOffset === 0) return { nodes: firstBatch, offset: 60 }
-        if (requestOffset === 60) return { nodes: secondBatch, offset: 0 }
-        return { nodes: [], offset: 0 }
-      },
+      ownerQueryPage: () => ({ nodes: [leaf], offset: 100 }),
       byIdNodes: {},
     })
 
-    const bundle = await fetchRecoveryBundle({
-      mnemonic: TEST_MNEMONIC,
-      network: Network.Mainnet,
-      appVersion: "1.0.1-test",
+    await expect(
+      fetchRecoveryBundle({
+        mnemonic: TEST_MNEMONIC,
+        network: Network.Mainnet,
+        appVersion: "1.0.1-test",
+      }),
+    ).rejects.toMatchObject({ reason: "invalid-page-offset" })
+    expect(ownerQueryOffsets).toEqual([0, 100])
+  })
+
+  it("refuses an owner offset that jumps past the rows one page can hold", async () => {
+    const leaf: TestNode = {
+      id: "leaf-jumped",
+      valueSats: 1,
+      owner: identity,
+      available: true,
+    }
+    const { ownerQueryOffsets } = mockOperator({
+      ownerQueryPage: () => ({ nodes: [leaf], offset: 101 }),
+      byIdNodes: {},
     })
 
-    expect(ownerQueryOffsets).toEqual([0, 60])
-    expect(bundle.leaves).toHaveLength(100)
-    expect(bundle.balances.btcSats).toBe("1000")
+    await expect(
+      fetchRecoveryBundle({
+        mnemonic: TEST_MNEMONIC,
+        network: Network.Mainnet,
+        appVersion: "1.0.1-test",
+      }),
+    ).rejects.toMatchObject({ reason: "invalid-page-offset" })
+    expect(ownerQueryOffsets).toEqual([0])
   })
 
   it("refuses a bundle whose ancestor chain contains a parent cycle", async () => {
@@ -621,9 +655,9 @@ describe("fetchRecoveryBundle", () => {
       owner: identity,
       available: true,
     }
-    // Every page is non-empty with a positive offset, promising more forever
+    // Every page is non-empty and moves the offset forward, promising more forever
     mockOperator({
-      ownerQueryPage: () => ({ nodes: [leaf], offset: 100 }),
+      ownerQueryPage: (requestOffset) => ({ nodes: [leaf], offset: requestOffset + 1 }),
       byIdNodes: {},
     })
 
