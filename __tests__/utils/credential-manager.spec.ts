@@ -2,8 +2,10 @@ import { signUpWithPassword } from "react-native-credentials-manager"
 
 import {
   CredentialError,
+  isSetupKeyCredential,
   mapCredentialError,
   savePasswordCredential,
+  setupKeyCredentialName,
 } from "@app/utils/credential-manager"
 
 describe("savePasswordCredential", () => {
@@ -87,5 +89,15 @@ describe("mapCredentialError", () => {
   it("reads any other failure as unknown", () => {
     expect(mapCredentialError(new Error("SOMETHING_ELSE"))).toBe(CredentialError.Unknown)
     expect(mapCredentialError("not an error")).toBe(CredentialError.Unknown)
+  })
+})
+
+describe("setup key entries", () => {
+  it("names the entry after its account, and tells it from a wallet backup", () => {
+    const name = setupKeyCredentialName("someone")
+
+    expect(name).toBe("someone (2FA)")
+    expect(isSetupKeyCredential(name)).toBe(true)
+    expect(isSetupKeyCredential("wallet-identifier")).toBe(false)
   })
 })

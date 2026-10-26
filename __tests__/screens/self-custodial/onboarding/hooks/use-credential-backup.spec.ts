@@ -241,6 +241,23 @@ describe("useCredentialBackup", () => {
       })
     })
 
+    /** The password manager offers every password saved for Blink. */
+    it("finds no wallet backup in an authenticator's setup key picked from the list", async () => {
+      mockSignIn.mockResolvedValue({
+        type: "password",
+        username: "someone (2FA)",
+        password: "ABCDEFGHIJKL",
+      })
+
+      const { result } = renderHook(() => useCredentialBackup())
+      let readResult
+      await act(async () => {
+        readResult = await result.current.read()
+      })
+
+      expect(readResult).toEqual({ success: false, error: CredentialError.NoProvider })
+    })
+
     it("classifies cancellation errors", async () => {
       mockSignIn.mockRejectedValue(new Error("user CANCELLED"))
 

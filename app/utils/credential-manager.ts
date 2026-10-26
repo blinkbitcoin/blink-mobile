@@ -35,6 +35,19 @@ export const mapCredentialError = (err: unknown): CredentialError => {
   return classify(err.message)
 }
 
+/** What the name of a two-factor setup key's entry ends with, apart from the wallet
+ *  backups the same password manager holds for Blink. */
+const SETUP_KEY_CREDENTIAL_SUFFIX = " (2FA)"
+
+/** The name a two-factor setup key is saved under: its account, and what it is for. */
+export const setupKeyCredentialName = (account: string): string =>
+  `${account}${SETUP_KEY_CREDENTIAL_SUFFIX}`
+
+/** Whether a saved entry is a two-factor setup key rather than a wallet backup: reading
+ *  Blink's passwords back offers both. */
+export const isSetupKeyCredential = (username: string): boolean =>
+  username.endsWith(SETUP_KEY_CREDENTIAL_SUFFIX)
+
 /**
  * Saves a username and password through Android's Credential Manager, whose system sheet
  * the user's password manager answers (Google Password Manager, Bitwarden and the like).

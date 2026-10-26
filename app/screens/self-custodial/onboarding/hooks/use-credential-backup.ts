@@ -8,6 +8,7 @@ import { BLINK_DOMAIN } from "@app/config/appinfo"
 import {
   CredentialError,
   CredentialSaveResult,
+  isSetupKeyCredential,
   mapCredentialError,
   savePasswordCredential,
 } from "@app/utils/credential-manager"
@@ -56,6 +57,11 @@ const saveIOS = async (
 const readAndroid = async (): Promise<CredentialReadResult> => {
   try {
     const credential = await signIn(["password"] as const, {})
+    /** The password manager offers every password saved for Blink, the authenticator's
+     *  setup keys among them, which are no wallet backup. */
+    if (isSetupKeyCredential(credential.username)) {
+      return { success: false, error: CredentialError.NoProvider }
+    }
     return {
       success: true,
       walletIdentifier: credential.username,

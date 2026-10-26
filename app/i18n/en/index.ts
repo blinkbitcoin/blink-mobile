@@ -4312,9 +4312,9 @@ const en: BaseTranslation = {
       "If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.",
     saveToPasswordManager: "Save to a password manager",
     copyForManualBackup: "Copy for manual backup",
+    passwordManagerUnavailable:
+      "No password manager available on this device. Copy the key for a manual backup instead.",
     savedIt: "I've saved it",
-    keyBackupText:
-      "Blink authenticator setup key\n\nAccount: {account: string}\nSetup key: {key: string}\n\nIf you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.",
     protectedTitle: "Your account is now protected",
     protectedDescription:
       "From now on, logging in needs a one-time code from your authenticator app.",

@@ -1,5 +1,5 @@
 import React from "react"
-import { Share } from "react-native"
+import { Platform } from "react-native"
 import { act, renderHook } from "@testing-library/react-native"
 
 import TypesafeI18n from "@app/i18n/i18n-react"
@@ -27,68 +27,189 @@ jest.mock("@app/utils/analytics", () => ({
   logSetupKeyBackupOptionSelected: (...args: unknown[]) => mockLogBackupOption(...args),
 }))
 
+const mockSavePasswordCredential = jest.fn()
+jest.mock("@app/utils/credential-manager", () => ({
+  ...jest.requireActual("@app/utils/credential-manager"),
+  savePasswordCredential: (...args: unknown[]) => mockSavePasswordCredential(...args),
+}))
+
 const mockReportError = jest.fn()
 jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
 const wrapper = ({ children }: { children: React.ReactNode }) => (
   <TypesafeI18n locale="en">{children}</TypesafeI18n>
 )
 
-const renderBackup = () =>
-  renderHook(() => useSetupKeyBackup({ secret: SECRET, userId: "user-id" }), { wrapper })
+const renderBackup = (secret = SECRET) =>
+  renderHook(() => useSetupKeyBackup({ secret, userId: "user-id" }), { wrapper })
 
-const backupTextFor = (account: string) =>
-  LL.AuthenticatorOnboarding.keyBackupText({ account, key: SECRET })
+const saveWith = async (secret?: string) => {
+  const { result } = renderBackup(secret)
+  await act(() => result.current.saveToPasswordManager())
+}
 
+/** The toast's message, as the hook shows it. */
+const toastMessage = () => mockToastShow.mock.calls.at(-1)?.[0]?.message
+
+// eslint-disable-next-line max-lines-per-function -- one hook's suite, sharing the mocked save and toast above
 describe("useSetupKeyBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMe = { id: "user-id", username: "someone" }
+    jest.replaceProperty(Platform, "OS", "android")
+    mockSavePasswordCredential.mockResolvedValue({ success: true })
   })
 
-  /** The text names the account, so the saved entry says which one it is for. */
-  it("hands the key, with its account, to the share sheet for a password manager", async () => {
-    const share = jest.spyOn(Share, "share").mockResolvedValue({ action: "sharedAction" })
-    const { result } = renderBackup()
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
 
-    await act(() => result.current.saveToPasswordManager())
+  /** The password manager the user has answers the system sheet, as it does for the
+   *  self-custodial backup. */
+  it("saves the key as a password named after its account, and says so", async () => {
+    await saveWith()
 
-    expect(share).toHaveBeenCalledWith({ message: backupTextFor("someone") })
+    expect(mockSavePasswordCredential).toHaveBeenCalledWith("someone (2FA)", SECRET)
     expect(mockLogBackupOption).toHaveBeenCalledWith({ option: "password_manager" })
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.BackupScreen.BackupMethod.passwordManagerBackupSaved(),
+        type: "success",
+      }),
+    )
     expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  /** As an authenticator takes it in, and as the manual copy gives it. */
+  it("saves the key without the spaces it is shown with", async () => {
+    await saveWith("ABCD EFGH IJKL")
+
+    expect(mockSavePasswordCredential).toHaveBeenCalledWith(
+      "someone (2FA)",
+      "ABCDEFGHIJKL",
+    )
   })
 
   it("names the account by its user id while it has no username", async () => {
     mockMe = { id: "user-id", username: null }
-    const share = jest.spyOn(Share, "share").mockResolvedValue({ action: "sharedAction" })
-    const { result } = renderBackup()
 
-    await act(() => result.current.saveToPasswordManager())
+    await saveWith()
 
-    expect(share).toHaveBeenCalledWith({ message: backupTextFor("user-id") })
+    expect(mockSavePasswordCredential).toHaveBeenCalledWith("user-id (2FA)", SECRET)
   })
 
   /** The user id comes with the accepted code, so the account never goes unnamed. */
   it("names the account by the user id while the username is not in the cache", async () => {
     mockMe = undefined
-    const share = jest.spyOn(Share, "share").mockResolvedValue({ action: "sharedAction" })
-    const { result } = renderBackup()
 
-    await act(() => result.current.saveToPasswordManager())
+    await saveWith()
 
-    expect(share).toHaveBeenCalledWith({ message: backupTextFor("user-id") })
+    expect(mockSavePasswordCredential).toHaveBeenCalledWith("user-id (2FA)", SECRET)
   })
 
-  it("reports a share sheet that fails to open", async () => {
-    const failure = new Error("no activity")
-    jest.spyOn(Share, "share").mockRejectedValue(failure)
+  it("says nothing when the user declines the sheet", async () => {
+    mockSavePasswordCredential.mockResolvedValue({
+      success: false,
+      error: "user-cancelled",
+    })
+
+    await saveWith()
+
+    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("says there is no password manager, and to copy the key instead", async () => {
+    mockSavePasswordCredential.mockResolvedValue({ success: false, error: "no-provider" })
+
+    await saveWith()
+
+    expect(toastMessage()).toBe(LL.AuthenticatorOnboarding.passwordManagerUnavailable())
+    expect(mockReportError).not.toHaveBeenCalled()
+  })
+
+  it("says the same where saving is unsupported", async () => {
+    mockSavePasswordCredential.mockResolvedValue({ success: false, error: "unsupported" })
+
+    await saveWith()
+
+    expect(toastMessage()).toBe(LL.AuthenticatorOnboarding.passwordManagerUnavailable())
+  })
+
+  it("reports a save that fails, with its cause, and says it failed", async () => {
+    const failure = new Error("Something broke")
+    mockSavePasswordCredential.mockResolvedValue({
+      success: false,
+      error: "unknown",
+      cause: failure,
+    })
+
+    await saveWith()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Setup key password manager save",
+      failure,
+    )
+    expect(toastMessage()).toBe(
+      LL.BackupScreen.BackupMethod.passwordManagerBackupFailed(),
+    )
+  })
+
+  it("reports the failure itself when the save hands back no cause", async () => {
+    mockSavePasswordCredential.mockResolvedValue({ success: false, error: "unknown" })
+
+    await saveWith()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Setup key password manager save",
+      "unknown",
+    )
+  })
+
+  /** A credential error added without its message fails loudly rather than say
+   *  nothing. */
+  it("throws on a credential error it does not know", async () => {
+    mockSavePasswordCredential.mockResolvedValue({ success: false, error: "bogus" })
     const { result } = renderBackup()
 
-    await act(() => result.current.saveToPasswordManager())
+    await expect(result.current.saveToPasswordManager()).rejects.toThrow(
+      "Unknown credential error: bogus",
+    )
+  })
 
-    expect(mockReportError).toHaveBeenCalledWith("Setup key share", failure)
+  it("raises one sheet when tapped twice in a row", async () => {
+    let finish: (value: unknown) => void = () => {}
+    mockSavePasswordCredential.mockReturnValue(
+      new Promise((resolve) => {
+        finish = resolve
+      }),
+    )
+    const { result } = renderBackup()
+
+    await act(async () => {
+      result.current.saveToPasswordManager()
+      result.current.saveToPasswordManager()
+    })
+    await act(async () => finish({ success: true }))
+
+    expect(mockSavePasswordCredential).toHaveBeenCalledTimes(1)
+  })
+
+  /** The screen offers it on Android only; iOS has no API that raises its save sheet. */
+  it("saves nothing on iOS, and says the password manager is unavailable", async () => {
+    jest.replaceProperty(Platform, "OS", "ios")
+
+    await saveWith()
+
+    expect(mockSavePasswordCredential).not.toHaveBeenCalled()
+    expect(toastMessage()).toBe(LL.AuthenticatorOnboarding.passwordManagerUnavailable())
   })
 
   it("reports a manual copy as the option used, and nothing more", () => {

@@ -13688,20 +13688,13 @@ type RootTranslation = {
 		 */
 		copyForManualBackup: string
 		/**
+		 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​C​o​p​y​ ​t​h​e​ ​k​e​y​ ​f​o​r​ ​a​ ​m​a​n​u​a​l​ ​b​a​c​k​u​p​ ​i​n​s​t​e​a​d​.
+		 */
+		passwordManagerUnavailable: string
+		/**
 		 * I​'​v​e​ ​s​a​v​e​d​ ​i​t
 		 */
 		savedIt: string
-		/**
-		 * B​l​i​n​k​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​s​e​t​u​p​ ​k​e​y​
-	​
-	​A​c​c​o​u​n​t​:​ ​{​a​c​c​o​u​n​t​}​
-	​S​e​t​u​p​ ​k​e​y​:​ ​{​k​e​y​}​
-	​
-	​I​f​ ​y​o​u​ ​l​o​s​e​ ​y​o​u​r​ ​p​h​o​n​e​,​ ​a​d​d​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​t​o​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​g​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​l​o​g​i​n​ ​c​o​d​e​s​ ​b​a​c​k​.​ ​A​n​y​o​n​e​ ​w​i​t​h​ ​t​h​i​s​ ​k​e​y​ ​c​a​n​ ​m​a​k​e​ ​y​o​u​r​ ​c​o​d​e​s​,​ ​s​o​ ​k​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
-		 * @param {string} account
-		 * @param {string} key
-		 */
-		keyBackupText: RequiredParams<'account' | 'key'>
 		/**
 		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​w​ ​p​r​o​t​e​c​t​e​d
 		 */
@@ -27601,18 +27594,13 @@ export type TranslationFunctions = {
 		 */
 		copyForManualBackup: () => LocalizedString
 		/**
+		 * No password manager available on this device. Copy the key for a manual backup instead.
+		 */
+		passwordManagerUnavailable: () => LocalizedString
+		/**
 		 * I've saved it
 		 */
 		savedIt: () => LocalizedString
-		/**
-		 * Blink authenticator setup key
-
-	Account: {account}
-	Setup key: {key}
-
-	If you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.
-		 */
-		keyBackupText: (arg: { account: string, key: string }) => LocalizedString
 		/**
 		 * Your account is now protected
 		 */

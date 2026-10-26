@@ -1,4 +1,5 @@
 import React from "react"
+import { Platform } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -67,6 +68,25 @@ describe("SetupKeyBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
+    jest.replaceProperty(Platform, "OS", "android")
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  /** As the self-custodial backup offers it: iOS has no API that raises its save
+   *  sheet, so the key is copied there. */
+  it("offers no password manager on iOS, only the copy", async () => {
+    jest.replaceProperty(Platform, "OS", "ios")
+    await renderScreen()
+
+    expect(
+      screen.queryByText(LL.AuthenticatorOnboarding.saveToPasswordManager()),
+    ).toBeNull()
+    expect(
+      screen.getByText(LL.AuthenticatorOnboarding.copyForManualBackup()),
+    ).toBeTruthy()
   })
 
   it("asks to keep the key off this phone, with every way to do it", async () => {
