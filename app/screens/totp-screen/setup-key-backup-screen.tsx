@@ -1,5 +1,5 @@
 import React, { useCallback } from "react"
-import { Platform, View } from "react-native"
+import { View } from "react-native"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -41,9 +41,13 @@ export const SetupKeyBackupScreen: React.FC = () => {
       NativeStackNavigationProp<RootStackParamList, "totpRegistrationBackup">
     >()
   const { params } = useRoute<RouteProp<RootStackParamList, "totpRegistrationBackup">>()
-  const { saveToPasswordManager, reportManualCopy } = useSetupKeyBackup(params)
-  /** As the self-custodial backup offers it: iOS has no API that raises its save sheet. */
-  const isNonIosPlatform = Platform.OS !== "ios"
+  const { saveToPasswordManager, canRaiseSaveSheet, reportManualCopy } =
+    useSetupKeyBackup(params)
+  /** Says what the row does: a save where the system takes the key, a share where the
+   *  user picks their password manager from the share sheet. */
+  const passwordManagerTitle = canRaiseSaveSheet
+    ? LL.AuthenticatorOnboarding.saveToPasswordManager()
+    : LL.AuthenticatorOnboarding.shareToPasswordManager()
 
   /** The done screen takes this one's place: once the user says the key is kept, no way
    *  back from there shows it again. */
@@ -72,16 +76,14 @@ export const SetupKeyBackupScreen: React.FC = () => {
         }
       />
       <View style={styles.body}>
-        {isNonIosPlatform && (
-          <View style={styles.option}>
-            <SettingItemRow
-              leftIcon="key-outline"
-              leftIconSize={OPTION_ICON_SIZE}
-              title={LL.AuthenticatorOnboarding.saveToPasswordManager()}
-              onPress={saveToPasswordManager}
-            />
-          </View>
-        )}
+        <View style={styles.option}>
+          <SettingItemRow
+            leftIcon="key-outline"
+            leftIconSize={OPTION_ICON_SIZE}
+            title={passwordManagerTitle}
+            onPress={saveToPasswordManager}
+          />
+        </View>
         <View style={styles.manualCopy}>
           <Text type="p3" style={styles.manualCopyLabel}>
             {LL.AuthenticatorOnboarding.copyForManualBackup()}

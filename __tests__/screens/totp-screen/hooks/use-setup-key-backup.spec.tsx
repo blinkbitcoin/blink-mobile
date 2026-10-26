@@ -1,5 +1,5 @@
 import React from "react"
-import { Platform } from "react-native"
+import { Platform, Share } from "react-native"
 import { act, renderHook } from "@testing-library/react-native"
 
 import TypesafeI18n from "@app/i18n/i18n-react"
@@ -79,6 +79,12 @@ describe("useSetupKeyBackup", () => {
 
   /** The password manager the user has answers the system sheet, as it does for the
    *  self-custodial backup. */
+  it("says the system's save sheet takes the key on Android", () => {
+    const { result } = renderBackup()
+
+    expect(result.current.canRaiseSaveSheet).toBe(true)
+  })
+
   it("saves the key as a password named after its account, and says so", async () => {
     await saveWith()
 
@@ -220,14 +226,45 @@ describe("useSetupKeyBackup", () => {
     expect(mockSavePasswordCredential).toHaveBeenCalledTimes(1)
   })
 
-  /** The screen offers it on Android only; iOS has no API that raises its save sheet. */
-  it("saves nothing on iOS, and says the password manager is unavailable", async () => {
-    jest.replaceProperty(Platform, "OS", "ios")
+  /** iOS has no API that raises its save sheet: the user picks their password manager
+   *  from the share sheet instead. */
+  describe("on iOS", () => {
+    beforeEach(() => {
+      jest.replaceProperty(Platform, "OS", "ios")
+    })
 
-    await saveWith()
+    it("says the system's save sheet cannot take the key", () => {
+      const { result } = renderBackup()
 
-    expect(mockSavePasswordCredential).not.toHaveBeenCalled()
-    expect(toastMessage()).toBe(LL.AuthenticatorOnboarding.passwordManagerUnavailable())
+      expect(result.current.canRaiseSaveSheet).toBe(false)
+    })
+
+    it("hands the key, with its account, to the share sheet", async () => {
+      const share = jest
+        .spyOn(Share, "share")
+        .mockResolvedValue({ action: "sharedAction" })
+
+      await saveWith("ABCD EFGH IJKL")
+
+      expect(share).toHaveBeenCalledWith({
+        message: LL.AuthenticatorOnboarding.keyBackupText({
+          account: "someone",
+          key: "ABCDEFGHIJKL",
+        }),
+      })
+      expect(mockSavePasswordCredential).not.toHaveBeenCalled()
+      expect(mockLogBackupOption).toHaveBeenCalledWith({ option: "password_manager" })
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+
+    it("reports a share sheet that fails to open", async () => {
+      const failure = new Error("no activity")
+      jest.spyOn(Share, "share").mockRejectedValue(failure)
+
+      await saveWith()
+
+      expect(mockReportError).toHaveBeenCalledWith("Setup key share", failure)
+    })
   })
 
   it("reports a manual copy as the option used, and nothing more", () => {

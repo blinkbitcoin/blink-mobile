@@ -1,5 +1,4 @@
 import React from "react"
-import { Platform } from "react-native"
 import { fireEvent, render, screen } from "@testing-library/react-native"
 
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -43,15 +42,16 @@ jest.mock("@app/hooks", () => ({
 
 const mockSaveToPasswordManager = jest.fn()
 const mockReportManualCopy = jest.fn()
-const mockBackup = {
-  saveToPasswordManager: mockSaveToPasswordManager,
-  reportManualCopy: mockReportManualCopy,
-}
+let mockCanRaiseSaveSheet = true
 const mockUseSetupKeyBackup = jest.fn()
 jest.mock("@app/screens/totp-screen/hooks/use-setup-key-backup", () => ({
   useSetupKeyBackup: (params: unknown) => {
     mockUseSetupKeyBackup(params)
-    return mockBackup
+    return {
+      saveToPasswordManager: mockSaveToPasswordManager,
+      canRaiseSaveSheet: mockCanRaiseSaveSheet,
+      reportManualCopy: mockReportManualCopy,
+    }
   },
 }))
 
@@ -68,25 +68,7 @@ describe("SetupKeyBackupScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     loadLocale("en")
-    jest.replaceProperty(Platform, "OS", "android")
-  })
-
-  afterEach(() => {
-    jest.restoreAllMocks()
-  })
-
-  /** As the self-custodial backup offers it: iOS has no API that raises its save
-   *  sheet, so the key is copied there. */
-  it("offers no password manager on iOS, only the copy", async () => {
-    jest.replaceProperty(Platform, "OS", "ios")
-    await renderScreen()
-
-    expect(
-      screen.queryByText(LL.AuthenticatorOnboarding.saveToPasswordManager()),
-    ).toBeNull()
-    expect(
-      screen.getByText(LL.AuthenticatorOnboarding.copyForManualBackup()),
-    ).toBeTruthy()
+    mockCanRaiseSaveSheet = true
   })
 
   it("asks to keep the key off this phone, with every way to do it", async () => {
@@ -125,6 +107,19 @@ describe("SetupKeyBackupScreen", () => {
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.saveToPasswordManager()))
+
+    expect(mockSaveToPasswordManager).toHaveBeenCalledTimes(1)
+  })
+
+  /** iOS: the row opens the share sheet, so it says share rather than promise a save. */
+  it("offers to share the key to a password manager where the system cannot save it", async () => {
+    mockCanRaiseSaveSheet = false
+    await renderScreen()
+
+    expect(
+      screen.queryByText(LL.AuthenticatorOnboarding.saveToPasswordManager()),
+    ).toBeNull()
+    fireEvent.press(screen.getByText(LL.AuthenticatorOnboarding.shareToPasswordManager()))
 
     expect(mockSaveToPasswordManager).toHaveBeenCalledTimes(1)
   })

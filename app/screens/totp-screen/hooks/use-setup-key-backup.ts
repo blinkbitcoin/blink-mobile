@@ -1,5 +1,5 @@
 import { useCallback } from "react"
-import { Platform } from "react-native"
+import { Platform, Share } from "react-native"
 
 import { authenticatorAccountLabel, compactSetupKey } from "@app/components/totp-export"
 import { useTotpRegistrationScreenQuery } from "@app/graphql/generated"
@@ -21,13 +21,11 @@ import { toastShow } from "@app/utils/toast"
 
 type SetupKeyBackup = {
   saveToPasswordManager: () => Promise<void>
+  /** Whether the system's save sheet takes the key, as on Android, rather than the share
+   *  sheet. */
+  canRaiseSaveSheet: boolean
   /** Reports a copy of the key for a manual backup. */
   reportManualCopy: () => void
-}
-
-const UNSUPPORTED: CredentialSaveResult = {
-  success: false,
-  error: CredentialError.Unsupported,
 }
 
 /** What a save that did not land says, as the self-custodial backup says it: nothing for
@@ -59,11 +57,12 @@ const showSaveErrorToast = (
 
 /**
  * The ways to keep a new authenticator's setup key off this phone: a password manager, or
- * a copy. The password manager is Android's, through the system's Credential Manager, as
- * the self-custodial backup saves to it; iOS has no API that raises its save sheet, so
- * the screen offers it on Android only. The backup is export only: Blink never reads it
- * back, and the key never goes to Blink's servers, logs or analytics, which report which
- * option was used and nothing more.
+ * a copy. On Android the password manager is reached through the system's Credential
+ * Manager, as the self-custodial backup saves to it; iOS has no API that raises its save
+ * sheet, so there the key goes to the share sheet, for the user to pick their password
+ * manager. The backup is export only: Blink never reads it back, and the key never goes
+ * to Blink's servers, logs or analytics, which report which option was used and nothing
+ * more.
  */
 export const useSetupKeyBackup = ({
   secret,
@@ -77,19 +76,36 @@ export const useSetupKeyBackup = ({
   const {
     appConfig: { galoyInstance },
   } = useAppConfig()
+  const canRaiseSaveSheet = Platform.OS === "android"
+
+  /** The key with the account it is for, so the entry the user saves says which one it
+   *  is. */
+  const share = useCallback(async () => {
+    try {
+      await Share.share({
+        message: LL.AuthenticatorOnboarding.keyBackupText({
+          account,
+          key: compactSetupKey(secret),
+        }),
+      })
+    } catch (err) {
+      reportError("Setup key share", err)
+    }
+  }, [account, secret, LL])
 
   /** Saved as a password whose username names the account, its instance outside
    *  production, and what it is for, apart from the wallet backups the same manager may
    *  hold, and whose password is the key as an authenticator takes it in. */
   const save = useCallback(async () => {
     logSetupKeyBackupOptionSelected({ option: SetupKeyBackupOption.PasswordManager })
-    const canRaiseSaveSheet = Platform.OS === "android"
-    const result = canRaiseSaveSheet
-      ? await savePasswordCredential(
-          setupKeyCredentialName(account, galoyInstance),
-          compactSetupKey(secret),
-        )
-      : UNSUPPORTED
+    if (!canRaiseSaveSheet) {
+      await share()
+      return
+    }
+    const result = await savePasswordCredential(
+      setupKeyCredentialName(account, galoyInstance),
+      compactSetupKey(secret),
+    )
     if (!result.success) {
       showSaveErrorToast(result, LL)
       return
@@ -99,7 +115,7 @@ export const useSetupKeyBackup = ({
       type: "success",
       LL,
     })
-  }, [account, galoyInstance, secret, LL])
+  }, [canRaiseSaveSheet, account, galoyInstance, secret, LL, share])
 
   /** A second tap while the sheet is coming up would raise another. */
   const { run } = useInFlightGuard()
@@ -111,5 +127,5 @@ export const useSetupKeyBackup = ({
     logSetupKeyBackupOptionSelected({ option: SetupKeyBackupOption.ManualCopy })
   }, [])
 
-  return { saveToPasswordManager, reportManualCopy }
+  return { saveToPasswordManager, canRaiseSaveSheet, reportManualCopy }
 }
