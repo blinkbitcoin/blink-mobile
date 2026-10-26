@@ -250,7 +250,7 @@ describe("TwoFactorEnforcementProvider", () => {
   })
 
   describe("tiers", () => {
-    it("stays quiet below the nudge threshold", async () => {
+    it("stays quiet below the suggested threshold", async () => {
       setAccount({ sats: 49_999, usdCents: 4_999 })
 
       const { result } = await renderEnforcement()
@@ -260,10 +260,10 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowSettingsBanner).toBe(false)
     })
 
-    it("shows the card and the banner at the nudge tier without two factors", async () => {
+    it("shows the card and the banner at the suggested tier without two factors", async () => {
       const { result } = await renderEnforcement()
 
-      expect(result.current.tier).toBe(TwoFactorTier.Nudge)
+      expect(result.current.tier).toBe(TwoFactorTier.Suggested)
       expect(result.current.shouldShowNudgeCard).toBe(true)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
@@ -273,33 +273,33 @@ describe("TwoFactorEnforcementProvider", () => {
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.tier).toBe(TwoFactorTier.Nudge)
+      expect(result.current.tier).toBe(TwoFactorTier.Suggested)
     })
 
-    it("keeps the banner at the required tier", async () => {
+    it("keeps the banner at the recommended tier", async () => {
       setAccount({ sats: 500_000 })
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.tier).toBe(TwoFactorTier.Required)
+      expect(result.current.tier).toBe(TwoFactorTier.Recommended)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
 
     /** The banner stays until the account holds two factors, whatever the tier: the
      *  setup it opens leads with the authenticator, which the highest tier asks for. */
-    it("keeps the card and the banner at the authenticator tier", async () => {
+    it("keeps the card and the banner at the enforced tier", async () => {
       setAccount({ sats: 5_000_000 })
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.tier).toBe(TwoFactorTier.Authenticator)
+      expect(result.current.tier).toBe(TwoFactorTier.Enforced)
       expect(result.current.shouldShowNudgeCard).toBe(true)
       expect(result.current.shouldShowSettingsBanner).toBe(true)
     })
 
-    it("keeps the banner at the authenticator tier once the card is dismissed", async () => {
+    it("keeps the banner at the enforced tier once the card is dismissed", async () => {
       setAccount({ sats: 5_000_000 })
-      storeRecord({ highestTier: TwoFactorTier.Authenticator, nudgeCardDismissed: true })
+      storeRecord({ highestTier: TwoFactorTier.Enforced, nudgeCardDismissed: true })
 
       const { result } = await renderEnforcement()
 
@@ -309,30 +309,33 @@ describe("TwoFactorEnforcementProvider", () => {
 
     it("keeps the highest tier the account ever reached", async () => {
       setAccount({ sats: 0 })
-      storeRecord({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: false })
+      storeRecord({ highestTier: TwoFactorTier.Recommended, nudgeCardDismissed: false })
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.tier).toBe(TwoFactorTier.Required)
+      expect(result.current.tier).toBe(TwoFactorTier.Recommended)
       expect(result.current.shouldShowNudgeCard).toBe(true)
       expect(mockSetItem).not.toHaveBeenCalled()
     })
 
     it("stores the tier the moment the balance crosses a higher threshold", async () => {
       setAccount({ sats: 500_000 })
-      storeRecord({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: true })
+      storeRecord({ highestTier: TwoFactorTier.Suggested, nudgeCardDismissed: true })
 
       const { result } = await renderEnforcement()
 
-      expect(result.current.tier).toBe(TwoFactorTier.Required)
+      expect(result.current.tier).toBe(TwoFactorTier.Recommended)
       expect(mockSetItem).toHaveBeenCalledWith(
         storageKeyFor(ACCOUNT_ID),
-        JSON.stringify({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: true }),
+        JSON.stringify({
+          highestTier: TwoFactorTier.Recommended,
+          nudgeCardDismissed: true,
+        }),
       )
     })
 
     it("does not rewrite a tier the record already holds", async () => {
-      storeRecord({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: false })
+      storeRecord({ highestTier: TwoFactorTier.Suggested, nudgeCardDismissed: false })
 
       await renderEnforcement()
 
@@ -414,7 +417,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
   describe("dismissal", () => {
     it("hides the card but not the banner once dismissed", async () => {
-      storeRecord({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: true })
+      storeRecord({ highestTier: TwoFactorTier.Suggested, nudgeCardDismissed: true })
 
       const { result } = await renderEnforcement()
 
@@ -430,17 +433,20 @@ describe("TwoFactorEnforcementProvider", () => {
       expect(result.current.shouldShowNudgeCard).toBe(false)
       expect(mockSetItem).toHaveBeenCalledWith(
         storageKeyFor(ACCOUNT_ID),
-        JSON.stringify({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: true }),
+        JSON.stringify({
+          highestTier: TwoFactorTier.Suggested,
+          nudgeCardDismissed: true,
+        }),
       )
       expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledTimes(1)
       expect(mockLogTwoFactorPromptDismissed).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Nudge,
+        tier: TwoFactorTier.Suggested,
         prompt: "home_card",
       })
     })
 
     it("keeps a dismissal that lands in the same pass as a tier raise", async () => {
-      storeRecord({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: false })
+      storeRecord({ highestTier: TwoFactorTier.Suggested, nudgeCardDismissed: false })
       const { result, rerender } = await renderEnforcement()
 
       setAccount({ sats: 500_000 })
@@ -450,10 +456,13 @@ describe("TwoFactorEnforcementProvider", () => {
       })
 
       expect(result.current.shouldShowNudgeCard).toBe(false)
-      expect(result.current.tier).toBe(TwoFactorTier.Required)
+      expect(result.current.tier).toBe(TwoFactorTier.Recommended)
       expect(mockSetItem).toHaveBeenLastCalledWith(
         storageKeyFor(ACCOUNT_ID),
-        JSON.stringify({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: true }),
+        JSON.stringify({
+          highestTier: TwoFactorTier.Recommended,
+          nudgeCardDismissed: true,
+        }),
       )
     })
 
@@ -493,7 +502,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
   describe("account switch", () => {
     it("never applies the previous account's record to the next one", async () => {
-      storeRecord({ highestTier: TwoFactorTier.Nudge, nudgeCardDismissed: true })
+      storeRecord({ highestTier: TwoFactorTier.Suggested, nudgeCardDismissed: true })
       const { result, rerender } = await renderEnforcement()
       expect(result.current.shouldShowNudgeCard).toBe(false)
 
@@ -517,9 +526,9 @@ describe("TwoFactorEnforcementProvider", () => {
     /** The tier reaches the context and the events, not only the prompts. */
     it("reports no tier from the previous account's record while the next one loads", async () => {
       setAccount({ sats: 0 })
-      storeRecord({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: false })
+      storeRecord({ highestTier: TwoFactorTier.Recommended, nudgeCardDismissed: false })
       const { result, rerender } = await renderEnforcement()
-      expect(result.current.tier).toBe(TwoFactorTier.Required)
+      expect(result.current.tier).toBe(TwoFactorTier.Recommended)
 
       mockGetItem.mockReturnValue(new Promise(() => {}))
       setAccount({ accountId: "custodial-account-2", sats: 0 })
@@ -538,7 +547,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
-        tier: TwoFactorTier.Nudge,
+        tier: TwoFactorTier.Suggested,
         prompt: "home_card",
       })
     })
@@ -551,7 +560,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(2)
       expect(mockLogTwoFactorPromptShown).toHaveBeenLastCalledWith({
-        tier: TwoFactorTier.Nudge,
+        tier: TwoFactorTier.Suggested,
         prompt: "settings_banner",
       })
     })
@@ -566,7 +575,7 @@ describe("TwoFactorEnforcementProvider", () => {
 
       expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(2)
       expect(mockLogTwoFactorPromptShown).toHaveBeenLastCalledWith({
-        tier: TwoFactorTier.Required,
+        tier: TwoFactorTier.Recommended,
         prompt: "settings_banner",
       })
     })

@@ -200,11 +200,11 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const hasUnverifiedEmail = emailAddress !== null && !isEmailVerified
   const unverifiedEmail = hasUnverifiedEmail ? emailAddress : null
 
-  /** Both prompts ask from the nudge tier on and stop once the account holds two
+  /** Both prompts ask from the suggested tier on and stop once the account holds two
    *  factors, whatever the tier: the setup they open leads with the authenticator,
    *  which is what the highest tier asks for. The card alone can be waved away. */
   const isEnforced = isEnabled && isLoadedForAccount && !isTwoFactorSet
-  const shouldPrompt = isEnforced && tier >= TwoFactorTier.Nudge
+  const shouldPrompt = isEnforced && tier >= TwoFactorTier.Suggested
   const shouldShowNudgeCard = shouldPrompt && !record.nudgeCardDismissed
   const shouldShowSettingsBanner = shouldPrompt
 

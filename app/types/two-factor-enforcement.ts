@@ -1,8 +1,8 @@
 export const TwoFactorTier = {
   None: 0,
-  Nudge: 1,
-  Required: 2,
-  Authenticator: 3,
+  Suggested: 1,
+  Recommended: 2,
+  Enforced: 3,
 } as const
 export type TwoFactorTier = (typeof TwoFactorTier)[keyof typeof TwoFactorTier]
 

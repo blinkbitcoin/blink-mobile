@@ -17,9 +17,9 @@ type TierThreshold = {
  * split across both can sit below every threshold and still not reach the tier.
  */
 const TIER_THRESHOLDS: readonly TierThreshold[] = [
-  { tier: TwoFactorTier.Authenticator, sats: 5_000_000, usdCents: 500_000 },
-  { tier: TwoFactorTier.Required, sats: 500_000, usdCents: 50_000 },
-  { tier: TwoFactorTier.Nudge, sats: 50_000, usdCents: 5_000 },
+  { tier: TwoFactorTier.Enforced, sats: 5_000_000, usdCents: 500_000 },
+  { tier: TwoFactorTier.Recommended, sats: 500_000, usdCents: 50_000 },
+  { tier: TwoFactorTier.Suggested, sats: 50_000, usdCents: 5_000 },
 ]
 
 export const resolveBalanceTier = (

@@ -24,33 +24,29 @@ describe("resolveBalanceTier", () => {
   })
 
   it("reaches nudge from the bitcoin wallet alone", () => {
-    expect(resolveBalanceTier(walletsWith(50_000, 0))).toBe(TwoFactorTier.Nudge)
+    expect(resolveBalanceTier(walletsWith(50_000, 0))).toBe(TwoFactorTier.Suggested)
   })
 
   it("reaches nudge from the dollar wallet alone", () => {
-    expect(resolveBalanceTier(walletsWith(0, 5_000))).toBe(TwoFactorTier.Nudge)
+    expect(resolveBalanceTier(walletsWith(0, 5_000))).toBe(TwoFactorTier.Suggested)
   })
 
   it("never adds the wallets together", () => {
-    expect(resolveBalanceTier(walletsWith(499_999, 49_999))).toBe(TwoFactorTier.Nudge)
+    expect(resolveBalanceTier(walletsWith(499_999, 49_999))).toBe(TwoFactorTier.Suggested)
   })
 
-  it("reaches required at 500,000 sats or $500", () => {
-    expect(resolveBalanceTier(walletsWith(500_000, 0))).toBe(TwoFactorTier.Required)
-    expect(resolveBalanceTier(walletsWith(0, 50_000))).toBe(TwoFactorTier.Required)
+  it("reaches the recommended tier at 500,000 sats or $500", () => {
+    expect(resolveBalanceTier(walletsWith(500_000, 0))).toBe(TwoFactorTier.Recommended)
+    expect(resolveBalanceTier(walletsWith(0, 50_000))).toBe(TwoFactorTier.Recommended)
   })
 
-  it("reaches authenticator at 5,000,000 sats or $5,000", () => {
-    expect(resolveBalanceTier(walletsWith(5_000_000, 0))).toBe(
-      TwoFactorTier.Authenticator,
-    )
-    expect(resolveBalanceTier(walletsWith(0, 500_000))).toBe(TwoFactorTier.Authenticator)
+  it("reaches the enforced tier at 5,000,000 sats or $5,000", () => {
+    expect(resolveBalanceTier(walletsWith(5_000_000, 0))).toBe(TwoFactorTier.Enforced)
+    expect(resolveBalanceTier(walletsWith(0, 500_000))).toBe(TwoFactorTier.Enforced)
   })
 
   it("takes the highest tier either wallet reaches", () => {
-    expect(resolveBalanceTier(walletsWith(50_000, 500_000))).toBe(
-      TwoFactorTier.Authenticator,
-    )
+    expect(resolveBalanceTier(walletsWith(50_000, 500_000))).toBe(TwoFactorTier.Enforced)
   })
 })
 
@@ -117,10 +113,10 @@ describe("normalizeStoredRecord", () => {
   it("keeps a valid stored record", () => {
     expect(
       normalizeStoredRecord({
-        highestTier: TwoFactorTier.Required,
+        highestTier: TwoFactorTier.Recommended,
         nudgeCardDismissed: true,
       }),
-    ).toEqual({ highestTier: TwoFactorTier.Required, nudgeCardDismissed: true })
+    ).toEqual({ highestTier: TwoFactorTier.Recommended, nudgeCardDismissed: true })
   })
 
   it("drops a tier this build does not know", () => {

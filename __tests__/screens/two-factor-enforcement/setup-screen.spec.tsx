@@ -52,7 +52,7 @@ const installedRemovalListener = (): RemovalListener | undefined =>
   removalListenerInstalls()[0]?.[1]
 
 const mockEnforcement = {
-  tier: TwoFactorTier.Nudge as TwoFactorTier,
+  tier: TwoFactorTier.Suggested as TwoFactorTier,
   hasTwoFactor: false,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
@@ -120,7 +120,7 @@ describe("TwoFactorSetupScreen", () => {
     mockIsFocused = true
     mockIsReverifying = false
     mockIsAskedHere = true
-    mockEnforcement.tier = TwoFactorTier.Nudge
+    mockEnforcement.tier = TwoFactorTier.Suggested
     mockEnforcement.hasTwoFactor = false
     mockEnforcement.missingMethod = TwoFactorMethod.Email
     mockEnforcement.unverifiedEmail = null
@@ -146,7 +146,7 @@ describe("TwoFactorSetupScreen", () => {
     })
     expect(mockPromptReverification).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Nudge,
+      tier: TwoFactorTier.Suggested,
       method: TwoFactorMethod.Email,
     })
   })
@@ -163,7 +163,7 @@ describe("TwoFactorSetupScreen", () => {
     })
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Nudge,
+      tier: TwoFactorTier.Suggested,
       method: TwoFactorMethod.Email,
     })
   })
@@ -281,7 +281,7 @@ describe("TwoFactorSetupScreen", () => {
 
   it("offers to add a phone number when the email is already verified", async () => {
     mockEnforcement.missingMethod = TwoFactorMethod.Phone
-    mockEnforcement.tier = TwoFactorTier.Required
+    mockEnforcement.tier = TwoFactorTier.Recommended
     await renderScreen()
 
     expect(screen.queryByText(LL.TwoFactorEnforcement.addEmail())).toBeNull()
@@ -289,7 +289,7 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith("phoneRegistrationInitiate")
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Required,
+      tier: TwoFactorTier.Recommended,
       method: TwoFactorMethod.Phone,
     })
   })
@@ -303,7 +303,7 @@ describe("TwoFactorSetupScreen", () => {
       returnTo: "twoFactorSetup",
     })
     expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Nudge,
+      tier: TwoFactorTier.Suggested,
       method: TwoFactorMethod.Authenticator,
     })
   })

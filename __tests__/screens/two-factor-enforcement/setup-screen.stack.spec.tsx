@@ -34,7 +34,7 @@ loadLocale("en")
 const LL = i18nObject("en")
 
 const mockEnforcement = {
-  tier: TwoFactorTier.Nudge as TwoFactorTier,
+  tier: TwoFactorTier.Suggested as TwoFactorTier,
   hasTwoFactor: false,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
