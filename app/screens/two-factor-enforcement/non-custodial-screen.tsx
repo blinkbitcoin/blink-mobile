@@ -37,7 +37,7 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
       NativeStackNavigationProp<RootStackParamList, "twoFactorNonCustodial">
     >()
   const { params } = useRoute<RouteProp<RootStackParamList, "twoFactorNonCustodial">>()
-  const isFromSetup = params?.isFromSetup ?? false
+  const isOpenedFromSetupScreen = params?.isOpenedFromSetupScreen ?? false
   const isFocused = useIsFocused()
   const { unmetTier, isCustodyExitOffered, registerDismissal } = useTwoFactorEnforcement()
   /** The tier this screen was opened for: what it reports, and what backing out of it
@@ -51,9 +51,9 @@ export const TwoFactorNonCustodialScreen: React.FC = () => {
    *  the setup, it only returns there: the setup is still up, and leaving it is what
    *  counts. */
   const handleCancel = useCallback(() => {
-    if (!isFromSetup) registerDismissal(promptTier, origin)
+    if (!isOpenedFromSetupScreen) registerDismissal(promptTier, origin)
     navigation.goBack()
-  }, [isFromSetup, registerDismissal, promptTier, origin, navigation])
+  }, [isOpenedFromSetupScreen, registerDismissal, promptTier, origin, navigation])
 
   useHardwareBackGuard(handleCancel)
 

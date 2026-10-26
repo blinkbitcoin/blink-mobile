@@ -157,7 +157,7 @@ describe("TwoFactorSetupScreen", () => {
     fireEvent.press(screen.getByText(LL.AccountMigration.moveToNonCustodial()))
 
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorNonCustodial", {
-      isFromSetup: true,
+      isOpenedFromSetupScreen: true,
     })
     expect(mockLogTwoFactorSetupStarted).not.toHaveBeenCalled()
     expect(mockRegisterDismissal).not.toHaveBeenCalled()

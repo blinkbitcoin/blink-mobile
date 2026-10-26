@@ -89,7 +89,7 @@ export const TwoFactorSetupScreen: React.FC = () => {
 
   /** The setup stays under the explanation, so backing out of it lands back here. */
   const handleMove = useCallback(() => {
-    navigation.navigate("twoFactorNonCustodial", { isFromSetup: true })
+    navigation.navigate("twoFactorNonCustodial", { isOpenedFromSetupScreen: true })
   }, [navigation])
 
   return (

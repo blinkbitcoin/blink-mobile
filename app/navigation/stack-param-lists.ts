@@ -266,7 +266,10 @@ export type RootStackParamList = {
   twoFactorSetup: TwoFactorPromptOrigin | undefined
   /** Opened from a prompt, whose dismissal backing out of it is, or from the setup,
    *  which stays under it and counts its own. */
-  twoFactorNonCustodial?: { origin?: TwoFactorPromptOrigin; isFromSetup?: boolean }
+  twoFactorNonCustodial?: {
+    origin?: TwoFactorPromptOrigin
+    isOpenedFromSetupScreen?: boolean
+  }
   webView: {
     url: string
     initialTitle?: string

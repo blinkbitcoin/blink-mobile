@@ -19,7 +19,9 @@ const LL = i18nObject("en")
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 let mockIsFocused = true
-let mockRouteParams: { origin?: TwoFactorPromptOrigin; isFromSetup?: boolean } | undefined
+let mockRouteParams:
+  | { origin?: TwoFactorPromptOrigin; isOpenedFromSetupScreen?: boolean }
+  | undefined
 
 const MODAL_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.SessionModal }
 
@@ -135,7 +137,7 @@ describe("TwoFactorNonCustodialScreen", () => {
 
   /** The setup is still up under it, and leaving the setup is what counts. */
   it("only returns to the setup it was opened from, charging nothing", async () => {
-    mockRouteParams = { isFromSetup: true }
+    mockRouteParams = { isOpenedFromSetupScreen: true }
     await renderScreen()
 
     fireEvent.press(screen.getByTestId("two-factor-non-custodial-cancel"))
