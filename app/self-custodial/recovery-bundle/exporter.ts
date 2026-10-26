@@ -77,6 +77,7 @@ export const RecoveryBundleExportErrorReason = {
   NoLeaves: "no-leaves",
   IncompleteChain: "incomplete-chain",
   PagingLimitExceeded: "paging-limit-exceeded",
+  InvalidPageOffset: "invalid-page-offset",
   BudgetExceeded: "budget-exceeded",
   InvalidNode: "invalid-node",
 } as const
@@ -155,6 +156,30 @@ type QueryContext = {
   deadline: number
 }
 
+/**
+ * The operator's response offset is where the next owner page starts: the
+ * request offset plus the owned rows it returned, or -1 once a page comes back
+ * short. Ancestors merged in by include_parents are not owned rows, so the size
+ * of the returned map cannot stand in for it without skipping leaves. A page
+ * holds at most PAGE_SIZE owned rows, so an offset that stays put or jumps past
+ * them would refetch or skip rows, and it is refused instead of followed.
+ */
+const nextOwnerQueryOffset = (
+  requestOffset: number,
+  responseOffset: bigint,
+): number | undefined => {
+  if (responseOffset <= 0n) return undefined
+  const hasAdvanced = responseOffset > BigInt(requestOffset)
+  const isWithinOnePage = responseOffset <= BigInt(requestOffset + PAGE_SIZE)
+  if (!hasAdvanced || !isWithinOnePage) {
+    throw new RecoveryBundleExportError(
+      RecoveryBundleExportErrorReason.InvalidPageOffset,
+      `Owner query returned offset ${responseOffset} for a page requested at ${requestOffset}`,
+    )
+  }
+  return Number(responseOffset)
+}
+
 const queryNodesByOwner = async (
   context: QueryContext,
   ownerIdentityPublicKey: Uint8Array,
@@ -185,17 +210,10 @@ const queryNodesByOwner = async (
       }),
     )
     for (const [id, node] of response.nodes) nodes.set(id, node)
-    // The request offset is a skip count and the response offset only signals
-    // "more pages" (semantics validated against the real operators by the
-    // spark-unilateral-exit reference exporter). Advance by the number of
-    // nodes actually returned, not the requested limit: a short page with a
-    // positive offset would otherwise silently skip the unreturned tail, and
-    // a skipped AVAILABLE leaf means an incomplete bundle saved as complete.
-    if (response.nodes.size === 0 || response.offset <= 0n) break
-    offset += response.nodes.size
+    const nextOffset = nextOwnerQueryOffset(offset, response.offset)
+    if (nextOffset === undefined) return nodes
+    offset = nextOffset
   }
-
-  return nodes
 }
 
 const queryNodesByIds = async (
