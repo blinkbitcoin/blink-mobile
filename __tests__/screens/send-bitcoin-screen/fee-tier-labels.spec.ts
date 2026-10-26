@@ -1,7 +1,12 @@
 import enBase from "@app/i18n/en"
 import { type Translations } from "@app/i18n/i18n-types"
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
 
-import { buildFeeTierOptions } from "@app/screens/send-bitcoin-screen/fee-tier-options"
+import {
+  buildFeeTierOptions,
+  feeTierLabels,
+} from "@app/screens/send-bitcoin-screen/fee-tier-options"
 import {
   FeeTierOption,
   FeeUnit,
@@ -10,7 +15,7 @@ import {
 import { CUSTODIAL_PAYOUT_ETA_MINUTES } from "@app/screens/send-bitcoin-screen/hooks/use-custodial-onchain-fee-tiers"
 import { FEE_TIER_ETA_MINUTES } from "@app/types/payment"
 
-import retiredTierCopy from "../../i18n/retired-tier-copy.json"
+import { LEDGER, TIER_KEY_NAMES } from "../../i18n/fee-tier-ledger"
 
 /**
  * The source file is typed as the loose BaseTranslation; the generated shape is the real
@@ -18,22 +23,17 @@ import retiredTierCopy from "../../i18n/retired-tier-copy.json"
  */
 const en = enBase as unknown as Pick<
   Translations,
-  "SendBitcoinScreen" | "UnclaimedDeposit"
+  "SendBitcoinScreen" | "UnclaimedDeposit" | "FeeRatesScreen"
 >
 const sendScreen = en.SendBitcoinScreen
 
-/**
- * Both rails read their tier names from these three keys, so the label map here is the one
- * `use-onchain-fee-tier-options.ts` and `unclaimed-deposits-screen.tsx` each build inline.
- */
-const labels = {
-  [FeeTierOption.Fast]: sendScreen.fast,
-  [FeeTierOption.Medium]: sendScreen.medium,
-  [FeeTierOption.Slow]: sendScreen.slow,
-}
+loadLocale("en")
+
+/** The label map both rails build their tiers from, read through the shipped `en` copy. */
+const labels = feeTierLabels(i18nObject("en"))
 
 /** Words these tiers have been called before. None of them may reach a screen again. */
-const SUPERSEDED_TIER_NAMES = retiredTierCopy.en.retired
+const SUPERSEDED_TIER_NAMES = LEDGER.en.retired
 
 const escapeRegExp = (value: string): string =>
   value.replace(/[.*+?^${}()|[\]\\]/g, "\\$&")
@@ -49,7 +49,7 @@ const survivingTierNames = (copy: string[]): string[] =>
  * "slow" are ordinary words a sentence about confirmation times may need.
  */
 const isTierCopyKey = (key: string): boolean =>
-  /feeRate|tier/i.test(key) || ["fast", "medium", "slow"].includes(key)
+  /feeRate|tier/i.test(key) || TIER_KEY_NAMES.includes(key)
 
 const presentTiers = (etaMinutes: Record<FeeTierOption, number>) =>
   buildFeeTierOptions({
@@ -80,6 +80,22 @@ describe("on-chain fee tier presentation", () => {
         { label: "Standard", detail: "~ 4h" },
         { label: "Economy", detail: "~ 24h" },
       ])
+    })
+
+    // Settings → Fee rates promises the same windows as "Onchain <tier> (~<window>)", so a
+    // re-timed queue has to reach that copy too, not just the selector.
+    it("promises the same windows in Settings → Fee rates", () => {
+      const settingsWindows = [
+        en.FeeRatesScreen.onchainPriority,
+        en.FeeRatesScreen.onchainStandard,
+        en.FeeRatesScreen.onchainEconomy,
+      ].map((row) => row.match(/\(([^)]*)\)$/)?.[1])
+
+      expect(settingsWindows).toEqual(
+        presentTiers(CUSTODIAL_PAYOUT_ETA_MINUTES).map(({ detail }) =>
+          detail.replace(/^~ /, "~"),
+        ),
+      )
     })
 
     it("keeps the tier ids the payout speeds are keyed on", () => {
@@ -113,7 +129,7 @@ describe("on-chain fee tier presentation", () => {
   })
 
   describe("the copy around the tiers", () => {
-    it("leaves no superseded tier name standing in the on-chain copy", () => {
+    it("leaves no superseded tier name standing in the tier, heading and fee rate copy", () => {
       const onchainCopy = Object.entries({
         ...sendScreen,
         ...en.UnclaimedDeposit,
