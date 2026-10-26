@@ -58,5 +58,11 @@ export interface ScreenProps {
    */
   avoidKeyboardOnAndroid?: boolean
 
+  /**
+   * Turns the keyboard lift off, e.g. while no keyboard is up. Android reports a closed
+   * keyboard as a keyboard change, which would otherwise leave a stale lift. Defaults to true.
+   */
+  avoidKeyboardEnabled?: boolean
+
   keyboardShouldPersistTaps?: "always" | "never" | "handled"
 }

@@ -586,6 +586,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       keyboardOffset="navigationHeader"
       keyboardVerticalOffset={headerHeight}
       avoidKeyboardOnAndroid
+      avoidKeyboardEnabled={isKeyboardVisible}
       edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
     >
       <ConfirmFeesModal
