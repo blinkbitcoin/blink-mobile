@@ -171,7 +171,7 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
 
 const useStyles = makeStyles((theme) => ({
   outer: {
-    height: 70,
+    minHeight: 70,
     padding: 4,
     display: "flex",
     flexDirection: "row",

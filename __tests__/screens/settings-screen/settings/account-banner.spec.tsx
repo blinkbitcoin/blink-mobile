@@ -1,6 +1,8 @@
 import React from "react"
 import fs from "fs"
 import path from "path"
+import { StyleSheet } from "react-native"
+import { ReactTestInstance } from "react-test-renderer"
 import { render, screen } from "@testing-library/react-native"
 
 import { AccountType } from "@app/types/wallet"
@@ -101,6 +103,15 @@ const TRANSLATIONS_DIR = path.resolve(
   "translations",
 )
 
+/** The row is the nearest ancestor laid out as one: it is the only flex row in the banner. */
+const rowStyleOf = (text: string) => {
+  let node: ReactTestInstance | null = screen.getByText(text)
+  while (node && StyleSheet.flatten(node.props.style)?.flexDirection !== "row") {
+    node = node.parent
+  }
+  return StyleSheet.flatten(node?.props.style)
+}
+
 const setCustodialAccount = (username: string | null) => {
   mockUseAccountRegistry.mockReturnValue({
     activeAccount: { id: "cust-1", type: AccountType.Custodial },
@@ -155,6 +166,16 @@ describe("AccountBanner (custodial)", () => {
     expect(title.props.ellipsizeMode).toBeUndefined()
     expect(screen.queryByText("Custodial account")).toBeNull()
   })
+
+  it("keeps 70 as the row's floor so enlarged fonts can grow it", () => {
+    setCustodialAccount("alice")
+
+    render(<AccountBanner />)
+
+    const row = rowStyleOf("alice@blink.sv")
+    expect(row.minHeight).toBe(70)
+    expect(row.height).toBeUndefined()
+  })
 })
 
 describe("AccountBanner (self-custodial)", () => {
@@ -174,6 +195,14 @@ describe("AccountBanner (self-custodial)", () => {
     expect(screen.getByText("alice@blink.sv")).toBeTruthy()
     expect(screen.getByText("Non-custodial account")).toBeTruthy()
     expect(screen.queryByText("Custodial account")).toBeNull()
+  })
+
+  it("keeps 70 as the row's floor so enlarged fonts can grow it", () => {
+    render(<AccountBanner />)
+
+    const row = rowStyleOf("alice@blink.sv")
+    expect(row.minHeight).toBe(70)
+    expect(row.height).toBeUndefined()
   })
 })
 
