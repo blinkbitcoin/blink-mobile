@@ -30,12 +30,26 @@ const linkOf = (action: Bulletin["action"]): string | null => {
   return null
 }
 
+type ServerBulletinItems = {
+  items: CarouselItem[]
+  /** The home carousel's key. It changes once, when the carousel opened with no server
+   *  bulletin and the first settled response brings some, so the carousel remounts on
+   *  the newest of them instead of keeping the app card it opened on in view. Later
+   *  refetches keep it, and with it the card the user is reading. */
+  carouselKey: string
+}
+
 /**
  * The server bulletins as carousel cards, newest first, followed in development by the
  * test bulletins. With no server bulletin, the card queued through `notifyCard`, if any,
- * takes their place, as before the carousel.
+ * takes their place, as before the carousel. Cached bulletins stay in while a request is
+ * in flight: `loading` gates nothing on screen, it only tells when the first response
+ * has settled.
  */
-export const useServerBulletinItems = ({ loading, bulletins }: Props): CarouselItem[] => {
+export const useServerBulletinItems = ({
+  loading,
+  bulletins,
+}: Props): ServerBulletinItems => {
   const { cardInfo } = useNotifications()
   const client = useApolloClient()
   const testBulletins = useTestBulletins()
@@ -60,8 +74,6 @@ export const useServerBulletinItems = ({ loading, bulletins }: Props): CarouselI
     },
     [ack, client],
   )
-
-  if (loading) return []
 
   const shownBulletins = selectCarouselBulletins({
     bulletins: (
@@ -129,22 +141,44 @@ export const useServerBulletinItems = ({ loading, bulletins }: Props): CarouselI
       )
     : []
 
-  const items = [...serverItems, ...testItems]
-  if (items.length > 0 || !cardInfo) return items
+  const carouselKey = useCarouselKey({
+    settled: !loading && bulletins !== undefined,
+    hasServerItems: serverItems.length > 0,
+  })
 
-  return [
-    {
-      key: "notify-card",
-      node: (
-        <NotificationCardUI
-          title={cardInfo.title}
-          text={cardInfo.text}
-          icon={cardInfo.icon}
-          action={cardInfo.action}
-          loading={cardInfo.loading}
-          dismissAction={cardInfo.dismissAction}
-        />
-      ),
-    },
-  ]
+  const items = [...serverItems, ...testItems]
+  if (items.length > 0 || !cardInfo) return { items, carouselKey }
+
+  return {
+    items: [
+      {
+        key: "notify-card",
+        node: (
+          <NotificationCardUI
+            title={cardInfo.title}
+            text={cardInfo.text}
+            icon={cardInfo.icon}
+            action={cardInfo.action}
+            loading={cardInfo.loading}
+            dismissAction={cardInfo.dismissAction}
+          />
+        ),
+      },
+    ],
+    carouselKey,
+  }
+}
+
+/** Decided on the first settled response, from what the carousel opened with. */
+const useCarouselKey = ({
+  settled,
+  hasServerItems,
+}: {
+  settled: boolean
+  hasServerItems: boolean
+}): string => {
+  const [openedWithServerItems] = React.useState(hasServerItems)
+  const [remount, setRemount] = React.useState<boolean | null>(null)
+  if (remount === null && settled) setRemount(!openedWithServerItems && hasServerItems)
+  return remount ? "settled" : "opened"
 }
