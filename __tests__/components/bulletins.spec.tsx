@@ -357,6 +357,50 @@ describe("useServerBulletinItems", () => {
       expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
     })
 
+    /** The carousel stays swipeable while a card closes, so a second close can start
+     *  before the first settles: each card keeps its own spinner until its own request
+     *  settles, and a close of a card already closing sends nothing. */
+    it("keeps each closing card's spinner until its own request settles", async () => {
+      const releases: Record<string, () => void> = {}
+      mockAck.mockImplementation(
+        ({ variables }) =>
+          new Promise<void>((resolve) => {
+            releases[variables.input.notificationId] = resolve
+          }),
+      )
+      const rendered = renderItems([
+        makeBulletin({ id: "a", title: "A", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin({ id: "b", title: "B" }),
+      ])
+
+      const [closeA, closeB] = rendered.getAllByTestId("icon-button-close")
+      fireEvent.press(closeA)
+      fireEvent.press(closeB)
+      fireEvent.press(closeB)
+      await act(async () => {})
+
+      expect(mockAck).toHaveBeenCalledTimes(2)
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(2)
+
+      await act(async () => {
+        releases.a()
+      })
+
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(1)
+      expect(rendered.queryByText("B")).toBeNull()
+      expect(mockAck).toHaveBeenCalledTimes(2)
+      expect(
+        mockAck.mock.calls.filter(
+          ([{ variables }]) => variables.input.notificationId === "b",
+        ),
+      ).toHaveLength(1)
+
+      await act(async () => {
+        releases.b()
+      })
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
+    })
+
     it("keeps the card and logs when the acknowledgement fails", async () => {
       const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
       mockAck.mockRejectedValueOnce(new Error("offline"))

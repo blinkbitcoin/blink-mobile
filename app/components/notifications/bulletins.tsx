@@ -56,20 +56,28 @@ export const useServerBulletinItems = ({
   const { persistentBulletinsEnabled, bulletinsShownSince } = useRemoteConfig()
 
   const [ack] = useStatefulNotificationAcknowledgeMutation()
-  /** The bulletin whose acknowledgement is in flight: its card alone shows the spinner. */
-  const [acknowledgingId, setAcknowledgingId] = React.useState<string | null>(null)
+  /** The bulletins whose acknowledgement is in flight: their cards alone show the
+   *  spinner. Several can be in flight at once, since the carousel stays swipeable. The
+   *  ref is the guard against a second close, as it is current before the next render. */
+  const [acknowledgingIds, setAcknowledgingIds] = React.useState<ReadonlySet<string>>(
+    () => new Set(),
+  )
+  const acknowledging = React.useRef(new Set<string>())
 
   /** Acknowledges a bulletin, then refetches, which takes its card out of the carousel. */
   const dismiss = React.useCallback(
     async (notificationId: string) => {
-      setAcknowledgingId(notificationId)
+      if (acknowledging.current.has(notificationId)) return
+      acknowledging.current.add(notificationId)
+      setAcknowledgingIds(new Set(acknowledging.current))
       try {
         await ack({ variables: { input: { notificationId } } })
         await client.refetchQueries({ include: [BulletinsDocument] })
       } catch (e) {
         console.error("Failed to acknowledge notification", e)
       } finally {
-        setAcknowledgingId(null)
+        acknowledging.current.delete(notificationId)
+        setAcknowledgingIds(new Set(acknowledging.current))
       }
     },
     [ack, client],
@@ -112,7 +120,7 @@ export const useServerBulletinItems = ({
           text={bulletin.body}
           action={openBulletin}
           dismissAction={close}
-          loading={acknowledgingId === bulletin.id}
+          loading={acknowledgingIds.has(bulletin.id)}
           buttonLabel={bulletin.action?.label ?? undefined}
         />
       ),
