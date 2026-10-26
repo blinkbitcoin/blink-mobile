@@ -106,6 +106,8 @@ export const EmailRegistrationInitiateScreen: React.FC<
     navigation.navigate("loginMethodCode", {
       addition: LoginMethodAddition.Email,
       email: emailInput,
+      onboarding,
+      hasUsername,
     })
 
   const submit = async () => {

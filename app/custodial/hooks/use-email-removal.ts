@@ -5,7 +5,6 @@ import {
   useUserEmailDeleteMutation,
 } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/transport-error"
-import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { LoginMethodRefusal } from "@app/types/two-factor-enforcement"
 
 import { useAccountReadBack } from "./use-account-read-back"
@@ -16,7 +15,6 @@ import { useAccountReadBack } from "./use-account-read-back"
  * server's refusal, if any, and throws on a request that never answers and did not land.
  */
 export const useEmailRemoval = () => {
-  const { updateCurrentProfile } = useSaveSessionProfile()
   const [emailDelete] = useUserEmailDeleteMutation()
   const { accountId, readBack } = useAccountReadBack()
 
@@ -46,9 +44,8 @@ export const useEmailRemoval = () => {
       const isRemoved = isAnswerLost && (await isRemovedOnServer(sentFor))
       if (!isRemoved) throw err
     }
-    await updateCurrentProfile()
     return undefined
-  }, [accountId, emailDelete, isRemovedOnServer, updateCurrentProfile])
+  }, [accountId, emailDelete, isRemovedOnServer])
 
   return { remove }
 }

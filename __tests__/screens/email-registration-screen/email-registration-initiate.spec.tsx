@@ -97,6 +97,8 @@ describe("EmailRegistrationInitiateScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", {
       addition: LoginMethodAddition.Email,
       email: EMAIL,
+      onboarding: false,
+      hasUsername: false,
     })
   })
 
@@ -115,11 +117,47 @@ describe("EmailRegistrationInitiateScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", {
       addition: LoginMethodAddition.Email,
       email: EMAIL,
+      onboarding: false,
+      hasUsername: false,
     })
     expect(mockNavigate).not.toHaveBeenCalledWith(
       "emailRegistrationValidate",
       expect.anything(),
     )
+  })
+
+  /** Once confirmed, the email goes on with the onboarding rather than to the settings,
+   *  which an onboarding stack may not have. */
+  describe("asking for the code during the onboarding", () => {
+    const ONBOARDING = { onboarding: true, hasUsername: true }
+    const CODE_SCREEN_PARAMS = {
+      addition: LoginMethodAddition.Email,
+      email: EMAIL,
+      ...ONBOARDING,
+    }
+
+    it("carries it on to the code on an account with an authenticator", async () => {
+      mockHasAuthenticator = true
+
+      await submitEmail(ONBOARDING)
+
+      expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", CODE_SCREEN_PARAMS)
+    })
+
+    it("carries it on to the code the server asks for", async () => {
+      mockEmailInitiate.mockResolvedValue({
+        data: {
+          userEmailRegistrationInitiate: {
+            errors: [{ message: "required", code: "TOTP_CODE_REQUIRED" }],
+            emailRegistrationId: null,
+          },
+        },
+      })
+
+      await submitEmail(ONBOARDING)
+
+      expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", CODE_SCREEN_PARAMS)
+    })
   })
 
   it("says the server's refusal under the field", async () => {

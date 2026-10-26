@@ -4,8 +4,13 @@ import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { CodeInput } from "@app/components/code-input"
-import { useLoginMethodAddition } from "@app/custodial/hooks/use-login-method-addition"
+import {
+  LoginMethodAdditionOutcome,
+  useLoginMethodAddition,
+} from "@app/custodial/hooks/use-login-method-addition"
+import { useCodeCheckHold } from "@app/hooks/use-code-check-hold"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { useSessionGuard } from "@app/hooks/use-session-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -14,8 +19,11 @@ import {
   mapValidatePhoneCodeErrorsToMessage,
 } from "@app/screens/phone-auth-screen/phone-registration-validation-errors"
 import {
+  EmailOnboardingParams,
   LoginMethod,
   LoginMethodAddition,
+  LoginMethodAdditionParams,
+  LoginMethodAdditionResult,
   loginMethodOf,
   LoginMethodRefusal,
   TotpStepUpErrorCode,
@@ -49,6 +57,14 @@ export const loginMethodCodeCopy = (
   }
 }
 
+/** Where the onboarding goes once the email is confirmed: only an address added from it
+ *  carries that on. */
+const emailOnboardingOf = (params: LoginMethodAdditionParams): EmailOnboardingParams => {
+  if (params.addition !== LoginMethodAddition.Email) return {}
+  const { onboarding, hasUsername } = params
+  return { onboarding, hasUsername }
+}
+
 /**
  * The authenticator's code for adding a login method, which the server checks with
  * the addition itself. A wrong code, or one too many this hour, is said under the
@@ -60,6 +76,7 @@ export const LoginMethodCodeScreen: React.FC = () => {
     useNavigation<NativeStackNavigationProp<RootStackParamList, "loginMethodCode">>()
   const { params } = useRoute<RouteProp<RootStackParamList, "loginMethodCode">>()
   const { run } = useLoginMethodAddition()
+  const { captureSession } = useSessionGuard()
 
   const [loading, setLoading] = useState(false)
   const [errorMessage, setErrorMessage] = useState("")
@@ -106,26 +123,61 @@ export const LoginMethodCodeScreen: React.FC = () => {
    *  server would refuse as the number is already added. */
   const isAdditionDoneRef = useRef(false)
 
+  /** What the screen shows for how the addition ended. */
+  const showOutcome = useCallback(
+    (outcome: LoginMethodAdditionOutcome, isOwnSession: () => boolean) => {
+      switch (outcome.result) {
+        case LoginMethodAdditionResult.EmailRegistered:
+          isAdditionDoneRef.current = true
+          navigation.replace("emailRegistrationValidate", {
+            email: outcome.email,
+            emailRegistrationId: outcome.emailRegistrationId,
+            ...emailOnboardingOf(params),
+          })
+          break
+        case LoginMethodAdditionResult.PhoneAdded:
+          isAdditionDoneRef.current = true
+          Alert.alert(LL.PhoneRegistrationValidateScreen.successTitle(), undefined, [
+            {
+              text: LL.common.ok(),
+              onPress: () => {
+                if (isOwnSession()) navigation.popTo("settings")
+              },
+            },
+          ])
+          break
+        case LoginMethodAdditionResult.Refused:
+          sayRefusal(outcome.refusal)
+          break
+        case LoginMethodAdditionResult.Abandoned:
+          break
+      }
+    },
+    [LL, navigation, params, sayRefusal],
+  )
+
+  /** Only the screen and the session the code was sent from show its answer: one the
+   *  user has left, or a stack an account switch reset, is not moved by it. */
   const runWithCode = useCallback(
     async (code: string) => {
       if (isAdditionDoneRef.current) return
+      const isOwnSession = captureSession()
       setLoading(true)
       try {
-        const outcome = await run(params, code)
-        if (outcome.isDone) {
-          // eslint-disable-next-line require-atomic-updates -- one addition in flight at a time, held by the guard below; nothing else writes it
-          isAdditionDoneRef.current = true
-          return
-        }
-        sayRefusal(outcome.refusal)
+        const outcome = await run({ params, totpCode: code, isOwnSession })
+        if (isOwnSession()) showOutcome(outcome, isOwnSession)
       } catch {
-        Alert.alert(LL.common.error())
+        if (isOwnSession()) Alert.alert(LL.common.error())
       } finally {
         setLoading(false)
       }
     },
-    [run, params, sayRefusal, LL],
+    [captureSession, run, params, showOutcome, LL],
   )
+
+  /** An answer that lands after the user left would move a screen they never sent the
+   *  code from, and a code sent again from a new one would spend another try. */
+  useCodeCheckHold(loading)
 
   /** A code typed again while one is checked would spend another of the hour's tries. */
   const { run: runOnce } = useInFlightGuard()

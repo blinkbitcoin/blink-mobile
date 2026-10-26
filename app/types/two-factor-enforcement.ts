@@ -77,10 +77,31 @@ export const LoginMethodAddition = {
 export type LoginMethodAddition =
   (typeof LoginMethodAddition)[keyof typeof LoginMethodAddition]
 
+/** Where the email's confirmation goes once done, during the onboarding. */
+export type EmailOnboardingParams = {
+  onboarding?: boolean
+  hasUsername?: boolean
+}
+
 export type LoginMethodAdditionParams =
-  | { addition: typeof LoginMethodAddition.Email; email: string }
+  | ({
+      addition: typeof LoginMethodAddition.Email
+      email: string
+    } & EmailOnboardingParams)
   | { addition: typeof LoginMethodAddition.EmailReverify; email: string }
   | { addition: typeof LoginMethodAddition.Phone; phone: string; smsCode: string }
+
+/** How an addition ended: the email registered and waiting for its own confirmation,
+ *  the phone number added, a refusal from the server, or left off because the screen
+ *  or the session it began under is gone. */
+export const LoginMethodAdditionResult = {
+  EmailRegistered: "email_registered",
+  PhoneAdded: "phone_added",
+  Refused: "refused",
+  Abandoned: "abandoned",
+} as const
+export type LoginMethodAdditionResult =
+  (typeof LoginMethodAdditionResult)[keyof typeof LoginMethodAdditionResult]
 
 /** The login method each addition is for. */
 export const loginMethodOf = (addition: LoginMethodAddition): LoginMethod => {
