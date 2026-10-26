@@ -35,6 +35,7 @@ function ScreenWithoutScrolling(props: ScreenProps) {
     <KeyboardAvoidingView
       style={[preset.outer, backgroundStyle]}
       behavior={isIos || props.avoidKeyboardOnAndroid ? "padding" : undefined}
+      enabled={props.avoidKeyboardEnabled ?? true}
       keyboardVerticalOffset={
         props.keyboardVerticalOffset ?? offsets[props.keyboardOffset || "none"]
       }
@@ -75,6 +76,7 @@ function ScreenWithScrolling(props: ScreenProps) {
     <KeyboardAvoidingView
       style={[preset.outer, backgroundStyle]}
       behavior={isIos || props.avoidKeyboardOnAndroid ? "padding" : undefined}
+      enabled={props.avoidKeyboardEnabled ?? true}
       keyboardVerticalOffset={
         props.keyboardVerticalOffset ?? offsets[props.keyboardOffset || "none"]
       }
