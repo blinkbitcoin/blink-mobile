@@ -222,7 +222,7 @@ export const Delete = () => {
         />
         <View style={styles.actionButtons}>
           <GaloyPrimaryButton
-            title="Confirm"
+            title={LL.common.confirm()}
             disabled={!userWroteDelete}
             onPress={() => {
               closeModal()
@@ -236,7 +236,7 @@ export const Delete = () => {
               )
             }}
           />
-          <GaloySecondaryButton title="Cancel" onPress={closeModal} />
+          <GaloySecondaryButton title={LL.common.cancel()} onPress={closeModal} />
         </View>
       </View>
     </Modal>
