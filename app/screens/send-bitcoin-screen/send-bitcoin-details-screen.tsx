@@ -44,6 +44,7 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { reportError } from "@app/utils/error-logging"
+import { isIos } from "@app/utils/helper"
 
 import { FeeTierSelector } from "./fee-tier-selector"
 import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
@@ -576,7 +577,9 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       keyboardOffset="navigationHeader"
       keyboardVerticalOffset={headerHeight}
       avoidKeyboardOnAndroid
-      avoidKeyboardEnabled={isKeyboardVisible}
+      // Android reports a closed keyboard as a keyboard change, which leaves a stale lift.
+      // iOS settles back by itself, and needs the lift on as the keyboard starts to move.
+      avoidKeyboardEnabled={isIos || isKeyboardVisible}
       edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
     >
       <ConfirmFeesModal
