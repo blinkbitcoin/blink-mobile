@@ -2,13 +2,13 @@ import { useCallback } from "react"
 
 import {
   SettingsScreenDocument,
-  useSettingsScreenLazyQuery,
-  useSettingsScreenQuery,
   useUserEmailDeleteMutation,
 } from "@app/graphql/generated"
 import { isNetworkFailure } from "@app/graphql/transport-error"
 import { useSaveSessionProfile } from "@app/hooks/use-save-session-profile"
 import { LoginMethodRefusal } from "@app/types/two-factor-enforcement"
+
+import { useAccountReadBack } from "./use-account-read-back"
 
 /**
  * Removes the account's email right before it is registered again, which the server
@@ -18,29 +18,16 @@ import { LoginMethodRefusal } from "@app/types/two-factor-enforcement"
 export const useEmailRemoval = () => {
   const { updateCurrentProfile } = useSaveSessionProfile()
   const [emailDelete] = useUserEmailDeleteMutation()
-  const [readAccount] = useSettingsScreenLazyQuery({ fetchPolicy: "network-only" })
-  /** The account the removal is for, as the settings read it. */
-  const { data: accountData } = useSettingsScreenQuery({ fetchPolicy: "cache-only" })
-  const accountId = accountData?.me?.id
+  const { accountId, readBack } = useAccountReadBack()
 
-  /** Whether the email is gone on the server, read from the network, on the account the
-   *  removal was sent for: a session switched meanwhile reads another one. A read that
-   *  fails is no proof it is. */
+  /** Whether the email is gone on the server, on the account the removal was sent for. */
   const isRemovedOnServer = useCallback(
     async (sentFor: string | undefined): Promise<boolean> => {
-      try {
-        const { data, error } = await readAccount()
-        if (error) return false
-        const me = data?.me
-        if (!me) return false
-        const isAccountSentFor = me.id === sentFor
-        if (!isAccountSentFor) return false
-        return !me.email?.address
-      } catch {
-        return false
-      }
+      const account = await readBack(sentFor)
+      if (!account) return false
+      return !account.email?.address
     },
-    [readAccount],
+    [readBack],
   )
 
   /** A removal whose answer was lost may have landed, and sent again it would be
