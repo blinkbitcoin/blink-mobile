@@ -3973,6 +3973,9 @@
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "transferInProgress": {
+      "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız."
+    },
     "transferDelayed": {
       "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Bu, normalden uzun sürüyor — uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız.",
       "contactSupportCta": "Destek ile iletişime geçin"

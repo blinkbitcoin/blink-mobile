@@ -70,8 +70,9 @@ export const MigrationTransferringFundsScreen: React.FC = () => {
     navigation.navigate("accountMigrationContactSupport", {
       reason: MigrationSupportReason.ReceiveDelayed,
       origin: MigrationSupportOrigin.ReceiveDelayed,
+      custodialAccountId: custodialAccountId ?? undefined,
     })
-  }, [navigation])
+  }, [navigation, custodialAccountId])
 
   const [isCloseUnavailable, setIsCloseUnavailable] = useState(false)
   const [completionAttempt, setCompletionAttempt] = useState(0)
