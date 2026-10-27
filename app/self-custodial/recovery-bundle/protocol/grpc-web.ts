@@ -14,6 +14,8 @@ const TRAILER_FLAG = 0x80
  * wire-format error. */
 const COMPRESSED_FLAG = 0x01
 const CALL_TIMEOUT_MS = 30_000
+const GRPC_STATUS_OK = 0
+const DECIMAL_STATUS_CODE = /^\d+$/
 
 export class GrpcWebError extends Error {
   constructor(
@@ -72,6 +74,42 @@ const parseTrailers = (payload: Uint8Array): Map<string, string> => {
     }
   }
   return trailers
+}
+
+/** Response headers and a parsed trailers frame both answer `get` by name. */
+type GrpcMetadata = { get: (name: string) => string | null | undefined }
+
+/**
+ * Reports whether the metadata carries an OK grpc-status, and throws when it
+ * carries any other value. A status that is not a decimal code is refused too:
+ * it cannot vouch for the call having completed any more than a failing one.
+ */
+const hasOkGrpcStatus = (
+  metadata: GrpcMetadata,
+  methodPath: string,
+  httpStatus: number,
+): boolean => {
+  const status = metadata.get("grpc-status")
+  const isStatusAbsent = status === null || status === undefined
+  if (isStatusAbsent) return false
+  if (!DECIMAL_STATUS_CODE.test(status)) {
+    throw new GrpcWebError(
+      undefined,
+      httpStatus,
+      `grpc-web: ${methodPath} returned a malformed grpc-status "${status}"`,
+    )
+  }
+  const code = Number(status)
+  if (code !== GRPC_STATUS_OK) {
+    throw new GrpcWebError(
+      code,
+      httpStatus,
+      `grpc-web: ${methodPath} failed with status ${code}: ${
+        metadata.get("grpc-message") ?? ""
+      }`,
+    )
+  }
+  return true
 }
 
 type UnaryCallParams = {
@@ -134,19 +172,10 @@ export const grpcWebUnaryCall = async ({
   }
 
   // Trailers-only responses carry grpc-status in the HTTP headers
-  const headerStatus = response.headers.get("grpc-status")
-  if (headerStatus !== null && headerStatus !== "0") {
-    throw new GrpcWebError(
-      Number(headerStatus),
-      response.status,
-      `grpc-web: ${methodPath} failed with status ${headerStatus}: ${
-        response.headers.get("grpc-message") ?? ""
-      }`,
-    )
-  }
+  const isOkInHeaders = hasOkGrpcStatus(response.headers, methodPath, response.status)
 
   let message: Uint8Array | undefined
-  let sawTrailers = false
+  let isOkInTrailers = false
   for (const frame of parseFrames(body)) {
     // eslint-disable-next-line no-bitwise -- gRPC-web compressed flag is the low bit
     if (frame.flag & COMPRESSED_FLAG) {
@@ -157,33 +186,27 @@ export const grpcWebUnaryCall = async ({
       )
     }
     // eslint-disable-next-line no-bitwise -- gRPC-web trailer flag is the high bit
-    if (frame.flag & TRAILER_FLAG) {
-      sawTrailers = true
-      const trailers = parseTrailers(frame.payload)
-      const status = trailers.get("grpc-status")
-      if (status !== undefined && status !== "0") {
-        throw new GrpcWebError(
-          Number(status),
-          response.status,
-          `grpc-web: ${methodPath} failed with status ${status}: ${
-            trailers.get("grpc-message") ?? ""
-          }`,
-        )
-      }
-    } else if (message === undefined) {
-      message = frame.payload
-    }
+    const isTrailerFrame = (frame.flag & TRAILER_FLAG) !== 0
+    const isOkTrailerFrame =
+      isTrailerFrame &&
+      hasOkGrpcStatus(parseTrailers(frame.payload), methodPath, response.status)
+    if (isOkTrailerFrame) isOkInTrailers = true
+    const isFirstMessageFrame = !isTrailerFrame && message === undefined
+    if (isFirstMessageFrame) message = frame.payload
   }
 
-  // The trailers frame is where a unary call's real grpc-status arrives
-  // (unless the server already sent it in the HTTP headers, checked above).
-  // A body without one means the stream was cut after the message frame, so
-  // a non-OK status may simply never have arrived - that is not success.
-  if (!sawTrailers && headerStatus === null) {
+  /**
+   * The grpc-status is the call's authoritative outcome, and it arrives in the
+   * trailers frame unless the server already sent it in the HTTP headers. A
+   * body without one was cut short or rewritten by a proxy, so a failing
+   * status may never have arrived. Neither case counts as success.
+   */
+  const isOkStatusReported = isOkInHeaders || isOkInTrailers
+  if (!isOkStatusReported) {
     throw new GrpcWebError(
       undefined,
       response.status,
-      `grpc-web: ${methodPath} response ended without a trailers frame`,
+      `grpc-web: ${methodPath} response carried no grpc-status`,
     )
   }
 
