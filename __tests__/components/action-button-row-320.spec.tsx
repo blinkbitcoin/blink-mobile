@@ -11,6 +11,10 @@ import { ActionButton } from "@app/components/action-button"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import theme from "@app/rne-theme/theme"
+import {
+  RECEIVE_ACTIONS_GAP,
+  RECEIVE_INPUTS_GUTTER,
+} from "@app/screens/receive-bitcoin-screen/layout"
 
 /**
  * The on-chain receive row holds Copy, Share and New. On the narrowest phone we
@@ -20,9 +24,8 @@ import theme from "@app/rne-theme/theme"
  * the parts that cannot shrink fit in the row with room left for a label.
  */
 const SCREEN_WIDTH = 320
-// receive-screen.tsx: inputsContainer paddingHorizontal and actionsRow columnGap.
-const SCREEN_GUTTER = 20
-const ROW_GAP = 10
+const SCREEN_GUTTER = RECEIVE_INPUTS_GUTTER
+const ROW_GAP = RECEIVE_ACTIONS_GAP
 const BUTTON_COUNT = 3
 const ICON_SIZE = 16
 // Room for one glyph and the ellipsis at 14px Source Sans Pro.
