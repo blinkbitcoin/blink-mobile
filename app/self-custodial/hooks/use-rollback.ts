@@ -25,7 +25,8 @@ export const useSelfCustodialRollback = ({
 
   useEffect(() => {
     /**
-     * A *successful* fetch that positively disables self-custody, never a default read as
+     * A value the server actually set that disables self-custody — from this launch's
+     * fetch, or activated by an earlier one when this one failed — never a default read as
      * an answer. `remoteConfigReady` is set in a `finally` regardless of whether the fetch
      * threw, and `nonCustodialEnabled` defaults to `false`, so gating on readiness alone
      * bounced a self-custodial user to custodial on any network blip — and, downstream of

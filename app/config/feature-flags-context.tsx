@@ -298,6 +298,38 @@ remoteConfigInstance().setConfigSettings({
 export const FeatureFlagContext = createContext<FeatureFlags>(defaultFeatureFlags)
 export const RemoteConfigContext = createContext<RemoteConfig>(defaultRemoteConfig)
 
+/**
+ * The self-custody rollout as an earlier successful fetch left it, for a launch whose own
+ * fetch failed. Firebase keeps activated values across launches, and `getSource()` says
+ * whether a value came from the server or is the shipped default.
+ *
+ * Trust follows `nonCustodialEnabled` specifically, because that is the value rollback acts
+ * on. Rollback is a safety control: a cohort that already received `false` must keep being
+ * moved off self-custody on every launch, including the offline starts, throttled fetches
+ * and networks that block Firebase where this fetch fails. A shipped default is still never
+ * read as an answer — that is what bounced every self-custodial user on a network blip. The
+ * other two rollout values are taken as they stand; a default there equals what the
+ * context already holds.
+ */
+const readActivatedRollout = (): Pick<
+  RemoteConfig,
+  "nonCustodialEnabled" | "stableBalanceEnabled" | "telemetryEnabled"
+> | null => {
+  try {
+    const nonCustodial = remoteConfigInstance().getValue(NonCustodialEnabledKey)
+    if (nonCustodial.getSource() !== "remote") return null
+    return {
+      nonCustodialEnabled: nonCustodial.asBoolean(),
+      stableBalanceEnabled: remoteConfigInstance()
+        .getValue(StableBalanceEnabledKey)
+        .asBoolean(),
+      telemetryEnabled: remoteConfigInstance().getValue(TelemetryEnabledKey).asBoolean(),
+    }
+  } catch {
+    return null
+  }
+}
+
 export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
@@ -556,6 +588,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           context: { stage: "fetchAndActivate" },
           dedupKey: "remote-config-fetch",
         })
+        const activated = readActivatedRollout()
+        if (activated) {
+          setRemoteConfig((previous) => ({ ...previous, ...activated }))
+          setRemoteConfigTrusted(true)
+        }
       } finally {
         setRemoteConfigReady(true)
       }

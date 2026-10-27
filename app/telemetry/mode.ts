@@ -85,7 +85,8 @@ export type TelemetryModeInputs = {
    */
   persistedMode: SelfCustodialModeAnswer
   serverMode: SelfCustodialModeAnswer
-  /** Whether the remote config behind the self-custody rollout was actually fetched. */
+  /** Whether the self-custody rollout's values came from the server — this launch's fetch,
+   *  or one an earlier fetch activated — rather than the shipped defaults. */
   remoteConfigTrusted: boolean
   /**
    * Whether the account registry has finished its first read of the device's account index.
