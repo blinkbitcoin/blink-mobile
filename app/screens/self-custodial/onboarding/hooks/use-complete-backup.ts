@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceContinueRoute,
@@ -39,7 +39,11 @@ type CompleteBackupOptions = {
 export const useCompleteBackup = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
-  const { isSelfCustodial } = useActiveWallet()
+  /** Account type, not useActiveWallet().isSelfCustodial: that also encodes SDK
+   *  availability, so it reads false at cold start and right after an account
+   *  switch, and a self-custodial user finishing a backup in that window would be
+   *  routed as if the account were custodial. */
+  const isSelfCustodialAccount = useIsSelfCustodialAccount()
   const { backupState, setBackupCompleted } = useBackupState()
   const {
     checkpoint: migrationCheckpoint,
@@ -50,7 +54,7 @@ export const useCompleteBackup = () => {
   const isAlreadyBackedUp = backupState.status === BackupStatus.Completed
   /** Migration only applies on a custodial account; self-custodial backups are standalone. */
   const isMigrating =
-    !isSelfCustodial && migrationCheckpoint !== null && !isAlreadyBackedUp
+    !isSelfCustodialAccount && migrationCheckpoint !== null && !isAlreadyBackedUp
 
   return useCallback(
     async ({ method, message, backupOptions }: CompleteBackupOptions) => {
@@ -117,7 +121,7 @@ export const useCompleteBackup = () => {
        *  user. A migration never gets here, since its provisioned account holds no funds
        *  and therefore no bundle until the transfer lands. The step replaces the one that
        *  called it, so going back cannot confirm, and record, the same backup twice. */
-      const isBundleHandoverDue = method === BackupMethod.Manual && isSelfCustodial
+      const isBundleHandoverDue = method === BackupMethod.Manual && isSelfCustodialAccount
       if (isBundleHandoverDue) {
         navigation.replace("selfCustodialBackupBundleExport", {
           successMessage: message,
@@ -136,7 +140,7 @@ export const useCompleteBackup = () => {
       migrationAccountId,
       saveCheckpoint,
       isAlreadyBackedUp,
-      isSelfCustodial,
+      isSelfCustodialAccount,
       setBackupCompleted,
       LL,
     ],
