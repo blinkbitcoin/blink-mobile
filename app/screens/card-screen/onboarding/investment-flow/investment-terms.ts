@@ -96,7 +96,7 @@ export const resolveInvestmentTerms = (
 
 /** Whether the investor can pay for what they signed for, and what stands in the way. */
 export type InvestmentFunding = {
-  /** The fullest single wallet, which is the one that has to cover the payment. */
+  /** The wallet the payment would draw on: the one that covers it, or the fullest. */
   balanceUsd: number
   shortfallUsd: number
   hasEnoughBalance: boolean
@@ -105,35 +105,44 @@ export type InvestmentFunding = {
 }
 
 /**
+ * What a conversion costs on the way, as a share of the amount: the spread between the
+ * two sides of the price. Funds spread over both wallets are only worth consolidating
+ * when the two together clear the debt by at least this much, or the investor converts,
+ * lands short by the spread, and the card they followed turns from "convert" into
+ * "deposit the remaining amount".
+ */
+export const CONVERSION_SPREAD_ALLOWANCE = 0.01
+
+/**
  * Measured against **one** wallet, not the two added together, because that is what a
  * payment can draw on: the send flow spends from a single wallet, so an investor holding
  * half the amount in each is turned away at it however healthy the total looks.
  *
  * Dollars, which is the currency the agreement is written in: the balance is shown to the
  * investor in whatever currency they chose to read it in, and that choice has no bearing
- * on whether the amount is covered.
+ * on whether the amount is covered. Whether the wallet covers the debt is decided by the
+ * caller, which knows the debt in the wallet's own currency; here it is only carried.
  *
  * The shortfall never goes below zero, so a covered investment reads as nothing missing
  * rather than as a negative sum the copy would print with a minus.
  */
 export const resolveInvestmentFunding = ({
-  largestWalletUsd,
+  balanceUsd,
+  isBalanceCovering,
   combinedUsd,
   totalUsd,
 }: {
-  largestWalletUsd: number
+  balanceUsd: number
+  isBalanceCovering: boolean
   combinedUsd: number
   totalUsd: number
-}): InvestmentFunding => {
-  const hasEnoughBalance = largestWalletUsd >= totalUsd
-
-  return {
-    balanceUsd: largestWalletUsd,
-    shortfallUsd: Math.max(totalUsd - largestWalletUsd, 0),
-    hasEnoughBalance,
-    isSplitAcrossWallets: !hasEnoughBalance && combinedUsd >= totalUsd,
-  }
-}
+}): InvestmentFunding => ({
+  balanceUsd,
+  shortfallUsd: Math.max(totalUsd - balanceUsd, 0),
+  hasEnoughBalance: isBalanceCovering,
+  isSplitAcrossWallets:
+    !isBalanceCovering && combinedUsd >= totalUsd * (1 + CONVERSION_SPREAD_ALLOWANCE),
+})
 
 /** The share of the company the terms buy, which the term sheet states beside the units. */
 export const resolveEquityPercent = ({
