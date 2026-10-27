@@ -1,19 +1,36 @@
 const mockClearCachedAccessToken = jest.fn()
 const mockGetTokens = jest.fn()
+const mockConfigure = jest.fn()
 
 jest.mock("@react-native-google-signin/google-signin", () => ({
   GoogleSignin: {
     clearCachedAccessToken: (...args: unknown[]) => mockClearCachedAccessToken(...args),
     getTokens: (...args: unknown[]) => mockGetTokens(...args),
+    configure: (...args: unknown[]) => mockConfigure(...args),
   },
 }))
 
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import { DriveError } from "@app/utils/google-drive-client"
-import { callDrive, isDeadAccessToken } from "@app/utils/google-drive-session"
+import {
+  callDrive,
+  configureGoogleSignIn,
+  isDeadAccessToken,
+} from "@app/utils/google-drive-session"
 
 const deadToken = () =>
   new DriveError(CloudBackupErrorReason.Auth, "Drive query failed (401)", 401)
+
+describe("configureGoogleSignIn", () => {
+  it("configures sign-in with the Drive appdata scope only", () => {
+    configureGoogleSignIn()
+
+    expect(mockConfigure).toHaveBeenCalledTimes(1)
+    expect(mockConfigure).toHaveBeenCalledWith({
+      scopes: ["https://www.googleapis.com/auth/drive.appdata"],
+    })
+  })
+})
 
 describe("isDeadAccessToken", () => {
   it("is true only for a DriveError carrying a 401 status", () => {

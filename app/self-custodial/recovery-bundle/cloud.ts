@@ -15,7 +15,7 @@ import {
   findAppDataFile as driveFindAppDataFile,
   uploadAppDataFile as driveUploadAppDataFile,
 } from "@app/utils/google-drive-client"
-import { callDrive } from "@app/utils/google-drive-session"
+import { callDrive, configureGoogleSignIn } from "@app/utils/google-drive-session"
 import {
   assertICloudAvailable,
   uploadAppDataFile as iCloudUploadAppDataFile,
@@ -29,8 +29,6 @@ export const getRecoveryBundleFilename = (
   walletIdentifier: string,
 ): string => `${getRecoveryBundleFilenamePrefix(network)}${walletIdentifier}.json`
 
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
-
 export type SilentCloudUploadResult =
   | { success: true }
   | {
@@ -42,7 +40,7 @@ export type SilentCloudUploadResult =
     }
 
 const silentDriveAccessToken = async (): Promise<string | null> => {
-  GoogleSignin.configure({ scopes: [DRIVE_SCOPE] })
+  configureGoogleSignIn()
   if (!GoogleSignin.getCurrentUser()) {
     const silent = await GoogleSignin.signInSilently()
     if (silent.type !== "success") return null
