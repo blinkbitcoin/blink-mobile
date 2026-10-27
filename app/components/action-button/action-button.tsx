@@ -1,10 +1,12 @@
 import React from "react"
-import { Pressable } from "react-native"
+import { ActivityIndicator, Pressable } from "react-native"
 
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { testProps } from "@app/utils/testProps"
+
+const ICON_SIZE = 16
 
 type ActionButtonProps = {
   label: string
@@ -12,6 +14,8 @@ type ActionButtonProps = {
   onPress: () => void
   accessibilityHint: string
   disabled?: boolean
+  /** Shows progress in place of the icon; the button takes no presses meanwhile. */
+  loading?: boolean
 }
 
 export const ActionButton: React.FC<ActionButtonProps> = ({
@@ -20,11 +24,13 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
   onPress,
   accessibilityHint,
   disabled = false,
+  loading = false,
 }) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
+  const isDisabled = disabled || loading
 
   return (
     <Pressable
@@ -32,19 +38,28 @@ export const ActionButton: React.FC<ActionButtonProps> = ({
       style={({ pressed }) => [
         styles.container,
         pressed && styles.pressed,
-        disabled && styles.disabled,
+        isDisabled && styles.disabled,
       ]}
       onPress={onPress}
-      disabled={disabled}
+      disabled={isDisabled}
       accessibilityRole="button"
       accessibilityHint={accessibilityHint}
-      accessibilityState={{ disabled }}
+      accessibilityState={{ disabled: isDisabled, busy: loading }}
     >
       {/* One line, always: a long translation ellipsizes instead of growing the row. */}
       <Text style={styles.label} numberOfLines={1} ellipsizeMode="tail">
         {label}
       </Text>
-      <GaloyIcon name={icon} size={16} color={colors.primary} />
+      {loading ? (
+        <ActivityIndicator
+          testID={`${label}-loading`}
+          size="small"
+          color={colors.primary}
+          style={styles.spinner}
+        />
+      ) : (
+        <GaloyIcon name={icon} size={ICON_SIZE} color={colors.primary} />
+      )}
     </Pressable>
   )
 }
@@ -72,5 +87,10 @@ const useStyles = makeStyles(({ colors }) => ({
     fontSize: 14,
     fontWeight: "400",
     color: colors.black,
+  },
+  // Same footprint as the icon, so the row does not shift while it spins.
+  spinner: {
+    width: ICON_SIZE,
+    height: ICON_SIZE,
   },
 }))
