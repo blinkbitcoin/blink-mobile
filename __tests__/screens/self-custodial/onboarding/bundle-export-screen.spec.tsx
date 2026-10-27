@@ -1,6 +1,6 @@
 import React from "react"
 
-import { render, fireEvent, screen, waitFor } from "@testing-library/react-native"
+import { render, fireEvent, screen, waitFor, within } from "@testing-library/react-native"
 
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -9,13 +9,11 @@ import type { RecoveryBundleActions } from "@app/screens/self-custodial/recovery
 // Direct import: the onboarding barrel pulls in the biometrics screen, whose
 // native fingerprint dep is not transformed for jest.
 import { BundleExportScreen } from "@app/screens/self-custodial/onboarding/manual-backup/bundle-export-screen"
-import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 
 import { ContextForScreen } from "../../helper"
 
 let LL: TranslationFunctions
 
-const mockCompleteBackup = jest.fn()
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
   settings: { autoRefresh: true, cloudSync: false },
@@ -39,17 +37,17 @@ jest.mock(
   () => ({ useRecoveryBundleActions: () => mockActions }),
 )
 
-jest.mock("@app/screens/self-custodial/onboarding/hooks", () => ({
-  ...jest.requireActual("@app/screens/self-custodial/onboarding/hooks"),
-  useCompleteBackup: () => mockCompleteBackup,
-}))
-
 const mockNavigate = jest.fn()
-const mockParams = jest.fn<{ successMessage?: string } | undefined, []>()
+const mockReplace = jest.fn()
+const mockNavigation = { navigate: mockNavigate, replace: mockReplace }
+const mockParams = jest.fn<
+  { successMessage?: string; reBackup?: boolean } | undefined,
+  []
+>()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useRoute: () => ({ params: mockParams() }),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => mockNavigation,
 }))
 
 const renderScreen = () =>
@@ -59,6 +57,20 @@ const renderScreen = () =>
     </ContextForScreen>,
   )
 
+/** The warning's confirm for a copy carries the same "Copy" label as the
+ *  screen's own button, so it is told apart by not being that button. */
+const pressCopyConfirm = () => {
+  const copyLabel = LL.BackupScreen.BundleExport.copy()
+  const screenButtonLabel = within(screen.getByTestId("bundle-copy-button")).getByText(
+    copyLabel,
+  )
+  const confirm = screen.getAllByText(copyLabel).find((el) => el !== screenButtonLabel)
+  if (!confirm) throw new Error("copy confirmation not rendered")
+  fireEvent.press(confirm)
+}
+
+const successRoute = { reBackup: false, message: "done" }
+
 describe("BundleExportScreen", () => {
   beforeAll(() => {
     loadLocale("en")
@@ -67,7 +79,7 @@ describe("BundleExportScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockParams.mockReturnValue({ successMessage: "done" })
+    mockParams.mockReturnValue({ successMessage: "done", reBackup: false })
     mockActions.bundleState = undefined
     mockActions.sharing = false
     mockActions.copying = false
@@ -104,10 +116,8 @@ describe("BundleExportScreen", () => {
       // Skipping does not leave them unprotected: the encrypted on-device copy
       // is written automatically, and the home nudge brings them back.
       fireEvent.press(screen.getByTestId("bundle-skip-button"))
-      expect(mockCompleteBackup).toHaveBeenCalledWith({
-        method: BackupMethod.Manual,
-        message: "done",
-      })
+      // The backup was recorded before this screen, so skipping only moves on.
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", successRoute)
     })
 
     it("warns before the first download and exports only on confirmation", async () => {
@@ -149,8 +159,9 @@ describe("BundleExportScreen", () => {
 
       expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBundleSaved", {
         successMessage: "done",
+        reBackup: false,
       })
-      expect(mockCompleteBackup).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
     })
 
     /** Dismissing the OS share sheet is one tap. Advancing anyway would tell the
@@ -191,15 +202,42 @@ describe("BundleExportScreen", () => {
       expect(mockNavigate).not.toHaveBeenCalled()
     })
 
-    it("copies without leaving the screen", async () => {
+    it("warns before a copy and copies only on confirmation", async () => {
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-copy-button"))
-      await waitFor(() => expect(mockActions.handleCopy).toHaveBeenCalled())
 
+      // The clipboard can sync off the device, so a copy is as sensitive as a
+      // download and sits behind the same warning.
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
+      expect(mockActions.handleCopy).not.toHaveBeenCalled()
+
+      pressCopyConfirm()
+      await waitFor(() => expect(mockActions.handleCopy).toHaveBeenCalledTimes(1))
       // Copy is a one-shot export (R10), not a step in the flow.
       expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockCompleteBackup).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+    })
+
+    it("can back out of the copy warning without touching the clipboard", () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-copy-button"))
+      fireEvent.press(screen.getByTestId("modal-close"))
+
+      expect(mockActions.handleCopy).not.toHaveBeenCalled()
+    })
+
+    it("does not re-warn for a copy once the warning was read for a download", async () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
+
+      fireEvent.press(screen.getByTestId("bundle-copy-button"))
+      await waitFor(() => expect(mockActions.handleCopy).toHaveBeenCalledTimes(1))
     })
 
     it("explains unilateral exit on request", () => {
@@ -257,10 +295,7 @@ describe("BundleExportScreen", () => {
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-continue-button"))
-      expect(mockCompleteBackup).toHaveBeenCalledWith({
-        method: BackupMethod.Manual,
-        message: "done",
-      })
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", successRoute)
     })
   })
 
@@ -275,7 +310,7 @@ describe("BundleExportScreen", () => {
     renderScreen()
 
     fireEvent.press(screen.getByTestId("bundle-continue-button"))
-    expect(mockCompleteBackup).not.toHaveBeenCalled()
+    expect(mockReplace).not.toHaveBeenCalled()
   })
 
   it("finishes without a message when the route carries no params", () => {
@@ -284,8 +319,8 @@ describe("BundleExportScreen", () => {
     renderScreen()
 
     fireEvent.press(screen.getByTestId("bundle-continue-button"))
-    expect(mockCompleteBackup).toHaveBeenCalledWith({
-      method: BackupMethod.Manual,
+    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
+      reBackup: undefined,
       message: undefined,
     })
   })
@@ -298,7 +333,7 @@ describe("BundleExportScreen", () => {
     expect(() => renderScreen()).not.toThrow()
   })
 
-  /** Skip finishes the backup and navigates away. Left live during an export it
+  /** Skip navigates away. Left live during an export it
    *  would tear the flow down while the share sheet or the clipboard write is
    *  still resolving into a screen the user has left. */
   describe("skip during an in-flight export", () => {
@@ -312,7 +347,7 @@ describe("BundleExportScreen", () => {
 
       fireEvent.press(getByTestId("bundle-skip-button"))
 
-      expect(mockCompleteBackup).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
     })
 
     it("refuses the press while a copy is in flight", () => {
@@ -321,7 +356,7 @@ describe("BundleExportScreen", () => {
 
       fireEvent.press(getByTestId("bundle-skip-button"))
 
-      expect(mockCompleteBackup).not.toHaveBeenCalled()
+      expect(mockReplace).not.toHaveBeenCalled()
     })
 
     it("allows the press once nothing is in flight", () => {
@@ -329,7 +364,7 @@ describe("BundleExportScreen", () => {
 
       fireEvent.press(getByTestId("bundle-skip-button"))
 
-      expect(mockCompleteBackup).toHaveBeenCalled()
+      expect(mockReplace).toHaveBeenCalled()
     })
   })
 })

@@ -438,7 +438,11 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
+  it("hands a settings re-backup over to the recovery bundle step as a re-backup", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "completed", method: "manual" },
@@ -457,13 +461,17 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
+    expect(mockReplace).toHaveBeenCalledWith(
+      "selfCustodialBackupBundleExport",
       expect.objectContaining({ reBackup: true }),
     )
   })
 
-  it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", async () => {
+  it("records a fresh manual backup and hands it over to the recovery bundle step", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockCheckpoint.mockReturnValue(null)
 
     const { getByPlaceholderText } = render(
@@ -479,8 +487,8 @@ describe("BackupPhraseConfirmScreen", () => {
     })
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
+    expect(mockReplace).toHaveBeenCalledWith(
+      "selfCustodialBackupBundleExport",
       expect.objectContaining({ reBackup: false }),
     )
   })
@@ -513,7 +521,11 @@ describe("BackupPhraseConfirmScreen", () => {
     })
   })
 
-  it("forwards the route's successMessage to the success screen when provided", async () => {
+  it("forwards the route's successMessage through the recovery bundle step", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockRouteParams.mockReturnValue({
       challenges: [
         { index: 0, word: "youth" },
@@ -539,11 +551,11 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockNavigate).toHaveBeenCalledWith(
-      "selfCustodialBackupSuccess",
+    expect(mockReplace).toHaveBeenCalledWith(
+      "selfCustodialBackupBundleExport",
       expect.objectContaining({
         reBackup: true,
-        message: "Your backup phrase is correct",
+        successMessage: "Your backup phrase is correct",
       }),
     )
   })

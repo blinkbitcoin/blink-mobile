@@ -336,8 +336,10 @@ export type RootStackParamList = {
     challenges: Array<{ index: number; word: string }>
     successMessage?: string
   }
-  selfCustodialBackupBundleExport: { successMessage?: string } | undefined
-  selfCustodialBundleSaved: { successMessage?: string } | undefined
+  selfCustodialBackupBundleExport:
+    | { successMessage?: string; reBackup?: boolean }
+    | undefined
+  selfCustodialBundleSaved: { successMessage?: string; reBackup?: boolean } | undefined
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
   /** The settings entry applies the choice to the active account and returns. The
    *  onboarding entries declare their onward step: restore and migration pass the

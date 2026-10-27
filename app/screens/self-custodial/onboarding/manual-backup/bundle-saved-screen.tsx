@@ -1,18 +1,20 @@
-import React, { useCallback, useEffect, useRef } from "react"
+import React, { useCallback } from "react"
 import { View } from "react-native"
 
-import { RouteProp, useFocusEffect, useRoute } from "@react-navigation/native"
+import {
+  RouteProp,
+  useFocusEffect,
+  useNavigation,
+  useRoute,
+} from "@react-navigation/native"
+import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { testProps } from "@app/utils/testProps"
-
-import { useCompleteBackup } from "../hooks"
 
 type BundleSavedRouteProp = RouteProp<RootStackParamList, "selfCustodialBundleSaved">
 
@@ -21,51 +23,36 @@ type BundleSavedRouteProp = RouteProp<RootStackParamList, "selfCustodialBundleSa
 const DWELL_MS = 1800
 
 /**
- * Confirms the emergency bundle reached the user's device, then finishes the
- * backup on its own.
+ * Confirms the emergency bundle reached the user's device, then moves on to the
+ * backup's success screen on its own.
  *
  * Deliberately actionless: the export already happened, so a button here would
  * only ask the user to acknowledge something that is already true. It mirrors
- * the app's other success interstitials.
+ * the app's other success interstitials. The backup was recorded before the
+ * bundle step, so leaving here only navigates and cannot fail, which is what
+ * makes a screen without an action safe.
  */
 export const BundleSavedScreen: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  const { successMessage } = useRoute<BundleSavedRouteProp>().params ?? {}
-  const completeBackup = useCompleteBackup()
+  const { successMessage, reBackup } = useRoute<BundleSavedRouteProp>().params ?? {}
+  const navigation =
+    useNavigation<
+      NativeStackNavigationProp<RootStackParamList, "selfCustodialBundleSaved">
+    >()
 
-  /** One manual backup is one completion, however many times this screen sends
-   *  the user onward. Navigating forward again after an iOS back-swipe is
-   *  correct; counting it as a second backup is not. */
-  const hasLoggedRef = useRef(false)
-
-  const finish = useCallback(() => {
-    if (!hasLoggedRef.current) {
-      hasLoggedRef.current = true
-      logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    }
-    completeBackup({ method: BackupMethod.Manual, message: successMessage })
-  }, [completeBackup, successMessage])
-
-  /** Held in a ref so the dwell is not keyed on finish's identity: finish()
-   *  completes the backup, which re-identifies the backup-state context and
-   *  finish with it, so an effect depending on it re-arms after every firing -
-   *  duplicate analytics, duplicate writes, and the success copy flipping while
-   *  the user reads it. */
-  const finishRef = useRef(finish)
-  useEffect(() => {
-    finishRef.current = finish
-  }, [finish])
-
-  /** Focus-scoped rather than mount-scoped. The success screen this pushes stays
-   *  above a still-mounted copy of this one and is swipeable back on iOS; since
-   *  this screen has no action of its own, a dwell that only ever armed once
-   *  would strand the user here with no way forward. */
+  /** Cleared when the screen loses focus, so the dwell never navigates out of a
+   *  screen the user has already left. */
   useFocusEffect(
     useCallback(() => {
-      const timer = setTimeout(() => finishRef.current(), DWELL_MS)
+      const timer = setTimeout(() => {
+        navigation.replace("selfCustodialBackupSuccess", {
+          reBackup,
+          message: successMessage,
+        })
+      }, DWELL_MS)
       return () => clearTimeout(timer)
-    }, []),
+    }, [navigation, reBackup, successMessage]),
   )
 
   return (
