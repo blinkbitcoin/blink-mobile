@@ -26,6 +26,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
+import { ActionButton } from "@app/components/action-button"
 import { toastShow } from "@app/utils/toast"
 import {
   AccountType,
@@ -696,9 +697,15 @@ describe("ReceiveScreen — self-custodial", () => {
     it("rotates once for a double tap", async () => {
       await renderOnOnchainPage()
 
-      const newButton = screen.getByText(LL.ReceiveScreen.newAddress())
-      fireEvent.press(newButton)
-      fireEvent.press(newButton)
+      // Both taps reach the handler before React re-renders, which is the case the
+      // in-flight guard exists for: fireEvent would see the disabled button and skip.
+      const { onPress } = screen
+        .UNSAFE_getAllByType(ActionButton)
+        .find((button) => button.props.label === LL.ReceiveScreen.newAddress())!.props
+      await act(async () => {
+        onPress()
+        onPress()
+      })
 
       await waitFor(() => {
         expect(screen.getByText(shown(freshAddress))).toBeTruthy()
@@ -741,7 +748,7 @@ describe("ReceiveScreen — self-custodial", () => {
 
       const identifier = screen.getByTestId("readable-payment-request")
       expect(identifier.props.children).toBeFalsy()
-      expect(screen.getByText(LL.ReceiveScreen.newAddressFailed())).toBeTruthy()
+      expect(screen.getByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeTruthy()
       expect(screen.queryByText("QR-OnChain")).toBeNull()
       fireEvent.press(identifier)
       expect(Clipboard.setString).not.toHaveBeenCalled()

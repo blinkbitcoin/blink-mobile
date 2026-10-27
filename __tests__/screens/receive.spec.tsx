@@ -9,6 +9,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
+import { ActionButton } from "@app/components/action-button"
 
 import { toastShow } from "@app/utils/toast"
 
@@ -1420,6 +1421,151 @@ describe("ReceiveScreen new on-chain address", () => {
     })
   }
 
+  const actionButton = (label: string) => screen.getByLabelText(label)
+  const isDisabled = (label: string) =>
+    Boolean(actionButton(label).props.accessibilityState?.disabled)
+
+  type CurrentResponse = Awaited<ReturnType<typeof onChainAddressCurrentMock>>
+  type CreateResult = Awaited<ReturnType<typeof onChainAddressCreateMock>>
+
+  describe("when the on-chain wallet switches", () => {
+    const btcShown = "tb1qstk6xu...w05pc7lmz5"
+    const usdFetch = { variables: { input: { walletId: "usd-wallet-id" } } }
+
+    // Starts the USD fetch and holds it open; returns a way to fail it.
+    const switchToUsdAndHold = async () => {
+      render(
+        <ContextForScreen headerShown>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      // The toggle ignores taps until the lightning request is ready.
+      await waitFor(() => {
+        expect(screen.getByText(/test1@/)).toBeTruthy()
+      })
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await waitFor(() => {
+        expect(screen.getByText(btcShown)).toBeTruthy()
+      })
+      let failUsd: (err: Error) => void = () => {}
+      onChainAddressCurrentMock.mockImplementationOnce(
+        () =>
+          new Promise<CurrentResponse>((_, reject) => {
+            failUsd = reject
+          }),
+      )
+      fireEvent.press(screen.getByLabelText("Toggle wallet"))
+      await flushAsync()
+      expect(onChainAddressCurrentMock).toHaveBeenLastCalledWith(usdFetch)
+      return (err: Error) => failUsd(err)
+    }
+
+    it("never shows or copies the BTC address while the USD one loads", async () => {
+      // Regression: the BTC address stayed on the USD page, with Copy and Share live,
+      // until the USD address arrived.
+      await switchToUsdAndHold()
+
+      expect(screen.queryByText(btcShown)).toBeNull()
+      expect(isDisabled(LL.ReceiveScreen.copyInvoice())).toBe(true)
+      expect(isDisabled(LL.ReceiveScreen.shareInvoice())).toBe(true)
+      expect(isDisabled(LL.ReceiveScreen.newAddress())).toBe(true)
+      fireEvent.press(screen.getByTestId("readable-payment-request"))
+      expect(Clipboard.setString).not.toHaveBeenCalled()
+    })
+
+    it("shows the failure and offers New when the USD address fails to load", async () => {
+      // Regression: a failed USD fetch left the BTC address on the USD page for good,
+      // QR included, and the failure state never appeared.
+      const failUsd = await switchToUsdAndHold()
+
+      await act(async () => failUsd(new Error("network")))
+      await flushAsync()
+
+      expect(screen.queryByText(btcShown)).toBeNull()
+      expect(screen.queryByText("QR-OnChain")).toBeNull()
+      expect(screen.getByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeTruthy()
+      expect(isDisabled(LL.ReceiveScreen.copyInvoice())).toBe(true)
+      expect(isDisabled(LL.ReceiveScreen.newAddress())).toBe(false)
+    })
+  })
+
+  it("keeps New disabled while the first address loads", async () => {
+    onChainAddressCurrentMock.mockImplementationOnce(
+      () => new Promise<CurrentResponse>(() => {}),
+    )
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await flushAsync()
+
+    expect(isDisabled(LL.ReceiveScreen.newAddress())).toBe(true)
+    expect(isDisabled(LL.ReceiveScreen.copyInvoice())).toBe(true)
+    expect(screen.queryByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeNull()
+  })
+
+  it("hides the load error while New retries, and brings it back if the retry fails", async () => {
+    onChainAddressCurrentMock.mockImplementationOnce(() =>
+      Promise.reject(new Error("network")),
+    )
+    let failCreate: (err: Error) => void = () => {}
+    onChainAddressCreateMock.mockImplementationOnce(
+      () =>
+        new Promise<CreateResult>((_, reject) => {
+          failCreate = reject
+        }),
+    )
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await flushAsync()
+    expect(screen.getByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeTruthy()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+    await flushAsync()
+
+    expect(screen.queryByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeNull()
+    expect(actionButton(LL.ReceiveScreen.newAddress()).props.accessibilityState).toEqual(
+      expect.objectContaining({ disabled: true, busy: true }),
+    )
+    expect(isDisabled(LL.ReceiveScreen.copyInvoice())).toBe(true)
+
+    await act(async () => failCreate(new Error("still offline")))
+    await flushAsync()
+
+    expect(screen.getByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeTruthy()
+    expect(isDisabled(LL.ReceiveScreen.newAddress())).toBe(false)
+    expect(toastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: LL.ReceiveScreen.newAddressFailed(),
+        type: "error",
+      }),
+    )
+  })
+
+  it("keeps the current address on screen while New makes another", async () => {
+    onChainAddressCreateMock.mockImplementationOnce(
+      () => new Promise<CreateResult>(() => {}),
+    )
+    await renderOnOnchainPage()
+
+    fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+    await flushAsync()
+
+    expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
+    expect(screen.getByText("QR-OnChain")).toBeTruthy()
+    expect(isDisabled(LL.ReceiveScreen.copyInvoice())).toBe(false)
+  })
+
   it("is only offered on the on-chain page", async () => {
     render(
       <ContextForScreen headerShown>
@@ -1460,9 +1606,15 @@ describe("ReceiveScreen new on-chain address", () => {
   it("creates one address for a double tap", async () => {
     await renderOnOnchainPage()
 
-    const newButton = screen.getByText(LL.ReceiveScreen.newAddress())
-    fireEvent.press(newButton)
-    fireEvent.press(newButton)
+    // Both taps reach the handler before React re-renders, which is the case the
+    // in-flight guard exists for: fireEvent would see the disabled button and skip.
+    const { onPress } = screen
+      .UNSAFE_getAllByType(ActionButton)
+      .find((button) => button.props.label === LL.ReceiveScreen.newAddress())!.props
+    await act(async () => {
+      onPress()
+      onPress()
+    })
 
     await waitFor(() => {
       expect(screen.getByText("tb1qfresha...xxxx9fresh")).toBeTruthy()
@@ -1556,13 +1708,17 @@ describe("ReceiveScreen new on-chain address", () => {
 
     const identifier = screen.getByTestId("readable-payment-request")
     expect(identifier.props.children).toBeFalsy()
-    expect(screen.getByText(LL.ReceiveScreen.newAddressFailed())).toBeTruthy()
+    expect(screen.getByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeTruthy()
     expect(screen.queryByText("QR-OnChain")).toBeNull()
     fireEvent.press(identifier)
     expect(Clipboard.setString).not.toHaveBeenCalled()
 
+    expect(actionButton(LL.ReceiveScreen.copyInvoice()).props.accessibilityState).toEqual(
+      expect.objectContaining({ disabled: true }),
+    )
     fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
     expect(Clipboard.setString).not.toHaveBeenCalled()
+    expect(isDisabled(LL.ReceiveScreen.newAddress())).toBe(false)
 
     fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
 

@@ -15,14 +15,14 @@ jest.mock("@app/graphql/generated", () => ({
   useOnChainAddressCreateMutation: () => [mockCreateFn],
 }))
 
-const mockLL = {}
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({ LL: mockLL }),
-}))
-
 const mockToastShow = jest.fn()
 jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: ReadonlyArray<Record<string, unknown>>) => mockToastShow(...args),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
 }))
 
 describe("useOnChainAddress", () => {
@@ -171,6 +171,7 @@ describe("useOnChainAddress", () => {
     })
 
     expect(result.current.address).toBeNull()
+    expect(result.current.failed).toBe(true)
   })
 
   it("returns null error on success", async () => {
@@ -187,7 +188,9 @@ describe("useOnChainAddress", () => {
     expect(result.current.error).toBeNull()
   })
 
-  it("exposes error when mutation rejects", async () => {
+  it("flags a rejected fetch as failed without a toast", async () => {
+    // The screen shows the failure in the QR and offers New; a raw transport message
+    // in a toast on top of it would be a second, different explanation.
     mockMutationFn.mockRejectedValue(new Error("Network failure"))
 
     const { result } = renderHook(() => useOnChainAddress("wallet-123"))
@@ -197,9 +200,79 @@ describe("useOnChainAddress", () => {
     })
 
     expect(result.current.loading).toBe(false)
-    expect(mockToastShow).toHaveBeenCalledWith(
-      expect.objectContaining({ message: "Network failure", type: "warning" }),
+    expect(result.current.failed).toBe(true)
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("is not failed before a wallet id arrives, nor in the render it arrives", async () => {
+    mockMutationFn.mockResolvedValue({
+      data: { onChainAddressCurrent: { address: "bc1qlate" } },
+    })
+    const failedByRender: boolean[] = []
+    const { result, rerender } = renderHook(
+      ({ walletId }: { walletId?: string }) => {
+        const hook = useOnChainAddress(walletId)
+        failedByRender.push(hook.failed)
+        return hook
+      },
+      { initialProps: {} as { walletId?: string } },
     )
+
+    rerender({ walletId: "wallet-123" })
+    await waitFor(() => expect(result.current.address).toBe("bc1qlate"))
+
+    expect(failedByRender).not.toContain(true)
+  })
+
+  describe("when the wallet changes", () => {
+    const renderOnWallet1 = async () => {
+      mockMutationFn.mockResolvedValueOnce({
+        data: { onChainAddressCurrent: { address: "bc1qwallet1" } },
+      })
+      const hook = renderHook(
+        ({ walletId }: { walletId: string }) => useOnChainAddress(walletId),
+        { initialProps: { walletId: "wallet-1" } },
+      )
+      await waitFor(() => expect(hook.result.current.address).toBe("bc1qwallet1"))
+      return hook
+    }
+
+    it("drops the previous wallet's address while the new one loads", async () => {
+      const { result, rerender } = await renderOnWallet1()
+      mockMutationFn.mockReturnValueOnce(new Promise(() => {}))
+
+      rerender({ walletId: "wallet-2" })
+
+      expect(result.current.address).toBeNull()
+      expect(result.current.getFullUriFn).toBeUndefined()
+      expect(result.current.loading).toBe(true)
+      expect(result.current.failed).toBe(false)
+    })
+
+    it("fails instead of keeping the previous wallet's address when the fetch fails", async () => {
+      // Regression: the previous wallet's address stayed on the new wallet's page for
+      // good, so a payer scanning it paid the wrong wallet and New never appeared.
+      const { result, rerender } = await renderOnWallet1()
+      mockMutationFn.mockRejectedValueOnce(new Error("Network failure"))
+
+      rerender({ walletId: "wallet-2" })
+
+      await waitFor(() => expect(result.current.failed).toBe(true))
+      expect(result.current.address).toBeNull()
+      expect(result.current.getFullUriFn).toBeUndefined()
+    })
+
+    it("fails when the new wallet's fetch returns no address", async () => {
+      const { result, rerender } = await renderOnWallet1()
+      mockMutationFn.mockResolvedValueOnce({
+        data: { onChainAddressCurrent: { address: null } },
+      })
+
+      rerender({ walletId: "wallet-2" })
+
+      await waitFor(() => expect(result.current.failed).toBe(true))
+      expect(result.current.address).toBeNull()
+    })
   })
 
   it("resets error when walletId changes", async () => {
@@ -267,6 +340,61 @@ describe("useOnChainAddress", () => {
       expect(outcome).toBe(NewOnchainAddressResult.Failed)
       expect(result.current.address).toBe("bc1qcurrent")
       expect(result.current.loading).toBe(false)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "onChainAddressCreate",
+        new Error("network"),
+      )
+    })
+
+    it("keeps the current address on screen while the create is in flight", async () => {
+      mockCreateFn.mockReturnValueOnce(new Promise(() => {}))
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
+
+      act(() => {
+        result.current.generateNewAddress()
+      })
+
+      expect(result.current.address).toBe("bc1qcurrent")
+      expect(result.current.loading).toBe(false)
+    })
+
+    it("clears a failed load once New produces an address", async () => {
+      mockMutationFn.mockRejectedValueOnce(new Error("offline"))
+      mockCreateFn.mockResolvedValue({
+        data: { onChainAddressCreate: { address: "bc1qfresh", errors: [] } },
+      })
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.failed).toBe(true))
+
+      await act(async () => {
+        await result.current.generateNewAddress()
+      })
+
+      expect(result.current.address).toBe("bc1qfresh")
+      expect(result.current.failed).toBe(false)
+    })
+
+    it("reports a create that returns no address with its error codes", async () => {
+      mockCreateFn.mockResolvedValue({
+        data: {
+          onChainAddressCreate: {
+            address: null,
+            errors: [{ message: "nope", code: "INVALID_INPUT" }],
+          },
+        },
+      })
+      const { result } = renderHook(() => useOnChainAddress("wallet-123"))
+      await waitFor(() => expect(result.current.address).toBe("bc1qcurrent"))
+
+      await act(async () => {
+        await result.current.generateNewAddress()
+      })
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "onChainAddressCreate",
+        new Error('onChainAddressCreate returned no address: ["INVALID_INPUT"]'),
+      )
     })
 
     it("keeps the current address when the API returns none", async () => {
@@ -328,7 +456,7 @@ describe("useOnChainAddress", () => {
 
         await act(async () => create.resolve(created("bc1qstale")))
 
-        await expect(outcome).resolves.toBe(NewOnchainAddressResult.Failed)
+        await expect(outcome).resolves.toBe(NewOnchainAddressResult.Superseded)
         expect(result.current.address).toBe("bc1qwallet2")
         expect(result.current.loading).toBe(false)
       })
@@ -348,8 +476,8 @@ describe("useOnChainAddress", () => {
 
         await act(async () => create.resolve(created("bc1qstale")))
 
-        await expect(outcome).resolves.toBe(NewOnchainAddressResult.Failed)
-        expect(result.current.address).toBe("bc1qcurrent")
+        await expect(outcome).resolves.toBe(NewOnchainAddressResult.Superseded)
+        expect(result.current.address).toBeNull()
         expect(result.current.loading).toBe(true)
 
         await act(async () => fetchWallet2.resolve(current("bc1qwallet2")))
@@ -396,6 +524,8 @@ describe("useOnChainAddress", () => {
       expect(outcome).toBe(NewOnchainAddressResult.RateLimited)
       expect(result.current.address).toBe("bc1qcurrent")
       expect(result.current.loading).toBe(false)
+      // Expected, and it has its own message: not an error worth a report.
+      expect(mockReportError).not.toHaveBeenCalled()
     })
   })
 })
