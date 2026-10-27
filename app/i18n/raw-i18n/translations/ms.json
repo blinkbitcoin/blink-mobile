@@ -4067,7 +4067,17 @@
     "setupDescription": "Untuk mengelakkan akses tanpa kebenaran ke akaun anda, tambah pengesahan dua faktor sekarang.",
     "addEmail": "Tambah e-mel",
     "addPhoneNumber": "Tambah nombor telefon",
-    "setAuthenticator": "Tetapkan authenticator"
+    "setAuthenticator": "Tetapkan authenticator",
+    "modalReminder": "Jika anda menolaknya sekarang, pastikan anda mengaktifkannya secepat mungkin.",
+    "dismissTwoMore": "Anda boleh menolak ini dua kali lagi.",
+    "dismissOneMore": "Anda boleh menolak ini sekali lagi.",
+    "dismissLast": "Ini adalah kali terakhir anda boleh menolak ini.",
+    "setNow": "Tetapkan sekarang",
+    "dontWantTo": "Saya tidak mahu",
+    "highBalanceTitle": "Anda mempunyai lebih daripada {amount}, sila tambah perlindungan tambahan",
+    "protectionRequiredBody": "Semakin banyak dana yang anda ada, semakin penting keselamatan yang lebih baik. Sila tambah authenticator untuk terus menggunakan Blink.",
+    "nonCustodialTitle": "Jika anda tidak mahu menetapkan pengesahan dua faktor",
+    "nonCustodialBody": "Pilihan lain ialah beralih kepada bukan kustodian. Maka anda bertanggungjawab ke atas dana anda sendiri."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

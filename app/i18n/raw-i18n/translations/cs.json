@@ -4067,7 +4067,17 @@
     "setupDescription": "Abyste zabránili neoprávněnému přístupu ke svému účtu, přidejte nyní dvoufaktorové ověření.",
     "addEmail": "Přidat e-mail",
     "addPhoneNumber": "Přidat telefonní číslo",
-    "setAuthenticator": "Nastavit autentikátor"
+    "setAuthenticator": "Nastavit autentikátor",
+    "modalReminder": "Pokud to teď odmítnete, nezapomeňte to co nejdříve zapnout.",
+    "dismissTwoMore": "Můžete to odmítnout ještě dvakrát.",
+    "dismissOneMore": "Můžete to odmítnout ještě jednou.",
+    "dismissLast": "Toto je naposledy, co to můžete odmítnout.",
+    "setNow": "Nastavit nyní",
+    "dontWantTo": "Nechci",
+    "highBalanceTitle": "Máte více než {amount}, přidejte prosím dodatečnou ochranu",
+    "protectionRequiredBody": "Čím více prostředků máte, tím důležitější je lepší zabezpečení. Pro další používání Blinku prosím přidejte autentikátor.",
+    "nonCustodialTitle": "Pokud nechcete nastavit dvoufaktorové ověření",
+    "nonCustodialBody": "Druhou možností je přejít na nesvěřenecký režim. Pak za své prostředky odpovídáte sami."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

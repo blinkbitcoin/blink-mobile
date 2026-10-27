@@ -1,5 +1,5 @@
 import React from "react"
-import { Pressable, Text } from "react-native"
+import { BackHandler, Pressable, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import {
   CommonActions,
@@ -24,24 +24,36 @@ import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
 import { TwoFactorMethod, TwoFactorTier } from "@app/types/two-factor-enforcement"
 
 /**
- * The setup on a real stack: the sibling spec mocks the navigator module-wide, so it
- * can say which listener the screen installed but not which action types the
- * navigator actually hands it, nor where a flow's `popTo` lands. Those are the
+ * The setup on a real stack: the sibling spec mocks the navigator and the hardware
+ * back module-wide, so it can say which handler the screen installed but not what the
+ * navigator does with a press, nor where a flow's `popTo` lands. Those are the
  * contracts here.
  */
 
 loadLocale("en")
 const LL = i18nObject("en")
 
+const mockRegisterDismissal = jest.fn()
 const mockEnforcement = {
   tier: TwoFactorTier.Suggested as TwoFactorTier,
+  unmetTier: TwoFactorTier.Suggested as TwoFactorTier,
   hasTwoFactor: false,
   missingMethod: TwoFactorMethod.Email as TwoFactorMethod,
   unverifiedEmail: null as string | null,
+  remainingDismissals: 3,
   shouldShowNudgeCard: true,
   shouldShowSettingsBanner: true,
   markPromptShown: jest.fn(),
   dismissNudgeCard: jest.fn(),
+  consumeSessionStart: jest.fn(),
+  registerDismissal: mockRegisterDismissal,
+}
+
+/** The Android back, raised on the handler the focused screen last installed. */
+const hardwareBackListeners = jest.spyOn(BackHandler, "addEventListener")
+const pressHardwareBack = () => {
+  const onHardwareBack = hardwareBackListeners.mock.calls.at(-1)?.[1]
+  onHardwareBack?.()
 }
 jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
   useTwoFactorEnforcement: () => mockEnforcement,
@@ -137,7 +149,13 @@ const renderStack = async () => {
         <NavigationContainer ref={navigationRef}>
           <Stack.Navigator screenOptions={{ headerShown: false }}>
             <Stack.Screen name="Primary" component={HomeStub} />
-            <Stack.Screen name="twoFactorSetup" component={TwoFactorSetupScreen} />
+            {/** With its header, so the close control the screen installs is on the
+             *   stack like everything else. */}
+            <Stack.Screen
+              name="twoFactorSetup"
+              component={TwoFactorSetupScreen}
+              options={{ headerShown: true }}
+            />
             <Stack.Screen
               name="emailRegistrationInitiate"
               component={EmailInitiateStub}
@@ -211,15 +229,20 @@ describe("TwoFactorSetupScreen in a stack", () => {
     expect(currentRoute()).toBe("Primary")
   })
 
-  it("refuses the user's back while it holds, and lets a reset through", async () => {
+  it("refuses the close control and the hardware back while it holds, and lets a reset through", async () => {
     mockIsReverifyingFromHere = true
     await renderStack()
     await openSetup()
 
     await act(async () => {
-      navigationRef.goBack()
+      fireEvent.press(screen.getByTestId("icon-close"))
     })
     expect(currentRoute()).toBe("twoFactorSetup")
+    await act(async () => {
+      pressHardwareBack()
+    })
+    expect(currentRoute()).toBe("twoFactorSetup")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
 
     await act(async () => {
       navigationRef.dispatch(
@@ -229,14 +252,15 @@ describe("TwoFactorSetupScreen in a stack", () => {
     expect(currentRoute()).toBe("Primary")
   })
 
-  it("lets the user back out while nothing is in flight", async () => {
+  it("lets the hardware back out while nothing is in flight, charging the exit to the tier", async () => {
     await renderStack()
     await openSetup()
 
     await act(async () => {
-      navigationRef.goBack()
+      pressHardwareBack()
     })
 
     expect(currentRoute()).toBe("Primary")
+    expect(mockRegisterDismissal).toHaveBeenCalledWith(TwoFactorTier.Suggested)
   })
 })

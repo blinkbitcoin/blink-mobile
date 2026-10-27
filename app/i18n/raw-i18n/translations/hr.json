@@ -4067,7 +4067,17 @@
     "setupDescription": "Kako biste spriječili neovlašteni pristup svom računu, dodajte dvofaktorsku autentifikaciju sada.",
     "addEmail": "Dodaj e-poštu",
     "addPhoneNumber": "Dodaj telefonski broj",
-    "setAuthenticator": "Postavi autentifikator"
+    "setAuthenticator": "Postavi autentifikator",
+    "modalReminder": "Ako ovo sada odbacite, svakako to uključite što prije.",
+    "dismissTwoMore": "Ovo možete odbaciti još dva puta.",
+    "dismissOneMore": "Ovo možete odbaciti još jednom.",
+    "dismissLast": "Ovo je zadnji put da ovo možete odbaciti.",
+    "setNow": "Postavi sada",
+    "dontWantTo": "Ne želim",
+    "highBalanceTitle": "Imate više od {amount}, molimo dodajte dodatnu zaštitu",
+    "protectionRequiredBody": "Što više sredstava imate, to je bolja sigurnost važnija. Molimo dodajte autentifikator kako biste nastavili koristiti Blink.",
+    "nonCustodialTitle": "Ako ne želite postaviti dvofaktorsku autentifikaciju",
+    "nonCustodialBody": "Druga je mogućnost prijeći na neskrbnički način. Tada ste sami odgovorni za svoja sredstva."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
