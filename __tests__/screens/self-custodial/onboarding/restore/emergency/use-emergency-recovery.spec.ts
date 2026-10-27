@@ -483,6 +483,35 @@ describe("useEmergencyRecovery", () => {
       })
       expect(result.current.busy).toBe(false)
     })
+
+    it("runs only the first of two sources tapped in the same render", async () => {
+      // Both taps land before React re-renders with busy set, so a guard that
+      // read busy would let the second one through.
+      let release: (value: string) => void = () => {}
+      mockClipboardGet.mockReturnValue(
+        new Promise<string>((resolve) => {
+          release = resolve
+        }),
+      )
+      const { result } = await renderAtStep(EmergencyRecoveryStep.Sources)
+      const { fromClipboard, fromFile } = result.current
+
+      let first: Promise<unknown> = Promise.resolve()
+      let second: Promise<unknown> = Promise.resolve()
+      await act(async () => {
+        first = fromClipboard()
+        second = fromFile()
+      })
+      expect(mockClipboardGet).toHaveBeenCalledTimes(1)
+      expect(mockPickFile).not.toHaveBeenCalled()
+
+      await act(async () => {
+        release(PAYLOAD)
+        await Promise.all([first, second])
+      })
+      expect(mockVerify).toHaveBeenCalledTimes(1)
+      expect(mockVerify).toHaveBeenCalledWith(PAYLOAD, MNEMONIC)
+    })
   })
 
   describe("exporting the verified bundle", () => {
