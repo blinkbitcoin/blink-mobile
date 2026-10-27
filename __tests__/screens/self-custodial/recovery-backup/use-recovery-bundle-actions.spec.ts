@@ -187,40 +187,42 @@ const deferred = <T>() => {
   return { promise, resolve, reject }
 }
 
-describe("useRecoveryBundleActions", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockActiveNetwork = mockSparkNetwork.Regtest
-    mockUseAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
-    mockGetMnemonicForAccount.mockResolvedValue("test mnemonic words")
-    mockReadRecoveryBundleState.mockResolvedValue(savedState)
-    mockLoadEncryptedBundleFile.mockResolvedValue("encrypted-payload")
-    mockDecryptBundleBackupPayload.mockResolvedValue({ schema: 1, leaves: [] })
-    // The metadata network deliberately differs from the mocked active network
-    // (regtest): the interactive-upload filename must be built from the saved
-    // bundle's metadata, not from whatever network the app is currently on.
-    mockParseBundleBackupMetadata.mockReturnValue({
-      network: "MAINNET",
-      walletIdentityPublicKey: "pubkey",
-      bundleCreatedAt: savedState.bundleCreatedAt,
-    })
-    mockRefreshRecoveryBundle.mockResolvedValue({ success: true, state: savedState })
-    mockSyncExistingBundleToCloud.mockResolvedValue(false)
-    mockIsCloudSyncAllowedFor.mockResolvedValue(true)
-    mockReadRecoveryBundleSettings.mockResolvedValue({
-      autoRefresh: true,
-      cloudSync: false,
-    })
-    mockWriteRecoveryBundleSettings.mockResolvedValue(undefined)
-    mockMarkCloudSynced.mockResolvedValue(null)
-    mockWithCloudBundleLock.mockImplementation(
-      (_accountId: string, _network: string, operation: () => Promise<unknown>) =>
-        operation(),
-    )
-    mockStartSession.mockResolvedValue({ success: true, session })
-    mockUpload.mockResolvedValue({ success: true })
-    mockShareOpen.mockResolvedValue(undefined)
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockActiveNetwork = mockSparkNetwork.Regtest
+  mockUseAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
+  mockGetMnemonicForAccount.mockResolvedValue("test mnemonic words")
+  mockReadRecoveryBundleState.mockResolvedValue(savedState)
+  mockLoadEncryptedBundleFile.mockResolvedValue("encrypted-payload")
+  mockDecryptBundleBackupPayload.mockResolvedValue({ schema: 1, leaves: [] })
+  // The metadata network deliberately differs from the mocked active network
+  // (regtest): the interactive-upload filename must be built from the saved
+  // bundle's metadata, not from whatever network the app is currently on.
+  mockParseBundleBackupMetadata.mockReturnValue({
+    network: "MAINNET",
+    walletIdentityPublicKey: "pubkey",
+    bundleCreatedAt: savedState.bundleCreatedAt,
   })
+  mockRefreshRecoveryBundle.mockResolvedValue({ success: true, state: savedState })
+  mockSyncExistingBundleToCloud.mockResolvedValue(false)
+  mockIsCloudSyncAllowedFor.mockResolvedValue(true)
+  mockReadRecoveryBundleSettings.mockResolvedValue({
+    autoRefresh: true,
+    cloudSync: false,
+  })
+  mockWriteRecoveryBundleSettings.mockResolvedValue(undefined)
+  mockMarkCloudSynced.mockResolvedValue(null)
+  mockWithCloudBundleLock.mockImplementation(
+    (_accountId: string, _network: string, operation: () => Promise<unknown>) =>
+      operation(),
+  )
+  mockStartSession.mockResolvedValue({ success: true, session })
+  mockUpload.mockResolvedValue({ success: true })
+  mockShareOpen.mockResolvedValue(undefined)
+}
+
+describe("useRecoveryBundleActions", () => {
+  beforeEach(resetMocks)
 
   describe("bundleState / reloadState", () => {
     it("starts with bundleState undefined (loading), distinct from null (no bundle)", () => {
@@ -271,183 +273,6 @@ describe("useRecoveryBundleActions", () => {
       expect(result.current.bundleState).toBeNull()
       expect(result.current.settings).toEqual(otherSettings)
       expect(mockRecordError).toHaveBeenCalled()
-    })
-  })
-
-  describe("account switch", () => {
-    it("keeps the new account's read when the previous account's read lands after it", async () => {
-      const previousRead = deferred<RecoveryBundleState | null>()
-      mockReadRecoveryBundleState
-        .mockReturnValueOnce(previousRead.promise)
-        .mockResolvedValueOnce(otherState)
-      mockReadRecoveryBundleSettings
-        .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
-        .mockResolvedValueOnce(otherSettings)
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      let previousReload: Promise<void> = Promise.resolve()
-      await act(async () => {
-        previousReload = result.current.reloadState()
-      })
-
-      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
-      rerender({})
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      await act(async () => {
-        previousRead.resolve(savedState)
-        await previousReload
-      })
-
-      expect(result.current.bundleState).toEqual(otherState)
-      expect(result.current.settings).toEqual(otherSettings)
-    })
-
-    it("reads as loading, with default settings, until the new account's own read lands", async () => {
-      mockReadRecoveryBundleSettings.mockResolvedValue(otherSettings)
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-
-      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
-      rerender({})
-
-      expect(result.current.bundleState).toBeUndefined()
-      expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
-    })
-
-    it("binds the read to the network too: a network switch reads as loading until it reloads", async () => {
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-
-      mockActiveNetwork = mockSparkNetwork.Mainnet
-      rerender({})
-      expect(result.current.bundleState).toBeUndefined()
-
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      expect(mockReadRecoveryBundleState).toHaveBeenLastCalledWith(
-        ACCOUNT_ID,
-        mockSparkNetwork.Mainnet,
-      )
-      expect(result.current.bundleState).toEqual(savedState)
-    })
-
-    it("drops a refresh that finishes after the switch", async () => {
-      const refresh = deferred<{ success: true; state: RecoveryBundleState }>()
-      mockRefreshRecoveryBundle.mockReturnValue(refresh.promise)
-      mockReadRecoveryBundleState
-        .mockResolvedValueOnce(savedState)
-        .mockResolvedValueOnce(otherState)
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      let refreshing: Promise<void> = Promise.resolve()
-      await act(async () => {
-        refreshing = result.current.handleRefresh()
-      })
-
-      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
-      rerender({})
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      await act(async () => {
-        refresh.resolve({ success: true, state: { ...savedState, leafCount: 9 } })
-        await refreshing
-      })
-
-      expect(result.current.bundleState).toEqual(otherState)
-    })
-
-    it("drops an interactive upload's synced state that lands after the switch", async () => {
-      const synced = deferred<RecoveryBundleState | null>()
-      mockMarkCloudSynced.mockReturnValue(synced.promise)
-      mockReadRecoveryBundleState
-        .mockResolvedValueOnce(savedState)
-        .mockResolvedValueOnce(otherState)
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      let uploading: Promise<void> = Promise.resolve()
-      await act(async () => {
-        uploading = result.current.handleCloudUpload()
-      })
-
-      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
-      rerender({})
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      await act(async () => {
-        synced.resolve({ ...savedState, cloudSyncedAt: 1_700_000_777_000 })
-        await uploading
-      })
-
-      expect(result.current.bundleState).toEqual(otherState)
-    })
-
-    it("does not let an upload that outlived the switch reload the previous account", async () => {
-      const silentSync = deferred<boolean>()
-      mockSyncExistingBundleToCloud.mockReturnValue(silentSync.promise)
-      mockReadRecoveryBundleState
-        .mockResolvedValueOnce(savedState)
-        .mockResolvedValueOnce(otherState)
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      let uploading: Promise<void> = Promise.resolve()
-      await act(async () => {
-        uploading = result.current.handleCloudUpload()
-      })
-
-      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
-      rerender({})
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      await act(async () => {
-        silentSync.resolve(true)
-        await uploading
-      })
-
-      expect(mockReadRecoveryBundleState).toHaveBeenCalledTimes(2)
-      expect(result.current.bundleState).toEqual(otherState)
-    })
-
-    it("keeps the new account's settings when the previous account's write fails after the switch", async () => {
-      const write = deferred<undefined>()
-      mockWriteRecoveryBundleSettings.mockReturnValue(write.promise)
-      mockReadRecoveryBundleSettings
-        .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
-        .mockResolvedValueOnce(otherSettings)
-      const { result, rerender } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      let toggling: Promise<void> = Promise.resolve()
-      await act(async () => {
-        toggling = result.current.handleSetAutoRefresh(false)
-      })
-
-      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
-      rerender({})
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      await act(async () => {
-        write.reject(new Error("disk full"))
-        await toggling
-      })
-
-      expect(result.current.settings).toEqual(otherSettings)
     })
   })
 
@@ -926,5 +751,184 @@ describe("useRecoveryBundleActions", () => {
       )
       expect(mockCopyToClipboard).not.toHaveBeenCalled()
     })
+  })
+})
+
+describe("useRecoveryBundleActions account switch", () => {
+  beforeEach(resetMocks)
+
+  it("keeps the new account's read when the previous account's read lands after it", async () => {
+    const previousRead = deferred<RecoveryBundleState | null>()
+    mockReadRecoveryBundleState
+      .mockReturnValueOnce(previousRead.promise)
+      .mockResolvedValueOnce(otherState)
+    mockReadRecoveryBundleSettings
+      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
+      .mockResolvedValueOnce(otherSettings)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    let previousReload: Promise<void> = Promise.resolve()
+    await act(async () => {
+      previousReload = result.current.reloadState()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    await act(async () => {
+      previousRead.resolve(savedState)
+      await previousReload
+    })
+
+    expect(result.current.bundleState).toEqual(otherState)
+    expect(result.current.settings).toEqual(otherSettings)
+  })
+
+  it("reads as loading, with default settings, until the new account's own read lands", async () => {
+    mockReadRecoveryBundleSettings.mockResolvedValue(otherSettings)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+
+    expect(result.current.bundleState).toBeUndefined()
+    expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
+  })
+
+  it("binds the read to the network too: a network switch reads as loading until it reloads", async () => {
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+
+    mockActiveNetwork = mockSparkNetwork.Mainnet
+    rerender({})
+    expect(result.current.bundleState).toBeUndefined()
+
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    expect(mockReadRecoveryBundleState).toHaveBeenLastCalledWith(
+      ACCOUNT_ID,
+      mockSparkNetwork.Mainnet,
+    )
+    expect(result.current.bundleState).toEqual(savedState)
+  })
+
+  it("drops a refresh that finishes after the switch", async () => {
+    const refresh = deferred<{ success: true; state: RecoveryBundleState }>()
+    mockRefreshRecoveryBundle.mockReturnValue(refresh.promise)
+    mockReadRecoveryBundleState
+      .mockResolvedValueOnce(savedState)
+      .mockResolvedValueOnce(otherState)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    let refreshing: Promise<void> = Promise.resolve()
+    await act(async () => {
+      refreshing = result.current.handleRefresh()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    await act(async () => {
+      refresh.resolve({ success: true, state: { ...savedState, leafCount: 9 } })
+      await refreshing
+    })
+
+    expect(result.current.bundleState).toEqual(otherState)
+  })
+
+  it("drops an interactive upload's synced state that lands after the switch", async () => {
+    const synced = deferred<RecoveryBundleState | null>()
+    mockMarkCloudSynced.mockReturnValue(synced.promise)
+    mockReadRecoveryBundleState
+      .mockResolvedValueOnce(savedState)
+      .mockResolvedValueOnce(otherState)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    let uploading: Promise<void> = Promise.resolve()
+    await act(async () => {
+      uploading = result.current.handleCloudUpload()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    await act(async () => {
+      synced.resolve({ ...savedState, cloudSyncedAt: 1_700_000_777_000 })
+      await uploading
+    })
+
+    expect(result.current.bundleState).toEqual(otherState)
+  })
+
+  it("does not let an upload that outlived the switch reload the previous account", async () => {
+    const silentSync = deferred<boolean>()
+    mockSyncExistingBundleToCloud.mockReturnValue(silentSync.promise)
+    mockReadRecoveryBundleState
+      .mockResolvedValueOnce(savedState)
+      .mockResolvedValueOnce(otherState)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    let uploading: Promise<void> = Promise.resolve()
+    await act(async () => {
+      uploading = result.current.handleCloudUpload()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    await act(async () => {
+      silentSync.resolve(true)
+      await uploading
+    })
+
+    expect(mockReadRecoveryBundleState).toHaveBeenCalledTimes(2)
+    expect(result.current.bundleState).toEqual(otherState)
+  })
+
+  it("keeps the new account's settings when the previous account's write fails after the switch", async () => {
+    const write = deferred<undefined>()
+    mockWriteRecoveryBundleSettings.mockReturnValue(write.promise)
+    mockReadRecoveryBundleSettings
+      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
+      .mockResolvedValueOnce(otherSettings)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    let toggling: Promise<void> = Promise.resolve()
+    await act(async () => {
+      toggling = result.current.handleSetAutoRefresh(false)
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    await act(async () => {
+      write.reject(new Error("disk full"))
+      await toggling
+    })
+
+    expect(result.current.settings).toEqual(otherSettings)
   })
 })
