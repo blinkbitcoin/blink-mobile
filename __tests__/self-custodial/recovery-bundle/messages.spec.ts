@@ -1,3 +1,5 @@
+import { it } from "@jest/globals"
+
 import {
   decodeGetChallengeResponse,
   decodeQueryNodesResponse,
@@ -82,6 +84,39 @@ describe("spark auth messages", () => {
       /no session token/,
     )
   })
+
+  it("defaults a missing verify_challenge expiration to zero", () => {
+    const response = new ProtoWriter().string(1, "session-token").finish()
+    expect(decodeVerifyChallengeResponse(response).expirationTimestamp).toBe(0n)
+  })
+
+  it("throws when get_challenge returns no protected_challenge", () => {
+    expect(() => decodeGetChallengeResponse(new Uint8Array(0))).toThrow(
+      /no protected_challenge/,
+    )
+  })
+
+  it("throws when the protected_challenge carries no inner challenge", () => {
+    const protectedChallenge = new ProtoWriter().varint(1, 1).finish()
+    const response = new ProtoWriter().bytes(1, protectedChallenge).finish()
+    expect(() => decodeGetChallengeResponse(response)).toThrow(/has no challenge/)
+  })
+
+  it("decodes absent challenge fields to the proto3 defaults it re-encodes from", () => {
+    const challengeBytes = new ProtoWriter()
+      .bytes(4, Uint8Array.from(Buffer.alloc(33, 0x02)))
+      .finish()
+    const response = new ProtoWriter()
+      .bytes(1, new ProtoWriter().bytes(2, challengeBytes).finish())
+      .finish()
+
+    const { challenge } = decodeGetChallengeResponse(response)
+
+    expect(challenge.version).toBe(0)
+    expect(challenge.timestamp).toBe(0n)
+    expect(challenge.nonce).toHaveLength(0)
+    expect(Buffer.from(encodeChallenge(challenge))).toEqual(Buffer.from(challengeBytes))
+  })
 })
 
 describe("query_nodes messages", () => {
@@ -145,5 +180,50 @@ describe("query_nodes messages", () => {
     expect(node?.treenodeStatus).toBe(1)
     // raw bytes preserved exactly - this is what lands in treeNodeHex
     expect(Buffer.from(node?.raw ?? [])).toEqual(Buffer.from(treeNode))
+  })
+
+  it("decodes absent TreeNode fields to proto3 defaults", () => {
+    const treeNode = new ProtoWriter().string(1, "leaf-1").finish()
+    const entry = new ProtoWriter().string(1, "leaf-1").bytes(2, treeNode).finish()
+
+    const node = decodeQueryNodesResponse(
+      new ProtoWriter().bytes(1, entry).finish(),
+    ).nodes.get("leaf-1")
+
+    expect(node).toMatchObject({
+      valueSats: 0n,
+      parentNodeId: undefined,
+      status: "",
+      treenodeStatus: 0,
+    })
+    expect(node?.ownerIdentityPublicKey).toHaveLength(0)
+  })
+
+  const treeNodeWithId = (id: string) =>
+    new ProtoWriter().string(1, id).varint(3, 1000).finish()
+
+  it.each([
+    {
+      name: "names a different node",
+      entry: new ProtoWriter()
+        .string(1, "root-A")
+        .bytes(2, treeNodeWithId("root-B"))
+        .finish(),
+    },
+    {
+      name: "is missing",
+      entry: new ProtoWriter().bytes(2, treeNodeWithId("root-B")).finish(),
+    },
+    {
+      name: "maps a node without an id",
+      entry: new ProtoWriter()
+        .string(1, "root-A")
+        .bytes(2, new ProtoWriter().varint(3, 1000).finish())
+        .finish(),
+    },
+    { name: "maps no node", entry: new ProtoWriter().string(1, "root-A").finish() },
+  ])("refuses a map entry whose key $name", ({ entry }) => {
+    const response = new ProtoWriter().bytes(1, entry).finish()
+    expect(() => decodeQueryNodesResponse(response)).toThrow(/does not match node id/)
   })
 })
