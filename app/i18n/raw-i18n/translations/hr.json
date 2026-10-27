@@ -2563,8 +2563,6 @@
     "emailUnverifiedContent": "Provjerite možete li se ponovno prijaviti na svoj račun tako da potvrdite svoju e-poštu. Želite li sada izvršiti provjeru?",
     "totp": "Dvofaktorska autentifikacija",
     "totpDeactivated": "Dvofaktorska autentifikacija je deaktivirana",
-    "totpDeleteAlertTitle": "Izbriši dvofaktorsku provjeru autentičnosti",
-    "totpDeleteAlertContent": "Jeste li sigurni da želite izbrisati svoju dvofaktorsku provjeru autentičnosti?",
     "copiedAccountId": "ID vašeg računa kopiran je u međuspremnik",
     "yourAccountId": "ID tvog računa",
     "accountId": "ID računa",
@@ -4109,6 +4107,18 @@
     "protectedDescription": "Od sada je za prijavu potreban jednokratni kod iz vaše aplikacije za autentifikaciju.",
     "newPhoneTip": "Ako nabavite novi telefon, prebacite autentifikator na njega <bold>prije</bold> nego što resetirate stari.",
     "done": "Gotovo"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Uključeno",
+    "statusDisabled": "2FA: Isključeno",
+    "modalTitle": "Ne preporučujemo isključivanje 2FA",
+    "modalBody": "To bi smanjilo sigurnost vašeg računa i olakšalo trećoj strani pristup vašem računu bez vašeg dopuštenja.",
+    "keepProtected": "Želim ostati zaštićen",
+    "codeInstruction": "Unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju kako biste isključili dvofaktorsku autentifikaciju.",
+    "codeInvalid": "Taj kôd nije točan. Unesite trenutačni kôd iz aplikacije za autentifikaciju.",
+    "tooManyAttempts": "Previše pokušaja. Pokušajte ponovno za sat vremena.",
+    "manualResetTitle": "Ručno resetiranje 2FA",
+    "manualResetBody": "Radi vaše zaštite ne dopuštamo uklanjanje 2FA unutar aplikacije. Ako trebate resetirati 2FA, obratite se našoj <support>podršci</support>."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

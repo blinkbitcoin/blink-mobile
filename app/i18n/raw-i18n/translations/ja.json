@@ -2563,8 +2563,6 @@
         "emailUnverifiedContent": "メールアドレスを認証して、ウォレットに再ログインできることを確認してください。 今すぐ認証しますか？",
         "totp": "2要素認証（2FA）",
         "totpDeactivated": "2要素認証（2FA）が無効化されました",
-        "totpDeleteAlertTitle": "2要素認証（2FA）を削除する",
-        "totpDeleteAlertContent": "2要素認証（2FA）を削除してもよろしいですか？",
         "copiedAccountId": "アカウントIDをクリップボードにコピーする",
         "yourAccountId": "あなたのアカウントID",
         "accountId": "アカウントID",
@@ -4109,6 +4107,18 @@
         "protectedDescription": "今後のログインには、認証アプリのワンタイムコードが必要です。",
         "newPhoneTip": "新しいスマートフォンに機種変更する場合は、古い端末をリセットする<bold>前に</bold>認証アプリを移行してください。",
         "done": "完了"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA：有効",
+        "statusDisabled": "2FA：無効",
+        "modalTitle": "2FAの無効化はおすすめしません",
+        "modalBody": "アカウントのセキュリティが低下し、第三者があなたの許可なくアカウントにアクセスしやすくなります。",
+        "keepProtected": "保護を続ける",
+        "codeInstruction": "2要素認証をオフにするには、認証アプリの6桁のコードを入力してください。",
+        "codeInvalid": "コードが正しくありません。認証アプリに表示されている現在のコードを入力してください。",
+        "tooManyAttempts": "試行回数が多すぎます。1時間後にもう一度お試しください。",
+        "manualResetTitle": "2FAの手動リセット",
+        "manualResetBody": "お客様を保護するため、アプリ内では2FAを削除できません。2FAのリセットが必要な場合は、<support>サポート</support>にお問い合わせください。"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

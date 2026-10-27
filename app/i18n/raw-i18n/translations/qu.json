@@ -2563,8 +2563,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Cuenta ID",
@@ -4109,6 +4107,18 @@
     "protectedDescription": "Kunanmanta, yaykunapaqqa autenticador appykimanta huk kutillapaq códigotam munanki.",
     "newPhoneTip": "Musuq telefonota hap'ispaykiqa, autenticadorniykita chayman apay, <bold>manaraq</bold> mawk'a telefonota kutichichkaspa.",
     "done": "Tukusqa"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Kawsachisqa",
+    "statusDisabled": "2FA: Wañuchisqa",
+    "modalTitle": "Manam 2FA wañuchiyta yuyaychaykuchu",
+    "modalBody": "Kayqa cuentaykiq waqaychasqa kayninta pisiyachinman, hukkunataq mana munasqaykiwan cuentaykiman yaykunankupaq facilchanman.",
+    "keepProtected": "Waqaychasqa kachun",
+    "codeInstruction": "Autenticador appaykimanta 6 yupayniyuq códigota qillqay iskay factor autenticación wañuchinaykipaq.",
+    "codeInvalid": "Chay códigoqa manam allinchu. Autenticador appaykimanta kunan códigota qillqay.",
+    "tooManyAttempts": "Achka kutitam kallpachakunki. Huk horamanta wakmanta kallpachakuy.",
+    "manualResetTitle": "2FA makiwan kutichiy",
+    "manualResetBody": "Waqaychasqa kanaykipaq, manam 2FA appllapi qichuyta saqinchikchu. 2FA kutichiyta munaspaqa, <support>Yanapaqninchikwan</support> rimay."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

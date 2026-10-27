@@ -2563,8 +2563,6 @@
     "emailUnverifiedContent": "Sila pastikan anda boleh log masuk kembali ke akaun anda dengan mengesahkan emel. Anda mahu laksanakan pengesahan sekarang? ",
     "totp": "Pengesahan dua kali",
     "totpDeactivated": "Pengesahan dua kali telah pun diaktifkan",
-    "totpDeleteAlertTitle": "Buang pengesahan dua kali",
-    "totpDeleteAlertContent": "Adakah anda pasti mahu membuang pengesahan dua kali ini?",
     "copiedAccountId": "Akaun ID anda telah disalin ke dalam papan klip",
     "yourAccountId": "ID akaun anda",
     "accountId": "ID Akaun",
@@ -4109,6 +4107,18 @@
     "protectedDescription": "Mulai sekarang, log masuk memerlukan kod sekali guna daripada aplikasi authenticator anda.",
     "newPhoneTip": "Jika anda mendapat telefon baharu, pindahkan authenticator anda ke telefon itu <bold>sebelum</bold> anda menetapkan semula telefon lama.",
     "done": "Selesai"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Didayakan",
+    "statusDisabled": "2FA: Dinyahdayakan",
+    "modalTitle": "Kami tidak mengesyorkan anda menyahdayakan 2FA",
+    "modalBody": "Ini akan merendahkan keselamatan akaun anda dan memudahkan pihak ketiga mengakses akaun anda tanpa kebenaran anda.",
+    "keepProtected": "Kekalkan perlindungan saya",
+    "codeInstruction": "Masukkan kod 6 digit daripada aplikasi pengesah anda untuk mematikan pengesahan dua faktor.",
+    "codeInvalid": "Kod itu salah. Masukkan kod semasa daripada aplikasi pengesah anda.",
+    "tooManyAttempts": "Terlalu banyak percubaan. Cuba lagi dalam satu jam.",
+    "manualResetTitle": "Tetapan semula 2FA secara manual",
+    "manualResetBody": "Demi perlindungan anda, kami tidak membenarkan 2FA dibuang dalam aplikasi. Jika anda perlu menetapkan semula 2FA, hubungi <support>Sokongan</support> kami."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

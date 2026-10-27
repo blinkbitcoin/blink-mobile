@@ -2563,8 +2563,6 @@
     "emailUnverifiedContent": "Zorg ervoor dat u weer kunt inloggen op uw account door uw e-mailadres te verifiëren. Wilt u de verificatie nu uitvoeren?",
     "totp": "Tweefactorauthenticatie",
     "totpDeactivated": "Tweefactorauthenticatie is uitgeschakeld",
-    "totpDeleteAlertTitle": "Verwijder tweefactorauthenticatie",
-    "totpDeleteAlertContent": "Weet u zeker dat u uw tweefactorauthenticatie wilt verwijderen?",
     "copiedAccountId": "Uw account-ID naar het klembord gekopieerd",
     "yourAccountId": "Uw account-ID",
     "accountId": "Account-ID",
@@ -4109,6 +4107,18 @@
     "protectedDescription": "Vanaf nu heb je om in te loggen een eenmalige code uit je authenticator-app nodig.",
     "newPhoneTip": "Als je een nieuwe telefoon krijgt, verplaats je authenticator er dan naartoe <bold>voordat</bold> je de oude reset.",
     "done": "Klaar"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ingeschakeld",
+    "statusDisabled": "2FA: Uitgeschakeld",
+    "modalTitle": "We raden af om 2FA uit te schakelen",
+    "modalBody": "Dit verlaagt de beveiliging van je account en maakt het voor een derde makkelijker om zonder je toestemming toegang te krijgen.",
+    "keepProtected": "Houd me beschermd",
+    "codeInstruction": "Voer de 6-cijferige code uit je authenticator-app in om tweestapsverificatie uit te schakelen.",
+    "codeInvalid": "Die code is onjuist. Voer de huidige code uit je authenticator-app in.",
+    "tooManyAttempts": "Te veel pogingen. Probeer het over een uur opnieuw.",
+    "manualResetTitle": "Handmatige reset van 2FA",
+    "manualResetBody": "Voor je bescherming kan 2FA niet in de app worden verwijderd. Heb je een reset van 2FA nodig, neem dan contact op met onze <support>Support</support>."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

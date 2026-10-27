@@ -2563,8 +2563,6 @@
     "emailUnverifiedContent": "Assegura't que vols tornar a iniciar sessió al teu compte verificant el teu correu electrònic. Vols fer la verificació ara?",
     "totp": "Autentificació de dos factors",
     "totpDeactivated": "L'autentificació de dos factors ha estat desactivada",
-    "totpDeleteAlertTitle": "Esborra l'autentificació de dos factors",
-    "totpDeleteAlertContent": "Estàs segur que vols suprimir la teva autenticació de dos factors?",
     "copiedAccountId": "S'ha copiat l'identificador del teu compte al porta-retalls",
     "yourAccountId": "La ID del teu compte",
     "accountId": "ID del compte",
@@ -4109,6 +4107,18 @@
     "protectedDescription": "A partir d'ara, per iniciar la sessió caldrà un codi d'un sol ús de la teva aplicació d'autenticació.",
     "newPhoneTip": "Si canvies de telèfon, passa l'autenticador al nou <bold>abans</bold> de restablir l'antic.",
     "done": "Fet"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Activada",
+    "statusDisabled": "2FA: Desactivada",
+    "modalTitle": "No et recomanem desactivar la 2FA",
+    "modalBody": "Això reduiria la seguretat del teu compte i facilitaria que un tercer hi accedís sense el teu permís.",
+    "keepProtected": "Mantén-me protegit",
+    "codeInstruction": "Introdueix el codi de 6 dígits de la teva app d'autenticació per desactivar l'autenticació de dos factors.",
+    "codeInvalid": "Aquest codi és incorrecte. Introdueix el codi actual de la teva app d'autenticació.",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a una hora.",
+    "manualResetTitle": "Restabliment manual de la 2FA",
+    "manualResetBody": "Per a la teva protecció, no permetem eliminar la 2FA des de l'app. Si necessites restablir la 2FA, contacta amb el nostre <support>Suport</support>."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

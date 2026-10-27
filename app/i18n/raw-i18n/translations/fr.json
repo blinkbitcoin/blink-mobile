@@ -2563,8 +2563,6 @@
         "emailUnverifiedContent": "Assurez-vous que vous pouvez vous reconnecter à votre compte en validant votre e-mail. Souhaitez-vous faire la validation maintenant ?",
         "totp": "Authentification à deux facteurs",
         "totpDeactivated": "L’authentification à deux facteurs a été désactivée.",
-        "totpDeleteAlertTitle": "Supprimer l’authentification à deux facteurs",
-        "totpDeleteAlertContent": "Êtes-vous sûr de vouloir supprimer votre authentification à deux facteurs ?",
         "copiedAccountId": "Copier votre identifiant de compte dans le presse-papiers",
         "yourAccountId": "Votre identifiant de compte",
         "accountId": "Identifiant du compte",
@@ -4109,6 +4107,18 @@
         "protectedDescription": "Désormais, la connexion nécessite un code à usage unique provenant de votre application d'authentification.",
         "newPhoneTip": "Si vous changez de téléphone, transférez votre authentificateur sur le nouveau <bold>avant</bold> de réinitialiser l'ancien.",
         "done": "Terminé"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA : Activée",
+        "statusDisabled": "2FA : Désactivée",
+        "modalTitle": "Nous déconseillons de désactiver la 2FA",
+        "modalBody": "Cela réduirait la sécurité de votre compte et permettrait plus facilement à un tiers d'y accéder sans votre autorisation.",
+        "keepProtected": "Rester protégé",
+        "codeInstruction": "Saisissez le code à 6 chiffres de votre application d'authentification pour désactiver l'authentification à deux facteurs.",
+        "codeInvalid": "Ce code est incorrect. Saisissez le code actuel de votre application d'authentification.",
+        "tooManyAttempts": "Trop de tentatives. Réessayez dans une heure.",
+        "manualResetTitle": "Réinitialisation manuelle de la 2FA",
+        "manualResetBody": "Pour votre protection, la 2FA ne peut pas être supprimée dans l'application. Si vous avez besoin de la réinitialiser, contactez notre <support>Assistance</support>."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

@@ -2563,8 +2563,6 @@
     "emailUnverifiedContent": "Győződj meg róla, hogy újra be tudsz jelentkezni a számládba az email címed megerősítésével. Szeretnéd most elvégezni a megerősítést?",
     "totp": "Kétlépcsős azonosítás",
     "totpDeactivated": "A kétlépcsős azonosítás letiltva",
-    "totpDeleteAlertTitle": "Kétlépcsős azonosítás törlése",
-    "totpDeleteAlertContent": "Biztosan törölni szeretnéd a kétlépcsős azonosítást?",
     "copiedAccountId": "A felhasználói fiók azonosítód a vágólapra másolva",
     "yourAccountId": "A felhasználói fiók azonosítód",
     "accountId": "Felhasználói fiók azonosító",
@@ -4109,6 +4107,18 @@
     "protectedDescription": "Mostantól a bejelentkezéshez egy egyszer használatos kódra lesz szükség a hitelesítő alkalmazásodból.",
     "newPhoneTip": "Ha új telefont kapsz, vidd át rá a hitelesítődet, <bold>mielőtt</bold> visszaállítod a régit.",
     "done": "Kész"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Bekapcsolva",
+    "statusDisabled": "2FA: Kikapcsolva",
+    "modalTitle": "Nem javasoljuk a 2FA kikapcsolását",
+    "modalBody": "Ez csökkentené a fiókod biztonságát, és megkönnyítené, hogy valaki az engedélyed nélkül hozzáférjen.",
+    "keepProtected": "Maradjak védve",
+    "codeInstruction": "Add meg a hitelesítő alkalmazásod 6 jegyű kódját a kétlépcsős azonosítás kikapcsolásához.",
+    "codeInvalid": "Ez a kód hibás. Add meg a hitelesítő alkalmazásod aktuális kódját.",
+    "tooManyAttempts": "Túl sok próbálkozás. Próbáld újra egy óra múlva.",
+    "manualResetTitle": "2FA kézi visszaállítása",
+    "manualResetBody": "A védelmed érdekében a 2FA nem távolítható el az alkalmazásban. Ha vissza kell állítani a 2FA-t, fordulj az <support>ügyfélszolgálatunkhoz</support>."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
