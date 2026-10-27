@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
+import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import {
   AccountLevel,
   BulletinsDocument,
@@ -464,23 +465,28 @@ jest.mock("@app/screens/conversion-flow/stable-token-convert-to-btc-modal", () =
   }
 })
 
-jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () =>
-    mockSelfCustodialWalletOverride ?? {
-      sdk: null,
-      wallets: [],
-      allTransactions: [],
-      status: "unavailable",
-      isStableBalanceActive: false,
-      lastReceivedPaymentId: null,
-      hasMoreTransactions: false,
-      loadingMore: false,
-      loadMore: jest.fn(),
-      refreshWallets: jest.fn(),
-      refreshStableBalanceActive: jest.fn(),
-      retry: jest.fn(),
-    },
-}))
+jest.mock("@app/self-custodial/providers/wallet", () => {
+  /** One shared fallback: a fresh object per render gives `wallets` a new identity
+   *  on every re-render, which usePendingDeposits reads as an SDK refresh and
+   *  re-lists after each press, settling after the test has returned. */
+  const unavailableWallet = {
+    sdk: null,
+    wallets: [],
+    allTransactions: [],
+    status: "unavailable",
+    isStableBalanceActive: false,
+    lastReceivedPaymentId: null,
+    hasMoreTransactions: false,
+    loadingMore: false,
+    loadMore: jest.fn(),
+    refreshWallets: jest.fn(),
+    refreshStableBalanceActive: jest.fn(),
+    retry: jest.fn(),
+  }
+  return {
+    useSelfCustodialWallet: () => mockSelfCustodialWalletOverride ?? unavailableWallet,
+  }
+})
 
 jest.mock("@app/hooks/use-balance-mode", () => {
   const BalanceMode = { Btc: "btc", Usd: "usd" } as const
@@ -2949,17 +2955,20 @@ describe("HomeScreen pull-to-refresh", () => {
 
   it("asks the server for the account's restrictions again on a pull", async () => {
     mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getByType } = render(
+    const view = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = view
     await flushEffects()
 
     await act(async () => {
       await UNSAFE_getByType(RefreshControl).props.onRefresh()
     })
+    // The pull refetches the screen's queries, whose results land a turn later.
+    await waitForStableRender(view)
 
     expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
   })
@@ -2968,17 +2977,20 @@ describe("HomeScreen pull-to-refresh", () => {
    *  it: the verdict lands whenever it lands. */
   it("retracts the spinner without waiting for the restrictions verdict", async () => {
     mockRefetchCustodialRestrictions.mockReturnValueOnce(new Promise(() => {}))
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getByType } = render(
+    const view = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = view
     await flushEffects()
 
     await act(async () => {
       await UNSAFE_getByType(RefreshControl).props.onRefresh()
     })
+    // The pull refetches the screen's queries, whose results land a turn later.
+    await waitForStableRender(view)
 
     expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
     expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
