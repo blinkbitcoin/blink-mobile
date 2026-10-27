@@ -280,4 +280,89 @@ describe("useRecoveryBundleStatus", () => {
       mockSparkNetwork.Regtest,
     )
   })
+
+  describe("reads that land out of order", () => {
+    const OTHER_ACCOUNT_ID = "other-self-custodial-uuid"
+    const otherAccount = { ...selfCustodialAccount, id: OTHER_ACCOUNT_ID }
+
+    const bundleState = (savedAt: number, totalSats: string) => ({
+      savedAt,
+      bundleCreatedAt: "2026-08-05T00:00:00Z",
+      leafCount: 3,
+      totalSats,
+      cloudSyncedAt: null,
+    })
+
+    const deferredRead = () => {
+      let resolve: (state: ReturnType<typeof bundleState> | null) => void = () => {}
+      const promise = new Promise<ReturnType<typeof bundleState> | null>((settle) => {
+        resolve = settle
+      })
+      return { promise, resolve }
+    }
+
+    it("keeps the active account's backup when the previous account's read lands last", async () => {
+      const previousRead = deferredRead()
+      const activeSavedAt = Date.now() - 120_000
+      mockReadRecoveryBundleState.mockImplementation((accountId: string) =>
+        accountId === ACCOUNT_ID
+          ? previousRead.promise
+          : Promise.resolve(bundleState(activeSavedAt, "21000")),
+      )
+      const { result, rerender } = renderHook(() => useRecoveryBundleStatus())
+
+      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+      rerender({})
+      await waitFor(() => expect(result.current.savedAt).toBe(activeSavedAt))
+
+      // The previous account's bundle is behind the active wallet's balance:
+      // were it committed, the status would flip to Stale for the wrong account.
+      await act(async () => {
+        previousRead.resolve(bundleState(Date.now() - 60_000, "5000"))
+      })
+
+      expect(result.current.savedAt).toBe(activeSavedAt)
+      expect(result.current.status).toBe(RecoveryBundleStatus.Fresh)
+    })
+
+    it("reads Unknown after a switch until the new account's read lands", async () => {
+      const { result, rerender } = await renderStatus()
+      const switchedRead = deferredRead()
+      mockReadRecoveryBundleState.mockReturnValue(switchedRead.promise)
+
+      mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+      rerender({})
+
+      expect(result.current.status).toBe(RecoveryBundleStatus.Unknown)
+      expect(result.current.savedAt).toBeNull()
+
+      await act(async () => {
+        switchedRead.resolve(null)
+      })
+      expect(result.current.status).toBe(RecoveryBundleStatus.Missing)
+    })
+
+    it("drops an older read of the same account that lands after a newer one", async () => {
+      const { result } = await renderStatus()
+      const olderRead = deferredRead()
+      const newerSavedAt = Date.now() - 30_000
+      mockReadRecoveryBundleState
+        .mockReturnValueOnce(olderRead.promise)
+        .mockResolvedValueOnce(bundleState(newerSavedAt, "21000"))
+
+      let olderReload: Promise<void> = Promise.resolve()
+      await act(async () => {
+        olderReload = result.current.reload()
+        await result.current.reload()
+      })
+      expect(result.current.savedAt).toBe(newerSavedAt)
+
+      await act(async () => {
+        olderRead.resolve(bundleState(Date.now() - 600_000, "21000"))
+        await olderReload
+      })
+
+      expect(result.current.savedAt).toBe(newerSavedAt)
+    })
+  })
 })
