@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Herufi 12 ndogo zaidi",
       "passwordMismatch": "Kaulisiri hazifanani",
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
+      "autoBundleSyncNotSaved": "Nakala imehifadhiwa kwenye {provider}, lakini chaguo lako la nakala rudufu za kiotomatiki halikuweza kuhifadhiwa. Unaweza kulibadilisha kwenye Mipangilio.",
       "uploadFailed": "Imeshindwa kupakia nakala",
       "signInFailed": "Imeshindwa kuingia katika {provider}",
       "storageAccessRequired": "Ruhusu {provider: string} kufikia nakala rudufu ya pochi yako, kisha ujaribu tena.",

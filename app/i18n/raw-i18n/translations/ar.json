@@ -3873,6 +3873,7 @@
       "passwordTooShort": "12 حرفًا كحد أدنى",
       "passwordMismatch": "عبارتا المرور غير متطابقتين",
       "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
+      "autoBundleSyncNotSaved": "تم حفظ النسخة الاحتياطية في {provider}، لكن تعذّر حفظ اختيارك للنسخ الاحتياطي التلقائي. يمكنك تغييره من الإعدادات.",
       "uploadFailed": "فشل رفع النسخة الاحتياطية",
       "signInFailed": "فشل تسجيل الدخول إلى {provider}",
       "storageAccessRequired": "امنح {provider: string} صلاحية الوصول إلى نسخة محفظتك الاحتياطية، ثم حاول مرة أخرى.",

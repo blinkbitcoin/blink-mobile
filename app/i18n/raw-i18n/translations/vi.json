@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Tối thiểu 12 ký tự",
       "passwordMismatch": "Cụm mật khẩu không khớp",
       "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
+      "autoBundleSyncNotSaved": "Bản sao lưu đã được lưu vào {provider}, nhưng không thể lưu lựa chọn sao lưu tự động của bạn. Bạn có thể thay đổi trong Cài đặt.",
       "uploadFailed": "Không thể tải lên bản sao lưu",
       "signInFailed": "Không thể đăng nhập vào {provider}",
       "storageAccessRequired": "Cho phép {provider: string} truy cập bản sao lưu ví của bạn, rồi thử lại.",

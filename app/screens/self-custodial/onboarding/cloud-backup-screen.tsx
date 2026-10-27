@@ -38,6 +38,8 @@ export const CloudBackupScreen: React.FC = () => {
   const {
     isEncrypted,
     autoBundleSync,
+    isAutoBundleSyncKnown,
+    isAutoBundleSyncLoading,
     canSyncBundle,
     toggleAutoBundleSync,
     password,
@@ -56,9 +58,15 @@ export const CloudBackupScreen: React.FC = () => {
     isEncrypted,
     password,
     autoBundleSync,
+    isAutoBundleSyncKnown,
   })
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
+
+  /** The backup commits the choices it was started with, so they stay put while it
+   *  runs; the opt-in also waits for the stored choice it starts from. */
+  const isAutoBundleSyncDisabled = !canSyncBundle || isAutoBundleSyncLoading || loading
+  const isContinueDisabled = !isValid || isAutoBundleSyncLoading
 
   const autoBundleHint = canSyncBundle
     ? LL.BackupScreen.CloudBackup.autoBundleHint()
@@ -84,6 +92,7 @@ export const CloudBackupScreen: React.FC = () => {
               label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
               onPress={toggleEncryption}
+              disabled={loading}
               centered
               {...testProps("encrypt-checkbox")}
             />
@@ -127,7 +136,7 @@ export const CloudBackupScreen: React.FC = () => {
               label={LL.BackupScreen.CloudBackup.autoBundleCheckbox()}
               isChecked={autoBundleSync}
               onPress={toggleAutoBundleSync}
-              disabled={!canSyncBundle}
+              disabled={isAutoBundleSyncDisabled}
               centered
               {...testProps("auto-bundle-checkbox")}
             />
@@ -138,7 +147,7 @@ export const CloudBackupScreen: React.FC = () => {
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.BackupScreen.CloudBackup.continueButton()}
-            disabled={!isValid}
+            disabled={isContinueDisabled}
             loading={loading}
             onPress={handleBackup}
             {...testProps("cloud-backup-continue")}

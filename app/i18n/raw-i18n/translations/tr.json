@@ -3873,6 +3873,7 @@
       "passwordTooShort": "En az 12 karakter",
       "passwordMismatch": "Parolalar uyuşmuyor",
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
+      "autoBundleSyncNotSaved": "Yedek {provider} hesabına kaydedildi, ancak otomatik yedekleme tercihiniz kaydedilemedi. Bunu Ayarlar'dan değiştirebilirsiniz.",
       "uploadFailed": "Yedek yüklenemedi",
       "signInFailed": "{provider} hesabınıza giriş yapılamadı",
       "storageAccessRequired": "Cüzdan yedeğiniz için {provider: string} erişimine izin verin, ardından tekrar deneyin.",

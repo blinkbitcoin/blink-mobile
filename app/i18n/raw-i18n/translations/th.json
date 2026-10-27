@@ -3873,6 +3873,7 @@
       "passwordTooShort": "อย่างน้อย 12 ตัวอักษร",
       "passwordMismatch": "วลีรหัสผ่านไม่ตรงกัน",
       "uploadSuccess": "สำรองข้อมูลไปยัง {provider} แล้ว",
+      "autoBundleSyncNotSaved": "สำรองข้อมูลไปยัง {provider} แล้ว แต่ไม่สามารถบันทึกตัวเลือกการสำรองข้อมูลอัตโนมัติของคุณได้ คุณเปลี่ยนได้ในการตั้งค่า",
       "uploadFailed": "อัปโหลดข้อมูลสำรองไม่สำเร็จ",
       "signInFailed": "ลงชื่อเข้าใช้ {provider} ไม่สำเร็จ",
       "storageAccessRequired": "อนุญาตให้ {provider: string} เข้าถึงข้อมูลสำรองกระเป๋าเงินของคุณ แล้วลองอีกครั้ง",

@@ -3873,6 +3873,7 @@
             "passwordTooShort": "12文字以上必要です",
             "passwordMismatch": "パスフレーズが一致しません",
             "uploadSuccess": "{provider}にバックアップを保存しました",
+            "autoBundleSyncNotSaved": "{provider}にバックアップを保存しましたが、自動バックアップの設定を保存できませんでした。設定から変更できます。",
             "uploadFailed": "バックアップのアップロードに失敗しました",
             "signInFailed": "{provider}へのサインインに失敗しました",
             "storageAccessRequired": "ウォレットのバックアップのために {provider: string} へのアクセスを許可してから、もう一度お試しください。",

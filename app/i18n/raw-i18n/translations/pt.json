@@ -3873,6 +3873,7 @@
             "passwordTooShort": "Mínimo 12 caracteres",
             "passwordMismatch": "As frases secretas não coincidem",
             "uploadSuccess": "Backup salvo no {provider}",
+            "autoBundleSyncNotSaved": "Backup salvo no {provider}, mas não foi possível salvar sua escolha de backups automáticos. Você pode alterá-la em Configurações.",
             "uploadFailed": "Falha ao enviar o backup",
             "signInFailed": "Falha ao iniciar sessão em {provider}",
             "storageAccessRequired": "Permita o acesso do {provider: string} ao backup da sua carteira e tente novamente.",

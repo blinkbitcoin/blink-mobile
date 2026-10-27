@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minimum 12 aksara",
       "passwordMismatch": "Frasa laluan tidak sepadan",
       "uploadSuccess": "Sandaran disimpan ke {provider}",
+      "autoBundleSyncNotSaved": "Sandaran disimpan ke {provider}, tetapi pilihan sandaran automatik anda tidak dapat disimpan. Anda boleh mengubahnya dalam Tetapan.",
       "uploadFailed": "Gagal memuat naik sandaran",
       "signInFailed": "Gagal mendaftar masuk ke {provider}",
       "storageAccessRequired": "Benarkan akses {provider: string} ke sandaran dompet anda, kemudian cuba lagi.",

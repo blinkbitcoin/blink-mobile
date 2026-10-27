@@ -3873,6 +3873,7 @@
             "passwordTooShort": "Minimum 12 caractères",
             "passwordMismatch": "Les phrases secrètes ne correspondent pas",
             "uploadSuccess": "Sauvegarde enregistrée dans {provider}",
+            "autoBundleSyncNotSaved": "Sauvegarde enregistrée dans {provider}, mais votre choix de sauvegardes automatiques n'a pas pu être enregistré. Vous pouvez le modifier dans les Réglages.",
             "uploadFailed": "Échec du téléchargement de la sauvegarde",
             "signInFailed": "Échec de la connexion à {provider}",
             "storageAccessRequired": "Autorisez l'accès de {provider: string} à la sauvegarde de votre portefeuille, puis réessayez.",

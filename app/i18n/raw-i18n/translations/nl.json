@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minimaal 12 tekens",
       "passwordMismatch": "Wachtwoordzinnen komen niet overeen",
       "uploadSuccess": "Back-up opgeslagen in {provider}",
+      "autoBundleSyncNotSaved": "Back-up opgeslagen in {provider}, maar je keuze voor automatische back-ups kon niet worden opgeslagen. Je kunt dit wijzigen in Instellingen.",
       "uploadFailed": "Uploaden van back-up mislukt",
       "signInFailed": "Aanmelden bij {provider} mislukt",
       "storageAccessRequired": "Geef {provider: string} toegang tot de back-up van je wallet en probeer het opnieuw.",
