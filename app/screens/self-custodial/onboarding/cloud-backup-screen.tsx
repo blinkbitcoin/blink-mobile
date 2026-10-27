@@ -63,8 +63,8 @@ export const CloudBackupScreen: React.FC = () => {
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
-  /** The backup commits the choices it was started with, so they stay put while it
-   *  runs; the opt-in also waits for the stored choice it starts from. */
+  /** The backup commits the choices and the passphrase it was started with, so they
+   *  stay put while it runs; the opt-in also waits for the stored choice it starts from. */
   const isAutoBundleSyncDisabled = !canSyncBundle || isAutoBundleSyncLoading || loading
   const isContinueDisabled = !isValid || isAutoBundleSyncLoading
 
@@ -106,6 +106,7 @@ export const CloudBackupScreen: React.FC = () => {
                   onBlur={markPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
                   error={passwordError}
+                  disabled={loading}
                   {...testProps("cloud-password-input")}
                 />
                 <PasswordInput
@@ -115,6 +116,7 @@ export const CloudBackupScreen: React.FC = () => {
                   onBlur={markConfirmPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
                   error={confirmPasswordError}
+                  disabled={loading}
                   {...testProps("cloud-confirm-password-input")}
                 />
 

@@ -337,6 +337,43 @@ describe("CloudBackupScreen", () => {
       expect(mockToggleEncryption).not.toHaveBeenCalled()
     })
 
+    /** handleBackup holds the passphrase it started with, so an edit landing
+     *  mid-upload would leave the screen showing one the backup never used. */
+    it("keeps the passphrase fields fixed while the backup runs", () => {
+      mockIsEncrypted = true
+      mockLoading = true
+      const { getByPlaceholderText } = renderScreen()
+
+      fireEvent.changeText(
+        getByPlaceholderText(LL.BackupScreen.CloudBackup.passwordPlaceholder()),
+        "a different passphrase",
+      )
+      fireEvent.changeText(
+        getByPlaceholderText(LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()),
+        "a different passphrase",
+      )
+
+      expect(mockSetPassword).not.toHaveBeenCalled()
+      expect(mockSetConfirmPassword).not.toHaveBeenCalled()
+    })
+
+    it("lets the passphrase be edited while no backup is running", () => {
+      mockIsEncrypted = true
+      const { getByPlaceholderText } = renderScreen()
+
+      fireEvent.changeText(
+        getByPlaceholderText(LL.BackupScreen.CloudBackup.passwordPlaceholder()),
+        "a new passphrase",
+      )
+      fireEvent.changeText(
+        getByPlaceholderText(LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()),
+        "a new passphrase",
+      )
+
+      expect(mockSetPassword).toHaveBeenCalledWith("a new passphrase")
+      expect(mockSetConfirmPassword).toHaveBeenCalledWith("a new passphrase")
+    })
+
     it("waits for the stored choice before it can be changed or committed", () => {
       mockCanSyncBundle = true
       mockIsAutoBundleSyncLoading = true
