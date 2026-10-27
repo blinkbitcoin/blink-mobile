@@ -107,6 +107,13 @@ const renderAtStep = async (step: EmergencyRecoveryStep) => {
   return rendered
 }
 
+/** Fires the pending timers inside act, so the state they set lands before the next read. */
+const advanceTimers = (ms: number): void => {
+  act(() => {
+    jest.advanceTimersByTime(ms)
+  })
+}
+
 describe("useEmergencyRecovery", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -209,9 +216,7 @@ describe("useEmergencyRecovery", () => {
           expect(result.current.step).toBe(EmergencyRecoveryStep.Verified),
         )
 
-        act(() => {
-          jest.advanceTimersByTime(2000)
-        })
+        advanceTimers(2000)
 
         expect(result.current.step).toBe(EmergencyRecoveryStep.Summary)
         expect(result.current.verified).toEqual(verifiedResult)
@@ -228,9 +233,7 @@ describe("useEmergencyRecovery", () => {
           expect(result.current.step).toBe(EmergencyRecoveryStep.Verified),
         )
 
-        act(() => {
-          jest.advanceTimersByTime(500)
-        })
+        advanceTimers(500)
 
         expect(result.current.step).toBe(EmergencyRecoveryStep.Verified)
       } finally {
@@ -247,11 +250,7 @@ describe("useEmergencyRecovery", () => {
         )
         unmount()
 
-        expect(() => {
-          act(() => {
-            jest.advanceTimersByTime(2000)
-          })
-        }).not.toThrow()
+        expect(() => advanceTimers(2000)).not.toThrow()
       } finally {
         jest.useRealTimers()
       }
@@ -494,9 +493,7 @@ describe("useEmergencyRecovery", () => {
       await waitFor(() =>
         expect(rendered.result.current.step).toBe(EmergencyRecoveryStep.Verified),
       )
-      act(() => {
-        jest.advanceTimersByTime(2000)
-      })
+      advanceTimers(2000)
       jest.useRealTimers()
       return rendered
     }

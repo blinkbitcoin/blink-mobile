@@ -62,7 +62,9 @@ export const OperatorUnreachableScreen: React.FC = () => {
             {LL.EmergencyRecovery.outageBody({ support: "" })}
             <Text
               style={styles.link}
-              onPress={() => navigation.navigate("onboarding", { screen: "supportScreen" })}
+              onPress={() =>
+                navigation.navigate("onboarding", { screen: "supportScreen" })
+              }
               {...testProps("outage-support-link")}
             >
               {LL.EmergencyRecovery.outageSupport()}
@@ -73,7 +75,9 @@ export const OperatorUnreachableScreen: React.FC = () => {
 
       <Text
         style={styles.recoveryLink}
-        onPress={() => navigation.navigate("selfCustodialEmergencyRecovery", { mnemonic })}
+        onPress={() =>
+          navigation.navigate("selfCustodialEmergencyRecovery", { mnemonic })
+        }
         {...testProps("outage-emergency-recovery-link")}
       >
         {LL.EmergencyRecovery.outageCta()}
