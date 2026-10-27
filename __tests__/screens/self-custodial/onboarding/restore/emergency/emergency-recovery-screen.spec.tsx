@@ -5,6 +5,10 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
+import {
+  holdEmergencyPhrase,
+  releaseEmergencyPhrase,
+} from "@app/screens/self-custodial/onboarding/restore/emergency/emergency-phrase"
 import { EmergencyRecoveryScreen } from "@app/screens/self-custodial/onboarding/restore/emergency/emergency-recovery-screen"
 import { EmergencyRecoveryStep } from "@app/screens/self-custodial/onboarding/restore/emergency/hooks/use-emergency-recovery"
 import { EmergencyBundleRejection } from "@app/self-custodial/recovery-bundle/emergency-recovery"
@@ -17,10 +21,12 @@ let LL: TranslationFunctions
 const MNEMONIC = "abandon abandon about"
 
 const mockNavigate = jest.fn()
+const mockUseEmergencyRecovery = jest.fn()
+let mockPhraseHandle = ""
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useRoute: () => ({ params: { mnemonic: MNEMONIC } }),
+  useRoute: () => ({ params: { phraseHandle: mockPhraseHandle } }),
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
@@ -69,7 +75,10 @@ jest.mock(
     ...jest.requireActual(
       "@app/screens/self-custodial/onboarding/restore/emergency/hooks/use-emergency-recovery",
     ),
-    useEmergencyRecovery: () => flow,
+    useEmergencyRecovery: (...args: readonly unknown[]) => {
+      mockUseEmergencyRecovery(...args)
+      return flow
+    },
   }),
 )
 
@@ -92,9 +101,27 @@ describe("EmergencyRecoveryScreen", () => {
     flow.rejection = null
     flow.verified = null
     flow.busy = false
+    mockPhraseHandle = holdEmergencyPhrase(MNEMONIC)
   })
 
   const t = () => LL.EmergencyRecovery
+
+  it("runs the flow on the phrase its handle names", () => {
+    renderScreen()
+
+    expect(mockUseEmergencyRecovery).toHaveBeenCalledWith(MNEMONIC)
+  })
+
+  it("sends the user to the restore methods once the phrase was released", () => {
+    // The flow that held the phrase has ended; nothing here works without it.
+    releaseEmergencyPhrase(mockPhraseHandle)
+
+    renderScreen()
+
+    expect(screen.queryByTestId("bundle-verifying-view")).toBeNull()
+    expect(mockUseEmergencyRecovery).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialRestoreMethod")
+  })
 
   it("shows the check in progress, with nothing to tap", () => {
     renderScreen()

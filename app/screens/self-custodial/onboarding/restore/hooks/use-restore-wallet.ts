@@ -33,6 +33,8 @@ import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import { toastShow } from "@app/utils/toast"
 
+import { holdEmergencyPhrase } from "../emergency/emergency-phrase"
+
 const RestoreWalletStatus = {
   Idle: "idle",
   Restoring: "restoring",
@@ -138,7 +140,7 @@ export const useRestoreWallet = () => {
           // a bundle against the phrase needs no network.
           if (classifySdkError(err) === SelfCustodialErrorCode.NetworkError) {
             navigation.navigate("selfCustodialOperatorUnreachable", {
-              mnemonic: normalized,
+              phraseHandle: holdEmergencyPhrase(normalized),
             })
             return
           }
