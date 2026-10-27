@@ -363,6 +363,7 @@ describe("useCloudBackupForm stored sync choice", () => {
   const storedSettings = (cloudSync: boolean): RecoveryBundleSettings => ({
     autoRefresh: true,
     cloudSync,
+    exportedAt: null,
   })
 
   beforeEach(() => {
