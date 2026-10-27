@@ -25,6 +25,7 @@ module.exports = {
     "\\.(ts|tsx)$": [
       "ts-jest",
       {
+        // Needed on ts-jest 29.1; deprecated from 29.2 (the tsconfig setting takes over), removed in 30.
         isolatedModules: true,
         tsconfig: "<rootDir>/tsconfig.jest-transpile.json",
       },
