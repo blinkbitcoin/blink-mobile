@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Alamat baharu sedia. Alamat sebelumnya masih berfungsi.",
     "newAddressFailed": "Tidak dapat menjana alamat baharu. Sila cuba lagi.",
     "newAddressRateLimited": "Terlalu banyak alamat baharu. Tunggu sebentar dan cuba lagi.",
+    "onchainAddressLoadFailed": "Tidak dapat memuatkan alamat Bitcoin anda. Ketik Baharu untuk cuba lagi.",
     "addAmount": "Mohon amaun yang spesifik",
     "expired": "Invois ni telah tamat tempoh",
     "expiresIn": "Tamat tempoh dalam",

@@ -6973,6 +6973,10 @@ type RootTranslation = {
 		 */
 		newAddressRateLimited: string
 		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.​ ​T​a​p​ ​N​e​w​ ​t​o​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		onchainAddressLoadFailed: string
+		/**
 		 * R​e​q​u​e​s​t​ ​S​p​e​c​i​f​i​c​ ​A​m​o​u​n​t
 		 */
 		addAmount: string
@@ -20839,6 +20843,10 @@ export type TranslationFunctions = {
 		 * Too many new addresses. Please wait a while and try again.
 		 */
 		newAddressRateLimited: () => LocalizedString
+		/**
+		 * Couldn't load your Bitcoin address. Tap New to try again.
+		 */
+		onchainAddressLoadFailed: () => LocalizedString
 		/**
 		 * Request Specific Amount
 		 */

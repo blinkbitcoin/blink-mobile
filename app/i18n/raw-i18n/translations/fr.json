@@ -2224,6 +2224,7 @@
         "newAddressGenerated": "Nouvelle adresse prête. Les adresses précédentes restent valables.",
         "newAddressFailed": "Impossible de générer une nouvelle adresse. Veuillez réessayer.",
         "newAddressRateLimited": "Trop de nouvelles adresses. Patientez un moment, puis réessayez.",
+        "onchainAddressLoadFailed": "Impossible de charger votre adresse Bitcoin. Appuyez sur Nouvelle pour réessayer.",
         "addAmount": "Demander un montant spécifique",
         "expired": "La facture a expiré",
         "expiresIn": "Expire dans",

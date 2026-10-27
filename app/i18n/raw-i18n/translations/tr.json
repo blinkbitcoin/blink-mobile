@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Yeni adres hazır. Önceki adresler çalışmaya devam ediyor.",
     "newAddressFailed": "Yeni adres oluşturulamadı. Lütfen tekrar deneyin.",
     "newAddressRateLimited": "Çok fazla yeni adres oluşturuldu. Lütfen biraz bekleyip tekrar deneyin.",
+    "onchainAddressLoadFailed": "Bitcoin adresiniz yüklenemedi. Tekrar denemek için Yeni'ye dokunun.",
     "addAmount": "Belli Bir Miktar Talep Ey",
     "expired": "Faturanın süresi geçti",
     "expiresIn": "Süresi doluyor",

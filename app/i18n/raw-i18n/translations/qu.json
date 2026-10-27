@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Musuq tiyana listoñam. Ñawpaq tiyanakunaqa llamk'allanmi.",
     "newAddressFailed": "Manam musuq tiyanata ruraytachu atikurqan. Huktawan kallpachakuy.",
     "newAddressRateLimited": "Nisyu musuq tiyanakuna. Asllata suyay, huktawan kallpachakuy.",
+    "onchainAddressLoadFailed": "Manam Bitcoin tiyanaykita apamuyta atikurqanchu. Musuqta ñit'iy huktawan kallpachakunaykipaq.",
     "addAmount": "Ch'usaq kayniyta sutichaq",
     "expired": "Qillqa chhikan",
     "expiresIn": "Munanpi chhikan",

@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Ny adresse klar. Tidligere adresser virker stadig.",
     "newAddressFailed": "Kunne ikke oprette en ny adresse. Prøv venligst igen.",
     "newAddressRateLimited": "For mange nye adresser. Vent lidt, og prøv igen.",
+    "onchainAddressLoadFailed": "Kunne ikke indlæse din Bitcoin-adresse. Tryk på Ny for at prøve igen.",
     "addAmount": "Anmod om et bestemt beløb",
     "expired": "Fakturaen er udløbet",
     "expiresIn": "Udløber om",

@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Nová adresa je pripravená. Predchádzajúce adresy stále fungujú.",
     "newAddressFailed": "Novú adresu sa nepodarilo vygenerovať. Skúste to znova.",
     "newAddressRateLimited": "Príliš veľa nových adries. Chvíľu počkajte a skúste to znova.",
+    "onchainAddressLoadFailed": "Vašu bitcoinovú adresu sa nepodarilo načítať. Ťuknite na Nová a skúste to znova.",
     "addAmount": "Požiadať o konkrétnu sumu",
     "expired": "Platnosť faktúry vypršala",
     "expiresIn": "Platnosť končí za",

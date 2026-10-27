@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Nova adresa je spremna. Prethodne adrese i dalje rade.",
     "newAddressFailed": "Nije moguće stvoriti novu adresu. Pokušajte ponovno.",
     "newAddressRateLimited": "Previše novih adresa. Pričekajte malo i pokušajte ponovno.",
+    "onchainAddressLoadFailed": "Nije moguće učitati vašu Bitcoin adresu. Dodirnite Nova za ponovni pokušaj.",
     "addAmount": "Zatraži određeni iznos",
     "expired": "Faktura je istekla",
     "expiresIn": "Istječe za",

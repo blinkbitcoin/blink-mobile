@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Az új cím elkészült. A korábbi címek továbbra is működnek.",
     "newAddressFailed": "Nem sikerült új címet létrehozni. Kérjük, próbáld újra.",
     "newAddressRateLimited": "Túl sok új cím. Várj egy kicsit, majd próbáld újra.",
+    "onchainAddressLoadFailed": "Nem sikerült betölteni a Bitcoin-címedet. Koppints az Új gombra az újrapróbáláshoz.",
     "addAmount": "Konkrét összeg igénylése",
     "expired": "A számla lejárt",
     "expiresIn": "Lejár",

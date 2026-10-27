@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Idilesi entsha ilungile. Iidilesi zangaphambili zisasebenza.",
     "newAddressFailed": "Ayikwazanga ukwenza idilesi entsha. Nceda uzame kwakhona.",
     "newAddressRateLimited": "Zininzi kakhulu iidilesi ezintsha. Nceda ulinde kancinci uze uzame kwakhona.",
+    "onchainAddressLoadFailed": "Ayikwazanga ukulayisha idilesi yakho yeBitcoin. Cofa u-Entsha ukuze uzame kwakhona.",
     "addAmount": "Cela Isixa esithile",
     "expired": "I-invoyisi iphelelwe lixesha",
     "expiresIn": "Iphelelwa",

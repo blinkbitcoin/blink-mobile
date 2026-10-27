@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Alamat baru siap. Alamat sebelumnya tetap berfungsi.",
     "newAddressFailed": "Gagal membuat alamat baru. Silakan coba lagi.",
     "newAddressRateLimited": "Terlalu banyak alamat baru. Tunggu sebentar lalu coba lagi.",
+    "onchainAddressLoadFailed": "Gagal memuat alamat Bitcoin Anda. Ketuk Baru untuk mencoba lagi.",
     "addAmount": "Minta Jumlah Tertentu",
     "expired": "Faktur telah kedaluwarsa",
     "expiresIn": "Berakhir dalam",

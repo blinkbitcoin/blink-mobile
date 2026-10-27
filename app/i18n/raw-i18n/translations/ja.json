@@ -2224,6 +2224,7 @@
         "newAddressGenerated": "新しいアドレスの準備ができました。以前のアドレスも引き続き使えます。",
         "newAddressFailed": "新しいアドレスを生成できませんでした。もう一度お試しください。",
         "newAddressRateLimited": "新しいアドレスの作成回数が多すぎます。しばらく待ってから再度お試しください。",
+        "onchainAddressLoadFailed": "ビットコインアドレスを読み込めませんでした。「新規」をタップしてもう一度お試しください。",
         "addAmount": "金額を設定する",
         "expired": "有効期限切れのインボイスです",
         "expiresIn": "有効期限",

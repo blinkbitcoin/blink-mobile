@@ -2224,6 +2224,7 @@
     "newAddressGenerated": "Nuwe adres gereed. Vorige adresse werk steeds.",
     "newAddressFailed": "Kon nie 'n nuwe adres skep nie. Probeer asseblief weer.",
     "newAddressRateLimited": "Te veel nuwe adresse. Wag 'n rukkie en probeer weer.",
+    "onchainAddressLoadFailed": "Kon nie jou Bitcoin-adres laai nie. Tik op Nuut om weer te probeer.",
     "addAmount": "Vra spesifieke bedrag",
     "expired": "Hierdie faktuur het verval",
     "expiresIn": "Verval in",
