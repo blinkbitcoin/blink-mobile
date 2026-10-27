@@ -56,6 +56,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
     async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
       setState("deleting")
       setError(null)
+      let isResweepScheduled = false
       try {
         const isActive =
           activeAccount?.type === AccountType.SelfCustodial &&
@@ -122,16 +123,17 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         // not block the delete UX.
         waitForRefreshesToSettle(accountId)
           .then(sweepRecoveryBundleFiles)
-          .then(() => {
-            // Bounds the deleted-accounts set: nothing can start a refresh
-            // once the mnemonic and registry entry are gone.
-            unmarkAccountDeletedForRefresh(accountId)
-          })
           .catch((err) => {
             crashlytics().log(
               `[self-custodial delete] post-refresh bundle re-sweep failed: ${err}`,
             )
           })
+          .finally(() => {
+            // Bounds the deleted-accounts set: nothing can start a refresh
+            // once the mnemonic and registry entry are gone.
+            unmarkAccountDeletedForRefresh(accountId)
+          })
+        isResweepScheduled = true
         await removeRecoveryBundleSettings(accountId).catch((err) => {
           crashlytics().log(
             `[self-custodial delete] recovery bundle settings cleanup failed: ${err}`,
@@ -148,6 +150,13 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         if (hasCustodialAccount) return "switched-to-custodial"
         return "logged-out"
       } catch (err) {
+        /**
+         * Once scheduled, the background re-sweep drops the deletion mark. A
+         * failure before that point would leave the mark behind, and every
+         * later refresh of an account that may still be registered would be
+         * refused until the app restarts.
+         */
+        if (!isResweepScheduled) unmarkAccountDeletedForRefresh(accountId)
         const wrapped = err instanceof Error ? err : new Error(String(err))
         reportError("Self-custodial wallet delete", wrapped)
         setState("error")

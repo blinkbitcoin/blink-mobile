@@ -373,6 +373,88 @@ describe("useDeleteAccount", () => {
     expect(outcome).toBeUndefined()
   })
 
+  it("wraps a non-Error rejection before reporting it", async () => {
+    mockRemoveSelfCustodialAccountId.mockRejectedValue("index unavailable")
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(result.current.error?.message).toBe("index unavailable")
+  })
+
+  it("logs the best-effort cleanup steps that fail and still completes the delete", async () => {
+    mockUnlink.mockRejectedValue(new Error("dir busy"))
+    mockRemoveRecoveryBundleSettings.mockRejectedValue(new Error("settings busy"))
+    mockWaitForRefreshesToSettle.mockRejectedValue(new Error("registry gone"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBe("logged-out")
+    for (const failure of [
+      "storage dir unlink failed",
+      "recovery bundle settings cleanup failed",
+      "post-refresh bundle re-sweep failed",
+    ]) {
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(expect.stringContaining(failure))
+    }
+    // A failed re-sweep still drops the deletion mark.
+    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+  })
+
+  it("drops the deletion mark when the delete fails before its re-sweep is scheduled", async () => {
+    mockStorageDirFor.mockImplementationOnce(() => {
+      throw new Error("no storage dir for this network")
+    })
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    const markOrder = mockMarkAccountDeletedForRefresh.mock.invocationCallOrder[0]
+    const unmarkOrder = mockUnmarkAccountDeletedForRefresh.mock.invocationCallOrder[0]
+    expect(unmarkOrder).toBeGreaterThan(markOrder)
+    expect(mockDeleteRecoveryBundleFile).not.toHaveBeenCalled()
+    expect(mockWaitForRefreshesToSettle).not.toHaveBeenCalled()
+    expect(result.current.state).toBe("error")
+  })
+
+  it("keeps the deletion mark until the background re-sweep when a later step fails", async () => {
+    let settle: () => void = () => {}
+    mockWaitForRefreshesToSettle.mockReturnValue(
+      new Promise<void>((resolve) => {
+        settle = resolve
+      }),
+    )
+    mockRemoveSelfCustodialAccountId.mockRejectedValue(new Error("index write failed"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(result.current.state).toBe("error")
+    expect(mockUnmarkAccountDeletedForRefresh).not.toHaveBeenCalled()
+
+    await act(async () => {
+      settle()
+      await new Promise<void>((resolve) => {
+        setImmediate(resolve)
+      })
+    })
+
+    expect(mockDeleteRecoveryBundleFile).toHaveBeenCalledTimes(4)
+    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledTimes(1)
+    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+  })
+
   it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref", async () => {
     const remaining = {
       ...activeSelfCustodialAccount,
