@@ -439,7 +439,8 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("hands a settings re-backup over to the recovery bundle step as a re-backup", async () => {
+  /** A re-backup was already offered the emergency bundle on its first run. */
+  it("sends a settings re-backup straight to success as a re-backup", async () => {
     mockActiveWalletValue.mockReturnValue({
       accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
@@ -463,13 +464,16 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockReplace).toHaveBeenCalledWith(
-      "selfCustodialBackupBundleExport",
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: true }),
     )
   })
 
-  it("records a fresh manual backup and hands it over to the recovery bundle step", async () => {
+  /** A first manual backup stops at the emergency bundle screen, which offers the
+   *  cloud backup that keeps the bundle current before success. */
+  it("routes a fresh manual backup without checkpoint to the emergency bundle screen", async () => {
     mockActiveWalletValue.mockReturnValue({
       accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
@@ -492,7 +496,7 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     expect(mockReplace).toHaveBeenCalledWith(
       "selfCustodialBackupBundleExport",
-      expect.objectContaining({ reBackup: false }),
+      expect.objectContaining({ fromOnboarding: true }),
     )
   })
 
@@ -538,10 +542,6 @@ describe("BackupPhraseConfirmScreen", () => {
       ],
       successMessage: "Your backup phrase is correct",
     })
-    mockBackupStateValue.mockReturnValue({
-      backupState: { status: "completed", method: "manual" },
-      setBackupCompleted: mockSetBackupCompleted,
-    })
 
     const { getByPlaceholderText } = render(
       <ContextForScreen>
@@ -558,7 +558,7 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockReplace).toHaveBeenCalledWith(
       "selfCustodialBackupBundleExport",
       expect.objectContaining({
-        reBackup: true,
+        fromOnboarding: true,
         successMessage: "Your backup phrase is correct",
       }),
     )

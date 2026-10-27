@@ -115,17 +115,18 @@ export const useCompleteBackup = () => {
       }
 
       setBackupCompleted(method, backupOptions)
-      /** The phrase is only half of what a self-custodial user needs, so a manual backup
-       *  goes on to hand over the recovery bundle. It is recorded above first: the bundle
-       *  screens that follow only navigate, so nothing on them can fail and strand the
-       *  user. A migration never gets here, since its provisioned account holds no funds
-       *  and therefore no bundle until the transfer lands. The step replaces the one that
-       *  called it, so going back cannot confirm, and record, the same backup twice. */
-      const isBundleHandoverDue = method === BackupMethod.Manual && isSelfCustodialAccount
+      /** A first manual backup leaves the emergency bundle on this device only,
+       *  so it stops at the bundle screen to offer the cloud backup that keeps
+       *  it current. Cloud and credential methods already sync it; a re-run of
+       *  the backup has already been offered the choice. It is recorded above
+       *  first, and the step replaces the one that called it, so going back
+       *  cannot confirm, and record, the same backup twice. */
+      const isBundleHandoverDue =
+        method === BackupMethod.Manual && isSelfCustodialAccount && !isAlreadyBackedUp
       if (isBundleHandoverDue) {
         navigation.replace("selfCustodialBackupBundleExport", {
+          fromOnboarding: true,
           successMessage: message,
-          reBackup: isAlreadyBackedUp,
         })
         return
       }

@@ -12770,37 +12770,47 @@ type RootTranslation = {
 		}
 		BundleExport: {
 			/**
-			 * O​n​e​ ​l​a​s​t​ ​t​h​i​n​g
+			 * E​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e
 			 */
 			title: string
 			/**
-			 * I​n​ ​c​a​s​e​ ​o​f​ ​S​p​a​r​k​ ​g​o​i​n​g​ ​o​f​f​l​i​n​e​,​ ​u​s​e​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​t​o​ ​e​x​i​t​ ​o​n​c​h​a​i​n​.​ ​T​h​i​s​ ​b​u​n​d​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​.​ ​K​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
+			 * I​f​ ​y​o​u​ ​t​u​r​n​ ​o​n​ ​c​l​o​u​d​ ​b​a​c​k​u​p​s​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​w​i​l​l​ ​b​e​ ​u​p​d​a​t​e​d​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​n​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​ ​a​n​d​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​c​l​o​u​d​.​
+		​
+		​A​c​t​i​v​a​t​e​ ​n​o​w​ ​t​o​ ​e​n​a​b​l​e​ ​e​m​e​r​g​e​n​c​y​ ​e​x​i​t​.
 			 */
-			subtitle: string
+			bodyOnboarding: string
 			/**
-			 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​o​n​c​e​ ​y​o​u​ ​r​e​c​e​i​v​e​ ​f​u​n​d​s​,​ ​a​n​d​ ​k​e​p​t​ ​u​p​ ​t​o​ ​d​a​t​e​ ​f​r​o​m​ ​t​h​e​n​ ​o​n​.​ ​Y​o​u​ ​c​a​n​ ​d​o​w​n​l​o​a​d​ ​i​t​ ​a​n​y​ ​t​i​m​e​ ​f​r​o​m​ ​S​e​t​t​i​n​g​s​.
+			 * A​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​ ​a​r​e​ ​t​u​r​n​e​d​ ​o​f​f​.​ ​T​u​r​n​ ​o​n​ ​n​o​w​ ​t​o​ ​e​n​a​b​l​e​ ​e​m​e​r​g​e​n​c​y​ ​e​x​i​t​.​
+		​
+		​I​f​ ​y​o​u​ ​t​u​r​n​ ​o​n​ ​a​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​w​i​l​l​ ​b​e​ ​u​p​d​a​t​e​d​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​n​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​ ​a​n​d​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​c​l​o​u​d​.
 			 */
-			subtitlePending: string
+			bodyBackupsOff: string
+			/**
+			 * A​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​ ​a​r​e​ ​t​u​r​n​e​d​ ​o​n​.​ ​T​h​i​s​ ​b​u​n​d​l​e​ ​i​s​ ​u​p​d​a​t​e​d​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​n​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​ ​a​n​d​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​c​l​o​u​d​.​
+		​
+		​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​a​t​t​e​m​p​t​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​e​x​i​t​,​ ​m​a​k​e​ ​s​u​r​e​ ​t​o​ ​u​s​e​ ​t​h​e​ ​l​a​t​e​s​t​ ​b​u​n​d​l​e​.
+			 */
+			bodyBackupsOn: string
+			/**
+			 * C​l​o​u​d​ ​b​a​c​k​u​p
+			 */
+			cloudBackup: string
+			/**
+			 * A​c​t​i​v​a​t​e​ ​b​a​c​k​u​p​s
+			 */
+			activateBackups: string
+			/**
+			 * R​e​a​d​ ​t​h​e​ ​c​a​s​e​ ​s​t​u​d​y
+			 */
+			readCaseStudy: string
 			/**
 			 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​u​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
 			 */
 			learnMore: string
 			/**
-			 * U​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
-			 */
-			learnMoreTitle: string
-			/**
-			 * S​p​a​r​k​ ​k​e​e​p​s​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​f​f​-​c​h​a​i​n​ ​s​o​ ​p​a​y​m​e​n​t​s​ ​a​r​e​ ​i​n​s​t​a​n​t​ ​a​n​d​ ​c​h​e​a​p​.​ ​I​f​ ​i​t​s​ ​o​p​e​r​a​t​o​r​s​ ​e​v​e​r​ ​b​e​c​a​m​e​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​p​l​u​s​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​I​t​ ​i​s​ ​a​ ​m​u​l​t​i​-​w​e​e​k​ ​p​r​o​c​e​s​s​ ​a​n​d​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​s​o​ ​i​t​ ​i​s​ ​a​ ​s​a​f​e​t​y​ ​n​e​t​ ​r​a​t​h​e​r​ ​t​h​a​n​ ​a​n​ ​e​v​e​r​y​d​a​y​ ​r​o​u​t​e​.
-			 */
-			learnMoreBody: string
-			/**
 			 * D​o​w​n​l​o​a​d​ ​b​u​n​d​l​e
 			 */
 			download: string
-			/**
-			 * C​o​p​y
-			 */
-			copy: string
 			/**
 			 * S​k​i​p
 			 */
@@ -12817,10 +12827,6 @@ type RootTranslation = {
 			 * D​o​w​n​l​o​a​d
 			 */
 			sensitiveConfirm: string
-			/**
-			 * E​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​s​a​v​e​d
-			 */
-			savedTitle: string
 		}
 		ManualBackup: {
 			Alerts: {
@@ -14024,162 +14030,11 @@ type RootTranslation = {
 		/**
 		 * H​o​w​ ​r​e​c​o​v​e​r​y​ ​w​o​r​k​s
 		 */
-		howItWorksCta: string
-		/**
-		 * H​o​w​ ​r​e​c​o​v​e​r​y​ ​w​o​r​k​s
-		 */
 		howItWorksTitle: string
 		/**
 		 * I​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​R​e​c​o​v​e​r​y​ ​i​s​ ​a​ ​m​u​l​t​i​-​w​e​e​k​ ​p​r​o​c​e​s​s​:​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​b​r​o​a​d​c​a​s​t​,​ ​t​h​e​n​ ​a​ ​w​a​i​t​i​n​g​ ​p​e​r​i​o​d​ ​p​a​s​s​e​s​ ​b​e​f​o​r​e​ ​t​h​e​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​s​w​e​p​t​ ​t​o​ ​a​ ​w​a​l​l​e​t​ ​y​o​u​ ​c​h​o​o​s​e​.​ ​I​t​ ​a​l​s​o​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​w​h​i​c​h​ ​y​o​u​ ​p​a​y​ ​f​r​o​m​ ​a​ ​s​e​p​a​r​a​t​e​ ​B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e​.​ ​S​m​a​l​l​ ​a​m​o​u​n​t​s​ ​m​a​y​ ​c​o​s​t​ ​m​o​r​e​ ​t​o​ ​r​e​c​o​v​e​r​ ​t​h​a​n​ ​t​h​e​y​ ​a​r​e​ ​w​o​r​t​h​.
 		 */
 		howItWorksBody: string
-		/**
-		 * Y​o​u​r​ ​D​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​i​s​ ​n​o​t​ ​c​o​v​e​r​e​d​ ​b​y​ ​o​n​c​h​a​i​n​ ​r​e​c​o​v​e​r​y​.​ ​O​n​l​y​ ​B​i​t​c​o​i​n​ ​c​a​n​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​t​h​i​s​ ​w​a​y​.
-		 */
-		dollarNotCovered: string
-		/**
-		 * Y​o​u​r​ ​f​u​n​d​s​ ​h​a​v​e​ ​n​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
-		 */
-		nudgeMissingTitle: string
-		/**
-		 * S​e​t​ ​u​p​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​o​ ​y​o​u​ ​c​a​n​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​i​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​.
-		 */
-		nudgeMissingBody: string
-		/**
-		 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​s​ ​o​n​l​y​ ​o​n​ ​t​h​i​s​ ​p​h​o​n​e
-		 */
-		nudgeOnlyOnThisDeviceTitle: string
-		/**
-		 * S​a​v​e​ ​a​ ​c​o​p​y​ ​s​o​m​e​w​h​e​r​e​ ​e​l​s​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​p​h​o​n​e​,​ ​t​h​e​ ​c​o​p​y​ ​s​t​o​r​e​d​ ​o​n​ ​i​t​ ​g​o​e​s​ ​w​i​t​h​ ​i​t​ ​a​n​d​ ​y​o​u​r​ ​f​u​n​d​s​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​o​n​c​h​a​i​n​.
-		 */
-		nudgeOnlyOnThisDeviceBody: string
-		/**
-		 * Y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​i​s​ ​o​u​t​ ​o​f​ ​d​a​t​e
-		 */
-		nudgeStaleTitle: string
-		/**
-		 * I​t​ ​n​o​ ​l​o​n​g​e​r​ ​m​a​t​c​h​e​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​.​ ​R​e​f​r​e​s​h​ ​i​t​ ​s​o​ ​a​ ​r​e​c​o​v​e​r​y​ ​w​o​u​l​d​ ​r​e​t​u​r​n​ ​e​v​e​r​y​t​h​i​n​g​ ​y​o​u​ ​h​o​l​d​.
-		 */
-		nudgeStaleBody: string
-		/**
-		 * O​p​e​n​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
-		 */
-		nudgeCta: string
-		/**
-		 * B​a​c​k​e​d​ ​u​p
-		 */
-		chipFresh: string
-		/**
-		 * O​u​t​ ​o​f​ ​d​a​t​e
-		 */
-		chipStale: string
-		/**
-		 * N​o​t​ ​s​e​t​ ​u​p
-		 */
-		chipMissing: string
-		/**
-		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
-		 */
-		settingsTitle: string
-		/**
-		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p
-		 */
-		title: string
-		/**
-		 * A​ ​s​n​a​p​s​h​o​t​ ​o​f​ ​y​o​u​r​ ​w​a​l​l​e​t​'​s​ ​e​x​i​t​ ​d​a​t​a​.​ ​C​o​m​b​i​n​e​d​ ​w​i​t​h​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​,​ ​i​t​ ​l​e​t​s​ ​y​o​u​ ​w​i​t​h​d​r​a​w​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​-​c​h​a​i​n​ ​e​v​e​n​ ​i​f​ ​t​h​e​ ​S​p​a​r​k​ ​n​e​t​w​o​r​k​ ​d​i​s​a​p​p​e​a​r​s​.​ ​I​t​ ​r​e​f​r​e​s​h​e​s​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​p​a​y​m​e​n​t​.
-		 */
-		description: string
-		/**
-		 * L​a​s​t​ ​r​e​f​r​e​s​h​e​d​:​ ​{​w​h​e​n​}
-		 * @param {string} when
-		 */
-		lastRefreshed: RequiredParams<'when'>
-		/**
-		 * L​e​a​v​e​s​ ​c​o​v​e​r​e​d​:​ ​{​c​o​u​n​t​}
-		 * @param {number} count
-		 */
-		leavesCovered: RequiredParams<'count'>
-		/**
-		 * C​l​o​u​d​ ​b​a​c​k​u​p​:​ ​{​w​h​e​n​}
-		 * @param {string} when
-		 */
-		cloudSynced: RequiredParams<'when'>
-		/**
-		 * C​l​o​u​d​ ​b​a​c​k​u​p​:​ ​n​o​t​ ​u​p​l​o​a​d​e​d​ ​y​e​t
-		 */
-		cloudNotSynced: string
-		/**
-		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​f​i​r​s​t​,​ ​t​h​e​n​ ​y​o​u​ ​c​a​n​ ​t​u​r​n​ ​o​n​ ​a​u​t​o​m​a​t​i​c​ ​c​l​o​u​d​ ​u​p​l​o​a​d​ ​o​f​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​h​e​r​e​,​ ​e​n​c​r​y​p​t​e​d​ ​w​i​t​h​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
-		 * @param {string} provider
-		 */
-		cloudFollowsSeedBackup: RequiredParams<'provider'>
-		/**
-		 * A​u​t​o​m​a​t​i​c​ ​r​e​f​r​e​s​h
-		 */
-		autoRefreshLabel: string
-		/**
-		 * K​e​e​p​s​ ​t​h​e​ ​b​a​c​k​u​p​ ​f​r​e​s​h​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​p​a​y​m​e​n​t​.​ ​T​u​r​n​ ​o​f​f​ ​t​o​ ​s​a​v​e​ ​m​o​b​i​l​e​ ​d​a​t​a​;​ ​y​o​u​ ​c​a​n​ ​s​t​i​l​l​ ​r​e​f​r​e​s​h​ ​m​a​n​u​a​l​l​y​.
-		 */
-		autoRefreshHint: string
-		/**
-		 * C​l​o​u​d​ ​b​a​c​k​u​p
-		 */
-		cloudSyncLabel: string
-		/**
-		 * A​u​t​o​m​a​t​i​c​a​l​l​y​ ​u​p​l​o​a​d​s​ ​t​h​e​ ​e​n​c​r​y​p​t​e​d​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​.
-		 * @param {string} provider
-		 */
-		cloudSyncHint: RequiredParams<'provider'>
-		/**
-		 * U​p​l​o​a​d​i​n​g​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​ ​r​e​q​u​i​r​e​s​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​ ​t​h​e​r​e​ ​t​o​ ​b​e​ ​p​r​o​t​e​c​t​e​d​ ​w​i​t​h​ ​a​ ​p​a​s​s​w​o​r​d​.​ ​R​e​-​d​o​ ​t​h​e​ ​w​a​l​l​e​t​ ​b​a​c​k​u​p​ ​w​i​t​h​ ​a​ ​p​a​s​s​w​o​r​d​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​.
-		 * @param {string} provider
-		 */
-		cloudSyncNeedsPassword: RequiredParams<'provider'>
-		/**
-		 * C​o​u​l​d​ ​n​o​t​ ​s​a​v​e​ ​t​h​e​ ​s​e​t​t​i​n​g​.​ ​T​r​y​ ​a​g​a​i​n​.
-		 */
-		settingUpdateFailed: string
-		/**
-		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​I​t​ ​i​s​ ​c​r​e​a​t​e​d​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​p​a​y​m​e​n​t​,​ ​o​r​ ​y​o​u​ ​c​a​n​ ​r​e​f​r​e​s​h​ ​n​o​w​.
-		 */
-		noBundleYet: string
-		/**
-		 * R​e​f​r​e​s​h​ ​n​o​w
-		 */
-		refreshNow: string
-		/**
-		 * B​a​c​k​ ​u​p​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}
-		 * @param {string} provider
-		 */
-		uploadToCloud: RequiredParams<'provider'>
-		/**
-		 * E​x​p​o​r​t​ ​a​s​ ​f​i​l​e
-		 */
-		exportFile: string
-		/**
-		 * C​o​p​y​ ​J​S​O​N
-		 */
-		copyJson: string
-		/**
-		 * E​x​p​o​r​t​s​ ​a​r​e​ ​u​n​e​n​c​r​y​p​t​e​d
-		 */
-		exportWarningTitle: string
-		/**
-		 * T​h​e​ ​e​x​p​o​r​t​e​d​ ​f​i​l​e​ ​c​o​n​t​a​i​n​s​ ​y​o​u​r​ ​w​a​l​l​e​t​'​s​ ​e​x​i​t​ ​d​a​t​a​ ​a​s​ ​p​l​a​i​n​ ​J​S​O​N​.​ ​I​t​ ​c​a​n​n​o​t​ ​b​e​ ​u​s​e​d​ ​t​o​ ​s​p​e​n​d​ ​y​o​u​r​ ​f​u​n​d​s​,​ ​b​u​t​ ​i​t​ ​r​e​v​e​a​l​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​s​t​r​u​c​t​u​r​e​.​ ​S​t​o​r​e​ ​i​t​ ​s​o​m​e​w​h​e​r​e​ ​s​a​f​e​.
-		 */
-		exportWarningMessage: string
-		/**
-		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​r​e​f​r​e​s​h​e​d
-		 */
-		refreshSuccess: string
-		/**
-		 * Y​o​u​r​ ​w​a​l​l​e​t​ ​i​s​ ​e​m​p​t​y​,​ ​s​o​ ​t​h​e​r​e​ ​i​s​ ​n​o​t​h​i​n​g​ ​t​o​ ​b​a​c​k​ ​u​p​ ​y​e​t​.
-		 */
-		refreshEmptyWallet: string
-		/**
-		 * C​o​u​l​d​ ​n​o​t​ ​r​e​f​r​e​s​h​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​.​ ​C​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
-		 */
-		refreshFailed: string
 		/**
 		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​R​e​f​r​e​s​h​ ​f​i​r​s​t​.
 		 */
@@ -14188,10 +14043,6 @@ type RootTranslation = {
 		 * C​o​u​l​d​ ​n​o​t​ ​e​x​p​o​r​t​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​.
 		 */
 		exportFailed: string
-		/**
-		 * R​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​u​p​l​o​a​d​e​d
-		 */
-		cloudUploadSuccess: string
 	}
 	SelfCustodialOffline: {
 		/**
@@ -27122,37 +26973,47 @@ export type TranslationFunctions = {
 		}
 		BundleExport: {
 			/**
-			 * One last thing
+			 * Emergency bundle
 			 */
 			title: () => LocalizedString
 			/**
-			 * In case of Spark going offline, use this bundle to exit onchain. This bundle is sensitive. Keep it private.
+			 * If you turn on cloud backups, this bundle will be updated after every new transaction and saved to your cloud.
+	
+		Activate now to enable emergency exit.
 			 */
-			subtitle: () => LocalizedString
+			bodyOnboarding: () => LocalizedString
 			/**
-			 * Your emergency bundle is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.
+			 * Automatic backups are turned off. Turn on now to enable emergency exit.
+	
+		If you turn on automatic backups, this bundle will be updated after every new transaction and saved to your cloud.
 			 */
-			subtitlePending: () => LocalizedString
+			bodyBackupsOff: () => LocalizedString
+			/**
+			 * Automatic backups are turned on. This bundle is updated after every new transaction and saved to your cloud.
+	
+		If you want to attempt the emergency exit, make sure to use the latest bundle.
+			 */
+			bodyBackupsOn: () => LocalizedString
+			/**
+			 * Cloud backup
+			 */
+			cloudBackup: () => LocalizedString
+			/**
+			 * Activate backups
+			 */
+			activateBackups: () => LocalizedString
+			/**
+			 * Read the case study
+			 */
+			readCaseStudy: () => LocalizedString
 			/**
 			 * Learn more about unilateral exit
 			 */
 			learnMore: () => LocalizedString
 			/**
-			 * Unilateral exit
-			 */
-			learnMoreTitle: () => LocalizedString
-			/**
-			 * Spark keeps your bitcoin off-chain so payments are instant and cheap. If its operators ever became unavailable, this bundle plus your backup phrase lets you move your funds onchain yourself, without Blink. It is a multi-week process and costs onchain fees, so it is a safety net rather than an everyday route.
-			 */
-			learnMoreBody: () => LocalizedString
-			/**
 			 * Download bundle
 			 */
 			download: () => LocalizedString
-			/**
-			 * Copy
-			 */
-			copy: () => LocalizedString
 			/**
 			 * Skip
 			 */
@@ -27169,10 +27030,6 @@ export type TranslationFunctions = {
 			 * Download
 			 */
 			sensitiveConfirm: () => LocalizedString
-			/**
-			 * Emergency bundle saved
-			 */
-			savedTitle: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {
@@ -28363,155 +28220,11 @@ export type TranslationFunctions = {
 		/**
 		 * How recovery works
 		 */
-		howItWorksCta: () => LocalizedString
-		/**
-		 * How recovery works
-		 */
 		howItWorksTitle: () => LocalizedString
 		/**
 		 * If Spark becomes unavailable, this backup lets you move your funds onchain yourself, without Blink. Recovery is a multi-week process: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay from a separate Bitcoin balance. Small amounts may cost more to recover than they are worth.
 		 */
 		howItWorksBody: () => LocalizedString
-		/**
-		 * Your Dollar balance is not covered by onchain recovery. Only Bitcoin can be recovered this way.
-		 */
-		dollarNotCovered: () => LocalizedString
-		/**
-		 * Your funds have no recovery backup
-		 */
-		nudgeMissingTitle: () => LocalizedString
-		/**
-		 * Set up your recovery backup so you can move your funds onchain if Spark becomes unavailable.
-		 */
-		nudgeMissingBody: () => LocalizedString
-		/**
-		 * Your emergency bundle is only on this phone
-		 */
-		nudgeOnlyOnThisDeviceTitle: () => LocalizedString
-		/**
-		 * Save a copy somewhere else. If you lose this phone, the copy stored on it goes with it and your funds cannot be recovered onchain.
-		 */
-		nudgeOnlyOnThisDeviceBody: () => LocalizedString
-		/**
-		 * Your recovery backup is out of date
-		 */
-		nudgeStaleTitle: () => LocalizedString
-		/**
-		 * It no longer matches your balance. Refresh it so a recovery would return everything you hold.
-		 */
-		nudgeStaleBody: () => LocalizedString
-		/**
-		 * Open recovery backup
-		 */
-		nudgeCta: () => LocalizedString
-		/**
-		 * Backed up
-		 */
-		chipFresh: () => LocalizedString
-		/**
-		 * Out of date
-		 */
-		chipStale: () => LocalizedString
-		/**
-		 * Not set up
-		 */
-		chipMissing: () => LocalizedString
-		/**
-		 * Recovery backup
-		 */
-		settingsTitle: () => LocalizedString
-		/**
-		 * Recovery backup
-		 */
-		title: () => LocalizedString
-		/**
-		 * A snapshot of your wallet's exit data. Combined with your backup phrase, it lets you withdraw your funds on-chain even if the Spark network disappears. It refreshes automatically after every payment.
-		 */
-		description: () => LocalizedString
-		/**
-		 * Last refreshed: {when}
-		 */
-		lastRefreshed: (arg: { when: string }) => LocalizedString
-		/**
-		 * Leaves covered: {count}
-		 */
-		leavesCovered: (arg: { count: number }) => LocalizedString
-		/**
-		 * Cloud backup: {when}
-		 */
-		cloudSynced: (arg: { when: string }) => LocalizedString
-		/**
-		 * Cloud backup: not uploaded yet
-		 */
-		cloudNotSynced: () => LocalizedString
-		/**
-		 * Back up your wallet to {provider} first, then you can turn on automatic cloud upload of the recovery backup here, encrypted with your backup phrase.
-		 */
-		cloudFollowsSeedBackup: (arg: { provider: string }) => LocalizedString
-		/**
-		 * Automatic refresh
-		 */
-		autoRefreshLabel: () => LocalizedString
-		/**
-		 * Keeps the backup fresh after every payment. Turn off to save mobile data; you can still refresh manually.
-		 */
-		autoRefreshHint: () => LocalizedString
-		/**
-		 * Cloud backup
-		 */
-		cloudSyncLabel: () => LocalizedString
-		/**
-		 * Automatically uploads the encrypted recovery backup to {provider}.
-		 */
-		cloudSyncHint: (arg: { provider: string }) => LocalizedString
-		/**
-		 * Uploading the recovery backup to {provider} requires your wallet backup there to be protected with a password. Re-do the wallet backup with a password to enable it.
-		 */
-		cloudSyncNeedsPassword: (arg: { provider: string }) => LocalizedString
-		/**
-		 * Could not save the setting. Try again.
-		 */
-		settingUpdateFailed: () => LocalizedString
-		/**
-		 * No recovery backup saved yet. It is created automatically after your first payment, or you can refresh now.
-		 */
-		noBundleYet: () => LocalizedString
-		/**
-		 * Refresh now
-		 */
-		refreshNow: () => LocalizedString
-		/**
-		 * Back up to {provider}
-		 */
-		uploadToCloud: (arg: { provider: string }) => LocalizedString
-		/**
-		 * Export as file
-		 */
-		exportFile: () => LocalizedString
-		/**
-		 * Copy JSON
-		 */
-		copyJson: () => LocalizedString
-		/**
-		 * Exports are unencrypted
-		 */
-		exportWarningTitle: () => LocalizedString
-		/**
-		 * The exported file contains your wallet's exit data as plain JSON. It cannot be used to spend your funds, but it reveals your balance and payment structure. Store it somewhere safe.
-		 */
-		exportWarningMessage: () => LocalizedString
-		/**
-		 * Recovery backup refreshed
-		 */
-		refreshSuccess: () => LocalizedString
-		/**
-		 * Your wallet is empty, so there is nothing to back up yet.
-		 */
-		refreshEmptyWallet: () => LocalizedString
-		/**
-		 * Could not refresh the recovery backup. Check your connection and try again.
-		 */
-		refreshFailed: () => LocalizedString
 		/**
 		 * No recovery backup saved yet. Refresh first.
 		 */
@@ -28520,10 +28233,6 @@ export type TranslationFunctions = {
 		 * Could not export the recovery backup.
 		 */
 		exportFailed: () => LocalizedString
-		/**
-		 * Recovery backup uploaded
-		 */
-		cloudUploadSuccess: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

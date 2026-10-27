@@ -58,7 +58,7 @@ import { AccountStaticQR } from "./settings/account-static-qr"
 import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
-import { RecoveryBackupSetting } from "./settings/recovery-backup"
+import { EmergencyBundleSetting } from "./settings/emergency-bundle"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 import { BackupWalletSetting } from "./settings/backup-wallet"
 
@@ -158,7 +158,7 @@ export const SettingsScreen: React.FC = () => {
       OnDeviceSecuritySetting,
       ViewBackupPhraseSetting,
       BackupWalletSetting,
-      RecoveryBackupSetting,
+      EmergencyBundleSetting,
     ],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],

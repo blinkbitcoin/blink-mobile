@@ -176,6 +176,25 @@ describe("useCompleteBackup", () => {
     })
   })
 
+  it("sends a cloud backup straight to success, past the emergency bundle screen", () => {
+    mockAccountType = AccountType.SelfCustodial
+    mockIsSelfCustodial = true
+    mockCheckpoint = null
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    result.current({ method: "cloud" })
+
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
+      reBackup: false,
+      message: undefined,
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupBundleExport",
+      expect.anything(),
+    )
+  })
+
   it("surfaces a lost resume state instead of faking a standalone success", () => {
     /** App killed between saving a step checkpoint and provisioning: checkpoint set, no id. */
     mockMigrationAccountId = null
@@ -228,8 +247,8 @@ describe("useCompleteBackup", () => {
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     // Replaces the confirm step, so going back cannot record the backup twice.
     expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      fromOnboarding: true,
       successMessage: "All set",
-      reBackup: false,
     })
     const recordOrder = mockSetBackupCompleted.mock.invocationCallOrder[0]
     const navigateOrder = mockReplace.mock.invocationCallOrder[0]
@@ -240,7 +259,8 @@ describe("useCompleteBackup", () => {
     )
   })
 
-  it("marks the active account as a re-backup and still hands over the bundle", () => {
+  /** A re-backup was already offered the emergency bundle on its first run. */
+  it("marks the active account as a re-backup and goes straight to success", () => {
     // An already-completed backup is never a migration, so it marks the active account.
     mockBackupStatus = "completed"
     mockAccountType = AccountType.SelfCustodial
@@ -252,9 +272,10 @@ describe("useCompleteBackup", () => {
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
-    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
-      successMessage: undefined,
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: true,
+      message: undefined,
     })
   })
 
@@ -284,8 +305,8 @@ describe("useCompleteBackup", () => {
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      fromOnboarding: true,
       successMessage: "All set",
-      reBackup: false,
     })
     expect(mockNavigate).not.toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
