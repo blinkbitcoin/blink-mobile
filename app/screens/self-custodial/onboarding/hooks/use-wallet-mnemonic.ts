@@ -8,18 +8,22 @@ import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
+/** The account a backup flow works on: the active self-custodial account, or mid-migration,
+ *  while the active account is still custodial, the provisioned one. */
+export const useBackupAccountId = (): string | null => {
+  const { isSelfCustodial } = useActiveWallet()
+  const { activeAccount } = useAccountRegistry()
+  const { accountId: migrationAccountId } = useMigrationCheckpointState()
+  return isSelfCustodial ? activeAccount?.id ?? null : migrationAccountId
+}
+
 /**
  * On-demand keychain read for the active backup account's phrase. Screens that must show or
  * save the phrase eagerly use useWalletMnemonic; the method picker uses this so the key
  * material is only pulled into memory once a method is actually chosen.
  */
 export const useLoadWalletMnemonic = (): (() => Promise<string>) => {
-  const { isSelfCustodial } = useActiveWallet()
-  const { activeAccount } = useAccountRegistry()
-  const { accountId: migrationAccountId } = useMigrationCheckpointState()
-
-  /** Mid-migration the active account is still custodial, so read the provisioned account. */
-  const targetAccountId = isSelfCustodial ? activeAccount?.id ?? null : migrationAccountId
+  const targetAccountId = useBackupAccountId()
 
   return useCallback(async () => {
     if (!targetAccountId) return ""

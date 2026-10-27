@@ -8,6 +8,7 @@ import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
+import { revokeCloudRecoveryBundle } from "@app/self-custodial/recovery-bundle/refresh"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   buildBackupPayload,
@@ -21,7 +22,11 @@ import { getCloudProviderName } from "../utils"
 
 import { useCompleteBackup } from "./use-complete-backup"
 import { usePlatformCloudBackup } from "./use-platform-cloud-backup"
-import { useWalletIdentity, useWalletMnemonicState } from "./use-wallet-mnemonic"
+import {
+  useBackupAccountId,
+  useWalletIdentity,
+  useWalletMnemonicState,
+} from "./use-wallet-mnemonic"
 
 const DEFAULT_BACKUP_VERSION = 1
 
@@ -61,6 +66,7 @@ export const useCloudBackup = ({
   const { mnemonic, loading: mnemonicLoading } = useWalletMnemonicState()
   const { pubkey: identityPubkey, loading: identityLoading } = useWalletIdentity(mnemonic)
   const { lightningAddress } = useSelfCustodialAccountInfo()
+  const backupAccountId = useBackupAccountId()
 
   /** The phrase is read from the keychain before the pubkey can derive from it; both
    *  windows leave the pubkey empty without it being a failure. */
@@ -128,6 +134,23 @@ export const useCloudBackup = ({
       if (!confirmed) return
     }
 
+    const isPasswordProtected = isEncrypted && password.length > 0
+    /**
+     * A recovery bundle uploaded beside an earlier password-protected seed backup is
+     * encrypted with this same seed, so a seed stored without a password would decrypt it
+     * on the spot (D9). The bundle has to leave the cloud before that seed arrives, and
+     * the backup stops here when it cannot.
+     */
+    if (!isPasswordProtected) {
+      const isBundleRevoked =
+        backupAccountId !== null &&
+        (await revokeCloudRecoveryBundle({ accountId: backupAccountId, mnemonic }))
+      if (!isBundleRevoked) {
+        toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
+        return
+      }
+    }
+
     const payload = buildBackupPayload(mnemonic, {
       walletIdentifier: identityPubkey,
       lightningAddress: lightningAddress ?? undefined,
@@ -153,12 +176,13 @@ export const useCloudBackup = ({
       method: BackupMethod.Cloud,
       // Whether the seed backup carries an extra password gates the
       // recovery-bundle cloud sync (D9), so record it with the completion.
-      backupOptions: { cloudPasswordProtected: isEncrypted && password.length > 0 },
+      backupOptions: { cloudPasswordProtected: isPasswordProtected },
     })
   }, [
     isEncrypted,
     password,
     version,
+    backupAccountId,
     startSession,
     upload,
     downloadById,
