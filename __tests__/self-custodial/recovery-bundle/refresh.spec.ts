@@ -125,7 +125,11 @@ const deferred = <T>() => {
 const stateKeyFor = (accountId: string, network: Network): string =>
   `${accountId}:${network}`
 let storedStates = new Map<string, RecoveryBundleState>()
-let storedSettings: RecoveryBundleSettings = { autoRefresh: true, cloudSync: true }
+let storedSettings: RecoveryBundleSettings = {
+  autoRefresh: true,
+  cloudSync: true,
+  exportedAt: null,
+}
 
 const testBundle = {
   createdAt: "2026-07-12T00:00:00.000Z",
@@ -192,7 +196,7 @@ beforeEach(() => {
     }),
   )
   // Cloud sync opted in by default here; the opt-out cases flip it per test.
-  storedSettings = { autoRefresh: true, cloudSync: true }
+  storedSettings = { autoRefresh: true, cloudSync: true, exportedAt: null }
   mockReadRecoveryBundleSettings.mockImplementation(async () => storedSettings)
   mockWriteRecoveryBundleSettings.mockImplementation(
     async (_accountId: string, settings: RecoveryBundleSettings) => {
