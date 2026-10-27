@@ -301,7 +301,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         return
       }
 
-      const next = await markCloudSynced(accountId, network)
+      const next = await markCloudSynced(accountId, network, metadata.bundleCreatedAt)
       if (next) setBundleState(next)
       toastShow({
         message: LL.RecoveryBundleScreen.cloudUploadSuccess(),

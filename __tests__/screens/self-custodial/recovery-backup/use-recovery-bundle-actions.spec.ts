@@ -176,6 +176,7 @@ describe("useRecoveryBundleActions", () => {
     mockParseBundleBackupMetadata.mockReturnValue({
       network: "MAINNET",
       walletIdentityPublicKey: "pubkey",
+      bundleCreatedAt: savedState.bundleCreatedAt,
     })
     mockRefreshRecoveryBundle.mockResolvedValue({ success: true, state: savedState })
     mockSyncExistingBundleToCloud.mockResolvedValue(false)
@@ -387,9 +388,12 @@ describe("useRecoveryBundleActions", () => {
         "blink-spark-recovery-bundle-mainnet-pubkey.json",
         session,
       )
+      // The stamp names the bundle this upload carried, which a refresh saving
+      // a newer one meanwhile cannot change.
       expect(mockMarkCloudSynced).toHaveBeenCalledWith(
         ACCOUNT_ID,
         mockSparkNetwork.Regtest,
+        savedState.bundleCreatedAt,
       )
       expect(result.current.bundleState).toEqual(synced)
       expect(mockToastShow).toHaveBeenCalledWith(
