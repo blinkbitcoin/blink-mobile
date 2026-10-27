@@ -16,6 +16,7 @@ import {
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { measure, ScEvent } from "@app/self-custodial/measurement"
 import {
   BackupMethod,
   markBackupCompletedFor,
@@ -43,7 +44,7 @@ type RestoreWalletStatus = (typeof RestoreWalletStatus)[keyof typeof RestoreWall
 export const useRestoreWallet = () => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { updateState } = usePersistentStateContext()
+  const { updateState, persistentState } = usePersistentStateContext()
   const { retry: reinitSdk } = useSelfCustodialWallet()
   const { reloadSelfCustodialAccounts } = useAccountRegistry()
   const [status, setStatus] = useState<RestoreWalletStatus>(RestoreWalletStatus.Idle)
@@ -93,7 +94,11 @@ export const useRestoreWallet = () => {
           if (lookup.id) {
             activateAccount(lookup.id)
             reinitSdk()
-            logSelfCustodialRestoreCompleted()
+            /** Re-entering a phrase for an account already on the device is not a new
+             *  account; only the restore is measured, against its stored mode. */
+            logSelfCustodialRestoreCompleted(
+              persistentState?.selfCustodialAccountModeByAccountId?.[lookup.id] ?? null,
+            )
             navigation.navigate("selfCustodialBackupSuccess")
             return
           }
@@ -110,7 +115,12 @@ export const useRestoreWallet = () => {
 
           activateAccount(accountId)
           reinitSdk()
-          logSelfCustodialRestoreCompleted()
+
+          /** The mode a restore measures against is the server's answer; an unanswered
+           *  server leaves both events to the mode selection that follows. */
+          const restoredMode = isServerModeKnown ? serverMode : null
+          logSelfCustodialRestoreCompleted(restoredMode)
+          measure(ScEvent.AccountCreated, { flow: "restore" }, restoredMode)
 
           /** Only an unanswered server leaves the question open. Assuming a default here
            *  would push it back and overwrite whatever the account really holds. */
@@ -141,6 +151,7 @@ export const useRestoreWallet = () => {
       reinitSdk,
       reloadSelfCustodialAccounts,
       navigation,
+      persistentState,
       LL,
       network,
       selfCustodialDepositClaimLeewayVbyte,

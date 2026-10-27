@@ -1,20 +1,26 @@
 /* eslint-disable camelcase */
 import analytics from "@react-native-firebase/analytics"
 
+import { AccountMode } from "@app/types/account"
+
+import { measure, ScEvent } from "./measurement"
+
 type SelfCustodialBackupCompletedParams = {
   backupMethod: "manual" | "google_drive" | "icloud" | "keychain"
 }
 
+/** Gated: a backup made under Incognito, or before any mode exists, leaves no event. */
 export const logSelfCustodialBackupCompleted = (
   params: SelfCustodialBackupCompletedParams,
 ) => {
-  analytics().logEvent("self_custodial_backup_completed", {
-    backup_method: params.backupMethod,
-  })
+  measure(ScEvent.BackupCompleted, { backup_method: params.backupMethod })
 }
 
-export const logSelfCustodialRestoreCompleted = () => {
-  analytics().logEvent("self_custodial_restore_completed")
+/** Restores happen before the account is active, so the caller passes the mode the
+ *  restore itself established (the server's answer, or the stored mode of an account
+ *  already on the device); an unknown mode suppresses the event. */
+export const logSelfCustodialRestoreCompleted = (mode: AccountMode | null) => {
+  measure(ScEvent.RestoreCompleted, undefined, mode)
 }
 
 type SelfCustodialStableBalanceActivatedParams = {
@@ -24,9 +30,7 @@ type SelfCustodialStableBalanceActivatedParams = {
 export const logSelfCustodialStableBalanceActivated = (
   params: SelfCustodialStableBalanceActivatedParams,
 ) => {
-  analytics().logEvent("self_custodial_stable_balance_activated", {
-    label: params.label,
-  })
+  measure(ScEvent.StableBalanceActivated, { label: params.label })
 }
 
 type SelfCustodialRolloutExposedParams = {
@@ -35,6 +39,8 @@ type SelfCustodialRolloutExposedParams = {
   hasCustodialAccount: boolean
 }
 
+/** Rollout exposure is a custodial-context signal — it measures what existing users are
+ *  shown, before any self-custodial account or mode exists — so it stays ungated. */
 export const logSelfCustodialRolloutExposed = (
   params: SelfCustodialRolloutExposedParams,
 ) => {
