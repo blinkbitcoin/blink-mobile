@@ -6,7 +6,7 @@
  * them (including fields this client does not model).
  */
 
-import { decodeFields, lastField, ProtoWriter, utf8Decode, WireType } from "./wire"
+import { decodeFields, lastField, ProtoWriter, utf8Decode } from "./wire"
 
 /** spark.proto `Network` enum values (proto, not the Breez SDK enum). */
 export const SparkProtoNetwork = {
@@ -171,6 +171,25 @@ const decodeTreeNode = (data: Uint8Array): DecodedTreeNode => {
   }
 }
 
+/**
+ * Decodes one map<string, TreeNode> entry (key = 1, value = 2). The exporter
+ * walks parent chains by map key but stores the node it carries, so an entry
+ * whose key is empty or names a different node would close a chain on a node
+ * the bundle never contains. Such an entry is refused instead of indexed.
+ */
+const decodeNodeEntry = (entry: Uint8Array): DecodedTreeNode => {
+  const entryFields = decodeFields(entry)
+  const key = utf8Decode(lastField(entryFields, 1)?.bytes ?? new Uint8Array(0))
+  const node = decodeTreeNode(lastField(entryFields, 2)?.bytes ?? new Uint8Array(0))
+  const isKeyBoundToNode = key.length > 0 && node.id === key
+  if (!isKeyBoundToNode) {
+    throw new Error(
+      `spark query_nodes: map key "${key}" does not match node id "${node.id}"`,
+    )
+  }
+  return node
+}
+
 export type QueryNodesResponse = {
   nodes: Map<string, DecodedTreeNode>
   offset: bigint
@@ -180,15 +199,13 @@ export const decodeQueryNodesResponse = (data: Uint8Array): QueryNodesResponse =
   const nodes = new Map<string, DecodedTreeNode>()
   let offset = 0n
 
-  for (const field of decodeFields(data)) {
-    if (field.fieldNumber === 2 && field.wireType === WireType.Varint) {
-      offset = BigInt.asIntN(64, field.varint ?? 0n)
-    } else if (field.fieldNumber === 1 && field.bytes) {
-      // map<string, TreeNode> entry: key = 1, value = 2
-      const entryFields = decodeFields(field.bytes)
-      const key = lastField(entryFields, 1)?.bytes
-      const value = lastField(entryFields, 2)?.bytes
-      if (key && value) nodes.set(utf8Decode(key), decodeTreeNode(value))
+  for (const { fieldNumber, varint, bytes } of decodeFields(data)) {
+    const isOffsetField = fieldNumber === 2 && varint !== undefined
+    if (isOffsetField) offset = BigInt.asIntN(64, varint)
+    const isNodeEntryField = fieldNumber === 1 && bytes !== undefined
+    if (isNodeEntryField) {
+      const node = decodeNodeEntry(bytes)
+      nodes.set(node.id, node)
     }
   }
 
