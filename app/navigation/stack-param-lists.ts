@@ -337,9 +337,8 @@ export type RootStackParamList = {
     successMessage?: string
   }
   selfCustodialBackupBundleExport:
-    | { successMessage?: string; reBackup?: boolean }
+    | { fromOnboarding?: boolean; successMessage?: string }
     | undefined
-  selfCustodialBundleSaved: { successMessage?: string; reBackup?: boolean } | undefined
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
   /** The settings entry applies the choice to the active account and returns. The
    *  onboarding entries declare their onward step: restore and migration pass the
@@ -385,7 +384,6 @@ export type RootStackParamList = {
   /** A handle to the phrase, never the phrase itself: see emergency-phrase.ts. */
   selfCustodialOperatorUnreachable: { phraseHandle: string }
   selfCustodialEmergencyRecovery: { phraseHandle: string }
-  selfCustodialRecoveryBackup: undefined
   stableBalanceSettings: undefined
 }
 

@@ -1,7 +1,9 @@
 import React from "react"
+import { Linking } from "react-native"
 
-import { render, fireEvent, screen, waitFor, within } from "@testing-library/react-native"
+import { render, fireEvent, screen, waitFor } from "@testing-library/react-native"
 
+import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
@@ -18,38 +20,42 @@ const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
   settings: { autoRefresh: true, cloudSync: false },
   settingsLoaded: true,
-  refreshing: false,
-  uploading: false,
   sharing: false,
-  copying: false,
   reloadState: jest.fn().mockResolvedValue(undefined),
-  handleRefresh: jest.fn(),
-  handleShare: jest.fn().mockResolvedValue(undefined),
-  handleCopy: jest.fn().mockResolvedValue(undefined),
-  handleCloudUpload: jest.fn(),
-  handleSetAutoRefresh: jest.fn().mockResolvedValue(undefined),
-  handleSetCloudSync: jest.fn().mockResolvedValue(undefined),
+  handleShare: jest.fn().mockResolvedValue(true),
 }
 
 // The actions hook has its own spec; mocking it keeps this one about the
-// screen's two states and the export gate, without pulling in the keystore.
+// screen's three states, without pulling in the keystore.
 jest.mock(
   "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions",
   () => ({ useRecoveryBundleActions: () => mockActions }),
 )
 
+const mockIsPasswordProtected = jest.fn()
+jest.mock("@app/self-custodial/providers/backup-state", () => ({
+  ...jest.requireActual("@app/self-custodial/providers/backup-state"),
+  useBackupState: () => ({ backupState: null }),
+  isPasswordProtectedCloudSeedBackup: () => mockIsPasswordProtected(),
+}))
+
 const mockNavigate = jest.fn()
 const mockReplace = jest.fn()
-const mockNavigation = { navigate: mockNavigate, replace: mockReplace }
 const mockParams = jest.fn<
-  { successMessage?: string; reBackup?: boolean } | undefined,
+  { fromOnboarding?: boolean; successMessage?: string } | undefined,
   []
 >()
-jest.mock("@react-navigation/native", () => ({
-  ...jest.requireActual("@react-navigation/native"),
-  useRoute: () => ({ params: mockParams() }),
-  useNavigation: () => mockNavigation,
-}))
+jest.mock("@react-navigation/native", () => {
+  const ReactActual = jest.requireActual("react")
+  return {
+    ...jest.requireActual("@react-navigation/native"),
+    useRoute: () => ({ params: mockParams() }),
+    useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
+    useFocusEffect: (effect: () => (() => void) | undefined) => {
+      ReactActual.useEffect(effect, [effect])
+    },
+  }
+})
 
 const renderScreen = () =>
   render(
@@ -58,19 +64,7 @@ const renderScreen = () =>
     </ContextForScreen>,
   )
 
-/** The warning's confirm for a copy carries the same "Copy" label as the
- *  screen's own button, so it is told apart by not being that button. */
-const pressCopyConfirm = () => {
-  const copyLabel = LL.BackupScreen.BundleExport.copy()
-  const screenButtonLabel = within(screen.getByTestId("bundle-copy-button")).getByText(
-    copyLabel,
-  )
-  const confirm = screen.getAllByText(copyLabel).find((el) => el !== screenButtonLabel)
-  if (!confirm) throw new Error("copy confirmation not rendered")
-  fireEvent.press(confirm)
-}
-
-const successRoute = { reBackup: false, message: "done" }
+const savedBundle = { savedAt: 1, leafCount: 3 } as never
 
 describe("BundleExportScreen", () => {
   beforeAll(() => {
@@ -80,45 +74,99 @@ describe("BundleExportScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockParams.mockReturnValue({ successMessage: "done", reBackup: false })
-    mockActions.bundleState = undefined
+    mockParams.mockReturnValue(undefined)
+    mockIsPasswordProtected.mockReturnValue(false)
+    mockActions.bundleState = savedBundle
+    mockActions.settings = { autoRefresh: true, cloudSync: false }
     mockActions.sharing = false
-    mockActions.copying = false
-    // Restored per test: jest.clearAllMocks() clears calls, not implementations,
-    // and cases below replace these members outright - without this the
-    // replacement leaks into every test that runs after them.
+    // Restored per test: cases below replace these members outright.
     mockActions.reloadState = jest.fn().mockResolvedValue(undefined)
-    // true = the share sheet completed; cases below override it to cover a
-    // dismissal, which must not advance the flow.
     mockActions.handleShare = jest.fn().mockResolvedValue(true)
-    mockActions.handleCopy = jest.fn().mockResolvedValue(undefined)
   })
 
-  describe("when a recovery backup exists", () => {
+  it("is titled Emergency bundle", () => {
+    renderScreen()
+
+    expect(screen.getByText(LL.BackupScreen.BundleExport.title())).toBeTruthy()
+  })
+
+  describe("from the manual backup (onboarding)", () => {
     beforeEach(() => {
-      mockActions.bundleState = { updatedAt: 1, outputCount: 3 } as never
+      mockParams.mockReturnValue({ fromOnboarding: true, successMessage: "done" })
     })
 
-    it("offers exactly two export actions and no cloud shortcut", () => {
+    it("offers the cloud backup and a skip", () => {
       renderScreen()
 
-      expect(screen.getByTestId("bundle-download-button")).toBeTruthy()
-      expect(screen.getByTestId("bundle-copy-button")).toBeTruthy()
-      // R7: one cloud button inside the manual flow is what produces
-      // "I did the backup, it's in Google Drive" with only the bundle saved.
-      expect(screen.queryByText(/google drive/i)).toBeNull()
-      expect(screen.queryByText(/icloud/i)).toBeNull()
-      expect(screen.queryByText(/cloud/i)).toBeNull()
+      expect(screen.getByText(LL.BackupScreen.BundleExport.bodyOnboarding())).toBeTruthy()
+      expect(screen.getByTestId("bundle-cloud-backup-button")).toBeTruthy()
+      expect(screen.getByTestId("bundle-skip-button")).toBeTruthy()
+      expect(screen.queryByTestId("bundle-download-button")).toBeNull()
     })
 
-    it("lets the user skip the export", () => {
+    it("opens the cloud backup flow", () => {
       renderScreen()
 
-      // Skipping does not leave them unprotected: the encrypted on-device copy
-      // is written automatically, and the home nudge brings them back.
+      fireEvent.press(screen.getByTestId("bundle-cloud-backup-button"))
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
+    })
+
+    it("skips to the success screen without staying in the back stack", () => {
+      renderScreen()
+
       fireEvent.press(screen.getByTestId("bundle-skip-button"))
-      // The backup was recorded before this screen, so skipping only moves on.
-      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", successRoute)
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
+        message: "done",
+      })
+    })
+
+    it("does not wait for the stored settings, which it does not depend on", () => {
+      mockActions.bundleState = undefined
+      renderScreen()
+
+      expect(screen.getByTestId("bundle-cloud-backup-button")).toBeTruthy()
+    })
+  })
+
+  describe("from Settings with automatic backups off", () => {
+    it("offers to activate backups", () => {
+      renderScreen()
+
+      expect(screen.getByText(LL.BackupScreen.BundleExport.bodyBackupsOff())).toBeTruthy()
+      fireEvent.press(screen.getByTestId("bundle-activate-backups-button"))
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
+      expect(screen.queryByTestId("bundle-skip-button")).toBeNull()
+    })
+
+    /** A cloud backup without a passphrase never uploads the bundle, so it must
+     *  not read as "turned on". */
+    it("stays off when sync is enabled but the cloud backup has no passphrase", () => {
+      mockActions.settings = { autoRefresh: true, cloudSync: true }
+      renderScreen()
+
+      expect(screen.getByTestId("bundle-activate-backups-button")).toBeTruthy()
+    })
+
+    it("stays off when the cloud backup has a passphrase but sync is disabled", () => {
+      mockIsPasswordProtected.mockReturnValue(true)
+      renderScreen()
+
+      expect(screen.getByTestId("bundle-activate-backups-button")).toBeTruthy()
+    })
+  })
+
+  describe("from Settings with automatic backups on", () => {
+    beforeEach(() => {
+      mockIsPasswordProtected.mockReturnValue(true)
+      mockActions.settings = { autoRefresh: true, cloudSync: true }
+    })
+
+    it("offers the latest bundle for download", () => {
+      renderScreen()
+
+      expect(screen.getByText(LL.BackupScreen.BundleExport.bodyBackupsOn())).toBeTruthy()
+      expect(screen.getByTestId("bundle-download-button")).toBeTruthy()
+      expect(screen.queryByTestId("bundle-activate-backups-button")).toBeNull()
     })
 
     it("warns before the first download and exports only on confirmation", async () => {
@@ -132,8 +180,6 @@ describe("BundleExportScreen", () => {
       expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveBody())).toBeTruthy()
       expect(mockActions.handleShare).not.toHaveBeenCalled()
 
-      // The modal's confirm is labelled differently from the screen's button,
-      // so it can be targeted directly.
       fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
     })
@@ -145,227 +191,65 @@ describe("BundleExportScreen", () => {
       fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
 
-      // The warning has been read; a second press exports directly, with no
-      // modal confirmation in between.
       fireEvent.press(screen.getByTestId("bundle-download-button"))
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(2))
     })
 
-    it("confirms the download on its own screen rather than finishing here", async () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-download-button"))
-      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
-      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalled())
-
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBundleSaved", {
-        successMessage: "done",
-        reBackup: false,
-      })
-      expect(mockReplace).not.toHaveBeenCalled()
-    })
-
-    /** Dismissing the OS share sheet is one tap. Advancing anyway would tell the
-     *  user their emergency bundle is saved when no file ever left the device -
-     *  and the bundle is the artifact a unilateral exit depends on. */
-    it("stays put when the share sheet is dismissed", async () => {
+    it("warns again after a dismissed share sheet", async () => {
       mockActions.handleShare = jest.fn().mockResolvedValue(false)
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-download-button"))
-      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
-      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalled())
-
-      expect(mockNavigate).not.toHaveBeenCalled()
-    })
-
-    /** The repeat-download path skips the warning modal, so it needs the same
-     *  gate: it is the easier of the two to leave unguarded. */
-    it("stays put when a repeat share is dismissed", async () => {
-      // One mock across both presses: the screen captures the reference it was
-      // rendered with, so swapping the member mid-test would leave it calling
-      // the original.
-      mockActions.handleShare = jest
-        .fn()
-        .mockResolvedValueOnce(true)
-        .mockResolvedValueOnce(false)
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-download-button"))
-      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
-      await waitFor(() => expect(mockNavigate).toHaveBeenCalled())
-      mockNavigate.mockClear()
-
-      // Second press skips the warning modal and shares straight away.
-      fireEvent.press(screen.getByTestId("bundle-download-button"))
-      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(2))
-
-      expect(mockNavigate).not.toHaveBeenCalled()
-    })
-
-    it("warns before a copy and copies only on confirmation", async () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-copy-button"))
-
-      // The clipboard can sync off the device, so a copy is as sensitive as a
-      // download and sits behind the same warning.
-      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
-      expect(mockActions.handleCopy).not.toHaveBeenCalled()
-
-      pressCopyConfirm()
-      await waitFor(() => expect(mockActions.handleCopy).toHaveBeenCalledTimes(1))
-      // Copy is a one-shot export (R10), not a step in the flow.
-      expect(mockNavigate).not.toHaveBeenCalled()
-      expect(mockReplace).not.toHaveBeenCalled()
-      expect(mockActions.handleShare).not.toHaveBeenCalled()
-    })
-
-    it("can back out of the copy warning without touching the clipboard", () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-copy-button"))
-      fireEvent.press(screen.getByTestId("modal-close"))
-
-      expect(mockActions.handleCopy).not.toHaveBeenCalled()
-    })
-
-    it("does not re-warn for a copy once the warning was read for a download", async () => {
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-download-button"))
       fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
 
-      fireEvent.press(screen.getByTestId("bundle-copy-button"))
-      await waitFor(() => expect(mockActions.handleCopy).toHaveBeenCalledTimes(1))
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
+      expect(mockActions.handleShare).toHaveBeenCalledTimes(1)
     })
 
-    it("explains unilateral exit on request", () => {
-      renderScreen()
-
-      expect(screen.queryByText(LL.BackupScreen.BundleExport.learnMoreBody())).toBeNull()
-      fireEvent.press(screen.getByTestId("bundle-learn-more"))
-      expect(screen.getByText(LL.BackupScreen.BundleExport.learnMoreBody())).toBeTruthy()
-    })
-
-    it("closes the explainer again without exporting or advancing", () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-learn-more"))
-      fireEvent.press(screen.getByText(LL.common.ok()))
-      expect(mockActions.handleShare).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
-
-      fireEvent.press(screen.getByTestId("bundle-learn-more"))
-      fireEvent.press(screen.getByTestId("modal-close"))
-      expect(mockActions.handleShare).not.toHaveBeenCalled()
-    })
-
-    it("can back out of the download warning without exporting", () => {
+    it("cannot download before the wallet has a bundle", () => {
+      // A wallet that has never held funds has nothing to hand over.
+      mockActions.bundleState = null
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-download-button"))
-      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
-
-      // Closing the warning must neither download nor advance the flow.
-      fireEvent.press(screen.getByTestId("modal-close"))
-      expect(mockActions.handleShare).not.toHaveBeenCalled()
-      expect(mockNavigate).not.toHaveBeenCalled()
+      expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
     })
   })
 
-  describe("when the wallet has no recovery backup yet", () => {
-    beforeEach(() => {
-      // A new wallet has no outputs, so the exporter cannot build a bundle;
-      // there is nothing to hand over and the screen must say so.
-      mockActions.bundleState = null
-    })
-
-    it("explains that the backup is created later instead of offering a file", () => {
-      renderScreen()
-
-      expect(
-        screen.getByText(LL.BackupScreen.BundleExport.subtitlePending()),
-      ).toBeTruthy()
-      expect(screen.queryByTestId("bundle-download-button")).toBeNull()
-      expect(screen.queryByTestId("bundle-copy-button")).toBeNull()
-    })
-
-    it("lets the user finish, since there is nothing to export", () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-continue-button"))
-      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", successRoute)
-    })
-  })
-
-  it("does not offer a learn-more link with no bundle to explain", () => {
-    mockActions.bundleState = null
-    renderScreen()
-    expect(screen.queryByTestId("bundle-learn-more")).toBeNull()
-  })
-
-  it("does not let the user past the loading state", () => {
+  it("waits for the stored settings before choosing a Settings state", () => {
+    // Guessing "off" first would flash the wrong copy and CTA for users whose
+    // backups are on.
     mockActions.bundleState = undefined
     renderScreen()
 
-    fireEvent.press(screen.getByTestId("bundle-continue-button"))
-    expect(mockReplace).not.toHaveBeenCalled()
+    expect(screen.queryByTestId("bundle-activate-backups-button")).toBeNull()
+    expect(screen.queryByTestId("bundle-download-button")).toBeNull()
   })
 
-  it("finishes without a message when the route carries no params", () => {
-    mockParams.mockReturnValue(undefined)
-    mockActions.bundleState = null
-    renderScreen()
+  describe("learn more", () => {
+    it("explains how recovery works", () => {
+      renderScreen()
 
-    fireEvent.press(screen.getByTestId("bundle-continue-button"))
-    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-      reBackup: undefined,
-      message: undefined,
+      fireEvent.press(screen.getByTestId("bundle-learn-more"))
+      expect(screen.getByText(LL.RecoveryBundleScreen.howItWorksTitle())).toBeTruthy()
+      expect(screen.getByText(LL.RecoveryBundleScreen.howItWorksBody())).toBeTruthy()
+    })
+
+    it("opens the case study in the browser", () => {
+      const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true)
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-learn-more"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.readCaseStudy()))
+      expect(openURL).toHaveBeenCalledWith(UNILATERAL_EXIT_CASE_STUDY_URL)
     })
   })
 
   it("survives a failing initial read", () => {
-    // The screen has its own empty state; an unhandled rejection here would
-    // take the whole onboarding stack down instead of showing it.
     mockActions.reloadState = jest.fn().mockRejectedValue(new Error("nope"))
 
     expect(() => renderScreen()).not.toThrow()
-  })
-
-  /** Skip navigates away. Left live during an export it
-   *  would tear the flow down while the share sheet or the clipboard write is
-   *  still resolving into a screen the user has left. */
-  describe("skip during an in-flight export", () => {
-    beforeEach(() => {
-      mockActions.bundleState = { updatedAt: 1, outputCount: 3 } as never
-    })
-
-    it("refuses the press while a share is in flight", () => {
-      mockActions.sharing = true
-      const { getByTestId } = renderScreen()
-
-      fireEvent.press(getByTestId("bundle-skip-button"))
-
-      expect(mockReplace).not.toHaveBeenCalled()
-    })
-
-    it("refuses the press while a copy is in flight", () => {
-      mockActions.copying = true
-      const { getByTestId } = renderScreen()
-
-      fireEvent.press(getByTestId("bundle-skip-button"))
-
-      expect(mockReplace).not.toHaveBeenCalled()
-    })
-
-    it("allows the press once nothing is in flight", () => {
-      const { getByTestId } = renderScreen()
-
-      fireEvent.press(getByTestId("bundle-skip-button"))
-
-      expect(mockReplace).toHaveBeenCalled()
-    })
   })
 })
