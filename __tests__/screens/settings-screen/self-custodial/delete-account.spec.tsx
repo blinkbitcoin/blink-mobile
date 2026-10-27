@@ -10,7 +10,11 @@ import { DeleteAccount } from "@app/screens/settings-screen/self-custodial/delet
 const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ dispatch: jest.fn(), navigate: jest.fn() }),
+  useNavigation: () => ({
+    dispatch: jest.fn(),
+    navigate: jest.fn(),
+    setOptions: jest.fn(),
+  }),
   CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
 }))
 
@@ -146,6 +150,9 @@ jest.mock("@app/hooks/use-account-registry", () => ({
       selected: true,
       status: AccountStatus.RequiresRestore,
     },
+    selfCustodialEntries: [
+      { id: TEST_SC_ACCOUNT_ID, lightningAddress: "persisted@breez.tips" },
+    ],
   }),
 }))
 
@@ -304,5 +311,23 @@ describe("DeleteAccount", () => {
     })
 
     expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "alice")
+  })
+
+  it("names the account from its persisted address while the live one has not loaded", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+    })
+
+    const { getByTestId } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "persisted")
   })
 })

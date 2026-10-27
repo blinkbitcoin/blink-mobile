@@ -23,7 +23,7 @@ import { useAccountRemoval } from "./use-account-removal"
 export const DeleteAccount: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
-  const { activeAccount } = useAccountRegistry()
+  const { activeAccount, selfCustodialEntries } = useAccountRegistry()
   const { requestRemoval, runPendingRemoval } = useAccountRemoval()
   const { wallets, lightningAddress } = useSelfCustodialWallet()
   const network = useSparkNetwork()
@@ -41,8 +41,14 @@ export const DeleteAccount: React.FC = () => {
 
   const handleConfirm = () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
+    /** Same fallback as the account's row: the live address is empty until the wallet
+     *  has loaded it, and the persisted one still names the account. */
+    const persistedLightningAddress = selfCustodialEntries.find(
+      (entry) => entry.id === activeAccount.id,
+    )?.lightningAddress
     const identifier =
-      extractLightningAddressUsername(lightningAddress) ?? LL.common.anonymousUser()
+      extractLightningAddressUsername(lightningAddress ?? persistedLightningAddress) ??
+      LL.common.anonymousUser()
     requestRemoval(activeAccount.id, identifier)
     setConfirmVisible(false)
   }
