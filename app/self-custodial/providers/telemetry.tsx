@@ -145,7 +145,8 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
    * reset — a debt that has to survive a logout and a relaunch. Restored before the first
    * resolution reads it, like the kill switch; absent counts as owed.
    */
-  const platformIdentityApplied = persistentState.telemetryPlatformIdentityApplied !== false
+  const platformIdentityApplied =
+    persistentState.telemetryPlatformIdentityApplied !== false
   useEffect(() => {
     restorePlatformIdentityApplied(platformIdentityApplied)
   }, [platformIdentityApplied])

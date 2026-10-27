@@ -132,7 +132,10 @@ describe("self-custodial analytics helpers", () => {
 
     it("waits for its own account, and is emitted exactly once", async () => {
       let n = 0
-      randomUUID.mockImplementation(() => `00000000-0000-4000-8000-00000000000${++n}`)
+      randomUUID.mockImplementation(() => {
+        n += 1
+        return `00000000-0000-4000-8000-00000000000${n}`
+      })
       logSelfCustodialRestoreCompleted({ accountId: RESTORED })
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 

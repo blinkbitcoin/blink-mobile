@@ -53,8 +53,12 @@ jest.mock("@app/utils/log-error", () => ({
 }))
 
 const FlagsProbe: React.FC = () => {
-  const { remoteConfigReady, remoteConfigTrusted, nonCustodialEnabled, telemetryEnabled } =
-    useFeatureFlags()
+  const {
+    remoteConfigReady,
+    remoteConfigTrusted,
+    nonCustodialEnabled,
+    telemetryEnabled,
+  } = useFeatureFlags()
   return (
     <Text testID="flags">
       {JSON.stringify({

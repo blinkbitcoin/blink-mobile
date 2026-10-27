@@ -335,7 +335,10 @@ describe("the collection gate", () => {
     // Clearing the user id governs only what comes next. The custodial rows already sent
     // carry this install's app-instance id, and a new instance is what unlinks them; but a
     // reset per launch would mint a new app instance every time for custodial users.
-    const flush = () => new Promise((resolve) => setImmediate(resolve))
+    const flush = () =>
+      new Promise<void>((resolve) => {
+        setImmediate(resolve)
+      })
 
     it("resets it when a self-custodial account becomes active after the ledger id was applied", async () => {
       restorePlatformIdentityApplied(false)
@@ -404,6 +407,16 @@ describe("the collection gate", () => {
 
       expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
       expect(isPlatformIdentityApplied()).toBe(true)
+    })
+
+    it("counts an install with no record as owing it, before anything restores one", () => {
+      // The persisted value is restored by the provider, but a freshly loaded module is
+      // what a launch starts from, and it must not start as paid.
+      jest.isolateModules(() => {
+        // eslint-disable-next-line @typescript-eslint/no-var-requires
+        const fresh: typeof import("@app/telemetry/platform-analytics") = require("@app/telemetry/platform-analytics")
+        expect(fresh.isPlatformIdentityApplied()).toBe(true)
+      })
     })
 
     it("does not count a cleared user id as the ledger id riding the instance", async () => {

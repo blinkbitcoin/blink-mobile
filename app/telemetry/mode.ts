@@ -6,7 +6,11 @@ import {
   reportBoundaryFault,
   setDiagnosticsModeInput,
 } from "./diagnostics"
-import { isKillSwitchEngaged, isTelemetryEnabled, onKillSwitchEngaged } from "./enablement"
+import {
+  isKillSwitchEngaged,
+  isTelemetryEnabled,
+  onKillSwitchEngaged,
+} from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
   isPlatformIdentityApplied,
