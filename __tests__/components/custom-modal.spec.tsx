@@ -120,4 +120,23 @@ describe("CustomModal", () => {
 
     expect(queryByTestId("icon-close")).toBeNull()
   })
+
+  it("says once it is off the screen", () => {
+    const onModalHide = jest.fn()
+    const { rerender } = render(
+      <CustomModal {...baseProps} toggleModal={jest.fn()} onModalHide={onModalHide} />,
+    )
+    expect(onModalHide).not.toHaveBeenCalled()
+
+    rerender(
+      <CustomModal
+        {...baseProps}
+        isVisible={false}
+        toggleModal={jest.fn()}
+        onModalHide={onModalHide}
+      />,
+    )
+
+    expect(onModalHide).toHaveBeenCalledTimes(1)
+  })
 })

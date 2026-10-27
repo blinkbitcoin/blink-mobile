@@ -67,6 +67,7 @@ import {
   ShieldIcon,
   SnowflakeIcon,
   SpinnerGapIcon,
+  SquaresFourIcon,
   StorefrontIcon,
   TrashIcon,
   TranslateIcon,
@@ -104,6 +105,7 @@ import Send from "@app/assets/icons-redesign/send.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
+import BtcOutline from "@app/assets/icons-redesign/btc-outline.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import CloudArrowUp from "@app/assets/icons-redesign/cloud-arrow-up.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
@@ -136,6 +138,7 @@ export type IconWeight = "thin" | "regular" | "bold"
 // ── Icon maps ───────────────────────────────────────────────────────────────
 
 const phosphorIconMap = {
+  "apps": SquaresFourIcon,
   "arrow-down": ArrowDownIcon,
   "arrow-left": ArrowLeftIcon,
   "arrow-right": ArrowRightIcon,
@@ -240,6 +243,7 @@ const customSvgMap = {
   "welcome": Welcome,
   "qr-code": QrCode,
   "btc-hand": BtcHand,
+  "btc-outline": BtcOutline,
   "check-badge": CheckBadge,
   "cloud-arrow-up": CloudArrowUp,
   "heart-outline": HeartOutline,

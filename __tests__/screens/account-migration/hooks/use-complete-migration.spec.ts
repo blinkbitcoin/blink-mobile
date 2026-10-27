@@ -70,6 +70,13 @@ jest.mock("@app/screens/account-migration/hooks/use-pending-migration-accounts",
   }),
 }))
 
+const mockClearReceiveDelayedSince = jest.fn()
+
+jest.mock("@app/screens/account-migration/utils/migration-receive-delay-storage", () => ({
+  clearReceiveDelayedSince: (accountId: string) =>
+    mockClearReceiveDelayedSince(accountId),
+}))
+
 const mockSeedMigratedSettings = jest.fn()
 
 jest.mock(
@@ -271,6 +278,13 @@ describe("useCompleteMigration", () => {
     expect(mockClearPendingAccount).toHaveBeenCalledWith("custodial-1")
   })
 
+  /** The record of a late receive belongs to the run, so it goes with the checkpoint. */
+  it("forgets the wallet's late-receive record after the swap", async () => {
+    await complete()
+
+    expect(mockClearReceiveDelayedSince).toHaveBeenCalledWith("sc-account-1")
+  })
+
   describe("when the close does not settle", () => {
     beforeEach(() => {
       mockCloseCustodialAccount.mockResolvedValue(AccountCloseOutcome.Retryable)
@@ -294,6 +308,7 @@ describe("useCompleteMigration", () => {
 
       expect(mockClearCheckpoint).not.toHaveBeenCalled()
       expect(mockClearPendingAccount).not.toHaveBeenCalled()
+      expect(mockClearReceiveDelayedSince).not.toHaveBeenCalled()
     })
   })
 

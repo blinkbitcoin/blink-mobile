@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nu se pot estima comisioanele. Încercați o sumă diferită."
   },
   "SettingsScreen": {
-    "createAddress": "Creează adresă",
+    "createAddress": "Creează adresă Lightning",
     "addressDisabled": "(dezactivat)",
     "donationButton": "Buton de donare",
     "btcpayServer": "BTCPay Server",
@@ -2454,6 +2454,7 @@
     "activated": "Activat",
     "addressScreen": "Modalități de a fi plătit",
     "nonCustodialAccount": "Cont non-custodial",
+    "custodialAccount": "Cont custodial",
     "tapUserName": "Atingeți pentru a seta numele de utilizator",
     "notifications": "Notificări",
     "title": "Setări",
@@ -2562,8 +2563,6 @@
     "emailUnverifiedContent": "Asigurați-vă că vă puteți conecta din nou la contul dvs. verificându-vă adresa de e-mail. Doriți să faceți verificarea acum?",
     "totp": "Autentificare cu doi factori",
     "totpDeactivated": "Autentificarea cu doi factori a fost dezactivată",
-    "totpDeleteAlertTitle": "Ștergeți autentificarea cu doi factori",
-    "totpDeleteAlertContent": "Sigur doriți să ștergeți autentificarea cu doi factori?",
     "copiedAccountId": "Ați copiat ID-ul contului în clipboard",
     "yourAccountId": "ID-ul contului dvs.",
     "accountId": "ID-ul contului",
@@ -2581,7 +2580,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",
-    "anonModeWalletLabel": "indisponibil în modul Incognito"
+    "anonModeWalletLabel": "indisponibil în modul Incognito",
+    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca"
   },
   "AnonModeConvertModal": {
     "title": "Transferă mai întâi soldul tău în dolari",
@@ -2604,7 +2604,9 @@
     "contactSupport": "Contactează asistența"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta"
+    "modalTitle": "Soldul în dolari nu este disponibil în regiunea ta",
+    "unknownRegionModalTitle": "Nu s-a putut verifica disponibilitatea soldului în dolari",
+    "unknownRegionModalBody": "Nu am putut verifica dacă soldul în dolari este disponibil pentru tine. Trage în jos pe ecranul principal pentru a reîncerca."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Soldul în dolari nu este disponibil în regiunea ta",
@@ -2613,14 +2615,11 @@
     "youGet": "Primești"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Autentificare cu doi factori",
-    "secret": "Secret/backup",
-    "content": "Scanați acest cod QR cu aplicația de autentificare. Alternativ, puteți copia / lipi manual secretul în aplicația de autentificare."
+    "title": "Autentificare cu doi factori"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Autentificare cu doi factori",
-    "enter6digitCode": "Introduceți codul din 6 cifre din aplicația de autentificare pentru a valida autentificarea cu doi factori.",
-    "success": "Autentificarea cu doi factori a fost activată. Acum veți putea să vă conectați din nou doar cu telefonul sau e-mailul ȘI autentificarea cu doi factori.\n\nDispozitivele din acest cont care nu sunt conectate cu 2FA vor trebui să se conecteze din nou.\n\nNumai conturile de nivel 2 pot fi recuperate de asistența pentru clienți în cazul pierderii accesului 2FA."
+    "enter6digitCode": "Introduceți codul din 6 cifre din aplicația de autentificare pentru a valida autentificarea cu doi factori."
   },
   "TotpLoginValidateScreen": {
     "title": "Autentificare cu doi factori",
@@ -2694,7 +2693,9 @@
     "noFee": "fără taxă",
     "fromApprox": "de la ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Nu se pot obține taxele în acest moment"
+    "error": "Nu se pot obține taxele în acest moment",
+    "inactivity": "Inactivitate >{months: number} luni",
+    "usdPerMonth": "{amount: string}/lună"
   },
   "TransactionLimitsScreen": {
     "receive": "Primește",
@@ -3681,6 +3682,67 @@
         "codingBackend": "...programăm backend-ul",
         "buttonText": "Grozav"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Bun venit pentru a deveni parte din Blink",
+          "paragraphs": {
+            "body1": "Înainte de a strânge mai multe fonduri de la investitori profesioniști, am decis să extindem o invitație familiei Blink, superutilizatorilor și susținătorilor noștri. De ce să aducem străini când putem mai întâi să invităm pe cineva ca tine?",
+            "body2": "Aceasta este o invitație personală. Te rugăm să nu o retransmiti sau să o distribui public."
+          }
+        },
+        "buttonText": "Continuă"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Cât ai dori să investești?",
+        "percent": "pentru ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Evaluarea companiei",
+          "paragraphs": {
+            "body1": "În această rundă de investiții, evaluarea pre-money a Blink este de 10 milioane de dolari.",
+            "body2": "Am putea strânge fonduri la un preț mai mare de la investitorii de capital de risc. Cu toate acestea, vedem beneficii reciproce pe termen lung în parteneriatul cu superutilizatorii noștri. Prin urmare, vă oferim această ofertă în condiții mai bune."
+          }
+        },
+        "buttonText": "Am înțeles"
+      },
+      "TermSheet": {
+        "title": "Foaie de Termeni",
+        "equitySection": {
+          "title": "Participație în Blink",
+          "investment": "Investiție de {amount: string}",
+          "valuation": "La o evaluare pre-money de $10M",
+          "units": "Primești {units: string} de unități ~{percent: number}% din Blink"
+        },
+        "buttonText": "Continuă la Semnătură"
+      },
+      "TransferInvest": {
+        "title": "Transferă-ți investiția",
+        "paragraphs": {
+          "body1": "Ai semnat acordul de subscriere pentru {units: string} de unități în Blink.",
+          "body2": "E timpul să transferi suma de investiție de {amount: string}. Vei plăti cu Bitcoin."
+        },
+        "buttonText": "Continuă",
+        "paymentsUnavailable": "Plățile pentru investiție nu sunt încă deschise. Te rugăm să încerci din nou mai târziu."
+      },
+      "InsufficientBalance": {
+        "title": "Sold insuficient",
+        "paragraphs": {
+          "balanceBitcoin": "Ai doar {balance: string} în contul tău de Bitcoin.",
+          "balanceDollar": "Ai doar {balance: string} în contul tău de Dolar.",
+          "body2": "Depune mai mult de {shortfall: string} în contul tău pentru a atinge suma de investiție de {investmentAmount: string}.",
+          "body3": "Asigură-te că întreaga sumă se află în unul dintre conturile tale; Bitcoin sau dolar."
+        },
+        "buttonText": "Depune",
+        "splitFunds": {
+          "title": "Fondurile tale sunt împărțite",
+          "body": "Ai destul pentru a investi, dar suma este împărțită între contul de Bitcoin și cel de Dolari. Convertește astfel încât întreaga sumă să fie într-unul singur."
+        }
+      },
+      "DepositPending": {
+        "message": "Se așteaptă decontarea depozitului tău; te rugăm să aștepți 2 confirmări pe lanț.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Ultimul pas",
         "fields": {
@@ -3781,17 +3843,17 @@
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",
       "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
-      "encryptCheckbox": "Criptează cu o parolă suplimentară",
-      "password": "Parolă",
+      "encryptCheckbox": "Adaugă o frază de acces suplimentară",
+      "password": "Frază de acces",
       "passwordPlaceholder": "(minim 12 caractere)",
-      "confirmPassword": "Confirmă parola",
-      "confirmPasswordPlaceholder": "Introdu parola din nou",
+      "confirmPassword": "Confirmă fraza de acces",
+      "confirmPasswordPlaceholder": "Introdu fraza de acces din nou",
       "continueButton": "Continuă",
       "importantTitle": "Important",
-      "importantMessage": "Blink nu stochează această parolă. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
+      "importantMessage": "Blink nu stochează această frază de acces. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
       "importantMessageBold": "nu vom putea",
       "passwordTooShort": "Minim 12 caractere",
-      "passwordMismatch": "Parolele nu se potrivesc",
+      "passwordMismatch": "Frazele de acces nu se potrivesc",
       "uploadSuccess": "Copie de siguranță salvată în {provider}",
       "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
       "signInFailed": "Conectarea la {provider} a eșuat",
@@ -3858,6 +3920,7 @@
       "newBitcoinBalance": "Sold Bitcoin nou",
       "newDollarBalance": "Sold în dolari nou",
       "dollarBalanceNotAvailable": "indisponibil",
+      "lnAddressNotMoved": "Adresa ta Lightning nu a putut fi mutată. Fondurile tale vor fi transferate oricum.",
       "networkFee": "Comision de rețea: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Comision de rețea: <bold>{fee: string}</bold> (acoperit de Blink)",
       "retryCta": "Încearcă din nou",
@@ -3906,9 +3969,19 @@
     "explainerCheck5": "Din contul tău se va deduce un comision de rețea Spark",
     "explainerCta": "Am înțeles",
     "transferringFunds": "Se transferă fondurile tale. Ar trebui să fie gata în câteva secunde.",
+    "transferInProgress": {
+      "body": "Fondurile tale sunt în drum spre noul tău cont. Ține aplicația deschisă și vom finaliza automat."
+    },
     "transferDelayed": {
       "body": "Fondurile tale sunt în drum spre noul tău cont. Durează mai mult decât de obicei — ține aplicația deschisă și vom finaliza automat.",
       "contactSupportCta": "Contactează asistența"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Nu am putut citi progresul migrării tale de pe acest dispozitiv. Nu s-a pierdut nimic: fondurile tale sunt în siguranță, iar progresul tău este încă salvat.",
+      "outOfSpaceBody": "Dispozitivul tău nu mai are spațiu de stocare, așa că nu putem citi progresul migrării tale. Eliberează spațiu și încearcă din nou. Nu s-a pierdut nimic: fondurile tale sunt în siguranță.",
+      "notSavedBody": "Nu am putut salva progresul migrării tale pe acest dispozitiv. Nu s-a pierdut nimic: fondurile tale sunt în siguranță. Încearcă din nou.",
+      "notSavedOutOfSpaceBody": "Dispozitivul tău nu mai are spațiu de stocare, așa că nu putem salva progresul migrării tale. Eliberează spațiu și încearcă din nou. Nu s-a pierdut nimic: fondurile tale sunt în siguranță.",
+      "contactSupportCta": "Contactează suportul"
     },
     "clockOutOfSync": {
       "body": "Data și ora dispozitivului tău nu sunt sincronizate. Setează-le pe automat pentru a continua.",
@@ -3964,8 +4037,8 @@
     "restore": "Restaurare portofel",
     "noBackupFound": "Niciun backup găsit",
     "noBackupDescription": "Nu am găsit un backup. Puteți introduce fraza de backup manual.",
-    "enterPassword": "Introduceți parola de criptare",
-    "wrongPassword": "Parolă incorectă. Încercați din nou.",
+    "enterPassword": "Introduceți fraza de acces pentru criptare",
+    "wrongPassword": "Frază de acces incorectă. Încercați din nou.",
     "pickBackupTitle": "Alege un portofel",
     "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare",
     "recognizePhraseTitle": "Recunoști această frază de backup?",
@@ -3979,6 +4052,81 @@
     "modalTitle": "Securizați-vă fondurile",
     "modalDescription": "Vă recomandăm insistent să faceți o copie de siguranță a portofelului pentru a preveni pierderea totală a fondurilor în cazul în care pierdeți acest dispozitiv.",
     "secureMe": "Securizare portofel"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Configurează autentificarea cu doi factori",
+    "cardDescription": "Protejează-ți contul împotriva accesului neautorizat.",
+    "cardCta": "Configurează",
+    "settingsDescription": "Protejează-ți contul împotriva accesului neautorizat configurând-o.",
+    "setupTitle": "Configurează acum autentificarea cu doi factori",
+    "setupDescription": "Pentru a preveni accesul neautorizat la contul tău, adaugă acum autentificarea cu doi factori.",
+    "setAuthenticator": "Configurează autentificatorul",
+    "reminderTitle": "Adaugă un autentificator pentru a-ți proteja fondurile",
+    "reminderDescription": "Soldul tău a crescut. O aplicație de autentificare îți păstrează contul în siguranță, chiar dacă cineva pune mâna pe e-mailul sau pe telefonul tău.",
+    "modalReminder": "Dacă respingi acum, asigură-te că o activezi cât mai curând.",
+    "dismissTwoMore": "Mai poți respinge asta de două ori.",
+    "dismissOneMore": "Mai poți respinge asta o singură dată.",
+    "dismissLast": "Aceasta este ultima dată când poți respinge asta.",
+    "setNow": "Configurează acum",
+    "dontWantTo": "Nu vreau",
+    "highBalanceTitle": "Ai peste {amount}, te rugăm să adaugi protecție suplimentară",
+    "protectionRequiredTitle": "Te rugăm să adaugi protecție suplimentară pentru a folosi Blink în continuare",
+    "protectionRequiredBody": "Cu cât ai mai multe fonduri, cu atât o securitate mai bună este mai importantă. Te rugăm să adaugi un autentificator pentru a continua să folosești Blink.",
+    "nonCustodialTitle": "Dacă nu vrei să configurezi autentificarea cu doi factori",
+    "nonCustodialBody": "Cealaltă opțiune este să treci la non-custodial. Atunci ești responsabil pentru propriile fonduri."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Protejează-ți fondurile cu un autentificator",
+    "introDescription": "O aplicație de autentificare generează un cod nou din 6 cifre la fiecare 30 de secunde.",
+    "takeoversTitle": "Oprește preluarea contului",
+    "takeoversDescription": "Codul există doar pe telefonul tău",
+    "stolenNumberTitle": "Fii în siguranță chiar dacă îți este furat numărul",
+    "stolenNumberDescription": "Chiar dacă cineva intră în e-mailul tău sau îți preia numărul de telefon, nu se poate conecta",
+    "durationTitle": "Durează aproximativ 2 minute",
+    "durationDescription": "Te ghidăm pas cu pas",
+    "getStarted": "Începe",
+    "appsTitle": "Instalează o aplicație de autentificare",
+    "appsDescription": "Funcționează orice aplicație de autentificare. Acestea sunt gratuite și de încredere:",
+    "googleAuthenticatorDescription": "Simplă și folosită pe scară largă. Backup opțional în contul tău Google.",
+    "protonAuthenticatorDescription": "Cod sursă deschis. Backup și sincronizare criptate integral.",
+    "twoFasAuthDescription": "Cod sursă deschis. Nu necesită cont.",
+    "get": "Descarcă",
+    "storeNote": "„Descarcă” deschide App Store sau Google Play. Revino în Blink după ce aplicația s-a instalat.",
+    "haveAnApp": "Am deja o aplicație",
+    "keyInstruction": "Copiază această cheie de configurare în aplicația ta de autentificare.",
+    "qrInstruction": "Folosești alt dispozitiv?\nScanează în schimb acest cod QR.",
+    "backupTitle": "Fă o copie de rezervă a cheii",
+    "backupDescription": "Dacă îți pierzi telefonul, această cheie îți permite să configurezi din nou autentificatorul. Salveaz-o în alt loc decât pe acest telefon.",
+    "saveToPasswordManager": "Salvează într-un manager de parole",
+    "shareToPasswordManager": "Partajează cu un manager de parole",
+    "copyForManualBackup": "Copiază pentru backup manual",
+    "passwordManagerUnavailable": "Niciun manager de parole disponibil pe acest dispozitiv. Copiază cheia pentru o copie de rezervă manuală.",
+    "savedIt": "Am salvat-o",
+    "keyBackupText": "Cheia de configurare a autentificatorului Blink\n\nCont: {account}\nCheie de configurare: {key}\n\nDacă îți pierzi telefonul, adaugă această cheie de configurare într-o aplicație de autentificare pentru a-ți recupera codurile de conectare Blink. Oricine are această cheie îți poate genera codurile, așa că păstreaz-o privată.",
+    "protectedTitle": "Contul tău este acum protejat",
+    "protectedDescription": "De acum înainte, conectarea necesită un cod unic din aplicația ta de autentificare.",
+    "newPhoneTip": "Dacă îți iei un telefon nou, mută autentificatorul pe el <bold>înainte</bold> să-l resetezi pe cel vechi.",
+    "done": "Gata"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Activată",
+    "statusDisabled": "2FA: Dezactivată",
+    "modalTitle": "Nu recomandăm dezactivarea 2FA",
+    "modalBody": "Acest lucru ar reduce securitatea contului tău și ar face mai ușor ca o terță parte să-l acceseze fără permisiunea ta.",
+    "keepProtected": "Vreau să rămân protejat",
+    "codeInstruction": "Introdu codul de 6 cifre din aplicația de autentificare pentru a dezactiva autentificarea în doi pași.",
+    "codeInvalid": "Codul este greșit. Introdu codul actual din aplicația de autentificare.",
+    "tooManyAttempts": "Prea multe încercări. Încearcă din nou peste o oră.",
+    "manualResetTitle": "Resetare manuală 2FA",
+    "manualResetBody": "Pentru protecția ta, nu permitem eliminarea 2FA din aplicație. Dacă ai nevoie de resetarea 2FA, contactează <support>Asistența</support> noastră."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Adaugă e-mail",
+    "addPhoneTitle": "Adaugă număr de telefon",
+    "addEmailCode": "Pentru a adăuga e-mailul, introdu codul de 6 cifre din aplicația de autentificare.",
+    "addPhoneCode": "Pentru a adăuga numărul de telefon, introdu codul de 6 cifre din aplicația de autentificare.",
+    "codeInvalid": "Codul este greșit. Introdu codul actual din aplicația de autentificare.",
+    "tooManyAttempts": "Prea multe încercări. Încearcă din nou peste o oră."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
