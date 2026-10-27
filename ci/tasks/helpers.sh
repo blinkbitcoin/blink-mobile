@@ -20,13 +20,27 @@ function unpack_deps() {
 
   pushd ${REPO_PATH:-repo} > /dev/null
 
-  tar -zxvf ../bundled-deps/bundled-deps-*.tgz ./node_modules/ ./yarn.lock ./patches/ > /dev/null
+  tar -zxvf ../bundled-deps/bundled-deps-*.tgz ./node_modules/ ./yarn.lock > /dev/null
 
   if [[ "$(git status -s -uno)" != "" ]]; then
     echo "Extracting deps has created a diff - deps are not in sync"
     git --no-pager diff
     exit 1;
   fi
+
+  # node_modules carries the patches the bundle was built with. Compare the whole
+  # tree, not an overlay: an overlay misses a patch added or deleted since then.
+  local bundled_patches
+  bundled_patches=$(mktemp -d)
+  tar -zxf ../bundled-deps/bundled-deps-*.tgz -C "${bundled_patches}" ./patches/
+
+  if ! diff -r "${bundled_patches}/patches" patches; then
+    echo "Bundled deps were built with different patches - deps are not in sync"
+    rm -rf "${bundled_patches}"
+    exit 1;
+  fi
+
+  rm -rf "${bundled_patches}"
 
   echo "Done!"
 
