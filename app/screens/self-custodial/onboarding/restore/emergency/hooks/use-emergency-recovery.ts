@@ -56,9 +56,7 @@ export const useEmergencyRecovery = (mnemonic: string) => {
   const network = useSparkNetwork()
   const cloudBackup = usePlatformCloudBackup()
 
-  const [step, setStep] = useState<EmergencyRecoveryStep>(
-    EmergencyRecoveryStep.Verifying,
-  )
+  const [step, setStep] = useState<EmergencyRecoveryStep>(EmergencyRecoveryStep.Verifying)
   const [rejection, setRejection] = useState<EmergencyBundleRejection | null>(null)
   const [verified, setVerified] = useState<VerifiedEmergencyBundle | null>(null)
   const [busy, setBusy] = useState(false)
@@ -204,7 +202,8 @@ export const useEmergencyRecovery = (mnemonic: string) => {
         type: "application/json",
       })
     } catch (err) {
-      const userCancelled = err instanceof Error && /User did not share/i.test(err.message)
+      const userCancelled =
+        err instanceof Error && /User did not share/i.test(err.message)
       if (userCancelled) return
       reportError(ERROR_CONTEXT, err)
       toastShow({ message: LL.EmergencyRecovery.sourceFailed(), LL })
