@@ -474,6 +474,32 @@ describe("SelfCustodialTelemetryMount", () => {
       })
     })
 
+    it("opens platform collection on Enhanced before the rollout flag lands, and keeps it open", async () => {
+      // On a real launch the mode resolves from what the device persisted, and the flag
+      // arrives from the network afterwards.
+      mockTelemetryEnabled = false
+      const view = render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+
+      mockTelemetryEnabled = true
+      view.rerender(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(isTelemetryEnabled()).toBe(true))
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+
+    it("never opens collection for an Enhanced device that launches already rolled back", async () => {
+      // The restore has to land before the first resolution reads the switch. This pins the
+      // order of the two effects rather than trusting it.
+      mockKillSwitchEngaged = true
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+    })
+
     it("keeps everything off until the rollout flag is on", async () => {
       mockTelemetryEnabled = false
 

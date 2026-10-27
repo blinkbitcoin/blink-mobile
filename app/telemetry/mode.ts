@@ -6,7 +6,7 @@ import {
   reportBoundaryFault,
   setDiagnosticsModeInput,
 } from "./diagnostics"
-import { isTelemetryEnabled, onKillSwitchEngaged } from "./enablement"
+import { isKillSwitchEngaged, isTelemetryEnabled, onKillSwitchEngaged } from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
   resetPlatformAnalyticsData,
@@ -159,14 +159,20 @@ export const isSuppressedMode = (mode: TelemetryMode): boolean =>
  * Whether the platform SDK may collect at all, and the only place that is decided.
  *
  * `Custodial` is unconditional: the kill switch rolls back the self-custodial programme, and
- * custodial analytics predate it. `Enhanced` is conditional on the switch, because on that
+ * custodial analytics predate it. `Enhanced` answers to the kill switch, because on that
  * device the platform's own automatic events are the larger half of what rollback has to
  * stop — the gate already refuses the contract events, and stopping those while the SDK kept
  * reporting sessions would be a rollback in name only.
+ *
+ * It does **not** answer to the rollout flag. That flag ramps the contract pipeline, which
+ * `isEventPermitted` and `isDrainPermitted` read live; and it arrives from a network fetch
+ * that lands after the mode has already resolved from what the device persisted, so a
+ * predicate that read it here would close collection at resolution and nothing would ever
+ * reopen it.
  */
 const mayCollectOnPlatform = (mode: TelemetryMode): boolean => {
   if (mode === TelemetryMode.Custodial) return true
-  return mode === TelemetryMode.Enhanced && isTelemetryEnabled()
+  return mode === TelemetryMode.Enhanced && !isKillSwitchEngaged()
 }
 
 /** What the mode alone says about diagnostics; the kill switch has its own say for

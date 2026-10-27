@@ -227,6 +227,17 @@ describe("the collection gate", () => {
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
     })
 
+    it("opens Enhanced collection while the rollout flag is still off", async () => {
+      // The flag ramps the contract pipeline and lands from the network after the mode has
+      // resolved from what the device persisted; collection must not wait on it.
+      setTelemetryRolloutEnabled(false)
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+      expect(isEventPermitted(TelemetryEvent.PaymentSettled)).toBe(false)
+    })
+
     it("collects on Enhanced without ever naming the account", async () => {
       setCustodialAnalyticsIdentity({ userId: "ledger-account", properties: {} })
       await resolveTelemetryMode(TelemetryMode.Custodial)
