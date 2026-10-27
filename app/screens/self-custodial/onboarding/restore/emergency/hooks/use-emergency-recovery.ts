@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import Clipboard from "@react-native-clipboard/clipboard"
 import Share from "react-native-share"
 
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   BundleFilePickStatus,
@@ -112,18 +113,22 @@ export const useEmergencyRecovery = (mnemonic: string) => {
     return () => clearTimeout(timer)
   }, [step])
 
+  /** The guard is a ref, not the busy state: two taps in the same render both
+   *  read busy as false, and would run two sources racing to set the step.
+   *  busy only drives what the screen shows. */
+  const { run: runGuarded } = useInFlightGuard()
   const runSource = useCallback(
-    async (load: () => Promise<string | null>) => {
-      if (busy) return
-      setBusy(true)
-      try {
-        const payload = await load()
-        if (payload !== null) await submit(payload)
-      } finally {
-        setBusy(false)
-      }
-    },
-    [busy, submit],
+    (load: () => Promise<string | null>) =>
+      runGuarded(async () => {
+        setBusy(true)
+        try {
+          const payload = await load()
+          if (payload !== null) await submit(payload)
+        } finally {
+          setBusy(false)
+        }
+      }),
+    [runGuarded, submit],
   )
 
   /** Interactive this time: the silent attempt already failed, so a sign-in
