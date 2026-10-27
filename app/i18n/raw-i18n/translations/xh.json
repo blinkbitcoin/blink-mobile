@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Ubuncinane oonobumba abayi-12",
       "passwordMismatch": "Amagama okugqitha awafani",
       "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
+      "autoBundleSyncNotSaved": "Ikopi igcinwe kwi-{provider}, kodwa ukhetho lwakho lokugcina oluzenzekelayo alukwazanga ukugcinwa. Ungalutshintsha kwiiSetingi.",
       "uploadFailed": "Ukufaka ikopi akuphumelelanga",
       "signInFailed": "Akuphumelelanga ukungena ku-{provider}",
       "storageAccessRequired": "Vumela {provider: string} ukufikelela kugcino lwesipaji sakho, uze uzame kwakhona.",

@@ -3873,6 +3873,7 @@
             "passwordTooShort": "Mínimo 12 caracteres",
             "passwordMismatch": "Las contraseñas no coinciden",
             "uploadSuccess": "Respaldo guardado en {provider}",
+            "autoBundleSyncNotSaved": "Respaldo guardado en {provider}, pero no se pudo guardar tu elección de copias automáticas. Puedes cambiarla en Configuración.",
             "uploadFailed": "Error al subir el respaldo",
             "signInFailed": "No se pudo iniciar sesión en {provider}",
             "storageAccessRequired": "Permite el acceso de {provider: string} al respaldo de tu billetera e inténtalo de nuevo.",

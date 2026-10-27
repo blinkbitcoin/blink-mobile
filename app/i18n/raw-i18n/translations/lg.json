@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Obunene ennukuta 12",
       "passwordMismatch": "Ebigambo eby'okuyingira tebituukagana",
       "uploadSuccess": "Kopi eterekedwa mu {provider}",
+      "autoBundleSyncNotSaved": "Kopi eterekedwa mu {provider}, naye ky'olonze ku bakaapu ez'obwannamu tekisobodde kuterekebwa. Osobola okukikyusa mu Ensengeka.",
       "uploadFailed": "Enteeka y'ekopi teeyasoboka",
       "signInFailed": "Okuyingira mu {provider} kukomye",
       "storageAccessRequired": "Kkiriza {provider: string} okuyingira ku kopi ya wallet yo, oluvannyuma ogezeeko nate.",

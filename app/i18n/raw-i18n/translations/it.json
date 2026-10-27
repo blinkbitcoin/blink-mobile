@@ -3873,6 +3873,7 @@
             "passwordTooShort": "Minimo 12 caratteri",
             "passwordMismatch": "Le password non corrispondono",
             "uploadSuccess": "Backup salvato su {provider}",
+            "autoBundleSyncNotSaved": "Backup salvato su {provider}, ma non è stato possibile salvare la tua scelta sui backup automatici. Puoi modificarla nelle Impostazioni.",
             "uploadFailed": "Impossibile caricare il backup",
             "signInFailed": "Accesso a {provider} non riuscito",
             "storageAccessRequired": "Consenti a {provider: string} l'accesso al backup del tuo portafoglio, poi riprova.",

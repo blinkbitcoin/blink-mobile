@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minimal 12 karakter",
       "passwordMismatch": "Kata sandi tidak cocok",
       "uploadSuccess": "Cadangan disimpan ke {provider}",
+      "autoBundleSyncNotSaved": "Cadangan disimpan ke {provider}, tetapi pilihan cadangan otomatis Anda tidak dapat disimpan. Anda dapat mengubahnya di Pengaturan.",
       "uploadFailed": "Gagal mengunggah cadangan",
       "signInFailed": "Gagal masuk ke {provider}",
       "storageAccessRequired": "Izinkan akses {provider: string} ke cadangan dompet Anda, lalu coba lagi.",

@@ -108,9 +108,16 @@ jest.mock("@app/self-custodial/providers/backup-state", () => ({
 }))
 
 const mockRevokeCloudRecoveryBundle = jest.fn()
+const mockSyncExistingBundleToCloud = jest.fn()
 jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
   revokeCloudRecoveryBundle: (...args: readonly unknown[]) =>
     mockRevokeCloudRecoveryBundle(...args),
+  syncExistingBundleToCloud: (...args: readonly unknown[]) =>
+    mockSyncExistingBundleToCloud(...args),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => "regtest",
 }))
 
 jest.mock("@app/utils/backup-payload", () => ({
@@ -151,6 +158,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
         },
         CloudBackup: {
           uploadSuccess: ({ provider }: { provider: string }) => `Saved to ${provider}`,
+          autoBundleSyncNotSaved: ({ provider }: { provider: string }) =>
+            `Saved to ${provider}, sync choice not saved`,
           uploadFailed: () => "Upload failed",
           signInFailed: () => "Sign in failed",
           cloudNotAvailable: () => "iCloud not available",
@@ -192,6 +201,7 @@ const setDefaultMocks = () => {
   mockLightningAddress = null
   mockBackupAccountId = "account-1"
   mockRevokeCloudRecoveryBundle.mockResolvedValue(true)
+  mockSyncExistingBundleToCloud.mockResolvedValue(true)
   mockStartSession.mockResolvedValue(sessionOk(noExistingFile))
   mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
   // Restored per test: jest.clearAllMocks() clears calls, not implementations,
@@ -744,36 +754,37 @@ describe("useCloudBackup", () => {
   })
 })
 
-describe("useCloudBackup recovery-bundle cloud sync opt-in", () => {
-  beforeEach(setDefaultMocks)
+const protectedBackup = {
+  isEncrypted: true,
+  password: "hunter2hunter2",
+  isAutoBundleSyncKnown: true,
+}
 
-  it("stays off when the user did not ask for it (D4)", async () => {
+const runBackup = async (params: Parameters<typeof useCloudBackup>[0]) => {
+  const { result } = renderHook(() => useCloudBackup(params))
+  await act(async () => {
+    await result.current.handleBackup()
+  })
+  return result
+}
+
+describe("useCloudBackup recovery-bundle cloud sync choice", () => {
+  beforeEach(() => {
+    setDefaultMocks()
     mockUpload.mockResolvedValue({ success: true })
+  })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: true, password: "hunter2hunter2" }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+  it("leaves the stored choice alone when the form could not learn it", async () => {
+    // Off by default (D4), and an unreadable setting must not pass for a
+    // deliberate opt-out of one the user made earlier.
+    await runBackup({ isEncrypted: true, password: "hunter2hunter2" })
 
-    // Off by default even though the seed just went to the same provider.
+    expect(mockReadSettings).not.toHaveBeenCalled()
     expect(mockWriteSettings).not.toHaveBeenCalled()
   })
 
   it("records the opt-in once the seed backup landed", async () => {
-    mockUpload.mockResolvedValue({ success: true })
-
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
 
     expect(mockWriteSettings).toHaveBeenCalledWith(
       "account-1",
@@ -781,105 +792,105 @@ describe("useCloudBackup recovery-bundle cloud sync opt-in", () => {
     )
   })
 
-  it("refuses the opt-in without a password on the seed backup (D9)", async () => {
-    mockUpload.mockResolvedValue({ success: true })
+  it("records an opt-out of a choice stored earlier", async () => {
+    mockReadSettings.mockResolvedValue({ autoRefresh: true, cloudSync: true })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({ isEncrypted: false, password: "", autoBundleSync: true }),
+    await runBackup({ ...protectedBackup, autoBundleSync: false })
+
+    expect(mockWriteSettings).toHaveBeenCalledWith("account-1", {
+      autoRefresh: true,
+      cloudSync: false,
+    })
+    expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+  })
+
+  /** A stored opt-in whose last upload failed would otherwise sit out of the
+   *  cloud until the next payment, re-backup or not. */
+  it("does not rewrite a stored opt-in but still uploads the bundle on disk", async () => {
+    mockReadSettings.mockResolvedValue({ autoRefresh: true, cloudSync: true })
+
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
+
+    expect(mockWriteSettings).not.toHaveBeenCalled()
+    expect(mockSyncExistingBundleToCloud).toHaveBeenCalledWith("account-1", "regtest")
+  })
+
+  /** The refresh hook syncs straight away only when the seed backup turns
+   *  password-protected; a re-backup over one that already was would leave the
+   *  bundle on disk out of the cloud until the next payment. */
+  it("uploads the bundle on disk right after the opt-in is recorded", async () => {
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
+
+    expect(mockSyncExistingBundleToCloud).toHaveBeenCalledWith("account-1", "regtest")
+    const writeOrder = mockWriteSettings.mock.invocationCallOrder[0]
+    const syncOrder = mockSyncExistingBundleToCloud.mock.invocationCallOrder[0]
+    expect(writeOrder).toBeLessThan(syncOrder)
+  })
+
+  it("still reports success when the upload after the opt-in fails", async () => {
+    mockSyncExistingBundleToCloud.mockRejectedValue(new Error("drive unreachable"))
+
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Saved to Apple iCloud", type: "success" }),
     )
-    await act(async () => {
-      await result.current.handleBackup()
+  })
+
+  it("refuses the opt-in without a password on the seed backup (D9)", async () => {
+    await runBackup({
+      isEncrypted: false,
+      password: "",
+      autoBundleSync: true,
+      isAutoBundleSyncKnown: true,
     })
 
-    // The seed-encrypted bundle must never sit next to an unencrypted seed:
-    // the co-located seed would decrypt it on the spot.
+    // The seed-encrypted bundle must never sit next to an unencrypted seed: the
+    // revocation already turned the opt-in off.
     expect(mockWriteSettings).not.toHaveBeenCalled()
   })
 
-  it("does not fail the seed backup when the opt-in cannot be recorded", async () => {
-    // The seed reached the provider; a settings write failing afterwards is
-    // recoverable from Settings and must not read as a failed backup.
-    mockUpload.mockResolvedValue({ success: true })
+  it("says plainly that the choice was not saved instead of reporting full success", async () => {
     mockWriteSettings.mockRejectedValue(new Error("disk full"))
 
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
+    const result = await runBackup({ ...protectedBackup, autoBundleSync: true })
+
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: "Saved to Apple iCloud, sync choice not saved",
+        type: "warning",
       }),
     )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
-
-    expect(mockWriteSettings).toHaveBeenCalled()
-    expect(result.current.loading).toBe(false)
-  })
-
-  /** The read feeds the write's arguments, and an argument that rejects
-   *  aborts the call before any .catch can attach. Left inline it would
-   *  escape this best-effort block and skip the completion below, leaving the
-   *  seed uploaded but the backup unrecorded and the user stuck on screen. */
-  it("still completes the backup when the settings read rejects", async () => {
-    mockUpload.mockResolvedValue({ success: true })
-    mockReadSettings.mockRejectedValue(new Error("storage unavailable"))
-
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
+    expect(mockToastShow).not.toHaveBeenCalledWith(
+      expect.objectContaining({ type: "success" }),
     )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
-
+    // The seed reached the provider, so the backup itself still completes.
     expect(mockCompleteBackup).toHaveBeenCalledWith(
       expect.objectContaining({ method: "cloud" }),
     )
     expect(result.current.loading).toBe(false)
   })
 
-  /** The write replaces the whole record, so writing without a successful
-   *  read would flip whatever it could not see - an autoRefresh the user
-   *  turned off in Settings would silently come back on. Dropping the opt-in
-   *  is the recoverable half: the toggle is still there. */
-  it("skips the opt-in write entirely when the settings read rejects", async () => {
-    mockUpload.mockResolvedValue({ success: true })
+  it("warns and skips the write when the stored settings cannot be read", async () => {
     mockReadSettings.mockRejectedValue(new Error("storage unavailable"))
 
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
 
+    // Writing without the read would replace the whole record and silently flip
+    // an autoRefresh the user had turned off.
     expect(mockWriteSettings).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ type: "warning" }),
+    )
+    expect(mockCompleteBackup).toHaveBeenCalledWith(
+      expect.objectContaining({ method: "cloud" }),
+    )
   })
 
-  /** The stored record is carried through, not replaced: an autoRefresh the
-   *  user turned off must survive the opt-in write. */
-  it("preserves the stored settings when recording the opt-in", async () => {
-    mockUpload.mockResolvedValue({ success: true })
+  it("preserves the stored settings when recording the choice", async () => {
     mockReadSettings.mockResolvedValue({ autoRefresh: false, cloudSync: false })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
 
     expect(mockWriteSettings).toHaveBeenCalledWith(expect.any(String), {
       autoRefresh: false,
@@ -888,87 +899,33 @@ describe("useCloudBackup recovery-bundle cloud sync opt-in", () => {
   })
 
   /** Mid-migration the active account is still the custodial one while the
-   *  phrase being uploaded belongs to the provisioned self-custodial account.
-   *  Recording the opt-in against the active account drops it silently: the
-   *  user ticks the box, the upload succeeds, and sync stays off with nothing
-   *  to tell them. */
-  it("records the opt-in against the migration account, not the active one", async () => {
-    mockUpload.mockResolvedValue({ success: true })
+   *  phrase being uploaded belongs to the provisioned self-custodial account. */
+  it("reads and records the choice against the migration account, not the active one", async () => {
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockBackupAccountId = "migration-account-1"
 
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
 
+    expect(mockReadSettings).toHaveBeenCalledWith("migration-account-1")
     expect(mockWriteSettings).toHaveBeenCalledWith(
       "migration-account-1",
       expect.objectContaining({ cloudSync: true }),
     )
   })
 
-  it("reads the existing settings from the migration account too", async () => {
-    mockUpload.mockResolvedValue({ success: true })
-    mockActiveAccount = { id: "custodial-1", type: "custodial" }
-    mockBackupAccountId = "migration-account-1"
-
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
-
-    // Reading one account and writing another would replace the target's
-    // record with a stranger's.
-    expect(mockReadSettings).toHaveBeenCalledWith("migration-account-1")
-  })
-
-  it("has no bundle to sync when there is no account to record it against", async () => {
-    mockUpload.mockResolvedValue({ success: true })
+  it("has no choice to record when there is no account to record it against", async () => {
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockBackupAccountId = null
 
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
 
-    // No migration in flight and no self-custodial account: there is nothing
-    // the setting could refer to.
     expect(mockWriteSettings).not.toHaveBeenCalled()
   })
 
-  it("does not enable sync when the upload failed", async () => {
+  it("does not record the choice when the upload failed", async () => {
     mockUpload.mockResolvedValue({ success: false, reason: "network" })
 
-    const { result } = renderHook(() =>
-      useCloudBackup({
-        isEncrypted: true,
-        password: "hunter2hunter2",
-        autoBundleSync: true,
-      }),
-    )
-    await act(async () => {
-      await result.current.handleBackup()
-    })
+    await runBackup({ ...protectedBackup, autoBundleSync: true })
 
     // Otherwise sync points at a provider holding no seed backup at all.
     expect(mockWriteSettings).not.toHaveBeenCalled()

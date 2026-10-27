@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minimálně 12 znaků",
       "passwordMismatch": "Hesla se neshodují",
       "uploadSuccess": "Záloha uložena do {provider}",
+      "autoBundleSyncNotSaved": "Záloha uložena do {provider}, ale vaši volbu automatických záloh se nepodařilo uložit. Můžete ji změnit v Nastavení.",
       "uploadFailed": "Nahrání zálohy se nezdařilo",
       "signInFailed": "Přihlášení k {provider} se nezdařilo",
       "storageAccessRequired": "Povolte {provider: string} přístup k záloze peněženky a zkuste to znovu.",

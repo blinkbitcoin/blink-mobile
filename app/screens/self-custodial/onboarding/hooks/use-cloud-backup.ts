@@ -1,14 +1,20 @@
 import { useCallback } from "react"
 import { Platform } from "react-native"
 
+import { type Network } from "@breeztech/breez-sdk-spark-react-native"
+
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
-import { revokeCloudRecoveryBundle } from "@app/self-custodial/recovery-bundle/refresh"
+import {
+  revokeCloudRecoveryBundle,
+  syncExistingBundleToCloud,
+} from "@app/self-custodial/recovery-bundle/refresh"
 import {
   readRecoveryBundleSettings,
   writeRecoveryBundleSettings,
@@ -52,11 +58,45 @@ const buildExistingBackupMessage = (
   return t.existingBackupMessageWithDetails({ provider, address, createdAt })
 }
 
+/**
+ * Stores the automatic-backups choice once a password-protected seed backup landed,
+ * opt-out as well as opt-in. An opt-in also uploads the bundle already on disk: the
+ * refresh hook syncs straight away only when the seed backup turns password-protected,
+ * so a re-backup over one that already was, or an earlier upload that failed, would
+ * otherwise wait for the next payment. Resolves false when the choice could not be
+ * stored.
+ */
+const recordBundleSyncChoice = async (
+  accountId: string,
+  network: Network,
+  isOptedIn: boolean,
+): Promise<boolean> => {
+  try {
+    const current = await readRecoveryBundleSettings(accountId)
+    const isChoiceChanged = current.cloudSync !== isOptedIn
+    if (isChoiceChanged) {
+      await writeRecoveryBundleSettings(accountId, { ...current, cloudSync: isOptedIn })
+    }
+  } catch (err) {
+    reportError("Recovery bundle cloud-sync choice", err)
+    return false
+  }
+  if (isOptedIn) {
+    syncExistingBundleToCloud(accountId, network).catch((err) =>
+      reportError("Recovery bundle sync after opt-in", err),
+    )
+  }
+  return true
+}
+
 type UseCloudBackupParams = {
   isEncrypted: boolean
   password: string
   /** Opt-in to ongoing cloud sync of the recovery backup (D4, off by default). */
   autoBundleSync?: boolean
+  /** Whether autoBundleSync is a choice to store: the saved one or one the user just
+   *  made. When it is not, the stored choice is left alone. */
+  isAutoBundleSyncKnown?: boolean
   version?: number
 }
 
@@ -64,10 +104,12 @@ export const useCloudBackup = ({
   isEncrypted,
   password,
   autoBundleSync = false,
+  isAutoBundleSyncKnown = false,
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
   const completeBackup = useCompleteBackup()
+  const network = useSparkNetwork()
   const { appConfig } = useAppConfig()
   const { startSession, upload, downloadById, resolveErrorMessage, loading } =
     usePlatformCloudBackup()
@@ -174,40 +216,30 @@ export const useCloudBackup = ({
       return
     }
 
-    /** Record the opt-in only once the seed backup actually landed, and only
-     *  alongside a password (D9). A failed upload must not leave sync enabled
-     *  for a provider that holds nothing. Failure here is not fatal: the seed
-     *  backup succeeded, and the toggle is available again in Settings. */
-    if (backupAccountId && autoBundleSync && isPasswordProtected) {
-      /** Read separately rather than inline in the write's arguments: an
-       *  argument that rejects aborts the call before .catch can attach, so a
-       *  failing storage read would escape this best-effort block and skip the
-       *  completion below - leaving the seed uploaded but the backup
-       *  unrecorded. */
-      const current = await readRecoveryBundleSettings(backupAccountId).catch((err) => {
-        reportError("Recovery bundle settings read", err)
-        return null
-      })
-      /** Skipped rather than defaulted when the read failed: the write replaces
-       *  the whole record, so falling back to the defaults would silently flip
-       *  an autoRefresh the user had turned off in Settings. Dropping the
-       *  opt-in is the recoverable half - the toggle is still there. */
-      if (current) {
-        await writeRecoveryBundleSettings(backupAccountId, {
-          ...current,
-          cloudSync: true,
-        }).catch((err) => reportError("Recovery bundle cloud-sync opt-in", err))
-      }
-    }
+    /** The choice is stored only once the seed backup actually landed, so a failed
+     *  upload never leaves sync enabled for a provider that holds nothing, and only
+     *  beside a password (D9): a passwordless backup already turned it off above. */
+    const isSyncChoiceRecordable = isPasswordProtected && isAutoBundleSyncKnown
+    const syncChoiceAccountId = isSyncChoiceRecordable ? backupAccountId : null
+    const isSyncChoiceSaved = syncChoiceAccountId
+      ? await recordBundleSyncChoice(syncChoiceAccountId, network, autoBundleSync)
+      : true
 
     logSelfCustodialBackupCompleted({
       backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
     })
-    toastShow({
-      message: LL.BackupScreen.CloudBackup.uploadSuccess({ provider }),
-      type: "success",
-      LL,
-    })
+    /** The seed backup succeeded either way, so the flow still completes; an
+     *  unsaved choice is said plainly instead of passing for full success. */
+    const backupToast = isSyncChoiceSaved
+      ? {
+          message: LL.BackupScreen.CloudBackup.uploadSuccess({ provider }),
+          type: "success" as const,
+        }
+      : {
+          message: LL.BackupScreen.CloudBackup.autoBundleSyncNotSaved({ provider }),
+          type: "warning" as const,
+        }
+    toastShow({ ...backupToast, LL })
     completeBackup({
       method: BackupMethod.Cloud,
       // Whether the seed backup carries an extra password gates the
@@ -218,8 +250,10 @@ export const useCloudBackup = ({
     isEncrypted,
     password,
     autoBundleSync,
+    isAutoBundleSyncKnown,
     version,
     backupAccountId,
+    network,
     startSession,
     upload,
     downloadById,

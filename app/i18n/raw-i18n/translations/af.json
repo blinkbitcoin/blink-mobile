@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minimum 12 karakters",
       "passwordMismatch": "Wagwoorde stem nie ooreen nie",
       "uploadSuccess": "Rugsteun gestoor in {provider}",
+      "autoBundleSyncNotSaved": "Rugsteun gestoor in {provider}, maar jou keuse vir outomatiese rugsteune kon nie gestoor word nie. Jy kan dit in Verstellings verander.",
       "uploadFailed": "Kon nie rugsteun oplaai nie",
       "signInFailed": "Kon nie by {provider} aanmeld nie",
       "storageAccessRequired": "Gee {provider: string} toegang tot jou beursie se rugsteun, en probeer dan weer.",

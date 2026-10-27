@@ -1,5 +1,7 @@
 import { renderHook, act } from "@testing-library/react-native"
 
+import type { RecoveryBundleSettings } from "@app/self-custodial/recovery-bundle/settings"
+
 import { useCloudBackupForm } from "@app/screens/self-custodial/onboarding/hooks/use-cloud-backup-form"
 
 let mockFocusCleanup: (() => void) | void
@@ -24,7 +26,43 @@ jest.mock("@app/i18n/i18n-react", () => ({
   }),
 }))
 
+let mockBackupAccountId: string | null = null
+jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
+  useBackupAccountId: () => mockBackupAccountId,
+}))
+
+const mockReadSettings = jest.fn()
+jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
+  readRecoveryBundleSettings: (...args: readonly unknown[]) => mockReadSettings(...args),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: readonly unknown[]) => mockReportError(...args),
+}))
+
+const setPasswordProtected = (result: {
+  current: ReturnType<typeof useCloudBackupForm>
+}) => {
+  act(() => result.current.toggleEncryption())
+  act(() => {
+    result.current.setPassword("hunter2hunter2")
+    result.current.setConfirmPassword("hunter2hunter2")
+  })
+}
+
+const flushRead = async () => {
+  await act(async () => {
+    await Promise.resolve()
+  })
+}
+
 describe("useCloudBackupForm", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBackupAccountId = null
+  })
+
   it("starts with encryption disabled and valid", () => {
     const { result } = renderHook(() => useCloudBackupForm())
     expect(result.current.isEncrypted).toBe(false)
@@ -208,16 +246,6 @@ describe("useCloudBackupForm", () => {
   })
 
   describe("recovery-backup cloud sync (D4/D9)", () => {
-    const setPasswordProtected = (result: {
-      current: ReturnType<typeof useCloudBackupForm>
-    }) => {
-      act(() => result.current.toggleEncryption())
-      act(() => {
-        result.current.setPassword("hunter2hunter2")
-        result.current.setConfirmPassword("hunter2hunter2")
-      })
-    }
-
     it("is off by default and not offered without a password", () => {
       const { result } = renderHook(() => useCloudBackupForm())
 
@@ -304,6 +332,17 @@ describe("useCloudBackupForm", () => {
       expect(result.current.autoBundleSync).toBe(true)
     })
 
+    it("toggles twice on a double tap that lands before a re-render", () => {
+      const { result } = renderHook(() => useCloudBackupForm())
+
+      act(() => {
+        result.current.toggleEncryption()
+        result.current.toggleEncryption()
+      })
+
+      expect(result.current.isEncrypted).toBe(false)
+    })
+
     /** Turning encryption off is deliberate, so it drops the choice itself -
      *  unlike a password merely being edited. */
     it("stays off after encryption is switched off and on again", () => {
@@ -317,5 +356,113 @@ describe("useCloudBackupForm", () => {
       expect(result.current.canSyncBundle).toBe(true)
       expect(result.current.autoBundleSync).toBe(false)
     })
+  })
+})
+
+describe("useCloudBackupForm stored sync choice", () => {
+  const storedSettings = (cloudSync: boolean): RecoveryBundleSettings => ({
+    autoRefresh: true,
+    cloudSync,
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBackupAccountId = "account-1"
+    mockReadSettings.mockResolvedValue(storedSettings(false))
+  })
+
+  it("holds the choice as loading and unknown until the stored one is read", () => {
+    mockReadSettings.mockReturnValue(new Promise(() => {}))
+    const { result } = renderHook(() => useCloudBackupForm())
+
+    expect(result.current.isAutoBundleSyncLoading).toBe(true)
+    expect(result.current.isAutoBundleSyncKnown).toBe(false)
+  })
+
+  it("starts from a stored opt-in, so re-entering shows it on again", async () => {
+    mockReadSettings.mockResolvedValue(storedSettings(true))
+    const { result } = renderHook(() => useCloudBackupForm())
+    await flushRead()
+
+    setPasswordProtected(result)
+
+    expect(mockReadSettings).toHaveBeenCalledWith("account-1")
+    expect(result.current.isAutoBundleSyncLoading).toBe(false)
+    expect(result.current.isAutoBundleSyncKnown).toBe(true)
+    expect(result.current.autoBundleSync).toBe(true)
+  })
+
+  it("starts off, as a known choice, when nothing was opted into", async () => {
+    const { result } = renderHook(() => useCloudBackupForm())
+    await flushRead()
+
+    setPasswordProtected(result)
+
+    expect(result.current.isAutoBundleSyncKnown).toBe(true)
+    expect(result.current.autoBundleSync).toBe(false)
+  })
+
+  it("stays unknown when the stored choice cannot be read, until the user picks one", async () => {
+    mockReadSettings.mockRejectedValue(new Error("storage unavailable"))
+    const { result } = renderHook(() => useCloudBackupForm())
+    await flushRead()
+    await flushRead()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Recovery bundle settings read",
+      expect.any(Error),
+    )
+    expect(result.current.isAutoBundleSyncLoading).toBe(false)
+    expect(result.current.isAutoBundleSyncKnown).toBe(false)
+
+    setPasswordProtected(result)
+    act(() => result.current.toggleAutoBundleSync())
+
+    expect(result.current.isAutoBundleSyncKnown).toBe(true)
+    expect(result.current.autoBundleSync).toBe(true)
+  })
+
+  it("locks the choice again when the backup account only becomes known later", async () => {
+    mockBackupAccountId = null
+    let resolveRead: (settings: RecoveryBundleSettings) => void = () => {}
+    mockReadSettings.mockReturnValue(
+      new Promise<RecoveryBundleSettings>((resolve) => {
+        resolveRead = resolve
+      }),
+    )
+    const { result, rerender } = renderHook(() => useCloudBackupForm())
+    expect(result.current.isAutoBundleSyncLoading).toBe(false)
+
+    // The migration account arrives after the first render.
+    mockBackupAccountId = "migration-account-1"
+    rerender(undefined)
+
+    expect(result.current.isAutoBundleSyncLoading).toBe(true)
+    expect(result.current.isAutoBundleSyncKnown).toBe(false)
+    expect(mockReadSettings).toHaveBeenCalledWith("migration-account-1")
+
+    await act(async () => {
+      resolveRead(storedSettings(true))
+    })
+    expect(result.current.isAutoBundleSyncLoading).toBe(false)
+    expect(result.current.isAutoBundleSyncKnown).toBe(true)
+  })
+
+  it("drops a stored choice that arrives after the form is gone", async () => {
+    let resolveRead: (settings: RecoveryBundleSettings) => void = () => {}
+    mockReadSettings.mockReturnValue(
+      new Promise<RecoveryBundleSettings>((resolve) => {
+        resolveRead = resolve
+      }),
+    )
+    const { result, unmount } = renderHook(() => useCloudBackupForm())
+
+    unmount()
+    await act(async () => {
+      resolveRead(storedSettings(true))
+    })
+
+    expect(result.current.isAutoBundleSyncKnown).toBe(false)
+    expect(result.current.isAutoBundleSyncLoading).toBe(true)
   })
 })

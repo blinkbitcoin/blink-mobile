@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Najmanje 12 znakova",
       "passwordMismatch": "Lozinke se ne podudaraju",
       "uploadSuccess": "Sigurnosna kopija spremljena u {provider}",
+      "autoBundleSyncNotSaved": "Sigurnosna kopija spremljena u {provider}, ali vaš izbor automatskih sigurnosnih kopija nije spremljen. Možete ga promijeniti u Postavkama.",
       "uploadFailed": "Učitavanje sigurnosne kopije nije uspjelo",
       "signInFailed": "Prijava na {provider} nije uspjela",
       "storageAccessRequired": "Dopustite pristup {provider: string} sigurnosnoj kopiji novčanika i pokušajte ponovno.",

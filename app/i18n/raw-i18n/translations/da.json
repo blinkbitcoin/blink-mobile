@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minimum 12 tegn",
       "passwordMismatch": "Adgangskoderne stemmer ikke overens",
       "uploadSuccess": "Sikkerhedskopi gemt i {provider}",
+      "autoBundleSyncNotSaved": "Sikkerhedskopi gemt i {provider}, men dit valg af automatiske sikkerhedskopier kunne ikke gemmes. Du kan ændre det i Indstillinger.",
       "uploadFailed": "Kunne ikke uploade sikkerhedskopi",
       "signInFailed": "Kunne ikke logge ind på {provider}",
       "storageAccessRequired": "Giv {provider: string} adgang til din tegnebogs sikkerhedskopi, og prøv igen.",

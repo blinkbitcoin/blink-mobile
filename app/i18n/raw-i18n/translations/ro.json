@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Minim 12 caractere",
       "passwordMismatch": "Parolele nu se potrivesc",
       "uploadSuccess": "Copie de siguranță salvată în {provider}",
+      "autoBundleSyncNotSaved": "Copie de siguranță salvată în {provider}, dar alegerea ta privind copiile de rezervă automate nu a putut fi salvată. O poți schimba din Setări.",
       "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
       "signInFailed": "Conectarea la {provider} a eșuat",
       "storageAccessRequired": "Permite accesul {provider: string} la copia de rezervă a portofelului, apoi încearcă din nou.",

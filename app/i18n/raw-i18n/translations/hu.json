@@ -3873,6 +3873,7 @@
       "passwordTooShort": "Legalább 12 karakter",
       "passwordMismatch": "A jelszavak nem egyeznek",
       "uploadSuccess": "Biztonsági mentés elmentve a {provider} tárhelyre",
+      "autoBundleSyncNotSaved": "Biztonsági mentés elmentve a {provider} tárhelyre, de az automatikus mentésekre vonatkozó választásodat nem sikerült menteni. A Beállításokban módosíthatod.",
       "uploadFailed": "A biztonsági mentés feltöltése sikertelen",
       "signInFailed": "Nem sikerült bejelentkezni a következőbe: {provider}",
       "storageAccessRequired": "Engedélyezze a(z) {provider: string} hozzáférést a tárca biztonsági mentéséhez, majd próbálja újra.",
