@@ -22,6 +22,7 @@ import {
   markCloudSynced,
   refreshRecoveryBundle,
   syncExistingBundleToCloud,
+  withCloudBundleLock,
 } from "@app/self-custodial/recovery-bundle/refresh"
 import {
   defaultRecoveryBundleSettings,
@@ -254,6 +255,55 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     await handleCloudUpload()
   }
 
+  /**
+   * The interactive fallback, run inside the cloud lock like the silent sync:
+   * one upload at a time keeps an older payload from landing after a newer
+   * one, and a revocation's delete waits for this upload instead of racing it.
+   * The D9 gate is checked again once the lock is held, because a revocation
+   * turns the opt-in off before it queues behind this upload.
+   */
+  const uploadInteractively = async (currentAccountId: string): Promise<void> => {
+    if (!(await isCloudSyncAllowedFor(currentAccountId))) return
+
+    const payload = await loadEncryptedBundleFile(currentAccountId, network)
+    if (!payload) {
+      toastShow({ message: LL.RecoveryBundleScreen.noBundleToExport(), LL })
+      return
+    }
+    const metadata = parseBundleBackupMetadata(payload)
+    if (!metadata) {
+      toastShow({ message: LL.RecoveryBundleScreen.exportFailed(), LL })
+      return
+    }
+    const fileName = getRecoveryBundleFilename(
+      metadata.network,
+      metadata.walletIdentityPublicKey,
+    )
+
+    const session = await cloudBackup.startSession(fileName)
+    if (!session.success) {
+      toastShow({ message: cloudBackup.resolveErrorMessage(session.reason, LL), LL })
+      return
+    }
+    const upload = await cloudBackup.upload(payload, fileName, session.session)
+    if (!upload.success) {
+      toastShow({ message: cloudBackup.resolveErrorMessage(upload.reason, LL), LL })
+      return
+    }
+
+    const next = await markCloudSynced(
+      currentAccountId,
+      network,
+      metadata.bundleCreatedAt,
+    )
+    if (next) setBundleState(next)
+    toastShow({
+      message: LL.RecoveryBundleScreen.cloudUploadSuccess(),
+      type: "success",
+      LL,
+    })
+  }
+
   const handleCloudUpload = async () => {
     if (!accountId || uploading) return
     setUploading(true)
@@ -275,39 +325,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         return
       }
 
-      const payload = await loadEncryptedBundleFile(accountId, network)
-      if (!payload) {
-        toastShow({ message: LL.RecoveryBundleScreen.noBundleToExport(), LL })
-        return
-      }
-      const metadata = parseBundleBackupMetadata(payload)
-      if (!metadata) {
-        toastShow({ message: LL.RecoveryBundleScreen.exportFailed(), LL })
-        return
-      }
-      const fileName = getRecoveryBundleFilename(
-        metadata.network,
-        metadata.walletIdentityPublicKey,
-      )
-
-      const session = await cloudBackup.startSession(fileName)
-      if (!session.success) {
-        toastShow({ message: cloudBackup.resolveErrorMessage(session.reason, LL), LL })
-        return
-      }
-      const upload = await cloudBackup.upload(payload, fileName, session.session)
-      if (!upload.success) {
-        toastShow({ message: cloudBackup.resolveErrorMessage(upload.reason, LL), LL })
-        return
-      }
-
-      const next = await markCloudSynced(accountId, network, metadata.bundleCreatedAt)
-      if (next) setBundleState(next)
-      toastShow({
-        message: LL.RecoveryBundleScreen.cloudUploadSuccess(),
-        type: "success",
-        LL,
-      })
+      await withCloudBundleLock(accountId, network, () => uploadInteractively(accountId))
     } catch (err) {
       recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
     } finally {
