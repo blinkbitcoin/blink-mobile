@@ -15,6 +15,7 @@ jest.mock("react-native-quick-crypto", () => {
 })
 
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
+import { it } from "@jest/globals"
 
 import {
   fetchRecoveryBundle,
@@ -28,7 +29,10 @@ import {
   ProtoWriter,
 } from "@app/self-custodial/recovery-bundle/protocol/wire"
 import { RECOVERY_BUNDLE_SCHEMA } from "@app/self-custodial/recovery-bundle/types"
-import type { DecodedTreeNode } from "@app/self-custodial/recovery-bundle/protocol/messages"
+import {
+  SparkProtoNetwork,
+  type DecodedTreeNode,
+} from "@app/self-custodial/recovery-bundle/protocol/messages"
 
 import packageJson from "../../../package.json"
 
@@ -66,6 +70,10 @@ type TestNode = {
    * so each variant is a genuinely single-signal fixture.
    */
   statusSignal?: "string-only" | "enum-only"
+  /** Legacy status string the operator sends; defaults to one matching `available`. */
+  legacyStatus?: string
+  /** Key the operator files the node under in the response map; defaults to its id. */
+  mapKey?: string
 }
 
 const encodeTreeNode = (node: TestNode): Uint8Array => {
@@ -76,7 +84,7 @@ const encodeTreeNode = (node: TestNode): Uint8Array => {
   if (node.parentNodeId) writer.string(4, node.parentNodeId)
   writer.bytes(9, node.owner)
   if (node.statusSignal !== "enum-only") {
-    writer.string(11, node.available ? "AVAILABLE" : "SPLITTED")
+    writer.string(11, node.legacyStatus ?? (node.available ? "AVAILABLE" : "SPLITTED"))
   }
   if (node.statusSignal !== "string-only") {
     writer.varint(19, node.available ? 1 : 5)
@@ -89,7 +97,10 @@ const encodeQueryNodesResponse = (nodes: TestNode[], offset = 0): Uint8Array => 
   for (const node of nodes) {
     writer.bytes(
       1,
-      new ProtoWriter().string(1, node.id).bytes(2, encodeTreeNode(node)).finish(),
+      new ProtoWriter()
+        .string(1, node.mapKey ?? node.id)
+        .bytes(2, encodeTreeNode(node))
+        .finish(),
     )
   }
   // -1 or an omitted offset (0) ends the exporter's paging loop; a positive
@@ -153,6 +164,7 @@ const mockOperator = ({
 }) => {
   const byIdRequests: string[][] = []
   const ownerQueryOffsets: number[] = []
+  const ownerQueryNetworks: number[] = []
   const verifyRequests: {
     protectedChallenge: Uint8Array
     signature: Uint8Array
@@ -192,6 +204,7 @@ const mockOperator = ({
         const requestOffset = Number(lastField(request, 5)?.varint ?? 0n)
         const requestLimit = Number(lastField(request, 4)?.varint ?? 0n)
         ownerQueryOffsets.push(requestOffset)
+        ownerQueryNetworks.push(Number(lastField(request, 6)?.varint ?? 0n))
         const page = ownerQueryPage
           ? ownerQueryPage(requestOffset, requestLimit)
           : { nodes: ownerQueryNodes ?? [], offset: LAST_PAGE_OFFSET }
@@ -209,7 +222,7 @@ const mockOperator = ({
     throw new Error(`unexpected url: ${url}`)
   }) as unknown as typeof fetch
 
-  return { byIdRequests, ownerQueryOffsets, verifyRequests }
+  return { byIdRequests, ownerQueryOffsets, ownerQueryNetworks, verifyRequests }
 }
 
 describe("findMissingAncestors", () => {
@@ -333,6 +346,76 @@ describe("fetchRecoveryBundle", () => {
     ).rejects.toMatchObject({ reason: "incomplete-chain" })
   })
 
+  describe("an ancestor filed under a key that names a different node", () => {
+    const leaf = (): TestNode => ({
+      id: "leaf-1",
+      valueSats: 1000,
+      parentNodeId: "root-A",
+      owner: identity,
+      available: true,
+    })
+    const forgedRoot: TestNode = {
+      id: "root-B",
+      mapKey: "root-A",
+      valueSats: 100000,
+      owner: otherOwner,
+      available: false,
+    }
+
+    it.each([
+      {
+        source: "the owner query",
+        mountOperator: () =>
+          mockOperator({ ownerQueryNodes: [leaf(), forgedRoot], byIdNodes: {} }),
+      },
+      {
+        source: "an ancestor refetch",
+        mountOperator: () =>
+          mockOperator({
+            ownerQueryNodes: [leaf()],
+            byIdNodes: { "root-A": forgedRoot },
+          }),
+      },
+    ])(
+      "cannot close the exit chain when it arrives in $source",
+      async ({ mountOperator }) => {
+        mountOperator()
+
+        await expect(
+          fetchRecoveryBundle({
+            mnemonic: TEST_MNEMONIC,
+            network: Network.Mainnet,
+            appVersion: "1.0.1-test",
+          }),
+        ).rejects.toThrow('map key "root-A" does not match node id "root-B"')
+      },
+    )
+  })
+
+  it("builds a regtest bundle from owner queries on the regtest network", async () => {
+    const regtestKeyPair = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Regtest)
+    const leaf: TestNode = {
+      id: "leaf-1",
+      valueSats: 1000,
+      owner: Uint8Array.from(regtestKeyPair.publicKey),
+      available: true,
+    }
+    const { ownerQueryNetworks } = mockOperator({
+      ownerQueryNodes: [leaf],
+      byIdNodes: {},
+    })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Regtest,
+      appVersion: "1.0.1-test",
+    })
+
+    expect(bundle.network).toBe("REGTEST")
+    expect(bundle.leaves.map((l) => l.id)).toEqual(["leaf-1"])
+    expect(ownerQueryNetworks).toEqual([SparkProtoNetwork.Regtest])
+  })
+
   it("errors when the wallet has no available leaves", async () => {
     mockOperator({ ownerQueryNodes: [], byIdNodes: {} })
 
@@ -343,6 +426,34 @@ describe("fetchRecoveryBundle", () => {
         appVersion: "1.0.1-test",
       }),
     ).rejects.toBeInstanceOf(RecoveryBundleExportError)
+  })
+
+  it("reports the statuses it saw when none of the nodes is an available leaf", async () => {
+    const splitted = (id: string): TestNode => ({
+      id,
+      valueSats: 100,
+      owner: identity,
+      available: false,
+    })
+    mockOperator({
+      ownerQueryNodes: [
+        splitted("node-1"),
+        splitted("node-2"),
+        { ...splitted("node-3"), statusSignal: "enum-only" },
+      ],
+      byIdNodes: {},
+    })
+
+    await expect(
+      fetchRecoveryBundle({
+        mnemonic: TEST_MNEMONIC,
+        network: Network.Mainnet,
+        appVersion: "1.0.1-test",
+      }),
+    ).rejects.toMatchObject({
+      reason: "no-leaves",
+      message: expect.stringContaining('queriedNodes=3, statuses={"5":1,"SPLITTED":2}'),
+    })
   })
 
   it("excludes leaves owned by other identities", async () => {
@@ -426,6 +537,36 @@ describe("fetchRecoveryBundle", () => {
     // The enum-only leaf has an empty status string; the bundle backfills the
     // human-readable status from the enum.
     expect(bundle.leaves.map((l) => l.status)).toEqual(["AVAILABLE", "AVAILABLE"])
+  })
+
+  it("labels every bundled leaf AVAILABLE whichever status field admitted it", async () => {
+    const lowercaseString: TestNode = {
+      id: "leaf-lowercase",
+      valueSats: 100,
+      owner: identity,
+      available: true,
+      statusSignal: "string-only",
+      legacyStatus: "available",
+    }
+    const conflictingString: TestNode = {
+      id: "leaf-conflicting",
+      valueSats: 200,
+      owner: identity,
+      available: true,
+      legacyStatus: "SPLIT_LOCKED",
+    }
+    mockOperator({ ownerQueryNodes: [lowercaseString, conflictingString], byIdNodes: {} })
+
+    const bundle = await fetchRecoveryBundle({
+      mnemonic: TEST_MNEMONIC,
+      network: Network.Mainnet,
+      appVersion: "1.0.1-test",
+    })
+
+    expect(bundle.leaves.map((l) => [l.id, l.status])).toEqual([
+      ["leaf-conflicting", "AVAILABLE"],
+      ["leaf-lowercase", "AVAILABLE"],
+    ])
   })
 
   it("resumes each owner page at the operator's offset when ancestors share the page", async () => {

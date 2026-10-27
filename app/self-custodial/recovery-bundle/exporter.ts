@@ -73,6 +73,9 @@ const MAX_ANCESTOR_REFETCH_ROUNDS = 10
  */
 const MAX_OWNER_QUERY_PAGES = 200
 
+/** spark.proto's legacy string form of TreeNodeStatus.AVAILABLE. */
+const AVAILABLE_STATUS = "AVAILABLE"
+
 export const RecoveryBundleExportErrorReason = {
   NoLeaves: "no-leaves",
   IncompleteChain: "incomplete-chain",
@@ -250,7 +253,7 @@ const isAvailableOwnerLeaf = (
   identityPublicKey: Uint8Array,
 ): boolean =>
   (node.treenodeStatus === TREE_NODE_STATUS_AVAILABLE ||
-    node.status.toUpperCase() === "AVAILABLE") &&
+    node.status.toUpperCase() === AVAILABLE_STATUS) &&
   bytesEqual(node.ownerIdentityPublicKey, identityPublicKey)
 
 /**
@@ -384,7 +387,7 @@ export const fetchRecoveryBundle = async ({
   // Plain code-unit comparison, not localeCompare: node ordering must not
   // depend on the device's ICU tables so bundles stay byte-reproducible.
   const sortedByIdAsc = <T extends { id: string }>(items: T[]): T[] =>
-    [...items].sort((a, b) => (a.id < b.id ? -1 : a.id > b.id ? 1 : 0))
+    [...items].sort((a, b) => Number(a.id > b.id) - Number(a.id < b.id))
 
   const totalSats = leaves.reduce((sum, leaf) => sum + leaf.valueSats, 0n)
 
@@ -398,11 +401,9 @@ export const fetchRecoveryBundle = async ({
     appVersion,
     leaves: sortedByIdAsc(leaves).map((leaf) => ({
       id: leaf.id,
-      status:
-        leaf.status ||
-        (leaf.treenodeStatus === TREE_NODE_STATUS_AVAILABLE
-          ? "AVAILABLE"
-          : String(leaf.treenodeStatus)),
+      // Every leaf passed isAvailableOwnerLeaf, whichever status field admitted
+      // it, so the label is normalized rather than echoing the operator's string.
+      status: AVAILABLE_STATUS,
       // Safe: a single leaf cannot exceed 21M BTC = 2.1e15 sats, well below
       // Number.MAX_SAFE_INTEGER (~9e15); the total stays a bigint string.
       valueSats: Number(leaf.valueSats),
