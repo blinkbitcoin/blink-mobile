@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   AmountAdjustmentReason,
   PaymentRequest,
@@ -26,6 +27,8 @@ import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts
 import { toNumber } from "@app/utils/helper"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
+import { measure, ScEvent } from "../measurement"
+import { classifySdkError } from "../sdk-error"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
@@ -281,10 +284,16 @@ const executePrepared = async (
   prepared: PrepareSendPaymentResponse,
   params: ConvertParams,
 ): Promise<PaymentAdapterResult> => {
+  const swapTelemetry = {
+    direction: params.direction,
+    source: params.source ?? "manual",
+  }
   try {
     await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
+    measure(ScEvent.SwapCompleted, swapTelemetry)
     return { status: PaymentResultStatus.Success }
   } catch (err) {
+    measure(ScEvent.SwapFailed, { ...swapTelemetry, error_code: classifySdkError(err) })
     recordConvertError(err, params, "executePrepared")
     return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
   }
@@ -310,7 +319,12 @@ export const createGetConversionQuote =
   async (params) => {
     try {
       const context = await prepareConversion(sdk, params)
-      return toConvertQuote(sdk, context, params)
+      const quote = toConvertQuote(sdk, context, params)
+      /** Auto-convert quotes are never shown, so only a manual one counts here. */
+      if (quote && params.source !== "auto_convert") {
+        measure(ScEvent.SwapQuoteShown, { direction: params.direction, source: "manual" })
+      }
+      return quote
     } catch (err) {
       recordConvertError(err, params, "getConversionQuote")
       throw err

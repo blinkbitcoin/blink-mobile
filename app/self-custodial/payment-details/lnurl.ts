@@ -42,6 +42,7 @@ import {
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "../bridge"
+import { isOwnLnurlAddress } from "../config"
 import { measure, ScEvent, ScRail } from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
@@ -281,6 +282,15 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   ) => {
     if (status === PaymentSendResult.Success) {
       measure(ScEvent.PaymentSendSettled, sendTelemetry)
+      /** A settled payment to one of our own addresses is the inviter side of an
+       *  Enhanced referral; the join to the recipient's account creation is the
+       *  server's, keyed on the address it serves. */
+      if (isOwnLnurlAddress(lnurlParams.identifier || lnurl)) {
+        measure(ScEvent.BlinkPaymentSent, {
+          ...sendTelemetry,
+          recipient_type: "blink_lightning_address",
+        })
+      }
     }
     return {
       status,
