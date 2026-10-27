@@ -428,6 +428,9 @@ describe("MapComponent", () => {
   })
 
   it("keeps the bottom controls 20 past the system bar where no tab bar is under the map", async () => {
+    // No route renders the map without its tab bar today (MapScreen is only
+    // mounted as a tab), so 54 is not the shipped layout. This pins the
+    // fallback for the day the map is shown full screen.
     mockBottomInset = 34
     const { getByTestId } = renderMap()
 
