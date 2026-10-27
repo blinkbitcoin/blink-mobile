@@ -6,7 +6,7 @@ import {
   reportBoundaryFault,
   setDiagnosticsModeInput,
 } from "./diagnostics"
-import { isTelemetryEnabled } from "./enablement"
+import { isTelemetryEnabled, onKillSwitchEngaged } from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
   resetPlatformAnalyticsData,
@@ -33,7 +33,7 @@ import {
  * | mode       | contract events | non-contract events | platform collection |
  * |------------|-----------------|---------------------|---------------------|
  * | Custodial  | permitted       | permitted           | on                  |
- * | Enhanced   | permitted       | suppressed          | on                  |
+ * | Enhanced   | permitted       | suppressed          | on, until rollback  |
  * | Anon       | suppressed      | suppressed          | off                 |
  * | Unresolved | suppressed      | suppressed          | off                 |
  *
@@ -44,6 +44,10 @@ import {
  * outbox on Enhanced and never to Firebase, and the ledger account id still rides Custodial
  * alone. So the platform counts an app instance it cannot name, and the settlements stay
  * ours.
+ *
+ * The Enhanced row says *until rollback* because the kill switch has to reach collection
+ * too, now that there is collection on Enhanced for it to reach. Custodial's does not
+ * answer to it — see `mayCollectOnPlatform`.
  */
 
 export const TelemetryMode = {
@@ -151,6 +155,20 @@ export const deriveTelemetryMode = ({
 export const isSuppressedMode = (mode: TelemetryMode): boolean =>
   mode === TelemetryMode.Anon || mode === TelemetryMode.Unresolved
 
+/**
+ * Whether the platform SDK may collect at all, and the only place that is decided.
+ *
+ * `Custodial` is unconditional: the kill switch rolls back the self-custodial programme, and
+ * custodial analytics predate it. `Enhanced` is conditional on the switch, because on that
+ * device the platform's own automatic events are the larger half of what rollback has to
+ * stop — the gate already refuses the contract events, and stopping those while the SDK kept
+ * reporting sessions would be a rollback in name only.
+ */
+const mayCollectOnPlatform = (mode: TelemetryMode): boolean => {
+  if (mode === TelemetryMode.Custodial) return true
+  return mode === TelemetryMode.Enhanced && isTelemetryEnabled()
+}
+
 /** What the mode alone says about diagnostics; the kill switch has its own say for
  *  `Enhanced`, and the derivation lives in `transmissibility.ts`. */
 const diagnosticsInputFor = (mode: TelemetryMode): DiagnosticsModeInput => {
@@ -212,8 +230,8 @@ let applying: Promise<void> = Promise.resolve()
  * event: the ledger account id is custodial-only, so an `Enhanced` device collects without
  * ever naming an account. Leaving `Custodial` also resets the app instance, which is what
  * stops the account being recoverable from the device's own earlier rows — see
- * `resetPlatformAnalyticsData`. Collection itself closes only on a mode that may emit nothing
- * at all.
+ * `resetPlatformAnalyticsData`. Collection closes wherever the mode may not collect at all —
+ * a suppressed mode, or an `Enhanced` device the kill switch has rolled back.
  *
  * The previous mode is passed in because `currentMode` has already moved by the time this
  * runs, and only the transition *out of* Custodial resets the instance: doing it on every
@@ -226,7 +244,7 @@ const closeSynchronously = (mode: TelemetryMode, previous: TelemetryMode): void 
     clearCustodialAnalyticsIdentity()
     if (previous === TelemetryMode.Custodial) resetPlatformAnalyticsData()
   }
-  if (isSuppressedMode(mode)) setPlatformCollectionEnabled(false)
+  if (!mayCollectOnPlatform(mode)) setPlatformCollectionEnabled(false)
 }
 
 /**
@@ -236,21 +254,16 @@ const closeSynchronously = (mode: TelemetryMode, previous: TelemetryMode): void 
  * asked for it is still the current one when its turn comes, so a mode resolved and
  * immediately overtaken by `Anon` does not reopen collection on the way through.
  *
- * The identity opens on `Custodial` alone. Collection opens on `Enhanced` too, and the
- * identity stays shut there — which is the whole of the difference between the two modes at
- * the platform SDK.
+ * The identity opens on `Custodial` alone. Collection opens on `Enhanced` too while the
+ * rollout stands, and the identity stays shut there — which is the whole of the difference
+ * between the two modes at the platform SDK.
  */
 const applyMode = async (mode: TelemetryMode): Promise<void> => {
   if (isSuppressedMode(mode)) await notifySuppressed()
   if (mode !== currentMode) return
 
-  if (mode === TelemetryMode.Custodial) {
-    setCustodialIdentityPermitted(true)
-    setPlatformCollectionEnabled(true)
-    return
-  }
-
-  if (mode === TelemetryMode.Enhanced) setPlatformCollectionEnabled(true)
+  if (mode === TelemetryMode.Custodial) setCustodialIdentityPermitted(true)
+  if (mayCollectOnPlatform(mode)) setPlatformCollectionEnabled(true)
 }
 
 /**
@@ -302,9 +315,21 @@ const settleFault = (err: unknown): void => {
  */
 let initialisedAt: number | null = null
 
+let releaseKillSwitchListener: (() => void) | null = null
+
 export const initializeTelemetryGate = (): Promise<void> => {
   currentMode = TelemetryMode.Unresolved
   initialisedAt = Date.now()
+  /**
+   * Every mode transition reads the switch through `mayCollectOnPlatform`. This covers the
+   * one case no transition sees: the switch engaging while `Enhanced` is already running and
+   * already collecting. A restore on launch needs no listener — it lands before the first
+   * resolution, so the transition itself reads it.
+   */
+  releaseKillSwitchListener?.()
+  releaseKillSwitchListener = onKillSwitchEngaged(() => {
+    if (!mayCollectOnPlatform(currentMode)) setPlatformCollectionEnabled(false)
+  })
   try {
     closeSynchronously(TelemetryMode.Unresolved, TelemetryMode.Unresolved)
   } catch (err) {

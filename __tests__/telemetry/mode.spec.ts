@@ -268,6 +268,46 @@ describe("the collection gate", () => {
       expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
     })
 
+    it("closes platform collection when the switch engages while Enhanced is running", async () => {
+      await initializeTelemetryGate()
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+
+      applyServerKillSwitch(false)
+
+      // Rollback means self-custodial collection stops. The gate already refuses the
+      // contract events; the platform's automatic events are the larger half of what is
+      // left, and stopping one without the other is a rollback in name only.
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("never opens collection on an Enhanced device that launches already rolled back", async () => {
+      restoreKillSwitch(true)
+      await initializeTelemetryGate()
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+    })
+
+    it("closes collection on the way from Custodial to a rolled-back Enhanced", async () => {
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+      applyServerKillSwitch(false)
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      // Enhanced is not a suppressed mode, so nothing else in the transition closes what
+      // the custodial period left open.
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("leaves custodial collection alone, because the switch is not its rollback", async () => {
+      applyServerKillSwitch(false)
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+
     it("keeps its app instance on a launch that reaches Enhanced without collecting as Custodial", async () => {
       await initializeTelemetryGate()
       await resolveTelemetryMode(TelemetryMode.Enhanced)
