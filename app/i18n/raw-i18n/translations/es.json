@@ -3858,10 +3858,6 @@
         "CloudBackup": {
             "title": "Respaldemos tu billetera",
             "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
-            "encryptCheckbox": "Encriptar con contraseña adicional",
-            "autoBundleCheckbox": "Copias automáticas",
-            "autoBundleHint": "Permite la salida unilateral si los operadores de Spark dejan de estar disponibles.",
-            "autoBundleNeedsPassword": "Añade una frase de contraseña arriba para activarlo. Sin ella, tu copia de recuperación quedaría junto a una frase de respaldo desprotegida.",
             "password": "Contraseña",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar contraseña",

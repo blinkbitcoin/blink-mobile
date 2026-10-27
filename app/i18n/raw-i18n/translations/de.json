@@ -3858,10 +3858,6 @@
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
             "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
-            "encryptCheckbox": "Mit zusätzlichem Passwort verschlüsseln",
-            "autoBundleCheckbox": "Automatische Backups",
-            "autoBundleHint": "Ermöglicht den einseitigen Ausstieg, falls Spark-Betreiber offline gehen.",
-            "autoBundleNeedsPassword": "Füge oben eine Passphrase hinzu, um dies zu aktivieren. Ohne Passphrase läge dein Wiederherstellungs-Backup neben einer ungeschützten Wiederherstellungsphrase.",
             "password": "Passwort",
             "passwordPlaceholder": "(mindestens 12 Zeichen)",
             "confirmPassword": "Passwort bestätigen",

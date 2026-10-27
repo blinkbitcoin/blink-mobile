@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Mari sandarkan dompet anda",
       "description": "Kami akan menyimpan sandaran frasa pemulihan anda ke {provider} anda.",
-      "encryptCheckbox": "Sulitkan dengan kata laluan tambahan",
-      "autoBundleCheckbox": "Sandaran automatik",
-      "autoBundleHint": "Membolehkan keluar secara unilateral jika pengendali Spark tidak tersedia.",
-      "autoBundleNeedsPassword": "Tambah frasa laluan di atas untuk mengaktifkannya. Tanpanya, sandaran pemulihan anda akan berada bersebelahan frasa sandaran yang tidak dilindungi.",
       "password": "Kata laluan",
       "passwordPlaceholder": "(minimum 12 aksara)",
       "confirmPassword": "Sahkan kata laluan",

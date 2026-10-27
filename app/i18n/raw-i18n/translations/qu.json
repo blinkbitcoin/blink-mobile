@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
-      "encryptCheckbox": "Yapay contraseñawan pakay",
-      "autoBundleCheckbox": "Kikinmanta waqaychaykuna",
-      "autoBundleHint": "Spark llamkaqkuna mana llamkaptinku sapallayki lloqsiyta atinaykipaq.",
-      "autoBundleNeedsPassword": "Kayta kachaykunaykipaq hanaqpi huk frase secretata churay. Mana chayqa, kutichiy waqaychayniyki mana harkasqa kutichiy simikuna ladunpi kanman.",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",

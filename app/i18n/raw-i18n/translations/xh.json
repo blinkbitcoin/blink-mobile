@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
       "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
-      "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
-      "autoBundleCheckbox": "Ugcino oluzenzekelayo",
-      "autoBundleHint": "Yenza ukuphuma kwelinye icala kwenzeke ukuba abaqhubi be-Spark abafumaneki.",
-      "autoBundleNeedsPassword": "Yongeza ibinzana lokugqitha ngasentla ukuze uvule oku. Ngaphandle kwalo, ugcino lwakho lokubuyisela beluya kuhlala ecaleni kwebinzana lokubuyisela elingakhuselwanga.",
       "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
       "confirmPassword": "Qinisekisa igama lokugqitha",

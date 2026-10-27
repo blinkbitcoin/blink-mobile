@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",
       "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
-      "encryptCheckbox": "Titkosítás további jelszóval",
-      "autoBundleCheckbox": "Automatikus mentések",
-      "autoBundleHint": "Lehetővé teszi az egyoldalú kilépést, ha a Spark üzemeltetői elérhetetlenné válnak.",
-      "autoBundleNeedsPassword": "A bekapcsoláshoz adj meg fent egy jelmondatot. Enélkül a helyreállítási mentés egy védtelen helyreállítási kifejezés mellett állna.",
       "password": "Jelszó",
       "passwordPlaceholder": "(legalább 12 karakter)",
       "confirmPassword": "Jelszó megerősítése",

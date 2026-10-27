@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
-      "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
-      "autoBundleCheckbox": "Bakaapu ez'obwannamu",
-      "autoBundleHint": "Kisobozesa okufuluma ku lwo bw'oba abakozesa ba Spark bagaanye okukola.",
-      "autoBundleNeedsPassword": "Yongerako ebigambo eby'ekyama waggulu okukisobozesa. Awatali byo, bakaapu yo ey'okuzza obuggya yandibadde kumpi n'ebigambo by'okuzza obuggya ebitakuumiddwa.",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",

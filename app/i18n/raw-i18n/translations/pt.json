@@ -3858,10 +3858,6 @@
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",
             "description": "Salvaremos uma cópia da sua frase de backup no seu {provider}.",
-            "encryptCheckbox": "Criptografar com senha adicional",
-            "autoBundleCheckbox": "Backups automáticos",
-            "autoBundleHint": "Permite a saída unilateral caso os operadores do Spark fiquem indisponíveis.",
-            "autoBundleNeedsPassword": "Adicione uma frase secreta acima para ativar. Sem ela, seu backup de recuperação ficaria ao lado de uma frase de recuperação desprotegida.",
             "password": "Senha",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar senha",

@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
       "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
-      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
-      "autoBundleCheckbox": "Cadangan otomatis",
-      "autoBundleHint": "Memungkinkan keluar sepihak jika operator Spark tidak tersedia.",
-      "autoBundleNeedsPassword": "Tambahkan frasa sandi di atas untuk mengaktifkannya. Tanpa frasa sandi, cadangan pemulihanmu akan berada di samping frasa cadangan yang tidak terlindungi.",
       "password": "Kata sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
       "confirmPassword": "Konfirmasi kata sandi",
