@@ -1,7 +1,8 @@
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 import DeviceInfo from "react-native-device-info"
 import Share, { type ShareOptions } from "react-native-share"
 
+import type { Network } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useClipboard } from "@app/hooks"
@@ -46,6 +47,26 @@ import { usePlatformCloudBackup } from "../onboarding/hooks/use-platform-cloud-b
  * it in the clipboard (cloud clipboard sync, keyboard apps) indefinitely. */
 const CLIPBOARD_CLEAR_MS = 60_000
 
+/**
+ * A value together with the account and network it was read for. After an
+ * account switch the hook still holds the previous account's values until the
+ * new account's own read lands, and this tag is what keeps them off its screen.
+ */
+type TargetBound<T> = { forTarget: string | null; value: T }
+
+const NO_BUNDLE_READ: TargetBound<RecoveryBundleState | null> = {
+  forTarget: null,
+  value: null,
+}
+
+const NO_SETTINGS_READ: TargetBound<RecoveryBundleSettings> = {
+  forTarget: null,
+  value: defaultRecoveryBundleSettings,
+}
+
+const targetFor = (accountId: string, network: Network): string =>
+  `${accountId}:${network}`
+
 export type RecoveryBundleActions = {
   /** undefined while the first read is in flight, null when no bundle saved. */
   bundleState: RecoveryBundleState | null | undefined
@@ -78,39 +99,71 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
 
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+  const target = accountId === null ? null : targetFor(accountId, network)
 
-  const [bundleState, setBundleState] = useState<RecoveryBundleState | null | undefined>(
-    undefined,
-  )
-  const [settings, setSettings] = useState<RecoveryBundleSettings>(
-    defaultRecoveryBundleSettings,
-  )
+  const [bundleRead, setBundleRead] = useState(NO_BUNDLE_READ)
+  const [settingsRead, setSettingsRead] = useState(NO_SETTINGS_READ)
   const [refreshing, setRefreshing] = useState(false)
   const [uploading, setUploading] = useState(false)
   // One export at a time (both paths decrypt the saved bundle), but tracked
   // per action so each button can show its own spinner.
   const [exportAction, setExportAction] = useState<"share" | "copy" | null>(null)
+  const latestRead = useRef(0)
+  /** Checked when async work finishes, which may be after an account switch. */
+  const activeTarget = useRef(target)
+  activeTarget.current = target
+
+  /** Until the active account's own read lands, what the hook holds belongs to
+   *  another account, so the bundle reads as still loading and the settings as
+   *  their defaults. */
+  const isBundleReadForTarget = bundleRead.forTarget === target
+  const isSettingsReadForTarget = settingsRead.forTarget === target
+  const bundleState = isBundleReadForTarget ? bundleRead.value : undefined
+  const settings = isSettingsReadForTarget
+    ? settingsRead.value
+    : defaultRecoveryBundleSettings
+
+  /** A refresh, upload or settings write that finishes after an account switch
+   *  ran for the account it started on, so its result must not land on the one
+   *  now on screen. */
+  const isStillActive = (forTarget: string) => forTarget === activeTarget.current
 
   const reloadState = useCallback(async () => {
+    /** An action that outlived an account switch still holds this closure, and
+     *  reading for its account now would only push out the one on screen. */
+    const isTargetActive = target === activeTarget.current
+    if (!isTargetActive) return
+    latestRead.current += 1
+    const read = latestRead.current
     if (!accountId) {
-      setBundleState(null)
-      setSettings(defaultRecoveryBundleSettings)
+      setBundleRead(NO_BUNDLE_READ)
+      setSettingsRead(NO_SETTINGS_READ)
       return
+    }
+    let next: {
+      bundle: RecoveryBundleState | null
+      settings: RecoveryBundleSettings | null
     }
     try {
       const [state, storedSettings] = await Promise.all([
         readRecoveryBundleState(accountId, network),
         readRecoveryBundleSettings(accountId),
       ])
-      setBundleState(state)
-      setSettings(storedSettings)
+      next = { bundle: state, settings: storedSettings }
     } catch (err) {
       // Degrade to "no bundle yet" instead of stranding the screen on the
       // loading spinner; the manual refresh still works from there.
       crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
-      setBundleState(null)
+      next = { bundle: null, settings: null }
     }
-  }, [accountId, network])
+    /** A read overtaken by a newer one is dropped: after an account switch a
+     *  slow read for the previous account would otherwise land last and show
+     *  its backup while the actions operate on the new account. */
+    const isLatestRead = read === latestRead.current
+    if (!isLatestRead) return
+    setBundleRead({ forTarget: target, value: next.bundle })
+    if (next.settings) setSettingsRead({ forTarget: target, value: next.settings })
+  }, [accountId, network, target])
 
   const recordAndToast = (err: unknown, message: string) => {
     crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
@@ -119,6 +172,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
 
   const handleRefresh = async () => {
     if (!accountId || refreshing) return
+    const forTarget = targetFor(accountId, network)
     setRefreshing(true)
     try {
       const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
@@ -137,7 +191,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
         coverageKey: `manual:${Date.now()}`,
       })
       if (result.success) {
-        setBundleState(result.state)
+        if (isStillActive(forTarget)) setBundleRead({ forTarget, value: result.state })
         toastShow({
           message: LL.RecoveryBundleScreen.refreshSuccess(),
           type: "success",
@@ -224,12 +278,13 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
 
   const persistSettings = async (next: RecoveryBundleSettings) => {
     if (!accountId) return
+    const forTarget = targetFor(accountId, network)
     const previous = settings
-    setSettings(next)
+    setSettingsRead({ forTarget, value: next })
     try {
       await writeRecoveryBundleSettings(accountId, next)
     } catch (err) {
-      setSettings(previous)
+      if (isStillActive(forTarget)) setSettingsRead({ forTarget, value: previous })
       recordAndToast(err, LL.RecoveryBundleScreen.settingUpdateFailed())
       throw err
     }
@@ -296,7 +351,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       network,
       metadata.bundleCreatedAt,
     )
-    if (next) setBundleState(next)
+    const forTarget = targetFor(currentAccountId, network)
+    const isSyncedStateForScreen = next !== null && isStillActive(forTarget)
+    if (isSyncedStateForScreen) setBundleRead({ forTarget, value: next })
     toastShow({
       message: LL.RecoveryBundleScreen.cloudUploadSuccess(),
       type: "success",
