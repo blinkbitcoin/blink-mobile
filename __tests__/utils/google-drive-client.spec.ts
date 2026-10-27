@@ -1,6 +1,7 @@
 import { CloudBackupErrorReason as DriveErrorReason } from "@app/types/cloud-backup"
 import {
   buildMultipartBody,
+  deleteAppDataFile,
   downloadAppDataFile,
   DriveError,
   findAppDataFile,
@@ -361,6 +362,55 @@ describe("google drive client", () => {
 
     await expect(downloadAppDataFile("file-456", "token-abc")).rejects.toMatchObject({
       reason: DriveErrorReason.Unknown,
+    })
+  })
+
+  it("deleteAppDataFile sends an authorized DELETE for the file", async () => {
+    global.fetch = jest.fn().mockResolvedValue({ ok: true })
+
+    await deleteAppDataFile("file-456", "token-abc")
+
+    expect(global.fetch).toHaveBeenCalledWith(
+      "https://www.googleapis.com/drive/v3/files/file-456",
+      expect.objectContaining({
+        method: "DELETE",
+        headers: { Authorization: "Bearer token-abc" },
+      }),
+    )
+  })
+
+  it("aborts a request that stalls and reports it as transient", async () => {
+    jest.useFakeTimers()
+    try {
+      global.fetch = jest.fn(
+        (_url: string, init: RequestInit) =>
+          new Promise((_resolve, reject) => {
+            init.signal?.addEventListener("abort", () => reject(new Error("Aborted")))
+          }),
+      ) as unknown as typeof fetch
+
+      const deletion = deleteAppDataFile("file-456", "token-abc")
+      jest.advanceTimersByTime(60_000)
+
+      await expect(deletion).rejects.toMatchObject({
+        reason: DriveErrorReason.Transient,
+        message: "Drive network error: Aborted",
+      })
+    } finally {
+      jest.useRealTimers()
+    }
+  })
+
+  it("deleteAppDataFile throws DriveError with reason='auth' on 401", async () => {
+    global.fetch = jest.fn().mockResolvedValue({
+      ok: false,
+      status: 401,
+      text: () => Promise.resolve("Unauthorized"),
+    })
+
+    await expect(deleteAppDataFile("file-456", "token-abc")).rejects.toMatchObject({
+      reason: DriveErrorReason.Auth,
+      message: expect.stringContaining("Drive delete failed (401)"),
     })
   })
 })
