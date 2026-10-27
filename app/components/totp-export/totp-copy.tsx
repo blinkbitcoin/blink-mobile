@@ -1,72 +1,106 @@
-import React from "react"
-import { View, TouchableOpacity, StyleSheet } from "react-native"
-import { Text, useTheme } from "@rn-vui/themed"
+import React, { useCallback, useEffect, useRef } from "react"
+import { TouchableOpacity } from "react-native"
+import Clipboard from "@react-native-clipboard/clipboard"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { testProps } from "@app/utils/testProps"
 
 type Props = {
   secret: string
+  /** Outlined in the primary colour where copying the key is the step to take. */
+  isHighlighted?: boolean
+  /** Told after each copy, for a screen that reports it. */
+  onCopy?: () => void
 }
 
-export const CopySecretComponent: React.FC<Props> = ({ secret }) => {
+type StyleProps = {
+  isHighlighted: boolean
+}
+
+/** The key as an authenticator app takes it: whole, without the spaces it may be shown
+ *  or typed with. */
+export const compactSetupKey = (secret: string): string => secret.replace(/\s/g, "")
+
+type AuthenticatorAccount = { id: string; username?: string | null }
+
+/** The name the authenticator's entry and the key's backup give the account, so the two
+ *  always match: its username, or its user id for an account without one. */
+export const authenticatorAccountLabel = ({
+  id,
+  username,
+}: AuthenticatorAccount): string => username || id
+
+/** An authenticator's setup key, copied whole with a tap on the field or its icon. */
+export const CopySecretComponent: React.FC<Props> = ({
+  secret,
+  isHighlighted = false,
+  onCopy,
+}) => {
   const { LL } = useI18nContext()
+  /** No timed clear: clearing reads the clipboard back first, and the user has by then
+   *  copied the code their authenticator made, so iOS would stop the registration with
+   *  a paste permission prompt naming the authenticator app. */
   const { copyToClipboard } = useClipboard()
+  /** The key would otherwise sit in the clipboard, and in whatever the system hands it
+   *  on to, long after the registration, and it is the one string that recreates the
+   *  second factor. So once the field is gone, a copy it made is wiped blind: a write
+   *  alone raises no paste prompt, and whatever was copied after it goes too. A
+   *  keyboard's own clipboard history keeps what it already took. */
+  const hasCopiedRef = useRef(false)
+  useEffect(
+    () => () => {
+      if (hasCopiedRef.current) Clipboard.setString("")
+    },
+    [],
+  )
+  const styles = useStyles({ isHighlighted })
   const {
     theme: { colors },
   } = useTheme()
 
+  const handleCopy = useCallback(() => {
+    copyToClipboard({
+      content: compactSetupKey(secret),
+      message: LL.CopySecretComponent.toastMessage(),
+    })
+    hasCopiedRef.current = true
+    onCopy?.()
+  }, [copyToClipboard, secret, LL, onCopy])
+
   return (
-    <View style={styles.container}>
-      <View style={styles.content}>
-        <Text type="p2">{LL.TotpRegistrationInitiateScreen.secret()}</Text>
-        <TouchableOpacity
-          style={[styles.secretContainer, { backgroundColor: colors.grey5 }]}
-          onPress={() =>
-            copyToClipboard({
-              content: secret,
-              message: LL.CopySecretComponent.toastMessage(),
-            })
-          }
-          activeOpacity={0.7}
-        >
-          <Text
-            type="p2"
-            style={[styles.secretText, { color: colors.grey0 }]}
-            numberOfLines={1}
-            ellipsizeMode="middle"
-          >
-            {secret}
-          </Text>
-          <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
-        </TouchableOpacity>
-      </View>
-    </View>
+    <TouchableOpacity
+      style={styles.field}
+      onPress={handleCopy}
+      activeOpacity={0.7}
+      {...testProps("setup-key-copy")}
+    >
+      <Text type="p3" style={styles.key} numberOfLines={1} ellipsizeMode="middle">
+        {secret}
+      </Text>
+      <GaloyIcon name="copy-paste" size={20} color={colors.primary} />
+    </TouchableOpacity>
   )
 }
 
-const styles = StyleSheet.create({
-  container: {
-    paddingHorizontal: 16,
-    paddingVertical: 8,
-    width: "100%",
-  },
-  content: {
-    gap: 8,
-  },
-  secretContainer: {
+const useStyles = makeStyles(({ colors }, { isHighlighted }: StyleProps) => ({
+  field: {
     flexDirection: "row",
     alignItems: "center",
-    justifyContent: "space-between",
-    paddingHorizontal: 16,
-    paddingVertical: 14,
+    gap: 14,
+    minHeight: 48,
+    paddingLeft: 14,
+    paddingRight: 10,
     borderRadius: 8,
-    gap: 12,
+    borderWidth: 1,
+    borderColor: isHighlighted ? colors.primary : colors.transparent,
+    backgroundColor: colors.grey5,
   },
-  secretText: {
+  key: {
     flex: 1,
-    fontFamily: "monospace",
-    letterSpacing: 0.5,
+    lineHeight: 20,
+    color: colors.black,
   },
-})
+}))

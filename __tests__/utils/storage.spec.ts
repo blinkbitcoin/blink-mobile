@@ -1,13 +1,52 @@
-import { getAllKeys } from "@app/utils/storage"
+import {
+  getAllKeys,
+  loadJson,
+  loadJsonOrThrow,
+  remove,
+  removeOrThrow,
+} from "@app/utils/storage"
 
 const mockGetAllKeys = jest.fn()
+const mockGetItem = jest.fn()
+const mockRemoveItem = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
   default: {
     getAllKeys: (...args: unknown[]) => mockGetAllKeys(...args),
+    getItem: (...args: unknown[]) => mockGetItem(...args),
+    removeItem: (...args: unknown[]) => mockRemoveItem(...args),
   },
 }))
+
+/** The removal pair, told apart the way the read pair is: one swallows, one tells. */
+describe("removeOrThrow", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("removes the key", async () => {
+    mockRemoveItem.mockResolvedValue(undefined)
+
+    await removeOrThrow("a")
+
+    expect(mockRemoveItem).toHaveBeenCalledWith("a")
+  })
+
+  it("propagates a removal that failed", async () => {
+    mockRemoveItem.mockRejectedValue(new Error("Database Error"))
+
+    await expect(removeOrThrow("a")).rejects.toThrow("Database Error")
+  })
+
+  /** The contrast that makes the new helper necessary. */
+  it("is what tells a failed removal apart from the best-effort remove", async () => {
+    mockRemoveItem.mockRejectedValue(new Error("Database Error"))
+    jest.spyOn(console, "error").mockImplementation(() => undefined)
+
+    await expect(remove("a")).resolves.toBeUndefined()
+  })
+})
 
 describe("getAllKeys", () => {
   beforeEach(() => {
@@ -27,5 +66,64 @@ describe("getAllKeys", () => {
     mockGetAllKeys.mockRejectedValue(new Error("storage unavailable"))
 
     expect(await getAllKeys()).toBeNull()
+  })
+})
+
+describe("loadJson", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("parses the stored value", async () => {
+    mockGetItem.mockResolvedValue(JSON.stringify({ step: "backupAlerts" }))
+
+    expect(await loadJson("key")).toEqual({ step: "backupAlerts" })
+  })
+
+  it("returns null when the key holds nothing", async () => {
+    mockGetItem.mockResolvedValue(null)
+
+    expect(await loadJson("key")).toBeNull()
+  })
+})
+
+describe("loadJsonOrThrow", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("parses the stored value", async () => {
+    mockGetItem.mockResolvedValue(JSON.stringify({ step: "balancesOverview" }))
+
+    expect(await loadJsonOrThrow("key")).toEqual({ step: "balancesOverview" })
+  })
+
+  it("returns null when the key holds nothing", async () => {
+    mockGetItem.mockResolvedValue(null)
+
+    expect(await loadJsonOrThrow("key")).toBeNull()
+  })
+
+  it("throws when the read fails, instead of reporting an empty store", async () => {
+    /** A caller that ends a flow on "nothing stored" must not be told that by a store it
+     *  merely could not open (blink-wip#1211). */
+    mockGetItem.mockRejectedValue(new Error("SQLITE_CORRUPT"))
+
+    await expect(loadJsonOrThrow("key")).rejects.toThrow("SQLITE_CORRUPT")
+  })
+
+  it("reads unparseable content as absent, so the key stays replaceable", async () => {
+    /** The opposite of a failed read: the store answered, and what it holds is
+     *  definitively unusable. Throwing would leave the key unreadable and unwritable. */
+    mockGetItem.mockResolvedValue("{ not json")
+
+    expect(await loadJsonOrThrow("key")).toBeNull()
+  })
+
+  it("differs from loadJson, which reports both absent and unreadable as null", async () => {
+    mockGetItem.mockRejectedValue(new Error("SQLITE_CORRUPT"))
+
+    expect(await loadJson("key")).toBeNull()
+    await expect(loadJsonOrThrow("key")).rejects.toThrow("SQLITE_CORRUPT")
   })
 })

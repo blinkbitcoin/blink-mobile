@@ -44,4 +44,24 @@ describe("react-native-credentials-manager patch", () => {
     expect(source).toContain("Arguments.createMap()")
     expect(source).not.toMatch(/promise\.resolve\(\s*mapOf/)
   })
+
+  /** The save's rejection names the exception's class, so JS can tell a dismissed sheet
+   *  or a phone with no password manager from a failure. */
+  it("rejects a save with a code after the exception's class", () => {
+    const source = newarchModule()
+
+    expect(source).toContain(
+      'is CreateCredentialCancellationException -> "USER_CANCELED"',
+    )
+    expect(source).toContain('-> "NO_CREATE_OPTION"')
+    expect(source).toContain("promise.reject(code, e.message.toString())")
+  })
+
+  /** A provider's own exception escaped the coroutine and crashed the app. */
+  it("rejects a save that fails with any other exception instead of crashing", () => {
+    expect(newarchModule()).toContain("catch (e: Exception) {")
+    expect(newarchModule()).toContain(
+      'promise.reject("CREDENTIAL_ERROR", e.message.toString())',
+    )
+  })
 })

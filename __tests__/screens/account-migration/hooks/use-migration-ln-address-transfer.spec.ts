@@ -6,6 +6,7 @@ import {
   useMigrationLnAddressTransfer,
 } from "@app/screens/account-migration/hooks/use-migration-ln-address-transfer"
 import { MigrationSdkStatus } from "@app/self-custodial/migration-transfer-request"
+import { MigrationLnAddressOutcome } from "@app/types/migration"
 
 import { flushEffects } from "../../../helpers/flush-effects"
 
@@ -124,8 +125,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** Nothing left to move is still a settled outcome, not a failure. */
@@ -145,7 +145,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** No identifiers to move is a settled success; a missing payload is not — it is an
@@ -155,16 +155,18 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
-  it("hands an empty payload to support rather than a false success", async () => {
+  /** An answer with nothing in it leaves the address unaccounted for, so it settles as a
+   *  rejection rather than a false success — but not as a proof failure: the signature the
+   *  commit needs was produced, so the commit is unaffected and the migration goes on. */
+  it("settles an empty payload as rejected rather than a false success", async () => {
     mockTransfer.mockResolvedValue({ data: undefined })
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
-    expect(result.current.isTransferred).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address empty payload",
       expect.any(Error),
@@ -176,8 +178,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isAccountMissing).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.AccountMissing)
     expect(mockTransfer).not.toHaveBeenCalled()
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address account missing",
@@ -190,7 +191,7 @@ describe("useMigrationLnAddressTransfer", () => {
     mockBuildProof.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isAccountMissing).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.AccountMissing)
 
     act(() => result.current.retry())
     await flushEffects()
@@ -198,7 +199,13 @@ describe("useMigrationLnAddressTransfer", () => {
     expect(mockBuildProof).toHaveBeenCalledTimes(1)
   })
 
-  it("hands a failed proof to support", async () => {
+  /**
+   * A device that cannot sign is not an address the server refused, and the two must not
+   * share an outcome: the commit signs the same proof through the same SDK chain, so
+   * telling this user their funds move anyway would break the promise moments later. It is
+   * the one re-point failure the migration still hands over.
+   */
+  it("settles a failed proof apart from a refusal, as a proof failure", async () => {
     mockBuildProof.mockResolvedValue({
       status: MigrationSdkStatus.Failed,
       error: new Error("sdk down"),
@@ -206,11 +213,28 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ProofFailed)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address proof",
       expect.objectContaining({ message: "sdk down" }),
     )
+  })
+
+  /** A proof failure is as terminal as a missing device key: the same SDK would answer the
+   *  same way, so a retry only spends another connect-and-sign on it. */
+  it("does not retry after a failed proof", async () => {
+    mockBuildProof.mockResolvedValue({
+      status: MigrationSdkStatus.Failed,
+      error: new Error("sdk down"),
+    })
+    const { result } = renderTransfer()
+    await flushEffects()
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ProofFailed)
+
+    act(() => result.current.retry())
+    await flushEffects()
+
+    expect(mockBuildProof).toHaveBeenCalledTimes(1)
   })
 
   /** A dropped connection while signing the proof is retryable, not settled: it offers the
@@ -223,8 +247,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.hasConnectionIssue).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
     expect(mockTransfer).not.toHaveBeenCalled()
     expect(mockReportError).not.toHaveBeenCalled()
   })
@@ -238,35 +261,37 @@ describe("useMigrationLnAddressTransfer", () => {
       .mockResolvedValue(okProof)
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
 
     act(() => result.current.retry())
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
     expect(mockTransfer).toHaveBeenCalledTimes(1)
   })
 
-  it("hands a top-level rejection to support", async () => {
+  /** The refusal the banner on the commit screen actually describes: the server would not
+   *  move the address, which costs the migration nothing else. */
+  it("settles a top-level rejection as rejected", async () => {
     mockTransfer.mockResolvedValue(payload([], [{ message: "flag off" }]))
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address rejected",
       expect.objectContaining({ message: "flag off" }),
     )
   })
 
-  it("hands a FAILED identifier to support and reports which one", async () => {
+  it("settles a FAILED identifier as rejected and reports which one", async () => {
     mockTransfer.mockResolvedValue(
       payload([{ identifier: "user", status: MigrationLnAddressTransferStatus.Failed }]),
     )
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address result failed",
       expect.objectContaining({ message: "user" }),
@@ -278,17 +303,18 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.hasConnectionIssue).toBe(true)
-    expect(result.current.isRejected).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("hands a non-network throw to support", async () => {
+  /** The proof was signed before the mutation went out, so a throw from the mutation leaves
+   *  the commit with everything it needs: a rejection, not a proof failure. */
+  it("settles a non-network throw as rejected", async () => {
     mockTransfer.mockRejectedValue(new Error("boom"))
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address failed",
       expect.any(Error),
@@ -296,10 +322,11 @@ describe("useMigrationLnAddressTransfer", () => {
   })
 
   it("does not fire while the caller is skipping", async () => {
-    renderTransfer({ skip: true })
+    const { result } = renderTransfer({ skip: true })
     await flushEffects()
 
     expect(mockBuildProof).not.toHaveBeenCalled()
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Pending)
   })
 
   it("waits for both account ids before firing", async () => {
@@ -334,13 +361,13 @@ describe("useMigrationLnAddressTransfer", () => {
     mockTransfer.mockRejectedValueOnce(networkError())
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.hasConnectionIssue).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
 
     act(() => result.current.retry())
     await flushEffects()
 
     expect(mockTransfer).toHaveBeenCalledTimes(2)
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** A superseded attempt — retried (via the screen's shared retry) while its first run was
@@ -358,23 +385,20 @@ describe("useMigrationLnAddressTransfer", () => {
 
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isTransferred).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Pending)
 
     act(() => result.current.retry())
     await flushEffects()
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
 
     await act(async () => {
       resolveFirstProof({ status: MigrationSdkStatus.NoMnemonic })
       await flushEffects()
     })
 
-    expect(result.current.isTransferred).toBe(true)
-    expect(result.current.isRejected).toBe(false)
-    /** Every settled kind, not just the rejection: a superseded answer landing in any of
+    /** The one outcome covers every kind at once: a superseded answer landing in any of
      *  them would hand a completed re-point to support. */
-    expect(result.current.isAccountMissing).toBe(false)
-    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
   })
 
   /** The shared retry button fires every source; a completed re-point must not re-run the
@@ -382,7 +406,7 @@ describe("useMigrationLnAddressTransfer", () => {
   it("does not re-fire a completed transfer on a shared retry", async () => {
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
 
     act(() => result.current.retry())
     await flushEffects()
@@ -410,9 +434,7 @@ describe("useMigrationLnAddressTransfer", () => {
         jest.advanceTimersByTime(LN_ADDRESS_TRANSFER_TIMEOUT_MS)
       })
 
-      expect(result.current.hasConnectionIssue).toBe(true)
-      expect(result.current.isRejected).toBe(false)
-      expect(result.current.isTransferred).toBe(false)
+      expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ConnectionIssue)
       expect(mockReportError).toHaveBeenCalledWith(
         "Migration ln-address stalled",
         expect.any(Error),
@@ -424,21 +446,20 @@ describe("useMigrationLnAddressTransfer", () => {
 
   /**
    * The proof is built before `run`'s own try, so a keychain that throws rejects it. That
-   * is a settled failure a retry only replays, not a wait that ran out, and support must
-   * not be told the attempt stalled when it threw.
+   * is a failure of the proof the commit signs too, not a wait that ran out, and support
+   * must not be told the attempt stalled when it threw.
    *
    * A stall stays retryable however often it happens: the attempt may still be in the air,
    * and the screen keeps its contact-support button on throughout, so a retry that cannot
    * land is never the user's only way out.
    */
-  it("hands a throw before the mutation to support rather than reporting a stall", async () => {
+  it("settles a throw before the mutation as a proof failure rather than a stall", async () => {
     mockBuildProof.mockRejectedValue(new Error("keychain unavailable"))
 
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isRejected).toBe(true)
-    expect(result.current.hasConnectionIssue).toBe(false)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.ProofFailed)
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration ln-address threw",
       expect.any(Error),
@@ -475,7 +496,7 @@ describe("useMigrationLnAddressTransfer", () => {
     settleProof(okProof)
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
     expect(mockTransfer).toHaveBeenCalledTimes(1)
   })
 
@@ -485,7 +506,7 @@ describe("useMigrationLnAddressTransfer", () => {
     const { result } = renderTransfer()
     await flushEffects()
 
-    expect(result.current.isTransferred).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Transferred)
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
@@ -493,7 +514,7 @@ describe("useMigrationLnAddressTransfer", () => {
     mockTransfer.mockResolvedValue(payload([], [{ message: "flag off" }]))
     const { result } = renderTransfer()
     await flushEffects()
-    expect(result.current.isRejected).toBe(true)
+    expect(result.current.outcome).toBe(MigrationLnAddressOutcome.Rejected)
 
     act(() => result.current.retry())
     await flushEffects()

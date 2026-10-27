@@ -102,7 +102,7 @@ jest.mock("@app/store/persistent-state", () => ({
 
 jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({
-    remoteConfigTrusted: mockRemoteConfigTrusted,
+    isNonCustodialFlagSettled: mockRemoteConfigTrusted,
     telemetryEnabled: mockTelemetryEnabled,
   }),
 }))

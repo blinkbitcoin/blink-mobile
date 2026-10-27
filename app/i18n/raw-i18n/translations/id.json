@@ -2426,9 +2426,9 @@
     "time": "Waktu",
     "type": "Jenis",
     "feeTier": "Prioritas transaksi",
-    "fast": "Cepat",
-    "medium": "Sedang",
-    "slow": "Lambat",
+    "fast": "Prioritas",
+    "medium": "Standar",
+    "slow": "Ekonomis",
     "recommended": "Direkomendasikan",
     "walletOffline": "Dompet Anda sedang offline. Silakan periksa koneksi Anda dan coba lagi.",
     "sdkInsufficientFunds": "Dana tidak cukup untuk transaksi ini.",
@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Tidak dapat memperkirakan biaya. Coba jumlah yang berbeda."
   },
   "SettingsScreen": {
-    "createAddress": "Buat alamat",
+    "createAddress": "Buat alamat Lightning",
     "addressDisabled": "(nonaktif)",
     "donationButton": "Tombol donasi",
     "btcpayServer": "BTCPay Server",
@@ -2455,6 +2455,7 @@
     "activated": "Diaktifkan",
     "addressScreen": "Cara menerima pembayaran",
     "nonCustodialAccount": "Akun non-kustodial",
+    "custodialAccount": "Akun kustodial",
     "tapUserName": "Ketuk untuk mengatur nama pengguna",
     "notifications": "Notifikasi",
     "title": "Pengaturan",
@@ -2563,8 +2564,6 @@
     "emailUnverifiedContent": "Pastikan Anda dapat masuk kembali ke akun Anda dengan memverifikasi email. Apakah Anda ingin melakukan verifikasi sekarang?",
     "totp": "Otentikasi dua faktor",
     "totpDeactivated": "Otentikasi dua faktor telah dinonaktifkan",
-    "totpDeleteAlertTitle": "Hapus otentikasi dua faktor",
-    "totpDeleteAlertContent": "Apakah Anda yakin ingin menghapus otentikasi dua faktor Anda?",
     "copiedAccountId": "ID akun Anda telah disalin ke papan klip",
     "yourAccountId": "ID Akun Anda",
     "accountId": "ID Akun",
@@ -2617,14 +2616,11 @@
     "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Otentikasi dua faktor",
-    "secret": "Rahasia/cadangan",
-    "content": "Pindai kode QR ini dengan aplikasi autentikator Anda. Sebagai alternatif, Anda dapat menyalin/tempelkan kode rahasia secara manual ke aplikasi autentikator Anda."
+    "title": "Otentikasi dua faktor"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Otentikasi dua faktor",
-    "enter6digitCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk memvalidasi otentikasi dua faktor Anda.",
-    "success": "Otentikasi dua faktor telah diaktifkan. Anda sekarang hanya dapat masuk kembali dengan ponsel atau email DAN autentikasi dua faktor Anda.\n\nPerangkat di akun ini yang belum masuk dengan 2FA harus masuk kembali.\n\nHanya akun level 2 yang dapat dipulihkan oleh dukungan pelanggan jika akses 2FA hilang."
+    "enter6digitCode": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk memvalidasi otentikasi dua faktor Anda."
   },
   "TotpLoginValidateScreen": {
     "title": "Otentikasi dua faktor",
@@ -2698,7 +2694,9 @@
     "noFee": "tanpa biaya",
     "fromApprox": "mulai ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Tidak dapat mengambil biaya saat ini"
+    "error": "Tidak dapat mengambil biaya saat ini",
+    "inactivity": "Tidak aktif >{months: number} bulan",
+    "usdPerMonth": "{amount: string}/bulan"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",
@@ -3685,6 +3683,67 @@
         "codingBackend": "...membuat kode backend",
         "buttonText": "Bagus"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Selamat datang untuk menjadi bagian dari Blink",
+          "paragraphs": {
+            "body1": "Sebelum kami mengumpulkan lebih banyak dana dari investor profesional, kami memutuskan untuk memperluas undangan kepada keluarga Blink, pengguna super dan pendukung kami. Mengapa membawa orang asing ketika kami bisa mengundang seseorang seperti Anda terlebih dahulu?",
+            "body2": "Ini adalah undangan pribadi. Mohon jangan meneruskan atau membagikan secara publik."
+          }
+        },
+        "buttonText": "Lanjutkan"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Berapa banyak yang ingin Anda investasikan?",
+        "percent": "untuk ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Valuasi perusahaan",
+          "paragraphs": {
+            "body1": "Dalam putaran investasi ini, valuasi pre-money Blink adalah $10 juta.",
+            "body2": "Kami bisa menggalang dana dengan harga lebih tinggi dari VC. Namun, kami melihat manfaat timbal balik jangka panjang dalam bermitra dengan pengguna super kami. Oleh karena itu, kami menawarkan penawaran ini dengan ketentuan yang lebih baik untuk Anda."
+          }
+        },
+        "buttonText": "Mengerti"
+      },
+      "TermSheet": {
+        "title": "Lembar Ketentuan",
+        "equitySection": {
+          "title": "Ekuitas di Blink",
+          "investment": "Investasi {amount: string}",
+          "valuation": "Pada valuasi pre-money $10M",
+          "units": "Anda menerima {units: string} unit ~{percent: number}% dari Blink"
+        },
+        "buttonText": "Lanjut ke Penandatanganan"
+      },
+      "TransferInvest": {
+        "title": "Transfer investasi Anda",
+        "paragraphs": {
+          "body1": "Anda telah menandatangani perjanjian langganan untuk {units: string} unit di Blink.",
+          "body2": "Saatnya mentransfer jumlah investasi {amount: string}. Anda akan membayar dengan Bitcoin."
+        },
+        "buttonText": "Lanjutkan",
+        "paymentsUnavailable": "Pembayaran investasi belum dibuka. Silakan coba lagi nanti."
+      },
+      "InsufficientBalance": {
+        "title": "Saldo tidak mencukupi",
+        "paragraphs": {
+          "balanceBitcoin": "Kamu hanya memiliki {balance: string} di akun Bitcoin-mu.",
+          "balanceDollar": "Kamu hanya memiliki {balance: string} di akun Dolar-mu.",
+          "body2": "Setor lebih dari {shortfall: string} ke akunmu untuk mencapai jumlah investasi sebesar {investmentAmount: string}.",
+          "body3": "Pastikan seluruh jumlah berada di salah satu akunmu; Bitcoin atau Dolar."
+        },
+        "buttonText": "Setor",
+        "splitFunds": {
+          "title": "Dana Anda terbagi",
+          "body": "Anda punya cukup untuk berinvestasi, tetapi tersebar di akun Bitcoin dan Dolar Anda. Konversikan agar seluruh jumlahnya ada di salah satunya."
+        }
+      },
+      "DepositPending": {
+        "message": "Menunggu setoranmu diselesaikan; harap tunggu 2 konfirmasi di rantai.",
+        "buttonText": "Oke"
+      },
       "PersonalInformation": {
         "title": "Langkah terakhir",
         "fields": {
@@ -3785,17 +3844,17 @@
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
       "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
-      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
-      "password": "Kata sandi",
+      "encryptCheckbox": "Tambahkan frasa sandi tambahan",
+      "password": "Frasa sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
-      "confirmPassword": "Konfirmasi kata sandi",
-      "confirmPasswordPlaceholder": "Masukkan kata sandi lagi",
+      "confirmPassword": "Konfirmasi frasa sandi",
+      "confirmPasswordPlaceholder": "Masukkan frasa sandi lagi",
       "continueButton": "Lanjutkan",
       "importantTitle": "Penting",
-      "importantMessage": "Blink tidak menyimpan kata sandi ini. Jika Anda kehilangannya, {bold} memulihkan dompet Anda.",
+      "importantMessage": "Blink tidak menyimpan frasa sandi ini. Jika Anda kehilangannya, {bold} memulihkan dompet Anda.",
       "importantMessageBold": "kami tidak akan bisa",
       "passwordTooShort": "Minimal 12 karakter",
-      "passwordMismatch": "Kata sandi tidak cocok",
+      "passwordMismatch": "Frasa sandi tidak cocok",
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
       "signInFailed": "Gagal masuk ke {provider}",
@@ -3862,6 +3921,7 @@
       "newBitcoinBalance": "Saldo Bitcoin baru",
       "newDollarBalance": "Saldo Dolar baru",
       "dollarBalanceNotAvailable": "tidak tersedia",
+      "lnAddressNotMoved": "Alamat Lightning Anda tidak dapat dipindahkan. Dana Anda tetap akan ditransfer.",
       "networkFee": "Biaya jaringan: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Biaya jaringan: <bold>{fee: string}</bold> (ditanggung oleh Blink)",
       "retryCta": "Coba lagi",
@@ -3910,8 +3970,18 @@
     "explainerCheck5": "Akun Anda akan dikenakan biaya jaringan Spark",
     "explainerCta": "Saya mengerti",
     "transferringFunds": "Mentransfer dana Anda. Seharusnya selesai dalam beberapa detik.",
+    "transferInProgress": {
+      "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis."
+    },
     "transferDelayed": {
       "body": "Dana Anda sedang dalam perjalanan ke akun baru Anda. Ini memakan waktu lebih lama dari biasanya — biarkan aplikasi tetap terbuka dan kami akan menyelesaikannya secara otomatis.",
+      "contactSupportCta": "Hubungi dukungan"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Kami tidak dapat membaca progres migrasi Anda dari perangkat ini. Tidak ada yang hilang — dana Anda aman dan progres Anda masih tersimpan.",
+      "outOfSpaceBody": "Perangkat Anda tidak memiliki sisa ruang penyimpanan, sehingga kami tidak dapat membaca progres migrasi Anda. Kosongkan ruang lalu coba lagi. Tidak ada yang hilang — dana Anda aman.",
+      "notSavedBody": "Kami tidak dapat menyimpan progres migrasi Anda di perangkat ini. Tidak ada yang hilang: dana Anda aman. Coba lagi.",
+      "notSavedOutOfSpaceBody": "Perangkat Anda tidak memiliki sisa ruang penyimpanan, sehingga kami tidak dapat menyimpan progres migrasi Anda. Kosongkan ruang lalu coba lagi. Tidak ada yang hilang: dana Anda aman.",
       "contactSupportCta": "Hubungi dukungan"
     },
     "clockOutOfSync": {
@@ -3968,8 +4038,8 @@
     "restore": "Pulihkan dompet",
     "noBackupFound": "Cadangan tidak ditemukan",
     "noBackupDescription": "Kami tidak dapat menemukan cadangan. Anda dapat memasukkan frasa cadangan secara manual.",
-    "enterPassword": "Masukkan kata sandi enkripsi Anda",
-    "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
+    "enterPassword": "Masukkan frasa sandi enkripsi Anda",
+    "wrongPassword": "Frasa sandi salah. Silakan coba lagi.",
     "pickBackupTitle": "Pilih dompet",
     "pickBackupDescription": "Pilih cadangan untuk dipulihkan",
     "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
@@ -3983,6 +4053,81 @@
     "modalTitle": "Amankan dana Anda",
     "modalDescription": "Kami sangat menyarankan Anda untuk mencadangkan dompet Anda untuk mencegah kehilangan total dana jika Anda kehilangan perangkat ini.",
     "secureMe": "Amankan dompet"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Atur otentikasi dua faktor",
+    "cardDescription": "Lindungi akun Anda dari akses yang tidak sah.",
+    "cardCta": "Atur",
+    "settingsDescription": "Lindungi akun Anda dari akses yang tidak sah dengan mengaturnya.",
+    "setupTitle": "Atur otentikasi dua faktor sekarang",
+    "setupDescription": "Untuk mencegah akses yang tidak sah ke akun Anda, tambahkan otentikasi dua faktor sekarang.",
+    "setAuthenticator": "Atur authenticator",
+    "reminderTitle": "Tambahkan authenticator untuk melindungi dana Anda",
+    "reminderDescription": "Saldo Anda telah bertambah. Aplikasi authenticator menjaga akun Anda tetap aman, bahkan jika seseorang mendapatkan akses ke email atau ponsel Anda.",
+    "modalReminder": "Jika Anda menutupnya sekarang, pastikan untuk mengaktifkannya sesegera mungkin.",
+    "dismissTwoMore": "Anda dapat menutup ini dua kali lagi.",
+    "dismissOneMore": "Anda dapat menutup ini satu kali lagi.",
+    "dismissLast": "Ini adalah terakhir kalinya Anda dapat menutup ini.",
+    "setNow": "Atur sekarang",
+    "dontWantTo": "Saya tidak mau",
+    "highBalanceTitle": "Anda memiliki lebih dari {amount}, harap tambahkan perlindungan tambahan",
+    "protectionRequiredTitle": "Harap tambahkan perlindungan tambahan untuk tetap menggunakan Blink",
+    "protectionRequiredBody": "Semakin banyak dana yang Anda miliki, semakin penting keamanan yang lebih baik. Harap tambahkan authenticator untuk terus menggunakan Blink.",
+    "nonCustodialTitle": "Jika Anda tidak ingin mengatur otentikasi dua faktor",
+    "nonCustodialBody": "Pilihan lainnya adalah beralih ke non-kustodial. Maka Anda bertanggung jawab atas dana Anda sendiri."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Lindungi dana Anda dengan authenticator",
+    "introDescription": "Aplikasi authenticator membuat kode 6 digit baru setiap 30 detik.",
+    "takeoversTitle": "Mencegah pengambilalihan akun",
+    "takeoversDescription": "Kode hanya ada di ponsel Anda",
+    "stolenNumberTitle": "Tetap aman meski nomor Anda dicuri",
+    "stolenNumberDescription": "Meskipun seseorang berhasil mengakses email atau nomor telepon Anda, mereka tidak bisa masuk",
+    "durationTitle": "Hanya sekitar 2 menit",
+    "durationDescription": "Kami akan memandu Anda langkah demi langkah",
+    "getStarted": "Mulai",
+    "appsTitle": "Dapatkan aplikasi authenticator",
+    "appsDescription": "Aplikasi authenticator apa pun bisa digunakan. Yang berikut ini gratis dan tepercaya:",
+    "googleAuthenticatorDescription": "Sederhana dan banyak digunakan. Cadangan opsional ke akun Google Anda.",
+    "protonAuthenticatorDescription": "Sumber terbuka. Cadangan dan sinkronisasi terenkripsi ujung ke ujung.",
+    "twoFasAuthDescription": "Sumber terbuka. Tidak perlu akun.",
+    "get": "Unduh",
+    "storeNote": "“Unduh” membuka App Store atau Google Play. Kembali ke Blink setelah aplikasi terpasang.",
+    "haveAnApp": "Saya sudah punya aplikasi",
+    "keyInstruction": "Salin kunci penyiapan ini ke aplikasi authenticator Anda.",
+    "qrInstruction": "Menggunakan perangkat lain?\nPindai kode QR ini sebagai gantinya.",
+    "backupTitle": "Cadangkan kunci Anda",
+    "backupDescription": "Jika ponsel Anda hilang, kunci ini memungkinkan Anda menyiapkan kembali authenticator Anda. Simpan di tempat selain ponsel ini.",
+    "saveToPasswordManager": "Simpan ke pengelola kata sandi",
+    "shareToPasswordManager": "Bagikan ke pengelola kata sandi",
+    "copyForManualBackup": "Salin untuk cadangan manual",
+    "passwordManagerUnavailable": "Tidak ada pengelola kata sandi di perangkat ini. Salin kuncinya untuk cadangan manual sebagai gantinya.",
+    "savedIt": "Saya sudah menyimpannya",
+    "keyBackupText": "Kunci penyiapan authenticator Blink\n\nAkun: {account}\nKunci penyiapan: {key}\n\nJika ponsel Anda hilang, tambahkan kunci penyiapan ini ke aplikasi authenticator untuk mendapatkan kembali kode masuk Blink Anda. Siapa pun yang memiliki kunci ini dapat membuat kode Anda, jadi rahasiakan kunci ini.",
+    "protectedTitle": "Akun Anda kini terlindungi",
+    "protectedDescription": "Mulai sekarang, untuk masuk diperlukan kode sekali pakai dari aplikasi authenticator Anda.",
+    "newPhoneTip": "Jika Anda mendapat ponsel baru, pindahkan authenticator ke ponsel tersebut <bold>sebelum</bold> Anda mengatur ulang ponsel lama.",
+    "done": "Selesai"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Aktif",
+    "statusDisabled": "2FA: Nonaktif",
+    "modalTitle": "Kami tidak menyarankan menonaktifkan 2FA",
+    "modalBody": "Ini akan menurunkan keamanan akun Anda dan memudahkan pihak ketiga mengakses akun Anda tanpa izin Anda.",
+    "keepProtected": "Tetap lindungi saya",
+    "codeInstruction": "Masukkan kode 6 digit dari aplikasi autentikator Anda untuk menonaktifkan autentikasi dua faktor.",
+    "codeInvalid": "Kode itu salah. Masukkan kode terbaru dari aplikasi autentikator Anda.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Coba lagi dalam satu jam.",
+    "manualResetTitle": "Reset 2FA manual",
+    "manualResetBody": "Demi perlindungan Anda, kami tidak mengizinkan penghapusan 2FA di dalam aplikasi. Jika Anda perlu mereset 2FA, hubungi <support>Dukungan</support> kami."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Tambah email",
+    "addPhoneTitle": "Tambah nomor telepon",
+    "addEmailCode": "Untuk menambahkan email Anda, masukkan kode 6 digit dari aplikasi autentikator Anda.",
+    "addPhoneCode": "Untuk menambahkan nomor telepon Anda, masukkan kode 6 digit dari aplikasi autentikator Anda.",
+    "codeInvalid": "Kode itu salah. Masukkan kode terbaru dari aplikasi autentikator Anda.",
+    "tooManyAttempts": "Terlalu banyak percobaan. Coba lagi dalam satu jam."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4083,9 +4228,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Tidak dapat memuat biaya jaringan. Periksa koneksi Anda dan coba lagi.",
     "refundNow": "Kembalikan sekarang",

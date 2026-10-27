@@ -2426,9 +2426,9 @@
     "time": "Време",
     "type": "Тип",
     "feeTier": "Приоритет трансакције",
-    "fast": "Брзо",
-    "medium": "Средње",
-    "slow": "Споро",
+    "fast": "Приоритетно",
+    "medium": "Стандардно",
+    "slow": "Економично",
     "recommended": "Препоручено",
     "walletOffline": "Ваш новчаник је офлајн. Проверите везу и покушајте поново.",
     "sdkInsufficientFunds": "Nedovoljno sredstava za ovu transakciju.",
@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nije moguće proceniti naknade. Pokušajte sa drugim iznosom."
   },
   "SettingsScreen": {
-    "createAddress": "Направи адресу",
+    "createAddress": "Направи Lightning адресу",
     "addressDisabled": "(онемогућено)",
     "donationButton": "Дугме за донирање",
     "btcpayServer": "BTCPay Server",
@@ -2455,6 +2455,7 @@
     "activated": "Активирано",
     "addressScreen": "Начини за примање плаћања",
     "nonCustodialAccount": "Не-кастодијални налог",
+    "custodialAccount": "Кастодијални налог",
     "tapUserName": "Додирните да бисте поставили корисничко име",
     "notifications": "Notifications",
     "title": "Подешавања",
@@ -2563,8 +2564,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID налога",
@@ -2617,14 +2616,11 @@
     "youGet": "Добијате"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Тајна/резервна копија",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2698,7 +2694,9 @@
     "noFee": "без накнаде",
     "fromApprox": "од ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Тренутно није могуће преузети накнаде"
+    "error": "Тренутно није могуће преузети накнаде",
+    "inactivity": "Неактивност >{months: number} месеци",
+    "usdPerMonth": "{amount: string}/месечно"
   },
   "TransactionLimitsScreen": {
     "receive": "Прими",
@@ -3685,6 +3683,67 @@
         "codingBackend": "...кодирамо бекенд",
         "buttonText": "Одлично"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Добродошли да постанете део Блинка",
+          "paragraphs": {
+            "body1": "Пре него што прикупимо више средстава од професионалних инвеститора, одлучили смо да проширимо позивницу породици Блинк, нашим суперкорисницима и подржаваоцима. Зашто доводити странце кад прво можемо позвати некога попут вас?",
+            "body2": "Ово је лична позивница. Молимо не прослеђујте је и не делите јавно."
+          }
+        },
+        "buttonText": "Настави"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Колико бисте желели да уложите?",
+        "percent": "за ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Процена компаније",
+          "paragraphs": {
+            "body1": "У овом инвестиционом кругу, пре-мани процена Блинка је 10 милиона долара.",
+            "body2": "Могли бисмо да прикупимо средства по вишој цени од VC-ова. Међутим, видимо дугорочне обостране користи у партнерству са нашим суперкорисницима. Стога вам нудимо ову понуду под бољим условима."
+          }
+        },
+        "buttonText": "Разумем"
+      },
+      "TermSheet": {
+        "title": "Услови",
+        "equitySection": {
+          "title": "Удео у Блинку",
+          "investment": "Улагање од {amount: string}",
+          "valuation": "Уз пре-мани процену од $10М",
+          "units": "Добијате {units: string} јединица ~{percent: number}% Блинка"
+        },
+        "buttonText": "Наставите на Потпис"
+      },
+      "TransferInvest": {
+        "title": "Пренесите своје улагање",
+        "paragraphs": {
+          "body1": "Потписали сте уговор о претплати за {units: string} јединица у Блинку.",
+          "body2": "Време је да пренесете износ улагања од {amount: string}. Платићете Биткоином."
+        },
+        "buttonText": "Настави",
+        "paymentsUnavailable": "Уплате за улагање још нису отворене. Покушај поново касније."
+      },
+      "InsufficientBalance": {
+        "title": "Недовољан салдо",
+        "paragraphs": {
+          "balanceBitcoin": "На свом Bitcoin рачуну имаш само {balance: string}.",
+          "balanceDollar": "На свом доларском рачуну имаш само {balance: string}.",
+          "body2": "Уплати више од {shortfall: string} на свој рачун да би достигао износ улагања од {investmentAmount: string}.",
+          "body3": "Увери се да је цео износ на једном од твојих рачуна; Bitcoin или долар."
+        },
+        "buttonText": "Уплати",
+        "splitFunds": {
+          "title": "Ваша средства су подељена",
+          "body": "Имате довољно за улагање, али је подељено између Bitcoin и Долар рачуна. Конвертујте тако да цео износ буде на једном од њих."
+        }
+      },
+      "DepositPending": {
+        "message": "Чека се намирење твог депозита; сачекај 2 потврде на ланцу.",
+        "buttonText": "У реду"
+      },
       "PersonalInformation": {
         "title": "Последњи корак",
         "fields": {
@@ -3785,17 +3844,17 @@
     "CloudBackup": {
       "title": "Направимо резервну копију вашег новчаника",
       "description": "Сачуваћемо копију ваше фразе за опоравак у вашем {provider}.",
-      "encryptCheckbox": "Шифрујте додатном лозинком",
-      "password": "Лозинка",
+      "encryptCheckbox": "Додајте додатну приступну фразу",
+      "password": "Приступна фраза",
       "passwordPlaceholder": "(најмање 12 знакова)",
-      "confirmPassword": "Потврдите лозинку",
-      "confirmPasswordPlaceholder": "Унесите лозинку поново",
+      "confirmPassword": "Потврдите приступну фразу",
+      "confirmPasswordPlaceholder": "Унесите приступну фразу поново",
       "continueButton": "Настави",
       "importantTitle": "Важно",
-      "importantMessage": "Blink не чува ову лозинку. Ако је изгубите, {bold} да повратимо ваш новчаник.",
+      "importantMessage": "Blink не чува ову приступну фразу. Ако је изгубите, {bold} да повратимо ваш новчаник.",
       "importantMessageBold": "нећемо моћи",
       "passwordTooShort": "Најмање 12 знакова",
-      "passwordMismatch": "Лозинке се не подударају",
+      "passwordMismatch": "Приступне фразе се не подударају",
       "uploadSuccess": "Резервна копија сачувана у {provider}",
       "uploadFailed": "Отпремање резервне копије није успело",
       "signInFailed": "Пријављивање на {provider} није успело",
@@ -3862,6 +3921,7 @@
       "newBitcoinBalance": "Нови Bitcoin салдо",
       "newDollarBalance": "Нови доларски салдо",
       "dollarBalanceNotAvailable": "није доступно",
+      "lnAddressNotMoved": "Вашу Lightning адресу није било могуће преместити. Ваша средства ће свеједно бити пренета.",
       "networkFee": "Мрежна накнада: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Мрежна накнада: <bold>{fee: string}</bold> (сноси Blink)",
       "retryCta": "Покушај поново",
@@ -3910,8 +3970,18 @@
     "explainerCheck5": "Са твог налога биће наплаћена мрежна накнада Spark",
     "explainerCta": "Разумем",
     "transferringFunds": "Пребацујемо ваша средства. Требало би да буде готово за неколико секунди.",
+    "transferInProgress": {
+      "body": "Ваша средства су на путу ка вашем новом налогу. Држите апликацију отвореном и аутоматски ћемо завршити."
+    },
     "transferDelayed": {
       "body": "Ваша средства су на путу ка вашем новом налогу. Траје дуже него обично — држите апликацију отвореном и аутоматски ћемо завршити.",
+      "contactSupportCta": "Контактирајте подршку"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Нисмо могли да прочитамо напредак ваше миграције са овог уређаја. Ништа није изгубљено: ваша средства су безбедна, а напредак је и даље сачуван.",
+      "outOfSpaceBody": "На вашем уређају нема слободног простора, па не можемо да прочитамо напредак ваше миграције. Ослободите простор и покушајте поново. Ништа није изгубљено: ваша средства су безбедна.",
+      "notSavedBody": "Нисмо могли да сачувамо напредак ваше миграције на овом уређају. Ништа није изгубљено: ваша средства су безбедна. Покушајте поново.",
+      "notSavedOutOfSpaceBody": "На вашем уређају нема слободног простора, па не можемо да сачувамо напредак ваше миграције. Ослободите простор и покушајте поново. Ништа није изгубљено: ваша средства су безбедна.",
       "contactSupportCta": "Контактирајте подршку"
     },
     "clockOutOfSync": {
@@ -3968,8 +4038,8 @@
     "restore": "Обнови новчаник",
     "noBackupFound": "Резервна копија није пронађена",
     "noBackupDescription": "Нисмо пронашли резервну копију. Можете унети безбедносну фразу ручно.",
-    "enterPassword": "Унесите лозинку за шифровање",
-    "wrongPassword": "Нетачна лозинка. Покушајте поново.",
+    "enterPassword": "Унесите приступну фразу за шифровање",
+    "wrongPassword": "Нетачна приступна фраза. Покушајте поново.",
     "pickBackupTitle": "Изаберите новчаник",
     "pickBackupDescription": "Изаберите резервну копију за враћање",
     "recognizePhraseTitle": "Да ли препознајете ову фразу за резервну копију?",
@@ -3983,6 +4053,81 @@
     "modalTitle": "Obezbedite svoja sredstva",
     "modalDescription": "Preporučujemo da napravite rezervnu kopiju novčanika kako biste sprečili potpuni gubitak sredstava u slučaju da izgubite ovaj uređaj.",
     "secureMe": "Obezbedi novčanik"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Подесите двофакторску аутентификацију",
+    "cardDescription": "Заштитите свој налог од неовлашћеног приступа.",
+    "cardCta": "Подеси",
+    "settingsDescription": "Заштитите свој налог од неовлашћеног приступа тако што ћете је подесити.",
+    "setupTitle": "Подесите двофакторску аутентификацију сада",
+    "setupDescription": "Да бисте спречили неовлашћени приступ свом налогу, додајте двофакторску аутентификацију сада.",
+    "setAuthenticator": "Подеси аутентификатор",
+    "reminderTitle": "Додајте аутентификатор да заштитите своја средства",
+    "reminderDescription": "Ваше стање је порасло. Апликација за аутентификацију чува ваш налог безбедним, чак и ако неко дође до вашег имејла или телефона.",
+    "modalReminder": "Ако ово сада одбаците, обавезно га укључите што пре.",
+    "dismissTwoMore": "Ово можете одбацити још два пута.",
+    "dismissOneMore": "Ово можете одбацити још једном.",
+    "dismissLast": "Ово је последњи пут да ово можете одбацити.",
+    "setNow": "Подеси сада",
+    "dontWantTo": "Не желим",
+    "highBalanceTitle": "Имате више од {amount}, молимо додајте додатну заштиту",
+    "protectionRequiredTitle": "Молимо додајте додатну заштиту да бисте наставили да користите Blink",
+    "protectionRequiredBody": "Што више средстава имате, то је боља безбедност важнија. Молимо додајте аутентификатор да бисте наставили да користите Blink.",
+    "nonCustodialTitle": "Ако не желите да подесите двофакторску аутентификацију",
+    "nonCustodialBody": "Друга опција је прелазак на некастодијални режим. Тада сте сами одговорни за своја средства."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Заштитите своја средства аутентификатором",
+    "introDescription": "Апликација за аутентификацију прави нови шестоцифрени код на сваких 30 секунди.",
+    "takeoversTitle": "Спречава преузимање налога",
+    "takeoversDescription": "Код постоји само на вашем телефону",
+    "stolenNumberTitle": "Будите безбедни чак и ако вам украду број",
+    "stolenNumberDescription": "Чак и ако неко дође до вашег имејла или броја телефона, неће моћи да се пријави",
+    "durationTitle": "Траје око 2 минута",
+    "durationDescription": "Водићемо вас корак по корак",
+    "getStarted": "Започни",
+    "appsTitle": "Набавите апликацију за аутентификацију",
+    "appsDescription": "Ради било која апликација за аутентификацију. Ове су бесплатне и поуздане:",
+    "googleAuthenticatorDescription": "Једноставна и широко коришћена. Опциона резервна копија на ваш Google налог.",
+    "protonAuthenticatorDescription": "Отвореног кода. Резервна копија и синхронизација са шифровањем с краја на крај.",
+    "twoFasAuthDescription": "Отвореног кода. Није потребан налог.",
+    "get": "Преузми",
+    "storeNote": "„Преузми“ отвара App Store или Google Play. Вратите се у Blink када се апликација инсталира.",
+    "haveAnApp": "Имам апликацију",
+    "keyInstruction": "Копирајте овај кључ за подешавање у своју апликацију за аутентификацију.",
+    "qrInstruction": "Користите други уређај?\nУместо тога скенирајте овај QR код.",
+    "backupTitle": "Направите резервну копију кључа",
+    "backupDescription": "Ако изгубите телефон, овај кључ вам омогућава да поново подесите аутентификатор. Сачувајте га негде другде, а не на овом телефону.",
+    "saveToPasswordManager": "Сачувај у менаџер лозинки",
+    "shareToPasswordManager": "Подели са менаџером лозинки",
+    "copyForManualBackup": "Копирај за ручну резервну копију",
+    "passwordManagerUnavailable": "На овом уређају није доступан менаџер лозинки. Уместо тога копирај кључ за ручну резервну копију.",
+    "savedIt": "Сачувао сам га",
+    "keyBackupText": "Blink кључ за подешавање аутентификатора\n\nНалог: {account}\nКључ за подешавање: {key}\n\nАко изгубите телефон, додајте овај кључ за подешавање у апликацију за аутентификацију да бисте повратили своје Blink кодове за пријаву. Свако ко има овај кључ може да прави ваше кодове, зато га чувајте у тајности.",
+    "protectedTitle": "Ваш налог је сада заштићен",
+    "protectedDescription": "Од сада је за пријаву потребан једнократни код из ваше апликације за аутентификацију.",
+    "newPhoneTip": "Ако набавите нови телефон, пребаците аутентификатор на њега <bold>пре</bold> него што ресетујете стари.",
+    "done": "Готово"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Укључено",
+    "statusDisabled": "2FA: Искључено",
+    "modalTitle": "Не препоручујемо искључивање 2FA",
+    "modalBody": "То би смањило безбедност вашег налога и олакшало трећој страни приступ вашем налогу без ваше дозволе.",
+    "keepProtected": "Желим да останем заштићен",
+    "codeInstruction": "Унесите 6-цифрени код из апликације за аутентификацију да бисте искључили двофакторску аутентификацију.",
+    "codeInvalid": "Тај код није тачан. Унесите тренутни код из апликације за аутентификацију.",
+    "tooManyAttempts": "Превише покушаја. Покушајте поново за сат времена.",
+    "manualResetTitle": "Ручно ресетовање 2FA",
+    "manualResetBody": "Ради ваше заштите не дозвољавамо уклањање 2FA у апликацији. Ако вам је потребно ресетовање 2FA, обратите се нашој <support>подршци</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Додај имејл",
+    "addPhoneTitle": "Додај број телефона",
+    "addEmailCode": "Да бисте додали имејл, унесите 6-цифрени код из апликације за аутентификацију.",
+    "addPhoneCode": "Да бисте додали број телефона, унесите 6-цифрени код из апликације за аутентификацију.",
+    "codeInvalid": "Тај код није тачан. Унесите тренутни код из апликације за аутентификацију.",
+    "tooManyAttempts": "Превише покушаја. Покушајте поново за сат времена."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4083,9 +4228,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Није могуће учитати мрежне накнаде. Проверите везу и покушајте поново.",
     "refundNow": "Поврат сада",

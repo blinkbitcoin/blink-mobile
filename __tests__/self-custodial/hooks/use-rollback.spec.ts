@@ -13,7 +13,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({
     nonCustodialEnabled: mockNonCustodialEnabled,
     remoteConfigReady: mockRemoteConfigReady,
-    remoteConfigTrusted: mockRemoteConfigTrusted,
+    isNonCustodialFlagSettled: mockRemoteConfigTrusted,
   }),
 }))
 

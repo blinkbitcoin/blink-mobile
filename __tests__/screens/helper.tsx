@@ -13,8 +13,35 @@ import { createTheme, ThemeProvider } from "@rn-vui/themed"
 
 import { createCache } from "../../app/graphql/cache"
 import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
-import { AccountRegistryProvider } from "../../app/hooks/use-account-registry"
+import {
+  AccountRegistryContext,
+  createCustodialDescriptor,
+  SelfCustodialIndexState,
+  type AccountRegistryResult,
+} from "../../app/hooks/use-account-registry"
 import { PersistentStateContext } from "../../app/store/persistent-state"
+
+/** The settled registry of an authed custodial account, provided statically. The real
+ *  provider reads the device twice and commits those reads after `render` returns,
+ *  which React reports as updates outside `act` in every screen test; the provider's
+ *  own behaviour is covered by __tests__/hooks/use-account-registry.spec.tsx. */
+const custodialAccount = { ...createCustodialDescriptor("Blink"), selected: true }
+
+const settledRegistry: AccountRegistryResult = {
+  accounts: [custodialAccount],
+  activeAccount: custodialAccount,
+  selfCustodialEntries: [],
+  selfCustodialIndex: SelfCustodialIndexState.Known,
+  loading: false,
+  setActiveAccountId: () => {},
+  reloadSelfCustodialAccounts: async () => {},
+}
+
+const StaticAccountRegistryProvider: React.FC<PropsWithChildren> = ({ children }) => (
+  <AccountRegistryContext.Provider value={settledRegistry}>
+    {children}
+  </AccountRegistryContext.Provider>
+)
 
 const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
   <PersistentStateContext.Provider
@@ -72,7 +99,9 @@ export const ContextForScreen: React.FC<PropsWithChildren<{ headerShown?: boolea
               <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
+                    <StaticAccountRegistryProvider>
+                      {children}
+                    </StaticAccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </PersistentStateWrapper>
@@ -96,7 +125,9 @@ export const ContextForScreenWithTheme: React.FC<
               <PersistentStateWrapper>
                 <TypesafeI18n locale={detectDefaultLocale()}>
                   <IsAuthedContextProvider value={true}>
-                    <AccountRegistryProvider>{children}</AccountRegistryProvider>
+                    <StaticAccountRegistryProvider>
+                      {children}
+                    </StaticAccountRegistryProvider>
                   </IsAuthedContextProvider>
                 </TypesafeI18n>
               </PersistentStateWrapper>

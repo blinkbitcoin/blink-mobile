@@ -2392,9 +2392,9 @@
         "time": "Time",
         "type": "Type",
         "feeTier": "Transaction priority",
-        "fast": "Fast",
-        "medium": "Medium",
-        "slow": "Slow",
+        "fast": "Priority",
+        "medium": "Standard",
+        "slow": "Economy",
         "recommended": "Recommended",
         "walletOffline": "Your wallet is offline. Please check your connection and try again.",
         "sdkInsufficientFunds": "Not enough funds for this transaction.",
@@ -2447,7 +2447,7 @@
         "modeNotSet": "Not set",
         "pos": "Point of Sale",
         "posCopied": "Your point of sale link has been copied",
-        "createAddress": "Create address",
+        "createAddress": "Create Lightning address",
         "addressDisabled": "(disabled)",
         "donationButton": "Donate Button",
         "btcpayServer": "BTCPay Server",
@@ -2455,6 +2455,7 @@
         "activated": "Activated",
         "addressScreen": "Ways to get paid",
         "nonCustodialAccount": "Non-custodial account",
+        "custodialAccount": "Custodial account",
         "tapUserName": "Tap to set username",
         "notifications": "Notifications",
         "title": "Settings",
@@ -2563,8 +2564,6 @@
         "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
         "totp": "Two-factor authentication",
         "totpDeactivated": "Two-factor authentication has been deactivated",
-        "totpDeleteAlertTitle": "Delete two-factor authentication",
-        "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
         "copiedAccountId": "Copied your account ID to clipboard",
         "yourAccountId": "Your Account ID",
         "accountId": "Account ID",
@@ -2581,14 +2580,11 @@
         "removedAccount": "You removed account {identifier: string}."
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Two-factor authentication",
-        "secret": "Secret/backup",
-        "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret."
+        "title": "Two-factor authentication"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Two-factor authentication",
-        "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-        "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nDevices on this account which are not logged in with 2FA will need to log back in.\n\nOnly level 2 accounts can be recovered by customer support in the event of lost 2FA access."
+        "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
     },
     "TotpLoginValidateScreen": {
         "title": "Two-factor authentication",
@@ -2711,7 +2707,9 @@
         "noFee": "no fee",
         "fromApprox": "from ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Unable to fetch fees at this time"
+        "error": "Unable to fetch fees at this time",
+        "inactivity": "Inactivity >{months: number} months",
+        "usdPerMonth": "{amount: string}/month"
     },
     "TransactionLimitsScreen": {
         "receive": "Receive",
@@ -3694,6 +3692,67 @@
                 "codingBackend": "...coding the backend",
                 "buttonText": "Nice"
             },
+            "WelcomeInvest": {
+                "welcomeMessage": {
+                    "title": "Welcome to become part of Blink",
+                    "paragraphs": {
+                        "body1": "Before we raise more funds from professional investors we decided to extend an invitation to the Blink family, our superusers and supporters. Why bring onboard strangers when we can first invite someone like you?",
+                        "body2": "This is a personal invitation. Please do not forward or share publicly."
+                    }
+                },
+                "buttonText": "Continue"
+            },
+            "SelectInvest": {
+                "desiredCreditLimit": "How much would you like to invest?",
+                "percent": "for ~{percent: number}%"
+            },
+            "CompanyValuation": {
+                "welcomeMessage": {
+                    "title": "Company valuation",
+                    "paragraphs": {
+                        "body1": "In this investment round the pre-money valuation of Blink is $10 million.",
+                        "body2": "We could raise at a higher price from VCs. However, we see long-term mutual benefits in partnering with our superusers. Therefore, we are extending this offer at better terms for you."
+                    }
+                },
+                "buttonText": "Got it"
+            },
+            "TermSheet": {
+                "title": "Term Sheet",
+                "equitySection": {
+                    "title": "Equity in Blink",
+                    "investment": "{amount: string} Investment",
+                    "valuation": "At $10M pre-money valuation",
+                    "units": "You receive {units: string} units ~{percent: number}% of Blink"
+                },
+                "buttonText": "Proceed to Sign"
+            },
+            "TransferInvest": {
+                "title": "Transfer your investment",
+                "paragraphs": {
+                    "body1": "You have signed the subscription agreement for {units: string} units in Blink.",
+                    "body2": "Time to transfer the investment amount of {amount: string}. You will pay with Bitcoin."
+                },
+                "buttonText": "Continue",
+                "paymentsUnavailable": "Investment payments are not open yet. Please try again later."
+            },
+            "InsufficientBalance": {
+                "title": "Insufficient balance",
+                "paragraphs": {
+                    "balanceBitcoin": "You only have {balance: string} in your Bitcoin account.",
+                    "balanceDollar": "You only have {balance: string} in your Dollar account.",
+                    "body2": "Deposit more than {shortfall: string} to your account to reach the investment amount of {investmentAmount: string}.",
+                    "body3": "Make sure that the full amount is in either of your accounts; Bitcoin or Dollar."
+                },
+                "buttonText": "Deposit",
+                "splitFunds": {
+                    "title": "Your funds are split",
+                    "body": "You have enough to invest, but it is spread across your Bitcoin and Dollar accounts. Convert so the full amount sits in one of them."
+                }
+            },
+            "DepositPending": {
+                "message": "Waiting for your deposit to settle, please wait 2 on-chain confirmations",
+                "buttonText": "Okay"
+            },
             "PersonalInformation": {
                 "title": "Final step",
                 "fields": {
@@ -3765,17 +3824,17 @@
         "CloudBackup": {
             "title": "Let's back up your wallet",
             "description": "We will save a backup of your backup phrase to your {provider: string}.",
-            "encryptCheckbox": "Encrypt with additional password",
-            "password": "Password",
+            "encryptCheckbox": "Add additional passphrase",
+            "password": "Passphrase",
             "passwordPlaceholder": "(12 characters minimum)",
-            "confirmPassword": "Confirm password",
-            "confirmPasswordPlaceholder": "Enter password again",
+            "confirmPassword": "Confirm passphrase",
+            "confirmPasswordPlaceholder": "Enter passphrase again",
             "continueButton": "Continue",
             "importantTitle": "Important",
-            "importantMessage": "Blink does not store this password. If you lose it, {bold: string} to recover your wallet.",
+            "importantMessage": "Blink does not store this passphrase. If you lose it, {bold: string} to recover your wallet.",
             "importantMessageBold": "we will not be able",
             "passwordTooShort": "Minimum 12 characters",
-            "passwordMismatch": "Passwords do not match",
+            "passwordMismatch": "Passphrases do not match",
             "existingBackupTitle": "Backup found",
             "existingBackupMessage": "A backup already exists in your {provider: string}. Do you want to overwrite it?",
             "existingBackupMessageWithDetails": "A backup already exists in your {provider: string}.\n\nLightning address: {address: string}\nCreated: {createdAt: string}\n\nDo you want to overwrite it?",
@@ -3833,8 +3892,18 @@
         "explainerCheck5": "Your account will be deducted with a Spark network fee",
         "explainerCta": "I understand",
         "transferringFunds": "Transferring your funds. It should be done in a few seconds.",
+        "transferInProgress": {
+            "body": "Your funds are on their way to your new account. Keep the app open and we'll finish up automatically."
+        },
         "transferDelayed": {
             "body": "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+            "contactSupportCta": "Contact support"
+        },
+        "storageUnavailable": {
+            "unreadableBody": "We couldn't read your migration progress from this device. Nothing is lost — your funds are safe and your progress is still saved.",
+            "outOfSpaceBody": "Your device has no storage space left, so we can't read your migration progress. Free up some space and try again. Nothing is lost — your funds are safe.",
+            "notSavedBody": "We couldn't save your migration progress on this device. Nothing is lost: your funds are safe. Try again.",
+            "notSavedOutOfSpaceBody": "Your device has no storage space left, so we can't save your migration progress. Free up some space and try again. Nothing is lost: your funds are safe.",
             "contactSupportCta": "Contact support"
         },
         "clockOutOfSync": {
@@ -3883,6 +3952,7 @@
             "newBitcoinBalance": "New Bitcoin Balance",
             "newDollarBalance": "New Dollar Balance",
             "dollarBalanceNotAvailable": "not available",
+            "lnAddressNotMoved": "Your Lightning address could not be moved. Your funds will still be transferred.",
             "networkFee": "Network fee: <bold>{fee: string}</bold>",
             "networkFeeCoveredByBlink": "Network fee: <bold>{fee: string}</bold> (covered by Blink)",
             "retryCta": "Try again",
@@ -3981,8 +4051,8 @@
         "restore": "Restore wallet",
         "noBackupFound": "No backup found",
         "noBackupDescription": "We couldn't find a backup. You can enter your backup phrase manually instead.",
-        "enterPassword": "Enter your encryption password",
-        "wrongPassword": "Incorrect password. Please try again.",
+        "enterPassword": "Enter your encryption passphrase",
+        "wrongPassword": "Incorrect passphrase. Please try again.",
         "pickBackupTitle": "Choose a wallet",
         "pickBackupDescription": "Select a backup to restore",
         "recognizePhraseTitle": "Do you recognize this backup phrase?",
@@ -3996,6 +4066,81 @@
         "modalTitle": "Secure your funds",
         "modalDescription": "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
         "secureMe": "Secure wallet"
+    },
+    "TwoFactorEnforcement": {
+        "title": "Set two-factor authentication",
+        "cardDescription": "Protect your account from unauthorized access.",
+        "cardCta": "Set",
+        "settingsDescription": "Protect your account from unauthorized access by setting it up.",
+        "setupTitle": "Set two-factor authentication now",
+        "setupDescription": "To prevent unauthorized access to your account, add two-factor authentication now.",
+        "setAuthenticator": "Set authenticator",
+        "reminderTitle": "Add an authenticator to protect your funds",
+        "reminderDescription": "Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.",
+        "modalReminder": "If you dismiss now, make sure to enable it as soon as possible.",
+        "dismissTwoMore": "You can dismiss this two more times.",
+        "dismissOneMore": "You can dismiss this one more time.",
+        "dismissLast": "This is the last time you can dismiss this.",
+        "setNow": "Set now",
+        "dontWantTo": "I don't want to",
+        "highBalanceTitle": "You have over {amount: string}, please add additional protection",
+        "protectionRequiredTitle": "Please add additional protection to keep using Blink",
+        "protectionRequiredBody": "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",
+        "nonCustodialTitle": "If you don't want to set two-factor authentication",
+        "nonCustodialBody": "The other option is to move to non-custodial. Then you are responsible for your own funds."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Protect your funds with an authenticator",
+        "introDescription": "An authenticator app makes a new 6-digit code every 30 seconds.",
+        "takeoversTitle": "Stops account takeovers",
+        "takeoversDescription": "The code lives only on your phone",
+        "stolenNumberTitle": "Be safe even if your number is stolen",
+        "stolenNumberDescription": "Even if someone gets into your email or phone number, they can't log in",
+        "durationTitle": "Takes about 2 minutes",
+        "durationDescription": "We'll guide you step by step",
+        "getStarted": "Get started",
+        "appsTitle": "Get an authenticator app",
+        "appsDescription": "Any authenticator app works. These are free and trusted:",
+        "googleAuthenticatorDescription": "Simple and widely used. Optional backup to your Google account.",
+        "protonAuthenticatorDescription": "Open source. End-to-end encrypted backup and sync.",
+        "twoFasAuthDescription": "Open source. No account needed.",
+        "get": "Get",
+        "storeNote": "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
+        "haveAnApp": "I have an app",
+        "keyInstruction": "Copy this setup key into your authenticator app.",
+        "qrInstruction": "Using another device?\nScan this QR code instead.",
+        "backupTitle": "Back up your key",
+        "backupDescription": "If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.",
+        "saveToPasswordManager": "Save to a password manager",
+        "shareToPasswordManager": "Share to a password manager",
+        "copyForManualBackup": "Copy for manual backup",
+        "passwordManagerUnavailable": "No password manager available on this device. Copy the key for a manual backup instead.",
+        "savedIt": "I've saved it",
+        "keyBackupText": "Blink authenticator setup key\n\nAccount: {account: string}\nSetup key: {key: string}\n\nIf you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.",
+        "protectedTitle": "Your account is now protected",
+        "protectedDescription": "From now on, logging in needs a one-time code from your authenticator app.",
+        "newPhoneTip": "If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.",
+        "done": "Done"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Enabled",
+        "statusDisabled": "2FA: Disabled",
+        "modalTitle": "We don't recommend disabling 2FA",
+        "modalBody": "This would lower your account's security and make it easier for a third party to access your account without your permission.",
+        "keepProtected": "Keep me protected",
+        "codeInstruction": "Enter the 6-digit code from your authenticator app to turn off two-factor authentication.",
+        "codeInvalid": "That code is incorrect. Enter the current code from your authenticator app.",
+        "tooManyAttempts": "Too many attempts. Try again in an hour.",
+        "manualResetTitle": "2FA manual reset",
+        "manualResetBody": "For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>."
+    },
+    "LoginMethodCode": {
+        "addEmailTitle": "Add email",
+        "addPhoneTitle": "Add phone number",
+        "addEmailCode": "To add your email, enter the 6-digit code from your authenticator app.",
+        "addPhoneCode": "To add your phone number, enter the 6-digit code from your authenticator app.",
+        "codeInvalid": "That code is incorrect. Enter the current code from your authenticator app.",
+        "tooManyAttempts": "Too many attempts. Try again in an hour."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
@@ -4041,9 +4186,6 @@
         "refundFailed": "Refund failed: {error}",
         "refundAddress": "Bitcoin address for refund",
         "feeRate": "Network fee",
-        "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Economy (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Couldn't load network fees. Please check your connection and try again.",
         "refundNow": "Refund now",

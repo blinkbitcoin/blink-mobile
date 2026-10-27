@@ -1,7 +1,9 @@
 /**
  * Rollback is a safety control, so it must not fail open on a launch whose Remote Config
- * fetch fails. Firebase keeps what an earlier fetch activated, and `getSource()` says
- * whether a value came from the server; that is what the provider trusts, against the real
+ * fetch fails. Firebase keeps what an earlier fetch activated, and the provider reads it
+ * whatever the fetch does; `non-custodial-flag-settled.spec.tsx` pins when the flag counts
+ * as the console's. What this pins is the two self-custody rollout values the branch reads
+ * — the rollback value and the telemetry ramp — surviving a failed fetch, against the real
  * provider rather than a copy of it.
  */
 import React from "react"
@@ -55,7 +57,7 @@ jest.mock("@app/utils/log-error", () => ({
 const FlagsProbe: React.FC = () => {
   const {
     remoteConfigReady,
-    remoteConfigTrusted,
+    isNonCustodialFlagSettled,
     nonCustodialEnabled,
     telemetryEnabled,
   } = useFeatureFlags()
@@ -63,7 +65,7 @@ const FlagsProbe: React.FC = () => {
     <Text testID="flags">
       {JSON.stringify({
         remoteConfigReady,
-        remoteConfigTrusted,
+        isNonCustodialFlagSettled,
         nonCustodialEnabled,
         telemetryEnabled,
       })}
@@ -98,7 +100,7 @@ describe("the self-custody rollout when this launch's fetch fails", () => {
     mockBooleans.nonCustodialEnabled = false
 
     expect(await settledFlags()).toMatchObject({
-      remoteConfigTrusted: true,
+      isNonCustodialFlagSettled: true,
       nonCustodialEnabled: false,
     })
   })
@@ -109,24 +111,9 @@ describe("the self-custody rollout when this launch's fetch fails", () => {
     mockBooleans.telemetryEnabled = true
 
     expect(await settledFlags()).toMatchObject({
-      remoteConfigTrusted: true,
+      isNonCustodialFlagSettled: true,
       nonCustodialEnabled: true,
       telemetryEnabled: true,
     })
-  })
-
-  it("never reads a shipped default as an answer", async () => {
-    // The default is `false` too, which is exactly why it must not count: trusting it
-    // bounced every self-custodial user to custodial on a network blip.
-    mockSources.nonCustodialEnabled = "default"
-    mockBooleans.nonCustodialEnabled = false
-
-    expect(await settledFlags()).toMatchObject({ remoteConfigTrusted: false })
-  })
-
-  it("trusts a successful fetch as before (anchor)", async () => {
-    mockFetchAndActivate.mockResolvedValue(true)
-
-    expect(await settledFlags()).toMatchObject({ remoteConfigTrusted: true })
   })
 })

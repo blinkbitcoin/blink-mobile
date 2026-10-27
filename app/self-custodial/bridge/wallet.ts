@@ -1,4 +1,5 @@
 import {
+  PaymentType,
   RegisterLightningAddressRequest,
   SyncWalletRequest,
   defaultExternalSigners,
@@ -64,6 +65,29 @@ export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: numb
     assetFilter: undefined,
     paymentDetailsFilter: undefined,
     fromTimestamp: undefined,
+    toTimestamp: undefined,
+    offset,
+    limit,
+    sortAscending: false,
+  })
+
+/** One page of the outgoing payments created at or after `fromTimestamp` (unix seconds),
+ *  newest first, in any status: what a send whose outcome the SDK lost is looked up
+ *  against. */
+export const listSentPaymentsSince = (
+  sdk: BreezSdkInterface,
+  {
+    fromTimestamp,
+    limit,
+    offset,
+  }: { fromTimestamp: bigint; limit: number; offset: number },
+) =>
+  sdk.listPayments({
+    typeFilter: [PaymentType.Send],
+    statusFilter: undefined,
+    assetFilter: undefined,
+    paymentDetailsFilter: undefined,
+    fromTimestamp,
     toTimestamp: undefined,
     offset,
     limit,

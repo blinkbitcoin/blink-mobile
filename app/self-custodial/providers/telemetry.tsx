@@ -81,7 +81,7 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
   const { activeAccount, selfCustodialEntries, selfCustodialIndex } = useAccountRegistry()
   const { accountMode } = useSelfCustodialAccountMode()
   const { persistentState, updateState } = usePersistentStateContext()
-  const { remoteConfigTrusted, telemetryEnabled } = useFeatureFlags()
+  const { isNonCustodialFlagSettled, telemetryEnabled } = useFeatureFlags()
   const { connectedAccountId, status } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
@@ -101,7 +101,7 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     activeAccount: toActiveAccountKind(accountType),
     persistedMode: toModeAnswer(accountMode),
     serverMode: toModeAnswer(serverMode),
-    remoteConfigTrusted,
+    remoteConfigTrusted: isNonCustodialFlagSettled,
     registryHydrated,
     hasSelfCustodialAccount,
   })
