@@ -19,6 +19,7 @@ const mockRefreshRecoveryBundle = jest.fn()
 const mockSyncExistingBundleToCloud = jest.fn()
 const mockIsCloudSyncAllowedFor = jest.fn()
 const mockMarkCloudSynced = jest.fn()
+const mockWithCloudBundleLock = jest.fn()
 const mockReadRecoveryBundleSettings = jest.fn()
 const mockWriteRecoveryBundleSettings = jest.fn()
 const mockLoadEncryptedBundleFile = jest.fn()
@@ -87,6 +88,7 @@ jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
   isCloudSyncAllowedFor: (...args: readonly unknown[]) =>
     mockIsCloudSyncAllowedFor(...args),
   markCloudSynced: (...args: readonly unknown[]) => mockMarkCloudSynced(...args),
+  withCloudBundleLock: (...args: readonly unknown[]) => mockWithCloudBundleLock(...args),
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
@@ -187,6 +189,10 @@ describe("useRecoveryBundleActions", () => {
     })
     mockWriteRecoveryBundleSettings.mockResolvedValue(undefined)
     mockMarkCloudSynced.mockResolvedValue(null)
+    mockWithCloudBundleLock.mockImplementation(
+      (_accountId: string, _network: string, operation: () => Promise<unknown>) =>
+        operation(),
+    )
     mockStartSession.mockResolvedValue({ success: true, session })
     mockUpload.mockResolvedValue({ success: true })
     mockShareOpen.mockResolvedValue(undefined)
@@ -402,6 +408,50 @@ describe("useRecoveryBundleActions", () => {
           type: "success",
         }),
       )
+    })
+
+    it("runs the interactive fallback inside the cloud lock for the account and network", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockWithCloudBundleLock).toHaveBeenCalledWith(
+        ACCOUNT_ID,
+        mockSparkNetwork.Regtest,
+        expect.any(Function),
+      )
+      const lockOrder = mockWithCloudBundleLock.mock.invocationCallOrder[0]
+      const sessionOrder = mockStartSession.mock.invocationCallOrder[0]
+      expect(lockOrder).toBeLessThan(sessionOrder)
+    })
+
+    it("skips the interactive upload when a revocation closed the gate while it waited for the lock", async () => {
+      mockIsCloudSyncAllowedFor.mockResolvedValueOnce(true).mockResolvedValueOnce(false)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockStartSession).not.toHaveBeenCalled()
+      expect(mockUpload).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(result.current.uploading).toBe(false)
+    })
+
+    it("does nothing once the account is deleted and the lock declines to run the upload", async () => {
+      mockWithCloudBundleLock.mockResolvedValue(undefined)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockStartSession).not.toHaveBeenCalled()
+      expect(mockToastShow).not.toHaveBeenCalled()
+      expect(result.current.uploading).toBe(false)
     })
 
     it("catches an unexpected rejection: records to crashlytics, toasts failure, and resets uploading", async () => {
