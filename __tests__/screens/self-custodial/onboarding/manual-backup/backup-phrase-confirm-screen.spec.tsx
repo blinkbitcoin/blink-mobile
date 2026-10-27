@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseConfirmScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-confirm-screen"
+import { AccountType } from "@app/types/wallet"
 import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
@@ -440,6 +441,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
   it("hands a settings re-backup over to the recovery bundle step as a re-backup", async () => {
     mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
       wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
     })
@@ -469,6 +471,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
   it("records a fresh manual backup and hands it over to the recovery bundle step", async () => {
     mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
       wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
     })
@@ -523,6 +526,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
   it("forwards the route's successMessage through the recovery bundle step", async () => {
     mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
       wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
     })
