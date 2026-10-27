@@ -58,18 +58,27 @@ const ClientOperation = {
   ListQuery: "list query",
   Upload: "upload",
   Download: "download",
+  Delete: "delete",
 } as const
 
 type ClientOperation = (typeof ClientOperation)[keyof typeof ClientOperation]
 
+/** fetch has no timeout of its own, and a stalled request would hold its caller
+ *  forever, along with anything queued behind it. */
+const DRIVE_REQUEST_TIMEOUT_MS = 60_000
+
 const driveFetch = async (input: string, init?: RequestInit): Promise<Response> => {
+  const controller = new AbortController()
+  const timeout = setTimeout(() => controller.abort(), DRIVE_REQUEST_TIMEOUT_MS)
   try {
-    return await fetch(input, init)
+    return await fetch(input, { ...init, signal: controller.signal })
   } catch (err) {
     throw new DriveError(
       CloudBackupErrorReason.Transient,
       `Drive network error: ${err instanceof Error ? err.message : String(err)}`,
     )
+  } finally {
+    clearTimeout(timeout)
   }
 }
 
@@ -179,4 +188,15 @@ export const downloadAppDataFile = async (
   await assertOkOrThrow(response, ClientOperation.Download)
 
   return response.text()
+}
+
+export const deleteAppDataFile = async (
+  fileId: string,
+  accessToken: string,
+): Promise<void> => {
+  const response = await driveFetch(`${DRIVE_FILES_URL}/${fileId}`, {
+    method: "DELETE",
+    headers: authHeader(accessToken),
+  })
+  await assertOkOrThrow(response, ClientOperation.Delete)
 }
