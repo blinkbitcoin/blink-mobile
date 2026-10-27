@@ -8,10 +8,13 @@ import {
   RecoveryBundleExportErrorReason,
 } from "@app/self-custodial/recovery-bundle/exporter"
 import { useRecoveryBundleRefresh } from "@app/self-custodial/hooks/use-recovery-bundle-refresh"
+import type { RefreshBundleResult } from "@app/self-custodial/recovery-bundle/refresh"
 
 const PAYMENT_DEBOUNCE_MS = 15_000
 const STARTUP_DELAY_MS = 15_000
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000
+const RETRY_BASE_DELAY_MS = 60_000
+const RETRY_MAX_DELAY_MS = 30 * 60_000
 
 const ACCOUNT_A_ID = "self-custodial-account-a"
 const ACCOUNT_B_ID = "self-custodial-account-b"
@@ -19,6 +22,7 @@ const MNEMONIC = "test mnemonic words"
 
 const mockRefreshRecoveryBundle = jest.fn()
 const mockSyncExistingBundleToCloud = jest.fn()
+const mockMarkRecoveryBundleStale = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
 const mockReadRecoveryBundleSettings = jest.fn()
 const mockGetMnemonicForAccount = jest.fn()
@@ -65,6 +69,7 @@ jest.mock("@app/self-custodial/recovery-bundle/refresh", () => {
     refreshRecoveryBundle: (...args: unknown[]) => mockRefreshRecoveryBundle(...args),
     syncExistingBundleToCloud: (...args: unknown[]) =>
       mockSyncExistingBundleToCloud(...args),
+    markRecoveryBundleStale: (...args: unknown[]) => mockMarkRecoveryBundleStale(...args),
   }
 })
 
@@ -127,6 +132,30 @@ const advance = async (ms: number) => {
   })
 }
 
+/** A refresh result the test settles by hand, to land it mid-flow. */
+const deferredRefresh = () => {
+  let resolve: (result: RefreshBundleResult) => void = () => {}
+  const promise = new Promise<RefreshBundleResult>((settle) => {
+    resolve = settle
+  })
+  return { promise, resolve }
+}
+
+const settleRefresh = async (
+  run: ReturnType<typeof deferredRefresh>,
+  result: RefreshBundleResult,
+) => {
+  await act(async () => {
+    run.resolve(result)
+  })
+  await flushMicrotasks()
+}
+
+const failedRefresh = (): RefreshBundleResult => ({
+  success: false,
+  error: new Error("operators unreachable"),
+})
+
 describe("useRecoveryBundleRefresh", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -147,6 +176,7 @@ describe("useRecoveryBundleRefresh", () => {
       state: bundleState(),
     })
     mockSyncExistingBundleToCloud.mockResolvedValue(true)
+    mockMarkRecoveryBundleStale.mockResolvedValue(undefined)
     // Fresh by default so the startup/staleness path stays quiet unless a
     // test opts into it.
     mockReadRecoveryBundleState.mockResolvedValue(bundleState())
@@ -176,6 +206,33 @@ describe("useRecoveryBundleRefresh", () => {
         // mid-run is not handed the run that fetched before it settled.
         coverageKey: "payment-1",
       })
+    })
+
+    it("marks the bundle as not covering the wallet as soon as a payment arrives, before the debounce", async () => {
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+
+      expect(mockMarkRecoveryBundleStale).toHaveBeenCalledWith(
+        ACCOUNT_A_ID,
+        mockSparkNetwork.Regtest,
+      )
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+
+    it("logs a stale mark that fails and still schedules the refresh", async () => {
+      mockMarkRecoveryBundleStale.mockRejectedValue(new Error("storage unavailable"))
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+      await advance(PAYMENT_DEBOUNCE_MS)
+
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("stale mark failed"),
+      )
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
     })
 
     it("does not schedule a second refresh after the same payment id was handled", async () => {
@@ -416,7 +473,94 @@ describe("useRecoveryBundleRefresh", () => {
     })
   })
 
+  describe("nothing to refresh", () => {
+    it("schedules nothing without a self-custodial account", async () => {
+      setActiveAccount(null)
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+      await advance(PAYMENT_DEBOUNCE_MS + STARTUP_DELAY_MS)
+
+      expect(mockReadRecoveryBundleState).not.toHaveBeenCalled()
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+
+    it("settles a payment refresh without retrying when the account has no mnemonic", async () => {
+      mockGetMnemonicForAccount.mockResolvedValue(null)
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+      await advance(RETRY_MAX_DELAY_MS)
+
+      expect(mockGetMnemonicForAccount).toHaveBeenCalledTimes(1)
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+
+    it("drops a staleness read that settles after the account changed", async () => {
+      let resolveState: (state: null) => void = () => {}
+      mockReadRecoveryBundleState.mockReturnValueOnce(
+        new Promise<null>((resolve) => {
+          resolveState = resolve
+        }),
+      )
+      const { rerender } = renderHook(() => useRecoveryBundleRefresh())
+
+      setActiveAccount(null)
+      rerender(undefined)
+      await act(async () => {
+        resolveState(null)
+      })
+      await advance(STARTUP_DELAY_MS)
+
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+
+    it("logs a staleness read that fails instead of scheduling from it", async () => {
+      mockReadRecoveryBundleState.mockRejectedValue(new Error("storage unavailable"))
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+      await advance(STARTUP_DELAY_MS)
+
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("state read failed"),
+      )
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+    })
+  })
+
   describe("failure reporting", () => {
+    it("wraps a non-Error refresh failure before recording it", async () => {
+      mockRefreshRecoveryBundle.mockResolvedValue({ success: false, error: "timeout" })
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "timeout" }),
+        "recovery-bundle-refresh",
+      )
+    })
+
+    it("wraps a non-Error thrown before the refresh before recording it", async () => {
+      mockReadRecoveryBundleSettings.mockRejectedValueOnce("settings unreadable")
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "settings unreadable" }),
+        "recovery-bundle-refresh",
+      )
+    })
+
     it("records non-benign refresh failures with crashlytics", async () => {
       const failure = new Error("operators unreachable")
       mockRefreshRecoveryBundle.mockResolvedValue({ success: false, error: failure })
@@ -447,6 +591,174 @@ describe("useRecoveryBundleRefresh", () => {
     })
   })
 
+  describe("failed refresh retry", () => {
+    it("retries a failed payment refresh after a minute although the saved bundle still reads fresh", async () => {
+      mockRefreshRecoveryBundle.mockResolvedValueOnce(failedRefresh())
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      renderHook(() => useRecoveryBundleRefresh())
+
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+
+      await advance(RETRY_BASE_DELAY_MS - 1)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+
+      await advance(1)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(2)
+      expect(mockRefreshRecoveryBundle.mock.calls[1][0]).toMatchObject({
+        coverageKey: "payment-1",
+      })
+
+      await flushMicrotasks()
+      await advance(RETRY_MAX_DELAY_MS * 2)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("doubles the retry delay per failure up to a 30 minute cap, then stops after six retries", async () => {
+      mockRefreshRecoveryBundle.mockResolvedValue(failedRefresh())
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+
+      const expectedDelays = [
+        RETRY_BASE_DELAY_MS,
+        RETRY_BASE_DELAY_MS * 2,
+        RETRY_BASE_DELAY_MS * 4,
+        RETRY_BASE_DELAY_MS * 8,
+        RETRY_BASE_DELAY_MS * 16,
+        RETRY_MAX_DELAY_MS,
+      ]
+      for (const [index, delay] of expectedDelays.entries()) {
+        await flushMicrotasks()
+        await advance(delay - 1)
+        expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(index + 1)
+        await advance(1)
+        expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(index + 2)
+      }
+
+      await flushMicrotasks()
+      await advance(RETRY_MAX_DELAY_MS * 4)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(expectedDelays.length + 1)
+    })
+
+    it("retries a refresh whose settings read throws before reaching the operators", async () => {
+      mockReadRecoveryBundleSettings.mockRejectedValueOnce(
+        new Error("storage unavailable"),
+      )
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      renderHook(() => useRecoveryBundleRefresh())
+
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "storage unavailable" }),
+        "recovery-bundle-refresh",
+      )
+
+      await advance(RETRY_BASE_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+    })
+
+    it("retries a failed startup refresh, which covers no payment", async () => {
+      mockReadRecoveryBundleState.mockResolvedValue(null)
+      mockRefreshRecoveryBundle.mockResolvedValueOnce(failedRefresh())
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+
+      await advance(STARTUP_DELAY_MS)
+      await flushMicrotasks()
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+
+      await advance(RETRY_BASE_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(2)
+      expect(mockRefreshRecoveryBundle.mock.calls[1][0].coverageKey).toBeUndefined()
+    })
+
+    it("leaves a failed refresh to the newer payment that replaced it mid-run", async () => {
+      const firstRun = deferredRefresh()
+      mockRefreshRecoveryBundle.mockReturnValueOnce(firstRun.promise)
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      const { rerender } = renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+
+      setWallet(ActiveWalletStatus.Ready, "payment-2")
+      rerender(undefined)
+      await settleRefresh(firstRun, failedRefresh())
+
+      await advance(PAYMENT_DEBOUNCE_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(2)
+      expect(mockRefreshRecoveryBundle.mock.calls[1][0]).toMatchObject({
+        coverageKey: "payment-2",
+      })
+
+      await flushMicrotasks()
+      await advance(RETRY_BASE_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("leaves a refresh that failed after the wallet left Ready to the next Ready render's staleness check", async () => {
+      const run = deferredRefresh()
+      mockRefreshRecoveryBundle.mockReturnValueOnce(run.promise)
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      const { rerender } = renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+
+      setWallet(ActiveWalletStatus.Loading, "payment-1")
+      rerender(undefined)
+      await settleRefresh(run, failedRefresh())
+      await advance(RETRY_BASE_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+
+      // The mark set when the payment arrived outlives the failed run.
+      mockReadRecoveryBundleState.mockResolvedValue(
+        bundleState({ uncoveredChangeAt: Date.now() - PAYMENT_DEBOUNCE_MS }),
+      )
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      rerender(undefined)
+      await flushMicrotasks()
+      await advance(STARTUP_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("keeps a scheduled refresh when the wallet's last payment key clears before it fires", async () => {
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      const { rerender } = renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS - 5_000)
+
+      setWallet(ActiveWalletStatus.Ready, null)
+      rerender(undefined)
+      await flushMicrotasks()
+
+      await advance(5_000)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+      expect(mockReadRecoveryBundleState).not.toHaveBeenCalled()
+    })
+
+    it("keeps an event covered when its refresh succeeds after the wallet left Ready", async () => {
+      const run = deferredRefresh()
+      mockRefreshRecoveryBundle.mockReturnValueOnce(run.promise)
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      const { rerender } = renderHook(() => useRecoveryBundleRefresh())
+      await advance(PAYMENT_DEBOUNCE_MS)
+      await flushMicrotasks()
+
+      setWallet(ActiveWalletStatus.Loading, "payment-1")
+      rerender(undefined)
+      await settleRefresh(run, { success: true, state: bundleState() })
+
+      setWallet(ActiveWalletStatus.Ready, "payment-1")
+      rerender(undefined)
+      await flushMicrotasks()
+      await advance(PAYMENT_DEBOUNCE_MS + RETRY_BASE_DELAY_MS)
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+    })
+  })
+
   describe("cloud sync of an existing bundle", () => {
     it("syncs a never-uploaded bundle when a password-protected cloud seed backup exists", async () => {
       mockUseBackupState.mockReturnValue({
@@ -468,7 +780,27 @@ describe("useRecoveryBundleRefresh", () => {
       )
     })
 
-    it("does not sync when the bundle was already uploaded", async () => {
+    it("logs a cloud sync that fails instead of throwing from the effect", async () => {
+      mockUseBackupState.mockReturnValue({
+        backupState: {
+          status: "completed",
+          method: "cloud",
+          cloudPasswordProtected: true,
+        },
+      })
+      mockReadRecoveryBundleState.mockResolvedValue(bundleState({ cloudSyncedAt: null }))
+      mockSyncExistingBundleToCloud.mockRejectedValue(new Error("drive unreachable"))
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+      await flushMicrotasks()
+
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("cloud sync failed"),
+      )
+    })
+
+    it("does not sync when the bundle on disk is the one already uploaded", async () => {
       mockUseBackupState.mockReturnValue({
         backupState: {
           status: "completed",
@@ -477,13 +809,39 @@ describe("useRecoveryBundleRefresh", () => {
         },
       })
       mockReadRecoveryBundleState.mockResolvedValue(
-        bundleState({ cloudSyncedAt: Date.now() - 60_000 }),
+        bundleState({
+          bundleCreatedAt: "2026-10-27T12:00:00.000Z",
+          cloudSyncedAt: Date.now() - 60_000,
+          cloudSyncedBundleCreatedAt: "2026-10-27T12:00:00.000Z",
+        }),
       )
 
       renderHook(() => useRecoveryBundleRefresh())
       await flushMicrotasks()
 
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+    })
+
+    it("syncs when the cloud holds an older bundle than the one on disk", async () => {
+      mockUseBackupState.mockReturnValue({
+        backupState: {
+          status: "completed",
+          method: "cloud",
+          cloudPasswordProtected: true,
+        },
+      })
+      mockReadRecoveryBundleState.mockResolvedValue(
+        bundleState({
+          bundleCreatedAt: "2026-10-27T12:00:00.000Z",
+          cloudSyncedAt: Date.now() - 60_000,
+          cloudSyncedBundleCreatedAt: "2026-10-26T09:00:00.000Z",
+        }),
+      )
+
+      renderHook(() => useRecoveryBundleRefresh())
+      await flushMicrotasks()
+
+      expect(mockSyncExistingBundleToCloud).toHaveBeenCalledTimes(1)
     })
 
     it("does not sync when cloud seed backup is not completed", async () => {
