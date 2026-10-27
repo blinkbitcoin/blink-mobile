@@ -2617,14 +2617,11 @@
     "youGet": "Ufumana"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Uqinisekiso lwezinto ezimbini",
-    "secret": "Imfihlo/ibhekap",
-    "content": "Skena le QR khowudi nge-app yakho yokuqinisekisa. Okanye, ungakopisha/uncamathisele imfihlo ngesandla."
+    "title": "Uqinisekiso lwezinto ezimbini"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
-    "enter6digitCode": "Faka ikhowudi yeedigithi ezi-6 evela kwi-app yakho yokuqinisekisa ukuze uqinisekise uqinisekiso lwezinto ezimbini.",
-    "success": "Uqinisekiso lwezinto ezimbini luvuliwe. Ngoku uya kukwazi ukuphinda ungene kuphela ngomnxeba wakho okanye i-imeyile KUNYE noqinisekiso lwezinto ezimbini.\n\nIidivayisi kule akhawunti ezingangenwanga nge-2FA ziya kufuneka ziphinde zingene.\n\nIi-akhawunti zenqanaba lesi-2 kuphela ezinokubuyiselwa ngenkxaso yabathengi ukuba ulahlekelwe kukufikelela kwe-2FA."
+    "enter6digitCode": "Faka ikhowudi yeedigithi ezi-6 evela kwi-app yakho yokuqinisekisa ukuze uqinisekise uqinisekiso lwezinto ezimbini."
   },
   "TotpLoginValidateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
@@ -4079,6 +4076,39 @@
     "protectionRequiredBody": "Okukhona unemali eninzi, kokukhona ukhuseleko olungcono lubaluleke ngakumbi. Nceda wongeze i-authenticator ukuze uqhubeke usebenzisa i-Blink.",
     "nonCustodialTitle": "Ukuba awufuni ukumisela uqinisekiso lwezinto ezimbini",
     "nonCustodialBody": "Olunye ukhetho kukufudukela kwi-non-custodial. Emva koko uyena onoxanduva lwemali yakho."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Khusela imali yakho nge-authenticator",
+    "introDescription": "I-app ye-authenticator yenza ikhowudi entsha yeedigithi ezi-6 rhoqo ngemizuzwana engama-30.",
+    "takeoversTitle": "Ithintela ukuthathwa kweakhawunti",
+    "takeoversDescription": "Ikhowudi ikwifowuni yakho kuphela",
+    "stolenNumberTitle": "Hlala ukhuselekile nokuba inombolo yakho ibiwe",
+    "stolenNumberDescription": "Nokuba umntu ungena kwi-imeyile yakho okanye kwinombolo yakho yefowuni, akanakungena kwiakhawunti yakho",
+    "durationTitle": "Kuthatha malunga nemizuzu emi-2",
+    "durationDescription": "Siza kukukhokela inyathelo ngenyathelo",
+    "getStarted": "Qalisa",
+    "appsTitle": "Fumana i-app ye-authenticator",
+    "appsDescription": "Nayiphi na i-app ye-authenticator iyasebenza. Ezi zisimahla kwaye zithembekile:",
+    "googleAuthenticatorDescription": "Ilula kwaye isetyenziswa kakhulu. Ukugcina ikopi kwiakhawunti yakho ye-Google kukhethwa nguwe.",
+    "protonAuthenticatorDescription": "Ikhowudi evulelekileyo. Ukugcina ikopi nokuvumelanisa okufihlwe ukusuka esiphelweni ukuya esiphelweni.",
+    "twoFasAuthDescription": "Ikhowudi evulelekileyo. Akufuneki iakhawunti.",
+    "get": "Khuphela",
+    "storeNote": "“Khuphela” ivula i-App Store okanye i-Google Play. Buyela kwi-Blink xa sele ifakiwe.",
+    "haveAnApp": "Ndine-app",
+    "keyInstruction": "Kopisha esi sitshixo sokumisela kwi-app yakho ye-authenticator.",
+    "qrInstruction": "Usebenzisa esinye isixhobo?\nEndaweni yoko skena le QR khowudi.",
+    "backupTitle": "Gcina ikopi yesitshixo sakho",
+    "backupDescription": "Ukuba ulahlekelwa yifowuni yakho, esi sitshixo sikuvumela ukuba uphinde umisele i-authenticator yakho. Sigcine kwenye indawo engeyiyo le fowuni.",
+    "saveToPasswordManager": "Gcina kumlawuli wezigxina",
+    "shareToPasswordManager": "Yabelana nomlawuli wezigxina",
+    "copyForManualBackup": "Kopisha ukuze ugcine ngesandla",
+    "passwordManagerUnavailable": "Akukho mlawuli wephasiwedi ukhoyo kwesi sixhobo. Kopa isitshixo ukuze wenze ikopi yokugcina ngesandla endaweni yoko.",
+    "savedIt": "Ndisigcinile",
+    "keyBackupText": "Isitshixo sokumisela i-authenticator ye-Blink\n\nIakhawunti: {account}\nIsitshixo sokumisela: {key}\n\nUkuba ulahlekelwa yifowuni yakho, yongeza esi sitshixo sokumisela kwi-app ye-authenticator ukuze ubuyisele iikhowudi zakho zokungena kwi-Blink. Nabani na onesi sitshixo angenza iikhowudi zakho, ngoko sigcine siyimfihlo.",
+    "protectedTitle": "Iakhawunti yakho ngoku ikhuselekile",
+    "protectedDescription": "Ukususela ngoku, ukungena kufuna ikhowudi yexesha elinye evela kwi-app yakho ye-authenticator.",
+    "newPhoneTip": "Ukuba ufumana ifowuni entsha, dlulisela i-authenticator yakho kuyo <bold>ngaphambi</bold> kokuba usete kwakhona endala.",
+    "done": "Kwenziwe"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

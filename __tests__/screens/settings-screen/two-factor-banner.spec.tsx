@@ -58,7 +58,7 @@ describe("TwoFactorBanner", () => {
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.title()))
 
     expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
-      prompt: "settings_banner",
+      origin: { prompt: "settings_banner" },
     })
   })
 })

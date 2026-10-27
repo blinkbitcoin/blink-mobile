@@ -2617,14 +2617,11 @@
     "youGet": "Reps"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Autentificació de dos factors",
-    "secret": "Secret/còpia de seguretat",
-    "content": "Escaneja aquest codi QR amb la teva aplicació d'autenticació. Alternativament, pots copiar/enganxar manualment el codi a la teva aplicació d'autenticació."
+    "title": "Autentificació de dos factors"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Autentificació de dos factors",
-    "enter6digitCode": "Introdueix el codi de 6 dígits de l'aplicació d'autenticació per validar la teva autenticació de dos factors.",
-    "success": "L'autenticació de dos factors s'ha habilitat. Ara només podràs tornar a iniciar la sessió amb el teu telèfon o correu electrònic i la teva autenticació de dos factors.\n\nEls dispositius d'aquest compte que no estiguin connectats amb 2FA hauran de tornar a iniciar la sessió.\n\nNomés els comptes de nivell 2 poden ser recuperats pel suport al client en cas de pèrdua d'accés a 2FA."
+    "enter6digitCode": "Introdueix el codi de 6 dígits de l'aplicació d'autenticació per validar la teva autenticació de dos factors."
   },
   "TotpLoginValidateScreen": {
     "title": "Autentificació de dos factors",
@@ -4079,6 +4076,39 @@
     "protectionRequiredBody": "Com més fons tens, més important és una millor seguretat. Afegeix un autenticador per continuar fent servir Blink.",
     "nonCustodialTitle": "Si no vols configurar l'autenticació de dos factors",
     "nonCustodialBody": "L'altra opció és passar a no custodiat. Llavors ets responsable dels teus propis fons."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Protegeix els teus fons amb un autenticador",
+    "introDescription": "Una aplicació d'autenticació genera un codi nou de 6 dígits cada 30 segons.",
+    "takeoversTitle": "Evita el segrest del compte",
+    "takeoversDescription": "El codi només existeix al teu telèfon",
+    "stolenNumberTitle": "Estigues segur encara que et robin el número",
+    "stolenNumberDescription": "Encara que algú accedeixi al teu correu electrònic o al teu número de telèfon, no podrà iniciar la sessió",
+    "durationTitle": "Triga uns 2 minuts",
+    "durationDescription": "Et guiarem pas a pas",
+    "getStarted": "Comença",
+    "appsTitle": "Aconsegueix una aplicació d'autenticació",
+    "appsDescription": "Qualsevol aplicació d'autenticació funciona. Aquestes són gratuïtes i de confiança:",
+    "googleAuthenticatorDescription": "Senzilla i molt utilitzada. Còpia de seguretat opcional al teu compte de Google.",
+    "protonAuthenticatorDescription": "Codi obert. Còpia de seguretat i sincronització amb xifratge d'extrem a extrem.",
+    "twoFasAuthDescription": "Codi obert. No cal cap compte.",
+    "get": "Obtén",
+    "storeNote": "«Obtén» obre l'App Store o Google Play. Torna a Blink quan estigui instal·lada.",
+    "haveAnApp": "Ja tinc una aplicació",
+    "keyInstruction": "Copia aquesta clau de configuració a la teva aplicació d'autenticació.",
+    "qrInstruction": "Fas servir un altre dispositiu?\nEn comptes d'això, escaneja aquest codi QR.",
+    "backupTitle": "Fes una còpia de seguretat de la clau",
+    "backupDescription": "Si perds el telèfon, aquesta clau et permet tornar a configurar l'autenticador. Desa-la en un lloc que no sigui aquest telèfon.",
+    "saveToPasswordManager": "Desa en un gestor de contrasenyes",
+    "shareToPasswordManager": "Comparteix amb un gestor de contrasenyes",
+    "copyForManualBackup": "Copia per a una còpia de seguretat manual",
+    "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Copia la clau per fer una còpia de seguretat manual.",
+    "savedIt": "Ja l'he desada",
+    "keyBackupText": "Clau de configuració de l'autenticador de Blink\n\nCompte: {account}\nClau de configuració: {key}\n\nSi perds el telèfon, afegeix aquesta clau de configuració a una aplicació d'autenticació per recuperar els teus codis d'inici de sessió de Blink. Qualsevol persona amb aquesta clau pot generar els teus codis, així que mantén-la en privat.",
+    "protectedTitle": "El teu compte ja està protegit",
+    "protectedDescription": "A partir d'ara, per iniciar la sessió caldrà un codi d'un sol ús de la teva aplicació d'autenticació.",
+    "newPhoneTip": "Si canvies de telèfon, passa l'autenticador al nou <bold>abans</bold> de restablir l'antic.",
+    "done": "Fet"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

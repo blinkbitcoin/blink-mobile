@@ -2617,14 +2617,11 @@
     "youGet": "Získáte"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Dvoufaktorové ověření",
-    "secret": "Tajný klíč/záloha",
-    "content": "Naskenujte tento QR kód pomocí aplikace autentizátoru. Případně můžete tajný kód do aplikace authenticator zkopírovat/vložit ručně."
+    "title": "Dvoufaktorové ověření"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Dvoufaktorové ověření",
-    "enter6digitCode": "Zadejte 6-místný kód z aplikace autentizátoru a ověřte dvoufaktorové ověření.",
-    "success": "Bylo povoleno dvoufaktorové ověřování. Nyní se budete moci znovu přihlásit pouze pomocí telefonu nebo e-mailu A dvoufaktorového ověření.\n\nV případě, že uživatel ztratil přístup ke svému dvoufaktorovému ověřování, lze obnovit pouze plné účty KYC."
+    "enter6digitCode": "Zadejte 6-místný kód z aplikace autentizátoru a ověřte dvoufaktorové ověření."
   },
   "TotpLoginValidateScreen": {
     "title": "Dvoufaktorové ověření",
@@ -4079,6 +4076,39 @@
     "protectionRequiredBody": "Čím více prostředků máte, tím důležitější je lepší zabezpečení. Pro další používání Blinku prosím přidejte autentikátor.",
     "nonCustodialTitle": "Pokud nechcete nastavit dvoufaktorové ověření",
     "nonCustodialBody": "Druhou možností je přejít na nesvěřenecký režim. Pak za své prostředky odpovídáte sami."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Chraňte své prostředky autentikátorem",
+    "introDescription": "Autentikační aplikace vytváří každých 30 sekund nový 6místný kód.",
+    "takeoversTitle": "Zabraňuje převzetí účtu",
+    "takeoversDescription": "Kód existuje jen ve vašem telefonu",
+    "stolenNumberTitle": "V bezpečí, i když vám ukradnou číslo",
+    "stolenNumberDescription": "I když se někdo dostane k vašemu e-mailu nebo telefonnímu číslu, nepřihlásí se",
+    "durationTitle": "Zabere asi 2 minuty",
+    "durationDescription": "Provedeme vás krok za krokem",
+    "getStarted": "Začít",
+    "appsTitle": "Získejte autentikační aplikaci",
+    "appsDescription": "Funguje jakákoli autentikační aplikace. Tyto jsou zdarma a důvěryhodné:",
+    "googleAuthenticatorDescription": "Jednoduchá a široce používaná. Volitelná záloha do vašeho účtu Google.",
+    "protonAuthenticatorDescription": "Otevřený zdrojový kód. Záloha a synchronizace s koncovým šifrováním.",
+    "twoFasAuthDescription": "Otevřený zdrojový kód. Nepotřebuje účet.",
+    "get": "Stáhnout",
+    "storeNote": "„Stáhnout“ otevře App Store nebo Google Play. Po instalaci se vraťte do Blinku.",
+    "haveAnApp": "Aplikaci už mám",
+    "keyInstruction": "Zkopírujte tento klíč pro nastavení do své autentikační aplikace.",
+    "qrInstruction": "Používáte jiné zařízení?\nNaskenujte místo toho tento QR kód.",
+    "backupTitle": "Zálohujte svůj klíč",
+    "backupDescription": "Pokud ztratíte telefon, tento klíč vám umožní autentikátor znovu nastavit. Uložte ho jinam než do tohoto telefonu.",
+    "saveToPasswordManager": "Uložit do správce hesel",
+    "shareToPasswordManager": "Sdílet do správce hesel",
+    "copyForManualBackup": "Zkopírovat pro ruční zálohu",
+    "passwordManagerUnavailable": "V tomto zařízení není k dispozici žádný správce hesel. Místo toho zkopírujte klíč pro ruční zálohu.",
+    "savedIt": "Mám ho uložený",
+    "keyBackupText": "Klíč pro nastavení autentikátoru Blink\n\nÚčet: {account}\nKlíč pro nastavení: {key}\n\nPokud ztratíte telefon, přidejte tento klíč pro nastavení do autentikační aplikace a získáte zpět své přihlašovací kódy pro Blink. Kdokoli s tímto klíčem může vytvářet vaše kódy, proto ho uchovejte v soukromí.",
+    "protectedTitle": "Váš účet je nyní chráněn",
+    "protectedDescription": "Od teď budete k přihlášení potřebovat jednorázový kód z autentikační aplikace.",
+    "newPhoneTip": "Pokud si pořídíte nový telefon, přeneste na něj autentikátor <bold>předtím</bold>, než resetujete ten starý.",
+    "done": "Hotovo"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

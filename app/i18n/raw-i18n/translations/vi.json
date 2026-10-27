@@ -2617,14 +2617,11 @@
     "youGet": "Bạn nhận được"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Khóa bí mật/sao lưu",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -4079,6 +4076,39 @@
     "protectionRequiredBody": "Bạn càng có nhiều tiền, bảo mật tốt hơn càng quan trọng. Vui lòng thêm ứng dụng xác thực để tiếp tục sử dụng Blink.",
     "nonCustodialTitle": "Nếu bạn không muốn thiết lập xác thực hai yếu tố",
     "nonCustodialBody": "Lựa chọn khác là chuyển sang không lưu ký. Khi đó bạn tự chịu trách nhiệm về tiền của mình."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Bảo vệ tiền của bạn bằng ứng dụng xác thực",
+    "introDescription": "Ứng dụng xác thực tạo một mã 6 chữ số mới sau mỗi 30 giây.",
+    "takeoversTitle": "Ngăn chặn chiếm đoạt tài khoản",
+    "takeoversDescription": "Mã chỉ có trên điện thoại của bạn",
+    "stolenNumberTitle": "An toàn ngay cả khi số điện thoại bị đánh cắp",
+    "stolenNumberDescription": "Ngay cả khi ai đó truy cập được email hoặc số điện thoại của bạn, họ cũng không thể đăng nhập",
+    "durationTitle": "Chỉ mất khoảng 2 phút",
+    "durationDescription": "Chúng tôi sẽ hướng dẫn bạn từng bước",
+    "getStarted": "Bắt đầu",
+    "appsTitle": "Tải ứng dụng xác thực",
+    "appsDescription": "Ứng dụng xác thực nào cũng dùng được. Các ứng dụng sau đây miễn phí và đáng tin cậy:",
+    "googleAuthenticatorDescription": "Đơn giản và được dùng rộng rãi. Tùy chọn sao lưu vào tài khoản Google của bạn.",
+    "protonAuthenticatorDescription": "Mã nguồn mở. Sao lưu và đồng bộ được mã hóa đầu cuối.",
+    "twoFasAuthDescription": "Mã nguồn mở. Không cần tài khoản.",
+    "get": "Tải về",
+    "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
+    "haveAnApp": "Tôi đã có ứng dụng",
+    "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
+    "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
+    "backupTitle": "Sao lưu khóa của bạn",
+    "backupDescription": "Nếu bạn mất điện thoại, khóa này giúp bạn thiết lập lại ứng dụng xác thực. Hãy lưu nó ở nơi khác ngoài điện thoại này.",
+    "saveToPasswordManager": "Lưu vào trình quản lý mật khẩu",
+    "shareToPasswordManager": "Chia sẻ với trình quản lý mật khẩu",
+    "copyForManualBackup": "Sao chép để sao lưu thủ công",
+    "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào trên thiết bị này. Thay vào đó, hãy sao chép khóa để sao lưu thủ công.",
+    "savedIt": "Tôi đã lưu",
+    "keyBackupText": "Khóa thiết lập ứng dụng xác thực Blink\n\nTài khoản: {account}\nKhóa thiết lập: {key}\n\nNếu bạn mất điện thoại, hãy thêm khóa thiết lập này vào một ứng dụng xác thực để lấy lại mã đăng nhập Blink của bạn. Bất kỳ ai có khóa này đều có thể tạo mã của bạn, vì vậy hãy giữ bí mật.",
+    "protectedTitle": "Tài khoản của bạn hiện đã được bảo vệ",
+    "protectedDescription": "Từ giờ trở đi, việc đăng nhập cần mã dùng một lần từ ứng dụng xác thực của bạn.",
+    "newPhoneTip": "Nếu bạn đổi sang điện thoại mới, hãy chuyển ứng dụng xác thực sang máy mới <bold>trước khi</bold> đặt lại máy cũ.",
+    "done": "Xong"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

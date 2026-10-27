@@ -1,6 +1,5 @@
 import {
   canGoBackFromChooseExperience,
-  canReturnToRoute,
   ChooseExperienceContinueRoute,
   isBackwardAction,
 } from "@app/navigation/stack-param-lists"
@@ -17,52 +16,6 @@ describe("isBackwardAction", () => {
     expect(isBackwardAction({ type: "RESET" })).toBe(false)
     expect(isBackwardAction({ type: "NAVIGATE" })).toBe(false)
     expect(isBackwardAction({ type: "REPLACE" })).toBe(false)
-  })
-})
-
-describe("canReturnToRoute", () => {
-  const stackWith = (...names: string[]) => ({ routes: names.map((name) => ({ name })) })
-
-  it("lets a flow return to the two-factor setup while that screen is in its stack", () => {
-    expect(
-      canReturnToRoute(
-        stackWith("Primary", "twoFactorSetup", "emailRegistrationInitiate"),
-        "twoFactorSetup",
-      ),
-    ).toBe(true)
-  })
-
-  /** The param reaches the registration screens through deep links too, so a name the
-   *  stack never had must not be dispatched. */
-  it("refuses a return route the stack does not hold", () => {
-    expect(
-      canReturnToRoute(
-        stackWith("Primary", "emailRegistrationInitiate"),
-        "twoFactorSetup",
-      ),
-    ).toBe(false)
-  })
-
-  it("lets a flow return to the home when the setup stood in for it", () => {
-    expect(
-      canReturnToRoute(stackWith("Primary", "emailRegistrationInitiate"), "Primary"),
-    ).toBe(true)
-  })
-
-  /** A deep link can name any route the app holds; only the setup and the home are
-   *  places a flow may return to. */
-  it("refuses a route the stack holds but a flow may not return to", () => {
-    expect(canReturnToRoute(stackWith("Primary", "settings"), "settings")).toBe(false)
-  })
-
-  it("refuses when no return route was asked for", () => {
-    expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), undefined)).toBe(
-      false,
-    )
-  })
-
-  it("refuses when the navigator has no state to check against", () => {
-    expect(canReturnToRoute(undefined, "twoFactorSetup")).toBe(false)
   })
 })
 

@@ -102,16 +102,19 @@ describe("TwoFactorReminderBulletin", () => {
     )
   })
 
-  it("opens the setup from Set authenticator, telling it the bulletin opened it and why", () => {
+  /** Its button names the authenticator, so it skips the setup's choice of ways. */
+  it("opens the authenticator onboarding from Set authenticator, telling it the bulletin opened it and why", () => {
     const { getByTestId } = render(
       <TwoFactorReminderBulletin reason={TwoFactorReminderReason.FirstSessions} />,
     )
 
     fireEvent.press(getByTestId("cta-button"))
 
-    expect(mockNavigate).toHaveBeenCalledWith("twoFactorSetup", {
-      prompt: TwoFactorPrompt.ReminderBulletin,
-      reason: TwoFactorReminderReason.FirstSessions,
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
+      origin: {
+        prompt: TwoFactorPrompt.ReminderBulletin,
+        reason: TwoFactorReminderReason.FirstSessions,
+      },
     })
   })
 

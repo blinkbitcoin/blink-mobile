@@ -5,6 +5,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorNonCustodialScreen } from "@app/screens/two-factor-enforcement"
 import {
+  TwoFactorFlowParams,
   TwoFactorPrompt,
   TwoFactorPromptOrigin,
   TwoFactorTier,
@@ -19,9 +20,7 @@ const LL = i18nObject("en")
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 let mockIsFocused = true
-let mockRouteParams:
-  | { origin?: TwoFactorPromptOrigin; isOpenedFromSetupScreen?: boolean }
-  | undefined
+let mockRouteParams: TwoFactorFlowParams | undefined
 
 const MODAL_ORIGIN: TwoFactorPromptOrigin = { prompt: TwoFactorPrompt.SessionModal }
 

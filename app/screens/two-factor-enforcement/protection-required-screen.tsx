@@ -14,22 +14,15 @@ import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enf
 import { WalletCurrency } from "@app/graphql/generated"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import {
-  RegistrationReturnRoute,
-  RootStackParamList,
-} from "@app/navigation/stack-param-lists"
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useHardwareBackGuard } from "@app/screens/account-migration/hooks/use-hardware-back-guard"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { TwoFactorMethod, TwoFactorPrompt } from "@app/types/two-factor-enforcement"
+import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorPromptShown,
-  logTwoFactorSetupStarted,
 } from "@app/utils/analytics"
 import { testProps } from "@app/utils/testProps"
-
-/** The gate stands in for the home, so its flows come back to the home. */
-const GATE_RETURN_ROUTE = RegistrationReturnRoute.Primary
 
 /** The hero names the wallet that crossed, as the title does: the warning sign for the
  *  bitcoin wallet, the dollar sign for the dollar wallet. */
@@ -79,15 +72,13 @@ export const TwoFactorProtectionRequiredScreen: React.FC = () => {
    *  app go. */
   useHardwareBackGuard(undefined)
 
-  /** A flow started from the gate returns to the home, where the gate decides again
-   *  with the authenticator just added. */
+  /** The gate stands in for the home, so the onboarding closes back to the home, where
+   *  the gate decides again with the authenticator just added. */
   const handleSetAuthenticator = useCallback(() => {
-    logTwoFactorSetupStarted({ tier: unmetTier, method: TwoFactorMethod.Authenticator })
-    navigation.navigate("totpRegistrationInitiate", {
-      returnTo: GATE_RETURN_ROUTE,
-      prompt: TwoFactorPrompt.ProtectionRequiredScreen,
+    navigation.navigate("totpRegistrationIntro", {
+      origin: { prompt: TwoFactorPrompt.ProtectionRequiredScreen },
     })
-  }, [navigation, unmetTier])
+  }, [navigation])
 
   const handleMove = useCallback(() => {
     logTwoFactorNonCustodialChosen({ tier: unmetTier })

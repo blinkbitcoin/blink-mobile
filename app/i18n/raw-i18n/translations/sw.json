@@ -2617,14 +2617,11 @@
     "youGet": "Unapata"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "uthibitishaji wa hatua mbili",
-    "secret": "Siri/hifadhi rudufu",
-    "content": "Skana nambari hii ya QR na programu yako ya uthibitishaji. Vinginevyo, unaweza kunakili/nakili siri kwa mikono kwenye programu yako ya uthibitishaji."
+    "title": "uthibitishaji wa hatua mbili"
   },
   "TotpRegistrationValidateScreen": {
     "title": "uthibitishaji wa hatua mbili",
-    "enter6digitCode": "Ingiza nambari ya 6-digit kutoka kwenye programu yako ya uthibitishaji kuthibitisha uthibitishaji wa hatua mbili wako.",
-    "success": "Uthibitishaji wa hatua mbili umewezeshwa. Sasa utaweza kuingia kwa kutumia namba yako ya simu au barua pepe PAMOJA NA uthibitishaji wako wa hatua mbili.\n\nVifaa kwenye akaunti hii ambavyo havijathibitishwa na 2FA itahitaji kuingia upya.\n\nAkaunti za kiwango cha 2 pekee ndizo zinazoweza kurejeshwa na msaada wa wateja kwa kupoteza upatikanaji wa 2FA."
+    "enter6digitCode": "Ingiza nambari ya 6-digit kutoka kwenye programu yako ya uthibitishaji kuthibitisha uthibitishaji wa hatua mbili wako."
   },
   "TotpLoginValidateScreen": {
     "title": "uthibitishaji wa hatua mbili",
@@ -4079,6 +4076,39 @@
     "protectionRequiredBody": "Kadiri unavyokuwa na fedha nyingi, ndivyo usalama bora unavyozidi kuwa muhimu. Tafadhali ongeza kithibitishaji ili kuendelea kutumia Blink.",
     "nonCustodialTitle": "Ikiwa hutaki kuweka uthibitishaji wa hatua mbili",
     "nonCustodialBody": "Chaguo lingine ni kuhamia kwenye usio wa udhamini. Hapo utakuwa unawajibika kwa fedha zako mwenyewe."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Linda fedha zako kwa kithibitishaji",
+    "introDescription": "Programu ya kithibitishaji hutengeneza msimbo mpya wa tarakimu 6 kila sekunde 30.",
+    "takeoversTitle": "Huzuia akaunti kutekwa",
+    "takeoversDescription": "Msimbo upo kwenye simu yako pekee",
+    "stolenNumberTitle": "Kuwa salama hata kama nambari yako imeibiwa",
+    "stolenNumberDescription": "Hata kama mtu ataingia kwenye barua pepe yako au nambari yako ya simu, hawezi kuingia kwenye akaunti yako",
+    "durationTitle": "Huchukua takriban dakika 2",
+    "durationDescription": "Tutakuongoza hatua kwa hatua",
+    "getStarted": "Anza",
+    "appsTitle": "Pata programu ya kithibitishaji",
+    "appsDescription": "Programu yoyote ya kithibitishaji inafanya kazi. Hizi ni za bure na zinaaminika:",
+    "googleAuthenticatorDescription": "Rahisi na inatumika sana. Nakala rudufu ya hiari kwenye akaunti yako ya Google.",
+    "protonAuthenticatorDescription": "Chanzo huria. Nakala rudufu na usawazishaji uliosimbwa kwa njia fiche kutoka mwanzo hadi mwisho.",
+    "twoFasAuthDescription": "Chanzo huria. Hakuna akaunti inayohitajika.",
+    "get": "Pakua",
+    "storeNote": "“Pakua” hufungua App Store au Google Play. Rudi kwenye Blink baada ya kusakinisha.",
+    "haveAnApp": "Nina programu",
+    "keyInstruction": "Nakili ufunguo huu wa kusanidi kwenye programu yako ya kithibitishaji.",
+    "qrInstruction": "Unatumia kifaa kingine?\nBadala yake changanua msimbo huu wa QR.",
+    "backupTitle": "Hifadhi nakala ya ufunguo wako",
+    "backupDescription": "Ukipoteza simu yako, ufunguo huu utakuwezesha kusanidi kithibitishaji chako tena. Uhifadhi mahali pengine tofauti na simu hii.",
+    "saveToPasswordManager": "Hifadhi kwenye kidhibiti cha nywila",
+    "shareToPasswordManager": "Shiriki kwenye kidhibiti cha nywila",
+    "copyForManualBackup": "Nakili kwa ajili ya hifadhi ya mkono",
+    "passwordManagerUnavailable": "Hakuna kidhibiti cha manenosiri kinachopatikana kwenye kifaa hiki. Nakili ufunguo kwa nakala ya ziada ya mkono badala yake.",
+    "savedIt": "Nimeuhifadhi",
+    "keyBackupText": "Ufunguo wa kusanidi kithibitishaji cha Blink\n\nAkaunti: {account}\nUfunguo wa kusanidi: {key}\n\nUkipoteza simu yako, ongeza ufunguo huu wa kusanidi kwenye programu ya kithibitishaji ili kurejesha misimbo yako ya kuingia kwenye Blink. Mtu yeyote mwenye ufunguo huu anaweza kutengeneza misimbo yako, kwa hivyo uweke siri.",
+    "protectedTitle": "Akaunti yako sasa imelindwa",
+    "protectedDescription": "Kuanzia sasa, kuingia kunahitaji msimbo wa matumizi ya mara moja kutoka kwenye programu yako ya kithibitishaji.",
+    "newPhoneTip": "Ukipata simu mpya, hamishia kithibitishaji chako kwenye simu hiyo <bold>kabla</bold> ya kuweka upya ile ya zamani.",
+    "done": "Imekamilika"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

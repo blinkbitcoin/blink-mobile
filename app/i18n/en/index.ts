@@ -2681,16 +2681,11 @@ const en: BaseTranslation = {
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
-    secret: "Secret/backup",
-    content:
-      "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.",
   },
   TotpRegistrationValidateScreen: {
     title: "Two-factor authentication",
     enter6digitCode:
       "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    success:
-      "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nDevices on this account which are not logged in with 2FA will need to log back in.\n\nOnly level 2 accounts can be recovered by customer support in the event of lost 2FA access.",
   },
   TotpLoginValidateScreen: {
     title: "Two-factor authentication",
@@ -4296,6 +4291,47 @@ const en: BaseTranslation = {
     nonCustodialTitle: "If you don't want to set two-factor authentication",
     nonCustodialBody:
       "The other option is to move to non-custodial. Then you are responsible for your own funds.",
+  },
+  AuthenticatorOnboarding: {
+    introTitle: "Protect your funds with an authenticator",
+    introDescription: "An authenticator app makes a new 6-digit code every 30 seconds.",
+    takeoversTitle: "Stops account takeovers",
+    takeoversDescription: "The code lives only on your phone",
+    stolenNumberTitle: "Be safe even if your number is stolen",
+    stolenNumberDescription:
+      "Even if someone gets into your email or phone number, they can't log in",
+    durationTitle: "Takes about 2 minutes",
+    durationDescription: "We'll guide you step by step",
+    getStarted: "Get started",
+    appsTitle: "Get an authenticator app",
+    appsDescription: "Any authenticator app works. These are free and trusted:",
+    googleAuthenticatorDescription:
+      "Simple and widely used. Optional backup to your Google account.",
+    protonAuthenticatorDescription: "Open source. End-to-end encrypted backup and sync.",
+    twoFasAuthDescription: "Open source. No account needed.",
+    get: "Get",
+    storeNote:
+      "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
+    haveAnApp: "I have an app",
+    keyInstruction: "Copy this setup key into your authenticator app.",
+    qrInstruction: "Using another device?\nScan this QR code instead.",
+    backupTitle: "Back up your key",
+    backupDescription:
+      "If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.",
+    saveToPasswordManager: "Save to a password manager",
+    shareToPasswordManager: "Share to a password manager",
+    copyForManualBackup: "Copy for manual backup",
+    passwordManagerUnavailable:
+      "No password manager available on this device. Copy the key for a manual backup instead.",
+    savedIt: "I've saved it",
+    keyBackupText:
+      "Blink authenticator setup key\n\nAccount: {account: string}\nSetup key: {key: string}\n\nIf you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.",
+    protectedTitle: "Your account is now protected",
+    protectedDescription:
+      "From now on, logging in needs a one-time code from your authenticator app.",
+    newPhoneTip:
+      "If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.",
+    done: "Done",
   },
   BackupRequired: {
     modalTitle: "Back up your wallet first",

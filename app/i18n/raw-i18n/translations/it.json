@@ -2617,14 +2617,11 @@
         "youGet": "Ricevi"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Autenticazione a due fattori",
-        "secret": "Segreto/backup",
-        "content": "Scansiona questo codice QR con la tua app di autenticazione. In alternativa, puoi copiare/incollare manualmente il segreto nella tua app di autenticazione."
+        "title": "Autenticazione a due fattori"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticazione a due fattori",
-        "enter6digitCode": "Inserisci il codice a 6 cifre dall'app di autenticazione per convalidare l'autenticazione a due fattori.",
-        "success": "L'autenticazione a due fattori è stata abilitata. Ora potrai effettuare nuovamente l'accesso solo con il tuo telefono o e-mail E con la tua autenticazione a due fattori.\n\nI dispositivi su questo account che non hanno effettuato l'accesso con 2FA dovranno effettuare nuovamente l'accesso.\n\nSolo gli account di livello 2 possono essere recuperati dall'assistenza clienti in caso di perdita dell'accesso 2FA."
+        "enter6digitCode": "Inserisci il codice a 6 cifre dall'app di autenticazione per convalidare l'autenticazione a due fattori."
     },
     "TotpLoginValidateScreen": {
         "title": "Autenticazione a due fattori",
@@ -4079,6 +4076,39 @@
         "protectionRequiredBody": "Più fondi hai, più è importante una sicurezza migliore. Aggiungi un autenticatore per continuare a usare Blink.",
         "nonCustodialTitle": "Se non vuoi impostare l'autenticazione a due fattori",
         "nonCustodialBody": "L'altra opzione è passare al non-custodial. In quel caso sei responsabile dei tuoi fondi."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Proteggi i tuoi fondi con un autenticatore",
+        "introDescription": "Un'app di autenticazione genera un nuovo codice a 6 cifre ogni 30 secondi.",
+        "takeoversTitle": "Blocca i furti di account",
+        "takeoversDescription": "Il codice esiste solo sul tuo telefono",
+        "stolenNumberTitle": "Al sicuro anche se ti rubano il numero",
+        "stolenNumberDescription": "Anche se qualcuno entra in possesso della tua email o del tuo numero di telefono, non può accedere",
+        "durationTitle": "Richiede circa 2 minuti",
+        "durationDescription": "Ti guideremo passo dopo passo",
+        "getStarted": "Inizia",
+        "appsTitle": "Scarica un'app di autenticazione",
+        "appsDescription": "Va bene qualsiasi app di autenticazione. Queste sono gratuite e affidabili:",
+        "googleAuthenticatorDescription": "Semplice e molto diffusa. Backup facoltativo sul tuo account Google.",
+        "protonAuthenticatorDescription": "A codice aperto. Backup e sincronizzazione con crittografia end-to-end.",
+        "twoFasAuthDescription": "A codice aperto. Nessun account necessario.",
+        "get": "Scarica",
+        "storeNote": "«Scarica» apre l'App Store o Google Play. Torna su Blink quando l'app è installata.",
+        "haveAnApp": "Ho già un'app",
+        "keyInstruction": "Copia questa chiave di configurazione nella tua app di autenticazione.",
+        "qrInstruction": "Usi un altro dispositivo?\nScansiona invece questo codice QR.",
+        "backupTitle": "Fai il backup della chiave",
+        "backupDescription": "Se perdi il telefono, questa chiave ti permette di configurare di nuovo l'autenticatore. Salvala in un posto diverso da questo telefono.",
+        "saveToPasswordManager": "Salva in un gestore di password",
+        "shareToPasswordManager": "Condividi con un gestore di password",
+        "copyForManualBackup": "Copia per un backup manuale",
+        "passwordManagerUnavailable": "Nessun gestore di password disponibile su questo dispositivo. Copia invece la chiave per un backup manuale.",
+        "savedIt": "L'ho salvata",
+        "keyBackupText": "Chiave di configurazione dell'autenticatore Blink\n\nAccount: {account}\nChiave di configurazione: {key}\n\nSe perdi il telefono, aggiungi questa chiave di configurazione a un'app di autenticazione per riavere i tuoi codici di accesso Blink. Chiunque abbia questa chiave può generare i tuoi codici, quindi tienila privata.",
+        "protectedTitle": "Il tuo account ora è protetto",
+        "protectedDescription": "D'ora in poi, per accedere servirà un codice monouso dalla tua app di autenticazione.",
+        "newPhoneTip": "Se prendi un nuovo telefono, trasferisci l'autenticatore sul nuovo <bold>prima</bold> di ripristinare quello vecchio.",
+        "done": "Fatto"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

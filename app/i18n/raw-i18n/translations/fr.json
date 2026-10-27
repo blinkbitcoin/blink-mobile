@@ -2617,14 +2617,11 @@
         "youGet": "Vous recevez"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Authentification à deux niveaux",
-        "secret": "Secret/sauvegarde",
-        "content": "Scanner ce code QR avec votre application d’authentification. Sinon vous pouvez copier/coller manuellement le code secret dans votre application d’authentification"
+        "title": "Authentification à deux niveaux"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Authentification à deux niveaux",
-        "enter6digitCode": "Saisir le code à 6 chiffres depuis votre application d’authentification pour valider votre authentification à deux facteurs.",
-        "success": "L’authentification à deux facteurs a été activée. À présent vous pourrez seulement vous reconnecter qu’avec votre téléphone ou votre e-mail ET votre authentification à deux facteurs.\n\nSeuls les comptes complets KYC peuvent être récupérés si jamais un utilisateur a perdu l’accès de son authentification à deux facteurs."
+        "enter6digitCode": "Saisir le code à 6 chiffres depuis votre application d’authentification pour valider votre authentification à deux facteurs."
     },
     "TotpLoginValidateScreen": {
         "title": "Authentification à deux niveaux",
@@ -4079,6 +4076,39 @@
         "protectionRequiredBody": "Plus vous avez de fonds, plus une meilleure sécurité est importante. Veuillez ajouter un authentificateur pour continuer à utiliser Blink.",
         "nonCustodialTitle": "Si vous ne voulez pas configurer l'authentification à deux facteurs",
         "nonCustodialBody": "L'autre option est de passer en non-custodial. Vous êtes alors responsable de vos propres fonds."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Protégez vos fonds avec un authentificateur",
+        "introDescription": "Une application d'authentification génère un nouveau code à 6 chiffres toutes les 30 secondes.",
+        "takeoversTitle": "Empêche le piratage de compte",
+        "takeoversDescription": "Le code n'existe que sur votre téléphone",
+        "stolenNumberTitle": "Restez protégé même si votre numéro est volé",
+        "stolenNumberDescription": "Même si quelqu'un accède à votre e-mail ou à votre numéro de téléphone, il ne pourra pas se connecter",
+        "durationTitle": "Environ 2 minutes",
+        "durationDescription": "Nous vous guidons étape par étape",
+        "getStarted": "Commencer",
+        "appsTitle": "Procurez-vous une application d'authentification",
+        "appsDescription": "N'importe quelle application d'authentification convient. Celles-ci sont gratuites et fiables :",
+        "googleAuthenticatorDescription": "Simple et très répandue. Sauvegarde facultative sur votre compte Google.",
+        "protonAuthenticatorDescription": "Code source ouvert. Sauvegarde et synchronisation chiffrées de bout en bout.",
+        "twoFasAuthDescription": "Code source ouvert. Aucun compte requis.",
+        "get": "Obtenir",
+        "storeNote": "« Obtenir » ouvre l'App Store ou Google Play. Revenez sur Blink une fois l'application installée.",
+        "haveAnApp": "J'ai déjà une application",
+        "keyInstruction": "Copiez cette clé de configuration dans votre application d'authentification.",
+        "qrInstruction": "Vous utilisez un autre appareil ?\nScannez plutôt ce code QR.",
+        "backupTitle": "Sauvegardez votre clé",
+        "backupDescription": "Si vous perdez votre téléphone, cette clé vous permet de configurer à nouveau votre authentificateur. Enregistrez-la ailleurs que sur ce téléphone.",
+        "saveToPasswordManager": "Enregistrer dans un gestionnaire de mots de passe",
+        "shareToPasswordManager": "Partager vers un gestionnaire de mots de passe",
+        "copyForManualBackup": "Copier pour une sauvegarde manuelle",
+        "passwordManagerUnavailable": "Aucun gestionnaire de mots de passe n'est disponible sur cet appareil. Copie plutôt la clé pour une sauvegarde manuelle.",
+        "savedIt": "Je l'ai enregistrée",
+        "keyBackupText": "Clé de configuration de l'authentificateur Blink\n\nCompte : {account}\nClé de configuration : {key}\n\nSi vous perdez votre téléphone, ajoutez cette clé de configuration à une application d'authentification pour récupérer vos codes de connexion Blink. Toute personne possédant cette clé peut générer vos codes, gardez-la donc privée.",
+        "protectedTitle": "Votre compte est désormais protégé",
+        "protectedDescription": "Désormais, la connexion nécessite un code à usage unique provenant de votre application d'authentification.",
+        "newPhoneTip": "Si vous changez de téléphone, transférez votre authentificateur sur le nouveau <bold>avant</bold> de réinitialiser l'ancien.",
+        "done": "Terminé"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

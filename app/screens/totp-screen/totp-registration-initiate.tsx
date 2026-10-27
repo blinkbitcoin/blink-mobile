@@ -1,21 +1,32 @@
-import React, { useEffect, useState } from "react"
-import { ActivityIndicator, Alert, View } from "react-native"
+import React, { useCallback, useEffect, useState } from "react"
+import { ActivityIndicator, useWindowDimensions, View } from "react-native"
 
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { IconHero } from "@app/components/icon-hero"
 import { Screen } from "@app/components/screen"
-import { CopySecretComponent, QrCodeComponent } from "@app/components/totp-export"
+import { StepLayout } from "@app/components/step-layout"
+import {
+  authenticatorAccountLabel,
+  compactSetupKey,
+  CopySecretComponent,
+  QrCodeComponent,
+} from "@app/components/totp-export"
 import {
   useTotpRegistrationScreenQuery,
   useUserTotpRegistrationInitiateMutation,
 } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
+import { useScreenSecurity } from "@app/hooks/use-screen-security"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { RouteProp, useNavigation } from "@react-navigation/native"
+import { reportError } from "@app/utils/error-logging"
+import { testProps } from "@app/utils/testProps"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles } from "@rn-vui/base"
-import { Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+
+import { useTotpRegistrationFlow } from "./hooks/use-totp-registration-flow"
 
 const generateOtpAuthURI = (
   accountName: string,
@@ -24,7 +35,7 @@ const generateOtpAuthURI = (
 ): string => {
   const encodedAccount = encodeURIComponent(accountName)
   const encodedIssuer = encodeURIComponent(issuer)
-  const base = `otpauth://totp/${issuer}:${encodedAccount}?`
+  const base = `otpauth://totp/${encodedIssuer}:${encodedAccount}?`
   const params = `secret=${secret}&issuer=${encodedIssuer}`
   return base + params
 }
@@ -48,18 +59,30 @@ gql`
   }
 `
 
-type Props = {
-  route: RouteProp<RootStackParamList, "totpRegistrationInitiate">
-}
+const QR_FRAME_PADDING = 14
+const QR_FRAME_BORDER = 2
+const QR_FRAME_MAX_SIZE = 240
 
-export const TotpRegistrationInitiateScreen: React.FC<Props> = ({ route }) => {
+/** Half the screen's width, as in the design, capped so a tablet does not blow it up.
+ *  The frame's padding and border come out of that size. */
+const qrCodeSize = (screenWidth: number): number =>
+  Math.min(Math.round(screenWidth / 2), QR_FRAME_MAX_SIZE) -
+  2 * (QR_FRAME_PADDING + QR_FRAME_BORDER)
+
+/**
+ * The setup key screen: the key first, to copy into an authenticator app on this phone,
+ * which is where most users keep one and where they cannot scan their own screen; the
+ * QR code second, for an app on another device. Next takes the key on to the code
+ * screen, and from there to its backup.
+ */
+export const TotpRegistrationInitiateScreen: React.FC = () => {
+  /** The key and its QR code are on screen: no screenshot, recording or app-switcher
+   *  snapshot of them. */
+  useScreenSecurity()
   const navigation =
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "totpRegistrationInitiate">
     >()
-  /** Handed on to the code screen, which is the one that decides where to go next and
-   *  reports the setup. */
-  const { returnTo, prompt } = route.params ?? {}
 
   const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation()
 
@@ -71,101 +94,156 @@ export const TotpRegistrationInitiateScreen: React.FC<Props> = ({ route }) => {
 
   const styles = useStyles()
 
-  const { data } = useTotpRegistrationScreenQuery()
-  const username = data?.me?.username || "blink"
+  const { markStart } = useTotpRegistrationFlow()
+
+  const {
+    data,
+    error: accountReadError,
+    refetch: rereadAccount,
+  } = useTotpRegistrationScreenQuery()
+  const me = data?.me
+  const account = me ? authenticatorAccountLabel(me) : undefined
 
   const [secret, setSecret] = useState("")
-  const [isLoading, setIsLoading] = useState(true)
   const [totpRegistrationId, setTotpRegistrationId] = useState("")
+  const [hasRegistrationFailed, setHasRegistrationFailed] = useState(false)
 
   const { appConfig } = useAppConfig()
   const service = appConfig.galoyInstance.name
 
-  const otpauth = generateOtpAuthURI(username, service, secret)
+  const { width: screenWidth } = useWindowDimensions()
+
+  /** A request that never reaches the server is told apart from a refused one by
+   *  neither: both leave the screen saying so, with a way to try again, rather than the
+   *  spinner up for good. */
+  const startRegistration = useCallback(async () => {
+    setHasRegistrationFailed(false)
+    try {
+      const res = await totpRegistrationInitiate()
+      const payload = res.data?.userTotpRegistrationInitiate
+      const registrationId = payload?.totpRegistrationId
+      const setupKey = payload?.totpSecret
+      if (!registrationId) throw new Error("Registration refused")
+      if (!setupKey) throw new Error("Registration started without its key")
+
+      setTotpRegistrationId(registrationId)
+      /** Once, as it arrives, so every screen that shows, copies or shares the key has
+       *  the same string. */
+      setSecret(compactSetupKey(setupKey))
+    } catch (err) {
+      reportError("Authenticator registration start", err)
+      setHasRegistrationFailed(true)
+    }
+  }, [totpRegistrationInitiate])
 
   useEffect(() => {
-    const fn = async () => {
-      const res = await totpRegistrationInitiate()
+    startRegistration()
+  }, [startRegistration])
 
-      if (res.data?.userTotpRegistrationInitiate?.totpRegistrationId) {
-        setTotpRegistrationId(res.data?.userTotpRegistrationInitiate?.totpRegistrationId)
-      } else {
-        Alert.alert(LL.common.error())
-        return
-      }
+  const hasStartFailed = hasRegistrationFailed || Boolean(accountReadError)
+  const isStarted = Boolean(secret && account)
+  /** Said once either way is known, so a try that works after one that failed makes
+   *  leaving count again. */
+  const isStartSettled = hasStartFailed || isStarted
+  useEffect(() => {
+    if (isStartSettled) markStart(hasStartFailed)
+  }, [isStartSettled, hasStartFailed, markStart])
 
-      if (res.data?.userTotpRegistrationInitiate?.totpSecret) {
-        setSecret(res.data?.userTotpRegistrationInitiate.totpSecret)
-      } else {
-        Alert.alert(LL.common.error())
-        return
-      }
+  const retry = useCallback(() => {
+    if (hasRegistrationFailed) startRegistration()
+    /** A failed read says so through the query's own error. */
+    if (accountReadError) rereadAccount().catch(() => {})
+  }, [hasRegistrationFailed, accountReadError, startRegistration, rereadAccount])
 
-      setIsLoading(false)
-    }
-    fn()
-  }, [totpRegistrationInitiate, LL])
+  const handleNext = useCallback(() => {
+    navigation.navigate("totpRegistrationValidate", { totpRegistrationId, secret })
+  }, [navigation, totpRegistrationId, secret])
 
-  return (
-    <Screen>
-      {isLoading ? (
+  if (hasStartFailed) {
+    return (
+      <StepLayout
+        footer={
+          <GaloyPrimaryButton
+            title={LL.common.tryAgain()}
+            onPress={retry}
+            {...testProps("totp-registration-retry")}
+          />
+        }
+      >
+        <IconHero icon="warning" iconColor={colors.error} title={LL.common.error()} />
+      </StepLayout>
+    )
+  }
+
+  if (!secret || !account) {
+    return (
+      <Screen>
         <View style={styles.loadingContainer}>
           <ActivityIndicator color={colors.primary} size={"large"} />
         </View>
-      ) : (
-        <>
-          <View style={styles.centeredContent}>
-            <QrCodeComponent value={otpauth} />
-          </View>
-          <CopySecretComponent secret={secret} />
-          <Text style={styles.textStyle} type="p2">
-            {LL.TotpRegistrationInitiateScreen.content()}
-          </Text>
+      </Screen>
+    )
+  }
 
-          <View style={styles.buttonsContainer}>
-            <GaloyPrimaryButton
-              containerStyle={styles.buttonContainer}
-              title={LL.common.next()}
-              onPress={() =>
-                navigation.navigate("totpRegistrationValidate", {
-                  totpRegistrationId,
-                  returnTo,
-                  prompt,
-                })
-              }
-            />
-          </View>
-        </>
-      )}
-    </Screen>
+  const otpauth = generateOtpAuthURI(account, service, secret)
+
+  return (
+    <StepLayout
+      contentStyle={styles.content}
+      footer={
+        <GaloyPrimaryButton
+          title={LL.common.next()}
+          onPress={handleNext}
+          {...testProps("totp-registration-next")}
+        />
+      }
+    >
+      <View style={styles.keyGroup}>
+        <Text type="p1" style={styles.instruction}>
+          {LL.AuthenticatorOnboarding.keyInstruction()}
+        </Text>
+        <CopySecretComponent secret={secret} isHighlighted />
+      </View>
+      <View style={styles.qrGroup}>
+        <Text type="p1" style={styles.instruction}>
+          {LL.AuthenticatorOnboarding.qrInstruction()}
+        </Text>
+        <QrCodeComponent
+          value={otpauth}
+          size={qrCodeSize(screenWidth)}
+          containerStyle={styles.qrFrame}
+        />
+      </View>
+    </StepLayout>
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   loadingContainer: {
     justifyContent: "center",
     alignItems: "center",
     flex: 1,
   },
-  centeredContent: {
-    padding: 20,
-    justifyContent: "center",
+  content: {
+    gap: 40,
+    paddingHorizontal: 20,
+    paddingTop: 20,
+  },
+  keyGroup: {
+    gap: 10,
+  },
+  qrGroup: {
+    gap: 20,
     alignItems: "center",
   },
-  textStyle: {
+  instruction: {
     textAlign: "center",
-    marginTop: 20,
-    marginHorizontal: 20,
+    color: colors.black,
   },
-  buttonContainer: {
-    marginTop: 20,
-  },
-  buttonsContainer: {
-    flex: 1,
-    justifyContent: "flex-end",
-    marginBottom: 14,
-    paddingHorizontal: 20,
-    paddingBottom: 20,
-    zIndex: 2,
+  qrFrame: {
+    padding: QR_FRAME_PADDING,
+    borderRadius: 20,
+    borderWidth: QR_FRAME_BORDER,
+    borderColor: colors.grey5,
   },
 }))

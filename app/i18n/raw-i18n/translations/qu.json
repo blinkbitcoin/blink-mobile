@@ -2617,14 +2617,11 @@
     "youGet": "Chaskinki"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Pakasqa/waqaychasqa",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -4079,6 +4076,39 @@
     "protectionRequiredBody": "Aswan qullqiyuq kaspaykiqa, aswan allin harkay aswan chaninmi. Ama hina kaspa autenticadorta yapay Blinkta llamk'achinaykipaq.",
     "nonCustodialTitle": "Mana iskay rakiypi riqsichiyta churayta munaspaykiqa",
     "nonCustodialBody": "Huk akllayqa non-custodialman pasaymi. Chaypiqa qam kikiyki qullqiykimanta ruwaq kanki."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Qullqiykita autenticadorwan harkay",
+    "introDescription": "Autenticador app sapa 30 segundopi musuq 6 yupayniyuq códigota ruran.",
+    "takeoversTitle": "Cuentaykita suwakunankuta harkan",
+    "takeoversDescription": "Códigoqa telefonoykillapim kan",
+    "stolenNumberTitle": "Yupayniykita suwaptinkupas allin harkasqa kay",
+    "stolenNumberDescription": "Pipas correoykiman utaq telefono yupayniykiman yaykuptinpas, manam cuentaykiman yaykuyta atinqachu",
+    "durationTitle": "Yaqa 2 minutollata munan",
+    "durationDescription": "Pasun pasun pusasqaykiku",
+    "getStarted": "Qallariy",
+    "appsTitle": "Autenticador appta hap'iy",
+    "appsDescription": "Mayqin autenticador apppas llamk'anmi. Kaykunaqa gratismi, iñiy atikuqmi:",
+    "googleAuthenticatorDescription": "Facilmi, achkha runakunam llamk'achinku. Munaspaykiqa Google cuentaykipi waqaychayta atinki.",
+    "protonAuthenticatorDescription": "Kichasqa códigoyuq. Waqaychay hinaspa sincronizay, puntamanta puntakama pakasqa.",
+    "twoFasAuthDescription": "Kichasqa códigoyuq. Mana cuentata munanchu.",
+    "get": "Uraqichiy",
+    "storeNote": "“Uraqichiy” App Store utaq Google Play nisqata kichan. Churasqaña kaptin Blinkman kutimuy.",
+    "haveAnApp": "Appniyuqmi kani",
+    "keyInstruction": "Kay churana llaveta autenticador appykiman kopiyay.",
+    "qrInstruction": "Huk aparatota llamk'achichkankichu?\nAswanpas kay QR códigota escaneay.",
+    "backupTitle": "Llaveykita waqaychay",
+    "backupDescription": "Telefonoykita chinkachispaykiqa, kay llavewan autenticadorniykita yapamanta churayta atinki. Kay telefonomanta hawa huk kitipi waqaychay.",
+    "saveToPasswordManager": "Yaykuna rimay kamachiqpi waqaychay",
+    "shareToPasswordManager": "Yaykuna rimay kamachiqwan rakinakuy",
+    "copyForManualBackup": "Makiwan waqaychanapaq kopiyay",
+    "passwordManagerUnavailable": "Kay aparatupiqa manam kanchu pakasqa simikunata waqaychaqqa. Llaveta copiay makiwan waqaychanapaq.",
+    "savedIt": "Ñam waqaychani",
+    "keyBackupText": "Blink autenticadorpa churana llavenin\n\nCuenta: {account}\nChurana llave: {key}\n\nTelefonoykita chinkachispaykiqa, kay churana llaveta huk autenticador appman yapay, Blinkman yaykuna códigoykikunata kutichinaykipaq. Pipas kay llaveyuq códigoykikunata ruwayta atin, chayrayku pakallapi waqaychay.",
+    "protectedTitle": "Cuentaykiqa kunanmi harkasqa",
+    "protectedDescription": "Kunanmanta, yaykunapaqqa autenticador appykimanta huk kutillapaq códigotam munanki.",
+    "newPhoneTip": "Musuq telefonota hap'ispaykiqa, autenticadorniykita chayman apay, <bold>manaraq</bold> mawk'a telefonota kutichichkaspa.",
+    "done": "Tukusqa"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",

@@ -2617,14 +2617,11 @@
         "youGet": "Du erhältst"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Zwei-Faktor Authentifizierung",
-        "secret": "Geheimnis/Backup",
-        "content": "Scannen Sie diesen QR-Code mit Ihrer Authenticator-App. Alternativ können Sie das Geheimnis auch manuell in Ihre Authenticator-App kopieren/einfügen."
+        "title": "Zwei-Faktor Authentifizierung"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
-        "enter6digitCode": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein, um Ihre Zwei-Faktor-Authentifizierung zu bestätigen.",
-        "success": "Die Zwei-Faktor-Authentifizierung wurde aktiviert. Sie können sich jetzt nur noch mit Ihrem Telefon oder Ihrer E-Mail UND Ihrer Zwei-Faktor-Authentifizierung anmelden.\n\nGeräte auf diesem Konto, die nicht mit 2FA angemeldet sind, müssen sich erneut anmelden.\n\nNur Konten der Stufe 2 können im Falle eines verlorenen 2FA-Zugangs vom Kundendienst wiederhergestellt werden."
+        "enter6digitCode": "Geben Sie den 6-stelligen Code aus Ihrer Authenticator-App ein, um Ihre Zwei-Faktor-Authentifizierung zu bestätigen."
     },
     "TotpLoginValidateScreen": {
         "title": "Zwei-Faktor Authentifizierung",
@@ -4079,6 +4076,39 @@
         "protectionRequiredBody": "Je mehr Guthaben du hast, desto wichtiger ist bessere Sicherheit. Bitte füge einen Authenticator hinzu, um Blink weiter zu nutzen.",
         "nonCustodialTitle": "Wenn du keine Zwei-Faktor-Authentifizierung einrichten möchtest",
         "nonCustodialBody": "Die andere Möglichkeit ist der Wechsel zu Non-Custodial. Dann bist du selbst für dein Guthaben verantwortlich."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Schütze dein Guthaben mit einem Authenticator",
+        "introDescription": "Eine Authenticator-App erzeugt alle 30 Sekunden einen neuen 6-stelligen Code.",
+        "takeoversTitle": "Verhindert Kontoübernahmen",
+        "takeoversDescription": "Der Code existiert nur auf deinem Telefon",
+        "stolenNumberTitle": "Sicher, selbst wenn deine Nummer gestohlen wird",
+        "stolenNumberDescription": "Selbst wenn jemand Zugriff auf deine E-Mail oder Telefonnummer bekommt, kann er sich nicht anmelden",
+        "durationTitle": "Dauert etwa 2 Minuten",
+        "durationDescription": "Wir führen dich Schritt für Schritt",
+        "getStarted": "Los geht's",
+        "appsTitle": "Hol dir eine Authenticator-App",
+        "appsDescription": "Jede Authenticator-App funktioniert. Diese sind kostenlos und vertrauenswürdig:",
+        "googleAuthenticatorDescription": "Einfach und weit verbreitet. Optionale Sicherung in deinem Google-Konto.",
+        "protonAuthenticatorDescription": "Quelloffen. Ende-zu-Ende-verschlüsselte Sicherung und Synchronisierung.",
+        "twoFasAuthDescription": "Quelloffen. Kein Konto erforderlich.",
+        "get": "Laden",
+        "storeNote": "„Laden“ öffnet den App Store oder Google Play. Kehre zu Blink zurück, sobald die App installiert ist.",
+        "haveAnApp": "Ich habe eine App",
+        "keyInstruction": "Kopiere diesen Einrichtungsschlüssel in deine Authenticator-App.",
+        "qrInstruction": "Nutzt du ein anderes Gerät?\nScanne stattdessen diesen QR-Code.",
+        "backupTitle": "Sichere deinen Schlüssel",
+        "backupDescription": "Wenn du dein Telefon verlierst, kannst du mit diesem Schlüssel deinen Authenticator neu einrichten. Bewahre ihn an einem anderen Ort als auf diesem Telefon auf.",
+        "saveToPasswordManager": "In einem Passwort-Manager speichern",
+        "shareToPasswordManager": "Mit einem Passwort-Manager teilen",
+        "copyForManualBackup": "Für manuelle Sicherung kopieren",
+        "passwordManagerUnavailable": "Auf diesem Gerät ist kein Passwort-Manager verfügbar. Kopiere den Schlüssel stattdessen für eine manuelle Sicherung.",
+        "savedIt": "Ich habe ihn gespeichert",
+        "keyBackupText": "Blink-Authenticator-Einrichtungsschlüssel\n\nKonto: {account}\nEinrichtungsschlüssel: {key}\n\nWenn du dein Telefon verlierst, füge diesen Einrichtungsschlüssel zu einer Authenticator-App hinzu, um deine Blink-Anmeldecodes zurückzubekommen. Jeder mit diesem Schlüssel kann deine Codes erzeugen, also halte ihn geheim.",
+        "protectedTitle": "Dein Konto ist jetzt geschützt",
+        "protectedDescription": "Ab jetzt brauchst du zum Anmelden einen Einmalcode aus deiner Authenticator-App.",
+        "newPhoneTip": "Wenn du ein neues Telefon bekommst, übertrage deinen Authenticator darauf, <bold>bevor</bold> du das alte zurücksetzt.",
+        "done": "Fertig"
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",

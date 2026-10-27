@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 import {
   logAddPhoneAttempt,
+  logAuthenticatorAppSelected,
+  logAuthenticatorEducationCompleted,
   logAttemptCreateDeviceAccount,
   logConversionAttempt,
   logConversionResult,
@@ -15,6 +17,7 @@ import {
   logPaymentAttempt,
   logPaymentResult,
   logRequestAuthCode,
+  logSetupKeyBackupOptionSelected,
   logStartCaptcha,
   logToastShown,
   logTwoFactorNonCustodialChosen,
@@ -355,6 +358,31 @@ describe("analytics helpers", () => {
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_non_custodial_chosen", {
         tier: 2,
+      })
+    })
+  })
+
+  describe("authenticator onboarding events", () => {
+    it("emits 'two_factor_education_app_selected' with the app", () => {
+      logAuthenticatorAppSelected({ app: "proton_authenticator" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_education_app_selected", {
+        app: "proton_authenticator",
+      })
+    })
+
+    it("emits 'two_factor_education_completed' with nothing else", () => {
+      logAuthenticatorEducationCompleted()
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_education_completed")
+    })
+
+    /** The option, never the key it saved. */
+    it("emits 'two_factor_key_backup_option_selected' with the option alone", () => {
+      logSetupKeyBackupOptionSelected({ option: "password_manager" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_key_backup_option_selected", {
+        option: "password_manager",
       })
     })
   })

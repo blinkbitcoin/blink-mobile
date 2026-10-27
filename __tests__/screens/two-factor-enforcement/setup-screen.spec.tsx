@@ -7,7 +7,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { TwoFactorSetupScreen } from "@app/screens/two-factor-enforcement"
 import {
-  TwoFactorMethod,
+  TwoFactorFlowParams,
   TwoFactorPrompt,
   TwoFactorPromptOrigin,
   TwoFactorReminderReason,
@@ -23,7 +23,7 @@ const LL = i18nObject("en")
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
 let mockIsFocused = true
-let mockRouteParams: TwoFactorPromptOrigin | undefined
+let mockRouteParams: TwoFactorFlowParams | undefined
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -99,7 +99,7 @@ describe("TwoFactorSetupScreen", () => {
     jest.clearAllMocks()
     loadLocale("en")
     mockIsFocused = true
-    mockRouteParams = BULLETIN_ORIGIN
+    mockRouteParams = { origin: BANNER_ORIGIN }
     mockEnforcement.isCustodyExitOffered = true
     mockEnforcement.unmetTier = TwoFactorTier.Suggested
     mockEnforcement.hasAuthenticator = false
@@ -132,20 +132,21 @@ describe("TwoFactorSetupScreen", () => {
     expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
   })
 
-  it("tells the authenticator flow to return here, under the tier it was opened for", async () => {
+  /** The onboarding reports the setup as started when it opens. The setup stays under
+   *  it, which it is told, so backing out of it lands back here with no dismissal, and
+   *  so does the prompt that opened the setup, which the completed setup reports. */
+  it("opens the authenticator onboarding over the setup, reporting nothing itself", async () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
     await renderScreen()
 
     fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
 
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
-      returnTo: "twoFactorSetup",
-      prompt: TwoFactorPrompt.ReminderBulletin,
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
+      isOpenedFromSetupScreen: true,
+      origin: BANNER_ORIGIN,
     })
-    expect(mockLogTwoFactorSetupStarted).toHaveBeenCalledWith({
-      tier: TwoFactorTier.Recommended,
-      method: TwoFactorMethod.Authenticator,
-    })
+    expect(mockLogTwoFactorSetupStarted).not.toHaveBeenCalled()
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
   })
 
   /** Leaving custody goes through the screen that explains what it means; that screen
@@ -173,7 +174,7 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BULLETIN_ORIGIN,
+      BANNER_ORIGIN,
     )
   })
 
@@ -187,7 +188,7 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BULLETIN_ORIGIN,
+      BANNER_ORIGIN,
     )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
@@ -200,43 +201,29 @@ describe("TwoFactorSetupScreen", () => {
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BULLETIN_ORIGIN,
+      BANNER_ORIGIN,
     )
     expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   /** Leaving the setup unfinished is the dismissal of the prompt that opened it, which
-   *  the enforcement reports once it counts it, and which it ignores for the Settings
-   *  banner, a prompt with no dismissal. */
-  it("hands an exit to the enforcement with the prompt that opened it", async () => {
+   *  the enforcement reports once it counts it. */
+  it("charges an exit to the prompt that opened it, with the reason it was up", async () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
-    mockRouteParams = BANNER_ORIGIN
+    mockRouteParams = { origin: BULLETIN_ORIGIN }
     await renderScreen()
 
     pressHardwareBack()
 
     expect(mockRegisterDismissal).toHaveBeenCalledWith(
       TwoFactorTier.Recommended,
-      BANNER_ORIGIN,
+      BULLETIN_ORIGIN,
     )
   })
 
-  it("tells the authenticator flow which prompt led to it", async () => {
-    mockRouteParams = BANNER_ORIGIN
-    await renderScreen()
-
-    fireEvent.press(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator()))
-
-    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationInitiate", {
-      returnTo: "twoFactorSetup",
-      prompt: TwoFactorPrompt.SettingsBanner,
-    })
-  })
-
-  /** The authenticator flow's return to this route replaces its params. */
   it("keeps the prompt that opened it once its params are replaced", async () => {
     mockEnforcement.unmetTier = TwoFactorTier.Recommended
-    mockRouteParams = BULLETIN_ORIGIN
+    mockRouteParams = { origin: BULLETIN_ORIGIN }
     const rendered = await renderScreen()
 
     mockRouteParams = undefined
