@@ -16,6 +16,15 @@ const MAX_RATIO = 2
 const LABEL_KEYS = ["copyInvoice", "shareInvoice", "newAddress"] as const
 
 /**
+ * "New" is three letters in English, so twice that rules out most gendered forms of it
+ * (fr "Nouvelle"). It gets an absolute cap instead: the longest form a locale needs
+ * today. A longer one is worth a second look before it ships.
+ */
+const MAX_LENGTH_BY_KEY: Partial<Record<(typeof LABEL_KEYS)[number], number>> = {
+  newAddress: 8,
+}
+
+/**
  * Over-long labels that predate this check. A ratchet: it may shrink, never grow.
  * Delete an entry once its translation is shortened.
  */
@@ -23,7 +32,6 @@ const KNOWN_LONG_LABELS = new Set([
   "cs.json:copyInvoice",
   "el.json:copyInvoice",
   "el.json:shareInvoice",
-  "fr.json:newAddress",
   "pt.json:shareInvoice",
   "qu.json:shareInvoice",
   "sk.json:copyInvoice",
@@ -57,9 +65,9 @@ const longLabels = (): string[] =>
       return LABEL_KEYS.filter((key) => {
         const translated = parsed.ReceiveScreen?.[key]
         if (!translated) return false
-        return (
-          visibleLength(translated) > MAX_RATIO * visibleLength(LL.ReceiveScreen[key]())
-        )
+        const limit =
+          MAX_LENGTH_BY_KEY[key] ?? MAX_RATIO * visibleLength(LL.ReceiveScreen[key]())
+        return visibleLength(translated) > limit
       }).map((key) => `${file}:${key}`)
     })
 
