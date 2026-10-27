@@ -25,7 +25,7 @@ import {
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
 const mockSetCollectionEnabled = jest.fn((_enabled: boolean) => Promise.resolve(null))
-const mockNativeSetDisposition = jest.fn((_permitted: boolean) => undefined)
+const mockNativeSetDisposition = jest.fn((_disposition: string) => undefined)
 
 /** RNFB's `crashlytics()` throws synchronously when the native module is not linked. */
 let mockCrashlyticsUnlinked = false
@@ -47,8 +47,8 @@ jest.mock("@react-native-firebase/crashlytics", () => () => {
   return crashlyticsClient
 })
 NativeModules.CrashCollection = {
-  setCrashCollectionDisposition: (permitted: boolean) =>
-    mockNativeSetDisposition(permitted),
+  setCrashCollectionDisposition: (disposition: string) =>
+    mockNativeSetDisposition(disposition),
 }
 
 const loadFreshErrorReportingModule = () => {
@@ -372,39 +372,57 @@ describe("recordAppError — the zero-transmission gate", () => {
   describe("automatic crash collection follows the disposition", () => {
     // The switch that changes the running process is native (CrashCollection, both
     // platforms); it also records the provenance the next launch decides by. The RNFB
-    // preference is kept in step so its own gate on log()/recordError() agrees.
+    // preference is kept in step so its own gate on log()/recordError() agrees, and so the
+    // switch it re-applies at the next launch is this session's answer.
     it("turns collection on natively, and in the RNFB preference, for a device that may report", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
 
-      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("permitted")
       expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(true)
     })
 
     it("turns it off for a device that must emit zero", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.Denied)
 
-      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(false)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("denied")
       expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(false)
     })
 
     it("turns it off when the kill switch engages on an Enhanced device", () => {
       setDiagnosticsModeInput(DiagnosticsModeInput.SelfCustodial)
-      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("permitted")
 
       setSelfCustodialDiagnosticsShutdown(true)
 
-      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(false)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("denied")
     })
 
-    it("touches nothing on the way into unresolved — the native launch default stands", () => {
+    it("turns collection off on the way back into unresolved, without deleting", () => {
+      // A custodial user restores a wallet whose mode is not yet known. Until it is, a
+      // crash must not be collected, and the next launch must read `unresolved`.
       setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)
       mockNativeSetDisposition.mockClear()
       mockSetCollectionEnabled.mockClear()
 
       setDiagnosticsModeInput(DiagnosticsModeInput.Unresolved)
 
-      expect(mockNativeSetDisposition).not.toHaveBeenCalled()
-      expect(mockSetCollectionEnabled).not.toHaveBeenCalled()
+      expect(mockNativeSetDisposition).toHaveBeenCalledTimes(1)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("unresolved")
+      expect(mockSetCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("applies the starting disposition as soon as the module is evaluated", () => {
+      // A launch after a permitted session still holds a `true` RNFB preference; it must
+      // not survive past the point JavaScript could have corrected it.
+      mockNativeSetDisposition.mockClear()
+      mockSetCollectionEnabled.mockClear()
+
+      jest.isolateModules(() => {
+        require("@app/utils/error-reporting")
+      })
+
+      expect(mockNativeSetDisposition.mock.calls[0]).toEqual(["unresolved"])
+      expect(mockSetCollectionEnabled.mock.calls[0]).toEqual([false])
     })
 
     it("lets the disposition change complete when the native module is absent", () => {
@@ -427,7 +445,7 @@ describe("recordAppError — the zero-transmission gate", () => {
       reportError("SDK init", new Error("still reported"))
 
       expect(mockRecordError).toHaveBeenCalledTimes(1)
-      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
+      expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("permitted")
     })
   })
 
@@ -460,7 +478,7 @@ describe("recordAppError — the zero-transmission gate", () => {
     mockSetCollectionEnabled.mockRejectedValueOnce(new Error("write failed"))
 
     expect(() => setDiagnosticsModeInput(DiagnosticsModeInput.Custodial)).not.toThrow()
-    expect(mockNativeSetDisposition).toHaveBeenLastCalledWith(true)
+    expect(mockNativeSetDisposition).toHaveBeenLastCalledWith("permitted")
   })
 
   it("carries on when the native switch throws", () => {

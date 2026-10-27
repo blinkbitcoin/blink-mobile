@@ -9,11 +9,13 @@ import com.facebook.react.uimanager.ViewManager
 
 /**
  * The one runtime switch for automatic crash collection, driven from
- * `app/utils/error-reporting.ts` once it knows what this session may send.
+ * `app/utils/error-reporting.ts` with the session's disposition: `permitted`, `denied` or
+ * `unresolved`.
  *
- * React Native Firebase has its own `setCrashlyticsCollectionEnabled`, but that only
- * stores a preference the *next* launch reads. This changes the running process, and
- * records the word that next launch will decide by.
+ * React Native Firebase has its own `setCrashlyticsCollectionEnabled`, but that only stores a
+ * preference — one its own `recordError` and `log` check, and its start-up re-applies to the
+ * SDK. It changes nothing in the running process and nothing about the reports on disk. This
+ * does both, and records the word the next launch decides by.
  */
 class CrashCollectionModule(reactContext: ReactApplicationContext) :
   ReactContextBaseJavaModule(reactContext) {
@@ -21,8 +23,8 @@ class CrashCollectionModule(reactContext: ReactApplicationContext) :
   override fun getName(): String = NAME
 
   @ReactMethod
-  fun setCrashCollectionDisposition(permitted: Boolean) {
-    CrashCollection.applyDisposition(reactApplicationContext, permitted)
+  fun setCrashCollectionDisposition(disposition: String) {
+    CrashCollection.applyDisposition(reactApplicationContext, disposition)
   }
 
   companion object {

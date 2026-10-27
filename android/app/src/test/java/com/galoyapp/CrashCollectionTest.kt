@@ -15,8 +15,8 @@ import org.robolectric.annotation.Config
 
 /**
  * [CrashCollection] against real SharedPreferences, with the crash SDK recorded rather than
- * called. What is checked is what a launch and a disposition change do to the two SDK
- * switches and to the word the device remembers.
+ * called. What is checked is what a launch and a disposition change do to the SDK, in what
+ * order, and to the word the device remembers.
  */
 @RunWith(RobolectricTestRunner::class)
 @Config(
@@ -28,28 +28,22 @@ import org.robolectric.annotation.Config
 class CrashCollectionTest {
 
   private class RecordingReporter(private val context: Context) : CrashReporter {
-    val collectCalls = mutableListOf<Boolean>()
-    var deleteCalls = 0
+    /** Every SDK call in order: `collect:true`, `collect:false`, `send`, `delete`. */
+    val calls = mutableListOf<String>()
 
     /** What the device remembered at the moment the SDK was first told anything. */
     var provenanceWhenToldSdk: String? = null
-    private var sawFirstCall = false
 
-    private fun noteFirstCall() {
-      if (sawFirstCall) return
-      sawFirstCall = true
-      provenanceWhenToldSdk = CrashCollection.provenanceOf(context)
+    private fun record(call: String) {
+      if (calls.isEmpty()) provenanceWhenToldSdk = CrashCollection.provenanceOf(context)
+      calls.add(call)
     }
 
-    override fun setCollectionEnabled(enabled: Boolean) {
-      noteFirstCall()
-      collectCalls.add(enabled)
-    }
+    override fun setCollectionEnabled(enabled: Boolean) = record("collect:$enabled")
 
-    override fun deleteUnsentReports() {
-      noteFirstCall()
-      deleteCalls += 1
-    }
+    override fun sendUnsentReports() = record("send")
+
+    override fun deleteUnsentReports() = record("delete")
   }
 
   private lateinit var context: Context
@@ -74,54 +68,66 @@ class CrashCollectionTest {
 
   private fun remembered(): String? = CrashCollection.provenanceOf(context)
 
+  /** Ends a session in [disposition] and starts the next process, as far as the SDK sees. */
+  private fun nextLaunchAfter(disposition: String): List<String> {
+    CrashCollection.applyDisposition(context, disposition)
+    reporter.calls.clear()
+    CrashCollection.applyLaunch(context)
+    return reporter.calls.toList()
+  }
+
   @Test
   fun `a first install does not collect and deletes what the SDK holds`() {
     assertNull(remembered())
 
     CrashCollection.applyLaunch(context)
 
-    assertEquals(listOf(false), reporter.collectCalls)
-    assertEquals(1, reporter.deleteCalls)
+    assertEquals(listOf("collect:false", "delete"), reporter.calls)
     assertEquals(CrashCollectionPolicy.UNRESOLVED, remembered())
   }
 
   @Test
-  fun `a launch after a permitted session collects, so its reports are delivered`() {
-    CrashCollection.applyDisposition(context, permitted = true)
-    reporter.collectCalls.clear()
-    reporter.deleteCalls = 0
-
-    CrashCollection.applyLaunch(context)
-
-    assertEquals(listOf(true), reporter.collectCalls)
-    assertEquals(0, reporter.deleteCalls)
+  fun `a launch after a permitted session sends what it left, and does not collect`() {
+    assertEquals(listOf("collect:false", "send"), nextLaunchAfter("permitted"))
   }
 
   @Test
-  fun `a launch after a denied session deletes what it holds and starts off`() {
-    CrashCollection.applyDisposition(context, permitted = false)
-    reporter.collectCalls.clear()
-    reporter.deleteCalls = 0
-
-    CrashCollection.applyLaunch(context)
-
-    assertEquals(listOf(false), reporter.collectCalls)
-    assertEquals(1, reporter.deleteCalls)
+  fun `a launch after a denied session deletes what it left`() {
+    assertEquals(listOf("collect:false", "delete"), nextLaunchAfter("denied"))
   }
 
   @Test
-  fun `a launch after a session that never resolved deletes what it holds`() {
-    // The previous session crashed before it knew what it was allowed to do, so its
-    // report never goes — even if the session before that one was permitted.
-    CrashCollection.applyDisposition(context, permitted = true)
-    CrashCollection.applyLaunch(context) // that session ends unresolved
-    reporter.collectCalls.clear()
-    reporter.deleteCalls = 0
+  fun `an unresolved session after a permitted one never uploads its crash`() {
+    // The session before last was permitted. The last one launched, never resolved, and
+    // crashed. Collection was off throughout it, so the SDK held the report; this launch
+    // deletes it rather than sending it.
+    CrashCollection.applyDisposition(context, "permitted")
+    CrashCollection.applyLaunch(context)
+    assertFalse(reporter.calls.drop(1).contains("collect:true"))
+    reporter.calls.clear()
 
     CrashCollection.applyLaunch(context)
 
-    assertEquals(listOf(false), reporter.collectCalls)
-    assertEquals(1, reporter.deleteCalls)
+    assertEquals(listOf("collect:false", "delete"), reporter.calls)
+  }
+
+  @Test
+  fun `falling back to unresolved mid-session stops collecting and keeps what is held`() {
+    CrashCollection.applyDisposition(context, "permitted")
+    reporter.calls.clear()
+
+    CrashCollection.applyDisposition(context, "unresolved")
+
+    assertEquals(listOf("collect:false"), reporter.calls)
+    assertEquals(CrashCollectionPolicy.UNRESOLVED, remembered())
+  }
+
+  @Test
+  fun `a crash after falling back to unresolved is deleted at the next launch`() {
+    // Permitted, then a restore into a wallet with no mode yet: the session ends unresolved.
+    CrashCollection.applyDisposition(context, "permitted")
+
+    assertEquals(listOf("collect:false", "delete"), nextLaunchAfter("unresolved"))
   }
 
   @Test
@@ -134,13 +140,12 @@ class CrashCollectionTest {
 
     CrashCollection.applyLaunch(context)
 
-    assertEquals(listOf(false), reporter.collectCalls)
-    assertEquals(1, reporter.deleteCalls)
+    assertEquals(listOf("collect:false", "delete"), reporter.calls)
   }
 
   @Test
   fun `every launch resets the word for the session now starting`() {
-    CrashCollection.applyDisposition(context, permitted = true)
+    CrashCollection.applyDisposition(context, "permitted")
     assertEquals(CrashCollectionPolicy.PERMITTED, remembered())
 
     CrashCollection.applyLaunch(context)
@@ -150,37 +155,54 @@ class CrashCollectionTest {
 
   @Test
   fun `resolving permitted collects and records it for the next launch`() {
-    CrashCollection.applyDisposition(context, permitted = true)
+    CrashCollection.applyDisposition(context, "permitted")
 
-    assertEquals(listOf(true), reporter.collectCalls)
-    assertEquals(0, reporter.deleteCalls)
+    assertEquals(listOf("collect:true"), reporter.calls)
     assertEquals(CrashCollectionPolicy.PERMITTED, remembered())
   }
 
   @Test
   fun `resolving denied stops collecting, deletes what is held, and records it`() {
-    CrashCollection.applyDisposition(context, permitted = false)
+    CrashCollection.applyDisposition(context, "denied")
 
-    assertEquals(listOf(false), reporter.collectCalls)
-    assertEquals(1, reporter.deleteCalls)
+    assertEquals(listOf("collect:false", "delete"), reporter.calls)
     assertEquals(CrashCollectionPolicy.DENIED, remembered())
+  }
+
+  @Test
+  fun `reports are only ever sent or deleted while collection is off`() {
+    // The SDK honours an explicit send or delete only with its own collection off.
+    for (step in listOf("launch", "permitted", "denied", "unresolved", "launch", "permitted")) {
+      reporter.calls.clear()
+      if (step == "launch") {
+        CrashCollection.applyLaunch(context)
+      } else {
+        CrashCollection.applyDisposition(context, step)
+      }
+      val switchedOn = reporter.calls.indexOf("collect:true")
+      for ((index, call) in reporter.calls.withIndex()) {
+        if (call == "send" || call == "delete") {
+          assertTrue("$step: $call before collection was off", index > 0)
+          assertEquals("$step: $call", "collect:false", reporter.calls.first())
+          assertTrue("$step: $call after collection came on", switchedOn < 0 || index < switchedOn)
+        }
+      }
+    }
   }
 
   @Test
   fun `the word is written before the SDK is told anything`() {
     // A death in between must leave the next launch erring on the side of not sending.
-    CrashCollection.applyDisposition(context, permitted = true)
+    CrashCollection.applyDisposition(context, "permitted")
 
     assertEquals(CrashCollectionPolicy.PERMITTED, reporter.provenanceWhenToldSdk)
   }
 
   @Test
   fun `the word survives a new process reading the same device`() {
-    CrashCollection.applyDisposition(context, permitted = true)
+    CrashCollection.applyDisposition(context, "permitted")
 
     // Nothing in memory carries over; the value comes back off disk.
     assertEquals(CrashCollectionPolicy.PERMITTED, CrashCollection.provenanceOf(context))
-    assertTrue(reporter.collectCalls.isNotEmpty())
-    assertFalse(reporter.collectCalls.contains(false))
   }
 }

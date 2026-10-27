@@ -158,28 +158,26 @@ onDiagnosticsDispositionChanged((disposition) => {
  * report carries the same installation id a non-fatal does, so gating one and not the
  * other would leave the larger channel open.
  *
- * Two SDK facts shape this. React Native Firebase's `setCrashlyticsCollectionEnabled`
- * persists a preference the native init provider applies at the *next* launch and does
- * not change the running process (verified against `@react-native-firebase/crashlytics@
- * 23.3.1`); and Crashlytics records a crash even while collection is off — it only
- * withholds the upload until the next launch. So the switch is native: the
- * `CrashCollection` module (MainApplication.kt / AppDelegate.mm) changes the running
- * process, deletes held reports on a denial, and records the disposition as *provenance*
- * for the next launch, which starts collection only if the previous session ended
- * permitted and deletes what it holds otherwise. The RNFB preference is kept in step so
- * its own gate on `log()` and `recordError()` agrees.
+ * Two switches, kept in step on every disposition, including `unresolved`:
  *
- * `unresolved` writes nothing: it is the start of every launch, and the native side has
- * already set this session to unresolved. A crash before resolution is therefore never
- * uploaded — including on a device whose previous session was permitted — at the cost of
- * a custodial device's start-up crashes before the mode resolves, and of a fresh install's
- * first session. Both are stated residuals of this rule, not of its implementation.
+ *  - The native `CrashCollection` module (MainApplication.kt / AppDelegate.mm) owns the
+ *    crash SDK's live switch and the *provenance* the next launch decides by. Collection is
+ *    on only while `permitted`; `denied` also deletes held reports; `unresolved` turns it
+ *    off and keeps them, so a session that later resolves can still send them and one that
+ *    never does has them deleted at the next launch. No launch collects until this says so.
+ *  - React Native Firebase's own preference, which its `recordError` and `log` check and
+ *    which its start-up re-applies to the SDK (verified against
+ *    `@react-native-firebase/crashlytics@23.3.1`). It is written `true` only while
+ *    permitted, so the switch every launch starts from is the previous session's answer.
+ *
+ * The first call happens when this module is evaluated, not on the first change: a launch
+ * that follows a permitted session still holds a `true` preference, and must not carry it
+ * past the point JavaScript could have corrected it.
  *
  * Nothing here may throw: a missing native module at start-up is a real failure mode, and
  * the disposition update this rides on must complete regardless.
  */
 const applyCrashCollection = (disposition: DiagnosticsDisposition): void => {
-  if (disposition === DiagnosticsDisposition.Unresolved) return
   const permitted = disposition === DiagnosticsDisposition.Permitted
   try {
     crashlytics()
@@ -191,13 +189,15 @@ const applyCrashCollection = (disposition: DiagnosticsDisposition): void => {
   }
   try {
     const native = NativeModules.CrashCollection as
-      | { setCrashCollectionDisposition: (permitted: boolean) => void }
+      | { setCrashCollectionDisposition: (disposition: DiagnosticsDisposition) => void }
       | undefined
-    native?.setCrashCollectionDisposition(permitted)
+    native?.setCrashCollectionDisposition(disposition)
   } catch (err) {
     if (__DEV__) console.warn("[error-reporting] crash collection not applied", err)
   }
 }
+
+applyCrashCollection(getDiagnosticsDisposition())
 
 /**
  * A breadcrumb, under the same rule. Code that used to call `crashlytics().log()`

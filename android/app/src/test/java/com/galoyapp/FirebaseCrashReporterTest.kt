@@ -38,14 +38,16 @@ class FirebaseCrashReporterTest {
     FirebaseApp.getApps(ApplicationProvider.getApplicationContext()).forEach { it.delete() }
 
     val collection = runCatching { FirebaseCrashReporter.setCollectionEnabled(true) }
+    val send = runCatching { FirebaseCrashReporter.sendUnsentReports() }
     val delete = runCatching { FirebaseCrashReporter.deleteUnsentReports() }
 
     assertTrue(collection.isFailure)
+    assertTrue(send.isFailure)
     assertTrue(delete.isFailure)
   }
 
   @Test
-  fun `passes both settings through once the SDK is available`() {
+  fun `passes every setting through once the SDK is available`() {
     val context = ApplicationProvider.getApplicationContext<android.content.Context>()
     FirebaseApp.getApps(context).forEach { it.delete() }
     FirebaseApp.initializeApp(
@@ -61,6 +63,7 @@ class FirebaseCrashReporterTest {
     // what it must not do is fail before reaching them.
     val outcome = runCatching {
       FirebaseCrashReporter.setCollectionEnabled(false)
+      FirebaseCrashReporter.sendUnsentReports()
       FirebaseCrashReporter.deleteUnsentReports()
     }
 

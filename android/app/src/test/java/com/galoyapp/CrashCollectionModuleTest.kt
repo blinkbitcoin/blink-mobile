@@ -24,15 +24,18 @@ import org.robolectric.annotation.Config
 class CrashCollectionModuleTest {
 
   private class RecordingReporter : CrashReporter {
-    val collectCalls = mutableListOf<Boolean>()
-    var deleteCalls = 0
+    val calls = mutableListOf<String>()
 
     override fun setCollectionEnabled(enabled: Boolean) {
-      collectCalls.add(enabled)
+      calls.add("collect:$enabled")
+    }
+
+    override fun sendUnsentReports() {
+      calls.add("send")
     }
 
     override fun deleteUnsentReports() {
-      deleteCalls += 1
+      calls.add("delete")
     }
   }
 
@@ -68,10 +71,9 @@ class CrashCollectionModuleTest {
 
   @Test
   fun `a permitted disposition reaches the SDK and is remembered`() {
-    CrashCollectionModule(reactContext).setCrashCollectionDisposition(true)
+    CrashCollectionModule(reactContext).setCrashCollectionDisposition("permitted")
 
-    assertEquals(listOf(true), reporter.collectCalls)
-    assertEquals(0, reporter.deleteCalls)
+    assertEquals(listOf("collect:true"), reporter.calls)
     assertEquals(
       CrashCollectionPolicy.PERMITTED,
       CrashCollection.provenanceOf(reactContext),
@@ -80,11 +82,21 @@ class CrashCollectionModuleTest {
 
   @Test
   fun `a denied disposition stops the SDK and deletes what it holds`() {
-    CrashCollectionModule(reactContext).setCrashCollectionDisposition(false)
+    CrashCollectionModule(reactContext).setCrashCollectionDisposition("denied")
 
-    assertEquals(listOf(false), reporter.collectCalls)
-    assertEquals(1, reporter.deleteCalls)
+    assertEquals(listOf("collect:false", "delete"), reporter.calls)
     assertEquals(CrashCollectionPolicy.DENIED, CrashCollection.provenanceOf(reactContext))
+  }
+
+  @Test
+  fun `an unresolved disposition stops the SDK and keeps what it holds`() {
+    CrashCollectionModule(reactContext).setCrashCollectionDisposition("unresolved")
+
+    assertEquals(listOf("collect:false"), reporter.calls)
+    assertEquals(
+      CrashCollectionPolicy.UNRESOLVED,
+      CrashCollection.provenanceOf(reactContext),
+    )
   }
 
   @Test

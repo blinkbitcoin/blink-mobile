@@ -43,12 +43,12 @@ class MainApplication : Application(), ReactApplication {
     // session collecting would otherwise log session_start natively — before any
     // JavaScript runs — even if that device has since become incognito. The telemetry
     // boundary (app/telemetry/mode.ts) re-enables collection only once the mode has
-    // positively resolved as custodial. This runs before the first Activity resumes,
-    // which is where the automatic session events are logged.
+    // positively resolved as one that may collect. This runs before the first Activity
+    // resumes, which is where the automatic session events are logged.
     FirebaseAnalytics.getInstance(this).setAnalyticsCollectionEnabled(false)
-    // Crash collection follows the same rule, one launch behind by the SDK's nature: the
-    // previous session's disposition decides whether the reports it left may go, and this
-    // session starts unresolved until the boundary says otherwise. See CrashCollectionPolicy.
+    // Crash collection starts off too, and the reports the previous session left are sent
+    // or deleted by what that session was allowed to do. This session collects nothing
+    // until the boundary says it may. See CrashCollectionPolicy.
     CrashCollection.applyLaunch(this)
     SoLoader.init(this, OpenSourceMergedSoMapping)
     if (BuildConfig.IS_NEW_ARCHITECTURE_ENABLED) {

@@ -4,22 +4,26 @@ package com.galoyapp
  * When automatic crash collection may run, and what to do with reports the crash SDK is
  * still holding on disk.
  *
- * Two facts about Crashlytics shape this. It writes a crash report when the crash happens
- * and uploads it at the *next* launch, so the decision about any report is taken one
- * process later than the crash itself. And it records a crash even while collection is
- * switched off — it only holds the upload back — so "collection was off" does not tell us
- * whether a report already on disk is one we are allowed to send.
+ * Three facts about Crashlytics shape this. It records a crash even while collection is off
+ * and only holds the upload back, so "collection was off" says nothing about whether a
+ * report on disk may go. It decides what to do with the reports on disk once per launch,
+ * from whatever its collection switch says at that moment: switched on, it sends them
+ * straight away; switched off, it waits for an explicit send or delete. And the switch it
+ * starts from is the previous process's: the SDK persists the last value it was given, and
+ * React Native Firebase re-applies its own stored copy at start-up.
  *
- * So the device remembers one word: what the *previous* session was allowed to do when it
- * ended. That is also what any crash in that session was allowed to do, because a crash
- * ends its session. Every launch reads the word, decides, and resets it to `unresolved` for
- * the session now starting; JavaScript overwrites it with `permitted` or `denied` as soon
- * as it knows which kind of wallet this is.
+ * So two things are kept true at all times. The switch is on only while the session is
+ * known to be permitted — never at launch, never while unresolved — so whatever the SDK
+ * reads at the next launch is what the previous session was allowed to do when it ended.
+ * And the device remembers that same answer as one word, which the launch reads to send or
+ * delete what was left. A crash ends its session, so the word is also what any crash in
+ * that session was allowed to do.
  *
- *  - previous session `permitted`: collect from the start, so the SDK sends what it holds.
- *  - anything else — `denied`, `unresolved`, or a first install: do not collect, and delete
- *    what it holds. A crash from an incognito wallet, or from a session that never said
- *    what it was, never leaves the device.
+ *  - previous session `permitted`: send what it left. Collection stays off until this
+ *    session says what it is.
+ *  - anything else — `denied`, `unresolved`, a first install, an unknown word: delete what
+ *    it left. A crash from an incognito wallet, or from a session that never said what it
+ *    was, never leaves the device.
  *
  * This object is pure so the table can be unit-tested on its own. [CrashCollection] is what
  * applies a decision.
@@ -32,6 +36,8 @@ object CrashCollectionPolicy {
   data class Decision(
     /** Whether the SDK may collect and upload from now on. */
     val collect: Boolean,
+    /** Whether reports already on disk are to be sent. */
+    val sendUnsent: Boolean,
     /** Whether reports already on disk must be deleted before anything could send them. */
     val deleteUnsent: Boolean,
     /** What the device should remember as the permission in force from this point. */
@@ -41,14 +47,28 @@ object CrashCollectionPolicy {
   /** At process start, from the word the previous session left. Null on a first install. */
   fun atLaunch(previous: String?): Decision {
     val permitted = previous == PERMITTED
-    return Decision(collect = permitted, deleteUnsent = !permitted, provenance = UNRESOLVED)
+    return Decision(
+      collect = false,
+      sendUnsent = permitted,
+      deleteUnsent = !permitted,
+      provenance = UNRESOLVED,
+    )
   }
 
-  /** When JavaScript works out what this session is allowed to do. */
-  fun onDisposition(permitted: Boolean): Decision =
-    Decision(
-      collect = permitted,
-      deleteUnsent = !permitted,
-      provenance = if (permitted) PERMITTED else DENIED,
-    )
+  /**
+   * When JavaScript works out what this session is allowed to do, or stops knowing.
+   *
+   * `unresolved` turns collection off and keeps what is on disk: the session may still turn
+   * out permitted, and if it never does the next launch deletes it. Anything unrecognised is
+   * treated as unresolved, which collects nothing.
+   */
+  fun onDisposition(disposition: String): Decision =
+    when (disposition) {
+      PERMITTED ->
+        Decision(collect = true, sendUnsent = false, deleteUnsent = false, provenance = PERMITTED)
+      DENIED ->
+        Decision(collect = false, sendUnsent = false, deleteUnsent = true, provenance = DENIED)
+      else ->
+        Decision(collect = false, sendUnsent = false, deleteUnsent = false, provenance = UNRESOLVED)
+    }
 }
