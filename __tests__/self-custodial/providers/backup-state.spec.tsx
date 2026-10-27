@@ -622,6 +622,24 @@ describe("BackupStateProvider", () => {
       expect(isCloudSeedBackupCompleted(state)).toBe(true)
       expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
     })
+
+    it("closes the gate when a protected cloud backup is redone without the flag", async () => {
+      let persisted: string | null = null
+      mockSetItem.mockImplementation(async (_key: string, value: string) => {
+        persisted = value
+      })
+      mockGetItem.mockImplementation(async () => persisted)
+
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud, {
+        cloudPasswordProtected: true,
+      })
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud)
+
+      // The second backup replaced the cloud seed; keeping the first one's
+      // flag would let the bundle sit beside a seed saved without a password.
+      const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
+      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
+    })
   })
 
   describe("removeBackupStateFor", () => {
