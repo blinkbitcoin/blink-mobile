@@ -42,11 +42,54 @@ const CUSTODIAL_ONLY_PROPERTIES = {
 const sideOf = (domain: AnalyticsDomain): Side =>
   domain === AnalyticsDomain.Custodial ? Side.Custodial : Side.SelfCustodial
 
+/** Domains under which nothing may leave the device: no identity, no collection. */
+const isClosed = (domain: AnalyticsDomain): boolean =>
+  domain === AnalyticsDomain.Anon || domain === AnalyticsDomain.Unset
+
 let desiredDomain: AnalyticsDomain | null = null
+/** The domain whose identity and collection state is fully applied right now; null while
+ *  a transition is under way or after one failed. Self-custodial events go out only while
+ *  this is Enhanced. */
+let appliedDomain: AnalyticsDomain | null = null
+/** The last domain a run finished applying, kept through a transition to tell a change of
+ *  domain from a re-application of the same one. */
+let lastAppliedDomain: AnalyticsDomain | null = null
 let custodialIdentity: CustodialIdentity | null = null
 let sharedProperties: Record<string, string> = {}
 let appliedSide: Side | null = null
 let queue: Promise<void> = Promise.resolve()
+
+/**
+ * Enhanced events that arrived before the Enhanced identity was in place: an onboarding
+ * event measured against the mode just chosen while the custodial account (or an
+ * Incognito one) is still the active identity, or any event emitted during the
+ * transition itself. They wait for the identity rather than going out under the wrong
+ * one, and are dropped if the device lands anywhere else, or after a while: an onboarding
+ * left unfinished is not reported against whatever Enhanced session comes much later.
+ */
+const PENDING_DELIVERY_TTL_MS = 5 * 60 * 1000
+const PENDING_DELIVERY_CAP = 50
+let pendingDeliveries: Array<{ deliver: () => void; queuedAtMs: number }> = []
+
+const pruneExpired = () => {
+  const now = Date.now()
+  pendingDeliveries = pendingDeliveries.filter(
+    ({ queuedAtMs }) => now - queuedAtMs <= PENDING_DELIVERY_TTL_MS,
+  )
+}
+
+const settlePendingDeliveries = (previous: AnalyticsDomain | null) => {
+  pruneExpired()
+  if (appliedDomain === AnalyticsDomain.Enhanced) {
+    const ready = pendingDeliveries
+    pendingDeliveries = []
+    ready.forEach(({ deliver }) => deliver())
+    return
+  }
+  /** Landing on another domain ends the wait; re-applying the one already in place (a
+   *  custodial identity update during an onboarding) does not. */
+  if (appliedDomain !== previous) pendingDeliveries = []
+}
 
 const readLastSide = async (): Promise<Side | null> => {
   try {
@@ -72,64 +115,113 @@ const separate = async () => {
   await ga.setUserProperties(sharedProperties)
 }
 
-const applyDomain = (domain: AnalyticsDomain, enhancedId: string | null) => {
+/** Identity off first, collection second: nothing already queued keeps the id. Issued
+ *  without waiting in between, so it can run ahead of a queued transition. */
+const shutCollection = (): Promise<unknown> => {
+  const ga = analytics()
+  return Promise.all([
+    ga.setUserId(null),
+    ga.setUserProperty("account_mode", null),
+    ga.setAnalyticsCollectionEnabled(false),
+  ])
+}
+
+type Step = () => Promise<unknown>
+
+const stepsFor = (domain: AnalyticsDomain, enhancedId: string | null): Step[] => {
   const ga = analytics()
   switch (domain) {
     case AnalyticsDomain.Anon:
-      /** Identity off first, collection second: nothing already queued keeps the id. */
-      ga.setUserId(null)
-      ga.setAnalyticsCollectionEnabled(false)
-      return
-    case AnalyticsDomain.Enhanced:
-      ga.setAnalyticsCollectionEnabled(true)
-      ga.setUserProperty("account_mode", "enhanced")
-      ga.setUserId(enhancedId)
-      return
     case AnalyticsDomain.Unset:
-      /** Pre-mode accounts were never asked anything, so collection stays on; no
-       *  identity is attached until the mode sync settles one. */
-      ga.setAnalyticsCollectionEnabled(true)
-      ga.setUserId(null)
-      return
-    case AnalyticsDomain.Custodial:
-      ga.setAnalyticsCollectionEnabled(true)
-      ga.setUserProperty("account_mode", "custodial")
-      if (!custodialIdentity) return
-      ga.setUserProperty("hasUsername", custodialIdentity.hasUsername ? "true" : "false")
-      ga.setUserProperty("accountLevel", custodialIdentity.accountLevel)
-      if (custodialIdentity.userId) ga.setUserId(custodialIdentity.userId)
+      /** An unset mode has not consented to anything, so it is as closed as Incognito
+       *  until the mode sync settles one. */
+      return [
+        () => ga.setUserId(null),
+        () => ga.setUserProperty("account_mode", null),
+        () => ga.setAnalyticsCollectionEnabled(false),
+      ]
+    case AnalyticsDomain.Enhanced:
+      /** Identity before collection: the first automatic event already carries it. */
+      return [
+        () => ga.setUserId(enhancedId),
+        () => ga.setUserProperty("account_mode", "enhanced"),
+        () => ga.setAnalyticsCollectionEnabled(true),
+      ]
+    case AnalyticsDomain.Custodial: {
+      const identity = custodialIdentity
+      const identitySteps: Step[] = identity
+        ? [
+            () =>
+              ga.setUserProperty("hasUsername", identity.hasUsername ? "true" : "false"),
+            () => ga.setUserProperty("accountLevel", identity.accountLevel),
+            ...(identity.userId ? [() => ga.setUserId(identity.userId ?? null)] : []),
+          ]
+        : []
+      return [
+        ...identitySteps,
+        () => ga.setUserProperty("account_mode", "custodial"),
+        () => ga.setAnalyticsCollectionEnabled(true),
+      ]
+    }
   }
+}
+
+/** Runs the steps in order, each awaited, stopping before any step once a newer request
+ *  has superseded this one: a late step could otherwise re-enable collection an Incognito
+ *  switch just shut. True when every step ran for a target that is still wanted. */
+const runSteps = async (target: AnalyticsDomain, steps: Step[]): Promise<boolean> => {
+  for (const step of steps) {
+    if (desiredDomain !== target) return false
+    await step()
+  }
+  return desiredDomain === target
 }
 
 const applyLatest = async () => {
   const target = desiredDomain
   if (!target) return
+  if (appliedDomain !== target) appliedDomain = null
 
-  const side = sideOf(target)
-  if (appliedSide !== side) {
-    /** The first run of a process compares against the side the last one ended on. With
-     *  no record (a fresh install, or the release that introduces this), a custodial
-     *  start has nothing to separate from, while a self-custodial one may be continuing
-     *  rows written under the custodial id. */
-    const previous = appliedSide ?? (await readLastSide())
-    const mustSeparate =
-      previous === null ? side === Side.SelfCustodial : previous !== side
-    if (mustSeparate) await separate()
-    /** Runs are serialized through `queue`, so no other run writes this meanwhile. */
+  try {
+    /** Read before anything changes: without the per-install id there is no Enhanced
+     *  identity to move to, and the failure below closes collection instead. */
+    const enhancedId =
+      target === AnalyticsDomain.Enhanced ? await getTelemetryInstanceId() : null
+
+    const side = sideOf(target)
+    if (appliedSide !== side) {
+      /** The first run of a process compares against the side the last one ended on.
+       *  With no record (a fresh install, or the release that introduces this), a
+       *  custodial start has nothing to separate from, while a self-custodial one may be
+       *  continuing rows written under the custodial id. */
+      const previous = appliedSide ?? (await readLastSide())
+      const mustSeparate =
+        previous === null ? side === Side.SelfCustodial : previous !== side
+      if (mustSeparate) await separate()
+      /** Runs are serialized through `queue`, so no other run writes this meanwhile. */
+      // eslint-disable-next-line require-atomic-updates
+      appliedSide = side
+      await AsyncStorage.setItem(LAST_SIDE_KEY, side)
+    }
+
+    const isApplied = await runSteps(target, stepsFor(target, enhancedId))
+    if (!isApplied) return
+
+    const previous = lastAppliedDomain
+    /** Runs are serialized through `queue`; a request made meanwhile only ever clears
+     *  this, and the run it queued applies its own target next. */
     // eslint-disable-next-line require-atomic-updates
-    appliedSide = side
-    await AsyncStorage.setItem(LAST_SIDE_KEY, side)
+    appliedDomain = target
+    lastAppliedDomain = target
+    settlePendingDeliveries(previous)
+  } catch (err) {
+    /** Fail closed: a self-custodial account whose identity could not be put in place
+     *  collects nothing, rather than reporting under whatever identity was left. */
+    if (target !== AnalyticsDomain.Custodial && desiredDomain === target) {
+      shutCollection().catch(() => undefined)
+    }
+    throw err
   }
-
-  const enhancedId =
-    target === AnalyticsDomain.Enhanced
-      ? await getTelemetryInstanceId().catch(() => null)
-      : null
-
-  /** Superseded while awaiting: the run queued by the newer request applies that one, and
-   *  applying this one first could re-enable collection an Incognito switch just shut. */
-  if (desiredDomain !== target) return
-  applyDomain(target, enhancedId)
 }
 
 const enqueue = () => {
@@ -140,17 +232,33 @@ const enqueue = () => {
 
 /**
  * The single owner of GA4 identity: which user id is attached, which identifying user
- * properties are set, and whether collection runs. Transitions are serialized and every
- * run applies the latest request, so a slow step (the reset, the per-install id read)
- * can never land an older identity over a newer one.
+ * properties are set, and whether collection runs. Transitions are serialized, every
+ * step is awaited, and every run applies the latest request, so a slow step (the reset,
+ * the per-install id read) can never land an older identity over a newer one.
  */
 export const setAnalyticsDomain = (domain: AnalyticsDomain): void => {
   desiredDomain = domain
-  if (domain === AnalyticsDomain.Anon) {
-    /** Incognito does not wait behind a queued transition. */
-    applyDomain(domain, null)
+  if (domain !== appliedDomain) appliedDomain = null
+  if (isClosed(domain)) {
+    /** Incognito, or no answer yet, does not wait behind a queued transition. */
+    shutCollection().catch(() => undefined)
   }
   enqueue()
+}
+
+/**
+ * Hands a self-custodial event to GA4 only under the Enhanced identity: at once when it
+ * is fully in place, otherwise once a transition puts it there. Measurement decides
+ * whether an event may be sent at all; this decides when it is safe to.
+ */
+export const deliverUnderEnhancedIdentity = (deliver: () => void): void => {
+  if (appliedDomain === AnalyticsDomain.Enhanced) {
+    deliver()
+    return
+  }
+  pruneExpired()
+  if (pendingDeliveries.length >= PENDING_DELIVERY_CAP) pendingDeliveries.shift()
+  pendingDeliveries.push({ deliver, queuedAtMs: Date.now() })
 }
 
 /** The custodial account's identity, attached only while the custodial account is the
@@ -163,5 +271,5 @@ export const setCustodialIdentity = (identity: CustodialIdentity): void => {
 /** User properties that describe the app, not the person, kept on every side. */
 export const setSharedUserProperties = (properties: Record<string, string>): void => {
   sharedProperties = { ...sharedProperties, ...properties }
-  analytics().setUserProperties(properties)
+  Promise.resolve(analytics().setUserProperties(properties)).catch(() => undefined)
 }

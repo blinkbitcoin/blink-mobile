@@ -1,0 +1,334 @@
+/* eslint-disable camelcase */
+/**
+ * The privacy boundary end to end: the real TelemetryContextMount drives the real identity
+ * owner and measurement gate, with only Firebase, storage and the active-account state
+ * stubbed. What these pin is ordering — no self-custodial event reaches GA4 before the
+ * Enhanced identity is fully in place, and no outcome crosses from the context it began
+ * in to the one that followed.
+ */
+import { it } from "@jest/globals"
+import type * as ReactNamespace from "react"
+import type * as Rntl from "@testing-library/react-native/pure"
+
+import type * as Components from "@app/self-custodial/components/telemetry-context-mount"
+import type * as Identity from "@app/self-custodial/analytics-identity"
+import type * as Measurement from "@app/self-custodial/measurement"
+import type { PersistentState } from "@app/store/persistent-state/state-migrations"
+import { AccountMode } from "@app/types/account"
+
+const resolved = (..._args: unknown[]): Promise<void> => Promise.resolve()
+const mockSetUserId = jest.fn(resolved)
+const mockSetUserProperty = jest.fn(resolved)
+const mockSetUserProperties = jest.fn(resolved)
+const mockSetAnalyticsCollectionEnabled = jest.fn(resolved)
+const mockResetAnalyticsData = jest.fn(resolved)
+const mockLogEvent = jest.fn(resolved)
+
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  setUserId: (...args: unknown[]) => mockSetUserId(...args),
+  setUserProperty: (...args: unknown[]) => mockSetUserProperty(...args),
+  setUserProperties: (...args: unknown[]) => mockSetUserProperties(...args),
+  setAnalyticsCollectionEnabled: (...args: unknown[]) =>
+    mockSetAnalyticsCollectionEnabled(...args),
+  resetAnalyticsData: (...args: unknown[]) => mockResetAnalyticsData(...args),
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: jest.fn(),
+  log: jest.fn(),
+}))
+
+const mockStore = new Map<string, string>()
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  getItem: jest.fn((key: string) => Promise.resolve(mockStore.get(key) ?? null)),
+  setItem: jest.fn((key: string, value: string) => {
+    mockStore.set(key, value)
+    return Promise.resolve()
+  }),
+}))
+
+jest.mock("@app/self-custodial/telemetry-instance-id", () => ({
+  getTelemetryInstanceId: () => Promise.resolve("install-uuid"),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => 0,
+}))
+
+const baseState: PersistentState = {
+  schemaVersion: 21,
+  galoyInstance: { id: "Main" },
+  galoyAuthToken: "",
+  activeAccountId: "custodial-default",
+}
+
+let mockPersistentState: PersistentState = baseState
+jest.mock("@app/store/persistent-state", () => ({
+  usePersistentStateContext: () => ({
+    persistentState: mockPersistentState,
+    updateState: jest.fn(),
+  }),
+}))
+
+const activate = (accountId: string | null, mode: AccountMode | null) => {
+  mockPersistentState = accountId
+    ? {
+        ...baseState,
+        activeAccountId: accountId,
+        selfCustodialAccountModeByAccountId: mode ? { [accountId]: mode } : {},
+      }
+    : baseState
+}
+
+/** A fresh process per test: the modules hold session state, and React, the renderer and
+ *  the component must come from one registry. */
+const boot = () => {
+  let loaded:
+    | {
+        React: typeof ReactNamespace
+        rntl: typeof Rntl
+        mount: typeof Components
+        identity: typeof Identity
+        measurement: typeof Measurement
+      }
+    | undefined
+  jest.isolateModules(() => {
+    loaded = {
+      React: jest.requireActual("react"),
+      /** `pure`: the default entry registers cleanup hooks, which cannot be added mid-test. */
+      rntl: jest.requireActual("@testing-library/react-native/pure"),
+      mount: jest.requireActual("@app/self-custodial/components/telemetry-context-mount"),
+      identity: jest.requireActual("@app/self-custodial/analytics-identity"),
+      measurement: jest.requireActual("@app/self-custodial/measurement"),
+    }
+  })
+  if (!loaded) throw new Error("modules did not load")
+  const { React, rntl, mount } = loaded
+  const view = rntl.render(React.createElement(mount.TelemetryContextMount))
+  const rerender = () => view.rerender(React.createElement(mount.TelemetryContextMount))
+  return { ...loaded, rerender }
+}
+
+const settle = async () => {
+  for (let i = 0; i < 20; i += 1) {
+    await new Promise((resolve) => {
+      setImmediate(resolve)
+    })
+  }
+}
+
+const deferred = () => {
+  let release: () => void = () => undefined
+  const promise = new Promise<void>((resolve) => {
+    release = resolve
+  })
+  return { promise, release: () => release() }
+}
+
+const firstCall = (mock: jest.Mock, matcher: (args: unknown[]) => boolean): number => {
+  const index = mock.mock.calls.findIndex(matcher)
+  if (index < 0) throw new Error("call not found")
+  return mock.mock.invocationCallOrder[index]
+}
+
+const COMPLETED = 0
+const PENDING = 1
+const SEND = 0
+
+describe("self-custodial telemetry privacy boundary", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockStore.clear()
+    activate(null, null)
+    ;[
+      mockSetUserId,
+      mockSetUserProperty,
+      mockSetUserProperties,
+      mockSetAnalyticsCollectionEnabled,
+      mockResetAnalyticsData,
+    ].forEach((mock) => mock.mockImplementation(resolved))
+  })
+
+  describe("onboarding events and the identity they go out under", () => {
+    it("holds a signed-in custodial user's wallet creation until the reset and the per-install id", async () => {
+      const { identity, measurement, rerender } = boot()
+      identity.setCustodialIdentity({
+        userId: "me-1",
+        hasUsername: true,
+        accountLevel: "TWO",
+      })
+      await settle()
+      expect(mockSetUserId).toHaveBeenCalledWith("me-1")
+      const heldReset = deferred()
+      mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
+
+      /** The creation is measured against the mode just chosen, before activation. */
+      measurement.measure(
+        measurement.ScEvent.AccountCreated,
+        { flow: "create" },
+        AccountMode.Enhanced,
+      )
+      await settle()
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      activate("sc-1", AccountMode.Enhanced)
+      rerender()
+      await settle()
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      heldReset.release()
+      await settle()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("sc_account_created", {
+        network: "mainnet",
+        flow: "create",
+      })
+      const logged = mockLogEvent.mock.invocationCallOrder[0]
+      expect(logged).toBeGreaterThan(mockResetAnalyticsData.mock.invocationCallOrder[0])
+      expect(logged).toBeGreaterThan(
+        firstCall(mockSetUserId, ([id]) => id === "install-uuid"),
+      )
+    })
+
+    it("delivers an Incognito → Enhanced switch once, after collection is back on", async () => {
+      activate("sc-1", AccountMode.Anon)
+      const { measurement, rerender } = boot()
+      await settle()
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+
+      /** As the switch surfaces do: measured, then the mode is written. */
+      measurement.measure(
+        measurement.ScEvent.AccountModeChanged,
+        { from: AccountMode.Anon, to: AccountMode.Enhanced },
+        AccountMode.Enhanced,
+      )
+      activate("sc-1", AccountMode.Enhanced)
+      rerender()
+      await settle()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith(
+        "sc_account_mode_changed",
+        expect.objectContaining({ to: AccountMode.Enhanced }),
+      )
+      expect(mockLogEvent.mock.invocationCallOrder[0]).toBeGreaterThan(
+        firstCall(mockSetAnalyticsCollectionEnabled, ([on]) => on === true),
+      )
+    })
+
+    it("sends nothing when the transition to Enhanced is rejected", async () => {
+      const { identity, measurement, rerender } = boot()
+      identity.setCustodialIdentity({
+        userId: "me-1",
+        hasUsername: true,
+        accountLevel: "TWO",
+      })
+      await settle()
+      mockResetAnalyticsData.mockImplementation(() =>
+        Promise.reject(new Error("native reset failed")),
+      )
+
+      activate("sc-1", AccountMode.Enhanced)
+      rerender()
+      measurement.measure(measurement.ScEvent.LightningAddressRegistered)
+      await settle()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+  })
+
+  describe("payment outcomes and the context they began in", () => {
+    const settlement = {
+      settled: [{ event: "sc_payment_send_settled" as const }],
+      failed: { event: "sc_payment_send_failed" as const },
+    }
+    const completedSend = { id: "pay-1", status: COMPLETED, paymentType: SEND, method: 0 }
+
+    it.each([
+      ["Incognito", AccountMode.Anon],
+      ["an unset mode", null],
+    ])(
+      "never reports a send begun under %s after a switch to Enhanced",
+      async (_label, startMode) => {
+        activate("sc-1", startMode)
+        const { measurement, rerender } = boot()
+        await settle()
+        const startedIn = measurement.measurementGeneration()
+
+        measurement.measureSettlement(
+          { id: "pay-1", status: PENDING },
+          settlement,
+          startedIn,
+        )
+        activate("sc-1", AccountMode.Enhanced)
+        rerender()
+        await settle()
+        measurement.measureObservedPayment(completedSend as never)
+        await settle()
+
+        expect(mockLogEvent).not.toHaveBeenCalled()
+      },
+    )
+
+    it("never reports a send that returns after its Incognito switch", async () => {
+      activate("sc-1", AccountMode.Anon)
+      const { measurement, rerender } = boot()
+      await settle()
+      const startedIn = measurement.measurementGeneration()
+
+      activate("sc-1", AccountMode.Enhanced)
+      rerender()
+      await settle()
+      measurement.measureSettlement(
+        { id: "pay-1", status: COMPLETED },
+        settlement,
+        startedIn,
+      )
+      await settle()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("does not carry a pending send from one Enhanced account to the next", async () => {
+      activate("sc-a", AccountMode.Enhanced)
+      const { measurement, rerender } = boot()
+      await settle()
+
+      measurement.measureSettlement(
+        { id: "pay-1", status: PENDING },
+        settlement,
+        measurement.measurementGeneration(),
+      )
+      activate("sc-b", AccountMode.Enhanced)
+      rerender()
+      await settle()
+      measurement.measureObservedPayment(completedSend as never)
+      await settle()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("reports a pending send that settles in the context it began in", async () => {
+      activate("sc-a", AccountMode.Enhanced)
+      const { measurement } = boot()
+      await settle()
+
+      measurement.measureSettlement(
+        { id: "pay-1", status: PENDING },
+        settlement,
+        measurement.measurementGeneration(),
+      )
+      measurement.measureObservedPayment(completedSend as never)
+      await settle()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith(
+        "sc_payment_send_settled",
+        expect.anything(),
+      )
+    })
+  })
+})

@@ -21,6 +21,11 @@ const mockExtractLnurlFee = jest.fn()
 const mockListSentPaymentsSince = jest.fn()
 const mockSyncSelfCustodialWallet = jest.fn()
 
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+}))
+
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
   executeLnurl: (...args: unknown[]) => mockExecuteLnurl(...args),
@@ -1597,7 +1602,11 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
     jest.clearAllMocks()
     resetMeasuredOnceKeys()
     resetSettlementTracking()
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
     mockExtractLnurlFee.mockReturnValue(5)
   })
 
@@ -1665,5 +1674,95 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
     await detail.sendPaymentMutation({} as never)
 
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+
+  describe("a dollar send that threw after dispatch", () => {
+    const dollarDetail = () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          sendingWalletDescriptor: { id: "w2", currency: WalletCurrency.Usd },
+          unitOfAccountAmount: {
+            amount: 150,
+            currency: WalletCurrency.Usd,
+            currencyCode: WalletCurrency.Usd,
+          },
+        }),
+      )
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      return detail
+    }
+
+    beforeEach(() => {
+      mockPrepareLnurl.mockResolvedValue(quote())
+      mockExecuteLnurl.mockRejectedValue({ tag: "NetworkError" })
+      mockFindLostSend.mockResolvedValue({ status: "not-found" })
+    })
+
+    it("counts the send once when a retry finds the payment it had lost", async () => {
+      const detail = dollarDetail()
+
+      const first = await detail.sendPaymentMutation({} as never)
+      expect(first.status).toBe(PaymentSendResult.Failure)
+
+      mockFindLostSend.mockResolvedValue({
+        status: "found",
+        payment: { id: "p1", status: COMPLETED },
+      })
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Success)
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_settled",
+      ])
+    })
+
+    it("counts a retry that pays anew as the same send", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      mockExecuteLnurl.mockResolvedValue({ payment: { id: "p2", status: COMPLETED } })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_settled",
+      ])
+    })
+
+    it("reports nothing past initiated while the payment may still turn up", async () => {
+      await dollarDetail().sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    })
+
+    it("reports a quote that fails before anything is sent as failed", async () => {
+      mockPrepareLnurl.mockRejectedValue({ tag: "InsufficientFunds" })
+
+      await dollarDetail().sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+      ])
+    })
+
+    it("reports a found payment under the context the send began in, not a later one", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      setMeasurementContext({
+        accountId: "sc-2",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
+      mockFindLostSend.mockResolvedValue({
+        status: "found",
+        payment: { id: "p1", status: COMPLETED },
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    })
   })
 })

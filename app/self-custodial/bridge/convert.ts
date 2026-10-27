@@ -27,7 +27,12 @@ import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts
 import { toNumber } from "@app/utils/helper"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
-import { measure, measureSettlement, ScEvent } from "../measurement"
+import {
+  measure,
+  measurementGeneration,
+  measureSettlement,
+  ScEvent,
+} from "../measurement"
 import { classifySdkError } from "../sdk-error"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
@@ -288,16 +293,21 @@ const executePrepared = async (
     direction: params.direction,
     source: params.source ?? "manual",
   }
+  const startedIn = measurementGeneration()
   try {
     const response = await sdk.sendPayment(
       SendPaymentRequest.create({ prepareResponse: prepared }),
     )
     /** By the SDK's word on the payment, as for sends: a conversion normally comes back
      *  completed, and one that does not is held until its outcome is announced. */
-    measureSettlement(response?.payment, {
-      settled: [{ event: ScEvent.SwapCompleted, params: swapTelemetry }],
-      failed: { event: ScEvent.SwapFailed, params: swapTelemetry },
-    })
+    measureSettlement(
+      response?.payment,
+      {
+        settled: [{ event: ScEvent.SwapCompleted, params: swapTelemetry }],
+        failed: { event: ScEvent.SwapFailed, params: swapTelemetry },
+      },
+      startedIn,
+    )
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     measure(ScEvent.SwapFailed, { ...swapTelemetry, error_code: classifySdkError(err) })

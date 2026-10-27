@@ -13,6 +13,11 @@ import { AccountMode } from "@app/types/account"
 
 const mockLogEvent = jest.fn()
 
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+}))
+
 jest.mock("@react-native-firebase/analytics", () => () => ({
   logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
@@ -25,7 +30,11 @@ describe("self-custodial analytics helpers", () => {
 
   describe("gated events", () => {
     it("emit with the network attached when the active account is Enhanced", () => {
-      setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+      setMeasurementContext({
+        accountId: "sc-1",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
 
       logSelfCustodialBackupCompleted({ backupMethod: "manual" })
 
@@ -36,11 +45,15 @@ describe("self-custodial analytics helpers", () => {
     })
 
     it("emit nothing when the active account is Incognito or modeless", () => {
-      setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+      setMeasurementContext({
+        accountId: "sc-1",
+        mode: AccountMode.Anon,
+        network: "mainnet",
+      })
       logSelfCustodialBackupCompleted({ backupMethod: "manual" })
       logSelfCustodialStableBalanceActivated({ label: "USD" })
 
-      setMeasurementContext({ mode: null, network: "mainnet" })
+      setMeasurementContext({ accountId: "sc-1", mode: null, network: "mainnet" })
       logSelfCustodialBackupCompleted({ backupMethod: "manual" })
 
       expect(mockLogEvent).not.toHaveBeenCalled()
@@ -49,7 +62,11 @@ describe("self-custodial analytics helpers", () => {
 
   describe("logSelfCustodialBackupCompleted", () => {
     beforeEach(() => {
-      setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+      setMeasurementContext({
+        accountId: "sc-1",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
     })
 
     it("emits 'self_custodial_backup_completed' with snake_case backup_method", () => {
@@ -96,7 +113,11 @@ describe("self-custodial analytics helpers", () => {
 
   describe("logSelfCustodialStableBalanceActivated", () => {
     it("emits 'self_custodial_stable_balance_activated' with the label", () => {
-      setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+      setMeasurementContext({
+        accountId: "sc-1",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
 
       logSelfCustodialStableBalanceActivated({ label: "USD" })
 
@@ -123,7 +144,11 @@ describe("self-custodial analytics helpers", () => {
     })
 
     it("stays ungated: it measures custodial rollout exposure, not account activity", () => {
-      setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+      setMeasurementContext({
+        accountId: "sc-1",
+        mode: AccountMode.Anon,
+        network: "mainnet",
+      })
 
       logSelfCustodialRolloutExposed({
         nonCustodialEnabled: false,

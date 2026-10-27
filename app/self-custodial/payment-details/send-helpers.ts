@@ -36,6 +36,7 @@ import {
 } from "../bridge"
 import {
   measure,
+  measurementGeneration,
   measureSettlement,
   ScEvent,
   type ScEventParams,
@@ -169,11 +170,16 @@ export const createSendMutation = (
   telemetry: SendTelemetry,
 ): SendPaymentMutation => {
   return async () => {
+    const startedIn = measurementGeneration()
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const response = await executeSend(params.sdk, prepared)
-      measureSettlement(response?.payment, sendSettlement(telemetryParams(telemetry)))
+      measureSettlement(
+        response?.payment,
+        sendSettlement(telemetryParams(telemetry)),
+        startedIn,
+      )
       return { status: PaymentSendResult.Success }
     } catch (err) {
       measure(ScEvent.PaymentSendFailed, {
@@ -194,11 +200,16 @@ export const createSendMutationOnchain = (
   telemetry: SendTelemetry,
 ): SendPaymentMutation => {
   return async () => {
+    const startedIn = measurementGeneration()
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const response = await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
-      measureSettlement(response?.payment, sendSettlement(telemetryParams(telemetry)))
+      measureSettlement(
+        response?.payment,
+        sendSettlement(telemetryParams(telemetry)),
+        startedIn,
+      )
       return { status: PaymentSendResult.Success }
     } catch (err) {
       measure(ScEvent.PaymentSendFailed, {

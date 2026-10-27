@@ -1,5 +1,8 @@
 import React, { useEffect } from "react"
 
+import { usePersistentStateContext } from "@app/store/persistent-state"
+import { resolveActiveSelfCustodialId } from "@app/store/persistent-state/active-self-custodial-account"
+
 import { networkLabelFor } from "../config"
 import { useAnalyticsCollectionGate } from "../hooks/use-analytics-collection-gate"
 import { useSelfCustodialAccountMode } from "../hooks/use-self-custodial-account-mode"
@@ -14,12 +17,18 @@ import { setMeasurementContext } from "../measurement"
  */
 export const TelemetryContextMount: React.FC = () => {
   const { accountMode } = useSelfCustodialAccountMode()
+  const { persistentState } = usePersistentStateContext()
+  const accountId = persistentState ? resolveActiveSelfCustodialId(persistentState) : null
   const network = useSparkNetwork()
   useAnalyticsCollectionGate()
 
   useEffect(() => {
-    setMeasurementContext({ mode: accountMode, network: networkLabelFor(network) })
-  }, [accountMode, network])
+    setMeasurementContext({
+      accountId,
+      mode: accountMode,
+      network: networkLabelFor(network),
+    })
+  }, [accountId, accountMode, network])
 
   return null
 }

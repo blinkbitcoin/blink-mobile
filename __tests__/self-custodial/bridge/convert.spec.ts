@@ -25,6 +25,11 @@ const mockFetchLimits = jest.fn()
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
 const mockRecordError = jest.fn()
 
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+}))
+
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
   default: () => ({ recordError: mockRecordError, log: jest.fn() }),
@@ -435,7 +440,11 @@ describe("swap telemetry", () => {
     jest.clearAllMocks()
     resetMeasuredOnceKeys()
     resetSettlementTracking()
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
     mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
   })
 

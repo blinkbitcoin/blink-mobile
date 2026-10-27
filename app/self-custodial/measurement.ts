@@ -9,6 +9,7 @@ import analytics from "@react-native-firebase/analytics"
 
 import { AccountMode } from "@app/types/account"
 
+import { deliverUnderEnhancedIdentity } from "./analytics-identity"
 import type { SparkNetworkLabel } from "./config"
 
 /**
@@ -78,23 +79,45 @@ export type ScEvent = (typeof ScEvent)[keyof typeof ScEvent]
 export type ScEventParams = Record<string, string | number | boolean>
 
 type MeasurementContext = {
+  /** The active self-custodial account; null while custodial is active. */
+  accountId: string | null
   /** The active self-custodial account's mode; null while custodial is active or the
    *  account has not chosen one. */
   mode: AccountMode | null
   network: SparkNetworkLabel
 }
 
-let context: MeasurementContext = { mode: null, network: "mainnet" }
+const EMPTY_CONTEXT: MeasurementContext = {
+  accountId: null,
+  mode: null,
+  network: "mainnet",
+}
+
+let context: MeasurementContext = EMPTY_CONTEXT
+/** Bumped whenever the account, its mode or the network changes: work begun under one
+ *  context (a send awaiting its outcome) is never reported under another. */
+let generation = 0
+
+const isSameContext = (a: MeasurementContext, b: MeasurementContext) =>
+  a.accountId === b.accountId && a.mode === b.mode && a.network === b.network
 
 /** Refreshed by TelemetryContextMount whenever the active account or instance changes,
  *  so the gate below works from non-React code (bridge, adapters, executors). */
 export const setMeasurementContext = (next: MeasurementContext): void => {
+  if (isSameContext(context, next)) return
   context = next
+  generation += 1
+  /** Outcomes still owed belong to the context that is ending; none crosses over. */
+  awaitingOutcome.clear()
+  observedOutcomes.clear()
 }
 
 export const resetMeasurementContext = (): void => {
-  context = { mode: null, network: "mainnet" }
+  setMeasurementContext(EMPTY_CONTEXT)
 }
+
+/** The context an operation starts in, to hand back when it reports how it ended. */
+export const measurementGeneration = (): number => generation
 
 /**
  * The privacy contract's single choke point: an event leaves the device only for an
@@ -110,10 +133,17 @@ export const measure = (
   event: ScEvent,
   params?: ScEventParams,
   modeOverride?: AccountMode | null,
-): void => {
+): boolean => {
   const mode = modeOverride === undefined ? context.mode : modeOverride
-  if (mode !== AccountMode.Enhanced) return
-  analytics().logEvent(event, { network: context.network, ...params })
+  if (mode !== AccountMode.Enhanced) return false
+  const payload = { network: context.network, ...params }
+  /** Consent says the event may be sent; the identity owner says when it is safe to,
+   *  holding it until GA4 reports under the Enhanced identity rather than the custodial
+   *  one (or with collection still shut by Incognito). */
+  deliverUnderEnhancedIdentity(() => {
+    analytics().logEvent(event, payload)
+  })
+  return true
 }
 
 /** Settles can be announced more than once (a pending-then-succeeded transition, a
@@ -130,12 +160,14 @@ export const measureOnce = (
   params?: ScEventParams,
 ): void => {
   if (measuredOnceKeys.has(key)) return
+  /** Only an event the gate let through uses up its key: a suppressed announcement
+   *  leaves a later one free to count. */
+  if (!measure(event, params)) return
   if (measuredOnceKeys.size >= MEASURED_ONCE_CAP) {
     const oldest = measuredOnceKeys.values().next().value
     if (oldest !== undefined) measuredOnceKeys.delete(oldest)
   }
   measuredOnceKeys.add(key)
-  measure(event, params)
 }
 
 export const resetMeasuredOnceKeys = (): void => {
@@ -199,10 +231,15 @@ const emitOutcome = (
 export const measureSettlement = (
   payment: Pick<Payment, "id" | "status"> | undefined,
   telemetry: SettlementTelemetry,
+  startedIn: number,
 ): void => {
   /** Telemetry never turns a send into a failure: a response without a payment reports
    *  nothing rather than throwing into the send path. */
   if (!payment) return
+  /** Begun under another account, mode or network (an Incognito send that returns after
+   *  a switch to Enhanced), or under a mode that reports nothing: never registered, so it
+   *  can never be reported later under the context that followed. */
+  if (startedIn !== generation || context.mode !== AccountMode.Enhanced) return
   if (payment.status !== PaymentStatus.Pending) {
     emitOutcome(payment.id, payment.status, telemetry)
     return

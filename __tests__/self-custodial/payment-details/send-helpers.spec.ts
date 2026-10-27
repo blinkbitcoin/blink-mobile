@@ -27,6 +27,11 @@ const telemetry = { rail: "bolt11", sendingWallet: WalletCurrency.Btc }
 const telemetryOnchain = { rail: "onchain", sendingWallet: WalletCurrency.Btc }
 const mockSendPayment = jest.fn()
 
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+}))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
   const tags = {
     SparkError: "SparkError",
@@ -1068,7 +1073,11 @@ describe("send telemetry", () => {
     jest.clearAllMocks()
     resetMeasuredOnceKeys()
     resetSettlementTracking()
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
     mockPrepareSendPayment.mockResolvedValue({
       paymentMethod: { tag: "Bolt11Invoice", inner: {} },
     })

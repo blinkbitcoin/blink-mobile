@@ -43,7 +43,13 @@ import {
   toSdkSendAmount,
 } from "../bridge"
 import { isOwnLnurlAddress } from "../config"
-import { measure, measureSettlement, ScEvent, ScRail } from "../measurement"
+import {
+  measure,
+  measurementGeneration,
+  measureSettlement,
+  ScEvent,
+  ScRail,
+} from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 import { feeFailure, findLostSend, sendSettlement } from "./send-helpers"
@@ -274,43 +280,45 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       : [],
   )
 
-  const sendFailure = (err: unknown) => {
-    measure(ScEvent.PaymentSendFailed, {
-      ...sendTelemetry,
-      error_code: classifySdkError(err),
-    })
-    return {
-      status: PaymentSendResult.Failure,
-      errors: [
-        {
-          __typename: "GraphQLApplicationError" as const,
-          message: classifySdkError(err),
-        },
-      ],
-    }
-  }
+  const sendFailure = (err: unknown) => ({
+    status: PaymentSendResult.Failure,
+    errors: [
+      {
+        __typename: "GraphQLApplicationError" as const,
+        message: classifySdkError(err),
+      },
+    ],
+  })
 
   const sendOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,
     status: PaymentSendResult,
+  ) => ({
+    status,
+    transaction: { createdAt: Number(payment.timestamp) },
+    extraInfo: {
+      preimage: extractPreimage(payment),
+      successAction: sdkSuccessActionToLib(successAction),
+    },
+  })
+
+  /** A payment the SDK handed back, reported as sent: it hands one back as soon as it is
+   *  dispatched, pending or not, and every rail reports that as sent. Telemetry waits
+   *  for the SDK's word on how it ended. */
+  const dispatchedOutcome = (
+    payment: Payment,
+    successAction: SuccessActionProcessed | undefined,
+    startedIn: number,
   ) => {
-    measureSettlement(payment, sendSettlementTelemetry)
-    return {
-      status,
-      transaction: { createdAt: Number(payment.timestamp) },
-      extraInfo: {
-        preimage: extractPreimage(payment),
-        successAction: sdkSuccessActionToLib(successAction),
-      },
-    }
+    measureSettlement(payment, sendSettlementTelemetry, startedIn)
+    return sendOutcome(payment, successAction, PaymentSendResult.Success)
   }
 
   /** The wallet's own record of a send this detail made, reported as the send itself
-   *  would have reported it: the SDK hands a payment back as soon as it is dispatched,
-   *  pending or not, and every rail reports that as sent. */
-  const foundOutcome = (found: Payment) =>
-    sendOutcome(found, extractProcessedSuccessAction(found), PaymentSendResult.Success)
+   *  would have reported it. */
+  const foundOutcome = (found: Payment, startedIn: number) =>
+    dispatchedOutcome(found, extractProcessedSuccessAction(found), startedIn)
 
   const findThisSend = (startedAtMs: number, paymentHashes: ReadonlyArray<string>) =>
     findLostSend({
@@ -319,11 +327,77 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       matches: (payment) => isPaymentOf(paymentHashes, payment),
     })
 
-  const rememberLostAttempts = (startedAtMs: number, paymentHashes: string[]) => {
-    attemptRef.lostSend = { startedAtMs, paymentHashes }
+  const rememberLostAttempts = (
+    startedAtMs: number,
+    paymentHashes: string[],
+    telemetryGeneration: number,
+  ) => {
+    attemptRef.lostSend = { startedAtMs, paymentHashes, telemetryGeneration }
   }
   const forgetLostAttempts = () => {
     attemptRef.lostSend = undefined
+  }
+
+  /** One attempt at the send (see sendPaymentMutation below for why attempts are looked
+   *  for), which may resolve an earlier attempt that threw after dispatch instead of
+   *  sending again. */
+  const attemptSend = async (startedIn: number) => {
+    const isKeyedSend = !isUsdSend
+    const sendIdempotencyKey = isKeyedSend ? attemptRef.current : undefined
+
+    /** Looked for whatever this send is: the lost attempt's payment is as real
+     *  after a switch of wallet or a new amount. */
+    const earlierAttemptMs = attemptRef.lostSend?.startedAtMs
+    const earlierHashes = attemptRef.lostSend?.paymentHashes ?? []
+    const hasLostAttempt = earlierAttemptMs !== undefined
+    if (hasLostAttempt) {
+      const earlier = await findThisSend(earlierAttemptMs, earlierHashes)
+      if (earlier.status === "found") {
+        forgetLostAttempts()
+        return foundOutcome(earlier.payment, startedIn)
+      }
+      /** Nothing is sent over a history that could not be read: the payment it
+       *  may hold would be paid again. The attempt stays remembered, and the next
+       *  retry asks again. */
+      if (earlier.status === "unreadable") return sendFailure(earlier.error)
+    }
+
+    /** Nothing has moved before the send itself, so a quote that fails is safe to
+     *  report as a failure and try again. */
+    let prepared
+    try {
+      prepared = await prepareLnurl(sdk, prepareOptions)
+    } catch (err) {
+      return sendFailure(err)
+    }
+
+    const startedAtMs = earlierAttemptMs ?? Date.now()
+    const paymentHashes = [...earlierHashes, prepared.invoiceDetails.paymentHash]
+    try {
+      const result = await executeLnurl(sdk, prepared, sendIdempotencyKey)
+      forgetLostAttempts()
+      return dispatchedOutcome(result.payment, result.successAction, startedIn)
+    } catch (err) {
+      /** Not looked for now when a retry under the same key is refused as a
+       *  duplicate by the SDK anyway, nor when the SDK refused the send on the
+       *  way in. Remembered all the same, in both cases: a new amount or wallet
+       *  starts the key over, whether anything was dispatched is the SDK's word
+       *  and not this code's, and the send made next has only the lookup between
+       *  it and paying twice. */
+      const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(
+        classifySdkError(err),
+      )
+      const needsLookingFor = !isKeyedSend && !isRaisedBeforeDispatch
+      if (needsLookingFor) {
+        const lost = await findThisSend(startedAtMs, paymentHashes)
+        if (lost.status === "found") {
+          forgetLostAttempts()
+          return foundOutcome(lost.payment, startedIn)
+        }
+      }
+      rememberLostAttempts(startedAtMs, paymentHashes, startedIn)
+      return sendFailure(err)
+    }
   }
 
   const sendPaymentAndGetFee: PaymentDetailSendPaymentGetFee<T> = settlementAmount.amount
@@ -354,67 +428,29 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
          * lost one is remembered by its own hash.
          */
         sendPaymentMutation: async () => {
-          measure(ScEvent.PaymentSendInitiated, sendTelemetry)
-          const isKeyedSend = !isUsdSend
-          const sendIdempotencyKey = isKeyedSend ? attemptRef.current : undefined
+          /** Telemetry counts the send, not each attempt at it: a retry that looks for
+           *  remembered attempts first is the same send, already counted as initiated,
+           *  and reports under the context that send began in. */
+          const lostSend = attemptRef.lostSend
+          const startedIn = lostSend?.telemetryGeneration ?? measurementGeneration()
+          if (!lostSend) measure(ScEvent.PaymentSendInitiated, sendTelemetry)
 
-          /** Looked for whatever this send is: the lost attempt's payment is as real
-           *  after a switch of wallet or a new amount. */
-          const earlierAttemptMs = attemptRef.lostSend?.startedAtMs
-          const earlierHashes = attemptRef.lostSend?.paymentHashes ?? []
-          const hasLostAttempt = earlierAttemptMs !== undefined
-          if (hasLostAttempt) {
-            const earlier = await findThisSend(earlierAttemptMs, earlierHashes)
-            if (earlier.status === "found") {
-              forgetLostAttempts()
-              return foundOutcome(earlier.payment)
-            }
-            /** Nothing is sent over a history that could not be read: the payment it
-             *  may hold would be paid again. The attempt stays remembered, and the next
-             *  retry asks again. */
-            if (earlier.status === "unreadable") return sendFailure(earlier.error)
-          }
+          const result = await attemptSend(startedIn)
 
-          /** Nothing has moved before the send itself, so a quote that fails is safe to
-           *  report as a failure and try again. */
-          let prepared
-          try {
-            prepared = await prepareLnurl(sdk, prepareOptions)
-          } catch (err) {
-            return sendFailure(err)
+          /** A failure is the send's last word only once nothing is left to look for:
+           *  while an attempt is remembered its payment may still turn up, and would
+           *  then be counted settled on top of failed. */
+          const isTerminalFailure =
+            result.status === PaymentSendResult.Failure && !attemptRef.lostSend
+          if (isTerminalFailure && startedIn === measurementGeneration()) {
+            measure(ScEvent.PaymentSendFailed, {
+              ...sendTelemetry,
+              error_code:
+                ("errors" in result ? result.errors[0]?.message : undefined) ??
+                SelfCustodialErrorCode.Generic,
+            })
           }
-
-          const startedAtMs = earlierAttemptMs ?? Date.now()
-          const paymentHashes = [...earlierHashes, prepared.invoiceDetails.paymentHash]
-          try {
-            const result = await executeLnurl(sdk, prepared, sendIdempotencyKey)
-            forgetLostAttempts()
-            return sendOutcome(
-              result.payment,
-              result.successAction,
-              PaymentSendResult.Success,
-            )
-          } catch (err) {
-            /** Not looked for now when a retry under the same key is refused as a
-             *  duplicate by the SDK anyway, nor when the SDK refused the send on the
-             *  way in. Remembered all the same, in both cases: a new amount or wallet
-             *  starts the key over, whether anything was dispatched is the SDK's word
-             *  and not this code's, and the send made next has only the lookup between
-             *  it and paying twice. */
-            const isRaisedBeforeDispatch = CODES_RAISED_BEFORE_DISPATCH.has(
-              classifySdkError(err),
-            )
-            const needsLookingFor = !isKeyedSend && !isRaisedBeforeDispatch
-            if (needsLookingFor) {
-              const lost = await findThisSend(startedAtMs, paymentHashes)
-              if (lost.status === "found") {
-                forgetLostAttempts()
-                return foundOutcome(lost.payment)
-              }
-            }
-            rememberLostAttempts(startedAtMs, paymentHashes)
-            return sendFailure(err)
-          }
+          return result
         },
       }
     : { canSendPayment: false, canGetFee: false }

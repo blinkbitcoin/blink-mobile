@@ -10,6 +10,7 @@ import {
   measure,
   measureObservedPayment,
   measureOnce,
+  measurementGeneration,
   measureSettlement,
   resetMeasuredOnceKeys,
   resetMeasurementContext,
@@ -24,6 +25,11 @@ import { AccountMode } from "@app/types/account"
 
 const mockLogEvent = jest.fn()
 
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+}))
+
 jest.mock("@react-native-firebase/analytics", () => () => ({
   logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
@@ -35,7 +41,11 @@ describe("measurement gate", () => {
   })
 
   it("emits with the network attached when the active account is Enhanced", () => {
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "regtest" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "regtest",
+    })
 
     measure(ScEvent.AccountCreated, { flow: "create" })
 
@@ -47,7 +57,11 @@ describe("measurement gate", () => {
   })
 
   it("emits nothing when the active account is Incognito", () => {
-    setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Anon,
+      network: "mainnet",
+    })
 
     measure(ScEvent.PaymentSendSettled, { rail: "spark" })
 
@@ -55,7 +69,7 @@ describe("measurement gate", () => {
   })
 
   it("fails closed when no mode is recorded", () => {
-    setMeasurementContext({ mode: null, network: "mainnet" })
+    setMeasurementContext({ accountId: "sc-1", mode: null, network: "mainnet" })
 
     measure(ScEvent.PaymentSendSettled, { rail: "spark" })
 
@@ -74,7 +88,11 @@ describe("measurement gate", () => {
   })
 
   it("honors an Incognito choice the moment it is made, even over an Enhanced context", () => {
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
 
     measure(ScEvent.AccountModeSelected, { mode: "anon" }, AccountMode.Anon)
 
@@ -101,7 +119,11 @@ describe("measureOnce", () => {
     jest.clearAllMocks()
     resetMeasurementContext()
     resetMeasuredOnceKeys()
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
   })
 
   it("emits once per key", () => {
@@ -113,11 +135,33 @@ describe("measureOnce", () => {
   })
 
   it("still respects the gate", () => {
-    setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Anon,
+      network: "mainnet",
+    })
 
     measureOnce("p1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
 
     expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+
+  it("leaves the key of a suppressed announcement free for a later one", () => {
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Anon,
+      network: "mainnet",
+    })
+    measureOnce("p1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
+
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+    measureOnce("p1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
+
+    expect(mockLogEvent).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -138,7 +182,11 @@ describe("settlement", () => {
     jest.clearAllMocks()
     resetMeasuredOnceKeys()
     resetSettlementTracking()
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
   })
 
   it("reports every settled event of a completed payment at once", () => {
@@ -151,13 +199,18 @@ describe("settlement", () => {
         ],
         failed: { event: ScEvent.PaymentSendFailed },
       },
+      measurementGeneration(),
     )
 
     expect(loggedEvents()).toEqual([ScEvent.PaymentSendSettled, ScEvent.BlinkPaymentSent])
   })
 
   it("holds a pending swap until the SDK announces it, then reports it once", () => {
-    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+    measureSettlement(
+      { id: "pay-1", status: PaymentStatus.Pending },
+      swap,
+      measurementGeneration(),
+    )
     expect(mockLogEvent).not.toHaveBeenCalled()
 
     measureObservedPayment(sendPayment(PaymentStatus.Pending) as never)
@@ -169,7 +222,11 @@ describe("settlement", () => {
   })
 
   it("reports an announced failure with the settlement code", () => {
-    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+    measureSettlement(
+      { id: "pay-1", status: PaymentStatus.Pending },
+      swap,
+      measurementGeneration(),
+    )
 
     measureObservedPayment(sendPayment(PaymentStatus.Failed) as never)
 
@@ -183,7 +240,11 @@ describe("settlement", () => {
   it("keeps an outcome announced before the payment was handed back", () => {
     measureObservedPayment(sendPayment(PaymentStatus.Failed) as never)
 
-    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+    measureSettlement(
+      { id: "pay-1", status: PaymentStatus.Pending },
+      swap,
+      measurementGeneration(),
+    )
 
     expect(loggedEvents()).toEqual([ScEvent.SwapFailed])
   })
@@ -195,8 +256,16 @@ describe("settlement", () => {
   })
 
   it("respects the gate when the outcome arrives", () => {
-    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
-    setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+    measureSettlement(
+      { id: "pay-1", status: PaymentStatus.Pending },
+      swap,
+      measurementGeneration(),
+    )
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Anon,
+      network: "mainnet",
+    })
 
     measureObservedPayment(sendPayment(PaymentStatus.Completed) as never)
 
@@ -212,7 +281,11 @@ describe("observed receives", () => {
     jest.clearAllMocks()
     resetMeasuredOnceKeys()
     resetSettlementTracking()
-    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
   })
 
   it("counts a completed receive once, on its coarse rail", () => {
