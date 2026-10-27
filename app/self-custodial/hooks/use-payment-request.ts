@@ -83,6 +83,23 @@ const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): bool
   a !== null && a.sdk === b.sdk && a.key === b.key
 
 /**
+ * How long one on-chain address request may hold the queue. The SDK call has no
+ * timeout of its own, and without one a single hung call would stall every request
+ * behind it, a tap on New included, until the user leaves the screen.
+ */
+export const ONCHAIN_REQUEST_TIMEOUT_MS = 30_000
+
+/** How one queued on-chain address request ended. */
+const OnchainRequestOutcome = {
+  Issued: "Issued",
+  // A newer request owns the screen, or this one ran out of time: nothing to report.
+  Skipped: "Skipped",
+  Failed: "Failed",
+} as const
+type OnchainRequestOutcomeType =
+  (typeof OnchainRequestOutcome)[keyof typeof OnchainRequestOutcome]
+
+/**
  * The deposit marker the rotation decision is made against.
  *
  * The loaded history is one page deep, so it answers "has money arrived on-chain?"
@@ -405,13 +422,19 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   const onchainQueueRef = useRef<Promise<unknown>>(Promise.resolve())
   const onchainRequestIdRef = useRef(0)
 
-  // Resolves true once the SDK has issued an address. `forceNew` is the user asking for a
-  // fresh one: earlier addresses stay valid, so it skips the reuse checks and no more.
+  // `forceNew` is the user asking for a fresh address: earlier addresses stay valid, so it
+  // skips the reuse checks and no more. `isAbandoned` turns true once the request has run
+  // out of time; whatever the SDK answers after that is dropped.
   const requestOnchainAddress = useCallback(
-    async (requestId: number, forceNew: boolean) => {
-      if (!sdk) return false
-      const isSuperseded = () => !forceNew && requestId !== onchainRequestIdRef.current
-      if (isSuperseded()) return true
+    async (
+      requestId: number,
+      forceNew: boolean,
+      isAbandoned: () => boolean,
+    ): Promise<OnchainRequestOutcomeType> => {
+      if (!sdk) return OnchainRequestOutcome.Failed
+      const isSuperseded = () =>
+        isAbandoned() || (!forceNew && requestId !== onchainRequestIdRef.current)
+      if (isSuperseded()) return OnchainRequestOutcome.Skipped
       const pendingIds = pendingDepositIdsRef.current
 
       const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
@@ -448,6 +471,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         forceNew || (canTrackReuse && (markerMoved || hasUnseenPendingDeposit))
 
       const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
+      // The timeout already reported this request; neither show nor record its answer.
+      if (isAbandoned()) return OnchainRequestOutcome.Skipped
       if (!result.address) {
         // The adapter reports failures as an error-only result rather than throwing,
         // so without this the address request would fail in complete silence.
@@ -458,14 +483,22 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
             )}`,
           ),
         )
-        return false
+        return OnchainRequestOutcome.Failed
       }
       // A newer request is queued behind this one and will publish from where it ends.
-      if (isSuperseded()) return true
+      // If this one rotated, the SDK has moved on regardless, so it still records the
+      // address: otherwise the next request reads the old record and rotates again.
+      const superseded = isSuperseded()
+      if (superseded && !shouldRotate) return OnchainRequestOutcome.Skipped
+      const outcome = superseded
+        ? OnchainRequestOutcome.Skipped
+        : OnchainRequestOutcome.Issued
 
-      setOnchainAddress(result.address)
-      setOnchainAddressFailed(false)
-      if (!canTrackReuse) return true
+      if (!superseded) {
+        setOnchainAddress(result.address)
+        setOnchainAddressFailed(false)
+      }
+      if (!canTrackReuse) return outcome
       await saveIssuedOnchainAddress(selfCustodialAccountId, {
         address: result.address,
         // Never let a snapshot that has not loaded erase a marker we already had:
@@ -480,26 +513,44 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
           pendingIds,
         ),
       })
-      return true
+      return outcome
     },
     [sdk, selfCustodialAccountId],
   )
 
   const issueOnchainAddress = useCallback(
-    (forceNew = false): Promise<boolean> => {
+    (forceNew = false): Promise<OnchainRequestOutcomeType> => {
       onchainRequestIdRef.current += 1
       const requestId = onchainRequestIdRef.current
       const markFailed = () => {
         if (requestId === onchainRequestIdRef.current) setOnchainAddressFailed(true)
       }
       const request = onchainQueueRef.current.then(async () => {
+        let timedOut = false
+        let timer: ReturnType<typeof setTimeout> | undefined
+        const timeout = new Promise<OnchainRequestOutcomeType>((resolve) => {
+          timer = setTimeout(() => {
+            timedOut = true
+            recordAppError(
+              new Error(
+                `Self-custodial onchain address request timed out after ${ONCHAIN_REQUEST_TIMEOUT_MS}ms`,
+              ),
+            )
+            resolve(OnchainRequestOutcome.Failed)
+          }, ONCHAIN_REQUEST_TIMEOUT_MS)
+        })
         try {
-          const issued = await requestOnchainAddress(requestId, forceNew)
-          if (!issued) markFailed()
-          return issued
+          const outcome = await Promise.race([
+            requestOnchainAddress(requestId, forceNew, () => timedOut),
+            timeout,
+          ])
+          if (outcome === OnchainRequestOutcome.Failed) markFailed()
+          return outcome
         } catch (err) {
           markFailed()
           throw err
+        } finally {
+          clearTimeout(timer)
         }
       })
       // A failed request must not stall the ones queued behind it.
@@ -526,8 +577,11 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   const generateNewOnchainAddress =
     useCallback(async (): Promise<NewOnchainAddressResultType> => {
       try {
-        const created = await issueOnchainAddress(true)
-        return created ? NewOnchainAddressResult.Created : NewOnchainAddressResult.Failed
+        // A tap is never superseded, so anything short of Issued means no new address.
+        const outcome = await issueOnchainAddress(true)
+        return outcome === OnchainRequestOutcome.Issued
+          ? NewOnchainAddressResult.Created
+          : NewOnchainAddressResult.Failed
       } catch (err) {
         recordAppError(
           err instanceof Error

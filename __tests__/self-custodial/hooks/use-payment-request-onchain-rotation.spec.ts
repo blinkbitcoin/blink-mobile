@@ -7,7 +7,10 @@ import {
   onchainReceipt,
   pendingDeposit,
 } from "../../helpers/self-custodial-payment-request"
-import { usePaymentRequest } from "@app/self-custodial/hooks/use-payment-request"
+import {
+  ONCHAIN_REQUEST_TIMEOUT_MS,
+  usePaymentRequest,
+} from "@app/self-custodial/hooks/use-payment-request"
 import {
   NewOnchainAddressResult,
   type NewOnchainAddressResultType,
@@ -806,6 +809,33 @@ describe("generateNewOnchainAddress", () => {
     expect(result.current?.onchainAddressFailed).toBe(false)
   })
 
+  it("does not flag a failure while a newer request is still on the way", async () => {
+    // Only the newest request may say "nothing is coming": an older one failing while
+    // a newer one runs would put the error over a load that is about to succeed.
+    let failFirst: (value: { errors: { message: string }[] }) => void = () => {}
+    mockReceiveOnchain
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          failFirst = resolve
+        }),
+      )
+      .mockReturnValueOnce(new Promise(() => {}))
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+
+    mockPendingDeposits.mockReturnValue({ deposits: [pendingDeposit("txid-1")] })
+    rerender({})
+    await flushEffects()
+
+    await act(async () => {
+      failFirst({ errors: [{ message: "offline" }] })
+    })
+    await flushEffects()
+
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+    expect(result.current?.onchainAddressFailed).toBe(false)
+  })
+
   it("flags a first request that rejects as settled too", async () => {
     mockReceiveOnchain.mockRejectedValueOnce(new Error("bridge exploded"))
 
@@ -941,5 +971,141 @@ describe("generateNewOnchainAddress", () => {
       expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
       expect(result.current?.onchainAddress).toBe("bc1qtapped...")
     })
+  })
+})
+
+describe("a request that never settles", () => {
+  // Fake timers, but not setImmediate: flushEffects needs it to settle promises.
+  beforeEach(() => {
+    jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+  })
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  const hung = () => new Promise<{ address: string }>(() => {})
+  const runOutTheClock = async () => {
+    await act(async () => {
+      jest.advanceTimersByTime(ONCHAIN_REQUEST_TIMEOUT_MS)
+    })
+    await flushEffects()
+  }
+
+  it("stops holding up a tap queued behind it", async () => {
+    // Regression: requests run one at a time and the SDK call has no timeout, so one
+    // hung background request kept every tap behind it waiting until the user left.
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockReturnValueOnce(hung())
+      .mockResolvedValueOnce({ address: "bc1qfresh..." })
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+
+    mockPendingDeposits.mockReturnValue({ deposits: [pendingDeposit("txid-1")] })
+    rerender({})
+    await flushEffects()
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+
+    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+    await act(async () => {
+      tap = result.current?.generateNewOnchainAddress?.()
+    })
+    await flushEffects()
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+
+    await runOutTheClock()
+
+    await expect(tap).resolves.toBe(NewOnchainAddressResult.Created)
+    expect(result.current?.onchainAddress).toBe("bc1qfresh...")
+    expect(mockRecordAppError).toHaveBeenCalledWith(
+      new Error(
+        `Self-custodial onchain address request timed out after ${ONCHAIN_REQUEST_TIMEOUT_MS}ms`,
+      ),
+    )
+  })
+
+  it("fails a hung tap, keeps the address on screen and drops the late answer", async () => {
+    let lateAnswer: (value: { address: string }) => void = () => {}
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockReturnValueOnce(
+        new Promise<{ address: string }>((resolve) => {
+          lateAnswer = resolve
+        }),
+      )
+    const { result } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+
+    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+    await act(async () => {
+      tap = result.current?.generateNewOnchainAddress?.()
+    })
+    await runOutTheClock()
+
+    await expect(tap).resolves.toBe(NewOnchainAddressResult.Failed)
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+
+    mockSaveIssuedOnchainAddress.mockClear()
+    await act(async () => {
+      lateAnswer({ address: "bc1qlate..." })
+    })
+    await flushEffects()
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+    expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
+  })
+})
+
+describe("a background request overtaken after rotating", () => {
+  it("records its rotation so the request behind it does not rotate again", async () => {
+    // The overtaken request does not publish, but the SDK has already moved to the
+    // new address. Unrecorded, the next request read the old record and rotated a
+    // second time: one wasted address per overlap.
+    let stored: unknown = { address: "bc1qfirst...", depositMarker: null }
+    mockLoadIssuedOnchainAddress.mockImplementation(() => Promise.resolve(stored))
+    mockSaveIssuedOnchainAddress.mockImplementation((_id: string, record: unknown) => {
+      stored = record
+      return Promise.resolve()
+    })
+    // Only the SDK lookback sees the deposit at first, so the first request rotates.
+    mockFindLatestOnchainReceiptId.mockResolvedValue("deposit-1")
+    let sdkCurrentAddress = "bc1qfirst..."
+    let finishRotation: () => void = () => {}
+    mockReceiveOnchain
+      .mockImplementationOnce(
+        () =>
+          new Promise<{ address: string }>((resolve) => {
+            finishRotation = () => {
+              sdkCurrentAddress = "bc1qrotated..."
+              resolve({ address: sdkCurrentAddress })
+            }
+          }),
+      )
+      .mockImplementation(() => Promise.resolve({ address: sdkCurrentAddress }))
+
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+
+    // The loaded history catches up and queues a second request behind the first.
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: mockSdk,
+      lastReceivedPaymentId: null,
+      allTransactions: [onchainReceipt("deposit-1")],
+    })
+    rerender({})
+    await flushEffects()
+
+    await act(async () => {
+      finishRotation()
+    })
+    await flushEffects()
+
+    expect(mockReceiveOnchain.mock.calls).toEqual([
+      [{ newAddress: true }],
+      [{ newAddress: false }],
+    ])
+    expect(result.current?.onchainAddress).toBe("bc1qrotated...")
   })
 })
