@@ -174,7 +174,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
   })
 
   const { displayPaymentRequest, showActions: hasPaymentRequestActions } =
-    useDisplayPaymentRequest(requestState, carousel.isOnChainPage, onchain.address)
+    useDisplayPaymentRequest(requestState, carousel.isOnChainPage, onchain)
   // A failed on-chain request keeps the row so New can retry it; there is nothing to copy.
   const onchainFailed = carousel.isOnChainPage && onchain.failed
   const showActions = hasPaymentRequestActions || onchainFailed
@@ -279,7 +279,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
             loading={onchain.loading || isGeneratingAddress}
             completed={requestState.state === PaymentRequestState.Paid}
             converting={isConverting}
-            err=""
+            err={
+              onchain.failed && !isGeneratingAddress
+                ? LL.ReceiveScreen.newAddressFailed()
+                : ""
+            }
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}
             copyToClipboard={handleCopy}
@@ -294,6 +298,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
       <Pressable
         style={styles.paymentIdentifier}
         onPress={handleCopy}
+        disabled={hasNothingToShare}
         accessibilityRole="button"
         accessibilityHint={
           carousel.isOnChainPage
