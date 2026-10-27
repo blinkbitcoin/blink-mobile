@@ -53,6 +53,7 @@ const OTHER_ACCOUNT_ID = "self-custodial-2"
 
 let mockActiveAccount: { id: string; type: AccountType } | undefined
 let mockSelfCustodialEntries: { id: string }[]
+let mockSelfCustodialIndex: "pending" | "unreadable" | "known"
 let mockAccountMode: AccountMode | null
 let mockServerModes: Record<string, AccountMode>
 let mockRemoteConfigTrusted: boolean
@@ -63,9 +64,15 @@ let mockWalletStatus: ActiveWalletStatus
 const mockUpdateState = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
+  SelfCustodialIndexState: {
+    Pending: "pending",
+    Unreadable: "unreadable",
+    Known: "known",
+  },
   useAccountRegistry: () => ({
     activeAccount: mockActiveAccount,
     selfCustodialEntries: mockSelfCustodialEntries,
+    selfCustodialIndex: mockSelfCustodialIndex,
   }),
 }))
 
@@ -176,6 +183,7 @@ describe("SelfCustodialTelemetryMount", () => {
 
     mockActiveAccount = { id: ACCOUNT_ID, type: AccountType.SelfCustodial }
     mockSelfCustodialEntries = [{ id: ACCOUNT_ID }]
+    mockSelfCustodialIndex = "known"
     mockAccountMode = AccountMode.Enhanced
     mockServerModes = {}
     mockRemoteConfigTrusted = true
@@ -542,6 +550,86 @@ describe("SelfCustodialTelemetryMount", () => {
 
       await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved))
       expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+    })
+  })
+
+  describe("before the registry has read the account index", () => {
+    // The registry seeds an empty list until listSelfCustodialAccounts() lands, so "this
+    // device holds no self-custodial account" is not yet an answer.
+    it("keeps a logged-out device with an incognito wallet closed until the index is read", async () => {
+      mockActiveAccount = undefined
+      mockSelfCustodialEntries = []
+      mockSelfCustodialIndex = "pending"
+      const view = render(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+      expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved)
+
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }]
+      mockSelfCustodialIndex = "known"
+      view.rerender(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+
+      expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved)
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+      expect(getDiagnosticsDisposition()).toBe(DiagnosticsDisposition.Unresolved)
+    })
+
+    it("opens a custodial-only device once the index says it holds nothing", async () => {
+      mockActiveAccount = undefined
+      mockSelfCustodialEntries = []
+      mockSelfCustodialIndex = "pending"
+      const view = render(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+
+      mockSelfCustodialIndex = "known"
+      view.rerender(<SelfCustodialTelemetryMount />)
+
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
+      expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+
+    it("counts an index that could not be read as holding a self-custodial account", async () => {
+      mockActiveAccount = undefined
+      mockSelfCustodialEntries = []
+      mockSelfCustodialIndex = "unreadable"
+
+      render(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+
+      expect(getTelemetryMode()).toBe(TelemetryMode.Unresolved)
+      expect(setCollectionEnabled).not.toHaveBeenCalledWith(true)
+    })
+
+    it("never passes through Custodial on a dual-account cold start", async () => {
+      // A custodial user who also holds a self-custodial wallet: the index read lands
+      // before the remote config fetch does.
+      mockActiveAccount = { id: "custodial-default", type: AccountType.Custodial }
+      mockSelfCustodialEntries = []
+      mockSelfCustodialIndex = "pending"
+      mockRemoteConfigTrusted = false
+      const seen: string[] = []
+      const view = render(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+      seen.push(getTelemetryMode())
+
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }]
+      mockSelfCustodialIndex = "known"
+      view.rerender(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+      seen.push(getTelemetryMode())
+
+      mockRemoteConfigTrusted = true
+      view.rerender(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+      seen.push(getTelemetryMode())
+
+      expect(seen).toEqual([
+        TelemetryMode.Unresolved,
+        TelemetryMode.Unresolved,
+        TelemetryMode.Custodial,
+      ])
+      expect(setCollectionEnabled.mock.calls.map((call) => call[0])).not.toContain(false)
     })
   })
 

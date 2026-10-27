@@ -52,6 +52,7 @@ const inputs = (overrides: Partial<TelemetryModeInputs> = {}): TelemetryModeInpu
   persistedMode: null,
   serverMode: null,
   remoteConfigTrusted: true,
+  registryHydrated: true,
   hasSelfCustodialAccount: true,
   ...overrides,
 })
@@ -113,6 +114,32 @@ describe("deriveTelemetryMode", () => {
         hasSelfCustodialAccount: true,
       }),
       expected: TelemetryMode.Unresolved,
+    },
+    {
+      // The registry seeds an empty list until it has read the index, so "none" is not yet
+      // an answer. An incognito wallet's device used to resolve Custodial here.
+      case: "no account, before the registry has read the index",
+      given: inputs({
+        activeAccount: ActiveAccountKind.None,
+        hasSelfCustodialAccount: false,
+        registryHydrated: false,
+      }),
+      expected: TelemetryMode.Unresolved,
+    },
+    {
+      case: "a custodial account, before the registry has read the index",
+      given: inputs({
+        activeAccount: ActiveAccountKind.Custodial,
+        hasSelfCustodialAccount: false,
+        registryHydrated: false,
+      }),
+      expected: TelemetryMode.Unresolved,
+    },
+    {
+      // The active account answers for itself; the index only matters when it does not.
+      case: "a self-custodial account, before the registry has read the index",
+      given: inputs({ persistedMode: "enhanced", registryHydrated: false }),
+      expected: TelemetryMode.Enhanced,
     },
   ])("resolves $case as $expected", ({ given, expected }) => {
     expect(deriveTelemetryMode(given)).toBe(expected)

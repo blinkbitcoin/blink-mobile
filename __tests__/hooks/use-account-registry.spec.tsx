@@ -4,6 +4,7 @@ import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
 import {
   AccountRegistryProvider,
+  SelfCustodialIndexState,
   createCustodialDescriptor,
   createSelfCustodialDescriptor,
   markSelected,
@@ -249,6 +250,76 @@ describe("useAccountRegistry", () => {
     const updater = mockUpdateState.mock.calls[0][0]
     expect(updater({ activeAccountId: "old" })).toEqual({
       activeAccountId: "self-custodial-uuid-1",
+    })
+  })
+
+  describe("what it knows about the account index", () => {
+    // "No self-custodial account" is an answer only after a read has succeeded. The
+    // telemetry mode turns full platform collection on from that answer.
+    it("is pending until the first read completes", async () => {
+      mockUseIsAuthed.mockReturnValue(true)
+      let resolveRead: (value: unknown) => void = () => undefined
+      mockListSelfCustodialAccounts.mockReturnValueOnce(
+        new Promise((resolve) => {
+          resolveRead = resolve
+        }),
+      )
+
+      const { result } = renderHook(() => useAccountRegistry(), {
+        wrapper: AccountRegistryProvider,
+      })
+      await flushAsyncEffects()
+
+      expect(result.current.selfCustodialIndex).toBe(SelfCustodialIndexState.Pending)
+      expect(result.current.selfCustodialEntries).toEqual([])
+
+      await act(async () => {
+        resolveRead({ status: "ok", entries: [] })
+        await Promise.resolve()
+      })
+
+      expect(result.current.selfCustodialIndex).toBe(SelfCustodialIndexState.Known)
+    })
+
+    it("is unreadable when every read so far has failed", async () => {
+      mockUseIsAuthed.mockReturnValue(true)
+      mockListSelfCustodialAccounts.mockResolvedValue({
+        status: "read-failed",
+        error: new Error("AsyncStorage unavailable"),
+      })
+
+      const { result } = renderHook(() => useAccountRegistry(), {
+        wrapper: AccountRegistryProvider,
+      })
+      await flushAsyncEffects()
+
+      expect(result.current.selfCustodialIndex).toBe(SelfCustodialIndexState.Unreadable)
+    })
+
+    it("stays known when a later read fails, since the entries it read still hold", async () => {
+      mockUseIsAuthed.mockReturnValue(true)
+      mockListSelfCustodialAccounts.mockResolvedValueOnce({
+        status: "ok",
+        entries: [{ id: "sc-1", lightningAddress: null }],
+      })
+
+      const { result } = renderHook(() => useAccountRegistry(), {
+        wrapper: AccountRegistryProvider,
+      })
+      await flushAsyncEffects()
+      mockListSelfCustodialAccounts.mockResolvedValueOnce({
+        status: "read-failed",
+        error: new Error("AsyncStorage unavailable"),
+      })
+
+      await act(async () => {
+        await result.current.reloadSelfCustodialAccounts()
+      })
+
+      expect(result.current.selfCustodialIndex).toBe(SelfCustodialIndexState.Known)
+      expect(result.current.selfCustodialEntries).toEqual([
+        { id: "sc-1", lightningAddress: null },
+      ])
     })
   })
 

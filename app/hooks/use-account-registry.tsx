@@ -55,10 +55,32 @@ export const markSelected = (
   }))
 }
 
+/**
+ * What the registry knows about the device's self-custodial account index.
+ *
+ * Until a read has succeeded, `selfCustodialEntries` is only the seed — at most the active
+ * account — so an empty list means "not read yet" or "could not be read", not "none".
+ * Anything that decides on "this device holds no self-custodial account" has to wait for
+ * `Known`; the telemetry mode is the case that matters, since that answer turns on full
+ * platform collection.
+ */
+export const SelfCustodialIndexState = {
+  /** No read has completed yet. */
+  Pending: "pending",
+  /** Reads have completed and none succeeded, so whether the device holds one is unknown. */
+  Unreadable: "unreadable",
+  /** A read has succeeded; `selfCustodialEntries` is the device's real list. */
+  Known: "known",
+} as const
+
+export type SelfCustodialIndexState =
+  (typeof SelfCustodialIndexState)[keyof typeof SelfCustodialIndexState]
+
 type AccountRegistryResult = {
   accounts: AccountDescriptor[]
   activeAccount?: AccountDescriptor
   selfCustodialEntries: SelfCustodialAccountEntry[]
+  selfCustodialIndex: SelfCustodialIndexState
   loading: boolean
   setActiveAccountId: (id: string) => void
   reloadSelfCustodialAccounts: () => Promise<void>
@@ -88,6 +110,9 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
   // True until both async reads settle, so callers can wait before trusting `accounts`.
   const [selfCustodialHydrating, setSelfCustodialHydrating] = useState(true)
   const [profilesHydrating, setProfilesHydrating] = useState(true)
+  const [selfCustodialIndex, setSelfCustodialIndex] = useState<SelfCustodialIndexState>(
+    SelfCustodialIndexState.Pending,
+  )
 
   // Consumers can call the reload below at any time, so a read that is still in
   // flight may resolve after a newer one has already answered. Applying it then
@@ -105,6 +130,14 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
 
     if (result.status === StorageReadStatus.Ok) {
       setSelfCustodialEntries(result.entries)
+      setSelfCustodialIndex(SelfCustodialIndexState.Known)
+    } else {
+      // A later failure leaves an earlier success standing: the entries it read still hold.
+      setSelfCustodialIndex((previous) =>
+        previous === SelfCustodialIndexState.Known
+          ? previous
+          : SelfCustodialIndexState.Unreadable,
+      )
     }
     setSelfCustodialHydrating(false)
   }, [])
@@ -167,6 +200,7 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
       accounts,
       activeAccount,
       selfCustodialEntries,
+      selfCustodialIndex,
       loading: selfCustodialHydrating || profilesHydrating,
       setActiveAccountId,
       reloadSelfCustodialAccounts,
@@ -175,6 +209,7 @@ export const AccountRegistryProvider = ({ children }: { children: ReactNode }) =
       accounts,
       activeAccount,
       selfCustodialEntries,
+      selfCustodialIndex,
       selfCustodialHydrating,
       profilesHydrating,
       setActiveAccountId,

@@ -2,7 +2,10 @@ import React, { useCallback, useEffect } from "react"
 import { AppState } from "react-native"
 
 import { useFeatureFlags } from "@app/config/feature-flags-context"
-import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import {
+  SelfCustodialIndexState,
+  useAccountRegistry,
+} from "@app/hooks/use-account-registry"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import {
@@ -71,7 +74,7 @@ import { useSelfCustodialWallet } from "./wallet"
  * activated again still expires on the usual schedule rather than sitting on disk.
  */
 export const SelfCustodialTelemetryMount: React.FC = () => {
-  const { activeAccount, selfCustodialEntries } = useAccountRegistry()
+  const { activeAccount, selfCustodialEntries, selfCustodialIndex } = useAccountRegistry()
   const { accountMode } = useSelfCustodialAccountMode()
   const { persistentState, updateState } = usePersistentStateContext()
   const { remoteConfigTrusted, telemetryEnabled } = useFeatureFlags()
@@ -81,7 +84,10 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
   const accountType = activeAccount?.type
   const accountId =
     accountType === AccountType.SelfCustodial ? activeAccount?.id ?? null : null
-  const hasSelfCustodialAccount = selfCustodialEntries.length > 0
+  const registryHydrated = selfCustodialIndex !== SelfCustodialIndexState.Pending
+  const hasSelfCustodialAccount =
+    selfCustodialEntries.length > 0 ||
+    selfCustodialIndex === SelfCustodialIndexState.Unreadable
 
   const serverMode = accountId
     ? getSelfCustodialServerAccountMode(persistentState, accountId)
@@ -92,6 +98,7 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     persistedMode: toModeAnswer(accountMode),
     serverMode: toModeAnswer(serverMode),
     remoteConfigTrusted,
+    registryHydrated,
     hasSelfCustodialAccount,
   })
 

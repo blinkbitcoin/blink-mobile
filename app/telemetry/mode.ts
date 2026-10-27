@@ -86,7 +86,14 @@ export type TelemetryModeInputs = {
   serverMode: SelfCustodialModeAnswer
   /** Whether the remote config behind the self-custody rollout was actually fetched. */
   remoteConfigTrusted: boolean
-  /** Whether this device holds a self-custodial account at all. */
+  /**
+   * Whether the account registry has finished its first read of the device's account index.
+   * Before it has, `hasSelfCustodialAccount` is only the registry's seed and cannot be read
+   * as "this device holds none".
+   */
+  registryHydrated: boolean
+  /** Whether this device holds a self-custodial account at all — or might: an index that
+   *  could not be read counts as holding one. */
   hasSelfCustodialAccount: boolean
 }
 
@@ -121,6 +128,7 @@ export const deriveTelemetryMode = ({
   persistedMode,
   serverMode,
   remoteConfigTrusted,
+  registryHydrated,
   hasSelfCustodialAccount,
 }: TelemetryModeInputs): TelemetryMode => {
   if (activeAccount === ActiveAccountKind.SelfCustodial) {
@@ -130,6 +138,15 @@ export const deriveTelemetryMode = ({
     }
     return TelemetryMode.Unresolved
   }
+
+  /**
+   * Everything below decides on whether the device holds a self-custodial account, and
+   * before the registry has read its index the answer is only a seed. Taking "none" from
+   * the seed resolved an incognito wallet's device Custodial on every cold start — full
+   * platform collection, crash provenance `permitted`, held errors released — until the
+   * read landed.
+   */
+  if (!registryHydrated) return TelemetryMode.Unresolved
 
   if (activeAccount === ActiveAccountKind.Custodial) {
     if (remoteConfigTrusted || !hasSelfCustodialAccount) return TelemetryMode.Custodial

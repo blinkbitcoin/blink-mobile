@@ -95,6 +95,7 @@ describe("what the rest of the app may reach", () => {
         persistedMode: null,
         serverMode: null,
         remoteConfigTrusted: true,
+        registryHydrated: true,
         hasSelfCustodialAccount: false,
       }),
     ).toBe(telemetry.TelemetryMode.Custodial)
