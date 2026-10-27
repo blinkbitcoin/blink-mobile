@@ -1,12 +1,24 @@
 /**
- * Dead-token recovery shared by every Drive caller, interactive or silent.
- * Lives apart from google-drive-client.ts so that module stays pure fetch;
- * this one needs the sign-in SDK to refresh tokens.
+ * Sign-in setup and dead-token recovery shared by every Drive caller,
+ * interactive or silent. Lives apart from google-drive-client.ts so that
+ * module stays pure fetch; this one needs the sign-in SDK.
  */
 
 import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
 import { DriveError } from "@app/utils/google-drive-client"
+
+export const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
+
+/**
+ * Safe to call before every Drive session. Drive is the Android backup
+ * provider (iOS uses iCloud), and there configure only rebuilds the sign-in
+ * client from these options while keeping the signed-in account, so calling
+ * it again neither signs the user out nor changes the requested scopes.
+ */
+export const configureGoogleSignIn = (): void => {
+  GoogleSignin.configure({ scopes: [DRIVE_SCOPE] })
+}
 
 /** Not `reason`: 403 shares it but means a withheld permission, which a new token cannot fix. */
 export const isDeadAccessToken = (err: unknown): boolean =>

@@ -25,15 +25,11 @@ import {
   downloadAppDataFile,
   DriveError,
 } from "@app/utils/google-drive-client"
-import { callDrive } from "@app/utils/google-drive-session"
-
-const DRIVE_SCOPE = "https://www.googleapis.com/auth/drive.appdata"
-
-const configureGoogleSignIn = () => {
-  GoogleSignin.configure({
-    scopes: [DRIVE_SCOPE],
-  })
-}
+import {
+  callDrive,
+  configureGoogleSignIn,
+  DRIVE_SCOPE,
+} from "@app/utils/google-drive-session"
 
 /**
  * Google's granular consent lets the user finish sign-in with the Drive scope unchecked,
