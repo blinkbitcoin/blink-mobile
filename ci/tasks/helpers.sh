@@ -9,6 +9,11 @@ if [[ -z $(git config --global user.name) ]]; then
   git config --global user.name "CI Bot" > /dev/null
 fi
 
+# Node's default heap cap is ~2 GB on the 8 GiB workers; matches .github/workflows/test.yml.
+function use_ci_node_heap() {
+  export NODE_OPTIONS=--max-old-space-size=4096
+}
+
 function unpack_deps() {
 
   echo "Unpacking deps... "
