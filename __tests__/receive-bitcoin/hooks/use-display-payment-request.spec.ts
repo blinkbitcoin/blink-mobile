@@ -70,7 +70,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          null,
+          { address: null, failed: false },
         ),
       )
 
@@ -83,7 +83,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          null,
+          { address: null, failed: false },
         ),
       )
 
@@ -97,7 +97,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           basePayCodeRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          null,
+          { address: null, failed: false },
         ),
       )
 
@@ -110,7 +110,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           basePayCodeRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          null,
+          { address: null, failed: false },
         ),
       )
 
@@ -123,7 +123,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           request as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          null,
+          { address: null, failed: false },
         ),
       )
 
@@ -137,7 +137,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
-          "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
+          { address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", failed: false },
         ),
       )
 
@@ -152,7 +152,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
-          "bc1qtest",
+          { address: "bc1qtest", failed: false },
         ),
       )
 
@@ -164,7 +164,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
-          null,
+          { address: null, failed: false },
         ),
       )
 
@@ -183,7 +183,8 @@ describe("useDisplayPaymentRequest", () => {
           request: Parameters<typeof useDisplayPaymentRequest>[0]
           isOnChain: boolean
           addr: string | null
-        }) => useDisplayPaymentRequest(request, isOnChain, addr),
+        }) =>
+          useDisplayPaymentRequest(request, isOnChain, { address: addr, failed: false }),
         {
           initialProps: {
             request: baseLightningRequest as Parameters<
@@ -209,6 +210,52 @@ describe("useDisplayPaymentRequest", () => {
       })
 
       expect(result.current.displayPaymentRequest).toBe(firstValue)
+    })
+
+    type RailProps = {
+      isOnChain: boolean
+      onchain: { address: string | null; failed: boolean }
+    }
+    const renderOnRails = (initialProps: RailProps) =>
+      renderHook(
+        ({ isOnChain, onchain }: RailProps) =>
+          useDisplayPaymentRequest(
+            baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
+            isOnChain,
+            onchain,
+          ),
+        { initialProps },
+      )
+
+    it("never shows the Lightning request on the on-chain page", () => {
+      const { result, rerender } = renderOnRails({
+        isOnChain: false,
+        onchain: { address: null, failed: false },
+      })
+      expect(result.current.displayPaymentRequest).toBe("lnbc1...quest")
+
+      rerender({ isOnChain: true, onchain: { address: null, failed: false } })
+      expect(result.current.displayPaymentRequest).toBe("")
+
+      rerender({ isOnChain: true, onchain: { address: null, failed: true } })
+      expect(result.current.displayPaymentRequest).toBe("")
+    })
+
+    it("drops the last on-chain address once a later on-chain load fails", () => {
+      const { result, rerender } = renderOnRails({
+        isOnChain: true,
+        onchain: { address: "bc1qfirstaddress", failed: false },
+      })
+      expect(result.current.displayPaymentRequest).toBe("bc1qf...dress")
+
+      rerender({ isOnChain: true, onchain: { address: null, failed: false } })
+      expect(result.current.displayPaymentRequest).toBe("bc1qf...dress")
+
+      rerender({ isOnChain: true, onchain: { address: null, failed: true } })
+      expect(result.current.displayPaymentRequest).toBe("")
+
+      rerender({ isOnChain: true, onchain: { address: null, failed: false } })
+      expect(result.current.displayPaymentRequest).toBe("")
     })
   })
 })

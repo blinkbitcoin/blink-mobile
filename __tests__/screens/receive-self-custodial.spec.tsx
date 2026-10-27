@@ -268,9 +268,9 @@ jest.mock("react-native-reanimated-carousel", () => {
 jest.mock("@app/screens/receive-bitcoin-screen/qr-view", () => {
   const { View: RNView, Text: RNText } = jest.requireActual("react-native")
   return {
-    QRView: ({ type, loading }: { type: string; loading: boolean }) => (
+    QRView: ({ type, loading, err }: { type: string; loading: boolean; err: string }) => (
       <RNView testID={`qr-view-${type}`}>
-        <RNText>{loading ? "Loading" : `QR-${type}`}</RNText>
+        <RNText>{err || (loading ? "Loading" : `QR-${type}`)}</RNText>
       </RNView>
     ),
   }
@@ -738,6 +738,13 @@ describe("ReceiveScreen — self-custodial", () => {
       fireEvent.press(screen.getByTestId("carousel-page-1"))
       await flushAsync()
       expect(screen.queryByText(shown(currentAddress))).toBeNull()
+
+      const identifier = screen.getByTestId("readable-payment-request")
+      expect(identifier.props.children).toBeFalsy()
+      expect(screen.getByText(LL.ReceiveScreen.newAddressFailed())).toBeTruthy()
+      expect(screen.queryByText("QR-OnChain")).toBeNull()
+      fireEvent.press(identifier)
+      expect(Clipboard.setString).not.toHaveBeenCalled()
 
       fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
       expect(Clipboard.setString).not.toHaveBeenCalled()

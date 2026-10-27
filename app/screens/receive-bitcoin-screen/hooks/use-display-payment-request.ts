@@ -8,6 +8,11 @@ import { Invoice } from "../payment/index.types"
 
 type RequestState = ReceivePaymentRequestState
 
+type OnchainDisplayState = {
+  address: string | null
+  failed: boolean
+}
+
 type DisplayPaymentRequestReturn = {
   displayPaymentRequest: string
   showActions: boolean
@@ -16,11 +21,16 @@ type DisplayPaymentRequestReturn = {
 export const useDisplayPaymentRequest = (
   request: RequestState,
   isOnChainPage: boolean,
-  onchainAddress: string | null,
+  onchain: OnchainDisplayState,
 ): DisplayPaymentRequestReturn => {
   const { type: requestType, canUsePaycode, info, lnAddressHostname } = request
+  const { address: onchainAddress, failed: onchainFailed } = onchain
 
-  const prevPaymentRequest = useRef("")
+  // Each rail falls back only to its own last value: a Lightning request must never
+  // stand in for a Bitcoin address, and a failed on-chain load has nothing to show.
+  const prevByRail = useRef({ onchain: "", lightning: "" })
+  const rail = isOnChainPage ? "onchain" : "lightning"
+  const hasNoFallback = isOnChainPage && onchainFailed
 
   const showActions = isOnChainPage
     ? Boolean(onchainAddress)
@@ -42,11 +52,13 @@ export const useDisplayPaymentRequest = (
       ? truncateMiddle(onchainAddress)
       : null
     : readablePaymentRequest
-  const displayPaymentRequest = activePaymentRequest || prevPaymentRequest.current
+  const fallback = hasNoFallback ? "" : prevByRail.current[rail]
+  const displayPaymentRequest = activePaymentRequest || fallback
 
   useEffect(() => {
-    if (activePaymentRequest) prevPaymentRequest.current = activePaymentRequest
-  }, [activePaymentRequest])
+    if (activePaymentRequest) prevByRail.current[rail] = activePaymentRequest
+    else if (hasNoFallback) prevByRail.current.onchain = ""
+  }, [activePaymentRequest, rail, hasNoFallback])
 
   return { displayPaymentRequest, showActions }
 }
