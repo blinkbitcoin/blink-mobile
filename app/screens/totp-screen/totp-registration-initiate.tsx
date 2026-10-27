@@ -57,8 +57,9 @@ export const TotpRegistrationInitiateScreen: React.FC<Props> = ({ route }) => {
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "totpRegistrationInitiate">
     >()
-  /** Handed on to the code screen, which is the one that decides where to go next. */
-  const { returnTo } = route.params ?? {}
+  /** Handed on to the code screen, which is the one that decides where to go next and
+   *  reports the setup. */
+  const { returnTo, prompt } = route.params ?? {}
 
   const [totpRegistrationInitiate] = useUserTotpRegistrationInitiateMutation()
 
@@ -129,6 +130,7 @@ export const TotpRegistrationInitiateScreen: React.FC<Props> = ({ route }) => {
                 navigation.navigate("totpRegistrationValidate", {
                   totpRegistrationId,
                   returnTo,
+                  prompt,
                 })
               }
             />

@@ -20,6 +20,7 @@ import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
+  logTwoFactorSetupCompleted,
   logTwoFactorSetupStarted,
   logUpgradeLoginAttempt,
   logUpgradeLoginSuccess,
@@ -288,12 +289,55 @@ describe("analytics helpers", () => {
       })
     })
 
+    it("adds the reason the reminder bulletin is up for, to both its events", () => {
+      logTwoFactorPromptShown({ tier: 2, prompt: "tier2_bulletin", reason: "new_ath" })
+      logTwoFactorPromptDismissed({
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "first_sessions",
+      })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_shown", {
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "new_ath",
+      })
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "first_sessions",
+      })
+    })
+
     it("emits 'two_factor_prompt_dismissed' with tier and prompt", () => {
       logTwoFactorPromptDismissed({ tier: 2, prompt: "settings_banner" })
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
         tier: 2,
         prompt: "settings_banner",
+      })
+    })
+
+    it("emits 'two_factor_setup_completed' with the tier, whether it was enforced and the prompt", () => {
+      logTwoFactorSetupCompleted({
+        tier: 2,
+        isEnforced: true,
+        prompt: "tier2_bulletin",
+      })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
+        tier: 2,
+        is_enforced: true,
+        prompt: "tier2_bulletin",
+      })
+    })
+
+    it("emits 'two_factor_setup_completed' without a prompt for a setup from the settings", () => {
+      logTwoFactorSetupCompleted({ tier: 0, isEnforced: false })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
+        tier: 0,
+        is_enforced: false,
       })
     })
 

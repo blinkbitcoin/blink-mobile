@@ -189,7 +189,6 @@ describe("useEmailReverification", () => {
     expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationValidate", {
       email: EMAIL,
       emailRegistrationId: "registration-id",
-      returnTo: undefined,
     })
   })
 
@@ -215,21 +214,6 @@ describe("useEmailReverification", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 
-  it("hands the code screen the screen's own route to return to", async () => {
-    const { result } = renderHook(() =>
-      useEmailReverification({ returnTo: "twoFactorSetup" }),
-    )
-
-    result.current.promptReverification(EMAIL)
-    await pressAlertButton("OK")
-
-    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationValidate", {
-      email: EMAIL,
-      emailRegistrationId: "registration-id",
-      returnTo: "twoFactorSetup",
-    })
-  })
-
   /** Two taps before the native alert takes over raise two prompts from the same
    *  render; answering both must not run the delete a second time mid-registration. */
   it("runs one sequence when two prompts are answered before the first is done", async () => {
@@ -248,10 +232,8 @@ describe("useEmailReverification", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 
-  /** A screen that holds the user while the sequence runs releases the hold after a
-   *  while; the screen reopened then joins the sequence on mount, is held by it, and is
-   *  the one to move on, with its own return route, since the screen that started the
-   *  sequence was left. */
+  /** A screen reopened while the sequence runs joins it on mount, shows it running, and
+   *  is the one to move on, since the screen that started the sequence was left. */
   it("joins a sequence in flight on mount, and moves on in place of the screen that was left", async () => {
     const finishDeletion = deletionHeld()
     const left = renderHook(() => useEmailReverification())
@@ -259,9 +241,7 @@ describe("useEmailReverification", () => {
     await pressOkAndLeaveRunning()
     left.unmount()
 
-    const reopened = renderHook(() =>
-      useEmailReverification({ returnTo: "twoFactorSetup" }),
-    )
+    const reopened = renderHook(() => useEmailReverification())
     await flushEffects()
 
     expect(reopened.result.current.spinner).toBe(true)
@@ -275,7 +255,6 @@ describe("useEmailReverification", () => {
     expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationValidate", {
       email: EMAIL,
       emailRegistrationId: "registration-id",
-      returnTo: "twoFactorSetup",
     })
     expect(reopened.result.current.spinner).toBe(false)
   })
@@ -388,8 +367,6 @@ describe("useEmailReverification", () => {
 
     expect(starter.result.current.spinner).toBe(false)
     expect(waiter.result.current.spinner).toBe(false)
-    /** What releases a screen that holds the user for its own request. */
-    expect(starter.result.current.isAskedHere).toBe(false)
     expect(mockNavigate).not.toHaveBeenCalled()
 
     /** The stalled delete is still on its way: nothing starts over it. */
@@ -548,44 +525,25 @@ describe("useEmailReverification", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(2)
   })
 
-  it("makes a sequence joined from elsewhere this screen's own once it is asked for here too", async () => {
+  it("waits on the sequence it already joined when it is asked for from that screen too", async () => {
     const finishDeletion = deletionHeld()
     const starter = renderHook(() => useEmailReverification())
     starter.result.current.promptReverification(EMAIL)
     await pressOkAndLeaveRunning()
     const joiner = renderHook(() => useEmailReverification())
     await flushEffects()
-    expect(joiner.result.current.isAskedHere).toBe(false)
+    expect(joiner.result.current.spinner).toBe(true)
 
     joiner.result.current.promptReverification(EMAIL)
     await pressOkAndLeaveRunning(1)
 
-    expect(joiner.result.current.isAskedHere).toBe(true)
     expect(mockEmailDelete).toHaveBeenCalledTimes(1)
 
     finishDeletion()
     await flushEffects()
 
-    expect(joiner.result.current.isAskedHere).toBe(false)
+    expect(joiner.result.current.spinner).toBe(false)
     expect(mockNavigate).toHaveBeenCalledTimes(1)
-  })
-
-  it("tells a sequence asked for from this screen from one joined from elsewhere", async () => {
-    const finishDeletion = deletionHeld()
-    const starter = renderHook(() => useEmailReverification())
-    starter.result.current.promptReverification(EMAIL)
-    await pressOkAndLeaveRunning()
-    const joiner = renderHook(() => useEmailReverification())
-    await flushEffects()
-
-    expect(starter.result.current.isAskedHere).toBe(true)
-    expect(joiner.result.current.isAskedHere).toBe(false)
-    expect(joiner.result.current.spinner).toBe(true)
-
-    finishDeletion()
-    await flushEffects()
-
-    expect(starter.result.current.isAskedHere).toBe(false)
   })
 
   it("keeps only the latest pending focus of a covered screen, and lets it go on unmount", async () => {
@@ -727,8 +685,7 @@ describe("useEmailReverification", () => {
     expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 
-  /** The setup screen's hold rests on this through the lock on a resume. */
-  it("keeps a sequence this screen asked for its own when the screen comes to the front again", async () => {
+  it("keeps waiting on its own sequence when the screen comes to the front again", async () => {
     const finishDeletion = deletionHeld()
     const { result } = renderHook(() => useEmailReverification())
     result.current.promptReverification(EMAIL)
@@ -737,9 +694,10 @@ describe("useEmailReverification", () => {
 
     act(() => joinOnFocus?.())
 
-    expect(result.current.isAskedHere).toBe(true)
     expect(result.current.spinner).toBe(true)
     finishDeletion()
+    await flushEffects()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 
   /** Judged when the screen is in front, not when the answer lands: a switch under a

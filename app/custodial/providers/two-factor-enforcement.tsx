@@ -3,22 +3,26 @@ import React, {
   useCallback,
   useContext,
   useEffect,
-  useMemo,
   useLayoutEffect,
+  useMemo,
+  useReducer,
   useRef,
-  useState,
 } from "react"
 
-import { useRemoteConfig } from "@app/config/feature-flags-context"
+import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
+import {
+  FreshAccountRead,
+  useFreshAccountRead,
+} from "@app/custodial/hooks/use-fresh-account-read"
 import { useSettingsScreenQuery, WalletCurrency } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useMigrateNowRemedy } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import {
-  TwoFactorEnforcementRecord,
-  TwoFactorMethod,
   TwoFactorPrompt,
+  TwoFactorPromptOrigin,
+  TwoFactorReminderReason,
   TwoFactorSessionPrompt,
   TwoFactorTier,
 } from "@app/types/two-factor-enforcement"
@@ -32,80 +36,71 @@ import { loadJsonOrThrow, saveJson } from "@app/utils/storage"
 
 import {
   DEFAULT_TWO_FACTOR_ENFORCEMENT,
-  hasTwoFactor,
+  isHoldingEnforcedThreshold,
   normalizeStoredRecord,
   remainingDismissals,
   resolveBalanceTier,
-  resolveMissingMethod,
+  resolveEnforcedCrossing,
+  resolveReminderReason,
   resolveSessionPrompt,
   resolveUnmetTier,
-  withDismissal,
-  withTierReached,
 } from "../two-factor-enforcement"
+import {
+  INITIAL_SESSION_STATE,
+  SessionEffect,
+  SessionRead,
+  SessionStart,
+  twoFactorSessionReducer,
+} from "../two-factor-session"
 
 const STORAGE_KEY_PREFIX = "twoFactorEnforcement"
 
 const storageKeyFor = (accountId: string): string => `${STORAGE_KEY_PREFIX}:${accountId}`
 
-type StoredState = {
-  accountId: string | null
-  record: TwoFactorEnforcementRecord
-}
-
-const INITIAL_STORED: StoredState = {
-  accountId: null,
-  record: DEFAULT_TWO_FACTOR_ENFORCEMENT,
-}
-
-/**
- * What this session has already done for the account, kept in memory on purpose: a
- * session is a cold launch or a fresh login, and both give this provider a fresh
- * account to load, while a return from the background gives it nothing new.
- */
-type SessionState = {
-  accountId: string | null
-  isStartPending: boolean
-  /** The highest tier whose prompt was waved away this session, None for none yet: a
-   *  tier counts one dismissal per session, and a higher tier's prompt raised later in
-   *  the same session, by a fresher read, counts its own. */
-  countedTier: TwoFactorTier
-  /** The tier of a prompt waved away while the fresh read of the account was still
-   *  out, None for none: whether that takes the session start is decided once the
-   *  read lands, since the read may raise a prompt the dismissal does not cover. */
-  dismissedTier: TwoFactorTier
-}
-
-const INITIAL_SESSION: SessionState = {
-  accountId: null,
-  isStartPending: false,
-  countedTier: TwoFactorTier.None,
-  dismissedTier: TwoFactorTier.None,
-}
-
-type RecordUpdate = (record: TwoFactorEnforcementRecord) => TwoFactorEnforcementRecord
-
-/** The prompts reported as shown this session, by prompt and tier, for the account
- *  they were shown to. */
-type ShownPrompts = {
-  accountId: string | null
-  impressions: Set<string>
+/** Carries out what a transition left: a write, reported if it fails, or an event. */
+const carryOut = (effect: SessionEffect) => {
+  switch (effect.kind) {
+    case "save":
+      saveJson(storageKeyFor(effect.accountId), effect.record).catch((err) =>
+        reportError("Two-factor enforcement write", err),
+      )
+      return
+    case "promptShown":
+      logTwoFactorPromptShown(effect.event)
+      return
+    case "promptDismissed":
+      logTwoFactorPromptDismissed(effect.event)
+  }
 }
 
 export type TwoFactorEnforcementState = {
   tier: TwoFactorTier
-  /** The highest tier whose condition the account still fails, None once it complies. */
+  /** The tier the account still owes, None once it holds an authenticator. */
   unmetTier: TwoFactorTier
-  hasTwoFactor: boolean
-  missingMethod: TwoFactorMethod
-  /** An address the account holds but never verified. It cannot be registered again as
-   *  new, so the setup has to send it through re-verification instead. */
-  unverifiedEmail: string | null
+  /** Whether the prompts apply to the active account: the console has them on, and the
+   *  account is a custodial one from level one whose record is in. Off, the account owes
+   *  nothing because nothing is asked of it, not because its balance is low. */
+  isEnforced: boolean
+  hasAuthenticator: boolean
   /** The wallet the high-balance copy names, meaningful at the enforced tier. */
   enforcedCurrency: WalletCurrency
+  /** The threshold that copy quotes, in that wallet's unit. */
+  enforcedThreshold: number
+  /** Whether that wallet still holds the threshold it crossed: the copy states the
+   *  balance only while it is true. */
+  isHoldingEnforcedThreshold: boolean
   remainingDismissals: number
+  /** Whether the prompts may offer leaving custody: only once the console is known to
+   *  have the self-custodial stack on, so nothing pushes the user toward a stack that is
+   *  switched off, not even before this launch's fetch settles. */
+  isCustodyExitOffered: boolean
+  /** Whether leaving custody is known to be switched off: the high-balance modal then
+   *  stays dismissible, spends none of its allowance and counts nothing down. Not yet
+   *  known, neither this nor the offer holds. */
+  isCustodyExitOff: boolean
   /** The prompt the unmet tier calls for at a session start, None once the account
    *  complies. */
-  requiredPrompt: TwoFactorSessionPrompt
+  sessionPrompt: TwoFactorSessionPrompt
   /** Whether this session's start is still to be acted on: the account's state is
    *  decided and no surface has taken the session start yet. */
   isSessionStartPending: boolean
@@ -113,40 +108,54 @@ export type TwoFactorEnforcementState = {
    *  start, and a home that has not shown yet waits rather than show before a prompt
    *  that replaces it. */
   isPreparingSessionStart: boolean
-  /** The full-screen prompt stands in for the home: shown in its place for the session
-   *  start that owes it, until a dismissal takes that start or the account complies.
-   *  Off while the wind-down's push into the migration applies, which outranks it. */
+  /** The high-balance blocking screen stands in for the home: shown in its place for
+   *  the session start that owes it, once the tier's modal has spent its dismissals,
+   *  until the account complies. Off while the wind-down's push into the migration
+   *  applies, which outranks it. */
   isProtectionGateActive: boolean
   shouldShowNudgeCard: boolean
+  /** Why the recommended tier's bulletin is on the home, in the card's place, and null
+   *  while it is not: due at every session start while the tier's dismissals last, then
+   *  at each new all-time high, and gone for the session once waved away. It never
+   *  blocks. The reason is what its events report. */
+  reminderBulletinReason: TwoFactorReminderReason | null
   shouldShowSettingsBanner: boolean
   /** Reports a prompt as shown, once per session for each tier it is shown at: a
    *  surface mounts again on every visit, and that is no new impression. */
-  markPromptShown: (prompt: TwoFactorPrompt) => void
+  markPromptShown: (prompt: TwoFactorPrompt, reason?: TwoFactorReminderReason) => void
   dismissNudgeCard: () => void
+  /** The bulletin's X: one dismissal of the recommended tier, at most one per session. */
+  dismissReminderBulletin: () => void
   /** Takes the session start, whether or not it owed a prompt: what the balance does
    *  later in the session waits for the next one. */
   consumeSessionStart: () => void
   /** Counts a prompt of the given tier waved away, at most once per session, and takes
-   *  the session start: the surface that raised the prompt is done asking for it. */
-  registerDismissal: (tier: TwoFactorTier) => void
+   *  the session start: the surface that raised the prompt is done asking for it. A
+   *  counted dismissal is reported as the given prompt's, once. */
+  registerDismissal: (tier: TwoFactorTier, origin?: TwoFactorPromptOrigin) => void
 }
 
 const INERT_STATE: TwoFactorEnforcementState = {
   tier: TwoFactorTier.None,
   unmetTier: TwoFactorTier.None,
-  hasTwoFactor: false,
-  missingMethod: TwoFactorMethod.Email,
-  unverifiedEmail: null,
+  isEnforced: false,
+  hasAuthenticator: false,
   enforcedCurrency: WalletCurrency.Btc,
+  enforcedThreshold: 0,
+  isHoldingEnforcedThreshold: false,
   remainingDismissals: 0,
-  requiredPrompt: TwoFactorSessionPrompt.None,
+  isCustodyExitOffered: false,
+  isCustodyExitOff: false,
+  sessionPrompt: TwoFactorSessionPrompt.None,
   isSessionStartPending: false,
   isPreparingSessionStart: false,
   isProtectionGateActive: false,
   shouldShowNudgeCard: false,
+  reminderBulletinReason: null,
   shouldShowSettingsBanner: false,
   markPromptShown: () => {},
   dismissNudgeCard: () => {},
+  dismissReminderBulletin: () => {},
   consumeSessionStart: () => {},
   registerDismissal: () => {},
 }
@@ -162,7 +171,9 @@ export const useTwoFactorEnforcement = (): TwoFactorEnforcementState =>
  * to the settings. The tier only ever rises and is remembered per account outside the
  * persistent state, which a logout resets: a dismissal must survive logging back in.
  * The stored record is keyed to the account it was read for, so switching accounts
- * never shows one account's prompts from the other's record.
+ * never shows one account's prompts from the other's record. Every change to the record
+ * and the session goes through one reducer, so changes that land in the same pass build
+ * on each other, and the writes and events they make are carried out after it.
  */
 export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = ({
   children,
@@ -170,18 +181,16 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const isAuthed = useIsAuthed()
   const { isAtLeastLevelOne } = useLevel()
   const { activeAccount } = useAccountRegistry()
-  const { custodialTwoFactorEnforcementEnabled } = useRemoteConfig()
-  const [stored, setStored] = useState<StoredState>(INITIAL_STORED)
-  const [session, setSession] = useState<SessionState>(INITIAL_SESSION)
-  /** The record and the session as last written, so two writes in the same pass build
-   *  on each other: a dismissal and a tier raise that land together must both survive,
-   *  and two dismissals that land together must still count as one. */
-  const latestStoredRef = useRef<StoredState>(INITIAL_STORED)
-  const latestSessionRef = useRef<SessionState>(INITIAL_SESSION)
-  const shownPromptsRef = useRef<ShownPrompts>({
-    accountId: null,
-    impressions: new Set(),
-  })
+  const {
+    custodialTwoFactorEnforcementEnabled,
+    custodialTwoFactorThresholds: thresholds,
+  } = useRemoteConfig()
+  const {
+    remoteConfigReady: isConfigSettled,
+    nonCustodialEnabled,
+    isNonCustodialFlagSettled,
+  } = useFeatureFlags()
+  const [state, dispatch] = useReducer(twoFactorSessionReducer, INITIAL_SESSION_STATE)
 
   /** The account's registered type rather than the wallet state, so the answer holds
    *  steady through the self-custodial cold-start window while the SDK connects. */
@@ -193,296 +202,304 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
     isAuthed &&
     isAtLeastLevelOne &&
     !isSelfCustodialAccount
-  /** The wind-down's push into the migration, which the full-screen prompt yields to,
+  /** The wind-down's push into the migration, which the blocking screen yields to,
    *  from the same read the home shows the push from. */
   const migrateNowRemedy = useMigrateNowRemedy()
+  const isCustodyExitOffered = isNonCustodialFlagSettled && nonCustodialEnabled
+  /** Whether the device knows if leaving custody is on offer: the console's word is in,
+   *  or this launch's fetch settled without it, which leaves the shipped default, off. */
+  const isCustodyExitKnown = isNonCustodialFlagSettled || isConfigSettled
+  const isCustodyExitOff = isCustodyExitKnown && !isCustodyExitOffered
 
-  /** Each session reads the balances and the factors from the network: the persisted
+  /** The account is read from the cache, which every reader shares; each session reads
+   *  it fresh from the network into that cache, and says whether it did. The persisted
    *  cache can carry a session-old balance, and a prompt decided from it would miss a
-   *  threshold crossed elsewhere. Once answered, the session keeps the cached copy. */
-  const { data, loading: isReadingAccount } = useSettingsScreenQuery({
-    skip: !isEnabled,
-    fetchPolicy: "cache-and-network",
-    nextFetchPolicy: "cache-first",
-  })
+   *  threshold crossed elsewhere. */
+  const { data } = useSettingsScreenQuery({ skip: !isEnabled, fetchPolicy: "cache-only" })
+  const freshRead = useFreshAccountRead(isEnabled)
+  const isReadingAccount = freshRead === FreshAccountRead.Pending
   /** Read through the gate, not only the skip: a skipped query may still hand back the
    *  answer it last had, and that answer belongs to a session this one must not act on. */
   const me = isEnabled ? data?.me : undefined
   const accountId = me?.defaultAccount.id ?? null
-
-  const commitStored = useCallback((next: StoredState) => {
-    latestStoredRef.current = next
-    setStored(next)
-  }, [])
-
-  const commitSession = useCallback((next: SessionState) => {
-    latestSessionRef.current = next
-    setSession(next)
-  }, [])
+  /** The fresh read is the account from the network and the thresholds once this
+   *  launch's console fetch has settled. Until then, the thresholds are what an earlier
+   *  launch activated, and a tier raised from them would stay raised once the console's
+   *  new ones land, since a reached tier never lowers. The fetch settles whether or not
+   *  it succeeds: offline, the thresholds an earlier launch activated are the ones. */
+  const isAwaitingFreshRead = isReadingAccount || !isConfigSettled
+  /** A read that fails lands as what the account last read as: the session can decide
+   *  from it, but nothing is written from it, since a tier reached never lowers and a
+   *  high only rises. What the network has confirmed is what the record keeps. */
+  const isReadConfirmed = freshRead === FreshAccountRead.Confirmed
+  const isBalanceConfirmed = isConfigSettled && isReadConfirmed
 
   useEffect(() => {
-    if (!accountId) {
-      commitStored(INITIAL_STORED)
-      commitSession(INITIAL_SESSION)
-      return
-    }
+    dispatch({ type: "accountChanged", accountId })
+    if (!accountId) return
     let isMounted = true
-    /** A record that could not be read is not a missing one: with the account left
-     *  unloaded, nothing is prompted and nothing is written, so a transient read
-     *  failure cannot replace a dismissal or a reached tier with the defaults. The
-     *  prompts stay off for that launch; the next one reads the record again. The
-     *  session is still marked as this account's, with nothing to start, so no
-     *  surface waits on a start that will never be decided. */
+    /** A record that could not be read leaves the prompts off for that launch; the next
+     *  one reads the record again. */
     loadJsonOrThrow(storageKeyFor(accountId))
       .then((raw) => {
         if (!isMounted) return
-        commitStored({ accountId, record: normalizeStoredRecord(raw) })
-        commitSession({
-          accountId,
-          isStartPending: true,
-          countedTier: TwoFactorTier.None,
-          dismissedTier: TwoFactorTier.None,
-        })
+        dispatch({ type: "recordLoaded", accountId, record: normalizeStoredRecord(raw) })
       })
       .catch((err) => {
         if (!isMounted) return
         reportError("Two-factor enforcement read", err)
-        /** Nothing to start, stated as such even though an unloaded record already
-         *  keeps the start from being pending: the session says what it means. */
-        commitSession({
-          accountId,
-          isStartPending: false,
-          countedTier: TwoFactorTier.None,
-          dismissedTier: TwoFactorTier.None,
-        })
+        dispatch({ type: "recordUnreadable", accountId })
       })
     return () => {
       isMounted = false
     }
-  }, [accountId, commitStored, commitSession])
+  }, [accountId])
 
-  /** Writes through the record, once this account's is loaded; tells whether it did. */
-  const persist = useCallback(
-    (update: RecordUpdate): boolean => {
-      const latest = latestStoredRef.current
-      if (!accountId || latest.accountId !== accountId) return false
-      const record = update(latest.record)
-      commitStored({ accountId, record })
-      saveJson(storageKeyFor(accountId), record).catch((err) =>
-        reportError("Two-factor enforcement write", err),
-      )
-      return true
-    },
-    [accountId, commitStored],
-  )
+  /** The writes and events the transitions left, carried out once each, in order. */
+  useEffect(() => {
+    if (state.outbox.length === 0) return
+    state.outbox.forEach(carryOut)
+    dispatch({ type: "outboxDrained", count: state.outbox.length })
+  }, [state.outbox])
 
-  const isLoadedForAccount = accountId !== null && stored.accountId === accountId
-  const isSessionForAccount = accountId !== null && session.accountId === accountId
+  const isStateForAccount = accountId !== null && state.accountId === accountId
   /** Only this account's record counts: while the next account's is still being read,
    *  the previous one's tier must not leak into the context or the events. */
-  const record = isLoadedForAccount ? stored.record : DEFAULT_TWO_FACTOR_ENFORCEMENT
+  const loadedRecord = isStateForAccount ? state.record : null
+  const isLoadedForAccount = loadedRecord !== null
+  const isSessionStarted = state.start !== SessionStart.Preparing
+  const isSessionForAccount = isStateForAccount && isSessionStarted
+  const record = loadedRecord ?? DEFAULT_TWO_FACTOR_ENFORCEMENT
   const wallets = me?.defaultAccount.wallets
-  const balanceTier = resolveBalanceTier(wallets)
+  /** No tier is read from a balance or thresholds that may be stale: the persisted cache
+   *  answers before the network, and can hold a balance the account no longer has. A
+   *  tier raised from it, and the high seeded with it, would stay. Until the fresh read
+   *  lands, the stored tier alone stands; a read that fails lands as what the account
+   *  last read as, which is then all there is to decide from. */
+  const balanceTier = isAwaitingFreshRead
+    ? TwoFactorTier.None
+    : resolveBalanceTier(wallets, thresholds)
   const tier = balanceTier > record.highestTier ? balanceTier : record.highestTier
 
+  const isTierRaised = balanceTier > record.highestTier
+  const isRaiseDue = isLoadedForAccount && isBalanceConfirmed && isTierRaised
   useEffect(() => {
-    if (!isLoadedForAccount || balanceTier <= record.highestTier) return
-    persist((current) => withTierReached(current, balanceTier, wallets))
-  }, [isLoadedForAccount, balanceTier, record.highestTier, wallets, persist])
+    if (!isRaiseDue || !accountId) return
+    dispatch({
+      type: "tierReached",
+      accountId,
+      tier: balanceTier,
+      crossing: resolveEnforcedCrossing(wallets, thresholds),
+      wallets,
+    })
+  }, [isRaiseDue, accountId, balanceTier, wallets, thresholds])
 
-  const emailAddress = me?.email?.address ?? null
-  const isEmailVerified = Boolean(me?.email?.verified)
   const hasAuthenticator = Boolean(me?.totpEnabled)
-  const factors = {
-    hasPhone: Boolean(me?.phone),
-    hasVerifiedEmail: isEmailVerified,
-    hasAuthenticator,
-  }
-  const isTwoFactorSet = hasTwoFactor(factors)
-  const missingMethod = resolveMissingMethod(factors)
-  const hasUnverifiedEmail = emailAddress !== null && !isEmailVerified
-  const unverifiedEmail = hasUnverifiedEmail ? emailAddress : null
 
   const isEnforced = isEnabled && isLoadedForAccount
   const unmetTier = isEnforced
-    ? resolveUnmetTier({ tier, hasTwoFactor: isTwoFactorSet, hasAuthenticator })
+    ? resolveUnmetTier({ tier, hasAuthenticator })
     : TwoFactorTier.None
   const dismissalsLeft = remainingDismissals(record, unmetTier)
-  const requiredPrompt = resolveSessionPrompt({ unmetTier, record })
-  /** The local read decides first: the stored tier never lowers and the cached factors
-   *  are what the account last showed, so a prompt they already call for goes up on the
-   *  first frame. Only a local read that owes nothing waits for the fresh one, which can
-   *  still raise the tier from a balance that moved elsewhere. */
-  const hasLocalPrompt = requiredPrompt !== TwoFactorSessionPrompt.None
-  const isSessionStartDecided = hasLocalPrompt || !isReadingAccount
+  const sessionPrompt = resolveSessionPrompt({ unmetTier, record, isCustodyExitOffered })
+  /** The local read decides first: the stored tier never lowers and the cached
+   *  authenticator is what the account last showed, so a prompt they already call for
+   *  goes up on the first frame. Only a local read that owes nothing waits for the fresh
+   *  one, which can still raise the tier from a balance that moved elsewhere. */
+  const hasLocalPrompt = sessionPrompt !== TwoFactorSessionPrompt.None
+  /** With the high-balance dismissals spent, whether the blocking screen or the modal is
+   *  owed turns on whether leaving custody is on offer: until the device knows, nothing
+   *  is decided, since a modal waved away in that window would take the start the
+   *  blocking screen is owed. */
+  const areEnforcedDismissalsSpent =
+    unmetTier === TwoFactorTier.Enforced && dismissalsLeft === 0
+  const isAwaitingCustodyExit = areEnforcedDismissalsSpent && !isCustodyExitKnown
+  const isReadDecided = hasLocalPrompt || !isAwaitingFreshRead
+  const isSessionStartDecided = isReadDecided && !isAwaitingCustodyExit
   /** A dismissal the fresh read has yet to judge has already answered the prompt as
    *  far as every surface is concerned: nothing shows for the start until the read
    *  lands and either takes the start or raises the prompt the dismissal fell short of. */
-  const isDismissalAwaitingRead = session.dismissedTier !== TwoFactorTier.None
+  const isDismissalAwaitingRead = state.dismissedTier !== TwoFactorTier.None
   const isSessionStartPending =
     isEnforced &&
     isSessionForAccount &&
-    session.isStartPending &&
+    state.start === SessionStart.Owed &&
     isSessionStartDecided &&
     !isDismissalAwaitingRead
-  /** The record of this account is still being read: nothing is decided yet, and a home
-   *  that has not shown yet does not show for the frames that read takes. */
-  const isPreparingSessionStart = isEnabled && accountId !== null && !isSessionForAccount
-  /** The full-screen prompt replaces the home for the session start that owes it, until
-   *  a dismissal takes that start or the account complies. The wind-down's push into
-   *  the migration outranks it, as it does the modal on the home: an account whose
-   *  custodial service is ending has one remedy that matters more than a second factor,
-   *  and that push lives on the home, which the prompt would stand in for. The push's
-   *  session dismissal is the home's own, so the prompt yields for as long as the push
-   *  applies, and the home then takes the start with no prompt. The prompt goes up from
-   *  the local read at once rather than wait for the wind-down's answer, which a
-   *  network that never answers would hold forever; should the answer then say the push
-   *  applies, the prompt yields to it. */
+  /** The record of this account is still being read, or the start waits to know which
+   *  blocking prompt it owes: nothing is decided yet, and a home that has not shown yet
+   *  does not show for the frames that takes. */
+  const isReadingRecord = isEnabled && accountId !== null && !isSessionForAccount
+  const isPreparingSessionStart = isReadingRecord || isAwaitingCustodyExit
+  /** The blocking screen replaces the home for the session start that owes it, until
+   *  the account complies. The wind-down's push into the migration outranks it, as it
+   *  does the modal on the home: an account whose custodial service is ending has one
+   *  remedy that matters more than a second factor, and that push lives on the home,
+   *  which the screen would stand in for. The push's session dismissal is the home's
+   *  own, so the screen yields for as long as the push applies, and the home then takes
+   *  the start with no prompt. The screen goes up from the local read at once rather
+   *  than wait for the wind-down's answer, which a network that never answers would
+   *  hold forever; should the answer then say the push applies, the screen yields to
+   *  it. */
   const isProtectionGateOwed =
-    isSessionStartPending && requiredPrompt === TwoFactorSessionPrompt.ProtectionRequired
+    isSessionStartPending && sessionPrompt === TwoFactorSessionPrompt.ProtectionRequired
   const isProtectionGateActive = isProtectionGateOwed && !migrateNowRemedy.isDue
 
-  /** The card belongs to the suggested tier alone: from the recommended tier on, the
-   *  session prompt is the one asking, and the home never stacks two. The banner asks at
-   *  every tier until the account holds two factors, since the setup it opens leads with
-   *  the authenticator, which is what the highest tier asks for; an account that already
-   *  holds two factors is asked for its authenticator by the session prompt alone. */
-  const shouldShowNudgeCard =
-    unmetTier === TwoFactorTier.Suggested && !record.nudgeCardDismissed
-  const isUnmet = unmetTier !== TwoFactorTier.None
-  const shouldShowSettingsBanner = isUnmet && !isTwoFactorSet
+  /** The card belongs to the suggested tier alone: from the recommended tier on, that
+   *  tier's own prompt asks instead, and the home never stacks two. The banner asks at
+   *  every tier until the account holds an authenticator. */
+  const isNudgeCardClosed = record.nudgeCardDismissed || state.isNudgeCardHidden
+  const shouldShowNudgeCard = unmetTier === TwoFactorTier.Suggested && !isNudgeCardClosed
+  const shouldShowSettingsBanner = unmetTier !== TwoFactorTier.None
 
-  /** Another account's impressions start afresh; the same account coming back through
-   *  a gate that closed and opened again within the session keeps its own. With the
-   *  gate closed there is no account to have shown a prompt to. */
+  /** The reminder bulletin takes the card's place at the recommended tier, whether or not
+   *  the card was closed, once the fresh read confirms the account still owes it: an
+   *  authenticator added elsewhere is not in the cached copy. A dismissal of the tier
+   *  this session, from the bulletin or from a setup left unfinished, puts it away until
+   *  the next session start. */
+  const reminderReason = resolveReminderReason({ unmetTier, record })
+  const isReminderWavedAway = state.countedTier >= TwoFactorTier.Recommended
+  const isReminderDue =
+    reminderReason !== null && isSessionForAccount && !isAwaitingFreshRead
+  const isReminderBulletinShown = isReminderDue && !isReminderWavedAway
+  const reminderBulletinReason = isReminderBulletinShown ? reminderReason : null
+
+  /** A logout ends the session, so a fresh login starts its impressions afresh, for
+   *  the same account too: its prompts are due again and are new impressions. */
+  useEffect(() => {
+    if (!isAuthed) dispatch({ type: "impressionsReset" })
+  }, [isAuthed])
+
+  /** With the gate closed there is no account to have shown a prompt to. */
   const markPromptShown = useCallback(
-    (prompt: TwoFactorPrompt) => {
+    (prompt: TwoFactorPrompt, reason?: TwoFactorReminderReason) => {
       if (!accountId) return
-      const isAnotherAccount = shownPromptsRef.current.accountId !== accountId
-      if (isAnotherAccount) {
-        shownPromptsRef.current = { accountId, impressions: new Set() }
-      }
-      const { impressions } = shownPromptsRef.current
-      const impression = `${prompt}:${tier}`
-      if (impressions.has(impression)) return
-      impressions.add(impression)
-      logTwoFactorPromptShown({ tier, prompt })
+      dispatch({ type: "promptShown", accountId, prompt, tier, reason })
     },
     [accountId, tier],
   )
 
   const dismissNudgeCard = useCallback(() => {
-    const isDismissed = persist((current) => ({ ...current, nudgeCardDismissed: true }))
-    if (isDismissed)
-      logTwoFactorPromptDismissed({ tier, prompt: TwoFactorPrompt.HomeCard })
-  }, [tier, persist])
+    if (!accountId) return
+    dispatch({ type: "nudgeCardDismissed", accountId, tier })
+  }, [accountId, tier])
 
   const consumeSessionStart = useCallback(() => {
-    commitSession({ ...latestSessionRef.current, isStartPending: false })
-  }, [commitSession])
+    dispatch({ type: "sessionStartTaken" })
+  }, [])
 
   /** The read as last committed, for a dismissal reported by a handler bound to an
    *  earlier render, as the hardware back's can be in the frames between a commit and
    *  its effects: the dismissal is judged by what the account owes now, not by what it
    *  owed when the handler was bound, so no commit shows the home in between. */
-  const latestReadRef = useRef({ isReadingAccount, unmetTier, isSessionStartDecided })
+  const latestReadRef = useRef<SessionRead>({
+    isAwaitingFreshRead,
+    unmetTier,
+    sessionPrompt,
+    isSessionStartDecided,
+    isCustodyExitOff,
+  })
   useLayoutEffect(() => {
-    latestReadRef.current = { isReadingAccount, unmetTier, isSessionStartDecided }
+    latestReadRef.current = {
+      isAwaitingFreshRead,
+      unmetTier,
+      sessionPrompt,
+      isSessionStartDecided,
+      isCustodyExitOff,
+    }
   })
 
-  /** A dismissal takes the session start when the prompt waved away is the one the
-   *  start owes, counted or not: on the home or on a flow the prompt opened, the home
-   *  must not raise it again on the way back. A start that a fresher read has since
-   *  made owe a higher tier's prompt is kept for that prompt. While the fresh read is
-   *  still out, a prompt raised from the local read can be waved away before the read
-   *  says whether the account owes more: the dismissal is kept until it lands, and
-   *  judged then by the effect below, so a balance that crossed into a higher tier
-   *  elsewhere still gets that tier's prompt this session. What is kept is the highest
-   *  tier waved away, so a lower one reported after it, or the no prompt the modal's
-   *  closing frames report, cannot replace it and raise the prompt again. */
   const registerDismissal = useCallback(
-    (promptTier: TwoFactorTier) => {
-      if (promptTier === TwoFactorTier.None) return
-      const latest = latestSessionRef.current
-      const read = latestReadRef.current
-      const isSessionAccount = accountId !== null && latest.accountId === accountId
-      if (!isSessionAccount) return
-      const isCountable =
-        promptTier >= TwoFactorTier.Recommended && promptTier > latest.countedTier
-      const isStartOwedToPrompt =
-        read.isSessionStartDecided && promptTier >= read.unmetTier
-      const isStartAwaitingRead = latest.isStartPending && read.isReadingAccount
-      const isStartTaken =
-        latest.isStartPending && isStartOwedToPrompt && !isStartAwaitingRead
-      const isHigherThanKept = promptTier > latest.dismissedTier
-      const isKeptForRead = isStartAwaitingRead && isHigherThanKept
-      if (!isCountable && !isStartTaken && !isKeptForRead) return
-      if (isCountable) persist((current) => withDismissal(current, promptTier))
-      commitSession({
+    (promptTier: TwoFactorTier, origin?: TwoFactorPromptOrigin) => {
+      if (!accountId) return
+      dispatch({
+        type: "dismissalRegistered",
         accountId,
-        isStartPending: latest.isStartPending && !isStartTaken,
-        countedTier: isCountable ? promptTier : latest.countedTier,
-        dismissedTier: isKeptForRead ? promptTier : latest.dismissedTier,
+        promptTier,
+        origin,
+        read: latestReadRef.current,
       })
     },
-    [accountId, persist, commitSession],
+    [accountId],
   )
 
-  /** Judges a dismissal made while the fresh read was out, once it has landed: the
-   *  start is taken if the prompt waved away still covers what the account owes, and
-   *  kept for the escalated prompt otherwise. A read that failed lands as what the
-   *  account last read as, which the dismissal covered. The dismissal itself is among
-   *  what wakes the judging, so none can wait on a change that is not coming. */
+  /** A dismissal made while the fresh read was out is judged once the read has landed.
+   *  The dismissal itself is among what makes the judging due, so none can wait on a
+   *  change that is not coming. */
+  const isDismissalDue =
+    isSessionForAccount && isDismissalAwaitingRead && !isAwaitingFreshRead
   useEffect(() => {
-    const latest = latestSessionRef.current
-    const isSessionAccount = accountId !== null && latest.accountId === accountId
-    const isDismissalDue =
-      latest.dismissedTier !== TwoFactorTier.None && !isReadingAccount
-    if (!isSessionAccount || !isDismissalDue) return
-    const isCovered = latest.dismissedTier >= unmetTier
-    commitSession({
-      ...latest,
-      isStartPending: latest.isStartPending && !isCovered,
-      dismissedTier: TwoFactorTier.None,
+    if (!isDismissalDue || !accountId) return
+    dispatch({ type: "dismissalJudged", accountId, unmetTier })
+  }, [isDismissalDue, accountId, unmetTier])
+
+  /** The session start reads the highs once, when the fresh read of the account has
+   *  landed. */
+  const isHighReadDue =
+    isSessionForAccount &&
+    isLoadedForAccount &&
+    isBalanceConfirmed &&
+    !state.isAllTimeHighRead
+  useEffect(() => {
+    if (!isHighReadDue || !accountId) return
+    dispatch({ type: "highsRead", accountId, tier, unmetTier, wallets })
+  }, [isHighReadDue, accountId, tier, unmetTier, wallets])
+
+  /** The reason is the one the bulletin was shown for: with no bulletin up there is
+   *  nothing to wave away. */
+  const dismissReminderBulletin = useCallback(() => {
+    if (reminderBulletinReason === null) return
+    registerDismissal(TwoFactorTier.Recommended, {
+      prompt: TwoFactorPrompt.ReminderBulletin,
+      reason: reminderBulletinReason,
     })
-  }, [accountId, isReadingAccount, unmetTier, session.dismissedTier, commitSession])
+  }, [reminderBulletinReason, registerDismissal])
 
   const contextValue = useMemo(
     () => ({
       tier,
       unmetTier,
-      hasTwoFactor: isTwoFactorSet,
-      missingMethod,
-      unverifiedEmail,
+      isEnforced,
+      hasAuthenticator,
       enforcedCurrency: record.enforcedCurrency,
+      enforcedThreshold: record.enforcedThreshold,
+      isHoldingEnforcedThreshold: isHoldingEnforcedThreshold(record, wallets),
       remainingDismissals: dismissalsLeft,
-      requiredPrompt,
+      isCustodyExitOffered,
+      isCustodyExitOff,
+      sessionPrompt,
       isSessionStartPending,
       isPreparingSessionStart,
       isProtectionGateActive,
       shouldShowNudgeCard,
+      reminderBulletinReason,
       shouldShowSettingsBanner,
       markPromptShown,
       dismissNudgeCard,
+      dismissReminderBulletin,
       consumeSessionStart,
       registerDismissal,
     }),
     [
       tier,
       unmetTier,
-      isTwoFactorSet,
-      missingMethod,
-      unverifiedEmail,
-      record.enforcedCurrency,
+      isEnforced,
+      hasAuthenticator,
+      record,
+      wallets,
       dismissalsLeft,
-      requiredPrompt,
+      isCustodyExitOffered,
+      isCustodyExitOff,
+      sessionPrompt,
       isSessionStartPending,
       isPreparingSessionStart,
       isProtectionGateActive,
       shouldShowNudgeCard,
+      reminderBulletinReason,
       shouldShowSettingsBanner,
       markPromptShown,
       dismissNudgeCard,
+      dismissReminderBulletin,
       consumeSessionStart,
       registerDismissal,
     ],

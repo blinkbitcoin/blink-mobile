@@ -78,16 +78,4 @@ describe("EmailRegistrationInitiateScreen", () => {
       hasUsername: false,
     })
   })
-
-  it("passes on the route to return to when it was opened from the two-factor setup", async () => {
-    await submitEmail({ returnTo: "twoFactorSetup" })
-
-    expect(mockNavigate).toHaveBeenCalledWith("emailRegistrationValidate", {
-      emailRegistrationId: "reg",
-      email: EMAIL,
-      onboarding: false,
-      hasUsername: false,
-      returnTo: "twoFactorSetup",
-    })
-  })
 })

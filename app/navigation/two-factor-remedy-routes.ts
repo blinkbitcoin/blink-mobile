@@ -4,18 +4,15 @@ import { isUnlockInProgress } from "./unlock-routes"
 
 /**
  * The routes the two-factor gate opens itself, or that its remedies start on: the setup
- * and the non-custodial screens, the factor registrations and the migration. A stack
+ * and the non-custodial screens, the authenticator registration and the migration. The
+ * email and phone registrations are no remedy, since neither is a second factor: one of
+ * those above the home is the user's own, and the gate waits for it. A stack
  * that starts with one of these above the home is one the gate's own flows built, and
  * the gate stays armed beneath it, whatever the flow pushed after it. Matched by
  * prefix, as the migration flow is, so a step a flow adds under its own name is covered
  * without being listed.
  */
-const TWO_FACTOR_REMEDY_ROUTE_PREFIXES = [
-  "twoFactor",
-  "emailRegistration",
-  "phoneRegistration",
-  "totpRegistration",
-] as const
+const TWO_FACTOR_REMEDY_ROUTE_PREFIXES = ["twoFactor", "totpRegistration"] as const
 
 type RemedyRoutePrefix = (typeof TWO_FACTOR_REMEDY_ROUTE_PREFIXES)[number]
 
