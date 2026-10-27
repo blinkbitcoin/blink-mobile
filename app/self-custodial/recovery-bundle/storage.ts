@@ -98,7 +98,22 @@ export type RecoveryBundleState = {
   totalSats: string
   /** Unix ms of the last successful cloud upload, if any. */
   cloudSyncedAt: number | null
+  /**
+   * The bundleCreatedAt of the payload that upload carried, so the cloud copy
+   * is known to hold the saved bundle only when the two match. Absent in states
+   * saved before it was recorded, which reads as no known cloud copy.
+   */
+  cloudSyncedBundleCreatedAt?: string | null
+  /**
+   * Unix ms of the latest wallet change this bundle may not cover, set before a
+   * refresh is attempted and cleared by a save whose fetch began after it. A
+   * refresh that fails leaves it set, so the bundle does not read as fresh.
+   */
+  uncoveredChangeAt?: number | null
 }
+
+const isOptional = (value: unknown, type: "number" | "string"): boolean =>
+  value === undefined || value === null || typeof value === type
 
 export const readRecoveryBundleState = async (
   accountId: string,
@@ -113,7 +128,9 @@ export const readRecoveryBundleState = async (
       typeof parsed?.bundleCreatedAt !== "string" ||
       typeof parsed?.leafCount !== "number" ||
       typeof parsed?.totalSats !== "string" ||
-      (parsed?.cloudSyncedAt !== null && typeof parsed?.cloudSyncedAt !== "number")
+      (parsed?.cloudSyncedAt !== null && typeof parsed?.cloudSyncedAt !== "number") ||
+      !isOptional(parsed?.cloudSyncedBundleCreatedAt, "string") ||
+      !isOptional(parsed?.uncoveredChangeAt, "number")
     ) {
       return null
     }

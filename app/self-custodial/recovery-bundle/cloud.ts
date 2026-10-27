@@ -12,12 +12,16 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
+  deleteAppDataFile as driveDeleteAppDataFile,
+  DriveError,
   findAppDataFile as driveFindAppDataFile,
+  listAppDataFiles as driveListAppDataFiles,
   uploadAppDataFile as driveUploadAppDataFile,
 } from "@app/utils/google-drive-client"
 import { callDrive, configureGoogleSignIn } from "@app/utils/google-drive-session"
 import {
   assertICloudAvailable,
+  deleteAppDataFile as iCloudDeleteAppDataFile,
   uploadAppDataFile as iCloudUploadAppDataFile,
 } from "@app/utils/icloud-client"
 
@@ -29,7 +33,7 @@ export const getRecoveryBundleFilename = (
   walletIdentifier: string,
 ): string => `${getRecoveryBundleFilenamePrefix(network)}${walletIdentifier}.json`
 
-export type SilentCloudUploadResult =
+export type SilentCloudResult =
   | { success: true }
   | {
       success: false
@@ -38,6 +42,14 @@ export type SilentCloudUploadResult =
        * its real message/stack instead of just the mapped reason enum. */
       error?: unknown
     }
+
+const silentFailure = (err: unknown): SilentCloudResult => {
+  const reason =
+    err && typeof err === "object" && "reason" in err
+      ? (err.reason as CloudBackupErrorReason)
+      : CloudBackupErrorReason.Unknown
+  return { success: false, reason, error: err }
+}
 
 const silentDriveAccessToken = async (): Promise<string | null> => {
   configureGoogleSignIn()
@@ -56,7 +68,7 @@ const silentDriveAccessToken = async (): Promise<string | null> => {
 export const attemptSilentCloudUpload = async (
   content: string,
   fileName: string,
-): Promise<SilentCloudUploadResult> => {
+): Promise<SilentCloudResult> => {
   try {
     if (Platform.OS === "ios") {
       await assertICloudAvailable()
@@ -78,10 +90,54 @@ export const attemptSilentCloudUpload = async (
     )
     return { success: true }
   } catch (err) {
-    const reason =
-      err && typeof err === "object" && "reason" in err
-        ? (err.reason as CloudBackupErrorReason)
-        : CloudBackupErrorReason.Unknown
-    return { success: false, reason, error: err }
+    return silentFailure(err)
+  }
+}
+
+const isMissingDriveFile = (err: unknown): boolean =>
+  err instanceof DriveError && err.reason === CloudBackupErrorReason.NotFound
+
+/**
+ * Removes every Drive file with exactly this name: Drive allows duplicate
+ * names, and two devices syncing the same wallet for the first time can each
+ * create one. One already gone, e.g. removed by the other device, counts as
+ * removed.
+ */
+const deleteDriveFilesNamed = async (fileName: string, accessToken: string) => {
+  const { value: entries, token: listToken } = await callDrive(accessToken, (token) =>
+    driveListAppDataFiles(fileName, token),
+  )
+  let token = listToken
+  for (const entry of entries.filter(({ name }) => name === fileName)) {
+    try {
+      ;({ token } = await callDrive(token, (current) =>
+        driveDeleteAppDataFile(entry.id, current),
+      ))
+    } catch (err) {
+      if (!isMissingDriveFile(err)) throw err
+    }
+  }
+}
+
+/**
+ * Best-effort, non-interactive removal of one known file. A file that is not
+ * there counts as removed: the caller only needs it gone.
+ */
+export const attemptSilentCloudDelete = async (
+  fileName: string,
+): Promise<SilentCloudResult> => {
+  try {
+    if (Platform.OS === "ios") {
+      await assertICloudAvailable()
+      await iCloudDeleteAppDataFile(fileName)
+      return { success: true }
+    }
+
+    const accessToken = await silentDriveAccessToken()
+    if (!accessToken) return { success: false, reason: CloudBackupErrorReason.Auth }
+    await deleteDriveFilesNamed(fileName, accessToken)
+    return { success: true }
+  } catch (err) {
+    return silentFailure(err)
   }
 }
