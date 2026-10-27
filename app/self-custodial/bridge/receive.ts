@@ -33,7 +33,7 @@ export const createReceiveLightning = (
         }),
       )
       measure(ScEvent.PaymentRequestCreated, {
-        rail: ScRail.Lightning,
+        rail: ScRail.Bolt11,
         has_amount: Boolean(amount),
       })
       return { invoice: response.paymentRequest }

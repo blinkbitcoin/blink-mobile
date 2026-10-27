@@ -245,7 +245,7 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(3065) }),
-      { rail: "lightning", sendingWallet: WalletCurrency.Usd },
+      { rail: "bolt11", sendingWallet: WalletCurrency.Usd },
     )
   })
 
@@ -262,7 +262,7 @@ describe("createSelfCustodialLightningPaymentDetails", () => {
 
     expect(mockCreateSendMutation).toHaveBeenCalledWith(
       expect.objectContaining({ amount: BigInt(12345) }),
-      { rail: "lightning", sendingWallet: WalletCurrency.Btc },
+      { rail: "bolt11", sendingWallet: WalletCurrency.Btc },
     )
   })
 

@@ -67,7 +67,7 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
         canGetFee: true,
         getFee: createGetFee(prepareParams),
         sendPaymentMutation: createSendMutation(prepareParams, {
-          rail: ScRail.Lightning,
+          rail: ScRail.Bolt11,
           sendingWallet: sendingWalletDescriptor.currency,
         }),
       }

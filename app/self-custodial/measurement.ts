@@ -7,13 +7,16 @@ import { AccountMode } from "@app/types/account"
 import type { SparkNetworkLabel } from "./config"
 
 /**
- * The coarse rails reported for self-custodial payments: Lightning lumps BOLT11 and
- * LNURL-pay together, and Lightning Address is a receive-side variant of it. Anything
- * finer (a BOLT11/LNURL-pay split) would still fit this enum, but the destination and
- * the counterparty never do: a rail is a category, never an identifier.
+ * The rails reported for self-custodial payments. Sends split Lightning finely (BOLT11
+ * vs LNURL-pay); SDK-observed settles keep the coarse `lightning`, since a settled
+ * payment's method does not say which of the two carried it, and Lightning Address is a
+ * receive-side variant. A rail is a category, never an identifier: the destination and
+ * the counterparty never appear.
  */
 export const ScRail = {
   Lightning: "lightning",
+  Bolt11: "bolt11",
+  LnurlPay: "lnurl_pay",
   Spark: "spark",
   Onchain: "onchain",
   LightningAddress: "lightning_address",

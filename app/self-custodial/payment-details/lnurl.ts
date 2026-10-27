@@ -253,9 +253,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     feePolicy: isUsdSend ? FeePolicy.FeesIncluded : undefined,
   }
 
-  /** LNURL sends report the coarse lightning rail; the fine split is a later phase. */
+  /** LNURL sends report their own fine rail, split from plain BOLT11. */
   const sendTelemetry = {
-    rail: ScRail.Lightning,
+    rail: ScRail.LnurlPay,
     sending_wallet: sendingWalletDescriptor.currency,
   }
 
