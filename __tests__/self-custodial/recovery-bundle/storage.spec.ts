@@ -127,6 +127,14 @@ describe("recovery-bundle storage", () => {
       expect(fsState.files.has(MAINNET_TMP_PATH)).toBe(false)
     })
 
+    it("replaces the previous bundle on the next save", async () => {
+      await saveEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet, "payload-1")
+      await saveEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet, "payload-2")
+
+      expect(await loadEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet)).toBe("payload-2")
+      expect(fsState.files.has(MAINNET_TMP_PATH)).toBe(false)
+    })
+
     it("excludes the bundle directory from iOS device backups", async () => {
       // D9 adjacency: an iOS device backup would put the seed-decryptable
       // bundle in the same Apple account as a passwordless iCloud seed backup.
@@ -253,12 +261,37 @@ describe("recovery-bundle storage", () => {
       { name: "numeric bundleCreatedAt", overrides: { bundleCreatedAt: 1752300000000 } },
       { name: "string cloudSyncedAt", overrides: { cloudSyncedAt: "yesterday" } },
       { name: "missing cloudSyncedAt", overrides: { cloudSyncedAt: undefined } },
+      {
+        name: "numeric cloudSyncedBundleCreatedAt",
+        overrides: { cloudSyncedBundleCreatedAt: 1752300000000 },
+      },
+      { name: "string uncoveredChangeAt", overrides: { uncoveredChangeAt: "today" } },
     ])("returns null for a stored state with $name", async ({ overrides }) => {
       // JSON.stringify drops undefined values, so "missing" cases persist
       // without the field at all.
       await AsyncStorage.setItem(MAINNET_STATE_KEY, JSON.stringify(makeState(overrides)))
 
       expect(await readRecoveryBundleState(ACCOUNT_ID, Network.Mainnet)).toBeNull()
+    })
+
+    it.each([
+      { name: "a state saved before they were recorded", overrides: {} },
+      {
+        name: "cleared values",
+        overrides: { cloudSyncedBundleCreatedAt: null, uncoveredChangeAt: null },
+      },
+      {
+        name: "recorded values",
+        overrides: {
+          cloudSyncedBundleCreatedAt: "2026-07-12T00:00:00.000Z",
+          uncoveredChangeAt: 1752300000000,
+        },
+      },
+    ])("accepts the cloud generation and change mark as $name", async ({ overrides }) => {
+      const state = makeState(overrides)
+      await AsyncStorage.setItem(MAINNET_STATE_KEY, JSON.stringify(state))
+
+      expect(await readRecoveryBundleState(ACCOUNT_ID, Network.Mainnet)).toEqual(state)
     })
   })
 
