@@ -11,18 +11,24 @@ import CustomModal from "@app/components/custom-modal/custom-modal"
 import { IconHero } from "@app/components/icon-hero"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
-import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { useRecoveryBundleActions } from "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions"
 import { testProps } from "@app/utils/testProps"
 
-import { useCompleteBackup } from "../hooks"
 import { OnboardingScreenLayout } from "../layouts"
 
 type BundleExportRouteProp = RouteProp<
   RootStackParamList,
   "selfCustodialBackupBundleExport"
 >
+
+/** Both exports put the decrypted bundle outside the app, so both sit behind
+ *  the same sensitive-data confirmation. */
+const ExportAction = {
+  Download: "download",
+  Copy: "copy",
+} as const
+
+type ExportAction = (typeof ExportAction)[keyof typeof ExportAction]
 
 /**
  * The manual path's last step: hand over the recovery backup, the second
@@ -50,7 +56,7 @@ export const BundleExportScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { successMessage } = useRoute<BundleExportRouteProp>().params ?? {}
+  const { successMessage, reBackup } = useRoute<BundleExportRouteProp>().params ?? {}
   const navigation =
     useNavigation<
       NativeStackNavigationProp<RootStackParamList, "selfCustodialBackupBundleExport">
@@ -59,50 +65,61 @@ export const BundleExportScreen: React.FC = () => {
   const { bundleState, sharing, copying, reloadState, handleShare, handleCopy } =
     useRecoveryBundleActions()
 
-  const [confirmingDownload, setConfirmingDownload] = useState(false)
+  const [requestedExport, setRequestedExport] = useState<ExportAction>(
+    ExportAction.Download,
+  )
+  const [isWarningVisible, setIsWarningVisible] = useState(false)
   const [showLearnMore, setShowLearnMore] = useState(false)
   /** Only controls whether the warning is repeated, not whether the user may
    *  move on. */
-  const [hasDownloaded, setHasDownloaded] = useState(false)
+  const [isWarningAcknowledged, setIsWarningAcknowledged] = useState(false)
 
   useEffect(() => {
     reloadState().catch(() => {})
   }, [reloadState])
 
-  const completeBackup = useCompleteBackup()
-
+  /** The backup was recorded before this screen, so leaving it only navigates. */
   const finish = useCallback(() => {
-    logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-    completeBackup({ method: BackupMethod.Manual, message: successMessage })
-  }, [completeBackup, successMessage])
+    navigation.replace("selfCustodialBackupSuccess", {
+      reBackup,
+      message: successMessage,
+    })
+  }, [navigation, reBackup, successMessage])
 
-  /** A completed download gets its own confirmation screen, which then finishes
-   *  the backup; every other route finishes here directly. */
-  const onDownloaded = useCallback(() => {
-    navigation.navigate("selfCustodialBundleSaved", { successMessage })
-  }, [navigation, successMessage])
-
-  /** The warning is shown once, before the first export; a user who has already
-   *  read it and comes back for the clipboard copy does not need it again.
-   *  Either way the flow advances only on a share that actually happened: a
-   *  dismissed sheet would otherwise confirm an emergency file that never left
-   *  the device, which is the one thing this screen exists to guarantee. */
-  const onDownloadPress = useCallback(async () => {
-    if (hasDownloaded) {
-      const didShare = await handleShare()
-      if (didShare) onDownloaded()
-      return
-    }
-    setConfirmingDownload(true)
-  }, [hasDownloaded, handleShare, onDownloaded])
-
-  const onConfirmDownload = useCallback(async () => {
-    setConfirmingDownload(false)
+  /** The flow advances only on a share that actually happened: a dismissed
+   *  sheet would otherwise confirm an emergency file that never left the
+   *  device, which is the one thing this screen exists to guarantee. */
+  const download = useCallback(async () => {
     const didShare = await handleShare()
-    if (!didShare) return
-    setHasDownloaded(true)
-    onDownloaded()
-  }, [handleShare, onDownloaded])
+    if (didShare)
+      navigation.navigate("selfCustodialBundleSaved", { successMessage, reBackup })
+  }, [handleShare, navigation, successMessage, reBackup])
+
+  const runExport = useCallback(
+    (action: ExportAction) =>
+      action === ExportAction.Download ? download() : handleCopy(),
+    [download, handleCopy],
+  )
+
+  /** The warning is shown once, before the first export of either kind; a user
+   *  who has read it does not need it again for the other one. */
+  const requestExport = useCallback(
+    async (action: ExportAction) => {
+      if (isWarningAcknowledged) {
+        await runExport(action)
+        return
+      }
+      setRequestedExport(action)
+      setIsWarningVisible(true)
+    },
+    [isWarningAcknowledged, runExport],
+  )
+
+  const onConfirmExport = useCallback(async () => {
+    setIsWarningVisible(false)
+    setIsWarningAcknowledged(true)
+    await runExport(requestedExport)
+  }, [requestedExport, runExport])
 
   const isLoading = bundleState === undefined
   const hasBundle = Boolean(bundleState)
@@ -112,18 +129,23 @@ export const BundleExportScreen: React.FC = () => {
     ? LL.BackupScreen.BundleExport.subtitle()
     : LL.BackupScreen.BundleExport.subtitlePending()
 
+  const confirmTitle =
+    requestedExport === ExportAction.Copy
+      ? LL.BackupScreen.BundleExport.copy()
+      : LL.BackupScreen.BundleExport.sensitiveConfirm()
+
   const exportActions = (
     <>
       <GaloyPrimaryButton
         title={LL.BackupScreen.BundleExport.download()}
-        onPress={onDownloadPress}
+        onPress={() => requestExport(ExportAction.Download)}
         loading={sharing}
         disabled={copying}
         {...testProps("bundle-download-button")}
       />
       <GaloySecondaryButton
         title={LL.BackupScreen.BundleExport.copy()}
-        onPress={handleCopy}
+        onPress={() => requestExport(ExportAction.Copy)}
         loading={copying}
         disabled={sharing}
         {...testProps("bundle-copy-button")}
@@ -171,8 +193,8 @@ export const BundleExportScreen: React.FC = () => {
       )}
 
       <CustomModal
-        isVisible={confirmingDownload}
-        toggleModal={() => setConfirmingDownload(false)}
+        isVisible={isWarningVisible}
+        toggleModal={() => setIsWarningVisible(false)}
         showCloseIconButton={true}
         image={<GaloyIcon name="eye-slash" size={52} color={colors.primary} />}
         title={LL.BackupScreen.BundleExport.sensitiveTitle()}
@@ -181,9 +203,9 @@ export const BundleExportScreen: React.FC = () => {
             {LL.BackupScreen.BundleExport.sensitiveBody()}
           </Text>
         }
-        primaryButtonTitle={LL.BackupScreen.BundleExport.sensitiveConfirm()}
-        primaryButtonOnPress={onConfirmDownload}
-        primaryButtonLoading={sharing}
+        primaryButtonTitle={confirmTitle}
+        primaryButtonOnPress={onConfirmExport}
+        primaryButtonLoading={isExporting}
       />
 
       <CustomModal
