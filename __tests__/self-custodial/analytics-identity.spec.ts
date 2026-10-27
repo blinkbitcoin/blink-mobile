@@ -300,124 +300,148 @@ describe("analytics identity", () => {
     })
   })
 
-  describe("delivery under the Enhanced identity", () => {
-    it("delivers at once while the Enhanced identity is in place", async () => {
-      mockStore.set(SIDE_KEY, "self_custodial")
-      const id = freshModule()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      await settle()
-      const deliver = jest.fn()
+  describe("the Enhanced-applied signal", () => {
+    const listen = (id: typeof AnalyticsIdentity) => {
+      const listener = jest.fn()
+      id.onEnhancedIdentityApplied(listener)
+      return listener
+    }
 
-      id.deliverUnderEnhancedIdentity(deliver)
-
-      expect(deliver).toHaveBeenCalledTimes(1)
-    })
-
-    it("stops delivering the moment a transition away from Enhanced is requested", async () => {
-      mockStore.set(SIDE_KEY, "self_custodial")
-      const id = freshModule()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      await settle()
-      const deliver = jest.fn()
-
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      id.deliverUnderEnhancedIdentity(deliver)
-      await settle()
-
-      expect(deliver).not.toHaveBeenCalled()
-    })
-
-    it("holds an event until the reset and the per-install id are both in place", async () => {
+    it("is given once the reset, the per-install id and collection are all in place", async () => {
       const id = freshModule()
       id.setCustodialIdentity(CUSTODIAL)
       id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
       await settle()
       const heldReset = deferred()
       mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
-      const deliver = jest.fn()
+      const listener = listen(id)
 
       id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      id.deliverUnderEnhancedIdentity(deliver)
       await settle()
-      expect(deliver).not.toHaveBeenCalled()
+      expect(id.isEnhancedIdentityApplied()).toBe(false)
+      expect(listener).not.toHaveBeenCalled()
 
       heldReset.release()
       await settle()
 
-      expect(deliver).toHaveBeenCalledTimes(1)
-      expect(deliver.mock.invocationCallOrder[0]).toBeGreaterThan(
+      expect(id.isEnhancedIdentityApplied()).toBe(true)
+      expect(listener).toHaveBeenCalledTimes(1)
+      expect(listener.mock.invocationCallOrder[0]).toBeGreaterThan(
         orderOf(mockSetUserId, userIdSetTo("install-uuid")),
       )
-      expect(deliver.mock.invocationCallOrder[0]).toBeGreaterThan(
+      expect(listener.mock.invocationCallOrder[0]).toBeGreaterThan(
         orderOf(mockSetAnalyticsCollectionEnabled, collectionSetTo(true)),
       )
     })
 
-    it("holds an onboarding event through custodial identity updates", async () => {
+    it("is withdrawn the moment another domain is requested", async () => {
+      mockStore.set(SIDE_KEY, "self_custodial")
       const id = freshModule()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const deliver = jest.fn()
-
-      id.deliverUnderEnhancedIdentity(deliver)
-      id.setCustodialIdentity(CUSTODIAL)
-      await settle()
-      expect(deliver).not.toHaveBeenCalled()
-
       id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
       await settle()
+      expect(id.isEnhancedIdentityApplied()).toBe(true)
 
-      expect(deliver).toHaveBeenCalledTimes(1)
-    })
-
-    it("drops held events when the device lands on Incognito instead", async () => {
-      const id = freshModule()
       id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const deliver = jest.fn()
-      id.deliverUnderEnhancedIdentity(deliver)
 
-      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
-      await settle()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      await settle()
-
-      expect(deliver).not.toHaveBeenCalled()
+      expect(id.isEnhancedIdentityApplied()).toBe(false)
     })
 
-    it("drops held events that waited too long", async () => {
-      const id = freshModule()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000_000)
-      const deliver = jest.fn()
-      id.deliverUnderEnhancedIdentity(deliver)
-
-      nowSpy.mockReturnValue(1_000_000 + 6 * 60 * 1000)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      await settle()
-      nowSpy.mockRestore()
-
-      expect(deliver).not.toHaveBeenCalled()
-    })
-
-    it("delivers nothing when a step of the transition is rejected", async () => {
+    it("is not given when a step of the transition is rejected", async () => {
       const id = freshModule()
       id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
       await settle()
       mockResetAnalyticsData.mockImplementation(() =>
         Promise.reject(new Error("native reset failed")),
       )
-      const deliver = jest.fn()
+      const listener = listen(id)
 
       id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      id.deliverUnderEnhancedIdentity(deliver)
       await settle()
 
-      expect(deliver).not.toHaveBeenCalled()
+      expect(listener).not.toHaveBeenCalled()
+      expect(id.isEnhancedIdentityApplied()).toBe(false)
       expect(mockSetUserId).not.toHaveBeenCalledWith("install-uuid")
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
       expect(mockRecordError).toHaveBeenCalled()
+    })
+
+    it("is not given for a superseded transition, only for the one that replaced it", async () => {
+      mockStore.set(SIDE_KEY, "self_custodial")
+      const heldId = deferred()
+      mockSetUserId.mockImplementation((...args: unknown[]) =>
+        args[0] === "install-uuid" ? heldId.promise : Promise.resolve(),
+      )
+      const id = freshModule()
+      const listener = listen(id)
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      /** Away and straight back while the first run waits on a step: the same domain,
+       *  but a newer request. */
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      mockSetUserId.mockImplementation(resolved)
+      heldId.release()
+      await settle()
+
+      expect(listener).toHaveBeenCalledTimes(1)
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+  })
+
+  describe("shutdowns and later transitions", () => {
+    it("lets a held Incognito shutdown finish before Enhanced is applied again", async () => {
+      mockStore.set(SIDE_KEY, "self_custodial")
+      const id = freshModule()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      const heldShutdown = deferred()
+      mockSetAnalyticsCollectionEnabled.mockImplementation((...args: unknown[]) =>
+        args[0] === false ? heldShutdown.promise : Promise.resolve(),
+      )
+      jest.clearAllMocks()
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      expect(mockSetAnalyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+      expect(id.isEnhancedIdentityApplied()).toBe(false)
+
+      heldShutdown.release()
+      await settle()
+
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(true)
+      expect(mockSetUserId).toHaveBeenLastCalledWith("install-uuid")
+      expect(id.isEnhancedIdentityApplied()).toBe(true)
+    })
+
+    it("lets a failed transition's cleanup finish before a retry begins", async () => {
+      const id = freshModule()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+      mockResetAnalyticsData.mockImplementationOnce(() =>
+        Promise.reject(new Error("native reset failed")),
+      )
+      const heldCleanup = deferred()
+      mockSetAnalyticsCollectionEnabled.mockImplementation((...args: unknown[]) =>
+        args[0] === false ? heldCleanup.promise : Promise.resolve(),
+      )
+      jest.clearAllMocks()
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      /** A retry arrives while the failed run's cleanup is still outstanding. */
+      id.setCustodialIdentity(CUSTODIAL)
+      await settle()
+      expect(mockSetAnalyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+
+      heldCleanup.release()
+      await settle()
+
+      const cleanedUp = orderOf(mockSetAnalyticsCollectionEnabled, collectionSetTo(false))
+      const reopened = orderOf(mockSetAnalyticsCollectionEnabled, collectionSetTo(true))
+      expect(cleanedUp).toBeLessThan(reopened)
+      expect(id.isEnhancedIdentityApplied()).toBe(true)
     })
   })
 })

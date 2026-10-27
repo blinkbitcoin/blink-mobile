@@ -1,7 +1,7 @@
 import React, { createContext, useCallback, useContext, useMemo, useState } from "react"
 
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
-import { measure, ScEvent } from "@app/self-custodial/measurement"
+import { measureFor, ScEvent } from "@app/self-custodial/measurement"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { AccountMode } from "@app/types/account"
@@ -38,16 +38,21 @@ const EnhancedModePromptModal: React.FC<PromptModalProps> = ({ onDismiss }) => {
   } = useTheme()
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { isAnonMode, setActiveAccountMode } = useSelfCustodialAccountMode()
+  const { activeAccountId, isAnonMode, setActiveAccountMode } =
+    useSelfCustodialAccountMode()
 
   const switchToEnhanced = () => {
     /** Only an Anon account can switch, and only a real write may confirm success. */
     if (isAnonMode) {
-      measure(
-        ScEvent.AccountModeChanged,
-        { from: AccountMode.Anon, to: AccountMode.Enhanced },
-        AccountMode.Enhanced,
-      )
+      /** Delivered once this account is active under Enhanced, never while Incognito's
+       *  collection is still shut. */
+      if (activeAccountId) {
+        measureFor(
+          { accountId: activeAccountId, mode: AccountMode.Enhanced },
+          ScEvent.AccountModeChanged,
+          { from: AccountMode.Anon, to: AccountMode.Enhanced },
+        )
+      }
       setActiveAccountMode(AccountMode.Enhanced)
       navigation.navigate("selfCustodialModeSwitchSuccess", {
         mode: AccountMode.Enhanced,

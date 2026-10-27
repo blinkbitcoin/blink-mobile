@@ -164,10 +164,10 @@ describe("self-custodial telemetry privacy boundary", () => {
       mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
 
       /** The creation is measured against the mode just chosen, before activation. */
-      measurement.measure(
+      measurement.measureFor(
+        { accountId: "sc-1", mode: AccountMode.Enhanced },
         measurement.ScEvent.AccountCreated,
         { flow: "create" },
-        AccountMode.Enhanced,
       )
       await settle()
       expect(mockLogEvent).not.toHaveBeenCalled()
@@ -199,10 +199,10 @@ describe("self-custodial telemetry privacy boundary", () => {
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
 
       /** As the switch surfaces do: measured, then the mode is written. */
-      measurement.measure(
+      measurement.measureFor(
+        { accountId: "sc-1", mode: AccountMode.Enhanced },
         measurement.ScEvent.AccountModeChanged,
         { from: AccountMode.Anon, to: AccountMode.Enhanced },
-        AccountMode.Enhanced,
       )
       activate("sc-1", AccountMode.Enhanced)
       rerender()
@@ -237,6 +237,75 @@ describe("self-custodial telemetry privacy boundary", () => {
 
       expect(mockLogEvent).not.toHaveBeenCalled()
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("does not carry an event from a failed transition onto the next account's identity", async () => {
+      const { identity, measurement, rerender } = boot()
+      identity.setCustodialIdentity({
+        userId: "me-1",
+        hasUsername: true,
+        accountLevel: "TWO",
+      })
+      await settle()
+      mockResetAnalyticsData.mockImplementationOnce(() =>
+        Promise.reject(new Error("native reset failed")),
+      )
+
+      activate("sc-a", AccountMode.Enhanced)
+      rerender()
+      measurement.measure(measurement.ScEvent.LightningAddressRegistered)
+      await settle()
+
+      activate("sc-b", AccountMode.Enhanced)
+      rerender()
+      /** sc-b's transition is retried by the custodial identity arriving again. */
+      identity.setCustodialIdentity({
+        userId: "me-1",
+        hasUsername: true,
+        accountLevel: "TWO",
+      })
+      await settle()
+      expect(identity.isEnhancedIdentityApplied()).toBe(true)
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("does not carry an event held for one account through custodial onto another", async () => {
+      activate("sc-a", AccountMode.Enhanced)
+      const { measurement, rerender } = boot()
+      await settle()
+      const heldId = deferred()
+      mockSetUserId.mockImplementation((...args: unknown[]) =>
+        args[0] === "install-uuid" ? heldId.promise : Promise.resolve(),
+      )
+
+      activate(null, null)
+      rerender()
+      activate("sc-a", AccountMode.Enhanced)
+      rerender()
+      measurement.measure(measurement.ScEvent.LightningAddressRegistered)
+      activate(null, null)
+      rerender()
+      activate("sc-b", AccountMode.Enhanced)
+      rerender()
+      mockSetUserId.mockImplementation(resolved)
+      heldId.release()
+      await settle()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("delivers an Enhanced account's events at once after a switch from another Enhanced account", async () => {
+      activate("sc-a", AccountMode.Enhanced)
+      const { measurement, rerender } = boot()
+      await settle()
+
+      activate("sc-b", AccountMode.Enhanced)
+      rerender()
+      measurement.measure(measurement.ScEvent.LightningAddressRegistered)
+      await settle()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
     })
   })
 

@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck — GetFee<T> type expects GQL fee probe params that self-custodial doesn't use
+import { it } from "@jest/globals"
+
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 
 import {
@@ -29,7 +31,8 @@ const mockSendPayment = jest.fn()
 
 jest.mock("@app/self-custodial/analytics-identity", () => ({
   /** The identity owner's own spec covers when delivery is safe; here it is in place. */
-  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+  isEnhancedIdentityApplied: () => true,
+  onEnhancedIdentityApplied: () => () => undefined,
 }))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
@@ -1184,6 +1187,39 @@ describe("send telemetry", () => {
 
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
+
+  it.each([
+    [
+      "another account",
+      { accountId: "sc-2", mode: AccountMode.Enhanced, network: "mainnet" },
+    ],
+    ["Incognito", { accountId: "sc-1", mode: AccountMode.Anon, network: "mainnet" }],
+    [
+      "another network",
+      { accountId: "sc-1", mode: AccountMode.Enhanced, network: "regtest" },
+    ],
+  ] as const)(
+    "does not report a rejection that arrives after a switch to %s",
+    async (_label, next) => {
+      let rejectSend: (err: unknown) => void = () => undefined
+      mockSendPayment.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectSend = reject
+          }),
+      )
+
+      const pending = sendBolt11()
+      await Promise.resolve()
+      await Promise.resolve()
+      setMeasurementContext(next)
+      rejectSend(sdkError("NetworkError"))
+      const result = await pending
+
+      expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    },
+  )
 
   it("still reports the send itself as sent when the SDK returns no payment", async () => {
     mockSendPayment.mockResolvedValue(undefined)

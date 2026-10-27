@@ -1,9 +1,7 @@
 /* eslint-disable camelcase */
 import analytics from "@react-native-firebase/analytics"
 
-import { AccountMode } from "@app/types/account"
-
-import { measure, ScEvent } from "./measurement"
+import { measure, measureFor, ScEvent, type MeasureTarget } from "./measurement"
 
 type SelfCustodialBackupCompletedParams = {
   backupMethod: "manual" | "google_drive" | "icloud" | "keychain"
@@ -16,11 +14,11 @@ export const logSelfCustodialBackupCompleted = (
   measure(ScEvent.BackupCompleted, { backup_method: params.backupMethod })
 }
 
-/** Restores happen before the account is active, so the caller passes the mode the
- *  restore itself established (the server's answer, or the stored mode of an account
- *  already on the device); an unknown mode suppresses the event. */
-export const logSelfCustodialRestoreCompleted = (mode: AccountMode | null) => {
-  measure(ScEvent.RestoreCompleted, undefined, mode)
+/** Restores happen before the account is active, so the caller names the account and
+ *  the mode the restore itself established (the server's answer, or the stored mode of
+ *  an account already on the device); an unknown mode suppresses the event. */
+export const logSelfCustodialRestoreCompleted = (target: MeasureTarget) => {
+  measureFor(target, ScEvent.RestoreCompleted)
 }
 
 type SelfCustodialStableBalanceActivatedParams = {

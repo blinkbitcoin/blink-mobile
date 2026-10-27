@@ -9,7 +9,10 @@ import analytics from "@react-native-firebase/analytics"
 
 import { AccountMode } from "@app/types/account"
 
-import { deliverUnderEnhancedIdentity } from "./analytics-identity"
+import {
+  isEnhancedIdentityApplied,
+  onEnhancedIdentityApplied,
+} from "./analytics-identity"
 import type { SparkNetworkLabel } from "./config"
 
 /**
@@ -95,11 +98,103 @@ const EMPTY_CONTEXT: MeasurementContext = {
 
 let context: MeasurementContext = EMPTY_CONTEXT
 /** Bumped whenever the account, its mode or the network changes: work begun under one
- *  context (a send awaiting its outcome) is never reported under another. */
+ *  context (a send awaiting its outcome, an event waiting to be delivered) is never
+ *  reported under another. */
 let generation = 0
 
 const isSameContext = (a: MeasurementContext, b: MeasurementContext) =>
   a.accountId === b.accountId && a.mode === b.mode && a.network === b.network
+
+/**
+ * Whose an event is, which decides when it may be delivered and when it is dropped
+ * instead. Most events belong to the context they were measured in. An onboarding event
+ * belongs to an account that is not active, or not Enhanced, yet: it waits for that
+ * account to become active under Enhanced and then belongs to that context.
+ */
+type Owner =
+  | { kind: "generation"; generation: number }
+  | { kind: "account"; accountId: string }
+
+type DeliveryHooks = { onDelivered?: () => void; onDropped?: () => void }
+
+type Delivery = {
+  owner: Owner
+  event: ScEvent
+  payload: ScEventParams
+  hooks: DeliveryHooks
+  queuedAtMs: number
+}
+
+/** Long enough for an onboarding to reach activation; an onboarding left unfinished is
+ *  not reported against whatever Enhanced session comes much later. */
+const PENDING_DELIVERY_TTL_MS = 5 * 60 * 1000
+const PENDING_DELIVERY_CAP = 50
+let pendingDeliveries: Delivery[] = []
+
+const send = ({ event, payload, hooks }: Delivery) => {
+  Promise.resolve(analytics().logEvent(event, payload)).then(
+    () => hooks.onDelivered?.(),
+    () => hooks.onDropped?.(),
+  )
+}
+
+/** Ready when it belongs to the context in effect and GA4 is fully under the Enhanced
+ *  identity: separated from the custodial account, the per-install id attached, and
+ *  collection on. */
+const isDeliverable = (owner: Owner) =>
+  owner.kind === "generation" &&
+  owner.generation === generation &&
+  isEnhancedIdentityApplied()
+
+const flushPendingDeliveries = () => {
+  const now = Date.now()
+  const waiting: Delivery[] = []
+  pendingDeliveries.forEach((delivery) => {
+    if (now - delivery.queuedAtMs > PENDING_DELIVERY_TTL_MS) {
+      delivery.hooks.onDropped?.()
+    } else if (isDeliverable(delivery.owner)) {
+      send(delivery)
+    } else {
+      waiting.push(delivery)
+    }
+  })
+  pendingDeliveries = waiting
+}
+
+onEnhancedIdentityApplied(flushPendingDeliveries)
+
+const deliver = (delivery: Omit<Delivery, "queuedAtMs">) => {
+  if (isDeliverable(delivery.owner)) {
+    send({ ...delivery, queuedAtMs: Date.now() })
+    return
+  }
+  if (pendingDeliveries.length >= PENDING_DELIVERY_CAP) {
+    pendingDeliveries.shift()?.hooks.onDropped?.()
+  }
+  pendingDeliveries.push({ ...delivery, queuedAtMs: Date.now() })
+}
+
+/** Moves every waiting event onto the context that just began: those of the context that
+ *  ended are dropped, and an onboarding event joins its account's context once that
+ *  account is active under Enhanced (or is dropped if it turns out Incognito). */
+const rehomePendingDeliveries = (next: MeasurementContext) => {
+  pendingDeliveries = pendingDeliveries.filter((delivery) => {
+    const { owner } = delivery
+    if (owner.kind === "generation" || owner.accountId !== next.accountId) {
+      const isStale = owner.kind === "generation"
+      if (isStale) delivery.hooks.onDropped?.()
+      return !isStale
+    }
+    if (next.mode === AccountMode.Enhanced) {
+      delivery.owner = { kind: "generation", generation }
+      return true
+    }
+    /** No mode yet: the choice may be about to land, so the event keeps waiting. */
+    if (next.mode === null) return true
+    delivery.hooks.onDropped?.()
+    return false
+  })
+}
 
 /** Refreshed by TelemetryContextMount whenever the active account or instance changes,
  *  so the gate below works from non-React code (bridge, adapters, executors). */
@@ -110,6 +205,8 @@ export const setMeasurementContext = (next: MeasurementContext): void => {
   /** Outcomes still owed belong to the context that is ending; none crosses over. */
   awaitingOutcome.clear()
   observedOutcomes.clear()
+  rehomePendingDeliveries(next)
+  flushPendingDeliveries()
 }
 
 export const resetMeasurementContext = (): void => {
@@ -119,32 +216,64 @@ export const resetMeasurementContext = (): void => {
 /** The context an operation starts in, to hand back when it reports how it ended. */
 export const measurementGeneration = (): number => generation
 
+const emit = (
+  owner: Owner,
+  { event, params }: MeasuredEvent,
+  hooks: DeliveryHooks = {},
+) => {
+  deliver({ owner, event, payload: { network: context.network, ...params }, hooks })
+}
+
 /**
  * The privacy contract's single choke point: an event leaves the device only for an
  * Enhanced account. Incognito suppresses everything, and so does an unset mode — an
  * account that never recorded a choice (restored wallets can hold none) has not
  * consented to the region posture Enhanced implies, so the gate fails closed.
  *
- * `modeOverride` is for onboarding, where the account being measured is not the active
- * one yet: the caller passes the mode it just wrote, and an Anon choice is honored the
- * moment it is made rather than after activation.
+ * Consent decides whether an event may be sent; delivery then waits for GA4 to be fully
+ * under the Enhanced identity, and drops the event if its context ends first.
  */
-export const measure = (
-  event: ScEvent,
-  params?: ScEventParams,
-  modeOverride?: AccountMode | null,
-): boolean => {
-  const mode = modeOverride === undefined ? context.mode : modeOverride
-  if (mode !== AccountMode.Enhanced) return false
-  const payload = { network: context.network, ...params }
-  /** Consent says the event may be sent; the identity owner says when it is safe to,
-   *  holding it until GA4 reports under the Enhanced identity rather than the custodial
-   *  one (or with collection still shut by Incognito). */
-  deliverUnderEnhancedIdentity(() => {
-    analytics().logEvent(event, payload)
-  })
+export const measure = (event: ScEvent, params?: ScEventParams): boolean => {
+  if (context.mode !== AccountMode.Enhanced) return false
+  emit({ kind: "generation", generation }, { event, params })
   return true
 }
+
+/** The account an onboarding or mode-switch event is about, and the mode it was just
+ *  given: the account need not be active, or Enhanced, yet. */
+export type MeasureTarget = { accountId: string; mode: AccountMode | null }
+
+/**
+ * For onboarding and mode switches, where the account measured is not the active one
+ * yet, or is but has not taken its new mode: an Incognito choice is honoured the moment
+ * it is made, and an Enhanced one is delivered only once that account is active under
+ * Enhanced — never under the custodial identity, or another account's.
+ */
+export const measureFor = (
+  target: MeasureTarget,
+  event: ScEvent,
+  params?: ScEventParams,
+): boolean => {
+  if (target.mode !== AccountMode.Enhanced) return false
+  const isInEffect =
+    target.accountId === context.accountId && context.mode === AccountMode.Enhanced
+  emit(
+    isInEffect
+      ? { kind: "generation", generation }
+      : { kind: "account", accountId: target.accountId },
+    { event, params },
+  )
+  return true
+}
+
+/** For the end of an operation begun in `startedIn`: reported only if that context is
+ *  still the one in effect, so a rejection that arrives after a switch is not attributed
+ *  to the account, mode or network that followed. */
+export const measureIn = (
+  startedIn: number,
+  event: ScEvent,
+  params?: ScEventParams,
+): boolean => startedIn === generation && measure(event, params)
 
 /** Settles can be announced more than once (a pending-then-succeeded transition, a
  *  listener re-registered after reconnect), so payment-keyed events dedupe here. The set
@@ -152,26 +281,44 @@ export const measure = (
  *  announcement, which monthly aggregation tolerates and a persistent ledger of seen
  *  payment ids would not be worth. */
 const MEASURED_ONCE_CAP = 1_000
-const measuredOnceKeys = new Set<string>()
+const deliveredKeys = new Set<string>()
+/** Keys of events accepted but not yet delivered: held so a second announcement does not
+ *  count twice, and released if the event is dropped rather than delivered. */
+const reservedKeys = new Set<string>()
+
+const commitKey = (key: string) => {
+  reservedKeys.delete(key)
+  if (deliveredKeys.size >= MEASURED_ONCE_CAP) {
+    const oldest = deliveredKeys.values().next().value
+    if (oldest !== undefined) deliveredKeys.delete(oldest)
+  }
+  deliveredKeys.add(key)
+}
 
 export const measureOnce = (
   key: string,
   event: ScEvent,
   params?: ScEventParams,
 ): void => {
-  if (measuredOnceKeys.has(key)) return
-  /** Only an event the gate let through uses up its key: a suppressed announcement
-   *  leaves a later one free to count. */
-  if (!measure(event, params)) return
-  if (measuredOnceKeys.size >= MEASURED_ONCE_CAP) {
-    const oldest = measuredOnceKeys.values().next().value
-    if (oldest !== undefined) measuredOnceKeys.delete(oldest)
-  }
-  measuredOnceKeys.add(key)
+  if (deliveredKeys.has(key) || reservedKeys.has(key)) return
+  if (context.mode !== AccountMode.Enhanced) return
+  /** A key is used up only by an event GA4 accepted: one that expires, is evicted, is
+   *  dropped with its context, or is rejected leaves a later announcement free to
+   *  count. */
+  reservedKeys.add(key)
+  emit(
+    { kind: "generation", generation },
+    { event, params },
+    {
+      onDelivered: () => commitKey(key),
+      onDropped: () => reservedKeys.delete(key),
+    },
+  )
 }
 
 export const resetMeasuredOnceKeys = (): void => {
-  measuredOnceKeys.clear()
+  deliveredKeys.clear()
+  reservedKeys.clear()
 }
 
 /** The error code a send or swap reports when the SDK announces its failure after the

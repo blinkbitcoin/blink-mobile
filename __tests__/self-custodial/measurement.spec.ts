@@ -8,6 +8,8 @@ import {
 
 import {
   measure,
+  measureFor,
+  measureIn,
   measureObservedPayment,
   measureOnce,
   measurementGeneration,
@@ -25,10 +27,25 @@ import { AccountMode } from "@app/types/account"
 
 const mockLogEvent = jest.fn()
 
-jest.mock("@app/self-custodial/analytics-identity", () => ({
-  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
-  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
-}))
+/** Whether GA4 is under the Enhanced identity, and the announcement that it now is: the
+ *  identity owner's own spec covers how it gets there. */
+const mockIdentity = { applied: true }
+jest.mock("@app/self-custodial/analytics-identity", () => {
+  const listeners: Array<() => void> = []
+  return {
+    isEnhancedIdentityApplied: () => mockIdentity.applied,
+    onEnhancedIdentityApplied: (listener: () => void) => {
+      listeners.push(listener)
+      return () => undefined
+    },
+    announceForTest: () => listeners.forEach((listener) => listener()),
+  }
+})
+
+const announceIdentityApplied = () => {
+  mockIdentity.applied = true
+  jest.requireMock("@app/self-custodial/analytics-identity").announceForTest()
+}
 
 jest.mock("@react-native-firebase/analytics", () => () => ({
   logEvent: (...args: unknown[]) => mockLogEvent(...args),
@@ -76,17 +93,6 @@ describe("measurement gate", () => {
     expect(mockLogEvent).not.toHaveBeenCalled()
   })
 
-  it("lets onboarding measure against the mode it just wrote, before activation", () => {
-    resetMeasurementContext()
-
-    measure(ScEvent.AccountCreated, { flow: "create" }, AccountMode.Enhanced)
-
-    expect(mockLogEvent).toHaveBeenCalledWith("sc_account_created", {
-      network: "mainnet",
-      flow: "create",
-    })
-  })
-
   it("honors an Incognito choice the moment it is made, even over an Enhanced context", () => {
     setMeasurementContext({
       accountId: "sc-1",
@@ -94,7 +100,11 @@ describe("measurement gate", () => {
       network: "mainnet",
     })
 
-    measure(ScEvent.AccountModeSelected, { mode: "anon" }, AccountMode.Anon)
+    measureFor(
+      { accountId: "sc-1", mode: AccountMode.Anon },
+      ScEvent.AccountModeSelected,
+      { mode: "anon" },
+    )
 
     expect(mockLogEvent).not.toHaveBeenCalled()
   })
@@ -307,4 +317,257 @@ describe("observed receives", () => {
       expect(mockLogEvent).not.toHaveBeenCalled()
     },
   )
+})
+
+describe("delivery ownership", () => {
+  const enhanced = (accountId: string) =>
+    setMeasurementContext({ accountId, mode: AccountMode.Enhanced, network: "mainnet" })
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetMeasurementContext()
+    mockIdentity.applied = true
+    mockLogEvent.mockImplementation(() => Promise.resolve())
+  })
+
+  afterAll(() => {
+    mockIdentity.applied = true
+  })
+
+  describe("context events", () => {
+    it("wait for the Enhanced identity, then go out once", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+
+      measure(ScEvent.LightningAddressRegistered)
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      announceIdentityApplied()
+      announceIdentityApplied()
+
+      expect(loggedEvents()).toEqual([ScEvent.LightningAddressRegistered])
+    })
+
+    it("never go out under the next Enhanced account", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      measure(ScEvent.LightningAddressRegistered)
+
+      enhanced("sc-b")
+      announceIdentityApplied()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("are dropped when the context passes through custodial on the way to another account", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      measure(ScEvent.LightningAddressRegistered)
+
+      resetMeasurementContext()
+      enhanced("sc-b")
+      announceIdentityApplied()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("from a transition that never completed do not ride on a later account's", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      measure(ScEvent.LightningAddressRegistered)
+
+      /** The transition for sc-a failed: no announcement. The user moves on to sc-b,
+       *  whose transition succeeds. */
+      enhanced("sc-b")
+      announceIdentityApplied()
+      measure(ScEvent.LightningAddressRegistered, { rail: "b" })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith(ScEvent.LightningAddressRegistered, {
+        network: "mainnet",
+        rail: "b",
+      })
+    })
+
+    it("are dropped after waiting too long", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000_000)
+      measure(ScEvent.LightningAddressRegistered)
+
+      nowSpy.mockReturnValue(1_000_000 + 6 * 60 * 1000)
+      announceIdentityApplied()
+      nowSpy.mockRestore()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("onboarding events", () => {
+    const forAccount = (mode: AccountMode | null) =>
+      measureFor({ accountId: "sc-new", mode }, ScEvent.AccountCreated, {
+        flow: "create",
+      })
+
+    it("wait for their account to be active under Enhanced", () => {
+      forAccount(AccountMode.Enhanced)
+      enhanced("sc-other")
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      enhanced("sc-new")
+
+      expect(loggedEvents()).toEqual([ScEvent.AccountCreated])
+    })
+
+    it("wait for their own account even while another is active under Enhanced", () => {
+      enhanced("sc-other")
+
+      forAccount(AccountMode.Enhanced)
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      enhanced("sc-new")
+      expect(loggedEvents()).toEqual([ScEvent.AccountCreated])
+    })
+
+    it("keep waiting while their account has no mode yet", () => {
+      forAccount(AccountMode.Enhanced)
+      setMeasurementContext({ accountId: "sc-new", mode: null, network: "mainnet" })
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      enhanced("sc-new")
+
+      expect(loggedEvents()).toEqual([ScEvent.AccountCreated])
+    })
+
+    it("are dropped if their account turns out Incognito", () => {
+      forAccount(AccountMode.Enhanced)
+      setMeasurementContext({
+        accountId: "sc-new",
+        mode: AccountMode.Anon,
+        network: "mainnet",
+      })
+      enhanced("sc-new")
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("go out at once for the account already active under Enhanced", () => {
+      enhanced("sc-new")
+
+      forAccount(AccountMode.Enhanced)
+
+      expect(loggedEvents()).toEqual([ScEvent.AccountCreated])
+    })
+
+    it("are dropped if their account is not activated in time", () => {
+      const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000_000)
+      forAccount(AccountMode.Enhanced)
+
+      nowSpy.mockReturnValue(1_000_000 + 6 * 60 * 1000)
+      enhanced("sc-new")
+      nowSpy.mockRestore()
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("operations that end in another context", () => {
+    it("report nothing", () => {
+      enhanced("sc-a")
+      const startedIn = measurementGeneration()
+
+      enhanced("sc-b")
+
+      expect(measureIn(startedIn, ScEvent.PaymentSendFailed)).toBe(false)
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("report in the context they began in", () => {
+      enhanced("sc-a")
+
+      expect(measureIn(measurementGeneration(), ScEvent.PaymentSendFailed)).toBe(true)
+      expect(loggedEvents()).toEqual([ScEvent.PaymentSendFailed])
+    })
+  })
+
+  describe("dedupe keys", () => {
+    const announce = () =>
+      measureOnce("rx-1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
+    const flush = async () => {
+      await Promise.resolve()
+      await Promise.resolve()
+    }
+
+    it("are used up by an event GA4 accepted", async () => {
+      enhanced("sc-a")
+      announce()
+      await flush()
+      announce()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+    })
+
+    it("are held while the event waits, so a repeat does not queue twice", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      announce()
+      announce()
+
+      announceIdentityApplied()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+    })
+
+    it("are freed when the waiting event is dropped with its context", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      announce()
+      enhanced("sc-b")
+      announceIdentityApplied()
+
+      announce()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+    })
+
+    it("are freed when the waiting event expires", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      const nowSpy = jest.spyOn(Date, "now").mockReturnValue(1_000_000)
+      announce()
+      nowSpy.mockReturnValue(1_000_000 + 6 * 60 * 1000)
+      announceIdentityApplied()
+      nowSpy.mockRestore()
+
+      announce()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+    })
+
+    it("are freed when the waiting event is evicted by newer ones", () => {
+      enhanced("sc-a")
+      mockIdentity.applied = false
+      announce()
+      for (let i = 0; i < 50; i += 1) measure(ScEvent.LightningAddressRegistered)
+      announceIdentityApplied()
+      jest.clearAllMocks()
+
+      announce()
+
+      expect(loggedEvents()).toEqual([ScEvent.PaymentReceived])
+    })
+
+    it("are freed when GA4 rejects the event", async () => {
+      enhanced("sc-a")
+      mockLogEvent.mockImplementationOnce(() => Promise.reject(new Error("native")))
+      announce()
+      await flush()
+
+      announce()
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(2)
+    })
+  })
 })

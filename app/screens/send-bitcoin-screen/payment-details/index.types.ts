@@ -58,13 +58,7 @@ export type IdempotencyKeyRef = { current?: string }
  * The attempts of a send that threw after dispatch without their payment turning up: the
  * payment hash of each invoice they paid, and when the first of them was made.
  */
-export type LostSend = {
-  startedAtMs: number
-  paymentHashes: string[]
-  /** Telemetry only: the measurement context the send began in, so a retry that finds
-   *  its payment reports under that context and not the one in effect by then. */
-  telemetryGeneration?: number
-}
+export type LostSend = { startedAtMs: number; paymentHashes: string[] }
 
 /**
  * Everything an attempt leaves behind for the next one, on one holder: the idempotency

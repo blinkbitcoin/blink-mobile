@@ -22,7 +22,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { armModeSelectionConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
-import { measure, ScEvent } from "@app/self-custodial/measurement"
+import { measureFor, ScEvent } from "@app/self-custodial/measurement"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountMode, CreationBlockReason } from "@app/types/account"
 import { ActiveWalletStatus } from "@app/types/wallet"
@@ -47,8 +47,13 @@ export const ChooseExperienceScreen: React.FC = () => {
   const LLScreen = LL.ChooseExperienceScreen
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const route = useRoute<RouteProp<RootStackParamList, "selfCustodialChooseExperience">>()
-  const { accountMode, getModeFor, setAccountMode, setActiveAccountMode } =
-    useSelfCustodialAccountMode()
+  const {
+    activeAccountId,
+    accountMode,
+    getModeFor,
+    setAccountMode,
+    setActiveAccountMode,
+  } = useSelfCustodialAccountMode()
   const { wallets, isReady: isWalletReady, status: walletStatus } = useActiveWallet()
   const { refreshWallets } = useSelfCustodialWallet()
   /** No first-signup gate here: this screen only ever submits self-custodial, which the
@@ -208,11 +213,13 @@ export const ChooseExperienceScreen: React.FC = () => {
       }
       /** Measured against the mode being switched to: a switch to Anon suppresses its
        *  own event, so leaving Enhanced is only ever visible in the server headcount. */
-      measure(
-        ScEvent.AccountModeChanged,
-        { from: accountMode ?? "none", to: selected },
-        selected,
-      )
+      if (activeAccountId) {
+        measureFor(
+          { accountId: activeAccountId, mode: selected },
+          ScEvent.AccountModeChanged,
+          { from: accountMode ?? "none", to: selected },
+        )
+      }
       setActiveAccountMode(selected)
       navigation.replace("selfCustodialModeSwitchSuccess", { mode: selected })
       return
@@ -227,7 +234,6 @@ export const ChooseExperienceScreen: React.FC = () => {
           navigation.navigate("unsupportedRegion", { reason: blockReason })
           return
         }
-        measure(ScEvent.AccountModeSelected, { mode: selected }, selected)
         navigation.navigate("acceptTermsAndConditions", {
           flow: "selfCustodial",
           mode: selected,
@@ -236,12 +242,20 @@ export const ChooseExperienceScreen: React.FC = () => {
       }
       case ChooseExperienceContinueRoute.BackupSuccess:
         setAccountMode(onContinue.accountId, selected)
-        measure(ScEvent.AccountModeSelected, { mode: selected }, selected)
+        measureFor(
+          { accountId: onContinue.accountId, mode: selected },
+          ScEvent.AccountModeSelected,
+          { mode: selected },
+        )
         navigation.navigate("selfCustodialBackupSuccess")
         return
       case ChooseExperienceContinueRoute.BalancesOverview:
         setAccountMode(onContinue.accountId, selected)
-        measure(ScEvent.AccountModeSelected, { mode: selected }, selected)
+        measureFor(
+          { accountId: onContinue.accountId, mode: selected },
+          ScEvent.AccountModeSelected,
+          { mode: selected },
+        )
         navigation.navigate("accountMigrationBalancesOverview")
         return
       default: {

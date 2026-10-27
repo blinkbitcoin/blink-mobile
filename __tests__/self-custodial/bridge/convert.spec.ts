@@ -27,7 +27,8 @@ const mockRecordError = jest.fn()
 
 jest.mock("@app/self-custodial/analytics-identity", () => ({
   /** The identity owner's own spec covers when delivery is safe; here it is in place. */
-  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+  isEnhancedIdentityApplied: () => true,
+  onEnhancedIdentityApplied: () => () => undefined,
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
@@ -493,6 +494,44 @@ describe("swap telemetry", () => {
     } as never)
 
     expect(loggedEvents()).toEqual(["sc_swap_failed"])
+  })
+
+  it("does not report a quote made for one account but executed after a switch", async () => {
+    const sdk = createSdk()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "cv-1", status: COMPLETED } })
+    const quote = await createGetConversionQuote(sdk as never)(params)
+
+    setMeasurementContext({
+      accountId: "sc-2",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+    await quote!.execute()
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+
+  it("does not report a rejection that arrives after a switch to another account", async () => {
+    const sdk = createSdk()
+    let rejectSend: (err: unknown) => void = () => undefined
+    sdk.sendPayment.mockImplementation(
+      () =>
+        new Promise((_resolve, reject) => {
+          rejectSend = reject
+        }),
+    )
+    const quote = await createGetConversionQuote(sdk as never)(params)
+
+    const executing = quote!.execute()
+    setMeasurementContext({
+      accountId: "sc-2",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+    rejectSend(new Error("send failed"))
+    await executing
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
   })
 
   it("reports a thrown conversion as failed", async () => {

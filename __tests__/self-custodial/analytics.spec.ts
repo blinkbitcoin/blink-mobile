@@ -15,7 +15,8 @@ const mockLogEvent = jest.fn()
 
 jest.mock("@app/self-custodial/analytics-identity", () => ({
   /** The identity owner's own spec covers when delivery is safe; here it is in place. */
-  deliverUnderEnhancedIdentity: (deliver: () => void) => deliver(),
+  isEnhancedIdentityApplied: () => true,
+  onEnhancedIdentityApplied: () => () => undefined,
 }))
 
 jest.mock("@react-native-firebase/analytics", () => () => ({
@@ -95,8 +96,19 @@ describe("self-custodial analytics helpers", () => {
   })
 
   describe("logSelfCustodialRestoreCompleted", () => {
-    it("emits against the mode the restore established, before activation", () => {
-      logSelfCustodialRestoreCompleted(AccountMode.Enhanced)
+    it("waits for the restored account to be active under Enhanced, then emits", () => {
+      resetMeasurementContext()
+      logSelfCustodialRestoreCompleted({
+        accountId: "sc-new",
+        mode: AccountMode.Enhanced,
+      })
+      expect(mockLogEvent).not.toHaveBeenCalled()
+
+      setMeasurementContext({
+        accountId: "sc-new",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
 
       expect(mockLogEvent).toHaveBeenCalledWith("self_custodial_restore_completed", {
         network: "mainnet",
@@ -104,8 +116,13 @@ describe("self-custodial analytics helpers", () => {
     })
 
     it("emits nothing for an Incognito or unknown-mode restore", () => {
-      logSelfCustodialRestoreCompleted(AccountMode.Anon)
-      logSelfCustodialRestoreCompleted(null)
+      logSelfCustodialRestoreCompleted({ accountId: "sc-new", mode: AccountMode.Anon })
+      logSelfCustodialRestoreCompleted({ accountId: "sc-new", mode: null })
+      setMeasurementContext({
+        accountId: "sc-new",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
 
       expect(mockLogEvent).not.toHaveBeenCalled()
     })

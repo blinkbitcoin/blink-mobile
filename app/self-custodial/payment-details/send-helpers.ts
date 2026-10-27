@@ -36,6 +36,7 @@ import {
 } from "../bridge"
 import {
   measure,
+  measureIn,
   measurementGeneration,
   measureSettlement,
   ScEvent,
@@ -182,7 +183,7 @@ export const createSendMutation = (
       )
       return { status: PaymentSendResult.Success }
     } catch (err) {
-      measure(ScEvent.PaymentSendFailed, {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
         error_code: classifySdkError(err),
       })
@@ -212,7 +213,7 @@ export const createSendMutationOnchain = (
       )
       return { status: PaymentSendResult.Success }
     } catch (err) {
-      measure(ScEvent.PaymentSendFailed, {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
         error_code: classifySdkError(err),
       })
