@@ -1,4 +1,5 @@
 import { useCallback, useRef } from "react"
+import { BackHandler } from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -44,9 +45,16 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     if (!removal) return
     pendingRemoval.current = null
 
+    /** The lock only covers the screen's body: the header back button, the swipe back
+     *  and the Android back button would still leave it mid-removal, onto a screen that
+     *  already describes the next account. */
+    navigation.setOptions({ headerLeft: () => null, gestureEnabled: false })
+    const backGuard = BackHandler.addEventListener("hardwareBackPress", () => true)
     setAccountIsBeingDeleted(true, removal.identifier)
     const outcome = await deleteWallet(removal.accountId)
+    backGuard.remove()
     if (!outcome) {
+      navigation.setOptions({ headerLeft: undefined, gestureEnabled: true })
       setAccountIsBeingDeleted(false)
       return
     }
