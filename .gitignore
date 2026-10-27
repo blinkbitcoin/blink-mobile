@@ -105,7 +105,11 @@ android-recordings
 !.yarn/versions
 
 # As long asd we haven't agreed on an AI agent strategy, let's ignore any AI agent data
-.claude
+# (except the shared skills listed below)
+.claude/*
+!.claude/skills/
+.claude/skills/*
+!.claude/skills/blink-figma-to-code/
 .augment
 .bmad
 bmad-custom-src
