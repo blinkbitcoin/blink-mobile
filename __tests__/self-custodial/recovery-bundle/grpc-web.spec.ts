@@ -102,6 +102,15 @@ describe("grpcWebUnaryCall", () => {
     await expect(grpcWebUnaryCall(params)).rejects.toBeInstanceOf(GrpcWebError)
   })
 
+  it("describes a network failure rejected with a non-Error value", async () => {
+    global.fetch = jest
+      .fn()
+      .mockRejectedValue("socket hang up") as unknown as typeof fetch
+    await expect(grpcWebUnaryCall(params)).rejects.toThrow(
+      /network error: socket hang up/,
+    )
+  })
+
   it("rejects a compressed message frame instead of feeding it to the decoder", async () => {
     // Flag bit 0x01 = compressed. Compression is never negotiated, so this
     // must fail as a protocol violation, not as a cryptic protobuf error.
@@ -118,7 +127,65 @@ describe("grpcWebUnaryCall", () => {
     // A stream cut after the message frame may have swallowed a non-OK
     // grpc-status; missing trailers must not be treated as success.
     mockFetchOnce({ body: frame(0, Uint8Array.from([1, 2, 3])) })
-    await expect(grpcWebUnaryCall(params)).rejects.toThrow(/without a trailers frame/)
+    await expect(grpcWebUnaryCall(params)).rejects.toThrow(/no grpc-status/)
+  })
+
+  it("rejects a message whose trailers frame omits grpc-status", async () => {
+    mockFetchOnce({
+      body: concat(
+        frame(0, Uint8Array.from([1, 2, 3])),
+        frame(0x80, textBytes("x-proxy-note: truncated")),
+      ),
+    })
+    await expect(grpcWebUnaryCall(params)).rejects.toThrow(/no grpc-status/)
+  })
+
+  it("rejects a malformed grpc-status instead of reading it as a code", async () => {
+    mockFetchOnce({
+      body: concat(
+        frame(0, Uint8Array.from([1])),
+        frame(0x80, textBytes("grpc-status: ok")),
+      ),
+    })
+    await expect(grpcWebUnaryCall(params)).rejects.toMatchObject({
+      grpcStatus: undefined,
+      message: expect.stringContaining('malformed grpc-status "ok"'),
+    })
+  })
+
+  it("rejects an empty grpc-status instead of treating it as absent", async () => {
+    mockFetchOnce({
+      headers: { "grpc-status": "" },
+      body: concat(
+        frame(0, Uint8Array.from([1])),
+        frame(0x80, textBytes("grpc-status: 0")),
+      ),
+    })
+    await expect(grpcWebUnaryCall(params)).rejects.toThrow('malformed grpc-status ""')
+  })
+
+  it("rejects a failing trailer status even when the headers reported OK", async () => {
+    mockFetchOnce({
+      headers: { "grpc-status": "0" },
+      body: concat(
+        frame(0, Uint8Array.from([1])),
+        frame(0x80, textBytes("grpc-status: 14")),
+      ),
+    })
+    await expect(grpcWebUnaryCall(params)).rejects.toMatchObject({ grpcStatus: 14 })
+  })
+
+  it("reports a failing status that arrives without a grpc-message", async () => {
+    mockFetchOnce({
+      body: concat(
+        frame(0, Uint8Array.from([1])),
+        frame(0x80, textBytes("grpc-status: 13")),
+      ),
+    })
+    await expect(grpcWebUnaryCall(params)).rejects.toMatchObject({
+      grpcStatus: 13,
+      message: expect.stringMatching(/status 13: $/),
+    })
   })
 
   it("accepts a message frame without trailers when grpc-status: 0 came in the HTTP headers", async () => {
@@ -164,6 +231,12 @@ describe("grpcWebUnaryCall", () => {
         Uint8Array.from([0x80, 0x00]),
       ),
     })
+    await expect(grpcWebUnaryCall(params)).rejects.toThrow(/truncated/)
+  })
+
+  it("rejects a frame whose declared length runs past the body", async () => {
+    const declaresTenBytes = frame(0, Uint8Array.from(Buffer.alloc(10, 1))).subarray(0, 8)
+    mockFetchOnce({ body: declaresTenBytes })
     await expect(grpcWebUnaryCall(params)).rejects.toThrow(/truncated/)
   })
 })
