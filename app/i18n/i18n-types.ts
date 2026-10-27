@@ -12654,7 +12654,7 @@ type RootTranslation = {
 			 */
 			autoBundleHint: string
 			/**
-			 * A​d​d​ ​a​ ​p​a​s​s​w​o​r​d​ ​a​b​o​v​e​ ​t​o​ ​e​n​a​b​l​e​ ​t​h​i​s​.​ ​W​i​t​h​o​u​t​ ​o​n​e​,​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​w​o​u​l​d​ ​s​i​t​ ​n​e​x​t​ ​t​o​ ​a​n​ ​u​n​p​r​o​t​e​c​t​e​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+			 * A​d​d​ ​a​ ​p​a​s​s​p​h​r​a​s​e​ ​a​b​o​v​e​ ​t​o​ ​e​n​a​b​l​e​ ​t​h​i​s​.​ ​W​i​t​h​o​u​t​ ​o​n​e​,​ ​y​o​u​r​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​w​o​u​l​d​ ​s​i​t​ ​n​e​x​t​ ​t​o​ ​a​n​ ​u​n​p​r​o​t​e​c​t​e​d​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
 			 */
 			autoBundleNeedsPassword: string
 			/**
@@ -26835,7 +26835,7 @@ export type TranslationFunctions = {
 			 */
 			autoBundleHint: () => LocalizedString
 			/**
-			 * Add a password above to enable this. Without one, your recovery backup would sit next to an unprotected backup phrase.
+			 * Add a passphrase above to enable this. Without one, your recovery backup would sit next to an unprotected backup phrase.
 			 */
 			autoBundleNeedsPassword: () => LocalizedString
 			/**
