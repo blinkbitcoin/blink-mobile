@@ -565,6 +565,33 @@ describe("PlaceSheet fallbacks", () => {
       expect(canOpen).toHaveBeenCalledTimes(1)
       expect(Linking.openURL).toHaveBeenCalledTimes(1)
     })
+
+    // The sheet stays mounted for the whole map session, so a guard that never
+    // resets would leave Navigate dead for every merchant opened after this one.
+    it("navigates again once the first tap has opened the maps app", async () => {
+      Platform.OS = "ios"
+      canOpen.mockResolvedValue(true)
+
+      const { getByText } = await pressNavigate()
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledTimes(1))
+      fireEvent.press(getByText("Navigate"))
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledTimes(2))
+      expect(canOpen).toHaveBeenCalledTimes(2)
+    })
+
+    it("navigates again after a tap that nothing could open", async () => {
+      Platform.OS = "android"
+      canOpen.mockResolvedValue(false)
+      jest.spyOn(Linking, "openURL").mockRejectedValueOnce(new Error("no handler"))
+
+      const { getByText } = await pressNavigate()
+      await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
+      fireEvent.press(getByText("Navigate"))
+
+      await waitFor(() => expect(Linking.openURL).toHaveBeenCalledTimes(2))
+      expect(Linking.openURL).toHaveBeenLastCalledWith(GEO)
+    })
   })
 })
 
@@ -581,6 +608,23 @@ describe("PlaceSheet contact and payment rows", () => {
 
     fireEvent.press(getByText("hi@satoshi.example"))
     expect(Linking.openURL).toHaveBeenCalledWith("mailto:hi@satoshi.example")
+  })
+
+  it("says so when a link row cannot be opened, in the browser or by the OS", async () => {
+    setDetails(details({ website: "https://satoshi.coffee", phone: "+44 20 7946 0100" }))
+    mockedOpenExternal.mockRejectedValueOnce(new Error("no browser"))
+    jest.spyOn(Linking, "openURL").mockRejectedValueOnce(new Error("no dialer"))
+    const { getByText } = renderSheet()
+
+    await waitFor(() => expect(getByText("+44 20 7946 0100")).toBeTruthy())
+    fireEvent.press(getByText("satoshi.coffee"))
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(1))
+
+    fireEvent.press(getByText("+44 20 7946 0100"))
+    await waitFor(() => expect(mockToastShow).toHaveBeenCalledTimes(2))
+    expect(mockToastShow).toHaveBeenLastCalledWith(
+      expect.objectContaining({ message: "Nothing on this phone can open that link" }),
+    )
   })
 
   it("refuses to hand a merchant's own scheme to the OS from a link row", async () => {
