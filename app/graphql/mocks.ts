@@ -1,4 +1,5 @@
 import {
+  ApiKeysDocument,
   BulletinsDocument,
   ContactsDocument,
   CurrencyListDocument,
@@ -328,6 +329,18 @@ const mocks = [
             },
             __typename: "ConsumerAccount",
           },
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
+    request: { query: ApiKeysDocument },
+    result: {
+      data: {
+        me: {
+          id: "user-id-123",
+          apiKeys: [],
           __typename: "User",
         },
       },
