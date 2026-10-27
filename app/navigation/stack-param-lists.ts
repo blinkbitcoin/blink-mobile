@@ -17,6 +17,7 @@ import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/ac
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
 import {
+  LoginMethodAdditionParams,
   TotpCodeCheckParams,
   TwoFactorFlowParams,
 } from "@app/types/two-factor-enforcement"
@@ -245,6 +246,8 @@ export type RootStackParamList = {
   totpRegistrationDone: undefined
   /** The authenticator's code, which turns it off. */
   totpDeleteValidate: undefined
+  /** The authenticator's code for adding a login method. */
+  loginMethodCode: LoginMethodAdditionParams
   totpLoginValidate: { authToken: string }
   twoFactorSetup: TwoFactorFlowParams | undefined
   twoFactorNonCustodial: TwoFactorFlowParams | undefined

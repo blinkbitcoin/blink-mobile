@@ -13771,6 +13771,32 @@ type RootTranslation = {
 		 */
 		manualResetBody: string
 	}
+	LoginMethodCode: {
+		/**
+		 * A​d​d​ ​e​m​a​i​l
+		 */
+		addEmailTitle: string
+		/**
+		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		addPhoneTitle: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​e​m​a​i​l​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addEmailCode: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addPhoneCode: string
+		/**
+		 * T​h​a​t​ ​c​o​d​e​ ​i​s​ ​i​n​c​o​r​r​e​c​t​.​ ​E​n​t​e​r​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		codeInvalid: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​n​ ​h​o​u​r​.
+		 */
+		tooManyAttempts: string
+	}
 	BackupRequired: {
 		/**
 		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​i​r​s​t
@@ -27733,6 +27759,32 @@ export type TranslationFunctions = {
 		 * For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.
 		 */
 		manualResetBody: () => LocalizedString
+	}
+	LoginMethodCode: {
+		/**
+		 * Add email
+		 */
+		addEmailTitle: () => LocalizedString
+		/**
+		 * Add phone number
+		 */
+		addPhoneTitle: () => LocalizedString
+		/**
+		 * To add your email, enter the 6-digit code from your authenticator app.
+		 */
+		addEmailCode: () => LocalizedString
+		/**
+		 * To add your phone number, enter the 6-digit code from your authenticator app.
+		 */
+		addPhoneCode: () => LocalizedString
+		/**
+		 * That code is incorrect. Enter the current code from your authenticator app.
+		 */
+		codeInvalid: () => LocalizedString
+		/**
+		 * Too many attempts. Try again in an hour.
+		 */
+		tooManyAttempts: () => LocalizedString
 	}
 	BackupRequired: {
 		/**

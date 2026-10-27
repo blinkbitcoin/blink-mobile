@@ -10,6 +10,7 @@ import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.t
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
 import {
   AuthenticatorApp,
+  LoginMethod,
   SetupKeyBackupOption,
   TwoFactorMethod,
   TwoFactorPrompt,
@@ -296,4 +297,14 @@ export const logTwoFactorDisableAttempted = (params: LogTwoFactorTurnOffParams) 
  *  tier, or the server found a balance that high. */
 export const logTwoFactorDisableBlocked = (params: LogTwoFactorTurnOffParams) => {
   analytics().logEvent("two_factor_disable_blocked", { tier: params.tier })
+}
+
+type LogLoginMethodCodeFailedParams = {
+  loginMethod: LoginMethod
+}
+
+/** The authenticator's code for adding the email or the phone number, refused as
+ *  wrong. */
+export const logLoginMethodCodeFailed = (params: LogLoginMethodCodeFailedParams) => {
+  analytics().logEvent("login_method_code_failed", { login_method: params.loginMethod })
 }

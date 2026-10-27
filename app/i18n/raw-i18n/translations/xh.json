@@ -4120,6 +4120,14 @@
     "manualResetTitle": "Ukusetha kwakhona i-2FA ngesandla",
     "manualResetBody": "Ukuze ukhuseleke, asivumeli ukususwa kwe-2FA ngaphakathi kwi-app. Ukuba ufuna ukusetha kwakhona i-2FA, qhagamshelana <support>neNkxaso</support> yethu."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Yongeza i-imeyile",
+    "addPhoneTitle": "Yongeza inombolo yefowuni",
+    "addEmailCode": "Ukuze wongeze i-imeyile yakho, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "addPhoneCode": "Ukuze wongeze inombolo yakho yefowuni, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "codeInvalid": "Loo khowudi ayichanekanga. Faka ikhowudi yangoku evela kwi-app yakho yokuqinisekisa.",
+    "tooManyAttempts": "Iinzame ezininzi kakhulu. Zama kwakhona emva kweyure enye."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

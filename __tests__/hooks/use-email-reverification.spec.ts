@@ -2,6 +2,7 @@ import { Alert, AlertButton } from "react-native"
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useEmailReverification } from "@app/hooks/use-email-reverification"
+import { LoginMethodAddition } from "@app/types/two-factor-enforcement"
 
 import { flushEffects } from "../helpers/flush-effects"
 
@@ -28,6 +29,11 @@ let mockToken = ""
 let mockAccountId: string | undefined = "custodial-default"
 const mockEmailDelete = jest.fn()
 const mockRegistrationInitiate = jest.fn()
+let mockTotpEnabled = false
+
+jest.mock("@app/screens/settings-screen/account/login-methods-hook", () => ({
+  useLoginMethods: () => ({ hasAuthenticator: mockTotpEnabled }),
+}))
 
 jest.mock("@app/graphql/generated", () => ({
   useUserEmailDeleteMutation: () => [mockEmailDelete, { loading: false }],
@@ -144,6 +150,7 @@ describe("useEmailReverification", () => {
     sessionB = `session-of-account-b:${testCount}`
     mockToken = sessionA
     mockAccountId = "custodial-default"
+    mockTotpEnabled = false
     jest.spyOn(Alert, "alert").mockImplementation(() => {})
     // The give-up branches log on purpose; the assertions cover them.
     jest.spyOn(console, "warn").mockImplementation(() => {})
@@ -172,6 +179,150 @@ describe("useEmailReverification", () => {
       expect.any(Array),
     )
     expect(mockEmailDelete).not.toHaveBeenCalled()
+  })
+
+  /** The server asks for the authenticator's code to remove and register the address,
+   *  so the code screen runs both. */
+  it("hands both requests to the code screen on an account with an authenticator", async () => {
+    mockTotpEnabled = true
+    const { result } = renderHook(() => useEmailReverification())
+
+    result.current.promptReverification(EMAIL)
+    await pressAlertButton("OK")
+
+    expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", {
+      addition: LoginMethodAddition.EmailReverify,
+      email: EMAIL,
+    })
+    expect(mockEmailDelete).not.toHaveBeenCalled()
+    expect(mockRegistrationInitiate).not.toHaveBeenCalled()
+  })
+
+  describe("with an authenticator, prompts the code screen must not follow", () => {
+    const codeScreenCalls = () =>
+      mockNavigate.mock.calls.filter(([route]) => route === "loginMethodCode")
+
+    it("ignores a prompt answered under a session switched to since", async () => {
+      mockTotpEnabled = true
+      const { result, rerender } = renderHook(() => useEmailReverification())
+      result.current.promptReverification(EMAIL)
+
+      mockToken = sessionB
+      rerender({})
+      await pressAlertButton("OK")
+
+      expect(codeScreenCalls()).toHaveLength(0)
+    })
+
+    it("ignores a prompt answered once its screen is gone", async () => {
+      mockTotpEnabled = true
+      const { result, unmount } = renderHook(() => useEmailReverification())
+      result.current.promptReverification(EMAIL)
+
+      unmount()
+      await pressAlertButton("OK")
+
+      expect(codeScreenCalls()).toHaveLength(0)
+    })
+
+    /** A sequence started before the authenticator was read may still register. */
+    it("ignores a prompt raised over a sequence still running", async () => {
+      deletionHeld()
+      const starter = renderHook(() => useEmailReverification())
+      starter.result.current.promptReverification(EMAIL)
+      await pressOkAndLeaveRunning()
+
+      mockTotpEnabled = true
+      const other = renderHook(() => useEmailReverification())
+      other.result.current.promptReverification(EMAIL)
+      await pressAlertButton("OK", 1)
+
+      expect(codeScreenCalls()).toHaveLength(0)
+    })
+
+    /** Its removal would take the address from under the code screen shown since. */
+    it("ignores a prompt overtaken by a sequence shown since", async () => {
+      const { result, rerender } = renderHook(() => useEmailReverification())
+      result.current.promptReverification(EMAIL)
+      mockTotpEnabled = true
+      rerender({})
+      result.current.promptReverification(EMAIL)
+
+      await pressAlertButton("OK", 0)
+      await flushEffects()
+      expect(mockNavigate).toHaveBeenCalledWith(
+        "emailRegistrationValidate",
+        expect.anything(),
+      )
+      await pressAlertButton("OK", 1)
+
+      expect(codeScreenCalls()).toHaveLength(0)
+    })
+  })
+
+  /** An authenticator added on another device since the account was read: the address
+   *  is removed already, and only the code screen can add it again. */
+  it("hands the addition to the code screen when the register needs the code", async () => {
+    mockRegistrationInitiate.mockResolvedValue(
+      registrationResult({
+        errors: [{ message: "Code required", code: "TOTP_CODE_REQUIRED" }],
+        emailRegistrationId: null,
+      }),
+    )
+    const { result } = renderHook(() => useEmailReverification())
+
+    result.current.promptReverification(EMAIL)
+    await pressAlertButton("OK")
+
+    expect(mockNavigate).toHaveBeenCalledWith("loginMethodCode", {
+      addition: LoginMethodAddition.Email,
+      email: EMAIL,
+    })
+    expect(Alert.alert).toHaveBeenCalledTimes(1)
+    expect(result.current.spinner).toBe(false)
+  })
+
+  /** Shown, the code screen stands for the one the sequence owed: a prompt raised
+   *  meanwhile starts nothing, as a removal would take the address from under it. */
+  it("starts nothing from a prompt raised before the code screen it opened", async () => {
+    mockRegistrationInitiate.mockResolvedValue(
+      registrationResult({
+        errors: [{ message: "Code required", code: "TOTP_CODE_REQUIRED" }],
+        emailRegistrationId: null,
+      }),
+    )
+    const finishDeletion = deletionHeld()
+    const { result } = renderHook(() => useEmailReverification())
+    result.current.promptReverification(EMAIL)
+    await pressOkAndLeaveRunning()
+    result.current.promptReverification(EMAIL)
+
+    finishDeletion()
+    await flushEffects()
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    await pressAlertButton("OK", 1)
+
+    expect(mockEmailDelete).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
+  })
+
+  /** Covered when the answer lands, the screen leaves the code screen for later and
+   *  says the refusal, as it did before. */
+  it("says the code is needed instead when its screen is no longer in front", async () => {
+    mockRegistrationInitiate.mockResolvedValue(
+      registrationResult({
+        errors: [{ message: "Code required", code: "TOTP_CODE_REQUIRED" }],
+        emailRegistrationId: null,
+      }),
+    )
+    const { result } = renderHook(() => useEmailReverification())
+    result.current.promptReverification(EMAIL)
+
+    mockIsFocused.mockReturnValue(false)
+    await pressAlertButton("OK")
+
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(Alert.alert).toHaveBeenLastCalledWith("Code required")
   })
 
   /** Registration is refused while any address sits on the identity, so the

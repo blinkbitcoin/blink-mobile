@@ -4120,6 +4120,14 @@
         "manualResetTitle": "2FAの手動リセット",
         "manualResetBody": "お客様を保護するため、アプリ内では2FAを削除できません。2FAのリセットが必要な場合は、<support>サポート</support>にお問い合わせください。"
     },
+    "LoginMethodCode": {
+        "addEmailTitle": "メールアドレスを追加",
+        "addPhoneTitle": "電話番号を追加",
+        "addEmailCode": "メールアドレスを追加するには、認証アプリの6桁のコードを入力してください。",
+        "addPhoneCode": "電話番号を追加するには、認証アプリの6桁のコードを入力してください。",
+        "codeInvalid": "コードが正しくありません。認証アプリに表示されている現在のコードを入力してください。",
+        "tooManyAttempts": "試行回数が多すぎます。1時間後にもう一度お試しください。"
+    },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
         "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

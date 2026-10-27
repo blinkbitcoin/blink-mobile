@@ -10,8 +10,13 @@ import {
 import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { useLoginMethods } from "@app/screens/settings-screen/account/login-methods-hook"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { resolveSessionKey } from "@app/store/persistent-state/account-key"
+import {
+  LoginMethodAddition,
+  TotpStepUpErrorCode,
+} from "@app/types/two-factor-enforcement"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -37,6 +42,7 @@ gql`
     userEmailRegistrationInitiate(input: $input) {
       errors {
         message
+        code
       }
       emailRegistrationId
       me {
@@ -123,6 +129,11 @@ type PromptContext = {
   owedSequenceId: number | undefined
 }
 
+/** A sequence started, or a code screen shown, since the prompt was raised. */
+const isPromptOvertaken = (prompt: PromptContext): boolean =>
+  sequenceCount !== prompt.sequenceCount ||
+  owedCodeScreenBySession.get(prompt.sessionKey) !== prompt.owedSequenceId
+
 /**
  * Re-verification for an address the account already holds. The registration
  * flow can't be re-run as-is — the backend refuses to initiate while any email
@@ -145,6 +156,10 @@ export const useEmailReverification = () => {
 
   const [emailDeleteMutation] = useUserEmailDeleteMutation()
   const [setEmailMutation] = useUserEmailRegistrationInitiateMutation()
+  /** With an authenticator, the server asks for its code to register the address
+   *  again, so the screen that takes it removes and registers it instead of the
+   *  sequence. */
+  const { hasAuthenticator } = useLoginMethods()
 
   /** What callers render: spans the sequence from before its first request to after
    *  its last, rather than following each mutation's own loading flag. */
@@ -190,6 +205,22 @@ export const useEmailReverification = () => {
         })
 
         const errors = data?.userEmailRegistrationInitiate.errors
+        /** An authenticator added on another device since the account was read: the
+         *  address is removed already, so the code screen adds it with the code the
+         *  sequence cannot ask for. Only from the screen that asked, still open and in
+         *  front: one the user left, or another account's, shows nothing of it. Shown,
+         *  it is owed no more, as the code screen it stands for is. */
+        const isCodeRequired = errors?.[0]?.code === TotpStepUpErrorCode.CodeRequired
+        const isAskerInFront =
+          !isSessionSwitched() && isMounted() && navigation.isFocused()
+        if (isCodeRequired && isAskerInFront) {
+          owedCodeScreenBySession.delete(askedUnder)
+          navigation.navigate("loginMethodCode", {
+            addition: LoginMethodAddition.Email,
+            email,
+          })
+          return null
+        }
         const hasErrors = errors !== undefined && errors.length > 0
         if (hasErrors && !isSessionSwitched()) {
           Alert.alert(errors[0].message)
@@ -207,7 +238,7 @@ export const useEmailReverification = () => {
         return null
       }
     },
-    [emailDeleteMutation, setEmailMutation],
+    [emailDeleteMutation, setEmailMutation, navigation, isMounted],
   )
 
   /** Moves this screen on to the code screen, once per sequence: at once when it is
@@ -310,14 +341,30 @@ export const useEmailReverification = () => {
         running !== null && running.sessionKey !== askedUnder
       if (isSequenceOfAnotherSession) return
       if (running !== null) return waitOnSequence(running)
-      const isPromptOvertaken =
-        sequenceCount !== prompt.sequenceCount ||
-        owedCodeScreenBySession.get(askedUnder) !== prompt.owedSequenceId
-      if (isPromptOvertaken) return
+      if (isPromptOvertaken(prompt)) return
       const request = { sessionKey: askedUnder, email }
       return waitOnSequence(startSequence(request, runSequence))
     },
     [isMounted, waitOnSequence, runSequence],
+  )
+
+  /** With an authenticator, the code screen removes and registers the address itself.
+   *  The same prompts as the sequence's start nothing: one outdated, one raised over a
+   *  sequence still running, whose register may yet land, and one overtaken, as its
+   *  removal would take the address from under a code screen shown since. */
+  const askForCodeToConfirmAgain = useCallback(
+    (email: string, prompt: PromptContext) => {
+      const isPromptOutdated = prompt.sessionKey !== sessionKeyRef.current || !isMounted()
+      if (isPromptOutdated) return
+      const isSequenceRunning = sequenceInFlight !== null
+      if (isSequenceRunning) return
+      if (isPromptOvertaken(prompt)) return
+      navigation.navigate("loginMethodCode", {
+        addition: LoginMethodAddition.EmailReverify,
+        email,
+      })
+    },
+    [isMounted, navigation],
   )
 
   const promptReverification = useCallback(
@@ -335,12 +382,18 @@ export const useEmailReverification = () => {
           { text: LL.common.cancel(), onPress: () => {} },
           {
             text: LL.common.ok(),
-            onPress: () => confirmEmailAgain(email, prompt),
+            onPress: () => {
+              if (hasAuthenticator) {
+                askForCodeToConfirmAgain(email, prompt)
+                return
+              }
+              confirmEmailAgain(email, prompt)
+            },
           },
         ],
       )
     },
-    [LL, confirmEmailAgain],
+    [LL, confirmEmailAgain, hasAuthenticator, askForCodeToConfirmAgain],
   )
 
   return { promptReverification, spinner: isSequenceRunning }

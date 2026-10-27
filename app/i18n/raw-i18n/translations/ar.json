@@ -4120,6 +4120,14 @@
     "manualResetTitle": "إعادة تعيين المصادقة الثنائية يدويًا",
     "manualResetBody": "لحمايتك، لا نسمح بإزالة المصادقة الثنائية داخل التطبيق. إذا كنت بحاجة إلى إعادة تعيينها، تواصل مع <support>الدعم</support>."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "إضافة بريد إلكتروني",
+    "addPhoneTitle": "إضافة رقم هاتف",
+    "addEmailCode": "لإضافة بريدك الإلكتروني، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "addPhoneCode": "لإضافة رقم هاتفك، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4120,6 +4120,14 @@
     "manualResetTitle": "Ručno resetiranje 2FA",
     "manualResetBody": "Radi vaše zaštite ne dopuštamo uklanjanje 2FA unutar aplikacije. Ako trebate resetirati 2FA, obratite se našoj <support>podršci</support>."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Dodaj e-poštu",
+    "addPhoneTitle": "Dodaj broj telefona",
+    "addEmailCode": "Za dodavanje e-pošte unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju.",
+    "addPhoneCode": "Za dodavanje broja telefona unesite 6-znamenkasti kôd iz aplikacije za autentifikaciju.",
+    "codeInvalid": "Taj kôd nije točan. Unesite trenutačni kôd iz aplikacije za autentifikaciju.",
+    "tooManyAttempts": "Previše pokušaja. Pokušajte ponovno za sat vremena."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

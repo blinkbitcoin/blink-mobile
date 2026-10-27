@@ -23,6 +23,7 @@ import {
   logTwoFactorNonCustodialChosen,
   logTwoFactorDisableAttempted,
   logTwoFactorDisableBlocked,
+  logLoginMethodCodeFailed,
   logTwoFactorPromptDismissed,
   logTwoFactorPromptShown,
   logTwoFactorSetupCompleted,
@@ -403,6 +404,16 @@ describe("analytics helpers", () => {
 
       expect(mockLogEvent).toHaveBeenCalledWith("two_factor_disable_blocked", {
         tier: 3,
+      })
+    })
+  })
+
+  describe("adding a login method", () => {
+    it("emits 'login_method_code_failed' with the login method", () => {
+      logLoginMethodCodeFailed({ loginMethod: "email" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("login_method_code_failed", {
+        login_method: "email",
       })
     })
   })

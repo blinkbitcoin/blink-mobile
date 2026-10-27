@@ -4120,6 +4120,14 @@
     "manualResetTitle": "2FA handmatige terugstelling",
     "manualResetBody": "Vir jou beskerming laat ons nie toe dat 2FA in die app verwyder word nie. As jy 'n 2FA-terugstelling nodig het, kontak ons <support>Ondersteuning</support>."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Voeg e-pos by",
+    "addPhoneTitle": "Voeg foonnommer by",
+    "addEmailCode": "Voer die 6-syfer-kode van jou verifikasie-app in om jou e-pos by te voeg.",
+    "addPhoneCode": "Voer die 6-syfer-kode van jou verifikasie-app in om jou foonnommer by te voeg.",
+    "codeInvalid": "Daardie kode is verkeerd. Voer die huidige kode van jou verifikasie-app in.",
+    "tooManyAttempts": "Te veel pogings. Probeer weer oor 'n uur."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

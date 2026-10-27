@@ -4120,6 +4120,14 @@
     "manualResetTitle": "Ruční reset 2FA",
     "manualResetBody": "Pro vaši ochranu nepovolujeme odebrání 2FA v aplikaci. Pokud potřebujete reset 2FA, kontaktujte naši <support>podporu</support>."
   },
+  "LoginMethodCode": {
+    "addEmailTitle": "Přidat e-mail",
+    "addPhoneTitle": "Přidat telefonní číslo",
+    "addEmailCode": "Pro přidání e-mailu zadejte 6místný kód z ověřovací aplikace.",
+    "addPhoneCode": "Pro přidání telefonního čísla zadejte 6místný kód z ověřovací aplikace.",
+    "codeInvalid": "Tento kód není správný. Zadejte aktuální kód z ověřovací aplikace.",
+    "tooManyAttempts": "Příliš mnoho pokusů. Zkuste to znovu za hodinu."
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
