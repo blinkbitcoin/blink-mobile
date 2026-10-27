@@ -38,7 +38,9 @@ import {
 } from "@app/telemetry/mode"
 
 import {
+  isPlatformIdentityApplied,
   resetPlatformIdentityForTesting,
+  restorePlatformIdentityApplied,
   setCustodialAnalyticsIdentity,
 } from "@app/telemetry/platform-analytics"
 
@@ -288,24 +290,6 @@ describe("the collection gate", () => {
       )
     })
 
-    it("resets the app instance when leaving Custodial, so the earlier rows cannot be joined", async () => {
-      await resolveTelemetryMode(TelemetryMode.Custodial)
-      expect(resetAnalyticsData).not.toHaveBeenCalled()
-
-      await resolveTelemetryMode(TelemetryMode.Enhanced)
-
-      // Clearing the user id governs only what comes next. The custodial rows already sent
-      // carry this install's app-instance id, and a new instance is what unlinks them.
-      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
-    })
-
-    it("resets on the way to incognito too, not only to Enhanced", async () => {
-      await resolveTelemetryMode(TelemetryMode.Custodial)
-      await resolveTelemetryMode(TelemetryMode.Anon)
-
-      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
-    })
-
     it("closes platform collection when the switch engages while Enhanced is running", async () => {
       await initializeTelemetryGate()
       await resolveTelemetryMode(TelemetryMode.Enhanced)
@@ -345,15 +329,90 @@ describe("the collection gate", () => {
 
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
     })
+  })
 
-    it("keeps its app instance on a launch that reaches Enhanced without collecting as Custodial", async () => {
+  describe("the app instance is reset when, and only when, the ledger id has ridden it", () => {
+    // Clearing the user id governs only what comes next. The custodial rows already sent
+    // carry this install's app-instance id, and a new instance is what unlinks them; but a
+    // reset per launch would mint a new app instance every time for custodial users.
+    const flush = () => new Promise((resolve) => setImmediate(resolve))
+
+    it("resets it when a self-custodial account becomes active after the ledger id was applied", async () => {
+      restorePlatformIdentityApplied(false)
+      setCustodialAnalyticsIdentity({ userId: "ledger-account", properties: {} })
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+      expect(isPlatformIdentityApplied()).toBe(true)
+      expect(resetAnalyticsData).not.toHaveBeenCalled()
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await flush()
+
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+      expect(isPlatformIdentityApplied()).toBe(false)
+    })
+
+    it("resets on the way to incognito too, not only to Enhanced", async () => {
+      restorePlatformIdentityApplied(true)
+
+      await resolveTelemetryMode(TelemetryMode.Anon)
+
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("does not reset on leaving Custodial for Unresolved, and keeps the debt for later", async () => {
+      // A logout on a device that holds a self-custodial wallet, or a cold start waiting on
+      // the remote config. Neither is a self-custodial session.
+      restorePlatformIdentityApplied(false)
+      setCustodialAnalyticsIdentity({ userId: "ledger-account", properties: {} })
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      await resolveTelemetryMode(TelemetryMode.Unresolved)
+      expect(resetAnalyticsData).not.toHaveBeenCalled()
+      expect(isPlatformIdentityApplied()).toBe(true)
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("pays a debt carried in from an earlier process", async () => {
+      restorePlatformIdentityApplied(true)
       await initializeTelemetryGate()
+
       await resolveTelemetryMode(TelemetryMode.Enhanced)
 
-      // A reset per launch would mint a new app instance every time, and inflate every
-      // instance-derived count the platform reports.
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("keeps its app instance on every launch once the debt is paid", async () => {
+      restorePlatformIdentityApplied(false)
+      await initializeTelemetryGate()
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await resolveTelemetryMode(TelemetryMode.Unresolved)
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
       expect(resetAnalyticsData).not.toHaveBeenCalled()
       expect(setCollectionEnabled).toHaveBeenLastCalledWith(true)
+    })
+
+    it("owes the reset again when the SDK refuses it", async () => {
+      resetAnalyticsData.mockRejectedValueOnce(new Error("native failure"))
+      restorePlatformIdentityApplied(true)
+
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+      await flush()
+
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+      expect(isPlatformIdentityApplied()).toBe(true)
+    })
+
+    it("does not count a cleared user id as the ledger id riding the instance", async () => {
+      restorePlatformIdentityApplied(false)
+      setCustodialAnalyticsIdentity({ userId: null, properties: {} })
+
+      await resolveTelemetryMode(TelemetryMode.Custodial)
+
+      expect(isPlatformIdentityApplied()).toBe(false)
     })
   })
 

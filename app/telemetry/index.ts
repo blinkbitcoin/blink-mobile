@@ -297,7 +297,11 @@ export {
   sweepCondemnedOutboxes,
 } from "./outbox"
 export { getDroppedEventCounts } from "./policy"
-export { setCustodialAnalyticsIdentity } from "./platform-analytics"
+export {
+  onPlatformIdentityAppliedChanged,
+  restorePlatformIdentityApplied,
+  setCustodialAnalyticsIdentity,
+} from "./platform-analytics"
 export {
   localOnlyTransport,
   registerTelemetryTransport,

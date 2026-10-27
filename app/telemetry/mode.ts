@@ -9,6 +9,7 @@ import {
 import { isKillSwitchEngaged, isTelemetryEnabled, onKillSwitchEngaged } from "./enablement"
 import {
   clearCustodialAnalyticsIdentity,
+  isPlatformIdentityApplied,
   resetPlatformAnalyticsData,
   setCustodialIdentityPermitted,
   setPlatformCollectionEnabled,
@@ -251,24 +252,32 @@ let applying: Promise<void> = Promise.resolve()
  * Three closes, because they answer to different rules. Leaving `Custodial` always withdraws
  * the identity permission and clears the identity the SDK would otherwise merge into its next
  * event: the ledger account id is custodial-only, so an `Enhanced` device collects without
- * ever naming an account. Leaving `Custodial` also resets the app instance, which is what
- * stops the account being recoverable from the device's own earlier rows — see
- * `resetPlatformAnalyticsData`. Collection closes wherever the mode may not collect at all —
- * a suppressed mode, or an `Enhanced` device the kill switch has rolled back.
+ * ever naming an account. A self-custodial session on an install the ledger id has ridden
+ * also resets the app instance, which is what stops the account being recoverable from the
+ * device's own earlier rows — see `isPlatformIdentityApplied`. Collection closes wherever the
+ * mode may not collect at all — a suppressed mode, or an `Enhanced` device the kill switch
+ * has rolled back.
  *
- * The previous mode is passed in because `currentMode` has already moved by the time this
- * runs, and only the transition *out of* Custodial resets the instance: doing it on every
- * entry into a collecting mode would mint a new app instance on every launch.
+ * The reset is keyed on that recorded debt rather than on leaving Custodial. Leaving
+ * Custodial also happens on logout and on every cold start that waits for the remote config,
+ * and a reset there minted a new app instance per launch for custodial users; while a debt
+ * carried across a logout into a later process would never have been paid.
  */
-const closeSynchronously = (mode: TelemetryMode, previous: TelemetryMode): void => {
+const closeSynchronously = (mode: TelemetryMode): void => {
   setDiagnosticsModeInput(diagnosticsInputFor(mode))
   if (mode !== TelemetryMode.Custodial) {
     setCustodialIdentityPermitted(false)
     clearCustodialAnalyticsIdentity()
-    if (previous === TelemetryMode.Custodial) resetPlatformAnalyticsData()
+    if (isSelfCustodialMode(mode) && isPlatformIdentityApplied()) {
+      resetPlatformAnalyticsData()
+    }
   }
   if (!mayCollectOnPlatform(mode)) setPlatformCollectionEnabled(false)
 }
+
+/** A self-custodial account is active and has said what it is. */
+const isSelfCustodialMode = (mode: TelemetryMode): boolean =>
+  mode === TelemetryMode.Enhanced || mode === TelemetryMode.Anon
 
 /**
  * The queued half: the discard, and the things that *open*. Opening waits its turn behind
@@ -305,12 +314,11 @@ export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
     initialisedAt = null
   }
 
-  const previous = currentMode
   currentMode = mode
   /** This runs inside a React effect, and at module scope through the gate's
    *  initialisation. Neither has anywhere to show a throw, so it never gets one. */
   try {
-    closeSynchronously(mode, previous)
+    closeSynchronously(mode)
   } catch (err) {
     settleFault(err)
   }
@@ -354,7 +362,7 @@ export const initializeTelemetryGate = (): Promise<void> => {
     if (!mayCollectOnPlatform(currentMode)) setPlatformCollectionEnabled(false)
   })
   try {
-    closeSynchronously(TelemetryMode.Unresolved, TelemetryMode.Unresolved)
+    closeSynchronously(TelemetryMode.Unresolved)
   } catch (err) {
     settleFault(err)
   }

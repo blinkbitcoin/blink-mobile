@@ -17,6 +17,10 @@ import {
 } from "@app/telemetry/contract"
 import { resetDiagnosticsForTesting } from "@app/telemetry/diagnostics"
 import {
+  resetPlatformIdentityForTesting,
+  setCustodialAnalyticsIdentity,
+} from "@app/telemetry/platform-analytics"
+import {
   applyServerKillSwitch,
   isTelemetryEnabled,
   resetEnablementForTesting,
@@ -59,6 +63,7 @@ let mockServerModes: Record<string, AccountMode>
 let mockRemoteConfigTrusted: boolean
 let mockTelemetryEnabled: boolean
 let mockKillSwitchEngaged: boolean | undefined
+let mockIdentityApplied: boolean | undefined
 let mockConnectedAccountId: string | null
 let mockWalletStatus: ActiveWalletStatus
 const mockUpdateState = jest.fn()
@@ -85,6 +90,7 @@ jest.mock("@app/store/persistent-state", () => ({
     persistentState: {
       selfCustodialServerAccountModeByAccountId: mockServerModes,
       telemetryKillSwitchEngaged: mockKillSwitchEngaged,
+      telemetryPlatformIdentityApplied: mockIdentityApplied,
     },
     updateState: mockUpdateState,
   }),
@@ -189,6 +195,7 @@ describe("SelfCustodialTelemetryMount", () => {
     mockRemoteConfigTrusted = true
     mockTelemetryEnabled = true
     mockKillSwitchEngaged = undefined
+    mockIdentityApplied = false
     mockConnectedAccountId = ACCOUNT_ID
     mockWalletStatus = ActiveWalletStatus.Ready
   })
@@ -630,6 +637,80 @@ describe("SelfCustodialTelemetryMount", () => {
         TelemetryMode.Custodial,
       ])
       expect(setCollectionEnabled.mock.calls.map((call) => call[0])).not.toContain(false)
+    })
+  })
+
+  describe("the app-instance reset follows a persisted debt", () => {
+    const resetAnalyticsData = analytics().resetAnalyticsData as jest.Mock
+    const lastPersistedDebt = () => {
+      const updaters = mockUpdateState.mock.calls.map((call) => call[0])
+      const written = updaters
+        .map((updater) => updater({ schemaVersion: 22 }))
+        .filter((state) => "telemetryPlatformIdentityApplied" in state)
+      return written.at(-1)?.telemetryPlatformIdentityApplied
+    }
+
+    beforeEach(() => {
+      resetPlatformIdentityForTesting()
+    })
+
+    it("keeps the instance on an Enhanced launch whose debt is already paid", async () => {
+      mockIdentityApplied = false
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(resetAnalyticsData).not.toHaveBeenCalled()
+    })
+
+    it("pays an owed debt on the Enhanced launch, and persists that it is paid", async () => {
+      mockIdentityApplied = true
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(lastPersistedDebt()).toBe(false))
+
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("treats an install with no record as owing it", async () => {
+      mockIdentityApplied = undefined
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Enhanced))
+
+      expect(resetAnalyticsData).toHaveBeenCalledTimes(1)
+    })
+
+    it("persists the debt when the ledger id is applied, so a later process pays it", async () => {
+      mockActiveAccount = undefined
+      mockSelfCustodialEntries = []
+      mockIdentityApplied = false
+      setCustodialAnalyticsIdentity({ userId: "ledger-account", properties: {} })
+
+      render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
+
+      await waitFor(() => expect(lastPersistedDebt()).toBe(true))
+    })
+
+    it("never resets on a dual-account custodial cold start", async () => {
+      mockActiveAccount = { id: "custodial-default", type: AccountType.Custodial }
+      mockSelfCustodialEntries = []
+      mockSelfCustodialIndex = "pending"
+      mockRemoteConfigTrusted = false
+      mockIdentityApplied = true
+      const view = render(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+
+      mockSelfCustodialEntries = [{ id: ACCOUNT_ID }]
+      mockSelfCustodialIndex = "known"
+      view.rerender(<SelfCustodialTelemetryMount />)
+      await act(async () => {})
+      mockRemoteConfigTrusted = true
+      view.rerender(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
+
+      expect(resetAnalyticsData).not.toHaveBeenCalled()
     })
   })
 

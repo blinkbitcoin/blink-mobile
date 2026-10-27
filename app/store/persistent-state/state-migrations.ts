@@ -325,12 +325,17 @@ type PersistentState_22 = {
   // channel and persisted so an absent or failed fetch leaves the last value rather than
   // resetting it. Never written back to false.
   telemetryKillSwitchEngaged?: boolean
+  // Whether the ledger account id has ridden this install's analytics app instance since it
+  // was last reset; the first self-custodial session after it resets the instance. Absent
+  // is read as true, because an install with no record may have carried it.
+  telemetryPlatformIdentityApplied?: boolean
 }
 
 const migrate22ToCurrent = (state: PersistentState_22): Promise<PersistentState> =>
   Promise.resolve(state)
 
-/** Adds the telemetry kill switch; absent means never engaged. */
+/** Adds the telemetry kill switch, absent meaning never engaged, and the analytics
+ *  identity debt, absent meaning owed. */
 const migrate21ToCurrent = (state: PersistentState_21): Promise<PersistentState> =>
   migrate22ToCurrent({ ...state, schemaVersion: 22 })
 

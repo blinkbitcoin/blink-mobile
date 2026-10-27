@@ -16,8 +16,10 @@ import {
   deriveTelemetryMode,
   drainActiveOutbox,
   isSuppressedMode,
+  onPlatformIdentityAppliedChanged,
   onTelemetrySuppressed,
   resolveTelemetryMode,
+  restorePlatformIdentityApplied,
   restoreKillSwitch,
   setActiveOutbox,
   registerTelemetryTransport,
@@ -132,6 +134,26 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
     () =>
       onKillSwitchEngaged(() => {
         updateState((prev) => prev && { ...prev, telemetryKillSwitchEngaged: true })
+      }),
+    [updateState],
+  )
+
+  /**
+   * Whether the ledger id has ridden this install's analytics instance since it was last
+   * reset — a debt that has to survive a logout and a relaunch. Restored before the first
+   * resolution reads it, like the kill switch; absent counts as owed.
+   */
+  const platformIdentityApplied = persistentState.telemetryPlatformIdentityApplied !== false
+  useEffect(() => {
+    restorePlatformIdentityApplied(platformIdentityApplied)
+  }, [platformIdentityApplied])
+
+  useEffect(
+    () =>
+      onPlatformIdentityAppliedChanged((applied) => {
+        updateState(
+          (prev) => prev && { ...prev, telemetryPlatformIdentityApplied: applied },
+        )
       }),
     [updateState],
   )

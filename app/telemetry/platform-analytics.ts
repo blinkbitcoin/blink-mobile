@@ -134,6 +134,7 @@ export const setCustodialAnalyticsIdentity = ({
 const push = ({ userId, properties }: CustodialIdentity): void => {
   if (userId !== undefined) {
     withAnalytics("set analytics user id", (client) => client.setUserId(userId))
+    if (userId) markIdentityApplied(true)
   }
   if (properties) {
     for (const key of Object.keys(properties)) propertiesSetThisSession.add(key)
@@ -156,25 +157,61 @@ export const clearCustodialAnalyticsIdentity = (): void => {
 }
 
 /**
- * Resets the SDK's own app-instance identifier, and with it everything the platform holds
- * for this install.
+ * Whether the ledger account id has ridden this app instance since it was last reset.
  *
  * Clearing `user_id` stops the ledger account riding *future* events and does nothing about
  * the ones already sent. Those rows carry the same app-instance id the device keeps using, so
- * a device that collected as Custodial and then became Enhanced is joinable to its ledger
- * account through its own history — no call site having done anything wrong. Resetting the id
- * on the way out of Custodial is what breaks that join: the Enhanced rows then share no
- * identifier with the custodial ones.
+ * a device that collected as Custodial and later runs a self-custodial account is joinable to
+ * its ledger account through its own history — no call site having done anything wrong. That
+ * debt is what this records, and it outlives the process: a user can log out of custodial
+ * today and open their self-custodial wallet next week.
  *
- * The cost is this install's platform history, for a device that leaves Custodial. That is
- * the point of it.
+ * It starts `true`. An install with no record of it may have carried the id under an earlier
+ * build, and the cost of being wrong the other way is a join the privacy ruling forbids; the
+ * cost this way is one app-instance reset on the first self-custodial session.
+ */
+let identityAppliedSinceReset = true
+let identityAppliedListener: ((applied: boolean) => void) | null = null
+
+const markIdentityApplied = (applied: boolean): void => {
+  if (identityAppliedSinceReset === applied) return
+  identityAppliedSinceReset = applied
+  identityAppliedListener?.(applied)
+}
+
+export const isPlatformIdentityApplied = (): boolean => identityAppliedSinceReset
+
+/** What the device persisted, applied before the first mode resolves. Never notifies. */
+export const restorePlatformIdentityApplied = (applied: boolean): void => {
+  identityAppliedSinceReset = applied
+}
+
+/** Fires on every change, so the provider can persist it. */
+export const onPlatformIdentityAppliedChanged = (
+  listener: (applied: boolean) => void,
+): (() => void) => {
+  identityAppliedListener = listener
+  return () => {
+    if (identityAppliedListener === listener) identityAppliedListener = null
+  }
+}
+
+/**
+ * Resets the SDK's own app-instance identifier, and with it everything the platform holds
+ * for this install, so rows sent from here on share no identifier with the ones that carried
+ * the ledger id. The debt is cleared only once the SDK confirms: a reset that failed is owed
+ * again at the next self-custodial session.
  */
 export const resetPlatformAnalyticsData = (): void => {
-  withAnalytics("reset analytics data", (client) => client.resetAnalyticsData())
+  withAnalytics("reset analytics data", (client) =>
+    client.resetAnalyticsData().then(() => markIdentityApplied(false)),
+  )
 }
 
 export const resetPlatformIdentityForTesting = (): void => {
   identityPermitted = false
+  identityAppliedSinceReset = true
+  identityAppliedListener = null
   requested = { properties: {} }
   propertiesSetThisSession.clear()
   for (const key of KNOWN_USER_PROPERTIES) propertiesSetThisSession.add(key)
