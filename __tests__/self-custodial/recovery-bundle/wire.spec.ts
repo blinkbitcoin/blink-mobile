@@ -1,3 +1,5 @@
+import { it } from "@jest/globals"
+
 import {
   decodeFields,
   lastField,
@@ -59,16 +61,41 @@ describe("protobuf wire codec", () => {
   })
 
   it("skips fixed32/fixed64 fields without corrupting subsequent fields", () => {
-    // Craft: field 1 fixed64 (tag 0x09), field 2 varint (tag 0x10)
-    const raw = Uint8Array.from([0x09, 1, 2, 3, 4, 5, 6, 7, 8, 0x10, 7])
+    // Craft: field 1 fixed64 (tag 0x09), field 2 fixed32 (tag 0x15), field 3 varint (tag 0x18)
+    const raw = Uint8Array.from([0x09, 1, 2, 3, 4, 5, 6, 7, 8, 0x15, 1, 2, 3, 4, 0x18, 7])
     const fields = decodeFields(raw)
-    expect(lastField(fields, 2)?.varint).toBe(7n)
+    expect(lastField(fields, 1)).toMatchObject({ wireType: WireType.Fixed64 })
+    expect(lastField(fields, 1)?.bytes).toHaveLength(8)
+    expect(lastField(fields, 2)).toMatchObject({ wireType: WireType.Fixed32 })
+    expect(lastField(fields, 2)?.bytes).toHaveLength(4)
+    expect(lastField(fields, 3)?.varint).toBe(7n)
   })
 
   it("throws on truncated input", () => {
     const encoded = new ProtoWriter().bytes(1, Uint8Array.from([1, 2, 3])).finish()
     expect(() => decodeFields(encoded.subarray(0, encoded.length - 1))).toThrow(
       /truncated/,
+    )
+  })
+
+  it.each([
+    { kind: "varint", bytes: [0x08, 0x80], error: /truncated varint/ },
+    { kind: "fixed64", bytes: [0x09, 1, 2, 3], error: /truncated fixed64/ },
+    { kind: "fixed32", bytes: [0x0d, 1, 2], error: /truncated fixed32/ },
+  ])("throws on a truncated $kind value", ({ bytes, error }) => {
+    expect(() => decodeFields(Uint8Array.from(bytes))).toThrow(error)
+  })
+
+  it("throws on field number zero", () => {
+    expect(() => decodeFields(Uint8Array.from([0x00, 0x01]))).toThrow(
+      /invalid field number 0/,
+    )
+  })
+
+  it.each([3, 4, 6, 7])("throws on unsupported wire type %i", (wireType) => {
+    const fieldOneTag = 0x08 + wireType
+    expect(() => decodeFields(Uint8Array.from([fieldOneTag, 0x00]))).toThrow(
+      `unsupported wire type ${wireType}`,
     )
   })
 

@@ -18,6 +18,18 @@ jest.mock("react-native-quick-crypto", () => {
   }
 })
 
+jest.mock("@bitcoinerlab/secp256k1", () => {
+  const actual = jest.requireActual(
+    "@bitcoinerlab/secp256k1",
+  ) as typeof import("@bitcoinerlab/secp256k1")
+
+  return {
+    ...actual,
+    privateAdd: jest.fn(actual.privateAdd),
+    pointFromScalar: jest.fn(actual.pointFromScalar),
+  }
+})
+
 import * as secp256k1 from "@bitcoinerlab/secp256k1"
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -65,6 +77,20 @@ describe("spark identity derivation", () => {
   it("respects an explicit account number override", async () => {
     const withOverride = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Regtest, 1)
     expect(Buffer.from(withOverride.publicKey).toString("hex")).toBe(MAINNET_IDENTITY_PUB)
+  })
+
+  it("refuses a child key the curve rejects instead of returning it", async () => {
+    jest.mocked(secp256k1.privateAdd).mockReturnValueOnce(null)
+    await expect(deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)).rejects.toThrow(
+      /invalid child key/,
+    )
+  })
+
+  it("refuses an identity key without a public point", async () => {
+    jest.mocked(secp256k1.pointFromScalar).mockReturnValueOnce(null)
+    await expect(deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)).rejects.toThrow(
+      /invalid identity key/,
+    )
   })
 })
 
@@ -140,6 +166,19 @@ describe("challenge signature canonicalization", () => {
     const s = extractS(first)
     expect(s > 0n).toBe(true)
     expect(s <= SECP256K1_N / 2n).toBe(true)
+  })
+
+  it("drops a leading zero byte so the DER integer stays minimal", async () => {
+    const CHALLENGE_WITH_LEADING_ZERO_R = "challenge-55"
+    const keyPair = await deriveIdentityKeyPair(TEST_MNEMONIC, Network.Mainnet)
+    const message = Uint8Array.from(Buffer.from(CHALLENGE_WITH_LEADING_ZERO_R, "utf8"))
+    const compactR = secp256k1.sign(sha256(message), keyPair.privateKey).subarray(0, 32)
+    expect(compactR[0]).toBe(0)
+
+    const der = signChallenge(message, keyPair.privateKey)
+
+    expect(der[3]).toBe(31)
+    expect(Buffer.from(der.subarray(4, 35))).toEqual(Buffer.from(compactR.subarray(1)))
   })
 })
 
