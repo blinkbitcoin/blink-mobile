@@ -1,6 +1,4 @@
 import { useCallback, useRef } from "react"
-import { BackHandler } from "react-native"
-
 import { useNavigation } from "@react-navigation/native"
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -32,7 +30,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
   const { deleteWallet } = useDeleteAccount()
-  const { setAccountIsBeingDeleted } = useAccountDeleteContext()
+  const { setAccountIsBeingDeleted, leaveWhileDeleting } = useAccountDeleteContext()
 
   const pendingRemoval = useRef<PendingRemoval | null>(null)
 
@@ -45,29 +43,22 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     if (!removal) return
     pendingRemoval.current = null
 
-    /** The lock only covers the screen's body: the header back button, the swipe back
-     *  and the Android back button would still leave it mid-removal, onto a screen that
-     *  already describes the next account. */
-    navigation.setOptions({ headerLeft: () => null, gestureEnabled: false })
-    const backGuard = BackHandler.addEventListener("hardwareBackPress", () => true)
     setAccountIsBeingDeleted(true, removal.identifier)
     const outcome = await deleteWallet(removal.accountId)
-    backGuard.remove()
     if (!outcome) {
-      navigation.setOptions({ headerLeft: undefined, gestureEnabled: true })
       setAccountIsBeingDeleted(false)
       return
     }
 
     /** No release on success: every outcome navigates this screen away, and dropping the
      *  lock first would flash the already-switched screen during the transition. */
-    navigateAfterAccountDelete(navigation, outcome)
+    leaveWhileDeleting(() => navigateAfterAccountDelete(navigation, outcome))
     toastShow({
       type: "success",
       message: LL.ProfileScreen.removedAccount({ identifier: removal.identifier }),
       LL,
     })
-  }, [deleteWallet, setAccountIsBeingDeleted, navigation, LL])
+  }, [deleteWallet, setAccountIsBeingDeleted, leaveWhileDeleting, navigation, LL])
 
   return { requestRemoval, runPendingRemoval }
 }

@@ -109,7 +109,11 @@ import { useSelfCustodialUnavailable } from "@app/self-custodial/hooks/use-unava
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { CardDashboardScreen } from "@app/screens/card-screen/card-dashboard-screen"
 import { CardFeeScheduleScreen } from "@app/screens/card-screen/card-fee-schedule-screen"
-import { headerBackControl } from "@app/components/header-back-control/header-back-control"
+import {
+  defaultHeaderBack,
+  headerBackControl,
+  suppressedHeaderBack,
+} from "@app/components/header-back-control/header-back-control"
 import { headerCloseControlOptions } from "@app/components/header-close-control"
 import { headerRightNoGlass } from "@app/components/header-no-glass"
 import { NotificationHistoryScreen } from "@app/screens/notification-history-screen/notification-history-screen"
@@ -208,15 +212,6 @@ const DeveloperScreen: React.ComponentType | null = __DEV__
   ? // eslint-disable-next-line @typescript-eslint/no-var-requires
     require("../screens/developer-screen").DeveloperScreen
   : null
-
-/** Built once so every navigator hands `headerLeft` the same function. Calling the factory
- *  inside a navigator's screenOptions would mint a new identity on each render, which stays
- *  invisible only while native-stack invokes headerLeft instead of rendering it as an
- *  element; the day that changes, the back button would remount on every render. */
-const defaultHeaderBack = headerBackControl()
-/** Same reasoning as `defaultHeaderBack`: built once so the screens that refuse a back
- *  press hand `headerLeft` a stable identity instead of minting one per render. */
-const suppressedHeaderBack = headerBackControl({ canGoBack: false })
 
 /**
  * The swipe stays blocked for every entry: leaving by gesture is undirected, so the arrow is

@@ -1,5 +1,3 @@
-import { BackHandler } from "react-native"
-
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useAccountRemoval } from "@app/screens/settings-screen/self-custodial/use-account-removal"
@@ -42,9 +40,11 @@ jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
 }))
 
 const mockSetAccountIsBeingDeleted = jest.fn()
+const mockLeaveWhileDeleting = jest.fn((navigate: () => void) => navigate())
 jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
   useAccountDeleteContext: () => ({
     setAccountIsBeingDeleted: mockSetAccountIsBeingDeleted,
+    leaveWhileDeleting: (navigate: () => void) => mockLeaveWhileDeleting(navigate),
   }),
 }))
 
@@ -129,51 +129,21 @@ describe("useAccountRemoval", () => {
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
   })
 
-  it("blocks every way back off the screen while the removal runs", async () => {
-    const removeBackGuard = jest.fn()
-    let backHandler: (() => boolean | null | undefined) | undefined
-    const addListener = jest
-      .spyOn(BackHandler, "addEventListener")
-      .mockImplementation((_event, handler) => {
-        backHandler = handler
-        return { remove: removeBackGuard }
-      })
-    let blockedWhileDeleting = false
-    mockDeleteWallet.mockImplementation(async () => {
-      blockedWhileDeleting =
-        backHandler?.() === true &&
-        mockSetOptions.mock.calls.some(
-          ([options]) =>
-            options.gestureEnabled === false && options.headerLeft?.() === null,
-        )
-      return "switched-to-self-custodial"
+  /** The lock stays up while the screen is left, so the provider has to be told this
+   *  navigation is the removal's own and not an exit it should refuse. */
+  it("leaves the screen through the lock rather than around it", async () => {
+    let navigatedThroughLock = false
+    mockLeaveWhileDeleting.mockImplementationOnce((navigate) => {
+      navigate()
+      navigatedThroughLock = mockNavigate.mock.calls.length === 1
     })
+    mockDeleteWallet.mockResolvedValue("switched-to-self-custodial")
     const { result } = renderHook(() => useAccountRemoval())
 
     act(() => result.current.requestRemoval("account-a", "Anon user"))
     await act(() => result.current.runPendingRemoval())
 
-    expect(blockedWhileDeleting).toBe(true)
-    expect(removeBackGuard).toHaveBeenCalledTimes(1)
-    addListener.mockRestore()
-  })
-
-  it("gives the ways back again when the removal fails", async () => {
-    const removeBackGuard = jest.fn()
-    const addListener = jest
-      .spyOn(BackHandler, "addEventListener")
-      .mockReturnValue({ remove: removeBackGuard })
-    mockDeleteWallet.mockResolvedValue(undefined)
-    const { result } = renderHook(() => useAccountRemoval())
-
-    act(() => result.current.requestRemoval("account-a", "Anon user"))
-    await act(() => result.current.runPendingRemoval())
-
-    expect(removeBackGuard).toHaveBeenCalledTimes(1)
-    expect(mockSetOptions).toHaveBeenLastCalledWith({
-      headerLeft: undefined,
-      gestureEnabled: true,
-    })
-    addListener.mockRestore()
+    expect(navigatedThroughLock).toBe(true)
+    expect(mockNavigate).toHaveBeenCalledTimes(1)
   })
 })

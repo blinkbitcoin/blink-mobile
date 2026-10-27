@@ -115,21 +115,14 @@ export const Delete = () => {
     }
   }
 
-  /** The deletion hides every way off this screen while it runs; a deletion that did not
+  /** The lock takes every way off this screen away while it runs; a deletion that did not
    *  happen has to give them back, or the user is left on a dead screen with no exit. */
-  const releaseDeletionLock = () => {
-    navigation.setOptions({ headerLeft: undefined, gestureEnabled: true })
-    setAccountIsBeingDeleted(false)
-  }
+  const releaseDeletionLock = () => setAccountIsBeingDeleted(false)
 
   const deleteUserAccount = async () => {
     try {
       const accountToDeleteToken = appConfig.token
 
-      navigation.setOptions({
-        headerLeft: () => null, // Hides the default back button
-        gestureEnabled: false, // Disables swipe to go back gesture
-      })
       setAccountIsBeingDeleted(true)
 
       const res = await deleteAccount()

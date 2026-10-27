@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react"
-import { Text } from "react-native"
+import { BackHandler, Text } from "react-native"
 import { act, render } from "@testing-library/react-native"
 
+import {
+  InvisibleBackButton,
+  defaultHeaderBack,
+} from "@app/components/header-back-control/header-back-control"
 import {
   AccountDeleteContextProvider,
   useAccountDeleteContext,
@@ -18,6 +22,23 @@ jest.mock("@rn-vui/themed", () => {
   }
 })
 
+const mockSetOptions = jest.fn()
+const mockDispatch = jest.fn()
+jest.mock("@react-navigation/native", () => ({
+  useNavigation: () => ({ setOptions: mockSetOptions, dispatch: mockDispatch }),
+  usePreventRemove: (isPrevented: boolean, onPrevented: PreventRemoveCallback) =>
+    mockUsePreventRemove(isPrevented, onPrevented),
+}))
+
+type PreventRemoveCallback = (options: { data: { action: { type: string } } }) => void
+const mockUsePreventRemove = jest.fn<void, [boolean, PreventRemoveCallback]>()
+
+/** What usePreventRemove was last told, and the screen-removal it would refuse. */
+const preventRemove = () => {
+  const [isPrevented, onPrevented] = mockUsePreventRemove.mock.calls.at(-1) ?? []
+  return { isPrevented, onPrevented }
+}
+
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
@@ -30,6 +51,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 
 type LockControls = {
   setAccountIsBeingDeleted: (isBeingDeleted: boolean, identifier?: string) => void
+  leaveWhileDeleting: (navigate: () => void) => void
 }
 
 const controls: Partial<LockControls> = {}
@@ -37,8 +59,9 @@ const controls: Partial<LockControls> = {}
 const mountCounter = { mounts: 0, unmounts: 0 }
 
 const LockController: React.FC = () => {
-  const { setAccountIsBeingDeleted } = useAccountDeleteContext()
+  const { setAccountIsBeingDeleted, leaveWhileDeleting } = useAccountDeleteContext()
   controls.setAccountIsBeingDeleted = setAccountIsBeingDeleted
+  controls.leaveWhileDeleting = leaveWhileDeleting
   useEffect(() => {
     mountCounter.mounts += 1
     return () => {
@@ -50,8 +73,13 @@ const LockController: React.FC = () => {
 
 describe("AccountDeleteContextProvider", () => {
   beforeEach(() => {
+    jest.clearAllMocks()
     mountCounter.mounts = 0
     mountCounter.unmounts = 0
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
   })
 
   it("covers the screen and names the account being removed", () => {
@@ -112,5 +140,88 @@ describe("AccountDeleteContextProvider", () => {
     act(() => controls.setAccountIsBeingDeleted?.(false))
 
     expect(queryByTestId("account-deletion-lock")).toBeNull()
+  })
+
+  describe("while the lock is up", () => {
+    const renderLocked = () => {
+      const view = render(
+        <AccountDeleteContextProvider>
+          <LockController />
+        </AccountDeleteContextProvider>,
+      )
+      act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+      return view
+    }
+
+    /** A headerLeft that renders nothing is not enough: with no left view the platform's
+     *  own back arrow appears, and it pops the screen natively onto the next account. */
+    it("keeps an inert, invisible control in the header so no back arrow shows", () => {
+      renderLocked()
+
+      const [options] = mockSetOptions.mock.calls.at(-1) ?? []
+      const headerLeft = options.headerLeft({ canGoBack: true })
+      expect(headerLeft).not.toBeNull()
+      expect(headerLeft.type).toBe(InvisibleBackButton)
+      expect(options.gestureEnabled).toBe(false)
+    })
+
+    it("holds the Android back key", () => {
+      const addListener = jest.spyOn(BackHandler, "addEventListener")
+      renderLocked()
+
+      const [event, handler] = addListener.mock.calls.at(-1) ?? []
+      expect(event).toBe("hardwareBackPress")
+      expect(handler?.()).toBe(true)
+    })
+
+    it("refuses anything else that would remove the screen", () => {
+      renderLocked()
+
+      const { isPrevented, onPrevented } = preventRemove()
+      expect(isPrevented).toBe(true)
+      act(() => onPrevented?.({ data: { action: { type: "POP" } } }))
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
+
+    it("lets the removal's own navigation through without lifting the cover", () => {
+      const { getByTestId } = renderLocked()
+      const action = { type: "NAVIGATE" }
+
+      act(() =>
+        controls.leaveWhileDeleting?.(() =>
+          preventRemove().onPrevented?.({ data: { action } }),
+        ),
+      )
+
+      expect(mockDispatch).toHaveBeenCalledWith(action)
+      expect(getByTestId("account-deletion-lock")).toBeTruthy()
+    })
+
+    it("gives every exit back when released", () => {
+      const remove = jest.fn()
+      jest.spyOn(BackHandler, "addEventListener").mockReturnValue({ remove })
+      renderLocked()
+
+      act(() => controls.setAccountIsBeingDeleted?.(false))
+
+      expect(mockSetOptions).toHaveBeenLastCalledWith({
+        headerLeft: defaultHeaderBack,
+        gestureEnabled: true,
+      })
+      expect(remove).toHaveBeenCalledTimes(1)
+      expect(preventRemove().isPrevented).toBe(false)
+    })
+
+    /** A lock raised again after a release must not inherit the earlier permission. */
+    it("refuses removal again once a new lock is raised after leaving", () => {
+      renderLocked()
+      act(() => controls.leaveWhileDeleting?.(() => {}))
+      act(() => controls.setAccountIsBeingDeleted?.(false))
+      act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+
+      act(() => preventRemove().onPrevented?.({ data: { action: { type: "POP" } } }))
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
   })
 })

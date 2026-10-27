@@ -140,6 +140,7 @@ const mockSetAccountIsBeingDeleted = jest.fn()
 jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
   useAccountDeleteContext: () => ({
     setAccountIsBeingDeleted: mockSetAccountIsBeingDeleted,
+    leaveWhileDeleting: (navigate: () => void) => navigate(),
   }),
 }))
 
