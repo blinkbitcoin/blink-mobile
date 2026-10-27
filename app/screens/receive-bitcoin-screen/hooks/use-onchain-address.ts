@@ -5,8 +5,7 @@ import {
   useOnChainAddressCreateMutation,
   useOnChainAddressCurrentMutation,
 } from "@app/graphql/generated"
-import { useI18nContext } from "@app/i18n/i18n-react"
-import { toastShow } from "@app/utils/toast"
+import { reportError } from "@app/utils/error-logging"
 
 import { getPaymentRequestFullUri } from "../payment/helpers"
 import { GetFullUriFn, Invoice } from "../payment/index.types"
@@ -36,6 +35,8 @@ gql`
   }
 `
 
+const RATE_LIMITED_CODE = "TOO_MANY_REQUEST"
+
 type UseOnChainAddressOptions = {
   amount?: number
   memo?: string
@@ -47,24 +48,29 @@ export const useOnChainAddress = (
 ) => {
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
   const [onChainAddressCreate] = useOnChainAddressCreateMutation()
-  const { LL } = useI18nContext()
 
   const [address, setAddress] = useState<string | null>(null)
   const [loading, setLoading] = useState(Boolean(walletId))
   const [error, setError] = useState<string | null>(null)
+  // The fetch settled without an address: nothing more is coming until the user retries.
+  const [failed, setFailed] = useState(false)
   // Only the latest fetch or create may write; a late answer may belong to another wallet.
   const generationRef = useRef(0)
 
   useEffect(() => {
     generationRef.current += 1
     const generation = generationRef.current
+    // The address held so far belongs to the previous wallet: never show, copy or
+    // share it on this one, even while this wallet's address is loading.
+    setAddress(null)
+    setError(null)
+    setFailed(false)
     if (!walletId) {
       setLoading(false)
       return
     }
     const isCurrent = () => generation === generationRef.current
 
-    setError(null)
     setLoading(true)
     onChainAddressCurrent({
       variables: { input: { walletId } },
@@ -73,17 +79,18 @@ export const useOnChainAddress = (
         if (!isCurrent()) return
         const addr = result.data?.onChainAddressCurrent?.address
         if (addr) setAddress(addr)
+        else setFailed(true)
       })
       .catch((err) => {
         if (!isCurrent()) return
-        const message = err?.message ?? "Unknown error"
-        setError(message)
-        toastShow({ message, LL, type: "warning" })
+        // The QR shows the failure and offers New; no toast on top of it.
+        setError(err?.message ?? "Unknown error")
+        setFailed(true)
       })
       .finally(() => {
         if (isCurrent()) setLoading(false)
       })
-  }, [walletId, onChainAddressCurrent, LL])
+  }, [walletId, onChainAddressCurrent])
 
   /** Resolves Created once a fresh address is on screen; the old one keeps working. */
   const generateNewAddress =
@@ -92,23 +99,35 @@ export const useOnChainAddress = (
       generationRef.current += 1
       const generation = generationRef.current
       const isCurrent = () => generation === generationRef.current
-      setLoading(true)
       try {
         const result = await onChainAddressCreate({
           variables: { input: { walletId } },
         })
-        if (!isCurrent()) return NewOnchainAddressResult.Failed
+        if (!isCurrent()) return NewOnchainAddressResult.Superseded
         const payload = result.data?.onChainAddressCreate
-        if (payload?.errors.some((err) => err.code === "TOO_MANY_REQUEST")) {
-          return NewOnchainAddressResult.RateLimited
-        }
+        const codes = payload?.errors.map((err) => err.code) ?? []
+        if (codes.includes(RATE_LIMITED_CODE)) return NewOnchainAddressResult.RateLimited
         const addr = payload?.address
-        if (!addr) return NewOnchainAddressResult.Failed
+        if (!addr) {
+          reportError(
+            "onChainAddressCreate",
+            new Error(
+              `onChainAddressCreate returned no address: ${JSON.stringify(codes)}`,
+            ),
+          )
+          return NewOnchainAddressResult.Failed
+        }
         setAddress(addr)
+        setFailed(false)
         return NewOnchainAddressResult.Created
-      } catch {
-        return NewOnchainAddressResult.Failed
+      } catch (err) {
+        reportError("onChainAddressCreate", err)
+        return isCurrent()
+          ? NewOnchainAddressResult.Failed
+          : NewOnchainAddressResult.Superseded
       } finally {
+        // A create can only start once the fetch has settled, but if it overtook one,
+        // that fetch can no longer clear `loading` itself.
         if (isCurrent()) setLoading(false)
       }
     }, [walletId, onChainAddressCreate])
@@ -126,5 +145,5 @@ export const useOnChainAddress = (
       })
   }, [address, amount, memo])
 
-  return { address, loading, error, getFullUriFn, generateNewAddress }
+  return { address, loading, error, failed, getFullUriFn, generateNewAddress }
 }

@@ -45,10 +45,7 @@ export const useOnchainResolver = (
   return {
     address: custodialOnchain.address,
     loading: custodialOnchain.loading,
-    failed:
-      Boolean(custodialWalletId) &&
-      !custodialOnchain.loading &&
-      !custodialOnchain.address,
+    failed: custodialOnchain.failed,
     getFullUriFn: custodialOnchain.getFullUriFn,
     generateNewAddress: custodialOnchain.generateNewAddress,
   }

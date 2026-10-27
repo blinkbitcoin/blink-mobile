@@ -70,7 +70,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          { address: null, failed: false },
+          null,
         ),
       )
 
@@ -83,7 +83,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          { address: null, failed: false },
+          null,
         ),
       )
 
@@ -97,7 +97,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           basePayCodeRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          { address: null, failed: false },
+          null,
         ),
       )
 
@@ -110,7 +110,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           basePayCodeRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          { address: null, failed: false },
+          null,
         ),
       )
 
@@ -123,7 +123,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           request as Parameters<typeof useDisplayPaymentRequest>[0],
           false,
-          { address: null, failed: false },
+          null,
         ),
       )
 
@@ -137,7 +137,7 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
-          { address: "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4", failed: false },
+          "bc1qw508d6qejxtdg4y5r3zarvary0c5xw7kv8f3t4",
         ),
       )
 
@@ -152,23 +152,25 @@ describe("useDisplayPaymentRequest", () => {
         useDisplayPaymentRequest(
           baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
-          { address: "bc1qtest", failed: false },
+          "bc1qtest",
         ),
       )
 
       expect(result.current.showActions).toBe(true)
     })
 
-    it("hides actions when onchain address is null", () => {
+    it("keeps the actions while there is no onchain address yet", () => {
+      // The screen disables Copy and Share until there is an address; hiding the row
+      // instead made it jump on every load and wallet switch.
       const { result } = renderHook(() =>
         useDisplayPaymentRequest(
-          baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
+          basePayCodeRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
-          { address: null, failed: false },
+          null,
         ),
       )
 
-      expect(result.current.showActions).toBe(false)
+      expect(result.current.showActions).toBe(true)
     })
   })
 
@@ -183,8 +185,7 @@ describe("useDisplayPaymentRequest", () => {
           request: Parameters<typeof useDisplayPaymentRequest>[0]
           isOnChain: boolean
           addr: string | null
-        }) =>
-          useDisplayPaymentRequest(request, isOnChain, { address: addr, failed: false }),
+        }) => useDisplayPaymentRequest(request, isOnChain, addr),
         {
           initialProps: {
             request: baseLightningRequest as Parameters<
@@ -212,10 +213,7 @@ describe("useDisplayPaymentRequest", () => {
       expect(result.current.displayPaymentRequest).toBe(firstValue)
     })
 
-    type RailProps = {
-      isOnChain: boolean
-      onchain: { address: string | null; failed: boolean }
-    }
+    type RailProps = { isOnChain: boolean; onchain: string | null }
     const renderOnRails = (initialProps: RailProps) =>
       renderHook(
         ({ isOnChain, onchain }: RailProps) =>
@@ -228,34 +226,32 @@ describe("useDisplayPaymentRequest", () => {
       )
 
     it("never shows the Lightning request on the on-chain page", () => {
-      const { result, rerender } = renderOnRails({
-        isOnChain: false,
-        onchain: { address: null, failed: false },
-      })
+      const { result, rerender } = renderOnRails({ isOnChain: false, onchain: null })
       expect(result.current.displayPaymentRequest).toBe("lnbc1...quest")
 
-      rerender({ isOnChain: true, onchain: { address: null, failed: false } })
-      expect(result.current.displayPaymentRequest).toBe("")
-
-      rerender({ isOnChain: true, onchain: { address: null, failed: true } })
+      rerender({ isOnChain: true, onchain: null })
       expect(result.current.displayPaymentRequest).toBe("")
     })
 
-    it("drops the last on-chain address once a later on-chain load fails", () => {
+    it("never shows an on-chain address the hook no longer holds", () => {
+      // A wallet switch clears the address while the new wallet's loads: showing the
+      // previous one meanwhile would hand out the other wallet's address.
       const { result, rerender } = renderOnRails({
         isOnChain: true,
-        onchain: { address: "bc1qfirstaddress", failed: false },
+        onchain: "bc1qfirstaddress",
       })
       expect(result.current.displayPaymentRequest).toBe("bc1qf...dress")
 
-      rerender({ isOnChain: true, onchain: { address: null, failed: false } })
-      expect(result.current.displayPaymentRequest).toBe("bc1qf...dress")
-
-      rerender({ isOnChain: true, onchain: { address: null, failed: true } })
+      rerender({ isOnChain: true, onchain: null })
       expect(result.current.displayPaymentRequest).toBe("")
+    })
 
-      rerender({ isOnChain: true, onchain: { address: null, failed: false } })
-      expect(result.current.displayPaymentRequest).toBe("")
+    it("shows the Lightning request again after visiting the on-chain page", () => {
+      const { result, rerender } = renderOnRails({ isOnChain: false, onchain: null })
+      rerender({ isOnChain: true, onchain: "bc1qfirstaddress" })
+      rerender({ isOnChain: false, onchain: "bc1qfirstaddress" })
+
+      expect(result.current.displayPaymentRequest).toBe("lnbc1...quest")
     })
   })
 })

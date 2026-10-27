@@ -12,6 +12,8 @@ export const NewOnchainAddressResult = {
   Created: "Created",
   Failed: "Failed",
   RateLimited: "RateLimited",
+  // A wallet switch or a newer request took over; the screen it was for is gone.
+  Superseded: "Superseded",
 } as const
 export type NewOnchainAddressResultType =
   (typeof NewOnchainAddressResult)[keyof typeof NewOnchainAddressResult]

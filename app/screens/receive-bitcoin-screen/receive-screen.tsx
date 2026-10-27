@@ -32,6 +32,7 @@ import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
+import { RECEIVE_ACTIONS_GAP, RECEIVE_INPUTS_GUTTER } from "./layout"
 import { NfcHeaderButton } from "./nfc-header-button"
 import { QRView } from "./qr-view"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"
@@ -144,8 +145,13 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
         setIsGeneratingAddress(true)
         const result = await generateNewAddress()
         setIsGeneratingAddress(false)
+        // The page the tap was for is gone; any toast would describe another wallet.
+        if (result === NewOnchainAddressResult.Superseded) return
         const created = result === NewOnchainAddressResult.Created
-        const toastMessages: Record<NewOnchainAddressResultType, string> = {
+        const toastMessages: Record<
+          Exclude<NewOnchainAddressResultType, typeof NewOnchainAddressResult.Superseded>,
+          string
+        > = {
           [NewOnchainAddressResult.Created]: LL.ReceiveScreen.newAddressGenerated(),
           [NewOnchainAddressResult.Failed]: LL.ReceiveScreen.newAddressFailed(),
           [NewOnchainAddressResult.RateLimited]: LL.ReceiveScreen.newAddressRateLimited(),
@@ -173,11 +179,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     onchainAddress: onchain.address,
   })
 
-  const { displayPaymentRequest, showActions: hasPaymentRequestActions } =
-    useDisplayPaymentRequest(requestState, carousel.isOnChainPage, onchain)
-  // A failed on-chain request keeps the row so New can retry it; there is nothing to copy.
-  const onchainFailed = carousel.isOnChainPage && onchain.failed
-  const showActions = hasPaymentRequestActions || onchainFailed
+  const { displayPaymentRequest, showActions } = useDisplayPaymentRequest(
+    requestState,
+    carousel.isOnChainPage,
+    onchain.address,
+  )
   const hasNothingToShare = carousel.isOnChainPage && !onchain.address
 
   const {
@@ -235,9 +241,10 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     ? onchainAmountRowCurrency
     : requestState.receivingWalletDescriptor.currency
 
-  // Switching wallets mid-create would put the old wallet's new address on the new wallet's page.
+  // Switching wallets mid-create would put the old wallet's new address on the new wallet's
+  // page. Off that page the create finishes quietly and its result is dropped.
   const canToggleWallet =
-    !isGeneratingAddress &&
+    !(isGeneratingAddress && carousel.isOnChainPage) &&
     (isSelfCustodial
       ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
       : !isDollarBalanceGated)
@@ -276,12 +283,13 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           <QRView
             type={Invoice.OnChain}
             getFullUri={onchain.getFullUriFn}
-            loading={onchain.loading || isGeneratingAddress}
+            // The address on screen keeps working while New makes another, so it stays.
+            loading={onchain.loading || (isGeneratingAddress && !onchain.address)}
             completed={requestState.state === PaymentRequestState.Paid}
             converting={isConverting}
             err={
               onchain.failed && !isGeneratingAddress
-                ? LL.ReceiveScreen.newAddressFailed()
+                ? LL.ReceiveScreen.onchainAddressLoadFailed()
                 : ""
             }
             expired={false}
@@ -380,7 +388,8 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
                 label={LL.ReceiveScreen.newAddress()}
                 icon="refresh"
                 onPress={handleNewAddress}
-                disabled={isGeneratingAddress || onchain.loading}
+                loading={isGeneratingAddress}
+                disabled={onchain.loading}
                 accessibilityHint={LL.ReceiveScreen.newAddressHint()}
               />
             )}
@@ -461,11 +470,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-start",
-    columnGap: 10,
+    columnGap: RECEIVE_ACTIONS_GAP,
   },
   inputsContainer: {
     marginTop: 14,
-    paddingHorizontal: 20,
+    paddingHorizontal: RECEIVE_INPUTS_GUTTER,
     rowGap: 14,
   },
 }))
