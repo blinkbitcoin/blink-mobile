@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+import { PaymentMethod } from "@breeztech/breez-sdk-spark-react-native"
 import analytics from "@react-native-firebase/analytics"
 
 import { AccountMode } from "@app/types/account"
@@ -19,6 +20,24 @@ export const ScRail = {
 } as const
 
 export type ScRail = (typeof ScRail)[keyof typeof ScRail]
+
+/** The rail an SDK-settled payment traveled, read from its method. Token transfers are
+ *  Spark transfers (USDB rides Spark), deposits and withdrawals are the onchain legs.
+ *  Unknown reports nothing: an unlabeled rail would quietly distort the per-rail counts. */
+export const scRailForPaymentMethod = (method: PaymentMethod): ScRail | null => {
+  switch (method) {
+    case PaymentMethod.Lightning:
+      return ScRail.Lightning
+    case PaymentMethod.Spark:
+    case PaymentMethod.Token:
+      return ScRail.Spark
+    case PaymentMethod.Deposit:
+    case PaymentMethod.Withdraw:
+      return ScRail.Onchain
+    default:
+      return null
+  }
+}
 
 /** Every self-custodial telemetry event. New names stay under GA4's 40-character limit
  *  and keep the `sc_` prefix so Enhanced activity is one filter away from custodial's;
@@ -87,4 +106,30 @@ export const measure = (
   const mode = modeOverride === undefined ? context.mode : modeOverride
   if (mode !== AccountMode.Enhanced) return
   analytics().logEvent(event, { network: context.network, ...params })
+}
+
+/** Settles can be announced more than once (a pending-then-succeeded transition, a
+ *  listener re-registered after reconnect), so payment-keyed events dedupe here. The set
+ *  is session-scoped: a restarted app that re-announces an old settle overstates by one
+ *  announcement, which monthly aggregation tolerates and a persistent ledger of seen
+ *  payment ids would not be worth. */
+const MEASURED_ONCE_CAP = 1_000
+const measuredOnceKeys = new Set<string>()
+
+export const measureOnce = (
+  key: string,
+  event: ScEvent,
+  params?: ScEventParams,
+): void => {
+  if (measuredOnceKeys.has(key)) return
+  if (measuredOnceKeys.size >= MEASURED_ONCE_CAP) {
+    const oldest = measuredOnceKeys.values().next().value
+    if (oldest !== undefined) measuredOnceKeys.delete(oldest)
+  }
+  measuredOnceKeys.add(key)
+  measure(event, params)
+}
+
+export const resetMeasuredOnceKeys = (): void => {
+  measuredOnceKeys.clear()
 }

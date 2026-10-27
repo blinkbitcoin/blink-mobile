@@ -1,9 +1,15 @@
 /* eslint-disable camelcase */
+import { PaymentMethod } from "@breeztech/breez-sdk-spark-react-native"
+
 import {
   measure,
+  measureOnce,
+  resetMeasuredOnceKeys,
   resetMeasurementContext,
+  scRailForPaymentMethod,
   setMeasurementContext,
   ScEvent,
+  ScRail,
 } from "@app/self-custodial/measurement"
 import { AccountMode } from "@app/types/account"
 
@@ -62,6 +68,45 @@ describe("measurement gate", () => {
     setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
 
     measure(ScEvent.AccountModeSelected, { mode: "anon" }, AccountMode.Anon)
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+})
+
+describe("scRailForPaymentMethod", () => {
+  it("maps SDK methods to coarse rails", () => {
+    expect(scRailForPaymentMethod(PaymentMethod.Lightning)).toBe(ScRail.Lightning)
+    expect(scRailForPaymentMethod(PaymentMethod.Spark)).toBe(ScRail.Spark)
+    expect(scRailForPaymentMethod(PaymentMethod.Token)).toBe(ScRail.Spark)
+    expect(scRailForPaymentMethod(PaymentMethod.Deposit)).toBe(ScRail.Onchain)
+    expect(scRailForPaymentMethod(PaymentMethod.Withdraw)).toBe(ScRail.Onchain)
+  })
+
+  it("reports nothing for a method it cannot label", () => {
+    expect(scRailForPaymentMethod(PaymentMethod.Unknown)).toBeNull()
+  })
+})
+
+describe("measureOnce", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasurementContext()
+    resetMeasuredOnceKeys()
+    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+  })
+
+  it("emits once per key", () => {
+    measureOnce("p1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
+    measureOnce("p1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
+    measureOnce("p2", ScEvent.PaymentReceived, { rail: ScRail.Lightning })
+
+    expect(mockLogEvent).toHaveBeenCalledTimes(2)
+  })
+
+  it("still respects the gate", () => {
+    setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+
+    measureOnce("p1", ScEvent.PaymentReceived, { rail: ScRail.Spark })
 
     expect(mockLogEvent).not.toHaveBeenCalled()
   })

@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   AesSuccessActionDataResult_Tags as AesResultTag,
   FeePolicy,
@@ -41,6 +42,7 @@ import {
   resolveSendTokenIdentifier,
   toSdkSendAmount,
 } from "../bridge"
+import { measure, ScEvent, ScRail } from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 import { feeFailure, findLostSend } from "./send-helpers"
@@ -250,28 +252,45 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     feePolicy: isUsdSend ? FeePolicy.FeesIncluded : undefined,
   }
 
-  const sendFailure = (err: unknown) => ({
-    status: PaymentSendResult.Failure,
-    errors: [
-      {
-        __typename: "GraphQLApplicationError" as const,
-        message: classifySdkError(err),
-      },
-    ],
-  })
+  /** LNURL sends report the coarse lightning rail; the fine split is a later phase. */
+  const sendTelemetry = {
+    rail: ScRail.Lightning,
+    sending_wallet: sendingWalletDescriptor.currency,
+  }
+
+  const sendFailure = (err: unknown) => {
+    measure(ScEvent.PaymentSendFailed, {
+      ...sendTelemetry,
+      error_code: classifySdkError(err),
+    })
+    return {
+      status: PaymentSendResult.Failure,
+      errors: [
+        {
+          __typename: "GraphQLApplicationError" as const,
+          message: classifySdkError(err),
+        },
+      ],
+    }
+  }
 
   const sendOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,
     status: PaymentSendResult,
-  ) => ({
-    status,
-    transaction: { createdAt: Number(payment.timestamp) },
-    extraInfo: {
-      preimage: extractPreimage(payment),
-      successAction: sdkSuccessActionToLib(successAction),
-    },
-  })
+  ) => {
+    if (status === PaymentSendResult.Success) {
+      measure(ScEvent.PaymentSendSettled, sendTelemetry)
+    }
+    return {
+      status,
+      transaction: { createdAt: Number(payment.timestamp) },
+      extraInfo: {
+        preimage: extractPreimage(payment),
+        successAction: sdkSuccessActionToLib(successAction),
+      },
+    }
+  }
 
   /** The wallet's own record of a send this detail made, reported as the send itself
    *  would have reported it: the SDK hands a payment back as soon as it is dispatched,
@@ -321,6 +340,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
          * lost one is remembered by its own hash.
          */
         sendPaymentMutation: async () => {
+          measure(ScEvent.PaymentSendInitiated, sendTelemetry)
           const isKeyedSend = !isUsdSend
           const sendIdempotencyKey = isKeyedSend ? attemptRef.current : undefined
 

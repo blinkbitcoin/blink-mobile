@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   ReceivePaymentMethod,
   ReceivePaymentRequest,
@@ -9,6 +10,8 @@ import type {
   ReceiveLightningAdapter,
   ReceiveOnchainAdapter,
 } from "@app/types/payment"
+
+import { measure, ScEvent, ScRail } from "../measurement"
 
 const receiveError = (message: string) => ({
   errors: [{ message }] as PaymentError[],
@@ -29,6 +32,10 @@ export const createReceiveLightning = (
           }),
         }),
       )
+      measure(ScEvent.PaymentRequestCreated, {
+        rail: ScRail.Lightning,
+        has_amount: Boolean(amount),
+      })
       return { invoice: response.paymentRequest }
     } catch (err) {
       return receiveError(err instanceof Error ? err.message : `Receive failed: ${err}`)
@@ -46,6 +53,7 @@ export const createReceiveOnchain = (sdk: BreezSdkInterface): ReceiveOnchainAdap
           }),
         }),
       )
+      measure(ScEvent.PaymentRequestCreated, { rail: ScRail.Onchain, has_amount: false })
       return { address: response.paymentRequest }
     } catch (err) {
       return receiveError(

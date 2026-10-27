@@ -1,7 +1,11 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  PaymentType,
+  SdkEvent_Tags as SdkEventTags,
+  type BreezSdkInterface,
+} from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -21,7 +25,9 @@ import {
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
+import { measureOnce, ScEvent, scRailForPaymentMethod } from "../measurement"
 import {
+  extractObservedPayment,
   extractPaymentId,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
@@ -242,6 +248,17 @@ export const useSdkLifecycle = (
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
           const paymentId = extractPaymentId(event)
           if (paymentId) setLastReceivedPaymentId(paymentId)
+        }
+
+        /** A succeeded receive is a settle the wallet observed, whichever screen was up
+         *  — and none need have been, for payments that landed while the app was away.
+         *  Deduped by id; gated to Enhanced inside measureOnce. */
+        if (event.tag === SdkEventTags.PaymentSucceeded) {
+          const payment = extractObservedPayment(event)
+          if (payment && payment.paymentType === PaymentType.Receive) {
+            const rail = scRailForPaymentMethod(payment.method)
+            if (rail) measureOnce(payment.id, ScEvent.PaymentReceived, { rail })
+          }
         }
         await refreshWallets()
       })

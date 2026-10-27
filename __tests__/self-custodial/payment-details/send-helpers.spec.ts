@@ -14,6 +14,9 @@ import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
 const mockPrepareSendPayment = jest.fn()
+
+const telemetry = { rail: "lightning", sendingWallet: WalletCurrency.Btc }
+const telemetryOnchain = { rail: "onchain", sendingWallet: WalletCurrency.Btc }
 const mockSendPayment = jest.fn()
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
@@ -550,11 +553,14 @@ describe("createSendMutation", () => {
     })
     mockSendPayment.mockResolvedValue(undefined)
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Success)
@@ -563,11 +569,14 @@ describe("createSendMutation", () => {
   it("classifies a thrown SdkError(InsufficientFunds) into the InsufficientFunds code", async () => {
     mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
@@ -581,11 +590,14 @@ describe("createSendMutation", () => {
       ]),
     )
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
@@ -594,11 +606,14 @@ describe("createSendMutation", () => {
   it("classifies a non-SdkError thrown value as Generic", async () => {
     mockPrepareSendPayment.mockRejectedValue(new Error("boom"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
@@ -609,11 +624,14 @@ describe("createSendMutation", () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue(new Error("payment refused"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockRecordError).toHaveBeenCalledWith(
@@ -625,11 +643,14 @@ describe("createSendMutation", () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue("network blip")
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockRecordError).toHaveBeenCalledWith(
@@ -647,12 +668,15 @@ describe("createSendMutation", () => {
     })
     mockSendPayment.mockResolvedValue(undefined)
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: BigInt(1500),
-      tokenIdentifier: "usdb-token-id",
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: BigInt(1500),
+        tokenIdentifier: "usdb-token-id",
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockPrepareSendPayment).toHaveBeenCalledWith(
@@ -671,12 +695,15 @@ describe("createSendMutation", () => {
       completionTimeoutSecs: undefined,
     } as never
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-      conversionOptions,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+        conversionOptions,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockPrepareSendPayment).toHaveBeenCalledWith(
@@ -699,6 +726,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
+      telemetryOnchain,
     )
     const result = await send()
 
@@ -716,6 +744,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "fast",
+      telemetryOnchain,
     )
     const result = await send()
 

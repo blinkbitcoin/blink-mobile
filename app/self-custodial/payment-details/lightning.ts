@@ -15,6 +15,7 @@ import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { ConvertDirection } from "@app/types/payment"
 
 import { buildConversionType } from "../bridge"
+import { ScRail } from "../measurement"
 
 import { createGetFee, createSendMutation } from "./send-helpers"
 
@@ -65,7 +66,10 @@ export const createSelfCustodialLightningPaymentDetails = <T extends WalletCurre
         canSendPayment: true,
         canGetFee: true,
         getFee: createGetFee(prepareParams),
-        sendPaymentMutation: createSendMutation(prepareParams),
+        sendPaymentMutation: createSendMutation(prepareParams, {
+          rail: ScRail.Lightning,
+          sendingWallet: sendingWalletDescriptor.currency,
+        }),
       }
     : { canSendPayment: false, canGetFee: false }
 
