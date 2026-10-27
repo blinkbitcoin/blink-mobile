@@ -1,4 +1,4 @@
-import React from "react"
+import React, { useEffect } from "react"
 
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -12,6 +12,8 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { testProps } from "@app/utils/testProps"
 
 import { OnboardingScreenLayout } from "../../layouts"
+
+import { releaseEmergencyPhrase } from "./emergency-phrase"
 
 type OperatorUnreachableRouteProp = RouteProp<
   RootStackParamList,
@@ -33,8 +35,13 @@ export const OperatorUnreachableScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { mnemonic } = useRoute<OperatorUnreachableRouteProp>().params
+  const { phraseHandle } = useRoute<OperatorUnreachableRouteProp>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+
+  /** This screen is where the flow starts, and every way out of it (trying again,
+   *  closing, leaving recovery for another restore method) takes it off the
+   *  stack, so its unmount is when the phrase is no longer needed. */
+  useEffect(() => () => releaseEmergencyPhrase(phraseHandle), [phraseHandle])
 
   return (
     <OnboardingScreenLayout
@@ -76,7 +83,7 @@ export const OperatorUnreachableScreen: React.FC = () => {
       <Text
         style={styles.recoveryLink}
         onPress={() =>
-          navigation.navigate("selfCustodialEmergencyRecovery", { mnemonic })
+          navigation.navigate("selfCustodialEmergencyRecovery", { phraseHandle })
         }
         {...testProps("outage-emergency-recovery-link")}
       >

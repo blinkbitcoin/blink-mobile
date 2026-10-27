@@ -5,6 +5,10 @@ import { fireEvent, render, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
+import {
+  holdEmergencyPhrase,
+  readEmergencyPhrase,
+} from "@app/screens/self-custodial/onboarding/restore/emergency/emergency-phrase"
 import { OperatorUnreachableScreen } from "@app/screens/self-custodial/onboarding/restore/emergency/operator-unreachable-screen"
 
 import { ContextForScreen } from "../../../../helper"
@@ -15,10 +19,11 @@ const MNEMONIC = "abandon abandon about"
 
 const mockNavigate = jest.fn()
 const mockGoBack = jest.fn()
+let mockPhraseHandle = ""
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useRoute: () => ({ params: { mnemonic: MNEMONIC } }),
+  useRoute: () => ({ params: { phraseHandle: mockPhraseHandle } }),
   useNavigation: () => ({ navigate: mockNavigate, goBack: mockGoBack }),
 }))
 
@@ -35,7 +40,10 @@ describe("OperatorUnreachableScreen", () => {
     LL = i18nObject("en")
   })
 
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockPhraseHandle = holdEmergencyPhrase(MNEMONIC)
+  })
 
   it("names the outage rather than blaming the backup phrase", () => {
     // The generic restore failure tells the user to check their phrase, which
@@ -51,20 +59,31 @@ describe("OperatorUnreachableScreen", () => {
 
     fireEvent.press(screen.getByTestId("outage-emergency-recovery-link"))
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialEmergencyRecovery", {
-      mnemonic: MNEMONIC,
+      phraseHandle: mockPhraseHandle,
     })
   })
 
-  it("carries the phrase forward so it is not typed twice", () => {
+  it("carries the phrase forward by handle so it is not typed twice", () => {
     // Twelve words re-entered at the worst possible moment is its own failure
-    // mode.
+    // mode; but the navigator keeps route params in its history, so the phrase
+    // itself must not ride in them.
     renderScreen()
 
     fireEvent.press(screen.getByTestId("outage-emergency-recovery-link"))
-    expect(mockNavigate).toHaveBeenCalledWith(
-      expect.any(String),
-      expect.objectContaining({ mnemonic: MNEMONIC }),
-    )
+    const [, params] = mockNavigate.mock.calls[0]
+    expect(JSON.stringify(params)).not.toContain("abandon")
+    expect(readEmergencyPhrase(params.phraseHandle)).toBe(MNEMONIC)
+  })
+
+  it("drops the phrase once it leaves the stack, whichever way out was taken", () => {
+    // Trying again, closing, and leaving recovery for another restore method all
+    // take this screen off the stack; its unmount is the one exit they share.
+    const { unmount } = renderScreen()
+    expect(readEmergencyPhrase(mockPhraseHandle)).toBe(MNEMONIC)
+
+    unmount()
+
+    expect(readEmergencyPhrase(mockPhraseHandle)).toBeNull()
   })
 
   it("goes back to the phrase for another attempt", () => {

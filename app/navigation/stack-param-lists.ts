@@ -382,8 +382,9 @@ export type RootStackParamList = {
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
-  selfCustodialOperatorUnreachable: { mnemonic: string }
-  selfCustodialEmergencyRecovery: { mnemonic: string }
+  /** A handle to the phrase, never the phrase itself: see emergency-phrase.ts. */
+  selfCustodialOperatorUnreachable: { phraseHandle: string }
+  selfCustodialEmergencyRecovery: { phraseHandle: string }
   selfCustodialRecoveryBackup: undefined
   stableBalanceSettings: undefined
 }

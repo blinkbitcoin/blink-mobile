@@ -1,4 +1,4 @@
-import React, { useCallback } from "react"
+import React, { useCallback, useEffect } from "react"
 
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -6,6 +6,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
+import { readEmergencyPhrase } from "./emergency-phrase"
 import {
   EmergencyRecoveryStep,
   useEmergencyRecovery,
@@ -28,8 +29,23 @@ type EmergencyRecoveryRouteProp = RouteProp<
  * leave a back button walking the user through their own failed attempts.
  */
 export const EmergencyRecoveryScreen: React.FC = () => {
+  const { phraseHandle } = useRoute<EmergencyRecoveryRouteProp>().params
+  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const phrase = readEmergencyPhrase(phraseHandle)
+
+  /** The phrase is gone once the flow that held it ended, and nothing on this
+   *  screen works without it, so the user starts a restore again. */
+  const isPhraseReleased = phrase === null
+  useEffect(() => {
+    if (isPhraseReleased) navigation.navigate("selfCustodialRestoreMethod")
+  }, [isPhraseReleased, navigation])
+
+  if (isPhraseReleased) return null
+  return <EmergencyRecoveryFlow phrase={phrase} />
+}
+
+const EmergencyRecoveryFlow: React.FC<{ phrase: string }> = ({ phrase }) => {
   const { LL } = useI18nContext()
-  const { mnemonic } = useRoute<EmergencyRecoveryRouteProp>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const {
@@ -42,7 +58,7 @@ export const EmergencyRecoveryScreen: React.FC = () => {
     fromFile,
     tryAnotherSource,
     exportBundle,
-  } = useEmergencyRecovery(mnemonic)
+  } = useEmergencyRecovery(phrase)
 
   const openSupport = useCallback(
     () => navigation.navigate("onboarding", { screen: "supportScreen" }),
