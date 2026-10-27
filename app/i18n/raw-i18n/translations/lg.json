@@ -4058,6 +4058,17 @@
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
     "secureMe": "Kuuma wallet"
   },
+  "TwoFactorEnforcement": {
+    "title": "Teekawo okukakasa emirundi ebiri",
+    "cardDescription": "Kuuma akawunti yo okuva ku abo abatakkiriziddwa kuyingira.",
+    "cardCta": "Teekawo",
+    "settingsDescription": "Kuuma akawunti yo okuva ku abo abatakkiriziddwa kuyingira ng'okiteekawo.",
+    "setupTitle": "Teekawo kati okukakasa emirundi ebiri",
+    "setupDescription": "Okuziyiza abatakkiriziddwa okuyingira mu akawunti yo, yongerako kati okukakasa emirundi ebiri.",
+    "addEmail": "Yongerako email",
+    "addPhoneNumber": "Yongerako ennamba y'essimu",
+    "setAuthenticator": "Teekawo authenticator"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

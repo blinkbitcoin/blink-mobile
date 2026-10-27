@@ -1,7 +1,66 @@
 import {
   canGoBackFromChooseExperience,
+  canReturnToRoute,
   ChooseExperienceContinueRoute,
+  isBackwardAction,
 } from "@app/navigation/stack-param-lists"
+
+describe("isBackwardAction", () => {
+  it("recognises the actions a user's own back press dispatches", () => {
+    expect(isBackwardAction({ type: "GO_BACK" })).toBe(true)
+    expect(isBackwardAction({ type: "POP" })).toBe(true)
+  })
+
+  /** A hold refuses only the user's back: a reset or a navigation the app dispatches
+   *  on its own has to keep working. */
+  it("leaves the removals the app dispatches on its own alone", () => {
+    expect(isBackwardAction({ type: "RESET" })).toBe(false)
+    expect(isBackwardAction({ type: "NAVIGATE" })).toBe(false)
+    expect(isBackwardAction({ type: "REPLACE" })).toBe(false)
+  })
+})
+
+describe("canReturnToRoute", () => {
+  const stackWith = (...names: string[]) => ({ routes: names.map((name) => ({ name })) })
+
+  it("lets a flow return to the two-factor setup while that screen is in its stack", () => {
+    expect(
+      canReturnToRoute(
+        stackWith("Primary", "twoFactorSetup", "emailRegistrationInitiate"),
+        "twoFactorSetup",
+      ),
+    ).toBe(true)
+  })
+
+  /** The param reaches the registration screens through deep links too, so a name the
+   *  stack never had must not be dispatched. */
+  it("refuses a return route the stack does not hold", () => {
+    expect(
+      canReturnToRoute(
+        stackWith("Primary", "emailRegistrationInitiate"),
+        "twoFactorSetup",
+      ),
+    ).toBe(false)
+  })
+
+  /** A deep link can name any route the app holds; only the setup is a place a flow
+   *  may return to. */
+  it("refuses a route the stack holds but a flow may not return to", () => {
+    expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), "Primary")).toBe(
+      false,
+    )
+  })
+
+  it("refuses when no return route was asked for", () => {
+    expect(canReturnToRoute(stackWith("Primary", "twoFactorSetup"), undefined)).toBe(
+      false,
+    )
+  })
+
+  it("refuses when the navigator has no state to check against", () => {
+    expect(canReturnToRoute(undefined, "twoFactorSetup")).toBe(false)
+  })
+})
 
 describe("canGoBackFromChooseExperience", () => {
   /** Settings carries no onward step: it opened this screen over a live session, which is a

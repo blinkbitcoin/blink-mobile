@@ -4058,6 +4058,17 @@
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
     "secureMe": "Khuseleka ingxowa"
   },
+  "TwoFactorEnforcement": {
+    "title": "Misela uqinisekiso lwezinto ezimbini",
+    "cardDescription": "Khusela iakhawunti yakho ekufikeleleni okungagunyaziswanga.",
+    "cardCta": "Misela",
+    "settingsDescription": "Khusela iakhawunti yakho ekufikeleleni okungagunyaziswanga ngokuyimisela.",
+    "setupTitle": "Misela uqinisekiso lwezinto ezimbini ngoku",
+    "setupDescription": "Ukuthintela ukufikelela okungagunyaziswanga kwiakhawunti yakho, yongeza uqinisekiso lwezinto ezimbini ngoku.",
+    "addEmail": "Yongeza i-imeyile",
+    "addPhoneNumber": "Yongeza inombolo yomnxeba",
+    "setAuthenticator": "Misela i-authenticator"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

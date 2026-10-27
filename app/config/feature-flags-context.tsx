@@ -57,6 +57,7 @@ const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeeway
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
+const CustodialTwoFactorEnforcementEnabledKey = "custodialTwoFactorEnforcementEnabled"
 const FeeRatesConfigKey = "feeRatesConfig"
 const InactivityFeeEnabledKey = "inactivityFeeEnabled"
 
@@ -126,6 +127,7 @@ type RemoteConfig = {
   [MigrationReceiveDelayedNoticeMsKey]: number
   [MigrationDelayedRedirectEnabledKey]: boolean
   [PersistentBulletinsEnabledKey]: boolean
+  [CustodialTwoFactorEnforcementEnabledKey]: boolean
   [FeeRatesConfigKey]: FeeRatesConfig
   [InactivityFeeEnabledKey]: boolean
 }
@@ -256,6 +258,10 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  such a bulletin stays until the server retires it. A console toggle, so a bulletin
    *  stuck on every home by mistake can be made closable again without a release. */
   persistentBulletinsEnabled: false,
+  /** Whether a custodial account's balance earns it two-factor prompts. Off by default
+   *  so the prompts reach users only once the console turns them on, and can be pulled
+   *  back the same way without a release. */
+  custodialTwoFactorEnforcementEnabled: false,
   feeRatesConfig: defaultFeeRatesConfig,
   /** Whether the fee rates screen lists the inactivity fee. Visibility only: the
    *  amount comes from `globals.feesInformation.inactivityFee`, the same config the
@@ -504,6 +510,10 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           .getValue(PersistentBulletinsEnabledKey)
           .asBoolean()
 
+        const custodialTwoFactorEnforcementEnabled = remoteConfigInstance()
+          .getValue(CustodialTwoFactorEnforcementEnabledKey)
+          .asBoolean()
+
         const feeRatesConfig = getRemoteConfigNumericObject(
           FeeRatesConfigKey,
           defaultFeeRatesConfig,
@@ -556,6 +566,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           migrationReceiveDelayedNoticeMs,
           migrationDelayedRedirectEnabled,
           persistentBulletinsEnabled,
+          custodialTwoFactorEnforcementEnabled,
           feeRatesConfig,
           inactivityFeeEnabled,
         })

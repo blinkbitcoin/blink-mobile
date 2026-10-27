@@ -4058,6 +4058,17 @@
     "modalDescription": "Ñuqayku mayt'a kunaykiku wallitaykita waqaychayta ama tukuy qullqiyki chinkananpaq kay aparatuykita chinkachispayki.",
     "secureMe": "Waqaychay wallita"
   },
+  "TwoFactorEnforcement": {
+    "title": "Iskay rakiypi riqsichiyta churay",
+    "cardDescription": "Cuentaykita mana saqisqa yaykuymanta harkay.",
+    "cardCta": "Churay",
+    "settingsDescription": "Cuentaykita mana saqisqa yaykuymanta harkay, chayta churaspa.",
+    "setupTitle": "Kunan iskay rakiypi riqsichiyta churay",
+    "setupDescription": "Cuentaykiman mana saqisqa yaykuyta harkanaykipaq, kunan iskay rakiypi riqsichiyta yapay.",
+    "addEmail": "Correo electrónicota yapay",
+    "addPhoneNumber": "Teléfono yupayta yapay",
+    "setAuthenticator": "Autenticadorta churay"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4058,6 +4058,17 @@
     "modalDescription": "Σας συνιστούμε ανεπιφύλακτα να δημιουργήσετε αντίγραφο ασφαλείας του πορτοφολιού σας για να αποτρέψετε πλήρη απώλεια κεφαλαίων σε περίπτωση που χάσετε αυτήν τη συσκευή.",
     "secureMe": "Ασφάλιση πορτοφολιού"
   },
+  "TwoFactorEnforcement": {
+    "title": "Ορίστε έλεγχο ταυτότητας δύο παραγόντων",
+    "cardDescription": "Προστατέψτε τον λογαριασμό σας από μη εξουσιοδοτημένη πρόσβαση.",
+    "cardCta": "Ορισμός",
+    "settingsDescription": "Προστατέψτε τον λογαριασμό σας από μη εξουσιοδοτημένη πρόσβαση ρυθμίζοντάς τον.",
+    "setupTitle": "Ορίστε τώρα έλεγχο ταυτότητας δύο παραγόντων",
+    "setupDescription": "Για να αποτρέψετε μη εξουσιοδοτημένη πρόσβαση στον λογαριασμό σας, προσθέστε τώρα έλεγχο ταυτότητας δύο παραγόντων.",
+    "addEmail": "Προσθήκη email",
+    "addPhoneNumber": "Προσθήκη αριθμού τηλεφώνου",
+    "setAuthenticator": "Ορισμός authenticator"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",

@@ -4058,6 +4058,17 @@
     "modalDescription": "Dôrazne odporúčame zálohovať peňaženku, aby ste predišli úplnej strate prostriedkov v prípade straty tohto zariadenia.",
     "secureMe": "Zabezpečiť peňaženku"
   },
+  "TwoFactorEnforcement": {
+    "title": "Nastavte dvojfaktorové overenie",
+    "cardDescription": "Chráňte svoj účet pred neoprávneným prístupom.",
+    "cardCta": "Nastaviť",
+    "settingsDescription": "Chráňte svoj účet pred neoprávneným prístupom jeho nastavením.",
+    "setupTitle": "Nastavte dvojfaktorové overenie teraz",
+    "setupDescription": "Aby ste zabránili neoprávnenému prístupu k svojmu účtu, pridajte teraz dvojfaktorové overenie.",
+    "addEmail": "Pridať e-mail",
+    "addPhoneNumber": "Pridať telefónne číslo",
+    "setAuthenticator": "Nastaviť autentifikátor"
+  },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
     "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
