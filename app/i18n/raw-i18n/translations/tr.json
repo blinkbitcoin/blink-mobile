@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
-      "encryptCheckbox": "Ek parola ekle",
-      "autoBundleCheckbox": "Otomatik yedeklemeler",
-      "autoBundleHint": "Spark operatörleri kullanılamaz hale gelirse tek taraflı çıkışı mümkün kılar.",
-      "autoBundleNeedsPassword": "Bunu etkinleştirmek için yukarıya bir parola ekle. Parola olmadan kurtarma yedeğin, korunmayan bir kurtarma ifadesinin yanında dururdu.",
       "password": "Parola",
       "passwordPlaceholder": "(en az 12 karakter)",
       "confirmPassword": "Parolayı onayla",

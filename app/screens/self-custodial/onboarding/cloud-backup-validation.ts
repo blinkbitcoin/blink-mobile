@@ -1,7 +1,6 @@
 import { validatePassword } from "@app/utils/validators/password"
 
 type CloudBackupFormInput = {
-  isEncrypted: boolean
   password: string
   confirmPassword: string
   passwordTouched: boolean
@@ -14,8 +13,10 @@ export type CloudBackupFormValidation = {
   isValid: boolean
 }
 
+/** Every cloud seed backup carries a passphrase: automatic bundle backups are
+ *  always on, and the seed-encrypted bundle must never sit next to an
+ *  unencrypted seed (D9). */
 export const validateCloudBackupForm = ({
-  isEncrypted,
   password,
   confirmPassword,
   passwordTouched,
@@ -27,10 +28,9 @@ export const validateCloudBackupForm = ({
   const doPasswordsMatch = password === confirmPassword
 
   return {
-    shouldShowPasswordError:
-      isEncrypted && passwordTouched && hasPassword && !isPasswordValid,
+    shouldShowPasswordError: passwordTouched && hasPassword && !isPasswordValid,
     shouldShowConfirmPasswordError:
-      isEncrypted && confirmPasswordTouched && hasConfirmPassword && !doPasswordsMatch,
-    isValid: !isEncrypted || (isPasswordValid && doPasswordsMatch),
+      confirmPasswordTouched && hasConfirmPassword && !doPasswordsMatch,
+    isValid: isPasswordValid && doPasswordsMatch,
   }
 }

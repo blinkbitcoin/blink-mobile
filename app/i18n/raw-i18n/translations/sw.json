@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
       "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
-      "encryptCheckbox": "Ongeza kaulisiri ya ziada",
-      "autoBundleCheckbox": "Nakala rudufu za kiotomatiki",
-      "autoBundleHint": "Huwezesha kutoka kwa upande mmoja iwapo waendeshaji wa Spark hawatapatikana.",
-      "autoBundleNeedsPassword": "Ongeza kaulisiri hapo juu ili kuwezesha hili. Bila kaulisiri, nakala yako ya urejeshaji ingekaa kando ya fungu la maneno lisilolindwa.",
       "password": "Kaulisiri",
       "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
       "confirmPassword": "Thibitisha kaulisiri",

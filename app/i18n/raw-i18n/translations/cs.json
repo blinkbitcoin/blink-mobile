@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",
       "description": "Uložíme zálohu vaší záložní fráze do vašeho {provider}.",
-      "encryptCheckbox": "Přidat dodatečnou heslovou frázi",
-      "autoBundleCheckbox": "Automatické zálohy",
-      "autoBundleHint": "Umožňuje jednostranný odchod, pokud operátoři Spark přestanou být dostupní.",
-      "autoBundleNeedsPassword": "Pro zapnutí zadejte výše heslovou frázi. Bez ní by záloha pro obnovu ležela vedle nechráněné obnovovací fráze.",
       "password": "Heslová fráze",
       "passwordPlaceholder": "(minimálně 12 znaků)",
       "confirmPassword": "Potvrdit heslovou frázi",

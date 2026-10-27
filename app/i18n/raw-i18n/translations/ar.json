@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "لنقم بنسخ محفظتك احتياطيًا",
       "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
-      "encryptCheckbox": "إضافة عبارة مرور إضافية",
-      "autoBundleCheckbox": "النسخ الاحتياطي التلقائي",
-      "autoBundleHint": "يتيح الخروج الأحادي في حال توقّف مشغّلي Spark.",
-      "autoBundleNeedsPassword": "أضف عبارة مرور أعلاه لتفعيل ذلك. بدونها ستكون نسخة الاسترداد بجوار عبارة احتياطية غير محمية.",
       "password": "عبارة المرور",
       "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
       "confirmPassword": "تأكيد عبارة المرور",

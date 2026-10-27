@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
-      "encryptCheckbox": "Thêm cụm mật khẩu bổ sung",
-      "autoBundleCheckbox": "Sao lưu tự động",
-      "autoBundleHint": "Cho phép rút đơn phương nếu các nhà vận hành Spark ngừng hoạt động.",
-      "autoBundleNeedsPassword": "Thêm cụm mật khẩu ở trên để bật tính năng này. Nếu không có cụm mật khẩu, bản sao lưu khôi phục sẽ nằm cạnh cụm từ khôi phục không được bảo vệ.",
       "password": "Cụm mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận cụm mật khẩu",

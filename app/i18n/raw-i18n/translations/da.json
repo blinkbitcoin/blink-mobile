@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
-      "encryptCheckbox": "Tilføj ekstra adgangssætning",
-      "autoBundleCheckbox": "Automatiske sikkerhedskopier",
-      "autoBundleHint": "Muliggør ensidig exit, hvis Spark-operatører går offline.",
-      "autoBundleNeedsPassword": "Tilføj en adgangssætning ovenfor for at aktivere dette. Uden en ville din gendannelsessikkerhedskopi ligge ved siden af en ubeskyttet gendannelsessætning.",
       "password": "Adgangssætning",
       "passwordPlaceholder": "(minimum 12 tegn)",
       "confirmPassword": "Bekræft adgangssætning",

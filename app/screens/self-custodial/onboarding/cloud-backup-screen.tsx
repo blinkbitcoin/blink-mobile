@@ -1,10 +1,9 @@
 import React from "react"
 import { View } from "react-native"
 
-import { makeStyles, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
-import { CheckboxRow } from "@app/components/checkbox-row"
 import { IconHero } from "@app/components/icon-hero"
 import { InfoBanner } from "@app/components/info-banner"
 import { PasswordInput } from "@app/components/password-input"
@@ -31,20 +30,13 @@ export const CloudBackupScreen: React.FC = () => {
   const cloudProvider = getCloudProviderName(LL)
 
   // The encryption password is typed here, and PasswordInput's eye toggle shows it in
-  // plain text. Guarded from mount, not from the moment encryption is switched on, so
-  // the first keystroke never lands on an unguarded frame.
+  // plain text. Guarded from mount, so the first keystroke never lands on an
+  // unguarded frame.
   useScreenSecurity()
 
   const {
-    isEncrypted,
-    autoBundleSync,
-    isAutoBundleSyncKnown,
-    isAutoBundleSyncLoading,
-    canSyncBundle,
-    toggleAutoBundleSync,
     password,
     confirmPassword,
-    toggleEncryption,
     setPassword,
     setConfirmPassword,
     markPasswordTouched,
@@ -54,23 +46,22 @@ export const CloudBackupScreen: React.FC = () => {
     isValid,
   } = useCloudBackupForm()
 
+  /** The passphrase is required and automatic bundle backups are always on:
+   *  the seed-encrypted bundle may only sit next to a passphrase-protected seed
+   *  (D9), and users cannot opt out of it. Always on is a known choice, so every
+   *  backup records it. */
   const { handleBackup, loading } = useCloudBackup({
-    isEncrypted,
+    isEncrypted: true,
     password,
-    autoBundleSync,
-    isAutoBundleSyncKnown,
+    autoBundleSync: true,
+    isAutoBundleSyncKnown: true,
   })
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 
-  /** The backup commits the choices and the passphrase it was started with, so they
-   *  stay put while it runs; the opt-in also waits for the stored choice it starts from. */
-  const isAutoBundleSyncDisabled = !canSyncBundle || isAutoBundleSyncLoading || loading
-  const isContinueDisabled = !isValid || isAutoBundleSyncLoading || loading
-
-  const autoBundleHint = canSyncBundle
-    ? LL.BackupScreen.CloudBackup.autoBundleHint()
-    : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()
+  /** The backup commits the passphrase it was started with, so it stays put
+   *  while it runs. */
+  const isContinueDisabled = !isValid || loading
 
   return (
     <Screen preset="fixed">
@@ -88,61 +79,40 @@ export const CloudBackupScreen: React.FC = () => {
           </View>
 
           <View style={styles.formContainer}>
-            <CheckboxRow
-              label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
-              isChecked={isEncrypted}
-              onPress={toggleEncryption}
-              disabled={loading}
-              centered
-              {...testProps("encrypt-checkbox")}
-            />
+            <View style={styles.encryptionFields}>
+              <PasswordInput
+                label={LL.BackupScreen.CloudBackup.password()}
+                value={password}
+                onChangeText={setPassword}
+                onBlur={markPasswordTouched}
+                placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
+                error={passwordError}
+                disabled={loading}
+                {...testProps("cloud-password-input")}
+              />
+              <PasswordInput
+                label={LL.BackupScreen.CloudBackup.confirmPassword()}
+                value={confirmPassword}
+                onChangeText={setConfirmPassword}
+                onBlur={markConfirmPasswordTouched}
+                placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
+                error={confirmPasswordError}
+                disabled={loading}
+                {...testProps("cloud-confirm-password-input")}
+              />
 
-            {isEncrypted && (
-              <View style={styles.encryptionFields}>
-                <PasswordInput
-                  label={LL.BackupScreen.CloudBackup.password()}
-                  value={password}
-                  onChangeText={setPassword}
-                  onBlur={markPasswordTouched}
-                  placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
-                  error={passwordError}
-                  disabled={loading}
-                  {...testProps("cloud-password-input")}
+              <InfoBanner
+                title={LL.BackupScreen.CloudBackup.importantTitle()}
+                icon="warning"
+                iconColor="warning"
+              >
+                <RichText
+                  text={LL.BackupScreen.CloudBackup.importantMessage({
+                    bold: `<bold>${LL.BackupScreen.CloudBackup.importantMessageBold()}</bold>`,
+                  })}
                 />
-                <PasswordInput
-                  label={LL.BackupScreen.CloudBackup.confirmPassword()}
-                  value={confirmPassword}
-                  onChangeText={setConfirmPassword}
-                  onBlur={markConfirmPasswordTouched}
-                  placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
-                  error={confirmPasswordError}
-                  disabled={loading}
-                  {...testProps("cloud-confirm-password-input")}
-                />
-
-                <InfoBanner
-                  title={LL.BackupScreen.CloudBackup.importantTitle()}
-                  icon="warning"
-                  iconColor="warning"
-                >
-                  <RichText
-                    text={LL.BackupScreen.CloudBackup.importantMessage({
-                      bold: `<bold>${LL.BackupScreen.CloudBackup.importantMessageBold()}</bold>`,
-                    })}
-                  />
-                </InfoBanner>
-              </View>
-            )}
-
-            <CheckboxRow
-              label={LL.BackupScreen.CloudBackup.autoBundleCheckbox()}
-              isChecked={autoBundleSync}
-              onPress={toggleAutoBundleSync}
-              disabled={isAutoBundleSyncDisabled}
-              centered
-              {...testProps("auto-bundle-checkbox")}
-            />
-            <Text style={styles.hint}>{autoBundleHint}</Text>
+              </InfoBanner>
+            </View>
           </View>
         </View>
 
@@ -160,7 +130,7 @@ export const CloudBackupScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(({ colors }) => ({
+const useStyles = makeStyles(() => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -173,12 +143,6 @@ const useStyles = makeStyles(({ colors }) => ({
     paddingTop: 20,
     gap: 14,
     alignItems: "center",
-  },
-  hint: {
-    fontSize: 14,
-    lineHeight: 18,
-    textAlign: "center",
-    color: colors.grey2,
   },
   encryptionFields: {
     gap: 0,

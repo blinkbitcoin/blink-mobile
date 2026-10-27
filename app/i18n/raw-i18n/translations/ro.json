@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",
       "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
-      "encryptCheckbox": "Adaugă o frază de acces suplimentară",
-      "autoBundleCheckbox": "Copii de rezervă automate",
-      "autoBundleHint": "Permite ieșirea unilaterală dacă operatorii Spark devin indisponibili.",
-      "autoBundleNeedsPassword": "Adaugă o frază de acces mai sus pentru a activa. Fără ea, copia de recuperare ar sta lângă o frază de recuperare neprotejată.",
       "password": "Frază de acces",
       "passwordPlaceholder": "(minim 12 caractere)",
       "confirmPassword": "Confirmă fraza de acces",

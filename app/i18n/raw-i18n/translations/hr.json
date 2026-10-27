@@ -3858,10 +3858,6 @@
     "CloudBackup": {
       "title": "Napravimo sigurnosnu kopiju vašeg novčanika",
       "description": "Spremit ćemo kopiju vaše sigurnosne fraze u vaš {provider}.",
-      "encryptCheckbox": "Dodaj dodatnu pristupnu frazu",
-      "autoBundleCheckbox": "Automatske sigurnosne kopije",
-      "autoBundleHint": "Omogućuje jednostrani izlazak ako Spark operateri postanu nedostupni.",
-      "autoBundleNeedsPassword": "Dodaj pristupnu frazu iznad da to omogućiš. Bez nje bi kopija za oporavak stajala uz nezaštićenu frazu za oporavak.",
       "password": "Pristupna fraza",
       "passwordPlaceholder": "(najmanje 12 znakova)",
       "confirmPassword": "Potvrdi pristupnu frazu",

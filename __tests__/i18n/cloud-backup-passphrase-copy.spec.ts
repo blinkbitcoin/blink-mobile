@@ -58,12 +58,6 @@ const localeFiles = fs
  * still pass if the copy regressed.
  */
 describe("cloud backup encryption passphrase copy", () => {
-  it("asks to add a passphrase rather than to encrypt with a password", () => {
-    expect(LL.BackupScreen.CloudBackup.encryptCheckbox()).toBe(
-      "Add additional passphrase",
-    )
-  })
-
   it("labels both entry fields as a passphrase", () => {
     expect(LL.BackupScreen.CloudBackup.password()).toBe("Passphrase")
     expect(LL.BackupScreen.CloudBackup.confirmPassword()).toBe("Confirm passphrase")

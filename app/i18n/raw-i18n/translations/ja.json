@@ -3858,10 +3858,6 @@
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
             "description": "{provider}にバックアップフレーズのコピーを保存します。",
-            "encryptCheckbox": "追加のパスフレーズを設定",
-            "autoBundleCheckbox": "自動バックアップ",
-            "autoBundleHint": "Spark のオペレーターが利用できなくなった場合の一方的な出金を可能にします。",
-            "autoBundleNeedsPassword": "有効にするには上でパスフレーズを設定してください。パスフレーズがないと、リカバリーバックアップが保護されていないバックアップフレーズの隣に保存されます。",
             "password": "パスフレーズ",
             "passwordPlaceholder": "（12文字以上）",
             "confirmPassword": "パスフレーズ確認",
