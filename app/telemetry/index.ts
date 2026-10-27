@@ -283,6 +283,7 @@ export {
   onTelemetrySuppressed,
   resolveTelemetryMode,
   TelemetryMode,
+  whenModeSettled,
   type SelfCustodialModeAnswer,
   type TelemetryModeInputs,
 } from "./mode"

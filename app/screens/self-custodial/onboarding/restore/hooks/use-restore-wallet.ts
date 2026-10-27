@@ -93,7 +93,7 @@ export const useRestoreWallet = () => {
           if (lookup.id) {
             activateAccount(lookup.id)
             reinitSdk()
-            logSelfCustodialRestoreCompleted()
+            logSelfCustodialRestoreCompleted({ accountId: lookup.id })
             navigation.navigate("selfCustodialBackupSuccess")
             return
           }
@@ -110,7 +110,7 @@ export const useRestoreWallet = () => {
 
           activateAccount(accountId)
           reinitSdk()
-          logSelfCustodialRestoreCompleted()
+          logSelfCustodialRestoreCompleted({ accountId })
 
           /**
            * An unanswered server leaves the question open, and so does a server that

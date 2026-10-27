@@ -4,8 +4,10 @@ import RNFS from "react-native-fs"
 import Crypto from "react-native-quick-crypto"
 
 import {
+  flushDeferredTelemetry,
   logSelfCustodialBackupCompleted,
   logSelfCustodialRestoreCompleted,
+  resetDeferredTelemetryForTesting,
   logSelfCustodialRolloutExposed,
   logSelfCustodialStableBalanceActivated,
 } from "@app/self-custodial/analytics"
@@ -46,6 +48,7 @@ describe("self-custodial analytics helpers", () => {
     resetDiagnosticsForTesting()
     resetOutboxCountersForTesting()
     resetEnablementForTesting()
+    resetDeferredTelemetryForTesting()
     setTelemetryRolloutEnabled(true)
     store = createOutboxStore(DIR)
     setActiveOutbox(store)
@@ -81,12 +84,66 @@ describe("self-custodial analytics helpers", () => {
   })
 
   describe("logSelfCustodialRestoreCompleted", () => {
-    it("emits 'self_custodial_restore_completed' with only the contract's common fields", () => {
-      logSelfCustodialRestoreCompleted()
+    // A restore logs straight after asking for the restored account to become active, while
+    // the mode is still the previous account's. The fact waits for the telemetry mount to
+    // report that its account is active and settled.
+    const RESTORED = "restored-account"
 
-      expect(
-        Object.keys(paramsSentFor("self_custodial_restore_completed") ?? {}).sort(),
-      ).toEqual(["event_version", "telemetry_event_id", "wallet_provider"])
+    it("emits nothing while its account is not active yet", () => {
+      logSelfCustodialRestoreCompleted({ accountId: RESTORED })
+
+      expect(logEvent).not.toHaveBeenCalled()
+    })
+
+    it("never reaches GA4, even if released while the device is custodial", async () => {
+      logSelfCustodialRestoreCompleted({ accountId: RESTORED })
+
+      flushDeferredTelemetry(RESTORED)
+
+      expect(logEvent).not.toHaveBeenCalled()
+      expect(await store.pending()).toEqual([])
+    })
+
+    it("lands in the outbox with only the contract's common fields once its account is Enhanced", async () => {
+      logSelfCustodialRestoreCompleted({ accountId: RESTORED })
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      flushDeferredTelemetry(RESTORED)
+
+      const [record] = await store.pending()
+      expect(record.event).toBe("self_custodial_restore_completed")
+      expect(Object.keys(record.payload).sort()).toEqual([
+        "event_version",
+        "telemetry_event_id",
+        "wallet_provider",
+      ])
+      expect(record.payload.wallet_provider).toBe("spark")
+      expect(logEvent).not.toHaveBeenCalled()
+    })
+
+    it("is dropped when its account comes up incognito", async () => {
+      logSelfCustodialRestoreCompleted({ accountId: RESTORED })
+      await resolveTelemetryMode(TelemetryMode.Anon)
+
+      flushDeferredTelemetry(RESTORED)
+
+      expect(await store.pending()).toEqual([])
+    })
+
+    it("waits for its own account, and is emitted exactly once", async () => {
+      let n = 0
+      randomUUID.mockImplementation(() => `00000000-0000-4000-8000-00000000000${++n}`)
+      logSelfCustodialRestoreCompleted({ accountId: RESTORED })
+      await resolveTelemetryMode(TelemetryMode.Enhanced)
+
+      flushDeferredTelemetry("some-other-account")
+      expect(await store.pending()).toEqual([])
+
+      flushDeferredTelemetry(RESTORED)
+      flushDeferredTelemetry(RESTORED)
+
+      randomUUID.mockImplementation(() => "00000000-0000-4000-8000-000000000000")
+      expect(await store.pending()).toHaveLength(1)
     })
   })
 
@@ -143,7 +200,8 @@ describe("self-custodial analytics helpers", () => {
         .mockReturnValueOnce("00000000-0000-4000-8000-000000000004")
 
       logSelfCustodialBackupCompleted({ backupMethod: "manual" })
-      logSelfCustodialRestoreCompleted()
+      logSelfCustodialRestoreCompleted({ accountId: "restored-account" })
+      flushDeferredTelemetry("restored-account")
       logSelfCustodialStableBalanceActivated({ label: "USDB" })
       logSelfCustodialRolloutExposed({
         nonCustodialEnabled: true,
@@ -165,7 +223,8 @@ describe("self-custodial analytics helpers", () => {
       await resolveTelemetryMode(TelemetryMode.Unresolved)
       logEvent.mockClear()
 
-      logSelfCustodialRestoreCompleted()
+      logSelfCustodialRestoreCompleted({ accountId: "restored-account" })
+      flushDeferredTelemetry("restored-account")
 
       expect(logEvent).not.toHaveBeenCalled()
       expect(await store.pending()).toEqual([])

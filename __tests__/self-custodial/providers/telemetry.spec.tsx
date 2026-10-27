@@ -6,6 +6,10 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import analytics from "@react-native-firebase/analytics"
 import RNFS from "react-native-fs"
 
+import {
+  logSelfCustodialRestoreCompleted,
+  resetDeferredTelemetryForTesting,
+} from "@app/self-custodial/analytics"
 import { telemetryOutboxDirFor } from "@app/self-custodial/config"
 import { SelfCustodialTelemetryMount } from "@app/self-custodial/providers/telemetry"
 import {
@@ -711,6 +715,39 @@ describe("SelfCustodialTelemetryMount", () => {
       await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
 
       expect(resetAnalyticsData).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("a restore logged before the account it activates is active", () => {
+    beforeEach(() => {
+      resetDeferredTelemetryForTesting()
+    })
+
+    it("files the restore under the restored account, and never hands it to GA4", async () => {
+      // A custodial user restores a self-custodial wallet: the hook activates it and logs in
+      // the same tick, before the switch has rendered.
+      mockActiveAccount = { id: "custodial-default", type: AccountType.Custodial }
+      // No drain, so the record stays where it was filed rather than going to the relay.
+      mockConnectedAccountId = null
+      const view = render(<SelfCustodialTelemetryMount />)
+      await waitFor(() => expect(getTelemetryMode()).toBe(TelemetryMode.Custodial))
+      const logEvent = analytics().logEvent as jest.Mock
+      logEvent.mockClear()
+
+      logSelfCustodialRestoreCompleted({ accountId: ACCOUNT_ID })
+      mockActiveAccount = { id: ACCOUNT_ID, type: AccountType.SelfCustodial }
+      view.rerender(<SelfCustodialTelemetryMount />)
+
+      await waitFor(async () => {
+        const queued = await createOutboxStore(DIR).pending()
+        expect(queued.map((record) => record.event)).toContain(
+          TelemetryEvent.RestoreCompleted,
+        )
+      })
+      expect(logEvent).not.toHaveBeenCalledWith(
+        TelemetryEvent.RestoreCompleted,
+        expect.anything(),
+      )
     })
   })
 

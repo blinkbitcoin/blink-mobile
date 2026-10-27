@@ -26,6 +26,7 @@ import {
   setEmissionListener,
   setTelemetryRolloutEnabled,
   TelemetryMode,
+  whenModeSettled,
   type SelfCustodialModeAnswer,
 } from "@app/telemetry"
 import { onKillSwitchEngaged } from "@app/telemetry/enablement"
@@ -38,6 +39,7 @@ import {
   telemetryOutboxParentDirFor,
   telemetryRelayUrlFor,
 } from "../config"
+import { flushDeferredTelemetry } from "../analytics"
 import { useSelfCustodialAccountMode } from "../hooks/use-self-custodial-account-mode"
 import { useSparkNetwork } from "../hooks/use-spark-network"
 import { refreshTelemetryKillSwitch } from "../lnurl-telemetry-config"
@@ -217,6 +219,22 @@ export const SelfCustodialTelemetryMount: React.FC = () => {
   useEffect(() => {
     resolveTelemetryMode(mode)
   }, [mode])
+
+  /**
+   * Facts held until their account is active — a restore logs before the switch it asks
+   * for has applied. Declared after the resolution above, so the settle it waits on
+   * includes this account's mode.
+   */
+  useEffect(() => {
+    if (!accountId) return undefined
+    let current = true
+    whenModeSettled().then(() => {
+      if (current) flushDeferredTelemetry(accountId)
+    })
+    return () => {
+      current = false
+    }
+  }, [accountId, mode])
 
   const sdkConnectedForAccount = Boolean(accountId) && connectedAccountId === accountId
   const walletOnline = status !== ActiveWalletStatus.Offline
