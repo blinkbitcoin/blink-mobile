@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback, useRef, useState } from "react"
 
 import { useFocusEffect } from "@react-navigation/native"
 
@@ -102,6 +102,25 @@ type RecoveryBundleStatusResult = {
   reload: () => Promise<void>
 }
 
+type SavedBundle = {
+  /** The account and network this read belongs to; null before any read lands. */
+  forTarget: string | null
+  savedAt: number | null
+  savedTotalSats: string | null
+  leafCount: number | null
+  cloudSyncedAt: number | null
+  exportedAt: number | null
+}
+
+const NO_SAVED_BUNDLE: SavedBundle = {
+  forTarget: null,
+  savedAt: null,
+  savedTotalSats: null,
+  leafCount: null,
+  cloudSyncedAt: null,
+  exportedAt: null,
+}
+
 /**
  * Freshness of the saved recovery bundle, shared by the settings chip and the
  * home nudge so the two can never disagree about whether a backup is current.
@@ -113,24 +132,12 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
   const { activeAccount } = useAccountRegistry()
   const { wallets } = useActiveWallet()
   const network = useSparkNetwork()
-  const [saved, setSaved] = useState<{
-    loaded: boolean
-    savedAt: number | null
-    savedTotalSats: string | null
-    leafCount: number | null
-    cloudSyncedAt: number | null
-    exportedAt: number | null
-  }>({
-    loaded: false,
-    savedAt: null,
-    savedTotalSats: null,
-    leafCount: null,
-    cloudSyncedAt: null,
-    exportedAt: null,
-  })
+  const [saved, setSaved] = useState<SavedBundle>(NO_SAVED_BUNDLE)
+  const latestRead = useRef(0)
 
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+  const target = accountId === null ? null : `${accountId}:${network}`
 
   /** wallets here is WalletState (MoneyAmount balances), not the GraphQL
    *  WalletBalance that getBtcWallet takes; this mirrors use-payment-request. */
@@ -139,43 +146,37 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     btcWallet === undefined ? null : String(btcWallet.balance.amount)
 
   const reload = useCallback(async () => {
+    latestRead.current += 1
+    const read = latestRead.current
     if (!accountId) {
-      setSaved({
-        loaded: false,
-        savedAt: null,
-        savedTotalSats: null,
-        leafCount: null,
-        cloudSyncedAt: null,
-        exportedAt: null,
-      })
+      setSaved(NO_SAVED_BUNDLE)
       return
     }
+    let next: SavedBundle
     try {
       const [state, settings] = await Promise.all([
         readRecoveryBundleState(accountId, network),
         readRecoveryBundleSettings(accountId),
       ])
-      setSaved({
-        loaded: true,
+      next = {
+        forTarget: target,
         savedAt: state?.savedAt ?? null,
         savedTotalSats: state?.totalSats ?? null,
         leafCount: state?.leafCount ?? null,
         cloudSyncedAt: state?.cloudSyncedAt ?? null,
         exportedAt: settings.exportedAt,
-      })
+      }
     } catch {
       /** An unreadable state file is indistinguishable from no backup, and the
        *  honest reading of "we cannot confirm you have one" is Missing. */
-      setSaved({
-        loaded: true,
-        savedAt: null,
-        savedTotalSats: null,
-        leafCount: null,
-        cloudSyncedAt: null,
-        exportedAt: null,
-      })
+      next = { ...NO_SAVED_BUNDLE, forTarget: target }
     }
-  }, [accountId, network])
+    /** A read overtaken by a newer one is dropped: after an account switch a
+     *  slow read for the previous account would otherwise land last and show
+     *  its backup against the new account's balance. */
+    const isLatestRead = read === latestRead.current
+    if (isLatestRead) setSaved(next)
+  }, [accountId, network, target])
 
   /** Re-read on focus, which also covers the mount for both consumers: they are
    *  screens, and useFocusEffect runs its callback from its own effect when the
@@ -189,26 +190,30 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     }, [reload]),
   )
 
-  const status =
-    !accountId || !saved.loaded
-      ? RecoveryBundleStatus.Unknown
-      : statusFor({
-          savedAt: saved.savedAt,
-          savedTotalSats: saved.savedTotalSats,
-          currentTotalSats,
-          now: Date.now(),
-        })
+  /** Until the active account's own read lands, a previous account's bundle
+   *  says nothing about this one, so it reads as Unknown. */
+  const isReadForTarget = target !== null && saved.forTarget === target
+  const current = isReadForTarget ? saved : NO_SAVED_BUNDLE
+
+  const status = isReadForTarget
+    ? statusFor({
+        savedAt: current.savedAt,
+        savedTotalSats: current.savedTotalSats,
+        currentTotalSats,
+        now: Date.now(),
+      })
+    : RecoveryBundleStatus.Unknown
 
   const isOnlyOnThisDevice =
     status !== RecoveryBundleStatus.Unknown &&
     status !== RecoveryBundleStatus.Missing &&
-    saved.exportedAt === null &&
-    saved.cloudSyncedAt === null
+    current.exportedAt === null &&
+    current.cloudSyncedAt === null
 
   return {
     status,
-    savedAt: saved.savedAt,
-    leafCount: saved.leafCount,
+    savedAt: current.savedAt,
+    leafCount: current.leafCount,
     isOnlyOnThisDevice,
     hasNothingToRecover: currentTotalSats === "0",
     reload,
