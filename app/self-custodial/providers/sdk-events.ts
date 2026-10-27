@@ -33,14 +33,18 @@ export const extractPaymentId = (event: PaymentEvent): string | null =>
   extractPayment(event)?.id ?? null
 
 /**
- * The settled payment an event carries, when it carries one. Typed loosely on the way in
+ * The payment an event carries, when it carries one. Typed loosely on the way in
  * (the SDK's event union arrives as a tag plus unknown inner) and returned as the full
- * payment so observers can read direction and method, not only the id.
+ * payment so observers can read direction, method and status, not only the id.
  */
 export const extractObservedPayment = (event: PaymentEvent): Payment | null => {
   const payment = extractPayment(event)
   if (!payment) return null
-  if (typeof payment.paymentType !== "number" || typeof payment.method !== "number") {
+  if (
+    typeof payment.paymentType !== "number" ||
+    typeof payment.method !== "number" ||
+    typeof payment.status !== "number"
+  ) {
     return null
   }
   return payment

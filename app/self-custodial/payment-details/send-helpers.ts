@@ -34,7 +34,14 @@ import {
   prepareSend,
   syncSelfCustodialWallet,
 } from "../bridge"
-import { measure, ScEvent, type ScEventParams, type ScRail } from "../measurement"
+import {
+  measure,
+  measureSettlement,
+  ScEvent,
+  type ScEventParams,
+  type ScRail,
+  type SettlementTelemetry,
+} from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 type PrepareParams = {
@@ -55,6 +62,15 @@ export type SendTelemetry = {
 const telemetryParams = ({ rail, sendingWallet }: SendTelemetry): ScEventParams => ({
   rail,
   sending_wallet: sendingWallet,
+})
+
+/** A send settles or fails once, by the SDK's word; `alsoSettled` rides on the settle. */
+export const sendSettlement = (
+  params: ScEventParams,
+  alsoSettled: SettlementTelemetry["settled"] = [],
+): SettlementTelemetry => ({
+  settled: [{ event: ScEvent.PaymentSendSettled, params }, ...alsoSettled],
+  failed: { event: ScEvent.PaymentSendFailed, params },
 })
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
@@ -156,8 +172,8 @@ export const createSendMutation = (
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared)
-      measure(ScEvent.PaymentSendSettled, telemetryParams(telemetry))
+      const response = await executeSend(params.sdk, prepared)
+      measureSettlement(response?.payment, sendSettlement(telemetryParams(telemetry)))
       return { status: PaymentSendResult.Success }
     } catch (err) {
       measure(ScEvent.PaymentSendFailed, {
@@ -181,8 +197,8 @@ export const createSendMutationOnchain = (
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
-      measure(ScEvent.PaymentSendSettled, telemetryParams(telemetry))
+      const response = await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
+      measureSettlement(response?.payment, sendSettlement(telemetryParams(telemetry)))
       return { status: PaymentSendResult.Success }
     } catch (err) {
       measure(ScEvent.PaymentSendFailed, {

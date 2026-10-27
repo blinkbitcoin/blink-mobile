@@ -1,11 +1,7 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import {
-  PaymentType,
-  SdkEvent_Tags as SdkEventTags,
-  type BreezSdkInterface,
-} from "@breeztech/breez-sdk-spark-react-native"
+import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
@@ -25,7 +21,7 @@ import {
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
-import { measureOnce, ScEvent, scRailForPaymentMethod } from "../measurement"
+import { measureObservedPayment } from "../measurement"
 import {
   extractObservedPayment,
   extractPaymentId,
@@ -243,22 +239,17 @@ export const useSdkLifecycle = (
 
       const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
+
+        /** Ahead of the refresh filter: a failed send is not a refresh event, but it is
+         *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
+        const observedPayment = extractObservedPayment(event)
+        if (observedPayment) measureObservedPayment(observedPayment)
+
         if (!REFRESH_EVENTS.has(event.tag)) return
 
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
           const paymentId = extractPaymentId(event)
           if (paymentId) setLastReceivedPaymentId(paymentId)
-        }
-
-        /** A succeeded receive is a settle the wallet observed, whichever screen was up
-         *  — and none need have been, for payments that landed while the app was away.
-         *  Deduped by id; gated to Enhanced inside measureOnce. */
-        if (event.tag === SdkEventTags.PaymentSucceeded) {
-          const payment = extractObservedPayment(event)
-          if (payment && payment.paymentType === PaymentType.Receive) {
-            const rail = scRailForPaymentMethod(payment.method)
-            if (rail) measureOnce(payment.id, ScEvent.PaymentReceived, { rail })
-          }
         }
         await refreshWallets()
       })

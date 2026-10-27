@@ -52,4 +52,12 @@ describe("getTelemetryInstanceId", () => {
 
     await expect(getTelemetryInstanceId()).resolves.not.toBe(first)
   })
+
+  it("tries storage again after a failed read instead of caching the failure", async () => {
+    const AsyncStorage = jest.requireMock("@react-native-async-storage/async-storage")
+    AsyncStorage.getItem.mockImplementationOnce(() => Promise.reject(new Error("busy")))
+
+    await expect(getTelemetryInstanceId()).rejects.toThrow("busy")
+    await expect(getTelemetryInstanceId()).resolves.toMatch(/^[0-9a-f-]{36}$/)
+  })
 })

@@ -1,5 +1,10 @@
 /* eslint-disable camelcase */
-import { PaymentMethod } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  PaymentMethod,
+  PaymentStatus,
+  PaymentType,
+  type Payment,
+} from "@breeztech/breez-sdk-spark-react-native"
 import analytics from "@react-native-firebase/analytics"
 
 import { AccountMode } from "@app/types/account"
@@ -135,4 +140,109 @@ export const measureOnce = (
 
 export const resetMeasuredOnceKeys = (): void => {
   measuredOnceKeys.clear()
+}
+
+/** The error code a send or swap reports when the SDK announces its failure after the
+ *  call that dispatched it had already returned: there is no error object to classify. */
+export const SETTLEMENT_FAILED_CODE = "sc_settlement_failed"
+
+type MeasuredEvent = { event: ScEvent; params?: ScEventParams }
+
+/** What a dispatched payment reports once its outcome is known: every event in
+ *  `settled` on completion, `failed` (with an error code) on failure. */
+export type SettlementTelemetry = {
+  settled: ReadonlyArray<MeasuredEvent>
+  failed: MeasuredEvent
+}
+
+type TerminalStatus = PaymentStatus.Completed | PaymentStatus.Failed
+
+/** Bounded like the dedupe set; a payment that never resolves (an app killed mid-send,
+ *  an SDK that suppresses its event) is dropped, never counted. */
+const SETTLEMENT_TRACK_CAP = 200
+const awaitingOutcome = new Map<string, SettlementTelemetry>()
+const observedOutcomes = new Map<string, TerminalStatus>()
+
+const remember = <V>(map: Map<string, V>, key: string, value: V) => {
+  if (map.size >= SETTLEMENT_TRACK_CAP) {
+    const oldest = map.keys().next().value
+    if (oldest !== undefined) map.delete(oldest)
+  }
+  map.set(key, value)
+}
+
+const emitOutcome = (
+  paymentId: string,
+  status: TerminalStatus,
+  telemetry: SettlementTelemetry,
+) => {
+  if (status === PaymentStatus.Completed) {
+    telemetry.settled.forEach(({ event, params }) =>
+      measureOnce(`${paymentId}:${event}`, event, params),
+    )
+    return
+  }
+  const { event, params } = telemetry.failed
+  measureOnce(`${paymentId}:${event}`, event, {
+    ...params,
+    error_code: SETTLEMENT_FAILED_CODE,
+  })
+}
+
+/**
+ * Reports a send or swap by what the SDK says happened to it, not by the call returning:
+ * `sendPayment` hands a payment back as soon as it is dispatched (a BOLT11 send waits for
+ * nothing, an onchain one is only broadcast), so a pending payment is held until the
+ * SDK's own success or failure event for it arrives through `measureObservedPayment`.
+ * That event can also beat the call's return, so an outcome seen first is kept too.
+ */
+export const measureSettlement = (
+  payment: Pick<Payment, "id" | "status"> | undefined,
+  telemetry: SettlementTelemetry,
+): void => {
+  /** Telemetry never turns a send into a failure: a response without a payment reports
+   *  nothing rather than throwing into the send path. */
+  if (!payment) return
+  if (payment.status !== PaymentStatus.Pending) {
+    emitOutcome(payment.id, payment.status, telemetry)
+    return
+  }
+  const observed = observedOutcomes.get(payment.id)
+  if (observed !== undefined) {
+    observedOutcomes.delete(payment.id)
+    emitOutcome(payment.id, observed, telemetry)
+    return
+  }
+  remember(awaitingOutcome, payment.id, telemetry)
+}
+
+/**
+ * A payment the SDK announced, whichever screen was up — and none need have been, for
+ * payments that landed while the app was away. A completed receive is a settle the
+ * wallet observed (railed coarsely: a settled payment's method does not tell BOLT11 from
+ * LNURL-pay); a send's terminal status resolves the send that dispatched it.
+ */
+export const measureObservedPayment = (payment: Payment): void => {
+  const { id, status, paymentType } = payment
+  if (status === PaymentStatus.Pending) return
+
+  if (paymentType === PaymentType.Receive) {
+    if (status !== PaymentStatus.Completed) return
+    const rail = scRailForPaymentMethod(payment.method)
+    if (rail) measureOnce(id, ScEvent.PaymentReceived, { rail })
+    return
+  }
+
+  const awaiting = awaitingOutcome.get(id)
+  if (awaiting) {
+    awaitingOutcome.delete(id)
+    emitOutcome(id, status, awaiting)
+    return
+  }
+  remember(observedOutcomes, id, status)
+}
+
+export const resetSettlementTracking = (): void => {
+  awaitingOutcome.clear()
+  observedOutcomes.clear()
 }

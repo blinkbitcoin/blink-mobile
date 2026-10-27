@@ -23,7 +23,13 @@ let inflight: Promise<string> | null = null
  * The promise itself is cached, so concurrent first callers share one mint.
  */
 export const getTelemetryInstanceId = (): Promise<string> => {
-  if (!inflight) inflight = resolveOrCreate()
+  if (!inflight) {
+    /** A failed read is not cached: the next caller tries again. */
+    inflight = resolveOrCreate().catch((err) => {
+      inflight = null
+      throw err
+    })
+  }
   return inflight
 }
 

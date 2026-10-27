@@ -10,12 +10,20 @@ import {
   createSendMutationOnchain,
   findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import {
+  measureObservedPayment,
+  resetMeasuredOnceKeys,
+  resetMeasurementContext,
+  resetSettlementTracking,
+  setMeasurementContext,
+} from "@app/self-custodial/measurement"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import { AccountMode } from "@app/types/account"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
 const mockPrepareSendPayment = jest.fn()
 
-const telemetry = { rail: "lightning", sendingWallet: WalletCurrency.Btc }
+const telemetry = { rail: "bolt11", sendingWallet: WalletCurrency.Btc }
 const telemetryOnchain = { rail: "onchain", sendingWallet: WalletCurrency.Btc }
 const mockSendPayment = jest.fn()
 
@@ -83,6 +91,11 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
 
 jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
   FeeTierOption: { Fast: "fast", Medium: "medium", Slow: "slow" },
+}))
+
+const mockLogEvent = jest.fn()
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
 
 const mockRecordError = jest.fn()
@@ -1026,5 +1039,149 @@ describe("findLostSend", () => {
     const found = await settle(lookup())
 
     expect(found).toEqual({ status: "not-found" })
+  })
+})
+
+describe("send telemetry", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const SEND = 0
+
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+  const sentPayment = (status: number) => ({ payment: { id: "pay-1", status } })
+  const observe = (status: number) =>
+    measureObservedPayment({
+      id: "pay-1",
+      status,
+      paymentType: SEND,
+      method: 0,
+    } as never)
+
+  const sendBolt11 = () =>
+    createSendMutation(
+      { sdk: mockSdk, paymentRequest: "lnbc1...", amount: undefined },
+      telemetry,
+    )()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+    })
+  })
+
+  afterAll(() => {
+    resetMeasurementContext()
+  })
+
+  it("reports a send the SDK completed as settled", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(COMPLETED))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith("sc_payment_send_settled", {
+      network: "mainnet",
+      rail: "bolt11",
+      sending_wallet: WalletCurrency.Btc,
+    })
+  })
+
+  it("holds a dispatched-but-pending send until the SDK settles it, once", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+
+    observe(COMPLETED)
+    observe(COMPLETED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+  })
+
+  it("reports a pending send the SDK later fails as failed, never settled", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await sendBolt11()
+    observe(FAILED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_failed",
+      expect.objectContaining({ rail: "bolt11", error_code: "sc_settlement_failed" }),
+    )
+  })
+
+  it("resolves a pending send whose outcome was announced before the call returned", async () => {
+    observe(COMPLETED)
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+  })
+
+  it("reports a send the SDK returned as failed as failed", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(FAILED))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+  })
+
+  it("reports a thrown send as failed with its classified code", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+
+    await sendBolt11()
+
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_failed",
+      expect.objectContaining({ error_code: SelfCustodialErrorCode.NetworkError }),
+    )
+  })
+
+  it("does not count a broadcast onchain send as settled", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: { tag: "BitcoinAddress", inner: {} },
+    })
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await createSendMutationOnchain(
+      { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
+      "medium",
+      telemetryOnchain,
+    )()
+
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+
+  it("still reports the send itself as sent when the SDK returns no payment", async () => {
+    mockSendPayment.mockResolvedValue(undefined)
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 })

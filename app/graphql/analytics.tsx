@@ -3,9 +3,10 @@ import { useEffect } from "react"
 import { gql } from "@apollo/client"
 import { useAnalyticsQuery } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
-import { usePersistentStateContext } from "@app/store/persistent-state"
-import { resolveActiveSelfCustodialId } from "@app/store/persistent-state/active-self-custodial-account"
-import analytics from "@react-native-firebase/analytics"
+import {
+  setCustodialIdentity,
+  setSharedUserProperties,
+} from "@app/self-custodial/analytics-identity"
 
 import { useIsAuthed } from "./is-authed-context"
 import { useLevel } from "./level-context"
@@ -25,7 +26,6 @@ gql`
 export const AnalyticsContainer = () => {
   const isAuthed = useIsAuthed()
   const level = useLevel()
-  const { persistentState } = usePersistentStateContext()
   const {
     appConfig: {
       galoyInstance: { name: galoyInstanceName },
@@ -37,40 +37,26 @@ export const AnalyticsContainer = () => {
     fetchPolicy: "cache-first",
   })
 
-  /** The custodial account id identifies GA4 only while custodial is active: a
-   *  self-custodial session reports under the per-install telemetry id (Enhanced) or
-   *  none at all (Incognito), both owned by useAnalyticsCollectionGate, and attaching
-   *  `me.id` there would join the two identities. The active account is a dependency so
-   *  switching back to custodial re-sets it. */
-  const isSelfCustodialActive = persistentState
-    ? Boolean(resolveActiveSelfCustodialId(persistentState))
-    : false
-
+  /** Identity is handed to its single owner, which attaches it only while the custodial
+   *  account is active: a self-custodial session reports under the per-install telemetry
+   *  id (Enhanced) or none at all (Incognito), on a separate GA4 app instance, and
+   *  attaching `me.id` there would join the two identities. */
   useEffect(() => {
-    if (isSelfCustodialActive) return
-    analytics().setUserProperty("hasUsername", data?.me?.username ? "true" : "false")
-  }, [data?.me?.username, isSelfCustodialActive])
-
-  useEffect(() => {
-    if (isSelfCustodialActive) return
-    if (data?.me?.id) {
-      analytics().setUserId(data?.me?.id)
-    }
-  }, [data?.me?.id, isSelfCustodialActive])
+    setCustodialIdentity({
+      userId: data?.me?.id,
+      hasUsername: Boolean(data?.me?.username),
+      accountLevel: level.currentLevel,
+    })
+  }, [data?.me?.id, data?.me?.username, level.currentLevel])
 
   useEffect(() => {
     if (data?.globals?.network) {
-      analytics().setUserProperties({ network: data.globals.network })
+      setSharedUserProperties({ network: data.globals.network })
     }
   }, [data?.globals?.network])
 
   useEffect(() => {
-    if (isSelfCustodialActive) return
-    analytics().setUserProperty("accountLevel", level.currentLevel)
-  }, [level, isSelfCustodialActive])
-
-  useEffect(() => {
-    analytics().setUserProperty("galoyInstance", galoyInstanceName)
+    setSharedUserProperties({ galoyInstance: galoyInstanceName })
   }, [galoyInstanceName])
 
   return null

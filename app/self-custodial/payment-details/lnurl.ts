@@ -43,10 +43,10 @@ import {
   toSdkSendAmount,
 } from "../bridge"
 import { isOwnLnurlAddress } from "../config"
-import { measure, ScEvent, ScRail } from "../measurement"
+import { measure, measureSettlement, ScEvent, ScRail } from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
-import { feeFailure, findLostSend } from "./send-helpers"
+import { feeFailure, findLostSend, sendSettlement } from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -259,6 +259,21 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     sending_wallet: sendingWalletDescriptor.currency,
   }
 
+  /** A payment to one of our own addresses is the inviter side of an Enhanced referral,
+   *  reported with the settle and only if the payment settles; the join to the
+   *  recipient's account creation is the server's, keyed on the address it serves. */
+  const sendSettlementTelemetry = sendSettlement(
+    sendTelemetry,
+    isOwnLnurlAddress(lnurlParams.identifier || lnurl)
+      ? [
+          {
+            event: ScEvent.BlinkPaymentSent,
+            params: { ...sendTelemetry, recipient_type: "blink_lightning_address" },
+          },
+        ]
+      : [],
+  )
+
   const sendFailure = (err: unknown) => {
     measure(ScEvent.PaymentSendFailed, {
       ...sendTelemetry,
@@ -280,18 +295,7 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     successAction: SuccessActionProcessed | undefined,
     status: PaymentSendResult,
   ) => {
-    if (status === PaymentSendResult.Success) {
-      measure(ScEvent.PaymentSendSettled, sendTelemetry)
-      /** A settled payment to one of our own addresses is the inviter side of an
-       *  Enhanced referral; the join to the recipient's account creation is the
-       *  server's, keyed on the address it serves. */
-      if (isOwnLnurlAddress(lnurlParams.identifier || lnurl)) {
-        measure(ScEvent.BlinkPaymentSent, {
-          ...sendTelemetry,
-          recipient_type: "blink_lightning_address",
-        })
-      }
-    }
+    measureSettlement(payment, sendSettlementTelemetry)
     return {
       status,
       transaction: { createdAt: Number(payment.timestamp) },

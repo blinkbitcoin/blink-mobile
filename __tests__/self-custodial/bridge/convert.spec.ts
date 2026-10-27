@@ -12,6 +12,14 @@ import {
   createGetConversionQuote,
   mapAmountAdjustment,
 } from "@app/self-custodial/bridge/convert"
+import {
+  measureObservedPayment,
+  resetMeasuredOnceKeys,
+  resetMeasurementContext,
+  resetSettlementTracking,
+  setMeasurementContext,
+} from "@app/self-custodial/measurement"
+import { AccountMode } from "@app/types/account"
 
 const mockFetchLimits = jest.fn()
 const mockRequireTokenId = jest.fn(() => "usdb-token-id")
@@ -20,6 +28,11 @@ const mockRecordError = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
   default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+}))
+
+const mockLogEvent = jest.fn()
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
 
 jest.mock("@app/self-custodial/bridge/limits", () => {
@@ -402,5 +415,84 @@ describe("mapAmountAdjustment", () => {
     expect(mapAmountAdjustment(AmountAdjustmentReason.IncreasedToAvoidDust)).toBe(
       ConvertAmountAdjustment.IncreasedToAvoidDust,
     )
+  })
+})
+
+describe("swap telemetry", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const SEND = 0
+
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+  const params = {
+    fromAmount: toBtcMoneyAmount(5000),
+    toAmount: toUsdMoneyAmount(137),
+    direction: ConvertDirection.BtcToUsd,
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+    mockFetchLimits.mockResolvedValue({ minFromAmount: 1000, minToAmount: 0 })
+  })
+
+  afterAll(() => {
+    resetMeasurementContext()
+  })
+
+  it("logs nothing for fetching a quote: a fetched quote is not a shown one", async () => {
+    await createGetConversionQuote(createSdk() as never)(params)
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+
+  it("reports a conversion the SDK completed, with its source", async () => {
+    const sdk = createSdk()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "cv-1", status: COMPLETED } })
+
+    const quote = await createGetConversionQuote(sdk as never)({
+      ...params,
+      source: "auto_convert",
+    })
+    await quote!.execute()
+
+    expect(mockLogEvent).toHaveBeenCalledWith("sc_swap_completed", {
+      network: "mainnet",
+      direction: ConvertDirection.BtcToUsd,
+      source: "auto_convert",
+    })
+  })
+
+  it("holds a pending conversion until the SDK says how it ended", async () => {
+    const sdk = createSdk()
+    sdk.sendPayment.mockResolvedValue({ payment: { id: "cv-1", status: PENDING } })
+
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    const result = await quote!.execute()
+
+    expect(result.status).toBe("success")
+    expect(mockLogEvent).not.toHaveBeenCalled()
+
+    measureObservedPayment({
+      id: "cv-1",
+      status: FAILED,
+      paymentType: SEND,
+      method: 0,
+    } as never)
+
+    expect(loggedEvents()).toEqual(["sc_swap_failed"])
+  })
+
+  it("reports a thrown conversion as failed", async () => {
+    const sdk = createSdk()
+    sdk.sendPayment.mockRejectedValue(new Error("send failed"))
+
+    const quote = await createGetConversionQuote(sdk as never)(params)
+    await quote!.execute()
+
+    expect(loggedEvents()).toEqual(["sc_swap_failed"])
   })
 })

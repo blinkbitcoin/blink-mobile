@@ -1,11 +1,20 @@
 /* eslint-disable camelcase */
-import { PaymentMethod } from "@breeztech/breez-sdk-spark-react-native"
+import { it } from "@jest/globals"
+import {
+  PaymentMethod,
+  PaymentStatus,
+  PaymentType,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   measure,
+  measureObservedPayment,
   measureOnce,
+  measureSettlement,
   resetMeasuredOnceKeys,
   resetMeasurementContext,
+  resetSettlementTracking,
+  SETTLEMENT_FAILED_CODE,
   scRailForPaymentMethod,
   setMeasurementContext,
   ScEvent,
@@ -110,4 +119,119 @@ describe("measureOnce", () => {
 
     expect(mockLogEvent).not.toHaveBeenCalled()
   })
+})
+
+describe("settlement", () => {
+  const swap = {
+    settled: [{ event: ScEvent.SwapCompleted, params: { direction: "BTCtoUSD" } }],
+    failed: { event: ScEvent.SwapFailed, params: { direction: "BTCtoUSD" } },
+  }
+  const sendPayment = (status: PaymentStatus) => ({
+    id: "pay-1",
+    status,
+    paymentType: PaymentType.Send,
+    method: PaymentMethod.Lightning,
+  })
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+  })
+
+  it("reports every settled event of a completed payment at once", () => {
+    measureSettlement(
+      { id: "pay-1", status: PaymentStatus.Completed },
+      {
+        settled: [
+          { event: ScEvent.PaymentSendSettled },
+          { event: ScEvent.BlinkPaymentSent },
+        ],
+        failed: { event: ScEvent.PaymentSendFailed },
+      },
+    )
+
+    expect(loggedEvents()).toEqual([ScEvent.PaymentSendSettled, ScEvent.BlinkPaymentSent])
+  })
+
+  it("holds a pending swap until the SDK announces it, then reports it once", () => {
+    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+    expect(mockLogEvent).not.toHaveBeenCalled()
+
+    measureObservedPayment(sendPayment(PaymentStatus.Pending) as never)
+    expect(mockLogEvent).not.toHaveBeenCalled()
+
+    measureObservedPayment(sendPayment(PaymentStatus.Completed) as never)
+    measureObservedPayment(sendPayment(PaymentStatus.Completed) as never)
+    expect(loggedEvents()).toEqual([ScEvent.SwapCompleted])
+  })
+
+  it("reports an announced failure with the settlement code", () => {
+    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+
+    measureObservedPayment(sendPayment(PaymentStatus.Failed) as never)
+
+    expect(mockLogEvent).toHaveBeenCalledWith(ScEvent.SwapFailed, {
+      network: "mainnet",
+      direction: "BTCtoUSD",
+      error_code: SETTLEMENT_FAILED_CODE,
+    })
+  })
+
+  it("keeps an outcome announced before the payment was handed back", () => {
+    measureObservedPayment(sendPayment(PaymentStatus.Failed) as never)
+
+    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+
+    expect(loggedEvents()).toEqual([ScEvent.SwapFailed])
+  })
+
+  it("reports nothing for a payment it was never asked about", () => {
+    measureObservedPayment(sendPayment(PaymentStatus.Completed) as never)
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+
+  it("respects the gate when the outcome arrives", () => {
+    measureSettlement({ id: "pay-1", status: PaymentStatus.Pending }, swap)
+    setMeasurementContext({ mode: AccountMode.Anon, network: "mainnet" })
+
+    measureObservedPayment(sendPayment(PaymentStatus.Completed) as never)
+
+    expect(mockLogEvent).not.toHaveBeenCalled()
+  })
+})
+
+describe("observed receives", () => {
+  const receive = (status: PaymentStatus, method = PaymentMethod.Spark) =>
+    ({ id: "rx-1", status, paymentType: PaymentType.Receive, method }) as never
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({ mode: AccountMode.Enhanced, network: "mainnet" })
+  })
+
+  it("counts a completed receive once, on its coarse rail", () => {
+    measureObservedPayment(receive(PaymentStatus.Completed, PaymentMethod.Lightning))
+    measureObservedPayment(receive(PaymentStatus.Completed, PaymentMethod.Lightning))
+
+    expect(mockLogEvent).toHaveBeenCalledTimes(1)
+    expect(mockLogEvent).toHaveBeenCalledWith(ScEvent.PaymentReceived, {
+      network: "mainnet",
+      rail: ScRail.Lightning,
+    })
+  })
+
+  it.each([PaymentStatus.Pending, PaymentStatus.Failed])(
+    "does not count a receive in status %s",
+    (status) => {
+      measureObservedPayment(receive(status))
+
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    },
+  )
 })

@@ -27,7 +27,7 @@ import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts
 import { toNumber } from "@app/utils/helper"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
-import { measure, ScEvent } from "../measurement"
+import { measure, measureSettlement, ScEvent } from "../measurement"
 import { classifySdkError } from "../sdk-error"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
@@ -289,8 +289,15 @@ const executePrepared = async (
     source: params.source ?? "manual",
   }
   try {
-    await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
-    measure(ScEvent.SwapCompleted, swapTelemetry)
+    const response = await sdk.sendPayment(
+      SendPaymentRequest.create({ prepareResponse: prepared }),
+    )
+    /** By the SDK's word on the payment, as for sends: a conversion normally comes back
+     *  completed, and one that does not is held until its outcome is announced. */
+    measureSettlement(response?.payment, {
+      settled: [{ event: ScEvent.SwapCompleted, params: swapTelemetry }],
+      failed: { event: ScEvent.SwapFailed, params: swapTelemetry },
+    })
     return { status: PaymentResultStatus.Success }
   } catch (err) {
     measure(ScEvent.SwapFailed, { ...swapTelemetry, error_code: classifySdkError(err) })
@@ -319,12 +326,7 @@ export const createGetConversionQuote =
   async (params) => {
     try {
       const context = await prepareConversion(sdk, params)
-      const quote = toConvertQuote(sdk, context, params)
-      /** Auto-convert quotes are never shown, so only a manual one counts here. */
-      if (quote && params.source !== "auto_convert") {
-        measure(ScEvent.SwapQuoteShown, { direction: params.direction, source: "manual" })
-      }
-      return quote
+      return toConvertQuote(sdk, context, params)
     } catch (err) {
       recordConvertError(err, params, "getConversionQuote")
       throw err
