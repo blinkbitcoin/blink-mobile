@@ -539,6 +539,9 @@ describe("useRecoveryBundleActions", () => {
 
     it("handleSetAutoRefresh persists the flag for the account", async () => {
       const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
 
       await act(async () => {
         await result.current.handleSetAutoRefresh(false)
@@ -627,6 +630,9 @@ describe("useRecoveryBundleActions", () => {
 
     it("handleSetCloudSync(false) persists the opt-out without syncing", async () => {
       const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
 
       await act(async () => {
         await result.current.handleSetCloudSync(false)
@@ -641,7 +647,11 @@ describe("useRecoveryBundleActions", () => {
 
     it("reverts the toggle and toasts when persisting fails", async () => {
       mockWriteRecoveryBundleSettings.mockRejectedValue(new Error("disk full"))
+      mockReadRecoveryBundleState.mockResolvedValue(null)
       const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
 
       await act(async () => {
         await result.current.handleSetCloudSync(true)
@@ -652,6 +662,45 @@ describe("useRecoveryBundleActions", () => {
         expect.objectContaining({ message: "Could not save the setting" }),
       )
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("settings not read yet", () => {
+    it("reports the settings as loaded only once this account's own read lands", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      expect(result.current.settingsLoaded).toBe(false)
+
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      expect(result.current.settingsLoaded).toBe(true)
+    })
+
+    it("ignores a toggle before this account's settings have been read", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleSetAutoRefresh(false)
+      })
+
+      expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
+      expect(result.current.settings.autoRefresh).toBe(true)
+    })
+
+    it("keeps the switches unwritable while a failed read leaves the defaults showing", async () => {
+      mockReadRecoveryBundleSettings.mockRejectedValue(new Error("unreadable"))
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      await act(async () => {
+        await result.current.handleSetCloudSync(true)
+      })
+
+      expect(result.current.settingsLoaded).toBe(false)
+      expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
     })
   })
 
@@ -902,6 +951,34 @@ describe("useRecoveryBundleActions account switch", () => {
 
     expect(mockReadRecoveryBundleState).toHaveBeenCalledTimes(2)
     expect(result.current.bundleState).toEqual(otherState)
+  })
+
+  it("ignores a toggle after a switch until the new account's settings land", async () => {
+    const otherRead = deferred<typeof otherSettings>()
+    mockReadRecoveryBundleSettings
+      .mockResolvedValueOnce({ autoRefresh: true, cloudSync: false })
+      .mockReturnValueOnce(otherRead.promise)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    let reading: Promise<void> = Promise.resolve()
+    await act(async () => {
+      reading = result.current.reloadState()
+    })
+    await act(async () => {
+      await result.current.handleSetAutoRefresh(false)
+    })
+
+    expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
+    await act(async () => {
+      otherRead.resolve(otherSettings)
+      await reading
+    })
+    expect(result.current.settings).toEqual(otherSettings)
   })
 
   it("keeps the new account's settings when the previous account's write fails after the switch", async () => {

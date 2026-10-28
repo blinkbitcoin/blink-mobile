@@ -71,6 +71,9 @@ export type RecoveryBundleActions = {
   /** undefined while the first read is in flight, null when no bundle saved. */
   bundleState: RecoveryBundleState | null | undefined
   settings: RecoveryBundleSettings
+  /** False until the active account's own settings have been read. Until
+   *  then `settings` holds the defaults as a placeholder, not stored values. */
+  settingsLoaded: boolean
   refreshing: boolean
   uploading: boolean
   sharing: boolean
@@ -278,6 +281,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
 
   const persistSettings = async (next: RecoveryBundleSettings) => {
     if (!accountId) return
+    /** The switches write the whole object, so one built on the placeholder
+     *  would replace the stored value of the switch the user did not touch. */
+    if (!isSettingsReadForTarget) return
     const forTarget = targetFor(accountId, network)
     const previous = settings
     setSettingsRead({ forTarget, value: next })
@@ -393,6 +399,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   return {
     bundleState,
     settings,
+    settingsLoaded: isSettingsReadForTarget,
     refreshing,
     uploading,
     sharing: exportAction === "share",
