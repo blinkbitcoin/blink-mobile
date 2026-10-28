@@ -115,13 +115,11 @@ jest.mock(
   }),
 )
 
-const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
+const mockDeleteWallet = jest
+  .fn()
+  .mockResolvedValue({ removed: false, outcome: "remained" })
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
-  useDeleteAccount: () => ({
-    state: "idle",
-    error: null,
-    deleteWallet: mockDeleteWallet,
-  }),
+  useDeleteAccount: () => ({ deleteWallet: mockDeleteWallet }),
 }))
 
 const mockUseSelfCustodialWallet = jest.fn()
@@ -166,6 +164,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       common: { anonymousUser: () => "Anon user" },
       SelfCustodialDelete: {
+        removalFailed: ({ identifier }: { identifier: string }) =>
+          `Couldn't remove account ${identifier}. Please try again.`,
         dangerZoneImportantTitle: () => "Important",
         dangerZoneBulletReinstated: () => "Deleted account cannot be reinstated",
         dangerZoneBulletPermanent: () => "Account deletion is permanent",

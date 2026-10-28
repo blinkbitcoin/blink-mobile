@@ -21,6 +21,10 @@ jest.mock("@app/i18n/i18n-react", () => ({
         removedAccount: ({ identifier }: { identifier: string }) =>
           `You removed account ${identifier}.`,
       },
+      SelfCustodialDelete: {
+        removalFailed: ({ identifier }: { identifier: string }) =>
+          `Couldn't remove account ${identifier}. Please try again.`,
+      },
     },
   }),
 }))
@@ -32,11 +36,7 @@ jest.mock("@app/utils/toast", () => ({
 
 const mockDeleteWallet = jest.fn()
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
-  useDeleteAccount: () => ({
-    state: "idle",
-    error: null,
-    deleteWallet: mockDeleteWallet,
-  }),
+  useDeleteAccount: () => ({ deleteWallet: mockDeleteWallet }),
 }))
 
 const mockSetAccountIsBeingDeleted = jest.fn()
@@ -77,7 +77,7 @@ describe("useAccountRemoval", () => {
       lockedWhenDeleteStarted = mockSetAccountIsBeingDeleted.mock.calls.some(
         ([isBeingDeleted, identifier]) => isBeingDeleted && identifier === "Anon user",
       )
-      return "switched-to-self-custodial"
+      return { removed: true, outcome: "switched-to-self-custodial" }
     })
     const { result } = renderHook(() => useAccountRemoval())
 
@@ -89,7 +89,10 @@ describe("useAccountRemoval", () => {
   })
 
   it("navigates away and names the removed account without dropping the lock first", async () => {
-    mockDeleteWallet.mockResolvedValue("switched-to-self-custodial")
+    mockDeleteWallet.mockResolvedValue({
+      removed: true,
+      outcome: "switched-to-self-custodial",
+    })
     const { result } = renderHook(() => useAccountRemoval())
 
     act(() => result.current.requestRemoval("account-a", "Anon user"))
@@ -105,8 +108,8 @@ describe("useAccountRemoval", () => {
     expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
   })
 
-  it("releases the lock and stays put when the removal fails", async () => {
-    mockDeleteWallet.mockResolvedValue(undefined)
+  it("releases the lock, stays put and says so when an inactive account fails to go", async () => {
+    mockDeleteWallet.mockResolvedValue({ removed: false, outcome: "remained" })
     const { result } = renderHook(() => useAccountRemoval())
 
     act(() => result.current.requestRemoval("account-a", "Anon user"))
@@ -115,11 +118,39 @@ describe("useAccountRemoval", () => {
     expect(mockSetAccountIsBeingDeleted).toHaveBeenLastCalledWith(false)
     expect(mockNavigate).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
-    expect(mockToastShow).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        message: "Couldn't remove account Anon user. Please try again.",
+      }),
+    )
+  })
+
+  /** The active account moved before the failure, so staying would leave the user on a
+   *  screen that already describes the next account. */
+  it("follows the switch a failed removal already made, and says it failed", async () => {
+    mockDeleteWallet.mockResolvedValue({
+      removed: false,
+      outcome: "switched-to-self-custodial",
+    })
+    const { result } = renderHook(() => useAccountRemoval())
+
+    act(() => result.current.requestRemoval("account-a", "Anon user"))
+    await act(() => result.current.runPendingRemoval())
+
+    expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        message: "Couldn't remove account Anon user. Please try again.",
+      }),
+    )
   })
 
   it("runs a confirmed removal once, even if the modal reports hiding again", async () => {
-    mockDeleteWallet.mockResolvedValue("remained")
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "remained" })
     const { result } = renderHook(() => useAccountRemoval())
 
     act(() => result.current.requestRemoval("account-a", "Anon user"))
@@ -137,7 +168,10 @@ describe("useAccountRemoval", () => {
       navigate()
       navigatedThroughLock = mockNavigate.mock.calls.length === 1
     })
-    mockDeleteWallet.mockResolvedValue("switched-to-self-custodial")
+    mockDeleteWallet.mockResolvedValue({
+      removed: true,
+      outcome: "switched-to-self-custodial",
+    })
     const { result } = renderHook(() => useAccountRemoval())
 
     act(() => result.current.requestRemoval("account-a", "Anon user"))

@@ -24,7 +24,8 @@ type UseAccountRemovalResult = {
  * The delete hook switches the active account before it wipes the removed one, so the
  * screen behind it starts describing the next account while the removal is still running.
  * The removal therefore waits for the confirm modal to finish closing, runs under an opaque
- * lock that names the account being removed, and says which account went once it lands.
+ * lock that names the account being removed, and says which account went once it lands,
+ * or that it could not be removed.
  */
 export const useAccountRemoval = (): UseAccountRemovalResult => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -43,19 +44,25 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     if (!removal) return
     pendingRemoval.current = null
 
-    setAccountIsBeingDeleted(true, removal.identifier)
-    const outcome = await deleteWallet(removal.accountId)
-    if (!outcome) {
+    const { identifier } = removal
+    setAccountIsBeingDeleted(true, identifier)
+    const { removed, outcome } = await deleteWallet(removal.accountId)
+
+    /** A failure that switched nothing leaves this screen accurate, so the user stays and
+     *  can retry. Otherwise the active account has already moved, even when the removal
+     *  failed, so the screen is left the way a removal leaves it. The lock is not dropped
+     *  first: that would flash the already-switched screen during the transition. */
+    if (!removed && outcome === "remained") {
       setAccountIsBeingDeleted(false)
-      return
+    } else {
+      leaveWhileDeleting(() => navigateAfterAccountDelete(navigation, outcome))
     }
 
-    /** No release on success: every outcome navigates this screen away, and dropping the
-     *  lock first would flash the already-switched screen during the transition. */
-    leaveWhileDeleting(() => navigateAfterAccountDelete(navigation, outcome))
     toastShow({
-      type: "success",
-      message: LL.ProfileScreen.removedAccount({ identifier: removal.identifier }),
+      type: removed ? "success" : "error",
+      message: removed
+        ? LL.ProfileScreen.removedAccount({ identifier })
+        : LL.SelfCustodialDelete.removalFailed({ identifier }),
       LL,
     })
   }, [deleteWallet, setAccountIsBeingDeleted, leaveWhileDeleting, navigation, LL])

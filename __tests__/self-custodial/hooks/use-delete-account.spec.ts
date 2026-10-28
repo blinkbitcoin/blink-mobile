@@ -1,9 +1,12 @@
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
-import { renderHook, act, waitFor } from "@testing-library/react-native"
+import { renderHook, act } from "@testing-library/react-native"
 
 import { AccountStatus, AccountType, DefaultAccountId } from "@app/types/wallet"
 
-import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
+import {
+  type DeleteAccountResult,
+  useDeleteAccount,
+} from "@app/self-custodial/hooks/use-delete-account"
 
 const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
@@ -111,19 +114,12 @@ describe("useDeleteAccount", () => {
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
 
-  it("starts in idle state with no error", () => {
-    const { result } = renderHook(() => useDeleteAccount())
-
-    expect(result.current.state).toBe("idle")
-    expect(result.current.error).toBeNull()
-  })
-
   it("disconnects SDK, wipes mnemonic, and returns 'logged-out' when no fallback account exists", async () => {
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
     expect(mockDisconnectSdk).toHaveBeenCalledWith(mockSdk)
@@ -131,8 +127,7 @@ describe("useDeleteAccount", () => {
     expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockRemoveBackupStateFor).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockUpdateState).toHaveBeenCalled()
-    expect(outcome).toBe("logged-out")
-    expect(result.current.state).toBe("idle")
+    expect(deletion).toEqual({ removed: true, outcome: "logged-out" })
   })
 
   it("wipes the active network's storage directory, not a hardcoded one, when deleting on mainnet", async () => {
@@ -153,13 +148,13 @@ describe("useDeleteAccount", () => {
     mockUseHasCustodialAccount.mockReturnValue(true)
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
     expect(mockSetActiveAccountId).toHaveBeenCalledWith(DefaultAccountId.Custodial)
-    expect(outcome).toBe("switched-to-custodial")
+    expect(deletion).toEqual({ removed: true, outcome: "switched-to-custodial" })
   })
 
   it("switches to a remaining self-custodial account and returns 'switched-to-self-custodial'", async () => {
@@ -177,13 +172,13 @@ describe("useDeleteAccount", () => {
 
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
     expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-self-custodial-id")
-    expect(outcome).toBe("switched-to-self-custodial")
+    expect(deletion).toEqual({ removed: true, outcome: "switched-to-self-custodial" })
   })
 
   it("returns 'remained' when deleting a non-active self-custodial account", async () => {
@@ -200,58 +195,104 @@ describe("useDeleteAccount", () => {
 
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet("other-id")
+      deletion = await result.current.deleteWallet("other-id")
     })
 
     expect(mockDisconnectSdk).not.toHaveBeenCalled()
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith("other-id")
-    expect(outcome).toBe("remained")
+    expect(deletion).toEqual({ removed: true, outcome: "remained" })
   })
 
   it("skips disconnect when sdk is null but still wipes the mnemonic and returns an outcome", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({ sdk: null })
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
     expect(mockDisconnectSdk).not.toHaveBeenCalled()
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
-    expect(outcome).toBe("logged-out")
+    expect(deletion).toEqual({ removed: true, outcome: "logged-out" })
   })
 
   it("does not abort the flow when disconnectSdk rejects (logs and continues)", async () => {
     mockDisconnectSdk.mockRejectedValue(new Error("disconnect failed"))
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
     expect(mockCrashlyticsLog).toHaveBeenCalled()
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalled()
-    expect(outcome).toBe("logged-out")
-    expect(result.current.state).toBe("idle")
+    expect(deletion).toEqual({ removed: true, outcome: "logged-out" })
   })
 
-  it("captures the error and returns undefined when deleteMnemonicForAccount fails", async () => {
+  it("reports the error and a failed removal when deleteMnemonicForAccount fails", async () => {
     mockDeleteMnemonicForAccount.mockRejectedValue(new Error("storage error"))
     const { result } = renderHook(() => useDeleteAccount())
 
-    let outcome: string | undefined
+    let deletion: DeleteAccountResult | undefined
     await act(async () => {
-      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
-    await waitFor(() => expect(result.current.state).toBe("error"))
-    expect(result.current.error?.message).toBe("storage error")
-    expect(mockReportError).toHaveBeenCalled()
-    expect(outcome).toBeUndefined()
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Self-custodial wallet delete",
+      expect.objectContaining({ message: "storage error" }),
+    )
+    expect(deletion).toEqual({ removed: false, outcome: "logged-out" })
+  })
+
+  /** The switch lands before the step that fails, so the caller has to be told about it
+   *  to follow it rather than stay on a screen that already describes the next account. */
+  it("still reports the switch it made when a later step fails", async () => {
+    const remaining = {
+      ...activeSelfCustodialAccount,
+      id: "other-self-custodial-id",
+      selected: false,
+    }
+    mockUseAccountRegistry.mockReturnValue({
+      accounts: [activeSelfCustodialAccount, remaining],
+      activeAccount: activeSelfCustodialAccount,
+      setActiveAccountId: mockSetActiveAccountId,
+      reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+    })
+    mockRemoveSelfCustodialAccountId.mockRejectedValue(new Error("index write failed"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let deletion: DeleteAccountResult | undefined
+    await act(async () => {
+      deletion = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockSetActiveAccountId).toHaveBeenCalledWith("other-self-custodial-id")
+    expect(deletion).toEqual({ removed: false, outcome: "switched-to-self-custodial" })
+  })
+
+  it("reports that nothing switched when removing an inactive account fails", async () => {
+    const otherAccount = { ...activeSelfCustodialAccount, id: "other-id" }
+    mockUseAccountRegistry.mockReturnValue({
+      accounts: [activeSelfCustodialAccount, otherAccount],
+      activeAccount: activeSelfCustodialAccount,
+      setActiveAccountId: mockSetActiveAccountId,
+      reloadSelfCustodialAccounts: mockReloadSelfCustodialAccounts,
+    })
+    mockDeleteMnemonicForAccount.mockRejectedValue(new Error("storage error"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let deletion: DeleteAccountResult | undefined
+    await act(async () => {
+      deletion = await result.current.deleteWallet("other-id")
+    })
+
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+    expect(deletion).toEqual({ removed: false, outcome: "remained" })
   })
 
   it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref", async () => {

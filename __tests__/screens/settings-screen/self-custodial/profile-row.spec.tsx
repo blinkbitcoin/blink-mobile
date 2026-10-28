@@ -185,7 +185,9 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: jest.fn(),
 }))
 
-const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
+const mockDeleteWallet = jest
+  .fn()
+  .mockResolvedValue({ removed: false, outcome: "remained" })
 const mockUseDeleteAccount = jest.fn()
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
   useDeleteAccount: () => mockUseDeleteAccount(),
@@ -202,8 +204,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
         removedAccount: ({ identifier }: { identifier: string }) =>
           `You removed account ${identifier}.`,
       },
+      SelfCustodialDelete: {
+        removalFailed: ({ identifier }: { identifier: string }) =>
+          `Couldn't remove account ${identifier}. Please try again.`,
+      },
       AccountScreen: {
-        pleaseWait: () => "Please wait",
         probeBalanceFailed: () => "Couldn't verify the wallet's balance.",
       },
       common: {
@@ -223,10 +228,7 @@ describe("ProfileRow", () => {
     lastWarningModalProps.isVisible = undefined
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
-    mockUseDeleteAccount.mockReturnValue({
-      state: "idle",
-      deleteWallet: mockDeleteWallet,
-    })
+    mockUseDeleteAccount.mockReturnValue({ deleteWallet: mockDeleteWallet })
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: {
         id: "current-custodial-id",
@@ -608,7 +610,10 @@ describe("ProfileRow", () => {
       wallets: [],
     })
     rerender(<ProfileRow entry={entry} />)
-    mockDeleteWallet.mockResolvedValueOnce("switched-to-self-custodial")
+    mockDeleteWallet.mockResolvedValueOnce({
+      removed: true,
+      outcome: "switched-to-self-custodial",
+    })
 
     await act(async () => {
       await lastConfirmModalProps.onModalHide?.()

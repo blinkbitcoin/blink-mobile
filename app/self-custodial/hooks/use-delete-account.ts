@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
@@ -16,44 +16,66 @@ import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-type DeleteState = "idle" | "deleting" | "error"
-
+/** Where the active account ended up. `remained` means it was not the one removed. */
 export type DeleteAccountOutcome =
   | "remained"
   | "switched-to-self-custodial"
   | "switched-to-custodial"
   | "logged-out"
 
-type DeleteAccountResult = {
-  state: DeleteState
-  error: Error | null
-  deleteWallet: (accountId: string) => Promise<DeleteAccountOutcome | undefined>
+/** The switch happens before anything that can fail, so a failed removal still reports
+ *  it: the caller has to follow the switch either way, or leave the user on a screen that
+ *  already describes the next account. */
+export type DeleteAccountResult = {
+  removed: boolean
+  outcome: DeleteAccountOutcome
 }
 
-export const useDeleteAccount = (): DeleteAccountResult => {
+const outcomeOf = ({
+  isActive,
+  hasRemainingSelfCustodial,
+  hasCustodialAccount,
+}: {
+  isActive: boolean
+  hasRemainingSelfCustodial: boolean
+  hasCustodialAccount: boolean
+}): DeleteAccountOutcome => {
+  if (!isActive) return "remained"
+  if (hasRemainingSelfCustodial) return "switched-to-self-custodial"
+  if (hasCustodialAccount) return "switched-to-custodial"
+  return "logged-out"
+}
+
+type UseDeleteAccountResult = {
+  deleteWallet: (accountId: string) => Promise<DeleteAccountResult>
+}
+
+export const useDeleteAccount = (): UseDeleteAccountResult => {
   const { sdk } = useSelfCustodialWallet()
   const { accounts, activeAccount, setActiveAccountId, reloadSelfCustodialAccounts } =
     useAccountRegistry()
   const { updateState } = usePersistentStateContext()
   const hasCustodialAccount = useHasCustodialAccount()
 
-  const [state, setState] = useState<DeleteState>("idle")
-  const [error, setError] = useState<Error | null>(null)
   const network = useSparkNetwork()
 
   const deleteWallet = useCallback(
-    async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
-      setState("deleting")
-      setError(null)
+    async (accountId: string): Promise<DeleteAccountResult> => {
+      const isActive =
+        activeAccount?.type === AccountType.SelfCustodial &&
+        activeAccount.id === accountId
+
+      const remainingSelfCustodial = accounts.find(
+        (a) => a.type === AccountType.SelfCustodial && a.id !== accountId,
+      )
+
+      const outcome = outcomeOf({
+        isActive,
+        hasRemainingSelfCustodial: Boolean(remainingSelfCustodial),
+        hasCustodialAccount,
+      })
+
       try {
-        const isActive =
-          activeAccount?.type === AccountType.SelfCustodial &&
-          activeAccount.id === accountId
-
-        const remainingSelfCustodial = accounts.find(
-          (a) => a.type === AccountType.SelfCustodial && a.id !== accountId,
-        )
-
         /**
          * Switch the active account before disconnecting the SDK so
          * useSdkLifecycle tears down via its own effect cleanup. Disconnecting
@@ -88,18 +110,11 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()
 
-        setState("idle")
-
-        if (!isActive) return "remained"
-        if (remainingSelfCustodial) return "switched-to-self-custodial"
-        if (hasCustodialAccount) return "switched-to-custodial"
-        return "logged-out"
+        return { removed: true, outcome }
       } catch (err) {
         const wrapped = err instanceof Error ? err : new Error(String(err))
         reportError("Self-custodial wallet delete", wrapped)
-        setState("error")
-        setError(wrapped)
-        return undefined
+        return { removed: false, outcome }
       }
     },
     [
@@ -114,5 +129,5 @@ export const useDeleteAccount = (): DeleteAccountResult => {
     ],
   )
 
-  return { state, error, deleteWallet }
+  return { deleteWallet }
 }
