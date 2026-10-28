@@ -53,6 +53,8 @@ export const logSdkEvent = (level: SdkLogLevel, message: string): void => {
   logDispatch[level](`${LOG_PREFIX} ${message}`)
 }
 
+/** From 0.27.1 the SDK also sends `instanceId`, the wallet's identity public key. Only
+ *  level and line are read: the key is an identifier and must never reach Crashlytics. */
 type LogEntry = {
   level: string
   line: string

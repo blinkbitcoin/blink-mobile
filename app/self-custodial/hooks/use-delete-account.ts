@@ -5,8 +5,9 @@ import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { disconnectSdk } from "@app/self-custodial/bridge"
+import { disconnectSdk, waitForSdkIdle } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
+import { resetSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
@@ -17,6 +18,10 @@ import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 type DeleteState = "idle" | "deleting" | "error"
+
+/** How long a deletion waits for the wallet's SDK to finish connecting and shut down
+ *  before cutting the log anyway, and exporting nothing more this session. */
+export const SDK_TEARDOWN_TIMEOUT_MS = 15_000
 
 export type DeleteAccountOutcome =
   | "remained"
@@ -80,6 +85,17 @@ export const useDeleteAccount = (): DeleteAccountResult => {
           })
         }
 
+        /** The SDK log mixes every wallet's lines and can't say whose they are, so any
+         *  deletion resets it: once every SDK instance of the wallet is gone, a connect
+         *  still in flight from before the switch included, so it writes nothing past
+         *  the cut; and before the wallet goes, so a stop in between still leaves the
+         *  reset to finish. It rejects only when it could neither record nor do the
+         *  reset, and then the wallet is kept. */
+        const isSdkIdle = await waitForSdkIdle(
+          storageDirFor(accountId, network),
+          SDK_TEARDOWN_TIMEOUT_MS,
+        )
+        await resetSdkLogs({ readNothingThisSession: !isSdkIdle })
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
           crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)

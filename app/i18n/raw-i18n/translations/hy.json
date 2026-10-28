@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Ողջույն: Խնդրում եմ փակեք իմ հաշիվը: Իմ հեռախոսահամարն է {phoneNumber: string}:",
     "deleteAccountError": "Սխալ։ Կապ հաստատեք {email: string} հետագա աջակցության համար։ ",
     "bye": "Հաջողությու՛ն։ ",
-    "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:"
+    "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Դուք չեք կարող առավելագույն չափը գերազանցող գումար ուղարկել",

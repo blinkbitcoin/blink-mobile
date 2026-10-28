@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Nkulamusizza! Nkusaba oggalawo akawunti yange. Ennamba yange ey'essimu ye {phoneNumber: string}.",
     "deleteAccountError": "Waliwo ekitatambudde bulungi. Tukirira {email: string} okufuna obuyambi.",
     "bye": "Tweelaba!",
-    "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira."
+    "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Tosobola kusindika ssente ezisukka mu muwendo ogusinga obunene",

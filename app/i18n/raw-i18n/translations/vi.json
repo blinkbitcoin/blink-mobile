@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Xin chào!, vui lòng đóng tài khoản của tôi. Số điện thoại của tôi là {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật."
+    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",

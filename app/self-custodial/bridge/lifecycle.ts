@@ -2,7 +2,6 @@ import {
   Seed,
   connect,
   defaultConfig,
-  initLogging,
   MaxFee,
   MaxOnchainFee,
   type BreezSdkInterface,
@@ -27,22 +26,9 @@ import {
   SparkToken,
   storageDirFor,
 } from "../config"
+import { startSdkLogger } from "../diagnostics/sdk-log-files"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
-import { createSdkLogListener } from "../logging"
 import { addSelfCustodialAccountId } from "../storage/account-index"
-
-const initializeLogging = (() => {
-  let done = false
-  return () => {
-    if (done) return
-    done = true
-    try {
-      initLogging(undefined, createSdkLogListener(), undefined)
-    } catch {
-      // initLogging can fail if called after SDK state changes; non-fatal
-    }
-  }
-})()
 
 const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
   const config = defaultConfig(network)
@@ -93,20 +79,91 @@ type InitSdkParams = {
   leewaySatPerVbyte: number
 }
 
+/**
+ * SDK instances per wallet storage directory, still connecting or live. Every one of them
+ * writes to the shared log, so a wallet being deleted keeps adding its lines until all of
+ * its instances are gone, including a connect that was in flight when the deletion began.
+ * Deletion waits for that before cutting the log (`waitForSdkIdle`).
+ */
+type SdkPresence = {
+  connecting: number
+  live: Set<BreezSdkInterface>
+  idleWaiters: Array<() => void>
+}
+const presenceByStorageDir = new Map<string, SdkPresence>()
+const storageDirBySdk = new WeakMap<BreezSdkInterface, string>()
+
+const presenceFor = (storageDir: string): SdkPresence => {
+  let presence = presenceByStorageDir.get(storageDir)
+  if (!presence) {
+    presence = { connecting: 0, live: new Set(), idleWaiters: [] }
+    presenceByStorageDir.set(storageDir, presence)
+  }
+  return presence
+}
+
+const isIdle = ({ connecting, live }: SdkPresence): boolean =>
+  connecting === 0 && live.size === 0
+
+const notifyIfIdle = (presence: SdkPresence): void => {
+  if (!isIdle(presence)) return
+  const waiters = presence.idleWaiters.splice(0)
+  waiters.forEach((resolve) => resolve())
+}
+
+/**
+ * Resolves true once no SDK instance for `storageDir` is connecting or connected, or false
+ * after `timeoutMs`: a connect can hang on the network, and a deletion must not hang with
+ * it. An instance whose disconnect failed never counts as gone.
+ */
+export const waitForSdkIdle = (
+  storageDir: string,
+  timeoutMs: number,
+): Promise<boolean> => {
+  const presence = presenceFor(storageDir)
+  if (isIdle(presence)) return Promise.resolve(true)
+  return new Promise((resolve) => {
+    const onIdle = () => {
+      clearTimeout(timer)
+      resolve(true)
+    }
+    const timer = setTimeout(() => {
+      presence.idleWaiters = presence.idleWaiters.filter((waiter) => waiter !== onIdle)
+      resolve(false)
+    }, timeoutMs)
+    presence.idleWaiters.push(onIdle)
+  })
+}
+
 export const initSdk = async ({
   mnemonic,
   storageDir,
   network,
   leewaySatPerVbyte,
 }: InitSdkParams): Promise<BreezSdkInterface> => {
-  initializeLogging()
-  const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
-  const config = createSdkConfig(network, leewaySatPerVbyte)
-  return connect({ config, seed, storageDir })
+  const presence = presenceFor(storageDir)
+  presence.connecting += 1
+  try {
+    await startSdkLogger()
+    const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
+    const config = createSdkConfig(network, leewaySatPerVbyte)
+    const sdk = await connect({ config, seed, storageDir })
+    presence.live.add(sdk)
+    storageDirBySdk.set(sdk, storageDir)
+    return sdk
+  } finally {
+    presence.connecting -= 1
+    notifyIfIdle(presence)
+  }
 }
 
 export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
   await sdk.disconnect()
+  const storageDir = storageDirBySdk.get(sdk)
+  if (storageDir === undefined) return
+  const presence = presenceFor(storageDir)
+  presence.live.delete(sdk)
+  notifyIfIdle(presence)
 }
 
 export const addSdkEventListener = (

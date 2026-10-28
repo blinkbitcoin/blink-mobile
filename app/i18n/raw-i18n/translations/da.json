@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Hej! Luk venligst min konto. Mit telefonnummer er {phoneNumber: string}.",
     "deleteAccountError": "Noget gik galt. Kontakt {email: string} for yderligere assistance.",
     "bye": "Farvel!",
-    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven."
+    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Du kan ikke sende mere end maks beløbet",

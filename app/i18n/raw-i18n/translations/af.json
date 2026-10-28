@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Hallo daar!, sluit asseblief my rekening. My telefoonnommer is {phoneNumber: string}.",
     "deleteAccountError": "Iets het foutgegaan. Kontak asseblief {email: string} vir verdere hulp. ",
     "bye": "Totsiens!",
-    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis."
+    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Jy kan nie meer as die maksimum bedrag stuur nie",
