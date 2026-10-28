@@ -1,3 +1,5 @@
+import { it } from "@jest/globals"
+
 import {
   SdkLogLevel,
   createSdkLogListener,
@@ -137,6 +139,26 @@ describe("createSdkLogListener", () => {
     expect(mockLog).not.toHaveBeenCalled()
     expect(mockRecordError).not.toHaveBeenCalled()
   })
+
+  it.each(["INFO", "WARN", "ERROR"])(
+    "never forwards the entry's instanceId (identity key) at %s",
+    (level) => {
+      const instanceId = "02".padEnd(66, "ab")
+      const fresh = loadFreshLoggingModule()
+
+      // the shape the 0.27.1 binding sends
+      const entry = { level, line: `${level} line`, instanceId }
+      fresh.createSdkLogListener().log(entry)
+
+      const forwarded = [...mockLog.mock.calls, ...mockRecordError.mock.calls]
+        .flat()
+        .map((arg) =>
+          arg instanceof Error ? `${arg.message} ${arg.stack}` : String(arg),
+        )
+      expect(forwarded.length).toBeGreaterThan(0)
+      expect(forwarded.join("\n")).not.toContain(instanceId)
+    },
+  )
 
   it("forwards other warnings normally", () => {
     const listener = createSdkLogListener()

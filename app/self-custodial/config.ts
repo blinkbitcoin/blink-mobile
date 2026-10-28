@@ -1,6 +1,6 @@
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import Config from "react-native-config"
-import { DocumentDirectoryPath } from "react-native-fs"
+import { CachesDirectoryPath, DocumentDirectoryPath } from "react-native-fs"
 
 import { LNURL_DOMAINS } from "@app/config/appinfo"
 import { type GaloyInstanceName } from "@app/config/galoy-instances"
@@ -76,6 +76,19 @@ export const mismatchedNetworkLabel = (
 
 export const storageDirFor = (accountId: string, network: Network): string =>
   `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
+
+/**
+ * Where the SDK writes `sdk.log`. One directory for the whole process, because the SDK
+ * logger is process-global rather than per account; under caches so the iOS backup
+ * skips it and Android's react-native-share provider (`cache-path "/"`) can share it.
+ */
+export const sdkLogDir = (): string => `${CachesDirectoryPath}/breez-sdk-logs`
+
+/** `sdk.log` is moved aside at launch once it passes this, so at most two files exist. */
+export const SDK_LOG_ROTATE_BYTES = 2 * 1024 * 1024
+
+/** Export cap: both files whole (2 x the rotate cap) plus room for one long session. */
+export const SDK_LOG_EXPORT_BYTES = 5 * 1024 * 1024
 
 // Validates BREEZ_API_KEY at SDK init (from `lifecycle.createSdkConfig`). A
 // missing key means the build is misconfigured (e.g. release minification

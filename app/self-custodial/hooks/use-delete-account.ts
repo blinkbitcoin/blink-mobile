@@ -7,6 +7,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
+import { deleteSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
@@ -86,6 +87,8 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
+        /** The log holds every wallet's payment history; it goes with the last one. */
+        if (!remainingSelfCustodial) await deleteSdkLogs()
         await reloadSelfCustodialAccounts()
 
         setState("idle")

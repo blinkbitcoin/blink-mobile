@@ -27,22 +27,45 @@ import {
   SparkToken,
   storageDirFor,
 } from "../config"
+import { prepareSdkLogDir } from "../diagnostics/sdk-log-files"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
-import { createSdkLogListener } from "../logging"
+import { createSdkLogListener, recordErrorOnce } from "../logging"
 import { addSelfCustodialAccountId } from "../storage/account-index"
 
-const initializeLogging = (() => {
-  let done = false
-  return () => {
-    if (done) return
-    done = true
+/**
+ * The SDK installs its logger once per process, so the file directory is decided here,
+ * at the first connect. A file that cannot be opened makes initLogging fail before it
+ * installs anything, the listener included, so it is retried without one: losing the
+ * file must not also lose the Crashlytics breadcrumbs.
+ */
+const startLogging = async (): Promise<void> => {
+  // prepareSdkLogDir does not reject; the catch keeps a future change from failing connects
+  const logDir = await prepareSdkLogDir().catch(() => undefined)
+  try {
+    initLogging(logDir, createSdkLogListener(), undefined)
+  } catch (err) {
+    // initLogging can fail if called after SDK state changes; non-fatal
+    if (logDir === undefined) return
     try {
       initLogging(undefined, createSdkLogListener(), undefined)
+      recordErrorOnce(
+        "sdk-log-file-init",
+        err instanceof Error ? err : new Error(String(err)),
+      )
     } catch {
-      // initLogging can fail if called after SDK state changes; non-fatal
+      // the retry failing too means the file was never the problem; non-fatal
     }
   }
-})()
+}
+
+/** Holds the promise rather than a flag: two connects racing (an account switch) must
+ *  share one initLogging call, and the flag would only be set after the first await. */
+let loggingStarted: Promise<void> | undefined
+
+const initializeLogging = (): Promise<void> => {
+  if (!loggingStarted) loggingStarted = startLogging()
+  return loggingStarted
+}
 
 const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
   const config = defaultConfig(network)
@@ -99,7 +122,7 @@ export const initSdk = async ({
   network,
   leewaySatPerVbyte,
 }: InitSdkParams): Promise<BreezSdkInterface> => {
-  initializeLogging()
+  await initializeLogging()
   const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
   const config = createSdkConfig(network, leewaySatPerVbyte)
   return connect({ config, seed, storageDir })
