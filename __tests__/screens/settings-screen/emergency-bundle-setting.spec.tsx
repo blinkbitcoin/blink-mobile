@@ -7,14 +7,12 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import type { TranslationFunctions } from "@app/i18n/i18n-types"
 import { EmergencyBundleSetting } from "@app/screens/settings-screen/settings/emergency-bundle"
-import { BackupStatus } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 
 let LL: TranslationFunctions
 
 const mockNavigate = jest.fn()
 const mockAccount = jest.fn()
-const mockBackupStatus = jest.fn()
 
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
@@ -34,10 +32,16 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockAccount() }),
 }))
 
-jest.mock("@app/self-custodial/providers/backup-state", () => ({
-  ...jest.requireActual("@app/self-custodial/providers/backup-state"),
-  useBackupState: () => ({ backupState: { status: mockBackupStatus() } }),
-}))
+/** No backup yet: the row must not depend on one. */
+jest.mock("@app/self-custodial/providers/backup-state", () => {
+  const actual = jest.requireActual("@app/self-custodial/providers/backup-state")
+  return {
+    ...actual,
+    useBackupState: () => ({
+      backupState: { status: actual.BackupStatus.None, method: null },
+    }),
+  }
+})
 
 const renderRow = () =>
   render(
@@ -55,7 +59,6 @@ describe("EmergencyBundleSetting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockAccount.mockReturnValue({ id: "a1", type: AccountType.SelfCustodial })
-    mockBackupStatus.mockReturnValue(BackupStatus.Completed)
   })
 
   /** The row must render nothing at all when hidden - not an empty wrapper -
@@ -66,13 +69,9 @@ describe("EmergencyBundleSetting", () => {
     expect(renderRow().toJSON()).toBeNull()
   })
 
-  it("renders nothing before the backup is completed", () => {
-    mockBackupStatus.mockReturnValue(BackupStatus.None)
-
-    expect(renderRow().toJSON()).toBeNull()
-  })
-
-  it("shows Emergency bundle once a self-custodial backup is completed", () => {
+  /** The bundle lives on the device whether or not the seed is backed up, so
+   *  the row does not wait for a backup. */
+  it("shows Emergency bundle on a self-custodial account with no backup yet", () => {
     const { getByText } = renderRow()
 
     expect(getByText(LL.BackupScreen.BundleExport.title())).toBeTruthy()

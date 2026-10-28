@@ -6,21 +6,19 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { AccountType } from "@app/types/wallet"
 
 import { SettingsRow } from "../row"
 
-// Same guards as BackupWalletSetting: the bundle screen offers the cloud backup
-// that keeps it current, which only makes sense once a backup exists.
+// Every self-custodial wallet keeps its bundle on the device, backed up or not,
+// so the row shows for all of them. A wallet that has never held funds has no
+// bundle yet; the screen says so and keeps Download disabled.
 export const EmergencyBundleSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
-  const { backupState } = useBackupState()
 
   if (activeAccount?.type !== AccountType.SelfCustodial) return null
-  if (backupState.status !== BackupStatus.Completed) return null
 
   return (
     <SettingsRow
