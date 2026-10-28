@@ -331,9 +331,9 @@ describe("useServerBulletinItems", () => {
       expect(Linking.openURL).not.toHaveBeenCalled()
     })
 
-    it("shows the spinner on the card being closed only, until the refetch is done", async () => {
+    it("shows the spinner on the card being closed only, until it is acknowledged", async () => {
       let release: () => void = () => {}
-      mockRefetchQueries.mockImplementationOnce(
+      mockAck.mockImplementationOnce(
         () =>
           new Promise<void>((resolve) => {
             release = resolve
@@ -355,6 +355,54 @@ describe("useServerBulletinItems", () => {
         release()
       })
       expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
+      expect(itemKeys(rendered)).toEqual(["server-other"])
+    })
+
+    /** The server has the acknowledgement: a refetch that never settles must not leave
+     *  the card spinning, nor the close guard held. */
+    it("takes the card out once acknowledged, without waiting for the refetch", async () => {
+      mockRefetchQueries.mockImplementationOnce(() => new Promise<void>(() => {}))
+      const rendered = renderItems([makeBulletin()])
+
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
+      await flushEffects()
+
+      expect(itemKeys(rendered)).toEqual([])
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
+    })
+
+    it("logs a failed refetch as a refresh failure, and keeps the card out", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockRefetchQueries.mockRejectedValueOnce(new Error("offline"))
+      const rendered = renderItems([makeBulletin()])
+
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
+      await flushEffects()
+
+      expect(itemKeys(rendered)).toEqual([])
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to refresh bulletins",
+        expect.any(Error),
+      )
+      expect(consoleError).not.toHaveBeenCalledWith(
+        "Failed to acknowledge notification",
+        expect.anything(),
+      )
+      consoleError.mockRestore()
+    })
+
+    /** With two closes in flight, the response the cache keeps can be one sent before
+     *  the second acknowledgement landed, which still lists that bulletin. */
+    it("keeps an acknowledged bulletin out when a stale response still lists it", async () => {
+      const a = makeBulletin({ id: "a", title: "A", createdAt: CUTOFF + 2 * HOUR })
+      const b = makeBulletin({ id: "b", title: "B" })
+      const rendered = renderItems([a, b])
+
+      fireEvent.press(rendered.getAllByTestId("icon-button-close")[1])
+      await flushEffects()
+      rendered.rerender(<Harness bulletins={makeBulletinsQuery([a, b])} />)
+
+      expect(itemKeys(rendered)).toEqual(["server-a"])
     })
 
     /** The carousel stays swipeable while a card closes, so a second close can start

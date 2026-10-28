@@ -63,8 +63,13 @@ export const useServerBulletinItems = ({
     () => new Set(),
   )
   const acknowledging = React.useRef(new Set<string>())
+  /** The bulletins acknowledged here, kept off the carousel whatever the cache says: a
+   *  refetch sent before a later acknowledgement landed still lists that bulletin, and
+   *  with concurrent closes it can be the response the cache ends up with. */
+  const [closedIds, setClosedIds] = React.useState<ReadonlySet<string>>(() => new Set())
 
-  /** Acknowledges a bulletin, then refetches, which takes its card out of the carousel. */
+  /** Acknowledges a bulletin, which takes its card out of the carousel at once, then
+   *  refetches in the background: a refetch that stalls or fails holds up no card. */
   const dismiss = React.useCallback(
     async (notificationId: string) => {
       if (acknowledging.current.has(notificationId)) return
@@ -72,13 +77,17 @@ export const useServerBulletinItems = ({
       setAcknowledgingIds(new Set(acknowledging.current))
       try {
         await ack({ variables: { input: { notificationId } } })
-        await client.refetchQueries({ include: [BulletinsDocument] })
+        setClosedIds((closed) => new Set(closed).add(notificationId))
       } catch (e) {
         console.error("Failed to acknowledge notification", e)
+        return
       } finally {
         acknowledging.current.delete(notificationId)
         setAcknowledgingIds(new Set(acknowledging.current))
       }
+      client
+        .refetchQueries({ include: [BulletinsDocument] })
+        .catch((e) => console.error("Failed to refresh bulletins", e))
     },
     [ack, client],
   )
@@ -86,7 +95,9 @@ export const useServerBulletinItems = ({
   const shownBulletins = selectCarouselBulletins({
     bulletins: (
       bulletins?.me?.unacknowledgedStatefulNotificationsWithBulletinEnabled?.edges ?? []
-    ).map(({ node }) => node),
+    )
+      .map(({ node }) => node)
+      .filter(({ id }) => !closedIds.has(id)),
     isPersistenceOn: persistentBulletinsEnabled,
     shownSince: bulletinsShownSince,
   })
