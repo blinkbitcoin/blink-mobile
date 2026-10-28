@@ -12758,31 +12758,13 @@ type RootTranslation = {
 			 */
 			title: string
 			/**
-			 * I​f​ ​y​o​u​ ​t​u​r​n​ ​o​n​ ​c​l​o​u​d​ ​b​a​c​k​u​p​s​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​w​i​l​l​ ​b​e​ ​u​p​d​a​t​e​d​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​n​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​ ​a​n​d​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​c​l​o​u​d​.​
-		​
-		​A​c​t​i​v​a​t​e​ ​n​o​w​ ​t​o​ ​e​n​a​b​l​e​ ​e​m​e​r​g​e​n​c​y​ ​e​x​i​t​.
+			 * E​m​e​r​g​e​n​c​y​ ​e​x​i​t
 			 */
-			bodyOnboarding: string
+			screenTitle: string
 			/**
-			 * A​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​ ​a​r​e​ ​t​u​r​n​e​d​ ​o​f​f​.​ ​T​u​r​n​ ​o​n​ ​n​o​w​ ​t​o​ ​e​n​a​b​l​e​ ​e​m​e​r​g​e​n​c​y​ ​e​x​i​t​.​
-		​
-		​I​f​ ​y​o​u​ ​t​u​r​n​ ​o​n​ ​a​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​w​i​l​l​ ​b​e​ ​u​p​d​a​t​e​d​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​n​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​ ​a​n​d​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​c​l​o​u​d​.
+			 * I​f​ ​S​p​a​r​k​ ​g​o​e​s​ ​d​o​w​n​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​n​c​h​a​i​n​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​c​a​n​'​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​.
 			 */
-			bodyBackupsOff: string
-			/**
-			 * A​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​ ​a​r​e​ ​t​u​r​n​e​d​ ​o​n​.​ ​T​h​i​s​ ​b​u​n​d​l​e​ ​i​s​ ​u​p​d​a​t​e​d​ ​a​f​t​e​r​ ​e​v​e​r​y​ ​n​e​w​ ​t​r​a​n​s​a​c​t​i​o​n​ ​a​n​d​ ​s​a​v​e​d​ ​t​o​ ​y​o​u​r​ ​c​l​o​u​d​.​
-		​
-		​I​f​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​a​t​t​e​m​p​t​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​e​x​i​t​,​ ​m​a​k​e​ ​s​u​r​e​ ​t​o​ ​u​s​e​ ​t​h​e​ ​l​a​t​e​s​t​ ​b​u​n​d​l​e​.
-			 */
-			bodyBackupsOn: string
-			/**
-			 * C​l​o​u​d​ ​b​a​c​k​u​p
-			 */
-			cloudBackup: string
-			/**
-			 * A​c​t​i​v​a​t​e​ ​b​a​c​k​u​p​s
-			 */
-			activateBackups: string
+			body: string
 			/**
 			 * R​e​a​d​ ​t​h​e​ ​c​a​s​e​ ​s​t​u​d​y
 			 */
@@ -12795,10 +12777,6 @@ type RootTranslation = {
 			 * D​o​w​n​l​o​a​d​ ​b​u​n​d​l​e
 			 */
 			download: string
-			/**
-			 * S​k​i​p
-			 */
-			skip: string
 			/**
 			 * S​e​n​s​i​t​i​v​e
 			 */
@@ -13557,10 +13535,6 @@ type RootTranslation = {
 		 * S​u​p​p​o​r​t
 		 */
 		outageSupport: string
-		/**
-		 * E​m​e​r​g​e​n​c​y​ ​r​e​c​o​v​e​r​y
-		 */
-		outageCta: string
 		/**
 		 * T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
 		 */
@@ -26947,31 +26921,13 @@ export type TranslationFunctions = {
 			 */
 			title: () => LocalizedString
 			/**
-			 * If you turn on cloud backups, this bundle will be updated after every new transaction and saved to your cloud.
-	
-		Activate now to enable emergency exit.
+			 * Emergency exit
 			 */
-			bodyOnboarding: () => LocalizedString
+			screenTitle: () => LocalizedString
 			/**
-			 * Automatic backups are turned off. Turn on now to enable emergency exit.
-	
-		If you turn on automatic backups, this bundle will be updated after every new transaction and saved to your cloud.
+			 * If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.
 			 */
-			bodyBackupsOff: () => LocalizedString
-			/**
-			 * Automatic backups are turned on. This bundle is updated after every new transaction and saved to your cloud.
-	
-		If you want to attempt the emergency exit, make sure to use the latest bundle.
-			 */
-			bodyBackupsOn: () => LocalizedString
-			/**
-			 * Cloud backup
-			 */
-			cloudBackup: () => LocalizedString
-			/**
-			 * Activate backups
-			 */
-			activateBackups: () => LocalizedString
+			body: () => LocalizedString
 			/**
 			 * Read the case study
 			 */
@@ -26984,10 +26940,6 @@ export type TranslationFunctions = {
 			 * Download bundle
 			 */
 			download: () => LocalizedString
-			/**
-			 * Skip
-			 */
-			skip: () => LocalizedString
 			/**
 			 * Sensitive
 			 */
@@ -27737,10 +27689,6 @@ export type TranslationFunctions = {
 		 * Support
 		 */
 		outageSupport: () => LocalizedString
-		/**
-		 * Emergency recovery
-		 */
-		outageCta: () => LocalizedString
 		/**
 		 * Try again later
 		 */

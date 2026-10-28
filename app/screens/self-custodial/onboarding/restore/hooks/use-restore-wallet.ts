@@ -33,8 +33,6 @@ import { reportError } from "@app/utils/error-logging"
 import { normalizeMnemonic } from "@app/utils/mnemonic"
 import { toastShow } from "@app/utils/toast"
 
-import { holdEmergencyPhrase } from "../emergency/emergency-phrase"
-
 const RestoreWalletStatus = {
   Idle: "idle",
   Restoring: "restoring",
@@ -134,14 +132,10 @@ export const useRestoreWallet = () => {
           setStatus(RestoreWalletStatus.Error)
           // An outage and a wrong phrase are indistinguishable inside this
           // catch, and the generic "check your phrase" toast sends an outage
-          // victim looking for a mistake they did not make. Only the operators
-          // being unreachable gets its own screen - which is also the only
-          // failure where emergency recovery is worth offering, since verifying
-          // a bundle against the phrase needs no network.
+          // victim looking for a mistake they did not make, so the operators
+          // being unreachable gets its own screen.
           if (classifySdkError(err) === SelfCustodialErrorCode.NetworkError) {
-            navigation.navigate("selfCustodialOperatorUnreachable", {
-              phraseHandle: holdEmergencyPhrase(normalized),
-            })
+            navigation.navigate("selfCustodialOperatorUnreachable")
             return
           }
           toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
