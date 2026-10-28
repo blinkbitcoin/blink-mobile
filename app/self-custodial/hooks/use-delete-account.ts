@@ -49,10 +49,15 @@ type DeleteAccountResult = {
 }
 
 /**
- * Erases one wallet from the device: its seed, its SDK storage on this network, its
- * recovery-bundle files on both networks and its backup record. The index entry is left to
- * the caller, which knows whether a wallet whose seed survived may still be dropped from the
- * list. Returns whether the seed itself was erased.
+ * Erases one wallet from the device: its seed, its index entry, its SDK storage on this
+ * network, its recovery-bundle files on both networks and its backup record. Returns whether
+ * the seed is gone.
+ *
+ * The index entry goes right after the seed and only with it. A wallet whose seed survived
+ * stays listed, so a later removal, the forgotten-PIN one included, finds it and tries again
+ * instead of reading an empty index as a device with nothing left to lock. What comes after
+ * is cleanup a failure leaves behind, so none of it can keep a wallet listed once its seed
+ * is gone, which a retry could never undo.
  *
  * The caller disconnects the SDK first, after moving the active account off this wallet, so
  * the SDK lifecycle tears down through its own effect cleanup.
@@ -61,14 +66,15 @@ export const eraseWalletFromDevice = async (
   accountId: string,
   network: Network,
 ): Promise<boolean> => {
-  let isResweepScheduled = false
   try {
     // Before sweeping: an in-flight bundle refresh must refuse to persist
     // its result, or the files would reappear after the sweep for an
     // account no longer in the registry.
     markAccountDeletedForRefresh(accountId)
 
-    const isMnemonicErased = await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+    const isSeedGone = await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
+    if (isSeedGone) await removeSelfCustodialAccountId(accountId)
+
     await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
       crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
     })
@@ -87,6 +93,9 @@ export const eraseWalletFromDevice = async (
       }
     }
     await sweepRecoveryBundleFiles()
+    await removeBackupStateFor(accountId).catch((err) => {
+      crashlytics().log(`[self-custodial delete] backup state cleanup failed: ${err}`)
+    })
     // A refresh already past its deleted-account check can still write
     // after the sweep above; once every in-flight run settles, sweep
     // again in the background so the deletion stays complete. Not
@@ -104,17 +113,14 @@ export const eraseWalletFromDevice = async (
         // once the mnemonic and registry entry are gone.
         unmarkAccountDeletedForRefresh(accountId)
       })
-    isResweepScheduled = true
-    await removeBackupStateFor(accountId)
-    return isMnemonicErased
+    return isSeedGone
   } catch (err) {
     /**
-     * Once scheduled, the background re-sweep drops the deletion mark. A
-     * failure before that point would leave the mark behind, and every
-     * later refresh of an account that may still be registered would be
-     * refused until the app restarts.
+     * The background re-sweep is what drops the deletion mark, and it is the last step, so
+     * a failure always lands before it is scheduled. Left behind, the mark would refuse
+     * every later refresh of an account that may still be registered until the app restarts.
      */
-    if (!isResweepScheduled) unmarkAccountDeletedForRefresh(accountId)
+    unmarkAccountDeletedForRefresh(accountId)
     throw err
   }
 }
@@ -169,18 +175,18 @@ export const useDeleteAccount = (): DeleteAccountResult => {
           })
         }
 
-        const isMnemonicErased = await eraseWalletFromDevice(accountId, network)
-        await removeSelfCustodialAccountId(accountId)
+        /** A seed that survived keeps its wallet listed, so nothing was deleted and the
+         *  owner is told so rather than shown a wallet gone that the device still holds. */
+        const isSeedGone = await eraseWalletFromDevice(accountId, network)
         await reloadSelfCustodialAccounts()
+        if (!isSeedGone) throw new Error("The wallet's seed survived its deletion")
 
         /**
          * Deleting the last account ends like a full logout, so the lock follows the same
          * rule (`canDropAppLock`): it goes once nothing it guards is left. Each question is
          * answered by the store that holds the thing, and each fails closed:
          *
-         * - The deleted wallet counts as gone only if its erase said so. Its index entry
-         *   goes either way, and a read-back cannot tell an absent key from an unreadable
-         *   one on either platform.
+         * - The wallets are asked of the index, which drops an entry only with its seed.
          * - The active token is read from the keychain, not the in-memory mirror, which
          *   `clearToken` and `resetState` blank whatever the keychain did.
          * - The saved profiles are asked on their own: a logout that preserved them leaves
@@ -206,7 +212,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
             (savedSessions.status === "found" && savedSessions.profiles.length === 0)
 
           const hasNothingLeftToGuard = canDropAppLock({
-            hasNoStoredWallet: isMnemonicErased && hasNoStoredWallet,
+            hasNoStoredWallet,
             hasNoSavedSession,
             hasNoActiveToken,
           })

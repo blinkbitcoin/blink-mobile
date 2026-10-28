@@ -15,7 +15,6 @@ const mockReadStoredWalletPresence = jest.fn()
 const mockClearAppLock = jest.fn()
 const mockReadSessionProfiles = jest.fn()
 const mockReadActiveToken = jest.fn()
-const mockGetMnemonicForAccount = jest.fn()
 const mockRemoveBackupStateFor = jest.fn()
 const mockDeleteRecoveryBundleFile = jest.fn()
 const mockRemoveRecoveryBundleState = jest.fn()
@@ -100,7 +99,6 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   default: {
     deleteMnemonicForAccount: (...args: unknown[]) =>
       mockDeleteMnemonicForAccount(...args),
-    getMnemonicForAccount: (...args: unknown[]) => mockGetMnemonicForAccount(...args),
     clearAppLock: () => mockClearAppLock(),
     readSessionProfiles: () => mockReadSessionProfiles(),
     readActiveToken: () => mockReadActiveToken(),
@@ -141,7 +139,6 @@ describe("useDeleteAccount", () => {
     mockClearAppLock.mockResolvedValue(true)
     mockReadSessionProfiles.mockResolvedValue({ status: "absent" })
     mockReadActiveToken.mockResolvedValue({ status: "absent" })
-    mockGetMnemonicForAccount.mockResolvedValue(null)
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
     mockDeleteRecoveryBundleFile.mockResolvedValue(undefined)
     mockRemoveRecoveryBundleState.mockResolvedValue(undefined)
@@ -432,13 +429,7 @@ describe("useDeleteAccount", () => {
     expect(result.current.state).toBe("error")
   })
 
-  it("keeps the deletion mark until the background re-sweep when a later step fails", async () => {
-    let settle: () => void = () => {}
-    mockWaitForRefreshesToSettle.mockReturnValue(
-      new Promise<void>((resolve) => {
-        settle = resolve
-      }),
-    )
+  it("drops the deletion mark and schedules no re-sweep when the index write fails", async () => {
     mockRemoveSelfCustodialAccountId.mockRejectedValue(new Error("index write failed"))
     const { result } = renderHook(() => useDeleteAccount())
 
@@ -447,18 +438,93 @@ describe("useDeleteAccount", () => {
     })
 
     expect(result.current.state).toBe("error")
-    expect(mockUnmarkAccountDeletedForRefresh).not.toHaveBeenCalled()
+    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    expect(mockWaitForRefreshesToSettle).not.toHaveBeenCalled()
+  })
 
-    await act(async () => {
-      settle()
-      await new Promise<void>((resolve) => {
-        setImmediate(resolve)
+  describe("a wallet leaves the index only with its seed", () => {
+    /** Unlisted while its seed survived, the wallet would be invisible to every later
+     *  removal, and the forgotten-PIN one would read the empty index as nothing left to
+     *  lock. So the deletion fails, the wallet stays listed, and the lock stays with it. */
+    it("keeps a wallet whose seed survived listed and reports the delete as failed", async () => {
+      mockDeleteMnemonicForAccount.mockResolvedValue(false)
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
       })
+
+      expect(outcome).toBeUndefined()
+      expect(result.current.state).toBe("error")
+      expect(result.current.error?.message).toBe(
+        "The wallet's seed survived its deletion",
+      )
+      expect(mockRemoveSelfCustodialAccountId).not.toHaveBeenCalled()
+      expect(mockClearAppLock).not.toHaveBeenCalled()
     })
 
-    expect(mockDeleteRecoveryBundleFile).toHaveBeenCalledTimes(4)
-    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledTimes(1)
-    expect(mockUnmarkAccountDeletedForRefresh).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+    /** Anything after the seed is cleanup a failure leaves behind, and none of it may keep
+     *  listed a wallet whose seed is already gone. */
+    it("drops the entry right after the seed, before the cleanup that can fail", async () => {
+      const { result } = renderHook(() => useDeleteAccount())
+
+      await act(async () => {
+        await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      const removeOrder = mockRemoveSelfCustodialAccountId.mock.invocationCallOrder[0]
+      expect(removeOrder).toBeGreaterThan(
+        mockDeleteMnemonicForAccount.mock.invocationCallOrder[0],
+      )
+      expect(removeOrder).toBeLessThan(mockUnlink.mock.invocationCallOrder[0])
+      expect(removeOrder).toBeLessThan(
+        mockRemoveBackupStateFor.mock.invocationCallOrder[0],
+      )
+    })
+
+    it("does not fail the delete when the backup record will not go (best-effort, logged)", async () => {
+      mockRemoveBackupStateFor.mockRejectedValue(new Error("AsyncStorage down"))
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let outcome: string | undefined
+      await act(async () => {
+        outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(outcome).toBe("logged-out")
+      expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("backup state cleanup failed"),
+      )
+    })
+
+    /**
+     * The seed answers whether it is gone, not whether this call removed it, so a delete
+     * cut short after the seed went is finished by the next one rather than leaving a
+     * wallet listed that no retry could ever drop.
+     */
+    it("finishes on a retry when the first run stopped after the seed went", async () => {
+      mockRemoveSelfCustodialAccountId.mockRejectedValueOnce(
+        new Error("index write failed"),
+      )
+      const { result } = renderHook(() => useDeleteAccount())
+
+      let firstOutcome: string | undefined
+      await act(async () => {
+        firstOutcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+      expect(firstOutcome).toBeUndefined()
+      expect(mockClearAppLock).not.toHaveBeenCalled()
+
+      let retryOutcome: string | undefined
+      await act(async () => {
+        retryOutcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(retryOutcome).toBe("logged-out")
+      expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledTimes(2)
+      expect(mockClearAppLock).toHaveBeenCalledTimes(1)
+    })
   })
 
   it("switches the active account BEFORE disconnecting the SDK so useSdkLifecycle does not poll a stale ref", async () => {
@@ -604,20 +670,6 @@ describe("useDeleteAccount", () => {
       expect(mockClearAppLock).not.toHaveBeenCalled()
     })
 
-    /** The index entry is removed either way, so an erase that failed would otherwise
-     *  leave the mnemonic on the device with the index reporting nothing stored. */
-    it("keeps the lock when the deleted wallet's key is still readable", async () => {
-      mockDeleteMnemonicForAccount.mockResolvedValue(false)
-      mockGetMnemonicForAccount.mockResolvedValue("word word word")
-      const { result } = renderHook(() => useDeleteAccount())
-
-      await act(async () => {
-        await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
-      })
-
-      expect(mockClearAppLock).not.toHaveBeenCalled()
-    })
-
     /**
      * A slot that would not erase leaves the lock half gone, which routes every later
      * unlock to the keypad instead of the prompt its owner chose. The deletion still
@@ -653,26 +705,6 @@ describe("useDeleteAccount", () => {
       })
 
       expect(outcome).toBe("logged-out-locked")
-    })
-
-    /**
-     * Reading the slot back cannot stand in for the erase. That read answers null for a key
-     * that is absent and for one it could not open, on either platform, so a seed whose
-     * erase and read both failed would be scored as gone and the lock wiped over a mnemonic
-     * still on the device. The erase has to say so itself; a wallet whose key was already
-     * missing keeps the lock, which is friction rather than exposure.
-     */
-    it("keeps the lock when the key's erase failed and reading it back answers nothing", async () => {
-      mockDeleteMnemonicForAccount.mockResolvedValue(false)
-      mockGetMnemonicForAccount.mockResolvedValue(null)
-      const { result } = renderHook(() => useDeleteAccount())
-
-      await act(async () => {
-        await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
-      })
-
-      expect(mockClearAppLock).not.toHaveBeenCalled()
-      expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
     })
 
     /**

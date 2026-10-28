@@ -105,15 +105,15 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
    *  reach it. */
   readStoredWalletPresence: async () =>
     mockDevice.walletIds.length > 0 ? "present" : "absent",
-  removeSelfCustodialAccountId: async (id: string) => {
-    mockDevice.walletIds = mockDevice.walletIds.filter((walletId) => walletId !== id)
-  },
 }))
 
 /** What a wallet's erase does is covered where it lives; here it only has to report the
- *  seed gone, so the journey can follow what the lock does next. */
+ *  seed gone and drop the entry with it, so the journey can follow what the lock does next. */
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
-  eraseWalletFromDevice: async () => true,
+  eraseWalletFromDevice: async (id: string) => {
+    mockDevice.walletIds = mockDevice.walletIds.filter((walletId) => walletId !== id)
+    return true
+  },
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({

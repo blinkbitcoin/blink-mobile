@@ -10,7 +10,6 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   listSelfCustodialAccounts,
   readStoredWalletPresence,
-  removeSelfCustodialAccountId,
   StorageReadStatus,
   StoredWalletPresence,
 } from "@app/self-custodial/storage/account-index"
@@ -61,10 +60,11 @@ export const useRemoveStoredWallets = (): (() => Promise<RemoveStoredWalletsResu
       })
     }
 
+    /** The erase drops a wallet from the index only with its seed, so the presence read
+     *  below is the whole answer and the erase's own result adds nothing to it. */
     for (const { id } of listed.entries) {
       try {
-        const isSeedErased = await eraseWalletFromDevice(id, network)
-        if (isSeedErased) await removeSelfCustodialAccountId(id)
+        await eraseWalletFromDevice(id, network)
       } catch (err) {
         reportError("Self-custodial remove stored wallets", err)
       }

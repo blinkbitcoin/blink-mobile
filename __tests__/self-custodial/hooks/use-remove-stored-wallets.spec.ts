@@ -4,7 +4,6 @@ import { useRemoveStoredWallets } from "@app/self-custodial/hooks/use-remove-sto
 
 const mockListSelfCustodialAccounts = jest.fn()
 const mockReadStoredWalletPresence = jest.fn()
-const mockRemoveSelfCustodialAccountId = jest.fn()
 const mockEraseWalletFromDevice = jest.fn()
 const mockDisconnectSdk = jest.fn()
 const mockLogout = jest.fn()
@@ -20,7 +19,6 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
   StoredWalletPresence: { Present: "present", Absent: "absent", Unknown: "unknown" },
   listSelfCustodialAccounts: () => mockListSelfCustodialAccounts(),
   readStoredWalletPresence: () => mockReadStoredWalletPresence(),
-  removeSelfCustodialAccountId: (id: string) => mockRemoveSelfCustodialAccountId(id),
 }))
 
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
@@ -84,7 +82,6 @@ describe("useRemoveStoredWallets", () => {
     mockSdk = null
     storeWallets(["wallet-a", "wallet-b"])
     mockEraseWalletFromDevice.mockResolvedValue(true)
-    mockRemoveSelfCustodialAccountId.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
     mockReadStoredWalletPresence.mockResolvedValue("absent")
     mockLogout.mockResolvedValue({ isAppLockKept: false })
@@ -96,8 +93,6 @@ describe("useRemoveStoredWallets", () => {
 
     expect(mockEraseWalletFromDevice).toHaveBeenCalledWith("wallet-a", "regtest")
     expect(mockEraseWalletFromDevice).toHaveBeenCalledWith("wallet-b", "regtest")
-    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith("wallet-a")
-    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith("wallet-b")
     expect(mockReloadSelfCustodialAccounts).toHaveBeenCalledTimes(1)
     expect(mockLogout).toHaveBeenCalledWith()
     expect(outcome).toEqual({ isEveryWalletRemoved: true, isAppLockKept: false })
@@ -159,7 +154,9 @@ describe("useRemoveStoredWallets", () => {
       expect(outcome).toEqual({ isEveryWalletRemoved: false, isAppLockKept: true })
     })
 
-    it("keeps a wallet whose seed would not erase listed, and does not log out", async () => {
+    /** The erase keeps a wallet whose seed survived listed, so the index still answers
+     *  present and the logout never runs. */
+    it("does not log out while a wallet whose seed would not erase stays listed", async () => {
       mockEraseWalletFromDevice.mockImplementation(
         async (id: string) => id !== "wallet-b",
       )
@@ -167,8 +164,7 @@ describe("useRemoveStoredWallets", () => {
 
       const outcome = await removeStoredWallets()
 
-      expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith("wallet-a")
-      expect(mockRemoveSelfCustodialAccountId).not.toHaveBeenCalledWith("wallet-b")
+      expect(mockEraseWalletFromDevice).toHaveBeenCalledWith("wallet-b", "regtest")
       expect(mockLogout).not.toHaveBeenCalled()
       expect(outcome).toEqual({ isEveryWalletRemoved: false, isAppLockKept: true })
     })
@@ -187,7 +183,7 @@ describe("useRemoveStoredWallets", () => {
         "Self-custodial remove stored wallets",
         eraseFailure,
       )
-      expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith("wallet-b")
+      expect(mockEraseWalletFromDevice).toHaveBeenCalledWith("wallet-b", "regtest")
       expect(outcome).toEqual({ isEveryWalletRemoved: false, isAppLockKept: true })
     })
 
