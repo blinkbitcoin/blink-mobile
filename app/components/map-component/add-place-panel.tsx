@@ -41,19 +41,17 @@ type Props = {
 }
 
 /**
- * What is being added, filled in while the pin is still being aimed.
+ * What is being added, in two steps: where the place is and what it is
+ * called, then what kind of place it is.
  *
- * Half the screen, with the map keeping the other half: the two halves of
- * adding a place — where it is and what it is — are one question, so neither
- * waits on the other. That is also why this is a plain view rather than a
- * modal. A modal window would take every touch on the screen, and the map
- * above has to stay pannable for the whole time this is open.
+ * The first step is filled in while the pin is still being aimed, so the map
+ * keeps the top of the screen and this takes the bottom. That is why it is the
+ * shared sheet drawn inline rather than in its own window: it has the sheet's
+ * entry and drag-to-dismiss, but no scrim and no window, which would take every
+ * touch on the screen while the map above has to stay pannable.
  *
- * A panel, and named for one. Every other surface over this map is a bottom
- * sheet, and while this was called a sheet too it kept being read as one that
- * had simply been built wrong — twice it was asked for the scrim and the
- * drag-to-dismiss its siblings have, and both would cost the panning that is
- * the reason it is not a sheet.
+ * A panel, and named for one: it shortens the map rather than covering it, so
+ * the coordinate read from the map's centre is still the pin's.
  *
  * The name and the category are both required — see `buildPlaceSubmission` for
  * why the category is. Submit stays disabled rather than explaining itself
@@ -283,7 +281,14 @@ export const AddPlacePanel: React.FC<Props> = ({
               `other` is not among them: it is the bucket unrecognised pins fall
               into, not a description of a place, and a submission under it
               would tell BTC Map nothing. */}
-            <View style={styles.chips}>
+            {/* One of fourteen, so a radio group: a screen reader says which is
+              chosen and how many there are, where buttons say neither. */}
+            <View
+              testID="place-categories"
+              style={styles.chips}
+              accessibilityRole="radiogroup"
+              accessibilityLabel={LL.MapScreen.placeCategory()}
+            >
               {SUBMITTABLE_PLACE_CATEGORIES.map((option) => {
                 const isSelected = option === category
                 return (
@@ -292,8 +297,8 @@ export const AddPlacePanel: React.FC<Props> = ({
                     testID={`place-category-${option}`}
                     style={[styles.chip, isSelected && styles.chipSelected]}
                     onPress={() => editCategory(option)}
-                    accessibilityRole="button"
-                    accessibilityState={{ selected: isSelected }}
+                    accessibilityRole="radio"
+                    accessibilityState={{ checked: isSelected }}
                   >
                     <Text style={isSelected ? styles.chipTextSelected : styles.chipText}>
                       {LL.MapScreen.category[option]()}
@@ -330,7 +335,9 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   title: {
     flex: 1,
     fontSize: 20,
-    fontWeight: "600",
+    // The bold face by name with no weight: Android swaps a weight on the
+    // regular face for Roboto, and there is no 600 face to ask for.
+    fontFamily: "SourceSansPro-Bold",
     color: colors.black,
   },
   content: {
@@ -345,9 +352,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     fontSize: 14,
     color: colors.grey1,
   },
-  // These two are hand-rolled where the category row is the shared dropdown,
-  // so they take their measurements from it rather than the other way around —
-  // three stacked rows in one short form have to be one row three times.
+  // The two rows of the first step, on one measurement so they read as a pair.
   input: {
     fontSize: 16,
     color: colors.black,
@@ -395,11 +400,11 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   },
   chipText: {
     color: colors.primary,
-    fontWeight: "bold",
+    fontFamily: "SourceSansPro-Bold",
   },
   chipTextSelected: {
     color: colors.white,
-    fontWeight: "bold",
+    fontFamily: "SourceSansPro-Bold",
   },
   note: {
     flexDirection: "row",
