@@ -931,3 +931,59 @@ describe("useCloudBackup recovery-bundle cloud sync choice", () => {
     expect(mockWriteSettings).not.toHaveBeenCalled()
   })
 })
+
+describe("useCloudBackup one backup at a time", () => {
+  beforeEach(setDefaultMocks)
+
+  const openingSession = () => {
+    let openSession: (result: ReturnType<typeof sessionOk>) => void = () => {}
+    mockStartSession.mockReturnValue(
+      new Promise((resolve) => {
+        openSession = resolve
+      }),
+    )
+    return (result: ReturnType<typeof sessionOk>) => openSession(result)
+  }
+
+  it("reports busy from the first tap, while the session is still opening", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+    const openSession = openingSession()
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: true, password: "a passphrase long enough" }),
+    )
+    expect(result.current.loading).toBe(false)
+
+    let backingUp: Promise<void | undefined> = Promise.resolve(undefined)
+    await act(async () => {
+      backingUp = result.current.handleBackup()
+    })
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      openSession(sessionOk(noExistingFile))
+      await backingUp
+    })
+    expect(result.current.loading).toBe(false)
+  })
+
+  it("ignores a second tap while the first backup is still opening its session", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+    const openSession = openingSession()
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: true, password: "a passphrase long enough" }),
+    )
+
+    let first: Promise<void | undefined> = Promise.resolve(undefined)
+    await act(async () => {
+      first = result.current.handleBackup()
+      await result.current.handleBackup()
+    })
+    await act(async () => {
+      openSession(sessionOk(noExistingFile))
+      await first
+    })
+
+    expect(mockStartSession).toHaveBeenCalledTimes(1)
+    expect(mockUpload).toHaveBeenCalledTimes(1)
+  })
+})

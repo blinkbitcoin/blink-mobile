@@ -66,7 +66,7 @@ export const CloudBackupScreen: React.FC = () => {
   /** The backup commits the choices and the passphrase it was started with, so they
    *  stay put while it runs; the opt-in also waits for the stored choice it starts from. */
   const isAutoBundleSyncDisabled = !canSyncBundle || isAutoBundleSyncLoading || loading
-  const isContinueDisabled = !isValid || isAutoBundleSyncLoading
+  const isContinueDisabled = !isValid || isAutoBundleSyncLoading || loading
 
   const autoBundleHint = canSyncBundle
     ? LL.BackupScreen.CloudBackup.autoBundleHint()

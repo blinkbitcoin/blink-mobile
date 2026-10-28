@@ -357,6 +357,16 @@ describe("CloudBackupScreen", () => {
       expect(mockSetConfirmPassword).not.toHaveBeenCalled()
     })
 
+    it("does not start a second backup while one runs", () => {
+      mockIsEncrypted = true
+      mockLoading = true
+      const { getByTestId } = renderScreen()
+
+      fireEvent.press(getByTestId("cloud-backup-continue"))
+
+      expect(mockHandleBackup).not.toHaveBeenCalled()
+    })
+
     it("lets the passphrase be edited while no backup is running", () => {
       mockIsEncrypted = true
       const { getByPlaceholderText } = renderScreen()
