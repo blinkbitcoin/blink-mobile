@@ -4187,7 +4187,7 @@
     },
     "RecoveryBundleScreen": {
         "howItWorksTitle": "Como funciona a recuperação",
-        "howItWorksBody": "Se o Spark ficar indisponível, este backup permite mover seus fundos on-chain você mesmo, sem o Blink. A recuperação leva várias semanas: transações são transmitidas e depois passa um período de espera antes que os fundos possam ir para uma carteira à sua escolha. Também há taxas on-chain, pagas de um saldo de Bitcoin separado. Valores pequenos podem custar mais para recuperar do que valem.",
+        "howItWorksBody": "Se o Spark ficar indisponível, este backup permite mover seus bitcoins on-chain você mesmo, sem o Blink. Seu saldo em dólares não pode ser recuperado dessa forma.\n\nA recuperação pode levar até cerca de duas semanas: transações são transmitidas e depois passa um período de espera antes que os fundos possam ir para uma carteira à sua escolha. Também há taxas on-chain, pagas com uma transação on-chain separada. Valores pequenos custarão mais em taxas do que valem.",
         "noBundleToExport": "Nenhum backup de recuperação salvo ainda. Atualize primeiro.",
         "exportFailed": "Não foi possível exportar o backup de recuperação."
     },

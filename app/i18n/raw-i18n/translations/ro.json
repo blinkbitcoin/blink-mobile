@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Cum funcționează recuperarea",
-    "howItWorksBody": "Dacă Spark devine indisponibil, această copie îți permite să îți muți fondurile on-chain singur, fără Blink. Recuperarea durează mai multe săptămâni: tranzacțiile sunt difuzate, apoi trece o perioadă de așteptare înainte ca fondurile să poată fi trimise către un portofel ales de tine. Implică și comisioane on-chain, plătite dintr-un sold Bitcoin separat. Sumele mici pot costa mai mult decât valorează.",
+    "howItWorksBody": "Dacă Spark devine indisponibil, această copie îți permite să îți muți bitcoinii on-chain singur, fără Blink. Soldul tău în dolari nu poate fi recuperat în acest fel.\n\nRecuperarea poate dura până la aproximativ două săptămâni: tranzacțiile sunt difuzate, apoi trece o perioadă de așteptare înainte ca fondurile să poată fi trimise către un portofel ales de tine. Implică și comisioane on-chain, plătite printr-o tranzacție on-chain separată. Sumele mici vor costa mai mult în comisioane decât valorează.",
     "noBundleToExport": "Niciun backup de recuperare salvat încă. Actualizează mai întâi.",
     "exportFailed": "Nu s-a putut exporta backup-ul de recuperare."
   },

@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Kako funkcionira oporavak",
-    "howItWorksBody": "Ako Spark postane nedostupan, ova kopija omogućuje da sam premjestiš sredstva on-chain, bez Blinka. Oporavak traje nekoliko tjedana: transakcije se emitiraju, a zatim prolazi razdoblje čekanja prije nego što se sredstva mogu poslati u novčanik po tvom izboru. Također košta on-chain naknade koje plaćaš iz zasebnog Bitcoin salda. Male iznose može biti skuplje oporaviti nego što vrijede.",
+    "howItWorksBody": "Ako Spark postane nedostupan, ova kopija omogućuje da sam premjestiš svoje bitcoine on-chain, bez Blinka. Tvoj dolarski saldo ne može se oporaviti na ovaj način.\n\nOporavak može trajati do otprilike dva tjedna: transakcije se emitiraju, a zatim prolazi razdoblje čekanja prije nego što se sredstva mogu poslati u novčanik po tvom izboru. Također košta on-chain naknade koje plaćaš zasebnom on-chain transakcijom. Mali iznosi koštat će više u naknadama nego što vrijede.",
     "noBundleToExport": "Još nema spremljene sigurnosne kopije za oporavak. Najprije osvježite.",
     "exportFailed": "Sigurnosnu kopiju za oporavak nije bilo moguće izvesti."
   },

@@ -4187,7 +4187,7 @@
     },
     "RecoveryBundleScreen": {
         "howItWorksTitle": "Comment fonctionne la récupération",
-        "howItWorksBody": "Si Spark devient indisponible, cette sauvegarde vous permet de déplacer vos fonds on-chain vous-même, sans Blink. La récupération dure plusieurs semaines : des transactions sont diffusées, puis une période d'attente s'écoule avant que les fonds puissent être envoyés vers un portefeuille de votre choix. Elle coûte aussi des frais on-chain, que vous payez depuis un solde Bitcoin distinct. Les petits montants peuvent coûter plus cher à récupérer qu'ils ne valent.",
+        "howItWorksBody": "Si Spark devient indisponible, cette sauvegarde vous permet de déplacer vos bitcoins on-chain vous-même, sans Blink. Votre solde en dollars ne peut pas être récupéré de cette façon.\n\nLa récupération peut prendre jusqu'à environ deux semaines : des transactions sont diffusées, puis une période d'attente s'écoule avant que les fonds puissent être envoyés vers un portefeuille de votre choix. Elle coûte aussi des frais on-chain, que vous payez avec une transaction on-chain distincte. Les petits montants coûteront plus cher en frais qu'ils ne valent.",
         "noBundleToExport": "Aucune sauvegarde de récupération enregistrée pour le moment. Actualisez-la d'abord.",
         "exportFailed": "Impossible d'exporter la sauvegarde de récupération."
     },

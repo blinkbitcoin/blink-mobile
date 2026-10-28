@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Cách khôi phục hoạt động",
-    "howItWorksBody": "Nếu Spark ngừng hoạt động, bản sao lưu này cho phép bạn tự chuyển tiền on-chain mà không cần Blink. Khôi phục là quá trình kéo dài nhiều tuần: các giao dịch được phát đi, sau đó là thời gian chờ trước khi tiền có thể gửi tới ví bạn chọn. Nó cũng tốn phí on-chain, trả từ một số dư Bitcoin riêng. Số tiền nhỏ có thể tốn nhiều hơn giá trị của nó.",
+    "howItWorksBody": "Nếu Spark ngừng hoạt động, bản sao lưu này cho phép bạn tự chuyển bitcoin của mình on-chain mà không cần Blink. Số dư đô la của bạn không thể khôi phục theo cách này.\n\nKhôi phục có thể mất tới khoảng hai tuần: các giao dịch được phát đi, sau đó là thời gian chờ trước khi tiền có thể gửi tới ví bạn chọn. Nó cũng tốn phí on-chain, trả bằng một giao dịch on-chain riêng. Số tiền nhỏ sẽ tốn phí nhiều hơn giá trị của nó.",
     "noBundleToExport": "Chưa có bản sao lưu khôi phục nào được lưu. Vui lòng làm mới trước.",
     "exportFailed": "Không thể xuất bản sao lưu khôi phục."
   },

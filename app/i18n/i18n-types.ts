@@ -14016,7 +14016,9 @@ type RootTranslation = {
 		 */
 		howItWorksTitle: string
 		/**
-		 * I​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​f​u​n​d​s​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​R​e​c​o​v​e​r​y​ ​i​s​ ​a​ ​m​u​l​t​i​-​w​e​e​k​ ​p​r​o​c​e​s​s​:​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​b​r​o​a​d​c​a​s​t​,​ ​t​h​e​n​ ​a​ ​w​a​i​t​i​n​g​ ​p​e​r​i​o​d​ ​p​a​s​s​e​s​ ​b​e​f​o​r​e​ ​t​h​e​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​s​w​e​p​t​ ​t​o​ ​a​ ​w​a​l​l​e​t​ ​y​o​u​ ​c​h​o​o​s​e​.​ ​I​t​ ​a​l​s​o​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​w​h​i​c​h​ ​y​o​u​ ​p​a​y​ ​f​r​o​m​ ​a​ ​s​e​p​a​r​a​t​e​ ​B​i​t​c​o​i​n​ ​b​a​l​a​n​c​e​.​ ​S​m​a​l​l​ ​a​m​o​u​n​t​s​ ​m​a​y​ ​c​o​s​t​ ​m​o​r​e​ ​t​o​ ​r​e​c​o​v​e​r​ ​t​h​a​n​ ​t​h​e​y​ ​a​r​e​ ​w​o​r​t​h​.
+		 * I​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​c​a​n​'​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​t​h​i​s​ ​w​a​y​.​
+	​
+	​R​e​c​o​v​e​r​y​ ​c​a​n​ ​t​a​k​e​ ​u​p​ ​t​o​ ​a​b​o​u​t​ ​t​w​o​ ​w​e​e​k​s​:​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​b​r​o​a​d​c​a​s​t​,​ ​t​h​e​n​ ​a​ ​w​a​i​t​i​n​g​ ​p​e​r​i​o​d​ ​p​a​s​s​e​s​ ​b​e​f​o​r​e​ ​t​h​e​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​s​w​e​p​t​ ​t​o​ ​a​ ​w​a​l​l​e​t​ ​y​o​u​ ​c​h​o​o​s​e​.​ ​I​t​ ​a​l​s​o​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​w​h​i​c​h​ ​y​o​u​ ​p​a​y​ ​w​i​t​h​ ​a​ ​s​e​p​a​r​a​t​e​ ​o​n​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​.​ ​S​m​a​l​l​ ​a​m​o​u​n​t​s​ ​w​i​l​l​ ​c​o​s​t​ ​m​o​r​e​ ​i​n​ ​f​e​e​s​ ​t​h​a​n​ ​t​h​e​y​ ​a​r​e​ ​w​o​r​t​h​.
 		 */
 		howItWorksBody: string
 		/**
@@ -28190,7 +28192,9 @@ export type TranslationFunctions = {
 		 */
 		howItWorksTitle: () => LocalizedString
 		/**
-		 * If Spark becomes unavailable, this backup lets you move your funds onchain yourself, without Blink. Recovery is a multi-week process: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay from a separate Bitcoin balance. Small amounts may cost more to recover than they are worth.
+		 * If Spark becomes unavailable, this backup lets you move your bitcoin onchain yourself, without Blink. Your dollar balance can't be recovered this way.
+
+	Recovery can take up to about two weeks: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay with a separate onchain transaction. Small amounts will cost more in fees than they are worth.
 		 */
 		howItWorksBody: () => LocalizedString
 		/**

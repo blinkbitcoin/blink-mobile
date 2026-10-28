@@ -4440,7 +4440,7 @@ const en: BaseTranslation = {
   RecoveryBundleScreen: {
     howItWorksTitle: "How recovery works",
     howItWorksBody:
-      "If Spark becomes unavailable, this backup lets you move your funds onchain yourself, without Blink. Recovery is a multi-week process: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay from a separate Bitcoin balance. Small amounts may cost more to recover than they are worth.",
+      "If Spark becomes unavailable, this backup lets you move your bitcoin onchain yourself, without Blink. Your dollar balance can't be recovered this way.\n\nRecovery can take up to about two weeks: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay with a separate onchain transaction. Small amounts will cost more in fees than they are worth.",
     noBundleToExport: "No recovery backup saved yet. Refresh first.",
     exportFailed: "Could not export the recovery backup.",
   },

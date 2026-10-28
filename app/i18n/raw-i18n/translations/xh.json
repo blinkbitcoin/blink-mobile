@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Indlela ukubuyisela okusebenza ngayo",
-    "howItWorksBody": "Ukuba iSpark ayifumaneki, olu gcino lukuvumela ukuba uhambise imali yakho kwi-chain ngokwakho, ngaphandle kweBlink. Ukubuyisela kuthatha iiveki ezininzi: intengiselwano isasazwa, emva koko kudlule ixesha lokulinda phambi kokuba imali ithunyelwe kwisipaji osikhethileyo. Kubiza neentlawulo ze-chain, ozihlawula kwibhalansi yeBitcoin eyahlukileyo. Izixa ezincinci zinokubiza ngaphezu kwexabiso lazo.",
+    "howItWorksBody": "Ukuba iSpark ayifumaneki, olu gcino lukuvumela ukuba uhambise ibitcoin yakho kwi-chain ngokwakho, ngaphandle kweBlink. Ibhalansi yakho yeedola ayinakubuyiselwa ngale ndlela.\n\nUkubuyisela kunokuthatha ukuya kutsho malunga neeveki ezimbini: intengiselwano isasazwa, emva koko kudlule ixesha lokulinda phambi kokuba imali ithunyelwe kwisipaji osikhethileyo. Kubiza neentlawulo ze-chain, ozihlawula ngentengiselwano eyahlukileyo ye-chain. Izixa ezincinci ziya kubiza iintlawulo ezingaphezu kwexabiso lazo.",
     "noBundleToExport": "Akukho gcino lokubuyisela lugciniweyo okwangoku. Hlaziya kuqala.",
     "exportFailed": "Akukwazekanga ukukhuphela ugcino lokubuyisela."
   },

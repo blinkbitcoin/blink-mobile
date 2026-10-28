@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Hoe herstel werkt",
-    "howItWorksBody": "Als Spark niet meer beschikbaar is, kun je met deze back-up je geld zelf on-chain verplaatsen, zonder Blink. Herstel duurt meerdere weken: transacties worden uitgezonden en daarna verstrijkt een wachtperiode voordat het geld naar een wallet naar keuze kan. Het kost ook on-chain kosten, die je betaalt uit een apart bitcoinsaldo. Kleine bedragen kunnen meer kosten om te herstellen dan ze waard zijn.",
+    "howItWorksBody": "Als Spark niet meer beschikbaar is, kun je met deze back-up je bitcoin zelf on-chain verplaatsen, zonder Blink. Je dollarsaldo kan op deze manier niet worden hersteld.\n\nHerstel kan tot ongeveer twee weken duren: transacties worden uitgezonden en daarna verstrijkt een wachtperiode voordat het geld naar een wallet naar keuze kan. Het kost ook on-chain kosten, die je betaalt met een aparte on-chain transactie. Kleine bedragen kosten meer aan kosten dan ze waard zijn.",
     "noBundleToExport": "Nog geen herstelback-up opgeslagen. Ververs eerst.",
     "exportFailed": "Kon de herstelback-up niet exporteren."
   },

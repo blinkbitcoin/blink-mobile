@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Engeri okuzza obuggya bwe kukola",
-    "howItWorksBody": "Singa Spark egaana okukola, bakaapu eno ekusobozesa okutwala ssente zo ku chain wekka, awatali Blink. Okuzza obuggya kutwala wiiki nnyingi: ebikolwa bisindikibwa, oluvannyuma ne wabaawo ekiseera eky'okulinda nga ssente tezinnaba kusindikibwa mu wallet gy'olonze. Kirimu n'ebisale bya chain, by'osasula okuva ku Bitcoin endala. Ssente entono ziyinza okusaba ebisale ebisinga omuwendo gwazo.",
+    "howItWorksBody": "Singa Spark egaana okukola, bakaapu eno ekusobozesa okutwala bitcoin yo ku chain wekka, awatali Blink. Ssente zo eza doola teziyinza kuzzibwawo mu ngeri eno.\n\nOkuzza obuggya kuyinza okutwala wiiki nga bbiri: ebikolwa bisindikibwa, oluvannyuma ne wabaawo ekiseera eky'okulinda nga ssente tezinnaba kusindikibwa mu wallet gy'olonze. Kirimu n'ebisale bya chain, by'osasula nga okozesa ekikolwa kya chain ekirala. Ssente entono zijja kusaba ebisale ebisinga omuwendo gwazo.",
     "noBundleToExport": "Tewali bbakappu y'okuzzaawo eterekeddwa. Sooka ogizze obuggya.",
     "exportFailed": "Tekisobose kufulumya bbakappu y'okuzzaawo."
   },

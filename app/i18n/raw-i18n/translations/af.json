@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Hoe herstel werk",
-    "howItWorksBody": "As Spark onbeskikbaar raak, laat hierdie rugsteun jou toe om jou fondse self na die ketting te skuif, sonder Blink. Herstel duur etlike weke: transaksies word uitgesaai, dan verloop 'n wagtydperk voordat die fondse na 'n beursie van jou keuse geskuif kan word. Dit kos ook kettingfooie, wat jy uit 'n aparte Bitcoin-saldo betaal. Klein bedrae kan meer kos om te herstel as wat hulle werd is.",
+    "howItWorksBody": "As Spark onbeskikbaar raak, laat hierdie rugsteun jou toe om jou bitcoin self na die ketting te skuif, sonder Blink. Jou dollarsaldo kan nie op hierdie manier herstel word nie.\n\nHerstel kan tot ongeveer twee weke duur: transaksies word uitgesaai, dan verloop 'n wagtydperk voordat die fondse na 'n beursie van jou keuse geskuif kan word. Dit kos ook kettingfooie, wat jy met 'n aparte kettingtransaksie betaal. Klein bedrae sal meer aan fooie kos as wat hulle werd is.",
     "noBundleToExport": "Nog geen herstelrugsteun gestoor nie. Verfris eers.",
     "exportFailed": "Kon nie die herstelrugsteun uitvoer nie."
   },
