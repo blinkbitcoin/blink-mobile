@@ -21,6 +21,7 @@ import {
 import {
   isCloudSyncAllowedFor,
   markCloudSynced,
+  markExported,
   refreshRecoveryBundle,
   syncExistingBundleToCloud,
   withCloudBundleLock,
@@ -66,6 +67,10 @@ const NO_SETTINGS_READ: TargetBound<RecoveryBundleSettings> = {
 
 const targetFor = (accountId: string, network: Network): string =>
   `${accountId}:${network}`
+
+/** A decrypted bundle on its way off the device, with the account it was read
+ *  from and the version it is, which is what the export gets recorded against. */
+type ExportedBundle = { accountId: string; json: string; createdAt: string }
 
 export type RecoveryBundleActions = {
   /** undefined while the first read is in flight, null when no bundle saved. */
@@ -223,8 +228,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     }
   }
 
-  /** Decrypts the saved bundle for export; requires the seed from the keystore. */
-  const loadDecryptedBundleJson = async (): Promise<string | null> => {
+  /** Decrypts the saved bundle for export; requires the seed from the keystore.
+   *  Hands back the version it decrypted, which is the one an export carries. */
+  const loadBundleForExport = async (): Promise<ExportedBundle | null> => {
     if (!accountId) return null
     const payload = await loadEncryptedBundleFile(accountId, network)
     if (!payload) {
@@ -237,15 +243,30 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       return null
     }
     const bundle = await decryptBundleBackupPayload(payload, mnemonic)
-    return JSON.stringify(bundle, null, 2)
+    return {
+      accountId,
+      json: JSON.stringify(bundle, null, 2),
+      createdAt: bundle.createdAt,
+    }
+  }
+
+  /** Recorded in the bundle state, against the exact version that left the
+   *  device, rather than in the settings: a settings write would carry this
+   *  render's copy of the switches and could undo one changed while the share
+   *  sheet was open. */
+  const recordExport = async (exported: ExportedBundle) => {
+    const forTarget = targetFor(exported.accountId, network)
+    const next = await markExported(exported.accountId, network, exported.createdAt)
+    const isExportedStateForScreen = next !== null && isStillActive(forTarget)
+    if (isExportedStateForScreen) setBundleRead({ forTarget, value: next })
   }
 
   const handleShare = async (): Promise<boolean> => {
     if (exportAction) return false
     setExportAction("share")
     try {
-      const json = await loadDecryptedBundleJson()
-      if (!json) return false
+      const exported = await loadBundleForExport()
+      if (!exported) return false
       // `useInternalStorage` is honored by the Android native module
       // (ShareIntent.java) but missing from the lib's ShareOptions type.
       // Android writes data: URLs to a file before sharing; keep the
@@ -253,14 +274,14 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       const options: ShareOptions & { useInternalStorage: boolean } = {
         title: "blink-recovery-bundle",
         filename: `blink-recovery-bundle-${networkLabelFor(network)}.json`,
-        url: `data:application/json;base64,${Buffer.from(json, "utf8").toString("base64")}`,
+        url: `data:application/json;base64,${Buffer.from(exported.json, "utf8").toString("base64")}`,
         type: "application/json",
         useInternalStorage: true,
       }
       await Share.open(options)
       // Recorded only after the sheet resolves, so a cancelled share does not
       // count as the user having a copy.
-      await persistSettings({ ...settings, exportedAt: Date.now() }).catch(() => {})
+      await recordExport(exported).catch(() => {})
       return true
     } catch (err) {
       /** Dismissing the sheet is a choice, not a failure, so it stays silent -
@@ -281,10 +302,10 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     if (exportAction) return
     setExportAction("copy")
     try {
-      const json = await loadDecryptedBundleJson()
-      if (!json) return
-      copyToClipboard({ content: json })
-      await persistSettings({ ...settings, exportedAt: Date.now() }).catch(() => {})
+      const exported = await loadBundleForExport()
+      if (!exported) return
+      copyToClipboard({ content: exported.json })
+      await recordExport(exported).catch(() => {})
     } catch (err) {
       recordAndToast(err, LL.RecoveryBundleScreen.exportFailed())
     } finally {

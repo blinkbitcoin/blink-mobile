@@ -210,7 +210,6 @@ const setDefaultMocks = () => {
   mockReadSettings.mockResolvedValue({
     autoRefresh: true,
     cloudSync: false,
-    exportedAt: null,
   })
   mockWriteSettings.mockResolvedValue(undefined)
   // Restored here rather than at the end of a test body, so an assertion

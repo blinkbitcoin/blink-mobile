@@ -13,7 +13,6 @@ const ACCOUNT_ID = "test-self-custodial-uuid"
 const mockUseAccountRegistry = jest.fn()
 const mockUseActiveWallet = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
-const mockReadRecoveryBundleSettings = jest.fn()
 
 jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => mockUseAccountRegistry(),
@@ -32,17 +31,24 @@ jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
     mockReadRecoveryBundleState(...args),
 }))
 
-jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
-  readRecoveryBundleSettings: (...args: readonly unknown[]) =>
-    mockReadRecoveryBundleSettings(...args),
-}))
-
 // The production hook re-reads on focus; running the callback as a plain effect
 // keeps that path exercised without a navigation container.
 jest.mock("@react-navigation/native", () => ({
   useFocusEffect: (callback: () => void | (() => void)) =>
     jest.requireActual<typeof import("react")>("react").useEffect(callback, [callback]),
 }))
+
+const CURRENT_BUNDLE = "2026-08-05T00:00:00Z"
+const EARLIER_BUNDLE = "2026-08-01T00:00:00Z"
+
+const savedBundle = (over: Record<string, unknown> = {}) => ({
+  savedAt: Date.now() - 60_000,
+  bundleCreatedAt: CURRENT_BUNDLE,
+  leafCount: 3,
+  totalSats: "21000",
+  cloudSyncedAt: null,
+  ...over,
+})
 
 const selfCustodialAccount = {
   id: ACCOUNT_ID,
@@ -75,18 +81,7 @@ describe("useRecoveryBundleStatus", () => {
     jest.clearAllMocks()
     mockUseAccountRegistry.mockReturnValue({ activeAccount: selfCustodialAccount })
     withBalance(21000)
-    mockReadRecoveryBundleState.mockResolvedValue({
-      savedAt: Date.now() - 60_000,
-      bundleCreatedAt: "2026-08-05T00:00:00Z",
-      leafCount: 3,
-      totalSats: "21000",
-      cloudSyncedAt: null,
-    })
-    mockReadRecoveryBundleSettings.mockResolvedValue({
-      autoRefresh: true,
-      cloudSync: false,
-      exportedAt: null,
-    })
+    mockReadRecoveryBundleState.mockResolvedValue(savedBundle())
   })
 
   it("reports a bundle that matches the wallet as current", async () => {
@@ -106,14 +101,9 @@ describe("useRecoveryBundleStatus", () => {
   it("reports a recent bundle at the same balance as out of date while a change it may not cover is marked", async () => {
     // A swap leaves the total where it was, and the refresh that should have
     // followed failed, so only the scheduler's mark says the bundle fell behind.
-    mockReadRecoveryBundleState.mockResolvedValue({
-      savedAt: Date.now() - 60_000,
-      bundleCreatedAt: "2026-08-05T00:00:00Z",
-      leafCount: 3,
-      totalSats: "21000",
-      cloudSyncedAt: null,
-      uncoveredChangeAt: Date.now() - 30_000,
-    })
+    mockReadRecoveryBundleState.mockResolvedValue(
+      savedBundle({ uncoveredChangeAt: Date.now() - 30_000 }),
+    )
     const { result } = await renderStatus()
 
     expect(result.current.status).toBe(RecoveryBundleStatus.Stale)
@@ -249,28 +239,47 @@ describe("useRecoveryBundleStatus", () => {
       expect(result.current.isOnlyOnThisDevice).toBe(true)
     })
 
-    it("says yes once the user exported it", async () => {
-      mockReadRecoveryBundleSettings.mockResolvedValue({
-        autoRefresh: true,
-        cloudSync: false,
-        exportedAt: Date.now(),
-      })
+    it("says yes once the user exported this version", async () => {
+      mockReadRecoveryBundleState.mockResolvedValue(
+        savedBundle({ exportedBundleCreatedAt: CURRENT_BUNDLE }),
+      )
       const { result } = await renderStatus()
 
       expect(result.current.isOnlyOnThisDevice).toBe(false)
     })
 
-    it("says yes once it reached the cloud", async () => {
-      mockReadRecoveryBundleState.mockResolvedValue({
-        savedAt: Date.now() - 60_000,
-        bundleCreatedAt: "2026-08-05T00:00:00Z",
-        leafCount: 3,
-        totalSats: "21000",
-        cloudSyncedAt: Date.now(),
-      })
+    it("says yes once this version reached the cloud", async () => {
+      mockReadRecoveryBundleState.mockResolvedValue(
+        savedBundle({
+          cloudSyncedAt: Date.now(),
+          cloudSyncedBundleCreatedAt: CURRENT_BUNDLE,
+        }),
+      )
       const { result } = await renderStatus()
 
       expect(result.current.isOnlyOnThisDevice).toBe(false)
+    })
+
+    it("says no when only an earlier version was exported", async () => {
+      // The export holds none of the outputs the current bundle added.
+      mockReadRecoveryBundleState.mockResolvedValue(
+        savedBundle({ exportedBundleCreatedAt: EARLIER_BUNDLE }),
+      )
+      const { result } = await renderStatus()
+
+      expect(result.current.isOnlyOnThisDevice).toBe(true)
+    })
+
+    it("says no when only an earlier version reached the cloud", async () => {
+      mockReadRecoveryBundleState.mockResolvedValue(
+        savedBundle({
+          cloudSyncedAt: Date.now(),
+          cloudSyncedBundleCreatedAt: EARLIER_BUNDLE,
+        }),
+      )
+      const { result } = await renderStatus()
+
+      expect(result.current.isOnlyOnThisDevice).toBe(true)
     })
 
     it("does not ask the question when there is no bundle", async () => {

@@ -205,6 +205,21 @@ export const markCloudSynced = (
   )
 
 /**
+ * Records the bundle a manual export carried, for the same reason the cloud
+ * stamp names its payload: the export holds that version only, and a refresh
+ * saving a newer one must not read as already off the device. Queued like every
+ * other state write, so it cannot revert a refresh or a cloud stamp.
+ */
+export const markExported = (
+  accountId: string,
+  network: Network,
+  exportedBundleCreatedAt: string,
+): Promise<RecoveryBundleState | null> =>
+  updateState(accountId, network, (previous) =>
+    previous ? { ...previous, exportedBundleCreatedAt } : null,
+  )
+
+/**
  * Single definition of "the bundle may be stored in the cloud": the user
  * opted in AND the cloud seed backup is password-protected (D9). Screen and
  * sync path both use this so they cannot diverge on it.
@@ -494,6 +509,7 @@ const runRefresh = async ({
         totalSats: bundle.balances.btcSats,
         cloudSyncedAt: previous?.cloudSyncedAt ?? null,
         cloudSyncedBundleCreatedAt: previous?.cloudSyncedBundleCreatedAt ?? null,
+        exportedBundleCreatedAt: previous?.exportedBundleCreatedAt ?? null,
         uncoveredChangeAt: isChangedDuringFetch
           ? previous?.uncoveredChangeAt ?? Date.now()
           : null,

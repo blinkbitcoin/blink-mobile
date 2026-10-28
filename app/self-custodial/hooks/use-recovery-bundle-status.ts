@@ -7,7 +7,6 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { AccountType } from "@app/types/wallet"
 
-import { readRecoveryBundleSettings } from "../recovery-bundle/settings"
 import { readRecoveryBundleState } from "../recovery-bundle/storage"
 import { useSparkNetwork } from "./use-spark-network"
 
@@ -87,9 +86,9 @@ type RecoveryBundleStatusResult = {
   status: RecoveryBundleStatus
   savedAt: number | null
   leafCount: number | null
-  /** True when a bundle exists but has never left this device - neither
-   *  exported by the user nor uploaded to their cloud. The automatic on-device
-   *  copy dies with the device, so this is "backed up" only in name. */
+  /** True when the saved bundle has not left this device - this version was
+   *  neither exported by the user nor uploaded to their cloud. The automatic
+   *  on-device copy dies with the device, so this is "backed up" only in name. */
   isOnlyOnThisDevice: boolean
   /**
    * True only when the wallet is known to hold nothing a recovery backup could
@@ -117,8 +116,9 @@ type SavedBundle = {
   savedAt: number | null
   savedTotalSats: string | null
   leafCount: number | null
-  cloudSyncedAt: number | null
-  exportedAt: number | null
+  bundleCreatedAt: string | null
+  cloudSyncedBundleCreatedAt: string | null
+  exportedBundleCreatedAt: string | null
   uncoveredChangeAt: number | null
 }
 
@@ -127,8 +127,9 @@ const NO_SAVED_BUNDLE: SavedBundle = {
   savedAt: null,
   savedTotalSats: null,
   leafCount: null,
-  cloudSyncedAt: null,
-  exportedAt: null,
+  bundleCreatedAt: null,
+  cloudSyncedBundleCreatedAt: null,
+  exportedBundleCreatedAt: null,
   uncoveredChangeAt: null,
 }
 
@@ -165,17 +166,15 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
     }
     let next: SavedBundle
     try {
-      const [state, settings] = await Promise.all([
-        readRecoveryBundleState(accountId, network),
-        readRecoveryBundleSettings(accountId),
-      ])
+      const state = await readRecoveryBundleState(accountId, network)
       next = {
         forTarget: target,
         savedAt: state?.savedAt ?? null,
         savedTotalSats: state?.totalSats ?? null,
         leafCount: state?.leafCount ?? null,
-        cloudSyncedAt: state?.cloudSyncedAt ?? null,
-        exportedAt: settings.exportedAt,
+        bundleCreatedAt: state?.bundleCreatedAt ?? null,
+        cloudSyncedBundleCreatedAt: state?.cloudSyncedBundleCreatedAt ?? null,
+        exportedBundleCreatedAt: state?.exportedBundleCreatedAt ?? null,
         uncoveredChangeAt: state?.uncoveredChangeAt ?? null,
       }
     } catch {
@@ -217,11 +216,16 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
       })
     : RecoveryBundleStatus.Unknown
 
+  /** Coverage is per version: an export or upload of an earlier bundle holds
+   *  none of the outputs this one added, so it does not take it off the phone. */
+  const isExportCurrent = current.exportedBundleCreatedAt === current.bundleCreatedAt
+  const isCloudCopyCurrent =
+    current.cloudSyncedBundleCreatedAt === current.bundleCreatedAt
   const isOnlyOnThisDevice =
     status !== RecoveryBundleStatus.Unknown &&
     status !== RecoveryBundleStatus.Missing &&
-    current.exportedAt === null &&
-    current.cloudSyncedAt === null
+    !isExportCurrent &&
+    !isCloudCopyCurrent
 
   return {
     status,
