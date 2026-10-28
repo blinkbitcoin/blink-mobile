@@ -4,6 +4,7 @@ import {
   Fee,
   ListUnclaimedDepositsRequest,
   MaxFee,
+  MaxOnchainFee,
   RefundDepositRequest,
   type BreezSdkInterface,
   type DepositInfo,
@@ -78,7 +79,11 @@ export const claimDeposit = async ({
   vout,
   maxFeeSats,
 }: ClaimParams): Promise<void> => {
-  const maxFee = maxFeeSats ? new MaxFee.Fixed({ amount: BigInt(maxFeeSats) }) : undefined
+  /** `maxFeeSats` is a quoted claim fee, which already includes any proportional
+   *  provider fee, so the ceiling takes no proportional part of its own. */
+  const maxFee = maxFeeSats
+    ? MaxFee.create({ onchain: new MaxOnchainFee.Fixed({ amount: BigInt(maxFeeSats) }) })
+    : undefined
 
   await sdk.claimDeposit(ClaimDepositRequest.create({ txid, vout, maxFee }))
 }

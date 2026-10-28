@@ -46,7 +46,13 @@ const SdkError_Tags = {
   OptimizationAlreadyRunning: "OptimizationAlreadyRunning",
   OptimizationCancelled: "OptimizationCancelled",
   InsufficientCpfpFunds: "InsufficientCpfpFunds",
-  FundingUtxoConflict: "FundingUtxoConflict",
+  DepositClaimInProgress: "DepositClaimInProgress",
+  RefundReplacementFeeTooLow: "RefundReplacementFeeTooLow",
+  CrossChainAmountOutOfRange: "CrossChainAmountOutOfRange",
+  CrossChainRouteUnavailable: "CrossChainRouteUnavailable",
+  CrossChainDisabled: "CrossChainDisabled",
+  DepositTooSmall: "DepositTooSmall",
+  TokenAllowance: "TokenAllowance",
   Generic: "Generic",
 }
 
@@ -109,6 +115,7 @@ module.exports = {
   PaymentRequest: {
     Input: jest.fn().mockImplementation((args) => ({ tag: "Input", inner: args })),
   },
+  GetSparkStatusRequest: { create: (p) => p },
   PrepareSendPaymentRequest: { create: (p) => p },
   RegisterLightningAddressRequest: { create: (p) => p },
   SendPaymentRequest: { create: (p) => p },

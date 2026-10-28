@@ -4,6 +4,7 @@ import {
   defaultConfig,
   initLogging,
   MaxFee,
+  MaxOnchainFee,
   type BreezSdkInterface,
   type Network,
   type SdkEvent,
@@ -53,10 +54,16 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
    * Track the network-recommended rate plus a small remote-config leeway so
    * automatic claims succeed at normal fees. Coerce to a non-negative integer:
    * BigInt() throws on the fractional values an operator could set remotely.
+   *
+   * The SDK's own default also allows 0.1% of the deposit (`proportionalPpm`) for
+   * a provider fee that grows with the deposit. The cap here takes no proportional
+   * part, so it stays the ceiling it was before the SDK could express one.
    */
   const safeLeewaySatPerVbyte = Math.max(0, Math.trunc(leewaySatPerVbyte))
-  config.maxDepositClaimFee = new MaxFee.NetworkRecommended({
-    leewaySatPerVbyte: BigInt(safeLeewaySatPerVbyte),
+  config.maxDepositClaimFee = MaxFee.create({
+    onchain: new MaxOnchainFee.NetworkRecommended({
+      leewaySatPerVbyte: BigInt(safeLeewaySatPerVbyte),
+    }),
   })
 
   config.stableBalanceConfig = {

@@ -41,7 +41,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
-  MaxFee: {
+  MaxFee: { create: (p: Record<string, unknown>) => p },
+  MaxOnchainFee: {
     NetworkRecommended: jest
       .fn()
       .mockImplementation((inner: unknown) => ({ tag: "NetworkRecommended", inner })),
@@ -152,8 +153,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 1n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 1n },
+            },
           },
         }),
       }),
@@ -174,8 +177,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 3n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 3n },
+            },
           },
         }),
       }),
@@ -196,8 +201,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 2n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 2n },
+            },
           },
         }),
       }),
@@ -218,8 +225,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 0n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 0n },
+            },
           },
         }),
       }),

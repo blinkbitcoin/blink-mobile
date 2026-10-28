@@ -29,7 +29,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Rate: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Rate", inner })),
   },
   ListUnclaimedDepositsRequest: { create: (p: Record<string, unknown>) => p },
-  MaxFee: {
+  MaxFee: { create: (p: Record<string, unknown>) => p },
+  MaxOnchainFee: {
     Fixed: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Fixed", inner })),
   },
   RefundDepositRequest: { create: (p: Record<string, unknown>) => p },
@@ -156,7 +157,7 @@ describe("claimDeposit", () => {
     )
   })
 
-  it("calls SDK claimDeposit with MaxFee.Fixed when maxFeeSats provided", async () => {
+  it("caps the claim at exactly maxFeeSats when provided, with no proportional part", async () => {
     mockClaimDeposit.mockResolvedValue(undefined)
 
     await claimDeposit({ sdk: mockSdk, txid: "abc", vout: 0, maxFeeSats: 500 })
@@ -165,7 +166,7 @@ describe("claimDeposit", () => {
       expect.objectContaining({
         txid: "abc",
         vout: 0,
-        maxFee: expect.objectContaining({ tag: "Fixed" }),
+        maxFee: { onchain: { tag: "Fixed", inner: { amount: 500n } } },
       }),
     )
   })
