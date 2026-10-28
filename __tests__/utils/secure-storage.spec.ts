@@ -180,8 +180,39 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       expect(result).toBe(true)
     })
 
-    it("returns false when the primary mnemonic removal fails", async () => {
+    it("returns false when the removal fails and the seed is still readable", async () => {
       mockRemove.mockRejectedValueOnce(new Error("keystore unavailable"))
+      mockGet.mockResolvedValueOnce("alice words")
+
+      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+      expect(result).toBe(false)
+      expect(mockGet).toHaveBeenCalledWith("mnemonic:alice")
+    })
+
+    /**
+     * The iOS module rejects a delete of a key that is not there, so a removal retried
+     * after an earlier one erased the seed fails the same way a real failure does. Reading
+     * the key back is what lets that retry finish instead of keeping the wallet listed.
+     */
+    it("returns true when the removal fails because the seed is already gone", async () => {
+      mockRemove.mockRejectedValueOnce(
+        Object.assign(new Error("could not delete key"), { code: "6" }),
+      )
+      mockGet.mockRejectedValueOnce(
+        Object.assign(new Error("key does not present"), { code: "404" }),
+      )
+
+      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+      expect(result).toBe(true)
+    })
+
+    it("returns false when the removal fails and the read-back cannot answer", async () => {
+      mockRemove.mockRejectedValueOnce(new Error("keystore unavailable"))
+      mockGet.mockRejectedValueOnce(
+        Object.assign(new Error("keystore locked"), { code: "-25308" }),
+      )
 
       const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
 

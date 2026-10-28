@@ -155,8 +155,11 @@ const onSlot = <T>(
  *
  * A read that cannot answer counts as not gone. It is the conservative half of
  * a real trade-off, recorded at `runRemove`.
+ *
+ * The seeds still live only in the legacy store, so for them this is the whole
+ * erase, and a retried removal relies on the same answer.
  */
-const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
+export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
   const erased = await legacyErase(legacyKey)
   if (erased) return true
 

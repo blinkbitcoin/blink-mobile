@@ -6,6 +6,7 @@ import RNSecureKeyStore, {
 import { type SecureExists } from "./secure-store"
 import {
   type ReadThroughArgs,
+  eraseLegacyCopy,
   existsThrough,
   readThrough,
   removeThrough,
@@ -597,11 +598,18 @@ export default class KeyStoreWrapper {
     )
   }
 
+  /**
+   * Answers whether the seed is gone, not whether this call removed it. A removal retried
+   * after an earlier one landed finds no key, and the iOS module rejects that delete like
+   * any failure, so a seed already gone would count as surviving forever and its wallet
+   * could never leave the list. The legacy-copy rule every migrated slot erases by settles
+   * it, with that rule's known limit: on iOS a read that fails also reports absent.
+   */
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
-    const removed = await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const isSeedGone = await eraseLegacyCopy(KeyStoreWrapper.mnemonicKeyFor(accountId))
     // The network marker is derived data; failing to drop it is tolerated.
     await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
-    return removed
+    return isSeedGone
   }
 
   public static async getMnemonicNetworkForAccount(
