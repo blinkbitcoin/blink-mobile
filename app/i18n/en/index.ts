@@ -4026,18 +4026,11 @@ const en: BaseTranslation = {
     },
     BundleExport: {
       title: "Emergency bundle",
-      bodyOnboarding:
-        "If you turn on cloud backups, this bundle will be updated after every new transaction and saved to your cloud.\n\nActivate now to enable emergency exit.",
-      bodyBackupsOff:
-        "Automatic backups are turned off. Turn on now to enable emergency exit.\n\nIf you turn on automatic backups, this bundle will be updated after every new transaction and saved to your cloud.",
-      bodyBackupsOn:
-        "Automatic backups are turned on. This bundle is updated after every new transaction and saved to your cloud.\n\nIf you want to attempt the emergency exit, make sure to use the latest bundle.",
-      cloudBackup: "Cloud backup",
-      activateBackups: "Activate backups",
+      screenTitle: "Emergency exit",
+      body: "If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.",
       readCaseStudy: "Read the case study",
       learnMore: "Learn more about unilateral exit",
       download: "Download bundle",
-      skip: "Skip",
       sensitiveTitle: "Sensitive",
       sensitiveBody:
         "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.",
@@ -4287,7 +4280,6 @@ const en: BaseTranslation = {
     outageTitle: "Operator unreachable",
     outageBody: "Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support: string}",
     outageSupport: "Support",
-    outageCta: "Emergency recovery",
     tryAgainLater: "Try again later",
 
     // Automatic attempt, and the verification of anything the user supplies.

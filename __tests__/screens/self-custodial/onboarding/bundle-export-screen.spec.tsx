@@ -26,31 +26,16 @@ const mockActions: RecoveryBundleActions = {
 }
 
 // The actions hook has its own spec; mocking it keeps this one about the
-// screen's three states, without pulling in the keystore.
+// screen, without pulling in the keystore.
 jest.mock(
   "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions",
   () => ({ useRecoveryBundleActions: () => mockActions }),
 )
 
-const mockIsPasswordProtected = jest.fn()
-jest.mock("@app/self-custodial/providers/backup-state", () => ({
-  ...jest.requireActual("@app/self-custodial/providers/backup-state"),
-  useBackupState: () => ({ backupState: null }),
-  isPasswordProtectedCloudSeedBackup: () => mockIsPasswordProtected(),
-}))
-
-const mockNavigate = jest.fn()
-const mockReplace = jest.fn()
-const mockParams = jest.fn<
-  { fromOnboarding?: boolean; successMessage?: string } | undefined,
-  []
->()
 jest.mock("@react-navigation/native", () => {
   const ReactActual = jest.requireActual("react")
   return {
     ...jest.requireActual("@react-navigation/native"),
-    useRoute: () => ({ params: mockParams() }),
-    useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
     useFocusEffect: (effect: () => (() => void) | undefined) => {
       ReactActual.useEffect(effect, [effect])
     },
@@ -74,8 +59,6 @@ describe("BundleExportScreen", () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
-    mockParams.mockReturnValue(undefined)
-    mockIsPasswordProtected.mockReturnValue(false)
     mockActions.bundleState = savedBundle
     mockActions.settings = { autoRefresh: true, cloudSync: false }
     mockActions.sharing = false
@@ -84,91 +67,25 @@ describe("BundleExportScreen", () => {
     mockActions.handleShare = jest.fn().mockResolvedValue(true)
   })
 
-  it("is titled Emergency bundle", () => {
+  it("explains the emergency exit", () => {
     renderScreen()
 
-    expect(screen.getByText(LL.BackupScreen.BundleExport.title())).toBeTruthy()
+    expect(screen.getByText(LL.BackupScreen.BundleExport.screenTitle())).toBeTruthy()
+    expect(screen.getByText(LL.BackupScreen.BundleExport.body())).toBeTruthy()
   })
 
-  describe("from the manual backup (onboarding)", () => {
-    beforeEach(() => {
-      mockParams.mockReturnValue({ fromOnboarding: true, successMessage: "done" })
-    })
+  /** Manual-backup users keep the bundle on this device only, so the screen
+   *  hands it over the same way whether or not it also syncs to the cloud. */
+  it("offers only the download, never a cloud backup", () => {
+    renderScreen()
 
-    it("offers the cloud backup and a skip", () => {
-      renderScreen()
-
-      expect(screen.getByText(LL.BackupScreen.BundleExport.bodyOnboarding())).toBeTruthy()
-      expect(screen.getByTestId("bundle-cloud-backup-button")).toBeTruthy()
-      expect(screen.getByTestId("bundle-skip-button")).toBeTruthy()
-      expect(screen.queryByTestId("bundle-download-button")).toBeNull()
-    })
-
-    it("opens the cloud backup flow", () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-cloud-backup-button"))
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
-    })
-
-    it("skips to the success screen without staying in the back stack", () => {
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-skip-button"))
-      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
-        message: "done",
-      })
-    })
-
-    it("does not wait for the stored settings, which it does not depend on", () => {
-      mockActions.bundleState = undefined
-      renderScreen()
-
-      expect(screen.getByTestId("bundle-cloud-backup-button")).toBeTruthy()
-    })
+    expect(screen.getByTestId("bundle-download-button")).toBeTruthy()
+    expect(screen.queryByTestId("bundle-cloud-backup-button")).toBeNull()
+    expect(screen.queryByTestId("bundle-activate-backups-button")).toBeNull()
+    expect(screen.queryByTestId("bundle-skip-button")).toBeNull()
   })
 
-  describe("from Settings with automatic backups off", () => {
-    it("offers to activate backups", () => {
-      renderScreen()
-
-      expect(screen.getByText(LL.BackupScreen.BundleExport.bodyBackupsOff())).toBeTruthy()
-      fireEvent.press(screen.getByTestId("bundle-activate-backups-button"))
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialCloudBackup")
-      expect(screen.queryByTestId("bundle-skip-button")).toBeNull()
-    })
-
-    /** A cloud backup without a passphrase never uploads the bundle, so it must
-     *  not read as "turned on". */
-    it("stays off when sync is enabled but the cloud backup has no passphrase", () => {
-      mockActions.settings = { autoRefresh: true, cloudSync: true }
-      renderScreen()
-
-      expect(screen.getByTestId("bundle-activate-backups-button")).toBeTruthy()
-    })
-
-    it("stays off when the cloud backup has a passphrase but sync is disabled", () => {
-      mockIsPasswordProtected.mockReturnValue(true)
-      renderScreen()
-
-      expect(screen.getByTestId("bundle-activate-backups-button")).toBeTruthy()
-    })
-  })
-
-  describe("from Settings with automatic backups on", () => {
-    beforeEach(() => {
-      mockIsPasswordProtected.mockReturnValue(true)
-      mockActions.settings = { autoRefresh: true, cloudSync: true }
-    })
-
-    it("offers the latest bundle for download", () => {
-      renderScreen()
-
-      expect(screen.getByText(LL.BackupScreen.BundleExport.bodyBackupsOn())).toBeTruthy()
-      expect(screen.getByTestId("bundle-download-button")).toBeTruthy()
-      expect(screen.queryByTestId("bundle-activate-backups-button")).toBeNull()
-    })
-
+  describe("download", () => {
     it("warns before the first download and exports only on confirmation", async () => {
       renderScreen()
 
@@ -218,14 +135,12 @@ describe("BundleExportScreen", () => {
     })
   })
 
-  it("waits for the stored settings before choosing a Settings state", () => {
-    // Guessing "off" first would flash the wrong copy and CTA for users whose
-    // backups are on.
+  it("cannot download while the saved bundle is still being read", () => {
     mockActions.bundleState = undefined
     renderScreen()
 
-    expect(screen.queryByTestId("bundle-activate-backups-button")).toBeNull()
-    expect(screen.queryByTestId("bundle-download-button")).toBeNull()
+    fireEvent.press(screen.getByTestId("bundle-download-button"))
+    expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
   })
 
   describe("learn more", () => {

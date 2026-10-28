@@ -115,21 +115,6 @@ export const useCompleteBackup = () => {
       }
 
       setBackupCompleted(method, backupOptions)
-      /** A first manual backup leaves the emergency bundle on this device only,
-       *  so it stops at the bundle screen to offer the cloud backup that keeps
-       *  it current. Cloud and credential methods already sync it; a re-run of
-       *  the backup has already been offered the choice. It is recorded above
-       *  first, and the step replaces the one that called it, so going back
-       *  cannot confirm, and record, the same backup twice. */
-      const isBundleHandoverDue =
-        method === BackupMethod.Manual && isSelfCustodialAccount && !isAlreadyBackedUp
-      if (isBundleHandoverDue) {
-        navigation.replace("selfCustodialBackupBundleExport", {
-          fromOnboarding: true,
-          successMessage: message,
-        })
-        return
-      }
       navigation.navigate("selfCustodialBackupSuccess", {
         reBackup: isAlreadyBackedUp,
         message,
@@ -141,7 +126,6 @@ export const useCompleteBackup = () => {
       migrationAccountId,
       saveCheckpoint,
       isAlreadyBackedUp,
-      isSelfCustodialAccount,
       setBackupCompleted,
       LL,
     ],

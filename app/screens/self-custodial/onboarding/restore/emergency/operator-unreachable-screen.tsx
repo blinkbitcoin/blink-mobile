@@ -1,6 +1,6 @@
-import React, { useEffect } from "react"
+import React from "react"
 
-import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
+import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -13,21 +13,13 @@ import { testProps } from "@app/utils/testProps"
 
 import { OnboardingScreenLayout } from "../../layouts"
 
-import { releaseEmergencyPhrase } from "./emergency-phrase"
-
-type OperatorUnreachableRouteProp = RouteProp<
-  RootStackParamList,
-  "selfCustodialOperatorUnreachable"
->
-
 /**
  * Restore could not reach the Spark operators.
  *
  * This is deliberately not the generic restore failure: a typo'd phrase and an
  * operator outage look identical from inside the catch, and telling an outage
  * victim to check their phrase sends them looking for a mistake they did not
- * make. The one thing still possible without operators is verifying an
- * emergency bundle against the phrase, which is what the second link offers.
+ * make.
  */
 export const OperatorUnreachableScreen: React.FC = () => {
   const { LL } = useI18nContext()
@@ -35,13 +27,7 @@ export const OperatorUnreachableScreen: React.FC = () => {
   const {
     theme: { colors },
   } = useTheme()
-  const { phraseHandle } = useRoute<OperatorUnreachableRouteProp>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  /** This screen is where the flow starts, and every way out of it (trying again,
-   *  closing, leaving recovery for another restore method) takes it off the
-   *  stack, so its unmount is when the phrase is no longer needed. */
-  useEffect(() => () => releaseEmergencyPhrase(phraseHandle), [phraseHandle])
 
   return (
     <OnboardingScreenLayout
@@ -79,16 +65,6 @@ export const OperatorUnreachableScreen: React.FC = () => {
           </Text>
         }
       />
-
-      <Text
-        style={styles.recoveryLink}
-        onPress={() =>
-          navigation.navigate("selfCustodialEmergencyRecovery", { phraseHandle })
-        }
-        {...testProps("outage-emergency-recovery-link")}
-      >
-        {LL.EmergencyRecovery.outageCta()}
-      </Text>
     </OnboardingScreenLayout>
   )
 }
@@ -101,12 +77,5 @@ const useStyles = makeStyles(() => ({
   },
   link: {
     textDecorationLine: "underline",
-  },
-  recoveryLink: {
-    marginTop: 24,
-    textAlign: "center",
-    textDecorationLine: "underline",
-    fontSize: 16,
-    lineHeight: 24,
   },
 }))

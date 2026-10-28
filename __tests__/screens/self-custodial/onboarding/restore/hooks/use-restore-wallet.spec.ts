@@ -8,7 +8,6 @@ import {
   useRestoreWallet,
   RestoreWalletStatus,
 } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
-import { readEmergencyPhrase } from "@app/screens/self-custodial/onboarding/restore/emergency/emergency-phrase"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
@@ -448,26 +447,21 @@ describe("useRestoreWallet", () => {
         await result.current.restore("word1 word2 word3").catch(() => {})
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable", {
-        phraseHandle: expect.any(String),
-      })
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable")
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
-    it("carries the phrase forward by handle, never in the route params", async () => {
+    /** Nothing past the outage screen needs the phrase, so none is held. */
+    it("carries no phrase to the outage screen", async () => {
       mockRestore.mockRejectedValue(networkError())
       const { result } = renderHook(() => useRestoreWallet())
 
       await act(async () => {
-        await result.current.restore("  word1 word2 word3  ").catch(() => {})
+        await result.current.restore("word1 word2 word3").catch(() => {})
       })
 
-      // The navigator keeps route params in its history, where a seed phrase
-      // could be inspected or serialized; only the handle may go there.
       const [, params] = mockNavigate.mock.calls[0]
-      expect(JSON.stringify(params)).not.toContain("word1")
-      // Normalized, since that is the form everything downstream derives from.
-      expect(readEmergencyPhrase(params.phraseHandle)).toBe("word1 word2 word3")
+      expect(params).toBeUndefined()
     })
 
     it("still records the failure", async () => {
