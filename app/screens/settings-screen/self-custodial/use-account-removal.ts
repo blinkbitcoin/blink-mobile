@@ -16,6 +16,8 @@ type PendingRemoval = { accountId: string; identifier: string }
 type UseAccountRemovalResult = {
   /** Called on confirm: only records the removal, the confirm modal is still closing. */
   requestRemoval: (accountId: string, identifier: string) => void
+  /** Wire to the confirm modal's `onClose`. */
+  cancelRemoval: () => void
   /** Wire to the confirm modal's `onModalHide`. */
   runPendingRemoval: () => Promise<void>
 }
@@ -37,6 +39,12 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
 
   const requestRemoval = useCallback((accountId: string, identifier: string) => {
     pendingRemoval.current = { accountId, identifier }
+  }, [])
+
+  /** A hide that never reported (it can be skipped on iOS) would leave a confirmed removal
+   *  waiting, and the next Cancel's hide would run it although the user just declined. */
+  const cancelRemoval = useCallback(() => {
+    pendingRemoval.current = null
   }, [])
 
   const runPendingRemoval = useCallback(async () => {
@@ -67,5 +75,5 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     })
   }, [deleteWallet, setAccountIsBeingDeleted, leaveWhileDeleting, navigation, LL])
 
-  return { requestRemoval, runPendingRemoval }
+  return { requestRemoval, cancelRemoval, runPendingRemoval }
 }

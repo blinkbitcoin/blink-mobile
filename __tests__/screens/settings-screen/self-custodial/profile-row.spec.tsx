@@ -356,6 +356,26 @@ describe("ProfileRow", () => {
     expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalled()
   })
 
+  /** A confirm whose hide never reported leaves the removal waiting; the next cancel must
+   *  drop it, or that cancel's hide would remove the account the user just declined. */
+  it("drops a confirmed removal whose hide never came once the user cancels", async () => {
+    const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
+    const { getByTestId, findByTestId } = render(<ProfileRow entry={entry} />)
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+    act(() => lastConfirmModalProps.onClose?.())
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+    expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalled()
+  })
+
   it("opens the has-funds warning on mainnet when the probe returns a positive balance", async () => {
     mockProbeWallets.mockResolvedValue({
       status: "ok",

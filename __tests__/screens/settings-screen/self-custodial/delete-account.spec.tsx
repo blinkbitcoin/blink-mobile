@@ -290,6 +290,24 @@ describe("DeleteAccount", () => {
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
   })
 
+  it("drops a confirmed removal whose hide never came once the user cancels", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+    })
+    const { getByTestId } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
+    act(() => lastConfirmProps.onClose?.())
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+  })
+
   it("locks the screen under the removed account's name, read before the switch", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({
       lightningAddress: "alice@breez.tips",

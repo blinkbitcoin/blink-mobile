@@ -24,7 +24,7 @@ export const DeleteAccount: React.FC = () => {
   const styles = useStyles()
   const { LL } = useI18nContext()
   const { activeAccount, selfCustodialEntries } = useAccountRegistry()
-  const { requestRemoval, runPendingRemoval } = useAccountRemoval()
+  const { requestRemoval, cancelRemoval, runPendingRemoval } = useAccountRemoval()
   const { wallets, lightningAddress } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
@@ -82,7 +82,10 @@ export const DeleteAccount: React.FC = () => {
 
       <DeleteAccountConfirmModal
         isVisible={confirmVisible}
-        onClose={() => setConfirmVisible(false)}
+        onClose={() => {
+          cancelRemoval()
+          setConfirmVisible(false)
+        }}
         onConfirm={handleConfirm}
         onModalHide={runPendingRemoval}
       />

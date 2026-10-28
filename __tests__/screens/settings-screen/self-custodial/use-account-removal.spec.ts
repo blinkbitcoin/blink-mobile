@@ -149,6 +149,16 @@ describe("useAccountRemoval", () => {
     )
   })
 
+  it("drops a confirmed removal once it is cancelled", async () => {
+    const { result } = renderHook(() => useAccountRemoval())
+
+    act(() => result.current.requestRemoval("account-a", "Anon user"))
+    act(() => result.current.cancelRemoval())
+    await act(() => result.current.runPendingRemoval())
+
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+  })
+
   it("runs a confirmed removal once, even if the modal reports hiding again", async () => {
     mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "remained" })
     const { result } = renderHook(() => useAccountRemoval())

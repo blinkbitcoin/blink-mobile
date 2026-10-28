@@ -48,7 +48,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const { lightningAddress: liveLightningAddress, wallets: liveWallets } =
     useSelfCustodialWallet()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
-  const { requestRemoval, runPendingRemoval } = useAccountRemoval()
+  const { requestRemoval, cancelRemoval, runPendingRemoval } = useAccountRemoval()
   const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -185,7 +185,10 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
       />
       <DeleteAccountConfirmModal
         isVisible={confirmVisible}
-        onClose={() => setConfirmVisible(false)}
+        onClose={() => {
+          cancelRemoval()
+          setConfirmVisible(false)
+        }}
         onConfirm={handleConfirm}
         onModalHide={runPendingRemoval}
       />
