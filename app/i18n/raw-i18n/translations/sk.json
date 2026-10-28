@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Núdzový balík",
-      "screenTitle": "Núdzový odchod",
+      "title": "Núdzový odchod",
       "body": "Ak Spark prestane fungovať, tento balík ti umožní presunúť tvoje bitcoiny on-chain bez Blinku. Tvoj dolárový zostatok sa obnoviť nedá.",
       "download": "Stiahnuť balík",
       "sensitiveTitle": "Citlivé",

@@ -32,7 +32,7 @@ Any failure on a supported OS blocks release.
 
 On a funded self-custodial wallet, for each backup method:
 
-- No backup and manual phrase backup → Settings → Emergency bundle downloads a
+- No backup and manual phrase backup → Settings → Emergency exit downloads a
   bundle; no bundle file appears in the cloud.
 - Cloud backup with a passphrase and cloud backup without one → a bundle file
   (`blink-spark-recovery-bundle-<network>-<pubkey>.json`) appears next to the

@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Vészhelyzeti csomag",
-      "screenTitle": "Vészkilépés",
+      "title": "Vészkilépés",
       "body": "Ha a Spark leáll, ezzel a csomaggal a Blink nélkül mozgathatod a bitcoinodat on-chain. A dolláregyenleged nem állítható helyre.",
       "download": "Csomag letöltése",
       "sensitiveTitle": "Érzékeny",

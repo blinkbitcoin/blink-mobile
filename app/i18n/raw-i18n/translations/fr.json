@@ -3841,8 +3841,7 @@
             }
         },
         "BundleExport": {
-            "title": "Paquet d'urgence",
-            "screenTitle": "Sortie d'urgence",
+            "title": "Sortie d'urgence",
             "body": "Si Spark tombe en panne, ce paquet vous permet de déplacer vos bitcoins on-chain sans Blink. Votre solde en dollars ne peut pas être récupéré.",
             "download": "Télécharger le paquet",
             "sensitiveTitle": "Sensible",

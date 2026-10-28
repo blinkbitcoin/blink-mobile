@@ -78,7 +78,7 @@ export const BundleExportScreen: React.FC = () => {
       <IconHero
         icon="emergency-kit"
         iconColor={colors._green}
-        title={LL.BackupScreen.BundleExport.screenTitle()}
+        title={LL.BackupScreen.BundleExport.title()}
         subtitle={LL.BackupScreen.BundleExport.body()}
       />
 

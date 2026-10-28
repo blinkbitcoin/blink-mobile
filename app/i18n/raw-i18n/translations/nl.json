@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Noodbundel",
-      "screenTitle": "Nooduitstap",
+      "title": "Nooduitstap",
       "body": "Als Spark uitvalt, kun je met deze bundel je bitcoin zonder Blink on-chain verplaatsen. Je dollarsaldo kan niet worden hersteld.",
       "download": "Bundel downloaden",
       "sensitiveTitle": "Gevoelig",

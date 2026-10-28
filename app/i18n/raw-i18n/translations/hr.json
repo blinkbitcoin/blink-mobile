@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Paket za hitne slučajeve",
-      "screenTitle": "Izlaz u nuždi",
+      "title": "Izlaz u nuždi",
       "body": "Ako Spark prestane raditi, ovaj paket omogućuje ti da premjestiš svoje bitcoine on-chain bez Blinka. Tvoj dolarski saldo ne može se oporaviti.",
       "download": "Preuzmi paket",
       "sensitiveTitle": "Osjetljivo",

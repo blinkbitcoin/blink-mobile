@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Paket darurat",
-      "screenTitle": "Keluar darurat",
+      "title": "Keluar darurat",
       "body": "Jika Spark mati, paket ini memungkinkanmu memindahkan bitcoin-mu secara on-chain tanpa Blink. Saldo dolarmu tidak bisa dipulihkan.",
       "download": "Unduh paket",
       "sensitiveTitle": "Sensitif",

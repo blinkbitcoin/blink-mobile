@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Gói khẩn cấp",
-      "screenTitle": "Rút khẩn cấp",
+      "title": "Rút khẩn cấp",
       "body": "Nếu Spark ngừng hoạt động, gói này cho phép bạn chuyển bitcoin của mình on-chain mà không cần Blink. Số dư đô la của bạn không thể khôi phục.",
       "download": "Tải gói xuống",
       "sensitiveTitle": "Nhạy cảm",

@@ -71,13 +71,18 @@ describe("EmergencyBundleSetting", () => {
 
   /** The bundle lives on the device whether or not the seed is backed up, so
    *  the row does not wait for a backup. */
-  it("shows Emergency bundle on a self-custodial account with no backup yet", () => {
+  it("shows Emergency exit on a self-custodial account with no backup yet", () => {
     const { getByText } = renderRow()
 
     expect(getByText(LL.BackupScreen.BundleExport.title())).toBeTruthy()
   })
 
-  it("opens the emergency bundle screen from the settings entry", () => {
+  /** The row carries the name of the screen it opens. */
+  it("is named Emergency exit, like the screen", () => {
+    expect(LL.BackupScreen.BundleExport.title()).toBe("Emergency exit")
+  })
+
+  it("opens the emergency exit screen from the settings entry", () => {
     const { getByText } = renderRow()
 
     fireEvent.press(getByText(LL.BackupScreen.BundleExport.title()))

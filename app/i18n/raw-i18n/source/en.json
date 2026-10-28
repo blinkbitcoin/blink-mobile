@@ -3847,8 +3847,7 @@
             "networkError": "Network error. Please check your connection and try again."
         },
         "BundleExport": {
-            "title": "Emergency bundle",
-            "screenTitle": "Emergency exit",
+            "title": "Emergency exit",
             "body": "If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.",
             "learnMore": "Learn more about unilateral exit",
             "download": "Download bundle",

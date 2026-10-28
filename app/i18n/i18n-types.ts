@@ -12749,13 +12749,9 @@ type RootTranslation = {
 		}
 		BundleExport: {
 			/**
-			 * E​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e
-			 */
-			title: string
-			/**
 			 * E​m​e​r​g​e​n​c​y​ ​e​x​i​t
 			 */
-			screenTitle: string
+			title: string
 			/**
 			 * I​f​ ​S​p​a​r​k​ ​g​o​e​s​ ​d​o​w​n​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​n​c​h​a​i​n​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​c​a​n​'​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​.
 			 */
@@ -26793,13 +26789,9 @@ export type TranslationFunctions = {
 		}
 		BundleExport: {
 			/**
-			 * Emergency bundle
-			 */
-			title: () => LocalizedString
-			/**
 			 * Emergency exit
 			 */
-			screenTitle: () => LocalizedString
+			title: () => LocalizedString
 			/**
 			 * If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.
 			 */

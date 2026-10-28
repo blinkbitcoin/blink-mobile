@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Ekipakiti eky'obwangu",
-      "screenTitle": "Okufuluma mu bwangu",
+      "title": "Okufuluma mu bwangu",
       "body": "Singa Spark egaana okukola, ekipakiti kino kikusobozesa okutwala bitcoin yo ku chain awatali Blink. Ssente zo eza doola teziyinza kuzzibwawo.",
       "download": "Ggya ekipakiti",
       "sensitiveTitle": "Kya kyama",

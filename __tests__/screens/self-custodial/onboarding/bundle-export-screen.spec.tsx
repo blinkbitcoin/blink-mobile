@@ -67,7 +67,7 @@ describe("BundleExportScreen", () => {
   it("explains the emergency exit", () => {
     renderScreen()
 
-    expect(screen.getByText(LL.BackupScreen.BundleExport.screenTitle())).toBeTruthy()
+    expect(screen.getByText(LL.BackupScreen.BundleExport.title())).toBeTruthy()
     expect(screen.getByText(LL.BackupScreen.BundleExport.body())).toBeTruthy()
   })
 

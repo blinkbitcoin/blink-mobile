@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Pachet de urgență",
-      "screenTitle": "Ieșire de urgență",
+      "title": "Ieșire de urgență",
       "body": "Dacă Spark nu mai funcționează, acest pachet îți permite să îți muți bitcoinii on-chain fără Blink. Soldul tău în dolari nu poate fi recuperat.",
       "download": "Descarcă pachetul",
       "sensitiveTitle": "Sensibil",

@@ -3841,8 +3841,7 @@
             }
         },
         "BundleExport": {
-            "title": "緊急バンドル",
-            "screenTitle": "緊急出金",
+            "title": "緊急出金",
             "body": "Spark が停止した場合、このバンドルを使えば Blink なしでビットコインをオンチェーンに移せます。ドル残高は復元できません。",
             "download": "バンドルをダウンロード",
             "sensitiveTitle": "機密情報",

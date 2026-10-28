@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Kifurushi cha dharura",
-      "screenTitle": "Kutoka kwa dharura",
+      "title": "Kutoka kwa dharura",
       "body": "Iwapo Spark itaacha kufanya kazi, kifurushi hiki hukuwezesha kuhamisha bitcoin zako on-chain bila Blink. Salio lako la dola haliwezi kurejeshwa.",
       "download": "Pakua kifurushi",
       "sensitiveTitle": "Nyeti",

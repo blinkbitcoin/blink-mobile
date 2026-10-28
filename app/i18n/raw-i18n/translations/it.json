@@ -3841,8 +3841,7 @@
             }
         },
         "BundleExport": {
-            "title": "Pacchetto di emergenza",
-            "screenTitle": "Uscita di emergenza",
+            "title": "Uscita di emergenza",
             "body": "Se Spark smette di funzionare, questo pacchetto ti permette di spostare i tuoi bitcoin on-chain senza Blink. Il tuo saldo in dollari non può essere recuperato.",
             "download": "Scarica il pacchetto",
             "sensitiveTitle": "Sensibile",

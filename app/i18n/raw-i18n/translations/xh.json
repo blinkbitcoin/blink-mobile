@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Ingqokelela yongxamiseko",
-      "screenTitle": "Ukuphuma ngongxamiseko",
+      "title": "Ukuphuma ngongxamiseko",
       "body": "Ukuba iSpark iyayeka ukusebenza, le ngqokelela ikuvumela ukuba uhambise ibitcoin yakho kwi-chain ngaphandle kweBlink. Ibhalansi yakho yeedola ayinakubuyiselwa.",
       "download": "Khuphela ingqokelela",
       "sensitiveTitle": "Ibucayi",

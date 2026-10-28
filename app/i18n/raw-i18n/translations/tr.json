@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Acil durum paketi",
-      "screenTitle": "Acil çıkış",
+      "title": "Acil çıkış",
       "body": "Spark çökerse bu paket, bitcoin'ini Blink olmadan zincir üzerine taşımanı sağlar. Dolar bakiyen kurtarılamaz.",
       "download": "Paketi indir",
       "sensitiveTitle": "Hassas",

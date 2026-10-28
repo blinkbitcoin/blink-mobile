@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Paquet d'emergència",
-      "screenTitle": "Sortida d'emergència",
+      "title": "Sortida d'emergència",
       "body": "Si Spark deixa de funcionar, aquest paquet et permet moure els teus bitcoins a la cadena sense Blink. El teu saldo en dòlars no es pot recuperar.",
       "download": "Baixa el paquet",
       "sensitiveTitle": "Sensible",

@@ -3841,8 +3841,7 @@
       }
     },
     "BundleExport": {
-      "title": "Nødbundt",
-      "screenTitle": "Nødexit",
+      "title": "Nødexit",
       "body": "Hvis Spark går ned, lader dette bundt dig flytte dine bitcoin on-chain uden Blink. Din dollarsaldo kan ikke gendannes.",
       "download": "Download bundt",
       "sensitiveTitle": "Følsom",

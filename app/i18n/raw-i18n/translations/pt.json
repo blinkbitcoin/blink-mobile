@@ -3841,8 +3841,7 @@
             }
         },
         "BundleExport": {
-            "title": "Pacote de emergência",
-            "screenTitle": "Saída de emergência",
+            "title": "Saída de emergência",
             "body": "Se o Spark cair, este pacote permite mover seus bitcoins on-chain sem o Blink. Seu saldo em dólares não pode ser recuperado.",
             "download": "Baixar pacote",
             "sensitiveTitle": "Sensível",

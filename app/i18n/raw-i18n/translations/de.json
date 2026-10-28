@@ -3841,8 +3841,7 @@
             }
         },
         "BundleExport": {
-            "title": "Notfall-Bundle",
-            "screenTitle": "Notfall-Ausstieg",
+            "title": "Notfall-Ausstieg",
             "body": "Falls Spark ausfällt, kannst du mit diesem Bundle deine Bitcoin ohne Blink On-Chain bewegen. Dein Dollar-Guthaben lässt sich nicht wiederherstellen.",
             "download": "Bundle herunterladen",
             "sensitiveTitle": "Sensibel",
