@@ -12,6 +12,7 @@ const check = (over: Partial<Parameters<typeof statusFor>[0]> = {}) =>
     savedAt: NOW - 60_000,
     savedTotalSats: "21000",
     currentTotalSats: "21000",
+    uncoveredChangeAt: null,
     now: NOW,
     ...over,
   })
@@ -63,6 +64,12 @@ describe("statusFor", () => {
       expect(check({ savedAt: NOW - 1000, currentTotalSats: "31000" })).toBe(
         RecoveryBundleStatus.Stale,
       )
+    })
+
+    it("is stale when a change the bundle may not cover was marked, even at a recent, unchanged balance", () => {
+      // A swap or consolidation moves the outputs without moving the total, and
+      // a refresh that failed leaves the mark set until a later one covers it.
+      expect(check({ uncoveredChangeAt: NOW - 30_000 })).toBe(RecoveryBundleStatus.Stale)
     })
 
     it("does not guess while the balance is still loading", () => {
