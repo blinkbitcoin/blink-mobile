@@ -540,6 +540,35 @@ describe("readPinLockState", () => {
     expect(mockedStore.setPinFailureState).toHaveBeenCalledWith(repaired)
   })
 
+  /** The repair runs outside the verification guard, so an entry can be recorded between
+   *  the read and the repair. Written blind, the repair would put a lower count back. */
+  it("does not write the repair over an entry recorded since the read", async () => {
+    const outran = { attempts: 1, lockedUntil: NOW + 60 * MINUTE_MS }
+    const recordedMeanwhile = { attempts: 2, lockedUntil: NOW + 30 * SECOND_MS }
+    mockedStore.getPinFailureState
+      .mockResolvedValueOnce({ status: "found", state: outran })
+      .mockResolvedValueOnce({ status: "found", state: recordedMeanwhile })
+
+    await expect(readPinLockState(NOW)).resolves.toEqual({
+      status: "readable",
+      state: { attempts: 1, lockedUntil: NOW + 10 * SECOND_MS },
+    })
+    expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
+  })
+
+  it("does not write the repair when the slot cannot be read again", async () => {
+    mockedStore.getPinFailureState
+      .mockResolvedValueOnce({
+        status: "found",
+        state: { attempts: 1, lockedUntil: NOW + 60 * MINUTE_MS },
+      })
+      .mockResolvedValueOnce({ status: "failed", err: new Error("keystore locked") })
+
+    await readPinLockState(NOW)
+
+    expect(mockedStore.setPinFailureState).not.toHaveBeenCalled()
+  })
+
   it("leaves a lock inside its own wait alone", async () => {
     const stored = { attempts: 2, lockedUntil: NOW + 20 * SECOND_MS }
     storedState(stored)

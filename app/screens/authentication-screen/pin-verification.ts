@@ -42,6 +42,43 @@ type PinLockStateRead =
   | { readonly status: "unreadable" }
 
 /**
+ * Writes a repaired lock only over the value it was cut from. The repair runs outside the
+ * verification guard, on mount and from a live countdown, so an entry can be recorded
+ * between the read and this write; written blind, the repair would put a lower count back
+ * over it. Today that cannot happen, since a repair is only due while a lock is in force
+ * and the keypad is shut, but that is the UI holding the invariant, not the store.
+ */
+const repairStoredLock = async (
+  stored: PinFailureState,
+  repaired: PinFailureState,
+): Promise<void> => {
+  const current = await KeyStoreWrapper.getPinFailureState()
+  const isStillWhatWasRead =
+    current.status === "found" &&
+    Object.is(current.state.attempts, stored.attempts) &&
+    Object.is(current.state.lockedUntil, stored.lockedUntil)
+  if (!isStillWhatWasRead) return
+
+  /** The cut state is returned either way, so a refused repair costs correctness nothing:
+   *  it is cut again on the next read. What it costs is silence. A slot that will not take
+   *  this write will not take the ones the budget depends on either, and nothing else here
+   *  would say so, because this is the one write whose result had no reader.
+   *
+   *  Under the attempt-write key rather than its own: this is that same slot refusing that
+   *  same write. The message names the slot rather than the repair because the key is
+   *  shared and the first report under it silences the rest, and this one can be the first:
+   *  it fires on mount and on a clock moved backward, both before any entry is submitted.
+   *  A message about a lock repair would file the write that ends a session as a nit. */
+  const isRepairWritten = await KeyStoreWrapper.setPinFailureState(repaired)
+  if (!isRepairWritten) {
+    recordAppError(new Error("PIN attempt state could not be persisted (lock repair)"), {
+      alwaysRecord: true,
+      dedupKey: PinErrorKey.AttemptsWrite,
+    })
+  }
+}
+
+/**
  * Reads the persisted attempt count and its lock, and bounds both.
  *
  * The count is floored and truncated, so a stored value that is negative or
@@ -69,29 +106,7 @@ export const readPinLockState = async (now: number): Promise<PinLockStateRead> =
   const lockedUntil = clampLockedUntil({ attempts, lockedUntil: stored.lockedUntil }, now)
 
   if (lockedUntil !== stored.lockedUntil) {
-    /** The cut state is returned either way, so a refused repair costs correctness nothing:
-     *  it is cut again on the next read. What it costs is silence. A slot that will not take
-     *  this write will not take the ones the budget depends on either, and nothing else here
-     *  would say so, because this is the one write whose result had no reader.
-     *
-     *  Under the attempt-write key rather than its own: this is that same slot refusing that
-     *  same write. The message names the slot rather than the repair because the key is
-     *  shared and the first report under it silences the rest, and this one can be the first:
-     *  it fires on mount and on a clock moved backward, both before any entry is submitted.
-     *  A message about a lock repair would file the write that ends a session as a nit. */
-    const isRepairWritten = await KeyStoreWrapper.setPinFailureState({
-      attempts,
-      lockedUntil,
-    })
-    if (!isRepairWritten) {
-      recordAppError(
-        new Error("PIN attempt state could not be persisted (lock repair)"),
-        {
-          alwaysRecord: true,
-          dedupKey: PinErrorKey.AttemptsWrite,
-        },
-      )
-    }
+    await repairStoredLock(stored, { attempts, lockedUntil })
   }
 
   return { status: "readable", state: { attempts, lockedUntil } }
