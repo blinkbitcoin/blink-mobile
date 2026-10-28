@@ -11,10 +11,15 @@ const mockNavigate = jest.fn()
 const mockToastShow = jest.fn()
 const mockReportError = jest.fn()
 const mockReadSessionProfiles = jest.fn()
+const mockReturnToGate = jest.fn()
 
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
   default: () => ({ logout: mockLogout }),
+}))
+
+jest.mock("@app/hooks/use-return-to-gate", () => ({
+  useReturnToGate: () => mockReturnToGate,
 }))
 
 jest.mock("@app/hooks", () => ({
@@ -71,10 +76,11 @@ describe("useSwitchToNextProfile", () => {
     mockSaveToken.mockResolvedValue(undefined)
   })
 
-  it("switches the session behind an unanswered lock without opening the home screen", async () => {
-    /** A session can die while the lock screen is the one on show. The home screen
-     *  pushed from here would sit on top of it; answering the lock is what lands on
-     *  home, on the session this switch left waiting. */
+  it("switches the session behind an unanswered lock and sends the whole stack back to the gate", async () => {
+    /** A session can die while the lock screen is the one on show. The screens under
+     *  the lock belong to the dead session, and a resume unlock would step back onto
+     *  them under the new token, so nothing of them may be left: the gate asks again
+     *  from a cold start, and answering it lands on home for the new session. */
     mockIsAppLocked = true
     storeProfiles([profileA, profileB])
 
@@ -87,6 +93,7 @@ describe("useSwitchToNextProfile", () => {
     expect(switchResult).toBe(SwitchProfileOutcome.Switched)
     expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockReturnToGate).toHaveBeenCalledTimes(1)
   })
 
   /**
@@ -124,6 +131,7 @@ describe("useSwitchToNextProfile", () => {
     expect(await switchDone).toBe(SwitchProfileOutcome.Switched)
     expect(mockSaveToken).toHaveBeenCalledWith("tok-b")
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockReturnToGate).toHaveBeenCalledTimes(1)
   })
 
   /** The mirror has to follow the lock down as well, or a switch after an answered lock
@@ -154,6 +162,7 @@ describe("useSwitchToNextProfile", () => {
     })
 
     expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockReturnToGate).not.toHaveBeenCalled()
   })
 
   it("deactivates the old token before saving the next profile's token", async () => {
