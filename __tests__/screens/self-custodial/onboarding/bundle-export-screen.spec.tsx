@@ -1,5 +1,6 @@
 import React from "react"
-import { Linking } from "react-native"
+import { Linking, StyleSheet } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import { render, fireEvent, screen, waitFor } from "@testing-library/react-native"
 
@@ -22,6 +23,11 @@ const mockActions: RecoveryBundleActions = {
   reloadState: jest.fn().mockResolvedValue(undefined),
   handleShare: jest.fn().mockResolvedValue(true),
 }
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
 
 // The actions hook has its own spec; mocking it keeps this one about the
 // screen, without pulling in the keystore.
@@ -46,6 +52,11 @@ const renderScreen = () =>
       <BundleExportScreen />
     </ContextForScreen>,
   )
+
+/** The inactive look is painted on the button's inner view, not its touchable. */
+const isDrawnInactive = (button: ReactTestInstance): boolean =>
+  button.findAll((node) => StyleSheet.flatten(node.props.style)?.opacity === 0.5).length >
+  0
 
 const savedBundle = { savedAt: 1, leafCount: 3 } as never
 
@@ -138,22 +149,57 @@ describe("BundleExportScreen", () => {
       expect(mockActions.handleShare).toHaveBeenCalledTimes(1)
     })
 
-    it("cannot download before the wallet has a bundle", () => {
-      // A wallet that has never held funds has nothing to hand over.
+    /** A wallet that has never held funds has nothing to hand over: the
+     *  button looks inactive, but a tap says why instead of doing nothing. */
+    it("says to transact first when tapped before the wallet has a bundle", () => {
       mockActions.bundleState = null
       renderScreen()
 
       fireEvent.press(screen.getByTestId("bundle-download-button"))
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.RecoveryBundleScreen.noBundleToExport(),
+          type: "warning",
+        }),
+      )
       expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+    })
+
+    it("looks inactive without a bundle but still takes the tap", () => {
+      mockActions.bundleState = null
+      renderScreen()
+
+      const button = screen.getByTestId("bundle-download-button")
+      expect(isDrawnInactive(button)).toBe(true)
+      fireEvent.press(button)
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+
+    it("looks active once the wallet has a bundle", () => {
+      renderScreen()
+
+      expect(isDrawnInactive(screen.getByTestId("bundle-download-button"))).toBe(false)
+      expect(mockToastShow).not.toHaveBeenCalled()
     })
   })
 
-  it("cannot download while the saved bundle is still being read", () => {
+  /** Still reading is not "no bundle": no toast claiming there is none. */
+  it("does nothing on a tap while the saved bundle is still being read", () => {
     mockActions.bundleState = undefined
     renderScreen()
 
     fireEvent.press(screen.getByTestId("bundle-download-button"))
     expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("re-reads the saved bundle when the screen comes into focus", () => {
+    renderScreen()
+
+    expect(mockActions.reloadState).toHaveBeenCalledTimes(1)
   })
 
   it("opens the unilateral exit article from learn more", () => {

@@ -12,6 +12,7 @@ import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useRecoveryBundleActions } from "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
 import { OnboardingScreenLayout } from "../layouts"
 
@@ -46,15 +47,27 @@ export const BundleExportScreen: React.FC = () => {
 
   /** A wallet that has never held funds has no bundle to hand over yet. */
   const hasBundle = Boolean(bundleState)
+  /** Read and found nothing, as opposed to still reading. */
+  const isBundleMissing = bundleState === null
 
-  /** The warning is shown once, before the first download. */
+  /** The warning is shown once, before the first download. Without a bundle
+   *  the button only looks inactive: a tap says why there is nothing yet. */
   const onDownloadPress = useCallback(async () => {
+    if (isBundleMissing) {
+      toastShow({
+        message: LL.RecoveryBundleScreen.noBundleToExport(),
+        type: "warning",
+        LL,
+      })
+      return
+    }
+    if (!hasBundle) return
     if (hasDownloaded) {
       await handleShare()
       return
     }
     setConfirmingDownload(true)
-  }, [hasDownloaded, handleShare])
+  }, [isBundleMissing, hasBundle, hasDownloaded, handleShare, LL])
 
   const onConfirmDownload = useCallback(async () => {
     setConfirmingDownload(false)
@@ -70,7 +83,9 @@ export const BundleExportScreen: React.FC = () => {
           title={LL.BackupScreen.BundleExport.download()}
           onPress={onDownloadPress}
           loading={sharing}
-          disabled={!hasBundle}
+          {...(hasBundle
+            ? {}
+            : { buttonStyle: styles.inactiveButton, titleStyle: styles.inactiveTitle })}
           {...testProps("bundle-download-button")}
         />
       }
@@ -110,7 +125,19 @@ export const BundleExportScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+/** GaloyPrimaryButton's disabled look, on a button that still takes the tap. */
+const useStyles = makeStyles(({ colors }) => ({
+  inactiveButton: {
+    minHeight: 50,
+    opacity: 0.5,
+    backgroundColor: colors.primary,
+  },
+  inactiveTitle: {
+    fontSize: 20,
+    lineHeight: 24,
+    fontWeight: "600",
+    color: colors.grey5,
+  },
   learnMore: {
     paddingTop: 10,
     textAlign: "center",
