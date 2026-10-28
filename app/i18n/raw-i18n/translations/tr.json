@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Kurtarma nasıl çalışır",
-    "howItWorksBody": "Spark kullanılamaz hale gelirse, bu yedek paranı Blink olmadan kendin zincir üzerine taşımanı sağlar. Kurtarma birkaç haftalık bir süreçtir: işlemler yayınlanır, ardından paranın seçtiğin bir cüzdana gönderilebilmesi için bir bekleme süresi geçer. Ayrı bir Bitcoin bakiyesinden ödediğin zincir ücretleri de vardır. Küçük tutarların kurtarılması değerinden fazlaya mal olabilir.",
+    "howItWorksBody": "Spark kullanılamaz hale gelirse, bu yedek bitcoin'ini Blink olmadan kendin zincir üzerine taşımanı sağlar. Dolar bakiyen bu yolla kurtarılamaz.\n\nKurtarma yaklaşık iki haftaya kadar sürebilir: işlemler yayınlanır, ardından paranın seçtiğin bir cüzdana gönderilebilmesi için bir bekleme süresi geçer. Ayrı bir zincir üstü işlemle ödediğin zincir ücretleri de vardır. Küçük tutarlar, değerlerinden fazla ücrete mal olur.",
     "noBundleToExport": "Henüz kaydedilmiş bir kurtarma yedeği yok. Önce yenileyin.",
     "exportFailed": "Kurtarma yedeği dışa aktarılamadı."
   },

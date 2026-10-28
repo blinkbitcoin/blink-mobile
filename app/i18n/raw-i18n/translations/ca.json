@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Com funciona la recuperació",
-    "howItWorksBody": "Si Spark deixa d'estar disponible, aquesta còpia et permet moure els teus fons a la cadena tu mateix, sense Blink. La recuperació és un procés de diverses setmanes: es difonen transaccions i després passa un període d'espera abans de poder enviar els fons a un moneder que triïs. També té comissions de cadena, que pagues des d'un saldo de Bitcoin separat. Els imports petits poden costar més de recuperar del que valen.",
+    "howItWorksBody": "Si Spark deixa d'estar disponible, aquesta còpia et permet moure els teus bitcoins a la cadena tu mateix, sense Blink. El teu saldo en dòlars no es pot recuperar d'aquesta manera.\n\nLa recuperació pot trigar fins a unes dues setmanes: es difonen transaccions i després passa un període d'espera abans de poder enviar els fons a un moneder que triïs. També té comissions de cadena, que pagues amb una transacció a la cadena separada. Els imports petits costaran més en comissions del que valen.",
     "noBundleToExport": "Encara no hi ha cap còpia de recuperació desada. Actualitza-la primer.",
     "exportFailed": "No s'ha pogut exportar la còpia de recuperació."
   },

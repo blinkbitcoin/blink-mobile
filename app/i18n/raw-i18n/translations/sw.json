@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Jinsi urejeshaji unavyofanya kazi",
-    "howItWorksBody": "Iwapo Spark haitapatikana, nakala hii hukuwezesha kuhamisha fedha zako on-chain mwenyewe, bila Blink. Urejeshaji huchukua wiki kadhaa: miamala hutangazwa, kisha kipindi cha kusubiri hupita kabla fedha kutumwa kwenye pochi unayochagua. Pia hugharimu ada za on-chain, unazolipa kutoka salio tofauti la Bitcoin. Kiasi kidogo kinaweza kugharimu zaidi ya thamani yake.",
+    "howItWorksBody": "Iwapo Spark haitapatikana, nakala hii hukuwezesha kuhamisha bitcoin zako on-chain mwenyewe, bila Blink. Salio lako la dola haliwezi kurejeshwa kwa njia hii.\n\nUrejeshaji unaweza kuchukua hadi takriban wiki mbili: miamala hutangazwa, kisha kipindi cha kusubiri hupita kabla fedha kutumwa kwenye pochi unayochagua. Pia hugharimu ada za on-chain, unazolipa kwa muamala tofauti wa on-chain. Kiasi kidogo kitagharimu ada zaidi ya thamani yake.",
     "noBundleToExport": "Hakuna nakala ya urejeshaji iliyohifadhiwa bado. Sasisha kwanza.",
     "exportFailed": "Imeshindwa kuhamisha nakala ya urejeshaji."
   },

@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Sådan fungerer gendannelse",
-    "howItWorksBody": "Hvis Spark bliver utilgængelig, lader denne sikkerhedskopi dig selv flytte dine midler on-chain, uden Blink. Gendannelse tager flere uger: transaktioner udsendes, og derefter går en ventetid, før midlerne kan sendes til en tegnebog, du vælger. Det koster også on-chain-gebyrer, som du betaler fra en separat bitcoin-saldo. Små beløb kan koste mere at gendanne, end de er værd.",
+    "howItWorksBody": "Hvis Spark bliver utilgængelig, lader denne sikkerhedskopi dig selv flytte dine bitcoin on-chain, uden Blink. Din dollarsaldo kan ikke gendannes på denne måde.\n\nGendannelse kan tage op til cirka to uger: transaktioner udsendes, og derefter går en ventetid, før midlerne kan sendes til en tegnebog, du vælger. Det koster også on-chain-gebyrer, som du betaler med en separat on-chain-transaktion. Små beløb vil koste mere i gebyrer, end de er værd.",
     "noBundleToExport": "Ingen gendannelsesbackup gemt endnu. Opdater først.",
     "exportFailed": "Kunne ikke eksportere gendannelsesbackuppen."
   },

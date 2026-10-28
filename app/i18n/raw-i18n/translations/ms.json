@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Cara pemulihan berfungsi",
-    "howItWorksBody": "Jika Spark tidak tersedia, sandaran ini membolehkan anda memindahkan dana sendiri secara on-chain, tanpa Blink. Pemulihan mengambil masa beberapa minggu: transaksi disiarkan, kemudian tempoh menunggu berlalu sebelum dana boleh dihantar ke dompet pilihan anda. Ia juga melibatkan yuran on-chain, yang anda bayar daripada baki Bitcoin berasingan. Jumlah kecil mungkin lebih mahal untuk dipulihkan daripada nilainya.",
+    "howItWorksBody": "Jika Spark tidak tersedia, sandaran ini membolehkan anda memindahkan bitcoin anda sendiri secara on-chain, tanpa Blink. Baki dolar anda tidak boleh dipulihkan dengan cara ini.\n\nPemulihan boleh mengambil masa sehingga kira-kira dua minggu: transaksi disiarkan, kemudian tempoh menunggu berlalu sebelum dana boleh dihantar ke dompet pilihan anda. Ia juga melibatkan yuran on-chain, yang anda bayar dengan transaksi on-chain berasingan. Jumlah kecil akan menelan yuran lebih daripada nilainya.",
     "noBundleToExport": "Tiada sandaran pemulihan disimpan lagi. Segarkan dahulu.",
     "exportFailed": "Tidak dapat mengeksport sandaran pemulihan."
   },

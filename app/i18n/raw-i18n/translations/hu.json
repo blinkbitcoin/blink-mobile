@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Hogyan működik a helyreállítás",
-    "howItWorksBody": "Ha a Spark elérhetetlenné válik, ezzel a mentéssel magad mozgathatod a pénzed on-chain, a Blink nélkül. A helyreállítás több hetes folyamat: tranzakciók kerülnek közvetítésre, majd várakozási idő telik el, mielőtt a pénz egy általad választott tárcába küldhető. On-chain díjakkal is jár, amelyeket külön bitcoin-egyenlegből fizetsz. Kis összegek helyreállítása többe kerülhet, mint amennyit érnek.",
+    "howItWorksBody": "Ha a Spark elérhetetlenné válik, ezzel a mentéssel magad mozgathatod a bitcoinodat on-chain, a Blink nélkül. A dolláregyenleged így nem állítható helyre.\n\nA helyreállítás akár nagyjából két hétig is tarthat: tranzakciók kerülnek közvetítésre, majd várakozási idő telik el, mielőtt a pénz egy általad választott tárcába küldhető. On-chain díjakkal is jár, amelyeket egy külön on-chain tranzakcióval fizetsz. Kis összegeknél a díjak többe kerülnek, mint amennyit az összeg ér.",
     "noBundleToExport": "Még nincs elmentett helyreállítási mentés. Először frissíts.",
     "exportFailed": "Nem sikerült exportálni a helyreállítási mentést."
   },

@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Kutichiy imayna llamkasqan",
-    "howItWorksBody": "Spark mana llamkaptin, kay waqaychayqa qullqiykita kikiyki on-chain astanaykipaq yanapasunki, mana Blink-wan. Kutichiyqa achka simanata apan: rurasqakuna willakun, chaymanta suyana pacha pasan, chaymantaraq qullqi akllasqayki qullqi wasiman rin. On-chain pagaykunapas kan, sapaq Bitcoin qullqimanta pagasqa. Huch'uy qullqiqa aswan qullqita mañakunman chanintapas.",
+    "howItWorksBody": "Spark mana llamkaptin, kay waqaychayqa bitcoinniykita kikiyki on-chain astanaykipaq yanapasunki, mana Blink-wan. Dólar qullqiykiqa manam kay hinata kutichiyta atikunchu.\n\nKutichiyqa yaqa iskay simanakama apanman: rurasqakuna willakun, chaymanta suyana pacha pasan, chaymantaraq qullqi akllasqayki qullqi wasiman rin. On-chain pagaykunapas kan, sapaq on-chain rurasqawan pagasqa. Huch'uy qullqiqa pagaykunapi aswan qullqita mañakunqa chanintapas.",
     "noBundleToExport": "Manaraq kutichinapaq backup waqaychasqachu. Ñawpaqta musuqchay.",
     "exportFailed": "Mana atikurqachu kutichinapaq backupta hurquyta."
   },

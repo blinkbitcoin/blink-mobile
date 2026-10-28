@@ -4187,7 +4187,7 @@
     },
     "RecoveryBundleScreen": {
         "howItWorksTitle": "So funktioniert die Wiederherstellung",
-        "howItWorksBody": "Falls Spark nicht mehr verfügbar ist, kannst du mit diesem Backup deine Mittel selbst On-Chain bewegen, ohne Blink. Die Wiederherstellung dauert mehrere Wochen: Transaktionen werden gesendet, danach vergeht eine Wartezeit, bevor die Mittel an eine Wallet deiner Wahl gehen können. Es fallen außerdem On-Chain-Gebühren an, die du aus einem separaten Bitcoin-Guthaben zahlst. Kleine Beträge können mehr kosten, als sie wert sind.",
+        "howItWorksBody": "Falls Spark nicht mehr verfügbar ist, kannst du mit diesem Backup deine Bitcoin selbst On-Chain bewegen, ohne Blink. Dein Dollar-Guthaben lässt sich auf diesem Weg nicht wiederherstellen.\n\nDie Wiederherstellung kann bis zu etwa zwei Wochen dauern: Transaktionen werden gesendet, danach vergeht eine Wartezeit, bevor die Mittel an eine Wallet deiner Wahl gehen können. Es fallen außerdem On-Chain-Gebühren an, die du mit einer separaten On-Chain-Transaktion zahlst. Bei kleinen Beträgen kosten die Gebühren mehr, als die Beträge wert sind.",
         "noBundleToExport": "Noch kein Wiederherstellungs-Backup gespeichert. Aktualisiere zuerst.",
         "exportFailed": "Das Wiederherstellungs-Backup konnte nicht exportiert werden."
     },

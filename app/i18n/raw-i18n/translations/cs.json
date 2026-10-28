@@ -4187,7 +4187,7 @@
     },
   "RecoveryBundleScreen": {
     "howItWorksTitle": "Jak funguje obnova",
-    "howItWorksBody": "Pokud Spark přestane být dostupný, tato záloha vám umožní přesunout prostředky on-chain sami, bez Blinku. Obnova je několikatýdenní proces: transakce se odvysílají a poté uplyne čekací doba, než lze prostředky poslat do peněženky dle vaší volby. Stojí také on-chain poplatky, které platíte ze samostatného bitcoinového zůstatku. Malé částky může být dražší obnovit, než kolik mají hodnotu.",
+    "howItWorksBody": "Pokud Spark přestane být dostupný, tato záloha vám umožní přesunout vaše bitcoiny on-chain sami, bez Blinku. Váš dolarový zůstatek tímto způsobem obnovit nelze.\n\nObnova může trvat až zhruba dva týdny: transakce se odvysílají a poté uplyne čekací doba, než lze prostředky poslat do peněženky dle vaší volby. Stojí také on-chain poplatky, které platíte samostatnou on-chain transakcí. Malé částky budou stát na poplatcích víc, než kolik mají hodnotu.",
     "noBundleToExport": "Zatím není uložena žádná záloha pro obnovu. Nejprve ji aktualizujte.",
     "exportFailed": "Zálohu pro obnovu se nepodařilo exportovat."
   },
