@@ -193,7 +193,11 @@ describe("listDeposits", () => {
 })
 
 describe("listDeposits — early claims (0.26)", () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    /** clearAllMocks leaves queued mockResolvedValueOnce pages behind. */
+    mockListPayments.mockReset()
+  })
 
   const depositWithInstantStatus = (instantClaimStatus: unknown) => ({
     txid: "pqr678",
@@ -237,11 +241,17 @@ describe("listDeposits — early claims (0.26)", () => {
     expect(deposit.earlyClaim).toBe("credited")
   })
 
-  it("looks for the credit among the newest completed receives only", async () => {
+  const unrelatedReceives = (count: number) =>
+    Array.from({ length: count }, (_, i) => depositReceive(`older-${i}`, 0))
+  const pagesOf = (...pages: unknown[][]) => {
+    for (const payments of pages) mockListPayments.mockResolvedValueOnce({ payments })
+  }
+
+  it("asks for completed receives, newest first, a page at a time", async () => {
     mockListUnclaimedDeposits.mockResolvedValue({
       deposits: [depositWithInstantStatus(submitted)],
     })
-    mockListPayments.mockResolvedValue({ payments: [] })
+    pagesOf([])
 
     await listDeposits(mockSdk)
 
@@ -254,6 +264,76 @@ describe("listDeposits — early claims (0.26)", () => {
         sortAscending: false,
       }),
     )
+  })
+
+  it("finds a credit beyond the newest 50 receives on a later page", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    pagesOf(unrelatedReceives(50), [depositReceive("pqr678", 1)])
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("credited")
+    expect(mockListPayments.mock.calls.map(([req]) => req.offset)).toEqual([0, 50])
+  })
+
+  it("keeps paging until every settling deposit is found", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [
+        { ...depositWithInstantStatus(submitted), txid: "first" },
+        { ...depositWithInstantStatus(submitted), txid: "second" },
+      ],
+    })
+    pagesOf(
+      [...unrelatedReceives(49), depositReceive("first", 1)],
+      [depositReceive("second", 1)],
+    )
+
+    const deposits = await listDeposits(mockSdk)
+
+    expect(deposits.map(({ earlyClaim }) => earlyClaim)).toEqual(["credited", "credited"])
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  it("stops paging once every settling deposit is found", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    pagesOf(
+      [...unrelatedReceives(49), depositReceive("pqr678", 1)],
+      unrelatedReceives(50),
+    )
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("credited")
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("stops at a short page, which means history has run out", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    pagesOf(unrelatedReceives(50), unrelatedReceives(3), unrelatedReceives(50))
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("settling")
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  it("gives up after 500 full pages, keeping the deposit settling and reporting it", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    mockListPayments.mockResolvedValue({ payments: unrelatedReceives(50) })
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("settling")
+    expect(mockListPayments).toHaveBeenCalledTimes(500)
+    expect(mockReportError).toHaveBeenCalledTimes(1)
   })
 
   it("keeps a submitted early claim settling, and reports it, when history cannot be read", async () => {

@@ -92,33 +92,50 @@ const mapDeposit = (deposit: DepositInfo): MappedDeposit => ({
 
 const outpointKey = (txid: string, vout: number): string => `${txid}:${vout}`
 
-/** Early claims credit within seconds of being submitted, so their receives are among
- *  the newest. */
-const RECENT_RECEIVES_SCANNED = 50
+const RECEIVES_PAGE_SIZE = 50
+/** 500 pages × 50 receives: far beyond any real wallet, so hitting it means the SDK
+ *  stopped shortening pages and the loop would otherwise never terminate. */
+const RECEIVES_MAX_PAGES = 500
 
 /**
- * The deposits whose claim has already landed as a completed receive. A Submitted
- * deposit can still be credited: the transfer may have been claimed by another device
- * on the same wallet, which leaves this device's row Submitted until the UTXO is spent.
+ * Which of `settling` have already landed as a completed receive. A Submitted deposit
+ * can still be credited: the transfer may have been claimed by another device on the
+ * same wallet, or while this one was offline, which leaves this device's row
+ * Submitted until the UTXO is spent. Any number of receives can land after it, so
+ * history is paged, newest first, until every deposit is found or it runs out. A
+ * receive arriving mid-scan shifts later pages down, so it repeats an entry rather
+ * than skipping one.
  */
-const creditedOutpoints = async (sdk: BreezSdkInterface): Promise<Set<string>> => {
-  const { payments } = await sdk.listPayments({
-    typeFilter: [PaymentType.Receive],
-    statusFilter: [PaymentStatus.Completed],
-    assetFilter: undefined,
-    paymentDetailsFilter: undefined,
-    fromTimestamp: undefined,
-    toTimestamp: undefined,
-    offset: 0,
-    limit: RECENT_RECEIVES_SCANNED,
-    sortAscending: false,
-  })
-  return new Set(
-    payments.flatMap(({ details }) =>
-      details?.tag === PaymentDetailsTag.Deposit
-        ? [outpointKey(details.inner.txId, details.inner.vout)]
-        : [],
-    ),
+const creditedOutpoints = async (
+  sdk: BreezSdkInterface,
+  settling: ReadonlySet<string>,
+): Promise<Set<string>> => {
+  const found = new Set<string>()
+  for (let page = 0; page < RECEIVES_MAX_PAGES; page += 1) {
+    const { payments } = await sdk.listPayments({
+      typeFilter: [PaymentType.Receive],
+      statusFilter: [PaymentStatus.Completed],
+      assetFilter: undefined,
+      paymentDetailsFilter: undefined,
+      fromTimestamp: undefined,
+      toTimestamp: undefined,
+      offset: page * RECEIVES_PAGE_SIZE,
+      limit: RECEIVES_PAGE_SIZE,
+      sortAscending: false,
+    })
+    for (const { details } of payments) {
+      const key =
+        details?.tag === PaymentDetailsTag.Deposit
+          ? outpointKey(details.inner.txId, details.inner.vout)
+          : undefined
+      if (key && settling.has(key)) found.add(key)
+    }
+    if (found.size === settling.size || payments.length < RECEIVES_PAGE_SIZE) {
+      return found
+    }
+  }
+  throw new Error(
+    `Deposit credit lookup aborted after ${RECEIVES_MAX_PAGES} pages of ${RECEIVES_PAGE_SIZE} receives`,
   )
 }
 
@@ -127,11 +144,16 @@ export const listDeposits = async (sdk: BreezSdkInterface): Promise<MappedDeposi
     ListUnclaimedDepositsRequest.create({}),
   )
   const deposits = response.deposits.map(mapDeposit)
-  if (!deposits.some(({ earlyClaim }) => earlyClaim === "settling")) return deposits
+  const settling = new Set(
+    deposits
+      .filter(({ earlyClaim }) => earlyClaim === "settling")
+      .map(({ txid, vout }) => outpointKey(txid, vout)),
+  )
+  if (settling.size === 0) return deposits
 
-  /** Unread history keeps a settling deposit listed: shown twice for a moment beats
-   *  shown nowhere. */
-  const credited = await creditedOutpoints(sdk).catch((err) => {
+  /** Unread history keeps a settling deposit listed: shown twice until the next
+   *  listing reads it beats shown nowhere. */
+  const credited = await creditedOutpoints(sdk, settling).catch((err) => {
     reportError("Self-custodial deposit credit lookup", err)
     return new Set<string>()
   })
