@@ -1,6 +1,6 @@
 import React from "react"
 import type { ReactTestInstance } from "react-test-renderer"
-import { AccessibilityInfo } from "react-native"
+import { AccessibilityInfo, StyleSheet } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
 import { SUBMITTABLE_PLACE_CATEGORIES } from "@app/btcmap"
@@ -532,5 +532,63 @@ describe("AddPlacePanel", () => {
     continueToCategories({ getByTestId })
 
     expect(getByTestId("submit-place").props.accessibilityLabel).toBe("Submit request")
+  })
+
+  describe("for screen readers", () => {
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    it("marks the title as the panel's heading", () => {
+      const { getByText } = renderSheet()
+
+      expect(getByText("Suggest business").props.accessibilityRole).toBe("header")
+    })
+
+    it("moves focus to the top of each step it changes to, and not on open", async () => {
+      // The button that changed the step is not on the step it leads to, so
+      // focus left where it was would be on nothing.
+      // Which element took focus, by test id, read when the call is made: both
+      // steps put their first label in the same slot, so React keeps one
+      // element and changes its props rather than mounting another.
+      const focusedIds: string[] = []
+      const focus = jest
+        .spyOn(AccessibilityInfo, "sendAccessibilityEvent")
+        .mockImplementation((target, event) => {
+          const { testID } = (target as unknown as { props: { testID: string } }).props
+          focusedIds.push(`${testID}:${event}`)
+        })
+      const focused = () => focusedIds
+      const { getByTestId } = renderSheet()
+      expect(focus).not.toHaveBeenCalled()
+
+      continueToCategories({ getByTestId })
+      await waitFor(() => expect(focused()).toEqual(["place-category-start:focus"]))
+
+      fireEvent.press(getByTestId("back-to-place-details"))
+      await waitFor(() =>
+        expect(focused()).toEqual([
+          "place-category-start:focus",
+          "place-details-start:focus",
+        ]),
+      )
+      expect(focus).toHaveBeenCalledTimes(2)
+    })
+
+    it("makes every chip at least 44 tall, the smallest target a finger can be expected to hit", () => {
+      const { getByTestId } = renderSheet()
+      continueToCategories({ getByTestId })
+
+      const style = StyleSheet.flatten(getByTestId("place-category-cafes").props.style)
+      expect(style.minHeight).toBeGreaterThanOrEqual(44)
+    })
+
+    it("draws the review note in grey1, which holds its contrast on the light sheet", () => {
+      const { getByTestId, getByText } = renderSheet()
+      continueToCategories({ getByTestId })
+
+      const note = getByText(/BTC Map/)
+      expect(StyleSheet.flatten(note.props.style).color).toBe("#393939")
+    })
   })
 })
