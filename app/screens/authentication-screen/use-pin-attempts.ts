@@ -127,8 +127,9 @@ export const usePinAttempts = ({
 
         switch (result.outcome) {
           case "unlocked":
+            /** No rejected-entry reset here: an unlock always takes the screen away,
+             *  to wherever the lock opens or back to the challenge's caller. */
             setFailureState(NO_FAILURES)
-            setHasRejectedEntry(false)
             setIsVerifying(false)
             onUnlocked()
             return
