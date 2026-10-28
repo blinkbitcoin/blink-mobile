@@ -1,6 +1,7 @@
 import { it } from "@jest/globals"
 
 import type * as AnalyticsIdentity from "@app/self-custodial/analytics-identity"
+import type * as ErrorReporting from "@app/utils/error-reporting"
 
 /** Firebase's setters are asynchronous; each mock answers with a promise, and a test can
  *  hold one back to see what the module does while it is outstanding. */
@@ -11,6 +12,13 @@ const mockSetUserProperties = jest.fn(resolved)
 const mockSetAnalyticsCollectionEnabled = jest.fn(resolved)
 const mockResetAnalyticsData = jest.fn(resolved)
 const mockRecordError = jest.fn()
+const mockCrashLog = jest.fn()
+let mockCrashCollectionEnabled = true
+const mockSetCrashlyticsCollectionEnabled = jest.fn((enabled: boolean) => {
+  mockCrashCollectionEnabled = enabled
+  return Promise.resolve(null)
+})
+const mockDeleteUnsentReports = jest.fn(resolved)
 
 jest.mock("@react-native-firebase/analytics", () => () => ({
   setUserId: (...args: unknown[]) => mockSetUserId(...args),
@@ -23,6 +31,13 @@ jest.mock("@react-native-firebase/analytics", () => () => ({
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: (...args: unknown[]) => mockRecordError(...args),
+  log: (...args: unknown[]) => mockCrashLog(...args),
+  get isCrashlyticsCollectionEnabled() {
+    return mockCrashCollectionEnabled
+  },
+  setCrashlyticsCollectionEnabled: (enabled: boolean) =>
+    mockSetCrashlyticsCollectionEnabled(enabled),
+  deleteUnsentReports: () => mockDeleteUnsentReports(),
 }))
 
 const mockStore = new Map<string, string>()
@@ -55,6 +70,23 @@ const freshModule = (): typeof AnalyticsIdentity => {
   return mod
 }
 
+/** The identity owner and the error-reporting gate it drives, from one fresh process. */
+const freshModules = (): {
+  id: typeof AnalyticsIdentity
+  reporting: typeof ErrorReporting
+} => {
+  let id: typeof AnalyticsIdentity | undefined
+  let reporting: typeof ErrorReporting | undefined
+  jest.isolateModules(() => {
+    id = jest.requireActual<typeof AnalyticsIdentity>(
+      "@app/self-custodial/analytics-identity",
+    )
+    reporting = jest.requireActual<typeof ErrorReporting>("@app/utils/error-reporting")
+  })
+  if (!id || !reporting) throw new Error("modules did not load")
+  return { id, reporting }
+}
+
 const settle = async () => {
   for (let i = 0; i < 20; i += 1) {
     await new Promise((resolve) => {
@@ -85,6 +117,7 @@ describe("analytics identity", () => {
     jest.clearAllMocks()
     mockStore.clear()
     mockInstanceId = () => Promise.resolve("install-uuid")
+    mockCrashCollectionEnabled = true
     ;[
       mockSetUserId,
       mockSetUserProperty,
@@ -297,6 +330,92 @@ describe("analytics identity", () => {
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
       expect(mockSetAnalyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
       expect(mockRecordError).toHaveBeenCalled()
+    })
+  })
+
+  describe("crash reporting", () => {
+    it.each([
+      ["Incognito", "anon"],
+      ["an unset mode", "unset"],
+    ] as const)(
+      "stops Crashlytics and its breadcrumbs at once for %s",
+      (_label, domain) => {
+        const { id, reporting } = freshModules()
+        reporting.logBreadcrumb("before the switch")
+
+        id.setAnalyticsDomain(domain)
+        reporting.logBreadcrumb("after the switch")
+        reporting.recordAppError(new Error("a defect"))
+
+        expect(mockCrashLog).toHaveBeenCalledWith("before the switch")
+        expect(mockCrashLog).not.toHaveBeenCalledWith("after the switch")
+        expect(mockRecordError).not.toHaveBeenCalled()
+        expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenCalledWith(false)
+      },
+    )
+
+    it("deletes the reports held while closed before collection resumes", async () => {
+      const { id, reporting } = freshModules()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+      jest.clearAllMocks()
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+
+      expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+      const deleted = mockDeleteUnsentReports.mock.invocationCallOrder[0]
+      const enabled = orderOf(mockSetCrashlyticsCollectionEnabled, collectionSetTo(true))
+      expect(deleted).toBeLessThan(enabled)
+      reporting.logBreadcrumb("enhanced again")
+      expect(mockCrashLog).toHaveBeenCalledWith("enhanced again")
+    })
+
+    it("keeps pending reports when collection was never off", async () => {
+      const { id } = freshModules()
+
+      id.setCustodialIdentity(CUSTODIAL)
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+
+      expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenCalledWith(true)
+      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
+    })
+
+    it("keeps breadcrumbs shut until collection is back on", async () => {
+      const { id, reporting } = freshModules()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+      const held = deferred()
+      mockSetCrashlyticsCollectionEnabled.mockImplementationOnce((enabled: boolean) =>
+        held.promise.then(() => {
+          mockCrashCollectionEnabled = enabled
+          return null
+        }),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      reporting.logBreadcrumb("while reopening")
+      held.release()
+      await settle()
+      reporting.logBreadcrumb("reopened")
+
+      expect(mockCrashLog).toHaveBeenCalledWith("reopened")
+      expect(mockCrashLog).not.toHaveBeenCalledWith("while reopening")
+    })
+
+    it("starts closed when the last run ended with collection off", async () => {
+      mockCrashCollectionEnabled = false
+      const { id, reporting } = freshModules()
+
+      reporting.logBreadcrumb("before any domain")
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+      reporting.logBreadcrumb("custodial")
+
+      expect(mockCrashLog).toHaveBeenCalledWith("custodial")
+      expect(mockCrashLog).not.toHaveBeenCalledWith("before any domain")
     })
   })
 

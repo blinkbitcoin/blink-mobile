@@ -67,9 +67,32 @@ export const classifyError = (
   return isConnectivityError(error) ? ErrorReportClass.Transient : ErrorReportClass.Defect
 }
 
+let crashReportingOpen: boolean | undefined
+
+/**
+ * Closed while an Incognito or unset-mode wallet is active: nothing is written to
+ * Crashlytics, not even a breadcrumb, since a breadcrumb rides along with the next report
+ * made in this process, whichever account is active by then. Set by the analytics
+ * identity owner; until it first speaks, the persisted collection switch decides, so a
+ * session that ended closed starts closed.
+ */
+export const setCrashReportingOpen = (open: boolean): void => {
+  crashReportingOpen = open
+}
+
+const isCrashReportingOpen = (): boolean =>
+  crashReportingOpen ?? crashlytics().isCrashlyticsCollectionEnabled !== false
+
+/** A Crashlytics breadcrumb, dropped while crash reporting is closed. */
+export const logBreadcrumb = (message: string): void => {
+  if (!isCrashReportingOpen()) return
+  crashlytics().log(message)
+}
+
 const recordedDedupKeys = new Set<string>()
 
 export const recordAppError = (error: Error, options?: RecordAppErrorOptions): void => {
+  if (!isCrashReportingOpen()) return
   const errorClass = classifyError(error, options)
   crashlytics().log(`[${errorClass}] ${error.message}`)
   if (errorClass !== ErrorReportClass.Defect) return
