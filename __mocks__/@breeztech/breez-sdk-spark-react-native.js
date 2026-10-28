@@ -4,6 +4,7 @@ const SdkEvent_Tags = {
   PaymentSucceeded: "PaymentSucceeded",
   PaymentPending: "PaymentPending",
   PaymentFailed: "PaymentFailed",
+  PaymentMetadataUpdated: "PaymentMetadataUpdated",
   ClaimedDeposits: "ClaimedDeposits",
   UnclaimedDeposits: "UnclaimedDeposits",
   AutoOptimization: "AutoOptimization",
