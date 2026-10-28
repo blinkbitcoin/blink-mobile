@@ -6649,6 +6649,10 @@ type RootTranslation = {
 		 */
 		submitPlaceRequest: string
 		/**
+		 * S​h​o​w​ ​m​y​ ​l​o​c​a​t​i​o​n
+		 */
+		showMyLocation: string
+		/**
 		 * M​o​v​e​ ​t​h​e​ ​m​a​p​ ​t​o​ ​p​u​t​ ​t​h​e​ ​p​i​n​ ​o​n​ ​t​h​e​ ​p​l​a​c​e
 		 */
 		placePinHint: string
@@ -20860,6 +20864,10 @@ export type TranslationFunctions = {
 		 * Submit request
 		 */
 		submitPlaceRequest: () => LocalizedString
+		/**
+		 * Show my location
+		 */
+		showMyLocation: () => LocalizedString
 		/**
 		 * Move the map to put the pin on the place
 		 */

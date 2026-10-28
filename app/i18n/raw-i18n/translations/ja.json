@@ -2135,6 +2135,7 @@
         "addPlace": "マップに追加",
         "addPlaceTitle": "店舗を提案",
         "submitPlaceRequest": "リクエストを送信",
+        "showMyLocation": "現在地を表示",
         "placePinHint": "マップを動かしてピンを場所に合わせてください",
         "placeName": "名称",
         "placeNameHint": "その場所の名前",

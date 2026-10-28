@@ -2135,6 +2135,7 @@
         "addPlace": "Añadir al mapa",
         "addPlaceTitle": "Sugerir comercio",
         "submitPlaceRequest": "Enviar solicitud",
+        "showMyLocation": "Mostrar mi ubicación",
         "placePinHint": "Mueve el mapa para poner el marcador sobre el lugar",
         "placeName": "Nombre",
         "placeNameHint": "Cómo se llama el lugar",

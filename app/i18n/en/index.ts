@@ -2139,6 +2139,7 @@ const en: BaseTranslation = {
     addPlace: "Add to map",
     addPlaceTitle: "Suggest business",
     submitPlaceRequest: "Submit request",
+    showMyLocation: "Show my location",
     placePinHint: "Move the map to put the pin on the place",
     placeName: "Name",
     placeNameHint: "What the place is called",

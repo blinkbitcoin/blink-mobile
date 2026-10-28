@@ -2135,6 +2135,7 @@
     "addPlace": "Afegeix al mapa",
     "addPlaceTitle": "Suggereix un comerç",
     "submitPlaceRequest": "Envia la sol·licitud",
+    "showMyLocation": "Mostra la meva ubicació",
     "placePinHint": "Mou el mapa per posar el marcador sobre el lloc",
     "placeName": "Nom",
     "placeNameHint": "Com es diu el lloc",

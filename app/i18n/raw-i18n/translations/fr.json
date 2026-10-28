@@ -2135,6 +2135,7 @@
         "addPlace": "Ajouter à la carte",
         "addPlaceTitle": "Suggérer un commerce",
         "submitPlaceRequest": "Envoyer la demande",
+        "showMyLocation": "Afficher ma position",
         "placePinHint": "Déplacez la carte pour placer le repère sur le lieu",
         "placeName": "Nom",
         "placeNameHint": "Le nom du lieu",
