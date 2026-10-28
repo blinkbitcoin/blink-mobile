@@ -301,6 +301,137 @@ describe("refreshRecoveryBundle cloud gating", () => {
     expect(first).toBe(second)
   })
 
+  describe("coverageKey", () => {
+    it("shares the in-flight run with a caller needing the same coverage", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const [first, second] = await Promise.all([
+        refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" }),
+        refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" }),
+      ])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(1)
+      expect(first).toBe(second)
+    })
+
+    /** The in-flight fetch read the leaves before payment B settled, so handing
+     *  it to B would drop B's leaves for good: the save stamps savedAt, which
+     *  makes the staleness path skip them too. */
+    it("reruns for a caller needing newer coverage instead of returning the stale run", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      expect(second).not.toBe(first)
+
+      await Promise.all([first, second])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("serves every mid-run caller with a single rerun rather than one each", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+      const third = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-c" })
+
+      // Both late callers collapse onto the same rerun, so a burst costs one
+      // extra pass over the operators, not one per payment.
+      expect(third).toBe(second)
+
+      await Promise.all([first, second, third])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    it("reports the rerun's own result to the late caller", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      const [, secondResult] = await Promise.all([first, second])
+
+      expect(secondResult.success).toBe(true)
+    })
+
+    /** A failed run must not strand the caller waiting behind it: the rerun is
+     *  chained off settlement, not success. */
+    it("still reruns when the in-flight run rejects", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+      mockFetchRecoveryBundle.mockRejectedValueOnce(new Error("operator down"))
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      const [firstResult, secondResult] = await Promise.all([first, second])
+
+      expect(firstResult.success).toBe(false)
+      expect(secondResult.success).toBe(true)
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    /** The staleness sweep names no payment: it only wants a current bundle, so
+     *  a run already fetching satisfies it and a second pass over the operators
+     *  would buy nothing. */
+    it("joins any in-flight run when the caller names no coverage", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const keyed = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const unkeyed = refreshRecoveryBundle(refreshParams)
+
+      expect(unkeyed).toBe(keyed)
+
+      await Promise.all([keyed, unkeyed])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(1)
+    })
+
+    /** The reverse: a payment arriving during the staleness run does need its
+     *  own pass, because that run fetched before the payment settled. */
+    it("reruns for a keyed caller arriving during an unkeyed run", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const unkeyed = refreshRecoveryBundle(refreshParams)
+      const keyed = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+
+      expect(keyed).not.toBe(unkeyed)
+
+      await Promise.all([unkeyed, keyed])
+
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+
+    /** The deletion sweep waits on in-flight work before re-sweeping. A queued
+     *  rerun has not started yet but will write once it does, so leaving it out
+     *  would let it recreate the deleted account's files after the sweep. */
+    it("makes waitForRefreshesToSettle await a queued rerun too", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      const first = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      const second = refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-b" })
+
+      await waitForRefreshesToSettle(refreshParams.accountId)
+
+      // Both passes are done by the time the sweep is allowed to proceed.
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+      await Promise.all([first, second])
+    })
+
+    it("starts a fresh run once the previous one settled", async () => {
+      mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+
+      await refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+      await refreshRecoveryBundle({ ...refreshParams, coverageKey: "payment-a" })
+
+      // Same key, but nothing is in flight the second time: coalescing must not
+      // outlive the run it belonged to.
+      expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(2)
+    })
+  })
+
   it("keys the in-flight run per network: same-network callers share, different networks run separately", async () => {
     mockReadBackupStateFor.mockResolvedValue(manualBackupState)
 
@@ -684,45 +815,94 @@ describe("a refresh that fails leaves the bundle stale", () => {
     expect(isBundleFresh(storedStates.get(key) ?? null, Date.now(), DAY_MS)).toBe(true)
   })
 
-  it("keeps a change that landed after the fetch began, from a caller handed that run", async () => {
+  it("keeps a payment that landed mid-fetch marked until the rerun covers it", async () => {
     const accountId = "acct-stale-late-change"
     const key = stateKeyFor(accountId, Network.Mainnet)
     mockReadBackupStateFor.mockResolvedValue(manualBackupState)
     storedStates.set(key, { ...testState })
-    const fetch = deferred<typeof testBundle>()
-    mockFetchRecoveryBundle.mockReturnValue(fetch.promise)
+    const firstFetch = deferred<typeof testBundle>()
+    const rerunFetch = deferred<typeof testBundle>()
+    mockFetchRecoveryBundle
+      .mockReturnValueOnce(firstFetch.promise)
+      .mockReturnValueOnce(rerunFetch.promise)
     const clock = jest.spyOn(Date, "now").mockReturnValue(1_000)
     try {
-      const run = refreshRecoveryBundle({ ...refreshParams, accountId })
+      const run = refreshRecoveryBundle({
+        ...refreshParams,
+        accountId,
+        coverageKey: "payment-1",
+      })
       await flushMicrotasks()
       expect(mockFetchRecoveryBundle).toHaveBeenCalledTimes(1)
 
-      // A payment lands mid-fetch: the caller shares the run, but the run read
-      // the leaves before the payment did.
+      // A second payment lands mid-fetch: the run read the leaves before it
+      // did, so its save must not clear the mark the payment left.
       clock.mockReturnValue(2_000)
-      expect(refreshRecoveryBundle({ ...refreshParams, accountId })).toBe(run)
-      fetch.resolve(testBundle)
+      const rerun = refreshRecoveryBundle({
+        ...refreshParams,
+        accountId,
+        coverageKey: "payment-2",
+      })
+      firstFetch.resolve(testBundle)
       expect((await run).success).toBe(true)
-      await waitForRefreshesToSettle(accountId)
-
+      await flushMicrotasks()
       expect(storedStates.get(key)?.uncoveredChangeAt).toBe(2_000)
       expect(isBundleFresh(storedStates.get(key) ?? null, 2_000, DAY_MS)).toBe(false)
+
+      rerunFetch.resolve(testBundle)
+      expect((await rerun).success).toBe(true)
+      expect(storedStates.get(key)?.uncoveredChangeAt).toBeNull()
     } finally {
       clock.mockRestore()
     }
   })
 
-  it("reports a failed mark from a caller handed the shared run, without failing the run", async () => {
+  it("does not mark for a caller the run already covers", async () => {
+    // No coverage named (the staleness sweep) or the same payment twice: the
+    // running fetch is what they asked for, so its save leaves nothing stale.
+    const accountId = "acct-stale-covered-joiner"
+    const key = stateKeyFor(accountId, Network.Mainnet)
+    mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+    storedStates.set(key, { ...testState })
+    const fetch = deferred<typeof testBundle>()
+    mockFetchRecoveryBundle.mockReturnValue(fetch.promise)
+
+    const run = refreshRecoveryBundle({
+      ...refreshParams,
+      accountId,
+      coverageKey: "payment-1",
+    })
+    await flushMicrotasks()
+    expect(refreshRecoveryBundle({ ...refreshParams, accountId })).toBe(run)
+    expect(
+      refreshRecoveryBundle({ ...refreshParams, accountId, coverageKey: "payment-1" }),
+    ).toBe(run)
+    fetch.resolve(testBundle)
+    await run
+    await waitForRefreshesToSettle(accountId)
+
+    expect(storedStates.get(key)?.uncoveredChangeAt).toBeNull()
+  })
+
+  it("reports a failed mark from a caller owed a rerun, without failing either run", async () => {
     const accountId = "acct-stale-mark-fails"
     mockReadBackupStateFor.mockResolvedValue(manualBackupState)
     const fetch = deferred<typeof testBundle>()
     mockFetchRecoveryBundle.mockReturnValue(fetch.promise)
-    const run = refreshRecoveryBundle({ ...refreshParams, accountId })
+    const run = refreshRecoveryBundle({
+      ...refreshParams,
+      accountId,
+      coverageKey: "payment-1",
+    })
     await flushMicrotasks()
 
     const storageDown = new Error("AsyncStorage unavailable")
     mockReadRecoveryBundleState.mockRejectedValueOnce(storageDown)
-    refreshRecoveryBundle({ ...refreshParams, accountId })
+    const rerun = refreshRecoveryBundle({
+      ...refreshParams,
+      accountId,
+      coverageKey: "payment-2",
+    })
     await flushMicrotasks()
 
     expect(mockRecordAppError).toHaveBeenCalledWith(storageDown, {
@@ -730,6 +910,7 @@ describe("a refresh that fails leaves the bundle stale", () => {
     })
     fetch.resolve(testBundle)
     expect((await run).success).toBe(true)
+    expect((await rerun).success).toBe(true)
   })
 
   it("marks nothing without a saved bundle, which already reads as not fresh", async () => {
@@ -753,22 +934,35 @@ describe("a refresh that fails leaves the bundle stale", () => {
     expect(storedStates.get(key)?.uncoveredChangeAt).toBeNull()
   })
 
-  it("keeps a change marked during the first fetch, before any bundle was saved", async () => {
+  it("keeps a payment marked during the first fetch, before any bundle was saved", async () => {
     const accountId = "acct-stale-first-fetch"
     const key = stateKeyFor(accountId, Network.Mainnet)
     mockReadBackupStateFor.mockResolvedValue(manualBackupState)
-    const fetch = deferred<typeof testBundle>()
-    mockFetchRecoveryBundle.mockReturnValue(fetch.promise)
+    const firstFetch = deferred<typeof testBundle>()
+    const rerunFetch = deferred<typeof testBundle>()
+    mockFetchRecoveryBundle
+      .mockReturnValueOnce(firstFetch.promise)
+      .mockReturnValueOnce(rerunFetch.promise)
 
-    const run = refreshRecoveryBundle({ ...refreshParams, accountId })
+    const run = refreshRecoveryBundle({
+      ...refreshParams,
+      accountId,
+      coverageKey: "payment-1",
+    })
     await flushMicrotasks()
-    refreshRecoveryBundle({ ...refreshParams, accountId })
-    fetch.resolve(testBundle)
+    const rerun = refreshRecoveryBundle({
+      ...refreshParams,
+      accountId,
+      coverageKey: "payment-2",
+    })
+    firstFetch.resolve(testBundle)
     expect((await run).success).toBe(true)
-    await waitForRefreshesToSettle(accountId)
+    await flushMicrotasks()
 
     expect(storedStates.get(key)?.uncoveredChangeAt).toEqual(expect.any(Number))
     expect(isBundleFresh(storedStates.get(key) ?? null, Date.now(), DAY_MS)).toBe(false)
+    rerunFetch.resolve(testBundle)
+    expect((await rerun).success).toBe(true)
   })
 })
 

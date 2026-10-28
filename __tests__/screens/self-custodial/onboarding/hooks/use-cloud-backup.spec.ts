@@ -61,7 +61,9 @@ let mockIdentityPubkey: string | null = "test-pubkey-1234"
 let mockIdentityLoading = false
 let mockMnemonic = "youth indicate void"
 let mockMnemonicLoading = false
+let mockBackupAccountId: string | null = "backup-account-id"
 jest.mock("@app/screens/self-custodial/onboarding/hooks/use-wallet-mnemonic", () => ({
+  useBackupAccountId: () => mockBackupAccountId,
   useWalletMnemonic: () => mockMnemonic,
   useWalletMnemonicState: () => ({
     mnemonic: mockMnemonic,
@@ -82,6 +84,12 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-info", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   BackupMethod: { Cloud: "cloud", Keychain: "keychain", Manual: "manual" },
+}))
+
+const mockRevokeCloudRecoveryBundle = jest.fn()
+jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
+  revokeCloudRecoveryBundle: (...args: readonly unknown[]) =>
+    mockRevokeCloudRecoveryBundle(...args),
 }))
 
 jest.mock("@app/utils/backup-payload", () => ({
@@ -162,6 +170,8 @@ describe("useCloudBackup", () => {
     mockMnemonic = "youth indicate void"
     mockMnemonicLoading = false
     mockLightningAddress = null
+    mockBackupAccountId = "backup-account-id"
+    mockRevokeCloudRecoveryBundle.mockResolvedValue(true)
     mockStartSession.mockResolvedValue(sessionOk(noExistingFile))
     mockDownloadById.mockResolvedValue({ success: false, reason: "not-found" })
   })
@@ -185,7 +195,70 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
+    // Recorded as NOT password-protected: the recovery-bundle cloud sync gate
+    // (D9) must stay closed next to this unencrypted seed backup.
+    expect(mockCompleteBackup).toHaveBeenCalledWith({
+      method: "cloud",
+      backupOptions: { cloudPasswordProtected: false },
+    })
+    expect(mockRevokeCloudRecoveryBundle).toHaveBeenCalledWith({
+      accountId: "backup-account-id",
+      mnemonic: "youth indicate void",
+    })
+    const revokeOrder = mockRevokeCloudRecoveryBundle.mock.invocationCallOrder[0]
+    const uploadOrder = mockUpload.mock.invocationCallOrder[0]
+    expect(revokeOrder).toBeLessThan(uploadOrder)
+  })
+
+  it("aborts a passwordless upload when the recovery bundle cannot leave the cloud", async () => {
+    mockRevokeCloudRecoveryBundle.mockResolvedValue(false)
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockCompleteBackup).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Upload failed" }),
+    )
+  })
+
+  it("aborts a passwordless upload when there is no backup account to revoke the bundle for", async () => {
+    mockBackupAccountId = null
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: false, password: "" }),
+    )
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockRevokeCloudRecoveryBundle).not.toHaveBeenCalled()
+    expect(mockUpload).not.toHaveBeenCalled()
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "Upload failed" }),
+    )
+  })
+
+  it("revokes the bundle when encryption is on but no password was entered", async () => {
+    mockUpload.mockResolvedValue({ success: true })
+
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: true, password: "" }),
+    )
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+
+    expect(mockRevokeCloudRecoveryBundle).toHaveBeenCalledTimes(1)
+    expect(mockCompleteBackup).toHaveBeenCalledWith({
+      method: "cloud",
+      backupOptions: { cloudPasswordProtected: false },
+    })
   })
 
   /** The success path tags the analytics event by platform; on android that is google_drive. */
@@ -224,7 +297,13 @@ describe("useCloudBackup", () => {
       "blink-spark-backup-blink-test-pubkey-1234.json",
       noExistingFile,
     )
-    expect(mockCompleteBackup).toHaveBeenCalledWith({ method: "cloud" })
+    expect(mockCompleteBackup).toHaveBeenCalledWith({
+      method: "cloud",
+      backupOptions: { cloudPasswordProtected: true },
+    })
+    // A password-protected seed cannot decrypt the bundle on its own, so the
+    // bundle stays in the cloud.
+    expect(mockRevokeCloudRecoveryBundle).not.toHaveBeenCalled()
   })
 
   it("shows the resolved failure message on upload failure", async () => {
@@ -490,6 +569,8 @@ describe("useCloudBackup", () => {
 
     expect(mockUpload).not.toHaveBeenCalled()
     expect(mockCompleteBackup).not.toHaveBeenCalled()
+    // Revoking turns the bundle opt-in off, so it waits for the confirmed overwrite.
+    expect(mockRevokeCloudRecoveryBundle).not.toHaveBeenCalled()
   })
 
   it("includes version in backup payload", async () => {
