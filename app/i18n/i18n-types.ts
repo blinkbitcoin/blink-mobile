@@ -12646,11 +12646,11 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
-			 * A​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​p​h​r​a​s​e
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
 			 */
 			encryptCheckbox: string
 			/**
-			 * P​a​s​s​p​h​r​a​s​e
+			 * P​a​s​s​w​o​r​d
 			 */
 			password: string
 			/**
@@ -12658,11 +12658,11 @@ type RootTranslation = {
 			 */
 			passwordPlaceholder: string
 			/**
-			 * C​o​n​f​i​r​m​ ​p​a​s​s​p​h​r​a​s​e
+			 * C​o​n​f​i​r​m​ ​p​a​s​s​w​o​r​d
 			 */
 			confirmPassword: string
 			/**
-			 * E​n​t​e​r​ ​p​a​s​s​p​h​r​a​s​e​ ​a​g​a​i​n
+			 * E​n​t​e​r​ ​p​a​s​s​w​o​r​d​ ​a​g​a​i​n
 			 */
 			confirmPasswordPlaceholder: string
 			/**
@@ -12674,7 +12674,7 @@ type RootTranslation = {
 			 */
 			importantTitle: string
 			/**
-			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​p​h​r​a​s​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​w​o​r​d​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
 			 * @param {string} bold
 			 */
 			importantMessage: RequiredParams<'bold'>
@@ -12687,7 +12687,7 @@ type RootTranslation = {
 			 */
 			passwordTooShort: string
 			/**
-			 * P​a​s​s​p​h​r​a​s​e​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
+			 * P​a​s​s​w​o​r​d​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
 			 */
 			passwordMismatch: string
 			/**
@@ -13458,11 +13458,11 @@ type RootTranslation = {
 		 */
 		noBackupDescription: string
 		/**
-		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​p​h​r​a​s​e
+		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​w​o​r​d
 		 */
 		enterPassword: string
 		/**
-		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		wrongPassword: string
 		/**
@@ -26639,11 +26639,11 @@ export type TranslationFunctions = {
 			 */
 			description: (arg: { provider: string }) => LocalizedString
 			/**
-			 * Add additional passphrase
+			 * Encrypt with additional password
 			 */
 			encryptCheckbox: () => LocalizedString
 			/**
-			 * Passphrase
+			 * Password
 			 */
 			password: () => LocalizedString
 			/**
@@ -26651,11 +26651,11 @@ export type TranslationFunctions = {
 			 */
 			passwordPlaceholder: () => LocalizedString
 			/**
-			 * Confirm passphrase
+			 * Confirm password
 			 */
 			confirmPassword: () => LocalizedString
 			/**
-			 * Enter passphrase again
+			 * Enter password again
 			 */
 			confirmPasswordPlaceholder: () => LocalizedString
 			/**
@@ -26667,7 +26667,7 @@ export type TranslationFunctions = {
 			 */
 			importantTitle: () => LocalizedString
 			/**
-			 * Blink does not store this passphrase. If you lose it, {bold} to recover your wallet.
+			 * Blink does not store this password. If you lose it, {bold} to recover your wallet.
 			 */
 			importantMessage: (arg: { bold: string }) => LocalizedString
 			/**
@@ -26679,7 +26679,7 @@ export type TranslationFunctions = {
 			 */
 			passwordTooShort: () => LocalizedString
 			/**
-			 * Passphrases do not match
+			 * Passwords do not match
 			 */
 			passwordMismatch: () => LocalizedString
 			/**
@@ -27435,11 +27435,11 @@ export type TranslationFunctions = {
 		 */
 		noBackupDescription: () => LocalizedString
 		/**
-		 * Enter your encryption passphrase
+		 * Enter your encryption password
 		 */
 		enterPassword: () => LocalizedString
 		/**
-		 * Incorrect passphrase. Please try again.
+		 * Incorrect password. Please try again.
 		 */
 		wrongPassword: () => LocalizedString
 		/**
