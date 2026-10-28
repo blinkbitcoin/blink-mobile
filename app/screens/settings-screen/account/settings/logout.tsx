@@ -1,5 +1,3 @@
-/** Needed despite the automatic JSX runtime: the Jest tsconfig compiles JSX the classic
- *  way, so a file reached by a spec has to have React in scope or it fails to build. */
 import React from "react"
 import { Alert } from "react-native"
 
