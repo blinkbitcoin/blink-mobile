@@ -12,6 +12,7 @@ export const MAX_PIN_ATTEMPTS = 3
 export const PinErrorKey = {
   AttemptsRead: "pin-attempts-read",
   AttemptsWrite: "pin-attempts-write",
+  AttemptsRepairWrite: "pin-attempts-repair-write",
   AttemptsClear: "pin-attempts-clear",
   PinRead: "pin-read",
 } as const
@@ -64,16 +65,14 @@ const repairStoredLock = async (
    *  this write will not take the ones the budget depends on either, and nothing else here
    *  would say so, because this is the one write whose result had no reader.
    *
-   *  Under the attempt-write key rather than its own: this is that same slot refusing that
-   *  same write. The message names the slot rather than the repair because the key is
-   *  shared and the first report under it silences the rest, and this one can be the first:
-   *  it fires on mount and on a clock moved backward, both before any entry is submitted.
-   *  A message about a lock repair would file the write that ends a session as a nit. */
+   *  Under its own key: it fires on mount and on a clock moved backward, before any entry,
+   *  and sharing the attempt-write key would let it silence the report of the write an
+   *  entry depends on for the rest of the process. */
   const isRepairWritten = await KeyStoreWrapper.setPinFailureState(repaired)
   if (!isRepairWritten) {
-    recordAppError(new Error("PIN attempt state could not be persisted (lock repair)"), {
+    recordAppError(new Error("PIN lock repair could not be persisted"), {
       alwaysRecord: true,
-      dedupKey: PinErrorKey.AttemptsWrite,
+      dedupKey: PinErrorKey.AttemptsRepairWrite,
     })
   }
 }

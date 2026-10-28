@@ -590,8 +590,8 @@ describe("readPinLockState", () => {
     })
   })
 
-  /** Named for the slot, not the repair: the key is shared with the write that ends a
-   *  session, and whichever fires first is the only one recorded. */
+  /** Under its own key: it fires before any entry, and sharing the attempt-write key
+   *  would silence the report of the write an entry depends on. */
   it("reports a repair the keystore refused", async () => {
     storedState({ attempts: 1, lockedUntil: NOW + 60 * MINUTE_MS })
     mockedStore.setPinFailureState.mockResolvedValue(false)
@@ -601,9 +601,9 @@ describe("readPinLockState", () => {
     expect(mockRecordAppError).toHaveBeenCalledTimes(1)
     expect(mockRecordAppError).toHaveBeenCalledWith(
       expect.objectContaining({
-        message: "PIN attempt state could not be persisted (lock repair)",
+        message: "PIN lock repair could not be persisted",
       }),
-      { alwaysRecord: true, dedupKey: "pin-attempts-write" },
+      { alwaysRecord: true, dedupKey: "pin-attempts-repair-write" },
     )
   })
 
