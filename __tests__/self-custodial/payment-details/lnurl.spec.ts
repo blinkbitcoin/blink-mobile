@@ -1792,6 +1792,29 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
       ).toEqual(expect.objectContaining({ sending_wallet: WalletCurrency.Usd }))
     })
 
+    /** The lookup hands back the payment that landed beside every failed one it read,
+     *  so forgetting the lost attempts leaves none of them owing an outcome. */
+    it("reports an older attempt's failure beside a newer one found completed", async () => {
+      const OLDER_HASH = "b".repeat(64)
+      const detail = dollarDetail()
+      mockPrepareLnurl.mockResolvedValueOnce(quote(OLDER_HASH))
+      await detail.sendPaymentMutation({} as never)
+      await detail.sendPaymentMutation({} as never)
+
+      mockFindLostSend.mockResolvedValue({
+        ...paidInvoice(COMPLETED),
+        failed: [{ ...paidInvoice(FAILED, OLDER_HASH).payment, id: "p0" }],
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+        "sc_payment_send_settled",
+      ])
+    })
+
     it("reports that failure once, however often the history shows it", async () => {
       const detail = dollarDetail()
       await detail.sendPaymentMutation({} as never)

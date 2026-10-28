@@ -916,13 +916,35 @@ describe("findLostSend", () => {
     )
   })
 
-  it("stops at a completed match without turning the page", async () => {
-    walletAnswers([...fullPageOfOthers().slice(1), sent("p1", COMPLETED)])
+  /** An older attempt's failed payment can sit a page below the one that landed, and
+   *  that attempt reports its end only once it is seen. */
+  it("reads past a completed match to the failed ones on later pages", async () => {
+    walletAnswers(
+      [...fullPageOfOthers().slice(1), sent("p2", COMPLETED)],
+      [sent("p1", FAILED)],
+    )
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({
+      status: "found",
+      payment: { id: "p2" },
+      failed: [{ id: "p1" }],
+    })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  /** Pages that never run short leave the later ones unread, but not the match. */
+  it("keeps a completed match when twenty full pages have no end", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", COMPLETED)],
+    })
+    mockListPayments.mockResolvedValue({ payments: fullPageOfOthers() })
 
     const found = await settle(lookup())
 
     expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
-    expect(mockListPayments).toHaveBeenCalledTimes(1)
+    expect(mockListPayments).toHaveBeenCalledTimes(20)
   })
 
   /** A match is a payment of the invoice, whatever a later page would have said. */

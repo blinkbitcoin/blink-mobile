@@ -298,10 +298,12 @@ const isLanded = (payment: Payment): boolean =>
 
 /**
  * One look: the wallet catches up with the server, then its outgoing payments in the
- * window are read page by page, until the caller's match is complete, the pages run
- * short, or the cap is hit. Throws when the history could not be read, except that a
- * page failing after a landed match was made takes nothing away from it: a payment of
- * the invoice exists. A failed match is not one, so the pages after it still count.
+ * window are read page by page, until the pages run short or the cap is hit. A completed
+ * match does not end it: an older attempt's failed payment may sit on a later page, and
+ * that attempt reports its end only once it is seen. Throws when the history could not
+ * be read, except that a page failing, or the cap, after a landed match was made takes
+ * nothing away from it: a payment of the invoice exists. A failed match is not one, so
+ * the pages after it still count.
  */
 const scanHistorySince = async (
   sdk: BreezSdkInterface,
@@ -328,11 +330,11 @@ const scanHistorySince = async (
     found.push(...payments.filter(matches))
     if (payments.some(isUndescribedSend)) hasUndescribedSend = true
 
-    const isScanComplete =
-      found.some(isCompleted) || payments.length < LOST_SEND_PAGE_SIZE
-    if (isScanComplete) return { matches: found, hasUndescribedSend }
+    if (payments.length < LOST_SEND_PAGE_SIZE)
+      return { matches: found, hasUndescribedSend }
   }
 
+  if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
 }
 
