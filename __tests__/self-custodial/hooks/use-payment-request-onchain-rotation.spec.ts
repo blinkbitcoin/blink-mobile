@@ -819,6 +819,23 @@ describe("onchain request telemetry", () => {
     expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
   })
 
+  it("does not count an address whose screen went while its record was being saved", async () => {
+    let finishSave: (saved: boolean) => void = () => undefined
+    mockSaveIssuedOnchainAddress.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        finishSave = resolve
+      }),
+    )
+
+    const { unmount } = renderHook(() => usePaymentRequest())
+    await settledAfterSave()
+    unmount()
+    await act(async () => finishSave(true))
+    await flushEffects()
+
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+  })
+
   it("counts the address of the account switched to, not the one switched from", async () => {
     const handOuts: Array<(value: { address: string }) => void> = []
     mockReceiveOnchain.mockImplementation(

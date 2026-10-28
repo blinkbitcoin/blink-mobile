@@ -600,6 +600,22 @@ describe("analytics identity", () => {
       return listener
     }
 
+    it("reports a listener that throws, and still tells the others", async () => {
+      const id = freshModule()
+      id.onEnhancedIdentityApplied(() => {
+        throw new Error("listener blew up")
+      })
+      const listener = listen(id)
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+
+      expect(listener).toHaveBeenCalledTimes(1)
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "listener blew up" }),
+      )
+    })
+
     it("is given once the reset, the per-install id and collection are all in place", async () => {
       const id = freshModule()
       id.setCustodialIdentity(CUSTODIAL)
