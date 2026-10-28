@@ -92,6 +92,8 @@ export type FeeQuote =
 
 export const DepositStatus = {
   Immature: "immature",
+  /** Claimed early (0.26) but not yet in the balance: still pending, nothing to do. */
+  Claiming: "claiming",
   Claimable: "claimable",
   FeeExceeded: "fee_exceeded",
   Error: "error",

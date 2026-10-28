@@ -2913,6 +2913,23 @@ describe("HomeScreen pending receive badge", () => {
       await flushEffects()
     })
 
+    it("opens the unclaimed-deposits screen when the pill holds a deposit claimed early", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("claiming")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(await findByTestId("pending-receive-badge"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+
+      await flushEffects()
+    })
+
     it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("claimable")] }

@@ -34,8 +34,10 @@ const resolveStatus = ({
   isMature,
   claimError,
   hasRefund,
+  earlyClaim,
 }: MappedDeposit): DepositStatus => {
   if (hasRefund) return DepositStatus.Refunded
+  if (earlyClaim === "settling") return DepositStatus.Claiming
   if (!isMature) return DepositStatus.Immature
   if (claimError?.reason === "fee_exceeded") return DepositStatus.FeeExceeded
   if (claimError) return DepositStatus.Error
@@ -64,7 +66,9 @@ const mapToPendingDeposit = (deposit: MappedDeposit): PendingDeposit => ({
 })
 
 const toClaimResult = (outcome: ClaimOutcome): ClaimDepositResult => {
-  if (outcome.status !== "deferred") return { status: PaymentResultStatus.Success }
+  if (outcome.status === "settled") return { status: PaymentResultStatus.Success }
+  /** An early claim on its way: the transfer that credits it settles later. */
+  if (outcome.status === "submitted") return { status: PaymentResultStatus.Pending }
   if (outcome.reason === "fee_exceeded") {
     return {
       ...failed(`Claim needs ${outcome.requiredFeeSats} sats in fees`),
@@ -108,7 +112,7 @@ export const createListPendingDeposits = (
       const deposits = await listDeposits(sdk)
       return {
         deposits: deposits
-          .filter(({ claimedEarly }) => !claimedEarly)
+          .filter(({ earlyClaim }) => earlyClaim !== "credited")
           .map(mapToPendingDeposit),
       }
     } catch (err) {

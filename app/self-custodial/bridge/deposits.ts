@@ -8,12 +8,16 @@ import {
   MaxFee,
   MaxOnchainFee,
   InstantClaimStatus_Tags as InstantClaimTag,
+  PaymentDetails_Tags as PaymentDetailsTag,
+  PaymentStatus,
+  PaymentType,
   RefundDepositRequest,
   type BreezSdkInterface,
   type ClaimDepositOutcome,
   type DepositInfo,
 } from "@breeztech/breez-sdk-spark-react-native"
 
+import { reportError } from "@app/utils/error-logging"
 import { toNumber } from "@app/utils/helper"
 
 export type ClaimErrorInfo = {
@@ -29,9 +33,23 @@ export type MappedDeposit = {
   isMature: boolean
   claimError: ClaimErrorInfo | null
   hasRefund: boolean
-  /** Claimed ahead of maturity (0.26). The SDK keeps the row until the UTXO leaves its
-   *  chain feed, but the funds are already in the balance. */
-  claimedEarly: boolean
+  /**
+   * How far an early (0-conf) claim has got (0.26). `settling`: the provider took the
+   * deposit but its transfer has not reached the wallet, so the funds are in neither
+   * the deposit nor the balance yet. `credited`: the funds are in the balance. The SDK
+   * keeps both rows until the provider spends the UTXO.
+   */
+  earlyClaim: EarlyClaim
+}
+
+export type EarlyClaim = "none" | "settling" | "credited"
+
+/** The SDK moves an early claim from Submitted to Claimed when the provider's transfer
+ *  is claimed into this wallet. */
+const mapEarlyClaim = (deposit: DepositInfo): EarlyClaim => {
+  if (deposit.instantClaimStatus?.tag === InstantClaimTag.Claimed) return "credited"
+  if (deposit.instantClaimStatus?.tag === InstantClaimTag.Submitted) return "settling"
+  return "none"
 }
 
 const mapClaimError = (deposit: DepositInfo): ClaimErrorInfo | null => {
@@ -69,16 +87,60 @@ const mapDeposit = (deposit: DepositInfo): MappedDeposit => ({
   isMature: deposit.isMature,
   claimError: mapClaimError(deposit),
   hasRefund: Boolean(deposit.refundTxId),
-  claimedEarly:
-    deposit.instantClaimStatus?.tag === InstantClaimTag.Submitted ||
-    deposit.instantClaimStatus?.tag === InstantClaimTag.Claimed,
+  earlyClaim: mapEarlyClaim(deposit),
 })
+
+const outpointKey = (txid: string, vout: number): string => `${txid}:${vout}`
+
+/** Early claims credit within seconds of being submitted, so their receives are among
+ *  the newest. */
+const RECENT_RECEIVES_SCANNED = 50
+
+/**
+ * The deposits whose claim has already landed as a completed receive. A Submitted
+ * deposit can still be credited: the transfer may have been claimed by another device
+ * on the same wallet, which leaves this device's row Submitted until the UTXO is spent.
+ */
+const creditedOutpoints = async (sdk: BreezSdkInterface): Promise<Set<string>> => {
+  const { payments } = await sdk.listPayments({
+    typeFilter: [PaymentType.Receive],
+    statusFilter: [PaymentStatus.Completed],
+    assetFilter: undefined,
+    paymentDetailsFilter: undefined,
+    fromTimestamp: undefined,
+    toTimestamp: undefined,
+    offset: 0,
+    limit: RECENT_RECEIVES_SCANNED,
+    sortAscending: false,
+  })
+  return new Set(
+    payments.flatMap(({ details }) =>
+      details?.tag === PaymentDetailsTag.Deposit
+        ? [outpointKey(details.inner.txId, details.inner.vout)]
+        : [],
+    ),
+  )
+}
 
 export const listDeposits = async (sdk: BreezSdkInterface): Promise<MappedDeposit[]> => {
   const response = await sdk.listUnclaimedDeposits(
     ListUnclaimedDepositsRequest.create({}),
   )
-  return response.deposits.map(mapDeposit)
+  const deposits = response.deposits.map(mapDeposit)
+  if (!deposits.some(({ earlyClaim }) => earlyClaim === "settling")) return deposits
+
+  /** Unread history keeps a settling deposit listed: shown twice for a moment beats
+   *  shown nowhere. */
+  const credited = await creditedOutpoints(sdk).catch((err) => {
+    reportError("Self-custodial deposit credit lookup", err)
+    return new Set<string>()
+  })
+  return deposits.map((deposit) =>
+    deposit.earlyClaim === "settling" &&
+    credited.has(outpointKey(deposit.txid, deposit.vout))
+      ? { ...deposit, earlyClaim: "credited" }
+      : deposit,
+  )
 }
 
 type ClaimParams = {

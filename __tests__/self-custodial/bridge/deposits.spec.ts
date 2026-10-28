@@ -11,9 +11,16 @@ const mockListUnclaimedDeposits = jest.fn()
 const mockClaimDeposit = jest.fn()
 const mockRefundDeposit = jest.fn()
 const mockRecommendedFees = jest.fn()
+const mockListPayments = jest.fn()
+const mockReportError = jest.fn()
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
 
 const mockSdk = {
   listUnclaimedDeposits: mockListUnclaimedDeposits,
+  listPayments: mockListPayments,
   claimDeposit: mockClaimDeposit,
   refundDeposit: mockRefundDeposit,
   recommendedFees: mockRecommendedFees,
@@ -50,6 +57,9 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   MaxOnchainFee: {
     Fixed: jest.fn().mockImplementation((inner: unknown) => ({ tag: "Fixed", inner })),
   },
+  PaymentDetails_Tags: { Deposit: "Deposit", Spark: "Spark" },
+  PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+  PaymentType: { Send: 0, Receive: 1 },
   RefundDepositRequest: { create: (p: Record<string, unknown>) => p },
 }))
 
@@ -183,40 +193,104 @@ describe("listDeposits", () => {
 })
 
 describe("listDeposits — early claims (0.26)", () => {
+  beforeEach(() => jest.clearAllMocks())
+
   const depositWithInstantStatus = (instantClaimStatus: unknown) => ({
     txid: "pqr678",
-    vout: 0,
+    vout: 1,
     amountSats: BigInt(3000),
     isMature: false,
     refundTxId: undefined,
     claimError: undefined,
     instantClaimStatus,
   })
+  const submitted = { tag: "Submitted", inner: { claimId: "c1" } }
+  const depositReceive = (txId: string, vout: number) => ({
+    details: { tag: "Deposit", inner: { txId, vout } },
+  })
 
-  it.each([
-    ["Submitted", { tag: "Submitted", inner: { claimId: "c1" } }],
-    ["Claimed", { tag: "Claimed" }],
-  ])("marks a deposit whose early claim is %s as claimed early", async (_, status) => {
+  it("reports a submitted early claim as settling while no receive credits it", async () => {
     mockListUnclaimedDeposits.mockResolvedValue({
-      deposits: [depositWithInstantStatus(status)],
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    mockListPayments.mockResolvedValue({
+      payments: [
+        depositReceive("pqr678", 0),
+        depositReceive("other", 1),
+        { details: { tag: "Spark", inner: { txId: "pqr678", vout: 1 } } },
+      ],
     })
 
     const [deposit] = await listDeposits(mockSdk)
 
-    expect(deposit.claimedEarly).toBe(true)
+    expect(deposit.earlyClaim).toBe("settling")
+  })
+
+  it("reports a submitted early claim as credited once its receive has completed", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    mockListPayments.mockResolvedValue({ payments: [depositReceive("pqr678", 1)] })
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("credited")
+  })
+
+  it("looks for the credit among the newest completed receives only", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    mockListPayments.mockResolvedValue({ payments: [] })
+
+    await listDeposits(mockSdk)
+
+    expect(mockListPayments).toHaveBeenCalledWith(
+      expect.objectContaining({
+        typeFilter: [1],
+        statusFilter: [0],
+        offset: 0,
+        limit: 50,
+        sortAscending: false,
+      }),
+    )
+  })
+
+  it("keeps a submitted early claim settling, and reports it, when history cannot be read", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus(submitted)],
+    })
+    mockListPayments.mockRejectedValue(new Error("storage"))
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("settling")
+    expect(mockReportError).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports a Claimed early claim as credited without reading history", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus({ tag: "Claimed" })],
+    })
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("credited")
+    expect(mockListPayments).not.toHaveBeenCalled()
   })
 
   it.each([
     ["declined", { tag: "Declined", inner: { maxFeeSats: BigInt(0), confirmations: 0 } }],
     ["never tried", undefined],
-  ])("does not mark a deposit whose early claim was %s", async (_, status) => {
+  ])("reports no early claim when it was %s", async (_, status) => {
     mockListUnclaimedDeposits.mockResolvedValue({
       deposits: [depositWithInstantStatus(status)],
     })
 
     const [deposit] = await listDeposits(mockSdk)
 
-    expect(deposit.claimedEarly).toBe(false)
+    expect(deposit.earlyClaim).toBe("none")
+    expect(mockListPayments).not.toHaveBeenCalled()
   })
 })
 

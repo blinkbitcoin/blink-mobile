@@ -40,31 +40,30 @@ describe("createListPendingDeposits", () => {
     expect(result.deposits[0].status).toBe("claimable")
   })
 
-  it("leaves out deposits already claimed early, which the balance already holds", async () => {
+  it("leaves out deposits claimed early that the balance already holds", async () => {
+    const early = (txid: string, earlyClaim: string, isMature = false) => ({
+      txid,
+      vout: 0,
+      amountSats: 3000,
+      isMature,
+      claimError: null,
+      hasRefund: false,
+      earlyClaim,
+    })
     mockListDeposits.mockResolvedValue([
-      {
-        txid: "early",
-        vout: 0,
-        amountSats: 3000,
-        isMature: false,
-        claimError: null,
-        hasRefund: false,
-        claimedEarly: true,
-      },
-      {
-        txid: "waiting",
-        vout: 0,
-        amountSats: 4000,
-        isMature: false,
-        claimError: null,
-        hasRefund: false,
-        claimedEarly: false,
-      },
+      early("credited", "credited"),
+      early("settling", "settling"),
+      early("settling-mature", "settling", true),
+      early("waiting", "none"),
     ])
 
     const result = await createListPendingDeposits(mockSdk)()
 
-    expect(result.deposits.map(({ id }) => id)).toEqual(["waiting:0"])
+    expect(result.deposits.map(({ id, status }) => [id, status])).toEqual([
+      ["settling:0", "claiming"],
+      ["settling-mature:0", "claiming"],
+      ["waiting:0", "immature"],
+    ])
   })
 
   it("returns immature status for unconfirmed deposits", async () => {
@@ -149,12 +148,12 @@ describe("createClaimDeposit", () => {
     )
   })
 
-  it("treats an early claim that was submitted as a success", async () => {
+  it("reports an early claim that was submitted as pending, not claimed", async () => {
     mockClaimDeposit.mockResolvedValue({ status: "submitted" })
 
     const result = await createClaimDeposit(mockSdk).claimDeposit({ depositId: "abc:0" })
 
-    expect(result).toEqual({ status: "success" })
+    expect(result).toEqual({ status: "pending" })
   })
 
   it("fails a claim deferred over the fee cap, carrying the fee it needs", async () => {
