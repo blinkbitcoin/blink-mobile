@@ -90,6 +90,13 @@ export const SDK_LOG_ROTATE_BYTES = 2 * 1024 * 1024
 /** Export cap: both files whole (2 x the rotate cap) plus room for one long session. */
 export const SDK_LOG_EXPORT_BYTES = 5 * 1024 * 1024
 
+/** Where a built export waits for the share target; emptied at the start of each export. */
+export const sdkLogExportDir = (): string =>
+  `${CachesDirectoryPath}/breez-sdk-log-exports`
+
+/** Printed in the export header. Pinned by a test against the installed package. */
+export const BREEZ_SDK_VERSION = "0.27.1"
+
 // Validates BREEZ_API_KEY at SDK init (from `lifecycle.createSdkConfig`). A
 // missing key means the build is misconfigured (e.g. release minification
 // stripped the react-native-config BuildConfig values); failing loud here

@@ -153,6 +153,16 @@ describe("deleteSdkLogs", () => {
     expect(mockFiles.size).toBe(0)
   })
 
+  it("removes a built export with the logs", async () => {
+    mockDirs.add("/caches/breez-sdk-log-exports")
+    mockFiles.set("/caches/breez-sdk-log-exports/blink-wallet-logs-x.txt", 30)
+
+    await deleteSdkLogs()
+
+    expect(mockUnlink).toHaveBeenCalledWith("/caches/breez-sdk-log-exports")
+    expect(mockFiles.size).toBe(0)
+  })
+
   it("does nothing when there are no logs", async () => {
     await deleteSdkLogs()
 

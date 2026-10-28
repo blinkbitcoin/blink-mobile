@@ -1,6 +1,6 @@
 import RNFS from "react-native-fs"
 
-import { SDK_LOG_ROTATE_BYTES, sdkLogDir } from "../config"
+import { SDK_LOG_ROTATE_BYTES, sdkLogDir, sdkLogExportDir } from "../config"
 import { recordErrorOnce } from "../logging"
 
 /** The name the SDK's file sink appends to inside the directory passed to initLogging. */
@@ -55,14 +55,16 @@ export const prepareSdkLogDir = async (): Promise<string | undefined> => {
 }
 
 /**
- * Removes the logs with the last wallet: they hold its payment history. A logger already
- * running in this process keeps writing to the unlinked file until the next launch.
+ * Removes the logs, and any export built from them, with the last wallet: they hold its
+ * payment history. A logger already running in this process keeps writing to the
+ * unlinked file until the next launch.
  */
 export const deleteSdkLogs = async (): Promise<void> => {
-  const dir = sdkLogDir()
-  try {
-    if (await RNFS.exists(dir)) await RNFS.unlink(dir)
-  } catch (err) {
-    recordErrorOnce("sdk-log-delete", toError(err), { expected: true })
+  for (const dir of [sdkLogDir(), sdkLogExportDir()]) {
+    try {
+      if (await RNFS.exists(dir)) await RNFS.unlink(dir)
+    } catch (err) {
+      recordErrorOnce("sdk-log-delete", toError(err), { expected: true })
+    }
   }
 }
