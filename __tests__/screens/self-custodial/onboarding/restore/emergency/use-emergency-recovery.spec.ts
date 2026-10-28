@@ -1,3 +1,19 @@
+jest.mock("react-native-quick-crypto", () => {
+  const crypto = jest.requireActual("crypto") as typeof import("crypto")
+
+  return {
+    __esModule: true,
+    default: {
+      randomBytes: crypto.randomBytes,
+      createCipheriv: crypto.createCipheriv,
+      createDecipheriv: crypto.createDecipheriv,
+      createHmac: crypto.createHmac,
+      createHash: crypto.createHash,
+    },
+    Buffer,
+  }
+})
+
 import React from "react"
 
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
@@ -9,6 +25,12 @@ import {
 } from "@app/screens/self-custodial/onboarding/restore/emergency/hooks/use-emergency-recovery"
 import { BundleFilePickStatus } from "@app/self-custodial/recovery-bundle/bundle-file"
 import { EmergencyBundleRejection } from "@app/self-custodial/recovery-bundle/emergency-recovery"
+import { buildEncryptedBundlePayload } from "@app/self-custodial/recovery-bundle/encryption"
+import { deriveIdentityKeyPair } from "@app/self-custodial/recovery-bundle/identity"
+import {
+  RECOVERY_BUNDLE_SCHEMA,
+  type RecoveryBundle,
+} from "@app/self-custodial/recovery-bundle/types"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 
 const MNEMONIC = "abandon abandon about"
@@ -322,7 +344,11 @@ describe("useEmergencyRecovery", () => {
         await act(async () => {
           await source()
         })
-        expect(mockVerify).toHaveBeenCalledWith(PAYLOAD, MNEMONIC)
+        expect(mockVerify).toHaveBeenCalledWith(
+          PAYLOAD,
+          MNEMONIC,
+          mockSparkNetwork.Regtest,
+        )
       }
     })
 
@@ -412,7 +438,7 @@ describe("useEmergencyRecovery", () => {
         await result.current.fromClipboard()
       })
 
-      expect(mockVerify).toHaveBeenCalledWith(PAYLOAD, MNEMONIC)
+      expect(mockVerify).toHaveBeenCalledWith(PAYLOAD, MNEMONIC, mockSparkNetwork.Regtest)
     })
 
     it("says so when the clipboard is empty", async () => {
@@ -510,7 +536,7 @@ describe("useEmergencyRecovery", () => {
         await Promise.all([first, second])
       })
       expect(mockVerify).toHaveBeenCalledTimes(1)
-      expect(mockVerify).toHaveBeenCalledWith(PAYLOAD, MNEMONIC)
+      expect(mockVerify).toHaveBeenCalledWith(PAYLOAD, MNEMONIC, mockSparkNetwork.Regtest)
     })
   })
 
@@ -582,6 +608,92 @@ describe("useEmergencyRecovery", () => {
       })
 
       expect(mockShareOpen).not.toHaveBeenCalled()
+    })
+  })
+})
+
+describe("useEmergencyRecovery with the real verifier", () => {
+  // A valid phrase, so the identity derives for real: the check this guards
+  // is that a bundle from the same seed on another network is turned away.
+  const SEED =
+    "abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon abandon about"
+  const { verifyEmergencyBundle: realVerify } = jest.requireActual<
+    typeof import("@app/self-custodial/recovery-bundle/emergency-recovery")
+  >("@app/self-custodial/recovery-bundle/emergency-recovery")
+
+  const payloadFor = async (network: Parameters<typeof deriveIdentityKeyPair>[1]) => {
+    const { publicKey } = await deriveIdentityKeyPair(SEED, network)
+    const bundle: RecoveryBundle = {
+      schema: RECOVERY_BUNDLE_SCHEMA,
+      createdAt: "2026-08-05T10:00:00.000Z",
+      network: network === mockSparkNetwork.Mainnet ? "MAINNET" : "REGTEST",
+      operatorSet: "operators",
+      walletIdentityPublicKey: Buffer.from(publicKey).toString("hex"),
+      sparkSdkVersion: "1.0.0",
+      appVersion: "5.0.0",
+      leaves: [
+        { id: "leaf-1", status: "AVAILABLE", valueSats: 21000, treeNodeHex: "aa" },
+      ],
+      nodes: [{ id: "node-1", treeNodeHex: "bb" }],
+      balances: {
+        btcSats: "21000",
+        usdb: { amount: "0", status: "not-covered-by-bitcoin-unilateral-exit" },
+      },
+    }
+    return buildEncryptedBundlePayload(bundle, SEED)
+  }
+
+  const offerByClipboard = (payload: string) =>
+    mockClipboardGet.mockResolvedValue(payload)
+  const offerByFile = (payload: string) =>
+    mockPickFile.mockResolvedValue({
+      status: BundleFilePickStatus.Picked,
+      content: payload,
+    })
+
+  const sources = [
+    { name: "clipboard", offer: offerByClipboard, source: "fromClipboard" },
+    { name: "file", offer: offerByFile, source: "fromFile" },
+  ] as const
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockExpectedFilename.mockResolvedValue(FILE_NAME)
+    mockSilentFetch.mockResolvedValue({
+      success: false,
+      reason: CloudBackupErrorReason.NotFound,
+    })
+    mockVerify.mockImplementation(realVerify)
+  })
+
+  sources.forEach(({ name, offer, source }) => {
+    it(`turns away a ${name} bundle this seed saved on another network`, async () => {
+      offer(await payloadFor(mockSparkNetwork.Mainnet))
+      const rendered = renderHook(() => useEmergencyRecovery(SEED))
+      await waitFor(() =>
+        expect(rendered.result.current.step).toBe(EmergencyRecoveryStep.Sources),
+      )
+
+      await act(async () => {
+        await rendered.result.current[source]()
+      })
+
+      expect(rendered.result.current.step).toBe(EmergencyRecoveryStep.Rejected)
+      expect(rendered.result.current.rejection).toBe(EmergencyBundleRejection.NotABundle)
+    })
+
+    it(`verifies a ${name} bundle saved on the network being restored`, async () => {
+      offer(await payloadFor(mockSparkNetwork.Regtest))
+      const rendered = renderHook(() => useEmergencyRecovery(SEED))
+      await waitFor(() =>
+        expect(rendered.result.current.step).toBe(EmergencyRecoveryStep.Sources),
+      )
+
+      await act(async () => {
+        await rendered.result.current[source]()
+      })
+
+      expect(rendered.result.current.step).toBe(EmergencyRecoveryStep.Verified)
     })
   })
 })

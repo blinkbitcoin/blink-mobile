@@ -24,11 +24,22 @@ import {
   RecoveryBundlePayloadErrorReason,
   type RecoveryBundleBackupMetadata,
 } from "./encryption"
+import { bundleNetworkLabelFor } from "./exporter"
 import { deriveIdentityKeyPair } from "./identity"
 import type { RecoveryBundle } from "./types"
 
 const hexEncode = (bytes: Uint8Array): string =>
   Array.from(bytes, (byte) => byte.toString(16).padStart(2, "0")).join("")
+
+/** The identity this seed has on `network`: what a bundle the wallet saved on
+ *  that network records, and what names its file in the cloud. */
+const identityPublicKeyFor = async (
+  mnemonic: string,
+  network: Network,
+): Promise<string> => {
+  const { publicKey } = await deriveIdentityKeyPair(mnemonic, network)
+  return hexEncode(publicKey)
+}
 
 /**
  * Where this seed's bundle would be in the user's cloud.
@@ -40,10 +51,11 @@ const hexEncode = (bytes: Uint8Array): string =>
 export const expectedBundleFilename = async (
   mnemonic: string,
   network: Network,
-): Promise<string> => {
-  const { publicKey } = await deriveIdentityKeyPair(mnemonic, network)
-  return getRecoveryBundleFilename(networkLabelFor(network), hexEncode(publicKey))
-}
+): Promise<string> =>
+  getRecoveryBundleFilename(
+    networkLabelFor(network),
+    await identityPublicKeyFor(mnemonic, network),
+  )
 
 export const EmergencyBundleRejection = {
   /** Parsed, but the seed does not decrypt it: someone else's bundle. */
@@ -82,6 +94,7 @@ const REJECTION_FOR_REASON: Readonly<
 export const verifyEmergencyBundle = async (
   payload: string,
   mnemonic: string,
+  network: Network,
 ): Promise<EmergencyBundleVerification> => {
   const metadata = parseBundleBackupMetadata(payload)
   if (!metadata) {
@@ -90,6 +103,17 @@ export const verifyEmergencyBundle = async (
 
   try {
     const bundle = await decryptBundleBackupPayload(payload, mnemonic)
+    /** The key comes from the seed alone, so a bundle this seed saved on
+     *  another network decrypts as well. It cannot recover the wallet being
+     *  restored, which only its recorded network and identity can tell, so it
+     *  is the wrong file here. */
+    const expectedIdentity = await identityPublicKeyFor(mnemonic, network)
+    const isForThisWallet =
+      bundle.network === bundleNetworkLabelFor(network) &&
+      bundle.walletIdentityPublicKey === expectedIdentity
+    if (!isForThisWallet) {
+      return { verified: false, rejection: EmergencyBundleRejection.NotABundle }
+    }
     return { verified: true, result: { bundle, metadata, payload } }
   } catch (err) {
     if (err instanceof RecoveryBundlePayloadError) {
