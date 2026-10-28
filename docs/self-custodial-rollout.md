@@ -28,6 +28,17 @@ flows end-to-end at least once:
 
 Any failure on a supported OS blocks release.
 
+## Emergency bundle
+
+On a funded self-custodial wallet, for each backup method:
+
+- No backup and manual phrase backup → Settings → Emergency bundle downloads a
+  bundle; no bundle file appears in the cloud.
+- Cloud backup with a passphrase and cloud backup without one → a bundle file
+  (`blink-spark-recovery-bundle-<network>-<pubkey>.json`) appears next to the
+  seed backup within a minute, and is replaced after the next payment.
+- A wallet that has never held funds → the screen opens with Download disabled.
+
 ## Deep-link routing (NFR23)
 
 For each active-account combination, hit at least one deep link of every
