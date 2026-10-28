@@ -1291,10 +1291,28 @@ describe("KeyStoreWrapper clearAppLock", () => {
     expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
   })
 
-  it("reports the lock kept when the PIN will not erase", async () => {
+  /** A PIN that survives without its spent count and its biometrics flag is the split
+   *  the group exists to prevent, so a refused PIN leaves the other two where they are. */
+  it("reports the lock kept and leaves the rest alone when the PIN will not erase", async () => {
     spyOnSlots({ biometrics: true, pin: false, budget: true })
 
     expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+    expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+  })
+
+  it("erases the PIN before the spent budget and the biometrics flag", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: true })
+
+    await KeyStoreWrapper.clearAppLock()
+
+    const pinOrder = jest.mocked(KeyStoreWrapper.removePin).mock.invocationCallOrder[0]
+    const budgetOrder = jest.mocked(KeyStoreWrapper.clearPinFailureState).mock
+      .invocationCallOrder[0]
+    const flagOrder = jest.mocked(KeyStoreWrapper.removeIsBiometricsEnabled).mock
+      .invocationCallOrder[0]
+    expect(pinOrder).toBeLessThan(budgetOrder)
+    expect(budgetOrder).toBeLessThan(flagOrder)
   })
 
   /** A PIN without the biometrics flag routes every later unlock to the keypad instead of
@@ -1316,5 +1334,6 @@ describe("KeyStoreWrapper clearAppLock", () => {
 
     await expect(KeyStoreWrapper.clearAppLock()).rejects.toThrow("keystore locked")
     expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).not.toHaveBeenCalled()
   })
 })

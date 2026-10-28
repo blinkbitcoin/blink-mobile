@@ -387,15 +387,22 @@ export default class KeyStoreWrapper {
    * own copy of the list. `clearUninstallSurvivingCredentials` still enumerates them, on
    * purpose: it reports and retries per slot, and it wipes more than the lock.
    *
+   * The PIN goes first, and a PIN that will not erase stops the rest. Left without its
+   * spent count and its biometrics flag, a surviving PIN would be exactly the split the
+   * group exists to prevent. The reverse is harmless: a count left behind is cleared by
+   * the next PIN that is set, and a flag left behind still asks before it opens anything.
+   *
    * Returns whether the lock is provably gone: a slot that could not be erased is a lock
    * that is still set, and the caller has to keep treating it as one.
    */
   public static async clearAppLock(): Promise<boolean> {
-    const isBiometricsFlagErased = await KeyStoreWrapper.removeIsBiometricsEnabled()
     const isPinErased = await KeyStoreWrapper.removePin()
-    const isSpentBudgetErased = await KeyStoreWrapper.clearPinFailureState()
+    if (!isPinErased) return false
 
-    return isBiometricsFlagErased && isPinErased && isSpentBudgetErased
+    const isSpentBudgetErased = await KeyStoreWrapper.clearPinFailureState()
+    const isBiometricsFlagErased = await KeyStoreWrapper.removeIsBiometricsEnabled()
+
+    return isSpentBudgetErased && isBiometricsFlagErased
   }
 
   // ── session profiles ──────────────────────────────────────────────────────
