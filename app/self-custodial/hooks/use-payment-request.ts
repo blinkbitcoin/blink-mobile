@@ -36,6 +36,7 @@ import {
   ReceiveAssetMode,
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
+import { measure, ScEvent, ScRail } from "../measurement"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
 import { findLatestOnchainReceiptId } from "../providers/wallet-snapshot"
@@ -444,6 +445,12 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
 
     setOnchainAddress(result.address)
     if (!canTrackReuse) return
+    /** A request is an address handed out, not a visit that shows the one issued before
+     *  (the first address an account gets counts too, having no record to match). */
+    if (result.address !== issued?.address) {
+      // eslint-disable-next-line camelcase
+      measure(ScEvent.PaymentRequestCreated, { rail: ScRail.Onchain, has_amount: false })
+    }
     await saveIssuedOnchainAddress(selfCustodialAccountId, {
       address: result.address,
       // Never let a snapshot that has not loaded erase a marker we already had:

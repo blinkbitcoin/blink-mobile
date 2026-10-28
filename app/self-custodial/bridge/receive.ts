@@ -53,7 +53,9 @@ export const createReceiveOnchain = (sdk: BreezSdkInterface): ReceiveOnchainAdap
           }),
         }),
       )
-      measure(ScEvent.PaymentRequestCreated, { rail: ScRail.Onchain, has_amount: false })
+      /** Not counted here: the receive screen asks for the address on every visit and
+       *  gets the same one back until it rotates, so the screen counts a request only
+       *  when an address is newly handed out. */
       return { address: response.paymentRequest }
     } catch (err) {
       return receiveError(
