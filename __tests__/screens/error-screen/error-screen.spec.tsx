@@ -1,8 +1,17 @@
 import React from "react"
+import { Text } from "react-native"
+import ErrorBoundary from "react-native-error-boundary"
 
-import { act, fireEvent, render } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { LAUNCH_ROUTE } from "@app/navigation/unlock-routes"
 import theme from "@app/rne-theme/theme"
 import { ErrorScreen } from "@app/screens/error-screen/error-screen"
 
@@ -149,5 +158,65 @@ describe("ErrorScreen app reset", () => {
     await pressClearAppData(jest.fn())
 
     expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * The app mounts this boundary inside the navigation container and around the root stack,
+ * so the reset hands nothing a route: it relies on the stack remounting at its own launch
+ * route. A container that kept the crashed screen's state would put the user straight back
+ * on it, past the gate.
+ */
+describe("ErrorScreen inside the app's navigation container", () => {
+  const Stack = createNativeStackNavigator<RootStackParamList>()
+
+  const GateScreen = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+    return <Text onPress={() => navigation.navigate("Primary")}>gate</Text>
+  }
+
+  const CrashingScreen = () => {
+    throw new Error("render crash")
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
+    jest.spyOn(console, "error").mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it("comes back at the gate once the app data is cleared, not on the screen that crashed", async () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <NavigationContainer>
+          <ErrorBoundary FallbackComponent={ErrorScreen}>
+            <Stack.Navigator
+              initialRouteName={LAUNCH_ROUTE}
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="authenticationCheck" component={GateScreen} />
+              <Stack.Screen name="Primary" component={CrashingScreen} />
+            </Stack.Navigator>
+          </ErrorBoundary>
+        </NavigationContainer>
+      </ThemeProvider>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByText("gate"))
+    })
+    expect(screen.getByText("fatal")).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText("clear"))
+    })
+
+    expect(screen.getByText("gate")).toBeTruthy()
+    expect(screen.queryByText("fatal")).toBeNull()
+    expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
   })
 })
