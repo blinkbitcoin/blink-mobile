@@ -8,6 +8,7 @@ import {
   useRestoreWallet,
   RestoreWalletStatus,
 } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
@@ -82,7 +83,7 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   markBackupCompletedFor: (...args: unknown[]) => mockMarkBackupCompletedFor(...args),
-  BackupMethod: { Manual: "manual", Recovery: "recovery" },
+  BackupMethod: { Manual: "manual", Cloud: "cloud", Recovery: "recovery" },
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -134,6 +135,18 @@ describe("useRestoreWallet", () => {
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
     expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "manual")
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+  })
+
+  /** The seed of a cloud restore is already in the cloud, so the account is
+   *  recorded as cloud-backed and its emergency bundle is uploaded beside it. */
+  it("records a cloud restore as a cloud backup", async () => {
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+    })
+
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "cloud")
   })
 
   it("activates an existing account when the mnemonic is already imported", async () => {

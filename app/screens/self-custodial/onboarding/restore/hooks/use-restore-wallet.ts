@@ -73,8 +73,11 @@ export const useRestoreWallet = () => {
     [updateState],
   )
 
+  /** `method` is where the phrase came from, recorded as the account's backup: a
+   *  cloud restore means the seed is already in the cloud, so the emergency
+   *  bundle follows it there. A typed phrase leaves the bundle on the device. */
   const restore = useCallback(
-    async (mnemonic: string) => {
+    async (mnemonic: string, method: BackupMethod = BackupMethod.Manual) => {
       await guard.run(async () => {
         setStatus(RestoreWalletStatus.Restoring)
 
@@ -106,7 +109,7 @@ export const useRestoreWallet = () => {
             network,
             leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
           })
-          await markBackupCompletedFor(accountId, BackupMethod.Manual)
+          await markBackupCompletedFor(accountId, method)
           await reloadSelfCustodialAccounts()
 
           activateAccount(accountId)

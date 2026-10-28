@@ -37,7 +37,13 @@ On a funded self-custodial wallet, for each backup method:
 - Cloud backup with a passphrase and cloud backup without one → a bundle file
   (`blink-spark-recovery-bundle-<network>-<pubkey>.json`) appears next to the
   seed backup within a minute, and is replaced after the next payment.
-- A wallet that has never held funds → the screen opens with Download disabled.
+- Restore from a cloud backup (with or without a passphrase) on a fresh
+  install → the bundle file in that cloud is replaced by the restored
+  device's within a minute, and after each payment from then on.
+- Restore by typing the backup phrase → the bundle stays on the device; the
+  cloud copy, if any, is not touched.
+- A wallet that has never held funds → Download bundle looks inactive, and
+  tapping it shows the "No emergency bundle yet" warning toast.
 
 ## Deep-link routing (NFR23)
 
