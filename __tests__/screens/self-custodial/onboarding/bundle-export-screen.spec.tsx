@@ -29,6 +29,11 @@ jest.mock("@app/utils/toast", () => ({
   toastShow: (...args: unknown[]) => mockToastShow(...args),
 }))
 
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
 // The actions hook has its own spec; mocking it keeps this one about the
 // screen, without pulling in the keystore.
 jest.mock(
@@ -208,6 +213,24 @@ describe("BundleExportScreen", () => {
 
     fireEvent.press(screen.getByTestId("bundle-learn-more"))
     expect(openURL).toHaveBeenCalledWith(UNILATERAL_EXIT_CASE_STUDY_URL)
+  })
+
+  it("says so and reports it when the browser refuses to open the article", async () => {
+    const refusal = new Error("no browser")
+    jest.spyOn(Linking, "openURL").mockRejectedValue(refusal)
+    renderScreen()
+
+    fireEvent.press(screen.getByTestId("bundle-learn-more"))
+
+    await waitFor(() =>
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: LL.errors.generic() }),
+      ),
+    )
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Emergency exit case study link",
+      refusal,
+    )
   })
 
   it("survives a failing initial read", () => {

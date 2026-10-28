@@ -11,6 +11,7 @@ import { IconHero } from "@app/components/icon-hero"
 import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useRecoveryBundleActions } from "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions"
+import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
@@ -75,6 +76,17 @@ export const BundleExportScreen: React.FC = () => {
     if (didShare) setHasDownloaded(true)
   }, [handleShare])
 
+  /** The system browser can refuse to open, and a tap that silently does
+   *  nothing reads as a broken link, so a refusal is said and reported. */
+  const openCaseStudy = useCallback(async () => {
+    try {
+      await Linking.openURL(UNILATERAL_EXIT_CASE_STUDY_URL)
+    } catch (err) {
+      reportError("Emergency exit case study link", err)
+      toastShow({ message: LL.errors.generic(), LL })
+    }
+  }, [LL])
+
   return (
     <OnboardingScreenLayout
       scrollable
@@ -100,7 +112,7 @@ export const BundleExportScreen: React.FC = () => {
       <Text
         type="p2"
         style={styles.learnMore}
-        onPress={() => Linking.openURL(UNILATERAL_EXIT_CASE_STUDY_URL)}
+        onPress={openCaseStudy}
         {...testProps("bundle-learn-more")}
       >
         {LL.BackupScreen.BundleExport.learnMore()}
