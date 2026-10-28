@@ -90,8 +90,11 @@ const separate = async () => {
   await ga.setUserProperties(sharedProperties)
 }
 
-/** Crash reports follow the same domains as GA4. The breadcrumb gate shuts at once;
- *  with collection off, Crashlytics holds any report on the device instead of sending it.
+/** Crash reports follow the same domains as GA4. The breadcrumb gate shuts at once, and so
+ *  do RNFB's own log and recordError, which read the stored switch on every call. On
+ *  Android, RNFB only stores the switch: the native SDK applies it at the next launch,
+ *  from which it holds any report on the device instead of sending it (seen on the
+ *  2026-10-28 emulator check: "Automatic data collection is disabled" after a restart).
  *  A throw comes back as a rejection, so a shutdown can never throw out of its caller. */
 const closeCrashReporting = (): Promise<unknown> => {
   setCrashReportingOpen(false)
@@ -102,7 +105,8 @@ const closeCrashReporting = (): Promise<unknown> => {
 
 /** Reports held while collection was off were made under a closed domain, and turning
  *  collection back on would send them under the account that opened it, so they are
- *  deleted first (Crashlytics only deletes while collection is still off). */
+ *  deleted first. Held reports exist only when this launch started closed, and then the
+ *  native SDK's collection is still off, which is the only time it deletes. */
 const openCrashReporting = async (): Promise<void> => {
   const reporter = crashlytics()
   if (!reporter.isCrashlyticsCollectionEnabled) await reporter.deleteUnsentReports()
