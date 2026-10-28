@@ -38,9 +38,9 @@ jest.mock("react-native-modal", () => {
 })
 
 const buildOptions = () => [
-  { id: "fast", label: "Fast", detail: "30 sat/vB" },
-  { id: "medium", label: "Medium", detail: "20 sat/vB" },
-  { id: "slow", label: "Slow", detail: "10 sat/vB" },
+  { id: "fast", label: "Priority", detail: "30 sat/vB" },
+  { id: "medium", label: "Standard", detail: "20 sat/vB" },
+  { id: "slow", label: "Economy", detail: "10 sat/vB" },
 ]
 
 const renderSelector = (
@@ -68,7 +68,7 @@ describe("FeeTierSelector", () => {
   it("shows the label and detail of the currently selected option", () => {
     const { getByText } = renderSelector({ selected: "fast" })
 
-    expect(getByText("Fast")).toBeTruthy()
+    expect(getByText("Priority")).toBeTruthy()
     expect(getByText("30 sat/vB")).toBeTruthy()
   })
 
@@ -78,9 +78,9 @@ describe("FeeTierSelector", () => {
     fireEvent.press(getByTestId("fee-tier-dropdown"))
 
     // Every option label is now visible in the modal list.
-    expect(getAllByText("Fast").length).toBeGreaterThan(0)
-    expect(getAllByText("Medium").length).toBeGreaterThan(0)
-    expect(getAllByText("Slow").length).toBeGreaterThan(0)
+    expect(getAllByText("Priority").length).toBeGreaterThan(0)
+    expect(getAllByText("Standard").length).toBeGreaterThan(0)
+    expect(getAllByText("Economy").length).toBeGreaterThan(0)
   })
 
   it("calls onSelect with the chosen tier id when an option is tapped", () => {

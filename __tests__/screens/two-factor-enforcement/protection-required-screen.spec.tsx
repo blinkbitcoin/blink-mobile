@@ -1,0 +1,208 @@
+import React from "react"
+import { fireEvent, render, screen } from "@testing-library/react-native"
+
+import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
+import { WalletCurrency } from "@app/graphql/generated"
+import { i18nObject } from "@app/i18n/i18n-util"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { TwoFactorProtectionRequiredScreen } from "@app/screens/two-factor-enforcement"
+import { TwoFactorPrompt, TwoFactorTier } from "@app/types/two-factor-enforcement"
+
+import { ContextForScreen } from "../helper"
+import { flushEffects } from "../../helpers/flush-effects"
+
+loadLocale("en")
+const LL = i18nObject("en")
+
+const mockNavigate = jest.fn()
+
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useNavigation: () => ({ navigate: mockNavigate }),
+}))
+
+const mockUseHardwareBackGuard = jest.fn()
+jest.mock("@app/screens/account-migration/hooks/use-hardware-back-guard", () => ({
+  useHardwareBackGuard: (onBack?: () => void) => mockUseHardwareBackGuard(onBack),
+}))
+
+const mockRegisterDismissal = jest.fn()
+const mockEnforcement = {
+  unmetTier: TwoFactorTier.Enforced as TwoFactorTier,
+  remainingDismissals: 0,
+  enforcedCurrency: WalletCurrency.Btc as WalletCurrency,
+  enforcedThreshold: 5_000_000,
+  isHoldingEnforcedThreshold: true,
+  isCustodyExitOffered: true,
+  registerDismissal: mockRegisterDismissal,
+}
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => mockEnforcement,
+}))
+
+const mockLogTwoFactorPromptShown = jest.fn()
+const mockLogTwoFactorNonCustodialChosen = jest.fn()
+jest.mock("@app/utils/analytics", () => ({
+  logTwoFactorPromptShown: (...args: unknown[]) => mockLogTwoFactorPromptShown(...args),
+  logTwoFactorNonCustodialChosen: (...args: unknown[]) =>
+    mockLogTwoFactorNonCustodialChosen(...args),
+}))
+
+const renderScreen = async () => {
+  const rendered = render(
+    <ContextForScreen>
+      <TwoFactorProtectionRequiredScreen />
+    </ContextForScreen>,
+  )
+  await flushEffects()
+  return rendered
+}
+
+const rerenderScreen = async (rendered: ReturnType<typeof render>) => {
+  rendered.rerender(
+    <ContextForScreen>
+      <TwoFactorProtectionRequiredScreen />
+    </ContextForScreen>,
+  )
+  await flushEffects()
+}
+
+/** The blocking screen is the enforced tier's alone, once its modal has spent its
+ *  dismissals. */
+describe("TwoFactorProtectionRequiredScreen", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    mockEnforcement.unmetTier = TwoFactorTier.Enforced
+    mockEnforcement.remainingDismissals = 0
+    mockEnforcement.enforcedCurrency = WalletCurrency.Btc
+    mockEnforcement.enforcedThreshold = 5_000_000
+    mockEnforcement.isHoldingEnforcedThreshold = true
+    mockEnforcement.isCustodyExitOffered = true
+  })
+
+  it("names the sats threshold under a warning sign, with no close control", async () => {
+    await renderScreen()
+
+    expect(screen.getByTestId("icon-warning")).toBeTruthy()
+    expect(screen.queryByTestId("icon-dollar")).toBeNull()
+    expect(
+      screen.getByText(
+        LL.TwoFactorEnforcement.highBalanceTitle({ amount: "5,000,000 SAT" }),
+      ),
+    ).toBeTruthy()
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
+    ).toBeTruthy()
+    expect(screen.queryByTestId("two-factor-protection-close")).toBeNull()
+  })
+
+  it("names the dollar threshold under a dollar sign, sign first and without cents, when only the dollar wallet crossed", async () => {
+    mockEnforcement.enforcedCurrency = WalletCurrency.Usd
+    mockEnforcement.enforcedThreshold = 500_000
+    await renderScreen()
+
+    expect(screen.getByTestId("icon-dollar")).toBeTruthy()
+    expect(screen.queryByTestId("icon-warning")).toBeNull()
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.highBalanceTitle({ amount: "$5,000" })),
+    ).toBeTruthy()
+  })
+
+  /** The thresholds are configuration: the title quotes the one the account crossed,
+   *  which the provider keeps. */
+  it("quotes the enforced threshold the account crossed", async () => {
+    mockEnforcement.enforcedThreshold = 3_000_000
+    await renderScreen()
+
+    expect(
+      screen.getByText(
+        LL.TwoFactorEnforcement.highBalanceTitle({ amount: "3,000,000 SAT" }),
+      ),
+    ).toBeTruthy()
+  })
+
+  it("offers the authenticator first and leaving custody second", async () => {
+    await renderScreen()
+
+    // eslint-disable-next-line camelcase
+    expect(screen.UNSAFE_getByType(GaloyPrimaryButton).props.title).toBe(
+      LL.TwoFactorEnforcement.setAuthenticator(),
+    )
+    // eslint-disable-next-line camelcase
+    expect(screen.UNSAFE_getByType(GaloySecondaryButton).props.title).toBe(
+      LL.AccountMigration.moveToNonCustodial(),
+    )
+  })
+
+  /** The tier stays once reached; a balance the account no longer holds is not stated. */
+  it("states no amount once the wallet that crossed no longer holds it", async () => {
+    mockEnforcement.isHoldingEnforcedThreshold = false
+    await renderScreen()
+
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.protectionRequiredTitle()),
+    ).toBeTruthy()
+    expect(screen.queryByText(/You have over/)).toBeNull()
+    expect(
+      screen.getByText(LL.TwoFactorEnforcement.protectionRequiredBody()),
+    ).toBeTruthy()
+  })
+
+  /** Until this launch knows the self-custodial stack is on there is nothing to move
+   *  toward, so the authenticator is the one way forward. */
+  it("offers the authenticator alone while leaving custody is not on offer", async () => {
+    mockEnforcement.isCustodyExitOffered = false
+    await renderScreen()
+
+    expect(screen.getByText(LL.TwoFactorEnforcement.setAuthenticator())).toBeTruthy()
+    expect(screen.queryByText(LL.AccountMigration.moveToNonCustodial())).toBeNull()
+  })
+
+  /** A blocking screen swallows the hardware back rather than letting the app go, and
+   *  nothing on it is a dismissal. */
+  it("swallows the hardware back and charges no dismissal", async () => {
+    await renderScreen()
+
+    expect(mockUseHardwareBackGuard).toHaveBeenLastCalledWith(undefined)
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+
+  it("logs the screen as shown once for the mount, not again on a re-render", async () => {
+    const rendered = await renderScreen()
+
+    await rerenderScreen(rendered)
+
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledTimes(1)
+    expect(mockLogTwoFactorPromptShown).toHaveBeenCalledWith({
+      tier: TwoFactorTier.Enforced,
+      prompt: "protection_required_screen",
+    })
+  })
+
+  /** The onboarding reports the setup as started, and closes back to the home this
+   *  screen stands in for. */
+  it("opens the authenticator onboarding, telling it the blocking screen opened it", async () => {
+    await renderScreen()
+
+    fireEvent.press(screen.getByTestId("two-factor-protection-authenticator"))
+
+    expect(mockNavigate).toHaveBeenCalledWith("totpRegistrationIntro", {
+      origin: { prompt: TwoFactorPrompt.ProtectionRequiredScreen },
+    })
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+
+  it("opens the standard migration from Move to non-custodial and logs the choice", async () => {
+    await renderScreen()
+
+    fireEvent.press(screen.getByTestId("two-factor-protection-move"))
+
+    expect(mockLogTwoFactorNonCustodialChosen).toHaveBeenCalledWith({
+      tier: TwoFactorTier.Enforced,
+    })
+    expect(mockNavigate).toHaveBeenCalledWith("accountMigrationEntry")
+    expect(mockRegisterDismissal).not.toHaveBeenCalled()
+  })
+})

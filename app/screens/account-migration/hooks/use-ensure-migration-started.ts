@@ -58,6 +58,20 @@ export const useEnsureMigrationStarted = ({
    */
   const firedAttemptRef = useRef(-1)
 
+  /**
+   * Whether an answer still speaks for the screen: only an unmount or a newer attempt
+   * retires one. A change to skip does not, since skip only holds the next attempt back:
+   * an accepted start dropped because one of its inputs flipped while it was out would
+   * leave the lock armed server-side with nothing here to fire the start again.
+   */
+  const isMountedRef = useRef(true)
+  useEffect(() => {
+    isMountedRef.current = true
+    return () => {
+      isMountedRef.current = false
+    }
+  }, [])
+
   /** A settled outcome stays settled however often the caller asks: retrying a refusal only
    *  replays the same answer, and re-firing an accepted start would re-arm an armed lock. */
   const retry = useCallback(() => {
@@ -66,12 +80,25 @@ export const useEnsureMigrationStarted = ({
     setAttempt((previous) => previous + 1)
   }, [isRejected, isStarted])
 
+  /** A settled outcome also keeps a retry asked for before it settled from firing: an
+   *  accepted start answering after the caller requested another needs no second one. */
+  const isSettled = isStarted || isRejected
+
+  /**
+   * Whether any attempt has been accepted. An acceptance is never stale: the server has
+   * the run, whichever request carried it. So it settles the start even when a newer
+   * attempt has gone out since (the shared retry can send one while the first is still
+   * out), and nothing that answers afterwards undoes it: the repeat's refusal, or its
+   * dropped connection, is about a start the server already holds. Read through a ref
+   * because those later answers land in closures from before the acceptance.
+   */
+  const isAcceptedRef = useRef(false)
+
   useEffect(() => {
-    if (skip || firedAttemptRef.current === attempt) return
+    if (skip || isSettled || firedAttemptRef.current === attempt) return
 
     firedAttemptRef.current = attempt
-
-    let isActive = true
+    const isCurrent = () => isMountedRef.current && firedAttemptRef.current === attempt
 
     const run = async () => {
       try {
@@ -86,17 +113,27 @@ export const useEnsureMigrationStarted = ({
             "Migration start empty payload",
             new Error("migrationStart returned no payload"),
           )
-          if (!isActive) return
+          if (!isCurrent() || isAcceptedRef.current) return
           setHasConnectionIssue(true)
           return
         }
 
         const [rejection] = payload.errors ?? []
-        if (rejection)
-          reportError("Migration start rejected", new Error(rejection.message))
-        if (!isActive) return
-        setIsRejected(Boolean(rejection))
-        setIsStarted(!rejection)
+        if (!rejection) {
+          if (!isMountedRef.current) return
+          isAcceptedRef.current = true
+          /** An answer settles the connection question too: an earlier attempt's dropped
+           *  request may have raised it after the caller asked for this one. */
+          setHasConnectionIssue(false)
+          setIsRejected(false)
+          setIsStarted(true)
+          return
+        }
+
+        reportError("Migration start rejected", new Error(rejection.message))
+        if (!isCurrent() || isAcceptedRef.current) return
+        setHasConnectionIssue(false)
+        setIsRejected(true)
       } catch (err) {
         const isRetryable = isNetworkFailure(err)
 
@@ -104,18 +141,14 @@ export const useEnsureMigrationStarted = ({
          *  about it; the caller's retry is what sends the next one. */
         if (!isRetryable) reportError("Migration start failed", err)
 
-        if (!isActive) return
+        if (!isCurrent() || isAcceptedRef.current) return
         setHasConnectionIssue(isRetryable)
         setIsRejected(!isRetryable)
       }
     }
 
     run()
-
-    return () => {
-      isActive = false
-    }
-  }, [skip, attempt, startMigration])
+  }, [skip, isSettled, attempt, startMigration])
 
   return { isStarted, isRejected, hasConnectionIssue, retry }
 }

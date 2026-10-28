@@ -2428,9 +2428,9 @@
     "time": "Zaman",
     "type": "Tür",
     "feeTier": "İşlem önceliği",
-    "fast": "Hızlı",
-    "medium": "Orta",
-    "slow": "Yavaş",
+    "fast": "Öncelikli",
+    "medium": "Standart",
+    "slow": "Ekonomik",
     "recommended": "Önerilen",
     "walletOffline": "Cüzdanınız çevrimdışı. Lütfen bağlantınızı kontrol edin ve tekrar deneyin.",
     "sdkInsufficientFunds": "Bu işlem için yeterli bakiye yok.",
@@ -2439,7 +2439,7 @@
     "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
-    "createAddress": "Adres oluştur",
+    "createAddress": "Lightning adresi oluştur",
     "addressDisabled": "(devre dışı)",
     "donationButton": "Bağış düğmesi",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "Aktive edildi",
     "addressScreen": "Ödeme alma yolları",
     "nonCustodialAccount": "Saklamasız hesap",
+    "custodialAccount": "Saklamalı hesap",
     "tapUserName": "Kullanıcı adını ayarlamak için tıkla",
     "notifications": "Bildirimler",
     "title": "Ayarlar",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "E-postanızı doğrulayarak hesabınıza tekrar giriş yapabildiğinizden emin olun. Doğrulamayı şimdi yapmak istiyor musunuz?",
     "totp": "İki aşamalı doğrulama",
     "totpDeactivated": "İki aşamalı doğrulama kapatıldı",
-    "totpDeleteAlertTitle": "İki aşamalı doğrulamayı sil",
-    "totpDeleteAlertContent": "İki aşamalı doğrulamanızı silmek istediğinize emin misiniz?",
     "copiedAccountId": "Hesap kimliğiniz panoya kopyalandı",
     "yourAccountId": "Hesap Kimliğiniz",
     "accountId": "Hesap Kimliği",
@@ -2618,14 +2617,11 @@
     "youGet": "Alacağınız"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "İki aşamalı doğrulama",
-    "secret": "Gizli anahtar/yedek",
-    "content": "Bu QR kodunu kimlik doğrulayıcı uygulamanızla tarayın. Alternatif olarak, sırrı kimlik doğrulayıcı uygulamanıza manuel olarak kopyalayıp yapıştırabilirsiniz."
+    "title": "İki aşamalı doğrulama"
   },
   "TotpRegistrationValidateScreen": {
     "title": "İki aşamalı doğrulama",
-    "enter6digitCode": "İki aşamalı doğrulamayı başlatmak için doğrulama uygulamanıza gelen 6 haneli kodu girin.",
-    "success": "İki faktörlü kimlik doğrulama etkinleştirildi. Artık yalnızca telefonunuz veya e-postanız VE iki faktörlü kimlik doğrulamanız ile tekrar giriş yapabileceksiniz.\n\nBu hesapta 2FA ile oturum açmamış cihazların tekrar oturum açması gerekecektir.\n\n2FA erişiminin kaybedilmesi durumunda müşteri desteği tarafından yalnızca 2. seviye hesaplar kurtarılabilir."
+    "enter6digitCode": "İki aşamalı doğrulamayı başlatmak için doğrulama uygulamanıza gelen 6 haneli kodu girin."
   },
   "TotpLoginValidateScreen": {
     "title": "İki aşamalı doğrulama",
@@ -2699,7 +2695,9 @@
     "noFee": "ücretsiz",
     "fromApprox": "en az ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Şu an için ücretlere ulaşamıyoruz"
+    "error": "Şu an için ücretlere ulaşamıyoruz",
+    "inactivity": "Hareketsizlik >{months: number} ay",
+    "usdPerMonth": "{amount: string}/ay"
   },
   "TransactionLimitsScreen": {
     "receive": "Al",
@@ -3973,8 +3971,18 @@
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "transferInProgress": {
+      "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız."
+    },
     "transferDelayed": {
       "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Bu, normalden uzun sürüyor — uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız.",
+      "contactSupportCta": "Destek ile iletişime geçin"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Taşıma ilerlemenizi bu cihazdan okuyamadık. Hiçbir şey kaybolmadı: paranız güvende ve ilerlemeniz hâlâ kayıtlı.",
+      "outOfSpaceBody": "Cihazınızda depolama alanı kalmadı, bu yüzden taşıma ilerlemenizi okuyamıyoruz. Yer açıp tekrar deneyin. Hiçbir şey kaybolmadı: paranız güvende.",
+      "notSavedBody": "Taşıma ilerlemenizi bu cihaza kaydedemedik. Hiçbir şey kaybolmadı: paranız güvende. Tekrar deneyin.",
+      "notSavedOutOfSpaceBody": "Cihazınızda depolama alanı kalmadı, bu yüzden taşıma ilerlemenizi kaydedemiyoruz. Yer açıp tekrar deneyin. Hiçbir şey kaybolmadı: paranız güvende.",
       "contactSupportCta": "Destek ile iletişime geçin"
     },
     "clockOutOfSync": {
@@ -4046,6 +4054,81 @@
     "modalTitle": "Fonlarınızı güvenceye alın",
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
+  },
+  "TwoFactorEnforcement": {
+    "title": "İki aşamalı doğrulamayı ayarlayın",
+    "cardDescription": "Hesabınızı yetkisiz erişime karşı koruyun.",
+    "cardCta": "Ayarla",
+    "settingsDescription": "Hesabınızı yetkisiz erişime karşı korumak için bunu ayarlayın.",
+    "setupTitle": "İki aşamalı doğrulamayı şimdi ayarlayın",
+    "setupDescription": "Hesabınıza yetkisiz erişimi önlemek için şimdi iki aşamalı doğrulama ekleyin.",
+    "setAuthenticator": "Doğrulayıcı ayarla",
+    "reminderTitle": "Varlıklarınızı korumak için bir doğrulayıcı ekleyin",
+    "reminderDescription": "Bakiyeniz arttı. Bir doğrulayıcı uygulaması, biri e-postanızı veya telefonunuzu ele geçirse bile hesabınızı güvende tutar.",
+    "modalReminder": "Şimdi reddederseniz, en kısa sürede etkinleştirdiğinizden emin olun.",
+    "dismissTwoMore": "Bunu iki kez daha reddedebilirsiniz.",
+    "dismissOneMore": "Bunu bir kez daha reddedebilirsiniz.",
+    "dismissLast": "Bu, bunu reddedebileceğiniz son seferdir.",
+    "setNow": "Şimdi ayarla",
+    "dontWantTo": "İstemiyorum",
+    "highBalanceTitle": "{amount} üzerinde varlığınız var, lütfen ek koruma ekleyin",
+    "protectionRequiredTitle": "Blink'i kullanmaya devam etmek için lütfen ek koruma ekleyin",
+    "protectionRequiredBody": "Ne kadar çok varlığınız varsa, daha iyi güvenlik o kadar önemlidir. Blink'i kullanmaya devam etmek için lütfen bir doğrulayıcı ekleyin.",
+    "nonCustodialTitle": "İki aşamalı doğrulamayı ayarlamak istemiyorsanız",
+    "nonCustodialBody": "Diğer seçenek saklama dışı moda geçmektir. O zaman kendi varlıklarınızdan siz sorumlu olursunuz."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Varlıklarınızı bir doğrulayıcıyla koruyun",
+    "introDescription": "Doğrulayıcı uygulaması her 30 saniyede bir yeni 6 haneli kod üretir.",
+    "takeoversTitle": "Hesabın ele geçirilmesini önler",
+    "takeoversDescription": "Kod yalnızca telefonunuzda bulunur",
+    "stolenNumberTitle": "Numaranız çalınsa bile güvende olun",
+    "stolenNumberDescription": "Biri e-postanıza veya telefon numaranıza erişse bile giriş yapamaz",
+    "durationTitle": "Yaklaşık 2 dakika sürer",
+    "durationDescription": "Size adım adım rehberlik edeceğiz",
+    "getStarted": "Başla",
+    "appsTitle": "Bir doğrulayıcı uygulaması edinin",
+    "appsDescription": "Her doğrulayıcı uygulaması çalışır. Bunlar ücretsiz ve güvenilirdir:",
+    "googleAuthenticatorDescription": "Basit ve yaygın olarak kullanılır. Google hesabınıza isteğe bağlı yedekleme.",
+    "protonAuthenticatorDescription": "Açık kaynak. Uçtan uca şifreli yedekleme ve senkronizasyon.",
+    "twoFasAuthDescription": "Açık kaynak. Hesap gerekmez.",
+    "get": "İndir",
+    "storeNote": "“İndir” App Store'u veya Google Play'i açar. Yüklendikten sonra Blink'e geri dönün.",
+    "haveAnApp": "Bir uygulamam var",
+    "keyInstruction": "Bu kurulum anahtarını doğrulayıcı uygulamanıza kopyalayın.",
+    "qrInstruction": "Başka bir cihaz mı kullanıyorsunuz?\nBunun yerine bu QR kodunu tarayın.",
+    "backupTitle": "Anahtarınızı yedekleyin",
+    "backupDescription": "Telefonunuzu kaybederseniz bu anahtar, doğrulayıcınızı yeniden kurmanızı sağlar. Bu telefondan başka bir yere kaydedin.",
+    "saveToPasswordManager": "Bir şifre yöneticisine kaydet",
+    "shareToPasswordManager": "Bir şifre yöneticisiyle paylaş",
+    "copyForManualBackup": "Manuel yedekleme için kopyala",
+    "passwordManagerUnavailable": "Bu cihazda kullanılabilir bir parola yöneticisi yok. Bunun yerine anahtarı manuel yedekleme için kopyala.",
+    "savedIt": "Kaydettim",
+    "keyBackupText": "Blink doğrulayıcı kurulum anahtarı\n\nHesap: {account}\nKurulum anahtarı: {key}\n\nTelefonunuzu kaybederseniz, Blink giriş kodlarınızı geri almak için bu kurulum anahtarını bir doğrulayıcı uygulamasına ekleyin. Bu anahtara sahip olan herkes kodlarınızı üretebilir, bu yüzden gizli tutun.",
+    "protectedTitle": "Hesabınız artık korunuyor",
+    "protectedDescription": "Bundan sonra giriş yapmak için doğrulayıcı uygulamanızdan tek kullanımlık bir kod gerekecek.",
+    "newPhoneTip": "Yeni bir telefon alırsanız, eskisini sıfırlamadan <bold>önce</bold> doğrulayıcınızı yeni telefona taşıyın.",
+    "done": "Tamam"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Açık",
+    "statusDisabled": "2FA: Kapalı",
+    "modalTitle": "2FA'yı kapatmanızı önermiyoruz",
+    "modalBody": "Bu, hesabınızın güvenliğini azaltır ve üçüncü bir kişinin izniniz olmadan hesabınıza erişmesini kolaylaştırır.",
+    "keepProtected": "Korumada kalayım",
+    "codeInstruction": "İki faktörlü kimlik doğrulamayı kapatmak için doğrulayıcı uygulamanızdaki 6 haneli kodu girin.",
+    "codeInvalid": "Bu kod yanlış. Doğrulayıcı uygulamanızdaki güncel kodu girin.",
+    "tooManyAttempts": "Çok fazla deneme. Bir saat sonra tekrar deneyin.",
+    "manualResetTitle": "2FA manuel sıfırlama",
+    "manualResetBody": "Güvenliğiniz için 2FA'nın uygulama içinden kaldırılmasına izin vermiyoruz. 2FA sıfırlamaya ihtiyacınız varsa <support>Destek</support> ekibimizle iletişime geçin."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "E-posta ekle",
+    "addPhoneTitle": "Telefon numarası ekle",
+    "addEmailCode": "E-postanı eklemek için doğrulayıcı uygulamandaki 6 haneli kodu gir.",
+    "addPhoneCode": "Telefon numaranı eklemek için doğrulayıcı uygulamandaki 6 haneli kodu gir.",
+    "codeInvalid": "Bu kod yanlış. Doğrulayıcı uygulamanızdaki güncel kodu girin.",
+    "tooManyAttempts": "Çok fazla deneme. Bir saat sonra tekrar deneyin."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4146,9 +4229,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Ağ ücretleri yüklenemedi. Lütfen bağlantını kontrol edip tekrar dene.",
     "refundNow": "Şimdi iade et",

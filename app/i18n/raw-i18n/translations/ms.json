@@ -2428,9 +2428,9 @@
     "time": "Masa",
     "type": "Jenis",
     "feeTier": "Keutamaan transaksi",
-    "fast": "Cepat",
-    "medium": "Sederhana",
-    "slow": "Perlahan",
+    "fast": "Keutamaan",
+    "medium": "Standard",
+    "slow": "Ekonomi",
     "recommended": "Disyorkan",
     "walletOffline": "Dompet anda di luar talian. Sila semak sambungan anda dan cuba lagi.",
     "sdkInsufficientFunds": "Dana tidak mencukupi untuk transaksi ini.",
@@ -2439,7 +2439,7 @@
     "sdkGenericError": "Tidak dapat menganggarkan yuran. Sila cuba jumlah yang berbeza."
   },
   "SettingsScreen": {
-    "createAddress": "Cipta alamat",
+    "createAddress": "Cipta alamat Lightning",
     "addressDisabled": "(dilumpuhkan)",
     "donationButton": "Butang derma",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "Telah diaktifkan",
     "addressScreen": "Cara untuk terima bayaran",
     "nonCustodialAccount": "Akaun bukan kustodial",
+    "custodialAccount": "Akaun kustodial",
     "tapUserName": "Tekan untuk tetapkan ID pengguna",
     "notifications": "Notifikasi",
     "title": "Tetapan",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "Sila pastikan anda boleh log masuk kembali ke akaun anda dengan mengesahkan emel. Anda mahu laksanakan pengesahan sekarang? ",
     "totp": "Pengesahan dua kali",
     "totpDeactivated": "Pengesahan dua kali telah pun diaktifkan",
-    "totpDeleteAlertTitle": "Buang pengesahan dua kali",
-    "totpDeleteAlertContent": "Adakah anda pasti mahu membuang pengesahan dua kali ini?",
     "copiedAccountId": "Akaun ID anda telah disalin ke dalam papan klip",
     "yourAccountId": "ID akaun anda",
     "accountId": "ID Akaun",
@@ -2618,14 +2617,11 @@
     "youGet": "Anda dapat"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Pengesahan dua kali",
-    "secret": "Rahsia/sandaran",
-    "content": "Imbas Kod QR dengan aplikasi authenticator anda. Sebagai alternatif, anda boleh salin/tampal kata rahsia ke dalam aplikasi authenticator anda"
+    "title": "Pengesahan dua kali"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Pengesahan dua kali",
-    "enter6digitCode": "Masukkan kod 6 digit dari aplikasi Authenticator anda untuk mengesahkan pengesahan dua kali",
-    "success": "Pengesahan dua kali telah diaktifkan. Anda hanya boleh log masuk kembali dengan nombor telefon atau emel anda DAN pengesahan dua kali anda.\n\nHanya akaun yang telah melalui proses penuh KYC sahaja yang dapat dipulihkan sekiranya pengguna hilang pengesahan dua kali mereka."
+    "enter6digitCode": "Masukkan kod 6 digit dari aplikasi Authenticator anda untuk mengesahkan pengesahan dua kali"
   },
   "TotpLoginValidateScreen": {
     "title": "Pengesahan dua kali",
@@ -2699,7 +2695,9 @@
     "noFee": "tiada caj",
     "fromApprox": "dari ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Tak dapat mendapatkan caj buat masa ini"
+    "error": "Tak dapat mendapatkan caj buat masa ini",
+    "inactivity": "Tidak aktif >{months: number} bulan",
+    "usdPerMonth": "{amount: string}/bulan"
   },
   "TransactionLimitsScreen": {
     "receive": "Terima",
@@ -3973,8 +3971,18 @@
     "explainerCheck5": "Akaun anda akan dikenakan yuran rangkaian Spark",
     "explainerCta": "Saya faham",
     "transferringFunds": "Memindahkan dana anda. Ia sepatutnya siap dalam beberapa saat.",
+    "transferInProgress": {
+      "body": "Dana anda sedang dalam perjalanan ke akaun baharu anda. Biarkan aplikasi terbuka dan kami akan menyelesaikannya secara automatik."
+    },
     "transferDelayed": {
       "body": "Dana anda sedang dalam perjalanan ke akaun baharu anda. Ia mengambil masa lebih lama daripada biasa — biarkan aplikasi terbuka dan kami akan menyelesaikannya secara automatik.",
+      "contactSupportCta": "Hubungi sokongan"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Kami tidak dapat membaca kemajuan migrasi anda daripada peranti ini. Tiada apa yang hilang — dana anda selamat dan kemajuan anda masih disimpan.",
+      "outOfSpaceBody": "Peranti anda tiada ruang storan yang tinggal, jadi kami tidak dapat membaca kemajuan migrasi anda. Kosongkan ruang dan cuba lagi. Tiada apa yang hilang — dana anda selamat.",
+      "notSavedBody": "Kami tidak dapat menyimpan kemajuan migrasi anda pada peranti ini. Tiada apa yang hilang: dana anda selamat. Cuba lagi.",
+      "notSavedOutOfSpaceBody": "Peranti anda tiada ruang storan yang tinggal, jadi kami tidak dapat menyimpan kemajuan migrasi anda. Kosongkan ruang dan cuba lagi. Tiada apa yang hilang: dana anda selamat.",
       "contactSupportCta": "Hubungi sokongan"
     },
     "clockOutOfSync": {
@@ -4046,6 +4054,81 @@
     "modalTitle": "Lindungi dana anda",
     "modalDescription": "Kami sangat mengesyorkan anda membuat sandaran dompet anda untuk mengelakkan kehilangan dana sepenuhnya sekiranya anda kehilangan peranti ini.",
     "secureMe": "Lindungi dompet"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Tetapkan pengesahan dua faktor",
+    "cardDescription": "Lindungi akaun anda daripada akses tanpa kebenaran.",
+    "cardCta": "Tetapkan",
+    "settingsDescription": "Lindungi akaun anda daripada akses tanpa kebenaran dengan menetapkannya.",
+    "setupTitle": "Tetapkan pengesahan dua faktor sekarang",
+    "setupDescription": "Untuk mengelakkan akses tanpa kebenaran ke akaun anda, tambah pengesahan dua faktor sekarang.",
+    "setAuthenticator": "Tetapkan authenticator",
+    "reminderTitle": "Tambah authenticator untuk melindungi dana anda",
+    "reminderDescription": "Baki anda telah bertambah. Aplikasi authenticator memastikan akaun anda kekal selamat, walaupun seseorang mendapat akses kepada e-mel atau telefon anda.",
+    "modalReminder": "Jika anda menolaknya sekarang, pastikan anda mengaktifkannya secepat mungkin.",
+    "dismissTwoMore": "Anda boleh menolak ini dua kali lagi.",
+    "dismissOneMore": "Anda boleh menolak ini sekali lagi.",
+    "dismissLast": "Ini adalah kali terakhir anda boleh menolak ini.",
+    "setNow": "Tetapkan sekarang",
+    "dontWantTo": "Saya tidak mahu",
+    "highBalanceTitle": "Anda mempunyai lebih daripada {amount}, sila tambah perlindungan tambahan",
+    "protectionRequiredTitle": "Sila tambah perlindungan tambahan untuk terus menggunakan Blink",
+    "protectionRequiredBody": "Semakin banyak dana yang anda ada, semakin penting keselamatan yang lebih baik. Sila tambah authenticator untuk terus menggunakan Blink.",
+    "nonCustodialTitle": "Jika anda tidak mahu menetapkan pengesahan dua faktor",
+    "nonCustodialBody": "Pilihan lain ialah beralih kepada bukan kustodian. Maka anda bertanggungjawab ke atas dana anda sendiri."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Lindungi dana anda dengan authenticator",
+    "introDescription": "Aplikasi authenticator menjana kod 6 digit baharu setiap 30 saat.",
+    "takeoversTitle": "Menghalang pengambilalihan akaun",
+    "takeoversDescription": "Kod hanya wujud pada telefon anda",
+    "stolenNumberTitle": "Kekal selamat walaupun nombor anda dicuri",
+    "stolenNumberDescription": "Walaupun seseorang mendapat akses kepada e-mel atau nombor telefon anda, mereka tidak boleh log masuk",
+    "durationTitle": "Mengambil masa kira-kira 2 minit",
+    "durationDescription": "Kami akan membimbing anda langkah demi langkah",
+    "getStarted": "Mulakan",
+    "appsTitle": "Dapatkan aplikasi authenticator",
+    "appsDescription": "Mana-mana aplikasi authenticator boleh digunakan. Yang berikut adalah percuma dan dipercayai:",
+    "googleAuthenticatorDescription": "Ringkas dan digunakan secara meluas. Sandaran pilihan ke akaun Google anda.",
+    "protonAuthenticatorDescription": "Sumber terbuka. Sandaran dan penyegerakan yang disulitkan hujung ke hujung.",
+    "twoFasAuthDescription": "Sumber terbuka. Tiada akaun diperlukan.",
+    "get": "Dapatkan",
+    "storeNote": "“Dapatkan” membuka App Store atau Google Play. Kembali ke Blink apabila aplikasi telah dipasang.",
+    "haveAnApp": "Saya sudah ada aplikasi",
+    "keyInstruction": "Salin kunci persediaan ini ke dalam aplikasi authenticator anda.",
+    "qrInstruction": "Menggunakan peranti lain?\nImbas kod QR ini sebagai gantinya.",
+    "backupTitle": "Sandarkan kunci anda",
+    "backupDescription": "Jika anda kehilangan telefon, kunci ini membolehkan anda menyediakan authenticator anda sekali lagi. Simpan kunci ini di tempat selain telefon ini.",
+    "saveToPasswordManager": "Simpan ke pengurus kata laluan",
+    "shareToPasswordManager": "Kongsi ke pengurus kata laluan",
+    "copyForManualBackup": "Salin untuk sandaran manual",
+    "passwordManagerUnavailable": "Tiada pengurus kata laluan tersedia pada peranti ini. Salin kunci untuk sandaran manual sebaliknya.",
+    "savedIt": "Saya telah menyimpannya",
+    "keyBackupText": "Kunci persediaan authenticator Blink\n\nAkaun: {account}\nKunci persediaan: {key}\n\nJika anda kehilangan telefon, tambah kunci persediaan ini ke aplikasi authenticator untuk mendapatkan semula kod log masuk Blink anda. Sesiapa yang mempunyai kunci ini boleh menjana kod anda, jadi rahsiakannya.",
+    "protectedTitle": "Akaun anda kini dilindungi",
+    "protectedDescription": "Mulai sekarang, log masuk memerlukan kod sekali guna daripada aplikasi authenticator anda.",
+    "newPhoneTip": "Jika anda mendapat telefon baharu, pindahkan authenticator anda ke telefon itu <bold>sebelum</bold> anda menetapkan semula telefon lama.",
+    "done": "Selesai"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Didayakan",
+    "statusDisabled": "2FA: Dinyahdayakan",
+    "modalTitle": "Kami tidak mengesyorkan anda menyahdayakan 2FA",
+    "modalBody": "Ini akan merendahkan keselamatan akaun anda dan memudahkan pihak ketiga mengakses akaun anda tanpa kebenaran anda.",
+    "keepProtected": "Kekalkan perlindungan saya",
+    "codeInstruction": "Masukkan kod 6 digit daripada aplikasi pengesah anda untuk mematikan pengesahan dua faktor.",
+    "codeInvalid": "Kod itu salah. Masukkan kod semasa daripada aplikasi pengesah anda.",
+    "tooManyAttempts": "Terlalu banyak percubaan. Cuba lagi dalam satu jam.",
+    "manualResetTitle": "Tetapan semula 2FA secara manual",
+    "manualResetBody": "Demi perlindungan anda, kami tidak membenarkan 2FA dibuang dalam aplikasi. Jika anda perlu menetapkan semula 2FA, hubungi <support>Sokongan</support> kami."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Tambah e-mel",
+    "addPhoneTitle": "Tambah nombor telefon",
+    "addEmailCode": "Untuk menambah e-mel anda, masukkan kod 6 digit daripada aplikasi pengesah anda.",
+    "addPhoneCode": "Untuk menambah nombor telefon anda, masukkan kod 6 digit daripada aplikasi pengesah anda.",
+    "codeInvalid": "Kod itu salah. Masukkan kod semasa daripada aplikasi pengesah anda.",
+    "tooManyAttempts": "Terlalu banyak percubaan. Cuba lagi dalam satu jam."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4146,9 +4229,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Tidak dapat memuatkan yuran rangkaian. Sila semak sambungan anda dan cuba lagi.",
     "refundNow": "Bayar balik sekarang",

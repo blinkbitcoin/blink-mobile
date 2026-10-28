@@ -7,6 +7,7 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
+import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
 import { DollarBalanceMigrationModal } from "@app/components/dollar-balance-migration-modal"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
@@ -16,6 +17,7 @@ import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migra
 import { WindDownStatus } from "@app/types/wind-down"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
+import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 import {
   useActiveApiKeys,
@@ -25,6 +27,7 @@ import {
 import { useCustodialWindDown } from "@app/screens/account-migration/hooks/use-custodial-wind-down"
 import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
 import { useReusablePendingWallet } from "@app/screens/account-migration/hooks/use-reusable-pending-wallet"
+import { useStorageHandover } from "@app/screens/account-migration/hooks/use-storage-handover"
 import { armMigrationConversion } from "@app/screens/conversion-flow/drain-conversion"
 import { useSelfCustodialDisabled } from "@app/screens/account-migration/hooks/use-self-custodial-disabled"
 
@@ -97,11 +100,13 @@ export const MigrationGate: React.FC = () => {
     hasError: checkpointError,
     refetch: refetchCheckpoint,
     hasResumableCheckpoint,
+    storageFailure: checkpointStorageFailure,
   } = useMigrationCheckpoint()
   const {
     reusablePendingAccountId,
     loading: pendingWalletLoading,
     hasError: pendingWalletError,
+    storageFailure: pendingWalletStorageFailure,
     refetch: refetchPendingWallet,
   } = useReusablePendingWallet()
 
@@ -119,24 +124,39 @@ export const MigrationGate: React.FC = () => {
     navigation.navigate("conversionDetails")
   }, [navigation])
 
-  /** Retry must not fail silently: catch the rejection, and disable/spin the button while it
-   *  is in flight so repeated taps cannot stack requests over an unchanged error screen. */
-  const [isRetrying, setIsRetrying] = useState(false)
-  const retryGateData = useCallback(async () => {
-    setIsRetrying(true)
-    try {
-      await Promise.all([
-        refetchApiKeys(),
-        refetchBalances(),
-        refetchLock(),
-        refetchCheckpoint(),
-        refetchPendingWallet(),
-      ])
-    } catch (err) {
-      reportError("Migration gate retry", err)
-    } finally {
-      setIsRetrying(false)
-    }
+  /**
+   * The pending wallet is the fallback for a checkpoint that is gone, so its read only
+   * matters once the checkpoint has answered without one. A resumable checkpoint routes on
+   * its own (and ensureAccount reuses its id before looking at the pending record), so a
+   * failed pending read under it must not hold the user on a retry, or hand them to support
+   * after three, over an answer that changes nothing. While the checkpoint is still loading
+   * the gate shows its spinner rather than an error that may not apply.
+   */
+  const isPendingWalletNeeded = !checkpointLoading && !hasResumableCheckpoint
+  const hasBlockingPendingWalletError = pendingWalletError && isPendingWalletNeeded
+  const hasResumeDataError = checkpointError || hasBlockingPendingWalletError
+
+  /** Named for what it tests, not for one of its causes: any of the three server-backed
+   *  reads failing, GraphQL and auth errors included. It drives a user-facing decision —
+   *  don't blame the device — so a reader must not widen it on the strength of the name. */
+  const hasServerDataError = apiKeysError || balancesError || lockError
+
+  /** Settles only once every source has: the three server refetches reject on a network
+   *  error, and failing fast on one would end the retry while the local reads it exists to
+   *  measure are still running. The first rejection is rethrown afterwards for the retry's
+   *  report. */
+  const refetchGateData = useCallback(async (): Promise<void> => {
+    const results = await Promise.allSettled([
+      refetchApiKeys(),
+      refetchBalances(),
+      refetchLock(),
+      refetchCheckpoint(),
+      refetchPendingWallet(),
+    ])
+    const rejection = results.find(
+      (result): result is PromiseRejectedResult => result.status === "rejected",
+    )
+    if (rejection) throw rejection.reason
   }, [
     refetchApiKeys,
     refetchBalances,
@@ -144,6 +164,18 @@ export const MigrationGate: React.FC = () => {
     refetchCheckpoint,
     refetchPendingWallet,
   ])
+
+  const {
+    isStorageReadFailure,
+    isRetrying,
+    retry: retryGateData,
+    shouldOfferHandover: shouldOfferStorageHandover,
+  } = useStorageHandover({
+    isMigrationLocked,
+    hasResumeDataError,
+    hasServerDataError,
+    refetchGateData,
+  })
 
   /** Returning from the dollar-transfer conversion, refetch so the balance reflects the
    *  now-empty dollars instead of the cached pre-transfer figure. */
@@ -168,12 +200,25 @@ export const MigrationGate: React.FC = () => {
    *  look unlocked, so a settled error blocks with a retry instead. The local reads join
    *  only when locked — that is the only decision they feed, and an unreadable store there
    *  would impersonate a wiped device and hand a resumable user to terminal support. */
-  const hasResumeDataError = checkpointError || pendingWalletError
-  const hasGateDataError =
-    apiKeysError ||
-    balancesError ||
-    lockError ||
-    (isMigrationLocked && hasResumeDataError)
+  const hasGateDataError = hasServerDataError || (isMigrationLocked && hasResumeDataError)
+
+  /** Either read can be the one that failed. The answer the user can act on wins over the
+   *  one that says nothing, rather than whichever source happened to answer first. */
+  const isStorageOutOfSpace =
+    checkpointStorageFailure === StorageFailure.OutOfSpace ||
+    pendingWalletStorageFailure === StorageFailure.OutOfSpace
+
+  /** The ticket carries the same diagnosis the screen gave: a user told to free up space
+   *  must not reach support under a code claiming the store could not be read. */
+  const goToStorageSupport = useCallback(() => {
+    const reason = isStorageOutOfSpace
+      ? MigrationSupportReason.StorageOutOfSpace
+      : MigrationSupportReason.StorageUnreadable
+    navigation.navigate("accountMigrationContactSupport", {
+      reason,
+      origin: MigrationSupportOrigin.GateStorage,
+    })
+  }, [isStorageOutOfSpace, navigation])
 
   /** The API-key warning outranks the Dollar-Balance precondition in the entry order
    *  (entry, API-key check, Dollar Balance check, intro). */
@@ -259,20 +304,40 @@ export const MigrationGate: React.FC = () => {
   }
 
   if (hasGateDataError) {
+    /** Says what actually failed, and only inside this branch: the generic wording stays
+     *  for the failures that are the network's, since telling those users their device
+     *  could not be read would send them looking in the wrong place. */
+    const storageErrorBody = isStorageOutOfSpace
+      ? LL.AccountMigration.storageUnavailable.outOfSpaceBody()
+      : LL.AccountMigration.storageUnavailable.unreadableBody()
+    const gateErrorBody = isStorageReadFailure ? storageErrorBody : LL.errors.generic()
+
     return (
       <Screen preset="fixed" headerShown={false}>
-        <View style={styles.messageContainer}>
-          <GaloyIcon name="warning" size={64} color={colors.warning} />
-          <Text type="p1" style={styles.messageText}>
-            {LL.errors.generic()}
-          </Text>
-          <GaloyPrimaryButton
-            title={LL.common.tryAgain()}
-            onPress={retryGateData}
-            loading={isRetrying}
-            disabled={isRetrying}
-            {...testProps("migration-gate-retry")}
-          />
+        <View style={styles.errorContainer}>
+          <View style={styles.messageContainer}>
+            <GaloyIcon name="warning" size={64} color={colors.warning} />
+            <Text type="p1" style={styles.messageText}>
+              {gateErrorBody}
+            </Text>
+          </View>
+
+          <View style={styles.buttonsContainer}>
+            <GaloyPrimaryButton
+              title={LL.common.tryAgain()}
+              onPress={retryGateData}
+              loading={isRetrying}
+              disabled={isRetrying}
+              {...testProps("migration-gate-retry")}
+            />
+            {shouldOfferStorageHandover ? (
+              <GaloySecondaryButton
+                title={LL.AccountMigration.storageUnavailable.contactSupportCta()}
+                onPress={goToStorageSupport}
+                {...testProps("migration-gate-storage-support")}
+              />
+            ) : null}
+          </View>
         </View>
       </Screen>
     )
@@ -336,12 +401,23 @@ const useStyles = makeStyles(() => ({
     alignItems: "center",
     justifyContent: "center",
   },
+  errorContainer: {
+    flex: 1,
+  },
   messageContainer: {
     flex: 1,
     alignItems: "center",
     justifyContent: "center",
     paddingHorizontal: 32,
     gap: 16,
+  },
+  /** The flow's button block: same metrics as every other migration screen, so the
+   *  actions sit where the user has been finding them all the way here. */
+  buttonsContainer: {
+    gap: 10,
+    paddingHorizontal: 20,
+    paddingBottom: 20,
+    paddingTop: 10,
   },
   messageText: {
     textAlign: "center",

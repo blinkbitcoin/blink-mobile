@@ -4,6 +4,8 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { MigrationCompletion } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
+import { clearReceiveDelayedSince } from "../utils/migration-receive-delay-storage"
+
 import {
   AccountCloseOutcome,
   useCloseCustodialAccount,
@@ -94,6 +96,7 @@ export const useCompleteMigration = () => {
       setActiveAccountId(selfCustodialAccountId)
       await clearCheckpoint()
       await clearPendingAccount(custodialAccountId)
+      await clearReceiveDelayedSince(selfCustodialAccountId)
     },
     [discardCustodialSession, setActiveAccountId, clearCheckpoint, clearPendingAccount],
   )

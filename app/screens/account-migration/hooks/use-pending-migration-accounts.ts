@@ -5,6 +5,11 @@ import { useFocusEffect } from "@react-navigation/native"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { reportError } from "@app/utils/error-logging"
+import {
+  classifyStorageFailure,
+  StorageFailure,
+  StorageWriteError,
+} from "@app/utils/storage/storage-failure"
 
 import {
   clearPendingProvisionedAccount,
@@ -29,6 +34,7 @@ export const usePendingMigrationAccounts = () => {
   const [pendingByOwner, setPendingByOwner] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [storageFailure, setStorageFailure] = useState<StorageFailure | null>(null)
   const isMountedRef = useRef(true)
 
   const activeAccountId = activeAccount?.id ?? null
@@ -58,6 +64,7 @@ export const usePendingMigrationAccounts = () => {
             const { [activatedOwner]: activated, ...rest } = pending
             setPendingByOwner(rest)
             setHasError(false)
+            setStorageFailure(null)
             setLoading(false)
             clearPendingProvisionedAccount(storageKey, activatedOwner).catch((err) => {
               reportError("Pending migration account self-heal", err)
@@ -67,12 +74,14 @@ export const usePendingMigrationAccounts = () => {
 
           setPendingByOwner(pending)
           setHasError(false)
+          setStorageFailure(null)
           setLoading(false)
         })
         .catch((err) => {
           reportError("Pending migration accounts load", err)
           if (!isMountedRef.current) return
           setHasError(true)
+          setStorageFailure(classifyStorageFailure(err))
           setLoading(false)
         }),
     [storageKey, activeAccountId],
@@ -99,16 +108,22 @@ export const usePendingMigrationAccounts = () => {
   /** Run as provision's beforeCreate, so it MUST throw on failure: a swallowed error (or a
    *  missing owner) would let the wallet be created with no record behind it, the orphan
    *  #6 guards against. The write lands before the in-memory update so a failed write
-   *  leaves no phantom record either. The caller (ensureAccount) reports and toasts. */
+   *  leaves no phantom record either. The caller (ensureAccount) reports and toasts.
+   *  Only the store's own refusal is classified: the missing owner is not a storage
+   *  failure, so it throws a plain error the caller cannot mistake for a full disk. */
   const savePendingAccount = useCallback(
     async (accountId: string): Promise<void> => {
       if (!ownerId) {
         throw new Error("Cannot record a pending migration account without an owner id")
       }
-      await savePendingProvisionedAccount(storageKey, {
-        custodialAccountId: ownerId,
-        accountId,
-      })
+      try {
+        await savePendingProvisionedAccount(storageKey, {
+          custodialAccountId: ownerId,
+          accountId,
+        })
+      } catch (err) {
+        throw new StorageWriteError(err)
+      }
       setPendingByOwner((previous) => ({ ...previous, [ownerId]: accountId }))
     },
     [storageKey, ownerId],
@@ -139,6 +154,8 @@ export const usePendingMigrationAccounts = () => {
     /** A read failure surfaced, not swallowed: an unreadable record read as "no pending
      *  wallet" would tell the gate this device was wiped when it wasn't. */
     hasError,
+    /** What the failed read was, when the message could say. */
+    storageFailure,
     /** Imperative reload for retry screens; leaves the mount flag alone so a retry
      *  resolving after unmount still drops its update. */
     refetch: load,

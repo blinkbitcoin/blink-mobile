@@ -67,6 +67,7 @@ import {
   ShieldIcon,
   SnowflakeIcon,
   SpinnerGapIcon,
+  SquaresFourIcon,
   StorefrontIcon,
   TrashIcon,
   TranslateIcon,
@@ -137,6 +138,7 @@ export type IconWeight = "thin" | "regular" | "bold"
 // ── Icon maps ───────────────────────────────────────────────────────────────
 
 const phosphorIconMap = {
+  "apps": SquaresFourIcon,
   "arrow-down": ArrowDownIcon,
   "arrow-left": ArrowLeftIcon,
   "arrow-right": ArrowRightIcon,

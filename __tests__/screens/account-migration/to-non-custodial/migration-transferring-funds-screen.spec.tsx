@@ -400,6 +400,7 @@ describe("MigrationTransferringFundsScreen", () => {
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: MigrationSupportReason.ReceiveDelayed,
       origin: "receive-delayed",
+      custodialAccountId: "custodial-1",
     })
   })
 

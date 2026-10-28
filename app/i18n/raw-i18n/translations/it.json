@@ -2428,9 +2428,9 @@
         "time": "Ora",
         "type": "Tipo",
         "feeTier": "Priorità della transazione",
-        "fast": "Veloce",
-        "medium": "Medio",
-        "slow": "Lento",
+        "fast": "Prioritario",
+        "medium": "Standard",
+        "slow": "Economico",
         "recommended": "Consigliato",
         "walletOffline": "Il tuo portafoglio è offline. Controlla la connessione e riprova.",
         "sdkInsufficientFunds": "Fondi insufficienti per questa transazione.",
@@ -2439,7 +2439,7 @@
         "sdkGenericError": "Impossibile stimare le commissioni. Prova con un importo diverso."
     },
     "SettingsScreen": {
-        "createAddress": "Crea indirizzo",
+        "createAddress": "Crea indirizzo Lightning",
         "addressDisabled": "(disattivato)",
         "donationButton": "Pulsante Dona",
         "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
         "activated": "Attivato",
         "addressScreen": "Modi per farsi pagare",
         "nonCustodialAccount": "Account non custodiale",
+        "custodialAccount": "Account custodiale",
         "tapUserName": "Tocca per impostare l'username",
         "notifications": "Notifiche",
         "title": "Impostazioni",
@@ -2564,8 +2565,6 @@
         "emailUnverifiedContent": "Assicurati di poter accedere nuovamente al tuo account verificando la tua email. Vuoi effettuare la verifica ora?",
         "totp": "Autenticazione a due fattori",
         "totpDeactivated": "L'autenticazione a due fattori è stata disattivata",
-        "totpDeleteAlertTitle": "Eliminare l'autenticazione a due fattori",
-        "totpDeleteAlertContent": "Vuoi davvero eliminare l'autenticazione a due fattori?",
         "copiedAccountId": "Copiato l'ID del tuo account negli appunti",
         "yourAccountId": "Il tuo ID account",
         "accountId": "ID account",
@@ -2618,14 +2617,11 @@
         "youGet": "Ricevi"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Autenticazione a due fattori",
-        "secret": "Segreto/backup",
-        "content": "Scansiona questo codice QR con la tua app di autenticazione. In alternativa, puoi copiare/incollare manualmente il segreto nella tua app di autenticazione."
+        "title": "Autenticazione a due fattori"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticazione a due fattori",
-        "enter6digitCode": "Inserisci il codice a 6 cifre dall'app di autenticazione per convalidare l'autenticazione a due fattori.",
-        "success": "L'autenticazione a due fattori è stata abilitata. Ora potrai effettuare nuovamente l'accesso solo con il tuo telefono o e-mail E con la tua autenticazione a due fattori.\n\nI dispositivi su questo account che non hanno effettuato l'accesso con 2FA dovranno effettuare nuovamente l'accesso.\n\nSolo gli account di livello 2 possono essere recuperati dall'assistenza clienti in caso di perdita dell'accesso 2FA."
+        "enter6digitCode": "Inserisci il codice a 6 cifre dall'app di autenticazione per convalidare l'autenticazione a due fattori."
     },
     "TotpLoginValidateScreen": {
         "title": "Autenticazione a due fattori",
@@ -2699,7 +2695,9 @@
         "noFee": "nessuna commissione",
         "fromApprox": "da ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Impossibile recuperare le commissioni al momento"
+        "error": "Impossibile recuperare le commissioni al momento",
+        "inactivity": "Inattività >{months: number} mesi",
+        "usdPerMonth": "{amount: string}/mese"
     },
     "TransactionLimitsScreen": {
         "receive": "Ricevi",
@@ -3973,8 +3971,18 @@
         "explainerCheck5": "Verrà addebitata una commissione di rete Spark sul tuo account",
         "explainerCta": "Ho capito",
         "transferringFunds": "Trasferimento dei tuoi fondi in corso. Dovrebbe completarsi in pochi secondi.",
+        "transferInProgress": {
+            "body": "I tuoi fondi sono in viaggio verso il tuo nuovo conto. Tieni l'app aperta e completeremo automaticamente."
+        },
         "transferDelayed": {
             "body": "I tuoi fondi sono in viaggio verso il tuo nuovo conto. Sta richiedendo più tempo del solito — tieni l'app aperta e completeremo automaticamente.",
+            "contactSupportCta": "Contatta l'assistenza"
+        },
+        "storageUnavailable": {
+            "unreadableBody": "Non siamo riusciti a leggere lo stato della tua migrazione su questo dispositivo. Non è andato perso nulla: i tuoi fondi sono al sicuro e i tuoi progressi sono ancora salvati.",
+            "outOfSpaceBody": "Il tuo dispositivo non ha più spazio di archiviazione, quindi non possiamo leggere lo stato della tua migrazione. Libera spazio e riprova. Non è andato perso nulla: i tuoi fondi sono al sicuro.",
+            "notSavedBody": "Non siamo riusciti a salvare lo stato della tua migrazione su questo dispositivo. Non è andato perso nulla: i tuoi fondi sono al sicuro. Riprova.",
+            "notSavedOutOfSpaceBody": "Il tuo dispositivo non ha più spazio di archiviazione, quindi non possiamo salvare lo stato della tua migrazione. Libera spazio e riprova. Non è andato perso nulla: i tuoi fondi sono al sicuro.",
             "contactSupportCta": "Contatta l'assistenza"
         },
         "clockOutOfSync": {
@@ -4046,6 +4054,81 @@
         "modalTitle": "Metti al sicuro i tuoi fondi",
         "modalDescription": "Ti consigliamo vivamente di eseguire il backup del tuo portafoglio per prevenire una perdita totale dei fondi nel caso in cui perdessi questo dispositivo.",
         "secureMe": "Proteggi portafoglio"
+    },
+    "TwoFactorEnforcement": {
+        "title": "Imposta l'autenticazione a due fattori",
+        "cardDescription": "Proteggi il tuo account dagli accessi non autorizzati.",
+        "cardCta": "Imposta",
+        "settingsDescription": "Proteggi il tuo account dagli accessi non autorizzati impostandola.",
+        "setupTitle": "Imposta ora l'autenticazione a due fattori",
+        "setupDescription": "Per prevenire accessi non autorizzati al tuo account, aggiungi ora l'autenticazione a due fattori.",
+        "setAuthenticator": "Imposta l'autenticatore",
+        "reminderTitle": "Aggiungi un autenticatore per proteggere i tuoi fondi",
+        "reminderDescription": "Il tuo saldo è cresciuto. Un'app di autenticazione mantiene il tuo account al sicuro, anche se qualcuno entra in possesso della tua email o del tuo telefono.",
+        "modalReminder": "Se lo ignori ora, assicurati di attivarlo il prima possibile.",
+        "dismissTwoMore": "Puoi ignorarlo ancora due volte.",
+        "dismissOneMore": "Puoi ignorarlo ancora una volta.",
+        "dismissLast": "Questa è l'ultima volta che puoi ignorarlo.",
+        "setNow": "Imposta ora",
+        "dontWantTo": "Non voglio",
+        "highBalanceTitle": "Hai più di {amount}, aggiungi una protezione aggiuntiva",
+        "protectionRequiredTitle": "Aggiungi una protezione aggiuntiva per continuare a usare Blink",
+        "protectionRequiredBody": "Più fondi hai, più è importante una sicurezza migliore. Aggiungi un autenticatore per continuare a usare Blink.",
+        "nonCustodialTitle": "Se non vuoi impostare l'autenticazione a due fattori",
+        "nonCustodialBody": "L'altra opzione è passare al non-custodial. In quel caso sei responsabile dei tuoi fondi."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Proteggi i tuoi fondi con un autenticatore",
+        "introDescription": "Un'app di autenticazione genera un nuovo codice a 6 cifre ogni 30 secondi.",
+        "takeoversTitle": "Blocca i furti di account",
+        "takeoversDescription": "Il codice esiste solo sul tuo telefono",
+        "stolenNumberTitle": "Al sicuro anche se ti rubano il numero",
+        "stolenNumberDescription": "Anche se qualcuno entra in possesso della tua email o del tuo numero di telefono, non può accedere",
+        "durationTitle": "Richiede circa 2 minuti",
+        "durationDescription": "Ti guideremo passo dopo passo",
+        "getStarted": "Inizia",
+        "appsTitle": "Scarica un'app di autenticazione",
+        "appsDescription": "Va bene qualsiasi app di autenticazione. Queste sono gratuite e affidabili:",
+        "googleAuthenticatorDescription": "Semplice e molto diffusa. Backup facoltativo sul tuo account Google.",
+        "protonAuthenticatorDescription": "A codice aperto. Backup e sincronizzazione con crittografia end-to-end.",
+        "twoFasAuthDescription": "A codice aperto. Nessun account necessario.",
+        "get": "Scarica",
+        "storeNote": "«Scarica» apre l'App Store o Google Play. Torna su Blink quando l'app è installata.",
+        "haveAnApp": "Ho già un'app",
+        "keyInstruction": "Copia questa chiave di configurazione nella tua app di autenticazione.",
+        "qrInstruction": "Usi un altro dispositivo?\nScansiona invece questo codice QR.",
+        "backupTitle": "Fai il backup della chiave",
+        "backupDescription": "Se perdi il telefono, questa chiave ti permette di configurare di nuovo l'autenticatore. Salvala in un posto diverso da questo telefono.",
+        "saveToPasswordManager": "Salva in un gestore di password",
+        "shareToPasswordManager": "Condividi con un gestore di password",
+        "copyForManualBackup": "Copia per un backup manuale",
+        "passwordManagerUnavailable": "Nessun gestore di password disponibile su questo dispositivo. Copia invece la chiave per un backup manuale.",
+        "savedIt": "L'ho salvata",
+        "keyBackupText": "Chiave di configurazione dell'autenticatore Blink\n\nAccount: {account}\nChiave di configurazione: {key}\n\nSe perdi il telefono, aggiungi questa chiave di configurazione a un'app di autenticazione per riavere i tuoi codici di accesso Blink. Chiunque abbia questa chiave può generare i tuoi codici, quindi tienila privata.",
+        "protectedTitle": "Il tuo account ora è protetto",
+        "protectedDescription": "D'ora in poi, per accedere servirà un codice monouso dalla tua app di autenticazione.",
+        "newPhoneTip": "Se prendi un nuovo telefono, trasferisci l'autenticatore sul nuovo <bold>prima</bold> di ripristinare quello vecchio.",
+        "done": "Fatto"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Attiva",
+        "statusDisabled": "2FA: Disattivata",
+        "modalTitle": "Sconsigliamo di disattivare la 2FA",
+        "modalBody": "Ridurrebbe la sicurezza del tuo account e renderebbe più facile a terzi accedervi senza il tuo permesso.",
+        "keepProtected": "Voglio restare protetto",
+        "codeInstruction": "Inserisci il codice a 6 cifre della tua app di autenticazione per disattivare l'autenticazione a due fattori.",
+        "codeInvalid": "Il codice non è corretto. Inserisci il codice attuale della tua app di autenticazione.",
+        "tooManyAttempts": "Troppi tentativi. Riprova tra un'ora.",
+        "manualResetTitle": "Reimpostazione manuale della 2FA",
+        "manualResetBody": "Per la tua protezione non consentiamo di rimuovere la 2FA dall'app. Se hai bisogno di reimpostarla, contatta il nostro <support>Supporto</support>."
+    },
+    "LoginMethodCode": {
+        "addEmailTitle": "Aggiungi email",
+        "addPhoneTitle": "Aggiungi numero di telefono",
+        "addEmailCode": "Per aggiungere la tua email, inserisci il codice a 6 cifre della tua app di autenticazione.",
+        "addPhoneCode": "Per aggiungere il tuo numero di telefono, inserisci il codice a 6 cifre della tua app di autenticazione.",
+        "codeInvalid": "Il codice non è corretto. Inserisci il codice attuale della tua app di autenticazione.",
+        "tooManyAttempts": "Troppi tentativi. Riprova tra un'ora."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
@@ -4146,9 +4229,6 @@
         "refundFailed": "Refund failed: {error}",
         "refundAddress": "Bitcoin address for refund",
         "feeRate": "Network fee",
-        "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-        "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-        "feeRateHour": "Economy (~{sats} sats) ~60 min",
         "feeRateUnit": "{rate} sat/vB",
         "feeRateUnavailable": "Impossibile caricare le commissioni di rete. Controlla la connessione e riprova.",
         "refundNow": "Rimborsa ora",

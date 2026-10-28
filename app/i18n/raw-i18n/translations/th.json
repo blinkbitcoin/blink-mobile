@@ -2428,9 +2428,9 @@
     "time": "เวลา",
     "type": "ประเภท",
     "feeTier": "ลำดับความสำคัญของธุรกรรม",
-    "fast": "เร็ว",
-    "medium": "ปานกลาง",
-    "slow": "ช้า",
+    "fast": "ด่วน",
+    "medium": "มาตรฐาน",
+    "slow": "ประหยัด",
     "recommended": "แนะนำ",
     "walletOffline": "กระเป๋าเงินของคุณออฟไลน์ กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "sdkInsufficientFunds": "ยอดเงินไม่เพียงพอสำหรับธุรกรรมนี้",
@@ -2439,7 +2439,7 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
-    "createAddress": "สร้างแอดเดรส",
+    "createAddress": "สร้างแอดเดรส Lightning",
     "addressDisabled": "(ปิดใช้งาน)",
     "donationButton": "ปุ่มบริจาค",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",
+    "custodialAccount": "บัญชีแบบฝากดูแล",
     "tapUserName": "กดเพื่อตั้งชื่อผู้ใช้",
     "notifications": "Notifications",
     "title": "การตั้งค่า",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "รหัสบัญชี",
@@ -2618,14 +2617,11 @@
     "youGet": "คุณจะได้รับ"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "รหัสลับ/สำรอง",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2699,7 +2695,9 @@
     "noFee": "ไม่มีค่าธรรมเนียม",
     "fromApprox": "เริ่มต้น ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้"
+    "error": "ไม่สามารถเรียกค่าธรรมเนียมได้ในขณะนี้",
+    "inactivity": "ไม่มีการใช้งาน >{months: number} เดือน",
+    "usdPerMonth": "{amount: string}/เดือน"
   },
   "TransactionLimitsScreen": {
     "receive": "รับเงิน",
@@ -3973,8 +3971,18 @@
     "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
     "explainerCta": "เข้าใจแล้ว",
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที",
+    "transferInProgress": {
+      "body": "เงินของคุณกำลังอยู่ระหว่างการโอนไปยังบัญชีใหม่ของคุณ เปิดแอปทิ้งไว้ แล้วเราจะดำเนินการให้เสร็จโดยอัตโนมัติ"
+    },
     "transferDelayed": {
       "body": "เงินของคุณกำลังอยู่ระหว่างการโอนไปยังบัญชีใหม่ของคุณ ใช้เวลานานกว่าปกติ — เปิดแอปทิ้งไว้ แล้วเราจะดำเนินการให้เสร็จโดยอัตโนมัติ",
+      "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "เราไม่สามารถอ่านความคืบหน้าการย้ายบัญชีของคุณจากอุปกรณ์นี้ได้ ไม่มีอะไรสูญหาย เงินของคุณปลอดภัยและความคืบหน้ายังถูกบันทึกไว้",
+      "outOfSpaceBody": "อุปกรณ์ของคุณไม่มีพื้นที่จัดเก็บเหลืออยู่ เราจึงอ่านความคืบหน้าการย้ายบัญชีของคุณไม่ได้ กรุณาเพิ่มพื้นที่ว่างแล้วลองอีกครั้ง ไม่มีอะไรสูญหาย เงินของคุณปลอดภัย",
+      "notSavedBody": "เราไม่สามารถบันทึกความคืบหน้าการย้ายบัญชีของคุณบนอุปกรณ์นี้ได้ ไม่มีอะไรสูญหาย เงินของคุณปลอดภัย กรุณาลองอีกครั้ง",
+      "notSavedOutOfSpaceBody": "อุปกรณ์ของคุณไม่มีพื้นที่จัดเก็บเหลืออยู่ เราจึงบันทึกความคืบหน้าการย้ายบัญชีของคุณไม่ได้ กรุณาเพิ่มพื้นที่ว่างแล้วลองอีกครั้ง ไม่มีอะไรสูญหาย เงินของคุณปลอดภัย",
       "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
     },
     "clockOutOfSync": {
@@ -4046,6 +4054,81 @@
     "modalTitle": "รักษาความปลอดภัยเงินของคุณ",
     "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
     "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
+  },
+  "TwoFactorEnforcement": {
+    "title": "ตั้งค่าการยืนยันตัวตนสองขั้นตอน",
+    "cardDescription": "ปกป้องบัญชีของคุณจากการเข้าถึงโดยไม่ได้รับอนุญาต",
+    "cardCta": "ตั้งค่า",
+    "settingsDescription": "ปกป้องบัญชีของคุณจากการเข้าถึงโดยไม่ได้รับอนุญาตด้วยการตั้งค่า",
+    "setupTitle": "ตั้งค่าการยืนยันตัวตนสองขั้นตอนตอนนี้",
+    "setupDescription": "เพื่อป้องกันการเข้าถึงบัญชีของคุณโดยไม่ได้รับอนุญาต โปรดเพิ่มการยืนยันตัวตนสองขั้นตอนตอนนี้",
+    "setAuthenticator": "ตั้งค่าแอปยืนยันตัวตน",
+    "reminderTitle": "เพิ่มแอปยืนยันตัวตนเพื่อปกป้องเงินของคุณ",
+    "reminderDescription": "ยอดเงินของคุณเพิ่มขึ้นแล้ว แอปยืนยันตัวตนช่วยให้บัญชีของคุณปลอดภัย แม้จะมีคนเข้าถึงอีเมลหรือโทรศัพท์ของคุณได้",
+    "modalReminder": "หากคุณปิดตอนนี้ โปรดเปิดใช้งานโดยเร็วที่สุด",
+    "dismissTwoMore": "คุณสามารถปิดได้อีกสองครั้ง",
+    "dismissOneMore": "คุณสามารถปิดได้อีกหนึ่งครั้ง",
+    "dismissLast": "นี่เป็นครั้งสุดท้ายที่คุณสามารถปิดได้",
+    "setNow": "ตั้งค่าตอนนี้",
+    "dontWantTo": "ฉันไม่ต้องการ",
+    "highBalanceTitle": "คุณมีมากกว่า {amount} โปรดเพิ่มการป้องกันเพิ่มเติม",
+    "protectionRequiredTitle": "โปรดเพิ่มการป้องกันเพิ่มเติมเพื่อใช้งาน Blink ต่อ",
+    "protectionRequiredBody": "ยิ่งคุณมีเงินมากเท่าไร ความปลอดภัยที่ดีกว่าก็ยิ่งสำคัญมากขึ้น โปรดเพิ่มแอปยืนยันตัวตนเพื่อใช้ Blink ต่อไป",
+    "nonCustodialTitle": "หากคุณไม่ต้องการตั้งค่าการยืนยันตัวตนสองขั้นตอน",
+    "nonCustodialBody": "อีกทางเลือกหนึ่งคือย้ายไปใช้แบบไม่ฝากดูแล ซึ่งคุณจะต้องรับผิดชอบเงินของคุณเอง"
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "ปกป้องเงินของคุณด้วยแอปยืนยันตัวตน",
+    "introDescription": "แอปยืนยันตัวตนจะสร้างรหัส 6 หลักใหม่ทุก 30 วินาที",
+    "takeoversTitle": "ป้องกันการยึดบัญชี",
+    "takeoversDescription": "รหัสอยู่ในโทรศัพท์ของคุณเท่านั้น",
+    "stolenNumberTitle": "ปลอดภัยแม้หมายเลขของคุณจะถูกขโมย",
+    "stolenNumberDescription": "แม้จะมีคนเข้าถึงอีเมลหรือหมายเลขโทรศัพท์ของคุณได้ ก็ไม่สามารถเข้าสู่ระบบได้",
+    "durationTitle": "ใช้เวลาประมาณ 2 นาที",
+    "durationDescription": "เราจะแนะนำคุณทีละขั้นตอน",
+    "getStarted": "เริ่มต้นใช้งาน",
+    "appsTitle": "ดาวน์โหลดแอปยืนยันตัวตน",
+    "appsDescription": "ใช้แอปยืนยันตัวตนใดก็ได้ แอปเหล่านี้ฟรีและเชื่อถือได้:",
+    "googleAuthenticatorDescription": "ใช้งานง่ายและเป็นที่นิยม สำรองข้อมูลไปยังบัญชี Google ได้ตามต้องการ",
+    "protonAuthenticatorDescription": "โอเพนซอร์ส สำรองข้อมูลและซิงค์แบบเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง",
+    "twoFasAuthDescription": "โอเพนซอร์ส ไม่ต้องมีบัญชี",
+    "get": "ดาวน์โหลด",
+    "storeNote": "“ดาวน์โหลด” จะเปิด App Store หรือ Google Play กลับมาที่ Blink เมื่อติดตั้งเสร็จแล้ว",
+    "haveAnApp": "ฉันมีแอปแล้ว",
+    "keyInstruction": "คัดลอกคีย์ตั้งค่านี้ไปยังแอปยืนยันตัวตนของคุณ",
+    "qrInstruction": "ใช้อุปกรณ์เครื่องอื่นอยู่ใช่ไหม\nสแกนรหัส QR นี้แทน",
+    "backupTitle": "สำรองคีย์ของคุณ",
+    "backupDescription": "หากคุณทำโทรศัพท์หาย คีย์นี้จะช่วยให้คุณตั้งค่าแอปยืนยันตัวตนได้อีกครั้ง โปรดบันทึกไว้ในที่อื่นที่ไม่ใช่โทรศัพท์เครื่องนี้",
+    "saveToPasswordManager": "บันทึกลงตัวจัดการรหัสผ่าน",
+    "shareToPasswordManager": "แชร์ไปยังตัวจัดการรหัสผ่าน",
+    "copyForManualBackup": "คัดลอกเพื่อสำรองด้วยตนเอง",
+    "passwordManagerUnavailable": "ไม่มีตัวจัดการรหัสผ่านในอุปกรณ์นี้ ให้คัดลอกคีย์เพื่อสำรองข้อมูลด้วยตนเองแทน",
+    "savedIt": "ฉันบันทึกแล้ว",
+    "keyBackupText": "คีย์ตั้งค่าแอปยืนยันตัวตนของ Blink\n\nบัญชี: {account}\nคีย์ตั้งค่า: {key}\n\nหากคุณทำโทรศัพท์หาย ให้เพิ่มคีย์ตั้งค่านี้ลงในแอปยืนยันตัวตนเพื่อรับรหัสเข้าสู่ระบบ Blink ของคุณกลับคืนมา ใครก็ตามที่มีคีย์นี้สามารถสร้างรหัสของคุณได้ จึงควรเก็บไว้เป็นความลับ",
+    "protectedTitle": "บัญชีของคุณได้รับการปกป้องแล้ว",
+    "protectedDescription": "นับจากนี้ การเข้าสู่ระบบต้องใช้รหัสแบบใช้ครั้งเดียวจากแอปยืนยันตัวตนของคุณ",
+    "newPhoneTip": "หากคุณเปลี่ยนโทรศัพท์เครื่องใหม่ ให้ย้ายแอปยืนยันตัวตนไปยังเครื่องใหม่<bold>ก่อน</bold>รีเซ็ตเครื่องเก่า",
+    "done": "เสร็จสิ้น"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: เปิดอยู่",
+    "statusDisabled": "2FA: ปิดอยู่",
+    "modalTitle": "เราไม่แนะนำให้ปิด 2FA",
+    "modalBody": "การปิดจะลดความปลอดภัยของบัญชีและทำให้บุคคลอื่นเข้าถึงบัญชีของคุณได้ง่ายขึ้นโดยไม่ได้รับอนุญาต",
+    "keepProtected": "ให้ฉันได้รับการปกป้องต่อไป",
+    "codeInstruction": "ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนเพื่อปิดการยืนยันตัวตนแบบสองขั้นตอน",
+    "codeInvalid": "รหัสไม่ถูกต้อง ป้อนรหัสปัจจุบันจากแอปยืนยันตัวตนของคุณ",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป โปรดลองอีกครั้งในอีกหนึ่งชั่วโมง",
+    "manualResetTitle": "รีเซ็ต 2FA ด้วยตนเอง",
+    "manualResetBody": "เพื่อปกป้องคุณ เราไม่อนุญาตให้ลบ 2FA ภายในแอป หากต้องการรีเซ็ต 2FA โปรดติดต่อ<support>ฝ่ายสนับสนุน</support>ของเรา"
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "เพิ่มอีเมล",
+    "addPhoneTitle": "เพิ่มหมายเลขโทรศัพท์",
+    "addEmailCode": "หากต้องการเพิ่มอีเมล ให้ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนของคุณ",
+    "addPhoneCode": "หากต้องการเพิ่มหมายเลขโทรศัพท์ ให้ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนของคุณ",
+    "codeInvalid": "รหัสไม่ถูกต้อง ป้อนรหัสปัจจุบันจากแอปยืนยันตัวตนของคุณ",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป โปรดลองอีกครั้งในอีกหนึ่งชั่วโมง"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4146,9 +4229,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "ไม่สามารถโหลดค่าธรรมเนียมเครือข่ายได้ โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "refundNow": "คืนเงินตอนนี้",

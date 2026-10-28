@@ -18,7 +18,7 @@ export type NotificationCardUIProps = {
   text: string
   icon?: IconNamesType
   /** Omitting the action renders an inert card: no press feedback, no button role. */
-  action?: () => Promise<void>
+  action?: () => void | Promise<void>
   loading?: boolean
   dismissAction?: () => void
   buttonLabel?: string

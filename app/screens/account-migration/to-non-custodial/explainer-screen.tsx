@@ -10,7 +10,7 @@ import { RevealedCheckboxList } from "@app/components/revealed-checkbox-list"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationAccount } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
 export const MigrationExplainerScreen: React.FC = () => {
@@ -45,7 +45,7 @@ export const MigrationExplainerScreen: React.FC = () => {
   }, [ensureAccount, navigation])
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       footer={
         <GaloyPrimaryButton
           title={LL.AccountMigration.explainerCta()}
@@ -66,6 +66,6 @@ export const MigrationExplainerScreen: React.FC = () => {
         testIdPrefix="migration-explainer-check"
         onAllCheckedChange={setAreAllChecked}
       />
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
