@@ -1,12 +1,16 @@
 import {
+  ClaimDeferredReason_Tags as DeferredReasonTag,
+  ClaimDepositOutcome_Tags as ClaimOutcomeTag,
   ClaimDepositRequest,
   DepositClaimError_Tags as ClaimErrorTag,
   Fee,
   ListUnclaimedDepositsRequest,
   MaxFee,
   MaxOnchainFee,
+  InstantClaimStatus_Tags as InstantClaimTag,
   RefundDepositRequest,
   type BreezSdkInterface,
+  type ClaimDepositOutcome,
   type DepositInfo,
 } from "@breeztech/breez-sdk-spark-react-native"
 
@@ -25,6 +29,9 @@ export type MappedDeposit = {
   isMature: boolean
   claimError: ClaimErrorInfo | null
   hasRefund: boolean
+  /** Claimed ahead of maturity (0.26). The SDK keeps the row until the UTXO leaves its
+   *  chain feed, but the funds are already in the balance. */
+  claimedEarly: boolean
 }
 
 const mapClaimError = (deposit: DepositInfo): ClaimErrorInfo | null => {
@@ -39,6 +46,11 @@ const mapClaimError = (deposit: DepositInfo): ClaimErrorInfo | null => {
 
   if (deposit.claimError.tag === ClaimErrorTag.MissingUtxo) {
     return { reason: "missing_utxo" }
+  }
+
+  /** Its claim fee would leave it at or under the dust limit (0.27). */
+  if (deposit.claimError.tag === ClaimErrorTag.DepositTooSmall) {
+    return { reason: "below_dust" }
   }
 
   const inner = "inner" in deposit.claimError ? deposit.claimError.inner : null
@@ -57,6 +69,9 @@ const mapDeposit = (deposit: DepositInfo): MappedDeposit => ({
   isMature: deposit.isMature,
   claimError: mapClaimError(deposit),
   hasRefund: Boolean(deposit.refundTxId),
+  claimedEarly:
+    deposit.instantClaimStatus?.tag === InstantClaimTag.Submitted ||
+    deposit.instantClaimStatus?.tag === InstantClaimTag.Claimed,
 })
 
 export const listDeposits = async (sdk: BreezSdkInterface): Promise<MappedDeposit[]> => {
@@ -73,19 +88,56 @@ type ClaimParams = {
   maxFeeSats?: number
 }
 
+export type ClaimOutcome =
+  | { status: "settled" }
+  | { status: "submitted" }
+  | { status: "deferred"; reason: "fee_exceeded"; requiredFeeSats: number }
+  | { status: "deferred"; reason: "awaiting_confirmations" }
+  | { status: "deferred"; reason: "provider_declined"; message: string }
+
+const mapClaimOutcome = (outcome: ClaimDepositOutcome): ClaimOutcome => {
+  if (outcome.tag === ClaimOutcomeTag.Settled) return { status: "settled" }
+  if (outcome.tag === ClaimOutcomeTag.Submitted) return { status: "submitted" }
+
+  const { reason } = outcome.inner
+  if (reason.tag === DeferredReasonTag.MaxFeeExceeded) {
+    return {
+      status: "deferred",
+      reason: "fee_exceeded",
+      requiredFeeSats: toNumber(reason.inner.requiredFeeSats),
+    }
+  }
+  if (reason.tag === DeferredReasonTag.NoEarlyClaimAvailable) {
+    return { status: "deferred", reason: "awaiting_confirmations" }
+  }
+  return {
+    status: "deferred",
+    reason: "provider_declined",
+    message: reason.inner.message,
+  }
+}
+
+/**
+ * A max fee passed here is recorded on the deposit, so the SDK's later automatic
+ * attempts on it are held to the same cap. Without one, the configured cap applies and
+ * any cap recorded earlier is cleared.
+ */
 export const claimDeposit = async ({
   sdk,
   txid,
   vout,
   maxFeeSats,
-}: ClaimParams): Promise<void> => {
+}: ClaimParams): Promise<ClaimOutcome> => {
   /** `maxFeeSats` is a quoted claim fee, which already includes any proportional
    *  provider fee, so the ceiling takes no proportional part of its own. */
   const maxFee = maxFeeSats
     ? MaxFee.create({ onchain: new MaxOnchainFee.Fixed({ amount: BigInt(maxFeeSats) }) })
     : undefined
 
-  await sdk.claimDeposit(ClaimDepositRequest.create({ txid, vout, maxFee }))
+  const { outcome } = await sdk.claimDeposit(
+    ClaimDepositRequest.create({ txid, vout, maxFee }),
+  )
+  return mapClaimOutcome(outcome)
 }
 
 export type NetworkFeeRates = {

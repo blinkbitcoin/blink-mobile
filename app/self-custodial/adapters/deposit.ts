@@ -1,17 +1,29 @@
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  SdkError,
+  SdkError_Tags as SdkErrorTags,
+  type BreezSdkInterface,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { toBtcMoneyAmount } from "@app/types/amounts"
 import {
+  DepositClaimDeferral,
   DepositErrorReason,
   DepositStatus,
   PaymentResultStatus,
   type ClaimDepositAdapter,
+  type ClaimDepositResult,
   type ListPendingDepositsAdapter,
   type PaymentAdapterResult,
   type PendingDeposit,
 } from "@app/types/payment"
 
-import { claimDeposit, listDeposits, refundDeposit, type MappedDeposit } from "../bridge"
+import {
+  claimDeposit,
+  listDeposits,
+  refundDeposit,
+  type ClaimOutcome,
+  type MappedDeposit,
+} from "../bridge"
 
 const failed = (message: string): PaymentAdapterResult => ({
   status: PaymentResultStatus.Failed,
@@ -51,6 +63,30 @@ const mapToPendingDeposit = (deposit: MappedDeposit): PendingDeposit => ({
   errorMessage: deposit.claimError?.message,
 })
 
+const toClaimResult = (outcome: ClaimOutcome): ClaimDepositResult => {
+  if (outcome.status !== "deferred") return { status: PaymentResultStatus.Success }
+  if (outcome.reason === "fee_exceeded") {
+    return {
+      ...failed(`Claim needs ${outcome.requiredFeeSats} sats in fees`),
+      deferral: DepositClaimDeferral.FeeExceeded,
+      requiredFeeSats: outcome.requiredFeeSats,
+    }
+  }
+  if (outcome.reason === "awaiting_confirmations") {
+    return {
+      ...failed("Deposit cannot be claimed before it confirms"),
+      deferral: DepositClaimDeferral.AwaitingConfirmations,
+    }
+  }
+  return { ...failed(outcome.message), deferral: DepositClaimDeferral.ProviderDeclined }
+}
+
+const isClaimInProgress = (err: unknown): boolean =>
+  SdkError.instanceOf(err) && err.tag === SdkErrorTags.DepositClaimInProgress
+
+const isDepositTooSmall = (err: unknown): boolean =>
+  SdkError.instanceOf(err) && err.tag === SdkErrorTags.DepositTooSmall
+
 export const parseDepositId = (
   depositId: string,
 ): { txid: string; vout: number } | null => {
@@ -70,7 +106,11 @@ export const createListPendingDeposits = (
   return async () => {
     try {
       const deposits = await listDeposits(sdk)
-      return { deposits: deposits.map(mapToPendingDeposit) }
+      return {
+        deposits: deposits
+          .filter(({ claimedEarly }) => !claimedEarly)
+          .map(mapToPendingDeposit),
+      }
     } catch (err) {
       return {
         deposits: [],
@@ -95,9 +135,16 @@ export const createClaimDeposit = (sdk: BreezSdkInterface): ClaimDepositAdapter 
     const parsed = parseDepositId(depositId)
     if (!parsed) return failed(`Invalid depositId: ${depositId}`)
     try {
-      await claimDeposit({ sdk, ...parsed, maxFeeSats })
-      return { status: PaymentResultStatus.Success }
+      return toClaimResult(await claimDeposit({ sdk, ...parsed, maxFeeSats }))
     } catch (err) {
+      /** The SDK's sync loop is already claiming this deposit; that claim settles it. */
+      if (isClaimInProgress(err)) return { status: PaymentResultStatus.Pending }
+      if (isDepositTooSmall(err)) {
+        return {
+          ...failed("Deposit is too small to claim after fees"),
+          errorReason: DepositErrorReason.BelowDust,
+        }
+      }
       return failed(err instanceof Error ? err.message : `Claim failed: ${err}`)
     }
   },

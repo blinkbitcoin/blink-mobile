@@ -110,6 +110,22 @@ export const DepositErrorReason = {
 export type DepositErrorReason =
   (typeof DepositErrorReason)[keyof typeof DepositErrorReason]
 
+/** Why a claim the SDK accepted did not claim yet (0.26 returns these instead of throwing). */
+export const DepositClaimDeferral = {
+  FeeExceeded: "fee_exceeded",
+  AwaitingConfirmations: "awaiting_confirmations",
+  ProviderDeclined: "provider_declined",
+} as const
+
+export type DepositClaimDeferral =
+  (typeof DepositClaimDeferral)[keyof typeof DepositClaimDeferral]
+
+export type ClaimDepositResult = PaymentAdapterResult & {
+  deferral?: DepositClaimDeferral
+  requiredFeeSats?: number
+  errorReason?: DepositErrorReason
+}
+
 export type PendingDeposit = {
   id: string
   txid: string
@@ -217,7 +233,7 @@ export type ListPendingDepositsAdapter = () => Promise<{
 
 export type ClaimDepositAdapter = {
   getClaimFee: (params: ClaimDepositParams) => Promise<FeeQuote | null>
-  claimDeposit: (params: ClaimDepositParams) => Promise<PaymentAdapterResult>
+  claimDeposit: (params: ClaimDepositParams) => Promise<ClaimDepositResult>
   refundDeposit: (params: RefundDepositParams) => Promise<PaymentAdapterResult>
 }
 
