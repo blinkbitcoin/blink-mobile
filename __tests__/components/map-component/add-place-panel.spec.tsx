@@ -3,6 +3,7 @@ import type { ReactTestInstance } from "react-test-renderer"
 import { AccessibilityInfo } from "react-native"
 import { fireEvent, render, waitFor } from "@testing-library/react-native"
 
+import { SUBMITTABLE_PLACE_CATEGORIES } from "@app/btcmap"
 import { AddPlacePanel } from "@app/components/map-component/add-place-panel"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
@@ -40,7 +41,7 @@ const continueToCategories = ({ getByTestId }: Queries, name = "Hope House") => 
 
 /** Which chip is answering the question, read the way a screen reader reads it. */
 const isSelected = (chip: ReactTestInstance) =>
-  Boolean(chip.props.accessibilityState?.selected)
+  Boolean(chip.props.accessibilityState?.checked)
 
 /** Both steps answered, left standing on the one that sends. */
 const fillInForm = (queries: Queries) => {
@@ -445,6 +446,23 @@ describe("AddPlacePanel", () => {
 
     await waitFor(() => expect(isSelected(getByTestId("place-category-bars"))).toBe(true))
     expect(isSelected(getByTestId("place-category-cafes"))).toBe(false)
+  })
+
+  it("offers the categories as one radio group, so a screen reader counts them", async () => {
+    // Read off the props rather than queried by role: the group is not itself
+    // a focusable element — making it one would hide the chips inside it from
+    // VoiceOver — and role queries only match focusable ones.
+    const { getByTestId } = renderSheet()
+    continueToCategories({ getByTestId })
+
+    const group = getByTestId("place-categories")
+    expect(group.props.accessibilityRole).toBe("radiogroup")
+    expect(group.props.accessibilityLabel).toBe("Category")
+    for (const option of SUBMITTABLE_PLACE_CATEGORIES) {
+      expect(getByTestId(`place-category-${option}`).props.accessibilityRole).toBe(
+        "radio",
+      )
+    }
   })
 
   it("takes a category back off when its own chip is tapped again", async () => {
