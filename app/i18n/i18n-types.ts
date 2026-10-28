@@ -10255,7 +10255,7 @@ type RootTranslation = {
 		 */
 		exportLogsTitle: string
 		/**
-		 * T​h​i​s​ ​f​i​l​e​ ​h​e​l​p​s​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​l​o​o​k​ ​i​n​t​o​ ​p​r​o​b​l​e​m​s​ ​w​i​t​h​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​I​t​ ​i​n​c​l​u​d​e​s​ ​y​o​u​r​ ​w​a​l​l​e​t​'​s​ ​p​u​b​l​i​c​ ​I​D​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​ ​(​a​m​o​u​n​t​s​,​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​a​d​d​r​e​s​s​e​s​)​,​ ​b​u​t​ ​n​e​v​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​o​r​ ​k​e​y​s​.​ ​O​n​l​y​ ​s​h​a​r​e​ ​i​t​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​.
+		 * T​h​i​s​ ​f​i​l​e​ ​h​e​l​p​s​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​l​o​o​k​ ​i​n​t​o​ ​p​r​o​b​l​e​m​s​ ​w​i​t​h​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​I​t​ ​i​n​c​l​u​d​e​s​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​ ​(​a​m​o​u​n​t​s​,​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​a​d​d​r​e​s​s​e​s​)​,​ ​b​u​t​ ​n​e​v​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​o​r​ ​k​e​y​s​.​ ​O​n​l​y​ ​s​h​a​r​e​ ​i​t​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​.
 		 */
 		exportLogsBody: string
 		/**
@@ -24310,7 +24310,7 @@ export type TranslationFunctions = {
 		 */
 		exportLogsTitle: () => LocalizedString
 		/**
-		 * This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.
+		 * This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.
 		 */
 		exportLogsBody: () => LocalizedString
 		/**

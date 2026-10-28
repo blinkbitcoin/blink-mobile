@@ -3219,7 +3219,7 @@ const en: BaseTranslation = {
     downloadLogs: "Download logs",
     exportLogsTitle: "Share your wallet logs",
     exportLogsBody:
-      "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+      "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
     exportLogsConfirm: "Share logs",
     noLogsYet: "There are no logs to share yet. Open your wallet and try again.",
     exportLogsError: "Couldn't export your logs. Please try again.",

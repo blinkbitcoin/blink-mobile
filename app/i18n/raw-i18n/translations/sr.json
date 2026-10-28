@@ -3067,7 +3067,7 @@
     "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом.",
     "downloadLogs": "Download logs",
     "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet identifier and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
     "exportLogsConfirm": "Share logs",
     "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
     "exportLogsError": "Couldn't export your logs. Please try again."
