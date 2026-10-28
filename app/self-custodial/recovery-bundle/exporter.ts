@@ -104,7 +104,7 @@ export class RecoveryBundleExportError extends Error {
 const protoNetworkFor = (network: Network): SparkProtoNetwork =>
   network === Network.Mainnet ? SparkProtoNetwork.Mainnet : SparkProtoNetwork.Regtest
 
-const bundleNetworkLabelFor = (network: Network): string =>
+export const bundleNetworkLabelFor = (network: Network): string =>
   network === Network.Mainnet ? "MAINNET" : "REGTEST"
 
 /** Remaining time before `deadline`; throws BudgetExceeded when spent. */

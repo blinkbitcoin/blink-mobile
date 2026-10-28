@@ -65,7 +65,7 @@ export const useEmergencyRecovery = (mnemonic: string) => {
   const submit = useCallback(
     async (payload: string) => {
       setStep(EmergencyRecoveryStep.Verifying)
-      const outcome = await verifyEmergencyBundle(payload, mnemonic)
+      const outcome = await verifyEmergencyBundle(payload, mnemonic, network)
       if (outcome.verified) {
         setVerified(outcome.result)
         setRejection(null)
@@ -75,7 +75,7 @@ export const useEmergencyRecovery = (mnemonic: string) => {
       setRejection(outcome.rejection)
       setStep(EmergencyRecoveryStep.Rejected)
     },
-    [mnemonic],
+    [mnemonic, network],
   )
 
   const attemptedRef = useRef(false)

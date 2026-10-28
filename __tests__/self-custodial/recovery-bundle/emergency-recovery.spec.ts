@@ -26,6 +26,7 @@ import {
   expectedBundleFilename,
   verifyEmergencyBundle,
 } from "@app/self-custodial/recovery-bundle/emergency-recovery"
+import { deriveIdentityKeyPair } from "@app/self-custodial/recovery-bundle/identity"
 import {
   RECOVERY_BUNDLE_SCHEMA,
   type RecoveryBundle,
@@ -38,12 +39,12 @@ const MNEMONIC =
 const OTHER_MNEMONIC =
   "legal winner thank year wave sausage worth useful legal winner thank yellow"
 
-const bundle: RecoveryBundle = {
+const regtestBundleContents: RecoveryBundle = {
   schema: RECOVERY_BUNDLE_SCHEMA,
   createdAt: "2026-08-05T10:00:00.000Z",
   network: "REGTEST",
   operatorSet: "regtest-set",
-  walletIdentityPublicKey: "02aa",
+  walletIdentityPublicKey: "",
   sparkSdkVersion: "1.0.0",
   appVersion: "5.0.0",
   leaves: [
@@ -57,11 +58,33 @@ const bundle: RecoveryBundle = {
   },
 }
 
+const identityHexFor = async (mnemonic: string, network: Network): Promise<string> => {
+  const { publicKey } = await deriveIdentityKeyPair(mnemonic, network)
+  return Buffer.from(publicKey).toString("hex")
+}
+
+/** What this seed's wallet saves on each network: the label and the identity
+ *  both come from the network, while the encryption key does not. */
+let bundle: RecoveryBundle
+let mainnetBundle: RecoveryBundle
+
+beforeAll(async () => {
+  bundle = {
+    ...regtestBundleContents,
+    walletIdentityPublicKey: await identityHexFor(MNEMONIC, Network.Regtest),
+  }
+  mainnetBundle = {
+    ...regtestBundleContents,
+    network: "MAINNET",
+    walletIdentityPublicKey: await identityHexFor(MNEMONIC, Network.Mainnet),
+  }
+})
+
 describe("verifyEmergencyBundle", () => {
   it("accepts a bundle encrypted with the same phrase", async () => {
     const payload = await buildEncryptedBundlePayload(bundle, MNEMONIC)
 
-    const outcome = await verifyEmergencyBundle(payload, MNEMONIC)
+    const outcome = await verifyEmergencyBundle(payload, MNEMONIC, Network.Regtest)
 
     expect(outcome.verified).toBe(true)
     if (!outcome.verified) throw new Error("unreachable")
@@ -76,7 +99,7 @@ describe("verifyEmergencyBundle", () => {
     // envelope is well-formed, so the mismatch is between phrase and file.
     const payload = await buildEncryptedBundlePayload(bundle, OTHER_MNEMONIC)
 
-    const outcome = await verifyEmergencyBundle(payload, MNEMONIC)
+    const outcome = await verifyEmergencyBundle(payload, MNEMONIC, Network.Regtest)
 
     expect(outcome).toEqual({
       verified: false,
@@ -85,7 +108,11 @@ describe("verifyEmergencyBundle", () => {
   })
 
   it("blames the file when the payload is not JSON", async () => {
-    const outcome = await verifyEmergencyBundle("not json at all", MNEMONIC)
+    const outcome = await verifyEmergencyBundle(
+      "not json at all",
+      MNEMONIC,
+      Network.Regtest,
+    )
 
     expect(outcome).toEqual({
       verified: false,
@@ -99,6 +126,7 @@ describe("verifyEmergencyBundle", () => {
     const outcome = await verifyEmergencyBundle(
       JSON.stringify({ hello: "world" }),
       MNEMONIC,
+      Network.Regtest,
     )
 
     expect(outcome).toEqual({
@@ -115,6 +143,7 @@ describe("verifyEmergencyBundle", () => {
         bundleCreatedAt: bundle.createdAt,
       }),
       MNEMONIC,
+      Network.Regtest,
     )
 
     expect(outcome).toEqual({
@@ -132,9 +161,51 @@ describe("verifyEmergencyBundle", () => {
       walletIdentityPublicKey: "02ff",
     })
 
-    const outcome = await verifyEmergencyBundle(tampered, MNEMONIC)
+    const outcome = await verifyEmergencyBundle(tampered, MNEMONIC, Network.Regtest)
 
     expect(outcome.verified).toBe(false)
+  })
+
+  it("accepts a bundle saved on the network being restored", async () => {
+    const payload = await buildEncryptedBundlePayload(mainnetBundle, MNEMONIC)
+
+    const outcome = await verifyEmergencyBundle(payload, MNEMONIC, Network.Mainnet)
+
+    expect(outcome.verified).toBe(true)
+  })
+
+  it("rejects a bundle this seed saved on another network as the wrong file", async () => {
+    // The key comes from the seed alone, so it decrypts; it still cannot
+    // recover the wallet being restored on this network.
+    const regtestPayload = await buildEncryptedBundlePayload(bundle, MNEMONIC)
+    const mainnetPayload = await buildEncryptedBundlePayload(mainnetBundle, MNEMONIC)
+
+    await expect(
+      verifyEmergencyBundle(regtestPayload, MNEMONIC, Network.Mainnet),
+    ).resolves.toEqual({
+      verified: false,
+      rejection: EmergencyBundleRejection.NotABundle,
+    })
+    await expect(
+      verifyEmergencyBundle(mainnetPayload, MNEMONIC, Network.Regtest),
+    ).resolves.toEqual({
+      verified: false,
+      rejection: EmergencyBundleRejection.NotABundle,
+    })
+  })
+
+  it("rejects a bundle on the right network that records another identity", async () => {
+    const payload = await buildEncryptedBundlePayload(
+      { ...bundle, walletIdentityPublicKey: "02aa" },
+      MNEMONIC,
+    )
+
+    const outcome = await verifyEmergencyBundle(payload, MNEMONIC, Network.Regtest)
+
+    expect(outcome).toEqual({
+      verified: false,
+      rejection: EmergencyBundleRejection.NotABundle,
+    })
   })
 
   it("rejects rather than throws when decryption fails in an unforeseen way", async () => {
@@ -154,7 +225,9 @@ describe("verifyEmergencyBundle", () => {
         "@app/self-custodial/recovery-bundle/emergency-recovery"
       )
 
-      await expect(isolated.verifyEmergencyBundle(payload, MNEMONIC)).resolves.toEqual({
+      await expect(
+        isolated.verifyEmergencyBundle(payload, MNEMONIC, Network.Regtest),
+      ).resolves.toEqual({
         verified: false,
         rejection: EmergencyBundleRejection.NotABundle,
       })
