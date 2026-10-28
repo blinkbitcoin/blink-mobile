@@ -143,23 +143,12 @@ describe("BundleExportScreen", () => {
     expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
   })
 
-  describe("learn more", () => {
-    it("explains how recovery works", () => {
-      renderScreen()
+  it("opens the unilateral exit article from learn more", () => {
+    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true)
+    renderScreen()
 
-      fireEvent.press(screen.getByTestId("bundle-learn-more"))
-      expect(screen.getByText(LL.RecoveryBundleScreen.howItWorksTitle())).toBeTruthy()
-      expect(screen.getByText(LL.RecoveryBundleScreen.howItWorksBody())).toBeTruthy()
-    })
-
-    it("opens the case study in the browser", () => {
-      const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true)
-      renderScreen()
-
-      fireEvent.press(screen.getByTestId("bundle-learn-more"))
-      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.readCaseStudy()))
-      expect(openURL).toHaveBeenCalledWith(UNILATERAL_EXIT_CASE_STUDY_URL)
-    })
+    fireEvent.press(screen.getByTestId("bundle-learn-more"))
+    expect(openURL).toHaveBeenCalledWith(UNILATERAL_EXIT_CASE_STUDY_URL)
   })
 
   it("survives a failing initial read", () => {

@@ -172,7 +172,6 @@ import {
   RestorePhraseScreen,
   CloudRestoreScreen,
   OperatorUnreachableScreen,
-  EmergencyRecoveryScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
   MigrationBalancesOverviewScreen,
@@ -1132,11 +1131,6 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialOperatorUnreachable"
         component={OperatorUnreachableScreen}
-        options={{ title: "" }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialEmergencyRecovery"
-        component={EmergencyRecoveryScreen}
         options={{ title: "" }}
       />
     </RootNavigator.Navigator>

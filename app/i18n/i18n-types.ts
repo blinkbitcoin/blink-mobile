@@ -12766,10 +12766,6 @@ type RootTranslation = {
 			 */
 			body: string
 			/**
-			 * R​e​a​d​ ​t​h​e​ ​c​a​s​e​ ​s​t​u​d​y
-			 */
-			readCaseStudy: string
-			/**
 			 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​u​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
 			 */
 			learnMore: string
@@ -13539,107 +13535,6 @@ type RootTranslation = {
 		 * T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
 		 */
 		tryAgainLater: string
-		/**
-		 * V​e​r​i​f​y​i​n​g​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e
-		 */
-		verifying: string
-		/**
-		 * E​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​v​e​r​i​f​i​e​d
-		 */
-		verified: string
-		/**
-		 * U​p​l​o​a​d​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e
-		 */
-		sourcesTitle: string
-		/**
-		 * I​f​ ​y​o​u​ ​h​a​v​e​ ​s​a​v​e​d​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​,​ ​u​p​l​o​a​d​ ​i​t​ ​n​o​w​ ​t​o​ ​b​e​ ​a​b​l​e​ ​t​o​ ​e​x​i​t​ ​o​n​c​h​a​i​n​.
-		 */
-		sourcesBody: string
-		/**
-		 * N​e​e​d​ ​h​e​l​p​?
-		 */
-		needHelp: string
-		/**
-		 * {​p​r​o​v​i​d​e​r​}
-		 * @param {string} provider
-		 */
-		fromCloud: RequiredParams<'provider'>
-		/**
-		 * P​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
-		 */
-		fromPasswordManager: string
-		/**
-		 * U​p​l​o​a​d​ ​b​u​n​d​l​e
-		 */
-		fromFile: string
-		/**
-		 * N​o​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​f​o​r​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​i​n​ ​y​o​u​r​ ​c​l​o​u​d​.
-		 */
-		notInCloud: string
-		/**
-		 * N​o​t​h​i​n​g​ ​o​n​ ​t​h​e​ ​c​l​i​p​b​o​a​r​d​ ​t​o​ ​c​h​e​c​k​.
-		 */
-		clipboardEmpty: string
-		/**
-		 * T​h​a​t​ ​f​i​l​e​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​r​e​a​d​.
-		 */
-		fileUnreadable: string
-		/**
-		 * C​o​u​l​d​ ​n​o​t​ ​f​e​t​c​h​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.
-		 */
-		sourceFailed: string
-		/**
-		 * P​r​o​b​a​b​l​y​ ​a​ ​w​r​o​n​g​ ​f​i​l​e
-		 */
-		rejectedTitle: string
-		/**
-		 * B​a​c​k​u​p​ ​p​h​r​a​s​e​ ​d​o​e​s​ ​n​o​t​ ​m​a​t​c​h​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​,​ ​y​o​u​ ​h​a​v​e​ ​t​h​e​ ​c​o​r​r​e​c​t​ ​o​n​e​?
-		 */
-		rejectedWrongPhrase: string
-		/**
-		 * T​h​a​t​ ​f​i​l​e​ ​i​s​ ​n​o​t​ ​a​n​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.​ ​A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​p​i​c​k​e​d​ ​t​h​e​ ​r​i​g​h​t​ ​o​n​e​?
-		 */
-		rejectedNotABundle: string
-		/**
-		 * T​r​y​ ​a​g​a​i​n
-		 */
-		tryAgain: string
-		/**
-		 * R​e​s​t​o​r​e​ ​o​t​h​e​r
-		 */
-		restoreOther: string
-		/**
-		 * Y​o​u​r​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​r​e​c​o​v​e​r​e​d
-		 */
-		summaryTitle: string
-		/**
-		 * T​h​i​s​ ​b​u​n​d​l​e​ ​c​o​v​e​r​s​ ​t​h​e​ ​b​a​l​a​n​c​e​ ​b​e​l​o​w​.​ ​B​l​i​n​k​ ​c​a​n​n​o​t​ ​p​e​r​f​o​r​m​ ​t​h​e​ ​o​n​c​h​a​i​n​ ​e​x​i​t​ ​f​o​r​ ​y​o​u​ ​y​e​t​ ​-​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​w​i​l​l​ ​w​a​l​k​ ​y​o​u​ ​t​h​r​o​u​g​h​ ​i​t​ ​w​i​t​h​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​t​o​o​l​i​n​g​.
-		 */
-		summaryBody: string
-		/**
-		 * C​o​v​e​r​e​d​ ​b​a​l​a​n​c​e
-		 */
-		summaryCovered: string
-		/**
-		 * O​u​t​p​u​t​s
-		 */
-		summaryOutputs: string
-		/**
-		 * B​u​n​d​l​e​ ​c​r​e​a​t​e​d
-		 */
-		summaryCreated: string
-		/**
-		 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
-		 */
-		summarySupport: string
-		/**
-		 * S​a​v​e​ ​b​u​n​d​l​e​ ​a​s​ ​a​ ​f​i​l​e
-		 */
-		summaryExport: string
-		/**
-		 * C​l​o​s​e
-		 */
-		summaryDone: string
 	}
 	BackupNudge: {
 		/**
@@ -13985,16 +13880,6 @@ type RootTranslation = {
 		cta: string
 	}
 	RecoveryBundleScreen: {
-		/**
-		 * H​o​w​ ​r​e​c​o​v​e​r​y​ ​w​o​r​k​s
-		 */
-		howItWorksTitle: string
-		/**
-		 * I​f​ ​S​p​a​r​k​ ​b​e​c​o​m​e​s​ ​u​n​a​v​a​i​l​a​b​l​e​,​ ​t​h​i​s​ ​b​a​c​k​u​p​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​n​c​h​a​i​n​ ​y​o​u​r​s​e​l​f​,​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​c​a​n​'​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​t​h​i​s​ ​w​a​y​.​
-	​
-	​R​e​c​o​v​e​r​y​ ​c​a​n​ ​t​a​k​e​ ​u​p​ ​t​o​ ​a​b​o​u​t​ ​t​w​o​ ​w​e​e​k​s​:​ ​t​r​a​n​s​a​c​t​i​o​n​s​ ​a​r​e​ ​b​r​o​a​d​c​a​s​t​,​ ​t​h​e​n​ ​a​ ​w​a​i​t​i​n​g​ ​p​e​r​i​o​d​ ​p​a​s​s​e​s​ ​b​e​f​o​r​e​ ​t​h​e​ ​f​u​n​d​s​ ​c​a​n​ ​b​e​ ​s​w​e​p​t​ ​t​o​ ​a​ ​w​a​l​l​e​t​ ​y​o​u​ ​c​h​o​o​s​e​.​ ​I​t​ ​a​l​s​o​ ​c​o​s​t​s​ ​o​n​c​h​a​i​n​ ​f​e​e​s​,​ ​w​h​i​c​h​ ​y​o​u​ ​p​a​y​ ​w​i​t​h​ ​a​ ​s​e​p​a​r​a​t​e​ ​o​n​c​h​a​i​n​ ​t​r​a​n​s​a​c​t​i​o​n​.​ ​S​m​a​l​l​ ​a​m​o​u​n​t​s​ ​w​i​l​l​ ​c​o​s​t​ ​m​o​r​e​ ​i​n​ ​f​e​e​s​ ​t​h​a​n​ ​t​h​e​y​ ​a​r​e​ ​w​o​r​t​h​.
-		 */
-		howItWorksBody: string
 		/**
 		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​R​e​f​r​e​s​h​ ​f​i​r​s​t​.
 		 */
@@ -26929,10 +26814,6 @@ export type TranslationFunctions = {
 			 */
 			body: () => LocalizedString
 			/**
-			 * Read the case study
-			 */
-			readCaseStudy: () => LocalizedString
-			/**
 			 * Learn more about unilateral exit
 			 */
 			learnMore: () => LocalizedString
@@ -27693,106 +27574,6 @@ export type TranslationFunctions = {
 		 * Try again later
 		 */
 		tryAgainLater: () => LocalizedString
-		/**
-		 * Verifying the emergency bundle
-		 */
-		verifying: () => LocalizedString
-		/**
-		 * Emergency bundle verified
-		 */
-		verified: () => LocalizedString
-		/**
-		 * Upload emergency bundle
-		 */
-		sourcesTitle: () => LocalizedString
-		/**
-		 * If you have saved the emergency bundle, upload it now to be able to exit onchain.
-		 */
-		sourcesBody: () => LocalizedString
-		/**
-		 * Need help?
-		 */
-		needHelp: () => LocalizedString
-		/**
-		 * {provider}
-		 */
-		fromCloud: (arg: { provider: string }) => LocalizedString
-		/**
-		 * Password manager
-		 */
-		fromPasswordManager: () => LocalizedString
-		/**
-		 * Upload bundle
-		 */
-		fromFile: () => LocalizedString
-		/**
-		 * No emergency bundle for this backup phrase in your cloud.
-		 */
-		notInCloud: () => LocalizedString
-		/**
-		 * Nothing on the clipboard to check.
-		 */
-		clipboardEmpty: () => LocalizedString
-		/**
-		 * That file could not be read.
-		 */
-		fileUnreadable: () => LocalizedString
-		/**
-		 * Could not fetch the emergency bundle.
-		 */
-		sourceFailed: () => LocalizedString
-		/**
-		 * Probably a wrong file
-		 */
-		rejectedTitle: () => LocalizedString
-		/**
-		 * Backup phrase does not match the emergency bundle. Are you sure, you have the correct one?
-		 */
-		rejectedWrongPhrase: () => LocalizedString
-		/**
-		 * That file is not an emergency bundle. Are you sure you picked the right one?
-		 */
-		rejectedNotABundle: () => LocalizedString
-		/**
-		 * Try again
-		 */
-		tryAgain: () => LocalizedString
-		/**
-		 * Restore other
-		 */
-		restoreOther: () => LocalizedString
-		/**
-		 * Your funds can be recovered
-		 */
-		summaryTitle: () => LocalizedString
-		/**
-		 * This bundle covers the balance below. Blink cannot perform the onchain exit for you yet - our support team will walk you through it with the recovery tooling.
-		 */
-		summaryBody: () => LocalizedString
-		/**
-		 * Covered balance
-		 */
-		summaryCovered: () => LocalizedString
-		/**
-		 * Outputs
-		 */
-		summaryOutputs: () => LocalizedString
-		/**
-		 * Bundle created
-		 */
-		summaryCreated: () => LocalizedString
-		/**
-		 * Contact support
-		 */
-		summarySupport: () => LocalizedString
-		/**
-		 * Save bundle as a file
-		 */
-		summaryExport: () => LocalizedString
-		/**
-		 * Close
-		 */
-		summaryDone: () => LocalizedString
 	}
 	BackupNudge: {
 		/**
@@ -28135,16 +27916,6 @@ export type TranslationFunctions = {
 		cta: () => LocalizedString
 	}
 	RecoveryBundleScreen: {
-		/**
-		 * How recovery works
-		 */
-		howItWorksTitle: () => LocalizedString
-		/**
-		 * If Spark becomes unavailable, this backup lets you move your bitcoin onchain yourself, without Blink. Your dollar balance can't be recovered this way.
-
-	Recovery can take up to about two weeks: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay with a separate onchain transaction. Small amounts will cost more in fees than they are worth.
-		 */
-		howItWorksBody: () => LocalizedString
 		/**
 		 * No recovery backup saved yet. Refresh first.
 		 */
