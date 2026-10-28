@@ -193,6 +193,7 @@ import {
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
 
 import { HomeGate } from "./home-gate"
+import { LAUNCH_ROUTE } from "./unlock-routes"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
@@ -417,7 +418,7 @@ export const RootStack = () => {
         headerShadowVisible: false,
         headerLeft: defaultHeaderBack,
       }}
-      initialRouteName="authenticationCheck"
+      initialRouteName={LAUNCH_ROUTE}
     >
       <RootNavigator.Screen
         name="getStarted"
