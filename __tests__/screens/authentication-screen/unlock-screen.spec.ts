@@ -9,11 +9,17 @@ import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { RouteProp } from "@react-navigation/native"
 
 const mockGoBack = jest.fn()
+const mockReset = jest.fn()
 const mockSetAppUnlocked = jest.fn()
 const mockListSelfCustodialAccounts = jest.fn()
+const mockReportError = jest.fn()
 
 /** One object across renders, as the real navigation prop is. */
-const mockNavigation = { goBack: mockGoBack }
+const mockNavigation = { goBack: mockGoBack, reset: mockReset }
+
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
 
 jest.mock("@react-navigation/native", () => {
   const { useEffect } = jest.requireActual("react")
@@ -212,19 +218,26 @@ describe("useUnlockScreen", () => {
       return (ids: ReadonlyArray<string>) => act(async () => settle(ids))
     }
 
-    it("lowers the lock at once but holds the landing", async () => {
+    /** A payment link parked behind the lock is released the moment the flag drops. Lowered
+     *  before the landing, the link would open its screen and the landing's reset would
+     *  then wipe it, with the link already spent. */
+    it("keeps the lock raised until the landing, and lowers it with the route", async () => {
       deviceHolds({})
       const settleRead = holdStoredWalletRead()
 
       const { navigateOnColdStart } = await completeColdStart()
 
-      expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
       expect(navigateOnColdStart).not.toHaveBeenCalled()
 
       await settleRead(["stored-wallet-id"])
 
+      expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
       expect(navigateOnColdStart).toHaveBeenCalledTimes(1)
       expect(navigateOnColdStart).toHaveBeenCalledWith("Primary")
+      expect(mockSetAppUnlocked.mock.invocationCallOrder[0]).toBeLessThan(
+        navigateOnColdStart.mock.invocationCallOrder[0],
+      )
     })
 
     it("does not route a screen that is gone by the time the read answers", async () => {
@@ -238,6 +251,8 @@ describe("useUnlockScreen", () => {
       await settleRead([])
 
       expect(navigateOnColdStart).not.toHaveBeenCalled()
+      /** Whatever replaced it owns the lock now. */
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     })
 
     it("opens the home screen when a session turned up while the read was out", async () => {
@@ -364,9 +379,9 @@ describe("useUnlockScreen", () => {
 
   /**
    * The read reports a failure rather than throwing one, so this cannot happen today. The
-   * one-way latch is what makes it worth guarding: by the time the read runs the lock is
-   * already lowered and the screen has spent its single way out, so anything that did throw
-   * would leave the user on the logo gate with no second attempt.
+   * one-way latch is what makes it worth guarding: by the time the read runs the screen has
+   * spent its single way out, so anything that did throw would leave the user on the logo
+   * gate with no second attempt.
    */
   describe("when the stored-wallet read throws", () => {
     it("still routes, landing where a launch with nothing to show has always gone", async () => {
@@ -377,6 +392,34 @@ describe("useUnlockScreen", () => {
 
       expect(navigateOnColdStart).toHaveBeenCalledTimes(1)
       expect(navigateOnColdStart).toHaveBeenCalledWith("getStarted")
+    })
+  })
+
+  describe("when the landing throws", () => {
+    /** The latch has already fired, so nothing else would move the user off the logo
+     *  gate: the failure is reported and the landing screen, which needs nothing from the
+     *  state that failed to route, is where the user goes. */
+    it("reports it and lands on the landing screen with the lock lowered", async () => {
+      deviceHolds({})
+      const routingFailure = new Error("navigator gone")
+      const navigateOnColdStart = jest.fn(() => {
+        throw routingFailure
+      })
+
+      const { result } = renderHook(() => useUnlockScreen({ isResume: false }))
+      await act(async () => {
+        result.current.completeUnlock(navigateOnColdStart)
+      })
+
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Unlock cold start routing",
+        routingFailure,
+      )
+      expect(mockSetAppUnlocked).toHaveBeenCalled()
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "getStarted" }],
+      })
     })
   })
 })

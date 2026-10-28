@@ -17,6 +17,7 @@ import {
   StoredWalletPresence,
 } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
+import { reportError } from "@app/utils/error-logging"
 
 type UseUnlockScreenParams = {
   isResume: boolean
@@ -92,35 +93,34 @@ export const useUnlockScreen = ({ isResume }: UseUnlockScreenParams) => {
     }, [isResume]),
   )
 
+  /** The flag comes down in the same tick as the route it opens, never ahead of it. A
+   *  payment link parked behind the lock is released the moment the flag drops, and a
+   *  route still to come would reset the screen that link just opened. */
   const completeUnlock = useCallback(
     (navigateOnColdStart: (route: ColdStartRoute) => void) => {
       if (hasLeftRef.current) return
       hasLeftRef.current = true
 
-      setAppUnlocked()
-
       if (isResume) {
+        setAppUnlocked()
         navigation.goBack()
         return
       }
 
       if (hasSessionOrChosenAccountRef.current) {
+        setAppUnlocked()
         navigateOnColdStart("Primary")
         return
       }
 
       /** Neither is there, which a logout leaves behind too, so what the device stores
-       *  decides. One read, which reports a failure rather than throwing one, so the
-       *  landing cannot be left waiting. A screen that went meanwhile is not routed, and
-       *  a session that turned up meanwhile is an account to show after all. */
+       *  decides. A screen that went meanwhile is not routed and does not lower the flag:
+       *  whatever replaced it owns the lock now. A session that turned up meanwhile is an
+       *  account to show after all. */
       readSessionlessColdStartRoute()
-        /** On the read, not on the chain: a fallback hung off the end would also swallow a
-         *  throw from the routing below and send an authed user to the landing screen. The
-         *  read reports a failure rather than throwing one, so this catches nothing today;
-         *  it is here because the one-way latch above has already fired, and anything that
-         *  did throw would leave the user on the logo gate with the lock lowered and no
-         *  second attempt. The landing screen is where a launch with nothing to show has
-         *  always gone. */
+        /** On the read: it reports a failure rather than throwing one, so this catches
+         *  nothing today, and if it ever does, the landing screen is where a launch with
+         *  nothing to show has always gone. */
         .catch((): ColdStartRoute => "getStarted")
         .then((sessionlessRoute) => {
           if (!isMounted()) return
@@ -128,7 +128,16 @@ export const useUnlockScreen = ({ isResume }: UseUnlockScreenParams) => {
           const coldStartRoute: ColdStartRoute = hasSessionOrChosenAccountRef.current
             ? "Primary"
             : sessionlessRoute
+          setAppUnlocked()
           navigateOnColdStart(coldStartRoute)
+        })
+        /** On the chain, for a route that throws: the latch above has already fired, so
+         *  nothing else would move the user off the logo gate. The landing screen is the
+         *  one place that needs nothing from the state that just failed to route. */
+        .catch((err: unknown) => {
+          reportError("Unlock cold start routing", err)
+          setAppUnlocked()
+          navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
         })
     },
     [isResume, navigation, setAppUnlocked, isMounted],
