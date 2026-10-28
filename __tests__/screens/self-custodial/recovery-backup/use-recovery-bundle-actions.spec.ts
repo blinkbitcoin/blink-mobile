@@ -21,6 +21,7 @@ const mockRefreshRecoveryBundle = jest.fn()
 const mockSyncExistingBundleToCloud = jest.fn()
 const mockIsCloudSyncAllowedFor = jest.fn()
 const mockMarkCloudSynced = jest.fn()
+const mockMarkExported = jest.fn()
 const mockWithCloudBundleLock = jest.fn()
 const mockReadRecoveryBundleSettings = jest.fn()
 const mockWriteRecoveryBundleSettings = jest.fn()
@@ -90,6 +91,7 @@ jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
   isCloudSyncAllowedFor: (...args: readonly unknown[]) =>
     mockIsCloudSyncAllowedFor(...args),
   markCloudSynced: (...args: readonly unknown[]) => mockMarkCloudSynced(...args),
+  markExported: (...args: readonly unknown[]) => mockMarkExported(...args),
   withCloudBundleLock: (...args: readonly unknown[]) => mockWithCloudBundleLock(...args),
 }))
 
@@ -194,7 +196,11 @@ const resetMocks = () => {
   mockGetMnemonicForAccount.mockResolvedValue("test mnemonic words")
   mockReadRecoveryBundleState.mockResolvedValue(savedState)
   mockLoadEncryptedBundleFile.mockResolvedValue("encrypted-payload")
-  mockDecryptBundleBackupPayload.mockResolvedValue({ schema: 1, leaves: [] })
+  mockDecryptBundleBackupPayload.mockResolvedValue({
+    schema: 1,
+    createdAt: savedState.bundleCreatedAt,
+    leaves: [],
+  })
   // The metadata network deliberately differs from the mocked active network
   // (regtest): the interactive-upload filename must be built from the saved
   // bundle's metadata, not from whatever network the app is currently on.
@@ -212,6 +218,7 @@ const resetMocks = () => {
   })
   mockWriteRecoveryBundleSettings.mockResolvedValue(undefined)
   mockMarkCloudSynced.mockResolvedValue(null)
+  mockMarkExported.mockResolvedValue(null)
   mockWithCloudBundleLock.mockImplementation(
     (_accountId: string, _network: string, operation: () => Promise<unknown>) =>
       operation(),
@@ -256,23 +263,6 @@ describe("useRecoveryBundleActions", () => {
         mockSparkNetwork.Regtest,
       )
       expect(result.current.bundleState).toEqual(savedState)
-    })
-
-    it("degrades to no bundle and keeps the loaded settings when a reload fails", async () => {
-      mockReadRecoveryBundleSettings.mockResolvedValue(otherSettings)
-      const { result } = renderHook(() => useRecoveryBundleActions())
-      await act(async () => {
-        await result.current.reloadState()
-      })
-      mockReadRecoveryBundleState.mockRejectedValue(new Error("unreadable"))
-
-      await act(async () => {
-        await result.current.reloadState()
-      })
-
-      expect(result.current.bundleState).toBeNull()
-      expect(result.current.settings).toEqual(otherSettings)
-      expect(mockRecordError).toHaveBeenCalled()
     })
   })
 
@@ -519,7 +509,10 @@ describe("useRecoveryBundleActions", () => {
     it("exposes the defaults before the first load: auto refresh on, cloud sync off", () => {
       const { result } = renderHook(() => useRecoveryBundleActions())
 
-      expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
+      expect(result.current.settings).toEqual({
+        autoRefresh: true,
+        cloudSync: false,
+      })
     })
 
     it("reloadState loads the stored settings alongside the bundle state", async () => {
@@ -534,7 +527,10 @@ describe("useRecoveryBundleActions", () => {
       })
 
       expect(mockReadRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID)
-      expect(result.current.settings).toEqual({ autoRefresh: false, cloudSync: true })
+      expect(result.current.settings).toEqual({
+        autoRefresh: false,
+        cloudSync: true,
+      })
     })
 
     it("handleSetAutoRefresh persists the flag for the account", async () => {
@@ -859,6 +855,469 @@ describe("useRecoveryBundleActions", () => {
   })
 })
 
+describe("useRecoveryBundleActions export record", () => {
+  beforeEach(resetMocks)
+
+  it("records the version the share sheet carried once it resolves", async () => {
+    const { result } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.handleShare()
+    })
+
+    expect(mockMarkExported).toHaveBeenCalledWith(
+      ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+      savedState.bundleCreatedAt,
+    )
+    expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
+  })
+
+  it("records the version a clipboard copy carried", async () => {
+    const { result } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.handleCopy()
+    })
+
+    expect(mockMarkExported).toHaveBeenCalledWith(
+      ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+      savedState.bundleCreatedAt,
+    )
+    expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
+  })
+
+  it("does not record an export the user cancelled", async () => {
+    // A dismissed share sheet is not a copy of anything; counting it would
+    // silence the "only on this phone" nudge on a lie.
+    mockShareOpen.mockRejectedValueOnce(new Error("User did not share"))
+    const { result } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.handleShare()
+    })
+
+    expect(mockMarkExported).not.toHaveBeenCalled()
+  })
+
+  it("shows the recorded export in the bundle state", async () => {
+    const exported = {
+      ...savedState,
+      exportedBundleCreatedAt: savedState.bundleCreatedAt,
+    }
+    mockMarkExported.mockResolvedValue(exported)
+    const { result } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+
+    await act(async () => {
+      await result.current.handleShare()
+    })
+
+    expect(result.current.bundleState).toEqual(exported)
+  })
+
+  it("keeps a switch changed while the share sheet was open", async () => {
+    const share = deferred<undefined>()
+    mockShareOpen.mockReturnValue(share.promise)
+    mockReadRecoveryBundleState.mockResolvedValue(null)
+    const { result } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    let sharing: Promise<boolean> = Promise.resolve(false)
+    await act(async () => {
+      sharing = result.current.handleShare()
+    })
+
+    await act(async () => {
+      await result.current.handleSetCloudSync(true)
+    })
+    await act(async () => {
+      share.resolve(undefined)
+      await sharing
+    })
+
+    expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledTimes(1)
+    expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_ID, {
+      autoRefresh: true,
+      cloudSync: true,
+    })
+    expect(result.current.settings.cloudSync).toBe(true)
+    expect(mockMarkExported).toHaveBeenCalled()
+  })
+})
+
+describe("useRecoveryBundleActions error handling", () => {
+  beforeEach(resetMocks)
+
+  describe("failure paths", () => {
+    it("reloadState degrades to no-bundle when storage throws", async () => {
+      // Leaving bundleState undefined would strand the screen on its spinner
+      // with no way back; "no bundle yet" still offers a refresh.
+      const err = new Error("disk gone")
+      mockReadRecoveryBundleState.mockRejectedValue(err)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      expect(result.current.bundleState).toBeNull()
+      expect(mockRecordError).toHaveBeenCalledWith(err)
+    })
+
+    it("degrades to no bundle and keeps the loaded settings when a reload fails", async () => {
+      mockReadRecoveryBundleSettings.mockResolvedValue(otherSettings)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
+      mockReadRecoveryBundleState.mockRejectedValue(new Error("unreadable"))
+
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      expect(result.current.bundleState).toBeNull()
+      expect(result.current.settings).toEqual(otherSettings)
+      expect(mockRecordError).toHaveBeenCalled()
+    })
+
+    it("reloadState wraps a non-Error rejection before recording it", async () => {
+      mockReadRecoveryBundleState.mockRejectedValue("disk gone")
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+      expect(mockRecordError.mock.calls[0][0].message).toBe("disk gone")
+    })
+
+    it("handleRefresh stops and reports when the seed is not in the keystore", async () => {
+      mockGetMnemonicForAccount.mockResolvedValue(null)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleRefresh()
+      })
+
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not refresh the recovery backup" }),
+      )
+      expect(result.current.refreshing).toBe(false)
+    })
+
+    it("export stops and reports when the seed is not in the keystore", async () => {
+      // The bundle is on disk but undecryptable without the seed.
+      mockGetMnemonicForAccount.mockResolvedValue(null)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleShare()
+      })
+
+      expect(mockDecryptBundleBackupPayload).not.toHaveBeenCalled()
+      expect(mockShareOpen).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not export the recovery backup" }),
+      )
+    })
+
+    it("handleShare reports a genuine share failure", async () => {
+      const err = new Error("share sheet exploded")
+      mockShareOpen.mockRejectedValue(err)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleShare()
+      })
+
+      expect(mockRecordError).toHaveBeenCalledWith(err)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not export the recovery backup" }),
+      )
+      expect(result.current.sharing).toBe(false)
+    })
+
+    it("handleCopy reports a decryption failure", async () => {
+      const err = new Error("bad key")
+      mockDecryptBundleBackupPayload.mockRejectedValue(err)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCopy()
+      })
+
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
+      expect(mockRecordError).toHaveBeenCalledWith(err)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not export the recovery backup" }),
+      )
+      expect(result.current.copying).toBe(false)
+    })
+
+    it("cloud upload reports when there is no bundle on disk", async () => {
+      mockLoadEncryptedBundleFile.mockResolvedValue(null)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockStartSession).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "No recovery backup saved yet" }),
+      )
+    })
+
+    it("cloud upload stops when the saved bundle has no readable metadata", async () => {
+      // Without metadata there is no filename, so an upload would overwrite
+      // an unrelated file or create an unfindable one.
+      mockParseBundleBackupMetadata.mockReturnValue(null)
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockStartSession).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not export the recovery backup" }),
+      )
+    })
+
+    it("cloud upload surfaces the provider's reason when sign-in fails", async () => {
+      mockStartSession.mockResolvedValue({ success: false, reason: "cancelled" })
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockUpload).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "cloud error: cancelled" }),
+      )
+    })
+
+    it("cloud upload surfaces the provider's reason when the upload fails", async () => {
+      mockUpload.mockResolvedValue({ success: false, reason: "quota" })
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      expect(mockMarkCloudSynced).not.toHaveBeenCalled()
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "cloud error: quota" }),
+      )
+      expect(result.current.uploading).toBe(false)
+    })
+  })
+
+  describe("guards", () => {
+    const withoutSelfCustodialAccount = () =>
+      mockUseAccountRegistry.mockReturnValue({ activeAccount: null })
+
+    it("does nothing without a self-custodial account", async () => {
+      // The screen is only reachable from a self-custodial account, but a
+      // mid-flight account switch must not export another account's bundle.
+      withoutSelfCustodialAccount()
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleRefresh()
+        await result.current.handleShare()
+        await result.current.handleCopy()
+        await result.current.handleCloudUpload()
+        await result.current.handleSetAutoRefresh(false)
+      })
+
+      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
+      expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
+      expect(mockShareOpen).not.toHaveBeenCalled()
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
+      expect(mockIsCloudSyncAllowedFor).not.toHaveBeenCalled()
+      expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
+    })
+
+    it("ignores a second export while one is already running", async () => {
+      // Both export paths decrypt the same bundle; overlapping them would
+      // leave the spinner state inconsistent with what actually ran.
+      let releaseShare: () => void = () => {}
+      mockShareOpen.mockImplementation(
+        () =>
+          new Promise<void>((resolve) => {
+            releaseShare = resolve
+          }),
+      )
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let firstShare: Promise<boolean> = Promise.resolve(false)
+      await act(async () => {
+        firstShare = result.current.handleShare()
+      })
+      expect(result.current.sharing).toBe(true)
+
+      await act(async () => {
+        await result.current.handleCopy()
+      })
+      expect(mockCopyToClipboard).not.toHaveBeenCalled()
+      expect(result.current.copying).toBe(false)
+
+      await act(async () => {
+        releaseShare()
+        await firstShare
+      })
+      expect(mockShareOpen).toHaveBeenCalledTimes(1)
+    })
+
+    it("ignores a second refresh while one is already running", async () => {
+      let releaseRefresh: (value: unknown) => void = () => {}
+      mockRefreshRecoveryBundle.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            releaseRefresh = resolve
+          }),
+      )
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let first: Promise<void> = Promise.resolve()
+      await act(async () => {
+        first = result.current.handleRefresh()
+      })
+      expect(result.current.refreshing).toBe(true)
+
+      await act(async () => {
+        await result.current.handleRefresh()
+      })
+
+      await act(async () => {
+        releaseRefresh({ success: true, state: savedState })
+        await first
+      })
+      expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(1)
+    })
+
+    it("ignores a second cloud upload while one is already running", async () => {
+      let releaseSync: (value: unknown) => void = () => {}
+      mockSyncExistingBundleToCloud.mockImplementation(
+        () =>
+          new Promise((resolve) => {
+            releaseSync = resolve
+          }),
+      )
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      let first: Promise<void> = Promise.resolve()
+      await act(async () => {
+        first = result.current.handleCloudUpload()
+      })
+      expect(result.current.uploading).toBe(true)
+
+      await act(async () => {
+        await result.current.handleCloudUpload()
+      })
+
+      await act(async () => {
+        releaseSync(true)
+        await first
+      })
+      expect(mockSyncExistingBundleToCloud).toHaveBeenCalledTimes(1)
+    })
+
+    it("wraps a non-Error failure before recording it", async () => {
+      mockShareOpen.mockRejectedValue("not an error object")
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleShare()
+      })
+
+      expect(mockRecordError).toHaveBeenCalledWith(expect.any(Error))
+      expect(mockRecordError.mock.calls[0][0].message).toBe("not an error object")
+    })
+  })
+
+  describe("when the settings write fails", () => {
+    beforeEach(() => {
+      mockWriteRecoveryBundleSettings.mockRejectedValue(new Error("disk full"))
+    })
+
+    it("still counts the share as done for the user", async () => {
+      // The file left the device whether or not we managed to note it down;
+      // failing the export here would tell the user the opposite.
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleShare()
+      })
+
+      expect(mockShareOpen).toHaveBeenCalled()
+      expect(result.current.sharing).toBe(false)
+    })
+
+    it("still leaves the bundle on the clipboard", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+
+      await act(async () => {
+        await result.current.handleCopy()
+      })
+
+      expect(mockCopyToClipboard).toHaveBeenCalled()
+      expect(result.current.copying).toBe(false)
+    })
+
+    it("puts the auto-refresh toggle back where it was", async () => {
+      const { result } = renderHook(() => useRecoveryBundleActions())
+      await act(async () => {
+        await result.current.reloadState()
+      })
+
+      await act(async () => {
+        await result.current.handleSetAutoRefresh(false)
+      })
+
+      // A switch left in a position that was never saved is a lie about the
+      // state of the app.
+      expect(result.current.settings.autoRefresh).toBe(true)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "Could not save the setting" }),
+      )
+    })
+  })
+
+  it("ignores a second share while one is already running", async () => {
+    let releaseShare: () => void = () => {}
+    mockShareOpen.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseShare = resolve
+        }),
+    )
+    const { result } = renderHook(() => useRecoveryBundleActions())
+
+    let first: Promise<boolean> = Promise.resolve(false)
+    await act(async () => {
+      first = result.current.handleShare()
+    })
+
+    await act(async () => {
+      await result.current.handleShare()
+    })
+
+    await act(async () => {
+      releaseShare()
+      await first
+    })
+    expect(mockShareOpen).toHaveBeenCalledTimes(1)
+  })
+})
+
 describe("useRecoveryBundleActions account switch", () => {
   beforeEach(resetMocks)
 
@@ -901,7 +1360,10 @@ describe("useRecoveryBundleActions account switch", () => {
     rerender({})
 
     expect(result.current.bundleState).toBeUndefined()
-    expect(result.current.settings).toEqual({ autoRefresh: true, cloudSync: false })
+    expect(result.current.settings).toEqual({
+      autoRefresh: true,
+      cloudSync: false,
+    })
   })
 
   it("binds the read to the network too: a network switch reads as loading until it reloads", async () => {
@@ -1035,6 +1497,43 @@ describe("useRecoveryBundleActions account switch", () => {
       await reading
     })
     expect(result.current.settings).toEqual(otherSettings)
+  })
+
+  it("records an export that finishes after the switch against its own account only", async () => {
+    const share = deferred<undefined>()
+    mockShareOpen.mockReturnValue(share.promise)
+    mockMarkExported.mockResolvedValue({
+      ...savedState,
+      exportedBundleCreatedAt: savedState.bundleCreatedAt,
+    })
+    mockReadRecoveryBundleState
+      .mockResolvedValueOnce(savedState)
+      .mockResolvedValueOnce(otherState)
+    const { result, rerender } = renderHook(() => useRecoveryBundleActions())
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    let sharing: Promise<boolean> = Promise.resolve(false)
+    await act(async () => {
+      sharing = result.current.handleShare()
+    })
+
+    mockUseAccountRegistry.mockReturnValue({ activeAccount: otherAccount })
+    rerender({})
+    await act(async () => {
+      await result.current.reloadState()
+    })
+    await act(async () => {
+      share.resolve(undefined)
+      await sharing
+    })
+
+    expect(mockMarkExported).toHaveBeenCalledWith(
+      ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+      savedState.bundleCreatedAt,
+    )
+    expect(result.current.bundleState).toEqual(otherState)
   })
 
   it("keeps the new account's settings when the previous account's write fails after the switch", async () => {

@@ -90,6 +90,7 @@ import {
   isBundleFresh,
   markAccountDeletedForRefresh,
   markCloudSynced,
+  markExported,
   markRecoveryBundleStale,
   refreshRecoveryBundle,
   revokeCloudRecoveryBundle,
@@ -125,7 +126,10 @@ const deferred = <T>() => {
 const stateKeyFor = (accountId: string, network: Network): string =>
   `${accountId}:${network}`
 let storedStates = new Map<string, RecoveryBundleState>()
-let storedSettings: RecoveryBundleSettings = { autoRefresh: true, cloudSync: true }
+let storedSettings: RecoveryBundleSettings = {
+  autoRefresh: true,
+  cloudSync: true,
+}
 
 const testBundle = {
   createdAt: "2026-07-12T00:00:00.000Z",
@@ -455,7 +459,7 @@ describe("refreshRecoveryBundle cloud gating", () => {
     )
   })
 
-  it("carries the previous cloud record into the saved state and returns the post-sync re-read", async () => {
+  it("carries the previous cloud and export records into the saved state and returns the post-sync re-read", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
     const priorCloudSyncedAt = 1_752_000_000_000
@@ -465,6 +469,7 @@ describe("refreshRecoveryBundle cloud gating", () => {
       bundleCreatedAt: priorBundleCreatedAt,
       cloudSyncedAt: priorCloudSyncedAt,
       cloudSyncedBundleCreatedAt: priorBundleCreatedAt,
+      exportedBundleCreatedAt: priorBundleCreatedAt,
     })
 
     const result = await refreshRecoveryBundle(refreshParams)
@@ -482,6 +487,7 @@ describe("refreshRecoveryBundle cloud gating", () => {
         totalSats: "32768",
         cloudSyncedAt: priorCloudSyncedAt,
         cloudSyncedBundleCreatedAt: priorBundleCreatedAt,
+        exportedBundleCreatedAt: priorBundleCreatedAt,
         uncoveredChangeAt: null,
       },
     )
@@ -781,6 +787,53 @@ describe("markCloudSynced", () => {
       await markCloudSynced(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt),
     ).toBeNull()
     expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
+  })
+})
+
+describe("markExported", () => {
+  it("records the bundle an export carried on the existing state", async () => {
+    mockReadRecoveryBundleState.mockResolvedValue(testState)
+
+    const next = await markExported(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt)
+
+    expect(mockReadRecoveryBundleState).toHaveBeenCalledWith(ACCOUNT_ID, Network.Mainnet)
+    expect(next).toEqual({ ...testState, exportedBundleCreatedAt: testBundle.createdAt })
+    expect(mockWriteRecoveryBundleState).toHaveBeenCalledWith(
+      ACCOUNT_ID,
+      Network.Mainnet,
+      next,
+    )
+  })
+
+  it("returns null and writes nothing when no state exists", async () => {
+    mockReadRecoveryBundleState.mockResolvedValue(null)
+
+    expect(
+      await markExported(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt),
+    ).toBeNull()
+    expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
+  })
+
+  it("queues behind a refresh's save so neither reverts the other", async () => {
+    const accountId = "acct-order-export"
+    const key = stateKeyFor(accountId, Network.Mainnet)
+    mockReadBackupStateFor.mockResolvedValue(manualBackupState)
+    const priorBundleCreatedAt = "2026-07-11T00:00:00.000Z"
+    storedStates.set(key, { ...testState, bundleCreatedAt: priorBundleCreatedAt })
+    const exportRead = deferred<RecoveryBundleState | null>()
+    mockReadRecoveryBundleState.mockReturnValueOnce(exportRead.promise)
+
+    const record = markExported(accountId, Network.Mainnet, priorBundleCreatedAt)
+    const refresh = refreshRecoveryBundle({ ...refreshParams, accountId })
+    await flushMicrotasks()
+    exportRead.resolve(storedStates.get(key) ?? null)
+    await record
+
+    expect((await refresh).success).toBe(true)
+    expect(storedStates.get(key)).toMatchObject({
+      bundleCreatedAt: testBundle.createdAt,
+      exportedBundleCreatedAt: priorBundleCreatedAt,
+    })
   })
 })
 

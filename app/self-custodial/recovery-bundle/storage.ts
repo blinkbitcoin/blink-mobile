@@ -105,6 +105,12 @@ export type RecoveryBundleState = {
    */
   cloudSyncedBundleCreatedAt?: string | null
   /**
+   * The bundleCreatedAt of the last bundle the user exported by hand (share
+   * sheet or clipboard), so an export is known to cover the saved bundle only
+   * when the two match. Absent in states saved before it was recorded.
+   */
+  exportedBundleCreatedAt?: string | null
+  /**
    * Unix ms of the latest wallet change this bundle may not cover, set before a
    * refresh is attempted and cleared by a save whose fetch began after it. A
    * refresh that fails leaves it set, so the bundle does not read as fresh.
