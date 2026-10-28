@@ -23,14 +23,14 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
     switch (true) {
       case pressed && outline:
         dynamicStyle = {
-          borderColor: colors.primary,
-          backgroundColor: colors.primary,
+          borderColor: colors.accent,
+          backgroundColor: colors.accent,
           borderWidth: 1.5,
         }
         break
       case pressed && !outline && !clear:
         dynamicStyle = {
-          backgroundColor: colors.primary,
+          backgroundColor: colors.accent,
         }
         break
       case pressed && clear:
@@ -42,7 +42,7 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
         dynamicStyle = {
           opacity: disabled ? 0.7 : 1,
           backgroundColor: colors.transparent,
-          borderColor: colors.primary,
+          borderColor: colors.accent,
           borderWidth: 1.5,
         }
         break
@@ -53,16 +53,16 @@ export const GaloyTertiaryButton = (props: GaloyTertiaryButtonProps) => {
         break
       default:
         dynamicStyle = {
-          backgroundColor: colors.primary,
+          backgroundColor: colors.accent,
         }
     }
 
     return [dynamicStyle, containerStyle, styles.pressableStyle]
   }
 
-  let textColor = colors.white
-  if (outline) textColor = colors.black
-  if (clear) textColor = colors.primary
+  let textColor = colors.backgroundDefault
+  if (outline) textColor = colors.textOnBackground
+  if (clear) textColor = colors.accent
 
   return (
     <Pressable {...remainingProps} style={pressableStyle} disabled={disabled}>

@@ -30,7 +30,7 @@ export const GaloySecondaryButton: FunctionComponent<GaloySecondaryButtonProps> 
     <GaloyIcon
       name={iconName}
       size={18}
-      color={grey ? colors.grey3 : colors.primary}
+      color={grey ? colors.textDisabled : colors.accent}
       style={styles.iconStyle}
     />
   ) : null
@@ -48,7 +48,7 @@ export const GaloySecondaryButton: FunctionComponent<GaloySecondaryButtonProps> 
       titleStyle={[styles.buttonTitleStyle, props.titleStyle]}
       disabledTitleStyle={styles.disabledTitleStyle}
       loadingProps={{
-        color: colors.primary,
+        color: colors.accent,
       }}
     />
   )
@@ -63,13 +63,13 @@ const useStyles = makeStyles(({ colors }, props: GaloySecondaryButtonProps) => (
     backgroundColor: colors.transparent,
   },
   buttonTitleStyle: {
-    color: props.grey ? colors.grey3 : colors.primary,
+    color: props.grey ? colors.textDisabled : colors.accent,
     fontSize: 20,
     lineHeight: 24,
     fontWeight: "600",
   },
   disabledTitleStyle: {
-    color: props.grey ? colors.grey3 : colors.primary,
+    color: props.grey ? colors.textDisabled : colors.accent,
   },
   iconStyle: {
     marginRight: props.iconPosition === "right" ? 0 : 10,

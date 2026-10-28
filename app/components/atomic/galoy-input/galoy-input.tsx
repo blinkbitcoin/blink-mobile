@@ -5,7 +5,7 @@ import { Input, InputProps, makeStyles } from "@rn-vui/themed"
 
 const useStyles = makeStyles(({ colors }) => ({
   inputContainerFocused: {
-    borderBottomColor: colors.grey3,
+    borderBottomColor: colors.textDisabled,
   },
 }))
 
