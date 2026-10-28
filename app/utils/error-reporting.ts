@@ -6,7 +6,8 @@ import crashlytics from "@react-native-firebase/crashlytics"
  * Every non-fatal in the app must flow through `recordAppError` (directly or via
  * `reportError` / `logError` / `recordErrorOnce`) so expected device/user states and
  * connectivity blips become breadcrumbs instead of non-fatal noise. This module must
- * stay the only caller of `crashlytics().recordError`.
+ * stay the only importer of Crashlytics (lint enforces it), so every write passes the
+ * closed-domain gate below.
  *
  * Dedup keys follow the `<area>-<what>` convention (e.g. `spark-token-decimals-missing`).
  */
@@ -37,6 +38,18 @@ export const CONNECTIVITY_PATTERNS: readonly RegExp[] = [
 export const isConnectivityError = (err: unknown): boolean => {
   const text = err instanceof Error ? `${err.name}: ${err.message}` : String(err)
   return CONNECTIVITY_PATTERNS.some((pattern) => pattern.test(text))
+}
+
+/**
+ * What kind of failure, without its text: a breadcrumb that interpolates an error carries
+ * whatever the error echoed back, such as the lightning address a contact call was given
+ * or a storage path naming the account. Only the class name (when it is a plain
+ * identifier) and whether it was connectivity survive.
+ */
+export const errorKind = (err: unknown): string => {
+  if (isConnectivityError(err)) return "connectivity"
+  if (err instanceof Error && /^[A-Za-z_]\w{0,39}$/.test(err.name)) return err.name
+  return typeof err
 }
 
 export const toError = (err: unknown): Error => {
@@ -86,8 +99,42 @@ export const setCrashReportingOpen = (open: boolean): void => {
   crashReportingOpen = open
 }
 
+/**
+ * Shuts the gate at once, then turns collection off. RNFB's switch reaches the native SDK
+ * in this process (patches/@react-native-firebase+crashlytics), so a fatal from here on is
+ * held on the device rather than sent. A throw comes back as a rejection, so a shutdown
+ * can never throw out of its caller.
+ */
+export const closeCrashReporting = (): Promise<unknown> => {
+  setCrashReportingOpen(false)
+  return new Promise((resolve) => {
+    resolve(crashlytics().setCrashlyticsCollectionEnabled(false))
+  })
+}
+
+/**
+ * Reports held while collection was off were made under a closed domain, and turning
+ * collection on would send them under the account that opened it. Crashlytics deletes
+ * only while collection is off, which is exactly when there can be any.
+ */
+export const deleteHeldCrashReports = async (): Promise<void> => {
+  const reporter = crashlytics()
+  if (!reporter.isCrashlyticsCollectionEnabled) await reporter.deleteUnsentReports()
+}
+
+/** Collection on; the gate stays shut until the caller, still current, reopens it. */
+export const enableCrashCollection = (): Promise<unknown> =>
+  crashlytics().setCrashlyticsCollectionEnabled(true)
+
 const isCrashReportingOpen = (): boolean =>
   crashReportingOpen ?? crashlytics().isCrashlyticsCollectionEnabled !== false
+
+/** The developer screen's crash test. Crashlytics itself drops it while collection is
+ *  off, so it never crashes an Incognito session. */
+export const crashForTesting = (): void => {
+  logBreadcrumb("Testing crash")
+  crashlytics().crash()
+}
 
 /** A Crashlytics breadcrumb, dropped while crash reporting is closed. */
 export const logBreadcrumb = (message: string): void => {

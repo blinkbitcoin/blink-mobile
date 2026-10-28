@@ -7,7 +7,7 @@ import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
-import { logBreadcrumb } from "@app/utils/error-reporting"
+import { errorKind, logBreadcrumb } from "@app/utils/error-reporting"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
@@ -76,13 +76,15 @@ export const useDeleteAccount = (): DeleteAccountResult => {
 
         if (isActive && sdk) {
           await disconnectSdk(sdk).catch((err) => {
-            logBreadcrumb(`[self-custodial delete] disconnect failed: ${err}`)
+            logBreadcrumb(`[self-custodial delete] disconnect failed (${errorKind(err)})`)
           })
         }
 
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
-          logBreadcrumb(`[self-custodial delete] storage dir unlink failed: ${err}`)
+          logBreadcrumb(
+            `[self-custodial delete] storage dir unlink failed (${errorKind(err)})`,
+          )
         })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)

@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
@@ -237,6 +238,40 @@ describe("useDeleteAccount", () => {
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")
+  })
+
+  /** iOS puts the path in an unlink error, and the path names the account. */
+  it.each([
+    [
+      "disconnect",
+      () =>
+        mockDisconnectSdk.mockRejectedValue(
+          new Error(`disconnect failed for ${TEST_SC_ACCOUNT_ID}`),
+        ),
+    ],
+    [
+      "storage cleanup",
+      () =>
+        mockUnlink.mockRejectedValue(
+          new Error(
+            `ENOENT: no such file or directory, unlink '/tmp/${TEST_SC_ACCOUNT_ID}'`,
+          ),
+        ),
+    ],
+  ])("leaves the account out of the breadcrumb when %s fails", async (_label, fail) => {
+    fail()
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+      expect.stringContaining("[self-custodial delete]"),
+    )
+    expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
+      expect.stringContaining(TEST_SC_ACCOUNT_ID),
+    )
   })
 
   it("captures the error and returns undefined when deleteMnemonicForAccount fails", async () => {

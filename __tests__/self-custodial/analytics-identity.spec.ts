@@ -14,10 +14,12 @@ const mockResetAnalyticsData = jest.fn(resolved)
 const mockRecordError = jest.fn()
 const mockCrashLog = jest.fn()
 let mockCrashCollectionEnabled = true
-const mockSetCrashlyticsCollectionEnabled = jest.fn((enabled: boolean) => {
+/** With the RNFB patch the switch reaches the native SDK at once, as this models. */
+const switchCrashCollection = (enabled: boolean): Promise<null> => {
   mockCrashCollectionEnabled = enabled
   return Promise.resolve(null)
-})
+}
+const mockSetCrashlyticsCollectionEnabled = jest.fn(switchCrashCollection)
 const mockDeleteUnsentReports = jest.fn(resolved)
 
 jest.mock("@react-native-firebase/analytics", () => () => ({
@@ -118,6 +120,11 @@ describe("analytics identity", () => {
     mockStore.clear()
     mockInstanceId = () => Promise.resolve("install-uuid")
     mockCrashCollectionEnabled = true
+    /** mockReset also drops a once-implementation a test left unused. */
+    mockSetCrashlyticsCollectionEnabled.mockReset()
+    mockSetCrashlyticsCollectionEnabled.mockImplementation(switchCrashCollection)
+    mockDeleteUnsentReports.mockReset()
+    mockDeleteUnsentReports.mockImplementation(resolved)
     ;[
       mockSetUserId,
       mockSetUserProperty,
@@ -329,7 +336,23 @@ describe("analytics identity", () => {
 
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
       expect(mockSetAnalyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
-      expect(mockRecordError).toHaveBeenCalled()
+      /** Failed into a closed domain, so the failure stays on the device too. */
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("reports a failed transition while crash reporting is open", async () => {
+      const id = freshModule()
+      id.setCustodialIdentity(CUSTODIAL)
+      mockSetUserProperty.mockImplementation(() =>
+        Promise.reject(new Error("native property failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "native property failed" }),
+      )
     })
   })
 
@@ -413,6 +436,130 @@ describe("analytics identity", () => {
 
       expect(() => id.setAnalyticsDomain(id.AnalyticsDomain.Anon)).not.toThrow()
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenCalledWith(false)
+    })
+
+    it("shuts breadcrumbs before the switch has taken effect", async () => {
+      const { id, reporting } = freshModules()
+      id.setCustodialIdentity(CUSTODIAL)
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+      /** The switch never lands, so only the gate itself can keep this out. */
+      mockSetCrashlyticsCollectionEnabled.mockImplementation(() => new Promise(() => {}))
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      reporting.logBreadcrumb("incognito")
+      reporting.recordAppError(new Error("an incognito defect"))
+
+      expect(mockCrashLog).not.toHaveBeenCalledWith("incognito")
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    /** Reopening is three steps (delete, enable, reopen the gate), each behind a check that
+     *  the request is still the latest. */
+    describe("a switch back to Incognito while reopening", () => {
+      const reopeningFromIncognito = async () => {
+        const modules = freshModules()
+        modules.id.setAnalyticsDomain(modules.id.AnalyticsDomain.Anon)
+        await settle()
+        jest.clearAllMocks()
+        return modules
+      }
+
+      it("stops at the delete, before collection is enabled", async () => {
+        const { id, reporting } = await reopeningFromIncognito()
+        const deleting = deferred()
+        mockDeleteUnsentReports.mockImplementationOnce(() => deleting.promise)
+
+        id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+        await settle()
+        expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+        id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+        deleting.release()
+        await settle()
+        reporting.logBreadcrumb("incognito again")
+
+        expect(mockSetCrashlyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+        expect(mockCrashCollectionEnabled).toBe(false)
+        expect(mockCrashLog).not.toHaveBeenCalledWith("incognito again")
+      })
+
+      it("never reopens the gate for an enable that finishes after it", async () => {
+        const { id, reporting } = await reopeningFromIncognito()
+        const enabling = deferred()
+        mockSetCrashlyticsCollectionEnabled.mockImplementationOnce((enabled: boolean) =>
+          enabling.promise.then(() => {
+            mockCrashCollectionEnabled = enabled
+            return null
+          }),
+        )
+        id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+        await settle()
+        expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenLastCalledWith(true)
+
+        id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+        /** Hold the Incognito run's first step, so what is seen next is the stale run's
+         *  doing alone. */
+        const closedRun = deferred()
+        mockSetUserId.mockImplementationOnce(() => closedRun.promise)
+        enabling.release()
+        await settle()
+        reporting.logBreadcrumb("after the stale enable")
+        closedRun.release()
+        await settle()
+
+        expect(mockCrashLog).not.toHaveBeenCalledWith("after the stale enable")
+        /** The enable landed after the shutdown's off; the Incognito run switches it back. */
+        expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+        expect(mockCrashCollectionEnabled).toBe(false)
+      })
+    })
+
+    it("closes collection again when the shutdown's own switch was rejected", async () => {
+      const { id } = freshModules()
+      mockSetCrashlyticsCollectionEnabled.mockImplementationOnce(() =>
+        Promise.reject(new Error("native switch failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+
+      expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenCalledTimes(2)
+      expect(mockCrashCollectionEnabled).toBe(false)
+    })
+
+    it("keeps crash reporting shut when the held reports cannot be deleted", async () => {
+      const { id, reporting } = freshModules()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+      mockDeleteUnsentReports.mockImplementationOnce(() =>
+        Promise.reject(new Error("delete failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      reporting.logBreadcrumb("after a failed delete")
+
+      /** Turning collection on would send the reports it could not delete. */
+      expect(mockSetCrashlyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+      expect(mockCrashLog).not.toHaveBeenCalledWith("after a failed delete")
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("keeps crash reporting shut when collection cannot be turned on", async () => {
+      const { id, reporting } = freshModules()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+      mockSetCrashlyticsCollectionEnabled.mockImplementationOnce(() =>
+        Promise.reject(new Error("enable failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      reporting.logBreadcrumb("after a failed enable")
+
+      expect(mockCrashLog).not.toHaveBeenCalledWith("after a failed enable")
+      expect(id.isEnhancedIdentityApplied()).toBe(false)
+      expect(mockCrashCollectionEnabled).toBe(false)
     })
 
     it("starts closed when the last run ended with collection off", async () => {
@@ -508,7 +655,7 @@ describe("analytics identity", () => {
       expect(id.isEnhancedIdentityApplied()).toBe(false)
       expect(mockSetUserId).not.toHaveBeenCalledWith("install-uuid")
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
-      expect(mockRecordError).toHaveBeenCalled()
+      expect(mockRecordError).not.toHaveBeenCalled()
     })
 
     it("is not given for a superseded transition, only for the one that replaced it", async () => {

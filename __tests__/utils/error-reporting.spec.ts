@@ -2,16 +2,29 @@ import {
   ErrorReportClass,
   classifyError,
   isConnectivityError,
+  errorKind,
   recordAppError,
   toError,
 } from "@app/utils/error-reporting"
 
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
+const mockCrash = jest.fn()
+const mockSetCollection = jest.fn(
+  (_enabled: boolean): Promise<unknown> => Promise.resolve(null),
+)
+const mockDeleteUnsentReports = jest.fn(() => Promise.resolve())
+let mockCollectionEnabled = true
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: (...args: string[]) => mockLog(...args),
   recordError: (...args: Error[]) => mockRecordError(...args),
+  crash: () => mockCrash(),
+  get isCrashlyticsCollectionEnabled() {
+    return mockCollectionEnabled
+  },
+  setCrashlyticsCollectionEnabled: (enabled: boolean) => mockSetCollection(enabled),
+  deleteUnsentReports: () => mockDeleteUnsentReports(),
 }))
 
 const loadFreshErrorReportingModule = () => {
@@ -209,5 +222,98 @@ describe("recordAppError", () => {
 
     expect(mockRecordError).toHaveBeenCalledTimes(1)
     expect(mockRecordError.mock.calls[0][0].message).toBe("real defect")
+  })
+})
+
+describe("collection control", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockCollectionEnabled = true
+    mockSetCollection.mockImplementation(() => Promise.resolve(null))
+  })
+
+  it("shuts the gate before the switch is even asked", () => {
+    const fresh = loadFreshErrorReportingModule()
+    mockSetCollection.mockImplementation(() => new Promise(() => {}))
+
+    fresh.closeCrashReporting()
+    fresh.logBreadcrumb("after close")
+
+    expect(mockSetCollection).toHaveBeenCalledWith(false)
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+
+  it("turns a throwing switch into a rejection, gate still shut", async () => {
+    const fresh = loadFreshErrorReportingModule()
+    mockSetCollection.mockImplementation(() => {
+      throw new Error("native module missing")
+    })
+
+    const closing = fresh.closeCrashReporting()
+    fresh.logBreadcrumb("after close")
+
+    await expect(closing).rejects.toThrow("native module missing")
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+
+  it("deletes held reports only while collection is off", async () => {
+    const fresh = loadFreshErrorReportingModule()
+
+    await fresh.deleteHeldCrashReports()
+    expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
+
+    mockCollectionEnabled = false
+    await fresh.deleteHeldCrashReports()
+    expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+  })
+
+  it("turns collection on without reopening the gate", async () => {
+    const fresh = loadFreshErrorReportingModule()
+    fresh.setCrashReportingOpen(false)
+
+    await fresh.enableCrashCollection()
+    fresh.logBreadcrumb("still closed")
+
+    expect(mockSetCollection).toHaveBeenCalledWith(true)
+    expect(mockLog).not.toHaveBeenCalled()
+  })
+
+  it("leaves the crash test's breadcrumb only while open", () => {
+    const fresh = loadFreshErrorReportingModule()
+
+    fresh.setCrashReportingOpen(false)
+    fresh.crashForTesting()
+    fresh.setCrashReportingOpen(true)
+    fresh.crashForTesting()
+
+    expect(mockLog.mock.calls).toEqual([["Testing crash"]])
+    expect(mockCrash).toHaveBeenCalledTimes(2)
+  })
+})
+
+describe("errorKind", () => {
+  it("keeps an error's class name and drops its text", () => {
+    class ContactError extends Error {
+      name = "ContactError"
+    }
+
+    expect(errorKind(new ContactError("failed to add alice@example.com"))).toBe(
+      "ContactError",
+    )
+  })
+
+  it("names connectivity failures as such", () => {
+    expect(errorKind(new Error("transport error: dns error"))).toBe("connectivity")
+  })
+
+  it("never passes on a class name that could carry data", () => {
+    const err = new Error("boom")
+    err.name = "alice@example.com"
+
+    expect(errorKind(err)).toBe("object")
+  })
+
+  it("names a thrown non-error by its type alone", () => {
+    expect(errorKind("/data/user/0/app/files/spark/account-123")).toBe("string")
   })
 })
