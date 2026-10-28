@@ -4923,11 +4923,6 @@
   resolved "https://registry.yarnpkg.com/@react-native-community/slider/-/slider-5.2.0.tgz#c154ac4ec10537160462d7a9f3e2e43098257302"
   integrity sha512-484sH8aWEaSjxaZ7HT3YZ8CKDcNes2synko1vdEz5DFEdvKAduxKJTj22L/qBMD7rtIkfbX69DMzWDAGbOAV6w==
 
-"@react-native-documents/picker@12.0.2":
-  version "12.0.2"
-  resolved "https://registry.yarnpkg.com/@react-native-documents/picker/-/picker-12.0.2.tgz#b0f7f615a27d7a7f2ba52c4e8b04a4eb7ab4a4b0"
-  integrity sha512-tiaPQjSdsaCkKw/N8XB+DXfhOJ+KJ1OYDliBGoBHEqLI7AhUsSPhn8fRI/gHs7hpYzqOBKf+em9MUrPIA9mlWA==
-
 "@react-native-firebase/analytics@^23.3.1":
   version "23.3.1"
   resolved "https://registry.yarnpkg.com/@react-native-firebase/analytics/-/analytics-23.3.1.tgz#e062db7a1554e5ed456cb361eda209822a793740"
