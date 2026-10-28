@@ -3864,7 +3864,6 @@
             "passwordTooShort": "Mindestens 12 Zeichen",
             "passwordMismatch": "Passwörter stimmen nicht überein",
             "uploadSuccess": "Sicherung in {provider} gespeichert",
-            "autoBundleSyncNotSaved": "Sicherung in {provider} gespeichert, aber deine Auswahl für automatische Backups konnte nicht gespeichert werden. Du kannst sie in den Einstellungen ändern.",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
             "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
             "storageAccessRequired": "Erlaube {provider: string} den Zugriff auf deine Wallet-Sicherung und versuche es erneut.",

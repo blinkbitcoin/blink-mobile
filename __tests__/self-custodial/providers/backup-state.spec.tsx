@@ -8,7 +8,6 @@ import {
   BackupStatus,
   completedMethodsOf,
   isCloudSeedBackupCompleted,
-  isPasswordProtectedCloudSeedBackup,
   markBackupCompletedFor,
   readBackupStateFor,
   removeBackupStateFor,
@@ -568,46 +567,11 @@ describe("BackupStateProvider", () => {
     })
   })
 
-  describe("cloudPasswordProtected persistence (D9 gate)", () => {
-    it("persists the flag when setBackupCompleted records a password-protected cloud backup", async () => {
-      const { result } = renderHook(() => useBackupState(), { wrapper })
-
-      await act(async () => {})
-
-      await act(async () => {
-        result.current.setBackupCompleted("cloud", { cloudPasswordProtected: true })
-      })
-
-      // Exact JSON: dropping the flag on write would silently close the D9
-      // gate for every future bundle cloud sync, and nothing else covers it.
-      expect(mockSetItem).toHaveBeenCalledWith(
-        BACKUP_KEY,
-        JSON.stringify({
-          status: "completed",
-          method: "cloud",
-          completedMethods: ["cloud"],
-          cloudPasswordProtected: true,
-        }),
-      )
-    })
-
-    it("round-trips the flag through markBackupCompletedFor into the D9 gate", async () => {
-      let persisted: string | null = null
-      mockSetItem.mockImplementation(async (_key: string, value: string) => {
-        persisted = value
-      })
-      mockGetItem.mockImplementation(async () => persisted)
-
-      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud, {
-        cloudPasswordProtected: true,
-      })
-
-      const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
-      expect(isCloudSeedBackupCompleted(state)).toBe(true)
-      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(true)
-    })
-
-    it("defaults closed: a cloud backup completed without the flag never opens the gate", async () => {
+  describe("cloud backup persistence", () => {
+    /** The bundle sync gate reads the persisted state outside the provider, so
+     *  a cloud completion has to survive the write and the read back. It opens
+     *  the gate with or without a passphrase on the seed. */
+    it("round-trips a cloud backup through markBackupCompletedFor into the gate", async () => {
       let persisted: string | null = null
       mockSetItem.mockImplementation(async (_key: string, value: string) => {
         persisted = value
@@ -617,28 +581,23 @@ describe("BackupStateProvider", () => {
       await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud)
 
       const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
-      // Pre-existing states and passwordless cloud backups look identical:
-      // the seed is in the cloud, but the bundle must not be (PRD rule D9).
       expect(isCloudSeedBackupCompleted(state)).toBe(true)
-      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
     })
 
-    it("closes the gate when a protected cloud backup is redone without the flag", async () => {
+    it("survives the real sequence: cloud backup, then manual", async () => {
       let persisted: string | null = null
       mockSetItem.mockImplementation(async (_key: string, value: string) => {
         persisted = value
       })
       mockGetItem.mockImplementation(async () => persisted)
 
-      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud, {
-        cloudPasswordProtected: true,
-      })
       await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud)
+      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Manual)
 
-      // The second backup replaced the cloud seed; keeping the first one's
-      // flag would let the bundle sit beside a seed saved without a password.
       const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
-      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
+      expect(state?.method).toBe(BackupMethod.Manual)
+      expect(completedMethodsOf(state)).toEqual([BackupMethod.Cloud, BackupMethod.Manual])
+      expect(isCloudSeedBackupCompleted(state)).toBe(true)
     })
   })
 
@@ -730,53 +689,6 @@ describe("BackupStateProvider", () => {
           method: BackupMethod.Cloud,
         }),
       ).toBe(false)
-    })
-  })
-
-  describe("D9 gate across a later non-cloud backup", () => {
-    it("stays open when a manual backup follows a password-protected cloud one", () => {
-      const state = {
-        status: BackupStatus.Completed,
-        method: BackupMethod.Manual,
-        completedMethods: [BackupMethod.Cloud, BackupMethod.Manual],
-        cloudPasswordProtected: true,
-      }
-
-      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(true)
-    })
-
-    /** Widening the completion check must not widen the password check: a
-     *  cloud backup redone without a password writes the flag false, and that
-     *  explicit false has to keep the bundle out of the cloud. */
-    it("closes when the cloud backup is redone without a password", () => {
-      const state = {
-        status: BackupStatus.Completed,
-        method: BackupMethod.Cloud,
-        completedMethods: [BackupMethod.Cloud, BackupMethod.Manual],
-        cloudPasswordProtected: false,
-      }
-
-      expect(isCloudSeedBackupCompleted(state)).toBe(true)
-      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(false)
-    })
-
-    it("survives the real sequence: password-protected cloud backup, then manual", async () => {
-      let persisted: string | null = null
-      mockSetItem.mockImplementation(async (_key: string, value: string) => {
-        persisted = value
-      })
-      mockGetItem.mockImplementation(async () => persisted)
-
-      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Cloud, {
-        cloudPasswordProtected: true,
-      })
-      await markBackupCompletedFor(TEST_SC_ACCOUNT_ID, BackupMethod.Manual)
-
-      const state = await readBackupStateFor(TEST_SC_ACCOUNT_ID)
-      expect(state?.method).toBe(BackupMethod.Manual)
-      expect(completedMethodsOf(state)).toEqual([BackupMethod.Cloud, BackupMethod.Manual])
-      expect(isCloudSeedBackupCompleted(state)).toBe(true)
-      expect(isPasswordProtectedCloudSeedBackup(state)).toBe(true)
     })
   })
 

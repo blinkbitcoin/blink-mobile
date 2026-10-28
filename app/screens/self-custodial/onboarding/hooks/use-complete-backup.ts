@@ -18,7 +18,6 @@ import {
   BackupStatus,
   markBackupCompletedFor,
   useBackupState,
-  type BackupCompletedOptions,
 } from "@app/self-custodial/providers/backup-state"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
@@ -26,9 +25,6 @@ import { toastShow } from "@app/utils/toast"
 type CompleteBackupOptions = {
   method: BackupMethod
   message?: string
-  /** Extra state recorded with the completion, e.g. whether a cloud backup
-   * carries an extra password (gates the recovery-bundle cloud sync, D9). */
-  backupOptions?: BackupCompletedOptions
 }
 
 /**
@@ -57,7 +53,7 @@ export const useCompleteBackup = () => {
     !isSelfCustodialAccount && migrationCheckpoint !== null && !isAlreadyBackedUp
 
   return useCallback(
-    async ({ method, message, backupOptions }: CompleteBackupOptions) => {
+    async ({ method, message }: CompleteBackupOptions) => {
       if (isMigrating && !migrationAccountId) {
         /** A checkpoint without its provisioned account means the resume state was lost;
          *  a fake standalone success would dead-end the migration silently, so surface
@@ -76,11 +72,7 @@ export const useCompleteBackup = () => {
          *  swap that follows Approve reads the committed backup state. A failed write must
          *  stop here, like the checkpoint saves: advancing would later nag the user that a
          *  backup they just completed is missing. The screen stays so a retry re-runs it. */
-        const isBackupPersisted = await markBackupCompletedFor(
-          migrationAccountId,
-          method,
-          backupOptions,
-        )
+        const isBackupPersisted = await markBackupCompletedFor(migrationAccountId, method)
           .then(() => true)
           .catch((err) => {
             reportError("Migration backup state persist", err)
@@ -114,7 +106,7 @@ export const useCompleteBackup = () => {
         return
       }
 
-      setBackupCompleted(method, backupOptions)
+      setBackupCompleted(method)
       navigation.navigate("selfCustodialBackupSuccess", {
         reBackup: isAlreadyBackedUp,
         message,

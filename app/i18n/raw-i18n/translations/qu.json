@@ -3864,7 +3864,6 @@
       "passwordTooShort": "Pisi kaptinpas 12 sanampakuna",
       "passwordMismatch": "Contraseñakuna mana tupanchu",
       "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
-      "autoBundleSyncNotSaved": "Waqaychay {provider} nisqaman waqaychasqa, ichaqa kikinmanta waqaychaykuna akllasqaykiqa mana waqaychakuyta atirqanchu. Rikch'apim tikrayta atinki.",
       "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
       "signInFailed": "{provider}-man yaykuy mana atikurqachu",
       "storageAccessRequired": "{provider: string} yaykuyta saqiy wallet waqaychasqaykiman, chaymanta yapamanta ruway.",

@@ -83,11 +83,7 @@ describe("useCompleteBackup", () => {
 
     await result.current({ method: "manual" })
 
-    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(
-      "migration-uuid",
-      "manual",
-      undefined,
-    )
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
     expect(mockSetBackupCompleted).not.toHaveBeenCalled()
     expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.ChooseExperience)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
@@ -168,7 +164,7 @@ describe("useCompleteBackup", () => {
 
     result.current({ method: "keychain", message: "All set" })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain", undefined)
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("keychain")
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
@@ -246,7 +242,7 @@ describe("useCompleteBackup", () => {
 
     result.current({ method: "manual", message: "All set" })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockReplace).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
@@ -268,7 +264,7 @@ describe("useCompleteBackup", () => {
 
     result.current({ method: "manual" })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
     expect(mockReplace).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
@@ -302,7 +298,7 @@ describe("useCompleteBackup", () => {
 
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
     expect(mockSaveCheckpoint).not.toHaveBeenCalled()
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
       reBackup: false,
       message: undefined,

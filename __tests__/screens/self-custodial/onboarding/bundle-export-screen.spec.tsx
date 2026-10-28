@@ -18,8 +18,6 @@ let LL: TranslationFunctions
 
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
-  settings: { autoRefresh: true, cloudSync: false },
-  settingsLoaded: true,
   sharing: false,
   reloadState: jest.fn().mockResolvedValue(undefined),
   handleShare: jest.fn().mockResolvedValue(true),
@@ -60,7 +58,6 @@ describe("BundleExportScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActions.bundleState = savedBundle
-    mockActions.settings = { autoRefresh: true, cloudSync: false }
     mockActions.sharing = false
     // Restored per test: cases below replace these members outright.
     mockActions.reloadState = jest.fn().mockResolvedValue(undefined)
@@ -74,14 +71,12 @@ describe("BundleExportScreen", () => {
     expect(screen.getByText(LL.BackupScreen.BundleExport.body())).toBeTruthy()
   })
 
-  /** Manual-backup users keep the bundle on this device only, so the screen
-   *  hands it over the same way whether or not it also syncs to the cloud. */
-  it("offers only the download, never a cloud backup", () => {
+  /** Keeping the bundle current, on the device and in the cloud, happens in
+   *  the background, so the screen only hands over the copy saved here. */
+  it("offers only the download", () => {
     renderScreen()
 
     expect(screen.getByTestId("bundle-download-button")).toBeTruthy()
-    expect(screen.queryByTestId("bundle-cloud-backup-button")).toBeNull()
-    expect(screen.queryByTestId("bundle-activate-backups-button")).toBeNull()
     expect(screen.queryByTestId("bundle-skip-button")).toBeNull()
   })
 

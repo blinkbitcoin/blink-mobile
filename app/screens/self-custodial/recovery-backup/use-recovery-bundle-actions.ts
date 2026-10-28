@@ -8,12 +8,6 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { networkLabelFor } from "@app/self-custodial/config"
 import { decryptBundleBackupPayload } from "@app/self-custodial/recovery-bundle/encryption"
-import { markExported } from "@app/self-custodial/recovery-bundle/refresh"
-import {
-  defaultRecoveryBundleSettings,
-  readRecoveryBundleSettings,
-  type RecoveryBundleSettings,
-} from "@app/self-custodial/recovery-bundle/settings"
 import {
   loadEncryptedBundleFile,
   readRecoveryBundleState,
@@ -36,25 +30,12 @@ const NO_BUNDLE_READ: TargetBound<RecoveryBundleState | null> = {
   value: null,
 }
 
-const NO_SETTINGS_READ: TargetBound<RecoveryBundleSettings> = {
-  forTarget: null,
-  value: defaultRecoveryBundleSettings,
-}
-
 const targetFor = (accountId: string, network: Network): string =>
   `${accountId}:${network}`
-
-/** A decrypted bundle on its way off the device, with the account it was read
- *  from and the version it is, which is what the export gets recorded against. */
-type ExportedBundle = { accountId: string; json: string; createdAt: string }
 
 export type RecoveryBundleActions = {
   /** undefined while the first read is in flight, null when no bundle saved. */
   bundleState: RecoveryBundleState | null | undefined
-  settings: RecoveryBundleSettings
-  /** False until the active account's own settings have been read. Until
-   *  then `settings` holds the defaults as a placeholder, not stored values. */
-  settingsLoaded: boolean
   sharing: boolean
   reloadState: () => Promise<void>
   /** Resolves false when nothing was exported - a dismissed sheet, no saved
@@ -65,10 +46,11 @@ export type RecoveryBundleActions = {
 }
 
 /**
- * State and export behind the emergency bundle screen: the saved bundle, the
- * settings that say whether it syncs to the cloud, and the unencrypted export
- * through the share sheet. Failures are reported with a toast - the screen stays
- * presentational.
+ * State and export behind the emergency bundle screen: the saved bundle and its
+ * unencrypted export through the share sheet. Keeping the bundle current, on
+ * the device and in the cloud, happens in the background (see
+ * useRecoveryBundleRefresh); this hook only reads and hands over what is saved.
+ * Failures are reported with a toast - the screen stays presentational.
  */
 export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   const { LL } = useI18nContext()
@@ -80,7 +62,6 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   const target = accountId === null ? null : targetFor(accountId, network)
 
   const [bundleRead, setBundleRead] = useState(NO_BUNDLE_READ)
-  const [settingsRead, setSettingsRead] = useState(NO_SETTINGS_READ)
   const [sharing, setSharing] = useState(false)
   const latestRead = useRef(0)
   /** Checked when async work finishes, which may be after an account switch. */
@@ -88,18 +69,9 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   activeTarget.current = target
 
   /** Until the active account's own read lands, what the hook holds belongs to
-   *  another account, so the bundle reads as still loading and the settings as
-   *  their defaults. */
+   *  another account, so the bundle reads as still loading. */
   const isBundleReadForTarget = bundleRead.forTarget === target
-  const isSettingsReadForTarget = settingsRead.forTarget === target
   const bundleState = isBundleReadForTarget ? bundleRead.value : undefined
-  const settings = isSettingsReadForTarget
-    ? settingsRead.value
-    : defaultRecoveryBundleSettings
-
-  /** An export that finishes after an account switch ran for the account it
-   *  started on, so its result must not land on the one now on screen. */
-  const isStillActive = (forTarget: string) => forTarget === activeTarget.current
 
   const reloadState = useCallback(async () => {
     /** An action that outlived an account switch still holds this closure, and
@@ -110,32 +82,23 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     const read = latestRead.current
     if (!accountId) {
       setBundleRead(NO_BUNDLE_READ)
-      setSettingsRead(NO_SETTINGS_READ)
       return
     }
-    let next: {
-      bundle: RecoveryBundleState | null
-      settings: RecoveryBundleSettings | null
-    }
+    let next: RecoveryBundleState | null
     try {
-      const [state, storedSettings] = await Promise.all([
-        readRecoveryBundleState(accountId, network),
-        readRecoveryBundleSettings(accountId),
-      ])
-      next = { bundle: state, settings: storedSettings }
+      next = await readRecoveryBundleState(accountId, network)
     } catch (err) {
       // Degrade to "no bundle yet" instead of stranding the screen on the
       // loading state.
       crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
-      next = { bundle: null, settings: null }
+      next = null
     }
     /** A read overtaken by a newer one is dropped: after an account switch a
      *  slow read for the previous account would otherwise land last and show
      *  its backup while the actions operate on the new account. */
     const isLatestRead = read === latestRead.current
     if (!isLatestRead) return
-    setBundleRead({ forTarget: target, value: next.bundle })
-    if (next.settings) setSettingsRead({ forTarget: target, value: next.settings })
+    setBundleRead({ forTarget: target, value: next })
   }, [accountId, network, target])
 
   const recordAndToast = (err: unknown, message: string) => {
@@ -143,9 +106,8 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     toastShow({ message, LL })
   }
 
-  /** Decrypts the saved bundle for export; requires the seed from the keystore.
-   *  Hands back the version it decrypted, which is the one an export carries. */
-  const loadBundleForExport = async (): Promise<ExportedBundle | null> => {
+  /** Decrypts the saved bundle for export; requires the seed from the keystore. */
+  const loadBundleForExport = async (): Promise<string | null> => {
     if (!accountId) return null
     const payload = await loadEncryptedBundleFile(accountId, network)
     if (!payload) {
@@ -158,30 +120,15 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       return null
     }
     const bundle = await decryptBundleBackupPayload(payload, mnemonic)
-    return {
-      accountId,
-      json: JSON.stringify(bundle, null, 2),
-      createdAt: bundle.createdAt,
-    }
-  }
-
-  /** Recorded in the bundle state, against the exact version that left the
-   *  device, rather than in the settings: a settings write would carry this
-   *  render's copy of the switches and could undo one changed while the share
-   *  sheet was open. */
-  const recordExport = async (exported: ExportedBundle) => {
-    const forTarget = targetFor(exported.accountId, network)
-    const next = await markExported(exported.accountId, network, exported.createdAt)
-    const isExportedStateForScreen = next !== null && isStillActive(forTarget)
-    if (isExportedStateForScreen) setBundleRead({ forTarget, value: next })
+    return JSON.stringify(bundle, null, 2)
   }
 
   const handleShare = async (): Promise<boolean> => {
     if (sharing) return false
     setSharing(true)
     try {
-      const exported = await loadBundleForExport()
-      if (!exported) return false
+      const json = await loadBundleForExport()
+      if (!json) return false
       // `useInternalStorage` is honored by the Android native module
       // (ShareIntent.java) but missing from the lib's ShareOptions type.
       // Android writes data: URLs to a file before sharing; keep the
@@ -189,14 +136,11 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
       const options: ShareOptions & { useInternalStorage: boolean } = {
         title: "blink-recovery-bundle",
         filename: `blink-recovery-bundle-${networkLabelFor(network)}.json`,
-        url: `data:application/json;base64,${Buffer.from(exported.json, "utf8").toString("base64")}`,
+        url: `data:application/json;base64,${Buffer.from(json, "utf8").toString("base64")}`,
         type: "application/json",
         useInternalStorage: true,
       }
       await Share.open(options)
-      // Recorded only after the sheet resolves, so a cancelled share does not
-      // count as the user having a copy.
-      await recordExport(exported).catch(() => {})
       return true
     } catch (err) {
       /** Dismissing the sheet is a choice, not a failure, so it stays silent -
@@ -215,8 +159,6 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
 
   return {
     bundleState,
-    settings,
-    settingsLoaded: isSettingsReadForTarget,
     sharing,
     reloadState,
     handleShare,

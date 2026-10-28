@@ -12725,11 +12725,6 @@ type RootTranslation = {
 			 */
 			uploadSuccess: RequiredParams<'provider'>
 			/**
-			 * B​a​c​k​u​p​ ​s​a​v​e​d​ ​t​o​ ​{​p​r​o​v​i​d​e​r​}​,​ ​b​u​t​ ​y​o​u​r​ ​a​u​t​o​m​a​t​i​c​ ​b​a​c​k​u​p​s​ ​c​h​o​i​c​e​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​s​a​v​e​d​.​ ​Y​o​u​ ​c​a​n​ ​c​h​a​n​g​e​ ​i​t​ ​i​n​ ​S​e​t​t​i​n​g​s​.
-			 * @param {string} provider
-			 */
-			autoBundleSyncNotSaved: RequiredParams<'provider'>
-			/**
 			 * F​a​i​l​e​d​ ​t​o​ ​u​p​l​o​a​d​ ​b​a​c​k​u​p
 			 */
 			uploadFailed: string
@@ -26775,10 +26770,6 @@ export type TranslationFunctions = {
 			 * Backup saved to {provider}
 			 */
 			uploadSuccess: (arg: { provider: string }) => LocalizedString
-			/**
-			 * Backup saved to {provider}, but your automatic backups choice could not be saved. You can change it in Settings.
-			 */
-			autoBundleSyncNotSaved: (arg: { provider: string }) => LocalizedString
 			/**
 			 * Failed to upload backup
 			 */

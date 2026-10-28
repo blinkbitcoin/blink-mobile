@@ -2,17 +2,13 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 
 const mockFetchRecoveryBundle = jest.fn()
 const mockAttemptSilentCloudUpload = jest.fn()
-const mockAttemptSilentCloudDelete = jest.fn()
 const mockReadBackupStateFor = jest.fn()
-const mockReadRecoveryBundleSettings = jest.fn()
-const mockWriteRecoveryBundleSettings = jest.fn()
 const mockSaveEncryptedBundleFile = jest.fn()
 const mockLoadEncryptedBundleFile = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
 const mockWriteRecoveryBundleState = jest.fn()
 const mockParseBundleBackupMetadata = jest.fn()
 const mockRecordAppError = jest.fn()
-const mockDeriveIdentityKeyPair = jest.fn()
 
 // The reporting boundary is mocked (not crashlytics underneath it) so the
 // expected/dedupKey classification is asserted directly, and because
@@ -37,11 +33,6 @@ jest.mock("@app/self-custodial/recovery-bundle/exporter", () => ({
 jest.mock("@app/self-custodial/recovery-bundle/cloud", () => ({
   ...jest.requireActual("@app/self-custodial/recovery-bundle/cloud"),
   attemptSilentCloudUpload: (...args: unknown[]) => mockAttemptSilentCloudUpload(...args),
-  attemptSilentCloudDelete: (...args: unknown[]) => mockAttemptSilentCloudDelete(...args),
-}))
-
-jest.mock("@app/self-custodial/recovery-bundle/identity", () => ({
-  deriveIdentityKeyPair: (...args: unknown[]) => mockDeriveIdentityKeyPair(...args),
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/encryption", () => ({
@@ -72,36 +63,21 @@ jest.mock("@app/self-custodial/providers/backup-state", () => {
     BackupStatus: actual.BackupStatus,
     BackupMethod: actual.BackupMethod,
     isCloudSeedBackupCompleted: actual.isCloudSeedBackupCompleted,
-    isPasswordProtectedCloudSeedBackup: actual.isPasswordProtectedCloudSeedBackup,
     readBackupStateFor: (...args: unknown[]) => mockReadBackupStateFor(...args),
   }
 })
-
-jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
-  ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
-  readRecoveryBundleSettings: (...args: unknown[]) =>
-    mockReadRecoveryBundleSettings(...args),
-  writeRecoveryBundleSettings: (...args: unknown[]) =>
-    mockWriteRecoveryBundleSettings(...args),
-}))
 
 import { BackupMethod, BackupStatus } from "@app/self-custodial/providers/backup-state"
 import {
   isBundleFresh,
   markAccountDeletedForRefresh,
-  markCloudSynced,
-  markExported,
   markRecoveryBundleStale,
   refreshRecoveryBundle,
-  revokeCloudRecoveryBundle,
   syncExistingBundleToCloud,
   unmarkAccountDeletedForRefresh,
   waitForRefreshesToSettle,
-  withCloudBundleLock,
 } from "@app/self-custodial/recovery-bundle/refresh"
-import type { RecoveryBundleSettings } from "@app/self-custodial/recovery-bundle/settings"
 import type { RecoveryBundleState } from "@app/self-custodial/recovery-bundle/storage"
-import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 
 const ACCOUNT_ID = "acct-1"
 const DAY_MS = 24 * 60 * 60 * 1000
@@ -121,15 +97,11 @@ const deferred = <T>() => {
   return { promise, resolve }
 }
 
-// State and settings round-trip through in-memory stores, so marks, saves and
-// stamps written by one step are what the next step reads.
+// State round-trips through an in-memory store, so marks, saves and stamps
+// written by one step are what the next step reads.
 const stateKeyFor = (accountId: string, network: Network): string =>
   `${accountId}:${network}`
 let storedStates = new Map<string, RecoveryBundleState>()
-let storedSettings: RecoveryBundleSettings = {
-  autoRefresh: true,
-  cloudSync: true,
-}
 
 const testBundle = {
   createdAt: "2026-07-12T00:00:00.000Z",
@@ -153,17 +125,9 @@ const testState = {
   cloudSyncedAt: null,
 }
 
-const cloudBackupState = {
-  status: BackupStatus.Completed,
-  method: BackupMethod.Cloud,
-  cloudPasswordProtected: true,
-}
-// A cloud seed backup saved WITHOUT an extra password: the seed-encrypted
-// bundle must never be uploaded next to it (PRD rule D9).
-const passwordlessCloudBackupState = {
-  status: BackupStatus.Completed,
-  method: BackupMethod.Cloud,
-}
+// A cloud seed backup, with or without a passphrase: the record is the same
+// either way, and either way the bundle follows it to the cloud.
+const cloudBackupState = { status: BackupStatus.Completed, method: BackupMethod.Cloud }
 const manualBackupState = { status: BackupStatus.Completed, method: BackupMethod.Manual }
 
 const refreshParams = {
@@ -187,22 +151,6 @@ beforeEach(() => {
     },
   )
   mockAttemptSilentCloudUpload.mockResolvedValue({ success: true })
-  mockAttemptSilentCloudDelete.mockResolvedValue({ success: true })
-  mockDeriveIdentityKeyPair.mockImplementation(
-    async (_mnemonic: string, network: Network) => ({
-      publicKey: Uint8Array.from(
-        network === Network.Mainnet ? [0x02, 0xab] : [0x03, 0xcd],
-      ),
-    }),
-  )
-  // Cloud sync opted in by default here; the opt-out cases flip it per test.
-  storedSettings = { autoRefresh: true, cloudSync: true }
-  mockReadRecoveryBundleSettings.mockImplementation(async () => storedSettings)
-  mockWriteRecoveryBundleSettings.mockImplementation(
-    async (_accountId: string, settings: RecoveryBundleSettings) => {
-      storedSettings = settings
-    },
-  )
   mockParseBundleBackupMetadata.mockImplementation((raw: string) => {
     const parsed = JSON.parse(raw)
     return {
@@ -214,7 +162,7 @@ beforeEach(() => {
 })
 
 describe("refreshRecoveryBundle cloud gating", () => {
-  it("uploads to the cloud when sync is opted in and the cloud seed backup is password-protected", async () => {
+  it("uploads to the cloud whenever the seed is backed up there", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
 
@@ -232,29 +180,18 @@ describe("refreshRecoveryBundle cloud gating", () => {
     )
   })
 
-  it("skips the cloud upload when the user has not opted in to cloud sync", async () => {
-    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
-    mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
-    mockReadRecoveryBundleSettings.mockResolvedValue({
-      autoRefresh: true,
-      cloudSync: false,
+  /** A manual or keychain backup run after the cloud one leaves the cloud
+   *  seed where it is, so the bundle keeps following it there. */
+  it("keeps uploading when a later backup replaced the method on record", async () => {
+    mockReadBackupStateFor.mockResolvedValue({
+      ...manualBackupState,
+      completedMethods: [BackupMethod.Cloud, BackupMethod.Manual],
     })
-
-    const result = await refreshRecoveryBundle(refreshParams)
-
-    expect(result.success).toBe(true)
-    expect(mockSaveEncryptedBundleFile).toHaveBeenCalledTimes(1)
-    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
-  })
-
-  it("skips the cloud upload when the cloud seed backup has no password (D9)", async () => {
-    mockReadBackupStateFor.mockResolvedValue(passwordlessCloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
 
-    const result = await refreshRecoveryBundle(refreshParams)
+    await refreshRecoveryBundle(refreshParams)
 
-    expect(result.success).toBe(true)
-    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
+    expect(mockAttemptSilentCloudUpload).toHaveBeenCalledTimes(1)
   })
 
   it("skips the cloud upload when the seed backup is manual", async () => {
@@ -459,7 +396,7 @@ describe("refreshRecoveryBundle cloud gating", () => {
     )
   })
 
-  it("carries the previous cloud and export records into the saved state and returns the post-sync re-read", async () => {
+  it("carries the previous cloud record into the saved state and returns the post-sync re-read", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
     const priorCloudSyncedAt = 1_752_000_000_000
@@ -469,7 +406,6 @@ describe("refreshRecoveryBundle cloud gating", () => {
       bundleCreatedAt: priorBundleCreatedAt,
       cloudSyncedAt: priorCloudSyncedAt,
       cloudSyncedBundleCreatedAt: priorBundleCreatedAt,
-      exportedBundleCreatedAt: priorBundleCreatedAt,
     })
 
     const result = await refreshRecoveryBundle(refreshParams)
@@ -487,7 +423,6 @@ describe("refreshRecoveryBundle cloud gating", () => {
         totalSats: "32768",
         cloudSyncedAt: priorCloudSyncedAt,
         cloudSyncedBundleCreatedAt: priorBundleCreatedAt,
-        exportedBundleCreatedAt: priorBundleCreatedAt,
         uncoveredChangeAt: null,
       },
     )
@@ -530,14 +465,13 @@ describe("refreshRecoveryBundle cloud gating", () => {
 
   it("still reports success when the post-save cloud sync step throws", async () => {
     // The bundle and state are already persisted; a failure in the cloud step
-    // (here: the settings read inside isCloudSyncAllowedFor) must be recorded
-    // separately, not flip the refresh result to failed.
-    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
+    // (here: the backup-state read that decides whether to upload) must be
+    // recorded separately, not flip the refresh result to failed.
     const syncFailure = new Error("AsyncStorage unavailable")
-    // The only settings read in a refresh happens inside the cloud step
-    // (isCloudSyncAllowedFor); rejecting it makes that step throw after the
-    // bundle and state were already persisted.
-    mockReadRecoveryBundleSettings.mockRejectedValueOnce(syncFailure)
+    // The only backup-state read in a refresh happens inside the cloud step;
+    // rejecting it makes that step throw after the bundle and state were
+    // already persisted.
+    mockReadBackupStateFor.mockRejectedValueOnce(syncFailure)
 
     const result = await refreshRecoveryBundle(refreshParams)
 
@@ -650,25 +584,6 @@ describe("syncExistingBundleToCloud", () => {
     expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
   })
 
-  it("does nothing when cloud sync is not opted in", async () => {
-    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
-    mockReadRecoveryBundleSettings.mockResolvedValue({
-      autoRefresh: true,
-      cloudSync: false,
-    })
-
-    expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
-    expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
-  })
-
-  it("does nothing when the cloud seed backup is not password-protected (D9)", async () => {
-    mockReadBackupStateFor.mockResolvedValue(passwordlessCloudBackupState)
-
-    expect(await syncExistingBundleToCloud(ACCOUNT_ID, Network.Mainnet)).toBe(false)
-    expect(mockLoadEncryptedBundleFile).not.toHaveBeenCalled()
-    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
-  })
-
   it("does nothing when no bundle is saved yet", async () => {
     mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
     mockLoadEncryptedBundleFile.mockResolvedValue(null)
@@ -757,82 +672,6 @@ describe("syncExistingBundleToCloud", () => {
     expect(mockRecordAppError).toHaveBeenCalledWith(networkError, {
       expected: true,
       dedupKey: "recovery-bundle-cloud-sync",
-    })
-  })
-})
-
-describe("markCloudSynced", () => {
-  it("stamps the upload time and the bundle it carried on the existing state", async () => {
-    mockReadRecoveryBundleState.mockResolvedValue(testState)
-
-    const next = await markCloudSynced(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt)
-
-    expect(mockReadRecoveryBundleState).toHaveBeenCalledWith(ACCOUNT_ID, Network.Mainnet)
-    expect(next).toEqual({
-      ...testState,
-      cloudSyncedAt: expect.any(Number),
-      cloudSyncedBundleCreatedAt: testBundle.createdAt,
-    })
-    expect(mockWriteRecoveryBundleState).toHaveBeenCalledWith(
-      ACCOUNT_ID,
-      Network.Mainnet,
-      next,
-    )
-  })
-
-  it("returns null and writes nothing when no state exists", async () => {
-    mockReadRecoveryBundleState.mockResolvedValue(null)
-
-    expect(
-      await markCloudSynced(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt),
-    ).toBeNull()
-    expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
-  })
-})
-
-describe("markExported", () => {
-  it("records the bundle an export carried on the existing state", async () => {
-    mockReadRecoveryBundleState.mockResolvedValue(testState)
-
-    const next = await markExported(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt)
-
-    expect(mockReadRecoveryBundleState).toHaveBeenCalledWith(ACCOUNT_ID, Network.Mainnet)
-    expect(next).toEqual({ ...testState, exportedBundleCreatedAt: testBundle.createdAt })
-    expect(mockWriteRecoveryBundleState).toHaveBeenCalledWith(
-      ACCOUNT_ID,
-      Network.Mainnet,
-      next,
-    )
-  })
-
-  it("returns null and writes nothing when no state exists", async () => {
-    mockReadRecoveryBundleState.mockResolvedValue(null)
-
-    expect(
-      await markExported(ACCOUNT_ID, Network.Mainnet, testBundle.createdAt),
-    ).toBeNull()
-    expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
-  })
-
-  it("queues behind a refresh's save so neither reverts the other", async () => {
-    const accountId = "acct-order-export"
-    const key = stateKeyFor(accountId, Network.Mainnet)
-    mockReadBackupStateFor.mockResolvedValue(manualBackupState)
-    const priorBundleCreatedAt = "2026-07-11T00:00:00.000Z"
-    storedStates.set(key, { ...testState, bundleCreatedAt: priorBundleCreatedAt })
-    const exportRead = deferred<RecoveryBundleState | null>()
-    mockReadRecoveryBundleState.mockReturnValueOnce(exportRead.promise)
-
-    const record = markExported(accountId, Network.Mainnet, priorBundleCreatedAt)
-    const refresh = refreshRecoveryBundle({ ...refreshParams, accountId })
-    await flushMicrotasks()
-    exportRead.resolve(storedStates.get(key) ?? null)
-    await record
-
-    expect((await refresh).success).toBe(true)
-    expect(storedStates.get(key)).toMatchObject({
-      bundleCreatedAt: testBundle.createdAt,
-      exportedBundleCreatedAt: priorBundleCreatedAt,
     })
   })
 })
@@ -1071,52 +910,21 @@ describe("account deletion vs cloud work", () => {
     expect(storedStates.get(key)).toEqual(testState)
   })
 
-  it("writes no interactive-sync stamp for a deleted account", async () => {
-    const accountId = "acct-stamp-deleted-before"
-    storedStates.set(stateKeyFor(accountId, Network.Mainnet), { ...testState })
-    markAccountDeletedForRefresh(accountId)
-
-    expect(
-      await markCloudSynced(accountId, Network.Mainnet, testBundle.createdAt),
-    ).toBeNull()
-    expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
-  })
-
-  it("drops a stamp whose read was pending when the account was deleted, and waits for it", async () => {
-    const accountId = "acct-stamp-deleted-reading"
-    const read = deferred<RecoveryBundleState | null>()
-    mockReadRecoveryBundleState.mockReturnValueOnce(read.promise)
-
-    const stamp = markCloudSynced(accountId, Network.Mainnet, testBundle.createdAt)
-    await flushMicrotasks()
-    markAccountDeletedForRefresh(accountId)
-    let isSettled = false
-    const settle = waitForRefreshesToSettle(accountId).then(() => {
-      isSettled = true
-    })
-    await flushMicrotasks()
-    expect(isSettled).toBe(false)
-
-    read.resolve(testState)
-    expect(await stamp).toBeNull()
-    await settle
-    expect(mockWriteRecoveryBundleState).not.toHaveBeenCalled()
-  })
-
-  it("skips a cloud operation queued before the deletion mark", async () => {
+  it("skips a sync queued before the deletion mark", async () => {
     const accountId = "acct-lock-deleted-queued"
-    const first = deferred<string>()
-    const queued = jest.fn(async () => "ran")
+    const firstUpload = deferred<{ success: true }>()
+    mockAttemptSilentCloudUpload.mockReturnValueOnce(firstUpload.promise)
 
-    const firstRun = withCloudBundleLock(accountId, Network.Mainnet, () => first.promise)
-    const queuedRun = withCloudBundleLock(accountId, Network.Mainnet, queued)
+    const firstSync = syncExistingBundleToCloud(accountId, Network.Mainnet)
+    await flushMicrotasks()
+    const queuedSync = syncExistingBundleToCloud(accountId, Network.Mainnet)
     await flushMicrotasks()
     markAccountDeletedForRefresh(accountId)
-    first.resolve("first")
+    firstUpload.resolve({ success: true })
 
-    expect(await firstRun).toBe("first")
-    expect(await queuedRun).toBeUndefined()
-    expect(queued).not.toHaveBeenCalled()
+    await firstSync
+    expect(await queuedSync).toBe(false)
+    expect(mockAttemptSilentCloudUpload).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -1181,33 +989,44 @@ describe("cloud upload ordering", () => {
     )
   })
 
-  it("runs the next cloud operation even when the one before it failed", async () => {
+  it("runs the next sync even when the one before it failed", async () => {
     const accountId = "acct-order-after-failure"
-    const failure = new Error("provider crashed")
+    storedStates.set(stateKeyFor(accountId, Network.Mainnet), { ...testState })
+    const failure = new Error("disk unreadable")
+    mockLoadEncryptedBundleFile.mockRejectedValueOnce(failure)
 
-    const failed = withCloudBundleLock(accountId, Network.Mainnet, async () => {
-      throw failure
-    })
-    const next = withCloudBundleLock(accountId, Network.Mainnet, async () => "ran")
+    const failed = syncExistingBundleToCloud(accountId, Network.Mainnet)
+    const next = syncExistingBundleToCloud(accountId, Network.Mainnet)
 
     await expect(failed).rejects.toBe(failure)
-    expect(await next).toBe("ran")
+    expect(await next).toBe(true)
   })
 
-  it("queues a stamp and a refresh's save so neither reverts the other", async () => {
+  it("queues a sync's stamp and a refresh's save so neither reverts the other", async () => {
     const accountId = "acct-order-state"
     const key = stateKeyFor(accountId, Network.Mainnet)
-    mockReadBackupStateFor.mockResolvedValue(manualBackupState)
     const priorBundleCreatedAt = "2026-07-11T00:00:00.000Z"
+    // Only the sync uploads; the refresh's own cloud step finds no cloud
+    // backup, so the one stamp in the end state is the sync's.
+    mockReadBackupStateFor
+      .mockResolvedValue(manualBackupState)
+      .mockResolvedValueOnce(cloudBackupState)
+    mockLoadEncryptedBundleFile.mockResolvedValue(
+      JSON.stringify({
+        ...JSON.parse(savedPayload),
+        bundleCreatedAt: priorBundleCreatedAt,
+      }),
+    )
     storedStates.set(key, { ...testState, bundleCreatedAt: priorBundleCreatedAt })
     const stampRead = deferred<RecoveryBundleState | null>()
     mockReadRecoveryBundleState.mockReturnValueOnce(stampRead.promise)
 
-    const stamp = markCloudSynced(accountId, Network.Mainnet, priorBundleCreatedAt)
+    const sync = syncExistingBundleToCloud(accountId, Network.Mainnet)
+    await flushMicrotasks()
     const refresh = refreshRecoveryBundle({ ...refreshParams, accountId })
     await flushMicrotasks()
     stampRead.resolve(storedStates.get(key) ?? null)
-    await stamp
+    expect(await sync).toBe(true)
 
     expect((await refresh).success).toBe(true)
     expect(storedStates.get(key)).toMatchObject({
@@ -1215,169 +1034,6 @@ describe("cloud upload ordering", () => {
       cloudSyncedAt: expect.any(Number),
       cloudSyncedBundleCreatedAt: priorBundleCreatedAt,
     })
-  })
-})
-
-describe("revokeCloudRecoveryBundle", () => {
-  const MAINNET_FILE = "blink-spark-recovery-bundle-mainnet-02ab.json"
-  const REGTEST_FILE = "blink-spark-recovery-bundle-regtest-03cd.json"
-  const syncedState = {
-    ...testState,
-    cloudSyncedAt: 1_752_000_000_000,
-    cloudSyncedBundleCreatedAt: testBundle.createdAt,
-  }
-  const revokeParams = (accountId: string) => ({ accountId, mnemonic: "mnemonic" })
-
-  it("turns cloud sync off, deletes both networks' copies and clears their cloud records", async () => {
-    const accountId = "acct-revoke"
-    storedStates.set(stateKeyFor(accountId, Network.Mainnet), { ...syncedState })
-    storedStates.set(stateKeyFor(accountId, Network.Regtest), { ...syncedState })
-
-    expect(await revokeCloudRecoveryBundle(revokeParams(accountId))).toBe(true)
-
-    expect(storedSettings.cloudSync).toBe(false)
-    expect(mockDeriveIdentityKeyPair).toHaveBeenCalledWith("mnemonic", Network.Mainnet)
-    expect(mockDeriveIdentityKeyPair).toHaveBeenCalledWith("mnemonic", Network.Regtest)
-    expect(mockAttemptSilentCloudDelete).toHaveBeenCalledWith(MAINNET_FILE)
-    expect(mockAttemptSilentCloudDelete).toHaveBeenCalledWith(REGTEST_FILE)
-    for (const network of [Network.Mainnet, Network.Regtest]) {
-      expect(storedStates.get(stateKeyFor(accountId, network))).toMatchObject({
-        cloudSyncedAt: null,
-        cloudSyncedBundleCreatedAt: null,
-      })
-    }
-  })
-
-  it("fails closed and leaves cloud sync off when one network's delete fails", async () => {
-    const accountId = "acct-revoke-delete-fails"
-    mockAttemptSilentCloudDelete.mockImplementation(async (fileName: string) =>
-      fileName === REGTEST_FILE
-        ? { success: false, reason: CloudBackupErrorReason.Transient }
-        : { success: true },
-    )
-
-    expect(await revokeCloudRecoveryBundle(revokeParams(accountId))).toBe(false)
-
-    // Writing back the value read before the delete could undo a change the
-    // user made while it waited, so sync stays off for the user to turn on.
-    expect(storedSettings.cloudSync).toBe(false)
-    expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledTimes(1)
-    expect(mockRecordAppError).toHaveBeenCalledWith(
-      expect.objectContaining({
-        message: expect.stringContaining("revoke failed: transient"),
-      }),
-      { expected: true, dedupKey: "recovery-bundle-cloud-revoke" },
-    )
-  })
-
-  it("fails closed when the wallet identity cannot be derived", async () => {
-    const accountId = "acct-revoke-identity-fails"
-    const derivationFailure = new Error("invalid mnemonic")
-    mockDeriveIdentityKeyPair.mockRejectedValue(derivationFailure)
-
-    expect(await revokeCloudRecoveryBundle(revokeParams(accountId))).toBe(false)
-
-    expect(storedSettings.cloudSync).toBe(false)
-    expect(mockAttemptSilentCloudDelete).not.toHaveBeenCalled()
-    expect(mockRecordAppError).toHaveBeenCalledWith(derivationFailure, {
-      dedupKey: "recovery-bundle-cloud-revoke",
-    })
-  })
-
-  it("resolves false instead of throwing when the opt-in cannot be read", async () => {
-    const settingsFailure = new Error("AsyncStorage unavailable")
-    mockReadRecoveryBundleSettings.mockRejectedValueOnce(settingsFailure)
-
-    expect(await revokeCloudRecoveryBundle(revokeParams("acct-revoke-read-fails"))).toBe(
-      false,
-    )
-
-    expect(mockAttemptSilentCloudDelete).not.toHaveBeenCalled()
-    expect(mockRecordAppError).toHaveBeenCalledWith(settingsFailure, {
-      dedupKey: "recovery-bundle-cloud-revoke",
-    })
-  })
-
-  it("refuses a deleted account without touching its settings", async () => {
-    const accountId = "acct-revoke-deleted-before"
-    markAccountDeletedForRefresh(accountId)
-
-    expect(await revokeCloudRecoveryBundle(revokeParams(accountId))).toBe(false)
-    expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
-  })
-
-  it("stops before turning sync off when the account is deleted while the opt-in is read", async () => {
-    const accountId = "acct-revoke-deleted-reading"
-    const read = deferred<RecoveryBundleSettings>()
-    mockReadRecoveryBundleSettings.mockReturnValueOnce(read.promise)
-
-    const revocation = revokeCloudRecoveryBundle(revokeParams(accountId))
-    await flushMicrotasks()
-    markAccountDeletedForRefresh(accountId)
-    read.resolve(storedSettings)
-
-    expect(await revocation).toBe(false)
-    expect(mockWriteRecoveryBundleSettings).not.toHaveBeenCalled()
-  })
-
-  it("deletes nothing for an account deleted after sync was turned off", async () => {
-    const accountId = "acct-revoke-deleted-after-off"
-    mockWriteRecoveryBundleSettings.mockImplementationOnce(
-      async (_accountId: string, settings: RecoveryBundleSettings) => {
-        storedSettings = settings
-        markAccountDeletedForRefresh(accountId)
-      },
-    )
-
-    expect(await revokeCloudRecoveryBundle(revokeParams(accountId))).toBe(false)
-    expect(mockWriteRecoveryBundleSettings).toHaveBeenCalledTimes(1)
-    expect(mockAttemptSilentCloudDelete).not.toHaveBeenCalled()
-  })
-
-  it("lets an upload already running finish first, so the delete leaves the cloud without the bundle", async () => {
-    const accountId = "acct-revoke-upload-race"
-    const key = stateKeyFor(accountId, Network.Mainnet)
-    storedStates.set(key, { ...testState })
-    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
-    mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
-    const upload = deferred<{ success: true }>()
-    mockAttemptSilentCloudUpload.mockReturnValueOnce(upload.promise)
-
-    const sync = syncExistingBundleToCloud(accountId, Network.Mainnet)
-    await flushMicrotasks()
-    const revocation = revokeCloudRecoveryBundle(revokeParams(accountId))
-    await flushMicrotasks()
-    expect(mockAttemptSilentCloudDelete).not.toHaveBeenCalledWith(MAINNET_FILE)
-
-    upload.resolve({ success: true })
-    expect(await sync).toBe(true)
-    expect(await revocation).toBe(true)
-
-    const [uploadOrder] = mockAttemptSilentCloudUpload.mock.invocationCallOrder
-    const mainnetDeleteIndex = mockAttemptSilentCloudDelete.mock.calls.findIndex(
-      ([fileName]: [string]) => fileName === MAINNET_FILE,
-    )
-    const mainnetDeleteOrder =
-      mockAttemptSilentCloudDelete.mock.invocationCallOrder[mainnetDeleteIndex]
-    expect(uploadOrder).toBeLessThan(mainnetDeleteOrder)
-    expect(storedStates.get(key)).toMatchObject({
-      cloudSyncedAt: null,
-      cloudSyncedBundleCreatedAt: null,
-    })
-  })
-
-  it("refuses an upload requested once the revocation turned sync off", async () => {
-    const accountId = "acct-revoke-then-sync"
-    storedStates.set(stateKeyFor(accountId, Network.Mainnet), { ...testState })
-    mockReadBackupStateFor.mockResolvedValue(cloudBackupState)
-    mockLoadEncryptedBundleFile.mockResolvedValue(savedPayload)
-
-    const revocation = revokeCloudRecoveryBundle(revokeParams(accountId))
-    await flushMicrotasks()
-
-    expect(await syncExistingBundleToCloud(accountId, Network.Mainnet)).toBe(false)
-    expect(mockAttemptSilentCloudUpload).not.toHaveBeenCalled()
-    expect(await revocation).toBe(true)
   })
 })
 

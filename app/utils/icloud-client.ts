@@ -28,7 +28,6 @@ const ERROR_CODE_TO_REASON: Readonly<
   [CloudStorageErrorCode.NETWORK_ERROR]: CloudBackupErrorReason.Transient,
   [CloudStorageErrorCode.READ_ERROR]: CloudBackupErrorReason.Transient,
   [CloudStorageErrorCode.WRITE_ERROR]: CloudBackupErrorReason.Transient,
-  [CloudStorageErrorCode.DELETE_ERROR]: CloudBackupErrorReason.Transient,
   [CloudStorageErrorCode.FILE_NOT_DOWNLOADABLE]: CloudBackupErrorReason.Transient,
 }
 
@@ -114,30 +113,6 @@ export const uploadAppDataFile = async ({
     await CloudStorage.writeFile(fileName, content, CloudStorageScope.AppData)
   } catch (err) {
     throw toICloudError(err, "upload")
-  }
-}
-
-/** Up to iOS 16, an item that is in iCloud but not downloaded on this device
- *  shows up only as this placeholder, and removing the placeholder removes the
- *  item. Looking for the real name alone would miss it. */
-const iCloudPlaceholderNameFor = (fileName: string): string => `.${fileName}.icloud`
-
-/**
- * Removes the item whether it is downloaded or only a placeholder, and resolves
- * once neither form remains. Each name is checked first: unlinking a path that
- * is not there fails with the same delete error as a real failure, not as
- * not-found, and the placeholder is absent whenever the item is downloaded.
- */
-export const deleteAppDataFile = async (fileName: string): Promise<void> => {
-  ensureICloudProviderConfigured()
-  for (const name of [fileName, iCloudPlaceholderNameFor(fileName)]) {
-    try {
-      const isPresent = await CloudStorage.exists(name, CloudStorageScope.AppData)
-      if (isPresent) await CloudStorage.unlink(name, CloudStorageScope.AppData)
-    } catch (err) {
-      const error = toICloudError(err, "delete")
-      if (error.reason !== CloudBackupErrorReason.NotFound) throw error
-    }
   }
 }
 

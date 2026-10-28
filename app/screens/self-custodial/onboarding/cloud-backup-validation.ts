@@ -13,9 +13,9 @@ export type CloudBackupFormValidation = {
   isValid: boolean
 }
 
-/** Every cloud seed backup carries a passphrase: automatic bundle backups are
- *  always on, and the seed-encrypted bundle must never sit next to an
- *  unencrypted seed (D9). */
+/** Every new cloud seed backup carries a passphrase: the emergency bundle
+ *  follows the seed to the cloud, encrypted with that same seed, so the
+ *  passphrase is what protects both. */
 export const validateCloudBackupForm = ({
   password,
   confirmPassword,

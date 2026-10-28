@@ -14,7 +14,6 @@ const mockRemoveSelfCustodialAccountId = jest.fn()
 const mockRemoveBackupStateFor = jest.fn()
 const mockDeleteRecoveryBundleFile = jest.fn()
 const mockRemoveRecoveryBundleState = jest.fn()
-const mockRemoveRecoveryBundleSettings = jest.fn()
 const mockMarkAccountDeletedForRefresh = jest.fn()
 const mockUnmarkAccountDeletedForRefresh = jest.fn()
 const mockWaitForRefreshesToSettle = jest.fn()
@@ -58,11 +57,6 @@ jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
   deleteRecoveryBundleFile: (...args: unknown[]) => mockDeleteRecoveryBundleFile(...args),
   removeRecoveryBundleState: (...args: unknown[]) =>
     mockRemoveRecoveryBundleState(...args),
-}))
-
-jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
-  removeRecoveryBundleSettings: (...args: unknown[]) =>
-    mockRemoveRecoveryBundleSettings(...args),
 }))
 
 jest.mock("@app/self-custodial/recovery-bundle/refresh", () => ({
@@ -135,7 +129,6 @@ describe("useDeleteAccount", () => {
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
     mockDeleteRecoveryBundleFile.mockResolvedValue(undefined)
     mockRemoveRecoveryBundleState.mockResolvedValue(undefined)
-    mockRemoveRecoveryBundleSettings.mockResolvedValue(undefined)
     mockWaitForRefreshesToSettle.mockResolvedValue(undefined)
     mockReloadSelfCustodialAccounts.mockResolvedValue(undefined)
   })
@@ -171,7 +164,6 @@ describe("useDeleteAccount", () => {
         bundleNetwork,
       )
     }
-    expect(mockRemoveRecoveryBundleSettings).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
     expect(mockUpdateState).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")
@@ -386,7 +378,6 @@ describe("useDeleteAccount", () => {
 
   it("logs the best-effort cleanup steps that fail and still completes the delete", async () => {
     mockUnlink.mockRejectedValue(new Error("dir busy"))
-    mockRemoveRecoveryBundleSettings.mockRejectedValue(new Error("settings busy"))
     mockWaitForRefreshesToSettle.mockRejectedValue(new Error("registry gone"))
     const { result } = renderHook(() => useDeleteAccount())
 
@@ -398,7 +389,6 @@ describe("useDeleteAccount", () => {
     expect(outcome).toBe("logged-out")
     for (const failure of [
       "storage dir unlink failed",
-      "recovery bundle settings cleanup failed",
       "post-refresh bundle re-sweep failed",
     ]) {
       expect(mockCrashlyticsLog).toHaveBeenCalledWith(expect.stringContaining(failure))

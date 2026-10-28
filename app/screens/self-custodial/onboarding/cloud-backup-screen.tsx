@@ -46,16 +46,7 @@ export const CloudBackupScreen: React.FC = () => {
     isValid,
   } = useCloudBackupForm()
 
-  /** The passphrase is required and automatic bundle backups are always on:
-   *  the seed-encrypted bundle may only sit next to a passphrase-protected seed
-   *  (D9), and users cannot opt out of it. Always on is a known choice, so every
-   *  backup records it. */
-  const { handleBackup, loading } = useCloudBackup({
-    isEncrypted: true,
-    password,
-    autoBundleSync: true,
-    isAutoBundleSyncKnown: true,
-  })
+  const { handleBackup, loading } = useCloudBackup({ password })
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
 

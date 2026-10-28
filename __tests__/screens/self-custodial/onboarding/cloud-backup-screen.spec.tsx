@@ -239,8 +239,9 @@ describe("CloudBackupScreen", () => {
     })
   })
 
-  /** Users cannot opt out of automatic bundle backups, and the seed-encrypted
-   *  bundle may only sit next to a passphrase-protected seed (D9). */
+  /** The emergency bundle follows every cloud backup and is encrypted with the
+   *  same seed, so a new cloud backup always carries a passphrase, and there is
+   *  no choice about the bundle to make. */
   describe("mandatory passphrase and automatic bundle backups", () => {
     it("offers no checkbox to skip the passphrase or the automatic backups", () => {
       const { queryByTestId } = renderScreen()
@@ -249,15 +250,10 @@ describe("CloudBackupScreen", () => {
       expect(queryByTestId("auto-bundle-checkbox")).toBeNull()
     })
 
-    it("always backs up with the passphrase and automatic backups on", () => {
+    it("always backs up with the passphrase", () => {
       renderScreen()
 
-      expect(mockUseCloudBackup).toHaveBeenLastCalledWith({
-        isEncrypted: true,
-        password: "ValidPass1234!",
-        autoBundleSync: true,
-        isAutoBundleSyncKnown: true,
-      })
+      expect(mockUseCloudBackup).toHaveBeenLastCalledWith({ password: "ValidPass1234!" })
     })
 
     it("keeps continue disabled until the passphrase is valid", () => {

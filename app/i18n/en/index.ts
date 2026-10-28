@@ -4016,8 +4016,6 @@ const en: BaseTranslation = {
       existingBackupUnknownCreatedAt: "Unknown",
       overwrite: "Overwrite",
       uploadSuccess: "Backup saved to {provider: string}",
-      autoBundleSyncNotSaved:
-        "Backup saved to {provider: string}, but your automatic backups choice could not be saved. You can change it in Settings.",
       uploadFailed: "Failed to upload backup",
       signInFailed: "Failed to sign in to {provider: string}",
       storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",

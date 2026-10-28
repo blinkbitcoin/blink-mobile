@@ -68,8 +68,8 @@ const setNoActiveAccount = (): void => {
  * Every step of a backup flow has to agree on which account it is acting on.
  * Mid-migration the active account is still custodial while the phrase, the
  * identity and the recovery bundle belong to the provisioned one, so reading
- * from one and writing to the other records an opt-in where nothing will ever
- * look for it.
+ * from one and writing to the other syncs a recovery bundle for an account
+ * nobody backed up.
  */
 describe("useBackupAccountId", () => {
   it("is the active account once it is self-custodial", () => {

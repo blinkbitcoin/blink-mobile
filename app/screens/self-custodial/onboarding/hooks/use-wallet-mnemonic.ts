@@ -13,7 +13,7 @@ import KeyStoreWrapper from "@app/utils/storage/secureStorage"
  * still the custodial one while the phrase, the identity and the recovery
  * bundle all belong to the provisioned self-custodial account, so every step of
  * those flows has to agree on this one answer - reading one account and writing
- * another is how an opt-in gets recorded where nothing will ever look for it.
+ * another is how a recovery bundle gets synced for an account nobody backed up.
  */
 export const useBackupAccountId = (): string | null => {
   const { activeAccount } = useAccountRegistry()
