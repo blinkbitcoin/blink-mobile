@@ -13,13 +13,16 @@ jest.mock("react-native-config", () => ({
   BREEZ_API_KEY: "test-api-key",
 }))
 
+/** Each connect yields a fresh instance whose disconnect succeeds; tests can hold one. */
+const mockConnect = jest.fn(async () => ({ disconnect: async () => undefined }))
+
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   Network: { Mainnet: 0, Regtest: 1 },
   Seed: { Mnemonic: jest.fn().mockImplementation((args: object) => args) },
   MaxFee: { create: (fee: object) => fee },
   MaxOnchainFee: { NetworkRecommended: jest.fn().mockImplementation((inner) => inner) },
   defaultConfig: () => ({}),
-  connect: async () => ({ id: "sdk" }),
+  connect: () => mockConnect(),
   initLogging: (logDir: string | undefined) =>
     jest.requireActual<typeof import("./inode-fs")>("./inode-fs").initLogging(logDir),
 }))
@@ -65,13 +68,19 @@ const launch = () => {
     logFiles = require("@app/self-custodial/diagnostics/sdk-log-files")
     exporter = require("@app/self-custodial/diagnostics/export-sdk-logs")
   })
-  const { initSdk } = lifecycle!
+  const { initSdk, disconnectSdk, waitForSdkIdle } = lifecycle!
   const { resetSdkLogs, finishPendingSdkLogReset } = logFiles!
   const { exportSdkLogs } = exporter!
   return {
-    connectWallet: () =>
-      initSdk({ mnemonic: "m", storageDir: "/s", network: 0, leewaySatPerVbyte: 1 }),
+    connectWallet: (storageDir = "/s") =>
+      initSdk({ mnemonic: "m", storageDir, network: 0, leewaySatPerVbyte: 1 }),
+    disconnect: disconnectSdk,
     deleteWallet: resetSdkLogs,
+    /** What use-delete-account does: wait out the wallet's SDK, then reset. */
+    deleteWalletAfterTeardown: async (storageDir: string) => {
+      const isSdkIdle = await waitForSdkIdle(storageDir, 1000)
+      await resetSdkLogs({ readNothingThisSession: !isSdkIdle })
+    },
     /** What SdkLogResetMount runs at app start. */
     appStarts: finishPendingSdkLogReset,
     exportText: async () => {
@@ -183,5 +192,35 @@ describe("deleting a wallet while the SDK logger runs", () => {
     expect(hasPath(builtPath!)).toBe(false)
     expect(hasPath("/caches/breez-sdk-log-exports")).toBe(false)
     await expect(app.exportText()).resolves.toBeNull()
+  })
+
+  it("keeps out what a connect still in flight when its wallet was deleted writes", async () => {
+    const WALLET_A_DIR = "/documents/breez-sdk-spark-mainnet/wallet-a"
+    const app = launch()
+    await app.connectWallet()
+
+    // wallet A is still on its loading spinner when the user deletes it (#4351 self-review, finding 1)
+    let release: () => void = () => {}
+    const released = new Promise<void>((resolve) => {
+      release = resolve
+    })
+    mockConnect.mockImplementationOnce(async () => {
+      await released
+      sdkWrites(WALLET_A)
+      return { disconnect: async () => undefined }
+    })
+    const connectingA = app.connectWallet(WALLET_A_DIR)
+    // useSdkLifecycle tears an aborted connect down as soon as it resolves
+    const tearingDownA = connectingA.then((sdk) => app.disconnect(sdk))
+    const deleting = app.deleteWalletAfterTeardown(WALLET_A_DIR)
+    await nextMacrotask()
+    release()
+    await Promise.all([tearingDownA, deleting])
+
+    sdkWrites(WALLET_B)
+    const exported = await app.exportText()
+
+    expect(exported).toContain(WALLET_B)
+    expect(exported).not.toContain(WALLET_A)
   })
 })

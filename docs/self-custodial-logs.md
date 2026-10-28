@@ -38,6 +38,10 @@ first: the row follows the active account.
   - With the logger running, the export folder and `sdk.log.1` go at once, and `sdk.log`
     is cut off in memory: for the rest of the session exports read only what it gains
     after the reset, so a wallet restored or created in that session exports at once.
+  - The cut waits until no SDK instance of the deleted wallet is connected or still
+    connecting (`waitForSdkIdle` in `bridge/lifecycle.ts`), so a connect that was in
+    flight when the user deleted it can't write past the cut. If that takes longer than
+    15 s, exports read nothing more this session instead.
   - The next launch removes the logs and then the flag, before the logger opens the
     file, whether or not a wallet connects again (`SdkLogResetMount`). The logger waits
     for it. If it can't finish, the logger runs without a file and the flag stays for the

@@ -162,9 +162,18 @@ export const startSdkLogger = (): Promise<void> => {
   return loggingStarted
 }
 
-const resetLogs = async (): Promise<void> => {
+type ResetOptions = {
+  /** The deleted wallet may still be writing (its SDK didn't go idle in time): exports
+   *  read nothing for the rest of the session rather than anything past the cut. */
+  readNothingThisSession?: boolean
+}
+
+const resetLogs = async ({
+  readNothingThisSession = false,
+}: ResetOptions): Promise<void> => {
   const dir = sdkLogDir()
   const { current, previous, flag } = pathsIn(dir)
+  if (readNothingThisSession) resetAtByte = Number.POSITIVE_INFINITY
 
   try {
     await RNFS.mkdir(dir)
@@ -195,9 +204,11 @@ const resetLogs = async (): Promise<void> => {
   /** The logger holds `sdk.log`: keep it, cut it off here, and leave it to the next
    *  launch. The other files are no longer read, so failing to remove them is recorded
    *  and left to that launch too. */
-  resetAtByte = await RNFS.stat(current)
-    .then(({ size }) => size)
-    .catch(() => Number.POSITIVE_INFINITY)
+  resetAtByte = readNothingThisSession
+    ? Number.POSITIVE_INFINITY
+    : await RNFS.stat(current)
+        .then(({ size }) => size)
+        .catch(() => Number.POSITIVE_INFINITY)
   for (const path of [previous, sdkLogExportDir()]) {
     await unlinkIfExists(path).catch((err) =>
       recordErrorOnce("sdk-log-reset", toError(err), { expected: true }),
@@ -207,12 +218,14 @@ const resetLogs = async (): Promise<void> => {
 
 /**
  * Resets the logs when any self-custodial wallet is deleted: they hold its payment
- * history, mixed with every other wallet's. Call it once the wallet's SDK is
- * disconnected and before the wallet itself is removed, so a stop in between still
- * leaves the reset to finish at the next launch. Rejects only when the reset could be
- * neither recorded nor done, and then the wallet must not be deleted.
+ * history, mixed with every other wallet's. Call it once every SDK instance of the
+ * wallet has disconnected (`waitForSdkIdle`), so nothing of it lands past the cut, and
+ * before the wallet itself is removed, so a stop in between still leaves the reset to
+ * finish at the next launch. Rejects only when the reset could be neither recorded nor
+ * done, and then the wallet must not be deleted.
  */
-export const resetSdkLogs = (): Promise<void> => withSdkLogLock(resetLogs)
+export const resetSdkLogs = (options: ResetOptions = {}): Promise<void> =>
+  withSdkLogLock(() => resetLogs(options))
 
 /**
  * Where an export of `sdk.log` must start, and whether `sdk.log.1` is off limits:

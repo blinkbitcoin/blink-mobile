@@ -1,6 +1,7 @@
 export {
   initSdk,
   disconnectSdk,
+  waitForSdkIdle,
   addSdkEventListener,
   removeSdkEventListener,
   selfCustodialCreateWallet,

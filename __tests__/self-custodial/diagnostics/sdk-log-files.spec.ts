@@ -318,6 +318,29 @@ describe("resetSdkLogs", () => {
     expect(hasPath(FLAG)).toBe(true)
   })
 
+  it("reads nothing more this session when the deleted wallet's SDK didn't go idle in time", async () => {
+    const logs = launch()
+    await logs.startSdkLogger()
+    sdkWrites("wallet A")
+
+    await logs.resetSdkLogs({ readNothingThisSession: true })
+    sdkWrites("wallet A still writing")
+
+    expect(hasPath(FLAG)).toBe(true)
+    await expect(logs.readSdkLogResetByte()).resolves.toBe(Number.POSITIVE_INFINITY)
+  })
+
+  it("reads nothing more this session either when no logger held the file", async () => {
+    makeDir(DIR)
+    writeText(CURRENT, "wallet A\n")
+    const logs = launch()
+
+    await logs.resetSdkLogs({ readNothingThisSession: true })
+
+    expect([CURRENT, FLAG].some(hasPath)).toBe(false)
+    await expect(logs.readSdkLogResetByte()).resolves.toBe(Number.POSITIVE_INFINITY)
+  })
+
   it("does nothing lasting when there are no logs", async () => {
     await launch().resetSdkLogs()
 
