@@ -257,6 +257,22 @@ describe("analytics helpers", () => {
       expect(mockLogEvent).toHaveBeenCalledTimes(1)
       expect(mockLogEvent).toHaveBeenCalledWith("toast_shown", expect.anything())
     })
+
+    it("leaves a swap to the sc_swap_* events", () => {
+      logConversionAttempt({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+      })
+      logConversionResult({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
+      logToastShown({ message: "anchor", type: "success", isTranslated: false })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("toast_shown", expect.anything())
+    })
   })
 
   describe("logConversionAttempt", () => {
