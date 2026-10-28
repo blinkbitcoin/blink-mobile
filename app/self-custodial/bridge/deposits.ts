@@ -105,12 +105,31 @@ const RECEIVES_MAX_PAGES = 500
  * history is paged, newest first, until every deposit is found or it runs out. A
  * receive arriving mid-scan shifts later pages down, so it repeats an entry rather
  * than skipping one.
+ *
+ * A scan that stops early, on a failed page or at the page cap, is reported and still
+ * returns what it found: a receive already read proves its deposit credited, and only
+ * the deposits not yet found stay settling.
  */
 const creditedOutpoints = async (
   sdk: BreezSdkInterface,
   settling: ReadonlySet<string>,
 ): Promise<Set<string>> => {
   const found = new Set<string>()
+  try {
+    await scanReceives(sdk, settling, found)
+  } catch (err) {
+    reportError("Self-custodial deposit credit lookup", err)
+  }
+  return found
+}
+
+/** Adds each settling outpoint it reads a completed receive for to `found`. Throws if
+ *  history is still unread after the page cap. */
+const scanReceives = async (
+  sdk: BreezSdkInterface,
+  settling: ReadonlySet<string>,
+  found: Set<string>,
+): Promise<void> => {
   for (let page = 0; page < RECEIVES_MAX_PAGES; page += 1) {
     const { payments } = await sdk.listPayments({
       typeFilter: [PaymentType.Receive],
@@ -130,9 +149,7 @@ const creditedOutpoints = async (
           : undefined
       if (key && settling.has(key)) found.add(key)
     }
-    if (found.size === settling.size || payments.length < RECEIVES_PAGE_SIZE) {
-      return found
-    }
+    if (found.size === settling.size || payments.length < RECEIVES_PAGE_SIZE) return
   }
   throw new Error(
     `Deposit credit lookup aborted after ${RECEIVES_MAX_PAGES} pages of ${RECEIVES_PAGE_SIZE} receives`,
@@ -153,10 +170,7 @@ export const listDeposits = async (sdk: BreezSdkInterface): Promise<MappedDeposi
 
   /** Unread history keeps a settling deposit listed: shown twice until the next
    *  listing reads it beats shown nowhere. */
-  const credited = await creditedOutpoints(sdk, settling).catch((err) => {
-    reportError("Self-custodial deposit credit lookup", err)
-    return new Set<string>()
-  })
+  const credited = await creditedOutpoints(sdk, settling)
   return deposits.map((deposit) =>
     deposit.earlyClaim === "settling" &&
     credited.has(outpointKey(deposit.txid, deposit.vout))
