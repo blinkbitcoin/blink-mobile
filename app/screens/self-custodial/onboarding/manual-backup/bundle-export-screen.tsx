@@ -33,7 +33,6 @@ export const BundleExportScreen: React.FC = () => {
   const { bundleState, sharing, reloadState, handleShare } = useRecoveryBundleActions()
 
   const [confirmingDownload, setConfirmingDownload] = useState(false)
-  const [showHowItWorks, setShowHowItWorks] = useState(false)
   /** Only controls whether the warning is repeated. */
   const [hasDownloaded, setHasDownloaded] = useState(false)
 
@@ -63,11 +62,6 @@ export const BundleExportScreen: React.FC = () => {
     if (didShare) setHasDownloaded(true)
   }, [handleShare])
 
-  const openCaseStudy = useCallback(() => {
-    setShowHowItWorks(false)
-    Linking.openURL(UNILATERAL_EXIT_CASE_STUDY_URL)
-  }, [])
-
   return (
     <OnboardingScreenLayout
       scrollable
@@ -91,7 +85,7 @@ export const BundleExportScreen: React.FC = () => {
       <Text
         type="p2"
         style={styles.learnMore}
-        onPress={() => setShowHowItWorks(true)}
+        onPress={() => Linking.openURL(UNILATERAL_EXIT_CASE_STUDY_URL)}
         {...testProps("bundle-learn-more")}
       >
         {LL.BackupScreen.BundleExport.learnMore()}
@@ -111,22 +105,6 @@ export const BundleExportScreen: React.FC = () => {
         primaryButtonTitle={LL.BackupScreen.BundleExport.sensitiveConfirm()}
         primaryButtonOnPress={onConfirmDownload}
         primaryButtonLoading={sharing}
-      />
-
-      <CustomModal
-        isVisible={showHowItWorks}
-        toggleModal={() => setShowHowItWorks(false)}
-        showCloseIconButton={true}
-        title={LL.RecoveryBundleScreen.howItWorksTitle()}
-        body={
-          <Text type="p2" style={styles.modalBody}>
-            {LL.RecoveryBundleScreen.howItWorksBody()}
-          </Text>
-        }
-        primaryButtonTitle={LL.common.ok()}
-        primaryButtonOnPress={() => setShowHowItWorks(false)}
-        secondaryButtonTitle={LL.BackupScreen.BundleExport.readCaseStudy()}
-        secondaryButtonOnPress={openCaseStudy}
       />
     </OnboardingScreenLayout>
   )

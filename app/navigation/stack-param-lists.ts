@@ -380,8 +380,6 @@ export type RootStackParamList = {
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
   selfCustodialOperatorUnreachable: undefined
-  /** A handle to the phrase, never the phrase itself: see emergency-phrase.ts. */
-  selfCustodialEmergencyRecovery: { phraseHandle: string }
   stableBalanceSettings: undefined
 }
 
