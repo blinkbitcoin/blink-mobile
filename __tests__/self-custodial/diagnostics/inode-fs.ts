@@ -73,6 +73,11 @@ export const hasPath = (path: string): boolean =>
 
 export const loggerStarts = (): number => disk.loggerStarts
 
+/** Every file reachable by path, joined: what a later export or a person could read. A
+ *  file the logger still holds after its path is gone is not reachable, so not here. */
+export const everythingOnDisk = (): string =>
+  [...disk.files.values()].map((inode) => inode.data.toString("utf8")).join("\n")
+
 /** A line from the SDK, appended to whatever inode the logger holds. */
 export const sdkWrites = (line: string): void => {
   if (!disk.loggerFile) return

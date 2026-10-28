@@ -32,7 +32,7 @@ import {
 const DIR = "/caches/breez-sdk-logs"
 const CURRENT = `${DIR}/sdk.log`
 const PREVIOUS = `${DIR}/sdk.log.1`
-const MARKER = `${DIR}/sdk.log.purge`
+const FLAG = `${DIR}/sdk.log.reset`
 const EXPORTS = "/caches/breez-sdk-log-exports"
 
 /** The module's state is per process; each call is a fresh app launch on the same disk. */
@@ -172,24 +172,39 @@ describe("startSdkLogger", () => {
   })
 })
 
-describe("deleteSdkLogs", () => {
+describe("resetSdkLogs", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetDisk()
   })
 
-  it("removes the logs and exports at once when no logger holds the file", async () => {
+  it("removes the logs, exports and its flag at once when no logger holds the file", async () => {
+    makeDir(DIR)
+    makeDir(EXPORTS)
     writeText(CURRENT, "wallet A\n")
     writeText(PREVIOUS, "wallet A older\n")
     writeText(`${EXPORTS}/blink-wallet-logs-x.txt`, "wallet A export")
-    makeDir(DIR)
-    makeDir(EXPORTS)
     const logs = launch()
 
-    await logs.deleteSdkLogs()
+    await logs.resetSdkLogs()
 
-    expect([CURRENT, PREVIOUS, DIR, EXPORTS].some(hasPath)).toBe(false)
-    await expect(logs.readSdkLogDeletedThroughByte()).resolves.toBeUndefined()
+    expect([CURRENT, PREVIOUS, EXPORTS, FLAG].some(hasPath)).toBe(false)
+    await expect(logs.readSdkLogResetByte()).resolves.toBeUndefined()
+  })
+
+  it("leaves its flag for the next launch when it cannot finish the removal", async () => {
+    makeDir(DIR)
+    writeText(CURRENT, "wallet A\n")
+    failNext("unlink", CURRENT, new Error("busy"))
+
+    await launch().resetSdkLogs()
+
+    expect(hasPath(FLAG)).toBe(true)
+    expect(mockRecordErrorOnce).toHaveBeenCalledWith(
+      "sdk-log-reset",
+      expect.objectContaining({ message: "busy" }),
+      { expected: true },
+    )
   })
 
   it("cuts off a file the running logger holds instead of orphaning it", async () => {
@@ -198,120 +213,156 @@ describe("deleteSdkLogs", () => {
     await logs.startSdkLogger()
     sdkWrites("wallet A")
 
-    await logs.deleteSdkLogs()
+    await logs.resetSdkLogs()
     sdkWrites("wallet B")
 
     expect(hasPath(PREVIOUS)).toBe(false)
-    expect(readText(MARKER)).toBe(String("wallet A\n".length))
+    expect(hasPath(FLAG)).toBe(true)
     expect(readText(CURRENT)).toBe("wallet A\nwallet B\n")
-    await expect(logs.readSdkLogDeletedThroughByte()).resolves.toBe("wallet A\n".length)
+    await expect(logs.readSdkLogResetByte()).resolves.toBe("wallet A\n".length)
   })
 
-  it("removes everything now when the cut-off cannot be recorded", async () => {
+  it("keeps the live file when sdk.log.1 can't be removed, leaving it to the next launch", async () => {
+    writeText(PREVIOUS, "wallet A older\n")
     const logs = launch()
     await logs.startSdkLogger()
     sdkWrites("wallet A")
-    failNext("writeFile", MARKER, new Error("disk full"))
+    failNext("unlink", PREVIOUS, new Error("busy"))
 
-    await logs.deleteSdkLogs()
+    await logs.resetSdkLogs()
+    sdkWrites("wallet B")
 
-    expect(hasPath(DIR)).toBe(false)
+    expect(readText(CURRENT)).toBe("wallet A\nwallet B\n")
+    expect(hasPath(FLAG)).toBe(true)
     expect(mockRecordErrorOnce).toHaveBeenCalledWith(
-      "sdk-log-delete",
+      "sdk-log-reset",
+      expect.objectContaining({ message: "busy" }),
+      { expected: true },
+    )
+  })
+
+  it("removes the logs now when the flag cannot be written", async () => {
+    writeText(PREVIOUS, "wallet A older\n")
+    const logs = launch()
+    await logs.startSdkLogger()
+    sdkWrites("wallet A")
+    failNext("writeFile", FLAG, new Error("disk full"))
+
+    await logs.resetSdkLogs()
+
+    expect([CURRENT, PREVIOUS, FLAG].some(hasPath)).toBe(false)
+    expect(mockRecordErrorOnce).toHaveBeenCalledWith(
+      "sdk-log-reset-flag",
       expect.objectContaining({ message: "disk full" }),
       { expected: true },
     )
   })
 
-  it("does nothing when there are no logs", async () => {
-    await expect(launch().deleteSdkLogs()).resolves.toBeUndefined()
+  it("waits for a logger part-way through starting, so it never removes the file it opens", async () => {
+    const logs = launch()
 
+    const starting = logs.startSdkLogger()
+    await logs.resetSdkLogs()
+    await starting
+    sdkWrites("wallet B")
+
+    expect(readText(CURRENT)).toBe("wallet B\n")
+    await expect(logs.readSdkLogResetByte()).resolves.toBe(0)
+  })
+
+  it("is not undone by a later launch-reset call in the same process (a remounted root)", async () => {
+    const logs = launch()
+    await logs.startSdkLogger()
+    sdkWrites("wallet A")
+    await logs.resetSdkLogs()
+
+    await logs.finishPendingSdkLogReset()
+    sdkWrites("wallet B")
+
+    expect(readText(CURRENT)).toBe("wallet A\nwallet B\n")
+    expect(hasPath(FLAG)).toBe(true)
+  })
+
+  it("does nothing lasting when there are no logs", async () => {
+    await launch().resetSdkLogs()
+
+    expect([CURRENT, PREVIOUS, FLAG].some(hasPath)).toBe(false)
     expect(mockRecordErrorOnce).not.toHaveBeenCalled()
   })
 })
 
-describe("the next launch after a deletion", () => {
+describe("the next launch after a reset", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     resetDisk()
   })
 
-  const deleteWhileLogging = async (afterDeletion: string[] = []) => {
+  const resetWhileLogging = async (afterReset: string[] = []) => {
+    writeText(PREVIOUS, "wallet A older\n")
     const logs = launch()
     await logs.startSdkLogger()
     sdkWrites("wallet A paid 1000 sats")
-    await logs.deleteSdkLogs()
-    afterDeletion.forEach(sdkWrites)
+    await logs.resetSdkLogs()
+    afterReset.forEach(sdkWrites)
     endProcess()
   }
 
-  it("removes the deleted lines before the logger opens the file again", async () => {
-    await deleteWhileLogging()
+  it("removes the logs and the flag at launch even if no wallet connects", async () => {
+    await resetWhileLogging(["wallet B restored"])
 
-    await launch().startSdkLogger()
-    sdkWrites("fresh")
+    await launch().finishPendingSdkLogReset()
 
-    expect(readText(CURRENT)).toBe("fresh\n")
-    expect(hasPath(MARKER)).toBe(false)
+    expect([CURRENT, PREVIOUS, FLAG].some(hasPath)).toBe(false)
+    expect(loggerStarts()).toBe(1)
   })
 
-  it("keeps what a wallet restored after the deletion wrote", async () => {
-    await deleteWhileLogging(["wallet B restored"])
+  it("finishes the reset before the logger opens the file again", async () => {
+    await resetWhileLogging(["wallet B restored"])
 
     await launch().startSdkLogger()
     sdkWrites("next session")
 
-    expect(readText(CURRENT)).toBe("wallet B restored\nnext session\n")
+    expect(readText(CURRENT)).toBe("next session\n")
+    expect(hasPath(FLAG)).toBe(false)
   })
 
-  it("reads the cut-off from disk when exporting before the purge has run", async () => {
-    await deleteWhileLogging(["wallet B restored"])
-
-    await expect(launch().readSdkLogDeletedThroughByte()).resolves.toBe(
-      "wallet A paid 1000 sats\n".length,
-    )
-  })
-
-  it("drops the whole file when the marker is unreadable", async () => {
-    await deleteWhileLogging(["wallet B restored"])
-    writeText(MARKER, "not a number")
-
+  it("runs the launch reset once, however many callers ask for it", async () => {
+    await resetWhileLogging()
     const logs = launch()
-    await expect(logs.readSdkLogDeletedThroughByte()).resolves.toBe(
-      Number.POSITIVE_INFINITY,
-    )
-    await logs.startSdkLogger()
 
-    expect(readText(CURRENT)).toBe("")
+    await Promise.all([logs.finishPendingSdkLogReset(), logs.startSdkLogger()])
+    sdkWrites("next session")
+    await logs.finishPendingSdkLogReset()
+
+    expect(readText(CURRENT)).toBe("next session\n")
   })
 
-  it("removes a previous generation that the deletion itself could not", async () => {
-    writeText(PREVIOUS, "wallet A older\n")
-    const logs = launch()
-    await logs.startSdkLogger()
-    sdkWrites("wallet A")
-    failNext("unlink", PREVIOUS)
-    failNext("unlink", DIR)
-    await logs.deleteSdkLogs()
-    endProcess()
-    expect(readText(PREVIOUS)).toBe("wallet A older\n")
+  it("reads nothing while an earlier reset is unfinished", async () => {
+    await resetWhileLogging(["wallet B restored"])
 
-    await launch().startSdkLogger()
-
-    expect(hasPath(PREVIOUS)).toBe(false)
+    await expect(launch().readSdkLogResetByte()).resolves.toBe(Number.POSITIVE_INFINITY)
   })
 
-  it("logs without a file, keeping the marker, when the purge fails", async () => {
-    await deleteWhileLogging()
+  it("counts a flag by its existence, so a torn write still resets everything", async () => {
+    await resetWhileLogging(["wallet B restored"])
+    writeText(FLAG, "")
+
+    await launch().finishPendingSdkLogReset()
+
+    expect([CURRENT, PREVIOUS, FLAG].some(hasPath)).toBe(false)
+  })
+
+  it("logs without a file, keeping the flag, when the reset can't finish", async () => {
+    await resetWhileLogging()
     failNext("unlink", CURRENT, new Error("busy"))
 
     await launch().startSdkLogger()
     sdkWrites("nowhere")
 
     expect(readText(CURRENT)).toBe("wallet A paid 1000 sats\n")
-    expect(hasPath(MARKER)).toBe(true)
+    expect(hasPath(FLAG)).toBe(true)
     expect(mockRecordErrorOnce).toHaveBeenCalledWith(
-      "sdk-log-purge",
+      "sdk-log-reset",
       expect.objectContaining({ message: "busy" }),
       { expected: true },
     )

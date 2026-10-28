@@ -3,11 +3,7 @@ import RNFS from "react-native-fs"
 import { SDK_LOG_EXPORT_BYTES, sdkLogDir, sdkLogExportDir } from "../config"
 
 import { buildSdkLogExport, type SdkLogPart } from "./build-sdk-log-export"
-import {
-  SDK_LOG_FILE,
-  SDK_LOG_FILE_PREVIOUS,
-  readSdkLogDeletedThroughByte,
-} from "./sdk-log-files"
+import { SDK_LOG_FILE, SDK_LOG_FILE_PREVIOUS, readSdkLogResetByte } from "./sdk-log-files"
 
 export const SDK_LOG_EXPORT_BASENAME = "blink-wallet-logs"
 
@@ -60,8 +56,8 @@ const exportStamp = (now: Date): string =>
 /**
  * Builds the export file from both log generations, newest bytes first within the cap,
  * and returns its path; null when there is nothing to share (the SDK has not run on this
- * install yet, or the logs were deleted). After the last wallet was deleted only what
- * `sdk.log` gained since is read, and never `sdk.log.1`. A previous export is removed
+ * install yet, or the logs were reset). After a wallet was deleted in this process only
+ * what `sdk.log` gained since is read, and never `sdk.log.1`. A previous export is removed
  * first instead of after sharing: some share targets read the file after the sheet has
  * closed.
  */
@@ -70,15 +66,15 @@ export const exportSdkLogs = async (
   now: Date,
 ): Promise<string | null> => {
   const dir = sdkLogDir()
-  const deletedThroughByte = await readSdkLogDeletedThroughByte()
+  const resetAtByte = await readSdkLogResetByte()
   const current = await readLogTail({
     path: `${dir}/${SDK_LOG_FILE}`,
     name: SDK_LOG_FILE,
     maxBytes: SDK_LOG_EXPORT_BYTES,
-    from: deletedThroughByte,
+    from: resetAtByte,
   })
   const previous =
-    deletedThroughByte === undefined
+    resetAtByte === undefined
       ? await readLogTail({
           path: `${dir}/${SDK_LOG_FILE_PREVIOUS}`,
           name: SDK_LOG_FILE_PREVIOUS,

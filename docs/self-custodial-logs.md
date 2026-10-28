@@ -28,16 +28,20 @@ first: the row follows the active account.
 - With the app open and idle the log grows by about 0.7 MB an hour (measured on
   0.26.1 and 0.27.1); it does not grow while the app is in the background. Two files hold
   roughly the last five hours of foreground use.
-- Deleting the last self-custodial wallet removes the logs with it. The SDK holds
-  `sdk.log` open for the rest of the process and can't reopen it, so when the logger is
-  running the file is cut off rather than removed:
-  - the export folder and `sdk.log.1` go at once;
-  - `sdk.log.purge` records where the deleted wallet's lines end, and no export reads
-    before that point or reads `sdk.log.1` again;
-  - a wallet restored or created in the same session keeps logging, and its lines
-    export at once;
-  - the next launch removes the deleted lines, keeping only what came after the cut,
-    before the logger opens the file again.
+- **Deleting any self-custodial wallet resets the whole log.** Lines don't say which
+  wallet wrote them, so the only safe deletion is all of it. Remaining wallets lose their
+  log history up to that point. The SDK holds `sdk.log` open for the rest of the process
+  and can't reopen it, so the reset runs in steps that hold wherever the process stops:
+  - `sdk.log.reset` is written *before* the wallet's backup phrase is removed. Only its
+    existence counts, so a write torn by a crash can't make it keep anything.
+  - With no logger holding the file, everything (logs, exports, flag) goes at once.
+  - With the logger running, the export folder and `sdk.log.1` go at once, and `sdk.log`
+    is cut off in memory: for the rest of the session exports read only what it gains
+    after the reset, so a wallet restored or created in that session exports at once.
+  - The next launch removes the logs and then the flag, before the logger opens the
+    file, whether or not a wallet connects again (`SdkLogResetMount`). The logger waits
+    for it. If it can't finish, the logger runs without a file and the flag stays for the
+    launch after.
 
   `app/self-custodial/diagnostics/sdk-log-files.ts` owns this whole lifecycle;
   `__tests__/self-custodial/diagnostics/log-lifecycle.spec.ts` runs it end to end.

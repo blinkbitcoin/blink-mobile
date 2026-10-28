@@ -7,7 +7,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
-import { deleteSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
+import { resetSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
@@ -81,14 +81,16 @@ export const useDeleteAccount = (): DeleteAccountResult => {
           })
         }
 
+        /** The SDK log mixes every wallet's lines and can't say whose they are, so any
+         *  deletion resets it, and before the wallet goes: a stop in between must still
+         *  leave the reset to finish. */
+        await resetSdkLogs()
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
           crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
         })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
-        /** The log holds every wallet's payment history; it goes with the last one. */
-        if (!remainingSelfCustodial) await deleteSdkLogs()
         await reloadSelfCustodialAccounts()
 
         setState("idle")

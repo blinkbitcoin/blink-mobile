@@ -1,7 +1,7 @@
 /**
- * Delete the last wallet, restore or create another in the same process, then export.
- * The SDK's logger is process-global and keeps its file open, so this is the sequence
- * where deleting and logging have to agree (#4351 review).
+ * Delete a wallet, restore or create another in the same process, export, relaunch.
+ * The SDK's logger is process-global, keeps its file open and can't tell wallets apart,
+ * so these are the sequences where deleting and logging have to agree (#4351 reviews).
  */
 jest.mock(
   "react-native-fs",
@@ -34,10 +34,10 @@ jest.mock("react-native-quick-crypto", () => ({}))
 
 import {
   endProcess,
+  everythingOnDisk,
   loggerStarts,
   readText,
   resetDisk,
-  rnfs,
   sdkWrites,
 } from "./inode-fs"
 
@@ -58,12 +58,14 @@ const launch = () => {
     exporter = require("@app/self-custodial/diagnostics/export-sdk-logs")
   })
   const { initSdk } = lifecycle!
-  const { deleteSdkLogs } = logFiles!
+  const { resetSdkLogs, finishPendingSdkLogReset } = logFiles!
   const { exportSdkLogs } = exporter!
   return {
     connectWallet: () =>
       initSdk({ mnemonic: "m", storageDir: "/s", network: 0, leewaySatPerVbyte: 1 }),
-    deleteSdkLogs,
+    deleteWallet: resetSdkLogs,
+    /** What SdkLogResetMount runs at app start. */
+    appStarts: finishPendingSdkLogReset,
     exportText: async () => {
       const path = await exportSdkLogs("header\n", NOW)
       return path === null ? null : readText(path)!
@@ -71,21 +73,7 @@ const launch = () => {
   }
 }
 
-/** Every byte on the fake disk, to prove the deleted wallet's lines are gone. */
-const everythingOnDisk = async (): Promise<string> => {
-  const paths = [
-    "/caches/breez-sdk-logs/sdk.log",
-    "/caches/breez-sdk-logs/sdk.log.1",
-    "/caches/breez-sdk-logs/sdk.log.purge",
-  ]
-  const exportsDir = "/caches/breez-sdk-log-exports"
-  const texts = await Promise.all(
-    paths.map(async (path) => ((await rnfs.exists(path)) ? readText(path) : "")),
-  )
-  return texts.join("\n") + ((await rnfs.exists(exportsDir)) ? "[exports present]" : "")
-}
-
-describe("deleting the last wallet while the SDK logger runs", () => {
+describe("deleting a wallet while the SDK logger runs", () => {
   beforeEach(() => {
     resetDisk()
   })
@@ -96,7 +84,7 @@ describe("deleting the last wallet while the SDK logger runs", () => {
     sdkWrites(WALLET_A)
     await expect(app.exportText()).resolves.toContain(WALLET_A)
 
-    await app.deleteSdkLogs()
+    await app.deleteWallet()
     await expect(app.exportText()).resolves.toBeNull()
 
     await app.connectWallet()
@@ -113,34 +101,57 @@ describe("deleting the last wallet while the SDK logger runs", () => {
     await first.connectWallet()
     sdkWrites(WALLET_A)
     await first.exportText()
-    await first.deleteSdkLogs()
+    await first.deleteWallet()
     await first.connectWallet()
     sdkWrites(WALLET_B)
     endProcess()
 
     const second = launch()
+    await second.appStarts()
     await second.connectWallet()
     sdkWrites("next session")
-    const exported = await second.exportText()
 
-    expect(exported).toContain(WALLET_B)
-    expect(exported).toContain("next session")
-    expect(exported).not.toContain(WALLET_A)
-    expect(await everythingOnDisk()).not.toContain(WALLET_A)
+    await expect(second.exportText()).resolves.toBe(
+      "header\n\n--- sdk.log ---\nnext session\n",
+    )
+    expect(everythingOnDisk()).not.toContain(WALLET_A)
   })
 
-  it("excludes the deleted lines from an export made before the next connect", async () => {
+  it("removes them at the next launch even if no wallet connects again", async () => {
     const first = launch()
     await first.connectWallet()
     sdkWrites(WALLET_A)
-    await first.deleteSdkLogs()
+    await first.exportText()
+    await first.deleteWallet()
+    endProcess()
+
+    await launch().appStarts()
+
+    expect(everythingOnDisk()).not.toContain(WALLET_A)
+  })
+
+  it("removes them when the process stops right after the reset, before the wallet is gone", async () => {
+    const first = launch()
+    await first.connectWallet()
+    sdkWrites(WALLET_A)
+    // use-delete-account resets the logs first; the process stops before the mnemonic goes
+    await first.deleteWallet()
+    endProcess()
+
+    await launch().appStarts()
+
+    expect(everythingOnDisk()).not.toContain(WALLET_A)
+  })
+
+  it("exports nothing from before the reset when exporting ahead of the next app start", async () => {
+    const first = launch()
+    await first.connectWallet()
+    sdkWrites(WALLET_A)
+    await first.deleteWallet()
     await first.connectWallet()
     sdkWrites(WALLET_B)
     endProcess()
 
-    const exported = await launch().exportText()
-
-    expect(exported).toContain(WALLET_B)
-    expect(exported).not.toContain(WALLET_A)
+    await expect(launch().exportText()).resolves.toBeNull()
   })
 })
