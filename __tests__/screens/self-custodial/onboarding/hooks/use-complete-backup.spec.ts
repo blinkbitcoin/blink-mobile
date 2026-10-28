@@ -2,19 +2,25 @@ import { renderHook } from "@testing-library/react-native"
 
 import { MigrationCheckpoint } from "@app/screens/account-migration/hooks"
 import { useCompleteBackup } from "@app/screens/self-custodial/onboarding/hooks/use-complete-backup"
+import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 
 const mockNavigate = jest.fn()
+const mockReplace = jest.fn()
 const mockSaveCheckpoint = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, replace: mockReplace }),
 }))
 
+let mockAccountType: AccountType = AccountType.Custodial
 let mockIsSelfCustodial = false
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
+  useActiveWallet: () => ({
+    accountType: mockAccountType,
+    isSelfCustodial: mockIsSelfCustodial,
+  }),
 }))
 
 let mockBackupStatus = "none"
@@ -63,6 +69,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
 describe("useCompleteBackup", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockAccountType = AccountType.Custodial
     mockIsSelfCustodial = false
     mockBackupStatus = "none"
     mockCheckpoint = "backupAlerts"
@@ -89,6 +96,12 @@ describe("useCompleteBackup", () => {
         accountId: "migration-uuid",
       },
     })
+    // The provisioned account has no funds and so no bundle yet: the export step,
+    // which reads the active account, is never reached from a migration.
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupBundleExport",
+      expect.anything(),
+    )
     expect(reportError).not.toHaveBeenCalled()
   })
 
@@ -148,6 +161,7 @@ describe("useCompleteBackup", () => {
   })
 
   it("marks the active self-custodial account on a standalone backup (no migration)", () => {
+    mockAccountType = AccountType.SelfCustodial
     mockIsSelfCustodial = true
 
     const { result } = renderHook(() => useCompleteBackup())
@@ -203,9 +217,34 @@ describe("useCompleteBackup", () => {
     )
   })
 
-  it("marks the active account as a re-backup when it was already backed up", () => {
+  it("records a standalone manual backup before handing over the recovery bundle", () => {
+    mockAccountType = AccountType.SelfCustodial
+    mockIsSelfCustodial = true
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    result.current({ method: "manual", message: "All set" })
+
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
+    // Replaces the confirm step, so going back cannot record the backup twice.
+    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      successMessage: "All set",
+      reBackup: false,
+    })
+    const recordOrder = mockSetBackupCompleted.mock.invocationCallOrder[0]
+    const navigateOrder = mockReplace.mock.invocationCallOrder[0]
+    expect(recordOrder).toBeLessThan(navigateOrder)
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
+  })
+
+  it("marks the active account as a re-backup and still hands over the bundle", () => {
     // An already-completed backup is never a migration, so it marks the active account.
     mockBackupStatus = "completed"
+    mockAccountType = AccountType.SelfCustodial
+    mockIsSelfCustodial = true
 
     const { result } = renderHook(() => useCompleteBackup())
 
@@ -213,9 +252,61 @@ describe("useCompleteBackup", () => {
 
     expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
     expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
-    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
+    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      successMessage: undefined,
       reBackup: true,
+    })
+  })
+
+  it("finishes a manual backup straight away for an account that has no recovery bundle", () => {
+    // Custodial and not migrating: there is no self-custodial bundle to hand over.
+    mockCheckpoint = null
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    result.current({ method: "manual" })
+
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess", {
+      reBackup: false,
       message: undefined,
     })
+  })
+
+  it("hands over the bundle while the wallet is still starting: routing follows the account type", () => {
+    mockAccountType = AccountType.SelfCustodial
+    mockIsSelfCustodial = false
+    mockCheckpoint = null
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    result.current({ method: "manual", message: "All set" })
+
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
+    expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupBundleExport", {
+      successMessage: "All set",
+      reBackup: false,
+    })
+    expect(mockNavigate).not.toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.anything(),
+    )
+  })
+
+  it("keeps a self-custodial account out of the migration branch while its wallet is still starting", () => {
+    mockAccountType = AccountType.SelfCustodial
+    mockIsSelfCustodial = false
+
+    const { result } = renderHook(() => useCompleteBackup())
+
+    result.current({ method: "manual" })
+
+    expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
+    expect(mockReplace).toHaveBeenCalledWith(
+      "selfCustodialBackupBundleExport",
+      expect.anything(),
+    )
   })
 })

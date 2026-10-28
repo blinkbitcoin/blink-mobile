@@ -1,20 +1,33 @@
 import { useCallback, useEffect, useMemo, useState } from "react"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useMigrationCheckpointState } from "@app/screens/account-migration/hooks/use-migration-checkpoint-state"
 import { deriveWalletIdentityPubkey } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-/** The account a backup flow works on: the active self-custodial account, or mid-migration,
- *  while the active account is still custodial, the provisioned one. */
+/**
+ * The account a backup flow is acting on. Mid-migration the active account is
+ * still the custodial one while the phrase, the identity and the recovery
+ * bundle all belong to the provisioned self-custodial account, so every step of
+ * those flows has to agree on this one answer - reading one account and writing
+ * another is how an opt-in gets recorded where nothing will ever look for it.
+ */
 export const useBackupAccountId = (): string | null => {
-  const { isSelfCustodial } = useActiveWallet()
   const { activeAccount } = useAccountRegistry()
   const { accountId: migrationAccountId } = useMigrationCheckpointState()
-  return isSelfCustodial ? activeAccount?.id ?? null : migrationAccountId
+
+  /** Account type, not useActiveWallet().isSelfCustodial: that also encodes SDK
+   *  availability, so it reads false on the initial renders at cold start and
+   *  right after an account switch. Falling through to the migration id there
+   *  would drop the target for a self-custodial user whose SDK is merely still
+   *  starting. */
+  const isActiveAccountSelfCustodial = activeAccount?.type === AccountType.SelfCustodial
+  if (isActiveAccountSelfCustodial) return activeAccount.id
+
+  return migrationAccountId
 }
 
 /**

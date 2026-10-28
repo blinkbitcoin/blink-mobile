@@ -1,7 +1,7 @@
 import React from "react"
 import { View } from "react-native"
 
-import { makeStyles, useTheme } from "@rn-vui/themed"
+import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CheckboxRow } from "@app/components/checkbox-row"
@@ -37,6 +37,11 @@ export const CloudBackupScreen: React.FC = () => {
 
   const {
     isEncrypted,
+    autoBundleSync,
+    isAutoBundleSyncKnown,
+    isAutoBundleSyncLoading,
+    canSyncBundle,
+    toggleAutoBundleSync,
     password,
     confirmPassword,
     toggleEncryption,
@@ -49,9 +54,23 @@ export const CloudBackupScreen: React.FC = () => {
     isValid,
   } = useCloudBackupForm()
 
-  const { handleBackup, loading } = useCloudBackup({ isEncrypted, password })
+  const { handleBackup, loading } = useCloudBackup({
+    isEncrypted,
+    password,
+    autoBundleSync,
+    isAutoBundleSyncKnown,
+  })
 
   useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup)
+
+  /** The backup commits the choices and the passphrase it was started with, so they
+   *  stay put while it runs; the opt-in also waits for the stored choice it starts from. */
+  const isAutoBundleSyncDisabled = !canSyncBundle || isAutoBundleSyncLoading || loading
+  const isContinueDisabled = !isValid || isAutoBundleSyncLoading || loading
+
+  const autoBundleHint = canSyncBundle
+    ? LL.BackupScreen.CloudBackup.autoBundleHint()
+    : LL.BackupScreen.CloudBackup.autoBundleNeedsPassword()
 
   return (
     <Screen preset="fixed">
@@ -73,6 +92,7 @@ export const CloudBackupScreen: React.FC = () => {
               label={LL.BackupScreen.CloudBackup.encryptCheckbox()}
               isChecked={isEncrypted}
               onPress={toggleEncryption}
+              disabled={loading}
               centered
               {...testProps("encrypt-checkbox")}
             />
@@ -86,6 +106,7 @@ export const CloudBackupScreen: React.FC = () => {
                   onBlur={markPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.passwordPlaceholder()}
                   error={passwordError}
+                  disabled={loading}
                   {...testProps("cloud-password-input")}
                 />
                 <PasswordInput
@@ -95,6 +116,7 @@ export const CloudBackupScreen: React.FC = () => {
                   onBlur={markConfirmPasswordTouched}
                   placeholder={LL.BackupScreen.CloudBackup.confirmPasswordPlaceholder()}
                   error={confirmPasswordError}
+                  disabled={loading}
                   {...testProps("cloud-confirm-password-input")}
                 />
 
@@ -111,13 +133,23 @@ export const CloudBackupScreen: React.FC = () => {
                 </InfoBanner>
               </View>
             )}
+
+            <CheckboxRow
+              label={LL.BackupScreen.CloudBackup.autoBundleCheckbox()}
+              isChecked={autoBundleSync}
+              onPress={toggleAutoBundleSync}
+              disabled={isAutoBundleSyncDisabled}
+              centered
+              {...testProps("auto-bundle-checkbox")}
+            />
+            <Text style={styles.hint}>{autoBundleHint}</Text>
           </View>
         </View>
 
         <View style={styles.buttonsContainer}>
           <GaloyPrimaryButton
             title={LL.BackupScreen.CloudBackup.continueButton()}
-            disabled={!isValid}
+            disabled={isContinueDisabled}
             loading={loading}
             onPress={handleBackup}
             {...testProps("cloud-backup-continue")}
@@ -128,7 +160,7 @@ export const CloudBackupScreen: React.FC = () => {
   )
 }
 
-const useStyles = makeStyles(() => ({
+const useStyles = makeStyles(({ colors }) => ({
   container: {
     flex: 1,
     justifyContent: "space-between",
@@ -141,6 +173,12 @@ const useStyles = makeStyles(() => ({
     paddingTop: 20,
     gap: 14,
     alignItems: "center",
+  },
+  hint: {
+    fontSize: 14,
+    lineHeight: 18,
+    textAlign: "center",
+    color: colors.grey2,
   },
   encryptionFields: {
     gap: 0,
