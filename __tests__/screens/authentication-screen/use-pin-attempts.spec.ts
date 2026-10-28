@@ -467,7 +467,7 @@ describe("usePinAttempts", () => {
       expect(result.current.attemptsRemaining).toBe(2)
     })
 
-    it("reports an unrecordable attempt so the caller can fail closed", async () => {
+    it("hands the keypad back on an attempt that could not be written down", async () => {
       mockedVerifyPin.mockResolvedValue({ outcome: "unrecorded" })
 
       const { result, handlers } = renderAttempts()
@@ -478,6 +478,8 @@ describe("usePinAttempts", () => {
       })
 
       expect(handlers.onUnrecorded).toHaveBeenCalledTimes(1)
+      expect(result.current.isInputDisabled).toBe(false)
+      expect(result.current.canAcceptInput()).toBe(true)
     })
   })
 

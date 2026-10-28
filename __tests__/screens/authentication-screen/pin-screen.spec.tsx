@@ -594,25 +594,23 @@ describe("PinScreen", () => {
       expect(mockReset).not.toHaveBeenCalled()
     })
 
-    it("logs out rather than let an attempt go unrecorded", async () => {
-      // A budget held only in memory dies with the process, so a failed write
-      // has to end the session instead of leaving the next guess free.
+    it("keeps the keypad and asks for a retry when an attempt cannot be written down", async () => {
+      /** Nothing was compared, so the entry gave a guesser nothing, and ending the
+       *  session over it would only cost the owner: no logout, so no saved session is
+       *  erased, and the keypad stays live for the retry. */
       mockedStore.setPinFailureState.mockResolvedValue(false)
 
       renderScreen(false)
       await flushEffects()
 
       await enterPin(WRONG_PIN)
-
-      expect(mockLogout).toHaveBeenCalledTimes(1)
-      expect(mockLogout).toHaveBeenCalledWith()
-      expect(screen.getByText("Couldn't record the attempt securely.")).toBeTruthy()
-
-      /** The same way out as the spent budget: to the gate, once the farewell has shown. */
-      expect(mockReturnToGate).not.toHaveBeenCalled()
       await advance(1000)
-      expect(mockReturnToGate).toHaveBeenCalledTimes(1)
+
+      expect(screen.getByText("Couldn't record the attempt securely.")).toBeTruthy()
+      expect(mockLogout).not.toHaveBeenCalled()
+      expect(mockReturnToGate).not.toHaveBeenCalled()
       expect(mockReset).not.toHaveBeenCalled()
+      expect(screen.getByText("1")).not.toBeDisabled()
     })
 
     it("does not open on the correct pin either when the attempt cannot be written down", async () => {
@@ -627,7 +625,9 @@ describe("PinScreen", () => {
 
       expect(mockSetAppUnlocked).not.toHaveBeenCalled()
       expect(mockedStore.clearPinFailureState).not.toHaveBeenCalled()
-      expect(mockLogout).toHaveBeenCalledTimes(1)
+      /** Refused without ending the session: the owner keeps every saved session and
+       *  gets the keypad back to try again. */
+      expect(mockLogout).not.toHaveBeenCalled()
       expect(screen.getByText("Couldn't record the attempt securely.")).toBeTruthy()
     })
 

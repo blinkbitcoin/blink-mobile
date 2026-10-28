@@ -350,7 +350,7 @@ describe("verifyPin", () => {
       mockedStore.setPinFailureState.mockResolvedValue(false)
     })
 
-    it("fails closed on a wrong entry", async () => {
+    it("judges nothing on a wrong entry", async () => {
       await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "unrecorded" })
     })
 

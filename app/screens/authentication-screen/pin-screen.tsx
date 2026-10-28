@@ -173,7 +173,10 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       setNoticeText(LL.PinScreen.pinUnreadable())
     },
     onExhausted: () => endSession(LL.PinScreen.tooManyAttempts()),
-    onUnrecorded: () => endSession(LL.PinScreen.attemptUnrecorded()),
+    onUnrecorded: () => {
+      setEnteredPIN("")
+      setNoticeText(LL.PinScreen.attemptUnrecorded())
+    },
   })
 
   const handleCompletedPinForSetPin = (newEnteredPIN: string) => {

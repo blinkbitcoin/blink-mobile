@@ -26,8 +26,9 @@ export type PinVerification =
   /** The attempt budget is spent. The caller must log out. */
   | { readonly outcome: "exhausted" }
   /**
-   * The attempt could not be written down, so it was not judged at all. The
-   * caller must log out: see the note on failing closed below.
+   * The attempt could not be written down, so it was not judged at all: nothing
+   * was compared and the entry gave nothing away. The caller keeps the keypad
+   * and invites a retry.
    */
   | { readonly outcome: "unrecorded" }
   /**
@@ -156,11 +157,11 @@ export const verifyPin = async (
   const isRecorded = await KeyStoreWrapper.setPinFailureState(recordedState)
 
   if (!isRecorded) {
-    /** Fail closed, and without comparing. An entry judged with nothing
-     *  written down is a free guess for as long as the store refuses writes,
-     *  and a lockout held only in memory dies with the process, so a disabled
-     *  keypad would be bypassed by force-quitting. Ending the session is the
-     *  refusal that does not rest on the write that just failed. */
+    /** Fail closed by not comparing. An entry judged with nothing written down
+     *  would be a free guess for as long as the store refuses writes, so none is
+     *  judged, and an entry nobody compared tells a guesser nothing. Ending the
+     *  session over it would only cost the owner, who may have typed the right
+     *  PIN, so the keypad stays and a retry is invited. */
     recordAppError(new Error("PIN attempt could not be persisted"), {
       alwaysRecord: true,
       dedupKey: PinErrorKey.AttemptsWrite,

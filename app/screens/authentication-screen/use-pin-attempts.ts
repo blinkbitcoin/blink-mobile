@@ -13,7 +13,9 @@ type UsePinAttemptsParams = {
   /** The entry did not open the lock and the keypad stays up; clear the entered digits. */
   readonly onRejected: () => void
   readonly onExhausted: () => void | Promise<void>
-  readonly onUnrecorded: () => void | Promise<void>
+  /** The attempt could not be written down, so nothing was compared and no
+   *  budget was spent; invite a retry. */
+  readonly onUnrecorded: () => void
   /** The stored PIN could not be read; no budget was spent, so invite a retry. */
   readonly onUnreadable: () => void
 }
@@ -160,7 +162,11 @@ export const usePinAttempts = ({
             onUnreadable()
             return
           case "unrecorded":
-            await onUnrecorded()
+            /** Nothing was compared, so the entry gave nothing away: the keypad
+             *  is handed back, as for an unreadable PIN, and a retry is what
+             *  recovers once the store takes writes again. */
+            setIsVerifying(false)
+            onUnrecorded()
         }
       })
     },
