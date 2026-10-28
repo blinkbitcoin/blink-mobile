@@ -4,17 +4,25 @@ import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { type DeleteAccountOutcome } from "@app/self-custodial/hooks/use-delete-account"
 
+/**
+ * Where a self-custodial delete lands, in one place for every screen that deletes.
+ *
+ * Both ends of the session go through the shared logout route, which owns the lock flag: a
+ * lock the wipe could not take is owed an answer and returns to the gate, and one the wipe
+ * did take has to lower the flag with it, or a relock raised mid-delete would park every
+ * deep link behind a lock that no longer exists.
+ */
 export const navigateAfterAccountDelete = (
   navigation: NativeStackNavigationProp<RootStackParamList>,
+  routeAfterLogout: (isAppLockKept: boolean) => void,
   outcome: DeleteAccountOutcome,
 ): void => {
   switch (outcome) {
-    /** Neither end of the session is routed from here. This navigator cannot move the lock
-     *  flag, and both outcomes need it moved: one is owed an answer and has to keep it
-     *  raised, the other took the lock with it and has to lower it. The caller sends both
-     *  through the shared logout route, which owns that flag. */
     case "logged-out":
+      routeAfterLogout(false)
+      return
     case "logged-out-locked":
+      routeAfterLogout(true)
       return
     case "switched-to-self-custodial":
       navigation.navigate("Primary")
