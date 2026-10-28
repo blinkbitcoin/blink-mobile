@@ -140,7 +140,7 @@ export const usePinAttempts = ({
              *  again even when the state is the one already held, which is a
              *  countdown that ran out before a clock that then moved back. */
             setFailureState(result.state)
-            resyncCountdown()
+            resyncCountdown(result.state)
             setIsVerifying(false)
             onRejected()
             return

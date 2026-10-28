@@ -22,9 +22,11 @@ const secondsLeft = (lock: PinFailureState, now: number): number =>
 type LockoutCountdown = {
   readonly remainingSeconds: number
   readonly isLocked: boolean
-  /** Counts the same lock again from the clock as it reads now. For a caller
-   *  that learns the lock is still in force after this countdown ran out. */
-  readonly resync: () => void
+  /** Counts this lock again from the clock as it reads now. For a caller that
+   *  learns the lock is still in force after this countdown ran out. It is handed
+   *  the lock rather than reading the one this render holds, which is a render
+   *  behind the state the caller is setting beside the call. */
+  readonly resync: (lock: PinFailureState) => void
 }
 
 /**
@@ -100,10 +102,10 @@ export const useLockoutCountdown = (
     }
   }, [attempts, lockedUntil, resyncs])
 
-  const resync = useCallback(() => {
-    setRemainingSeconds(secondsLeft({ attempts, lockedUntil }, Date.now()))
+  const resync = useCallback((lock: PinFailureState) => {
+    setRemainingSeconds(secondsLeft(lock, Date.now()))
     setResyncs((count) => count + 1)
-  }, [attempts, lockedUntil])
+  }, [])
 
   return {
     remainingSeconds,

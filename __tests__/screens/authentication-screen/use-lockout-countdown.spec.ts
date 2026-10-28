@@ -227,10 +227,8 @@ describe("useLockoutCountdown", () => {
      *  about the lock changed, so only an explicit resync can start it counting. */
     const start = Date.now()
     const onLockedUntilRepaired = jest.fn()
-    const { result } = renderCountdown(
-      { attempts: 1, lockedUntil: start + 10 * SECOND_MS },
-      onLockedUntilRepaired,
-    )
+    const lock = { attempts: 1, lockedUntil: start + 10 * SECOND_MS }
+    const { result } = renderCountdown(lock, onLockedUntilRepaired)
     await advance(10 * SECOND_MS)
     expect(result.current.isLocked).toBe(false)
 
@@ -240,7 +238,7 @@ describe("useLockoutCountdown", () => {
     expect(result.current.isLocked).toBe(false)
 
     act(() => {
-      result.current.resync()
+      result.current.resync(lock)
     })
 
     expect(result.current.isLocked).toBe(true)
