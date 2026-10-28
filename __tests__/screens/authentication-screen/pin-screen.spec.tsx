@@ -602,8 +602,8 @@ describe("PinScreen", () => {
        *  rather than assume it is not. */
       expect(mockLogout).toHaveBeenCalledTimes(1)
       expect(mockLogout).toHaveBeenCalledWith()
-      /** Said without promising a logout: on a later round the session is already gone. */
-      expect(screen.getByText("Too many failed attempts.")).toBeTruthy()
+      /** This entry is the one that ends the session, so its farewell says so. */
+      expect(screen.getByText("Too many failed attempts. Logging out.")).toBeTruthy()
       /** The farewell stays on screen for a full second before the screen leaves. */
       await advance(999)
       expect(mockReturnToGate).not.toHaveBeenCalled()

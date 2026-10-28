@@ -2190,7 +2190,8 @@
     "setPin": "Postavite svoj PIN kod",
     "setPinFailedMatch": "Pinovi se ne podudaraju - postavite svoj PIN kod",
     "storePinFailed": "Nije moguće pohraniti vaš PIN.",
-    "tooManyAttempts": "Previše neuspjelih pokušaja.",
+    "tooManyAttempts": "Previše neuspjelih pokušaja. Odjava.",
+    "attemptBudgetSpent": "Previše neuspjelih pokušaja.",
     "tryAgainIn": "Pokušajte ponovno za {time: string}.",
     "verifyPin": "Potvrdite svoj PIN kod"
   },

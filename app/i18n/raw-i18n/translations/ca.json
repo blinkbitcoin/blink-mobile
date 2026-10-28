@@ -2190,7 +2190,8 @@
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
     "storePinFailed": "No es pot desar el teu pin.",
-    "tooManyAttempts": "Massa intents fallits.",
+    "tooManyAttempts": "Massa intents fallits. Tancant la sessió.",
+    "attemptBudgetSpent": "Massa intents fallits.",
     "tryAgainIn": "Torna-ho a provar d'aquí a {time: string}.",
     "verifyPin": "Verifica el teu codi PIN"
   },

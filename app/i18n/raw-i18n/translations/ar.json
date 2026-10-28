@@ -2190,7 +2190,8 @@
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
     "storePinFailed": "غير قادر على تخزين ال PIN الخاص بك.",
-    "tooManyAttempts": "الكثير من المحاولات الفاشلة.",
+    "tooManyAttempts": "الكثير من المحاولات الفاشلة. \nيتم تسجيل الخروج.",
+    "attemptBudgetSpent": "الكثير من المحاولات الفاشلة.",
     "tryAgainIn": "حاول مرة أخرى بعد {time: string}.",
     "verifyPin": "تحقق من رمز PIN الخاص بك"
   },

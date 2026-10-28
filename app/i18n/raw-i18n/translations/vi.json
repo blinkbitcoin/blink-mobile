@@ -2190,7 +2190,8 @@
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",
-    "tooManyAttempts": "Quá nhiều lần thử không thành công.",
+    "tooManyAttempts": "Quá nhiều lần thử không thành công. Đang đăng xuất.",
+    "attemptBudgetSpent": "Quá nhiều lần thử không thành công.",
     "tryAgainIn": "Thử lại sau {time: string}.",
     "verifyPin": "Xác minh mã PIN của bạn"
   },

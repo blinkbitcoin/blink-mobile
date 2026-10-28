@@ -2190,7 +2190,8 @@
     "setPin": "Սահմանել PIN ծածկագիր",
     "setPinFailedMatch": "Pin ծածկագրերը չեն համընկնում - Կարգավորել PIN ծածկագիրը",
     "storePinFailed": "Չհաջողվեց պահպանել Ձեր pin-ը։ ",
-    "tooManyAttempts": "Չափից շատ անհաջող փորձեր։",
+    "tooManyAttempts": "Չափից շատ անհաջող փորձեր։ Ելք համակարգից։ ",
+    "attemptBudgetSpent": "Չափից շատ անհաջող փորձեր։",
     "tryAgainIn": "Կրկին փորձեք {time: string} հետո։",
     "verifyPin": "Հաստատեք Ձեր PIN ծածկագիրը"
   },

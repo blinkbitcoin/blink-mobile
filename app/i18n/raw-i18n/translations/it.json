@@ -2190,7 +2190,8 @@
         "setPin": "Imposta il tuo codice PIN",
         "setPinFailedMatch": "I PIN non corrispondono - Imposta il tuo PIN",
         "storePinFailed": "Non è possibile salvare il tuo PIN.",
-        "tooManyAttempts": "Troppi tentativi falliti.",
+        "tooManyAttempts": "Troppi tentativi falliti. Eseguo log out.",
+        "attemptBudgetSpent": "Troppi tentativi falliti.",
         "tryAgainIn": "Riprova tra {time: string}.",
         "verifyPin": "Verifica il tuo PIN"
     },

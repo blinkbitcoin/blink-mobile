@@ -2190,7 +2190,8 @@
     "setPin": "PIN kodunu ayarla",
     "setPinFailedMatch": "Pin kodu eşleşmedi - PIN kodunu ayarla",
     "storePinFailed": "Pin'in kaydedilemedi.",
-    "tooManyAttempts": "Çok fazla başarısız deneme.",
+    "tooManyAttempts": "Çok fazla başarısız deneme. Çıkış yapılıyor.",
+    "attemptBudgetSpent": "Çok fazla başarısız deneme.",
     "tryAgainIn": "{time: string} sonra tekrar deneyin.",
     "verifyPin": "PIN kodunu onayla"
   },

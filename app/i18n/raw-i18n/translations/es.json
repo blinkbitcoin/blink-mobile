@@ -2190,7 +2190,8 @@
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
         "storePinFailed": "No se puede guardar su PIN.",
-        "tooManyAttempts": "Ha superado el límite de intentos.",
+        "tooManyAttempts": "Ha superado el límite de intentos. Cerrando sesión.",
+        "attemptBudgetSpent": "Ha superado el límite de intentos.",
         "tryAgainIn": "Inténtelo de nuevo en {time: string}.",
         "verifyPin": "Verifique su PIN"
     },

@@ -2190,7 +2190,8 @@
         "setPin": "Définissez votre code NIP",
         "setPinFailedMatch": "Les NIP ne correspondent pas - Corrigez votre code NIP",
         "storePinFailed": "Impossible d’enregistrer votre NIP.",
-        "tooManyAttempts": "Trop de tentatives infructeuses.",
+        "tooManyAttempts": "Trop de tentatives infructeuses. Déconnexion.",
+        "attemptBudgetSpent": "Trop de tentatives infructeuses.",
         "tryAgainIn": "Réessayez dans {time: string}.",
         "verifyPin": "Validez votre code NIP"
     },

@@ -2193,6 +2193,7 @@ const en: BaseTranslation = {
       "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account",
   },
   PinScreen: {
+    attemptBudgetSpent: "Too many failed attempts.",
     attemptUnrecorded: "Couldn't record the attempt securely.",
     attemptsLeft: "{attemptsRemaining: number} attempts remaining.",
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
@@ -2203,7 +2204,7 @@ const en: BaseTranslation = {
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
-    tooManyAttempts: "Too many failed attempts.",
+    tooManyAttempts: "Too many failed attempts. Logging out.",
     tryAgainIn: "Try again in {time: string}.",
     verifyPin: "Verify your PIN code",
   },

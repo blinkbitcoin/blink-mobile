@@ -2190,7 +2190,8 @@
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",
     "storePinFailed": "Ñuqa PIN kodiyan kawsayninkuqa mana kani.",
-    "tooManyAttempts": "Rantiq kawsayninkuqa hukllaqmi.",
+    "tooManyAttempts": "Rantiq kawsayninkuqa hukllaqmi. Chiqanichu.",
+    "attemptBudgetSpent": "Rantiq kawsayninkuqa hukllaqmi.",
     "tryAgainIn": "Wakmanta ruwaykuy {time: string} qhipata.",
     "verifyPin": "PIN qillqinmi qhipanichu"
   },

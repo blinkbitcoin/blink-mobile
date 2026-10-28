@@ -2190,7 +2190,8 @@
     "setPin": "Állítsd be a PIN kódodat",
     "setPinFailedMatch": "A PIN kódok nem egyeznek - Állítsd be a PIN kódodat",
     "storePinFailed": "Nem sikerült tárolni a PIN kódodat.",
-    "tooManyAttempts": "Túl sok sikertelen próbálkozás.",
+    "tooManyAttempts": "Túl sok sikertelen próbálkozás. Kijelentkezés.",
+    "attemptBudgetSpent": "Túl sok sikertelen próbálkozás.",
     "tryAgainIn": "Próbálja újra {time: string} múlva.",
     "verifyPin": "Ellenőrizd a PIN kódodat"
   },

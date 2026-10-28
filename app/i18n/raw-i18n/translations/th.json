@@ -2190,7 +2190,8 @@
     "setPin": "ตั้งค่าพินโค้ด",
     "setPinFailedMatch": "พินไม่ตรงกัน - ตั้งค่าพินโค้ดอีกครั้ง",
     "storePinFailed": "ไม่สามารถเก็บพินได้",
-    "tooManyAttempts": "คุณใส่ผิดมากเกินไป",
+    "tooManyAttempts": "คุณใส่ผิดมากเกินไป ทำการออกจากระบบ",
+    "attemptBudgetSpent": "คุณใส่ผิดมากเกินไป",
     "tryAgainIn": "ลองอีกครั้งใน {time: string}",
     "verifyPin": "ยืนยันพินโค้ด"
   },

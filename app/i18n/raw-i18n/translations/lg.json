@@ -2190,7 +2190,8 @@
     "setPin": "Kola PIN yo",
     "setPinFailedMatch": "Pins tezikwatagana - Kola PIN yo",
     "storePinFailed": "Tetusobodde kutereka pin yo",
-    "tooManyAttempts": "Okugezaako okungi ennyo okulemeredwa.",
+    "tooManyAttempts": "Okugezaako okungi ennyo okulemeredwa. Logging out.",
+    "attemptBudgetSpent": "Okugezaako okungi ennyo okulemeredwa.",
     "tryAgainIn": "Gezaako nate mu {time: string}.",
     "verifyPin": "Kakasa pini koodi yo"
   },

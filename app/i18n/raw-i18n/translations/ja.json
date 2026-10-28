@@ -2190,7 +2190,8 @@
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
         "storePinFailed": "PINコードを保存できません。",
-        "tooManyAttempts": "間違えられる上限を超えました。",
+        "tooManyAttempts": "間違えられる上限を超えましたので、自動ログアウトしました。",
+        "attemptBudgetSpent": "間違えられる上限を超えました。",
         "tryAgainIn": "{time: string}後にもう一度お試しください。",
         "verifyPin": "PINコードを認証する"
     },

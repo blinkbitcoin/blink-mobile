@@ -295,8 +295,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     if (attemptsRemaining === null) return helperText
     /** A spent budget has no number left to show. It is what the keypad comes
      *  back with when the lock outlives the logout, where a wrong entry no
-     *  longer costs a session but a longer wait. */
-    if (attemptsRemaining === 0) return LL.PinScreen.tooManyAttempts()
+     *  longer costs a session but a longer wait, so it says nothing of a logout:
+     *  that is the farewell's to say, on the entry that spends the budget. */
+    if (attemptsRemaining === 0) return LL.PinScreen.attemptBudgetSpent()
 
     const isLastAttempt = attemptsRemaining === 1
     /** "Incorrect PIN" is said only of an entry made on this screen. A count the

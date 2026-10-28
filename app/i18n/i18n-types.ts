@@ -6813,6 +6813,10 @@ type RootTranslation = {
 	}
 	PinScreen: {
 		/**
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.
+		 */
+		attemptBudgetSpent: string
+		/**
 		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.
 		 */
 		attemptUnrecorded: string
@@ -6855,7 +6859,7 @@ type RootTranslation = {
 		 */
 		storePinFailed: string
 		/**
-		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
 		 */
 		tooManyAttempts: string
 		/**
@@ -21049,6 +21053,10 @@ export type TranslationFunctions = {
 	}
 	PinScreen: {
 		/**
+		 * Too many failed attempts.
+		 */
+		attemptBudgetSpent: () => LocalizedString
+		/**
 		 * Couldn't record the attempt securely.
 		 */
 		attemptUnrecorded: () => LocalizedString
@@ -21089,7 +21097,7 @@ export type TranslationFunctions = {
 		 */
 		storePinFailed: () => LocalizedString
 		/**
-		 * Too many failed attempts.
+		 * Too many failed attempts. Logging out.
 		 */
 		tooManyAttempts: () => LocalizedString
 		/**

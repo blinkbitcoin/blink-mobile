@@ -2190,7 +2190,8 @@
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
         "storePinFailed": "Não foi possível armazenar seu pin.",
-        "tooManyAttempts": "Muitas tentativas falharam.",
+        "tooManyAttempts": "Muitas tentativas falharam. Saindo.",
+        "attemptBudgetSpent": "Muitas tentativas falharam.",
         "tryAgainIn": "Tente novamente em {time: string}.",
         "verifyPin": "Verifique seu código PIN"
     },

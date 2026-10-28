@@ -2190,7 +2190,8 @@
     "setPin": "Stel jou PIN-kode in",
     "setPinFailedMatch": "PINs stem nie ooreen nie - Stel jou PIN-kode in",
     "storePinFailed": "Kan nie nou jou PIN stoor nie.",
-    "tooManyAttempts": "Te veel verkeerde probeerslae.",
+    "tooManyAttempts": "Te veel verkeerde probeerslae. Teken uit. ",
+    "attemptBudgetSpent": "Te veel verkeerde probeerslae.",
     "tryAgainIn": "Probeer weer oor {time: string}.",
     "verifyPin": "Bevestig jou PIN-kode"
   },

@@ -2190,7 +2190,8 @@
     "setPin": "Nastavenie PIN kódu",
     "setPinFailedMatch": "PINy sa nezhodujú - nastavte svoj PIN kód",
     "storePinFailed": "Nepodarilo sa uložiť váš PIN.",
-    "tooManyAttempts": "Príliš veľa neúspešných pokusov.",
+    "tooManyAttempts": "Príliš veľa neúspešných pokusov. Odhlásenie.",
+    "attemptBudgetSpent": "Príliš veľa neúspešných pokusov.",
     "tryAgainIn": "Skúste to znova o {time: string}.",
     "verifyPin": "Overte svoj PIN kód"
   },

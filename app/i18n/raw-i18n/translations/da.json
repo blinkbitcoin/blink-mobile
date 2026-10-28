@@ -2190,7 +2190,8 @@
     "setPin": "Vælg din PIN-kode.",
     "setPinFailedMatch": "PIN-koderne matcher ikke - Vælg din PIN-kode.",
     "storePinFailed": "Kunne ikke gemme din PIN-kode",
-    "tooManyAttempts": "For mange fejlede forsøg.",
+    "tooManyAttempts": "For mange fejlede forsøg. Logger ud.",
+    "attemptBudgetSpent": "For mange fejlede forsøg.",
     "tryAgainIn": "Prøv igen om {time: string}.",
     "verifyPin": "Bekræft din PIN-kode"
   },

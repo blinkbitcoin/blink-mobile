@@ -2190,7 +2190,8 @@
     "setPin": "Tetapkan kod PIN anda",
     "setPinFailedMatch": "Pin tak sama - Tetapkan kod PIN anda",
     "storePinFailed": "Tak boleh nak simpan kod pin anda.",
-    "tooManyAttempts": "Terlalu banyak percubaan yang gagal.",
+    "tooManyAttempts": "Terlalu banyak percubaan yang gagal. Daftar keluar sekarang",
+    "attemptBudgetSpent": "Terlalu banyak percubaan yang gagal.",
     "tryAgainIn": "Cuba lagi dalam {time: string}.",
     "verifyPin": "Sahkan kod PIN anda"
   },

@@ -2190,7 +2190,8 @@
     "setPin": "Stel uw PIN code in",
     "setPinFailedMatch": "Pincodes komen niet overeen - Stel uw pincode in",
     "storePinFailed": "Kan je pincode niet opslaan.",
-    "tooManyAttempts": "Teveel mislukte pogingen.",
+    "tooManyAttempts": "Teveel mislukte pogingen. Uitloggen.",
+    "attemptBudgetSpent": "Teveel mislukte pogingen.",
     "tryAgainIn": "Probeer het over {time: string} opnieuw.",
     "verifyPin": "Verifieer uw pincode"
   },

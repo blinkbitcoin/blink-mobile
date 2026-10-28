@@ -2190,7 +2190,8 @@
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",
     "storePinFailed": "Imeshindwa kuhifadhi pini yako.",
-    "tooManyAttempts": "Majaribio mengi sana yaliyokosa.",
+    "tooManyAttempts": "Majaribio mengi sana yaliyokosa. Kutoka nje ya programu.",
+    "attemptBudgetSpent": "Majaribio mengi sana yaliyokosa.",
     "tryAgainIn": "Jaribu tena baada ya {time: string}.",
     "verifyPin": "Thibitisha nambari yako ya pini"
   },

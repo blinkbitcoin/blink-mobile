@@ -2190,7 +2190,8 @@
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",
     "storePinFailed": "Nu se poate stoca codul PIN.",
-    "tooManyAttempts": "Prea multe încercări eșuate.",
+    "tooManyAttempts": "Prea multe încercări eșuate. Deconectare.",
+    "attemptBudgetSpent": "Prea multe încercări eșuate.",
     "tryAgainIn": "Încercați din nou în {time: string}.",
     "verifyPin": "Verificați codul PIN"
   },

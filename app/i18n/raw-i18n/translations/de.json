@@ -2190,7 +2190,8 @@
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
         "storePinFailed": "Dein PIN Code konnte nicht gespeichert werden.",
-        "tooManyAttempts": "Zu viele Fehlversuche.",
+        "tooManyAttempts": "Zu viele Fehlversuche. Du wirst nun ausgeloggt.",
+        "attemptBudgetSpent": "Zu viele Fehlversuche.",
         "tryAgainIn": "Versuche es in {time: string} erneut.",
         "verifyPin": "Bestätige deinen PIN Code"
     },

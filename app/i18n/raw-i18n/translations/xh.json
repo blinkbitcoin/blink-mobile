@@ -2190,7 +2190,8 @@
     "setPin": "Seta ikhowudi yakho ye-PIN",
     "setPinFailedMatch": "Pin azihambelani  - Seta ikhowudi yakho ye-PIN",
     "storePinFailed": "Ayikwazanga ukugcina iphini yakho.",
-    "tooManyAttempts": "Mininzi kakhulu imizamo engaphumeleliyo.",
+    "tooManyAttempts": "Mininzi kakhulu imizamo engaphumeleliyo. Ukuloga ngaphandle.",
+    "attemptBudgetSpent": "Mininzi kakhulu imizamo engaphumeleliyo.",
     "tryAgainIn": "Zama kwakhona emva kwe-{time: string}.",
     "verifyPin": "Qinisekisa ikhowudi yakho ye-PIN"
   },
