@@ -5,6 +5,7 @@ import crashlytics from "@react-native-firebase/crashlytics"
 import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { canDropAppLock } from "@app/hooks/use-logout"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
@@ -145,39 +146,20 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         await reloadSelfCustodialAccounts()
 
         /**
-         * The same rule a full logout applies, for the one deletion that ends like one: a
-         * lock is kept for as long as the device still stores something it guards, and with
-         * the last wallet gone there is nothing left behind it. A lock with nothing behind
-         * it only locks its owner out, and since every launch now opens at the gate it
-         * would ask on each one before landing on the screen it was always going to land on.
+         * Deleting the last account ends like a full logout, so the lock follows the same
+         * rule (`canDropAppLock`): it goes once nothing it guards is left. Each question is
+         * answered by the store that holds the thing, and each fails closed:
          *
-         * Four questions, each answered by the store that actually holds the thing, and
-         * each failing closed:
+         * - The deleted wallet counts as gone only if its erase said so. Its index entry
+         *   goes either way, and a read-back cannot tell an absent key from an unreadable
+         *   one on either platform.
+         * - The active token is read from the keychain, not the in-memory mirror, which
+         *   `clearToken` and `resetState` blank whatever the keychain did.
+         * - The saved profiles are asked on their own: a logout that preserved them leaves
+         *   live bearer tokens with no active one.
          *
-         * The wallet this call just deleted counts only if its erase said so. The index
-         * entry is removed either way, so an erase that failed would otherwise leave the
-         * mnemonic on the device with the index reporting nothing stored.
-         *
-         * Reading the slot back is not the answer: that read collapses "absent" and
-         * "unreadable" into null on both platforms, so a seed whose erase and read both
-         * failed would score as gone. The cost of asking for the erase itself is that a
-         * wallet whose key was already missing keeps the lock, which is friction rather
-         * than exposure.
-         *
-         * The active token is read from the keychain, never from the in-memory mirror. That
-         * field is blanked by `clearToken` and by `resetState` whatever the keychain did, so
-         * a logout whose keychain erase failed, the one case where the logout deliberately
-         * keeps the lock, would read as no token at all.
-         *
-         * The saved profiles are asked separately: a logout that preserved stored
-         * credentials leaves the token gone with live bearer tokens still beside it, and the
-         * landing screen this deletion ends on offers them.
-         *
-         * Known limit: on iOS a legacy-store read cannot tell a missing key from a failed
-         * one, so `absent` is weaker there than on Android. It narrows to devices whose
-         * slots have not migrated yet, since the Keychain-backed store does separate the
-         * two, and it is the same degradation every other reader of these slots already
-         * accepts.
+         * Known limit: an unmigrated iOS legacy slot cannot tell a missing key from a
+         * failed read, so `absent` is weaker there, as it is for every reader of it.
          */
         const isLastAccountGone = !remainingSelfCustodial && !hasCustodialAccount
         let isAppLockKept = true
@@ -195,8 +177,11 @@ export const useDeleteAccount = (): DeleteAccountResult => {
             savedSessions.status === "absent" ||
             (savedSessions.status === "found" && savedSessions.profiles.length === 0)
 
-          const hasNothingLeftToGuard =
-            isMnemonicErased && hasNoStoredWallet && hasNoActiveToken && hasNoSavedSession
+          const hasNothingLeftToGuard = canDropAppLock({
+            hasNoStoredWallet: isMnemonicErased && hasNoStoredWallet,
+            hasNoSavedSession,
+            hasNoActiveToken,
+          })
 
           if (hasNothingLeftToGuard) {
             /** A slot that would not erase leaves the lock half gone, which routes every

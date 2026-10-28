@@ -67,6 +67,25 @@ const isAppLockStillOwed = async (): Promise<boolean> => {
   return presence !== StoredWalletPresence.Absent
 }
 
+/** What the app lock guards, each answered fail-closed by the store that holds it. */
+export type AppLockGuardedState = {
+  readonly hasNoStoredWallet: boolean
+  readonly hasNoSavedSession: boolean
+  readonly hasNoActiveToken: boolean
+}
+
+/**
+ * The one rule for when the app lock may go: once nothing it guards is left on the device.
+ * Each caller brings the evidence it has, a logout what its own erasures reported and a
+ * delete what it reads back of the stores it did not erase, but the rule is this one.
+ */
+export const canDropAppLock = ({
+  hasNoStoredWallet,
+  hasNoSavedSession,
+  hasNoActiveToken,
+}: AppLockGuardedState): boolean =>
+  hasNoStoredWallet && hasNoSavedSession && hasNoActiveToken
+
 gql`
   mutation userLogout($input: UserLogoutInput!) {
     userLogout(input: $input) {
@@ -147,7 +166,11 @@ const useLogout = () => {
            *  The lock goes as one thing, which `clearAppLock` owns beside the
            *  slots: every caller that may erase it has to erase the same three,
            *  and a second copy of that list is a second chance to miss one. */
-          const canDropLock = !isLockOwed && areSavedSessionsErased && isActiveTokenErased
+          const canDropLock = canDropAppLock({
+            hasNoStoredWallet: !isLockOwed,
+            hasNoSavedSession: areSavedSessionsErased,
+            hasNoActiveToken: isActiveTokenErased,
+          })
           if (canDropLock) {
             /** Gone only when every slot says so: one that could not be erased
              *  is a lock that is still set. */

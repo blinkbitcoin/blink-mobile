@@ -1,6 +1,6 @@
 import { renderHook } from "@testing-library/react-native"
 
-import useLogout from "@app/hooks/use-logout"
+import useLogout, { canDropAppLock } from "@app/hooks/use-logout"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 const mockReadStoredWalletPresence = jest.fn()
@@ -399,6 +399,30 @@ describe("useLogout", () => {
       expect(mockReadStoredWalletPresence).not.toHaveBeenCalled()
       expect(mockedStore.removePin).not.toHaveBeenCalled()
       expect(result).toEqual({ isAppLockKept: true })
+    })
+  })
+})
+
+describe("canDropAppLock", () => {
+  const nothingLeft = {
+    hasNoStoredWallet: true,
+    hasNoSavedSession: true,
+    hasNoActiveToken: true,
+  }
+
+  it("lets the lock go once nothing it guards is left", () => {
+    expect(canDropAppLock(nothingLeft)).toBe(true)
+  })
+
+  /** Each one alone is something a dropped lock would leave with nothing in front of it. */
+  const leftBehindCases: ReadonlyArray<[string, Partial<typeof nothingLeft>]> = [
+    ["a stored wallet", { hasNoStoredWallet: false }],
+    ["a saved session", { hasNoSavedSession: false }],
+    ["the active token", { hasNoActiveToken: false }],
+  ]
+  leftBehindCases.forEach(([what, leftBehind]) => {
+    it(`keeps the lock while ${what} is left`, () => {
+      expect(canDropAppLock({ ...nothingLeft, ...leftBehind })).toBe(false)
     })
   })
 })
