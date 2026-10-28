@@ -28,7 +28,19 @@ first: the row follows the active account.
 - With the app open and idle the log grows by about 0.7 MB an hour (measured on
   0.26.1 and 0.27.1); it does not grow while the app is in the background. Two files hold
   roughly the last five hours of foreground use.
-- Deleting the last self-custodial wallet deletes both directories.
+- Deleting the last self-custodial wallet removes the logs with it. The SDK holds
+  `sdk.log` open for the rest of the process and can't reopen it, so when the logger is
+  running the file is cut off rather than removed:
+  - the export folder and `sdk.log.1` go at once;
+  - `sdk.log.purge` records where the deleted wallet's lines end, and no export reads
+    before that point or reads `sdk.log.1` again;
+  - a wallet restored or created in the same session keeps logging, and its lines
+    export at once;
+  - the next launch removes the deleted lines, keeping only what came after the cut,
+    before the logger opens the file again.
+
+  `app/self-custodial/diagnostics/sdk-log-files.ts` owns this whole lifecycle;
+  `__tests__/self-custodial/diagnostics/log-lifecycle.spec.ts` runs it end to end.
 - Every self-custodial wallet in the process writes to the same `sdk.log`, and lines
   do not say which wallet emitted them.
 - An SDK that rejects its config writes nothing: `connect` validates before it logs a

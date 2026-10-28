@@ -3,6 +3,8 @@ const mockDirs = new Set<string>()
 type ReadArgs = [path: string, length: number, position: number, encoding: string]
 const mockRead = jest.fn(async (...[path, length, position, encoding]: ReadArgs) => {
   if (encoding !== "base64") throw new Error("utf8 reads throw on a split character")
+  // Android's RNFS allocates `new byte[length]`, so a negative length rejects
+  if (length < 0) throw new Error("NegativeArraySizeException")
   const file = mockFiles.get(path)
   if (!file) throw new Error(`${path} does not exist`)
   return file.subarray(position, position + length).toString("base64")
@@ -40,6 +42,14 @@ jest.mock("@app/self-custodial/config", () => ({
 
 jest.mock("@app/self-custodial/logging", () => ({ recordErrorOnce: jest.fn() }))
 
+/** Where the last wallet's deletion cut `sdk.log` off; undefined when nothing was deleted. */
+let mockDeletedThroughByte: number | undefined
+jest.mock("@app/self-custodial/diagnostics/sdk-log-files", () => ({
+  SDK_LOG_FILE: "sdk.log",
+  SDK_LOG_FILE_PREVIOUS: "sdk.log.1",
+  readSdkLogDeletedThroughByte: async () => mockDeletedThroughByte,
+}))
+
 import { exportSdkLogs } from "@app/self-custodial/diagnostics/export-sdk-logs"
 
 const LOG_DIR = "/caches/breez-sdk-logs"
@@ -56,6 +66,7 @@ describe("exportSdkLogs", () => {
     jest.clearAllMocks()
     mockFiles.clear()
     mockDirs.clear()
+    mockDeletedThroughByte = undefined
   })
 
   it("returns null and writes nothing when the SDK has not logged yet", async () => {
@@ -163,5 +174,70 @@ describe("exportSdkLogs", () => {
     const path = await exportSdkLogs("h\n", NOW)
 
     expect(exportedText(path)).toContain(`preimage: Some("<redacted>")`)
+  })
+
+  describe("after the last wallet was deleted in a running process", () => {
+    const DELETED = "wallet A paid alice@blink.sv\n"
+
+    it("reads only what sdk.log gained since, from its first line", async () => {
+      writeLog(CURRENT, `${DELETED}wallet B line\n`)
+      mockDeletedThroughByte = Buffer.byteLength(DELETED)
+
+      const path = await exportSdkLogs("h\n", NOW)
+
+      expect(exportedText(path)).toBe("h\n\n--- sdk.log ---\nwallet B line\n")
+    })
+
+    it("never reads sdk.log.1, even when it could not be removed", async () => {
+      writeLog(PREVIOUS, "wallet A older\n")
+      writeLog(CURRENT, `${DELETED}wallet B line\n`)
+      mockDeletedThroughByte = Buffer.byteLength(DELETED)
+
+      const path = await exportSdkLogs("h\n", NOW)
+
+      expect(exportedText(path)).not.toContain("wallet A")
+      expect(mockRead).not.toHaveBeenCalledWith(
+        PREVIOUS,
+        expect.anything(),
+        expect.anything(),
+        expect.anything(),
+      )
+    })
+
+    it("returns null while nothing has been written since", async () => {
+      writeLog(CURRENT, DELETED)
+      mockDeletedThroughByte = Buffer.byteLength(DELETED)
+
+      await expect(exportSdkLogs("h\n", NOW)).resolves.toBeNull()
+    })
+
+    it("keeps to the cap within what came after the cut", async () => {
+      const after = Array.from({ length: 30 }, (_, i) => `line ${i}\n`).join("")
+      writeLog(CURRENT, `${DELETED}${after}`)
+      mockDeletedThroughByte = Buffer.byteLength(DELETED)
+
+      const body = exportedText(await exportSdkLogs("h\n", NOW)).split(
+        "--- sdk.log ---\n",
+      )[1]
+
+      expect(body).not.toContain("wallet A")
+      expect(body.startsWith("line ")).toBe(true)
+      expect(body.endsWith("line 29\n")).toBe(true)
+      expect(Buffer.byteLength(body)).toBeLessThanOrEqual(CAP)
+    })
+
+    it("returns null, without a negative read, when sdk.log is shorter than the cut", async () => {
+      writeLog(CURRENT, "short\n")
+      mockDeletedThroughByte = Buffer.byteLength(DELETED)
+
+      await expect(exportSdkLogs("h\n", NOW)).resolves.toBeNull()
+    })
+
+    it("exports nothing when the cut is unreadable", async () => {
+      writeLog(CURRENT, `${DELETED}wallet B line\n`)
+      mockDeletedThroughByte = Number.POSITIVE_INFINITY
+
+      await expect(exportSdkLogs("h\n", NOW)).resolves.toBeNull()
+    })
   })
 })
