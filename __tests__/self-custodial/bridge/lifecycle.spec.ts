@@ -41,7 +41,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
-  MaxFee: {
+  MaxFee: { create: (p: Record<string, unknown>) => p },
+  MaxOnchainFee: {
     NetworkRecommended: jest
       .fn()
       .mockImplementation((inner: unknown) => ({ tag: "NetworkRecommended", inner })),
@@ -152,12 +153,28 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 1n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 1n },
+            },
           },
         }),
       }),
     )
+  })
+
+  it("routes the SDK through no proxy, matching the status call", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).toHaveProperty("proxy", undefined)
   })
 
   it("uses the provided leeway for the deposit claim fee cap", async () => {
@@ -174,8 +191,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 3n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 3n },
+            },
           },
         }),
       }),
@@ -196,8 +215,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 2n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 2n },
+            },
           },
         }),
       }),
@@ -218,8 +239,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 0n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 0n },
+            },
           },
         }),
       }),

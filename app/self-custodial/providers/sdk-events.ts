@@ -7,6 +7,9 @@ export const REFRESH_EVENTS = new Set([
   SdkEventTags.ClaimedDeposits,
   SdkEventTags.UnclaimedDeposits,
   SdkEventTags.NewDeposits,
+  /** 0.26: details that land after the payment itself, such as a sender's LNURL comment,
+   *  rewrite a payment already in the history. */
+  SdkEventTags.PaymentMetadataUpdated,
 ])
 
 export const PAYMENT_RECEIVED_EVENTS = new Set([

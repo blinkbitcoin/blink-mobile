@@ -390,11 +390,12 @@ export const HomeScreen: React.FC = () => {
     deposits,
   })
   /** The banner below only counts actionable deposits, so the pending row
-   *  carries the immature deposits' inspection path (txid / mempool link) to
-   *  the unclaimed-deposits screen. Custodial pending receives have no such
-   *  screen — their row stays inert. */
+   *  carries the immature and claiming deposits' inspection path (txid /
+   *  mempool link) to the unclaimed-deposits screen. Custodial pending
+   *  receives have no such screen — their row stays inert. */
   const hasImmatureDeposits = deposits.some(
-    ({ status }) => status === DepositStatus.Immature,
+    ({ status }) =>
+      status === DepositStatus.Immature || status === DepositStatus.Claiming,
   )
   const openUnclaimedDeposits = React.useCallback(
     () => navigation.navigate("unclaimedDepositsScreen"),

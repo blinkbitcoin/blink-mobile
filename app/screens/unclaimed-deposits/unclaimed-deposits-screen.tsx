@@ -117,27 +117,34 @@ export const UnclaimedDepositsScreen: React.FC = () => {
                 <Text style={styles.mutedText}>{LL.UnclaimedDeposit.immature()}</Text>
               )}
 
-              {deposit.status !== DepositStatus.Immature && !isRefunding && (
-                <View style={styles.actions}>
-                  {isProcessing(deposit.id, DepositActionType.Claim) ? (
-                    <ActivityIndicator size="small" color={colors.primary} />
-                  ) : (
-                    <GaloyTertiaryButton
-                      title={LL.UnclaimedDeposit.claim()}
-                      onPress={() => handleClaim(deposit)}
-                      disabled={isClaimDisabled}
-                      {...testProps(`claim-${deposit.id}`)}
-                    />
-                  )}
-                  <GaloyTertiaryButton
-                    title={LL.UnclaimedDeposit.refund()}
-                    outline
-                    onPress={() => setRefundDepositId(deposit.id)}
-                    disabled={isBusy}
-                    {...testProps(`refund-toggle-${deposit.id}`)}
-                  />
-                </View>
+              {/** Claimed early: the provider has it, so neither claim nor refund applies. */}
+              {deposit.status === DepositStatus.Claiming && (
+                <Text style={styles.mutedText}>{LL.UnclaimedDeposit.claiming()}</Text>
               )}
+
+              {deposit.status !== DepositStatus.Immature &&
+                deposit.status !== DepositStatus.Claiming &&
+                !isRefunding && (
+                  <View style={styles.actions}>
+                    {isProcessing(deposit.id, DepositActionType.Claim) ? (
+                      <ActivityIndicator size="small" color={colors.primary} />
+                    ) : (
+                      <GaloyTertiaryButton
+                        title={LL.UnclaimedDeposit.claim()}
+                        onPress={() => handleClaim(deposit)}
+                        disabled={isClaimDisabled}
+                        {...testProps(`claim-${deposit.id}`)}
+                      />
+                    )}
+                    <GaloyTertiaryButton
+                      title={LL.UnclaimedDeposit.refund()}
+                      outline
+                      onPress={() => setRefundDepositId(deposit.id)}
+                      disabled={isBusy}
+                      {...testProps(`refund-toggle-${deposit.id}`)}
+                    />
+                  </View>
+                )}
 
               {isRefunding && (
                 <View style={styles.refundPanel}>
