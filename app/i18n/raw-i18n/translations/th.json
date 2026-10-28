@@ -2449,6 +2449,7 @@
     "apiDocumentation": "เอกสาร API",
     "apiDashboard": "การเข้าถึงและแดชบอร์ด API",
     "mode": "โหมด",
+    "modeNotSet": "Not set",
     "pos": "จุดขาย",
     "posCopied": "คัดลอกลิงก์จุดขายของคุณแล้ว",
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",

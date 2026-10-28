@@ -91,6 +91,7 @@ jest.mock("@app/self-custodial/storage/onchain-address", () => ({
 
 jest.mock("@app/utils/error-reporting", () => ({
   recordAppError: (...args: unknown[]) => mockRecordAppError(...args),
+  logBreadcrumb: jest.fn(),
 }))
 
 jest.mock("@app/self-custodial/providers/auto-convert-status", () => ({

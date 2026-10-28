@@ -19,10 +19,20 @@ export const useSelfCustodialRollback = ({
   accounts,
   setActiveAccountId,
 }: RollbackDeps): RollbackResult => {
-  const { nonCustodialEnabled, remoteConfigReady } = useFeatureFlags()
+  const { nonCustodialEnabled, remoteConfigReady, isNonCustodialFlagSettled } =
+    useFeatureFlags()
   const hasCustodialAccount = useHasCustodialAccount()
 
   useEffect(() => {
+    /**
+     * A value the console actually set that disables self-custody — from this launch's
+     * fetch, or activated by an earlier one when this one fails — never a default read as
+     * an answer. `remoteConfigReady` is set in a `finally` regardless of whether the fetch
+     * threw, and `nonCustodialEnabled` defaults to `false`, so gating on readiness alone
+     * bounced a self-custodial user to custodial on any network blip — and, downstream of
+     * that, turned full analytics collection on for someone who last chose incognito.
+     */
+    if (!isNonCustodialFlagSettled) return
     if (!remoteConfigReady) return
     if (nonCustodialEnabled) return
     if (activeAccount?.type !== AccountType.SelfCustodial) return
@@ -32,6 +42,7 @@ export const useSelfCustodialRollback = ({
 
     setActiveAccountId(fallback.id)
   }, [
+    isNonCustodialFlagSettled,
     remoteConfigReady,
     nonCustodialEnabled,
     activeAccount,
@@ -39,7 +50,8 @@ export const useSelfCustodialRollback = ({
     setActiveAccountId,
   ])
 
-  const isLockedOutOfSelfCustodial = remoteConfigReady && !nonCustodialEnabled
+  const isLockedOutOfSelfCustodial =
+    isNonCustodialFlagSettled && remoteConfigReady && !nonCustodialEnabled
 
   const shouldShowUnavailable =
     isLockedOutOfSelfCustodial &&

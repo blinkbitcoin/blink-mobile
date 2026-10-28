@@ -51,6 +51,9 @@ const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
 const NonCustodialEnabledKey = "nonCustodialEnabled"
 const StableBalanceEnabledKey = "stableBalanceEnabled"
+/** The rollout flag for self-custodial telemetry. Off by default; a failed fetch leaves
+ *  it off, which is why this one may ride Remote Config when the kill switch may not. */
+const TelemetryEnabledKey = "telemetryEnabled"
 const BtcMapPlacesEnabledKey = "btcMapPlacesEnabled"
 const AutoConvertMaxAttemptsKey = "autoConvertMaxAttempts"
 const AutoConvertPollMaxAttemptsKey = "autoConvertPollMaxAttempts"
@@ -91,6 +94,9 @@ type FeatureFlags = {
   deviceAccountEnabled: boolean
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
+  /** Self-custodial telemetry rollout. Off until the ramp turns it on. */
+  telemetryEnabled: boolean
+  /** The fetch has settled, either way. Gates rendering, not trust. */
   remoteConfigReady: boolean
   /** Whether `nonCustodialEnabled` is the console's: fetched on this launch, or
    *  activated on an earlier one and read before this launch's fetch settles. Off, it is
@@ -127,6 +133,7 @@ type RemoteConfig = {
   [BackupNudgeModalCooldownMsKey]: number
   [NonCustodialEnabledKey]: boolean
   [StableBalanceEnabledKey]: boolean
+  [TelemetryEnabledKey]: boolean
   [BtcMapPlacesEnabledKey]: boolean
   [AutoConvertMaxAttemptsKey]: number
   [AutoConvertPollMaxAttemptsKey]: number
@@ -263,6 +270,7 @@ export const defaultRemoteConfig: RemoteConfig = {
   backupNudgeModalCooldownMs: 24 * 60 * 60 * 1000,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  telemetryEnabled: false,
   /** Kill switch for the map's merchant data, which comes from BTC Map — a third
    *  party we do not control. If the feed starts serving something harmful or
    *  simply wrong, turning this off empties the map without an app release. */
@@ -306,6 +314,7 @@ const defaultFeatureFlags: FeatureFlags = {
   deviceAccountEnabled: false,
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
+  telemetryEnabled: false,
   remoteConfigReady: false,
   isNonCustodialFlagSettled: false,
 }
@@ -540,6 +549,11 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.stableBalanceEnabled,
   )
 
+  const telemetryEnabled = readBoolean(
+    TelemetryEnabledKey,
+    defaultRemoteConfig.telemetryEnabled,
+  )
+
   const btcMapPlacesEnabled = readBoolean(
     BtcMapPlacesEnabledKey,
     defaultRemoteConfig.btcMapPlacesEnabled,
@@ -666,6 +680,7 @@ const readRemoteConfig = (): RemoteConfig => {
     backupNudgeModalCooldownMs,
     nonCustodialEnabled,
     stableBalanceEnabled,
+    telemetryEnabled,
     btcMapPlacesEnabled,
     autoConvertMaxAttempts,
     autoConvertPollMaxAttempts,
@@ -763,6 +778,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
+    telemetryEnabled: remoteConfig.telemetryEnabled,
     remoteConfigReady,
     isNonCustodialFlagSettled,
   }

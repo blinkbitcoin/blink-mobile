@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API dokumentacija",
     "apiDashboard": "API pristup i nadzorna ploča",
     "mode": "Način",
+    "modeNotSet": "Not set",
     "pos": "Prodajno mjesto",
     "posCopied": "Vaša poveznica prodajnog mjesta je kopirana",
     "activated": "Aktivirano",

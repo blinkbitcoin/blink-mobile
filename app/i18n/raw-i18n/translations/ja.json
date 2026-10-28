@@ -2449,6 +2449,7 @@
         "apiDocumentation": "APIドキュメント",
         "apiDashboard": "APIアクセスとダッシュボード",
         "mode": "モード",
+        "modeNotSet": "Not set",
         "pos": "ポイント・オブ・セール",
         "posCopied": "ポイント・オブ・セールのリンクをコピーしました",
         "activated": "アクティベーション",

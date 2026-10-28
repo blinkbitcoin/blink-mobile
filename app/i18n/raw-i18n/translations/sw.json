@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Nyaraka za API",
     "apiDashboard": "Ufikiaji wa API na dashibodi",
     "mode": "Hali",
+    "modeNotSet": "Not set",
     "pos": "Sehemu ya Uuzaji",
     "posCopied": "Kiungo chako cha mauzo kimenakiliwa",
     "activated": "Imewezeshwa",

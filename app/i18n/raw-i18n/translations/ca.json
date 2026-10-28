@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Documentació de l'API",
     "apiDashboard": "Accés a l'API i tauler de control",
     "mode": "Mode",
+    "modeNotSet": "Not set",
     "pos": "Punt de venda",
     "posCopied": "S'ha copiat l'enllaç del teu punt de venda",
     "activated": "Activat",

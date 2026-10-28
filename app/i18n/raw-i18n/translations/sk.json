@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API dokumentácia",
     "apiDashboard": "API prístup a dashboard",
     "mode": "Režim",
+    "modeNotSet": "Not set",
     "pos": "Terminál PoS",
     "posCopied": "Váš Terminál PoS bol skopírovaný",
     "activated": "Aktivované",

@@ -15,7 +15,6 @@ import { SafeAreaProvider, initialWindowMetrics } from "react-native-safe-area-c
 import "react-native-url-polyfill/auto"
 
 import "@react-native-firebase/app"
-import "@react-native-firebase/crashlytics"
 
 import { GaloyThemeProvider } from "./components/galoy-theme-provider"
 import { GaloyToast } from "./components/galoy-toast"
@@ -27,12 +26,18 @@ import { TwoFactorEnforcementProvider } from "./custodial/providers/two-factor-e
 import { WindDownStatusProvider } from "./screens/account-migration/hooks/use-wind-down-status"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
 import {
+  initializeTelemetryGate,
+  localOnlyTransport,
+  registerTelemetryTransport,
+} from "./telemetry"
+import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
   DisplayCurrencyFromRegionMount,
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
+import { SelfCustodialTelemetryMount } from "./self-custodial/providers/telemetry"
 import { SelfCustodialWalletProvider } from "./self-custodial/providers/wallet"
 import { GaloyClient } from "./graphql/client"
 import { NetworkErrorComponent } from "./graphql/network-error-component"
@@ -57,6 +62,26 @@ import { RestrictedRegionProvider } from "./components/restricted-region"
 const defaultLocale = detectDefaultLocale()
 loadLocale(defaultLocale)
 if (__DEV__) console.log(`Loaded default locale: ${defaultLocale}`)
+
+// Shut the analytics gate as early as any JavaScript can. Firebase persists the last value
+// of `setAnalyticsCollectionEnabled` across launches and that persisted value overrides
+// `firebase.json`, so a device that collected last run would otherwise start this one
+// collecting — including automatic and screen-level events — before it knows whether this
+// launch is incognito.
+//
+// The window before JS runs is closed natively: MainApplication.kt and AppDelegate.mm turn
+// collection off at process start, before the first Activity resumes / the app becomes
+// active, which is where `session_start` is logged. This call is the JS half of the same
+// default; the mode gate re-enables collection once the mode resolves Custodial or Enhanced.
+// Residual, stated: an `app_update` logged at SDK initialisation, before Application start,
+// on the one launch after an upgrade of a device that last ran collecting. The cost of the
+// native default is the first `session_start` of a launch that turns out to be permitted.
+initializeTelemetryGate()
+
+// The null adapter stands behind the port until the provider knows which network it is on
+// and registers the relay for it. It acknowledges everything and keeps what it was handed
+// in a ring buffer, so nothing leaves the device in the meantime.
+registerTelemetryTransport(localOnlyTransport)
 
 /**
  * This is the root component of our app.
@@ -93,6 +118,7 @@ export const App = () => (
                                               <PushNotificationComponent />
                                               <AutoConvertListenerMount />
                                               <AccountModeSyncMount />
+                                              <SelfCustodialTelemetryMount />
                                               <DisplayCurrencyFromRegionMount />
                                               <RootStack />
                                               <NetworkErrorComponent />

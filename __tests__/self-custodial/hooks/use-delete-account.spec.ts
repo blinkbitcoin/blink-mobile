@@ -40,8 +40,13 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 const mockStorageDirFor = jest.fn((id: string, _network: unknown) => `/tmp/${id}`)
+const mockTelemetryOutboxDirFor = jest.fn(
+  (id: string, _network: unknown) => `/tmp/outbox/${id}`,
+)
 jest.mock("@app/self-custodial/config", () => ({
   storageDirFor: (id: string, network: unknown) => mockStorageDirFor(id, network),
+  telemetryOutboxDirFor: (id: string, network: unknown) =>
+    mockTelemetryOutboxDirFor(id, network),
 }))
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
@@ -79,6 +84,21 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
 
 jest.mock("react-native-fs", () => ({
   unlink: (...args: unknown[]) => mockUnlink(...args),
+}))
+
+const mockLogBreadcrumb = jest.fn()
+jest.mock("@app/utils/error-reporting", () => ({
+  logBreadcrumb: (...args: unknown[]) => mockLogBreadcrumb(...args),
+}))
+
+/** The outbox is retired through its store, never unlinked here (see the hook). */
+const mockRetire = jest.fn(() => Promise.resolve())
+const mockCreateOutboxStore = jest.fn((directory: string) => ({
+  directory,
+  retire: () => mockRetire(),
+}))
+jest.mock("@app/telemetry", () => ({
+  createOutboxStore: (directory: string) => mockCreateOutboxStore(directory),
 }))
 
 const mockSdk = { id: "sdk" }
@@ -147,6 +167,71 @@ describe("useDeleteAccount", () => {
       TEST_SC_ACCOUNT_ID,
       mockSparkNetwork.Mainnet,
     )
+  })
+
+  it("retires the telemetry outbox through its store, alongside the wallet store", async () => {
+    // The outbox is a sibling of the wallet store, so it shares its deletion pairing.
+    // Left behind, its queued records outlive the account that produced them and nothing
+    // ever sweeps them: the 72h TTL only runs while a store for that account is mounted,
+    // and a deleted account never mounts one again. And it is retired through the store
+    // rather than unlinked: a bare unlink neither moves the queue's generation nor
+    // serialises with a drain, so a transport result in flight would write the deleted
+    // account's queue back.
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockTelemetryOutboxDirFor).toHaveBeenCalledWith(
+      TEST_SC_ACCOUNT_ID,
+      mockSparkNetwork.Regtest,
+    )
+    expect(mockCreateOutboxStore).toHaveBeenCalledWith(
+      `/tmp/outbox/${TEST_SC_ACCOUNT_ID}`,
+    )
+    expect(mockRetire).toHaveBeenCalledTimes(1)
+    expect(mockUnlink).not.toHaveBeenCalledWith(`/tmp/outbox/${TEST_SC_ACCOUNT_ID}`)
+    // Anchor: the wallet store is still wiped, so this is an addition rather than a
+    // swap of one directory for the other.
+    expect(mockUnlink).toHaveBeenCalledWith(`/tmp/${TEST_SC_ACCOUNT_ID}`)
+  })
+
+  it("leaves a breadcrumb, and finishes, when the wallet directory cannot be removed", async () => {
+    // The account is gone from the registry either way; a directory left behind is a
+    // breadcrumb through the app's one sink, not a failed delete the user has to repeat.
+    mockUnlink.mockImplementation((path: string) =>
+      path === `/tmp/${TEST_SC_ACCOUNT_ID}`
+        ? Promise.reject(new Error("EBUSY"))
+        : Promise.resolve(undefined),
+    )
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBe("logged-out")
+    expect(mockLogBreadcrumb).toHaveBeenCalledWith(
+      expect.stringContaining("storage dir unlink failed"),
+    )
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
+  })
+
+  it("finishes the delete when the outbox retirement fails", async () => {
+    // The retirement leaves its own durable signal for the provider's parent sweep; the
+    // account must still go.
+    mockRetire.mockRejectedValueOnce(new Error("telemetry outbox discard did not finish"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBe("logged-out")
+    expect(mockRemoveSelfCustodialAccountId).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
   })
 
   it("switches to the custodial account and returns 'switched-to-custodial' when a custodial account exists", async () => {
@@ -233,7 +318,9 @@ describe("useDeleteAccount", () => {
       outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
     })
 
-    expect(mockCrashlyticsLog).toHaveBeenCalled()
+    expect(mockLogBreadcrumb).toHaveBeenCalledWith(
+      expect.stringContaining("disconnect failed"),
+    )
     expect(mockDeleteMnemonicForAccount).toHaveBeenCalled()
     expect(outcome).toBe("logged-out")
     expect(result.current.state).toBe("idle")
@@ -315,5 +402,37 @@ describe("useDeleteAccount", () => {
     const disconnectOrder = mockDisconnectSdk.mock.invocationCallOrder[0]
 
     expect(setActiveOrder).toBeLessThan(disconnectOrder)
+  })
+
+  it("clears the active account when the last wallet goes and there is no custodial one", async () => {
+    const { result } = renderHook(() => useDeleteAccount())
+
+    await act(async () => {
+      await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    const updater = mockUpdateState.mock.calls.at(-1)?.[0] as (
+      prev: { activeAccountId?: string } | undefined,
+    ) => unknown
+    expect(updater({ activeAccountId: TEST_SC_ACCOUNT_ID })).toMatchObject({
+      activeAccountId: undefined,
+    })
+    // Nothing to clear before the store has loaded; the updater must say so rather than
+    // inventing a state object.
+    expect(updater(undefined)).toBeUndefined()
+  })
+
+  it("reports a rejection that is not an Error, without losing what it said", async () => {
+    mockDeleteMnemonicForAccount.mockRejectedValue("keystore exploded")
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(outcome).toBeUndefined()
+    expect(result.current.state).toBe("error")
+    expect(result.current.error?.message).toBe("keystore exploded")
   })
 })

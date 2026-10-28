@@ -16,6 +16,7 @@ import { IsAuthedContextProvider } from "../../app/graphql/is-authed-context"
 import {
   AccountRegistryContext,
   createCustodialDescriptor,
+  SelfCustodialIndexState,
   type AccountRegistryResult,
 } from "../../app/hooks/use-account-registry"
 import { PersistentStateContext } from "../../app/store/persistent-state"
@@ -30,6 +31,7 @@ const settledRegistry: AccountRegistryResult = {
   accounts: [custodialAccount],
   activeAccount: custodialAccount,
   selfCustodialEntries: [],
+  selfCustodialIndex: SelfCustodialIndexState.Known,
   loading: false,
   setActiveAccountId: () => {},
   reloadSelfCustodialAccounts: async () => {},
@@ -45,7 +47,7 @@ const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
   <PersistentStateContext.Provider
     value={{
       persistentState: {
-        schemaVersion: 21,
+        schemaVersion: 22,
         galoyInstance: {
           id: "Main",
         },

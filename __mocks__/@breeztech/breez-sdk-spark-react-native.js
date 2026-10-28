@@ -133,6 +133,9 @@ module.exports = {
     Unknown: 5,
   },
   PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+  // Ordinals match the generated bindings, where ConversionStatus is declared
+  // Pending, Completed, Failed, RefundNeeded.
+  ConversionStatus: { Pending: 0, Completed: 1, Failed: 2, RefundNeeded: 3 },
   PaymentType: { Send: 0, Receive: 1 },
   PaymentDetails_Tags,
   PaymentDetails,

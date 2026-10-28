@@ -2449,6 +2449,7 @@
     "apiDocumentation": "وثائق API",
     "apiDashboard": "الوصول إلى API ولوحة التحكم",
     "mode": "الوضع",
+    "modeNotSet": "Not set",
     "pos": "نقطة البيع",
     "posCopied": "تم نسخ رابط نقطة البيع الخاص بك",
     "activated": "تم التفعيل",

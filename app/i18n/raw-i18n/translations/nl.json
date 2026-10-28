@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API-documentatie",
     "apiDashboard": "API-toegang en dashboard",
     "mode": "Modus",
+    "modeNotSet": "Not set",
     "pos": "Kassasysteem",
     "posCopied": "Je kassasysteem-link is gekopieerd",
     "activated": "Geactiveerd",

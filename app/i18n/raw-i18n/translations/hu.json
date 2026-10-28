@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API dokumentáció",
     "apiDashboard": "API hozzáférés és kezelőpanel",
     "mode": "Mód",
+    "modeNotSet": "Not set",
     "pos": "Értékesítési pont",
     "posCopied": "Az értékesítési pont hivatkozásod másolva lett",
     "activated": "Aktiválva",

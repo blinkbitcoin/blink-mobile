@@ -1,6 +1,8 @@
-import crashlytics from "@react-native-firebase/crashlytics"
-
-import { RecordAppErrorOptions, recordAppError } from "@app/utils/error-reporting"
+import {
+  logBreadcrumb,
+  RecordAppErrorOptions,
+  recordAppError,
+} from "@app/utils/error-reporting"
 
 export const recordErrorOnce = (
   dedupKey: string,
@@ -33,15 +35,26 @@ const toSdkLogLevel = (level: string): SdkLogLevel =>
 // so each distinct message shape records at most one non-fatal per session.
 const sdkErrorDedupKey = (msg: string): string => msg.replace(/\d+/g, "#").slice(0, 200)
 
+/**
+ * SDK log lines leave the device only from a `Custodial` or `Enhanced` one. An SDK line
+ * routinely carries payment ids and amounts, and a
+ * Crashlytics breadcrumb or non-fatal is a transmission with a device-stable installation
+ * id on it — from an `Anon` or `Unresolved` device that is telemetry, whatever product
+ * sends it, and those devices must send none. The gate lives in the sink both of these go
+ * through
+ * (`app/utils/error-reporting.ts`), not here: this file cannot reach Crashlytics directly,
+ * and neither can any other self-custodial module. The console still gets everything, so a
+ * device in hand can be debugged; what changes is what a device out of hand sends home.
+ */
 const logDispatch: Record<SdkLogLevel, (msg: string) => void> = {
   [SdkLogLevel.Debug]: (msg) => console.debug(msg),
   [SdkLogLevel.Info]: (msg) => {
     console.debug(msg)
-    crashlytics().log(msg)
+    logBreadcrumb(msg)
   },
   [SdkLogLevel.Warn]: (msg) => {
     console.warn(msg)
-    crashlytics().log(msg)
+    logBreadcrumb(msg)
   },
   [SdkLogLevel.Error]: (msg) => {
     console.error(msg)

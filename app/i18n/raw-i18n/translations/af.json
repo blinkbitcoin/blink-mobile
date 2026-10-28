@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API-dokumentasie",
     "apiDashboard": "API-toegang en kontroleskerm",
     "mode": "Modus",
+    "modeNotSet": "Not set",
     "pos": "Punt van Verkoop",
     "posCopied": "Jou punt van verkoop-skakel is gekopieer",
     "activated": "Geaktiveer ",

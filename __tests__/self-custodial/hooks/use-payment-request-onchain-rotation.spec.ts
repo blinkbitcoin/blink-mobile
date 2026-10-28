@@ -92,6 +92,7 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 
 jest.mock("@app/utils/error-reporting", () => ({
   recordAppError: (...args: unknown[]) => mockRecordAppError(...args),
+  logBreadcrumb: jest.fn(),
 }))
 
 jest.mock("@app/self-custodial/storage/onchain-address", () => ({

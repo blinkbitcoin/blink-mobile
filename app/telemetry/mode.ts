@@ -1,0 +1,433 @@
+import { contractRowFor, type EmittingMode } from "./contract"
+import {
+  countSuppressedEvent,
+  DiagnosticsModeInput,
+  recordModeResolutionLatency,
+  reportBoundaryFault,
+  setDiagnosticsModeInput,
+} from "./diagnostics"
+import {
+  isKillSwitchEngaged,
+  isTelemetryEnabled,
+  onKillSwitchEngaged,
+} from "./enablement"
+import {
+  clearCustodialAnalyticsIdentity,
+  isPlatformIdentityApplied,
+  resetPlatformAnalyticsData,
+  setCustodialIdentityPermitted,
+  setPlatformCollectionEnabled,
+} from "./platform-analytics"
+
+/**
+ * The derived telemetry mode and the gate it drives.
+ *
+ * The repo's own mode accessor cannot be used for this. `AccountMode` is
+ * `{ enhanced, anon }` with **no custodial value**, and `null` means *both* "a custodial
+ * account is active" *and* "self-custodial, never chose" — a state `app/types/account.ts`
+ * documents as normal and permanent after an interrupted restore. So `!isAnonMode` is true
+ * for an account that never answered, and gating on it would turn "we do not know" into
+ * "collect", which is the one thing this gate exists to prevent.
+ *
+ * The gate has two dimensions: the mode, and the contract row's `modes` column. It is not
+ * "what the boundary emitted versus what the platform emitted" — every call goes through
+ * the boundary, so that split says nothing. An event with a row is permitted where its row
+ * says; anything without a row is permitted on Custodial alone. Every contract row now
+ * names both emitting modes, so the table reads:
+ *
+ * | mode       | contract events | non-contract events | platform collection |
+ * |------------|-----------------|---------------------|---------------------|
+ * | Custodial  | permitted       | permitted           | on                  |
+ * | Enhanced   | permitted       | suppressed          | on, until rollback  |
+ * | Anon       | suppressed      | suppressed          | off                 |
+ * | Unresolved | suppressed      | suppressed          | off                 |
+ *
+ * The last column reads `on` for Enhanced because a platform pseudo identifier is allowed
+ * there. It used to read `off`, to keep the SDK's automatic events — each one carrying that
+ * identifier — out of the allowlist; with the identifier allowed there is nothing left to
+ * suppress. Two things that did not change with it: a contract event still goes to the
+ * outbox on Enhanced and never to Firebase, and the ledger account id still rides Custodial
+ * alone. So the platform counts an app instance it cannot name, and the settlements stay
+ * ours.
+ *
+ * The Enhanced row says *until rollback* because the kill switch has to reach collection
+ * too, now that there is collection on Enhanced for it to reach. Custodial's does not
+ * answer to it — see `mayCollectOnPlatform`.
+ */
+
+export const TelemetryMode = {
+  Custodial: "custodial",
+  Enhanced: "enhanced",
+  /** Incognito as the user reads it; the stored account value stays `anon`. */
+  Anon: "anon",
+  /** The startup state, and the state every failure returns to. */
+  Unresolved: "unresolved",
+} as const
+
+export type TelemetryMode = (typeof TelemetryMode)[keyof typeof TelemetryMode]
+
+export const ActiveAccountKind = {
+  None: "none",
+  Custodial: "custodial",
+  SelfCustodial: "self-custodial",
+} as const
+
+export type ActiveAccountKind = (typeof ActiveAccountKind)[keyof typeof ActiveAccountKind]
+
+export type SelfCustodialModeAnswer = "enhanced" | "anon" | null
+
+export type TelemetryModeInputs = {
+  activeAccount: ActiveAccountKind
+  /**
+   * Three inputs, for the active self-custodial account:
+   *
+   *  - `persistedMode` — what this device holds, chosen on this device or recovered onto
+   *    it. Never a default: a server that answers "no mode" does not write Enhanced here.
+   *  - `serverMode` — the LNURL server's last answer, as the sync hook recorded it.
+   *  - neither — the account has never held a mode anywhere this device can see, or the
+   *    hook's request is still in flight.
+   */
+  persistedMode: SelfCustodialModeAnswer
+  serverMode: SelfCustodialModeAnswer
+  /** Whether the self-custody rollout's values came from the server — this launch's fetch,
+   *  or one an earlier fetch activated — rather than the shipped defaults. */
+  remoteConfigTrusted: boolean
+  /**
+   * Whether the account registry has finished its first read of the device's account index.
+   * Before it has, `hasSelfCustodialAccount` is only the registry's seed and cannot be read
+   * as "this device holds none".
+   */
+  registryHydrated: boolean
+  /** Whether this device holds a self-custodial account at all — or might: an index that
+   *  could not be read counts as holding one. */
+  hasSelfCustodialAccount: boolean
+}
+
+/**
+ * Pure, and the whole of the default-deny rule.
+ *
+ * For a self-custodial account the two mode inputs combine with **deny winning in both
+ * directions**. Plain precedence — the server first, then what this device holds — would
+ * resolve Enhanced in the window after a user switches to incognito here and before the
+ * push lands, while the server's stale answer still says Enhanced. That is the exact window
+ * a switch is meant to close. So an Anon from either input is Anon; Enhanced
+ * needs a positive Enhanced from either and no Anon from the other; and nothing from
+ * either — never asked, in flight, or the server holding no mode — is `Unresolved`. The
+ * server still overrides a stale persisted Enhanced with Anon, which is the multi-device
+ * case the precedence exists for.
+ *
+ * A **null server answer is Unresolved, never Enhanced.** The settings row reads an unset
+ * mode as Enhanced so it has something to display. What the gate needs is a positive
+ * answer, and "we never asked, so we assumed yes" is not one.
+ *
+ * A custodial account active on an **untrusted** remote config resolves `Unresolved` if
+ * the device holds a self-custodial account at all; so does a device with no active
+ * account that holds one. The rollout flag defaults to `off`,
+ * `remoteConfigReady` is set in a `finally` regardless of whether the fetch threw, and
+ * `useSelfCustodialRollback` swaps the active account to a custodial fallback on that
+ * default — so a failed fetch could otherwise turn full platform collection on for someone
+ * who last chose incognito. A device with no self-custodial account has nothing to have
+ * been rolled back from, and keeps its existing custodial analytics behaviour.
+ */
+export const deriveTelemetryMode = ({
+  activeAccount,
+  persistedMode,
+  serverMode,
+  remoteConfigTrusted,
+  registryHydrated,
+  hasSelfCustodialAccount,
+}: TelemetryModeInputs): TelemetryMode => {
+  if (activeAccount === ActiveAccountKind.SelfCustodial) {
+    if (persistedMode === "anon" || serverMode === "anon") return TelemetryMode.Anon
+    if (persistedMode === "enhanced" || serverMode === "enhanced") {
+      return TelemetryMode.Enhanced
+    }
+    return TelemetryMode.Unresolved
+  }
+
+  /**
+   * Everything below decides on whether the device holds a self-custodial account, and
+   * before the registry has read its index the answer is only a seed. Taking "none" from
+   * the seed resolved an incognito wallet's device Custodial on every cold start — full
+   * platform collection, crash provenance `permitted`, held errors released — until the
+   * read landed.
+   */
+  if (!registryHydrated) return TelemetryMode.Unresolved
+
+  if (activeAccount === ActiveAccountKind.Custodial) {
+    if (remoteConfigTrusted || !hasSelfCustodialAccount) return TelemetryMode.Custodial
+    return TelemetryMode.Unresolved
+  }
+
+  /**
+   * No account at all — a fresh install, or a logged-out device. With no self-custodial
+   * account on the device either, this is the custodial product's visitor: the acquisition
+   * funnel is custodial analytics, a crash on the login screen is a custodial crash,
+   * nothing
+   * here has chosen anything, and nothing on the device could have been rolled back from —
+   * the escape hatch the custodial branch takes, for the same reason. Left `Unresolved`,
+   * nothing in a pre-auth session could ever resolve it: the funnel would be dropped and
+   * the sink would hold sign-up crashes for an answer that never came. A device that does
+   * hold a self-custodial account stays unresolved until one is active — an incognito
+   * wallet's device must not collect between accounts.
+   */
+  if (!hasSelfCustodialAccount) return TelemetryMode.Custodial
+  return TelemetryMode.Unresolved
+}
+
+export const isSuppressedMode = (mode: TelemetryMode): boolean =>
+  mode === TelemetryMode.Anon || mode === TelemetryMode.Unresolved
+
+/**
+ * Whether the platform SDK may collect at all, and the only place that is decided.
+ *
+ * `Custodial` is unconditional: the kill switch rolls back the self-custodial programme, and
+ * custodial analytics predate it. `Enhanced` answers to the kill switch, because on that
+ * device the platform's own automatic events are the larger half of what rollback has to
+ * stop — the gate already refuses the contract events, and stopping those while the SDK kept
+ * reporting sessions would be a rollback in name only.
+ *
+ * It does **not** answer to the rollout flag. That flag ramps the contract pipeline, which
+ * `isEventPermitted` and `isDrainPermitted` read live; and it arrives from a network fetch
+ * that lands after the mode has already resolved from what the device persisted, so a
+ * predicate that read it here would close collection at resolution and nothing would ever
+ * reopen it.
+ */
+const mayCollectOnPlatform = (mode: TelemetryMode): boolean => {
+  if (mode === TelemetryMode.Custodial) return true
+  return mode === TelemetryMode.Enhanced && !isKillSwitchEngaged()
+}
+
+/** What the mode alone says about diagnostics; the kill switch has its own say for
+ *  `Enhanced`, and the derivation lives in `transmissibility.ts`. */
+const diagnosticsInputFor = (mode: TelemetryMode): DiagnosticsModeInput => {
+  switch (mode) {
+    case TelemetryMode.Custodial:
+      return DiagnosticsModeInput.Custodial
+    case TelemetryMode.Enhanced:
+      return DiagnosticsModeInput.SelfCustodial
+    case TelemetryMode.Anon:
+      return DiagnosticsModeInput.Denied
+    case TelemetryMode.Unresolved:
+      return DiagnosticsModeInput.Unresolved
+  }
+}
+
+let currentMode: TelemetryMode = TelemetryMode.Unresolved
+
+/**
+ * Runs when the gate closes so anything holding un-sent events can drop them. The outbox
+ * registers here rather than being called directly, because "closed before discarded,
+ * and never reopened over a discard" is the gate's to enforce and not the
+ * outbox's to remember.
+ */
+type SuppressionListener = () => void | Promise<void>
+const suppressionListeners = new Set<SuppressionListener>()
+
+export const onTelemetrySuppressed = (listener: SuppressionListener): (() => void) => {
+  suppressionListeners.add(listener)
+  return () => {
+    suppressionListeners.delete(listener)
+  }
+}
+
+const notifySuppressed = async (): Promise<void> => {
+  await Promise.all(
+    [...suppressionListeners].map(async (listener) => {
+      try {
+        await listener()
+      } catch (err) {
+        reportBoundaryFault("suppression listener", err)
+      }
+    }),
+  )
+}
+
+/** Transitions are serialised, so two mode changes in quick succession cannot interleave a
+ *  discard with the enable that follows the next one. */
+let applying: Promise<void> = Promise.resolve()
+
+/**
+ * Everything that closes, closes here and now — synchronously, in the same tick the mode
+ * moves, ahead of anything queued behind a discard. A discard is a directory unlink and can
+ * be slow; collection staying on for its duration would let the SDK's automatic events, and
+ * the analytics calls that still reach the SDK directly, transmit from a device whose mode
+ * has already closed.
+ *
+ * Three closes, because they answer to different rules. Leaving `Custodial` always withdraws
+ * the identity permission and clears the identity the SDK would otherwise merge into its next
+ * event: the ledger account id is custodial-only, so an `Enhanced` device collects without
+ * ever naming an account. A self-custodial session on an install the ledger id has ridden
+ * also resets the app instance, which is what stops the account being recoverable from the
+ * device's own earlier rows — see `isPlatformIdentityApplied`. Collection closes wherever the
+ * mode may not collect at all — a suppressed mode, or an `Enhanced` device the kill switch
+ * has rolled back.
+ *
+ * The reset is keyed on that recorded debt rather than on leaving Custodial. Leaving
+ * Custodial also happens on logout and on every cold start that waits for the remote config,
+ * and a reset there minted a new app instance per launch for custodial users; while a debt
+ * carried across a logout into a later process would never have been paid.
+ */
+const closeSynchronously = (mode: TelemetryMode): void => {
+  setDiagnosticsModeInput(diagnosticsInputFor(mode))
+  if (mode !== TelemetryMode.Custodial) {
+    setCustodialIdentityPermitted(false)
+    clearCustodialAnalyticsIdentity()
+    if (isSelfCustodialMode(mode) && isPlatformIdentityApplied()) {
+      resetPlatformAnalyticsData()
+    }
+  }
+  if (!mayCollectOnPlatform(mode)) setPlatformCollectionEnabled(false)
+}
+
+/** A self-custodial account is active and has said what it is. */
+const isSelfCustodialMode = (mode: TelemetryMode): boolean =>
+  mode === TelemetryMode.Enhanced || mode === TelemetryMode.Anon
+
+/**
+ * The queued half: the discard, and the things that *open*. Opening waits its turn behind
+ * every discard queued before it — never flush what a switch withheld, and never start
+ * collecting again over a queue still being destroyed — and it happens only if the mode that
+ * asked for it is still the current one when its turn comes, so a mode resolved and
+ * immediately overtaken by `Anon` does not reopen collection on the way through.
+ *
+ * The identity opens on `Custodial` alone. Collection opens on `Enhanced` too while the
+ * rollout stands, and the identity stays shut there — which is the whole of the difference
+ * between the two modes at the platform SDK.
+ */
+const applyMode = async (mode: TelemetryMode): Promise<void> => {
+  if (isSuppressedMode(mode)) await notifySuppressed()
+  if (mode !== currentMode) return
+
+  if (mode === TelemetryMode.Custodial) setCustodialIdentityPermitted(true)
+  if (mayCollectOnPlatform(mode)) setPlatformCollectionEnabled(true)
+}
+
+/**
+ * Records the mode the app has positively established. Re-resolving the same mode is a
+ * no-op, so this is safe to call from an effect that re-runs on unrelated renders.
+ *
+ * `currentMode` moves synchronously while the side effects are queued: capture must stop
+ * the instant the mode changes, not once a directory has finished being unlinked.
+ */
+export const resolveTelemetryMode = (mode: TelemetryMode): Promise<void> => {
+  if (mode === currentMode) return applying
+
+  /** How long the device sat in `Unresolved` after the gate was initialised. */
+  if (currentMode === TelemetryMode.Unresolved && initialisedAt !== null) {
+    recordModeResolutionLatency(Date.now() - initialisedAt)
+    initialisedAt = null
+  }
+
+  currentMode = mode
+  /** This runs inside a React effect, and at module scope through the gate's
+   *  initialisation. Neither has anywhere to show a throw, so it never gets one. */
+  try {
+    closeSynchronously(mode)
+  } catch (err) {
+    settleFault(err)
+  }
+
+  applying = applying.then(() => applyMode(mode)).catch(settleFault)
+  return applying
+}
+
+/**
+ * The transition chain must always settle. A transition that threw — a platform seam
+ * failing synchronously, a listener that rejected past `notifySuppressed`'s own guard —
+ * would otherwise leave `applying` rejected for the rest of the process: every later
+ * `whenModeSettled()` would reject, no drain would ever run, and the reopen that follows
+ * the next Custodial resolution would never be reached.
+ */
+const settleFault = (err: unknown): void => {
+  reportBoundaryFault("mode transition", err)
+}
+
+/**
+ * Forces the gate shut, as early in bootstrap as possible.
+ * `setAnalyticsCollectionEnabled` persists across launches, so a device that resolved
+ * Custodial last run starts this one collecting — and the window before the real mode
+ * resolves is exactly when a user who has since switched to incognito would leak.
+ */
+let initialisedAt: number | null = null
+
+let releaseKillSwitchListener: (() => void) | null = null
+
+export const initializeTelemetryGate = (): Promise<void> => {
+  currentMode = TelemetryMode.Unresolved
+  initialisedAt = Date.now()
+  /**
+   * Every mode transition reads the switch through `mayCollectOnPlatform`. This covers the
+   * one case no transition sees: the switch engaging while `Enhanced` is already running and
+   * already collecting. A restore on launch needs no listener — it lands before the first
+   * resolution, so the transition itself reads it.
+   */
+  releaseKillSwitchListener?.()
+  releaseKillSwitchListener = onKillSwitchEngaged(() => {
+    if (!mayCollectOnPlatform(currentMode)) setPlatformCollectionEnabled(false)
+  })
+  try {
+    closeSynchronously(TelemetryMode.Unresolved)
+  } catch (err) {
+    settleFault(err)
+  }
+  applying = applying.then(() => applyMode(TelemetryMode.Unresolved)).catch(settleFault)
+  return applying
+}
+
+export const getTelemetryMode = (): TelemetryMode => currentMode
+
+/**
+ * Settles when every queued transition has finished its side effects.
+ *
+ * The drain waits on this. `currentMode` moves synchronously but the discard it triggers is
+ * a directory unlink, so an Anon → Enhanced switch leaves a window where draining is once
+ * again permitted while the previous mode's discard is still running — and a drain reading
+ * the queue inside that window would submit exactly the records the switch to incognito
+ * withheld: the flush a switch is meant to prevent, one turn of the event loop wide.
+ */
+export const whenModeSettled = (): Promise<void> => applying
+
+/**
+ * The gate. Reads the event **name** against the contract before a payload exists,
+ * which is why `TelemetryFact` needs no origin field.
+ *
+ * The two switches sit in front of the *self-custodial* pipeline only, so a custodial
+ * device never answers to them. The rollout flag defaults to off, and gating custodial
+ * emission on it would silence the self-custody rollout's own control group until the ramp
+ * reached each device.
+ */
+export const isEventPermitted = (event: string): boolean => {
+  const permitted =
+    isEventPermittedInMode(event, currentMode) &&
+    (currentMode !== TelemetryMode.Enhanced || isTelemetryEnabled())
+  if (!permitted) countSuppressedEvent()
+  return permitted
+}
+
+/**
+ * The second axis, read off the contract row's `modes` column. A contract event is
+ * permitted where its row says so; a non-contract event — anything not in the table,
+ * whatever emitted it — is permitted on Custodial alone. Neither `Anon` nor
+ * `Unresolved` appears in any row, so they permit nothing.
+ */
+const isEventPermittedInMode = (event: string, mode: TelemetryMode): boolean => {
+  const row = contractRowFor(event)
+  if (!row) return mode === TelemetryMode.Custodial
+  return row.modes.includes(mode as EmittingMode)
+}
+
+/** The drain is gated too, not just capture. An account can queue events, switch to
+ *  incognito while inactive and flush them on next activation — which is flushing exactly
+ *  what the switch was supposed to destroy. */
+export const isDrainPermitted = (): boolean =>
+  isTelemetryEnabled() && currentMode === TelemetryMode.Enhanced
+
+export const resetTelemetryModeForTesting = (): void => {
+  currentMode = TelemetryMode.Unresolved
+  initialisedAt = null
+  applying = Promise.resolve()
+  suppressionListeners.clear()
+  setDiagnosticsModeInput(DiagnosticsModeInput.Unresolved)
+  setCustodialIdentityPermitted(false)
+}

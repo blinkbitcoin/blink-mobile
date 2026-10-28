@@ -2449,6 +2449,7 @@
     "apiDocumentation": "API документација",
     "apiDashboard": "API приступ и контролна табла",
     "mode": "Режим",
+    "modeNotSet": "Not set",
     "pos": "Продајно место",
     "posCopied": "Линк вашег продајног места је копиран",
     "activated": "Активирано",

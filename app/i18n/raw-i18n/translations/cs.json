@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Dokumentace API",
     "apiDashboard": "Přístup k API a nástěnka",
     "mode": "Režim",
+    "modeNotSet": "Not set",
     "pos": "Pokladní místo",
     "posCopied": "Odkaz na vaše pokladní místo byl zkopírován",
     "activated": "Aktivováno",

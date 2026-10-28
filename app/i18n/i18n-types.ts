@@ -7988,6 +7988,10 @@ type RootTranslation = {
 		 */
 		mode: string
 		/**
+		 * N​o​t​ ​s​e​t
+		 */
+		modeNotSet: string
+		/**
 		 * P​o​i​n​t​ ​o​f​ ​S​a​l​e
 		 */
 		pos: string
@@ -22071,6 +22075,10 @@ export type TranslationFunctions = {
 		 * Mode
 		 */
 		mode: () => LocalizedString
+		/**
+		 * Not set
+		 */
+		modeNotSet: () => LocalizedString
 		/**
 		 * Point of Sale
 		 */

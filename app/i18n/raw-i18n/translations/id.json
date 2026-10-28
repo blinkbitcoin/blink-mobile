@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Dokumentasi API",
     "apiDashboard": "Akses API dan dasbor",
     "mode": "Mode",
+    "modeNotSet": "Not set",
     "pos": "Tempat Penjualan",
     "posCopied": "Tautan tempat penjualan Anda telah disalin",
     "activated": "Diaktifkan",

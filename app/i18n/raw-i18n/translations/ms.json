@@ -2449,6 +2449,7 @@
     "apiDocumentation": "Dokumentasi API",
     "apiDashboard": "Akses dan papan pemuka API",
     "mode": "Mod",
+    "modeNotSet": "Not set",
     "pos": "Point of Sale",
     "posCopied": "Pautan Point of Sale anda telah disalin",
     "activated": "Telah diaktifkan",
