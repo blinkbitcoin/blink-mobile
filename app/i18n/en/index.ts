@@ -4029,7 +4029,7 @@ const en: BaseTranslation = {
       download: "Download bundle",
       sensitiveTitle: "Sensitive",
       sensitiveBody:
-        "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.",
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
       sensitiveConfirm: "Download",
     },
     ManualBackup: {

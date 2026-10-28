@@ -12769,7 +12769,7 @@ type RootTranslation = {
 			 */
 			sensitiveTitle: string
 			/**
-			 * T​h​i​s​ ​f​i​l​e​ ​i​s​ ​s​e​n​s​i​t​i​v​e​ ​w​a​l​l​e​t​ ​d​a​t​a​ ​a​n​d​ ​m​u​s​t​ ​b​e​ ​k​e​p​t​ ​p​r​i​v​a​t​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​y​o​u​ ​w​i​l​l​ ​n​o​t​ ​b​e​ ​a​b​l​e​ ​t​o​ ​u​s​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​r​e​c​o​v​e​r​y​.
+			 * T​h​i​s​ ​f​i​l​e​ ​s​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​,​ ​s​o​ ​k​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.​ ​T​o​ ​u​s​e​ ​i​t​ ​i​n​ ​a​n​ ​e​m​e​r​g​e​n​c​y​,​ ​y​o​u​ ​a​l​s​o​ ​n​e​e​d​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
 			 */
 			sensitiveBody: string
 			/**
@@ -26809,7 +26809,7 @@ export type TranslationFunctions = {
 			 */
 			sensitiveTitle: () => LocalizedString
 			/**
-			 * This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.
+			 * This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.
 			 */
 			sensitiveBody: () => LocalizedString
 			/**

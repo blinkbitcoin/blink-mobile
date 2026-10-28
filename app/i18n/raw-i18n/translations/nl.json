@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Gevoelig",
       "learnMore": "Meer over eenzijdige uitstap",
       "sensitiveConfirm": "Downloaden",
-      "sensitiveBody": "Dit bestand bevat gevoelige walletgegevens en moet privé blijven. Als je dit apparaat verliest, kun je herstel via de noodbundel niet gebruiken."
+      "sensitiveBody": "Dit bestand toont je saldo en betalingsgeschiedenis, dus houd het privé. Om het in een noodgeval te gebruiken, heb je ook je herstelzin nodig."
     },
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",

@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Sensible",
       "learnMore": "Més informació sobre la sortida unilateral",
       "sensitiveConfirm": "Baixa",
-      "sensitiveBody": "Aquest fitxer conté dades sensibles del moneder i s'ha de mantenir privat. Si perds aquest dispositiu, no podràs fer servir la recuperació del paquet d'emergència."
+      "sensitiveBody": "Aquest fitxer mostra el teu saldo i l'historial de pagaments, així que mantén-lo privat. Per fer-lo servir en una emergència, també necessites la teva frase de còpia de seguretat."
     },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",

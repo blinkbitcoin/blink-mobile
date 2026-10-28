@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Osjetljivo",
       "learnMore": "Saznaj više o jednostranom izlasku",
       "sensitiveConfirm": "Preuzmi",
-      "sensitiveBody": "Ova datoteka sadrži osjetljive podatke novčanika i mora ostati privatna. Ako izgubiš ovaj uređaj, nećeš moći upotrijebiti oporavak iz paketa za hitne slučajeve."
+      "sensitiveBody": "Ova datoteka prikazuje tvoje stanje i povijest plaćanja, zato je čuvaj privatnom. Da bi je upotrijebio u hitnom slučaju, trebat ćeš i svoju pričuvnu frazu."
     },
     "CloudBackup": {
       "title": "Napravimo sigurnosnu kopiju vašeg novčanika",

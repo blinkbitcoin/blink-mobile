@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Sensitif",
       "learnMore": "Pelajari lebih lanjut tentang keluar sepihak",
       "sensitiveConfirm": "Unduh",
-      "sensitiveBody": "Berkas ini berisi data dompet yang sensitif dan harus dirahasiakan. Jika kamu kehilangan perangkat ini, kamu tidak bisa memakai pemulihan paket darurat."
+      "sensitiveBody": "Berkas ini menunjukkan saldo dan riwayat pembayaranmu, jadi rahasiakan. Untuk memakainya dalam keadaan darurat, kamu juga perlu frasa cadanganmu."
     },
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",

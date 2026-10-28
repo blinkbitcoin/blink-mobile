@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Følsom",
       "learnMore": "Læs mere om ensidig exit",
       "sensitiveConfirm": "Download",
-      "sensitiveBody": "Denne fil indeholder følsomme tegnebogsdata og skal holdes privat. Hvis du mister denne enhed, kan du ikke bruge gendannelse fra nødbundtet."
+      "sensitiveBody": "Denne fil viser din saldo og betalingshistorik, så hold den privat. For at bruge den i en nødsituation skal du også bruge din gendannelsesfrase."
     },
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",

@@ -3847,7 +3847,7 @@
             "sensitiveTitle": "Sensibile",
             "learnMore": "Scopri di più sull'uscita unilaterale",
             "sensitiveConfirm": "Scarica",
-            "sensitiveBody": "Questo file contiene dati sensibili del portafoglio e deve restare privato. Se perdi questo dispositivo, non potrai usare il recupero dal pacchetto di emergenza."
+            "sensitiveBody": "Questo file mostra il tuo saldo e la cronologia dei pagamenti, quindi tienilo privato. Per usarlo in caso di emergenza, ti serve anche la tua frase di recupero."
         },
         "CloudBackup": {
             "title": "Eseguiamo il backup del portafoglio",

@@ -96,6 +96,13 @@ describe("BundleExportScreen", () => {
       await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
     })
 
+    /** The bundle alone cannot move funds: an exit also signs with the seed. */
+    it("warns that the file is private and needs the backup phrase to be used", () => {
+      expect(LL.BackupScreen.BundleExport.sensitiveBody()).toBe(
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
+      )
+    })
+
     it("does not re-warn on a second download", async () => {
       renderScreen()
 

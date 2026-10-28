@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Nhạy cảm",
       "learnMore": "Tìm hiểu thêm về rút đơn phương",
       "sensitiveConfirm": "Tải xuống",
-      "sensitiveBody": "Tệp này chứa dữ liệu ví nhạy cảm và phải được giữ riêng tư. Nếu bạn mất thiết bị này, bạn sẽ không thể dùng khôi phục từ gói khẩn cấp."
+      "sensitiveBody": "Tệp này cho thấy số dư và lịch sử thanh toán của bạn, vì vậy hãy giữ riêng tư. Để dùng tệp này trong trường hợp khẩn cấp, bạn cũng cần cụm từ sao lưu của mình."
     },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",

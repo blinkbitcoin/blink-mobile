@@ -3847,7 +3847,7 @@
             "sensitiveTitle": "Sensible",
             "learnMore": "Más información sobre la salida unilateral",
             "sensitiveConfirm": "Descargar",
-            "sensitiveBody": "Este archivo contiene datos sensibles de la billetera y debe mantenerse privado. Si pierdes este dispositivo, no podrás usar la recuperación del paquete de emergencia."
+            "sensitiveBody": "Este archivo muestra tu saldo y tu historial de pagos, así que mantenlo privado. Para usarlo en una emergencia, también necesitas tu frase de recuperación."
         },
         "CloudBackup": {
             "title": "Respaldemos tu billetera",

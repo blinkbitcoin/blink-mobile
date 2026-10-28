@@ -3847,7 +3847,7 @@
             "sensitiveTitle": "Sensível",
             "learnMore": "Saiba mais sobre a saída unilateral",
             "sensitiveConfirm": "Baixar",
-            "sensitiveBody": "Este arquivo contém dados sensíveis da carteira e deve ser mantido privado. Se você perder este dispositivo, não poderá usar a recuperação pelo pacote de emergência."
+            "sensitiveBody": "Este arquivo mostra seu saldo e seu histórico de pagamentos, então mantenha-o privado. Para usá-lo em uma emergência, você também precisa da sua frase de recuperação."
         },
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",

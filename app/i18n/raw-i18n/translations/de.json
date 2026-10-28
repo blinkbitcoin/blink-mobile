@@ -3847,7 +3847,7 @@
             "sensitiveTitle": "Sensibel",
             "learnMore": "Mehr über den einseitigen Ausstieg",
             "sensitiveConfirm": "Herunterladen",
-            "sensitiveBody": "Diese Datei enthält sensible Wallet-Daten und muss privat bleiben. Wenn du dieses Gerät verlierst, kannst du die Notfall-Bundle-Wiederherstellung nicht nutzen."
+            "sensitiveBody": "Diese Datei zeigt dein Guthaben und deinen Zahlungsverlauf, also halte sie privat. Um sie im Notfall zu nutzen, brauchst du außerdem deine Wiederherstellungsphrase."
         },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",

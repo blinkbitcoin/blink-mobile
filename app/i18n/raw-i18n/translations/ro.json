@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Sensibil",
       "learnMore": "Află mai multe despre ieșirea unilaterală",
       "sensitiveConfirm": "Descarcă",
-      "sensitiveBody": "Acest fișier conține date sensibile ale portofelului și trebuie păstrat privat. Dacă pierzi acest dispozitiv, nu vei putea folosi recuperarea din pachetul de urgență."
+      "sensitiveBody": "Acest fișier arată soldul și istoricul plăților tale, așa că păstrează-l privat. Ca să-l folosești într-o urgență, ai nevoie și de fraza ta de recuperare."
     },
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",

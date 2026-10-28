@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Érzékeny",
       "learnMore": "Tudj meg többet az egyoldalú kilépésről",
       "sensitiveConfirm": "Letöltés",
-      "sensitiveBody": "Ez a fájl érzékeny tárcaadatokat tartalmaz, és titokban kell tartani. Ha elveszíted ezt az eszközt, nem tudod használni a vészhelyzeti csomagból való helyreállítást."
+      "sensitiveBody": "Ez a fájl megmutatja az egyenlegedet és a fizetési előzményeidet, ezért tartsd titokban. Ahhoz, hogy vészhelyzetben használhasd, a biztonsági mentési kifejezésedre is szükséged lesz."
     },
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",

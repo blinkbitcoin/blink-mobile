@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Hassas",
       "learnMore": "Tek taraflı çıkış hakkında daha fazla bilgi",
       "sensitiveConfirm": "İndir",
-      "sensitiveBody": "Bu dosya hassas cüzdan verileri içerir ve gizli tutulmalıdır. Bu cihazı kaybedersen acil durum paketiyle kurtarmayı kullanamazsın."
+      "sensitiveBody": "Bu dosya bakiyeni ve ödeme geçmişini gösterir, bu yüzden gizli tut. Acil bir durumda kullanmak için yedekleme ifadene de ihtiyacın var."
     },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",

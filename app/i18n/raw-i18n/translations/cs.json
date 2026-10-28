@@ -3847,7 +3847,7 @@
       "sensitiveTitle": "Citlivé",
       "learnMore": "Více o jednostranném odchodu",
       "sensitiveConfirm": "Stáhnout",
-      "sensitiveBody": "Tento soubor obsahuje citlivá data peněženky a musí zůstat soukromý. Pokud toto zařízení ztratíte, obnovu z nouzového balíčku nebude možné použít."
+      "sensitiveBody": "Tento soubor ukazuje váš zůstatek a historii plateb, proto ho uchovávejte v soukromí. Abyste ho mohli v nouzi použít, budete potřebovat také svou záložní frázi."
     },
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",
