@@ -2172,7 +2172,9 @@
     "updateAvailable": "Hi ha una actualització.\nToca per actualitzar ara",
     "useLightning": "Utilitzem la xaxa Lightning.",
     "myAccounts": "Saldos",
-    "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
+    "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte",
+    "bulletinPosition": "Notificació {position: number} de {total: number}",
+    "bulletinReadMore": "Llegeix més"
   },
   "PinScreen": {
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",

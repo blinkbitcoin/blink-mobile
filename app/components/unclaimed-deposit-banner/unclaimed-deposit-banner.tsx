@@ -16,6 +16,16 @@ type Props = {
   deposits: readonly PendingDeposit[]
 }
 
+/** Only actionable deposits belong in this banner: Immature ones are the balance header
+ *  pill's job until they confirm, and Refunded ones are already resolved. The remaining
+ *  statuses (Claimable, FeeExceeded, Error) all carry an action on the unclaimed-deposits
+ *  screen. */
+export const actionableDeposits = (deposits: readonly PendingDeposit[]) =>
+  deposits.filter(
+    ({ status }) =>
+      status !== DepositStatus.Immature && status !== DepositStatus.Refunded,
+  )
+
 /**
  * The screen owns the deposit fetch (usePendingDeposits) and feeds both this
  * banner and the balance header's pending pill, so the two can never disagree
@@ -30,14 +40,7 @@ export const UnclaimedDepositBanner: React.FC<Props> = ({ deposits }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
   const { count, totalSats } = useMemo(() => {
-    // Only actionable deposits belong in this banner: Immature ones are the
-    // balance header pill's job until they confirm, and Refunded ones are
-    // already resolved. The remaining statuses (Claimable, FeeExceeded, Error)
-    // all carry an action on the unclaimed-deposits screen.
-    const actionable = deposits.filter(
-      ({ status }) =>
-        status !== DepositStatus.Immature && status !== DepositStatus.Refunded,
-    )
+    const actionable = actionableDeposits(deposits)
     return {
       count: actionable.length,
       totalSats: actionable.reduce((sum, { amount }) => sum + amount.amount, 0),

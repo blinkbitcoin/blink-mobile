@@ -2172,7 +2172,9 @@
     "updateAvailable": "Qallarina kani, imapaspaqmi kani.\nTapchuytaqmi, qallarina kani.",
     "useLightning": "\"Lightning Networkpiqa kawsayninkunawan kani.\"",
     "myAccounts": "Saldo",
-    "walletCountNotTwo": "Walleta yupayqa mana 2 kanchu. Ama hina kaspa dashboard nisqata llamk'achiy tukuy walletakunata qullqikunatapas qhawanaykipaq"
+    "walletCountNotTwo": "Walleta yupayqa mana 2 kanchu. Ama hina kaspa dashboard nisqata llamk'achiy tukuy walletakunata qullqikunatapas qhawanaykipaq",
+    "bulletinPosition": "Willanakuy {position: number}, {total: number}manta",
+    "bulletinReadMore": "Astawan ñawinchay"
   },
   "PinScreen": {
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",

@@ -2172,7 +2172,9 @@
         "updateAvailable": "新しいアップデートがあります。\n今すぐ更新をタップして、アップデートしてください",
         "useLightning": "私たちはライトニング・ネットワークを使っています。",
         "myAccounts": "残高",
-        "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください"
+        "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください",
+        "bulletinPosition": "通知 {position: number}/{total: number}",
+        "bulletinReadMore": "続きを読む"
     },
     "PinScreen": {
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",

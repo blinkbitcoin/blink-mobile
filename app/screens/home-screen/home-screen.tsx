@@ -14,7 +14,11 @@ import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { DisabledFeature } from "@app/components/disabled-feature"
-import { BulletinsCard } from "@app/components/notifications/bulletins"
+import { useServerBulletinItems } from "@app/components/notifications/bulletins"
+import {
+  BulletinCarousel,
+  CarouselItem,
+} from "@app/components/notifications/bulletin-carousel"
 import { SetDefaultAccountModal } from "@app/components/set-default-account-modal"
 import { StableSatsModal } from "@app/components/stablesats-modal"
 import { DollarBalanceRestrictionModal } from "@app/components/dollar-balance-restriction-modal"
@@ -85,7 +89,10 @@ import { getBtcWallet, getUsdWallet } from "@app/graphql/wallets-utils"
 import { useCardData } from "@app/screens/card-screen/hooks/use-card-data"
 import { isCardUsable } from "@app/screens/card-screen/utils/card-display"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { UnclaimedDepositBanner } from "@app/components/unclaimed-deposit-banner"
+import {
+  UnclaimedDepositBanner,
+  actionableDeposits,
+} from "@app/components/unclaimed-deposit-banner"
 import { testProps } from "@app/utils/testProps"
 import { isIos } from "@app/utils/helper"
 import { extractLightningAddressUsername } from "@app/utils/pay-links"
@@ -203,12 +210,12 @@ gql`
 `
 
 /**
- * A page of bulletins rather than one: the home shows the newest bulletin the user cannot
- * close next to the newest one they can, and one they cannot close must not be pushed off
- * the page by the closable ones sent after it. Bulletins are few, so a small page holds
- * them all; the card decides how many of them to show.
+ * A page of bulletins rather than one: the carousel shows every bulletin sent since the
+ * release cutoff, and the page also carries the older unacknowledged ones that the cutoff
+ * filters out on the device. One page is enough by design: no more than 50 bulletins are
+ * ever active at once, and usually fewer than 5, so the home does not follow the cursor.
  */
-const BULLETINS_PAGE_SIZE = 10
+const BULLETINS_PAGE_SIZE = 50
 
 // eslint-disable-next-line max-statements, max-lines-per-function -- HomeScreen orchestrates the entire home; splitting solely to meet the statement and line caps would fragment cohesive setup without improving readability
 export const HomeScreen: React.FC = () => {
@@ -316,6 +323,10 @@ export const HomeScreen: React.FC = () => {
     skip: !isAuthed,
     fetchPolicy: "cache-and-network",
     variables: { first: BULLETINS_PAGE_SIZE },
+  })
+  const { items: serverBulletinItems, carouselKey } = useServerBulletinItems({
+    loading: bulletinsLoading,
+    bulletins,
   })
 
   // not loaded yet: no wallets while not ready (a loaded account keeps its balance
@@ -587,6 +598,55 @@ export const HomeScreen: React.FC = () => {
     !isAnotherHomeModalVisible &&
     !isTwoFactorModalOpen &&
     isFocused
+
+  /** Every home bulletin in one carousel: the server ones first, newest first, then the
+   *  app's own in their former home order. The network status stays outside it. */
+  const appBulletinCandidates: (CarouselItem | false)[] = [
+    isSelfCustodial &&
+      actionableDeposits(deposits).length > 0 && {
+        key: "unclaimed-deposit",
+        node: <UnclaimedDepositBanner deposits={deposits} />,
+      },
+    shouldShowBanner && {
+      key: "backup-nudge",
+      node: <BackupNudgeBanner onDismiss={dismissBanner} />,
+    },
+    shouldShowTwoFactorNudgeCard && {
+      key: "two-factor-nudge",
+      node: <TwoFactorNudgeCard />,
+    },
+    twoFactorReminderReason !== null && {
+      key: "two-factor-reminder",
+      node: <TwoFactorReminderBulletin reason={twoFactorReminderReason} />,
+    },
+    offboardBulletin.isVisible && {
+      key: "offboard",
+      node: <OffboardOnlyBulletin />,
+    },
+    reminderBulletin.isVisible && {
+      key: "migration-reminder",
+      node: (
+        <MigrationReminderBulletin
+          onMigrate={goToMigration}
+          phase={reminderBulletin.phase}
+          deadlineTimestamp={reminderBulletin.deadlineTimestamp}
+          receiveDisabledTimestamp={reminderBulletin.receiveDisabledTimestamp}
+          timezone={reminderBulletin.timezone}
+        />
+      ),
+    },
+    shouldShowSelfCustodialInfoBulletin && {
+      key: "self-custodial-info",
+      node: <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />,
+    },
+  ]
+  /** Shown at once, the app's cards and any cached server bulletins alike, while the
+   *  request is in flight. `carouselKey` remounts the carousel on the newest server
+   *  bulletin when the first response puts some ahead of the card it opened on. */
+  const bulletinItems = [
+    ...serverBulletinItems,
+    ...appBulletinCandidates.filter((item): item is CarouselItem => item !== false),
+  ]
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)
@@ -1011,27 +1071,8 @@ export const HomeScreen: React.FC = () => {
             </React.Fragment>
           ))}
         </View>
-        {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
-        {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
-        {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
-        {twoFactorReminderReason && (
-          <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
-        )}
-        {offboardBulletin.isVisible && <OffboardOnlyBulletin />}
-        {reminderBulletin.isVisible && (
-          <MigrationReminderBulletin
-            onMigrate={goToMigration}
-            phase={reminderBulletin.phase}
-            deadlineTimestamp={reminderBulletin.deadlineTimestamp}
-            receiveDisabledTimestamp={reminderBulletin.receiveDisabledTimestamp}
-            timezone={reminderBulletin.timezone}
-          />
-        )}
-        {shouldShowSelfCustodialInfoBulletin && (
-          <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
-        )}
-        <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
+        <BulletinCarousel key={carouselKey} items={bulletinItems} />
         <AppUpdate />
         <SetDefaultAccountModal
           isVisible={setDefaultAccountModalVisible}

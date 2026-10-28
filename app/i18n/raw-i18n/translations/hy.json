@@ -2172,7 +2172,9 @@
     "updateAvailable": "Թարմացումը հասանելի է։\nՍեղմել թարմացման համար",
     "useLightning": "Մենք օգտագործում ենք Lightning ցանցը։",
     "myAccounts": "Մնացորդներ",
-    "walletCountNotTwo": "Դրամապանակների քանակը 2 չէ։ Խնդրում ենք օգտագործել վահանակը՝ այս հաշվի բոլոր դրամապանակներն ու միջոցները տեսնելու համար"
+    "walletCountNotTwo": "Դրամապանակների քանակը 2 չէ։ Խնդրում ենք օգտագործել վահանակը՝ այս հաշվի բոլոր դրամապանակներն ու միջոցները տեսնելու համար",
+    "bulletinPosition": "Ծանուցում {position: number}՝ {total: number}-ից",
+    "bulletinReadMore": "Կարդալ ավելին"
   },
   "PinScreen": {
     "attemptsRemaining": "Սխալ PIN: {attemptsRemaining: number} փորձեր են մնացել։ ",

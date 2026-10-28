@@ -66,6 +66,7 @@ const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeeway
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
 const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
+const BulletinsShownSinceKey = "bulletinsShownSince"
 const CustodialTwoFactorEnforcementEnabledKey = "custodialTwoFactorEnforcementEnabled"
 const CustodialTwoFactorThresholdsKey = "custodialTwoFactorThresholds"
 const FeeRatesConfigKey = "feeRatesConfig"
@@ -141,6 +142,7 @@ type RemoteConfig = {
   [MigrationReceiveDelayedNoticeMsKey]: number
   [MigrationDelayedRedirectEnabledKey]: boolean
   [PersistentBulletinsEnabledKey]: boolean
+  [BulletinsShownSinceKey]: number
   [CustodialTwoFactorEnforcementEnabledKey]: boolean
   [CustodialTwoFactorThresholdsKey]: TwoFactorThresholds
   [FeeRatesConfigKey]: FeeRatesConfig
@@ -290,6 +292,11 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  such a bulletin stays until the server retires it. A console toggle, so a bulletin
    *  stuck on every home by mistake can be made closable again without a release. */
   persistentBulletinsEnabled: false,
+  /** The release cutoff of the home bulletin carousel, as a Unix timestamp in seconds.
+   *  A closable bulletin sent before it is never shown, so the carousel does not bring
+   *  back the unacknowledged bulletins the single-card home used to hide behind newer
+   *  ones. A bulletin the user cannot close is exempt: the home already pins it. */
+  bulletinsShownSince: Date.UTC(2026, 9, 20) / 1000,
   /** Whether a custodial account's balance earns it two-factor prompts. Off by default
    *  so the prompts reach users only once the console turns them on, and can be pulled
    *  back the same way without a release. */
@@ -620,6 +627,11 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.persistentBulletinsEnabled,
   )
 
+  const bulletinsShownSince = getRemoteConfigPositiveNumber(
+    BulletinsShownSinceKey,
+    defaultRemoteConfig.bulletinsShownSince,
+  )
+
   const custodialTwoFactorEnforcementEnabled = readBoolean(
     CustodialTwoFactorEnforcementEnabledKey,
     defaultRemoteConfig.custodialTwoFactorEnforcementEnabled,
@@ -680,6 +692,7 @@ const readRemoteConfig = (): RemoteConfig => {
     migrationReceiveDelayedNoticeMs,
     migrationDelayedRedirectEnabled,
     persistentBulletinsEnabled,
+    bulletinsShownSince,
     custodialTwoFactorEnforcementEnabled,
     custodialTwoFactorThresholds,
     feeRatesConfig,

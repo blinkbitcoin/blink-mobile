@@ -6,25 +6,24 @@ import {
   View,
   Linking,
 } from "react-native"
-import { render, fireEvent, waitFor, act } from "@testing-library/react-native"
+import {
+  render,
+  renderHook,
+  fireEvent,
+  waitFor,
+  act,
+} from "@testing-library/react-native"
 
 import { flushEffects } from "../helpers/flush-effects"
 
-/** Records whether the list is asked to stay visible, the one thing the animation reads. */
-const mockDropInOut = jest.fn((_options: { visible: boolean }) => ({
-  opacity: { _value: 1 },
-  translateY: { _value: 0 },
-}))
-jest.mock("@app/components/animations", () => ({
-  useDropInOutAnimation: (options: { visible: boolean }) => mockDropInOut(options),
-}))
-
-import { BulletinsCard } from "@app/components/notifications/bulletins"
+import { useServerBulletinItems } from "@app/components/notifications/bulletins"
 import { testBulletinsStore } from "@app/components/notifications/test-bulletins-store"
-import { BulletinsQuery, Icon } from "@app/graphql/generated"
+import { defaultRemoteConfig } from "@app/config/feature-flags-context"
+import { BulletinsDocument, BulletinsQuery, Icon } from "@app/graphql/generated"
 
-const mockAck = jest.fn(() => Promise.resolve())
-const mockRefetchQueries = jest.fn()
+type AckOptions = { variables: { input: { notificationId: string } } }
+const mockAck = jest.fn<Promise<void>, [AckOptions]>(() => Promise.resolve())
+const mockRefetchQueries = jest.fn(() => Promise.resolve())
 
 jest.mock("@apollo/client", () => ({
   ...jest.requireActual("@apollo/client"),
@@ -33,7 +32,7 @@ jest.mock("@apollo/client", () => ({
   }),
 }))
 
-/** Persistent bulletins on, the rollout this card is built for; the flag's own tests
+/** Persistent bulletins on, the rollout these cards are built for; the flag's own tests
  *  switch it off. */
 const mockRemoteConfig = { persistentBulletinsEnabled: true }
 jest.mock("@app/config/feature-flags-context", () => {
@@ -112,12 +111,15 @@ type BulletinNode = NonNullable<
   BulletinsQuery["me"]
 >["unacknowledgedStatefulNotificationsWithBulletinEnabled"]["edges"][number]["node"]
 
+const CUTOFF = defaultRemoteConfig.bulletinsShownSince
+const HOUR = 3600
+
 const makeBulletin = (overrides: Partial<BulletinNode> = {}): BulletinNode => ({
   __typename: "StatefulNotification" as const,
   id: "notif-1",
   title: "Test Bulletin",
   body: "Test body text",
-  createdAt: 1700000000,
+  createdAt: CUTOFF + HOUR,
   acknowledgedAt: null,
   bulletinEnabled: true,
   dismissible: true,
@@ -149,6 +151,37 @@ const makeBulletinsQuery = (bulletins: BulletinNode[]): BulletinsQuery => ({
   },
 })
 
+type HarnessProps = { loading?: boolean; bulletins: BulletinsQuery | undefined }
+
+/** Every card the hook returns, in order, each tagged with its carousel key. */
+const Harness: React.FC<HarnessProps> = ({ loading = false, bulletins }) => {
+  const { items } = useServerBulletinItems({ loading, bulletins })
+  return (
+    <>
+      {items.map(({ key, node }) => (
+        <View key={key} testID={`item-${key}`}>
+          {node}
+        </View>
+      ))}
+    </>
+  )
+}
+
+const renderItems = (bulletins: BulletinNode[] | undefined, loading = false) =>
+  render(
+    <Harness
+      loading={loading}
+      bulletins={bulletins ? makeBulletinsQuery(bulletins) : undefined}
+    />,
+  )
+
+type Rendered = ReturnType<typeof render>
+
+const itemKeys = (rendered: Rendered): string[] =>
+  rendered
+    .queryAllByTestId(/^item-/)
+    .map((node) => String(node.props.testID).replace(/^item-/, ""))
+
 beforeEach(() => {
   jest.clearAllMocks()
   /** Reset, not only cleared: a one-shot rejection a test queued and did not use must
@@ -160,23 +193,32 @@ beforeEach(() => {
   mockRemoteConfig.persistentBulletinsEnabled = true
 })
 
-describe("BulletinsCard", () => {
-  it("returns null when loading", () => {
-    const { toJSON } = render(<BulletinsCard loading={true} bulletins={undefined} />)
+describe("useServerBulletinItems", () => {
+  /** `cache-and-network` hands back the cached bulletins with `loading` still true: they
+   *  stay on screen while the request is in flight. */
+  it("keeps the cached bulletins while a request is in flight", () => {
+    const rendered = renderItems([makeBulletin()], true)
 
-    expect(toJSON()).toBeNull()
+    expect(itemKeys(rendered)).toEqual(["server-notif-1"])
   })
 
-  it("renders bulletin title and body", () => {
-    const bulletins = makeBulletinsQuery([makeBulletin()])
-    const { getByText } = render(<BulletinsCard loading={false} bulletins={bulletins} />)
+  it("keeps the app's queued card while the first request is in flight", () => {
+    mockCardInfo.current = { title: "Local card", text: "Shown by the app" }
+    const rendered = renderItems(undefined, true)
 
-    expect(getByText("Test Bulletin")).toBeTruthy()
-    expect(getByText("Test body text")).toBeTruthy()
+    expect(itemKeys(rendered)).toEqual(["notify-card"])
   })
 
-  it("renders button when action has label", () => {
-    const bulletins = makeBulletinsQuery([
+  it("renders a card with the bulletin's title and body, keyed by its id", () => {
+    const rendered = renderItems([makeBulletin()])
+
+    expect(itemKeys(rendered)).toEqual(["server-notif-1"])
+    expect(rendered.getByText("Test Bulletin")).toBeTruthy()
+    expect(rendered.getByText("Test body text")).toBeTruthy()
+  })
+
+  it("renders the action's label as a button", () => {
+    const rendered = renderItems([
       makeBulletin({
         action: {
           __typename: "OpenExternalLinkAction",
@@ -185,309 +227,238 @@ describe("BulletinsCard", () => {
         },
       }),
     ])
-    const { getByText, queryByTestId } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
 
-    expect(queryByTestId("primary-button")).toBeTruthy()
-    expect(getByText("Deposit now")).toBeTruthy()
+    expect(rendered.getByTestId("primary-button")).toBeTruthy()
+    expect(rendered.getByText("Deposit now")).toBeTruthy()
   })
 
-  it("does not render button when action has no label", () => {
-    const bulletins = makeBulletinsQuery([makeBulletin()])
-    const { queryByTestId } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
-
-    expect(queryByTestId("primary-button")).toBeNull()
-  })
-
-  it("converts icon enum to lowercase kebab-case", () => {
-    const bulletins = makeBulletinsQuery([
-      makeBulletin({ icon: "PAYMENT_SUCCESS" as Icon }),
+  it("renders no button when the action has no label", () => {
+    const rendered = renderItems([
+      makeBulletin({
+        action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
+      }),
     ])
-    const { queryByTestId } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
 
-    expect(queryByTestId("galoy-icon-payment-success")).toBeTruthy()
+    expect(rendered.queryByTestId("primary-button")).toBeNull()
   })
 
-  it("replaces every underscore in a multi-word icon enum", () => {
-    const bulletins = makeBulletinsQuery([
+  it("turns every underscore of the icon enum into a dash, in lower case", () => {
+    const rendered = renderItems([
       makeBulletin({ icon: "WARNING_WITH_BACKGROUND" as Icon }),
     ])
-    const { queryByTestId } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
 
-    expect(queryByTestId("galoy-icon-warning-with-background")).toBeTruthy()
+    expect(rendered.getByTestId("galoy-icon-warning-with-background")).toBeTruthy()
   })
 
-  it("does not render icon when icon is null", () => {
-    const bulletins = makeBulletinsQuery([makeBulletin()])
-    const { queryByTestId } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
+  it("renders no icon when the bulletin has none", () => {
+    const rendered = renderItems([makeBulletin()])
 
-    expect(queryByTestId(/galoy-icon/)).toBeNull()
+    expect(rendered.queryByTestId(/galoy-icon/)).toBeNull()
   })
 
-  it("calls ack and opens deep link on action press", async () => {
-    const bulletins = makeBulletinsQuery([
-      makeBulletin({
-        action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
-      }),
-    ])
-    const { getByText } = render(<BulletinsCard loading={false} bulletins={bulletins} />)
+  describe("which bulletins it shows, and in what order", () => {
+    it("shows every bulletin sent since the cutoff, newest first", () => {
+      const rendered = renderItems([
+        makeBulletin({ id: "middle", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin({ id: "oldest", createdAt: CUTOFF }),
+        makeBulletin({ id: "newest", createdAt: CUTOFF + 3 * HOUR }),
+      ])
 
-    fireEvent.press(getByText("Test Bulletin"))
-
-    await waitFor(() => {
-      expect(mockAck).toHaveBeenCalledWith({
-        variables: { input: { notificationId: "notif-1" } },
-      })
-      expect(Linking.openURL).toHaveBeenCalledWith("blink:/settings")
-    })
-  })
-
-  it("calls ack and opens external URL on action press", async () => {
-    const bulletins = makeBulletinsQuery([
-      makeBulletin({
-        action: { __typename: "OpenExternalLinkAction", url: "https://example.com" },
-      }),
-    ])
-    const { getByText } = render(<BulletinsCard loading={false} bulletins={bulletins} />)
-
-    fireEvent.press(getByText("Test Bulletin"))
-
-    await waitFor(() => {
-      expect(mockAck).toHaveBeenCalled()
-      expect(Linking.openURL).toHaveBeenCalledWith("https://example.com")
-    })
-  })
-
-  it("calls ack on dismiss without opening any link", async () => {
-    const bulletins = makeBulletinsQuery([makeBulletin()])
-    const { getByTestId } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
-
-    fireEvent.press(getByTestId("icon-button-close"))
-
-    expect(mockAck).toHaveBeenCalledWith({
-      variables: { input: { notificationId: "notif-1" } },
-    })
-    expect(Linking.openURL).not.toHaveBeenCalled()
-    await flushEffects()
-  })
-
-  /** The server keeps such a bulletin up until it retires it itself; the app offers no
-   *  way to close it and does not acknowledge it on a tap either. */
-  describe("a bulletin that is not dismissible", () => {
-    it("offers no close control", () => {
-      const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
-      const { getByText, queryByTestId } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
-
-      expect(getByText("Test Bulletin")).toBeTruthy()
-      expect(queryByTestId("icon-button-close")).toBeNull()
+      expect(itemKeys(rendered)).toEqual([
+        "server-newest",
+        "server-middle",
+        "server-oldest",
+      ])
     })
 
-    /** A standing notice with no link has nothing to open and nothing to acknowledge, so
-     *  it is an inert card: no press feedback, no button role, no dead press. */
-    it("is an inert card when it has no link", () => {
-      const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
-      const rendered = render(<BulletinsCard loading={false} bulletins={bulletins} />)
+    it("sorts a bulletin the user cannot close by date with the rest", () => {
+      const rendered = renderItems([
+        makeBulletin({ id: "pinned", dismissible: false, createdAt: CUTOFF + HOUR }),
+        makeBulletin({ id: "newer", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin({ id: "older", createdAt: CUTOFF }),
+      ])
 
-      expect(rendered.getByText("Test Bulletin")).toBeTruthy()
-      expect(rendered.UNSAFE_queryAllByType(TouchableOpacity)).toHaveLength(0)
-
-      fireEvent.press(rendered.getByText("Test Bulletin"))
-      expect(Linking.openURL).not.toHaveBeenCalled()
-      expect(mockAck).not.toHaveBeenCalled()
+      expect(itemKeys(rendered)).toEqual([
+        "server-newer",
+        "server-pinned",
+        "server-older",
+      ])
     })
 
-    /** What the feature promises: pressing it opens its link and leaves it in place, and
-     *  the list the server sends back afterwards still carries it. */
-    it("is still on the home after a press and the refetch that follows", async () => {
-      const bulletin = makeBulletin({
-        dismissible: false,
-        action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
-      })
-      const { getByText, rerender } = render(
-        <BulletinsCard loading={false} bulletins={makeBulletinsQuery([bulletin])} />,
-      )
+    /** The single-card home hid these behind newer ones; the carousel must not bring
+     *  them back. */
+    it("hides a closable bulletin sent before the cutoff", () => {
+      const rendered = renderItems([
+        makeBulletin({ id: "before", title: "Before", createdAt: CUTOFF - 1 }),
+        makeBulletin({ id: "after", title: "After" }),
+      ])
 
-      fireEvent.press(getByText("Test Bulletin"))
-      await flushEffects()
-      rerender(
-        <BulletinsCard
-          loading={false}
-          bulletins={makeBulletinsQuery([{ ...bulletin }])}
-        />,
-      )
-
-      expect(mockAck).not.toHaveBeenCalled()
-      expect(getByText("Test Bulletin")).toBeTruthy()
+      expect(itemKeys(rendered)).toEqual(["server-after"])
+      expect(rendered.queryByText("Before")).toBeNull()
     })
 
-    it("opens its deep link on press without acknowledging it", async () => {
-      const bulletins = makeBulletinsQuery([
+    it("still shows a bulletin the user cannot close, however old", () => {
+      const rendered = renderItems([
         makeBulletin({
+          id: "pinned",
           dismissible: false,
+          createdAt: CUTOFF - 90 * 86400,
+        }),
+      ])
+
+      expect(itemKeys(rendered)).toEqual(["server-pinned"])
+    })
+  })
+
+  describe("closing with the X", () => {
+    it("acknowledges the bulletin, then refetches, without opening any link", async () => {
+      const rendered = renderItems([
+        makeBulletin({
           action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
         }),
       ])
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
 
-      fireEvent.press(getByText("Test Bulletin"))
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
       await flushEffects()
 
-      expect(Linking.openURL).toHaveBeenCalledWith("blink:/settings")
-      expect(mockAck).not.toHaveBeenCalled()
-      expect(mockRefetchQueries).not.toHaveBeenCalled()
-    })
-
-    it("opens its external link on press without acknowledging it", async () => {
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({
-          dismissible: false,
-          action: { __typename: "OpenExternalLinkAction", url: "https://example.com" },
-        }),
-      ])
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
+      expect(mockAck).toHaveBeenCalledWith({
+        variables: { input: { notificationId: "notif-1" } },
+      })
+      expect(mockRefetchQueries).toHaveBeenCalledWith({ include: [BulletinsDocument] })
+      expect(mockAck.mock.invocationCallOrder[0]).toBeLessThan(
+        mockRefetchQueries.mock.invocationCallOrder[0],
       )
-
-      fireEvent.press(getByText("Test Bulletin"))
-      await flushEffects()
-
-      expect(Linking.openURL).toHaveBeenCalledWith("https://example.com")
-      expect(mockAck).not.toHaveBeenCalled()
+      expect(Linking.openURL).not.toHaveBeenCalled()
     })
 
-    /** The one kept up goes on top, whatever arrived after it: a closable bulletin sent
-     *  later sits under it rather than pushing it down or out, and older closable ones
-     *  do not stack. */
-    it("puts the one it keeps up on top of the newest closable one", () => {
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "notif-3", title: "Newer promo", dismissible: true }),
-        makeBulletin({ id: "notif-2", title: "Older promo", dismissible: true }),
-        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
-        makeBulletin({ id: "notif-0", title: "Older notice", dismissible: false }),
-      ])
-      const { queryByText, getAllByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
-
-      expect(
-        getAllByText(/Newer promo|Stays/).map((node) => node.props.children),
-      ).toEqual(["Stays", "Newer promo"])
-      expect(queryByText("Older promo")).toBeNull()
-      expect(queryByText("Older notice")).toBeNull()
-    })
-
-    it("shows the one it keeps up alone when nothing closable came with it", () => {
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "notif-2", title: "Stays", dismissible: false }),
-        makeBulletin({ id: "notif-1", title: "Older notice", dismissible: false }),
-      ])
-      const { getByText, queryByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
-
-      expect(getByText("Stays")).toBeTruthy()
-      expect(queryByText("Older notice")).toBeNull()
-    })
-
-    /** Acknowledging one card spins that card alone; the one kept up stays readable. */
-    it("shows the spinner on the card being closed only", async () => {
+    it("shows the spinner on the card being closed only, until it is acknowledged", async () => {
       let release: () => void = () => {}
-      mockAck.mockImplementation(
+      mockAck.mockImplementationOnce(
         () =>
           new Promise<void>((resolve) => {
             release = resolve
           }),
       )
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
-        makeBulletin({ id: "notif-2", title: "Closable", dismissible: true }),
+      const rendered = renderItems([
+        makeBulletin({ id: "closing", title: "Closing", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin({ id: "other", title: "Other" }),
       ])
-      const rendered = render(<BulletinsCard loading={false} bulletins={bulletins} />)
 
-      fireEvent.press(rendered.getByTestId("icon-button-close"))
+      fireEvent.press(rendered.getAllByTestId("icon-button-close")[0])
       await act(async () => {})
 
       expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(1)
-      expect(rendered.getByText("Stays")).toBeTruthy()
-      expect(rendered.queryByText("Closable")).toBeNull()
+      expect(rendered.queryByText("Closing")).toBeNull()
+      expect(rendered.getByText("Other")).toBeTruthy()
 
       await act(async () => {
         release()
       })
       expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
+      expect(itemKeys(rendered)).toEqual(["server-other"])
     })
 
-    /** Closing one of two cards must not take the one that stays out with it: the list
-     *  animates out only when the card closed was the last one shown. */
-    it("keeps the list up when a card closes next to one that stays", async () => {
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
-        makeBulletin({ id: "notif-2", title: "Closable", dismissible: true }),
-      ])
-      const { getByTestId } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
+    /** The server has the acknowledgement: a refetch that never settles must not leave
+     *  the card spinning, nor the close guard held. */
+    it("takes the card out once acknowledged, without waiting for the refetch", async () => {
+      mockRefetchQueries.mockImplementationOnce(() => new Promise<void>(() => {}))
+      const rendered = renderItems([makeBulletin()])
 
-      fireEvent.press(getByTestId("icon-button-close"))
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
       await flushEffects()
 
-      expect(mockDropInOut).toHaveBeenLastCalledWith(
-        expect.objectContaining({ visible: true }),
-      )
-      expect(mockRefetchQueries).toHaveBeenCalledWith({
-        include: [expect.objectContaining({ kind: "Document" })],
-      })
+      expect(itemKeys(rendered)).toEqual([])
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
     })
 
-    it("stays on the home next to a dismissible one, which keeps its close control", () => {
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "notif-1", title: "Stays", dismissible: false }),
-        makeBulletin({ id: "notif-2", title: "Closable", dismissible: true }),
+    it("logs a failed refetch as a refresh failure, and keeps the card out", async () => {
+      const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
+      mockRefetchQueries.mockRejectedValueOnce(new Error("offline"))
+      const rendered = renderItems([makeBulletin()])
+
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
+      await flushEffects()
+
+      expect(itemKeys(rendered)).toEqual([])
+      expect(consoleError).toHaveBeenCalledWith(
+        "Failed to refresh bulletins",
+        expect.any(Error),
+      )
+      expect(consoleError).not.toHaveBeenCalledWith(
+        "Failed to acknowledge notification",
+        expect.anything(),
+      )
+      consoleError.mockRestore()
+    })
+
+    /** With two closes in flight, the response the cache keeps can be one sent before
+     *  the second acknowledgement landed, which still lists that bulletin. */
+    it("keeps an acknowledged bulletin out when a stale response still lists it", async () => {
+      const a = makeBulletin({ id: "a", title: "A", createdAt: CUTOFF + 2 * HOUR })
+      const b = makeBulletin({ id: "b", title: "B" })
+      const rendered = renderItems([a, b])
+
+      fireEvent.press(rendered.getAllByTestId("icon-button-close")[1])
+      await flushEffects()
+      rendered.rerender(<Harness bulletins={makeBulletinsQuery([a, b])} />)
+
+      expect(itemKeys(rendered)).toEqual(["server-a"])
+    })
+
+    /** The carousel stays swipeable while a card closes, so a second close can start
+     *  before the first settles: each card keeps its own spinner until its own request
+     *  settles, and a close of a card already closing sends nothing. */
+    it("keeps each closing card's spinner until its own request settles", async () => {
+      const releases: Record<string, () => void> = {}
+      mockAck.mockImplementation(
+        ({ variables }) =>
+          new Promise<void>((resolve) => {
+            releases[variables.input.notificationId] = resolve
+          }),
+      )
+      const rendered = renderItems([
+        makeBulletin({ id: "a", title: "A", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin({ id: "b", title: "B" }),
       ])
-      const { getByText, getAllByTestId } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
 
-      expect(getByText("Stays")).toBeTruthy()
-      expect(getByText("Closable")).toBeTruthy()
-      expect(getAllByTestId("icon-button-close")).toHaveLength(1)
+      const [closeA, closeB] = rendered.getAllByTestId("icon-button-close")
+      fireEvent.press(closeA)
+      fireEvent.press(closeB)
+      fireEvent.press(closeB)
+      await act(async () => {})
+
+      expect(mockAck).toHaveBeenCalledTimes(2)
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(2)
+
+      await act(async () => {
+        releases.a()
+      })
+
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(1)
+      expect(rendered.queryByText("B")).toBeNull()
+      expect(mockAck).toHaveBeenCalledTimes(2)
+      expect(
+        mockAck.mock.calls.filter(
+          ([{ variables }]) => variables.input.notificationId === "b",
+        ),
+      ).toHaveLength(1)
+
+      await act(async () => {
+        releases.b()
+      })
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
     })
-  })
 
-  /** The card is gone only once the server has taken the acknowledgement: a failed one
-   *  leaves it in place, and a successful one refetches the list after the exit animation. */
-  describe("acknowledging", () => {
-    afterEach(() => {
-      jest.useRealTimers()
-    })
-
-    it("keeps the bulletin and says so in the log when the acknowledgement fails", async () => {
+    it("keeps the card and logs when the acknowledgement fails", async () => {
       const consoleError = jest.spyOn(console, "error").mockImplementation(() => {})
       mockAck.mockRejectedValueOnce(new Error("offline"))
-      const bulletins = makeBulletinsQuery([makeBulletin()])
-      const { getByTestId, getByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
+      const rendered = renderItems([makeBulletin()])
 
-      fireEvent.press(getByTestId("icon-button-close"))
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
       await flushEffects()
 
-      expect(getByText("Test Bulletin")).toBeTruthy()
+      expect(rendered.getByText("Test Bulletin")).toBeTruthy()
+      expect(rendered.UNSAFE_queryAllByType(ActivityIndicator)).toHaveLength(0)
       expect(mockRefetchQueries).not.toHaveBeenCalled()
       expect(consoleError).toHaveBeenCalledWith(
         "Failed to acknowledge notification",
@@ -495,40 +466,93 @@ describe("BulletinsCard", () => {
       )
       consoleError.mockRestore()
     })
+  })
 
-    it("refetches the bulletins once the exit animation has run", async () => {
-      jest.useFakeTimers()
-      const bulletins = makeBulletinsQuery([makeBulletin()])
-      const { getByTestId } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
+  describe("opening the link", () => {
+    it("opens a deep link and acknowledges a closable bulletin", async () => {
+      const rendered = renderItems([
+        makeBulletin({
+          action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
+        }),
+      ])
 
-      fireEvent.press(getByTestId("icon-button-close"))
-      await act(async () => {})
-      expect(mockRefetchQueries).not.toHaveBeenCalled()
+      fireEvent.press(rendered.getByText("Test Bulletin"))
+      await flushEffects()
 
-      act(() => {
-        jest.runOnlyPendingTimers()
+      expect(Linking.openURL).toHaveBeenCalledWith("blink:/settings")
+      expect(mockAck).toHaveBeenCalledWith({
+        variables: { input: { notificationId: "notif-1" } },
       })
+      expect(mockRefetchQueries).toHaveBeenCalled()
+    })
 
-      expect(mockRefetchQueries).toHaveBeenCalledWith({
-        include: [expect.objectContaining({ kind: "Document" })],
-      })
+    it("opens an external link from the action button", async () => {
+      const rendered = renderItems([
+        makeBulletin({
+          action: {
+            __typename: "OpenExternalLinkAction",
+            url: "https://example.com",
+            label: "Visit",
+          },
+        }),
+      ])
+
+      fireEvent.press(rendered.getByTestId("primary-button"))
+      await flushEffects()
+
+      expect(Linking.openURL).toHaveBeenCalledWith("https://example.com")
+      expect(mockAck).toHaveBeenCalledTimes(1)
+    })
+
+    /** Only the X or opening the link closes a bulletin, so a card with no link is not a
+     *  button: no press feedback, and a tap neither opens nor acknowledges anything. */
+    it("does nothing on a tap when a closable bulletin has no link", async () => {
+      const rendered = renderItems([makeBulletin()])
+
+      expect(rendered.UNSAFE_queryAllByType(TouchableOpacity)).toHaveLength(1)
+      fireEvent.press(rendered.getByText("Test Bulletin"))
+      await flushEffects()
+
+      expect(Linking.openURL).not.toHaveBeenCalled()
+      expect(mockAck).not.toHaveBeenCalled()
     })
   })
 
-  /** Closable bulletins do not stack: the newest one the server sent is the one shown. */
-  it("shows only the newest of several closable bulletins", () => {
-    const bulletins = makeBulletinsQuery([
-      makeBulletin({ id: "notif-2", title: "Newest" }),
-      makeBulletin({ id: "notif-1", title: "Older" }),
-    ])
-    const { getByText, queryByText } = render(
-      <BulletinsCard loading={false} bulletins={bulletins} />,
-    )
+  /** The server keeps such a bulletin up until it retires it itself. */
+  describe("a bulletin that is not dismissible", () => {
+    it("offers no close control", () => {
+      const rendered = renderItems([makeBulletin({ dismissible: false })])
 
-    expect(getByText("Newest")).toBeTruthy()
-    expect(queryByText("Older")).toBeNull()
+      expect(rendered.getByText("Test Bulletin")).toBeTruthy()
+      expect(rendered.queryByTestId("icon-button-close")).toBeNull()
+    })
+
+    it("is an inert card when it has no link", async () => {
+      const rendered = renderItems([makeBulletin({ dismissible: false })])
+
+      expect(rendered.UNSAFE_queryAllByType(TouchableOpacity)).toHaveLength(0)
+      fireEvent.press(rendered.getByText("Test Bulletin"))
+      await flushEffects()
+
+      expect(Linking.openURL).not.toHaveBeenCalled()
+      expect(mockAck).not.toHaveBeenCalled()
+    })
+
+    it("opens its link without acknowledging it, and stays", async () => {
+      const bulletin = makeBulletin({
+        dismissible: false,
+        action: { __typename: "OpenExternalLinkAction", url: "https://example.com" },
+      })
+      const rendered = renderItems([bulletin])
+
+      fireEvent.press(rendered.getByText("Test Bulletin"))
+      await flushEffects()
+
+      expect(Linking.openURL).toHaveBeenCalledWith("https://example.com")
+      expect(mockAck).not.toHaveBeenCalled()
+      expect(mockRefetchQueries).not.toHaveBeenCalled()
+      expect(rendered.getByText("Test Bulletin")).toBeTruthy()
+    })
   })
 
   /** The rollout switch: off, a bulletin marked as not dismissible is treated like any
@@ -539,12 +563,9 @@ describe("BulletinsCard", () => {
     })
 
     it("gives a bulletin marked as not dismissible its close control back", async () => {
-      const bulletins = makeBulletinsQuery([makeBulletin({ dismissible: false })])
-      const { getByTestId } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
+      const rendered = renderItems([makeBulletin({ dismissible: false })])
 
-      fireEvent.press(getByTestId("icon-button-close"))
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
       await flushEffects()
 
       expect(mockAck).toHaveBeenCalledWith({
@@ -552,202 +573,217 @@ describe("BulletinsCard", () => {
       })
     })
 
-    it("acknowledges it on a press, as any closable bulletin", async () => {
-      const bulletins = makeBulletinsQuery([
+    it("acknowledges it when its link opens, as any closable bulletin", async () => {
+      const rendered = renderItems([
         makeBulletin({
           dismissible: false,
           action: { __typename: "OpenDeepLinkAction", deepLink: "settings" },
         }),
       ])
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
 
-      fireEvent.press(getByText("Test Bulletin"))
+      fireEvent.press(rendered.getByText("Test Bulletin"))
       await flushEffects()
 
       expect(Linking.openURL).toHaveBeenCalledWith("blink:/settings")
       expect(mockAck).toHaveBeenCalledTimes(1)
     })
 
-    it("shows only the newest bulletin, whichever it is", () => {
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "notif-2", title: "Newest", dismissible: true }),
-        makeBulletin({ id: "notif-1", title: "Kept up", dismissible: false }),
+    it("applies the cutoff to it too", () => {
+      const rendered = renderItems([
+        makeBulletin({ id: "old", dismissible: false, createdAt: CUTOFF - 1 }),
       ])
-      const { getByText, queryByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
 
-      expect(getByText("Newest")).toBeTruthy()
-      expect(queryByText("Kept up")).toBeNull()
+      expect(itemKeys(rendered)).toEqual([])
     })
   })
 
-  /** With nothing from the server, the card the app itself asked for is what shows. */
-  it("falls back to the app's own card when no bulletin came from the server", () => {
-    mockCardInfo.current = {
-      title: "Local card",
-      text: "Shown by the app",
-      action: async () => {},
-      dismissAction: () => {},
-    }
+  describe("the app's own card", () => {
+    beforeEach(() => {
+      mockCardInfo.current = {
+        title: "Local card",
+        text: "Shown by the app",
+        action: async () => {},
+        dismissAction: () => {},
+      }
+    })
 
-    const { getByText } = render(<BulletinsCard loading={false} bulletins={undefined} />)
+    it("takes the place of the server bulletins when there are none", () => {
+      const rendered = renderItems(undefined)
 
-    expect(getByText("Local card")).toBeTruthy()
-    expect(getByText("Shown by the app")).toBeTruthy()
+      expect(itemKeys(rendered)).toEqual(["notify-card"])
+      expect(rendered.getByText("Local card")).toBeTruthy()
+      expect(rendered.getByText("Shown by the app")).toBeTruthy()
+    })
+
+    it("is not shown next to a server bulletin", () => {
+      const rendered = renderItems([makeBulletin()])
+
+      expect(itemKeys(rendered)).toEqual(["server-notif-1"])
+    })
   })
 
-  it("returns null when bulletins is undefined and no cardInfo", () => {
-    const { toJSON } = render(<BulletinsCard loading={false} bulletins={undefined} />)
+  it("returns no card when there is nothing to show", () => {
+    const rendered = renderItems(undefined)
 
-    expect(toJSON()).toBeNull()
+    expect(itemKeys(rendered)).toEqual([])
   })
 
   describe("test bulletins (__DEV__)", () => {
-    it("renders test bulletins when no real bulletins exist", () => {
+    it("come after the server bulletins", () => {
       testBulletinsStore.add({
-        id: "test-1",
-        title: "Test Notification",
-        body: "This is a test",
-        type: "none",
-      })
-
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
-
-      expect(getByText("Test Notification")).toBeTruthy()
-      expect(getByText("This is a test")).toBeTruthy()
-    })
-
-    it("renders test bulletins alongside real bulletins", () => {
-      testBulletinsStore.add({
-        id: "test-1",
+        id: "dev-1",
         title: "Dev Bulletin",
         body: "Dev body",
         type: "none",
       })
 
-      const bulletins = makeBulletinsQuery([
-        makeBulletin({ id: "real-1", title: "Real Bulletin" }),
-      ])
+      const rendered = renderItems([makeBulletin({ id: "real-1" })])
 
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={bulletins} />,
-      )
-
-      expect(getByText("Real Bulletin")).toBeTruthy()
-      expect(getByText("Dev Bulletin")).toBeTruthy()
+      expect(itemKeys(rendered)).toEqual(["server-real-1", "test-dev-1"])
     })
 
-    it("renders icon for deep-link test bulletin", () => {
+    it("render their icon", () => {
       testBulletinsStore.add({
-        id: "test-dl",
-        title: "Deep Link Test",
-        body: "Tap to open",
-        icon: "bitcoin",
-        type: "deep-link",
-        deepLink: "card/onboarding",
-      })
-
-      const { getByText, queryByTestId } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
-
-      expect(getByText("Deep Link Test")).toBeTruthy()
-      expect(queryByTestId("galoy-icon-bitcoin")).toBeTruthy()
-    })
-
-    it("opens deep link on test bulletin action press", async () => {
-      testBulletinsStore.add({
-        id: "test-dl",
-        title: "Deep Link Test",
-        body: "Tap to open",
-        type: "deep-link",
-        deepLink: "card/onboarding",
-      })
-
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
-
-      fireEvent.press(getByText("Deep Link Test"))
-
-      await waitFor(() => {
-        expect(Linking.openURL).toHaveBeenCalledWith("blink:/card/onboarding")
-      })
-    })
-
-    it("opens external URL on test bulletin action press", async () => {
-      testBulletinsStore.add({
-        id: "test-ext",
-        title: "External Test",
-        body: "Tap to visit",
-        type: "external-link",
-        url: "https://www.blink.sv",
-      })
-
-      const { getByText } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
-
-      fireEvent.press(getByText("External Test"))
-
-      await waitFor(() => {
-        expect(Linking.openURL).toHaveBeenCalledWith("https://www.blink.sv")
-      })
-    })
-
-    it("removes test bulletin on dismiss", async () => {
-      testBulletinsStore.add({
-        id: "test-dismiss",
-        title: "Dismissable",
-        body: "Dismiss me",
-        type: "none",
-      })
-
-      const { getByTestId } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
-
-      fireEvent.press(getByTestId("icon-button-close"))
-
-      await waitFor(() => {
-        expect(testBulletinsStore.getSnapshot()).toEqual([])
-      })
-    })
-
-    it("does not render button for no-action test bulletin", () => {
-      testBulletinsStore.add({
-        id: "test-none",
-        title: "No Action",
-        body: "Just info",
-        type: "none",
-      })
-
-      const { queryByTestId } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
-
-      expect(queryByTestId("primary-button")).toBeNull()
-    })
-
-    it("renders icon for test bulletin with icon", () => {
-      testBulletinsStore.add({
-        id: "test-icon",
+        id: "dev-icon",
         title: "With Icon",
         body: "Has icon",
         icon: "info",
         type: "none",
       })
 
-      const { queryByTestId } = render(
-        <BulletinsCard loading={false} bulletins={undefined} />,
-      )
+      const rendered = renderItems(undefined)
 
-      expect(queryByTestId("galoy-icon-info")).toBeTruthy()
+      expect(rendered.getByTestId("galoy-icon-info")).toBeTruthy()
     })
+
+    it("open a deep link on press and leave", async () => {
+      testBulletinsStore.add({
+        id: "dev-dl",
+        title: "Deep Link Test",
+        body: "Tap to open",
+        type: "deep-link",
+        deepLink: "card/onboarding",
+      })
+      const rendered = renderItems(undefined)
+
+      fireEvent.press(rendered.getByText("Deep Link Test"))
+
+      await waitFor(() => {
+        expect(Linking.openURL).toHaveBeenCalledWith("blink:/card/onboarding")
+        expect(testBulletinsStore.getSnapshot()).toEqual([])
+      })
+    })
+
+    it("open an external link on press", async () => {
+      testBulletinsStore.add({
+        id: "dev-ext",
+        title: "External Test",
+        body: "Tap to visit",
+        type: "external-link",
+        url: "https://www.blink.sv",
+      })
+      const rendered = renderItems(undefined)
+
+      fireEvent.press(rendered.getByText("External Test"))
+
+      await waitFor(() => {
+        expect(Linking.openURL).toHaveBeenCalledWith("https://www.blink.sv")
+      })
+    })
+
+    it("open nothing on press when they have no link", async () => {
+      testBulletinsStore.add({
+        id: "dev-none",
+        title: "No Action",
+        body: "Just info",
+        type: "none",
+      })
+      const rendered = renderItems(undefined)
+
+      fireEvent.press(rendered.getByText("No Action"))
+
+      await waitFor(() => {
+        expect(testBulletinsStore.getSnapshot()).toEqual([])
+      })
+      expect(Linking.openURL).not.toHaveBeenCalled()
+    })
+
+    it("leave on dismiss", async () => {
+      testBulletinsStore.add({
+        id: "dev-dismiss",
+        title: "Dismissable",
+        body: "Dismiss me",
+        type: "none",
+      })
+      const rendered = renderItems(undefined)
+
+      fireEvent.press(rendered.getByTestId("icon-button-close"))
+
+      await waitFor(() => {
+        expect(testBulletinsStore.getSnapshot()).toEqual([])
+      })
+    })
+  })
+})
+
+/** The carousel remounts once, so a cold load opens on the newest server bulletin rather
+ *  than on the app card it was first built from; never again after that. */
+describe("the carousel key", () => {
+  type HookProps = Parameters<typeof useServerBulletinItems>[0]
+  const renderKey = (initial: HookProps) =>
+    renderHook((props: HookProps) => useServerBulletinItems(props).carouselKey, {
+      initialProps: initial,
+    })
+
+  it("changes when the first response brings server bulletins the carousel opened without", () => {
+    const hook = renderKey({ loading: true, bulletins: undefined })
+    const opened = hook.result.current
+
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([makeBulletin()]) })
+
+    expect(hook.result.current).not.toBe(opened)
+  })
+
+  it("keeps it across later refetches, whatever they bring", () => {
+    const hook = renderKey({ loading: true, bulletins: undefined })
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([makeBulletin()]) })
+    const settled = hook.result.current
+
+    hook.rerender({ loading: true, bulletins: makeBulletinsQuery([makeBulletin()]) })
+    hook.rerender({
+      loading: false,
+      bulletins: makeBulletinsQuery([
+        makeBulletin({ id: "newer", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin(),
+      ]),
+    })
+
+    expect(hook.result.current).toBe(settled)
+  })
+
+  it("keeps it when the carousel opened on cached server bulletins", () => {
+    const cached = makeBulletinsQuery([makeBulletin()])
+    const hook = renderKey({ loading: true, bulletins: cached })
+    const opened = hook.result.current
+
+    hook.rerender({
+      loading: false,
+      bulletins: makeBulletinsQuery([
+        makeBulletin({ id: "newer", createdAt: CUTOFF + 2 * HOUR }),
+        makeBulletin(),
+      ]),
+    })
+
+    expect(hook.result.current).toBe(opened)
+  })
+
+  it("keeps it when the first response brings no server bulletin, and after", () => {
+    const hook = renderKey({ loading: true, bulletins: undefined })
+    const opened = hook.result.current
+
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([]) })
+    hook.rerender({ loading: false, bulletins: makeBulletinsQuery([makeBulletin()]) })
+
+    expect(hook.result.current).toBe(opened)
   })
 })

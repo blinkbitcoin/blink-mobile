@@ -2172,7 +2172,9 @@
     "updateAvailable": "تحديث متاح.\nانقر للتحديث الآن",
     "useLightning": "نحن نستخدم شبكة البرق.",
     "myAccounts": "أرصدة",
-    "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
+    "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب",
+    "bulletinPosition": "الإشعار {position: number} من {total: number}",
+    "bulletinReadMore": "اقرأ المزيد"
   },
   "PinScreen": {
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",

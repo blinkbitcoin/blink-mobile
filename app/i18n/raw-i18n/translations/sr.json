@@ -2172,7 +2172,9 @@
     "updateAvailable": "Доступно је ажурирање.\nДодирните да ажурирате сада",
     "useLightning": "Користимо мрежу Lightning.",
     "myAccounts": "Стања",
-    "walletCountNotTwo": "Број новчаника није 2. Молимо користите контролну таблу да видите све новчанике и средства овог налога"
+    "walletCountNotTwo": "Број новчаника није 2. Молимо користите контролну таблу да видите све новчанике и средства овог налога",
+    "bulletinPosition": "Нотификација {position: number} од {total: number}",
+    "bulletinReadMore": "Прочитајте више"
   },
   "PinScreen": {
     "attemptsRemaining": "Неисправан ПИН. Преостало је {attemptsRemaining: number} покушаја.",
