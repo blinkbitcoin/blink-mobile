@@ -95,6 +95,12 @@ export const useRestoreWallet = () => {
           /** Already on this device, so its mode is already stored: re-entering the
            *  phrase is not a new answer about how the account should behave. */
           if (lookup.id) {
+            /** A cloud restore proves the seed is in the cloud whether or not the
+             *  account was already here, so it is recorded the same way as a new one
+             *  and the bundle follows it there. A typed phrase made no new backup. */
+            const isCloudRestore = method === BackupMethod.Cloud
+            if (isCloudRestore)
+              await markBackupCompletedFor(lookup.id, BackupMethod.Cloud)
             activateAccount(lookup.id)
             reinitSdk()
             logSelfCustodialRestoreCompleted()

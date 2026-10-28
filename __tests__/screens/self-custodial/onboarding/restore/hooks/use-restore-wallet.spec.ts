@@ -165,6 +165,28 @@ describe("useRestoreWallet", () => {
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    // Re-entering the phrase made no new backup, so nothing is recorded.
+    expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
+  })
+
+  it("records a cloud restore of an account already on this device as a cloud backup", async () => {
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+      status: "ok",
+      id: "existing-id",
+    })
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+    })
+
+    expect(mockRestore).not.toHaveBeenCalled()
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("existing-id", "cloud")
+    const markOrder = mockMarkBackupCompletedFor.mock.invocationCallOrder[0]
+    const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
+    expect(markOrder).toBeLessThan(activateOrder)
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
   /**
