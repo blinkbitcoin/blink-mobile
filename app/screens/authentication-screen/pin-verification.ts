@@ -172,9 +172,15 @@ export const verifyPin = async (
   if (enteredPin === storedPin) {
     /** Takes the recorded attempt back. Awaited so a kill right after unlock
      *  can't leave it behind. Entry is never refused over a clear that failed,
-     *  since the PIN was proven correct, but what could not be cleared stays
-     *  counted, and locked, for the next unlock, so it is reported. */
-    if (!(await KeyStoreWrapper.clearPinFailureState())) {
+     *  since the PIN was proven correct. */
+    const isCleared = await KeyStoreWrapper.clearPinFailureState()
+    if (!isCleared) {
+      /** A correct entry must not stay stored as a failure with its wait, or the
+       *  next launch shows a lock to someone who just proved the PIN. What the
+       *  store held before this entry goes back instead: the write that recorded
+       *  the entry just landed, so this one likely will too, and if it does not,
+       *  the next correct entry takes the count back. Reported either way. */
+      await KeyStoreWrapper.setPinFailureState(state)
       recordAppError(new Error("PIN attempt count could not be cleared"), {
         alwaysRecord: true,
         dedupKey: PinErrorKey.AttemptsClear,

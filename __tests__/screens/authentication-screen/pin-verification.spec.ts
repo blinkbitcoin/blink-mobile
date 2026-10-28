@@ -121,6 +121,30 @@ describe("verifyPin", () => {
       )
     })
 
+    /** The entry was recorded as a failure, with its wait, before it was compared. A
+     *  refused clear must not leave it that way, or the next launch shows a lock and a
+     *  spent attempt to the person who just proved the PIN. */
+    it("puts back what the store held before a correct entry whose clear is refused", async () => {
+      mockedStore.clearPinFailureState.mockResolvedValue(false)
+      storedState({ attempts: 2, lockedUntil: NOW - 1 })
+      keepWrites()
+
+      await expect(verifyPin(CORRECT_PIN, NOW)).resolves.toEqual({ outcome: "unlocked" })
+
+      expect(mockedStore.setPinFailureState).toHaveBeenLastCalledWith({
+        attempts: 2,
+        lockedUntil: NOW - 1,
+      })
+      /** What the next launch reads: the count from before, and no lock. */
+      await expect(readPinLockState(NOW + SECOND_MS)).resolves.toEqual({
+        status: "readable",
+        state: { attempts: 2, lockedUntil: NOW - 1 },
+      })
+      await expect(verifyPin(WRONG_PIN, NOW + SECOND_MS)).resolves.toEqual({
+        outcome: "exhausted",
+      })
+    })
+
     it("is refused while a lock is still in force, without spending budget", async () => {
       // Otherwise the lockout is theatre: wait it out or not, the right PIN
       // would open the app either way.

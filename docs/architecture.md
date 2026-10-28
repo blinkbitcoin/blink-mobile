@@ -177,12 +177,15 @@ show and on `getStarted` for one without. A logout keeps the app lock for as lon
 device still stores a self-custodial wallet, and whatever ends a session without the lock
 having been answered returns to the gate rather than to `getStarted`.
 
-A wrong PIN starts a wait before the keypad takes another entry: seconds for the first two
-failures, then minutes that grow with each failure from the third on, up to an hour. The
-third failure is the one that ends the session. Where the lock outlives that logout, the
+Every entry is recorded with its wait before it is compared, and a correct one takes both
+back. The wait is seconds for the first two failures, then minutes that grow with each
+failure from the third on, up to an hour. The third failure is the one that ends the
+session. Where the lock outlives that logout, a later wrong entry ends nothing, and the
 wait is what paces the guesses. The count and the wait are stored as one value, so they
-survive a relaunch, and an entry is written there before it is compared: one the store
-cannot record is not judged at all.
+survive a relaunch. An entry the store cannot record is not judged at all, and the keypad
+stays for a retry. A correct entry whose clear is refused puts back the count from before
+it, but a kill between the record and the clear leaves that entry counted, until the next
+correct one takes it back.
 
 The diagram below is the sign-in that starts from `getStarted`.
 
