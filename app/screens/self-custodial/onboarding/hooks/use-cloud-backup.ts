@@ -241,7 +241,9 @@ export const useCloudBackup = ({
           type: "warning" as const,
         }
     toastShow({ ...backupToast, LL })
-    completeBackup({
+    /** Awaited, so the guard below holds until a migration's own writes land:
+     *  released earlier, a second backup could start before this one navigates. */
+    await completeBackup({
       method: BackupMethod.Cloud,
       // Whether the seed backup carries an extra password gates the
       // recovery-bundle cloud sync (D9), so record it with the completion.
