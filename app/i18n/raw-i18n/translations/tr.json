@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Uyarı",
     "hasFundsWarningBody": "Cüzdanında {balance} bakiye var. Güvenliğin için, bakiyesi olan hesapların silinmesine izin vermiyoruz.",
     "hasFundsWarningHelper": "Silme işlemine devam etmek için hesabını boşalt veya döngüsel ekonomilere bağışta bulun.",
-    "hasFundsWarningButton": "Geri dön"
+    "hasFundsWarningButton": "Geri dön",
+    "removalFailed": "{identifier: string} hesabı kaldırılamadı. Lütfen tekrar deneyin."
   }
 }

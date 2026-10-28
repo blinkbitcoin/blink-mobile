@@ -4254,6 +4254,7 @@
         "hasFundsWarningTitle": "Avertissement",
         "hasFundsWarningBody": "Votre portefeuille a un solde de {balance}. Pour votre sécurité, nous n'autorisons pas la suppression de comptes contenant des fonds.",
         "hasFundsWarningHelper": "Pour poursuivre la suppression, videz votre compte ou faites un don à des économies circulaires.",
-        "hasFundsWarningButton": "Retour"
+        "hasFundsWarningButton": "Retour",
+        "removalFailed": "Impossible de supprimer le compte {identifier: string}. Veuillez réessayer."
     }
 }

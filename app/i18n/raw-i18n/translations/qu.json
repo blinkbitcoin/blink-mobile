@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Yuyay",
     "hasFundsWarningBody": "Wallet-niykipi {balance} kachkan. Allin kawsayniykipaq, qullqi kapuq cuentakunata mana pichaykachiykuchu.",
     "hasFundsWarningHelper": "Pichayta qatipayta munaspaqa, cuentaykita ch'usaqyachiy utaq circular economies-man qullqita qoy.",
-    "hasFundsWarningButton": "Kutiy"
+    "hasFundsWarningButton": "Kutiy",
+    "removalFailed": "{identifier: string} cuentata mana qichuyta atikurqanchu. Yapamanta ruray."
   }
 }

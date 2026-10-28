@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Figyelmeztetés",
     "hasFundsWarningBody": "A pénztárcád egyenlege {balance}. Biztonságod érdekében nem engedélyezzük olyan fiókok törlését, amelyekben még van összeg.",
     "hasFundsWarningHelper": "A törlés folytatásához ürítsd ki a fiókodat, vagy adományozz körkörös gazdaságoknak.",
-    "hasFundsWarningButton": "Vissza"
+    "hasFundsWarningButton": "Vissza",
+    "removalFailed": "A(z) {identifier: string} fiók eltávolítása nem sikerült. Próbáld újra."
   }
 }

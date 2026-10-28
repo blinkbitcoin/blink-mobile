@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Onyo",
     "hasFundsWarningBody": "Pochi yako ina salio la {balance}. Kwa usalama wako, hatukuruhusu kufuta akaunti zenye fedha.",
     "hasFundsWarningHelper": "Ili kuendelea na kufutwa, futa fedha kwenye akaunti yako au changia kwa uchumi wa mzunguko.",
-    "hasFundsWarningButton": "Rudi nyuma"
+    "hasFundsWarningButton": "Rudi nyuma",
+    "removalFailed": "Imeshindwa kuondoa akaunti {identifier: string}. Tafadhali jaribu tena."
   }
 }

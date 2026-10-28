@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "تحذير",
     "hasFundsWarningBody": "محفظتك تحتوي على رصيد قدره {balance}. للحفاظ على سلامتك، لا نسمح بحذف الحسابات التي تحتوي على أموال.",
     "hasFundsWarningHelper": "للمتابعة في الحذف، يرجى إفراغ حسابك أو التبرع للاقتصادات الدائرية.",
-    "hasFundsWarningButton": "العودة"
+    "hasFundsWarningButton": "العودة",
+    "removalFailed": "تعذّرت إزالة الحساب {identifier: string}. يرجى المحاولة مرة أخرى."
   }
 }

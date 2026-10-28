@@ -14188,6 +14188,11 @@ type RootTranslation = {
 		 * G​o​ ​b​a​c​k
 		 */
 		hasFundsWarningButton: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​m​o​v​e​ ​a​c​c​o​u​n​t​ ​{​i​d​e​n​t​i​f​i​e​r​}​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 * @param {string} identifier
+		 */
+		removalFailed: RequiredParams<'identifier'>
 	}
 }
 
@@ -28146,6 +28151,10 @@ export type TranslationFunctions = {
 		 * Go back
 		 */
 		hasFundsWarningButton: () => LocalizedString
+		/**
+		 * Couldn't remove account {identifier}. Please try again.
+		 */
+		removalFailed: (arg: { identifier: string }) => LocalizedString
 	}
 }
 

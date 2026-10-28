@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Atenció",
     "hasFundsWarningBody": "La teva cartera té un saldo de {balance}. Per la teva seguretat, no permetem eliminar comptes amb fons.",
     "hasFundsWarningHelper": "Per continuar amb l'eliminació, buida el teu compte o fes una donació a economies circulars.",
-    "hasFundsWarningButton": "Tornar"
+    "hasFundsWarningButton": "Tornar",
+    "removalFailed": "No s'ha pogut eliminar el compte {identifier: string}. Torna-ho a provar."
   }
 }

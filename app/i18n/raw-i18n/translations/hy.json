@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Զգուշացում",
     "hasFundsWarningBody": "Ձեր դրամապանակում առկա է {balance} միջոցներ։ Ձեր անվտանգության համար մենք թույլ չենք տալիս ջնջել միջոցներ պարունակող հաշիվներ։",
     "hasFundsWarningHelper": "Ջնջումը շարունակելու համար դատարկեք ձեր հաշիվը կամ նվիրաբերեք շրջանաձև տնտեսություններին։",
-    "hasFundsWarningButton": "Հետ"
+    "hasFundsWarningButton": "Հետ",
+    "removalFailed": "{identifier: string} հաշիվը չհաջողվեց հեռացնել: Փորձեք նորից:"
   }
 }

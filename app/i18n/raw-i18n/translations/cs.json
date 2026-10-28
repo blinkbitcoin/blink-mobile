@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Upozornění",
     "hasFundsWarningBody": "Vaše peněženka má zůstatek {balance}. Pro vaši bezpečnost neumožňujeme smazání účtů s prostředky.",
     "hasFundsWarningHelper": "Chcete-li pokračovat ve smazání, vyprázdněte svůj účet nebo darujte do cirkulárních ekonomik.",
-    "hasFundsWarningButton": "Zpět"
+    "hasFundsWarningButton": "Zpět",
+    "removalFailed": "Účet {identifier: string} se nepodařilo odebrat. Zkuste to znovu."
   }
 }

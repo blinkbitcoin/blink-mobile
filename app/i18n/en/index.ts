@@ -4497,6 +4497,7 @@ const en: BaseTranslation = {
     hasFundsWarningHelper:
       "To proceed with deletion, either empty your account or donate to circular economies.",
     hasFundsWarningButton: "Go back",
+    removalFailed: "Couldn't remove account {identifier: string}. Please try again.",
   },
 }
 

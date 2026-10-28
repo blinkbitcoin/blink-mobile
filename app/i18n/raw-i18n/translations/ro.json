@@ -4254,6 +4254,7 @@
     "hasFundsWarningTitle": "Avertisment",
     "hasFundsWarningBody": "Portofelul tău are un sold de {balance}. Pentru siguranța ta, nu permitem ștergerea conturilor cu fonduri.",
     "hasFundsWarningHelper": "Pentru a continua ștergerea, golește-ți contul sau donează către economii circulare.",
-    "hasFundsWarningButton": "Înapoi"
+    "hasFundsWarningButton": "Înapoi",
+    "removalFailed": "Contul {identifier: string} nu a putut fi eliminat. Încearcă din nou."
   }
 }
