@@ -15,6 +15,7 @@ const mockUseBackupState = jest.fn()
 const mockActions: RecoveryBundleActions = {
   bundleState: undefined,
   settings: { autoRefresh: true, cloudSync: false },
+  settingsLoaded: true,
   refreshing: false,
   uploading: false,
   sharing: false,
@@ -91,6 +92,7 @@ describe("RecoveryBackupScreen", () => {
     jest.clearAllMocks()
     mockActions.bundleState = savedState
     mockActions.settings = { autoRefresh: true, cloudSync: false }
+    mockActions.settingsLoaded = true
     mockActions.sharing = false
     mockActions.copying = false
     mockUseBackupState.mockReturnValue({
@@ -170,6 +172,26 @@ describe("RecoveryBackupScreen", () => {
     const { getByTestId } = renderScreen()
     fireEvent(getByTestId("recovery-bundle-auto-refresh-switch"), "pressIn")
     expect(mockActions.handleSetAutoRefresh).toHaveBeenCalledWith(false)
+  })
+
+  it("keeps both switches inert until the account's own settings are read", () => {
+    // Until then the switches show placeholder defaults; flipping one would
+    // write them over the stored value of the other.
+    mockActions.settingsLoaded = false
+    mockUseBackupState.mockReturnValue({
+      backupState: {
+        status: "completed",
+        method: "cloud",
+        cloudPasswordProtected: true,
+      },
+    })
+    const { getByTestId } = renderScreen()
+
+    fireEvent(getByTestId("recovery-bundle-auto-refresh-switch"), "pressIn")
+    fireEvent(getByTestId("recovery-bundle-cloud-sync-switch"), "pressIn")
+
+    expect(mockActions.handleSetAutoRefresh).not.toHaveBeenCalled()
+    expect(mockActions.handleSetCloudSync).not.toHaveBeenCalled()
   })
 
   it("shows the copy-in-progress spinner on the Copy JSON button only", () => {

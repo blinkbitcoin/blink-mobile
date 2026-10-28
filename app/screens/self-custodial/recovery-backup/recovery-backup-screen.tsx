@@ -39,6 +39,7 @@ export const RecoveryBackupScreen: React.FC = () => {
   const {
     bundleState,
     settings,
+    settingsLoaded,
     refreshing,
     uploading,
     sharing,
@@ -124,6 +125,7 @@ export const RecoveryBackupScreen: React.FC = () => {
               onValueChange={(enabled) => {
                 handleSetAutoRefresh(enabled).catch(() => {})
               }}
+              disabled={!settingsLoaded}
               testID="recovery-bundle-auto-refresh-switch"
             />
           </View>
@@ -142,6 +144,7 @@ export const RecoveryBackupScreen: React.FC = () => {
                   onValueChange={(enabled) => {
                     handleSetCloudSync(enabled).catch(() => {})
                   }}
+                  disabled={!settingsLoaded}
                   testID="recovery-bundle-cloud-sync-switch"
                 />
               </View>
