@@ -2,6 +2,7 @@ import React from "react"
 import { TouchableOpacity, View } from "react-native"
 import { PermissionStatus, RESULTS } from "react-native-permissions"
 
+import { useI18nContext } from "@app/i18n/i18n-react"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import CenterLocationAndroid from "../../assets/icons/center-location-android.svg"
@@ -26,6 +27,7 @@ export default function LocationButtonCopy({
   bottom,
 }: Props) {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const {
     theme: { colors },
   } = useTheme()
@@ -35,6 +37,11 @@ export default function LocationButtonCopy({
       <TouchableOpacity
         testID="location-button"
         style={styles.android}
+        // An icon alone, so a screen reader has nothing to read without this.
+        // The same words whether it centres on the user or first asks for
+        // permission to: either way, the map is about to show where they are.
+        accessibilityRole="button"
+        accessibilityLabel={LL.MapScreen.showMyLocation()}
         onPress={permissionStatus === RESULTS.GRANTED ? centerOnUser : requestPermissions}
       >
         <CenterLocationAndroid height={22} width={22} fill={colors.primary} />

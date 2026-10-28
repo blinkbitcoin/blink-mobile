@@ -417,6 +417,16 @@ describe("MapComponent", () => {
     })
   })
 
+  it("names the locate button for a screen reader, which would otherwise read only an icon", async () => {
+    const { getByTestId } = renderMap()
+
+    await waitFor(() => expect(getByTestId("location-button")).toBeTruthy())
+    expect(getByTestId("location-button").props).toMatchObject({
+      accessibilityRole: "button",
+      accessibilityLabel: "Show my location",
+    })
+  })
+
   it("keeps the 20 past the top system bar, and adds no side inset Screen already took", async () => {
     mockTopInset = 47
     mockLeftInset = 44
