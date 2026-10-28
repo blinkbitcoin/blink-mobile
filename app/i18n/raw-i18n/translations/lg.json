@@ -78,7 +78,12 @@
     "skip": "Buuka",
     "unlock": "Sumulula",
     "usePin": "Kozesa PINI",
-    "confirmLogout": "Oli mukakafu nti wandyagadde okufuluma? Kino kijja kuzzaa bujja ekifo ekikuumirwamu n'enteekateeka z'okukozesa"
+    "confirmLogout": "Oli mukakafu nti wandyagadde okufuluma? Kino kijja kuzzaa bujja ekifo ekikuumirwamu n'enteekateeka z'okukozesa",
+    "forgotPin": "Weerabidde PINI? Ggyawo akawunti",
+    "removeWalletsTitle": "Ggyawo akawunti ku kyuma kino?",
+    "removeWalletsBody": "Kino kiggyawo akawunti zonna ku kyuma kino era kikuggya mu akawunti. Okuzzaawo akawunti, weetaaga ekigambo kyayo eky'okukuuma. Awatali kyo, akawunti ebula.",
+    "removeWalletsConfirm": "Ggyawo akawunti",
+    "removeWalletsFailed": "Akawunti ezimu tezisobodde kuggyibwawo. Gezaako nate."
   },
   "PeopleScreen": {
     "title": "Abantu",

@@ -78,7 +78,12 @@
         "skip": "Pular",
         "unlock": "Desbloquear",
         "usePin": "Usar PIN",
-        "confirmLogout": "Tem certeza de que deseja sair? Isso redefinirá seu cache e todas as configurações locais de usuário"
+        "confirmLogout": "Tem certeza de que deseja sair? Isso redefinirá seu cache e todas as configurações locais de usuário",
+        "forgotPin": "Esqueceu o PIN? Remover carteiras",
+        "removeWalletsTitle": "Remover as carteiras deste dispositivo?",
+        "removeWalletsBody": "Isto remove todas as carteiras deste dispositivo e encerra a sua sessão. Para recuperar uma carteira, você precisa da frase de backup dela. Sem ela, a carteira é perdida.",
+        "removeWalletsConfirm": "Remover carteiras",
+        "removeWalletsFailed": "Não foi possível remover algumas carteiras. Tente novamente."
     },
     "PeopleScreen": {
         "title": "Pessoas",

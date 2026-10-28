@@ -78,7 +78,12 @@
     "skip": "Atla",
     "unlock": "Kilidi aç",
     "usePin": "PIN kullan",
-    "confirmLogout": "Çıkış yapmak istediğinden emin misin? Bu işlem çerezlerini ve tüm yerel kullanıcı verilerini temizleyecek."
+    "confirmLogout": "Çıkış yapmak istediğinden emin misin? Bu işlem çerezlerini ve tüm yerel kullanıcı verilerini temizleyecek.",
+    "forgotPin": "PIN'i mi unuttunuz? Cüzdanları kaldırın",
+    "removeWalletsTitle": "Cüzdanlar bu cihazdan kaldırılsın mı?",
+    "removeWalletsBody": "Bu işlem bu cihazdaki tüm cüzdanları kaldırır ve oturumunuzu kapatır. Bir cüzdanı geri almak için yedek ifadesine ihtiyacınız var. O olmadan cüzdan kaybolur.",
+    "removeWalletsConfirm": "Cüzdanları kaldır",
+    "removeWalletsFailed": "Bazı cüzdanlar kaldırılamadı. Lütfen tekrar deneyin."
   },
   "PeopleScreen": {
     "title": "İnsanlar",

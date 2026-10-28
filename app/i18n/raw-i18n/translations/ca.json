@@ -78,7 +78,12 @@
     "skip": "Omet",
     "unlock": "Desbloqueja",
     "usePin": "Utilitza el PIN",
-    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari."
+    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari.",
+    "forgotPin": "Has oblidat el PIN? Elimina les carteres",
+    "removeWalletsTitle": "Vols eliminar les carteres d'aquest dispositiu?",
+    "removeWalletsBody": "Això elimina totes les carteres d'aquest dispositiu i tanca la sessió. Per recuperar una cartera, necessites la seva frase de seguretat. Sense ella, la cartera es perd.",
+    "removeWalletsConfirm": "Elimina les carteres",
+    "removeWalletsFailed": "No s'han pogut eliminar algunes carteres. Torna-ho a provar."
   },
   "PeopleScreen": {
     "title": "Gent",

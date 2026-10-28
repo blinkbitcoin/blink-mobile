@@ -1,13 +1,15 @@
 import React from "react"
-import { Text } from "react-native"
+import { Alert, AlertButton, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
 
 import { MockedProvider } from "@apollo/client/testing"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { LAUNCH_ROUTE } from "@app/navigation/unlock-routes"
 import theme from "@app/rne-theme/theme"
 import { AuthenticationCheckScreen } from "@app/screens/authentication-screen/authentication-check-screen"
+import { AuthenticationScreen } from "@app/screens/authentication-screen/authentication-screen"
 import { PinScreen } from "@app/screens/authentication-screen/pin-screen"
 import { PersistentStateContext } from "@app/store/persistent-state"
 import { NavigationContainer } from "@react-navigation/native"
@@ -32,6 +34,9 @@ const STORED_WALLET_ID = "stored-wallet"
 
 type Device = {
   pin: string | null
+  /** A store that cannot say whether a PIN is set, which the gate reads as one. */
+  isPinReadFailing: boolean
+  hasBiometrics: boolean
   attempts: number
   walletIds: ReadonlyArray<string>
   hasSession: boolean
@@ -43,8 +48,13 @@ let mockDevice: Device
 jest.mock("@app/utils/storage/secureStorage", () => ({
   __esModule: true,
   default: {
-    readIsPinEnabled: async () => ({ status: mockDevice.pin === null ? "no" : "yes" }),
-    readIsBiometricsEnabled: async () => ({ status: "no" }),
+    readIsPinEnabled: async () => {
+      if (mockDevice.isPinReadFailing) return { status: "failed" }
+      return { status: mockDevice.pin === null ? "no" : "yes" }
+    },
+    readIsBiometricsEnabled: async () => ({
+      status: mockDevice.hasBiometrics ? "yes" : "no",
+    }),
     getPin: async () => mockDevice.pin,
     getPinFailureState: async () => ({
       status: "found",
@@ -74,9 +84,14 @@ jest.mock("@app/utils/storage/secureStorage", () => ({
   },
 }))
 
+/** The prompt never passes here: the journeys that reach it are the ones where the owner
+ *  cannot answer it. */
 jest.mock("@app/utils/biometricAuthentication", () => ({
   __esModule: true,
-  default: { isSensorAvailable: async () => false },
+  default: {
+    isSensorAvailable: async () => mockDevice.hasBiometrics,
+    authenticate: () => undefined,
+  },
 }))
 
 jest.mock("@app/self-custodial/storage/account-index", () => ({
@@ -90,6 +105,31 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
    *  reach it. */
   readStoredWalletPresence: async () =>
     mockDevice.walletIds.length > 0 ? "present" : "absent",
+  removeSelfCustodialAccountId: async (id: string) => {
+    mockDevice.walletIds = mockDevice.walletIds.filter((walletId) => walletId !== id)
+  },
+}))
+
+/** What a wallet's erase does is covered where it lives; here it only has to report the
+ *  seed gone, so the journey can follow what the lock does next. */
+jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
+  eraseWalletFromDevice: async () => true,
+}))
+
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => ({ sdk: null }),
+}))
+
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => "regtest",
+}))
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  disconnectSdk: jest.fn(),
+}))
+
+jest.mock("@app/hooks/use-account-registry", () => ({
+  useAccountRegistry: () => ({ reloadSelfCustodialAccounts: async () => undefined }),
 }))
 
 jest.mock("@app/graphql/is-authed-context", () => ({
@@ -156,13 +196,14 @@ const launchApp = () =>
           <TypesafeI18n locale="en">
             <NavigationContainer>
               <Stack.Navigator
-                initialRouteName="authenticationCheck"
+                initialRouteName={LAUNCH_ROUTE}
                 screenOptions={{ headerShown: false }}
               >
                 <Stack.Screen
                   name="authenticationCheck"
                   component={AuthenticationCheckScreen}
                 />
+                <Stack.Screen name="authentication" component={AuthenticationScreen} />
                 <Stack.Screen name="pin" component={PinScreen} />
                 <Stack.Screen name="Primary" component={HomeScreen} />
                 <Stack.Screen name="getStarted" component={LandingScreen} />
@@ -190,6 +231,18 @@ const waitOutFarewell = async () => {
   await flushEffects()
 }
 
+/** Answers the most recent alert by pressing the button with this label. */
+const pressAlertButton = async (label: string) => {
+  const alertCalls = jest.mocked(Alert.alert).mock.calls
+  const buttons: ReadonlyArray<AlertButton> = alertCalls[alertCalls.length - 1]?.[2] ?? []
+  const button = buttons.find((candidate) => candidate.text === label)
+  if (!button) throw new Error(`No alert button labelled ${label}`)
+  await act(async () => {
+    button.onPress?.()
+  })
+  await flushEffects()
+}
+
 const spendBudget = async () => {
   await enterPin(WRONG_PIN)
   await enterPin(WRONG_PIN)
@@ -207,6 +260,8 @@ describe("the spent PIN budget, from the keypad round to wherever the gate opens
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
     mockDevice = {
       pin: CORRECT_PIN,
+      isPinReadFailing: false,
+      hasBiometrics: false,
       attempts: 0,
       walletIds: [],
       hasSession: true,
@@ -288,6 +343,91 @@ describe("the spent PIN budget, from the keypad round to wherever the gate opens
 
       expect(screen.getByText("landing screen")).toBeTruthy()
       expect(screen.queryByText("home screen")).toBeNull()
+    })
+  })
+
+  describe("a forgotten PIN on a device that stores a wallet", () => {
+    beforeEach(() => {
+      mockDevice.walletIds = [STORED_WALLET_ID]
+      jest.spyOn(Alert, "alert").mockImplementation(() => undefined)
+    })
+
+    afterEach(() => {
+      jest.restoreAllMocks()
+    })
+
+    /** A logout there keeps the lock and comes straight back to it, so the way out the
+     *  lock screen offers is removing the wallets it is kept for. */
+    it("offers removing the wallets instead of a logout when the prompt cannot be passed", async () => {
+      mockDevice.hasBiometrics = true
+      launchApp()
+      await flushEffects()
+
+      expect(screen.getByText("Forgot PIN? Remove wallets")).toBeTruthy()
+      expect(screen.queryByText("Log Out")).toBeNull()
+
+      fireEvent.press(screen.getByText("Forgot PIN? Remove wallets"))
+      await pressAlertButton("Remove wallets")
+
+      /** The wallets went, so the lock had nothing left to guard and went with them. */
+      expect(mockDevice.walletIds).toEqual([])
+      expect(mockDevice.hasSession).toBe(false)
+      expect(mockDevice.pin).toBeNull()
+      expect(mockDevice.isAppLocked).toBe(false)
+      expect(screen.getByText("landing screen")).toBeTruthy()
+    })
+
+    it("offers the same way out on the keypad, which had none", async () => {
+      launchApp()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenForgotPin"))
+      await pressAlertButton("Remove wallets")
+
+      expect(mockDevice.walletIds).toEqual([])
+      expect(mockDevice.pin).toBeNull()
+      expect(screen.getByText("landing screen")).toBeTruthy()
+    })
+
+    it("leaves everything as it was when the owner backs out", async () => {
+      launchApp()
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenForgotPin"))
+      await pressAlertButton("Cancel")
+
+      expect(mockDevice.walletIds).toEqual([STORED_WALLET_ID])
+      expect(mockDevice.pin).toBe(CORRECT_PIN)
+      expect(mockDevice.isAppLocked).toBe(true)
+      expect(screen.queryByText("landing screen")).toBeNull()
+    })
+  })
+
+  describe("a first launch on a fresh install", () => {
+    beforeEach(() => {
+      mockDevice.pin = null
+      mockDevice.hasSession = false
+    })
+
+    it("asks for nothing and lands on the landing screen", async () => {
+      launchApp()
+      await flushEffects()
+
+      expect(screen.getByText("landing screen")).toBeTruthy()
+      expect(mockDevice.isAppLocked).toBe(false)
+    })
+
+    /** A store that cannot say whether a PIN is set is read as one, so a brand-new user
+     *  can meet a lock screen. It has to have a way out: with no wallet stored, the logout
+     *  takes the lock with it. */
+    it("shows a lock screen with a way out when the PIN read fails", async () => {
+      mockDevice.isPinReadFailing = true
+      launchApp()
+      await flushEffects()
+
+      expect(screen.getByText("Log Out")).toBeTruthy()
+      expect(screen.queryByText("Forgot PIN? Remove wallets")).toBeNull()
+      expect(screen.queryByText("landing screen")).toBeNull()
     })
   })
 })

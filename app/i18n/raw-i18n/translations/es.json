@@ -78,7 +78,12 @@
         "skip": "Saltar",
         "unlock": "Desbloquear",
         "usePin": "Usar PIN",
-        "confirmLogout": "¿Está seguro de que desea cerrar sesión? Esto reiniciará su caché y todas las configuraciones de usuario locales."
+        "confirmLogout": "¿Está seguro de que desea cerrar sesión? Esto reiniciará su caché y todas las configuraciones de usuario locales.",
+        "forgotPin": "¿Olvidaste el PIN? Eliminar billeteras",
+        "removeWalletsTitle": "¿Eliminar las billeteras de este dispositivo?",
+        "removeWalletsBody": "Esto elimina todas las billeteras de este dispositivo y cierra tu sesión. Para recuperar una billetera, necesitas su frase de respaldo. Sin ella, la billetera se pierde.",
+        "removeWalletsConfirm": "Eliminar billeteras",
+        "removeWalletsFailed": "No se pudieron eliminar algunas billeteras. Inténtalo de nuevo."
     },
     "PeopleScreen": {
         "title": "Personas",

@@ -78,7 +78,12 @@
     "skip": "Spring over",
     "unlock": "Lås op",
     "usePin": "Brug PIN",
-    "confirmLogout": "Are you sure you'd like to log out? This will reset your cache and all local user settings"
+    "confirmLogout": "Are you sure you'd like to log out? This will reset your cache and all local user settings",
+    "forgotPin": "Glemt PIN? Fjern tegnebøger",
+    "removeWalletsTitle": "Fjern tegnebøger fra denne enhed?",
+    "removeWalletsBody": "Dette fjerner alle tegnebøger fra denne enhed og logger dig ud. For at få en tegnebog tilbage skal du bruge dens gendannelsesfrase. Uden den er tegnebogen tabt.",
+    "removeWalletsConfirm": "Fjern tegnebøger",
+    "removeWalletsFailed": "Nogle tegnebøger kunne ikke fjernes. Prøv igen."
   },
   "PeopleScreen": {
     "title": "Mennesker",

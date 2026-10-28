@@ -49,9 +49,10 @@ export const AuthenticationCheckScreen: React.FC = () => {
       /**
        * A lock we inferred rather than read is not one we can promise the user
        * can pass: the PIN screen would compare against a secret it also cannot
-       * read, and it offers no way out. The authentication screen does — it
-       * carries the logout escape and still routes to the PIN — so an uncertain
-       * lock goes there instead of into a keypad with no exit.
+       * read. The authentication screen still routes to the PIN and always shows
+       * a way out: a logout that takes the lock with it on a device that stores
+       * no wallet, and removing the wallets on one that does, where a logout
+       * would keep the lock and come straight back here.
        */
       const isLockUncertain =
         pinRead.status === "failed" || biometricsRead.status === "failed"

@@ -78,7 +78,12 @@
     "skip": "Lewati",
     "unlock": "Buka Kunci",
     "usePin": "Gunakan Pin",
-    "confirmLogout": "Apakah anda yakin anda ingin keluar? Ini akan mengatur ulang cache anda dan semua pengaturan pengguna lokal"
+    "confirmLogout": "Apakah anda yakin anda ingin keluar? Ini akan mengatur ulang cache anda dan semua pengaturan pengguna lokal",
+    "forgotPin": "Lupa PIN? Hapus dompet",
+    "removeWalletsTitle": "Hapus dompet dari perangkat ini?",
+    "removeWalletsBody": "Ini menghapus semua dompet dari perangkat ini dan mengeluarkan Anda. Untuk memulihkan dompet, Anda memerlukan frasa pemulihannya. Tanpa itu, dompet akan hilang.",
+    "removeWalletsConfirm": "Hapus dompet",
+    "removeWalletsFailed": "Beberapa dompet tidak dapat dihapus. Silakan coba lagi."
   },
   "PeopleScreen": {
     "title": "Orang-orang",

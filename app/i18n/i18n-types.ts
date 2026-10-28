@@ -203,6 +203,26 @@ type RootTranslation = {
 		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​l​o​g​ ​o​u​t​?​ ​T​h​i​s​ ​w​i​l​l​ ​r​e​s​e​t​ ​y​o​u​r​ ​c​a​c​h​e​ ​a​n​d​ ​a​l​l​ ​l​o​c​a​l​ ​u​s​e​r​ ​s​e​t​t​i​n​g​s
 		 */
 		confirmLogout: string
+		/**
+		 * F​o​r​g​o​t​ ​P​I​N​?​ ​R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		forgotPin: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		removeWalletsTitle: string
+		/**
+		 * T​h​i​s​ ​r​e​m​o​v​e​s​ ​a​l​l​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​ ​a​n​d​ ​l​o​g​s​ ​y​o​u​ ​o​u​t​.​ ​T​o​ ​g​e​t​ ​a​ ​w​a​l​l​e​t​ ​b​a​c​k​,​ ​y​o​u​ ​n​e​e​d​ ​i​t​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​W​i​t​h​o​u​t​ ​i​t​,​ ​t​h​e​ ​w​a​l​l​e​t​ ​i​s​ ​l​o​s​t​.
+		 */
+		removeWalletsBody: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		removeWalletsConfirm: string
+		/**
+		 * S​o​m​e​ ​w​a​l​l​e​t​s​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​r​e​m​o​v​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		removeWalletsFailed: string
 	}
 	PeopleScreen: {
 		/**
@@ -14418,6 +14438,26 @@ export type TranslationFunctions = {
 		 * Are you sure you'd like to log out? This will reset your cache and all local user settings
 		 */
 		confirmLogout: () => LocalizedString
+		/**
+		 * Forgot PIN? Remove wallets
+		 */
+		forgotPin: () => LocalizedString
+		/**
+		 * Remove wallets from this device?
+		 */
+		removeWalletsTitle: () => LocalizedString
+		/**
+		 * This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.
+		 */
+		removeWalletsBody: () => LocalizedString
+		/**
+		 * Remove wallets
+		 */
+		removeWalletsConfirm: () => LocalizedString
+		/**
+		 * Some wallets could not be removed. Please try again.
+		 */
+		removeWalletsFailed: () => LocalizedString
 	}
 	PeopleScreen: {
 		/**

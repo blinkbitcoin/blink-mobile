@@ -373,6 +373,47 @@ describe("PinScreen", () => {
     })
   })
 
+  describe("the forgotten PIN way out", () => {
+    beforeEach(() => {
+      jest.spyOn(Alert, "alert").mockImplementation(() => undefined)
+    })
+
+    /** A logout there keeps the lock and comes back to this keypad, so removing the
+     *  wallets the lock is kept for is the only way out the owner has. */
+    it("is offered on the app lock of a device that stores a wallet, and asks first", async () => {
+      mockListSelfCustodialAccounts.mockResolvedValue(storedWallets(["stored-wallet"]))
+      renderScreen(false)
+      await flushEffects()
+
+      fireEvent.press(screen.getByTestId("pinScreenForgotPin"))
+
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Remove wallets from this device?",
+        expect.any(String),
+        expect.any(Array),
+      )
+    })
+
+    it("is not offered on a device that stores no wallet, where the logout is the way out", async () => {
+      mockListSelfCustodialAccounts.mockResolvedValue(storedWallets([]))
+      renderScreen(false)
+      await flushEffects()
+
+      expect(screen.queryByTestId("pinScreenForgotPin")).toBeNull()
+    })
+
+    it("is not offered on a challenge, which can be dismissed", async () => {
+      mockListSelfCustodialAccounts.mockResolvedValue(storedWallets(["stored-wallet"]))
+      renderScreen(undefined, PinScreenPurpose.ChallengePin, {
+        onChallengeSuccess: jest.fn(),
+        onChallengeFailure: jest.fn(),
+      })
+      await flushEffects()
+
+      expect(screen.queryByTestId("pinScreenForgotPin")).toBeNull()
+    })
+  })
+
   describe("the attempt budget", () => {
     beforeEach(() => {
       // flushEffects relies on setImmediate; keep it real so effects settle.

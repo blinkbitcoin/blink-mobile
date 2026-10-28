@@ -78,7 +78,12 @@
     "skip": "Tsiba",
     "unlock": "Vula",
     "usePin": "Sebenzisa iphini",
-    "confirmLogout": "Uqinisekile ukuba ufuna ukuphuma? Oku kuya kucima ikheshe yakho kunye nezicwangciso zomsebenzisi wangaphakathi"
+    "confirmLogout": "Uqinisekile ukuba ufuna ukuphuma? Oku kuya kucima ikheshe yakho kunye nezicwangciso zomsebenzisi wangaphakathi",
+    "forgotPin": "Ulibele iphini? Susa izipaji",
+    "removeWalletsTitle": "Susa izipaji kwesi sixhobo?",
+    "removeWalletsBody": "Oku kususa zonke izipaji kwesi sixhobo kwaye kukukhuphe. Ukubuyisa isipaji, ufuna isivakalisi saso sokugcina. Ngaphandle kwaso, isipaji silahlekile.",
+    "removeWalletsConfirm": "Susa izipaji",
+    "removeWalletsFailed": "Ezinye izipaji azikwazanga ukususwa. Nceda uzame kwakhona."
   },
   "PeopleScreen": {
     "title": "Abantu",

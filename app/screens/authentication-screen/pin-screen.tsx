@@ -11,6 +11,7 @@ import { makeStyles } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { useUnlockScreen } from "./unlock-screen"
+import { useForgottenPinEscape } from "./use-forgotten-pin-escape"
 import { usePinAttempts } from "./use-pin-attempts"
 
 import { Screen } from "../../components/screen"
@@ -50,6 +51,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
   const { routeAfterLogout } = useLogoutAndRoute()
+  const { escape, confirmRemoveWallets } = useForgottenPinEscape()
   const { LL } = useI18nContext()
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
@@ -249,6 +251,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  branch nothing can reach. */
   const isTearingDown = Boolean(farewellText)
 
+  /** The app lock's only way out on a device that stores a wallet: a logout there keeps
+   *  the lock and returns to this keypad. A device that stores none needs no button, since
+   *  the spent budget's logout takes the lock with it. */
+  const isForgotPinOffered = isAuthenticate && escape === "removeWallets"
+
   const circleComponentForDigit = (digit: number) => {
     return (
       <View style={styles.circleContainer}>
@@ -331,7 +338,20 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           </View>
         </View>
       </View>
-      <View style={styles.bottomSpacer} />
+      <View style={styles.bottomSpacer}>
+        {isForgotPinOffered ? (
+          <TouchableOpacity
+            disabled={isTearingDown}
+            onPress={confirmRemoveWallets}
+            accessibilityRole="button"
+            testID="pinScreenForgotPin"
+          >
+            <Text style={styles.forgotPinText}>
+              {LL.AuthenticationScreen.forgotPin()}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
       {/* Last child on purpose: an absolute view earlier in the tree is painted
           under, and hit-tested behind, every sibling that follows it — and the
           top spacer covers exactly the corner this sits in. */}
@@ -355,7 +375,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomSpacer: {
+    alignItems: "center",
     flex: 1,
+    justifyContent: "center",
   },
 
   /** Absolute, so adding it cannot shift the keypad's flex layout. The screen is
@@ -401,6 +423,12 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 16 / 2,
     height: 16,
     width: 16,
+  },
+
+  forgotPinText: {
+    color: colors.white,
+    fontSize: 16,
+    textDecorationLine: "underline",
   },
 
   helperText: {

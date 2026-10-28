@@ -408,6 +408,38 @@ describe("AuthenticationScreen", () => {
     })
   })
 
+  describe("on a device that stores a wallet", () => {
+    beforeEach(() => {
+      jest.spyOn(Alert, "alert").mockImplementation(() => undefined)
+      mockedBiometrics.authenticate.mockImplementation(async () => {})
+      mockListSelfCustodialAccounts.mockResolvedValue(storedWallets(["stored-wallet"]))
+    })
+
+    /** There the logout keeps the lock and comes straight back to this screen, so it is
+     *  not offered: the way out is removing the wallets the lock is kept for. */
+    it("offers removing the wallets instead of a logout", async () => {
+      renderScreen(true)
+      await flushEffects()
+
+      expect(screen.getByLabelText("Forgot PIN? Remove wallets")).toBeTruthy()
+      expect(screen.queryByLabelText("Log Out")).toBeNull()
+    })
+
+    it("asks before removing anything", async () => {
+      renderScreen(true)
+      await flushEffects()
+
+      fireEvent.press(screen.getByLabelText("Forgot PIN? Remove wallets"))
+
+      expect(Alert.alert).toHaveBeenCalledWith(
+        "Remove wallets from this device?",
+        expect.any(String),
+        expect.any(Array),
+      )
+      expect(mockLogout).not.toHaveBeenCalled()
+    })
+  })
+
   describe("falling back to the pin", () => {
     beforeEach(() => {
       /** The prompt has to go unanswered, or the screen unlocks before the fallback. */

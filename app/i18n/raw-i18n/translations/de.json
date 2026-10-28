@@ -78,7 +78,12 @@
         "skip": "Überspringen",
         "unlock": "Entsperren",
         "usePin": "PIN nutzen",
-        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt."
+        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt.",
+        "forgotPin": "PIN vergessen? Brieftaschen entfernen",
+        "removeWalletsTitle": "Brieftaschen von diesem Gerät entfernen?",
+        "removeWalletsBody": "Damit werden alle Brieftaschen von diesem Gerät entfernt und Sie werden abgemeldet. Um eine Brieftasche zurückzubekommen, brauchen Sie ihre Sicherungsphrase. Ohne sie ist die Brieftasche verloren.",
+        "removeWalletsConfirm": "Brieftaschen entfernen",
+        "removeWalletsFailed": "Einige Brieftaschen konnten nicht entfernt werden. Bitte versuchen Sie es erneut."
     },
     "PeopleScreen": {
         "title": "Leute",

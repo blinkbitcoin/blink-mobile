@@ -78,7 +78,12 @@
     "skip": "Gaan verby",
     "unlock": "Ontsluit",
     "usePin": "Gebruik PIN",
-    "confirmLogout": "Is jy seker jy wil afmeld? Dit sal jou kas en alle plaaslike gebruikersinstellings herstel"
+    "confirmLogout": "Is jy seker jy wil afmeld? Dit sal jou kas en alle plaaslike gebruikersinstellings herstel",
+    "forgotPin": "PIN vergeet? Verwyder beursies",
+    "removeWalletsTitle": "Verwyder beursies van hierdie toestel?",
+    "removeWalletsBody": "Dit verwyder alle beursies van hierdie toestel en teken jou uit. Om 'n beursie terug te kry, het jy sy rugsteunfrase nodig. Daarsonder is die beursie weg.",
+    "removeWalletsConfirm": "Verwyder beursies",
+    "removeWalletsFailed": "Sommige beursies kon nie verwyder word nie. Probeer asseblief weer."
   },
   "PeopleScreen": {
     "title": "Mense",

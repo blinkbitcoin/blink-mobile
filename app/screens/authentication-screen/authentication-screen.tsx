@@ -10,6 +10,7 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { PinErrorKey } from "./pin-verification"
+import { useForgottenPinEscape } from "./use-forgotten-pin-escape"
 import { useUnlockScreen } from "./unlock-screen"
 
 import AppLogoDarkMode from "../../assets/logo/app-logo-dark.svg"
@@ -40,6 +41,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   const { screenPurpose, isPinEnabled, isResume = false } = route.params
   const { completeUnlock } = useUnlockScreen({ isResume })
   const { routeAfterLogout } = useLogoutAndRoute()
+  const { escape, confirmRemoveWallets } = useForgottenPinEscape()
   const { LL } = useI18nContext()
 
   const handleAuthenticationSuccess = React.useCallback(async () => {
@@ -103,6 +105,7 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
   }
 
   let PinButtonContent
+  let EscapeContent
   let AlternateContent
 
   if (isPinEnabled) {
@@ -122,15 +125,33 @@ export const AuthenticationScreen: React.FC<Props> = ({ route }) => {
     PinButtonContent = null
   }
 
+  /** Where a logout would keep the lock, it only comes back to this screen, so the way out
+   *  offered there is removing the wallets the lock is kept for. */
+  if (escape === "removeWallets") {
+    EscapeContent = (
+      <GaloySecondaryButton
+        title={LL.AuthenticationScreen.forgotPin()}
+        onPress={confirmRemoveWallets}
+        containerStyle={styles.buttonContainer}
+      />
+    )
+  } else if (escape === "logout") {
+    EscapeContent = (
+      <GaloySecondaryButton
+        title={LL.common.logout()}
+        onPress={confirmLogout}
+        containerStyle={styles.buttonContainer}
+      />
+    )
+  } else {
+    EscapeContent = null
+  }
+
   if (screenPurpose === AuthenticationScreenPurpose.Authenticate) {
     AlternateContent = (
       <>
         {PinButtonContent}
-        <GaloySecondaryButton
-          title={LL.common.logout()}
-          onPress={confirmLogout}
-          containerStyle={styles.buttonContainer}
-        />
+        {EscapeContent}
       </>
     )
   } else if (screenPurpose === AuthenticationScreenPurpose.TurnOnAuthentication) {
