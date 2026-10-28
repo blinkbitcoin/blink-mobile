@@ -5,8 +5,13 @@ import { Marker } from "react-native-maps"
 import { LatLng } from "@app/btcmap"
 import { makeStyles } from "@rn-vui/themed"
 
-import { PIN_ANCHOR } from "./marker-layout"
-import { PIN_HEIGHT, PIN_WIDTH, PinShape, usePinColor } from "./pin-shape"
+import {
+  OUTLINED_PIN_ANCHOR,
+  OUTLINED_PIN_HEIGHT,
+  OUTLINED_PIN_WIDTH,
+  PinShape,
+  useNewPlacePinColors,
+} from "./pin-shape"
 import { useMarkerSettle } from "./use-marker-settle"
 
 type Props = {
@@ -23,13 +28,12 @@ type Props = {
  * So the pin becomes a marker on the map itself: it stays on the place while
  * the map moves, and it carries no instruction to move it.
  *
- * The same teardrop and fill as the locator, with no glyph — the place has no
- * category on the map until BTC Map has reviewed it.
+ * The same blue, white-ringed teardrop as the locator, with no glyph — the
+ * place has no category on the map until BTC Map has reviewed it.
  */
 export const PinnedPlaceMarker: React.FC<Props> = ({ coordinate }) => {
   const styles = useStyles()
-  // Never a boosted place — it is not a place at all yet.
-  const color = usePinColor(false)
+  const { color, outlineColor } = useNewPlacePinColors()
   const { markerRef, tracksViewChanges } = useMarkerSettle(color)
 
   return (
@@ -38,12 +42,12 @@ export const PinnedPlaceMarker: React.FC<Props> = ({ coordinate }) => {
       identifier="pinned-place"
       testID="pinned-place-pin"
       coordinate={coordinate}
-      anchor={PIN_ANCHOR}
+      anchor={OUTLINED_PIN_ANCHOR}
       tracksViewChanges={tracksViewChanges}
       tappable={false}
     >
       <View style={styles.pin}>
-        <PinShape color={color} />
+        <PinShape color={color} outlineColor={outlineColor} />
       </View>
     </Marker>
   )
@@ -51,7 +55,7 @@ export const PinnedPlaceMarker: React.FC<Props> = ({ coordinate }) => {
 
 const useStyles = makeStyles(() => ({
   pin: {
-    width: PIN_WIDTH,
-    height: PIN_HEIGHT,
+    width: OUTLINED_PIN_WIDTH,
+    height: OUTLINED_PIN_HEIGHT,
   },
 }))
