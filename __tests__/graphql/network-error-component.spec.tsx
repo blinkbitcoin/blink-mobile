@@ -19,11 +19,15 @@ jest.mock("@app/hooks/use-logout")
 /** A factory, not an automock: building one would load the hook's module, and the lock
  *  context it imports pulls in native boot code. */
 jest.mock("@app/hooks/use-return-to-gate", () => ({ useReturnToGate: jest.fn() }))
-/** The profile switch runs for real here and asks whether the lock is up, reading it from
- *  the lock's own ref rather than a mirror; these tests run with it down, where a switch
- *  opens the home screen as it always did. */
+/** The profile switch and the shared logout route run for real here. The switch asks
+ *  whether the lock is up, reading it from the lock's own ref rather than a mirror; these
+ *  tests run with it down, where a switch opens the home screen as it always did. The
+ *  route lowers the flag when a logout took the lock with it. */
 jest.mock("@app/navigation/navigation-container-wrapper", () => ({
-  useAuthenticationContext: () => ({ readIsAppLocked: () => false }),
+  useAuthenticationContext: () => ({
+    readIsAppLocked: () => false,
+    setAppUnlocked: mockSetAppUnlocked,
+  }),
 }))
 jest.mock("@app/hooks")
 jest.mock("@app/utils/toast")
@@ -48,6 +52,7 @@ const mockReset = jest.fn()
 /** Where a session the backend no longer accepts leaves for: the gate, lock raised. What
  *  that does is its own spec. */
 const mockReturnToGate = jest.fn()
+const mockSetAppUnlocked = jest.fn()
 
 const mockNavigation = {
   navigate: mockNavigate,
@@ -82,6 +87,8 @@ beforeEach(() => {
     },
   })
   ;(useLogout as jest.Mock).mockReturnValue({ logout: mockLogout })
+  /** Kept unless a test says otherwise: a device that stores something the lock guards. */
+  mockLogout.mockResolvedValue({ isAppLockKept: true })
   ;(useReturnToGate as jest.Mock).mockReturnValue(mockReturnToGate)
   ;(useAppConfig as jest.Mock).mockReturnValue({
     appConfig: { token: "current-token" },
@@ -206,6 +213,33 @@ describe("NetworkErrorComponent", () => {
       expect(mockReset).not.toHaveBeenCalled()
       expect(mockClearNetworkError).toHaveBeenCalled()
     })
+  })
+
+  /** The gate would lower the flag again on a device with no lock, but nothing here
+   *  should lean on that: a logout that took the lock with it lands on the landing screen
+   *  with the flag down, the same way out every full logout takes. */
+  it("lands on the landing screen with the lock flag down when the logout took the lock", async () => {
+    storeProfiles([{ token: "current-token", username: "user1" }])
+    mockLogout.mockResolvedValue({ isAppLockKept: false })
+
+    const { rerender } = render(<NetworkErrorComponent />)
+
+    ;(useNetworkError as jest.Mock).mockReturnValue({
+      networkError: { statusCode: 401 },
+      token: "current-token",
+      clearNetworkError: mockClearNetworkError,
+    })
+
+    rerender(<NetworkErrorComponent />)
+
+    await waitFor(() => {
+      expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "getStarted" }],
+      })
+    })
+    expect(mockReturnToGate).not.toHaveBeenCalled()
   })
 
   it("handles InvalidAuthentication with no current token - logs out and navigates", async () => {

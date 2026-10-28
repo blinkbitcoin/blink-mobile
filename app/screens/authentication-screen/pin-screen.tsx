@@ -15,7 +15,7 @@ import { usePinAttempts } from "./use-pin-attempts"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
-import { useReturnToGate } from "../../hooks/use-return-to-gate"
+import { useLogoutAndRoute } from "../../hooks/use-logout-and-route"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
@@ -49,7 +49,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  lock — the back-press swallow is isResume-gated and completeUnlock is only invoked
    *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
-  const returnToGate = useReturnToGate()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { LL } = useI18nContext()
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
@@ -107,13 +107,16 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     async (message: string) => {
       setEnteredPIN("")
       setFarewellText(message)
+      /** Kept until the logout says otherwise: one that threw part-way says nothing
+       *  about the lock, and the gate is the way out that asks again. */
+      let isAppLockKept = true
       try {
         /** Everything the session held goes: the token and the saved profiles.
          *  Whether the lock goes with it is the logout's own call, made on what
          *  the device still stores: it stays, spent budget included, for as
          *  long as a wallet is left here for it to guard, so the next round
          *  does not open on a fresh three guesses against it. */
-        await logout()
+        ;({ isAppLockKept } = await logout())
         await sleep(1000)
       } catch {
         /** Swallowed, not rethrown: usePinAttempts awaits this from a floating
@@ -122,15 +125,11 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         /** In a finally so a rejected logout cannot strand the screen. A
          *  challenge caller is already marked resolved by the removal this
          *  reset performs, so a screen that never left would leave it waiting
-         *  on a callback that can no longer fire.
-         *
-         *  To the gate rather than past it: the PIN can outlive this logout, so
-         *  whether the device is still locked is a question to ask, not one to
-         *  answer here. */
-        returnToGate()
+         *  on a callback that can no longer fire. */
+        routeAfterLogout(isAppLockKept)
       }
     },
-    [logout, returnToGate],
+    [logout, routeAfterLogout],
   )
 
   /** The challenge's success answer: tell the caller before leaving, and mark it

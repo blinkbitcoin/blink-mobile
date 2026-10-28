@@ -207,6 +207,8 @@ describe("PinScreen", () => {
     jest.clearAllMocks()
     primeStore()
     mockAddListener.mockReturnValue(jest.fn())
+    /** What the logout answers on a device that still stores something the lock guards. */
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
     backHandlerSpy = jest.spyOn(BackHandler, "addEventListener")
   })
 
@@ -726,6 +728,8 @@ describe("PinScreen ChallengePin", () => {
     jest.clearAllMocks()
     primeStore()
     mockAddListener.mockReturnValue(jest.fn())
+    /** What the logout answers on a device that still stores something the lock guards. */
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
     backHandlerSpy = jest.spyOn(BackHandler, "addEventListener")
   })
 
@@ -961,8 +965,8 @@ describe("PinScreen ChallengePin", () => {
       it("ignores a tap while the logout runs", async () => {
         let releaseLogout!: () => void
         mockLogout.mockReturnValueOnce(
-          new Promise<void>((resolve) => {
-            releaseLogout = resolve
+          new Promise<{ isAppLockKept: boolean }>((resolve) => {
+            releaseLogout = () => resolve({ isAppLockKept: true })
           }),
         )
         stored.attempts = 2
@@ -1076,8 +1080,8 @@ describe("PinScreen ChallengePin", () => {
          *  otherwise resolve the challenge against a session being destroyed. */
         let releaseLogout!: () => void
         mockLogout.mockReturnValueOnce(
-          new Promise<void>((resolve) => {
-            releaseLogout = resolve
+          new Promise<{ isAppLockKept: boolean }>((resolve) => {
+            releaseLogout = () => resolve({ isAppLockKept: true })
           }),
         )
         stored.attempts = 2

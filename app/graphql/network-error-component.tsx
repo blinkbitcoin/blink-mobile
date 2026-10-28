@@ -2,10 +2,10 @@ import React, { useState, useCallback, useEffect, useRef } from "react"
 import { Alert } from "react-native"
 
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useAppConfig } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
-import { useReturnToGate } from "@app/hooks/use-return-to-gate"
 import { toastShow } from "@app/utils/toast"
 import {
   SwitchProfileOutcome,
@@ -17,10 +17,9 @@ import { useNetworkError } from "./network-error-context"
 
 export const NetworkErrorComponent: React.FC = () => {
   /** A session the backend no longer accepts ends here whatever screen is up, the lock
-   *  screen included, and the logout keeps the lock for as long as the device still stores
-   *  something it guards. So it leaves for the gate, never straight for the landing screen:
-   *  the gate hands a device with nothing left to unlock to the landing screen itself. */
-  const returnToGate = useReturnToGate()
+   *  screen included. Where it lands is the logout's answer, taken through the shared
+   *  route: the gate while the lock is kept, the landing screen once it went. */
+  const { logoutAndRoute, routeAfterLogout } = useLogoutAndRoute()
 
   const { networkError, clearNetworkError, token: networkErrorToken } = useNetworkError()
   const { LL } = useI18nContext()
@@ -51,8 +50,7 @@ export const NetworkErrorComponent: React.FC = () => {
         // No active token right now says nothing about what is stored: a 401
         // arriving mid-switch lands here, and erasing on it would take the
         // account the user is switching to.
-        await logout({ preserveStoredCredentials: true })
-        returnToGate()
+        await logoutAndRoute({ preserveStoredCredentials: true })
         return
       }
 
@@ -79,13 +77,15 @@ export const NetworkErrorComponent: React.FC = () => {
 
       if (!showedAlert) {
         setShowedAlert(true)
-        await logout({ preserveStoredCredentials: isStoreUnreadable })
+        const { isAppLockKept } = await logout({
+          preserveStoredCredentials: isStoreUnreadable,
+        })
         Alert.alert(LL.common.reauth(), "", [
           {
             text: LL.common.ok(),
             onPress: () => {
               setShowedAlert(false)
-              returnToGate()
+              routeAfterLogout(isAppLockKept)
             },
           },
         ])
@@ -95,8 +95,7 @@ export const NetworkErrorComponent: React.FC = () => {
       // Same rule as above, and this branch knows even less: something threw
       // mid-teardown, so the saved list stays rather than being erased on a
       // guess. A stale entry costs one failed switch; erasing costs sessions.
-      await logout({ preserveStoredCredentials: true })
-      returnToGate()
+      await logoutAndRoute({ preserveStoredCredentials: true })
     } finally {
       resetSyncFlag()
     }
@@ -104,8 +103,9 @@ export const NetworkErrorComponent: React.FC = () => {
     appConfig.token,
     isSelfCustodialActive,
     logout,
+    logoutAndRoute,
+    routeAfterLogout,
     LL,
-    returnToGate,
     networkErrorToken,
     showedAlert,
     switchToNextProfile,

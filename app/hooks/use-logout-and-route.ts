@@ -29,9 +29,11 @@ type UseLogoutAndRoute = {
  * device holds. The gate asks again, and it is the gate that hands a device with nothing
  * left to unlock on to the landing screen.
  *
- * The rule lives here, once, because it was the duplication that broke it: every full
- * logout call site repeated the route, and the ones that were written before the lock could
- * outlive a logout kept routing straight to the landing screen and walked the lock away.
+ * Every full logout that leaves a screen routes through here: the settings logout, the
+ * account delete, the lock screens, the spent PIN budget and a session the backend no
+ * longer accepts. The one exception is the error screen, which sits outside the navigator
+ * and has nothing to route: it matches the lock flag to the logout's answer and lets the
+ * remount bring back the gate.
  *
  * `logout` itself stays free of routing on purpose. Most of its callers pass a token and
  * are scoped to that one session, which ends no session the lock is guarding and must not
