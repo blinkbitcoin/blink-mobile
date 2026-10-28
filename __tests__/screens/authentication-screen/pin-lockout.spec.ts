@@ -108,4 +108,13 @@ describe("remainingLockoutMs", () => {
 
     expect(remainingLockoutMs({ attempts: 2, lockedUntil }, 0)).toBe(30 * SECOND_MS)
   })
+
+  /** The accepted trade-off, stated where it can fail: nothing in JS gives a clock that
+   *  survives a relaunch, so a wall clock moved forward past the lock lifts it at once.
+   *  The day a monotonic clock lands, this case has to change with it. */
+  it("lifts the lock at once for a clock moved forward past it", () => {
+    const lockedUntil = 60 * MINUTE_MS
+
+    expect(remainingLockoutMs({ attempts: 6, lockedUntil }, lockedUntil + 1)).toBe(0)
+  })
 })

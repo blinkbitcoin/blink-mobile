@@ -502,6 +502,26 @@ describe("usePinAttempts", () => {
     expect(warn).not.toHaveBeenCalled()
     warn.mockRestore()
   })
+
+  /** An unreadable answer for a screen that already went would put a notice on whatever
+   *  replaced it. */
+  it("says nothing of an unreadable store to a screen that went before the read answered", async () => {
+    let release: (state: { status: "unreadable" }) => void = () => {}
+    mockedReadPinLockState.mockReturnValue(
+      new Promise((resolve) => {
+        release = resolve
+      }),
+    )
+
+    const { unmount, handlers } = renderAttempts()
+    unmount()
+
+    await act(async () => {
+      release({ status: "unreadable" })
+    })
+
+    expect(handlers.onUnreadable).not.toHaveBeenCalled()
+  })
 })
 
 describe("when the stored pin could not be read", () => {
