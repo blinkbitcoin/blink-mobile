@@ -4152,6 +4152,11 @@
     "body": "Untuk mengetahui lebih lanjut, baca catatan blog kami",
     "cta": "Baca"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Kemas kini sandaran awan anda",
+    "body": "Bundel kecemasan anda dalam {provider} sudah lapuk. Sandarkan dompet anda sekali lagi untuk mengemas kininya.",
+    "cta": "Sandarkan semula"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Belum ada bundel kecemasan. Ia dicipta selepas transaksi pertama anda.",
     "exportFailed": "Tidak dapat memuat turun bundel kecemasan."

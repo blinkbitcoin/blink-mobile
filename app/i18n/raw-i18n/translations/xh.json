@@ -4152,6 +4152,11 @@
     "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
     "cta": "Funda"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Hlaziya ugcino lwakho kwilifu",
+    "body": "Ingqokelela yakho yongxamiseko ku-{provider} indala. Gcina isipaji sakho kwakhona ukuze uyihlaziye.",
+    "cta": "Gcina kwakhona"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Akukabikho ngqokelela yongxamiseko. Yenziwa emva kwentengiselwano yakho yokuqala.",
     "exportFailed": "Ayikwazanga ukukhuphela ingqokelela yongxamiseko."

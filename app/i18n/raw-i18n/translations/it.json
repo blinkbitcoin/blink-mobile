@@ -4152,6 +4152,11 @@
         "body": "Per saperne di più, leggi il nostro articolo del blog",
         "cta": "Leggi"
     },
+    "StaleCloudBundleBulletin": {
+        "title": "Aggiorna il backup nel cloud",
+        "body": "Il tuo pacchetto di emergenza su {provider} non è aggiornato. Esegui di nuovo il backup del portafoglio per aggiornarlo.",
+        "cta": "Rifai il backup"
+    },
     "RecoveryBundleScreen": {
         "noBundleToExport": "Nessun pacchetto di emergenza ancora. Viene creato dopo la tua prima transazione.",
         "exportFailed": "Impossibile scaricare il pacchetto di emergenza."

@@ -4152,6 +4152,11 @@
         "body": "Para saber más, lee nuestra entrada del blog",
         "cta": "Leer"
     },
+    "StaleCloudBundleBulletin": {
+        "title": "Actualiza tu respaldo en la nube",
+        "body": "Tu paquete de emergencia en {provider} está desactualizado. Vuelve a respaldar tu billetera para actualizarlo.",
+        "cta": "Respaldar de nuevo"
+    },
     "RecoveryBundleScreen": {
         "noBundleToExport": "Aún no hay paquete de emergencia. Se crea después de tu primera transacción.",
         "exportFailed": "No se pudo descargar el paquete de emergencia."

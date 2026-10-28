@@ -4152,6 +4152,11 @@
         "body": "Para saber mais, leia a nossa publicação no blog",
         "cta": "Ler"
     },
+    "StaleCloudBundleBulletin": {
+        "title": "Atualize seu backup na nuvem",
+        "body": "Seu pacote de emergência no {provider} está desatualizado. Faça o backup da sua carteira de novo para atualizá-lo.",
+        "cta": "Fazer backup de novo"
+    },
     "RecoveryBundleScreen": {
         "noBundleToExport": "Ainda não há pacote de emergência. Ele é criado após sua primeira transação.",
         "exportFailed": "Não foi possível baixar o pacote de emergência."

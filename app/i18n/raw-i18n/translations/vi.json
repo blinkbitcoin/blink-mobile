@@ -4152,6 +4152,11 @@
     "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
     "cta": "Đọc"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Cập nhật bản sao lưu trên đám mây",
+    "body": "Gói khẩn cấp của bạn trong {provider} đã cũ. Hãy sao lưu ví của bạn lại để cập nhật.",
+    "cta": "Sao lưu lại"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Chưa có gói khẩn cấp. Gói được tạo sau giao dịch đầu tiên của bạn.",
     "exportFailed": "Không thể tải xuống gói khẩn cấp."

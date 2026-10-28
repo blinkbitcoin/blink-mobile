@@ -4152,6 +4152,11 @@
     "body": "Astawan yachanaykipaq, blog qillqaykuta ñawinchay",
     "cta": "Ñawinchay"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Phuyupi waqaychasqaykita musuqchay",
+    "body": "{provider} nisqapi utqay qipiyki mawk'añam. Qullqikuqniykita hukmanta waqaychay musuqchanaykipaq.",
+    "cta": "Hukmanta waqaychay"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Manaraq utqay qipi kanchu. Ñawpaq kaq pagasqaykimanta qhipata ruwakun.",
     "exportFailed": "Utqay qipita mana uraykachiyta atikurqanchu."

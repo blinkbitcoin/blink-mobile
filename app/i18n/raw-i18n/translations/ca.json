@@ -4152,6 +4152,11 @@
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
     "cta": "Llegeix"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualitza la teva còpia al núvol",
+    "body": "El teu paquet d'emergència a {provider} no està actualitzat. Torna a fer una còpia de seguretat de la cartera per actualitzar-lo.",
+    "cta": "Torna a fer la còpia"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
     "exportFailed": "No s'ha pogut baixar el paquet d'emergència."

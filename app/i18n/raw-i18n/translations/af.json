@@ -4152,6 +4152,11 @@
     "body": "Lees ons blogpos om meer te wete te kom",
     "cta": "Lees"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Werk jou wolk-rugsteun by",
+    "body": "Jou noodbundel in {provider} is verouderd. Rugsteun jou beursie weer om dit by te werk.",
+    "cta": "Rugsteun weer"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Nog geen noodbundel nie. Dit word ná jou eerste transaksie geskep.",
     "exportFailed": "Kon nie die noodbundel aflaai nie."

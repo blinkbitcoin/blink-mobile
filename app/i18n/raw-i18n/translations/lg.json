@@ -4152,6 +4152,11 @@
     "body": "Okumanya ebisingawo, soma blog yaffe",
     "cta": "Soma"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Zza obuggya kkopi yo ey'omu kire",
+    "body": "Ekipakiti kyo eky'obwangu mu {provider} kikadde. Koppa akawunti yo nate okukizza obuggya.",
+    "cta": "Koppa nate"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Tewannabaawo kipakiti kya bwangu. Kikolebwa oluvannyuma lw'okusasula kwo okusooka.",
     "exportFailed": "Tetusobodde kuwanula kipakiti kya bwangu."

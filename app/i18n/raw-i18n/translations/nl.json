@@ -4152,6 +4152,11 @@
     "body": "Lees ons blogbericht voor meer informatie",
     "cta": "Lezen"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Werk je cloudback-up bij",
+    "body": "Je noodbundel in {provider} is verouderd. Maak opnieuw een back-up van je portemonnee om hem bij te werken.",
+    "cta": "Opnieuw back-up maken"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Nog geen noodbundel. Die wordt gemaakt na je eerste transactie.",
     "exportFailed": "Kan de noodbundel niet downloaden."

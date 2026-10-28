@@ -4152,6 +4152,11 @@
         "body": "Pour en savoir plus, lisez notre article de blog",
         "cta": "Lire"
     },
+    "StaleCloudBundleBulletin": {
+        "title": "Mettez à jour votre sauvegarde dans le cloud",
+        "body": "Votre paquet d'urgence dans {provider} n'est plus à jour. Sauvegardez à nouveau votre portefeuille pour le mettre à jour.",
+        "cta": "Sauvegarder à nouveau"
+    },
     "RecoveryBundleScreen": {
         "noBundleToExport": "Pas encore de paquet d'urgence. Il est créé après votre première transaction.",
         "exportFailed": "Impossible de télécharger le paquet d'urgence."

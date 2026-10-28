@@ -4152,6 +4152,11 @@
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
     "cta": "Číst"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Aktualizujte zálohu v cloudu",
+    "body": "Váš nouzový balíček v {provider} je zastaralý. Znovu zálohujte peněženku, abyste ho aktualizovali.",
+    "cta": "Znovu zálohovat"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Zatím nemáte nouzový balíček. Vytvoří se po vaší první transakci.",
     "exportFailed": "Nouzový balíček se nepodařilo stáhnout."

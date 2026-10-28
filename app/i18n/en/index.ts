@@ -4392,6 +4392,11 @@ const en: BaseTranslation = {
     body: "To learn more read our blog post",
     cta: "Read",
   },
+  StaleCloudBundleBulletin: {
+    title: "Update your cloud backup",
+    body: "Your emergency bundle in {provider: string} is out of date. Back up your wallet again to update it.",
+    cta: "Back up again",
+  },
   RecoveryBundleScreen: {
     noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
     exportFailed: "Could not download the emergency bundle.",

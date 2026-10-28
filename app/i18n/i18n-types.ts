@@ -13870,6 +13870,21 @@ type RootTranslation = {
 		 */
 		cta: string
 	}
+	StaleCloudBundleBulletin: {
+		/**
+		 * U​p​d​a​t​e​ ​y​o​u​r​ ​c​l​o​u​d​ ​b​a​c​k​u​p
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​n​ ​{​p​r​o​v​i​d​e​r​}​ ​i​s​ ​o​u​t​ ​o​f​ ​d​a​t​e​.​ ​B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​a​g​a​i​n​ ​t​o​ ​u​p​d​a​t​e​ ​i​t​.
+		 * @param {string} provider
+		 */
+		body: RequiredParams<'provider'>
+		/**
+		 * B​a​c​k​ ​u​p​ ​a​g​a​i​n
+		 */
+		cta: string
+	}
 	RecoveryBundleScreen: {
 		/**
 		 * N​o​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​y​e​t​.​ ​I​t​'​s​ ​c​r​e​a​t​e​d​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​t​r​a​n​s​a​c​t​i​o​n​.
@@ -27895,6 +27910,20 @@ export type TranslationFunctions = {
 		body: () => LocalizedString
 		/**
 		 * Read
+		 */
+		cta: () => LocalizedString
+	}
+	StaleCloudBundleBulletin: {
+		/**
+		 * Update your cloud backup
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your emergency bundle in {provider} is out of date. Back up your wallet again to update it.
+		 */
+		body: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Back up again
 		 */
 		cta: () => LocalizedString
 	}

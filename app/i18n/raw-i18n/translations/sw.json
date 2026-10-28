@@ -4152,6 +4152,11 @@
     "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
     "cta": "Soma"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Sasisha nakala yako ya wingu",
+    "body": "Kifurushi chako cha dharura kwenye {provider} kimepitwa na wakati. Hifadhi nakala ya mkoba wako tena ili kukisasisha.",
+    "cta": "Hifadhi nakala tena"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Bado hakuna kifurushi cha dharura. Kinaundwa baada ya muamala wako wa kwanza.",
     "exportFailed": "Imeshindwa kupakua kifurushi cha dharura."

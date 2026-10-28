@@ -4152,6 +4152,11 @@
     "body": "Daha fazla bilgi için blog yazımızı okuyun",
     "cta": "Oku"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Bulut yedeğini güncelle",
+    "body": "{provider} içindeki acil durum paketin güncel değil. Güncellemek için cüzdanını yeniden yedekle.",
+    "cta": "Yeniden yedekle"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Henüz acil durum paketi yok. İlk işleminden sonra oluşturulur.",
     "exportFailed": "Acil durum paketi indirilemedi."

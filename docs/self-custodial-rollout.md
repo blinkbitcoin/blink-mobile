@@ -44,6 +44,11 @@ On a funded self-custodial wallet, for each backup method:
   cloud copy, if any, is not touched.
 - A wallet that has never held funds → Download bundle looks inactive, and
   tapping it shows the "No emergency bundle yet" warning toast.
+- Cloud backup with `cloudBundleStaleAfterMs` set to a minute in the console,
+  then signed out of Google or with iCloud Drive turned off → a minute after
+  the next payment, returning to the home shows "Update your cloud backup";
+  Back up again opens the cloud backup, and the X hides it until a newer
+  bundle is saved.
 
 ## Deep-link routing (NFR23)
 

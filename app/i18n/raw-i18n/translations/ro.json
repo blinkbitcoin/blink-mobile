@@ -4152,6 +4152,11 @@
     "body": "Pentru a afla mai multe, citește articolul nostru de blog",
     "cta": "Citește"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualizează copia de siguranță din cloud",
+    "body": "Pachetul tău de urgență din {provider} nu este actualizat. Fă din nou o copie de siguranță a portofelului pentru a-l actualiza.",
+    "cta": "Fă din nou copia"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Încă nu există un pachet de urgență. Este creat după prima ta tranzacție.",
     "exportFailed": "Pachetul de urgență nu a putut fi descărcat."

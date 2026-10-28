@@ -4152,6 +4152,11 @@
     "body": "Da biste saznali više, pročitajte naš blog post",
     "cta": "Pročitaj"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Ažuriraj sigurnosnu kopiju u oblaku",
+    "body": "Tvoj paket za hitne slučajeve u {provider} je zastario. Ponovno napravi sigurnosnu kopiju novčanika da ga ažuriraš.",
+    "cta": "Ponovno napravi kopiju"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Još nema paketa za hitne slučajeve. Stvara se nakon tvoje prve transakcije.",
     "exportFailed": "Paket za hitne slučajeve nije moguće preuzeti."

@@ -4152,6 +4152,11 @@
     "body": "Læs vores blogindlæg for at lære mere",
     "cta": "Læs"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Opdater din sikkerhedskopi i skyen",
+    "body": "Dit nødbundt i {provider} er forældet. Sikkerhedskopiér din tegnebog igen for at opdatere det.",
+    "cta": "Sikkerhedskopiér igen"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Intet nødbundt endnu. Det oprettes efter din første transaktion.",
     "exportFailed": "Kunne ikke downloade nødbundtet."

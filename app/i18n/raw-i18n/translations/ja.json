@@ -4152,6 +4152,11 @@
         "body": "詳しくはブログ記事をご覧ください",
         "cta": "読む"
     },
+    "StaleCloudBundleBulletin": {
+        "title": "クラウドのバックアップを更新",
+        "body": "{provider} の緊急バンドルが古くなっています。ウォレットをもう一度バックアップして更新してください。",
+        "cta": "もう一度バックアップ"
+    },
     "RecoveryBundleScreen": {
         "noBundleToExport": "緊急バンドルはまだありません。最初の取引の後に作成されます。",
         "exportFailed": "緊急バンドルをダウンロードできませんでした。"

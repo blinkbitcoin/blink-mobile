@@ -4152,6 +4152,11 @@
     "body": "További információért olvasd el blogbejegyzésünket",
     "cta": "Olvasás"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Frissítsd a felhőben lévő mentést",
+    "body": "A vészhelyzeti csomagod a(z) {provider} szolgáltatásban elavult. Készíts újra biztonsági mentést a tárcádról a frissítéshez.",
+    "cta": "Mentés újra"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Még nincs vészhelyzeti csomag. Az első tranzakciód után jön létre.",
     "exportFailed": "Nem sikerült letölteni a vészhelyzeti csomagot."

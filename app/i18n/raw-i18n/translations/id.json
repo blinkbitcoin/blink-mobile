@@ -4152,6 +4152,11 @@
     "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
     "cta": "Baca"
     },
+  "StaleCloudBundleBulletin": {
+    "title": "Perbarui cadangan cloud-mu",
+    "body": "Paket darurat kamu di {provider} sudah usang. Cadangkan dompetmu lagi untuk memperbaruinya.",
+    "cta": "Cadangkan lagi"
+    },
   "RecoveryBundleScreen": {
     "noBundleToExport": "Belum ada paket darurat. Paket dibuat setelah transaksi pertamamu.",
     "exportFailed": "Tidak dapat mengunduh paket darurat."
