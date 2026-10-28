@@ -282,6 +282,66 @@ describe("useRecoveryBackupNudge", () => {
     )
   })
 
+  describe("switching accounts", () => {
+    const otherSelfCustodial = { id: "account-2", type: "self-custodial" }
+    const dismissalReadsBy = (reads: Record<string, () => Promise<string | null>>) =>
+      mockGetItem.mockImplementation((key: string) => {
+        const read = reads[key.split(":")[1]]
+        return read ? read() : Promise.resolve(null)
+      })
+
+    beforeEach(() => {
+      mockStatus.mockReturnValue({
+        status: RecoveryBundleStatus.Stale,
+        savedAt: SAVED_AT,
+        leafCount: 3,
+        isOnlyOnThisDevice: false,
+      })
+    })
+
+    it("does not judge the next account by the previous one's dismissal while its own read is pending", async () => {
+      let releaseOtherRead: (value: string | null) => void = () => {}
+      dismissalReadsBy({
+        "account-1": () => Promise.resolve(null),
+        "account-2": () =>
+          new Promise((resolve) => {
+            releaseOtherRead = resolve
+          }),
+      })
+      const { result, rerender } = renderNudge(true)
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+      )
+
+      mockAccount.mockReturnValue(otherSelfCustodial)
+      rerender({})
+
+      expect(result.current.variant).toBeNull()
+
+      await act(async () => {
+        releaseOtherRead(String(SAVED_AT + 1000))
+      })
+      expect(result.current.variant).toBeNull()
+    })
+
+    it("shows the next account's reminder when its dismissal cannot be read", async () => {
+      dismissalReadsBy({
+        "account-1": () => Promise.resolve(String(SAVED_AT + 1000)),
+        "account-2": () => Promise.reject(new Error("storage unavailable")),
+      })
+      const { result, rerender } = renderNudge(true)
+      await waitFor(() => expect(mockGetItem).toHaveBeenCalledTimes(1))
+      expect(result.current.variant).toBeNull()
+
+      mockAccount.mockReturnValue(otherSelfCustodial)
+      rerender({})
+
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+      )
+    })
+  })
+
   describe("reading and writing the dismissal", () => {
     it("does not set state after the screen is gone", async () => {
       // The read outlives a quick navigation away; writing into an unmounted

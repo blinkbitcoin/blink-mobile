@@ -38,6 +38,12 @@ type RecoveryBackupNudge = {
   dismiss: () => void
 }
 
+/** A dismissal together with the account it was read for, so one account's
+ *  dismissal can never stand in for another's while that one is still loading. */
+type Dismissal = { forAccount: string | null; dismissedAt: number | null }
+
+const NO_DISMISSAL: Dismissal = { forAccount: null, dismissedAt: null }
+
 /**
  * Drives the home-screen recovery-backup banner.
  *
@@ -50,27 +56,27 @@ export const useRecoveryBackupNudge = (): RecoveryBackupNudge => {
   const { activeAccount } = useAccountRegistry()
   const { status, savedAt, isOnlyOnThisDevice, hasNothingToRecover } =
     useRecoveryBundleStatus()
-  const [dismissedAt, setDismissedAt] = useState<number | null>(null)
-  const [dismissalLoaded, setDismissalLoaded] = useState(false)
+  const [dismissal, setDismissal] = useState<Dismissal>(NO_DISMISSAL)
 
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
 
   useEffect(() => {
-    if (!accountId) {
-      setDismissalLoaded(true)
-      return
-    }
+    if (!accountId) return
     let cancelled = false
     AsyncStorage.getItem(dismissalKeyFor(accountId))
       .then((raw) => {
         if (cancelled) return
         const parsed = raw === null ? NaN : Number(raw)
-        setDismissedAt(Number.isFinite(parsed) ? parsed : null)
-        setDismissalLoaded(true)
+        setDismissal({
+          forAccount: accountId,
+          dismissedAt: Number.isFinite(parsed) ? parsed : null,
+        })
       })
       .catch(() => {
-        if (!cancelled) setDismissalLoaded(true)
+        /** An unreadable dismissal reads as none, so the reminder shows rather
+         *  than staying hidden behind a dismissal this account never made. */
+        if (!cancelled) setDismissal({ forAccount: accountId, dismissedAt: null })
       })
     return () => {
       cancelled = true
@@ -80,12 +86,15 @@ export const useRecoveryBackupNudge = (): RecoveryBackupNudge => {
   const dismiss = useCallback(() => {
     if (!accountId) return
     const now = Date.now()
-    setDismissedAt(now)
+    setDismissal({ forAccount: accountId, dismissedAt: now })
     AsyncStorage.setItem(dismissalKeyFor(accountId), String(now)).catch(() => {})
   }, [accountId])
 
+  const isDismissalLoaded = accountId !== null && dismissal.forAccount === accountId
+  const { dismissedAt } = dismissal
+
   const variant = ((): RecoveryBackupNudgeVariant | null => {
-    if (!accountId || !dismissalLoaded) return null
+    if (!isDismissalLoaded) return null
 
     /** No bundle and nothing to recover is the ordinary state of a fresh wallet,
      *  not a problem to nag about: there is nothing that could be backed up. */
