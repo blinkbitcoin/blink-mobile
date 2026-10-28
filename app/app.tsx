@@ -22,6 +22,9 @@ import { GaloyToast } from "./components/galoy-toast"
 import { NotificationsProvider } from "./components/notifications/index"
 import { PushNotificationComponent } from "./components/push-notification"
 import { FeatureFlagContextProvider } from "./config/feature-flags-context"
+import { CustodialRestrictionsProvider } from "./custodial/providers/restrictions"
+import { TwoFactorEnforcementProvider } from "./custodial/providers/two-factor-enforcement"
+import { WindDownStatusProvider } from "./screens/account-migration/hooks/use-wind-down-status"
 import { CustodialWalletProvider } from "./custodial/providers/wallet"
 import {
   AccountModeSyncMount,
@@ -72,37 +75,43 @@ export const App = () => (
             <GaloyThemeProvider>
               <FeatureFlagContextProvider>
                 <CustodialWalletProvider>
-                  <SelfCustodialWalletProvider>
-                    <BackupStateProvider>
-                      <AutoConvertStatusProvider>
-                        <ActionsProvider>
-                          <MigrationBlockerProvider>
-                            <NavigationContainerWrapper>
-                              <ErrorBoundary FallbackComponent={ErrorScreen}>
-                                <RootSiblingParent>
-                                  <EnhancedModePromptProvider>
-                                    <RestrictedRegionProvider>
-                                      <NotificationsProvider>
-                                        <AppStateWrapper />
-                                        <PushNotificationComponent />
-                                        <AutoConvertListenerMount />
-                                        <AccountModeSyncMount />
-                                        <DisplayCurrencyFromRegionMount />
-                                        <RootStack />
-                                        <NetworkErrorComponent />
-                                        <ActionModals />
-                                      </NotificationsProvider>
-                                    </RestrictedRegionProvider>
-                                  </EnhancedModePromptProvider>
-                                  <GaloyToast />
-                                </RootSiblingParent>
-                              </ErrorBoundary>
-                            </NavigationContainerWrapper>
-                          </MigrationBlockerProvider>
-                        </ActionsProvider>
-                      </AutoConvertStatusProvider>
-                    </BackupStateProvider>
-                  </SelfCustodialWalletProvider>
+                  <CustodialRestrictionsProvider>
+                    <WindDownStatusProvider>
+                      <TwoFactorEnforcementProvider>
+                        <SelfCustodialWalletProvider>
+                          <BackupStateProvider>
+                            <AutoConvertStatusProvider>
+                              <ActionsProvider>
+                                <MigrationBlockerProvider>
+                                  <NavigationContainerWrapper>
+                                    <ErrorBoundary FallbackComponent={ErrorScreen}>
+                                      <RootSiblingParent>
+                                        <EnhancedModePromptProvider>
+                                          <RestrictedRegionProvider>
+                                            <NotificationsProvider>
+                                              <AppStateWrapper />
+                                              <PushNotificationComponent />
+                                              <AutoConvertListenerMount />
+                                              <AccountModeSyncMount />
+                                              <DisplayCurrencyFromRegionMount />
+                                              <RootStack />
+                                              <NetworkErrorComponent />
+                                              <ActionModals />
+                                            </NotificationsProvider>
+                                          </RestrictedRegionProvider>
+                                        </EnhancedModePromptProvider>
+                                        <GaloyToast />
+                                      </RootSiblingParent>
+                                    </ErrorBoundary>
+                                  </NavigationContainerWrapper>
+                                </MigrationBlockerProvider>
+                              </ActionsProvider>
+                            </AutoConvertStatusProvider>
+                          </BackupStateProvider>
+                        </SelfCustodialWalletProvider>
+                      </TwoFactorEnforcementProvider>
+                    </WindDownStatusProvider>
+                  </CustodialRestrictionsProvider>
                 </CustodialWalletProvider>
               </FeatureFlagContextProvider>
             </GaloyThemeProvider>

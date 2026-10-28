@@ -4,6 +4,11 @@ import { useFocusEffect } from "@react-navigation/native"
 
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { reportError } from "@app/utils/error-logging"
+import {
+  classifyStorageFailure,
+  StorageFailure,
+  type StorageWriteResult,
+} from "@app/utils/storage/storage-failure"
 
 import {
   MigrationCheckpoint,
@@ -12,7 +17,6 @@ import {
   getStorageKey,
   isCommitPointCheckpoint,
   loadCheckpoint,
-  mergeCheckpoint,
   saveCheckpointToStorage,
 } from "../utils/migration-checkpoint-storage"
 
@@ -23,6 +27,13 @@ import { useCustodialOwnerId } from "./use-custodial-owner-id"
 type SaveCheckpointOptions = {
   provisionedAccountId?: string
   expectedReceiveSats?: number
+  /** Marks this run's start as accepted by the server. Never re-sent from what the hook
+   *  holds: the record keeps it for the run, and only the caller that saw the start may
+   *  set it. */
+  isStartConfirmed?: true
+  /** The server reports this account's migration not started, read by the caller just
+   *  before the save. Never re-sent either: an answer goes stale. */
+  isServerFlowUnstarted?: true
 }
 
 /**
@@ -39,6 +50,7 @@ export const useMigrationCheckpointState = () => {
   const [stored, setStored] = useState<StoredCheckpoint | null>(null)
   const [loading, setLoading] = useState(true)
   const [hasError, setHasError] = useState(false)
+  const [storageFailure, setStorageFailure] = useState<StorageFailure | null>(null)
   const isFocusedRef = useRef(true)
 
   const {
@@ -61,12 +73,14 @@ export const useMigrationCheckpointState = () => {
           if (!isFocusedRef.current) return
           setStored(storedCheckpoint ?? null)
           setHasError(false)
+          setStorageFailure(null)
           setLoading(false)
         })
         .catch((err) => {
           reportError("Checkpoint load", err)
           if (!isFocusedRef.current) return
           setHasError(true)
+          setStorageFailure(classifyStorageFailure(err))
           setLoading(false)
         }),
     [storageKey],
@@ -105,37 +119,50 @@ export const useMigrationCheckpointState = () => {
   const expectedReceiveSats = isOwnedByActiveAccount
     ? stored?.expectedReceiveSats ?? null
     : null
+  /** Owned like the ids above: another profile's confirmed start says nothing about this
+   *  account's flow. */
+  const isStartConfirmed = isOwnedByActiveAccount && stored?.isStartConfirmed === true
 
-  /** Resolves false when the write fails, so callers can stop the flow instead of
-   *  advancing on a checkpoint that only exists in memory. Re-sending what this hook
-   *  already knows heals a failed write: mergeCheckpoint preserves what reached storage,
-   *  this covers what never did. */
+  /** Answers `isSaved: false` when the write fails, so callers can stop the flow instead of
+   *  advancing on a checkpoint that only exists in memory, and carries the kind of failure
+   *  with it so a full disk can be named rather than toasted as "something went wrong".
+   *  Re-sending what this hook already knows heals a failed write: mergeCheckpoint preserves
+   *  what reached storage, this covers what never did. */
   const saveCheckpoint = useCallback(
     async (
       step: MigrationCheckpoint,
       {
         provisionedAccountId,
         expectedReceiveSats: expectedReceiveSatsUpdate,
+        isStartConfirmed: isStartConfirmedUpdate,
+        isServerFlowUnstarted,
       }: SaveCheckpointOptions = {},
-    ): Promise<boolean> => {
+    ): Promise<StorageWriteResult> => {
       /** Without a resolved owner the checkpoint cannot be keyed, and saving would erase the
        *  stored owner + account id via mergeCheckpoint; refuse so a null-owner window (an
        *  offline owner query) never wipes real progress. Callers gate on the false. */
-      if (!ownerId) return false
+      if (!ownerId) return { isSaved: false, failure: null }
       const update = {
         step,
         accountId: provisionedAccountId ?? accountId ?? undefined,
         custodialAccountId: ownerId,
         expectedReceiveSats:
           expectedReceiveSatsUpdate ?? expectedReceiveSats ?? undefined,
+        isStartConfirmed: isStartConfirmedUpdate,
+        isServerFlowUnstarted,
       }
-      setStored((existing) => mergeCheckpoint(existing, update))
       try {
-        await saveCheckpointToStorage(storageKey, update)
-        return true
+        const written = await saveCheckpointToStorage(storageKey, update)
+        /** Applied only once the disk has it, and as the disk has it. An optimistic update
+         *  here would leave the hook reporting a step the store refused, which is how a
+         *  resume ends up looking for an expected receive that was never written; and a
+         *  merge against this hook's own copy would drift from what another instance wrote
+         *  to the same key since this one last read it. */
+        setStored(written)
+        return { isSaved: true, failure: null }
       } catch (err) {
         reportError("Checkpoint save", err)
-        return false
+        return { isSaved: false, failure: classifyStorageFailure(err) }
       }
     },
     [storageKey, ownerId, accountId, expectedReceiveSats],
@@ -160,6 +187,7 @@ export const useMigrationCheckpointState = () => {
     checkpoint,
     accountId,
     expectedReceiveSats,
+    isStartConfirmed,
     /** The owner the record was actually saved under, null on one written before owners
      *  existed. Read by consumers that spend something irreversible, since the ownership
      *  flag above claims an owner-less record for whoever is active. */
@@ -169,6 +197,9 @@ export const useMigrationCheckpointState = () => {
      *  indistinguishable from a wiped device, and the gate would hand a resumable user
      *  to support (terminal for that origin) on a transient storage error. */
     hasError,
+    /** What the failed read was, when the message could say. Carried next to the flag
+     *  because only one of these failures is the user's to fix. */
+    storageFailure,
     /** Imperative reload for retry screens. Leaves the focus flag alone on purpose: a
      *  retry resolving after blur still drops its update, same as the focus reload. */
     refetch: reload,

@@ -20,13 +20,13 @@ const mockMigrationAccountId = jest.fn<string | null, []>()
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useMigrationCheckpoint: () => ({
-    saveCheckpoint: jest.fn().mockResolvedValue(true),
+    saveCheckpoint: jest.fn().mockResolvedValue({ isSaved: true, failure: null }),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
   }),
   useMigrationCheckpointState: () => ({
-    saveCheckpoint: jest.fn().mockResolvedValue(true),
+    saveCheckpoint: jest.fn().mockResolvedValue({ isSaved: true, failure: null }),
     checkpoint: mockCheckpoint(),
     accountId: mockMigrationAccountId(),
     loading: mockCheckpointLoading(),
@@ -99,6 +99,15 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+const mockEnableScreenSecurity = jest.fn()
+const mockDisableScreenSecurity = jest.fn()
+jest.mock("@app/utils/screen-security", () => ({
+  enableScreenSecurity: (...args: readonly unknown[]) =>
+    mockEnableScreenSecurity(...args),
+  disableScreenSecurity: (...args: readonly unknown[]) =>
+    mockDisableScreenSecurity(...args),
+}))
+
 loadLocale("en")
 const LL = i18nObject("en")
 
@@ -108,6 +117,8 @@ describe("BackupPhraseConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
+    mockEnableScreenSecurity.mockResolvedValue(undefined)
+    mockDisableScreenSecurity.mockResolvedValue(undefined)
     mockCheckpoint.mockReturnValue(null)
     mockMigrationAccountId.mockReturnValue("migration-uuid")
     mockCheckpointLoading.mockReturnValue(false)
@@ -418,6 +429,9 @@ describe("BackupPhraseConfirmScreen", () => {
         accountId: "migration-uuid",
       },
     })
+    /** A checkpoint write that landed reports nothing; a mock out of step with the
+     *  write's answer would report here on every happy path. */
+    expect(mockReportError).not.toHaveBeenCalled()
   })
 
   it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
@@ -565,6 +579,34 @@ describe("BackupPhraseConfirmScreen", () => {
         route: "accountMigrationBalancesOverview",
         accountId: "migration-uuid",
       },
+    })
+  })
+
+  /** The screen shows individual mnemonic words with their positions, so it must carry
+   *  the same screenshot/screen-recording protection as the backup-phrase screen. */
+  describe("screen security", () => {
+    it("enables screenshot protection on mount", async () => {
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    it("disables screenshot protection on unmount", async () => {
+      const { unmount } = render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      unmount()
+
+      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 })

@@ -17,32 +17,31 @@ describe("ApiScreen", () => {
     jest.clearAllMocks()
   })
 
-  it("renders API Documentation item", () => {
+  /** The screen lists the account's API keys on mount; settling that query inside
+   *  the test keeps its state update from landing after the assertions. */
+  const renderSettled = async () => {
     render(
       <ContextForScreen>
         <ApiScreen />
       </ContextForScreen>,
     )
+    await screen.findByText(LL.ApiScreen.noKeys())
+  }
+
+  it("renders API Documentation item", async () => {
+    await renderSettled()
 
     expect(screen.getByText(LL.SettingsScreen.apiDocumentation())).toBeTruthy()
   })
 
-  it("renders API Dashboard item", () => {
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+  it("renders API Dashboard item", async () => {
+    await renderSettled()
 
     expect(screen.getByText(LL.SettingsScreen.apiDashboard())).toBeTruthy()
   })
 
-  it("opens dashboard link when pressing API Documentation", () => {
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+  it("opens dashboard link when pressing API Documentation", async () => {
+    await renderSettled()
 
     const documentationItem = screen.getByText(LL.SettingsScreen.apiDocumentation())
     fireEvent.press(documentationItem)
@@ -50,12 +49,8 @@ describe("ApiScreen", () => {
     expect(Linking.openURL).toHaveBeenCalledWith("https://dashboard.blink.sv")
   })
 
-  it("opens dashboard link when pressing API Dashboard", () => {
-    render(
-      <ContextForScreen>
-        <ApiScreen />
-      </ContextForScreen>,
-    )
+  it("opens dashboard link when pressing API Dashboard", async () => {
+    await renderSettled()
 
     const dashboardItem = screen.getByText(LL.SettingsScreen.apiDashboard())
     fireEvent.press(dashboardItem)

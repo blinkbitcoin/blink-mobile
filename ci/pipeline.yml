@@ -409,7 +409,7 @@ resources:
   type: git
   webhook_token: ((webhook.secret))
   source:
-    paths: [ yarn.lock ]
+    paths: [ yarn.lock, patches/* ]
     uri: #@ data.values.git_uri
     branch: #@ data.values.git_branch
     private_key: #@ data.values.github_private_key
@@ -463,7 +463,7 @@ resources:
 - name: daily
   type: time
   source:
-    day_of_week: 1-6
+    days: [Monday, Tuesday, Wednesday, Thursday, Friday, Saturday]
     start: 6:00 AM
     stop: 6:00 AM
     location: UTC

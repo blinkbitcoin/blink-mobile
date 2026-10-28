@@ -11,6 +11,7 @@ export {
   deriveWalletIdentityPubkey,
   listAllPayments,
   listPayments,
+  listSentPaymentsSince,
   getUserSettings,
   getLightningAddress,
   checkLightningAddressAvailable,

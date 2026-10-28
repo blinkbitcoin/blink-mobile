@@ -6,6 +6,7 @@ import MapIcon from "@app/assets/icons/map.svg"
 import ScanIcon from "@app/assets/icons/scan.svg"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
 import {
   ConversionConfirmationScreen,
   ConversionDetailsScreen,
@@ -49,10 +50,21 @@ import { ThemeScreen } from "@app/screens/settings-screen/theme-screen"
 import { FeeRatesScreen } from "@app/screens/settings-screen/fee-rates-screen"
 import { TransactionLimitsScreen } from "@app/screens/settings-screen/transaction-limits-screen"
 import {
+  AuthenticatorAppsScreen,
+  AuthenticatorIntroScreen,
+  AuthenticatorProtectedScreen,
+  SetupKeyBackupScreen,
+  LoginMethodCodeScreen,
+  loginMethodCodeCopy,
+  TotpDeleteValidateScreen,
   TotpLoginValidateScreen,
   TotpRegistrationInitiateScreen,
   TotpRegistrationValidateScreen,
 } from "@app/screens/totp-screen"
+import {
+  TwoFactorNonCustodialScreen,
+  TwoFactorSetupScreen,
+} from "@app/screens/two-factor-enforcement"
 import { WebViewScreen } from "@app/screens/webview/webview"
 import { testProps } from "@app/utils/testProps"
 import { createBottomTabNavigator } from "@react-navigation/bottom-tabs"
@@ -122,6 +134,13 @@ import {
   WelcomeOnboardScreen,
   CardSubscriptionScreen,
   LoadingCardScreen,
+  WelcomeInvestScreen,
+  SelectInvestScreen,
+  TermSheetScreen,
+  TransferInvestScreen,
+  InsufficientBalanceScreen,
+  DepositPendingScreen,
+  CompanyValuationScreen,
   CardPersonalInformationScreen,
   CardAcknowledgementScreen,
   CardPreapprovedScreen,
@@ -171,8 +190,9 @@ import {
   PrimaryStackParamList,
   RootStackParamList,
 } from "./stack-param-lists"
-import { useMigrationBlocker } from "@app/screens/account-migration/hooks/use-migration-blocker"
 import { useResumeCompletedMigration } from "@app/screens/account-migration/hooks/use-resume-completed-migration"
+
+import { HomeGate } from "./home-gate"
 import { WindDownReceiveGate } from "@app/screens/account-migration/wind-down-receive-gate"
 import { AcceptTermsAndConditionsScreen } from "@app/screens/accept-t-and-c"
 import { TouchableOpacity } from "react-native"
@@ -260,6 +280,111 @@ const RedeemBitcoinDetailGated: React.FC<
 const ConversionDetailsGated = withOfflineGate(ConversionDetailsScreen)
 const ConversionConfirmationGated = withOfflineGate(ConversionConfirmationScreen)
 const UnclaimedDepositsGated = withOfflineGate(UnclaimedDepositsScreen)
+
+/** The card investment onboarding leg, kept out of RootStack so that function stays under
+ *  the max-lines-per-function limit. A fragment rather than a component: the navigator
+ *  reads its Screen children directly, and only fragments and groups are flattened. */
+const investmentOnboardingScreens = () => (
+  <>
+    <RootNavigator.Screen
+      name="cardOnboardingWelcomeInvestScreen"
+      component={WelcomeInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingCompanyValuationScreen"
+      component={CompanyValuationScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingSelectInvestScreen"
+      component={SelectInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingTermSheetScreen"
+      component={TermSheetScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingTransferInvestScreen"
+      component={TransferInvestScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingInsufficientBalanceScreen"
+      component={InsufficientBalanceScreen}
+      options={{ headerShown: false }}
+    />
+    <RootNavigator.Screen
+      name="cardOnboardingDepositPendingScreen"
+      component={DepositPendingScreen}
+      options={{ headerShown: false }}
+    />
+  </>
+)
+
+/** The two-factor enforcement leg, out of RootStack for the same line limit. Leaving
+ *  any of these screens is something the account is held to, so none can be swiped
+ *  away: each exit goes through the screen's own control, which does the counting. */
+const twoFactorEnforcementScreens = () => (
+  <>
+    <RootNavigator.Screen
+      name="twoFactorSetup"
+      component={TwoFactorSetupScreen}
+      options={{ headerShown: false, gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="twoFactorNonCustodial"
+      component={TwoFactorNonCustodialScreen}
+      options={{ headerShown: false, gestureEnabled: false }}
+    />
+  </>
+)
+
+/** The authenticator registration, from the onboarding to the key's backup, out of
+ *  RootStack for the same line limit. Every route shares the totpRegistration prefix,
+ *  which is how the flow finds where it began and the gate tells a remedy apart. The
+ *  backup takes no swipe: it is the one chance to keep the key, which an accidental
+ *  swipe would close for good; its back arrow still leaves. */
+const totpRegistrationScreens = (LL: TranslationFunctions) => (
+  <>
+    <RootNavigator.Screen
+      name="totpRegistrationIntro"
+      component={AuthenticatorIntroScreen}
+      options={{ title: "", gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationApps"
+      component={AuthenticatorAppsScreen}
+      options={{ title: "" }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationInitiate"
+      component={TotpRegistrationInitiateScreen}
+      options={{
+        title: LL.TotpRegistrationInitiateScreen.title(),
+      }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationValidate"
+      component={TotpRegistrationValidateScreen}
+      options={{
+        title: LL.TotpRegistrationValidateScreen.title(),
+      }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationBackup"
+      component={SetupKeyBackupScreen}
+      options={{ title: "", gestureEnabled: false }}
+    />
+    <RootNavigator.Screen
+      name="totpRegistrationDone"
+      component={AuthenticatorProtectedScreen}
+      options={{ title: "" }}
+    />
+  </>
+)
 
 export const RootStack = () => {
   const styles = useStyles()
@@ -648,26 +773,26 @@ export const RootStack = () => {
           title: LL.common.codeConfirmation(),
         }}
       />
-      <RootNavigator.Screen
-        name="totpRegistrationInitiate"
-        component={TotpRegistrationInitiateScreen}
-        options={{
-          title: LL.TotpRegistrationInitiateScreen.title(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="totpRegistrationValidate"
-        component={TotpRegistrationValidateScreen}
-        options={{
-          title: LL.TotpRegistrationValidateScreen.title(),
-        }}
-      />
+      {twoFactorEnforcementScreens()}
+      {totpRegistrationScreens(LL)}
       <RootNavigator.Screen
         name="totpLoginValidate"
         component={TotpLoginValidateScreen}
         options={{
           title: LL.TotpLoginValidateScreen.title(),
         }}
+      />
+      <RootNavigator.Screen
+        name="totpDeleteValidate"
+        component={TotpDeleteValidateScreen}
+        options={{ title: LL.AccountScreen.totp() }}
+      />
+      <RootNavigator.Screen
+        name="loginMethodCode"
+        component={LoginMethodCodeScreen}
+        options={({ route }) => ({
+          title: loginMethodCodeCopy(LL, route.params.addition).title,
+        })}
       />
       <RootNavigator.Screen
         name="webView"
@@ -823,6 +948,7 @@ export const RootStack = () => {
           ...headerCloseControlOptions(),
         }}
       />
+      {investmentOnboardingScreens()}
       <RootNavigator.Screen
         name="cardOnboardingPersonalInfoScreen"
         component={CardPersonalInformationScreen}
@@ -1172,82 +1298,81 @@ export const PrimaryNavigator = () => {
    *  here, before any screen renders, since no screen in the flow is mounted to do it. */
   useResumeCompletedMigration()
 
-  const migrationBlocker = useMigrationBlocker()
-  if (migrationBlocker.isVisible) return <MigrationGate />
-
   return (
-    <Tab.Navigator
-      initialRouteName="Home"
-      screenOptions={{
-        tabBarActiveTintColor: colors.primary,
-        tabBarInactiveTintColor: colors.grey2,
-        tabBarStyle: [
-          styles.bottomNavigatorStyle,
-          {
-            height: 60 + insets.bottom,
-            paddingBottom: insets.bottom,
+    <HomeGate>
+      <Tab.Navigator
+        initialRouteName="Home"
+        screenOptions={{
+          tabBarActiveTintColor: colors.primary,
+          tabBarInactiveTintColor: colors.grey2,
+          tabBarStyle: [
+            styles.bottomNavigatorStyle,
+            {
+              height: 60 + insets.bottom,
+              paddingBottom: insets.bottom,
+            },
+          ],
+          tabBarLabelStyle: {
+            paddingBottom: 6,
+            fontSize: 12,
+            fontWeight: "bold",
+            width: "100%",
           },
-        ],
-        tabBarLabelStyle: {
-          paddingBottom: 6,
-          fontSize: 12,
-          fontWeight: "bold",
-          width: "100%",
-        },
-        tabBarHideOnKeyboard: true,
-      }}
-    >
-      <Tab.Screen
-        name="Home"
-        component={HomeScreen}
-        options={{
-          title: LL.HomeScreen.title(),
-          tabBarAccessibilityLabel: LL.HomeScreen.title(),
-          tabBarButtonTestID: LL.HomeScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => (
-            <HomeIcon {...testProps("Home")} fill={color} color={color} />
-          ),
-          headerShown: false,
+          tabBarHideOnKeyboard: true,
         }}
-      />
-      <Tab.Screen
-        name="People"
-        component={ContactNavigator}
-        options={{
-          headerShown: false,
-          title: LL.PeopleScreen.title(),
-          tabBarAccessibilityLabel: LL.PeopleScreen.title(),
-          tabBarButtonTestID: LL.PeopleScreen.title(),
-          tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
-            <PeopleTabIcon color={color} focused={focused} />
-          ),
-        }}
-      />
-      <Tab.Screen
-        name="Map"
-        component={MapScreen}
-        options={{
-          title: LL.MapScreen.title(),
-          headerShown: false,
-          tabBarAccessibilityLabel: LL.MapScreen.title(),
-          tabBarButtonTestID: LL.MapScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
-        }}
-      />
-      <Tab.Screen
-        name="Earn"
-        component={EarnMapScreen}
-        options={{
-          title: LL.EarnScreen.title(),
-          headerShown: false,
-          tabBarAccessibilityLabel: LL.EarnScreen.title(),
-          tabBarButtonTestID: LL.EarnScreen.title(),
-          tabBarIcon: ({ color }: { color: string }) => (
-            <LearnIcon {...testProps("Earn")} color={color} />
-          ),
-        }}
-      />
-    </Tab.Navigator>
+      >
+        <Tab.Screen
+          name="Home"
+          component={HomeScreen}
+          options={{
+            title: LL.HomeScreen.title(),
+            tabBarAccessibilityLabel: LL.HomeScreen.title(),
+            tabBarButtonTestID: LL.HomeScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => (
+              <HomeIcon {...testProps("Home")} fill={color} color={color} />
+            ),
+            headerShown: false,
+          }}
+        />
+        <Tab.Screen
+          name="People"
+          component={ContactNavigator}
+          options={{
+            headerShown: false,
+            title: LL.PeopleScreen.title(),
+            tabBarAccessibilityLabel: LL.PeopleScreen.title(),
+            tabBarButtonTestID: LL.PeopleScreen.title(),
+            tabBarIcon: ({ color, focused }: { color: string; focused: boolean }) => (
+              <PeopleTabIcon color={color} focused={focused} />
+            ),
+          }}
+        />
+        <Tab.Screen
+          name="Map"
+          component={MapScreen}
+          options={{
+            title: LL.MapScreen.title(),
+            headerShown: false,
+            tabBarAccessibilityLabel: LL.MapScreen.title(),
+            tabBarButtonTestID: LL.MapScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => <MapIcon color={color} />,
+          }}
+        />
+        <Tab.Screen
+          name="Earn"
+          component={EarnMapScreen}
+          options={{
+            title: LL.EarnScreen.title(),
+            headerShown: false,
+            tabBarAccessibilityLabel: LL.EarnScreen.title(),
+            tabBarButtonTestID: LL.EarnScreen.title(),
+            tabBarIcon: ({ color }: { color: string }) => (
+              <LearnIcon {...testProps("Earn")} color={color} />
+            ),
+          }}
+        />
+      </Tab.Navigator>
+    </HomeGate>
   )
 }
 
