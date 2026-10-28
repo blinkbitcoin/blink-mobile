@@ -103,6 +103,22 @@ describe("useRecoveryBundleStatus", () => {
     expect(result.current.status).toBe(RecoveryBundleStatus.Stale)
   })
 
+  it("reports a recent bundle at the same balance as out of date while a change it may not cover is marked", async () => {
+    // A swap leaves the total where it was, and the refresh that should have
+    // followed failed, so only the scheduler's mark says the bundle fell behind.
+    mockReadRecoveryBundleState.mockResolvedValue({
+      savedAt: Date.now() - 60_000,
+      bundleCreatedAt: "2026-08-05T00:00:00Z",
+      leafCount: 3,
+      totalSats: "21000",
+      cloudSyncedAt: null,
+      uncoveredChangeAt: Date.now() - 30_000,
+    })
+    const { result } = await renderStatus()
+
+    expect(result.current.status).toBe(RecoveryBundleStatus.Stale)
+  })
+
   it("reports no bundle as missing", async () => {
     mockReadRecoveryBundleState.mockResolvedValue(null)
     const { result } = await renderStatus()

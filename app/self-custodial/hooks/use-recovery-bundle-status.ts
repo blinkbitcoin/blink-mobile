@@ -47,6 +47,9 @@ type StatusInput = {
   savedTotalSats: string | null
   /** Current wallet balance in sats, or null while it is still loading. */
   currentTotalSats: string | null
+  /** Set when the wallet changed after this bundle was saved and no refresh
+   *  has caught up yet, including one that failed. */
+  uncoveredChangeAt: number | null
   now: number
   backstopMs?: number
 }
@@ -55,10 +58,16 @@ export const statusFor = ({
   savedAt,
   savedTotalSats,
   currentTotalSats,
+  uncoveredChangeAt,
   now,
   backstopMs = BUNDLE_BACKSTOP_MS,
 }: StatusInput): RecoveryBundleStatus => {
   if (savedAt === null || savedTotalSats === null) return RecoveryBundleStatus.Missing
+
+  /** The refresh scheduler already knows the wallet moved past this bundle,
+   *  which a balance comparison can miss: a swap or consolidation changes the
+   *  outputs and not the total, and a refresh that failed leaves the mark. */
+  if (uncoveredChangeAt !== null) return RecoveryBundleStatus.Stale
 
   /** The balance moved, so the backup no longer describes the wallet - true
    *  even if it was written a minute ago. */
@@ -110,6 +119,7 @@ type SavedBundle = {
   leafCount: number | null
   cloudSyncedAt: number | null
   exportedAt: number | null
+  uncoveredChangeAt: number | null
 }
 
 const NO_SAVED_BUNDLE: SavedBundle = {
@@ -119,6 +129,7 @@ const NO_SAVED_BUNDLE: SavedBundle = {
   leafCount: null,
   cloudSyncedAt: null,
   exportedAt: null,
+  uncoveredChangeAt: null,
 }
 
 /**
@@ -165,6 +176,7 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
         leafCount: state?.leafCount ?? null,
         cloudSyncedAt: state?.cloudSyncedAt ?? null,
         exportedAt: settings.exportedAt,
+        uncoveredChangeAt: state?.uncoveredChangeAt ?? null,
       }
     } catch {
       /** An unreadable state file is indistinguishable from no backup, and the
@@ -200,6 +212,7 @@ export const useRecoveryBundleStatus = (): RecoveryBundleStatusResult => {
         savedAt: current.savedAt,
         savedTotalSats: current.savedTotalSats,
         currentTotalSats,
+        uncoveredChangeAt: current.uncoveredChangeAt,
         now: Date.now(),
       })
     : RecoveryBundleStatus.Unknown
