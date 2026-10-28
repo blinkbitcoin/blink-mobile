@@ -91,10 +91,13 @@ const separate = async () => {
 }
 
 /** Crash reports follow the same domains as GA4. The breadcrumb gate shuts at once;
- *  with collection off, Crashlytics holds any report on the device instead of sending it. */
+ *  with collection off, Crashlytics holds any report on the device instead of sending it.
+ *  A throw comes back as a rejection, so a shutdown can never throw out of its caller. */
 const closeCrashReporting = (): Promise<unknown> => {
   setCrashReportingOpen(false)
-  return crashlytics().setCrashlyticsCollectionEnabled(false)
+  return new Promise((resolve) => {
+    resolve(crashlytics().setCrashlyticsCollectionEnabled(false))
+  })
 }
 
 /** Reports held while collection was off were made under a closed domain, and turning

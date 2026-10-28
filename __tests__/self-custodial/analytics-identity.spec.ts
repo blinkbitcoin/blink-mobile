@@ -405,6 +405,16 @@ describe("analytics identity", () => {
       expect(mockCrashLog).not.toHaveBeenCalledWith("while reopening")
     })
 
+    it("still shuts GA4 when the Crashlytics switch throws", () => {
+      const { id } = freshModules()
+      mockSetCrashlyticsCollectionEnabled.mockImplementationOnce(() => {
+        throw new Error("native module missing")
+      })
+
+      expect(() => id.setAnalyticsDomain(id.AnalyticsDomain.Anon)).not.toThrow()
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenCalledWith(false)
+    })
+
     it("starts closed when the last run ended with collection off", async () => {
       mockCrashCollectionEnabled = false
       const { id, reporting } = freshModules()

@@ -37,6 +37,9 @@ jest.mock("@react-native-firebase/analytics", () => () => ({
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   recordError: jest.fn(),
   log: jest.fn(),
+  isCrashlyticsCollectionEnabled: true,
+  setCrashlyticsCollectionEnabled: () => Promise.resolve(null),
+  deleteUnsentReports: () => Promise.resolve(),
 }))
 
 const mockStore = new Map<string, string>()
