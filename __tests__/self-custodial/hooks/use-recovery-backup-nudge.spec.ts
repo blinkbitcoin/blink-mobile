@@ -1,3 +1,4 @@
+import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { renderHook, waitFor, act } from "@testing-library/react-native"
 
 import {
@@ -26,6 +27,11 @@ jest.mock("@app/hooks/use-account-registry", () => ({
   useAccountRegistry: () => ({ activeAccount: mockAccount() }),
 }))
 
+let mockActiveNetwork = mockSparkNetwork.Regtest
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useSparkNetwork: () => mockActiveNetwork,
+}))
+
 const SAVED_AT = 1_700_000_000_000
 const selfCustodial = { id: "account-1", type: "self-custodial" }
 
@@ -40,6 +46,7 @@ const renderNudge = (hasBalance: boolean) => {
 describe("useRecoveryBackupNudge", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockActiveNetwork = mockSparkNetwork.Regtest
     mockGetItem.mockResolvedValue(null)
     mockSetItem.mockResolvedValue(undefined)
     mockAccount.mockReturnValue(selfCustodial)
@@ -286,7 +293,7 @@ describe("useRecoveryBackupNudge", () => {
     const otherSelfCustodial = { id: "account-2", type: "self-custodial" }
     const dismissalReadsBy = (reads: Record<string, () => Promise<string | null>>) =>
       mockGetItem.mockImplementation((key: string) => {
-        const read = reads[key.split(":")[1]]
+        const read = reads[key.split(":")[2]]
         return read ? read() : Promise.resolve(null)
       })
 
@@ -339,6 +346,53 @@ describe("useRecoveryBackupNudge", () => {
       await waitFor(() =>
         expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
       )
+    })
+  })
+
+  describe("switching networks under the same account", () => {
+    beforeEach(() => {
+      mockStatus.mockReturnValue({
+        status: RecoveryBundleStatus.Stale,
+        savedAt: SAVED_AT,
+        leafCount: 3,
+        isOnlyOnThisDevice: false,
+      })
+    })
+
+    it("keeps a dismissal on one network from hiding the reminder on the other", async () => {
+      // The bundle state is per network, so the backup the user dismissed on
+      // one network says nothing about the one on the other.
+      mockGetItem.mockImplementation((key: string) =>
+        Promise.resolve(key.includes(":mainnet:") ? null : String(SAVED_AT + 1000)),
+      )
+      const { result, rerender } = renderNudge(true)
+      await waitFor(() => expect(mockGetItem).toHaveBeenCalledTimes(1))
+      await act(async () => {
+        await Promise.resolve()
+      })
+      expect(result.current.variant).toBeNull()
+
+      mockActiveNetwork = mockSparkNetwork.Mainnet
+      rerender({})
+
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+      )
+    })
+
+    it("reads and writes the dismissal under the account and the network", async () => {
+      const { result } = renderNudge(true)
+      await waitFor(() =>
+        expect(result.current.variant).toBe(RecoveryBackupNudgeVariant.Stale),
+      )
+
+      await act(async () => {
+        result.current.dismiss()
+      })
+
+      const key = "recoveryBackupNudgeDismissedAt:regtest:account-1"
+      expect(mockGetItem).toHaveBeenCalledWith(key)
+      expect(mockSetItem).toHaveBeenCalledWith(key, expect.any(String))
     })
   })
 
