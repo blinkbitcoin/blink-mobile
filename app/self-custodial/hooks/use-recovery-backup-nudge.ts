@@ -1,17 +1,23 @@
 import { useCallback, useEffect, useState } from "react"
 
+import type { Network } from "@breeztech/breez-sdk-spark-react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { networkLabelFor } from "@app/self-custodial/config"
 import {
   RecoveryBundleStatus,
   useRecoveryBundleStatus,
 } from "@app/self-custodial/hooks/use-recovery-bundle-status"
+import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { AccountType } from "@app/types/wallet"
 
 const DISMISSAL_KEY_PREFIX = "recoveryBackupNudgeDismissedAt"
 
-const dismissalKeyFor = (accountId: string) => `${DISMISSAL_KEY_PREFIX}:${accountId}`
+/** Per account and network, like the bundle state the reminder is about: a
+ *  dismissal covers the backup the user saw, which lives on one network only. */
+const dismissalKeyFor = (accountId: string, network: Network) =>
+  `${DISMISSAL_KEY_PREFIX}:${networkLabelFor(network)}:${accountId}`
 
 export const RecoveryBackupNudgeVariant = {
   /** Funds on the wallet with no recovery backup saved at all. Automatic
@@ -38,11 +44,11 @@ type RecoveryBackupNudge = {
   dismiss: () => void
 }
 
-/** A dismissal together with the account it was read for, so one account's
- *  dismissal can never stand in for another's while that one is still loading. */
-type Dismissal = { forAccount: string | null; dismissedAt: number | null }
+/** A dismissal together with the account and network it was read for, so one
+ *  target's dismissal never stands in for another's while that one is loading. */
+type Dismissal = { forTarget: string | null; dismissedAt: number | null }
 
-const NO_DISMISSAL: Dismissal = { forAccount: null, dismissedAt: null }
+const NO_DISMISSAL: Dismissal = { forTarget: null, dismissedAt: null }
 
 /**
  * Drives the home-screen recovery-backup banner.
@@ -58,39 +64,43 @@ export const useRecoveryBackupNudge = (): RecoveryBackupNudge => {
     useRecoveryBundleStatus()
   const [dismissal, setDismissal] = useState<Dismissal>(NO_DISMISSAL)
 
+  const network = useSparkNetwork()
+
   const accountId =
     activeAccount?.type === AccountType.SelfCustodial ? activeAccount.id : null
+  const target = accountId === null ? null : `${accountId}:${network}`
 
   useEffect(() => {
     if (!accountId) return
+    const forTarget = `${accountId}:${network}`
     let cancelled = false
-    AsyncStorage.getItem(dismissalKeyFor(accountId))
+    AsyncStorage.getItem(dismissalKeyFor(accountId, network))
       .then((raw) => {
         if (cancelled) return
         const parsed = raw === null ? NaN : Number(raw)
         setDismissal({
-          forAccount: accountId,
+          forTarget,
           dismissedAt: Number.isFinite(parsed) ? parsed : null,
         })
       })
       .catch(() => {
         /** An unreadable dismissal reads as none, so the reminder shows rather
-         *  than staying hidden behind a dismissal this account never made. */
-        if (!cancelled) setDismissal({ forAccount: accountId, dismissedAt: null })
+         *  than staying hidden behind a dismissal this target never made. */
+        if (!cancelled) setDismissal({ forTarget, dismissedAt: null })
       })
     return () => {
       cancelled = true
     }
-  }, [accountId])
+  }, [accountId, network])
 
   const dismiss = useCallback(() => {
     if (!accountId) return
     const now = Date.now()
-    setDismissal({ forAccount: accountId, dismissedAt: now })
-    AsyncStorage.setItem(dismissalKeyFor(accountId), String(now)).catch(() => {})
-  }, [accountId])
+    setDismissal({ forTarget: `${accountId}:${network}`, dismissedAt: now })
+    AsyncStorage.setItem(dismissalKeyFor(accountId, network), String(now)).catch(() => {})
+  }, [accountId, network])
 
-  const isDismissalLoaded = accountId !== null && dismissal.forAccount === accountId
+  const isDismissalLoaded = target !== null && dismissal.forTarget === target
   const { dismissedAt } = dismissal
 
   const variant = ((): RecoveryBackupNudgeVariant | null => {
