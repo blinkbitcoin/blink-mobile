@@ -4153,8 +4153,8 @@
     "cta": "Đọc"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Chưa có bản sao lưu khôi phục nào được lưu. Vui lòng làm mới trước.",
-    "exportFailed": "Không thể xuất bản sao lưu khôi phục."
+    "noBundleToExport": "Chưa có gói khẩn cấp. Gói được tạo sau giao dịch đầu tiên của bạn.",
+    "exportFailed": "Không thể tải xuống gói khẩn cấp."
   },
   "StableBalance": {
     "title": "Số dư ổn định",

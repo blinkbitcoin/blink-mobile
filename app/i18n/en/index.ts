@@ -4393,8 +4393,8 @@ const en: BaseTranslation = {
     cta: "Read",
   },
   RecoveryBundleScreen: {
-    noBundleToExport: "No recovery backup saved yet. Refresh first.",
-    exportFailed: "Could not export the recovery backup.",
+    noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
+    exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

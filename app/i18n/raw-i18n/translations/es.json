@@ -4153,8 +4153,8 @@
         "cta": "Leer"
     },
     "RecoveryBundleScreen": {
-        "noBundleToExport": "Aún no hay ningún respaldo de recuperación guardado. Actualízalo primero.",
-        "exportFailed": "No se pudo exportar el respaldo de recuperación."
+        "noBundleToExport": "Aún no hay paquete de emergencia. Se crea después de tu primera transacción.",
+        "exportFailed": "No se pudo descargar el paquete de emergencia."
     },
     "StableBalance": {
         "title": "Balance estable",

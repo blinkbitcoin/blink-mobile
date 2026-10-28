@@ -4153,8 +4153,8 @@
     "cta": "Læs"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Ingen gendannelsesbackup gemt endnu. Opdater først.",
-    "exportFailed": "Kunne ikke eksportere gendannelsesbackuppen."
+    "noBundleToExport": "Intet nødbundt endnu. Det oprettes efter din første transaktion.",
+    "exportFailed": "Kunne ikke downloade nødbundtet."
   },
   "StableBalance": {
     "title": "Stabil saldo",

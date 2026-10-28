@@ -4153,8 +4153,8 @@
     "cta": "Ñawinchay"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Manaraq kutichinapaq backup waqaychasqachu. Ñawpaqta musuqchay.",
-    "exportFailed": "Mana atikurqachu kutichinapaq backupta hurquyta."
+    "noBundleToExport": "Manaraq utqay qipi kanchu. Ñawpaq kaq pagasqaykimanta qhipata ruwakun.",
+    "exportFailed": "Utqay qipita mana uraykachiyta atikurqanchu."
   },
   "StableBalance": {
     "title": "Saldo sinchi",

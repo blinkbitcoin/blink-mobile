@@ -4153,8 +4153,8 @@
     "cta": "Soma"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Hakuna nakala ya urejeshaji iliyohifadhiwa bado. Sasisha kwanza.",
-    "exportFailed": "Imeshindwa kuhamisha nakala ya urejeshaji."
+    "noBundleToExport": "Bado hakuna kifurushi cha dharura. Kinaundwa baada ya muamala wako wa kwanza.",
+    "exportFailed": "Imeshindwa kupakua kifurushi cha dharura."
   },
   "StableBalance": {
     "title": "Salio thabiti",

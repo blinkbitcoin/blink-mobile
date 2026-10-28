@@ -4153,8 +4153,8 @@
     "cta": "Olvasás"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Még nincs elmentett helyreállítási mentés. Először frissíts.",
-    "exportFailed": "Nem sikerült exportálni a helyreállítási mentést."
+    "noBundleToExport": "Még nincs vészhelyzeti csomag. Az első tranzakciód után jön létre.",
+    "exportFailed": "Nem sikerült letölteni a vészhelyzeti csomagot."
   },
   "StableBalance": {
     "title": "Stabil egyenleg",

@@ -4153,8 +4153,8 @@
     "cta": "Soma"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Tewali bbakappu y'okuzzaawo eterekeddwa. Sooka ogizze obuggya.",
-    "exportFailed": "Tekisobose kufulumya bbakappu y'okuzzaawo."
+    "noBundleToExport": "Tewannabaawo kipakiti kya bwangu. Kikolebwa oluvannyuma lw'okusasula kwo okusooka.",
+    "exportFailed": "Tetusobodde kuwanula kipakiti kya bwangu."
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",

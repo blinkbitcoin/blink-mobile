@@ -4153,8 +4153,8 @@
     "cta": "Funda"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Akukho gcino lokubuyisela lugciniweyo okwangoku. Hlaziya kuqala.",
-    "exportFailed": "Akukwazekanga ukukhuphela ugcino lokubuyisela."
+    "noBundleToExport": "Akukabikho ngqokelela yongxamiseko. Yenziwa emva kwentengiselwano yakho yokuqala.",
+    "exportFailed": "Ayikwazanga ukukhuphela ingqokelela yongxamiseko."
   },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",

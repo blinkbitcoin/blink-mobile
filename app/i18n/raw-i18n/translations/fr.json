@@ -4153,8 +4153,8 @@
         "cta": "Lire"
     },
     "RecoveryBundleScreen": {
-        "noBundleToExport": "Aucune sauvegarde de récupération enregistrée pour le moment. Actualisez-la d'abord.",
-        "exportFailed": "Impossible d'exporter la sauvegarde de récupération."
+        "noBundleToExport": "Pas encore de paquet d'urgence. Il est créé après votre première transaction.",
+        "exportFailed": "Impossible de télécharger le paquet d'urgence."
     },
     "StableBalance": {
         "title": "Solde stable",

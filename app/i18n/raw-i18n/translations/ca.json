@@ -4153,8 +4153,8 @@
     "cta": "Llegeix"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Encara no hi ha cap còpia de recuperació desada. Actualitza-la primer.",
-    "exportFailed": "No s'ha pogut exportar la còpia de recuperació."
+    "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
+    "exportFailed": "No s'ha pogut baixar el paquet d'emergència."
   },
   "StableBalance": {
     "title": "Balanç estable",

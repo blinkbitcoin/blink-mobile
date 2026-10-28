@@ -4153,8 +4153,8 @@
         "cta": "読む"
     },
     "RecoveryBundleScreen": {
-        "noBundleToExport": "リカバリーバックアップはまだ保存されていません。先に更新してください。",
-        "exportFailed": "リカバリーバックアップをエクスポートできませんでした。"
+        "noBundleToExport": "緊急バンドルはまだありません。最初の取引の後に作成されます。",
+        "exportFailed": "緊急バンドルをダウンロードできませんでした。"
     },
     "StableBalance": {
         "title": "ステーブルバランス",

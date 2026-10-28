@@ -4153,8 +4153,8 @@
     "cta": "Oku"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Henüz kaydedilmiş bir kurtarma yedeği yok. Önce yenileyin.",
-    "exportFailed": "Kurtarma yedeği dışa aktarılamadı."
+    "noBundleToExport": "Henüz acil durum paketi yok. İlk işleminden sonra oluşturulur.",
+    "exportFailed": "Acil durum paketi indirilemedi."
   },
   "StableBalance": {
     "title": "Sabit bakiye",

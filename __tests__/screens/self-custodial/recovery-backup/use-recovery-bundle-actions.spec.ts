@@ -68,8 +68,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       RecoveryBundleScreen: {
-        noBundleToExport: () => "No recovery backup saved yet",
-        exportFailed: () => "Could not export the recovery backup",
+        noBundleToExport: () => "No emergency bundle yet",
+        exportFailed: () => "Could not download the emergency bundle",
       },
     },
   }),
@@ -222,7 +222,7 @@ describe("useRecoveryBundleActions", () => {
 
       expect(didShare).toBe(false)
       expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "Could not export the recovery backup" }),
+        expect.objectContaining({ message: "Could not download the emergency bundle" }),
       )
     })
 
@@ -247,7 +247,7 @@ describe("useRecoveryBundleActions", () => {
       })
 
       expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "No recovery backup saved yet" }),
+        expect.objectContaining({ message: "No emergency bundle yet" }),
       )
       expect(mockShareOpen).not.toHaveBeenCalled()
       expect(mockDecryptBundleBackupPayload).not.toHaveBeenCalled()
@@ -298,7 +298,7 @@ describe("useRecoveryBundleActions error handling", () => {
       expect(mockDecryptBundleBackupPayload).not.toHaveBeenCalled()
       expect(mockShareOpen).not.toHaveBeenCalled()
       expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "Could not export the recovery backup" }),
+        expect.objectContaining({ message: "Could not download the emergency bundle" }),
       )
     })
 
@@ -313,7 +313,7 @@ describe("useRecoveryBundleActions error handling", () => {
 
       expect(mockRecordError).toHaveBeenCalledWith(err)
       expect(mockToastShow).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "Could not export the recovery backup" }),
+        expect.objectContaining({ message: "Could not download the emergency bundle" }),
       )
       expect(result.current.sharing).toBe(false)
     })

@@ -4153,8 +4153,8 @@
         "cta": "Ler"
     },
     "RecoveryBundleScreen": {
-        "noBundleToExport": "Nenhum backup de recuperação salvo ainda. Atualize primeiro.",
-        "exportFailed": "Não foi possível exportar o backup de recuperação."
+        "noBundleToExport": "Ainda não há pacote de emergência. Ele é criado após sua primeira transação.",
+        "exportFailed": "Não foi possível baixar o pacote de emergência."
     },
     "StableBalance": {
         "title": "Saldo estável",

@@ -103,6 +103,17 @@ describe("BundleExportScreen", () => {
       )
     })
 
+    /** The toasts the download can end in, named the way the screen names the
+     *  file. Nothing reaches the network, so a failure is never a connection. */
+    it("names the emergency bundle in its toasts", () => {
+      expect(LL.RecoveryBundleScreen.noBundleToExport()).toBe(
+        "No emergency bundle yet. It's created after your first transaction.",
+      )
+      expect(LL.RecoveryBundleScreen.exportFailed()).toBe(
+        "Could not download the emergency bundle.",
+      )
+    })
+
     it("does not re-warn on a second download", async () => {
       renderScreen()
 

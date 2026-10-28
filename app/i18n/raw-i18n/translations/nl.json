@@ -4153,8 +4153,8 @@
     "cta": "Lezen"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Nog geen herstelback-up opgeslagen. Ververs eerst.",
-    "exportFailed": "Kon de herstelback-up niet exporteren."
+    "noBundleToExport": "Nog geen noodbundel. Die wordt gemaakt na je eerste transactie.",
+    "exportFailed": "Kan de noodbundel niet downloaden."
   },
   "StableBalance": {
     "title": "Stabiel saldo",

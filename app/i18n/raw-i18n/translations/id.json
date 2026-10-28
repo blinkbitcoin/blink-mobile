@@ -4153,8 +4153,8 @@
     "cta": "Baca"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Belum ada cadangan pemulihan yang tersimpan. Perbarui terlebih dahulu.",
-    "exportFailed": "Tidak dapat mengekspor cadangan pemulihan."
+    "noBundleToExport": "Belum ada paket darurat. Paket dibuat setelah transaksi pertamamu.",
+    "exportFailed": "Tidak dapat mengunduh paket darurat."
   },
   "StableBalance": {
     "title": "Saldo stabil",

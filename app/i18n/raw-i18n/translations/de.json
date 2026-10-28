@@ -4153,8 +4153,8 @@
         "cta": "Lesen"
     },
     "RecoveryBundleScreen": {
-        "noBundleToExport": "Noch kein Wiederherstellungs-Backup gespeichert. Aktualisiere zuerst.",
-        "exportFailed": "Das Wiederherstellungs-Backup konnte nicht exportiert werden."
+        "noBundleToExport": "Noch kein Notfall-Bundle. Es wird nach deiner ersten Transaktion erstellt.",
+        "exportFailed": "Das Notfall-Bundle konnte nicht heruntergeladen werden."
     },
     "StableBalance": {
         "title": "Stabiles Guthaben",

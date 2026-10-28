@@ -4153,8 +4153,8 @@
     "cta": "Čítať"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Zatiaľ nie je uložená žiadna záloha na obnovu. Najprv ju aktualizujte.",
-    "exportFailed": "Zálohu na obnovu sa nepodarilo exportovať."
+    "noBundleToExport": "Zatiaľ nemáš núdzový balík. Vytvorí sa po tvojej prvej transakcii.",
+    "exportFailed": "Núdzový balík sa nepodarilo stiahnuť."
   },
   "StableBalance": {
     "title": "Stabilný zostatok",

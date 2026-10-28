@@ -4153,8 +4153,8 @@
     "cta": "Lees"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Nog geen herstelrugsteun gestoor nie. Verfris eers.",
-    "exportFailed": "Kon nie die herstelrugsteun uitvoer nie."
+    "noBundleToExport": "Nog geen noodbundel nie. Dit word ná jou eerste transaksie geskep.",
+    "exportFailed": "Kon nie die noodbundel aflaai nie."
   },
   "StableBalance": {
     "title": "Stabiele balans",

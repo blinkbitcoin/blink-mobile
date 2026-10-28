@@ -13872,11 +13872,11 @@ type RootTranslation = {
 	}
 	RecoveryBundleScreen: {
 		/**
-		 * N​o​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​ ​s​a​v​e​d​ ​y​e​t​.​ ​R​e​f​r​e​s​h​ ​f​i​r​s​t​.
+		 * N​o​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​y​e​t​.​ ​I​t​'​s​ ​c​r​e​a​t​e​d​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​t​r​a​n​s​a​c​t​i​o​n​.
 		 */
 		noBundleToExport: string
 		/**
-		 * C​o​u​l​d​ ​n​o​t​ ​e​x​p​o​r​t​ ​t​h​e​ ​r​e​c​o​v​e​r​y​ ​b​a​c​k​u​p​.
+		 * C​o​u​l​d​ ​n​o​t​ ​d​o​w​n​l​o​a​d​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.
 		 */
 		exportFailed: string
 	}
@@ -27900,11 +27900,11 @@ export type TranslationFunctions = {
 	}
 	RecoveryBundleScreen: {
 		/**
-		 * No recovery backup saved yet. Refresh first.
+		 * No emergency bundle yet. It's created after your first transaction.
 		 */
 		noBundleToExport: () => LocalizedString
 		/**
-		 * Could not export the recovery backup.
+		 * Could not download the emergency bundle.
 		 */
 		exportFailed: () => LocalizedString
 	}

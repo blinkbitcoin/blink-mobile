@@ -4153,8 +4153,8 @@
     "cta": "Pročitaj"
     },
   "RecoveryBundleScreen": {
-    "noBundleToExport": "Još nema spremljene sigurnosne kopije za oporavak. Najprije osvježite.",
-    "exportFailed": "Sigurnosnu kopiju za oporavak nije bilo moguće izvesti."
+    "noBundleToExport": "Još nema paketa za hitne slučajeve. Stvara se nakon tvoje prve transakcije.",
+    "exportFailed": "Paket za hitne slučajeve nije moguće preuzeti."
   },
   "StableBalance": {
     "title": "Stabilan saldo",
