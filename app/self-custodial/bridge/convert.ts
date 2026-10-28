@@ -9,10 +9,10 @@ import {
   SendPaymentRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { toUsdMoneyAmount } from "@app/types/amounts"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -65,9 +65,7 @@ class ConvertError extends Error {
 }
 
 const recordConvertError = (err: unknown, params: ConvertParams, where: string): void => {
-  crashlytics().log(
-    `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
-  )
+  logBreadcrumb(`[Convert] ${where} failed (direction=${params.direction})`)
   reportError(where, err)
 }
 

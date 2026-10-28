@@ -2,9 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
-import { recordAppError } from "@app/utils/error-reporting"
+import { logBreadcrumb, recordAppError } from "@app/utils/error-reporting"
 import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -216,8 +214,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         memo: memo || undefined,
       })
       if (!("invoice" in result) || !result.invoice) {
-        crashlytics().log(
-          `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+        logBreadcrumb(
+          `[Self-custodial] Lightning adapter returned no invoice (hasAmount=${Boolean(amount)}, currency=${amount?.currencyCode ?? "none"})`,
         )
         recordAppError(
           new Error("Self-custodial invoice adapter returned no invoice field"),
@@ -240,8 +238,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       setPaymentRequest(result.invoice)
       setRequestState(PaymentRequestState.Created)
     } catch (err) {
-      crashlytics().log(
-        `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+      logBreadcrumb(
+        `[Self-custodial] Lightning invoice generation failed (hasAmount=${Boolean(amount)}, currency=${amount?.currencyCode ?? "none"})`,
       )
       recordAppError(
         err instanceof Error

@@ -56,15 +56,21 @@ export type RecordAppErrorOptions = {
   dedupKey?: string
   /** Bypass the connectivity downgrade (crash-adjacent sites); `expected` still wins. */
   alwaysRecord?: boolean
+  /** The unredacted text to classify, when the reported message has been scrubbed of
+   *  the very words (a quoted server message) that mark it as connectivity. */
+  classifyText?: string
 }
 
 export const classifyError = (
   error: Error,
-  options?: Pick<RecordAppErrorOptions, "expected" | "alwaysRecord">,
+  options?: Pick<RecordAppErrorOptions, "expected" | "alwaysRecord" | "classifyText">,
 ): ErrorReportClass => {
   if (options?.expected) return ErrorReportClass.Expected
   if (options?.alwaysRecord) return ErrorReportClass.Defect
-  return isConnectivityError(error) ? ErrorReportClass.Transient : ErrorReportClass.Defect
+  const subject = options?.classifyText ?? error
+  return isConnectivityError(subject)
+    ? ErrorReportClass.Transient
+    : ErrorReportClass.Defect
 }
 
 let crashReportingOpen: boolean | undefined
