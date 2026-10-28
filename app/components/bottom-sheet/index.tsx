@@ -347,6 +347,14 @@ export const BottomSheet: React.FC<Props> = ({
     return () => subscription.remove()
   }, [isDismissing, isInline, isLeaving, isVisible, leave])
 
+  const escape = React.useCallback(() => {
+    if (!isInline) {
+      onCloseRef.current()
+      return
+    }
+    if (!isDismissing.value) leave()
+  }, [isDismissing, isInline, leave])
+
   const pan = React.useMemo(
     () =>
       Gesture.Pan()
@@ -465,6 +473,10 @@ export const BottomSheet: React.FC<Props> = ({
             : undefined
         }
         testID={testID}
+        // VoiceOver's escape (a two-finger Z) is how a screen reader user
+        // backs out of something, and the drag that closes this is not one
+        // they can make. It closes the way the X and the back button do.
+        onAccessibilityEscape={escape}
       >
         <View style={styles.handle} />
 

@@ -487,7 +487,31 @@ describe("BottomSheet", () => {
     })
   })
 
+  it("closes on VoiceOver's escape, which a screen reader has instead of the drag", () => {
+    const onClose = jest.fn()
+    const { getByTestId } = renderSheet({ onClose })
+
+    fireEvent(getByTestId(SHEET_TEST_ID), "accessibilityEscape")
+
+    expect(onClose).toHaveBeenCalledTimes(1)
+  })
+
   describe("inline", () => {
+    it("slides out on VoiceOver's escape and reports once it has gone", async () => {
+      const onClose = jest.fn()
+      const { getByTestId } = renderSheet({ presentation: "inline", onClose })
+      await settle()
+
+      fireEvent(getByTestId(SHEET_TEST_ID), "accessibilityEscape")
+      // Slid out first, the way every other exit goes, then reported.
+      expect(onClose).not.toHaveBeenCalled()
+      // A second escape while it is leaving does not restart the exit.
+      fireEvent(getByTestId(SHEET_TEST_ID), "accessibilityEscape")
+      await settle()
+
+      expect(onClose).toHaveBeenCalledTimes(1)
+    })
+
     it("puts up no scrim, so what it sits beside keeps its own touches", async () => {
       const { getByText, queryByLabelText } = renderSheet({ presentation: "inline" })
 
