@@ -21,6 +21,9 @@ const switchCrashCollection = (enabled: boolean): Promise<null> => {
 }
 const mockSetCrashlyticsCollectionEnabled = jest.fn(switchCrashCollection)
 const mockDeleteUnsentReports = jest.fn(resolved)
+/** Whether this launch's startup found reports held on the device. */
+const nothingHeld = (): Promise<boolean> => Promise.resolve(false)
+const mockCheckForUnsentReports = jest.fn(nothingHeld)
 
 jest.mock("@react-native-firebase/analytics", () => () => ({
   setUserId: (...args: unknown[]) => mockSetUserId(...args),
@@ -39,6 +42,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   },
   setCrashlyticsCollectionEnabled: (enabled: boolean) =>
     mockSetCrashlyticsCollectionEnabled(enabled),
+  checkForUnsentReports: () => mockCheckForUnsentReports(),
   deleteUnsentReports: () => mockDeleteUnsentReports(),
 }))
 
@@ -125,6 +129,8 @@ describe("analytics identity", () => {
     mockSetCrashlyticsCollectionEnabled.mockImplementation(switchCrashCollection)
     mockDeleteUnsentReports.mockReset()
     mockDeleteUnsentReports.mockImplementation(resolved)
+    mockCheckForUnsentReports.mockReset()
+    mockCheckForUnsentReports.mockImplementation(nothingHeld)
     ;[
       mockSetUserId,
       mockSetUserProperty,
@@ -377,7 +383,7 @@ describe("analytics identity", () => {
       },
     )
 
-    it("deletes the reports held while closed before collection resumes", async () => {
+    it("turns collection back on once the launch is known to hold nothing", async () => {
       const { id, reporting } = freshModules()
       id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
       await settle()
@@ -386,13 +392,41 @@ describe("analytics identity", () => {
       id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
       await settle()
 
-      expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
-      const deleted = mockDeleteUnsentReports.mock.invocationCallOrder[0]
+      const checked = mockCheckForUnsentReports.mock.invocationCallOrder[0]
       const enabled = orderOf(mockSetCrashlyticsCollectionEnabled, collectionSetTo(true))
-      expect(deleted).toBeLessThan(enabled)
+      expect(checked).toBeLessThan(enabled)
+      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
       reporting.logBreadcrumb("enhanced again")
       expect(mockCrashLog).toHaveBeenCalledWith("enhanced again")
     })
+
+    /** A launch after an Incognito session starts with collection off and that session's
+     *  crash held. The SDK reports no deletion's end, and an enable that reaches its
+     *  startup first sends the crash instead, so the launch deletes it and keeps crash
+     *  reporting shut; the next one's own check is the proof it is gone. */
+    it.each([
+      ["Enhanced", "enhanced"],
+      ["the custodial account", "custodial"],
+    ] as const)(
+      "deletes a crash held at launch and keeps collection off for %s",
+      async (_label, domain) => {
+        mockCrashCollectionEnabled = false
+        mockCheckForUnsentReports.mockResolvedValue(true)
+        const { id, reporting } = freshModules()
+
+        id.setCustodialIdentity(CUSTODIAL)
+        id.setAnalyticsDomain(domain)
+        await settle()
+        reporting.logBreadcrumb("held launch")
+
+        expect(mockDeleteUnsentReports).toHaveBeenCalled()
+        expect(mockSetCrashlyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+        expect(mockCrashLog).not.toHaveBeenCalledWith("held launch")
+        /** GA4 is not held back by it. */
+        expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(true)
+        expect(id.isEnhancedIdentityApplied()).toBe(domain === "enhanced")
+      },
+    )
 
     it("keeps pending reports when collection was never off", async () => {
       const { id } = freshModules()
@@ -454,7 +488,7 @@ describe("analytics identity", () => {
       expect(mockRecordError).not.toHaveBeenCalled()
     })
 
-    /** Reopening is three steps (delete, enable, reopen the gate), each behind a check that
+    /** Reopening is three steps (release held reports, enable, reopen the gate), each behind a check that
      *  the request is still the latest. */
     describe("a switch back to Incognito while reopening", () => {
       const reopeningFromIncognito = async () => {
@@ -465,16 +499,18 @@ describe("analytics identity", () => {
         return modules
       }
 
-      it("stops at the delete, before collection is enabled", async () => {
+      it("stops at the held-report check, before collection is enabled", async () => {
         const { id, reporting } = await reopeningFromIncognito()
-        const deleting = deferred()
-        mockDeleteUnsentReports.mockImplementationOnce(() => deleting.promise)
+        const checking = deferred()
+        mockCheckForUnsentReports.mockImplementationOnce(() =>
+          checking.promise.then(() => false),
+        )
 
         id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
         await settle()
-        expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+        expect(mockCheckForUnsentReports).toHaveBeenCalledTimes(1)
         id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
-        deleting.release()
+        checking.release()
         await settle()
         reporting.logBreadcrumb("incognito again")
 
@@ -531,6 +567,7 @@ describe("analytics identity", () => {
       const { id, reporting } = freshModules()
       id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
       await settle()
+      mockCheckForUnsentReports.mockResolvedValue(true)
       mockDeleteUnsentReports.mockImplementationOnce(() =>
         Promise.reject(new Error("delete failed")),
       )

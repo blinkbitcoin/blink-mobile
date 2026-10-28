@@ -1,5 +1,7 @@
 import crashlytics from "@react-native-firebase/crashlytics"
 
+import { withTimeout } from "./with-timeout"
+
 /**
  * The single Crashlytics recording boundary (issue #3928).
  *
@@ -112,14 +114,44 @@ export const closeCrashReporting = (): Promise<unknown> => {
   })
 }
 
+/** How long a reopen waits for the SDK's startup to say whether it found held reports. */
+export const HELD_REPORTS_CHECK_TIMEOUT_MS = 5000
+
+let heldAtLaunch: Promise<boolean> | undefined
+
 /**
- * Reports held while collection was off were made under a closed domain, and turning
- * collection on would send them under the account that opened it. Crashlytics deletes
- * only while collection is off, which is exactly when there can be any.
+ * Whether this launch started with reports held on the device. The SDK answers once per
+ * process (a second ask is told false), so the first answer is kept. It answers as its
+ * startup subscribes to the send-or-delete decision, so a delete issued after it is one
+ * that startup obeys.
  */
-export const deleteHeldCrashReports = async (): Promise<void> => {
+const wereReportsHeldAtLaunch = (): Promise<boolean> => {
+  heldAtLaunch ??= crashlytics().checkForUnsentReports()
+  return heldAtLaunch
+}
+
+/**
+ * Clears the way for collection to come back on, and says whether it may. Reports held
+ * while collection was off were made under a closed domain, and turning collection on
+ * would send them under the account that opened it. The SDK reports no deletion's
+ * completion, and an enable that reaches its startup before the delete does sends them
+ * instead (firebase-crashlytics 20.0.1 `waitForReportAction` reads the switch before it
+ * listens for a delete). So collection comes back only in a launch whose startup found
+ * nothing held: one that did deletes them and stays off, and the next launch's own check
+ * is the proof they are gone. No answer in time counts as held.
+ */
+export const releaseHeldCrashReports = async (): Promise<boolean> => {
   const reporter = crashlytics()
-  if (!reporter.isCrashlyticsCollectionEnabled) await reporter.deleteUnsentReports()
+  if (reporter.isCrashlyticsCollectionEnabled) return true
+  const held = await withTimeout(
+    wereReportsHeldAtLaunch(),
+    HELD_REPORTS_CHECK_TIMEOUT_MS,
+    "Crashlytics held-report check",
+  ).catch(() => true)
+  /** Harmless when unsure: with collection kept off, a startup that has yet to look
+   *  finds the decision already made. */
+  if (held) await reporter.deleteUnsentReports()
+  return !held
 }
 
 /** Collection on; the gate stays shut until the caller, still current, reopens it. */

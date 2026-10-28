@@ -4,9 +4,9 @@ import analytics from "@react-native-firebase/analytics"
 
 import {
   closeCrashReporting,
-  deleteHeldCrashReports,
   enableCrashCollection,
   recordAppError,
+  releaseHeldCrashReports,
   setCrashReportingOpen,
   toError,
 } from "@app/utils/error-reporting"
@@ -102,12 +102,22 @@ const separate = async () => {
  *  checks the request between each: a newer Incognito request during the delete stops
  *  the run before collection is enabled, and one during the enable stops it before the
  *  gate reopens. That request's own shutdown and closed run then switch collection back
- *  off, so an enable already issued never outlives it. */
-const openCrashReportingSteps: Step[] = [
-  deleteHeldCrashReports,
-  enableCrashCollection,
-  async () => setCrashReportingOpen(true),
-]
+ *  off, so an enable already issued never outlives it. A launch that started with
+ *  reports held keeps crash reporting shut to its end, while GA4 still opens. */
+const openCrashReportingSteps = (): Step[] => {
+  let mayOpen = false
+  return [
+    async () => {
+      mayOpen = await releaseHeldCrashReports()
+    },
+    async () => {
+      if (mayOpen) await enableCrashCollection()
+    },
+    async () => {
+      if (mayOpen) setCrashReportingOpen(true)
+    },
+  ]
+}
 
 /** Identity off first, collection second: nothing already queued keeps the id. Issued
  *  without waiting in between, so it can run ahead of a queued transition; every later
@@ -143,7 +153,7 @@ const stepsFor = (domain: AnalyticsDomain, enhancedId: string | null): Step[] =>
         () => ga.setUserId(enhancedId),
         () => ga.setUserProperty("account_mode", "enhanced"),
         () => ga.setAnalyticsCollectionEnabled(true),
-        ...openCrashReportingSteps,
+        ...openCrashReportingSteps(),
       ]
     case AnalyticsDomain.Custodial: {
       const identity = custodialIdentity
@@ -159,7 +169,7 @@ const stepsFor = (domain: AnalyticsDomain, enhancedId: string | null): Step[] =>
         ...identitySteps,
         () => ga.setUserProperty("account_mode", "custodial"),
         () => ga.setAnalyticsCollectionEnabled(true),
-        ...openCrashReportingSteps,
+        ...openCrashReportingSteps(),
       ]
     }
   }

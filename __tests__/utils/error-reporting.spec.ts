@@ -14,6 +14,7 @@ const mockSetCollection = jest.fn(
   (_enabled: boolean): Promise<unknown> => Promise.resolve(null),
 )
 const mockDeleteUnsentReports = jest.fn(() => Promise.resolve())
+const mockCheckForUnsentReports = jest.fn(() => Promise.resolve(false))
 let mockCollectionEnabled = true
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -24,6 +25,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
     return mockCollectionEnabled
   },
   setCrashlyticsCollectionEnabled: (enabled: boolean) => mockSetCollection(enabled),
+  checkForUnsentReports: () => mockCheckForUnsentReports(),
   deleteUnsentReports: () => mockDeleteUnsentReports(),
 }))
 
@@ -256,15 +258,71 @@ describe("collection control", () => {
     expect(mockLog).not.toHaveBeenCalled()
   })
 
-  it("deletes held reports only while collection is off", async () => {
-    const fresh = loadFreshErrorReportingModule()
+  describe("releasing held reports", () => {
+    beforeEach(() => {
+      mockCollectionEnabled = false
+      mockCheckForUnsentReports.mockReset()
+      mockCheckForUnsentReports.mockImplementation(() => Promise.resolve(false))
+    })
 
-    await fresh.deleteHeldCrashReports()
-    expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
+    afterEach(() => {
+      jest.useRealTimers()
+    })
 
-    mockCollectionEnabled = false
-    await fresh.deleteHeldCrashReports()
-    expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+    it("has nothing to do while collection is already on", async () => {
+      const fresh = loadFreshErrorReportingModule()
+      mockCollectionEnabled = true
+
+      await expect(fresh.releaseHeldCrashReports()).resolves.toBe(true)
+      expect(mockCheckForUnsentReports).not.toHaveBeenCalled()
+      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
+    })
+
+    it("lets collection back on when this launch started with nothing held", async () => {
+      const fresh = loadFreshErrorReportingModule()
+
+      await expect(fresh.releaseHeldCrashReports()).resolves.toBe(true)
+      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
+    })
+
+    /** The SDK reports no deletion's end, and an enable that reaches its startup first
+     *  sends what it was deleting; only the next launch's check can show they are gone. */
+    it("deletes what this launch started with and keeps collection off", async () => {
+      const fresh = loadFreshErrorReportingModule()
+      mockCheckForUnsentReports.mockResolvedValue(true)
+
+      await expect(fresh.releaseHeldCrashReports()).resolves.toBe(false)
+      expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+    })
+
+    /** A second ask is told false whatever the first was told. */
+    it("asks the SDK once per process and keeps its answer", async () => {
+      const fresh = loadFreshErrorReportingModule()
+      mockCheckForUnsentReports.mockResolvedValueOnce(true).mockResolvedValueOnce(false)
+
+      await fresh.releaseHeldCrashReports()
+      await expect(fresh.releaseHeldCrashReports()).resolves.toBe(false)
+      expect(mockCheckForUnsentReports).toHaveBeenCalledTimes(1)
+    })
+
+    it("counts no answer in time as held", async () => {
+      jest.useFakeTimers()
+      const fresh = loadFreshErrorReportingModule()
+      mockCheckForUnsentReports.mockImplementation(() => new Promise(() => {}))
+
+      const releasing = fresh.releaseHeldCrashReports()
+      await jest.advanceTimersByTimeAsync(fresh.HELD_REPORTS_CHECK_TIMEOUT_MS)
+
+      await expect(releasing).resolves.toBe(false)
+      expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
+    })
+
+    it("counts a failed check as held", async () => {
+      const fresh = loadFreshErrorReportingModule()
+      mockCheckForUnsentReports.mockRejectedValue(new Error("native module missing"))
+
+      await expect(fresh.releaseHeldCrashReports()).resolves.toBe(false)
+    })
   })
 
   it("turns collection on without reopening the gate", async () => {
