@@ -423,11 +423,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
     await act(async () => {})
 
-    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(
-      "migration-uuid",
-      "manual",
-      undefined,
-    )
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("migration-uuid", "manual")
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialChooseExperience", {
       onContinue: {
         route: "accountMigrationBalancesOverview",
@@ -439,7 +435,8 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("hands a settings re-backup over to the recovery bundle step as a re-backup", async () => {
+  /** A re-backup was already offered the emergency bundle on its first run. */
+  it("sends a settings re-backup straight to success as a re-backup", async () => {
     mockActiveWalletValue.mockReturnValue({
       accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
@@ -463,13 +460,15 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockReplace).toHaveBeenCalledWith(
-      "selfCustodialBackupBundleExport",
+    expect(mockReplace).not.toHaveBeenCalled()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: true }),
     )
   })
 
-  it("records a fresh manual backup and hands it over to the recovery bundle step", async () => {
+  /** The emergency bundle is handed over from Settings only, never in the backup flow. */
+  it("routes a fresh manual backup without checkpoint straight to success", async () => {
     mockActiveWalletValue.mockReturnValue({
       accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
@@ -489,9 +488,9 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual", undefined)
-    expect(mockReplace).toHaveBeenCalledWith(
-      "selfCustodialBackupBundleExport",
+    expect(mockSetBackupCompleted).toHaveBeenCalledWith("manual")
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: false }),
     )
   })
@@ -524,7 +523,7 @@ describe("BackupPhraseConfirmScreen", () => {
     })
   })
 
-  it("forwards the route's successMessage through the recovery bundle step", async () => {
+  it("forwards the route's successMessage to the success screen", async () => {
     mockActiveWalletValue.mockReturnValue({
       accountType: AccountType.SelfCustodial,
       isSelfCustodial: true,
@@ -537,10 +536,6 @@ describe("BackupPhraseConfirmScreen", () => {
         { index: 8, word: "harvest" },
       ],
       successMessage: "Your backup phrase is correct",
-    })
-    mockBackupStateValue.mockReturnValue({
-      backupState: { status: "completed", method: "manual" },
-      setBackupCompleted: mockSetBackupCompleted,
     })
 
     const { getByPlaceholderText } = render(
@@ -555,12 +550,9 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
-    expect(mockReplace).toHaveBeenCalledWith(
-      "selfCustodialBackupBundleExport",
-      expect.objectContaining({
-        reBackup: true,
-        successMessage: "Your backup phrase is correct",
-      }),
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "selfCustodialBackupSuccess",
+      expect.objectContaining({ message: "Your backup phrase is correct" }),
     )
   })
 

@@ -1,8 +1,6 @@
 import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
-import { type Network } from "@breeztech/breez-sdk-spark-react-native"
-
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
@@ -12,14 +10,7 @@ import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
 import { useSelfCustodialAccountInfo } from "@app/self-custodial/hooks/use-self-custodial-account-info"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { BackupMethod } from "@app/self-custodial/providers/backup-state"
-import {
-  revokeCloudRecoveryBundle,
-  syncExistingBundleToCloud,
-} from "@app/self-custodial/recovery-bundle/refresh"
-import {
-  readRecoveryBundleSettings,
-  writeRecoveryBundleSettings,
-} from "@app/self-custodial/recovery-bundle/settings"
+import { syncExistingBundleToCloud } from "@app/self-custodial/recovery-bundle/refresh"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import { reportError } from "@app/utils/error-logging"
 import {
@@ -59,53 +50,16 @@ const buildExistingBackupMessage = (
   return t.existingBackupMessageWithDetails({ provider, address, createdAt })
 }
 
-/**
- * Stores the automatic-backups choice once a password-protected seed backup landed,
- * opt-out as well as opt-in. An opt-in also uploads the bundle already on disk: the
- * refresh hook syncs straight away only when the seed backup turns password-protected,
- * so a re-backup over one that already was, or an earlier upload that failed, would
- * otherwise wait for the next payment. Resolves false when the choice could not be
- * stored.
- */
-const recordBundleSyncChoice = async (
-  accountId: string,
-  network: Network,
-  isOptedIn: boolean,
-): Promise<boolean> => {
-  try {
-    const current = await readRecoveryBundleSettings(accountId)
-    const isChoiceChanged = current.cloudSync !== isOptedIn
-    if (isChoiceChanged) {
-      await writeRecoveryBundleSettings(accountId, { ...current, cloudSync: isOptedIn })
-    }
-  } catch (err) {
-    reportError("Recovery bundle cloud-sync choice", err)
-    return false
-  }
-  if (isOptedIn) {
-    syncExistingBundleToCloud(accountId, network).catch((err) =>
-      reportError("Recovery bundle sync after opt-in", err),
-    )
-  }
-  return true
-}
-
 type UseCloudBackupParams = {
-  isEncrypted: boolean
+  /** Every new cloud backup carries a passphrase: the emergency bundle follows
+   *  the seed to the cloud, encrypted with that same seed, so the passphrase is
+   *  what protects both. */
   password: string
-  /** Opt-in to ongoing cloud sync of the recovery backup (D4, off by default). */
-  autoBundleSync?: boolean
-  /** Whether autoBundleSync is a choice to store: the saved one or one the user just
-   *  made. When it is not, the stored choice is left alone. */
-  isAutoBundleSyncKnown?: boolean
   version?: number
 }
 
 export const useCloudBackup = ({
-  isEncrypted,
   password,
-  autoBundleSync = false,
-  isAutoBundleSyncKnown = false,
   version = DEFAULT_BACKUP_VERSION,
 }: UseCloudBackupParams) => {
   const { LL } = useI18nContext()
@@ -187,27 +141,10 @@ export const useCloudBackup = ({
       if (!confirmed) return
     }
 
-    const isPasswordProtected = isEncrypted && password.length > 0
-    /**
-     * A recovery bundle uploaded beside an earlier password-protected seed backup is
-     * encrypted with this same seed, so a seed stored without a password would decrypt it
-     * on the spot (D9). The bundle has to leave the cloud before that seed arrives, and
-     * the backup stops here when it cannot.
-     */
-    if (!isPasswordProtected) {
-      const isBundleRevoked =
-        backupAccountId !== null &&
-        (await revokeCloudRecoveryBundle({ accountId: backupAccountId, mnemonic }))
-      if (!isBundleRevoked) {
-        toastShow({ message: LL.BackupScreen.CloudBackup.uploadFailed(), LL })
-        return
-      }
-    }
-
     const payload = buildBackupPayload(mnemonic, {
       walletIdentifier: identityPubkey,
       lightningAddress: lightningAddress ?? undefined,
-      password: isEncrypted ? password : undefined,
+      password,
       version,
     })
 
@@ -217,43 +154,33 @@ export const useCloudBackup = ({
       return
     }
 
-    /** The choice is stored only once the seed backup actually landed, so a failed
-     *  upload never leaves sync enabled for a provider that holds nothing, and only
-     *  beside a password (D9): a passwordless backup already turned it off above. */
-    const isSyncChoiceRecordable = isPasswordProtected && isAutoBundleSyncKnown
-    const syncChoiceAccountId = isSyncChoiceRecordable ? backupAccountId : null
-    const isSyncChoiceSaved = syncChoiceAccountId
-      ? await recordBundleSyncChoice(syncChoiceAccountId, network, autoBundleSync)
-      : true
-
     logSelfCustodialBackupCompleted({
       backupMethod: Platform.OS === "ios" ? "icloud" : "google_drive",
     })
-    /** The seed backup succeeded either way, so the flow still completes; an
-     *  unsaved choice is said plainly instead of passing for full success. */
-    const backupToast = isSyncChoiceSaved
-      ? {
-          message: LL.BackupScreen.CloudBackup.uploadSuccess({ provider }),
-          type: "success" as const,
-        }
-      : {
-          message: LL.BackupScreen.CloudBackup.autoBundleSyncNotSaved({ provider }),
-          type: "warning" as const,
-        }
-    toastShow({ ...backupToast, LL })
+    toastShow({
+      message: LL.BackupScreen.CloudBackup.uploadSuccess({ provider }),
+      type: "success",
+      LL,
+    })
     /** Awaited, so the guard below holds until a migration's own writes land:
      *  released earlier, a second backup could start before this one navigates. */
-    await completeBackup({
-      method: BackupMethod.Cloud,
-      // Whether the seed backup carries an extra password gates the
-      // recovery-bundle cloud sync (D9), so record it with the completion.
-      backupOptions: { cloudPasswordProtected: isPasswordProtected },
-    })
+    await completeBackup({ method: BackupMethod.Cloud })
+
+    /**
+     * A cloud seed backup puts the recovery bundle in the same cloud, with or
+     * without a passphrase, and keeps it there automatically. The refresh hook
+     * uploads straight away only when the active account's seed first reaches
+     * the cloud, so a re-backup, an earlier upload that failed, or a migration's
+     * account that is not active yet would otherwise wait for the next payment.
+     * Runs after the completion is recorded, since the upload checks it.
+     */
+    if (backupAccountId) {
+      syncExistingBundleToCloud(backupAccountId, network).catch((err) =>
+        reportError("Recovery bundle sync after cloud backup", err),
+      )
+    }
   }, [
-    isEncrypted,
     password,
-    autoBundleSync,
-    isAutoBundleSyncKnown,
     version,
     backupAccountId,
     network,

@@ -58,7 +58,6 @@ const ClientOperation = {
   ListQuery: "list query",
   Upload: "upload",
   Download: "download",
-  Delete: "delete",
 } as const
 
 type ClientOperation = (typeof ClientOperation)[keyof typeof ClientOperation]
@@ -188,15 +187,4 @@ export const downloadAppDataFile = async (
   await assertOkOrThrow(response, ClientOperation.Download)
 
   return response.text()
-}
-
-export const deleteAppDataFile = async (
-  fileId: string,
-  accessToken: string,
-): Promise<void> => {
-  const response = await driveFetch(`${DRIVE_FILES_URL}/${fileId}`, {
-    method: "DELETE",
-    headers: authHeader(accessToken),
-  })
-  await assertOkOrThrow(response, ClientOperation.Delete)
 }

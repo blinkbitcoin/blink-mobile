@@ -29,9 +29,9 @@ export const saveEncryptedBundleFile = async (
   payload: string,
 ): Promise<void> => {
   // NSURLIsExcludedFromBackupKey: the bundle must not ride along in iOS
-  // device backups - a passwordless iCloud seed backup in the same Apple
-  // account would make it decryptable there (PRD rule D9). Android is covered
-  // by allowBackup="false". No-op key on Android; reapplied on every call
+  // device backups. It reaches the cloud only when the user backs the seed up
+  // there, as its own file beside the seed, never as a side effect of a
+  // device backup. Android is covered by allowBackup="false". No-op key on Android; reapplied on every call
   // since mkdir is idempotent.
   await RNFS.mkdir(recoveryBundleDirFor(network), {
     NSURLIsExcludedFromBackupKey: true,
@@ -104,12 +104,6 @@ export type RecoveryBundleState = {
    * saved before it was recorded, which reads as no known cloud copy.
    */
   cloudSyncedBundleCreatedAt?: string | null
-  /**
-   * The bundleCreatedAt of the last bundle the user exported by hand (share
-   * sheet or clipboard), so an export is known to cover the saved bundle only
-   * when the two match. Absent in states saved before it was recorded.
-   */
-  exportedBundleCreatedAt?: string | null
   /**
    * Unix ms of the latest wallet change this bundle may not cover, set before a
    * refresh is attempted and cleared by a save whose fetch began after it. A

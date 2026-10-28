@@ -136,8 +136,8 @@ describe("recovery-bundle storage", () => {
     })
 
     it("excludes the bundle directory from iOS device backups", async () => {
-      // D9 adjacency: an iOS device backup would put the seed-decryptable
-      // bundle in the same Apple account as a passwordless iCloud seed backup.
+      // The bundle reaches the cloud only as its own file beside a cloud seed
+      // backup, never as a side effect of an iOS device backup.
       await saveEncryptedBundleFile(ACCOUNT_ID, Network.Mainnet, "payload-1")
 
       expect(fsState.mkdirCalls).toEqual([

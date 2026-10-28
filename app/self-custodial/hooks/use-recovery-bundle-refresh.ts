@@ -17,12 +17,8 @@ import {
   refreshRecoveryBundle,
   syncExistingBundleToCloud,
 } from "../recovery-bundle/refresh"
-import { readRecoveryBundleSettings } from "../recovery-bundle/settings"
 import { readRecoveryBundleState } from "../recovery-bundle/storage"
-import {
-  isPasswordProtectedCloudSeedBackup,
-  useBackupState,
-} from "../providers/backup-state"
+import { isCloudSeedBackupCompleted, useBackupState } from "../providers/backup-state"
 import { useSelfCustodialWallet } from "../providers/wallet"
 
 import { useSparkNetwork } from "./use-spark-network"
@@ -52,8 +48,8 @@ const MAX_RETRY_ATTEMPTS = 6
 const retryDelayFor = (attempt: number): number =>
   Math.min(RETRY_BASE_DELAY_MS * 2 ** attempt, RETRY_MAX_DELAY_MS)
 
-/** Saved, empty wallet, auto refresh off or no mnemonic settle a scheduled
- * refresh; only a failure leaves it owed. */
+/** Saved, empty wallet or no mnemonic settle a scheduled refresh; only a
+ * failure leaves it owed. */
 const RefreshOutcome = {
   Settled: "settled",
   Failed: "failed",
@@ -76,12 +72,10 @@ const isBenignExportError = (error: unknown): boolean =>
 /**
  * Keeps the unilateral-exit recovery bundle fresh: refreshes it after every
  * send/receive (the SDK's PaymentSucceeded fires for both directions) and on
- * startup when the saved bundle is stale or missing. The user can opt out of
- * automatic refresh (to save mobile data); the setting is checked when a
- * scheduled refresh fires, so a change on the Recovery Backup screen takes
- * effect without this hook remounting. Errors are recorded to crashlytics,
- * never surfaced - the Recovery Backup screen shows freshness and offers a
- * manual refresh.
+ * startup when the saved bundle is stale or missing. It always runs: there is
+ * no opt-out, since a bundle that falls behind the wallet cannot recover the
+ * funds it misses. Errors are recorded to crashlytics, never surfaced - the
+ * retries below and the next startup or payment try again.
  */
 export const useRecoveryBundleRefresh = (): void => {
   const { activeAccount } = useAccountRegistry()
@@ -90,10 +84,9 @@ export const useRecoveryBundleRefresh = (): void => {
   const network = useSparkNetwork()
   const { status, lastPaymentEventKey } = useSelfCustodialWallet()
   const { backupState } = useBackupState()
-  // Password-protected, not merely completed: the upload itself requires the
-  // password gate (D9), so the trigger must key on the same condition - a
-  // passwordless backup later redone with a password must fire the effect.
-  const cloudSeedBackupActive = isPasswordProtectedCloudSeedBackup(backupState)
+  // The same condition the upload itself checks, so the effect below fires
+  // the moment a cloud seed backup completes.
+  const cloudSeedBackupActive = isCloudSeedBackupCompleted(backupState)
 
   const lastHandledEventKeyRef = useRef<string | null>(null)
   const activeRefreshRef = useRef<ActiveRefresh | null>(null)
@@ -138,9 +131,6 @@ export const useRecoveryBundleRefresh = (): void => {
     const currentAccountId = accountId
 
     const runRefresh = async (coverageKey?: string): Promise<RefreshOutcome> => {
-      const settings = await readRecoveryBundleSettings(currentAccountId)
-      if (!settings.autoRefresh) return RefreshOutcome.Settled
-
       const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(currentAccountId)
       if (!mnemonic) return RefreshOutcome.Settled
 
@@ -162,7 +152,7 @@ export const useRecoveryBundleRefresh = (): void => {
         return RefreshOutcome.Settled
       }
       // recordError, not a breadcrumb: background failures are otherwise
-      // invisible until the user happens to open the Recovery Backup screen.
+      // invisible.
       const wrapped =
         result.error instanceof Error ? result.error : new Error(String(result.error))
       crashlytics().recordError(wrapped, "recovery-bundle-refresh")

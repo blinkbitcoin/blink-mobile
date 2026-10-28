@@ -162,7 +162,6 @@ import {
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
   BundleExportScreen,
-  BundleSavedScreen,
   BackupSuccessScreen,
   ChooseExperienceScreen,
   WalletCreationScreen,
@@ -173,9 +172,7 @@ import {
   RestorePhraseScreen,
   CloudRestoreScreen,
   OperatorUnreachableScreen,
-  EmergencyRecoveryScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
-import { RecoveryBackupScreen } from "@app/screens/self-custodial/recovery-backup"
 import {
   MigrationBalancesOverviewScreen,
   MigrationContactSupportScreen,
@@ -1044,14 +1041,7 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialBackupBundleExport"
         component={BundleExportScreen}
-        options={{
-          title: LL.BackupScreen.BundleExport.title(),
-        }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialBundleSaved"
-        component={BundleSavedScreen}
-        options={{ headerShown: false, gestureEnabled: false }}
+        options={{ title: "" }}
       />
       <RootNavigator.Screen
         name="selfCustodialBackupSuccess"
@@ -1072,11 +1062,6 @@ export const RootStack = () => {
         name="selfCustodialWalletCreation"
         component={WalletCreationScreen}
         options={{ title: "" }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialRecoveryBackup"
-        component={RecoveryBackupScreen}
-        options={{ title: LL.RecoveryBundleScreen.settingsTitle() }}
       />
       <RootNavigator.Screen
         name="stableBalanceSettings"
@@ -1146,11 +1131,6 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialOperatorUnreachable"
         component={OperatorUnreachableScreen}
-        options={{ title: "" }}
-      />
-      <RootNavigator.Screen
-        name="selfCustodialEmergencyRecovery"
-        component={EmergencyRecoveryScreen}
         options={{ title: "" }}
       />
     </RootNavigator.Navigator>

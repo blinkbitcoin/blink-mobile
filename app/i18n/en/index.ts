@@ -3996,11 +3996,6 @@ const en: BaseTranslation = {
       title: "Let's back up your wallet",
       description:
         "We will save a backup of your backup phrase to your {provider: string}.",
-      autoBundleCheckbox: "Automatic backups",
-      autoBundleHint: "Enables unilateral exit in case Spark operators go offline",
-      autoBundleNeedsPassword:
-        "Add a password above to enable this. Without one, your recovery backup would sit next to an unprotected backup phrase.",
-      encryptCheckbox: "Encrypt with additional password",
       password: "Password",
       passwordPlaceholder: "(12 characters minimum)",
       confirmPassword: "Confirm password",
@@ -4021,8 +4016,6 @@ const en: BaseTranslation = {
       existingBackupUnknownCreatedAt: "Unknown",
       overwrite: "Overwrite",
       uploadSuccess: "Backup saved to {provider: string}",
-      autoBundleSyncNotSaved:
-        "Backup saved to {provider: string}, but your automatic backups choice could not be saved. You can change it in Settings.",
       uploadFailed: "Failed to upload backup",
       signInFailed: "Failed to sign in to {provider: string}",
       storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",
@@ -4030,23 +4023,14 @@ const en: BaseTranslation = {
       networkError: "Network error. Please check your connection and try again.",
     },
     BundleExport: {
-      title: "One last thing",
-      subtitle:
-        "In case of Spark going offline, use this bundle to exit onchain. This bundle is sensitive. Keep it private.",
-      subtitlePending:
-        "Your emergency bundle is created automatically once you receive funds, and kept up to date from then on. You can download it any time from Settings.",
+      title: "Emergency exit",
+      body: "If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.",
       learnMore: "Learn more about unilateral exit",
-      learnMoreTitle: "Unilateral exit",
-      learnMoreBody:
-        "Spark keeps your bitcoin off-chain so payments are instant and cheap. If its operators ever became unavailable, this bundle plus your backup phrase lets you move your funds onchain yourself, without Blink. It is a multi-week process and costs onchain fees, so it is a safety net rather than an everyday route.",
       download: "Download bundle",
-      copy: "Copy",
-      skip: "Skip",
       sensitiveTitle: "Sensitive",
       sensitiveBody:
-        "This file is sensitive wallet data and must be kept private. If you lose this device, you will not be able to use emergency bundle recovery.",
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
       sensitiveConfirm: "Download",
-      savedTitle: "Emergency bundle saved",
     },
     ManualBackup: {
       Alerts: {
@@ -4292,41 +4276,7 @@ const en: BaseTranslation = {
     outageTitle: "Operator unreachable",
     outageBody: "Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support: string}",
     outageSupport: "Support",
-    outageCta: "Emergency recovery",
     tryAgainLater: "Try again later",
-
-    // Automatic attempt, and the verification of anything the user supplies.
-    verifying: "Verifying the emergency bundle",
-    verified: "Emergency bundle verified",
-
-    // Nothing found automatically: ask where the bundle is.
-    sourcesTitle: "Upload emergency bundle",
-    sourcesBody: "If you have saved the emergency bundle, upload it now to be able to exit onchain.",
-    needHelp: "Need help?",
-    fromCloud: "{provider: string}",
-    fromPasswordManager: "Password manager",
-    fromFile: "Upload bundle",
-    notInCloud: "No emergency bundle for this backup phrase in your cloud.",
-    clipboardEmpty: "Nothing on the clipboard to check.",
-    fileUnreadable: "That file could not be read.",
-    sourceFailed: "Could not fetch the emergency bundle.",
-
-    // The bundle did not belong to this phrase, or was not a bundle at all.
-    rejectedTitle: "Probably a wrong file",
-    rejectedWrongPhrase: "Backup phrase does not match the emergency bundle. Are you sure, you have the correct one?",
-    rejectedNotABundle: "That file is not an emergency bundle. Are you sure you picked the right one?",
-    tryAgain: "Try again",
-    restoreOther: "Restore other",
-
-    // What a verified bundle actually means, stated without overclaiming.
-    summaryTitle: "Your funds can be recovered",
-    summaryBody: "This bundle covers the balance below. Blink cannot perform the onchain exit for you yet - our support team will walk you through it with the recovery tooling.",
-    summaryCovered: "Covered balance",
-    summaryOutputs: "Outputs",
-    summaryCreated: "Bundle created",
-    summarySupport: "Contact support",
-    summaryExport: "Save bundle as a file",
-    summaryDone: "Close",
   },
   BackupNudge: {
     title: "Your funds are at risk",
@@ -4442,61 +4392,14 @@ const en: BaseTranslation = {
     body: "To learn more read our blog post",
     cta: "Read",
   },
+  StaleCloudBundleBulletin: {
+    title: "Update your cloud backup",
+    body: "Your emergency bundle in {provider: string} is out of date. Back up your wallet again to update it.",
+    cta: "Back up again",
+  },
   RecoveryBundleScreen: {
-    howItWorksCta: "How recovery works",
-    howItWorksTitle: "How recovery works",
-    howItWorksBody:
-      "If Spark becomes unavailable, this backup lets you move your funds onchain yourself, without Blink. Recovery is a multi-week process: transactions are broadcast, then a waiting period passes before the funds can be swept to a wallet you choose. It also costs onchain fees, which you pay from a separate Bitcoin balance. Small amounts may cost more to recover than they are worth.",
-    dollarNotCovered:
-      "Your Dollar balance is not covered by onchain recovery. Only Bitcoin can be recovered this way.",
-    nudgeMissingTitle: "Your funds have no recovery backup",
-    nudgeMissingBody:
-      "Set up your recovery backup so you can move your funds onchain if Spark becomes unavailable.",
-    nudgeOnlyOnThisDeviceTitle: "Your emergency bundle is only on this phone",
-    nudgeOnlyOnThisDeviceBody:
-      "Save a copy somewhere else. If you lose this phone, the copy stored on it goes with it and your funds cannot be recovered onchain.",
-    nudgeStaleTitle: "Your recovery backup is out of date",
-    nudgeStaleBody:
-      "It no longer matches your balance. Refresh it so a recovery would return everything you hold.",
-    nudgeCta: "Open recovery backup",
-    chipFresh: "Backed up",
-    chipStale: "Out of date",
-    chipMissing: "Not set up",
-    settingsTitle: "Recovery backup",
-    title: "Recovery backup",
-    description:
-      "A snapshot of your wallet's exit data. Combined with your backup phrase, it lets you withdraw your funds on-chain even if the Spark network disappears. It refreshes automatically after every payment.",
-    lastRefreshed: "Last refreshed: {when: string}",
-    leavesCovered: "Leaves covered: {count: number}",
-    cloudSynced: "Cloud backup: {when: string}",
-    cloudNotSynced: "Cloud backup: not uploaded yet",
-    cloudFollowsSeedBackup:
-      "Back up your wallet to {provider: string} first, then you can turn on automatic cloud upload of the recovery backup here, encrypted with your backup phrase.",
-    autoRefreshLabel: "Automatic refresh",
-    autoRefreshHint:
-      "Keeps the backup fresh after every payment. Turn off to save mobile data; you can still refresh manually.",
-    cloudSyncLabel: "Cloud backup",
-    cloudSyncHint:
-      "Automatically uploads the encrypted recovery backup to {provider: string}.",
-    cloudSyncNeedsPassword:
-      "Uploading the recovery backup to {provider: string} requires your wallet backup there to be protected with a password. Re-do the wallet backup with a password to enable it.",
-    settingUpdateFailed: "Could not save the setting. Try again.",
-    noBundleYet:
-      "No recovery backup saved yet. It is created automatically after your first payment, or you can refresh now.",
-    refreshNow: "Refresh now",
-    uploadToCloud: "Back up to {provider: string}",
-    exportFile: "Export as file",
-    copyJson: "Copy JSON",
-    exportWarningTitle: "Exports are unencrypted",
-    exportWarningMessage:
-      "The exported file contains your wallet's exit data as plain JSON. It cannot be used to spend your funds, but it reveals your balance and payment structure. Store it somewhere safe.",
-    refreshSuccess: "Recovery backup refreshed",
-    refreshEmptyWallet: "Your wallet is empty, so there is nothing to back up yet.",
-    refreshFailed:
-      "Could not refresh the recovery backup. Check your connection and try again.",
-    noBundleToExport: "No recovery backup saved yet. Refresh first.",
-    exportFailed: "Could not export the recovery backup.",
-    cloudUploadSuccess: "Recovery backup uploaded",
+    noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
+    exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

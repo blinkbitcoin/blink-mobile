@@ -24,7 +24,6 @@ const mockRefreshRecoveryBundle = jest.fn()
 const mockSyncExistingBundleToCloud = jest.fn()
 const mockMarkRecoveryBundleStale = jest.fn()
 const mockReadRecoveryBundleState = jest.fn()
-const mockReadRecoveryBundleSettings = jest.fn()
 const mockGetMnemonicForAccount = jest.fn()
 const mockUseAccountRegistry = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
@@ -50,12 +49,12 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => mockUseSelfCustodialWallet(),
 }))
 
-// Keep the real isPasswordProtectedCloudSeedBackup so the gate the hook
-// applies to backupState is the production one, not a test re-implementation.
+// Keep the real isCloudSeedBackupCompleted so the gate the hook applies to
+// backupState is the production one, not a test re-implementation.
 jest.mock("@app/self-custodial/providers/backup-state", () => {
   const actual = jest.requireActual("@app/self-custodial/providers/backup-state")
   return {
-    isPasswordProtectedCloudSeedBackup: actual.isPasswordProtectedCloudSeedBackup,
+    isCloudSeedBackupCompleted: actual.isCloudSeedBackupCompleted,
     useBackupState: () => mockUseBackupState(),
   }
 })
@@ -75,12 +74,6 @@ jest.mock("@app/self-custodial/recovery-bundle/refresh", () => {
 
 jest.mock("@app/self-custodial/recovery-bundle/storage", () => ({
   readRecoveryBundleState: (...args: unknown[]) => mockReadRecoveryBundleState(...args),
-}))
-
-jest.mock("@app/self-custodial/recovery-bundle/settings", () => ({
-  ...jest.requireActual("@app/self-custodial/recovery-bundle/settings"),
-  readRecoveryBundleSettings: (...args: unknown[]) =>
-    mockReadRecoveryBundleSettings(...args),
 }))
 
 jest.mock("@app/utils/storage/secureStorage", () => ({
@@ -167,10 +160,6 @@ describe("useRecoveryBundleRefresh", () => {
       backupState: { status: "none", method: null },
     })
     mockGetMnemonicForAccount.mockResolvedValue(MNEMONIC)
-    mockReadRecoveryBundleSettings.mockResolvedValue({
-      autoRefresh: true,
-      cloudSync: false,
-    })
     mockRefreshRecoveryBundle.mockResolvedValue({
       success: true,
       state: bundleState(),
@@ -409,41 +398,6 @@ describe("useRecoveryBundleRefresh", () => {
     })
   })
 
-  describe("auto-refresh opt-out", () => {
-    it("skips the payment-driven refresh when automatic refresh is turned off", async () => {
-      mockReadRecoveryBundleSettings.mockResolvedValue({
-        autoRefresh: false,
-        cloudSync: false,
-      })
-      setWallet(ActiveWalletStatus.Ready, "payment-1")
-
-      renderHook(() => useRecoveryBundleRefresh())
-      await advance(PAYMENT_DEBOUNCE_MS)
-
-      // The setting is read when the timer fires, so a change made on the
-      // Recovery Backup screen applies without a remount - and no mnemonic
-      // is even fetched for a skipped run.
-      expect(mockReadRecoveryBundleSettings).toHaveBeenCalledWith(ACCOUNT_A_ID)
-      expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
-      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
-    })
-
-    it("skips the startup staleness refresh when automatic refresh is turned off", async () => {
-      mockReadRecoveryBundleSettings.mockResolvedValue({
-        autoRefresh: false,
-        cloudSync: false,
-      })
-      setWallet(ActiveWalletStatus.Ready, null)
-      mockReadRecoveryBundleState.mockResolvedValue(null)
-
-      renderHook(() => useRecoveryBundleRefresh())
-      await flushMicrotasks()
-      await advance(STARTUP_DELAY_MS)
-
-      expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
-    })
-  })
-
   describe("account switch", () => {
     it("clears account A's pending timer and resets payment dedupe when switching to account B", async () => {
       setWallet(ActiveWalletStatus.Ready, "payment-1")
@@ -548,7 +502,7 @@ describe("useRecoveryBundleRefresh", () => {
     })
 
     it("wraps a non-Error thrown before the refresh before recording it", async () => {
-      mockReadRecoveryBundleSettings.mockRejectedValueOnce("settings unreadable")
+      mockGetMnemonicForAccount.mockRejectedValueOnce("keychain unreadable")
       setWallet(ActiveWalletStatus.Ready, "payment-1")
 
       renderHook(() => useRecoveryBundleRefresh())
@@ -556,7 +510,7 @@ describe("useRecoveryBundleRefresh", () => {
       await flushMicrotasks()
 
       expect(mockRecordError).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "settings unreadable" }),
+        expect.objectContaining({ message: "keychain unreadable" }),
         "recovery-bundle-refresh",
       )
     })
@@ -642,10 +596,8 @@ describe("useRecoveryBundleRefresh", () => {
       expect(mockRefreshRecoveryBundle).toHaveBeenCalledTimes(expectedDelays.length + 1)
     })
 
-    it("retries a refresh whose settings read throws before reaching the operators", async () => {
-      mockReadRecoveryBundleSettings.mockRejectedValueOnce(
-        new Error("storage unavailable"),
-      )
+    it("retries a refresh whose mnemonic read throws before reaching the operators", async () => {
+      mockGetMnemonicForAccount.mockRejectedValueOnce(new Error("keychain unavailable"))
       setWallet(ActiveWalletStatus.Ready, "payment-1")
       renderHook(() => useRecoveryBundleRefresh())
 
@@ -653,7 +605,7 @@ describe("useRecoveryBundleRefresh", () => {
       await flushMicrotasks()
       expect(mockRefreshRecoveryBundle).not.toHaveBeenCalled()
       expect(mockRecordError).toHaveBeenCalledWith(
-        expect.objectContaining({ message: "storage unavailable" }),
+        expect.objectContaining({ message: "keychain unavailable" }),
         "recovery-bundle-refresh",
       )
 
@@ -760,13 +712,11 @@ describe("useRecoveryBundleRefresh", () => {
   })
 
   describe("cloud sync of an existing bundle", () => {
-    it("syncs a never-uploaded bundle when a password-protected cloud seed backup exists", async () => {
+    /** With or without a passphrase on the seed: the cloud backup alone puts
+     *  the bundle in the cloud. */
+    it("syncs a never-uploaded bundle when a cloud seed backup exists", async () => {
       mockUseBackupState.mockReturnValue({
-        backupState: {
-          status: "completed",
-          method: "cloud",
-          cloudPasswordProtected: true,
-        },
+        backupState: { status: "completed", method: "cloud" },
       })
       mockReadRecoveryBundleState.mockResolvedValue(bundleState({ cloudSyncedAt: null }))
 
@@ -782,11 +732,7 @@ describe("useRecoveryBundleRefresh", () => {
 
     it("logs a cloud sync that fails instead of throwing from the effect", async () => {
       mockUseBackupState.mockReturnValue({
-        backupState: {
-          status: "completed",
-          method: "cloud",
-          cloudPasswordProtected: true,
-        },
+        backupState: { status: "completed", method: "cloud" },
       })
       mockReadRecoveryBundleState.mockResolvedValue(bundleState({ cloudSyncedAt: null }))
       mockSyncExistingBundleToCloud.mockRejectedValue(new Error("drive unreachable"))
@@ -802,11 +748,7 @@ describe("useRecoveryBundleRefresh", () => {
 
     it("does not sync when the bundle on disk is the one already uploaded", async () => {
       mockUseBackupState.mockReturnValue({
-        backupState: {
-          status: "completed",
-          method: "cloud",
-          cloudPasswordProtected: true,
-        },
+        backupState: { status: "completed", method: "cloud" },
       })
       mockReadRecoveryBundleState.mockResolvedValue(
         bundleState({
@@ -824,11 +766,7 @@ describe("useRecoveryBundleRefresh", () => {
 
     it("syncs when the cloud holds an older bundle than the one on disk", async () => {
       mockUseBackupState.mockReturnValue({
-        backupState: {
-          status: "completed",
-          method: "cloud",
-          cloudPasswordProtected: true,
-        },
+        backupState: { status: "completed", method: "cloud" },
       })
       mockReadRecoveryBundleState.mockResolvedValue(
         bundleState({
@@ -853,24 +791,7 @@ describe("useRecoveryBundleRefresh", () => {
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
     })
 
-    it("does not sync on a passwordless cloud seed backup (D9 gate)", async () => {
-      mockUseBackupState.mockReturnValue({
-        backupState: { status: "completed", method: "cloud" },
-      })
-      mockReadRecoveryBundleState.mockResolvedValue(bundleState({ cloudSyncedAt: null }))
-
-      renderHook(() => useRecoveryBundleRefresh())
-      await flushMicrotasks()
-
-      expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
-    })
-
-    it("syncs when a passwordless backup is upgraded to a password-protected one", async () => {
-      // The upload requires the password gate, so the trigger must fire on
-      // the protection upgrade even though "completed" was already true.
-      mockUseBackupState.mockReturnValue({
-        backupState: { status: "completed", method: "cloud" },
-      })
+    it("syncs as soon as a cloud seed backup completes", async () => {
       mockReadRecoveryBundleState.mockResolvedValue(bundleState({ cloudSyncedAt: null }))
 
       const { rerender } = renderHook(() => useRecoveryBundleRefresh())
@@ -878,11 +799,7 @@ describe("useRecoveryBundleRefresh", () => {
       expect(mockSyncExistingBundleToCloud).not.toHaveBeenCalled()
 
       mockUseBackupState.mockReturnValue({
-        backupState: {
-          status: "completed",
-          method: "cloud",
-          cloudPasswordProtected: true,
-        },
+        backupState: { status: "completed", method: "cloud" },
       })
       rerender(undefined)
       await flushMicrotasks()

@@ -1,9 +1,9 @@
 /**
  * Cloud sync for the encrypted recovery bundle. The event-driven refresh path
  * must never pop UI, so Android only uploads when a silent Google sign-in
- * succeeds (the user linked Drive before, e.g. for the seed backup); iCloud
- * needs no interaction. The Recovery Backup screen offers the interactive
- * session via the shared CloudBackupHook for first-time setup.
+ * succeeds (the user linked Drive for the seed backup); iCloud needs no
+ * interaction. The bundle only syncs once the seed is backed up to the cloud,
+ * so the provider has already been linked by then.
  */
 
 import { Platform } from "react-native"
@@ -12,19 +12,12 @@ import { GoogleSignin } from "@react-native-google-signin/google-signin"
 
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
-  deleteAppDataFile as driveDeleteAppDataFile,
-  DriveError,
-  downloadAppDataFile as driveDownloadAppDataFile,
   findAppDataFile as driveFindAppDataFile,
-  listAppDataFiles as driveListAppDataFiles,
   uploadAppDataFile as driveUploadAppDataFile,
 } from "@app/utils/google-drive-client"
 import { callDrive, configureGoogleSignIn } from "@app/utils/google-drive-session"
 import {
   assertICloudAvailable,
-  deleteAppDataFile as iCloudDeleteAppDataFile,
-  downloadAppDataFile as iCloudDownloadAppDataFile,
-  findAppDataFile as iCloudFindAppDataFile,
   uploadAppDataFile as iCloudUploadAppDataFile,
 } from "@app/utils/icloud-client"
 
@@ -94,95 +87,5 @@ export const attemptSilentCloudUpload = async (
     return { success: true }
   } catch (err) {
     return silentFailure(err)
-  }
-}
-
-const isMissingDriveFile = (err: unknown): boolean =>
-  err instanceof DriveError && err.reason === CloudBackupErrorReason.NotFound
-
-/**
- * Removes every Drive file with exactly this name: Drive allows duplicate
- * names, and two devices syncing the same wallet for the first time can each
- * create one. One already gone, e.g. removed by the other device, counts as
- * removed.
- */
-const deleteDriveFilesNamed = async (fileName: string, accessToken: string) => {
-  const { value: entries, token: listToken } = await callDrive(accessToken, (token) =>
-    driveListAppDataFiles(fileName, token),
-  )
-  let token = listToken
-  for (const entry of entries.filter(({ name }) => name === fileName)) {
-    try {
-      ;({ token } = await callDrive(token, (current) =>
-        driveDeleteAppDataFile(entry.id, current),
-      ))
-    } catch (err) {
-      if (!isMissingDriveFile(err)) throw err
-    }
-  }
-}
-
-/**
- * Best-effort, non-interactive removal of one known file. A file that is not
- * there counts as removed: the caller only needs it gone.
- */
-export const attemptSilentCloudDelete = async (
-  fileName: string,
-): Promise<SilentCloudResult> => {
-  try {
-    if (Platform.OS === "ios") {
-      await assertICloudAvailable()
-      await iCloudDeleteAppDataFile(fileName)
-      return { success: true }
-    }
-
-    const accessToken = await silentDriveAccessToken()
-    if (!accessToken) return { success: false, reason: CloudBackupErrorReason.Auth }
-    await deleteDriveFilesNamed(fileName, accessToken)
-    return { success: true }
-  } catch (err) {
-    return silentFailure(err)
-  }
-}
-
-export type SilentCloudFetchResult =
-  | { success: true; content: string }
-  | { success: false; reason: CloudBackupErrorReason }
-
-/**
- * Best-effort, non-interactive read of one known file.
- *
- * The emergency-recovery flow leads with this: the user has just typed a seed
- * that names their bundle exactly, so the app can go and look before asking
- * them to hunt for a file. A sign-in prompt here would defeat the point, so an
- * unlinked Drive is reported as a reason like any other miss.
- */
-export const attemptSilentCloudFetch = async (
-  fileName: string,
-): Promise<SilentCloudFetchResult> => {
-  try {
-    if (Platform.OS === "ios") {
-      await assertICloudAvailable()
-      const found = await iCloudFindAppDataFile(fileName)
-      if (!found) return { success: false, reason: CloudBackupErrorReason.NotFound }
-      return { success: true, content: await iCloudDownloadAppDataFile(found) }
-    }
-
-    const accessToken = await silentDriveAccessToken()
-    if (!accessToken) return { success: false, reason: CloudBackupErrorReason.Auth }
-    const { value: fileId, token: freshToken } = await callDrive(accessToken, (token) =>
-      driveFindAppDataFile(fileName, token),
-    )
-    if (!fileId) return { success: false, reason: CloudBackupErrorReason.NotFound }
-    const { value: content } = await callDrive(freshToken, (token) =>
-      driveDownloadAppDataFile(fileId, token),
-    )
-    return { success: true, content }
-  } catch (err) {
-    const reason =
-      err && typeof err === "object" && "reason" in err
-        ? (err.reason as CloudBackupErrorReason)
-        : CloudBackupErrorReason.Unknown
-    return { success: false, reason }
   }
 }

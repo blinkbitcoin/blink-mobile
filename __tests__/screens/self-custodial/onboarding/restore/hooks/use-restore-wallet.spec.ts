@@ -8,7 +8,7 @@ import {
   useRestoreWallet,
   RestoreWalletStatus,
 } from "@app/screens/self-custodial/onboarding/restore/hooks/use-restore-wallet"
-import { readEmergencyPhrase } from "@app/screens/self-custodial/onboarding/restore/emergency/emergency-phrase"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
 import { getSelfCustodialServerAccountMode } from "@app/store/persistent-state/self-custodial-server-account-mode"
 import { PersistentState } from "@app/store/persistent-state/state-migrations"
@@ -83,7 +83,7 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
 
 jest.mock("@app/self-custodial/providers/backup-state", () => ({
   markBackupCompletedFor: (...args: unknown[]) => mockMarkBackupCompletedFor(...args),
-  BackupMethod: { Manual: "manual", Recovery: "recovery" },
+  BackupMethod: { Manual: "manual", Cloud: "cloud", Recovery: "recovery" },
 }))
 
 jest.mock("@app/utils/toast", () => ({
@@ -137,6 +137,18 @@ describe("useRestoreWallet", () => {
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
+  /** The seed of a cloud restore is already in the cloud, so the account is
+   *  recorded as cloud-backed and its emergency bundle is uploaded beside it. */
+  it("records a cloud restore as a cloud backup", async () => {
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+    })
+
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith(TEST_ACCOUNT_ID, "cloud")
+  })
+
   it("activates an existing account when the mnemonic is already imported", async () => {
     mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
       status: "ok",
@@ -152,6 +164,28 @@ describe("useRestoreWallet", () => {
     expect(mockRestore).not.toHaveBeenCalled()
     expect(mockUpdateState).toHaveBeenCalledTimes(1)
     expect(mockReinitSdk).toHaveBeenCalledTimes(1)
+    expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
+    // Re-entering the phrase made no new backup, so nothing is recorded.
+    expect(mockMarkBackupCompletedFor).not.toHaveBeenCalled()
+  })
+
+  it("records a cloud restore of an account already on this device as a cloud backup", async () => {
+    mockFindSelfCustodialAccountByMnemonic.mockResolvedValue({
+      status: "ok",
+      id: "existing-id",
+    })
+
+    const { result } = renderHook(() => useRestoreWallet())
+
+    await act(async () => {
+      await result.current.restore("word1 word2 word3", BackupMethod.Cloud)
+    })
+
+    expect(mockRestore).not.toHaveBeenCalled()
+    expect(mockMarkBackupCompletedFor).toHaveBeenCalledWith("existing-id", "cloud")
+    const markOrder = mockMarkBackupCompletedFor.mock.invocationCallOrder[0]
+    const activateOrder = mockUpdateState.mock.invocationCallOrder[0]
+    expect(markOrder).toBeLessThan(activateOrder)
     expect(mockNavigate).toHaveBeenCalledWith("selfCustodialBackupSuccess")
   })
 
@@ -448,26 +482,21 @@ describe("useRestoreWallet", () => {
         await result.current.restore("word1 word2 word3").catch(() => {})
       })
 
-      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable", {
-        phraseHandle: expect.any(String),
-      })
+      expect(mockNavigate).toHaveBeenCalledWith("selfCustodialOperatorUnreachable")
       expect(mockToastShow).not.toHaveBeenCalled()
     })
 
-    it("carries the phrase forward by handle, never in the route params", async () => {
+    /** Nothing past the outage screen needs the phrase, so none is held. */
+    it("carries no phrase to the outage screen", async () => {
       mockRestore.mockRejectedValue(networkError())
       const { result } = renderHook(() => useRestoreWallet())
 
       await act(async () => {
-        await result.current.restore("  word1 word2 word3  ").catch(() => {})
+        await result.current.restore("word1 word2 word3").catch(() => {})
       })
 
-      // The navigator keeps route params in its history, where a seed phrase
-      // could be inspected or serialized; only the handle may go there.
       const [, params] = mockNavigate.mock.calls[0]
-      expect(JSON.stringify(params)).not.toContain("word1")
-      // Normalized, since that is the form everything downstream derives from.
-      expect(readEmergencyPhrase(params.phraseHandle)).toBe("word1 word2 word3")
+      expect(params).toBeUndefined()
     })
 
     it("still records the failure", async () => {

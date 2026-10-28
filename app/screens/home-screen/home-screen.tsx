@@ -42,7 +42,6 @@ import { PendingAmountBadge } from "@app/components/pending-amount-badge"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useFeatureFlags, useRemoteConfig } from "@app/config/feature-flags-context"
 import { BackupNudgeBanner } from "@app/components/backup-nudge-banner"
-import { RecoveryBackupNudgeBanner } from "@app/self-custodial/components"
 import { SelfCustodialInfoBulletin } from "@app/components/self-custodial-info-bulletin"
 import { TwoFactorNudgeCard } from "@app/custodial/components/two-factor-nudge-card"
 import { TwoFactorReminderBulletin } from "@app/custodial/components/two-factor-reminder-bulletin"
@@ -53,7 +52,6 @@ import { useHideAmount } from "@app/graphql/hide-amount-context"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useRecoveryBackupNudge } from "@app/self-custodial/hooks/use-recovery-backup-nudge"
 import { useDefaultAccountModalShown } from "@app/hooks/use-default-account-modal-shown"
 import {
   useDollarBalanceGate,
@@ -80,6 +78,8 @@ import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { StaleCloudBundleBulletin } from "@app/self-custodial/components/stale-cloud-bundle-bulletin"
+import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -247,13 +247,14 @@ export const HomeScreen: React.FC = () => {
   const { mode: balanceMode, toggleMode: toggleBalanceMode } = useBalanceMode()
   const { shouldShowBanner, shouldShowModal, dismissBanner, dismissModal } =
     useBackupNudgeState()
-
-  const { variant: recoveryNudgeVariant, dismiss: dismissRecoveryNudge } =
-    useRecoveryBackupNudge()
   const {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
   } = useSelfCustodialInfoBulletinState()
+  const {
+    shouldShow: shouldShowStaleCloudBundleBulletin,
+    dismiss: dismissStaleCloudBundleBulletin,
+  } = useStaleCloudBundleBulletin()
   const {
     shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
     reminderBulletinReason: twoFactorReminderReason,
@@ -1019,12 +1020,6 @@ export const HomeScreen: React.FC = () => {
         {isSelfCustodial && <UnclaimedDepositBanner deposits={deposits} />}
         <NetworkStatusBanner />
         {shouldShowBanner && <BackupNudgeBanner onDismiss={dismissBanner} />}
-        {recoveryNudgeVariant && (
-          <RecoveryBackupNudgeBanner
-            variant={recoveryNudgeVariant}
-            onDismiss={dismissRecoveryNudge}
-          />
-        )}
         {shouldShowTwoFactorNudgeCard && <TwoFactorNudgeCard />}
         {twoFactorReminderReason && (
           <TwoFactorReminderBulletin reason={twoFactorReminderReason} />
@@ -1041,6 +1036,9 @@ export const HomeScreen: React.FC = () => {
         )}
         {shouldShowSelfCustodialInfoBulletin && (
           <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
+        {shouldShowStaleCloudBundleBulletin && (
+          <StaleCloudBundleBulletin onDismiss={dismissStaleCloudBundleBulletin} />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />

@@ -15,7 +15,6 @@ import {
   unmarkAccountDeletedForRefresh,
   waitForRefreshesToSettle,
 } from "@app/self-custodial/recovery-bundle/refresh"
-import { removeRecoveryBundleSettings } from "@app/self-custodial/recovery-bundle/settings"
 import {
   deleteRecoveryBundleFile,
   removeRecoveryBundleState,
@@ -134,11 +133,6 @@ export const useDeleteAccount = (): DeleteAccountResult => {
             unmarkAccountDeletedForRefresh(accountId)
           })
         isResweepScheduled = true
-        await removeRecoveryBundleSettings(accountId).catch((err) => {
-          crashlytics().log(
-            `[self-custodial delete] recovery bundle settings cleanup failed: ${err}`,
-          )
-        })
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()

@@ -1,17 +1,17 @@
 /**
  * Orchestrates one recovery-bundle refresh: fetch from operators, encrypt with
  * the seed-derived key, persist to the device filesystem, then cloud sync.
- * Single-flight per account - payment bursts and manual refreshes share the
- * in-flight run instead of hammering the operators.
+ * Single-flight per account - payment bursts share the in-flight run instead
+ * of hammering the operators.
  *
- * Cloud sync follows the wallet's seed backup and is opt-in: the bundle is
- * uploaded only when the user enabled cloud sync AND completed a cloud seed
- * backup (iCloud/Google Drive) protected by an extra password, and it goes to
- * the same provider. The password gate exists because the uploaded payload is
- * seed-encrypted - next to an unencrypted seed in the same cloud account it
- * would be decryptable on the spot (blink-specs PRD rule D9).
+ * Every self-custodial wallet keeps its bundle on the device. Cloud sync
+ * follows the wallet's seed backup and cannot be turned off: once the seed is
+ * backed up to iCloud/Google Drive, with or without a passphrase, every saved
+ * bundle is uploaded to the same provider. The uploaded payload is the same
+ * seed-encrypted file kept on the device, so it is only as protected as the
+ * seed backup beside it.
  *
- * Every refresh, upload, state write and revocation is registered per account,
+ * Every refresh, upload and state write is registered per account,
  * so account deletion can refuse new work and wait for what is running before
  * its final sweep. Cloud operations run one at a time per account and network,
  * and state writes queue per account and network, so no two of them interleave.
@@ -23,21 +23,15 @@ import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import { recordAppError, toError } from "@app/utils/error-reporting"
 
 import { networkLabelFor } from "../config"
-import {
-  isPasswordProtectedCloudSeedBackup,
-  readBackupStateFor,
-} from "../providers/backup-state"
+import { isCloudSeedBackupCompleted, readBackupStateFor } from "../providers/backup-state"
 
 import {
-  attemptSilentCloudDelete,
   attemptSilentCloudUpload,
   getRecoveryBundleFilename,
   type SilentCloudResult,
 } from "./cloud"
 import { buildEncryptedBundlePayload, parseBundleBackupMetadata } from "./encryption"
 import { fetchRecoveryBundle } from "./exporter"
-import { deriveIdentityKeyPair } from "./identity"
-import { readRecoveryBundleSettings, writeRecoveryBundleSettings } from "./settings"
 import {
   loadEncryptedBundleFile,
   readRecoveryBundleState,
@@ -53,7 +47,7 @@ export type RefreshBundleParams = {
   appVersion: string
   /**
    * What wallet state this caller needs the bundle to cover - the payment event
-   * key for a payment-triggered refresh, a fresh value for a user-initiated one.
+   * key for a payment-triggered refresh.
    * Callers sharing a key are the same request arriving twice and share the run;
    * a different key means newer leaves the in-flight fetch never read, so it
    * earns a second pass. Omit it to accept whatever run is already going: the
@@ -186,10 +180,9 @@ export const markRecoveryBundleStale = async (
  * Records the bundle an upload carried. It names that payload's own
  * bundleCreatedAt, never the state saved now: a refresh can save a newer
  * bundle while an older payload is still uploading, and stamping the newer one
- * would claim a cloud copy that does not exist. Shared by the silent sync below
- * and the screen's interactive upload so both paths stamp identically.
+ * would claim a cloud copy that does not exist.
  */
-export const markCloudSynced = (
+const markCloudSynced = (
   accountId: string,
   network: Network,
   uploadedBundleCreatedAt: string,
@@ -204,33 +197,9 @@ export const markCloudSynced = (
       : null,
   )
 
-/**
- * Records the bundle a manual export carried, for the same reason the cloud
- * stamp names its payload: the export holds that version only, and a refresh
- * saving a newer one must not read as already off the device. Queued like every
- * other state write, so it cannot revert a refresh or a cloud stamp.
- */
-export const markExported = (
-  accountId: string,
-  network: Network,
-  exportedBundleCreatedAt: string,
-): Promise<RecoveryBundleState | null> =>
-  updateState(accountId, network, (previous) =>
-    previous ? { ...previous, exportedBundleCreatedAt } : null,
-  )
-
-/**
- * Single definition of "the bundle may be stored in the cloud": the user
- * opted in AND the cloud seed backup is password-protected (D9). Screen and
- * sync path both use this so they cannot diverge on it.
- */
-export const isCloudSyncAllowedFor = async (accountId: string): Promise<boolean> => {
-  const [settings, backupState] = await Promise.all([
-    readRecoveryBundleSettings(accountId),
-    readBackupStateFor(accountId),
-  ])
-  return settings.cloudSync && isPasswordProtectedCloudSeedBackup(backupState)
-}
+/** The bundle goes to the cloud exactly when the seed is backed up there. */
+const isCloudSyncDueFor = async (accountId: string): Promise<boolean> =>
+  isCloudSeedBackupCompleted(await readBackupStateFor(accountId))
 
 // Silent cloud failures that are user/device states, not defects - the same
 // set the interactive Drive hook treats as expected (EXPECTED_DRIVE_REASONS in
@@ -268,11 +237,10 @@ const cloudLocks = new Map<string, Promise<unknown>>()
 /**
  * Runs a cloud operation for the account and network once any already running
  * for them settles, inside the deletion barrier. One at a time means an older
- * payload cannot finish uploading after a newer one, and a revocation's delete
- * cannot be overtaken by an upload that began before it. Resolves to undefined
+ * payload cannot finish uploading after a newer one. Resolves to undefined
  * without running the operation once the account is marked deleted.
  */
-export const withCloudBundleLock = <T>(
+const withCloudBundleLock = <T>(
   accountId: string,
   network: Network,
   operation: () => Promise<T>,
@@ -290,7 +258,7 @@ const uploadSavedBundle = async (
   accountId: string,
   network: Network,
 ): Promise<boolean> => {
-  if (!(await isCloudSyncAllowedFor(accountId))) return false
+  if (!(await isCloudSyncDueFor(accountId))) return false
 
   const payload = await loadEncryptedBundleFile(accountId, network)
   if (!payload) return false
@@ -322,11 +290,11 @@ const uploadSavedBundle = async (
 
 /**
  * Uploads the already-saved encrypted bundle to the seed backup's cloud
- * provider. No-op (false) when cloud sync is not allowed (not opted in, or no
- * password-protected cloud seed backup), no bundle is saved yet, the account
- * is deleted, or the silent upload fails. The payload is read inside the cloud
- * lock, so it is the newest one saved when its turn comes. Used after each
- * refresh and when the user turns cloud sync on with a bundle already on disk.
+ * provider. No-op (false) when the seed is not backed up to the cloud, no
+ * bundle is saved yet, the account is deleted, or the silent upload fails. The
+ * payload is read inside the cloud lock, so it is the newest one saved when its
+ * turn comes. Used after each refresh and when a cloud seed backup completes
+ * with a bundle already on disk.
  */
 export const syncExistingBundleToCloud = async (
   accountId: string,
@@ -336,90 +304,6 @@ export const syncExistingBundleToCloud = async (
     uploadSavedBundle(accountId, network),
   )
   return isSynced === true
-}
-
-const RECOVERY_BUNDLE_NETWORKS: readonly Network[] = [Network.Mainnet, Network.Regtest]
-
-/** The cloud filename depends only on the network and the wallet's identity
- *  key, so it is derived from the seed rather than read from a saved bundle the
- *  device may no longer hold. */
-const cloudFilenameFor = async (mnemonic: string, network: Network): Promise<string> => {
-  const { publicKey } = await deriveIdentityKeyPair(mnemonic, network)
-  return getRecoveryBundleFilename(
-    networkLabelFor(network),
-    Buffer.from(publicKey).toString("hex"),
-  )
-}
-
-/** Resolves false rather than throwing, so the other network's delete still
- *  runs and the revocation reports the failure as a result. */
-const deleteCloudCopy = async (
-  accountId: string,
-  network: Network,
-  mnemonic: string,
-): Promise<boolean> => {
-  try {
-    const fileName = await cloudFilenameFor(mnemonic, network)
-    const deletion = await attemptSilentCloudDelete(fileName)
-    if (!deletion.success) {
-      recordSilentCloudFailure(deletion, "revoke")
-      return false
-    }
-    await updateState(accountId, network, (previous) =>
-      previous
-        ? { ...previous, cloudSyncedAt: null, cloudSyncedBundleCreatedAt: null }
-        : null,
-    )
-    return true
-  } catch (err) {
-    recordAppError(toError(err), { dedupKey: "recovery-bundle-cloud-revoke" })
-    return false
-  }
-}
-
-export type RevokeCloudBundleParams = {
-  accountId: string
-  mnemonic: string
-}
-
-/**
- * Removes the account's bundle from the cloud before its seed backup there is
- * replaced by one without a password, which would decrypt it (D9). The caller
- * must not upload that seed unless this resolves true.
- *
- * The opt-in is turned off first and durably, so no upload starts after this
- * one; uploads already running finish before the delete, which waits for the
- * cloud lock. Both networks' copies go, since the bundle key does not depend
- * on the network. The opt-in stays off even when a delete fails: putting the
- * value read earlier back could undo a change the user made meanwhile, and a
- * user whose seed backup is still protected can turn it on again. Never throws.
- */
-export const revokeCloudRecoveryBundle = ({
-  accountId,
-  mnemonic,
-}: RevokeCloudBundleParams): Promise<boolean> => {
-  if (deletedAccounts.has(accountId)) return Promise.resolve(false)
-  const revoke = async (): Promise<boolean> => {
-    const settings = await readRecoveryBundleSettings(accountId)
-    if (deletedAccounts.has(accountId)) return false
-    await writeRecoveryBundleSettings(accountId, { ...settings, cloudSync: false })
-
-    const deletions = await Promise.all(
-      RECOVERY_BUNDLE_NETWORKS.map((network) =>
-        withCloudBundleLock(accountId, network, () =>
-          deleteCloudCopy(accountId, network, mnemonic),
-        ),
-      ),
-    )
-    return deletions.every((deleted) => deleted === true)
-  }
-  return trackWork(
-    accountId,
-    revoke().catch((err) => {
-      recordAppError(toError(err), { dedupKey: "recovery-bundle-cloud-revoke" })
-      return false
-    }),
-  )
 }
 
 type InFlightRefresh = {
@@ -445,7 +329,7 @@ export const markAccountDeletedForRefresh = (accountId: string): void => {
 }
 
 /**
- * Resolves once every refresh, upload, state write and revocation registered
+ * Resolves once every refresh, upload and state write registered
  * for the account (any network) has settled, a queued rerun included: it has
  * not started yet but will write once it does. Work already past its
  * deleted-account check can still land writes after the deletion sweep;
@@ -466,7 +350,7 @@ export const waitForRefreshesToSettle = async (accountId: string): Promise<void>
  * Drops the deletion mark once the post-deletion re-sweep has run: every
  * in-flight refresh has settled and its writes were swept, and nothing can
  * start a new refresh (the mnemonic and registry entry are gone - the hook
- * bails without a mnemonic, the screen without an active account), so keeping
+ * bails without a mnemonic, the export screen without an active account), so keeping
  * the id would only grow the set for the process lifetime.
  */
 export const unmarkAccountDeletedForRefresh = (accountId: string): void => {
@@ -509,7 +393,6 @@ const runRefresh = async ({
         totalSats: bundle.balances.btcSats,
         cloudSyncedAt: previous?.cloudSyncedAt ?? null,
         cloudSyncedBundleCreatedAt: previous?.cloudSyncedBundleCreatedAt ?? null,
-        exportedBundleCreatedAt: previous?.exportedBundleCreatedAt ?? null,
         uncoveredChangeAt: isChangedDuringFetch
           ? previous?.uncoveredChangeAt ?? Date.now()
           : null,
