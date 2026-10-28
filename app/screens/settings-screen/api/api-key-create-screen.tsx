@@ -168,9 +168,12 @@ const useStyles = makeStyles(() => ({
   expiry: {
     rowGap: 5,
   },
+  // wraps rather than clips when large accessibility text outgrows a narrow screen
   expiryOptions: {
     justifyContent: "flex-start",
+    flexWrap: "wrap",
     columnGap: 10,
+    rowGap: 10,
   },
   buttonsContainer: {
     flex: 1,
