@@ -87,6 +87,15 @@ const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0
 const serializePinFailureState = (state: PinFailureState): string =>
   JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil })
 
+/**
+ * Whether the legacy attempt count may still be stored, remembered for the life of the
+ * process. Erasing it on every write and clear costs native round trips on the unlock path
+ * for a slot an upgrade empties once. So it is erased by the first write or clear in a
+ * process, and again only after a read finds a count in it. An erase that fails leaves a
+ * stale entry the current key shadows on read, so one attempt is enough.
+ */
+let mayLegacyPinAttemptsRemain = true
+
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
@@ -302,7 +311,11 @@ export default class KeyStoreWrapper {
       KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
     )
     if (legacy.status === "failed") return legacy
-    if (legacy.status === "absent") return { status: "absent" }
+    if (legacy.status === "absent") {
+      mayLegacyPinAttemptsRemain = false
+      return { status: "absent" }
+    }
+    mayLegacyPinAttemptsRemain = true
 
     const attempts = Number(legacy.value)
     return {
@@ -344,9 +357,17 @@ export default class KeyStoreWrapper {
 
     // The new key shadows the legacy one on read, so a failed erase here costs
     // nothing but a stale entry.
-    if (written) await KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
+    if (written) await KeyStoreWrapper.eraseLegacyPinAttemptsOnce()
 
     return written
+  }
+
+  /** Erases the legacy attempt count unless this process already tried. True when
+   *  there was nothing left to try, so a clear does not re-read over a slot it skipped. */
+  private static async eraseLegacyPinAttemptsOnce(): Promise<boolean> {
+    if (!mayLegacyPinAttemptsRemain) return true
+    mayLegacyPinAttemptsRemain = false
+    return KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
   }
 
   /**
@@ -360,7 +381,7 @@ export default class KeyStoreWrapper {
   public static async clearPinFailureState(): Promise<boolean> {
     const [erased, legacyErased] = await Promise.all([
       KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN_FAILURE_STATE),
-      KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+      KeyStoreWrapper.eraseLegacyPinAttemptsOnce(),
     ])
 
     if (erased && legacyErased) return true
@@ -555,6 +576,9 @@ export default class KeyStoreWrapper {
     // that strands its new owner, since a reinstall would boot into a PIN
     // nobody on this device ever chose.
     await removeWithRetry(KeyStoreWrapper.removePin, "pin")
+    /** A wipe does not trust what this process remembers about the legacy count: the
+     *  slot it asks about is the one an uninstall left behind. */
+    mayLegacyPinAttemptsRemain = true
     await removeWithRetry(KeyStoreWrapper.clearPinFailureState, "pin attempt count")
     await removeWithRetry(KeyStoreWrapper.removeIsBiometricsEnabled, "biometrics flag")
   }

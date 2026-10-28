@@ -541,6 +541,20 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     mockResetInternet.mockResolvedValue(undefined)
   })
 
+  /** A read that finds a count in the legacy slot, which is what tells this process the
+   *  slot still has to be erased. */
+  const readsLegacyCount = async (count: string) => {
+    storedKeys({ pinAttempts: count })
+    await KeyStoreWrapper.getPinFailureState()
+    jest.clearAllMocks()
+    mockSet.mockResolvedValue(undefined)
+    mockRemove.mockResolvedValue(undefined)
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+  }
+
   describe("getPinFailureState", () => {
     it("reads the attempt count and the lock expiry from one key", async () => {
       storedKeys({
@@ -719,9 +733,24 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("drops the legacy key once the state has moved", async () => {
+      await readsLegacyCount("2")
+
       await KeyStoreWrapper.setPinFailureState({ attempts: 1, lockedUntil: 0 })
 
       expect(mockRemove).toHaveBeenCalledWith("pinAttempts")
+    })
+
+    /** The unlock path writes and clears on every entry, and the legacy slot is emptied
+     *  once per upgrade: after one attempt, it is not erased again in this process. */
+    it("erases the legacy key once, not on every write", async () => {
+      await readsLegacyCount("2")
+
+      await KeyStoreWrapper.setPinFailureState({ attempts: 1, lockedUntil: 0 })
+      await KeyStoreWrapper.setPinFailureState({ attempts: 2, lockedUntil: 0 })
+      await KeyStoreWrapper.clearPinFailureState()
+
+      const legacyErases = mockRemove.mock.calls.filter(([key]) => key === "pinAttempts")
+      expect(legacyErases).toHaveLength(1)
     })
 
     it("reports failure — and leaves the legacy key alone — when the write is rejected", async () => {
@@ -741,6 +770,8 @@ describe("KeyStoreWrapper PIN attempt state", () => {
 
   describe("clearPinFailureState", () => {
     it("drops both the current and the legacy key", async () => {
+      await readsLegacyCount("2")
+
       const result = await KeyStoreWrapper.clearPinFailureState()
 
       expect(result).toBe(true)
@@ -801,6 +832,7 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("repairs a legacy count that would not erase", async () => {
+      await readsLegacyCount("3")
       legacyStoreRejects(new Error("keystore locked"))
       storedKeys({ pinAttempts: "3" })
 
