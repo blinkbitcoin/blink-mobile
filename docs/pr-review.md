@@ -357,6 +357,13 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
       the SDK's `lnurl.rs` between the two tags, and run username register, availability
       and restore against staging before merging (#4257).
+- [ ] SDK bumps: logging. Diff `crates/breez-sdk/core/src/logger.rs` between the two tags
+      (file name, append mode, filters) and scan the commits for new `{:?}` log lines.
+      Then grep a real `sdk.log` for the test phrase, `xprv`, raw preimages and any new
+      line carrying the identity key (known at 0.27.1: LNURL URLs and `Balance updated
+      for identity`). Since 0.27.1 the identity key travels as
+      `LogEntry.instanceId`: it must stay out of the file (`file_log_filter`) and out of
+      Crashlytics. See [Self-custodial wallet logs](./self-custodial-logs.md).
 
 ### Feature flags / Remote Config
 
