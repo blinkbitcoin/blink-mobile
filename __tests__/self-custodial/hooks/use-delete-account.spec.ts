@@ -24,6 +24,7 @@ const mockWaitForRefreshesToSettle = jest.fn()
 const mockReloadSelfCustodialAccounts = jest.fn()
 const mockSetActiveAccountId = jest.fn()
 const mockUpdateState = jest.fn()
+const mockClearToken = jest.fn()
 const mockUseSelfCustodialWallet = jest.fn()
 const mockUseHasCustodialAccount = jest.fn()
 const mockUseAccountRegistry = jest.fn()
@@ -87,7 +88,10 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/store/persistent-state", () => ({
-  usePersistentStateContext: () => ({ updateState: mockUpdateState }),
+  usePersistentStateContext: () => ({
+    updateState: mockUpdateState,
+    clearToken: () => mockClearToken(),
+  }),
 }))
 
 jest.mock("@app/hooks/use-has-custodial-account", () => ({
@@ -139,6 +143,7 @@ describe("useDeleteAccount", () => {
     mockClearAppLock.mockResolvedValue(true)
     mockReadSessionProfiles.mockResolvedValue({ status: "absent" })
     mockReadActiveToken.mockResolvedValue({ status: "absent" })
+    mockClearToken.mockResolvedValue(true)
     mockRemoveBackupStateFor.mockResolvedValue(undefined)
     mockDeleteRecoveryBundleFile.mockResolvedValue(undefined)
     mockRemoveRecoveryBundleState.mockResolvedValue(undefined)
@@ -640,13 +645,23 @@ describe("useDeleteAccount", () => {
       )
     })
 
-    /**
-     * The in-memory token field is blanked by `clearToken` and by `resetState` whatever the
-     * keychain did, so a logout whose keychain erase failed, the one case where the logout
-     * deliberately keeps the lock, would read as no token at all.
-     */
-    it("keeps the lock when the keychain still holds an active token", async () => {
-      mockReadActiveToken.mockResolvedValue({ status: "found", token: "live-token" })
+    /** The same evidence a logout goes by: a token an earlier erase missed is erased now,
+     *  and the lock goes only once that erase says the token is gone. */
+    it("erases the active token before deciding on the lock", async () => {
+      const { result } = renderHook(() => useDeleteAccount())
+
+      await act(async () => {
+        await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+      })
+
+      expect(mockClearToken).toHaveBeenCalledTimes(1)
+      expect(mockClearToken.mock.invocationCallOrder[0]).toBeLessThan(
+        mockClearAppLock.mock.invocationCallOrder[0],
+      )
+    })
+
+    it("keeps the lock when the active token will not erase", async () => {
+      mockClearToken.mockResolvedValue(false)
       const { result } = renderHook(() => useDeleteAccount())
 
       await act(async () => {
@@ -656,17 +671,21 @@ describe("useDeleteAccount", () => {
       expect(mockClearAppLock).not.toHaveBeenCalled()
     })
 
-    it("keeps the lock when the active token cannot be read", async () => {
-      mockReadActiveToken.mockResolvedValue({
-        status: "failed",
-        err: new Error("keystore locked"),
-      })
+    /**
+     * The iOS legacy module reports every failed read as a missing key, so a token still in
+     * the keychain can read as absent. The deletion never asks: only the erase decides, and
+     * one that failed keeps the lock whatever a read would have said.
+     */
+    it("keeps the lock on a failed token erase even where a read would answer absent", async () => {
+      mockReadActiveToken.mockResolvedValue({ status: "absent" })
+      mockClearToken.mockResolvedValue(false)
       const { result } = renderHook(() => useDeleteAccount())
 
       await act(async () => {
         await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
       })
 
+      expect(mockReadActiveToken).not.toHaveBeenCalled()
       expect(mockClearAppLock).not.toHaveBeenCalled()
     })
 
@@ -696,7 +715,7 @@ describe("useDeleteAccount", () => {
     /** Every branch that keeps the lock ends the same way: still owed an answer, so not on
      *  the screen that opens a new account. */
     it("keeps a wallet whose lock was never dropped off the landing screen", async () => {
-      mockReadActiveToken.mockResolvedValue({ status: "found", token: "live-token" })
+      mockClearToken.mockResolvedValue(false)
       const { result } = renderHook(() => useDeleteAccount())
 
       let outcome: string | undefined

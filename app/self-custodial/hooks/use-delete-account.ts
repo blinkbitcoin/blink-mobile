@@ -129,7 +129,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
   const { sdk } = useSelfCustodialWallet()
   const { accounts, activeAccount, setActiveAccountId, reloadSelfCustodialAccounts } =
     useAccountRegistry()
-  const { updateState } = usePersistentStateContext()
+  const { updateState, clearToken } = usePersistentStateContext()
   const hasCustodialAccount = useHasCustodialAccount()
 
   const [state, setState] = useState<DeleteState>("idle")
@@ -187,26 +187,27 @@ export const useDeleteAccount = (): DeleteAccountResult => {
          * answered by the store that holds the thing, and each fails closed:
          *
          * - The wallets are asked of the index, which drops an entry only with its seed.
-         * - The active token is read from the keychain, not the in-memory mirror, which
-         *   `clearToken` and `resetState` blank whatever the keychain did.
+         * - The active token is erased, not read, the same evidence a logout goes by. With
+         *   no custodial account left, a token the keychain still holds is one an earlier
+         *   erase missed, and on iOS a read that fails reports it absent.
          * - The saved profiles are asked on their own: a logout that preserved them leaves
          *   live bearer tokens with no active one.
          *
-         * Known limit: an unmigrated iOS legacy slot cannot tell a missing key from a
-         * failed read, so `absent` is weaker there, as it is for every reader of it.
+         * Known limit: the profiles can only be read, since erasing them would end sessions
+         * a logout kept on purpose, and an unmigrated iOS legacy copy reads absent when the
+         * read fails.
          */
         const isLastAccountGone = !remainingSelfCustodial && !hasCustodialAccount
         let isAppLockKept = true
 
         if (isLastAccountGone) {
-          const [presence, activeToken, savedSessions] = await Promise.all([
+          const [presence, hasNoActiveToken, savedSessions] = await Promise.all([
             readStoredWalletPresence(),
-            KeyStoreWrapper.readActiveToken(),
+            clearToken(),
             KeyStoreWrapper.readSessionProfiles(),
           ])
 
           const hasNoStoredWallet = presence === StoredWalletPresence.Absent
-          const hasNoActiveToken = activeToken.status === "absent"
           const hasNoSavedSession =
             savedSessions.status === "absent" ||
             (savedSessions.status === "found" && savedSessions.profiles.length === 0)
@@ -254,6 +255,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
       setActiveAccountId,
       reloadSelfCustodialAccounts,
       updateState,
+      clearToken,
       hasCustodialAccount,
       network,
     ],
