@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Halo!, tolong tutup akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum."
+    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",

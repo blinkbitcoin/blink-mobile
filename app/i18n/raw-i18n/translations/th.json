@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "สวัสดี! โปรดปิดบัญชีของฉัน หมายเลขโทรศัพท์ของฉันคือ {phoneNumber: string}",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด"
+    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",

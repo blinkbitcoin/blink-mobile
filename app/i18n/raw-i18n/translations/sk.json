@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Dobrý deň!, prosím, zatvorte môj účet. Moje telefónne číslo je {phoneNumber: string}.",
     "deleteAccountError": "Niečo sa pokazilo. Pre ďalšiu pomoc kontaktujte {email: string}",
     "bye": "Dovidenia!",
-    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon."
+    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Nemôžete poslať viac ako maximálnu sumu",

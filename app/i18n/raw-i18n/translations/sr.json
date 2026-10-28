@@ -3064,7 +3064,13 @@
     "deleteAccountFromPhone": "Здраво!, молим вас затворите мој налог. Мој број телефона је {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом."
+    "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Не можете послати више од максималног износа",

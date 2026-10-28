@@ -10246,6 +10246,30 @@ type RootTranslation = {
 	​W​e​ ​m​a​y​ ​r​e​t​a​i​n​ ​c​e​r​t​a​i​n​ ​r​e​c​o​r​d​s​ ​a​s​ ​r​e​q​u​i​r​e​d​ ​b​y​ ​l​a​w​.
 		 */
 		deleteAccountWarning: string
+		/**
+		 * D​o​w​n​l​o​a​d​ ​l​o​g​s
+		 */
+		downloadLogs: string
+		/**
+		 * S​h​a​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​l​o​g​s
+		 */
+		exportLogsTitle: string
+		/**
+		 * T​h​i​s​ ​f​i​l​e​ ​h​e​l​p​s​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​l​o​o​k​ ​i​n​t​o​ ​p​r​o​b​l​e​m​s​ ​w​i​t​h​ ​y​o​u​r​ ​w​a​l​l​e​t​.​ ​I​t​ ​i​n​c​l​u​d​e​s​ ​y​o​u​r​ ​w​a​l​l​e​t​'​s​ ​p​u​b​l​i​c​ ​I​D​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​ ​(​a​m​o​u​n​t​s​,​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​a​d​d​r​e​s​s​e​s​)​,​ ​b​u​t​ ​n​e​v​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​ ​o​r​ ​k​e​y​s​.​ ​O​n​l​y​ ​s​h​a​r​e​ ​i​t​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​.
+		 */
+		exportLogsBody: string
+		/**
+		 * S​h​a​r​e​ ​l​o​g​s
+		 */
+		exportLogsConfirm: string
+		/**
+		 * T​h​e​r​e​ ​a​r​e​ ​n​o​ ​l​o​g​s​ ​t​o​ ​s​h​a​r​e​ ​y​e​t​.​ ​O​p​e​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		noLogsYet: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​e​x​p​o​r​t​ ​y​o​u​r​ ​l​o​g​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		exportLogsError: string
 	}
 	lnurl: {
 		/**
@@ -24277,6 +24301,30 @@ export type TranslationFunctions = {
 	We may retain certain records as required by law.
 		 */
 		deleteAccountWarning: () => LocalizedString
+		/**
+		 * Download logs
+		 */
+		downloadLogs: () => LocalizedString
+		/**
+		 * Share your wallet logs
+		 */
+		exportLogsTitle: () => LocalizedString
+		/**
+		 * This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.
+		 */
+		exportLogsBody: () => LocalizedString
+		/**
+		 * Share logs
+		 */
+		exportLogsConfirm: () => LocalizedString
+		/**
+		 * There are no logs to share yet. Open your wallet and try again.
+		 */
+		noLogsYet: () => LocalizedString
+		/**
+		 * Couldn't export your logs. Please try again.
+		 */
+		exportLogsError: () => LocalizedString
 	}
 	lnurl: {
 		/**

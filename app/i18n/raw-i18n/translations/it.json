@@ -3064,7 +3064,13 @@
         "deleteAccountFromPhone": "Ciao! Per favore chiudete il mio account. Il mio numero di telefono è {phoneNumber: string}.",
         "deleteAccountError": "Qualcosa è andato storto. Contatta {email: string} per ulteriore assistenza.",
         "bye": "Ciao!",
-        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge."
+        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge.",
+        "downloadLogs": "Download logs",
+        "exportLogsTitle": "Share your wallet logs",
+        "exportLogsBody": "This file helps our support team look into problems with your wallet. It includes your wallet's public ID and payment history (amounts, invoices and addresses), but never your backup phrase or keys. Only share it with our support team.",
+        "exportLogsConfirm": "Share logs",
+        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+        "exportLogsError": "Couldn't export your logs. Please try again."
     },
     "lnurl": {
         "overLimit": "Non è possibile inviare più dell'importo massimo",
