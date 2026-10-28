@@ -1,10 +1,11 @@
-import { useCallback } from "react"
+import { useCallback, useState } from "react"
 import { Platform } from "react-native"
 
 import { type Network } from "@breeztech/breez-sdk-spark-react-native"
 
 import { getCloudBackupFilename } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { logSelfCustodialBackupCompleted } from "@app/self-custodial/analytics"
@@ -124,7 +125,7 @@ export const useCloudBackup = ({
    *  windows leave the pubkey empty without it being a failure. */
   const identityPending = mnemonicLoading || identityLoading
 
-  const handleBackup = useCallback(async () => {
+  const backUp = useCallback(async () => {
     const provider = getCloudProviderName(LL)
 
     /** Every non-cancelled Drive failure carries its own remedy (e.g. storageAccessRequired for
@@ -267,7 +268,28 @@ export const useCloudBackup = ({
     lightningAddress,
   ])
 
-  const isBackupBusy = loading || identityPending
+  /** One backup at a time, from the first tap until it settles. The platform hook
+   *  reports loading only around its own calls, not the availability check, the
+   *  existing-file lookup or the confirmation in between, and a second run there
+   *  would race the first with whatever passphrase the screen shows by then. The
+   *  ref guard catches two taps in the same render; the state is what the screen
+   *  reads to hold its fields. */
+  const { run: runGuarded } = useInFlightGuard()
+  const [isBackingUp, setIsBackingUp] = useState(false)
+  const handleBackup = useCallback(
+    () =>
+      runGuarded(async () => {
+        setIsBackingUp(true)
+        try {
+          await backUp()
+        } finally {
+          setIsBackingUp(false)
+        }
+      }),
+    [runGuarded, backUp],
+  )
+
+  const isBackupBusy = loading || identityPending || isBackingUp
 
   return { handleBackup, loading: isBackupBusy }
 }
