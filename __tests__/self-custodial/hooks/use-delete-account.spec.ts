@@ -230,6 +230,22 @@ describe("useDeleteAccount", () => {
     )
   })
 
+  it("keeps the wallet when its logs could be neither reset nor removed", async () => {
+    mockResetSdkLogs.mockRejectedValue(new Error("SDK logs could be neither marked"))
+    const { result } = renderHook(() => useDeleteAccount())
+
+    let outcome: string | undefined = "unset"
+    await act(async () => {
+      outcome = await result.current.deleteWallet(TEST_SC_ACCOUNT_ID)
+    })
+
+    expect(mockResetSdkLogs).toHaveBeenCalledTimes(1)
+    expect(outcome).toBeUndefined()
+    expect(result.current.state).toBe("error")
+    expect(mockDeleteMnemonicForAccount).not.toHaveBeenCalled()
+    expect(mockRemoveSelfCustodialAccountId).not.toHaveBeenCalled()
+  })
+
   it("resets the SDK logs when only a custodial account is left", async () => {
     mockUseHasCustodialAccount.mockReturnValue(true)
     const { result } = renderHook(() => useDeleteAccount())

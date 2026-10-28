@@ -258,16 +258,51 @@ describe("resetSdkLogs", () => {
     )
   })
 
-  it("waits for a logger part-way through starting, so it never removes the file it opens", async () => {
+  it("never removes the file a logger starting alongside it opens", async () => {
+    writeText(CURRENT, "wallet A\n")
     const logs = launch()
 
+    // a reset that begins just before the logger starts (#4351 review 3, finding 3)
+    const resetting = logs.resetSdkLogs()
     const starting = logs.startSdkLogger()
-    await logs.resetSdkLogs()
-    await starting
+    await Promise.all([resetting, starting])
     sdkWrites("wallet B")
 
     expect(readText(CURRENT)).toBe("wallet B\n")
-    await expect(logs.readSdkLogResetByte()).resolves.toBe(0)
+    expect(hasPath(FLAG)).toBe(false)
+  })
+
+  it("never removes the file when it lands while the logger is already starting", async () => {
+    writeText(CURRENT, "wallet A\n")
+    const logs = launch()
+
+    const starting = logs.startSdkLogger()
+    const resetting = logs.resetSdkLogs()
+    await Promise.all([starting, resetting])
+    sdkWrites("wallet B")
+
+    expect(readText(CURRENT)?.endsWith("wallet B\n")).toBe(true)
+    const exportable = readText(CURRENT)!.slice((await logs.readSdkLogResetByte()) ?? 0)
+    expect(exportable).not.toContain("wallet A")
+  })
+
+  it("refuses, and exports nothing old, when it can neither flag the reset nor remove the logs", async () => {
+    const logs = launch()
+    await logs.startSdkLogger()
+    sdkWrites("wallet A")
+    failNext("writeFile", FLAG, new Error("disk full"))
+    failNext("unlink", CURRENT, new Error("busy"))
+
+    await expect(logs.resetSdkLogs()).rejects.toThrow(
+      "neither marked for reset nor removed",
+    )
+
+    await expect(logs.readSdkLogResetByte()).resolves.toBe(Number.POSITIVE_INFINITY)
+    expect(mockRecordErrorOnce).toHaveBeenCalledWith(
+      "sdk-log-reset-flag",
+      expect.objectContaining({ message: "disk full" }),
+      { expected: true },
+    )
   })
 
   it("is not undone by a later launch-reset call in the same process (a remounted root)", async () => {

@@ -82,8 +82,10 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         }
 
         /** The SDK log mixes every wallet's lines and can't say whose they are, so any
-         *  deletion resets it, and before the wallet goes: a stop in between must still
-         *  leave the reset to finish. */
+         *  deletion resets it: after the disconnect, so the wallet writes nothing past
+         *  the cut, and before the wallet goes, so a stop in between still leaves the
+         *  reset to finish. It rejects only when it could neither record nor do the
+         *  reset, and then the wallet is kept. */
         await resetSdkLogs()
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {

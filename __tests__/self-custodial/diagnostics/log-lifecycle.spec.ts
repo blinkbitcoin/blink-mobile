@@ -35,6 +35,8 @@ jest.mock("react-native-quick-crypto", () => ({}))
 import {
   endProcess,
   everythingOnDisk,
+  hasPath,
+  holdNext,
   loggerStarts,
   readText,
   resetDisk,
@@ -44,6 +46,12 @@ import {
 const NOW = new Date("2026-10-28T09:05:00Z")
 const WALLET_A = "Synced payment: wallet A paid lnbc1aaaa to alice@blink.sv"
 const WALLET_B = "Synced payment: wallet B received 2000 sats"
+
+/** Lets every queued microtask, and every async step that needs only those, run first. */
+const nextMacrotask = () =>
+  new Promise<void>((resolve) => {
+    setImmediate(resolve)
+  })
 
 /** One app process: the lifecycle, deletion and export modules sharing its state. */
 const launch = () => {
@@ -70,6 +78,7 @@ const launch = () => {
       const path = await exportSdkLogs("header\n", NOW)
       return path === null ? null : readText(path)!
     },
+    exportPath: () => exportSdkLogs("header\n", NOW),
   }
 }
 
@@ -153,5 +162,26 @@ describe("deleting a wallet while the SDK logger runs", () => {
     endProcess()
 
     await expect(launch().exportText()).resolves.toBeNull()
+  })
+
+  it("doesn't let an export that read the logs before the deletion write them back after it", async () => {
+    const app = launch()
+    await app.connectWallet()
+    sdkWrites(WALLET_A)
+
+    // the export is part-way through reading sdk.log when the wallet is deleted
+    const release = holdNext("read", "/caches/breez-sdk-logs/sdk.log")
+    const exporting = app.exportPath()
+    await nextMacrotask()
+    const deleting = app.deleteWallet()
+    // let the deletion get as far as it can before the export reads on
+    await nextMacrotask()
+    release()
+    const [builtPath] = await Promise.all([exporting, deleting])
+
+    expect(builtPath).not.toBeNull()
+    expect(hasPath(builtPath!)).toBe(false)
+    expect(hasPath("/caches/breez-sdk-log-exports")).toBe(false)
+    await expect(app.exportText()).resolves.toBeNull()
   })
 })

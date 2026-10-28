@@ -3,7 +3,12 @@ import RNFS from "react-native-fs"
 import { SDK_LOG_EXPORT_BYTES, sdkLogDir, sdkLogExportDir } from "../config"
 
 import { buildSdkLogExport, type SdkLogPart } from "./build-sdk-log-export"
-import { SDK_LOG_FILE, SDK_LOG_FILE_PREVIOUS, readSdkLogResetByte } from "./sdk-log-files"
+import {
+  SDK_LOG_FILE,
+  SDK_LOG_FILE_PREVIOUS,
+  readSdkLogResetByte,
+  withSdkLogLock,
+} from "./sdk-log-files"
 
 export const SDK_LOG_EXPORT_BASENAME = "blink-wallet-logs"
 
@@ -59,12 +64,13 @@ const exportStamp = (now: Date): string =>
  * install yet, or the logs were reset). After a wallet was deleted in this process only
  * what `sdk.log` gained since is read, and never `sdk.log.1`. A previous export is removed
  * first instead of after sharing: some share targets read the file after the sheet has
- * closed.
+ * closed. Built under the log lock, so a reset can't land between reading the logs and
+ * writing the file.
  */
-export const exportSdkLogs = async (
-  header: string,
-  now: Date,
-): Promise<string | null> => {
+export const exportSdkLogs = (header: string, now: Date): Promise<string | null> =>
+  withSdkLogLock(() => buildExportFile(header, now))
+
+const buildExportFile = async (header: string, now: Date): Promise<string | null> => {
   const dir = sdkLogDir()
   const resetAtByte = await readSdkLogResetByte()
   const current = await readLogTail({

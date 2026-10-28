@@ -35,6 +35,20 @@ const unlinkIfExists = async (path: string): Promise<void> => {
   if (await RNFS.exists(path)) await RNFS.unlink(path)
 }
 
+/**
+ * Starting the logger, a reset and building an export run one at a time. Interleaved,
+ * an export that read the logs before a reset could write them back after it, and a reset
+ * that began as the logger started could remove the file the logger had just opened.
+ * Sharing the built file happens outside: a share sheet can stay open indefinitely.
+ */
+let lockTail: Promise<unknown> = Promise.resolve()
+
+export const withSdkLogLock = <T>(step: () => Promise<T>): Promise<T> => {
+  const run = lockTail.then(step, step)
+  lockTail = run.catch(() => undefined)
+  return run
+}
+
 /** Set once initLogging has opened `sdk.log`; it can't be removed in this process after. */
 let isLogFileOpen = false
 /** Where the last reset in this process cut `sdk.log` off; exports read past it. */
@@ -59,7 +73,7 @@ let launchReset: Promise<void> | undefined
  */
 export const finishPendingSdkLogReset = (): Promise<void> => {
   if (!launchReset) {
-    launchReset = finishReset(sdkLogDir()).catch((err) =>
+    launchReset = withSdkLogLock(() => finishReset(sdkLogDir())).catch((err) =>
       recordErrorOnce("sdk-log-reset", toError(err), { expected: true }),
     )
   }
@@ -114,9 +128,8 @@ const prepareSdkLogDir = async (): Promise<string | undefined> => {
  * listener included, so it is retried without one: losing the file must not also lose
  * the Crashlytics breadcrumbs.
  */
-const startLogging = async (): Promise<void> => {
-  // neither rejects; the catches keep a future change from failing connects
-  await finishPendingSdkLogReset().catch(() => undefined)
+const openLogger = async (): Promise<void> => {
+  // prepareSdkLogDir does not reject; the catch keeps a future change from failing connects
   const logDir = await prepareSdkLogDir().catch(() => undefined)
   try {
     initLogging(logDir, createSdkLogListener(), undefined)
@@ -133,6 +146,12 @@ const startLogging = async (): Promise<void> => {
   }
 }
 
+const startLogging = async (): Promise<void> => {
+  // neither rejects; the catches keep a future change from failing connects
+  await finishPendingSdkLogReset().catch(() => undefined)
+  await withSdkLogLock(openLogger).catch(() => undefined)
+}
+
 /** Holds the promise rather than a flag: two connects racing (an account switch) must
  *  share one initLogging call, and the flag would only be set after the first await. */
 let loggingStarted: Promise<void> | undefined
@@ -143,26 +162,25 @@ export const startSdkLogger = (): Promise<void> => {
   return loggingStarted
 }
 
-/**
- * Resets the logs when any self-custodial wallet is deleted: they hold its payment
- * history, mixed with every other wallet's. Call it before the wallet itself is removed,
- * so a stop in between still leaves the reset to finish at the next launch. Never rejects.
- */
-export const resetSdkLogs = async (): Promise<void> => {
-  // a logger part-way through starting could otherwise open a file this then removes
-  if (loggingStarted) await loggingStarted
+const resetLogs = async (): Promise<void> => {
   const dir = sdkLogDir()
-  const { current, previous } = pathsIn(dir)
+  const { current, previous, flag } = pathsIn(dir)
 
   try {
     await RNFS.mkdir(dir)
-    await RNFS.writeFile(pathsIn(dir).flag, "", "utf8")
+    await RNFS.writeFile(flag, "", "utf8")
   } catch (err) {
     recordErrorOnce("sdk-log-reset-flag", toError(err), { expected: true })
     /** With no flag on disk the next launch can't finish the reset, so remove the logs
-     *  now; a running logger then writes where no export reads until the next launch. */
-    for (const path of [sdkLogExportDir(), current, previous]) {
-      await unlinkIfExists(path).catch(() => undefined)
+     *  now; a running logger then writes where no export reads until the next launch.
+     *  If they can't be removed either, read nothing from before the reset for the rest
+     *  of the session and refuse, so the wallet isn't deleted with its history kept. */
+    const removals = await Promise.allSettled(
+      [sdkLogExportDir(), current, previous].map(unlinkIfExists),
+    )
+    if (removals.some(({ status }) => status === "rejected")) {
+      resetAtByte = Number.POSITIVE_INFINITY
+      throw new Error("SDK logs could be neither marked for reset nor removed")
     }
     return
   }
@@ -186,6 +204,15 @@ export const resetSdkLogs = async (): Promise<void> => {
     )
   }
 }
+
+/**
+ * Resets the logs when any self-custodial wallet is deleted: they hold its payment
+ * history, mixed with every other wallet's. Call it once the wallet's SDK is
+ * disconnected and before the wallet itself is removed, so a stop in between still
+ * leaves the reset to finish at the next launch. Rejects only when the reset could be
+ * neither recorded nor done, and then the wallet must not be deleted.
+ */
+export const resetSdkLogs = (): Promise<void> => withSdkLogLock(resetLogs)
 
 /**
  * Where an export of `sdk.log` must start, and whether `sdk.log.1` is off limits:

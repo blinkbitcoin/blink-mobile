@@ -48,6 +48,7 @@ jest.mock("@app/self-custodial/diagnostics/sdk-log-files", () => ({
   SDK_LOG_FILE: "sdk.log",
   SDK_LOG_FILE_PREVIOUS: "sdk.log.1",
   readSdkLogResetByte: async () => mockDeletedThroughByte,
+  withSdkLogLock: <T>(step: () => Promise<T>) => step(),
 }))
 
 import { exportSdkLogs } from "@app/self-custodial/diagnostics/export-sdk-logs"

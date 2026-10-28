@@ -42,6 +42,13 @@ first: the row follows the active account.
     file, whether or not a wallet connects again (`SdkLogResetMount`). The logger waits
     for it. If it can't finish, the logger runs without a file and the flag stays for the
     launch after.
+  - If the flag can't be written, the logs are removed at once. If that fails too, the
+    reset rejects and the wallet deletion stops before the backup phrase is touched:
+    a wallet is never deleted with its history left exportable.
+  - Starting the logger, a reset and building an export run one at a time under one
+    lock, so an export can't write back logs a reset just removed, and a reset can't
+    remove the file a starting logger just opened. Sharing happens outside the lock,
+    because a share sheet can stay open indefinitely.
 
   `app/self-custodial/diagnostics/sdk-log-files.ts` owns this whole lifecycle;
   `__tests__/self-custodial/diagnostics/log-lifecycle.spec.ts` runs it end to end.

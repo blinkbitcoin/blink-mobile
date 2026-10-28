@@ -17,6 +17,7 @@ type DiskState = {
   loggerFile: Inode | undefined
   loggerStarts: number
   failures: Map<string, Error>
+  holds: Map<string, Promise<void>>
 }
 
 const globalDisk = globalThis as { __inodeDisk?: DiskState }
@@ -27,6 +28,7 @@ if (!globalDisk.__inodeDisk) {
     loggerFile: undefined,
     loggerStarts: 0,
     failures: new Map(),
+    holds: new Map(),
   }
 }
 const disk: DiskState = globalDisk.__inodeDisk
@@ -38,6 +40,7 @@ export const resetDisk = (): void => {
   disk.loggerFile = undefined
   disk.loggerStarts = 0
   disk.failures.clear()
+  disk.holds.clear()
 }
 
 /** A process exit: the logger's handle goes away, the disk stays. */
@@ -48,6 +51,27 @@ export const endProcess = (): void => {
 /** Makes the next call of an RNFS operation on `path` reject. */
 export const failNext = (operation: string, path: string, error = new Error(operation)) =>
   disk.failures.set(`${operation}:${path}`, error)
+
+/** Makes the next call of an RNFS operation on `path` wait until the returned release
+ *  is called: a way to stop one async flow part-way while another runs. */
+export const holdNext = (operation: string, path: string): (() => void) => {
+  let release: () => void = () => {}
+  disk.holds.set(
+    `${operation}:${path}`,
+    new Promise<void>((resolve) => {
+      release = resolve
+    }),
+  )
+  return () => release()
+}
+
+const waitIfHeld = async (operation: string, path: string): Promise<void> => {
+  const key = `${operation}:${path}`
+  const hold = disk.holds.get(key)
+  if (!hold) return
+  disk.holds.delete(key)
+  await hold
+}
 
 const maybeFail = (operation: string, path: string): void => {
   const key = `${operation}:${path}`
@@ -114,6 +138,7 @@ export const rnfs = {
   read: async (
     ...[path, length, position, encoding]: [string, number, number, string]
   ) => {
+    await waitIfHeld("read", path)
     maybeFail("read", path)
     if (encoding !== "base64")
       throw new Error("utf8 range reads throw on a split character")
