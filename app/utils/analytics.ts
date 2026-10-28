@@ -8,6 +8,8 @@ import {
 import { ValidatePhoneCodeErrorsType } from "@app/screens/phone-auth-screen"
 import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import { isCustodialAnalyticsDomain } from "@app/self-custodial/analytics-identity"
+import { measure, ScEvent } from "@app/self-custodial/measurement"
 import {
   AuthenticatorApp,
   LoginMethod,
@@ -81,7 +83,29 @@ export const logUpgradeLoginSuccess = () => {
   analytics().logEvent("upgrade_login_success")
 }
 
+/** A self-custodial parse reports as sc_payment_destination_parsed, which its own gate
+ *  sends only for an Enhanced account; the payment_destination_* events stay custodial. */
+const measureParsedDestination = (parsedDestination: ParseDestinationResult) => {
+  if (parsedDestination.valid) {
+    measure(ScEvent.PaymentDestinationParsed, {
+      valid: true,
+      payment_type: parsedDestination.validDestination.paymentType,
+      direction: parsedDestination.destinationDirection,
+    })
+    return
+  }
+  measure(ScEvent.PaymentDestinationParsed, {
+    valid: false,
+    payment_type: parsedDestination.invalidPaymentDestination.paymentType,
+    reason: parsedDestination.invalidReason,
+  })
+}
+
 export const logParseDestinationResult = (parsedDestination: ParseDestinationResult) => {
+  if (!isCustodialAnalyticsDomain()) {
+    measureParsedDestination(parsedDestination)
+    return
+  }
   if (parsedDestination.valid) {
     analytics().logEvent("payment_destination_accepted", {
       paymentType: parsedDestination.validDestination.paymentType,
@@ -100,7 +124,9 @@ type LogPaymentAttemptParams = {
   sendingWallet: WalletCurrency
 }
 
+/** Custodial only: a self-custodial send reports through its sc_payment_send_* events. */
 export const logPaymentAttempt = (params: LogPaymentAttemptParams) => {
+  if (!isCustodialAnalyticsDomain()) return
   analytics().logEvent("payment_attempt", {
     payment_type: params.paymentType,
     sending_wallet: params.sendingWallet,
@@ -113,7 +139,9 @@ type LogPaymentResultParams = {
   paymentStatus: PaymentSendResult | null | undefined
 }
 
+/** Custodial only, like `logPaymentAttempt`. */
 export const logPaymentResult = (params: LogPaymentResultParams) => {
+  if (!isCustodialAnalyticsDomain()) return
   analytics().logEvent("payment_result", {
     payment_type: params.paymentType,
     sending_wallet: params.sendingWallet,

@@ -429,6 +429,23 @@ describe("analytics identity", () => {
     })
   })
 
+  describe("the custodial domain", () => {
+    it("is reported only once custodial has been requested, and not after a switch away", () => {
+      const id = freshModule()
+      const before = id.isCustodialAnalyticsDomain()
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      const custodial = id.isCustodialAnalyticsDomain()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+
+      expect([before, custodial, id.isCustodialAnalyticsDomain()]).toEqual([
+        false,
+        true,
+        false,
+      ])
+    })
+  })
+
   describe("the Enhanced-applied signal", () => {
     const listen = (id: typeof AnalyticsIdentity) => {
       const listener = jest.fn()

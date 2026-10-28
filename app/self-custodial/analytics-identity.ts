@@ -264,6 +264,12 @@ export const setAnalyticsDomain = (domain: AnalyticsDomain): void => {
   enqueue()
 }
 
+/** Whether the custodial account is the one requested: the custodial-era events in
+ *  `utils/analytics` report only for it, leaving a self-custodial account to the sc_*
+ *  events. False until the first request, so nothing reports for an unknown account. */
+export const isCustodialAnalyticsDomain = (): boolean =>
+  desiredDomain === AnalyticsDomain.Custodial
+
 /** Whether GA4 is fully under the Enhanced identity right now: separated from the
  *  custodial account, the per-install id attached, and collection on. */
 export const isEnhancedIdentityApplied = (): boolean =>
