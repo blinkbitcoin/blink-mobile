@@ -1,5 +1,12 @@
 import React from "react"
-import { AccessibilityInfo, Pressable, TextInput, View } from "react-native"
+import {
+  AccessibilityInfo,
+  Text as NativeText,
+  Pressable,
+  TextInput,
+  TextProps,
+  View,
+} from "react-native"
 import { useSafeAreaInsets } from "react-native-safe-area-context"
 
 import {
@@ -85,6 +92,25 @@ export const AddPlacePanel: React.FC<Props> = ({
   const [isOpen, setOpen] = React.useState(true)
 
   const [step, setStep] = React.useState<"details" | "category">("details")
+  // The first thing on whichever step is showing. The button that changed the
+  // step is gone from the step it leads to, so a screen reader's focus has
+  // nowhere to stay: it is put here instead, and the step reads from its top.
+  const stepStartRef = React.useRef<NativeText>(null)
+  // A types-only gap: `@rn-vui/themed` declares Text's ref as a ref to its
+  // props, and forwards the ref to the native Text, which is what the focus
+  // call below takes.
+  const stepStartLabelRef = stepStartRef as unknown as React.Ref<TextProps>
+  const hasChangedStep = React.useRef(false)
+  React.useEffect(() => {
+    // Not on open: nothing is focused then, on purpose — see above.
+    if (!hasChangedStep.current) {
+      hasChangedStep.current = true
+      return
+    }
+    if (stepStartRef.current) {
+      AccessibilityInfo.sendAccessibilityEvent(stepStartRef.current, "focus")
+    }
+  }, [step])
   // The pin as it stood when Continue was pressed. The map above stays
   // pannable the whole time this is open — that is the reason it is a panel —
   // and the coordinate row is on the first step while the send is on the
@@ -187,7 +213,9 @@ export const AddPlacePanel: React.FC<Props> = ({
               <GaloyIcon name="arrow-left" size={20} color={colors.black} />
             </Pressable>
           )}
-          <Text style={styles.title}>{LL.MapScreen.addPlaceTitle()}</Text>
+          <Text style={styles.title} accessibilityRole="header">
+            {LL.MapScreen.addPlaceTitle()}
+          </Text>
           <Pressable
             testID="close-add-place"
             onPress={() => setOpen(false)}
@@ -235,7 +263,13 @@ export const AddPlacePanel: React.FC<Props> = ({
       {step === "details" ? (
         <>
           <View style={styles.field}>
-            <Text style={styles.label}>{LL.MapScreen.placeLocation()}</Text>
+            <Text
+              ref={stepStartLabelRef}
+              testID="place-details-start"
+              style={styles.label}
+            >
+              {LL.MapScreen.placeLocation()}
+            </Text>
             {/* Read-only, and with nothing to tap: the map above is the control
               for this row, and it is on screen. */}
             <View style={styles.locationRow}>
@@ -269,7 +303,13 @@ export const AddPlacePanel: React.FC<Props> = ({
       ) : (
         <>
           <View style={styles.field}>
-            <Text style={styles.label}>{LL.MapScreen.placeCategory()}</Text>
+            <Text
+              ref={stepStartLabelRef}
+              testID="place-category-start"
+              style={styles.label}
+            >
+              {LL.MapScreen.placeCategory()}
+            </Text>
             {/* All of them at once, rather than a row that opens a list. The
               fourteen are short, familiar words and reading them is the fastest
               way to find the one that fits — a list of the same fourteen hides
@@ -313,7 +353,7 @@ export const AddPlacePanel: React.FC<Props> = ({
             what keeps "I added my shop and it isn't there" from being a
             surprise. */}
           <View style={styles.note}>
-            <GaloyIcon name="info" size={16} color={colors.grey2} />
+            <GaloyIcon name="info" size={16} color={colors.grey1} />
             <Text style={styles.noteText}>{LL.MapScreen.placeReviewNote()}</Text>
           </View>
         </>
@@ -392,6 +432,11 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     backgroundColor: colors.grey5,
     borderRadius: 100,
     alignItems: "center",
+    justifyContent: "center",
+    // The smallest target a finger can be expected to hit. The padding alone
+    // left a chip about 35 tall, and a hit slop that made up the rest would
+    // overlap the row below at this row gap.
+    minHeight: 44,
     paddingVertical: 8,
     paddingHorizontal: 16,
   },
@@ -415,7 +460,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     flex: 1,
     fontSize: 13,
     lineHeight: 18,
-    color: colors.grey2,
+    color: colors.grey1,
   },
   // Below the scroll rather than at the end of it — see the sheet's `footer` —
   // so the fourteen chips can be as tall as they need without the button that
