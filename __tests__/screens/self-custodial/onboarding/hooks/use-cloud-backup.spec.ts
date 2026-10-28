@@ -986,4 +986,37 @@ describe("useCloudBackup one backup at a time", () => {
     expect(mockStartSession).toHaveBeenCalledTimes(1)
     expect(mockUpload).toHaveBeenCalledTimes(1)
   })
+
+  it("stays busy, and ignores another tap, until the backup's completion settles", async () => {
+    // Mid-migration the completion still writes the provisioned account's
+    // backup state and checkpoint after the upload has landed.
+    mockUpload.mockResolvedValue({ success: true })
+    let settleCompletion: () => void = () => {}
+    mockCompleteBackup.mockReturnValue(
+      new Promise<void>((resolve) => {
+        settleCompletion = resolve
+      }),
+    )
+    const { result } = renderHook(() =>
+      useCloudBackup({ isEncrypted: true, password: "a passphrase long enough" }),
+    )
+
+    let backingUp: Promise<void | undefined> = Promise.resolve(undefined)
+    await act(async () => {
+      backingUp = result.current.handleBackup()
+    })
+    expect(mockCompleteBackup).toHaveBeenCalledTimes(1)
+    expect(result.current.loading).toBe(true)
+
+    await act(async () => {
+      await result.current.handleBackup()
+    })
+    expect(mockStartSession).toHaveBeenCalledTimes(1)
+
+    await act(async () => {
+      settleCompletion()
+      await backingUp
+    })
+    expect(result.current.loading).toBe(false)
+  })
 })
