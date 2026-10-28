@@ -50,14 +50,19 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
   config.lnurlDomain = lnurlDomainFor(network)
 
   /**
-   * The SDK default cap is 1 sat/vByte, which blocks almost every deposit claim.
-   * Track the network-recommended rate plus a small remote-config leeway so
-   * automatic claims succeed at normal fees. Coerce to a non-negative integer:
-   * BigInt() throws on the fractional values an operator could set remotely.
+   * The SDK default cap is a fixed 1 sat/vByte (plus 0.1% of the deposit), which
+   * blocks claims as soon as on-chain fees rise above it. Track the
+   * network-recommended rate plus a small remote-config leeway so automatic claims
+   * succeed at normal fees. Coerce to a non-negative integer: BigInt() throws on
+   * the fractional values an operator could set remotely.
    *
-   * The SDK's own default also allows 0.1% of the deposit (`proportionalPpm`) for
-   * a provider fee that grows with the deposit. The cap here takes no proportional
-   * part, so it stays the ceiling it was before the SDK could express one.
+   * From 0.26 the same cap also admits early claims: the sync loop claims an
+   * unconfirmed deposit ahead of maturity whenever the provider's spread fits under
+   * this cap, priced as the rate times the SDK's 99 vB claim size.
+   *
+   * No proportional part (`proportionalPpm`, 0.27), so the ceiling stays what it was
+   * before the SDK could express one. Adding one raises it for every claim, early
+   * ones included.
    */
   const safeLeewaySatPerVbyte = Math.max(0, Math.trunc(leewaySatPerVbyte))
   config.maxDepositClaimFee = MaxFee.create({
@@ -65,6 +70,10 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
       leewaySatPerVbyte: BigInt(safeLeewaySatPerVbyte),
     }),
   })
+
+  /** No SOCKS5 proxy. `getSparkStatus` runs without the SDK and passes its own, so
+   *  bridge/status.ts must change with this. */
+  config.proxy = undefined
 
   config.stableBalanceConfig = {
     tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],

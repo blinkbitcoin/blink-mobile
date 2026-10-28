@@ -163,6 +163,20 @@ describe("initSdk", () => {
     )
   })
 
+  it("routes the SDK through no proxy, matching the status call", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).toHaveProperty("proxy", undefined)
+  })
+
   it("uses the provided leeway for the deposit claim fee cap", async () => {
     mockConnect.mockResolvedValue(makeSdk())
 
