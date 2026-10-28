@@ -184,15 +184,18 @@ describe("verifyPin", () => {
       [6, 60 * MINUTE_MS],
       [10, 60 * MINUTE_MS],
     ])(
-      "keeps ending the round past the budget, and failure %i waits %i ms",
+      "answers a wrong entry past the budget with its wait, and failure %i waits %i ms",
       async (failures, wait) => {
+        /** The session went with the entry that spent the budget, so there is none left
+         *  to end: the entry is wrong, and the wait it starts paces the next one. */
         storedState({ attempts: failures - 1, lockedUntil: NOW - 1 })
+        const recorded = { attempts: failures, lockedUntil: NOW + wait }
 
-        await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "exhausted" })
-        expect(mockedStore.setPinFailureState).toHaveBeenCalledWith({
-          attempts: failures,
-          lockedUntil: NOW + wait,
+        await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({
+          outcome: "wrong",
+          state: recorded,
         })
+        expect(mockedStore.setPinFailureState).toHaveBeenCalledWith(recorded)
       },
     )
 
@@ -266,8 +269,8 @@ describe("verifyPin", () => {
       await spendBudget()
 
       const fourthAt = budgetSpentAt + MINUTE_MS
-      await expect(verifyPin(WRONG_PIN, fourthAt)).resolves.toEqual({
-        outcome: "exhausted",
+      await expect(verifyPin(WRONG_PIN, fourthAt)).resolves.toMatchObject({
+        outcome: "wrong",
       })
       expect(mockedStore.setPinFailureState).toHaveBeenLastCalledWith({
         attempts: 4,
@@ -280,8 +283,8 @@ describe("verifyPin", () => {
       })
 
       const fifthAt = fourthAt + 5 * MINUTE_MS
-      await expect(verifyPin(WRONG_PIN, fifthAt)).resolves.toEqual({
-        outcome: "exhausted",
+      await expect(verifyPin(WRONG_PIN, fifthAt)).resolves.toMatchObject({
+        outcome: "wrong",
       })
       expect(mockedStore.setPinFailureState).toHaveBeenLastCalledWith({
         attempts: 5,
@@ -297,7 +300,7 @@ describe("verifyPin", () => {
       storedState({ attempts: 3, lockedUntil: 0 })
       keepWrites()
 
-      await expect(verifyPin(WRONG_PIN, NOW)).resolves.toEqual({ outcome: "exhausted" })
+      await expect(verifyPin(WRONG_PIN, NOW)).resolves.toMatchObject({ outcome: "wrong" })
       expect(mockedStore.setPinFailureState).toHaveBeenLastCalledWith({
         attempts: 4,
         lockedUntil: NOW + 5 * MINUTE_MS,

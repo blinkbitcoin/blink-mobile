@@ -20,10 +20,10 @@ export type PinVerification =
   /** A lock was still in force, so the PIN was never compared. */
   | { readonly outcome: "locked"; readonly state: PinFailureState }
   | { readonly outcome: "unlocked" }
-  /** The entry was wrong and budget remains. The state carries the count it
-   *  left and the lock it started. */
+  /** The entry was wrong, with budget left or past an already spent one. The
+   *  state carries the count it left and the lock it started. */
   | { readonly outcome: "wrong"; readonly state: PinFailureState }
-  /** The attempt budget is spent. The caller must log out. */
+  /** The entry that spent the attempt budget. The caller must log out. */
   | { readonly outcome: "exhausted" }
   /**
    * The attempt could not be written down, so it was not judged at all: nothing
@@ -183,7 +183,12 @@ export const verifyPin = async (
     return { outcome: "unlocked" }
   }
 
-  if (countedAttempts >= MAX_PIN_ATTEMPTS) {
+  /** Only the entry that spends the budget ends the session. Past it the lock has
+   *  outlived that logout because a wallet is stored, there is no session left to
+   *  end, and the longer wait each entry starts is what paces the next one. */
+  const isSpendingTheBudget =
+    state.attempts < MAX_PIN_ATTEMPTS && countedAttempts >= MAX_PIN_ATTEMPTS
+  if (isSpendingTheBudget) {
     return { outcome: "exhausted" }
   }
 

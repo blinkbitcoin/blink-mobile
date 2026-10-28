@@ -570,6 +570,24 @@ describe("PinScreen", () => {
       expect(screen.getByText("Try again in 00:30.")).toBeTruthy()
     })
 
+    /** Only the entry that spends the budget ends the session. Past it there is none left
+     *  to end, so a wrong entry gets its longer wait and the keypad stays. */
+    it("keeps the keypad past a spent budget, with the longer wait and no logout", async () => {
+      stored.attempts = 3
+      stored.lockedUntil = 0
+
+      renderScreen(false)
+      await flushEffects()
+
+      await enterPin(WRONG_PIN)
+      await advance(1000)
+
+      expect(mockLogout).not.toHaveBeenCalled()
+      expect(mockReturnToGate).not.toHaveBeenCalled()
+      expect(stored.attempts).toBe(4)
+      expect(screen.getByText("Try again in 04:59.")).toBeTruthy()
+    })
+
     it("still logs out on the third failure", async () => {
       stored.attempts = 2
 
