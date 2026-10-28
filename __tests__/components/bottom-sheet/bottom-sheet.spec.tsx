@@ -597,6 +597,12 @@ describe("BottomSheet", () => {
       const { rerender } = renderSheet({ presentation: "inline", onClose })
       await waitFor(() => expect(addListener).toHaveBeenCalled())
 
+      // Arrived first. Hidden while still off the bottom, the slide-out has no
+      // distance to travel and completes on the spot, so there is no exit left
+      // for the show below to land inside — the test then fails or passes on
+      // how far the entry spring happened to have got.
+      await settle()
+
       // Hidden and shown again before the slide-out can finish, which cancels
       // it — and with it the completion that would have reset the exit.
       rerender(sheetElement({ presentation: "inline", isVisible: false, onClose }))
