@@ -134,6 +134,8 @@ describe("ApiKeyCreateScreen", () => {
         },
       }),
     )
+    // The created key opens its secret behind the guard, whose lease settles after.
+    await flushEffects()
   })
 
   it("defaults to both scopes and 90 days expiry", async () => {
@@ -153,6 +155,8 @@ describe("ApiKeyCreateScreen", () => {
         },
       }),
     )
+    // The created key opens its secret behind the guard, whose lease settles after.
+    await flushEffects()
   })
 
   it("reveals the one-time secret with copy, share and screen security", async () => {

@@ -462,14 +462,17 @@ describe("RestorePhraseScreen", () => {
     expect(getByText(LL.RestoreScreen.recognizePhraseBody())).toBeTruthy()
   })
 
-  it("does not render the recognize-phrase warning card on step 2", () => {
+  it("does not render the recognize-phrase warning card on step 2", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       isStep1: false,
     })
 
     const { queryByText } = renderScreen()
+    await flushEffects()
 
+    // The gate has mounted the step's content, so the card's absence is not the gate's.
+    expect(mockMnemonicWordInput).toHaveBeenCalled()
     expect(queryByText(LL.RestoreScreen.recognizePhraseTitle())).toBeNull()
   })
 
