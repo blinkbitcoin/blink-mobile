@@ -24,6 +24,18 @@ import { BottomSheet } from "@app/components/bottom-sheet"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
+// Phosphor draws its X at about 70% of the box, so 24 is what puts the glyph at
+// the 17.5 the design draws in its 20 frame.
+const CLOSE_ICON_SIZE = 24
+
+// Each header icon's slop takes its target to 48, Android's minimum and over
+// iOS's 44: the 24 X needs 12 a side, the 20 arrow 14.
+const MIN_TARGET = 48
+const HEADER_ICON_HIT_SLOP = {
+  back: (MIN_TARGET - 20) / 2,
+  close: (MIN_TARGET - CLOSE_ICON_SIZE) / 2,
+}
+
 type Props = {
   /**
    * Where the pin is pointing right now — the centre of the map above, which
@@ -205,7 +217,7 @@ export const AddPlacePanel: React.FC<Props> = ({
               onPress={goBack}
               accessibilityRole="button"
               accessibilityLabel={LL.common.back()}
-              hitSlop={12}
+              hitSlop={HEADER_ICON_HIT_SLOP.back}
             >
               {/* The foreground colour, not the accent: this reads as part of
                   the title row it sits in rather than as an action of its
@@ -221,9 +233,9 @@ export const AddPlacePanel: React.FC<Props> = ({
             onPress={() => setOpen(false)}
             accessibilityRole="button"
             accessibilityLabel={LL.common.close()}
-            hitSlop={12}
+            hitSlop={HEADER_ICON_HIT_SLOP.close}
           >
-            <GaloyIcon name="close" size={20} color={colors.primary} />
+            <GaloyIcon name="close" size={CLOSE_ICON_SIZE} color={colors.primary} />
           </Pressable>
         </>
       }
