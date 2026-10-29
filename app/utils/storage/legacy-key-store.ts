@@ -19,6 +19,13 @@ import type { SecureRead } from "./secure-store"
  * This module is the read-and-erase half of the migration off that library
  * (blinkbitcoin/blink-wip#1143). Its one write is the blank `legacyBlank` erases
  * with, never a value: migrated values are only ever written to the new store.
+ *
+ * On Android a resolved `set` or `remove` means the write reached disk. The
+ * library's module resolves whatever `SharedPreferences.Editor.commit()` returns,
+ * so a write that failed would pass for one that landed and the old value would
+ * come back on the next launch. The library is unmaintained and JS cannot see
+ * that result, so `patches/react-native-secure-key-store+2.0.10.patch` makes both
+ * reject when `commit()` returns false.
  */
 
 /**
@@ -88,6 +95,8 @@ export const legacyRead = async (key: string): Promise<SecureRead> => {
 /**
  * False covers both a failed erase and a key that was never there: iOS `remove:`
  * rejects with code "6" when `deleteKeychainValue` gets `errSecItemNotFound`.
+ * On Android a missing key resolves, and a removal resolves only once it is on
+ * disk (see the module doc).
  *
  * Not guarded, unlike the read: `remove:` is the one entry point that never
  * reaches `handleAppUninstallation`, so the guard would be a bridge call that
@@ -120,6 +129,7 @@ const BLANK_OPTIONS = { accessible: ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ON
  * erased key from a keychain that is not answering. `set:` adds the item or replaces the
  * one already there and resolves only once the keychain took the write, so a key that was
  * already gone blanks as cleanly as one that held a value, while a failing keychain refuses.
+ * On Android `set` resolves only once the blank is on disk, so it is the same proof there.
  *
  * Guarded like the read: `set:` reaches the reinstall wipe.
  */
