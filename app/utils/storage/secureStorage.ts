@@ -39,16 +39,11 @@ export type SessionProfilesRead =
   | { status: "absent" }
   | { status: "failed"; err: unknown }
 
-// Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
-// `get`, android RNSecureKeyStoreModule#get). Every other code means the read
-// itself went wrong.
-//
-// True on Android only. The iOS module discards the OSStatus from
-// SecItemCopyMatching (`searchKeychainCopyMatching` returns nil for any failure)
-// and `get` rejects nil with "404", so an entitlement or decode error is
-// indistinguishable from a missing key there. Every caller that branches on this
-// therefore degrades to "absent" on iOS; the distinction becomes real when the
-// slots move to react-native-keychain (blink-wip#1161).
+// Both native modules reject a missing key with code "404", and only a missing key
+// (android RNSecureKeyStoreModule#get, and ios/RNSecureKeyStore.m `get` through
+// patches/react-native-secure-key-store+2.0.10.patch, since the module used to drop
+// the keychain status and reject every failed lookup as missing). Every other code
+// means the read itself went wrong.
 const KEY_NOT_FOUND_CODE = "404"
 
 const isKeyNotFound = (err: unknown): boolean =>
@@ -428,9 +423,6 @@ export default class KeyStoreWrapper {
    * list scored from a failed read deletes every profile, and profiles carry
    * their sessions' tokens.
    *
-   * Platform caveat: this only separates the two cases on Android — see the
-   * note above KEY_NOT_FOUND_CODE.
-   *
    * A payload that will not parse, or that parses to something other than an
    * array, is reported as absent rather than failed: it holds nothing a caller
    * could preserve, so refusing to overwrite it would protect no session while
@@ -603,8 +595,7 @@ export default class KeyStoreWrapper {
    * after an earlier one landed finds no key, and the iOS module rejects that delete like
    * any failure, so a seed already gone would count as surviving forever and its wallet
    * could never leave the list. The legacy-copy rule every migrated slot erases by settles
-   * it with a blank write the keychain has to accept, never with a read, since on iOS a
-   * read that fails reports the key absent too.
+   * it with a blank write the keychain has to accept.
    */
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
     const isSeedGone = await eraseLegacyCopy(KeyStoreWrapper.mnemonicKeyFor(accountId))

@@ -189,13 +189,11 @@ export const useDeleteAccount = (): DeleteAccountResult => {
          * - The wallets are asked of the index, which drops an entry only with its seed.
          * - The active token is erased, not read, the same evidence a logout goes by. With
          *   no custodial account left, a token the keychain still holds is one an earlier
-         *   erase missed, and on iOS a read that fails reports it absent.
+         *   erase missed.
          * - The saved profiles are asked on their own: a logout that preserved them leaves
-         *   live bearer tokens with no active one.
-         *
-         * Known limit: the profiles can only be read, since erasing them would end sessions
-         * a logout kept on purpose, and an unmigrated iOS legacy copy reads absent when the
-         * read fails.
+         *   live bearer tokens with no active one. They are read rather than erased, since
+         *   erasing them would end sessions a logout kept on purpose, so a read that cannot
+         *   answer counts as sessions still saved.
          */
         const isLastAccountGone = !remainingSelfCustodial && !hasCustodialAccount
         let isAppLockKept = true

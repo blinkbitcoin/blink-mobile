@@ -20,18 +20,24 @@ import type { SecureRead } from "./secure-store"
  * (blinkbitcoin/blink-wip#1143). Its one write is the blank `legacyBlank` erases
  * with, never a value: migrated values are only ever written to the new store.
  *
- * On Android a resolved `set` or `remove` means the write reached disk. The
- * library's module resolves whatever `SharedPreferences.Editor.commit()` returns,
- * so a write that failed would pass for one that landed and the old value would
- * come back on the next launch. The library is unmaintained and JS cannot see
- * that result, so `patches/react-native-secure-key-store+2.0.10.patch` makes both
- * reject when `commit()` returns false.
+ * The library is unmaintained and JS cannot see what the keystore answered, so
+ * `patches/react-native-secure-key-store+2.0.10.patch` makes both native modules
+ * report it:
+ *
+ * - On Android a resolved `set` or `remove` means the write reached disk. The
+ *   module resolved whatever `SharedPreferences.Editor.commit()` returned, so a
+ *   write that failed passed for one that landed and the old value came back on
+ *   the next launch.
+ * - On iOS `get` rejects with the missing-key code only when the keychain reports
+ *   the item missing. The module dropped the keychain status and rejected every
+ *   lookup that failed as missing, so a keychain that would not answer passed for
+ *   an empty one.
  */
 
 /**
- * Both native modules reject a missing key with code "404"
- * (ios/RNSecureKeyStore.m `get`, RNSecureKeyStoreModule#get). Every other code
- * means the read itself went wrong.
+ * Both native modules reject a missing key with code "404", and only a missing
+ * key (RNSecureKeyStoreModule#get, and ios/RNSecureKeyStore.m `get:` through the
+ * patch). Every other code means the read itself went wrong.
  */
 const KEY_NOT_FOUND_CODE = "404"
 
@@ -124,12 +130,12 @@ const BLANK_OPTIONS = { accessible: ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ON
 /**
  * Overwrites a key with nothing: the erase the iOS module can prove where `remove:` cannot.
  *
- * Its `remove:` rejects a key that is not there exactly like a delete that failed, and its
- * `get:` reports every lookup that fails with the missing-key code, so neither tells an
- * erased key from a keychain that is not answering. `set:` adds the item or replaces the
- * one already there and resolves only once the keychain took the write, so a key that was
- * already gone blanks as cleanly as one that held a value, while a failing keychain refuses.
- * On Android `set` resolves only once the blank is on disk, so it is the same proof there.
+ * Its `remove:` rejects a key that is not there exactly like a delete that failed, so a
+ * refused delete cannot tell an erased key from a keychain that is not answering. `set:`
+ * adds the item or replaces the one already there and resolves only once the keychain took
+ * the write, so a key that was already gone blanks as cleanly as one that held a value,
+ * while a failing keychain refuses. On Android `set` resolves only once the blank is on
+ * disk, so it is the same proof there.
  *
  * Guarded like the read: `set:` reaches the reinstall wipe.
  */

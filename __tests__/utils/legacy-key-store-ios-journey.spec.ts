@@ -1,7 +1,8 @@
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import useLogout from "@app/hooks/use-logout"
+import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 import { useRemoveStoredWallets } from "@app/self-custodial/hooks/use-remove-stored-wallets"
 import {
   addSelfCustodialAccountId,
@@ -11,24 +12,34 @@ import {
 import KeyStoreWrapper, { GALOY_AUTH_TOKEN_KEY } from "@app/utils/storage/secureStorage"
 
 /**
- * The legacy keychain as iOS answers it, under the real storage stack and the two ways out
- * that drop the app lock: a logout, and the forgotten-PIN removal of every stored wallet.
- * Each of those has its own spec that stubs what storage answers; this one pins what the
- * native answers compose into. Only the two keychains are faked.
+ * The legacy keychain as iOS answers it, under the real storage stack and the ways out that
+ * drop the app lock: a logout, the forgotten-PIN removal of every stored wallet, and the
+ * deletion of the last one. Each of those has its own spec that stubs what storage answers;
+ * this one pins what the native answers compose into. Only the two keychains are faked.
  *
- * The iOS module loses the OSStatus on the way out (ios/RNSecureKeyStore.m): `remove:`
- * rejects with "6" and `get:` with "404" whatever went wrong, so a keychain that will not
- * answer for an item looks to both exactly like one that does not hold it. Only `set:`
- * refuses for the fault alone.
+ * The iOS module answers as `patches/react-native-secure-key-store+2.0.10.patch` leaves it
+ * (ios/RNSecureKeyStore.m): `get:` rejects with "404" only for an item the keychain reports
+ * missing and with "1" for any other failure. `remove:` still rejects with "6" whatever went
+ * wrong, so a refused delete looks exactly like a key that is not there, and `set:` refuses
+ * for the fault alone.
  */
 
 type LegacyKeychain = {
   readonly items: Map<string, string>
   /** The items are there but the keychain will not answer for them, as before first unlock. */
   isFailing: boolean
+  /** Items the keychain holds but will not answer for, as under a class not available yet. */
+  readonly unanswered: Set<string>
 }
 
-const mockLegacyKeychain: LegacyKeychain = { items: new Map(), isFailing: false }
+const mockLegacyKeychain: LegacyKeychain = {
+  items: new Map(),
+  isFailing: false,
+  unanswered: new Set(),
+}
+
+const mockIsUnanswered = (key: string): boolean =>
+  mockLegacyKeychain.isFailing || mockLegacyKeychain.unanswered.has(key)
 
 /** The new store answers truthfully on iOS, so it is kept healthy: a fault there already
  *  fails closed, and only the legacy store's answers are under test. */
@@ -41,22 +52,21 @@ jest.mock("react-native-secure-key-store", () => ({
   __esModule: true,
   default: {
     get: async (key: string) => {
+      if (mockIsUnanswered(key)) throw mockNativeRejection("1", "key could not be read")
       const value = mockLegacyKeychain.items.get(key)
-      const isUnanswered = mockLegacyKeychain.isFailing || value === undefined
-      if (isUnanswered) throw mockNativeRejection("404", "key does not present")
+      if (value === undefined) throw mockNativeRejection("404", "key does not present")
       return value
     },
     set: async (key: string, value: string, options?: object) => {
       // A call without its options crashes the app on iOS; a rejection here keeps that loud.
       if (options === undefined) throw new Error("set: called without its options")
-      if (mockLegacyKeychain.isFailing) throw mockNativeRejection("9", "error saving key")
+      if (mockIsUnanswered(key)) throw mockNativeRejection("9", "error saving key")
       mockLegacyKeychain.items.set(key, value)
       return "key stored successfully"
     },
     remove: async (key: string) => {
-      const isUnanswered =
-        mockLegacyKeychain.isFailing || !mockLegacyKeychain.items.has(key)
-      if (isUnanswered) throw mockNativeRejection("6", "could not delete key")
+      const isRefused = mockIsUnanswered(key) || !mockLegacyKeychain.items.has(key)
+      if (isRefused) throw mockNativeRejection("6", "could not delete key")
       mockLegacyKeychain.items.delete(key)
       return "key removed successfully"
     },
@@ -132,8 +142,16 @@ jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: jest.fn(),
 }))
 
+/** The one wallet the device stores, open in the app, so deleting it deletes the last one. */
+const mockStoredAccount = { type: "self-custodial", id: "stored-wallet" }
+
 jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ reloadSelfCustodialAccounts: async () => undefined }),
+  useAccountRegistry: () => ({
+    accounts: [mockStoredAccount],
+    activeAccount: mockStoredAccount,
+    setActiveAccountId: () => {},
+    reloadSelfCustodialAccounts: async () => undefined,
+  }),
 }))
 
 jest.mock("@app/hooks/use-has-custodial-account", () => ({
@@ -200,6 +218,15 @@ const logout = () => {
   return result.current.logout()
 }
 
+const deleteLastWallet = async () => {
+  const { result } = renderHook(() => useDeleteAccount())
+  let outcome: Awaited<ReturnType<typeof result.current.deleteWallet>>
+  await act(async () => {
+    outcome = await result.current.deleteWallet(WALLET_ID)
+  })
+  return outcome
+}
+
 const listedWalletIds = async (): Promise<ReadonlyArray<string>> => {
   const listed = await listSelfCustodialAccounts()
   if (listed.status === StorageReadStatus.ReadFailed) throw listed.error
@@ -214,6 +241,7 @@ const storeWallet = async (id: string) => {
 beforeEach(async () => {
   mockLegacyKeychain.items.clear()
   mockLegacyKeychain.isFailing = false
+  mockLegacyKeychain.unanswered.clear()
   mockNewKeychain.clear()
   await AsyncStorage.clear()
   await KeyStoreWrapper.setPin(PIN)
@@ -287,5 +315,48 @@ describe("a logout on the iOS legacy keychain", () => {
     expect(isAppLockKept).toBe(false)
     expect(await KeyStoreWrapper.getPin()).toBeNull()
     expect([...mockLegacyKeychain.items.keys()]).toEqual([])
+  })
+})
+
+describe("the last wallet's deletion on the iOS legacy keychain", () => {
+  const SESSIONS_KEY = "sessionProfiles"
+
+  it("keeps the lock while the keychain will not answer for the saved sessions", async () => {
+    await storeWallet(WALLET_ID)
+    mockLegacyKeychain.items.set(SESSIONS_KEY, JSON.stringify([{ token: "saved" }]))
+    mockLegacyKeychain.unanswered.add(SESSIONS_KEY)
+
+    const outcome = await deleteLastWallet()
+
+    expect(outcome).toBe("logged-out-locked")
+    expect(await listedWalletIds()).toEqual([])
+    expect(mockLegacyKeychain.items.has(SESSIONS_KEY)).toBe(true)
+    expect(await KeyStoreWrapper.getPin()).toBe(PIN)
+  })
+
+  it("drops the lock once the keychain answers that no session is saved", async () => {
+    await storeWallet(WALLET_ID)
+
+    const outcome = await deleteLastWallet()
+
+    expect(outcome).toBe("logged-out")
+    expect(await KeyStoreWrapper.getPin()).toBeNull()
+  })
+})
+
+describe("the launch gate's reads on the iOS legacy keychain", () => {
+  it("reads an unmigrated PIN the keychain will not answer for as unknown, never as off", async () => {
+    await KeyStoreWrapper.removePin()
+    mockLegacyKeychain.items.set("PIN", PIN)
+    mockLegacyKeychain.unanswered.add("PIN")
+
+    expect((await KeyStoreWrapper.readIsPinEnabled()).status).toBe("failed")
+  })
+
+  it("reads the lock as off only when the keychain answers that nothing is stored", async () => {
+    await KeyStoreWrapper.removePin()
+
+    expect(await KeyStoreWrapper.readIsPinEnabled()).toEqual({ status: "no" })
+    expect(await KeyStoreWrapper.readIsBiometricsEnabled()).toEqual({ status: "no" })
   })
 })

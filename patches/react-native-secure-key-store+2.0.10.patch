@@ -24,3 +24,44 @@ index e20d488..5396846 100644
        promise.resolve("cleared alias");
      } catch (Exception e) {
        e.printStackTrace();
+diff --git a/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m b/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m
+index d7fe4cd..87e1b92 100644
+--- a/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m
++++ b/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m
+@@ -51,7 +51,7 @@ - (NSMutableDictionary *)newSearchDictionary:(NSString *)identifier {
+     return searchDictionary;
+ }
+ 
+-- (NSString *)searchKeychainCopyMatching:(NSString *)identifier {
++- (NSString *)searchKeychainCopyMatching:(NSString *)identifier status:(OSStatus *)status {
+     NSMutableDictionary *searchDictionary = [self newSearchDictionary:identifier];
+ 
+     // Add search attributes
+@@ -62,8 +62,8 @@ - (NSString *)searchKeychainCopyMatching:(NSString *)identifier {
+ 
+     NSDictionary *found = nil;
+     CFTypeRef result = NULL;
+-    OSStatus status = SecItemCopyMatching((CFDictionaryRef)searchDictionary,
+-                                          (CFTypeRef *)&result);
++    *status = SecItemCopyMatching((CFDictionaryRef)searchDictionary,
++                                  (CFTypeRef *)&result);
+     
+     NSString *value = nil;
+     found = (__bridge NSDictionary*)(result);
+@@ -181,10 +181,14 @@ - (void)handleAppUninstallation
+ {
+     @try {
+         [self handleAppUninstallation];
+-        NSString *value = [self searchKeychainCopyMatching:key];
+-        if (value == nil) {
++        OSStatus status = errSecSuccess;
++        NSString *value = [self searchKeychainCopyMatching:key status:&status];
++        if (status == errSecItemNotFound) {
+             NSString* errorMessage = @"{\"message\":\"key does not present\"}";
+             reject(@"404", errorMessage, secureKeyStoreError(errorMessage));
++        } else if (value == nil) {
++            NSString* errorMessage = [NSString stringWithFormat:@"{\"message\":\"key could not be read\",\"status\":%d}", (int)status];
++            reject(@"1", errorMessage, secureKeyStoreError(errorMessage));
+         } else {
+             resolve(value);
+         }

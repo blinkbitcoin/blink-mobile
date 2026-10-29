@@ -150,9 +150,7 @@ const onSlot = <T>(
  * Only the keychain acknowledging a write counts as proof. The legacy `remove`
  * rejects with code "6" for a key that was never there (ios/RNSecureKeyStore.m
  * `remove:`, whose `deleteKeychainValue` returns NO on `errSecItemNotFound`), so
- * a failed erase is not evidence of anything on its own. Reading the key back
- * cannot settle it either: iOS `get:` reports every lookup that fails as a
- * missing key, so a keychain that is not answering would pass for an empty one.
+ * a failed erase is not evidence of anything on its own.
  *
  * A blank write settles it. It lands on a missing key and on a present one alike,
  * so a key another read already migrated away still finishes its removal, while a
