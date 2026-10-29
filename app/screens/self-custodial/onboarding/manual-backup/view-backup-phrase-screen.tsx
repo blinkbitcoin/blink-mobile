@@ -26,27 +26,21 @@ import { useViewBackupPhrase } from "../hooks"
 // The clear tertiary button has no padding, so its hit area is the text bounds.
 const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
+type ViewBackupPhraseContentProps = {
+  isAuthenticated: boolean
+}
+
 /** The gate mounts this only once the screenshot guard is actually on — the words
- *  and the header Copy action must not exist while registration is pending. The
- *  biometric prompt likewise fires only after the guard is active. */
-const ViewBackupPhraseContent: React.FC = () => {
-  const { LL } = useI18nContext()
+ *  and the header Copy action must not exist while registration is pending. */
+const ViewBackupPhraseContent: React.FC<ViewBackupPhraseContentProps> = ({
+  isAuthenticated,
+}) => {
   const styles = useStyles()
   const {
     theme: { colors },
   } = useTheme()
-  const handleAuthFailure = useAuthGateFailureHandler()
 
-  const authenticated = useLocalAuthGate({
-    description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),
-    onFailure: handleAuthFailure,
-    // Product decision (blink-wip#1064): with NO app lock configured, the user
-    // keeps one-tap access to their own backup phrase — the backup path is not
-    // blocked behind lock setup. A factor they did configure is still enforced.
-    required: false,
-  })
-
-  if (!authenticated) {
+  if (!isAuthenticated) {
     return (
       <Screen preset="fixed">
         <ActivityIndicator style={styles.loader} color={colors.primary} />
@@ -112,11 +106,30 @@ const BackupPhraseContent: React.FC = () => {
   )
 }
 
-export const ViewBackupPhraseScreen: React.FC = () => (
-  <ScreenSecurityGate>
-    <ViewBackupPhraseContent />
-  </ScreenSecurityGate>
-)
+export const ViewBackupPhraseScreen: React.FC = () => {
+  const { LL } = useI18nContext()
+  const handleAuthFailure = useAuthGateFailureHandler()
+
+  /** Held above the gate, which mounts its content again each time it re-activates
+   *  (a theme flip re-acquires the guard to apply the new mask color). Inside it, a
+   *  user who already authenticated would be prompted again, and a pin challenge
+   *  still on screen would answer a mount that is gone. The prompt shows nothing
+   *  sensitive, so it can run while the guard registers: the words still need both. */
+  const isAuthenticated = useLocalAuthGate({
+    description: LL.BackupScreen.ManualBackup.Phrase.authDescription(),
+    onFailure: handleAuthFailure,
+    // Product decision (blink-wip#1064): with NO app lock configured, the user
+    // keeps one-tap access to their own backup phrase — the backup path is not
+    // blocked behind lock setup. A factor they did configure is still enforced.
+    required: false,
+  })
+
+  return (
+    <ScreenSecurityGate>
+      <ViewBackupPhraseContent isAuthenticated={isAuthenticated} />
+    </ScreenSecurityGate>
+  )
+}
 
 const useStyles = makeStyles(() => ({
   loader: {
