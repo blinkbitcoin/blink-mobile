@@ -1,15 +1,17 @@
 import { Platform } from "react-native"
 
-import { renderHook } from "@testing-library/react-native"
+import { act, renderHook } from "@testing-library/react-native"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
 import useLogout from "@app/hooks/use-logout"
+import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 import { useRemoveStoredWallets } from "@app/self-custodial/hooks/use-remove-stored-wallets"
 import {
   addSelfCustodialAccountId,
   listSelfCustodialAccounts,
   StorageReadStatus,
 } from "@app/self-custodial/storage/account-index"
+import { legacyErase } from "@app/utils/storage/legacy-key-store"
 import KeyStoreWrapper, { GALOY_AUTH_TOKEN_KEY } from "@app/utils/storage/secureStorage"
 
 /**
@@ -22,7 +24,9 @@ import KeyStoreWrapper, { GALOY_AUTH_TOKEN_KEY } from "@app/utils/storage/secure
  * The process then reads the key as gone while the file still holds it, and the next
  * launch reads the file. `patches/react-native-secure-key-store+2.0.10.patch` makes `set`
  * and `remove` reject on that false, which is the answer these journeys depend on. A
- * commit with nothing to change writes no file, so removing a missing key still resolves.
+ * commit writes the whole map, and only while memory is ahead of the file
+ * (`SharedPreferencesImpl.writeToFile`), so removing a missing key resolves without a
+ * write unless an earlier one never reached the file, which it then tries again.
  */
 
 type LegacyPrefs = {
@@ -46,8 +50,16 @@ const mockCommitRejection = (code: number, message: string) =>
     code: "EUNSPECIFIED",
   })
 
+/** Memory holds an edit the file does not, from this call or from a commit that failed. */
+const mockIsFileBehind = (): boolean =>
+  mockLegacyPrefs.memory.size !== mockLegacyPrefs.file.size ||
+  [...mockLegacyPrefs.memory].some(
+    ([key, value]) => mockLegacyPrefs.file.get(key) !== value,
+  )
+
 /** False when the file write failed, like `commit()`. The memory change stays either way. */
 const mockCommit = (): boolean => {
+  if (!mockIsFileBehind()) return true
   if (mockLegacyPrefs.isFileWriteFailing) return false
   mockLegacyPrefs.file.clear()
   mockLegacyPrefs.memory.forEach((value, key) => mockLegacyPrefs.file.set(key, value))
@@ -67,18 +79,13 @@ jest.mock("react-native-secure-key-store", () => ({
       return value
     },
     set: async (key: string, value: string) => {
-      const isChanged = mockLegacyPrefs.memory.get(key) !== value
       mockLegacyPrefs.memory.set(key, value)
-      if (isChanged && !mockCommit()) {
-        throw mockCommitRejection(9, "write did not reach disk")
-      }
+      if (!mockCommit()) throw mockCommitRejection(9, "write did not reach disk")
       return "stored ciphertext in app storage"
     },
     remove: async (key: string) => {
-      const isChanged = mockLegacyPrefs.memory.delete(key)
-      if (isChanged && !mockCommit()) {
-        throw mockCommitRejection(6, "remove did not reach disk")
-      }
+      mockLegacyPrefs.memory.delete(key)
+      if (!mockCommit()) throw mockCommitRejection(6, "remove did not reach disk")
       return "cleared alias"
     },
   },
@@ -150,8 +157,16 @@ jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: jest.fn(),
 }))
 
+/** The one wallet the device stores, open in the app, so deleting it deletes the last one. */
+const mockStoredAccount = { type: "self-custodial", id: "stored-wallet" }
+
 jest.mock("@app/hooks/use-account-registry", () => ({
-  useAccountRegistry: () => ({ reloadSelfCustodialAccounts: async () => undefined }),
+  useAccountRegistry: () => ({
+    accounts: [mockStoredAccount],
+    activeAccount: mockStoredAccount,
+    setActiveAccountId: () => {},
+    reloadSelfCustodialAccounts: async () => undefined,
+  }),
 }))
 
 jest.mock("@app/hooks/use-has-custodial-account", () => ({
@@ -221,6 +236,15 @@ const logout = () => {
   return result.current.logout()
 }
 
+const deleteLastWallet = async () => {
+  const { result } = renderHook(() => useDeleteAccount())
+  let outcome: Awaited<ReturnType<typeof result.current.deleteWallet>>
+  await act(async () => {
+    outcome = await result.current.deleteWallet(WALLET_ID)
+  })
+  return outcome
+}
+
 const listedWalletIds = async (): Promise<ReadonlyArray<string>> => {
   const listed = await listSelfCustodialAccounts()
   if (listed.status === StorageReadStatus.ReadFailed) throw listed.error
@@ -255,6 +279,9 @@ beforeEach(async () => {
   mockNewKeychain.clear()
   await AsyncStorage.clear()
   await KeyStoreWrapper.setPin(PIN)
+  // A fresh launch: memory matches the file, which a write the module acknowledges is what
+  // tells the legacy store.
+  await legacyErase("launch")
 })
 
 describe("the forgotten-PIN removal on the Android legacy store", () => {
@@ -315,5 +342,65 @@ describe("a logout on the Android legacy store", () => {
     expect(isAppLockKept).toBe(false)
     expect(await KeyStoreWrapper.getPin()).toBeNull()
     expect([...mockLegacyPrefs.file.keys()]).toEqual([])
+  })
+})
+
+describe("the last wallet's deletion after a logout whose erase missed the disk", () => {
+  const SAVED_SESSIONS = JSON.stringify([{ token: "saved" }])
+  const SESSIONS_KEY = "sessionProfiles"
+
+  it("reads the saved sessions as unreadable, not as the erase memory already shows", async () => {
+    storeLegacyValue(SESSIONS_KEY, SAVED_SESSIONS)
+    mockLegacyPrefs.isFileWriteFailing = true
+
+    await logout()
+    const read = await KeyStoreWrapper.readSessionProfiles()
+
+    expect(mockLegacyPrefs.memory.get(SESSIONS_KEY)).not.toBe(SAVED_SESSIONS)
+    expect(mockLegacyPrefs.file.get(SESSIONS_KEY)).toBe(SAVED_SESSIONS)
+    expect(read.status).toBe("failed")
+  })
+
+  it("keeps the wallet and the lock while the disk still fails", async () => {
+    storeLegacyValue(SESSIONS_KEY, SAVED_SESSIONS)
+    await storeWallet(WALLET_ID)
+    mockLegacyPrefs.isFileWriteFailing = true
+    await logout()
+
+    const outcome = await deleteLastWallet()
+
+    expect(outcome).toBeUndefined()
+    expect(await listedWalletIds()).toEqual([WALLET_ID])
+    expect(mockLegacyPrefs.file.get(SESSIONS_KEY)).toBe(SAVED_SESSIONS)
+    expect(await KeyStoreWrapper.getPin()).toBe(PIN)
+  })
+
+  it("keeps the lock when the seed was already gone, since its erase retries the failing write", async () => {
+    storeLegacyValue(SESSIONS_KEY, SAVED_SESSIONS)
+    // Listed with no seed behind it: the state a run cut short right after the seed leaves.
+    await addSelfCustodialAccountId(WALLET_ID)
+    mockLegacyPrefs.isFileWriteFailing = true
+    await logout()
+
+    const outcome = await deleteLastWallet()
+
+    expect(outcome).toBeUndefined()
+    expect(mockLegacyPrefs.file.get(SESSIONS_KEY)).toBe(SAVED_SESSIONS)
+    expect(await KeyStoreWrapper.getPin()).toBe(PIN)
+  })
+
+  it("drops the lock once the disk is back, since the seed's write takes the sessions' erase to the file too", async () => {
+    storeLegacyValue(SESSIONS_KEY, SAVED_SESSIONS)
+    await storeWallet(WALLET_ID)
+    mockLegacyPrefs.isFileWriteFailing = true
+    await logout()
+    mockLegacyPrefs.isFileWriteFailing = false
+
+    const outcome = await deleteLastWallet()
+
+    expect(outcome).toBe("logged-out")
+    // Nothing a relaunch could read back: at most the blank, which reads as absent.
+    expect(mockLegacyPrefs.file.get(SESSIONS_KEY) ?? "").toBe("")
+    expect(await KeyStoreWrapper.getPin()).toBeNull()
   })
 })

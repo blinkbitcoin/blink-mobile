@@ -207,4 +207,79 @@ describe("legacy-key-store", () => {
       expect(await legacyBlank("PIN")).toBe(false)
     })
   })
+
+  describe("a write the Android module refused", () => {
+    /** The patched module rejects a commit that missed the disk with a bare message, which
+     *  React Native gives this code. Its in-memory map keeps the edit either way. */
+    const refusedCommit = () =>
+      Object.assign(new Error('{"code":6,"api-level":35,"message":did not reach disk}'), {
+        code: "EUNSPECIFIED",
+      })
+
+    /** Each case starts the way a launch does, with memory loaded from the file. A write the
+     *  module acknowledges is what tells the store so. */
+    beforeEach(async () => {
+      setPlatform("android")
+      mockRemove.mockResolvedValue("cleared alias")
+      await legacyErase("launch")
+      jest.clearAllMocks()
+    })
+
+    it("reads a key whose erase was refused as failed, not as the absence memory reports", async () => {
+      mockRemove.mockRejectedValue(refusedCommit())
+      mockGet.mockRejectedValue(keyNotFound())
+
+      await legacyErase("sessionProfiles")
+      const read = await legacyRead("sessionProfiles")
+
+      expect(read.status).toBe("failed")
+      expect(mockGet).not.toHaveBeenCalled()
+    })
+
+    it("reads a key whose blank was refused as failed, not as the blank memory holds", async () => {
+      mockSet.mockRejectedValue(refusedCommit())
+      mockGet.mockResolvedValue("")
+
+      await legacyBlank("sessionProfiles")
+
+      expect((await legacyRead("sessionProfiles")).status).toBe("failed")
+    })
+
+    it("still reads the keys no refused write touched", async () => {
+      mockRemove.mockRejectedValue(refusedCommit())
+      mockGet.mockResolvedValue("1234")
+
+      await legacyErase("sessionProfiles")
+
+      expect(await legacyRead("PIN")).toEqual({ status: "found", value: "1234" })
+    })
+
+    it("reads every key from the module again once a later write lands, since that write saves the whole file", async () => {
+      mockRemove.mockRejectedValue(refusedCommit())
+      await legacyErase("sessionProfiles")
+      await legacyErase("token")
+      mockSet.mockResolvedValue("stored ciphertext in app storage")
+      mockGet.mockRejectedValue(keyNotFound())
+
+      await legacyBlank("PIN")
+
+      expect(await legacyRead("sessionProfiles")).toEqual({ status: "absent" })
+      expect(await legacyRead("token")).toEqual({ status: "absent" })
+    })
+
+    it("leaves iOS reads to the keychain, which a refused write does not change", async () => {
+      setPlatform("ios")
+      mockRemove.mockRejectedValue(
+        Object.assign(new Error("could not delete key"), { code: "6" }),
+      )
+      mockGet.mockResolvedValue("saved")
+
+      await legacyErase("sessionProfiles")
+
+      expect(await legacyRead("sessionProfiles")).toEqual({
+        status: "found",
+        value: "saved",
+      })
+    })
+  })
 })

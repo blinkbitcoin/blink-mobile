@@ -82,10 +82,45 @@ const disableUninstallReset = (): void => {
 }
 
 /**
+ * Keys whose last write the Android module refused, kept for the reads after it.
+ *
+ * `SharedPreferences` applies an edit to its in-memory map before it writes the
+ * file, and a refused commit leaves the edit in place, so `get` goes on answering
+ * with a value the file does not hold: an erase that failed reads as absent until
+ * the process ends, and the next launch reads the old value back. Those keys read
+ * as failed instead.
+ *
+ * Every commit writes the whole map, and one that follows a refused commit writes
+ * even with nothing new in it (`SharedPreferencesImpl.writeToFile` compares the
+ * memory and disk generations). So the first write the module acknowledges brings
+ * the file level with memory for every key, and clears them all.
+ *
+ * Android only: a write the iOS keychain refuses changes nothing, and every iOS
+ * read asks the keychain itself. The seed reads `secureStorage.ts` still makes
+ * directly do not consult this, and none of them decides whether a lock goes.
+ */
+const keysAheadOfFile = new Set<string>()
+
+const recordWrite = (key: string, isWritten: boolean): void => {
+  if (Platform.OS !== "android") return
+  if (isWritten) {
+    keysAheadOfFile.clear()
+    return
+  }
+  keysAheadOfFile.add(key)
+}
+
+/**
  * An empty stored value reads as absent, matching the new store so that a slot
  * cannot change meaning by migrating.
  */
 export const legacyRead = async (key: string): Promise<SecureRead> => {
+  if (keysAheadOfFile.has(key)) {
+    return {
+      status: "failed",
+      err: new Error("Legacy key store write did not reach disk"),
+    }
+  }
   disableUninstallReset()
   try {
     const value: unknown = await RNSecureKeyStore.get(key)
@@ -102,7 +137,7 @@ export const legacyRead = async (key: string): Promise<SecureRead> => {
  * False covers both a failed erase and a key that was never there: iOS `remove:`
  * rejects with code "6" when `deleteKeychainValue` gets `errSecItemNotFound`.
  * On Android a missing key resolves, and a removal resolves only once it is on
- * disk (see the module doc).
+ * disk (see the module doc). Either answer is recorded for the reads after it.
  *
  * Not guarded, unlike the read: `remove:` is the one entry point that never
  * reaches `handleAppUninstallation`, so the guard would be a bridge call that
@@ -111,8 +146,10 @@ export const legacyRead = async (key: string): Promise<SecureRead> => {
 export const legacyErase = async (key: string): Promise<boolean> => {
   try {
     await RNSecureKeyStore.remove(key)
+    recordWrite(key, true)
     return true
   } catch {
+    recordWrite(key, false)
     return false
   }
 }
@@ -135,7 +172,7 @@ const BLANK_OPTIONS = { accessible: ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ON
  * adds the item or replaces the one already there and resolves only once the keychain took
  * the write, so a key that was already gone blanks as cleanly as one that held a value,
  * while a failing keychain refuses. On Android `set` resolves only once the blank is on
- * disk, so it is the same proof there.
+ * disk, so it is the same proof there, and its answer is recorded like an erase's.
  *
  * Guarded like the read: `set:` reaches the reinstall wipe.
  */
@@ -143,8 +180,10 @@ export const legacyBlank = async (key: string): Promise<boolean> => {
   disableUninstallReset()
   try {
     await RNSecureKeyStore.set(key, BLANK, BLANK_OPTIONS)
+    recordWrite(key, true)
     return true
   } catch {
+    recordWrite(key, false)
     return false
   }
 }
