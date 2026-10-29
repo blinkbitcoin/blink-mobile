@@ -753,6 +753,36 @@ describe("KeyStoreWrapper PIN attempt state", () => {
       expect(legacyErases).toHaveLength(1)
     })
 
+    /**
+     * The current key shadows a legacy count that would not erase only until a clear erases
+     * that key. Remembered as done, the failed erase would be skipped by that clear, and the
+     * next launch would read the old count back and spend the budget on one more typo.
+     */
+    it("tries a failed legacy erase again, so a later clear cannot bring the old count back", async () => {
+      await readsLegacyCount("2")
+      const stored: Record<string, string> = { pinAttempts: "2" }
+      let isLegacyEraseFailing = true
+      mockGet.mockImplementation(async (key: string) => {
+        if (key in stored) return stored[key]
+        throw missingKey(`${key} has not been set`)
+      })
+      const isLockedKey = (key: string) => key === "pinAttempts" && isLegacyEraseFailing
+      mockRemove.mockImplementation(async (key: string) => {
+        if (isLockedKey(key)) throw new Error("keystore locked")
+        delete stored[key]
+      })
+      mockSet.mockImplementation(async (key: string, value: string) => {
+        if (isLockedKey(key)) throw new Error("keystore locked")
+        stored[key] = value
+      })
+
+      await KeyStoreWrapper.setPinFailureState({ attempts: 3, lockedUntil: 0 })
+      isLegacyEraseFailing = false
+
+      expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({ status: "absent" })
+    })
+
     it("reports failure — and leaves the legacy key alone — when the write is rejected", async () => {
       // Single write, so `false` is the whole truth: nothing was recorded, and
       // the caller must treat the failure as unrecorded rather than half-kept.

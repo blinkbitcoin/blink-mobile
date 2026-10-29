@@ -91,8 +91,9 @@ const serializePinFailureState = (state: PinFailureState): string =>
  * Whether the legacy attempt count may still be stored, remembered for the life of the
  * process. Erasing it on every write and clear costs native round trips on the unlock path
  * for a slot an upgrade empties once. So it is erased by the first write or clear in a
- * process, and again only after a read finds a count in it. An erase that fails leaves a
- * stale entry the current key shadows on read, so one attempt is enough.
+ * process, and again only after a read finds a count in it. Only an erase that succeeds
+ * settles it: the current key shadows a stale count just until a clear erases that key, and
+ * the next launch would read the old count back, so a failed erase is tried again.
  */
 let mayLegacyPinAttemptsRemain = true
 
@@ -362,12 +363,18 @@ export default class KeyStoreWrapper {
     return written
   }
 
-  /** Erases the legacy attempt count unless this process already tried. True when
-   *  there was nothing left to try, so a clear does not re-read over a slot it skipped. */
+  /** Erases the legacy attempt count unless this process already erased it. True when
+   *  there was nothing left to erase, so a clear does not re-read over a slot it skipped. */
   private static async eraseLegacyPinAttemptsOnce(): Promise<boolean> {
     if (!mayLegacyPinAttemptsRemain) return true
-    mayLegacyPinAttemptsRemain = false
-    return KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
+    const isErased = await KeyStoreWrapper.migratedErase(
+      KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
+    )
+    /** Set after the await on purpose: reads and erases of the slot take turns in one
+     *  queue, so a read that found a count before this erase ran was answered first, and
+     *  the slot this settles is empty. */
+    if (isErased) mayLegacyPinAttemptsRemain = false // eslint-disable-line require-atomic-updates
+    return isErased
   }
 
   /**
