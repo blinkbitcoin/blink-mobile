@@ -3035,7 +3035,8 @@
         "problemPersists": "Bitte kontaktiere uns, wenn dieses Problem weiterhin besteht.",
         "fatalError": "Entschuldige, die Applikationsdaten konnten nicht geladen werden. Bitte kontaktiere uns, wenn dieses Problem weiterhin besteht.",
         "showError": "Fehler anzeigen",
-        "clearAppData": "App-Daten löschen und ausloggen"
+        "clearAppData": "App-Daten löschen und ausloggen",
+        "screenSecurityUnavailable": "Dieser Bildschirm bleibt ausgeblendet, weil der Screenshot-Schutz nicht aktiviert werden konnte."
     },
     "notifications": {
         "payment": {

@@ -10134,6 +10134,10 @@ type RootTranslation = {
 		 * C​l​e​a​r​ ​A​p​p​ ​D​a​t​a​ ​a​n​d​ ​L​o​g​o​u​t
 		 */
 		clearAppData: string
+		/**
+		 * T​h​i​s​ ​s​c​r​e​e​n​ ​s​t​a​y​s​ ​h​i​d​d​e​n​ ​b​e​c​a​u​s​e​ ​s​c​r​e​e​n​s​h​o​t​ ​p​r​o​t​e​c​t​i​o​n​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​t​u​r​n​e​d​ ​o​n​.
+		 */
+		screenSecurityUnavailable: string
 	}
 	notifications: {
 		payment: {
@@ -24252,6 +24256,10 @@ export type TranslationFunctions = {
 		 * Clear App Data and Logout
 		 */
 		clearAppData: () => LocalizedString
+		/**
+		 * This screen stays hidden because screenshot protection could not be turned on.
+		 */
+		screenSecurityUnavailable: () => LocalizedString
 	}
 	notifications: {
 		payment: {

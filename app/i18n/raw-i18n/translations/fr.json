@@ -3035,7 +3035,8 @@
         "problemPersists": "Si le problème persiste, contactez le support technique.",
         "fatalError": "Désolé, nous semblons avoir des problèmes pour charger les données de l’application. Si le problème persiste, merci de contacter le support technique.",
         "showError": "Afficher l’erreur",
-        "clearAppData": "Effacer les données de l’application et se déconnecter"
+        "clearAppData": "Effacer les données de l’application et se déconnecter",
+        "screenSecurityUnavailable": "Cet écran reste masqué, car la protection contre les captures d'écran n'a pas pu être activée."
     },
     "notifications": {
         "payment": {

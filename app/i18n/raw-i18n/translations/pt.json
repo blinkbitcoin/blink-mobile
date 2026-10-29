@@ -3035,7 +3035,8 @@
         "problemPersists": "Se o problema persistir entre em contato com o suporte.",
         "fatalError": "Desculpe, parece que estamos tendo problemas para carregar os dados do aplicativo. Se os problemas persistirem, entre em contato com o suporte.",
         "showError": "Mostrar erro",
-        "clearAppData": "Apagar Informação do App e Sair"
+        "clearAppData": "Apagar Informação do App e Sair",
+        "screenSecurityUnavailable": "Esta tela permanece oculta porque não foi possível ativar a proteção contra capturas de tela."
     },
     "notifications": {
         "payment": {

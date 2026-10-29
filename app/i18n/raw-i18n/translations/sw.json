@@ -3035,7 +3035,8 @@
     "problemPersists": "Tatizo likiendelea wasiliana na usaidizi",
     "fatalError": "Pole, inaonekana kwamba tunatatizika kupakua data ya aplikisheni. Tatizo likiendelea tafadhali wasiliana na usaidizi. ",
     "showError": "Onyesha kosa",
-    "clearAppData": "Ondoa Data ya Programu na Toka"
+    "clearAppData": "Ondoa Data ya Programu na Toka",
+    "screenSecurityUnavailable": "Skrini hii inabaki imefichwa kwa sababu ulinzi dhidi ya picha za skrini haukuweza kuwashwa."
   },
   "notifications": {
     "payment": {

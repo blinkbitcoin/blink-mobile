@@ -3035,7 +3035,8 @@
     "problemPersists": "Jika masalah berlanjut, hubungi dukungan.",
     "fatalError": "Maaf, tampaknya ada masalah dalam memuat data aplikasi. Jika masalah berlanjut, silakan hubungi dukungan.",
     "showError": "Tampilkan Kesalahan",
-    "clearAppData": "Hapus Data Aplikasi dan Keluar"
+    "clearAppData": "Hapus Data Aplikasi dan Keluar",
+    "screenSecurityUnavailable": "Layar ini tetap disembunyikan karena perlindungan tangkapan layar tidak dapat diaktifkan."
   },
   "notifications": {
     "payment": {

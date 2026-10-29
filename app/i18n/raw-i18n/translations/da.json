@@ -3035,7 +3035,8 @@
     "problemPersists": "Hvis problemet fortsætter, kontakt support.",
     "fatalError": "Beklager, det lader til at vi har problemer med at indlæse applikationsdataene. Hvis problemerne fortsætter, kontakt support.",
     "showError": "Vis fejl",
-    "clearAppData": "Ryd appdata og log ud"
+    "clearAppData": "Ryd appdata og log ud",
+    "screenSecurityUnavailable": "Denne skærm forbliver skjult, fordi beskyttelse mod skærmbilleder ikke kunne slås til."
   },
   "notifications": {
     "payment": {

@@ -3035,7 +3035,8 @@
         "problemPersists": "Si el problema persiste, comuníquese con el soporte técnico.",
         "fatalError": "Lo sentimos, parece que estamos teniendo problemas para cargar la aplicación por usted. Si los problemas persisten, comuníquese con el soporte técnico.",
         "showError": "Mostrar error",
-        "clearAppData": "Borrar datos de la aplicación y cerrar sesión"
+        "clearAppData": "Borrar datos de la aplicación y cerrar sesión",
+        "screenSecurityUnavailable": "Esta pantalla se mantiene oculta porque no se pudo activar la protección contra capturas de pantalla."
     },
     "notifications": {
         "payment": {

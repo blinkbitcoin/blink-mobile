@@ -3035,7 +3035,8 @@
         "problemPersists": "Se il problema persiste, contattare l'assistenza.",
         "fatalError": "Siamo spiacenti, sembra che si stiano verificando dei problemi nel caricamento dei dati dell'applicazione. Se i problemi persistono, contattare l'assistenza.",
         "showError": "Mostra errore",
-        "clearAppData": "Cancella i dati dell'app e disconnettiti"
+        "clearAppData": "Cancella i dati dell'app e disconnettiti",
+        "screenSecurityUnavailable": "Questa schermata resta nascosta perché non è stato possibile attivare la protezione dagli screenshot."
     },
     "notifications": {
         "payment": {

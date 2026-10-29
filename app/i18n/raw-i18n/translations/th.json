@@ -3035,7 +3035,8 @@
     "problemPersists": "หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "fatalError": "ขออภัย เราพบปัญหาในการโหลดข้อมูลแอปพลิเคชั่น หากปัญหานี้ยังคงไม่หายไป กรุณาติดต่อศูนย์ช่วยเหลือ",
     "showError": "ไม่สามารถแสดงได้",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "หน้าจอนี้ยังคงถูกซ่อนไว้ เนื่องจากไม่สามารถเปิดการป้องกันการจับภาพหน้าจอได้"
   },
   "notifications": {
     "payment": {

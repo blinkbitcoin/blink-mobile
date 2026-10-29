@@ -3035,7 +3035,8 @@
     "problemPersists": "Nếu vấn đề vẫn tiếp diễn liên hệ hỗ trợ.",
     "fatalError": "Xin lỗi, chúng tôi dường như đang gặp sự cố khi tải dữ liệu ứng dụng. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với hỗ trợ.",
     "showError": "Hiển thị lỗi",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "Màn hình này vẫn bị ẩn vì không thể bật tính năng chống chụp màn hình."
   },
   "notifications": {
     "payment": {

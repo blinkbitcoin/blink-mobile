@@ -3035,7 +3035,8 @@
     "problemPersists": "Ha a probléma továbbra is fennáll, lépj kapcsolatba az ügyfélszolgálattal.",
     "fatalError": "Sajnáljuk, problémák merültek fel az alkalmazás adatainak betöltése során. Ha a problémák továbbra is fennállnak, kérjük, lépjen kapcsolatba a ügyfélszolgálattal.",
     "showError": "Hiba megjelenítése",
-    "clearAppData": "Alkalmazásadatok törlése és kijelentkezés"
+    "clearAppData": "Alkalmazásadatok törlése és kijelentkezés",
+    "screenSecurityUnavailable": "Ez a képernyő rejtve marad, mert nem sikerült bekapcsolni a képernyőkép elleni védelmet."
   },
   "notifications": {
     "payment": {

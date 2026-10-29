@@ -3035,7 +3035,8 @@
     "problemPersists": "Problem devam ederse destek birimine ulaşın",
     "fatalError": "Üzgünüz, uygulama verilerini yüklerken sorun yaşıyoruz gibi görünüyor. Sorunlar devam ederse lütfen destek ekibiyle iletişime geçin.",
     "showError": "Hatayı göster",
-    "clearAppData": "Uygulama Verilerini Temizleme ve Oturumu Kapatma"
+    "clearAppData": "Uygulama Verilerini Temizleme ve Oturumu Kapatma",
+    "screenSecurityUnavailable": "Ekran görüntüsü koruması açılamadığı için bu ekran gizli kalıyor."
   },
   "notifications": {
     "payment": {

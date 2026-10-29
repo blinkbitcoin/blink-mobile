@@ -3035,7 +3035,8 @@
     "problemPersists": "Kawsayninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
     "fatalError": "Ñuqaqmi, kaypiqa, kawsayninmanta, aplicacionta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Ñuqaqmi, kawsayninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
     "showError": "Llank'ayta kani",
-    "clearAppData": "Puriytaqmi hanaq p'anta kullaywanmi k'uchuchuni"
+    "clearAppData": "Puriytaqmi hanaq p'anta kullaywanmi k'uchuchuni",
+    "screenSecurityUnavailable": "Kay pantallaqa pakasqallam qhepan, pantalla capturakunamanta amachayta mana hap'ichiyta atisqanrayku."
   },
   "notifications": {
     "payment": {

@@ -83,7 +83,7 @@ const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
     <Screen preset="fixed">
       <View style={styles.errorContainer}>
         <Text style={styles.errorText} {...testProps("screen-security-error")}>
-          {LL.errors.generic()}
+          {LL.errors.screenSecurityUnavailable()}
         </Text>
         <GaloyPrimaryButton
           title={LL.common.tryAgain()}

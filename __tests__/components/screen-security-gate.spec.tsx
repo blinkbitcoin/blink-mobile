@@ -3,6 +3,7 @@ import { Text } from "react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
 
 import { ScreenSecurityGate } from "@app/components/screen-security-gate"
+import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import type { ScreenSecurityLease } from "@app/utils/screen-security"
 
@@ -111,6 +112,19 @@ describe("ScreenSecurityGate", () => {
 
     fireEvent.press(getByTestId("screen-security-back"))
     expect(mockGoBack).toHaveBeenCalledTimes(1)
+  })
+
+  /** The failure is the device's, not a passing error, so the view names it rather
+   *  than suggesting a later retry will help. */
+  it("says the screen stays hidden because screenshot protection is off", async () => {
+    const lease = pendingLease()
+
+    const { getByText } = renderGated()
+    await act(async () => {})
+    lease.reject(new Error("native failure"))
+    await act(async () => {})
+
+    expect(getByText(i18nObject("en").errors.screenSecurityUnavailable())).toBeTruthy()
   })
 
   it("releases the failed lease and acquires a fresh one when retry is pressed", async () => {

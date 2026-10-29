@@ -3035,7 +3035,8 @@
     "problemPersists": "Pokud problém přetrvává, kontaktujte podporu.",
     "fatalError": "Omlouváme se, ale zdá se, že máme problémy s načítáním dat aplikace. Pokud problémy přetrvávají, kontaktujte prosím podporu.",
     "showError": "Zobrazit chybu",
-    "clearAppData": "Vymazat aplikační data a odhlásit"
+    "clearAppData": "Vymazat aplikační data a odhlásit",
+    "screenSecurityUnavailable": "Tato obrazovka zůstává skrytá, protože se nepodařilo zapnout ochranu proti snímkům obrazovky."
   },
   "notifications": {
     "payment": {

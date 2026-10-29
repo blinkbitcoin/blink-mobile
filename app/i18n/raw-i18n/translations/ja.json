@@ -3035,7 +3035,8 @@
         "problemPersists": "問題が解決しない場合は、サポートにお問い合わせください。",
         "fatalError": "アプリケーションデータの読み込みに問題があるようです。 問題が解決しない場合は、サポートにお問い合わせください。",
         "showError": "エラーを表示する",
-        "clearAppData": "アプリのデータを消去してログアウトする"
+        "clearAppData": "アプリのデータを消去してログアウトする",
+        "screenSecurityUnavailable": "スクリーンショット保護をオンにできなかったため、この画面は非表示のままです。"
     },
     "notifications": {
         "payment": {

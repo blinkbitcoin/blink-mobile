@@ -3035,7 +3035,8 @@
     "problemPersists": "If problem persists contact support.",
     "fatalError": "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     "showError": "Show Error",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "Esi sikrini sihlala sifihliwe kuba ukhuseleko ekuthatheni imifanekiso yesikrini aluzange lukwazi ukuvulwa."
   },
   "notifications": {
     "payment": {

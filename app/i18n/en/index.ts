@@ -3182,6 +3182,8 @@ const en: BaseTranslation = {
       "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     showError: "Show Error",
     clearAppData: "Clear App Data and Logout",
+    screenSecurityUnavailable:
+      "This screen stays hidden because screenshot protection could not be turned on.",
   },
   notifications: {
     payment: {

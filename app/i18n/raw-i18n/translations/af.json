@@ -3035,7 +3035,8 @@
     "problemPersists": "As die fout aanhou opduik, kontak asseblief ondersteuning. ",
     "fatalError": "Jammer, dit lyk of ons probleme het met die toepassing se data. As die probleem voortduur, kontak asseblief ondersteuning.",
     "showError": "Wys Fout",
-    "clearAppData": "Vee Toepassingdata skoon en Teken Uit"
+    "clearAppData": "Vee Toepassingdata skoon en Teken Uit",
+    "screenSecurityUnavailable": "Hierdie skerm bly versteek omdat skermskootbeskerming nie aangeskakel kon word nie."
   },
   "notifications": {
     "payment": {

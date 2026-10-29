@@ -3035,7 +3035,8 @@
     "problemPersists": "تواصل مع مركز الدعم اذا استمرت المشكلة.",
     "fatalError": "نأسف على ما يبدو أننا نواجه مشكلات في تحميل بيانات التطبيق. إذا استمرت المشاكل يرجى الاتصال بالدعم.",
     "showError": "إظهار الخطأ",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "تبقى هذه الشاشة مخفية لأنه تعذّر تفعيل الحماية من لقطات الشاشة."
   },
   "notifications": {
     "payment": {

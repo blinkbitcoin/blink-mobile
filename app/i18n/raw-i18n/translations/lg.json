@@ -3035,7 +3035,8 @@
     "problemPersists": "Ekizibu bw'ekisigalawo tutukirire.",
     "fatalError": "Bambi tulabika tulina ensonga mu kutikka eby'okunonyereza byo ebya application. Singa ebizibu bikyaliwo tukusaba otuukirire abayambi.",
     "showError": "Laga Ensobi",
-    "clearAppData": "Sangula Eby'okunonyeereza ku App omale ofulume"
+    "clearAppData": "Sangula Eby'okunonyeereza ku App omale ofulume",
+    "screenSecurityUnavailable": "Olupapula luno lusigala nga lukwekeddwa kubanga obukuumi obuziyiza okukwata ebifaananyi by'olupapula tebusobose kutandikibwa."
   },
   "notifications": {
     "payment": {
