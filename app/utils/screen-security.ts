@@ -37,7 +37,12 @@ export type ScreenSecurityLease = {
  *  retries rejected a lease that had joined it, whose own cycle then landed the
  *  guard behind a failure view. A task that finds the guard already registered with
  *  its lease's color resolves at once, so stacked screens still share one native
- *  registration. */
+ *  registration.
+ *
+ *  A resolved register is taken as the guard being on. On Android the library's
+ *  `activateShield` returned without applying `FLAG_SECURE` when there was no
+ *  current Activity, so `patches/react-native-screenguard+2.0.0-beta5.patch` makes
+ *  it reject instead, which the retries treat as any failed attempt. */
 let leaseCount = 0
 let registered = false
 /** The color the live guard was registered with. `registered` alone cannot tell a

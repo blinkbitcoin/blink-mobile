@@ -1,0 +1,13 @@
+diff --git a/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java b/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java
+index 287dc26..95e9161 100644
+--- a/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java
++++ b/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java
+@@ -303,7 +303,7 @@ public class ScreenGuardModule implements LifecycleEventListener {
+         Activity currentActivity = currentReactContext.getCurrentActivity();
+ 
+         if (currentActivity == null) {
+-            return;
++            throw new IllegalStateException("No current activity, FLAG_SECURE was not applied");
+         }
+         mainActivityRef = new WeakReference<>(currentActivity);
+ 
