@@ -59,6 +59,30 @@ let pending: Promise<void> = Promise.resolve()
 const ENABLE_RETRY_DELAY_MS = 10_000
 const ENABLE_RETRY_LIMIT = 3
 
+/** The retries bound a native call that rejects, not one that never settles, and such
+ *  a call would hold the queue for good: every protected screen behind it would stay
+ *  on its spinner. Each call is bounded, and one that runs out of time fails like one
+ *  that rejected, so the retries and the teardown carry on. */
+const NATIVE_CALL_TIMEOUT_MS = 5_000
+
+const withinTimeout = <T>(call: Promise<T>): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const timer = setTimeout(
+      () => reject(new Error("Screen security native call timed out")),
+      NATIVE_CALL_TIMEOUT_MS,
+    )
+    call.then(
+      (value) => {
+        clearTimeout(timer)
+        resolve(value)
+      },
+      (error: unknown) => {
+        clearTimeout(timer)
+        reject(error)
+      },
+    )
+  })
+
 /** What one acquire asked for, and how to answer it. The cycle checks `released`
  *  rather than the lease count: a lease that is gone has nobody to settle and no
  *  reason to keep registering, while any other live lease has a task of its own. */
@@ -136,8 +160,8 @@ const registerWithRetries = async (registration: Registration): Promise<void> =>
     attempt += 1
   ) {
     try {
-      await ScreenGuard.initSettings()
-      await ScreenGuard.register({ backgroundColor: registration.color })
+      await withinTimeout(ScreenGuard.initSettings())
+      await withinTimeout(ScreenGuard.register({ backgroundColor: registration.color }))
       return
     } catch (error) {
       lastError = error
@@ -193,7 +217,7 @@ const startRegistration = (registration: Registration): void => {
           // reported rather than rethrown, so the lease fails with the error that
           // caused the teardown, and `forgetGuard` keeps the state recoverable.
           try {
-            await ScreenGuard.unregister()
+            await withinTimeout(ScreenGuard.unregister())
           } catch (unregisterError) {
             reportError("Disable screen security", unregisterError)
           } finally {
@@ -247,7 +271,7 @@ export const acquireScreenSecurity = (backgroundColor: string): ScreenSecurityLe
     releasePromise = enqueue(async () => {
       if (leaseCount > 0 || !registered) return
       try {
-        await ScreenGuard.unregister()
+        await withinTimeout(ScreenGuard.unregister())
       } finally {
         // No later release can reach this task to retry a rejected unregister, so
         // the state is forgotten either way; the rejection still propagates so the

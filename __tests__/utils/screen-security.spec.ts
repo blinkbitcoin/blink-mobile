@@ -49,6 +49,11 @@ const settlementOf = (ready: Promise<void>) => {
 // there should fail here.
 const RETRY_DELAY_MS = 10_000
 const RETRY_LIMIT = 3
+// Must match NATIVE_CALL_TIMEOUT_MS in the manager.
+const NATIVE_CALL_TIMEOUT_MS = 5_000
+
+/** A native call that neither resolves nor rejects, as a wedged bridge would. */
+const never = () => new Promise<never>(() => {})
 
 describe("screen-security", () => {
   beforeEach(() => {
@@ -548,5 +553,79 @@ describe("screen-security", () => {
 
     expect(mockRegister).toHaveBeenCalledTimes(3)
     expect(mockUnregister).toHaveBeenCalledTimes(2)
+  })
+  /** The retries bound rejected calls only: a native call that never settles would
+   *  hold the queue for good, leaving every protected screen on its spinner. Each
+   *  call is bounded, and a call that runs out of time counts as a failed attempt. */
+  describe("a native call that never settles", () => {
+    it("fails the attempt whose register never settles and retries it", async () => {
+      const { acquireScreenSecurity } = loadModule()
+      mockRegister.mockReturnValueOnce(never())
+
+      const lease = acquireScreenSecurity("#000000")
+      const settled = settlementOf(lease.ready)
+      await jest.advanceTimersByTimeAsync(NATIVE_CALL_TIMEOUT_MS + RETRY_DELAY_MS)
+
+      expect(settled).toHaveBeenCalledWith("resolved")
+      expect(mockRegister).toHaveBeenCalledTimes(2)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Enable screen security",
+        expect.any(Error),
+      )
+    })
+
+    it("fails the attempt whose initSettings never settles and retries it", async () => {
+      const { acquireScreenSecurity } = loadModule()
+      mockInitSettings.mockReturnValueOnce(never())
+
+      const lease = acquireScreenSecurity("#000000")
+      const settled = settlementOf(lease.ready)
+      await jest.advanceTimersByTimeAsync(NATIVE_CALL_TIMEOUT_MS + RETRY_DELAY_MS)
+
+      expect(settled).toHaveBeenCalledWith("resolved")
+      expect(mockRegister).toHaveBeenCalledTimes(1)
+    })
+
+    it("rejects the lease once every attempt has run out of time, and frees the queue", async () => {
+      const { acquireScreenSecurity } = loadModule()
+      mockRegister.mockImplementation(never)
+
+      const stuck = acquireScreenSecurity("#000000")
+      const settled = settlementOf(stuck.ready)
+      await jest.advanceTimersByTimeAsync(
+        NATIVE_CALL_TIMEOUT_MS * (RETRY_LIMIT + 1) + RETRY_DELAY_MS * RETRY_LIMIT,
+      )
+      expect(settled).toHaveBeenCalledWith("rejected")
+      await stuck.release()
+
+      mockRegister.mockResolvedValue(undefined)
+      const next = acquireScreenSecurity("#000000")
+      await jest.advanceTimersByTimeAsync(0)
+      await next.ready
+
+      expect(mockRegister).toHaveBeenCalledTimes(RETRY_LIMIT + 2)
+    })
+
+    it("lets the next lease register after an unregister that never settles", async () => {
+      const { acquireScreenSecurity } = loadModule()
+
+      const first = acquireScreenSecurity("#000000")
+      await first.ready
+      mockUnregister.mockReturnValueOnce(never())
+      const released = first.release()
+      const releaseSettled = jest.fn()
+      released.then(
+        () => releaseSettled("resolved"),
+        () => releaseSettled("rejected"),
+      )
+      await jest.advanceTimersByTimeAsync(NATIVE_CALL_TIMEOUT_MS)
+      expect(releaseSettled).toHaveBeenCalledWith("rejected")
+
+      const second = acquireScreenSecurity("#000000")
+      await jest.advanceTimersByTimeAsync(0)
+      await second.ready
+
+      expect(mockRegister).toHaveBeenCalledTimes(2)
+    })
   })
 })
