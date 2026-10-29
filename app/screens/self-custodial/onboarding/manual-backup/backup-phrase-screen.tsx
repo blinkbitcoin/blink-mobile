@@ -31,19 +31,16 @@ const HEADER_BUTTON_HIT_SLOP = { top: 12, bottom: 12, left: 12, right: 12 }
 
 type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase">
 
+type BackupPhraseContentProps = {
+  step: PhraseStep
+}
+
 /** The gate mounts this only once the screenshot guard is actually on — the words
  *  and the header Copy action must not exist while registration is pending. */
-const BackupPhraseContent: React.FC = () => {
+const BackupPhraseContent: React.FC<BackupPhraseContentProps> = ({ step }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-
-  /** Deep links and navigation-state rehydration can deliver missing or malformed params
-   *  despite the route type; a bare destructure here threw into the app-wide ErrorBoundary,
-   *  replacing the whole navigation tree (#4070). Fall back to the first six words. The
-   *  report lives in the screen wrapper below, ahead of the gate. */
-  const stepParam = useRoute<PhraseRouteProp>().params?.step
-  const step = isPhraseStep(stepParam) ? stepParam : PhraseStep.First
 
   const {
     firstCard,
@@ -121,24 +118,29 @@ const BackupPhraseContent: React.FC = () => {
 }
 
 export const BackupPhraseScreen: React.FC = () => {
+  /** Deep links and navigation-state rehydration can deliver missing or malformed params
+   *  despite the route type; a bare destructure threw into the app-wide ErrorBoundary,
+   *  replacing the whole navigation tree (#4070). Fall back to the first six words, which
+   *  is benign since step 1 is this screen's own entry. */
+  const stepParam = useRoute<PhraseRouteProp>().params?.step
+  const hasValidStep = isPhraseStep(stepParam)
+  const step = hasValidStep ? stepParam : PhraseStep.First
+
   // Report ahead of the gate, not inside the gated content: on a device where
   // registration keeps failing the content never mounts, and the signal that the
-  // route delivered no valid step would be lost with it. The fallback itself is
-  // benign (step 1 is this screen's own entry), so the content keeps it.
-  const stepParam = useRoute<PhraseRouteProp>().params?.step
-
+  // route delivered no valid step would be lost with it.
   useEffect(() => {
-    if (isPhraseStep(stepParam)) return
+    if (hasValidStep) return
     reportError(
       "Backup phrase route params missing",
       new Error("Route delivered no valid step"),
       { dedupKey: "backup-phrase-params-missing", alwaysRecord: true },
     )
-  }, [stepParam])
+  }, [hasValidStep])
 
   return (
     <ScreenSecurityGate>
-      <BackupPhraseContent />
+      <BackupPhraseContent step={step} />
     </ScreenSecurityGate>
   )
 }
