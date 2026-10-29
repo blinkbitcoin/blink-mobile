@@ -2,9 +2,13 @@ import { useCallback, useRef } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { CONTACT_EMAIL_ADDRESS } from "@app/config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
-import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
+import {
+  type DeleteAccountOutcome,
+  useDeleteAccount,
+} from "@app/self-custodial/hooks/use-delete-account"
 import { toastShow } from "@app/utils/toast"
 
 import { useAccountDeleteContext } from "../account/account-delete-context"
@@ -47,6 +51,19 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     pendingRemoval.current = null
   }, [])
 
+  /** A failed removal of the last account lands on Get started, which has no way back
+   *  to the account, so offering a retry there would promise something the app can't do. */
+  const failureMessage = useCallback(
+    (identifier: string, outcome: DeleteAccountOutcome) =>
+      outcome === "logged-out"
+        ? LL.SelfCustodialDelete.removalIncomplete({
+            identifier,
+            email: CONTACT_EMAIL_ADDRESS,
+          })
+        : LL.SelfCustodialDelete.removalFailed({ identifier }),
+    [LL],
+  )
+
   const runPendingRemoval = useCallback(async () => {
     const removal = pendingRemoval.current
     if (!removal) return
@@ -70,10 +87,17 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
       type: removed ? "success" : "error",
       message: removed
         ? LL.ProfileScreen.removedAccount({ identifier })
-        : LL.SelfCustodialDelete.removalFailed({ identifier }),
+        : failureMessage(identifier, outcome),
       LL,
     })
-  }, [deleteWallet, setAccountIsBeingDeleted, leaveWhileDeleting, navigation, LL])
+  }, [
+    deleteWallet,
+    setAccountIsBeingDeleted,
+    leaveWhileDeleting,
+    navigation,
+    failureMessage,
+    LL,
+  ])
 
   return { requestRemoval, cancelRemoval, runPendingRemoval }
 }

@@ -24,6 +24,13 @@ jest.mock("@app/i18n/i18n-react", () => ({
       SelfCustodialDelete: {
         removalFailed: ({ identifier }: { identifier: string }) =>
           `Couldn't remove account ${identifier}. Please try again.`,
+        removalIncomplete: ({
+          identifier,
+          email,
+        }: {
+          identifier: string
+          email: string
+        }) => `Couldn't fully remove account ${identifier}. Contact ${email} for help.`,
       },
     },
   }),
@@ -145,6 +152,30 @@ describe("useAccountRemoval", () => {
       expect.objectContaining({
         type: "error",
         message: "Couldn't remove account Anon user. Please try again.",
+      }),
+    )
+  })
+
+  /** The last account is gone from the active slot, so the user lands on Get started,
+   *  where nothing leads back to it: the copy points to support instead of a retry. */
+  it("sends a failed removal of the last account to Get started, pointing to support", async () => {
+    mockDeleteWallet.mockResolvedValue({ removed: false, outcome: "logged-out" })
+    const { result } = renderHook(() => useAccountRemoval())
+
+    act(() => result.current.requestRemoval("account-a", "Anon user"))
+    await act(() => result.current.runPendingRemoval())
+
+    expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
+    expect(mockDispatch).toHaveBeenCalledWith({
+      type: "reset",
+      payload: { index: 0, routes: [{ name: "getStarted" }] },
+    })
+    expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({
+        type: "error",
+        message:
+          "Couldn't fully remove account Anon user. Contact support@blink.sv for help.",
       }),
     )
   })
