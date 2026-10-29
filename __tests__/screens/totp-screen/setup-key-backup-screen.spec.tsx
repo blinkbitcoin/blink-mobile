@@ -20,13 +20,12 @@ jest.mock("@react-navigation/native", () => ({
   useRoute: () => ({ params: { secret: "ABCD EFGH IJKL", userId: "user-id" } }),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: unknown[]) => {
-    mockEnableScreenSecurity(...args)
-    return Promise.resolve()
+  acquireScreenSecurity: (...args: unknown[]) => {
+    mockAcquireScreenSecurity(...args)
+    return { ready: Promise.resolve(), release: () => Promise.resolve() }
   },
-  disableScreenSecurity: () => Promise.resolve(),
 }))
 
 const mockUseHardwareBackGuard = jest.fn()
@@ -92,7 +91,7 @@ describe("SetupKeyBackupScreen", () => {
   it("keeps the key out of screenshots, recordings and the app switcher", async () => {
     await renderScreen()
 
-    expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
   })
 
   /** The guard with no handler swallows the system back, edge swipes included; what
