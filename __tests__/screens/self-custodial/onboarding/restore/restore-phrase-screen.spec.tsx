@@ -604,9 +604,9 @@ describe("RestorePhraseScreen", () => {
   })
 
   /** Both regressions below come from the same place: the gate unmounts its subtree
-   *  whenever the guard drops, and a theme flip re-registers the guard with the new
-   *  mask colour. What the user typed, and the header action the content installed,
-   *  must both survive that. */
+   *  whenever it re-activates, which a theme flip does to apply the new mask color.
+   *  What the user typed, and the header action the content installed, must both
+   *  survive that. */
   describe("surviving a gate re-activation", () => {
     it("keeps the phrase state above the gate, so a pending guard cannot wipe it", async () => {
       // Never-settling lease: the gate stays on its spinner and mounts no content.

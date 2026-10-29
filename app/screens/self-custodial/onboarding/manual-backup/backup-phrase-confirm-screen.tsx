@@ -196,10 +196,11 @@ type GatedConfirmProps = {
 }
 
 /** Sits between the redirect guard and the gate so the confirmation state can be
- *  held above the gate: its subtree is unmounted every time the guard drops (a
- *  theme flip re-registers it), and the words the user has already typed must
- *  survive that. Safe here because useBackupConfirm's only effect is the
- *  all-correct auto-advance, which cannot fire while the inputs are empty. */
+ *  held above the gate: its subtree is unmounted every time the gate re-activates
+ *  (a theme flip re-acquires the guard to apply the new mask color), and the words
+ *  the user has already typed must survive that. Safe here because
+ *  useBackupConfirm's only effect is the all-correct auto-advance, which cannot
+ *  fire while the inputs are empty. */
 const GatedConfirm: React.FC<GatedConfirmProps> = ({ challenges, successMessage }) => {
   const { loading: checkpointLoading } = useMigrationCheckpoint()
   const completeBackup = useCompleteBackup()

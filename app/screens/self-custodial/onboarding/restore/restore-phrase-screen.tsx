@@ -248,11 +248,12 @@ export const RestorePhraseScreen: React.FC = () => {
     )
   }, [hasValidParams])
 
-  /** Held above the gate deliberately. The gate unmounts its subtree every time the
-   *  guard drops — a theme flip re-registers it with the new mask colour — and the
-   *  words the user has already typed must survive that. Safe to run here because
-   *  useRestorePhrase has no mount effects: the clipboard read and the restore both
-   *  hang off presses, so nothing sensitive happens before the guard is on. */
+  /** Held above the gate deliberately. The gate unmounts its subtree every time it
+   *  re-activates (a theme flip re-acquires the guard to apply the new mask color),
+   *  and the words the user has already typed must survive that. Safe to run here
+   *  because its one mount effect, in useBip39Input, only tracks whether the keyboard
+   *  is up: the clipboard read and the restore both hang off presses, so nothing
+   *  sensitive happens before the guard is on. */
   const restore = useRestorePhrase({ step, initialWords })
 
   return (

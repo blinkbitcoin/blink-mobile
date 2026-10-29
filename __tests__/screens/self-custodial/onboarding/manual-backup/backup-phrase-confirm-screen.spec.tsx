@@ -668,9 +668,9 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(queryByText("youth")).toBeNull()
   })
 
-  /** The gate unmounts its subtree whenever the guard drops — a theme flip
-   *  re-registers it with the new mask colour — so the answers the user has
-   *  already typed are held above the gate and handed in. */
+  /** The gate unmounts its subtree whenever it re-activates (a theme flip
+   *  re-acquires the guard to apply the new mask color), so the answers the user
+   *  has already typed are held above the gate and handed in. */
   describe("surviving a gate re-activation", () => {
     it("builds the confirmation state above the gate, so a pending guard cannot wipe it", async () => {
       // Never-settling lease: the gate stays on its spinner and mounts no content.

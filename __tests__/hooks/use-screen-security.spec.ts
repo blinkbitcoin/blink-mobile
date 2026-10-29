@@ -113,9 +113,10 @@ describe("useScreenSecurity", () => {
     )
   })
 
-  /** A theme flip re-runs the effect: the old lease is released and the guard
-   *  drops before the fresh registration lands. The state must fall back to
-   *  "activating" for that window so the gate re-hides the content. */
+  /** A theme flip re-runs the effect: the old lease is released and the new one
+   *  asks for the new color. The state must fall back to "activating" until that
+   *  lands, since a re-registration that exhausts its retries brings the guard
+   *  down, so the gate re-hides the content. */
   it("re-gates while re-acquiring after the background color changes", async () => {
     const first = deferred<void>()
     const firstLease = leaseWith(first.promise)
