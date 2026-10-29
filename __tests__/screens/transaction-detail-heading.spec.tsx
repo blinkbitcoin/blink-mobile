@@ -2,7 +2,16 @@ import React from "react"
 
 import { render } from "@testing-library/react-native"
 
+import { WalletCurrency } from "@app/graphql/generated"
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
+import { toTransactionFragment } from "@app/self-custodial/mappers/to-transaction-fragment"
+import {
+  PaymentType,
+  TransactionDirection,
+  TransactionStatus,
+  type NormalizedTransaction,
+} from "@app/types/transaction"
+import { AccountType } from "@app/types/wallet"
 
 jest.mock("@rn-vui/themed", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockThemedText(),
@@ -19,9 +28,15 @@ jest.mock("@app/components/atomic/galoy-icon-button", () =>
 jest.mock("@app/components/atomic/galoy-primary-button", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyPrimaryButton(),
 )
-jest.mock("@app/graphql/generated", () =>
-  jest.requireActual("../helpers/transaction-detail-mocks").mockGeneratedGraphql(),
-)
+// The enums are real so the self-custodial cases can go through the real mapper.
+jest.mock("@app/graphql/generated", () => {
+  const { TxDirection, TxStatus } = jest.requireActual("@app/graphql/generated")
+  return {
+    ...jest.requireActual("../helpers/transaction-detail-mocks").mockGeneratedGraphql(),
+    TxDirection,
+    TxStatus,
+  }
+})
 jest.mock("@app/hooks", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockAppHooks(),
 )
@@ -52,8 +67,9 @@ jest.mock("@app/components/atomic/galoy-info", () => ({ GaloyInfo: () => null })
 jest.mock("@app/components/transaction-item", () => ({
   useDescriptionDisplay: () => "some description",
 }))
+let mockIsSelfCustodial = false
 jest.mock("@app/hooks/use-active-wallet", () => ({
-  useActiveWallet: () => ({ isSelfCustodial: false, wallets: [] }),
+  useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial, wallets: [] }),
 }))
 jest.mock("@app/hooks/use-resolve-transaction-account", () => ({
   useResolveTransactionAccount: () => ({ status: "resolved", retry: jest.fn() }),
@@ -117,12 +133,27 @@ const broadcastOnChainSend = {
 }
 
 // A transfer to yourself pays no one, which is why the heading says "sent" and not "spent".
+// It documents that motivation rather than adding coverage: the heading never reads the
+// settlement rail, so this passes for the same reason the lightning send does.
 const selfTransfer = {
   ...lightningSend,
   memo: null,
   settlementVia: { __typename: "SettlementViaIntraLedger", counterPartyUsername: null },
   initiationVia: { __typename: "InitiationViaIntraLedger", counterPartyUsername: null },
 }
+
+const selfCustodialSend = (
+  overrides: Partial<NormalizedTransaction>,
+): NormalizedTransaction => ({
+  id: "tx-1",
+  amount: { amount: 23, currency: WalletCurrency.Btc, currencyCode: WalletCurrency.Btc },
+  direction: TransactionDirection.Send,
+  status: TransactionStatus.Completed,
+  timestamp: 1785589616,
+  paymentType: PaymentType.Spark,
+  sourceAccountType: AccountType.SelfCustodial,
+  ...overrides,
+})
 
 const renderHeading = (tx: unknown) => {
   mockUseFragment.mockReturnValue({ data: tx })
@@ -141,7 +172,10 @@ const renderHeading = (tx: unknown) => {
 // long locale whole under font scaling rather than trading the drop for an
 // ellipsis.
 describe("TransactionDetailScreen heading", () => {
-  beforeEach(() => jest.clearAllMocks())
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsSelfCustodial = false
+  })
 
   const cases: Array<{ name: string; tx: unknown; copy: string }> = [
     { name: "send", tx: lightningSend, copy: "You sent" },
@@ -153,6 +187,19 @@ describe("TransactionDetailScreen heading", () => {
     },
     { name: "queued onchain send", tx: queuedOnChainSend, copy: "Sending" },
     { name: "broadcast onchain send", tx: broadcastOnChainSend, copy: "You sent" },
+    // Today's behaviour, not a decision: the heading ignores status, so a payment that
+    // failed or has not settled still reads "You sent". The follow-up that makes the
+    // heading status-aware flips these on purpose.
+    {
+      name: "failed send",
+      tx: { ...lightningSend, status: "FAILURE" },
+      copy: "You sent",
+    },
+    {
+      name: "pending send",
+      tx: { ...lightningSend, status: "PENDING" },
+      copy: "You sent",
+    },
   ]
 
   cases.forEach(({ name, tx, copy }) => {
@@ -168,6 +215,43 @@ describe("TransactionDetailScreen heading", () => {
 
       expect(heading?.props.numberOfLines).toBe(1)
       expect(heading?.props.adjustsFontSizeToFit).toBe(true)
+      tree.unmount()
+    })
+  })
+})
+
+// Self-custodial transactions reach the screen through the same Apollo fragment, written
+// there by `toTransactionFragment`, so these cases render what that mapper produces.
+describe("TransactionDetailScreen heading for a self-custodial wallet", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockIsSelfCustodial = true
+  })
+
+  const cases: Array<{ name: string; tx: NormalizedTransaction; copy: string }> = [
+    { name: "spark send", tx: selfCustodialSend({}), copy: "You sent" },
+    {
+      name: "receive",
+      tx: selfCustodialSend({ direction: TransactionDirection.Receive }),
+      copy: "You received",
+    },
+    // The mapper always sets transactionHash, so a self-custodial onchain send never
+    // reads "Sending", even while it is still pending.
+    {
+      name: "pending onchain send",
+      tx: selfCustodialSend({
+        paymentType: PaymentType.Onchain,
+        status: TransactionStatus.Pending,
+      }),
+      copy: "You sent",
+    },
+  ]
+
+  cases.forEach(({ name, tx, copy }) => {
+    it(`renders the full ${name} copy`, () => {
+      const { heading, tree } = renderHeading(toTransactionFragment(tx))
+
+      expect(heading?.props.children).toBe(copy)
       tree.unmount()
     })
   })

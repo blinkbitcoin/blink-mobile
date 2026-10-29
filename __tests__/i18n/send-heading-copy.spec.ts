@@ -1,8 +1,19 @@
+import fs from "fs"
+import path from "path"
+
 import type { Locales } from "@app/i18n/i18n-types"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
-import id from "@app/i18n/raw-i18n/translations/id.json"
-import xh from "@app/i18n/raw-i18n/translations/xh.json"
+
+const TRANSLATIONS_DIR = path.resolve(
+  __dirname,
+  "..",
+  "..",
+  "app",
+  "i18n",
+  "raw-i18n",
+  "translations",
+)
 
 /**
  * The transaction detail heading for an outgoing payment, per locale. A send is not
@@ -53,17 +64,34 @@ describe("TransactionDetailScreen.sent", () => {
   )
 })
 
-// Translated in Crowdin but not generated into `Locales`, so the app never renders them
+// Translated in Transifex but not generated into `Locales`, so the app never renders them
 // and `i18nObject` cannot load them. Pinned on the raw file so they are not left behind.
-describe("TransactionDetailScreen.sent in unshipped translations", () => {
-  const unshipped = [
-    { locale: "id", raw: id, expected: "Anda mengirim" },
-    { locale: "xh", raw: xh, expected: "Uthumele" },
-  ]
+const UNSHIPPED_SENT_HEADING: Record<string, string> = {
+  id: "Anda mengirim",
+  xh: "Uthumele",
+}
 
-  unshipped.forEach(({ locale, raw, expected }) => {
-    it(`reads "${expected}" in ${locale}`, () => {
-      expect(raw.TransactionDetailScreen.sent).toBe(expected)
+/** Every translation file the pin above does not cover, so a new file without a loader
+ *  fails here until its heading is pinned, rather than going unchecked. */
+const unshippedLocales = fs
+  .readdirSync(TRANSLATIONS_DIR)
+  .filter((name) => name.endsWith(".json"))
+  .map((name) => path.basename(name, ".json"))
+  .filter((locale) => !(locale in SENT_HEADING))
+  .sort()
+
+describe("TransactionDetailScreen.sent in unshipped translations", () => {
+  it("pins every translation file that is not a shipped locale", () => {
+    expect(unshippedLocales).toEqual(Object.keys(UNSHIPPED_SENT_HEADING).sort())
+  })
+
+  unshippedLocales.forEach((locale) => {
+    it(`reads "${UNSHIPPED_SENT_HEADING[locale]}" in ${locale}`, () => {
+      const raw = JSON.parse(
+        fs.readFileSync(path.join(TRANSLATIONS_DIR, `${locale}.json`), "utf8"),
+      )
+
+      expect(raw.TransactionDetailScreen.sent).toBe(UNSHIPPED_SENT_HEADING[locale])
     })
   })
 })
