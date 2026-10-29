@@ -14193,6 +14193,12 @@ type RootTranslation = {
 		 * @param {string} identifier
 		 */
 		removalFailed: RequiredParams<'identifier'>
+		/**
+		 * C​o​u​l​d​n​'​t​ ​f​u​l​l​y​ ​r​e​m​o​v​e​ ​a​c​c​o​u​n​t​ ​{​i​d​e​n​t​i​f​i​e​r​}​.​ ​C​o​n​t​a​c​t​ ​{​e​m​a​i​l​}​ ​f​o​r​ ​h​e​l​p​.
+		 * @param {string} email
+		 * @param {string} identifier
+		 */
+		removalIncomplete: RequiredParams<'email' | 'identifier'>
 	}
 }
 
@@ -28155,6 +28161,10 @@ export type TranslationFunctions = {
 		 * Couldn't remove account {identifier}. Please try again.
 		 */
 		removalFailed: (arg: { identifier: string }) => LocalizedString
+		/**
+		 * Couldn't fully remove account {identifier}. Contact {email} for help.
+		 */
+		removalIncomplete: (arg: { email: string, identifier: string }) => LocalizedString
 	}
 }
 

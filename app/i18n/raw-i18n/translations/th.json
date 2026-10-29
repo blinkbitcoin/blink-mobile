@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "กระเป๋าเงินของคุณมียอดคงเหลือ {balance} เพื่อความปลอดภัยของคุณ เราจึงไม่อนุญาตให้ลบบัญชีที่ยังมีเงินอยู่",
     "hasFundsWarningHelper": "หากต้องการดำเนินการลบต่อ โปรดถอนเงินออกจากบัญชีของคุณหรือบริจาคให้กับ circular economies",
     "hasFundsWarningButton": "ย้อนกลับ",
-    "removalFailed": "ไม่สามารถลบบัญชี {identifier: string} ได้ โปรดลองอีกครั้ง"
+    "removalFailed": "ไม่สามารถลบบัญชี {identifier: string} ได้ โปรดลองอีกครั้ง",
+    "removalIncomplete": "ไม่สามารถลบบัญชี {identifier: string} ได้ทั้งหมด โปรดติดต่อ {email: string} เพื่อขอความช่วยเหลือ"
   }
 }

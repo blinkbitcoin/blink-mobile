@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Ваш новчаник има стање од {balance}. Због ваше безбедности, не дозвољавамо брисање налога са средствима.",
     "hasFundsWarningHelper": "Да бисте наставили са брисањем, испразните свој налог или донирајте циркуларним економијама.",
     "hasFundsWarningButton": "Назад",
-    "removalFailed": "Није могуће уклонити налог {identifier: string}. Покушајте поново."
+    "removalFailed": "Није могуће уклонити налог {identifier: string}. Покушајте поново.",
+    "removalIncomplete": "Није могуће потпуно уклонити налог {identifier: string}. За помоћ се обратите на {email: string}."
   }
 }

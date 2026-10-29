@@ -4255,6 +4255,7 @@
         "hasFundsWarningBody": "ウォレットには{balance}の残高があります。安全のため、残高のあるアカウントの削除は許可されていません。",
         "hasFundsWarningHelper": "削除を続行するには、アカウントを空にするか、循環経済へ寄付してください。",
         "hasFundsWarningButton": "戻る",
-        "removalFailed": "アカウント {identifier: string} を削除できませんでした。もう一度お試しください。"
+        "removalFailed": "アカウント {identifier: string} を削除できませんでした。もう一度お試しください。",
+        "removalIncomplete": "アカウント {identifier: string} を完全に削除できませんでした。{email: string} までお問い合わせください。"
     }
 }

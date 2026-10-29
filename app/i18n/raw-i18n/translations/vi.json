@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Ví của bạn có số dư là {balance}. Vì sự an toàn của bạn, chúng tôi không cho phép xóa tài khoản còn tiền.",
     "hasFundsWarningHelper": "Để tiếp tục xóa, hãy làm trống tài khoản hoặc quyên góp cho các nền kinh tế tuần hoàn.",
     "hasFundsWarningButton": "Quay lại",
-    "removalFailed": "Không thể xóa tài khoản {identifier: string}. Vui lòng thử lại."
+    "removalFailed": "Không thể xóa tài khoản {identifier: string}. Vui lòng thử lại.",
+    "removalIncomplete": "Không thể xóa hoàn toàn tài khoản {identifier: string}. Liên hệ {email: string} để được hỗ trợ."
   }
 }

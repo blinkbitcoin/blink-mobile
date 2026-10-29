@@ -4255,6 +4255,7 @@
         "hasFundsWarningBody": "Deine Wallet hat ein Guthaben von {balance}. Aus Sicherheitsgründen erlauben wir keine Löschung von Konten mit Guthaben.",
         "hasFundsWarningHelper": "Um mit der Löschung fortzufahren, leere dein Konto oder spende an Kreislaufwirtschaften.",
         "hasFundsWarningButton": "Zurück",
-        "removalFailed": "Das Konto {identifier: string} konnte nicht entfernt werden. Bitte versuche es erneut."
+        "removalFailed": "Das Konto {identifier: string} konnte nicht entfernt werden. Bitte versuche es erneut.",
+        "removalIncomplete": "Das Konto {identifier: string} konnte nicht vollständig entfernt werden. Wende dich an {email: string}, um Hilfe zu erhalten."
     }
 }

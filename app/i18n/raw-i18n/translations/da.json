@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Din tegnebog har en saldo på {balance}. For din sikkerhed tillader vi ikke sletning af konti med midler.",
     "hasFundsWarningHelper": "For at fortsætte med sletningen skal du tømme din konto eller donere til cirkulære økonomier.",
     "hasFundsWarningButton": "Tilbage",
-    "removalFailed": "Kontoen {identifier: string} kunne ikke fjernes. Prøv igen."
+    "removalFailed": "Kontoen {identifier: string} kunne ikke fjernes. Prøv igen.",
+    "removalIncomplete": "Kontoen {identifier: string} kunne ikke fjernes helt. Kontakt {email: string} for hjælp."
   }
 }

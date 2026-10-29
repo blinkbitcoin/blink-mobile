@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Vaš novčanik ima saldo od {balance}. Radi vaše sigurnosti ne dopuštamo brisanje računa sa sredstvima.",
     "hasFundsWarningHelper": "Da biste nastavili s brisanjem, ispraznite svoj račun ili donirajte u kružne ekonomije.",
     "hasFundsWarningButton": "Natrag",
-    "removalFailed": "Račun {identifier: string} nije moguće ukloniti. Pokušajte ponovno."
+    "removalFailed": "Račun {identifier: string} nije moguće ukloniti. Pokušajte ponovno.",
+    "removalIncomplete": "Račun {identifier: string} nije moguće potpuno ukloniti. Za pomoć se obratite na {email: string}."
   }
 }

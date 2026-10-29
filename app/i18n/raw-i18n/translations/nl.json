@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Je portemonnee heeft een saldo van {balance}. Voor je veiligheid staan we het verwijderen van accounts met geld er nog op niet toe.",
     "hasFundsWarningHelper": "Om door te gaan met verwijderen, maak je account leeg of doneer aan circulaire economieën.",
     "hasFundsWarningButton": "Terug",
-    "removalFailed": "Kan account {identifier: string} niet verwijderen. Probeer het opnieuw."
+    "removalFailed": "Kan account {identifier: string} niet verwijderen. Probeer het opnieuw.",
+    "removalIncomplete": "Kan account {identifier: string} niet volledig verwijderen. Neem contact op met {email: string} voor hulp."
   }
 }

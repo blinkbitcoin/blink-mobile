@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Ipokotho yakho inebhalansi ye-{balance}. Ngenxa yokhuseleko lwakho, asivumeli ukucinywa kweeakhawunti ezineemali.",
     "hasFundsWarningHelper": "Ukuze uqhubeke nokucima, sisa imali eseakhawuntini yakho okanye unikele kuluhlu lweemali ezijikelezayo.",
     "hasFundsWarningButton": "Buyela",
-    "removalFailed": "Ayikwazanga ukususa i-akhawunti {identifier: string}. Nceda uzame kwakhona."
+    "removalFailed": "Ayikwazanga ukususa i-akhawunti {identifier: string}. Nceda uzame kwakhona.",
+    "removalIncomplete": "Ayikwazanga ukususa ngokupheleleyo i-akhawunti {identifier: string}. Qhagamshelana no-{email: string} ukuze ufumane uncedo."
   }
 }

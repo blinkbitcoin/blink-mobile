@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Dompet anda mempunyai baki sebanyak {balance}. Demi keselamatan anda, kami tidak membenarkan pemadaman akaun yang mempunyai dana.",
     "hasFundsWarningHelper": "Untuk meneruskan pemadaman, kosongkan akaun anda atau dermakan kepada ekonomi pekeliling.",
     "hasFundsWarningButton": "Kembali",
-    "removalFailed": "Tidak dapat mengalih keluar akaun {identifier: string}. Sila cuba lagi."
+    "removalFailed": "Tidak dapat mengalih keluar akaun {identifier: string}. Sila cuba lagi.",
+    "removalIncomplete": "Tidak dapat mengalih keluar akaun {identifier: string} sepenuhnya. Hubungi {email: string} untuk bantuan."
   }
 }

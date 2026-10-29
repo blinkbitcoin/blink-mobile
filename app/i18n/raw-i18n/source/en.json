@@ -4255,6 +4255,7 @@
         "hasFundsWarningBody": "Your wallet has a balance of {balance: string}. For your safety, we dont allow deletion of accounts with funds.",
         "hasFundsWarningHelper": "To proceed with deletion, either empty your account or donate to circular economies.",
         "hasFundsWarningButton": "Go back",
-        "removalFailed": "Couldn't remove account {identifier: string}. Please try again."
+        "removalFailed": "Couldn't remove account {identifier: string}. Please try again.",
+        "removalIncomplete": "Couldn't fully remove account {identifier: string}. Contact {email: string} for help."
     }
 }

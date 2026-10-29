@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Ssente zo eziri ku akawunti ze {balance}. Olw'obukuumi bwo, tetukkiriza kusangulawo akawunti ezirimu sente.",
     "hasFundsWarningHelper": "Okweyongera okusangulawo, jjawo sente zo oba kuba ne togaba mu economies circular.",
     "hasFundsWarningButton": "Komawo",
-    "removalFailed": "Akawunti {identifier: string} tesobose kuggyibwawo. Gezaako nate."
+    "removalFailed": "Akawunti {identifier: string} tesobose kuggyibwawo. Gezaako nate.",
+    "removalIncomplete": "Akawunti {identifier: string} tesobose kuggyibwawo yonna. Tuukirira {email: string} okufuna obuyambi."
   }
 }

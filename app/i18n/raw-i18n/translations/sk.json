@@ -4255,6 +4255,7 @@
     "hasFundsWarningBody": "Vaša peňaženka má zostatok {balance}. Pre vašu bezpečnosť neumožňujeme mazanie účtov s prostriedkami.",
     "hasFundsWarningHelper": "Ak chcete pokračovať v mazaní, vyprázdnite svoj účet alebo darujte do cirkulárnych ekonomík.",
     "hasFundsWarningButton": "Späť",
-    "removalFailed": "Účet {identifier: string} sa nepodarilo odstrániť. Skúste to znova."
+    "removalFailed": "Účet {identifier: string} sa nepodarilo odstrániť. Skúste to znova.",
+    "removalIncomplete": "Účet {identifier: string} sa nepodarilo úplne odstrániť. Pre pomoc kontaktujte {email: string}."
   }
 }
