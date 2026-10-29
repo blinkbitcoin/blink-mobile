@@ -73,7 +73,9 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
       message: LL.ProfileScreen.switchAccount(),
       LL,
     })
-    navigation.navigate("Primary")
+    /** Back to the Home already on the stack: `navigate` would push another one on top
+     *  of this screen, and every switch would grow the stack by one. */
+    navigation.popTo("Primary")
   }
 
   const openModalForWallets = (wallets: ReadonlyArray<WalletState>) => {

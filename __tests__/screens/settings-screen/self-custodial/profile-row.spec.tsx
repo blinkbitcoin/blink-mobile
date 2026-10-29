@@ -127,11 +127,12 @@ jest.mock("@app/components/atomic/galoy-icon-button/galoy-icon-button", () => {
 })
 
 const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
     dispatch: jest.fn(),
-    popTo: jest.fn(),
+    popTo: mockPopTo,
     setOptions: jest.fn(),
   }),
   CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
@@ -272,7 +273,8 @@ describe("ProfileRow", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success", message: "Switched accounts" }),
     )
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("does not switch when the entry is the active self-custodial account", () => {
