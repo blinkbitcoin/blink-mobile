@@ -282,8 +282,9 @@ export const AddPlacePanel: React.FC<Props> = ({
             >
               {LL.MapScreen.placeLocation()}
             </Text>
-            {/* Read-only, and with nothing to tap: the map above is the control
-              for this row, and it is on screen. */}
+            {/* Nothing to tap: the map above is the control for this row, and it
+              is on screen. The pencil says the row can still change — moving
+              the map changes it. */}
             <View style={styles.locationRow}>
               <GaloyIcon name="map-pin" size={16} color={colors.grey1} />
               <Text
@@ -293,23 +294,27 @@ export const AddPlacePanel: React.FC<Props> = ({
               >
                 {formatCoordinates(location)}
               </Text>
+              <GaloyIcon name="pencil" size={16} color={colors.primary} />
             </View>
           </View>
 
           <View style={styles.field}>
             <Text style={styles.label}>{LL.MapScreen.placeName()}</Text>
-            <TextInput
-              testID="place-name-input"
-              style={styles.input}
-              value={name}
-              onChangeText={editName}
-              placeholder={LL.MapScreen.placeNameHint()}
-              placeholderTextColor={colors.grey2}
-              maxLength={PLACE_NAME_MAX_LENGTH}
-              autoCorrect={false}
-              returnKeyType="done"
-              accessibilityLabel={LL.MapScreen.placeName()}
-            />
+            <View style={styles.inputRow}>
+              <TextInput
+                testID="place-name-input"
+                style={styles.input}
+                value={name}
+                onChangeText={editName}
+                placeholder={LL.MapScreen.placeNameHint()}
+                placeholderTextColor={colors.grey2}
+                maxLength={PLACE_NAME_MAX_LENGTH}
+                autoCorrect={false}
+                returnKeyType="done"
+                accessibilityLabel={LL.MapScreen.placeName()}
+              />
+              <GaloyIcon name="pencil" size={16} color={colors.primary} />
+            </View>
           </View>
         </>
       ) : (
@@ -404,14 +409,23 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     fontSize: 14,
     color: colors.grey1,
   },
-  // The two rows of the first step, on one measurement so they read as a pair.
-  input: {
-    fontSize: 16,
-    color: colors.black,
+  // The two rows of the first step, on one measurement so they read as a pair,
+  // each ending in the design's pencil on `galoy-input`'s right-icon inset.
+  inputRow: {
+    flexDirection: "row",
+    alignItems: "center",
+    columnGap: 12,
     backgroundColor: colors.grey5,
     borderRadius: 8,
     minHeight: 60,
-    paddingHorizontal: 14,
+    paddingLeft: 14,
+    paddingRight: 10,
+  },
+  input: {
+    flex: 1,
+    alignSelf: "stretch",
+    fontSize: 16,
+    color: colors.black,
     // Android gives inputs their own vertical padding on top of the row's.
     paddingVertical: 0,
   },
@@ -422,7 +436,8 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
     backgroundColor: colors.grey5,
     borderRadius: 8,
     minHeight: 60,
-    paddingHorizontal: 14,
+    paddingLeft: 14,
+    paddingRight: 10,
   },
   coordinates: {
     flex: 1,
