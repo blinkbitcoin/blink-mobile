@@ -29,9 +29,23 @@ type AccountDeleteContextType = {
   leaveWhileDeleting: (navigate: () => void) => void
 }
 
+/** Outside a provider nothing covers the screen and nothing blocks its exits, yet every
+ *  call still compiles and runs, so a screen that forgot the provider would remove an
+ *  account in plain view. Development builds say so. */
+const warnMissingProvider = () => {
+  if (__DEV__) {
+    console.warn(
+      "An account removal ran outside AccountDeleteContextProvider: the screen is not covered and its exits are not blocked.",
+    )
+  }
+}
+
 const AccountDeleteContext = createContext<AccountDeleteContextType>({
-  setAccountIsBeingDeleted: () => {},
-  leaveWhileDeleting: (navigate) => navigate(),
+  setAccountIsBeingDeleted: warnMissingProvider,
+  leaveWhileDeleting: (navigate) => {
+    warnMissingProvider()
+    navigate()
+  },
 })
 
 type DeletionLock = { identifier?: string } | null

@@ -142,6 +142,33 @@ describe("AccountDeleteContextProvider", () => {
     expect(queryByTestId("account-deletion-lock")).toBeNull()
   })
 
+  /** Without a provider the removal still runs, uncovered and with every exit open, so
+   *  a screen that forgot to wrap itself has to be told. */
+  it("warns when a removal runs outside a provider", () => {
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+    render(<LockController />)
+
+    act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+
+    expect(warn).toHaveBeenCalledWith(
+      expect.stringContaining("outside AccountDeleteContextProvider"),
+    )
+  })
+
+  it("does not warn inside a provider", () => {
+    const warn = jest.spyOn(console, "warn").mockImplementation(() => {})
+    render(
+      <AccountDeleteContextProvider>
+        <LockController />
+      </AccountDeleteContextProvider>,
+    )
+
+    act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+    act(() => controls.leaveWhileDeleting?.(() => {}))
+
+    expect(warn).not.toHaveBeenCalled()
+  })
+
   describe("while the lock is up", () => {
     const renderLocked = () => {
       const view = render(
