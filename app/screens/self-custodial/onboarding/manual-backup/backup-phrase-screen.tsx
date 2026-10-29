@@ -22,7 +22,7 @@ import {
 } from "@app/navigation/stack-param-lists"
 import { SettingsGroup } from "@app/screens/settings-screen/group"
 
-import { useBackupPhrase } from "../hooks"
+import { useBackupCountdownDeadline, useBackupPhrase } from "../hooks"
 
 const WORDS_PER_CARD = 3
 
@@ -33,11 +33,15 @@ type PhraseRouteProp = RouteProp<RootStackParamList, "selfCustodialBackupPhrase"
 
 type BackupPhraseContentProps = {
   step: PhraseStep
+  getCountdownDeadline: () => Date
 }
 
 /** The gate mounts this only once the screenshot guard is actually on — the words
  *  and the header Copy action must not exist while registration is pending. */
-const BackupPhraseContent: React.FC<BackupPhraseContentProps> = ({ step }) => {
+const BackupPhraseContent: React.FC<BackupPhraseContentProps> = ({
+  step,
+  getCountdownDeadline,
+}) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
@@ -50,7 +54,7 @@ const BackupPhraseContent: React.FC<BackupPhraseContentProps> = ({ step }) => {
     handleContinue,
     buttonTitle,
     isButtonDisabled,
-  } = useBackupPhrase(step)
+  } = useBackupPhrase(step, getCountdownDeadline)
 
   const copyLabel = LL.BackupScreen.ManualBackup.Phrase.copy()
 
@@ -126,6 +130,9 @@ export const BackupPhraseScreen: React.FC = () => {
   const hasValidStep = isPhraseStep(stepParam)
   const step = hasValidStep ? stepParam : PhraseStep.First
 
+  /** Held above the gate, which mounts the words again each time it re-activates. */
+  const getCountdownDeadline = useBackupCountdownDeadline()
+
   // Report ahead of the gate, not inside the gated content: on a device where
   // registration keeps failing the content never mounts, and the signal that the
   // route delivered no valid step would be lost with it.
@@ -140,7 +147,7 @@ export const BackupPhraseScreen: React.FC = () => {
 
   return (
     <ScreenSecurityGate>
-      <BackupPhraseContent step={step} />
+      <BackupPhraseContent step={step} getCountdownDeadline={getCountdownDeadline} />
     </ScreenSecurityGate>
   )
 }

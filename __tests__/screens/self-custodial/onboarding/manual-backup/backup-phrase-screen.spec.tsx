@@ -4,7 +4,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen"
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
@@ -51,9 +51,13 @@ const renderHeaderRight = () => {
 
 const mockCopyToClipboard = jest.fn()
 let mockCountdown = { remainingSeconds: 0, isExpired: true }
+const mockUseCountdown = jest.fn()
 jest.mock("@app/hooks", () => ({
   useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
-  useCountdown: () => mockCountdown,
+  useCountdown: (expiresAt: Date) => {
+    mockUseCountdown(expiresAt)
+    return mockCountdown
+  },
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -268,6 +272,53 @@ describe("BackupPhraseScreen", () => {
       expect(
         getByText(new RegExp(LL.BackupScreen.ManualBackup.Phrase.saveItNow())),
       ).toBeTruthy()
+    })
+
+    /** A theme flip re-acquires the guard to apply the new mask color, and the gate
+     *  mounts the words again while that lands. The deadline is held above the gate,
+     *  so the user who already waited is not made to wait again. */
+    it("resumes the countdown when a theme flip mounts the words again", async () => {
+      const renderInMode = (mode: "light" | "dark") => (
+        <ContextForScreenWithTheme mode={mode}>
+          <BackupPhraseScreen />
+        </ContextForScreenWithTheme>
+      )
+
+      const { getByText, rerender } = render(renderInMode("light"))
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      const [firstDeadline] = mockUseCountdown.mock.calls[0]
+
+      rerender(renderInMode("dark"))
+      await flushEffects()
+
+      // The gate did re-activate: the first lease was handed back for a new one.
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      const [lastDeadline] =
+        mockUseCountdown.mock.calls[mockUseCountdown.mock.calls.length - 1]
+      expect(lastDeadline).toBe(firstDeadline)
+    })
+
+    it("starts the countdown once the words show, not while the guard registers", async () => {
+      const now = jest.spyOn(Date, "now").mockReturnValue(1_000)
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      expect(mockUseCountdown).not.toHaveBeenCalled()
+
+      now.mockReturnValue(30_000)
+      registration.resolve(undefined)
+      await flushEffects()
+      now.mockRestore()
+
+      const [deadline] = mockUseCountdown.mock.calls[0]
+      expect(deadline.getTime()).toBe(40_000)
     })
 
     it("disables button during countdown", async () => {
