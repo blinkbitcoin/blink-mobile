@@ -21,7 +21,9 @@ type Props = {
   /** Input-only screens (the user types a phrase they already hold) must not be
    *  locked out when registration keeps failing — Try Again re-runs the same
    *  failing cycle and would leave no path back to the funds. Fail open: mount
-   *  the content unprotected instead. Display-only screens must never use this. */
+   *  the content unprotected instead. Display-only screens must never use this.
+   *  Only while the guard has never been on for this screen: content shown under
+   *  the guard stays hidden once it is gone. */
   failOpen?: boolean
 }
 
@@ -34,26 +36,44 @@ type Props = {
  *  the old lease and acquires a fresh one. */
 export const ScreenSecurityGate: React.FC<Props> = ({ children, onBack, failOpen }) => {
   const [attempt, setAttempt] = React.useState(0)
+  /** Outlives the retries: what the user typed while the guard was on must not come
+   *  back unprotected on a retry that fails either. */
+  const [hasBeenProtected, setHasBeenProtected] = React.useState(false)
+  const markProtected = React.useCallback(() => setHasBeenProtected(true), [])
+  const canFailOpen = Boolean(failOpen) && !hasBeenProtected
 
   return (
     <GatedContent
       key={attempt}
       onRetry={() => setAttempt((current) => current + 1)}
+      onProtected={markProtected}
       onBack={onBack}
-      failOpen={failOpen}
+      failOpen={canFailOpen}
     >
       {children}
     </GatedContent>
   )
 }
 
-const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
+type GatedContentProps = Props & {
+  onRetry: () => void
+  onProtected: () => void
+}
+
+const GatedContent: React.FC<GatedContentProps> = ({
   children,
   onRetry,
+  onProtected,
   onBack,
   failOpen,
 }) => {
   const state = useScreenSecurity()
+  const isActive = state === "active"
+
+  React.useEffect(() => {
+    if (isActive) onProtected()
+  }, [isActive, onProtected])
+
   const { LL } = useI18nContext()
   const styles = useStyles()
   const {
@@ -63,7 +83,7 @@ const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
   const handleBack = onBack ?? (() => navigation.goBack())
   const hasScreenOwnedBack = onBack !== undefined
 
-  if (state === "active") return <>{children}</>
+  if (isActive) return <>{children}</>
 
   if (state === "activating") {
     // A spinner carries nothing sensitive, so it is safe to paint before the

@@ -5,7 +5,7 @@ import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/rest
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockUseRestorePhrase = jest.fn()
@@ -600,6 +600,40 @@ describe("RestorePhraseScreen", () => {
 
       expect(mockUseRestorePhrase).toHaveBeenCalled()
       expect(mockMnemonicWordInput).toHaveBeenCalled()
+    })
+
+    /** Failing open is for a guard that never came on. Words typed under a guard
+     *  that is then lost (a theme flip whose re-registration runs out of retries)
+     *  stay with the screen above the gate but are not shown again unprotected. */
+    it("keeps the typed words hidden when the guard fails after it was on", async () => {
+      const renderInMode = (mode: "light" | "dark") => (
+        <ContextForScreenWithTheme mode={mode}>
+          <RestorePhraseScreen />
+        </ContextForScreenWithTheme>
+      )
+      const { rerender, getByTestId } = render(renderInMode("light"))
+      await flushEffects()
+      expect(mockMnemonicWordInput).toHaveBeenCalled()
+
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: Promise.reject(new Error("native failure")),
+        release: mockReleaseScreenSecurity,
+      })
+      rerender(renderInMode("dark"))
+      await flushEffects()
+      expect(getByTestId("screen-security-retry")).toBeTruthy()
+
+      // A render after the failure reaches the inputs only if they are still mounted.
+      mockMnemonicWordInput.mockClear()
+      const hookCallsBeforeRender = mockUseRestorePhrase.mock.calls.length
+      rerender(renderInMode("dark"))
+      await flushEffects()
+
+      expect(mockMnemonicWordInput).not.toHaveBeenCalled()
+      // The words stay with the screen above the gate, which kept rendering.
+      expect(mockUseRestorePhrase.mock.calls.length).toBeGreaterThan(
+        hookCallsBeforeRender,
+      )
     })
   })
 

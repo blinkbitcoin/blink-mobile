@@ -7,7 +7,7 @@ import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import type { ScreenSecurityLease } from "@app/utils/screen-security"
 
-import { ContextForScreen } from "../screens/helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../screens/helper"
 
 const mockAcquireScreenSecurity = jest.fn<ScreenSecurityLease, []>()
 jest.mock("@app/utils/screen-security", () => ({
@@ -224,5 +224,53 @@ describe("ScreenSecurityGate", () => {
     await act(async () => {})
 
     expect(queryByTestId("screen-security-back")).toBeNull()
+  })
+
+  /** Failing open spares a user whose guard never came on. Content that was shown
+   *  under the guard is a different case: once the guard that protected it is gone,
+   *  it stays hidden, so what was typed under protection never reappears without it. */
+  describe("a failure after the guard was on", () => {
+    const renderInMode = (mode: "light" | "dark") => (
+      <ContextForScreenWithTheme mode={mode}>
+        <ScreenSecurityGate failOpen>
+          <SensitiveContent />
+        </ScreenSecurityGate>
+      </ContextForScreenWithTheme>
+    )
+
+    const loseTheGuardAfterItWasOn = async () => {
+      const first = pendingLease()
+      const rendered = render(renderInMode("light"))
+      first.resolve()
+      await act(async () => {})
+      expect(rendered.getByText(SENSITIVE)).toBeTruthy()
+
+      const second = pendingLease()
+      rendered.rerender(renderInMode("dark"))
+      await act(async () => {})
+      second.reject(new Error("native failure"))
+      await act(async () => {})
+      return rendered
+    }
+
+    it("keeps the content hidden instead of failing open", async () => {
+      const { queryByText, getByTestId } = await loseTheGuardAfterItWasOn()
+
+      expect(queryByText(SENSITIVE)).toBeNull()
+      expect(getByTestId("screen-security-retry")).toBeTruthy()
+    })
+
+    it("stays closed when the retry fails too", async () => {
+      const { queryByText, getByTestId } = await loseTheGuardAfterItWasOn()
+
+      const third = pendingLease()
+      fireEvent.press(getByTestId("screen-security-retry"))
+      await act(async () => {})
+      third.reject(new Error("native failure"))
+      await act(async () => {})
+
+      expect(queryByText(SENSITIVE)).toBeNull()
+      expect(getByTestId("screen-security-retry")).toBeTruthy()
+    })
   })
 })
