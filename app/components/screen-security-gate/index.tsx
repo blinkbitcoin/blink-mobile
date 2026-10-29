@@ -58,6 +58,7 @@ const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
     theme: { colors },
   } = useTheme()
   const navigation = useNavigation()
+  const handleBack = onBack ?? (() => navigation.goBack())
 
   if (state === "active") return <>{children}</>
 
@@ -92,7 +93,7 @@ const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
         />
         <GaloySecondaryButton
           title={LL.common.back()}
-          onPress={onBack ?? (() => navigation.goBack())}
+          onPress={handleBack}
           {...testProps("screen-security-back")}
         />
       </View>
