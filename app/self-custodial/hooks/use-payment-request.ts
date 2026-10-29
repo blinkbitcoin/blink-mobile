@@ -83,9 +83,9 @@ const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): bool
   a !== null && a.sdk === b.sdk && a.key === b.key
 
 /**
- * How long one on-chain address request may hold the queue. The SDK call has no
- * timeout of its own, and without one a single hung call would stall every request
- * behind it, a tap on New included, until the user leaves the screen.
+ * How long one on-chain address request may take to get its answer from the SDK. The
+ * SDK call has no timeout of its own, and without one a single hung call would stall
+ * every request behind it, a tap on New included, until the user leaves the screen.
  */
 export const ONCHAIN_REQUEST_TIMEOUT_MS = 30_000
 
@@ -98,6 +98,31 @@ const OnchainRequestOutcome = {
 } as const
 type OnchainRequestOutcomeType =
   (typeof OnchainRequestOutcome)[keyof typeof OnchainRequestOutcome]
+
+/**
+ * One request's deadline. `signal` aborts once time is up, cancelling the SDK call;
+ * `settle` is called the moment the SDK has answered, after which the deadline no
+ * longer applies: the address exists, and the request goes on to record it.
+ */
+type OnchainRequestDeadline = { signal: AbortSignal; settle: () => void }
+
+/**
+ * Stops waiting on a read once `signal` aborts. Only for reads: the read itself runs
+ * on, which is harmless because it changes nothing.
+ */
+const unlessAborted = <T>(promise: Promise<T>, signal: AbortSignal): Promise<T> =>
+  new Promise<T>((resolve, reject) => {
+    const onAbort = () =>
+      reject(new Error("Self-custodial onchain address request aborted"))
+    if (signal.aborted) {
+      onAbort()
+      return
+    }
+    signal.addEventListener("abort", onAbort)
+    promise
+      .then(resolve, reject)
+      .finally(() => signal.removeEventListener("abort", onAbort))
+  })
 
 /**
  * The deposit marker the rotation decision is made against.
@@ -423,21 +448,22 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
   const onchainRequestIdRef = useRef(0)
 
   // `forceNew` is the user asking for a fresh address: earlier addresses stay valid, so it
-  // skips the reuse checks and no more. `isAbandoned` turns true once the request has run
-  // out of time; whatever the SDK answers after that is dropped.
+  // skips the reuse checks and no more.
   const requestOnchainAddress = useCallback(
     async (
       requestId: number,
       forceNew: boolean,
-      isAbandoned: () => boolean,
+      { signal, settle }: OnchainRequestDeadline,
     ): Promise<OnchainRequestOutcomeType> => {
       if (!sdk) return OnchainRequestOutcome.Failed
-      const isSuperseded = () =>
-        isAbandoned() || (!forceNew && requestId !== onchainRequestIdRef.current)
-      if (isSuperseded()) return OnchainRequestOutcome.Skipped
+      const isSuperseded = () => !forceNew && requestId !== onchainRequestIdRef.current
+      if (signal.aborted || isSuperseded()) return OnchainRequestOutcome.Skipped
       const pendingIds = pendingDepositIdsRef.current
 
-      const marker = await resolveDepositMarker(sdk, loadedDepositMarkerRef.current)
+      const marker = await unlessAborted(
+        resolveDepositMarker(sdk, loadedDepositMarkerRef.current),
+        signal,
+      )
 
       // Rotating is only worth anything if we can record that we did: without an account
       // id there is nowhere to write, so every run would rotate again and remember
@@ -446,7 +472,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       // an account to key on. This state is transient, an account switch mid-render.
       const canTrackReuse = selfCustodialAccountId !== null
       const issued = canTrackReuse
-        ? await loadIssuedOnchainAddress(selfCustodialAccountId)
+        ? await unlessAborted(loadIssuedOnchainAddress(selfCustodialAccountId), signal)
         : null
       const seenPendingIds = issued?.seenPendingDepositIds ?? []
 
@@ -470,10 +496,17 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       const shouldRotate =
         forceNew || (canTrackReuse && (markerMoved || hasUnseenPendingDeposit))
 
-      const result = await createReceiveOnchain(sdk)({ newAddress: shouldRotate })
-      // The timeout already reported this request; neither show nor record its answer.
-      if (isAbandoned()) return OnchainRequestOutcome.Skipped
+      // Out of time before the call went out: nothing has changed, so nothing to undo.
+      if (signal.aborted) return OnchainRequestOutcome.Skipped
+      const result = await createReceiveOnchain(sdk, { signal })({
+        newAddress: shouldRotate,
+      })
+      // An answer after the deadline is not shown: the timeout has already reported this
+      // request, and the caller told the user it failed.
+      const abandoned = signal.aborted
+      if (!abandoned) settle()
       if (!result.address) {
+        if (abandoned) return OnchainRequestOutcome.Skipped
         // The adapter reports failures as an error-only result rather than throwing,
         // so without this the address request would fail in complete silence.
         recordAppError(
@@ -485,10 +518,11 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         )
         return OnchainRequestOutcome.Failed
       }
-      // A newer request is queued behind this one and will publish from where it ends.
-      // If this one rotated, the SDK has moved on regardless, so it still records the
-      // address: otherwise the next request reads the old record and rotates again.
-      const superseded = isSuperseded()
+      // Too late, or a newer request is queued behind this one and will publish from
+      // where it ends. If this one rotated, the SDK has moved on regardless, so it still
+      // records the address: otherwise the next request reads the old record and
+      // rotates again.
+      const superseded = abandoned || isSuperseded()
       if (superseded && !shouldRotate) return OnchainRequestOutcome.Skipped
       const outcome = superseded
         ? OnchainRequestOutcome.Skipped
@@ -525,37 +559,50 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       const markFailed = () => {
         if (requestId === onchainRequestIdRef.current) setOnchainAddressFailed(true)
       }
+      const controller = new AbortController()
+      // The caller hears back at the deadline, even while the request is still stopping.
+      const timedOut = new Promise<OnchainRequestOutcomeType>((resolve) => {
+        controller.signal.addEventListener("abort", () =>
+          resolve(OnchainRequestOutcome.Failed),
+        )
+      })
       const request = onchainQueueRef.current.then(async () => {
-        let timedOut = false
-        let timer: ReturnType<typeof setTimeout> | undefined
-        const timeout = new Promise<OnchainRequestOutcomeType>((resolve) => {
-          timer = setTimeout(() => {
-            timedOut = true
-            recordAppError(
-              new Error(
-                `Self-custodial onchain address request timed out after ${ONCHAIN_REQUEST_TIMEOUT_MS}ms`,
-              ),
-            )
-            resolve(OnchainRequestOutcome.Failed)
-          }, ONCHAIN_REQUEST_TIMEOUT_MS)
-        })
+        const timer = setTimeout(() => {
+          recordAppError(
+            new Error(
+              `Self-custodial onchain address request timed out after ${ONCHAIN_REQUEST_TIMEOUT_MS}ms`,
+            ),
+          )
+          controller.abort()
+        }, ONCHAIN_REQUEST_TIMEOUT_MS)
         try {
-          const outcome = await Promise.race([
-            requestOnchainAddress(requestId, forceNew, () => timedOut),
-            timeout,
-          ])
-          if (outcome === OnchainRequestOutcome.Failed) markFailed()
-          return outcome
+          return await requestOnchainAddress(requestId, forceNew, {
+            signal: controller.signal,
+            settle: () => clearTimeout(timer),
+          })
         } catch (err) {
-          markFailed()
+          // The timeout has already answered the caller and reported it.
+          if (controller.signal.aborted) return OnchainRequestOutcome.Skipped
           throw err
         } finally {
           clearTimeout(timer)
         }
       })
-      // A failed request must not stall the ones queued behind it.
+      // The queue waits for the request itself, not its deadline: one that ran out of
+      // time is cancelled, and the next starts only once it has stopped, so it can no
+      // longer move the SDK to another address behind the next one's back. A failed
+      // request must not stall the ones queued behind it either.
       onchainQueueRef.current = request.catch(() => undefined)
-      return request
+      return Promise.race([request, timedOut]).then(
+        (outcome) => {
+          if (outcome === OnchainRequestOutcome.Failed) markFailed()
+          return outcome
+        },
+        (err) => {
+          markFailed()
+          throw err
+        },
+      )
     },
     [requestOnchainAddress],
   )

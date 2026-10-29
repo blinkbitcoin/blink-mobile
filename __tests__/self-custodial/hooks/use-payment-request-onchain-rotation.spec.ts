@@ -25,6 +25,7 @@ import {
 
 const mockReceiveLightning = jest.fn()
 const mockReceiveOnchain = jest.fn()
+const mockCreateReceiveOnchain = jest.fn()
 const mockSelfCustodialWallet = jest.fn()
 const mockActiveWallet = jest.fn()
 const mockConvertMoneyAmount = jest.fn()
@@ -42,7 +43,10 @@ const mockFindLatestOnchainReceiptId = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
   createReceiveLightning: () => mockReceiveLightning,
-  createReceiveOnchain: () => mockReceiveOnchain,
+  createReceiveOnchain: (...args: unknown[]) => {
+    mockCreateReceiveOnchain(...args)
+    return mockReceiveOnchain
+  },
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
@@ -983,20 +987,40 @@ describe("a request that never settles", () => {
     jest.useRealTimers()
   })
 
-  const hung = () => new Promise<{ address: string }>(() => {})
+  const signalOf = (call: number): AbortSignal =>
+    mockCreateReceiveOnchain.mock.calls[call][1].signal
+  // What the SDK does with an aborted call: it stops and settles as an error.
+  const hungUntilAborted = () => {
+    const signal = signalOf(mockCreateReceiveOnchain.mock.calls.length - 1)
+    return new Promise<{ errors: { message: string }[] }>((resolve) => {
+      signal.addEventListener("abort", () =>
+        resolve({ errors: [{ message: "aborted" }] }),
+      )
+    })
+  }
   const runOutTheClock = async () => {
     await act(async () => {
       jest.advanceTimersByTime(ONCHAIN_REQUEST_TIMEOUT_MS)
     })
     await flushEffects()
   }
+  const startTap = async (result: { current: ReturnType<typeof usePaymentRequest> }) => {
+    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+    await act(async () => {
+      tap = result.current?.generateNewOnchainAddress?.()
+    })
+    await flushEffects()
+    // A thunk, not the promise itself: returned from here, awaiting the helper would
+    // wait for the tap to settle.
+    return () => tap
+  }
 
-  it("stops holding up a tap queued behind it", async () => {
+  it("cancels it at the deadline, then runs the tap queued behind it", async () => {
     // Regression: requests run one at a time and the SDK call has no timeout, so one
     // hung background request kept every tap behind it waiting until the user left.
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
-      .mockReturnValueOnce(hung())
+      .mockImplementationOnce(hungUntilAborted)
       .mockResolvedValueOnce({ address: "bc1qfresh..." })
     const { result, rerender } = renderHook(() => usePaymentRequest())
     await flushEffects()
@@ -1007,16 +1031,13 @@ describe("a request that never settles", () => {
     await flushEffects()
     expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
 
-    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
-    await act(async () => {
-      tap = result.current?.generateNewOnchainAddress?.()
-    })
-    await flushEffects()
+    const tap = await startTap(result)
     expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
 
     await runOutTheClock()
 
-    await expect(tap).resolves.toBe(NewOnchainAddressResult.Created)
+    expect(signalOf(1).aborted).toBe(true)
+    await expect(tap()).resolves.toBe(NewOnchainAddressResult.Created)
     expect(result.current?.onchainAddress).toBe("bc1qfresh...")
     expect(mockRecordAppError).toHaveBeenCalledWith(
       new Error(
@@ -1025,7 +1046,66 @@ describe("a request that never settles", () => {
     )
   })
 
-  it("fails a hung tap, keeps the address on screen and drops the late answer", async () => {
+  it("holds the next request until a late answer is in, so it cannot replace the address behind it", async () => {
+    // Regression: the queue moved on at the deadline while the SDK call ran on. The
+    // tap behind it published its address, the late call then rotated the SDK to a
+    // hidden one, and the next visit showed that instead of the tapped address.
+    let stored: unknown = { address: "bc1qfirst...", depositMarker: null }
+    mockLoadIssuedOnchainAddress.mockImplementation(() => Promise.resolve(stored))
+    mockSaveIssuedOnchainAddress.mockImplementation((_id: string, record: unknown) => {
+      stored = record
+      return Promise.resolve()
+    })
+    let sdkCurrentAddress = "bc1qfirst..."
+    let rotations = 0
+    let answerLate: () => void = () => {}
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: sdkCurrentAddress })
+      // An SDK call that does not stop when aborted, and rotates when it does answer.
+      .mockImplementationOnce(
+        () =>
+          new Promise<{ address: string }>((resolve) => {
+            answerLate = () => {
+              sdkCurrentAddress = "bc1qlate..."
+              resolve({ address: sdkCurrentAddress })
+            }
+          }),
+      )
+      .mockImplementation(({ newAddress }: { newAddress: boolean }) => {
+        if (newAddress) {
+          rotations += 1
+          sdkCurrentAddress = `bc1qtapped-${rotations}...`
+        }
+        return Promise.resolve({ address: sdkCurrentAddress })
+      })
+    const { result, unmount } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+
+    const hungTap = await startTap(result)
+    await runOutTheClock()
+    await expect(hungTap()).resolves.toBe(NewOnchainAddressResult.Failed)
+
+    const tap = await startTap(result)
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      answerLate()
+    })
+    await flushEffects()
+
+    await expect(tap()).resolves.toBe(NewOnchainAddressResult.Created)
+    expect(result.current?.onchainAddress).toBe("bc1qtapped-1...")
+    unmount()
+
+    // The next visit asks for the SDK's current address without rotating.
+    const revisit = renderHook(() => usePaymentRequest())
+    await flushEffects()
+    expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
+    expect(revisit.result.current?.onchainAddress).toBe("bc1qtapped-1...")
+    expect(stored).toEqual(expect.objectContaining({ address: "bc1qtapped-1..." }))
+  })
+
+  it("fails a hung tap, keeps the address on screen and records its late rotation unseen", async () => {
     let lateAnswer: (value: { address: string }) => void = () => {}
     mockReceiveOnchain
       .mockResolvedValueOnce({ address: "bc1qfirst..." })
@@ -1038,13 +1118,10 @@ describe("a request that never settles", () => {
     await flushEffects()
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
 
-    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
-    await act(async () => {
-      tap = result.current?.generateNewOnchainAddress?.()
-    })
+    const tap = await startTap(result)
     await runOutTheClock()
 
-    await expect(tap).resolves.toBe(NewOnchainAddressResult.Failed)
+    await expect(tap()).resolves.toBe(NewOnchainAddressResult.Failed)
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
 
     mockSaveIssuedOnchainAddress.mockClear()
@@ -1052,8 +1129,73 @@ describe("a request that never settles", () => {
       lateAnswer({ address: "bc1qlate..." })
     })
     await flushEffects()
+    // The SDK has moved on, so the record follows it; the screen keeps what the
+    // failure toast promised.
     expect(result.current?.onchainAddress).toBe("bc1qfirst...")
-    expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledWith(
+      "sc-account-1",
+      expect.objectContaining({ address: "bc1qlate..." }),
+    )
+  })
+
+  it("reports success when the SDK answered in time but the save crosses the deadline", async () => {
+    // Regression: the deadline covered the save too, so an address already on screen
+    // came with a failure toast, and the queue moved on before it was recorded.
+    let finishSave: () => void = () => {}
+    mockSaveIssuedOnchainAddress.mockResolvedValueOnce(undefined).mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishSave = resolve
+      }),
+    )
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockResolvedValueOnce({ address: "bc1qfresh..." })
+      .mockResolvedValue({ address: "bc1qfresh..." })
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+
+    let settled = false
+    const tap = await startTap(result)
+    tap()?.then(() => {
+      settled = true
+    })
+    expect(result.current?.onchainAddress).toBe("bc1qfresh...")
+
+    await runOutTheClock()
+    mockPendingDeposits.mockReturnValue({ deposits: [pendingDeposit("txid-1")] })
+    rerender({})
+    await flushEffects()
+
+    expect(settled).toBe(false)
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+    expect(mockRecordAppError).not.toHaveBeenCalled()
+    expect(result.current?.onchainAddressFailed).toBe(false)
+
+    await act(async () => {
+      finishSave()
+    })
+    await flushEffects()
+
+    await expect(tap()).resolves.toBe(NewOnchainAddressResult.Created)
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(3)
+  })
+
+  it("never calls the SDK for a request that ran out of time before reaching it", async () => {
+    // The deposit lookup ahead of the SDK call can hang too. Waited on, it would hold
+    // the queue for good; and a call sent after the deadline could still rotate.
+    mockFindLatestOnchainReceiptId.mockReturnValueOnce(new Promise(() => {}))
+    mockReceiveOnchain.mockResolvedValue({ address: "bc1qfresh..." })
+    const { result } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+
+    const tap = await startTap(result)
+    expect(mockReceiveOnchain).not.toHaveBeenCalled()
+
+    await runOutTheClock()
+
+    await expect(tap()).resolves.toBe(NewOnchainAddressResult.Created)
+    expect(mockReceiveOnchain.mock.calls).toEqual([[{ newAddress: true }]])
+    expect(result.current?.onchainAddress).toBe("bc1qfresh...")
   })
 })
 
