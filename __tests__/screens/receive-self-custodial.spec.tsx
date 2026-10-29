@@ -646,7 +646,7 @@ describe("ReceiveScreen — self-custodial", () => {
     })
 
     const renderOnOnchainPage = async () => {
-      render(
+      const view = render(
         <ContextForScreen>
           <ReceiveScreen />
         </ContextForScreen>,
@@ -657,6 +657,7 @@ describe("ReceiveScreen — self-custodial", () => {
       await waitFor(() => {
         expect(screen.getByText(shown(currentAddress))).toBeTruthy()
       })
+      return view
     }
 
     it("is only offered on the on-chain page", async () => {
@@ -692,6 +693,31 @@ describe("ReceiveScreen — self-custodial", () => {
           type: "success",
         }),
       )
+    })
+
+    it("does not confirm a fresh address once the screen has been left", async () => {
+      // Regression: the rotation finishes after a back-press and reported Created, so the
+      // toast landed on Home, or on a reopened Receive not showing that address yet.
+      const view = await renderOnOnchainPage()
+      let finishRotation: () => void = () => {}
+      mockReceiveOnchain.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishRotation = () => resolve({ address: freshAddress })
+          }),
+      )
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+      await flushAsync()
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+      view.unmount()
+
+      await act(async () => {
+        finishRotation()
+      })
+      await flushAsync()
+
+      expect(toastShow).not.toHaveBeenCalled()
     })
 
     it("rotates once for a double tap", async () => {

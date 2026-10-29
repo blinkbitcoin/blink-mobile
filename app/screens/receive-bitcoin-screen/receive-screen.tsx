@@ -20,6 +20,7 @@ import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDollarBalanceGated } from "@app/hooks/use-dollar-balance-restricted"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
@@ -138,6 +139,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
   const [isGeneratingAddress, setIsGeneratingAddress] = useState(false)
   // A second tap can land before the disabled state renders; each one would burn an address.
   const { run: runNewAddressOnce } = useInFlightGuard()
+  const isMounted = useIsMounted()
   const { generateNewAddress } = onchain
   const handleNewAddress = useCallback(
     () =>
@@ -147,6 +149,9 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
         setIsGeneratingAddress(false)
         // The page the tap was for is gone; any toast would describe another wallet.
         if (result === NewOnchainAddressResult.Superseded) return
+        // So is the screen: the request still finishes and is recorded, but a toast now would
+        // land on whatever the user moved on to, describing an address it does not show.
+        if (!isMounted()) return
         const created = result === NewOnchainAddressResult.Created
         const toastMessages: Record<
           Exclude<NewOnchainAddressResultType, typeof NewOnchainAddressResult.Superseded>,
@@ -162,7 +167,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           type: created ? "success" : "error",
         })
       }),
-    [runNewAddressOnce, generateNewAddress, LL],
+    [runNewAddressOnce, isMounted, generateNewAddress, LL],
   )
 
   const {
