@@ -29,7 +29,7 @@ const SENT_HEADING: Record<Locales, string> = {
   ja: "送金完了",
   lg: "Osindise",
   ms: "Anda dah hantar",
-  nl: "Je hebt verzonden",
+  nl: "Jij verzond",
   pt: "Você enviou",
   qu: "Apachirqanki",
   ro: "Ați trimis",
