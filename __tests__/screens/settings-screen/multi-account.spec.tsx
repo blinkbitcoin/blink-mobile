@@ -1,5 +1,5 @@
 import React from "react"
-import { render, waitFor, screen } from "@testing-library/react-native"
+import { fireEvent, render, waitFor, screen } from "@testing-library/react-native"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { MockedProvider } from "@apollo/client/testing"
@@ -68,11 +68,24 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
   }),
 }))
 
+/** Pressing a row raises the removal lock through whatever context it is rendered in,
+ *  the way a confirmed removal does, so the screen's own provider is what answers. */
 jest.mock("@app/screens/settings-screen/self-custodial/profile-row", () => ({
   ProfileRow: ({ entry }: { entry: { id: string } }) => {
     const ReactActual = jest.requireActual("react")
     const { Text } = jest.requireActual("react-native")
-    return ReactActual.createElement(Text, { testID: `sc-entry-${entry.id}` }, entry.id)
+    const { useAccountDeleteContext } = jest.requireActual(
+      "@app/screens/settings-screen/account/account-delete-context",
+    )
+    const { setAccountIsBeingDeleted } = useAccountDeleteContext()
+    return ReactActual.createElement(
+      Text,
+      {
+        testID: `sc-entry-${entry.id}`,
+        onPress: () => setAccountIsBeingDeleted(true, entry.id),
+      },
+      entry.id,
+    )
   },
 }))
 
@@ -173,6 +186,28 @@ describe("Settings", () => {
       expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
     })
     expect(screen.queryByTestId("sc-entry-sc-pending-1")).toBeNull()
+  })
+
+  /** The removal runs from the rows, and without the screen's provider it would get the
+   *  context's default: no cover, no blocked exits, the next account in plain view. */
+  it("covers the screen when a row removes its account", async () => {
+    ;(KeyStoreWrapper.getSessionProfiles as jest.Mock).mockResolvedValue(expectedProfiles)
+    mockSelfCustodialEntries = [{ id: "sc-normal-1", createdAt: 1 }]
+
+    render(
+      <ContextForScreen>
+        <SwitchAccountComponent />
+      </ContextForScreen>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("sc-entry-sc-normal-1")).toBeTruthy()
+    })
+    expect(screen.queryByTestId("account-deletion-lock")).toBeNull()
+
+    fireEvent.press(screen.getByTestId("sc-entry-sc-normal-1"))
+
+    expect(screen.getByTestId("account-deletion-lock")).toBeTruthy()
   })
 
   it("keeps a pending wallet visible once it became the active account", async () => {

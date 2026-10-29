@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { Text } from "react-native"
+import { StyleSheet, Text } from "react-native"
 import { act, render } from "@testing-library/react-native"
 
 import {
@@ -94,6 +94,31 @@ describe("AccountDeleteContextProvider", () => {
     expect(getByTestId("account-deletion-lock")).toBeTruthy()
     expect(getByText("satoshi")).toBeTruthy()
     expect(getByText("Your account is being closed, please wait...")).toBeTruthy()
+  })
+
+  /** A see-through cover was the original bug: the screen behind it re-renders for the
+   *  next account mid-removal. It is painted in the screen's own background. */
+  it("hides the screen behind it completely", () => {
+    const { getByTestId } = render(
+      <AccountDeleteContextProvider>
+        <LockController />
+      </AccountDeleteContextProvider>,
+    )
+
+    act(() => controls.setAccountIsBeingDeleted?.(true, "satoshi"))
+
+    const coverStyle = StyleSheet.flatten(
+      getByTestId("account-deletion-lock").props.style,
+    )
+    expect(coverStyle).toMatchObject({
+      position: "absolute",
+      top: 0,
+      right: 0,
+      bottom: 0,
+      left: 0,
+      backgroundColor: "#fff",
+    })
+    expect(coverStyle.opacity ?? 1).toBe(1)
   })
 
   it("keeps the screen mounted under the cover so the removal it runs is not torn down", () => {
