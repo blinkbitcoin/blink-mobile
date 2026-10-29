@@ -14,7 +14,9 @@ type Props = {
   children: React.ReactNode
   /** Back action for the failure view. Screens whose gated content cannot be
    *  recovered once popped (a server-once API secret) pass a confirming handler
-   *  here so Back can never silently discard it. Defaults to goBack. */
+   *  here so Back can never silently discard it. Defaults to goBack. Such a screen
+   *  also blocks its header Back, so the handler is offered while registration is
+   *  pending too. */
   onBack?: () => void
   /** Input-only screens (the user types a phrase they already hold) must not be
    *  locked out when registration keeps failing — Try Again re-runs the same
@@ -59,6 +61,7 @@ const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
   } = useTheme()
   const navigation = useNavigation()
   const handleBack = onBack ?? (() => navigation.goBack())
+  const hasScreenOwnedBack = onBack !== undefined
 
   if (state === "active") return <>{children}</>
 
@@ -74,6 +77,15 @@ const GatedContent: React.FC<Props & { onRetry: () => void }> = ({
             {...testProps("screen-security-activating")}
           />
         </View>
+        {hasScreenOwnedBack ? (
+          <View style={styles.activatingBackContainer}>
+            <GaloySecondaryButton
+              title={LL.common.back()}
+              onPress={onBack}
+              {...testProps("screen-security-back")}
+            />
+          </View>
+        ) : null}
       </Screen>
     )
   }
@@ -106,6 +118,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flex: 1,
     justifyContent: "center",
     alignItems: "center",
+  },
+  activatingBackContainer: {
+    paddingHorizontal: 20,
+    paddingBottom: 20,
   },
   errorContainer: {
     flex: 1,

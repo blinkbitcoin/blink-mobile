@@ -202,4 +202,27 @@ describe("ScreenSecurityGate", () => {
 
     expect(mockSetOptions).toHaveBeenCalled()
   })
+  /** A screen that owns its way out (the one-time API secret hides the header Back
+   *  and blocks every removal) must still offer it while registration is pending,
+   *  or a registration that does not land leaves the user with no way to leave. */
+  it("offers the screen's own Back while registration is pending", async () => {
+    pendingLease()
+    const onBack = jest.fn()
+
+    const { getByTestId, queryByText } = renderGated(<SensitiveContent />, { onBack })
+    await act(async () => {})
+
+    expect(queryByText(SENSITIVE)).toBeNull()
+    fireEvent.press(getByTestId("screen-security-back"))
+    expect(onBack).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves Back to the header while pending when the screen has no handler of its own", async () => {
+    pendingLease()
+
+    const { queryByTestId } = renderGated()
+    await act(async () => {})
+
+    expect(queryByTestId("screen-security-back")).toBeNull()
+  })
 })

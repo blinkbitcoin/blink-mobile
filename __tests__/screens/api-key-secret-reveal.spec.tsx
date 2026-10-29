@@ -158,6 +158,29 @@ describe("ApiKeySecretReveal", () => {
       expect(event.preventDefault).toHaveBeenCalled()
     })
 
+    /** Header Back is hidden and every removal is blocked, so a registration that
+     *  does not land would otherwise leave no way out while it is pending. */
+    it("offers Back while registration is pending, and it asks before discarding", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      expect(screen.queryByTestId("api-key-secret")).toBeNull()
+
+      fireEvent.press(screen.getByTestId("screen-security-back"))
+
+      expect(mockGoBack).not.toHaveBeenCalled()
+      expect(Alert.alert).toHaveBeenCalledWith(
+        LL.ApiScreen.discardSecretTitle(),
+        LL.ApiScreen.discardSecretBody(),
+        expect.any(Array),
+      )
+      const discard = lastAlertButtons().find((button) => button.style === "destructive")
+      discard?.onPress?.()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+    })
+
     it("still blocks dismissal after registration fails", async () => {
       const registration = deferred<void>()
       mockLeaseReady = registration.promise
