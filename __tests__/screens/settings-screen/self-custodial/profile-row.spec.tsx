@@ -131,6 +131,7 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
     navigate: mockNavigate,
     dispatch: jest.fn(),
+    popTo: jest.fn(),
     setOptions: jest.fn(),
   }),
   CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },

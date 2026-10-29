@@ -2,12 +2,12 @@ import { act, renderHook } from "@testing-library/react-native"
 
 import { useAccountRemoval } from "@app/screens/settings-screen/self-custodial/use-account-removal"
 
-const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 const mockDispatch = jest.fn()
 const mockSetOptions = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({
-    navigate: mockNavigate,
+    popTo: mockPopTo,
     dispatch: mockDispatch,
     setOptions: mockSetOptions,
   }),
@@ -98,7 +98,7 @@ describe("useAccountRemoval", () => {
     act(() => result.current.requestRemoval("account-a", "Anon user"))
     await act(() => result.current.runPendingRemoval())
 
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({
         type: "success",
@@ -116,7 +116,7 @@ describe("useAccountRemoval", () => {
     await act(() => result.current.runPendingRemoval())
 
     expect(mockSetAccountIsBeingDeleted).toHaveBeenLastCalledWith(false)
-    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockPopTo).not.toHaveBeenCalled()
     expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -139,7 +139,7 @@ describe("useAccountRemoval", () => {
     await act(() => result.current.runPendingRemoval())
 
     expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
     expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({
@@ -176,7 +176,7 @@ describe("useAccountRemoval", () => {
     let navigatedThroughLock = false
     mockLeaveWhileDeleting.mockImplementationOnce((navigate) => {
       navigate()
-      navigatedThroughLock = mockNavigate.mock.calls.length === 1
+      navigatedThroughLock = mockPopTo.mock.calls.length === 1
     })
     mockDeleteWallet.mockResolvedValue({
       removed: true,
@@ -188,6 +188,6 @@ describe("useAccountRemoval", () => {
     await act(() => result.current.runPendingRemoval())
 
     expect(navigatedThroughLock).toBe(true)
-    expect(mockNavigate).toHaveBeenCalledTimes(1)
+    expect(mockPopTo).toHaveBeenCalledTimes(1)
   })
 })

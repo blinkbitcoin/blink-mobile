@@ -3,12 +3,11 @@ import React, {
   createContext,
   useCallback,
   useContext,
-  useEffect,
   useMemo,
   useRef,
   useState,
 } from "react"
-import { ActivityIndicator, BackHandler, View } from "react-native"
+import { ActivityIndicator, View } from "react-native"
 
 import { useNavigation, usePreventRemove } from "@react-navigation/native"
 
@@ -74,16 +73,12 @@ export const AccountDeleteContextProvider: React.FC<PropsWithChildren> = ({
     navigate()
   }, [])
 
-  /** The Android back key is not a header option, so it is held separately. */
-  useEffect(() => {
-    if (!isLocked) return
-    const backGuard = BackHandler.addEventListener("hardwareBackPress", () => true)
-    return () => backGuard.remove()
-  }, [isLocked])
-
   /** Anything that still tries to remove the screen mid-removal is refused, except the
-   *  navigation the removal itself runs once it lands. A refused action is marked as
-   *  already seen by this screen, so dispatching it again lets it through. */
+   *  navigation the removal itself runs once it lands. That includes the Android back key:
+   *  the navigator turns it into a `goBack`, so it needs no listener of its own, and an
+   *  app-wide one would outlive the screen if the screen were ever left on the stack.
+   *  A refused action is marked as already seen by this screen, so dispatching it again
+   *  lets it through. */
   usePreventRemove(isLocked, ({ data }) => {
     if (isLeaving.current) navigation.dispatch(data.action)
   })

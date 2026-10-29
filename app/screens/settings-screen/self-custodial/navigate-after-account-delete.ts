@@ -4,13 +4,16 @@ import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { type DeleteAccountOutcome } from "@app/self-custodial/hooks/use-delete-account"
 
+/** Every outcome takes the removed account's screen off the stack. Its lock stays up
+ *  while it leaves, so a screen left underneath would keep that lock: a dead screen to
+ *  come back to, with the header back control hidden and the swipe off. */
 export const navigateAfterAccountDelete = (
   navigation: NativeStackNavigationProp<RootStackParamList>,
   outcome: DeleteAccountOutcome,
 ): void => {
   switch (outcome) {
     case "switched-to-self-custodial":
-      navigation.navigate("Primary")
+      navigation.popTo("Primary")
       return
     case "remained":
     case "switched-to-custodial":

@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react"
-import { BackHandler, Text } from "react-native"
+import { Text } from "react-native"
 import { act, render } from "@testing-library/react-native"
 
 import {
@@ -165,15 +165,6 @@ describe("AccountDeleteContextProvider", () => {
       expect(options.gestureEnabled).toBe(false)
     })
 
-    it("holds the Android back key", () => {
-      const addListener = jest.spyOn(BackHandler, "addEventListener")
-      renderLocked()
-
-      const [event, handler] = addListener.mock.calls.at(-1) ?? []
-      expect(event).toBe("hardwareBackPress")
-      expect(handler?.()).toBe(true)
-    })
-
     it("refuses anything else that would remove the screen", () => {
       renderLocked()
 
@@ -198,8 +189,6 @@ describe("AccountDeleteContextProvider", () => {
     })
 
     it("gives every exit back when released", () => {
-      const remove = jest.fn()
-      jest.spyOn(BackHandler, "addEventListener").mockReturnValue({ remove })
       renderLocked()
 
       act(() => controls.setAccountIsBeingDeleted?.(false))
@@ -208,7 +197,6 @@ describe("AccountDeleteContextProvider", () => {
         headerLeft: defaultHeaderBack,
         gestureEnabled: true,
       })
-      expect(remove).toHaveBeenCalledTimes(1)
       expect(preventRemove().isPrevented).toBe(false)
     })
 
