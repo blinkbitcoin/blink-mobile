@@ -360,8 +360,8 @@ export default class KeyStoreWrapper {
 
     if (erased && legacyErased) return true
 
-    // An erase reports failure for a key that was never there too, so ask what
-    // is actually still readable rather than writing on every clear.
+    // An erase can fail on a slot that holds nothing to clear, so ask what is
+    // actually still readable rather than writing on every failed clear.
     const remaining = await KeyStoreWrapper.getPinFailureState()
     if (remaining.status === "absent") return true
     const storedAttempts = remaining.status === "found" ? remaining.state.attempts : null
@@ -603,7 +603,8 @@ export default class KeyStoreWrapper {
    * after an earlier one landed finds no key, and the iOS module rejects that delete like
    * any failure, so a seed already gone would count as surviving forever and its wallet
    * could never leave the list. The legacy-copy rule every migrated slot erases by settles
-   * it, with that rule's known limit: on iOS a read that fails also reports absent.
+   * it with a blank write the keychain has to accept, never with a read, since on iOS a
+   * read that fails reports the key absent too.
    */
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
     const isSeedGone = await eraseLegacyCopy(KeyStoreWrapper.mnemonicKeyFor(accountId))

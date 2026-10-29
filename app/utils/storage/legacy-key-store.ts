@@ -1,5 +1,5 @@
 import { Platform } from "react-native"
-import RNSecureKeyStore from "react-native-secure-key-store"
+import RNSecureKeyStore, { ACCESSIBLE } from "react-native-secure-key-store"
 
 import type { SecureRead } from "./secure-store"
 
@@ -17,8 +17,8 @@ import type { SecureRead } from "./secure-store"
  * exception goes away.
  *
  * This module is the read-and-erase half of the migration off that library
- * (blinkbitcoin/blink-wip#1143); it deliberately has no write primitive.
- * Migrated values are only ever written to the new store.
+ * (blinkbitcoin/blink-wip#1143). Its one write is the blank `legacyBlank` erases
+ * with, never a value: migrated values are only ever written to the new store.
  */
 
 /**
@@ -96,6 +96,37 @@ export const legacyRead = async (key: string): Promise<SecureRead> => {
 export const legacyErase = async (key: string): Promise<boolean> => {
   try {
     await RNSecureKeyStore.remove(key)
+    return true
+  } catch {
+    return false
+  }
+}
+
+/** Read back by both stores as absent, so a blanked key holds nothing either will serve. */
+const BLANK = ""
+
+/**
+ * Always passed, though the typings call it optional: the iOS `set:` takes it as a fixed
+ * argument, and a call without it crashes the native side instead of rejecting. This
+ * device-only class keeps a blank the tidy-up delete leaves behind out of every backup.
+ */
+const BLANK_OPTIONS = { accessible: ACCESSIBLE.AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY }
+
+/**
+ * Overwrites a key with nothing: the erase the iOS module can prove where `remove:` cannot.
+ *
+ * Its `remove:` rejects a key that is not there exactly like a delete that failed, and its
+ * `get:` reports every lookup that fails with the missing-key code, so neither tells an
+ * erased key from a keychain that is not answering. `set:` adds the item or replaces the
+ * one already there and resolves only once the keychain took the write, so a key that was
+ * already gone blanks as cleanly as one that held a value, while a failing keychain refuses.
+ *
+ * Guarded like the read: `set:` reaches the reinstall wipe.
+ */
+export const legacyBlank = async (key: string): Promise<boolean> => {
+  disableUninstallReset()
+  try {
+    await RNSecureKeyStore.set(key, BLANK, BLANK_OPTIONS)
     return true
   } catch {
     return false
