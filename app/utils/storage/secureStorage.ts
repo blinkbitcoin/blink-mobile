@@ -466,10 +466,6 @@ export default class KeyStoreWrapper {
    * "nothing stored" and "the keystore is unhappy" arrive the same way and only
    * the error code tells them apart. Callers that would destroy or overwrite a
    * credential based on an empty read must use this instead of getActiveToken.
-   *
-   * The code only tells them apart on Android — see the note above
-   * KEY_NOT_FOUND_CODE. On iOS every failed read reports absent, so the failed
-   * branch its callers take is unreachable there.
    */
   public static async readActiveToken(): Promise<ActiveTokenRead> {
     const read = await KeyStoreWrapper.migratedReadWithStatus(

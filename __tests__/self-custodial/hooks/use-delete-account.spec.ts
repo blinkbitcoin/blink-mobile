@@ -672,9 +672,8 @@ describe("useDeleteAccount", () => {
     })
 
     /**
-     * The iOS legacy module reports every failed read as a missing key, so a token still in
-     * the keychain can read as absent. The deletion never asks: only the erase decides, and
-     * one that failed keeps the lock whatever a read would have said.
+     * The deletion never asks whether the token is there: only the erase decides, and one
+     * that failed keeps the lock whatever a read would have said.
      */
     it("keeps the lock on a failed token erase even where a read would answer absent", async () => {
       mockReadActiveToken.mockResolvedValue({ status: "absent" })
