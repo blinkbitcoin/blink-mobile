@@ -24,10 +24,10 @@ import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/acco
 import { AccountType, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { hasFunds } from "@app/utils/has-funds"
-import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
+import { selfCustodialAccountName } from "./account-name"
 import { useAccountRemoval } from "./use-account-removal"
 
 type ProfileRowProps = {
@@ -59,11 +59,12 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const isActive =
     activeAccount?.type === AccountType.SelfCustodial && activeAccount.id === accountId
 
-  const lightningAddress = isActive
-    ? liveLightningAddress ?? persistedLightningAddress
-    : persistedLightningAddress
-  const rowTitle =
-    extractLightningAddressUsername(lightningAddress) ?? LL.common.anonymousUser()
+  const rowTitle = selfCustodialAccountName({
+    isActive,
+    liveLightningAddress,
+    persistedLightningAddress,
+    anonymousName: LL.common.anonymousUser(),
+  })
 
   const handleSwitch = () => {
     if (isActive) return

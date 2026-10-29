@@ -11,11 +11,11 @@ import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
 import { hasFunds } from "@app/utils/has-funds"
-import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 
 import { SettingsButton } from "../button"
 
+import { selfCustodialAccountName } from "./account-name"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
 import { useAccountRemoval } from "./use-account-removal"
@@ -41,14 +41,14 @@ export const DeleteAccount: React.FC = () => {
 
   const handleConfirm = () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
-    /** Same fallback as the account's row: the live address is empty until the wallet
-     *  has loaded it, and the persisted one still names the account. */
-    const persistedLightningAddress = selfCustodialEntries.find(
-      (entry) => entry.id === activeAccount.id,
-    )?.lightningAddress
-    const identifier =
-      extractLightningAddressUsername(lightningAddress ?? persistedLightningAddress) ??
-      LL.common.anonymousUser()
+    const identifier = selfCustodialAccountName({
+      isActive: true,
+      liveLightningAddress: lightningAddress,
+      persistedLightningAddress: selfCustodialEntries.find(
+        (entry) => entry.id === activeAccount.id,
+      )?.lightningAddress,
+      anonymousName: LL.common.anonymousUser(),
+    })
     requestRemoval(activeAccount.id, identifier)
     setConfirmVisible(false)
   }
