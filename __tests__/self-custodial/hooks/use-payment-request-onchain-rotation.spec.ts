@@ -1251,3 +1251,104 @@ describe("a background request overtaken after rotating", () => {
     expect(result.current?.onchainAddress).toBe("bc1qrotated...")
   })
 })
+
+describe("a tap still running when Receive is left and reopened", () => {
+  // Regression: the queue belonged to the screen, so a reopened Receive started with an
+  // empty one. It read back the address the tap was replacing and showed it, then the
+  // tap's late rotation overwrote the record behind it.
+  const holdTapThenReopen = async () => {
+    let stored: unknown = { address: "bc1qfirst...", depositMarker: null }
+    mockLoadIssuedOnchainAddress.mockImplementation(() => Promise.resolve(stored))
+    mockSaveIssuedOnchainAddress.mockImplementation((_id: string, record: unknown) => {
+      stored = record
+      return Promise.resolve()
+    })
+    let sdkCurrentAddress = "bc1qfirst..."
+    let finishRotation: () => void = () => {}
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockImplementationOnce(
+        () =>
+          new Promise<{ address: string }>((resolve) => {
+            finishRotation = () => {
+              sdkCurrentAddress = "bc1qtapped..."
+              resolve({ address: sdkCurrentAddress })
+            }
+          }),
+      )
+      .mockImplementation(() => Promise.resolve({ address: sdkCurrentAddress }))
+
+    const first = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(first.result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+    let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+    await act(async () => {
+      tap = first.result.current?.generateNewOnchainAddress?.()
+      await flushEffects()
+    })
+    first.unmount()
+
+    const reopened = renderHook(() => usePaymentRequest())
+    await flushEffects()
+    return { reopened, finishRotation, tap: () => tap, stored: () => stored }
+  }
+
+  it("holds the reopened screen's request until the tap has rotated", async () => {
+    const { reopened, finishRotation } = await holdTapThenReopen()
+
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+    expect(reopened.result.current?.onchainAddress).toBeUndefined()
+
+    await act(async () => {
+      finishRotation()
+    })
+    await flushEffects()
+
+    expect(mockReceiveOnchain.mock.calls).toEqual([
+      [{ newAddress: false }],
+      [{ newAddress: true }],
+      [{ newAddress: false }],
+    ])
+    expect(reopened.result.current?.onchainAddress).toBe("bc1qtapped...")
+  })
+
+  it("leaves the record on the address the reopened screen shows", async () => {
+    const { reopened, finishRotation, tap, stored } = await holdTapThenReopen()
+
+    let outcome: NewOnchainAddressResultType | undefined
+    await act(async () => {
+      finishRotation()
+      outcome = await tap()
+    })
+    await flushEffects()
+
+    expect(outcome).toBe(NewOnchainAddressResult.Created)
+    expect(reopened.result.current?.onchainAddress).toBe("bc1qtapped...")
+    expect(stored()).toEqual(expect.objectContaining({ address: "bc1qtapped..." }))
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenLastCalledWith(
+      "sc-account-1",
+      expect.objectContaining({ address: "bc1qtapped..." }),
+    )
+  })
+
+  it("does not hold a different SDK's request behind it", async () => {
+    // An account switch brings its own SDK, which the old one's rotation cannot move.
+    const { finishRotation } = await holdTapThenReopen()
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: { id: "other-sdk" },
+      lastReceivedPaymentId: null,
+      allTransactions: [],
+    })
+
+    const other = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(other.result.current?.onchainAddress).toBe("bc1qfirst...")
+    })
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(3)
+
+    await act(async () => {
+      finishRotation()
+    })
+  })
+})

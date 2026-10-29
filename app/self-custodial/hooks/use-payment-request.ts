@@ -89,6 +89,21 @@ const isSameGeneration = (a: GenerationInputs | null, b: GenerationInputs): bool
  */
 export const ONCHAIN_REQUEST_TIMEOUT_MS = 30_000
 
+/**
+ * The tail of each SDK's on-chain address queue. It belongs to the SDK, not to the receive
+ * screen: a request runs on after the screen that made it is gone, and a screen opened
+ * meanwhile has to start from where that request leaves the SDK. Otherwise it reads back
+ * the address a tap was replacing, shows it, and the late rotation then overwrites the
+ * record behind it. Weakly keyed, so an SDK that is switched away from takes its queue.
+ */
+let onchainQueues = new WeakMap<BreezSdkInterface, Promise<unknown>>()
+
+/** Drops every queue. For test isolation: a request one spec leaves hanging would
+ *  otherwise hold up the next spec's requests on the same mock SDK. */
+export const resetOnchainRequestQueues = (): void => {
+  onchainQueues = new WeakMap()
+}
+
 /** How one queued on-chain address request ended. */
 const OnchainRequestOutcome = {
   Issued: "Issued",
@@ -440,11 +455,13 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
    * a request overlapping a rotation can come back with the address it replaced and
    * put it back on screen. Run in order, each request starts from the one before it.
    *
+   * The queue is the SDK's (see `onchainQueues`), so this holds across screens too: a
+   * request left running by a screen the user backed out of still finishes first.
+   *
    * Only the newest request may publish, unless it was the user asking for a fresh
    * address: a background request queued behind another adds nothing the later one
    * will not redo, but a tap must show the address it created.
    */
-  const onchainQueueRef = useRef<Promise<unknown>>(Promise.resolve())
   const onchainRequestIdRef = useRef(0)
 
   // `forceNew` is the user asking for a fresh address: earlier addresses stay valid, so it
@@ -566,7 +583,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
           resolve(OnchainRequestOutcome.Failed),
         )
       })
-      const request = onchainQueueRef.current.then(async () => {
+      const queueTail = (sdk && onchainQueues.get(sdk)) || Promise.resolve()
+      const request = queueTail.then(async () => {
         const timer = setTimeout(() => {
           recordAppError(
             new Error(
@@ -592,7 +610,12 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       // time is cancelled, and the next starts only once it has stopped, so it can no
       // longer move the SDK to another address behind the next one's back. A failed
       // request must not stall the ones queued behind it either.
-      onchainQueueRef.current = request.catch(() => undefined)
+      if (sdk) {
+        onchainQueues.set(
+          sdk,
+          request.catch(() => undefined),
+        )
+      }
       return Promise.race([request, timedOut]).then(
         (outcome) => {
           if (outcome === OnchainRequestOutcome.Failed) markFailed()
@@ -604,7 +627,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         },
       )
     },
-    [requestOnchainAddress],
+    [sdk, requestOnchainAddress],
   )
 
   // Runs on mount and again whenever an on-chain receipt or an unclaimed deposit
