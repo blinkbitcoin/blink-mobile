@@ -539,6 +539,24 @@ describe("AddPlacePanel", () => {
       jest.restoreAllMocks()
     })
 
+    it("gives the X and the back arrow a 48 target, Android's minimum and over iOS's 44", () => {
+      const { getByTestId } = renderSheet()
+      continueToCategories({ getByTestId })
+
+      for (const [testID, iconSize] of [
+        ["close-add-place", 24],
+        ["back-to-place-details", 20],
+      ] as const) {
+        const button = getByTestId(testID)
+        // The drawn icon is the button's only child, so its box is the icon's.
+        const slop = button.props.hitSlop
+        expect(iconSize + slop * 2).toBeGreaterThanOrEqual(48)
+      }
+      expect(
+        getByTestId("close-add-place").findByProps({ name: "close" }).props.size,
+      ).toBe(24)
+    })
+
     it("marks the title as the panel's heading", () => {
       const { getByText } = renderSheet()
 
