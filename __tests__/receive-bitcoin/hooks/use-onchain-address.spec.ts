@@ -249,6 +249,33 @@ describe("useOnChainAddress", () => {
       expect(result.current.failed).toBe(false)
     })
 
+    it("never returns the previous wallet's address, not even in the render that switches", async () => {
+      // Regression: the address was cleared from an effect, so the first render on the
+      // new wallet still handed the previous wallet's address to the QR, copy and share.
+      mockMutationFn.mockResolvedValueOnce({
+        data: { onChainAddressCurrent: { address: "bc1qwallet1" } },
+      })
+      const renders: { walletId: string; address: string | null; uri?: string }[] = []
+      const { result, rerender } = renderHook(
+        ({ walletId }: { walletId: string }) => {
+          const hook = useOnChainAddress(walletId)
+          renders.push({ walletId, address: hook.address, uri: hook.getFullUriFn?.({}) })
+          return hook
+        },
+        { initialProps: { walletId: "wallet-1" } },
+      )
+      await waitFor(() => expect(result.current.address).toBe("bc1qwallet1"))
+      mockMutationFn.mockReturnValueOnce(new Promise(() => {}))
+
+      rerender({ walletId: "wallet-2" })
+
+      const onWallet2 = renders.filter((r) => r.walletId === "wallet-2")
+      expect(onWallet2.length).toBeGreaterThan(0)
+      expect(onWallet2).toEqual(
+        onWallet2.map(({ walletId }) => ({ walletId, address: null, uri: undefined })),
+      )
+    })
+
     it("fails instead of keeping the previous wallet's address when the fetch fails", async () => {
       // Regression: the previous wallet's address stayed on the new wallet's page for
       // good, so a payer scanning it paid the wrong wallet and New never appeared.

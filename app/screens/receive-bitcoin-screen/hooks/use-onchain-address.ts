@@ -37,6 +37,30 @@ gql`
 
 const RATE_LIMITED_CODE = "TOO_MANY_REQUEST"
 
+type WalletAddressState = {
+  walletId: string | undefined
+  address: string | null
+  loading: boolean
+  error: string | null
+  // The fetch settled without an address: nothing more is coming until the user retries.
+  failed: boolean
+}
+
+const initialState = (walletId: string | undefined): WalletAddressState => ({
+  walletId,
+  address: null,
+  loading: Boolean(walletId),
+  error: null,
+  failed: false,
+})
+
+const isInitialState = (state: WalletAddressState, walletId: string | undefined) => {
+  const initial = initialState(walletId)
+  return (Object.keys(initial) as (keyof WalletAddressState)[]).every(
+    (key) => state[key] === initial[key],
+  )
+}
+
 type UseOnChainAddressOptions = {
   amount?: number
   memo?: string
@@ -49,46 +73,42 @@ export const useOnChainAddress = (
   const [onChainAddressCurrent] = useOnChainAddressCurrentMutation()
   const [onChainAddressCreate] = useOnChainAddressCreateMutation()
 
-  const [address, setAddress] = useState<string | null>(null)
-  const [loading, setLoading] = useState(Boolean(walletId))
-  const [error, setError] = useState<string | null>(null)
-  // The fetch settled without an address: nothing more is coming until the user retries.
-  const [failed, setFailed] = useState(false)
+  // Tagged with the wallet it belongs to, so the render that switches wallets already
+  // reads as "no address": clearing it from an effect would leave that render, and the
+  // QR, copy and share it feeds, holding the previous wallet's address.
+  const [state, setState] = useState<WalletAddressState>(() => initialState(walletId))
+  const current = state.walletId === walletId ? state : initialState(walletId)
+  const { address, loading, error, failed } = current
   // Only the latest fetch or create may write; a late answer may belong to another wallet.
   const generationRef = useRef(0)
 
   useEffect(() => {
     generationRef.current += 1
     const generation = generationRef.current
-    // The address held so far belongs to the previous wallet: never show, copy or
-    // share it on this one, even while this wallet's address is loading.
-    setAddress(null)
-    setError(null)
-    setFailed(false)
-    if (!walletId) {
-      setLoading(false)
-      return
-    }
+    // Kept as is when already reset: a fresh object would re-render, and with no wallet
+    // the effect can run again on every render.
+    setState((prev) => (isInitialState(prev, walletId) ? prev : initialState(walletId)))
+    if (!walletId) return
     const isCurrent = () => generation === generationRef.current
+    const update = (patch: Partial<WalletAddressState>) =>
+      setState((prev) => ({ ...prev, ...patch }))
 
-    setLoading(true)
     onChainAddressCurrent({
       variables: { input: { walletId } },
     })
       .then((result) => {
         if (!isCurrent()) return
         const addr = result.data?.onChainAddressCurrent?.address
-        if (addr) setAddress(addr)
-        else setFailed(true)
+        if (addr) update({ address: addr })
+        else update({ failed: true })
       })
       .catch((err) => {
         if (!isCurrent()) return
         // The QR shows the failure and offers New; no toast on top of it.
-        setError(err?.message ?? "Unknown error")
-        setFailed(true)
+        update({ error: err?.message ?? "Unknown error", failed: true })
       })
       .finally(() => {
-        if (isCurrent()) setLoading(false)
+        if (isCurrent()) update({ loading: false })
       })
   }, [walletId, onChainAddressCurrent])
 
@@ -117,8 +137,7 @@ export const useOnChainAddress = (
           )
           return NewOnchainAddressResult.Failed
         }
-        setAddress(addr)
-        setFailed(false)
+        setState((prev) => ({ ...prev, address: addr, failed: false }))
         return NewOnchainAddressResult.Created
       } catch (err) {
         reportError("onChainAddressCreate", err)
@@ -128,7 +147,7 @@ export const useOnChainAddress = (
       } finally {
         // A create can only start once the fetch has settled, but if it overtook one,
         // that fetch can no longer clear `loading` itself.
-        if (isCurrent()) setLoading(false)
+        if (isCurrent()) setState((prev) => ({ ...prev, loading: false }))
       }
     }, [walletId, onChainAddressCreate])
 
