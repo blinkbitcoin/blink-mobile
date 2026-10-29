@@ -1,10 +1,19 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
 import remoteConfigInstance from "@react-native-firebase/remote-config"
 
+import {
+  isUsableThresholdSet,
+  thresholdsFromConsole,
+  toWalletThresholds,
+} from "@app/custodial/two-factor-enforcement"
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
+import {
+  TwoFactorConsoleThresholds,
+  TwoFactorThresholds,
+} from "@app/types/two-factor-enforcement"
 import { logError } from "@app/utils/log-error"
 import {
   getRemoteConfigNumericObject,
@@ -36,6 +45,7 @@ const CardMaxOverdraftUsdKey = "cardMaxOverdraftUsd"
 const CardLateRepaymentFeeUsdKey = "cardLateRepaymentFeeUsd"
 const ReplaceCardDeliveryConfigKey = "replaceCardDeliveryConfig"
 const SparkCompatibleWalletsUrlKey = "sparkCompatibleWalletsUrl"
+const CardInvestmentDepositBtcWalletIdKey = "cardInvestmentDepositBtcWalletId"
 const BackupNudgeBannerThresholdKey = "backupNudgeBannerThreshold"
 const BackupNudgeModalThresholdKey = "backupNudgeModalThreshold"
 const BackupNudgeModalCooldownMsKey = "backupNudgeModalCooldownMs"
@@ -55,7 +65,12 @@ const OffboardOnlyCountriesKey = "offboardOnlyCountries"
 const SelfCustodialDepositClaimLeewayVbyteKey = "selfCustodialDepositClaimLeewayVbyte"
 const MigrationReceiveDelayedNoticeMsKey = "migrationReceiveDelayedNoticeMs"
 const MigrationDelayedRedirectEnabledKey = "migrationDelayedRedirectEnabled"
+const PersistentBulletinsEnabledKey = "persistentBulletinsEnabled"
+const CustodialTwoFactorEnforcementEnabledKey = "custodialTwoFactorEnforcementEnabled"
+const CustodialTwoFactorThresholdsKey = "custodialTwoFactorThresholds"
 const FeeRatesConfigKey = "feeRatesConfig"
+const InactivityFeeEnabledKey = "inactivityFeeEnabled"
+const CloudBundleStaleAfterMsKey = "cloudBundleStaleAfterMs"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -78,6 +93,10 @@ type FeatureFlags = {
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
   remoteConfigReady: boolean
+  /** Whether `nonCustodialEnabled` is the console's: fetched on this launch, or
+   *  activated on an earlier one and read before this launch's fetch settles. Off, it is
+   *  the shipped default, which says nothing about what the console set. */
+  isNonCustodialFlagSettled: boolean
 }
 
 type RemoteConfig = {
@@ -103,6 +122,7 @@ type RemoteConfig = {
   [CardLateRepaymentFeeUsdKey]: number
   [ReplaceCardDeliveryConfigKey]: ReplaceCardDeliveryConfig
   [SparkCompatibleWalletsUrlKey]: string
+  [CardInvestmentDepositBtcWalletIdKey]: string
   [BackupNudgeBannerThresholdKey]: number
   [BackupNudgeModalThresholdKey]: number
   [BackupNudgeModalCooldownMsKey]: number
@@ -121,7 +141,12 @@ type RemoteConfig = {
   [SelfCustodialDepositClaimLeewayVbyteKey]: number
   [MigrationReceiveDelayedNoticeMsKey]: number
   [MigrationDelayedRedirectEnabledKey]: boolean
+  [PersistentBulletinsEnabledKey]: boolean
+  [CustodialTwoFactorEnforcementEnabledKey]: boolean
+  [CustodialTwoFactorThresholdsKey]: TwoFactorThresholds
   [FeeRatesConfigKey]: FeeRatesConfig
+  [InactivityFeeEnabledKey]: boolean
+  [CloudBundleStaleAfterMsKey]: number
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -146,6 +171,23 @@ export const defaultFeeRatesConfig: FeeRatesConfig = {
   onchainEconomyBps: 40,
   transferBps: 50,
 }
+
+/** The two-factor tiers as shipped, as the console writes them: 50,000 sats or $50 for
+ *  the suggested tier, 500,000 sats or $500 for the recommended tier, 5,000,000 sats or
+ *  $5,000 for the enforced tier. */
+export const defaultTwoFactorConsoleThresholds: TwoFactorConsoleThresholds = {
+  suggestedSats: 50_000,
+  suggestedUsd: 50,
+  recommendedSats: 500_000,
+  recommendedUsd: 500,
+  enforcedSats: 5_000_000,
+  enforcedUsd: 5_000,
+}
+
+/** The same tiers in the wallets' own units, dollars in cents. */
+export const defaultTwoFactorThresholds: TwoFactorThresholds = toWalletThresholds(
+  defaultTwoFactorConsoleThresholds,
+)
 
 /** Default transfer/swap block, read by both account types. */
 // prettier-ignore
@@ -211,6 +253,10 @@ export const defaultRemoteConfig: RemoteConfig = {
   cardLateRepaymentFeeUsd: 25,
   replaceCardDeliveryConfig: defaultReplaceCardDeliveryConfig,
   sparkCompatibleWalletsUrl: "https://docs.spark.money/wallets/overview",
+  /** The receiving account's BITCOIN wallet, named by id so a rename cannot redirect the
+   *  money. A dollar wallet is refused by the API and reads as a failed invoice. Empty
+   *  until that account is decided, and the transfer step cannot pay while it is. */
+  cardInvestmentDepositBtcWalletId: "",
   backupNudgeBannerThreshold: 2100,
   backupNudgeModalThreshold: 21000,
   /** How long the self-custodial backup modal stays dismissed after the user closes it.
@@ -241,7 +287,25 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  releases the redirect once the notice window elapses instead of holding the swap
    *  until the receive confirms. Off by default — waiting is the product decision. */
   migrationDelayedRedirectEnabled: false,
+  /** Whether the home honours a bulletin the server marks as not dismissible. Off by
+   *  default, so every bulletin keeps its close control, as before the flag existed; on,
+   *  such a bulletin stays until the server retires it. A console toggle, so a bulletin
+   *  stuck on every home by mistake can be made closable again without a release. */
+  persistentBulletinsEnabled: false,
+  /** Whether a custodial account's balance earns it two-factor prompts. Off by default
+   *  so the prompts reach users only once the console turns them on, and can be pulled
+   *  back the same way without a release. */
+  custodialTwoFactorEnforcementEnabled: false,
+  custodialTwoFactorThresholds: defaultTwoFactorThresholds,
   feeRatesConfig: defaultFeeRatesConfig,
+  /** Whether the fee rates screen lists the inactivity fee. Visibility only: the
+   *  amount comes from `globals.feesInformation.inactivityFee`, the same config the
+   *  backend charges from, so it is never priced here (blink-wip#1200). */
+  inactivityFeeEnabled: true,
+  /** How long the cloud copy of the emergency bundle may trail the one on the device
+   *  before the home says so. An upload lands within seconds, so a week behind means
+   *  uploads stopped: a lapsed sign-in, or the cloud drive turned off (#4337). */
+  cloudBundleStaleAfterMs: 7 * 24 * 60 * 60 * 1000,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -249,34 +313,391 @@ const defaultFeatureFlags: FeatureFlags = {
   nonCustodialEnabled: false,
   stableBalanceEnabled: false,
   remoteConfigReady: false,
+  isNonCustodialFlagSettled: false,
 }
 
-remoteConfigInstance().setDefaults({
-  ...defaultRemoteConfig,
-  replaceCardDeliveryConfig: serializeRemoteConfigDefault(
-    defaultReplaceCardDeliveryConfig,
-  ),
-  custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
-    custodialFirstSignupBlockedDefault,
-  ),
-  selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
-  ),
-  selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-  ),
-  selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.selfCustodialCreationBlockedCountries,
-  ),
-  offboardOnlyCountries: serializeRemoteConfigDefault(
-    defaultRemoteConfig.offboardOnlyCountries,
-  ),
-  feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
-})
+/** Applied asynchronously: until it lands Firebase reports every key as static, values it
+ *  activated on an earlier launch included. */
+const defaultsApplied = Promise.resolve(
+  remoteConfigInstance().setDefaults({
+    ...defaultRemoteConfig,
+    replaceCardDeliveryConfig: serializeRemoteConfigDefault(
+      defaultReplaceCardDeliveryConfig,
+    ),
+    custodialFirstSignupBlockedCountries: serializeRemoteConfigDefault(
+      custodialFirstSignupBlockedDefault,
+    ),
+    selfCustodialDollarBalanceBlockedCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
+    ),
+    selfCustodialTransferBlockedCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+    ),
+    selfCustodialCreationBlockedCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+    ),
+    offboardOnlyCountries: serializeRemoteConfigDefault(
+      defaultRemoteConfig.offboardOnlyCountries,
+    ),
+    custodialTwoFactorThresholds: serializeRemoteConfigDefault(
+      defaultTwoFactorConsoleThresholds,
+    ),
+    feeRatesConfig: serializeRemoteConfigDefault(defaultFeeRatesConfig),
+  }),
+)
+
+/** A fetch that has not answered in this long settles as failed, and the app goes on
+ *  with what an earlier launch activated: what waits on the fetch, as the two-factor
+ *  tiers do, must not wait out Firebase's own minute on a weak connection. */
+const FETCH_TIMEOUT_MS = 10_000
 
 remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,
+  fetchTimeMillis: FETCH_TIMEOUT_MS,
 })
+
+/** A value Firebase holds for the key, or none while it holds only the static empty
+ *  one: the shipped defaults above are applied asynchronously, and a read before that
+ *  lands sees every key as an empty static value, which is no value at all. */
+const activatedValue = (key: string) => {
+  const value = remoteConfigInstance().getValue(key)
+  return value.getSource() === "static" ? null : value
+}
+
+const readBoolean = (key: string, fallback: boolean): boolean =>
+  activatedValue(key)?.asBoolean() ?? fallback
+
+const readNumber = (key: string, fallback: number): number =>
+  activatedValue(key)?.asNumber() ?? fallback
+
+const readString = (key: string, fallback: string): string =>
+  activatedValue(key)?.asString() ?? fallback
+
+/** Whether Firebase holds a value the console set for the key, activated on this
+ *  launch or an earlier one, rather than the shipped default. */
+const isFromConsole = (key: string): boolean =>
+  remoteConfigInstance().getValue(key).getSource() === "remote"
+
+/** The tier thresholds as the console sets them, read and checked once, as a set: a
+ *  set the two-factor rules cannot use, incomplete or out of bounds, falls back to the
+ *  shipped one as a whole, and is reported. Mixing a console value with a shipped one
+ *  could pass every check and still not be a set anyone wrote. */
+const readTwoFactorThresholds = (): TwoFactorThresholds => {
+  const value = getRemoteConfigObject<Record<string, unknown>>(
+    CustodialTwoFactorThresholdsKey,
+    defaultTwoFactorConsoleThresholds,
+  )
+  const thresholds = thresholdsFromConsole(value)
+  const isUsable =
+    thresholds !== null && isUsableThresholdSet(thresholds, defaultTwoFactorThresholds)
+  if (isUsable) return thresholds
+  logError({
+    scope: "remote-config",
+    error: new Error(`Thresholds in "${CustodialTwoFactorThresholdsKey}" are not usable`),
+    context: { key: CustodialTwoFactorThresholdsKey, value },
+  })
+  return defaultTwoFactorThresholds
+}
+
+/**
+ * Reads the config Firebase has activated: the values of the last fetch, persisted
+ * on the device, or the shipped defaults before any fetch. Read at the first render
+ * as well as after each fetch, so no flag is defaulted for the seconds a fetch takes.
+ * A key Firebase holds nothing for yet reads as its shipped default.
+ */
+const readRemoteConfig = (): RemoteConfig => {
+  const deviceAccountEnabledRestAuth = readBoolean(
+    DeviceAccountEnabledKey,
+    defaultRemoteConfig.deviceAccountEnabledRestAuth,
+  )
+
+  const balanceLimitToTriggerUpgradeModal = readNumber(
+    BalanceLimitToTriggerUpgradeModalKey,
+    defaultRemoteConfig.balanceLimitToTriggerUpgradeModal,
+  )
+
+  const feedbackEmailAddress = readString(
+    FeedbackEmailKey,
+    defaultRemoteConfig.feedbackEmailAddress,
+  )
+
+  const supportEmailAddress = readString(
+    SupportEmailKey,
+    defaultRemoteConfig.supportEmailAddress,
+  )
+
+  const upgradeModalCooldownDays = readNumber(
+    UpgradeModalCooldownDaysKey,
+    defaultRemoteConfig.upgradeModalCooldownDays,
+  )
+
+  const upgradeModalShowAtSessionNumber = readNumber(
+    UpgradeModalShowAtSessionNumberKey,
+    defaultRemoteConfig.upgradeModalShowAtSessionNumber,
+  )
+
+  const feeReimbursementMemo = readString(
+    FeeReimbursementMemoKey,
+    defaultRemoteConfig.feeReimbursementMemo,
+  )
+  const successIconDuration = readNumber(
+    SuccessIconDurationKey,
+    defaultRemoteConfig.successIconDuration,
+  )
+
+  const appLockGracePeriodSeconds = readNumber(
+    AppLockGracePeriodSecondsKey,
+    defaultRemoteConfig.appLockGracePeriodSeconds,
+  )
+
+  const cardTermsAndConditionsUrl = readString(
+    CardTermsAndConditionsUrlKey,
+    defaultRemoteConfig.cardTermsAndConditionsUrl,
+  )
+
+  const cardPrivacyPolicyUrl = readString(
+    CardPrivacyPolicyUrlKey,
+    defaultRemoteConfig.cardPrivacyPolicyUrl,
+  )
+
+  const cardCardholderAgreementUrl = readString(
+    CardCardholderAgreementUrlKey,
+    defaultRemoteConfig.cardCardholderAgreementUrl,
+  )
+
+  const cardESignConsentUrl = readString(
+    CardESignConsentUrlKey,
+    defaultRemoteConfig.cardESignConsentUrl,
+  )
+
+  const cardIssuerPrivacyPolicyUrl = readString(
+    CardIssuerPrivacyPolicyUrlKey,
+    defaultRemoteConfig.cardIssuerPrivacyPolicyUrl,
+  )
+
+  const cardSubscriptionPriceUsd = readNumber(
+    CardSubscriptionPriceUsdKey,
+    defaultRemoteConfig.cardSubscriptionPriceUsd,
+  )
+
+  const cardReplacementFeeUsd = readNumber(
+    CardReplacementFeeUsdKey,
+    defaultRemoteConfig.cardReplacementFeeUsd,
+  )
+
+  const cardUsdTransactionFeePercent = readNumber(
+    CardUsdTransactionFeePercentKey,
+    defaultRemoteConfig.cardUsdTransactionFeePercent,
+  )
+
+  const cardForeignTransactionFeePercent = readNumber(
+    CardForeignTransactionFeePercentKey,
+    defaultRemoteConfig.cardForeignTransactionFeePercent,
+  )
+
+  const cardMaxOverdraftUsd = readNumber(
+    CardMaxOverdraftUsdKey,
+    defaultRemoteConfig.cardMaxOverdraftUsd,
+  )
+
+  const cardLateRepaymentFeeUsd = readNumber(
+    CardLateRepaymentFeeUsdKey,
+    defaultRemoteConfig.cardLateRepaymentFeeUsd,
+  )
+
+  const sparkCompatibleWalletsUrl = readString(
+    SparkCompatibleWalletsUrlKey,
+    defaultRemoteConfig.sparkCompatibleWalletsUrl,
+  )
+
+  const cardInvestmentDepositBtcWalletId = readString(
+    CardInvestmentDepositBtcWalletIdKey,
+    defaultRemoteConfig.cardInvestmentDepositBtcWalletId,
+  )
+
+  const backupNudgeBannerThreshold = readNumber(
+    BackupNudgeBannerThresholdKey,
+    defaultRemoteConfig.backupNudgeBannerThreshold,
+  )
+
+  const backupNudgeModalThreshold = readNumber(
+    BackupNudgeModalThresholdKey,
+    defaultRemoteConfig.backupNudgeModalThreshold,
+  )
+
+  // asNumber() yields 0 for a malformed remote value, and a zero cooldown would
+  // make the modal undismissable again — fall back to the shipped default.
+  const remoteBackupNudgeModalCooldownMs = readNumber(
+    BackupNudgeModalCooldownMsKey,
+    defaultRemoteConfig.backupNudgeModalCooldownMs,
+  )
+  const backupNudgeModalCooldownMs =
+    remoteBackupNudgeModalCooldownMs > 0
+      ? remoteBackupNudgeModalCooldownMs
+      : defaultRemoteConfig.backupNudgeModalCooldownMs
+
+  const nonCustodialEnabled = readBoolean(
+    NonCustodialEnabledKey,
+    defaultRemoteConfig.nonCustodialEnabled,
+  )
+
+  const stableBalanceEnabled = readBoolean(
+    StableBalanceEnabledKey,
+    defaultRemoteConfig.stableBalanceEnabled,
+  )
+
+  const btcMapPlacesEnabled = readBoolean(
+    BtcMapPlacesEnabledKey,
+    defaultRemoteConfig.btcMapPlacesEnabled,
+  )
+
+  const autoConvertMaxAttempts = readNumber(
+    AutoConvertMaxAttemptsKey,
+    defaultRemoteConfig.autoConvertMaxAttempts,
+  )
+
+  const autoConvertPollMaxAttempts = readNumber(
+    AutoConvertPollMaxAttemptsKey,
+    defaultRemoteConfig.autoConvertPollMaxAttempts,
+  )
+
+  const autoConvertPollIntervalMs = readNumber(
+    AutoConvertPollIntervalMsKey,
+    defaultRemoteConfig.autoConvertPollIntervalMs,
+  )
+
+  const autoConvertAmountMatchToleranceBps = readNumber(
+    AutoConvertAmountMatchToleranceBpsKey,
+    defaultRemoteConfig.autoConvertAmountMatchToleranceBps,
+  )
+
+  const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
+    ReplaceCardDeliveryConfigKey,
+    {},
+  )
+
+  const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
+    ...defaultReplaceCardDeliveryConfig,
+    ...parsedDeliveryConfig,
+  }
+
+  const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
+    CustodialFirstSignupBlockedCountriesKey,
+    custodialFirstSignupBlockedDefault,
+  )
+
+  const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
+    SelfCustodialDollarBalanceBlockedCountriesKey,
+    defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
+  )
+
+  const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
+    SelfCustodialTransferBlockedCountriesKey,
+    defaultRemoteConfig.selfCustodialTransferBlockedCountries,
+  )
+
+  const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
+    SelfCustodialCreationBlockedCountriesKey,
+    defaultRemoteConfig.selfCustodialCreationBlockedCountries,
+  )
+
+  const offboardOnlyCountries = getRemoteConfigStringList(
+    OffboardOnlyCountriesKey,
+    defaultRemoteConfig.offboardOnlyCountries,
+  )
+
+  const selfCustodialDepositClaimLeewayVbyte = readNumber(
+    SelfCustodialDepositClaimLeewayVbyteKey,
+    defaultRemoteConfig.selfCustodialDepositClaimLeewayVbyte,
+  )
+
+  const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
+    MigrationReceiveDelayedNoticeMsKey,
+    defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
+  )
+
+  const migrationDelayedRedirectEnabled = readBoolean(
+    MigrationDelayedRedirectEnabledKey,
+    defaultRemoteConfig.migrationDelayedRedirectEnabled,
+  )
+
+  const persistentBulletinsEnabled = readBoolean(
+    PersistentBulletinsEnabledKey,
+    defaultRemoteConfig.persistentBulletinsEnabled,
+  )
+
+  const custodialTwoFactorEnforcementEnabled = readBoolean(
+    CustodialTwoFactorEnforcementEnabledKey,
+    defaultRemoteConfig.custodialTwoFactorEnforcementEnabled,
+  )
+
+  const custodialTwoFactorThresholds = readTwoFactorThresholds()
+
+  const feeRatesConfig = getRemoteConfigNumericObject(
+    FeeRatesConfigKey,
+    defaultFeeRatesConfig,
+  )
+
+  const inactivityFeeEnabled = readBoolean(
+    InactivityFeeEnabledKey,
+    defaultRemoteConfig.inactivityFeeEnabled,
+  )
+
+  const cloudBundleStaleAfterMs = getRemoteConfigPositiveNumber(
+    CloudBundleStaleAfterMsKey,
+    defaultRemoteConfig.cloudBundleStaleAfterMs,
+  )
+
+  return {
+    deviceAccountEnabledRestAuth,
+    balanceLimitToTriggerUpgradeModal,
+    feedbackEmailAddress,
+    supportEmailAddress,
+    upgradeModalCooldownDays,
+    upgradeModalShowAtSessionNumber,
+    feeReimbursementMemo,
+    successIconDuration,
+    appLockGracePeriodSeconds,
+    cardTermsAndConditionsUrl,
+    cardPrivacyPolicyUrl,
+    cardCardholderAgreementUrl,
+    cardESignConsentUrl,
+    cardIssuerPrivacyPolicyUrl,
+    cardSubscriptionPriceUsd,
+    cardReplacementFeeUsd,
+    cardUsdTransactionFeePercent,
+    cardForeignTransactionFeePercent,
+    cardMaxOverdraftUsd,
+    cardLateRepaymentFeeUsd,
+    replaceCardDeliveryConfig,
+    sparkCompatibleWalletsUrl,
+    cardInvestmentDepositBtcWalletId,
+    backupNudgeBannerThreshold,
+    backupNudgeModalThreshold,
+    backupNudgeModalCooldownMs,
+    nonCustodialEnabled,
+    stableBalanceEnabled,
+    btcMapPlacesEnabled,
+    autoConvertMaxAttempts,
+    autoConvertPollMaxAttempts,
+    autoConvertPollIntervalMs,
+    autoConvertAmountMatchToleranceBps,
+    custodialFirstSignupBlockedCountries,
+    selfCustodialDollarBalanceBlockedCountries,
+    selfCustodialTransferBlockedCountries,
+    selfCustodialCreationBlockedCountries,
+    offboardOnlyCountries,
+    selfCustodialDepositClaimLeewayVbyte,
+    migrationReceiveDelayedNoticeMs,
+    migrationDelayedRedirectEnabled,
+    persistentBulletinsEnabled,
+    custodialTwoFactorEnforcementEnabled,
+    custodialTwoFactorThresholds,
+    feeRatesConfig,
+    inactivityFeeEnabled,
+    cloudBundleStaleAfterMs,
+  }
+}
 
 export const FeatureFlagContext = createContext<FeatureFlags>(defaultFeatureFlags)
 export const RemoteConfigContext = createContext<RemoteConfig>(defaultRemoteConfig)
@@ -284,10 +705,17 @@ export const RemoteConfigContext = createContext<RemoteConfig>(defaultRemoteConf
 export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
   children,
 }) => {
-  const [remoteConfig, setRemoteConfig] = useState<RemoteConfig>(defaultRemoteConfig)
+  const [remoteConfig, setRemoteConfig] = useState<RemoteConfig>(readRemoteConfig)
 
   const { currentLevel } = useLevel()
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
+  /** Whether `nonCustodialEnabled` is the console's: activated on an earlier launch,
+   *  which cannot change before this launch's fetch settles and is readable once the
+   *  shipped defaults land, or by that fetch. A fetch that fails with nothing activated
+   *  before leaves the shipped default, which says nothing about the console. */
+  const [isNonCustodialFlagSettled, setIsNonCustodialFlagSettled] = useState(() =>
+    isFromConsole(NonCustodialEnabledKey),
+  )
   const rolloutLoggedRef = useRef(false)
 
   const {
@@ -295,236 +723,37 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
   } = useAppConfig()
   const hasCustodialAccount = useHasCustodialAccount()
 
+  /** Read again whether or not the fetch lands: a fetch that fails, offline, still
+   *  leaves Firebase holding what the device activated on an earlier launch, which the
+   *  first read could not see while the shipped defaults were still being applied. */
+  useEffect(() => {
+    let isMounted = true
+    /** Once the shipped defaults land, what an earlier launch activated is readable:
+     *  the config is read again from it, so the flag that says it is the console's
+     *  never runs ahead of the values it vouches for. */
+    defaultsApplied
+      .then(() => {
+        if (!isMounted) return
+        setRemoteConfig(readRemoteConfig())
+        if (isFromConsole(NonCustodialEnabledKey)) setIsNonCustodialFlagSettled(true)
+      })
+      .catch((err) =>
+        logError({
+          scope: "remote-config",
+          error: err,
+          context: { stage: "setDefaults" },
+        }),
+      )
+    return () => {
+      isMounted = false
+    }
+  }, [])
+
   useEffect(() => {
     ;(async () => {
       try {
         await remoteConfigInstance().fetchAndActivate()
-
-        const deviceAccountEnabledRestAuth = remoteConfigInstance()
-          .getValue(DeviceAccountEnabledKey)
-          .asBoolean()
-
-        const balanceLimitToTriggerUpgradeModal = remoteConfigInstance()
-          .getValue(BalanceLimitToTriggerUpgradeModalKey)
-          .asNumber()
-
-        const feedbackEmailAddress = remoteConfigInstance()
-          .getValue(FeedbackEmailKey)
-          .asString()
-
-        const supportEmailAddress = remoteConfigInstance()
-          .getValue(SupportEmailKey)
-          .asString()
-
-        const upgradeModalCooldownDays = remoteConfigInstance()
-          .getValue(UpgradeModalCooldownDaysKey)
-          .asNumber()
-
-        const upgradeModalShowAtSessionNumber = remoteConfigInstance()
-          .getValue(UpgradeModalShowAtSessionNumberKey)
-          .asNumber()
-
-        const feeReimbursementMemo = remoteConfigInstance()
-          .getValue(FeeReimbursementMemoKey)
-          .asString()
-        const successIconDuration = remoteConfigInstance()
-          .getValue(SuccessIconDurationKey)
-          .asNumber()
-
-        const appLockGracePeriodSeconds = remoteConfigInstance()
-          .getValue(AppLockGracePeriodSecondsKey)
-          .asNumber()
-
-        const cardTermsAndConditionsUrl = remoteConfigInstance()
-          .getValue(CardTermsAndConditionsUrlKey)
-          .asString()
-
-        const cardPrivacyPolicyUrl = remoteConfigInstance()
-          .getValue(CardPrivacyPolicyUrlKey)
-          .asString()
-
-        const cardCardholderAgreementUrl = remoteConfigInstance()
-          .getValue(CardCardholderAgreementUrlKey)
-          .asString()
-
-        const cardESignConsentUrl = remoteConfigInstance()
-          .getValue(CardESignConsentUrlKey)
-          .asString()
-
-        const cardIssuerPrivacyPolicyUrl = remoteConfigInstance()
-          .getValue(CardIssuerPrivacyPolicyUrlKey)
-          .asString()
-
-        const cardSubscriptionPriceUsd = remoteConfigInstance()
-          .getValue(CardSubscriptionPriceUsdKey)
-          .asNumber()
-
-        const cardReplacementFeeUsd = remoteConfigInstance()
-          .getValue(CardReplacementFeeUsdKey)
-          .asNumber()
-
-        const cardUsdTransactionFeePercent = remoteConfigInstance()
-          .getValue(CardUsdTransactionFeePercentKey)
-          .asNumber()
-
-        const cardForeignTransactionFeePercent = remoteConfigInstance()
-          .getValue(CardForeignTransactionFeePercentKey)
-          .asNumber()
-
-        const cardMaxOverdraftUsd = remoteConfigInstance()
-          .getValue(CardMaxOverdraftUsdKey)
-          .asNumber()
-
-        const cardLateRepaymentFeeUsd = remoteConfigInstance()
-          .getValue(CardLateRepaymentFeeUsdKey)
-          .asNumber()
-
-        const sparkCompatibleWalletsUrl = remoteConfigInstance()
-          .getValue(SparkCompatibleWalletsUrlKey)
-          .asString()
-
-        const backupNudgeBannerThreshold = remoteConfigInstance()
-          .getValue(BackupNudgeBannerThresholdKey)
-          .asNumber()
-
-        const backupNudgeModalThreshold = remoteConfigInstance()
-          .getValue(BackupNudgeModalThresholdKey)
-          .asNumber()
-
-        // asNumber() yields 0 for a malformed remote value, and a zero cooldown would
-        // make the modal undismissable again — fall back to the shipped default.
-        const remoteBackupNudgeModalCooldownMs = remoteConfigInstance()
-          .getValue(BackupNudgeModalCooldownMsKey)
-          .asNumber()
-        const backupNudgeModalCooldownMs =
-          remoteBackupNudgeModalCooldownMs > 0
-            ? remoteBackupNudgeModalCooldownMs
-            : defaultRemoteConfig.backupNudgeModalCooldownMs
-
-        const nonCustodialEnabled = remoteConfigInstance()
-          .getValue(NonCustodialEnabledKey)
-          .asBoolean()
-
-        const stableBalanceEnabled = remoteConfigInstance()
-          .getValue(StableBalanceEnabledKey)
-          .asBoolean()
-
-        const btcMapPlacesEnabled = remoteConfigInstance()
-          .getValue(BtcMapPlacesEnabledKey)
-          .asBoolean()
-
-        const autoConvertMaxAttempts = remoteConfigInstance()
-          .getValue(AutoConvertMaxAttemptsKey)
-          .asNumber()
-
-        const autoConvertPollMaxAttempts = remoteConfigInstance()
-          .getValue(AutoConvertPollMaxAttemptsKey)
-          .asNumber()
-
-        const autoConvertPollIntervalMs = remoteConfigInstance()
-          .getValue(AutoConvertPollIntervalMsKey)
-          .asNumber()
-
-        const autoConvertAmountMatchToleranceBps = remoteConfigInstance()
-          .getValue(AutoConvertAmountMatchToleranceBpsKey)
-          .asNumber()
-
-        const parsedDeliveryConfig = getRemoteConfigObject<ReplaceCardDeliveryConfig>(
-          ReplaceCardDeliveryConfigKey,
-          {},
-        )
-
-        const replaceCardDeliveryConfig: ReplaceCardDeliveryConfig = {
-          ...defaultReplaceCardDeliveryConfig,
-          ...parsedDeliveryConfig,
-        }
-
-        const custodialFirstSignupBlockedCountries = getRemoteConfigStringList(
-          CustodialFirstSignupBlockedCountriesKey,
-          custodialFirstSignupBlockedDefault,
-        )
-
-        const selfCustodialDollarBalanceBlockedCountries = getRemoteConfigStringList(
-          SelfCustodialDollarBalanceBlockedCountriesKey,
-          defaultRemoteConfig.selfCustodialDollarBalanceBlockedCountries,
-        )
-
-        const selfCustodialTransferBlockedCountries = getRemoteConfigStringList(
-          SelfCustodialTransferBlockedCountriesKey,
-          defaultRemoteConfig.selfCustodialTransferBlockedCountries,
-        )
-
-        const selfCustodialCreationBlockedCountries = getRemoteConfigStringList(
-          SelfCustodialCreationBlockedCountriesKey,
-          defaultRemoteConfig.selfCustodialCreationBlockedCountries,
-        )
-
-        const offboardOnlyCountries = getRemoteConfigStringList(
-          OffboardOnlyCountriesKey,
-          defaultRemoteConfig.offboardOnlyCountries,
-        )
-
-        const selfCustodialDepositClaimLeewayVbyte = remoteConfigInstance()
-          .getValue(SelfCustodialDepositClaimLeewayVbyteKey)
-          .asNumber()
-
-        const migrationReceiveDelayedNoticeMs = getRemoteConfigPositiveNumber(
-          MigrationReceiveDelayedNoticeMsKey,
-          defaultRemoteConfig.migrationReceiveDelayedNoticeMs,
-        )
-
-        const migrationDelayedRedirectEnabled = remoteConfigInstance()
-          .getValue(MigrationDelayedRedirectEnabledKey)
-          .asBoolean()
-
-        const feeRatesConfig = getRemoteConfigNumericObject(
-          FeeRatesConfigKey,
-          defaultFeeRatesConfig,
-        )
-
-        setRemoteConfig({
-          deviceAccountEnabledRestAuth,
-          balanceLimitToTriggerUpgradeModal,
-          feedbackEmailAddress,
-          supportEmailAddress,
-          upgradeModalCooldownDays,
-          upgradeModalShowAtSessionNumber,
-          feeReimbursementMemo,
-          successIconDuration,
-          appLockGracePeriodSeconds,
-          cardTermsAndConditionsUrl,
-          cardPrivacyPolicyUrl,
-          cardCardholderAgreementUrl,
-          cardESignConsentUrl,
-          cardIssuerPrivacyPolicyUrl,
-          cardSubscriptionPriceUsd,
-          cardReplacementFeeUsd,
-          cardUsdTransactionFeePercent,
-          cardForeignTransactionFeePercent,
-          cardMaxOverdraftUsd,
-          cardLateRepaymentFeeUsd,
-          replaceCardDeliveryConfig,
-          sparkCompatibleWalletsUrl,
-          backupNudgeBannerThreshold,
-          backupNudgeModalThreshold,
-          backupNudgeModalCooldownMs,
-          nonCustodialEnabled,
-          stableBalanceEnabled,
-          btcMapPlacesEnabled,
-          autoConvertMaxAttempts,
-          autoConvertPollMaxAttempts,
-          autoConvertPollIntervalMs,
-          autoConvertAmountMatchToleranceBps,
-          custodialFirstSignupBlockedCountries,
-          selfCustodialDollarBalanceBlockedCountries,
-          selfCustodialTransferBlockedCountries,
-          selfCustodialCreationBlockedCountries,
-          offboardOnlyCountries,
-          selfCustodialDepositClaimLeewayVbyte,
-          migrationReceiveDelayedNoticeMs,
-          migrationDelayedRedirectEnabled,
-          feeRatesConfig,
-        })
+        setIsNonCustodialFlagSettled(true)
       } catch (err) {
         logError({
           scope: "remote-config",
@@ -533,7 +762,9 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
           dedupKey: "remote-config-fetch",
         })
       } finally {
+        setRemoteConfig(readRemoteConfig())
         setRemoteConfigReady(true)
+        if (isFromConsole(NonCustodialEnabledKey)) setIsNonCustodialFlagSettled(true)
       }
     })()
   }, [])
@@ -545,6 +776,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     stableBalanceEnabled:
       remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
     remoteConfigReady,
+    isNonCustodialFlagSettled,
   }
 
   useEffect(() => {

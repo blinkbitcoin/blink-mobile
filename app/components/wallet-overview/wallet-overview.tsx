@@ -11,8 +11,9 @@ import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { getBtcWallet, getUsdWallet, WalletBalance } from "@app/graphql/wallets-utils"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
 import { useDollarBalanceGate } from "@app/hooks/use-dollar-balance-restricted"
-import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { TranslationFunctions } from "@app/i18n/i18n-types"
+import { GateReason } from "@app/types/account"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
@@ -60,6 +61,29 @@ gql`
   }
 `
 
+type UnavailableLabelInputs = {
+  reason: GateReason | null
+  isRestrictedRegion: boolean
+}
+
+/**
+ * Anon and an undetermined region each get their own words; a decided restriction keeps
+ * the region label. The sanctions block outranks the undetermined region, in the same
+ * order the gated tap resolves: a sanctioned row opens the sanctions modal, so a label
+ * inviting the user to pull and retry would promise a check that cannot reopen it.
+ */
+const unavailableLabelFor = (
+  { reason, isRestrictedRegion }: UnavailableLabelInputs,
+  LL: TranslationFunctions,
+): string => {
+  if (reason === GateReason.Anon) return LL.StablesatsRestriction.anonModeWalletLabel()
+  if (isRestrictedRegion) return LL.StablesatsRestriction.walletLabel()
+  if (reason === GateReason.UnknownRegion) {
+    return LL.StablesatsRestriction.unknownRegionWalletLabel()
+  }
+  return LL.StablesatsRestriction.walletLabel()
+}
+
 type Props = {
   loading: boolean
   setIsStablesatModalVisible: (value: boolean) => void
@@ -81,16 +105,20 @@ const WalletOverview: React.FC<Props> = ({
   showBtcNotification = false,
   showUsdNotification = false,
 }) => {
-  const { isGated: isDollarBalanceGated, isRegionPending } = useDollarBalanceGate()
+  const {
+    isGated: isDollarBalanceGated,
+    isRegionPending,
+    reason: dollarBalanceGateReason,
+  } = useDollarBalanceGate()
   const { isRestrictedRegion } = useRestrictedRegion()
   const isDollarRowUnavailable = isDollarBalanceGated || isRestrictedRegion
-  const { isAnonMode } = useSelfCustodialAccountMode()
   const { hideAmount, toggleHideAmount } = useHideAmount()
 
   const { LL } = useI18nContext()
-  const unavailableLabel = isAnonMode
-    ? LL.StablesatsRestriction.anonModeWalletLabel()
-    : LL.StablesatsRestriction.walletLabel()
+  const unavailableLabel = unavailableLabelFor(
+    { reason: dollarBalanceGateReason, isRestrictedRegion },
+    LL,
+  )
   const isAuthed = useIsAuthed()
   const {
     theme: { colors },

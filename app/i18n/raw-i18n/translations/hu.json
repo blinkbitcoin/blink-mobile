@@ -2426,9 +2426,9 @@
     "time": "Időpont",
     "type": "Típus",
     "feeTier": "Tranzakció prioritása",
-    "fast": "Gyors",
-    "medium": "Közepes",
-    "slow": "Lassú",
+    "fast": "Elsőbbségi",
+    "medium": "Normál",
+    "slow": "Gazdaságos",
     "recommended": "Ajánlott",
     "walletOffline": "A tárcád offline. Kérjük, ellenőrizd a kapcsolatot és próbáld újra.",
     "sdkInsufficientFunds": "Nincs elegendő egyenleg ehhez a tranzakcióhoz.",
@@ -2437,7 +2437,7 @@
     "sdkGenericError": "Nem sikerült megbecsülni a díjakat. Próbáljon másik összeget."
   },
   "SettingsScreen": {
-    "createAddress": "Cím létrehozása",
+    "createAddress": "Lightning cím létrehozása",
     "addressDisabled": "(letiltva)",
     "donationButton": "Adományozás gomb",
     "btcpayServer": "BTCPay Server",
@@ -2454,6 +2454,7 @@
     "activated": "Aktiválva",
     "addressScreen": "Fizetési módok",
     "nonCustodialAccount": "Nem letétkezelt fiók",
+    "custodialAccount": "Letétkezelt fiók",
     "tapUserName": "Koppints a felhasználónév beállításához",
     "notifications": "Értesítések",
     "title": "Beállítások",
@@ -2562,8 +2563,6 @@
     "emailUnverifiedContent": "Győződj meg róla, hogy újra be tudsz jelentkezni a számládba az email címed megerősítésével. Szeretnéd most elvégezni a megerősítést?",
     "totp": "Kétlépcsős azonosítás",
     "totpDeactivated": "A kétlépcsős azonosítás letiltva",
-    "totpDeleteAlertTitle": "Kétlépcsős azonosítás törlése",
-    "totpDeleteAlertContent": "Biztosan törölni szeretnéd a kétlépcsős azonosítást?",
     "copiedAccountId": "A felhasználói fiók azonosítód a vágólapra másolva",
     "yourAccountId": "A felhasználói fiók azonosítód",
     "accountId": "Felhasználói fiók azonosító",
@@ -2581,7 +2580,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "nem érhető el a régiódban",
-    "anonModeWalletLabel": "Incognito módban nem érhető el"
+    "anonModeWalletLabel": "Incognito módban nem érhető el",
+    "unknownRegionWalletLabel": "az elérhetőséget nem sikerült ellenőrizni, húzd le az újrapróbáláshoz"
   },
   "AnonModeConvertModal": {
     "title": "Először utald át a dolláregyenleged",
@@ -2604,7 +2604,9 @@
     "contactSupport": "Kapcsolatfelvétel az ügyfélszolgálattal"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "A dolláregyenleg nem érhető el a régiódban"
+    "modalTitle": "A dolláregyenleg nem érhető el a régiódban",
+    "unknownRegionModalTitle": "A dolláregyenleg elérhetőségét nem sikerült ellenőrizni",
+    "unknownRegionModalBody": "Nem tudtuk ellenőrizni, hogy a dolláregyenleg elérhető-e számodra. Húzd le a kezdőképernyőt az újrapróbáláshoz."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "A dolláregyenleg nem érhető el a régiódban",
@@ -2613,14 +2615,11 @@
     "youGet": "Kapsz"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Kétlépcsős azonosítás",
-    "secret": "Titkos kulcs/biztonsági mentés",
-    "content": "Olvasd be ezt a QR kódot az azonosító alkalmazásoddal. Vagy másold / illeszd be manuálisan a kódot az azonosító alkalmazásodba."
+    "title": "Kétlépcsős azonosítás"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Kétlépcsős azonosítás",
-    "enter6digitCode": "Írd be az azonosító alkalmazásodból származó 6 jegyű kódot a kétlépcsős azonosításod érvényesítéséhez.",
-    "success": "A kétlépcsős azonosítást aktiváltuk. Mostantól csak a telefonszámod vagy az email címed ÉS a kétlépcsős azonosítás segítségével tudsz visszajelentkezni.\n\nAzokról az eszközökről, amelyekről nem történt még kétlépcsős bejelentkezés, újra be kell jelentkezned.\n\nKétlépcsős azonosítás beállítása esetén, amennyiben a számládat nem tudnád elérni, annak visszaállításában az ügyfélszolgálat csak akkor tud segíteni ha 2. szintű számlára váltottál."
+    "enter6digitCode": "Írd be az azonosító alkalmazásodból származó 6 jegyű kódot a kétlépcsős azonosításod érvényesítéséhez."
   },
   "TotpLoginValidateScreen": {
     "title": "Kétlépcsős azonosítás",
@@ -2694,7 +2693,9 @@
     "noFee": "díjmentes",
     "fromApprox": "~{fee: string}-tól",
     "satAmount": "{amount: string} SAT",
-    "error": "Jelenleg nem lehet lekérdezni a díjakat"
+    "error": "Jelenleg nem lehet lekérdezni a díjakat",
+    "inactivity": "Inaktivitás >{months: number} hónap",
+    "usdPerMonth": "{amount: string}/hó"
   },
   "TransactionLimitsScreen": {
     "receive": "Fogadás",
@@ -3681,6 +3682,67 @@
         "codingBackend": "...a backend kódolása",
         "buttonText": "Szuper"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Üdvözöljük, legyen a Blink része",
+          "paragraphs": {
+            "body1": "Mielőtt további forrásokat gyűjtünk professzionális befektetőktől, úgy döntöttünk, hogy meghívást küldünk a Blink családnak, szuperfelhasználóinknak és támogatóinknak. Miért hoznánk idegeneket, ha először olyasvalakit hívhatunk meg, mint te?",
+            "body2": "Ez egy személyes meghívó. Kérjük, ne továbbítsd és ne oszd meg nyilvánosan."
+          }
+        },
+        "buttonText": "Tovább"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Mennyit szeretnél befektetni?",
+        "percent": "~{percent: number}%-ért"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Cégértékelés",
+          "paragraphs": {
+            "body1": "Ebben a befektetési körben a Blink pre-money értékelése 10 millió dollár.",
+            "body2": "Magasabb áron is bevonhatnánk tőkét kockázati tőkebefektetőktől. Azonban hosszú távú kölcsönös előnyöket látunk a szuperfelhasználóinkkal való partnerségben. Ezért jobb feltételekkel kínáljuk neked ezt az ajánlatot."
+          }
+        },
+        "buttonText": "Értem"
+      },
+      "TermSheet": {
+        "title": "Feltételek",
+        "equitySection": {
+          "title": "Részesedés a Blinkben",
+          "investment": "{amount: string} Befektetés",
+          "valuation": "$10M pre-money értékelésnél",
+          "units": "{units: string} egységet kapsz ~{percent: number}%-ot a Blinkből"
+        },
+        "buttonText": "Tovább az Aláíráshoz"
+      },
+      "TransferInvest": {
+        "title": "Utald át a befektetésedet",
+        "paragraphs": {
+          "body1": "Aláírtad az előfizetési megállapodást {units: string} egységre a Blinkben.",
+          "body2": "Ideje átutalni a {amount: string} befektetési összeget. Bitcoinnal fizetsz."
+        },
+        "buttonText": "Tovább",
+        "paymentsUnavailable": "A befektetési befizetések még nem indultak el. Kérlek, próbáld újra később."
+      },
+      "InsufficientBalance": {
+        "title": "Nem elegendő egyenleg",
+        "paragraphs": {
+          "balanceBitcoin": "Csak {balance: string} van a Bitcoin-számládon.",
+          "balanceDollar": "Csak {balance: string} van a Dollár-számládon.",
+          "body2": "Utalj be több mint {shortfall: string} összeget a számládra, hogy elérd a {investmentAmount: string} befektetési összeget.",
+          "body3": "Győződj meg róla, hogy a teljes összeg a számláid egyikén van; Bitcoin vagy dollár."
+        },
+        "buttonText": "Befizetés",
+        "splitFunds": {
+          "title": "A pénzed meg van osztva",
+          "body": "Van elég a befektetéshez, de meg van osztva a Bitcoin- és a Dollár-számlád között. Váltsd át, hogy a teljes összeg az egyiken legyen."
+        }
+      },
+      "DepositPending": {
+        "message": "Várakozás a befizetésed teljesülésére; kérjük, várj 2 megerősítésre a láncon.",
+        "buttonText": "Rendben"
+      },
       "PersonalInformation": {
         "title": "Utolsó lépés",
         "fields": {
@@ -3778,10 +3840,18 @@
         "testSuccess": "A biztonsági mentési kifejezésed helyes"
       }
     },
+    "BundleExport": {
+      "title": "Vészkilépés",
+      "body": "Ha a Spark leáll, ezzel a csomaggal a Blink nélkül mozgathatod a bitcoinodat on-chain. A dolláregyenleged nem állítható helyre.",
+      "download": "Csomag letöltése",
+      "sensitiveTitle": "Érzékeny",
+      "learnMore": "Tudj meg többet az egyoldalú kilépésről",
+      "sensitiveConfirm": "Letöltés",
+      "sensitiveBody": "Ez a fájl megmutatja az egyenlegedet és a fizetési előzményeidet, ezért tartsd titokban. Ahhoz, hogy vészhelyzetben használhasd, a biztonsági mentési kifejezésedre is szükséged lesz."
+    },
     "CloudBackup": {
       "title": "Készítsünk biztonsági mentést a tárcádról",
       "description": "Elmentjük a biztonsági kifejezésed másolatát a {provider} tárhelyedre.",
-      "encryptCheckbox": "Titkosítás további jelszóval",
       "password": "Jelszó",
       "passwordPlaceholder": "(legalább 12 karakter)",
       "confirmPassword": "Jelszó megerősítése",
@@ -3858,6 +3928,7 @@
       "newBitcoinBalance": "Új Bitcoin-egyenleg",
       "newDollarBalance": "Új dolláregyenleg",
       "dollarBalanceNotAvailable": "nem elérhető",
+      "lnAddressNotMoved": "A Lightning-címedet nem sikerült áthelyezni. Az egyenleged ettől függetlenül átkerül.",
       "networkFee": "Hálózati díj: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Hálózati díj: <bold>{fee: string}</bold> (a Blink fedezi)",
       "retryCta": "Próbáld újra",
@@ -3906,9 +3977,19 @@
     "explainerCheck5": "A fiókodból levonásra kerül egy Spark hálózati díj",
     "explainerCta": "Megértettem",
     "transferringFunds": "Átutalás folyamatban. Néhány másodperc alatt befejeződik.",
+    "transferInProgress": {
+      "body": "A pénzed úton van az új számládra. Hagyd nyitva az alkalmazást, és automatikusan befejezzük."
+    },
     "transferDelayed": {
       "body": "A pénzed úton van az új számládra. A szokásosnál tovább tart — hagyd nyitva az alkalmazást, és automatikusan befejezzük.",
       "contactSupportCta": "Kapcsolatfelvétel az ügyfélszolgálattal"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Nem tudtuk beolvasni a migráció állapotát erről az eszközről. Semmi sem veszett el: az egyenleged biztonságban van, és az állapotod is megmaradt.",
+      "outOfSpaceBody": "Az eszközödön nincs több tárhely, ezért nem tudjuk beolvasni a migráció állapotát. Szabadíts fel helyet, és próbáld újra. Semmi sem veszett el: az egyenleged biztonságban van.",
+      "notSavedBody": "Nem tudtuk menteni a migráció állapotát ezen az eszközön. Semmi sem veszett el: az egyenleged biztonságban van. Próbáld újra.",
+      "notSavedOutOfSpaceBody": "Az eszközödön nincs több tárhely, ezért nem tudjuk menteni a migráció állapotát. Szabadíts fel helyet, és próbáld újra. Semmi sem veszett el: az egyenleged biztonságban van.",
+      "contactSupportCta": "Ügyfélszolgálat"
     },
     "clockOutOfSync": {
       "body": "Az eszközöd dátuma és ideje nincs szinkronban. Állítsd automatikusra a folytatáshoz.",
@@ -3971,6 +4052,12 @@
     "recognizePhraseTitle": "Felismered ezt a biztonsági mentési kifejezést?",
     "recognizePhraseBody": "Soha ne írj be olyan szavakat, amelyeket valaki más küldött neked."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Az üzemeltető nem érhető el",
+    "outageBody": "A Sparknál üzemzavar van. Várj néhány percet és próbáld újra, vagy fordulj az {support}",
+    "outageSupport": "ügyfélszolgálatunkhoz",
+    "tryAgainLater": "Próbáld később"
+  },
   "BackupNudge": {
     "title": "Pénzeszközeid veszélyben vannak",
     "description": "Biztosítsd a tárcádat most. Csak egy percet vesz igénybe.",
@@ -3979,6 +4066,81 @@
     "modalTitle": "Biztosítsd a pénzeszközeidet",
     "modalDescription": "Nyomatékosan javasoljuk, hogy készíts biztonsági mentést a tárcádról, hogy megelőzd a pénzeszközeid teljes elvesztését, ha elveszíted ezt az eszközt.",
     "secureMe": "Tárca biztosítása"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Állítsd be a kétlépcsős azonosítást",
+    "cardDescription": "Védd meg fiókodat a jogosulatlan hozzáféréstől.",
+    "cardCta": "Beállítás",
+    "settingsDescription": "Védd meg fiókodat a jogosulatlan hozzáféréstől a beállításával.",
+    "setupTitle": "Állítsd be most a kétlépcsős azonosítást",
+    "setupDescription": "A fiókodhoz való jogosulatlan hozzáférés megakadályozásához add hozzá most a kétlépcsős azonosítást.",
+    "setAuthenticator": "Hitelesítő beállítása",
+    "reminderTitle": "Adj hozzá hitelesítőt a pénzed védelméhez",
+    "reminderDescription": "Az egyenleged megnőtt. Egy hitelesítő alkalmazás biztonságban tartja a fiókodat, még akkor is, ha valaki megszerzi az e-mail-címedet vagy a telefonodat.",
+    "modalReminder": "Ha most elutasítod, mindenképp kapcsold be, amint lehet.",
+    "dismissTwoMore": "Ezt még kétszer elutasíthatod.",
+    "dismissOneMore": "Ezt még egyszer elutasíthatod.",
+    "dismissLast": "Ez az utolsó alkalom, hogy elutasíthatod.",
+    "setNow": "Beállítás most",
+    "dontWantTo": "Nem szeretném",
+    "highBalanceTitle": "Több mint {amount} van nálad, kérjük, adj hozzá további védelmet",
+    "protectionRequiredTitle": "Kérjük, adj hozzá további védelmet a Blink további használatához",
+    "protectionRequiredBody": "Minél több pénzed van, annál fontosabb a jobb biztonság. Kérjük, adj hozzá hitelesítőt a Blink további használatához.",
+    "nonCustodialTitle": "Ha nem szeretnél kétlépcsős azonosítást beállítani",
+    "nonCustodialBody": "A másik lehetőség az átállás nem letétkezelt módra. Akkor te felelsz a saját pénzedért."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Védd a pénzed egy hitelesítővel",
+    "introDescription": "Egy hitelesítő alkalmazás 30 másodpercenként új, 6 jegyű kódot hoz létre.",
+    "takeoversTitle": "Megakadályozza a fiók eltérítését",
+    "takeoversDescription": "A kód csak a telefonodon létezik",
+    "stolenNumberTitle": "Biztonságban vagy akkor is, ha ellopják a számodat",
+    "stolenNumberDescription": "Még ha valaki hozzá is fér az e-mail-címedhez vagy a telefonszámodhoz, akkor sem tud bejelentkezni",
+    "durationTitle": "Nagyjából 2 percet vesz igénybe",
+    "durationDescription": "Lépésről lépésre végigvezetünk",
+    "getStarted": "Kezdjük",
+    "appsTitle": "Szerezz be egy hitelesítő alkalmazást",
+    "appsDescription": "Bármelyik hitelesítő alkalmazás megfelel. Ezek ingyenesek és megbízhatók:",
+    "googleAuthenticatorDescription": "Egyszerű és széles körben használt. Opcionális biztonsági mentés a Google-fiókodba.",
+    "protonAuthenticatorDescription": "Nyílt forráskódú. Végponttól végpontig titkosított biztonsági mentés és szinkronizálás.",
+    "twoFasAuthDescription": "Nyílt forráskódú. Nem kell hozzá fiók.",
+    "get": "Letöltés",
+    "storeNote": "A „Letöltés” megnyitja az App Store-t vagy a Google Playt. Ha telepítetted, gyere vissza a Blinkbe.",
+    "haveAnApp": "Már van alkalmazásom",
+    "keyInstruction": "Másold be ezt a beállítási kulcsot a hitelesítő alkalmazásodba.",
+    "qrInstruction": "Másik eszközt használsz?\nOlvasd be inkább ezt a QR-kódot.",
+    "backupTitle": "Mentsd el a kulcsodat",
+    "backupDescription": "Ha elveszíted a telefonodat, ezzel a kulccsal újra beállíthatod a hitelesítődet. Ne ezen a telefonon tárold, hanem valahol máshol.",
+    "saveToPasswordManager": "Mentés jelszókezelőbe",
+    "shareToPasswordManager": "Megosztás jelszókezelővel",
+    "copyForManualBackup": "Másolás kézi mentéshez",
+    "passwordManagerUnavailable": "Ezen az eszközön nincs elérhető jelszókezelő. Inkább másold ki a kulcsot kézi biztonsági mentéshez.",
+    "savedIt": "Elmentettem",
+    "keyBackupText": "Blink hitelesítő beállítási kulcs\n\nFiók: {account}\nBeállítási kulcs: {key}\n\nHa elveszíted a telefonodat, add hozzá ezt a beállítási kulcsot egy hitelesítő alkalmazáshoz, hogy visszakapd a Blink bejelentkezési kódjaidat. Bárki, akinél ez a kulcs van, elő tudja állítani a kódjaidat, ezért tartsd titokban.",
+    "protectedTitle": "A fiókod most már védett",
+    "protectedDescription": "Mostantól a bejelentkezéshez egy egyszer használatos kódra lesz szükség a hitelesítő alkalmazásodból.",
+    "newPhoneTip": "Ha új telefont kapsz, vidd át rá a hitelesítődet, <bold>mielőtt</bold> visszaállítod a régit.",
+    "done": "Kész"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Bekapcsolva",
+    "statusDisabled": "2FA: Kikapcsolva",
+    "modalTitle": "Nem javasoljuk a 2FA kikapcsolását",
+    "modalBody": "Ez csökkentené a fiókod biztonságát, és megkönnyítené, hogy valaki az engedélyed nélkül hozzáférjen.",
+    "keepProtected": "Maradjak védve",
+    "codeInstruction": "Add meg a hitelesítő alkalmazásod 6 jegyű kódját a kétlépcsős azonosítás kikapcsolásához.",
+    "codeInvalid": "Ez a kód hibás. Add meg a hitelesítő alkalmazásod aktuális kódját.",
+    "tooManyAttempts": "Túl sok próbálkozás. Próbáld újra egy óra múlva.",
+    "manualResetTitle": "2FA kézi visszaállítása",
+    "manualResetBody": "A védelmed érdekében a 2FA nem távolítható el az alkalmazásban. Ha vissza kell állítani a 2FA-t, fordulj az <support>ügyfélszolgálatunkhoz</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "E-mail hozzáadása",
+    "addPhoneTitle": "Telefonszám hozzáadása",
+    "addEmailCode": "Az e-mail hozzáadásához add meg a hitelesítő alkalmazásod 6 jegyű kódját.",
+    "addPhoneCode": "A telefonszám hozzáadásához add meg a hitelesítő alkalmazásod 6 jegyű kódját.",
+    "codeInvalid": "Ez a kód hibás. Add meg a hitelesítő alkalmazásod aktuális kódját.",
+    "tooManyAttempts": "Túl sok próbálkozás. Próbáld újra egy óra múlva."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -3989,6 +4151,15 @@
     "title": "Ez egy nem letétkezelt fiók",
     "body": "További információért olvasd el blogbejegyzésünket",
     "cta": "Olvasás"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Frissítsd a felhőben lévő mentést",
+    "body": "A vészhelyzeti csomagod a(z) {provider} szolgáltatásban elavult. Készíts újra biztonsági mentést a tárcádról a frissítéshez.",
+    "cta": "Mentés újra"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Még nincs vészhelyzeti csomag. Az első tranzakciód után jön létre.",
+    "exportFailed": "Nem sikerült letölteni a vészhelyzeti csomagot."
   },
   "StableBalance": {
     "title": "Stabil egyenleg",
@@ -4079,9 +4250,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nem sikerült betölteni a hálózati díjakat. Ellenőrizd a kapcsolatot és próbáld újra.",
     "refundNow": "Visszatérítés most",

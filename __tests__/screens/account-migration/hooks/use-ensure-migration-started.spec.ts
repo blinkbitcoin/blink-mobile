@@ -255,4 +255,242 @@ describe("useEnsureMigrationStarted", () => {
 
     expect(result.current.hasConnectionIssue).toBe(false)
   })
+
+  it("drops an empty answer when the screen leaves before it arrives", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, unmount } = renderHook(() =>
+      useEnsureMigrationStarted({ skip: false }),
+    )
+    unmount()
+
+    await act(async () => {
+      settle({ data: { migrationStart: null } })
+    })
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration start empty payload",
+      expect.any(Error),
+    )
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  /** Skip only holds the next attempt back. A start already out still answers for the
+   *  screen when one of the inputs behind skip flips meanwhile; dropping it would leave the
+   *  lock armed server-side with nothing here to fire the start again. */
+  it("keeps an accepted start whose skip flipped while it was in flight", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValue(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, rerender } = renderHook(
+      ({ skip }: { skip: boolean }) => useEnsureMigrationStarted({ skip }),
+      { initialProps: { skip: false } },
+    )
+    await flushEffects()
+    rerender({ skip: true })
+
+    await act(async () => {
+      settle(accepted)
+    })
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(result.current.isStarted).toBe(true)
+  })
+
+  /** A retry asked for while skipped, before the earlier start answered: once that start is
+   *  accepted there is nothing left to send, and a second one that dropped on the network
+   *  would leave a retry on screen that can never clear. */
+  it("does not fire a retry asked for before an earlier start was accepted", async () => {
+    let settle: (value: unknown) => void = () => undefined
+    mockMigrationStart.mockReturnValueOnce(
+      new Promise((resolve) => {
+        settle = resolve
+      }),
+    )
+
+    const { result, rerender } = renderHook(
+      ({ skip }: { skip: boolean }) => useEnsureMigrationStarted({ skip }),
+      { initialProps: { skip: false } },
+    )
+    await flushEffects()
+    rerender({ skip: true })
+    await act(async () => {
+      result.current.retry()
+    })
+    await act(async () => {
+      settle(accepted)
+    })
+    rerender({ skip: false })
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(1)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  it("clears an earlier attempt's connection issue once a later one is accepted", async () => {
+    let failFirst: (reason: unknown) => void = () => undefined
+    mockMigrationStart
+      .mockReturnValueOnce(
+        new Promise((_resolve, reject) => {
+          failFirst = reject
+        }),
+      )
+      .mockResolvedValueOnce(accepted)
+
+    const { result, rerender } = renderHook(
+      ({ skip }: { skip: boolean }) => useEnsureMigrationStarted({ skip }),
+      { initialProps: { skip: false } },
+    )
+    await flushEffects()
+    rerender({ skip: true })
+    await act(async () => {
+      result.current.retry()
+    })
+    await act(async () => {
+      failFirst(networkFailure())
+    })
+    expect(result.current.hasConnectionIssue).toBe(true)
+
+    rerender({ skip: false })
+    await flushEffects()
+
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  it("takes the newer attempt's answer over an older one that lands after it", async () => {
+    let failFirst: (reason: unknown) => void = () => undefined
+    let settleSecond: (value: unknown) => void = () => undefined
+    mockMigrationStart
+      .mockReturnValueOnce(
+        new Promise((_resolve, reject) => {
+          failFirst = reject
+        }),
+      )
+      .mockReturnValueOnce(
+        new Promise((resolve) => {
+          settleSecond = resolve
+        }),
+      )
+
+    const { result } = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+    await flushEffects()
+    await act(async () => {
+      result.current.retry()
+    })
+    expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+
+    await act(async () => {
+      settleSecond(accepted)
+    })
+    await act(async () => {
+      failFirst(networkFailure())
+    })
+
+    expect(result.current.isStarted).toBe(true)
+    expect(result.current.hasConnectionIssue).toBe(false)
+  })
+
+  /**
+   * The shared retry can send a second start while the first is still out. The server
+   * has the run once either is accepted, so a refusal or a dropped connection on the other
+   * request must not undo that: read as refused, the screen would hand the user to support
+   * over a run the server is holding.
+   */
+  describe("when a repeat goes out before the first start answers", () => {
+    let answerFirst: (value: unknown) => void = () => undefined
+    let answerSecond: (value: unknown) => void = () => undefined
+    let failSecond: (reason: unknown) => void = () => undefined
+
+    const sendRepeat = async () => {
+      mockMigrationStart
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            answerFirst = resolve
+          }),
+        )
+        .mockReturnValueOnce(
+          new Promise((resolve, reject) => {
+            answerSecond = resolve
+            failSecond = reject
+          }),
+        )
+      const hook = renderHook(() => useEnsureMigrationStarted({ skip: false }))
+      await flushEffects()
+      await act(async () => {
+        hook.result.current.retry()
+      })
+      expect(mockMigrationStart).toHaveBeenCalledTimes(2)
+      return hook
+    }
+
+    it("keeps the first start's acceptance when the repeat is refused after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        answerSecond(refusedWith("MIGRATION_STATE_CONFLICT"))
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isRejected).toBe(false)
+    })
+
+    it("takes the first start's acceptance over a refusal of the repeat that came first", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerSecond(refusedWith("MIGRATION_STATE_CONFLICT"))
+      })
+      expect(result.current.isRejected).toBe(true)
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.isRejected).toBe(false)
+    })
+
+    it("keeps the acceptance when the repeat answers with no payload after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        answerSecond({ data: { migrationStart: null } })
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.hasConnectionIssue).toBe(false)
+    })
+
+    it("keeps the acceptance when the repeat's connection drops after it", async () => {
+      const { result } = await sendRepeat()
+
+      await act(async () => {
+        answerFirst(accepted)
+      })
+      await act(async () => {
+        failSecond(networkFailure())
+      })
+
+      expect(result.current.isStarted).toBe(true)
+      expect(result.current.hasConnectionIssue).toBe(false)
+    })
+  })
 })

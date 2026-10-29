@@ -2426,9 +2426,9 @@
     "time": "الوقت",
     "type": "النوع",
     "feeTier": "أولوية المعاملة",
-    "fast": "سريع",
-    "medium": "متوسط",
-    "slow": "بطيء",
+    "fast": "أولوية",
+    "medium": "عادي",
+    "slow": "اقتصادي",
     "recommended": "موصى به",
     "walletOffline": "محفظتك غير متصلة. يرجى التحقق من اتصالك والمحاولة مرة أخرى.",
     "sdkInsufficientFunds": "لا توجد أموال كافية لهذه المعاملة.",
@@ -2437,7 +2437,7 @@
     "sdkGenericError": "تعذّر تقدير الرسوم. يرجى تجربة مبلغ مختلف."
   },
   "SettingsScreen": {
-    "createAddress": "إنشاء عنوان",
+    "createAddress": "إنشاء عنوان Lightning",
     "addressDisabled": "(معطّل)",
     "donationButton": "زر التبرع",
     "btcpayServer": "BTCPay Server",
@@ -2454,6 +2454,7 @@
     "activated": "تم التفعيل",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "حساب غير حافظ",
+    "custodialAccount": "حساب حاضن",
     "tapUserName": "إضغط لتعيين اسم المستخدم",
     "notifications": "Notifications",
     "title": "تطبيق الإعدادات",
@@ -2562,8 +2563,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "معرّف الحساب",
@@ -2581,7 +2580,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "غير متاح في منطقتك",
-    "anonModeWalletLabel": "غير متاح في وضع Incognito"
+    "anonModeWalletLabel": "غير متاح في وضع Incognito",
+    "unknownRegionWalletLabel": "تعذّر التحقق من التوفر، اسحب للأسفل لإعادة المحاولة"
   },
   "AnonModeConvertModal": {
     "title": "حوّل رصيدك بالدولار أولًا",
@@ -2604,7 +2604,9 @@
     "contactSupport": "تواصل مع الدعم"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "رصيد الدولار غير متاح في منطقتك"
+    "modalTitle": "رصيد الدولار غير متاح في منطقتك",
+    "unknownRegionModalTitle": "تعذّر التحقق من توفر رصيد الدولار",
+    "unknownRegionModalBody": "لم نتمكن من التحقق مما إذا كان رصيد الدولار متاحًا لك. اسحب للأسفل في الشاشة الرئيسية لإعادة المحاولة."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "رصيد الدولار غير متاح في منطقتك",
@@ -2613,14 +2615,11 @@
     "youGet": "تحصل على"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "الرمز السري/النسخ الاحتياطي",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2694,7 +2693,9 @@
     "noFee": "بدون رسوم",
     "fromApprox": "من ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "لم يُستطَع الحصول على الرسوم الآن"
+    "error": "لم يُستطَع الحصول على الرسوم الآن",
+    "inactivity": "عدم النشاط >{months: number} شهرًا",
+    "usdPerMonth": "{amount: string}/شهر"
   },
   "TransactionLimitsScreen": {
     "receive": "استقبال",
@@ -3681,6 +3682,67 @@
         "codingBackend": "...نبرمج الخلفية",
         "buttonText": "رائع"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "مرحباً بك لتصبح جزءاً من Blink",
+          "paragraphs": {
+            "body1": "قبل أن نجمع المزيد من الأموال من المستثمرين المحترفين، قررنا توجيه دعوة لعائلة Blink، مستخدمينا المميزين وداعمينا. لماذا نجلب غرباء بينما يمكننا أولاً دعوة شخص مثلك؟",
+            "body2": "هذه دعوة شخصية. يرجى عدم إعادة توجيهها أو مشاركتها علناً."
+          }
+        },
+        "buttonText": "متابعة"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "كم تود أن تستثمر؟",
+        "percent": "مقابل ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "تقييم الشركة",
+          "paragraphs": {
+            "body1": "في جولة الاستثمار هذه، تقييم Blink قبل التمويل هو 10 مليون دولار.",
+            "body2": "يمكننا جمع الأموال بسعر أعلى من المستثمرين المغامرين. ومع ذلك، نرى فوائد متبادلة طويلة الأمد في الشراكة مع مستخدمينا المتميزين. لذلك، نقدم لك هذا العرض بشروط أفضل."
+          }
+        },
+        "buttonText": "فهمت"
+      },
+      "TermSheet": {
+        "title": "ورقة الشروط",
+        "equitySection": {
+          "title": "حصة في Blink",
+          "investment": "استثمار {amount: string}",
+          "valuation": "بتقييم 10 مليون$ قبل التمويل",
+          "units": "تحصل على {units: string} وحدة ~{percent: number}% من Blink"
+        },
+        "buttonText": "المتابعة للتوقيع"
+      },
+      "TransferInvest": {
+        "title": "حوّل استثمارك",
+        "paragraphs": {
+          "body1": "لقد وقعت اتفاقية الاشتراك لـ {units: string} وحدة في Blink.",
+          "body2": "حان وقت تحويل مبلغ الاستثمار البالغ {amount: string}. ستدفع بالبيتكوين."
+        },
+        "buttonText": "متابعة",
+        "paymentsUnavailable": "مدفوعات الاستثمار غير متاحة بعد. يُرجى المحاولة لاحقاً."
+      },
+      "InsufficientBalance": {
+        "title": "رصيد غير كافٍ",
+        "paragraphs": {
+          "balanceBitcoin": "لديك {balance: string} فقط في حساب البيتكوين الخاص بك.",
+          "balanceDollar": "لديك {balance: string} فقط في حساب الدولار الخاص بك.",
+          "body2": "أودِع أكثر من {shortfall: string} في حسابك للوصول إلى مبلغ الاستثمار وهو {investmentAmount: string}.",
+          "body3": "تأكد من وجود المبلغ الكامل في أحد حسابيك؛ البيتكوين أو الدولار."
+        },
+        "buttonText": "إيداع",
+        "splitFunds": {
+          "title": "أموالك موزعة",
+          "body": "لديك ما يكفي للاستثمار، لكنه موزع بين حسابي البيتكوين والدولار. قم بالتحويل ليصبح المبلغ كاملاً في حساب واحد."
+        }
+      },
+      "DepositPending": {
+        "message": "في انتظار تسوية إيداعك، يُرجى الانتظار لتأكيدَين على السلسلة.",
+        "buttonText": "حسنًا"
+      },
       "PersonalInformation": {
         "title": "الخطوة الأخيرة",
         "fields": {
@@ -3778,10 +3840,18 @@
         "testSuccess": "عبارة النسخ الاحتياطي صحيحة"
       }
     },
+    "BundleExport": {
+      "title": "الخروج الطارئ",
+      "body": "إذا توقف Spark، تتيح لك هذه الحزمة نقل البيتكوين الخاص بك على السلسلة بدون Blink. لا يمكن استرداد رصيدك بالدولار.",
+      "download": "تنزيل الحزمة",
+      "sensitiveTitle": "حسّاس",
+      "learnMore": "اعرف المزيد عن الخروج الأحادي",
+      "sensitiveConfirm": "تنزيل",
+      "sensitiveBody": "يعرض هذا الملف رصيدك وسجل مدفوعاتك، لذا احتفظ به بشكل خاص. لاستخدامه في حالة الطوارئ، تحتاج أيضًا إلى عبارة النسخ الاحتياطي."
+    },
     "CloudBackup": {
       "title": "لنقم بنسخ محفظتك احتياطيًا",
       "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
-      "encryptCheckbox": "تشفير بكلمة مرور إضافية",
       "password": "كلمة المرور",
       "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
       "confirmPassword": "تأكيد كلمة المرور",
@@ -3858,6 +3928,7 @@
       "newBitcoinBalance": "رصيد البيتكوين الجديد",
       "newDollarBalance": "رصيد الدولار الجديد",
       "dollarBalanceNotAvailable": "غير متاح",
+      "lnAddressNotMoved": "تعذّر نقل عنوان Lightning الخاص بك. سيتم تحويل أموالك على أي حال.",
       "networkFee": "رسوم الشبكة: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "رسوم الشبكة: <bold>{fee: string}</bold> (تغطيها Blink)",
       "retryCta": "حاول مرة أخرى",
@@ -3906,9 +3977,19 @@
     "explainerCheck5": "سيتم خصم رسوم شبكة Spark من حسابك",
     "explainerCta": "فهمت",
     "transferringFunds": "جارٍ تحويل أموالك. سيتم الانتهاء في غضون ثوانٍ قليلة.",
+    "transferInProgress": {
+      "body": "أموالك في طريقها إلى حسابك الجديد. أبقِ التطبيق مفتوحًا وسننهي العملية تلقائيًا."
+    },
     "transferDelayed": {
       "body": "أموالك في طريقها إلى حسابك الجديد. يستغرق الأمر وقتًا أطول من المعتاد — أبقِ التطبيق مفتوحًا وسننهي العملية تلقائيًا.",
       "contactSupportCta": "التواصل مع الدعم"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "تعذّر علينا قراءة تقدّم عملية الترحيل من هذا الجهاز. لم يُفقد شيء؛ أموالك آمنة وتقدّمك ما زال محفوظًا.",
+      "outOfSpaceBody": "لم تعد هناك مساحة تخزين على جهازك، لذا يتعذّر علينا قراءة تقدّم عملية الترحيل. حرّر بعض المساحة ثم أعد المحاولة. لم يُفقد شيء؛ أموالك آمنة.",
+      "notSavedBody": "تعذّر علينا حفظ تقدّم عملية الترحيل على هذا الجهاز. لم يُفقد شيء؛ أموالك آمنة. أعد المحاولة.",
+      "notSavedOutOfSpaceBody": "لم تعد هناك مساحة تخزين على جهازك، لذا يتعذّر علينا حفظ تقدّم عملية الترحيل. حرّر بعض المساحة ثم أعد المحاولة. لم يُفقد شيء؛ أموالك آمنة.",
+      "contactSupportCta": "تواصل مع الدعم"
     },
     "clockOutOfSync": {
       "body": "تاريخ ووقت جهازك غير متزامنين. اضبطهما على الوضع التلقائي للمتابعة.",
@@ -3971,6 +4052,12 @@
     "recognizePhraseTitle": "هل تتعرّف على عبارة النسخ الاحتياطي هذه؟",
     "recognizePhraseBody": "لا تُدخل أبدًا كلمات أرسلها لك شخص آخر."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "تعذّر الوصول إلى المشغّل",
+    "outageBody": "يواجه Spark انقطاعًا في الخدمة. يُرجى الانتظار بضع دقائق والمحاولة مجددًا أو التواصل مع {support}",
+    "outageSupport": "الدعم",
+    "tryAgainLater": "حاول لاحقًا"
+  },
   "BackupNudge": {
     "title": "أموالك في خطر",
     "description": "قم بتأمين محفظتك الآن. لن يستغرق الأمر سوى دقيقة واحدة.",
@@ -3979,6 +4066,81 @@
     "modalTitle": "قم بتأمين أموالك",
     "modalDescription": "نوصي بشدة بعمل نسخة احتياطية لمحفظتك لمنع فقدان كامل للأموال في حال فقدت هذا الجهاز.",
     "secureMe": "تأمين المحفظة"
+  },
+  "TwoFactorEnforcement": {
+    "title": "فعّل المصادقة الثنائية",
+    "cardDescription": "احمِ حسابك من الوصول غير المصرح به.",
+    "cardCta": "تفعيل",
+    "settingsDescription": "احمِ حسابك من الوصول غير المصرح به عبر تفعيلها.",
+    "setupTitle": "فعّل المصادقة الثنائية الآن",
+    "setupDescription": "لمنع الوصول غير المصرح به إلى حسابك، أضف المصادقة الثنائية الآن.",
+    "setAuthenticator": "إعداد تطبيق المصادقة",
+    "reminderTitle": "أضف تطبيق المصادقة لحماية أموالك",
+    "reminderDescription": "لقد زاد رصيدك. يحافظ تطبيق المصادقة على أمان حسابك، حتى إذا تمكّن شخص ما من الوصول إلى بريدك الإلكتروني أو هاتفك.",
+    "modalReminder": "إذا تجاهلت هذا الآن، فاحرص على تفعيله في أقرب وقت ممكن.",
+    "dismissTwoMore": "يمكنك تجاهل هذا مرتين أخريين.",
+    "dismissOneMore": "يمكنك تجاهل هذا مرة واحدة أخرى.",
+    "dismissLast": "هذه آخر مرة يمكنك فيها تجاهل هذا.",
+    "setNow": "فعّل الآن",
+    "dontWantTo": "لا أريد ذلك",
+    "highBalanceTitle": "لديك أكثر من {amount}، يرجى إضافة حماية إضافية",
+    "protectionRequiredTitle": "يرجى إضافة حماية إضافية لمواصلة استخدام Blink",
+    "protectionRequiredBody": "كلما زادت أموالك، زادت أهمية الأمان الأفضل. يرجى إضافة تطبيق المصادقة لمواصلة استخدام Blink.",
+    "nonCustodialTitle": "إذا كنت لا تريد تفعيل المصادقة الثنائية",
+    "nonCustodialBody": "الخيار الآخر هو الانتقال إلى الحفظ الذاتي. عندها تكون مسؤولًا عن أموالك."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "احمِ أموالك باستخدام تطبيق المصادقة",
+    "introDescription": "يُنشئ تطبيق المصادقة رمزًا جديدًا مكوّنًا من 6 أرقام كل 30 ثانية.",
+    "takeoversTitle": "يمنع الاستيلاء على الحساب",
+    "takeoversDescription": "الرمز موجود على هاتفك فقط",
+    "stolenNumberTitle": "ابقَ آمنًا حتى لو سُرق رقمك",
+    "stolenNumberDescription": "حتى لو تمكّن شخص ما من الوصول إلى بريدك الإلكتروني أو رقم هاتفك، فلن يتمكّن من تسجيل الدخول",
+    "durationTitle": "يستغرق نحو دقيقتين",
+    "durationDescription": "سنرشدك خطوة بخطوة",
+    "getStarted": "ابدأ",
+    "appsTitle": "احصل على تطبيق مصادقة",
+    "appsDescription": "أي تطبيق مصادقة يفي بالغرض. هذه التطبيقات مجانية وموثوقة:",
+    "googleAuthenticatorDescription": "بسيط وواسع الاستخدام. نسخ احتياطي اختياري إلى حسابك على Google.",
+    "protonAuthenticatorDescription": "مفتوح المصدر. نسخ احتياطي ومزامنة بتشفير تام بين الطرفين.",
+    "twoFasAuthDescription": "مفتوح المصدر. لا يحتاج إلى حساب.",
+    "get": "تنزيل",
+    "storeNote": "يفتح زر «تنزيل» متجر App Store أو Google Play. عُد إلى Blink بعد تثبيت التطبيق.",
+    "haveAnApp": "لديّ تطبيق",
+    "keyInstruction": "انسخ مفتاح الإعداد هذا إلى تطبيق المصادقة.",
+    "qrInstruction": "هل تستخدم جهازًا آخر؟\nامسح رمز QR هذا بدلًا من ذلك.",
+    "backupTitle": "احفظ نسخة احتياطية من مفتاحك",
+    "backupDescription": "إذا فقدت هاتفك، يتيح لك هذا المفتاح إعداد تطبيق المصادقة من جديد. احفظه في مكان آخر غير هذا الهاتف.",
+    "saveToPasswordManager": "الحفظ في مدير كلمات المرور",
+    "shareToPasswordManager": "المشاركة مع مدير كلمات المرور",
+    "copyForManualBackup": "النسخ للحفظ الاحتياطي اليدوي",
+    "passwordManagerUnavailable": "لا يوجد مدير كلمات مرور متاح على هذا الجهاز. انسخ المفتاح لعمل نسخة احتياطية يدوية بدلاً من ذلك.",
+    "savedIt": "لقد حفظته",
+    "keyBackupText": "مفتاح إعداد تطبيق المصادقة لـ Blink\n\nالحساب: {account}\nمفتاح الإعداد: {key}\n\nإذا فقدت هاتفك، أضف مفتاح الإعداد هذا إلى تطبيق مصادقة لاستعادة رموز تسجيل الدخول إلى Blink. يمكن لأي شخص يملك هذا المفتاح إنشاء رموزك، لذا احتفظ به سرًّا.",
+    "protectedTitle": "حسابك محمي الآن",
+    "protectedDescription": "من الآن فصاعدًا، يتطلب تسجيل الدخول رمزًا لمرة واحدة من تطبيق المصادقة.",
+    "newPhoneTip": "إذا حصلت على هاتف جديد، انقل تطبيق المصادقة إليه <bold>قبل</bold> إعادة ضبط الهاتف القديم.",
+    "done": "تم"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "المصادقة الثنائية: مفعّلة",
+    "statusDisabled": "المصادقة الثنائية: معطّلة",
+    "modalTitle": "لا ننصح بتعطيل المصادقة الثنائية",
+    "modalBody": "سيؤدي ذلك إلى تقليل أمان حسابك وتسهيل وصول طرف ثالث إلى حسابك دون إذنك.",
+    "keepProtected": "أبقني محميًا",
+    "codeInstruction": "أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة لإيقاف المصادقة الثنائية.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة.",
+    "manualResetTitle": "إعادة تعيين المصادقة الثنائية يدويًا",
+    "manualResetBody": "لحمايتك، لا نسمح بإزالة المصادقة الثنائية داخل التطبيق. إذا كنت بحاجة إلى إعادة تعيينها، تواصل مع <support>الدعم</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "إضافة بريد إلكتروني",
+    "addPhoneTitle": "إضافة رقم هاتف",
+    "addEmailCode": "لإضافة بريدك الإلكتروني، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "addPhoneCode": "لإضافة رقم هاتفك، أدخل الرمز المكوّن من 6 أرقام من تطبيق المصادقة.",
+    "codeInvalid": "هذا الرمز غير صحيح. أدخل الرمز الحالي من تطبيق المصادقة.",
+    "tooManyAttempts": "محاولات كثيرة جدًا. حاول مرة أخرى بعد ساعة."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -3989,6 +4151,15 @@
     "title": "هذا حساب غير حافظ",
     "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
     "cta": "اقرأ"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "حدّث نسختك الاحتياطية السحابية",
+    "body": "حزمة الطوارئ في {provider} قديمة. انسخ محفظتك احتياطيًا مرة أخرى لتحديثها.",
+    "cta": "نسخ احتياطي مرة أخرى"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "لا توجد حزمة طوارئ بعد. يتم إنشاؤها بعد معاملتك الأولى.",
+    "exportFailed": "تعذّر تنزيل حزمة الطوارئ."
   },
   "StableBalance": {
     "title": "الرصيد المستقر",
@@ -4079,9 +4250,6 @@
     "refundFailed": "فشل الاسترداد: {error}",
     "refundAddress": "عنوان بيتكوين للاسترداد",
     "feeRate": "رسوم الشبكة",
-    "feeRateFastest": "الأسرع (~{sats} sats) ~10 دقائق",
-    "feeRateHalfHour": "عادي (~{sats} sats) ~30 دقيقة",
-    "feeRateHour": "اقتصادي (~{sats} sats) ~60 دقيقة",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "تعذّر تحميل رسوم الشبكة. يرجى التحقق من الاتصال والمحاولة مرة أخرى.",
     "refundNow": "استرداد الآن",

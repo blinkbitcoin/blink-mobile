@@ -28,6 +28,28 @@ describe("DollarBalanceRestrictionModal", () => {
     expect(getByText("Dollar Balance is not available in your region")).toBeTruthy()
   })
 
+  /** An unanswered query is not a verdict: the modal says the check failed and how to ask
+   *  again, never that the region is restricted. */
+  it("explains the failed check, not a restriction, when the region is unknown", () => {
+    const { getByText, queryByText } = render(
+      wrap(
+        <DollarBalanceRestrictionModal
+          isVisible={true}
+          toggleModal={jest.fn()}
+          isRegionUnknown={true}
+        />,
+      ),
+    )
+
+    expect(getByText("Couldn't check Dollar Balance availability")).toBeTruthy()
+    expect(
+      getByText(
+        "We couldn't check whether the Dollar Balance is available to you. Pull down on the home screen to try again.",
+      ),
+    ).toBeTruthy()
+    expect(queryByText("Dollar Balance is not available in your region")).toBeNull()
+  })
+
   it("closes the modal when the Close button is pressed", () => {
     const toggleModal = jest.fn()
     const { getByText } = render(
