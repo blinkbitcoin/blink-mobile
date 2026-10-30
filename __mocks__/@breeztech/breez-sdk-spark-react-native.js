@@ -75,11 +75,21 @@ module.exports = {
   InputType_Tags: { SparkAddress: "SparkAddress", BitcoinAddress: "BitcoinAddress" },
   Network: { Mainnet: 0, Regtest: 1 },
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
+  SendPaymentMethod_Tags: {
+    BitcoinAddress: "BitcoinAddress",
+    Bolt11Invoice: "Bolt11Invoice",
+    SparkAddress: "SparkAddress",
+    SparkInvoice: "SparkInvoice",
+    CrossChainAddress: "CrossChainAddress",
+  },
   SendPaymentOptions: {
     BitcoinAddress: jest.fn().mockImplementation((args) => ({
       tag: "BitcoinAddress",
       ...args,
     })),
+    Bolt11Invoice: jest
+      .fn()
+      .mockImplementation((args) => ({ tag: "Bolt11Invoice", inner: args })),
   },
   Seed: { Mnemonic: jest.fn().mockImplementation((args) => args) },
   StableBalanceActiveLabel: {
