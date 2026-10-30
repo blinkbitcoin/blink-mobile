@@ -19,7 +19,10 @@ import {
   saveJson,
   saveString,
 } from "@app/utils/storage"
-import KeyStoreWrapper, { type GaloyAuthTokenKey } from "@app/utils/storage/secureStorage"
+import KeyStoreWrapper, {
+  type GaloyAuthTokenKey,
+  type ReinstallSessionSlot,
+} from "@app/utils/storage/secureStorage"
 
 import {
   defaultPersistentState,
@@ -171,7 +174,14 @@ type LoadedPersistentState = {
 
 const handleMigratedState = async (
   state: PersistentState,
+  { isActiveTokenOwed }: { isActiveTokenOwed: boolean },
 ): Promise<LoadedPersistentState> => {
+  // The slot still holds what a reinstall wipe could not erase, which may be the previous
+  // owner's token, so this boot starts signed out rather than in their account.
+  if (isActiveTokenOwed) {
+    return { state: { ...state, galoyAuthToken: "" }, persistedToken: "" }
+  }
+
   const read = await KeyStoreWrapper.readActiveToken()
   const keychainToken = read.status === "found" ? read.token : ""
   // Blobs written before the token moved to the keychain still carry it;
@@ -250,16 +260,40 @@ const withOwedWipe = (state: PersistentState): PersistentState => ({
   pendingReinstallKeyMaterialWipe: true,
 })
 
+/** The literal the token slot is recorded under, pinned to secureStorage's at compile time. */
+const ACTIVE_TOKEN_SLOT: ReinstallSessionSlot = "active token"
+
+/**
+ * The session slots the blob says are still owed. A value that is not a list reads as none:
+ * the names are only ever written by this file, and secureStorage skips one it does not
+ * know, so nothing here erases on a guess.
+ */
+const owedSessionSlotsOf = (state: PersistentState | null): ReinstallSessionSlot[] => {
+  const owed: unknown = state?.pendingReinstallSessionWipe
+  if (!Array.isArray(owed)) return []
+  return owed.filter((slot): slot is ReinstallSessionSlot => typeof slot === "string")
+}
+
+/** Records exactly these slots as owed, and drops the marker once there are none. */
+const withOwedSessionWipe = (
+  state: PersistentState,
+  slots: ReadonlyArray<ReinstallSessionSlot>,
+): PersistentState => {
+  const { pendingReinstallSessionWipe: _owed, ...rest } = state
+  const isAnySlotOwed = slots.length > 0
+  return isAnySlotOwed ? { ...rest, pendingReinstallSessionWipe: [...slots] } : rest
+}
+
 /**
  * What a reset leaves: every setting back at its default, and an owed reinstall
- * wipe still owed. The marker is not a setting. It stands for key material of
- * the previous owner that is still on the device, and a logout erases none of
- * it, so only the retry may retire it, by finishing the erase or giving it up.
+ * wipe still owed. Neither marker is a setting. They stand for what the previous
+ * owner left on the device, and a logout does not tell whose it erased, so only
+ * the retries retire them, by finishing what they owe.
  */
-const resetKeepingOwedWipe = (current: PersistentState | null): PersistentState =>
-  current?.pendingReinstallKeyMaterialWipe
-    ? withOwedWipe(defaultPersistentState)
-    : defaultPersistentState
+const resetKeepingOwedWipe = (current: PersistentState | null): PersistentState => {
+  const reset = withOwedSessionWipe(defaultPersistentState, owedSessionSlotsOf(current))
+  return current?.pendingReinstallKeyMaterialWipe ? withOwedWipe(reset) : reset
+}
 
 const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   // Read before anything is erased, because both erases below are gated on it.
@@ -290,9 +324,15 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   }
 
   // This branch owns only the trigger and the reporting; WHICH credentials
-  // survive uninstall is secureStorage's knowledge. It re-runs every boot until
-  // the first blob write, so a failed wipe retries across boots.
-  await KeyStoreWrapper.clearUninstallSurvivingCredentials(reportReinstallCleanupFailure)
+  // survive uninstall is secureStorage's knowledge. A slot it could not erase is
+  // recorded and written at once, whatever the index says: the written blob is what
+  // keeps this branch from running again, so the record is the only thing that
+  // brings a later boot back for it.
+  const owedSessionSlots = await KeyStoreWrapper.clearUninstallSurvivingCredentials(
+    reportReinstallCleanupFailure,
+  )
+  const freshState = withOwedSessionWipe(defaultPersistentState, owedSessionSlots)
+  const isSessionWipeOwed = owedSessionSlots.length > 0
 
   if (presence === SelfCustodialIndexPresence.Absent) {
     // An erase that ran and failed is as owed as one that never ran: the seeds
@@ -302,13 +342,13 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
     // above, which signs the user out on every launch with nothing to end it.
     await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure)
     if (keyMaterial.isComplete()) {
-      return { state: defaultPersistentState, persistedToken: "" }
+      return { state: freshState, persistedToken: "", stateChanged: isSessionWipeOwed }
     }
     // stateChanged, because nothing else will write this blob: the user has
     // touched nothing on a launch that just signed them out, and a marker that
     // is never written is a marker the next boot cannot read.
     return {
-      state: withOwedWipe(defaultPersistentState),
+      state: withOwedWipe(freshState),
       persistedToken: "",
       stateChanged: true,
     }
@@ -321,7 +361,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
       new Error("Reinstall key-material wipe skipped: account index is populated"),
       { alwaysRecord: true },
     )
-    return { state: defaultPersistentState, persistedToken: "" }
+    return { state: freshState, persistedToken: "", stateChanged: isSessionWipeOwed }
   }
 
   // Unknown: the index could not answer, so the erase may still be owed. It is
@@ -333,9 +373,40 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
     { alwaysRecord: true },
   )
   return {
-    state: withOwedWipe(defaultPersistentState),
+    state: withOwedWipe(freshState),
     persistedToken: "",
     stateChanged: true,
+  }
+}
+
+/**
+ * The session slots a reinstall wipe could not erase, retried on a later boot until each
+ * is gone, whatever the account index says.
+ *
+ * It runs before the active token is read. A token the previous owner left is a session
+ * into their account, and a slot that still will not erase tells the read to leave it
+ * alone, so the boot starts signed out instead.
+ *
+ * What it costs: a slot the new owner wrote after a failed wipe is theirs by then, and
+ * this erases it anyway, which means one more sign-in or setting the lock again. Nothing
+ * here can tell the two values apart, and leaving the previous owner's sign-in or lock on
+ * the device costs more than either.
+ */
+const retryOwedSessionWipe = async (
+  state: PersistentState,
+): Promise<{ state: PersistentState; changed: boolean; isActiveTokenOwed: boolean }> => {
+  const owed = owedSessionSlotsOf(state)
+  const isAnySlotOwed = owed.length > 0
+  if (!isAnySlotOwed) return { state, changed: false, isActiveTokenOwed: false }
+
+  const stillOwed = await KeyStoreWrapper.clearUninstallSurvivingCredentials(
+    reportReinstallCleanupFailure,
+    owed,
+  )
+  return {
+    state: withOwedSessionWipe(state, stillOwed),
+    changed: stillOwed.length !== owed.length,
+    isActiveTokenOwed: stillOwed.includes(ACTIVE_TOKEN_SLOT),
   }
 }
 
@@ -483,11 +554,16 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
   const result = await migratePersistentState(data)
   switch (result.status) {
     case MigrationStatus.Ok: {
-      const loaded = await handleMigratedState(result.state)
-      // A reinstall whose key-material erase never finished records it in the
-      // blob; this is the boot that acts on it.
-      const retried = await retryOwedKeyMaterialWipe(loaded.state)
-      return { ...loaded, state: retried.state, stateChanged: retried.changed }
+      // A reinstall whose wipe never finished records what it still owes in the
+      // blob, and this is the boot that acts on it: the session slots before the
+      // token is read, so a token the previous owner left never becomes this session.
+      const session = await retryOwedSessionWipe(result.state)
+      const loaded = await handleMigratedState(session.state, {
+        isActiveTokenOwed: session.isActiveTokenOwed,
+      })
+      const keyMaterial = await retryOwedKeyMaterialWipe(loaded.state)
+      const isStateChanged = session.changed || keyMaterial.changed
+      return { ...loaded, state: keyMaterial.state, stateChanged: isStateChanged }
     }
     case MigrationStatus.NoData:
       return handleFreshInstall()

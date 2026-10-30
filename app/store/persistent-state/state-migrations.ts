@@ -3,6 +3,7 @@ import { type StoredFiatCurrencies } from "./self-custodial-fiat-currencies"
 import { type StoredFiatRates } from "./self-custodial-fiat-rates"
 import { AccountMode } from "@app/types/account"
 import { DefaultAccountId } from "@app/types/wallet"
+import type { ReinstallSessionSlot } from "@app/utils/storage/secureStorage"
 
 type PersistentState_3 = {
   schemaVersion: 3
@@ -326,9 +327,20 @@ type PersistentState_24 = Omit<PersistentState_23, "schemaVersion"> & {
    * clears this, and a genuine reinstall should start the whole verdict again.
    *
    * It is not a setting, so a state reset carries it over. Only the retry that
-   * finishes the erase, or gives it up for good, removes it.
+   * finishes the erase removes it.
    */
   pendingReinstallKeyMaterialWipe?: boolean
+  /**
+   * The session slots a reinstall wipe could not erase, by name.
+   *
+   * Recorded for the same reason as the key-material marker above, and beside it rather
+   * than inside it: the blob is written as soon as either is owed, and a written blob is
+   * what keeps the fresh-install branch from running again, so this is the only thing
+   * left that brings a later boot back for these slots. Retried whatever the account
+   * index says, since the previous owner's sign-in and lock are no less theirs once the
+   * new owner opens an account. Absent once nothing is owed.
+   */
+  pendingReinstallSessionWipe?: ReinstallSessionSlot[]
 }
 
 const migrate24ToCurrent = (state: PersistentState_24): Promise<PersistentState> =>

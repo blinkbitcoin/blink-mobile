@@ -46,6 +46,22 @@ export type SessionProfilesRead =
   | { status: "failed"; err: unknown }
 
 /**
+ * The session slots the reinstall wipe erases, named as its reports name them. A slot the
+ * wipe could not erase is recorded by this name, so a later boot retries that slot alone.
+ */
+export const ReinstallSessionSlot = {
+  ActiveToken: "active token",
+  SessionProfiles: "session profiles",
+  Pin: "pin",
+  PinAttemptCount: "pin attempt count",
+  LegacyPinAttempts: "legacy pin attempts",
+  BiometricsFlag: "biometrics flag",
+} as const
+
+export type ReinstallSessionSlot =
+  (typeof ReinstallSessionSlot)[keyof typeof ReinstallSessionSlot]
+
+/**
  * The failed-PIN state, stored as one value under one key — see the note above
  * the PIN lockout block.
  */
@@ -127,8 +143,8 @@ const parseLegacyAccountIdArray = (raw: string): MnemonicAccountsRead => {
  * One immediate retry, no backoff, reporting the slot by name on a second
  * failure. Both halves of the reinstall wipe use it, so the policy is stated
  * once: the failures worth a second attempt are one-shot keystore hiccups, and
- * boot cannot wait out anything longer-lived — the fresh-install branch re-runs
- * the wipe on the next launch. A failure is reported, never thrown, and never
+ * boot cannot wait out anything longer-lived — what is still owed is recorded and
+ * retried on a later launch. A failure is reported, never thrown, and never
  * stops the slots behind it.
  */
 const retryOnce = async (remove: () => Promise<boolean>): Promise<boolean> => {
@@ -621,35 +637,54 @@ export default class KeyStoreWrapper {
    * `MigrationStatus.NoData` can arrive without a reinstall. Deliberate, because
    * a real reinstall otherwise boots the next owner into a PIN nobody on the
    * device chose, which is unrecoverable, against a lock the user can set again.
+   *
+   * Returns the slots it could not erase, which the caller records so a later boot can
+   * finish them: `only` limits the erase to those. A name this method does not know is
+   * not a slot, so it is neither erased nor returned.
    */
   public static async clearUninstallSurvivingCredentials(
     onFailure: (what: string) => void,
-  ): Promise<void> {
+    only?: ReadonlyArray<string>,
+  ): Promise<ReinstallSessionSlot[]> {
     const removeWithRetry = withOneRetry(onFailure)
-
-    await removeWithRetry(KeyStoreWrapper.removeActiveToken, "active token")
-    await removeWithRetry(KeyStoreWrapper.removeSessionProfiles, "session profiles")
-    // The migrated slots are Keychain internet credentials, which outlive an
-    // uninstall exactly as the legacy items did — and the app lock is the one
-    // that strands its new owner, since a reinstall would boot into a PIN
-    // nobody on this device ever chose.
-    await removeWithRetry(KeyStoreWrapper.removePin, "pin")
     /** A wipe does not trust what this process remembers about the legacy count: the
      *  slot it asks about is the one an uninstall left behind. */
     mayLegacyPinAttemptsRemain = true
-    // Erased rather than cleared: `clearPinFailureState` falls back to writing a
-    // zeroed value when both erases fail, which is right for its own caller but
-    // would let a wipe finish by creating an entry that then outlives the *next*
-    // uninstall. Both keys, because that is what the cleared path covers.
-    await removeWithRetry(
-      () => KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN_FAILURE_STATE),
-      "pin attempt count",
-    )
-    await removeWithRetry(
-      () => KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
-      "legacy pin attempts",
-    )
-    await removeWithRetry(KeyStoreWrapper.removeIsBiometricsEnabled, "biometrics flag")
+
+    const erasers: ReadonlyArray<
+      readonly [ReinstallSessionSlot, () => Promise<boolean>]
+    > = [
+      [ReinstallSessionSlot.ActiveToken, KeyStoreWrapper.removeActiveToken],
+      [ReinstallSessionSlot.SessionProfiles, KeyStoreWrapper.removeSessionProfiles],
+      // The migrated slots are Keychain internet credentials, which outlive an
+      // uninstall exactly as the legacy items did — and the app lock is the one
+      // that strands its new owner, since a reinstall would boot into a PIN
+      // nobody on this device ever chose.
+      [ReinstallSessionSlot.Pin, KeyStoreWrapper.removePin],
+      // Erased rather than cleared: `clearPinFailureState` falls back to writing a
+      // zeroed value when both erases fail, which is right for its own caller but
+      // would let a wipe finish by creating an entry that then outlives the *next*
+      // uninstall. Both keys, because that is what the cleared path covers.
+      [
+        ReinstallSessionSlot.PinAttemptCount,
+        () => KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN_FAILURE_STATE),
+      ],
+      [
+        ReinstallSessionSlot.LegacyPinAttempts,
+        () => KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+      ],
+      [ReinstallSessionSlot.BiometricsFlag, KeyStoreWrapper.removeIsBiometricsEnabled],
+    ]
+
+    const isAsked = (slot: ReinstallSessionSlot) =>
+      only === undefined || only.includes(slot)
+    const asked = erasers.filter(([slot]) => isAsked(slot))
+    const owed: ReinstallSessionSlot[] = []
+    for (const [slot, erase] of asked) {
+      const isErased = await removeWithRetry(erase, slot)
+      if (!isErased) owed.push(slot)
+    }
+    return owed
   }
 
   /**

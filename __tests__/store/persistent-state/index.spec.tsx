@@ -152,7 +152,7 @@ const setupStorageMockDefaults = () => {
   })
   mockSetActiveToken.mockResolvedValue(true)
   mockRemoveActiveToken.mockResolvedValue(true)
-  mockClearUninstallSurvivingCredentials.mockResolvedValue(undefined)
+  mockClearUninstallSurvivingCredentials.mockResolvedValue([])
 }
 
 describe("PersistentStateProvider", () => {
@@ -280,6 +280,7 @@ describe("PersistentStateProvider", () => {
     mockClearUninstallSurvivingCredentials.mockImplementation(
       async (onFailure: (what: string) => void) => {
         onFailure("active token")
+        return ["active token"]
       },
     )
 
@@ -1169,6 +1170,7 @@ describe("PersistentStateProvider reinstall wipe", () => {
     })
     mockClearUninstallSurvivingCredentials.mockImplementation(async () => {
       order.push("session")
+      return []
     })
     mockClearUninstallSurvivingKeyMaterial.mockImplementation(async () => {
       order.push("key material")
@@ -1224,6 +1226,166 @@ describe("PersistentStateProvider reinstall wipe", () => {
     })
 
     expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
+  })
+})
+
+/**
+ * The session half of a reinstall wipe, owed across boots. Kept apart from the describe
+ * above, which is near the function line cap.
+ */
+describe("PersistentStateProvider owed session wipe", () => {
+  beforeEach(setupStorageMockDefaults)
+
+  const boot = async () => {
+    const view = render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+    return view
+  }
+
+  const sessionWipeFails = (...owed: string[]) => {
+    mockClearUninstallSurvivingCredentials.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        owed.forEach(onFailure)
+        return owed
+      },
+    )
+  }
+
+  /**
+   * The bug this marker closes: the blob is written at once when anything is owed, and a
+   * written blob is what keeps the fresh-install branch, the session wipe's only retry,
+   * from ever running again.
+   */
+  for (const presence of ["absent", "present", "unknown"]) {
+    it(`records the slots it could not erase when the index is ${presence}`, async () => {
+      storedStrings.delete(PERSISTENT_STATE_KEY)
+      mockReadSelfCustodialIndexPresence.mockResolvedValue(presence)
+      sessionWipeFails("active token", "pin")
+
+      await boot()
+
+      // Unprompted: nothing else would write the blob on this launch.
+      await waitFor(() => {
+        expect(mockSaveJson).toHaveBeenCalled()
+      })
+      expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+        pendingReinstallSessionWipe: ["active token", "pin"],
+      })
+    })
+  }
+
+  it("records nothing when every session slot went", async () => {
+    storedStrings.delete(PERSISTENT_STATE_KEY)
+
+    await boot()
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-other-btn"))
+    })
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+      "pendingReinstallSessionWipe",
+    )
+  })
+
+  /**
+   * Whatever the index says, and before the token is read: the token the previous owner
+   * left would otherwise become this boot's session.
+   */
+  it("erases the owed slots on a later boot before it reads the token", async () => {
+    setPersistedBlob({
+      ...scrubbedBlob,
+      pendingReinstallSessionWipe: ["active token", "pin"],
+    })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    const order: string[] = []
+    mockClearUninstallSurvivingCredentials.mockImplementationOnce(async () => {
+      order.push("session wipe")
+      return []
+    })
+    mockReadActiveToken.mockImplementation(async () => {
+      order.push("token read")
+      return { status: "absent" }
+    })
+
+    await boot()
+
+    expect(mockClearUninstallSurvivingCredentials).toHaveBeenCalledWith(
+      expect.any(Function),
+      ["active token", "pin"],
+    )
+    expect(order).toEqual(["session wipe", "token read"])
+    await waitFor(() => {
+      expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+        "pendingReinstallSessionWipe",
+      )
+    })
+  })
+
+  it("keeps a slot owed that still will not go, and boots signed out over it", async () => {
+    setPersistedBlob({
+      ...scrubbedBlob,
+      pendingReinstallSessionWipe: ["active token", "pin"],
+    })
+    mockGetActiveToken.mockResolvedValue("previous-owner-token")
+    sessionWipeFails("active token")
+
+    await boot()
+
+    expect(mockReadActiveToken).not.toHaveBeenCalled()
+    expect(screen.getByTestId("token").props.children).toBe("")
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallSessionWipe: ["active token"],
+    })
+  })
+
+  it("reads the token as usual once the owed slots are gone", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallSessionWipe: ["pin"] })
+    mockGetActiveToken.mockResolvedValue("new-owner-token")
+
+    await boot()
+
+    expect(screen.getByTestId("token").props.children).toBe("new-owner-token")
+  })
+
+  /** Only this file writes the names, so anything but a list of them is read as none. */
+  it("erases nothing when the marker is not a list", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallSessionWipe: "active token" })
+
+    await boot()
+
+    expect(mockClearUninstallSurvivingCredentials).not.toHaveBeenCalled()
+  })
+
+  it("keeps the session wipe owed when the state is reset", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallSessionWipe: ["pin"] })
+    sessionWipeFails("pin")
+    await boot()
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("reset-btn"))
+    })
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toEqual({
+      ...defaultStateWithoutToken,
+      pendingReinstallSessionWipe: ["pin"],
+    })
   })
 })
 
