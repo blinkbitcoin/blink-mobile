@@ -596,7 +596,7 @@ describe("self-custodial account-index", () => {
       ])
       mockMnemonicExists.mockResolvedValue({
         status: "failed",
-        err: new Error("keychain locked"),
+        err: Object.assign(new Error("keychain locked"), { code: "E_KEYCHAIN" }),
       })
 
       await sweepMnemonicMigration()
@@ -608,21 +608,11 @@ describe("self-custodial account-index", () => {
       // occurrence, which would pass even if only one of the two failures left
       // a trace.
       expect(
-        breadcrumbs.filter((line) => line === "[expected] keychain locked"),
+        breadcrumbs.filter(
+          (line) => line === "[expected] Mnemonic sweep probe failed: Error E_KEYCHAIN",
+        ),
       ).toHaveLength(2)
       expect(breadcrumbs).toContain("[defect] Mnemonic sweep incomplete: 2/2")
-    })
-
-    it("wraps a non-Error read failure so the breadcrumb still names it", async () => {
-      setIndex([{ id: "a1", lightningAddress: null }])
-      mockMnemonicExists.mockResolvedValue({ status: "failed", err: "-25308" })
-
-      const result = await sweepMnemonicMigration()
-
-      expect(result).toEqual({ status: "incomplete", failures: 1 })
-      expect(mockCrashlyticsLog.mock.calls.map(([line]) => line)).toContain(
-        "[expected] Mnemonic sweep probe failed: -25308",
-      )
     })
 
     it("raises no non-fatal when every account migrates", async () => {
@@ -912,6 +902,57 @@ describe("self-custodial account-index — strict account ids", () => {
 
     expect((await readSelfCustodialAccountIds()).status).toBe(
       StorageReadStatus.ReadFailed,
+    )
+  })
+})
+
+/**
+ * The sweep's breadcrumbs, which leave the device in every report. Kept out of the
+ * describe above, which is at the line cap.
+ */
+describe("self-custodial account-index — sweep breadcrumbs", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetItem.mockResolvedValue(undefined)
+    mockGetItem.mockResolvedValue(null)
+    mockGetMnemonicNetworkForAccount.mockResolvedValue(null)
+    mockRememberMnemonicAccount.mockResolvedValue(true)
+    mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
+    mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
+  })
+
+  /**
+   * The native error names the slot it looked for, and the slot name ends in the account
+   * id. The breadcrumb keeps the kind of failure and none of what it said.
+   */
+  it("keeps the account id a native error carries out of the breadcrumb", async () => {
+    setIndex([{ id: "acct-7f3c", lightningAddress: null }])
+    mockMnemonicExists.mockResolvedValue({
+      status: "failed",
+      err: new Error(
+        "No entry found for service: secure-store.blink.local/mnemonic:acct-7f3c",
+      ),
+    })
+
+    await sweepMnemonicMigration()
+
+    const breadcrumbs = mockCrashlyticsLog.mock.calls.map(([line]) => line)
+    expect(breadcrumbs).toContain("[expected] Mnemonic sweep probe failed: Error")
+    expect(breadcrumbs.filter((line) => line.includes("acct-7f3c"))).toEqual([])
+  })
+
+  it("names only the kind of a failure that is not an Error", async () => {
+    setIndex([{ id: "acct-7f3c", lightningAddress: null }])
+    mockMnemonicExists.mockResolvedValue({
+      status: "failed",
+      err: "secure-store.blink.local/mnemonic:acct-7f3c",
+    })
+
+    const result = await sweepMnemonicMigration()
+
+    expect(result).toEqual({ status: "incomplete", failures: 1 })
+    expect(mockCrashlyticsLog.mock.calls.map(([line]) => line)).toContain(
+      "[expected] Mnemonic sweep probe failed: string",
     )
   })
 })
