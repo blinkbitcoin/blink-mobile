@@ -46,6 +46,13 @@ jest.mock("@react-navigation/native", () => ({
   },
 }))
 
+const mockHapticReject = jest.fn()
+
+jest.mock("@app/utils/haptics", () => {
+  const actual = jest.requireActual("@app/utils/haptics")
+  return { ...actual, haptics: { ...actual.haptics, reject: () => mockHapticReject() } }
+})
+
 /** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
 const mockFeeTierOverride: { current: Record<string, unknown> } = { current: {} }
 
@@ -249,6 +256,7 @@ beforeEach(() => {
   mockSavePreferredAmountCurrency.mockClear()
   mockNavigate.mockClear()
   mockFeeTierOverride.current = {}
+  mockHapticReject.mockClear()
   mockDisplayCurrency.current = "NGN"
   mockPreferredAmountCurrency.current = undefined
 })
@@ -574,12 +582,14 @@ describe("a self-custodial on-chain fee", () => {
 
     expect(screen.queryByText(tooLow)).toBeNull()
     expect(isNextDisabled()).toBe(false)
+    expect(mockHapticReject).not.toHaveBeenCalled()
 
     fireEvent.press(nextButton())
     await settle()
 
     expect(screen.getByText(tooLow)).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
   })
 
   /** The reported bug: a quote that failed for a cause no amount fixes left the sender
