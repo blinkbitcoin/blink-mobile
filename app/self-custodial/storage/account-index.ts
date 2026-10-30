@@ -312,6 +312,18 @@ type SweepResult =
 export const SWEEP_IDLE_TIMEOUT_MS = 5000
 
 /**
+ * What a failed probe was, without what it said: a keychain error can carry the server
+ * string, which ends in the account id, the reason the other readers of these slots drop
+ * the cause too. The kind and the code survive, and they are what tells a locked device
+ * from a broken one.
+ */
+const describeProbeFailure = (err: unknown): string => {
+  if (!(err instanceof Error)) return typeof err
+  const { code } = err as { code?: unknown }
+  return code === undefined ? err.name : `${err.name} ${String(code)}`
+}
+
+/**
  * Migrates the mnemonic of every account in the index, whether or not the user
  * ever opens it.
  *
@@ -359,9 +371,7 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
       // account on a locked device raising its own non-fatal. The sweep being
       // incomplete is the reportable event, and it is raised once below.
       recordAppError(
-        mnemonic.err instanceof Error
-          ? mnemonic.err
-          : new Error(`Mnemonic sweep probe failed: ${mnemonic.err}`),
+        new Error(`Mnemonic sweep probe failed: ${describeProbeFailure(mnemonic.err)}`),
         { expected: true },
       )
     } else {
