@@ -15,6 +15,7 @@
  *   - Stable balance ON locks Dollar
  *   - Lightning address copied/shown as payment identifier
  *   - Set amount switches to Lightning invoice with the amount
+ *   - New on-chain address: offered on the on-chain page, rotates once per tap
  */
 import React from "react"
 import { it } from "@jest/globals"
@@ -25,6 +26,8 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { WalletCurrency } from "@app/graphql/generated"
 import ReceiveScreen from "@app/screens/receive-bitcoin-screen/receive-screen"
+import { ActionButton } from "@app/components/action-button"
+import { toastShow } from "@app/utils/toast"
 import {
   AccountType,
   ActiveWalletStatus,
@@ -106,6 +109,7 @@ jest.mock("@app/graphql/generated", () => {
     useLnInvoiceCreateMutation: () => [jest.fn()],
     useLnUsdInvoiceCreateMutation: () => [jest.fn()],
     useOnChainAddressCurrentMutation: () => [jest.fn()],
+    useOnChainAddressCreateMutation: () => [jest.fn()],
     useMyLnUpdatesSubscription: () => mockUseMyLnUpdatesSubscription(),
   }
 })
@@ -265,9 +269,9 @@ jest.mock("react-native-reanimated-carousel", () => {
 jest.mock("@app/screens/receive-bitcoin-screen/qr-view", () => {
   const { View: RNView, Text: RNText } = jest.requireActual("react-native")
   return {
-    QRView: ({ type, loading }: { type: string; loading: boolean }) => (
+    QRView: ({ type, loading, err }: { type: string; loading: boolean; err: string }) => (
       <RNView testID={`qr-view-${type}`}>
-        <RNText>{loading ? "Loading" : `QR-${type}`}</RNText>
+        <RNText>{err || (loading ? "Loading" : `QR-${type}`)}</RNText>
       </RNView>
     ),
   }
@@ -627,6 +631,168 @@ describe("ReceiveScreen — self-custodial", () => {
       fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
 
       expect(Clipboard.setString).toHaveBeenCalledWith("alice@spark.tips")
+    })
+  })
+
+  describe("new on-chain address", () => {
+    const currentAddress = "bc1qcurrentaddressxxxxxxxxxxxxxxxxxxxxx1current"
+    const freshAddress = "bc1qfreshaddressxxxxxxxxxxxxxxxxxxxxxxxxx9fresh"
+    const shown = (address: string) => `${address.slice(0, 10)}...${address.slice(-10)}`
+
+    beforeEach(() => {
+      mockReceiveOnchain.mockImplementation((params?: { newAddress?: boolean }) =>
+        Promise.resolve({ address: params?.newAddress ? freshAddress : currentAddress }),
+      )
+    })
+
+    const renderOnOnchainPage = async () => {
+      const view = render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await waitFor(() => {
+        expect(screen.getByText(shown(currentAddress))).toBeTruthy()
+      })
+      return view
+    }
+
+    it("is only offered on the on-chain page", async () => {
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+
+      expect(screen.queryByText(LL.ReceiveScreen.newAddress())).toBeNull()
+
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+
+      await waitFor(() => {
+        expect(screen.getByText(LL.ReceiveScreen.newAddress())).toBeTruthy()
+      })
+    })
+
+    it("asks the SDK for a fresh address, shows it and confirms it", async () => {
+      await renderOnOnchainPage()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressGenerated(),
+          type: "success",
+        }),
+      )
+    })
+
+    it("does not confirm a fresh address once the screen has been left", async () => {
+      // Regression: the rotation finishes after a back-press and reported Created, so the
+      // toast landed on Home, or on a reopened Receive not showing that address yet.
+      const view = await renderOnOnchainPage()
+      let finishRotation: () => void = () => {}
+      mockReceiveOnchain.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            finishRotation = () => resolve({ address: freshAddress })
+          }),
+      )
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+      await flushAsync()
+      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: true })
+      view.unmount()
+
+      await act(async () => {
+        finishRotation()
+      })
+      await flushAsync()
+
+      expect(toastShow).not.toHaveBeenCalled()
+    })
+
+    it("rotates once for a double tap", async () => {
+      await renderOnOnchainPage()
+
+      // Both taps reach the handler before React re-renders, which is the case the
+      // in-flight guard exists for: fireEvent would see the disabled button and skip.
+      const { onPress } = screen
+        .UNSAFE_getAllByType(ActionButton)
+        .find((button) => button.props.label === LL.ReceiveScreen.newAddress())!.props
+      await act(async () => {
+        onPress()
+        onPress()
+      })
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      const rotations = mockReceiveOnchain.mock.calls.filter(
+        ([params]) => params?.newAddress === true,
+      )
+      expect(rotations).toHaveLength(1)
+    })
+
+    it("keeps the current address and reports the failure", async () => {
+      await renderOnOnchainPage()
+      mockReceiveOnchain.mockResolvedValueOnce({ errors: [{ message: "sdk down" }] })
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(toastShow).toHaveBeenCalledWith(
+          expect.objectContaining({
+            message: LL.ReceiveScreen.newAddressFailed(),
+            type: "error",
+          }),
+        )
+      })
+      expect(screen.getByText(shown(currentAddress))).toBeTruthy()
+    })
+
+    it("retries from New after the first address request failed", async () => {
+      mockReceiveOnchain.mockResolvedValueOnce({ errors: [{ message: "offline" }] })
+      render(
+        <ContextForScreen>
+          <ReceiveScreen />
+        </ContextForScreen>,
+      )
+      await flushAsync()
+      await flushAsync()
+      fireEvent.press(screen.getByTestId("carousel-page-1"))
+      await flushAsync()
+      expect(screen.queryByText(shown(currentAddress))).toBeNull()
+
+      const identifier = screen.getByTestId("readable-payment-request")
+      expect(identifier.props.children).toBeFalsy()
+      expect(screen.getByText(LL.ReceiveScreen.onchainAddressLoadFailed())).toBeTruthy()
+      expect(screen.queryByText("QR-OnChain")).toBeNull()
+      fireEvent.press(identifier)
+      expect(Clipboard.setString).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.copyInvoice()))
+      expect(Clipboard.setString).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByText(LL.ReceiveScreen.newAddress()))
+
+      await waitFor(() => {
+        expect(screen.getByText(shown(freshAddress))).toBeTruthy()
+      })
+      expect(toastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.ReceiveScreen.newAddressGenerated(),
+          type: "success",
+        }),
+      )
     })
   })
 })

@@ -20,11 +20,14 @@ export const useDisplayPaymentRequest = (
 ): DisplayPaymentRequestReturn => {
   const { type: requestType, canUsePaycode, info, lnAddressHostname } = request
 
-  const prevPaymentRequest = useRef("")
+  // Only Lightning falls back to its last value, to bridge an invoice being replaced.
+  // An on-chain address that is not held right now may belong to another wallet, and
+  // a Lightning request must never stand in for a Bitcoin address.
+  const prevLightning = useRef("")
 
-  const showActions = isOnChainPage
-    ? Boolean(onchainAddress)
-    : requestType !== Invoice.PayCode || canUsePaycode
+  // The on-chain row stays put while an address loads, fails or changes wallet, so the
+  // layout does not jump; the screen disables what has nothing to act on, and New retries.
+  const showActions = isOnChainPage || requestType !== Invoice.PayCode || canUsePaycode
 
   const readablePaymentRequest = (() => {
     if (info?.data?.invoiceType === Invoice.Lightning)
@@ -37,16 +40,14 @@ export const useDisplayPaymentRequest = (
       return getLightningAddress(lnAddressHostname, info.data.username)
   })()
 
-  const activePaymentRequest = isOnChainPage
-    ? onchainAddress
-      ? truncateMiddle(onchainAddress)
-      : null
-    : readablePaymentRequest
-  const displayPaymentRequest = activePaymentRequest || prevPaymentRequest.current
+  const onchainDisplay = onchainAddress ? truncateMiddle(onchainAddress) : ""
+  const displayPaymentRequest = isOnChainPage
+    ? onchainDisplay
+    : readablePaymentRequest || prevLightning.current
 
   useEffect(() => {
-    if (activePaymentRequest) prevPaymentRequest.current = activePaymentRequest
-  }, [activePaymentRequest])
+    if (readablePaymentRequest) prevLightning.current = readablePaymentRequest
+  }, [readablePaymentRequest])
 
   return { displayPaymentRequest, showActions }
 }

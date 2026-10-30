@@ -53,6 +53,23 @@ describe("createReceiveOnchain", () => {
     expect(methodInnerOf(receivePayment)).toEqual({ newAddress: true })
   })
 
+  it("hands the caller's abort signal to the SDK call", async () => {
+    const { sdk, receivePayment } = buildSdk()
+    const controller = new AbortController()
+
+    await createReceiveOnchain(sdk, { signal: controller.signal })({ newAddress: true })
+
+    expect(receivePayment.mock.calls[0][1]).toEqual({ signal: controller.signal })
+  })
+
+  it("passes no abort options when the caller has no signal", async () => {
+    const { sdk, receivePayment } = buildSdk()
+
+    await createReceiveOnchain(sdk)({ newAddress: true })
+
+    expect(receivePayment.mock.calls[0][1]).toBeUndefined()
+  })
+
   it("returns an error result when the SDK rejects", async () => {
     const receivePayment = jest.fn().mockRejectedValue(new Error("sdk offline"))
     const sdk = { receivePayment } as unknown as BreezSdkInterface
