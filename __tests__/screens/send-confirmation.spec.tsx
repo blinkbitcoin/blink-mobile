@@ -12,6 +12,7 @@ import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-detail
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
 import * as PaymentDetailsOnchain from "@app/screens/send-bitcoin-screen/payment-details/onchain"
+import { createSelfCustodialSparkPaymentDetails } from "@app/self-custodial/payment-details/spark"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
@@ -693,6 +694,37 @@ describe("SendBitcoinConfirmationScreen", () => {
 
       const params = findCompletedRouteParams()
       expect(params.destination).toBe(longLnurl)
+    })
+
+    it("passes a Spark address to the receipt in full, however long", async () => {
+      const sparkAddress = `sp1${"pgss9qzk8dxs7ehvlwrjr3qyrmsy".repeat(3)}`
+      const sparkDetail = createSelfCustodialSparkPaymentDetails<WalletCurrency>({
+        sdk: {} as never,
+        address: sparkAddress,
+        unitOfAccountAmount: toBtcMoneyAmount(1000),
+        convertMoneyAmount: convertMoneyAmountMock,
+        sendingWalletDescriptor: btcSendingWalletDescriptor,
+      })
+      const routeSpark = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: sparkDetail },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinConfirmationScreen route={routeSpark} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.destination).toBe(sparkAddress)
     })
 
     it("still shortens a Lightning invoice on the receipt", async () => {
