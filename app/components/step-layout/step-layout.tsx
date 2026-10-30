@@ -15,17 +15,19 @@ import { Screen } from "@app/components/screen"
 /** Rounding and bounce leave the offset a hair short of the exact bottom. */
 const AT_BOTTOM_SLACK = 8
 
-type MigrationStepLayoutProps = {
+type StepLayoutProps = {
   children: React.ReactNode
   footer: React.ReactNode
+  /** A row the screen draws itself, for a screen whose navigation header is hidden. */
   header?: React.ReactNode
   headerShown?: boolean
   contentStyle?: StyleProp<ViewStyle>
 }
 
 /**
- * The migration flow's shared step scaffold: an optional header row, the step content,
- * and the footer actions pinned to the bottom with the flow's spacing.
+ * The shared scaffold of a step a flow walks the user through, the migration's and the
+ * two-factor prompts' alike: an optional header row, the step content, and the footer
+ * actions pinned to the bottom with the flow's spacing.
  *
  * The content scrolls so that enlarged system text can never push it into the footer,
  * and the footer is a sibling below the scroll view rather than an overlay, so the
@@ -36,7 +38,7 @@ type MigrationStepLayoutProps = {
  * text sizes the next box lands off-screen; without this the user sees the CTA stay
  * disabled with no visible reason why.
  */
-export const MigrationStepLayout: React.FC<MigrationStepLayoutProps> = ({
+export const StepLayout: React.FC<StepLayoutProps> = ({
   children,
   footer,
   header,

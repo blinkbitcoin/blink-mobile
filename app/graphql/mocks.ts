@@ -1,4 +1,5 @@
 import {
+  ApiKeysDocument,
   BulletinsDocument,
   ContactsDocument,
   CurrencyListDocument,
@@ -334,6 +335,18 @@ const mocks = [
     },
   },
   {
+    request: { query: ApiKeysDocument },
+    result: {
+      data: {
+        me: {
+          id: "user-id-123",
+          apiKeys: [],
+          __typename: "User",
+        },
+      },
+    },
+  },
+  {
     request: { query: MyUserIdDocument },
     result: {
       data: {
@@ -469,6 +482,10 @@ const mocks = [
                   amount: "5000",
                 },
               ],
+            },
+            inactivityFee: {
+              __typename: "InactivityFeeInformation",
+              usdCentsPerMonth: 100,
             },
           },
         },

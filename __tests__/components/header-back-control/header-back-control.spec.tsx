@@ -89,6 +89,18 @@ describe("headerBackControl", () => {
     await waitFor(() => expect(mockGoBack).toHaveBeenCalledTimes(1))
   })
 
+  it("runs the screen's own way out, instead of going back, when it hands one", async () => {
+    const onPress = jest.fn()
+    const { getByLabelText } = renderHeaderLeft(
+      headerBackControl({ onPress })(headerProps),
+    )
+
+    fireEvent.press(getByLabelText(BACK_BUTTON_LABEL))
+
+    await waitFor(() => expect(onPress).toHaveBeenCalledTimes(1))
+    expect(mockGoBack).not.toHaveBeenCalled()
+  })
+
   /* The crash #4176 fixed: the KYC webview (webview.tsx) and the account-delete flow
    * (delete.tsx) both hand `setOptions` a headerLeft that calls no hooks, so whatever this
    * control puts there first must not call any either. */

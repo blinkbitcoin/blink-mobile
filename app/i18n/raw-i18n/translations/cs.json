@@ -2460,7 +2460,7 @@
     "sdkGenericError": "Nelze odhadnout poplatky. Zkuste jiný částku."
   },
   "SettingsScreen": {
-    "createAddress": "Vytvořit adresu",
+    "createAddress": "Vytvořit Lightning adresu",
     "addressDisabled": "(zakázáno)",
     "donationButton": "Darovací tlačítko",
     "btcpayServer": "BTCPay Server",
@@ -2477,6 +2477,7 @@
     "activated": "Aktivováno",
     "addressScreen": "Způsoby platby",
     "nonCustodialAccount": "Nesvěřenský účet",
+    "custodialAccount": "Svěřenský účet",
     "tapUserName": "Klepnutím na nastavíte uživatelské jméno",
     "notifications": "Notifications",
     "title": "Nastavení",
@@ -2585,8 +2586,6 @@
     "emailUnverifiedContent": "Ověřením e-mailu zajistěte, abyste se mohli znovu přihlásit ke svému účtu. Chcete provést ověření nyní?",
     "totp": "Dvoufaktorové ověření",
     "totpDeactivated": "Dvoufaktorové ověřování bylo deaktivováno",
-    "totpDeleteAlertTitle": "Zmazat dvoufaktorové ověřování",
-    "totpDeleteAlertContent": "Opravdu chcete odstranit dvoufaktorové ověřování?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "ID účtu",
@@ -2639,14 +2638,11 @@
     "youGet": "Získáte"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Dvoufaktorové ověření",
-    "secret": "Tajný klíč/záloha",
-    "content": "Naskenujte tento QR kód pomocí aplikace autentizátoru. Případně můžete tajný kód do aplikace authenticator zkopírovat/vložit ručně."
+    "title": "Dvoufaktorové ověření"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Dvoufaktorové ověření",
-    "enter6digitCode": "Zadejte 6-místný kód z aplikace autentizátoru a ověřte dvoufaktorové ověření.",
-    "success": "Bylo povoleno dvoufaktorové ověřování. Nyní se budete moci znovu přihlásit pouze pomocí telefonu nebo e-mailu A dvoufaktorového ověření.\n\nV případě, že uživatel ztratil přístup ke svému dvoufaktorovému ověřování, lze obnovit pouze plné účty KYC."
+    "enter6digitCode": "Zadejte 6-místný kód z aplikace autentizátoru a ověřte dvoufaktorové ověření."
   },
   "TotpLoginValidateScreen": {
     "title": "Dvoufaktorové ověření",
@@ -2720,7 +2716,9 @@
     "noFee": "bez poplatku",
     "fromApprox": "od ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "V tuto chvíli nelze načíst poplatky"
+    "error": "V tuto chvíli nelze načíst poplatky",
+    "inactivity": "Neaktivita >{months: number} měsíců",
+    "usdPerMonth": "{amount: string}/měsíc"
   },
   "TransactionLimitsScreen": {
     "receive": "Přijmout",
@@ -3873,10 +3871,18 @@
         "testSuccess": "Vaše záložní fráze je správná"
       }
     },
+    "BundleExport": {
+      "title": "Nouzový odchod",
+      "body": "Pokud Spark přestane fungovat, tento balíček vám umožní přesunout vaše bitcoiny on-chain bez Blinku. Váš dolarový zůstatek obnovit nelze.",
+      "download": "Stáhnout balíček",
+      "sensitiveTitle": "Citlivé",
+      "learnMore": "Více o jednostranném odchodu",
+      "sensitiveConfirm": "Stáhnout",
+      "sensitiveBody": "Tento soubor ukazuje váš zůstatek a historii plateb, proto ho uchovávejte v soukromí. Abyste ho mohli v nouzi použít, budete potřebovat také svou záložní frázi."
+    },
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",
       "description": "Uložíme zálohu vaší záložní fráze do vašeho {provider}.",
-      "encryptCheckbox": "Šifrovat dodatečným heslem",
       "password": "Heslo",
       "passwordPlaceholder": "(minimálně 12 znaků)",
       "confirmPassword": "Potvrdit heslo",
@@ -4002,8 +4008,18 @@
     "explainerCheck5": "Z tvého účtu bude stržen síťový poplatek Spark",
     "explainerCta": "Rozumím",
     "transferringFunds": "Převádíme vaše prostředky. Mělo by to být hotové za několik sekund.",
+    "transferInProgress": {
+      "body": "Vaše prostředky jsou na cestě do vašeho nového účtu. Nechte aplikaci otevřenou a dokončíme to automaticky."
+    },
     "transferDelayed": {
       "body": "Vaše prostředky jsou na cestě do vašeho nového účtu. Trvá to déle než obvykle — nechte aplikaci otevřenou a dokončíme to automaticky.",
+      "contactSupportCta": "Kontaktovat podporu"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Nepodařilo se nám z tohoto zařízení načíst průběh vaší migrace. Nic není ztraceno — vaše prostředky jsou v bezpečí a váš postup je stále uložen.",
+      "outOfSpaceBody": "Ve vašem zařízení není volné úložiště, takže nemůžeme načíst průběh migrace. Uvolněte místo a zkuste to znovu. Nic není ztraceno — vaše prostředky jsou v bezpečí.",
+      "notSavedBody": "Průběh vaší migrace se nám na tomto zařízení nepodařilo uložit. Nic není ztraceno: vaše prostředky jsou v bezpečí. Zkuste to znovu.",
+      "notSavedOutOfSpaceBody": "Ve vašem zařízení není volné úložiště, takže nemůžeme uložit průběh migrace. Uvolněte místo a zkuste to znovu. Nic není ztraceno: vaše prostředky jsou v bezpečí.",
       "contactSupportCta": "Kontaktovat podporu"
     },
     "clockOutOfSync": {
@@ -4067,6 +4083,12 @@
     "recognizePhraseTitle": "Poznáváte tuto zálohovací frázi?",
     "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operátor je nedostupný",
+    "outageBody": "Spark má výpadek. Počkejte pár minut a zkuste to znovu, nebo kontaktujte naši {support}",
+    "outageSupport": "Podporu",
+    "tryAgainLater": "Zkusit později"
+  },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",
     "description": "Zabezpečte svou peněženku nyní. Zabere to jen minutu.",
@@ -4075,6 +4097,81 @@
     "modalTitle": "Zabezpečte své prostředky",
     "modalDescription": "Důrazně doporučujeme zálohovat peněženku, abyste předešli úplné ztrátě prostředků v případě ztráty tohoto zařízení.",
     "secureMe": "Zabezpečit peněženku"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Nastavte dvoufaktorové ověření",
+    "cardDescription": "Chraňte svůj účet před neoprávněným přístupem.",
+    "cardCta": "Nastavit",
+    "settingsDescription": "Chraňte svůj účet před neoprávněným přístupem jeho nastavením.",
+    "setupTitle": "Nastavte dvoufaktorové ověření nyní",
+    "setupDescription": "Abyste zabránili neoprávněnému přístupu ke svému účtu, přidejte nyní dvoufaktorové ověření.",
+    "setAuthenticator": "Nastavit autentikátor",
+    "reminderTitle": "Přidejte autentikátor a ochraňte své prostředky",
+    "reminderDescription": "Váš zůstatek vzrostl. Autentikační aplikace udrží váš účet v bezpečí, i když někdo získá přístup k vašemu e-mailu nebo telefonu.",
+    "modalReminder": "Pokud to teď odmítnete, nezapomeňte to co nejdříve zapnout.",
+    "dismissTwoMore": "Můžete to odmítnout ještě dvakrát.",
+    "dismissOneMore": "Můžete to odmítnout ještě jednou.",
+    "dismissLast": "Toto je naposledy, co to můžete odmítnout.",
+    "setNow": "Nastavit nyní",
+    "dontWantTo": "Nechci",
+    "highBalanceTitle": "Máte více než {amount}, přidejte prosím dodatečnou ochranu",
+    "protectionRequiredTitle": "Přidejte prosím dodatečnou ochranu, abyste mohli Blink dál používat",
+    "protectionRequiredBody": "Čím více prostředků máte, tím důležitější je lepší zabezpečení. Pro další používání Blinku prosím přidejte autentikátor.",
+    "nonCustodialTitle": "Pokud nechcete nastavit dvoufaktorové ověření",
+    "nonCustodialBody": "Druhou možností je přejít na nesvěřenecký režim. Pak za své prostředky odpovídáte sami."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Chraňte své prostředky autentikátorem",
+    "introDescription": "Autentikační aplikace vytváří každých 30 sekund nový 6místný kód.",
+    "takeoversTitle": "Zabraňuje převzetí účtu",
+    "takeoversDescription": "Kód existuje jen ve vašem telefonu",
+    "stolenNumberTitle": "V bezpečí, i když vám ukradnou číslo",
+    "stolenNumberDescription": "I když se někdo dostane k vašemu e-mailu nebo telefonnímu číslu, nepřihlásí se",
+    "durationTitle": "Zabere asi 2 minuty",
+    "durationDescription": "Provedeme vás krok za krokem",
+    "getStarted": "Začít",
+    "appsTitle": "Získejte autentikační aplikaci",
+    "appsDescription": "Funguje jakákoli autentikační aplikace. Tyto jsou zdarma a důvěryhodné:",
+    "googleAuthenticatorDescription": "Jednoduchá a široce používaná. Volitelná záloha do vašeho účtu Google.",
+    "protonAuthenticatorDescription": "Otevřený zdrojový kód. Záloha a synchronizace s koncovým šifrováním.",
+    "twoFasAuthDescription": "Otevřený zdrojový kód. Nepotřebuje účet.",
+    "get": "Stáhnout",
+    "storeNote": "„Stáhnout“ otevře App Store nebo Google Play. Po instalaci se vraťte do Blinku.",
+    "haveAnApp": "Aplikaci už mám",
+    "keyInstruction": "Zkopírujte tento klíč pro nastavení do své autentikační aplikace.",
+    "qrInstruction": "Používáte jiné zařízení?\nNaskenujte místo toho tento QR kód.",
+    "backupTitle": "Zálohujte svůj klíč",
+    "backupDescription": "Pokud ztratíte telefon, tento klíč vám umožní autentikátor znovu nastavit. Uložte ho jinam než do tohoto telefonu.",
+    "saveToPasswordManager": "Uložit do správce hesel",
+    "shareToPasswordManager": "Sdílet do správce hesel",
+    "copyForManualBackup": "Zkopírovat pro ruční zálohu",
+    "passwordManagerUnavailable": "V tomto zařízení není k dispozici žádný správce hesel. Místo toho zkopírujte klíč pro ruční zálohu.",
+    "savedIt": "Mám ho uložený",
+    "keyBackupText": "Klíč pro nastavení autentikátoru Blink\n\nÚčet: {account}\nKlíč pro nastavení: {key}\n\nPokud ztratíte telefon, přidejte tento klíč pro nastavení do autentikační aplikace a získáte zpět své přihlašovací kódy pro Blink. Kdokoli s tímto klíčem může vytvářet vaše kódy, proto ho uchovejte v soukromí.",
+    "protectedTitle": "Váš účet je nyní chráněn",
+    "protectedDescription": "Od teď budete k přihlášení potřebovat jednorázový kód z autentikační aplikace.",
+    "newPhoneTip": "Pokud si pořídíte nový telefon, přeneste na něj autentikátor <bold>předtím</bold>, než resetujete ten starý.",
+    "done": "Hotovo"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Zapnuto",
+    "statusDisabled": "2FA: Vypnuto",
+    "modalTitle": "Nedoporučujeme vypínat 2FA",
+    "modalBody": "Snížilo by to zabezpečení vašeho účtu a usnadnilo třetí straně přístup k vašemu účtu bez vašeho svolení.",
+    "keepProtected": "Chci zůstat chráněn",
+    "codeInstruction": "Zadejte 6místný kód z ověřovací aplikace, abyste vypnuli dvoufázové ověření.",
+    "codeInvalid": "Tento kód není správný. Zadejte aktuální kód z ověřovací aplikace.",
+    "tooManyAttempts": "Příliš mnoho pokusů. Zkuste to znovu za hodinu.",
+    "manualResetTitle": "Ruční reset 2FA",
+    "manualResetBody": "Pro vaši ochranu nepovolujeme odebrání 2FA v aplikaci. Pokud potřebujete reset 2FA, kontaktujte naši <support>podporu</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Přidat e-mail",
+    "addPhoneTitle": "Přidat telefonní číslo",
+    "addEmailCode": "Pro přidání e-mailu zadejte 6místný kód z ověřovací aplikace.",
+    "addPhoneCode": "Pro přidání telefonního čísla zadejte 6místný kód z ověřovací aplikace.",
+    "codeInvalid": "Tento kód není správný. Zadejte aktuální kód z ověřovací aplikace.",
+    "tooManyAttempts": "Příliš mnoho pokusů. Zkuste to znovu za hodinu."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4085,6 +4182,15 @@
     "title": "Toto je nesvěřenský účet",
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
     "cta": "Číst"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Aktualizujte zálohu v cloudu",
+    "body": "Váš nouzový balíček v {provider} je zastaralý. Znovu zálohujte peněženku, abyste ho aktualizovali.",
+    "cta": "Znovu zálohovat"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Zatím nemáte nouzový balíček. Vytvoří se po vaší první transakci.",
+    "exportFailed": "Nouzový balíček se nepodařilo stáhnout."
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",

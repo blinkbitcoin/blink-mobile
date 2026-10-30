@@ -69,7 +69,10 @@ export const CodeInput: React.FC<Props> = ({
 
   const [code, _setCode] = useState("")
 
+  /** Nothing typed while a code is checked: the field keeps the one sent, rather than
+   *  show another that would not be. */
   const setCode = (codeInput: string) => {
+    if (loading) return
     const code = codeInput.trim()
 
     if (code.length > 6) {

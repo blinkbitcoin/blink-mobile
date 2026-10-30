@@ -16,6 +16,11 @@ import { DrainConversionReturn } from "@app/screens/conversion-flow/drain-conver
 import { AccountMode, AccountTypeMode, CreationBlockReason } from "@app/types/account"
 import { DisplayCurrency, MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 import { WalletDescriptor } from "@app/types/wallets"
+import {
+  LoginMethodAdditionParams,
+  TotpCodeCheckParams,
+  TwoFactorFlowParams,
+} from "@app/types/two-factor-enforcement"
 import { MigrationSupportOrigin, MigrationSupportReason } from "@app/types/migration"
 
 import { AuthenticationScreenPurpose, PinScreenPurpose } from "../utils/enum"
@@ -61,6 +66,16 @@ export const canGoBackFromChooseExperience = (
 
   return onContinue.route === ChooseExperienceContinueRoute.AcceptTerms
 }
+
+const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
+
+/** Whether a removal is one the user's own back press dispatched: the header arrow and
+ *  the Android hardware back raise GO_BACK, the swipe raises POP. A screen that holds
+ *  the user refuses only these. A removal the app dispatches on its own, a reset for a
+ *  logout or a gate, or a navigation for a profile switch, has to keep working, and
+ *  blocking those is how a hold meant to protect the user ends up trapping them. */
+export const isBackwardAction = (action: { type: string }): boolean =>
+  BACKWARD_ACTIONS.includes(action.type)
 
 export type RootStackParamList = {
   getStarted: undefined
@@ -204,7 +219,10 @@ export type RootStackParamList = {
   transactionLimitsScreen: undefined
   feeRatesScreen: undefined
   acceptTermsAndConditions: NewAccountFlowParamsList
-  emailRegistrationInitiate?: { onboarding?: boolean; hasUsername?: boolean }
+  emailRegistrationInitiate?: {
+    onboarding?: boolean
+    hasUsername?: boolean
+  }
   emailRegistrationValidate: {
     email: string
     emailRegistrationId: string
@@ -213,9 +231,28 @@ export type RootStackParamList = {
   }
   emailLoginInitiate: undefined
   emailLoginValidate: { email: string; emailLoginId: string }
+  /** The authenticator onboarding: why, then which app, then the setup key. Opened by
+   *  every prompt's Set authenticator. */
+  totpRegistrationIntro: TwoFactorFlowParams | undefined
+  totpRegistrationApps: undefined
   totpRegistrationInitiate: undefined
-  totpRegistrationValidate: { totpRegistrationId: string }
+  /** The setup key travels on to the backup, the only screens that ever show it, and
+   *  goes with them once the flow is left. Neither route is deep-linkable, so the key
+   *  cannot arrive from outside the app (asserted over DEEP_LINK_SCREENS). */
+  totpRegistrationValidate: {
+    totpRegistrationId: string
+    secret: string
+  } & TotpCodeCheckParams
+  /** The user id names the account in the backup for an account with no username yet. */
+  totpRegistrationBackup: { secret: string; userId: string }
+  totpRegistrationDone: undefined
+  /** The authenticator's code, which turns it off. */
+  totpDeleteValidate: undefined
+  /** The authenticator's code for adding a login method. */
+  loginMethodCode: LoginMethodAdditionParams
   totpLoginValidate: { authToken: string }
+  twoFactorSetup: TwoFactorFlowParams | undefined
+  twoFactorNonCustodial: TwoFactorFlowParams | undefined
   webView: {
     url: string
     initialTitle?: string
@@ -301,6 +338,7 @@ export type RootStackParamList = {
     challenges: Array<{ index: number; word: string }>
     successMessage?: string
   }
+  selfCustodialBackupBundleExport: undefined
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
   /** The settings entry applies the choice to the active account and returns. The
    *  onboarding entries declare their onward step: restore and migration pass the
@@ -343,6 +381,7 @@ export type RootStackParamList = {
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
+  selfCustodialOperatorUnreachable: undefined
   stableBalanceSettings: undefined
 }
 
