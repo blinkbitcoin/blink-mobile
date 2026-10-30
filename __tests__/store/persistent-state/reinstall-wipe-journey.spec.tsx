@@ -10,7 +10,10 @@ import {
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge/lifecycle"
 import { sweepMnemonicMigration } from "@app/self-custodial/storage/account-index"
-import { PersistentStateProvider } from "@app/store/persistent-state"
+import {
+  PersistentStateProvider,
+  usePersistentStateContext,
+} from "@app/store/persistent-state"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
@@ -27,6 +30,7 @@ const mockFaults = {
   indexReads: false,
   trackedListReads: false,
   trackedListWrites: false,
+  tokenErases: false,
 }
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -67,6 +71,9 @@ jest.mock("react-native-keychain", () => ({
     return { service: server }
   },
   resetInternetCredentials: async ({ server }: { server: string }) => {
+    const isFailingTokenErase =
+      mockFaults.tokenErases && server.endsWith("/galoyAuthToken")
+    if (isFailingTokenErase) throw new Error("keychain unavailable")
     mockKeychain.delete(server)
   },
   resetGenericPassword: async ({ service }: { service: string }) => {
@@ -174,6 +181,21 @@ const isWipeOwed = (): boolean => {
   return JSON.parse(blob).pendingReinstallKeyMaterialWipe === true
 }
 
+const owedSessionSlots = (): unknown => {
+  const blob = mockAsyncStorage.get(BLOB_KEY)
+  if (blob === undefined) return undefined
+  return JSON.parse(blob).pendingReinstallSessionWipe
+}
+
+const PREVIOUS_OWNER_TOKEN = "previous-owner-token"
+const PREVIOUS_OWNER_PIN = "1234"
+
+/** The previous owner was signed in and had set a PIN. */
+const signedInPreviousOwner = () => {
+  mockKeychain.set(serverFor("galoyAuthToken"), PREVIOUS_OWNER_TOKEN)
+  mockKeychain.set(serverFor("PIN"), PREVIOUS_OWNER_PIN)
+}
+
 /** A device handed over with the previous owner's wallet still in its keychain. */
 const reinstallOverPreviousOwner = () => {
   mockKeychain.set(serverFor(`mnemonic:${PREVIOUS_OWNER}`), PREVIOUS_OWNER_WORDS)
@@ -197,6 +219,7 @@ const uninstallAndReinstall = () => mockAsyncStorage.clear()
 
 const App: React.FC = () => {
   const { logout } = useLogout()
+  const { persistentState } = usePersistentStateContext()
   const [isSignedOut, setIsSignedOut] = React.useState(false)
 
   const expireSession = async () => {
@@ -207,6 +230,7 @@ const App: React.FC = () => {
   return (
     <>
       <Text testID="booted">booted</Text>
+      <Text testID="token">{persistentState.galoyAuthToken}</Text>
       {isSignedOut && <Text testID="signed-out">signed out</Text>}
       <TouchableOpacity testID="expire-session" onPress={expireSession} />
     </>
@@ -260,6 +284,7 @@ beforeEach(() => {
   mockFaults.indexReads = false
   mockFaults.trackedListReads = false
   mockFaults.trackedListWrites = false
+  mockFaults.tokenErases = false
   // The app is closed before the idle sweep in every journey here, so nothing
   // but the code under test gets to record an account.
   jest.spyOn(global, "requestIdleCallback").mockImplementation(() => 0)
@@ -380,6 +405,67 @@ describe("an owed reinstall wipe", () => {
     )
     expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
     expect(isWipeOwed()).toBe(true)
+  })
+})
+
+describe("an owed session wipe", () => {
+  /**
+   * Both halves fail on the reinstall boot, which writes the blob at once. That write is
+   * what keeps the fresh-install branch from running again, so the next boot finishes
+   * both from what the blob records, and only then lets either record go.
+   */
+  it("erases the previous owner's token, PIN and wallet on the next boot when both halves failed", async () => {
+    reinstallOverPreviousOwner()
+    signedInPreviousOwner()
+    mockFaults.tokenErases = true
+    mockFaults.trackedListReads = true
+    const reinstallBoot = await boot()
+
+    expect(owedSessionSlots()).toEqual(["active token"])
+    expect(isWipeOwed()).toBe(true)
+    expect(mockKeychain.get(serverFor("galoyAuthToken"))).toBe(PREVIOUS_OWNER_TOKEN)
+
+    mockFaults.tokenErases = false
+    mockFaults.trackedListReads = false
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(screen.getByTestId("token").props.children).toBe("")
+    expect(deviceSecrets()).toEqual([])
+    expect(owedSessionSlots()).toBeUndefined()
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  /** Still there, so still possibly theirs: the boot leaves it alone rather than use it. */
+  it("never signs in with a token the retry could not erase", async () => {
+    reinstallOverPreviousOwner()
+    signedInPreviousOwner()
+    mockFaults.tokenErases = true
+    const reinstallBoot = await boot()
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(screen.getByTestId("token").props.children).toBe("")
+    expect(mockKeychain.get(serverFor("galoyAuthToken"))).toBe(PREVIOUS_OWNER_TOKEN)
+    expect(owedSessionSlots()).toEqual(["active token"])
+  })
+
+  /** The new owner's account does not make the previous owner's session any less theirs. */
+  it("erases the owed token once the new owner has a wallet of their own", async () => {
+    reinstallOverPreviousOwner()
+    signedInPreviousOwner()
+    mockFaults.tokenErases = true
+    const reinstallBoot = await boot()
+    mockFaults.tokenErases = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(mockKeychain.has(serverFor("galoyAuthToken"))).toBe(false)
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(owedSessionSlots()).toBeUndefined()
   })
 })
 

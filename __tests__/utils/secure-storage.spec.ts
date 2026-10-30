@@ -2051,6 +2051,42 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
     expect(onFailure).not.toHaveBeenCalled()
   })
 
+  it("owes nothing once every slot is gone", async () => {
+    await expect(
+      KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
+    ).resolves.toEqual([])
+  })
+
+  /**
+   * A later boot finishes what the reinstall boot could not, so it erases the slots it is
+   * handed and no others: one that went then may be the new owner's by now.
+   */
+  it("erases only the slots it is asked for and returns the ones still owed", async () => {
+    legacyRefusesToDrop("galoyAuthToken")
+
+    const owed = await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure, [
+      "active token",
+      "pin",
+    ])
+
+    expect(owed).toEqual(["active token"])
+    expect(mockRemove).toHaveBeenCalledWith("PIN")
+    expect(mockRemove).not.toHaveBeenCalledWith("sessionProfiles")
+    expect(mockRemove).not.toHaveBeenCalledWith("isBiometricsEnabled")
+    expect(onFailure).toHaveBeenCalledWith("active token")
+  })
+
+  /** The names come back out of the blob, and a name that is not a slot erases nothing. */
+  it("erases nothing for a name that is not a slot", async () => {
+    const owed = await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure, [
+      "not a slot",
+    ])
+
+    expect(owed).toEqual([])
+    expect(mockRemove).not.toHaveBeenCalled()
+    expect(mockResetInternet).not.toHaveBeenCalled()
+  })
+
   it("retries a failed removal once and stays silent when the retry lands", async () => {
     onlyInLegacyStore({ galoyAuthToken: "still here" })
     mockRemove
@@ -2409,9 +2445,17 @@ describe("KeyStoreWrapper wipe reporting", () => {
     legacyStoreRejects(new Error("keystore unavailable"))
     mockResetGenericPassword.mockRejectedValue(new Error("keystore unavailable"))
 
+    // Every slot comes back owed, which is what the caller records for a later boot.
     await expect(
       KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
-    ).resolves.toBeUndefined()
+    ).resolves.toEqual([
+      "active token",
+      "session profiles",
+      "pin",
+      "pin attempt count",
+      "legacy pin attempts",
+      "biometrics flag",
+    ])
 
     // The attempt count reports now. The wipe erases both of its keys directly
     // instead of going through clearPinFailureState, whose fallback writes a
