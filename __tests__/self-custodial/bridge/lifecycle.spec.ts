@@ -1,15 +1,18 @@
 /* eslint-disable camelcase */
-jest.mock("react-native-config", () => ({
+const mockConfig: Record<string, string | undefined> = {
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
-}))
+}
+jest.mock("react-native-config", () => mockConfig)
 
 jest.mock("react-native-fs", () => ({
   DocumentDirectoryPath: "/test/documents",
 }))
 
 const mockConnect = jest.fn()
-const mockDefaultConfig = jest.fn().mockReturnValue({})
+/** A fresh object per call: the config is mutated, and a shared one would carry the last
+ *  network's Stable Balance into the next test. */
+const mockDefaultConfig = jest.fn().mockImplementation(() => ({}))
 const mockUpdateUserSettings = jest.fn()
 const mockDisconnect = jest.fn()
 const mockAddEventListener = jest.fn()
@@ -101,6 +104,7 @@ import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
+import { sparkTokenIdentifier } from "@app/self-custodial/config"
 
 const makeSdk = () => ({
   updateUserSettings: (...args: unknown[]) => mockUpdateUserSettings(...args),
@@ -161,6 +165,84 @@ describe("initSdk", () => {
         }),
       }),
     )
+  })
+
+  it("configures Stable Balance with the mainnet token on mainnet", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Mainnet,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.stableBalanceConfig).toEqual({
+      tokens: [{ label: "USDB", tokenIdentifier: "test-token-id" }],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: 50,
+    })
+  })
+
+  /** 0.27 rejects the mainnet USDB id on regtest, which is what kept Staging from starting. */
+  it("leaves Stable Balance out on regtest when the build names no regtest token", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).not.toHaveProperty("stableBalanceConfig")
+  })
+
+  it("configures Stable Balance with the regtest token a build names", async () => {
+    mockConfig.SPARK_REGTEST_TOKEN_IDENTIFIER = "btknrt1-test"
+    mockConnect.mockResolvedValue(makeSdk())
+
+    try {
+      await initSdk({
+        mnemonic: "word1 word2 word3",
+        storageDir: "/test/storage",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      })
+    } finally {
+      delete mockConfig.SPARK_REGTEST_TOKEN_IDENTIFIER
+    }
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.stableBalanceConfig).toEqual(
+      expect.objectContaining({
+        tokens: [{ label: "USDB", tokenIdentifier: "btknrt1-test" }],
+      }),
+    )
+  })
+
+  /** The bridge and mappers read the token without being handed the network. */
+  it("points the token lookups at the network it connected to", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+    expect(sparkTokenIdentifier()).toBeNull()
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Mainnet,
+      leewaySatPerVbyte: 1,
+    })
+    expect(sparkTokenIdentifier()).toBe("test-token-id")
   })
 
   it("routes the SDK through no proxy, matching the status call", async () => {

@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nem érhető el a régiódban",
     "anonModeWalletLabel": "Incognito módban nem érhető el",
-    "unknownRegionWalletLabel": "az elérhetőséget nem sikerült ellenőrizni, húzd le az újrapróbáláshoz"
+    "unknownRegionWalletLabel": "az elérhetőséget nem sikerült ellenőrizni, húzd le az újrapróbáláshoz",
+    "networkWalletLabel": "ezen a hálózaton nem érhető el"
   },
   "AnonModeConvertModal": {
     "title": "Először utald át a dolláregyenleged",

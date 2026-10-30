@@ -8658,6 +8658,10 @@ type RootTranslation = {
 		 * c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​a​v​a​i​l​a​b​i​l​i​t​y​,​ ​p​u​l​l​ ​d​o​w​n​ ​t​o​ ​r​e​t​r​y
 		 */
 		unknownRegionWalletLabel: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​n​e​t​w​o​r​k
+		 */
+		networkWalletLabel: string
 	}
 	AnonModeConvertModal: {
 		/**
@@ -22846,6 +22850,10 @@ export type TranslationFunctions = {
 		 * couldn't check availability, pull down to retry
 		 */
 		unknownRegionWalletLabel: () => LocalizedString
+		/**
+		 * not available on this network
+		 */
+		networkWalletLabel: () => LocalizedString
 	}
 	AnonModeConvertModal: {
 		/**

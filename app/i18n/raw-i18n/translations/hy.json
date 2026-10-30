@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",
     "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում",
-    "unknownRegionWalletLabel": "հասանելիությունը հնարավոր չեղավ ստուգել, քաշեք ներքև՝ կրկին փորձելու համար"
+    "unknownRegionWalletLabel": "հասանելիությունը հնարավոր չեղավ ստուգել, քաշեք ներքև՝ կրկին փորձելու համար",
+    "networkWalletLabel": "հասանելի չէ այս ցանցում"
   },
   "AnonModeConvertModal": {
     "title": "Նախ փոխանցեք ձեր դոլարային մնացորդը",

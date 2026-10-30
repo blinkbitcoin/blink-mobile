@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
     "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi",
+    "networkWalletLabel": "tidak tersedia di jaringan ini"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",

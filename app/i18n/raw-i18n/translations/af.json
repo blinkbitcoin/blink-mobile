@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nie beskikbaar in jou streek nie",
     "anonModeWalletLabel": "nie beskikbaar in Incognito-modus nie",
-    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer"
+    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer",
+    "networkWalletLabel": "nie beskikbaar op hierdie netwerk nie"
   },
   "AnonModeConvertModal": {
     "title": "Dra eers jou Dollar-saldo oor",

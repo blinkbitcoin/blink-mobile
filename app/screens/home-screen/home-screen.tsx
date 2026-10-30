@@ -606,6 +606,8 @@ export const HomeScreen: React.FC = () => {
    *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
    *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {
+    /** Nothing the user can do opens it, and the row's label already says why. */
+    if (dollarBalanceGateReason === GateReason.Network) return
     if (isAnonMode) {
       promptEnhancedMode()
       return

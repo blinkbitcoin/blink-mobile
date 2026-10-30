@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
     "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito",
-    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง"
+    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง",
+    "networkWalletLabel": "ไม่พร้อมใช้งานบนเครือข่ายนี้"
   },
   "AnonModeConvertModal": {
     "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",

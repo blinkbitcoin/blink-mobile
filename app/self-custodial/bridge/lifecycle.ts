@@ -23,8 +23,9 @@ import {
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
-  requireSparkTokenIdentifier,
+  setSparkTokenNetwork,
   SparkToken,
+  sparkTokenIdentifierFor,
   storageDirFor,
 } from "../config"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
@@ -75,11 +76,17 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
    *  bridge/status.ts must change with this. */
   config.proxy = undefined
 
-  config.stableBalanceConfig = {
-    tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],
-    defaultActiveLabel: undefined,
-    thresholdSats: undefined,
-    maxSlippageBps: MAX_SLIPPAGE_BPS,
+  /** Left out where the network has no token: 0.27 refuses to connect with a token
+   *  minted on another network, and the dollar-balance gate keeps its surfaces closed. */
+  setSparkTokenNetwork(network)
+  const tokenIdentifier = sparkTokenIdentifierFor(network)
+  if (tokenIdentifier !== null) {
+    config.stableBalanceConfig = {
+      tokens: [{ label: SparkToken.Label, tokenIdentifier }],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: MAX_SLIPPAGE_BPS,
+    }
   }
 
   return config

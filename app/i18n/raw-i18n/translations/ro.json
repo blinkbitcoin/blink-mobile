@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",
     "anonModeWalletLabel": "indisponibil în modul Incognito",
-    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca"
+    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca",
+    "networkWalletLabel": "indisponibil în această rețea"
   },
   "AnonModeConvertModal": {
     "title": "Transferă mai întâi soldul tău în dolari",

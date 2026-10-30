@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",
     "anonModeWalletLabel": "no disponible en mode Incognito",
-    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar"
+    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar",
+    "networkWalletLabel": "no disponible en aquesta xarxa"
   },
   "AnonModeConvertModal": {
     "title": "Transfereix primer el teu saldo en dòlars",

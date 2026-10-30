@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di rantau anda",
     "anonModeWalletLabel": "tidak tersedia dalam mod Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi",
+    "networkWalletLabel": "tidak tersedia di rangkaian ini"
   },
   "AnonModeConvertModal": {
     "title": "Pindahkan baki Dolar anda dahulu",

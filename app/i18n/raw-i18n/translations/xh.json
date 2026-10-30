@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
     "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito",
-    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona"
+    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona",
+    "networkWalletLabel": "akufumaneki kolu thungelwano"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",

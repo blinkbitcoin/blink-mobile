@@ -2591,7 +2591,8 @@
     "StablesatsRestriction": {
         "walletLabel": "non è disponibile nella tua regione",
         "anonModeWalletLabel": "non disponibile in modalità Incognito",
-        "unknownRegionWalletLabel": "impossibile verificare la disponibilità, trascina verso il basso per riprovare"
+        "unknownRegionWalletLabel": "impossibile verificare la disponibilità, trascina verso il basso per riprovare",
+        "networkWalletLabel": "non disponibile su questa rete"
     },
     "AnonModeConvertModal": {
         "title": "Trasferisci prima il tuo saldo in dollari",

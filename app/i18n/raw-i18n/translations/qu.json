@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "mana kapunchu suyuykipi",
     "anonModeWalletLabel": "mana Incognito modopi kanchu",
-    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq"
+    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq",
+    "networkWalletLabel": "kay llika-pi mana kanchu"
   },
   "AnonModeConvertModal": {
     "title": "Ñawpaqta Dolar qullqiykita astay",
