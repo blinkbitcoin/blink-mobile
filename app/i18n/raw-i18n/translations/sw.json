@@ -31,6 +31,8 @@
     "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
     "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
     "loadError": "Imeshindwa kupakia funguo zako za API. Tafadhali jaribu tena baadaye.",
+    "discardSecretTitle": "Tupa ufunguo huu wa API?",
+    "discardSecretBody": "Hii ndiyo mara pekee siri inayoonyeshwa. Ukiacha sasa, ufunguo hauwezi kupatikana tena na utalazimika kuunda mpya.",
     "done": "Imekamilika"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Tatizo likiendelea wasiliana na usaidizi",
     "fatalError": "Pole, inaonekana kwamba tunatatizika kupakua data ya aplikisheni. Tatizo likiendelea tafadhali wasiliana na usaidizi. ",
     "showError": "Onyesha kosa",
-    "clearAppData": "Ondoa Data ya Programu na Toka"
+    "clearAppData": "Ondoa Data ya Programu na Toka",
+    "screenSecurityUnavailable": "Skrini hii inabaki imefichwa kwa sababu ulinzi dhidi ya picha za skrini haukuweza kuwashwa."
   },
   "notifications": {
     "payment": {

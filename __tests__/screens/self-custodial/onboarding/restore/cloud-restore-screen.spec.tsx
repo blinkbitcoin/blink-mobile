@@ -24,13 +24,10 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: readonly unknown[]) =>
-    mockEnableScreenSecurity(...args),
-  disableScreenSecurity: (...args: readonly unknown[]) =>
-    mockDisableScreenSecurity(...args),
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
 }))
 
 const mockLoadCloudBackups = jest.fn()
@@ -93,8 +90,10 @@ const renderScreen = async (state: Partial<RestoreState>) => {
 describe("CloudRestoreScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     restoreState = idleState
   })
 
@@ -198,7 +197,7 @@ describe("CloudRestoreScreen", () => {
     it("guards the password step", async () => {
       await renderScreen({ isPassword: true })
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
     it("keeps the guard on every other step", async () => {
@@ -214,7 +213,7 @@ describe("CloudRestoreScreen", () => {
 
         const { unmount } = await renderScreen(step)
 
-        expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+        expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
         unmount()
       }
     })
@@ -224,7 +223,7 @@ describe("CloudRestoreScreen", () => {
 
       unmount()
 
-      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
     })
   })
 })

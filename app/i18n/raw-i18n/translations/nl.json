@@ -31,6 +31,8 @@
     "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
     "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
     "loadError": "Kan je API-sleutels niet laden. Probeer het later opnieuw.",
+    "discardSecretTitle": "Deze API-sleutel verwijderen?",
+    "discardSecretBody": "Dit is de enige keer dat het geheim wordt getoond. Als je nu weggaat, kan de sleutel niet worden hersteld en moet je een nieuwe aanmaken.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Neem contact op met de technische ondersteuning als het probleem aanhoudt.",
     "fatalError": "Het spijt ons dat we problemen lijken te hebben met het laden van de applicatiegegevens. Neem contact op met de technische ondersteuning als de problemen aanhouden.",
     "showError": "Toon Fout",
-    "clearAppData": "App-gegevens wissen en uitloggen"
+    "clearAppData": "App-gegevens wissen en uitloggen",
+    "screenSecurityUnavailable": "Dit scherm blijft verborgen omdat de bescherming tegen schermafbeeldingen niet kon worden ingeschakeld."
   },
   "notifications": {
     "payment": {
