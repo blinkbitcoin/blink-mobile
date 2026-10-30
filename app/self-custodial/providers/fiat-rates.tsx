@@ -21,6 +21,7 @@ import {
 } from "@app/store/persistent-state/self-custodial-fiat-rates"
 import { type DisplayCurrencyEntry } from "@app/types/currency"
 import { rateFreshness, RateFreshness, type FiatRate } from "@app/types/price"
+import { ActiveWalletStatus } from "@app/types/wallet"
 
 import { listFiatCurrencies, listFiatRates } from "../bridge/fiat"
 import { recordErrorOnce } from "../logging"
@@ -90,7 +91,7 @@ export const SelfCustodialFiatRatesProvider: React.FC<ProviderProps> = ({
   now: readClock = Date.now,
 }) => {
   const { persistentState, updateState } = usePersistentStateContext()
-  const { sdk } = useSelfCustodialWallet()
+  const { sdk, status } = useSelfCustodialWallet()
 
   const stored = getSelfCustodialFiatRates(persistentState)
   const storedCurrencies = getSelfCustodialFiatCurrencies(persistentState)
@@ -182,9 +183,16 @@ export const SelfCustodialFiatRatesProvider: React.FC<ProviderProps> = ({
     return () => clearInterval(timer)
   }, [refresh, readClock])
 
-  /** Nothing to wait for when there is no SDK to ask: a caller blocked on `hasSettled`
-   *  would otherwise wait forever on a custodial-only device. */
-  const hasSettled = hasFetchSettled || !sdk
+  /**
+   * Nothing to wait for when there is no SDK to ask and none is coming: a caller blocked
+   * on `hasSettled` would otherwise wait forever on a custodial-only device.
+   *
+   * A wallet still connecting is not that case. Its SDK is on the way, and calling the
+   * feed settled meanwhile let a launch with no stored feed and the backend down fall
+   * back to sats for the seconds a connect takes, then jump to fiat when the feed came.
+   */
+  const isWalletConnecting = status === ActiveWalletStatus.Loading
+  const hasSettled = hasFetchSettled || (!sdk && !isWalletConnecting)
 
   const currencies = storedCurrencies?.currencies ?? EMPTY_CURRENCIES
 

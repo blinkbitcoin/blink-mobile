@@ -12,6 +12,7 @@ import {
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
+import { ActiveWalletStatus } from "@app/types/wallet"
 import { Text } from "react-native"
 
 jest.mock("@app/self-custodial/bridge/fiat", () => ({
@@ -48,6 +49,11 @@ const Probe: React.FC = () => {
   )
 }
 
+const SettledProbe: React.FC = () => {
+  const { hasSettled } = useFiatRates()
+  return <Text testID="settled">{String(hasSettled)}</Text>
+}
+
 type StateHolder = {
   state: typeof defaultPersistentState
   updateState: jest.Mock
@@ -56,6 +62,7 @@ type StateHolder = {
 const mountWith = (
   stored?: { rates: typeof feed; fetchedAt: number },
   now?: () => number,
+  probe: React.ReactElement = <Probe />,
 ) => {
   const holder: StateHolder = {
     state: stored
@@ -72,9 +79,7 @@ const mountWith = (
       }) as any,
   )
   const view = render(
-    <SelfCustodialFiatRatesProvider now={now}>
-      <Probe />
-    </SelfCustodialFiatRatesProvider>,
+    <SelfCustodialFiatRatesProvider now={now}>{probe}</SelfCustodialFiatRatesProvider>,
   )
   return { holder, view }
 }
@@ -200,5 +205,66 @@ describe("SelfCustodialFiatRatesProvider", () => {
         FIXED_NOW,
       )
     })
+  })
+})
+
+describe("SelfCustodialFiatRatesProvider hasSettled", () => {
+  const walletIs = (sdk: unknown, status: ActiveWalletStatus) =>
+    mockedUseWallet.mockReturnValue({ sdk, status } as ReturnType<
+      typeof useSelfCustodialWallet
+    >)
+  const settledOf = (view: ReturnType<typeof render>) =>
+    view.getByTestId("settled").props.children
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockedListFiatRates.mockReset()
+    mockedListFiatRates.mockImplementation(() => new Promise(() => {}))
+  })
+
+  it("is not settled while the wallet is still connecting", () => {
+    // Its SDK is on the way: settling now is what flashed sats before the feed came.
+    walletIs(null, ActiveWalletStatus.Loading)
+
+    const { view } = mountWith(undefined, undefined, <SettledProbe />)
+
+    expect(settledOf(view)).toBe("false")
+  })
+
+  it("is settled when there is no wallet to wait for", () => {
+    walletIs(null, ActiveWalletStatus.Unavailable)
+
+    const { view } = mountWith(undefined, undefined, <SettledProbe />)
+
+    expect(settledOf(view)).toBe("true")
+  })
+
+  it("waits for the first fetch when nothing is stored", () => {
+    walletIs(fakeSdk, ActiveWalletStatus.Ready)
+
+    const { view } = mountWith(undefined, undefined, <SettledProbe />)
+
+    expect(settledOf(view)).toBe("false")
+  })
+
+  it("settles once that fetch fails, so the caller can stop waiting", async () => {
+    walletIs(fakeSdk, ActiveWalletStatus.Ready)
+    mockedListFiatRates.mockRejectedValue(new Error("offline"))
+
+    const { view } = mountWith(undefined, undefined, <SettledProbe />)
+
+    await waitFor(() => expect(settledOf(view)).toBe("true"))
+  })
+
+  it("is settled at once with a stored feed, even while connecting", () => {
+    walletIs(null, ActiveWalletStatus.Loading)
+
+    const { view } = mountWith(
+      { rates: feed, fetchedAt: Date.now() },
+      undefined,
+      <SettledProbe />,
+    )
+
+    expect(settledOf(view)).toBe("true")
   })
 })
