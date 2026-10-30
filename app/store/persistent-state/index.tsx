@@ -1,8 +1,10 @@
 import { createContext, useContext, PropsWithChildren } from "react"
 import * as React from "react"
 import {
+  readSelfCustodialAccountIds,
   readSelfCustodialIndexPresence,
   SelfCustodialIndexPresence,
+  StorageReadStatus,
   SWEEP_IDLE_TIMEOUT_MS,
   sweepMnemonicMigration,
 } from "@app/self-custodial/storage/account-index"
@@ -339,10 +341,19 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
 /**
  * The owed erase, retried on a later boot.
  *
- * It can only run while the device still has no account of its own. Once one
- * exists, the tracked list names that account's mnemonic too, and the erase
- * could no longer tell the previous owner's seeds from this user's — so the
- * window closes, loudly, rather than risking the wrong one.
+ * While the device has no account of its own it runs whole, as the reinstall boot would
+ * have. Once one exists, the tracked list names that account's mnemonic too, so the erase
+ * spares every account the index names and takes only the tracked mnemonics it does not:
+ * the previous owner's. That needs the index read in full, since an id it failed to name
+ * is a wallet whose seed would be erased, so a read that cannot vouch for every entry
+ * keeps the erase owed for the next boot instead.
+ *
+ * The legacy store is cleared whole only on an index that is absent. With accounts listed
+ * the marker may come from a boot that could not read the index at all rather than from a
+ * reinstall, and on such a device the legacy store can still hold this user's only copy
+ * of a seed the sweep has not moved yet. Each tracked mnemonic goes with its legacy copy,
+ * so what that leaves is a legacy-only seed of an owner who never ran a build that tracks
+ * it, which no id can name.
  */
 const retryOwedKeyMaterialWipe = async (
   state: PersistentState,
@@ -361,11 +372,17 @@ const retryOwedKeyMaterialWipe = async (
   }
 
   if (presence === SelfCustodialIndexPresence.Present) {
-    recordAppError(
-      new Error("Reinstall key-material wipe abandoned: an account now exists"),
-      { alwaysRecord: true },
+    const indexed = await readSelfCustodialAccountIds()
+    if (indexed.status === StorageReadStatus.ReadFailed) return { state, changed: false }
+
+    const keyMaterial = createEraseTracker(reportFailure)
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(
+      keyMaterial.onFailure,
+      new Set(indexed.ids),
     )
-    return { state: withoutOwedWipe(state), changed: true }
+    return keyMaterial.isComplete()
+      ? { state: withoutOwedWipe(state), changed: true }
+      : { state, changed: false }
   }
 
   // Both steps, in the order handleFreshInstall runs them. The legacy clear is

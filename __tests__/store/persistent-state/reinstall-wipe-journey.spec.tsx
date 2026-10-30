@@ -338,7 +338,12 @@ describe("an owed reinstall wipe", () => {
     expect(isWipeOwed()).toBe(false)
   })
 
-  it("leaves alone the wallet that registered on a second attempt", async () => {
+  /**
+   * The erase is still owed when the new owner's wallet lands, so the next boot finds the
+   * index populated. It spares that wallet and takes the previous owner's, from both
+   * stores, instead of giving the erase up.
+   */
+  it("erases the previous owner's wallet and leaves alone the one that registered on a second attempt", async () => {
     reinstallOverPreviousOwner()
     mockFaults.indexReads = true
     const reinstallBoot = await boot()
@@ -351,7 +356,30 @@ describe("an owed reinstall wipe", () => {
     await boot()
 
     expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(mockKeychain.has(serverFor(`mnemonic:${PREVIOUS_OWNER}`))).toBe(false)
+    expect(mockLegacyStore.has(`mnemonic:${PREVIOUS_OWNER}`)).toBe(false)
+    expect(mockKeychain.get(serverFor("mnemonicAccounts"))).toBe(NEW_WALLET)
     expect(isWipeOwed()).toBe(false)
+  })
+
+  /** An index the erase cannot read in full could be hiding the new owner's wallet. */
+  it("keeps the previous owner's wallet owed while the index cannot vouch for every account", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    const index = JSON.parse(mockAsyncStorage.get(INDEX_KEY) ?? "[]")
+    mockAsyncStorage.set(INDEX_KEY, JSON.stringify([...index, { id: 7 }]))
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(mockKeychain.get(serverFor(`mnemonic:${PREVIOUS_OWNER}`))).toBe(
+      PREVIOUS_OWNER_WORDS,
+    )
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(isWipeOwed()).toBe(true)
   })
 })
 

@@ -24,6 +24,7 @@ jest.mock("@app/utils/storage", () => ({
 
 const mockSweepMnemonicMigration = jest.fn()
 const mockReadSelfCustodialIndexPresence = jest.fn()
+const mockReadSelfCustodialAccountIds = jest.fn()
 // Scheduled off the boot path once the state has loaded; its own spec covers
 // what it does, and here it must not add reports to the ones under assertion.
 // The account index is the second witness the key-material wipe waits for.
@@ -31,6 +32,9 @@ jest.mock("@app/self-custodial/storage/account-index", () => ({
   sweepMnemonicMigration: (...args: unknown[]) => mockSweepMnemonicMigration(...args),
   readSelfCustodialIndexPresence: (...args: unknown[]) =>
     mockReadSelfCustodialIndexPresence(...args),
+  readSelfCustodialAccountIds: (...args: unknown[]) =>
+    mockReadSelfCustodialAccountIds(...args),
+  StorageReadStatus: { Ok: "ok", ReadFailed: "read-failed" },
   SelfCustodialIndexPresence: {
     Absent: "absent",
     Present: "present",
@@ -128,6 +132,7 @@ const setupStorageMockDefaults = () => {
   mockSweepMnemonicMigration.mockResolvedValue({ status: "ok", migrated: 0 })
   // A real reinstall clears the index, so absence is the default here.
   mockReadSelfCustodialIndexPresence.mockResolvedValue("absent")
+  mockReadSelfCustodialAccountIds.mockResolvedValue({ status: "ok", ids: [] })
   mockSaveJson.mockResolvedValue(undefined)
   mockSaveString.mockResolvedValue(true)
   mockLoadString.mockImplementation(async (key: string) => storedStrings.get(key) ?? null)
@@ -958,12 +963,21 @@ describe("PersistentStateProvider reinstall wipe", () => {
     })
   })
 
-  it("abandons the owed erase once the device has an account of its own", async () => {
+  /**
+   * The tracked list now names this user's mnemonic too, so the erase spares every account
+   * the index names and takes the rest: the previous owner's. Giving up here left that
+   * owner's seeds on the device for good.
+   */
+  it("erases only the mnemonics no account of the device claims once one exists", async () => {
     storedStrings.set(
       PERSISTENT_STATE_KEY,
       JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
     )
     mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    mockReadSelfCustodialAccountIds.mockResolvedValue({
+      status: "ok",
+      ids: ["new-wallet"],
+    })
 
     render(
       <PersistentStateProvider>
@@ -975,12 +989,94 @@ describe("PersistentStateProvider reinstall wipe", () => {
       expect(screen.getByTestId("token")).toBeTruthy()
     })
 
-    // The tracked list now names this user's mnemonic too, so the erase can no
-    // longer tell whose seeds it would take.
-    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
-    expect(mockRecordError.mock.calls.map(([err]) => err.message)).toContain(
-      "Reinstall key-material wipe abandoned: an account now exists",
+    await waitFor(() => {
+      expect(mockClearUninstallSurvivingKeyMaterial).toHaveBeenCalledTimes(1)
+    })
+    const spared = mockClearUninstallSurvivingKeyMaterial.mock.calls[0][1]
+    expect([...spared]).toEqual(["new-wallet"])
+    // The legacy store goes whole only on proof of a reinstall, which an index with
+    // accounts in it is not.
+    expect(mockClearLegacyKeyStore).not.toHaveBeenCalled()
+    await waitFor(() => {
+      expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+        "pendingReinstallKeyMaterialWipe",
+      )
+    })
+  })
+
+  /** An id the read failed to name is a wallet whose seed the erase would take. */
+  it("keeps the erase owed when the index cannot vouch for every account", async () => {
+    storedStrings.set(
+      PERSISTENT_STATE_KEY,
+      JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
     )
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    mockReadSelfCustodialAccountIds.mockResolvedValue({
+      status: "read-failed",
+      error: new Error("Account index holds entries that are not accounts"),
+    })
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallKeyMaterialWipe: true,
+    })
+  })
+
+  it("keeps the erase owed when a mnemonic no account claims will not go", async () => {
+    storedStrings.set(
+      PERSISTENT_STATE_KEY,
+      JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
+    )
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    mockReadSelfCustodialAccountIds.mockResolvedValue({
+      status: "ok",
+      ids: ["new-wallet"],
+    })
+    mockClearUninstallSurvivingKeyMaterial.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("mnemonic (1/1)")
+      },
+    )
+
+    render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-btn"))
+    })
+
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
+      pendingReinstallKeyMaterialWipe: true,
+    })
   })
 
   it("leaves no marker when the erase completed", async () => {
