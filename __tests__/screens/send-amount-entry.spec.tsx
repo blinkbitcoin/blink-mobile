@@ -21,6 +21,7 @@ import {
   createIntraledgerPaymentDetails,
   PaymentDetail,
 } from "@app/screens/send-bitcoin-screen/payment-details"
+import { createSelfCustodialOnchainPaymentDetails } from "@app/self-custodial/payment-details/onchain"
 import {
   MoneyAmount,
   WalletOrDisplayCurrency,
@@ -88,7 +89,9 @@ jest.mock("@app/store/persistent-state", () => ({
   }),
 }))
 
+/** The real descriptors stay, since the screen helper builds its account from one. */
 jest.mock("@app/hooks/use-account-registry", () => ({
+  ...jest.requireActual("@app/hooks/use-account-registry"),
   AccountRegistryProvider: ({ children }: { children: React.ReactNode }) => children,
   useAccountRegistry: () => ({
     accounts: [],
@@ -211,8 +214,24 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
     usdWallet,
     network: "mainnet",
     loading: false,
-    isSelfCustodial: false,
+    get isSelfCustodial() {
+      return mockIsSelfCustodial.current
+    },
   }),
+}))
+
+const mockIsSelfCustodial = { current: false }
+
+/** The SDK edge only: everything between it and the screen runs for real. */
+const mockPrepareSend = jest.fn()
+const mockSelfCustodialWallet = { sdk: { id: "sdk" } }
+
+jest.mock("@app/self-custodial/bridge", () => ({
+  prepareSend: (...args: unknown[]) => mockPrepareSend(...args),
+  extractOnchainFees: () => ({ fast: 300, medium: 200, slow: 100 }),
+}))
+jest.mock("@app/self-custodial/providers/wallet", () => ({
+  useSelfCustodialWallet: () => mockSelfCustodialWallet,
 }))
 
 const flushAsync = () =>
@@ -561,6 +580,89 @@ describe("an amount the fee quote calls too low", () => {
 
     expect(screen.getByText(LL.SendBitcoinScreen.sdkNetworkError())).toBeTruthy()
     expect(isNextDisabled()).toBe(true)
+  })
+})
+
+/**
+ * The same hold, end to end: the SDK's real refusal travels through the fee rail and the
+ * options hook to the screen. Pinned because a merge once dropped the hook's hand-off,
+ * which the specs above, standing in for the hook, could not see.
+ */
+describe("a self-custodial on-chain amount below the minimum", () => {
+  const ONCHAIN_ADDRESS = "bc1qamountentryspec"
+  /** ₦1 is about 4,164 sats against the mocked price, ₦10 about 41,640. */
+  const MINIMUM_SATS = 30000
+  const tooLow = LL.SendBitcoinScreen.sdkAmountTooLow()
+
+  const onchainDestination = {
+    valid: true,
+    validDestination: {
+      valid: true,
+      paymentType: PaymentType.Onchain,
+      address: ONCHAIN_ADDRESS,
+    },
+    destinationDirection: DestinationDirection.Send,
+    createPaymentDetail: <T extends WalletCurrency>({
+      convertMoneyAmount,
+      sendingWalletDescriptor,
+    }: CreatePaymentDetailParams<T>) =>
+      createSelfCustodialOnchainPaymentDetails({
+        sdk: mockSelfCustodialWallet.sdk as never,
+        address: ONCHAIN_ADDRESS,
+        unitOfAccountAmount: ZeroBtcMoneyAmount,
+        convertMoneyAmount,
+        sendingWalletDescriptor,
+      }),
+  } as unknown as PaymentDestination
+
+  beforeEach(() => {
+    mockIsSelfCustodial.current = true
+    mockPrepareSend.mockImplementation(
+      async (_sdk: unknown, { amount }: { amount: bigint }) => {
+        if (amount < BigInt(MINIMUM_SATS)) {
+          // The SDK's typed error, told apart by its tag as the rail reads it.
+          throw Object.assign(new Error("amount too low"), { tag: "InvalidInput" })
+        }
+        return {}
+      },
+    )
+  })
+
+  afterEach(() => {
+    mockIsSelfCustodial.current = false
+  })
+
+  it("is held while typed and shown on Next", async () => {
+    renderScreen(onchainDestination)
+    await settle()
+
+    typeKeys("1")
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalled()
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(screen.getByText(tooLow)).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  it("leaves nothing to show once the amount clears the minimum", async () => {
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1")
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    typeKeys("0")
+    await settle()
+
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
   })
 })
 
