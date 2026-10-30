@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Bayaran telah pun dicuba.\n\nJika anda mahu menghantar bayaran ini semula, mulakan dari awal.",
     "slideToConfirm": "Leret untuk Sahkan",
     "slideConfirming": "Mengesahkan...",
+    "slideToSend": "Leret untuk Hantar",
+    "calculatingFee": "Mengira cas…",
+    "sendProgress": {
+      "reviewing": "Menyemak",
+      "signing": "Menandatangani",
+      "findingRoute": "Mencari laluan",
+      "broadcasting": "Menyiarkan",
+      "checkingDelivery": "Menyemak penghantaran",
+      "retrying": "Mencuba semula",
+      "almostThere": "Hampir siap",
+      "anyTimeNow": "Bila-bila masa sekarang",
+      "ohOh": "Alamak",
+      "tryingAgain": "Cuba sekali lagi"
+    },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
     "lightningRecommended": "Yuran tinggi! Kami mengesyorkan Lightning.",
     "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}."

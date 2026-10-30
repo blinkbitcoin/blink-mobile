@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Malipo tayari yamejaribiwa.\n\nIkiwa unataka kutuma malipo haya tena, anza upya.",
     "slideToConfirm": "Telezesha kidole ili Kuthibitisha",
     "slideConfirming": "Inathibitisha...",
+    "slideToSend": "Telezesha ili Kutuma",
+    "calculatingFee": "Inakokotoa ada…",
+    "sendProgress": {
+      "reviewing": "Inakagua",
+      "signing": "Inatia sahihi",
+      "findingRoute": "Inatafuta njia",
+      "broadcasting": "Inatangaza",
+      "checkingDelivery": "Inakagua uwasilishaji",
+      "retrying": "Inajaribu tena",
+      "almostThere": "Karibu tumefika",
+      "anyTimeNow": "Wakati wowote sasa",
+      "ohOh": "Lo!",
+      "tryingAgain": "Tunajaribu tena"
+    },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
     "lightningRecommended": "Ada kubwa! Tunapendekeza Umeme.",
     "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}."

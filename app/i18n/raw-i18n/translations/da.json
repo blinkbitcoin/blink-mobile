@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Betalingen er allerede forsøgt gennemført.\n\nHvis du ønsker at sende denne betaling igen, venligst start forfra.",
     "slideToConfirm": "Slide to Confirm",
     "slideConfirming": "Confirming...",
+    "slideToSend": "Skub for at sende",
+    "calculatingFee": "Beregner gebyr…",
+    "sendProgress": {
+      "reviewing": "Gennemgår",
+      "signing": "Underskriver",
+      "findingRoute": "Finder rute",
+      "broadcasting": "Udsender",
+      "checkingDelivery": "Tjekker levering",
+      "retrying": "Prøver igen",
+      "almostThere": "Næsten der",
+      "anyTimeNow": "Når som helst nu",
+      "ohOh": "Øv",
+      "tryingAgain": "Forsøger igen"
+    },
     "copiedDestination": "Copied destination to clipboard",
     "lightningRecommended": "High fee! We recommend Lightning.",
     "usdRemainderSweep": "Resterende {remaining: string} ({remainingSats: string}) konverteres til Bitcoin. USD-minimum: {minimum: string}."

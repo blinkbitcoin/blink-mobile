@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Վճարումը արդեն փորձվել է։\n\nԵթե ցանկանում եք կրկին ուղարկել այս վճարումը՝ սկսել ի սկբանե։",
     "slideToConfirm": "Սահեցրեք՝ հաստատելու համար",
     "slideConfirming": "Հաստատվում է...",
+    "slideToSend": "Սահեցրեք՝ ուղարկելու համար",
+    "calculatingFee": "Վճարը հաշվարկվում է…",
+    "sendProgress": {
+      "reviewing": "Ստուգվում է",
+      "signing": "Ստորագրվում է",
+      "findingRoute": "Երթուղի է որոնվում",
+      "broadcasting": "Հեռարձակվում է",
+      "checkingDelivery": "Առաքումը ստուգվում է",
+      "retrying": "Կրկին փորձ",
+      "almostThere": "Գրեթե պատրաստ է",
+      "anyTimeNow": "Ցանկացած պահի",
+      "ohOh": "Վայ",
+      "tryingAgain": "Կրկին փորձում ենք"
+    },
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
     "usdRemainderSweep": "Մնացած {remaining: string} ({remainingSats: string}) կփոխարկվի Bitcoin-ի։ USD-ի նվազագույնը՝ {minimum: string}։"

@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Pembayaran telah dicoba sebelumnya.\n\nJika Anda ingin mengirim pembayaran ini lagi, mulailah dari awal.",
     "slideToConfirm": "Geser untuk Konfirmasi",
     "slideConfirming": "Mengkonfirmasi...",
+    "slideToSend": "Geser untuk Kirim",
+    "calculatingFee": "Menghitung biaya…",
+    "sendProgress": {
+      "reviewing": "Meninjau",
+      "signing": "Menandatangani",
+      "findingRoute": "Mencari rute",
+      "broadcasting": "Menyiarkan",
+      "checkingDelivery": "Memeriksa pengiriman",
+      "retrying": "Mencoba ulang",
+      "almostThere": "Hampir selesai",
+      "anyTimeNow": "Sebentar lagi",
+      "ohOh": "Aduh",
+      "tryingAgain": "Mencoba lagi"
+    },
     "copiedDestination": "Tujuan disalin ke papan klip",
     "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
     "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."

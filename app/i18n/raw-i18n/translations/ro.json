@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Plata deja încercată.\n\nDacă doriți să trimiteți din nou această plată, începeți de la zero.",
     "slideToConfirm": "Glisați pentru a confirma",
     "slideConfirming": "Confirmare...",
+    "slideToSend": "Glisați pentru a trimite",
+    "calculatingFee": "Se calculează taxa…",
+    "sendProgress": {
+      "reviewing": "Verificare",
+      "signing": "Semnare",
+      "findingRoute": "Se caută ruta",
+      "broadcasting": "Difuzare",
+      "checkingDelivery": "Se verifică livrarea",
+      "retrying": "Reîncercare",
+      "almostThere": "Aproape gata",
+      "anyTimeNow": "Din clipă în clipă",
+      "ohOh": "Of",
+      "tryingAgain": "Încercăm din nou"
+    },
     "copiedDestination": "Destinație copiată în clipboard",
     "lightningRecommended": "Taxă mare! Vă recomandăm Lightning.",
     "usdRemainderSweep": "Soldul rămas {remaining: string} ({remainingSats: string}) va fi convertit în Bitcoin. Minim USD: {minimum: string}."

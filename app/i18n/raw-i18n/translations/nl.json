@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Betaling al geprobeerd.\n\nAls je deze betaling opnieuw wilt doen, begin dan opnieuw.",
     "slideToConfirm": "Veeg om te bevestigen",
     "slideConfirming": "Bevestigen...",
+    "slideToSend": "Veeg om te verzenden",
+    "calculatingFee": "Kosten berekenen…",
+    "sendProgress": {
+      "reviewing": "Controleren",
+      "signing": "Ondertekenen",
+      "findingRoute": "Route zoeken",
+      "broadcasting": "Uitzenden",
+      "checkingDelivery": "Aflevering controleren",
+      "retrying": "Opnieuw proberen",
+      "almostThere": "Bijna klaar",
+      "anyTimeNow": "Elk moment nu",
+      "ohOh": "Oei",
+      "tryingAgain": "Nog een poging"
+    },
     "copiedDestination": "Bestemming naar het klembord gekopieerd",
     "lightningRecommended": "Hoge kosten! We raden Lightning aan.",
     "usdRemainderSweep": "Resterend saldo {remaining: string} ({remainingSats: string}) wordt omgezet naar Bitcoin. USD-minimum: {minimum: string}."
