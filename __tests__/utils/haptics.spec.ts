@@ -27,6 +27,7 @@ const loadHaptics = (os: "android" | "ios"): Haptics => {
 const ANDROID: [intent: keyof Haptics, type: string, ignoresSettings: boolean][] = [
   ["tap", "soft", false],
   ["select", "impactLight", false],
+  ["grab", "impactLight", false],
   ["reject", "rigid", false],
   ["commit", "impactMedium", true],
   ["success", "notificationSuccess", true],
@@ -53,8 +54,10 @@ describe("haptics", () => {
 
     haptics.tap()
     haptics.select()
+    haptics.grab()
 
     expect(mockTrigger.mock.calls.map(([type]) => type)).toEqual([
+      "selection",
       "selection",
       "selection",
     ])
