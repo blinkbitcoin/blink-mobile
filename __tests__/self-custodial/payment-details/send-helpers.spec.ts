@@ -956,9 +956,11 @@ describe("findLostSend", () => {
     expect(found).toEqual({ status: "not-found" })
   })
 
+  /** A history the wallet could not refresh may be missing the payment, so it cannot
+   *  show the payment is absent: answering "not-found" would let the send go twice. */
   it("answers unreadable when the wallet could not catch up with the server on the last look", async () => {
     const offline = new Error("no connection")
-    walletAnswers([], [])
+    walletAnswers([], [], [])
     mockSyncWallet.mockResolvedValueOnce(undefined)
     mockSyncWallet.mockResolvedValueOnce(undefined)
     mockSyncWallet.mockRejectedValueOnce(offline)
@@ -966,7 +968,29 @@ describe("findLostSend", () => {
     const found = await settle(lookup())
 
     expect(found).toEqual({ status: "unreadable", error: offline })
-    expect(mockListPayments).toHaveBeenCalledTimes(2)
+    expect(mockListPayments).toHaveBeenCalledTimes(3)
+  })
+
+  /** From SDK 0.26 the sync also waits for exit-chain collection and fails with it, so a
+   *  failed sync must not hide a payment the local history already holds. */
+  it("finds the payment in the local history when the wallet could not catch up", async () => {
+    mockSyncWallet.mockRejectedValue(new Error("exit chain collection failed"))
+    walletAnswers([sent("p1", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED) })
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports a sync that failed during the lookup", async () => {
+    const offline = new Error("no connection")
+    mockSyncWallet.mockRejectedValue(offline)
+    walletAnswers([sent("p1", COMPLETED)])
+
+    await settle(lookup())
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
   })
 
   /** A send the wallet has not described yet carries nothing to match on, and may be the

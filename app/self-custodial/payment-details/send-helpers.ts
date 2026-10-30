@@ -214,6 +214,9 @@ type HistoryScan = {
    *  carries nothing to match on, and a Lightning send can sit that way until the
    *  wallet has fetched what it paid, so it may be the attempt itself. */
   readonly hasUndescribedSend: boolean
+  /** Set when the wallet could not catch up with the server first. The local history
+   *  can still show the payment, but not that it is absent. */
+  readonly syncFailure?: { readonly error: unknown }
 }
 
 const isUndescribedSend = (payment: Payment): boolean =>
@@ -241,7 +244,18 @@ const scanHistorySince = async (
   since: bigint,
   matches: (payment: Payment) => boolean,
 ): Promise<HistoryScan> => {
-  await syncSelfCustodialWallet(sdk)
+  /**
+   * From SDK 0.26 the sync also waits for exit-chain collection, and fails when that
+   * does, while the history it would have refreshed may already hold the payment. So a
+   * failed sync does not end the look; it only rules out "not-found".
+   */
+  let syncFailure: HistoryScan["syncFailure"]
+  try {
+    await syncSelfCustodialWallet(sdk)
+  } catch (err) {
+    reportError("Self-custodial lost send lookup", err)
+    syncFailure = { error: err }
+  }
 
   const found: Payment[] = []
   let hasUndescribedSend = false
@@ -254,7 +268,7 @@ const scanHistorySince = async (
         offset: page * LOST_SEND_PAGE_SIZE,
       }))
     } catch (err) {
-      if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
+      if (found.some(isLanded)) return { matches: found, hasUndescribedSend, syncFailure }
       throw err
     }
 
@@ -263,7 +277,7 @@ const scanHistorySince = async (
 
     const isScanComplete =
       found.some(isCompleted) || payments.length < LOST_SEND_PAGE_SIZE
-    if (isScanComplete) return { matches: found, hasUndescribedSend }
+    if (isScanComplete) return { matches: found, hasUndescribedSend, syncFailure }
   }
 
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
@@ -278,6 +292,21 @@ const scanHistorySince = async (
  * The last look decides, since each one reads the history afresh after the wallet caught
  * up: a look that could not read earlier says nothing about one that did later.
  */
+/** What a look that showed no payment of the attempt is able to say. */
+const withoutPayment = ({
+  syncFailure,
+  hasUndescribedSend,
+}: HistoryScan): LostSendLookup => {
+  if (syncFailure) return { status: "unreadable", error: syncFailure.error }
+  if (hasUndescribedSend) {
+    return {
+      status: "unreadable",
+      error: new Error("Lost send lookup met an undescribed send"),
+    }
+  }
+  return { status: "not-found" }
+}
+
 export const findLostSend = async ({
   sdk,
   startedAtMs,
@@ -292,12 +321,7 @@ export const findLostSend = async ({
       const payment =
         scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
       if (payment) return { status: "found", payment }
-      lastLook = scan.hasUndescribedSend
-        ? {
-            status: "unreadable",
-            error: new Error("Lost send lookup met an undescribed send"),
-          }
-        : { status: "not-found" }
+      lastLook = withoutPayment(scan)
     } catch (err) {
       reportError("Self-custodial lost send lookup", err)
       lastLook = { status: "unreadable", error: err }

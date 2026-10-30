@@ -37,7 +37,20 @@ const TAG_TO_CODE: Record<SdkErrorTags, SelfCustodialErrorCode> = {
    *  so no user-facing refinement exists for them. */
   [SdkErrorTags.OptimizationAlreadyRunning]: SelfCustodialErrorCode.Generic,
   [SdkErrorTags.OptimizationCancelled]: SelfCustodialErrorCode.Generic,
-  [SdkErrorTags.FundingUtxoConflict]: SelfCustodialErrorCode.Generic,
+  /** A claim the sync loop is already running on the same deposit (0.26). It settles on
+   *  its own, so there is nothing for the user to change. */
+  [SdkErrorTags.DepositClaimInProgress]: SelfCustodialErrorCode.Generic,
+  /** A refund replacing one still in the mempool must outbid it (0.26): the fee rate is
+   *  what the user picked, so it reads as their input. */
+  [SdkErrorTags.RefundReplacementFeeTooLow]: SelfCustodialErrorCode.InvalidInput,
+  /** Cross-chain sends and receives (0.26, 0.27): flows the app never starts. */
+  [SdkErrorTags.CrossChainAmountOutOfRange]: SelfCustodialErrorCode.Generic,
+  [SdkErrorTags.CrossChainRouteUnavailable]: SelfCustodialErrorCode.Generic,
+  [SdkErrorTags.CrossChainDisabled]: SelfCustodialErrorCode.Generic,
+  /** Token allowances (0.27): a flow the app never starts. */
+  [SdkErrorTags.TokenAllowance]: SelfCustodialErrorCode.Generic,
+  /** A deposit whose claim fee would leave it at or under the dust limit (0.27). */
+  [SdkErrorTags.DepositTooSmall]: SelfCustodialErrorCode.BelowMinimum,
   /** Raised when the CPFP funding of a unilateral exit cannot cover its on-chain fees.
    *  InsufficientFunds would read as an empty wallet, which is a different problem from
    *  a fee reserve the user never chose. */

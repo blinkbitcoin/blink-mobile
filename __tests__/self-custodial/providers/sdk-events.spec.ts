@@ -34,12 +34,16 @@ describe("sdk-events", () => {
       expect(REFRESH_EVENTS.has(SdkEventTags.NewDeposits)).toBe(true)
     })
 
+    it("includes PaymentMetadataUpdated so details that land later reach the history", () => {
+      expect(REFRESH_EVENTS.has(SdkEventTags.PaymentMetadataUpdated)).toBe(true)
+    })
+
     it("does NOT include PaymentFailed (failed sends should not trigger a refresh)", () => {
       expect(REFRESH_EVENTS.has(SdkEventTags.PaymentFailed)).toBe(false)
     })
 
     it("contains exactly the documented refresh tags (no silent additions)", () => {
-      expect(REFRESH_EVENTS.size).toBe(6)
+      expect(REFRESH_EVENTS.size).toBe(7)
     })
   })
 
