@@ -54,7 +54,7 @@ let desiredDomain: AnalyticsDomain | null = null
 let requestEpoch = 0
 /** The domain whose identity and collection state is fully applied right now; null while
  *  a transition is under way or after one failed. Self-custodial events are delivered
- *  only while this is Enhanced. */
+ *  only while this is Enhanced, and custodial-era ones only while it is Custodial. */
 let appliedDomain: AnalyticsDomain | null = null
 let custodialIdentity: CustodialIdentity | null = null
 let sharedProperties: Record<string, string> = {}
@@ -65,6 +65,26 @@ let queue: Promise<void> = Promise.resolve()
  *  newer identity. */
 let shutdownBarrier: Promise<unknown> = Promise.resolve()
 const enhancedAppliedListeners = new Set<() => void>()
+
+/** A custodial-era event made while the custodial identity was still being put in place.
+ *  It belongs to the request it was made under: every new request clears the held ones. */
+type HeldCustodialEvent = { heldAtMs: number; send: () => unknown }
+
+/** The same bounds as the Enhanced deliveries in `measurement`. */
+const HELD_CUSTODIAL_TTL_MS = 5 * 60 * 1000
+const HELD_CUSTODIAL_CAP = 50
+let heldCustodialEvents: HeldCustodialEvent[] = []
+
+/** Sends what the request that just applied the custodial identity was holding; anything
+ *  past its time is dropped. Each event is sent at most once. */
+const releaseHeldCustodialEvents = () => {
+  const now = Date.now()
+  const held = heldCustodialEvents
+  heldCustodialEvents = []
+  held.forEach((event) => {
+    if (now - event.heldAtMs <= HELD_CUSTODIAL_TTL_MS) event.send()
+  })
+}
 
 const readLastSide = async (): Promise<Side | null> => {
   try {
@@ -235,6 +255,7 @@ const applyLatest = async () => {
     // eslint-disable-next-line require-atomic-updates
     appliedDomain = target
     if (target === AnalyticsDomain.Enhanced && !wasApplied) announceEnhancedApplied()
+    if (target === AnalyticsDomain.Custodial) releaseHeldCustodialEvents()
   } catch (err) {
     /** Fail closed: a self-custodial account whose identity could not be put in place
      *  collects nothing, rather than reporting under whatever identity was left. The
@@ -261,6 +282,9 @@ export const setAnalyticsDomain = (domain: AnalyticsDomain): void => {
   desiredDomain = domain
   requestEpoch += 1
   appliedDomain = null
+  /** Held for a request that no longer stands: dropped rather than sent under the
+   *  identity that replaces it. */
+  heldCustodialEvents = []
   if (isClosed(domain)) {
     /** Incognito, or no answer yet, does not wait behind a queued transition. */
     issueShutdown()
@@ -269,10 +293,29 @@ export const setAnalyticsDomain = (domain: AnalyticsDomain): void => {
 }
 
 /** Whether the custodial account is the one requested: the custodial-era events in
- *  `utils/analytics` report only for it, leaving a self-custodial account to the sc_*
- *  events. False until the first request, so nothing reports for an unknown account. */
+ *  `utils/analytics` belong to it, leaving a self-custodial account to the sc_* events.
+ *  False until the first request, so nothing reports for an unknown account. Whose an
+ *  event is, not when it may go: `reportCustodialEvent` decides that. */
 export const isCustodialAnalyticsDomain = (): boolean =>
   desiredDomain === AnalyticsDomain.Custodial
+
+/**
+ * Sends a custodial-era event only under the custodial identity. While a transition to the
+ * custodial account is still separating from the self-custodial app instance, attaching
+ * the custodial id or turning collection on, the event is held for that request and sent
+ * once it applies: sent sooner, it would go out under the previous app instance, or be
+ * dropped by collection that is still off. A newer request drops it, and so does any
+ * request other than the custodial account.
+ */
+export const reportCustodialEvent = (send: () => unknown): void => {
+  if (appliedDomain === AnalyticsDomain.Custodial) {
+    send()
+    return
+  }
+  if (desiredDomain !== AnalyticsDomain.Custodial) return
+  if (heldCustodialEvents.length >= HELD_CUSTODIAL_CAP) heldCustodialEvents.shift()
+  heldCustodialEvents.push({ heldAtMs: Date.now(), send })
+}
 
 /** Whether GA4 is fully under the Enhanced identity right now: separated from the
  *  custodial account, the per-install id attached, and collection on. */
