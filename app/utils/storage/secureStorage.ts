@@ -18,6 +18,7 @@ import {
   readThrough,
   type SlotPurge,
   removeThrough,
+  worsePurge,
   writeThrough,
 } from "./secure-store-migration"
 
@@ -1269,10 +1270,9 @@ export default class KeyStoreWrapper {
 
       if (slotOutcome === "gone") provenGone.push(slot.args.slot)
 
-      // Worst wins, and `transient` is the worst: a pass with anything still worth
-      // retrying is worth retrying, which a wholly `permanent` pass is not.
-      if (slotOutcome === "transient") outcome = "transient"
-      if (slotOutcome === "permanent" && outcome === "gone") outcome = "permanent"
+      // Worst wins: a pass with anything still worth retrying is worth retrying,
+      // which a wholly `permanent` pass is not.
+      outcome = worsePurge(outcome, slotOutcome)
     }
 
     return { outcome, purgedSlots: provenGone }

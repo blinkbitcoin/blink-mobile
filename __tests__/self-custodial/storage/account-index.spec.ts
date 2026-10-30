@@ -78,6 +78,7 @@ const SWEEP_INCOMPLETE = { status: "incomplete", failures: 1 } as const
 const PASS_GONE = { outcome: "gone", purgedSlots: [] } as const
 const PASS_TRANSIENT = { outcome: "transient", purgedSlots: [] } as const
 const PASS_PERMANENT = { outcome: "permanent", purgedSlots: [] } as const
+const PASS_UNCONFIRMED = { outcome: "unconfirmed", purgedSlots: [] } as const
 
 const setIndex = (entries: SelfCustodialAccountEntry[]) => {
   mockGetItem.mockImplementation((key: string) =>
@@ -1012,6 +1013,22 @@ describe("self-custodial account-index — legacy key store purge", () => {
         )
       })
 
+      /** On iOS an empty legacy read may be a lookup that failed, so no number of
+       *  launches makes a seed in neither store terminal there. */
+      it("does not count an attempt iOS could not confirm", async () => {
+        setAttempts("4")
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_UNCONFIRMED)
+
+        const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(result).toEqual({ status: "unconfirmed" })
+        expect(mockSetItem).not.toHaveBeenCalledWith(
+          LEGACY_PURGE_ATTEMPTS_KEY,
+          expect.anything(),
+        )
+        expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
+      })
+
       it("keeps attempting after any number of unreadable launches", async () => {
         setAttempts(String(LEGACY_PURGE_MAX_ATTEMPTS - 1))
         mockPurgeLegacyKeyStore.mockResolvedValue(PASS_TRANSIENT)
@@ -1343,6 +1360,28 @@ describe("self-custodial account-index — legacy key store purge", () => {
           outcome: "unmigrated",
         })
         expect(mockRecordError).not.toHaveBeenCalled()
+      })
+
+      /**
+       * The same device on iOS, which is every phone restored from a backup: the
+       * index comes back and neither store's device-only item does. Counted under
+       * its own name, so a keychain that will not answer still stands out as
+       * `incomplete`. Asserted through the crashlytics log as well, which runs
+       * before the per-process dedup gate.
+       */
+      it("counts an iOS seed in neither store without raising a defect", async () => {
+        setIndexAndFlag([{ id: "a1", lightningAddress: null }], null)
+        mockPurgeLegacyKeyStore.mockResolvedValue(PASS_UNCONFIRMED)
+
+        const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+        expect(result).toEqual({ status: "unconfirmed" })
+        expect(mockLogEvent).toHaveBeenCalledWith("legacy_key_store_purge", {
+          outcome: "unconfirmed",
+        })
+        expect(mockRecordError).not.toHaveBeenCalled()
+        const logged = mockCrashlyticsLog.mock.calls.map(([line]) => line).join("\n")
+        expect(logged).not.toContain("Legacy key store purge")
       })
 
       it("never lets a telemetry failure reach the boot path", async () => {

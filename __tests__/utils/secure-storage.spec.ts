@@ -3079,14 +3079,47 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
      * Never terminal on iOS. The module rejects every failure with the not-found
      * code, so retiring the purge on that answer would strand a seed in the legacy
      * store for good. Retrying costs round trips off the boot path instead.
+     *
+     * Kept apart from a store that could not answer, though: this is what every
+     * phone restored from a backup shows, since the index comes back and neither
+     * store's device-only item does, and the caller must not raise it as a fault.
      */
-    it("keeps retrying on iOS, where it cannot be told from a failed lookup", async () => {
+    it("keeps retrying on iOS, as unconfirmed rather than a store that could not answer", async () => {
       setPlatform("ios")
       stores.migrated.set("mnemonicAccounts", "alice")
 
       const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
+      expect(purged.outcome).toBe("unconfirmed")
+    })
+
+    /** A slot a store could not answer for still decides the pass: that one is a
+     *  fault to raise, and the unconfirmed seed beside it must not hide it. */
+    it("lets a store that could not answer outrank it", async () => {
+      setPlatform("ios")
+      stores.migrated.set("mnemonicAccounts", "alice")
+      mockGet.mockImplementation(async (key: string) => {
+        if (key === "PIN") throw new Error("keychain unavailable")
+        throw legacyNotFound()
+      })
+
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
+
       expect(purged.outcome).toBe("transient")
+    })
+
+    /**
+     * It outranks a terminal answer elsewhere in the pass. A damaged tracked list
+     * reaches the caller as `permanent`, which counts against the retry bound, and
+     * letting that win would retire the purge over a seed iOS could not rule out.
+     */
+    it("outranks a damaged tracked list, so the retry bound does not end the purge", async () => {
+      setPlatform("ios")
+      stores.migrated.set("mnemonicAccounts", "[1, 2]")
+
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+      expect(purged.outcome).toBe("unconfirmed")
     })
 
     /**
