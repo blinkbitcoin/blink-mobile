@@ -186,6 +186,21 @@ describe("recordAppError", () => {
     expect(mockRecordError).toHaveBeenCalledTimes(2)
   })
 
+  it("writes nothing while crash reporting is closed, and resumes once reopened", () => {
+    const fresh = loadFreshErrorReportingModule()
+
+    fresh.setCrashReportingOpen(false)
+    fresh.recordAppError(new Error("closed defect"))
+    fresh.logBreadcrumb("closed breadcrumb")
+    fresh.setCrashReportingOpen(true)
+    fresh.recordAppError(new Error("open defect"))
+    fresh.logBreadcrumb("open breadcrumb")
+
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+    expect(mockRecordError.mock.calls[0][0].message).toBe("open defect")
+    expect(mockLog.mock.calls).toEqual([["[defect] open defect"], ["open breadcrumb"]])
+  })
+
   it("dedup does not consume the key for non-defect classes", () => {
     const fresh = loadFreshErrorReportingModule()
 

@@ -1,12 +1,15 @@
+/* eslint-disable camelcase */
 import { useCallback, useState } from "react"
 
 import { CommonActions, useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
+import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useProvisionSelfCustodialAccount } from "@app/self-custodial/hooks/use-provision-self-custodial-account"
+import { measureFor, ScEvent } from "@app/self-custodial/measurement"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { withSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
@@ -30,6 +33,7 @@ export const useCreateWallet = () => {
   const { LL } = useI18nContext()
   const [status, setStatus] = useState<CreationStatus>(CreationStatus.Idle)
   const guard = useInFlightGuard()
+  const hasCustodialAccount = useHasCustodialAccount()
 
   const create = useCallback(
     async (mode?: AccountMode) => {
@@ -47,6 +51,17 @@ export const useCreateWallet = () => {
               ? withSelfCustodialAccountMode(withActive, accountId, mode)
               : withActive
           })
+          /** The account is not active until the write above lands, so the account and
+           *  the mode it was created with are named; both events are delivered once it
+           *  is active under Enhanced. The mode was chosen before the account existed,
+           *  so its selection is reported here, against the account it was chosen for.
+           *  A creation without a mode records nothing. */
+          const target = { accountId, mode: mode ?? null }
+          measureFor(target, ScEvent.AccountModeSelected, { mode: mode ?? "none" })
+          measureFor(target, ScEvent.AccountCreated, {
+            flow: "create",
+            has_custodial_account: hasCustodialAccount,
+          })
           navigation.dispatch(
             CommonActions.reset({ index: 0, routes: [{ name: "Primary" }] }),
           )
@@ -57,7 +72,7 @@ export const useCreateWallet = () => {
         }
       })
     },
-    [guard, navigation, updateState, reinitSdk, provision, LL],
+    [guard, navigation, updateState, reinitSdk, provision, hasCustodialAccount, LL],
   )
 
   return { status, create }

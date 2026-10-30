@@ -91,7 +91,14 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/utils/error-reporting", () => ({
+  logBreadcrumb: jest.fn(),
   recordAppError: (...args: unknown[]) => mockRecordAppError(...args),
+}))
+
+const mockMeasure = jest.fn()
+jest.mock("@app/self-custodial/measurement", () => ({
+  ...jest.requireActual("@app/self-custodial/measurement"),
+  measure: (...args: unknown[]) => mockMeasure(...args),
 }))
 
 jest.mock("@app/self-custodial/storage/onchain-address", () => ({
@@ -170,7 +177,8 @@ describe("onchain address rotation", () => {
       address: "bc1qrotated...",
       depositMarker: "deposit-1",
       seenPendingDepositIds: [],
-    })
+    }) /** The address already issued is shown, not counted; the rotated one is new. */
+    expect(mockMeasure).toHaveBeenCalledTimes(1)
   })
 
   it("waits for the wallet snapshot instead of reading an empty history as no deposits", async () => {
@@ -704,5 +712,37 @@ describe("onchain address rotation", () => {
         }),
       )
     })
+  })
+})
+
+describe("onchain request telemetry", () => {
+  const onchainRequest = [
+    "sc_payment_request_created",
+    // eslint-disable-next-line camelcase
+    { rail: "onchain", has_amount: false },
+  ] as const
+
+  it("counts the first address an account is given", async () => {
+    renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalled()
+    })
+    expect(mockMeasure).toHaveBeenCalledTimes(1)
+    expect(mockMeasure).toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("does not count a visit that shows the address already issued", async () => {
+    mockLoadIssuedOnchainAddress.mockResolvedValue({
+      address: "bc1qtest...",
+      depositMarker: null,
+    })
+
+    renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalled()
+    })
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
   })
 })

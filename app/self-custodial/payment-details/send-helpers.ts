@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   OnchainConfirmationSpeed,
   PaymentStatus,
@@ -33,6 +34,16 @@ import {
   prepareSend,
   syncSelfCustodialWallet,
 } from "../bridge"
+import {
+  measure,
+  measureIn,
+  measurementGeneration,
+  measureSettlement,
+  ScEvent,
+  type ScEventParams,
+  type ScRail,
+  type SettlementTelemetry,
+} from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 type PrepareParams = {
@@ -42,6 +53,27 @@ type PrepareParams = {
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
 }
+
+/** What a send reports about itself: the rail category and the wallet spent from, never
+ *  the destination, amount, or counterparty. */
+export type SendTelemetry = {
+  rail: ScRail
+  sendingWallet: WalletCurrency
+}
+
+const telemetryParams = ({ rail, sendingWallet }: SendTelemetry): ScEventParams => ({
+  rail,
+  sending_wallet: sendingWallet,
+})
+
+/** A send settles or fails once, by the SDK's word; `alsoSettled` rides on the settle. */
+export const sendSettlement = (
+  params: ScEventParams,
+  alsoSettled: SettlementTelemetry["settled"] = [],
+): SettlementTelemetry => ({
+  settled: [{ event: ScEvent.PaymentSendSettled, params }, ...alsoSettled],
+  failed: { event: ScEvent.PaymentSendFailed, params },
+})
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
   [FeeTierOption.Fast]: OnchainConfirmationSpeed.Fast,
@@ -134,13 +166,27 @@ const reportSendFailure = (
   return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
-export const createSendMutation = (params: PrepareParams): SendPaymentMutation => {
+export const createSendMutation = (
+  params: PrepareParams,
+  telemetry: SendTelemetry,
+): SendPaymentMutation => {
   return async () => {
+    const startedIn = measurementGeneration()
+    measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared)
+      const response = await executeSend(params.sdk, prepared)
+      measureSettlement(
+        response?.payment,
+        sendSettlement(telemetryParams(telemetry)),
+        startedIn,
+      )
       return { status: PaymentSendResult.Success }
     } catch (err) {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
+        ...telemetryParams(telemetry),
+        error_code: classifySdkError(err),
+      })
       return {
         status: PaymentSendResult.Failure,
         errors: [reportSendFailure("Self-custodial Lightning send", err)],
@@ -152,13 +198,25 @@ export const createSendMutation = (params: PrepareParams): SendPaymentMutation =
 export const createSendMutationOnchain = (
   params: PrepareParams,
   feeTier: FeeTierOption,
+  telemetry: SendTelemetry,
 ): SendPaymentMutation => {
   return async () => {
+    const startedIn = measurementGeneration()
+    measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
+      const response = await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
+      measureSettlement(
+        response?.payment,
+        sendSettlement(telemetryParams(telemetry)),
+        startedIn,
+      )
       return { status: PaymentSendResult.Success }
     } catch (err) {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
+        ...telemetryParams(telemetry),
+        error_code: classifySdkError(err),
+      })
       return {
         status: PaymentSendResult.Failure,
         errors: [reportSendFailure("Self-custodial onchain send", err)],

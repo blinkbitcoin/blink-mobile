@@ -4,6 +4,7 @@ import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { measure, ScEvent } from "@app/self-custodial/measurement"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
 import {
   oppositeWalletCurrency,
@@ -67,6 +68,13 @@ export const useSelfCustodialConversion = ({
   useEffect(() => {
     if (quote && !snapshotParams && liveQuoteParams) {
       setSnapshotParams(liveQuoteParams)
+      /** The quote the user is shown and confirms against is the snapshot, taken once per
+       *  amount; quotes fetched to check an amount as it is typed, or to price the Stable
+       *  Balance toggle, are never shown as a swap and are not counted. */
+      measure(ScEvent.SwapQuoteShown, {
+        direction: liveQuoteParams.direction,
+        source: "manual",
+      })
     }
   }, [quote, snapshotParams, liveQuoteParams])
 

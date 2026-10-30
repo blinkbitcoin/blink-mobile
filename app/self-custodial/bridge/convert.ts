@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   AmountAdjustmentReason,
   PaymentRequest,
@@ -8,10 +9,10 @@ import {
   SendPaymentRequest,
   type BreezSdkInterface,
 } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { toUsdMoneyAmount } from "@app/types/amounts"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import {
   ConvertAmountAdjustment,
   ConvertDirection,
@@ -26,6 +27,13 @@ import { centsToTokenBaseUnits, tokenBaseUnitsToCents } from "@app/utils/amounts
 import { toNumber } from "@app/utils/helper"
 
 import { MAX_SLIPPAGE_BPS, requireSparkTokenIdentifier } from "../config"
+import {
+  measureIn,
+  measurementGeneration,
+  measureSettlement,
+  ScEvent,
+} from "../measurement"
+import { classifySdkError } from "../sdk-error"
 
 import { buildConversionType, fetchConversionLimits } from "./limits"
 import { fetchUsdbDecimals, findUsdbToken } from "./token-balance"
@@ -57,9 +65,7 @@ class ConvertError extends Error {
 }
 
 const recordConvertError = (err: unknown, params: ConvertParams, where: string): void => {
-  crashlytics().log(
-    `[Convert] ${where} failed (direction=${params.direction}, fromAmount=${params.fromAmount.amount}, toAmount=${params.toAmount.amount})`,
-  )
+  logBreadcrumb(`[Convert] ${where} failed (direction=${params.direction})`)
   reportError(where, err)
 }
 
@@ -276,15 +282,39 @@ const prepareConversion = async (
   return { prepared: corrected, tokenDecimals }
 }
 
+/** A prepared conversion, and the measurement context its quote was made in: the quote
+ *  closes over that context's SDK, so its outcome belongs to that context too. */
+type QuotedConversion = { prepared: PrepareSendPaymentResponse; startedIn: number }
+
 const executePrepared = async (
   sdk: BreezSdkInterface,
-  prepared: PrepareSendPaymentResponse,
+  { prepared, startedIn }: QuotedConversion,
   params: ConvertParams,
 ): Promise<PaymentAdapterResult> => {
+  const swapTelemetry = {
+    direction: params.direction,
+    source: params.source ?? "manual",
+  }
   try {
-    await sdk.sendPayment(SendPaymentRequest.create({ prepareResponse: prepared }))
+    const response = await sdk.sendPayment(
+      SendPaymentRequest.create({ prepareResponse: prepared }),
+    )
+    /** By the SDK's word on the payment, as for sends: a conversion normally comes back
+     *  completed, and one that does not is held until its outcome is announced. */
+    measureSettlement(
+      response?.payment,
+      {
+        settled: [{ event: ScEvent.SwapCompleted, params: swapTelemetry }],
+        failed: { event: ScEvent.SwapFailed, params: swapTelemetry },
+      },
+      startedIn,
+    )
     return { status: PaymentResultStatus.Success }
   } catch (err) {
+    measureIn(startedIn, ScEvent.SwapFailed, {
+      ...swapTelemetry,
+      error_code: classifySdkError(err),
+    })
     recordConvertError(err, params, "executePrepared")
     return failed(err instanceof Error ? err.message : `Conversion failed: ${err}`)
   }
@@ -292,7 +322,7 @@ const executePrepared = async (
 
 const toConvertQuote = (
   sdk: BreezSdkInterface,
-  { prepared, tokenDecimals }: PreparedConversion,
+  { prepared, tokenDecimals, startedIn }: PreparedConversion & { startedIn: number },
   params: ConvertParams,
 ): ConvertQuote | null => {
   const estimate = prepared.conversionEstimate
@@ -301,16 +331,17 @@ const toConvertQuote = (
   return {
     feeAmount: toUsdMoneyAmount(feeCents),
     amountAdjustment: mapAmountAdjustment(estimate.amountAdjustment),
-    execute: () => executePrepared(sdk, prepared, params),
+    execute: () => executePrepared(sdk, { prepared, startedIn }, params),
   }
 }
 
 export const createGetConversionQuote =
   (sdk: BreezSdkInterface): GetConversionQuoteAdapter =>
   async (params) => {
+    const startedIn = measurementGeneration()
     try {
       const context = await prepareConversion(sdk, params)
-      return toConvertQuote(sdk, context, params)
+      return toConvertQuote(sdk, { ...context, startedIn }, params)
     } catch (err) {
       recordConvertError(err, params, "getConversionQuote")
       throw err

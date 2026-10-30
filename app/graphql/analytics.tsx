@@ -3,7 +3,10 @@ import { useEffect } from "react"
 import { gql } from "@apollo/client"
 import { useAnalyticsQuery } from "@app/graphql/generated"
 import { useAppConfig } from "@app/hooks"
-import analytics from "@react-native-firebase/analytics"
+import {
+  setCustodialIdentity,
+  setSharedUserProperties,
+} from "@app/self-custodial/analytics-identity"
 
 import { useIsAuthed } from "./is-authed-context"
 import { useLevel } from "./level-context"
@@ -34,28 +37,26 @@ export const AnalyticsContainer = () => {
     fetchPolicy: "cache-first",
   })
 
+  /** Identity is handed to its single owner, which attaches it only while the custodial
+   *  account is active: a self-custodial session reports under the per-install telemetry
+   *  id (Enhanced) or none at all (Incognito), on a separate GA4 app instance, and
+   *  attaching `me.id` there would join the two identities. */
   useEffect(() => {
-    analytics().setUserProperty("hasUsername", data?.me?.username ? "true" : "false")
-  }, [data?.me?.username])
-
-  useEffect(() => {
-    if (data?.me?.id) {
-      analytics().setUserId(data?.me?.id)
-    }
-  }, [data?.me?.id])
+    setCustodialIdentity({
+      userId: data?.me?.id,
+      hasUsername: Boolean(data?.me?.username),
+      accountLevel: level.currentLevel,
+    })
+  }, [data?.me?.id, data?.me?.username, level.currentLevel])
 
   useEffect(() => {
     if (data?.globals?.network) {
-      analytics().setUserProperties({ network: data.globals.network })
+      setSharedUserProperties({ network: data.globals.network })
     }
   }, [data?.globals?.network])
 
   useEffect(() => {
-    analytics().setUserProperty("accountLevel", level.currentLevel)
-  }, [level])
-
-  useEffect(() => {
-    analytics().setUserProperty("galoyInstance", galoyInstanceName)
+    setSharedUserProperties({ galoyInstance: galoyInstanceName })
   }, [galoyInstanceName])
 
   return null
