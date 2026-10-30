@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 
@@ -128,7 +129,12 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
 
   const [lightningAddress, setLightningAddress] = useState<string | null>(null)
 
+  /** The account the SDK last answered for. An answer of "none" is null like the
+   *  empty state before any answer, so this is what tells the two apart. */
+  const sdkAnsweredForRef = useRef<string | null>(null)
+
   useEffect(() => {
+    sdkAnsweredForRef.current = null
     setLightningAddress(null)
   }, [activeSelfCustodialAccountId])
 
@@ -141,7 +147,9 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
    * address and the paycode tab with it, as though the name had been given up.
    *
    * The SDK's answer below overwrites this when it arrives, so a name changed on
-   * another device still wins; this only fills the gap where there is no answer.
+   * another device still wins; this only fills the gap where there is no answer. A
+   * seed read that lands after the answer is dropped, so it cannot put back an address
+   * the SDK has just said the account no longer has.
    */
   useEffect(() => {
     if (!activeSelfCustodialAccountId) return undefined
@@ -150,8 +158,9 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
 
     getSelfCustodialLightningAddress(accountId)
       .then((stored) => {
-        if (!mounted || !stored) return
-        setLightningAddress((current) => current ?? stored)
+        const hasSdkAnswered = sdkAnsweredForRef.current === accountId
+        if (!mounted || !stored || hasSdkAnswered) return
+        setLightningAddress(stored)
       })
       .catch((err) => {
         reportLightningAddressError(LightningAddressOperation.Resolve, err)
@@ -172,8 +181,10 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         const info = await getLightningAddress(sdk)
         if (!mounted) return
         const resolved = info?.lightningAddress ?? null
+        sdkAnsweredForRef.current = accountId
         setLightningAddress(resolved)
-        if (!resolved) return
+        /** Recorded even when there is none: the record is what the next launch seeds
+         *  from, so an address the server no longer holds must not outlive it there. */
         await setSelfCustodialLightningAddress(accountId, resolved).catch((err) => {
           reportLightningAddressError(LightningAddressOperation.Persist, err)
         })
@@ -197,6 +208,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     try {
       const info = await getLightningAddress(sdk)
       const resolved = info?.lightningAddress ?? null
+      sdkAnsweredForRef.current = connectedAccountId
       setLightningAddress(resolved)
       await setSelfCustodialLightningAddress(connectedAccountId, resolved)
       await reloadSelfCustodialAccounts()
