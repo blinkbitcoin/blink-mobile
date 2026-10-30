@@ -3840,20 +3840,28 @@
                 "testSuccess": "バックアップフレーズは正しいです"
             }
         },
+        "BundleExport": {
+            "title": "緊急出金",
+            "body": "Spark が停止した場合、このバンドルを使えば Blink なしでビットコインをオンチェーンに移せます。ドル残高は復元できません。",
+            "download": "バンドルをダウンロード",
+            "sensitiveTitle": "機密情報",
+            "learnMore": "一方的な出金について詳しく見る",
+            "sensitiveConfirm": "ダウンロード",
+            "sensitiveBody": "このファイルには残高と支払い履歴が含まれるため、非公開にしてください。緊急時に使うには、リカバリーフレーズも必要です。"
+        },
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
             "description": "{provider}にバックアップフレーズのコピーを保存します。",
-            "encryptCheckbox": "追加のパスフレーズを設定",
-            "password": "パスフレーズ",
+            "password": "パスワード",
             "passwordPlaceholder": "（12文字以上）",
-            "confirmPassword": "パスフレーズ確認",
-            "confirmPasswordPlaceholder": "パスフレーズを再入力",
+            "confirmPassword": "パスワード確認",
+            "confirmPasswordPlaceholder": "パスワードを再入力",
             "continueButton": "続行",
             "importantTitle": "重要",
-            "importantMessage": "Blinkはこのパスフレーズを保存しません。紛失した場合、{bold}。",
+            "importantMessage": "Blinkはこのパスワードを保存しません。紛失した場合、{bold}。",
             "importantMessageBold": "ウォレットを復元できません",
             "passwordTooShort": "12文字以上必要です",
-            "passwordMismatch": "パスフレーズが一致しません",
+            "passwordMismatch": "パスワードが一致しません",
             "uploadSuccess": "{provider}にバックアップを保存しました",
             "uploadFailed": "バックアップのアップロードに失敗しました",
             "signInFailed": "{provider}へのサインインに失敗しました",
@@ -4037,12 +4045,18 @@
         "restore": "ウォレットを復元",
         "noBackupFound": "バックアップが見つかりません",
         "noBackupDescription": "バックアップが見つかりませんでした。バックアップフレーズを手動で入力できます。",
-        "enterPassword": "暗号化パスフレーズを入力してください",
-        "wrongPassword": "パスフレーズが正しくありません。再試行してください。",
+        "enterPassword": "暗号化パスワードを入力してください",
+        "wrongPassword": "パスワードが正しくありません。再試行してください.",
         "pickBackupTitle": "ウォレットを選択",
         "pickBackupDescription": "復元するバックアップを選択",
         "recognizePhraseTitle": "このバックアップフレーズに見覚えがありますか？",
         "recognizePhraseBody": "他人から送られた単語は絶対に入力しないでください。"
+    },
+    "EmergencyRecovery": {
+        "outageTitle": "オペレーターに接続できません",
+        "outageBody": "Spark で障害が発生しています。数分待ってから再試行するか、{support}にお問い合わせください",
+        "outageSupport": "サポート",
+        "tryAgainLater": "後で再試行"
     },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",
@@ -4137,6 +4151,15 @@
         "title": "これは非カストディアルアカウントです",
         "body": "詳しくはブログ記事をご覧ください",
         "cta": "読む"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "クラウドのバックアップを更新",
+        "body": "{provider} の緊急バンドルが古くなっています。ウォレットをもう一度バックアップして更新してください。",
+        "cta": "もう一度バックアップ"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "緊急バンドルはまだありません。最初の取引の後に作成されます。",
+        "exportFailed": "緊急バンドルをダウンロードできませんでした。"
     },
     "StableBalance": {
         "title": "ステーブルバランス",

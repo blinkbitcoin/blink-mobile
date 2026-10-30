@@ -3840,20 +3840,28 @@
         "testSuccess": "Vaše záložní fráze je správná"
       }
     },
+    "BundleExport": {
+      "title": "Nouzový odchod",
+      "body": "Pokud Spark přestane fungovat, tento balíček vám umožní přesunout vaše bitcoiny on-chain bez Blinku. Váš dolarový zůstatek obnovit nelze.",
+      "download": "Stáhnout balíček",
+      "sensitiveTitle": "Citlivé",
+      "learnMore": "Více o jednostranném odchodu",
+      "sensitiveConfirm": "Stáhnout",
+      "sensitiveBody": "Tento soubor ukazuje váš zůstatek a historii plateb, proto ho uchovávejte v soukromí. Abyste ho mohli v nouzi použít, budete potřebovat také svou záložní frázi."
+    },
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",
       "description": "Uložíme zálohu vaší záložní fráze do vašeho {provider}.",
-      "encryptCheckbox": "Přidat dodatečnou heslovou frázi",
-      "password": "Heslová fráze",
+      "password": "Heslo",
       "passwordPlaceholder": "(minimálně 12 znaků)",
-      "confirmPassword": "Potvrdit heslovou frázi",
-      "confirmPasswordPlaceholder": "Zadejte heslovou frázi znovu",
+      "confirmPassword": "Potvrdit heslo",
+      "confirmPasswordPlaceholder": "Zadejte heslo znovu",
       "continueButton": "Pokračovat",
       "importantTitle": "Důležité",
-      "importantMessage": "Blink tuto heslovou frázi neukládá. Pokud ji ztratíte, {bold} obnovit vaši peněženku.",
+      "importantMessage": "Blink toto heslo neukládá. Pokud ho ztratíte, {bold} obnovit vaši peněženku.",
       "importantMessageBold": "nebudeme schopni",
       "passwordTooShort": "Minimálně 12 znaků",
-      "passwordMismatch": "Heslové fráze se neshodují",
+      "passwordMismatch": "Hesla se neshodují",
       "uploadSuccess": "Záloha uložena do {provider}",
       "uploadFailed": "Nahrání zálohy se nezdařilo",
       "signInFailed": "Přihlášení k {provider} se nezdařilo",
@@ -4037,12 +4045,18 @@
     "restore": "Obnovit peněženku",
     "noBackupFound": "Záloha nenalezena",
     "noBackupDescription": "Nepodařilo se najít zálohu. Můžete zadat zálohovací frázi ručně.",
-    "enterPassword": "Zadejte heslovou frázi pro šifrování",
-    "wrongPassword": "Nesprávná heslová fráze. Zkuste to prosím znovu.",
+    "enterPassword": "Zadejte heslo šifrování",
+    "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu.",
     "pickBackupTitle": "Vyberte peněženku",
     "pickBackupDescription": "Vyberte zálohu k obnovení",
     "recognizePhraseTitle": "Poznáváte tuto zálohovací frázi?",
     "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operátor je nedostupný",
+    "outageBody": "Spark má výpadek. Počkejte pár minut a zkuste to znovu, nebo kontaktujte naši {support}",
+    "outageSupport": "Podporu",
+    "tryAgainLater": "Zkusit později"
   },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",
@@ -4137,6 +4151,15 @@
     "title": "Toto je nesvěřenský účet",
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
     "cta": "Číst"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Aktualizujte zálohu v cloudu",
+    "body": "Váš nouzový balíček v {provider} je zastaralý. Znovu zálohujte peněženku, abyste ho aktualizovali.",
+    "cta": "Znovu zálohovat"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Zatím nemáte nouzový balíček. Vytvoří se po vaší první transakci.",
+    "exportFailed": "Nouzový balíček se nepodařilo stáhnout."
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",

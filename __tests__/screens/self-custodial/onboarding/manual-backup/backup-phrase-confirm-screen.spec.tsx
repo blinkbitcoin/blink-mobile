@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseConfirmScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-confirm-screen"
+import { AccountType } from "@app/types/wallet"
 import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
@@ -434,7 +435,13 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
+  /** A re-backup was already offered the emergency bundle on its first run. */
+  it("sends a settings re-backup straight to success as a re-backup", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "completed", method: "manual" },
@@ -453,13 +460,20 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
+    expect(mockReplace).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: true }),
     )
   })
 
-  it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", async () => {
+  /** The emergency bundle is handed over from Settings only, never in the backup flow. */
+  it("routes a fresh manual backup without checkpoint straight to success", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockCheckpoint.mockReturnValue(null)
 
     const { getByPlaceholderText } = render(
@@ -509,7 +523,12 @@ describe("BackupPhraseConfirmScreen", () => {
     })
   })
 
-  it("forwards the route's successMessage to the success screen when provided", async () => {
+  it("forwards the route's successMessage to the success screen", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockRouteParams.mockReturnValue({
       challenges: [
         { index: 0, word: "youth" },
@@ -517,10 +536,6 @@ describe("BackupPhraseConfirmScreen", () => {
         { index: 8, word: "harvest" },
       ],
       successMessage: "Your backup phrase is correct",
-    })
-    mockBackupStateValue.mockReturnValue({
-      backupState: { status: "completed", method: "manual" },
-      setBackupCompleted: mockSetBackupCompleted,
     })
 
     const { getByPlaceholderText } = render(
@@ -537,10 +552,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
-      expect.objectContaining({
-        reBackup: true,
-        message: "Your backup phrase is correct",
-      }),
+      expect.objectContaining({ message: "Your backup phrase is correct" }),
     )
   })
 
@@ -608,5 +620,30 @@ describe("BackupPhraseConfirmScreen", () => {
 
       expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
     })
+  })
+
+  it("moves the suggestions to whichever field the user tapped into", async () => {
+    // Suggestions follow focus, not typing order: tapping back into an earlier
+    // field must not leave the previous field's suggestions on screen.
+    const { getByPlaceholderText, getAllByPlaceholderText, getByText, queryByText } =
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+    await flushEffects()
+
+    const first = getByPlaceholderText(
+      `${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`,
+    )
+    const [, second] = getAllByPlaceholderText(
+      new RegExp(LL.BackupScreen.ManualBackup.Confirm.enterWord()),
+    )
+
+    fireEvent.changeText(first, "you")
+    expect(getByText("youth")).toBeTruthy()
+
+    fireEvent(second, "focus")
+    expect(queryByText("youth")).toBeNull()
   })
 })

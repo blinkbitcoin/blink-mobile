@@ -3840,20 +3840,28 @@
                 "testSuccess": "La tua frase di backup è corretta"
             }
         },
+        "BundleExport": {
+            "title": "Uscita di emergenza",
+            "body": "Se Spark smette di funzionare, questo pacchetto ti permette di spostare i tuoi bitcoin on-chain senza Blink. Il tuo saldo in dollari non può essere recuperato.",
+            "download": "Scarica il pacchetto",
+            "sensitiveTitle": "Sensibile",
+            "learnMore": "Scopri di più sull'uscita unilaterale",
+            "sensitiveConfirm": "Scarica",
+            "sensitiveBody": "Questo file mostra il tuo saldo e la cronologia dei pagamenti, quindi tienilo privato. Per usarlo in caso di emergenza, ti serve anche la tua frase di recupero."
+        },
         "CloudBackup": {
             "title": "Eseguiamo il backup del portafoglio",
             "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
-            "encryptCheckbox": "Aggiungi una passphrase aggiuntiva",
-            "password": "Passphrase",
+            "password": "Password",
             "passwordPlaceholder": "(minimo 12 caratteri)",
-            "confirmPassword": "Conferma passphrase",
-            "confirmPasswordPlaceholder": "Inserisci nuovamente la passphrase",
+            "confirmPassword": "Conferma password",
+            "confirmPasswordPlaceholder": "Inserisci nuovamente la password",
             "continueButton": "Continua",
             "importantTitle": "Importante",
-            "importantMessage": "Blink non memorizza questa passphrase. Se la perdi, {bold} recuperare il tuo portafoglio.",
+            "importantMessage": "Blink non memorizza questa password. Se la perdi, {bold} recuperare il tuo portafoglio.",
             "importantMessageBold": "non saremo in grado di",
             "passwordTooShort": "Minimo 12 caratteri",
-            "passwordMismatch": "Le passphrase non corrispondono",
+            "passwordMismatch": "Le password non corrispondono",
             "uploadSuccess": "Backup salvato su {provider}",
             "uploadFailed": "Impossibile caricare il backup",
             "signInFailed": "Accesso a {provider} non riuscito",
@@ -4037,12 +4045,18 @@
         "restore": "Ripristina portafoglio",
         "noBackupFound": "Nessun backup trovato",
         "noBackupDescription": "Non abbiamo trovato un backup. Puoi inserire la tua frase di backup manualmente.",
-        "enterPassword": "Inserisci la passphrase di crittografia",
-        "wrongPassword": "Passphrase errata. Riprova.",
+        "enterPassword": "Inserisci la password di crittografia",
+        "wrongPassword": "Password errata. Riprova.",
         "pickBackupTitle": "Scegli un portafoglio",
         "pickBackupDescription": "Seleziona un backup da ripristinare",
         "recognizePhraseTitle": "Riconosci questa frase di backup?",
         "recognizePhraseBody": "Non inserire mai parole che ti ha inviato qualcun altro."
+    },
+    "EmergencyRecovery": {
+        "outageTitle": "Operatore irraggiungibile",
+        "outageBody": "Spark sta riscontrando un'interruzione. Attendi qualche minuto e riprova oppure contatta il nostro {support}",
+        "outageSupport": "Supporto",
+        "tryAgainLater": "Riprova più tardi"
     },
     "BackupNudge": {
         "title": "I tuoi fondi sono a rischio",
@@ -4137,6 +4151,15 @@
         "title": "Questo è un account non custodiale",
         "body": "Per saperne di più, leggi il nostro articolo del blog",
         "cta": "Leggi"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Aggiorna il backup nel cloud",
+        "body": "Il tuo pacchetto di emergenza su {provider} non è aggiornato. Esegui di nuovo il backup del portafoglio per aggiornarlo.",
+        "cta": "Rifai il backup"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Nessun pacchetto di emergenza ancora. Viene creato dopo la tua prima transazione.",
+        "exportFailed": "Impossibile scaricare il pacchetto di emergenza."
     },
     "StableBalance": {
         "title": "Saldo stabile",

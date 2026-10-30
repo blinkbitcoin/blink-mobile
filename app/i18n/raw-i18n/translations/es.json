@@ -3840,20 +3840,28 @@
                 "testSuccess": "Tus frases de respaldo son correctas"
             }
         },
+        "BundleExport": {
+            "title": "Salida de emergencia",
+            "body": "Si Spark deja de funcionar, este paquete te permite mover tus bitcoins on-chain sin Blink. Tu saldo en dólares no se puede recuperar.",
+            "download": "Descargar paquete",
+            "sensitiveTitle": "Sensible",
+            "learnMore": "Más información sobre la salida unilateral",
+            "sensitiveConfirm": "Descargar",
+            "sensitiveBody": "Este archivo muestra tu saldo y tu historial de pagos, así que mantenlo privado. Para usarlo en una emergencia, también necesitas tu frase de recuperación."
+        },
         "CloudBackup": {
             "title": "Respaldemos tu billetera",
             "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
-            "encryptCheckbox": "Agregar frase de contraseña adicional",
-            "password": "Frase de contraseña",
+            "password": "Contraseña",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
-            "confirmPassword": "Confirmar frase de contraseña",
-            "confirmPasswordPlaceholder": "Ingresa la frase de contraseña de nuevo",
+            "confirmPassword": "Confirmar contraseña",
+            "confirmPasswordPlaceholder": "Ingresa la contraseña de nuevo",
             "continueButton": "Continuar",
             "importantTitle": "Importante",
-            "importantMessage": "Blink no almacena esta frase de contraseña. Si la pierdes, {bold} recuperar tu billetera.",
+            "importantMessage": "Blink no almacena esta contraseña. Si la pierdes, {bold} recuperar tu billetera.",
             "importantMessageBold": "no podremos",
             "passwordTooShort": "Mínimo 12 caracteres",
-            "passwordMismatch": "Las frases de contraseña no coinciden",
+            "passwordMismatch": "Las contraseñas no coinciden",
             "uploadSuccess": "Respaldo guardado en {provider}",
             "uploadFailed": "Error al subir el respaldo",
             "signInFailed": "No se pudo iniciar sesión en {provider}",
@@ -4037,12 +4045,18 @@
         "restore": "Restaurar billetera",
         "noBackupFound": "No se encontró respaldo",
         "noBackupDescription": "No pudimos encontrar un respaldo. Puedes ingresar tu frase de respaldo manualmente.",
-        "enterPassword": "Ingresa tu frase de contraseña de cifrado",
-        "wrongPassword": "Frase de contraseña incorrecta. Por favor intenta de nuevo.",
+        "enterPassword": "Ingresa tu contraseña de cifrado",
+        "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo.",
         "pickBackupTitle": "Elige una cartera",
         "pickBackupDescription": "Selecciona una copia de seguridad para restaurar",
         "recognizePhraseTitle": "¿Reconoce esta frase de respaldo?",
         "recognizePhraseBody": "Nunca introduzca palabras que otra persona le haya enviado."
+    },
+    "EmergencyRecovery": {
+        "outageTitle": "Operador inaccesible",
+        "outageBody": "Spark está experimentando una interrupción. Espera un par de minutos e inténtalo de nuevo o contacta a nuestro {support}",
+        "outageSupport": "Soporte",
+        "tryAgainLater": "Intentar más tarde"
     },
     "BackupNudge": {
         "title": "Tus fondos están en riesgo",
@@ -4137,6 +4151,15 @@
         "title": "Esta es una cuenta no custodial",
         "body": "Para saber más, lee nuestra entrada del blog",
         "cta": "Leer"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Actualiza tu respaldo en la nube",
+        "body": "Tu paquete de emergencia en {provider} está desactualizado. Vuelve a respaldar tu billetera para actualizarlo.",
+        "cta": "Respaldar de nuevo"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Aún no hay paquete de emergencia. Se crea después de tu primera transacción.",
+        "exportFailed": "No se pudo descargar el paquete de emergencia."
     },
     "StableBalance": {
         "title": "Balance estable",

@@ -161,6 +161,7 @@ import {
   ViewBackupSecurityChecksScreen,
   ViewBackupPhraseScreen,
   BackupPhraseConfirmScreen,
+  BundleExportScreen,
   BackupSuccessScreen,
   ChooseExperienceScreen,
   WalletCreationScreen,
@@ -170,6 +171,7 @@ import {
   RestoreMethodScreen,
   RestorePhraseScreen,
   CloudRestoreScreen,
+  OperatorUnreachableScreen,
 } from "@app/screens/self-custodial/onboarding/restore"
 import {
   MigrationBalancesOverviewScreen,
@@ -386,6 +388,7 @@ const totpRegistrationScreens = (LL: TranslationFunctions) => (
   </>
 )
 
+// eslint-disable-next-line max-lines-per-function -- RootStack is one flat route table; splitting it solely to meet the line cap would scatter screen registrations that are read as a single list
 export const RootStack = () => {
   const styles = useStyles()
   const {
@@ -1036,6 +1039,11 @@ export const RootStack = () => {
         }}
       />
       <RootNavigator.Screen
+        name="selfCustodialBackupBundleExport"
+        component={BundleExportScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
         name="selfCustodialBackupSuccess"
         component={BackupSuccessScreen}
         options={{ headerShown: false }}
@@ -1118,6 +1126,11 @@ export const RootStack = () => {
       <RootNavigator.Screen
         name="selfCustodialCloudRestore"
         component={CloudRestoreScreen}
+        options={{ title: "" }}
+      />
+      <RootNavigator.Screen
+        name="selfCustodialOperatorUnreachable"
+        component={OperatorUnreachableScreen}
         options={{ title: "" }}
       />
     </RootNavigator.Navigator>

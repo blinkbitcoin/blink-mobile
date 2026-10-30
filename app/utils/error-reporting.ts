@@ -71,6 +71,8 @@ export type RecordAppErrorOptions = {
   dedupKey?: string
   /** Bypass the connectivity downgrade (crash-adjacent sites); `expected` still wins. */
   alwaysRecord?: boolean
+  /** Crashlytics' name for the non-fatal, which groups its reports. */
+  jsErrorName?: string
   /** The unredacted text to classify, when the reported message has been scrubbed of
    *  the very words (a quoted server message) that mark it as connectivity. */
   classifyText?: string
@@ -185,5 +187,6 @@ export const recordAppError = (error: Error, options?: RecordAppErrorOptions): v
     if (recordedDedupKeys.has(options.dedupKey)) return
     recordedDedupKeys.add(options.dedupKey)
   }
-  crashlytics().recordError(error)
+  if (options?.jsErrorName) crashlytics().recordError(error, options.jsErrorName)
+  else crashlytics().recordError(error)
 }

@@ -12646,11 +12646,7 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
-			 * A​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​p​h​r​a​s​e
-			 */
-			encryptCheckbox: string
-			/**
-			 * P​a​s​s​p​h​r​a​s​e
+			 * P​a​s​s​w​o​r​d
 			 */
 			password: string
 			/**
@@ -12658,11 +12654,11 @@ type RootTranslation = {
 			 */
 			passwordPlaceholder: string
 			/**
-			 * C​o​n​f​i​r​m​ ​p​a​s​s​p​h​r​a​s​e
+			 * C​o​n​f​i​r​m​ ​p​a​s​s​w​o​r​d
 			 */
 			confirmPassword: string
 			/**
-			 * E​n​t​e​r​ ​p​a​s​s​p​h​r​a​s​e​ ​a​g​a​i​n
+			 * E​n​t​e​r​ ​p​a​s​s​w​o​r​d​ ​a​g​a​i​n
 			 */
 			confirmPasswordPlaceholder: string
 			/**
@@ -12674,7 +12670,7 @@ type RootTranslation = {
 			 */
 			importantTitle: string
 			/**
-			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​p​h​r​a​s​e​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
+			 * B​l​i​n​k​ ​d​o​e​s​ ​n​o​t​ ​s​t​o​r​e​ ​t​h​i​s​ ​p​a​s​s​w​o​r​d​.​ ​I​f​ ​y​o​u​ ​l​o​s​e​ ​i​t​,​ ​{​b​o​l​d​}​ ​t​o​ ​r​e​c​o​v​e​r​ ​y​o​u​r​ ​w​a​l​l​e​t​.
 			 * @param {string} bold
 			 */
 			importantMessage: RequiredParams<'bold'>
@@ -12687,7 +12683,7 @@ type RootTranslation = {
 			 */
 			passwordTooShort: string
 			/**
-			 * P​a​s​s​p​h​r​a​s​e​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
+			 * P​a​s​s​w​o​r​d​s​ ​d​o​ ​n​o​t​ ​m​a​t​c​h
 			 */
 			passwordMismatch: string
 			/**
@@ -12750,6 +12746,36 @@ type RootTranslation = {
 			 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
 			 */
 			networkError: string
+		}
+		BundleExport: {
+			/**
+			 * E​m​e​r​g​e​n​c​y​ ​e​x​i​t
+			 */
+			title: string
+			/**
+			 * I​f​ ​S​p​a​r​k​ ​g​o​e​s​ ​d​o​w​n​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​n​c​h​a​i​n​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​c​a​n​'​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​.
+			 */
+			body: string
+			/**
+			 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​u​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
+			 */
+			learnMore: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​b​u​n​d​l​e
+			 */
+			download: string
+			/**
+			 * S​e​n​s​i​t​i​v​e
+			 */
+			sensitiveTitle: string
+			/**
+			 * T​h​i​s​ ​f​i​l​e​ ​s​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​,​ ​s​o​ ​k​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.​ ​T​o​ ​u​s​e​ ​i​t​ ​i​n​ ​a​n​ ​e​m​e​r​g​e​n​c​y​,​ ​y​o​u​ ​a​l​s​o​ ​n​e​e​d​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+			 */
+			sensitiveBody: string
+			/**
+			 * D​o​w​n​l​o​a​d
+			 */
+			sensitiveConfirm: string
 		}
 		ManualBackup: {
 			Alerts: {
@@ -13458,11 +13484,11 @@ type RootTranslation = {
 		 */
 		noBackupDescription: string
 		/**
-		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​p​h​r​a​s​e
+		 * E​n​t​e​r​ ​y​o​u​r​ ​e​n​c​r​y​p​t​i​o​n​ ​p​a​s​s​w​o​r​d
 		 */
 		enterPassword: string
 		/**
-		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​p​h​r​a​s​e​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 * I​n​c​o​r​r​e​c​t​ ​p​a​s​s​w​o​r​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
 		 */
 		wrongPassword: string
 		/**
@@ -13481,6 +13507,25 @@ type RootTranslation = {
 		 * N​e​v​e​r​ ​e​n​t​e​r​ ​w​o​r​d​s​ ​s​o​m​e​o​n​e​ ​e​l​s​e​ ​s​e​n​t​ ​y​o​u​.
 		 */
 		recognizePhraseBody: string
+	}
+	EmergencyRecovery: {
+		/**
+		 * O​p​e​r​a​t​o​r​ ​u​n​r​e​a​c​h​a​b​l​e
+		 */
+		outageTitle: string
+		/**
+		 * S​p​a​r​k​ ​i​s​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​o​u​t​a​g​e​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​c​o​u​p​l​e​ ​m​i​n​u​t​e​s​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​ ​o​r​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​{​s​u​p​p​o​r​t​}
+		 * @param {string} support
+		 */
+		outageBody: RequiredParams<'support'>
+		/**
+		 * S​u​p​p​o​r​t
+		 */
+		outageSupport: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
+		 */
+		tryAgainLater: string
 	}
 	BackupNudge: {
 		/**
@@ -13824,6 +13869,31 @@ type RootTranslation = {
 		 * R​e​a​d
 		 */
 		cta: string
+	}
+	StaleCloudBundleBulletin: {
+		/**
+		 * U​p​d​a​t​e​ ​y​o​u​r​ ​c​l​o​u​d​ ​b​a​c​k​u​p
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​n​ ​{​p​r​o​v​i​d​e​r​}​ ​i​s​ ​o​u​t​ ​o​f​ ​d​a​t​e​.​ ​B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​a​g​a​i​n​ ​t​o​ ​u​p​d​a​t​e​ ​i​t​.
+		 * @param {string} provider
+		 */
+		body: RequiredParams<'provider'>
+		/**
+		 * B​a​c​k​ ​u​p​ ​a​g​a​i​n
+		 */
+		cta: string
+	}
+	RecoveryBundleScreen: {
+		/**
+		 * N​o​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​y​e​t​.​ ​I​t​'​s​ ​c​r​e​a​t​e​d​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		noBundleToExport: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​d​o​w​n​l​o​a​d​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.
+		 */
+		exportFailed: string
 	}
 	SelfCustodialOffline: {
 		/**
@@ -26639,11 +26709,7 @@ export type TranslationFunctions = {
 			 */
 			description: (arg: { provider: string }) => LocalizedString
 			/**
-			 * Add additional passphrase
-			 */
-			encryptCheckbox: () => LocalizedString
-			/**
-			 * Passphrase
+			 * Password
 			 */
 			password: () => LocalizedString
 			/**
@@ -26651,11 +26717,11 @@ export type TranslationFunctions = {
 			 */
 			passwordPlaceholder: () => LocalizedString
 			/**
-			 * Confirm passphrase
+			 * Confirm password
 			 */
 			confirmPassword: () => LocalizedString
 			/**
-			 * Enter passphrase again
+			 * Enter password again
 			 */
 			confirmPasswordPlaceholder: () => LocalizedString
 			/**
@@ -26667,7 +26733,7 @@ export type TranslationFunctions = {
 			 */
 			importantTitle: () => LocalizedString
 			/**
-			 * Blink does not store this passphrase. If you lose it, {bold} to recover your wallet.
+			 * Blink does not store this password. If you lose it, {bold} to recover your wallet.
 			 */
 			importantMessage: (arg: { bold: string }) => LocalizedString
 			/**
@@ -26679,7 +26745,7 @@ export type TranslationFunctions = {
 			 */
 			passwordTooShort: () => LocalizedString
 			/**
-			 * Passphrases do not match
+			 * Passwords do not match
 			 */
 			passwordMismatch: () => LocalizedString
 			/**
@@ -26735,6 +26801,36 @@ export type TranslationFunctions = {
 			 * Network error. Please check your connection and try again.
 			 */
 			networkError: () => LocalizedString
+		}
+		BundleExport: {
+			/**
+			 * Emergency exit
+			 */
+			title: () => LocalizedString
+			/**
+			 * If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Learn more about unilateral exit
+			 */
+			learnMore: () => LocalizedString
+			/**
+			 * Download bundle
+			 */
+			download: () => LocalizedString
+			/**
+			 * Sensitive
+			 */
+			sensitiveTitle: () => LocalizedString
+			/**
+			 * This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.
+			 */
+			sensitiveBody: () => LocalizedString
+			/**
+			 * Download
+			 */
+			sensitiveConfirm: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {
@@ -27435,11 +27531,11 @@ export type TranslationFunctions = {
 		 */
 		noBackupDescription: () => LocalizedString
 		/**
-		 * Enter your encryption passphrase
+		 * Enter your encryption password
 		 */
 		enterPassword: () => LocalizedString
 		/**
-		 * Incorrect passphrase. Please try again.
+		 * Incorrect password. Please try again.
 		 */
 		wrongPassword: () => LocalizedString
 		/**
@@ -27458,6 +27554,24 @@ export type TranslationFunctions = {
 		 * Never enter words someone else sent you.
 		 */
 		recognizePhraseBody: () => LocalizedString
+	}
+	EmergencyRecovery: {
+		/**
+		 * Operator unreachable
+		 */
+		outageTitle: () => LocalizedString
+		/**
+		 * Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support}
+		 */
+		outageBody: (arg: { support: string }) => LocalizedString
+		/**
+		 * Support
+		 */
+		outageSupport: () => LocalizedString
+		/**
+		 * Try again later
+		 */
+		tryAgainLater: () => LocalizedString
 	}
 	BackupNudge: {
 		/**
@@ -27798,6 +27912,30 @@ export type TranslationFunctions = {
 		 * Read
 		 */
 		cta: () => LocalizedString
+	}
+	StaleCloudBundleBulletin: {
+		/**
+		 * Update your cloud backup
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your emergency bundle in {provider} is out of date. Back up your wallet again to update it.
+		 */
+		body: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Back up again
+		 */
+		cta: () => LocalizedString
+	}
+	RecoveryBundleScreen: {
+		/**
+		 * No emergency bundle yet. It's created after your first transaction.
+		 */
+		noBundleToExport: () => LocalizedString
+		/**
+		 * Could not download the emergency bundle.
+		 */
+		exportFailed: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

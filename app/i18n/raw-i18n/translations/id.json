@@ -3840,20 +3840,28 @@
         "testSuccess": "Frasa cadanganmu sudah benar"
       }
     },
+    "BundleExport": {
+      "title": "Keluar darurat",
+      "body": "Jika Spark mati, paket ini memungkinkanmu memindahkan bitcoin-mu secara on-chain tanpa Blink. Saldo dolarmu tidak bisa dipulihkan.",
+      "download": "Unduh paket",
+      "sensitiveTitle": "Sensitif",
+      "learnMore": "Pelajari lebih lanjut tentang keluar sepihak",
+      "sensitiveConfirm": "Unduh",
+      "sensitiveBody": "Berkas ini menunjukkan saldo dan riwayat pembayaranmu, jadi rahasiakan. Untuk memakainya dalam keadaan darurat, kamu juga perlu frasa cadanganmu."
+    },
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
       "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
-      "encryptCheckbox": "Tambahkan frasa sandi tambahan",
-      "password": "Frasa sandi",
+      "password": "Kata sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
-      "confirmPassword": "Konfirmasi frasa sandi",
-      "confirmPasswordPlaceholder": "Masukkan frasa sandi lagi",
+      "confirmPassword": "Konfirmasi kata sandi",
+      "confirmPasswordPlaceholder": "Masukkan kata sandi lagi",
       "continueButton": "Lanjutkan",
       "importantTitle": "Penting",
-      "importantMessage": "Blink tidak menyimpan frasa sandi ini. Jika Anda kehilangannya, {bold} memulihkan dompet Anda.",
+      "importantMessage": "Blink tidak menyimpan kata sandi ini. Jika Anda kehilangannya, {bold} memulihkan dompet Anda.",
       "importantMessageBold": "kami tidak akan bisa",
       "passwordTooShort": "Minimal 12 karakter",
-      "passwordMismatch": "Frasa sandi tidak cocok",
+      "passwordMismatch": "Kata sandi tidak cocok",
       "uploadSuccess": "Cadangan disimpan ke {provider}",
       "uploadFailed": "Gagal mengunggah cadangan",
       "signInFailed": "Gagal masuk ke {provider}",
@@ -4037,12 +4045,18 @@
     "restore": "Pulihkan dompet",
     "noBackupFound": "Cadangan tidak ditemukan",
     "noBackupDescription": "Kami tidak dapat menemukan cadangan. Anda dapat memasukkan frasa cadangan secara manual.",
-    "enterPassword": "Masukkan frasa sandi enkripsi Anda",
-    "wrongPassword": "Frasa sandi salah. Silakan coba lagi.",
+    "enterPassword": "Masukkan kata sandi enkripsi Anda",
+    "wrongPassword": "Kata sandi salah. Silakan coba lagi.",
     "pickBackupTitle": "Pilih dompet",
     "pickBackupDescription": "Pilih cadangan untuk dipulihkan",
     "recognizePhraseTitle": "Apakah Anda mengenali frasa cadangan ini?",
     "recognizePhraseBody": "Jangan pernah memasukkan kata-kata yang dikirim orang lain kepada Anda."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operator tidak dapat dijangkau",
+    "outageBody": "Spark sedang mengalami gangguan. Tunggu beberapa menit lalu coba lagi atau hubungi {support} kami",
+    "outageSupport": "Dukungan",
+    "tryAgainLater": "Coba lagi nanti"
   },
   "BackupNudge": {
     "title": "Dana Anda dalam bahaya",
@@ -4137,6 +4151,15 @@
     "title": "Ini adalah akun non-kustodial",
     "body": "Untuk mempelajari lebih lanjut, baca postingan blog kami",
     "cta": "Baca"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Perbarui cadangan cloud-mu",
+    "body": "Paket darurat kamu di {provider} sudah usang. Cadangkan dompetmu lagi untuk memperbaruinya.",
+    "cta": "Cadangkan lagi"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Belum ada paket darurat. Paket dibuat setelah transaksi pertamamu.",
+    "exportFailed": "Tidak dapat mengunduh paket darurat."
   },
   "StableBalance": {
     "title": "Saldo stabil",

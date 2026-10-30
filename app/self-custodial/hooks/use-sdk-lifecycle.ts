@@ -24,7 +24,8 @@ import { logSdkEvent, SdkLogLevel } from "../logging"
 import { measureObservedPayment } from "../measurement"
 import {
   extractObservedPayment,
-  extractPaymentId,
+  paymentEventKey,
+  paymentIdFromEventKey,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
@@ -51,6 +52,12 @@ type SdkLifecycleState = {
   sdk: BreezSdkInterface | null
   connectedAccountId: string | null
   sdkStableBalanceActive?: boolean
+  /** `${event tag}:${payment id}` of the last received payment event (see
+   * paymentEventKey); null until one arrives. Tag-aware so a Pending →
+   * Succeeded transition for the same payment is a distinct value. */
+  lastPaymentEventKey: string | null
+  /** The payment id alone, for consumers that look the payment up by id and
+   * must not re-trigger on settlement of an already-seen payment. */
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -85,7 +92,7 @@ export const useSdkLifecycle = (
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [sdkStableBalanceActive, setSdkStableBalanceActive] = useState<boolean>()
-  const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
+  const [lastPaymentEventKey, setLastPaymentEventKey] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [sdk, setSdk] = useState<BreezSdkInterface | null>(null)
@@ -248,8 +255,8 @@ export const useSdkLifecycle = (
         if (!REFRESH_EVENTS.has(event.tag)) return
 
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
-          const paymentId = extractPaymentId(event)
-          if (paymentId) setLastReceivedPaymentId(paymentId)
+          const eventKey = paymentEventKey(event)
+          if (eventKey) setLastPaymentEventKey(eventKey)
         }
         await refreshWallets()
       })
@@ -363,6 +370,11 @@ export const useSdkLifecycle = (
     }
   }, [])
 
+  // Derived, not separate state: equal-by-value ids keep effect deps stable
+  // across a Pending -> Succeeded transition, preserving the id-keyed
+  // consumers' behavior.
+  const lastReceivedPaymentId = paymentIdFromEventKey(lastPaymentEventKey)
+
   return {
     wallets,
     allTransactions,
@@ -370,6 +382,7 @@ export const useSdkLifecycle = (
     sdk,
     connectedAccountId,
     sdkStableBalanceActive,
+    lastPaymentEventKey,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,
