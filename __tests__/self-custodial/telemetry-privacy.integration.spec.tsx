@@ -3,8 +3,8 @@
  * The privacy boundary end to end: the real TelemetryContextMount drives the real identity
  * owner and measurement gate, with only Firebase, storage and the active-account state
  * stubbed. What these pin is ordering — no self-custodial event reaches GA4 before the
- * Enhanced identity is fully in place, and no outcome crosses from the context it began
- * in to the one that followed.
+ * Enhanced identity is fully in place, no custodial-era event before the custodial one is,
+ * and no outcome crosses from the context it began in to the one that followed.
  */
 import { it } from "@jest/globals"
 import type * as ReactNamespace from "react"
@@ -13,6 +13,7 @@ import type * as Rntl from "@testing-library/react-native/pure"
 import type * as Components from "@app/self-custodial/components/telemetry-context-mount"
 import type * as Identity from "@app/self-custodial/analytics-identity"
 import type * as Measurement from "@app/self-custodial/measurement"
+import type * as LegacyAnalytics from "@app/utils/analytics"
 import type { PersistentState } from "@app/store/persistent-state/state-migrations"
 import { AccountMode } from "@app/types/account"
 
@@ -94,6 +95,7 @@ const boot = () => {
         mount: typeof Components
         identity: typeof Identity
         measurement: typeof Measurement
+        legacy: typeof LegacyAnalytics
       }
     | undefined
   jest.isolateModules(() => {
@@ -104,6 +106,7 @@ const boot = () => {
       mount: jest.requireActual("@app/self-custodial/components/telemetry-context-mount"),
       identity: jest.requireActual("@app/self-custodial/analytics-identity"),
       measurement: jest.requireActual("@app/self-custodial/measurement"),
+      legacy: jest.requireActual("@app/utils/analytics"),
     }
   })
   if (!loaded) throw new Error("modules did not load")
@@ -309,6 +312,113 @@ describe("self-custodial telemetry privacy boundary", () => {
       await settle()
 
       expect(mockLogEvent).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /** The custodial-era events in `utils/analytics` follow the custodial identity the way
+   *  sc_* events follow the Enhanced one: requested is not enough, applied is. */
+  describe("custodial-era events and the identity they go out under", () => {
+    const CUSTODIAL = { userId: "me-1", hasUsername: true, accountLevel: "TWO" }
+    const PAYMENT_ATTEMPT = { paymentType: "lightning", sendingWallet: "BTC" } as const
+    const loggedNamed = (name: string) =>
+      mockLogEvent.mock.calls.filter(([logged]) => logged === name)
+
+    it("holds a payment attempt made while switching back from Enhanced until the separation and the custodial id", async () => {
+      activate("sc-1", AccountMode.Enhanced)
+      const { identity, legacy, rerender } = boot()
+      identity.setCustodialIdentity(CUSTODIAL)
+      await settle()
+      expect(identity.isEnhancedIdentityApplied()).toBe(true)
+      const heldReset = deferred()
+      mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
+
+      activate(null, null)
+      rerender()
+      await settle()
+      legacy.logPaymentAttempt(PAYMENT_ATTEMPT as never)
+      await settle()
+      /** Sent now, it would land on the Enhanced app instance under the per-install id. */
+      expect(loggedNamed("payment_attempt")).toHaveLength(0)
+
+      heldReset.release()
+      await settle()
+
+      expect(loggedNamed("payment_attempt")).toHaveLength(1)
+      const logged = firstCall(mockLogEvent, ([name]) => name === "payment_attempt")
+      expect(logged).toBeGreaterThan(
+        mockResetAnalyticsData.mock.invocationCallOrder[
+          mockResetAnalyticsData.mock.calls.length - 1
+        ],
+      )
+      expect(logged).toBeGreaterThan(firstCall(mockSetUserId, ([id]) => id === "me-1"))
+      expect(logged).toBeGreaterThan(
+        mockSetAnalyticsCollectionEnabled.mock.invocationCallOrder[
+          mockSetAnalyticsCollectionEnabled.mock.calls.length - 1
+        ],
+      )
+    })
+
+    it("holds a destination parse made while leaving Incognito until collection is back on", async () => {
+      activate("sc-1", AccountMode.Anon)
+      const { identity, legacy, rerender } = boot()
+      identity.setCustodialIdentity(CUSTODIAL)
+      await settle()
+      const heldCollection = deferred()
+      mockSetAnalyticsCollectionEnabled.mockImplementation((...args: unknown[]) =>
+        args[0] === true ? heldCollection.promise : Promise.resolve(),
+      )
+
+      activate(null, null)
+      rerender()
+      await settle()
+      legacy.logParseDestinationResult({
+        valid: true,
+        validDestination: { paymentType: "lightning" },
+        destinationDirection: "Send",
+      } as never)
+      await settle()
+      /** Sent now, collection that is still off would drop it. */
+      expect(loggedNamed("payment_destination_accepted")).toHaveLength(0)
+
+      heldCollection.release()
+      await settle()
+
+      expect(loggedNamed("payment_destination_accepted")).toHaveLength(1)
+      expect(
+        firstCall(mockLogEvent, ([name]) => name === "payment_destination_accepted"),
+      ).toBeGreaterThan(
+        firstCall(mockSetAnalyticsCollectionEnabled, ([enabled]) => enabled === true),
+      )
+    })
+
+    it("drops what it held when the switch to custodial is overtaken by Incognito", async () => {
+      activate("sc-1", AccountMode.Enhanced)
+      const { identity, legacy, rerender } = boot()
+      identity.setCustodialIdentity(CUSTODIAL)
+      await settle()
+      const heldReset = deferred()
+      mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
+
+      activate(null, null)
+      rerender()
+      await settle()
+      legacy.logPaymentAttempt(PAYMENT_ATTEMPT as never)
+      activate("sc-1", AccountMode.Anon)
+      rerender()
+      heldReset.release()
+      await settle()
+
+      expect(loggedNamed("payment_attempt")).toHaveLength(0)
+    })
+
+    it("sends at once while the custodial identity is in place", async () => {
+      const { identity, legacy } = boot()
+      identity.setCustodialIdentity(CUSTODIAL)
+      await settle()
+
+      legacy.logPaymentAttempt(PAYMENT_ATTEMPT as never)
+
+      expect(loggedNamed("payment_attempt")).toHaveLength(1)
     })
   })
 

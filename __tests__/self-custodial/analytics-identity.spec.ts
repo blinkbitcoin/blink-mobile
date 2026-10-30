@@ -118,27 +118,30 @@ const orderOf = (mock: jest.Mock, matcher: (args: unknown[]) => boolean): number
 const userIdSetTo = (value: unknown) => (args: unknown[]) => args[0] === value
 const collectionSetTo = (value: boolean) => (args: unknown[]) => args[0] === value
 
+/** Every test starts from a clean Firebase and store. */
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockStore.clear()
+  mockInstanceId = () => Promise.resolve("install-uuid")
+  mockCrashCollectionEnabled = true
+  /** mockReset also drops a once-implementation a test left unused. */
+  mockSetCrashlyticsCollectionEnabled.mockReset()
+  mockSetCrashlyticsCollectionEnabled.mockImplementation(switchCrashCollection)
+  mockDeleteUnsentReports.mockReset()
+  mockDeleteUnsentReports.mockImplementation(resolved)
+  mockCheckForUnsentReports.mockReset()
+  mockCheckForUnsentReports.mockImplementation(nothingHeld)
+  ;[
+    mockSetUserId,
+    mockSetUserProperty,
+    mockSetUserProperties,
+    mockSetAnalyticsCollectionEnabled,
+    mockResetAnalyticsData,
+  ].forEach((mock) => mock.mockImplementation(resolved))
+}
+
 describe("analytics identity", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockStore.clear()
-    mockInstanceId = () => Promise.resolve("install-uuid")
-    mockCrashCollectionEnabled = true
-    /** mockReset also drops a once-implementation a test left unused. */
-    mockSetCrashlyticsCollectionEnabled.mockReset()
-    mockSetCrashlyticsCollectionEnabled.mockImplementation(switchCrashCollection)
-    mockDeleteUnsentReports.mockReset()
-    mockDeleteUnsentReports.mockImplementation(resolved)
-    mockCheckForUnsentReports.mockReset()
-    mockCheckForUnsentReports.mockImplementation(nothingHeld)
-    ;[
-      mockSetUserId,
-      mockSetUserProperty,
-      mockSetUserProperties,
-      mockSetAnalyticsCollectionEnabled,
-      mockResetAnalyticsData,
-    ].forEach((mock) => mock.mockImplementation(resolved))
-  })
+  beforeEach(resetMocks)
 
   describe("identity transitions", () => {
     it("attaches the custodial identity on a custodial start without resetting", async () => {
@@ -789,5 +792,126 @@ describe("analytics identity", () => {
       expect(cleanedUp).toBeLessThan(reopened)
       expect(id.isEnhancedIdentityApplied()).toBe(true)
     })
+  })
+})
+
+describe("custodial-era events", () => {
+  beforeEach(resetMocks)
+
+  const custodialApplied = async () => {
+    const id = freshModule()
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    return id
+  }
+
+  it("sends at once while the custodial identity is applied", async () => {
+    const id = await custodialApplied()
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+
+    expect(send).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds one made mid-transition until the custodial identity is applied", async () => {
+    const id = freshModule()
+    const heldId = deferred()
+    mockSetUserId.mockImplementation((...args: unknown[]) =>
+      args[0] === "me-1" ? heldId.promise : Promise.resolve(),
+    )
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+    await settle()
+    expect(send).not.toHaveBeenCalled()
+
+    heldId.release()
+    await settle()
+
+    expect(send).toHaveBeenCalledTimes(1)
+    expect(send.mock.invocationCallOrder[0]).toBeGreaterThan(
+      orderOf(mockSetAnalyticsCollectionEnabled, collectionSetTo(true)),
+    )
+  })
+
+  it("drops one made for a self-custodial account", async () => {
+    const id = freshModule()
+    id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+    await settle()
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  /** A repeat request starts a new transition; what the old one held is not its own. */
+  it("drops what an overtaken request held, even when the next is custodial too", async () => {
+    const id = freshModule()
+    const heldReset = deferred()
+    mockStore.set(SIDE_KEY, "self_custodial")
+    mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    heldReset.release()
+    await settle()
+
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it("drops one held past five minutes", async () => {
+    const id = freshModule()
+    const heldId = deferred()
+    mockSetUserId.mockImplementation((...args: unknown[]) =>
+      args[0] === "me-1" ? heldId.promise : Promise.resolve(),
+    )
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const now = Date.now()
+    const clock = jest.spyOn(Date, "now").mockReturnValue(now)
+    const stale = jest.fn()
+    const fresh = jest.fn()
+
+    id.reportCustodialEvent(stale)
+    clock.mockReturnValue(now + 4 * 60 * 1000)
+    id.reportCustodialEvent(fresh)
+    clock.mockReturnValue(now + 5 * 60 * 1000 + 1)
+    heldId.release()
+    await settle()
+    clock.mockRestore()
+
+    expect(stale).not.toHaveBeenCalled()
+    expect(fresh).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds at most 50, dropping the oldest", async () => {
+    const id = freshModule()
+    const heldId = deferred()
+    mockSetUserId.mockImplementation((...args: unknown[]) =>
+      args[0] === "me-1" ? heldId.promise : Promise.resolve(),
+    )
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const sends = Array.from({ length: 51 }, () => jest.fn())
+
+    sends.forEach((send) => id.reportCustodialEvent(send))
+    heldId.release()
+    await settle()
+
+    expect(sends[0]).not.toHaveBeenCalled()
+    sends.slice(1).forEach((send) => expect(send).toHaveBeenCalledTimes(1))
   })
 })

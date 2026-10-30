@@ -40,8 +40,14 @@ jest.mock("@react-native-firebase/analytics", () => () => ({
 }))
 
 let mockIsCustodial = true
+let mockIsCustodialApplied = true
+/** The identity owner's spec covers when a custodial event may go; here it is the
+ *  custodial account (applied, or still being put in place) or a self-custodial one. */
 jest.mock("@app/self-custodial/analytics-identity", () => ({
   isCustodialAnalyticsDomain: () => mockIsCustodial,
+  reportCustodialEvent: (send: () => unknown) => {
+    if (mockIsCustodial && mockIsCustodialApplied) send()
+  },
 }))
 
 const mockMeasure = jest.fn()
@@ -203,6 +209,48 @@ describe("analytics helpers", () => {
         sending_wallet: "BTC",
         payment_status: null,
       })
+    })
+  })
+
+  describe("while the custodial identity is still being put in place", () => {
+    afterEach(() => {
+      mockIsCustodialApplied = true
+    })
+
+    it("leaves every custodial-era event to the identity owner to send", () => {
+      mockIsCustodialApplied = false
+
+      logParseDestinationResult({
+        valid: true,
+        validDestination: { paymentType: "lightning" },
+        destinationDirection: "Send",
+      } as never)
+      logParseDestinationResult({
+        valid: false,
+        invalidReason: "InvoiceExpired",
+        invalidPaymentDestination: { paymentType: "lightning" },
+      } as never)
+      logPaymentAttempt({ paymentType: "lnurl" as never, sendingWallet: "BTC" as never })
+      logPaymentResult({
+        paymentType: "lnurl" as never,
+        sendingWallet: "BTC" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
+      logConversionAttempt({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+      })
+      logConversionResult({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
+      logToastShown({ message: "anchor", type: "success", isTranslated: false })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("toast_shown", expect.anything())
+      /** Still the custodial account's, so no sc_* event stands in for them. */
+      expect(mockMeasure).not.toHaveBeenCalled()
     })
   })
 
