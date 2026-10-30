@@ -1,6 +1,18 @@
+import React from "react"
+
+import {
+  ApolloClient,
+  ApolloLink,
+  ApolloProvider,
+  InMemoryCache,
+  Observable,
+  useQuery,
+  type QueryHookOptions,
+} from "@apollo/client"
 import { beforeEach, describe, expect, it, jest } from "@jest/globals"
 import { renderHook } from "@testing-library/react-hooks"
 
+import { CurrencyListDocument } from "@app/graphql/generated"
 import { useCurrencyList } from "@app/hooks/use-currency-list"
 import { AccountType } from "@app/types/wallet"
 
@@ -9,6 +21,7 @@ const mockUseAccountRegistry = jest.fn()
 const mockUseFiatRates = jest.fn()
 
 jest.mock("@app/graphql/generated", () => ({
+  ...jest.requireActual<object>("@app/graphql/generated"),
   useCurrencyListQuery: (options: unknown) => mockUseCurrencyListQuery(options),
 }))
 jest.mock("@app/hooks/use-account-registry", () => ({
@@ -76,8 +89,48 @@ describe("useCurrencyList", () => {
     renderHook(() => useCurrencyList())
 
     expect(mockUseCurrencyListQuery).toHaveBeenCalledWith(
-      expect.objectContaining({ fetchPolicy: "cache-and-network" }),
+      expect.objectContaining({ fetchPolicy: "cache-first" }),
     )
+  })
+
+  it("asks the backend once, however many consumers mount", async () => {
+    // Every price conversion and every display-currency consumer runs this hook, so a
+    // policy that goes to the network per mount sends a request each time a screen
+    // opens. This drives the real Apollo client and counts what reaches the link.
+    let requests = 0
+    const link = new ApolloLink(
+      () =>
+        new Observable((observer) => {
+          requests += 1
+          observer.next({
+            data: {
+              currencyList: backendNames.map((entry) => ({
+                __typename: "Currency",
+                ...entry,
+              })),
+            },
+          })
+          observer.complete()
+        }),
+    )
+    const client = new ApolloClient({ link, cache: new InMemoryCache() })
+    const wrapper = ({ children }: { children: React.ReactNode }) => (
+      <ApolloProvider client={client}>{children}</ApolloProvider>
+    )
+    mockUseCurrencyListQuery.mockImplementation((options) =>
+      useQuery(CurrencyListDocument, options as QueryHookOptions),
+    )
+
+    const first = renderHook(() => useCurrencyList(), { wrapper })
+    await first.waitFor(() => expect(first.result.current.currencyList).toHaveLength(2))
+    first.unmount()
+    const second = renderHook(() => useCurrencyList(), { wrapper })
+
+    expect(second.result.current.currencyList.map((entry) => entry.id)).toEqual([
+      "NGN",
+      "COP",
+    ])
+    expect(requests).toBe(1)
   })
 
   describe("wording", () => {

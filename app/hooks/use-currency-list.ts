@@ -43,12 +43,14 @@ export const useCurrencyList = (): CurrencyListResult => {
 
   /**
    * Asked even when the SDK has a list, because the backend's entries are the ones that
-   * win — see `mergeCurrencyLists`. It is a public, rarely-changing query served
-   * from the Apollo cache after the first hit, and `useDisplayCurrency` fetched it
-   * unconditionally before any of this, so this is not new traffic so much as traffic
-   * an earlier pass had removed.
+   * win — see `mergeCurrencyLists`.
+   *
+   * Cache-first, which is what `useDisplayCurrency` asked with before any of this. The
+   * list is public and rarely changes, and this hook runs inside every price conversion
+   * and every display-currency consumer: under cache-and-network each of those mounts
+   * sent its own request, every time a screen opened.
    */
-  const { data, loading } = useCurrencyListQuery({ fetchPolicy: "cache-and-network" })
+  const { data, loading } = useCurrencyListQuery({ fetchPolicy: "cache-first" })
   const backendCurrencies = data?.currencyList
 
   /**
