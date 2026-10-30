@@ -3840,20 +3840,28 @@
         "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
+    "BundleExport": {
+      "title": "Sortida d'emergència",
+      "body": "Si Spark deixa de funcionar, aquest paquet et permet moure els teus bitcoins a la cadena sense Blink. El teu saldo en dòlars no es pot recuperar.",
+      "download": "Baixa el paquet",
+      "sensitiveTitle": "Sensible",
+      "learnMore": "Més informació sobre la sortida unilateral",
+      "sensitiveConfirm": "Baixa",
+      "sensitiveBody": "Aquest fitxer mostra el teu saldo i l'historial de pagaments, així que mantén-lo privat. Per fer-lo servir en una emergència, també necessites la teva frase de còpia de seguretat."
+    },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
       "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
-      "encryptCheckbox": "Afegeix una frase de contrasenya addicional",
-      "password": "Frase de contrasenya",
+      "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
-      "confirmPassword": "Confirma la frase de contrasenya",
-      "confirmPasswordPlaceholder": "Introdueix la frase de contrasenya de nou",
+      "confirmPassword": "Confirmar contrasenya",
+      "confirmPasswordPlaceholder": "Introdueix la contrasenya de nou",
       "continueButton": "Continuar",
       "importantTitle": "Important",
-      "importantMessage": "Blink no emmagatzema aquesta frase de contrasenya. Si la perds, {bold} recuperar la teva cartera.",
+      "importantMessage": "Blink no emmagatzema aquesta contrasenya. Si la perds, {bold} recuperar la teva cartera.",
       "importantMessageBold": "no podrem",
       "passwordTooShort": "Mínim 12 caràcters",
-      "passwordMismatch": "Les frases de contrasenya no coincideixen",
+      "passwordMismatch": "Les contrasenyes no coincideixen",
       "uploadSuccess": "Còpia de seguretat desada a {provider}",
       "uploadFailed": "Error en pujar la còpia de seguretat",
       "signInFailed": "No s'ha pogut iniciar sessió a {provider}",
@@ -4037,12 +4045,18 @@
     "restore": "Restaurar cartera",
     "noBackupFound": "No s'ha trobat cap còpia de seguretat",
     "noBackupDescription": "No hem pogut trobar una còpia de seguretat. Pots introduir la teva frase de recuperació manualment.",
-    "enterPassword": "Introdueix la teva frase de contrasenya de xifratge",
-    "wrongPassword": "Frase de contrasenya incorrecta. Si us plau, torna-ho a provar.",
+    "enterPassword": "Introdueix la teva contrasenya de xifratge",
+    "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
     "pickBackupTitle": "Tria una cartera",
     "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar",
     "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
     "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operador inaccessible",
+    "outageBody": "Spark està patint una interrupció. Espera un parell de minuts i torna-ho a provar o contacta amb el nostre {support}",
+    "outageSupport": "Suport",
+    "tryAgainLater": "Torna-ho a provar més tard"
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",
@@ -4137,6 +4151,15 @@
     "title": "Aquest és un compte no custodi",
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
     "cta": "Llegeix"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualitza la teva còpia al núvol",
+    "body": "El teu paquet d'emergència a {provider} no està actualitzat. Torna a fer una còpia de seguretat de la cartera per actualitzar-lo.",
+    "cta": "Torna a fer la còpia"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
+    "exportFailed": "No s'ha pogut baixar el paquet d'emergència."
   },
   "StableBalance": {
     "title": "Balanç estable",

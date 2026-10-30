@@ -1,0 +1,241 @@
+import React from "react"
+import { Linking, StyleSheet } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
+
+import { render, fireEvent, screen, waitFor } from "@testing-library/react-native"
+
+import { UNILATERAL_EXIT_CASE_STUDY_URL } from "@app/config"
+import { loadLocale } from "@app/i18n/i18n-util.sync"
+import { i18nObject } from "@app/i18n/i18n-util"
+import type { TranslationFunctions } from "@app/i18n/i18n-types"
+import type { RecoveryBundleActions } from "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions"
+// Direct import: the onboarding barrel pulls in the biometrics screen, whose
+// native fingerprint dep is not transformed for jest.
+import { BundleExportScreen } from "@app/screens/self-custodial/onboarding/manual-backup/bundle-export-screen"
+
+import { ContextForScreen } from "../../helper"
+
+let LL: TranslationFunctions
+
+const mockActions: RecoveryBundleActions = {
+  bundleState: undefined,
+  sharing: false,
+  reloadState: jest.fn().mockResolvedValue(undefined),
+  handleShare: jest.fn().mockResolvedValue(true),
+}
+
+const mockToastShow = jest.fn()
+jest.mock("@app/utils/toast", () => ({
+  toastShow: (...args: unknown[]) => mockToastShow(...args),
+}))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  reportError: (...args: unknown[]) => mockReportError(...args),
+}))
+
+// The actions hook has its own spec; mocking it keeps this one about the
+// screen, without pulling in the keystore.
+jest.mock(
+  "@app/screens/self-custodial/recovery-backup/use-recovery-bundle-actions",
+  () => ({ useRecoveryBundleActions: () => mockActions }),
+)
+
+jest.mock("@react-navigation/native", () => {
+  const ReactActual = jest.requireActual("react")
+  return {
+    ...jest.requireActual("@react-navigation/native"),
+    useFocusEffect: (effect: () => (() => void) | undefined) => {
+      ReactActual.useEffect(effect, [effect])
+    },
+  }
+})
+
+const renderScreen = () =>
+  render(
+    <ContextForScreen>
+      <BundleExportScreen />
+    </ContextForScreen>,
+  )
+
+/** The inactive look is painted on the button's inner view, not its touchable. */
+const isDrawnInactive = (button: ReactTestInstance): boolean =>
+  button.findAll((node) => StyleSheet.flatten(node.props.style)?.opacity === 0.5).length >
+  0
+
+const savedBundle = { savedAt: 1, leafCount: 3 } as never
+
+describe("BundleExportScreen", () => {
+  beforeAll(() => {
+    loadLocale("en")
+    LL = i18nObject("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActions.bundleState = savedBundle
+    mockActions.sharing = false
+    // Restored per test: cases below replace these members outright.
+    mockActions.reloadState = jest.fn().mockResolvedValue(undefined)
+    mockActions.handleShare = jest.fn().mockResolvedValue(true)
+  })
+
+  it("explains the emergency exit", () => {
+    renderScreen()
+
+    expect(screen.getByText(LL.BackupScreen.BundleExport.title())).toBeTruthy()
+    expect(screen.getByText(LL.BackupScreen.BundleExport.body())).toBeTruthy()
+  })
+
+  /** Keeping the bundle current, on the device and in the cloud, happens in
+   *  the background, so the screen only hands over the copy saved here. */
+  it("offers only the download", () => {
+    renderScreen()
+
+    expect(screen.getByTestId("bundle-download-button")).toBeTruthy()
+    expect(screen.queryByTestId("bundle-skip-button")).toBeNull()
+  })
+
+  describe("download", () => {
+    it("warns before the first download and exports only on confirmation", async () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
+      // Assert the body too: React Native drops a bare string inside a View,
+      // so passing one to CustomModal renders a warning with no warning in it.
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveBody())).toBeTruthy()
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
+    })
+
+    /** The bundle alone cannot move funds: an exit also signs with the seed. */
+    it("warns that the file is private and needs the backup phrase to be used", () => {
+      expect(LL.BackupScreen.BundleExport.sensitiveBody()).toBe(
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
+      )
+    })
+
+    /** The toasts the download can end in, named the way the screen names the
+     *  file. Nothing reaches the network, so a failure is never a connection. */
+    it("names the emergency bundle in its toasts", () => {
+      expect(LL.RecoveryBundleScreen.noBundleToExport()).toBe(
+        "No emergency bundle yet. It's created after your first transaction.",
+      )
+      expect(LL.RecoveryBundleScreen.exportFailed()).toBe(
+        "Could not download the emergency bundle.",
+      )
+    })
+
+    it("does not re-warn on a second download", async () => {
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(2))
+    })
+
+    it("warns again after a dismissed share sheet", async () => {
+      mockActions.handleShare = jest.fn().mockResolvedValue(false)
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      fireEvent.press(screen.getByText(LL.BackupScreen.BundleExport.sensitiveConfirm()))
+      await waitFor(() => expect(mockActions.handleShare).toHaveBeenCalledTimes(1))
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+      expect(screen.getByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeTruthy()
+      expect(mockActions.handleShare).toHaveBeenCalledTimes(1)
+    })
+
+    /** A wallet that has never held funds has nothing to hand over: the
+     *  button looks inactive, but a tap says why instead of doing nothing. */
+    it("says to transact first when tapped before the wallet has a bundle", () => {
+      mockActions.bundleState = null
+      renderScreen()
+
+      fireEvent.press(screen.getByTestId("bundle-download-button"))
+
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({
+          message: LL.RecoveryBundleScreen.noBundleToExport(),
+          type: "warning",
+        }),
+      )
+      expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
+      expect(mockActions.handleShare).not.toHaveBeenCalled()
+    })
+
+    it("looks inactive without a bundle but still takes the tap", () => {
+      mockActions.bundleState = null
+      renderScreen()
+
+      const button = screen.getByTestId("bundle-download-button")
+      expect(isDrawnInactive(button)).toBe(true)
+      fireEvent.press(button)
+      expect(mockToastShow).toHaveBeenCalledTimes(1)
+    })
+
+    it("looks active once the wallet has a bundle", () => {
+      renderScreen()
+
+      expect(isDrawnInactive(screen.getByTestId("bundle-download-button"))).toBe(false)
+      expect(mockToastShow).not.toHaveBeenCalled()
+    })
+  })
+
+  /** Still reading is not "no bundle": no toast claiming there is none. */
+  it("does nothing on a tap while the saved bundle is still being read", () => {
+    mockActions.bundleState = undefined
+    renderScreen()
+
+    fireEvent.press(screen.getByTestId("bundle-download-button"))
+    expect(screen.queryByText(LL.BackupScreen.BundleExport.sensitiveTitle())).toBeNull()
+    expect(mockToastShow).not.toHaveBeenCalled()
+  })
+
+  it("re-reads the saved bundle when the screen comes into focus", () => {
+    renderScreen()
+
+    expect(mockActions.reloadState).toHaveBeenCalledTimes(1)
+  })
+
+  it("opens the unilateral exit article from learn more", () => {
+    const openURL = jest.spyOn(Linking, "openURL").mockResolvedValue(true)
+    renderScreen()
+
+    fireEvent.press(screen.getByTestId("bundle-learn-more"))
+    expect(openURL).toHaveBeenCalledWith(UNILATERAL_EXIT_CASE_STUDY_URL)
+  })
+
+  it("says so and reports it when the browser refuses to open the article", async () => {
+    const refusal = new Error("no browser")
+    jest.spyOn(Linking, "openURL").mockRejectedValue(refusal)
+    renderScreen()
+
+    fireEvent.press(screen.getByTestId("bundle-learn-more"))
+
+    await waitFor(() =>
+      expect(mockToastShow).toHaveBeenCalledWith(
+        expect.objectContaining({ message: LL.errors.generic() }),
+      ),
+    )
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Emergency exit case study link",
+      refusal,
+    )
+  })
+
+  it("survives a failing initial read", () => {
+    mockActions.reloadState = jest.fn().mockRejectedValue(new Error("nope"))
+
+    expect(() => renderScreen()).not.toThrow()
+  })
+})

@@ -3840,20 +3840,28 @@
         "testSuccess": "Yedekleme ifaden doğru"
       }
     },
+    "BundleExport": {
+      "title": "Acil çıkış",
+      "body": "Spark çökerse bu paket, bitcoin'ini Blink olmadan zincir üzerine taşımanı sağlar. Dolar bakiyen kurtarılamaz.",
+      "download": "Paketi indir",
+      "sensitiveTitle": "Hassas",
+      "learnMore": "Tek taraflı çıkış hakkında daha fazla bilgi",
+      "sensitiveConfirm": "İndir",
+      "sensitiveBody": "Bu dosya bakiyeni ve ödeme geçmişini gösterir, bu yüzden gizli tut. Acil bir durumda kullanmak için yedekleme ifadene de ihtiyacın var."
+    },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
-      "encryptCheckbox": "Ek parola ekle",
-      "password": "Parola",
+      "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
-      "confirmPassword": "Parolayı onayla",
-      "confirmPasswordPlaceholder": "Parolayı tekrar girin",
+      "confirmPassword": "Şifreyi onayla",
+      "confirmPasswordPlaceholder": "Şifreyi tekrar girin",
       "continueButton": "Devam et",
       "importantTitle": "Önemli",
-      "importantMessage": "Blink bu parolayı saklamaz. Kaybederseniz, {bold} cüzdanınızı kurtaramayız.",
+      "importantMessage": "Blink bu şifreyi saklamaz. Kaybederseniz, {bold} cüzdanınızı kurtaramayız.",
       "importantMessageBold": "cüzdanınızı kurtaramayız",
       "passwordTooShort": "En az 12 karakter",
-      "passwordMismatch": "Parolalar uyuşmuyor",
+      "passwordMismatch": "Şifreler uyuşmuyor",
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
       "signInFailed": "{provider} hesabınıza giriş yapılamadı",
@@ -4044,6 +4052,12 @@
     "recognizePhraseTitle": "Bu yedekleme ifadesini tanıyor musun?",
     "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operatöre ulaşılamıyor",
+    "outageBody": "Spark'ta bir kesinti yaşanıyor. Lütfen birkaç dakika bekleyip tekrar deneyin veya {support} ile iletişime geçin",
+    "outageSupport": "Destek",
+    "tryAgainLater": "Daha sonra dene"
+  },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",
     "description": "Cüzdanınızı şimdi güvenceye alın. Sadece bir dakika sürer.",
@@ -4137,6 +4151,15 @@
     "title": "Bu, saklamasız bir hesaptır",
     "body": "Daha fazla bilgi için blog yazımızı okuyun",
     "cta": "Oku"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Bulut yedeğini güncelle",
+    "body": "{provider} içindeki acil durum paketin güncel değil. Güncellemek için cüzdanını yeniden yedekle.",
+    "cta": "Yeniden yedekle"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Henüz acil durum paketi yok. İlk işleminden sonra oluşturulur.",
+    "exportFailed": "Acil durum paketi indirilemedi."
   },
   "StableBalance": {
     "title": "Sabit bakiye",

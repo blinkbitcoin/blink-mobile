@@ -3840,20 +3840,28 @@
         "testSuccess": "Maneno yako ya hifadhi ni sahihi"
       }
     },
+    "BundleExport": {
+      "title": "Kutoka kwa dharura",
+      "body": "Iwapo Spark itaacha kufanya kazi, kifurushi hiki hukuwezesha kuhamisha bitcoin zako on-chain bila Blink. Salio lako la dola haliwezi kurejeshwa.",
+      "download": "Pakua kifurushi",
+      "sensitiveTitle": "Nyeti",
+      "learnMore": "Jifunze zaidi kuhusu kutoka kwa upande mmoja",
+      "sensitiveConfirm": "Pakua",
+      "sensitiveBody": "Faili hili linaonyesha salio lako na historia ya malipo yako, kwa hiyo liweke faragha. Ili kulitumia wakati wa dharura, unahitaji pia kifungu chako cha akiba."
+    },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
       "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
-      "encryptCheckbox": "Ongeza kaulisiri ya ziada",
-      "password": "Kaulisiri",
+      "password": "Nywila",
       "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
-      "confirmPassword": "Thibitisha kaulisiri",
-      "confirmPasswordPlaceholder": "Ingiza kaulisiri tena",
+      "confirmPassword": "Thibitisha nywila",
+      "confirmPasswordPlaceholder": "Ingiza nywila tena",
       "continueButton": "Endelea",
       "importantTitle": "Muhimu",
-      "importantMessage": "Blink haihifadhi kaulisiri hii. Ukiipoteza, {bold} kurejesha mkoba wako.",
+      "importantMessage": "Blink haihifadhi nywila hii. Ukiipoteza, {bold} kurejesha mkoba wako.",
       "importantMessageBold": "hatutaweza",
       "passwordTooShort": "Herufi 12 ndogo zaidi",
-      "passwordMismatch": "Kaulisiri hazifanani",
+      "passwordMismatch": "Nywila hazifanani",
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
       "uploadFailed": "Imeshindwa kupakia nakala",
       "signInFailed": "Imeshindwa kuingia katika {provider}",
@@ -4037,12 +4045,18 @@
     "restore": "Rejesha mkoba",
     "noBackupFound": "Hakuna hifadhi iliyopatikana",
     "noBackupDescription": "Hatukupata hifadhi. Unaweza kuingiza msemo wako wa hifadhi kwa mkono.",
-    "enterPassword": "Ingiza kaulisiri yako ya usimbaji",
-    "wrongPassword": "Kaulisiri si sahihi. Tafadhali jaribu tena.",
+    "enterPassword": "Ingiza nenosiri lako la usimbaji",
+    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
     "pickBackupTitle": "Chagua pochi",
     "pickBackupDescription": "Chagua nakala rudufu ya kurejesha",
     "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
     "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Mwendeshaji hapatikani",
+    "outageBody": "Spark inakabiliwa na hitilafu. Tafadhali subiri dakika chache ujaribu tena au wasiliana na {support} wetu",
+    "outageSupport": "Msaada",
+    "tryAgainLater": "Jaribu tena baadaye"
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",
@@ -4137,6 +4151,15 @@
     "title": "Hii ni akaunti isiyo ya udhamini",
     "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
     "cta": "Soma"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Sasisha nakala yako ya wingu",
+    "body": "Kifurushi chako cha dharura kwenye {provider} kimepitwa na wakati. Hifadhi nakala ya mkoba wako tena ili kukisasisha.",
+    "cta": "Hifadhi nakala tena"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Bado hakuna kifurushi cha dharura. Kinaundwa baada ya muamala wako wa kwanza.",
+    "exportFailed": "Imeshindwa kupakua kifurushi cha dharura."
   },
   "StableBalance": {
     "title": "Salio thabiti",

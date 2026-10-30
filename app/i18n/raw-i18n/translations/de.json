@@ -3840,20 +3840,28 @@
                 "testSuccess": "Deine Wiederherstellungsphrase ist korrekt"
             }
         },
+        "BundleExport": {
+            "title": "Notfall-Ausstieg",
+            "body": "Falls Spark ausfällt, kannst du mit diesem Bundle deine Bitcoin ohne Blink On-Chain bewegen. Dein Dollar-Guthaben lässt sich nicht wiederherstellen.",
+            "download": "Bundle herunterladen",
+            "sensitiveTitle": "Sensibel",
+            "learnMore": "Mehr über den einseitigen Ausstieg",
+            "sensitiveConfirm": "Herunterladen",
+            "sensitiveBody": "Diese Datei zeigt dein Guthaben und deinen Zahlungsverlauf, also halte sie privat. Um sie im Notfall zu nutzen, brauchst du außerdem deine Wiederherstellungsphrase."
+        },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
             "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
-            "encryptCheckbox": "Zusätzliche Passphrase hinzufügen",
-            "password": "Passphrase",
+            "password": "Passwort",
             "passwordPlaceholder": "(mindestens 12 Zeichen)",
-            "confirmPassword": "Passphrase bestätigen",
-            "confirmPasswordPlaceholder": "Passphrase erneut eingeben",
+            "confirmPassword": "Passwort bestätigen",
+            "confirmPasswordPlaceholder": "Passwort erneut eingeben",
             "continueButton": "Weiter",
             "importantTitle": "Wichtig",
-            "importantMessage": "Blink speichert diese Passphrase nicht. Wenn Sie sie verlieren, {bold} Ihre Brieftasche wiederherstellen.",
+            "importantMessage": "Blink speichert dieses Passwort nicht. Wenn Sie es verlieren, {bold} Ihre Brieftasche wiederherstellen.",
             "importantMessageBold": "können wir nicht",
             "passwordTooShort": "Mindestens 12 Zeichen",
-            "passwordMismatch": "Passphrasen stimmen nicht überein",
+            "passwordMismatch": "Passwörter stimmen nicht überein",
             "uploadSuccess": "Sicherung in {provider} gespeichert",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
             "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
@@ -4037,12 +4045,18 @@
         "restore": "Wallet wiederherstellen",
         "noBackupFound": "Kein Backup gefunden",
         "noBackupDescription": "Wir konnten kein Backup finden. Du kannst deine Sicherungsphrase manuell eingeben.",
-        "enterPassword": "Gib deine Verschlüsselungs-Passphrase ein",
-        "wrongPassword": "Falsche Passphrase. Bitte versuche es erneut.",
+        "enterPassword": "Gib dein Verschlüsselungspasswort ein",
+        "wrongPassword": "Falsches Passwort. Bitte versuche es erneut.",
         "pickBackupTitle": "Wallet auswählen",
         "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen",
         "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
         "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
+    },
+    "EmergencyRecovery": {
+        "outageTitle": "Betreiber nicht erreichbar",
+        "outageBody": "Bei Spark gibt es eine Störung. Bitte warte ein paar Minuten und versuche es erneut oder kontaktiere unseren {support}",
+        "outageSupport": "Support",
+        "tryAgainLater": "Später erneut versuchen"
     },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",
@@ -4137,6 +4151,15 @@
         "title": "Dies ist ein nicht-verwahrtes Konto",
         "body": "Lies unseren Blogbeitrag, um mehr zu erfahren",
         "cta": "Lesen"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Aktualisiere dein Cloud-Backup",
+        "body": "Dein Notfall-Bundle in {provider} ist veraltet. Sichere deine Brieftasche erneut, um es zu aktualisieren.",
+        "cta": "Erneut sichern"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Noch kein Notfall-Bundle. Es wird nach deiner ersten Transaktion erstellt.",
+        "exportFailed": "Das Notfall-Bundle konnte nicht heruntergeladen werden."
     },
     "StableBalance": {
         "title": "Stabiles Guthaben",

@@ -16,6 +16,7 @@ import {
 import { logSelfCustodialRestoreCompleted } from "@app/self-custodial/analytics"
 import { selfCustodialRestoreWallet } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
+import { classifySdkError, SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 import {
   BackupMethod,
   markBackupCompletedFor,
@@ -72,8 +73,11 @@ export const useRestoreWallet = () => {
     [updateState],
   )
 
+  /** `method` is where the phrase came from, recorded as the account's backup: a
+   *  cloud restore means the seed is already in the cloud, so the emergency
+   *  bundle follows it there. A typed phrase leaves the bundle on the device. */
   const restore = useCallback(
-    async (mnemonic: string) => {
+    async (mnemonic: string, method: BackupMethod = BackupMethod.Manual) => {
       await guard.run(async () => {
         setStatus(RestoreWalletStatus.Restoring)
 
@@ -91,6 +95,12 @@ export const useRestoreWallet = () => {
           /** Already on this device, so its mode is already stored: re-entering the
            *  phrase is not a new answer about how the account should behave. */
           if (lookup.id) {
+            /** A cloud restore proves the seed is in the cloud whether or not the
+             *  account was already here, so it is recorded the same way as a new one
+             *  and the bundle follows it there. A typed phrase made no new backup. */
+            const isCloudRestore = method === BackupMethod.Cloud
+            if (isCloudRestore)
+              await markBackupCompletedFor(lookup.id, BackupMethod.Cloud)
             activateAccount(lookup.id)
             reinitSdk()
             logSelfCustodialRestoreCompleted()
@@ -105,7 +115,7 @@ export const useRestoreWallet = () => {
             network,
             leewaySatPerVbyte: selfCustodialDepositClaimLeewayVbyte,
           })
-          await markBackupCompletedFor(accountId, BackupMethod.Manual)
+          await markBackupCompletedFor(accountId, method)
           await reloadSelfCustodialAccounts()
 
           activateAccount(accountId)
@@ -129,6 +139,14 @@ export const useRestoreWallet = () => {
         } catch (err) {
           reportError("Wallet restore", err)
           setStatus(RestoreWalletStatus.Error)
+          // An outage and a wrong phrase are indistinguishable inside this
+          // catch, and the generic "check your phrase" toast sends an outage
+          // victim looking for a mistake they did not make, so the operators
+          // being unreachable gets its own screen.
+          if (classifySdkError(err) === SelfCustodialErrorCode.NetworkError) {
+            navigation.navigate("selfCustodialOperatorUnreachable")
+            return
+          }
           toastShow({ message: LL.RestoreScreen.restoreFailed(), LL })
           throw err
         }
