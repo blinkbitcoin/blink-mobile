@@ -27,6 +27,7 @@ const PINNED_SURFACE = [
   "clearUninstallSurvivingCredentials",
   "deleteMnemonicForAccount",
   "erase",
+  "eraseLegacyPinAttemptsOnce",
   "getActiveToken",
   "getIsBiometricsEnabled",
   "getIsPinEnabled",

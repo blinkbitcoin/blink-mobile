@@ -11,6 +11,8 @@ import {
   listSelfCustodialAccounts,
   StorageReadStatus,
 } from "@app/self-custodial/storage/account-index"
+import { readPinLockState } from "@app/screens/authentication-screen/pin-verification"
+import { serverFor } from "@app/utils/storage/secure-store"
 import KeyStoreWrapper, { GALOY_AUTH_TOKEN_KEY } from "@app/utils/storage/secureStorage"
 
 /**
@@ -412,5 +414,38 @@ describe("writes after one the disk refused", () => {
       profiles: [{ token: "saved" }],
     })
     expect(await KeyStoreWrapper.getPin()).toBe(PIN)
+  })
+})
+
+describe("the PIN lock repair after a seed erase the disk refused", () => {
+  const DAY_MS = 24 * 60 * 60 * 1000
+
+  it("keeps the seed when the repair's erase of the legacy count is the next write to land", async () => {
+    await storeWallet(WALLET_ID)
+    // An upgraded install whose launch read a legacy count, so the next write to the PIN
+    // state still erases it from the legacy store.
+    storeLegacyValue("pinAttempts", "1")
+    await KeyStoreWrapper.getPinFailureState()
+    // A lock further out than one failure warrants, as a clock corrected backward leaves it.
+    const now = Date.now()
+    mockNewKeychain.set(
+      serverFor("pinFailureState"),
+      JSON.stringify({ attempts: 1, lockedUntil: now + DAY_MS }),
+    )
+    mockLegacyPrefs.isFileWriteFailing = true
+    const outcome = await deleteLastWallet()
+    mockLegacyPrefs.isFileWriteFailing = false
+
+    const lock = await readPinLockState(now)
+
+    expect(outcome).toBeUndefined()
+    expect(lock).toEqual({
+      status: "readable",
+      state: { attempts: 1, lockedUntil: now + 10_000 },
+    })
+    // The repair's legacy erase reached disk, and the seed's refused erase did not go with it.
+    expect(mockLegacyPrefs.file.has("pinAttempts")).toBe(false)
+    expect(mockLegacyPrefs.file.get(SEED_KEY)).toBe(SEED)
+    expect(await listedWalletIds()).toEqual([WALLET_ID])
   })
 })

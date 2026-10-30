@@ -6813,9 +6813,18 @@ type RootTranslation = {
 	}
 	PinScreen: {
 		/**
-		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.
+		 */
+		attemptBudgetSpent: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.
 		 */
 		attemptUnrecorded: string
+		/**
+		 * {​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
+		 * @param {number} attemptsRemaining
+		 */
+		attemptsLeft: RequiredParams<'attemptsRemaining'>
 		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​{​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
 		 * @param {number} attemptsRemaining
@@ -6825,6 +6834,10 @@ type RootTranslation = {
 		 * E​n​t​e​r​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
 		enterPin: string
+		/**
+		 * 1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
+		 */
+		oneAttemptLeft: string
 		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
@@ -6849,6 +6862,11 @@ type RootTranslation = {
 		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
 		 */
 		tooManyAttempts: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​t​i​m​e​}​.
+		 * @param {string} time
+		 */
+		tryAgainIn: RequiredParams<'time'>
 		/**
 		 * V​e​r​i​f​y​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
@@ -21047,9 +21065,17 @@ export type TranslationFunctions = {
 	}
 	PinScreen: {
 		/**
-		 * Couldn't record the failed attempt securely. Logging out.
+		 * Too many failed attempts.
+		 */
+		attemptBudgetSpent: () => LocalizedString
+		/**
+		 * Couldn't record the attempt securely.
 		 */
 		attemptUnrecorded: () => LocalizedString
+		/**
+		 * {attemptsRemaining} attempts remaining.
+		 */
+		attemptsLeft: (arg: { attemptsRemaining: number }) => LocalizedString
 		/**
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
@@ -21058,6 +21084,10 @@ export type TranslationFunctions = {
 		 * Enter your PIN code
 		 */
 		enterPin: () => LocalizedString
+		/**
+		 * 1 attempt remaining.
+		 */
+		oneAttemptLeft: () => LocalizedString
 		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
@@ -21082,6 +21112,10 @@ export type TranslationFunctions = {
 		 * Too many failed attempts. Logging out.
 		 */
 		tooManyAttempts: () => LocalizedString
+		/**
+		 * Try again in {time}.
+		 */
+		tryAgainIn: (arg: { time: string }) => LocalizedString
 		/**
 		 * Verify your PIN code
 		 */
