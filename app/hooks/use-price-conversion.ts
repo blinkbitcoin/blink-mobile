@@ -99,8 +99,9 @@ export const usePriceConversion = () => {
   /**
    * Breez quotes whole units and the app works in minor ones, so the display currency's
    * fraction size is what makes its rates comparable with the backend's. Taken from the
-   * resolved list rather than the SDK's own, so the backend can supply it when the SDK's
-   * currency call failed while its rates call succeeded.
+   * resolved list rather than the SDK's own: that is the size every amount is formatted
+   * with, and it is the backend's wherever the backend lists the currency, which is the
+   * only size its own rate is right under. A whole-unit rate scales to either.
    */
   const { currencyList } = useCurrencyList()
   const fractionDigits = currencyList.find(

@@ -24,60 +24,51 @@ export type CurrencyListSource = {
   hasSettled: boolean
 }
 
+const NO_CURRENCIES: readonly DisplayCurrencyEntry[] = Object.freeze([])
+
 export const noCurrencyListSource: CurrencyListSource = Object.freeze({
-  currencies: Object.freeze([]),
+  currencies: NO_CURRENCIES,
   hasSettled: true,
 })
 
-/** The first source with a list, or the last one when none has yet. */
-export const firstPopulatedCurrencyList = (
-  ...sources: CurrencyListSource[]
-): CurrencyListSource =>
-  sources.find((source) => source.currencies.length > 0) ??
-  sources[sources.length - 1] ??
-  noCurrencyListSource
-
 /**
- * Takes the presentational fields from `preferred` wherever it names the same currency,
- * keeping everything else from `base`.
+ * Every currency any of the lists carries, in preference order: where two lists name the
+ * same code, the entry of the earlier one is taken whole.
  *
- * The Breez feed and the backend disagree on wording. Breez carries the raw ISO 4217
- * name column, which is inconsistent — "US Dollar" and "Colombian Peso" are qualified,
- * "Naira" and "Cordoba Oro" are not — while the backend's names are uniformly
- * country-qualified, which is what the picker has always shown. The feed is still the
- * authority on *which* currencies exist and how many decimals they carry, because that
- * is what has to be right when the backend cannot be reached; only the words come from
- * the backend, and only while it is answering.
+ * Whole, `fractionDigits` included, because the two sources quote prices in different
+ * units. The Breez feed prices a whole unit of the currency, so its rate scales to any
+ * fraction size; the backend's `realtimePrice` is already in *its own* minor units, so
+ * it is right only under the backend's fraction size. Where the two disagree (COP, HUF,
+ * LBP and UYU did when this was written), taking the backend's entry keeps both rates
+ * right, while taking the feed's mispriced a backend rate a hundredfold. The backend's
+ * wording is also the one the picker has always shown: Breez carries the raw ISO 4217
+ * name column, so "Naira" where the backend says "Nigerian Naira".
  *
- * `fractionDigits` deliberately stays with `base`: it is the input the amount was priced
- * with, not a label, and taking it from a different source than the rate would be a way
- * to misprice.
+ * A union rather than a choice, because neither list contains the other. The backend
+ * carries currencies the feed does not (GHS, TZS, XAF among them), and an account whose
+ * display currency is one of those is still priced, by the backend; without its entry
+ * the amount was formatted with dollar defaults. The feed carries a few the backend does
+ * not, and is all there is while the backend cannot be reached.
  *
- * Returns `base` unchanged when nothing differs, so a memoised consumer does not
- * re-render for an overlay that said the same thing.
+ * Returns the first list itself when the others add nothing, so a memoised consumer does
+ * not re-render for a merge that changed nothing.
  */
-export const withPreferredNames = (
-  base: readonly DisplayCurrencyEntry[],
-  preferred: readonly DisplayCurrencyEntry[],
+export const mergeCurrencyLists = (
+  ...lists: (readonly DisplayCurrencyEntry[])[]
 ): readonly DisplayCurrencyEntry[] => {
-  if (base.length === 0 || preferred.length === 0 || base === preferred) return base
+  const populated = lists.filter((list) => list.length > 0)
+  const [first, ...rest] = populated
+  if (!first) return NO_CURRENCIES
 
-  const byCode = new Map(preferred.map((entry) => [entry.id.toUpperCase(), entry]))
-  let changed = false
+  const seen = new Set(first.map((entry) => entry.id.toUpperCase()))
+  const additions = rest.flatMap((list) =>
+    list.filter((entry) => {
+      const code = entry.id.toUpperCase()
+      if (seen.has(code)) return false
+      seen.add(code)
+      return true
+    }),
+  )
 
-  const merged = base.map((entry) => {
-    const named = byCode.get(entry.id.toUpperCase())
-    if (
-      !named ||
-      (named.name === entry.name &&
-        named.flag === entry.flag &&
-        named.symbol === entry.symbol)
-    ) {
-      return entry
-    }
-    changed = true
-    return { ...entry, name: named.name, flag: named.flag, symbol: named.symbol }
-  })
-
-  return changed ? merged : base
+  return additions.length > 0 ? [...first, ...additions] : first
 }

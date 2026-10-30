@@ -294,10 +294,14 @@ was the larger half of this phase.
   balance needs; losing them because the currency list failed would be the
   worse trade.
 - **One adapter** — [use-currency-list.ts](../app/hooks/use-currency-list.ts)
-  picks the source: the SDK for a self-custodial account that has a list, the
-  backend otherwise and for custodial always. It reports `isUnavailable` so the
-  picker can say so instead of spinning, which only a self-custodial session can
-  reach.
+  merges the two for a self-custodial account and reads the backend alone for a
+  custodial one. The merge is a union, and where both lists name a code the
+  backend's entry is taken whole, `fractionDigits` included: neither list
+  contains the other (the backend carries GHS, TZS and XAF, the feed does not),
+  and the two disagree on the fraction size of COP, HUF, LBP and UYU, where only
+  the backend's size is right for the backend's own rate. It reports
+  `isUnavailable` so the picker can say so instead of spinning, which only a
+  self-custodial session can reach.
 - **Consumers repointed**: `useDisplayCurrency` (the formatting dictionary),
   `display-currency-screen`, and `use-display-currency-from-region`.
 
@@ -733,7 +737,7 @@ and the price specs construct fakes rather than mocking module paths.
 **Landed**, with one claim above corrected.
 
 `PriceSource` and `CurrencyListSource` are declared in `app/types/`, alongside
-`firstPricedSource` / `firstPopulatedCurrencyList` — the selection rule that was
+`firstPricedSource` / `mergeCurrencyLists` — the selection rule that was
 a chain of `??` in the middle of the hook. Four adapters implement them:
 `createSelfCustodialPriceSource`, `createCustodialPriceSource`,
 `createSelfCustodialCurrencyList`, `createCustodialCurrencyList`. Both hooks now

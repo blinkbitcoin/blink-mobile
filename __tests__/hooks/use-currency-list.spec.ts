@@ -67,7 +67,7 @@ describe("useCurrencyList", () => {
     expect(result.current.loading).toBe(false)
   })
 
-  it("still asks the backend when the SDK has a list, for the wording", () => {
+  it("still asks the backend when the SDK has a list, since its entries win", () => {
     // Breez carries the raw ISO 4217 names; the backend's are the uniformly
     // country-qualified ones the picker has always shown.
     selfCustodial()
@@ -96,10 +96,48 @@ describe("useCurrencyList", () => {
       expect(byId("COP")?.name).toBe("Colombian Peso")
     })
 
-    it("keeps the SDK's membership, not the backend's", () => {
-      // The SDK list is what can still be priced offline; the overlay only renames.
+    it("carries every code either list has, the backend's first", () => {
+      // Neither contains the other: the feed alone is what is left offline, and the
+      // backend alone prices some currencies the feed does not carry.
       selfCustodial()
       fiatRates(sdkList)
+      mockUseCurrencyListQuery.mockReturnValue({
+        data: { currencyList: [...backendNames, ...backendList] },
+        loading: false,
+      })
+
+      const { result } = renderHook(() => useCurrencyList())
+
+      expect(result.current.currencyList.map((c) => c.id)).toEqual([
+        "NGN",
+        "COP",
+        "EUR",
+        "USD",
+      ])
+    })
+
+    it("formats a currency only the backend carries with the backend's entry", () => {
+      // The account is priced by the backend there; without the entry its amounts were
+      // formatted with dollar defaults.
+      selfCustodial()
+      fiatRates(sdkList)
+      mockUseCurrencyListQuery.mockReturnValue({
+        data: { currencyList: backendList },
+        loading: false,
+      })
+
+      const { result } = renderHook(() => useCurrencyList())
+
+      expect(result.current.currencyList.find((c) => c.id === "EUR")).toEqual(
+        backendList[0],
+      )
+    })
+
+    it("takes the backend's fraction size where the two disagree", () => {
+      // The backend's rate is in its own minor units, so its size is the only one both
+      // rates are right under.
+      selfCustodial()
+      fiatRates([{ ...sdkList[2], fractionDigits: 0 }])
       mockUseCurrencyListQuery.mockReturnValue({
         data: { currencyList: backendNames },
         loading: false,
@@ -107,7 +145,9 @@ describe("useCurrencyList", () => {
 
       const { result } = renderHook(() => useCurrencyList())
 
-      expect(result.current.currencyList.map((c) => c.id)).toEqual(["USD", "NGN", "COP"])
+      expect(
+        result.current.currencyList.find((c) => c.id === "COP")?.fractionDigits,
+      ).toBe(2)
     })
 
     /**
