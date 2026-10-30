@@ -373,6 +373,9 @@ type PurgeResult =
   /** Every store answered and a mnemonic is not in the new one, which no later
    *  boot changes on its own. */
   | { status: "unmigrated" }
+  /** Every key the pass could name is gone, but the index holds entries it cannot
+   *  read as accounts, and a mnemonic under one of them was never named. */
+  | { status: "index-damaged" }
   | { status: "skipped"; reason: PurgeSkippedReason }
 
 /**
@@ -597,6 +600,8 @@ const logPurgeOutcome = (outcome: string): void => {
  * itself left nothing behind. It is still counted, because a pass that finishes
  * and cannot record itself is the purge's own outcome, and the release that drops
  * the dependency has to tell that install from one that never launched.
+ * `index-damaged` is not one either: the strict index read already raised the
+ * damage where it found it, and it is counted for the same reason.
  */
 const reportPurgeOutcome = (result: PurgeResult): PurgeResult => {
   const outcome = result.status === "skipped" ? result.reason : result.status
@@ -706,6 +711,12 @@ export const purgeLegacyKeyStoreOnce = async (
     return reportPurgeOutcome({ status: "skipped", reason: "index-unreadable" })
   }
 
+  // The lenient read names what it can, and the strict one says whether that was
+  // everything: readIndex drops an entry it cannot read rather than failing, and a
+  // mnemonic only that entry named would never be reached by this pass.
+  const indexed = await readSelfCustodialAccountIds()
+  const isIndexWhole = indexed.status === StorageReadStatus.Ok
+
   const accountIds = result.entries.map((entry) => entry.id)
   const purgedSlots = await readPurgedSlots()
   const purged = await KeyStoreWrapper.purgeLegacyKeyStore(accountIds, purgedSlots)
@@ -752,6 +763,11 @@ export const purgeLegacyKeyStoreOnce = async (
   // flag's own lifetime resets at a reinstall, and so does this. Through the same
   // helper as the other two counter operations, which swallows its own failures.
   await remove(LEGACY_PURGE_ATTEMPTS_KEY)
+
+  // A damaged index gates the flag the same way. Uncounted, like a store that
+  // could not answer: the next write to the index rewrites it from what readIndex
+  // could read, and the launch after that can finish.
+  if (!isIndexWhole) return reportPurgeOutcome({ status: "index-damaged" })
 
   // The sweep's verdict gates the flag, not the pass: every key this launch could
   // name is gone, and the marker keeps that, but an account the sweep could not

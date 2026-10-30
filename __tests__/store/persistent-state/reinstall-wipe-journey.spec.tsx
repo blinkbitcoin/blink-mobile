@@ -10,6 +10,7 @@ import {
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge/lifecycle"
 import {
+  purgeLegacyKeyStoreOnce,
   setSelfCustodialLightningAddress,
   sweepMnemonicMigration,
 } from "@app/self-custodial/storage/account-index"
@@ -624,5 +625,39 @@ describe("a mnemonic that a read migrated", () => {
     await boot()
 
     expect(deviceSecrets()).toEqual([])
+  })
+})
+
+describe("the legacy purge over a damaged index", () => {
+  /**
+   * readIndex lists the entries it can read and drops the rest, so a wallet whose entry is
+   * damaged is one the pass never names. Its seed is only in the legacy store and nothing
+   * tracks it, so a flag written here would retire the purge with that seed still there,
+   * and the release that drops the dependency would take its only reader.
+   */
+  it("never records itself done while a damaged entry names a seed only the legacy store holds", async () => {
+    mockAsyncStorage.set(
+      INDEX_KEY,
+      JSON.stringify([
+        { id: UPGRADED_ACCOUNT, lightningAddress: null },
+        { id: "damaged-entry-account", lightningAddress: 5 },
+      ]),
+    )
+    mockLegacyStore.set(`mnemonic:${UPGRADED_ACCOUNT}`, UPGRADED_WORDS)
+    mockLegacyStore.set("mnemonic:damaged-entry-account", "damaged entry fixture words")
+
+    const sweep = await sweepMnemonicMigration()
+    const purged = await purgeLegacyKeyStoreOnce(sweep)
+
+    expect(purged).toEqual({ status: "index-damaged" })
+    expect(mockAsyncStorage.has("legacyKeyStorePurged")).toBe(false)
+    expect(mockLegacyStore.get("mnemonic:damaged-entry-account")).toBe(
+      "damaged entry fixture words",
+    )
+    // What it could name it still purged.
+    expect(mockLegacyStore.has(`mnemonic:${UPGRADED_ACCOUNT}`)).toBe(false)
+    expect(await KeyStoreWrapper.getMnemonicForAccount(UPGRADED_ACCOUNT)).toBe(
+      UPGRADED_WORDS,
+    )
   })
 })
