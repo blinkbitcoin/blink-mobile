@@ -475,6 +475,28 @@ describe("free amount", () => {
     )
   })
 
+  /** The light refusal for an amount fixed in place: once as it goes over, not again while
+   *  it stays over, and again after it comes back under and goes over once more. */
+  it("buzzes a refusal each time the amount goes over the balance", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("2", "2")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    typeKeys("2")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+    typeKeys("2")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
+  })
+
   /** ₦22 is past the bitcoin balance against the mocked price (see the switch spec below). */
   it("reads Low funds and outlines the wallet when the amount exceeds its balance", async () => {
     renderScreen(intraledgerDestination())
