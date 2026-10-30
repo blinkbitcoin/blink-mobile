@@ -48,8 +48,82 @@ export const usePinGlyphColor = (): string => {
   return theme.colors._white
 }
 
-export const PinShape: React.FC<{ color: string }> = ({ color }) => (
-  <Svg width={PIN_WIDTH} height={PIN_HEIGHT} viewBox="0 0 32 43">
-    <Path d={PIN_PATH} fill={color} />
-  </Svg>
-)
+// The white ring a new place's pin wears outside its fill. Drawn outside rather
+// than over the fill's edge, so the teardrop keeps its full size inside it.
+const OUTLINE_WIDTH = 2
+
+/** The outlined pin's box: the plain pin grown by the ring on every side. */
+export const OUTLINED_PIN_WIDTH = PIN_WIDTH + OUTLINE_WIDTH * 2
+export const OUTLINED_PIN_HEIGHT = PIN_HEIGHT + OUTLINE_WIDTH * 2
+
+/**
+ * How far down the outlined pin's box its point is: where the plain pin's
+ * bottom edge would be, below the ring's width at the top.
+ */
+export const OUTLINED_PIN_TIP_Y = PIN_HEIGHT + OUTLINE_WIDTH
+
+/** Where the outlined pin's point is, for a marker hung from it. */
+export const OUTLINED_PIN_ANCHOR = {
+  x: 0.5,
+  y: OUTLINED_PIN_TIP_Y / OUTLINED_PIN_HEIGHT,
+}
+
+type PinShapeProps = {
+  color: string
+  /**
+   * A ring of this colour drawn outside the fill. The pin then takes
+   * `OUTLINED_PIN_WIDTH` × `OUTLINED_PIN_HEIGHT` rather than its plain size.
+   */
+  outlineColor?: string
+}
+
+export const PinShape: React.FC<PinShapeProps> = ({ color, outlineColor }) => {
+  if (!outlineColor) {
+    return (
+      <Svg width={PIN_WIDTH} height={PIN_HEIGHT} viewBox="0 0 32 43">
+        <Path d={PIN_PATH} fill={color} />
+      </Svg>
+    )
+  }
+
+  // A stroke is centred on the path, so the ring is a stroke twice its width
+  // drawn under the fill: the inner half is covered and the outer half is the
+  // ring. Round joins keep it the same width around the tip.
+  return (
+    <Svg
+      width={OUTLINED_PIN_WIDTH}
+      height={OUTLINED_PIN_HEIGHT}
+      viewBox={`${-OUTLINE_WIDTH} ${-OUTLINE_WIDTH} ${OUTLINED_PIN_WIDTH} ${OUTLINED_PIN_HEIGHT}`}
+    >
+      <Path
+        d={PIN_PATH}
+        fill={outlineColor}
+        stroke={outlineColor}
+        strokeWidth={OUTLINE_WIDTH * 2}
+        strokeLinejoin="round"
+      />
+      <Path d={PIN_PATH} fill={color} />
+    </Svg>
+  )
+}
+
+/**
+ * The pin for a place that is not on the map yet: the one being aimed, and the
+ * one Continue fixes in place.
+ *
+ * Blue with a white ring rather than the accent every listed place wears, so it
+ * cannot be mistaken for one of them. Both colours are the static ones, not
+ * theme-relative: the theme's `blue5` turns near-white in dark mode and its
+ * `white` turns black, and either would lose the pin against the map.
+ */
+export const useNewPlacePinColors = (): { color: string; outlineColor: string } => {
+  const { theme } = useTheme()
+
+  return { color: theme.colors._blue, outlineColor: theme.colors._white }
+}
+
+export const NewPlacePinShape: React.FC = () => {
+  const { color, outlineColor } = useNewPlacePinColors()
+
+  return <PinShape color={color} outlineColor={outlineColor} />
+}

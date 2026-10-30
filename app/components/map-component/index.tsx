@@ -34,19 +34,27 @@ import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
-import { useFocusEffect } from "@react-navigation/native"
+import { useBottomTabBarStyle } from "@app/navigation/bottom-tab-bar-style"
+import { PrimaryStackParamList } from "@app/navigation/stack-param-lists"
+import {
+  BottomTabBarHeightContext,
+  BottomTabNavigationProp,
+} from "@react-navigation/bottom-tabs"
+import { useFocusEffect, useNavigation } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
-import { AddPlaceSheet } from "./add-place-sheet"
+import { AddPlacePanel } from "./add-place-panel"
 import { CategoryFilterSheet } from "./category-filter-sheet"
 import { ClusterMarker, ClusterMarkerData } from "./cluster-marker"
 import { Viewport, placeLabels } from "./label-collision"
 import LocationButtonCopy from "./location-button-copy"
-import { MapSearchBar, searchBarBottom } from "./map-search-bar"
+import { MAP_CONTROL_INSET, searchBarBottom } from "./map-layout"
+import { MapSearchBar } from "./map-search-bar"
 import MapStyles from "./map-styles.json"
 import { OpenSettingsElement, OpenSettingsModal } from "./open-settings-modal"
 import { truncateLabel } from "./marker-layout"
+import { PinnedPlaceMarker } from "./pinned-place-marker"
 import { PlaceLabelMarker } from "./place-label-marker"
 import { PlaceLocator } from "./place-locator"
 import { PlaceMarker } from "./place-marker"
@@ -69,6 +77,10 @@ const EMPTY_LABELS: ReadonlySet<number> = new Set()
 const SAVE_COORDS_DEBOUNCE_MS = 1000
 const FLY_TO_DURATION_MS = 350
 
+// Hoisted so the effect that sets it has one object to depend on rather than a
+// fresh one every run. See the tab bar effect below.
+const HIDDEN_TAB_BAR = { display: "none" } as const
+
 type Props = {
   userLocation: Region
   userCoords?: LatLng
@@ -88,6 +100,9 @@ export default function MapComponent({
     theme: { colors, mode: themeMode },
   } = useTheme()
   const insets = useSafeAreaInsets()
+  const navigation =
+    useNavigation<BottomTabNavigationProp<PrimaryStackParamList, "Map">>()
+  const tabBarStyle = useBottomTabBarStyle()
   const styles = useStyles({ topInset: insets.top })
   const client = useApolloClient()
   const { LL } = useI18nContext()
@@ -131,6 +146,16 @@ export default function MapComponent({
   // Aiming the pin and saying what is under it are one step, on one screen: the
   // map keeps the top half and the form takes the bottom.
   const [isAddingPlace, setAddingPlace] = React.useState(false)
+  // Where the place being added was fixed by the panel's Continue, or null
+  // while the pin is still being aimed. See `PinnedPlaceMarker`.
+  const [pinnedLocation, setPinnedLocation] = React.useState<LatLng | null>(null)
+  // The map's bottom edge is the screen's only when nothing is drawn below it.
+  // The tab bar and the add-place form each already pay for the system bar, so
+  // adding it again would lift the controls past 20. Read from the context
+  // rather than useBottomTabBarHeight, which throws outside a tab navigator.
+  const tabBarHeight = React.useContext(BottomTabBarHeightContext) ?? 0
+  const bottomControlOffset =
+    MAP_CONTROL_INSET + (tabBarHeight > 0 || isAddingPlace ? 0 : insets.bottom)
   // Read by the submit handler after its awaits, when the attempt may have been
   // closed, and by the cluster handler, which has to stay a stable callback.
   // Synced in an effect rather than during render: writing a ref in the render
@@ -349,18 +374,39 @@ export default function MapComponent({
     addSessionRef.current += 1
     // The next attempt's id is minted on its first send — see the ref above.
     submissionIdRef.current = null
+    setPinnedLocation(null)
     setAddingPlace(true)
   }, [])
 
-  const stopAddingPlace = React.useCallback(() => setAddingPlace(false), [])
+  const stopAddingPlace = React.useCallback(() => {
+    setAddingPlace(false)
+    setPinnedLocation(null)
+  }, [])
+
+  // The panel runs to the bottom of the screen while a place is being added,
+  // covering the tab bar the way the place sheet's own window covers it. This
+  // one has no window on purpose — the map above it has to stay pannable while
+  // the form is filled in — so the bar is taken away rather than drawn over.
+  //
+  // Set on the way back too, rather than restored from a cleanup, and to the
+  // navigator's own style rather than to nothing: `setOptions` merges over
+  // `screenOptions` instead of falling back to them, and it outlives the effect
+  // that set it. A cleanup would leave this screen holding whichever style was
+  // current the moment the panel closed — switch to dark afterwards and every
+  // other tab's bar repaints from the navigator while the map's stays light.
+  // Owning the option on every run instead means the theme is followed for
+  // free, and nothing is written to a screen that has already been torn down.
+  React.useEffect(() => {
+    navigation.setOptions({ tabBarStyle: isAddingPlace ? HIDDEN_TAB_BAR : tabBarStyle })
+  }, [isAddingPlace, navigation, tabBarStyle])
 
   /**
    * Sends the place and answers the form with what to say about it.
    *
    * A failure is the form's to report rather than this screen's: it belongs
    * beside the button that would retry it, on the sheet that still holds
-   * everything that was typed. Success is a toast, since by then the sheet is
-   * gone and there is nothing left to say it on.
+   * everything that was typed. Success is a toast, since the panel closes
+   * itself on it and there is nothing left to say it on.
    *
    * Both awaits are long enough for the attempt underneath to be abandoned and
    * another one started, so what comes back is applied to the form only while
@@ -409,9 +455,10 @@ export default function MapComponent({
         })
 
         // Leaving the attempt open would let its next send arrive as an edit of
-        // the place BTC Map just took, so it closes. Only the attempt that sent
-        // it, though — a later one is another place's business.
-        if (addSessionRef.current === attempt) setAddingPlace(false)
+        // the place BTC Map just took, so it closes — by the panel, which
+        // slides out on the null and only then asks to be taken away, rather
+        // than by pulling it out from under itself here. An abandoned
+        // attempt's panel is already gone, so there is nothing to close.
         return null
       }
 
@@ -435,6 +482,7 @@ export default function MapComponent({
   )
 
   const closeSheet = React.useCallback(() => setSelectedPlace(null), [])
+  const closeFilter = React.useCallback(() => setFilterOpen(false), [])
 
   // The sheet cannot open in the same breath as the search closes on iOS: both
   // are native modals, and iOS silently drops one presented while another is
@@ -539,6 +587,9 @@ export default function MapComponent({
               />
             ) : null
           })}
+          {isAddingPlace && pinnedLocation && (
+            <PinnedPlaceMarker coordinate={pinnedLocation} />
+          )}
         </MapView>
 
         {/* Both are about reading the map, and neither belongs over a map that
@@ -555,7 +606,7 @@ export default function MapComponent({
             {canAddPlace && (
               <Pressable
                 testID="open-add-place"
-                style={styles.addPlace}
+                style={[styles.addPlace, { bottom: bottomControlOffset }]}
                 onPress={startAddingPlace}
                 accessibilityRole="button"
               >
@@ -566,7 +617,10 @@ export default function MapComponent({
           </>
         )}
 
-        {isAddingPlace && <PlaceLocator />}
+        {/* Aimed by panning until Continue, and a marker on the place after
+            it — the second step sends the coordinate Continue took, so a
+            crosshair still asking to be moved would be moving nothing. */}
+        {isAddingPlace && !pinnedLocation && <PlaceLocator />}
 
         {isLoading && !allPlaces.length && (
           <View style={styles.statusPill}>
@@ -587,10 +641,8 @@ export default function MapComponent({
           permissionsStatus !== RESULTS.LIMITED && (
             // Centring on yourself and then nudging the pin onto your own shop is
             // the common way to place one, so this stays on the map throughout.
-            // It needs no lifting to clear the form: the form is the map's
-            // sibling rather than something over it, so the bottom this is
-            // measured from is already the top of the form.
             <LocationButtonCopy
+              bottom={bottomControlOffset}
               requestPermissions={requestLocationPermission}
               permissionStatus={permissionsStatus}
               centerOnUser={centerOnUser}
@@ -603,10 +655,11 @@ export default function MapComponent({
           typed — so the map gets all of itself back and a next attempt starts
           on an empty form. */}
       {isAddingPlace && (
-        <AddPlaceSheet
+        <AddPlacePanel
           location={center}
           onSubmit={handlePlaceSubmit}
           onClose={stopAddingPlace}
+          onPin={setPinnedLocation}
         />
       )}
 
@@ -627,7 +680,7 @@ export default function MapComponent({
         isVisible={isFilterOpen}
         selected={categories}
         onChange={setCategories}
-        onClose={() => setFilterOpen(false)}
+        onClose={closeFilter}
       />
 
       <PlaceSheet place={selectedPlace} userLocation={coords} onClose={closeSheet} />
@@ -645,7 +698,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
 
   // Everything drawn on the map is positioned inside this rather than over the
   // whole screen, so that "the bottom of the map" means the top of the form
-  // while one is open and the bottom of the screen when none is. The pin's
+  // while one is open and the top of the tab bar when none is. The pin's
   // centre — which is the coordinate being submitted — comes out right for the
   // same reason: it is the centre of the map view, whatever height that view
   // currently has.
@@ -677,8 +730,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   addPlace: {
     position: "absolute",
-    left: 8,
-    bottom: 12,
+    left: MAP_CONTROL_INSET,
     zIndex: 99,
     flexDirection: "row",
     alignItems: "center",
