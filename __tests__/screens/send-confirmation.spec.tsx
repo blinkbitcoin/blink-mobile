@@ -1896,6 +1896,13 @@ describe("SendBitcoinConfirmationScreen — review layout", () => {
       expect(screen.getByText(`${LL.SendBitcoinScreen.slow()} ~ 24h`)).toBeTruthy()
     })
 
+    it("gives custodial Standard the payout queue's ~ 4h, not the mempool ~ 30m", async () => {
+      await renderReview(buildOnchainRoute(1000, { payoutSpeed: PayoutSpeed.Medium }))
+
+      expect(screen.getByText(`${LL.SendBitcoinScreen.medium()} ~ 4h`)).toBeTruthy()
+      expect(screen.queryByText(`${LL.SendBitcoinScreen.medium()} ~ 30m`)).toBeNull()
+    })
+
     it("shows the self-custodial fee tier as the Transaction priority on-chain", async () => {
       await renderReview(buildOnchainRoute(1000, { feeTier: FeeTierOption.Medium }))
 
