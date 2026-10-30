@@ -41,6 +41,11 @@ export const BackendFeatureGate: React.FC<BackendFeatureGateProps> = ({
    * Deliberately only when the session is otherwise entitled to the feature. A user who
    * has no custodial account is told that first — it is the durable reason, and it stays
    * true when the servers come back.
+   *
+   * The gate does not probe to learn when the outage ends. The status flips back on the
+   * next request anything answers, and an authed session sends one at least every five
+   * minutes in the price poll, which keeps polling through failures. A probe of its own
+   * is what `blink-services-status.ts` declines to add.
    */
   const isUnreachable = servicesStatus === BlinkServicesStatus.Unreachable
 
