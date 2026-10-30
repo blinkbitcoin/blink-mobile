@@ -125,10 +125,13 @@ type UserWalletLookupResult =
   | { status: typeof UserWalletLookup.Unverifiable }
 
 /**
- * A query that failed at the transport resolves with no data and an error, which is
- * indistinguishable from an answer of "no such user" unless the error is read. It is
- * read here so a backend that is merely down cannot be reported to the sender as a
- * payee who does not exist.
+ * A query that failed at the transport resolves with no data and an error, and so does
+ * the backend's answer for an unknown name, which is a GraphQL error ("Account does not
+ * exist for username") rather than an empty result. The two are told apart by the kind
+ * of error: only a network error means the backend did not answer, so only it is
+ * reported as unverifiable. Any other error is an answer that the payee does not exist,
+ * which is what lets a custodial sender retry the name as a self-custodial recipient's
+ * address.
  *
  * A thrown lookup is treated the same way: whatever went wrong, nothing was learned
  * about the name.
@@ -152,7 +155,7 @@ const getUserWalletId = async ({
 
     const walletId = data?.accountDefaultWallet?.id
     if (walletId) return { status: UserWalletLookup.Found, walletId }
-    if (error) return { status: UserWalletLookup.Unverifiable }
+    if (error?.networkError) return { status: UserWalletLookup.Unverifiable }
     return { status: UserWalletLookup.NotFound }
   } catch {
     return { status: UserWalletLookup.Unverifiable }

@@ -1,5 +1,8 @@
 // sort-imports-ignore
 
+import { ApolloError } from "@apollo/client"
+import { GraphQLError } from "graphql"
+
 import { WalletCurrency } from "@app/graphql/generated"
 import {
   PaymentDetail,
@@ -56,7 +59,7 @@ describe("resolve intraledger", () => {
     it("reports a transport failure as unverifiable, not as a missing user", async () => {
       defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
         data: undefined,
-        error: new Error("Network request failed"),
+        error: new ApolloError({ networkError: new Error("Network request failed") }),
       })
 
       const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
@@ -98,11 +101,33 @@ describe("resolve intraledger", () => {
       )
     })
 
+    it("reports a missing user when the backend refuses the name with an error", async () => {
+      // How the backend actually answers an unknown name: a GraphQL error, not an
+      // empty result. It is an answer, and the custodial flow retries the name as a
+      // self-custodial recipient's address only on this reason.
+      defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
+        data: { accountDefaultWallet: null },
+        error: new ApolloError({
+          graphQLErrors: [
+            new GraphQLError("Account does not exist for username testhandle"),
+          ],
+        }),
+      })
+
+      const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
+
+      expect(destination).toEqual(
+        expect.objectContaining({
+          invalidReason: InvalidDestinationReason.UsernameDoesNotExist,
+        }),
+      )
+    })
+
     it("prefers the wallet it found over an error alongside it", async () => {
       // A partial response that still carries the id is an answer.
       defaultIntraledgerParams.accountDefaultWalletQuery.mockResolvedValue({
         data: { accountDefaultWallet: { id: "successwalletid" } },
-        error: new Error("partial failure"),
+        error: new ApolloError({ networkError: new Error("partial failure") }),
       })
 
       const destination = await resolveIntraledgerDestination(defaultIntraledgerParams)
