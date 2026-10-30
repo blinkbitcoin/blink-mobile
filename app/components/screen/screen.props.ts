@@ -47,5 +47,22 @@ export interface ScreenProps {
    */
   keyboardOffset?: KeyboardOffsets
 
+  /**
+   * An exact keyboard offset, such as the measured header height. Wins over keyboardOffset.
+   */
+  keyboardVerticalOffset?: number
+
+  /**
+   * Lift the content above the keyboard on Android too. Edge-to-edge no longer resizes
+   * the window for the keyboard, so without this Android lets it cover the screen.
+   */
+  avoidKeyboardOnAndroid?: boolean
+
+  /**
+   * Turns the keyboard lift off, e.g. while no keyboard is up. Android reports a closed
+   * keyboard as a keyboard change, which would otherwise leave a stale lift. Defaults to true.
+   */
+  avoidKeyboardEnabled?: boolean
+
   keyboardShouldPersistTaps?: "always" | "never" | "handled"
 }
