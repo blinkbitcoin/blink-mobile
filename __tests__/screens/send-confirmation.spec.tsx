@@ -41,6 +41,7 @@ import {
   SEND_HERO_SECONDARY_TEST_ID,
 } from "@app/screens/send-bitcoin-screen/send-hero"
 
+import { flushEffects } from "../helpers/flush-effects"
 import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import { ContextForScreen } from "./helper"
 
