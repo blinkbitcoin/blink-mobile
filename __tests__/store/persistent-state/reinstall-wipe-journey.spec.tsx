@@ -31,6 +31,7 @@ const mockFaults = {
   trackedListReads: false,
   trackedListWrites: false,
   tokenErases: false,
+  legacyStoreClears: false,
 }
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
@@ -77,6 +78,7 @@ jest.mock("react-native-keychain", () => ({
     mockKeychain.delete(server)
   },
   resetGenericPassword: async ({ service }: { service: string }) => {
+    if (mockFaults.legacyStoreClears) return false
     if (service === "RNSecureKeyStoreKeyChain") mockLegacyStore.clear()
     return true
   },
@@ -179,6 +181,19 @@ const isWipeOwed = (): boolean => {
   const blob = mockAsyncStorage.get(BLOB_KEY)
   if (blob === undefined) return false
   return JSON.parse(blob).pendingReinstallKeyMaterialWipe === true
+}
+
+const isLegacyStoreClearOwed = (): boolean => {
+  const blob = mockAsyncStorage.get(BLOB_KEY)
+  if (blob === undefined) return false
+  return JSON.parse(blob).pendingReinstallLegacyStoreClear === true
+}
+
+/** A seed an older build left in the legacy store only: no tracked id names it, so only
+ *  clearing the legacy store whole reaches it. */
+const LEGACY_ONLY_KEY = "mnemonic:legacy-only-previous-owner"
+const leaveLegacyOnlySeed = () => {
+  mockLegacyStore.set(LEGACY_ONLY_KEY, "legacy only fixture words")
 }
 
 const owedSessionSlots = (): unknown => {
@@ -285,6 +300,7 @@ beforeEach(() => {
   mockFaults.trackedListReads = false
   mockFaults.trackedListWrites = false
   mockFaults.tokenErases = false
+  mockFaults.legacyStoreClears = false
   // The app is closed before the idle sweep in every journey here, so nothing
   // but the code under test gets to record an account.
   jest.spyOn(global, "requestIdleCallback").mockImplementation(() => 0)
@@ -405,6 +421,68 @@ describe("an owed reinstall wipe", () => {
     )
     expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
     expect(isWipeOwed()).toBe(true)
+  })
+})
+
+describe("an owed legacy store clear", () => {
+  /**
+   * The reinstall boot proved the reinstall and could not clear the legacy store whole. The
+   * new owner opens a wallet before the next boot, so the index is no longer absent, and the
+   * clear still has to happen: it is the only thing that reaches a seed no tracked id names.
+   */
+  it("clears the legacy store whole on the next boot even after the new owner opened a wallet", async () => {
+    reinstallOverPreviousOwner()
+    leaveLegacyOnlySeed()
+    mockFaults.legacyStoreClears = true
+    const reinstallBoot = await boot()
+
+    expect(isLegacyStoreClearOwed()).toBe(true)
+    expect(mockLegacyStore.get(LEGACY_ONLY_KEY)).toBe("legacy only fixture words")
+
+    mockFaults.legacyStoreClears = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(mockLegacyStore.has(LEGACY_ONLY_KEY)).toBe(false)
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(isLegacyStoreClearOwed()).toBe(false)
+  })
+
+  it("keeps the clear owed across boots while it keeps failing", async () => {
+    reinstallOverPreviousOwner()
+    leaveLegacyOnlySeed()
+    mockFaults.legacyStoreClears = true
+    const reinstallBoot = await boot()
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    reinstallBoot.unmount()
+
+    const secondBoot = await boot()
+    expect(isLegacyStoreClearOwed()).toBe(true)
+    expect(mockLegacyStore.get(LEGACY_ONLY_KEY)).toBe("legacy only fixture words")
+
+    mockFaults.legacyStoreClears = false
+    secondBoot.unmount()
+    await boot()
+
+    expect(mockLegacyStore.has(LEGACY_ONLY_KEY)).toBe(false)
+    expect(isLegacyStoreClearOwed()).toBe(false)
+  })
+
+  /** Nothing proved a reinstall there, so the legacy store may hold this user's only copy. */
+  it("never clears the legacy store whole for an erase an unreadable index left owed", async () => {
+    reinstallOverPreviousOwner()
+    leaveLegacyOnlySeed()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(isLegacyStoreClearOwed()).toBe(false)
+    expect(mockLegacyStore.get(LEGACY_ONLY_KEY)).toBe("legacy only fixture words")
+    expect(mockLegacyStore.has(`mnemonic:${PREVIOUS_OWNER}`)).toBe(false)
   })
 })
 

@@ -274,6 +274,16 @@ const owedSessionSlotsOf = (state: PersistentState | null): ReinstallSessionSlot
   return owed.filter((slot): slot is ReinstallSessionSlot => typeof slot === "string")
 }
 
+/** Records whether the whole legacy store still has to be cleared, and drops the marker
+ *  once it does not. */
+const withLegacyStoreClearOwed = (
+  state: PersistentState,
+  isOwed: boolean,
+): PersistentState => {
+  const { pendingReinstallLegacyStoreClear: _owed, ...rest } = state
+  return isOwed ? { ...rest, pendingReinstallLegacyStoreClear: true } : rest
+}
+
 /** Records exactly these slots as owed, and drops the marker once there are none. */
 const withOwedSessionWipe = (
   state: PersistentState,
@@ -291,7 +301,10 @@ const withOwedSessionWipe = (
  * the retries retire them, by finishing what they owe.
  */
 const resetKeepingOwedWipe = (current: PersistentState | null): PersistentState => {
-  const reset = withOwedSessionWipe(defaultPersistentState, owedSessionSlotsOf(current))
+  const reset = withLegacyStoreClearOwed(
+    withOwedSessionWipe(defaultPersistentState, owedSessionSlotsOf(current)),
+    Boolean(current?.pendingReinstallLegacyStoreClear),
+  )
   return current?.pendingReinstallKeyMaterialWipe ? withOwedWipe(reset) : reset
 }
 
@@ -310,17 +323,19 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   // Two steps with the session wipe between them, so failures are collected
   // rather than answered one at a time.
   const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
+  const legacyStore = createEraseTracker(reportReinstallCleanupFailure)
 
   // Before either half, and only on a confirmed reinstall — see
   // clearLegacyKeyStore for what it does and why it goes first. On a false
   // positive it would take the legacy mnemonic copies that mnemonicSlotFor
   // keeps as rollback insurance, and a re-login is not worth that.
   //
-  // Its failure counts against the key material, not the session: those copies
-  // are seeds, so a clear that did not happen is a reinstall that left them
-  // behind, and the marker below is what brings the next boot back for them.
+  // Its failure is recorded on a marker of its own. Those copies are seeds a
+  // reinstall left behind, some of them named by no tracked id, and this boot is
+  // the proof of a reinstall that lets the store go whole, so a later boot retries
+  // it whatever the index says by then.
   if (presence === SelfCustodialIndexPresence.Absent) {
-    await KeyStoreWrapper.clearLegacyKeyStore(keyMaterial.onFailure)
+    await KeyStoreWrapper.clearLegacyKeyStore(legacyStore.onFailure)
   }
 
   // This branch owns only the trigger and the reporting; WHICH credentials
@@ -331,8 +346,12 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   const owedSessionSlots = await KeyStoreWrapper.clearUninstallSurvivingCredentials(
     reportReinstallCleanupFailure,
   )
-  const freshState = withOwedSessionWipe(defaultPersistentState, owedSessionSlots)
-  const isSessionWipeOwed = owedSessionSlots.length > 0
+  const isLegacyStoreClearOwed = !legacyStore.isComplete()
+  const freshState = withLegacyStoreClearOwed(
+    withOwedSessionWipe(defaultPersistentState, owedSessionSlots),
+    isLegacyStoreClearOwed,
+  )
+  const isFreshStateOwed = owedSessionSlots.length > 0 || isLegacyStoreClearOwed
 
   if (presence === SelfCustodialIndexPresence.Absent) {
     // An erase that ran and failed is as owed as one that never ran: the seeds
@@ -342,7 +361,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
     // above, which signs the user out on every launch with nothing to end it.
     await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure)
     if (keyMaterial.isComplete()) {
-      return { state: freshState, persistedToken: "", stateChanged: isSessionWipeOwed }
+      return { state: freshState, persistedToken: "", stateChanged: isFreshStateOwed }
     }
     // stateChanged, because nothing else will write this blob: the user has
     // touched nothing on a launch that just signed them out, and a marker that
@@ -361,7 +380,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
       new Error("Reinstall key-material wipe skipped: account index is populated"),
       { alwaysRecord: true },
     )
-    return { state: freshState, persistedToken: "", stateChanged: isSessionWipeOwed }
+    return { state: freshState, persistedToken: "", stateChanged: isFreshStateOwed }
   }
 
   // Unknown: the index could not answer, so the erase may still be owed. It is
@@ -411,57 +430,74 @@ const retryOwedSessionWipe = async (
 }
 
 /**
- * The owed erase, retried on a later boot.
+ * The tracked mnemonics an owed erase still has to reach, by what the index says now.
  *
- * While the device has no account of its own it runs whole, as the reinstall boot would
- * have. Once one exists, the tracked list names that account's mnemonic too, so the erase
- * spares every account the index names and takes only the tracked mnemonics it does not:
- * the previous owner's. That needs the index read in full, since an id it failed to name
- * is a wallet whose seed would be erased, so a read that cannot vouch for every entry
- * keeps the erase owed for the next boot instead.
+ * While the device has no account of its own it takes every tracked mnemonic, as the
+ * reinstall boot would have. Once one exists, the tracked list names that account's
+ * mnemonic too, so it spares every account the index names and takes the rest: the
+ * previous owner's, each with its legacy copy. That needs the index read in full, since
+ * an id it failed to name is a wallet whose seed would be erased, so a read that cannot
+ * vouch for every entry keeps the erase owed for the next boot instead.
+ */
+const eraseOwedTrackedMnemonics = async (
+  state: PersistentState,
+  presence: SelfCustodialIndexPresence,
+): Promise<PersistentState> => {
+  if (presence === SelfCustodialIndexPresence.Unknown) return state
+
+  let spared: ReadonlySet<string> = new Set()
+  if (presence === SelfCustodialIndexPresence.Present) {
+    const indexed = await readSelfCustodialAccountIds()
+    if (indexed.status === StorageReadStatus.ReadFailed) return state
+    spared = new Set(indexed.ids)
+  }
+
+  const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
+  await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure, spared)
+  return keyMaterial.isComplete() ? withoutOwedWipe(state) : state
+}
+
+/**
+ * The key-material erase a reinstall still owes, retried on a later boot. Two debts with
+ * different rules, so two markers.
  *
- * The legacy store is cleared whole only on an index that is absent. With accounts listed
- * the marker may come from a boot that could not read the index at all rather than from a
- * reinstall, and on such a device the legacy store can still hold this user's only copy
- * of a seed the sweep has not moved yet. Each tracked mnemonic goes with its legacy copy,
- * so what that leaves is a legacy-only seed of an owner who never ran a build that tracks
- * it, which no id can name.
+ * The legacy store goes whole only on proof of a reinstall: a boot that found the index
+ * absent and recorded the clear as owed, or an index absent now. Once proven it is retried
+ * whatever the index says later, because it is the only thing that reaches a previous
+ * owner's legacy-only seeds, which no tracked id names, and the new owner writes nothing
+ * to that store. A marker an unreadable index left proves nothing, and there the legacy
+ * store can still hold this user's only copy of a seed the sweep has not moved yet, so
+ * that case reaches the tracked mnemonics alone.
+ *
+ * It runs before the tracked mnemonics, as on the reinstall boot: `removeThrough` empties
+ * the new store only once the legacy copy is provably gone.
  */
 const retryOwedKeyMaterialWipe = async (
   state: PersistentState,
 ): Promise<{ state: PersistentState; changed: boolean }> => {
-  if (!state.pendingReinstallKeyMaterialWipe) return { state, changed: false }
+  const isKeyMaterialOwed = Boolean(state.pendingReinstallKeyMaterialWipe)
+  const isLegacyStoreClearOwed = Boolean(state.pendingReinstallLegacyStoreClear)
+  const isAnythingOwed = isKeyMaterialOwed || isLegacyStoreClearOwed
+  if (!isAnythingOwed) return { state, changed: false }
 
   const presence = await readSelfCustodialIndexPresence()
-  if (presence === SelfCustodialIndexPresence.Unknown) {
-    return { state, changed: false }
+
+  let next = state
+  const isReinstallProven =
+    isLegacyStoreClearOwed || presence === SelfCustodialIndexPresence.Absent
+  if (isReinstallProven) {
+    const legacyStore = createEraseTracker(reportReinstallCleanupFailure)
+    await KeyStoreWrapper.clearLegacyKeyStore(legacyStore.onFailure)
+    next = withLegacyStoreClearOwed(next, !legacyStore.isComplete())
   }
 
-  if (presence === SelfCustodialIndexPresence.Present) {
-    const indexed = await readSelfCustodialAccountIds()
-    if (indexed.status === StorageReadStatus.ReadFailed) return { state, changed: false }
+  if (isKeyMaterialOwed) next = await eraseOwedTrackedMnemonics(next, presence)
 
-    const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
-    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(
-      keyMaterial.onFailure,
-      new Set(indexed.ids),
-    )
-    return keyMaterial.isComplete()
-      ? { state: withoutOwedWipe(state), changed: true }
-      : { state, changed: false }
-  }
-
-  // Both steps, in the order handleFreshInstall runs them. The legacy clear is
-  // not optional here either: on the Unknown verdict that recorded the marker,
-  // it never ran at all, so leaving it out would retire the marker having
-  // erased only the copies in the new store.
-  const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
-  await KeyStoreWrapper.clearLegacyKeyStore(keyMaterial.onFailure)
-  await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure)
-
-  return keyMaterial.isComplete()
-    ? { state: withoutOwedWipe(state), changed: true }
-    : { state, changed: false }
+  const isLegacyMarkerChanged =
+    Boolean(next.pendingReinstallLegacyStoreClear) !== isLegacyStoreClearOwed
+  const isKeyMaterialMarkerChanged =
+    Boolean(next.pendingReinstallKeyMaterialWipe) !== isKeyMaterialOwed
+  return { state: next, changed: isLegacyMarkerChanged || isKeyMaterialMarkerChanged }
 }
 
 /**

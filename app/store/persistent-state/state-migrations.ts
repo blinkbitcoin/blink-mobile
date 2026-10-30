@@ -322,6 +322,18 @@ type PersistentState_22 = Omit<PersistentState_21, "schemaVersion"> & {
    * new owner opens an account. Absent once nothing is owed.
    */
   pendingReinstallSessionWipe?: ReinstallSessionSlot[]
+  /**
+   * A whole-store clear of the legacy key store that a confirmed reinstall still owes.
+   *
+   * Apart from the key-material marker because the two follow different rules. This one is
+   * only recorded on proof of a reinstall, the boot that found the account index absent, so
+   * it is retried whatever the index says later: an account the new owner opens does not
+   * make the previous owner's legacy-only seeds, which no tracked id names, any less theirs,
+   * and this build writes nothing new to the legacy store. An index that could not be read
+   * never records it, since there the legacy store may hold this user's only copy of a seed
+   * the sweep has not moved yet.
+   */
+  pendingReinstallLegacyStoreClear?: boolean
 }
 
 const migrate22ToCurrent = (state: PersistentState_22): Promise<PersistentState> =>

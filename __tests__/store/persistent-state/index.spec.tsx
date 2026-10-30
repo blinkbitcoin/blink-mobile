@@ -763,6 +763,10 @@ describe("PersistentStateProvider reinstall wipe", () => {
     expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
       pendingReinstallKeyMaterialWipe: true,
     })
+    // Nothing proved a reinstall, so the legacy store is never owed whole.
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+      "pendingReinstallLegacyStoreClear",
+    )
   })
 
   /**
@@ -802,10 +806,10 @@ describe("PersistentStateProvider reinstall wipe", () => {
   /**
    * The legacy store holds the pre-migration copies of the very mnemonics this
    * erase is for, so a clear that failed is a reinstall that left seeds behind.
-   * Reporting it is not enough — without the marker, the next boot reads a blob
-   * that says the wipe is done.
+   * Its own marker, because only a boot that proved the reinstall may clear the
+   * store whole, and that proof has to outlive the index filling up again.
    */
-  it("records the erase as owed when the legacy store cannot be cleared", async () => {
+  it("records the legacy store clear as owed on its own marker when it fails", async () => {
     storedStrings.delete(PERSISTENT_STATE_KEY)
     mockClearLegacyKeyStore.mockImplementationOnce(
       async (onFailure: (what: string) => void) => {
@@ -827,8 +831,12 @@ describe("PersistentStateProvider reinstall wipe", () => {
       expect(mockSaveJson).toHaveBeenCalled()
     })
     expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
-      pendingReinstallKeyMaterialWipe: true,
+      pendingReinstallLegacyStoreClear: true,
     })
+    // The tracked mnemonics went, so that erase is not owed.
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+      "pendingReinstallKeyMaterialWipe",
+    )
   })
 
   /**
@@ -929,7 +937,7 @@ describe("PersistentStateProvider reinstall wipe", () => {
    * The retry's own legacy clear is held to the same rule as the first one: it
    * failed, so the seeds it covers are still there and the marker stays.
    */
-  it("keeps the marker when the retry cannot clear the legacy store", async () => {
+  it("keeps the legacy store clear owed when the retry cannot clear it", async () => {
     storedStrings.set(
       PERSISTENT_STATE_KEY,
       JSON.stringify({ ...scrubbedBlob, pendingReinstallKeyMaterialWipe: true }),
@@ -960,8 +968,11 @@ describe("PersistentStateProvider reinstall wipe", () => {
       expect(mockSaveJson).toHaveBeenCalled()
     })
     expect(mockSaveJson.mock.calls.at(-1)?.[1]).toMatchObject({
-      pendingReinstallKeyMaterialWipe: true,
+      pendingReinstallLegacyStoreClear: true,
     })
+    expect(mockSaveJson.mock.calls.at(-1)?.[1]).not.toHaveProperty(
+      "pendingReinstallKeyMaterialWipe",
+    )
   })
 
   /**
@@ -1385,6 +1396,133 @@ describe("PersistentStateProvider owed session wipe", () => {
     expect(mockSaveJson.mock.calls.at(-1)?.[1]).toEqual({
       ...defaultStateWithoutToken,
       pendingReinstallSessionWipe: ["pin"],
+    })
+  })
+})
+
+/**
+ * The whole-store legacy clear a confirmed reinstall still owes. Kept apart from the
+ * describes above, which are near the function line cap.
+ */
+describe("PersistentStateProvider owed legacy store clear", () => {
+  beforeEach(setupStorageMockDefaults)
+
+  const boot = async () => {
+    const view = render(
+      <PersistentStateProvider>
+        <TestConsumer />
+      </PersistentStateProvider>,
+    )
+    await waitFor(() => {
+      expect(screen.getByTestId("token")).toBeTruthy()
+    })
+    return view
+  }
+
+  const lastWrittenBlob = async () => {
+    await waitFor(() => {
+      expect(mockSaveJson).toHaveBeenCalled()
+    })
+    return mockSaveJson.mock.calls.at(-1)?.[1]
+  }
+
+  /**
+   * The reinstall was proven on the boot that recorded this, so an account the new owner
+   * opened since does not end it: the previous owner's legacy-only seeds are still there,
+   * and no tracked id can name them.
+   */
+  it("clears the legacy store whole once the device has an account, and lets the marker go", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallLegacyStoreClear: true })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+
+    await boot()
+
+    await waitFor(() => {
+      expect(mockClearLegacyKeyStore).toHaveBeenCalledTimes(1)
+    })
+    expect(mockClearUninstallSurvivingKeyMaterial).not.toHaveBeenCalled()
+    expect(await lastWrittenBlob()).not.toHaveProperty("pendingReinstallLegacyStoreClear")
+  })
+
+  it("retries it while the index cannot answer, since the proof was already made", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallLegacyStoreClear: true })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("unknown")
+
+    await boot()
+
+    await waitFor(() => {
+      expect(mockClearLegacyKeyStore).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("keeps it owed while the clear keeps failing", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallLegacyStoreClear: true })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    mockClearLegacyKeyStore.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("legacy key store")
+      },
+    )
+
+    await boot()
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("update-other-btn"))
+    })
+    expect(await lastWrittenBlob()).toMatchObject({
+      pendingReinstallLegacyStoreClear: true,
+    })
+  })
+
+  /** As on the reinstall boot: the tracked deletes wait for the legacy copies to be gone. */
+  it("clears the legacy store before the tracked mnemonics it also owes", async () => {
+    setPersistedBlob({
+      ...scrubbedBlob,
+      pendingReinstallLegacyStoreClear: true,
+      pendingReinstallKeyMaterialWipe: true,
+    })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    mockReadSelfCustodialAccountIds.mockResolvedValue({
+      status: "ok",
+      ids: ["new-wallet"],
+    })
+    const order: string[] = []
+    mockClearLegacyKeyStore.mockImplementationOnce(async () => {
+      order.push("legacy store")
+    })
+    mockClearUninstallSurvivingKeyMaterial.mockImplementationOnce(async () => {
+      order.push("tracked mnemonics")
+    })
+
+    await boot()
+
+    await waitFor(() => {
+      expect(order).toEqual(["legacy store", "tracked mnemonics"])
+    })
+    const written = await lastWrittenBlob()
+    expect(written).not.toHaveProperty("pendingReinstallLegacyStoreClear")
+    expect(written).not.toHaveProperty("pendingReinstallKeyMaterialWipe")
+  })
+
+  it("keeps it owed when the state is reset", async () => {
+    setPersistedBlob({ ...scrubbedBlob, pendingReinstallLegacyStoreClear: true })
+    mockReadSelfCustodialIndexPresence.mockResolvedValue("present")
+    mockClearLegacyKeyStore.mockImplementationOnce(
+      async (onFailure: (what: string) => void) => {
+        onFailure("legacy key store")
+      },
+    )
+    await boot()
+
+    mockSaveJson.mockClear()
+    await act(async () => {
+      fireEvent.press(screen.getByTestId("reset-btn"))
+    })
+
+    expect(await lastWrittenBlob()).toEqual({
+      ...defaultStateWithoutToken,
+      pendingReinstallLegacyStoreClear: true,
     })
   })
 })
