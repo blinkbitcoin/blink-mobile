@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { act, renderHook } from "@testing-library/react-native"
 
 import { useMigrationReceiveConfirmation } from "@app/screens/account-migration/hooks/use-migration-receive-confirmation"
@@ -91,6 +92,7 @@ describe("useMigrationReceiveConfirmation", () => {
       isReceiveConfirmed: false,
       isReceiveProven: false,
       isReceiveDelayed: false,
+      recheck: expect.any(Function),
     })
   })
 
@@ -119,6 +121,27 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(result.current.isReceiveDelayed).toBe(true)
   })
 
+  /** A relaunch mid-wait: an earlier session already watched this receive run past the
+   *  window, so it is late now rather than a full window from now. */
+  it("raises the notice at once for a receive an earlier session saw run late", async () => {
+    const { result } = renderGate({ wasDelayedEarlier: true })
+    await advance(0)
+
+    expect(result.current.isReceiveDelayed).toBe(true)
+  })
+
+  /** The caller reads the earlier delay from storage, so it can arrive after the watch. */
+  it("cuts the window short when the earlier delay is learned after the watch began", async () => {
+    const { result, rerender } = renderGate()
+    await advance(DELAYED_NOTICE_MS / 2)
+    expect(result.current.isReceiveDelayed).toBe(false)
+
+    rerender({ wasDelayedEarlier: true })
+    await advance(0)
+
+    expect(result.current.isReceiveDelayed).toBe(true)
+  })
+
   /** The reverse ordering of "confirms in time": the notice has already fired when the
    *  funds land. The screen must swap at once, not keep the "taking longer" copy up. */
   it("withdraws the delayed notice when the receive lands after it fired", async () => {
@@ -134,6 +157,7 @@ describe("useMigrationReceiveConfirmation", () => {
       isReceiveConfirmed: true,
       isReceiveProven: true,
       isReceiveDelayed: false,
+      recheck: expect.any(Function),
     })
   })
 
@@ -153,6 +177,7 @@ describe("useMigrationReceiveConfirmation", () => {
       isReceiveConfirmed: false,
       isReceiveProven: false,
       isReceiveDelayed: false,
+      recheck: expect.any(Function),
     })
     expect(mockCheckReceiveLanded.mock.calls).toHaveLength(checksSoFar)
   })
@@ -536,6 +561,276 @@ describe("useMigrationReceiveConfirmation", () => {
     expect(mockReportError).toHaveBeenCalledTimes(1)
 
     await advance(5000)
+    expect(result.current.isReceiveConfirmed).toBe(true)
+  })
+
+  /** The caller hands support over only on a look taken since the app came back, so it
+   *  is told each time a check reaches the wallet, and when that look began. A check that
+   *  never reached it says nothing about the funds and must not count as one. */
+  describe("each check that reaches the wallet", () => {
+    it("reports when a look that found nothing began", async () => {
+      jest.setSystemTime(1_000_000)
+      const onWalletChecked = jest.fn()
+
+      renderGate({ onWalletChecked })
+      await flushCheck()
+      expect(onWalletChecked).toHaveBeenLastCalledWith(1_000_000)
+
+      await advance(RECEIVE_CHECK_RETRY_MS)
+      expect(onWalletChecked).toHaveBeenCalledTimes(2)
+      expect(onWalletChecked).toHaveBeenLastCalledWith(1_000_000 + RECEIVE_CHECK_RETRY_MS)
+    })
+
+    /** A caller passing a fresh function each render is told on the newest one, without
+     *  the polling re-arming (a re-armed watch fires an extra check at once). */
+    it("tells the latest callback without starting another check", async () => {
+      const first = jest.fn()
+      const latest = jest.fn()
+
+      const { rerender } = renderGate({ onWalletChecked: first })
+      await flushCheck()
+      rerender({ onWalletChecked: latest })
+      await flushCheck()
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      await advance(RECEIVE_CHECK_RETRY_MS)
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(2)
+      expect(first).toHaveBeenCalledTimes(1)
+      expect(latest).toHaveBeenCalledTimes(1)
+    })
+
+    /** Funds that landed confirm the gate, which withdraws the notice itself; the report
+     *  still goes out so the caller's record of the latest look stays true. */
+    it("reports the look that confirms the receive too", async () => {
+      const onWalletChecked = jest.fn()
+      mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+
+      renderGate({ onWalletChecked })
+      await flushCheck()
+
+      expect(onWalletChecked).toHaveBeenCalledTimes(1)
+    })
+
+    /** A missing key is an answer that no retry will change, and support is where it has
+     *  to end: not counting it would leave that user on "on its way" for good. */
+    it("reports a wallet whose key is gone", async () => {
+      const onWalletChecked = jest.fn()
+      mockCheckReceiveLanded.mockResolvedValue({ status: MigrationSdkStatus.NoMnemonic })
+
+      renderGate({ onWalletChecked })
+      await flushCheck()
+
+      expect(onWalletChecked).toHaveBeenCalledTimes(1)
+    })
+
+    const UNSEEN_WALLET_CASES: { label: string; status: MigrationSdkStatus }[] = [
+      { label: "a dropped connection", status: MigrationSdkStatus.ConnectionError },
+      { label: "a settled failure", status: MigrationSdkStatus.Failed },
+    ]
+
+    it.each(UNSEEN_WALLET_CASES)(
+      "does not report $label, which never saw the wallet",
+      async ({ status }) => {
+        const onWalletChecked = jest.fn()
+        mockCheckReceiveLanded.mockResolvedValue({ status, error: new Error("offline") })
+
+        renderGate({ onWalletChecked })
+        await flushCheck()
+
+        expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+        expect(onWalletChecked).not.toHaveBeenCalled()
+      },
+    )
+
+    it("does not report a keystore read that threw", async () => {
+      const onWalletChecked = jest.fn()
+      mockCheckReceiveLanded.mockRejectedValue(new Error("keystore locked"))
+
+      renderGate({ onWalletChecked })
+      await flushCheck()
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+      expect(onWalletChecked).not.toHaveBeenCalled()
+    })
+
+    /** A failed look still frees the slot: a recheck asked for behind it must run. */
+    it("runs a queued recheck after a look that failed", async () => {
+      let settleCheck: (value: unknown) => void = () => undefined
+      mockCheckReceiveLanded.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            settleCheck = resolve
+          }),
+      )
+      const { result } = renderGate()
+      await flushCheck()
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+      await act(async () => {
+        settleCheck({ status: MigrationSdkStatus.ConnectionError, error: new Error("x") })
+        await Promise.resolve()
+      })
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(2)
+    })
+
+    it("does not re-arm the polling when the caller passes a fresh callback", async () => {
+      const { rerender } = renderGate({ onWalletChecked: jest.fn() })
+      await flushCheck()
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      rerender({ onWalletChecked: jest.fn() })
+      await flushCheck()
+
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /** Once the wait is overdue the next scheduled look can be half a minute out, so the
+   *  caller asks for one on the spot when the app comes back. */
+  describe("recheck", () => {
+    it("looks at once instead of waiting for the next scheduled check", async () => {
+      const { result } = renderGate()
+      await flushCheck()
+      await advance(DELAYED_NOTICE_MS)
+      const checksSoFar = mockCheckReceiveLanded.mock.calls.length
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksSoFar + 1)
+
+      /** The scheduled check it replaced does not also fire on its old deadline. */
+      await advance(DELAYED_RETRY_MS - 1)
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksSoFar + 1)
+      await advance(1)
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(checksSoFar + 2)
+    })
+
+    /** A check in flight began before whatever the caller knows changed: the fresh look
+     *  follows it rather than stacking a second connection beside it. */
+    it("queues behind a check already in flight", async () => {
+      let settleCheck: (value: ReturnType<typeof ok>) => void = () => undefined
+      mockCheckReceiveLanded.mockImplementationOnce(
+        () =>
+          new Promise((resolve) => {
+            settleCheck = resolve
+          }),
+      )
+      const { result } = renderGate()
+      await flushCheck()
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(1)
+
+      await act(async () => {
+        settleCheck(ok(stillEmpty))
+        await Promise.resolve()
+      })
+      expect(mockCheckReceiveLanded).toHaveBeenCalledTimes(2)
+    })
+
+    it("does nothing while the gate is skipped", async () => {
+      const { result } = renderGate({ skip: true })
+      await flushCheck()
+
+      await act(async () => {
+        result.current.recheck()
+        await Promise.resolve()
+      })
+
+      expect(mockCheckReceiveLanded).not.toHaveBeenCalled()
+    })
+  })
+})
+
+/**
+ * The background resume keeps one gate for the whole session, and an account switch
+ * does not remount it: one migration's proof must not stand for the next. A second
+ * wallet starts unconfirmed, is looked at, and is proven only by its own look.
+ */
+describe("useMigrationReceiveConfirmation pointed at another wallet after one was settled", () => {
+  beforeEach(() => {
+    jest.useFakeTimers()
+    jest.clearAllMocks()
+    mockRemoteConfig = { ...defaultRemoteConfig }
+    mockCheckReceiveLanded.mockResolvedValue(ok(stillEmpty))
+  })
+
+  afterEach(() => {
+    jest.useRealTimers()
+  })
+
+  const checkedWallets = () =>
+    mockCheckReceiveLanded.mock.calls.map(
+      ([args]) => (args as { accountId: string }).accountId,
+    )
+
+  it("proves nothing for the second wallet on the first one's look", async () => {
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+    const { result, rerender } = renderGate({ selfCustodialAccountId: "sc-A" })
+    await flushCheck()
+    expect(result.current.isReceiveProven).toBe(true)
+
+    mockCheckReceiveLanded.mockResolvedValue(ok(stillEmpty))
+    rerender({ selfCustodialAccountId: null, skip: true })
+    await flushCheck()
+    rerender({ selfCustodialAccountId: "sc-B" })
+    await flushCheck()
+
+    expect(result.current.isReceiveConfirmed).toBe(false)
+    expect(result.current.isReceiveProven).toBe(false)
+    expect(checkedWallets()).toEqual(["sc-A", "sc-B"])
+
+    mockCheckReceiveLanded.mockResolvedValue(ok(landed))
+    await advance(RECEIVE_CHECK_RETRY_MS)
+
+    expect(result.current.isReceiveProven).toBe(true)
+  })
+
+  /** One report per receive, not per session: the second wallet's failing check is
+   *  its own story, and swallowing it as the first one's would hide it. */
+  it("reports the second wallet's failing check too", async () => {
+    mockCheckReceiveLanded.mockResolvedValue({
+      status: MigrationSdkStatus.Failed,
+      error: new Error("sdk down"),
+    })
+    const { rerender } = renderGate({ selfCustodialAccountId: "sc-A" })
+    await flushCheck()
+    rerender({ selfCustodialAccountId: "sc-B" })
+    await flushCheck()
+
+    expect(checkedWallets()).toEqual(["sc-A", "sc-B"])
+    expect(mockReportError).toHaveBeenCalledTimes(2)
+  })
+
+  /** With the delayed-redirect flag on, an elapsed window releases the gate; the first
+   *  wallet's window must not release the second before it has waited one of its own. */
+  it("does not release the second wallet on the first one's window", async () => {
+    mockRemoteConfig = { ...defaultRemoteConfig, migrationDelayedRedirectEnabled: true }
+    const { result, rerender } = renderGate({ selfCustodialAccountId: "sc-A" })
+    await flushCheck()
+    await advance(DELAYED_NOTICE_MS)
+    expect(result.current.isReceiveConfirmed).toBe(true)
+    expect(result.current.isReceiveProven).toBe(false)
+
+    rerender({ selfCustodialAccountId: "sc-B" })
+    await flushCheck()
+
+    expect(result.current.isReceiveConfirmed).toBe(false)
+    expect(checkedWallets()).toContain("sc-B")
+
+    await advance(DELAYED_NOTICE_MS)
+
     expect(result.current.isReceiveConfirmed).toBe(true)
   })
 })

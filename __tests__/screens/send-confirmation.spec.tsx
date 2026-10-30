@@ -34,7 +34,7 @@ import {
   SEND_HERO_SECONDARY_TEST_ID,
 } from "@app/screens/send-bitcoin-screen/send-hero"
 
-import { flushEffects } from "../helpers/flush-effects"
+import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import { ContextForScreen } from "./helper"
 
 const Intraledger = ({
@@ -63,7 +63,7 @@ jest.mock("@app/store/persistent-state", () => ({
 }))
 
 jest.mock("@app/hooks/use-account-registry", () => ({
-  AccountRegistryProvider: ({ children }: { children: React.ReactNode }) => children,
+  ...jest.requireActual("@app/hooks/use-account-registry"),
   useAccountRegistry: () => ({
     accounts: [],
     activeAccount: undefined,
@@ -1087,13 +1087,13 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   it("disables the slider when the fee quote errors so the user cannot sweep unwarned (C1)", async () => {
     mockUseFee.mockReturnValue({ status: "error" })
 
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    await waitForStableRender(view)
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
@@ -1101,13 +1101,13 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
   it("disables the slider while the fee quote is loading", async () => {
     mockUseFee.mockReturnValue({ status: "loading" })
 
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    await waitForStableRender(view)
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(true)
   })
@@ -1123,13 +1123,13 @@ describe("SendBitcoinConfirmationScreen — skipBalanceCheck matrix", () => {
       amount: { amount: 0, currency: WalletCurrency.Usd, currencyCode: "USD" },
     })
 
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
 
-    await flushEffects()
+    await waitForStableRender(view)
 
     expect(screen.getByTestId("slider").props.accessibilityState.disabled).toBe(false)
   })
@@ -1143,12 +1143,12 @@ describe("SendBitcoinConfirmationScreen — fee error messages", () => {
 
   const renderWithFee = async (fee: Record<string, unknown>) => {
     mockUseFee.mockReturnValue(fee)
-    render(
+    const view = render(
       <ContextForScreen>
         <Intraledger route={buildUsdSettlementRoute(200)} />
       </ContextForScreen>,
     )
-    await flushEffects()
+    await waitForStableRender(view)
   }
 
   it("names the cause when the quote carries a classified self-custodial code", async () => {

@@ -2499,10 +2499,12 @@ const en: BaseTranslation = {
     feeTier: "Transaction priority",
     /**
      * Shared by two rails with different windows: the custodial payout queues
-     * (10m / 4h / 24h, use-onchain-fee-tier-options.ts) and the self-custodial refund's
-     * mempool fee rates (10m / 30m / 60m, unclaimed-deposits-screen.tsx). They name the
-     * relative speed within a rail, not an absolute time — don't tune either one for a
-     * single rail's window without splitting the keys per domain first.
+     * (10m / 4h / 24h, CUSTODIAL_PAYOUT_ETA_MINUTES) and the self-custodial mempool fee
+     * rates (10m / 30m / 60m, FEE_TIER_ETA_MINUTES). They name the relative speed within a
+     * rail, not an absolute time — don't tune either one for a single rail's window without
+     * splitting the keys per domain first. The feeTier heading above reads "Transaction
+     * priority" directly over the "Priority" option; that repetition is known and left for
+     * design to settle.
      */
     fast: "Priority",
     medium: "Standard",
@@ -2561,7 +2563,7 @@ const en: BaseTranslation = {
     mode: "Mode",
     pos: "Point of Sale",
     posCopied: "Your point of sale link has been copied",
-    createAddress: "Create address",
+    createAddress: "Create Lightning address",
     addressDisabled: "(disabled)",
     donationButton: "Donate Button",
     btcpayServer: "BTCPay Server",
@@ -2569,6 +2571,7 @@ const en: BaseTranslation = {
     activated: "Activated",
     addressScreen: "Ways to get paid",
     nonCustodialAccount: "Non-custodial account",
+    custodialAccount: "Custodial account",
     tapUserName: "Tap to set username",
     notifications: "Notifications",
     title: "Settings",
@@ -2688,9 +2691,6 @@ const en: BaseTranslation = {
       "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     totp: "Two-factor authentication",
     totpDeactivated: "Two-factor authentication has been deactivated",
-    totpDeleteAlertTitle: "Delete two-factor authentication",
-    totpDeleteAlertContent:
-      "Are you sure you want to delete your two-factor authentication?",
     copiedAccountId: "Copied your account ID to clipboard",
     yourAccountId: "Your Account ID",
     accountId: "Account ID",
@@ -2708,16 +2708,11 @@ const en: BaseTranslation = {
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",
-    secret: "Secret/backup",
-    content:
-      "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.",
   },
   TotpRegistrationValidateScreen: {
     title: "Two-factor authentication",
     enter6digitCode:
       "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    success:
-      "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nDevices on this account which are not logged in with 2FA will need to log back in.\n\nOnly level 2 accounts can be recovered by customer support in the event of lost 2FA access.",
   },
   TotpLoginValidateScreen: {
     title: "Two-factor authentication",
@@ -2848,6 +2843,8 @@ const en: BaseTranslation = {
     fromApprox: "from ~{fee: string}",
     satAmount: "{amount: string} SAT",
     error: "Unable to fetch fees at this time",
+    inactivity: "Inactivity >{months: number} months",
+    usdPerMonth: "{amount: string}/month",
   },
   TransactionLimitsScreen: {
     receive: "Receive",
@@ -4028,7 +4025,6 @@ const en: BaseTranslation = {
       title: "Let's back up your wallet",
       description:
         "We will save a backup of your backup phrase to your {provider: string}.",
-      encryptCheckbox: "Encrypt with additional password",
       password: "Password",
       passwordPlaceholder: "(12 characters minimum)",
       confirmPassword: "Confirm password",
@@ -4054,6 +4050,16 @@ const en: BaseTranslation = {
       storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",
       cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
       networkError: "Network error. Please check your connection and try again.",
+    },
+    BundleExport: {
+      title: "Emergency exit",
+      body: "If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.",
+      learnMore: "Learn more about unilateral exit",
+      download: "Download bundle",
+      sensitiveTitle: "Sensitive",
+      sensitiveBody:
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
+      sensitiveConfirm: "Download",
     },
     ManualBackup: {
       Alerts: {
@@ -4103,8 +4109,26 @@ const en: BaseTranslation = {
     explainerCta: "I understand",
     transferringFunds:
       "Transferring your funds. It should be done in a few seconds.",
+    // The migration entry and steps' toast while a completed transfer is still finishing
+    // on this device, usually seconds in: no "longer than usual" until it is overdue.
+    transferInProgress: {
+      body: "Your funds are on their way to your new account. Keep the app open and we'll finish up automatically.",
+    },
+    // Shared with the migration entry and steps' toast for an overdue receive; keep it
+    // saying the wait is unusual, since both only show it once it is.
     transferDelayed: {
       body: "Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.",
+      contactSupportCta: "Contact support",
+    },
+    storageUnavailable: {
+      unreadableBody:
+        "We couldn't read your migration progress from this device. Nothing is lost — your funds are safe and your progress is still saved.",
+      outOfSpaceBody:
+        "Your device has no storage space left, so we can't read your migration progress. Free up some space and try again. Nothing is lost — your funds are safe.",
+      notSavedBody:
+        "We couldn't save your migration progress on this device. Nothing is lost: your funds are safe. Try again.",
+      notSavedOutOfSpaceBody:
+        "Your device has no storage space left, so we can't save your migration progress. Free up some space and try again. Nothing is lost: your funds are safe.",
       contactSupportCta: "Contact support",
     },
     clockOutOfSync: {
@@ -4276,6 +4300,13 @@ const en: BaseTranslation = {
     recognizePhraseTitle: "Do you recognize this backup phrase?",
     recognizePhraseBody: "Never enter words someone else sent you.",
   },
+  EmergencyRecovery: {
+    // Restore could not reach the Spark operators.
+    outageTitle: "Operator unreachable",
+    outageBody: "Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support: string}",
+    outageSupport: "Support",
+    tryAgainLater: "Try again later",
+  },
   BackupNudge: {
     title: "Your funds are at risk",
     description: "Secure your wallet now. It only takes a minute.",
@@ -4285,6 +4316,99 @@ const en: BaseTranslation = {
     modalDescription:
       "We highly recommend you backup your wallet to prevent a complete loss of funds in case you lose this device.",
     secureMe: "Secure wallet",
+  },
+  TwoFactorEnforcement: {
+    title: "Set two-factor authentication",
+    cardDescription: "Protect your account from unauthorized access.",
+    cardCta: "Set",
+    settingsDescription: "Protect your account from unauthorized access by setting it up.",
+    setupTitle: "Set two-factor authentication now",
+    setupDescription:
+      "To prevent unauthorized access to your account, add two-factor authentication now.",
+    setAuthenticator: "Set authenticator",
+    reminderTitle: "Add an authenticator to protect your funds",
+    reminderDescription:
+      "Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.",
+    modalReminder: "If you dismiss now, make sure to enable it as soon as possible.",
+    dismissTwoMore: "You can dismiss this two more times.",
+    dismissOneMore: "You can dismiss this one more time.",
+    dismissLast: "This is the last time you can dismiss this.",
+    setNow: "Set now",
+    dontWantTo: "I don't want to",
+    highBalanceTitle: "You have over {amount: string}, please add additional protection",
+    protectionRequiredTitle: "Please add additional protection to keep using Blink",
+    protectionRequiredBody:
+      "The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.",
+    nonCustodialTitle: "If you don't want to set two-factor authentication",
+    nonCustodialBody:
+      "The other option is to move to non-custodial. Then you are responsible for your own funds.",
+  },
+  AuthenticatorOnboarding: {
+    introTitle: "Protect your funds with an authenticator",
+    introDescription: "An authenticator app makes a new 6-digit code every 30 seconds.",
+    takeoversTitle: "Stops account takeovers",
+    takeoversDescription: "The code lives only on your phone",
+    stolenNumberTitle: "Be safe even if your number is stolen",
+    stolenNumberDescription:
+      "Even if someone gets into your email or phone number, they can't log in",
+    durationTitle: "Takes about 2 minutes",
+    durationDescription: "We'll guide you step by step",
+    getStarted: "Get started",
+    appsTitle: "Get an authenticator app",
+    appsDescription: "Any authenticator app works. These are free and trusted:",
+    googleAuthenticatorDescription:
+      "Simple and widely used. Optional backup to your Google account.",
+    protonAuthenticatorDescription: "Open source. End-to-end encrypted backup and sync.",
+    twoFasAuthDescription: "Open source. No account needed.",
+    get: "Get",
+    storeNote:
+      "\"Get\" opens the App Store or Google Play. Come back to Blink when it's installed.",
+    haveAnApp: "I have an app",
+    keyInstruction: "Copy this setup key into your authenticator app.",
+    qrInstruction: "Using another device?\nScan this QR code instead.",
+    backupTitle: "Back up your key",
+    backupDescription:
+      "If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.",
+    saveToPasswordManager: "Save to a password manager",
+    shareToPasswordManager: "Share to a password manager",
+    copyForManualBackup: "Copy for manual backup",
+    passwordManagerUnavailable:
+      "No password manager available on this device. Copy the key for a manual backup instead.",
+    savedIt: "I've saved it",
+    keyBackupText:
+      "Blink authenticator setup key\n\nAccount: {account: string}\nSetup key: {key: string}\n\nIf you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.",
+    protectedTitle: "Your account is now protected",
+    protectedDescription:
+      "From now on, logging in needs a one-time code from your authenticator app.",
+    newPhoneTip:
+      "If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.",
+    done: "Done",
+  },
+  TwoFactorTurnOff: {
+    statusEnabled: "2FA: Enabled",
+    statusDisabled: "2FA: Disabled",
+    modalTitle: "We don't recommend disabling 2FA",
+    modalBody:
+      "This would lower your account's security and make it easier for a third party to access your account without your permission.",
+    keepProtected: "Keep me protected",
+    codeInstruction:
+      "Enter the 6-digit code from your authenticator app to turn off two-factor authentication.",
+    codeInvalid:
+      "That code is incorrect. Enter the current code from your authenticator app.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
+    manualResetTitle: "2FA manual reset",
+    manualResetBody:
+      "For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.",
+  },
+  LoginMethodCode: {
+    addEmailTitle: "Add email",
+    addPhoneTitle: "Add phone number",
+    addEmailCode: "To add your email, enter the 6-digit code from your authenticator app.",
+    addPhoneCode:
+      "To add your phone number, enter the 6-digit code from your authenticator app.",
+    codeInvalid:
+      "That code is incorrect. Enter the current code from your authenticator app.",
+    tooManyAttempts: "Too many attempts. Try again in an hour.",
   },
   BackupRequired: {
     modalTitle: "Back up your wallet first",
@@ -4296,6 +4420,15 @@ const en: BaseTranslation = {
     title: "This is a non-custodial account",
     body: "To learn more read our blog post",
     cta: "Read",
+  },
+  StaleCloudBundleBulletin: {
+    title: "Update your cloud backup",
+    body: "Your emergency bundle in {provider: string} is out of date. Back up your wallet again to update it.",
+    cta: "Back up again",
+  },
+  RecoveryBundleScreen: {
+    noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
+    exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

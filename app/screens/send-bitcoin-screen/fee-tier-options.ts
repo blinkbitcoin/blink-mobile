@@ -1,3 +1,4 @@
+import { type TranslationFunctions } from "@app/i18n/i18n-types"
 import { formatDuration } from "@app/utils/date"
 
 import {
@@ -22,6 +23,23 @@ export const formatEta = (etaMinutes: number, locale: string): string => {
   }
   return formatDuration(etaMinutes, { unit: "minute", locale })
 }
+
+type TierLabelCopy = {
+  SendBitcoinScreen: Pick<
+    TranslationFunctions["SendBitcoinScreen"],
+    "fast" | "medium" | "slow"
+  >
+}
+
+/**
+ * The tier names every on-chain rail shows: the send selector and the self-custodial
+ * refund both read them here, so renaming a tier is one change for both.
+ */
+export const feeTierLabels = (LL: TierLabelCopy): Record<FeeTierOption, string> => ({
+  [Tier.Fast]: LL.SendBitcoinScreen.fast(),
+  [Tier.Medium]: LL.SendBitcoinScreen.medium(),
+  [Tier.Slow]: LL.SendBitcoinScreen.slow(),
+})
 
 type BuildFeeTierOptionsParams = {
   tiers: Record<FeeTierOption, FeeTierInfo>

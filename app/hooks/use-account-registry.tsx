@@ -55,7 +55,7 @@ export const markSelected = (
   }))
 }
 
-type AccountRegistryResult = {
+export type AccountRegistryResult = {
   accounts: AccountDescriptor[]
   activeAccount?: AccountDescriptor
   selfCustodialEntries: SelfCustodialAccountEntry[]
@@ -64,7 +64,7 @@ type AccountRegistryResult = {
   reloadSelfCustodialAccounts: () => Promise<void>
 }
 
-const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
+export const AccountRegistryContext = createContext<AccountRegistryResult | null>(null)
 
 /** Owns the registry so its two device reads run once and are shared via context. */
 export const AccountRegistryProvider = ({ children }: { children: ReactNode }) => {

@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 import {
   logAddPhoneAttempt,
+  logAuthenticatorAppSelected,
+  logAuthenticatorEducationCompleted,
   logAttemptCreateDeviceAccount,
   logConversionAttempt,
   logConversionResult,
@@ -15,8 +17,17 @@ import {
   logPaymentAttempt,
   logPaymentResult,
   logRequestAuthCode,
+  logSetupKeyBackupOptionSelected,
   logStartCaptcha,
   logToastShown,
+  logTwoFactorNonCustodialChosen,
+  logTwoFactorDisableAttempted,
+  logTwoFactorDisableBlocked,
+  logLoginMethodCodeFailed,
+  logTwoFactorPromptDismissed,
+  logTwoFactorPromptShown,
+  logTwoFactorSetupCompleted,
+  logTwoFactorSetupStarted,
   logUpgradeLoginAttempt,
   logUpgradeLoginSuccess,
   logValidateAuthCodeFailure,
@@ -270,6 +281,139 @@ describe("analytics helpers", () => {
         message: "raw string",
         type: "warning",
         is_translated: false,
+      })
+    })
+  })
+
+  describe("two-factor enforcement events", () => {
+    it("emits 'two_factor_prompt_shown' with tier and prompt", () => {
+      logTwoFactorPromptShown({ tier: 1, prompt: "home_card" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_shown", {
+        tier: 1,
+        prompt: "home_card",
+      })
+    })
+
+    it("adds the reason the reminder bulletin is up for, to both its events", () => {
+      logTwoFactorPromptShown({ tier: 2, prompt: "tier2_bulletin", reason: "new_ath" })
+      logTwoFactorPromptDismissed({
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "first_sessions",
+      })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_shown", {
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "new_ath",
+      })
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
+        tier: 2,
+        prompt: "tier2_bulletin",
+        reason: "first_sessions",
+      })
+    })
+
+    it("emits 'two_factor_prompt_dismissed' with tier and prompt", () => {
+      logTwoFactorPromptDismissed({ tier: 2, prompt: "settings_banner" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_prompt_dismissed", {
+        tier: 2,
+        prompt: "settings_banner",
+      })
+    })
+
+    it("emits 'two_factor_setup_completed' with the tier, whether it was enforced and the prompt", () => {
+      logTwoFactorSetupCompleted({
+        tier: 2,
+        isEnforced: true,
+        prompt: "tier2_bulletin",
+      })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
+        tier: 2,
+        is_enforced: true,
+        prompt: "tier2_bulletin",
+      })
+    })
+
+    it("emits 'two_factor_setup_completed' without a prompt for a setup from the settings", () => {
+      logTwoFactorSetupCompleted({ tier: 0, isEnforced: false })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_completed", {
+        tier: 0,
+        is_enforced: false,
+      })
+    })
+
+    it("emits 'two_factor_setup_started' with tier and method", () => {
+      logTwoFactorSetupStarted({ tier: 3, method: "authenticator" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_setup_started", {
+        tier: 3,
+        method: "authenticator",
+      })
+    })
+
+    it("emits 'two_factor_non_custodial_chosen' with the tier", () => {
+      logTwoFactorNonCustodialChosen({ tier: 2 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_non_custodial_chosen", {
+        tier: 2,
+      })
+    })
+  })
+
+  describe("authenticator onboarding events", () => {
+    it("emits 'two_factor_education_app_selected' with the app", () => {
+      logAuthenticatorAppSelected({ app: "proton_authenticator" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_education_app_selected", {
+        app: "proton_authenticator",
+      })
+    })
+
+    it("emits 'two_factor_education_completed' with nothing else", () => {
+      logAuthenticatorEducationCompleted()
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_education_completed")
+    })
+
+    /** The option, never the key it saved. */
+    it("emits 'two_factor_key_backup_option_selected' with the option alone", () => {
+      logSetupKeyBackupOptionSelected({ option: "password_manager" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_key_backup_option_selected", {
+        option: "password_manager",
+      })
+    })
+  })
+
+  describe("turning the authenticator off", () => {
+    it("emits 'two_factor_disable_attempted' with the tier reached", () => {
+      logTwoFactorDisableAttempted({ tier: 2 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_disable_attempted", {
+        tier: 2,
+      })
+    })
+
+    it("emits 'two_factor_disable_blocked' with the tier reached", () => {
+      logTwoFactorDisableBlocked({ tier: 3 })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("two_factor_disable_blocked", {
+        tier: 3,
+      })
+    })
+  })
+
+  describe("adding a login method", () => {
+    it("emits 'login_method_code_failed' with the login method", () => {
+      logLoginMethodCodeFailed({ loginMethod: "email" })
+
+      expect(mockLogEvent).toHaveBeenCalledWith("login_method_code_failed", {
+        login_method: "email",
       })
     })
   })

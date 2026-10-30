@@ -2458,7 +2458,7 @@
     "sdkGenericError": "Tesobola kusoma ssente z'obukozi. Gezaako omuwendo omulala."
   },
   "SettingsScreen": {
-    "createAddress": "Kola endagiriro",
+    "createAddress": "Kola endagiriro ya Lightning",
     "addressDisabled": "(tekikola)",
     "donationButton": "Bbatani y'okuwaayo",
     "btcpayServer": "BTCPay Server",
@@ -2475,6 +2475,7 @@
     "activated": "Ekoleddwa",
     "addressScreen": "Engeri y'okusasulwa",
     "nonCustodialAccount": "Akawunti etakuumibwa",
+    "custodialAccount": "Akawunti ekuumibwa",
     "tapUserName": "Koona okuteeka erinnya ly'omukozesa",
     "notifications": "Okumanyisibwa",
     "title": "Ensengeka",
@@ -2583,8 +2584,6 @@
     "emailUnverifiedContent": "Kakasa nti osobola okuddamu okuyingira mu akawunti yo ng'okakasa email yo. Oyagala okukola okukakasa kati?",
     "totp": "Okukakasa emirundi ebiri",
     "totpDeactivated": "Okukakasa emirundi ebiri kuggyidwawo",
-    "totpDeleteAlertTitle": "Ggyawo okukakasa emirundi ebiri",
-    "totpDeleteAlertContent": "Okakasa oyagala kuggyawo okukakasa kw'emirundi ebiri?",
     "copiedAccountId": "Wandukulula ID ya akawunti yo ku lutimbe",
     "yourAccountId": "ID ya Akawunti yo",
     "accountId": "ID ya Akawunti",
@@ -2637,14 +2636,11 @@
     "youGet": "Ofuna"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Okukakasa emirundi ebiri",
-    "secret": "Ekyama/ekyokudda ku nnyuma",
-    "content": "Sika code eno eya QR ne app yo ey’okukakasa. Ekirala, osobola okukoppa/okuteeka ekyama mu app yo ey’okukakasa."
+    "title": "Okukakasa emirundi ebiri"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Okukakasa emirundi ebiri",
-    "enter6digitCode": "Yingiza koodi ya nnukuta 6 okuva mu app yo ey'okukakasa okukakasa okukakasa kwo okw'ensonga bbiri.",
-    "success": "Okukakasa ensonga bbiri kusobozeseddwa. Kati ojja kusobola okuddamu okuyingira n’essimu yo oba email yo yokka NE two factor authentication yo.\n\nEbyuma ebiri ku akawunti eno ebitayingidde mu 2FA bijja kwetaaga okuddamu okuyingira.\n\nAkawunti z'omutendera ogw'okubiri zokka ze zisobola okuddizibwa obuyambi bwa bakasitoma singa wabaawo okufiirwa okutuukirira 2FA."
+    "enter6digitCode": "Yingiza koodi ya nnukuta 6 okuva mu app yo ey'okukakasa okukakasa okukakasa kwo okw'ensonga bbiri."
   },
   "TotpLoginValidateScreen": {
     "title": "Okukakasa emirundi ebiri",
@@ -2718,7 +2714,9 @@
     "noFee": "tewali kisale",
     "fromApprox": "okuva ku ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Tetusobodde kufuna bisale mu kiseera kino"
+    "error": "Tetusobodde kufuna bisale mu kiseera kino",
+    "inactivity": "Obutakozesa >emyezi {months: number}",
+    "usdPerMonth": "{amount: string}/omwezi"
   },
   "TransactionLimitsScreen": {
     "receive": "Funa",
@@ -3871,10 +3869,18 @@
         "testSuccess": "Ebigambo byo ebya bbakappu birongoofu"
       }
     },
+    "BundleExport": {
+      "title": "Okufuluma mu bwangu",
+      "body": "Singa Spark egaana okukola, ekipakiti kino kikusobozesa okutwala bitcoin yo ku chain awatali Blink. Ssente zo eza doola teziyinza kuzzibwawo.",
+      "download": "Ggya ekipakiti",
+      "sensitiveTitle": "Kya kyama",
+      "learnMore": "Manya ebisingawo ku kufuluma ku lwo",
+      "sensitiveConfirm": "Ggya",
+      "sensitiveBody": "Fayiro eno eraga ssente zo n'ebyafaayo by'okusasula kwo, n'olwekyo gikuume mu kyama. Okugikozesa mu bwangu, weetaaga n'ebigambo byo eby'enkalakkalira."
+    },
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
-      "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",
@@ -4000,9 +4006,19 @@
     "explainerCheck5": "Ku kawunti yo kujja kusalibwako ssente z'omukutu gwa Spark",
     "explainerCta": "Ntegedde",
     "transferringFunds": "Tutwala ssente zo. Kijja kuggwa mu sikonda ntono.",
+    "transferInProgress": {
+      "body": "Ssente zo ziri mu kkubo okutuuka ku akaawunti yo empya. Leka app ng'eggule, tujja kukimaliriza kyokka."
+    },
     "transferDelayed": {
       "body": "Ssente zo ziri mu kkubo okutuuka ku akaawunti yo empya. Kino kitwala ebbanga okusinga bulijjo — leka app ng'eggule, tujja kukimaliriza kyokka.",
       "contactSupportCta": "Tuukirira abayambi"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Tetusobodde kusoma bw'oyimiridde mu kujjulukuka ku kyuma kino. Tewali kibuze — ssente zo ziri bulungi era n'obw'oyimiridde bukyaterekeddwa.",
+      "outOfSpaceBody": "Ekyuma kyo tekirina bbanga lya kutereka lisigadde, noolwekyo tetusobola kusoma bw'oyimiridde mu kujjulukuka. Ggyawo ebimu ozzeemu ogezaako. Tewali kibuze — ssente zo ziri bulungi.",
+      "notSavedBody": "Tetusobodde kutereka bw'oyimiridde mu kujjulukuka ku kyuma kino. Tewali kibuze: ssente zo ziri bulungi. Ozzeemu ogezaako.",
+      "notSavedOutOfSpaceBody": "Ekyuma kyo tekirina bbanga lya kutereka lisigadde, noolwekyo tetusobola kutereka bw'oyimiridde mu kujjulukuka. Ggyawo ebimu ozzeemu ogezaako. Tewali kibuze: ssente zo ziri bulungi.",
+      "contactSupportCta": "Tukwatagane n'abayambi"
     },
     "clockOutOfSync": {
       "body": "Ennaku n'obudde bw'ekyuma kyo tebituukagana. Bisseeko ku otomatiki osobole okweyongerayo.",
@@ -4065,6 +4081,12 @@
     "recognizePhraseTitle": "Omanyi ebigambo bino eby'okukuuma?",
     "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Omukugu tatuukibwako",
+    "outageBody": "Spark erina obuzibu mu mpeereza. Lindako eddakiika ntono ogezeeko nate oba tuukirira {support} waffe",
+    "outageSupport": "Obuyambi",
+    "tryAgainLater": "Gezaako oluvannyuma"
+  },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",
     "description": "Kuuma wallet yo kati. Kimala ddakiika emu yokka.",
@@ -4073,6 +4095,81 @@
     "modalTitle": "Kuuma ssente zo",
     "modalDescription": "Tukutegeeza nnyo okukola backup ya wallet yo okusobola okuziyiza okufiirwa ssente zo zonna bw'onooba ofiirwa device eno.",
     "secureMe": "Kuuma wallet"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Teekawo okukakasa emirundi ebiri",
+    "cardDescription": "Kuuma akawunti yo okuva ku abo abatakkiriziddwa kuyingira.",
+    "cardCta": "Teekawo",
+    "settingsDescription": "Kuuma akawunti yo okuva ku abo abatakkiriziddwa kuyingira ng'okiteekawo.",
+    "setupTitle": "Teekawo kati okukakasa emirundi ebiri",
+    "setupDescription": "Okuziyiza abatakkiriziddwa okuyingira mu akawunti yo, yongerako kati okukakasa emirundi ebiri.",
+    "setAuthenticator": "Teekawo authenticator",
+    "reminderTitle": "Gattako authenticator okukuuma ssente zo",
+    "reminderDescription": "Ssente zo zeeyongedde. App ya authenticator ekuuma akawunti yo nga tekuliiko bulabe, ne bwe wabaawo omuntu afuna email yo oba essimu yo.",
+    "modalReminder": "Bw'okigaana kati, kakasa nti okiteekawo mangu ddala.",
+    "dismissTwoMore": "Osobola okugaana kino emirundi ebiri endala.",
+    "dismissOneMore": "Osobola okugaana kino omulundi gumu omulala.",
+    "dismissLast": "Guno gwe mulundi ogusembayo gw'osobola okugaana kino.",
+    "setNow": "Teekawo kati",
+    "dontWantTo": "Sagala",
+    "highBalanceTitle": "Olina okusinga {amount}, tukusaba oyongereko obukuumi obulala",
+    "protectionRequiredTitle": "Tukusaba oyongereko obukuumi obulala okusobola okweyongera okukozesa Blink",
+    "protectionRequiredBody": "Gy'olina ssente ennyingi, gye bukoma okuba obukulu okuba n'obukuumi obusinga. Tukusaba oyongereko authenticator osobole okweyongera okukozesa Blink.",
+    "nonCustodialTitle": "Bw'oba tooyagala kuteekawo kukakasa mirundi ebiri",
+    "nonCustodialBody": "Ekirala kye kudda mu non-custodial. Olwo ggwe ovunaanyizibwa ku ssente zo."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Kuuma ssente zo ne authenticator",
+    "introDescription": "App ya authenticator ekola koodi empya ey'ennamba 6 buli butikitiki 30.",
+    "takeoversTitle": "Eziyiza okuwamba akawunti",
+    "takeoversDescription": "Koodi eba ku ssimu yo yokka",
+    "stolenNumberTitle": "Beera mu bukuumi ne bwe babba ennamba yo",
+    "stolenNumberDescription": "Ne bwe wabaawo omuntu ayingira mu email yo oba ennamba yo ey'essimu, tasobola kuyingira",
+    "durationTitle": "Kitwala eddakiika nga 2",
+    "durationDescription": "Tujja kukulungamya mutendera ku mutendera",
+    "getStarted": "Tandika",
+    "appsTitle": "Funa app ya authenticator",
+    "appsDescription": "App yonna eya authenticator ekola. Zino za bwereere era zeesigika:",
+    "googleAuthenticatorDescription": "Nnyangu era ekozesebwa nnyo. Okutereka kopi ku akawunti yo eya Google si kya buwaze.",
+    "protonAuthenticatorDescription": "Koodi yaayo nzigule. Kopi n'okukwataganya bikuumibwa mu nsirifu okuva ku nkomerero emu okutuuka ku ndala.",
+    "twoFasAuthDescription": "Koodi yaayo nzigule. Tekyetaagisa kuba na akawunti.",
+    "get": "Funa",
+    "storeNote": "“Funa” eggulawo App Store oba Google Play. Komawo ku Blink ng'emaze okuteekebwamu.",
+    "haveAnApp": "Nnina app",
+    "keyInstruction": "Koppa ekisumuluzo kino eky'okuteekawo mu app yo eya authenticator.",
+    "qrInstruction": "Okozesa kyuma kirala?\nMu kifo ky'ekyo sika koodi eno eya QR.",
+    "backupTitle": "Tereka kopi y'ekisumuluzo kyo",
+    "backupDescription": "Bw'ofiirwa essimu yo, ekisumuluzo kino kikusobozesa okuddamu okuteekawo authenticator yo. Kitereke awalala, si ku ssimu eno.",
+    "saveToPasswordManager": "Tereka mu muteegezzi w'ebigambo by'okuyingira",
+    "shareToPasswordManager": "Gabana ne muteegezzi w'ebigambo by'okuyingira",
+    "copyForManualBackup": "Koppa okutereka mu ngalo",
+    "passwordManagerUnavailable": "Tewali kakuuma bigambo by'ekyama ku kyuma kino. Koppa ekisumuluzo okukikuuma mu ngalo.",
+    "savedIt": "Nkiterese",
+    "keyBackupText": "Ekisumuluzo ky'okuteekawo authenticator ya Blink\n\nAkawunti: {account}\nEkisumuluzo ky'okuteekawo: {key}\n\nBw'ofiirwa essimu yo, yongera ekisumuluzo kino eky'okuteekawo mu app ya authenticator osobole okuddamu okufuna koodi zo ez'okuyingira mu Blink. Omuntu yenna alina ekisumuluzo kino asobola okukola koodi zo, kale kikuume nga kya kyama.",
+    "protectedTitle": "Akawunti yo kati ekuumiddwa",
+    "protectedDescription": "Okuva kati, okuyingira kwetaaga koodi ey'omulundi gumu okuva mu app yo eya authenticator.",
+    "newPhoneTip": "Bw'ofuna essimu empya, kyusiza authenticator yo ku yo <bold>nga tonnaba</bold> kusangula ssimu enkadde.",
+    "done": "Kimaze"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ekoleddwa",
+    "statusDisabled": "2FA: Teekoleddwa",
+    "modalTitle": "Tetukuwa magezi kuggyako 2FA",
+    "modalBody": "Kino kyandikendeezezza obukuumi bwa akawunti yo era kyandyanguyiza omuntu omulala okuyingira mu akawunti yo nga tokkirizza.",
+    "keepProtected": "Nkuuma nga ndi mukuumi",
+    "codeInstruction": "Yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa okuggyako okukakasa okw'emitendera ebiri.",
+    "codeInvalid": "Koodi eyo si ntuufu. Yingiza koodi ey'kaakati okuva mu app yo ey'okukakasa.",
+    "tooManyAttempts": "Ogezezzaako emirundi mingi nnyo. Ddamu okugezaako oluvannyuma lw'essaawa emu.",
+    "manualResetTitle": "Okuddamu okuteekawo 2FA mu ngalo",
+    "manualResetBody": "Olw'obukuumi bwo, tetukkiriza 2FA kuggibwako mu app. Bw'oba weetaaga okuddamu okuteekawo 2FA, tuukirira <support>Obuyambi</support> bwaffe."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Gattako email",
+    "addPhoneTitle": "Gattako ennamba y'essimu",
+    "addEmailCode": "Okugattako email yo, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "addPhoneCode": "Okugattako ennamba yo ey'essimu, yingiza koodi ey'ennamba 6 okuva mu app yo ey'okukakasa.",
+    "codeInvalid": "Koodi eyo si ntuufu. Yingiza koodi ey'kaakati okuva mu app yo ey'okukakasa.",
+    "tooManyAttempts": "Ogezezzaako emirundi mingi nnyo. Ddamu okugezaako oluvannyuma lw'essaawa emu."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4083,6 +4180,15 @@
     "title": "Eno ye akawunti etakuumibwa",
     "body": "Okumanya ebisingawo, soma blog yaffe",
     "cta": "Soma"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Zza obuggya kkopi yo ey'omu kire",
+    "body": "Ekipakiti kyo eky'obwangu mu {provider} kikadde. Koppa akawunti yo nate okukizza obuggya.",
+    "cta": "Koppa nate"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Tewannabaawo kipakiti kya bwangu. Kikolebwa oluvannyuma lw'okusasula kwo okusooka.",
+    "exportFailed": "Tetusobodde kuwanula kipakiti kya bwangu."
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",

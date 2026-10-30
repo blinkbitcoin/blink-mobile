@@ -11,6 +11,8 @@ import Modal from "react-native-modal"
 
 import { makeStyles, Text, TextProps, useTheme } from "@rn-vui/themed"
 
+import { testProps } from "@app/utils/testProps"
+
 import { GaloyIcon } from "../atomic/galoy-icon"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "../atomic/galoy-secondary-button"
@@ -34,6 +36,8 @@ export type CustomModalProps = {
   secondaryButtonLoading?: boolean
   showCloseIconButton?: boolean
   dismissable?: boolean
+  /** Once the modal is off the screen, for what must not run while it closes. */
+  onModalHide?: () => void
   minHeight?: DimensionValue
   titleMaxWidth?: DimensionValue
   titleTextAlignment?: "auto" | "center" | "left" | "right" | "justify"
@@ -63,6 +67,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
   secondaryButtonLoading,
   showCloseIconButton = true,
   dismissable = true,
+  onModalHide,
   backgroundModalColor,
   titleFontSize,
 }) => {
@@ -89,6 +94,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
       avoidKeyboard={true}
       onBackdropPress={dismissable ? toggleModal : undefined}
       onBackButtonPress={dismissable ? toggleModal : undefined}
+      onModalHide={onModalHide}
     >
       <View style={styles.container}>
         <View style={styles.headerContainer}>
@@ -106,7 +112,7 @@ const CustomModal: React.FC<CustomModalProps> = ({
           )}
 
           {showCloseIconButton && (
-            <TouchableOpacity onPress={toggleModal}>
+            <TouchableOpacity onPress={toggleModal} {...testProps("modal-close")}>
               <GaloyIcon name="close" size={30} color={colors.grey0} />
             </TouchableOpacity>
           )}

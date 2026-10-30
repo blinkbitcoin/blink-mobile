@@ -8,6 +8,15 @@ import {
 import { ValidatePhoneCodeErrorsType } from "@app/screens/phone-auth-screen"
 import { InvoiceType } from "@app/screens/receive-bitcoin-screen/payment/index.types"
 import { ParseDestinationResult } from "@app/screens/send-bitcoin-screen/payment-destination/index.types"
+import {
+  AuthenticatorApp,
+  LoginMethod,
+  SetupKeyBackupOption,
+  TwoFactorMethod,
+  TwoFactorPrompt,
+  TwoFactorReminderReason,
+  TwoFactorTier,
+} from "@app/types/two-factor-enforcement"
 import { PaymentType as ParsedPaymentType } from "@blinkbitcoin/blink-client"
 import analytics from "@react-native-firebase/analytics"
 
@@ -175,4 +184,127 @@ export const logToastShown = (params: LogToastShownParams) => {
     type: params.type,
     is_translated: params.isTranslated,
   })
+}
+
+type LogTwoFactorPromptParams = {
+  tier: TwoFactorTier
+  prompt: TwoFactorPrompt
+  /** Why the reminder bulletin was shown; the other prompts have no reason to report. */
+  reason?: TwoFactorReminderReason
+}
+
+/** The prompt's event parameters, with the reason only where there is one. */
+const twoFactorPromptEventParams = ({
+  tier,
+  prompt,
+  reason,
+}: LogTwoFactorPromptParams) =>
+  reason === undefined ? { tier, prompt } : { tier, prompt, reason }
+
+export const logTwoFactorPromptShown = (params: LogTwoFactorPromptParams) => {
+  analytics().logEvent("two_factor_prompt_shown", twoFactorPromptEventParams(params))
+}
+
+export const logTwoFactorPromptDismissed = (params: LogTwoFactorPromptParams) => {
+  analytics().logEvent("two_factor_prompt_dismissed", twoFactorPromptEventParams(params))
+}
+
+type LogTwoFactorSetupStartedParams = {
+  tier: TwoFactorTier
+  method: TwoFactorMethod
+}
+
+export const logTwoFactorSetupStarted = (params: LogTwoFactorSetupStartedParams) => {
+  analytics().logEvent("two_factor_setup_started", {
+    tier: params.tier,
+    method: params.method,
+  })
+}
+
+type LogTwoFactorNonCustodialChosenParams = {
+  tier: TwoFactorTier
+}
+
+export const logTwoFactorNonCustodialChosen = (
+  params: LogTwoFactorNonCustodialChosenParams,
+) => {
+  analytics().logEvent("two_factor_non_custodial_chosen", {
+    tier: params.tier,
+  })
+}
+
+type LogTwoFactorSetupCompletedParams = {
+  tier: TwoFactorTier
+  /** Whether the prompts applied to the account: off, its tier says nothing about a
+   *  balance, since nothing was asked of it. */
+  isEnforced: boolean
+  /** The prompt that led to the setup, none when it was started from the settings. */
+  prompt?: TwoFactorPrompt
+}
+
+/** An authenticator added to the account, from a prompt or from the settings alike: the
+ *  adoption the prompts are measured by, joinable to the prompt that led to it. */
+export const logTwoFactorSetupCompleted = (params: LogTwoFactorSetupCompletedParams) => {
+  const promptParams = params.prompt === undefined ? {} : { prompt: params.prompt }
+  analytics().logEvent("two_factor_setup_completed", {
+    tier: params.tier,
+    is_enforced: params.isEnforced,
+    ...promptParams,
+  })
+}
+
+type LogAuthenticatorAppSelectedParams = {
+  app: AuthenticatorApp
+}
+
+/** A recommended authenticator app opened in its store. */
+export const logAuthenticatorAppSelected = (
+  params: LogAuthenticatorAppSelectedParams,
+) => {
+  analytics().logEvent("two_factor_education_app_selected", { app: params.app })
+}
+
+/** The onboarding left for the setup itself, with an app at hand, once per
+ *  registration. */
+export const logAuthenticatorEducationCompleted = () => {
+  analytics().logEvent("two_factor_education_completed")
+}
+
+type LogSetupKeyBackupOptionSelectedParams = {
+  option: SetupKeyBackupOption
+}
+
+/** A backup option used for a new authenticator's setup key. Never the key itself. */
+export const logSetupKeyBackupOptionSelected = (
+  params: LogSetupKeyBackupOptionSelectedParams,
+) => {
+  analytics().logEvent("two_factor_key_backup_option_selected", {
+    option: params.option,
+  })
+}
+
+type LogTwoFactorTurnOffParams = {
+  tier: TwoFactorTier
+}
+
+/** Turning the authenticator off was asked for from the settings, at the tier the
+ *  account reached. */
+export const logTwoFactorDisableAttempted = (params: LogTwoFactorTurnOffParams) => {
+  analytics().logEvent("two_factor_disable_attempted", { tier: params.tier })
+}
+
+/** Turning the authenticator off was refused: the account reached the enforced
+ *  tier, or the server found a balance that high. */
+export const logTwoFactorDisableBlocked = (params: LogTwoFactorTurnOffParams) => {
+  analytics().logEvent("two_factor_disable_blocked", { tier: params.tier })
+}
+
+type LogLoginMethodCodeFailedParams = {
+  loginMethod: LoginMethod
+}
+
+/** The authenticator's code for adding the email or the phone number, refused as
+ *  wrong. */
+export const logLoginMethodCodeFailed = (params: LogLoginMethodCodeFailedParams) => {
+  analytics().logEvent("login_method_code_failed", { login_method: params.loginMethod })
 }
