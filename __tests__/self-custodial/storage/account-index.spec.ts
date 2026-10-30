@@ -68,6 +68,7 @@ const LEGACY_ID_LIST_KEY = "selfCustodialAccountIds"
 const LEGACY_PURGE_DONE_KEY = "legacyKeyStorePurged"
 const LEGACY_PURGE_ATTEMPTS_KEY = "legacyKeyStorePurgeAttempts"
 const LEGACY_PURGE_SLOTS_KEY = "legacyKeyStorePurgedSlots"
+const LEGACY_PURGE_INDEX_DAMAGE_KEY = "legacyKeyStorePurgeIndexDamage"
 /** Mirrors LEGACY_PURGE_MAX_ATTEMPTS, which is not exported. */
 const LEGACY_PURGE_MAX_ATTEMPTS = 5
 
@@ -894,37 +895,148 @@ describe("self-custodial account-index — legacy key store purge", () => {
       expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
 
+    /** One AsyncStorage across launches, so what a pass records is what the next one reads. */
+    const useStoredItems = (initial: Record<string, string>) => {
+      const items = new Map(Object.entries(initial))
+      mockGetItem.mockImplementation((key: string) =>
+        Promise.resolve(items.get(key) ?? null),
+      )
+      mockSetItem.mockImplementation((key: string, value: string) => {
+        items.set(key, value)
+        return Promise.resolve()
+      })
+      return items
+    }
+
+    const DAMAGED_INDEX = JSON.stringify([
+      { id: "a1", lightningAddress: null },
+      { id: "a2", lightningAddress: 5 },
+    ])
+
     /**
-     * readIndex drops an entry it cannot read and lists the rest, so the pass names fewer
-     * accounts than the index holds. A mnemonic only that entry named is never reached, and
-     * the flag would retire the purge over it.
+     * readIndex drops an entry it cannot read and lists the rest. One that still carries an
+     * id is named all the same, and recorded, since the next write to the index drops it.
      */
-    it("purges what it can name and withholds the flag when an index entry is damaged", async () => {
+    it("names a damaged entry that still carries an id, and records it", async () => {
+      const items = useStoredItems({ [ACCOUNT_INDEX_KEY]: DAMAGED_INDEX })
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "done" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1", "a2"], [])
+      expect(JSON.parse(items.get(LEGACY_PURGE_INDEX_DAMAGE_KEY) ?? "null")).toEqual({
+        ids: ["a2"],
+        hasUnnameableEntry: false,
+      })
+    })
+
+    /** The bug a strict read alone left open: the rewrite hides the entry from the index. */
+    it("still names a damaged entry after a rewrite dropped it from the index", async () => {
+      const items = useStoredItems({ [ACCOUNT_INDEX_KEY]: DAMAGED_INDEX })
+      mockPurgeLegacyKeyStore.mockResolvedValueOnce(PASS_TRANSIENT)
+      await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      items.set(ACCOUNT_INDEX_KEY, JSON.stringify([{ id: "a1", lightningAddress: null }]))
+      mockPurgeLegacyKeyStore.mockClear()
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1", "a2"], [])
+      expect(result).toEqual({ status: "done" })
+    })
+
+    /** An entry with no id names nothing, so whatever it stood for was never reached. */
+    it("withholds the flag for an entry with no id, and keeps withholding it after a rewrite", async () => {
+      const items = useStoredItems({
+        [ACCOUNT_INDEX_KEY]: JSON.stringify([
+          { id: "a1", lightningAddress: null },
+          { lightningAddress: null },
+        ]),
+      })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
+
+      items.set(ACCOUNT_INDEX_KEY, JSON.stringify([{ id: "a1", lightningAddress: null }]))
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+
+      expect(items.has(LEGACY_PURGE_DONE_KEY)).toBe(false)
+      // Uncounted: a damaged index costs no round trips a bound would save.
+      expect(items.has(LEGACY_PURGE_ATTEMPTS_KEY)).toBe(false)
+      expect(mockLogEvent).toHaveBeenCalledWith("legacy_key_store_purge", {
+        outcome: "index-damaged",
+      })
+    })
+
+    it("reads a canonical index that is not a list as an entry with no id", async () => {
+      useStoredItems({ [ACCOUNT_INDEX_KEY]: '{"not":"a list"}' })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith([], [])
+    })
+
+    it("reads an index item that is not an object as an entry with no id", async () => {
+      useStoredItems({
+        [ACCOUNT_INDEX_KEY]: JSON.stringify([{ id: "a1", lightningAddress: null }, "a2"]),
+      })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
+    })
+
+    it("names no account and finishes on a device with no index at all", async () => {
+      useStoredItems({})
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "done" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith([], [])
+    })
+
+    it("reads a legacy id list item that is not an id as an entry with no id", async () => {
+      useStoredItems({ [LEGACY_ID_LIST_KEY]: JSON.stringify(["l1", 7]) })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["l1"], [])
+    })
+
+    /** A record nothing here wrote may stand for an entry with no id, so it holds the flag. */
+    it("holds the flag over a damage record it cannot read", async () => {
+      useStoredItems({
+        [ACCOUNT_INDEX_KEY]: JSON.stringify([{ id: "a1", lightningAddress: null }]),
+        [LEGACY_PURGE_INDEX_DAMAGE_KEY]: "not json",
+      })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+    })
+
+    it("holds the flag over a damage record stored as null", async () => {
+      useStoredItems({
+        [ACCOUNT_INDEX_KEY]: JSON.stringify([{ id: "a1", lightningAddress: null }]),
+        [LEGACY_PURGE_INDEX_DAMAGE_KEY]: "null",
+      })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+    })
+
+    it("holds the flag over a damage record of the wrong shape", async () => {
+      useStoredItems({
+        [ACCOUNT_INDEX_KEY]: JSON.stringify([{ id: "a1", lightningAddress: null }]),
+        [LEGACY_PURGE_INDEX_DAMAGE_KEY]: JSON.stringify({ ids: [7] }),
+      })
+
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
+    })
+
+    it("holds the flag when the damage record cannot be read at all", async () => {
       mockGetItem.mockImplementation((key: string) => {
+        if (key === LEGACY_PURGE_INDEX_DAMAGE_KEY) {
+          return Promise.reject(new Error("AsyncStorage unavailable"))
+        }
         if (key === ACCOUNT_INDEX_KEY) {
-          return Promise.resolve(
-            JSON.stringify([
-              { id: "a1", lightningAddress: null },
-              { id: "a2", lightningAddress: 5 },
-            ]),
-          )
+          return Promise.resolve(JSON.stringify([{ id: "a1", lightningAddress: null }]))
         }
         return Promise.resolve(null)
       })
 
-      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
-
-      expect(result).toEqual({ status: "index-damaged" })
-      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
-      expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
-      // Uncounted: the next write to the index can repair it.
-      expect(mockSetItem).not.toHaveBeenCalledWith(
-        LEGACY_PURGE_ATTEMPTS_KEY,
-        expect.anything(),
-      )
-      expect(mockLogEvent).toHaveBeenCalledWith("legacy_key_store_purge", {
-        outcome: "index-damaged",
-      })
+      expect(await purgeLegacyKeyStoreOnce(SWEEP_OK)).toEqual({ status: "index-damaged" })
     })
 
     it("does not purge twice on the same install", async () => {
@@ -941,6 +1053,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
         if (key === LEGACY_PURGE_DONE_KEY) {
           return Promise.reject(new Error("AsyncStorage unavailable"))
         }
+        if (key !== ACCOUNT_INDEX_KEY) return Promise.resolve(null)
         return Promise.resolve(JSON.stringify([{ id: "a1", lightningAddress: null }]))
       })
 
@@ -1112,7 +1225,7 @@ describe("self-custodial account-index — legacy key store purge", () => {
           if (key === LEGACY_PURGE_ATTEMPTS_KEY) {
             return Promise.reject(new Error("AsyncStorage unavailable"))
           }
-          if (key === LEGACY_PURGE_DONE_KEY) return Promise.resolve(null)
+          if (key !== ACCOUNT_INDEX_KEY) return Promise.resolve(null)
           return Promise.resolve(JSON.stringify([{ id: "a1", lightningAddress: null }]))
         })
 

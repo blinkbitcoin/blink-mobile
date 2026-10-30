@@ -50,6 +50,9 @@ jest.mock("@react-native-async-storage/async-storage", () => ({
     setItem: async (key: string, value: string) => {
       mockAsyncStorage.set(key, value)
     },
+    removeItem: async (key: string) => {
+      mockAsyncStorage.delete(key)
+    },
     multiRemove: async (keys: string[]) => {
       keys.forEach((key) => mockAsyncStorage.delete(key))
     },
@@ -629,33 +632,61 @@ describe("a mnemonic that a read migrated", () => {
 })
 
 describe("the legacy purge over a damaged index", () => {
-  /**
-   * readIndex lists the entries it can read and drops the rest, so a wallet whose entry is
-   * damaged is one the pass never names. Its seed is only in the legacy store and nothing
-   * tracks it, so a flag written here would retire the purge with that seed still there,
-   * and the release that drops the dependency would take its only reader.
-   */
-  it("never records itself done while a damaged entry names a seed only the legacy store holds", async () => {
+  const DAMAGED_ACCOUNT = "damaged-entry-account"
+  const DAMAGED_WORDS = "damaged entry fixture words"
+
+  /** An upgrading install whose index has one entry readIndex cannot read. Both seeds are
+   *  still in the legacy store only, and nothing tracks them yet. */
+  const upgradeWithDamagedEntry = (damagedEntry: Record<string, unknown>) => {
     mockAsyncStorage.set(
       INDEX_KEY,
-      JSON.stringify([
-        { id: UPGRADED_ACCOUNT, lightningAddress: null },
-        { id: "damaged-entry-account", lightningAddress: 5 },
-      ]),
+      JSON.stringify([{ id: UPGRADED_ACCOUNT, lightningAddress: null }, damagedEntry]),
     )
     mockLegacyStore.set(`mnemonic:${UPGRADED_ACCOUNT}`, UPGRADED_WORDS)
-    mockLegacyStore.set("mnemonic:damaged-entry-account", "damaged entry fixture words")
+    mockLegacyStore.set(`mnemonic:${DAMAGED_ACCOUNT}`, DAMAGED_WORDS)
+  }
 
-    const sweep = await sweepMnemonicMigration()
-    const purged = await purgeLegacyKeyStoreOnce(sweep)
+  const launchPurge = async () => purgeLegacyKeyStoreOnce(await sweepMnemonicMigration())
 
-    expect(purged).toEqual({ status: "index-damaged" })
-    expect(mockAsyncStorage.has("legacyKeyStorePurged")).toBe(false)
-    expect(mockLegacyStore.get("mnemonic:damaged-entry-account")).toBe(
-      "damaged entry fixture words",
+  /**
+   * The next lightning address the app stores is written from readIndex's list, which drops
+   * the damaged entry. The purge has to have reached that account's seed by then, and has to
+   * keep naming it after: the seed is moved, not left behind.
+   */
+  it("moves the seed of a damaged entry that carries an id, and keeps it through a rewrite", async () => {
+    upgradeWithDamagedEntry({ id: DAMAGED_ACCOUNT, lightningAddress: 5 })
+
+    expect(await launchPurge()).toEqual({ status: "done" })
+    expect(mockLegacyStore.has(`mnemonic:${DAMAGED_ACCOUNT}`)).toBe(false)
+    expect(await KeyStoreWrapper.getMnemonicForAccount(DAMAGED_ACCOUNT)).toBe(
+      DAMAGED_WORDS,
     )
-    // What it could name it still purged.
-    expect(mockLegacyStore.has(`mnemonic:${UPGRADED_ACCOUNT}`)).toBe(false)
+
+    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "upgraded@blink.sv")
+    expect(mockAsyncStorage.get(INDEX_KEY)).not.toContain(DAMAGED_ACCOUNT)
+    mockAsyncStorage.delete("legacyKeyStorePurged")
+
+    expect(await launchPurge()).toEqual({ status: "done" })
+    expect(await KeyStoreWrapper.getMnemonicForAccount(DAMAGED_ACCOUNT)).toBe(
+      DAMAGED_WORDS,
+    )
+  })
+
+  /**
+   * An entry with no id names nothing. Once a rewrite has dropped it, the index reads whole,
+   * and only the record the first pass kept stops the second from calling the purge done
+   * over the seed it stood for.
+   */
+  it("never records itself done after a rewrite hides an entry it could not name", async () => {
+    upgradeWithDamagedEntry({ lightningAddress: null })
+
+    expect(await launchPurge()).toEqual({ status: "index-damaged" })
+
+    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "upgraded@blink.sv")
+    expect(await launchPurge()).toEqual({ status: "index-damaged" })
+
+    expect(mockAsyncStorage.has("legacyKeyStorePurged")).toBe(false)
+    expect(mockLegacyStore.get(`mnemonic:${DAMAGED_ACCOUNT}`)).toBe(DAMAGED_WORDS)
     expect(await KeyStoreWrapper.getMnemonicForAccount(UPGRADED_ACCOUNT)).toBe(
       UPGRADED_WORDS,
     )
