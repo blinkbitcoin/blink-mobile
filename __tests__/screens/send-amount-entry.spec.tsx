@@ -40,6 +40,13 @@ jest.mock("@react-navigation/native", () => ({
   }),
 }))
 
+const mockHapticReject = jest.fn()
+
+jest.mock("@app/utils/haptics", () => {
+  const actual = jest.requireActual("@app/utils/haptics")
+  return { ...actual, haptics: { ...actual.haptics, reject: () => mockHapticReject() } }
+})
+
 /** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
 const mockFeeTierOverride: { current: Record<string, unknown> } = { current: {} }
 
@@ -225,6 +232,7 @@ beforeEach(() => {
   mockSavePreferredAmountCurrency.mockClear()
   mockNavigate.mockClear()
   mockFeeTierOverride.current = {}
+  mockHapticReject.mockClear()
   mockDisplayCurrency.current = "NGN"
   mockPreferredAmountCurrency.current = undefined
 })
@@ -484,6 +492,27 @@ describe("an amount the fee quote calls too low", () => {
 
     expect(screen.queryByText(tooLow)).toBeNull()
     expect(isNextDisabled()).toBe(false)
+    expect(mockHapticReject).not.toHaveBeenCalled()
+  })
+
+  /** The light refusal of an amount fixed in place, like Low funds: once per showing. */
+  it("buzzes a refusal each time Next shows it", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("1")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    typeKeys("0")
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
+
+    fireEvent.press(nextButton())
+    await settle()
+    expect(mockHapticReject).toHaveBeenCalledTimes(2)
   })
 
   it("says so on Next, holds the send, and turns Next off for that amount", async () => {

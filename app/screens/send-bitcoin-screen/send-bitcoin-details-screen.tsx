@@ -674,10 +674,17 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         onRetry={goToNextScreen || undefined}
         onChangeAmount={clearAmount}
       />
-      {/* An amount the sender fixes right here gets the light refusal. Over the daily
-          limit opens the error sheet, which buzzes for itself. */}
+      {/* An amount the sender fixes right here gets the light refusal, the too-low
+          on-chain amount once Next shows it. Over the daily limit opens the error sheet,
+          which buzzes for itself. */}
       <ErrorHaptic
-        error={lnurlBoundsErrorMessage || (isLowFunds ? "lowFunds" : undefined)}
+        error={
+          lnurlBoundsErrorMessage ||
+          (isLowFunds ? "lowFunds" : undefined) ||
+          (isFeeTierErrorDeferred && !isFeeTierErrorHeld
+            ? feeTierErrorMessage
+            : undefined)
+        }
         kind="reject"
       />
       <HighFeeSheet
