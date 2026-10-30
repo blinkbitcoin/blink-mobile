@@ -183,6 +183,7 @@ export const useOnchainFeeTierOptions = ({
     hasFeeQuote: feeRail.hasQuote,
     feeTierErrorMessage: feeRail.errorMessage,
     isFeeTierErrorBlocking: feeRail.isErrorBlocking,
+    isFeeTierErrorDeferred: feeRail.isErrorDeferred,
     isQuotingFees,
   }
 }

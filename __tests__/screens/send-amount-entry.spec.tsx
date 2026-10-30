@@ -1,10 +1,11 @@
 import React from "react"
-import { StyleSheet } from "react-native"
+import { Keyboard, ScrollView, StyleSheet } from "react-native"
 
 import { act, fireEvent, render, screen, within } from "@testing-library/react-native"
 import { i18nObject } from "@app/i18n/i18n-util"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 
+import { Screen } from "@app/components/screen"
 import { PreferredAmountCurrency } from "@app/graphql/client-only-query"
 import { WalletCurrency } from "@app/graphql/generated"
 import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
@@ -29,13 +30,43 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { ContextForScreen } from "./helper"
 
+const mockNavigate = jest.fn()
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
-    navigate: jest.fn(),
+    navigate: mockNavigate,
     setOptions: jest.fn(),
   }),
 }))
+
+/** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
+const mockFeeTierOverride: { current: Record<string, unknown> } = { current: {} }
+
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options", () => {
+  const actual = jest.requireActual(
+    "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options",
+  )
+  return {
+    ...actual,
+    useOnchainFeeTierOptions: (...args: unknown[]) => ({
+      ...actual.useOnchainFeeTierOptions(...args),
+      ...mockFeeTierOverride.current,
+    }),
+  }
+})
+
+const mockIsIos = { current: true }
+
+jest.mock("@app/utils/helper", () => {
+  const actual = jest.requireActual("@app/utils/helper")
+  return {
+    ...actual,
+    get isIos() {
+      return mockIsIos.current
+    },
+  }
+})
 
 jest.mock("@app/store/persistent-state", () => ({
   ...jest.requireActual("@app/store/persistent-state"),
@@ -192,6 +223,8 @@ beforeEach(() => {
   loadLocale("en")
   mockSetAmount.mockClear()
   mockSavePreferredAmountCurrency.mockClear()
+  mockNavigate.mockClear()
+  mockFeeTierOverride.current = {}
   mockDisplayCurrency.current = "NGN"
   mockPreferredAmountCurrency.current = undefined
 })
@@ -427,6 +460,81 @@ describe("free amount", () => {
   })
 })
 
+/**
+ * The SDK calls an on-chain amount too low until the sender has typed past the minimum, so
+ * that error waits for Next rather than flagging each keystroke on the way there.
+ */
+describe("an amount the fee quote calls too low", () => {
+  const tooLow = LL.SendBitcoinScreen.sdkAmountTooLow()
+
+  beforeEach(() => {
+    mockFeeTierOverride.current = {
+      feeTierErrorMessage: tooLow,
+      isFeeTierErrorBlocking: true,
+      isFeeTierErrorDeferred: true,
+    }
+  })
+
+  it("stays quiet while the amount is typed, with Next on", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("3")
+    await settle()
+
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+  })
+
+  it("says so on Next, holds the send, and turns Next off for that amount", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("3")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(screen.getByText(tooLow)).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(isNextDisabled()).toBe(true)
+  })
+
+  /** ₦10 stays inside the bitcoin balance, so Next answers to the fee error alone. */
+  it("goes quiet again once the amount changes", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("1")
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    typeKeys("0")
+    await settle()
+
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+  })
+
+  /** Every other self-custodial fee error still shows at once: no amount typed further on
+   *  fixes a network failure or a balance that cannot cover the fee. */
+  it("shows a fee error that is not deferred straight away", async () => {
+    mockFeeTierOverride.current = {
+      feeTierErrorMessage: LL.SendBitcoinScreen.sdkNetworkError(),
+      isFeeTierErrorBlocking: true,
+      isFeeTierErrorDeferred: false,
+    }
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("3")
+    await settle()
+
+    expect(screen.getByText(LL.SendBitcoinScreen.sdkNetworkError())).toBeTruthy()
+    expect(isNextDisabled()).toBe(true)
+  })
+})
+
 describe("fixed amount", () => {
   it("hides the keypad and chips and offers Next straight away", async () => {
     renderScreen(invoiceDestination)
@@ -586,5 +694,123 @@ describe("wallet summary under hide-balance", () => {
     renderScreen(intraledgerDestination(), { hideAmount: true })
     await settle()
     expectBalanceShown()
+  })
+})
+
+/** The note is the screen's only text field, so these drive the keyboard listeners the
+ *  way typing a note would: will events for iOS, did events for Android. */
+describe("while the note is typed", () => {
+  const keyboardListeners: Record<string, Array<() => void>> = {}
+  const emitKeyboard = (event: string) =>
+    act(() => (keyboardListeners[event] ?? []).forEach((listener) => listener()))
+  const showKeyboard = () => {
+    emitKeyboard("keyboardWillShow")
+    emitKeyboard("keyboardDidShow")
+  }
+  const hideKeyboard = () => {
+    emitKeyboard("keyboardWillHide")
+    emitKeyboard("keyboardDidHide")
+  }
+
+  beforeEach(() => {
+    jest.spyOn(Keyboard, "isVisible").mockReturnValue(false)
+    jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
+      ;(keyboardListeners[event] ??= []).push(listener as () => void)
+      return { remove: jest.fn() } as unknown as ReturnType<typeof Keyboard.addListener>
+    })
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+    Object.keys(keyboardListeners).forEach((event) => delete keyboardListeners[event])
+    mockIsIos.current = true
+  })
+
+  const screenProps = () => screen.UNSAFE_getByType(Screen).props
+  const scrollView = () =>
+    screen
+      .UNSAFE_getAllByType(ScrollView)
+      .find((node) => node.props.keyboardShouldPersistTaps === "handled")!
+
+  it("hands the keypad's place to the system keyboard, and takes it back", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    showKeyboard()
+    expect(screen.queryByTestId("Key 1")).toBeNull()
+    expect(screen.queryByTestId("send-25%")).toBeNull()
+    expect(nextButton()).toBeTruthy()
+
+    hideKeyboard()
+    expect(screen.getByTestId("Key 1")).toBeTruthy()
+    expect(screen.getByTestId("send-25%")).toBeTruthy()
+  })
+
+  /** Android reports a closed keyboard as a keyboard change, which left a stale lift. */
+  it("lifts the screen on Android only while the keyboard is up", async () => {
+    mockIsIos.current = false
+    renderScreen(intraledgerDestination())
+    await settle()
+    expect(screenProps().avoidKeyboardOnAndroid).toBe(true)
+    expect(screenProps().avoidKeyboardEnabled).toBe(false)
+
+    showKeyboard()
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+
+    hideKeyboard()
+    expect(screenProps().avoidKeyboardEnabled).toBe(false)
+  })
+
+  /** iOS settles back by itself and needs the lift on as the keyboard starts to move. */
+  it("keeps the lift on for iOS", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+    showKeyboard()
+    hideKeyboard()
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+  })
+
+  it("drops the bottom inset the keyboard covers", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    expect(screenProps().edges).toEqual(["left", "right", "bottom"])
+
+    showKeyboard()
+    expect(screenProps().edges).toEqual(["left", "right"])
+
+    hideKeyboard()
+    expect(screenProps().edges).toEqual(["left", "right", "bottom"])
+  })
+
+  it("scrolls to the note as the screen shrinks and the note grows", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    const scrollToEnd = scrollView().instance.scrollToEnd as jest.Mock
+    scrollToEnd.mockClear()
+
+    fireEvent(scrollView(), "layout", { nativeEvent: { layout: { height: 600 } } })
+    expect(scrollToEnd).not.toHaveBeenCalled()
+
+    showKeyboard()
+    fireEvent(scrollView(), "layout", { nativeEvent: { layout: { height: 300 } } })
+    fireEvent(scrollView(), "contentSizeChange", 360, 520)
+    expect(scrollToEnd).toHaveBeenCalledTimes(2)
+  })
+
+  /** A fixed amount has no keypad to hand over, but the note still rides the keyboard. */
+  it("keeps the note in view for a fixed amount too", async () => {
+    renderScreen(invoiceDestination)
+    await settle()
+    const scrollToEnd = scrollView().instance.scrollToEnd as jest.Mock
+    scrollToEnd.mockClear()
+
+    showKeyboard()
+    fireEvent(scrollView(), "layout", { nativeEvent: { layout: { height: 300 } } })
+
+    expect(screenProps().avoidKeyboardEnabled).toBe(true)
+    expect(scrollToEnd).toHaveBeenCalledTimes(1)
+    expect(within(nextButton()).getByText(LL.common.next())).toBeTruthy()
   })
 })

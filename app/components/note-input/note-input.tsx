@@ -1,5 +1,6 @@
-import React, { useRef } from "react"
+import React, { useEffect, useRef, useState } from "react"
 import {
+  Keyboard,
   Pressable,
   View,
   TextInput,
@@ -36,11 +37,21 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   fontSize = 16,
 }) => {
   const { LL } = useI18nContext()
-  const styles = useStyles({ editable: Boolean(editable), big })
+  const [isFocused, setIsFocused] = useState(false)
+  const styles = useStyles({ editable: Boolean(editable), big, isFocused })
   const {
     theme: { colors },
   } = useTheme()
   const textInputRef = useRef<TextInput>(null)
+
+  /** Android's back gesture closes the keyboard but keeps the field focused; let go of it
+   *  too, so the field never looks focused with no keyboard to type on. */
+  useEffect(() => {
+    const sub = Keyboard.addListener("keyboardDidHide", () =>
+      textInputRef.current?.blur(),
+    )
+    return () => sub.remove()
+  }, [])
 
   const focusTextInput = () => {
     if (textInputRef.current) {
@@ -63,7 +74,11 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           placeholder={LL.NoteInput.addNote()}
           placeholderTextColor={colors.black}
           onChangeText={onChangeText}
-          onBlur={onBlur}
+          onFocus={() => setIsFocused(true)}
+          onBlur={() => {
+            setIsFocused(false)
+            onBlur?.()
+          }}
           value={value}
           editable={editable}
           selectTextOnFocus
@@ -85,12 +100,16 @@ export const NoteInput: React.FC<NoteInputProps> = ({
 }
 
 const useStyles = makeStyles(
-  ({ colors }, { editable, big }: { editable: boolean; big: boolean }) => ({
+  (
+    { colors },
+    { editable, big, isFocused }: { editable: boolean; big: boolean; isFocused: boolean },
+  ) => ({
     fieldBackground: {
       flexDirection: "row",
       borderStyle: "solid",
       overflow: "hidden",
-      backgroundColor: colors.grey5,
+      /** Lifts to grey6 while typed in, as the conversion fields do. */
+      backgroundColor: isFocused ? colors.grey6 : colors.grey5,
       paddingHorizontal: 10,
       borderRadius: 10,
       alignItems: "center",

@@ -4,7 +4,7 @@ import {
   Satoshis,
   LnUrlPayServiceResponse,
 } from "lnurl-pay"
-import React, { useCallback, useEffect, useState } from "react"
+import React, { useCallback, useContext, useEffect, useRef, useState } from "react"
 import { ActivityIndicator, ScrollView, View } from "react-native"
 import { gql } from "@apollo/client"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
@@ -25,11 +25,13 @@ import {
   decodeInvoiceString,
   Network as NetworkLibGaloy,
 } from "@blinkbitcoin/blink-client"
+import { HeaderHeightContext } from "@react-navigation/elements"
 import { NavigationProp, RouteProp, useNavigation } from "@react-navigation/native"
 import { makeStyles, useTheme } from "@rn-vui/themed"
 
 import { useAppConfig, useClipboard, usePriceConversion } from "@app/hooks"
 import { useDisplayCurrency } from "@app/hooks/use-display-currency"
+import { useKeyboardVisible } from "@app/hooks/use-keyboard-visible"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -42,6 +44,7 @@ import {
   WalletOrDisplayCurrency,
 } from "@app/types/amounts"
 import { reportError } from "@app/utils/error-logging"
+import { isIos } from "@app/utils/helper"
 
 import { FeeTierSelector } from "./fee-tier-selector"
 import { shouldWarnAboutHighFee } from "./hooks/high-fee-alert"
@@ -143,6 +146,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     useDisplayCurrency()
   const { LL } = useI18nContext()
   const { copyToClipboard } = useClipboard()
+  const headerHeight = useContext(HeaderHeightContext)
+  /** The note is the only text field here, so a raised keyboard means the note is being
+   *  typed: the system keyboard takes the keypad's place, and the bottom inset goes, since
+   *  the keyboard covers it. */
+  const isKeyboardVisible = useKeyboardVisible()
+  const scrollRef = useRef<ScrollView>(null)
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },
@@ -151,6 +160,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [isHighFeeSheetVisible, setIsHighFeeSheetVisible] = useState(false)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
+  /** The amount Next was last pressed at, so a deferred fee error speaks for that amount only. */
+  const [nextPressedAmount, setNextPressedAmount] = useState<number | null>(null)
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
@@ -169,6 +180,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     feeTierOptions,
     feeTierErrorMessage,
     isFeeTierErrorBlocking,
+    isFeeTierErrorDeferred,
     isQuotingFees,
     isOnchain,
     selectedTierFee,
@@ -434,10 +446,23 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     setSelectedPercent(percent)
   }
 
+  /**
+   * A deferred fee error waits for Next, then holds until the amount changes, so a sender
+   * typing past it toward a valid amount is never told the half-typed one is too low.
+   */
+  const settlementAmountValue = paymentDetail.settlementAmount?.amount ?? null
+  const isFeeTierErrorHeld =
+    isFeeTierErrorDeferred && nextPressedAmount !== settlementAmountValue
+
   const goToNextScreen =
     (paymentDetail.sendPaymentMutation ||
       (paymentDetail.paymentType === "lnurl" && paymentDetail.unitOfAccountAmount)) &&
     (async () => {
+      if (isFeeTierErrorDeferred) {
+        setNextPressedAmount(settlementAmountValue)
+        return
+      }
+
       let paymentDetailForConfirmation: PaymentDetail<WalletCurrency> = paymentDetail
 
       if (paymentDetail.paymentType === "lnurl" && !paymentDetail.sendPaymentMutation) {
@@ -546,7 +571,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     !amountStatus.validAmount ||
     Boolean(retryLimits) ||
     Boolean(lnurlBoundsErrorMessage) ||
-    isFeeTierErrorBlocking ||
+    (isFeeTierErrorBlocking && !isFeeTierErrorHeld) ||
     isQuotingFees
 
   /**
@@ -554,7 +579,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
    * act on. A fee error only takes the box once the amount is valid, or when it blocks the
    * send outright, since then there is nothing to continue to whatever the amount reads.
    */
-  const shouldShowFeeTierError = amountStatus.validAmount || isFeeTierErrorBlocking
+  const shouldShowFeeTierError =
+    !isFeeTierErrorHeld && (amountStatus.validAmount || isFeeTierErrorBlocking)
   const extraInfoErrorMessage =
     lnurlError?.message ||
     lnurlBoundsErrorMessage ||
@@ -610,6 +636,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
       (amountStatus.invalidReason === AmountInvalidReason.InsufficientBalance ||
         amountStatus.invalidReason === AmountInvalidReason.InsufficientLimit))
 
+  /** The note is the last field, so while it is being typed the end of the scroll is the
+   *  note: follow it as the screen shrinks over the keyboard and as the note grows. */
+  const scrollNoteIntoView = () => {
+    if (isKeyboardVisible) scrollRef.current?.scrollToEnd({ animated: true })
+  }
+
   const nextButtonTitle = (() => {
     if (paymentDetail.canSetAmount && !hasAmount) return LL.SendBitcoinScreen.addAmount()
     if (isLowFunds) return LL.SendBitcoinScreen.lowFunds()
@@ -617,7 +649,16 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   })()
 
   return (
-    <Screen preset="fixed" keyboardOffset="navigationHeader">
+    <Screen
+      preset="fixed"
+      keyboardOffset="navigationHeader"
+      keyboardVerticalOffset={headerHeight}
+      avoidKeyboardOnAndroid
+      // Android reports a closed keyboard as a keyboard change, which leaves a stale lift.
+      // iOS settles back by itself, and needs the lift on as the keyboard starts to move.
+      avoidKeyboardEnabled={isIos || isKeyboardVisible}
+      edges={isKeyboardVisible ? ["left", "right"] : ["left", "right", "bottom"]}
+    >
       <AmountEntryErrorSheet
         lnurlError={lnurlError}
         limitMessage={
@@ -641,9 +682,12 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         onClose={() => setIsHighFeeSheetVisible(false)}
       />
       <ScrollView
+        ref={scrollRef}
         style={styles.scroll}
         contentContainerStyle={styles.scrollContent}
         keyboardShouldPersistTaps="handled"
+        onLayout={scrollNoteIntoView}
+        onContentSizeChange={scrollNoteIntoView}
       >
         <SendHero
           active
@@ -705,7 +749,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
         </View>
       </ScrollView>
       <View style={styles.bottom}>
-        {paymentDetail.canSetAmount && (
+        {paymentDetail.canSetAmount && !isKeyboardVisible && (
           <View style={styles.pad}>
             <PercentageSelector
               isLocked={false}
