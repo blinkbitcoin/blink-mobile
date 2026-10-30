@@ -8,6 +8,7 @@ import {
   ArrowsDownUpIcon,
   ArrowsClockwiseIcon,
   ArrowSquareOutIcon,
+  AsteriskIcon,
   BackspaceIcon,
   BankIcon,
   BellIcon,
@@ -67,6 +68,7 @@ import {
   ShieldIcon,
   SnowflakeIcon,
   SpinnerGapIcon,
+  SquaresFourIcon,
   StorefrontIcon,
   TrashIcon,
   TranslateIcon,
@@ -90,6 +92,7 @@ import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-wit
 import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
+import EmergencyKit from "@app/assets/icons-redesign/emergency-kit.svg"
 import PaymentPending from "@app/assets/icons-redesign/payment-pending.svg"
 import PaymentSuccess from "@app/assets/icons-redesign/payment-success.svg"
 import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
@@ -104,6 +107,7 @@ import Send from "@app/assets/icons-redesign/send.svg"
 import Upgrade from "@app/assets/icons-redesign/upgrade.svg"
 import QrCode from "@app/assets/icons-redesign/qr-code.svg"
 import BtcHand from "@app/assets/icons-redesign/btc-hand.svg"
+import BtcOutline from "@app/assets/icons-redesign/btc-outline.svg"
 import CheckBadge from "@app/assets/icons-redesign/check-badge.svg"
 import CloudArrowUp from "@app/assets/icons-redesign/cloud-arrow-up.svg"
 import HeartOutline from "@app/assets/icons-redesign/heart-outline.svg"
@@ -136,6 +140,7 @@ export type IconWeight = "thin" | "regular" | "bold"
 // ── Icon maps ───────────────────────────────────────────────────────────────
 
 const phosphorIconMap = {
+  "apps": SquaresFourIcon,
   "arrow-down": ArrowDownIcon,
   "arrow-left": ArrowLeftIcon,
   "arrow-right": ArrowRightIcon,
@@ -151,6 +156,7 @@ const phosphorIconMap = {
   "calendar": CalendarIcon,
   "caret-down": CaretDownIcon,
   "caret-left": CaretLeftIcon,
+  "asterisk": AsteriskIcon,
   "caret-right": CaretRightIcon,
   "caret-up": CaretUpIcon,
   "chat": ChatCircleDotsIcon,
@@ -226,6 +232,7 @@ const customSvgMap = {
   "google-pay": GooglePay,
   "lightning-address": LightningAddress,
   "payment-error": PaymentError,
+  "emergency-kit": EmergencyKit,
   "payment-pending": PaymentPending,
   "payment-success": PaymentSuccess,
   "physical-card": PhysicalCard,
@@ -240,6 +247,7 @@ const customSvgMap = {
   "welcome": Welcome,
   "qr-code": QrCode,
   "btc-hand": BtcHand,
+  "btc-outline": BtcOutline,
   "check-badge": CheckBadge,
   "cloud-arrow-up": CloudArrowUp,
   "heart-outline": HeartOutline,
@@ -302,8 +310,8 @@ export const GaloyIcon = ({
   name,
   size,
   sizeVariant,
-  width,
-  height,
+  width = 0,
+  height = 0,
   color,
   style,
   backgroundColor,
@@ -316,9 +324,7 @@ export const GaloyIcon = ({
   } = useTheme()
 
   const resolvedSize =
-    size ??
-    (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ??
-    Math.max(width ?? 0, height ?? 0)
+    size ?? (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ?? Math.max(width, height)
   const resolvedColor = color || colors.black
 
   const styles = useStyles({
@@ -379,8 +385,12 @@ export const GaloyIcon = ({
   return (
     <SvgIcon
       opacity={opacity || 1}
-      width={size ?? width}
-      height={size ?? height}
+      /* Falls back to resolvedSize, not to the raw width/height: those default
+         to 0, so a caller passing only sizeVariant would otherwise render the
+         icon at zero pixels. Kept per-axis rather than using resolvedSize
+         outright so an explicit width/height pair stays non-square. */
+      width={width || resolvedSize}
+      height={height || resolvedSize}
       color={resolvedColor}
       style={style}
       testID={`icon-${name}`}

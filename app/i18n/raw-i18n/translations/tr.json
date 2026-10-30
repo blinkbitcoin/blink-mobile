@@ -2439,7 +2439,7 @@
     "sdkGenericError": "Ücretler tahmin edilemiyor. Lütfen farklı bir tutar deneyin."
   },
   "SettingsScreen": {
-    "createAddress": "Adres oluştur",
+    "createAddress": "Lightning adresi oluştur",
     "addressDisabled": "(devre dışı)",
     "donationButton": "Bağış düğmesi",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "Aktive edildi",
     "addressScreen": "Ödeme alma yolları",
     "nonCustodialAccount": "Saklamasız hesap",
+    "custodialAccount": "Saklamalı hesap",
     "tapUserName": "Kullanıcı adını ayarlamak için tıkla",
     "notifications": "Bildirimler",
     "title": "Ayarlar",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "E-postanızı doğrulayarak hesabınıza tekrar giriş yapabildiğinizden emin olun. Doğrulamayı şimdi yapmak istiyor musunuz?",
     "totp": "İki aşamalı doğrulama",
     "totpDeactivated": "İki aşamalı doğrulama kapatıldı",
-    "totpDeleteAlertTitle": "İki aşamalı doğrulamayı sil",
-    "totpDeleteAlertContent": "İki aşamalı doğrulamanızı silmek istediğinize emin misiniz?",
     "copiedAccountId": "Hesap kimliğiniz panoya kopyalandı",
     "yourAccountId": "Hesap Kimliğiniz",
     "accountId": "Hesap Kimliği",
@@ -2583,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",
-    "anonModeWalletLabel": "Incognito modunda kullanılamaz"
+    "anonModeWalletLabel": "Incognito modunda kullanılamaz",
+    "unknownRegionWalletLabel": "kullanılabilirlik kontrol edilemedi, yeniden denemek için aşağı çekin"
   },
   "AnonModeConvertModal": {
     "title": "Önce Dolar bakiyeni aktar",
@@ -2606,7 +2606,9 @@
     "contactSupport": "Destekle iletişime geçin"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor"
+    "modalTitle": "Dolar bakiyesi bölgenizde kullanılamıyor",
+    "unknownRegionModalTitle": "Dolar bakiyesinin kullanılabilirliği kontrol edilemedi",
+    "unknownRegionModalBody": "Dolar bakiyesinin sizin için kullanılabilir olup olmadığını kontrol edemedik. Yeniden denemek için ana ekranı aşağı çekin."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dolar bakiyesi bölgenizde kullanılamıyor",
@@ -2615,14 +2617,11 @@
     "youGet": "Alacağınız"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "İki aşamalı doğrulama",
-    "secret": "Gizli anahtar/yedek",
-    "content": "Bu QR kodunu kimlik doğrulayıcı uygulamanızla tarayın. Alternatif olarak, sırrı kimlik doğrulayıcı uygulamanıza manuel olarak kopyalayıp yapıştırabilirsiniz."
+    "title": "İki aşamalı doğrulama"
   },
   "TotpRegistrationValidateScreen": {
     "title": "İki aşamalı doğrulama",
-    "enter6digitCode": "İki aşamalı doğrulamayı başlatmak için doğrulama uygulamanıza gelen 6 haneli kodu girin.",
-    "success": "İki faktörlü kimlik doğrulama etkinleştirildi. Artık yalnızca telefonunuz veya e-postanız VE iki faktörlü kimlik doğrulamanız ile tekrar giriş yapabileceksiniz.\n\nBu hesapta 2FA ile oturum açmamış cihazların tekrar oturum açması gerekecektir.\n\n2FA erişiminin kaybedilmesi durumunda müşteri desteği tarafından yalnızca 2. seviye hesaplar kurtarılabilir."
+    "enter6digitCode": "İki aşamalı doğrulamayı başlatmak için doğrulama uygulamanıza gelen 6 haneli kodu girin."
   },
   "TotpLoginValidateScreen": {
     "title": "İki aşamalı doğrulama",
@@ -2696,7 +2695,9 @@
     "noFee": "ücretsiz",
     "fromApprox": "en az ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Şu an için ücretlere ulaşamıyoruz"
+    "error": "Şu an için ücretlere ulaşamıyoruz",
+    "inactivity": "Hareketsizlik >{months: number} ay",
+    "usdPerMonth": "{amount: string}/ay"
   },
   "TransactionLimitsScreen": {
     "receive": "Al",
@@ -3689,6 +3690,67 @@
         "codingBackend": "...backend kodlanıyor",
         "buttonText": "Güzel"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Blink'in bir parçası olmaya hoş geldiniz",
+          "paragraphs": {
+            "body1": "Profesyonel yatırımcılardan daha fazla fon toplamadan önce, Blink ailesine, süper kullanıcılarımıza ve destekçilerimize bir davetiye göndermeye karar verdik. Önce sizin gibi birini davet edebilecekken neden yabancıları getirelim?",
+            "body2": "Bu kişisel bir davettir. Lütfen iletmeyin veya herkese açık paylaşmayın."
+          }
+        },
+        "buttonText": "Devam Et"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ne kadar yatırım yapmak istersiniz?",
+        "percent": "~{percent: number}% için"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Şirket değerlemesi",
+          "paragraphs": {
+            "body1": "Bu yatırım turunda Blink'in ön para değerlemesi 10 milyon dolardır.",
+            "body2": "VC'lerden daha yüksek bir fiyatla fon toplayabiliriz. Ancak, süper kullanıcılarımızla ortaklıkta uzun vadeli karşılıklı faydalar görüyoruz. Bu nedenle, bu teklifi sizin için daha iyi koşullarla sunuyoruz."
+          }
+        },
+        "buttonText": "Anladım"
+      },
+      "TermSheet": {
+        "title": "Şartname",
+        "equitySection": {
+          "title": "Blink'te Pay",
+          "investment": "{amount: string} Yatırım",
+          "valuation": "10M $ ön para değerlemesinde",
+          "units": "{units: string} birim alırsınız ~Blink'in %{percent: number}'i"
+        },
+        "buttonText": "İmzaya Geç"
+      },
+      "TransferInvest": {
+        "title": "Yatırımınızı transfer edin",
+        "paragraphs": {
+          "body1": "Blink'te {units: string} birim için abonelik sözleşmesini imzaladınız.",
+          "body2": "{amount: string} yatırım tutarını transfer etme zamanı. Bitcoin ile ödeyeceksiniz."
+        },
+        "buttonText": "Devam Et",
+        "paymentsUnavailable": "Yatırım ödemeleri henüz açık değil. Lütfen daha sonra tekrar dene."
+      },
+      "InsufficientBalance": {
+        "title": "Yetersiz bakiye",
+        "paragraphs": {
+          "balanceBitcoin": "Bitcoin hesabında yalnızca {balance: string} var.",
+          "balanceDollar": "Dolar hesabında yalnızca {balance: string} var.",
+          "body2": "{investmentAmount: string} tutarındaki yatırım miktarına ulaşmak için hesabına {shortfall: string} tutarından fazlasını yatır.",
+          "body3": "Tutarın tamamının hesaplarından birinde bulunduğundan emin ol; Bitcoin veya Dolar."
+        },
+        "buttonText": "Yatır",
+        "splitFunds": {
+          "title": "Paranız bölünmüş durumda",
+          "body": "Yatırım yapmaya yetecek kadar paranız var, ancak Bitcoin ve Dolar hesaplarınız arasında bölünmüş. Tutarın tamamı tek bir hesapta olacak şekilde dönüştürün."
+        }
+      },
+      "DepositPending": {
+        "message": "Yatırılan tutarın kesinleşmesi bekleniyor; lütfen zincir üzerinde 2 onay bekle.",
+        "buttonText": "Tamam"
+      },
       "PersonalInformation": {
         "title": "Son adım",
         "fields": {
@@ -3786,10 +3848,18 @@
         "testSuccess": "Yedekleme ifaden doğru"
       }
     },
+    "BundleExport": {
+      "title": "Acil çıkış",
+      "body": "Spark çökerse bu paket, bitcoin'ini Blink olmadan zincir üzerine taşımanı sağlar. Dolar bakiyen kurtarılamaz.",
+      "download": "Paketi indir",
+      "sensitiveTitle": "Hassas",
+      "learnMore": "Tek taraflı çıkış hakkında daha fazla bilgi",
+      "sensitiveConfirm": "İndir",
+      "sensitiveBody": "Bu dosya bakiyeni ve ödeme geçmişini gösterir, bu yüzden gizli tut. Acil bir durumda kullanmak için yedekleme ifadene de ihtiyacın var."
+    },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
-      "encryptCheckbox": "Ek şifre ile şifrele",
       "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
       "confirmPassword": "Şifreyi onayla",
@@ -3866,6 +3936,7 @@
       "newBitcoinBalance": "Yeni Bitcoin bakiyesi",
       "newDollarBalance": "Yeni Dolar bakiyesi",
       "dollarBalanceNotAvailable": "kullanılamıyor",
+      "lnAddressNotMoved": "Lightning adresiniz taşınamadı. Paranız yine de aktarılacak.",
       "networkFee": "Ağ ücreti: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Ağ ücreti: <bold>{fee: string}</bold> (Blink tarafından karşılanır)",
       "retryCta": "Tekrar dene",
@@ -3914,8 +3985,18 @@
     "explainerCheck5": "Hesabından bir Spark ağ ücreti düşülecek",
     "explainerCta": "Anladım",
     "transferringFunds": "Bakiyeniz aktarılıyor. Birkaç saniye içinde tamamlanacaktır.",
+    "transferInProgress": {
+      "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız."
+    },
     "transferDelayed": {
       "body": "Bakiyeniz yeni hesabınıza aktarılıyor. Bu, normalden uzun sürüyor — uygulamayı açık tutun, işlemi otomatik olarak tamamlayacağız.",
+      "contactSupportCta": "Destek ile iletişime geçin"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Taşıma ilerlemenizi bu cihazdan okuyamadık. Hiçbir şey kaybolmadı: paranız güvende ve ilerlemeniz hâlâ kayıtlı.",
+      "outOfSpaceBody": "Cihazınızda depolama alanı kalmadı, bu yüzden taşıma ilerlemenizi okuyamıyoruz. Yer açıp tekrar deneyin. Hiçbir şey kaybolmadı: paranız güvende.",
+      "notSavedBody": "Taşıma ilerlemenizi bu cihaza kaydedemedik. Hiçbir şey kaybolmadı: paranız güvende. Tekrar deneyin.",
+      "notSavedOutOfSpaceBody": "Cihazınızda depolama alanı kalmadı, bu yüzden taşıma ilerlemenizi kaydedemiyoruz. Yer açıp tekrar deneyin. Hiçbir şey kaybolmadı: paranız güvende.",
       "contactSupportCta": "Destek ile iletişime geçin"
     },
     "clockOutOfSync": {
@@ -3979,6 +4060,12 @@
     "recognizePhraseTitle": "Bu yedekleme ifadesini tanıyor musun?",
     "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operatöre ulaşılamıyor",
+    "outageBody": "Spark'ta bir kesinti yaşanıyor. Lütfen birkaç dakika bekleyip tekrar deneyin veya {support} ile iletişime geçin",
+    "outageSupport": "Destek",
+    "tryAgainLater": "Daha sonra dene"
+  },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",
     "description": "Cüzdanınızı şimdi güvenceye alın. Sadece bir dakika sürer.",
@@ -3987,6 +4074,81 @@
     "modalTitle": "Fonlarınızı güvenceye alın",
     "modalDescription": "Cüzdanınızı yedeklemenizi şiddetle tavsiye ederiz. Bu cihazı kaybetmeniz durumunda fonlarınızın tamamen kaybolmasını önlemek için.",
     "secureMe": "Cüzdanı güvenceye al"
+  },
+  "TwoFactorEnforcement": {
+    "title": "İki aşamalı doğrulamayı ayarlayın",
+    "cardDescription": "Hesabınızı yetkisiz erişime karşı koruyun.",
+    "cardCta": "Ayarla",
+    "settingsDescription": "Hesabınızı yetkisiz erişime karşı korumak için bunu ayarlayın.",
+    "setupTitle": "İki aşamalı doğrulamayı şimdi ayarlayın",
+    "setupDescription": "Hesabınıza yetkisiz erişimi önlemek için şimdi iki aşamalı doğrulama ekleyin.",
+    "setAuthenticator": "Doğrulayıcı ayarla",
+    "reminderTitle": "Varlıklarınızı korumak için bir doğrulayıcı ekleyin",
+    "reminderDescription": "Bakiyeniz arttı. Bir doğrulayıcı uygulaması, biri e-postanızı veya telefonunuzu ele geçirse bile hesabınızı güvende tutar.",
+    "modalReminder": "Şimdi reddederseniz, en kısa sürede etkinleştirdiğinizden emin olun.",
+    "dismissTwoMore": "Bunu iki kez daha reddedebilirsiniz.",
+    "dismissOneMore": "Bunu bir kez daha reddedebilirsiniz.",
+    "dismissLast": "Bu, bunu reddedebileceğiniz son seferdir.",
+    "setNow": "Şimdi ayarla",
+    "dontWantTo": "İstemiyorum",
+    "highBalanceTitle": "{amount} üzerinde varlığınız var, lütfen ek koruma ekleyin",
+    "protectionRequiredTitle": "Blink'i kullanmaya devam etmek için lütfen ek koruma ekleyin",
+    "protectionRequiredBody": "Ne kadar çok varlığınız varsa, daha iyi güvenlik o kadar önemlidir. Blink'i kullanmaya devam etmek için lütfen bir doğrulayıcı ekleyin.",
+    "nonCustodialTitle": "İki aşamalı doğrulamayı ayarlamak istemiyorsanız",
+    "nonCustodialBody": "Diğer seçenek saklama dışı moda geçmektir. O zaman kendi varlıklarınızdan siz sorumlu olursunuz."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Varlıklarınızı bir doğrulayıcıyla koruyun",
+    "introDescription": "Doğrulayıcı uygulaması her 30 saniyede bir yeni 6 haneli kod üretir.",
+    "takeoversTitle": "Hesabın ele geçirilmesini önler",
+    "takeoversDescription": "Kod yalnızca telefonunuzda bulunur",
+    "stolenNumberTitle": "Numaranız çalınsa bile güvende olun",
+    "stolenNumberDescription": "Biri e-postanıza veya telefon numaranıza erişse bile giriş yapamaz",
+    "durationTitle": "Yaklaşık 2 dakika sürer",
+    "durationDescription": "Size adım adım rehberlik edeceğiz",
+    "getStarted": "Başla",
+    "appsTitle": "Bir doğrulayıcı uygulaması edinin",
+    "appsDescription": "Her doğrulayıcı uygulaması çalışır. Bunlar ücretsiz ve güvenilirdir:",
+    "googleAuthenticatorDescription": "Basit ve yaygın olarak kullanılır. Google hesabınıza isteğe bağlı yedekleme.",
+    "protonAuthenticatorDescription": "Açık kaynak. Uçtan uca şifreli yedekleme ve senkronizasyon.",
+    "twoFasAuthDescription": "Açık kaynak. Hesap gerekmez.",
+    "get": "İndir",
+    "storeNote": "“İndir” App Store'u veya Google Play'i açar. Yüklendikten sonra Blink'e geri dönün.",
+    "haveAnApp": "Bir uygulamam var",
+    "keyInstruction": "Bu kurulum anahtarını doğrulayıcı uygulamanıza kopyalayın.",
+    "qrInstruction": "Başka bir cihaz mı kullanıyorsunuz?\nBunun yerine bu QR kodunu tarayın.",
+    "backupTitle": "Anahtarınızı yedekleyin",
+    "backupDescription": "Telefonunuzu kaybederseniz bu anahtar, doğrulayıcınızı yeniden kurmanızı sağlar. Bu telefondan başka bir yere kaydedin.",
+    "saveToPasswordManager": "Bir şifre yöneticisine kaydet",
+    "shareToPasswordManager": "Bir şifre yöneticisiyle paylaş",
+    "copyForManualBackup": "Manuel yedekleme için kopyala",
+    "passwordManagerUnavailable": "Bu cihazda kullanılabilir bir parola yöneticisi yok. Bunun yerine anahtarı manuel yedekleme için kopyala.",
+    "savedIt": "Kaydettim",
+    "keyBackupText": "Blink doğrulayıcı kurulum anahtarı\n\nHesap: {account}\nKurulum anahtarı: {key}\n\nTelefonunuzu kaybederseniz, Blink giriş kodlarınızı geri almak için bu kurulum anahtarını bir doğrulayıcı uygulamasına ekleyin. Bu anahtara sahip olan herkes kodlarınızı üretebilir, bu yüzden gizli tutun.",
+    "protectedTitle": "Hesabınız artık korunuyor",
+    "protectedDescription": "Bundan sonra giriş yapmak için doğrulayıcı uygulamanızdan tek kullanımlık bir kod gerekecek.",
+    "newPhoneTip": "Yeni bir telefon alırsanız, eskisini sıfırlamadan <bold>önce</bold> doğrulayıcınızı yeni telefona taşıyın.",
+    "done": "Tamam"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Açık",
+    "statusDisabled": "2FA: Kapalı",
+    "modalTitle": "2FA'yı kapatmanızı önermiyoruz",
+    "modalBody": "Bu, hesabınızın güvenliğini azaltır ve üçüncü bir kişinin izniniz olmadan hesabınıza erişmesini kolaylaştırır.",
+    "keepProtected": "Korumada kalayım",
+    "codeInstruction": "İki faktörlü kimlik doğrulamayı kapatmak için doğrulayıcı uygulamanızdaki 6 haneli kodu girin.",
+    "codeInvalid": "Bu kod yanlış. Doğrulayıcı uygulamanızdaki güncel kodu girin.",
+    "tooManyAttempts": "Çok fazla deneme. Bir saat sonra tekrar deneyin.",
+    "manualResetTitle": "2FA manuel sıfırlama",
+    "manualResetBody": "Güvenliğiniz için 2FA'nın uygulama içinden kaldırılmasına izin vermiyoruz. 2FA sıfırlamaya ihtiyacınız varsa <support>Destek</support> ekibimizle iletişime geçin."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "E-posta ekle",
+    "addPhoneTitle": "Telefon numarası ekle",
+    "addEmailCode": "E-postanı eklemek için doğrulayıcı uygulamandaki 6 haneli kodu gir.",
+    "addPhoneCode": "Telefon numaranı eklemek için doğrulayıcı uygulamandaki 6 haneli kodu gir.",
+    "codeInvalid": "Bu kod yanlış. Doğrulayıcı uygulamanızdaki güncel kodu girin.",
+    "tooManyAttempts": "Çok fazla deneme. Bir saat sonra tekrar deneyin."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -3997,6 +4159,15 @@
     "title": "Bu, saklamasız bir hesaptır",
     "body": "Daha fazla bilgi için blog yazımızı okuyun",
     "cta": "Oku"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Bulut yedeğini güncelle",
+    "body": "{provider} içindeki acil durum paketin güncel değil. Güncellemek için cüzdanını yeniden yedekle.",
+    "cta": "Yeniden yedekle"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Henüz acil durum paketi yok. İlk işleminden sonra oluşturulur.",
+    "exportFailed": "Acil durum paketi indirilemedi."
   },
   "StableBalance": {
     "title": "Sabit bakiye",

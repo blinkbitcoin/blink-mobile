@@ -1,4 +1,4 @@
-import { useEffect, useRef, useState } from "react"
+import { useCallback, useEffect, useRef, useState } from "react"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
@@ -29,6 +29,18 @@ type UseMigrationReceiveConfirmationArgs = {
   /** True until the server phase is COMPLETED: before the drain is even paid there is
    *  nothing to look for, and each look opens a whole SDK connection. */
   skip: boolean
+  /** Told when a check got an answer about the wallet, with the moment it began: the funds
+   *  landed or not, or the wallet's key is gone. A check that failed to look (a dropped
+   *  connection, a keystore read that threw) is not reported, since it says nothing about
+   *  where the funds are. Read through a ref, so a caller passing a fresh function each
+   *  render never re-arms the polling (a re-armed effect fires an extra check at once). */
+  onWalletChecked?: (startedAt: number) => void
+  /** An earlier watch of this same receive already ran past the notice window (the app was
+   *  relaunched mid-wait), so the window is not started over: a receive that was late
+   *  before the relaunch is late now. With the delayed-redirect flag on, that releases the
+   *  gate at once, as the elapsed window would have. Read once it is known, so a caller
+   *  that learns it after the watch began still cuts the window short. */
+  wasDelayedEarlier?: boolean
 }
 
 type UseMigrationReceiveConfirmation = {
@@ -41,6 +53,10 @@ type UseMigrationReceiveConfirmation = {
    */
   isReceiveProven: boolean
   isReceiveDelayed: boolean
+  /** Looks again now rather than on the next scheduled check, or straight after the one in
+   *  flight, so a caller can ask for a look taken after something it knows has changed.
+   *  Does nothing while the gate is not watching. */
+  recheck: () => void
 }
 
 /**
@@ -61,6 +77,8 @@ export const useMigrationReceiveConfirmation = ({
   selfCustodialAccountId,
   expectedReceiveSats,
   skip,
+  onWalletChecked,
+  wasDelayedEarlier = false,
 }: UseMigrationReceiveConfirmationArgs): UseMigrationReceiveConfirmation => {
   const network = useSparkNetwork()
   const {
@@ -68,8 +86,20 @@ export const useMigrationReceiveConfirmation = ({
     migrationReceiveDelayedNoticeMs,
     migrationDelayedRedirectEnabled,
   } = useRemoteConfig()
-  const [isReceiveConfirmed, setIsReceiveConfirmed] = useState(false)
-  const [isReceiveDelayed, setIsReceiveDelayed] = useState(false)
+  /**
+   * Each answer is kept with the wallet it is about. The gate outlives the wallet it
+   * watches (the background resume is mounted under the tab navigator, which an account
+   * switch keeps), so a bare "confirmed" from one migration would stand as proof for the
+   * next: the gate would never look at the second wallet, and the completion would close
+   * its custodial account on a receive nobody saw land. A delay kept bare would do the
+   * same through the timeout release.
+   */
+  const [confirmedAccountId, setConfirmedAccountId] = useState<string | null>(null)
+  const [delayedAccountId, setDelayedAccountId] = useState<string | null>(null)
+  const isReceiveConfirmed =
+    selfCustodialAccountId !== null && confirmedAccountId === selfCustodialAccountId
+  const isReceiveDelayed =
+    selfCustodialAccountId !== null && delayedAccountId === selfCustodialAccountId
 
   /** A zero-receive migration (balance at or under an uncovered fee) gets no payment, so
    *  the gate opens without ever touching the SDK; waiting would strand the user forever. */
@@ -94,14 +124,33 @@ export const useMigrationReceiveConfirmation = ({
    *  current cadence without re-arming (a re-armed effect fires an extra check at once). */
   const isReceiveDelayedRef = useRef(false)
 
+  /** The latest callback, refreshed after each commit rather than during render, where a
+   *  render React throws away would still have written it. Declared ahead of the polling
+   *  effect, so the first check already sees the current one. */
+  const onWalletCheckedRef = useRef(onWalletChecked)
+  useEffect(() => {
+    onWalletCheckedRef.current = onWalletChecked
+  }, [onWalletChecked])
+
+  /** Set by the polling effect while it runs; the effect owns the timer and the in-flight
+   *  check the recheck has to coordinate with. */
+  const recheckRef = useRef<(() => void) | null>(null)
+
   useEffect(() => {
     if (!isWatching || selfCustodialAccountId === null) return
 
     let isActive = true
     let timer: ReturnType<typeof setTimeout> | undefined
+    let isCheckInFlight = false
+    let isRecheckQueued = false
     const accountId = selfCustodialAccountId
 
     const scheduleNextCheck = () => {
+      if (isRecheckQueued) {
+        isRecheckQueued = false
+        runCheck()
+        return
+      }
       const retryMs = isReceiveDelayedRef.current
         ? DELAYED_RECEIVE_CHECK_RETRY_MS
         : RECEIVE_CHECK_RETRY_MS
@@ -115,6 +164,8 @@ export const useMigrationReceiveConfirmation = ({
     }
 
     const runCheck = async () => {
+      isCheckInFlight = true
+      const startedAt = Date.now()
       let result: Awaited<ReturnType<typeof checkMigrationReceiveLanded>>
       try {
         result = await checkMigrationReceiveLanded({
@@ -126,11 +177,20 @@ export const useMigrationReceiveConfirmation = ({
         /** A keystore read that threw before the SDK result shape existed: transient as
          *  far as this gate can tell, so it is retried like a lost connection. */
         if (!isActive) return
+        isCheckInFlight = false
         reportOnce(err)
         scheduleNextCheck()
         return
       }
       if (!isActive) return
+      isCheckInFlight = false
+      /** Listed rather than excluded: a dropped connection and a settled failure both mean
+       *  the wallet was never seen, and a status added later should have to earn its place
+       *  here rather than count by default. */
+      const hasLooked =
+        result.status === MigrationSdkStatus.Ok ||
+        result.status === MigrationSdkStatus.NoMnemonic
+      if (hasLooked) onWalletCheckedRef.current?.(startedAt)
 
       /**
        * The wallet's key is gone from the device, and the gate must not answer that with a
@@ -147,7 +207,7 @@ export const useMigrationReceiveConfirmation = ({
       }
 
       if (result.status === MigrationSdkStatus.Ok && result.value.hasReceived) {
-        setIsReceiveConfirmed(true)
+        setConfirmedAccountId(accountId)
         return
       }
 
@@ -158,10 +218,22 @@ export const useMigrationReceiveConfirmation = ({
       scheduleNextCheck()
     }
 
+    /** A check already on its way began before whatever the caller knows changed, so the
+     *  fresh look is queued behind it rather than stacked beside it. */
+    recheckRef.current = () => {
+      if (isCheckInFlight) {
+        isRecheckQueued = true
+        return
+      }
+      if (timer) clearTimeout(timer)
+      runCheck()
+    }
+
     runCheck()
 
     return () => {
       isActive = false
+      recheckRef.current = null
       if (timer) clearTimeout(timer)
     }
   }, [isWatching, selfCustodialAccountId, network, selfCustodialDepositClaimLeewayVbyte])
@@ -180,19 +252,31 @@ export const useMigrationReceiveConfirmation = ({
     if (watchedAccountIdRef.current !== selfCustodialAccountId) {
       watchedAccountIdRef.current = selfCustodialAccountId
       watchStartedAtRef.current = Date.now()
+      /** The answers already belong to their wallet; these two mirrors do not, so they
+       *  start over with it: the cadence, and the one failure report per receive. */
       isReceiveDelayedRef.current = false
-      setIsReceiveDelayed(false)
+      hasReportedFailureRef.current = false
     }
 
     const elapsed = Date.now() - watchStartedAtRef.current
-    const remaining = Math.max(migrationReceiveDelayedNoticeMs - elapsed, 0)
+    const remaining = wasDelayedEarlier
+      ? 0
+      : Math.max(migrationReceiveDelayedNoticeMs - elapsed, 0)
 
+    const delayedWalletId = selfCustodialAccountId
     const timer = setTimeout(() => {
       isReceiveDelayedRef.current = true
-      setIsReceiveDelayed(true)
+      setDelayedAccountId(delayedWalletId)
     }, remaining)
     return () => clearTimeout(timer)
-  }, [isWatching, selfCustodialAccountId, migrationReceiveDelayedNoticeMs])
+  }, [
+    isWatching,
+    selfCustodialAccountId,
+    migrationReceiveDelayedNoticeMs,
+    wasDelayedEarlier,
+  ])
+
+  const recheck = useCallback(() => recheckRef.current?.(), [])
 
   /** A zero-receive migration counts as proven, not merely released: nothing was ever
    *  going to arrive, so an empty wallet is the confirmed outcome rather than an unknown. */
@@ -212,5 +296,6 @@ export const useMigrationReceiveConfirmation = ({
       !isReceiveConfirmed &&
       !isConfirmedWithoutWaiting &&
       !isReleasedByTimeout,
+    recheck,
   }
 }

@@ -38,4 +38,28 @@ describe("deep-linkable routes", () => {
     expect(routeNames).toContain("circlesDashboard")
     expect(routeNames).toContain("sendBitcoinDestination")
   })
+
+  /**
+   * No link reaches the investment flow yet. Its entry arrives together with the check
+   * of who may take part: a build that links to it without that check would let any
+   * signed-in user pay into the round the day the deposit wallet is configured. Its
+   * later steps take figures the signing produced and are reached from it alone; a link
+   * landing on one would open it with nothing to show, or with a sum nobody agreed to.
+   */
+  it("links to no step of the investment flow", () => {
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingWelcomeInvestScreen")
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingTransferInvestScreen")
+    expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingDepositPendingScreen")
+  })
+
+  /**
+   * The code screen and the backup take the setup key as a param. A link landing on
+   * either would show a key the registration never issued, and offer to save it as the
+   * account's. The registration is reached from its own start alone.
+   */
+  it("links to no step of the authenticator registration that carries the setup key", () => {
+    const routeNames = collectRouteNames(DEEP_LINK_SCREENS as ScreenConfig)
+    expect(routeNames).not.toContain("totpRegistrationValidate")
+    expect(routeNames).not.toContain("totpRegistrationBackup")
+  })
 })

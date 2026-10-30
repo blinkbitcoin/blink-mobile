@@ -348,6 +348,11 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       (#3824); concurrency guarded with `useInFlightGuard` (#3868).
 - [ ] Fees/limits from the SDK: don't rely on SDK defaults silently (default fee caps bit
       us in #3903); make chosen fee policy explicit and remote-configurable.
+- [ ] **SDK upgrades re-run the manual send matrix and record it in the PR**: every spec
+      mocks the bridge, so a contract change in the SDK is invisible to the suite (0.22.0
+      started refusing the idempotency key on dollar sends and nothing went red, #4272).
+      At minimum: dollar wallet to a Lightning address, bitcoin wallet to a Lightning
+      address, and a bech32 LNURL, as first verified in #3765.
 
 ### Feature flags / Remote Config
 

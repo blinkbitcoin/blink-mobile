@@ -2439,7 +2439,7 @@
     "sdkGenericError": "Kan ikke estimere gebyrer. Prøv venligst et andet beløb."
   },
   "SettingsScreen": {
-    "createAddress": "Opret adresse",
+    "createAddress": "Opret Lightning-adresse",
     "addressDisabled": "(deaktiveret)",
     "donationButton": "Donér-knap",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "Aktiveret",
     "addressScreen": "Måder at modtage betaling",
     "nonCustodialAccount": "Ikke-depotkonto",
+    "custodialAccount": "Depotkonto",
     "tapUserName": "Tryk for at indstille brugernavn",
     "notifications": "Notifikationer",
     "title": "Indstillinger",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "Sørg for, at du kan logge tilbage ind på din konto ved at verificere din e-mail. Vil du udføre verifikationen nu?",
     "totp": "To-faktor godkendelse",
     "totpDeactivated": "To-faktor godkendelse er blevet deaktiveret",
-    "totpDeleteAlertTitle": "Slet to-faktor godkendelse",
-    "totpDeleteAlertContent": "Er du sikker på, at du vil slette din to-faktor godkendelse?",
     "copiedAccountId": "Dit konto ID er kopieret til udklipsholderen",
     "yourAccountId": "Dit konto ID",
     "accountId": "Konto-ID",
@@ -2583,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",
-    "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand"
+    "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand",
+    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen"
   },
   "AnonModeConvertModal": {
     "title": "Overfør først din dollarsaldo",
@@ -2606,7 +2606,9 @@
     "contactSupport": "Kontakt support"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region"
+    "modalTitle": "Dollar-saldo er ikke tilgængelig i din region",
+    "unknownRegionModalTitle": "Kunne ikke tjekke Dollar-saldoens tilgængelighed",
+    "unknownRegionModalBody": "Vi kunne ikke tjekke, om Dollar-saldoen er tilgængelig for dig. Træk ned på startskærmen for at prøve igen."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Dollar-saldo er ikke tilgængelig i din region",
@@ -2615,14 +2617,11 @@
     "youGet": "Du får"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "To-faktor godkendelse",
-    "secret": "Hemmelighed/backup",
-    "content": "Scan denne QR-kode med din autentificeringsapp. Alternativt kan du manuelt kopiere/indsætte den hemmelige nøgle i din autentificeringsapp."
+    "title": "To-faktor godkendelse"
   },
   "TotpRegistrationValidateScreen": {
     "title": "To-faktor godkendelse",
-    "enter6digitCode": "Indtast den 6-cifrede kode fra din autentificeringsapp for at bekræfte din to-faktor godkendelse.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nDevices on this account which are not logged in with 2FA will need to log back in.\n\nOnly level 2 accounts can be recovered by customer support in the event of lost 2FA access."
+    "enter6digitCode": "Indtast den 6-cifrede kode fra din autentificeringsapp for at bekræfte din to-faktor godkendelse."
   },
   "TotpLoginValidateScreen": {
     "title": "To-faktor godkendelse",
@@ -2696,7 +2695,9 @@
     "noFee": "intet gebyr",
     "fromApprox": "fra ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Kunne ikke hente gebyrer i øjeblikket"
+    "error": "Kunne ikke hente gebyrer i øjeblikket",
+    "inactivity": "Inaktivitet >{months: number} måneder",
+    "usdPerMonth": "{amount: string}/måned"
   },
   "TransactionLimitsScreen": {
     "receive": "Modtag",
@@ -3689,6 +3690,67 @@
         "codingBackend": "...koder backend",
         "buttonText": "Fedt"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Velkommen til at blive en del af Blink",
+          "paragraphs": {
+            "body1": "Før vi rejser flere midler fra professionelle investorer, besluttede vi at udvide en invitation til Blink-familien, vores superbrugere og støtter. Hvorfor bringe fremmede ombord, når vi først kan invitere nogen som dig?",
+            "body2": "Dette er en personlig invitation. Del den venligst ikke videre eller offentligt."
+          }
+        },
+        "buttonText": "Fortsæt"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Hvor meget vil du gerne investere?",
+        "percent": "for ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Virksomhedsvurdering",
+          "paragraphs": {
+            "body1": "I denne investeringsrunde er pre-money-vurderingen af Blink 10 millioner dollars.",
+            "body2": "Vi kunne rejse kapital til en højere pris fra venturekapitalister. Vi ser dog langsigtede gensidige fordele i at samarbejde med vores superbrugere. Derfor tilbyder vi dette tilbud til bedre vilkår for dig."
+          }
+        },
+        "buttonText": "Forstået"
+      },
+      "TermSheet": {
+        "title": "Termblad",
+        "equitySection": {
+          "title": "Egenkapital i Blink",
+          "investment": "{amount: string} Investering",
+          "valuation": "Ved $10M pre-money vurdering",
+          "units": "Du modtager {units: string} enheder ~{percent: number}% af Blink"
+        },
+        "buttonText": "Fortsæt til Underskrift"
+      },
+      "TransferInvest": {
+        "title": "Overfør din investering",
+        "paragraphs": {
+          "body1": "Du har underskrevet tegningsaftalen for {units: string} enheder i Blink.",
+          "body2": "Det er tid til at overføre investeringsbeløbet på {amount: string}. Du betaler med Bitcoin."
+        },
+        "buttonText": "Fortsæt",
+        "paymentsUnavailable": "Betalinger for investeringen er ikke åbne endnu. Prøv venligst igen senere."
+      },
+      "InsufficientBalance": {
+        "title": "Utilstrækkelig saldo",
+        "paragraphs": {
+          "balanceBitcoin": "Du har kun {balance: string} på din Bitcoin-konto.",
+          "balanceDollar": "Du har kun {balance: string} på din dollar-konto.",
+          "body2": "Indbetal mere end {shortfall: string} på din konto for at nå investeringsbeløbet på {investmentAmount: string}.",
+          "body3": "Sørg for, at hele beløbet står på en af dine konti; Bitcoin eller Dollar."
+        },
+        "buttonText": "Indbetal",
+        "splitFunds": {
+          "title": "Dine midler er delt op",
+          "body": "Du har nok til at investere, men det er fordelt mellem din Bitcoin- og din Dollar-konto. Konvertér, så hele beløbet står på én af dem."
+        }
+      },
+      "DepositPending": {
+        "message": "Venter på, at dit indskud afregnes; vent venligst på 2 bekræftelser på kæden.",
+        "buttonText": "OK"
+      },
       "PersonalInformation": {
         "title": "Sidste trin",
         "fields": {
@@ -3786,10 +3848,18 @@
         "testSuccess": "Din backup-frase er korrekt"
       }
     },
+    "BundleExport": {
+      "title": "Nødexit",
+      "body": "Hvis Spark går ned, lader dette bundt dig flytte dine bitcoin on-chain uden Blink. Din dollarsaldo kan ikke gendannes.",
+      "download": "Download bundt",
+      "sensitiveTitle": "Følsom",
+      "learnMore": "Læs mere om ensidig exit",
+      "sensitiveConfirm": "Download",
+      "sensitiveBody": "Denne fil viser din saldo og betalingshistorik, så hold den privat. For at bruge den i en nødsituation skal du også bruge din gendannelsesfrase."
+    },
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
-      "encryptCheckbox": "Kryptér med ekstra adgangskode",
       "password": "Adgangskode",
       "passwordPlaceholder": "(minimum 12 tegn)",
       "confirmPassword": "Bekræft adgangskode",
@@ -3866,6 +3936,7 @@
       "newBitcoinBalance": "Ny Bitcoin-saldo",
       "newDollarBalance": "Ny dollarsaldo",
       "dollarBalanceNotAvailable": "ikke tilgængelig",
+      "lnAddressNotMoved": "Din Lightning-adresse kunne ikke flyttes. Dine midler bliver stadig overført.",
       "networkFee": "Netværksgebyr: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Netværksgebyr: <bold>{fee: string}</bold> (dækkes af Blink)",
       "retryCta": "Prøv igen",
@@ -3914,8 +3985,18 @@
     "explainerCheck5": "Din konto vil blive trukket et Spark-netværksgebyr",
     "explainerCta": "Jeg forstår",
     "transferringFunds": "Overfører dine midler. Det skulle være færdigt om få sekunder.",
+    "transferInProgress": {
+      "body": "Dine midler er på vej til din nye konto. Hold appen åben, så afslutter vi automatisk."
+    },
     "transferDelayed": {
       "body": "Dine midler er på vej til din nye konto. Det tager længere tid end normalt — hold appen åben, så afslutter vi automatisk.",
+      "contactSupportCta": "Kontakt support"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Vi kunne ikke læse din migreringsstatus fra denne enhed. Intet er tabt — dine midler er sikre, og din status er stadig gemt.",
+      "outOfSpaceBody": "Der er ikke mere lagerplads på din enhed, så vi kan ikke læse din migreringsstatus. Frigør plads, og prøv igen. Intet er tabt — dine midler er sikre.",
+      "notSavedBody": "Vi kunne ikke gemme din migreringsstatus på denne enhed. Intet er tabt: dine midler er sikre. Prøv igen.",
+      "notSavedOutOfSpaceBody": "Der er ikke mere lagerplads på din enhed, så vi kan ikke gemme din migreringsstatus. Frigør plads, og prøv igen. Intet er tabt: dine midler er sikre.",
       "contactSupportCta": "Kontakt support"
     },
     "clockOutOfSync": {
@@ -3979,6 +4060,12 @@
     "recognizePhraseTitle": "Genkender du denne backup-sætning?",
     "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operatør kan ikke nås",
+    "outageBody": "Spark har et nedbrud. Vent et par minutter og prøv igen, eller kontakt vores {support}",
+    "outageSupport": "Support",
+    "tryAgainLater": "Prøv igen senere"
+  },
   "BackupNudge": {
     "title": "Dine midler er i fare",
     "description": "Sikr din tegnebog nu. Det tager kun et minut.",
@@ -3987,6 +4074,81 @@
     "modalTitle": "Sikr dine midler",
     "modalDescription": "Vi anbefaler stærkt, at du sikkerhedskopierer din tegnebog for at forhindre et fuldstændigt tab af midler, hvis du mister denne enhed.",
     "secureMe": "Sikr tegnebog"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Opsæt to-faktor godkendelse",
+    "cardDescription": "Beskyt din konto mod uautoriseret adgang.",
+    "cardCta": "Opsæt",
+    "settingsDescription": "Beskyt din konto mod uautoriseret adgang ved at opsætte den.",
+    "setupTitle": "Opsæt to-faktor godkendelse nu",
+    "setupDescription": "For at forhindre uautoriseret adgang til din konto skal du tilføje to-faktor godkendelse nu.",
+    "setAuthenticator": "Opsæt authenticator",
+    "reminderTitle": "Tilføj en authenticator for at beskytte dine midler",
+    "reminderDescription": "Din saldo er vokset. En authenticator-app holder din konto sikker, selv hvis nogen får fat i din e-mail eller telefon.",
+    "modalReminder": "Hvis du afviser nu, så sørg for at slå det til hurtigst muligt.",
+    "dismissTwoMore": "Du kan afvise dette to gange mere.",
+    "dismissOneMore": "Du kan afvise dette én gang mere.",
+    "dismissLast": "Dette er sidste gang, du kan afvise dette.",
+    "setNow": "Opsæt nu",
+    "dontWantTo": "Det vil jeg ikke",
+    "highBalanceTitle": "Du har over {amount}, tilføj venligst ekstra beskyttelse",
+    "protectionRequiredTitle": "Tilføj venligst ekstra beskyttelse for at fortsætte med at bruge Blink",
+    "protectionRequiredBody": "Jo flere midler du har, jo vigtigere er bedre sikkerhed. Tilføj venligst en authenticator for at fortsætte med at bruge Blink.",
+    "nonCustodialTitle": "Hvis du ikke vil opsætte to-faktor godkendelse",
+    "nonCustodialBody": "Den anden mulighed er at skifte til ikke-depot. Så er du selv ansvarlig for dine midler."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Beskyt dine midler med en authenticator",
+    "introDescription": "En authenticator-app laver en ny 6-cifret kode hvert 30. sekund.",
+    "takeoversTitle": "Stopper kontoovertagelser",
+    "takeoversDescription": "Koden findes kun på din telefon",
+    "stolenNumberTitle": "Vær sikker, selv hvis dit nummer bliver stjålet",
+    "stolenNumberDescription": "Selv hvis nogen får adgang til din e-mail eller dit telefonnummer, kan de ikke logge ind",
+    "durationTitle": "Tager cirka 2 minutter",
+    "durationDescription": "Vi guider dig trin for trin",
+    "getStarted": "Kom i gang",
+    "appsTitle": "Hent en authenticator-app",
+    "appsDescription": "Alle authenticator-apps virker. Disse er gratis og pålidelige:",
+    "googleAuthenticatorDescription": "Enkel og udbredt. Valgfri backup til din Google-konto.",
+    "protonAuthenticatorDescription": "Åben kildekode. End-to-end-krypteret backup og synkronisering.",
+    "twoFasAuthDescription": "Åben kildekode. Ingen konto nødvendig.",
+    "get": "Hent",
+    "storeNote": "»Hent« åbner App Store eller Google Play. Vend tilbage til Blink, når appen er installeret.",
+    "haveAnApp": "Jeg har en app",
+    "keyInstruction": "Kopiér denne opsætningsnøgle ind i din authenticator-app.",
+    "qrInstruction": "Bruger du en anden enhed?\nScan denne QR-kode i stedet.",
+    "backupTitle": "Sikkerhedskopiér din nøgle",
+    "backupDescription": "Hvis du mister din telefon, kan du med denne nøgle opsætte din authenticator igen. Gem den et andet sted end på denne telefon.",
+    "saveToPasswordManager": "Gem i en adgangskodeadministrator",
+    "shareToPasswordManager": "Del med en adgangskodeadministrator",
+    "copyForManualBackup": "Kopiér til manuel backup",
+    "passwordManagerUnavailable": "Ingen adgangskodeadministrator tilgængelig på denne enhed. Kopiér i stedet nøglen til en manuel sikkerhedskopi.",
+    "savedIt": "Jeg har gemt den",
+    "keyBackupText": "Opsætningsnøgle til Blink-authenticator\n\nKonto: {account}\nOpsætningsnøgle: {key}\n\nHvis du mister din telefon, kan du tilføje denne opsætningsnøgle til en authenticator-app for at få dine Blink-loginkoder tilbage. Alle med denne nøgle kan lave dine koder, så hold den privat.",
+    "protectedTitle": "Din konto er nu beskyttet",
+    "protectedDescription": "Fra nu af kræver login en engangskode fra din authenticator-app.",
+    "newPhoneTip": "Hvis du får en ny telefon, så flyt din authenticator over på den, <bold>før</bold> du nulstiller den gamle.",
+    "done": "Færdig"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Slået til",
+    "statusDisabled": "2FA: Slået fra",
+    "modalTitle": "Vi anbefaler ikke at slå 2FA fra",
+    "modalBody": "Det ville sænke din kontos sikkerhed og gøre det lettere for en tredjepart at få adgang til din konto uden din tilladelse.",
+    "keepProtected": "Hold mig beskyttet",
+    "codeInstruction": "Indtast den 6-cifrede kode fra din godkendelsesapp for at slå totrinsgodkendelse fra.",
+    "codeInvalid": "Den kode er forkert. Indtast den aktuelle kode fra din godkendelsesapp.",
+    "tooManyAttempts": "For mange forsøg. Prøv igen om en time.",
+    "manualResetTitle": "Manuel nulstilling af 2FA",
+    "manualResetBody": "Af hensyn til din beskyttelse tillader vi ikke, at 2FA fjernes i appen. Hvis du har brug for at nulstille 2FA, så kontakt vores <support>support</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Tilføj e-mail",
+    "addPhoneTitle": "Tilføj telefonnummer",
+    "addEmailCode": "Indtast den 6-cifrede kode fra din godkendelsesapp for at tilføje din e-mail.",
+    "addPhoneCode": "Indtast den 6-cifrede kode fra din godkendelsesapp for at tilføje dit telefonnummer.",
+    "codeInvalid": "Den kode er forkert. Indtast den aktuelle kode fra din godkendelsesapp.",
+    "tooManyAttempts": "For mange forsøg. Prøv igen om en time."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -3997,6 +4159,15 @@
     "title": "Dette er en ikke-depotkonto",
     "body": "Læs vores blogindlæg for at lære mere",
     "cta": "Læs"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Opdater din sikkerhedskopi i skyen",
+    "body": "Dit nødbundt i {provider} er forældet. Sikkerhedskopiér din tegnebog igen for at opdatere det.",
+    "cta": "Sikkerhedskopiér igen"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Intet nødbundt endnu. Det oprettes efter din første transaktion.",
+    "exportFailed": "Kunne ikke downloade nødbundtet."
   },
   "StableBalance": {
     "title": "Stabil saldo",
