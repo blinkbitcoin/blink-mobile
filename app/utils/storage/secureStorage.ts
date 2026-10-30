@@ -911,24 +911,29 @@ export default class KeyStoreWrapper {
    */
   private static async trackMnemonicAccount(accountId: string): Promise<boolean> {
     try {
-      return await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async (isCurrent) => {
-        const tracked = await KeyStoreWrapper.readMnemonicAccounts()
-        if (tracked.status === "failed") return false
+      return await onSlot(
+        KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+        async (isCurrent, holdSlot) => {
+          const tracked = await KeyStoreWrapper.readMnemonicAccounts()
+          if (tracked.status === "failed") return false
 
-        const accountIds = tracked.accountIds
-        if (accountIds.includes(accountId)) return true
-        // A snapshot written after this task was abandoned lands over the turn
-        // that replaced it, dropping whatever that turn recorded.
-        if (!isCurrent()) return false
+          const accountIds = tracked.accountIds
+          if (accountIds.includes(accountId)) return true
+          // A snapshot written after this task was abandoned lands over the turn
+          // that replaced it, dropping whatever that turn recorded.
+          if (!isCurrent()) return false
 
-        const written = await secureWrite(
-          KeyStoreWrapper.MNEMONIC_ACCOUNTS,
-          [...accountIds, accountId].join("\n"),
-          ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
-        )
+          const written = await holdSlot(
+            secureWrite(
+              KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+              [...accountIds, accountId].join("\n"),
+              ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+            ),
+          )
 
-        return written
-      })
+          return written
+        },
+      )
     } catch {
       // The queue rejects on timeout. Best effort, as above.
       return false
@@ -944,7 +949,7 @@ export default class KeyStoreWrapper {
    */
   private static async untrackMnemonicAccount(accountId: string): Promise<void> {
     try {
-      await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async (isCurrent) => {
+      await onSlot(KeyStoreWrapper.MNEMONIC_ACCOUNTS, async (isCurrent, holdSlot) => {
         const tracked = await KeyStoreWrapper.readMnemonicAccounts()
         // A list that cannot be read is left exactly as it is: the ids still in
         // it cannot be read out, so any rewrite here would forget accounts
@@ -959,17 +964,19 @@ export default class KeyStoreWrapper {
 
         const remaining = tracked.accountIds.filter((id) => id !== accountId)
         if (remaining.length > 0) {
-          await secureWrite(
-            KeyStoreWrapper.MNEMONIC_ACCOUNTS,
-            remaining.join("\n"),
-            ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+          await holdSlot(
+            secureWrite(
+              KeyStoreWrapper.MNEMONIC_ACCOUNTS,
+              remaining.join("\n"),
+              ACCESSIBLE.WHEN_UNLOCKED_THIS_DEVICE_ONLY,
+            ),
           )
           return
         }
 
         // Removed rather than stored as "[]", so an absent slot keeps meaning
         // exactly "nothing is tracked" — see readMnemonicAccounts.
-        await secureRemove(KeyStoreWrapper.MNEMONIC_ACCOUNTS)
+        await holdSlot(secureRemove(KeyStoreWrapper.MNEMONIC_ACCOUNTS))
       })
     } catch {
       // The queue rejects on timeout; the id stays tracked, which is the safe
