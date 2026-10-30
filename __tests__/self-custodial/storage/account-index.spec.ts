@@ -1685,6 +1685,19 @@ describe("self-custodial account-index — damaged entries", () => {
       expect(result).toEqual({ status: "ok", migrated: 1 })
     })
 
+    /**
+     * The purge erases this account's legacy copy, so its mnemonic has to be one the
+     * reinstall wipe can name: the sweep is what records it, and it runs first.
+     */
+    it("reports itself incomplete when a damaged entry's record does not land", async () => {
+      storeCanonical([VALID, DAMAGED])
+      mockRememberMnemonicAccount.mockImplementation(async (id: string) => id !== "acc-2")
+
+      const result = await sweepMnemonicMigration()
+
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+    })
+
     it("reports itself incomplete over an item that names no account", async () => {
       storeCanonical([VALID, { lightningAddress: null }])
 
