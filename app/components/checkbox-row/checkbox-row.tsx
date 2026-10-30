@@ -10,6 +10,7 @@ type CheckboxRowProps = {
   isChecked: boolean
   onPress: () => void
   centered?: boolean
+  disabled?: boolean
   testID?: string
 }
 
@@ -18,6 +19,7 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   isChecked,
   onPress,
   centered,
+  disabled,
   testID,
 }) => {
   const styles = useStyles()
@@ -27,7 +29,8 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
 
   return (
     <Pressable
-      style={[styles.container, centered && styles.centered]}
+      disabled={disabled}
+      style={[styles.container, centered && styles.centered, disabled && styles.disabled]}
       onPress={onPress}
       accessibilityRole="checkbox"
       accessibilityState={{ checked: isChecked }}
@@ -73,5 +76,8 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   labelCentered: {
     flex: 0,
+  },
+  disabled: {
+    opacity: 0.5,
   },
 }))

@@ -3,7 +3,7 @@ import { useCallback } from "react"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
-import { useActiveWallet } from "@app/hooks/use-active-wallet"
+import { useIsSelfCustodialAccount } from "@app/hooks/use-is-self-custodial-account"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import {
   ChooseExperienceContinueRoute,
@@ -35,7 +35,11 @@ type CompleteBackupOptions = {
 export const useCompleteBackup = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
-  const { isSelfCustodial } = useActiveWallet()
+  /** Account type, not useActiveWallet().isSelfCustodial: that also encodes SDK
+   *  availability, so it reads false at cold start and right after an account
+   *  switch, and a self-custodial user finishing a backup in that window would be
+   *  routed as if the account were custodial. */
+  const isSelfCustodialAccount = useIsSelfCustodialAccount()
   const { backupState, setBackupCompleted } = useBackupState()
   const {
     checkpoint: migrationCheckpoint,
@@ -46,7 +50,7 @@ export const useCompleteBackup = () => {
   const isAlreadyBackedUp = backupState.status === BackupStatus.Completed
   /** Migration only applies on a custodial account; self-custodial backups are standalone. */
   const isMigrating =
-    !isSelfCustodial && migrationCheckpoint !== null && !isAlreadyBackedUp
+    !isSelfCustodialAccount && migrationCheckpoint !== null && !isAlreadyBackedUp
 
   return useCallback(
     async ({ method, message }: CompleteBackupOptions) => {
@@ -81,8 +85,17 @@ export const useCompleteBackup = () => {
         /** Recorded so the stored step matches where the user actually stands, but never
          *  gated on: the mode screen is not a commit point, so a resume routes to the
          *  explainer whether or not this write lands. Blocking would only strand a user who
-         *  just finished their backup on a screen with nothing left to do. */
-        await saveCheckpoint(MigrationCheckpoint.ChooseExperience)
+         *  just finished their backup on a screen with nothing left to do. Reported, though:
+         *  a store refusing writes here is the same store the commit point depends on. */
+        const { isSaved: isStepRecorded } = await saveCheckpoint(
+          MigrationCheckpoint.ChooseExperience,
+        )
+        if (!isStepRecorded) {
+          reportError(
+            "Migration choose-experience checkpoint save",
+            new Error("Choose-experience step was not persisted"),
+          )
+        }
 
         navigation.navigate("selfCustodialChooseExperience", {
           onContinue: {

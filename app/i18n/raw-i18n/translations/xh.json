@@ -2439,7 +2439,7 @@
     "sdkGenericError": "Ayikwazi ukuqikelela iintlawulo. Nceda uzame imali eyahlukileyo."
   },
   "SettingsScreen": {
-    "createAddress": "Yenza idilesi",
+    "createAddress": "Yenza idilesi ye-Lightning",
     "addressDisabled": "(icimile)",
     "donationButton": "Iqhosha lomnikelo",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "Yenziwe yasebenza",
     "addressScreen": "Iindlela zokuhlawulwa",
     "nonCustodialAccount": "Iakhawunti engagcinwanga",
+    "custodialAccount": "Iakhawunti egcinwayo",
     "tapUserName": "Cofa ukuseta igama lomsebenzisi",
     "notifications": "Izaziso",
     "title": "Iisetingi",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "Qinisekisa ukuba ungaphinda ungene kwi-akhawunti yakho ngokuqinisekisa i-imeyile yakho. Ufuna ukwenza ukuqinisekisa ngoku?",
     "totp": "Uqinisekiso lwezinto ezimbini",
     "totpDeactivated": "Uqinisekiso lwezinto ezimbini lucinyiwe",
-    "totpDeleteAlertTitle": "Cima uqinisekiso lwezinto ezimbini",
-    "totpDeleteAlertContent": "Uqinisekile ukuba ufuna ukucima uqinisekiso lwezinto ezimbini?",
     "copiedAccountId": "I-ID ye-akhawunti yakho ikopishwe kwibhodi eqhotyoshwayo",
     "yourAccountId": "I-ID Ye-akhawunti Yakho",
     "accountId": "I-ID ye-akhawunti",
@@ -2583,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
-    "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito"
+    "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito",
+    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",
@@ -2606,7 +2606,9 @@
     "contactSupport": "Qhagamshelana nenkxaso"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho"
+    "modalTitle": "Ibhalansi yedola ayifumaneki kummandla wakho",
+    "unknownRegionModalTitle": "Akukwazekanga ukujonga ukufumaneka kwebhalansi yedola",
+    "unknownRegionModalBody": "Asikwazanga ukujonga ukuba ibhalansi yedola iyafumaneka na kuwe. Tsala ezantsi kwiskrini sasekhaya ukuze uzame kwakhona."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "Ibhalansi yedola ayifumaneki kummandla wakho",
@@ -2615,14 +2617,11 @@
     "youGet": "Ufumana"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Uqinisekiso lwezinto ezimbini",
-    "secret": "Imfihlo/ibhekap",
-    "content": "Skena le QR khowudi nge-app yakho yokuqinisekisa. Okanye, ungakopisha/uncamathisele imfihlo ngesandla."
+    "title": "Uqinisekiso lwezinto ezimbini"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
-    "enter6digitCode": "Faka ikhowudi yeedigithi ezi-6 evela kwi-app yakho yokuqinisekisa ukuze uqinisekise uqinisekiso lwezinto ezimbini.",
-    "success": "Uqinisekiso lwezinto ezimbini luvuliwe. Ngoku uya kukwazi ukuphinda ungene kuphela ngomnxeba wakho okanye i-imeyile KUNYE noqinisekiso lwezinto ezimbini.\n\nIidivayisi kule akhawunti ezingangenwanga nge-2FA ziya kufuneka ziphinde zingene.\n\nIi-akhawunti zenqanaba lesi-2 kuphela ezinokubuyiselwa ngenkxaso yabathengi ukuba ulahlekelwe kukufikelela kwe-2FA."
+    "enter6digitCode": "Faka ikhowudi yeedigithi ezi-6 evela kwi-app yakho yokuqinisekisa ukuze uqinisekise uqinisekiso lwezinto ezimbini."
   },
   "TotpLoginValidateScreen": {
     "title": "Uqinisekiso lwezinto ezimbini",
@@ -2696,7 +2695,9 @@
     "noFee": "akukho mrhumo",
     "fromApprox": "ukusuka ku-~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Ayikwazanga kufumana imirhumo ngeli xesha"
+    "error": "Ayikwazanga kufumana imirhumo ngeli xesha",
+    "inactivity": "Ukungasebenzi >iinyanga ezi-{months: number}",
+    "usdPerMonth": "{amount: string}/ngenyanga"
   },
   "TransactionLimitsScreen": {
     "receive": "Yamkela",
@@ -3689,6 +3690,67 @@
         "codingBackend": "...ukubhala ikhowudi ye-backend",
         "buttonText": "Kuhle"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Wamkelekile ukuba ube yinxalenye yeBlink",
+          "paragraphs": {
+            "body1": "Phambi kokuba siqokelele iimali ezingakumbi kubatyali-mali abanobuchule, sigqibe ekubeni sandise isimemo kusapho lweBlink, abasebenzisi bethu abakhulu nabaxhasi. Kutheni sizise abangaziwayo xa sinokumema kuqala umntu onjenganwe?",
+            "body2": "Esi sisimemo sobuqu. Nceda ungasigqithiseli okanye wasabelane esidlangalaleni."
+          }
+        },
+        "buttonText": "Qhubeka"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Ungathanda ukutyala malini?",
+        "percent": "nge-~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Uxabiso lwenkampani",
+          "paragraphs": {
+            "body1": "Kumjikelo wokutyala imali, uxabiso lwangaphambi kwemali lweBlink luyi-$10 yezigidi.",
+            "body2": "Sinokunyusa imali ngexabiso eliphezulu kwi-VCs. Nangona kunjalo, sibona iinzuzo zexesha elide ezabelwana ngabasebenzisi bethu abakhulu. Ngoko ke, sikunika esi sithembiso ngemiqathango engcono kuwe."
+          }
+        },
+        "buttonText": "Ndiyaqonda"
+      },
+      "TermSheet": {
+        "title": "Iphepha leMiqathango",
+        "equitySection": {
+          "title": "Isabelo kwiBlink",
+          "investment": "Utyalo-mali lwe-{amount: string}",
+          "valuation": "Ngoxabiso lwangaphambi kwemali lwe-$10M",
+          "units": "Ufumana iiyunithi ezili-{units: string} ~{percent: number}% yeBlink"
+        },
+        "buttonText": "Qhubeka ukuya kuSayina"
+      },
+      "TransferInvest": {
+        "title": "Dlulisela utyalo-mali lwakho",
+        "paragraphs": {
+          "body1": "Usayine isivumelwano sobhaliso lweeyunithi ezili-{units: string} kwiBlink.",
+          "body2": "Lixesha lokudlulisela isixa sotyalo-mali se-{amount: string}. Uza kuhlawula ngeBitcoin."
+        },
+        "buttonText": "Qhubeka",
+        "paymentsUnavailable": "Iintlawulo zotyalo-mali azikavulwa okwangoku. Nceda uzame kwakhona kamva."
+      },
+      "InsufficientBalance": {
+        "title": "Ibhalansi ayonelanga",
+        "paragraphs": {
+          "balanceBitcoin": "Une-{balance: string} kuphela kwiakhawunti yakho yeBitcoin.",
+          "balanceDollar": "Une-{balance: string} kuphela kwiakhawunti yakho yeDola.",
+          "body2": "Faka ngaphezu kwe-{shortfall: string} kwiakhawunti yakho ukuze ufikelele kwimali yotyalo-mali eyi-{investmentAmount: string}.",
+          "body3": "Qiniseka ukuba yonke imali ikwenye yeeakhawunti zakho; iBitcoin okanye iDollar."
+        },
+        "buttonText": "Faka imali",
+        "splitFunds": {
+          "title": "Imali yakho yahlulahlulwe",
+          "body": "Unemali eyaneleyo yokutyala, kodwa yahlulwe phakathi kweeakhawunti zakho zeBitcoin neeDola. Guqula ukuze isixa sonke sibe kwenye kuzo."
+        }
+      },
+      "DepositPending": {
+        "message": "Kulindwe ukuba idiphozithi yakho igqitywe; nceda ulinde iiqinisekiso ezi-2 kwitsheyini.",
+        "buttonText": "Kulungile"
+      },
       "PersonalInformation": {
         "title": "Inyathelo lokugqibela",
         "fields": {
@@ -3786,10 +3848,18 @@
         "testSuccess": "Ibinzana lakho lokugcina lichanekile"
       }
     },
+    "BundleExport": {
+      "title": "Ukuphuma ngongxamiseko",
+      "body": "Ukuba iSpark iyayeka ukusebenza, le ngqokelela ikuvumela ukuba uhambise ibitcoin yakho kwi-chain ngaphandle kweBlink. Ibhalansi yakho yeedola ayinakubuyiselwa.",
+      "download": "Khuphela ingqokelela",
+      "sensitiveTitle": "Ibucayi",
+      "learnMore": "Funda ngakumbi ngokuphuma kwelinye icala",
+      "sensitiveConfirm": "Khuphela",
+      "sensitiveBody": "Le fayile ibonisa ibhalansi yakho nembali yeentlawulo zakho, ngoko yigcine iyimfihlo. Ukuze uyisebenzise kwimeko yongxamiseko, ukwadinga nebinzana lakho lokugcina."
+    },
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
       "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
-      "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
       "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
       "confirmPassword": "Qinisekisa igama lokugqitha",
@@ -3866,6 +3936,7 @@
       "newBitcoinBalance": "Ibhalansi entsha ye-Bitcoin",
       "newDollarBalance": "Ibhalansi entsha yeDola",
       "dollarBalanceNotAvailable": "ayifumaneki",
+      "lnAddressNotMoved": "Idilesi yakho ye-Lightning ayikwazanga ukususwa. Imali yakho isaza kudluliselwa.",
       "networkFee": "Umrhumo wothungelwano: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Umrhumo wothungelwano: <bold>{fee: string}</bold> (uhlawulwa nguBlink)",
       "retryCta": "Zama kwakhona",
@@ -3914,8 +3985,18 @@
     "explainerCheck5": "I-akhawunti yakho iya kukhutshelwa intlawulo yothungelwano lwe-Spark",
     "explainerCta": "Ndiyaqonda",
     "transferringFunds": "Sidlulisela imali yakho. Kufanele kugqitywe ngomzuzwana nje.",
+    "transferInProgress": {
+      "body": "Imali yakho isendleleni eya kwiakhawunti yakho entsha. Gcina i-app ivulekile, siza kugqibezela ngokuzenzekelayo."
+    },
     "transferDelayed": {
       "body": "Imali yakho isendleleni eya kwiakhawunti yakho entsha. Kuthatha ixesha elide kunesiqhelo — gcina i-app ivulekile, siza kugqibezela ngokuzenzekelayo.",
+      "contactSupportCta": "Qhagamshelana nenkxaso"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Asikwazanga ukufunda inkqubela yokufuduka kwakho kwesi sixhobo. Akukho nto ilahlekileyo — imali yakho ikhuselekile kwaye inkqubela yakho isagcinwe.",
+      "outOfSpaceBody": "Isixhobo sakho asinandawo yokugcina eseleyo, ngoko asikwazi ukufunda inkqubela yokufuduka kwakho. Khulula indawo uze uzame kwakhona. Akukho nto ilahlekileyo — imali yakho ikhuselekile.",
+      "notSavedBody": "Asikwazanga ukugcina inkqubela yokufuduka kwakho kwesi sixhobo. Akukho nto ilahlekileyo: imali yakho ikhuselekile. Zama kwakhona.",
+      "notSavedOutOfSpaceBody": "Isixhobo sakho asinandawo yokugcina eseleyo, ngoko asikwazi ukugcina inkqubela yokufuduka kwakho. Khulula indawo uze uzame kwakhona. Akukho nto ilahlekileyo: imali yakho ikhuselekile.",
       "contactSupportCta": "Qhagamshelana nenkxaso"
     },
     "clockOutOfSync": {
@@ -3979,6 +4060,12 @@
     "recognizePhraseTitle": "Ngaba uyayazi le binzana yokhuselo?",
     "recognizePhraseBody": "Ungaze ufake amagama akuthunyelwe ngomnye umntu."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Umqhubi akafikeleleki",
+    "outageBody": "I-Spark inengxaki yenkonzo. Nceda ulinde imizuzu embalwa uze uzame kwakhona okanye uqhagamshelane {support}",
+    "outageSupport": "Nenkxaso",
+    "tryAgainLater": "Zama kwakhona kamva"
+  },
   "BackupNudge": {
     "title": "Imali yakho isengozini",
     "description": "Khuseleka ingxowa yakho ngoku. Kuthatha umzuzu nje kuphela.",
@@ -3987,6 +4074,81 @@
     "modalTitle": "Khuseleka imali yakho",
     "modalDescription": "Siyakucebisa kakhulu ukuba wenze isipele songeno lwengxowa yakho ukukhusela ukuphulukana ngokupheleleyo neemali zakho xa uphulukana nale divayisi.",
     "secureMe": "Khuseleka ingxowa"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Misela uqinisekiso lwezinto ezimbini",
+    "cardDescription": "Khusela iakhawunti yakho ekufikeleleni okungagunyaziswanga.",
+    "cardCta": "Misela",
+    "settingsDescription": "Khusela iakhawunti yakho ekufikeleleni okungagunyaziswanga ngokuyimisela.",
+    "setupTitle": "Misela uqinisekiso lwezinto ezimbini ngoku",
+    "setupDescription": "Ukuthintela ukufikelela okungagunyaziswanga kwiakhawunti yakho, yongeza uqinisekiso lwezinto ezimbini ngoku.",
+    "setAuthenticator": "Misela i-authenticator",
+    "reminderTitle": "Yongeza i-authenticator ukukhusela imali yakho",
+    "reminderDescription": "Ibhalansi yakho ikhulile. I-app ye-authenticator igcina iakhawunti yakho ikhuselekile, nokuba umntu ufumene i-imeyile okanye ifowuni yakho.",
+    "modalReminder": "Ukuba uyayichitha ngoku, qinisekisa ukuba uyayivula ngokukhawuleza.",
+    "dismissTwoMore": "Ungayichitha le nto kabini kwakhona.",
+    "dismissOneMore": "Ungayichitha le nto kanye kwakhona.",
+    "dismissLast": "Esi sisihlandlo sokugqibela unokuyichitha le nto.",
+    "setNow": "Misela ngoku",
+    "dontWantTo": "Andifuni",
+    "highBalanceTitle": "Unengaphezu kwe-{amount}, nceda wongeze ukhuseleko olongezelelekileyo",
+    "protectionRequiredTitle": "Nceda wongeze ukhuseleko olongezelelekileyo ukuze uqhubeke usebenzisa i-Blink",
+    "protectionRequiredBody": "Okukhona unemali eninzi, kokukhona ukhuseleko olungcono lubaluleke ngakumbi. Nceda wongeze i-authenticator ukuze uqhubeke usebenzisa i-Blink.",
+    "nonCustodialTitle": "Ukuba awufuni ukumisela uqinisekiso lwezinto ezimbini",
+    "nonCustodialBody": "Olunye ukhetho kukufudukela kwi-non-custodial. Emva koko uyena onoxanduva lwemali yakho."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Khusela imali yakho nge-authenticator",
+    "introDescription": "I-app ye-authenticator yenza ikhowudi entsha yeedigithi ezi-6 rhoqo ngemizuzwana engama-30.",
+    "takeoversTitle": "Ithintela ukuthathwa kweakhawunti",
+    "takeoversDescription": "Ikhowudi ikwifowuni yakho kuphela",
+    "stolenNumberTitle": "Hlala ukhuselekile nokuba inombolo yakho ibiwe",
+    "stolenNumberDescription": "Nokuba umntu ungena kwi-imeyile yakho okanye kwinombolo yakho yefowuni, akanakungena kwiakhawunti yakho",
+    "durationTitle": "Kuthatha malunga nemizuzu emi-2",
+    "durationDescription": "Siza kukukhokela inyathelo ngenyathelo",
+    "getStarted": "Qalisa",
+    "appsTitle": "Fumana i-app ye-authenticator",
+    "appsDescription": "Nayiphi na i-app ye-authenticator iyasebenza. Ezi zisimahla kwaye zithembekile:",
+    "googleAuthenticatorDescription": "Ilula kwaye isetyenziswa kakhulu. Ukugcina ikopi kwiakhawunti yakho ye-Google kukhethwa nguwe.",
+    "protonAuthenticatorDescription": "Ikhowudi evulelekileyo. Ukugcina ikopi nokuvumelanisa okufihlwe ukusuka esiphelweni ukuya esiphelweni.",
+    "twoFasAuthDescription": "Ikhowudi evulelekileyo. Akufuneki iakhawunti.",
+    "get": "Khuphela",
+    "storeNote": "“Khuphela” ivula i-App Store okanye i-Google Play. Buyela kwi-Blink xa sele ifakiwe.",
+    "haveAnApp": "Ndine-app",
+    "keyInstruction": "Kopisha esi sitshixo sokumisela kwi-app yakho ye-authenticator.",
+    "qrInstruction": "Usebenzisa esinye isixhobo?\nEndaweni yoko skena le QR khowudi.",
+    "backupTitle": "Gcina ikopi yesitshixo sakho",
+    "backupDescription": "Ukuba ulahlekelwa yifowuni yakho, esi sitshixo sikuvumela ukuba uphinde umisele i-authenticator yakho. Sigcine kwenye indawo engeyiyo le fowuni.",
+    "saveToPasswordManager": "Gcina kumlawuli wezigxina",
+    "shareToPasswordManager": "Yabelana nomlawuli wezigxina",
+    "copyForManualBackup": "Kopisha ukuze ugcine ngesandla",
+    "passwordManagerUnavailable": "Akukho mlawuli wephasiwedi ukhoyo kwesi sixhobo. Kopa isitshixo ukuze wenze ikopi yokugcina ngesandla endaweni yoko.",
+    "savedIt": "Ndisigcinile",
+    "keyBackupText": "Isitshixo sokumisela i-authenticator ye-Blink\n\nIakhawunti: {account}\nIsitshixo sokumisela: {key}\n\nUkuba ulahlekelwa yifowuni yakho, yongeza esi sitshixo sokumisela kwi-app ye-authenticator ukuze ubuyisele iikhowudi zakho zokungena kwi-Blink. Nabani na onesi sitshixo angenza iikhowudi zakho, ngoko sigcine siyimfihlo.",
+    "protectedTitle": "Iakhawunti yakho ngoku ikhuselekile",
+    "protectedDescription": "Ukususela ngoku, ukungena kufuna ikhowudi yexesha elinye evela kwi-app yakho ye-authenticator.",
+    "newPhoneTip": "Ukuba ufumana ifowuni entsha, dlulisela i-authenticator yakho kuyo <bold>ngaphambi</bold> kokuba usete kwakhona endala.",
+    "done": "Kwenziwe"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ivuliwe",
+    "statusDisabled": "2FA: Icinyiwe",
+    "modalTitle": "Asicebisi ukuba ucime i-2FA",
+    "modalBody": "Oku kungathoba ukhuseleko lweakhawunti yakho kwaye kwenze kube lula ukuba omnye umntu angene kwiakhawunti yakho ngaphandle kwemvume yakho.",
+    "keepProtected": "Ndigcine ndikhuselekile",
+    "codeInstruction": "Faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa ukuze ucime ukuqinisekisa ngezinto ezimbini.",
+    "codeInvalid": "Loo khowudi ayichanekanga. Faka ikhowudi yangoku evela kwi-app yakho yokuqinisekisa.",
+    "tooManyAttempts": "Iinzame ezininzi kakhulu. Zama kwakhona emva kweyure enye.",
+    "manualResetTitle": "Ukusetha kwakhona i-2FA ngesandla",
+    "manualResetBody": "Ukuze ukhuseleke, asivumeli ukususwa kwe-2FA ngaphakathi kwi-app. Ukuba ufuna ukusetha kwakhona i-2FA, qhagamshelana <support>neNkxaso</support> yethu."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Yongeza i-imeyile",
+    "addPhoneTitle": "Yongeza inombolo yefowuni",
+    "addEmailCode": "Ukuze wongeze i-imeyile yakho, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "addPhoneCode": "Ukuze wongeze inombolo yakho yefowuni, faka ikhowudi enamanani ama-6 evela kwi-app yakho yokuqinisekisa.",
+    "codeInvalid": "Loo khowudi ayichanekanga. Faka ikhowudi yangoku evela kwi-app yakho yokuqinisekisa.",
+    "tooManyAttempts": "Iinzame ezininzi kakhulu. Zama kwakhona emva kweyure enye."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -3997,6 +4159,15 @@
     "title": "Le yiakhawunti engagcinwanga",
     "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
     "cta": "Funda"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Hlaziya ugcino lwakho kwilifu",
+    "body": "Ingqokelela yakho yongxamiseko ku-{provider} indala. Gcina isipaji sakho kwakhona ukuze uyihlaziye.",
+    "cta": "Gcina kwakhona"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Akukabikho ngqokelela yongxamiseko. Yenziwa emva kwentengiselwano yakho yokuqala.",
+    "exportFailed": "Ayikwazanga ukukhuphela ingqokelela yongxamiseko."
   },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",

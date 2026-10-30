@@ -19,6 +19,7 @@ import { activateBeta } from "@app/graphql/client-only-query"
 import { useBetaQuery, useDebugScreenQuery, useLevelQuery } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { cancelPendingClipboardClear } from "@app/hooks/use-clipboard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import Clipboard from "@react-native-clipboard/clipboard"
 import crashlytics from "@react-native-firebase/crashlytics"
@@ -28,6 +29,7 @@ import { Button, Text, makeStyles } from "@rn-vui/themed"
 
 import { Screen } from "@app/components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"
+import { useI18nContext } from "@app/i18n/i18n-react"
 import useLogout from "../../hooks/use-logout"
 import { addDeviceToken } from "../../utils/notifications"
 import { testProps } from "../../utils/testProps"
@@ -48,6 +50,7 @@ const usingHermes = typeof HermesInternal === "object" && HermesInternal !== nul
 
 export const DeveloperScreen: React.FC = () => {
   const styles = useStyles()
+  const { LL } = useI18nContext()
   const client = useApolloClient()
   const { usdPerSat } = usePriceConversion()
   const { logout } = useLogout()
@@ -311,6 +314,34 @@ export const DeveloperScreen: React.FC = () => {
               })
             }
           />
+          <Button
+            title="Onboarding Phase 2: Investment"
+            containerStyle={styles.button}
+            onPress={() =>
+              testBulletinsStore.add({
+                id: `test-deeplink-invest-${Date.now()}`,
+                /** The title the flow's first screen shows, read from the same place so
+                 *  the test card cannot drift from it. */
+                title: LL.CardFlow.Onboarding.WelcomeInvest.welcomeMessage.title(),
+                body: "You are invited to participate in the Blink financing round. For Blink fans only.",
+                type: "deep-link",
+                deepLink: "card/onboarding/investment",
+              })
+            }
+          />
+          <Button
+            title="Onboarding Phase 3: Card Dashboard"
+            containerStyle={styles.button}
+            onPress={() =>
+              testBulletinsStore.add({
+                id: `test-deeplink-dashboard-${Date.now()}`,
+                title: "Your Card is now live!",
+                body: "You can start using it instantly.",
+                type: "deep-link",
+                deepLink: "card/onboarding/approved",
+              })
+            }
+          />
           {testBulletins.length > 0 && (
             <Button
               title="Clear All Test Notifications"
@@ -386,6 +417,7 @@ export const DeveloperScreen: React.FC = () => {
               title="Copy access token"
               containerStyle={styles.button}
               onPress={async () => {
+                cancelPendingClipboardClear()
                 Clipboard.setString(newToken || "")
                 Alert.alert("Token copied in clipboard.")
               }}

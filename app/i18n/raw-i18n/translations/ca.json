@@ -2439,7 +2439,7 @@
     "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
-    "createAddress": "Crea una adreça",
+    "createAddress": "Crea una adreça Lightning",
     "addressDisabled": "(desactivat)",
     "donationButton": "Botó Donar",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2456,7 @@
     "activated": "Activat",
     "addressScreen": "Maneres de cobrar",
     "nonCustodialAccount": "Compte no custodi",
+    "custodialAccount": "Compte custodi",
     "tapUserName": "Toca per definir el nom d'usuari",
     "notifications": "Notificacions",
     "title": "Configuració",
@@ -2564,8 +2565,6 @@
     "emailUnverifiedContent": "Assegura't que vols tornar a iniciar sessió al teu compte verificant el teu correu electrònic. Vols fer la verificació ara?",
     "totp": "Autentificació de dos factors",
     "totpDeactivated": "L'autentificació de dos factors ha estat desactivada",
-    "totpDeleteAlertTitle": "Esborra l'autentificació de dos factors",
-    "totpDeleteAlertContent": "Estàs segur que vols suprimir la teva autenticació de dos factors?",
     "copiedAccountId": "S'ha copiat l'identificador del teu compte al porta-retalls",
     "yourAccountId": "La ID del teu compte",
     "accountId": "ID del compte",
@@ -2583,7 +2582,8 @@
   },
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",
-    "anonModeWalletLabel": "no disponible en mode Incognito"
+    "anonModeWalletLabel": "no disponible en mode Incognito",
+    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar"
   },
   "AnonModeConvertModal": {
     "title": "Transfereix primer el teu saldo en dòlars",
@@ -2606,7 +2606,9 @@
     "contactSupport": "Contacta amb el suport"
   },
   "DollarBalanceRestriction": {
-    "modalTitle": "El saldo en dòlars no està disponible a la teva regió"
+    "modalTitle": "El saldo en dòlars no està disponible a la teva regió",
+    "unknownRegionModalTitle": "No s'ha pogut comprovar la disponibilitat del saldo en dòlars",
+    "unknownRegionModalBody": "No hem pogut comprovar si el saldo en dòlars està disponible per a tu. Llisca avall a la pantalla d'inici per tornar-ho a provar."
   },
   "ConvertDollarToBitcoinModal": {
     "title": "El saldo en dòlars no està disponible a la teva regió",
@@ -2615,14 +2617,11 @@
     "youGet": "Reps"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Autentificació de dos factors",
-    "secret": "Secret/còpia de seguretat",
-    "content": "Escaneja aquest codi QR amb la teva aplicació d'autenticació. Alternativament, pots copiar/enganxar manualment el codi a la teva aplicació d'autenticació."
+    "title": "Autentificació de dos factors"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Autentificació de dos factors",
-    "enter6digitCode": "Introdueix el codi de 6 dígits de l'aplicació d'autenticació per validar la teva autenticació de dos factors.",
-    "success": "L'autenticació de dos factors s'ha habilitat. Ara només podràs tornar a iniciar la sessió amb el teu telèfon o correu electrònic i la teva autenticació de dos factors.\n\nEls dispositius d'aquest compte que no estiguin connectats amb 2FA hauran de tornar a iniciar la sessió.\n\nNomés els comptes de nivell 2 poden ser recuperats pel suport al client en cas de pèrdua d'accés a 2FA."
+    "enter6digitCode": "Introdueix el codi de 6 dígits de l'aplicació d'autenticació per validar la teva autenticació de dos factors."
   },
   "TotpLoginValidateScreen": {
     "title": "Autentificació de dos factors",
@@ -2696,7 +2695,9 @@
     "noFee": "sense comissió",
     "fromApprox": "des de ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "No es poden obtenir les comissions en aquest moment"
+    "error": "No es poden obtenir les comissions en aquest moment",
+    "inactivity": "Inactivitat >{months: number} mesos",
+    "usdPerMonth": "{amount: string}/mes"
   },
   "TransactionLimitsScreen": {
     "receive": "Rebre",
@@ -3689,6 +3690,67 @@
         "codingBackend": "...programant el backend",
         "buttonText": "Genial"
       },
+      "WelcomeInvest": {
+        "welcomeMessage": {
+          "title": "Benvingut a formar part de Blink",
+          "paragraphs": {
+            "body1": "Abans de recaptar més fons d'inversors professionals, hem decidit estendre una invitació a la família Blink, els nostres superusuaris i seguidors. Per què portar desconeguts quan podem convidar primer algú com tu?",
+            "body2": "Aquesta és una invitació personal. Si us plau, no la reenviïs ni comparteixis públicament."
+          }
+        },
+        "buttonText": "Continuar"
+      },
+      "SelectInvest": {
+        "desiredCreditLimit": "Quant t'agradaria invertir?",
+        "percent": "per ~{percent: number}%"
+      },
+      "CompanyValuation": {
+        "welcomeMessage": {
+          "title": "Valoració de l'empresa",
+          "paragraphs": {
+            "body1": "En aquesta ronda d'inversió, la valoració pre-money de Blink és de 10 milions de dòlars.",
+            "body2": "Podríem recaptar a un preu més alt dels inversors de capital risc. No obstant això, veiem beneficis mutus a llarg termini en associar-nos amb els nostres superusuaris. Per tant, estem oferint aquesta oferta en millors condicions per a tu."
+          }
+        },
+        "buttonText": "Entesos"
+      },
+      "TermSheet": {
+        "title": "Full de Termes",
+        "equitySection": {
+          "title": "Participació a Blink",
+          "investment": "Inversió de {amount: string}",
+          "valuation": "Amb valoració pre-money de $10M",
+          "units": "Reps {units: string} unitats ~{percent: number}% de Blink"
+        },
+        "buttonText": "Procedir a Signar"
+      },
+      "TransferInvest": {
+        "title": "Transfereix la teva inversió",
+        "paragraphs": {
+          "body1": "Has signat l'acord de subscripció per {units: string} unitats a Blink.",
+          "body2": "És el moment de transferir l'import d'inversió de {amount: string}. Pagaràs amb Bitcoin."
+        },
+        "buttonText": "Continuar",
+        "paymentsUnavailable": "Els pagaments de la inversió encara no estan oberts. Torna-ho a provar més tard."
+      },
+      "InsufficientBalance": {
+        "title": "Saldo insuficient",
+        "paragraphs": {
+          "balanceBitcoin": "Només tens {balance: string} al teu compte de Bitcoin.",
+          "balanceDollar": "Només tens {balance: string} al teu compte de Dòlar.",
+          "body2": "Diposita més de {shortfall: string} al teu compte per assolir l'import de la inversió de {investmentAmount: string}.",
+          "body3": "Assegura't que l'import complet es trobi en algun dels teus comptes; Bitcoin o dòlar."
+        },
+        "buttonText": "Diposita",
+        "splitFunds": {
+          "title": "Els teus fons estan repartits",
+          "body": "Tens prou per invertir, però està repartit entre els comptes de Bitcoin i de Dòlar. Converteix perquè l'import complet quedi en un de sol."
+        }
+      },
+      "DepositPending": {
+        "message": "Esperant que el teu dipòsit es liquidi; espera 2 confirmacions a la cadena.",
+        "buttonText": "D'acord"
+      },
       "PersonalInformation": {
         "title": "Últim pas",
         "fields": {
@@ -3786,10 +3848,18 @@
         "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
+    "BundleExport": {
+      "title": "Sortida d'emergència",
+      "body": "Si Spark deixa de funcionar, aquest paquet et permet moure els teus bitcoins a la cadena sense Blink. El teu saldo en dòlars no es pot recuperar.",
+      "download": "Baixa el paquet",
+      "sensitiveTitle": "Sensible",
+      "learnMore": "Més informació sobre la sortida unilateral",
+      "sensitiveConfirm": "Baixa",
+      "sensitiveBody": "Aquest fitxer mostra el teu saldo i l'historial de pagaments, així que mantén-lo privat. Per fer-lo servir en una emergència, també necessites la teva frase de còpia de seguretat."
+    },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
       "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
-      "encryptCheckbox": "Xifrar amb contrasenya addicional",
       "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
       "confirmPassword": "Confirmar contrasenya",
@@ -3866,6 +3936,7 @@
       "newBitcoinBalance": "Nou saldo de Bitcoin",
       "newDollarBalance": "Nou saldo en dòlars",
       "dollarBalanceNotAvailable": "no disponible",
+      "lnAddressNotMoved": "No s'ha pogut moure la teva adreça Lightning. Els teus fons es transferiran igualment.",
       "networkFee": "Comissió de xarxa: <bold>{fee: string}</bold>",
       "networkFeeCoveredByBlink": "Comissió de xarxa: <bold>{fee: string}</bold> (coberta per Blink)",
       "retryCta": "Torna-ho a provar",
@@ -3914,8 +3985,18 @@
     "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
     "explainerCta": "Ho entenc",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons.",
+    "transferInProgress": {
+      "body": "Els teus fons estan de camí al teu nou compte. Mantén l'aplicació oberta i ho acabarem automàticament."
+    },
     "transferDelayed": {
       "body": "Els teus fons estan de camí al teu nou compte. Està trigant més de l'habitual — mantén l'aplicació oberta i ho acabarem automàticament.",
+      "contactSupportCta": "Contacta amb suport"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "No hem pogut llegir el progrés de la teva migració en aquest dispositiu. No s'ha perdut res: els teus fons estan segurs i el teu progrés continua desat.",
+      "outOfSpaceBody": "El teu dispositiu no té espai d'emmagatzematge lliure, així que no podem llegir el progrés de la teva migració. Allibera espai i torna-ho a provar. No s'ha perdut res: els teus fons estan segurs.",
+      "notSavedBody": "No hem pogut desar el progrés de la teva migració en aquest dispositiu. No s'ha perdut res: els teus fons estan segurs. Torna-ho a provar.",
+      "notSavedOutOfSpaceBody": "El teu dispositiu no té espai d'emmagatzematge lliure, així que no podem desar el progrés de la teva migració. Allibera espai i torna-ho a provar. No s'ha perdut res: els teus fons estan segurs.",
       "contactSupportCta": "Contacta amb suport"
     },
     "clockOutOfSync": {
@@ -3979,6 +4060,12 @@
     "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
     "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operador inaccessible",
+    "outageBody": "Spark està patint una interrupció. Espera un parell de minuts i torna-ho a provar o contacta amb el nostre {support}",
+    "outageSupport": "Suport",
+    "tryAgainLater": "Torna-ho a provar més tard"
+  },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",
     "description": "Assegura la teva cartera ara. Només triga un minut.",
@@ -3987,6 +4074,81 @@
     "modalTitle": "Assegura els teus fons",
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Configura l'autenticació de dos factors",
+    "cardDescription": "Protegeix el teu compte de l'accés no autoritzat.",
+    "cardCta": "Configura",
+    "settingsDescription": "Protegeix el teu compte de l'accés no autoritzat configurant-la.",
+    "setupTitle": "Configura ara l'autenticació de dos factors",
+    "setupDescription": "Per evitar l'accés no autoritzat al teu compte, afegeix ara l'autenticació de dos factors.",
+    "setAuthenticator": "Configura l'autenticador",
+    "reminderTitle": "Afegeix un autenticador per protegir els teus fons",
+    "reminderDescription": "El teu saldo ha augmentat. Una aplicació d'autenticació manté el teu compte segur, fins i tot si algú s'apodera del teu correu electrònic o del teu telèfon.",
+    "modalReminder": "Si ho descartes ara, assegura't d'activar-ho tan aviat com puguis.",
+    "dismissTwoMore": "Pots descartar això dues vegades més.",
+    "dismissOneMore": "Pots descartar això una vegada més.",
+    "dismissLast": "Aquesta és l'última vegada que pots descartar això.",
+    "setNow": "Configura ara",
+    "dontWantTo": "No vull",
+    "highBalanceTitle": "Tens més de {amount}, afegeix protecció addicional",
+    "protectionRequiredTitle": "Afegeix protecció addicional per continuar fent servir Blink",
+    "protectionRequiredBody": "Com més fons tens, més important és una millor seguretat. Afegeix un autenticador per continuar fent servir Blink.",
+    "nonCustodialTitle": "Si no vols configurar l'autenticació de dos factors",
+    "nonCustodialBody": "L'altra opció és passar a no custodiat. Llavors ets responsable dels teus propis fons."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Protegeix els teus fons amb un autenticador",
+    "introDescription": "Una aplicació d'autenticació genera un codi nou de 6 dígits cada 30 segons.",
+    "takeoversTitle": "Evita el segrest del compte",
+    "takeoversDescription": "El codi només existeix al teu telèfon",
+    "stolenNumberTitle": "Estigues segur encara que et robin el número",
+    "stolenNumberDescription": "Encara que algú accedeixi al teu correu electrònic o al teu número de telèfon, no podrà iniciar la sessió",
+    "durationTitle": "Triga uns 2 minuts",
+    "durationDescription": "Et guiarem pas a pas",
+    "getStarted": "Comença",
+    "appsTitle": "Aconsegueix una aplicació d'autenticació",
+    "appsDescription": "Qualsevol aplicació d'autenticació funciona. Aquestes són gratuïtes i de confiança:",
+    "googleAuthenticatorDescription": "Senzilla i molt utilitzada. Còpia de seguretat opcional al teu compte de Google.",
+    "protonAuthenticatorDescription": "Codi obert. Còpia de seguretat i sincronització amb xifratge d'extrem a extrem.",
+    "twoFasAuthDescription": "Codi obert. No cal cap compte.",
+    "get": "Obtén",
+    "storeNote": "«Obtén» obre l'App Store o Google Play. Torna a Blink quan estigui instal·lada.",
+    "haveAnApp": "Ja tinc una aplicació",
+    "keyInstruction": "Copia aquesta clau de configuració a la teva aplicació d'autenticació.",
+    "qrInstruction": "Fas servir un altre dispositiu?\nEn comptes d'això, escaneja aquest codi QR.",
+    "backupTitle": "Fes una còpia de seguretat de la clau",
+    "backupDescription": "Si perds el telèfon, aquesta clau et permet tornar a configurar l'autenticador. Desa-la en un lloc que no sigui aquest telèfon.",
+    "saveToPasswordManager": "Desa en un gestor de contrasenyes",
+    "shareToPasswordManager": "Comparteix amb un gestor de contrasenyes",
+    "copyForManualBackup": "Copia per a una còpia de seguretat manual",
+    "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Copia la clau per fer una còpia de seguretat manual.",
+    "savedIt": "Ja l'he desada",
+    "keyBackupText": "Clau de configuració de l'autenticador de Blink\n\nCompte: {account}\nClau de configuració: {key}\n\nSi perds el telèfon, afegeix aquesta clau de configuració a una aplicació d'autenticació per recuperar els teus codis d'inici de sessió de Blink. Qualsevol persona amb aquesta clau pot generar els teus codis, així que mantén-la en privat.",
+    "protectedTitle": "El teu compte ja està protegit",
+    "protectedDescription": "A partir d'ara, per iniciar la sessió caldrà un codi d'un sol ús de la teva aplicació d'autenticació.",
+    "newPhoneTip": "Si canvies de telèfon, passa l'autenticador al nou <bold>abans</bold> de restablir l'antic.",
+    "done": "Fet"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Activada",
+    "statusDisabled": "2FA: Desactivada",
+    "modalTitle": "No et recomanem desactivar la 2FA",
+    "modalBody": "Això reduiria la seguretat del teu compte i facilitaria que un tercer hi accedís sense el teu permís.",
+    "keepProtected": "Mantén-me protegit",
+    "codeInstruction": "Introdueix el codi de 6 dígits de la teva app d'autenticació per desactivar l'autenticació de dos factors.",
+    "codeInvalid": "Aquest codi és incorrecte. Introdueix el codi actual de la teva app d'autenticació.",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a una hora.",
+    "manualResetTitle": "Restabliment manual de la 2FA",
+    "manualResetBody": "Per a la teva protecció, no permetem eliminar la 2FA des de l'app. Si necessites restablir la 2FA, contacta amb el nostre <support>Suport</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Afegeix un correu",
+    "addPhoneTitle": "Afegeix un número de telèfon",
+    "addEmailCode": "Per afegir el teu correu, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "addPhoneCode": "Per afegir el teu número de telèfon, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "codeInvalid": "Aquest codi és incorrecte. Introdueix el codi actual de la teva app d'autenticació.",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a una hora."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -3997,6 +4159,15 @@
     "title": "Aquest és un compte no custodi",
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
     "cta": "Llegeix"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualitza la teva còpia al núvol",
+    "body": "El teu paquet d'emergència a {provider} no està actualitzat. Torna a fer una còpia de seguretat de la cartera per actualitzar-lo.",
+    "cta": "Torna a fer la còpia"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
+    "exportFailed": "No s'ha pogut baixar el paquet d'emergència."
   },
   "StableBalance": {
     "title": "Balanç estable",
