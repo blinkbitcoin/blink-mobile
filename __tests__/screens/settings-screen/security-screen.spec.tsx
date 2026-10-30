@@ -108,7 +108,11 @@ jest.mock("@app/utils/toast", () => ({
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useFocusEffect: (callback: () => void) => mockUseFocusEffect(callback),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    isFocused: () => true,
+    addListener: () => () => {},
+  }),
 }))
 
 jest.mock("@app/components/screen", () => ({

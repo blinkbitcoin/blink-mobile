@@ -22,8 +22,10 @@ const affectedWindDown: WindDown = {
 let mockStatus: WindDownStatus | null = WindDownStatus.PreCutoff
 
 jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () =>
-    mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+  useWindDownStatus: () => ({
+    windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+    isPending: false,
+  }),
 }))
 
 describe("useMigrationReminderBulletin", () => {

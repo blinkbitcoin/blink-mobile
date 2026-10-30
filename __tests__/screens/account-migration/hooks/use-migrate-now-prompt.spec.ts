@@ -1,6 +1,9 @@
 import { act, renderHook } from "@testing-library/react-native"
 
-import { useMigrateNowPrompt } from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
+import {
+  useMigrateNowPrompt,
+  useMigrateNowRemedy,
+} from "@app/screens/account-migration/hooks/use-migrate-now-prompt"
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
@@ -33,22 +36,65 @@ const affectedWindDown: WindDown = {
 
 let mockStatus: WindDownStatus | null = WindDownStatus.ReceiveDisabled
 
-jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
-  useWindDownStatus: () =>
-    mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+let mockIsPending = false
+
+const mockUseWindDownStatus = jest.fn(() => ({
+  windDown: mockStatus === null ? null : { ...affectedWindDown, status: mockStatus },
+  isPending: mockIsPending,
 }))
+jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
+  useWindDownStatus: () => mockUseWindDownStatus(),
+}))
+
+describe("useMigrateNowRemedy", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockActiveAccount = { id: "custodial-1", type: AccountType.Custodial }
+    mockStatus = WindDownStatus.ReceiveDisabled
+    mockIsPending = false
+  })
+
+  it("is due once receiving is disabled and the self-custodial stack is on", () => {
+    const { result } = renderHook(() => useMigrateNowRemedy())
+
+    expect(result.current.isDue).toBe(true)
+    expect(result.current.isPending).toBe(false)
+  })
+
+  it("is not due before the cutoff, nor while the self-custodial stack is off", () => {
+    mockStatus = WindDownStatus.PreCutoff
+    expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
+
+    mockStatus = WindDownStatus.ReceiveDisabled
+    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
+  })
+})
 
 describe("useMigrateNowPrompt", () => {
   beforeEach(() => {
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockOwnerId = "custodial-1"
     mockStatus = WindDownStatus.ReceiveDisabled
+    mockIsPending = false
     mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+  })
+
+  it("reports the wind-down as pending while the server has not answered", () => {
+    mockStatus = null
+    mockIsPending = true
+
+    const { result } = renderHook(() => useMigrateNowPrompt())
+
+    expect(result.current.isPending).toBe(true)
+    expect(result.current.isVisible).toBe(false)
   })
 
   it("prompts a custodial account once the server disables receiving", () => {
     const { result } = renderHook(() => useMigrateNowPrompt())
 
+    expect(result.current.isPending).toBe(false)
     expect(result.current.isVisible).toBe(true)
     expect(result.current.canReopen).toBe(true)
     expect(result.current.deadlineTimestamp).toBe(affectedWindDown.finalDeadline)

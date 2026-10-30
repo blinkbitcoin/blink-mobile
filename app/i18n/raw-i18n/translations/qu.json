@@ -2440,9 +2440,9 @@
     "time": "Pacha",
     "type": "Laya",
     "feeTier": "Apachiypa ñawpaqnin",
-    "fast": "Usqhay",
-    "medium": "Chawpi",
-    "slow": "Allillamanta",
+    "fast": "Ñawpaq",
+    "medium": "Sapsi",
+    "slow": "Pisi chaniyuq",
     "recommended": "Allin",
     "walletOffline": "Qullqi wasi offline kachkan. Ama hina t'inkisqaykita qhaway hinaspa wakmanta ñit'iy.",
     "sdkInsufficientFunds": "Mana kaniyuqchu kay ruwaykunapaq.",
@@ -2451,7 +2451,7 @@
     "sdkGenericError": "Mana chaninchayta atinichu. Huk yupaywan watiqmanta ruway."
   },
   "SettingsScreen": {
-    "createAddress": "Tinkunata ruray",
+    "createAddress": "Lightning tinkunata ruray",
     "addressDisabled": "(mana atikuq)",
     "donationButton": "Qaray ñit'ana",
     "btcpayServer": "BTCPay Server",
@@ -2468,6 +2468,7 @@
     "activated": "Kawsayniyta rikuchiykachkanki",
     "addressScreen": "Kawsayniyta qillqata sutichinaqinmi kaniyta rikuyta munanman",
     "nonCustodialAccount": "Mana waqaychasqa kuenta",
+    "custodialAccount": "Waqaychasqa kuenta",
     "tapUserName": "Yachanakuyta sutichinaqinmi kaniyta ruchiykachkanki",
     "notifications": "Notifications",
     "title": "Rikch'a",
@@ -2576,8 +2577,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Cuenta ID",
@@ -2630,14 +2629,11 @@
     "youGet": "Chaskinki"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Pakasqa/waqaychasqa",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2711,7 +2707,9 @@
     "noFee": "mana chaniyuq",
     "fromApprox": "~{fee: string}manta",
     "satAmount": "{amount: string} SAT",
-    "error": "Kunanqa mana chaninkunata chaskiyta atinchikchu"
+    "error": "Kunanqa mana chaninkunata chaskiyta atinchikchu",
+    "inactivity": "Mana llamk'achiy >{months: number} killa",
+    "usdPerMonth": "{amount: string}/killa"
   },
   "TransactionLimitsScreen": {
     "receive": "Allinmi",
@@ -3856,10 +3854,18 @@
         "testSuccess": "Bakuy rimasqaykiqa allinmi"
       }
     },
+    "BundleExport": {
+      "title": "Utqay lloqsiy",
+      "body": "Spark mana llamkaptin, kay qipiqa bitcoinniykita on-chain astanaykipaq yanapasunki, mana Blink-wan. Dólar qullqiykiqa manam kutichiyta atikunchu.",
+      "download": "Qipita urquy",
+      "sensitiveTitle": "Sinchi allin waqaychana",
+      "learnMore": "Sapallanchik lloqsiymanta astawan yachay",
+      "sensitiveConfirm": "Urquy",
+      "sensitiveBody": "Kay willañiqiqa qullqiykita, pagasqaykikunatapas rikuchin, chayrayku pakallapi waqaychay. Utqaypi llamk'achinaykipaqqa, waqaychana rimayniykitapas munanki."
+    },
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
-      "encryptCheckbox": "Yapay contraseñawan pakay",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",
@@ -3985,9 +3991,19 @@
     "explainerCheck5": "Akawuntiykimanta Spark red pagota qichunqaku",
     "explainerCta": "Entiendini",
     "transferringFunds": "Qullqiykita apachkaniku. Iskay kinsa sikundullapi tukurunqa.",
+    "transferInProgress": {
+      "body": "Qullqiykiqa musuq cuentaykiman chayachkanña. App kichasqata saqiy, ñuqayku kikillanmanta tukuchisaqku."
+    },
     "transferDelayed": {
       "body": "Qullqiykiqa musuq cuentaykiman chayachkanña. Aswan unayta ruwakuchkan — app kichasqata saqiy, ñuqayku kikillanmanta tukuchisaqku.",
       "contactSupportCta": "Yanapakuqkunawan rimanakuy"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Kay rurayniykipi migracionniykipa ñawpaqmanchasqanta mana ñawinchayta atinikuchu. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan, ñawpaqmanchasqaykipas waqaychasqallam.",
+      "outOfSpaceBody": "Rurayniykipa waqaychanan mana kapunchu, chayrayku migracionniykipa ñawpaqmanchasqanta mana ñawinchayta atinikuchu. Kichariy tumpa, hinaspa yapamanta ruray. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan.",
+      "notSavedBody": "Kay rurayniykipi migracionniykipa ñawpaqmanchasqanta mana waqaychayta atinikuchu. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan. Yapamanta ruray.",
+      "notSavedOutOfSpaceBody": "Rurayniykipa waqaychanan mana kapunchu, chayrayku migracionniykipa ñawpaqmanchasqanta mana waqaychayta atinikuchu. Kichariy tumpa, hinaspa yapamanta ruray. Manam imapas chinkanchu: qullqiykiqa allinmi kachkan.",
+      "contactSupportCta": "Yanapaqwan rimay"
     },
     "clockOutOfSync": {
       "body": "Dispositivoykipa p'unchawnin hinaspa horan mana huñusqachu. Automáticoman churay qatinaykipaq.",
@@ -4050,6 +4066,12 @@
     "recognizePhraseTitle": "¿Kay waqaychana rimaykunata reqsinkichu?",
     "recognizePhraseBody": "Ama hayk'aqpas hukkuna apachisqan simikunata churaychu."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operadorwan mana tinkiy atikunchu",
+    "outageBody": "Spark llamk'ayninpi sasachakuy kashan. Ama hina kaspa iskay kimsa minututa suyay, chaymanta yapamanta ruway, icha {support} nisqawan rimay",
+    "outageSupport": "Yanapaywan",
+    "tryAgainLater": "Qhipaman yapamanta ruway"
+  },
   "BackupNudge": {
     "title": "Qullqiykikuna sasachakuypi kachkan",
     "description": "Waqaychay wallitaykita kunan. Huk minutullam.",
@@ -4058,6 +4080,81 @@
     "modalTitle": "Waqaychay qullqiykikunata",
     "modalDescription": "Ñuqayku mayt'a kunaykiku wallitaykita waqaychayta ama tukuy qullqiyki chinkananpaq kay aparatuykita chinkachispayki.",
     "secureMe": "Waqaychay wallita"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Iskay rakiypi riqsichiyta churay",
+    "cardDescription": "Cuentaykita mana saqisqa yaykuymanta harkay.",
+    "cardCta": "Churay",
+    "settingsDescription": "Cuentaykita mana saqisqa yaykuymanta harkay, chayta churaspa.",
+    "setupTitle": "Kunan iskay rakiypi riqsichiyta churay",
+    "setupDescription": "Cuentaykiman mana saqisqa yaykuyta harkanaykipaq, kunan iskay rakiypi riqsichiyta yapay.",
+    "setAuthenticator": "Autenticadorta churay",
+    "reminderTitle": "Autenticadorta yapay qullqiykita harkanaykipaq",
+    "reminderDescription": "Qullqiyki yapakurqanmi. Autenticador app cuentaykita allinta waqaychan, pipas correoykita utaq telefonoykita hap'iptinpas.",
+    "modalReminder": "Kunan saqispaykiqa, usqhaylla chayta qallarichiy.",
+    "dismissTwoMore": "Kayta iskay kutita saqiyta atinkiraq.",
+    "dismissOneMore": "Kayta huk kutita saqiyta atinkiraq.",
+    "dismissLast": "Kayqa qhipa kuti kayta saqiyta atinki.",
+    "setNow": "Kunan churay",
+    "dontWantTo": "Mana munanichu",
+    "highBalanceTitle": "{amount} masta kapusunki, ama hina kaspa aswan harkayta yapay",
+    "protectionRequiredTitle": "Ama hina kaspa aswan harkayta yapay Blink-ta llamk'achinallaykipaq",
+    "protectionRequiredBody": "Aswan qullqiyuq kaspaykiqa, aswan allin harkay aswan chaninmi. Ama hina kaspa autenticadorta yapay Blinkta llamk'achinaykipaq.",
+    "nonCustodialTitle": "Mana iskay rakiypi riqsichiyta churayta munaspaykiqa",
+    "nonCustodialBody": "Huk akllayqa non-custodialman pasaymi. Chaypiqa qam kikiyki qullqiykimanta ruwaq kanki."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Qullqiykita autenticadorwan harkay",
+    "introDescription": "Autenticador app sapa 30 segundopi musuq 6 yupayniyuq códigota ruran.",
+    "takeoversTitle": "Cuentaykita suwakunankuta harkan",
+    "takeoversDescription": "Códigoqa telefonoykillapim kan",
+    "stolenNumberTitle": "Yupayniykita suwaptinkupas allin harkasqa kay",
+    "stolenNumberDescription": "Pipas correoykiman utaq telefono yupayniykiman yaykuptinpas, manam cuentaykiman yaykuyta atinqachu",
+    "durationTitle": "Yaqa 2 minutollata munan",
+    "durationDescription": "Pasun pasun pusasqaykiku",
+    "getStarted": "Qallariy",
+    "appsTitle": "Autenticador appta hap'iy",
+    "appsDescription": "Mayqin autenticador apppas llamk'anmi. Kaykunaqa gratismi, iñiy atikuqmi:",
+    "googleAuthenticatorDescription": "Facilmi, achkha runakunam llamk'achinku. Munaspaykiqa Google cuentaykipi waqaychayta atinki.",
+    "protonAuthenticatorDescription": "Kichasqa códigoyuq. Waqaychay hinaspa sincronizay, puntamanta puntakama pakasqa.",
+    "twoFasAuthDescription": "Kichasqa códigoyuq. Mana cuentata munanchu.",
+    "get": "Uraqichiy",
+    "storeNote": "“Uraqichiy” App Store utaq Google Play nisqata kichan. Churasqaña kaptin Blinkman kutimuy.",
+    "haveAnApp": "Appniyuqmi kani",
+    "keyInstruction": "Kay churana llaveta autenticador appykiman kopiyay.",
+    "qrInstruction": "Huk aparatota llamk'achichkankichu?\nAswanpas kay QR códigota escaneay.",
+    "backupTitle": "Llaveykita waqaychay",
+    "backupDescription": "Telefonoykita chinkachispaykiqa, kay llavewan autenticadorniykita yapamanta churayta atinki. Kay telefonomanta hawa huk kitipi waqaychay.",
+    "saveToPasswordManager": "Yaykuna rimay kamachiqpi waqaychay",
+    "shareToPasswordManager": "Yaykuna rimay kamachiqwan rakinakuy",
+    "copyForManualBackup": "Makiwan waqaychanapaq kopiyay",
+    "passwordManagerUnavailable": "Kay aparatupiqa manam kanchu pakasqa simikunata waqaychaqqa. Llaveta copiay makiwan waqaychanapaq.",
+    "savedIt": "Ñam waqaychani",
+    "keyBackupText": "Blink autenticadorpa churana llavenin\n\nCuenta: {account}\nChurana llave: {key}\n\nTelefonoykita chinkachispaykiqa, kay churana llaveta huk autenticador appman yapay, Blinkman yaykuna códigoykikunata kutichinaykipaq. Pipas kay llaveyuq códigoykikunata ruwayta atin, chayrayku pakallapi waqaychay.",
+    "protectedTitle": "Cuentaykiqa kunanmi harkasqa",
+    "protectedDescription": "Kunanmanta, yaykunapaqqa autenticador appykimanta huk kutillapaq códigotam munanki.",
+    "newPhoneTip": "Musuq telefonota hap'ispaykiqa, autenticadorniykita chayman apay, <bold>manaraq</bold> mawk'a telefonota kutichichkaspa.",
+    "done": "Tukusqa"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Kawsachisqa",
+    "statusDisabled": "2FA: Wañuchisqa",
+    "modalTitle": "Manam 2FA wañuchiyta yuyaychaykuchu",
+    "modalBody": "Kayqa cuentaykiq waqaychasqa kayninta pisiyachinman, hukkunataq mana munasqaykiwan cuentaykiman yaykunankupaq facilchanman.",
+    "keepProtected": "Waqaychasqa kachun",
+    "codeInstruction": "Autenticador appaykimanta 6 yupayniyuq códigota qillqay iskay factor autenticación wañuchinaykipaq.",
+    "codeInvalid": "Chay códigoqa manam allinchu. Autenticador appaykimanta kunan códigota qillqay.",
+    "tooManyAttempts": "Achka kutitam kallpachakunki. Huk horamanta wakmanta kallpachakuy.",
+    "manualResetTitle": "2FA makiwan kutichiy",
+    "manualResetBody": "Waqaychasqa kanaykipaq, manam 2FA appllapi qichuyta saqinchikchu. 2FA kutichiyta munaspaqa, <support>Yanapaqninchikwan</support> rimay."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Correota yapay",
+    "addPhoneTitle": "Telefono yupayta yapay",
+    "addEmailCode": "Correoykita yapanaykipaq, autenticador appaykimanta 6 yupayniyuq códigota qillqay.",
+    "addPhoneCode": "Telefono yupayniykita yapanaykipaq, autenticador appaykimanta 6 yupayniyuq códigota qillqay.",
+    "codeInvalid": "Chay códigoqa manam allinchu. Autenticador appaykimanta kunan códigota qillqay.",
+    "tooManyAttempts": "Achka kutitam kallpachakunki. Huk horamanta wakmanta kallpachakuy."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4068,6 +4165,15 @@
     "title": "Kayqa mana waqaychasqa kuentam",
     "body": "Astawan yachanaykipaq, blog qillqaykuta ñawinchay",
     "cta": "Ñawinchay"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Phuyupi waqaychasqaykita musuqchay",
+    "body": "{provider} nisqapi utqay qipiyki mawk'añam. Qullqikuqniykita hukmanta waqaychay musuqchanaykipaq.",
+    "cta": "Hukmanta waqaychay"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Manaraq utqay qipi kanchu. Ñawpaq kaq pagasqaykimanta qhipata ruwakun.",
+    "exportFailed": "Utqay qipita mana uraykachiyta atikurqanchu."
   },
   "StableBalance": {
     "title": "Saldo sinchi",
@@ -4158,9 +4264,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Mana atikurqachu red kustukunata wakichiyta. Tinkichakuyta qhaway, kutispa ruway.",
     "refundNow": "Kunan kutichiy",

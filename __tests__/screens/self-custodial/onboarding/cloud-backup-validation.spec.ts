@@ -3,7 +3,6 @@ import { validateCloudBackupForm } from "@app/screens/self-custodial/onboarding/
 type Input = Parameters<typeof validateCloudBackupForm>[0]
 
 const buildInput = (overrides: Partial<Input> = {}): Input => ({
-  isEncrypted: true,
   password: "",
   confirmPassword: "",
   passwordTouched: false,
@@ -12,17 +11,9 @@ const buildInput = (overrides: Partial<Input> = {}): Input => ({
 })
 
 describe("validateCloudBackupForm", () => {
-  it("is valid and shows no errors when encryption is disabled", () => {
-    const result = validateCloudBackupForm(
-      buildInput({ isEncrypted: false, password: "short" }),
-    )
-
-    expect(result.isValid).toBe(true)
-    expect(result.shouldShowPasswordError).toBe(false)
-    expect(result.shouldShowConfirmPasswordError).toBe(false)
-  })
-
-  it("is invalid when encrypted with no password", () => {
+  /** The passphrase is mandatory: there is no unencrypted cloud backup to fall
+   *  back to, so empty fields never pass. */
+  it("is invalid with no passphrase", () => {
     expect(validateCloudBackupForm(buildInput()).isValid).toBe(false)
   })
 
