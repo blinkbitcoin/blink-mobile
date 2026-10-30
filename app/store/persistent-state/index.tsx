@@ -213,6 +213,13 @@ const handleMigratedState = async (
   }
 }
 
+/** How every step of the reinstall wipe reports a slot it could not erase, by name. */
+const reportReinstallCleanupFailure = (what: string) => {
+  recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
+    alwaysRecord: true,
+  })
+}
+
 /**
  * Collects the failures of an erase that runs in more than one step, so the
  * caller can ask one question at the end: did all of it complete?
@@ -255,12 +262,6 @@ const resetKeepingOwedWipe = (current: PersistentState | null): PersistentState 
     : defaultPersistentState
 
 const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
-  const reportFailure = (what: string) => {
-    recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
-      alwaysRecord: true,
-    })
-  }
-
   // Read before anything is erased, because both erases below are gated on it.
   //
   // The index is the second witness the key material waits for and the session
@@ -274,7 +275,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
 
   // Two steps with the session wipe between them, so failures are collected
   // rather than answered one at a time.
-  const keyMaterial = createEraseTracker(reportFailure)
+  const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
 
   // Before either half, and only on a confirmed reinstall — see
   // clearLegacyKeyStore for what it does and why it goes first. On a false
@@ -291,7 +292,7 @@ const handleFreshInstall = async (): Promise<LoadedPersistentState> => {
   // This branch owns only the trigger and the reporting; WHICH credentials
   // survive uninstall is secureStorage's knowledge. It re-runs every boot until
   // the first blob write, so a failed wipe retries across boots.
-  await KeyStoreWrapper.clearUninstallSurvivingCredentials(reportFailure)
+  await KeyStoreWrapper.clearUninstallSurvivingCredentials(reportReinstallCleanupFailure)
 
   if (presence === SelfCustodialIndexPresence.Absent) {
     // An erase that ran and failed is as owed as one that never ran: the seeds
@@ -360,12 +361,6 @@ const retryOwedKeyMaterialWipe = async (
 ): Promise<{ state: PersistentState; changed: boolean }> => {
   if (!state.pendingReinstallKeyMaterialWipe) return { state, changed: false }
 
-  const reportFailure = (what: string) => {
-    recordAppError(new Error(`Reinstall keychain cleanup failed: ${what}`), {
-      alwaysRecord: true,
-    })
-  }
-
   const presence = await readSelfCustodialIndexPresence()
   if (presence === SelfCustodialIndexPresence.Unknown) {
     return { state, changed: false }
@@ -375,7 +370,7 @@ const retryOwedKeyMaterialWipe = async (
     const indexed = await readSelfCustodialAccountIds()
     if (indexed.status === StorageReadStatus.ReadFailed) return { state, changed: false }
 
-    const keyMaterial = createEraseTracker(reportFailure)
+    const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
     await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(
       keyMaterial.onFailure,
       new Set(indexed.ids),
@@ -389,7 +384,7 @@ const retryOwedKeyMaterialWipe = async (
   // not optional here either: on the Unknown verdict that recorded the marker,
   // it never ran at all, so leaving it out would retire the marker having
   // erased only the copies in the new store.
-  const keyMaterial = createEraseTracker(reportFailure)
+  const keyMaterial = createEraseTracker(reportReinstallCleanupFailure)
   await KeyStoreWrapper.clearLegacyKeyStore(keyMaterial.onFailure)
   await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(keyMaterial.onFailure)
 
