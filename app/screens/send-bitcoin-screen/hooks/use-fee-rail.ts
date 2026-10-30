@@ -18,17 +18,16 @@ export type FeeRail = {
   tiers: Record<FeeTierOption, FeeTierInfo>
   errorMessage: string | undefined
   hasQuote: boolean
+  isQuoting: boolean
+}
+
+export type SelfCustodialFeeRail = FeeRail & {
   /**
-   * A self-custodial failure means the SDK could not build the transaction, so there is
-   * nothing to continue to. A custodial quote is only an estimate that the confirmation
-   * screen fetches again, so a transient failure must not strand the user.
+   * The only way this rail quotes: once, on Next, for the inputs on screen. Resolves to
+   * the tiers, or null when it failed (the reason lands in errorMessage) or the inputs
+   * moved on first.
    */
-  isErrorBlocking: boolean
-  /**
-   * Held until the sender presses Next. Every amount reads too low on its way to the one
-   * being typed, so saying so per keystroke flags a number the sender has not finished.
-   */
-  isErrorDeferred: boolean
+  quote: () => Promise<Record<FeeTierOption, FeeTierInfo> | null>
 }
 
 type FeeRailParams = {
@@ -49,7 +48,7 @@ const resolveSdkErrorMessage = (error: SdkFeeError, LL: LL): string => {
 export const useSelfCustodialFeeRail = ({
   paymentDetail,
   isActive,
-}: FeeRailParams): FeeRail => {
+}: FeeRailParams): SelfCustodialFeeRail => {
   const { sdk } = useSelfCustodialWallet()
   const { LL } = useI18nContext()
 
@@ -58,22 +57,20 @@ export const useSelfCustodialFeeRail = ({
     isActive && settlementAmount?.amount ? settlementAmount.amount : undefined
   const address = isActive ? paymentDetail?.destination : undefined
 
-  const { tiers, error, hasQuote } = useOnchainFeeTiers(sdk ?? null, address, amountSats)
+  const { tiers, error, hasQuote, isQuoting, quote } = useOnchainFeeTiers(
+    sdk ?? null,
+    address,
+    amountSats,
+  )
   const errorMessage = error ? resolveSdkErrorMessage(error, LL) : undefined
 
-  return {
-    tiers,
-    errorMessage,
-    hasQuote,
-    isErrorBlocking: Boolean(errorMessage),
-    isErrorDeferred: error === FeeError.InvalidInput,
-  }
+  return { tiers, errorMessage, hasQuote, isQuoting, quote }
 }
 
 export const useCustodialFeeRail = ({
   paymentDetail,
   isActive,
-}: FeeRailParams): FeeRail & { isQuoting: boolean } => {
+}: FeeRailParams): FeeRail => {
   const { LL } = useI18nContext()
 
   const quotedAmount = paymentDetail?.destinationSpecifiedAmount
@@ -93,8 +90,6 @@ export const useCustodialFeeRail = ({
     /** Shared with the confirmation screen, so neither promises an impossible retry. */
     errorMessage: hasError ? LL.common.feeError() : undefined,
     hasQuote,
-    isErrorBlocking: false,
-    isErrorDeferred: false,
     isQuoting,
   }
 }
