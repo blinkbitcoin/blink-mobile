@@ -8,7 +8,10 @@ type HapticType = keyof typeof HapticFeedbackTypes
 
 type HapticIntent = {
   type: HapticType
-  /** Touch feedback must be silent when the device is; a payment result may override. */
+  /**
+   * Ignoring them buzzes even when the phone is on silent: the library drops anything that
+   * respects them while the ringer is silent.
+   */
   ignoreAndroidSystemSettings: boolean
 }
 
@@ -26,20 +29,20 @@ const pick = (ios: HapticType, android: HapticType): HapticType =>
  * those: `soft` is 10 ms, `impactLight` 20 ms, `rigid` 30 ms, `impactMedium` 40 ms.
  */
 const INTENTS = {
-  /** A keypad key that was accepted. */
+  /** A keypad key that was accepted. Buzzes on silent too, so typing never feels dead. */
   tap: {
     type: pick("selection", "soft"),
-    ignoreAndroidSystemSettings: false,
+    ignoreAndroidSystemSettings: true,
   },
   /** A chip, wallet switch, currency swap, option pick, long-press copy. */
   select: {
     type: pick("selection", "impactLight"),
     ignoreAndroidSystemSettings: false,
   },
-  /** A press the app refused. */
+  /** A press the app refused. Buzzes on silent too, like the error it accompanies. */
   reject: {
     type: "rigid",
-    ignoreAndroidSystemSettings: false,
+    ignoreAndroidSystemSettings: true,
   },
   /** Slide-to-send committing. */
   commit: {
