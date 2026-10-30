@@ -256,6 +256,43 @@ describe("SendBitcoinCompletedScreen actions", () => {
   })
 })
 
+describe("SendBitcoinCompletedScreen recipient", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    loadLocale("en")
+    screenshotState.isTakingScreenshot = false
+  })
+
+  it("prints an on-chain recipient in full and lets it wrap", () => {
+    const onchainRoute = {
+      key: "sendBitcoinCompleted",
+      name: "sendBitcoinCompleted",
+      params: {
+        status: "SUCCESS",
+        currencyAmount: "$100.00",
+        satAmount: "100,100 SAT",
+        destination: "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297",
+        paymentType: "onchain",
+        createdAt: 1747691078,
+      },
+    } as const
+
+    render(
+      <ContextForScreen>
+        <SuccessAction route={onchainRoute} />
+      </ContextForScreen>,
+    )
+
+    act(() => {
+      jest.advanceTimersByTime(2300)
+    })
+
+    const recipient = screen.getByText(onchainRoute.params.destination)
+    expect(recipient.props.numberOfLines).toBeUndefined()
+    expect(recipient.props.ellipsizeMode).toBeUndefined()
+  })
+})
+
 describe("SendBitcoinCompletedScreen", () => {
   let LL: ReturnType<typeof i18nObject>
 
