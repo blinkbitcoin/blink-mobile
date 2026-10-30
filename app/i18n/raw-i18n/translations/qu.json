@@ -31,6 +31,8 @@
     "createError": "API llave mana rurayta atikurqanchu. Yapamanta ruray.",
     "revokeError": "API llave mana chinkachiyta atikurqanchu. Yapamanta ruray.",
     "loadError": "API llavekuna mana cargayta atikurqanchu. Qhipaman ruray.",
+    "discardSecretTitle": "¿Kay API llave-ta wikch'unkichu?",
+    "discardSecretBody": "Kayllam secreto rikuchisqa kanqa. Kunan ripuspaqa llave-ta manam kutichiy atinki, chaymi musuq-ta ruwanayki kanqa.",
     "done": "Tukusqa"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Kawsayninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
     "fatalError": "Ñuqaqmi, kaypiqa, kawsayninmanta, aplicacionta kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Ñuqaqmi, kawsayninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
     "showError": "Llank'ayta kani",
-    "clearAppData": "Puriytaqmi hanaq p'anta kullaywanmi k'uchuchuni"
+    "clearAppData": "Puriytaqmi hanaq p'anta kullaywanmi k'uchuchuni",
+    "screenSecurityUnavailable": "Kay pantallaqa pakasqallam qhepan, pantalla capturakunamanta amachayta mana hap'ichiyta atisqanrayku."
   },
   "notifications": {
     "payment": {

@@ -31,6 +31,8 @@
     "createError": "Klíč API se nepodařilo vytvořit. Zkuste to znovu.",
     "revokeError": "Klíč API se nepodařilo zrušit. Zkuste to znovu.",
     "loadError": "Vaše klíče API se nepodařilo načíst. Zkuste to později.",
+    "discardSecretTitle": "Zahodit tento API klíč?",
+    "discardSecretBody": "Toto je jediný okamžik, kdy se tajný klíč zobrazí. Pokud nyní odejdete, klíč nelze obnovit a budete muset vytvořit nový.",
     "done": "Hotovo"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Pokud problém přetrvává, kontaktujte podporu.",
     "fatalError": "Omlouváme se, ale zdá se, že máme problémy s načítáním dat aplikace. Pokud problémy přetrvávají, kontaktujte prosím podporu.",
     "showError": "Zobrazit chybu",
-    "clearAppData": "Vymazat aplikační data a odhlásit"
+    "clearAppData": "Vymazat aplikační data a odhlásit",
+    "screenSecurityUnavailable": "Tato obrazovka zůstává skrytá, protože se nepodařilo zapnout ochranu proti snímkům obrazovky."
   },
   "notifications": {
     "payment": {

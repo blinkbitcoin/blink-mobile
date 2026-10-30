@@ -31,6 +31,8 @@
         "createError": "Não foi possível criar a chave de API. Tente novamente.",
         "revokeError": "Não foi possível revogar a chave de API. Tente novamente.",
         "loadError": "Não foi possível carregar as suas chaves de API. Tente mais tarde.",
+        "discardSecretTitle": "Descartar esta chave de API?",
+        "discardSecretBody": "Esta é a única vez que o segredo é exibido. Se sair agora, a chave não poderá ser recuperada e terá de criar uma nova.",
         "done": "Concluído"
     },
     "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
         "problemPersists": "Se o problema persistir entre em contato com o suporte.",
         "fatalError": "Desculpe, parece que estamos tendo problemas para carregar os dados do aplicativo. Se os problemas persistirem, entre em contato com o suporte.",
         "showError": "Mostrar erro",
-        "clearAppData": "Apagar Informação do App e Sair"
+        "clearAppData": "Apagar Informação do App e Sair",
+        "screenSecurityUnavailable": "Esta tela permanece oculta porque não foi possível ativar a proteção contra capturas de tela."
     },
     "notifications": {
         "payment": {

@@ -5,7 +5,7 @@ import { RestorePhraseScreen } from "@app/screens/self-custodial/onboarding/rest
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockUseRestorePhrase = jest.fn()
@@ -32,13 +32,10 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: readonly unknown[]) =>
-    mockEnableScreenSecurity(...args),
-  disableScreenSecurity: (...args: readonly unknown[]) =>
-    mockDisableScreenSecurity(...args),
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
 }))
 
 type MnemonicWordInputProps = {
@@ -130,8 +127,10 @@ const renderScreen = () =>
 describe("RestorePhraseScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     mockRouteParams = { step: 2, words: [...validStep2Words] }
     mockUseRestorePhrase.mockReturnValue(defaultHookReturn)
   })
@@ -450,30 +449,34 @@ describe("RestorePhraseScreen", () => {
     expect(updateWord).toHaveBeenCalledWith(0, "aba")
   })
 
-  it("renders the recognize-phrase warning card on step 1", () => {
+  it("renders the recognize-phrase warning card on step 1", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       isStep1: true,
     })
 
     const { getByText } = renderScreen()
+    await flushEffects()
 
     expect(getByText(LL.RestoreScreen.recognizePhraseTitle())).toBeTruthy()
     expect(getByText(LL.RestoreScreen.recognizePhraseBody())).toBeTruthy()
   })
 
-  it("does not render the recognize-phrase warning card on step 2", () => {
+  it("does not render the recognize-phrase warning card on step 2", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       isStep1: false,
     })
 
     const { queryByText } = renderScreen()
+    await flushEffects()
 
+    // The gate has mounted the step's content, so the card's absence is not the gate's.
+    expect(mockMnemonicWordInput).toHaveBeenCalled()
     expect(queryByText(LL.RestoreScreen.recognizePhraseTitle())).toBeNull()
   })
 
-  it("installs the header Paste button on step 1 and wires it to the clipboard", () => {
+  it("installs the header Paste button on step 1 and wires it to the clipboard", async () => {
     const handlePasteFromClipboard = jest.fn()
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
@@ -482,6 +485,7 @@ describe("RestorePhraseScreen", () => {
     })
 
     renderScreen()
+    await flushEffects()
 
     const { getByText } = renderHeaderRight()
     fireEvent.press(getByText(LL.RestoreScreen.paste()))
@@ -489,13 +493,14 @@ describe("RestorePhraseScreen", () => {
     expect(handlePasteFromClipboard).toHaveBeenCalledTimes(1)
   })
 
-  it("announces the Paste button by its visible label, not the test id", () => {
+  it("announces the Paste button by its visible label, not the test id", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       isStep1: true,
     })
 
     renderScreen()
+    await flushEffects()
 
     const { getByTestId } = renderHeaderRight()
     const button = getByTestId("restore-paste-button")
@@ -503,13 +508,14 @@ describe("RestorePhraseScreen", () => {
     expect(button.props.hitSlop).toEqual({ top: 12, bottom: 12, left: 12, right: 12 })
   })
 
-  it("clears the header Paste button when step 1 advances to step 2", () => {
+  it("clears the header Paste button when step 1 advances to step 2", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       isStep1: true,
     })
 
     const { rerender } = renderScreen()
+    await flushEffects()
     expect(headerRightWasInstalled()).toBe(true)
 
     // Step 1 -> step 2 updates params on the same mounted screen, so the header
@@ -523,6 +529,7 @@ describe("RestorePhraseScreen", () => {
         <RestorePhraseScreen />
       </ContextForScreen>,
     )
+    await flushEffects()
 
     expect(lastSetOptions()).toEqual({
       headerRight: undefined,
@@ -531,13 +538,14 @@ describe("RestorePhraseScreen", () => {
     })
   })
 
-  it("never installs the header Paste button when rendered on step 2", () => {
+  it("never installs the header Paste button when rendered on step 2", async () => {
     mockUseRestorePhrase.mockReturnValue({
       ...defaultHookReturn,
       isStep1: false,
     })
 
     renderScreen()
+    await flushEffects()
 
     expect(headerRightWasInstalled()).toBe(false)
     expect(lastSetOptions()).toEqual({
@@ -550,14 +558,14 @@ describe("RestorePhraseScreen", () => {
   /** The screen shows a funded wallet's mnemonic, so it must carry the same
    *  screenshot/screen-recording protection as the backup-creation screen. */
   describe("screen security", () => {
-    it("enables screenshot protection on mount", async () => {
+    it("acquires screen protection on mount", async () => {
       renderScreen()
       await flushEffects()
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
-    it("keeps screenshot protection active on the restoring and error states", async () => {
+    it("keeps screen protection active on the restoring and error states", async () => {
       for (const status of ["restoring", "error"]) {
         jest.clearAllMocks()
         mockUseRestorePhrase.mockReturnValue({ ...defaultHookReturn, status })
@@ -565,17 +573,105 @@ describe("RestorePhraseScreen", () => {
         renderScreen()
         await flushEffects()
 
-        expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+        expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
       }
     })
 
-    it("disables screenshot protection on unmount", async () => {
+    it("releases screen protection on unmount", async () => {
       const { unmount } = renderScreen()
       await flushEffects()
 
       unmount()
 
-      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+
+    /** Restore is input-only — the user types a phrase they already hold — so the
+     *  gate fails open: a device where registration never succeeds must not lock
+     *  the user out of their funds. */
+    it("still renders the inputs when screen protection cannot be acquired", async () => {
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: Promise.reject(new Error("native failure")),
+        release: mockReleaseScreenSecurity,
+      })
+
+      renderScreen()
+      await flushEffects()
+
+      expect(mockUseRestorePhrase).toHaveBeenCalled()
+      expect(mockMnemonicWordInput).toHaveBeenCalled()
+    })
+
+    /** Failing open is for a guard that never came on. Words typed under a guard
+     *  that is then lost (a theme flip whose re-registration runs out of retries)
+     *  stay with the screen above the gate but are not shown again unprotected. */
+    it("keeps the typed words hidden when the guard fails after it was on", async () => {
+      const renderInMode = (mode: "light" | "dark") => (
+        <ContextForScreenWithTheme mode={mode}>
+          <RestorePhraseScreen />
+        </ContextForScreenWithTheme>
+      )
+      const { rerender, getByTestId } = render(renderInMode("light"))
+      await flushEffects()
+      expect(mockMnemonicWordInput).toHaveBeenCalled()
+
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: Promise.reject(new Error("native failure")),
+        release: mockReleaseScreenSecurity,
+      })
+      rerender(renderInMode("dark"))
+      await flushEffects()
+      expect(getByTestId("screen-security-retry")).toBeTruthy()
+
+      // A render after the failure reaches the inputs only if they are still mounted.
+      mockMnemonicWordInput.mockClear()
+      const hookCallsBeforeRender = mockUseRestorePhrase.mock.calls.length
+      rerender(renderInMode("dark"))
+      await flushEffects()
+
+      expect(mockMnemonicWordInput).not.toHaveBeenCalled()
+      // The words stay with the screen above the gate, which kept rendering.
+      expect(mockUseRestorePhrase.mock.calls.length).toBeGreaterThan(
+        hookCallsBeforeRender,
+      )
+    })
+  })
+
+  /** Both regressions below come from the same place: the gate unmounts its subtree
+   *  whenever it re-activates, which a theme flip does to apply the new mask color.
+   *  What the user typed, and the header action the content installed, must both
+   *  survive that. */
+  describe("surviving a gate re-activation", () => {
+    it("keeps the phrase state above the gate, so a pending guard cannot wipe it", async () => {
+      // Never-settling lease: the gate stays on its spinner and mounts no content.
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: new Promise<void>(() => {}),
+        release: mockReleaseScreenSecurity,
+      })
+
+      renderScreen()
+      await flushEffects()
+
+      /** The hook holding the typed words runs even with the content unmounted.
+       *  Held inside the gate it would be torn down and re-created on every
+       *  re-activation, losing every word the user had entered. */
+      expect(mockUseRestorePhrase).toHaveBeenCalled()
+    })
+
+    it("clears the Paste action from the header when the content unmounts", async () => {
+      mockUseRestorePhrase.mockReturnValue({ ...defaultHookReturn, isStep1: true })
+
+      const { unmount } = renderScreen()
+      await flushEffects()
+      expect(headerRightWasInstalled()).toBe(true)
+
+      unmount()
+
+      /** setOptions has no owner: the route keeps the last value, so without the
+       *  cleanup Paste would stay live in the header with the guard off. */
+      expect(lastSetOptions()).toEqual(
+        expect.objectContaining({ headerRight: undefined }),
+      )
     })
   })
 })

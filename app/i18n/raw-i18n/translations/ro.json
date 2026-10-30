@@ -31,6 +31,8 @@
     "createError": "Cheia API nu a putut fi creată. Încearcă din nou.",
     "revokeError": "Cheia API nu a putut fi revocată. Încearcă din nou.",
     "loadError": "Cheile tale API nu au putut fi încărcate. Încearcă mai târziu.",
+    "discardSecretTitle": "Renunți la această cheie API?",
+    "discardSecretBody": "Aceasta este singura dată când secretul este afișat. Dacă pleci acum, cheia nu poate fi recuperată și va trebui să creezi una nouă.",
     "done": "Gata"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Dacă problema persistă, contactați asistența.",
     "fatalError": "Ne pare rău, se pare că avem probleme la încărcarea datelor aplicației. Dacă problemele persistă, vă rugăm să contactați asistența.",
     "showError": "Afișare eroare",
-    "clearAppData": "Ștergeți datele aplicației și deconectați-vă"
+    "clearAppData": "Ștergeți datele aplicației și deconectați-vă",
+    "screenSecurityUnavailable": "Acest ecran rămâne ascuns deoarece protecția împotriva capturilor de ecran nu a putut fi activată."
   },
   "notifications": {
     "payment": {

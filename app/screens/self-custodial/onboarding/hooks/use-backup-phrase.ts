@@ -1,4 +1,4 @@
-import { useCallback, useMemo, useRef } from "react"
+import { useCallback, useMemo, useRef, useState } from "react"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -18,14 +18,26 @@ const WORDS_PER_CARD = 3
 const COUNTDOWN_SECONDS = 10
 const CLIPBOARD_CLEAR_MS = 60_000
 
-export const useBackupPhrase = (step: PhraseStep) => {
+/** When the look at step 1's words ends, fixed by the first call rather than on
+ *  creation. The screen holds it above its screen-security gate, which mounts the
+ *  words again each time it re-activates, so the countdown resumes from the first
+ *  time they showed instead of starting over. */
+export const useBackupCountdownDeadline = (): (() => Date) => {
+  const deadline = useRef<Date | undefined>(undefined)
+  return useCallback(() => {
+    deadline.current ??= new Date(Date.now() + COUNTDOWN_SECONDS * 1000)
+    return deadline.current
+  }, [])
+}
+
+export const useBackupPhrase = (step: PhraseStep, getCountdownDeadline: () => Date) => {
   const { LL, locale } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { copyToClipboard } = useClipboard(CLIPBOARD_CLEAR_MS)
   const mnemonic = useWalletMnemonic()
   const words = useMemo(() => (mnemonic ? splitWords(mnemonic) : []), [mnemonic])
 
-  const expiresAt = useRef(new Date(Date.now() + COUNTDOWN_SECONDS * 1000)).current
+  const [expiresAt] = useState(getCountdownDeadline)
   const { remainingSeconds, isExpired } = useCountdown(expiresAt)
 
   const isStep1 = step === PhraseStep.First

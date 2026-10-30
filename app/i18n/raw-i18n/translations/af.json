@@ -31,6 +31,8 @@
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",
     "loadError": "Kon nie jou API-sleutels laai nie. Probeer later weer.",
+    "discardSecretTitle": "Gooi hierdie API-sleutel weg?",
+    "discardSecretBody": "Dit is die enigste keer wat die geheim gewys word. As jy nou weggaan, kan die sleutel nie herwin word nie en sal jy 'n nuwe een moet skep.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "As die fout aanhou opduik, kontak asseblief ondersteuning. ",
     "fatalError": "Jammer, dit lyk of ons probleme het met die toepassing se data. As die probleem voortduur, kontak asseblief ondersteuning.",
     "showError": "Wys Fout",
-    "clearAppData": "Vee Toepassingdata skoon en Teken Uit"
+    "clearAppData": "Vee Toepassingdata skoon en Teken Uit",
+    "screenSecurityUnavailable": "Hierdie skerm bly versteek omdat skermskootbeskerming nie aangeskakel kon word nie."
   },
   "notifications": {
     "payment": {
