@@ -80,7 +80,12 @@
         "skip": "Passez cette étape",
         "unlock": "Déverrouillez",
         "usePin": "Utilisez un NIP",
-        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux"
+        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux",
+        "forgotPin": "NIP oublié ? Supprimer les portefeuilles",
+        "removeWalletsTitle": "Supprimer les portefeuilles de cet appareil ?",
+        "removeWalletsBody": "Cela supprime tous les portefeuilles de cet appareil et vous déconnecte. Pour récupérer un portefeuille, vous avez besoin de sa phrase de sauvegarde. Sans elle, le portefeuille est perdu.",
+        "removeWalletsConfirm": "Supprimer les portefeuilles",
+        "removeWalletsFailed": "Certains portefeuilles n'ont pas pu être supprimés. Veuillez réessayer."
     },
     "PeopleScreen": {
         "title": "Cercles",
@@ -2177,16 +2182,19 @@
         "walletCountNotTwo": "Le nombre de portefeuilles n'est pas 2. Veuillez utiliser le tableau de bord pour voir tous les portefeuilles et les fonds de ce compte"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Impossible d'enregistrer la tentative en toute sécurité.",
+        "attemptsLeft": "{attemptsRemaining: number} tentatives restantes.",
         "attemptsRemaining": "NIP incorrect. {attemptsRemaining: number} tentatives restantes.",
         "enterPin": "Saisissez votre code NIP",
-        "lockoutUnavailable": "Impossible d'enregistrer la tentative échouée en toute sécurité. Déconnexion.",
+        "oneAttemptLeft": "1 tentative restante.",
         "oneAttemptRemaining": "NIP incorrect. 1 tentative restante.",
         "pinUnreadable": "Impossible de vérifier votre NIP. Veuillez réessayer.",
         "setPin": "Définissez votre code NIP",
         "setPinFailedMatch": "Les NIP ne correspondent pas - Corrigez votre code NIP",
         "storePinFailed": "Impossible d’enregistrer votre NIP.",
         "tooManyAttempts": "Trop de tentatives infructeuses. Déconnexion.",
-        "tryAgainIn": "Réessayez dans {seconds: number} s.",
+        "attemptBudgetSpent": "Trop de tentatives infructeuses.",
+        "tryAgainIn": "Réessayez dans {time: string}.",
         "verifyPin": "Validez votre code NIP"
     },
     "PriceHistoryScreen": {

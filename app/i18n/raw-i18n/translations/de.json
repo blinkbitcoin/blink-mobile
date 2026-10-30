@@ -80,7 +80,12 @@
         "skip": "Überspringen",
         "unlock": "Entsperren",
         "usePin": "PIN nutzen",
-        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt."
+        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt.",
+        "forgotPin": "PIN vergessen? Brieftaschen entfernen",
+        "removeWalletsTitle": "Brieftaschen von diesem Gerät entfernen?",
+        "removeWalletsBody": "Damit werden alle Brieftaschen von diesem Gerät entfernt und Sie werden abgemeldet. Um eine Brieftasche zurückzubekommen, brauchen Sie ihre Sicherungsphrase. Ohne sie ist die Brieftasche verloren.",
+        "removeWalletsConfirm": "Brieftaschen entfernen",
+        "removeWalletsFailed": "Einige Brieftaschen konnten nicht entfernt werden. Bitte versuchen Sie es erneut."
     },
     "PeopleScreen": {
         "title": "Leute",
@@ -2177,16 +2182,19 @@
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Der Versuch konnte nicht sicher gespeichert werden.",
+        "attemptsLeft": "{attemptsRemaining: string} verbleibende Versuche.",
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
         "enterPin": "Gib deinen PIN Code ein",
-        "lockoutUnavailable": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
+        "oneAttemptLeft": "Letzter Versuch.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
         "storePinFailed": "Dein PIN Code konnte nicht gespeichert werden.",
         "tooManyAttempts": "Zu viele Fehlversuche. Du wirst nun ausgeloggt.",
-        "tryAgainIn": "Versuche es in {seconds: number} s erneut.",
+        "attemptBudgetSpent": "Zu viele Fehlversuche.",
+        "tryAgainIn": "Versuche es in {time: string} erneut.",
         "verifyPin": "Bestätige deinen PIN Code"
     },
     "PriceHistoryScreen": {

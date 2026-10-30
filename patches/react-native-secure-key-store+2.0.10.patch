@@ -1,0 +1,130 @@
+diff --git a/node_modules/react-native-secure-key-store/android/src/main/java/com/reactlibrary/securekeystore/RNSecureKeyStoreModule.java b/node_modules/react-native-secure-key-store/android/src/main/java/com/reactlibrary/securekeystore/RNSecureKeyStoreModule.java
+index e20d488..d02807f 100644
+--- a/node_modules/react-native-secure-key-store/android/src/main/java/com/reactlibrary/securekeystore/RNSecureKeyStoreModule.java
++++ b/node_modules/react-native-secure-key-store/android/src/main/java/com/reactlibrary/securekeystore/RNSecureKeyStoreModule.java
+@@ -6,6 +6,7 @@
+ 
+ package com.reactlibrary.securekeystore;
+ 
++import android.content.Context;
+ import android.content.SharedPreferences;
+ import android.os.Build;
+ import android.util.Log;
+@@ -23,9 +24,12 @@ import com.facebook.react.bridge.ReadableMap;
+ import java.io.FileNotFoundException;
+ import java.io.IOException;
+ import java.security.GeneralSecurityException;
++import java.util.Map;
+ 
+ public class RNSecureKeyStoreModule extends ReactContextBaseJavaModule {
+ 
++  private static final String PREFERENCES_FILE = "secret_shared_prefs";
++
+   private final ReactApplicationContext reactContext;
+ 
+   public RNSecureKeyStoreModule(ReactApplicationContext reactContext) {
+@@ -41,7 +45,9 @@ public class RNSecureKeyStoreModule extends ReactContextBaseJavaModule {
+   @ReactMethod
+   public void set(String alias, String input, @Nullable ReadableMap options, Promise promise) {
+     try {
+-      getSecureSharedPreferences().edit().putString(alias, input).commit();
++      if (!commitOrUndo(getSecureSharedPreferences().edit().putString(alias, input))) {
++        throw new IOException("write did not reach disk");
++      }
+       promise.resolve("stored ciphertext in app storage");
+     } catch (Exception e) {
+       e.printStackTrace();
+@@ -50,9 +56,40 @@ public class RNSecureKeyStoreModule extends ReactContextBaseJavaModule {
+     }
+   }
+ 
++  /**
++   * Commits an edit and reports whether it reached disk. SharedPreferences applies an edit
++   * to its in-memory map before it writes the file, and a commit whose file write fails
++   * keeps the edit there, where the next commit that succeeds would save it after all. So a
++   * refused edit is undone in memory first, entry by entry back to what the file still
++   * holds. Entries are compared as stored, encrypted, so one that no longer decrypts is put
++   * back as it was too.
++   */
++  private boolean commitOrUndo(SharedPreferences.Editor edit) {
++    SharedPreferences stored = reactContext.getSharedPreferences(PREFERENCES_FILE, Context.MODE_PRIVATE);
++    Map<String, ?> before = stored.getAll();
++    if (edit.commit()) {
++      return true;
++    }
++    Map<String, ?> after = stored.getAll();
++    SharedPreferences.Editor undo = stored.edit();
++    for (String key : after.keySet()) {
++      if (!before.containsKey(key)) {
++        undo.remove(key);
++      }
++    }
++    for (Map.Entry<String, ?> entry : before.entrySet()) {
++      Object value = entry.getValue();
++      if (value instanceof String && !value.equals(after.get(entry.getKey()))) {
++        undo.putString(entry.getKey(), (String) value);
++      }
++    }
++    undo.commit();
++    return false;
++  }
++
+   private SharedPreferences getSecureSharedPreferences() throws GeneralSecurityException, IOException {
+     return EncryptedSharedPreferences.create(
+-      "secret_shared_prefs",
++      PREFERENCES_FILE,
+       MasterKeys.getOrCreate(MasterKeys.AES256_GCM_SPEC),
+       reactContext,
+       EncryptedSharedPreferences.PrefKeyEncryptionScheme.AES256_SIV,
+@@ -83,7 +120,9 @@ public class RNSecureKeyStoreModule extends ReactContextBaseJavaModule {
+   @ReactMethod
+   public void remove(String alias, Promise promise) {
+     try {
+-      getSecureSharedPreferences().edit().remove(alias).commit();
++      if (!commitOrUndo(getSecureSharedPreferences().edit().remove(alias))) {
++        throw new IOException("remove did not reach disk");
++      }
+       promise.resolve("cleared alias");
+     } catch (Exception e) {
+       e.printStackTrace();
+diff --git a/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m b/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m
+index d7fe4cd..02a52e4 100644
+--- a/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m
++++ b/node_modules/react-native-secure-key-store/ios/RNSecureKeyStore.m
+@@ -51,7 +51,7 @@ - (NSMutableDictionary *)newSearchDictionary:(NSString *)identifier {
+     return searchDictionary;
+ }
+ 
+-- (NSString *)searchKeychainCopyMatching:(NSString *)identifier {
++- (NSString *)searchKeychainCopyMatching:(NSString *)identifier status:(OSStatus *)status {
+     NSMutableDictionary *searchDictionary = [self newSearchDictionary:identifier];
+     
+     // Add search attributes
+@@ -62,8 +62,8 @@ - (NSString *)searchKeychainCopyMatching:(NSString *)identifier {
+     
+     NSDictionary *found = nil;
+     CFTypeRef result = NULL;
+-    OSStatus status = SecItemCopyMatching((CFDictionaryRef)searchDictionary,
+-                                          (CFTypeRef *)&result);
++    *status = SecItemCopyMatching((CFDictionaryRef)searchDictionary,
++                                  (CFTypeRef *)&result);
+     
+     NSString *value = nil;
+     found = (__bridge NSDictionary*)(result);
+@@ -181,10 +181,14 @@ - (void)handleAppUninstallation
+ {
+     @try {
+         [self handleAppUninstallation];
+-        NSString *value = [self searchKeychainCopyMatching:key];
+-        if (value == nil) {
++        OSStatus status = errSecSuccess;
++        NSString *value = [self searchKeychainCopyMatching:key status:&status];
++        if (status == errSecItemNotFound) {
+             NSString* errorMessage = @"{\"message\":\"key does not present\"}";
+             reject(@"404", errorMessage, secureKeyStoreError(errorMessage));
++        } else if (value == nil) {
++            NSString* errorMessage = [NSString stringWithFormat:@"{\"message\":\"key could not be read\",\"status\":%d}", (int)status];
++            reject(@"1", errorMessage, secureKeyStoreError(errorMessage));
+         } else {
+             resolve(value);
+         }

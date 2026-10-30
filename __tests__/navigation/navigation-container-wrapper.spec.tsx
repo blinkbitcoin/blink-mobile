@@ -220,6 +220,62 @@ describe("isMigrationDeeplink", () => {
   })
 })
 
+describe("the lock's synchronous read", () => {
+  /** onReady logs on the way past, and these tests mount the container to get the real
+   *  context. */
+  const consoleLogSpy = jest.spyOn(console, "log")
+  beforeAll(() => consoleLogSpy.mockImplementation(() => {}))
+  afterAll(() => consoleLogSpy.mockRestore())
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockBlockerVisible = false
+    mockIsReady = true
+    mockRootState = STACK_AT_BLOCKER
+    syncRead = undefined
+    renderedState = undefined
+  })
+
+  const renderProbes = () =>
+    render(
+      <NavigationContainerWrapper>
+        <UnlockProbe />
+        <SyncReadProbe />
+      </NavigationContainerWrapper>,
+    )
+
+  /**
+   * The read exists because its callers ask after awaits. A relock raised during those
+   * awaits lands in the ref at once, while the state value the caller's render closed over
+   * is still a commit behind: navigating on that stale one puts a live session on top of
+   * the lock screen it just raised.
+   */
+  it("answers a lock raised in the same tick, which the rendered value still misses", () => {
+    renderProbes()
+    unlock()
+
+    fireEvent.press(screen.getByTestId("lock-then-read"))
+
+    expect(syncRead).toBe(true)
+    expect(renderedState).toBe(false)
+  })
+
+  /** It has to follow the lock down as well, or a caller asking after an answered lock
+   *  would stop routing anywhere. The lock starts up, which is what the released read is
+   *  measured against. */
+  it("follows the lock down once it has been answered", () => {
+    renderProbes()
+
+    fireEvent.press(screen.getByTestId("read-only"))
+    expect(syncRead).toBe(true)
+
+    unlock()
+
+    fireEvent.press(screen.getByTestId("read-only"))
+    expect(syncRead).toBe(false)
+  })
+})
+
 describe("blockerEntryRoute", () => {
   it("routes a still-locked armed start through authenticationCheck so the PIN/biometric unlock is not skipped", () => {
     expect(blockerEntryRoute(true)).toBe("authenticationCheck")
@@ -240,6 +296,34 @@ const UnlockProbe: React.FC = () => {
     </Text>
   )
 }
+
+/** Asks the lock two ways: raising it and reading in the same handler, which is what a
+ *  caller resuming after an await does, and reading it on its own. Both record the value
+ *  this render closed over alongside the read, since telling those apart is the point. */
+const SyncReadProbe: React.FC = () => {
+  const { isAppLocked, readIsAppLocked, setAppLocked } = useAuthenticationContext()
+
+  const lockThenRead = () => {
+    setAppLocked()
+    syncRead = readIsAppLocked()
+    renderedState = isAppLocked
+  }
+
+  const readOnly = () => {
+    syncRead = readIsAppLocked()
+    renderedState = isAppLocked
+  }
+
+  return (
+    <>
+      <Text testID="lock-then-read" onPress={lockThenRead} />
+      <Text testID="read-only" onPress={readOnly} />
+    </>
+  )
+}
+
+let syncRead: boolean | undefined
+let renderedState: boolean | undefined
 
 const RESET_TO_PRIMARY = { index: 0, routes: [{ name: "Primary" }] }
 const RESET_TO_UNLOCK = { index: 0, routes: [{ name: "authenticationCheck" }] }

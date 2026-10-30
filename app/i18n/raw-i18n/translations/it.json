@@ -80,7 +80,12 @@
         "skip": "Salta",
         "unlock": "Sblocca",
         "usePin": "Usa PIN",
-        "confirmLogout": "Sei sicuro di voler uscire? Ciò ripristinerà la cache e tutte le impostazioni dell'utente locale"
+        "confirmLogout": "Sei sicuro di voler uscire? Ciò ripristinerà la cache e tutte le impostazioni dell'utente locale",
+        "forgotPin": "PIN dimenticato? Rimuovi i portafogli",
+        "removeWalletsTitle": "Rimuovere i portafogli da questo dispositivo?",
+        "removeWalletsBody": "Questo rimuove tutti i portafogli da questo dispositivo ed esegue il logout. Per recuperare un portafoglio, ti serve la sua frase di backup. Senza di essa, il portafoglio è perso.",
+        "removeWalletsConfirm": "Rimuovi i portafogli",
+        "removeWalletsFailed": "Non è stato possibile rimuovere alcuni portafogli. Riprova."
     },
     "PeopleScreen": {
         "title": "Persone",
@@ -2177,16 +2182,19 @@
         "walletCountNotTwo": "Il conteggio del portafoglio non è 2. Si prega di utilizzare la dashboard per visualizzare tutti i portafogli e i fondi di questo account"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Impossibile registrare in modo sicuro il tentativo.",
+        "attemptsLeft": "Hai {attemptsRemaining: number} tentativi rimanenti.",
         "attemptsRemaining": "PIN errato. Hai {attemptsRemaining: number} tentativi rimanenti.",
         "enterPin": "Inserisci il tuo codice PIN",
-        "lockoutUnavailable": "Impossibile registrare in modo sicuro il tentativo fallito. Eseguo log out.",
+        "oneAttemptLeft": "1 tentativo rimasto.",
         "oneAttemptRemaining": "PIN errato. 1 tentativo rimasto.",
         "pinUnreadable": "Impossibile verificare il PIN. Riprova.",
         "setPin": "Imposta il tuo codice PIN",
         "setPinFailedMatch": "I PIN non corrispondono - Imposta il tuo PIN",
         "storePinFailed": "Non è possibile salvare il tuo PIN.",
         "tooManyAttempts": "Troppi tentativi falliti. Eseguo log out.",
-        "tryAgainIn": "Riprova tra {seconds: number} s.",
+        "attemptBudgetSpent": "Troppi tentativi falliti.",
+        "tryAgainIn": "Riprova tra {time: string}.",
         "verifyPin": "Verifica il tuo PIN"
     },
     "PriceHistoryScreen": {

@@ -80,7 +80,12 @@
     "skip": "Langkau",
     "unlock": "Buka",
     "usePin": "Gunakan PIN",
-    "confirmLogout": "Adakah anda pasti mahu log keluar? Ini akan menetapkan semula cache dan semua tetapan pengguna tempatan anda"
+    "confirmLogout": "Adakah anda pasti mahu log keluar? Ini akan menetapkan semula cache dan semua tetapan pengguna tempatan anda",
+    "forgotPin": "Lupa PIN? Alih keluar dompet",
+    "removeWalletsTitle": "Alih keluar dompet daripada peranti ini?",
+    "removeWalletsBody": "Ini mengalih keluar semua dompet daripada peranti ini dan log keluar anda. Untuk mendapatkan semula dompet, anda memerlukan frasa pemulihannya. Tanpanya, dompet itu hilang.",
+    "removeWalletsConfirm": "Alih keluar dompet",
+    "removeWalletsFailed": "Sesetengah dompet tidak dapat dialih keluar. Sila cuba lagi."
   },
   "PeopleScreen": {
     "title": "Kenalan",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Bilangan dompet bukan 2. Sila gunakan papan pemuka untuk melihat semua dompet dan dana akaun ini"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Tidak dapat merekod percubaan dengan selamat.",
+    "attemptsLeft": "{attemptsRemaining: number} kali lagi percubaan.",
     "attemptsRemaining": "Salah No PIN. {Percubaan yang tinggal: number} kali lagi percubaan.",
     "enterPin": "Masukkan kod PIN anda",
-    "lockoutUnavailable": "Tidak dapat merekod percubaan yang gagal dengan selamat. Daftar keluar sekarang",
+    "oneAttemptLeft": "1 lagi percubaan.",
     "oneAttemptRemaining": "Salah no PIN. 1 lagi percubaan.",
     "pinUnreadable": "Tidak dapat menyemak PIN anda. Sila cuba lagi.",
     "setPin": "Tetapkan kod PIN anda",
     "setPinFailedMatch": "Pin tak sama - Tetapkan kod PIN anda",
     "storePinFailed": "Tak boleh nak simpan kod pin anda.",
     "tooManyAttempts": "Terlalu banyak percubaan yang gagal. Daftar keluar sekarang",
-    "tryAgainIn": "Cuba lagi dalam {seconds: number} s.",
+    "attemptBudgetSpent": "Terlalu banyak percubaan yang gagal.",
+    "tryAgainIn": "Cuba lagi dalam {time: string}.",
     "verifyPin": "Sahkan kod PIN anda"
   },
   "PriceHistoryScreen": {

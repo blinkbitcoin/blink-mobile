@@ -80,7 +80,12 @@
     "skip": "Overslaan",
     "unlock": "Ontgrendelen",
     "usePin": "Gebruik je PIN",
-    "confirmLogout": "Weet je zeker dat je wilt uitloggen? Dit wist je cache en alle lokale gebruikersinstellingen"
+    "confirmLogout": "Weet je zeker dat je wilt uitloggen? Dit wist je cache en alle lokale gebruikersinstellingen",
+    "forgotPin": "PIN vergeten? Verwijder portemonnees",
+    "removeWalletsTitle": "Portemonnees van dit apparaat verwijderen?",
+    "removeWalletsBody": "Dit verwijdert alle portemonnees van dit apparaat en logt je uit. Om een portemonnee terug te krijgen, heb je de herstelzin nodig. Zonder die zin is de portemonnee weg.",
+    "removeWalletsConfirm": "Verwijder portemonnees",
+    "removeWalletsFailed": "Sommige portemonnees konden niet worden verwijderd. Probeer het opnieuw."
   },
   "PeopleScreen": {
     "title": "Mensen",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Wallet-aantal is niet 2. Gebruik het dashboard om alle wallets en fondsen van dit account te bekijken"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Kon de poging niet veilig vastleggen.",
+    "attemptsLeft": "{attemptsRemaining: number} resterende pogingen.",
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
     "enterPin": "Voer uw pincode in",
-    "lockoutUnavailable": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
+    "oneAttemptLeft": "1 poging over.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",
     "setPin": "Stel uw PIN code in",
     "setPinFailedMatch": "Pincodes komen niet overeen - Stel uw pincode in",
     "storePinFailed": "Kan je pincode niet opslaan.",
     "tooManyAttempts": "Teveel mislukte pogingen. Uitloggen.",
-    "tryAgainIn": "Probeer het over {seconds: number} s opnieuw.",
+    "attemptBudgetSpent": "Teveel mislukte pogingen.",
+    "tryAgainIn": "Probeer het over {time: string} opnieuw.",
     "verifyPin": "Verifieer uw pincode"
   },
   "PriceHistoryScreen": {

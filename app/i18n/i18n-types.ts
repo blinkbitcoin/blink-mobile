@@ -203,6 +203,26 @@ type RootTranslation = {
 		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​l​o​g​ ​o​u​t​?​ ​T​h​i​s​ ​w​i​l​l​ ​r​e​s​e​t​ ​y​o​u​r​ ​c​a​c​h​e​ ​a​n​d​ ​a​l​l​ ​l​o​c​a​l​ ​u​s​e​r​ ​s​e​t​t​i​n​g​s
 		 */
 		confirmLogout: string
+		/**
+		 * F​o​r​g​o​t​ ​P​I​N​?​ ​R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		forgotPin: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		removeWalletsTitle: string
+		/**
+		 * T​h​i​s​ ​r​e​m​o​v​e​s​ ​a​l​l​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​ ​a​n​d​ ​l​o​g​s​ ​y​o​u​ ​o​u​t​.​ ​T​o​ ​g​e​t​ ​a​ ​w​a​l​l​e​t​ ​b​a​c​k​,​ ​y​o​u​ ​n​e​e​d​ ​i​t​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​W​i​t​h​o​u​t​ ​i​t​,​ ​t​h​e​ ​w​a​l​l​e​t​ ​i​s​ ​l​o​s​t​.
+		 */
+		removeWalletsBody: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		removeWalletsConfirm: string
+		/**
+		 * S​o​m​e​ ​w​a​l​l​e​t​s​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​r​e​m​o​v​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		removeWalletsFailed: string
 	}
 	PeopleScreen: {
 		/**
@@ -6793,6 +6813,19 @@ type RootTranslation = {
 	}
 	PinScreen: {
 		/**
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.
+		 */
+		attemptBudgetSpent: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.
+		 */
+		attemptUnrecorded: string
+		/**
+		 * {​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
+		 * @param {number} attemptsRemaining
+		 */
+		attemptsLeft: RequiredParams<'attemptsRemaining'>
+		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​{​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
 		 * @param {number} attemptsRemaining
 		 */
@@ -6802,9 +6835,9 @@ type RootTranslation = {
 		 */
 		enterPin: string
 		/**
-		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
+		 * 1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
-		lockoutUnavailable: string
+		oneAttemptLeft: string
 		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
@@ -6830,10 +6863,10 @@ type RootTranslation = {
 		 */
 		tooManyAttempts: string
 		/**
-		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
-		 * @param {number} seconds
+		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​t​i​m​e​}​.
+		 * @param {string} time
 		 */
-		tryAgainIn: RequiredParams<'seconds'>
+		tryAgainIn: RequiredParams<'time'>
 		/**
 		 * V​e​r​i​f​y​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
@@ -14435,6 +14468,26 @@ export type TranslationFunctions = {
 		 * Are you sure you'd like to log out? This will reset your cache and all local user settings
 		 */
 		confirmLogout: () => LocalizedString
+		/**
+		 * Forgot PIN? Remove wallets
+		 */
+		forgotPin: () => LocalizedString
+		/**
+		 * Remove wallets from this device?
+		 */
+		removeWalletsTitle: () => LocalizedString
+		/**
+		 * This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.
+		 */
+		removeWalletsBody: () => LocalizedString
+		/**
+		 * Remove wallets
+		 */
+		removeWalletsConfirm: () => LocalizedString
+		/**
+		 * Some wallets could not be removed. Please try again.
+		 */
+		removeWalletsFailed: () => LocalizedString
 	}
 	PeopleScreen: {
 		/**
@@ -21012,6 +21065,18 @@ export type TranslationFunctions = {
 	}
 	PinScreen: {
 		/**
+		 * Too many failed attempts.
+		 */
+		attemptBudgetSpent: () => LocalizedString
+		/**
+		 * Couldn't record the attempt securely.
+		 */
+		attemptUnrecorded: () => LocalizedString
+		/**
+		 * {attemptsRemaining} attempts remaining.
+		 */
+		attemptsLeft: (arg: { attemptsRemaining: number }) => LocalizedString
+		/**
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
@@ -21020,9 +21085,9 @@ export type TranslationFunctions = {
 		 */
 		enterPin: () => LocalizedString
 		/**
-		 * Couldn't record the failed attempt securely. Logging out.
+		 * 1 attempt remaining.
 		 */
-		lockoutUnavailable: () => LocalizedString
+		oneAttemptLeft: () => LocalizedString
 		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
@@ -21048,9 +21113,9 @@ export type TranslationFunctions = {
 		 */
 		tooManyAttempts: () => LocalizedString
 		/**
-		 * Try again in {seconds}s.
+		 * Try again in {time}.
 		 */
-		tryAgainIn: (arg: { seconds: number }) => LocalizedString
+		tryAgainIn: (arg: { time: string }) => LocalizedString
 		/**
 		 * Verify your PIN code
 		 */

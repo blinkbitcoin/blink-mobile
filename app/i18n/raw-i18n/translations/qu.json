@@ -80,7 +80,12 @@
     "skip": "Atipanichu",
     "unlock": "Churay",
     "usePin": "PIN tukuyta",
-    "confirmLogout": "¿Chiqaptachu lluqsiyta munankí? Kayqa cache nisqata tukuy local ruwachikunatapas qallarimanta churanqa"
+    "confirmLogout": "¿Chiqaptachu lluqsiyta munankí? Kayqa cache nisqata tukuy local ruwachikunatapas qallarimanta churanqa",
+    "forgotPin": "PIN qunqarqankichu? Qullqikuqkunata qichuy",
+    "removeWalletsTitle": "Kay aparatomanta qullqikuqkunata qichuykuchu?",
+    "removeWalletsBody": "Kayqa tukuy qullqikuqkunata kay aparatomanta qichun, hinallataq lluqsichisunki. Huk qullqikuqta kutichinaykipaqqa, waqaychay siminta munanki. Mana chayqa, qullqikuqqa chinkanmi.",
+    "removeWalletsConfirm": "Qullqikuqkunata qichuy",
+    "removeWalletsFailed": "Wakin qullqikuqkunataqa mana qichuyta atikurqanchu. Huktawan kallpachakuy."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Walleta yupayqa mana 2 kanchu. Ama hina kaspa dashboard nisqata llamk'achiy tukuy walletakunata qullqikunatapas qhawanaykipaq"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Manam allinta waqaychayta atirqanchu kutita.",
+    "attemptsLeft": "{attemptsRemaining: number} rantiq kani.",
     "attemptsRemaining": "Mana kani PIN. {attemptsRemaining: number} rantiq kani.",
     "enterPin": "PIN kodiykita yaykuchiy",
-    "lockoutUnavailable": "Manam allinta waqaychayta atirqanchu pantasqa kutita. Chiqanichu.",
+    "oneAttemptLeft": "1 rantiq kani.",
     "oneAttemptRemaining": "Mana kani PIN. 1 rantiq kani.",
     "pinUnreadable": "Manam PIN nikita qhawayta atirqanchu. Wakmanta ruwaykuy.",
     "setPin": "PIN kodiyan kani",
     "setPinFailedMatch": "PIN kodiyan mana kani - PIN kodiyan kani.",
     "storePinFailed": "Ñuqa PIN kodiyan kawsayninkuqa mana kani.",
     "tooManyAttempts": "Rantiq kawsayninkuqa hukllaqmi. Chiqanichu.",
-    "tryAgainIn": "Wakmanta ruwaykuy {seconds: number} s qhipata.",
+    "attemptBudgetSpent": "Rantiq kawsayninkuqa hukllaqmi.",
+    "tryAgainIn": "Wakmanta ruwaykuy {time: string} qhipata.",
     "verifyPin": "PIN qillqinmi qhipanichu"
   },
   "PriceHistoryScreen": {

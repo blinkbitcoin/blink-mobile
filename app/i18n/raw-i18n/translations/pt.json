@@ -80,7 +80,12 @@
         "skip": "Pular",
         "unlock": "Desbloquear",
         "usePin": "Usar PIN",
-        "confirmLogout": "Tem certeza de que deseja sair? Isso redefinirá seu cache e todas as configurações locais de usuário"
+        "confirmLogout": "Tem certeza de que deseja sair? Isso redefinirá seu cache e todas as configurações locais de usuário",
+        "forgotPin": "Esqueceu o PIN? Remover carteiras",
+        "removeWalletsTitle": "Remover as carteiras deste dispositivo?",
+        "removeWalletsBody": "Isto remove todas as carteiras deste dispositivo e encerra a sua sessão. Para recuperar uma carteira, você precisa da frase de backup dela. Sem ela, a carteira é perdida.",
+        "removeWalletsConfirm": "Remover carteiras",
+        "removeWalletsFailed": "Não foi possível remover algumas carteiras. Tente novamente."
     },
     "PeopleScreen": {
         "title": "Pessoas",
@@ -2177,16 +2182,19 @@
         "walletCountNotTwo": "O número de carteiras não é 2. Por favor, utilize o painel para ver todas as carteiras e fundos desta conta."
     },
     "PinScreen": {
+        "attemptUnrecorded": "Não foi possível registar a tentativa em segurança.",
+        "attemptsLeft": "{attemptsRemaining: string} tentativas restantes.",
         "attemptsRemaining": "PIN incorreto. {attemptsRemaining: string} tentativas restantes.",
         "enterPin": "Insira seu código PIN",
-        "lockoutUnavailable": "Não foi possível registar a tentativa falhada em segurança. Saindo.",
+        "oneAttemptLeft": "1 tentativa restante.",
         "oneAttemptRemaining": "PIN incorreto. 1 tentativa restante.",
         "pinUnreadable": "Não foi possível verificar o seu PIN. Tente novamente.",
         "setPin": "Defina seu código PIN",
         "setPinFailedMatch": "Os PINs não correspondem - Defina seu código PIN",
         "storePinFailed": "Não foi possível armazenar seu pin.",
         "tooManyAttempts": "Muitas tentativas falharam. Saindo.",
-        "tryAgainIn": "Tente novamente em {seconds: number} s.",
+        "attemptBudgetSpent": "Muitas tentativas falharam.",
+        "tryAgainIn": "Tente novamente em {time: string}.",
         "verifyPin": "Verifique seu código PIN"
     },
     "PriceHistoryScreen": {

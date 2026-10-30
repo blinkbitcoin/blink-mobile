@@ -80,7 +80,12 @@
     "skip": "Kihagy",
     "unlock": "Feloldás",
     "usePin": "PIN kód használata",
-    "confirmLogout": "Biztos, hogy szeretnél kijelentkezni? Ezzel visszaállítod a gyorsítótárat és az összes helyi felhasználói beállítást"
+    "confirmLogout": "Biztos, hogy szeretnél kijelentkezni? Ezzel visszaállítod a gyorsítótárat és az összes helyi felhasználói beállítást",
+    "forgotPin": "Elfelejtetted a PIN kódot? Tárcák eltávolítása",
+    "removeWalletsTitle": "Eltávolítod a tárcákat erről az eszközről?",
+    "removeWalletsBody": "Ez eltávolítja az összes tárcát erről az eszközről, és kijelentkeztet. Egy tárca visszaállításához szükséged van a biztonsági kifejezésére. Nélküle a tárca elvész.",
+    "removeWalletsConfirm": "Tárcák eltávolítása",
+    "removeWalletsFailed": "Néhány tárcát nem sikerült eltávolítani. Próbáld újra."
   },
   "PeopleScreen": {
     "title": "Kapcsolatok",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "A tárca száma nem 2. Kérlek használd az irányítópultot az összes tárca és azok egyenlegeinek megtekintéséhez."
   },
   "PinScreen": {
+    "attemptUnrecorded": "A próbálkozást nem sikerült biztonságosan rögzíteni.",
+    "attemptsLeft": "{attemptsRemaining: number} próbálkozás maradt.",
     "attemptsRemaining": "Helytelen PIN. {attemptsRemaining: number} próbálkozás maradt.",
     "enterPin": "Add meg a PIN kódodat",
-    "lockoutUnavailable": "A sikertelen próbálkozást nem sikerült biztonságosan rögzíteni. Kijelentkezés.",
+    "oneAttemptLeft": "1 próbálkozás maradt.",
     "oneAttemptRemaining": "Helytelen PIN. 1 próbálkozás maradt.",
     "pinUnreadable": "Nem sikerült ellenőrizni a PIN-kódot. Kérjük, próbálja újra.",
     "setPin": "Állítsd be a PIN kódodat",
     "setPinFailedMatch": "A PIN kódok nem egyeznek - Állítsd be a PIN kódodat",
     "storePinFailed": "Nem sikerült tárolni a PIN kódodat.",
     "tooManyAttempts": "Túl sok sikertelen próbálkozás. Kijelentkezés.",
-    "tryAgainIn": "Próbálja újra {seconds: number} mp múlva.",
+    "attemptBudgetSpent": "Túl sok sikertelen próbálkozás.",
+    "tryAgainIn": "Próbálja újra {time: string} múlva.",
     "verifyPin": "Ellenőrizd a PIN kódodat"
   },
   "PriceHistoryScreen": {

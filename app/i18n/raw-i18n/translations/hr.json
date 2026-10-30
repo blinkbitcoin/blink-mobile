@@ -80,7 +80,12 @@
     "skip": "Preskoči",
     "unlock": "Otključaj",
     "usePin": "Koristi PIN",
-    "confirmLogout": "Jeste li sigurni da se želite odjaviti? Ovo će resetirati vašu predmemoriju i sve lokalne korisničke postavke"
+    "confirmLogout": "Jeste li sigurni da se želite odjaviti? Ovo će resetirati vašu predmemoriju i sve lokalne korisničke postavke",
+    "forgotPin": "Zaboravili ste PIN? Uklonite novčanike",
+    "removeWalletsTitle": "Ukloniti novčanike s ovog uređaja?",
+    "removeWalletsBody": "Ovo uklanja sve novčanike s ovog uređaja i odjavljuje vas. Da biste vratili novčanik, trebate njegovu sigurnosnu frazu. Bez nje novčanik je izgubljen.",
+    "removeWalletsConfirm": "Ukloni novčanike",
+    "removeWalletsFailed": "Neke novčanike nije bilo moguće ukloniti. Pokušajte ponovno."
   },
   "PeopleScreen": {
     "title": "Ljudi",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Broj novčanika nije 2. Molimo koristite nadzornu ploču za pregled svih novčanika i sredstava ovog računa"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Pokušaj nije moguće sigurno zabilježiti.",
+    "attemptsLeft": "{attemptsRemaining: number} preostalih pokušaja.",
     "attemptsRemaining": "Netočan PIN. {attemptsRemaining: number} preostalih pokušaja.",
     "enterPin": "Unesite svoj PIN kod",
-    "lockoutUnavailable": "Neuspjeli pokušaj nije moguće sigurno zabilježiti. Odjava.",
+    "oneAttemptLeft": "Preostao je 1 pokušaj.",
     "oneAttemptRemaining": "Netočan PIN. Preostao je 1 pokušaj.",
     "pinUnreadable": "Nije moguće provjeriti vaš PIN. Pokušajte ponovno.",
     "setPin": "Postavite svoj PIN kod",
     "setPinFailedMatch": "Pinovi se ne podudaraju - postavite svoj PIN kod",
     "storePinFailed": "Nije moguće pohraniti vaš PIN.",
     "tooManyAttempts": "Previše neuspjelih pokušaja. Odjava.",
-    "tryAgainIn": "Pokušajte ponovno za {seconds: number} s.",
+    "attemptBudgetSpent": "Previše neuspjelih pokušaja.",
+    "tryAgainIn": "Pokušajte ponovno za {time: string}.",
     "verifyPin": "Potvrdite svoj PIN kod"
   },
   "PriceHistoryScreen": {
