@@ -100,8 +100,9 @@ export const useLocalAuthGate = ({
   requiredRef.current = required
 
   useEffect(() => {
-    /** The challenge resolves through closures that can outlive this screen — a
-     *  lockout resets the whole stack — so results landing late are dropped. */
+    /** The challenge resolves through closures that can outlive this screen — the
+     *  spent budget's logout resets the whole stack — so results landing late are
+     *  dropped. */
     let mounted = true
 
     /** push, never navigate: navigate onto an already-focused pin route replaces

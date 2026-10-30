@@ -80,7 +80,12 @@
     "skip": "Atla",
     "unlock": "Kilidi aç",
     "usePin": "PIN kullan",
-    "confirmLogout": "Çıkış yapmak istediğinden emin misin? Bu işlem çerezlerini ve tüm yerel kullanıcı verilerini temizleyecek."
+    "confirmLogout": "Çıkış yapmak istediğinden emin misin? Bu işlem çerezlerini ve tüm yerel kullanıcı verilerini temizleyecek.",
+    "forgotPin": "PIN'i mi unuttunuz? Cüzdanları kaldırın",
+    "removeWalletsTitle": "Cüzdanlar bu cihazdan kaldırılsın mı?",
+    "removeWalletsBody": "Bu işlem bu cihazdaki tüm cüzdanları kaldırır ve oturumunuzu kapatır. Bir cüzdanı geri almak için yedek ifadesine ihtiyacınız var. O olmadan cüzdan kaybolur.",
+    "removeWalletsConfirm": "Cüzdanları kaldır",
+    "removeWalletsFailed": "Bazı cüzdanlar kaldırılamadı. Lütfen tekrar deneyin."
   },
   "PeopleScreen": {
     "title": "İnsanlar",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Cüzdan sayısı 2 değil. Bu hesabın tüm cüzdanlarını ve fonlarını görmek için lütfen kontrol panelini kullanın"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Deneme güvenli şekilde kaydedilemedi.",
+    "attemptsLeft": "Kalan deneme hakkınız: {attemptsRemaining: number}",
     "attemptsRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: {attemptsRemaining: number}",
     "enterPin": "PIN kodunu gir",
-    "lockoutUnavailable": "Başarısız deneme güvenli şekilde kaydedilemedi. Çıkış yapılıyor.",
+    "oneAttemptLeft": "Kalan deneme hakkınız: 1",
     "oneAttemptRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: 1",
     "pinUnreadable": "PIN kodunuz kontrol edilemedi. Lütfen tekrar deneyin.",
     "setPin": "PIN kodunu ayarla",
     "setPinFailedMatch": "Pin kodu eşleşmedi - PIN kodunu ayarla",
     "storePinFailed": "Pin'in kaydedilemedi.",
     "tooManyAttempts": "Çok fazla başarısız deneme. Çıkış yapılıyor.",
-    "tryAgainIn": "{seconds: number} sn sonra tekrar deneyin.",
+    "attemptBudgetSpent": "Çok fazla başarısız deneme.",
+    "tryAgainIn": "{time: string} sonra tekrar deneyin.",
     "verifyPin": "PIN kodunu onayla"
   },
   "PriceHistoryScreen": {

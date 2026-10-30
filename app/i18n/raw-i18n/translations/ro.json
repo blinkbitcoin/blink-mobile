@@ -80,7 +80,12 @@
     "skip": "Săriți peste",
     "unlock": "Deblocați",
     "usePin": "Utilizați codul PIN",
-    "confirmLogout": "Sunteți sigur că doriți să vă deconectați? Aceasta vă va reseta memoria cache și toate setările locale ale utilizatorului"
+    "confirmLogout": "Sunteți sigur că doriți să vă deconectați? Aceasta vă va reseta memoria cache și toate setările locale ale utilizatorului",
+    "forgotPin": "Ai uitat PIN-ul? Elimină portofelele",
+    "removeWalletsTitle": "Elimini portofelele de pe acest dispozitiv?",
+    "removeWalletsBody": "Aceasta elimină toate portofelele de pe acest dispozitiv și te deconectează. Pentru a recupera un portofel, ai nevoie de fraza lui de recuperare. Fără ea, portofelul este pierdut.",
+    "removeWalletsConfirm": "Elimină portofelele",
+    "removeWalletsFailed": "Unele portofele nu au putut fi eliminate. Încearcă din nou."
   },
   "PeopleScreen": {
     "title": "Persoane",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Numărul portofelelor nu este 2. Vă rugăm să utilizați tabloul de bord pentru a vedea toate portofelele și fondurile acestui cont"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Încercarea nu a putut fi înregistrată în siguranță.",
+    "attemptsLeft": "{attemptsRemaining: number} încercări rămase.",
     "attemptsRemaining": "PIN incorect. {attemptsRemaining: number} încercări rămase.",
     "enterPin": "Introduceți codul PIN",
-    "lockoutUnavailable": "Încercarea eșuată nu a putut fi înregistrată în siguranță. Deconectare.",
+    "oneAttemptLeft": "1 încercare rămasă.",
     "oneAttemptRemaining": "PIN incorect. 1 încercare rămasă.",
     "pinUnreadable": "Nu am putut verifica PIN-ul. Vă rugăm să încercați din nou.",
     "setPin": "Setează codul PIN",
     "setPinFailedMatch": "Pinurile nu se potrivesc - Setează codul PIN",
     "storePinFailed": "Nu se poate stoca codul PIN.",
     "tooManyAttempts": "Prea multe încercări eșuate. Deconectare.",
-    "tryAgainIn": "Încercați din nou în {seconds: number} s.",
+    "attemptBudgetSpent": "Prea multe încercări eșuate.",
+    "tryAgainIn": "Încercați din nou în {time: string}.",
     "verifyPin": "Verificați codul PIN"
   },
   "PriceHistoryScreen": {

@@ -5,7 +5,7 @@ import type { ACCESSIBLE } from "react-native-keychain"
 import { recordAppError } from "@app/utils/error-reporting"
 import { withTimeout } from "@app/utils/with-timeout"
 
-import { legacyErase, legacyRead } from "./legacy-key-store"
+import { legacyBlank, legacyErase, legacyRead } from "./legacy-key-store"
 import {
   type SecureExists,
   type SecureRead,
@@ -147,21 +147,31 @@ const onSlot = <T>(
 /**
  * Erases the legacy copy and reports whether it is provably gone.
  *
- * The legacy `remove` rejects with code "6" for a key that was never there
- * (ios/RNSecureKeyStore.m `remove:`, whose `deleteKeychainValue` returns NO on
- * `errSecItemNotFound`), so a failed erase is not evidence of anything on its
- * own. Asking what is still readable is what tells a genuine failure apart from
- * a key another read already migrated away.
+ * Only the keychain acknowledging a write counts as proof. The legacy `remove`
+ * rejects with code "6" for a key that was never there (ios/RNSecureKeyStore.m
+ * `remove:`, whose `deleteKeychainValue` returns NO on `errSecItemNotFound`), so
+ * a failed erase is not evidence of anything on its own.
  *
- * A read that cannot answer counts as not gone. It is the conservative half of
- * a real trade-off, recorded at `runRemove`.
+ * A blank write settles it. It lands on a missing key and on a present one alike,
+ * so a key another read already migrated away still finishes its removal, while a
+ * keychain that is failing refuses it and the copy counts as surviving. The blank
+ * reads as absent everywhere, so the delete tried after it only tidies it away.
+ *
+ * A refused blank counts as not gone. It is the conservative half of a real
+ * trade-off, recorded at `runRemove`.
+ *
+ * The seeds still live only in the legacy store, so for them this is the whole
+ * erase, and a retried removal relies on the same answer.
  */
-const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
+export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
   const erased = await legacyErase(legacyKey)
   if (erased) return true
 
-  const remaining = await legacyRead(legacyKey)
-  if (remaining.status === "absent") return true
+  const blanked = await legacyBlank(legacyKey)
+  if (blanked) {
+    await legacyErase(legacyKey)
+    return true
+  }
 
   const keyClass = keyClassOf(legacyKey)
   recordAppError(new Error(`Legacy key store erase failed: ${keyClass}`), {

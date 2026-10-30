@@ -80,7 +80,12 @@
     "skip": "Přeskočit",
     "unlock": "Odemknout",
     "usePin": "Použít PIN",
-    "confirmLogout": "Opravdu se chcete odhlásit? Tím se resetuje mezipaměť a všechna místní uživatelská nastavení"
+    "confirmLogout": "Opravdu se chcete odhlásit? Tím se resetuje mezipaměť a všechna místní uživatelská nastavení",
+    "forgotPin": "Zapomněli jste PIN? Odstraňte peněženky",
+    "removeWalletsTitle": "Odstranit peněženky z tohoto zařízení?",
+    "removeWalletsBody": "Tím se odstraní všechny peněženky z tohoto zařízení a budete odhlášeni. K obnovení peněženky potřebujete její záložní frázi. Bez ní je peněženka ztracena.",
+    "removeWalletsConfirm": "Odstranit peněženky",
+    "removeWalletsFailed": "Některé peněženky se nepodařilo odstranit. Zkuste to prosím znovu."
   },
   "PeopleScreen": {
     "title": "Lidé",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Počet peněženek není 2. K zobrazení všech peněženek a prostředků tohoto účtu použijte prosím nástěnku"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Pokus se nepodařilo bezpečně zaznamenat.",
+    "attemptsLeft": "{attemptsRemaining: string} zbývající pokusy.",
     "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining: string} zbývající pokusy.",
     "enterPin": "Zadejte svůj PIN kód",
-    "lockoutUnavailable": "Neúspěšný pokus se nepodařilo bezpečně zaznamenat. Odhlášení.",
+    "oneAttemptLeft": "Zbývá 1 pokus.",
     "oneAttemptRemaining": "Nesprávný kód PIN. Zbývá 1 pokus.",
     "pinUnreadable": "Kód PIN se nepodařilo ověřit. Zkuste to prosím znovu.",
     "setPin": "Nastavení PIN kódu",
     "setPinFailedMatch": "Piny se neshodují - nastavte svůj PIN kód",
     "storePinFailed": "Nelze uložit váš PIN.",
     "tooManyAttempts": "Příliš mnoho neúspěšných pokusů. Odhlášení.",
-    "tryAgainIn": "Zkuste to znovu za {seconds: number} s.",
+    "attemptBudgetSpent": "Příliš mnoho neúspěšných pokusů.",
+    "tryAgainIn": "Zkuste to znovu za {time: string}.",
     "verifyPin": "Ověřte svůj PIN kód"
   },
   "PriceHistoryScreen": {

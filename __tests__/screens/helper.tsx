@@ -53,7 +53,7 @@ const PersistentStateWrapper: React.FC<PropsWithChildren> = ({ children }) => (
       },
       updateState: () => {},
       resetState: () => {},
-      clearToken: async () => {},
+      clearToken: async () => true,
     }}
   >
     <>{children}</>

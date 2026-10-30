@@ -80,7 +80,12 @@
     "skip": "Omet",
     "unlock": "Desbloqueja",
     "usePin": "Utilitza el PIN",
-    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari."
+    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari.",
+    "forgotPin": "Has oblidat el PIN? Elimina les carteres",
+    "removeWalletsTitle": "Vols eliminar les carteres d'aquest dispositiu?",
+    "removeWalletsBody": "Això elimina totes les carteres d'aquest dispositiu i tanca la sessió. Per recuperar una cartera, necessites la seva frase de seguretat. Sense ella, la cartera es perd.",
+    "removeWalletsConfirm": "Elimina les carteres",
+    "removeWalletsFailed": "No s'han pogut eliminar algunes carteres. Torna-ho a provar."
   },
   "PeopleScreen": {
     "title": "Gent",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
   },
   "PinScreen": {
+    "attemptUnrecorded": "No s'ha pogut registrar l'intent de manera segura.",
+    "attemptsLeft": "Queden {attemptsRemaining: string} intents.",
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
     "enterPin": "Introdueix el teu codi PIN",
-    "lockoutUnavailable": "No s'ha pogut registrar l'intent fallit de manera segura. Tancant la sessió.",
+    "oneAttemptLeft": "Queda 1 intent.",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "pinUnreadable": "No s'ha pogut comprovar el PIN. Torna-ho a provar.",
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
     "storePinFailed": "No es pot desar el teu pin.",
     "tooManyAttempts": "Massa intents fallits. Tancant la sessió.",
-    "tryAgainIn": "Torna-ho a provar d'aquí a {seconds: number} s.",
+    "attemptBudgetSpent": "Massa intents fallits.",
+    "tryAgainIn": "Torna-ho a provar d'aquí a {time: string}.",
     "verifyPin": "Verifica el teu codi PIN"
   },
   "PriceHistoryScreen": {

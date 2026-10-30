@@ -7,6 +7,7 @@ import { makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
 
 import { InfoCard } from "@app/components/card-screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isRegtestNetwork } from "@app/self-custodial/config"
@@ -32,6 +33,7 @@ export const DeleteAccount: React.FC = () => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
   const { state, deleteWallet } = useDeleteAccount()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { wallets } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
@@ -50,7 +52,7 @@ export const DeleteAccount: React.FC = () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
     setConfirmVisible(false)
     const outcome = await deleteWallet(activeAccount.id)
-    if (outcome) navigateAfterAccountDelete(navigation, outcome)
+    if (outcome) navigateAfterAccountDelete(navigation, routeAfterLogout, outcome)
   }
 
   const bulletItems = [

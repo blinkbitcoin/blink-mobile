@@ -80,7 +80,12 @@
     "skip": "Ruka",
     "unlock": "Fungua",
     "usePin": "Tumia pini",
-    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani"
+    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani",
+    "forgotPin": "Umesahau pini? Ondoa mikoba",
+    "removeWalletsTitle": "Ondoa mikoba kwenye kifaa hiki?",
+    "removeWalletsBody": "Hii inaondoa mikoba yote kwenye kifaa hiki na kukutoa nje. Ili kurudisha mkoba, unahitaji neno lake la kurejesha. Bila hilo, mkoba unapotea.",
+    "removeWalletsConfirm": "Ondoa mikoba",
+    "removeWalletsFailed": "Baadhi ya mikoba haikuweza kuondolewa. Tafadhali jaribu tena."
   },
   "PeopleScreen": {
     "title": "Watunzi",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "Idadi ya mifuko haitoshi. Tafadhali tumia kiolesura ili kuona mifuko yote na fedha za akaunti hii"
   },
   "PinScreen": {
-    "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "attemptUnrecorded": "Imeshindwa kurekodi jaribio kwa usalama.",
+    "attemptsLeft": "Majaribio {attemptsRemaining: number} yamesalia.",
+    "attemptsRemaining": "Pini si sahihi. Majaribio {attemptsRemaining: number} yamesalia.",
     "enterPin": "Ingiza pini yako",
-    "lockoutUnavailable": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
+    "oneAttemptLeft": "Jaribio 1 limesalia.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",
     "storePinFailed": "Imeshindwa kuhifadhi pini yako.",
     "tooManyAttempts": "Majaribio mengi sana yaliyokosa. Kutoka nje ya programu.",
-    "tryAgainIn": "Jaribu tena baada ya sekunde {seconds: number}.",
+    "attemptBudgetSpent": "Majaribio mengi sana yaliyokosa.",
+    "tryAgainIn": "Jaribu tena baada ya {time: string}.",
     "verifyPin": "Thibitisha nambari yako ya pini"
   },
   "PriceHistoryScreen": {

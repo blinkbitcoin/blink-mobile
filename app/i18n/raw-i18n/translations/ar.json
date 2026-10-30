@@ -80,7 +80,12 @@
     "skip": "تخطى",
     "unlock": "إلغاء القفل",
     "usePin": "استخدم الرمز الشخصي (PIN)",
-    "confirmLogout": "هل أنت متأكد أنك تريد تسجيل الخروج؟ سيؤدي ذلك إلى مسح ذاكرة التخزين المؤقت وجميع إعدادات المستخدم المحلية"
+    "confirmLogout": "هل أنت متأكد أنك تريد تسجيل الخروج؟ سيؤدي ذلك إلى مسح ذاكرة التخزين المؤقت وجميع إعدادات المستخدم المحلية",
+    "forgotPin": "نسيت الرمز الشخصي؟ أزل المحافظ",
+    "removeWalletsTitle": "إزالة المحافظ من هذا الجهاز؟",
+    "removeWalletsBody": "سيزيل هذا جميع المحافظ من هذا الجهاز ويسجل خروجك. لاستعادة محفظة، تحتاج إلى عبارة النسخ الاحتياطي الخاصة بها. بدونها تضيع المحفظة.",
+    "removeWalletsConfirm": "إزالة المحافظ",
+    "removeWalletsFailed": "تعذرت إزالة بعض المحافظ. يرجى المحاولة مرة أخرى."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2177,16 +2182,19 @@
     "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
   },
   "PinScreen": {
+    "attemptUnrecorded": "تعذّر تسجيل المحاولة بشكل آمن.",
+    "attemptsLeft": "بقي {attemptsRemaining: string} محاولات.",
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
     "enterPin": "أدخل رمز PIN الخاص بك",
-    "lockoutUnavailable": "تعذّر تسجيل المحاولة الفاشلة بشكل آمن. يتم تسجيل الخروج.",
+    "oneAttemptLeft": "بقيت محاولة واحدة.",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
     "pinUnreadable": "تعذّر التحقق من رمزك الشخصي. يرجى المحاولة مرة أخرى.",
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
     "storePinFailed": "غير قادر على تخزين ال PIN الخاص بك.",
     "tooManyAttempts": "الكثير من المحاولات الفاشلة. \nيتم تسجيل الخروج.",
-    "tryAgainIn": "حاول مرة أخرى بعد {seconds: number} ث.",
+    "attemptBudgetSpent": "الكثير من المحاولات الفاشلة.",
+    "tryAgainIn": "حاول مرة أخرى بعد {time: string}.",
     "verifyPin": "تحقق من رمز PIN الخاص بك"
   },
   "PriceHistoryScreen": {
