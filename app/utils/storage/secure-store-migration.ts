@@ -118,14 +118,16 @@ const pendingBySlot = new Map<string, Promise<void>>()
 type IsCurrent = () => boolean
 
 /**
- * Passed to every queued task beside `isCurrent`, and wrapped around each native call in it
- * that changes a store. The guard above stops an abandoned task from starting a change; it
- * cannot stop one already sent, and a write that lands after the queue has moved on puts
- * back what the operation behind it removed. So a task that has sent a change keeps its
- * slot until the task and every change it sent have settled, timeout or not. A task that
- * only read still frees the slot at its timeout.
+ * Passed to every queued task beside `isCurrent`, and the only way a task sends a native
+ * call that changes a store: it takes the call unsent. The guard above has to be checked
+ * before every change, and a change sent after the caller timed out lands after the queue
+ * has moved on, putting back what the operation behind it removed. Through this, a task
+ * that was abandoned cannot send one at all, and the slot is kept until every change
+ * already sent has landed, timeout or not. What it does not wait for is the rest of the
+ * task: a read that hangs after a change went out frees the slot once that change has
+ * settled, so a hung native read never holds a slot past its owner's budget.
  */
-type HoldSlot = <M>(mutation: Promise<M>) => Promise<M>
+type HoldSlot = <M>(change: () => Promise<M>) => Promise<M>
 
 /** What a queued task holds while it runs, for a helper that needs both halves. */
 type SlotTurn = {
@@ -152,18 +154,21 @@ export const onSlot = <T>(
   timeoutMs: number = SLOT_OPERATION_TIMEOUT_MS,
 ): Promise<T> => {
   const previous = pendingBySlot.get(slot) ?? Promise.resolve()
-  const mutations: Promise<unknown>[] = []
-  const holdSlot: HoldSlot = (mutation) => {
-    mutations.push(mutation)
-    return mutation
+  // Scoped to this operation, so it is collected with the closure rather than
+  // living in a map that has to be pruned. Pruning is the hazard here: a
+  // reset counter would hand a still-running abandoned task its slot back.
+  let isAbandoned = false
+  const sentChanges: Promise<unknown>[] = []
+  const holdSlot: HoldSlot = (change) => {
+    if (isAbandoned) {
+      return Promise.reject(new Error(`secure store ${keyClassOf(slot)} was abandoned`))
+    }
+    const sent = change()
+    sentChanges.push(sent)
+    return sent
   }
-  let running: Promise<T> | undefined
   const result = previous.then(() => {
-    // Scoped to this operation, so it is collected with the closure rather than
-    // living in a map that has to be pruned. Pruning is the hazard here: a
-    // reset counter would hand a still-running abandoned task its slot back.
-    let isAbandoned = false
-    running = task(() => !isAbandoned, holdSlot)
+    const running = task(() => !isAbandoned, holdSlot)
 
     return withTimeout(running, timeoutMs, `secure store ${keyClassOf(slot)}`).catch(
       (err) => {
@@ -179,19 +184,17 @@ export const onSlot = <T>(
   // rejection so that one failed operation cannot cancel the work behind it,
   // while the rejection still reaches its own caller through `result`.
   //
-  // And it settles only once the change the task sent has landed (see HoldSlot). The
+  // And it settles only once every change the task sent has landed (see HoldSlot). The
   // caller is answered at the timeout either way; what waits is the next operation on
-  // this slot, which a late write would otherwise undo.
+  // this slot, which a late write would otherwise undo. Nothing is added to the list
+  // after this point, since an abandoned task can no longer send a change.
   const settled = result
     .then(
       () => undefined,
       () => undefined,
     )
-    .then(() => {
-      const hasSentChange = mutations.length > 0
-      if (!hasSentChange) return undefined
-      return Promise.allSettled([running, ...mutations]).then(() => undefined)
-    })
+    .then(() => Promise.allSettled(sentChanges))
+    .then(() => undefined)
   pendingBySlot.set(slot, settled)
   settled.then(() => {
     const isLastInLine = pendingBySlot.get(slot) === settled
@@ -229,12 +232,12 @@ export const eraseLegacyCopy = async (
   legacyKey: string,
   holdSlot: HoldSlot,
 ): Promise<boolean> => {
-  const erased = await holdSlot(legacyErase(legacyKey))
+  const erased = await holdSlot(() => legacyErase(legacyKey))
   if (erased) return true
 
-  const blanked = await holdSlot(legacyBlank(legacyKey))
+  const blanked = await holdSlot(() => legacyBlank(legacyKey))
   if (blanked) {
-    await holdSlot(legacyErase(legacyKey))
+    await holdSlot(() => legacyErase(legacyKey))
     return true
   }
 
@@ -325,7 +328,7 @@ const copyLegacyValue = async (
   // Recording is an await too, so the slot may have changed hands during it.
   if (!isCurrent()) return "abandoned"
 
-  const written = await holdSlot(secureWrite(args.slot, value, args.accessible))
+  const written = await holdSlot(() => secureWrite(args.slot, value, args.accessible))
   return written ? "written" : "failed"
 }
 
@@ -396,7 +399,7 @@ const runRemove = async (
   // contract for "not provably gone", so the caller keeps treating it as set.
   if (!isCurrent()) return false
 
-  return holdSlot(secureRemove(args.slot))
+  return holdSlot(() => secureRemove(args.slot))
 }
 
 const runExists = async (
@@ -472,7 +475,7 @@ export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> =
 export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => {
   try {
     return await onSlot(args.slot, (_isCurrent, holdSlot) =>
-      holdSlot(secureWrite(args.slot, args.value, args.accessible)),
+      holdSlot(() => secureWrite(args.slot, args.value, args.accessible)),
     )
   } catch {
     return false

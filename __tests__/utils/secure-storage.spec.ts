@@ -3391,4 +3391,38 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     expect((await purged).outcome).toBe("transient")
     jest.useRealTimers()
   })
+
+  /**
+   * The slot is kept for the write, not for the purge. Once the write has landed, a read
+   * of the purge that hangs after it must not keep the lock screen waiting on the PIN.
+   */
+  it("frees the slot once its write lands, even if the read that follows hangs", async () => {
+    jest.useFakeTimers()
+    stores.legacy.set("PIN", "1234")
+    let pinReads = 0
+    mockGetInternet.mockImplementation(async (server: string) => {
+      const slot = server.replace("secure-store.blink.local/", "")
+      if (slot === "PIN") {
+        pinReads += 1
+        // The read that proves the copy: it never answers.
+        if (pinReads === 2) return new Promise(() => {})
+      }
+      const value = stores.migrated.get(slot)
+      return value === undefined ? false : { username: slot, password: value }
+    })
+
+    const purged = KeyStoreWrapper.purgeLegacyKeyStore([], [])
+    await jest.advanceTimersByTimeAsync(PURGE_SLOT_TIMEOUT_MS + 500)
+    expect(stores.migrated.get("PIN")).toBe("1234")
+
+    let pin: string | null | undefined
+    KeyStoreWrapper.getPin().then((value) => {
+      pin = value
+    })
+    await jest.advanceTimersByTimeAsync(100)
+
+    expect(pin).toBe("1234")
+    expect((await purged).outcome).toBe("transient")
+    jest.useRealTimers()
+  })
 })

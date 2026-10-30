@@ -923,7 +923,7 @@ export default class KeyStoreWrapper {
           // that replaced it, dropping whatever that turn recorded.
           if (!isCurrent()) return false
 
-          const written = await holdSlot(
+          const written = await holdSlot(() =>
             secureWrite(
               KeyStoreWrapper.MNEMONIC_ACCOUNTS,
               [...accountIds, accountId].join("\n"),
@@ -964,7 +964,7 @@ export default class KeyStoreWrapper {
 
         const remaining = tracked.accountIds.filter((id) => id !== accountId)
         if (remaining.length > 0) {
-          await holdSlot(
+          await holdSlot(() =>
             secureWrite(
               KeyStoreWrapper.MNEMONIC_ACCOUNTS,
               remaining.join("\n"),
@@ -976,7 +976,7 @@ export default class KeyStoreWrapper {
 
         // Removed rather than stored as "[]", so an absent slot keeps meaning
         // exactly "nothing is tracked" — see readMnemonicAccounts.
-        await holdSlot(secureRemove(KeyStoreWrapper.MNEMONIC_ACCOUNTS))
+        await holdSlot(() => secureRemove(KeyStoreWrapper.MNEMONIC_ACCOUNTS))
       })
     } catch {
       // The queue rejects on timeout; the id stays tracked, which is the safe
