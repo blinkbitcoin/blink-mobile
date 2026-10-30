@@ -1173,14 +1173,11 @@ export default class KeyStoreWrapper {
    * lifetime and the same limits, and this method only ever extends it: a slot
    * that reached `gone` is added, one that did not is named again next launch.
    *
-   * "The same limits" includes the empty legacy read a session slot is allowed
-   * to take as gone, which purgeThrough documents as accepted residue: on iOS a
-   * lookup that merely failed reads as absent, and a session slot scored gone on
-   * it is remembered like any other. Before the marker that slot was asked again
-   * only on launches some other slot kept short of done, which was a side effect
-   * of the pass having no memory rather than a safeguard: a pass that finished
-   * committed the same verdict through the flag. A mnemonic is never in this
-   * position, since its `gone` always rests on a read that returned the value.
+   * "The same limits" includes the empty legacy read a session slot is taken as
+   * gone on. Both platforms report a lookup that failed as `failed` rather than
+   * absent (see purgeThrough), so that read is a missing key and the slot is
+   * remembered like any other. A mnemonic's `gone` rests on a read that returned
+   * the value.
    */
   public static async purgeLegacyKeyStore(
     accountIds: string[],
