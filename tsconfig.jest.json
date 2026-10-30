@@ -2,15 +2,8 @@
   "extends": "./tsconfig",
   "compilerOptions": {
     "jsx": "react",
-    "plugins": [
-      {
-        "transform": "ts-auto-mock/transformer",
-        "cacheBetweenTests": false,
-        "features": ["random"]
-      }
-    ],
     "types": ["webdriverio/async", "@wdio/globals/types", "@wdio/mocha-framework", "@wdio/devtools-service", "@types/jest"]
   },
-  "include": ["app", "e2e", "__tests__", "test", "utils/declaration.d.ts"],
+  "include": ["app", "e2e", "__tests__"],
   "exclude": ["node_modules"]
 }

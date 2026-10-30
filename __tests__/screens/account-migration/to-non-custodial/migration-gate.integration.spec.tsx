@@ -21,6 +21,7 @@ const mockClearPendingProvisionedAccount = jest.fn()
 const mockReportError = jest.fn()
 let mockActiveAccount: { id: string; type: string } | undefined
 let mockRegistryAccounts: { id: string }[] = []
+let mockHasResumableCheckpoint = false
 
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
@@ -44,7 +45,8 @@ jest.mock("@app/components/screen", () => ({
 }))
 
 /** The barrel spread keeps usePendingMigrationAccounts real; the checkpoint hook is
- *  stubbed to "nothing resumable" so the decision rides on the pending chain alone. */
+ *  stubbed, to "nothing resumable" unless a case says otherwise, so the decision rides on
+ *  the pending chain alone. */
 jest.mock("@app/screens/account-migration/hooks", () => ({
   ...jest.requireActual("@app/screens/account-migration/hooks"),
   useActiveApiKeys: () => ({
@@ -59,7 +61,7 @@ jest.mock("@app/screens/account-migration/hooks", () => ({
     loading: false,
     hasError: false,
     refetch: jest.fn().mockResolvedValue(undefined),
-    hasResumableCheckpoint: false,
+    hasResumableCheckpoint: mockHasResumableCheckpoint,
   }),
 }))
 
@@ -159,6 +161,13 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       errors: { generic: () => "generic error" },
       common: { tryAgain: () => "Try Again" },
+      AccountMigration: {
+        storageUnavailable: {
+          outOfSpaceBody: () => "no space left",
+          unreadableBody: () => "could not read your progress",
+          contactSupportCta: () => "Contact support",
+        },
+      },
     },
   }),
 }))
@@ -181,6 +190,7 @@ describe("MigrationGate pending-wallet integration", () => {
     jest.clearAllMocks()
     mockActiveAccount = { id: "custodial-1", type: "custodial" }
     mockRegistryAccounts = [{ id: "custodial-1" }]
+    mockHasResumableCheckpoint = false
     mockLoadPendingProvisionedAccounts.mockResolvedValue({})
     mockClearPendingProvisionedAccount.mockResolvedValue(undefined)
   })
@@ -223,6 +233,42 @@ describe("MigrationGate pending-wallet integration", () => {
       "custodial-1",
     )
     expect(mockNavigateToCheckpoint).not.toHaveBeenCalled()
+  })
+
+  /** The classifier's own seam, which every other spec fakes by injecting the kind into a
+   *  mocked hook. */
+  it("names a full device from the error the real hook caught", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { getByText } = render(<MigrationGate />)
+
+    await waitFor(() => expect(getByText("no space left")).toBeTruthy())
+  })
+
+  /** And the other half: a message that says nothing must not be dressed up as advice. */
+  it("keeps the generic storage wording when the message says nothing", async () => {
+    mockLoadPendingProvisionedAccounts.mockRejectedValue(new Error("Database Error"))
+
+    const { getByText, queryByText } = render(<MigrationGate />)
+
+    await waitFor(() => expect(getByText("could not read your progress")).toBeTruthy())
+    expect(queryByText("no space left")).toBeNull()
+  })
+
+  /** The real hook's read failure under a checkpoint that already answered: the pending
+   *  record is only the fallback, so it must not stop a resume it could not have changed. */
+  it("resumes from a resumable checkpoint even when the pending-wallet read fails", async () => {
+    mockHasResumableCheckpoint = true
+    mockLoadPendingProvisionedAccounts.mockRejectedValue(new Error("Database Error"))
+
+    const { queryByText } = render(<MigrationGate />)
+
+    await waitFor(() => expect(mockNavigateToCheckpoint).toHaveBeenCalledTimes(1))
+    expect(mockLoadPendingProvisionedAccounts).toHaveBeenCalled()
+    expect(queryByText("could not read your progress")).toBeNull()
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   /** The wiped-device signature end to end: an empty store (fresh reinstall) with the

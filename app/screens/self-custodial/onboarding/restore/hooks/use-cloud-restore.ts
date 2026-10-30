@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { getCloudBackupFilenamePrefix } from "@app/config/appinfo"
 import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { BackupMethod } from "@app/self-custodial/providers/backup-state"
 import { CloudBackupErrorReason } from "@app/types/cloud-backup"
 import {
   type BackupMetadata,
@@ -107,7 +108,7 @@ export const useCloudRestore = () => {
         return
       }
       const { mnemonic } = parseBackupPayload(content)
-      await restore(mnemonic)
+      await restore(mnemonic, BackupMethod.Cloud)
     },
     [restore],
   )
@@ -266,7 +267,7 @@ export const useCloudRestore = () => {
       return
     }
 
-    await restore(mnemonic).catch(() => undefined)
+    await restore(mnemonic, BackupMethod.Cloud).catch(() => undefined)
   }, [backupContent, password, restore, LL])
 
   const isLoading =

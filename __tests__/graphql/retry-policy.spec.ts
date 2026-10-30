@@ -26,8 +26,18 @@ const MIGRATION_OPERATIONS = [
 ]
 
 /** Deleting the account cannot be undone, and the resend cannot authenticate itself either:
- *  it spent the only token that could. */
-const IRREVERSIBLE_OPERATIONS = [...MIGRATION_OPERATIONS, "accountDelete"]
+ *  it spent the only token that could. An authenticator's code check spends its
+ *  registration: a resend after a lost answer is refused though the first turned it on.
+ *  Removing the authenticator spends one of the hour's code checks on every try, as do
+ *  the login method additions it guards. */
+const IRREVERSIBLE_OPERATIONS = [
+  ...MIGRATION_OPERATIONS,
+  "accountDelete",
+  "userTotpRegistrationValidate",
+  "userTotpDelete",
+  "userEmailRegistrationInitiate",
+  "userPhoneRegistrationValidate",
+]
 
 /**
  * The on-chain fee quotes, single-speed and by-speed alike. A silent resend with backoff

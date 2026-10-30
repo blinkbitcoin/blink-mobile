@@ -23,11 +23,13 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { VersionComponent } from "@app/components/version"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
 import { useLevel } from "@app/graphql/level-context"
+import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useUnacknowledgedNotificationCountQuery } from "@app/graphql/generated"
 import { AccountType } from "@app/types/wallet"
 
 import { AccountBanner } from "./account/banner"
+import { TwoFactorBanner } from "./two-factor-banner"
 import { EmailSetting } from "./account/settings/email"
 import { PhoneSetting } from "./account/settings/phone"
 import { SettingsGroup } from "./group"
@@ -56,6 +58,7 @@ import { AccountStaticQR } from "./settings/account-static-qr"
 import { MoveToNonCustodialSetting } from "./settings/account-move-to-noncustodial"
 import { SwitchAccountSetting } from "./settings/multi-account"
 import { StableBalanceSetting } from "./settings/stable-balance"
+import { EmergencyBundleSetting } from "./settings/emergency-bundle"
 import { ViewBackupPhraseSetting } from "./settings/view-backup-phrase"
 import { BackupWalletSetting } from "./settings/backup-wallet"
 
@@ -111,6 +114,8 @@ export const SettingsScreen: React.FC = () => {
   const isSelfCustodialMode = activeAccount?.type === AccountType.SelfCustodial
   const shouldShowSettingsBanner =
     isSelfCustodialMode && backupState.status !== BackupStatus.Completed
+  const { shouldShowSettingsBanner: shouldShowTwoFactorBanner } =
+    useTwoFactorEnforcement()
   const { isAnonMode } = useSelfCustodialAccountMode()
   const { promptEnhancedMode } = useEnhancedModePrompt()
   const { isRestrictedRegion, presentRestrictedRegionModal } = useRestrictedRegion()
@@ -153,6 +158,7 @@ export const SettingsScreen: React.FC = () => {
       OnDeviceSecuritySetting,
       ViewBackupPhraseSetting,
       BackupWalletSetting,
+      EmergencyBundleSetting,
     ],
     advanced: [ExportCsvSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
@@ -194,6 +200,7 @@ export const SettingsScreen: React.FC = () => {
             titleColor="primary"
           />
         )}
+        {shouldShowTwoFactorBanner && <TwoFactorBanner />}
         <SettingsGroup name={LL.common.account()} items={items.account} />
         <SettingsGroup
           name={LL.SettingsScreen.addressScreen()}

@@ -2461,7 +2461,7 @@
         "sdkGenericError": "Não foi possível estimar as taxas. Tente um valor diferente."
     },
     "SettingsScreen": {
-        "createAddress": "Criar endereço",
+        "createAddress": "Criar endereço Lightning",
         "addressDisabled": "(desativado)",
         "donationButton": "Botão Doar",
         "btcpayServer": "BTCPay Server",
@@ -2478,6 +2478,7 @@
         "activated": "Ativado",
         "addressScreen": "Formas de receber pagamentos",
         "nonCustodialAccount": "Conta não custodial",
+        "custodialAccount": "Conta custodial",
         "tapUserName": "Toque para definir o nome de usuário",
         "notifications": "Notificações",
         "title": "Configurações",
@@ -2586,8 +2587,6 @@
         "emailUnverifiedContent": "Certifique-se de que pode fazer login novamente na sua conta verificando o seu e-mail. Deseja fazer a verificação agora?",
         "totp": "Autenticação de dois fatores",
         "totpDeactivated": "A autenticação de dois fatores foi desativada",
-        "totpDeleteAlertTitle": "Excluir autenticação de dois fatores",
-        "totpDeleteAlertContent": "Você tem certeza de que deseja excluir sua autenticação de dois fatores?",
         "copiedAccountId": "Copiou o ID da sua conta para a área de transferência",
         "yourAccountId": "Seu ID de conta",
         "accountId": "ID da conta",
@@ -2640,14 +2639,11 @@
         "youGet": "Você recebe"
     },
     "TotpRegistrationInitiateScreen": {
-        "title": "Autenticação de dois fatores",
-        "secret": "Segredo/backup",
-        "content": "Digitalize este código QR com o seu aplicativo autenticador. Alternativamente, você pode copiar/colar manualmente o segredo no seu aplicativo autenticador."
+        "title": "Autenticação de dois fatores"
     },
     "TotpRegistrationValidateScreen": {
         "title": "Autenticação de dois fatores",
-        "enter6digitCode": "Digite o código de 6 dígitos do seu aplicativo autenticador para validar sua autenticação de dois fatores.",
-        "success": "A autenticação de dois fatores foi ativada. Agora você só poderá fazer login novamente com seu telefone ou e-mail E sua autenticação de dois fatores.\n\nDispositivos nesta conta que não estão conectados com 2FA precisarão fazer login novamente.\n\nApenas contas de nível 2 podem ser recuperadas pelo suporte ao cliente em caso de perda de acesso ao 2FA."
+        "enter6digitCode": "Digite o código de 6 dígitos do seu aplicativo autenticador para validar sua autenticação de dois fatores."
     },
     "TotpLoginValidateScreen": {
         "title": "Autenticação de dois fatores",
@@ -2721,7 +2717,9 @@
         "noFee": "sem taxa",
         "fromApprox": "a partir de ~{fee: string}",
         "satAmount": "{amount: string} SAT",
-        "error": "Incapaz de obter as taxas agora"
+        "error": "Incapaz de obter as taxas agora",
+        "inactivity": "Inatividade >{months: number} meses",
+        "usdPerMonth": "{amount: string}/mês"
     },
     "TransactionLimitsScreen": {
         "receive": "Receber",
@@ -3874,10 +3872,18 @@
                 "testSuccess": "Sua frase de backup está correta"
             }
         },
+        "BundleExport": {
+            "title": "Saída de emergência",
+            "body": "Se o Spark cair, este pacote permite mover seus bitcoins on-chain sem o Blink. Seu saldo em dólares não pode ser recuperado.",
+            "download": "Baixar pacote",
+            "sensitiveTitle": "Sensível",
+            "learnMore": "Saiba mais sobre a saída unilateral",
+            "sensitiveConfirm": "Baixar",
+            "sensitiveBody": "Este arquivo mostra seu saldo e seu histórico de pagamentos, então mantenha-o privado. Para usá-lo em uma emergência, você também precisa da sua frase de recuperação."
+        },
         "CloudBackup": {
             "title": "Vamos fazer backup da sua carteira",
             "description": "Salvaremos uma cópia da sua frase de backup no seu {provider}.",
-            "encryptCheckbox": "Criptografar com senha adicional",
             "password": "Senha",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar senha",
@@ -4003,9 +4009,19 @@
         "explainerCheck5": "Uma taxa de rede Spark será descontada da sua conta",
         "explainerCta": "Entendi",
         "transferringFunds": "Transferindo seus fundos. Deve ser concluído em poucos segundos.",
+        "transferInProgress": {
+            "body": "Seus fundos estão a caminho da sua nova conta. Mantenha o aplicativo aberto e concluiremos automaticamente."
+        },
         "transferDelayed": {
             "body": "Seus fundos estão a caminho da sua nova conta. Está demorando mais que o normal — mantenha o aplicativo aberto e concluiremos automaticamente.",
             "contactSupportCta": "Falar com o suporte"
+        },
+        "storageUnavailable": {
+            "unreadableBody": "Não conseguimos ler o progresso da sua migração neste dispositivo. Nada se perdeu: os seus fundos estão seguros e o seu progresso continua guardado.",
+            "outOfSpaceBody": "O seu dispositivo não tem espaço de armazenamento livre, por isso não conseguimos ler o progresso da sua migração. Liberte espaço e tente novamente. Nada se perdeu: os seus fundos estão seguros.",
+            "notSavedBody": "Não conseguimos guardar o progresso da sua migração neste dispositivo. Nada se perdeu: os seus fundos estão seguros. Tente novamente.",
+            "notSavedOutOfSpaceBody": "O seu dispositivo não tem espaço de armazenamento livre, por isso não conseguimos guardar o progresso da sua migração. Liberte espaço e tente novamente. Nada se perdeu: os seus fundos estão seguros.",
+            "contactSupportCta": "Contactar o suporte"
         },
         "clockOutOfSync": {
             "body": "A data e a hora do teu dispositivo estão dessincronizadas. Define-as como automáticas para continuar.",
@@ -4068,6 +4084,12 @@
         "recognizePhraseTitle": "Você reconhece esta frase de backup?",
         "recognizePhraseBody": "Nunca insira palavras que outra pessoa lhe enviou."
     },
+    "EmergencyRecovery": {
+        "outageTitle": "Operador inacessível",
+        "outageBody": "O Spark está com uma interrupção. Aguarde alguns minutos e tente novamente ou entre em contato com nosso {support}",
+        "outageSupport": "Suporte",
+        "tryAgainLater": "Tentar mais tarde"
+    },
     "BackupNudge": {
         "title": "Seus fundos estão em risco",
         "description": "Proteja sua carteira agora. Leva apenas um minuto.",
@@ -4076,6 +4098,81 @@
         "modalTitle": "Proteja seus fundos",
         "modalDescription": "Recomendamos fortemente que você faça backup da sua carteira para evitar uma perda total de fundos caso perca este dispositivo.",
         "secureMe": "Proteger carteira"
+    },
+    "TwoFactorEnforcement": {
+        "title": "Configure a autenticação de dois fatores",
+        "cardDescription": "Proteja sua conta contra acessos não autorizados.",
+        "cardCta": "Configurar",
+        "settingsDescription": "Proteja sua conta contra acessos não autorizados configurando-a.",
+        "setupTitle": "Configure agora a autenticação de dois fatores",
+        "setupDescription": "Para evitar acessos não autorizados à sua conta, adicione agora a autenticação de dois fatores.",
+        "setAuthenticator": "Configurar autenticador",
+        "reminderTitle": "Adicione um autenticador para proteger seus fundos",
+        "reminderDescription": "Seu saldo cresceu. Um aplicativo autenticador mantém sua conta segura, mesmo que alguém tenha acesso ao seu e-mail ou telefone.",
+        "modalReminder": "Se você dispensar agora, não se esqueça de ativar o quanto antes.",
+        "dismissTwoMore": "Você pode dispensar isto mais duas vezes.",
+        "dismissOneMore": "Você pode dispensar isto mais uma vez.",
+        "dismissLast": "Esta é a última vez que você pode dispensar isto.",
+        "setNow": "Configurar agora",
+        "dontWantTo": "Não quero",
+        "highBalanceTitle": "Você tem mais de {amount}, por favor adicione proteção adicional",
+        "protectionRequiredTitle": "Por favor adicione proteção adicional para continuar usando o Blink",
+        "protectionRequiredBody": "Quanto mais fundos você tem, mais importante é uma segurança melhor. Por favor, adicione um autenticador para continuar usando o Blink.",
+        "nonCustodialTitle": "Se você não quiser configurar a autenticação de dois fatores",
+        "nonCustodialBody": "A outra opção é mudar para não custodial. Nesse caso, você é responsável pelos seus próprios fundos."
+    },
+    "AuthenticatorOnboarding": {
+        "introTitle": "Proteja seus fundos com um autenticador",
+        "introDescription": "Um aplicativo autenticador gera um novo código de 6 dígitos a cada 30 segundos.",
+        "takeoversTitle": "Impede invasões de conta",
+        "takeoversDescription": "O código fica apenas no seu telefone",
+        "stolenNumberTitle": "Fique seguro mesmo se roubarem seu número",
+        "stolenNumberDescription": "Mesmo que alguém acesse seu e-mail ou número de telefone, não conseguirá fazer login",
+        "durationTitle": "Leva cerca de 2 minutos",
+        "durationDescription": "Vamos guiar você passo a passo",
+        "getStarted": "Começar",
+        "appsTitle": "Obtenha um aplicativo autenticador",
+        "appsDescription": "Qualquer aplicativo autenticador funciona. Estes são gratuitos e confiáveis:",
+        "googleAuthenticatorDescription": "Simples e amplamente usado. Backup opcional na sua conta Google.",
+        "protonAuthenticatorDescription": "Código aberto. Backup e sincronização com criptografia de ponta a ponta.",
+        "twoFasAuthDescription": "Código aberto. Não precisa de conta.",
+        "get": "Baixar",
+        "storeNote": "“Baixar” abre a App Store ou o Google Play. Volte ao Blink quando o aplicativo estiver instalado.",
+        "haveAnApp": "Já tenho um aplicativo",
+        "keyInstruction": "Copie esta chave de configuração para o seu aplicativo autenticador.",
+        "qrInstruction": "Está usando outro dispositivo?\nEscaneie este código QR em vez disso.",
+        "backupTitle": "Faça backup da sua chave",
+        "backupDescription": "Se você perder seu telefone, esta chave permite configurar seu autenticador novamente. Guarde-a em outro lugar que não seja este telefone.",
+        "saveToPasswordManager": "Salvar em um gerenciador de senhas",
+        "shareToPasswordManager": "Compartilhar com um gerenciador de senhas",
+        "copyForManualBackup": "Copiar para backup manual",
+        "passwordManagerUnavailable": "Nenhum gerenciador de senhas disponível neste dispositivo. Copie a chave para um backup manual.",
+        "savedIt": "Já salvei",
+        "keyBackupText": "Chave de configuração do autenticador do Blink\n\nConta: {account}\nChave de configuração: {key}\n\nSe você perder seu telefone, adicione esta chave de configuração a um aplicativo autenticador para recuperar seus códigos de login do Blink. Qualquer pessoa com esta chave pode gerar seus códigos, então mantenha-a em sigilo.",
+        "protectedTitle": "Sua conta agora está protegida",
+        "protectedDescription": "A partir de agora, para fazer login você precisará de um código de uso único do seu aplicativo autenticador.",
+        "newPhoneTip": "Se você trocar de telefone, transfira seu autenticador para o novo <bold>antes</bold> de redefinir o antigo.",
+        "done": "Concluído"
+    },
+    "TwoFactorTurnOff": {
+        "statusEnabled": "2FA: Ativada",
+        "statusDisabled": "2FA: Desativada",
+        "modalTitle": "Não recomendamos desativar a 2FA",
+        "modalBody": "Isso reduziria a segurança da sua conta e facilitaria que terceiros a acessassem sem a sua permissão.",
+        "keepProtected": "Manter-me protegido",
+        "codeInstruction": "Digite o código de 6 dígitos do seu app autenticador para desativar a autenticação de dois fatores.",
+        "codeInvalid": "Esse código está incorreto. Digite o código atual do seu app autenticador.",
+        "tooManyAttempts": "Muitas tentativas. Tente novamente em uma hora.",
+        "manualResetTitle": "Redefinição manual da 2FA",
+        "manualResetBody": "Para sua proteção, não permitimos remover a 2FA dentro do app. Se você precisar redefinir a 2FA, entre em contato com o nosso <support>Suporte</support>."
+    },
+    "LoginMethodCode": {
+        "addEmailTitle": "Adicionar e-mail",
+        "addPhoneTitle": "Adicionar número de telefone",
+        "addEmailCode": "Para adicionar seu e-mail, digite o código de 6 dígitos do seu app autenticador.",
+        "addPhoneCode": "Para adicionar seu número de telefone, digite o código de 6 dígitos do seu app autenticador.",
+        "codeInvalid": "Esse código está incorreto. Digite o código atual do seu app autenticador.",
+        "tooManyAttempts": "Muitas tentativas. Tente novamente em uma hora."
     },
     "BackupRequired": {
         "modalTitle": "Back up your wallet first",
@@ -4086,6 +4183,15 @@
         "title": "Esta é uma conta não custodial",
         "body": "Para saber mais, leia a nossa publicação no blog",
         "cta": "Ler"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Atualize seu backup na nuvem",
+        "body": "Seu pacote de emergência no {provider} está desatualizado. Faça o backup da sua carteira de novo para atualizá-lo.",
+        "cta": "Fazer backup de novo"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Ainda não há pacote de emergência. Ele é criado após sua primeira transação.",
+        "exportFailed": "Não foi possível baixar o pacote de emergência."
     },
     "StableBalance": {
         "title": "Saldo estável",
