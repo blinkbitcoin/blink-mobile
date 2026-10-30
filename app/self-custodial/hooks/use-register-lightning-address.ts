@@ -11,6 +11,7 @@ import {
 } from "@app/self-custodial/bridge"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
+import { classifySdkError, SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
 type UseRegisterLightningAddress = {
   lnAddress: string
@@ -61,8 +62,19 @@ export const useRegisterLightningAddress = (
         await registerLightningAddress(sdk, lnAddress)
         await updateCurrentSelfCustodialAccount()
         onRegistered()
-      } catch {
-        setError(SetUsernameError.UNKNOWN_ERROR)
+      } catch (err) {
+        /**
+         * A server that did not answer is not a name that is taken, and not an unknown
+         * fault either, so it gets its own message. That message says only to retry,
+         * not that the name is still free: the failure may have come before the
+         * availability check, or after the server took the registration and before
+         * its answer arrived, and in neither case is that known.
+         */
+        setError(
+          classifySdkError(err) === SelfCustodialErrorCode.NetworkError
+            ? SetUsernameError.SERVER_UNREACHABLE
+            : SetUsernameError.UNKNOWN_ERROR,
+        )
       } finally {
         setLoading(false)
       }

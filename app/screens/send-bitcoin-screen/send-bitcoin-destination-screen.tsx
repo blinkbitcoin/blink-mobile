@@ -191,11 +191,9 @@ const SendBitcoinDestinationScreen: React.FC<Props> = ({ route }) => {
   const { myWalletIds, bitcoinNetwork, lnurlDomains } = useScanContext()
   const { displayCurrency } = useDisplayCurrency()
 
-  // forcing price refresh
-  useRealtimePriceQuery({
-    fetchPolicy: "network-only",
-    skip: !isAuthed,
-  })
+  /** Custodial only: a self-custodial sender is priced from the SDK feed instead. */
+  const isPriceRefreshSkipped = !isAuthed || isSelfCustodial
+  useRealtimePriceQuery({ fetchPolicy: "network-only", skip: isPriceRefreshSkipped })
 
   const wallets = useMemo(() => {
     if (isSelfCustodial) {
