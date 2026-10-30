@@ -3183,6 +3183,8 @@ const en: BaseTranslation = {
       server: "Server Error. Please try again later",
       request: "Request issue.\nContact support if the problem persists",
       connection: "Connection issue.\nVerify your internet connection",
+      statusCode: "Status code: {statusCode: number}",
+      errorCode: "Error code: {errorCode: string}",
     },
     unexpectedError: "Unexpected error occurred",
     restartApp: "Please restart the application.",
