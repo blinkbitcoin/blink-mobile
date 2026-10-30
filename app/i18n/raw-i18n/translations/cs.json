@@ -2209,14 +2209,14 @@
     "lastMonth": "předchozí měsíc",
     "lastYear": "předchozí rok",
     "lastFiveYears": "posledních pět let",
-    "buyAndSell": "Buy and sell bitcoin"
+    "buyAndSell": "Kupte a prodejte bitcoin"
   },
   "PrimaryScreen": {
     "title": "Domů"
   },
   "ReceiveScreen": {
     "nfc": "NFC",
-    "enterAmountFirst": "Please enter an amount first",
+    "enterAmountFirst": "Nejprve zadejte částku",
     "activateNotifications": "Chcete aktivovat oznámení, abyste byli informováni o příchozích platbách?",
     "copyClipboard": "Faktura byla zkopírována do schránky",
     "copyClipboardBitcoin": "Bitcoinová adresa byla zkopírována do schránky",
@@ -2257,19 +2257,19 @@
       "expiresNow": "Platnost končí nyní"
     },
     "invoiceHasBeenPaid": "Faktura byla uhrazena",
-    "btcOnChainAddress": "Bitcoin Onchain Address",
+    "btcOnChainAddress": "Bitcoin onchain adresa",
     "receiveViaInvoice": "Příjem přes Lightning",
     "receiveViaPaycode": "Příjem přes Paycode",
     "receiveViaOnchain": "Příjem přes Onchain",
     "payCodeOrLNURL": "Paycode / LNURL",
-    "cantReceiveZeroSats": "You can't receive zero sats. Please enter an amount corresponding to 1 or more sats.",
+    "cantReceiveZeroSats": "Nemůžete přijmout nula satů. Zadejte částku odpovídající 1 nebo více satům.",
     "lightningAddress": "Lightning adresa",
     "lightningInvoice": "Lightning faktura",
     "bitcoinOnchain": "Bitcoin onchain",
     "depositFee": "Poplatek za vklad: {fee} SAT pro částky pod {threshold} SAT nebo {overFee} SAT pro vklady nad {threshold} SAT",
-    "depositFeeTiers": "Deposit fees: {tiers: string}",
-    "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
-    "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositFeeTiers": "Poplatky za vklad: {tiers: string}",
+    "depositFeeTierUpTo": "{fee: string} SAT do {max: string} SAT",
+    "depositFeeTierAbove": "{fee: string} SAT nad {min: string} SAT",
     "autoConvertMinAmount": "Částky pod {minSats: number} satoshi / {minFiat: string} nelze automaticky převést na dolary. Obdržíte místo toho Bitcoin.",
     "autoConvertFailed": "Platba přijata, ale konverze selhala.",
     "pleaseWaitForConversion": "Počkejte, prosím, dokud se převod nedokončí"
@@ -2297,12 +2297,12 @@
     "confirmOpenLink": "Opravdu chcete otevřít tento odkaz?",
     "noQrCode": "Na obrázku se nám nepodařilo najít QR kód.",
     "title": "Sken QR kódu",
-    "permissionCamera": "We need permission to use your camera",
+    "permissionCamera": "Potřebujeme oprávnění k použití fotoaparátu",
     "noCamera": "Kamera nebyla nalezena",
     "openSettings": "Otevřít nastavení",
     "unableToOpenSettings": "Nelze otevřít nastavení",
     "invalidContentLnurl": "Našli jsme:\n\n{found: string}\n\nnení v současné době podporováno",
-    "imageLibraryPermissionsNotGranted": "We don't have permissions to access the image library.  Please check app settings for your platform."
+    "imageLibraryPermissionsNotGranted": "Nemáme oprávnění k přístupu ke knihovně obrázků. Zkontrolujte nastavení aplikace pro svou platformu."
   },
   "SecurityScreen": {
     "securityScore": {
@@ -2463,10 +2463,10 @@
     "posCopied": "Odkaz na vaše pokladní místo byl zkopírován",
     "activated": "Aktivováno",
     "addressScreen": "Způsoby platby",
-    "nonCustodialAccount": "Nesvěřenský účet",
-    "custodialAccount": "Svěřenský účet",
+    "nonCustodialAccount": "Non-custodial účet",
+    "custodialAccount": "Custodial účet",
     "tapUserName": "Klepnutím na nastavíte uživatelské jméno",
-    "notifications": "Notifications",
+    "notifications": "Oznámení",
     "title": "Nastavení",
     "darkMode": "Tmavý režim",
     "setToDark": "Režim: tmavý",
@@ -2493,11 +2493,11 @@
     "receiveCurrency": "Měna příjmu",
     "displayCurrency": "Měna zobrazení",
     "AccountInformation": {
-      "identityLabel": "Wallet identifier",
-      "backupStatusLabel": "Backup status",
-      "backupStatusCompleted": "Backup complete",
-      "backupStatusNotCompleted": "Backup not complete",
-      "loadError": "Could not load your account information.",
+      "identityLabel": "Identifikátor peněženky",
+      "backupStatusLabel": "Stav zálohy",
+      "backupStatusCompleted": "Záloha dokončena",
+      "backupStatusNotCompleted": "Záloha nedokončena",
+      "loadError": "Nepodařilo se načíst informace o vašem účtu.",
       "lightningAddressLabel": "Lightning adresa"
     }
   },
@@ -2573,8 +2573,8 @@
     "emailUnverifiedContent": "Ověřením e-mailu zajistěte, abyste se mohli znovu přihlásit ke svému účtu. Chcete provést ověření nyní?",
     "totp": "Dvoufaktorové ověření",
     "totpDeactivated": "Dvoufaktorové ověřování bylo deaktivováno",
-    "copiedAccountId": "Copied your account ID to clipboard",
-    "yourAccountId": "Your Account ID",
+    "copiedAccountId": "ID účtu zkopírováno do schránky",
+    "yourAccountId": "Vaše ID účtu",
     "accountId": "ID účtu",
     "publicKey": "Veřejný klíč",
     "copiedPublicKey": "Veřejný klíč zkopírován do schránky",
@@ -2603,8 +2603,8 @@
     "switchButton": "Přepnout na Enhanced"
   },
   "ModeSwitchSuccessScreen": {
-    "enhanced": "Přepnuto na režim Enhanced\ns vlastní správou",
-    "anon": "Přepnuto na režim Incognito\ns vlastní správou"
+    "enhanced": "Přepnuto na non-custodial\nrežim Enhanced",
+    "anon": "Přepnuto na non-custodial\nrežim Incognito"
   },
   "RestrictedRegion": {
     "title": "Zjištěn omezený region",
@@ -2660,11 +2660,11 @@
   },
   "StablesatsModal": {
     "header": "Váš Dolarový zůstatek je poháněný technologií Stablesats",
-    "body": "V kustodiálním režimu váš Dolarový zůstatek využívá technologii Stablesats — držíte Bitcoin, nikoli skutečné USD, ale hodnota je navržena tak, aby si udržela stejnou částku vůči USD. Bitcoin můžete odesílat a přijímat jako obvykle.",
+    "body": "V custodial režimu váš Dolarový zůstatek využívá technologii Stablesats — držíte Bitcoin, nikoli skutečné USD, ale hodnota je navržena tak, aby si udržela stejnou částku vůči USD. Bitcoin můžete odesílat a přijímat jako obvykle.",
     "termsAndConditions": "Přečtěte si smluvní podmínky",
     "learnMore": "Zjistěte více o Dolarovém zůstatku",
     "headerSelfCustodial": "O vašem Dolarovém zůstatku",
-    "bodySelfCustodial": "V nekustodiálním režimu váš Dolarový zůstatek využívá podporované stablecoiny, které jsou navrženy tak, aby si udržely stejnou hodnotu vůči USD.",
+    "bodySelfCustodial": "V non-custodial režimu váš Dolarový zůstatek využívá podporované stablecoiny, které jsou navrženy tak, aby si udržely stejnou hodnotu vůči USD.",
     "learnMoreSelfCustodial": "Zjistit více"
   },
   "SplashScreen": {
@@ -2698,7 +2698,7 @@
     "lightningTransactions": "Lightning transakce",
     "onchainBelowThreshold": "Onchain pod {threshold: string} SAT",
     "onchainAboveThreshold": "Onchain nad {threshold: string} SAT",
-    "onchainBetweenThresholds": "Onchain between {lower: string} and {upper: string} SAT",
+    "onchainBetweenThresholds": "Onchain mezi {lower: string} a {upper: string} SAT",
     "transferFee": "Poplatek za převod",
     "noFee": "bez poplatku",
     "fromApprox": "od ~{fee: string}",
@@ -2750,7 +2750,7 @@
       "invalidCharacter": "Adresa může obsahovat pouze písmena, číslice a podtržítka.",
       "addressUnavailable": "Tato adresa je již obsazena",
       "unknownError": "Došlo k neznámé chybě, zkuste to prosím později",
-      "backupRequired": "Back up your wallet before creating a Lightning address"
+      "backupRequired": "Před vytvořením Lightning adresy si zálohujte peněženku"
     },
     "receiveMoney": "Přijímejte peníze z jiných Lightning peněženek a od uživatelů {bankName: string} s touto adresou.",
     "itCannotBeChanged": "Později ji nelze změnit."
@@ -2909,7 +2909,7 @@
     "bank": "Banka",
     "bankAccount": "Peněžní účet",
     "bankAdvice": "{bankName: string} Poradna",
-    "bankInfo": "{bankName: string} Info",
+    "bankInfo": "Informace o {bankName: string}",
     "beta": "beta",
     "bitcoin": "Bitcoin",
     "bitcoinPrice": "Cena bitcoinu",
@@ -2929,7 +2929,7 @@
     "discard": "Zahodit",
     "discardChangesMessage": "Máte neuložené změny. Opravdu je chcete zahodit?",
     "domain": "Doména",
-    "email": "Email",
+    "email": "E-mail",
     "error": "Chyba",
     "fatal": "Závažná",
     "fee": "poplatek",
@@ -3056,7 +3056,7 @@
     "contactUs": "Potřebujete poradit? Kontaktujte nás.",
     "joinTheCommunity": "Připojte se ke komunitě",
     "whatsapp": "WhatsApp",
-    "email": "Email",
+    "email": "E-mail",
     "sms": "SMS",
     "faq": "FAQ",
     "statusPage": "Stav",
@@ -3094,7 +3094,7 @@
     "minAmountNotMet": "Částka musí být alespoň {minAmount: string}."
   },
   "AmountInputButton": {
-    "tapToSetAmount": "Set amount"
+    "tapToSetAmount": "Nastavit částku"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potřebuji aktualizovat aplikaci na nejnovější verzi. Používám aplikaci {os: string} s verzí {version: string}.",
@@ -3106,9 +3106,9 @@
   "Circles": {
     "title": "Moje Kruhy",
     "titleBlinkCircles": "Blink Kruhy",
-    "fetchingLatestCircles": "Fetching latest circles",
+    "fetchingLatestCircles": "Načítání nejnovějších kruhů",
     "circles": "kruhy",
-    "circlesExplainer": "Welcome someone to Blink by sending them their first sats! Your circles will grow with each welcome.",
+    "circlesExplainer": "Přivítejte někoho v Blinku tím, že mu pošlete jeho první saty! Vaše kruhy porostou s každým přivítáním.",
     "viewMyCircles": "Zobrazit Kruhy",
     "introducingCircles": "Představení Kruhů",
     "copiedInviteLink": "Zkopírovaný odkaz pozvánky",
@@ -3126,7 +3126,7 @@
     "innerCircleExplainer": "S Blinkem řídíte růst Bitcoinu, pokračujte v tom!",
     "innerCircleExplainerCard": "Podporuji přijetí Bitcoinu pomocí Blinku!",
     "innerCircle": "Vnitřní Kruh",
-    "peopleYouWelcomed": "people welcomed by you",
+    "peopleYouWelcomed": "lidé, které jste přivítali",
     "peopleIWelcomed": "lidé \nkteré jsem přivítal",
     "thisMonth": "tento měsíc",
     "outerCircle": "Vnější Kruh",
@@ -3157,21 +3157,21 @@
     }
   },
   "FullOnboarding": {
-    "title": "Full onboarding",
-    "confirmNameTitle": "Name confirmation",
-    "firstName": "First name",
-    "lastName": "Last name",
-    "confirmNameContent": "Is the spelling of your name correct?\n\n{firstName: string} {lastName: string}\n\nIt must match the name on your ID.",
-    "requirements": "Upgrading your account will increase your limits and give you additional functionality such as transfer to bank accounts in selected countries.\n\nYou will have to provide your name, a governement issued ID and a selfie. We'll start with your name.",
-    "success": "Documents has been successfully received and will be processed shortly. you can come back to this page to have an update on the status of your onboarding",
-    "error": "There has been an error with the submission of your documents. You can contact the support is the problem persists.",
-    "status": "Your onboarding status is: ",
-    "ABANDONED": "Abandoned",
-    "APPROVED": "Approved",
-    "DECLINED": "Declined",
+    "title": "Kompletní nastavení",
+    "confirmNameTitle": "Potvrzení jména",
+    "firstName": "Křestní jméno",
+    "lastName": "Příjmení",
+    "confirmNameContent": "Je vaše jméno napsáno správně?\n\n{firstName: string} {lastName: string}\n\nMusí se shodovat se jménem na vašem dokladu totožnosti.",
+    "requirements": "Vylepšení vašeho účtu zvýší vaše limity a poskytne vám další funkce, například převody na bankovní účty ve vybraných zemích.\n\nBudete muset uvést své jméno, úřední doklad totožnosti a selfie. Začneme vaším jménem.",
+    "success": "Dokumenty byly úspěšně přijaty a brzy budou zpracovány. Na této stránce můžete sledovat stav svého nastavení.",
+    "error": "Při odesílání vašich dokumentů došlo k chybě. Pokud problém přetrvává, kontaktujte podporu.",
+    "status": "Stav vašeho nastavení je: ",
+    "ABANDONED": "Opuštěno",
+    "APPROVED": "Schváleno",
+    "DECLINED": "Zamítnuto",
     "ERROR": "Chyba",
-    "PROCESSING": "Processing",
-    "REVIEW": "Review"
+    "PROCESSING": "Zpracovává se",
+    "REVIEW": "Kontrola"
   },
   "NotificationHistory": {
     "title": "Oznámení",
@@ -3317,20 +3317,20 @@
       "authDescription": "Ověřte se pro zobrazení údajů karty"
     },
     "CardStatements": {
-      "title": "Statements",
-      "selectYear": "Select year",
-      "currentStatement": "Current statement",
-      "statementPeriod": "Statement period",
-      "totalSpent": "Total spent",
-      "monthlyStatements": "Monthly statements",
-      "downloadAll": "Download all",
-      "spent": "{amount} spent",
-      "transactions": "{count} transactions, {amount} spent",
-      "aboutStatements": "About statements",
-      "aboutBullet1": "Monthly statements are generated on the last day of each month",
-      "aboutBullet2": "Statements include all transactions and fees for the period",
-      "aboutBullet3": "Download statements as PDF",
-      "notifyNewStatements": "Notify me when new statements are made available",
+      "title": "Výpisy",
+      "selectYear": "Vyberte rok",
+      "currentStatement": "Aktuální výpis",
+      "statementPeriod": "Období výpisu",
+      "totalSpent": "Celkem utraceno",
+      "monthlyStatements": "Měsíční výpisy",
+      "downloadAll": "Stáhnout vše",
+      "spent": "Utraceno: {amount}",
+      "transactions": "Transakce: {count}, utraceno: {amount}",
+      "aboutStatements": "O výpisech",
+      "aboutBullet1": "Měsíční výpisy se generují poslední den každého měsíce",
+      "aboutBullet2": "Výpisy obsahují všechny transakce a poplatky za dané období",
+      "aboutBullet3": "Stáhněte si výpisy ve formátu PDF",
+      "notifyNewStatements": "Upozornit mě, až budou k dispozici nové výpisy",
       "noStatements": "Zatím žádné pohyby",
       "statementsCount": "{count} pohybů"
     },
@@ -3805,8 +3805,8 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
-    "description": "Choose a backup method to secure your funds",
+    "title": "Zálohujte si peněženku",
+    "description": "Vyberte způsob zálohy pro zabezpečení svých prostředků",
     "BackupMethod": {
       "title": "Vyberte metodu zálohování",
       "subtitle": "Pro nové uživatele doporučujeme {provider}.",
@@ -3847,7 +3847,7 @@
         "incorrectWord": "Nesprávné slovo, zkontroluj prosím pořadí"
       },
       "Success": {
-        "title": "Vítejte v necustodial Blink",
+        "title": "Vítejte v non-custodial Blink",
         "testSuccess": "Vaše záložní fráze je správná"
       }
     },
@@ -3913,14 +3913,14 @@
       "copy": "Kopírovat"
     },
     "migrateNowModal": {
-      "title": "Přejděte nyní na nesvěřenský účet",
-      "body": "Na svůj svěřenský účet již nemůžete přijímat prostředky. Blink ukončil svěřenskou službu ve vašem regionu a tento účet bude deaktivován do konce dne {date}.\n\nPřejděte nyní na nesvěřenský účet.",
+      "title": "Přejděte nyní na non-custodial účet",
+      "body": "Na svůj custodial účet již nemůžete přijímat prostředky. Blink ukončil custodial službu ve vašem regionu a tento účet bude deaktivován do konce dne {date}.\n\nPřejděte nyní na non-custodial účet.",
       "migrateCta": "Migrovat nyní"
     },
     "reminderBulletin": {
       "title": "Důležité",
-      "body": "Přejděte na nesvěřenský účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}. Přijímání končí {receiveStopsDate}.",
-      "bodyReceiveDisabled": "Přijímání skončilo. Přejděte na nesvěřenský účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}.",
+      "body": "Přejděte na non-custodial účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}. Přijímání končí {receiveStopsDate}.",
+      "bodyReceiveDisabled": "Přijímání skončilo. Přejděte na non-custodial účet pomocí řízené migrace, nebo si vyberte prostředky, před {date}.",
       "migrateCta": "Migrovat"
     },
     "offboardBulletin": {
@@ -3973,8 +3973,8 @@
       "woocommerceBody": "Platba Bitcoinem pro váš e-shop."
     },
     "resumeFailed": "Při pokračování migrace se něco pokazilo. Začněte ji prosím znovu.",
-    "migrationRequiredBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet.",
-    "migrationRequiredForcedBody": "Je čas migrovat váš svěřenský účet na nesvěřenský účet. Je to vyžadováno z regulatorních důvodů.\n\nNení třeba se obávat, non-custodial pro tebe bude z dlouhodobého hlediska lepší.",
+    "migrationRequiredBody": "Je čas migrovat váš custodial účet na non-custodial účet.",
+    "migrationRequiredForcedBody": "Je čas migrovat váš custodial účet na non-custodial účet. Je to vyžadováno z regulatorních důvodů.\n\nNení třeba se obávat, non-custodial pro tebe bude z dlouhodobého hlediska lepší.",
     "migrationGateTitle": "Účet není přístupný",
     "migrationGateBody": "Z regulatorních důvodů nemůžeme ve tvém regionu poskytovat custodial účty. Převeď své prostředky na non-custodial účet u Blink podle následujících kroků nebo nás kontaktuj na <link>{email}</link>",
     "bitcoinBalance": "Zůstatek Bitcoinu",
@@ -4009,8 +4009,8 @@
     "closeUnavailable": "Vaše prostředky jsou v bezpečí v nové peněžence. Váš starý účet stále zavíráme, zkuste to prosím za chvíli znovu."
   },
   "AccountTypeSelectionScreen": {
-    "custodialLabel": "Spravovaný",
-    "selfCustodialLabel": "Vlastní správa",
+    "custodialLabel": "Custodial",
+    "selfCustodialLabel": "Non-custodial",
     "custodialDescription": "Prostředky držíme za vás",
     "selfCustodialDescription": "Pouze vy máte přístup k prostředkům",
     "continueButton": "Pokračovat",
@@ -4020,10 +4020,10 @@
     "restoreComingSoonTitle": "Již brzy",
     "restoreComingSoonDescription": "Funkce obnovení bude dostupná v budoucí aktualizaci.",
     "createFailed": "Nepodařilo se vytvořit peněženku. Zkuste to prosím znovu.",
-    "selfCustodialDisabled": "Nesvěřenecký režim je dočasně nedostupný."
+    "selfCustodialDisabled": "Non-custodial režim je dočasně nedostupný."
   },
   "ChooseExperienceScreen": {
-    "title": "Vyberte režim s vlastní správou",
+    "title": "Vyberte non-custodial režim",
     "subtitle": "Vaše volba určuje, které funkce jsou dostupné. Kdykoli můžete přepnout.",
     "enhancedLabel": "Enhanced\nrežim",
     "enhancedDescription": "Vaši oblast používáme k odemčení cenných služeb dostupných tam, kde jste.",
@@ -4034,8 +4034,8 @@
   "UnsupportedRegionScreen": {
     "title": "Nepodporovaný region",
     "description": "Bohužel nemůžeme obsluhovat uživatele z vašeho aktuálního regionu.",
-    "custodialSignupDescription": "Bohužel nemůžeme ve vašem regionu vytvářet nové svěřenecké účty. Místo toho můžete použít účet ve vlastní správě.",
-    "custodialSignupOnlyDescription": "Bohužel nemůžeme ve vašem regionu vytvářet nové svěřenecké účty.",
+    "custodialSignupDescription": "Bohužel nemůžeme ve vašem regionu vytvářet nové custodial účty. Místo toho můžete použít non-custodial účet.",
+    "custodialSignupOnlyDescription": "Bohužel nemůžeme ve vašem regionu vytvářet nové custodial účty.",
     "unknownRegionTitle": "Region nezjištěn",
     "unknownRegionDescription": "Nepodařilo se nám určit váš region. Zkontrolujte připojení a zkuste to znovu."
   },
@@ -4098,7 +4098,7 @@
     "protectionRequiredTitle": "Přidejte prosím dodatečnou ochranu, abyste mohli Blink dál používat",
     "protectionRequiredBody": "Čím více prostředků máte, tím důležitější je lepší zabezpečení. Pro další používání Blinku prosím přidejte autentikátor.",
     "nonCustodialTitle": "Pokud nechcete nastavit dvoufaktorové ověření",
-    "nonCustodialBody": "Druhou možností je přejít na nesvěřenecký režim. Pak za své prostředky odpovídáte sami."
+    "nonCustodialBody": "Druhou možností je přejít na non-custodial. Pak za své prostředky odpovídáte sami."
   },
   "AuthenticatorOnboarding": {
     "introTitle": "Chraňte své prostředky autentikátorem",
@@ -4154,12 +4154,12 @@
     "tooManyAttempts": "Příliš mnoho pokusů. Zkuste to znovu za hodinu."
   },
   "BackupRequired": {
-    "modalTitle": "Back up your wallet first",
-    "modalDescription": "Your Lightning address is permanently linked to this wallet. Back up your recovery phrase first, so you never lose access to your address and funds.",
-    "backupNow": "Back up wallet"
+    "modalTitle": "Nejprve si zálohujte peněženku",
+    "modalDescription": "Vaše Lightning adresa je natrvalo propojena s touto peněženkou. Nejprve si zálohujte záložní frázi, abyste nikdy neztratili přístup ke své adrese a prostředkům.",
+    "backupNow": "Zálohovat peněženku"
   },
   "NonCustodialInfoBulletin": {
-    "title": "Toto je nesvěřenský účet",
+    "title": "Toto je non-custodial účet",
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
     "cta": "Číst"
     },
@@ -4199,14 +4199,14 @@
   },
   "BackendFeatureGate": {
     "title": "Funkce nedostupná",
-    "description": "Tato funkce vyžaduje úschovný účet.",
-    "signInTitle": "Sign in required",
-    "signInDescription": "Sign in to your custodial account to use {featureName}.",
-    "noAccountTitle": "Custodial account required",
-    "noAccountDescription": "{featureName} requires a Blink custodial account.",
-    "featureCircles": "Circles",
+    "description": "Tato funkce vyžaduje custodial účet.",
+    "signInTitle": "Vyžaduje se přihlášení",
+    "signInDescription": "Pro použití funkce {featureName} se přihlaste ke svému custodial účtu.",
+    "noAccountTitle": "Vyžaduje se custodial účet",
+    "noAccountDescription": "Funkce {featureName} vyžaduje custodial účet Blink.",
+    "featureCircles": "Kruhy",
     "featureEarn": "Učit se",
-    "featureCard": "Card"
+    "featureCard": "Karta"
   },
   "WalletCreationScreen": {
     "creating": "Vytváření peněženky...",
@@ -4229,7 +4229,7 @@
   },
   "SelfCustodialOffline": {
     "title": "Peněženka je offline",
-    "description": "Vaše nesvěřenská peněženka momentálně nemůže dosáhnout sítě. Zkuste to znovu, až budete online.",
+    "description": "Vaše non-custodial peněženka momentálně nemůže dosáhnout sítě. Zkuste to znovu, až budete online.",
     "retry": "Zkusit znovu"
   },
   "SelfCustodialError": {
@@ -4248,34 +4248,34 @@
     "claim": "Vyzvednout nyní",
     "claiming": "Vyzvedávání...",
     "screenTitle": "Nevyzvednuté vklady",
-    "cardTitle": "Claim {sats} sats",
-    "claimWithFee": "Claim (max fee: {fee} sats)",
+    "cardTitle": "Vyzvednout {sats} satů",
+    "claimWithFee": "Vyzvednout (max. poplatek: {fee} satů)",
     "refund": "Vrátit",
-    "refunding": "Refunding...",
+    "refunding": "Vrací se...",
     "immature": "Čekání na potvrzení...",
-    "feeExceeded": "Network fees are too high to claim ({requiredFee} sats required). Try again later or refund to an on-chain address.",
-    "missingUtxo": "This deposit is no longer available on the network.",
-    "belowDustLimit": "This deposit is too small to claim after fees. Wait for lower fees or refund to an on-chain address.",
-    "genericError": "Unable to claim: {error}",
-    "claimFailed": "Claim failed: {error}",
-    "refundFailed": "Refund failed: {error}",
-    "refundAddress": "Bitcoin address for refund",
-    "feeRate": "Network fee",
+    "feeExceeded": "Síťové poplatky jsou na vyzvednutí příliš vysoké (potřeba {requiredFee} satů). Zkuste to později nebo prostředky vraťte na on-chain adresu.",
+    "missingUtxo": "Tento vklad už v síti není k dispozici.",
+    "belowDustLimit": "Tento vklad je po odečtení poplatků příliš malý na vyzvednutí. Počkejte na nižší poplatky nebo ho vraťte na on-chain adresu.",
+    "genericError": "Nepodařilo se vyzvednout: {error}",
+    "claimFailed": "Vyzvednutí selhalo: {error}",
+    "refundFailed": "Vrácení selhalo: {error}",
+    "refundAddress": "Bitcoinová adresa pro vrácení",
+    "feeRate": "Síťový poplatek",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Nepodařilo se načíst síťové poplatky. Zkontrolujte připojení a zkuste to znovu.",
     "refundNow": "Vrátit nyní",
-    "refundSuccess": "Refund initiated successfully",
-    "claimSuccess": "Deposit claimed successfully",
-    "error": "Unable to claim this deposit"
+    "refundSuccess": "Vrácení bylo úspěšně zahájeno",
+    "claimSuccess": "Vklad byl úspěšně vyzvednut",
+    "error": "Tento vklad se nepodařilo vyzvednout"
   },
   "FeatureUnavailable": {
     "SelfCustodial": {
-      "title": "Temporarily unavailable",
-      "description": "Self-custodial wallet features are temporarily disabled. Your wallet and funds are safe. Please check back later."
+      "title": "Dočasně nedostupné",
+      "description": "Funkce non-custodial peněženky jsou dočasně vypnuté. Vaše peněženka a prostředky jsou v bezpečí. Zkuste to později."
     }
   },
   "NetworkStatus": {
-    "degradedBanner": "Spark network is currently degraded. Payments may take longer."
+    "degradedBanner": "Síť Spark má momentálně zhoršený provoz. Platby mohou trvat déle."
   },
   "SelfCustodialDelete": {
     "dangerZoneImportantTitle": "Důležité",

@@ -133,6 +133,27 @@ const placeholderDrift = (localeFile: string, parsed: AnyTranslation): string[] 
   return Object.keys(sourceLeaves).filter(hasDrifted)
 }
 
+/**
+ * Slovak and Czech name the account types with the English "custodial" and
+ * "non-custodial". Their earlier translations ran to six variants per locale
+ * (zverenský, svěřenský, kustodiálny, úschovný, vlastná správa, Spravovaný…),
+ * often on the same screen, so any of them coming back is a regression.
+ */
+const TRANSLATED_CUSTODY_TERMS: Record<string, RegExp> = {
+  "sk.json":
+    /zverensk|zvereneck|sverensk|sverenec|kustodi|úschov|nesprávcov|vlastn\w* správ|spravovan|necustodial/i,
+  "cs.json": /svěřensk|svěřeneck|kustodi|úschov|vlastn\w* správ|spravovan|necustodial/i,
+}
+
+const translatedCustodyTerms = (localeFile: string, parsed: AnyTranslation): string[] => {
+  const pattern = TRANSLATED_CUSTODY_TERMS[localeFile]
+  const localeLeaves = collectLeaves(parsed)
+  return Object.keys(localeLeaves).filter((key) => {
+    const value = localeLeaves[key]
+    return typeof value === "string" && pattern.test(value)
+  })
+}
+
 const localeFiles = fs
   .readdirSync(TRANSLATIONS_DIR)
   .filter((name) => name.endsWith(".json"))
@@ -160,6 +181,12 @@ describe("locale parity", () => {
       it("interpolates the same placeholders as the English source", () => {
         expect(placeholderDrift(localeFile, parsed)).toEqual([])
       })
+
+      if (localeFile in TRANSLATED_CUSTODY_TERMS) {
+        it("names the account types custodial and non-custodial", () => {
+          expect(translatedCustodyTerms(localeFile, parsed)).toEqual([])
+        })
+      }
     })
   })
 })
