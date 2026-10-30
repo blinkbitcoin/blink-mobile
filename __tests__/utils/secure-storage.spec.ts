@@ -3352,4 +3352,43 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     expect(mockRemove).not.toHaveBeenCalled()
     jest.useRealTimers()
   })
+
+  /**
+   * The purge moves on from a slot at its own budget, but a migrating write it already sent
+   * keeps that slot until it lands. Freed at the budget, a logout queued behind it would
+   * remove the PIN first and the late write would put it back.
+   */
+  it("keeps a removal queued behind a migrating write it gave up on from being undone", async () => {
+    jest.useFakeTimers()
+    stores.legacy.set("PIN", "1234")
+    let releaseHungWrite: () => void = () => {}
+    mockSetInternet.mockImplementation(
+      async (server: string, slot: string, value: string) => {
+        if (slot === "PIN") {
+          await new Promise<void>((resolve) => {
+            releaseHungWrite = resolve
+          })
+        }
+        stores.migrated.set(slot, value)
+        return { service: server }
+      },
+    )
+    mockResetInternet.mockImplementation(async ({ server }: { server: string }) => {
+      stores.migrated.delete(server.replace("secure-store.blink.local/", ""))
+    })
+
+    const purged = KeyStoreWrapper.purgeLegacyKeyStore([], [])
+    await jest.advanceTimersByTimeAsync(PURGE_SLOT_TIMEOUT_MS + 500)
+    const removal = KeyStoreWrapper.removePin()
+    await jest.advanceTimersByTimeAsync(0)
+
+    releaseHungWrite()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(await removal).toBe(true)
+    expect(stores.migrated.has("PIN")).toBe(false)
+    expect(stores.legacy.has("PIN")).toBe(false)
+    expect((await purged).outcome).toBe("transient")
+    jest.useRealTimers()
+  })
 })

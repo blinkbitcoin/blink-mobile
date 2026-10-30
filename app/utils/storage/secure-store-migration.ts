@@ -118,6 +118,22 @@ const pendingBySlot = new Map<string, Promise<void>>()
 type IsCurrent = () => boolean
 
 /**
+ * Passed to every queued task beside `isCurrent`, and wrapped around each native call in it
+ * that changes a store. The guard above stops an abandoned task from starting a change; it
+ * cannot stop one already sent, and a write that lands after the queue has moved on puts
+ * back what the operation behind it removed. So a task that has sent a change keeps its
+ * slot until the task and every change it sent have settled, timeout or not. A task that
+ * only read still frees the slot at its timeout.
+ */
+type HoldSlot = <M>(mutation: Promise<M>) => Promise<M>
+
+/** What a queued task holds while it runs, for a helper that needs both halves. */
+type SlotTurn = {
+  readonly isCurrent: IsCurrent
+  readonly holdSlot: HoldSlot
+}
+
+/**
  * Exported for the one caller that needs the queue without the migration: the
  * mnemonic account list is read-modify-written as a whole in `secureStorage.ts`
  * and has no legacy copy to read through. Taking its turn here is what makes
@@ -132,16 +148,22 @@ type IsCurrent = () => boolean
  */
 export const onSlot = <T>(
   slot: string,
-  task: (isCurrent: IsCurrent) => Promise<T>,
+  task: (isCurrent: IsCurrent, holdSlot: HoldSlot) => Promise<T>,
   timeoutMs: number = SLOT_OPERATION_TIMEOUT_MS,
 ): Promise<T> => {
   const previous = pendingBySlot.get(slot) ?? Promise.resolve()
+  const mutations: Promise<unknown>[] = []
+  const holdSlot: HoldSlot = (mutation) => {
+    mutations.push(mutation)
+    return mutation
+  }
+  let running: Promise<T> | undefined
   const result = previous.then(() => {
     // Scoped to this operation, so it is collected with the closure rather than
     // living in a map that has to be pruned. Pruning is the hazard here: a
     // reset counter would hand a still-running abandoned task its slot back.
     let isAbandoned = false
-    const running = task(() => !isAbandoned)
+    running = task(() => !isAbandoned, holdSlot)
 
     return withTimeout(running, timeoutMs, `secure store ${keyClassOf(slot)}`).catch(
       (err) => {
@@ -156,10 +178,20 @@ export const onSlot = <T>(
   // What gets queued is the settled promise, not the result: it absorbs the
   // rejection so that one failed operation cannot cancel the work behind it,
   // while the rejection still reaches its own caller through `result`.
-  const settled = result.then(
-    () => undefined,
-    () => undefined,
-  )
+  //
+  // And it settles only once the change the task sent has landed (see HoldSlot). The
+  // caller is answered at the timeout either way; what waits is the next operation on
+  // this slot, which a late write would otherwise undo.
+  const settled = result
+    .then(
+      () => undefined,
+      () => undefined,
+    )
+    .then(() => {
+      const hasSentChange = mutations.length > 0
+      if (!hasSentChange) return undefined
+      return Promise.allSettled([running, ...mutations]).then(() => undefined)
+    })
   pendingBySlot.set(slot, settled)
   settled.then(() => {
     const isLastInLine = pendingBySlot.get(slot) === settled
@@ -193,13 +225,16 @@ export const onSlot = <T>(
  * no longer allowed to reach and needs the same proof of absence to decide
  * whether it may record itself as done.
  */
-export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
-  const erased = await legacyErase(legacyKey)
+export const eraseLegacyCopy = async (
+  legacyKey: string,
+  holdSlot: HoldSlot,
+): Promise<boolean> => {
+  const erased = await holdSlot(legacyErase(legacyKey))
   if (erased) return true
 
-  const blanked = await legacyBlank(legacyKey)
+  const blanked = await holdSlot(legacyBlank(legacyKey))
   if (blanked) {
-    await legacyErase(legacyKey)
+    await holdSlot(legacyErase(legacyKey))
     return true
   }
 
@@ -280,7 +315,7 @@ type LegacyCopy = "written" | "failed" | "abandoned"
 const copyLegacyValue = async (
   args: ReadThroughArgs,
   value: string,
-  isCurrent: IsCurrent,
+  { isCurrent, holdSlot }: SlotTurn,
 ): Promise<LegacyCopy> => {
   if (!isCurrent()) return "abandoned"
 
@@ -290,13 +325,14 @@ const copyLegacyValue = async (
   // Recording is an await too, so the slot may have changed hands during it.
   if (!isCurrent()) return "abandoned"
 
-  const written = await secureWrite(args.slot, value, args.accessible)
+  const written = await holdSlot(secureWrite(args.slot, value, args.accessible))
   return written ? "written" : "failed"
 }
 
 const runRead = async (
   args: ReadThroughArgs,
   isCurrent: IsCurrent,
+  holdSlot: HoldSlot,
 ): Promise<SecureRead> => {
   const current = await secureRead(args.slot)
 
@@ -322,7 +358,7 @@ const runRead = async (
   // A failed write leaves the legacy copy intact and retries on the next read:
   // migration bookkeeping must never cost availability, so the erase outcome is
   // reported inside `eraseLegacyCopy` and never changes what the caller gets.
-  const copy = await copyLegacyValue(args, legacy.value, isCurrent)
+  const copy = await copyLegacyValue(args, legacy.value, { isCurrent, holdSlot })
   if (copy === "abandoned") return abandoned(args.slot)
 
   // Re-checked because the write is itself an await: a slot handed over while
@@ -331,7 +367,7 @@ const runRead = async (
   // so it stays unreachable, and the next `removeThrough` clears it.
   const shouldEraseLegacy =
     copy === "written" && args.deleteLegacyOnMigrate && isCurrent()
-  if (shouldEraseLegacy) await eraseLegacyCopy(args.legacyKey)
+  if (shouldEraseLegacy) await eraseLegacyCopy(args.legacyKey, holdSlot)
 
   return legacy
 }
@@ -339,6 +375,7 @@ const runRead = async (
 const runRemove = async (
   args: RemoveThroughArgs,
   isCurrent: IsCurrent,
+  holdSlot: HoldSlot,
 ): Promise<boolean> => {
   // The legacy copy goes first, and a copy that is not provably gone stops the
   // removal there. While the new store still holds the value it answers first,
@@ -351,7 +388,7 @@ const runRemove = async (
   // at the price of a silently restored credential the moment that store
   // recovers. Leaving a failed operation with everything where it was is the
   // safer half, and the caller is told so.
-  const legacyGone = await eraseLegacyCopy(args.legacyKey)
+  const legacyGone = await eraseLegacyCopy(args.legacyKey, holdSlot)
   if (!legacyGone) return false
 
   // The mirror of the read guard: emptying the new store after the slot has
@@ -359,18 +396,19 @@ const runRemove = async (
   // contract for "not provably gone", so the caller keeps treating it as set.
   if (!isCurrent()) return false
 
-  return secureRemove(args.slot)
+  return holdSlot(secureRemove(args.slot))
 }
 
 const runExists = async (
   args: ReadThroughArgs,
   isCurrent: IsCurrent,
+  holdSlot: HoldSlot,
 ): Promise<SecureExists> => {
   const current = await secureExists(args.slot)
   if (current.status === "yes") return current
   if (current.status === "failed") return current
 
-  const read = await runRead(args, isCurrent)
+  const read = await runRead(args, isCurrent, holdSlot)
   if (read.status === "found") return { status: "yes" }
   if (read.status === "absent") return { status: "no" }
   return { status: "failed", err: read.err }
@@ -389,7 +427,9 @@ const runExists = async (
  */
 export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runRead(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent, holdSlot) =>
+      runRead(args, isCurrent, holdSlot),
+    )
   } catch (err) {
     return { status: "failed", err }
   }
@@ -409,7 +449,9 @@ export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> =>
  */
 export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runRemove(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent, holdSlot) =>
+      runRemove(args, isCurrent, holdSlot),
+    )
   } catch {
     return false
   }
@@ -429,8 +471,8 @@ export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> =
  */
 export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => {
   try {
-    return await onSlot(args.slot, () =>
-      secureWrite(args.slot, args.value, args.accessible),
+    return await onSlot(args.slot, (_isCurrent, holdSlot) =>
+      holdSlot(secureWrite(args.slot, args.value, args.accessible)),
     )
   } catch {
     return false
@@ -451,7 +493,9 @@ export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => 
  */
 export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent, holdSlot) =>
+      runExists(args, isCurrent, holdSlot),
+    )
   } catch (err) {
     return { status: "failed", err }
   }
@@ -539,7 +583,7 @@ export const purgeThrough = async (
   try {
     return await onSlot(
       args.slot,
-      async (isCurrent) => {
+      async (isCurrent, holdSlot) => {
         const legacy = await legacyRead(args.legacyKey)
         if (legacy.status === "failed") return "transient"
 
@@ -610,7 +654,7 @@ export const purgeThrough = async (
           const mayRewrite = migrated.status === "absent" || requireMigrated
           if (!mayRewrite) return "transient"
 
-          const copy = await copyLegacyValue(args, legacy.value, isCurrent)
+          const copy = await copyLegacyValue(args, legacy.value, { isCurrent, holdSlot })
           if (copy !== "written") return "transient"
 
           // A write that resolved is not the proof: on Android the entry can land
@@ -626,7 +670,7 @@ export const purgeThrough = async (
         // proof above describes a state that may already have moved on.
         if (!isCurrent()) return "transient"
 
-        return (await eraseLegacyCopy(args.legacyKey)) ? "gone" : "transient"
+        return (await eraseLegacyCopy(args.legacyKey, holdSlot)) ? "gone" : "transient"
       },
       PURGE_SLOT_TIMEOUT_MS,
     )
