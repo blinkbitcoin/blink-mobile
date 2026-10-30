@@ -461,19 +461,37 @@ export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists
 /**
  * Why a legacy copy is still there, split by whether a later launch could change
  * the answer. Carries a whole pass as well as a single slot, worst outcome
- * winning: `transient` beats `permanent`, because a pass with anything still worth
- * retrying is worth retrying.
+ * winning in the order `transient`, `unconfirmed`, `permanent`: a pass with
+ * anything still worth retrying is worth retrying.
  *
  * `transient` covers everything a store's silence or a failed write caused. Those
  * clear themselves, so they must never count against a retry bound: a keychain
  * that cannot answer for a few launches would otherwise retire the purge and
  * leave every legacy copy in place for good.
  *
+ * `unconfirmed` is the iOS form of `permanent`: both stores report the seed
+ * missing, but the iOS legacy store reports a failed lookup the same way, so the
+ * answer cannot end anything. It is what a phone restored from a backup shows:
+ * the account index comes back and neither store's device-only item does.
+ * Retried like `transient`, and not a fault.
+ *
  * `permanent` is the state no later launch resolves: every store answered, and
  * the value is in none of them. An index entry can outlive its key material that
  * way, and retrying it is spend with no upside.
  */
-export type SlotPurge = "gone" | "transient" | "permanent"
+export type SlotPurge = "gone" | "transient" | "unconfirmed" | "permanent"
+
+/** How much a later launch could still change, low to high. */
+const SLOT_PURGE_RANK: Record<SlotPurge, number> = {
+  gone: 0,
+  permanent: 1,
+  unconfirmed: 2,
+  transient: 3,
+}
+
+/** The outcome a pass reports for two of its slots: whichever is worse. */
+export const worsePurge = (a: SlotPurge, b: SlotPurge): SlotPurge =>
+  SLOT_PURGE_RANK[b] > SLOT_PURGE_RANK[a] ? b : a
 
 /** One option, named rather than positional: `purgeThrough(args, true)` at a call
  *  site says nothing about which rule it is asking for. */
@@ -575,7 +593,7 @@ export const purgeThrough = async (
           // two, so the verdict is trustworthy and the retry bound gets the
           // terminal state it exists for; iOS keeps retrying, which costs round
           // trips off the boot path and never costs a seed.
-          return Platform.OS === "android" ? "permanent" : "transient"
+          return Platform.OS === "android" ? "permanent" : "unconfirmed"
         }
 
         // There is a legacy copy to erase, so the probe is no longer enough.
