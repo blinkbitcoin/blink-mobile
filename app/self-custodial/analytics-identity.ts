@@ -1,9 +1,15 @@
 /* eslint-disable camelcase */
 import AsyncStorage from "@react-native-async-storage/async-storage"
 import analytics from "@react-native-firebase/analytics"
-import crashlytics from "@react-native-firebase/crashlytics"
 
-import { setCrashReportingOpen } from "@app/utils/error-reporting"
+import {
+  closeCrashReporting,
+  enableCrashCollection,
+  recordAppError,
+  releaseHeldCrashReports,
+  setCrashReportingOpen,
+  toError,
+} from "@app/utils/error-reporting"
 
 import { getTelemetryInstanceId } from "./telemetry-instance-id"
 
@@ -66,6 +72,8 @@ let queue: Promise<void> = Promise.resolve()
 let shutdownBarrier: Promise<unknown> = Promise.resolve()
 const enhancedAppliedListeners = new Set<() => void>()
 
+type Step = () => Promise<unknown>
+
 /** A custodial-era event made while the custodial identity was still being put in place.
  *  It belongs to the request it was made under: every new request clears the held ones. */
 type HeldCustodialEvent = { heldAtMs: number; send: () => unknown }
@@ -110,28 +118,25 @@ const separate = async () => {
   await ga.setUserProperties(sharedProperties)
 }
 
-/** Crash reports follow the same domains as GA4. The breadcrumb gate shuts at once, and so
- *  do RNFB's own log and recordError, which read the stored switch on every call. On
- *  Android, RNFB only stores the switch: the native SDK applies it at the next launch,
- *  from which it holds any report on the device instead of sending it (seen on the
- *  2026-10-28 emulator check: "Automatic data collection is disabled" after a restart).
- *  A throw comes back as a rejection, so a shutdown can never throw out of its caller. */
-const closeCrashReporting = (): Promise<unknown> => {
-  setCrashReportingOpen(false)
-  return new Promise((resolve) => {
-    resolve(crashlytics().setCrashlyticsCollectionEnabled(false))
-  })
-}
-
-/** Reports held while collection was off were made under a closed domain, and turning
- *  collection back on would send them under the account that opened it, so they are
- *  deleted first. Held reports exist only when this launch started closed, and then the
- *  native SDK's collection is still off, which is the only time it deletes. */
-const openCrashReporting = async (): Promise<void> => {
-  const reporter = crashlytics()
-  if (!reporter.isCrashlyticsCollectionEnabled) await reporter.deleteUnsentReports()
-  await reporter.setCrashlyticsCollectionEnabled(true)
-  setCrashReportingOpen(true)
+/** Crash reports follow the same domains as GA4. Opening is three steps, so `runSteps`
+ *  checks the request between each: a newer Incognito request during the delete stops
+ *  the run before collection is enabled, and one during the enable stops it before the
+ *  gate reopens. That request's own shutdown and closed run then switch collection back
+ *  off, so an enable already issued never outlives it. A launch that started with
+ *  reports held keeps crash reporting shut to its end, while GA4 still opens. */
+const openCrashReportingSteps = (): Step[] => {
+  let mayOpen = false
+  return [
+    async () => {
+      mayOpen = await releaseHeldCrashReports()
+    },
+    async () => {
+      if (mayOpen) await enableCrashCollection()
+    },
+    async () => {
+      if (mayOpen) setCrashReportingOpen(true)
+    },
+  ]
 }
 
 /** Identity off first, collection second: nothing already queued keeps the id. Issued
@@ -148,8 +153,6 @@ const issueShutdown = (): Promise<unknown> => {
   shutdownBarrier = Promise.all([shutdownBarrier, shutdown])
   return shutdown
 }
-
-type Step = () => Promise<unknown>
 
 const stepsFor = (domain: AnalyticsDomain, enhancedId: string | null): Step[] => {
   const ga = analytics()
@@ -170,7 +173,7 @@ const stepsFor = (domain: AnalyticsDomain, enhancedId: string | null): Step[] =>
         () => ga.setUserId(enhancedId),
         () => ga.setUserProperty("account_mode", "enhanced"),
         () => ga.setAnalyticsCollectionEnabled(true),
-        openCrashReporting,
+        ...openCrashReportingSteps(),
       ]
     case AnalyticsDomain.Custodial: {
       const identity = custodialIdentity
@@ -186,7 +189,7 @@ const stepsFor = (domain: AnalyticsDomain, enhancedId: string | null): Step[] =>
         ...identitySteps,
         () => ga.setUserProperty("account_mode", "custodial"),
         () => ga.setAnalyticsCollectionEnabled(true),
-        openCrashReporting,
+        ...openCrashReportingSteps(),
       ]
     }
   }
@@ -208,7 +211,7 @@ const announceEnhancedApplied = () => {
     try {
       listener()
     } catch (err) {
-      crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
+      recordAppError(toError(err))
     }
   })
 }
@@ -266,8 +269,10 @@ const applyLatest = async () => {
 }
 
 const enqueue = () => {
+  /** Through the gate: a transition that failed into a closed domain stays on the
+   *  device, and so does a failed close itself. */
   queue = queue.then(applyLatest).catch((err) => {
-    crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
+    recordAppError(toError(err))
   })
 }
 

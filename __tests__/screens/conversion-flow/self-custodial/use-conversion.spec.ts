@@ -36,9 +36,13 @@ jest.mock("@app/self-custodial/measurement", () => ({
   measure: (...args: unknown[]) => mockMeasure(...args),
 }))
 
+/** Spied on rather than run: these helpers are gated on the custodial domain too, and the
+ *  hook must not call them at all. */
+const mockLogConversionAttempt = jest.fn()
+const mockLogConversionResult = jest.fn()
 jest.mock("@app/utils/analytics", () => ({
-  logConversionAttempt: jest.fn(),
-  logConversionResult: jest.fn(),
+  logConversionAttempt: (...args: unknown[]) => mockLogConversionAttempt(...args),
+  logConversionResult: (...args: unknown[]) => mockLogConversionResult(...args),
 }))
 
 jest.mock("@react-native-firebase/crashlytics", () => ({
@@ -160,6 +164,9 @@ describe("useSelfCustodialConversion", () => {
     expect(execute).toHaveBeenCalledTimes(1)
     expect(mockOnSuccess).toHaveBeenCalledTimes(1)
     expect(result.current.errorMessage).toBeUndefined()
+    /** The custodial account's swap events; this one reports through sc_swap_*. */
+    expect(mockLogConversionAttempt).not.toHaveBeenCalled()
+    expect(mockLogConversionResult).not.toHaveBeenCalled()
     expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith(
       "notificationSuccess",
       {
@@ -184,6 +191,8 @@ describe("useSelfCustodialConversion", () => {
 
     expect(result.current.errorMessage).toBe("SDK boom")
     expect(mockOnSuccess).not.toHaveBeenCalled()
+    expect(mockLogConversionAttempt).not.toHaveBeenCalled()
+    expect(mockLogConversionResult).not.toHaveBeenCalled()
     expect(ReactNativeHapticFeedback.trigger).toHaveBeenCalledWith("notificationError", {
       ignoreAndroidSystemSettings: true,
     })

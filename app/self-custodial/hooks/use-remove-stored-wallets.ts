@@ -4,7 +4,7 @@ import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import useLogout from "@app/hooks/use-logout"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
-import { logBreadcrumb } from "@app/utils/error-reporting"
+import { errorKind, logBreadcrumb } from "@app/utils/error-reporting"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import {
   listSelfCustodialAccounts,
@@ -55,7 +55,9 @@ export const useRemoveStoredWallets = (): (() => Promise<RemoveStoredWalletsResu
     updateState((prev) => prev && { ...prev, activeAccountId: undefined })
     if (sdk) {
       await disconnectSdk(sdk).catch((err) => {
-        logBreadcrumb(`[self-custodial remove wallets] disconnect failed: ${err}`)
+        logBreadcrumb(
+          `[self-custodial remove wallets] disconnect failed (${errorKind(err)})`,
+        )
       })
     }
 

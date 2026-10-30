@@ -860,7 +860,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED) })
+    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED), failed: [] })
     expect(mockListPayments).toHaveBeenCalledTimes(1)
   })
 
@@ -869,7 +869,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "found", payment: sent("p1", PENDING) })
+    expect(found).toEqual({ status: "found", payment: sent("p1", PENDING), failed: [] })
   })
 
   it("prefers a completed payment over a pending one for the same attempt", async () => {
@@ -881,12 +881,23 @@ describe("findLostSend", () => {
   })
 
   /** A failed payment is not the attempt landing; it is exactly what makes a retry safe. */
+  it("passes a failed payment back beside the one that landed", async () => {
+    walletAnswers([sent("p1", FAILED), sent("p2", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p2" } })
+    expect(found).toMatchObject({ failed: [{ id: "p1" }] })
+  })
+
   it("passes over a failed payment", async () => {
     walletAnswers([sent("p1", FAILED)], [sent("p1", FAILED)], [sent("p1", FAILED)])
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    /** Not the attempt landing, so still safe to send again; passed back so telemetry
+     *  can close the attempt it ended. */
+    expect(found).toEqual({ status: "not-found", failed: [sent("p1", FAILED)] })
   })
 
   /** A busy wallet fills the first page with later sends; the payment is on the next. */
@@ -905,13 +916,35 @@ describe("findLostSend", () => {
     )
   })
 
-  it("stops at a completed match without turning the page", async () => {
-    walletAnswers([...fullPageOfOthers().slice(1), sent("p1", COMPLETED)])
+  /** An older attempt's failed payment can sit a page below the one that landed, and
+   *  that attempt reports its end only once it is seen. */
+  it("reads past a completed match to the failed ones on later pages", async () => {
+    walletAnswers(
+      [...fullPageOfOthers().slice(1), sent("p2", COMPLETED)],
+      [sent("p1", FAILED)],
+    )
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({
+      status: "found",
+      payment: { id: "p2" },
+      failed: [{ id: "p1" }],
+    })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  /** Pages that never run short leave the later ones unread, but not the match. */
+  it("keeps a completed match when twenty full pages have no end", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", COMPLETED)],
+    })
+    mockListPayments.mockResolvedValue({ payments: fullPageOfOthers() })
 
     const found = await settle(lookup())
 
     expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
-    expect(mockListPayments).toHaveBeenCalledTimes(1)
+    expect(mockListPayments).toHaveBeenCalledTimes(20)
   })
 
   /** A match is a payment of the invoice, whatever a later page would have said. */
@@ -969,7 +1002,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    expect(found).toEqual({ status: "not-found", failed: [] })
     expect(mockListPayments).toHaveBeenCalledTimes(3)
   })
 
@@ -1003,7 +1036,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    expect(found).toEqual({ status: "not-found", failed: [] })
   })
 
   it("answers unreadable when the wallet could not catch up with the server on the last look", async () => {
@@ -1046,7 +1079,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    expect(found).toEqual({ status: "not-found", failed: [] })
   })
 })
 

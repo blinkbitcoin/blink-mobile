@@ -7,7 +7,7 @@ import { ContactType, useContactCreateMutation } from "@app/graphql/generated"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { findOrCreateContact as bridgeFindOrCreateContact } from "@app/self-custodial/bridge"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
-import { logBreadcrumb } from "@app/utils/error-reporting"
+import { errorKind, logBreadcrumb } from "@app/utils/error-reporting"
 
 gql`
   mutation contactCreate($input: ContactCreateInput!) {
@@ -54,7 +54,7 @@ export const useSaveLnAddressContact = () => {
           await bridgeFindOrCreateContact(sdk, handle, handle)
           return { saved: true, handle }
         } catch (err) {
-          logBreadcrumb(`[self-custodial contacts] auto-save failed: ${err}`)
+          logBreadcrumb(`[self-custodial contacts] auto-save failed (${errorKind(err)})`)
           return { saved: false, handle }
         }
       }

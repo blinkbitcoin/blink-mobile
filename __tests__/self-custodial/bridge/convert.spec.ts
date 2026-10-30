@@ -31,9 +31,10 @@ jest.mock("@app/self-custodial/analytics-identity", () => ({
   onEnhancedIdentityApplied: () => () => undefined,
 }))
 
+const mockCrashLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => ({
   __esModule: true,
-  default: () => ({ recordError: mockRecordError, log: jest.fn() }),
+  default: () => ({ recordError: mockRecordError, log: mockCrashLog }),
 }))
 
 const mockLogEvent = jest.fn()
@@ -256,6 +257,10 @@ describe("createGetConversionQuote — error handling", () => {
 
     expect(mockRecordError).toHaveBeenCalled()
     expect(sdk.sendPayment).not.toHaveBeenCalled()
+    /** The breadcrumb names the direction only: amounts are payment data. */
+    expect(mockCrashLog).toHaveBeenCalledWith(expect.stringContaining("[Convert]"))
+    const breadcrumbs = mockCrashLog.mock.calls.map(([line]) => String(line)).join("\n")
+    expect(breadcrumbs).not.toMatch(/5000|137/)
   })
 
   it("execute() records to crashlytics and returns failed when sendPayment throws", async () => {
