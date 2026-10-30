@@ -42,10 +42,18 @@ jest.mock("@react-navigation/native", () => ({
 }))
 
 const mockHapticReject = jest.fn()
+const mockHapticTap = jest.fn()
 
 jest.mock("@app/utils/haptics", () => {
   const actual = jest.requireActual("@app/utils/haptics")
-  return { ...actual, haptics: { ...actual.haptics, reject: () => mockHapticReject() } }
+  return {
+    ...actual,
+    haptics: {
+      ...actual.haptics,
+      reject: () => mockHapticReject(),
+      tap: () => mockHapticTap(),
+    },
+  }
 })
 
 /** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
@@ -252,6 +260,7 @@ beforeEach(() => {
   mockNavigate.mockClear()
   mockFeeTierOverride.current = {}
   mockHapticReject.mockClear()
+  mockHapticTap.mockClear()
   mockDisplayCurrency.current = "NGN"
   mockPreferredAmountCurrency.current = undefined
 })
@@ -370,6 +379,21 @@ const typeKeys = (...keys: string[]) =>
   keys.forEach((key) => fireEvent.press(screen.getByTestId(`Key ${key}`)))
 
 describe("free amount", () => {
+  /** The keypad's tap reaches the screen's pad: one per accepted key, none for a refused
+   *  one. In Android silent mode the phone drops it, see haptics.spec.ts. */
+  it("taps once per accepted key and stays silent on a refused one", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    fireEvent.press(screen.getByTestId("Key ⌫"))
+    await settle()
+    expect(mockHapticTap).not.toHaveBeenCalled()
+
+    typeKeys("1", "2")
+    await settle()
+    expect(mockHapticTap).toHaveBeenCalledTimes(2)
+  })
+
   it("opens with the keypad, the percent chips and a disabled Add amount", async () => {
     renderScreen(intraledgerDestination())
     await settle()
