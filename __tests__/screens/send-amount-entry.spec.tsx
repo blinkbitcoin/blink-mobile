@@ -29,13 +29,31 @@ import { PaymentType } from "@blinkbitcoin/blink-client"
 
 import { ContextForScreen } from "./helper"
 
+const mockNavigate = jest.fn()
+
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
   useNavigation: () => ({
-    navigate: jest.fn(),
+    navigate: mockNavigate,
     setOptions: jest.fn(),
   }),
 }))
+
+/** Laid over the real fee options, so a spec can stand in a fee error the quote returned. */
+const mockFeeTierOverride: { current: Record<string, unknown> } = { current: {} }
+
+jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options", () => {
+  const actual = jest.requireActual(
+    "@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options",
+  )
+  return {
+    ...actual,
+    useOnchainFeeTierOptions: (...args: unknown[]) => ({
+      ...actual.useOnchainFeeTierOptions(...args),
+      ...mockFeeTierOverride.current,
+    }),
+  }
+})
 
 const mockIsIos = { current: true }
 
@@ -183,6 +201,8 @@ const LL = i18nObject("en")
 beforeEach(() => {
   loadLocale("en")
   mockSetAmount.mockClear()
+  mockNavigate.mockClear()
+  mockFeeTierOverride.current = {}
   mockDisplayCurrency.current = "NGN"
 })
 
@@ -414,6 +434,81 @@ describe("free amount", () => {
 
     expect(screen.getByTestId(`${WalletCurrency.Usd} Wallet Balance`)).toBeTruthy()
     expect(isNextDisabled()).toBe(false)
+  })
+})
+
+/**
+ * The SDK calls an on-chain amount too low until the sender has typed past the minimum, so
+ * that error waits for Next rather than flagging each keystroke on the way there.
+ */
+describe("an amount the fee quote calls too low", () => {
+  const tooLow = LL.SendBitcoinScreen.sdkAmountTooLow()
+
+  beforeEach(() => {
+    mockFeeTierOverride.current = {
+      feeTierErrorMessage: tooLow,
+      isFeeTierErrorBlocking: true,
+      isFeeTierErrorDeferred: true,
+    }
+  })
+
+  it("stays quiet while the amount is typed, with Next on", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("3")
+    await settle()
+
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+  })
+
+  it("says so on Next, holds the send, and turns Next off for that amount", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("3")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(screen.getByText(tooLow)).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(isNextDisabled()).toBe(true)
+  })
+
+  /** ₦10 stays inside the bitcoin balance, so Next answers to the fee error alone. */
+  it("goes quiet again once the amount changes", async () => {
+    renderScreen(intraledgerDestination())
+    await settle()
+    typeKeys("1")
+    await settle()
+    fireEvent.press(nextButton())
+    await settle()
+
+    typeKeys("0")
+    await settle()
+
+    expect(screen.queryByText(tooLow)).toBeNull()
+    expect(isNextDisabled()).toBe(false)
+  })
+
+  /** Every other self-custodial fee error still shows at once: no amount typed further on
+   *  fixes a network failure or a balance that cannot cover the fee. */
+  it("shows a fee error that is not deferred straight away", async () => {
+    mockFeeTierOverride.current = {
+      feeTierErrorMessage: LL.SendBitcoinScreen.sdkNetworkError(),
+      isFeeTierErrorBlocking: true,
+      isFeeTierErrorDeferred: false,
+    }
+    renderScreen(intraledgerDestination())
+    await settle()
+
+    typeKeys("3")
+    await settle()
+
+    expect(screen.getByText(LL.SendBitcoinScreen.sdkNetworkError())).toBeTruthy()
+    expect(isNextDisabled()).toBe(true)
   })
 })
 

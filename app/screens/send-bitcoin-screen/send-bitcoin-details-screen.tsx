@@ -156,6 +156,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
   const [isLoadingLnurl, setIsLoadingLnurl] = useState(false)
   const [modalHighFeesVisible, setModalHighFeesVisible] = useState(false)
   const [selectedPercent, setSelectedPercent] = useState<number | null>(null)
+  /** The amount Next was last pressed at, so a deferred fee error speaks for that amount only. */
+  const [nextPressedAmount, setNextPressedAmount] = useState<number | null>(null)
 
   const { convertMoneyAmount: _convertMoneyAmount } = usePriceConversion()
   const { zeroDisplayAmount } = useDisplayCurrency()
@@ -169,6 +171,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     feeTierOptions,
     feeTierErrorMessage,
     isFeeTierErrorBlocking,
+    isFeeTierErrorDeferred,
     isQuotingFees,
     isOnchain,
     selectedTierFee,
@@ -411,10 +414,23 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     setSelectedPercent(percent)
   }
 
+  /**
+   * A deferred fee error waits for Next, then holds until the amount changes, so a sender
+   * typing past it toward a valid amount is never told the half-typed one is too low.
+   */
+  const settlementAmountValue = paymentDetail.settlementAmount?.amount ?? null
+  const isFeeTierErrorHeld =
+    isFeeTierErrorDeferred && nextPressedAmount !== settlementAmountValue
+
   const goToNextScreen =
     (paymentDetail.sendPaymentMutation ||
       (paymentDetail.paymentType === "lnurl" && paymentDetail.unitOfAccountAmount)) &&
     (async () => {
+      if (isFeeTierErrorDeferred) {
+        setNextPressedAmount(settlementAmountValue)
+        return
+      }
+
       let paymentDetailForConfirmation: PaymentDetail<WalletCurrency> = paymentDetail
 
       if (paymentDetail.paymentType === "lnurl" && !paymentDetail.sendPaymentMutation) {
@@ -500,7 +516,7 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
     !goToNextScreen ||
     !amountStatus.validAmount ||
     Boolean(lnurlBoundsErrorMessage) ||
-    isFeeTierErrorBlocking ||
+    (isFeeTierErrorBlocking && !isFeeTierErrorHeld) ||
     isQuotingFees
 
   /**
@@ -508,7 +524,8 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
    * act on. A fee error only takes the box once the amount is valid, or when it blocks the
    * send outright, since then there is nothing to continue to whatever the amount reads.
    */
-  const shouldShowFeeTierError = amountStatus.validAmount || isFeeTierErrorBlocking
+  const shouldShowFeeTierError =
+    !isFeeTierErrorHeld && (amountStatus.validAmount || isFeeTierErrorBlocking)
   const extraInfoErrorMessage =
     asyncErrorMessage ||
     lnurlBoundsErrorMessage ||
