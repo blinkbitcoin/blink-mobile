@@ -80,7 +80,12 @@
     "skip": "Ruka",
     "unlock": "Fungua",
     "usePin": "Tumia pini",
-    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani"
+    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani",
+    "forgotPin": "Umesahau pini? Ondoa mikoba",
+    "removeWalletsTitle": "Ondoa mikoba kwenye kifaa hiki?",
+    "removeWalletsBody": "Hii inaondoa mikoba yote kwenye kifaa hiki na kukutoa nje. Ili kurudisha mkoba, unahitaji neno lake la kurejesha. Bila hilo, mkoba unapotea.",
+    "removeWalletsConfirm": "Ondoa mikoba",
+    "removeWalletsFailed": "Baadhi ya mikoba haikuweza kuondolewa. Tafadhali jaribu tena."
   },
   "PeopleScreen": {
     "title": "Watunzi",

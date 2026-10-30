@@ -80,7 +80,12 @@
     "skip": "Săriți peste",
     "unlock": "Deblocați",
     "usePin": "Utilizați codul PIN",
-    "confirmLogout": "Sunteți sigur că doriți să vă deconectați? Aceasta vă va reseta memoria cache și toate setările locale ale utilizatorului"
+    "confirmLogout": "Sunteți sigur că doriți să vă deconectați? Aceasta vă va reseta memoria cache și toate setările locale ale utilizatorului",
+    "forgotPin": "Ai uitat PIN-ul? Elimină portofelele",
+    "removeWalletsTitle": "Elimini portofelele de pe acest dispozitiv?",
+    "removeWalletsBody": "Aceasta elimină toate portofelele de pe acest dispozitiv și te deconectează. Pentru a recupera un portofel, ai nevoie de fraza lui de recuperare. Fără ea, portofelul este pierdut.",
+    "removeWalletsConfirm": "Elimină portofelele",
+    "removeWalletsFailed": "Unele portofele nu au putut fi eliminate. Încearcă din nou."
   },
   "PeopleScreen": {
     "title": "Persoane",

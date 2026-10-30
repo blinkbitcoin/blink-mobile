@@ -80,7 +80,12 @@
         "skip": "Salta",
         "unlock": "Sblocca",
         "usePin": "Usa PIN",
-        "confirmLogout": "Sei sicuro di voler uscire? Ciò ripristinerà la cache e tutte le impostazioni dell'utente locale"
+        "confirmLogout": "Sei sicuro di voler uscire? Ciò ripristinerà la cache e tutte le impostazioni dell'utente locale",
+        "forgotPin": "PIN dimenticato? Rimuovi i portafogli",
+        "removeWalletsTitle": "Rimuovere i portafogli da questo dispositivo?",
+        "removeWalletsBody": "Questo rimuove tutti i portafogli da questo dispositivo ed esegue il logout. Per recuperare un portafoglio, ti serve la sua frase di backup. Senza di essa, il portafoglio è perso.",
+        "removeWalletsConfirm": "Rimuovi i portafogli",
+        "removeWalletsFailed": "Non è stato possibile rimuovere alcuni portafogli. Riprova."
     },
     "PeopleScreen": {
         "title": "Persone",

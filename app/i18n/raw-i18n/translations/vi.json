@@ -80,7 +80,12 @@
     "skip": "Bỏ qua",
     "unlock": "Mở khóa",
     "usePin": "Sử dụng PIN",
-    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ"
+    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ",
+    "forgotPin": "Quên PIN? Xóa ví",
+    "removeWalletsTitle": "Xóa ví khỏi thiết bị này?",
+    "removeWalletsBody": "Thao tác này xóa tất cả ví khỏi thiết bị này và đăng xuất bạn. Để lấy lại ví, bạn cần cụm từ khôi phục của ví đó. Nếu không có, ví sẽ bị mất.",
+    "removeWalletsConfirm": "Xóa ví",
+    "removeWalletsFailed": "Không thể xóa một số ví. Vui lòng thử lại."
   },
   "PeopleScreen": {
     "title": "People",

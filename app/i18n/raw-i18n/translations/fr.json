@@ -80,7 +80,12 @@
         "skip": "Passez cette étape",
         "unlock": "Déverrouillez",
         "usePin": "Utilisez un NIP",
-        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux"
+        "confirmLogout": "Êtes-vous sûr de vouloir vous déconnecter ? Cela réinitialisera votre cache et tous les paramètres utilisateur locaux",
+        "forgotPin": "NIP oublié ? Supprimer les portefeuilles",
+        "removeWalletsTitle": "Supprimer les portefeuilles de cet appareil ?",
+        "removeWalletsBody": "Cela supprime tous les portefeuilles de cet appareil et vous déconnecte. Pour récupérer un portefeuille, vous avez besoin de sa phrase de sauvegarde. Sans elle, le portefeuille est perdu.",
+        "removeWalletsConfirm": "Supprimer les portefeuilles",
+        "removeWalletsFailed": "Certains portefeuilles n'ont pas pu être supprimés. Veuillez réessayer."
     },
     "PeopleScreen": {
         "title": "Cercles",

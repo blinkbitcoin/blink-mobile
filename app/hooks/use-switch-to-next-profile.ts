@@ -3,7 +3,9 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
+import { useReturnToGate } from "@app/hooks/use-return-to-gate"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { useAuthenticationContext } from "@app/navigation/navigation-container-wrapper"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
@@ -32,6 +34,8 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
   const { logout } = useLogout()
   const { saveToken } = useAppConfig()
   const { LL } = useI18nContext()
+  const { readIsAppLocked } = useAuthenticationContext()
+  const returnToGate = useReturnToGate()
 
   const switchToNextProfile = async (
     tokenToDeactivate: string,
@@ -61,7 +65,20 @@ export const useSwitchToNextProfile = (): UseSwitchToNextProfileResult => {
       message: LL.ProfileScreen.switchAccount(),
       LL,
     })
-    navigation.navigate("Primary")
+    /** Behind a lock that has not been answered, the screens under the lock still
+     *  belong to the session that just died: answered, a resume lock steps back onto
+     *  them, now running under the next session's token. So the whole stack goes and
+     *  the gate asks again from a cold start, which lands on home for the new session.
+     *  Without a lock up, home is where the switch lands.
+     *
+     *  Read now rather than at the call, and from the lock's own ref rather than a mirror
+     *  of it: a relock raised during the awaits above lands there at once, while any state
+     *  copied from it is still a commit behind. */
+    if (readIsAppLocked()) {
+      returnToGate()
+    } else {
+      navigation.navigate("Primary")
+    }
     return SwitchProfileOutcome.Switched
   }
 

@@ -55,6 +55,12 @@ const en: BaseTranslation = {
     usePin: "Use PIN",
     confirmLogout:
       "Are you sure you'd like to log out? This will reset your cache and all local user settings",
+    forgotPin: "Forgot PIN? Remove wallets",
+    removeWalletsTitle: "Remove wallets from this device?",
+    removeWalletsBody:
+      "This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.",
+    removeWalletsConfirm: "Remove wallets",
+    removeWalletsFailed: "Some wallets could not be removed. Please try again.",
   },
   PeopleScreen: {
     title: "People",

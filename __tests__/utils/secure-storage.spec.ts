@@ -54,8 +54,18 @@ jest.mock("react-native-secure-key-store", () => ({
   ACCESSIBLE: {
     ALWAYS_THIS_DEVICE_ONLY: "ALWAYS_THIS_DEVICE_ONLY",
     WHEN_UNLOCKED_THIS_DEVICE_ONLY: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
   },
 }))
+
+/**
+ * A legacy keystore that refuses everything: the delete, and the blank write that would
+ * otherwise prove a key that is not there gone.
+ */
+const legacyStoreRejects = (err: Error) => {
+  mockRemove.mockRejectedValue(err)
+  mockSet.mockRejectedValue(err)
+}
 
 describe("KeyStoreWrapper per-account mnemonic methods", () => {
   beforeEach(() => {
@@ -180,8 +190,51 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       expect(result).toBe(true)
     })
 
-    it("returns false when the primary mnemonic removal fails", async () => {
-      mockRemove.mockRejectedValueOnce(new Error("keystore unavailable"))
+    /** What the iOS module rejects with: a delete of any kind that did not land, a lookup
+     *  of any kind that found nothing, and a write the keychain refused. */
+    const couldNotDelete = () =>
+      Object.assign(new Error("could not delete key"), { code: "6" })
+    const keyNotPresent = () =>
+      Object.assign(new Error("key does not present"), { code: "404" })
+    const couldNotSave = () => Object.assign(new Error("error saving key"), { code: "9" })
+
+    it("returns false when neither the removal nor the blank lands", async () => {
+      mockRemove.mockRejectedValue(couldNotDelete())
+      mockSet.mockRejectedValue(couldNotSave())
+
+      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+      expect(result).toBe(false)
+      expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
+        accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+      })
+    })
+
+    /**
+     * The iOS module rejects a delete of a key that is not there, so a removal retried
+     * after an earlier one erased the seed fails the same way a real failure does. A blank
+     * the keychain takes is what lets that retry finish instead of keeping the wallet listed.
+     */
+    it("returns true when the removal fails because the seed is already gone", async () => {
+      mockRemove.mockRejectedValueOnce(couldNotDelete()).mockResolvedValue(undefined)
+      mockSet.mockResolvedValue("key stored successfully")
+
+      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+      expect(result).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
+        accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+      })
+    })
+
+    /**
+     * A failing iOS keychain answers the lookup with the missing-key code too, so a read
+     * back would call this seed gone while it is still stored.
+     */
+    it("returns false on a failing keychain whose lookup answers missing", async () => {
+      mockRemove.mockRejectedValue(couldNotDelete())
+      mockGet.mockRejectedValue(keyNotPresent())
+      mockSet.mockRejectedValue(couldNotSave())
 
       const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
 
@@ -338,7 +391,7 @@ describe("KeyStoreWrapper biometrics methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removeIsBiometricsEnabled()
 
@@ -454,7 +507,7 @@ describe("KeyStoreWrapper PIN methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removePin()
 
@@ -699,17 +752,18 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("writes nothing when the erase only failed because nothing was stored", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      // How the iOS module answers a delete of a key that is not there; the blank lands.
+      mockRemove.mockRejectedValue(new Error("could not delete key"))
       storedKeys({})
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
-      expect(mockSet).not.toHaveBeenCalled()
+      expect(mockSetInternet).not.toHaveBeenCalled()
     })
 
     it("writes a cleared value when a failed erase left state readable", async () => {
       // Otherwise a spent budget survives a correct PIN, and the next typo logs
       // the user out on the spot.
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       storedKeys({
         pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 0 }),
       })
@@ -722,7 +776,7 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("writes a cleared value when the fallback read also fails", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       mockGet.mockRejectedValue(new Error("keystore unavailable"))
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
@@ -733,7 +787,7 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("repairs a legacy count that would not erase", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       storedKeys({ pinAttempts: "3" })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
@@ -743,9 +797,8 @@ describe("KeyStoreWrapper PIN attempt state", () => {
       )
     })
 
-    // An erase reports failure for a key that was never there too, so a failed
-    // erase over nothing readable is a clear, not a fault: writing on it would
-    // put an item back where none was.
+    // A failed erase over nothing readable is a clear, not a fault: writing on
+    // it would put an item back where none was.
     it("writes nothing when a failed erase left the slot empty anyway", async () => {
       onlyInLegacyStore({})
       mockResetInternet.mockRejectedValue(new Error("keystore locked"))
@@ -760,7 +813,7 @@ describe("KeyStoreWrapper PIN attempt state", () => {
       onlyInLegacyStore({
         pinFailureState: JSON.stringify({ attempts: 0, lockedUntil: 0 }),
       })
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
       // The one write is the migrating read moving the value across, not a
@@ -769,7 +822,7 @@ describe("KeyStoreWrapper PIN attempt state", () => {
     })
 
     it("reports false when neither the erase nor the repair lands", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       mockSetInternet.mockRejectedValue(new Error("keystore locked"))
       storedKeys({ pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 0 }) })
 
@@ -943,7 +996,7 @@ describe("KeyStoreWrapper session-profile methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removeSessionProfiles()
 
@@ -1137,7 +1190,7 @@ describe("KeyStoreWrapper active-token methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removeActiveToken()
 
@@ -1165,7 +1218,12 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
    *  not provably done, which is the only thing that counts as a failure. */
   const legacyRefusesToDrop = (slot: string) => {
     onlyInLegacyStore({ [slot]: "still here" })
-    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+    const refusesTheSlot = (key: string) =>
+      key === slot
+        ? Promise.reject(new Error("keystore unavailable"))
+        : Promise.resolve(undefined)
+    mockRemove.mockImplementation(refusesTheSlot)
+    mockSet.mockImplementation(refusesTheSlot)
   }
 
   it("removes every uninstall-surviving slot, and only those", async () => {
@@ -1206,11 +1264,6 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
 
   it("reports a persistently failing token removal and still wipes the profiles", async () => {
     legacyRefusesToDrop("galoyAuthToken")
-    mockRemove.mockImplementation((key: string) =>
-      key === "galoyAuthToken"
-        ? Promise.reject(new Error("keystore unavailable"))
-        : Promise.resolve(undefined),
-    )
 
     await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
 
@@ -1231,7 +1284,7 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
 
   it("reports every slot when the keystore is fully unavailable, and never throws", async () => {
     mockGet.mockRejectedValue(new Error("keystore unavailable"))
-    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+    legacyStoreRejects(new Error("keystore unavailable"))
 
     await expect(
       KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
@@ -1246,5 +1299,94 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
       "pin",
       "biometrics flag",
     ])
+  })
+})
+
+/**
+ * The lock is one thing made of three slots. Every caller that may erase it erases the same
+ * three, and this is where that list lives so a second copy cannot miss one.
+ */
+describe("KeyStoreWrapper clearAppLock", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const spyOnSlots = (results: {
+    biometrics: boolean
+    pin: boolean
+    budget: boolean
+  }) => {
+    jest
+      .spyOn(KeyStoreWrapper, "removeIsBiometricsEnabled")
+      .mockResolvedValue(results.biometrics)
+    jest.spyOn(KeyStoreWrapper, "removePin").mockResolvedValue(results.pin)
+    jest.spyOn(KeyStoreWrapper, "clearPinFailureState").mockResolvedValue(results.budget)
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it("erases all three slots and reports the lock gone", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(true)
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.removePin).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.clearPinFailureState).toHaveBeenCalledTimes(1)
+  })
+
+  /** A PIN without its spent attempt count hands the next round a fresh budget against a
+   *  secret that no longer expires, so a half-erased lock is still a lock. */
+  it("reports the lock kept when the spent budget will not clear", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: false })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  /** A PIN that survives without its spent count and its biometrics flag is the split
+   *  the group exists to prevent, so a refused PIN leaves the other two where they are. */
+  it("reports the lock kept and leaves the rest alone when the PIN will not erase", async () => {
+    spyOnSlots({ biometrics: true, pin: false, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+    expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+  })
+
+  it("erases the PIN before the spent budget and the biometrics flag", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: true })
+
+    await KeyStoreWrapper.clearAppLock()
+
+    const pinOrder = jest.mocked(KeyStoreWrapper.removePin).mock.invocationCallOrder[0]
+    const budgetOrder = jest.mocked(KeyStoreWrapper.clearPinFailureState).mock
+      .invocationCallOrder[0]
+    const flagOrder = jest.mocked(KeyStoreWrapper.removeIsBiometricsEnabled).mock
+      .invocationCallOrder[0]
+    expect(pinOrder).toBeLessThan(budgetOrder)
+    expect(budgetOrder).toBeLessThan(flagOrder)
+  })
+
+  /** A PIN without the biometrics flag routes every later unlock to the keypad instead of
+   *  to the prompt its owner chose. */
+  it("reports the lock kept when the biometrics flag will not erase", async () => {
+    spyOnSlots({ biometrics: false, pin: true, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  /** Sequential, so a slot that throws stops the ones behind it rather than leaving the
+   *  caller to guess which went. */
+  it("stops at a slot that throws", async () => {
+    jest.spyOn(KeyStoreWrapper, "removeIsBiometricsEnabled").mockResolvedValue(true)
+    jest
+      .spyOn(KeyStoreWrapper, "removePin")
+      .mockRejectedValue(new Error("keystore locked"))
+    jest.spyOn(KeyStoreWrapper, "clearPinFailureState").mockResolvedValue(true)
+
+    await expect(KeyStoreWrapper.clearAppLock()).rejects.toThrow("keystore locked")
+    expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).not.toHaveBeenCalled()
   })
 })

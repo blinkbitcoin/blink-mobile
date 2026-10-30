@@ -80,7 +80,12 @@
     "skip": "Kihagy",
     "unlock": "Feloldás",
     "usePin": "PIN kód használata",
-    "confirmLogout": "Biztos, hogy szeretnél kijelentkezni? Ezzel visszaállítod a gyorsítótárat és az összes helyi felhasználói beállítást"
+    "confirmLogout": "Biztos, hogy szeretnél kijelentkezni? Ezzel visszaállítod a gyorsítótárat és az összes helyi felhasználói beállítást",
+    "forgotPin": "Elfelejtetted a PIN kódot? Tárcák eltávolítása",
+    "removeWalletsTitle": "Eltávolítod a tárcákat erről az eszközről?",
+    "removeWalletsBody": "Ez eltávolítja az összes tárcát erről az eszközről, és kijelentkeztet. Egy tárca visszaállításához szükséged van a biztonsági kifejezésére. Nélküle a tárca elvész.",
+    "removeWalletsConfirm": "Tárcák eltávolítása",
+    "removeWalletsFailed": "Néhány tárcát nem sikerült eltávolítani. Próbáld újra."
   },
   "PeopleScreen": {
     "title": "Kapcsolatok",

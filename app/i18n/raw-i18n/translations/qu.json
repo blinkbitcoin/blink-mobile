@@ -80,7 +80,12 @@
     "skip": "Atipanichu",
     "unlock": "Churay",
     "usePin": "PIN tukuyta",
-    "confirmLogout": "¿Chiqaptachu lluqsiyta munankí? Kayqa cache nisqata tukuy local ruwachikunatapas qallarimanta churanqa"
+    "confirmLogout": "¿Chiqaptachu lluqsiyta munankí? Kayqa cache nisqata tukuy local ruwachikunatapas qallarimanta churanqa",
+    "forgotPin": "PIN qunqarqankichu? Qullqikuqkunata qichuy",
+    "removeWalletsTitle": "Kay aparatomanta qullqikuqkunata qichuykuchu?",
+    "removeWalletsBody": "Kayqa tukuy qullqikuqkunata kay aparatomanta qichun, hinallataq lluqsichisunki. Huk qullqikuqta kutichinaykipaqqa, waqaychay siminta munanki. Mana chayqa, qullqikuqqa chinkanmi.",
+    "removeWalletsConfirm": "Qullqikuqkunata qichuy",
+    "removeWalletsFailed": "Wakin qullqikuqkunataqa mana qichuyta atikurqanchu. Huktawan kallpachakuy."
   },
   "PeopleScreen": {
     "title": "People",

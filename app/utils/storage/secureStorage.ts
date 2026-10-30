@@ -6,6 +6,7 @@ import RNSecureKeyStore, {
 import { type SecureExists } from "./secure-store"
 import {
   type ReadThroughArgs,
+  eraseLegacyCopy,
   existsThrough,
   readThrough,
   removeThrough,
@@ -38,16 +39,11 @@ export type SessionProfilesRead =
   | { status: "absent" }
   | { status: "failed"; err: unknown }
 
-// Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
-// `get`, android RNSecureKeyStoreModule#get). Every other code means the read
-// itself went wrong.
-//
-// True on Android only. The iOS module discards the OSStatus from
-// SecItemCopyMatching (`searchKeychainCopyMatching` returns nil for any failure)
-// and `get` rejects nil with "404", so an entitlement or decode error is
-// indistinguishable from a missing key there. Every caller that branches on this
-// therefore degrades to "absent" on iOS; the distinction becomes real when the
-// slots move to react-native-keychain (blink-wip#1161).
+// Both native modules reject a missing key with code "404", and only a missing key
+// (android RNSecureKeyStoreModule#get, and ios/RNSecureKeyStore.m `get` through
+// patches/react-native-secure-key-store+2.0.10.patch, since the module used to drop
+// the keychain status and reject every failed lookup as missing). Every other code
+// means the read itself went wrong.
 const KEY_NOT_FOUND_CODE = "404"
 
 const isKeyNotFound = (err: unknown): boolean =>
@@ -359,8 +355,8 @@ export default class KeyStoreWrapper {
 
     if (erased && legacyErased) return true
 
-    // An erase reports failure for a key that was never there too, so ask what
-    // is actually still readable rather than writing on every clear.
+    // An erase can fail on a slot that holds nothing to clear, so ask what is
+    // actually still readable rather than writing on every failed clear.
     const remaining = await KeyStoreWrapper.getPinFailureState()
     if (remaining.status === "absent") return true
     const storedAttempts = remaining.status === "found" ? remaining.state.attempts : null
@@ -374,6 +370,35 @@ export default class KeyStoreWrapper {
       KeyStoreWrapper.PIN_FAILURE_STATE,
       serializePinFailureState(CLEARED_PIN_FAILURE_STATE),
     )
+  }
+
+  /**
+   * The app lock as one thing: the PIN, the biometrics flag and the spent attempt budget,
+   * kept or dropped together.
+   *
+   * The group cannot be split. A PIN without its spent attempt count hands the next round a
+   * fresh budget against a secret that no longer expires, and a PIN without the biometrics
+   * flag routes every later unlock to the keypad instead of to the prompt its owner chose.
+   * It lives here, beside the slots, so a caller that may erase the lock does not carry its
+   * own copy of the list. `clearUninstallSurvivingCredentials` still enumerates them, on
+   * purpose: it reports and retries per slot, and it wipes more than the lock.
+   *
+   * The PIN goes first, and a PIN that will not erase stops the rest. Left without its
+   * spent count and its biometrics flag, a surviving PIN would be exactly the split the
+   * group exists to prevent. The reverse is harmless: a count left behind is cleared by
+   * the next PIN that is set, and a flag left behind still asks before it opens anything.
+   *
+   * Returns whether the lock is provably gone: a slot that could not be erased is a lock
+   * that is still set, and the caller has to keep treating it as one.
+   */
+  public static async clearAppLock(): Promise<boolean> {
+    const isPinErased = await KeyStoreWrapper.removePin()
+    if (!isPinErased) return false
+
+    const isSpentBudgetErased = await KeyStoreWrapper.clearPinFailureState()
+    const isBiometricsFlagErased = await KeyStoreWrapper.removeIsBiometricsEnabled()
+
+    return isSpentBudgetErased && isBiometricsFlagErased
   }
 
   // ── session profiles ──────────────────────────────────────────────────────
@@ -397,9 +422,6 @@ export default class KeyStoreWrapper {
    * write the list back must use this instead of getSessionProfiles: an empty
    * list scored from a failed read deletes every profile, and profiles carry
    * their sessions' tokens.
-   *
-   * Platform caveat: this only separates the two cases on Android — see the
-   * note above KEY_NOT_FOUND_CODE.
    *
    * A payload that will not parse, or that parses to something other than an
    * array, is reported as absent rather than failed: it holds nothing a caller
@@ -444,10 +466,6 @@ export default class KeyStoreWrapper {
    * "nothing stored" and "the keystore is unhappy" arrive the same way and only
    * the error code tells them apart. Callers that would destroy or overwrite a
    * credential based on an empty read must use this instead of getActiveToken.
-   *
-   * The code only tells them apart on Android — see the note above
-   * KEY_NOT_FOUND_CODE. On iOS every failed read reports absent, so the failed
-   * branch its callers take is unreachable there.
    */
   public static async readActiveToken(): Promise<ActiveTokenRead> {
     const read = await KeyStoreWrapper.migratedReadWithStatus(
@@ -568,11 +586,18 @@ export default class KeyStoreWrapper {
     )
   }
 
+  /**
+   * Answers whether the seed is gone, not whether this call removed it. A removal retried
+   * after an earlier one landed finds no key, and the iOS module rejects that delete like
+   * any failure, so a seed already gone would count as surviving forever and its wallet
+   * could never leave the list. The legacy-copy rule every migrated slot erases by settles
+   * it with a blank write the keychain has to accept.
+   */
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
-    const removed = await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const isSeedGone = await eraseLegacyCopy(KeyStoreWrapper.mnemonicKeyFor(accountId))
     // The network marker is derived data; failing to drop it is tolerated.
     await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
-    return removed
+    return isSeedGone
   }
 
   public static async getMnemonicNetworkForAccount(

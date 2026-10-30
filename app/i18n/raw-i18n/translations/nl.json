@@ -80,7 +80,12 @@
     "skip": "Overslaan",
     "unlock": "Ontgrendelen",
     "usePin": "Gebruik je PIN",
-    "confirmLogout": "Weet je zeker dat je wilt uitloggen? Dit wist je cache en alle lokale gebruikersinstellingen"
+    "confirmLogout": "Weet je zeker dat je wilt uitloggen? Dit wist je cache en alle lokale gebruikersinstellingen",
+    "forgotPin": "PIN vergeten? Verwijder portemonnees",
+    "removeWalletsTitle": "Portemonnees van dit apparaat verwijderen?",
+    "removeWalletsBody": "Dit verwijdert alle portemonnees van dit apparaat en logt je uit. Om een portemonnee terug te krijgen, heb je de herstelzin nodig. Zonder die zin is de portemonnee weg.",
+    "removeWalletsConfirm": "Verwijder portemonnees",
+    "removeWalletsFailed": "Sommige portemonnees konden niet worden verwijderd. Probeer het opnieuw."
   },
   "PeopleScreen": {
     "title": "Mensen",

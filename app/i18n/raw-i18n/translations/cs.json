@@ -80,7 +80,12 @@
     "skip": "Přeskočit",
     "unlock": "Odemknout",
     "usePin": "Použít PIN",
-    "confirmLogout": "Opravdu se chcete odhlásit? Tím se resetuje mezipaměť a všechna místní uživatelská nastavení"
+    "confirmLogout": "Opravdu se chcete odhlásit? Tím se resetuje mezipaměť a všechna místní uživatelská nastavení",
+    "forgotPin": "Zapomněli jste PIN? Odstraňte peněženky",
+    "removeWalletsTitle": "Odstranit peněženky z tohoto zařízení?",
+    "removeWalletsBody": "Tím se odstraní všechny peněženky z tohoto zařízení a budete odhlášeni. K obnovení peněženky potřebujete její záložní frázi. Bez ní je peněženka ztracena.",
+    "removeWalletsConfirm": "Odstranit peněženky",
+    "removeWalletsFailed": "Některé peněženky se nepodařilo odstranit. Zkuste to prosím znovu."
   },
   "PeopleScreen": {
     "title": "Lidé",

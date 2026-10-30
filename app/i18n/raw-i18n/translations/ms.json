@@ -80,7 +80,12 @@
     "skip": "Langkau",
     "unlock": "Buka",
     "usePin": "Gunakan PIN",
-    "confirmLogout": "Adakah anda pasti mahu log keluar? Ini akan menetapkan semula cache dan semua tetapan pengguna tempatan anda"
+    "confirmLogout": "Adakah anda pasti mahu log keluar? Ini akan menetapkan semula cache dan semua tetapan pengguna tempatan anda",
+    "forgotPin": "Lupa PIN? Alih keluar dompet",
+    "removeWalletsTitle": "Alih keluar dompet daripada peranti ini?",
+    "removeWalletsBody": "Ini mengalih keluar semua dompet daripada peranti ini dan log keluar anda. Untuk mendapatkan semula dompet, anda memerlukan frasa pemulihannya. Tanpanya, dompet itu hilang.",
+    "removeWalletsConfirm": "Alih keluar dompet",
+    "removeWalletsFailed": "Sesetengah dompet tidak dapat dialih keluar. Sila cuba lagi."
   },
   "PeopleScreen": {
     "title": "Kenalan",

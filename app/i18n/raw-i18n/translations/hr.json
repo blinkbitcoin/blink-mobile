@@ -80,7 +80,12 @@
     "skip": "Preskoči",
     "unlock": "Otključaj",
     "usePin": "Koristi PIN",
-    "confirmLogout": "Jeste li sigurni da se želite odjaviti? Ovo će resetirati vašu predmemoriju i sve lokalne korisničke postavke"
+    "confirmLogout": "Jeste li sigurni da se želite odjaviti? Ovo će resetirati vašu predmemoriju i sve lokalne korisničke postavke",
+    "forgotPin": "Zaboravili ste PIN? Uklonite novčanike",
+    "removeWalletsTitle": "Ukloniti novčanike s ovog uređaja?",
+    "removeWalletsBody": "Ovo uklanja sve novčanike s ovog uređaja i odjavljuje vas. Da biste vratili novčanik, trebate njegovu sigurnosnu frazu. Bez nje novčanik je izgubljen.",
+    "removeWalletsConfirm": "Ukloni novčanike",
+    "removeWalletsFailed": "Neke novčanike nije bilo moguće ukloniti. Pokušajte ponovno."
   },
   "PeopleScreen": {
     "title": "Ljudi",
