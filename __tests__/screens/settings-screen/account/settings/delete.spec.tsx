@@ -92,6 +92,7 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       common: {
         cancel: () => "Cancel",
+        confirm: () => "Confirm",
         error: () => "Error",
         ok: () => "OK",
         warning: () => "Warning",
