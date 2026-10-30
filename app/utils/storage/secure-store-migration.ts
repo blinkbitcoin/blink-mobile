@@ -450,12 +450,9 @@ export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => 
  * the slot is unmigrated by definition, so its legacy copy is still readable
  * under the protection class it has today.
  */
-export const existsThrough = async (
-  args: ReadThroughArgs,
-  timeoutMs?: number,
-): Promise<SecureExists> => {
+export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent), timeoutMs)
+    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent))
   } catch (err) {
     return { status: "failed", err }
   }
@@ -517,20 +514,16 @@ export const purgeThrough = async (
   args: ReadThroughArgs,
   { requireMigrated }: PurgeThroughOptions,
 ): Promise<SlotPurge> => {
-  // Probed rather than read. The probe still migrates when the value is only in
-  // the legacy store, which is the last chance this slot gets before its legacy
-  // copy is gone, but a slot the sweep already moved answers from the new store
-  // without its value leaving the keychain — the reason sweepMnemonicMigration
-  // probes rather than reads.
+  // One turn, one budget and one legacy read per slot. A probe in a turn of its
+  // own ahead of this one held the slot twice, so the lock screen could wait
+  // behind two budgets on `PIN`, and read an unmigrated seed twice.
   //
-  // A seed does enter memory below, where the erase or the done-flag needs proof
+  // A seed does enter memory here, where the erase or the done-flag needs proof
   // that the value survived the move. That read is the price of not deleting the
   // last readable copy, and it is paid on every launch until this slot is proven
   // gone, not on every launch the purge runs: the caller remembers a slot that
   // reached `gone` and never names it again (see purgeLegacyKeyStore), so a slot
   // that keeps the pass short of done costs its own re-proof and nobody else's.
-  await existsThrough(args, PURGE_SLOT_TIMEOUT_MS)
-
   try {
     return await onSlot(
       args.slot,
@@ -597,9 +590,33 @@ export const purgeThrough = async (
         // that erases, rather than on every launch for every account.
         const migrated = await secureRead(args.slot)
 
-        // `absent` means the migrating write failed and `failed` means the store
-        // could not say. Both keep the legacy copy, and both clear themselves.
-        if (migrated.status !== "found") return "transient"
+        if (migrated.status !== "found") {
+          // `absent` is a slot nothing has migrated yet, and this is its last
+          // chance to move before its legacy copy goes. `failed` on a seed is the
+          // Android entry whose Keystore key went bad: it never clears itself, and
+          // the release that drops the legacy library would take the only readable
+          // copy with it. Rewriting it from the legacy value is the one repair, and
+          // this is the one moment that holds both the good value and the proof the
+          // new copy is bad.
+          //
+          // Only the seed is rewritten over a failed read. Its value never changes,
+          // since every wallet gets a new account id, so the legacy copy is the same
+          // value. A session slot's legacy copy can be older than the new one, such
+          // as a token rotated since it moved, and a failed read there clears itself.
+          const mayRewrite = migrated.status === "absent" || requireMigrated
+          if (!mayRewrite) return "transient"
+
+          const copy = await copyLegacyValue(args, legacy.value, isCurrent)
+          if (copy !== "written") return "transient"
+
+          // A write that resolved is not the proof: on Android the entry can land
+          // under a key that still will not decrypt it. The erase below waits for
+          // a read that returns the value.
+          const rewritten = await secureRead(args.slot)
+          const isReadable =
+            rewritten.status === "found" && rewritten.value === legacy.value
+          if (!isReadable) return "transient"
+        }
 
         // The queue handed this slot to someone else while it was held, so the
         // proof above describes a state that may already have moved on.

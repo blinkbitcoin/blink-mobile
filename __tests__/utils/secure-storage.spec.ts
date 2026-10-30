@@ -2746,8 +2746,8 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
       if (value === undefined) return false
       return { username: slot, password: value }
     })
-    // The purge probes rather than reads, so this is the call that answers for
-    // the new store on an already-migrated slot — see purgeThrough.
+    // The purge probes a seed the legacy store does not hold before it reads it,
+    // so this is the call that answers for the new store there — see purgeThrough.
     mockHasInternet.mockImplementation(async ({ server }: { server: string }) => {
       const slot = server.replace("secure-store.blink.local/", "")
       return stores.migrated.has(slot)
@@ -2781,27 +2781,91 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
   })
 
   /**
-   * On Android `hasInternetCredentials` resolves true for an entry that exists
-   * without decrypting it, so a Keystore key invalidated by a lock-screen change
-   * answers yes for a value nothing can read. Erasing the legacy copy on that
-   * answer destroys the last readable seed, so the proof before an erase has to be
-   * a read that returns the value.
+   * A seed the new store holds under a Keystore key that went bad. Nothing
+   * clears that on its own, and the release that drops the legacy library would
+   * take the only readable copy with it, so the purge rewrites the seed from the
+   * legacy value and erases only once the new store returns it.
    */
-  it("keeps the legacy copy when the new store has an entry it cannot decrypt", async () => {
-    stores.migrated.set("mnemonicAccounts", "alice")
-    stores.migrated.set("mnemonic:alice", "alpha beta")
-    stores.legacy.set("mnemonic:alice", "alpha beta")
-    mockGetInternet.mockImplementation(async (server: string) => {
-      const slot = server.replace("secure-store.blink.local/", "")
-      if (slot === "mnemonic:alice") throw new Error("key permanently invalidated")
-      const value = stores.migrated.get(slot)
-      return value === undefined ? false : { username: slot, password: value }
+  describe("a seed the new store cannot decrypt", () => {
+    /** Unreadable until something writes the slot again, the way a key the
+     *  write regenerates behaves. */
+    const failReadsUntilRewritten = (slotToFail: string) => {
+      let isRewritten = false
+      mockSetInternet.mockImplementation(
+        async (server: string, slot: string, value: string) => {
+          if (slot === slotToFail) isRewritten = true
+          stores.migrated.set(slot, value)
+          return { service: server }
+        },
+      )
+      mockGetInternet.mockImplementation(async (server: string) => {
+        const slot = server.replace("secure-store.blink.local/", "")
+        if (slot === slotToFail && !isRewritten) {
+          throw new Error("key permanently invalidated")
+        }
+        const value = stores.migrated.get(slot)
+        return value === undefined ? false : { username: slot, password: value }
+      })
+    }
+
+    beforeEach(() => {
+      stores.migrated.set("mnemonicAccounts", "alice")
+      stores.migrated.set("mnemonic:alice", "alpha beta")
+      stores.legacy.set("mnemonic:alice", "alpha beta")
     })
 
-    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+    it("rewrites it from the legacy copy and then erases that copy", async () => {
+      failReadsUntilRewritten("mnemonic:alice")
 
-    expect(purged.outcome).toBe("transient")
-    expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+      expect(purged.outcome).toBe("gone")
+      expect(mockSetInternet).toHaveBeenCalledWith(
+        serverFor("mnemonic:alice"),
+        "mnemonic:alice",
+        "alpha beta",
+        { accessible: MNEMONIC_ACCESSIBLE },
+      )
+      expect(stores.migrated.get("mnemonic:alice")).toBe("alpha beta")
+      expect(stores.legacy.has("mnemonic:alice")).toBe(false)
+    })
+
+    /**
+     * A write that resolved is not the proof: the entry can land under a key that
+     * still will not decrypt it. Erasing on the write would destroy the last
+     * readable seed, so the legacy copy waits for a read that returns the value.
+     */
+    it("keeps the legacy copy when the rewrite still cannot be read back", async () => {
+      mockGetInternet.mockImplementation(async (server: string) => {
+        const slot = server.replace("secure-store.blink.local/", "")
+        if (slot === "mnemonic:alice") throw new Error("key permanently invalidated")
+        const value = stores.migrated.get(slot)
+        return value === undefined ? false : { username: slot, password: value }
+      })
+
+      const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+      expect(purged.outcome).toBe("transient")
+      expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+    })
+
+    it("keeps the legacy copy for the next launch when the rewrite fails", async () => {
+      failReadsUntilRewritten("mnemonic:alice")
+      mockSetInternet.mockResolvedValueOnce(false)
+
+      const first = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+      expect(first.outcome).toBe("transient")
+      expect(stores.legacy.get("mnemonic:alice")).toBe("alpha beta")
+
+      const second = await KeyStoreWrapper.purgeLegacyKeyStore(
+        ["alice"],
+        first.purgedSlots,
+      )
+
+      expect(second.outcome).toBe("gone")
+      expect(stores.legacy.has("mnemonic:alice")).toBe(false)
+    })
   })
 
   it("moves a value to the new store before erasing it", async () => {
@@ -2810,6 +2874,20 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
 
     expect(stores.migrated.get("mnemonic:alice")).toBe("alpha beta")
+  })
+
+  /**
+   * One turn per slot: a probe in a turn of its own ahead of the purge migrated
+   * the seed there and the purge then read it out of the legacy store again.
+   */
+  it("reads an unmigrated seed out of the legacy store once", async () => {
+    stores.legacy.set("mnemonic:alice", "alpha beta")
+
+    const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
+
+    expect(purged.outcome).toBe("gone")
+    const legacySeedReads = mockGet.mock.calls.filter(([key]) => key === "mnemonic:alice")
+    expect(legacySeedReads).toHaveLength(1)
   })
 
   it("counts a key that was never there as gone", async () => {
@@ -2838,19 +2916,25 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
    * Scoped to the one slot on purpose. A blanket rejection also takes the
    * tracked-list read, which returns before any slot is looked at, so the
    * assertions would hold without the erase path ever running.
+   *
+   * Not rewritten either, unlike a seed: a session slot's legacy copy can be older
+   * than the value the new store holds, and a read that failed clears itself.
    */
   it("keeps the legacy copy when the new store cannot be read back", async () => {
     stores.legacy.set("PIN", "1234")
-    mockHasInternet.mockImplementation(async ({ server }: { server: string }) => {
+    stores.migrated.set("PIN", "5678")
+    mockGetInternet.mockImplementation(async (server: string) => {
       const slot = server.replace("secure-store.blink.local/", "")
       if (slot === "PIN") throw new Error("keychain unavailable")
-      return stores.migrated.has(slot)
+      const value = stores.migrated.get(slot)
+      return value === undefined ? false : { username: slot, password: value }
     })
 
     const purged = await KeyStoreWrapper.purgeLegacyKeyStore([], [])
 
     expect(purged.outcome).toBe("transient")
     expect(stores.legacy.get("PIN")).toBe("1234")
+    expect(stores.migrated.get("PIN")).toBe("5678")
     expect(mockRemove).not.toHaveBeenCalledWith("PIN")
   })
 
@@ -3230,9 +3314,8 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     stores.legacy.set("PIN", "1234")
     stores.migrated.set("PIN", "1234")
 
-    // The verify is the read inside the queued task. The probe ahead of it answers
-    // from the new store without reading, so this is the only read of the slot, and
-    // it is the one that may be left holding a stale slot.
+    // The verify is the only new-store read of the slot, so it is the one that may
+    // be left holding a stale slot.
     let releaseHungVerify: () => void = () => {}
     mockGetInternet.mockImplementation(async (server: string) => {
       const slot = server.replace("secure-store.blink.local/", "")
