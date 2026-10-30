@@ -403,9 +403,10 @@ const describeProbeFailure = (err: unknown): string => {
  * Every account id the index names, and how many of its items name none.
  *
  * Not readIndex's list, which leaves out an entry it cannot read as an account. One that
- * is damaged but still carries an id is named all the same, since a seed may stand behind
- * it that nothing but the sweep would ever move or record, and the purge reaches its
- * legacy copy through the same name. An item with no id is something nothing can name.
+ * is damaged but still carries an id is named all the same: the sweep records its
+ * mnemonic for the reinstall wipe and the purge erases its legacy copy, and both must
+ * reach the same accounts, or the purge would erase a copy the wipe cannot name. Only an
+ * item with no id is something neither can name.
  */
 type IndexNames =
   | {
@@ -434,8 +435,11 @@ const readIndexNames = async (): Promise<IndexNames> => {
  *
  * Every id the index holds, a damaged entry's included, rather than the accounts a
  * screen can list: an entry that does not read as an account still stands for a seed,
- * and nothing else would ever move or record it. An item that carries no id counts as
- * an account the sweep could not reach, so it never reports itself finished over one.
+ * and nothing else would ever move or record it. They are also the ids the purge erases
+ * legacy copies for, so an id the purge reaches is one this has recorded for the
+ * reinstall wipe, or one it reports as incomplete, which holds the purge's done flag
+ * until a later launch records it. An item that carries no id counts as an account the
+ * sweep could not reach, so it never reports itself finished over one.
  *
  * The read-through alone moves a value when something reads it, so an account
  * left untouched between this release and the one that drops the legacy store
