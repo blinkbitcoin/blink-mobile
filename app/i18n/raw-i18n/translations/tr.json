@@ -2751,7 +2751,7 @@
       "tooLong": "Adres en fazla 50 karakter uzunluğunda olabilir",
       "invalidCharacter": "Adres yalnızca harf, sayı ve alttan çizgi içerebilir",
       "addressUnavailable": "Üzgünüm, bu adres çoktan alındı",
-      "serverUnreachable": "Adres sunucusuna ulaşılamadı. Adresiniz hâlâ boşta — birazdan tekrar deneyin.",
+      "serverUnreachable": "Adres sunucusuna ulaşılamadı. Birazdan tekrar deneyin.",
       "unknownError": "Bilinmeyen bir hata yaşandı, lütfen daha sonra tekrar deneyin",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

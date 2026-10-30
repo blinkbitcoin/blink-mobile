@@ -2751,7 +2751,7 @@
       "tooLong": "Հասցեն պետք է ունենա առնվազն 50 նիշ",
       "invalidCharacter": "րՀասցեն կարող է ունենալ միայն նամակներ, թվեր, և ստորագծեր",
       "addressUnavailable": "Ներողություն, այս հասցեն արդեն կիրառվում է",
-      "serverUnreachable": "Հասցեների սերվերը հասանելի չէ։ Ձեր հասցեն դեռ ազատ է — փորձեք մի պահից նորից։",
+      "serverUnreachable": "Հասցեների սերվերը հասանելի չէ։ Փորձեք մի պահից նորից։",
       "unknownError": "Անհայտ սխալ։ Խնդրում ենք կրկին փորձել ավելի ուշ",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

@@ -2751,7 +2751,7 @@
       "tooLong": "Adres kan nie meer as 50 karakters lank wees nie",
       "invalidCharacter": "Adres kan net letters, nommers en 'n onderstreep bevat",
       "addressUnavailable": "Jammer, die adres is reeds geneem",
-      "serverUnreachable": "Kon nie die adresbediener bereik nie. Jou adres is steeds beskikbaar — probeer oor 'n oomblik weer.",
+      "serverUnreachable": "Kon nie die adresbediener bereik nie. Probeer oor 'n oomblik weer.",
       "unknownError": "'n Onbekende fout het voorgekom, probeer asseblief later weer",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

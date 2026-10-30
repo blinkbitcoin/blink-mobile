@@ -2751,7 +2751,7 @@
       "tooLong": "Alamat harus memiliki maksimal 50 karakter",
       "invalidCharacter": "Alamat hanya boleh berisi huruf, angka, dan garis bawah",
       "addressUnavailable": "Maaf, alamat ini sudah digunakan",
-      "serverUnreachable": "Tidak dapat menghubungi server alamat. Alamat Anda masih tersedia — coba lagi sebentar.",
+      "serverUnreachable": "Tidak dapat menghubungi server alamat. Coba lagi sebentar.",
       "unknownError": "Terjadi kesalahan yang tidak diketahui, silakan coba lagi nanti",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

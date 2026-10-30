@@ -2751,7 +2751,7 @@
       "tooLong": "Adresa môže mať maximálne 50 znakov",
       "invalidCharacter": "Adresa môže obsahovať iba písmená, číslice a podčiarkovníky.",
       "addressUnavailable": "Táto adresa je už obsadená",
-      "serverUnreachable": "Nepodarilo sa spojiť so serverom adries. Vaša adresa je stále voľná – skúste to o chvíľu znova.",
+      "serverUnreachable": "Nepodarilo sa spojiť so serverom adries. Skúste to o chvíľu znova.",
       "unknownError": "Došlo k neznámej chybe, skúste to prosím neskôr",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

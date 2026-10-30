@@ -2751,7 +2751,7 @@
       "tooLong": "Panjang alamat maksimum adalah 50 aksara",
       "invalidCharacter": "Alamat hanya boleh mengandungi huruf, nombor dan underscores sahaja",
       "addressUnavailable": "Maaf, alamat ini sudah ada pemiliknya ",
-      "serverUnreachable": "Tidak dapat menghubungi pelayan alamat. Alamat anda masih tersedia — cuba lagi sebentar.",
+      "serverUnreachable": "Tidak dapat menghubungi pelayan alamat. Cuba lagi sebentar.",
       "unknownError": "Ada masalah yang belum dikenal pasti berlaku, sila cuba lagi sekali.",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

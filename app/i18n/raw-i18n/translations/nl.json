@@ -2751,7 +2751,7 @@
       "tooLong": "Het adres mag maximaal 50 tekens lang zijn",
       "invalidCharacter": "Adres mag alleen letters, cijfers en onderstrepingstekens bevatten",
       "addressUnavailable": "Sorry, dit adres is al in gebruik",
-      "serverUnreachable": "Kon de adresserver niet bereiken. Je adres is nog vrij — probeer het zo opnieuw.",
+      "serverUnreachable": "Kon de adresserver niet bereiken. Probeer het zo opnieuw.",
       "unknownError": "Er is een onbekende fout opgetreden. Probeer het later opnieuw",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

@@ -9107,7 +9107,7 @@ type RootTranslation = {
 			 */
 			addressUnavailable: string
 			/**
-			 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​a​d​d​r​e​s​s​ ​s​e​r​v​e​r​.​ ​Y​o​u​r​ ​a​d​d​r​e​s​s​ ​i​s​ ​s​t​i​l​l​ ​f​r​e​e​ ​—​ ​t​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
+			 * C​o​u​l​d​n​'​t​ ​r​e​a​c​h​ ​t​h​e​ ​a​d​d​r​e​s​s​ ​s​e​r​v​e​r​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​ ​m​o​m​e​n​t​.
 			 */
 			serverUnreachable: string
 			/**
@@ -23307,7 +23307,7 @@ export type TranslationFunctions = {
 			 */
 			addressUnavailable: () => LocalizedString
 			/**
-			 * Couldn't reach the address server. Your address is still free — try again in a moment.
+			 * Couldn't reach the address server. Try again in a moment.
 			 */
 			serverUnreachable: () => LocalizedString
 			/**

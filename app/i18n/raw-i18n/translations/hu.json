@@ -2751,7 +2751,7 @@
       "tooLong": "A cím legfeljebb 50 karakter hosszú lehet",
       "invalidCharacter": "A cím csak betűket, számokat és aláhúzásjeleket tartalmazhat",
       "addressUnavailable": "Sajnáljuk, ez a cím már foglalt",
-      "serverUnreachable": "Nem sikerült elérni a címszervert. A címed továbbra is szabad – próbáld újra egy pillanat múlva.",
+      "serverUnreachable": "Nem sikerült elérni a címszervert. Próbáld újra egy pillanat múlva.",
       "unknownError": "Ismeretlen hiba történt, kérjük, próbálja újra később",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

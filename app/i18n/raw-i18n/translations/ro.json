@@ -2751,7 +2751,7 @@
       "tooLong": "Adresa poate să aibă cel mult 50 de caractere",
       "invalidCharacter": "Adresa poate conține doar litere, cifre și caractere de subliniere",
       "addressUnavailable": "Ne pare rău, această adresă este deja luată",
-      "serverUnreachable": "Serverul de adrese nu a putut fi contactat. Adresa ta este în continuare liberă — încearcă din nou într-o clipă.",
+      "serverUnreachable": "Serverul de adrese nu a putut fi contactat. Încearcă din nou într-o clipă.",
       "unknownError": "A apărut o eroare necunoscută, încercați din nou mai târziu",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

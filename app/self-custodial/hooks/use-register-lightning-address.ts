@@ -65,9 +65,10 @@ export const useRegisterLightningAddress = (
       } catch (err) {
         /**
          * A server that did not answer is not a name that is taken, and not an unknown
-         * fault either. Collapsing it into UNKNOWN_ERROR told the user to "try again
-         * later" with no hint that their chosen address is still free, which is the one
-         * thing they want to know before going off to pick another.
+         * fault either, so it gets its own message. That message says only to retry,
+         * not that the name is still free: the failure may have come before the
+         * availability check, or after the server took the registration and before
+         * its answer arrived, and in neither case is that known.
          */
         setError(
           classifySdkError(err) === SelfCustodialErrorCode.NetworkError

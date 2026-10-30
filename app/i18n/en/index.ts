@@ -2883,8 +2883,7 @@ const en: BaseTranslation = {
       tooLong: "Address must be at most 50 characters long",
       invalidCharacter: "Address can only contain letters, numbers, and underscores",
       addressUnavailable: "Sorry, this address is already taken",
-      serverUnreachable:
-        "Couldn't reach the address server. Your address is still free — try again in a moment.",
+      serverUnreachable: "Couldn't reach the address server. Try again in a moment.",
       unknownError: "An unknown error occurred, please try again later",
       backupRequired: "Back up your wallet before creating a Lightning address",
     },

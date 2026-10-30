@@ -2751,7 +2751,7 @@
       "tooLong": "Endagiriro eteekwa ennyo okuba n'ennukuta 50",
       "invalidCharacter": "Endagiriro esobola okubaamu ennukuta, ennamba, n'okuggumiza",
       "addressUnavailable": "Tusonyiwe, eno endagiriro yatwaliddwa dda",
-      "serverUnreachable": "Tetusobodde kutuuka ku sevva y'endagiriro. Endagiriro yo ekyali nnamba — ddamu ogezeeko mu kaseera katono.",
+      "serverUnreachable": "Tetusobodde kutuuka ku sevva y'endagiriro. Ddamu ogezeeko mu kaseera katono.",
       "unknownError": "Ensobi etamanyiddwa etuseewo, tukusaba okugezaako nate oluvannyuma",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

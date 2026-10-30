@@ -2751,7 +2751,7 @@
       "tooLong": "Adressen må maksimalt være 50 tegn lang",
       "invalidCharacter": "Adressen kan kun indeholde bogstaver, tal og understregninger",
       "addressUnavailable": "Beklager, denne adresse er allerede taget",
-      "serverUnreachable": "Kunne ikke nå adresseserveren. Din adresse er stadig ledig – prøv igen om lidt.",
+      "serverUnreachable": "Kunne ikke nå adresseserveren. Prøv igen om lidt.",
       "unknownError": "Der opstod en ukendt fejl, prøv igen senere",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

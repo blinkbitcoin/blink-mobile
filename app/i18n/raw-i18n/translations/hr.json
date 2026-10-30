@@ -2751,7 +2751,7 @@
       "tooLong": "Adresa mora imati najviše 50 znakova",
       "invalidCharacter": "Adresa može sadržavati samo slova, brojke i donje crte",
       "addressUnavailable": "Nažalost, ova adresa je već zauzeta",
-      "serverUnreachable": "Poslužitelj adresa nije dostupan. Vaša adresa je i dalje slobodna — pokušajte ponovno za trenutak.",
+      "serverUnreachable": "Poslužitelj adresa nije dostupan. Pokušajte ponovno za trenutak.",
       "unknownError": "Došlo je do nepoznate pogreške, molimo pokušajte ponovno kasnije",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },

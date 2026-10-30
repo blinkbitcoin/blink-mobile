@@ -2751,7 +2751,7 @@
             "tooLong": "L'indirizzo deve essere lungo al massimo 50 caratteri",
             "invalidCharacter": "L'indirizzo può contenere solo lettere, numeri e caratteri di sottolineatura",
             "addressUnavailable": "Spiacenti, questo indirizzo è già stato preso",
-            "serverUnreachable": "Impossibile raggiungere il server degli indirizzi. Il tuo indirizzo è ancora libero: riprova tra un momento.",
+            "serverUnreachable": "Impossibile raggiungere il server degli indirizzi. Riprova tra un momento.",
             "unknownError": "Si è verificato un errore sconosciuto, riprova più tardi",
             "backupRequired": "Back up your wallet before creating a Lightning address"
         },
