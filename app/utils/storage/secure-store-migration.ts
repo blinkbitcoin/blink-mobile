@@ -266,6 +266,35 @@ const recordBeforeMigrate = async (args: ReadThroughArgs): Promise<void> => {
   }
 }
 
+/** What copying a legacy value into the new store came to. `abandoned` means the
+ *  slot changed hands before the write, so nothing was written. */
+type LegacyCopy = "written" | "failed" | "abandoned"
+
+/**
+ * The write half of a migration, shared by the read-through and the purge: count
+ * the legacy hit, record the slot's name, then write the value under the slot's
+ * own protection class.
+ *
+ * The caller has already read both stores, so the slot may have changed hands
+ * while they answered. Everything before this only reads; everything in it writes.
+ */
+const copyLegacyValue = async (
+  args: ReadThroughArgs,
+  value: string,
+  isCurrent: IsCurrent,
+): Promise<LegacyCopy> => {
+  if (!isCurrent()) return "abandoned"
+
+  logLegacyHit(args.legacyKey)
+
+  await recordBeforeMigrate(args)
+  // Recording is an await too, so the slot may have changed hands during it.
+  if (!isCurrent()) return "abandoned"
+
+  const written = await secureWrite(args.slot, value, args.accessible)
+  return written ? "written" : "failed"
+}
+
 const runRead = async (
   args: ReadThroughArgs,
   isCurrent: IsCurrent,
@@ -291,25 +320,18 @@ const runRead = async (
   // scoring the first as absent is what deletes credentials downstream.
   if (legacy.status === "failed") return legacy
 
-  // Both stores have answered, so the slot may have changed hands while they
-  // did. Everything above this line only reads; everything below it writes.
-  if (!isCurrent()) return abandoned(args.slot)
-
-  logLegacyHit(args.legacyKey)
-
-  await recordBeforeMigrate(args)
-  // Recording is an await too, so the slot may have changed hands during it.
-  if (!isCurrent()) return abandoned(args.slot)
-
   // A failed write leaves the legacy copy intact and retries on the next read:
   // migration bookkeeping must never cost availability, so the erase outcome is
   // reported inside `eraseLegacyCopy` and never changes what the caller gets.
-  const written = await secureWrite(args.slot, legacy.value, args.accessible)
+  const copy = await copyLegacyValue(args, legacy.value, isCurrent)
+  if (copy === "abandoned") return abandoned(args.slot)
+
   // Re-checked because the write is itself an await: a slot handed over while
   // it was in flight leaves this erase as the one side effect still ahead. An
   // unerased legacy copy is the harmless outcome — the new store answers first,
   // so it stays unreachable, and the next `removeThrough` clears it.
-  const shouldEraseLegacy = written && args.deleteLegacyOnMigrate && isCurrent()
+  const shouldEraseLegacy =
+    copy === "written" && args.deleteLegacyOnMigrate && isCurrent()
   if (shouldEraseLegacy) await eraseLegacyCopy(args.legacyKey)
 
   return legacy
