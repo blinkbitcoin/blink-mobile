@@ -31,6 +31,8 @@
     "createError": "API ključ nije moguće stvoriti. Pokušajte ponovno.",
     "revokeError": "API ključ nije moguće opozvati. Pokušajte ponovno.",
     "loadError": "Vaše API ključeve nije moguće učitati. Pokušajte kasnije.",
+    "discardSecretTitle": "Odbaciti ovaj API ključ?",
+    "discardSecretBody": "Ovo je jedini put da se tajna prikazuje. Ako sada odete, ključ se neće moći vratiti i morat ćete stvoriti novi.",
     "done": "Gotovo"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Ako se problem nastavi, obratite se podršci.",
     "fatalError": "Nažalost, čini se da imamo problema s učitavanjem podataka aplikacije. Ako problemi potraju, kontaktirajte podršku.",
     "showError": "Prikaži pogrešku",
-    "clearAppData": "Izbrišite podatke aplikacije i odjavite se"
+    "clearAppData": "Izbrišite podatke aplikacije i odjavite se",
+    "screenSecurityUnavailable": "Ovaj zaslon ostaje skriven jer nije bilo moguće uključiti zaštitu od snimki zaslona."
   },
   "notifications": {
     "payment": {

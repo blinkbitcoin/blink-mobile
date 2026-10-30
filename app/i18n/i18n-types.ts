@@ -7954,6 +7954,14 @@ type RootTranslation = {
 		 */
 		loadError: string
 		/**
+		 * D​i​s​c​a​r​d​ ​t​h​i​s​ ​A​P​I​ ​k​e​y​?
+		 */
+		discardSecretTitle: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​o​n​l​y​ ​t​i​m​e​ ​t​h​e​ ​s​e​c​r​e​t​ ​i​s​ ​s​h​o​w​n​.​ ​I​f​ ​y​o​u​ ​l​e​a​v​e​ ​n​o​w​,​ ​t​h​e​ ​k​e​y​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​a​n​d​ ​y​o​u​ ​w​i​l​l​ ​n​e​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​a​ ​n​e​w​ ​o​n​e​.
+		 */
+		discardSecretBody: string
+		/**
 		 * D​o​n​e
 		 */
 		done: string
@@ -10126,6 +10134,10 @@ type RootTranslation = {
 		 * C​l​e​a​r​ ​A​p​p​ ​D​a​t​a​ ​a​n​d​ ​L​o​g​o​u​t
 		 */
 		clearAppData: string
+		/**
+		 * T​h​i​s​ ​s​c​r​e​e​n​ ​s​t​a​y​s​ ​h​i​d​d​e​n​ ​b​e​c​a​u​s​e​ ​s​c​r​e​e​n​s​h​o​t​ ​p​r​o​t​e​c​t​i​o​n​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​t​u​r​n​e​d​ ​o​n​.
+		 */
+		screenSecurityUnavailable: string
 	}
 	notifications: {
 		payment: {
@@ -22108,6 +22120,14 @@ export type TranslationFunctions = {
 		 */
 		loadError: () => LocalizedString
 		/**
+		 * Discard this API key?
+		 */
+		discardSecretTitle: () => LocalizedString
+		/**
+		 * This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.
+		 */
+		discardSecretBody: () => LocalizedString
+		/**
 		 * Done
 		 */
 		done: () => LocalizedString
@@ -24236,6 +24256,10 @@ export type TranslationFunctions = {
 		 * Clear App Data and Logout
 		 */
 		clearAppData: () => LocalizedString
+		/**
+		 * This screen stays hidden because screenshot protection could not be turned on.
+		 */
+		screenSecurityUnavailable: () => LocalizedString
 	}
 	notifications: {
 		payment: {

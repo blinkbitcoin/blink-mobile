@@ -31,6 +31,8 @@
     "createError": "API anahtarı oluşturulamadı. Lütfen tekrar deneyin.",
     "revokeError": "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.",
     "loadError": "API anahtarlarınız yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+    "discardSecretTitle": "Bu API anahtarından vazgeçilsin mi?",
+    "discardSecretBody": "Gizli anahtar yalnızca bu bir kez gösterilir. Şimdi ayrılırsanız anahtar kurtarılamaz ve yenisini oluşturmanız gerekir.",
     "done": "Tamam"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Problem devam ederse destek birimine ulaşın",
     "fatalError": "Üzgünüz, uygulama verilerini yüklerken sorun yaşıyoruz gibi görünüyor. Sorunlar devam ederse lütfen destek ekibiyle iletişime geçin.",
     "showError": "Hatayı göster",
-    "clearAppData": "Uygulama Verilerini Temizleme ve Oturumu Kapatma"
+    "clearAppData": "Uygulama Verilerini Temizleme ve Oturumu Kapatma",
+    "screenSecurityUnavailable": "Ekran görüntüsü koruması açılamadığı için bu ekran gizli kalıyor."
   },
   "notifications": {
     "payment": {

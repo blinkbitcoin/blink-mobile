@@ -31,6 +31,8 @@
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
     "loadError": "No s'han pogut carregar les teves claus API. Torna-ho a provar més tard.",
+    "discardSecretTitle": "Descartar aquesta clau d'API?",
+    "discardSecretBody": "Aquesta és l'única vegada que es mostra el secret. Si surts ara, la clau no es podrà recuperar i hauràs de crear-ne una de nova.",
     "done": "Fet"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Si el problema continua contacta amb suport.",
     "fatalError": "Ho sentim, sembla que estem tenint problemes per carregar les dades de l'aplicació. Si els problemes persisteixen, poseu-vos en contacte amb el servei de suport.",
     "showError": "Mostra l'error",
-    "clearAppData": "Esborra les dades de l'aplicació i tanca la sessió"
+    "clearAppData": "Esborra les dades de l'aplicació i tanca la sessió",
+    "screenSecurityUnavailable": "Aquesta pantalla es manté oculta perquè no s'ha pogut activar la protecció contra captures de pantalla."
   },
   "notifications": {
     "payment": {

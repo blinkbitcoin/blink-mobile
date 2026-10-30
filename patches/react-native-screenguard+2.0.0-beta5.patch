@@ -1,0 +1,19 @@
+diff --git a/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java b/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java
+index 287dc26..4996b8f 100644
+--- a/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java
++++ b/node_modules/react-native-screenguard/android/src/main/java/com/screenguard/ScreenGuardModule.java
+@@ -303,7 +303,13 @@ public class ScreenGuardModule implements LifecycleEventListener {
+         Activity currentActivity = currentReactContext.getCurrentActivity();
+ 
+         if (currentActivity == null) {
+-            return;
++            /*
++             * Patched (blink-mobile): upstream returned here, so register() resolved
++             * without FLAG_SECURE ever being set. Rejecting lets the caller retry or
++             * keep its content hidden.
++             * Upstream: https://github.com/gbumps/react-native-screenguard/issues/133
++             */
++            throw new IllegalStateException("No current activity, FLAG_SECURE was not applied");
+         }
+         mainActivityRef = new WeakReference<>(currentActivity);
+ 

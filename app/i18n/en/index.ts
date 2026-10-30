@@ -2530,6 +2530,9 @@ const en: BaseTranslation = {
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",
     loadError: "Could not load your API keys. Please try again later.",
+    discardSecretTitle: "Discard this API key?",
+    discardSecretBody:
+      "This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.",
     done: "Done",
   },
   SettingsScreen: {
@@ -3179,6 +3182,8 @@ const en: BaseTranslation = {
       "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     showError: "Show Error",
     clearAppData: "Clear App Data and Logout",
+    screenSecurityUnavailable:
+      "This screen stays hidden because screenshot protection could not be turned on.",
   },
   notifications: {
     payment: {

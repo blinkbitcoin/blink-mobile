@@ -31,6 +31,8 @@
     "createError": "Tidak dapat mencipta kunci API. Sila cuba lagi.",
     "revokeError": "Tidak dapat membatalkan kunci API. Sila cuba lagi.",
     "loadError": "Tidak dapat memuatkan kunci API anda. Sila cuba lagi kemudian.",
+    "discardSecretTitle": "Buang kunci API ini?",
+    "discardSecretBody": "Ini satu-satunya kali rahsia ditunjukkan. Jika anda pergi sekarang, kunci tidak dapat dipulihkan dan anda perlu membuat yang baharu.",
     "done": "Selesai"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "Jika masalah tidak selesai, hubungi pasukan sokongan",
     "fatalError": "Maafkan kami, kami sedang hadapi masalah ketika menyediakan data aplikasi ini. Jika masalah belum selesai, sila hubungi pasukan sokongan.",
     "showError": "Pamerkan Masalah",
-    "clearAppData": "Padan Data Aplikasi dan Log Keluar"
+    "clearAppData": "Padan Data Aplikasi dan Log Keluar",
+    "screenSecurityUnavailable": "Skrin ini kekal tersembunyi kerana perlindungan tangkapan skrin tidak dapat dihidupkan."
   },
   "notifications": {
     "payment": {

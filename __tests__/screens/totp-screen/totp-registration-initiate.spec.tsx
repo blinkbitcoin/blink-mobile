@@ -52,13 +52,12 @@ jest.mock("@app/screens/totp-screen/hooks/use-totp-registration-flow", () => ({
   useTotpRegistrationFlow: () => ({ markStart: mockMarkStart }),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: unknown[]) => {
-    mockEnableScreenSecurity(...args)
-    return Promise.resolve()
+  acquireScreenSecurity: (...args: unknown[]) => {
+    mockAcquireScreenSecurity(...args)
+    return { ready: Promise.resolve(), release: () => Promise.resolve() }
   },
-  disableScreenSecurity: () => Promise.resolve(),
 }))
 
 const mockReportError = jest.fn()
@@ -143,7 +142,7 @@ describe("TotpRegistrationInitiateScreen", () => {
   it("keeps the key and its QR code out of screenshots, recordings and the app switcher", async () => {
     await renderScreen()
 
-    expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+    expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
   })
 
   it("encodes the account and the key in the QR code, under the instance's name", async () => {

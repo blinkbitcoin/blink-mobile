@@ -31,6 +31,8 @@
     "createError": "تعذّر إنشاء مفتاح API. يرجى المحاولة مرة أخرى.",
     "revokeError": "تعذّر إلغاء مفتاح API. يرجى المحاولة مرة أخرى.",
     "loadError": "تعذّر تحميل مفاتيح API الخاصة بك. يرجى المحاولة لاحقًا.",
+    "discardSecretTitle": "تجاهل مفتاح API هذا؟",
+    "discardSecretBody": "هذه هي المرة الوحيدة التي يُعرض فيها السر. إذا غادرت الآن، فلن تتمكن من استرداد المفتاح وستحتاج إلى إنشاء مفتاح جديد.",
     "done": "تم"
   },
   "GaloyAddressScreen": {
@@ -3033,7 +3035,8 @@
     "problemPersists": "تواصل مع مركز الدعم اذا استمرت المشكلة.",
     "fatalError": "نأسف على ما يبدو أننا نواجه مشكلات في تحميل بيانات التطبيق. إذا استمرت المشاكل يرجى الاتصال بالدعم.",
     "showError": "إظهار الخطأ",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "تبقى هذه الشاشة مخفية لأنه تعذّر تفعيل الحماية من لقطات الشاشة."
   },
   "notifications": {
     "payment": {
