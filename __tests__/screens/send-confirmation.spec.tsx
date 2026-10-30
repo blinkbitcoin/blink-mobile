@@ -663,7 +663,7 @@ describe("SendBitcoinConfirmationScreen", () => {
       expect(params.destination).toBe(taprootAddress)
     })
 
-    it("still shortens a long LNURL on the receipt", async () => {
+    it("passes an LNURL to the receipt in full, however long", async () => {
       const longLnurl = `lnurl1${"dp68gurn8ghj7mr".repeat(5)}`
       const { createLnurlPaymentDetails } = PaymentDetailsLightning
       const lnurlDetail = createLnurlPaymentDetails({
@@ -692,9 +692,41 @@ describe("SendBitcoinConfirmationScreen", () => {
       })
 
       const params = findCompletedRouteParams()
-      expect(params.destination).toBe(
-        `${longLnurl.slice(0, 13)}...${longLnurl.slice(-8)}`,
+      expect(params.destination).toBe(longLnurl)
+    })
+
+    it("still shortens a Lightning invoice on the receipt", async () => {
+      const invoice = `lnbc10u1p${"5qk3z7tpp5qk3z7t".repeat(5)}`
+      const invoiceDetail =
+        PaymentDetailsLightning.createAmountLightningPaymentDetails<WalletCurrency>({
+          paymentRequest: invoice,
+          paymentRequestAmount: toBtcMoneyAmount(1000),
+          convertMoneyAmount: convertMoneyAmountMock,
+          sendingWalletDescriptor: btcSendingWalletDescriptor,
+        })
+      const routeInvoice = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: invoiceDetail },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p" },
+      })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinConfirmationScreen route={routeInvoice} />
+        </ContextForScreen>,
       )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.destination).toBe(`${invoice.slice(0, 13)}...${invoice.slice(-8)}`)
     })
   })
 })

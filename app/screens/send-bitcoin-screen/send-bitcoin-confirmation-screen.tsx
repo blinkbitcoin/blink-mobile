@@ -240,11 +240,12 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
               satAmount,
               currencyFeeAmount,
               satFeeAmount,
-              // The receipt wraps a handle or an on-chain address in full; only
-              // invoices and LNURLs are long enough to need shortening.
+              // The receipt wraps a handle, an on-chain address or an LNURL in
+              // full; only invoices are long enough to need shortening.
               destination:
                 paymentDetail?.paymentType === "intraledger" ||
-                paymentDetail?.paymentType === "onchain"
+                paymentDetail?.paymentType === "onchain" ||
+                paymentDetail?.paymentType === "lnurl"
                   ? destination
                   : ellipsizeMiddle(destination, {
                       maxLength: 50,
