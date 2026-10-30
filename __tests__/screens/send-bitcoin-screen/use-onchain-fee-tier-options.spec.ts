@@ -417,6 +417,31 @@ describe("useOnchainFeeTierOptions", () => {
     expect(selfCustodialFailed.current.isFeeTierErrorBlocking).toBe(true)
   })
 
+  it("defers only the amount-too-low error until Next", () => {
+    const render = () =>
+      renderHook(() =>
+        useOnchainFeeTierOptions({
+          paymentDetail: buildOnchainDetail(),
+          isSelfCustodial: true,
+          paymentDestination: undefined,
+          convertMoneyAmount: undefined,
+        }),
+      ).result.current
+
+    mockFeeError = SdkFeeError.InvalidInput
+    expect(render().isFeeTierErrorDeferred).toBe(true)
+
+    for (const error of [
+      SdkFeeError.InsufficientFunds,
+      SdkFeeError.NetworkError,
+      SdkFeeError.Generic,
+      null,
+    ]) {
+      mockFeeError = error
+      expect(render().isFeeTierErrorDeferred).toBe(false)
+    }
+  })
+
   it("shows a custodial quote failure without blocking the send", () => {
     mockCustodialHasError = true
     const { result } = renderHook(() =>
@@ -430,6 +455,7 @@ describe("useOnchainFeeTierOptions", () => {
 
     expect(result.current.feeTierErrorMessage).toBe("Unable to calculate fee")
     expect(result.current.isFeeTierErrorBlocking).toBe(false)
+    expect(result.current.isFeeTierErrorDeferred).toBe(false)
   })
 
   it("ignores a self-custodial fee error while on a custodial account", () => {
