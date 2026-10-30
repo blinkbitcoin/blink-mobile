@@ -11,6 +11,7 @@ import { HideAmountContextProvider } from "@app/graphql/hide-amount-context"
 import * as PaymentDetails from "@app/screens/send-bitcoin-screen/payment-details/intraledger"
 import { ConvertMoneyAmount } from "@app/screens/send-bitcoin-screen/payment-details/index.types"
 import * as PaymentDetailsLightning from "@app/screens/send-bitcoin-screen/payment-details/lightning"
+import * as PaymentDetailsOnchain from "@app/screens/send-bitcoin-screen/payment-details/onchain"
 import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 import SendBitcoinConfirmationScreen from "@app/screens/send-bitcoin-screen/send-bitcoin-confirmation-screen"
@@ -524,7 +525,11 @@ describe("SendBitcoinConfirmationScreen", () => {
         const routes = action.payload?.routes ?? action.routes ?? []
         const completed = routes.find((r) => r.name === "sendBitcoinCompleted")
         if (completed)
-          return completed.params as { successAction?: unknown; note?: unknown }
+          return completed.params as {
+            successAction?: unknown
+            note?: unknown
+            destination?: unknown
+          }
       }
       throw new Error("sendBitcoinCompleted route was not dispatched")
     }
@@ -624,6 +629,72 @@ describe("SendBitcoinConfirmationScreen", () => {
 
       const params = findCompletedRouteParams()
       expect(params.note).toBe(memo)
+    })
+
+    it("passes an on-chain address to the receipt in full, however long", async () => {
+      const taprootAddress =
+        "bc1p5d7rjq7g6rdk2yhzks9smlaqtedr4dekq08ge8ztwac72sfr9rusxg3297"
+      const onchainDetail =
+        PaymentDetailsOnchain.createAmountOnchainPaymentDetails<WalletCurrency>({
+          address: taprootAddress,
+          destinationSpecifiedAmount: toBtcMoneyAmount(10000),
+          convertMoneyAmount: convertMoneyAmountMock,
+          sendingWalletDescriptor: btcSendingWalletDescriptor,
+        })
+      const routeOnchain = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: onchainDetail },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({ status: "SUCCESS" })
+
+      render(
+        <ContextForScreen>
+          <SendBitcoinConfirmationScreen route={routeOnchain} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.destination).toBe(taprootAddress)
+    })
+
+    it("still shortens a long LNURL on the receipt", async () => {
+      const longLnurl = `lnurl1${"dp68gurn8ghj7mr".repeat(5)}`
+      const { createLnurlPaymentDetails } = PaymentDetailsLightning
+      const lnurlDetail = createLnurlPaymentDetails({
+        ...defaultLightningParams,
+        lnurl: longLnurl,
+      })
+      const routeLnurl = {
+        key: "sendBitcoinConfirmationScreen",
+        name: "sendBitcoinConfirmation",
+        params: { paymentDetail: lnurlDetail },
+      } as const
+
+      sendPaymentMock.mockResolvedValueOnce({
+        status: "SUCCESS",
+        extraInfo: { preimage: "p" },
+      })
+
+      render(
+        <ContextForScreen>
+          <LightningLnURL route={routeLnurl} />
+        </ContextForScreen>,
+      )
+
+      await act(async () => {
+        fireEvent.press(screen.getByTestId("slider"))
+      })
+
+      const params = findCompletedRouteParams()
+      expect(params.destination).toBe(
+        `${longLnurl.slice(0, 13)}...${longLnurl.slice(-8)}`,
+      )
     })
   })
 })
