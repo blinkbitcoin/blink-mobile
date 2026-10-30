@@ -24,6 +24,11 @@ export type FeeRail = {
    * screen fetches again, so a transient failure must not strand the user.
    */
   isErrorBlocking: boolean
+  /**
+   * Held until the sender presses Next. Every amount reads too low on its way to the one
+   * being typed, so saying so per keystroke flags a number the sender has not finished.
+   */
+  isErrorDeferred: boolean
 }
 
 type FeeRailParams = {
@@ -56,7 +61,13 @@ export const useSelfCustodialFeeRail = ({
   const { tiers, error, hasQuote } = useOnchainFeeTiers(sdk ?? null, address, amountSats)
   const errorMessage = error ? resolveSdkErrorMessage(error, LL) : undefined
 
-  return { tiers, errorMessage, hasQuote, isErrorBlocking: Boolean(errorMessage) }
+  return {
+    tiers,
+    errorMessage,
+    hasQuote,
+    isErrorBlocking: Boolean(errorMessage),
+    isErrorDeferred: error === FeeError.InvalidInput,
+  }
 }
 
 export const useCustodialFeeRail = ({
@@ -83,6 +94,7 @@ export const useCustodialFeeRail = ({
     errorMessage: hasError ? LL.common.feeError() : undefined,
     hasQuote,
     isErrorBlocking: false,
+    isErrorDeferred: false,
     isQuoting,
   }
 }
