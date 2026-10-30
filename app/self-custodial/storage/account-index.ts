@@ -68,11 +68,12 @@ const toReadFailed = (err: unknown): StorageReadFailed => {
  * The two differ only when the index is damaged, and every write starts from the items. A
  * write that started from the accounts alone would store the index back without the
  * entries it could not read, and those entries are the only sign that a mnemonic stood
- * behind them: the sweep names each one that still carries an id, and the strict reader
- * the owed reinstall erase trusts refuses the index while one is there. One lightning
- * address stored from the accounts alone was enough to turn an index the erase refused
- * into a shorter one it trusts, and the seed of the entry left out went with the previous
- * owner's.
+ * behind them: the sweep and the purge name each one that still carries an id, the
+ * purge withholds its done flag over one that does not, and the strict reader the owed
+ * reinstall erase trusts refuses the index while one is there. One lightning address
+ * stored from the accounts alone was enough to turn an index the erase refused into a
+ * shorter one it trusts, and to let the purge call itself done over a seed it had never
+ * reached.
  */
 type StoredIndex =
   | {
@@ -272,8 +273,8 @@ export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
 
 /**
  * Drops every item naming the account, a damaged one included: the account's mnemonic is
- * erased with it, so an item left behind would only have the sweep name a seed that is
- * gone.
+ * erased with it, so an item left behind would only have the sweep and the purge name a
+ * seed that is gone.
  */
 export const removeSelfCustodialAccountId = async (id: string): Promise<void> => {
   const result = await readStoredIndex()
@@ -373,8 +374,8 @@ type PurgeResult =
   /** Every store answered and a mnemonic is not in the new one, which no later
    *  boot changes on its own. */
   | { status: "unmigrated" }
-  /** Every key the pass could name is gone, but the index has held an entry with no
-   *  id to name it by, so a mnemonic under it may never have been reached. */
+  /** Every key the pass could name is gone, but the index holds an entry with no id
+   *  to name it by, so a mnemonic under it may never have been reached. */
   | { status: "index-damaged" }
   | { status: "skipped"; reason: PurgeSkippedReason }
 
@@ -403,8 +404,8 @@ const describeProbeFailure = (err: unknown): string => {
  *
  * Not readIndex's list, which leaves out an entry it cannot read as an account. One that
  * is damaged but still carries an id is named all the same, since a seed may stand behind
- * it that nothing but the sweep would ever move or record. An item with no id is
- * something nothing can name.
+ * it that nothing but the sweep would ever move or record, and the purge reaches its
+ * legacy copy through the same name. An item with no id is something nothing can name.
  */
 type IndexNames =
   | {
@@ -534,7 +535,6 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
 const LEGACY_PURGE_DONE_KEY = "legacyKeyStorePurged"
 const LEGACY_PURGE_ATTEMPTS_KEY = "legacyKeyStorePurgeAttempts"
 const LEGACY_PURGE_SLOTS_KEY = "legacyKeyStorePurgedSlots"
-const LEGACY_PURGE_INDEX_DAMAGE_KEY = "legacyKeyStorePurgeIndexDamage"
 
 /**
  * How many launches may end `unmigrated` before the purge stops trying.
@@ -643,145 +643,6 @@ const readPurgeAttempts = async (): Promise<number> => {
 }
 
 /**
- * The account ids the purge names, and whether the index held anything it could not name,
- * from one read of the same key `readIndex` uses.
- *
- * Not readIndex's list. That read drops an entry it cannot read as an account, and the next
- * write to the index rewrites it from what is left, so a dropped account disappears from it
- * for good. Here an entry that is damaged but still carries an id is named all the same:
- * naming a mnemonic costs nothing but the proof the pass runs anyway. Only an entry with no
- * id, or a value that is not a list at all, is something this pass cannot name.
- */
-type PurgeNames =
-  | {
-      readonly status: typeof StorageReadStatus.Ok
-      /** Every id the index carries, damaged entries included. */
-      readonly ids: readonly string[]
-      /** The ids of entries readIndex would drop, so a rewrite would lose them. */
-      readonly damagedIds: readonly string[]
-      readonly hasUnnameableEntry: boolean
-    }
-  | StorageReadFailed
-
-const idOfEntry = (value: unknown): string | null => {
-  if (!value || typeof value !== "object") return null
-  const { id } = value as { id?: unknown }
-  const isUsableId = typeof id === "string" && id.length > 0
-  return isUsableId ? id : null
-}
-
-const idOfLegacyListItem = (value: unknown): string | null => {
-  const isUsableId = typeof value === "string" && value.length > 0
-  return isUsableId ? value : null
-}
-
-const namesFrom = (
-  parsed: unknown,
-  idOf: (value: unknown) => string | null,
-  isReadable: (value: unknown) => boolean,
-): PurgeNames => {
-  if (!Array.isArray(parsed)) {
-    return {
-      status: StorageReadStatus.Ok,
-      ids: [],
-      damagedIds: [],
-      hasUnnameableEntry: true,
-    }
-  }
-  const ids: string[] = []
-  const damagedIds: string[] = []
-  let hasUnnameableEntry = false
-  for (const item of parsed) {
-    const id = idOf(item)
-    if (id === null) {
-      hasUnnameableEntry = true
-    } else {
-      ids.push(id)
-      if (!isReadable(item)) damagedIds.push(id)
-    }
-  }
-  return { status: StorageReadStatus.Ok, ids, damagedIds, hasUnnameableEntry }
-}
-
-const readPurgeNames = async (): Promise<PurgeNames> => {
-  try {
-    const raw = await AsyncStorage.getItem(ACCOUNT_INDEX_KEY)
-    if (raw) return namesFrom(JSON.parse(raw), idOfEntry, isEntry)
-
-    const legacyRaw = await AsyncStorage.getItem(LEGACY_ID_LIST_KEY)
-    if (!legacyRaw) {
-      return {
-        status: StorageReadStatus.Ok,
-        ids: [],
-        damagedIds: [],
-        hasUnnameableEntry: false,
-      }
-    }
-    // A legacy list item is a bare id, so one that carries an id is read whole.
-    return namesFrom(JSON.parse(legacyRaw), idOfLegacyListItem, () => true)
-  } catch (err) {
-    return toReadFailed(err)
-  }
-}
-
-/** Damage the purge has seen in the index, kept past the write that would hide it. */
-type IndexDamage = {
-  readonly ids: readonly string[]
-  readonly hasUnnameableEntry: boolean
-}
-
-/**
- * Adds what this read shows to the damage already recorded, and returns the whole of it.
- *
- * The index does not keep its own damage: the next add, remove or lightning address it
- * stores is written from readIndex's list, which leaves the damaged entries out. Without a
- * record, the launch after that would read a whole index, name none of them and write the
- * done flag. So what was seen is kept beside the flag, with the same lifetime, and named or
- * held against the flag on every later pass.
- *
- * A record that cannot be read is read as damage nothing can name: it may hold an entry
- * with no id, and the flag is the one thing that must not be written over it.
- */
-const recordIndexDamage = async (
-  names: Extract<PurgeNames, { status: typeof StorageReadStatus.Ok }>,
-): Promise<IndexDamage> => {
-  const stored = await readString(LEGACY_PURGE_INDEX_DAMAGE_KEY)
-  if (stored.status === "failed")
-    return { ids: names.damagedIds, hasUnnameableEntry: true }
-
-  const recorded = parseIndexDamage(stored.status === "found" ? stored.value : null)
-  const damage: IndexDamage = {
-    ids: [...new Set([...recorded.ids, ...names.damagedIds])],
-    hasUnnameableEntry: recorded.hasUnnameableEntry || names.hasUnnameableEntry,
-  }
-
-  const isChanged =
-    damage.ids.length !== recorded.ids.length ||
-    damage.hasUnnameableEntry !== recorded.hasUnnameableEntry
-  // Result discarded like the marker's: a record that does not land is written again on
-  // the next pass that sees the same damage, and until then this pass already acts on it.
-  if (isChanged) await save(LEGACY_PURGE_INDEX_DAMAGE_KEY, damage)
-  return damage
-}
-
-/** A stored record that is not one this file wrote counts as damage with no id to name. */
-const parseIndexDamage = (raw: string | null): IndexDamage => {
-  if (raw === null) return { ids: [], hasUnnameableEntry: false }
-  try {
-    const parsed: unknown = JSON.parse(raw)
-    const { ids, hasUnnameableEntry } = (parsed ?? {}) as Partial<Record<string, unknown>>
-    const isRecord =
-      Array.isArray(ids) &&
-      ids.every((id) => typeof id === "string") &&
-      typeof hasUnnameableEntry === "boolean"
-    if (!isRecord) return { ids: [], hasUnnameableEntry: true }
-    return { ids, hasUnnameableEntry }
-  } catch {
-    return { ids: [], hasUnnameableEntry: true }
-  }
-}
-
-/**
  * Empty when the marker cannot be read or holds anything that is not a list of
  * slot names. The two errors cost differently: a marker read as fuller than it
  * is would skip a slot nothing proved gone, and the flag could then be written
@@ -844,17 +705,15 @@ export const purgeLegacyKeyStoreOnce = async (
     return { status: "skipped", reason: "retries-exhausted" }
   }
 
-  const names = await readPurgeNames()
+  const names = await readIndexNames()
   // Without the index the per-account keys cannot be named, and a purge that
   // skips them would still record itself as done.
   if (names.status === StorageReadStatus.ReadFailed) {
     return reportPurgeOutcome({ status: "skipped", reason: "index-unreadable" })
   }
 
-  const damage = await recordIndexDamage(names)
-  const accountIds = [...new Set([...names.ids, ...damage.ids])]
   const purgedSlots = await readPurgedSlots()
-  const purged = await KeyStoreWrapper.purgeLegacyKeyStore(accountIds, purgedSlots)
+  const purged = await KeyStoreWrapper.purgeLegacyKeyStore(names.ids, purgedSlots)
 
   // Saved before the verdict is acted on, so a pass that ends short of done still
   // keeps what it proved. Result discarded like the flag's: a marker that cannot
@@ -899,10 +758,12 @@ export const purgeLegacyKeyStoreOnce = async (
   // helper as the other two counter operations, which swallows its own failures.
   await remove(LEGACY_PURGE_ATTEMPTS_KEY)
 
-  // An entry the index held with no id gates the flag for good: whatever it named was
-  // never reached, and no later launch can name it. Uncounted against the bound, which
-  // is for a state that costs a slot's round trips every launch, and this costs none.
-  if (damage.hasUnnameableEntry) return reportPurgeOutcome({ status: "index-damaged" })
+  // An item the index holds with no id gates the flag for good: whatever it named was
+  // never reached, no later launch can name it, and no write to the index drops it.
+  // Uncounted against the bound, which is for a state that costs a slot's round trips
+  // every launch, and this costs none.
+  const hasUnnameableEntry = names.unnameableItems > 0
+  if (hasUnnameableEntry) return reportPurgeOutcome({ status: "index-damaged" })
 
   // The sweep's verdict gates the flag, not the pass: every key this launch could
   // name is gone, and the marker keeps that, but an account the sweep could not

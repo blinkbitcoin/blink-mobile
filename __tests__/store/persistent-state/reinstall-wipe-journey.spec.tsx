@@ -649,40 +649,34 @@ describe("the legacy purge over a damaged index", () => {
   const launchPurge = async () => purgeLegacyKeyStoreOnce(await sweepMnemonicMigration())
 
   /**
-   * The next lightning address the app stores is written from readIndex's list, which drops
-   * the damaged entry. The purge has to have reached that account's seed by then, and has to
-   * keep naming it after: the seed is moved, not left behind.
+   * The wallet stores its lightning address on connect, which can come before the idle
+   * purge. That write keeps the damaged entry, so the purge still reaches its seed, and
+   * moves it rather than leaving it behind.
    */
-  it("moves the seed of a damaged entry that carries an id, and keeps it through a rewrite", async () => {
+  it("moves the seed of a damaged entry that carries an id, rewritten before the purge", async () => {
     upgradeWithDamagedEntry({ id: DAMAGED_ACCOUNT, lightningAddress: 5 })
+
+    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "upgraded@blink.sv")
+    expect(mockAsyncStorage.get(INDEX_KEY)).toContain(DAMAGED_ACCOUNT)
 
     expect(await launchPurge()).toEqual({ status: "done" })
     expect(mockLegacyStore.has(`mnemonic:${DAMAGED_ACCOUNT}`)).toBe(false)
     expect(await KeyStoreWrapper.getMnemonicForAccount(DAMAGED_ACCOUNT)).toBe(
       DAMAGED_WORDS,
     )
-
-    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "upgraded@blink.sv")
-    expect(mockAsyncStorage.get(INDEX_KEY)).not.toContain(DAMAGED_ACCOUNT)
-    mockAsyncStorage.delete("legacyKeyStorePurged")
-
-    expect(await launchPurge()).toEqual({ status: "done" })
-    expect(await KeyStoreWrapper.getMnemonicForAccount(DAMAGED_ACCOUNT)).toBe(
-      DAMAGED_WORDS,
+    expect(mockKeychain.get(serverFor("mnemonicAccounts"))?.split("\n")).toContain(
+      DAMAGED_ACCOUNT,
     )
   })
 
-  /**
-   * An entry with no id names nothing. Once a rewrite has dropped it, the index reads whole,
-   * and only the record the first pass kept stops the second from calling the purge done
-   * over the seed it stood for.
-   */
-  it("never records itself done after a rewrite hides an entry it could not name", async () => {
+  /** An entry with no id names nothing, and no write to the index drops it. */
+  it("never records itself done over an entry it could not name, rewritten or not", async () => {
     upgradeWithDamagedEntry({ lightningAddress: null })
 
+    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "upgraded@blink.sv")
     expect(await launchPurge()).toEqual({ status: "index-damaged" })
 
-    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "upgraded@blink.sv")
+    await setSelfCustodialLightningAddress(UPGRADED_ACCOUNT, "other@blink.sv")
     expect(await launchPurge()).toEqual({ status: "index-damaged" })
 
     expect(mockAsyncStorage.has("legacyKeyStorePurged")).toBe(false)
