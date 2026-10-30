@@ -373,10 +373,6 @@ type PurgeResult =
   /** Every store answered and a mnemonic is not in the new one, which no later
    *  boot changes on its own. */
   | { status: "unmigrated" }
-  /** The iOS form of `unmigrated`: both stores report a mnemonic missing, which
-   *  the iOS legacy store also says for a lookup that failed, so the next boot
-   *  asks again. */
-  | { status: "unconfirmed" }
   | { status: "skipped"; reason: PurgeSkippedReason }
 
 /**
@@ -543,12 +539,10 @@ const LEGACY_PURGE_SLOTS_KEY = "legacyKeyStorePurgedSlots"
  * neither store. Nothing is there to erase and no later launch changes that, but
  * the purge would still pay that slot's keychain round trips every launch.
  *
- * Two states reach it. A seed in neither store is **Android only**, by
- * construction: that verdict needs a legacy store that can tell a missing key from
- * a failed lookup, and only Android's can (see purgeThrough). So a restored iOS device
- * with an index entry whose key material did not come with it keeps paying for that
- * slot every launch and reports `unconfirmed` each time. That cost is accepted, because
- * the alternative is retiring the purge on an answer iOS cannot stand behind.
+ * Two states reach it. A seed in neither store, which is what every phone restored
+ * from a backup holds: the index comes back and neither store's device-only item
+ * does. That verdict needs a legacy store that can tell a missing key from a failed
+ * lookup, which both platforms' can (see purgeThrough).
  *
  * A damaged MNEMONIC_ACCOUNTS value reaches it on **both** platforms. Nothing read
  * it wrong there: it was read, and what it holds is not a list of ids, which no
@@ -596,9 +590,6 @@ const logPurgeOutcome = (outcome: string): void => {
  * process the way the sweep raises its own. `unmigrated` is not one: an index entry
  * whose key material exists nowhere is an odd device rather than a fault, and
  * raising it would bury the real faults under the noise of every restored phone.
- * `unconfirmed` is that same device on iOS, so it is not one either, and it is
- * counted under its own name so a keychain that will not answer still shows up as
- * `incomplete` rather than among the restored phones.
  * `retries-exhausted` is not one either, for the same reason: it is that same state
  * having run out of launches, and it reaches this function only once, so the event
  * carries it without a defect report behind it. `sweep-incomplete` is not one
@@ -729,12 +720,6 @@ export const purgeLegacyKeyStoreOnce = async (
   // answer, or a migrating write that failed, gets every later launch it needs.
   if (purged.outcome === "transient") {
     return reportPurgeOutcome({ status: "incomplete" })
-  }
-
-  // Uncounted for the same reason: on iOS the empty legacy read behind it may be
-  // a lookup that failed, so no number of launches makes it terminal.
-  if (purged.outcome === "unconfirmed") {
-    return reportPurgeOutcome({ status: "unconfirmed" })
   }
 
   if (purged.outcome === "permanent") {
