@@ -642,12 +642,14 @@ describe("a self-custodial on-chain amount below the minimum", () => {
     expect(mockPrepareSend).toHaveBeenCalled()
     expect(screen.queryByText(tooLow)).toBeNull()
     expect(isNextDisabled()).toBe(false)
+    expect(mockHapticReject).not.toHaveBeenCalled()
 
     fireEvent.press(nextButton())
     await settle()
 
     expect(screen.getByText(tooLow)).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalled()
+    expect(mockHapticReject).toHaveBeenCalledTimes(1)
   })
 
   it("leaves nothing to show once the amount clears the minimum", async () => {
