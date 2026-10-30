@@ -348,7 +348,7 @@ const typeKeys = (...keys: string[]) =>
 
 describe("free amount", () => {
   /** The keypad's tap reaches the screen's pad: one per accepted key, none for a refused
-   *  one. In Android silent mode the phone drops it, see haptics.spec.ts. */
+   *  one. It buzzes in Android silent mode too, see haptics.spec.ts. */
   it("taps once per accepted key and stays silent on a refused one", async () => {
     renderScreen(intraledgerDestination())
     await settle()

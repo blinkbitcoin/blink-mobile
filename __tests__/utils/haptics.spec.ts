@@ -21,15 +21,16 @@ const loadHaptics = (os: "android" | "ios"): Haptics => {
 }
 
 /**
- * Touch feedback follows the phone: on Android, a silent ringer drops every intent that
- * respects the system settings, as react-native-haptic-feedback checks the ringer mode.
- * A payment outcome and the slide-to-send commit buzz regardless. A keypad or an inline
- * refusal that went quiet in silent mode is this table working, not a lost call.
+ * On Android a silent ringer drops every intent that respects the system settings, as
+ * react-native-haptic-feedback checks the ringer mode. The keypad tap and the inline
+ * refusal buzz regardless (ruled 2026-10-30), with the payment outcomes and the slide-to-
+ * send commit. Only the selection-style touches (chips, switches, the slider grab) follow
+ * the phone.
  */
 const ANDROID: [intent: keyof Haptics, type: string, ignoresSettings: boolean][] = [
-  ["tap", "soft", false],
+  ["tap", "soft", true],
   ["select", "impactLight", false],
-  ["reject", "rigid", false],
+  ["reject", "rigid", true],
   ["commit", "impactMedium", true],
   ["success", "notificationSuccess", true],
   ["error", "notificationError", true],
