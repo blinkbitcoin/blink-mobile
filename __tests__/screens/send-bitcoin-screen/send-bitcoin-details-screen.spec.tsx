@@ -83,6 +83,7 @@ const FEE_TIER_OPTIONS = {
   feeTierOptions: [],
   feeTierErrorMessage: undefined,
   isFeeTierErrorBlocking: false,
+  isFeeTierErrorDeferred: false,
   isQuotingFees: false,
   isOnchain: false,
   selectedTierFee: undefined,

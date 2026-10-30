@@ -1,8 +1,16 @@
 import React from "react"
-import { Text } from "react-native"
+import { KeyboardAvoidingView, Text } from "react-native"
 import { render } from "@testing-library/react-native"
 
 import { Screen } from "@app/components/screen"
+
+const mockIsIos = { current: true }
+
+jest.mock("@app/utils/helper", () => ({
+  get isIos() {
+    return mockIsIos.current
+  },
+}))
 
 jest.mock("@rn-vui/themed", () => ({
   useTheme: () => ({ theme: { mode: "light", colors: { white: "#FFFFFF" } } }),
@@ -59,5 +67,52 @@ describe("Screen safe-area edges", () => {
   it("renders no SafeAreaView when unsafe, even with edges set", () => {
     const { queryByTestId } = renderScreen({ unsafe: true, edges: ["bottom"] })
     expect(queryByTestId("safe-area")).toBeNull()
+  })
+})
+
+describe("Screen keyboard avoidance", () => {
+  const keyboardAvoidingProps = (props: React.ComponentProps<typeof Screen> = {}) =>
+    renderScreen(props).UNSAFE_getByType(KeyboardAvoidingView).props
+
+  beforeEach(() => {
+    mockIsIos.current = true
+  })
+
+  it("lifts the content on iOS", () => {
+    expect(keyboardAvoidingProps().behavior).toBe("padding")
+  })
+
+  it("leaves Android alone unless the screen asks", () => {
+    mockIsIos.current = false
+    expect(keyboardAvoidingProps().behavior).toBeUndefined()
+  })
+
+  /** Edge-to-edge no longer resizes Android's window for the keyboard. */
+  it("lifts the content on Android when the screen asks", () => {
+    mockIsIos.current = false
+    expect(keyboardAvoidingProps({ avoidKeyboardOnAndroid: true }).behavior).toBe(
+      "padding",
+    )
+  })
+
+  it("takes an exact offset over the preset one", () => {
+    expect(
+      keyboardAvoidingProps({ keyboardOffset: "navigationHeader" })
+        .keyboardVerticalOffset,
+    ).toBe(100)
+    expect(
+      keyboardAvoidingProps({
+        keyboardOffset: "navigationHeader",
+        keyboardVerticalOffset: 64,
+      }).keyboardVerticalOffset,
+    ).toBe(64)
+  })
+
+  it("can turn the lift off, on scrolling screens too", () => {
+    expect(keyboardAvoidingProps().enabled).toBe(true)
+    expect(keyboardAvoidingProps({ avoidKeyboardEnabled: false }).enabled).toBe(false)
+    expect(
+      keyboardAvoidingProps({ preset: "scroll", avoidKeyboardEnabled: false }).enabled,
+    ).toBe(false)
   })
 })

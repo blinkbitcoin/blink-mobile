@@ -1,5 +1,6 @@
 import React from "react"
-import { render, screen } from "@testing-library/react-native"
+import { Keyboard, StyleSheet, TextInput } from "react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import { NoteInput } from "@app/components/note-input"
@@ -37,5 +38,53 @@ describe("NoteInput and the screen reader", () => {
         (node) => node.props.importantForAccessibility === "no-hide-descendants",
       ),
     ).toBe(true)
+  })
+})
+
+describe("NoteInput focus", () => {
+  const keyboardListeners: Record<string, () => void> = {}
+
+  beforeEach(() => {
+    jest.spyOn(Keyboard, "addListener").mockImplementation((event, listener) => {
+      keyboardListeners[event] = listener as () => void
+      return { remove: jest.fn() } as unknown as ReturnType<typeof Keyboard.addListener>
+    })
+    render(
+      <TypesafeI18n locale="en">
+        <ThemeProvider theme={theme}>
+          <NoteInput editable value="" onChangeText={jest.fn()} />
+        </ThemeProvider>
+      </TypesafeI18n>,
+    )
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  const fieldColor = () =>
+    StyleSheet.flatten(screen.UNSAFE_getByProps({ accessible: false }).props.style)
+      .backgroundColor
+  const { grey5, grey6 } = theme.lightColors ?? {}
+
+  it("lifts the field from grey5 to grey6 while it is typed in", () => {
+    const input = screen.getByTestId("add-note")
+    expect(fieldColor()).toBe(grey5)
+
+    fireEvent(input, "focus")
+    expect(fieldColor()).toBe(grey6)
+
+    fireEvent(input, "blur")
+    expect(fieldColor()).toBe(grey5)
+  })
+
+  /** Android's back gesture closes the keyboard but keeps the field focused. */
+  it("lets go of focus when the keyboard closes", () => {
+    const input = screen.UNSAFE_getByType(TextInput).instance
+    input.blur.mockClear()
+
+    act(() => keyboardListeners.keyboardDidHide())
+
+    expect(input.blur).toHaveBeenCalledTimes(1)
   })
 })
