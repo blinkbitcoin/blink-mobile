@@ -54,13 +54,12 @@ import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
 import { SendWalletSummary } from "./amount-entry/send-wallet-summary"
 import { isAmountFixableError } from "./amount-fixable-error"
-import { formatEta } from "./fee-tier-options"
+import { feeTierLabels, formatEta } from "./fee-tier-options"
 import { FeeTierOption } from "./hooks/fee-tiers.types"
 import {
   CUSTODIAL_PAYOUT_ETA_MINUTES,
   feeTierFromPayoutSpeed,
 } from "./hooks/use-custodial-onchain-fee-tiers"
-import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { useHomeOnBackWhenSpent } from "./hooks/use-home-on-back-when-spent"
 import { useSendFailureCopy } from "./hooks/use-send-failure-copy"
 import { ETA_MINUTES } from "./hooks/use-onchain-fee-tiers"
@@ -169,7 +168,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
   const translateSdkError = useTranslateSdkError()
   const failureCopy = useSendFailureCopy()
   const { copyToClipboard } = useClipboard()
-  const feeTierLabels = useFeeTierLabels()
+  const tierLabels = feeTierLabels(LL)
   const {
     appConfig: {
       galoyInstance: { lnAddressHostname },
@@ -660,7 +659,7 @@ const SendBitcoinConfirmationScreen: React.FC<Props> = ({ route }) => {
       ? [
           {
             label: LL.SendBitcoinScreen.feeTier(),
-            value: `${feeTierLabels[priorityTier]} ~ ${formatEta(priorityEtaMinutes, locale)}`,
+            value: `${tierLabels[priorityTier]} ~ ${formatEta(priorityEtaMinutes, locale)}`,
           },
         ]
       : []),
