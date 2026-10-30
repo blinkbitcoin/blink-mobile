@@ -89,12 +89,18 @@ jest.mock("react-native-secure-key-store", () => ({
       }
       return value
     },
+    set: async (key: string, value: string) => {
+      mockLegacyStore.set(key, value)
+    },
     remove: async (key: string) => {
       if (!mockLegacyStore.delete(key)) {
         throw Object.assign(new Error("could not delete"), { code: "6" })
       }
     },
     setResetOnAppUninstallTo: () => {},
+  },
+  ACCESSIBLE: {
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AccessibleAfterFirstUnlockThisDeviceOnly",
   },
 }))
 

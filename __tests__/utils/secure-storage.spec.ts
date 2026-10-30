@@ -548,158 +548,6 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
     })
   })
 
-  describe("deleteMnemonicForAccount", () => {
-    it("removes both 'mnemonic:{id}' and 'mnemonic_network:{id}', returns true", async () => {
-      mockRemove.mockResolvedValue(undefined)
-
-      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(result).toBe(true)
-      expect(mockRemove).toHaveBeenCalledWith("mnemonic:alice")
-      expect(mockRemove).toHaveBeenCalledWith("mnemonic_network:alice")
-    })
-
-    it("returns true even when the network-key removal fails (tolerated)", async () => {
-      mockRemove
-        .mockResolvedValueOnce(undefined)
-        .mockRejectedValueOnce(new Error("network key missing"))
-
-      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(result).toBe(true)
-    })
-
-    /** What the iOS module rejects with: a delete of any kind that did not land, a lookup
-     *  of any kind that found nothing, and a write the keychain refused. */
-    const couldNotDelete = () =>
-      Object.assign(new Error("could not delete key"), { code: "6" })
-    const keyNotPresent = () =>
-      Object.assign(new Error("key does not present"), { code: "404" })
-    const couldNotSave = () => Object.assign(new Error("error saving key"), { code: "9" })
-
-    it("returns false when neither the removal nor the blank lands", async () => {
-      mockRemove.mockRejectedValue(couldNotDelete())
-      mockSet.mockRejectedValue(couldNotSave())
-
-      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(result).toBe(false)
-      expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
-        accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
-      })
-    })
-
-    /**
-     * The iOS module rejects a delete of a key that is not there, so a removal retried
-     * after an earlier one erased the seed fails the same way a real failure does. A blank
-     * the keychain takes is what lets that retry finish instead of keeping the wallet listed.
-     */
-    it("returns true when the removal fails because the seed is already gone", async () => {
-      mockRemove.mockRejectedValueOnce(couldNotDelete()).mockResolvedValue(undefined)
-      mockSet.mockResolvedValue("key stored successfully")
-
-      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(result).toBe(true)
-      expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
-        accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
-      })
-    })
-
-    /**
-     * A failing iOS keychain answers the lookup with the missing-key code too, so a read
-     * back would call this seed gone while it is still stored.
-     */
-    it("returns false on a failing keychain whose lookup answers missing", async () => {
-      mockRemove.mockRejectedValue(couldNotDelete())
-      mockGet.mockRejectedValue(keyNotPresent())
-      mockSet.mockRejectedValue(couldNotSave())
-
-      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(result).toBe(false)
-    })
-
-    it("drops the account from the tracked list once its mnemonic is gone", async () => {
-      mockGetInternet.mockImplementation(async (server: string) =>
-        server === "secure-store.blink.local/mnemonicAccounts"
-          ? { username: "mnemonicAccounts", password: "alice\nbob" }
-          : false,
-      )
-
-      await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(mockSetInternet).toHaveBeenCalledWith(
-        "secure-store.blink.local/mnemonicAccounts",
-        "mnemonicAccounts",
-        "bob",
-        { accessible: MNEMONIC_ACCESSIBLE },
-      )
-    })
-
-    it("removes the tracked list entirely with the last account", async () => {
-      mockGetInternet.mockImplementation(async (server: string) =>
-        server === "secure-store.blink.local/mnemonicAccounts"
-          ? { username: "mnemonicAccounts", password: "alice" }
-          : false,
-      )
-
-      await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(mockResetInternet).toHaveBeenCalledWith({
-        server: "secure-store.blink.local/mnemonicAccounts",
-      })
-    })
-
-    it("keeps the account tracked when its mnemonic is not provably gone", async () => {
-      onlyInLegacyStore({ "mnemonic:alice": "still here" })
-      mockRemove.mockRejectedValue(new Error("keystore unavailable"))
-      mockGetInternet.mockImplementation(async (server: string) =>
-        server === "secure-store.blink.local/mnemonicAccounts"
-          ? { username: "mnemonicAccounts", password: "alice" }
-          : false,
-      )
-
-      expect(await KeyStoreWrapper.deleteMnemonicForAccount("alice")).toBe(false)
-      // Forgetting the id would leave a mnemonic nothing can reach.
-      expect(mockResetInternet).not.toHaveBeenCalledWith({
-        server: "secure-store.blink.local/mnemonicAccounts",
-      })
-    })
-
-    it("never touches the global 'mnemonic' / 'mnemonic_network' keys", async () => {
-      mockRemove.mockResolvedValue(undefined)
-
-      await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      expect(mockRemove).toHaveBeenCalledWith("mnemonic:alice")
-      expect(mockRemove).toHaveBeenCalledWith("mnemonic_network:alice")
-      expect(mockRemove).not.toHaveBeenCalledWith("mnemonic")
-      expect(mockRemove).not.toHaveBeenCalledWith("mnemonic_network")
-      expect(mockRemove).not.toHaveBeenCalledWith("mnemonic:bob")
-    })
-
-    it("drops only the id it was asked to, leaving damaged lines where they are", async () => {
-      mockRemove.mockResolvedValue(undefined)
-      mockGetInternet.mockImplementation(async (server: string) =>
-        server === "secure-store.blink.local/mnemonicAccounts"
-          ? { username: "mnemonicAccounts", password: "alice\n\u0000garbage\nbob" }
-          : false,
-      )
-
-      await KeyStoreWrapper.deleteMnemonicForAccount("alice")
-
-      // Subtracting cannot lose what it cannot read, because there is nothing
-      // it cannot read: the line it does not recognise is carried through.
-      expect(mockSetInternet).toHaveBeenCalledWith(
-        "secure-store.blink.local/mnemonicAccounts",
-        "mnemonicAccounts",
-        "\u0000garbage\nbob",
-        { accessible: MNEMONIC_ACCESSIBLE },
-      )
-    })
-  })
-
   /**
    * The list is read, modified and written back, and that has to be one turn in
    * the slot queue rather than three unrelated calls. Two overlapping
@@ -862,6 +710,170 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
 
       expect(result).toBe(false)
     })
+  })
+})
+
+describe("KeyStoreWrapper deleteMnemonicForAccount", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+    /** A legacy store that takes the delete and the blank, so a test that makes either
+     *  refuse leaves nothing behind for the next one. */
+    mockRemove.mockResolvedValue(undefined)
+    mockSet.mockResolvedValue("key stored successfully")
+  })
+
+  it("removes both 'mnemonic:{id}' and 'mnemonic_network:{id}', returns true", async () => {
+    mockRemove.mockResolvedValue(undefined)
+
+    const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(result).toBe(true)
+    expect(mockRemove).toHaveBeenCalledWith("mnemonic:alice")
+    expect(mockRemove).toHaveBeenCalledWith("mnemonic_network:alice")
+  })
+
+  it("returns true even when the network-key removal fails (tolerated)", async () => {
+    mockRemove
+      .mockResolvedValueOnce(undefined)
+      .mockRejectedValueOnce(new Error("network key missing"))
+
+    const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(result).toBe(true)
+  })
+
+  /** What the iOS module rejects with: a delete of any kind that did not land, a lookup
+   *  of any kind that found nothing, and a write the keychain refused. */
+  const couldNotDelete = () =>
+    Object.assign(new Error("could not delete key"), { code: "6" })
+  const keyNotPresent = () =>
+    Object.assign(new Error("key does not present"), { code: "404" })
+  const couldNotSave = () => Object.assign(new Error("error saving key"), { code: "9" })
+
+  it("returns false when neither the removal nor the blank lands", async () => {
+    mockRemove.mockRejectedValue(couldNotDelete())
+    mockSet.mockRejectedValue(couldNotSave())
+
+    const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(result).toBe(false)
+    expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
+      accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+    })
+  })
+
+  /**
+   * The iOS module rejects a delete of a key that is not there, so a removal retried
+   * after an earlier one erased the seed fails the same way a real failure does. A blank
+   * the keychain takes is what lets that retry finish instead of keeping the wallet listed.
+   */
+  it("returns true when the removal fails because the seed is already gone", async () => {
+    mockRemove.mockRejectedValueOnce(couldNotDelete()).mockResolvedValue(undefined)
+    mockSet.mockResolvedValue("key stored successfully")
+
+    const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(result).toBe(true)
+    expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
+      accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+    })
+  })
+
+  /**
+   * A failing iOS keychain answers the lookup with the missing-key code too, so a read
+   * back would call this seed gone while it is still stored.
+   */
+  it("returns false on a failing keychain whose lookup answers missing", async () => {
+    mockRemove.mockRejectedValue(couldNotDelete())
+    mockGet.mockRejectedValue(keyNotPresent())
+    mockSet.mockRejectedValue(couldNotSave())
+
+    const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(result).toBe(false)
+  })
+
+  it("drops the account from the tracked list once its mnemonic is gone", async () => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: "alice\nbob" }
+        : false,
+    )
+
+    await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(mockSetInternet).toHaveBeenCalledWith(
+      "secure-store.blink.local/mnemonicAccounts",
+      "mnemonicAccounts",
+      "bob",
+      { accessible: MNEMONIC_ACCESSIBLE },
+    )
+  })
+
+  it("removes the tracked list entirely with the last account", async () => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: "alice" }
+        : false,
+    )
+
+    await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(mockResetInternet).toHaveBeenCalledWith({
+      server: "secure-store.blink.local/mnemonicAccounts",
+    })
+  })
+
+  it("keeps the account tracked when its mnemonic is not provably gone", async () => {
+    onlyInLegacyStore({ "mnemonic:alice": "still here" })
+    legacyStoreRejects(new Error("keystore unavailable"))
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: "alice" }
+        : false,
+    )
+
+    expect(await KeyStoreWrapper.deleteMnemonicForAccount("alice")).toBe(false)
+    // Forgetting the id would leave a mnemonic nothing can reach.
+    expect(mockResetInternet).not.toHaveBeenCalledWith({
+      server: "secure-store.blink.local/mnemonicAccounts",
+    })
+  })
+
+  it("never touches the global 'mnemonic' / 'mnemonic_network' keys", async () => {
+    mockRemove.mockResolvedValue(undefined)
+
+    await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    expect(mockRemove).toHaveBeenCalledWith("mnemonic:alice")
+    expect(mockRemove).toHaveBeenCalledWith("mnemonic_network:alice")
+    expect(mockRemove).not.toHaveBeenCalledWith("mnemonic")
+    expect(mockRemove).not.toHaveBeenCalledWith("mnemonic_network")
+    expect(mockRemove).not.toHaveBeenCalledWith("mnemonic:bob")
+  })
+
+  it("drops only the id it was asked to, leaving damaged lines where they are", async () => {
+    mockRemove.mockResolvedValue(undefined)
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: "alice\n\u0000garbage\nbob" }
+        : false,
+    )
+
+    await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+    // Subtracting cannot lose what it cannot read, because there is nothing
+    // it cannot read: the line it does not recognise is carried through.
+    expect(mockSetInternet).toHaveBeenCalledWith(
+      "secure-store.blink.local/mnemonicAccounts",
+      "mnemonicAccounts",
+      "\u0000garbage\nbob",
+      { accessible: MNEMONIC_ACCESSIBLE },
+    )
   })
 })
 
@@ -2454,12 +2466,17 @@ describe("KeyStoreWrapper clearLegacyKeyStore", () => {
         ? { username: "mnemonicAccounts", password: "alice" }
         : false,
     )
-    // The per-key erase never works; only the service-wide reset does.
+    // The per-key erase never works, and the blank write over the stuck copy is
+    // refused too until the service-wide reset clears it.
     mockRemove.mockRejectedValue(new Error("legacy erase refused"))
     let legacyStoreEmptied = false
     mockResetGenericPassword.mockImplementation(async () => {
       legacyStoreEmptied = true
       return true
+    })
+    mockSet.mockImplementation(async () => {
+      if (!legacyStoreEmptied) throw new Error("legacy write refused")
+      return "key stored successfully"
     })
     mockGet.mockImplementation(async () => {
       if (legacyStoreEmptied) {
