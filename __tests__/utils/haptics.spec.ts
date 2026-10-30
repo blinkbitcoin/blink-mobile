@@ -1,3 +1,5 @@
+import { it } from "@jest/globals"
+
 const mockTrigger = jest.fn()
 
 jest.mock("react-native-haptic-feedback", () => ({
