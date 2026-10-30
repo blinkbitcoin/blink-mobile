@@ -228,6 +228,17 @@ describe("useDisplayCurrency", () => {
       expect(formatted).toBe("$500.00")
     })
 
+    it("formats a round threshold in whole units when told to", () => {
+      const { result } = renderHook(() => useDisplayCurrency())
+
+      const formatted = result.current.formatMoneyAmount({
+        moneyAmount: toUsdMoneyAmount(500_000),
+        noFractionDigits: true,
+      })
+
+      expect(formatted).toBe("$5,000")
+    })
+
     it("should format display currency amount with symbol", () => {
       const { result } = renderHook(() => useDisplayCurrency())
 

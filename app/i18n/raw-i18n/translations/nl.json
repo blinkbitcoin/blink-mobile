@@ -2461,7 +2461,7 @@
     "sdkGenericError": "Kan kosten niet schatten. Probeer een ander bedrag."
   },
   "SettingsScreen": {
-    "createAddress": "Adres aanmaken",
+    "createAddress": "Lightning-adres aanmaken",
     "addressDisabled": "(uitgeschakeld)",
     "donationButton": "Doneerknop",
     "btcpayServer": "BTCPay Server",
@@ -2478,6 +2478,7 @@
     "activated": "Geactiveerd",
     "addressScreen": "Manieren om betaald te krijgen",
     "nonCustodialAccount": "Niet-bewaarde rekening",
+    "custodialAccount": "Bewaarde rekening",
     "tapUserName": "Click om gebruikersnaam in te stellen",
     "notifications": "Meldingen",
     "title": "Instellingen",
@@ -2586,8 +2587,6 @@
     "emailUnverifiedContent": "Zorg ervoor dat u weer kunt inloggen op uw account door uw e-mailadres te verifiëren. Wilt u de verificatie nu uitvoeren?",
     "totp": "Tweefactorauthenticatie",
     "totpDeactivated": "Tweefactorauthenticatie is uitgeschakeld",
-    "totpDeleteAlertTitle": "Verwijder tweefactorauthenticatie",
-    "totpDeleteAlertContent": "Weet u zeker dat u uw tweefactorauthenticatie wilt verwijderen?",
     "copiedAccountId": "Uw account-ID naar het klembord gekopieerd",
     "yourAccountId": "Uw account-ID",
     "accountId": "Account-ID",
@@ -2640,14 +2639,11 @@
     "youGet": "Je krijgt"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Tweefactorauthenticatie",
-    "secret": "Geheim/back-up",
-    "content": "Scan deze QR-code met uw authenticator-app. Als alternatief kunt u het geheim handmatig in uw authenticator-app kopiëren/plakken."
+    "title": "Tweefactorauthenticatie"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Tweefactorauthenticatie",
-    "enter6digitCode": "Voer de 6-cijferige code van uw authenticator-app in om uw tweefactorauthenticatie te valideren.",
-    "success": "Tweefactorauthenticatie is ingeschakeld. U kunt nu alleen weer inloggen met uw telefoon of e-mailadres EN uw tweefactorauthenticatie.\n\nAlleen volledige KYC-accounts kunnen worden hersteld als een gebruiker de toegang tot zijn tweefactorauthenticatie heeft verloren."
+    "enter6digitCode": "Voer de 6-cijferige code van uw authenticator-app in om uw tweefactorauthenticatie te valideren."
   },
   "TotpLoginValidateScreen": {
     "title": "Tweefactorauthenticatie",
@@ -2721,7 +2717,9 @@
     "noFee": "geen kosten",
     "fromApprox": "vanaf ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Kan momenteel geen kosten ophalen"
+    "error": "Kan momenteel geen kosten ophalen",
+    "inactivity": "Inactiviteit >{months: number} maanden",
+    "usdPerMonth": "{amount: string}/maand"
   },
   "TransactionLimitsScreen": {
     "receive": "Ontvang",
@@ -3874,10 +3872,18 @@
         "testSuccess": "Je back-upzin is correct"
       }
     },
+    "BundleExport": {
+      "title": "Nooduitstap",
+      "body": "Als Spark uitvalt, kun je met deze bundel je bitcoin zonder Blink on-chain verplaatsen. Je dollarsaldo kan niet worden hersteld.",
+      "download": "Bundel downloaden",
+      "sensitiveTitle": "Gevoelig",
+      "learnMore": "Meer over eenzijdige uitstap",
+      "sensitiveConfirm": "Downloaden",
+      "sensitiveBody": "Dit bestand toont je saldo en betalingsgeschiedenis, dus houd het privé. Om het in een noodgeval te gebruiken, heb je ook je herstelzin nodig."
+    },
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
       "description": "We slaan een back-up van je herstelzin op in je {provider}.",
-      "encryptCheckbox": "Versleutelen met extra wachtwoord",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",
@@ -4003,9 +4009,19 @@
     "explainerCheck5": "Er worden Spark-netwerkkosten van je account afgeschreven",
     "explainerCta": "Ik begrijp het",
     "transferringFunds": "Je saldo wordt overgedragen. Het zou binnen enkele seconden klaar moeten zijn.",
+    "transferInProgress": {
+      "body": "Je saldo is onderweg naar je nieuwe account. Houd de app open, dan ronden we het automatisch af."
+    },
     "transferDelayed": {
       "body": "Je saldo is onderweg naar je nieuwe account. Het duurt langer dan gebruikelijk — houd de app open, dan ronden we het automatisch af.",
       "contactSupportCta": "Contact opnemen met support"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "We konden je migratievoortgang niet van dit apparaat lezen. Er is niets verloren: je tegoed is veilig en je voortgang is nog opgeslagen.",
+      "outOfSpaceBody": "Je apparaat heeft geen opslagruimte meer, dus we kunnen je migratievoortgang niet lezen. Maak ruimte vrij en probeer het opnieuw. Er is niets verloren: je tegoed is veilig.",
+      "notSavedBody": "We konden je migratievoortgang niet op dit apparaat opslaan. Er is niets verloren: je tegoed is veilig. Probeer het opnieuw.",
+      "notSavedOutOfSpaceBody": "Je apparaat heeft geen opslagruimte meer, dus we kunnen je migratievoortgang niet opslaan. Maak ruimte vrij en probeer het opnieuw. Er is niets verloren: je tegoed is veilig.",
+      "contactSupportCta": "Neem contact op met support"
     },
     "clockOutOfSync": {
       "body": "De datum en tijd van je apparaat lopen niet gelijk. Zet ze op automatisch om door te gaan.",
@@ -4068,6 +4084,12 @@
     "recognizePhraseTitle": "Herken je deze back-upzin?",
     "recognizePhraseBody": "Voer nooit woorden in die iemand anders je heeft gestuurd."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operator onbereikbaar",
+    "outageBody": "Spark heeft een storing. Wacht een paar minuten en probeer het opnieuw of neem contact op met onze {support}",
+    "outageSupport": "Support",
+    "tryAgainLater": "Later opnieuw proberen"
+  },
   "BackupNudge": {
     "title": "Uw fondsen lopen gevaar",
     "description": "Beveilig nu uw portemonnee. Het duurt maar een minuut.",
@@ -4076,6 +4098,81 @@
     "modalTitle": "Beveilig uw fondsen",
     "modalDescription": "We raden u ten zeerste aan om een back-up van uw portemonnee te maken om volledig verlies van fondsen te voorkomen als u dit apparaat kwijtraakt.",
     "secureMe": "Portemonnee beveiligen"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Stel tweefactorauthenticatie in",
+    "cardDescription": "Bescherm je account tegen ongeautoriseerde toegang.",
+    "cardCta": "Instellen",
+    "settingsDescription": "Bescherm je account tegen ongeautoriseerde toegang door deze in te stellen.",
+    "setupTitle": "Stel nu tweefactorauthenticatie in",
+    "setupDescription": "Voeg nu tweefactorauthenticatie toe om ongeautoriseerde toegang tot je account te voorkomen.",
+    "setAuthenticator": "Authenticator instellen",
+    "reminderTitle": "Voeg een authenticator toe om je tegoed te beschermen",
+    "reminderDescription": "Je saldo is gegroeid. Een authenticator-app houdt je account veilig, zelfs als iemand toegang krijgt tot je e-mail of telefoon.",
+    "modalReminder": "Als je dit nu wegklikt, zorg dan dat je het zo snel mogelijk inschakelt.",
+    "dismissTwoMore": "Je kunt dit nog twee keer wegklikken.",
+    "dismissOneMore": "Je kunt dit nog één keer wegklikken.",
+    "dismissLast": "Dit is de laatste keer dat je dit kunt wegklikken.",
+    "setNow": "Nu instellen",
+    "dontWantTo": "Ik wil niet",
+    "highBalanceTitle": "Je hebt meer dan {amount}, voeg extra bescherming toe",
+    "protectionRequiredTitle": "Voeg extra bescherming toe om Blink te blijven gebruiken",
+    "protectionRequiredBody": "Hoe meer tegoed je hebt, hoe belangrijker betere beveiliging is. Voeg een authenticator toe om Blink te blijven gebruiken.",
+    "nonCustodialTitle": "Als je geen tweefactorauthenticatie wilt instellen",
+    "nonCustodialBody": "De andere optie is overstappen naar non-custodial. Dan ben je zelf verantwoordelijk voor je tegoed."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Bescherm je tegoed met een authenticator",
+    "introDescription": "Een authenticator-app maakt elke 30 seconden een nieuwe 6-cijferige code.",
+    "takeoversTitle": "Voorkomt accountovername",
+    "takeoversDescription": "De code staat alleen op je telefoon",
+    "stolenNumberTitle": "Veilig, zelfs als je nummer wordt gestolen",
+    "stolenNumberDescription": "Zelfs als iemand toegang krijgt tot je e-mail of telefoonnummer, kan diegene niet inloggen",
+    "durationTitle": "Duurt ongeveer 2 minuten",
+    "durationDescription": "We begeleiden je stap voor stap",
+    "getStarted": "Aan de slag",
+    "appsTitle": "Installeer een authenticator-app",
+    "appsDescription": "Elke authenticator-app werkt. Deze zijn gratis en betrouwbaar:",
+    "googleAuthenticatorDescription": "Eenvoudig en veelgebruikt. Optionele back-up naar je Google-account.",
+    "protonAuthenticatorDescription": "Opensource. End-to-end versleutelde back-up en synchronisatie.",
+    "twoFasAuthDescription": "Opensource. Geen account nodig.",
+    "get": "Downloaden",
+    "storeNote": "“Downloaden” opent de App Store of Google Play. Kom terug naar Blink zodra de app is geïnstalleerd.",
+    "haveAnApp": "Ik heb al een app",
+    "keyInstruction": "Kopieer deze configuratiesleutel naar je authenticator-app.",
+    "qrInstruction": "Gebruik je een ander apparaat?\nScan dan deze QR-code.",
+    "backupTitle": "Maak een back-up van je sleutel",
+    "backupDescription": "Als je je telefoon verliest, kun je met deze sleutel je authenticator opnieuw instellen. Bewaar hem ergens anders dan op deze telefoon.",
+    "saveToPasswordManager": "Opslaan in een wachtwoordbeheerder",
+    "shareToPasswordManager": "Delen met een wachtwoordbeheerder",
+    "copyForManualBackup": "Kopiëren voor handmatige back-up",
+    "passwordManagerUnavailable": "Geen wachtwoordbeheerder beschikbaar op dit apparaat. Kopieer in plaats daarvan de sleutel voor een handmatige back-up.",
+    "savedIt": "Ik heb hem opgeslagen",
+    "keyBackupText": "Configuratiesleutel voor Blink-authenticator\n\nAccount: {account}\nConfiguratiesleutel: {key}\n\nAls je je telefoon verliest, voeg dan deze configuratiesleutel toe aan een authenticator-app om je Blink-inlogcodes terug te krijgen. Iedereen met deze sleutel kan je codes maken, dus houd hem privé.",
+    "protectedTitle": "Je account is nu beveiligd",
+    "protectedDescription": "Vanaf nu heb je om in te loggen een eenmalige code uit je authenticator-app nodig.",
+    "newPhoneTip": "Als je een nieuwe telefoon krijgt, verplaats je authenticator er dan naartoe <bold>voordat</bold> je de oude reset.",
+    "done": "Klaar"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Ingeschakeld",
+    "statusDisabled": "2FA: Uitgeschakeld",
+    "modalTitle": "We raden af om 2FA uit te schakelen",
+    "modalBody": "Dit verlaagt de beveiliging van je account en maakt het voor een derde makkelijker om zonder je toestemming toegang te krijgen.",
+    "keepProtected": "Houd me beschermd",
+    "codeInstruction": "Voer de 6-cijferige code uit je authenticator-app in om tweestapsverificatie uit te schakelen.",
+    "codeInvalid": "Die code is onjuist. Voer de huidige code uit je authenticator-app in.",
+    "tooManyAttempts": "Te veel pogingen. Probeer het over een uur opnieuw.",
+    "manualResetTitle": "Handmatige reset van 2FA",
+    "manualResetBody": "Voor je bescherming kan 2FA niet in de app worden verwijderd. Heb je een reset van 2FA nodig, neem dan contact op met onze <support>Support</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "E-mail toevoegen",
+    "addPhoneTitle": "Telefoonnummer toevoegen",
+    "addEmailCode": "Voer de 6-cijferige code uit je authenticator-app in om je e-mail toe te voegen.",
+    "addPhoneCode": "Voer de 6-cijferige code uit je authenticator-app in om je telefoonnummer toe te voegen.",
+    "codeInvalid": "Die code is onjuist. Voer de huidige code uit je authenticator-app in.",
+    "tooManyAttempts": "Te veel pogingen. Probeer het over een uur opnieuw."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4086,6 +4183,15 @@
     "title": "Dit is een niet-bewaarde rekening",
     "body": "Lees ons blogbericht voor meer informatie",
     "cta": "Lezen"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Werk je cloudback-up bij",
+    "body": "Je noodbundel in {provider} is verouderd. Maak opnieuw een back-up van je portemonnee om hem bij te werken.",
+    "cta": "Opnieuw back-up maken"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Nog geen noodbundel. Die wordt gemaakt na je eerste transactie.",
+    "exportFailed": "Kan de noodbundel niet downloaden."
   },
   "StableBalance": {
     "title": "Stabiel saldo",

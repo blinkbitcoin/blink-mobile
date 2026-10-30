@@ -17,6 +17,7 @@ import { WalletCurrency } from "@app/graphql/generated"
 import {
   canGoBackFromChooseExperience,
   ChooseExperienceContinueRoute,
+  isBackwardAction,
   RootStackParamList,
 } from "@app/navigation/stack-param-lists"
 import { armModeSelectionConversion } from "@app/screens/conversion-flow/drain-conversion"
@@ -30,10 +31,6 @@ import { testProps } from "@app/utils/testProps"
 import { OnboardingScreenLayout } from "./layouts"
 
 const MODE_ICON_SIZE = 22
-
-/** The actions a user's own back press dispatches, and the only ones this screen refuses:
- *  the header arrow and the Android hardware back raise GO_BACK, the swipe raises POP. */
-const BACKWARD_ACTIONS = ["GO_BACK", "POP"]
 
 /**
  * Lets a self-custodial user pick their region posture (Enhanced or Anon). The settings
@@ -132,7 +129,7 @@ export const ChooseExperienceScreen: React.FC = () => {
   useEffect(() => {
     if (canGoBackFromChooseExperience(onContinue)) return
     return navigation.addListener("beforeRemove", (event) => {
-      if (!BACKWARD_ACTIONS.includes(event.data.action.type)) return
+      if (!isBackwardAction(event.data.action)) return
       event.preventDefault()
     })
   }, [navigation, onContinue])

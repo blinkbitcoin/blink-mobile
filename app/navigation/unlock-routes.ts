@@ -4,9 +4,10 @@ import { RootStackParamList } from "./stack-param-lists"
 
 /**
  * The routes the unlock flow runs on, and the single source of truth for them: the unlock
- * screens type their own options against this list, and the armed migration gate reads it
- * to know which screen it must never tear down, so a fourth unlock step cannot be added to
- * one and forgotten in the other.
+ * screens type their own options against this list, the armed migration gate reads it to
+ * know which screen it must never tear down, and the two-factor gate to know which screen
+ * is not the user's own, so a fourth unlock step cannot be added to one and forgotten in
+ * the others.
  */
 const UNLOCK_ROUTE_NAMES = [
   "authenticationCheck",

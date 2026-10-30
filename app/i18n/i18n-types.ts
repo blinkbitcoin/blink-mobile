@@ -8116,7 +8116,7 @@ type RootTranslation = {
 		 */
 		posCopied: string
 		/**
-		 * C​r​e​a​t​e​ ​a​d​d​r​e​s​s
+		 * C​r​e​a​t​e​ ​L​i​g​h​t​n​i​n​g​ ​a​d​d​r​e​s​s
 		 */
 		createAddress: string
 		/**
@@ -8147,6 +8147,10 @@ type RootTranslation = {
 		 * N​o​n​-​c​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
 		 */
 		nonCustodialAccount: string
+		/**
+		 * C​u​s​t​o​d​i​a​l​ ​a​c​c​o​u​n​t
+		 */
+		custodialAccount: string
 		/**
 		 * T​a​p​ ​t​o​ ​s​e​t​ ​u​s​e​r​n​a​m​e
 		 */
@@ -8545,14 +8549,6 @@ type RootTranslation = {
 		 */
 		totpDeactivated: string
 		/**
-		 * D​e​l​e​t​e​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
-		 */
-		totpDeleteAlertTitle: string
-		/**
-		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​ ​w​a​n​t​ ​t​o​ ​d​e​l​e​t​e​ ​y​o​u​r​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​?
-		 */
-		totpDeleteAlertContent: string
-		/**
 		 * C​o​p​i​e​d​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​I​D​ ​t​o​ ​c​l​i​p​b​o​a​r​d
 		 */
 		copiedAccountId: string
@@ -8609,14 +8605,6 @@ type RootTranslation = {
 		 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
 		 */
 		title: string
-		/**
-		 * S​e​c​r​e​t​/​b​a​c​k​u​p
-		 */
-		secret: string
-		/**
-		 * S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​w​i​t​h​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.​ ​A​l​t​e​r​n​a​t​i​v​e​l​y​,​ ​y​o​u​ ​c​a​n​ ​m​a​n​u​a​l​l​y​ ​c​o​p​y​/​p​a​s​t​e​ ​t​h​e​ ​s​e​c​r​e​t​.
-		 */
-		content: string
 	}
 	TotpRegistrationValidateScreen: {
 		/**
@@ -8627,14 +8615,6 @@ type RootTranslation = {
 		 * E​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​v​a​l​i​d​a​t​e​ ​y​o​u​r​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
 		 */
 		enter6digitCode: string
-		/**
-		 * T​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​h​a​s​ ​b​e​e​n​ ​e​n​a​b​l​e​d​.​ ​Y​o​u​ ​w​i​l​l​ ​n​o​w​ ​o​n​l​y​ ​b​e​ ​a​b​l​e​ ​t​o​ ​l​o​g​ ​b​a​c​k​ ​i​n​ ​w​i​t​h​ ​y​o​u​r​ ​p​h​o​n​e​ ​o​r​ ​e​m​a​i​l​ ​A​N​D​ ​y​o​u​r​ ​t​w​o​ ​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.​
-	​
-	​D​e​v​i​c​e​s​ ​o​n​ ​t​h​i​s​ ​a​c​c​o​u​n​t​ ​w​h​i​c​h​ ​a​r​e​ ​n​o​t​ ​l​o​g​g​e​d​ ​i​n​ ​w​i​t​h​ ​2​F​A​ ​w​i​l​l​ ​n​e​e​d​ ​t​o​ ​l​o​g​ ​b​a​c​k​ ​i​n​.​
-	​
-	​O​n​l​y​ ​l​e​v​e​l​ ​2​ ​a​c​c​o​u​n​t​s​ ​c​a​n​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​b​y​ ​c​u​s​t​o​m​e​r​ ​s​u​p​p​o​r​t​ ​i​n​ ​t​h​e​ ​e​v​e​n​t​ ​o​f​ ​l​o​s​t​ ​2​F​A​ ​a​c​c​e​s​s​.
-		 */
-		success: string
 	}
 	TotpLoginValidateScreen: {
 		/**
@@ -9042,6 +9022,16 @@ type RootTranslation = {
 		 * U​n​a​b​l​e​ ​t​o​ ​f​e​t​c​h​ ​f​e​e​s​ ​a​t​ ​t​h​i​s​ ​t​i​m​e
 		 */
 		error: string
+		/**
+		 * I​n​a​c​t​i​v​i​t​y​ ​>​{​m​o​n​t​h​s​}​ ​m​o​n​t​h​s
+		 * @param {number} months
+		 */
+		inactivity: RequiredParams<'months'>
+		/**
+		 * {​a​m​o​u​n​t​}​/​m​o​n​t​h
+		 * @param {string} amount
+		 */
+		usdPerMonth: RequiredParams<'amount'>
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -12802,10 +12792,6 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
-			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
-			 */
-			encryptCheckbox: string
-			/**
 			 * P​a​s​s​w​o​r​d
 			 */
 			password: string
@@ -12906,6 +12892,36 @@ type RootTranslation = {
 			 * N​e​t​w​o​r​k​ ​e​r​r​o​r​.​ ​P​l​e​a​s​e​ ​c​h​e​c​k​ ​y​o​u​r​ ​c​o​n​n​e​c​t​i​o​n​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
 			 */
 			networkError: string
+		}
+		BundleExport: {
+			/**
+			 * E​m​e​r​g​e​n​c​y​ ​e​x​i​t
+			 */
+			title: string
+			/**
+			 * I​f​ ​S​p​a​r​k​ ​g​o​e​s​ ​d​o​w​n​,​ ​t​h​i​s​ ​b​u​n​d​l​e​ ​l​e​t​s​ ​y​o​u​ ​m​o​v​e​ ​y​o​u​r​ ​b​i​t​c​o​i​n​ ​o​n​c​h​a​i​n​ ​w​i​t​h​o​u​t​ ​B​l​i​n​k​.​ ​Y​o​u​r​ ​d​o​l​l​a​r​ ​b​a​l​a​n​c​e​ ​c​a​n​'​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​.
+			 */
+			body: string
+			/**
+			 * L​e​a​r​n​ ​m​o​r​e​ ​a​b​o​u​t​ ​u​n​i​l​a​t​e​r​a​l​ ​e​x​i​t
+			 */
+			learnMore: string
+			/**
+			 * D​o​w​n​l​o​a​d​ ​b​u​n​d​l​e
+			 */
+			download: string
+			/**
+			 * S​e​n​s​i​t​i​v​e
+			 */
+			sensitiveTitle: string
+			/**
+			 * T​h​i​s​ ​f​i​l​e​ ​s​h​o​w​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​a​n​d​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​,​ ​s​o​ ​k​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.​ ​T​o​ ​u​s​e​ ​i​t​ ​i​n​ ​a​n​ ​e​m​e​r​g​e​n​c​y​,​ ​y​o​u​ ​a​l​s​o​ ​n​e​e​d​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.
+			 */
+			sensitiveBody: string
+			/**
+			 * D​o​w​n​l​o​a​d
+			 */
+			sensitiveConfirm: string
 		}
 		ManualBackup: {
 			Alerts: {
@@ -13048,11 +13064,39 @@ type RootTranslation = {
 		 * T​r​a​n​s​f​e​r​r​i​n​g​ ​y​o​u​r​ ​f​u​n​d​s​.​ ​I​t​ ​s​h​o​u​l​d​ ​b​e​ ​d​o​n​e​ ​i​n​ ​a​ ​f​e​w​ ​s​e​c​o​n​d​s​.
 		 */
 		transferringFunds: string
+		transferInProgress: {
+			/**
+			 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​o​n​ ​t​h​e​i​r​ ​w​a​y​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​.​ ​K​e​e​p​ ​t​h​e​ ​a​p​p​ ​o​p​e​n​ ​a​n​d​ ​w​e​'​l​l​ ​f​i​n​i​s​h​ ​u​p​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.
+			 */
+			body: string
+		}
 		transferDelayed: {
 			/**
 			 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​o​n​ ​t​h​e​i​r​ ​w​a​y​ ​t​o​ ​y​o​u​r​ ​n​e​w​ ​a​c​c​o​u​n​t​.​ ​T​h​i​s​ ​i​s​ ​t​a​k​i​n​g​ ​l​o​n​g​e​r​ ​t​h​a​n​ ​u​s​u​a​l​ ​—​ ​k​e​e​p​ ​t​h​e​ ​a​p​p​ ​o​p​e​n​ ​a​n​d​ ​w​e​'​l​l​ ​f​i​n​i​s​h​ ​u​p​ ​a​u​t​o​m​a​t​i​c​a​l​l​y​.
 			 */
 			body: string
+			/**
+			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
+			 */
+			contactSupportCta: string
+		}
+		storageUnavailable: {
+			/**
+			 * W​e​ ​c​o​u​l​d​n​'​t​ ​r​e​a​d​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​ ​a​n​d​ ​y​o​u​r​ ​p​r​o​g​r​e​s​s​ ​i​s​ ​s​t​i​l​l​ ​s​a​v​e​d​.
+			 */
+			unreadableBody: string
+			/**
+			 * Y​o​u​r​ ​d​e​v​i​c​e​ ​h​a​s​ ​n​o​ ​s​t​o​r​a​g​e​ ​s​p​a​c​e​ ​l​e​f​t​,​ ​s​o​ ​w​e​ ​c​a​n​'​t​ ​r​e​a​d​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​.​ ​F​r​e​e​ ​u​p​ ​s​o​m​e​ ​s​p​a​c​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​ ​—​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.
+			 */
+			outOfSpaceBody: string
+			/**
+			 * W​e​ ​c​o​u​l​d​n​'​t​ ​s​a​v​e​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​:​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.​ ​T​r​y​ ​a​g​a​i​n​.
+			 */
+			notSavedBody: string
+			/**
+			 * Y​o​u​r​ ​d​e​v​i​c​e​ ​h​a​s​ ​n​o​ ​s​t​o​r​a​g​e​ ​s​p​a​c​e​ ​l​e​f​t​,​ ​s​o​ ​w​e​ ​c​a​n​'​t​ ​s​a​v​e​ ​y​o​u​r​ ​m​i​g​r​a​t​i​o​n​ ​p​r​o​g​r​e​s​s​.​ ​F​r​e​e​ ​u​p​ ​s​o​m​e​ ​s​p​a​c​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.​ ​N​o​t​h​i​n​g​ ​i​s​ ​l​o​s​t​:​ ​y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​s​a​f​e​.
+			 */
+			notSavedOutOfSpaceBody: string
 			/**
 			 * C​o​n​t​a​c​t​ ​s​u​p​p​o​r​t
 			 */
@@ -13610,6 +13654,25 @@ type RootTranslation = {
 		 */
 		recognizePhraseBody: string
 	}
+	EmergencyRecovery: {
+		/**
+		 * O​p​e​r​a​t​o​r​ ​u​n​r​e​a​c​h​a​b​l​e
+		 */
+		outageTitle: string
+		/**
+		 * S​p​a​r​k​ ​i​s​ ​e​x​p​e​r​i​e​n​c​i​n​g​ ​a​n​ ​o​u​t​a​g​e​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​c​o​u​p​l​e​ ​m​i​n​u​t​e​s​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​ ​o​r​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​{​s​u​p​p​o​r​t​}
+		 * @param {string} support
+		 */
+		outageBody: RequiredParams<'support'>
+		/**
+		 * S​u​p​p​o​r​t
+		 */
+		outageSupport: string
+		/**
+		 * T​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r
+		 */
+		tryAgainLater: string
+	}
 	BackupNudge: {
 		/**
 		 * Y​o​u​r​ ​f​u​n​d​s​ ​a​r​e​ ​a​t​ ​r​i​s​k
@@ -13640,6 +13703,291 @@ type RootTranslation = {
 		 */
 		secureMe: string
 	}
+	TwoFactorEnforcement: {
+		/**
+		 * S​e​t​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+		 */
+		title: string
+		/**
+		 * P​r​o​t​e​c​t​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​f​r​o​m​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​a​c​c​e​s​s​.
+		 */
+		cardDescription: string
+		/**
+		 * S​e​t
+		 */
+		cardCta: string
+		/**
+		 * P​r​o​t​e​c​t​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​f​r​o​m​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​a​c​c​e​s​s​ ​b​y​ ​s​e​t​t​i​n​g​ ​i​t​ ​u​p​.
+		 */
+		settingsDescription: string
+		/**
+		 * S​e​t​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​n​o​w
+		 */
+		setupTitle: string
+		/**
+		 * T​o​ ​p​r​e​v​e​n​t​ ​u​n​a​u​t​h​o​r​i​z​e​d​ ​a​c​c​e​s​s​ ​t​o​ ​y​o​u​r​ ​a​c​c​o​u​n​t​,​ ​a​d​d​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​ ​n​o​w​.
+		 */
+		setupDescription: string
+		/**
+		 * S​e​t​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
+		 */
+		setAuthenticator: string
+		/**
+		 * A​d​d​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​p​r​o​t​e​c​t​ ​y​o​u​r​ ​f​u​n​d​s
+		 */
+		reminderTitle: string
+		/**
+		 * Y​o​u​r​ ​b​a​l​a​n​c​e​ ​h​a​s​ ​g​r​o​w​n​.​ ​A​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​k​e​e​p​s​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​s​a​f​e​,​ ​e​v​e​n​ ​i​f​ ​s​o​m​e​o​n​e​ ​g​e​t​s​ ​h​o​l​d​ ​o​f​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​.
+		 */
+		reminderDescription: string
+		/**
+		 * I​f​ ​y​o​u​ ​d​i​s​m​i​s​s​ ​n​o​w​,​ ​m​a​k​e​ ​s​u​r​e​ ​t​o​ ​e​n​a​b​l​e​ ​i​t​ ​a​s​ ​s​o​o​n​ ​a​s​ ​p​o​s​s​i​b​l​e​.
+		 */
+		modalReminder: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​d​i​s​m​i​s​s​ ​t​h​i​s​ ​t​w​o​ ​m​o​r​e​ ​t​i​m​e​s​.
+		 */
+		dismissTwoMore: string
+		/**
+		 * Y​o​u​ ​c​a​n​ ​d​i​s​m​i​s​s​ ​t​h​i​s​ ​o​n​e​ ​m​o​r​e​ ​t​i​m​e​.
+		 */
+		dismissOneMore: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​l​a​s​t​ ​t​i​m​e​ ​y​o​u​ ​c​a​n​ ​d​i​s​m​i​s​s​ ​t​h​i​s​.
+		 */
+		dismissLast: string
+		/**
+		 * S​e​t​ ​n​o​w
+		 */
+		setNow: string
+		/**
+		 * I​ ​d​o​n​'​t​ ​w​a​n​t​ ​t​o
+		 */
+		dontWantTo: string
+		/**
+		 * Y​o​u​ ​h​a​v​e​ ​o​v​e​r​ ​{​a​m​o​u​n​t​}​,​ ​p​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n
+		 * @param {string} amount
+		 */
+		highBalanceTitle: RequiredParams<'amount'>
+		/**
+		 * P​l​e​a​s​e​ ​a​d​d​ ​a​d​d​i​t​i​o​n​a​l​ ​p​r​o​t​e​c​t​i​o​n​ ​t​o​ ​k​e​e​p​ ​u​s​i​n​g​ ​B​l​i​n​k
+		 */
+		protectionRequiredTitle: string
+		/**
+		 * T​h​e​ ​m​o​r​e​ ​f​u​n​d​s​ ​y​o​u​ ​h​a​v​e​,​ ​t​h​e​ ​m​o​r​e​ ​i​m​p​o​r​t​a​n​t​ ​i​t​ ​i​s​ ​w​i​t​h​ ​b​e​t​t​e​r​ ​s​e​c​u​r​i​t​y​.​ ​P​l​e​a​s​e​ ​a​d​d​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​c​o​n​t​i​n​u​e​ ​u​s​i​n​g​ ​B​l​i​n​k​.
+		 */
+		protectionRequiredBody: string
+		/**
+		 * I​f​ ​y​o​u​ ​d​o​n​'​t​ ​w​a​n​t​ ​t​o​ ​s​e​t​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n
+		 */
+		nonCustodialTitle: string
+		/**
+		 * T​h​e​ ​o​t​h​e​r​ ​o​p​t​i​o​n​ ​i​s​ ​t​o​ ​m​o​v​e​ ​t​o​ ​n​o​n​-​c​u​s​t​o​d​i​a​l​.​ ​T​h​e​n​ ​y​o​u​ ​a​r​e​ ​r​e​s​p​o​n​s​i​b​l​e​ ​f​o​r​ ​y​o​u​r​ ​o​w​n​ ​f​u​n​d​s​.
+		 */
+		nonCustodialBody: string
+	}
+	AuthenticatorOnboarding: {
+		/**
+		 * P​r​o​t​e​c​t​ ​y​o​u​r​ ​f​u​n​d​s​ ​w​i​t​h​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r
+		 */
+		introTitle: string
+		/**
+		 * A​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​m​a​k​e​s​ ​a​ ​n​e​w​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​e​v​e​r​y​ ​3​0​ ​s​e​c​o​n​d​s​.
+		 */
+		introDescription: string
+		/**
+		 * S​t​o​p​s​ ​a​c​c​o​u​n​t​ ​t​a​k​e​o​v​e​r​s
+		 */
+		takeoversTitle: string
+		/**
+		 * T​h​e​ ​c​o​d​e​ ​l​i​v​e​s​ ​o​n​l​y​ ​o​n​ ​y​o​u​r​ ​p​h​o​n​e
+		 */
+		takeoversDescription: string
+		/**
+		 * B​e​ ​s​a​f​e​ ​e​v​e​n​ ​i​f​ ​y​o​u​r​ ​n​u​m​b​e​r​ ​i​s​ ​s​t​o​l​e​n
+		 */
+		stolenNumberTitle: string
+		/**
+		 * E​v​e​n​ ​i​f​ ​s​o​m​e​o​n​e​ ​g​e​t​s​ ​i​n​t​o​ ​y​o​u​r​ ​e​m​a​i​l​ ​o​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​t​h​e​y​ ​c​a​n​'​t​ ​l​o​g​ ​i​n
+		 */
+		stolenNumberDescription: string
+		/**
+		 * T​a​k​e​s​ ​a​b​o​u​t​ ​2​ ​m​i​n​u​t​e​s
+		 */
+		durationTitle: string
+		/**
+		 * W​e​'​l​l​ ​g​u​i​d​e​ ​y​o​u​ ​s​t​e​p​ ​b​y​ ​s​t​e​p
+		 */
+		durationDescription: string
+		/**
+		 * G​e​t​ ​s​t​a​r​t​e​d
+		 */
+		getStarted: string
+		/**
+		 * G​e​t​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p
+		 */
+		appsTitle: string
+		/**
+		 * A​n​y​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​w​o​r​k​s​.​ ​T​h​e​s​e​ ​a​r​e​ ​f​r​e​e​ ​a​n​d​ ​t​r​u​s​t​e​d​:
+		 */
+		appsDescription: string
+		/**
+		 * S​i​m​p​l​e​ ​a​n​d​ ​w​i​d​e​l​y​ ​u​s​e​d​.​ ​O​p​t​i​o​n​a​l​ ​b​a​c​k​u​p​ ​t​o​ ​y​o​u​r​ ​G​o​o​g​l​e​ ​a​c​c​o​u​n​t​.
+		 */
+		googleAuthenticatorDescription: string
+		/**
+		 * O​p​e​n​ ​s​o​u​r​c​e​.​ ​E​n​d​-​t​o​-​e​n​d​ ​e​n​c​r​y​p​t​e​d​ ​b​a​c​k​u​p​ ​a​n​d​ ​s​y​n​c​.
+		 */
+		protonAuthenticatorDescription: string
+		/**
+		 * O​p​e​n​ ​s​o​u​r​c​e​.​ ​N​o​ ​a​c​c​o​u​n​t​ ​n​e​e​d​e​d​.
+		 */
+		twoFasAuthDescription: string
+		/**
+		 * G​e​t
+		 */
+		get: string
+		/**
+		 * "​G​e​t​"​ ​o​p​e​n​s​ ​t​h​e​ ​A​p​p​ ​S​t​o​r​e​ ​o​r​ ​G​o​o​g​l​e​ ​P​l​a​y​.​ ​C​o​m​e​ ​b​a​c​k​ ​t​o​ ​B​l​i​n​k​ ​w​h​e​n​ ​i​t​'​s​ ​i​n​s​t​a​l​l​e​d​.
+		 */
+		storeNote: string
+		/**
+		 * I​ ​h​a​v​e​ ​a​n​ ​a​p​p
+		 */
+		haveAnApp: string
+		/**
+		 * C​o​p​y​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​i​n​t​o​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		keyInstruction: string
+		/**
+		 * U​s​i​n​g​ ​a​n​o​t​h​e​r​ ​d​e​v​i​c​e​?​
+	​S​c​a​n​ ​t​h​i​s​ ​Q​R​ ​c​o​d​e​ ​i​n​s​t​e​a​d​.
+		 */
+		qrInstruction: string
+		/**
+		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​k​e​y
+		 */
+		backupTitle: string
+		/**
+		 * I​f​ ​y​o​u​ ​l​o​s​e​ ​y​o​u​r​ ​p​h​o​n​e​,​ ​t​h​i​s​ ​k​e​y​ ​l​e​t​s​ ​y​o​u​ ​s​e​t​ ​u​p​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​g​a​i​n​.​ ​S​a​v​e​ ​i​t​ ​s​o​m​e​w​h​e​r​e​ ​o​t​h​e​r​ ​t​h​a​n​ ​t​h​i​s​ ​p​h​o​n​e​.
+		 */
+		backupDescription: string
+		/**
+		 * S​a​v​e​ ​t​o​ ​a​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+		 */
+		saveToPasswordManager: string
+		/**
+		 * S​h​a​r​e​ ​t​o​ ​a​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r
+		 */
+		shareToPasswordManager: string
+		/**
+		 * C​o​p​y​ ​f​o​r​ ​m​a​n​u​a​l​ ​b​a​c​k​u​p
+		 */
+		copyForManualBackup: string
+		/**
+		 * N​o​ ​p​a​s​s​w​o​r​d​ ​m​a​n​a​g​e​r​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​.​ ​C​o​p​y​ ​t​h​e​ ​k​e​y​ ​f​o​r​ ​a​ ​m​a​n​u​a​l​ ​b​a​c​k​u​p​ ​i​n​s​t​e​a​d​.
+		 */
+		passwordManagerUnavailable: string
+		/**
+		 * I​'​v​e​ ​s​a​v​e​d​ ​i​t
+		 */
+		savedIt: string
+		/**
+		 * B​l​i​n​k​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​s​e​t​u​p​ ​k​e​y​
+	​
+	​A​c​c​o​u​n​t​:​ ​{​a​c​c​o​u​n​t​}​
+	​S​e​t​u​p​ ​k​e​y​:​ ​{​k​e​y​}​
+	​
+	​I​f​ ​y​o​u​ ​l​o​s​e​ ​y​o​u​r​ ​p​h​o​n​e​,​ ​a​d​d​ ​t​h​i​s​ ​s​e​t​u​p​ ​k​e​y​ ​t​o​ ​a​n​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​g​e​t​ ​y​o​u​r​ ​B​l​i​n​k​ ​l​o​g​i​n​ ​c​o​d​e​s​ ​b​a​c​k​.​ ​A​n​y​o​n​e​ ​w​i​t​h​ ​t​h​i​s​ ​k​e​y​ ​c​a​n​ ​m​a​k​e​ ​y​o​u​r​ ​c​o​d​e​s​,​ ​s​o​ ​k​e​e​p​ ​i​t​ ​p​r​i​v​a​t​e​.
+		 * @param {string} account
+		 * @param {string} key
+		 */
+		keyBackupText: RequiredParams<'account' | 'key'>
+		/**
+		 * Y​o​u​r​ ​a​c​c​o​u​n​t​ ​i​s​ ​n​o​w​ ​p​r​o​t​e​c​t​e​d
+		 */
+		protectedTitle: string
+		/**
+		 * F​r​o​m​ ​n​o​w​ ​o​n​,​ ​l​o​g​g​i​n​g​ ​i​n​ ​n​e​e​d​s​ ​a​ ​o​n​e​-​t​i​m​e​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		protectedDescription: string
+		/**
+		 * I​f​ ​y​o​u​ ​g​e​t​ ​a​ ​n​e​w​ ​p​h​o​n​e​,​ ​m​o​v​e​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​t​o​ ​i​t​ ​<​b​o​l​d​>​b​e​f​o​r​e​<​/​b​o​l​d​>​ ​y​o​u​ ​r​e​s​e​t​ ​t​h​e​ ​o​l​d​ ​o​n​e​.
+		 */
+		newPhoneTip: string
+		/**
+		 * D​o​n​e
+		 */
+		done: string
+	}
+	TwoFactorTurnOff: {
+		/**
+		 * 2​F​A​:​ ​E​n​a​b​l​e​d
+		 */
+		statusEnabled: string
+		/**
+		 * 2​F​A​:​ ​D​i​s​a​b​l​e​d
+		 */
+		statusDisabled: string
+		/**
+		 * W​e​ ​d​o​n​'​t​ ​r​e​c​o​m​m​e​n​d​ ​d​i​s​a​b​l​i​n​g​ ​2​F​A
+		 */
+		modalTitle: string
+		/**
+		 * T​h​i​s​ ​w​o​u​l​d​ ​l​o​w​e​r​ ​y​o​u​r​ ​a​c​c​o​u​n​t​'​s​ ​s​e​c​u​r​i​t​y​ ​a​n​d​ ​m​a​k​e​ ​i​t​ ​e​a​s​i​e​r​ ​f​o​r​ ​a​ ​t​h​i​r​d​ ​p​a​r​t​y​ ​t​o​ ​a​c​c​e​s​s​ ​y​o​u​r​ ​a​c​c​o​u​n​t​ ​w​i​t​h​o​u​t​ ​y​o​u​r​ ​p​e​r​m​i​s​s​i​o​n​.
+		 */
+		modalBody: string
+		/**
+		 * K​e​e​p​ ​m​e​ ​p​r​o​t​e​c​t​e​d
+		 */
+		keepProtected: string
+		/**
+		 * E​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​ ​t​o​ ​t​u​r​n​ ​o​f​f​ ​t​w​o​-​f​a​c​t​o​r​ ​a​u​t​h​e​n​t​i​c​a​t​i​o​n​.
+		 */
+		codeInstruction: string
+		/**
+		 * T​h​a​t​ ​c​o​d​e​ ​i​s​ ​i​n​c​o​r​r​e​c​t​.​ ​E​n​t​e​r​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		codeInvalid: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​n​ ​h​o​u​r​.
+		 */
+		tooManyAttempts: string
+		/**
+		 * 2​F​A​ ​m​a​n​u​a​l​ ​r​e​s​e​t
+		 */
+		manualResetTitle: string
+		/**
+		 * F​o​r​ ​y​o​u​r​ ​p​r​o​t​e​c​t​i​o​n​,​ ​w​e​ ​d​o​n​'​t​ ​a​l​l​o​w​ ​r​e​m​o​v​a​l​ ​o​f​ ​2​F​A​ ​i​n​s​i​d​e​ ​t​h​e​ ​a​p​p​.​ ​I​f​ ​y​o​u​ ​n​e​e​d​ ​a​ ​2​F​A​ ​r​e​s​e​t​,​ ​c​o​n​t​a​c​t​ ​o​u​r​ ​<​s​u​p​p​o​r​t​>​S​u​p​p​o​r​t​<​/​s​u​p​p​o​r​t​>​.
+		 */
+		manualResetBody: string
+	}
+	LoginMethodCode: {
+		/**
+		 * A​d​d​ ​e​m​a​i​l
+		 */
+		addEmailTitle: string
+		/**
+		 * A​d​d​ ​p​h​o​n​e​ ​n​u​m​b​e​r
+		 */
+		addPhoneTitle: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​e​m​a​i​l​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addEmailCode: string
+		/**
+		 * T​o​ ​a​d​d​ ​y​o​u​r​ ​p​h​o​n​e​ ​n​u​m​b​e​r​,​ ​e​n​t​e​r​ ​t​h​e​ ​6​-​d​i​g​i​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		addPhoneCode: string
+		/**
+		 * T​h​a​t​ ​c​o​d​e​ ​i​s​ ​i​n​c​o​r​r​e​c​t​.​ ​E​n​t​e​r​ ​t​h​e​ ​c​u​r​r​e​n​t​ ​c​o​d​e​ ​f​r​o​m​ ​y​o​u​r​ ​a​u​t​h​e​n​t​i​c​a​t​o​r​ ​a​p​p​.
+		 */
+		codeInvalid: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​a​t​t​e​m​p​t​s​.​ ​T​r​y​ ​a​g​a​i​n​ ​i​n​ ​a​n​ ​h​o​u​r​.
+		 */
+		tooManyAttempts: string
+	}
 	BackupRequired: {
 		/**
 		 * B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​f​i​r​s​t
@@ -13667,6 +14015,31 @@ type RootTranslation = {
 		 * R​e​a​d
 		 */
 		cta: string
+	}
+	StaleCloudBundleBulletin: {
+		/**
+		 * U​p​d​a​t​e​ ​y​o​u​r​ ​c​l​o​u​d​ ​b​a​c​k​u​p
+		 */
+		title: string
+		/**
+		 * Y​o​u​r​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​i​n​ ​{​p​r​o​v​i​d​e​r​}​ ​i​s​ ​o​u​t​ ​o​f​ ​d​a​t​e​.​ ​B​a​c​k​ ​u​p​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​a​g​a​i​n​ ​t​o​ ​u​p​d​a​t​e​ ​i​t​.
+		 * @param {string} provider
+		 */
+		body: RequiredParams<'provider'>
+		/**
+		 * B​a​c​k​ ​u​p​ ​a​g​a​i​n
+		 */
+		cta: string
+	}
+	RecoveryBundleScreen: {
+		/**
+		 * N​o​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​ ​y​e​t​.​ ​I​t​'​s​ ​c​r​e​a​t​e​d​ ​a​f​t​e​r​ ​y​o​u​r​ ​f​i​r​s​t​ ​t​r​a​n​s​a​c​t​i​o​n​.
+		 */
+		noBundleToExport: string
+		/**
+		 * C​o​u​l​d​ ​n​o​t​ ​d​o​w​n​l​o​a​d​ ​t​h​e​ ​e​m​e​r​g​e​n​c​y​ ​b​u​n​d​l​e​.
+		 */
+		exportFailed: string
 	}
 	SelfCustodialOffline: {
 		/**
@@ -22043,7 +22416,7 @@ export type TranslationFunctions = {
 		 */
 		posCopied: () => LocalizedString
 		/**
-		 * Create address
+		 * Create Lightning address
 		 */
 		createAddress: () => LocalizedString
 		/**
@@ -22074,6 +22447,10 @@ export type TranslationFunctions = {
 		 * Non-custodial account
 		 */
 		nonCustodialAccount: () => LocalizedString
+		/**
+		 * Custodial account
+		 */
+		custodialAccount: () => LocalizedString
 		/**
 		 * Tap to set username
 		 */
@@ -22463,14 +22840,6 @@ export type TranslationFunctions = {
 		 */
 		totpDeactivated: () => LocalizedString
 		/**
-		 * Delete two-factor authentication
-		 */
-		totpDeleteAlertTitle: () => LocalizedString
-		/**
-		 * Are you sure you want to delete your two-factor authentication?
-		 */
-		totpDeleteAlertContent: () => LocalizedString
-		/**
 		 * Copied your account ID to clipboard
 		 */
 		copiedAccountId: () => LocalizedString
@@ -22526,14 +22895,6 @@ export type TranslationFunctions = {
 		 * Two-factor authentication
 		 */
 		title: () => LocalizedString
-		/**
-		 * Secret/backup
-		 */
-		secret: () => LocalizedString
-		/**
-		 * Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret.
-		 */
-		content: () => LocalizedString
 	}
 	TotpRegistrationValidateScreen: {
 		/**
@@ -22544,14 +22905,6 @@ export type TranslationFunctions = {
 		 * Enter the 6-digit code from your authenticator app to validate your two-factor authentication.
 		 */
 		enter6digitCode: () => LocalizedString
-		/**
-		 * Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.
-
-	Devices on this account which are not logged in with 2FA will need to log back in.
-
-	Only level 2 accounts can be recovered by customer support in the event of lost 2FA access.
-		 */
-		success: () => LocalizedString
 	}
 	TotpLoginValidateScreen: {
 		/**
@@ -22946,6 +23299,14 @@ export type TranslationFunctions = {
 		 * Unable to fetch fees at this time
 		 */
 		error: () => LocalizedString
+		/**
+		 * Inactivity >{months} months
+		 */
+		inactivity: (arg: { months: number }) => LocalizedString
+		/**
+		 * {amount}/month
+		 */
+		usdPerMonth: (arg: { amount: string }) => LocalizedString
 	}
 	TransactionLimitsScreen: {
 		/**
@@ -26640,10 +27001,6 @@ export type TranslationFunctions = {
 			 */
 			description: (arg: { provider: string }) => LocalizedString
 			/**
-			 * Encrypt with additional password
-			 */
-			encryptCheckbox: () => LocalizedString
-			/**
 			 * Password
 			 */
 			password: () => LocalizedString
@@ -26736,6 +27093,36 @@ export type TranslationFunctions = {
 			 * Network error. Please check your connection and try again.
 			 */
 			networkError: () => LocalizedString
+		}
+		BundleExport: {
+			/**
+			 * Emergency exit
+			 */
+			title: () => LocalizedString
+			/**
+			 * If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.
+			 */
+			body: () => LocalizedString
+			/**
+			 * Learn more about unilateral exit
+			 */
+			learnMore: () => LocalizedString
+			/**
+			 * Download bundle
+			 */
+			download: () => LocalizedString
+			/**
+			 * Sensitive
+			 */
+			sensitiveTitle: () => LocalizedString
+			/**
+			 * This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.
+			 */
+			sensitiveBody: () => LocalizedString
+			/**
+			 * Download
+			 */
+			sensitiveConfirm: () => LocalizedString
 		}
 		ManualBackup: {
 			Alerts: {
@@ -26877,11 +27264,39 @@ export type TranslationFunctions = {
 		 * Transferring your funds. It should be done in a few seconds.
 		 */
 		transferringFunds: () => LocalizedString
+		transferInProgress: {
+			/**
+			 * Your funds are on their way to your new account. Keep the app open and we'll finish up automatically.
+			 */
+			body: () => LocalizedString
+		}
 		transferDelayed: {
 			/**
 			 * Your funds are on their way to your new account. This is taking longer than usual — keep the app open and we'll finish up automatically.
 			 */
 			body: () => LocalizedString
+			/**
+			 * Contact support
+			 */
+			contactSupportCta: () => LocalizedString
+		}
+		storageUnavailable: {
+			/**
+			 * We couldn't read your migration progress from this device. Nothing is lost — your funds are safe and your progress is still saved.
+			 */
+			unreadableBody: () => LocalizedString
+			/**
+			 * Your device has no storage space left, so we can't read your migration progress. Free up some space and try again. Nothing is lost — your funds are safe.
+			 */
+			outOfSpaceBody: () => LocalizedString
+			/**
+			 * We couldn't save your migration progress on this device. Nothing is lost: your funds are safe. Try again.
+			 */
+			notSavedBody: () => LocalizedString
+			/**
+			 * Your device has no storage space left, so we can't save your migration progress. Free up some space and try again. Nothing is lost: your funds are safe.
+			 */
+			notSavedOutOfSpaceBody: () => LocalizedString
 			/**
 			 * Contact support
 			 */
@@ -27432,6 +27847,24 @@ export type TranslationFunctions = {
 		 */
 		recognizePhraseBody: () => LocalizedString
 	}
+	EmergencyRecovery: {
+		/**
+		 * Operator unreachable
+		 */
+		outageTitle: () => LocalizedString
+		/**
+		 * Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support}
+		 */
+		outageBody: (arg: { support: string }) => LocalizedString
+		/**
+		 * Support
+		 */
+		outageSupport: () => LocalizedString
+		/**
+		 * Try again later
+		 */
+		tryAgainLater: () => LocalizedString
+	}
 	BackupNudge: {
 		/**
 		 * Your funds are at risk
@@ -27462,6 +27895,288 @@ export type TranslationFunctions = {
 		 */
 		secureMe: () => LocalizedString
 	}
+	TwoFactorEnforcement: {
+		/**
+		 * Set two-factor authentication
+		 */
+		title: () => LocalizedString
+		/**
+		 * Protect your account from unauthorized access.
+		 */
+		cardDescription: () => LocalizedString
+		/**
+		 * Set
+		 */
+		cardCta: () => LocalizedString
+		/**
+		 * Protect your account from unauthorized access by setting it up.
+		 */
+		settingsDescription: () => LocalizedString
+		/**
+		 * Set two-factor authentication now
+		 */
+		setupTitle: () => LocalizedString
+		/**
+		 * To prevent unauthorized access to your account, add two-factor authentication now.
+		 */
+		setupDescription: () => LocalizedString
+		/**
+		 * Set authenticator
+		 */
+		setAuthenticator: () => LocalizedString
+		/**
+		 * Add an authenticator to protect your funds
+		 */
+		reminderTitle: () => LocalizedString
+		/**
+		 * Your balance has grown. An authenticator app keeps your account safe, even if someone gets hold of your email or phone.
+		 */
+		reminderDescription: () => LocalizedString
+		/**
+		 * If you dismiss now, make sure to enable it as soon as possible.
+		 */
+		modalReminder: () => LocalizedString
+		/**
+		 * You can dismiss this two more times.
+		 */
+		dismissTwoMore: () => LocalizedString
+		/**
+		 * You can dismiss this one more time.
+		 */
+		dismissOneMore: () => LocalizedString
+		/**
+		 * This is the last time you can dismiss this.
+		 */
+		dismissLast: () => LocalizedString
+		/**
+		 * Set now
+		 */
+		setNow: () => LocalizedString
+		/**
+		 * I don't want to
+		 */
+		dontWantTo: () => LocalizedString
+		/**
+		 * You have over {amount}, please add additional protection
+		 */
+		highBalanceTitle: (arg: { amount: string }) => LocalizedString
+		/**
+		 * Please add additional protection to keep using Blink
+		 */
+		protectionRequiredTitle: () => LocalizedString
+		/**
+		 * The more funds you have, the more important it is with better security. Please add authenticator to continue using Blink.
+		 */
+		protectionRequiredBody: () => LocalizedString
+		/**
+		 * If you don't want to set two-factor authentication
+		 */
+		nonCustodialTitle: () => LocalizedString
+		/**
+		 * The other option is to move to non-custodial. Then you are responsible for your own funds.
+		 */
+		nonCustodialBody: () => LocalizedString
+	}
+	AuthenticatorOnboarding: {
+		/**
+		 * Protect your funds with an authenticator
+		 */
+		introTitle: () => LocalizedString
+		/**
+		 * An authenticator app makes a new 6-digit code every 30 seconds.
+		 */
+		introDescription: () => LocalizedString
+		/**
+		 * Stops account takeovers
+		 */
+		takeoversTitle: () => LocalizedString
+		/**
+		 * The code lives only on your phone
+		 */
+		takeoversDescription: () => LocalizedString
+		/**
+		 * Be safe even if your number is stolen
+		 */
+		stolenNumberTitle: () => LocalizedString
+		/**
+		 * Even if someone gets into your email or phone number, they can't log in
+		 */
+		stolenNumberDescription: () => LocalizedString
+		/**
+		 * Takes about 2 minutes
+		 */
+		durationTitle: () => LocalizedString
+		/**
+		 * We'll guide you step by step
+		 */
+		durationDescription: () => LocalizedString
+		/**
+		 * Get started
+		 */
+		getStarted: () => LocalizedString
+		/**
+		 * Get an authenticator app
+		 */
+		appsTitle: () => LocalizedString
+		/**
+		 * Any authenticator app works. These are free and trusted:
+		 */
+		appsDescription: () => LocalizedString
+		/**
+		 * Simple and widely used. Optional backup to your Google account.
+		 */
+		googleAuthenticatorDescription: () => LocalizedString
+		/**
+		 * Open source. End-to-end encrypted backup and sync.
+		 */
+		protonAuthenticatorDescription: () => LocalizedString
+		/**
+		 * Open source. No account needed.
+		 */
+		twoFasAuthDescription: () => LocalizedString
+		/**
+		 * Get
+		 */
+		get: () => LocalizedString
+		/**
+		 * "Get" opens the App Store or Google Play. Come back to Blink when it's installed.
+		 */
+		storeNote: () => LocalizedString
+		/**
+		 * I have an app
+		 */
+		haveAnApp: () => LocalizedString
+		/**
+		 * Copy this setup key into your authenticator app.
+		 */
+		keyInstruction: () => LocalizedString
+		/**
+		 * Using another device?
+	Scan this QR code instead.
+		 */
+		qrInstruction: () => LocalizedString
+		/**
+		 * Back up your key
+		 */
+		backupTitle: () => LocalizedString
+		/**
+		 * If you lose your phone, this key lets you set up your authenticator again. Save it somewhere other than this phone.
+		 */
+		backupDescription: () => LocalizedString
+		/**
+		 * Save to a password manager
+		 */
+		saveToPasswordManager: () => LocalizedString
+		/**
+		 * Share to a password manager
+		 */
+		shareToPasswordManager: () => LocalizedString
+		/**
+		 * Copy for manual backup
+		 */
+		copyForManualBackup: () => LocalizedString
+		/**
+		 * No password manager available on this device. Copy the key for a manual backup instead.
+		 */
+		passwordManagerUnavailable: () => LocalizedString
+		/**
+		 * I've saved it
+		 */
+		savedIt: () => LocalizedString
+		/**
+		 * Blink authenticator setup key
+
+	Account: {account}
+	Setup key: {key}
+
+	If you lose your phone, add this setup key to an authenticator app to get your Blink login codes back. Anyone with this key can make your codes, so keep it private.
+		 */
+		keyBackupText: (arg: { account: string, key: string }) => LocalizedString
+		/**
+		 * Your account is now protected
+		 */
+		protectedTitle: () => LocalizedString
+		/**
+		 * From now on, logging in needs a one-time code from your authenticator app.
+		 */
+		protectedDescription: () => LocalizedString
+		/**
+		 * If you get a new phone, move your authenticator to it <bold>before</bold> you reset the old one.
+		 */
+		newPhoneTip: () => LocalizedString
+		/**
+		 * Done
+		 */
+		done: () => LocalizedString
+	}
+	TwoFactorTurnOff: {
+		/**
+		 * 2FA: Enabled
+		 */
+		statusEnabled: () => LocalizedString
+		/**
+		 * 2FA: Disabled
+		 */
+		statusDisabled: () => LocalizedString
+		/**
+		 * We don't recommend disabling 2FA
+		 */
+		modalTitle: () => LocalizedString
+		/**
+		 * This would lower your account's security and make it easier for a third party to access your account without your permission.
+		 */
+		modalBody: () => LocalizedString
+		/**
+		 * Keep me protected
+		 */
+		keepProtected: () => LocalizedString
+		/**
+		 * Enter the 6-digit code from your authenticator app to turn off two-factor authentication.
+		 */
+		codeInstruction: () => LocalizedString
+		/**
+		 * That code is incorrect. Enter the current code from your authenticator app.
+		 */
+		codeInvalid: () => LocalizedString
+		/**
+		 * Too many attempts. Try again in an hour.
+		 */
+		tooManyAttempts: () => LocalizedString
+		/**
+		 * 2FA manual reset
+		 */
+		manualResetTitle: () => LocalizedString
+		/**
+		 * For your protection, we don't allow removal of 2FA inside the app. If you need a 2FA reset, contact our <support>Support</support>.
+		 */
+		manualResetBody: () => LocalizedString
+	}
+	LoginMethodCode: {
+		/**
+		 * Add email
+		 */
+		addEmailTitle: () => LocalizedString
+		/**
+		 * Add phone number
+		 */
+		addPhoneTitle: () => LocalizedString
+		/**
+		 * To add your email, enter the 6-digit code from your authenticator app.
+		 */
+		addEmailCode: () => LocalizedString
+		/**
+		 * To add your phone number, enter the 6-digit code from your authenticator app.
+		 */
+		addPhoneCode: () => LocalizedString
+		/**
+		 * That code is incorrect. Enter the current code from your authenticator app.
+		 */
+		codeInvalid: () => LocalizedString
+		/**
+		 * Too many attempts. Try again in an hour.
+		 */
+		tooManyAttempts: () => LocalizedString
+	}
 	BackupRequired: {
 		/**
 		 * Back up your wallet first
@@ -27489,6 +28204,30 @@ export type TranslationFunctions = {
 		 * Read
 		 */
 		cta: () => LocalizedString
+	}
+	StaleCloudBundleBulletin: {
+		/**
+		 * Update your cloud backup
+		 */
+		title: () => LocalizedString
+		/**
+		 * Your emergency bundle in {provider} is out of date. Back up your wallet again to update it.
+		 */
+		body: (arg: { provider: string }) => LocalizedString
+		/**
+		 * Back up again
+		 */
+		cta: () => LocalizedString
+	}
+	RecoveryBundleScreen: {
+		/**
+		 * No emergency bundle yet. It's created after your first transaction.
+		 */
+		noBundleToExport: () => LocalizedString
+		/**
+		 * Could not download the emergency bundle.
+		 */
+		exportFailed: () => LocalizedString
 	}
 	SelfCustodialOffline: {
 		/**

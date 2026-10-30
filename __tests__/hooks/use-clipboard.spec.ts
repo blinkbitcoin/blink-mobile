@@ -1,6 +1,6 @@
 import { renderHook, act } from "@testing-library/react-hooks"
 
-import { useClipboard } from "@app/hooks/use-clipboard"
+import { cancelPendingClipboardClear, useClipboard } from "@app/hooks/use-clipboard"
 
 const mockSetString = jest.fn()
 const mockGetString = jest.fn(() => Promise.resolve(""))
@@ -36,9 +36,11 @@ describe("useClipboard", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers()
+    cancelPendingClipboardClear()
   })
 
   afterEach(() => {
+    cancelPendingClipboardClear()
     jest.useRealTimers()
   })
 
@@ -210,43 +212,78 @@ describe("useClipboard", () => {
       expect(mockSetString).toHaveBeenCalledWith("")
     })
 
-    it("clears a pending secret immediately when the consumer unmounts", async () => {
-      mockGetString.mockResolvedValue("test")
+    it("still clears the clipboard after unmount (auto-clear is a security guarantee)", async () => {
+      mockGetString.mockResolvedValue("secret")
       const { result, unmount } = renderHook(() => useClipboard(5000))
 
       act(() => {
-        result.current.copyToClipboard({ content: "test" })
+        result.current.copyToClipboard({ content: "secret" })
       })
 
       mockSetString.mockClear()
       unmount()
+      expect(mockSetString).not.toHaveBeenCalled()
+
+      act(() => {
+        jest.advanceTimersByTime(5000)
+      })
       await flushMicrotasks()
 
       expect(mockSetString).toHaveBeenCalledWith("")
     })
 
-    it("does not clear again after the delay when unmount already cleared", async () => {
-      mockGetString.mockResolvedValue("test")
-      const { result, unmount } = renderHook(() => useClipboard(5000))
+    it("does not let a departed screen's pending clear wipe a newer copy from another instance", () => {
+      const secretScreen = renderHook(() => useClipboard(5000))
+      const otherScreen = renderHook(() => useClipboard())
 
       act(() => {
-        result.current.copyToClipboard({ content: "test" })
+        secretScreen.result.current.copyToClipboard({ content: "secret" })
+      })
+      secretScreen.unmount()
+
+      act(() => {
+        jest.advanceTimersByTime(3000)
+      })
+      act(() => {
+        otherScreen.result.current.copyToClipboard({ content: "tx-id" })
       })
 
-      unmount()
-      await flushMicrotasks()
+      mockSetString.mockClear()
+      act(() => {
+        jest.advanceTimersByTime(60_000)
+      })
+
+      // The stale 5s clear from the secret screen must have been cancelled by
+      // the newer copy; nothing may blank the clipboard now.
+      expect(mockSetString).not.toHaveBeenCalledWith("")
+    })
+
+    it("cancelPendingClipboardClear protects clipboard writes that bypass the hook", () => {
+      // Callers that use Clipboard.setString directly (receive screen,
+      // developer screen) cancel the pending clear first, so a secret copied
+      // a minute earlier cannot wipe their content.
+      const secretScreen = renderHook(() => useClipboard(5000))
+
+      act(() => {
+        secretScreen.result.current.copyToClipboard({ content: "secret" })
+      })
+      secretScreen.unmount()
+
+      act(() => {
+        jest.advanceTimersByTime(3000)
+      })
+      // Direct-call site: cancel, then write outside the hook.
+      cancelPendingClipboardClear()
       mockSetString.mockClear()
 
       act(() => {
-        jest.advanceTimersByTime(10_000)
+        jest.advanceTimersByTime(60_000)
       })
-      await flushMicrotasks()
 
       expect(mockSetString).not.toHaveBeenCalled()
     })
 
-    it("does not touch the clipboard on unmount when no timed copy is pending", async () => {
-      mockGetString.mockResolvedValue("persistent")
+    it("does not touch the clipboard on unmount when no timed copy is pending", () => {
       const { result, unmount } = renderHook(() => useClipboard())
 
       act(() => {
@@ -255,7 +292,6 @@ describe("useClipboard", () => {
 
       mockSetString.mockClear()
       unmount()
-      await flushMicrotasks()
 
       expect(mockSetString).not.toHaveBeenCalled()
     })

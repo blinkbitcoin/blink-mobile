@@ -2461,7 +2461,7 @@
     "sdkGenericError": "Không thể ước tính phí. Vui lòng thử số tiền khác."
   },
   "SettingsScreen": {
-    "createAddress": "Tạo địa chỉ",
+    "createAddress": "Tạo địa chỉ Lightning",
     "addressDisabled": "(đã tắt)",
     "donationButton": "Nút quyên góp",
     "btcpayServer": "BTCPay Server",
@@ -2478,6 +2478,7 @@
     "activated": "Đã kích hoạt",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "Tài khoản không lưu ký",
+    "custodialAccount": "Tài khoản lưu ký",
     "tapUserName": "Nhấn để đặt tên người dùng",
     "notifications": "Notifications",
     "title": "Cài đặt",
@@ -2586,8 +2587,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "Mã Tài khoản",
@@ -2640,14 +2639,11 @@
     "youGet": "Bạn nhận được"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "Khóa bí mật/sao lưu",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2721,7 +2717,9 @@
     "noFee": "miễn phí",
     "fromApprox": "từ ~{fee: string}",
     "satAmount": "{amount: string} SAT",
-    "error": "Không thể lấy thông tin phí tại thời điểm này"
+    "error": "Không thể lấy thông tin phí tại thời điểm này",
+    "inactivity": "Không hoạt động >{months: number} tháng",
+    "usdPerMonth": "{amount: string}/tháng"
   },
   "TransactionLimitsScreen": {
     "receive": "Nhận",
@@ -3874,10 +3872,18 @@
         "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
     },
+    "BundleExport": {
+      "title": "Rút khẩn cấp",
+      "body": "Nếu Spark ngừng hoạt động, gói này cho phép bạn chuyển bitcoin của mình on-chain mà không cần Blink. Số dư đô la của bạn không thể khôi phục.",
+      "download": "Tải gói xuống",
+      "sensitiveTitle": "Nhạy cảm",
+      "learnMore": "Tìm hiểu thêm về rút đơn phương",
+      "sensitiveConfirm": "Tải xuống",
+      "sensitiveBody": "Tệp này cho thấy số dư và lịch sử thanh toán của bạn, vì vậy hãy giữ riêng tư. Để dùng tệp này trong trường hợp khẩn cấp, bạn cũng cần cụm từ sao lưu của mình."
+    },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
-      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",
@@ -4003,8 +4009,18 @@
     "explainerCheck5": "Tài khoản của bạn sẽ bị trừ phí mạng Spark",
     "explainerCta": "Tôi hiểu",
     "transferringFunds": "Đang chuyển tiền của bạn. Sẽ hoàn tất trong vài giây.",
+    "transferInProgress": {
+      "body": "Tiền của bạn đang trên đường chuyển đến tài khoản mới. Hãy giữ ứng dụng mở và chúng tôi sẽ tự động hoàn tất."
+    },
     "transferDelayed": {
       "body": "Tiền của bạn đang trên đường chuyển đến tài khoản mới. Quá trình này lâu hơn bình thường — hãy giữ ứng dụng mở và chúng tôi sẽ tự động hoàn tất.",
+      "contactSupportCta": "Liên hệ hỗ trợ"
+    },
+    "storageUnavailable": {
+      "unreadableBody": "Chúng tôi không thể đọc tiến trình chuyển đổi của bạn từ thiết bị này. Không có gì bị mất: tiền của bạn vẫn an toàn và tiến trình vẫn được lưu.",
+      "outOfSpaceBody": "Thiết bị của bạn không còn dung lượng lưu trữ, nên chúng tôi không thể đọc tiến trình chuyển đổi của bạn. Hãy giải phóng dung lượng rồi thử lại. Không có gì bị mất: tiền của bạn vẫn an toàn.",
+      "notSavedBody": "Chúng tôi không thể lưu tiến trình chuyển đổi của bạn trên thiết bị này. Không có gì bị mất: tiền của bạn vẫn an toàn. Hãy thử lại.",
+      "notSavedOutOfSpaceBody": "Thiết bị của bạn không còn dung lượng lưu trữ, nên chúng tôi không thể lưu tiến trình chuyển đổi của bạn. Hãy giải phóng dung lượng rồi thử lại. Không có gì bị mất: tiền của bạn vẫn an toàn.",
       "contactSupportCta": "Liên hệ hỗ trợ"
     },
     "clockOutOfSync": {
@@ -4068,6 +4084,12 @@
     "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
     "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Không kết nối được nhà vận hành",
+    "outageBody": "Spark đang gặp sự cố. Vui lòng đợi vài phút rồi thử lại hoặc liên hệ {support} của chúng tôi",
+    "outageSupport": "Bộ phận hỗ trợ",
+    "tryAgainLater": "Thử lại sau"
+  },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",
     "description": "Bảo mật ví của bạn ngay bây giờ. Chỉ mất một phút.",
@@ -4076,6 +4098,81 @@
     "modalTitle": "Bảo mật tiền của bạn",
     "modalDescription": "Chúng tôi khuyến nghị bạn sao lưu ví để ngăn chặn mất hoàn toàn tiền trong trường hợp bạn mất thiết bị này.",
     "secureMe": "Bảo mật ví"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Thiết lập xác thực hai yếu tố",
+    "cardDescription": "Bảo vệ tài khoản của bạn khỏi truy cập trái phép.",
+    "cardCta": "Thiết lập",
+    "settingsDescription": "Bảo vệ tài khoản của bạn khỏi truy cập trái phép bằng cách thiết lập nó.",
+    "setupTitle": "Thiết lập xác thực hai yếu tố ngay",
+    "setupDescription": "Để ngăn truy cập trái phép vào tài khoản của bạn, hãy thêm xác thực hai yếu tố ngay.",
+    "setAuthenticator": "Thiết lập ứng dụng xác thực",
+    "reminderTitle": "Thêm ứng dụng xác thực để bảo vệ tiền của bạn",
+    "reminderDescription": "Số dư của bạn đã tăng. Ứng dụng xác thực giúp tài khoản của bạn an toàn, ngay cả khi ai đó chiếm được email hoặc điện thoại của bạn.",
+    "modalReminder": "Nếu bạn bỏ qua bây giờ, hãy nhớ bật nó càng sớm càng tốt.",
+    "dismissTwoMore": "Bạn có thể bỏ qua điều này thêm hai lần nữa.",
+    "dismissOneMore": "Bạn có thể bỏ qua điều này thêm một lần nữa.",
+    "dismissLast": "Đây là lần cuối cùng bạn có thể bỏ qua điều này.",
+    "setNow": "Thiết lập ngay",
+    "dontWantTo": "Tôi không muốn",
+    "highBalanceTitle": "Bạn có hơn {amount}, vui lòng thêm lớp bảo vệ bổ sung",
+    "protectionRequiredTitle": "Vui lòng thêm lớp bảo vệ bổ sung để tiếp tục sử dụng Blink",
+    "protectionRequiredBody": "Bạn càng có nhiều tiền, bảo mật tốt hơn càng quan trọng. Vui lòng thêm ứng dụng xác thực để tiếp tục sử dụng Blink.",
+    "nonCustodialTitle": "Nếu bạn không muốn thiết lập xác thực hai yếu tố",
+    "nonCustodialBody": "Lựa chọn khác là chuyển sang không lưu ký. Khi đó bạn tự chịu trách nhiệm về tiền của mình."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Bảo vệ tiền của bạn bằng ứng dụng xác thực",
+    "introDescription": "Ứng dụng xác thực tạo một mã 6 chữ số mới sau mỗi 30 giây.",
+    "takeoversTitle": "Ngăn chặn chiếm đoạt tài khoản",
+    "takeoversDescription": "Mã chỉ có trên điện thoại của bạn",
+    "stolenNumberTitle": "An toàn ngay cả khi số điện thoại bị đánh cắp",
+    "stolenNumberDescription": "Ngay cả khi ai đó truy cập được email hoặc số điện thoại của bạn, họ cũng không thể đăng nhập",
+    "durationTitle": "Chỉ mất khoảng 2 phút",
+    "durationDescription": "Chúng tôi sẽ hướng dẫn bạn từng bước",
+    "getStarted": "Bắt đầu",
+    "appsTitle": "Tải ứng dụng xác thực",
+    "appsDescription": "Ứng dụng xác thực nào cũng dùng được. Các ứng dụng sau đây miễn phí và đáng tin cậy:",
+    "googleAuthenticatorDescription": "Đơn giản và được dùng rộng rãi. Tùy chọn sao lưu vào tài khoản Google của bạn.",
+    "protonAuthenticatorDescription": "Mã nguồn mở. Sao lưu và đồng bộ được mã hóa đầu cuối.",
+    "twoFasAuthDescription": "Mã nguồn mở. Không cần tài khoản.",
+    "get": "Tải về",
+    "storeNote": "“Tải về” sẽ mở App Store hoặc Google Play. Hãy quay lại Blink khi đã cài đặt xong.",
+    "haveAnApp": "Tôi đã có ứng dụng",
+    "keyInstruction": "Sao chép khóa thiết lập này vào ứng dụng xác thực của bạn.",
+    "qrInstruction": "Bạn đang dùng thiết bị khác?\nThay vào đó, hãy quét mã QR này.",
+    "backupTitle": "Sao lưu khóa của bạn",
+    "backupDescription": "Nếu bạn mất điện thoại, khóa này giúp bạn thiết lập lại ứng dụng xác thực. Hãy lưu nó ở nơi khác ngoài điện thoại này.",
+    "saveToPasswordManager": "Lưu vào trình quản lý mật khẩu",
+    "shareToPasswordManager": "Chia sẻ với trình quản lý mật khẩu",
+    "copyForManualBackup": "Sao chép để sao lưu thủ công",
+    "passwordManagerUnavailable": "Không có trình quản lý mật khẩu nào trên thiết bị này. Thay vào đó, hãy sao chép khóa để sao lưu thủ công.",
+    "savedIt": "Tôi đã lưu",
+    "keyBackupText": "Khóa thiết lập ứng dụng xác thực Blink\n\nTài khoản: {account}\nKhóa thiết lập: {key}\n\nNếu bạn mất điện thoại, hãy thêm khóa thiết lập này vào một ứng dụng xác thực để lấy lại mã đăng nhập Blink của bạn. Bất kỳ ai có khóa này đều có thể tạo mã của bạn, vì vậy hãy giữ bí mật.",
+    "protectedTitle": "Tài khoản của bạn hiện đã được bảo vệ",
+    "protectedDescription": "Từ giờ trở đi, việc đăng nhập cần mã dùng một lần từ ứng dụng xác thực của bạn.",
+    "newPhoneTip": "Nếu bạn đổi sang điện thoại mới, hãy chuyển ứng dụng xác thực sang máy mới <bold>trước khi</bold> đặt lại máy cũ.",
+    "done": "Xong"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Đã bật",
+    "statusDisabled": "2FA: Đã tắt",
+    "modalTitle": "Chúng tôi không khuyến nghị tắt 2FA",
+    "modalBody": "Việc này sẽ làm giảm bảo mật tài khoản và khiến bên thứ ba dễ truy cập tài khoản của bạn hơn mà không cần sự cho phép của bạn.",
+    "keepProtected": "Giữ tôi được bảo vệ",
+    "codeInstruction": "Nhập mã 6 chữ số từ ứng dụng xác thực để tắt xác thực hai yếu tố.",
+    "codeInvalid": "Mã đó không đúng. Nhập mã hiện tại từ ứng dụng xác thực của bạn.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy thử lại sau một giờ.",
+    "manualResetTitle": "Đặt lại 2FA thủ công",
+    "manualResetBody": "Để bảo vệ bạn, chúng tôi không cho phép gỡ 2FA trong ứng dụng. Nếu bạn cần đặt lại 2FA, hãy liên hệ <support>Bộ phận hỗ trợ</support> của chúng tôi."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Thêm email",
+    "addPhoneTitle": "Thêm số điện thoại",
+    "addEmailCode": "Để thêm email, hãy nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+    "addPhoneCode": "Để thêm số điện thoại, hãy nhập mã 6 chữ số từ ứng dụng xác thực của bạn.",
+    "codeInvalid": "Mã đó không đúng. Nhập mã hiện tại từ ứng dụng xác thực của bạn.",
+    "tooManyAttempts": "Quá nhiều lần thử. Hãy thử lại sau một giờ."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4086,6 +4183,15 @@
     "title": "Đây là tài khoản không lưu ký",
     "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
     "cta": "Đọc"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Cập nhật bản sao lưu trên đám mây",
+    "body": "Gói khẩn cấp của bạn trong {provider} đã cũ. Hãy sao lưu ví của bạn lại để cập nhật.",
+    "cta": "Sao lưu lại"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Chưa có gói khẩn cấp. Gói được tạo sau giao dịch đầu tiên của bạn.",
+    "exportFailed": "Không thể tải xuống gói khẩn cấp."
   },
   "StableBalance": {
     "title": "Số dư ổn định",
