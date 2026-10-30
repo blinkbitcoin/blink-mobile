@@ -686,9 +686,16 @@ export default class KeyStoreWrapper {
    * **`clearLegacyKeyStore` must have run first**, which the caller owns rather
    * than this method, because the session half needs it too. Skipping it leaves
    * both of the things that method exists for undone — see its docblock.
+   *
+   * `spared` names the accounts that are not the previous owner's: an erase still owed
+   * when the device already has accounts of its own takes only the tracked mnemonics
+   * none of them claims. Each goes with its legacy copy, through the same delete. A
+   * mnemonic only the legacy store holds, of an owner who never ran a build that tracks
+   * it, has no id to be named by, and only `clearLegacyKeyStore` reaches it.
    */
   public static async clearUninstallSurvivingKeyMaterial(
     onFailure: (what: string) => void,
+    spared: ReadonlySet<string> = new Set(),
   ): Promise<void> {
     // A list that cannot be read, or cannot be trusted, leaves the per-account
     // wipe with nothing to work from and says so. Treating either as empty
@@ -709,8 +716,11 @@ export default class KeyStoreWrapper {
     // account says nothing about how much of the device was missed, and N
     // identical entries are worse than one that carries the number — the sweep
     // reports its own failures the same way, for the same reason.
+    const owedAccountIds = tracked.accountIds.filter(
+      (accountId) => !spared.has(accountId),
+    )
     let failed = 0
-    for (const accountId of tracked.accountIds) {
+    for (const accountId of owedAccountIds) {
       // Retried without reporting: the per-account label is the repetition this
       // aggregate replaces.
       const removed = await retryOnce(() =>
@@ -718,7 +728,7 @@ export default class KeyStoreWrapper {
       )
       if (!removed) failed += 1
     }
-    if (failed > 0) onFailure(`mnemonic (${failed}/${tracked.accountIds.length})`)
+    if (failed > 0) onFailure(`mnemonic (${failed}/${owedAccountIds.length})`)
   }
 
   public static async removeSessionProfileByToken(token: string): Promise<boolean> {

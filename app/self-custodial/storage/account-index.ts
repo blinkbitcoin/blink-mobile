@@ -32,6 +32,10 @@ export type FindMnemonicResult =
   | { status: typeof StorageReadStatus.Ok; id: string | null }
   | StorageReadFailed
 
+export type AccountIdsRead =
+  | { status: typeof StorageReadStatus.Ok; ids: readonly string[] }
+  | StorageReadFailed
+
 const isEntry = (value: unknown): value is SelfCustodialAccountEntry => {
   if (!value || typeof value !== "object") return false
   const candidate = value as Record<string, unknown>
@@ -45,7 +49,7 @@ const isEntry = (value: unknown): value is SelfCustodialAccountEntry => {
   return true
 }
 
-const toReadFailed = (err: unknown): ReadIndexResult => {
+const toReadFailed = (err: unknown): StorageReadFailed => {
   const error =
     err instanceof Error ? err : new Error(`Account index read failed: ${err}`)
   // Registry read failures can wipe account bookkeeping; never downgrade them
@@ -88,6 +92,48 @@ const writeIndex = async (entries: SelfCustodialAccountEntry[]): Promise<void> =
 }
 
 export const listSelfCustodialAccounts = async (): Promise<ReadIndexResult> => readIndex()
+
+/**
+ * Every account id the index names, read from the same key `readIndex` would use, or that
+ * it cannot say for certain.
+ *
+ * Strict where `readIndex` degrades. That function keeps an index usable by dropping
+ * entries it does not recognise, which is right for a screen listing wallets and wrong for
+ * a caller that spares exactly the ids it is handed: an entry dropped there is a wallet
+ * whose seed would be erased. So a value that is not wholly a list of accounts is a read
+ * that failed, never a shorter list. Read-only, unlike `readIndex`, which also migrates the
+ * legacy list it falls back to.
+ */
+export const readSelfCustodialAccountIds = async (): Promise<AccountIdsRead> => {
+  try {
+    const raw = await AsyncStorage.getItem(ACCOUNT_INDEX_KEY)
+    if (raw) {
+      const parsed: unknown = JSON.parse(raw)
+      const isWholeIndex = Array.isArray(parsed) && parsed.every(isEntry)
+      if (!isWholeIndex) {
+        return toReadFailed(
+          new Error("Account index holds entries that are not accounts"),
+        )
+      }
+      return { status: StorageReadStatus.Ok, ids: parsed.map((entry) => entry.id) }
+    }
+
+    const legacyRaw = await AsyncStorage.getItem(LEGACY_ID_LIST_KEY)
+    if (!legacyRaw) return { status: StorageReadStatus.Ok, ids: [] }
+
+    const legacyParsed: unknown = JSON.parse(legacyRaw)
+    const isWholeList =
+      Array.isArray(legacyParsed) && legacyParsed.every((id) => typeof id === "string")
+    if (!isWholeList) {
+      return toReadFailed(
+        new Error("Legacy account id list holds values that are not ids"),
+      )
+    }
+    return { status: StorageReadStatus.Ok, ids: legacyParsed }
+  } catch (err) {
+    return toReadFailed(err)
+  }
+}
 
 export const StoredWalletPresence = {
   Present: "present",

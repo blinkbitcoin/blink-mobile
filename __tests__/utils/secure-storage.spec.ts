@@ -2138,6 +2138,49 @@ describe("KeyStoreWrapper clearUninstallSurvivingKeyMaterial", () => {
   })
 
   /**
+   * An erase still owed once the device has accounts of its own: the tracked list names
+   * them too, and only the mnemonics none of them claims are the previous owner's.
+   */
+  it("spares the accounts it is handed and erases the rest with their legacy copies", async () => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: "previous\nmine" }
+        : false,
+    )
+
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(onFailure, new Set(["mine"]))
+
+    expect(mockResetInternet).toHaveBeenCalledWith({
+      server: "secure-store.blink.local/mnemonic:previous",
+    })
+    expect(mockRemove).toHaveBeenCalledWith("mnemonic:previous")
+    const touched = [
+      ...mockResetInternet.mock.calls.map(([{ server }]) => server),
+      ...mockRemove.mock.calls.map(([key]) => key),
+    ]
+    expect(touched.filter((key: string) => key.endsWith(":mine"))).toEqual([])
+    expect(onFailure).not.toHaveBeenCalled()
+  })
+
+  it("counts a failure against the mnemonics it was owed, not the whole list", async () => {
+    mockGetInternet.mockImplementation(async (server: string) =>
+      server === "secure-store.blink.local/mnemonicAccounts"
+        ? { username: "mnemonicAccounts", password: "previous\nmine\nyours" }
+        : false,
+    )
+    mockResetInternet.mockImplementation(async ({ server }: { server: string }) => {
+      if (server.endsWith("mnemonic:previous")) throw new Error("keychain unavailable")
+    })
+
+    await KeyStoreWrapper.clearUninstallSurvivingKeyMaterial(
+      onFailure,
+      new Set(["mine", "yours"]),
+    )
+
+    expect(onFailure).toHaveBeenCalledWith("mnemonic (1/1)")
+  })
+
+  /**
    * The wipe is the reason the array shape is still read at all: a device that
    * ran an earlier build of this branch is exactly the device whose seeds this
    * has to reach.

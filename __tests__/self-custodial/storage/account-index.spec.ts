@@ -46,6 +46,7 @@ import {
   removeSelfCustodialAccountId,
   setSelfCustodialLightningAddress,
   StoredWalletPresence,
+  readSelfCustodialAccountIds,
   readSelfCustodialIndexPresence,
   SelfCustodialIndexPresence,
   sweepMnemonicMigration,
@@ -809,5 +810,108 @@ describe("self-custodial account-index", () => {
 
       expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Present)
     })
+  })
+})
+
+/**
+ * The ids an erase spares, so the read can fail but never come back shorter than the
+ * index. Kept out of the describe above, which is at the line cap.
+ */
+describe("self-custodial account-index — strict account ids", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockSetItem.mockResolvedValue(undefined)
+    mockGetItem.mockResolvedValue(null)
+  })
+
+  const setCanonicalRaw = (raw: string) => {
+    mockGetItem.mockImplementation((key: string) =>
+      key === ACCOUNT_INDEX_KEY ? Promise.resolve(raw) : Promise.resolve(null),
+    )
+  }
+
+  const setLegacyRaw = (raw: string) => {
+    mockGetItem.mockImplementation((key: string) =>
+      key === LEGACY_ID_LIST_KEY ? Promise.resolve(raw) : Promise.resolve(null),
+    )
+  }
+
+  it("names every account of the canonical index", async () => {
+    setIndex([
+      { id: "a1", lightningAddress: null },
+      { id: "a2", lightningAddress: "a2@blink.sv" },
+    ])
+
+    expect(await readSelfCustodialAccountIds()).toEqual({
+      status: StorageReadStatus.Ok,
+      ids: ["a1", "a2"],
+    })
+  })
+
+  it("names no account on a device with neither list", async () => {
+    expect(await readSelfCustodialAccountIds()).toEqual({
+      status: StorageReadStatus.Ok,
+      ids: [],
+    })
+  })
+
+  /** Where readIndex would drop the entry and list the rest. */
+  it("fails on an index with one entry that is not an account", async () => {
+    setCanonicalRaw(JSON.stringify([{ id: "a1", lightningAddress: null }, { id: 7 }]))
+
+    const read = await readSelfCustodialAccountIds()
+
+    expect(read.status).toBe(StorageReadStatus.ReadFailed)
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
+  })
+
+  it("fails on a canonical index that is not a list", async () => {
+    setCanonicalRaw('{"not":"a list"}')
+
+    expect((await readSelfCustodialAccountIds()).status).toBe(
+      StorageReadStatus.ReadFailed,
+    )
+  })
+
+  it("fails on a canonical index that is not JSON", async () => {
+    setCanonicalRaw("{truncated")
+
+    expect((await readSelfCustodialAccountIds()).status).toBe(
+      StorageReadStatus.ReadFailed,
+    )
+  })
+
+  it("names the ids of a device that only has the legacy list, without migrating it", async () => {
+    setLegacyOnly(["l1", "l2"])
+
+    expect(await readSelfCustodialAccountIds()).toEqual({
+      status: StorageReadStatus.Ok,
+      ids: ["l1", "l2"],
+    })
+    expect(mockSetItem).not.toHaveBeenCalled()
+  })
+
+  it("fails on a legacy list that holds something that is not an id", async () => {
+    setLegacyRaw(JSON.stringify(["l1", 2]))
+
+    expect((await readSelfCustodialAccountIds()).status).toBe(
+      StorageReadStatus.ReadFailed,
+    )
+  })
+
+  it("fails on a legacy list that is not a list", async () => {
+    setLegacyRaw('"l1"')
+
+    expect((await readSelfCustodialAccountIds()).status).toBe(
+      StorageReadStatus.ReadFailed,
+    )
+  })
+
+  it("fails when the store cannot be read", async () => {
+    mockGetItem.mockRejectedValue(new Error("AsyncStorage unavailable"))
+
+    expect((await readSelfCustodialAccountIds()).status).toBe(
+      StorageReadStatus.ReadFailed,
+    )
   })
 })
