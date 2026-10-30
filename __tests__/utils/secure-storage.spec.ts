@@ -2740,6 +2740,10 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     mockRemove.mockImplementation(async (key: string) => {
       stores.legacy.delete(key)
     })
+    // The blank an erase falls back to when the delete is refused lands like any write.
+    mockSet.mockImplementation(async (key: string, value: string) => {
+      stores.legacy.set(key, value)
+    })
     mockGetInternet.mockImplementation(async (server: string) => {
       const slot = server.replace("secure-store.blink.local/", "")
       const value = stores.migrated.get(slot)
@@ -3328,6 +3332,11 @@ describe("KeyStoreWrapper.purgeLegacyKeyStore", () => {
     mockRemove.mockImplementation(async (key: string) => {
       if (key === "PIN") throw new Error("keychain unavailable")
       stores.legacy.delete(key)
+    })
+    // Unavailable for the blank too, which would otherwise prove the PIN gone.
+    mockSet.mockImplementation(async (key: string, value: string) => {
+      if (key === "PIN") throw new Error("keychain unavailable")
+      stores.legacy.set(key, value)
     })
 
     const purged = await KeyStoreWrapper.purgeLegacyKeyStore(["alice"], [])
