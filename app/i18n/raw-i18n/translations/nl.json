@@ -2673,7 +2673,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaald van/naar",
     "received": "Jij ontving",
-    "spent": "Je hebt uitgegeven",
+    "sent": "Jij verzond",
     "sending": "Verzenden",
     "receivingAccount": "Ontvangend saldo",
     "sendingAccount": "Verzendend saldo",
