@@ -46,9 +46,9 @@ import {
 import { reportError } from "@app/utils/error-logging"
 import { isIos } from "@app/utils/helper"
 
+import { feeTierLabels } from "./fee-tier-options"
 import { FeeTierSelector } from "./fee-tier-selector"
 import { shouldWarnAboutHighFee } from "./hooks/onchain-fee-alert"
-import { useFeeTierLabels } from "./hooks/use-fee-tier-labels"
 import { useOnchainFeeTierOptions } from "./hooks/use-onchain-fee-tier-options"
 import { useSendWallets } from "./hooks/use-send-wallets"
 
@@ -192,10 +192,10 @@ const SendBitcoinDetailsScreen: React.FC<Props> = ({ route }) => {
    * The fee is shown on review only, so the row and its options carry the tier name and
    * ETA. The shared options still put the fee in the label for the refund flow.
    */
-  const feeTierLabels = useFeeTierLabels()
+  const tierLabels = feeTierLabels(LL)
   const priorityOptions = feeTierOptions.map((option) => ({
     ...option,
-    label: feeTierLabels[option.id],
+    label: tierLabels[option.id],
   }))
 
   const handleFeeTierChange = (tier: typeof feeTier) => {
