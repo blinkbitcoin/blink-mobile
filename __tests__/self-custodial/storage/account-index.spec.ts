@@ -894,6 +894,39 @@ describe("self-custodial account-index — legacy key store purge", () => {
       expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
     })
 
+    /**
+     * readIndex drops an entry it cannot read and lists the rest, so the pass names fewer
+     * accounts than the index holds. A mnemonic only that entry named is never reached, and
+     * the flag would retire the purge over it.
+     */
+    it("purges what it can name and withholds the flag when an index entry is damaged", async () => {
+      mockGetItem.mockImplementation((key: string) => {
+        if (key === ACCOUNT_INDEX_KEY) {
+          return Promise.resolve(
+            JSON.stringify([
+              { id: "a1", lightningAddress: null },
+              { id: "a2", lightningAddress: 5 },
+            ]),
+          )
+        }
+        return Promise.resolve(null)
+      })
+
+      const result = await purgeLegacyKeyStoreOnce(SWEEP_OK)
+
+      expect(result).toEqual({ status: "index-damaged" })
+      expect(mockPurgeLegacyKeyStore).toHaveBeenCalledWith(["a1"], [])
+      expect(mockSetItem).not.toHaveBeenCalledWith(LEGACY_PURGE_DONE_KEY, "true")
+      // Uncounted: the next write to the index can repair it.
+      expect(mockSetItem).not.toHaveBeenCalledWith(
+        LEGACY_PURGE_ATTEMPTS_KEY,
+        expect.anything(),
+      )
+      expect(mockLogEvent).toHaveBeenCalledWith("legacy_key_store_purge", {
+        outcome: "index-damaged",
+      })
+    })
+
     it("does not purge twice on the same install", async () => {
       setIndexAndFlag([{ id: "a1", lightningAddress: null }], "true")
 
