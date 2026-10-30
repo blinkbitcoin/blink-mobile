@@ -3840,20 +3840,28 @@
         "testSuccess": "Fraza ta de rezervă este corectă"
       }
     },
+    "BundleExport": {
+      "title": "Ieșire de urgență",
+      "body": "Dacă Spark nu mai funcționează, acest pachet îți permite să îți muți bitcoinii on-chain fără Blink. Soldul tău în dolari nu poate fi recuperat.",
+      "download": "Descarcă pachetul",
+      "sensitiveTitle": "Sensibil",
+      "learnMore": "Află mai multe despre ieșirea unilaterală",
+      "sensitiveConfirm": "Descarcă",
+      "sensitiveBody": "Acest fișier arată soldul și istoricul plăților tale, așa că păstrează-l privat. Ca să-l folosești într-o urgență, ai nevoie și de fraza ta de recuperare."
+    },
     "CloudBackup": {
       "title": "Să facem o copie de siguranță a portofelului tău",
       "description": "Vom salva o copie a frazei de recuperare în {provider} tău.",
-      "encryptCheckbox": "Adaugă o frază de acces suplimentară",
-      "password": "Frază de acces",
+      "password": "Parolă",
       "passwordPlaceholder": "(minim 12 caractere)",
-      "confirmPassword": "Confirmă fraza de acces",
-      "confirmPasswordPlaceholder": "Introdu fraza de acces din nou",
+      "confirmPassword": "Confirmă parola",
+      "confirmPasswordPlaceholder": "Introdu parola din nou",
       "continueButton": "Continuă",
       "importantTitle": "Important",
-      "importantMessage": "Blink nu stochează această frază de acces. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
+      "importantMessage": "Blink nu stochează această parolă. Dacă o pierzi, {bold} să recuperăm portofelul tău.",
       "importantMessageBold": "nu vom putea",
       "passwordTooShort": "Minim 12 caractere",
-      "passwordMismatch": "Frazele de acces nu se potrivesc",
+      "passwordMismatch": "Parolele nu se potrivesc",
       "uploadSuccess": "Copie de siguranță salvată în {provider}",
       "uploadFailed": "Încarcărea copiei de siguranță a eșuat",
       "signInFailed": "Conectarea la {provider} a eșuat",
@@ -4037,12 +4045,18 @@
     "restore": "Restaurare portofel",
     "noBackupFound": "Niciun backup găsit",
     "noBackupDescription": "Nu am găsit un backup. Puteți introduce fraza de backup manual.",
-    "enterPassword": "Introduceți fraza de acces pentru criptare",
-    "wrongPassword": "Frază de acces incorectă. Încercați din nou.",
+    "enterPassword": "Introduceți parola de criptare",
+    "wrongPassword": "Parolă incorectă. Încercați din nou.",
     "pickBackupTitle": "Alege un portofel",
     "pickBackupDescription": "Selectează o copie de rezervă pentru restaurare",
     "recognizePhraseTitle": "Recunoști această frază de backup?",
     "recognizePhraseBody": "Nu introduce niciodată cuvinte trimise de altcineva."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operator inaccesibil",
+    "outageBody": "Spark are o întrerupere. Așteaptă câteva minute și încearcă din nou sau contactează {support}",
+    "outageSupport": "Asistența",
+    "tryAgainLater": "Încearcă mai târziu"
   },
   "BackupNudge": {
     "title": "Fondurile dumneavoastră sunt în pericol",
@@ -4137,6 +4151,15 @@
     "title": "Acesta este un cont non-custodial",
     "body": "Pentru a afla mai multe, citește articolul nostru de blog",
     "cta": "Citește"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualizează copia de siguranță din cloud",
+    "body": "Pachetul tău de urgență din {provider} nu este actualizat. Fă din nou o copie de siguranță a portofelului pentru a-l actualiza.",
+    "cta": "Fă din nou copia"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Încă nu există un pachet de urgență. Este creat după prima ta tranzacție.",
+    "exportFailed": "Pachetul de urgență nu a putut fi descărcat."
   },
   "StableBalance": {
     "title": "Sold stabil",

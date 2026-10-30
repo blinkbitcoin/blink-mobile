@@ -1,5 +1,6 @@
 import { useCallback, useState } from "react"
 
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
@@ -9,6 +10,15 @@ import { storageDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { logBreadcrumb } from "@app/utils/error-reporting"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
+import {
+  markAccountDeletedForRefresh,
+  unmarkAccountDeletedForRefresh,
+  waitForRefreshesToSettle,
+} from "@app/self-custodial/recovery-bundle/refresh"
+import {
+  deleteRecoveryBundleFile,
+  removeRecoveryBundleState,
+} from "@app/self-custodial/recovery-bundle/storage"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
 import { usePersistentStateContext } from "@app/store/persistent-state"
@@ -45,6 +55,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
     async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
       setState("deleting")
       setError(null)
+      let isResweepScheduled = false
       try {
         const isActive =
           activeAccount?.type === AccountType.SelfCustodial &&
@@ -80,10 +91,48 @@ export const useDeleteAccount = (): DeleteAccountResult => {
           })
         }
 
+        // Before sweeping: an in-flight bundle refresh must refuse to persist
+        // its result, or the files would reappear after the sweep for an
+        // account no longer in the registry.
+        markAccountDeletedForRefresh(accountId)
+
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
         await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
           logBreadcrumb(`[self-custodial delete] storage dir unlink failed: ${err}`)
         })
+        // Best-effort: leftover recovery-bundle files must not block deletion.
+        // Both networks are swept - the account may have been used on the
+        // other network under a different galoy instance.
+        const sweepRecoveryBundleFiles = async () => {
+          for (const bundleNetwork of [Network.Mainnet, Network.Regtest]) {
+            await deleteRecoveryBundleFile(accountId, bundleNetwork)
+              .then(() => removeRecoveryBundleState(accountId, bundleNetwork))
+              .catch((err) => {
+                logBreadcrumb(
+                  `[self-custodial delete] recovery bundle cleanup failed: ${err}`,
+                )
+              })
+          }
+        }
+        await sweepRecoveryBundleFiles()
+        // A refresh already past its deleted-account check can still write
+        // after the sweep above; once every in-flight run settles, sweep
+        // again in the background so the deletion stays complete. Not
+        // awaited - a mid-fetch refresh can take tens of seconds and must
+        // not block the delete UX.
+        waitForRefreshesToSettle(accountId)
+          .then(sweepRecoveryBundleFiles)
+          .catch((err) => {
+            logBreadcrumb(
+              `[self-custodial delete] post-refresh bundle re-sweep failed: ${err}`,
+            )
+          })
+          .finally(() => {
+            // Bounds the deleted-accounts set: nothing can start a refresh
+            // once the mnemonic and registry entry are gone.
+            unmarkAccountDeletedForRefresh(accountId)
+          })
+        isResweepScheduled = true
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()
@@ -95,6 +144,13 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         if (hasCustodialAccount) return "switched-to-custodial"
         return "logged-out"
       } catch (err) {
+        /**
+         * Once scheduled, the background re-sweep drops the deletion mark. A
+         * failure before that point would leave the mark behind, and every
+         * later refresh of an account that may still be registered would be
+         * refused until the app restarts.
+         */
+        if (!isResweepScheduled) unmarkAccountDeletedForRefresh(accountId)
         const wrapped = err instanceof Error ? err : new Error(String(err))
         reportError("Self-custodial wallet delete", wrapped)
         setState("error")

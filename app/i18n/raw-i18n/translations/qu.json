@@ -3840,20 +3840,28 @@
         "testSuccess": "Bakuy rimasqaykiqa allinmi"
       }
     },
+    "BundleExport": {
+      "title": "Utqay lloqsiy",
+      "body": "Spark mana llamkaptin, kay qipiqa bitcoinniykita on-chain astanaykipaq yanapasunki, mana Blink-wan. Dólar qullqiykiqa manam kutichiyta atikunchu.",
+      "download": "Qipita urquy",
+      "sensitiveTitle": "Sinchi allin waqaychana",
+      "learnMore": "Sapallanchik lloqsiymanta astawan yachay",
+      "sensitiveConfirm": "Urquy",
+      "sensitiveBody": "Kay willañiqiqa qullqiykita, pagasqaykikunatapas rikuchin, chayrayku pakallapi waqaychay. Utqaypi llamk'achinaykipaqqa, waqaychana rimayniykitapas munanki."
+    },
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
-      "encryptCheckbox": "Yapa frase secretata yapay",
-      "password": "Frase secreta",
+      "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
-      "confirmPassword": "Frase secretata takyachiy",
-      "confirmPasswordPlaceholder": "Frase secretata hukmanta qillqay",
+      "confirmPassword": "Contraseñata takyachiy",
+      "confirmPasswordPlaceholder": "Contraseñata hukmanta qillqay",
       "continueButton": "Hinalla",
       "importantTitle": "Allin yachanapaq",
-      "importantMessage": "Blink mana kay frase secretata waqaychanchu. Chinkachiptiykeqa, {bold} qullqikuqniykita kutichiyku.",
+      "importantMessage": "Blink mana kay contraseñata waqaychanchu. Chinkachiptiykeqa, {bold} qullqikuqniykita kutichiyku.",
       "importantMessageBold": "mana atiykumanchu",
       "passwordTooShort": "Pisi kaptinpas 12 sanampakuna",
-      "passwordMismatch": "Frase secretakuna mana tupanchu",
+      "passwordMismatch": "Contraseñakuna mana tupanchu",
       "uploadSuccess": "Waqaychay {provider} nisqaman waqaychasqa",
       "uploadFailed": "Waqaychayta apachiy mana atikurqanchu",
       "signInFailed": "{provider}-man yaykuy mana atikurqachu",
@@ -4037,12 +4045,18 @@
     "restore": "Wallet kutichiy",
     "noBackupFound": "Mana backup tarikunchu",
     "noBackupDescription": "Mana backup tarikuyta atinichu. Makiykiwan backup frase qillqayta atinki.",
-    "enterPassword": "Cifrado frase secretaykita qillqay",
-    "wrongPassword": "Mana allin frase secreta. Watiqmanta ruway.",
+    "enterPassword": "Cifrado contraseñaykita qillqay",
+    "wrongPassword": "Mana allin contraseña. Watiqmanta ruway.",
     "pickBackupTitle": "Akllay wallet",
     "pickBackupDescription": "Akllay huk waqaychasqa kutichinaykipaq",
     "recognizePhraseTitle": "¿Kay waqaychana rimaykunata reqsinkichu?",
     "recognizePhraseBody": "Ama hayk'aqpas hukkuna apachisqan simikunata churaychu."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operadorwan mana tinkiy atikunchu",
+    "outageBody": "Spark llamk'ayninpi sasachakuy kashan. Ama hina kaspa iskay kimsa minututa suyay, chaymanta yapamanta ruway, icha {support} nisqawan rimay",
+    "outageSupport": "Yanapaywan",
+    "tryAgainLater": "Qhipaman yapamanta ruway"
   },
   "BackupNudge": {
     "title": "Qullqiykikuna sasachakuypi kachkan",
@@ -4137,6 +4151,15 @@
     "title": "Kayqa mana waqaychasqa kuentam",
     "body": "Astawan yachanaykipaq, blog qillqaykuta ñawinchay",
     "cta": "Ñawinchay"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Phuyupi waqaychasqaykita musuqchay",
+    "body": "{provider} nisqapi utqay qipiyki mawk'añam. Qullqikuqniykita hukmanta waqaychay musuqchanaykipaq.",
+    "cta": "Hukmanta waqaychay"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Manaraq utqay qipi kanchu. Ñawpaq kaq pagasqaykimanta qhipata ruwakun.",
+    "exportFailed": "Utqay qipita mana uraykachiyta atikurqanchu."
   },
   "StableBalance": {
     "title": "Saldo sinchi",

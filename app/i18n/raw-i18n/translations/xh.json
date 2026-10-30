@@ -3840,20 +3840,28 @@
         "testSuccess": "Ibinzana lakho lokugcina lichanekile"
       }
     },
+    "BundleExport": {
+      "title": "Ukuphuma ngongxamiseko",
+      "body": "Ukuba iSpark iyayeka ukusebenza, le ngqokelela ikuvumela ukuba uhambise ibitcoin yakho kwi-chain ngaphandle kweBlink. Ibhalansi yakho yeedola ayinakubuyiselwa.",
+      "download": "Khuphela ingqokelela",
+      "sensitiveTitle": "Ibucayi",
+      "learnMore": "Funda ngakumbi ngokuphuma kwelinye icala",
+      "sensitiveConfirm": "Khuphela",
+      "sensitiveBody": "Le fayile ibonisa ibhalansi yakho nembali yeentlawulo zakho, ngoko yigcine iyimfihlo. Ukuze uyisebenzise kwimeko yongxamiseko, ukwadinga nebinzana lakho lokugcina."
+    },
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
       "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
-      "encryptCheckbox": "Yongeza ibinzana lokugqitha elongezelelweyo",
-      "password": "Ibinzana lokugqitha",
+      "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
-      "confirmPassword": "Qinisekisa ibinzana lokugqitha",
-      "confirmPasswordPlaceholder": "Faka ibinzana lokugqitha kwakhona",
+      "confirmPassword": "Qinisekisa igama lokugqitha",
+      "confirmPasswordPlaceholder": "Faka igama lokugqitha kwakhona",
       "continueButton": "Qhubeka",
       "importantTitle": "Okubalulekileyo",
-      "importantMessage": "I-Blink ayigcini eli binzana lokugqitha. Ukuba ulilahla, {bold} ukubuyisela isipaji sakho.",
+      "importantMessage": "I-Blink ayigcini eli gama lokugqitha. Ukuba ulilahla, {bold} ukubuyisela isipaji sakho.",
       "importantMessageBold": "asiyi kukwazi",
       "passwordTooShort": "Ubuncinane oonobumba abayi-12",
-      "passwordMismatch": "Amabinzana okugqitha awafani",
+      "passwordMismatch": "Amagama okugqitha awafani",
       "uploadSuccess": "Ikopi igcinwe kwi-{provider}",
       "uploadFailed": "Ukufaka ikopi akuphumelelanga",
       "signInFailed": "Akuphumelelanga ukungena ku-{provider}",
@@ -4037,12 +4045,18 @@
     "restore": "Buyisela isipaji",
     "noBackupFound": "Akukho gcino lifunyenweyo",
     "noBackupDescription": "Asikwazanga ukufumana igcino. Ungafaka umgca wakho wokugcina ngesandla.",
-    "enterPassword": "Faka ibinzana lakho lokugqitha lokufihla",
-    "wrongPassword": "Ibinzana lokugqitha elingalunganga. Nceda uzame kwakhona.",
+    "enterPassword": "Faka iphasiwedi yakho yokufihla",
+    "wrongPassword": "Iphasiwedi engalunganga. Nceda uzame kwakhona.",
     "pickBackupTitle": "Khetha isipaji",
     "pickBackupDescription": "Khetha ugcino lokubuyisela",
     "recognizePhraseTitle": "Ngaba uyayazi le binzana yokhuselo?",
     "recognizePhraseBody": "Ungaze ufake amagama akuthunyelwe ngomnye umntu."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Umqhubi akafikeleleki",
+    "outageBody": "I-Spark inengxaki yenkonzo. Nceda ulinde imizuzu embalwa uze uzame kwakhona okanye uqhagamshelane {support}",
+    "outageSupport": "Nenkxaso",
+    "tryAgainLater": "Zama kwakhona kamva"
   },
   "BackupNudge": {
     "title": "Imali yakho isengozini",
@@ -4137,6 +4151,15 @@
     "title": "Le yiakhawunti engagcinwanga",
     "body": "Ukufunda okungakumbi, funda ipowusti yebhlog yethu",
     "cta": "Funda"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Hlaziya ugcino lwakho kwilifu",
+    "body": "Ingqokelela yakho yongxamiseko ku-{provider} indala. Gcina isipaji sakho kwakhona ukuze uyihlaziye.",
+    "cta": "Gcina kwakhona"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Akukabikho ngqokelela yongxamiseko. Yenziwa emva kwentengiselwano yakho yokuqala.",
+    "exportFailed": "Ayikwazanga ukukhuphela ingqokelela yongxamiseko."
   },
   "StableBalance": {
     "title": "Ibhalansi ezinzileyo",
