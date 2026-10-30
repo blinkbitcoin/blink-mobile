@@ -734,6 +734,28 @@ describe("per-slot serialization", () => {
     expect(calls).toEqual(["write landed", "remove"])
   })
 
+  /** An erase abandoned while its delete was out must not follow it with the blank: the
+   *  slot may have moved on by then, and the blank is a write. */
+  it("does not send the blank of an erase abandoned before it", async () => {
+    jest.useFakeTimers()
+    let releaseHungErase: () => void = () => {}
+    mockedLegacyErase.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungErase = () => resolve(false)
+        }),
+    )
+
+    const abandoned = removeThrough(REMOVE_ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toBe(false)
+
+    releaseHungErase()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockedLegacyBlank).not.toHaveBeenCalled()
+  })
+
   /** The read-through has already fetched the legacy value when a fresh one is
    *  saved. Unqueued, its migrating write lands last and the rotated credential
    *  is replaced by the one it rotated away from. */
