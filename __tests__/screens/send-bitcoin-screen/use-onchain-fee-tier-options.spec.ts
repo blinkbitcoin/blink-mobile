@@ -24,7 +24,7 @@ let mockHasSelfCustodialQuote = true
 
 let mockCustodialTiers = {
   [FeeTierOption.Fast]: { feeAmount: 300, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
-  [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 60 },
+  [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 240 },
   [FeeTierOption.Slow]: { feeAmount: 100, feeUnit: FeeUnit.Sats, etaMinutes: 1440 },
 }
 let mockCustodialHasError = false
@@ -185,7 +185,7 @@ describe("useOnchainFeeTierOptions", () => {
     }
     mockCustodialTiers = {
       [FeeTierOption.Fast]: { feeAmount: 300, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
-      [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 60 },
+      [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 240 },
       [FeeTierOption.Slow]: { feeAmount: 100, feeUnit: FeeUnit.Sats, etaMinutes: 1440 },
     }
   })

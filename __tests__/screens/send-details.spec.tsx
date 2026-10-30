@@ -764,6 +764,27 @@ describe("onchain fee tier gating", () => {
     ).toBeTruthy()
   })
 
+  it("shows the custodial payout windows on the row and in the options", async () => {
+    loadLocale("en")
+    const LL = i18nObject("en")
+
+    render(
+      <ContextForScreen>
+        <Onchain />
+      </ContextForScreen>,
+    )
+    await screen.findByTestId("fee-tier-dropdown")
+    await flushAsync()
+
+    // Custodial sends wait on the payout queues, so Standard is ~ 4h here, not the
+    // self-custodial ~ 30m.
+    expect(screen.getByText(`${LL.SendBitcoinScreen.fast()} ~ 10m`)).toBeTruthy()
+    fireEvent.press(screen.getByTestId("fee-tier-dropdown"))
+    expect(screen.getByText("~ 4h")).toBeTruthy()
+    expect(screen.getByText("~ 24h")).toBeTruthy()
+    expect(screen.queryByText("~ 30m")).toBeNull()
+  })
+
   it("keeps the quoted fee off the priority row", async () => {
     loadLocale("en")
     const LL = i18nObject("en")
