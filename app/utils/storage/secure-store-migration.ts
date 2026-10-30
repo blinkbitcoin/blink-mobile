@@ -1,5 +1,4 @@
 /* eslint-disable camelcase */
-import { Platform } from "react-native"
 
 import analytics from "@react-native-firebase/analytics"
 import type { ACCESSIBLE } from "react-native-keychain"
@@ -461,32 +460,27 @@ export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists
 /**
  * Why a legacy copy is still there, split by whether a later launch could change
  * the answer. Carries a whole pass as well as a single slot, worst outcome
- * winning in the order `transient`, `unconfirmed`, `permanent`: a pass with
- * anything still worth retrying is worth retrying.
+ * winning: `transient` beats `permanent`, because a pass with anything still worth
+ * retrying is worth retrying.
  *
  * `transient` covers everything a store's silence or a failed write caused. Those
  * clear themselves, so they must never count against a retry bound: a keychain
  * that cannot answer for a few launches would otherwise retire the purge and
  * leave every legacy copy in place for good.
  *
- * `unconfirmed` is the iOS form of `permanent`: both stores report the seed
- * missing, but the iOS legacy store reports a failed lookup the same way, so the
- * answer cannot end anything. It is what a phone restored from a backup shows:
- * the account index comes back and neither store's device-only item does.
- * Retried like `transient`, and not a fault.
- *
  * `permanent` is the state no later launch resolves: every store answered, and
  * the value is in none of them. An index entry can outlive its key material that
- * way, and retrying it is spend with no upside.
+ * way, and retrying it is spend with no upside. It is what a phone restored from
+ * a backup shows: the account index comes back and neither store's device-only
+ * item does.
  */
-export type SlotPurge = "gone" | "transient" | "unconfirmed" | "permanent"
+export type SlotPurge = "gone" | "transient" | "permanent"
 
 /** How much a later launch could still change, low to high. */
 const SLOT_PURGE_RANK: Record<SlotPurge, number> = {
   gone: 0,
   permanent: 1,
-  unconfirmed: 2,
-  transient: 3,
+  transient: 2,
 }
 
 /** The outcome a pass reports for two of its slots: whichever is worse. */
@@ -549,17 +543,16 @@ export const purgeThrough = async (
         const legacy = await legacyRead(args.legacyKey)
         if (legacy.status === "failed") return "transient"
 
-        // `absent` is not proof the legacy store is empty. The iOS module
-        // discards the OSStatus and rejects every failed lookup with the
-        // not-found code, so a lookup that merely failed is indistinguishable
-        // from one that found nothing.
+        // `absent` is the legacy store saying the key is missing, and on both
+        // platforms it now says so only for a missing key: a lookup that failed
+        // comes back `failed` above (the iOS half is
+        // patches/react-native-secure-key-store+2.0.10.patch).
         //
         // Nothing is erased on this path, so the question is only whether to keep
         // asking. A session slot stops: a user who never set a PIN has nothing
-        // here and must not be retried forever, and the copy a lying read leaves
-        // behind costs a re-login. A mnemonic keeps its strict rule, because
-        // getting that wrong costs someone their seed — and when both stores agree
-        // the value is nowhere, no later boot changes that.
+        // here and must not be retried forever. A mnemonic keeps its strict rule,
+        // because getting that wrong costs someone their seed — and when both
+        // stores agree the value is nowhere, no later boot changes that.
         if (legacy.status === "absent") {
           if (!requireMigrated) return "gone"
 
@@ -575,25 +568,18 @@ export const purgeThrough = async (
 
           if (present.status === "yes") {
             // `gone` here is what lets the caller record the purge as finished, so
-            // the proof has to be a read that returns the value. A locked iOS
-            // launch answers the probe from an item it cannot decrypt while
-            // legacyRead lies `absent` for the legacy copy, and believing both
-            // would write the done-flag over a seed still sitting in the legacy
-            // store, with no later launch to look again.
+            // the proof has to be a read that returns the value. The probe answers
+            // yes for an item the store cannot decrypt, and believing it would
+            // write the done-flag over a seed nothing can read, with no later
+            // launch to look again.
             const migrated = await secureRead(args.slot)
             return migrated.status === "found" ? "gone" : "transient"
           }
 
-          // Both stores say the seed is nowhere. Terminal only where the legacy
-          // store can tell a missing key from a failed lookup: the iOS module
-          // rejects every failure with the not-found code, so legacyRead reports
-          // `absent` for both there (see its isKeyNotFound branch). Calling that
-          // permanent would let a handful of unlucky launches retire the purge and
-          // strand a seed in the legacy store for good. Android distinguishes the
-          // two, so the verdict is trustworthy and the retry bound gets the
-          // terminal state it exists for; iOS keeps retrying, which costs round
-          // trips off the boot path and never costs a seed.
-          return Platform.OS === "android" ? "permanent" : "unconfirmed"
+          // Both stores say the seed is nowhere, and both can tell a missing key
+          // from a failed lookup, so the verdict is trustworthy and the retry
+          // bound gets the terminal state it exists for.
+          return "permanent"
         }
 
         // There is a legacy copy to erase, so the probe is no longer enough.
