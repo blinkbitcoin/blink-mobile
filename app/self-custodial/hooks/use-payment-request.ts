@@ -2,9 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
-import { recordAppError } from "@app/utils/error-reporting"
+import { logBreadcrumb, recordAppError } from "@app/utils/error-reporting"
 import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -38,6 +36,7 @@ import {
   ReceiveAssetMode,
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
+import { measure, ScEvent, ScRail } from "../measurement"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
 import { findLatestOnchainReceiptId } from "../providers/wallet-snapshot"
@@ -216,8 +215,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         memo: memo || undefined,
       })
       if (!("invoice" in result) || !result.invoice) {
-        crashlytics().log(
-          `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+        logBreadcrumb(
+          `[Self-custodial] Lightning adapter returned no invoice (hasAmount=${Boolean(amount)}, currency=${amount?.currencyCode ?? "none"})`,
         )
         recordAppError(
           new Error("Self-custodial invoice adapter returned no invoice field"),
@@ -240,8 +239,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       setPaymentRequest(result.invoice)
       setRequestState(PaymentRequestState.Created)
     } catch (err) {
-      crashlytics().log(
-        `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+      logBreadcrumb(
+        `[Self-custodial] Lightning invoice generation failed (hasAmount=${Boolean(amount)}, currency=${amount?.currencyCode ?? "none"})`,
       )
       recordAppError(
         err instanceof Error
@@ -446,6 +445,12 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
 
     setOnchainAddress(result.address)
     if (!canTrackReuse) return
+    /** A request is an address handed out, not a visit that shows the one issued before
+     *  (the first address an account gets counts too, having no record to match). */
+    if (result.address !== issued?.address) {
+      // eslint-disable-next-line camelcase
+      measure(ScEvent.PaymentRequestCreated, { rail: ScRail.Onchain, has_amount: false })
+    }
     await saveIssuedOnchainAddress(selfCustodialAccountId, {
       address: result.address,
       // Never let a snapshot that has not loaded erase a marker we already had:

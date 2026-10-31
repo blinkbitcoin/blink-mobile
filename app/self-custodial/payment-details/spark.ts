@@ -14,6 +14,7 @@ import {
 import { MoneyAmount, WalletOrDisplayCurrency } from "@app/types/amounts"
 
 import { resolveSendTokenIdentifier, toSdkSendAmount } from "../bridge"
+import { ScRail } from "../measurement"
 
 import { createGetFee, createSendMutation } from "./send-helpers"
 
@@ -56,7 +57,10 @@ export const createSelfCustodialSparkPaymentDetails = <T extends WalletCurrency>
         canSendPayment: true,
         canGetFee: true,
         getFee: createGetFee(prepareParams),
-        sendPaymentMutation: createSendMutation(prepareParams),
+        sendPaymentMutation: createSendMutation(prepareParams, {
+          rail: ScRail.Spark,
+          sendingWallet: sendingWalletDescriptor.currency,
+        }),
       }
     : { canSendPayment: false, canGetFee: false }
 

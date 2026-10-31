@@ -4,3 +4,4 @@ export { DisplayCurrencyFromRegionMount } from "./display-currency-from-region-m
 export { RecoveryBundleListenerMount } from "./recovery-bundle-listener-mount"
 export { OfflineGate } from "./offline-gate"
 export { PaymentOfflineNotice } from "./payment-offline-notice"
+export { TelemetryContextMount } from "./telemetry-context-mount"

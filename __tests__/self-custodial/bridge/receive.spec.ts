@@ -18,6 +18,12 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   },
 }))
 
+const mockMeasure = jest.fn()
+jest.mock("@app/self-custodial/measurement", () => ({
+  ...jest.requireActual("@app/self-custodial/measurement"),
+  measure: (...args: unknown[]) => mockMeasure(...args),
+}))
+
 const buildSdk = (paymentRequest = "bc1qaddress") => {
   const receivePayment = jest.fn().mockResolvedValue({ paymentRequest })
   return { sdk: { receivePayment } as unknown as BreezSdkInterface, receivePayment }
@@ -130,5 +136,32 @@ describe("createReceiveLightning", () => {
     const result = await createReceiveLightning(sdk)({})
 
     expect(result.errors?.[0]?.message).toBe("Receive failed: plain string blowup")
+  })
+})
+
+describe("receive request telemetry", () => {
+  beforeEach(() => {
+    mockMeasure.mockClear()
+  })
+
+  it("counts each invoice it creates", async () => {
+    const { sdk } = buildSdk("lnbc1invoice")
+
+    await createReceiveLightning(sdk)({ amount: undefined, memo: undefined })
+
+    expect(mockMeasure).toHaveBeenCalledWith("sc_payment_request_created", {
+      rail: "bolt11",
+      // eslint-disable-next-line camelcase
+      has_amount: false,
+    })
+  })
+
+  it("leaves on-chain counting to the receive flow, which knows a new address from a shown one", async () => {
+    const { sdk } = buildSdk()
+
+    const result = await createReceiveOnchain(sdk)()
+
+    expect(result).toEqual({ address: "bc1qaddress" })
+    expect(mockMeasure).not.toHaveBeenCalled()
   })
 })

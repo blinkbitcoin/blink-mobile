@@ -39,6 +39,23 @@ jest.mock("@react-native-firebase/analytics", () => () => ({
   logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
 
+let mockIsCustodial = true
+let mockIsCustodialApplied = true
+/** The identity owner's spec covers when a custodial event may go; here it is the
+ *  custodial account (applied, or still being put in place) or a self-custodial one. */
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  isCustodialAnalyticsDomain: () => mockIsCustodial,
+  reportCustodialEvent: (send: () => unknown) => {
+    if (mockIsCustodial && mockIsCustodialApplied) send()
+  },
+}))
+
+const mockMeasure = jest.fn()
+jest.mock("@app/self-custodial/measurement", () => ({
+  ScEvent: { PaymentDestinationParsed: "sc_payment_destination_parsed" },
+  measure: (...args: unknown[]) => mockMeasure(...args),
+}))
+
 describe("analytics helpers", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -192,6 +209,92 @@ describe("analytics helpers", () => {
         sending_wallet: "BTC",
         payment_status: null,
       })
+    })
+  })
+
+  describe("while the custodial identity is still being put in place", () => {
+    afterEach(() => {
+      mockIsCustodialApplied = true
+    })
+
+    it("leaves every custodial-era event to the identity owner to send", () => {
+      mockIsCustodialApplied = false
+
+      logParseDestinationResult({
+        valid: true,
+        validDestination: { paymentType: "lightning" },
+        destinationDirection: "Send",
+      } as never)
+      logParseDestinationResult({
+        valid: false,
+        invalidReason: "InvoiceExpired",
+        invalidPaymentDestination: { paymentType: "lightning" },
+      } as never)
+      logPaymentAttempt({ paymentType: "lnurl" as never, sendingWallet: "BTC" as never })
+      logPaymentResult({
+        paymentType: "lnurl" as never,
+        sendingWallet: "BTC" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
+      logToastShown({ message: "anchor", type: "success", isTranslated: false })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("toast_shown", expect.anything())
+      /** Still the custodial account's, so no sc_* event stands in for them. */
+      expect(mockMeasure).not.toHaveBeenCalled()
+    })
+  })
+
+  describe("while a self-custodial account is active", () => {
+    beforeEach(() => {
+      mockIsCustodial = false
+    })
+
+    afterEach(() => {
+      mockIsCustodial = true
+    })
+
+    it("reports a valid parse as sc_payment_destination_parsed instead", () => {
+      logParseDestinationResult({
+        valid: true,
+        validDestination: { paymentType: "lnurl" },
+        destinationDirection: "Send",
+      } as never)
+
+      expect(mockMeasure).toHaveBeenCalledWith("sc_payment_destination_parsed", {
+        valid: true,
+        payment_type: "lnurl",
+        direction: "Send",
+      })
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("reports a rejected parse with its reason", () => {
+      logParseDestinationResult({
+        valid: false,
+        invalidReason: "InvoiceExpired",
+        invalidPaymentDestination: { paymentType: "lightning" },
+      } as never)
+
+      expect(mockMeasure).toHaveBeenCalledWith("sc_payment_destination_parsed", {
+        valid: false,
+        payment_type: "lightning",
+        reason: "InvoiceExpired",
+      })
+      expect(mockLogEvent).not.toHaveBeenCalled()
+    })
+
+    it("leaves the send to the sc_payment_send_* events", () => {
+      logPaymentAttempt({ paymentType: "lnurl" as never, sendingWallet: "BTC" as never })
+      logPaymentResult({
+        paymentType: "lnurl" as never,
+        sendingWallet: "BTC" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
+      logToastShown({ message: "anchor", type: "success", isTranslated: false })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("toast_shown", expect.anything())
     })
   })
 
