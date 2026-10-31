@@ -698,6 +698,22 @@ describe("a self-custodial on-chain fee", () => {
     )
   })
 
+  /** ₦0.05 is about 208 sats, so the 200 sat Standard fee Next gets back is half of it. */
+  it("judges the fee Next quoted for the high-fee sheet", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("0", ".", "0", "5")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
   it("leaves nothing to show once the amount clears the minimum", async () => {
     renderScreen(onchainDestination)
     await settle()
