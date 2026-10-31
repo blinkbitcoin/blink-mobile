@@ -24,6 +24,10 @@ jest.mock("@rn-vui/themed", () => ({
   }),
 }))
 
+jest.mock("@app/i18n/i18n-react", () => ({
+  useI18nContext: () => ({ LL: { Accessibility: { deleteKey: () => "Delete" } } }),
+}))
+
 jest.mock("@app/components/atomic/galoy-icon", () => ({
   GaloyIcon: ({ name, ...props }: { name: string }) => (
     <View {...props} testID={`galoy-icon-${name}`} />
@@ -287,6 +291,38 @@ describe("getDisabledKeys", () => {
 
       expect(disabled.has(Key.Decimal)).toBe(true)
       expect(disabled.has(Key.Backspace)).toBe(false)
+    })
+  })
+
+  describe("screen reader", () => {
+    const mockOnPress = jest.fn()
+
+    it("reads every key as a button named for what it types", () => {
+      const { getByLabelText, queryByLabelText } = render(
+        <CurrencyKeyboard onPress={mockOnPress} />,
+      )
+
+      ;["0", "1", "5", "9", "."].forEach((label) => {
+        expect(getByLabelText(label).props.accessibilityRole).toBe("button")
+      })
+      expect(queryByLabelText("Key 1")).toBeNull()
+    })
+
+    it("names the backspace key, which shows only an icon", () => {
+      const { getByLabelText } = render(<CurrencyKeyboard onPress={mockOnPress} />)
+
+      fireEvent.press(getByLabelText("Delete"))
+
+      expect(mockOnPress).toHaveBeenCalledWith(Key.Backspace)
+    })
+
+    it("reports a refused key as disabled", () => {
+      const { getByLabelText } = render(
+        <CurrencyKeyboard onPress={mockOnPress} disabledKeys={new Set([Key.Decimal])} />,
+      )
+
+      expect(getByLabelText(".").props.accessibilityState).toEqual({ disabled: true })
+      expect(getByLabelText("1").props.accessibilityState).toEqual({ disabled: false })
     })
   })
 })

@@ -2347,11 +2347,32 @@
     "maxFeeSelected": "Hii ndio ada ya juu zaidi ambayo unawezalipishwa kwa malipo haya. Inaweza kuishia kuwa kidogo malipo yatakapofanyika.",
     "invoiceAlreadyPaid": "Laini ya malipo imekwisha kulipiwa",
     "somethingWentWrong": "Kitu kimeenda vibaya",
+    "priceUpdated": "Bei imebadilika, kwa hivyo kiasi kimesasishwa. Kikague kabla ya kutuma.",
     "paymentAlreadyAttempted": "Malipo tayari yamejaribiwa.\n\nIkiwa unataka kutuma malipo haya tena, anza upya.",
     "slideToConfirm": "Telezesha kidole ili Kuthibitisha",
     "slideConfirming": "Inathibitisha...",
+    "slideToSend": "Telezesha ili Kutuma",
+    "calculatingFee": "Inakokotoa ada…",
+    "sendProgress": {
+      "reviewing": "Inakagua",
+      "signing": "Inatia sahihi",
+      "findingRoute": "Inatafuta njia",
+      "broadcasting": "Inatangaza",
+      "checkingDelivery": "Inakagua uwasilishaji",
+      "retrying": "Inajaribu tena",
+      "almostThere": "Karibu tumefika",
+      "anyTimeNow": "Wakati wowote sasa",
+      "ohOh": "Lo!",
+      "tryingAgain": "Tunajaribu tena"
+    },
     "copiedDestination": "Imeakiliwa marudio kwenye ubao wa kunakili",
-    "lightningRecommended": "Ada kubwa! Tunapendekeza Umeme.",
+    "lightningRecommended": "Ada kubwa. Tunapendekeza Umeme.",
+    "sending": "Inatuma",
+    "sent": "Imetumwa",
+    "receipt": "Risiti",
+    "fromBalance": "Kutoka Salio",
+    "details": "Maelezo",
+    "changeAmount": "Badilisha kiasi",
     "usdRemainderSweep": "Iliyosalia {remaining: string} ({remainingSats: string}) itabadilishwa kuwa Bitcoin. Kima cha chini cha USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",
+    "addAmount": "Ongeza kiasi",
+    "lowFunds": "Fedha hazitoshi",
     "amountExceed": "Kiasi kimepitisha baki yako ya {balance: string}",
     "amountExceedsLimit": "Kiasi kinazidi kikomo chako cha kila siku kilichobaki cha {limit: string}",
     "upgradeAccountToIncreaseLimit": "Boresha akaunti yako ili kuongeza kikomo chako",
@@ -3095,6 +3118,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Weka kiasi"
+  },
+  "Accessibility": {
+    "deleteKey": "Futa",
+    "swapCurrencyHint": "Hubadilisha sarafu unayoandikia kiasi",
+    "switchWalletHint": "Hubadilisha kwenda kwenye pochi yako nyingine",
+    "copy": "Nakili",
+    "balanceHidden": "Salio limefichwa",
+    "revealBalanceHint": "Huonyesha salio lako kwenye skrini hii"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ninahitaji kusasisha programu yangu hadi toleo jipya zaidi. Ninatumia programu ya {os: string} yenye toleo la {version: string}.",

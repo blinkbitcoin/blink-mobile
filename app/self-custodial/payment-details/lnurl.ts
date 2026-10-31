@@ -43,7 +43,15 @@ import {
 } from "../bridge"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
-import { feeFailure, findLostSend } from "./send-helpers"
+import {
+  feeFailure,
+  findLostSend,
+  hasQuoteMoved,
+  QuoteRef,
+  quoteMovedFailure,
+  quoteOf,
+  sendResultOf,
+} from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -226,6 +234,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   )
   const isUsdSend = sendingWalletDescriptor.currency === WalletCurrency.Usd
   const payRequest = lnurlParamsToPayRequest(lnurlParams, lnurl)
+  /** The quote review showed for a dollar send, which the send checks before it pays. */
+  const quoteRef: QuoteRef = {}
 
   // `commentAllowed` is a maximum length, not a flag. The note field accepts more
   // characters than a destination typically allows, and since the note is now what fills
@@ -263,9 +273,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const sendOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,
-    status: PaymentSendResult,
   ) => ({
-    status,
+    status: sendResultOf(payment),
     transaction: { createdAt: Number(payment.timestamp) },
     extraInfo: {
       preimage: extractPreimage(payment),
@@ -274,10 +283,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   })
 
   /** The wallet's own record of a send this detail made, reported as the send itself
-   *  would have reported it: the SDK hands a payment back as soon as it is dispatched,
-   *  pending or not, and every rail reports that as sent. */
+   *  would have reported it: sent once completed, pending while still in flight. */
   const foundOutcome = (found: Payment) =>
-    sendOutcome(found, extractProcessedSuccessAction(found), PaymentSendResult.Success)
+    sendOutcome(found, extractProcessedSuccessAction(found))
 
   const findThisSend = (startedAtMs: number, paymentHashes: ReadonlyArray<string>) =>
     findLostSend({
@@ -301,6 +309,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
           try {
             const prepared = await prepareLnurl(sdk, prepareOptions)
             const feeSats = extractLnurlFee(prepared)
+            if (isUsdSend)
+              quoteRef.current = quoteOf(feeSats, prepared.conversionEstimate)
             return { amount: asBtcSettlementAmount<T>(feeSats) }
           } catch (err) {
             return feeFailure<T>("Self-custodial LNURL fee", err)
@@ -350,16 +360,24 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
             return sendFailure(err)
           }
 
+          /** A dollar send converts at the price of the moment: one that moved since
+           *  review stops here, before it is sent, for the sender to see it again. */
+          if (
+            isUsdSend &&
+            hasQuoteMoved(
+              quoteRef.current,
+              quoteOf(extractLnurlFee(prepared), prepared.conversionEstimate),
+            )
+          ) {
+            return quoteMovedFailure()
+          }
+
           const startedAtMs = earlierAttemptMs ?? Date.now()
           const paymentHashes = [...earlierHashes, prepared.invoiceDetails.paymentHash]
           try {
             const result = await executeLnurl(sdk, prepared, sendIdempotencyKey)
             forgetLostAttempts()
-            return sendOutcome(
-              result.payment,
-              result.successAction,
-              PaymentSendResult.Success,
-            )
+            return sendOutcome(result.payment, result.successAction)
           } catch (err) {
             /** Not looked for now when a retry under the same key is refused as a
              *  duplicate by the SDK anyway, nor when the SDK refused the send on the
@@ -452,6 +470,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     successAction,
     setSuccessAction,
     isMerchant,
+    // The SDK takes a dollar send's fee out of its amount (FeesIncluded).
+    isFeeIncluded: isUsdSend,
     ...(destinationSpecifiedAmount
       ? { canSetAmount: false as const, destinationSpecifiedAmount }
       : { canSetAmount: true as const, setAmount }),

@@ -41,7 +41,45 @@ type PrepareParams = {
   amount: bigint | undefined
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
+  /** The quote review showed, for a send that converts dollars on the way out. */
+  quoteRef?: QuoteRef
 }
+
+/** What review showed for a dollar send: the fee, and the conversion behind it. */
+export type SendQuote = { feeSats: number; amountIn?: string; amountOut?: string }
+export type QuoteRef = { current?: SendQuote }
+
+export const quoteOf = (
+  feeSats: number,
+  estimate: { amountIn: unknown; amountOut: unknown } | undefined,
+): SendQuote => ({
+  feeSats,
+  amountIn: estimate ? String(estimate.amountIn) : undefined,
+  amountOut: estimate ? String(estimate.amountOut) : undefined,
+})
+
+/**
+ * Whether a dollar send's fresh quote differs from the one review showed. The price
+ * moves the conversion, so a send that kept going would pay or deliver amounts the
+ * sender never saw. A send with no quote on record has nothing to compare: review
+ * always quotes before the slider can move.
+ */
+export const hasQuoteMoved = (reviewed: SendQuote | undefined, fresh: SendQuote) =>
+  reviewed !== undefined &&
+  (reviewed.feeSats !== fresh.feeSats ||
+    reviewed.amountIn !== fresh.amountIn ||
+    reviewed.amountOut !== fresh.amountOut)
+
+/** A send stopped before anything went out, because its quote moved. */
+export const quoteMovedFailure = () => ({
+  status: PaymentSendResult.Failure,
+  errors: [
+    {
+      __typename: "GraphQLApplicationError" as const,
+      message: SelfCustodialErrorCode.QuoteMoved,
+    },
+  ],
+})
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
   [FeeTierOption.Fast]: OnchainConfirmationSpeed.Fast,
@@ -94,6 +132,9 @@ export const createGetFee = <T extends WalletCurrency>(
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
       const feeSats = extractLightningFee(prepared) ?? 0
+      if (params.quoteRef) {
+        params.quoteRef.current = quoteOf(feeSats, prepared.conversionEstimate)
+      }
       const amountAdjustment = mapAmountAdjustment(
         prepared.conversionEstimate?.amountAdjustment,
       )
@@ -126,6 +167,22 @@ export const createGetFeeOnchain = <T extends WalletCurrency>(
   }
 }
 
+/**
+ * What a dispatched send reports. Only a completed payment is sent: the SDK hands a
+ * payment back as soon as it is dispatched, and one still in flight, or with no status,
+ * may yet fail, so the sender sees it as pending rather than celebrated as sent.
+ */
+export const sendResultOf = (payment: Payment | undefined): PaymentSendResult => {
+  switch (payment?.status) {
+    case PaymentStatus.Completed:
+      return PaymentSendResult.Success
+    case PaymentStatus.Failed:
+      return PaymentSendResult.Failure
+    default:
+      return PaymentSendResult.Pending
+  }
+}
+
 const reportSendFailure = (
   scope: string,
   err: unknown,
@@ -138,8 +195,17 @@ export const createSendMutation = (params: PrepareParams): SendPaymentMutation =
   return async () => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared)
-      return { status: PaymentSendResult.Success }
+      if (
+        params.quoteRef &&
+        hasQuoteMoved(
+          params.quoteRef.current,
+          quoteOf(extractLightningFee(prepared) ?? 0, prepared.conversionEstimate),
+        )
+      ) {
+        return quoteMovedFailure()
+      }
+      const response = await executeSend(params.sdk, prepared)
+      return { status: sendResultOf(response?.payment) }
     } catch (err) {
       return {
         status: PaymentSendResult.Failure,
@@ -156,8 +222,8 @@ export const createSendMutationOnchain = (
   return async () => {
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
-      return { status: PaymentSendResult.Success }
+      const response = await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
+      return { status: sendResultOf(response?.payment) }
     } catch (err) {
       return {
         status: PaymentSendResult.Failure,

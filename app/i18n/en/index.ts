@@ -2375,12 +2375,33 @@ const en: BaseTranslation = {
       "This is the maximum fee you will be charged for this transaction.  It may end up being less once the payment has been made.",
     invoiceAlreadyPaid: "This invoice has already been paid",
     somethingWentWrong: "Something went wrong",
+    priceUpdated: "The price moved, so the amounts were updated. Check them before you send.",
     paymentAlreadyAttempted:
       "Payment already attempted.\n\nIf you want to send this payment again, start from scratch.",
     slideToConfirm: "Slide to Confirm",
     slideConfirming: "Confirming...",
+    slideToSend: "Slide to send",
+    calculatingFee: "Calculating fee…",
+    sendProgress: {
+      reviewing: "Reviewing",
+      signing: "Signing",
+      findingRoute: "Finding route",
+      broadcasting: "Broadcasting",
+      checkingDelivery: "Checking delivery",
+      retrying: "Re-trying",
+      almostThere: "Almost there",
+      anyTimeNow: "Any time now",
+      ohOh: "Oh oh",
+      tryingAgain: "Trying again",
+    },
     copiedDestination: "Copied destination to clipboard",
-    lightningRecommended: "High fee! We recommend Lightning.",
+    lightningRecommended: "High fee. We recommend Lightning.",
+    sending: "Sending",
+    sent: "Sent",
+    receipt: "Receipt",
+    fromBalance: "From Balance",
+    details: "Details",
+    changeAmount: "Change amount",
     usdRemainderSweep:
       "Remaining {remaining: string} ({remainingSats: string}) will be converted to Bitcoin. USD minimum: {minimum: string}.",
   },
@@ -2437,6 +2458,8 @@ const en: BaseTranslation = {
   SendBitcoinScreen: {
     willBeSentToMempoolBy: "Transaction should be submitted to mempool",
     amount: "Amount",
+    addAmount: "Add amount",
+    lowFunds: "Low funds",
     amountExceed: "Amount exceeds your balance of {balance: string}",
     amountExceedsLimit: "Amount exceeds your remaining daily limit of {limit: string}",
     upgradeAccountToIncreaseLimit: "Upgrade your account to increase your limit",
@@ -3249,6 +3272,14 @@ const en: BaseTranslation = {
   },
   AmountInputButton: {
     tapToSetAmount: "Set amount",
+  },
+  Accessibility: {
+    balanceHidden: "Balance hidden",
+    copy: "Copy",
+    deleteKey: "Delete",
+    revealBalanceHint: "Shows your balance on this screen",
+    swapCurrencyHint: "Switches the currency you type the amount in",
+    switchWalletHint: "Switches to your other wallet",
   },
   AppUpdate: {
     needToUpdateSupportMessage:

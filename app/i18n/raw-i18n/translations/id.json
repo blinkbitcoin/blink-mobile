@@ -2347,11 +2347,32 @@
     "maxFeeSelected": "Ini adalah biaya maksimum yang akan dikenakan untuk transaksi ini. Biaya mungkin lebih rendah setelah pembayaran dilakukan.",
     "invoiceAlreadyPaid": "Faktur ini telah dibayar",
     "somethingWentWrong": "Terjadi kesalahan",
+    "priceUpdated": "Harga berubah, jadi jumlahnya diperbarui. Periksa sebelum mengirim.",
     "paymentAlreadyAttempted": "Pembayaran telah dicoba sebelumnya.\n\nJika Anda ingin mengirim pembayaran ini lagi, mulailah dari awal.",
     "slideToConfirm": "Geser untuk Konfirmasi",
     "slideConfirming": "Mengkonfirmasi...",
+    "slideToSend": "Geser untuk Kirim",
+    "calculatingFee": "Menghitung biaya…",
+    "sendProgress": {
+      "reviewing": "Meninjau",
+      "signing": "Menandatangani",
+      "findingRoute": "Mencari rute",
+      "broadcasting": "Menyiarkan",
+      "checkingDelivery": "Memeriksa pengiriman",
+      "retrying": "Mencoba ulang",
+      "almostThere": "Hampir selesai",
+      "anyTimeNow": "Sebentar lagi",
+      "ohOh": "Aduh",
+      "tryingAgain": "Mencoba lagi"
+    },
     "copiedDestination": "Tujuan disalin ke papan klip",
-    "lightningRecommended": "Biaya tinggi! Kami merekomendasikan Lightning.",
+    "lightningRecommended": "Biaya tinggi. Kami merekomendasikan Lightning.",
+    "sending": "Mengirim",
+    "sent": "Terkirim",
+    "receipt": "Struk",
+    "fromBalance": "Dari Saldo",
+    "details": "Detail",
+    "changeAmount": "Ubah jumlah",
     "usdRemainderSweep": "Sisa {remaining: string} ({remainingSats: string}) akan dikonversi ke Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi akan dikirim ke mempool",
     "amount": "Jumlah",
+    "addAmount": "Tambahkan jumlah",
+    "lowFunds": "Dana tidak cukup",
     "amountExceed": "Jumlah melebihi saldo Anda sebesar {balance: string}",
     "amountExceedsLimit": "Jumlah melebihi batas harian Anda yang tersisa sebesar {limit: string}",
     "upgradeAccountToIncreaseLimit": "Tingkatkan akun Anda untuk meningkatkan batas",
@@ -3095,6 +3118,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan jumlah"
+  },
+  "Accessibility": {
+    "deleteKey": "Hapus",
+    "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
+    "switchWalletHint": "Beralih ke dompet Anda yang lain",
+    "copy": "Salin",
+    "balanceHidden": "Saldo disembunyikan",
+    "revealBalanceHint": "Menampilkan saldo Anda di layar ini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",

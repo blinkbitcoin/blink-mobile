@@ -2347,11 +2347,32 @@
     "maxFeeSelected": "Սա առավելագույն վճարն է, որը Ձեզանից կգանձվի այս գործառնության համար: Վճարումը կատարելուց հետո այն կարող է նվազել։ ",
     "invoiceAlreadyPaid": "Այս հաշիվ առաջնարդեն վճարված է",
     "somethingWentWrong": "Ինչ-որ բան այնպես չգնաց",
+    "priceUpdated": "Գինը փոխվել է, ուստի գումարները թարմացվել են։ Ստուգեք դրանք ուղարկելուց առաջ։",
     "paymentAlreadyAttempted": "Վճարումը արդեն փորձվել է։\n\nԵթե ցանկանում եք կրկին ուղարկել այս վճարումը՝ սկսել ի սկբանե։",
     "slideToConfirm": "Սահեցրեք՝ հաստատելու համար",
     "slideConfirming": "Հաստատվում է...",
+    "slideToSend": "Սահեցրեք՝ ուղարկելու համար",
+    "calculatingFee": "Վճարը հաշվարկվում է…",
+    "sendProgress": {
+      "reviewing": "Ստուգվում է",
+      "signing": "Ստորագրվում է",
+      "findingRoute": "Երթուղի է որոնվում",
+      "broadcasting": "Հեռարձակվում է",
+      "checkingDelivery": "Առաքումը ստուգվում է",
+      "retrying": "Կրկին փորձ",
+      "almostThere": "Գրեթե պատրաստ է",
+      "anyTimeNow": "Ցանկացած պահի",
+      "ohOh": "Վայ",
+      "tryingAgain": "Կրկին փորձում ենք"
+    },
     "copiedDestination": "Նպատակակետը պատծենվել է ջամանակավոր շտեմարանում",
     "lightningRecommended": "Բարձր միջնորդավճար։ Խորհուրդ ենք տալիս Lightning-ը։",
+    "sending": "Ուղարկվում է",
+    "sent": "Ուղարկված է",
+    "receipt": "Անդորրագիր",
+    "fromBalance": "Հաշվեկշռից",
+    "details": "Մանրամասներ",
+    "changeAmount": "Փոխել գումարը",
     "usdRemainderSweep": "Մնացած {remaining: string} ({remainingSats: string}) կփոխարկվի Bitcoin-ի։ USD-ի նվազագույնը՝ {minimum: string}։"
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Գործարքը պետք է ուղարկվի mempool",
     "amount": "Չափ",
+    "addAmount": "Ավելացնել գումար",
+    "lowFunds": "Բավարար միջոցներ չկան",
     "amountExceed": "Գումարի չափը գերազանցում է Ձեր {balance: string} հաշվեկշիռը",
     "amountExceedsLimit": "Գումարի չափը գերազանցում է {limit: string}ի Ձեր օրական սահմանաչափը",
     "upgradeAccountToIncreaseLimit": "Թարմացրեք Ձեր հաշիվը Ձեր սահմանաչափը բարձրացնելու համար",
@@ -3095,6 +3118,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Ջնջել",
+    "swapCurrencyHint": "Փոխում է արժույթը, որով մուտքագրում եք գումարը",
+    "switchWalletHint": "Անցնում է ձեր մյուս դրամապանակին",
+    "copy": "Պատճենել",
+    "balanceHidden": "Մնացորդը թաքցված է",
+    "revealBalanceHint": "Ցույց է տալիս ձեր մնացորդը այս էկրանին"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ես պետք է թարմացնել հավելվածը։ Ես օգտագործում եմ {os: string} հավելվածը {version: string} տարբերակով։ ",

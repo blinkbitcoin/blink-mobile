@@ -2347,11 +2347,32 @@
     "maxFeeSelected": "Ово је максимална накнада која ће вам бити наплаћена за ову трансакцију. Може се испоставити да је мања након што је плаћање извршено.",
     "invoiceAlreadyPaid": "Овај рачун је већ плаћен",
     "somethingWentWrong": "Нешто је пошло наопако",
+    "priceUpdated": "Цена се променила, па су износи ажурирани. Проверите их пре слања.",
     "paymentAlreadyAttempted": "Плаћање је већ покушано.\n\nАко желите да поново пошаљете ову уплату, започните испочетка.",
     "slideToConfirm": "Превуците за потврду",
     "slideConfirming": "Потврђивање...",
+    "slideToSend": "Превуците за слање",
+    "calculatingFee": "Израчунавање накнаде…",
+    "sendProgress": {
+      "reviewing": "Провера",
+      "signing": "Потписивање",
+      "findingRoute": "Тражење руте",
+      "broadcasting": "Емитовање",
+      "checkingDelivery": "Провера испоруке",
+      "retrying": "Поновни покушај",
+      "almostThere": "Скоро готово",
+      "anyTimeNow": "Сваког тренутка",
+      "ohOh": "Упс",
+      "tryingAgain": "Покушавамо поново"
+    },
     "copiedDestination": "Одредиште је копирано у клипборд",
-    "lightningRecommended": "Висока провизија! Препоручујемо Lightning.",
+    "lightningRecommended": "Висока провизија. Препоручујемо Lightning.",
+    "sending": "Слање",
+    "sent": "Послато",
+    "receipt": "Потврда",
+    "fromBalance": "Са салда",
+    "details": "Детаљи",
+    "changeAmount": "Промени износ",
     "usdRemainderSweep": "Preostalo {remaining: string} ({remainingSats: string}) biće konvertovano u Bitcoin. Minimum u USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Трансакција треба да буде прослеђена у мемпул",
     "amount": "Износ",
+    "addAmount": "Додај износ",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Износ прелази ваше стање од {balance: string}",
     "amountExceedsLimit": "Износ прелази ваш дневни лимит од {limit: string}",
     "upgradeAccountToIncreaseLimit": "Надоградите свој налог да бисте повећали лимит",
@@ -3095,6 +3118,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Обриши",
+    "swapCurrencyHint": "Мења валуту у којој уносите износ",
+    "switchWalletHint": "Прелази на ваш други новчаник",
+    "copy": "Копирај",
+    "balanceHidden": "Стање је скривено",
+    "revealBalanceHint": "Приказује ваше стање на овом екрану"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Морам да ажурирам апликацију на најновију верзију. Користим {os: string} апликацију са верзијом {version: string}.",

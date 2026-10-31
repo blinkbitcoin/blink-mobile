@@ -2347,11 +2347,32 @@
         "maxFeeSelected": "これは今回のトランザクションで請求される手数料の上限です。 お取引完了後に、手数料は少なくなる場合があります。",
         "invoiceAlreadyPaid": "このインボイスは既に支払い済みです",
         "somethingWentWrong": "エラーが発生しました",
+        "priceUpdated": "価格が変動したため、金額を更新しました。送金前にご確認ください。",
         "paymentAlreadyAttempted": "支払いは既に試行済みです。\n\nこの支払いを再度送信する場合は、最初からやり直してください。",
         "slideToConfirm": "スライドして確認",
         "slideConfirming": "確認中...",
+        "slideToSend": "スライドして送金",
+        "calculatingFee": "手数料を計算中…",
+        "sendProgress": {
+            "reviewing": "内容を確認中",
+            "signing": "署名中",
+            "findingRoute": "ルートを検索中",
+            "broadcasting": "ブロードキャスト中",
+            "checkingDelivery": "着金を確認中",
+            "retrying": "再試行中",
+            "almostThere": "もう少しです",
+            "anyTimeNow": "まもなく完了",
+            "ohOh": "おっと",
+            "tryingAgain": "もう一度試しています"
+        },
         "copiedDestination": "送信先をクリップボードにコピーしました",
-        "lightningRecommended": "手数料が高額です！Lightningをお勧めします。",
+        "lightningRecommended": "手数料が高額です。Lightningをお勧めします。",
+        "sending": "送信中",
+        "sent": "送金済み",
+        "receipt": "領収書",
+        "fromBalance": "送金元の残高",
+        "details": "詳細",
+        "changeAmount": "金額を変更",
         "usdRemainderSweep": "残高{remaining: string}（{remainingSats: string}）はビットコインに変換されます。USDの最低額：{minimum: string}。"
     },
     "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "トランザクションはメモリプールに送信されます",
         "amount": "金額",
+        "addAmount": "金額を追加",
+        "lowFunds": "残高不足",
         "amountExceed": "限度額が{balance: string}を超えています",
         "amountExceedsLimit": "1日の残りの限度額{limit: string}を超えています",
         "upgradeAccountToIncreaseLimit": "ウォレットをアップグレードして限度額を増やす",
@@ -3095,6 +3118,14 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "金額を設定する"
+    },
+    "Accessibility": {
+        "deleteKey": "削除",
+        "swapCurrencyHint": "金額を入力する通貨を切り替えます",
+        "switchWalletHint": "もう一方のウォレットに切り替えます",
+        "copy": "コピー",
+        "balanceHidden": "残高は非表示",
+        "revealBalanceHint": "この画面で残高を表示します"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
