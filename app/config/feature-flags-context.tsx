@@ -394,22 +394,29 @@ const waitForShippedDefaults = (): Promise<void> =>
 
 /** Asks for the console's values and activates them, true once they landed. Only the
  *  launch's first failure is reported: every report also leaves a Crashlytics breadcrumb,
- *  and a retry every minute would bury the ones that lead up to a real crash. */
-const fetchConsoleConfig = ({ isReported }: { isReported: boolean }): Promise<boolean> =>
-  remoteConfigInstance()
-    .fetchAndActivate()
-    .then(() => true)
-    .catch((err) => {
-      if (isReported) {
-        logError({
-          scope: "remote-config",
-          error: err,
-          context: { stage: "fetchAndActivate" },
-          dedupKey: "remote-config-fetch",
-        })
-      }
-      return false
-    })
+ *  and a retry every minute would bury the ones that lead up to a real crash. A call that
+ *  throws before it hands back a promise fails the same way, or the first launch would
+ *  never mark the config ready and would stay on an empty screen. */
+const fetchConsoleConfig = async ({
+  isReported,
+}: {
+  isReported: boolean
+}): Promise<boolean> => {
+  try {
+    await remoteConfigInstance().fetchAndActivate()
+    return true
+  } catch (err) {
+    if (isReported) {
+      logError({
+        scope: "remote-config",
+        error: err,
+        context: { stage: "fetchAndActivate" },
+        dedupKey: "remote-config-fetch",
+      })
+    }
+    return false
+  }
+}
 
 remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,

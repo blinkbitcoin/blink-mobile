@@ -162,6 +162,22 @@ describe("remote config fetch retry", () => {
     expect(shown(view, "settled")).toBe("false")
   })
 
+  it("opens the app and asks again when the fetch throws before it returns a promise", async () => {
+    mockFetchAndActivate.mockImplementationOnce(() => {
+      throw new Error("bridge")
+    })
+
+    const view = renderProbe()
+    await flushEffects()
+
+    expect(mockLogError).toHaveBeenCalledWith(
+      expect.objectContaining({ context: { stage: "fetchAndActivate" } }),
+    )
+    expect(shown(view, "enabled")).toBe("true")
+    await advanceToNextFetch(2_000)
+    expect(mockFetchAndActivate).toHaveBeenCalledTimes(2)
+  })
+
   it("asks again after a failed fetch, waiting twice as long each time", async () => {
     mockFetchOutcomes.push("fail", "fail", "fail")
 
