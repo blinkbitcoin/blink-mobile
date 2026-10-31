@@ -14,10 +14,12 @@ jest.mock("react-native-safe-area-context", () =>
 jest.mock("@app/components/screen", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockScreen(),
 )
-// IconAction renders a GaloyIconButton; the shared mock reduces it to a plain
-// Pressable so the explorer / copy icons can be pressed by testID.
+// The close button is a GaloyIconButton; the shared mock reduces it to a plain Pressable.
 jest.mock("@app/components/atomic/galoy-icon-button", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyIconButton(),
+)
+jest.mock("@app/components/atomic/galoy-primary-button", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockGaloyPrimaryButton(),
 )
 jest.mock("@app/graphql/generated", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockGeneratedGraphql(),
@@ -33,12 +35,13 @@ jest.mock("@app/components/icon-transactions", () => ({
   IconTransaction: () => null,
 }))
 
-jest.mock("@app/components/wallet-summary", () => ({
-  WalletSummary: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
 }))
 
 jest.mock("@app/components/transaction-date", () => ({
   TransactionDate: () => null,
+  formatDateForTransaction: () => "24 Jul 2024, 06:26",
 }))
 
 jest.mock("@app/components/atomic/galoy-info", () => ({
@@ -81,32 +84,19 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
   useSelfCustodialWallet: () => ({ allTransactions: mockNoTransactions }),
 }))
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-      },
-    },
-    locale: "en",
+// Rows are found by their label, so the labels the spec presses get a copy.
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n({
+    "common.advanced": "advanced",
+    "common.note": "note",
+    "common.preimageProofOfPayment": "preimage",
+    "common.paymentRequest": "payment-request",
+    "TransactionDetailScreen.transactionId": "transaction-id",
+    "TransactionDetailScreen.hash": "hash",
+    "TransactionDetailScreen.blinkInternalId": "internal-id",
+    "TransactionDetailScreen.copyAllData": "copy-all",
   }),
-}))
+)
 
 const ONCHAIN_TX_HASH = "4a5e1e4baab89f3a32518a88c31bc87f618f76673e2cc77ab2127b7afdeda33b"
 const SPARK_TX_ID = "0196fe12-7fca-7d55-8d9d-1af6f9f0e7b9"
@@ -167,10 +157,10 @@ const renderScreenWithTx = (tx: unknown) => {
 const copiedContents = () =>
   mockCopyToClipboard.mock.calls.map(([{ content }]) => content)
 
-// Regression guards for the #3732 / #3898 icon-row rework: every copy /
-// open-in-explorer icon on the detail rows must fire its handler with the
-// right payload when tapped.
-describe("TransactionDetailScreen row icon actions", () => {
+// Regression guards for the #3732 / #3898 row actions: the copy icons are gone,
+// but tapping a row still copies its value, and tapping the on-chain
+// transaction ID opens it on the explorer (a long press copies it).
+describe("TransactionDetailScreen row actions", () => {
   const openURLSpy = jest.spyOn(Linking, "openURL").mockResolvedValue(undefined)
 
   beforeEach(() => {
@@ -178,11 +168,17 @@ describe("TransactionDetailScreen row icon actions", () => {
     mockCopyToClipboard.mockClear()
   })
 
+  const renderExpanded = (tx: unknown) => {
+    const screen = renderScreenWithTx(tx)
+    fireEvent.press(screen.getByTestId("advanced"))
+    return screen
+  }
+
   describe("broadcasted onchain transaction", () => {
     it("opens the hex transaction hash on the block explorer", () => {
-      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+      const { getByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
-      fireEvent.press(getByTestId("arrow-square-out"))
+      fireEvent.press(getByTestId("transaction-id"))
 
       expect(openURLSpy).toHaveBeenCalledWith(
         "https://mempool.space/tx/" + ONCHAIN_TX_HASH,
@@ -190,30 +186,30 @@ describe("TransactionDetailScreen row icon actions", () => {
     })
 
     it("opens a spark transaction (UUID hash with dashes) on the spark explorer", () => {
-      const { getByTestId } = renderScreenWithTx(broadcastedOnChainTx(SPARK_TX_ID))
+      const { getByTestId } = renderExpanded(broadcastedOnChainTx(SPARK_TX_ID))
 
-      fireEvent.press(getByTestId("arrow-square-out"))
+      fireEvent.press(getByTestId("transaction-id"))
 
       expect(openURLSpy).toHaveBeenCalledWith("https://sparkscan.io/tx/" + SPARK_TX_ID)
     })
 
     it("copies the transaction hash, description and internal id", () => {
-      const { getAllByTestId } = renderScreenWithTx(broadcastedOnChainTx(ONCHAIN_TX_HASH))
+      const { getByTestId } = renderExpanded(broadcastedOnChainTx(ONCHAIN_TX_HASH))
 
-      // rows in render order: transaction hash, description, Blink internal id
-      const copyIcons = getAllByTestId("copy-paste")
-      expect(copyIcons).toHaveLength(3)
-      copyIcons.forEach((icon) => fireEvent.press(icon))
+      fireEvent(getByTestId("transaction-id"), "longPress")
+      fireEvent.press(getByTestId("note"))
+      fireEvent.press(getByTestId("internal-id"))
 
       expect(copiedContents()).toEqual([ONCHAIN_TX_HASH, "some description", TX_ID])
+      expect(openURLSpy).not.toHaveBeenCalled()
     })
   })
 
   describe("lightning transaction", () => {
     it("opens the payment request in the lightning decoder", () => {
-      const { getByTestId } = renderScreenWithTx(lightningTx)
+      const { getByTestId } = renderExpanded(lightningTx)
 
-      fireEvent.press(getByTestId("arrow-square-out"))
+      fireEvent.press(getByTestId("payment-request"))
 
       expect(openURLSpy).toHaveBeenCalledWith(
         "https://dev.blink.sv/decode?invoice=" + LN_PAYMENT_REQUEST,
@@ -221,13 +217,13 @@ describe("TransactionDetailScreen row icon actions", () => {
     })
 
     it("copies description, payment hash, preimage, payment request and internal id", () => {
-      const { getAllByTestId } = renderScreenWithTx(lightningTx)
+      const { getByTestId } = renderExpanded(lightningTx)
 
-      // rows in render order: description, hash, preimage, payment request,
-      // Blink internal id
-      const copyIcons = getAllByTestId("copy-paste")
-      expect(copyIcons).toHaveLength(5)
-      copyIcons.forEach((icon) => fireEvent.press(icon))
+      fireEvent.press(getByTestId("note"))
+      fireEvent.press(getByTestId("hash"))
+      fireEvent.press(getByTestId("preimage"))
+      fireEvent(getByTestId("payment-request"), "longPress")
+      fireEvent.press(getByTestId("internal-id"))
 
       expect(copiedContents()).toEqual([
         "some description",
@@ -236,6 +232,33 @@ describe("TransactionDetailScreen row icon actions", () => {
         LN_PAYMENT_REQUEST,
         TX_ID,
       ])
+      expect(openURLSpy).not.toHaveBeenCalled()
+    })
+
+    it("copies every row as one block, in screen order", () => {
+      const { getByLabelText } = renderExpanded(lightningTx)
+
+      fireEvent.press(getByLabelText("copy-all"))
+
+      const lines = copiedContents()[0].split("\n")
+      const at = (line: string) => lines.indexOf(line)
+      expect(lines).toContain(": 24 Jul 2024, 06:26")
+      expect(at("note: some description")).toBeGreaterThan(-1)
+      expect(at(`hash: ${LN_PAYMENT_HASH}`)).toBeGreaterThan(at("note: some description"))
+      expect(at(`preimage: ${LN_PRE_IMAGE}`)).toBeGreaterThan(
+        at(`hash: ${LN_PAYMENT_HASH}`),
+      )
+      expect(at(`payment-request: ${LN_PAYMENT_REQUEST}`)).toBeGreaterThan(
+        at(`preimage: ${LN_PRE_IMAGE}`),
+      )
+      expect(lines[lines.length - 1]).toBe(`internal-id: ${TX_ID}`)
+    })
+
+    it("keeps the technical rows folded away until Advanced is opened", () => {
+      const { queryByTestId } = renderScreenWithTx(lightningTx)
+
+      expect(queryByTestId("hash")).toBeNull()
+      expect(queryByTestId("payment-request")).toBeNull()
     })
   })
 })

@@ -41,7 +41,9 @@ jest.mock("@app/components/screen", () => ({
 }))
 
 jest.mock("@app/components/icon-transactions", () => ({ IconTransaction: () => null }))
-jest.mock("@app/components/wallet-summary", () => ({ WalletSummary: () => null }))
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
+}))
 jest.mock("@app/components/transaction-date", () => ({ TransactionDate: () => null }))
 jest.mock("@app/components/atomic/galoy-info", () => ({ GaloyInfo: () => null }))
 jest.mock("@app/components/atomic/galoy-icon-button", () => ({
@@ -137,36 +139,9 @@ jest.mock("@app/store/persistent-state", () => ({
 
 jest.mock("@react-navigation/native", () => ({ useNavigation: () => ({}) }))
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-        tryAgain: LLText,
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-        findingAccount: LLText,
-        txNotFoundInAccounts: LLText,
-        txLoadFailed: LLText,
-      },
-    },
-    locale: "en",
-  }),
-}))
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n(),
+)
 
 type Fragment = {
   id: string

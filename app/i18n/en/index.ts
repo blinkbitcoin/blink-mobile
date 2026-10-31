@@ -2790,7 +2790,7 @@ const en: BaseTranslation = {
   TransactionDetailScreen: {
     paid: "Paid to/from",
     received: "You received",
-    spent: "You spent",
+    sent: "You sent",
     sending: "Sending",
     receivingAccount: "Receiving Balance",
     sendingAccount: "Sending Balance",
@@ -2802,6 +2802,14 @@ const en: BaseTranslation = {
       "This payment couldn't be found in any account on this device. It may belong to an account that was logged out.",
     txLoadFailed: "Couldn't load this payment. Check your connection and try again.",
     switchedForPayment: "Switched to {identifier: string} to show this payment",
+    customLabel: "Custom label",
+    depositFee: "Deposit fee",
+    time: "Time",
+    transactionId: "Transaction ID",
+    hash: "Hash",
+    blinkInternalId: "Blink internal ID",
+    copyAllData: "Copy all data",
+    allData: "Transaction details",
   },
   FeeRatesScreen: {
     title: "Fee rates",

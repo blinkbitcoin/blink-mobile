@@ -19,8 +19,8 @@ jest.mock("@app/components/icon-transactions", () => ({
   IconTransaction: () => null,
 }))
 
-jest.mock("@app/components/wallet-summary", () => ({
-  WalletSummary: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
 }))
 
 jest.mock("@app/components/transaction-date", () => ({
@@ -80,36 +80,14 @@ jest.mock("@react-navigation/native", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
 )
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-        tryAgain: () => "try-again",
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-        findingAccount: () => "finding-account",
-        txNotFoundInAccounts: () => "tx-not-found",
-        txLoadFailed: () => "tx-load-failed",
-      },
-    },
-    locale: "en",
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n({
+    "common.tryAgain": "try-again",
+    "TransactionDetailScreen.findingAccount": "finding-account",
+    "TransactionDetailScreen.txNotFoundInAccounts": "tx-not-found",
+    "TransactionDetailScreen.txLoadFailed": "tx-load-failed",
   }),
-}))
+)
 
 const mockRetry = jest.fn()
 let mockResolveStatus: ResolveTransactionAccountStatus = "resolving"

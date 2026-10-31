@@ -24,6 +24,9 @@ export type NoteInputProps = {
   big?: boolean
   iconSize?: number
   fontSize?: number
+  /** Replaces "Add note" as both the placeholder and the field's accessibility label. */
+  placeholder?: string
+  maxLength?: number
 }
 
 export const NoteInput: React.FC<NoteInputProps> = ({
@@ -35,8 +38,11 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   big = true,
   iconSize = 18,
   fontSize = 16,
+  placeholder,
+  maxLength = 500,
 }) => {
   const { LL } = useI18nContext()
+  const label = placeholder ?? LL.NoteInput.addNote()
   const [isFocused, setIsFocused] = useState(false)
   const styles = useStyles({ editable: Boolean(editable), big, isFocused })
   const {
@@ -69,9 +75,9 @@ export const NoteInput: React.FC<NoteInputProps> = ({
       <View style={styles.noteContainer}>
         <TextInput
           {...testProps("add-note")}
-          accessibilityLabel={LL.NoteInput.addNote()}
+          accessibilityLabel={label}
           style={[styles.noteInput, { fontSize }]}
-          placeholder={LL.NoteInput.addNote()}
+          placeholder={label}
           placeholderTextColor={colors.black}
           onChangeText={onChangeText}
           onFocus={() => setIsFocused(true)}
@@ -82,7 +88,7 @@ export const NoteInput: React.FC<NoteInputProps> = ({
           value={value}
           editable={editable}
           selectTextOnFocus
-          maxLength={500}
+          maxLength={maxLength}
           ref={textInputRef}
         />
         {/* The same target as the field, so a screen reader skips it. */}
