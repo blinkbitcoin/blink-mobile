@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Ruwaynin mempool nisqaman apachisqa kanan kachkan",
     "amount": "Suma",
+    "addAmount": "Suma yapay",
+    "lowFunds": "Mana kaniyuqchu",
     "amountExceed": "Mana kaniyta rikuchiy {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Pichay",
+    "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
+    "switchWalletHint": "Huk qipiykiman tikran",
+    "copy": "Kopiay"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",

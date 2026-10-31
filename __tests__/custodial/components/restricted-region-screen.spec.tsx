@@ -3,6 +3,7 @@ import { Linking } from "react-native"
 
 import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
+import { fonts } from "@app/rne-theme/fonts"
 import theme from "@app/rne-theme/theme"
 import TypesafeI18n from "@app/i18n/i18n-react"
 import { i18nObject } from "@app/i18n/i18n-util"
@@ -84,12 +85,14 @@ describe("RestrictedRegionScreen", () => {
     expect(getByText("$0.20")).toBeTruthy()
   })
 
+  /** Bold is the bold face, not a weight on the regular one: Android synthesises the
+   *  weight rather than loading the file. */
   it("renders the native sat amount bold and the fiat conversion plain", () => {
     const { getByText } = renderScreen()
 
-    expect(getByText("21,493 sats")).toHaveStyle({ fontWeight: "700" })
-    expect(getByText("($22.42)")).toHaveStyle({ fontWeight: "400" })
-    expect(getByText("$0.20")).toHaveStyle({ fontWeight: "700" })
+    expect(getByText("21,493 sats")).toHaveStyle({ fontFamily: fonts.bold })
+    expect(getByText("($22.42)")).toHaveStyle({ fontFamily: fonts.regular })
+    expect(getByText("$0.20")).toHaveStyle({ fontFamily: fonts.bold })
   })
 
   it("renders the bitcoin balance without parentheses when no fiat resolves", () => {

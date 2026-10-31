@@ -7646,6 +7646,14 @@ type RootTranslation = {
 		 */
 		amount: string
 		/**
+		 * A​d​d​ ​a​m​o​u​n​t
+		 */
+		addAmount: string
+		/**
+		 * L​o​w​ ​f​u​n​d​s
+		 */
+		lowFunds: string
+		/**
 		 * A​m​o​u​n​t​ ​e​x​c​e​e​d​s​ ​y​o​u​r​ ​b​a​l​a​n​c​e​ ​o​f​ ​{​b​a​l​a​n​c​e​}
 		 * @param {string} balance
 		 */
@@ -10346,6 +10354,24 @@ type RootTranslation = {
 		 * S​e​t​ ​a​m​o​u​n​t
 		 */
 		tapToSetAmount: string
+	}
+	Accessibility: {
+		/**
+		 * C​o​p​y
+		 */
+		copy: string
+		/**
+		 * D​e​l​e​t​e
+		 */
+		deleteKey: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​h​e​ ​c​u​r​r​e​n​c​y​ ​y​o​u​ ​t​y​p​e​ ​t​h​e​ ​a​m​o​u​n​t​ ​i​n
+		 */
+		swapCurrencyHint: string
+		/**
+		 * S​w​i​t​c​h​e​s​ ​t​o​ ​y​o​u​r​ ​o​t​h​e​r​ ​w​a​l​l​e​t
+		 */
+		switchWalletHint: string
 	}
 	AppUpdate: {
 		/**
@@ -21849,6 +21875,14 @@ export type TranslationFunctions = {
 		 */
 		amount: () => LocalizedString
 		/**
+		 * Add amount
+		 */
+		addAmount: () => LocalizedString
+		/**
+		 * Low funds
+		 */
+		lowFunds: () => LocalizedString
+		/**
 		 * Amount exceeds your balance of {balance}
 		 */
 		amountExceed: (arg: { balance: string }) => LocalizedString
@@ -24488,6 +24522,24 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		tapToSetAmount: () => LocalizedString
+	}
+	Accessibility: {
+		/**
+		 * Copy
+		 */
+		copy: () => LocalizedString
+		/**
+		 * Delete
+		 */
+		deleteKey: () => LocalizedString
+		/**
+		 * Switches the currency you type the amount in
+		 */
+		swapCurrencyHint: () => LocalizedString
+		/**
+		 * Switches to your other wallet
+		 */
+		switchWalletHint: () => LocalizedString
 	}
 	AppUpdate: {
 		/**

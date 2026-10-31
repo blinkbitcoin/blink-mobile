@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transactie wordt naar de mempool verzonden",
     "amount": "Bedrag",
+    "addAmount": "Bedrag toevoegen",
+    "lowFunds": "Onvoldoende saldo",
     "amountExceed": "Bedrag overschrijdt uw saldo van {balance: string}",
     "amountExceedsLimit": "Bedrag overschrijdt uw resterende dagelijkse limiet van {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade uw account om uw limiet te verhogen",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag in"
+  },
+  "Accessibility": {
+    "deleteKey": "Wissen",
+    "swapCurrencyHint": "Wisselt de valuta waarin je het bedrag invoert",
+    "switchWalletHint": "Schakelt over naar je andere wallet",
+    "copy": "Kopiëren"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ik moet mijn app bijwerken naar de nieuwste versie. Ik gebruik de app {os: string} met versie {version: string}.",
