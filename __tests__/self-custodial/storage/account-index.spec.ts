@@ -956,3 +956,175 @@ describe("self-custodial account-index — sweep breadcrumbs", () => {
     )
   })
 })
+
+/**
+ * An index item that does not read as an account still stands for a seed, so neither a
+ * write back nor the sweep may lose it. Kept out of the first describe, which is at the
+ * line cap.
+ */
+describe("self-custodial account-index — damaged entries", () => {
+  const stored = new Map<string, string>()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    stored.clear()
+    mockGetItem.mockImplementation(async (key: string) => stored.get(key) ?? null)
+    mockSetItem.mockImplementation(async (key: string, value: string) => {
+      stored.set(key, value)
+    })
+    mockRememberMnemonicAccount.mockResolvedValue(true)
+    mockMnemonicExists.mockResolvedValue({ status: "yes" })
+    mockMnemonicNetworkExists.mockResolvedValue({ status: "no" })
+    mockMnemonicIsMigrated.mockResolvedValue({ status: "yes" })
+  })
+
+  const VALID = { id: "acc-1", lightningAddress: null }
+  const DAMAGED = { id: "acc-2" }
+
+  const storeCanonical = (value: unknown) => {
+    stored.set(ACCOUNT_INDEX_KEY, JSON.stringify(value))
+  }
+
+  const storeLegacy = (value: unknown) => {
+    stored.set(LEGACY_ID_LIST_KEY, JSON.stringify(value))
+  }
+
+  const storedIndex = (): unknown => JSON.parse(stored.get(ACCOUNT_INDEX_KEY) ?? "null")
+
+  describe("the sweep", () => {
+    it("records the seed of an entry that is damaged but still carries an id", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      const result = await sweepMnemonicMigration()
+
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("acc-2")
+      expect(result).toEqual({ status: "ok", migrated: 2 })
+    })
+
+    it("records the account a canonical value that is not a list still names", async () => {
+      storeCanonical(VALID)
+
+      const result = await sweepMnemonicMigration()
+
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("acc-1")
+      expect(result).toEqual({ status: "ok", migrated: 1 })
+    })
+
+    it("reports itself incomplete over an item that names no account", async () => {
+      storeCanonical([VALID, { lightningAddress: null }])
+
+      const result = await sweepMnemonicMigration()
+
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("acc-1")
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+    })
+
+    it("counts every item without a usable id as an account it could not reach", async () => {
+      storeCanonical([VALID, { id: "" }, { id: 7 }, 42, null])
+
+      const result = await sweepMnemonicMigration()
+
+      expect(mockMnemonicExists).toHaveBeenCalledTimes(1)
+      expect(mockMnemonicExists).toHaveBeenCalledWith("acc-1")
+      expect(result).toEqual({ status: "incomplete", failures: 4 })
+    })
+
+    it("probes an account the index names twice only once", async () => {
+      storeCanonical([VALID, { id: "acc-1" }])
+
+      await sweepMnemonicMigration()
+
+      expect(mockMnemonicExists).toHaveBeenCalledTimes(1)
+    })
+
+    it("records an id the legacy list holds next to an item that is not one", async () => {
+      storeLegacy(["acc-1", 42])
+
+      const result = await sweepMnemonicMigration()
+
+      expect(mockRememberMnemonicAccount).toHaveBeenCalledWith("acc-1")
+      expect(result).toEqual({ status: "incomplete", failures: 1 })
+    })
+  })
+
+  describe("the legacy id list", () => {
+    it("carries an item that is not an id into the index instead of dropping it", async () => {
+      storeLegacy(["acc-1", 42])
+
+      const result = await listSelfCustodialAccounts()
+
+      expect(result).toEqual({ status: StorageReadStatus.Ok, entries: [VALID] })
+      expect(storedIndex()).toEqual([VALID, 42])
+    })
+
+    it("keeps a legacy value that is not a list when an account registers", async () => {
+      storeLegacy(DAMAGED)
+
+      await addSelfCustodialAccountId("acc-3")
+
+      expect(storedIndex()).toEqual([DAMAGED, { id: "acc-3", lightningAddress: null }])
+    })
+  })
+
+  describe("writing the index back", () => {
+    it("keeps a damaged entry when an account registers", async () => {
+      storeCanonical([DAMAGED])
+
+      await addSelfCustodialAccountId("acc-3")
+
+      expect(storedIndex()).toEqual([DAMAGED, { id: "acc-3", lightningAddress: null }])
+    })
+
+    it("keeps a canonical value that is not a list when an account registers", async () => {
+      storeCanonical(DAMAGED)
+
+      await addSelfCustodialAccountId("acc-3")
+
+      expect(storedIndex()).toEqual([DAMAGED, { id: "acc-3", lightningAddress: null }])
+    })
+
+    it("registers a readable entry beside a damaged one that names the same account", async () => {
+      storeCanonical([DAMAGED])
+
+      await addSelfCustodialAccountId("acc-2")
+
+      expect(storedIndex()).toEqual([DAMAGED, { id: "acc-2", lightningAddress: null }])
+    })
+
+    it("keeps a damaged entry when another account is removed", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      await removeSelfCustodialAccountId("acc-1")
+
+      expect(storedIndex()).toEqual([DAMAGED])
+    })
+
+    it("drops a damaged entry that names the account being removed", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      await removeSelfCustodialAccountId("acc-2")
+
+      expect(storedIndex()).toEqual([VALID])
+    })
+
+    it("keeps a damaged entry when a lightning address is stored", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      await setSelfCustodialLightningAddress("acc-1", "alice@blink.sv")
+
+      expect(storedIndex()).toEqual([
+        { id: "acc-1", lightningAddress: "alice@blink.sv" },
+        DAMAGED,
+      ])
+    })
+
+    it("leaves the index as untrusted for the erase as it was before the write", async () => {
+      storeCanonical([VALID, DAMAGED])
+
+      await setSelfCustodialLightningAddress("acc-1", "alice@blink.sv")
+
+      const ids = await readSelfCustodialAccountIds()
+      expect(ids.status).toBe(StorageReadStatus.ReadFailed)
+    })
+  })
+})
