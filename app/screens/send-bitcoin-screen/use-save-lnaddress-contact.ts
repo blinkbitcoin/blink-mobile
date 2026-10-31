@@ -61,10 +61,15 @@ export const useSaveLnAddressContact = () => {
         }
       }
 
-      await contactCreate({
-        variables: { input: { handle, type: ContactType.Lnaddress } },
-      })
-      return { saved: true, handle }
+      try {
+        await contactCreate({
+          variables: { input: { handle, type: ContactType.Lnaddress } },
+        })
+        return { saved: true, handle }
+      } catch (err) {
+        crashlytics().log(`[contacts] auto-save failed for ${handle}: ${err}`)
+        return { saved: false, handle }
+      }
     },
     [contactCreate, isSelfCustodial, sdk],
   )

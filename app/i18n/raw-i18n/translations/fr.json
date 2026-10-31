@@ -2347,11 +2347,32 @@
         "maxFeeSelected": "Il s’agit des frais maximums qui vous seront facturés pour cette transaction. Il peut s’avérer inférieur une fois le paiement effectué.",
         "invoiceAlreadyPaid": "Cette facture a déjà été payée",
         "somethingWentWrong": "Une erreur est survenue",
+        "priceUpdated": "Le prix a changé, les montants ont donc été mis à jour. Vérifiez-les avant d'envoyer.",
         "paymentAlreadyAttempted": "Paiement déjà tenté.\n\nSi vous souhaitez renvoyer ce paiement, recommencez depuis le début.",
         "slideToConfirm": "Glissez pour confirmer",
         "slideConfirming": "Confirmation en cours…",
+        "slideToSend": "Glissez pour envoyer",
+        "calculatingFee": "Calcul des frais…",
+        "sendProgress": {
+            "reviewing": "Vérification",
+            "signing": "Signature",
+            "findingRoute": "Recherche d'un itinéraire",
+            "broadcasting": "Diffusion",
+            "checkingDelivery": "Vérification de la livraison",
+            "retrying": "Nouvelle tentative",
+            "almostThere": "Presque fini",
+            "anyTimeNow": "D'un instant à l'autre",
+            "ohOh": "Oh oh",
+            "tryingAgain": "On réessaie"
+        },
         "copiedDestination": "Destination copiée dans le presse-papiers",
-        "lightningRecommended": "Frais élevés ! Nous recommandons Lightning.",
+        "lightningRecommended": "Frais élevés. Nous recommandons Lightning.",
+        "sending": "Envoi en cours",
+        "sent": "Envoyé",
+        "receipt": "Reçu",
+        "fromBalance": "Depuis le solde",
+        "details": "Détails",
+        "changeAmount": "Modifier le montant",
         "usdRemainderSweep": "Solde restant {remaining: string} ({remainingSats: string}) sera converti en Bitcoin. Minimum en USD : {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transaction devrait être soumise au mempool",
         "amount": "Montant",
+        "addAmount": "Ajouter un montant",
+        "lowFunds": "Fonds insuffisants",
         "amountExceed": "Le montant excède votre solde de {balance: string}",
         "amountExceedsLimit": "Le montant excède le restant de votre limite journalière qui est de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Mettre à jour votre compte pour augmenter votre limite",
@@ -2413,10 +2436,11 @@
         "title": "Envoyer des bitcoins",
         "failedToFetchLnurlInvoice": "Échec de la récupération de la facture lnurl",
         "lnurlInvoiceIncorrectAmount": "Le serveur lnurl a répondu avec une facture contenant un montant incorrect",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerte frais élevés !",
-            "content": "Vos frais représentent plus de 50 % du montant envoyé. Êtes-vous sûr de vouloir continuer ?\n\nPour réduire les frais, demandez au destinataire d'accepter la transaction via Lightning",
-            "confirmButton": "J'en suis sûr à 100 %"
+            "body": "Vos frais représentent 50 % ou plus du montant envoyé. Voulez-vous vraiment continuer ?",
+            "cancelPayment": "Annuler le paiement",
+            "acceptFee": "Accepter les frais"
         },
         "copiedDestination": "Destination copiée dans le presse-papiers",
         "pendingPayment": "Le paiement a été envoyé, mais n'a pas encore été confirmé.\n\nIl est possible que le paiement ne soit pas confirmé, auquel cas les fonds seront restitués à votre compte.",
@@ -3095,6 +3119,14 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Fixer le montant"
+    },
+    "Accessibility": {
+        "deleteKey": "Effacer",
+        "swapCurrencyHint": "Change la devise dans laquelle vous saisissez le montant",
+        "switchWalletHint": "Passe à votre autre portefeuille",
+        "copy": "Copier",
+        "balanceHidden": "Solde masqué",
+        "revealBalanceHint": "Affiche votre solde sur cet écran"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "J’ai besoin de mettre à jour la dernière version sur mon app. J’utilise l’app {os: string} avec la version {version: string}.",

@@ -2347,11 +2347,32 @@
         "maxFeeSelected": "Esta é a taxa máxima que será cobrada por esta transação. Pode acabar sendo menor uma vez que o pagamento foi feito.",
         "invoiceAlreadyPaid": "Esta fatura já foi paga",
         "somethingWentWrong": "Algo deu errado",
+        "priceUpdated": "O preço mudou, então os valores foram atualizados. Confira antes de enviar.",
         "paymentAlreadyAttempted": "Pagamento já tentado.\n\nSe você deseja enviar esse pagamento novamente, comece do zero.",
         "slideToConfirm": "Deslize para Confirmar",
         "slideConfirming": "Confirmando...",
+        "slideToSend": "Deslize para Enviar",
+        "calculatingFee": "Calculando taxa…",
+        "sendProgress": {
+            "reviewing": "Revisando",
+            "signing": "Assinando",
+            "findingRoute": "Buscando rota",
+            "broadcasting": "Transmitindo",
+            "checkingDelivery": "Verificando entrega",
+            "retrying": "Tentando novamente",
+            "almostThere": "Quase lá",
+            "anyTimeNow": "A qualquer momento",
+            "ohOh": "Opa",
+            "tryingAgain": "Tentando de novo"
+        },
         "copiedDestination": "Copiado destino para a área de transferência",
-        "lightningRecommended": "Alta taxa! Recomendamos Lightning.",
+        "lightningRecommended": "Alta taxa. Recomendamos Lightning.",
+        "sending": "Enviando",
+        "sent": "Enviado",
+        "receipt": "Comprovante",
+        "fromBalance": "Do saldo",
+        "details": "Detalhes",
+        "changeAmount": "Alterar valor",
         "usdRemainderSweep": "Saldo restante {remaining: string} ({remainingSats: string}) será convertido em Bitcoin. Mínimo em USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "A transação deve ser enviada para o mempool.",
         "amount": "quantidade",
+        "addAmount": "Adicione um valor",
+        "lowFunds": "Saldo insuficiente",
         "amountExceed": "O valor excede seu saldo de {balance: string}",
         "amountExceedsLimit": "O valor excede seu limite diário restante de {limit: string}",
         "upgradeAccountToIncreaseLimit": "Atualize a sua conta para aumentar o seu limite",
@@ -2413,10 +2436,11 @@
         "title": "Enviar Bitcoin",
         "failedToFetchLnurlInvoice": "Falha ao buscar a fatura lnurl",
         "lnurlInvoiceIncorrectAmount": "O server lnurl respondeu com uma invoice de valor incorreto",
-        "confirmFeesModal": {
+        "highFeeSheet": {
             "title": "Alerta de taxa alta!",
-            "content": "Sua taxa é mais de 50% maior do que o valor enviado. Tem certeza de que deseja prosseguir?\n\nPara reduzir as taxas, peça ao destinatário para aceitar a transação via Lightning.",
-            "confirmButton": "Tenho 100% de certeza"
+            "body": "Sua taxa é 50% ou mais do valor que você está enviando. Tem certeza de que deseja continuar?",
+            "cancelPayment": "Cancelar pagamento",
+            "acceptFee": "Aceitar taxa"
         },
         "copiedDestination": "Copiado destino para a área de transferência",
         "pendingPayment": "O pagamento foi enviado, mas ainda não foi confirmado.\n\nÉ possível que o pagamento não seja confirmado, caso em que os fundos serão devolvidos à sua conta.",
@@ -3095,6 +3119,14 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Defina a quantidade"
+    },
+    "Accessibility": {
+        "deleteKey": "Apagar",
+        "swapCurrencyHint": "Troca a moeda em que escreve o montante",
+        "switchWalletHint": "Muda para a sua outra carteira",
+        "copy": "Copiar",
+        "balanceHidden": "Saldo oculto",
+        "revealBalanceHint": "Mostra o seu saldo neste ecrã"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Eu tenho que atualizar o meu app para a última versão. Eu estou usando a {os: string} app com a versão {version: string}.",

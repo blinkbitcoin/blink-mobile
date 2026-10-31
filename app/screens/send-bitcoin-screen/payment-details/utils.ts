@@ -82,9 +82,12 @@ export const isValidAmount = ({
 
   if (paymentDetail.paymentType === PaymentType.Intraledger) {
     for (const intraledgerLimit of intraledgerLimits || []) {
-      const remainingIntraledgerLimit = intraledgerLimit.remainingLimit
-        ? toUsdMoneyAmount(intraledgerLimit.remainingLimit)
-        : undefined
+      // A remaining limit of 0 is a spent limit, not a missing one.
+      const remainingIntraledgerLimit =
+        intraledgerLimit.remainingLimit === null ||
+        intraledgerLimit.remainingLimit === undefined
+          ? undefined
+          : toUsdMoneyAmount(intraledgerLimit.remainingLimit)
       if (
         remainingIntraledgerLimit &&
         greaterThan({
@@ -102,9 +105,12 @@ export const isValidAmount = ({
     }
   } else {
     for (const withdrawalLimit of withdrawalLimits || []) {
-      const remainingWithdrawalLimit = withdrawalLimit.remainingLimit
-        ? toUsdMoneyAmount(withdrawalLimit.remainingLimit)
-        : undefined
+      // A remaining limit of 0 is a spent limit, not a missing one.
+      const remainingWithdrawalLimit =
+        withdrawalLimit.remainingLimit === null ||
+        withdrawalLimit.remainingLimit === undefined
+          ? undefined
+          : toUsdMoneyAmount(withdrawalLimit.remainingLimit)
       if (
         remainingWithdrawalLimit &&
         greaterThan({
