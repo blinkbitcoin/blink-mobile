@@ -236,6 +236,15 @@ describe("analytics helpers", () => {
         sendingWallet: "BTC" as never,
         paymentStatus: "SUCCESS" as never,
       })
+      logConversionAttempt({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+      })
+      logConversionResult({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
       logToastShown({ message: "anchor", type: "success", isTranslated: false })
 
       expect(mockLogEvent).toHaveBeenCalledTimes(1)
@@ -289,6 +298,22 @@ describe("analytics helpers", () => {
       logPaymentResult({
         paymentType: "lnurl" as never,
         sendingWallet: "BTC" as never,
+        paymentStatus: "SUCCESS" as never,
+      })
+      logToastShown({ message: "anchor", type: "success", isTranslated: false })
+
+      expect(mockLogEvent).toHaveBeenCalledTimes(1)
+      expect(mockLogEvent).toHaveBeenCalledWith("toast_shown", expect.anything())
+    })
+
+    it("leaves a swap to the sc_swap_* events", () => {
+      logConversionAttempt({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
+      })
+      logConversionResult({
+        sendingWallet: "BTC" as never,
+        receivingWallet: "USD" as never,
         paymentStatus: "SUCCESS" as never,
       })
       logToastShown({ message: "anchor", type: "success", isTranslated: false })

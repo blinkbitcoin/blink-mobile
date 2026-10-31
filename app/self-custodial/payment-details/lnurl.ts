@@ -54,7 +54,12 @@ import {
 } from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
-import { feeFailure, findLostSend, sendSettlement } from "./send-helpers"
+import {
+  feeFailure,
+  findLostSend,
+  type LostSendLookup,
+  sendSettlement,
+} from "./send-helpers"
 
 const SAT_TO_MILLISAT = BigInt(1000)
 
@@ -357,12 +362,26 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       takeAttemptTelemetry(found),
     )
 
-  const findThisSend = (startedAtMs: number, paymentHashes: ReadonlyArray<string>) =>
-    findLostSend({
+  /** Each attempt whose payment the history shows failed has ended, and reports so with
+   *  its own telemetry: the lookup passes it over as not the send landing, which would
+   *  otherwise leave that attempt waiting forever for an outcome. */
+  const findThisSend = async (
+    startedAtMs: number,
+    paymentHashes: ReadonlyArray<string>,
+  ): Promise<LostSendLookup> => {
+    const lookup = await findLostSend({
       sdk,
       startedAtMs,
       matches: (payment) => isPaymentOf(paymentHashes, payment),
     })
+    if (lookup.status !== "unreadable") {
+      lookup.failed.forEach((payment) => {
+        const attempt = takeAttemptTelemetry(payment)
+        if (attempt) measureSettlement(payment, attempt.settlement, attempt.startedIn)
+      })
+    }
+    return lookup
+  }
 
   const rememberLostAttempts = (startedAtMs: number, paymentHashes: string[]) => {
     attemptRef.lostSend = { startedAtMs, paymentHashes }

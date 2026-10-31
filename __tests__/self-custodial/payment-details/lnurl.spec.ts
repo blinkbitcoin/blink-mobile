@@ -1065,8 +1065,8 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     },
   })
 
-  const found = (payment: unknown) => ({ status: "found", payment })
-  const notFound = () => ({ status: "not-found" })
+  const found = (payment: unknown) => ({ status: "found", payment, failed: [] })
+  const notFound = () => ({ status: "not-found", failed: [] })
   const unreadable = (error: unknown) => ({ status: "unreadable", error })
 
   const sendFromDollars = async (params = usdParams()) => {
@@ -1662,6 +1662,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
     mockFindLostSend.mockResolvedValue({
       status: "found",
       payment: { id: "p1", status: PENDING },
+      failed: [],
     })
     const detail = createSelfCustodialLnurlPaymentDetails(
       createParams({
@@ -1704,6 +1705,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
         status,
         details: { tag: "Lightning", inner: { htlcDetails: { paymentHash } } },
       },
+      failed: [],
     })
     const settledParams = () =>
       mockLogEvent.mock.calls.find(([name]) => name === "sc_payment_send_settled")?.[1]
@@ -1711,7 +1713,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
     beforeEach(() => {
       mockPrepareLnurl.mockResolvedValue(quote())
       mockExecuteLnurl.mockRejectedValue({ tag: "NetworkError" })
-      mockFindLostSend.mockResolvedValue({ status: "not-found" })
+      mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
     })
 
     it("counts the send once when a retry finds the payment it had lost", async () => {
@@ -1768,6 +1770,78 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
       expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
     })
 
+    /** The lookup passes a failed payment over (it is not the send landing), so the
+     *  retry sends anew; the attempt it ended still owes its failure. */
+    it("reports a lost attempt as failed once its payment shows failed", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      const failedPayment = paidInvoice(FAILED).payment
+      mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [failedPayment] })
+      mockExecuteLnurl.mockResolvedValue({ payment: { id: "p2", status: COMPLETED } })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+        "sc_payment_send_initiated",
+        "sc_payment_send_settled",
+      ])
+      expect(
+        mockLogEvent.mock.calls.find(([name]) => name === "sc_payment_send_failed")?.[1],
+      ).toEqual(expect.objectContaining({ sending_wallet: WalletCurrency.Usd }))
+    })
+
+    /** The lookup hands back the payment that landed beside every failed one it read,
+     *  so forgetting the lost attempts leaves none of them owing an outcome. */
+    it("reports an older attempt's failure beside a newer one found completed", async () => {
+      const OLDER_HASH = "b".repeat(64)
+      const detail = dollarDetail()
+      mockPrepareLnurl.mockResolvedValueOnce(quote(OLDER_HASH))
+      await detail.sendPaymentMutation({} as never)
+      await detail.sendPaymentMutation({} as never)
+
+      mockFindLostSend.mockResolvedValue({
+        ...paidInvoice(COMPLETED),
+        failed: [{ ...paidInvoice(FAILED, OLDER_HASH).payment, id: "p0" }],
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+        "sc_payment_send_settled",
+      ])
+    })
+
+    it("reports that failure once, however often the history shows it", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+      const failedPayment = paidInvoice(FAILED).payment
+      mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [failedPayment] })
+
+      await detail.sendPaymentMutation({} as never)
+      await detail.sendPaymentMutation({} as never)
+
+      expect(
+        loggedEvents().filter((name) => name === "sc_payment_send_failed"),
+      ).toHaveLength(1)
+    })
+
+    it("reports nothing for a failed payment while the history cannot be read", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      mockFindLostSend.mockResolvedValue({
+        status: "unreadable",
+        error: new Error("down"),
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    })
+
     it("reports a quote that fails before anything is sent as failed", async () => {
       mockPrepareLnurl.mockRejectedValue({ tag: "InsufficientFunds" })
 
@@ -1805,7 +1879,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
       async (tag, code) => {
         mockPrepareLnurl.mockResolvedValue(quote())
         mockExecuteLnurl.mockRejectedValue({ tag })
-        mockFindLostSend.mockResolvedValue({ status: "not-found" })
+        mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
         const detail = createSelfCustodialLnurlPaymentDetails(createParams())
         if (!detail.canSendPayment) throw new Error("expected canSendPayment")
 
@@ -1839,6 +1913,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
             inner: { htlcDetails: { paymentHash: QUOTED_HASH } },
           },
         },
+        failed: [],
       })
       await detail.sendPaymentMutation({} as never)
 

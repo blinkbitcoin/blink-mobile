@@ -9,7 +9,7 @@ import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { disconnectSdk } from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
-import { logBreadcrumb } from "@app/utils/error-reporting"
+import { errorKind, logBreadcrumb } from "@app/utils/error-reporting"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import {
   markAccountDeletedForRefresh,
@@ -76,7 +76,9 @@ export const eraseWalletFromDevice = async (
     if (isSeedGone) await removeSelfCustodialAccountId(accountId)
 
     await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
-      logBreadcrumb(`[self-custodial delete] storage dir unlink failed: ${err}`)
+      logBreadcrumb(
+        `[self-custodial delete] storage dir unlink failed (${errorKind(err)})`,
+      )
     })
     // Best-effort: leftover recovery-bundle files must not block deletion.
     // Both networks are swept - the account may have been used on the
@@ -87,14 +89,16 @@ export const eraseWalletFromDevice = async (
           .then(() => removeRecoveryBundleState(accountId, bundleNetwork))
           .catch((err) => {
             logBreadcrumb(
-              `[self-custodial delete] recovery bundle cleanup failed: ${err}`,
+              `[self-custodial delete] recovery bundle cleanup failed (${errorKind(err)})`,
             )
           })
       }
     }
     await sweepRecoveryBundleFiles()
     await removeBackupStateFor(accountId).catch((err) => {
-      logBreadcrumb(`[self-custodial delete] backup state cleanup failed: ${err}`)
+      logBreadcrumb(
+        `[self-custodial delete] backup state cleanup failed (${errorKind(err)})`,
+      )
     })
     // A refresh already past its deleted-account check can still write
     // after the sweep above; once every in-flight run settles, sweep
@@ -105,7 +109,7 @@ export const eraseWalletFromDevice = async (
       .then(sweepRecoveryBundleFiles)
       .catch((err) => {
         logBreadcrumb(
-          `[self-custodial delete] post-refresh bundle re-sweep failed: ${err}`,
+          `[self-custodial delete] post-refresh bundle re-sweep failed (${errorKind(err)})`,
         )
       })
       .finally(() => {
@@ -171,7 +175,7 @@ export const useDeleteAccount = (): DeleteAccountResult => {
 
         if (isActive && sdk) {
           await disconnectSdk(sdk).catch((err) => {
-            logBreadcrumb(`[self-custodial delete] disconnect failed: ${err}`)
+            logBreadcrumb(`[self-custodial delete] disconnect failed (${errorKind(err)})`)
           })
         }
 

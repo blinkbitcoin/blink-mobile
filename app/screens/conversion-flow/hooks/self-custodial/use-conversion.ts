@@ -1,17 +1,12 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
-import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
+import { WalletCurrency } from "@app/graphql/generated"
 import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { measure, ScEvent } from "@app/self-custodial/measurement"
 import { type MoneyAmount, type WalletOrDisplayCurrency } from "@app/types/amounts"
-import {
-  oppositeWalletCurrency,
-  PaymentResultStatus,
-  type ConvertParams,
-} from "@app/types/payment"
-import { logConversionAttempt, logConversionResult } from "@app/utils/analytics"
+import { PaymentResultStatus, type ConvertParams } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { triggerHapticFeedback } from "@app/utils/helper"
 
@@ -104,21 +99,10 @@ export const useSelfCustodialConversion = ({
           return
         }
 
-        logConversionAttempt({
-          sendingWallet: fromCurrency,
-          receivingWallet: oppositeWalletCurrency(fromCurrency),
-        })
-
+        /** No conversion_attempt/result here: those are the custodial account's events,
+         *  and the swap reports itself through the bridge's sc_swap_* events. */
         const result = await quote.execute()
         const isSuccess = result.status === PaymentResultStatus.Success
-
-        logConversionResult({
-          sendingWallet: fromCurrency,
-          receivingWallet: oppositeWalletCurrency(fromCurrency),
-          paymentStatus: isSuccess
-            ? PaymentSendResult.Success
-            : PaymentSendResult.Failure,
-        })
 
         if (isSuccess) {
           triggerHapticFeedback("notificationSuccess")

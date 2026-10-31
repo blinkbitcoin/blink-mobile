@@ -14,11 +14,16 @@ const mockResetAnalyticsData = jest.fn(resolved)
 const mockRecordError = jest.fn()
 const mockCrashLog = jest.fn()
 let mockCrashCollectionEnabled = true
-const mockSetCrashlyticsCollectionEnabled = jest.fn((enabled: boolean) => {
+/** With the RNFB patch the switch reaches the native SDK at once, as this models. */
+const switchCrashCollection = (enabled: boolean): Promise<null> => {
   mockCrashCollectionEnabled = enabled
   return Promise.resolve(null)
-})
+}
+const mockSetCrashlyticsCollectionEnabled = jest.fn(switchCrashCollection)
 const mockDeleteUnsentReports = jest.fn(resolved)
+/** Whether this launch's startup found reports held on the device. */
+const nothingHeld = (): Promise<boolean> => Promise.resolve(false)
+const mockCheckForUnsentReports = jest.fn(nothingHeld)
 
 jest.mock("@react-native-firebase/analytics", () => () => ({
   setUserId: (...args: unknown[]) => mockSetUserId(...args),
@@ -37,6 +42,7 @@ jest.mock("@react-native-firebase/crashlytics", () => () => ({
   },
   setCrashlyticsCollectionEnabled: (enabled: boolean) =>
     mockSetCrashlyticsCollectionEnabled(enabled),
+  checkForUnsentReports: () => mockCheckForUnsentReports(),
   deleteUnsentReports: () => mockDeleteUnsentReports(),
 }))
 
@@ -112,20 +118,30 @@ const orderOf = (mock: jest.Mock, matcher: (args: unknown[]) => boolean): number
 const userIdSetTo = (value: unknown) => (args: unknown[]) => args[0] === value
 const collectionSetTo = (value: boolean) => (args: unknown[]) => args[0] === value
 
+/** Every test starts from a clean Firebase and store. */
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockStore.clear()
+  mockInstanceId = () => Promise.resolve("install-uuid")
+  mockCrashCollectionEnabled = true
+  /** mockReset also drops a once-implementation a test left unused. */
+  mockSetCrashlyticsCollectionEnabled.mockReset()
+  mockSetCrashlyticsCollectionEnabled.mockImplementation(switchCrashCollection)
+  mockDeleteUnsentReports.mockReset()
+  mockDeleteUnsentReports.mockImplementation(resolved)
+  mockCheckForUnsentReports.mockReset()
+  mockCheckForUnsentReports.mockImplementation(nothingHeld)
+  ;[
+    mockSetUserId,
+    mockSetUserProperty,
+    mockSetUserProperties,
+    mockSetAnalyticsCollectionEnabled,
+    mockResetAnalyticsData,
+  ].forEach((mock) => mock.mockImplementation(resolved))
+}
+
 describe("analytics identity", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockStore.clear()
-    mockInstanceId = () => Promise.resolve("install-uuid")
-    mockCrashCollectionEnabled = true
-    ;[
-      mockSetUserId,
-      mockSetUserProperty,
-      mockSetUserProperties,
-      mockSetAnalyticsCollectionEnabled,
-      mockResetAnalyticsData,
-    ].forEach((mock) => mock.mockImplementation(resolved))
-  })
+  beforeEach(resetMocks)
 
   describe("identity transitions", () => {
     it("attaches the custodial identity on a custodial start without resetting", async () => {
@@ -329,7 +345,23 @@ describe("analytics identity", () => {
 
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
       expect(mockSetAnalyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
-      expect(mockRecordError).toHaveBeenCalled()
+      /** Failed into a closed domain, so the failure stays on the device too. */
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    it("reports a failed transition while crash reporting is open", async () => {
+      const id = freshModule()
+      id.setCustodialIdentity(CUSTODIAL)
+      mockSetUserProperty.mockImplementation(() =>
+        Promise.reject(new Error("native property failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "native property failed" }),
+      )
     })
   })
 
@@ -354,7 +386,7 @@ describe("analytics identity", () => {
       },
     )
 
-    it("deletes the reports held while closed before collection resumes", async () => {
+    it("turns collection back on once the launch is known to hold nothing", async () => {
       const { id, reporting } = freshModules()
       id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
       await settle()
@@ -363,13 +395,41 @@ describe("analytics identity", () => {
       id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
       await settle()
 
-      expect(mockDeleteUnsentReports).toHaveBeenCalledTimes(1)
-      const deleted = mockDeleteUnsentReports.mock.invocationCallOrder[0]
+      const checked = mockCheckForUnsentReports.mock.invocationCallOrder[0]
       const enabled = orderOf(mockSetCrashlyticsCollectionEnabled, collectionSetTo(true))
-      expect(deleted).toBeLessThan(enabled)
+      expect(checked).toBeLessThan(enabled)
+      expect(mockDeleteUnsentReports).not.toHaveBeenCalled()
       reporting.logBreadcrumb("enhanced again")
       expect(mockCrashLog).toHaveBeenCalledWith("enhanced again")
     })
+
+    /** A launch after an Incognito session starts with collection off and that session's
+     *  crash held. The SDK reports no deletion's end, and an enable that reaches its
+     *  startup first sends the crash instead, so the launch deletes it and keeps crash
+     *  reporting shut; the next one's own check is the proof it is gone. */
+    it.each([
+      ["Enhanced", "enhanced"],
+      ["the custodial account", "custodial"],
+    ] as const)(
+      "deletes a crash held at launch and keeps collection off for %s",
+      async (_label, domain) => {
+        mockCrashCollectionEnabled = false
+        mockCheckForUnsentReports.mockResolvedValue(true)
+        const { id, reporting } = freshModules()
+
+        id.setCustodialIdentity(CUSTODIAL)
+        id.setAnalyticsDomain(domain)
+        await settle()
+        reporting.logBreadcrumb("held launch")
+
+        expect(mockDeleteUnsentReports).toHaveBeenCalled()
+        expect(mockSetCrashlyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+        expect(mockCrashLog).not.toHaveBeenCalledWith("held launch")
+        /** GA4 is not held back by it. */
+        expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(true)
+        expect(id.isEnhancedIdentityApplied()).toBe(domain === "enhanced")
+      },
+    )
 
     it("keeps pending reports when collection was never off", async () => {
       const { id } = freshModules()
@@ -415,6 +475,133 @@ describe("analytics identity", () => {
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenCalledWith(false)
     })
 
+    it("shuts breadcrumbs before the switch has taken effect", async () => {
+      const { id, reporting } = freshModules()
+      id.setCustodialIdentity(CUSTODIAL)
+      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+      await settle()
+      /** The switch never lands, so only the gate itself can keep this out. */
+      mockSetCrashlyticsCollectionEnabled.mockImplementation(() => new Promise(() => {}))
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      reporting.logBreadcrumb("incognito")
+      reporting.recordAppError(new Error("an incognito defect"))
+
+      expect(mockCrashLog).not.toHaveBeenCalledWith("incognito")
+      expect(mockRecordError).not.toHaveBeenCalled()
+    })
+
+    /** Reopening is three steps (release held reports, enable, reopen the gate), each behind a check that
+     *  the request is still the latest. */
+    describe("a switch back to Incognito while reopening", () => {
+      const reopeningFromIncognito = async () => {
+        const modules = freshModules()
+        modules.id.setAnalyticsDomain(modules.id.AnalyticsDomain.Anon)
+        await settle()
+        jest.clearAllMocks()
+        return modules
+      }
+
+      it("stops at the held-report check, before collection is enabled", async () => {
+        const { id, reporting } = await reopeningFromIncognito()
+        const checking = deferred()
+        mockCheckForUnsentReports.mockImplementationOnce(() =>
+          checking.promise.then(() => false),
+        )
+
+        id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+        await settle()
+        expect(mockCheckForUnsentReports).toHaveBeenCalledTimes(1)
+        id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+        checking.release()
+        await settle()
+        reporting.logBreadcrumb("incognito again")
+
+        expect(mockSetCrashlyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+        expect(mockCrashCollectionEnabled).toBe(false)
+        expect(mockCrashLog).not.toHaveBeenCalledWith("incognito again")
+      })
+
+      it("never reopens the gate for an enable that finishes after it", async () => {
+        const { id, reporting } = await reopeningFromIncognito()
+        const enabling = deferred()
+        mockSetCrashlyticsCollectionEnabled.mockImplementationOnce((enabled: boolean) =>
+          enabling.promise.then(() => {
+            mockCrashCollectionEnabled = enabled
+            return null
+          }),
+        )
+        id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+        await settle()
+        expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenLastCalledWith(true)
+
+        id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+        /** Hold the Incognito run's first step, so what is seen next is the stale run's
+         *  doing alone. */
+        const closedRun = deferred()
+        mockSetUserId.mockImplementationOnce(() => closedRun.promise)
+        enabling.release()
+        await settle()
+        reporting.logBreadcrumb("after the stale enable")
+        closedRun.release()
+        await settle()
+
+        expect(mockCrashLog).not.toHaveBeenCalledWith("after the stale enable")
+        /** The enable landed after the shutdown's off; the Incognito run switches it back. */
+        expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+        expect(mockCrashCollectionEnabled).toBe(false)
+      })
+    })
+
+    it("closes collection again when the shutdown's own switch was rejected", async () => {
+      const { id } = freshModules()
+      mockSetCrashlyticsCollectionEnabled.mockImplementationOnce(() =>
+        Promise.reject(new Error("native switch failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+
+      expect(mockSetCrashlyticsCollectionEnabled).toHaveBeenCalledTimes(2)
+      expect(mockCrashCollectionEnabled).toBe(false)
+    })
+
+    it("keeps crash reporting shut when the held reports cannot be deleted", async () => {
+      const { id, reporting } = freshModules()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+      mockCheckForUnsentReports.mockResolvedValue(true)
+      mockDeleteUnsentReports.mockImplementationOnce(() =>
+        Promise.reject(new Error("delete failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      reporting.logBreadcrumb("after a failed delete")
+
+      /** Turning collection on would send the reports it could not delete. */
+      expect(mockSetCrashlyticsCollectionEnabled).not.toHaveBeenCalledWith(true)
+      expect(mockCrashLog).not.toHaveBeenCalledWith("after a failed delete")
+      expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
+    })
+
+    it("keeps crash reporting shut when collection cannot be turned on", async () => {
+      const { id, reporting } = freshModules()
+      id.setAnalyticsDomain(id.AnalyticsDomain.Anon)
+      await settle()
+      mockSetCrashlyticsCollectionEnabled.mockImplementationOnce(() =>
+        Promise.reject(new Error("enable failed")),
+      )
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+      reporting.logBreadcrumb("after a failed enable")
+
+      expect(mockCrashLog).not.toHaveBeenCalledWith("after a failed enable")
+      expect(id.isEnhancedIdentityApplied()).toBe(false)
+      expect(mockCrashCollectionEnabled).toBe(false)
+    })
+
     it("starts closed when the last run ended with collection off", async () => {
       mockCrashCollectionEnabled = false
       const { id, reporting } = freshModules()
@@ -446,131 +633,28 @@ describe("analytics identity", () => {
     })
   })
 
-  describe("custodial-era events", () => {
-    const custodialApplied = async () => {
-      const id = freshModule()
-      id.setCustodialIdentity(CUSTODIAL)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      return id
-    }
-
-    it("sends at once while the custodial identity is applied", async () => {
-      const id = await custodialApplied()
-      const send = jest.fn()
-
-      id.reportCustodialEvent(send)
-
-      expect(send).toHaveBeenCalledTimes(1)
-    })
-
-    it("holds one made mid-transition until the custodial identity is applied", async () => {
-      const id = freshModule()
-      const heldId = deferred()
-      mockSetUserId.mockImplementation((...args: unknown[]) =>
-        args[0] === "me-1" ? heldId.promise : Promise.resolve(),
-      )
-      id.setCustodialIdentity(CUSTODIAL)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const send = jest.fn()
-
-      id.reportCustodialEvent(send)
-      await settle()
-      expect(send).not.toHaveBeenCalled()
-
-      heldId.release()
-      await settle()
-
-      expect(send).toHaveBeenCalledTimes(1)
-      expect(send.mock.invocationCallOrder[0]).toBeGreaterThan(
-        orderOf(mockSetAnalyticsCollectionEnabled, collectionSetTo(true)),
-      )
-    })
-
-    it("drops one made for a self-custodial account", async () => {
-      const id = freshModule()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
-      const send = jest.fn()
-
-      id.reportCustodialEvent(send)
-      await settle()
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-
-      expect(send).not.toHaveBeenCalled()
-    })
-
-    /** A repeat request starts a new transition; what the old one held is not its own. */
-    it("drops what an overtaken request held, even when the next is custodial too", async () => {
-      const id = freshModule()
-      const heldReset = deferred()
-      mockStore.set(SIDE_KEY, "self_custodial")
-      mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const send = jest.fn()
-
-      id.reportCustodialEvent(send)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      heldReset.release()
-      await settle()
-
-      expect(send).not.toHaveBeenCalled()
-    })
-
-    it("drops one held past five minutes", async () => {
-      const id = freshModule()
-      const heldId = deferred()
-      mockSetUserId.mockImplementation((...args: unknown[]) =>
-        args[0] === "me-1" ? heldId.promise : Promise.resolve(),
-      )
-      id.setCustodialIdentity(CUSTODIAL)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const now = Date.now()
-      const clock = jest.spyOn(Date, "now").mockReturnValue(now)
-      const stale = jest.fn()
-      const fresh = jest.fn()
-
-      id.reportCustodialEvent(stale)
-      clock.mockReturnValue(now + 4 * 60 * 1000)
-      id.reportCustodialEvent(fresh)
-      clock.mockReturnValue(now + 5 * 60 * 1000 + 1)
-      heldId.release()
-      await settle()
-      clock.mockRestore()
-
-      expect(stale).not.toHaveBeenCalled()
-      expect(fresh).toHaveBeenCalledTimes(1)
-    })
-
-    it("holds at most 50, dropping the oldest", async () => {
-      const id = freshModule()
-      const heldId = deferred()
-      mockSetUserId.mockImplementation((...args: unknown[]) =>
-        args[0] === "me-1" ? heldId.promise : Promise.resolve(),
-      )
-      id.setCustodialIdentity(CUSTODIAL)
-      id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
-      await settle()
-      const sends = Array.from({ length: 51 }, () => jest.fn())
-
-      sends.forEach((send) => id.reportCustodialEvent(send))
-      heldId.release()
-      await settle()
-
-      expect(sends[0]).not.toHaveBeenCalled()
-      sends.slice(1).forEach((send) => expect(send).toHaveBeenCalledTimes(1))
-    })
-  })
-
   describe("the Enhanced-applied signal", () => {
     const listen = (id: typeof AnalyticsIdentity) => {
       const listener = jest.fn()
       id.onEnhancedIdentityApplied(listener)
       return listener
     }
+
+    it("reports a listener that throws, and still tells the others", async () => {
+      const id = freshModule()
+      id.onEnhancedIdentityApplied(() => {
+        throw new Error("listener blew up")
+      })
+      const listener = listen(id)
+
+      id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+      await settle()
+
+      expect(listener).toHaveBeenCalledTimes(1)
+      expect(mockRecordError).toHaveBeenCalledWith(
+        expect.objectContaining({ message: "listener blew up" }),
+      )
+    })
 
     it("is given once the reset, the per-install id and collection are all in place", async () => {
       const id = freshModule()
@@ -627,7 +711,7 @@ describe("analytics identity", () => {
       expect(id.isEnhancedIdentityApplied()).toBe(false)
       expect(mockSetUserId).not.toHaveBeenCalledWith("install-uuid")
       expect(mockSetAnalyticsCollectionEnabled).toHaveBeenLastCalledWith(false)
-      expect(mockRecordError).toHaveBeenCalled()
+      expect(mockRecordError).not.toHaveBeenCalled()
     })
 
     it("is not given for a superseded transition, only for the one that replaced it", async () => {
@@ -708,5 +792,126 @@ describe("analytics identity", () => {
       expect(cleanedUp).toBeLessThan(reopened)
       expect(id.isEnhancedIdentityApplied()).toBe(true)
     })
+  })
+})
+
+describe("custodial-era events", () => {
+  beforeEach(resetMocks)
+
+  const custodialApplied = async () => {
+    const id = freshModule()
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    return id
+  }
+
+  it("sends at once while the custodial identity is applied", async () => {
+    const id = await custodialApplied()
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+
+    expect(send).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds one made mid-transition until the custodial identity is applied", async () => {
+    const id = freshModule()
+    const heldId = deferred()
+    mockSetUserId.mockImplementation((...args: unknown[]) =>
+      args[0] === "me-1" ? heldId.promise : Promise.resolve(),
+    )
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+    await settle()
+    expect(send).not.toHaveBeenCalled()
+
+    heldId.release()
+    await settle()
+
+    expect(send).toHaveBeenCalledTimes(1)
+    expect(send.mock.invocationCallOrder[0]).toBeGreaterThan(
+      orderOf(mockSetAnalyticsCollectionEnabled, collectionSetTo(true)),
+    )
+  })
+
+  it("drops one made for a self-custodial account", async () => {
+    const id = freshModule()
+    id.setAnalyticsDomain(id.AnalyticsDomain.Enhanced)
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+    await settle()
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  /** A repeat request starts a new transition; what the old one held is not its own. */
+  it("drops what an overtaken request held, even when the next is custodial too", async () => {
+    const id = freshModule()
+    const heldReset = deferred()
+    mockStore.set(SIDE_KEY, "self_custodial")
+    mockResetAnalyticsData.mockImplementation(() => heldReset.promise)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const send = jest.fn()
+
+    id.reportCustodialEvent(send)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    heldReset.release()
+    await settle()
+
+    expect(send).not.toHaveBeenCalled()
+  })
+
+  it("drops one held past five minutes", async () => {
+    const id = freshModule()
+    const heldId = deferred()
+    mockSetUserId.mockImplementation((...args: unknown[]) =>
+      args[0] === "me-1" ? heldId.promise : Promise.resolve(),
+    )
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const now = Date.now()
+    const clock = jest.spyOn(Date, "now").mockReturnValue(now)
+    const stale = jest.fn()
+    const fresh = jest.fn()
+
+    id.reportCustodialEvent(stale)
+    clock.mockReturnValue(now + 4 * 60 * 1000)
+    id.reportCustodialEvent(fresh)
+    clock.mockReturnValue(now + 5 * 60 * 1000 + 1)
+    heldId.release()
+    await settle()
+    clock.mockRestore()
+
+    expect(stale).not.toHaveBeenCalled()
+    expect(fresh).toHaveBeenCalledTimes(1)
+  })
+
+  it("holds at most 50, dropping the oldest", async () => {
+    const id = freshModule()
+    const heldId = deferred()
+    mockSetUserId.mockImplementation((...args: unknown[]) =>
+      args[0] === "me-1" ? heldId.promise : Promise.resolve(),
+    )
+    id.setCustodialIdentity(CUSTODIAL)
+    id.setAnalyticsDomain(id.AnalyticsDomain.Custodial)
+    await settle()
+    const sends = Array.from({ length: 51 }, () => jest.fn())
+
+    sends.forEach((send) => id.reportCustodialEvent(send))
+    heldId.release()
+    await settle()
+
+    expect(sends[0]).not.toHaveBeenCalled()
+    sends.slice(1).forEach((send) => expect(send).toHaveBeenCalledTimes(1))
   })
 })

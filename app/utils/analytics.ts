@@ -160,8 +160,9 @@ type LogConversionAttemptParams = {
   receivingWallet: WalletCurrency
 }
 
+/** Custodial only: a self-custodial swap reports through its sc_swap_* events. */
 export const logConversionAttempt = (params: LogConversionAttemptParams) => {
-  analytics().logEvent("conversion_attempt", {
+  logCustodialEvent("conversion_attempt", {
     sending_wallet: params.sendingWallet,
     receiving_wallet: params.receivingWallet,
   })
@@ -172,8 +173,9 @@ type LogConversionResultParams = {
   receivingWallet: WalletCurrency
   paymentStatus: PaymentSendResult
 }
+/** Custodial only, like `logConversionAttempt`. */
 export const logConversionResult = (params: LogConversionResultParams) => {
-  analytics().logEvent("conversion_result", {
+  logCustodialEvent("conversion_result", {
     sending_wallet: params.sendingWallet,
     receiving_wallet: params.receivingWallet,
     payment_status: params.paymentStatus,
