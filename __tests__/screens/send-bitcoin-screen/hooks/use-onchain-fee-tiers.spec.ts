@@ -191,6 +191,34 @@ describe("useOnchainFeeTiers", () => {
     expect(result.current.error).toBeNull()
   })
 
+  it("does not bring an error back when its amount is retyped", async () => {
+    mockPrepareSend.mockRejectedValue({ tag: "InvalidInput" })
+    const { result, rerender } = renderTiers(5000)
+    await act(async () => {
+      await result.current.quote()
+    })
+    expect(result.current.error).toBe(SdkFeeError.InvalidInput)
+
+    rerender({ amount: 50000 })
+    rerender({ amount: 5000 })
+
+    // Only Next asks again; until then the amount on screen has no verdict.
+    expect(result.current.error).toBeNull()
+  })
+
+  it("does not bring a quote back when its amount is retyped", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    const { result, rerender } = renderTiers(5000)
+    await act(async () => {
+      await result.current.quote()
+    })
+
+    rerender({ amount: 6000 })
+    rerender({ amount: 5000 })
+
+    expect(result.current.hasQuote).toBe(false)
+  })
+
   it("clears the error when a retry succeeds", async () => {
     mockPrepareSend.mockRejectedValueOnce(new Error("transient")).mockResolvedValue({})
     const { result } = renderTiers()
