@@ -19,8 +19,8 @@ jest.mock("@app/components/icon-transactions", () => ({
   IconTransaction: () => null,
 }))
 
-jest.mock("@app/components/wallet-summary", () => ({
-  WalletSummary: () => null,
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
 }))
 
 jest.mock("@app/components/transaction-date", () => ({

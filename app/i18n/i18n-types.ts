@@ -8825,6 +8825,38 @@ type RootTranslation = {
 		 * @param {string} identifier
 		 */
 		switchedForPayment: RequiredParams<'identifier'>
+		/**
+		 * C​u​s​t​o​m​ ​l​a​b​e​l
+		 */
+		customLabel: string
+		/**
+		 * D​e​p​o​s​i​t​ ​f​e​e
+		 */
+		depositFee: string
+		/**
+		 * T​i​m​e
+		 */
+		time: string
+		/**
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​I​D
+		 */
+		transactionId: string
+		/**
+		 * H​a​s​h
+		 */
+		hash: string
+		/**
+		 * B​l​i​n​k​ ​i​n​t​e​r​n​a​l​ ​I​D
+		 */
+		blinkInternalId: string
+		/**
+		 * C​o​p​y​ ​a​l​l​ ​d​a​t​a
+		 */
+		copyAllData: string
+		/**
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​d​e​t​a​i​l​s
+		 */
+		allData: string
 	}
 	FeeRatesScreen: {
 		/**
@@ -22989,6 +23021,38 @@ export type TranslationFunctions = {
 		 * Switched to {identifier} to show this payment
 		 */
 		switchedForPayment: (arg: { identifier: string }) => LocalizedString
+		/**
+		 * Custom label
+		 */
+		customLabel: () => LocalizedString
+		/**
+		 * Deposit fee
+		 */
+		depositFee: () => LocalizedString
+		/**
+		 * Time
+		 */
+		time: () => LocalizedString
+		/**
+		 * Transaction ID
+		 */
+		transactionId: () => LocalizedString
+		/**
+		 * Hash
+		 */
+		hash: () => LocalizedString
+		/**
+		 * Blink internal ID
+		 */
+		blinkInternalId: () => LocalizedString
+		/**
+		 * Copy all data
+		 */
+		copyAllData: () => LocalizedString
+		/**
+		 * Transaction details
+		 */
+		allData: () => LocalizedString
 	}
 	FeeRatesScreen: {
 		/**

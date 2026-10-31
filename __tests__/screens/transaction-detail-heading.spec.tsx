@@ -61,7 +61,9 @@ jest.mock("@app/self-custodial/providers/wallet", () => ({
 }))
 
 jest.mock("@app/components/icon-transactions", () => ({ IconTransaction: () => null }))
-jest.mock("@app/components/wallet-summary", () => ({ WalletSummary: () => null }))
+jest.mock("@app/screens/send-bitcoin-screen/amount-entry/send-wallet-summary", () => ({
+  SendWalletSummary: () => null,
+}))
 jest.mock("@app/components/transaction-date", () => ({ TransactionDate: () => null }))
 jest.mock("@app/components/atomic/galoy-info", () => ({ GaloyInfo: () => null }))
 jest.mock("@app/components/transaction-item", () => ({
@@ -160,7 +162,7 @@ const renderHeading = (tx: unknown) => {
   const tree = render(<TransactionDetailScreen route={route} />)
   const heading = tree
     .UNSAFE_getAllByType("Text" as never)
-    .find((node) => node.props.type === "h2")
+    .find((node) => node.props.testID === "transaction-heading")
 
   return { heading, tree }
 }
