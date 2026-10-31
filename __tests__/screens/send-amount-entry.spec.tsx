@@ -480,86 +480,11 @@ describe("free amount", () => {
 })
 
 /**
- * The SDK calls an on-chain amount too low until the sender has typed past the minimum, so
- * that error waits for Next rather than flagging each keystroke on the way there.
+ * End to end from the SDK edge: the quote travels through the fee rail and the options
+ * hook to the screen. The SDK reserves the wallet's funds to quote, so it is asked once,
+ * on Next, and never while the amount is typed.
  */
-describe("an amount the fee quote calls too low", () => {
-  const tooLow = LL.SendBitcoinScreen.sdkAmountTooLow()
-
-  beforeEach(() => {
-    mockFeeTierOverride.current = {
-      feeTierErrorMessage: tooLow,
-      isFeeTierErrorBlocking: true,
-      isFeeTierErrorDeferred: true,
-    }
-  })
-
-  it("stays quiet while the amount is typed, with Next on", async () => {
-    renderScreen(intraledgerDestination())
-    await settle()
-
-    typeKeys("3")
-    await settle()
-
-    expect(screen.queryByText(tooLow)).toBeNull()
-    expect(isNextDisabled()).toBe(false)
-  })
-
-  it("says so on Next, holds the send, and turns Next off for that amount", async () => {
-    renderScreen(intraledgerDestination())
-    await settle()
-    typeKeys("3")
-    await settle()
-
-    fireEvent.press(nextButton())
-    await settle()
-
-    expect(screen.getByText(tooLow)).toBeTruthy()
-    expect(mockNavigate).not.toHaveBeenCalled()
-    expect(isNextDisabled()).toBe(true)
-  })
-
-  /** ₦10 stays inside the bitcoin balance, so Next answers to the fee error alone. */
-  it("goes quiet again once the amount changes", async () => {
-    renderScreen(intraledgerDestination())
-    await settle()
-    typeKeys("1")
-    await settle()
-    fireEvent.press(nextButton())
-    await settle()
-
-    typeKeys("0")
-    await settle()
-
-    expect(screen.queryByText(tooLow)).toBeNull()
-    expect(isNextDisabled()).toBe(false)
-  })
-
-  /** Every other self-custodial fee error still shows at once: no amount typed further on
-   *  fixes a network failure or a balance that cannot cover the fee. */
-  it("shows a fee error that is not deferred straight away", async () => {
-    mockFeeTierOverride.current = {
-      feeTierErrorMessage: LL.SendBitcoinScreen.sdkNetworkError(),
-      isFeeTierErrorBlocking: true,
-      isFeeTierErrorDeferred: false,
-    }
-    renderScreen(intraledgerDestination())
-    await settle()
-
-    typeKeys("3")
-    await settle()
-
-    expect(screen.getByText(LL.SendBitcoinScreen.sdkNetworkError())).toBeTruthy()
-    expect(isNextDisabled()).toBe(true)
-  })
-})
-
-/**
- * The same hold, end to end: the SDK's real refusal travels through the fee rail and the
- * options hook to the screen. Pinned because a merge once dropped the hook's hand-off,
- * which the specs above, standing in for the hook, could not see.
- */
-describe("a self-custodial on-chain amount below the minimum", () => {
+describe("a self-custodial on-chain fee", () => {
   const ONCHAIN_ADDRESS = "bc1qamountentryspec"
   /** ₦1 is about 4,164 sats against the mocked price, ₦10 about 41,640. */
   const MINIMUM_SATS = 30000
@@ -588,6 +513,7 @@ describe("a self-custodial on-chain amount below the minimum", () => {
 
   beforeEach(() => {
     mockIsSelfCustodial.current = true
+    mockPrepareSend.mockReset()
     mockPrepareSend.mockImplementation(
       async (_sdk: unknown, { amount }: { amount: bigint }) => {
         if (amount < BigInt(MINIMUM_SATS)) {
@@ -603,14 +529,44 @@ describe("a self-custodial on-chain amount below the minimum", () => {
     mockIsSelfCustodial.current = false
   })
 
-  it("is held while typed and shown on Next", async () => {
+  it("is not quoted while the amount is typed", async () => {
+    renderScreen(onchainDestination)
+    await settle()
+
+    typeKeys("1")
+    await settle()
+    typeKeys("0")
+    await settle()
+
+    expect(mockPrepareSend).not.toHaveBeenCalled()
+    expect(isNextDisabled()).toBe(false)
+  })
+
+  it("is quoted once on Next, then goes to review", async () => {
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1", "0")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+    const [, { amount }] = mockPrepareSend.mock.calls[0]
+    expect(amount).toBeGreaterThanOrEqual(BigInt(MINIMUM_SATS))
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.objectContaining({ paymentDetail: expect.anything() }),
+    )
+  })
+
+  it("says the amount is too low on Next, and holds the send", async () => {
     renderScreen(onchainDestination)
     await settle()
 
     typeKeys("1")
     await settle()
 
-    expect(mockPrepareSend).toHaveBeenCalled()
     expect(screen.queryByText(tooLow)).toBeNull()
     expect(isNextDisabled()).toBe(false)
 
@@ -618,6 +574,49 @@ describe("a self-custodial on-chain amount below the minimum", () => {
     await settle()
 
     expect(screen.getByText(tooLow)).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+  })
+
+  /** The reported bug: a quote that failed for a cause no amount fixes left the sender
+   *  stuck until they typed a different amount. Next stays on and asks again. */
+  it("keeps Next on after a failed quote, and pressing it again retries", async () => {
+    mockPrepareSend.mockRejectedValueOnce(new Error("Failed to select leaves"))
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("1", "0")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(screen.getByText(LL.SendBitcoinScreen.sdkGenericError())).toBeTruthy()
+    expect(mockNavigate).not.toHaveBeenCalled()
+    expect(isNextDisabled()).toBe(false)
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalledTimes(2)
+    expect(screen.queryByText(LL.SendBitcoinScreen.sdkGenericError())).toBeNull()
+    expect(mockNavigate).toHaveBeenCalledWith(
+      "sendBitcoinConfirmation",
+      expect.anything(),
+    )
+  })
+
+  /** ₦0.05 is about 208 sats, so the 200 sat Standard fee Next gets back is half of it. */
+  it("judges the fee Next quoted for the high-fee sheet", async () => {
+    mockPrepareSend.mockResolvedValue({})
+    renderScreen(onchainDestination)
+    await settle()
+    typeKeys("0", ".", "0", "5")
+    await settle()
+
+    fireEvent.press(nextButton())
+    await settle()
+
+    expect(mockPrepareSend).toHaveBeenCalledTimes(1)
+    expect(screen.getByText(LL.SendBitcoinScreen.highFeeSheet.title())).toBeTruthy()
     expect(mockNavigate).not.toHaveBeenCalled()
   })
 
