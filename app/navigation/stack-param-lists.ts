@@ -131,6 +131,8 @@ export type RootStackParamList = {
   }
   sendBitcoinDetails: {
     paymentDestination: PaymentDestination
+    /** Set when review's "Change amount" returns here: the amount starts again from zero. */
+    resetAmountAt?: number
     /** Handed on from the destination step; see it there. */
     sendingWalletId?: string
   }
@@ -168,6 +170,8 @@ export type RootStackParamList = {
     destination?: string
     paymentType?: string
     createdAt?: number
+    /** Review already played Sent, so the receipt opens straight away. */
+    hasShownSuccess?: boolean
   }
   setLightningAddress: { onboarding?: boolean }
   language: undefined

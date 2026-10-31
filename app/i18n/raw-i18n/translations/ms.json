@@ -2347,11 +2347,32 @@
     "maxFeeSelected": "Ini adalah cas bayaran maksimum yang akan dikenakan untuk transaksi ini. Tapi cas ni mungkin akan lagi rendah bila bayaran telah dibuat.",
     "invoiceAlreadyPaid": "Invois ini telah pun dibayar",
     "somethingWentWrong": "Sesuatu tidak kena",
+    "priceUpdated": "Harga berubah, jadi jumlah telah dikemas kini. Semak sebelum anda hantar.",
     "paymentAlreadyAttempted": "Bayaran telah pun dicuba.\n\nJika anda mahu menghantar bayaran ini semula, mulakan dari awal.",
     "slideToConfirm": "Leret untuk Sahkan",
     "slideConfirming": "Mengesahkan...",
+    "slideToSend": "Leret untuk Hantar",
+    "calculatingFee": "Mengira cas…",
+    "sendProgress": {
+      "reviewing": "Menyemak",
+      "signing": "Menandatangani",
+      "findingRoute": "Mencari laluan",
+      "broadcasting": "Menyiarkan",
+      "checkingDelivery": "Menyemak penghantaran",
+      "retrying": "Mencuba semula",
+      "almostThere": "Hampir siap",
+      "anyTimeNow": "Bila-bila masa sekarang",
+      "ohOh": "Alamak",
+      "tryingAgain": "Cuba sekali lagi"
+    },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
-    "lightningRecommended": "Yuran tinggi! Kami mengesyorkan Lightning.",
+    "lightningRecommended": "Yuran tinggi. Kami mengesyorkan Lightning.",
+    "sending": "Menghantar",
+    "sent": "Dihantar",
+    "receipt": "Resit",
+    "fromBalance": "Daripada Baki",
+    "details": "Butiran",
+    "changeAmount": "Tukar amaun",
     "usdRemainderSweep": "Baki {remaining: string} ({remainingSats: string}) akan ditukar kepada Bitcoin. Minimum USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2414,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
+    "addAmount": "Tambah amaun",
+    "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
@@ -2413,10 +2436,11 @@
     "title": "Hantar bitcoin",
     "failedToFetchLnurlInvoice": "Gagal untuk dapatkan invois lnurl ",
     "lnurlInvoiceIncorrectAmount": "Server lnurl telah beri respon invois tersebut salah amaunnya",
-    "confirmFeesModal": {
+    "highFeeSheet": {
       "title": "Amaran yuran tinggi!",
-      "content": "Yuran anda melebihi 50% daripada jumlah yang dihantar. Adakah anda pasti mahu meneruskan?\n\nUntuk mengurangkan yuran, minta penerima menerima transaksi melalui Lightning",
-      "confirmButton": "Saya 100% pasti"
+      "body": "Cas anda ialah 50% atau lebih daripada jumlah yang anda hantar. Adakah anda pasti mahu meneruskan?",
+      "cancelPayment": "Batalkan pembayaran",
+      "acceptFee": "Terima cas"
     },
     "copiedDestination": "Destinasi telah disalin ke clipboard",
     "pendingPayment": "Bayaran telah dihantar, tetapi belum disahkan lagi.\n\nKemungkinan bayaran tidak akan disahkan, dan dalam kes itu dana akan dikembalikan ke akaun anda.",
@@ -3095,6 +3119,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan amaun"
+  },
+  "Accessibility": {
+    "deleteKey": "Padam",
+    "swapCurrencyHint": "Menukar mata wang untuk menaip amaun",
+    "switchWalletHint": "Bertukar ke dompet anda yang lain",
+    "copy": "Salin",
+    "balanceHidden": "Baki disembunyikan",
+    "revealBalanceHint": "Menunjukkan baki anda pada skrin ini"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {version: string}",
