@@ -8,14 +8,19 @@ import { staticSurface } from "@app/rne-theme/surfaces"
 type GaloyInfoProps = {
   highlight?: boolean
   isWarning?: boolean
+  backgroundColor?: string
   children: ReactNode
 }
 
-export const GaloyInfo: React.FC<GaloyInfoProps> = ({ children, isWarning }) => {
+export const GaloyInfo: React.FC<GaloyInfoProps> = ({
+  children,
+  isWarning,
+  backgroundColor,
+}) => {
   const {
     theme: { colors },
   } = useTheme()
-  const styles = useStyles({ isWarning })
+  const styles = useStyles({ isWarning, backgroundColor })
 
   return (
     <View style={styles.container}>
@@ -35,6 +40,7 @@ export const GaloyInfo: React.FC<GaloyInfoProps> = ({ children, isWarning }) => 
 
 type StyleProps = {
   isWarning?: boolean
+  backgroundColor?: string
 }
 
 const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
@@ -51,6 +57,7 @@ const useStyles = makeStyles(({ colors }, props: StyleProps) => ({
     borderTopRightRadius: radius.default,
     borderBottomRightRadius: radius.default,
     ...staticSurface(colors),
+    ...(props.backgroundColor ? { backgroundColor: props.backgroundColor } : {}),
   },
   verticalLine: {
     width: 3,
