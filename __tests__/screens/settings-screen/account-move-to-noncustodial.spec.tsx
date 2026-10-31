@@ -12,7 +12,11 @@ jest.mock("@react-navigation/native", () => ({
   useNavigation: () => ({ navigate: mockNavigate }),
 }))
 
-let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+let mockFeatureFlags = {
+  nonCustodialEnabled: true,
+  remoteConfigReady: true,
+  isNonCustodialFlagSettled: true,
+}
 
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
@@ -52,7 +56,11 @@ describe("MoveToNonCustodialSetting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockActiveAccount.mockReturnValue({ type: AccountType.Custodial })
-    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: true,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
   })
 
   it("renders for custodial accounts", () => {
@@ -86,7 +94,11 @@ describe("MoveToNonCustodialSetting", () => {
   })
 
   it("hides the entry while the self-custodial kill-switch is off", () => {
-    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: false,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
 
     render(<MoveToNonCustodialSetting />)
 

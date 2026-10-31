@@ -5,6 +5,7 @@ import { useSelfCustodialRollback } from "@app/self-custodial/hooks/use-rollback
 
 let mockNonCustodialEnabled = true
 let mockRemoteConfigReady = true
+let mockIsNonCustodialFlagSettled = true
 let mockHasCustodialAccount = true
 let mockGaloyAuthToken = ""
 
@@ -12,6 +13,7 @@ jest.mock("@app/config/feature-flags-context", () => ({
   useFeatureFlags: () => ({
     nonCustodialEnabled: mockNonCustodialEnabled,
     remoteConfigReady: mockRemoteConfigReady,
+    isNonCustodialFlagSettled: mockIsNonCustodialFlagSettled,
   }),
 }))
 
@@ -47,8 +49,38 @@ describe("useSelfCustodialRollback", () => {
     jest.clearAllMocks()
     mockNonCustodialEnabled = true
     mockRemoteConfigReady = true
+    mockIsNonCustodialFlagSettled = true
     mockHasCustodialAccount = true
     mockGaloyAuthToken = "auth-token"
+  })
+
+  it("does not roll back while the console has not answered", () => {
+    mockIsNonCustodialFlagSettled = false
+
+    renderHook(() =>
+      useSelfCustodialRollback({
+        activeAccount: selfCustodialAccount,
+        accounts: [custodialAccount, selfCustodialAccount],
+        setActiveAccountId: mockSetActiveAccountId,
+      }),
+    )
+
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
+  })
+
+  it("does not roll back while the console has not answered, whatever the raw flag says", () => {
+    mockIsNonCustodialFlagSettled = false
+    mockNonCustodialEnabled = false
+
+    renderHook(() =>
+      useSelfCustodialRollback({
+        activeAccount: selfCustodialAccount,
+        accounts: [custodialAccount, selfCustodialAccount],
+        setActiveAccountId: mockSetActiveAccountId,
+      }),
+    )
+
+    expect(mockSetActiveAccountId).not.toHaveBeenCalled()
   })
 
   it("rolls back when flag disabled and active is self-custodial", () => {
@@ -212,6 +244,25 @@ describe("useSelfCustodialRollback", () => {
       const { result } = renderWith({ accounts: [selfCustodialAccount] })
 
       expect(result.current.shouldShowUnavailable).toBe(true)
+    })
+
+    it("does not lock the user out while the console has not answered", () => {
+      mockIsNonCustodialFlagSettled = false
+      mockHasCustodialAccount = false
+
+      const { result } = renderWith({ accounts: [selfCustodialAccount] })
+
+      expect(result.current.shouldShowUnavailable).toBe(false)
+    })
+
+    it("does not lock the user out while the console has not answered, whatever the raw flag says", () => {
+      mockIsNonCustodialFlagSettled = false
+      mockNonCustodialEnabled = false
+      mockHasCustodialAccount = false
+
+      const { result } = renderWith({ accounts: [selfCustodialAccount] })
+
+      expect(result.current.shouldShowUnavailable).toBe(false)
     })
 
     it("flag=disabled, active=self-custodial, custodial available → false (rollback handles it)", () => {
