@@ -138,11 +138,17 @@ const placeholderDrift = (localeFile: string, parsed: AnyTranslation): string[] 
  * "non-custodial". Their earlier translations ran to six variants per locale
  * (zverenský, svěřenský, kustodiálny, úschovný, vlastná správa, Spravovaný…),
  * often on the same screen, so any of them coming back is a regression.
+ *
+ * `\p{L}` rather than `\w`: JavaScript `\w` is ASCII, so "Vlastná správa" and
+ * "s vlastní správou" never matched. `spravovan` stops before `i` so the noun
+ * "spravovanie" (management) is not treated as a custody term. A bare `zveren`
+ * is not used, because that also matches "zverejnenie" (publish).
  */
 const TRANSLATED_CUSTODY_TERMS: Record<string, RegExp> = {
   "sk.json":
-    /zverensk|zvereneck|sverensk|sverenec|kustodi|úschov|nesprávcov|vlastn\w* správ|spravovan|necustodial/i,
-  "cs.json": /svěřensk|svěřeneck|kustodi|úschov|vlastn\w* správ|spravovan|necustodial/i,
+    /zverensk|zvereneck|sverensk|sverenec|kustodi|úschov|nesprávcov|vlastn\p{L}* správ|spravovan(?!i)|necustodial/iu,
+  "cs.json":
+    /svěřensk|svěřeneck|kustodi|úschov|vlastn\p{L}* správ|spravovan(?!i)|necustodial/iu,
 }
 
 const translatedCustodyTerms = (localeFile: string, parsed: AnyTranslation): string[] => {
@@ -153,6 +159,71 @@ const translatedCustodyTerms = (localeFile: string, parsed: AnyTranslation): str
     return typeof value === "string" && pattern.test(value)
   })
 }
+
+/**
+ * The picker and the settings account row are the names users see. Banning old
+ * stems does not keep these keys on "custodial" / "non-custodial".
+ */
+const ACCOUNT_TYPE_TERMS: Record<string, "custodial" | "non-custodial"> = {
+  "AccountTypeSelectionScreen.custodialLabel": "custodial",
+  "AccountTypeSelectionScreen.selfCustodialLabel": "non-custodial",
+  "SettingsScreen.custodialAccount": "custodial",
+  "SettingsScreen.nonCustodialAccount": "non-custodial",
+}
+
+const namesAccountType = (
+  value: unknown,
+  term: "custodial" | "non-custodial",
+): boolean => {
+  if (typeof value !== "string") return false
+  if (term === "non-custodial") return /non-custodial/i.test(value)
+  return /custodial/i.test(value.replace(/non-custodial/gi, ""))
+}
+
+const missingAccountTypeTerms = (parsed: AnyTranslation): string[] => {
+  const localeLeaves = collectLeaves(parsed)
+  return Object.entries(ACCOUNT_TYPE_TERMS)
+    .filter(([key, term]) => !namesAccountType(localeLeaves[key], term))
+    .map(([key]) => key)
+}
+
+/** Every historical form named in the glossary, including the accented labels. */
+const PROHIBITED_CUSTODY_FORMS: Array<[string, string]> = [
+  ["sk.json", "zverenský"],
+  ["sk.json", "zverenecký"],
+  ["sk.json", "kustodiálny"],
+  ["sk.json", "úschovný"],
+  ["sk.json", "Spravovaný"],
+  ["sk.json", "nesverenecký"],
+  ["sk.json", "nesprávcovský"],
+  ["sk.json", "nekustodiálny"],
+  ["sk.json", "vo vlastnej správe"],
+  ["sk.json", "Vlastná správa"],
+  ["sk.json", "necustodial"],
+  ["sk.json", "Vyberte režim s vlastnou správou"],
+  ["cs.json", "svěřenský"],
+  ["cs.json", "svěřenecký"],
+  ["cs.json", "kustodiální"],
+  ["cs.json", "úschovný"],
+  ["cs.json", "Spravovaný"],
+  ["cs.json", "nesvěřenský"],
+  ["cs.json", "nesvěřenecký"],
+  ["cs.json", "nekustodiální"],
+  ["cs.json", "ve vlastní správě"],
+  ["cs.json", "Vlastní správa"],
+  ["cs.json", "necustodial"],
+  ["cs.json", "Vyberte režim s vlastní správou"],
+  ["cs.json", "Přepnuto na režim Enhanced\ns vlastní správou"],
+  ["cs.json", "Přepnuto na režim Incognito\ns vlastní správou"],
+]
+
+const ALLOWED_NEAR_MATCHES = [
+  "spravovanie",
+  "zverejnenie",
+  "správca hesiel",
+  "non-custodial",
+  "Custodial účet",
+]
 
 const localeFiles = fs
   .readdirSync(TRANSLATIONS_DIR)
@@ -186,7 +257,23 @@ describe("locale parity", () => {
         it("names the account types custodial and non-custodial", () => {
           expect(translatedCustodyTerms(localeFile, parsed)).toEqual([])
         })
+
+        it("keeps custodial and non-custodial on the account-type keys", () => {
+          expect(missingAccountTypeTerms(parsed)).toEqual([])
+        })
       }
     })
+  })
+})
+
+describe("custody term guard", () => {
+  it.each(PROHIBITED_CUSTODY_FORMS)("%s flags %j", (localeFile, form) => {
+    expect(TRANSLATED_CUSTODY_TERMS[localeFile].test(form)).toBe(true)
+  })
+
+  it.each(ALLOWED_NEAR_MATCHES)("allows %j", (form) => {
+    for (const pattern of Object.values(TRANSLATED_CUSTODY_TERMS)) {
+      expect(pattern.test(form)).toBe(false)
+    }
   })
 })
