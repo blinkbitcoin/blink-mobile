@@ -82,12 +82,13 @@ const FEE_TIER_OPTIONS = {
   setFeeTier: jest.fn(),
   feeTierOptions: [],
   feeTierErrorMessage: undefined,
-  isFeeTierErrorBlocking: false,
-  isFeeTierErrorDeferred: false,
+  isFeeTierAmountTooLow: false,
   isQuotingFees: false,
+  isQuotingFeesForNext: false,
   isOnchain: false,
   selectedTierFee: undefined,
   hasFeeQuote: false,
+  quoteFeesForNext: async () => ({ selectedTierFee: undefined, hasFeeQuote: false }),
 }
 
 jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tier-options", () => ({
