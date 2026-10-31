@@ -17,6 +17,9 @@ export type NoteInputProps = {
   big?: boolean
   iconSize?: number
   fontSize?: number
+  /** Replaces "Add note" as both the placeholder and the field's accessibility label. */
+  placeholder?: string
+  maxLength?: number
 }
 
 export const NoteInput: React.FC<NoteInputProps> = ({
@@ -28,8 +31,11 @@ export const NoteInput: React.FC<NoteInputProps> = ({
   big = true,
   iconSize = 18,
   fontSize = 16,
+  placeholder,
+  maxLength = 500,
 }) => {
   const { LL } = useI18nContext()
+  const label = placeholder ?? LL.NoteInput.addNote()
   const styles = useStyles({ editable: Boolean(editable), big })
   const {
     theme: { colors },
@@ -46,15 +52,16 @@ export const NoteInput: React.FC<NoteInputProps> = ({
       <View style={styles.noteContainer}>
         <TextInput
           {...testProps("add-note")}
+          accessibilityLabel={label}
           style={[styles.noteInput, { fontSize }]}
-          placeholder={LL.NoteInput.addNote()}
+          placeholder={label}
           placeholderTextColor={colors.textOnBackground}
           onChangeText={onChangeText}
           onBlur={onBlur}
           value={value}
           editable={editable}
           selectTextOnFocus
-          maxLength={500}
+          maxLength={maxLength}
           ref={textInputRef}
         />
         <TouchableOpacity style={styles.noteIconContainer} onPress={focusTextInput}>
