@@ -2393,6 +2393,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "Transaktion sollte an den Mempool übermittelt werden",
         "amount": "Betrag",
+        "addAmount": "Betrag hinzufügen",
+        "lowFunds": "Nicht genügend Guthaben",
         "amountExceed": "Der Betrag übersteigt dein Guthaben von {balance: string}",
         "amountExceedsLimit": "Der Betrag übersteigt dein verbleibendes tägliches Limit von {limit: string}",
         "upgradeAccountToIncreaseLimit": "Upgrade deinen Account, um dein Limit zu erhöhen",
@@ -3095,6 +3097,12 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Setze Betrag"
+    },
+    "Accessibility": {
+        "deleteKey": "Löschen",
+        "swapCurrencyHint": "Wechselt die Währung für die Betragseingabe",
+        "switchWalletHint": "Wechselt zur anderen Wallet",
+        "copy": "Kopieren"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Ich muss meine App auf die neuste Version updaten. Ich nutze die {os: string} App mit Version {version: string}.",

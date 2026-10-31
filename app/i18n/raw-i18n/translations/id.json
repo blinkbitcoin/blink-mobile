@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi akan dikirim ke mempool",
     "amount": "Jumlah",
+    "addAmount": "Tambahkan jumlah",
+    "lowFunds": "Dana tidak cukup",
     "amountExceed": "Jumlah melebihi saldo Anda sebesar {balance: string}",
     "amountExceedsLimit": "Jumlah melebihi batas harian Anda yang tersisa sebesar {limit: string}",
     "upgradeAccountToIncreaseLimit": "Tingkatkan akun Anda untuk meningkatkan batas",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan jumlah"
+  },
+  "Accessibility": {
+    "deleteKey": "Hapus",
+    "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
+    "switchWalletHint": "Beralih ke dompet Anda yang lain",
+    "copy": "Salin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Saya perlu memperbarui aplikasi saya ke versi terbaru. Saya menggunakan aplikasi {os: string} dengan versi {version: string}.",

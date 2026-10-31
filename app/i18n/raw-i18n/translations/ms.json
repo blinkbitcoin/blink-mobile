@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transaksi sepatutnya dihantar ke mempool",
     "amount": "Amaun",
+    "addAmount": "Tambah amaun",
+    "lowFunds": "Dana tidak mencukupi",
     "amountExceed": "Amaun ini telah melebihi baki {balance: string}",
     "amountExceedsLimit": "Amaun ini telah melebihi baki transaksi harian {limit: string}",
     "upgradeAccountToIncreaseLimit": "Naik taraf akaun anda untuk tambahkan had",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Tetapkan amaun"
+  },
+  "Accessibility": {
+    "deleteKey": "Padam",
+    "swapCurrencyHint": "Menukar mata wang untuk menaip amaun",
+    "switchWalletHint": "Bertukar ke dompet anda yang lain",
+    "copy": "Salin"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Aku perlu kemaskini aplikasi ini kepada yang terkini. Aku gunakan {os: string} dengan versi aplikasi {version: string}",

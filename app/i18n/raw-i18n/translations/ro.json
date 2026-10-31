@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Tranzacția trebuie trimisă la mempool",
     "amount": "Suma",
+    "addAmount": "Adaugă suma",
+    "lowFunds": "Fonduri insuficiente",
     "amountExceed": "Suma depășește soldul de {balance: string}",
     "amountExceedsLimit": "Suma depășește limita zilnică rămasă de {limit: string}",
     "upgradeAccountToIncreaseLimit": "Faceți upgrade la cont pentru a vă crește limita",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Setați suma"
+  },
+  "Accessibility": {
+    "deleteKey": "Șterge",
+    "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
+    "switchWalletHint": "Trece la celălalt portofel",
+    "copy": "Copiați"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",
