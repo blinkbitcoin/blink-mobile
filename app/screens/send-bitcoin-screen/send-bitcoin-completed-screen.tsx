@@ -160,7 +160,7 @@ const SuccessIconComponent: React.FC<{
   )
 }
 
-const PaymentDetailsSection: React.FC<{
+export const PaymentDetailsSection: React.FC<{
   currencyAmount?: string
   satAmount?: string
   satFeeAmount?: string
@@ -239,7 +239,7 @@ const PaymentDetailsSection: React.FC<{
   )
 }
 
-const NoteSection: React.FC<{
+export const NoteSection: React.FC<{
   noteMessage: string
   LL: TranslationFunctions
 }> = ({ noteMessage, LL }) => {
