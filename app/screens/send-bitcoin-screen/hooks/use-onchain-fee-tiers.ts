@@ -101,7 +101,19 @@ export const useOnchainFeeTiers = (
   const [quotingKey, setQuotingKey] = useState<string | null>(null)
   /** The SDK instance cannot be keyed by value, so its absence gates the quote instead. */
   const inputsKey = sdk && address && amountSats ? `${address}|${amountSats}` : null
-  const { hasQuote, hasFailed, markQuoted, markFailed } = useQuoteStatus(inputsKey)
+  const { hasQuote, hasFailed, discardQuote, markQuoted, markFailed } =
+    useQuoteStatus(inputsKey)
+
+  /**
+   * Whatever was answered stops applying once the inputs change, even if they come back:
+   * retyping an amount that failed must not bring its error back before Next asks again.
+   * Adjusted during render, so the stale outcome is never on screen for a frame.
+   */
+  const [seenKey, setSeenKey] = useState(inputsKey)
+  if (seenKey !== inputsKey) {
+    setSeenKey(inputsKey)
+    discardQuote()
+  }
   /** One quote at a time: a second press for the same inputs waits on the first. */
   const inFlightRef = useRef<{
     key: string
