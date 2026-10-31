@@ -2347,11 +2347,30 @@
         "maxFeeSelected": "Questa è la commissione massima che ti verrà addebitata per questa transazione. Una volta effettuato il pagamento, il costo potrebbe risultare inferiore.",
         "invoiceAlreadyPaid": "Questa fattura è già stata pagata",
         "somethingWentWrong": "Qualcosa è andato storto",
+        "priceUpdated": "Il prezzo è cambiato, quindi gli importi sono stati aggiornati. Controllali prima di inviare.",
         "paymentAlreadyAttempted": "Pagamento già tentato.\n\nSe vuoi inviare di nuovo questo pagamento, ricomincia da zero.",
         "slideToConfirm": "Scorri per confermare",
         "slideConfirming": "Confermando...",
+        "slideToSend": "Scorri per inviare",
+        "calculatingFee": "Calcolo della commissione…",
+        "sendProgress": {
+            "reviewing": "Verifica",
+            "signing": "Firma",
+            "findingRoute": "Ricerca del percorso",
+            "broadcasting": "Trasmissione",
+            "checkingDelivery": "Verifica della consegna",
+            "retrying": "Nuovo tentativo",
+            "almostThere": "Quasi fatto",
+            "anyTimeNow": "A momenti",
+            "ohOh": "Oh oh",
+            "tryingAgain": "Riproviamo"
+        },
         "copiedDestination": "Destinazione copiata negli appunti",
-        "lightningRecommended": "Tariffa elevata! Consigliamo Lightning",
+        "lightningRecommended": "Tariffa elevata. Consigliamo Lightning",
+        "sending": "Invio",
+        "fromBalance": "Dal saldo",
+        "details": "Dettagli",
+        "changeAmount": "Modifica importo",
         "usdRemainderSweep": "Saldo rimanente {remaining: string} ({remainingSats: string}) sarà convertito in Bitcoin. Minimo USD: {minimum: string}."
     },
     "SendBitcoinDestinationScreen": {
@@ -2393,6 +2412,8 @@
     "SendBitcoinScreen": {
         "willBeSentToMempoolBy": "La transazione deve essere inviata a mempool",
         "amount": "Importo",
+        "addAmount": "Aggiungi importo",
+        "lowFunds": "Fondi insufficienti",
         "amountExceed": "L'importo supera il saldo di {balance: string}",
         "amountExceedsLimit": "L'importo supera il limite giornaliero rimanente di {limit: string}",
         "upgradeAccountToIncreaseLimit": "Aggiorna il tuo account per aumentare il tuo limite",
@@ -3095,6 +3116,14 @@
     },
     "AmountInputButton": {
         "tapToSetAmount": "Imposta importo"
+    },
+    "Accessibility": {
+        "deleteKey": "Cancella",
+        "swapCurrencyHint": "Cambia la valuta in cui digiti l'importo",
+        "switchWalletHint": "Passa all'altro tuo wallet",
+        "copy": "Copia",
+        "balanceHidden": "Saldo nascosto",
+        "revealBalanceHint": "Mostra il tuo saldo in questa schermata"
     },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Devo aggiornare la mia app all'ultima versione. Sto usando l'app {os: string} con la versione {version: string}.",

@@ -21,10 +21,12 @@ let mockFeeTiers = {
 }
 let mockFeeError: SdkFeeError | null = null
 let mockHasSelfCustodialQuote = true
+let mockSelfCustodialIsQuoting = false
+const mockSelfCustodialQuote = jest.fn()
 
 let mockCustodialTiers = {
   [FeeTierOption.Fast]: { feeAmount: 300, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
-  [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 60 },
+  [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 240 },
   [FeeTierOption.Slow]: { feeAmount: 100, feeUnit: FeeUnit.Sats, etaMinutes: 1440 },
 }
 let mockCustodialHasError = false
@@ -65,6 +67,8 @@ jest.mock("@app/screens/send-bitcoin-screen/hooks/use-onchain-fee-tiers", () => 
         tiers: mockFeeTiers,
         error: mockFeeError,
         hasQuote: mockHasSelfCustodialQuote,
+        isQuoting: mockSelfCustodialIsQuoting,
+        quote: mockSelfCustodialQuote,
       }
     },
   }
@@ -175,6 +179,7 @@ describe("useOnchainFeeTierOptions", () => {
     mockDisplayPriceReady = true
     mockFeeError = null
     mockHasSelfCustodialQuote = true
+    mockSelfCustodialIsQuoting = false
     mockHasCustodialQuote = true
     mockCustodialHasError = false
     mockCustodialIsQuoting = false
@@ -185,7 +190,7 @@ describe("useOnchainFeeTierOptions", () => {
     }
     mockCustodialTiers = {
       [FeeTierOption.Fast]: { feeAmount: 300, feeUnit: FeeUnit.Sats, etaMinutes: 10 },
-      [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 60 },
+      [FeeTierOption.Medium]: { feeAmount: 200, feeUnit: FeeUnit.Sats, etaMinutes: 240 },
       [FeeTierOption.Slow]: { feeAmount: 100, feeUnit: FeeUnit.Sats, etaMinutes: 1440 },
     }
   })
@@ -392,44 +397,6 @@ describe("useOnchainFeeTierOptions", () => {
 
     // The SDK quotes in sats regardless of wallet, so 30 must not be read as 30 cents.
     expect(result.current.feeTierOptions[0].label).toBe("Priority (30 BTC display)")
-  })
-
-  it("blocks the send only when the self-custodial quote failed", () => {
-    const { result: selfCustodial } = renderHook(() =>
-      useOnchainFeeTierOptions({
-        paymentDetail: buildOnchainDetail(),
-        isSelfCustodial: true,
-        paymentDestination: undefined,
-        convertMoneyAmount: undefined,
-      }),
-    )
-    expect(selfCustodial.current.isFeeTierErrorBlocking).toBe(false)
-
-    mockFeeError = SdkFeeError.NetworkError
-    const { result: selfCustodialFailed } = renderHook(() =>
-      useOnchainFeeTierOptions({
-        paymentDetail: buildOnchainDetail(),
-        isSelfCustodial: true,
-        paymentDestination: undefined,
-        convertMoneyAmount: undefined,
-      }),
-    )
-    expect(selfCustodialFailed.current.isFeeTierErrorBlocking).toBe(true)
-  })
-
-  it("shows a custodial quote failure without blocking the send", () => {
-    mockCustodialHasError = true
-    const { result } = renderHook(() =>
-      useOnchainFeeTierOptions({
-        paymentDetail: buildCustodialOnchainDetail(),
-        isSelfCustodial: false,
-        paymentDestination: undefined,
-        convertMoneyAmount: undefined,
-      }),
-    )
-
-    expect(result.current.feeTierErrorMessage).toBe("Unable to calculate fee")
-    expect(result.current.isFeeTierErrorBlocking).toBe(false)
   })
 
   it("ignores a self-custodial fee error while on a custodial account", () => {
@@ -882,5 +849,129 @@ describe("useOnchainFeeTierOptions", () => {
       "Standard (200 BTC display)",
       "Economy (100 BTC display)",
     ])
+  })
+})
+
+describe("useOnchainFeeTierOptions on Next", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockActiveSdk = mockSdk
+    mockFeeError = null
+    mockHasSelfCustodialQuote = true
+    mockSelfCustodialIsQuoting = false
+    mockHasCustodialQuote = true
+    mockCustodialHasError = false
+    mockCustodialIsQuoting = false
+  })
+
+  it("quotes a self-custodial on-chain send on Next and judges it by the picked tier", async () => {
+    mockSelfCustodialQuote.mockResolvedValueOnce(mockFeeTiers)
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetail(),
+        isSelfCustodial: true,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    let quoted: unknown
+    await act(async () => {
+      quoted = await result.current.quoteFeesForNext()
+    })
+
+    expect(mockSelfCustodialQuote).toHaveBeenCalledTimes(1)
+    // Medium is the self-custodial default.
+    expect(quoted).toEqual({
+      selectedTierFee: expect.objectContaining({
+        amount: 20,
+        currency: WalletCurrency.Btc,
+      }),
+      hasFeeQuote: true,
+    })
+  })
+
+  it("stops Next when the self-custodial quote fails", async () => {
+    mockSelfCustodialQuote.mockResolvedValueOnce(null)
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildOnchainDetail(),
+        isSelfCustodial: true,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    let quoted: unknown = "unset"
+    await act(async () => {
+      quoted = await result.current.quoteFeesForNext()
+    })
+
+    expect(quoted).toBeNull()
+  })
+
+  it("never quotes the self-custodial rail on a custodial account", async () => {
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildCustodialOnchainDetail(),
+        isSelfCustodial: false,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    let quoted: unknown
+    await act(async () => {
+      quoted = await result.current.quoteFeesForNext()
+    })
+
+    expect(mockSelfCustodialQuote).not.toHaveBeenCalled()
+    // Fast is the custodial default, already quoted as the amount changed.
+    expect(quoted).toEqual({
+      selectedTierFee: expect.objectContaining({
+        amount: 300,
+        currency: WalletCurrency.Btc,
+      }),
+      hasFeeQuote: true,
+    })
+  })
+
+  it("spins Next only while a self-custodial quote is out", () => {
+    mockSelfCustodialIsQuoting = true
+    const render = (isSelfCustodial: boolean) =>
+      renderHook(() =>
+        useOnchainFeeTierOptions({
+          paymentDetail: isSelfCustodial
+            ? buildOnchainDetail()
+            : buildCustodialOnchainDetail(),
+          isSelfCustodial,
+          paymentDestination: undefined,
+          convertMoneyAmount: undefined,
+        }),
+      ).result.current
+
+    expect(render(true).isQuotingFeesForNext).toBe(true)
+    expect(render(true).isQuotingFees).toBe(false)
+    expect(render(false).isQuotingFeesForNext).toBe(false)
+  })
+
+  it("shows a custodial quote failure without stopping Next", async () => {
+    mockCustodialHasError = true
+    mockHasCustodialQuote = false
+    const { result } = renderHook(() =>
+      useOnchainFeeTierOptions({
+        paymentDetail: buildCustodialOnchainDetail(),
+        isSelfCustodial: false,
+        paymentDestination: undefined,
+        convertMoneyAmount: undefined,
+      }),
+    )
+
+    expect(result.current.feeTierErrorMessage).toBe("Unable to calculate fee")
+    let quoted: unknown
+    await act(async () => {
+      quoted = await result.current.quoteFeesForNext()
+    })
+    expect(quoted).toEqual(expect.objectContaining({ hasFeeQuote: false }))
   })
 })

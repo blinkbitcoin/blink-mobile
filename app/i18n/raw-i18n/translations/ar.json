@@ -2347,11 +2347,30 @@
     "maxFeeSelected": "هذا هو الحد الأقصى للرسوم التي ستُقتضى منك لهذه المعاملة. قد تكون أقل من ذلك عند إتمام الدفع.",
     "invoiceAlreadyPaid": "تم دفع هذه الفاتورة بالفعل",
     "somethingWentWrong": "حدث خطأ ما",
+    "priceUpdated": "تغيّر السعر، لذلك تم تحديث المبالغ. راجعها قبل الإرسال.",
     "paymentAlreadyAttempted": "تمت محاولة الدفع بالفعل.\n\nإذا أردت إرسال هذه الدفعة مرة أخرى، ابدأ من جديد.",
     "slideToConfirm": "اسحب للتأكيد",
     "slideConfirming": "جارٍ التأكيد...",
+    "slideToSend": "اسحب للإرسال",
+    "calculatingFee": "جارٍ حساب العمولة…",
+    "sendProgress": {
+      "reviewing": "جارٍ المراجعة",
+      "signing": "جارٍ التوقيع",
+      "findingRoute": "جارٍ البحث عن مسار",
+      "broadcasting": "جارٍ البث",
+      "checkingDelivery": "جارٍ التحقق من التسليم",
+      "retrying": "جارٍ إعادة المحاولة",
+      "almostThere": "أوشكنا على الانتهاء",
+      "anyTimeNow": "في أي لحظة الآن",
+      "ohOh": "أوه أوه",
+      "tryingAgain": "نحاول مرة أخرى"
+    },
     "copiedDestination": "تم نسخ الوجهة إلى الحافظة",
-    "lightningRecommended": "رسوم مرتفعة! نوصي باستخدام Lightning.",
+    "lightningRecommended": "رسوم مرتفعة. نوصي باستخدام Lightning.",
+    "sending": "جارٍ الإرسال",
+    "fromBalance": "من الرصيد",
+    "details": "التفاصيل",
+    "changeAmount": "تغيير المبلغ",
     "usdRemainderSweep": "الرصيد المتبقي {remaining: string} ({remainingSats: string}) سيتم تحويله إلى بيتكوين. الحد الأدنى للدولار الأمريكي: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2412,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "يجب إرسال المعاملة إلى mempool",
     "amount": "الكمية",
+    "addAmount": "أضف المبلغ",
+    "lowFunds": "أموال غير كافية",
     "amountExceed": "المقدار أعلى من ميزانيتك التي تبلغ {balance: string}",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -3095,6 +3116,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "حذف",
+    "swapCurrencyHint": "يبدّل العملة التي تكتب بها المبلغ",
+    "switchWalletHint": "ينتقل إلى محفظتك الأخرى",
+    "copy": "نسخ",
+    "balanceHidden": "الرصيد مخفي",
+    "revealBalanceHint": "يعرض رصيدك في هذه الشاشة"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "أحتاج إلى تحديث تطبيقي إلى أحدث إصدار. أنا أستخدم تطبيق {os: string} مع الإصدار {version: string}.",

@@ -2347,11 +2347,30 @@
     "maxFeeSelected": "Đây là mức phí tối đa bạn sẽ phải trả cho giao dịch này. Nó có thể sẽ ít hơn sau khi thanh toán được thực hiện.",
     "invoiceAlreadyPaid": "Hóa đơn này đã được thanh toán",
     "somethingWentWrong": "Đã xảy ra sự cố",
+    "priceUpdated": "Giá đã thay đổi nên số tiền đã được cập nhật. Hãy kiểm tra trước khi gửi.",
     "paymentAlreadyAttempted": "Thanh toán đã được thử.\n\nNếu bạn muốn gửi lại khoản thanh toán này, hãy bắt đầu lại từ đầu.",
     "slideToConfirm": "Vuốt để Xác nhận",
     "slideConfirming": "Đang xác nhận...",
+    "slideToSend": "Vuốt để Gửi",
+    "calculatingFee": "Đang tính phí…",
+    "sendProgress": {
+      "reviewing": "Đang xem xét",
+      "signing": "Đang ký",
+      "findingRoute": "Đang tìm đường",
+      "broadcasting": "Đang phát",
+      "checkingDelivery": "Đang kiểm tra giao nhận",
+      "retrying": "Đang thử lại",
+      "almostThere": "Sắp xong",
+      "anyTimeNow": "Sắp rồi",
+      "ohOh": "Ôi",
+      "tryingAgain": "Thử lại lần nữa"
+    },
     "copiedDestination": "Đã sao chép địa chỉ đích vào bộ nhớ tạm",
-    "lightningRecommended": "Phí cao! Chúng tôi khuyên bạn nên dùng Lightning.",
+    "lightningRecommended": "Phí cao. Chúng tôi khuyên bạn nên dùng Lightning.",
+    "sending": "Đang gửi",
+    "fromBalance": "Từ số dư",
+    "details": "Chi tiết",
+    "changeAmount": "Đổi số tiền",
     "usdRemainderSweep": "Số dư còn lại {remaining: string} ({remainingSats: string}) sẽ được chuyển đổi thành Bitcoin. Tối thiểu USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2412,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",
+    "addAmount": "Thêm số tiền",
+    "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -3095,6 +3116,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Xóa",
+    "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
+    "switchWalletHint": "Chuyển sang ví còn lại của bạn",
+    "copy": "Sao chép",
+    "balanceHidden": "Số dư đang ẩn",
+    "revealBalanceHint": "Hiển thị số dư của bạn trên màn hình này"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

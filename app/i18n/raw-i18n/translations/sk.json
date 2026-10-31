@@ -2347,11 +2347,30 @@
     "maxFeeSelected": "Ide o maximálny poplatok, ktorý vám bude účtovaný za túto transakciu. Po jej vykonaní môže byť poplatok nižší.",
     "invoiceAlreadyPaid": "Táto faktúra už bola uhradená",
     "somethingWentWrong": "Niečo sa pokazilo",
+    "priceUpdated": "Cena sa zmenila, preto boli sumy aktualizované. Pred odoslaním ich skontrolujte.",
     "paymentAlreadyAttempted": "Platba už bola vykonaná.\n\nAk chcete túto platbu odoslať znova, začnite od začiatku.",
     "slideToConfirm": "Posunutím potvrďte",
     "slideConfirming": "Potvrdzovanie...",
+    "slideToSend": "Posunutím odošlite",
+    "calculatingFee": "Výpočet poplatku…",
+    "sendProgress": {
+      "reviewing": "Kontrola",
+      "signing": "Podpisovanie",
+      "findingRoute": "Hľadanie trasy",
+      "broadcasting": "Vysielanie",
+      "checkingDelivery": "Overovanie doručenia",
+      "retrying": "Opakovanie",
+      "almostThere": "Takmer hotovo",
+      "anyTimeNow": "Každú chvíľu",
+      "ohOh": "Ojoj",
+      "tryingAgain": "Skúšame znova"
+    },
     "copiedDestination": "Cieľ bol skopírovaný do schránky",
-    "lightningRecommended": "Vysoký poplatok! Odporúčame Lightning.",
+    "lightningRecommended": "Vysoký poplatok. Odporúčame Lightning.",
+    "sending": "Odosielanie",
+    "fromBalance": "Zo zostatku",
+    "details": "Podrobnosti",
+    "changeAmount": "Zmeniť sumu",
     "usdRemainderSweep": "Zostávajúcich {remaining: string} ({remainingSats: string}) bude prevedených na Bitcoin. Minimum v USD: {minimum: string}."
   },
   "SendBitcoinDestinationScreen": {
@@ -2393,6 +2412,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakciu je potrebné odoslať do mempoolu",
     "amount": "Suma",
+    "addAmount": "Pridať sumu",
+    "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",
@@ -3095,6 +3116,14 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Nastaviť sumu"
+  },
+  "Accessibility": {
+    "deleteKey": "Vymazať",
+    "swapCurrencyHint": "Prepne menu, v ktorej zadávate sumu",
+    "switchWalletHint": "Prepne na vašu druhú peňaženku",
+    "copy": "Kopírovať",
+    "balanceHidden": "Zostatok skrytý",
+    "revealBalanceHint": "Zobrazí váš zostatok na tejto obrazovke"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potrebujem aktualizovať aplikáciu na najnovšiu verziu. Používam aplikáciu {os: string} s verziou {version: string}.",
