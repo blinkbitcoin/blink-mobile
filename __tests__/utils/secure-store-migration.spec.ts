@@ -472,12 +472,23 @@ describe("removeThrough", () => {
 
   it("reports false when the operation times out", async () => {
     jest.useFakeTimers()
-    mockedLegacyErase.mockImplementation(() => new Promise<never>(() => {}))
+    let releaseHungErase: () => void = () => {}
+    mockedLegacyErase.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungErase = () => resolve(false)
+        }),
+    )
 
     const remove = removeThrough(REMOVE_ARGS)
     await jest.advanceTimersByTimeAsync(30_000)
 
     expect(await remove).toBe(false)
+
+    // The erase it sent still holds the slot, so it has to settle before the
+    // next spec gets a turn.
+    releaseHungErase()
+    await jest.advanceTimersByTimeAsync(0)
   })
 
   it("succeeds when the erase failed on a key that was never there", async () => {
@@ -680,6 +691,69 @@ describe("per-slot serialization", () => {
     await jest.advanceTimersByTimeAsync(0)
 
     expect(mockedSecureRemove).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The guard stops an abandoned task from starting a write; it cannot recall one already
+   * sent. Released at the timeout, the slot would let a remove run first, and the write
+   * landing after it would put the credential back.
+   */
+  it("holds the slot for a write the timeout abandoned, so a remove behind it runs after", async () => {
+    jest.useFakeTimers()
+    const calls: string[] = []
+    let releaseHungWrite: () => void = () => {}
+    mockedSecureRead.mockResolvedValue({ status: "absent" })
+    mockedLegacyRead.mockResolvedValue({ status: "found", value: "stale-token" })
+    mockedSecureWrite.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungWrite = () => {
+            calls.push("write landed")
+            resolve(true)
+          }
+        }),
+    )
+    mockedLegacyErase.mockResolvedValue(true)
+    mockedSecureRemove.mockImplementation(async () => {
+      calls.push("remove")
+      return true
+    })
+
+    const abandoned = readThrough(ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toMatchObject({ status: "failed" })
+
+    const remove = removeThrough(REMOVE_ARGS)
+    await jest.advanceTimersByTimeAsync(0)
+    expect(calls).toEqual([])
+
+    releaseHungWrite()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(await remove).toBe(true)
+    expect(calls).toEqual(["write landed", "remove"])
+  })
+
+  /** An erase abandoned while its delete was out must not follow it with the blank: the
+   *  slot may have moved on by then, and the blank is a write. */
+  it("does not send the blank of an erase abandoned before it", async () => {
+    jest.useFakeTimers()
+    let releaseHungErase: () => void = () => {}
+    mockedLegacyErase.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releaseHungErase = () => resolve(false)
+        }),
+    )
+
+    const abandoned = removeThrough(REMOVE_ARGS)
+    await jest.advanceTimersByTimeAsync(30_000)
+    expect(await abandoned).toBe(false)
+
+    releaseHungErase()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockedLegacyBlank).not.toHaveBeenCalled()
   })
 
   /** The read-through has already fetched the legacy value when a fresh one is
