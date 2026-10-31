@@ -41,6 +41,24 @@ describe("NoteInput and the screen reader", () => {
   })
 })
 
+describe("NoteInput with its own placeholder", () => {
+  /** A field that is not a note (the transaction's custom label) must not read as one. */
+  it("shows and reads the placeholder instead of Add note", () => {
+    render(
+      <TypesafeI18n locale="en">
+        <ThemeProvider theme={theme}>
+          <NoteInput editable value="" placeholder="Custom label" maxLength={140} />
+        </ThemeProvider>
+      </TypesafeI18n>,
+    )
+    const input = screen.getByTestId("add-note")
+
+    expect(input.props.placeholder).toBe("Custom label")
+    expect(input.props.accessibilityLabel).toBe("Custom label")
+    expect(input.props.maxLength).toBe(140)
+  })
+})
+
 describe("NoteInput focus", () => {
   const keyboardListeners: Record<string, () => void> = {}
 
