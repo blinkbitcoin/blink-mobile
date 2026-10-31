@@ -58,37 +58,84 @@ const toReadFailed = (err: unknown): StorageReadFailed => {
   return { status: StorageReadStatus.ReadFailed, error }
 }
 
-const readIndex = async (): Promise<ReadIndexResult> => {
+/**
+ * What the index key holds, both as the accounts a reader can use and as every item it
+ * stores, from one read.
+ *
+ * The two differ only when the index is damaged, and every write starts from the items. A
+ * write that started from the accounts alone would store the index back without the
+ * entries it could not read, and those entries are the only sign that a mnemonic stood
+ * behind them: the sweep names each one that still carries an id, and the strict reader
+ * the owed reinstall erase trusts refuses the index while one is there. One lightning
+ * address stored from the accounts alone was enough to turn an index the erase refused
+ * into a shorter one it trusts, and the seed of the entry left out went with the previous
+ * owner's.
+ */
+type StoredIndex =
+  | {
+      status: typeof StorageReadStatus.Ok
+      entries: SelfCustodialAccountEntry[]
+      items: readonly unknown[]
+    }
+  | StorageReadFailed
+
+/** A value that is not a list is kept as the one item it is, so a write cannot replace
+ *  it with a list that no longer shows it. */
+const itemsOf = (parsed: unknown): readonly unknown[] =>
+  Array.isArray(parsed) ? parsed : [parsed]
+
+const entriesOf = (parsed: unknown): SelfCustodialAccountEntry[] =>
+  Array.isArray(parsed) ? parsed.filter(isEntry) : []
+
+const readStoredIndex = async (): Promise<StoredIndex> => {
   try {
     const raw = await AsyncStorage.getItem(ACCOUNT_INDEX_KEY)
     if (raw) {
       const parsed: unknown = JSON.parse(raw)
-      const entries = Array.isArray(parsed) ? parsed.filter(isEntry) : []
-      return { status: StorageReadStatus.Ok, entries }
+      return {
+        status: StorageReadStatus.Ok,
+        entries: entriesOf(parsed),
+        items: itemsOf(parsed),
+      }
     }
 
     // One-shot migration from the legacy id-only list.
     const legacyRaw = await AsyncStorage.getItem(LEGACY_ID_LIST_KEY)
-    if (!legacyRaw) return { status: StorageReadStatus.Ok, entries: [] }
+    if (!legacyRaw) return { status: StorageReadStatus.Ok, entries: [], items: [] }
 
     const legacyParsed: unknown = JSON.parse(legacyRaw)
     if (!Array.isArray(legacyParsed)) {
-      return { status: StorageReadStatus.Ok, entries: [] }
+      return { status: StorageReadStatus.Ok, entries: [], items: itemsOf(legacyParsed) }
     }
 
-    const migrated: SelfCustodialAccountEntry[] = legacyParsed
-      .filter((id): id is string => typeof id === "string")
-      .map((id) => ({ id, lightningAddress: null }))
+    // An item that is not an id is carried over as it is, for the reason above.
+    const migrated: unknown[] = legacyParsed.map((item: unknown) =>
+      typeof item === "string" ? { id: item, lightningAddress: null } : item,
+    )
     await AsyncStorage.setItem(ACCOUNT_INDEX_KEY, JSON.stringify(migrated))
 
-    return { status: StorageReadStatus.Ok, entries: migrated }
+    return { status: StorageReadStatus.Ok, entries: entriesOf(migrated), items: migrated }
   } catch (err) {
     return toReadFailed(err)
   }
 }
 
-const writeIndex = async (entries: SelfCustodialAccountEntry[]): Promise<void> => {
-  await AsyncStorage.setItem(ACCOUNT_INDEX_KEY, JSON.stringify(entries))
+const readIndex = async (): Promise<ReadIndexResult> => {
+  const stored = await readStoredIndex()
+  if (stored.status === StorageReadStatus.ReadFailed) return stored
+  return { status: StorageReadStatus.Ok, entries: stored.entries }
+}
+
+const writeIndex = async (items: readonly unknown[]): Promise<void> => {
+  await AsyncStorage.setItem(ACCOUNT_INDEX_KEY, JSON.stringify(items))
+}
+
+/** The id an index item names, damaged or not, or null when it carries none. */
+const idOfEntry = (value: unknown): string | null => {
+  if (!value || typeof value !== "object") return null
+  const { id } = value as { id?: unknown }
+  const isUsableId = typeof id === "string" && id.length > 0
+  return isUsableId ? id : null
 }
 
 export const listSelfCustodialAccounts = async (): Promise<ReadIndexResult> => readIndex()
@@ -213,19 +260,24 @@ export const readSelfCustodialIndexPresence =
  * throws.
  */
 export const addSelfCustodialAccountId = async (id: string): Promise<void> => {
-  const result = await readIndex()
+  const result = await readStoredIndex()
   if (result.status === StorageReadStatus.ReadFailed) throw result.error
   if (result.entries.some((e) => e.id === id)) return
 
-  await writeIndex([...result.entries, { id, lightningAddress: null }])
+  await writeIndex([...result.items, { id, lightningAddress: null }])
 }
 
+/**
+ * Drops every item naming the account, a damaged one included: the account's mnemonic is
+ * erased with it, so an item left behind would only have the sweep name a seed that is
+ * gone.
+ */
 export const removeSelfCustodialAccountId = async (id: string): Promise<void> => {
-  const result = await readIndex()
+  const result = await readStoredIndex()
   if (result.status === StorageReadStatus.ReadFailed) return
 
-  const next = result.entries.filter((e) => e.id !== id)
-  if (next.length === result.entries.length) return
+  const next = result.items.filter((item) => idOfEntry(item) !== id)
+  if (next.length === result.items.length) return
 
   await writeIndex(next)
 }
@@ -234,15 +286,16 @@ export const setSelfCustodialLightningAddress = async (
   id: string,
   lightningAddress: string | null,
 ): Promise<void> => {
-  const result = await readIndex()
+  const result = await readStoredIndex()
   if (result.status === StorageReadStatus.ReadFailed) return
 
-  const idx = result.entries.findIndex((e) => e.id === id)
-  if (idx === -1) return
-  if (result.entries[idx].lightningAddress === lightningAddress) return
+  const target = result.entries.find((e) => e.id === id)
+  if (!target) return
+  if (target.lightningAddress === lightningAddress) return
 
-  const next = [...result.entries]
-  next[idx] = { ...next[idx], lightningAddress }
+  const next = result.items.map((item) =>
+    item === target ? { ...target, lightningAddress } : item,
+  )
   await writeIndex(next)
 }
 
@@ -324,8 +377,42 @@ const describeProbeFailure = (err: unknown): string => {
 }
 
 /**
+ * Every account id the index names, and how many of its items name none.
+ *
+ * Not readIndex's list, which leaves out an entry it cannot read as an account. One that
+ * is damaged but still carries an id is named all the same, since a seed may stand behind
+ * it that nothing but the sweep would ever move or record. An item with no id is
+ * something nothing can name.
+ */
+type IndexNames =
+  | {
+      readonly status: typeof StorageReadStatus.Ok
+      readonly ids: string[]
+      readonly unnameableItems: number
+    }
+  | StorageReadFailed
+
+const readIndexNames = async (): Promise<IndexNames> => {
+  const stored = await readStoredIndex()
+  if (stored.status === StorageReadStatus.ReadFailed) return stored
+
+  const named = stored.items.map(idOfEntry)
+  const ids = named.filter((id): id is string => id !== null)
+  return {
+    status: StorageReadStatus.Ok,
+    ids: [...new Set(ids)],
+    unnameableItems: named.length - ids.length,
+  }
+}
+
+/**
  * Migrates the mnemonic of every account in the index, whether or not the user
  * ever opens it.
+ *
+ * Every id the index holds, a damaged entry's included, rather than the accounts a
+ * screen can list: an entry that does not read as an account still stands for a seed,
+ * and nothing else would ever move or record it. An item that carries no id counts as
+ * an account the sweep could not reach, so it never reports itself finished over one.
  *
  * The read-through alone moves a value when something reads it, so an account
  * left untouched between this release and the one that drops the legacy store
@@ -352,19 +439,19 @@ const describeProbeFailure = (err: unknown): string => {
  * and would score every account on the device as a failure.
  */
 export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
-  const result = await readIndex()
+  const names = await readIndexNames()
   // No index means no enumeration; the next boot reads it again. Reporting zero
   // migrations here would look like a completed sweep over accounts never seen.
-  if (result.status === StorageReadStatus.ReadFailed) {
+  if (names.status === StorageReadStatus.ReadFailed) {
     return { status: "incomplete", failures: 0 }
   }
 
   let migrated = 0
-  let failures = 0
+  let failures = names.unnameableItems
 
-  for (const entry of result.entries) {
+  for (const id of names.ids) {
     // Per account, so one unreadable slot cannot strand the accounts behind it.
-    const mnemonic = await KeyStoreWrapper.mnemonicExists(entry.id)
+    const mnemonic = await KeyStoreWrapper.mnemonicExists(id)
     if (mnemonic.status === "failed") {
       failures += 1
       // Breadcrumb only, so the cause of each failure survives without every
@@ -383,7 +470,7 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
         // report a finished migration while nothing had moved. The release that
         // drops the legacy store is gated on this count, so it asks again,
         // without the fallback.
-        const landed = await KeyStoreWrapper.mnemonicIsMigrated(entry.id)
+        const landed = await KeyStoreWrapper.mnemonicIsMigrated(id)
         if (landed.status === "yes") {
           // The write that put the mnemonic there records the account first, so
           // this is the repair for a record that did not land or was lost
@@ -391,7 +478,7 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
           // record that does not land here is a failure of the sweep too: the
           // seed is there and the wipe cannot name it, which is the whole point
           // of running this.
-          const remembered = await KeyStoreWrapper.rememberMnemonicAccount(entry.id)
+          const remembered = await KeyStoreWrapper.rememberMnemonicAccount(id)
           if (remembered) {
             migrated += 1
           } else {
@@ -403,7 +490,7 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
       }
       // The network marker rides along: probed for its side effect only, and an
       // account with no marker is not a failure.
-      await KeyStoreWrapper.mnemonicNetworkExists(entry.id)
+      await KeyStoreWrapper.mnemonicNetworkExists(id)
     }
   }
 
@@ -414,10 +501,10 @@ export const sweepMnemonicMigration = async (): Promise<SweepResult> => {
   // behind, and the dedup below only holds for this process, so the next boot
   // reports the sweep again if it is still incomplete. The ids stay out of both
   // the key and the message, for the reason keyClassOf exists.
-  recordAppError(
-    new Error(`Mnemonic sweep incomplete: ${failures}/${result.entries.length}`),
-    { dedupKey: "storage-mnemonic-sweep-failed" },
-  )
+  const indexedCount = names.ids.length + names.unnameableItems
+  recordAppError(new Error(`Mnemonic sweep incomplete: ${failures}/${indexedCount}`), {
+    dedupKey: "storage-mnemonic-sweep-failed",
+  })
 
   return { status: "incomplete", failures }
 }

@@ -9,7 +9,10 @@ import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge/lifecycle"
-import { sweepMnemonicMigration } from "@app/self-custodial/storage/account-index"
+import {
+  setSelfCustodialLightningAddress,
+  sweepMnemonicMigration,
+} from "@app/self-custodial/storage/account-index"
 import {
   PersistentStateProvider,
   usePersistentStateContext,
@@ -172,6 +175,8 @@ const UPGRADED_ACCOUNT = "upgraded-account"
 const UPGRADED_WORDS = "upgraded account fixture words"
 const NEW_WALLET = "new-wallet-account"
 const NEW_WALLET_WORDS = "new wallet fixture words"
+const RESTORED_WALLET = "restored-wallet-account"
+const RESTORED_WALLET_WORDS = "restored wallet fixture words"
 
 const serverFor = (slot: string) => `secure-store.blink.local/${slot}`
 
@@ -420,6 +425,36 @@ describe("an owed reinstall wipe", () => {
       PREVIOUS_OWNER_WORDS,
     )
     expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(isWipeOwed()).toBe(true)
+  })
+
+  /** A later write to the index must not turn an entry it cannot read into a wallet the
+   *  erase no longer has to spare. */
+  it("spares a wallet whose damaged entry outlived a later write to the index", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    await selfCustodialRestoreWallet({
+      accountId: RESTORED_WALLET,
+      mnemonic: RESTORED_WALLET_WORDS,
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+    const index: { id: string }[] = JSON.parse(mockAsyncStorage.get(INDEX_KEY) ?? "[]")
+    const damaged = index.map((entry) =>
+      entry.id === RESTORED_WALLET ? { id: RESTORED_WALLET } : entry,
+    )
+    mockAsyncStorage.set(INDEX_KEY, JSON.stringify(damaged))
+    await setSelfCustodialLightningAddress(NEW_WALLET, "alice@blink.sv")
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(await KeyStoreWrapper.getMnemonicForAccount(RESTORED_WALLET)).toBe(
+      RESTORED_WALLET_WORDS,
+    )
     expect(isWipeOwed()).toBe(true)
   })
 })
