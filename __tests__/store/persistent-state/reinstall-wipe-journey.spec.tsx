@@ -1,0 +1,628 @@
+import React from "react"
+import { Platform, Text, TouchableOpacity } from "react-native"
+
+import { Network } from "@breeztech/breez-sdk-spark-react-native"
+import { act, fireEvent, render, screen, waitFor } from "@testing-library/react-native"
+
+import useLogout from "@app/hooks/use-logout"
+import {
+  selfCustodialCreateWallet,
+  selfCustodialRestoreWallet,
+} from "@app/self-custodial/bridge/lifecycle"
+import {
+  setSelfCustodialLightningAddress,
+  sweepMnemonicMigration,
+} from "@app/self-custodial/storage/account-index"
+import {
+  PersistentStateProvider,
+  usePersistentStateContext,
+} from "@app/store/persistent-state"
+import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
+import KeyStoreWrapper from "@app/utils/storage/secureStorage"
+
+/**
+ * The three stores of a device, held in memory and read by the real storage
+ * code. A reinstall empties the first and leaves the other two, which is the
+ * whole reason the wipe under test exists.
+ */
+const mockAsyncStorage = new Map<string, string>()
+const mockKeychain = new Map<string, string>()
+const mockLegacyStore = new Map<string, string>()
+
+const mockFaults = {
+  indexReads: false,
+  trackedListReads: false,
+  trackedListWrites: false,
+  tokenErases: false,
+  legacyStoreClears: false,
+}
+
+jest.mock("@react-native-async-storage/async-storage", () => ({
+  __esModule: true,
+  default: {
+    getItem: async (key: string) => {
+      const isFailingIndexRead =
+        mockFaults.indexReads && key.startsWith("selfCustodialAccount")
+      if (isFailingIndexRead) throw new Error("AsyncStorage unavailable")
+      return mockAsyncStorage.get(key) ?? null
+    },
+    setItem: async (key: string, value: string) => {
+      mockAsyncStorage.set(key, value)
+    },
+    multiRemove: async (keys: string[]) => {
+      keys.forEach((key) => mockAsyncStorage.delete(key))
+    },
+    getAllKeys: async () => [...mockAsyncStorage.keys()],
+  },
+}))
+
+jest.mock("react-native-keychain", () => ({
+  __esModule: true,
+  getInternetCredentials: async (server: string) => {
+    const isFailingListRead =
+      mockFaults.trackedListReads && server.endsWith("/mnemonicAccounts")
+    if (isFailingListRead) throw new Error("keychain unavailable")
+    const password = mockKeychain.get(server)
+    return password === undefined ? false : { username: server, password }
+  },
+  hasInternetCredentials: async ({ server }: { server: string }) =>
+    mockKeychain.has(server),
+  setInternetCredentials: async (server: string, _username: string, password: string) => {
+    const isFailingListWrite =
+      mockFaults.trackedListWrites && server.endsWith("/mnemonicAccounts")
+    if (isFailingListWrite) return false
+    mockKeychain.set(server, password)
+    return { service: server }
+  },
+  resetInternetCredentials: async ({ server }: { server: string }) => {
+    const isFailingTokenErase =
+      mockFaults.tokenErases && server.endsWith("/galoyAuthToken")
+    if (isFailingTokenErase) throw new Error("keychain unavailable")
+    mockKeychain.delete(server)
+  },
+  resetGenericPassword: async ({ service }: { service: string }) => {
+    if (mockFaults.legacyStoreClears) return false
+    if (service === "RNSecureKeyStoreKeyChain") mockLegacyStore.clear()
+    return true
+  },
+  ACCESSIBLE: {
+    WHEN_UNLOCKED_THIS_DEVICE_ONLY: "AccessibleWhenUnlockedThisDeviceOnly",
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AccessibleAfterFirstUnlockThisDeviceOnly",
+  },
+}))
+
+jest.mock("react-native-secure-key-store", () => ({
+  __esModule: true,
+  default: {
+    get: async (key: string) => {
+      const value = mockLegacyStore.get(key)
+      if (value === undefined) {
+        throw Object.assign(new Error("key does not present"), { code: "404" })
+      }
+      return value
+    },
+    set: async (key: string, value: string) => {
+      mockLegacyStore.set(key, value)
+    },
+    remove: async (key: string) => {
+      if (!mockLegacyStore.delete(key)) {
+        throw Object.assign(new Error("could not delete"), { code: "6" })
+      }
+    },
+    setResetOnAppUninstallTo: () => {},
+  },
+  ACCESSIBLE: {
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AccessibleAfterFirstUnlockThisDeviceOnly",
+  },
+}))
+
+jest.mock("@react-native-firebase/crashlytics", () => () => ({
+  recordError: jest.fn(),
+  log: jest.fn(),
+}))
+
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  logEvent: async () => {},
+}))
+
+jest.mock("@react-native-firebase/messaging", () => () => ({
+  getToken: async () => "",
+}))
+
+jest.mock("@app/utils/analytics", () => ({ logLogout: jest.fn() }))
+
+jest.mock("@app/graphql/generated", () => ({
+  useUserLogoutMutation: () => [jest.fn()],
+}))
+
+jest.mock("react-native-config", () => ({
+  SPARK_TOKEN_IDENTIFIER: "test-token-id",
+  BREEZ_API_KEY: "test-api-key",
+}))
+
+jest.mock("react-native-fs", () => ({ DocumentDirectoryPath: "/test/documents" }))
+
+jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
+  Network: { Mainnet: 0, Regtest: 1 },
+  Seed: { Mnemonic: jest.fn() },
+  MaxFee: { NetworkRecommended: jest.fn() },
+  defaultConfig: () => ({}),
+  initLogging: jest.fn(),
+  connect: async () => ({ disconnect: async () => {} }),
+}))
+
+jest.mock("bip39", () => ({
+  generateMnemonic: () => "new wallet fixture words",
+  validateMnemonic: () => true,
+}))
+
+jest.mock("react-native-quick-crypto", () => ({
+  randomBytes: (size: number) => Buffer.alloc(size),
+}))
+
+jest.mock("@app/self-custodial/logging", () => ({ createSdkLogListener: jest.fn() }))
+
+jest.mock("@app/self-custodial/lnurl-server-mode", () => ({
+  recoverLnurlServerMode: async () => null,
+}))
+
+const BLOB_KEY = "persistentState"
+const INDEX_KEY = "selfCustodialAccountIndex"
+
+const PREVIOUS_OWNER = "previous-owner-account"
+const PREVIOUS_OWNER_WORDS = "previous owner fixture words"
+const UPGRADED_ACCOUNT = "upgraded-account"
+const UPGRADED_WORDS = "upgraded account fixture words"
+const NEW_WALLET = "new-wallet-account"
+const NEW_WALLET_WORDS = "new wallet fixture words"
+const RESTORED_WALLET = "restored-wallet-account"
+const RESTORED_WALLET_WORDS = "restored wallet fixture words"
+
+const serverFor = (slot: string) => `secure-store.blink.local/${slot}`
+
+const deviceSecrets = () => [...mockKeychain.keys(), ...mockLegacyStore.keys()]
+
+const isWipeOwed = (): boolean => {
+  const blob = mockAsyncStorage.get(BLOB_KEY)
+  if (blob === undefined) return false
+  return JSON.parse(blob).pendingReinstallKeyMaterialWipe === true
+}
+
+const isLegacyStoreClearOwed = (): boolean => {
+  const blob = mockAsyncStorage.get(BLOB_KEY)
+  if (blob === undefined) return false
+  return JSON.parse(blob).pendingReinstallLegacyStoreClear === true
+}
+
+/** A seed an older build left in the legacy store only: no tracked id names it, so only
+ *  clearing the legacy store whole reaches it. */
+const LEGACY_ONLY_KEY = "mnemonic:legacy-only-previous-owner"
+const leaveLegacyOnlySeed = () => {
+  mockLegacyStore.set(LEGACY_ONLY_KEY, "legacy only fixture words")
+}
+
+const owedSessionSlots = (): unknown => {
+  const blob = mockAsyncStorage.get(BLOB_KEY)
+  if (blob === undefined) return undefined
+  return JSON.parse(blob).pendingReinstallSessionWipe
+}
+
+const PREVIOUS_OWNER_TOKEN = "previous-owner-token"
+const PREVIOUS_OWNER_PIN = "1234"
+
+/** The previous owner was signed in and had set a PIN. */
+const signedInPreviousOwner = () => {
+  mockKeychain.set(serverFor("galoyAuthToken"), PREVIOUS_OWNER_TOKEN)
+  mockKeychain.set(serverFor("PIN"), PREVIOUS_OWNER_PIN)
+}
+
+/** A device handed over with the previous owner's wallet still in its keychain. */
+const reinstallOverPreviousOwner = () => {
+  mockKeychain.set(serverFor(`mnemonic:${PREVIOUS_OWNER}`), PREVIOUS_OWNER_WORDS)
+  mockKeychain.set(serverFor("mnemonicAccounts"), PREVIOUS_OWNER)
+  mockLegacyStore.set(`mnemonic:${PREVIOUS_OWNER}`, PREVIOUS_OWNER_WORDS)
+}
+
+/** An install that predates the keychain move: its wallet is in the legacy store only. */
+const upgradeWithLegacyWallet = () => {
+  const { galoyAuthToken: _token, ...blob } = defaultPersistentState
+  mockAsyncStorage.set(BLOB_KEY, JSON.stringify(blob))
+  mockAsyncStorage.set(
+    INDEX_KEY,
+    JSON.stringify([{ id: UPGRADED_ACCOUNT, lightningAddress: null }]),
+  )
+  mockLegacyStore.set(`mnemonic:${UPGRADED_ACCOUNT}`, UPGRADED_WORDS)
+  mockLegacyStore.set(`mnemonic_network:${UPGRADED_ACCOUNT}`, "mainnet")
+}
+
+const uninstallAndReinstall = () => mockAsyncStorage.clear()
+
+const App: React.FC = () => {
+  const { logout } = useLogout()
+  const { persistentState } = usePersistentStateContext()
+  const [isSignedOut, setIsSignedOut] = React.useState(false)
+
+  const expireSession = async () => {
+    await logout({ preserveStoredCredentials: true })
+    setIsSignedOut(true)
+  }
+
+  return (
+    <>
+      <Text testID="booted">booted</Text>
+      <Text testID="token">{persistentState.galoyAuthToken}</Text>
+      {isSignedOut && <Text testID="signed-out">signed out</Text>}
+      <TouchableOpacity testID="expire-session" onPress={expireSession} />
+    </>
+  )
+}
+
+/**
+ * The first render loads React Native's components on demand, which on a cold
+ * transform cache outlasts the default wait before it is ever polled.
+ */
+const BOOT_TIMEOUT_MS = 10_000
+
+/** Every fake resolves on a microtask, so one macrotask lets each queued save land. */
+const settle = () =>
+  act(async () => {
+    await new Promise((resolve) => {
+      setTimeout(resolve, 0)
+    })
+  })
+
+const boot = async () => {
+  const view = render(
+    <PersistentStateProvider>
+      <App />
+    </PersistentStateProvider>,
+  )
+  await waitFor(
+    () => {
+      expect(screen.getByTestId("booted")).toBeTruthy()
+    },
+    { timeout: BOOT_TIMEOUT_MS },
+  )
+  await settle()
+  return view
+}
+
+const ORIGINAL_PLATFORM = Platform.OS
+
+beforeAll(() => {
+  Object.defineProperty(Platform, "OS", { configurable: true, value: "ios" })
+})
+
+afterAll(() => {
+  Object.defineProperty(Platform, "OS", { configurable: true, value: ORIGINAL_PLATFORM })
+})
+
+beforeEach(() => {
+  mockAsyncStorage.clear()
+  mockKeychain.clear()
+  mockLegacyStore.clear()
+  mockFaults.indexReads = false
+  mockFaults.trackedListReads = false
+  mockFaults.trackedListWrites = false
+  mockFaults.tokenErases = false
+  mockFaults.legacyStoreClears = false
+  // The app is closed before the idle sweep in every journey here, so nothing
+  // but the code under test gets to record an account.
+  jest.spyOn(global, "requestIdleCallback").mockImplementation(() => 0)
+})
+
+afterEach(() => {
+  jest.restoreAllMocks()
+})
+
+describe("an owed reinstall wipe", () => {
+  it("outlives an expired-session logout and erases the previous owner's wallet on the next boot", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.trackedListReads = true
+    const reinstallBoot = await boot()
+    expect(isWipeOwed()).toBe(true)
+    mockFaults.trackedListReads = false
+
+    fireEvent.press(screen.getByTestId("expire-session"))
+    await waitFor(() => {
+      expect(screen.getByTestId("signed-out")).toBeTruthy()
+    })
+    await settle()
+
+    expect(isWipeOwed()).toBe(true)
+    expect(mockKeychain.get(serverFor(`mnemonic:${PREVIOUS_OWNER}`))).toBe(
+      PREVIOUS_OWNER_WORDS,
+    )
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(deviceSecrets()).toEqual([])
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  it("finds no wallet to take when a registration could not read the index", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    expect(isWipeOwed()).toBe(true)
+
+    await expect(selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)).rejects.toThrow(
+      "AsyncStorage unavailable",
+    )
+    expect(mockKeychain.has(serverFor(`mnemonic:${NEW_WALLET}`))).toBe(false)
+    expect(mockKeychain.get(serverFor("mnemonicAccounts"))).toBe(PREVIOUS_OWNER)
+
+    mockFaults.indexReads = false
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(deviceSecrets()).toEqual([])
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  it("finds nothing of a restored wallet whose registration could not read the index", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+
+    await expect(
+      selfCustodialRestoreWallet({
+        accountId: NEW_WALLET,
+        mnemonic: NEW_WALLET_WORDS,
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
+    ).rejects.toThrow("AsyncStorage unavailable")
+    expect(mockKeychain.has(serverFor(`mnemonic:${NEW_WALLET}`))).toBe(false)
+
+    mockFaults.indexReads = false
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(deviceSecrets()).toEqual([])
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  /**
+   * The erase is still owed when the new owner's wallet lands, so the next boot finds the
+   * index populated. It spares that wallet and takes the previous owner's, from both
+   * stores, instead of giving the erase up.
+   */
+  it("erases the previous owner's wallet and leaves alone the one that registered on a second attempt", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+
+    await expect(selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)).rejects.toThrow()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(mockKeychain.has(serverFor(`mnemonic:${PREVIOUS_OWNER}`))).toBe(false)
+    expect(mockLegacyStore.has(`mnemonic:${PREVIOUS_OWNER}`)).toBe(false)
+    expect(mockKeychain.get(serverFor("mnemonicAccounts"))).toBe(NEW_WALLET)
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  /** An index the erase cannot read in full could be hiding the new owner's wallet. */
+  it("keeps the previous owner's wallet owed while the index cannot vouch for every account", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    const index = JSON.parse(mockAsyncStorage.get(INDEX_KEY) ?? "[]")
+    mockAsyncStorage.set(INDEX_KEY, JSON.stringify([...index, { id: 7 }]))
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(mockKeychain.get(serverFor(`mnemonic:${PREVIOUS_OWNER}`))).toBe(
+      PREVIOUS_OWNER_WORDS,
+    )
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(isWipeOwed()).toBe(true)
+  })
+
+  /** A later write to the index must not turn an entry it cannot read into a wallet the
+   *  erase no longer has to spare. */
+  it("spares a wallet whose damaged entry outlived a later write to the index", async () => {
+    reinstallOverPreviousOwner()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    await selfCustodialRestoreWallet({
+      accountId: RESTORED_WALLET,
+      mnemonic: RESTORED_WALLET_WORDS,
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+    const index: { id: string }[] = JSON.parse(mockAsyncStorage.get(INDEX_KEY) ?? "[]")
+    const damaged = index.map((entry) =>
+      entry.id === RESTORED_WALLET ? { id: RESTORED_WALLET } : entry,
+    )
+    mockAsyncStorage.set(INDEX_KEY, JSON.stringify(damaged))
+    await setSelfCustodialLightningAddress(NEW_WALLET, "alice@blink.sv")
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(await KeyStoreWrapper.getMnemonicForAccount(RESTORED_WALLET)).toBe(
+      RESTORED_WALLET_WORDS,
+    )
+    expect(isWipeOwed()).toBe(true)
+  })
+})
+
+describe("an owed legacy store clear", () => {
+  /**
+   * The reinstall boot proved the reinstall and could not clear the legacy store whole. The
+   * new owner opens a wallet before the next boot, so the index is no longer absent, and the
+   * clear still has to happen: it is the only thing that reaches a seed no tracked id names.
+   */
+  it("clears the legacy store whole on the next boot even after the new owner opened a wallet", async () => {
+    reinstallOverPreviousOwner()
+    leaveLegacyOnlySeed()
+    mockFaults.legacyStoreClears = true
+    const reinstallBoot = await boot()
+
+    expect(isLegacyStoreClearOwed()).toBe(true)
+    expect(mockLegacyStore.get(LEGACY_ONLY_KEY)).toBe("legacy only fixture words")
+
+    mockFaults.legacyStoreClears = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(mockLegacyStore.has(LEGACY_ONLY_KEY)).toBe(false)
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(isLegacyStoreClearOwed()).toBe(false)
+  })
+
+  it("keeps the clear owed across boots while it keeps failing", async () => {
+    reinstallOverPreviousOwner()
+    leaveLegacyOnlySeed()
+    mockFaults.legacyStoreClears = true
+    const reinstallBoot = await boot()
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    reinstallBoot.unmount()
+
+    const secondBoot = await boot()
+    expect(isLegacyStoreClearOwed()).toBe(true)
+    expect(mockLegacyStore.get(LEGACY_ONLY_KEY)).toBe("legacy only fixture words")
+
+    mockFaults.legacyStoreClears = false
+    secondBoot.unmount()
+    await boot()
+
+    expect(mockLegacyStore.has(LEGACY_ONLY_KEY)).toBe(false)
+    expect(isLegacyStoreClearOwed()).toBe(false)
+  })
+
+  /** Nothing proved a reinstall there, so the legacy store may hold this user's only copy. */
+  it("never clears the legacy store whole for an erase an unreadable index left owed", async () => {
+    reinstallOverPreviousOwner()
+    leaveLegacyOnlySeed()
+    mockFaults.indexReads = true
+    const reinstallBoot = await boot()
+    mockFaults.indexReads = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(isLegacyStoreClearOwed()).toBe(false)
+    expect(mockLegacyStore.get(LEGACY_ONLY_KEY)).toBe("legacy only fixture words")
+    expect(mockLegacyStore.has(`mnemonic:${PREVIOUS_OWNER}`)).toBe(false)
+  })
+})
+
+describe("an owed session wipe", () => {
+  /**
+   * Both halves fail on the reinstall boot, which writes the blob at once. That write is
+   * what keeps the fresh-install branch from running again, so the next boot finishes
+   * both from what the blob records, and only then lets either record go.
+   */
+  it("erases the previous owner's token, PIN and wallet on the next boot when both halves failed", async () => {
+    reinstallOverPreviousOwner()
+    signedInPreviousOwner()
+    mockFaults.tokenErases = true
+    mockFaults.trackedListReads = true
+    const reinstallBoot = await boot()
+
+    expect(owedSessionSlots()).toEqual(["active token"])
+    expect(isWipeOwed()).toBe(true)
+    expect(mockKeychain.get(serverFor("galoyAuthToken"))).toBe(PREVIOUS_OWNER_TOKEN)
+
+    mockFaults.tokenErases = false
+    mockFaults.trackedListReads = false
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(screen.getByTestId("token").props.children).toBe("")
+    expect(deviceSecrets()).toEqual([])
+    expect(owedSessionSlots()).toBeUndefined()
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  /** Still there, so still possibly theirs: the boot leaves it alone rather than use it. */
+  it("never signs in with a token the retry could not erase", async () => {
+    reinstallOverPreviousOwner()
+    signedInPreviousOwner()
+    mockFaults.tokenErases = true
+    const reinstallBoot = await boot()
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(screen.getByTestId("token").props.children).toBe("")
+    expect(mockKeychain.get(serverFor("galoyAuthToken"))).toBe(PREVIOUS_OWNER_TOKEN)
+    expect(owedSessionSlots()).toEqual(["active token"])
+  })
+
+  /** The new owner's account does not make the previous owner's session any less theirs. */
+  it("erases the owed token once the new owner has a wallet of their own", async () => {
+    reinstallOverPreviousOwner()
+    signedInPreviousOwner()
+    mockFaults.tokenErases = true
+    const reinstallBoot = await boot()
+    mockFaults.tokenErases = false
+    await selfCustodialCreateWallet(NEW_WALLET, Network.Regtest)
+
+    reinstallBoot.unmount()
+    await boot()
+
+    expect(mockKeychain.has(serverFor("galoyAuthToken"))).toBe(false)
+    expect(await KeyStoreWrapper.getMnemonicForAccount(NEW_WALLET)).toBe(NEW_WALLET_WORDS)
+    expect(owedSessionSlots()).toBeUndefined()
+  })
+})
+
+describe("a mnemonic that a read migrated", () => {
+  it("is erased by the next reinstall, with no sweep in between", async () => {
+    upgradeWithLegacyWallet()
+    const upgradeBoot = await boot()
+
+    expect(await KeyStoreWrapper.getMnemonicForAccount(UPGRADED_ACCOUNT)).toBe(
+      UPGRADED_WORDS,
+    )
+    expect(await KeyStoreWrapper.getMnemonicNetworkForAccount(UPGRADED_ACCOUNT)).toBe(
+      "mainnet",
+    )
+    expect(mockKeychain.get(serverFor(`mnemonic:${UPGRADED_ACCOUNT}`))).toBe(
+      UPGRADED_WORDS,
+    )
+
+    upgradeBoot.unmount()
+    uninstallAndReinstall()
+    await boot()
+
+    expect(deviceSecrets()).toEqual([])
+    expect(isWipeOwed()).toBe(false)
+  })
+
+  it("is recorded by the next sweep when the read could not record it, and erased after", async () => {
+    upgradeWithLegacyWallet()
+    mockFaults.trackedListWrites = true
+    const upgradeBoot = await boot()
+
+    expect(await KeyStoreWrapper.getMnemonicForAccount(UPGRADED_ACCOUNT)).toBe(
+      UPGRADED_WORDS,
+    )
+    expect([...mockKeychain.keys()]).toEqual([serverFor(`mnemonic:${UPGRADED_ACCOUNT}`)])
+
+    mockFaults.trackedListWrites = false
+    expect(await sweepMnemonicMigration()).toEqual({ status: "ok", migrated: 1 })
+    expect(mockKeychain.get(serverFor("mnemonicAccounts"))).toBe(UPGRADED_ACCOUNT)
+
+    upgradeBoot.unmount()
+    uninstallAndReinstall()
+    await boot()
+
+    expect(deviceSecrets()).toEqual([])
+  })
+})

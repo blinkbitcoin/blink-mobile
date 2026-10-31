@@ -262,15 +262,17 @@ const listedWalletIds = async (): Promise<ReadonlyArray<string>> => {
   return listed.entries.map(({ id }) => id)
 }
 
-const storeWallet = async (id: string) => {
-  await KeyStoreWrapper.setMnemonicForAccount(id, SEED)
-  await addSelfCustodialAccountId(id)
-}
-
 /** A value left by an earlier release, on disk and loaded by this launch. */
 const storeLegacyValue = (key: string, value: string) => {
   mockLegacyPrefs.memory.set(key, value)
   mockLegacyPrefs.file.set(key, value)
+}
+
+/** A wallet an earlier release stored: its seed is still in the legacy store, since this
+ *  release writes seeds to the new store and only a read moves an old one across. */
+const storeWallet = async (id: string) => {
+  storeLegacyValue(`mnemonic:${id}`, SEED)
+  await addSelfCustodialAccountId(id)
 }
 
 const originalPlatform = Platform.OS
@@ -369,13 +371,14 @@ describe("writes after one the disk refused", () => {
   })
 
   it("keeps a refused seed erase from landing with the next write that reaches disk", async () => {
+    storeLegacyValue(GALOY_AUTH_TOKEN_KEY, "bearer-token")
     await storeWallet(WALLET_ID)
     mockLegacyPrefs.isFileWriteFailing = true
     const outcome = await deleteLastWallet()
     mockLegacyPrefs.isFileWriteFailing = false
 
-    // Any write that lands saves the whole file, as storing another wallet's seed does.
-    await KeyStoreWrapper.setMnemonicForAccount("another-wallet", SEED)
+    // Any write that lands saves the whole file, as erasing an older release's token does.
+    await KeyStoreWrapper.removeActiveToken()
 
     expect(outcome).toBeUndefined()
     expect(await listedWalletIds()).toEqual([WALLET_ID])

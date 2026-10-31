@@ -233,8 +233,10 @@ const listedWalletIds = async (): Promise<ReadonlyArray<string>> => {
   return listed.entries.map(({ id }) => id)
 }
 
+/** A wallet an earlier release stored: its seed is still in the legacy keychain, since this
+ *  release writes seeds to the new store and only a read moves an old one across. */
 const storeWallet = async (id: string) => {
-  await KeyStoreWrapper.setMnemonicForAccount(id, SEED)
+  mockLegacyKeychain.items.set(`mnemonic:${id}`, SEED)
   await addSelfCustodialAccountId(id)
 }
 
