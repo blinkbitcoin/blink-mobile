@@ -1,19 +1,24 @@
 /**
  * Tests the feature flag cascade invariant:
- * stableBalanceEnabled can only be true when nonCustodialEnabled is also true.
+ * stableBalanceEnabled can only be true when the console turns nonCustodialEnabled on.
  *
  * This mirrors the derivation logic in feature-flags-context.tsx:
- *   stableBalanceEnabled: nonCustodialEnabled && stableBalanceEnabled
+ *   stableBalanceEnabled:
+ *     isNonCustodialFlagSettled && nonCustodialEnabled && stableBalanceEnabled
  */
 
 type RemoteFlags = {
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
+  isNonCustodialFlagSettled?: boolean
 }
 
-const deriveFlags = (remote: RemoteFlags) => ({
+const deriveFlags = ({ isNonCustodialFlagSettled = true, ...remote }: RemoteFlags) => ({
   nonCustodialEnabled: remote.nonCustodialEnabled,
-  stableBalanceEnabled: remote.nonCustodialEnabled && remote.stableBalanceEnabled,
+  stableBalanceEnabled:
+    isNonCustodialFlagSettled &&
+    remote.nonCustodialEnabled &&
+    remote.stableBalanceEnabled,
 })
 
 describe("feature flag cascade", () => {
@@ -41,5 +46,16 @@ describe("feature flag cascade", () => {
 
     expect(flags.stableBalanceEnabled).toBe(false)
     expect(flags.nonCustodialEnabled).toBe(false)
+  })
+
+  it("stableBalanceEnabled is false while only the shipped default turns nonCustodialEnabled on", () => {
+    const flags = deriveFlags({
+      nonCustodialEnabled: true,
+      stableBalanceEnabled: true,
+      isNonCustodialFlagSettled: false,
+    })
+
+    expect(flags.stableBalanceEnabled).toBe(false)
+    expect(flags.nonCustodialEnabled).toBe(true)
   })
 })

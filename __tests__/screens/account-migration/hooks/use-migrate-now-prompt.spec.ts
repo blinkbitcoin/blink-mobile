@@ -7,7 +7,11 @@ import {
 import { WindDown, WindDownStatus } from "@app/types/wind-down"
 import { AccountType } from "@app/types/wallet"
 
-let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+let mockFeatureFlags = {
+  nonCustodialEnabled: true,
+  remoteConfigReady: true,
+  isNonCustodialFlagSettled: true,
+}
 
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
@@ -49,7 +53,11 @@ jest.mock("@app/screens/account-migration/hooks/use-wind-down-status", () => ({
 describe("useMigrateNowRemedy", () => {
   beforeEach(() => {
     jest.clearAllMocks()
-    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: true,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
     mockActiveAccount = { id: "custodial-1", type: AccountType.Custodial }
     mockStatus = WindDownStatus.ReceiveDisabled
     mockIsPending = false
@@ -67,7 +75,11 @@ describe("useMigrateNowRemedy", () => {
     expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
 
     mockStatus = WindDownStatus.ReceiveDisabled
-    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: false,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
     expect(renderHook(() => useMigrateNowRemedy()).result.current.isDue).toBe(false)
   })
 })
@@ -78,7 +90,11 @@ describe("useMigrateNowPrompt", () => {
     mockOwnerId = "custodial-1"
     mockStatus = WindDownStatus.ReceiveDisabled
     mockIsPending = false
-    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: true,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
   })
 
   it("reports the wind-down as pending while the server has not answered", () => {
@@ -175,7 +191,11 @@ describe("useMigrateNowPrompt", () => {
   })
 
   it("cannot reopen while the self-custodial flag is off, so the home falls back to a toast", () => {
-    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: false,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
 
     const { result } = renderHook(() => useMigrateNowPrompt())
 
