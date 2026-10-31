@@ -353,6 +353,10 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       started refusing the idempotency key on dollar sends and nothing went red, #4272).
       At minimum: dollar wallet to a Lightning address, bitcoin wallet to a Lightning
       address, and a bech32 LNURL, as first verified in #3765.
+- [ ] SDK bumps: LNURL-server wire compatibility. The SDK talks to Blink's own
+      `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
+      the SDK's `lnurl.rs` between the two tags, and run username register, availability
+      and restore against staging before merging (#4257).
 
 ### Feature flags / Remote Config
 
