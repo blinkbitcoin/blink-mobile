@@ -1,6 +1,8 @@
 import fs from "fs"
 import path from "path"
 
+import { it } from "@jest/globals"
+
 import en from "@app/i18n/en"
 
 const TRANSLATIONS_DIR = path.resolve(
