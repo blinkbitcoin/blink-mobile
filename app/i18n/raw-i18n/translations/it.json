@@ -4288,6 +4288,8 @@
         "hasFundsWarningTitle": "Attenzione",
         "hasFundsWarningBody": "Il tuo portafoglio ha un saldo di {balance}. Per la tua sicurezza, non consentiamo l'eliminazione di account con fondi.",
         "hasFundsWarningHelper": "Per procedere con l'eliminazione, svuota il tuo account o fai una donazione a economie circolari.",
-        "hasFundsWarningButton": "Indietro"
+        "hasFundsWarningButton": "Indietro",
+        "removalFailed": "Impossibile rimuovere l'account {identifier: string}. Riprova.",
+        "removalIncomplete": "Impossibile rimuovere completamente l'account {identifier: string}. Contatta {email: string} per assistenza."
     }
 }

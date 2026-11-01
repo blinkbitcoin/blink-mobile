@@ -260,16 +260,21 @@ describe("Delete", () => {
     expect(mockDeleteAccount).not.toHaveBeenCalled()
   })
 
-  /** A deletion in flight cannot be backed out of half-way, so every exit is taken away
-   *  for as long as it runs. */
-  it("takes the back button and the swipe gesture away while the deletion runs", async () => {
+  /** A deletion in flight cannot be backed out of half-way. The lock takes every exit
+   *  away for as long as it runs (pinned in account-delete-context.spec), so it has to be
+   *  up before the mutation starts. */
+  it("raises the lock before the deletion runs", async () => {
+    let lockedWhenMutationStarted = false
+    mockDeleteAccount.mockImplementation(async () => {
+      lockedWhenMutationStarted = mockSetAccountIsBeingDeleted.mock.calls.some(
+        ([isBeingDeleted]) => isBeingDeleted === true,
+      )
+      return { data: { accountDelete: { success: true, errors: [] } } }
+    })
     await openDeletionModal()
     await confirmDeletion()
 
-    const [hideOptions] = mockSetOptions.mock.calls[0]
-    expect(hideOptions.gestureEnabled).toBe(false)
-    expect(hideOptions.headerLeft()).toBeNull()
-    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true)
+    expect(lockedWhenMutationStarted).toBe(true)
   })
 
   describe("when the deletion succeeds", () => {
@@ -396,8 +401,8 @@ describe("Delete", () => {
       })
     })
 
-    /** The deletion hid the back button and the swipe gesture; a deletion that did not
-     *  happen has to give them back or the user is stuck on a dead screen. */
+    /** The lock took every way off the screen away; a deletion that did not happen has
+     *  to release it or the user is stuck on a dead screen. */
     it("gives the user their way off the screen back", async () => {
       mockDeleteAccount.mockResolvedValue({
         data: { accountDelete: { success: false, errors: [] } },
@@ -405,10 +410,6 @@ describe("Delete", () => {
       await openDeletionModal()
       await confirmDeletion()
 
-      expect(mockSetOptions).toHaveBeenLastCalledWith({
-        headerLeft: undefined,
-        gestureEnabled: true,
-      })
       expect(mockSetAccountIsBeingDeleted).toHaveBeenLastCalledWith(false)
     })
   })
@@ -433,10 +434,6 @@ describe("Delete", () => {
       await openDeletionModal()
       await confirmDeletion()
 
-      expect(mockSetOptions).toHaveBeenLastCalledWith({
-        headerLeft: undefined,
-        gestureEnabled: true,
-      })
       expect(mockSetAccountIsBeingDeleted).toHaveBeenLastCalledWith(false)
     })
   })

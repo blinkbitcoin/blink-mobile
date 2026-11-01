@@ -1,4 +1,4 @@
-import { useCallback, useState } from "react"
+import { useCallback } from "react"
 
 import { Network } from "@breeztech/breez-sdk-spark-react-native"
 import RNFS from "react-native-fs"
@@ -31,8 +31,7 @@ import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-type DeleteState = "idle" | "deleting" | "error"
-
+/** Where the active account ended up. `remained` means it was not the one removed. */
 export type DeleteAccountOutcome =
   | "remained"
   | "switched-to-self-custodial"
@@ -42,10 +41,14 @@ export type DeleteAccountOutcome =
    *  an answer, so this one may not land on the screen that opens a new account. */
   | "logged-out-locked"
 
-type DeleteAccountResult = {
-  state: DeleteState
-  error: Error | null
-  deleteWallet: (accountId: string) => Promise<DeleteAccountOutcome | undefined>
+/** The switch happens before anything that can fail, so a failed removal still reports
+ *  it: the caller has to follow the switch either way, or leave the user on a screen that
+ *  already describes the next account. `logged-out` vs `logged-out-locked` is the one
+ *  part that is only known once the wipe has tried to drop the lock, so a failure of the
+ *  last account reports `logged-out-locked`: the lock was not taken. */
+export type DeleteAccountResult = {
+  removed: boolean
+  outcome: DeleteAccountOutcome
 }
 
 /**
@@ -129,30 +132,53 @@ export const eraseWalletFromDevice = async (
   }
 }
 
-export const useDeleteAccount = (): DeleteAccountResult => {
+/** Known before the wipe. The last account starts as `logged-out-locked`: the lock is
+ *  still standing until the wipe itself takes it. */
+const outcomeOf = ({
+  isActive,
+  hasRemainingSelfCustodial,
+  hasCustodialAccount,
+}: {
+  isActive: boolean
+  hasRemainingSelfCustodial: boolean
+  hasCustodialAccount: boolean
+}): DeleteAccountOutcome => {
+  if (!isActive) return "remained"
+  if (hasRemainingSelfCustodial) return "switched-to-self-custodial"
+  if (hasCustodialAccount) return "switched-to-custodial"
+  return "logged-out-locked"
+}
+
+type UseDeleteAccountResult = {
+  deleteWallet: (accountId: string) => Promise<DeleteAccountResult>
+}
+
+export const useDeleteAccount = (): UseDeleteAccountResult => {
   const { sdk } = useSelfCustodialWallet()
   const { accounts, activeAccount, setActiveAccountId, reloadSelfCustodialAccounts } =
     useAccountRegistry()
   const { updateState, clearToken } = usePersistentStateContext()
   const hasCustodialAccount = useHasCustodialAccount()
 
-  const [state, setState] = useState<DeleteState>("idle")
-  const [error, setError] = useState<Error | null>(null)
   const network = useSparkNetwork()
 
   const deleteWallet = useCallback(
-    async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
-      setState("deleting")
-      setError(null)
+    async (accountId: string): Promise<DeleteAccountResult> => {
+      const isActive =
+        activeAccount?.type === AccountType.SelfCustodial &&
+        activeAccount.id === accountId
+
+      const remainingSelfCustodial = accounts.find(
+        (a) => a.type === AccountType.SelfCustodial && a.id !== accountId,
+      )
+
+      let outcome = outcomeOf({
+        isActive,
+        hasRemainingSelfCustodial: Boolean(remainingSelfCustodial),
+        hasCustodialAccount,
+      })
+
       try {
-        const isActive =
-          activeAccount?.type === AccountType.SelfCustodial &&
-          activeAccount.id === accountId
-
-        const remainingSelfCustodial = accounts.find(
-          (a) => a.type === AccountType.SelfCustodial && a.id !== accountId,
-        )
-
         /**
          * Switch the active account before disconnecting the SDK so
          * useSdkLifecycle tears down via its own effect cleanup. Disconnecting
@@ -233,21 +259,15 @@ export const useDeleteAccount = (): DeleteAccountResult => {
               )
             }
           }
+
+          if (!isAppLockKept) outcome = "logged-out"
         }
 
-        setState("idle")
-
-        if (!isActive) return "remained"
-        if (remainingSelfCustodial) return "switched-to-self-custodial"
-        if (hasCustodialAccount) return "switched-to-custodial"
-
-        return isAppLockKept ? "logged-out-locked" : "logged-out"
+        return { removed: true, outcome }
       } catch (err) {
         const wrapped = err instanceof Error ? err : new Error(String(err))
         reportError("Self-custodial wallet delete", wrapped)
-        setState("error")
-        setError(wrapped)
-        return undefined
+        return { removed: false, outcome }
       }
     },
     [
@@ -263,5 +283,5 @@ export const useDeleteAccount = (): DeleteAccountResult => {
     ],
   )
 
-  return { state, error, deleteWallet }
+  return { deleteWallet }
 }

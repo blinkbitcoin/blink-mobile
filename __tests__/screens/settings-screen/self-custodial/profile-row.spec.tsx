@@ -58,16 +58,6 @@ jest.mock("@rn-vui/themed", () => {
           React.createElement("Text", props, children),
       },
     ),
-    Overlay: ({
-      children,
-      isVisible,
-    }: {
-      children: React.ReactNode
-      isVisible: boolean
-    }) =>
-      isVisible
-        ? React.createElement("Overlay", { testID: "delete-overlay" }, children)
-        : null,
   }
 })
 
@@ -75,6 +65,7 @@ const lastConfirmModalProps: {
   isVisible?: boolean
   onClose?: () => void
   onConfirm?: () => void | Promise<void>
+  onModalHide?: () => void | Promise<void>
 } = {}
 jest.mock(
   "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal",
@@ -85,10 +76,12 @@ jest.mock(
         isVisible: boolean
         onClose: () => void
         onConfirm: () => void | Promise<void>
+        onModalHide?: () => void | Promise<void>
       }) => {
         lastConfirmModalProps.isVisible = props.isVisible
         lastConfirmModalProps.onClose = props.onClose
         lastConfirmModalProps.onConfirm = props.onConfirm
+        lastConfirmModalProps.onModalHide = props.onModalHide
         return props.isVisible
           ? ReactActual.createElement("View", { testID: "delete-modal" })
           : null
@@ -142,8 +135,23 @@ jest.mock("@app/components/atomic/galoy-icon-button/galoy-icon-button", () => {
 })
 
 const mockNavigate = jest.fn()
+const mockPopTo = jest.fn()
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({
+    navigate: mockNavigate,
+    dispatch: jest.fn(),
+    popTo: mockPopTo,
+    setOptions: jest.fn(),
+  }),
+  CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
+}))
+
+const mockSetAccountIsBeingDeleted = jest.fn()
+jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
+  useAccountDeleteContext: () => ({
+    setAccountIsBeingDeleted: mockSetAccountIsBeingDeleted,
+    leaveWhileDeleting: (navigate: () => void) => navigate(),
+  }),
 }))
 
 const mockToastShow = jest.fn()
@@ -187,7 +195,9 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: jest.fn(),
 }))
 
-const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
+const mockDeleteWallet = jest
+  .fn()
+  .mockResolvedValue({ removed: false, outcome: "remained" })
 const mockUseDeleteAccount = jest.fn()
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
   useDeleteAccount: () => mockUseDeleteAccount(),
@@ -201,9 +211,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
       },
       ProfileScreen: {
         switchAccount: () => "Switched accounts",
+        removedAccount: ({ identifier }: { identifier: string }) =>
+          `You removed account ${identifier}.`,
+      },
+      SelfCustodialDelete: {
+        removalFailed: ({ identifier }: { identifier: string }) =>
+          `Couldn't remove account ${identifier}. Please try again.`,
       },
       AccountScreen: {
-        pleaseWait: () => "Please wait",
         probeBalanceFailed: () => "Couldn't verify the wallet's balance.",
       },
       common: {
@@ -223,10 +238,7 @@ describe("ProfileRow", () => {
     lastWarningModalProps.isVisible = undefined
     mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: null, wallets: [] })
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
-    mockUseDeleteAccount.mockReturnValue({
-      state: "idle",
-      deleteWallet: mockDeleteWallet,
-    })
+    mockUseDeleteAccount.mockReturnValue({ deleteWallet: mockDeleteWallet })
     mockUseAccountRegistry.mockReturnValue({
       activeAccount: {
         id: "current-custodial-id",
@@ -269,7 +281,8 @@ describe("ProfileRow", () => {
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({ type: "success", message: "Switched accounts" }),
     )
-    expect(mockNavigate).toHaveBeenCalledWith("Primary")
+    expect(mockPopTo).toHaveBeenCalledWith("Primary")
+    expect(mockNavigate).not.toHaveBeenCalled()
   })
 
   it("does not switch when the entry is the active self-custodial account", () => {
@@ -314,7 +327,7 @@ describe("ProfileRow", () => {
     expect(mockDeleteWallet).not.toHaveBeenCalled()
   })
 
-  it("calls deleteWallet with the entry id and closes the modal when the user confirms", async () => {
+  it("closes the modal on confirm but waits for it to finish hiding before removing", async () => {
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
     const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
     const { getByTestId, queryByTestId, findByTestId, rerender } = render(
@@ -328,9 +341,50 @@ describe("ProfileRow", () => {
     })
     rerender(<ProfileRow entry={entry} />)
 
+    expect(queryByTestId("delete-modal")).toBeNull()
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_ENTRY_ID)
-    expect(queryByTestId("delete-modal")).toBeNull()
+  })
+
+  it("does not remove anything when the modal hides after a cancel", async () => {
+    const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
+    const { getByTestId, findByTestId } = render(<ProfileRow entry={entry} />)
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    act(() => lastConfirmModalProps.onClose?.())
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+    expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalled()
+  })
+
+  /** A confirm whose hide never reported leaves the removal waiting; the next cancel must
+   *  drop it, or that cancel's hide would remove the account the user just declined. */
+  it("drops a confirmed removal whose hide never came once the user cancels", async () => {
+    const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
+    const { getByTestId, findByTestId } = render(<ProfileRow entry={entry} />)
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+    act(() => lastConfirmModalProps.onClose?.())
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+    expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalled()
   })
 
   it("opens the has-funds warning on mainnet when the probe returns a positive balance", async () => {
@@ -546,17 +600,60 @@ describe("ProfileRow", () => {
     expect(queryByTestId(`probe-spinner-${TEST_ENTRY_ID}`)).toBeNull()
   })
 
-  it("renders the deleting overlay when the delete hook is in deleting state", () => {
-    mockUseDeleteAccount.mockReturnValue({
-      state: "deleting",
-      deleteWallet: mockDeleteWallet,
+  it("names the removed account, not the one the row describes once the delete has switched away", async () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.Available,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "alice@breez.tips",
+      wallets: [],
+    })
+    const entry = { id: TEST_ENTRY_ID, lightningAddress: null }
+    const { getByTestId, findByTestId, rerender } = render(<ProfileRow entry={entry} />)
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
     })
 
-    const { getByTestId } = render(
-      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
-    )
+    // The delete hook switches the active account first, so from here on the
+    // row stops reading the live address and falls back to "Anon user".
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: "next-account-id",
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.Available,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "satoshin21@breez.tips",
+      wallets: [],
+    })
+    rerender(<ProfileRow entry={entry} />)
+    mockDeleteWallet.mockResolvedValueOnce({
+      removed: true,
+      outcome: "switched-to-self-custodial",
+    })
 
-    expect(getByTestId("delete-overlay")).toBeTruthy()
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "alice")
+    expect(mockToastShow).toHaveBeenCalledWith(
+      expect.objectContaining({ message: "You removed account alice." }),
+    )
   })
 
   it("prefers the live lightning address from the SDK when the row is active", () => {
@@ -602,7 +699,7 @@ describe("ProfileRow", () => {
   it("returns through the gate when the deletion left the lock standing", async () => {
     mockNetwork = mockSparkNetwork.Mainnet
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
-    mockDeleteWallet.mockResolvedValue("logged-out-locked")
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "logged-out-locked" })
 
     const { getByTestId, findByTestId } = render(
       <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
@@ -612,6 +709,9 @@ describe("ProfileRow", () => {
 
     await act(async () => {
       await lastConfirmModalProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
     })
 
     expect(mockRouteAfterLogout).toHaveBeenCalledWith(true)
@@ -623,7 +723,7 @@ describe("ProfileRow", () => {
   it("lowers the lock flag when the deletion took the lock with it", async () => {
     mockNetwork = mockSparkNetwork.Mainnet
     mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
-    mockDeleteWallet.mockResolvedValue("logged-out")
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "logged-out" })
 
     const { getByTestId, findByTestId } = render(
       <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
@@ -633,6 +733,9 @@ describe("ProfileRow", () => {
 
     await act(async () => {
       await lastConfirmModalProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
     })
 
     expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)

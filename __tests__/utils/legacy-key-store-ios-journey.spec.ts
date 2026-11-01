@@ -220,10 +220,11 @@ const logout = () => {
 
 const deleteLastWallet = async () => {
   const { result } = renderHook(() => useDeleteAccount())
-  let outcome: Awaited<ReturnType<typeof result.current.deleteWallet>>
+  let outcome: Awaited<ReturnType<typeof result.current.deleteWallet>> | undefined
   await act(async () => {
     outcome = await result.current.deleteWallet(WALLET_ID)
   })
+  if (!outcome) throw new Error("deleteWallet did not return")
   return outcome
 }
 
@@ -328,7 +329,7 @@ describe("the last wallet's deletion on the iOS legacy keychain", () => {
 
     const outcome = await deleteLastWallet()
 
-    expect(outcome).toBe("logged-out-locked")
+    expect(outcome).toEqual({ removed: true, outcome: "logged-out-locked" })
     expect(await listedWalletIds()).toEqual([])
     expect(mockLegacyKeychain.items.has(SESSIONS_KEY)).toBe(true)
     expect(await KeyStoreWrapper.getPin()).toBe(PIN)
@@ -339,7 +340,7 @@ describe("the last wallet's deletion on the iOS legacy keychain", () => {
 
     const outcome = await deleteLastWallet()
 
-    expect(outcome).toBe("logged-out")
+    expect(outcome).toEqual({ removed: true, outcome: "logged-out" })
     expect(await KeyStoreWrapper.getPin()).toBeNull()
   })
 })

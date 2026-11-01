@@ -1,4 +1,4 @@
-import { useState } from "react"
+import React, { useState } from "react"
 import { View, TouchableOpacity } from "react-native"
 
 import { Text, makeStyles } from "@rn-vui/themed"

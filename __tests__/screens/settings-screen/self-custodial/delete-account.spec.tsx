@@ -10,9 +10,24 @@ import { DeleteAccount } from "@app/screens/settings-screen/self-custodial/delet
 const TEST_SC_ACCOUNT_ID = "test-self-custodial-uuid"
 
 jest.mock("@react-navigation/native", () => ({
-  useNavigation: () => ({ dispatch: jest.fn(), navigate: jest.fn() }),
+  useNavigation: () => ({
+    dispatch: jest.fn(),
+    navigate: jest.fn(),
+    popTo: jest.fn(),
+    setOptions: jest.fn(),
+  }),
   CommonActions: { reset: (args: unknown) => ({ type: "reset", payload: args }) },
 }))
+
+const mockSetAccountIsBeingDeleted = jest.fn()
+jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
+  useAccountDeleteContext: () => ({
+    setAccountIsBeingDeleted: mockSetAccountIsBeingDeleted,
+    leaveWhileDeleting: (navigate: () => void) => navigate(),
+  }),
+}))
+
+jest.mock("@app/utils/toast", () => ({ toastShow: jest.fn() }))
 
 jest.mock("@rn-vui/themed", () => {
   const colors: Record<string, string> = {
@@ -34,16 +49,6 @@ jest.mock("@rn-vui/themed", () => {
         fn({ colors }, params),
     Text: ({ children, ...props }: { children: React.ReactNode }) =>
       React.createElement("Text", props, children),
-    Overlay: ({
-      isVisible,
-      children,
-    }: {
-      isVisible: boolean
-      children: React.ReactNode
-    }) =>
-      isVisible
-        ? React.createElement("View", { testID: "deleting-overlay" }, children)
-        : null,
     useTheme: () => ({ theme: { colors, mode: "light" } }),
   }
 })
@@ -89,6 +94,7 @@ const lastConfirmProps: {
   isVisible?: boolean
   onClose?: () => void
   onConfirm?: () => void | Promise<void>
+  onModalHide?: () => void | Promise<void>
 } = {}
 jest.mock(
   "@app/screens/settings-screen/self-custodial/delete-account-confirm-modal",
@@ -97,10 +103,12 @@ jest.mock(
       isVisible: boolean
       onClose: () => void
       onConfirm: () => void | Promise<void>
+      onModalHide?: () => void | Promise<void>
     }) => {
       lastConfirmProps.isVisible = props.isVisible
       lastConfirmProps.onClose = props.onClose
       lastConfirmProps.onConfirm = props.onConfirm
+      lastConfirmProps.onModalHide = props.onModalHide
       return props.isVisible
         ? React.createElement("View", { testID: "confirm-modal" })
         : null
@@ -108,13 +116,11 @@ jest.mock(
   }),
 )
 
-const mockDeleteWallet = jest.fn().mockResolvedValue(undefined)
+const mockDeleteWallet = jest
+  .fn()
+  .mockResolvedValue({ removed: false, outcome: "remained" })
 jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
-  useDeleteAccount: () => ({
-    state: "idle",
-    error: null,
-    deleteWallet: mockDeleteWallet,
-  }),
+  useDeleteAccount: () => ({ deleteWallet: mockDeleteWallet }),
 }))
 
 const mockUseSelfCustodialWallet = jest.fn()
@@ -152,14 +158,23 @@ jest.mock("@app/hooks/use-account-registry", () => ({
       selected: true,
       status: AccountStatus.RequiresRestore,
     },
+    selfCustodialEntries: [
+      { id: TEST_SC_ACCOUNT_ID, lightningAddress: "persisted@breez.tips" },
+    ],
   }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
-      AccountScreen: { pleaseWait: () => "Please wait" },
+      ProfileScreen: {
+        removedAccount: ({ identifier }: { identifier: string }) =>
+          `You removed account ${identifier}.`,
+      },
+      common: { anonymousUser: () => "Anon user" },
       SelfCustodialDelete: {
+        removalFailed: ({ identifier }: { identifier: string }) =>
+          `Couldn't remove account ${identifier}. Please try again.`,
         dangerZoneImportantTitle: () => "Important",
         dangerZoneBulletReinstated: () => "Deleted account cannot be reinstated",
         dangerZoneBulletPermanent: () => "Account deletion is permanent",
@@ -260,7 +275,7 @@ describe("DeleteAccount", () => {
     expect(queryByTestId("warning-modal")).toBeNull()
   })
 
-  it("confirm onConfirm calls deleteWallet and closes the modal", async () => {
+  it("confirm closes the modal and removes the account once the modal has hidden", async () => {
     mockUseSelfCustodialWallet.mockReturnValue({
       wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
     })
@@ -273,9 +288,75 @@ describe("DeleteAccount", () => {
     })
     rerender(<DeleteAccount />)
 
+    expect(queryByTestId("confirm-modal")).toBeNull()
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
     expect(mockDeleteWallet).toHaveBeenCalledTimes(1)
     expect(mockDeleteWallet).toHaveBeenCalledWith(TEST_SC_ACCOUNT_ID)
-    expect(queryByTestId("confirm-modal")).toBeNull()
+  })
+
+  it("drops a confirmed removal whose hide never came once the user cancels", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+    })
+    const { getByTestId } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
+    act(() => lastConfirmProps.onClose?.())
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
+    expect(mockDeleteWallet).not.toHaveBeenCalled()
+  })
+
+  it("locks the screen under the removed account's name, read before the switch", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "alice@breez.tips",
+      wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+    })
+
+    const { getByTestId, rerender } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
+
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: "satoshin21@breez.tips",
+      wallets: [],
+    })
+    rerender(<DeleteAccount />)
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "alice")
+  })
+
+  it("names the account from its persisted address while the live one has not loaded", async () => {
+    mockUseSelfCustodialWallet.mockReturnValue({
+      lightningAddress: null,
+      wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
+    })
+
+    const { getByTestId } = render(<DeleteAccount />)
+    fireEvent.press(getByTestId("danger-zone-delete-button"))
+    await act(async () => {
+      await lastConfirmProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
+    })
+
+    expect(mockSetAccountIsBeingDeleted).toHaveBeenCalledWith(true, "persisted")
   })
 
   /** A lock the wipe could not take is still owed an answer, so this one may not land on
@@ -284,13 +365,16 @@ describe("DeleteAccount", () => {
     mockUseSelfCustodialWallet.mockReturnValue({
       wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
     })
-    mockDeleteWallet.mockResolvedValue("logged-out-locked")
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "logged-out-locked" })
 
     const { getByTestId } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
     await act(async () => {
       await lastConfirmProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
     })
 
     expect(mockRouteAfterLogout).toHaveBeenCalledWith(true)
@@ -303,13 +387,16 @@ describe("DeleteAccount", () => {
     mockUseSelfCustodialWallet.mockReturnValue({
       wallets: [emptyWallet("btc", "BTC"), emptyWallet("usd", "USD")],
     })
-    mockDeleteWallet.mockResolvedValue("logged-out")
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "logged-out" })
 
     const { getByTestId } = render(<DeleteAccount />)
     fireEvent.press(getByTestId("danger-zone-delete-button"))
 
     await act(async () => {
       await lastConfirmProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmProps.onModalHide?.()
     })
 
     expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)

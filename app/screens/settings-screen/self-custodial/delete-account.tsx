@@ -1,17 +1,12 @@
 import React, { useState } from "react"
-import { ActivityIndicator, View } from "react-native"
+import { View } from "react-native"
 
-import { useNavigation } from "@react-navigation/native"
-import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
-import { makeStyles, Overlay, Text, useTheme } from "@rn-vui/themed"
+import { makeStyles } from "@rn-vui/themed"
 
 import { InfoCard } from "@app/components/card-screen"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
-import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import { isRegtestNetwork } from "@app/self-custodial/config"
-import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { AccountType } from "@app/types/wallet"
@@ -20,21 +15,17 @@ import { testProps } from "@app/utils/testProps"
 
 import { SettingsButton } from "../button"
 
+import { selfCustodialAccountName } from "./account-name"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
 import { DeleteAccountHasFundsModal } from "./delete-account-has-funds-modal"
-import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
+import { useAccountRemoval } from "./use-account-removal"
 
 export const DeleteAccount: React.FC = () => {
   const styles = useStyles()
-  const {
-    theme: { colors },
-  } = useTheme()
   const { LL } = useI18nContext()
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
-  const { activeAccount } = useAccountRegistry()
-  const { state, deleteWallet } = useDeleteAccount()
-  const { routeAfterLogout } = useLogoutAndRoute()
-  const { wallets } = useSelfCustodialWallet()
+  const { activeAccount, selfCustodialEntries } = useAccountRegistry()
+  const { requestRemoval, cancelRemoval, runPendingRemoval } = useAccountRemoval()
+  const { wallets, lightningAddress } = useSelfCustodialWallet()
   const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -48,11 +39,18 @@ export const DeleteAccount: React.FC = () => {
     setConfirmVisible(true)
   }
 
-  const handleConfirm = async () => {
+  const handleConfirm = () => {
     if (activeAccount?.type !== AccountType.SelfCustodial) return
+    const identifier = selfCustodialAccountName({
+      isActive: true,
+      liveLightningAddress: lightningAddress,
+      persistedLightningAddress: selfCustodialEntries.find(
+        (entry) => entry.id === activeAccount.id,
+      )?.lightningAddress,
+      anonymousName: LL.common.anonymousUser(),
+    })
+    requestRemoval(activeAccount.id, identifier)
     setConfirmVisible(false)
-    const outcome = await deleteWallet(activeAccount.id)
-    if (outcome) navigateAfterAccountDelete(navigation, routeAfterLogout, outcome)
   }
 
   const bulletItems = [
@@ -76,11 +74,6 @@ export const DeleteAccount: React.FC = () => {
         {...testProps("self-custodial-danger-zone-delete-button")}
       />
 
-      <Overlay isVisible={state === "deleting"} overlayStyle={styles.overlayStyle}>
-        <ActivityIndicator size={50} color={colors.primary} />
-        <Text>{LL.AccountScreen.pleaseWait()}</Text>
-      </Overlay>
-
       <DeleteAccountHasFundsModal
         isVisible={warningVisible}
         onClose={() => setWarningVisible(false)}
@@ -89,8 +82,12 @@ export const DeleteAccount: React.FC = () => {
 
       <DeleteAccountConfirmModal
         isVisible={confirmVisible}
-        onClose={() => setConfirmVisible(false)}
+        onClose={() => {
+          cancelRemoval()
+          setConfirmVisible(false)
+        }}
         onConfirm={handleConfirm}
+        onModalHide={runPendingRemoval}
       />
     </View>
   )
@@ -101,9 +98,5 @@ const useStyles = makeStyles(() => ({
     flexDirection: "column",
     rowGap: 18,
     marginTop: 8,
-  },
-  overlayStyle: {
-    backgroundColor: "transparent",
-    shadowColor: "transparent",
   },
 }))

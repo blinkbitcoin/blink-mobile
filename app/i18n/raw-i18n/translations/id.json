@@ -4288,6 +4288,8 @@
     "hasFundsWarningTitle": "Peringatan",
     "hasFundsWarningBody": "Dompet Anda memiliki saldo {balance}. Demi keamanan Anda, kami tidak mengizinkan penghapusan akun yang masih memiliki dana.",
     "hasFundsWarningHelper": "Untuk melanjutkan penghapusan, kosongkan akun Anda atau donasikan ke ekonomi sirkular.",
-    "hasFundsWarningButton": "Kembali"
+    "hasFundsWarningButton": "Kembali",
+    "removalFailed": "Tidak dapat menghapus akun {identifier: string}. Silakan coba lagi.",
+    "removalIncomplete": "Tidak dapat menghapus akun {identifier: string} sepenuhnya. Hubungi {email: string} untuk bantuan."
   }
 }

@@ -7,6 +7,10 @@ import { type DeleteAccountOutcome } from "@app/self-custodial/hooks/use-delete-
 /**
  * Where a self-custodial delete lands, in one place for every screen that deletes.
  *
+ * Every outcome takes the removed account's screen off the stack. Its lock stays up
+ * while it leaves, so a screen left underneath would keep that lock: a dead screen to
+ * come back to, with the header back control hidden and the swipe off.
+ *
  * Both ends of the session go through the shared logout route, which owns the lock flag: a
  * lock the wipe could not take is owed an answer and returns to the gate, and one the wipe
  * did take has to lower the flag with it, or a relock raised mid-delete would park every
@@ -25,7 +29,8 @@ export const navigateAfterAccountDelete = (
       routeAfterLogout(true)
       return
     case "switched-to-self-custodial":
-      navigation.navigate("Primary")
+      /** `navigate` would push a second Primary and leave the locked screen underneath. */
+      navigation.popTo("Primary")
       return
     case "remained":
     case "switched-to-custodial":

@@ -4288,6 +4288,8 @@
     "hasFundsWarningTitle": "Προσοχή",
     "hasFundsWarningBody": "Το πορτοφόλι σου έχει υπόλοιπο {balance}. Για την ασφάλειά σου, δεν επιτρέπουμε τη διαγραφή λογαριασμών με κεφάλαια.",
     "hasFundsWarningHelper": "Για να συνεχίσεις με τη διαγραφή, άδειασε τον λογαριασμό σου ή δώρισε σε κυκλικές οικονομίες.",
-    "hasFundsWarningButton": "Πίσω"
+    "hasFundsWarningButton": "Πίσω",
+    "removalFailed": "Δεν ήταν δυνατή η αφαίρεση του λογαριασμού {identifier: string}. Προσπαθήστε ξανά.",
+    "removalIncomplete": "Δεν ήταν δυνατή η πλήρης αφαίρεση του λογαριασμού {identifier: string}. Επικοινωνήστε με {email: string} για βοήθεια."
   }
 }

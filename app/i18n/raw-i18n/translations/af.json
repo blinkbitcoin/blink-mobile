@@ -4288,6 +4288,8 @@
     "hasFundsWarningTitle": "Waarskuwing",
     "hasFundsWarningBody": "Jou beursie het 'n saldo van {balance}. Vir jou veiligheid laat ons nie die verwydering van rekeninge met fondse toe nie.",
     "hasFundsWarningHelper": "Om voort te gaan met verwydering, maak jou rekening leeg of skenk aan sirkulêre ekonomieë.",
-    "hasFundsWarningButton": "Gaan terug"
+    "hasFundsWarningButton": "Gaan terug",
+    "removalFailed": "Kon nie rekening {identifier: string} verwyder nie. Probeer weer.",
+    "removalIncomplete": "Kon nie rekening {identifier: string} heeltemal verwyder nie. Kontak {email: string} vir hulp."
   }
 }

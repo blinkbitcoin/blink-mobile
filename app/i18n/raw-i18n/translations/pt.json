@@ -4288,6 +4288,8 @@
         "hasFundsWarningTitle": "Atenção",
         "hasFundsWarningBody": "Sua carteira tem um saldo de {balance}. Para sua segurança, não permitimos a exclusão de contas com fundos.",
         "hasFundsWarningHelper": "Para prosseguir com a exclusão, esvazie sua conta ou faça uma doação a economias circulares.",
-        "hasFundsWarningButton": "Voltar"
+        "hasFundsWarningButton": "Voltar",
+        "removalFailed": "Não foi possível remover a conta {identifier: string}. Tente novamente.",
+        "removalIncomplete": "Não foi possível remover completamente a conta {identifier: string}. Entre em contato com {email: string} para obter ajuda."
     }
 }
