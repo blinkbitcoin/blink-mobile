@@ -18,6 +18,14 @@ const UNLOCK_ROUTE_NAMES = [
 export type UnlockRouteName = (typeof UNLOCK_ROUTE_NAMES)[number]
 
 /**
+ * Where every launch starts: the gate, with an account or without. The landing screen can
+ * open a new account with no credentials and lists every wallet the device stores, so no
+ * launch may open on it ahead of a lock that could still be set. The gate hands a device
+ * with nothing to unlock on to it.
+ */
+export const LAUNCH_ROUTE = "authenticationCheck" satisfies UnlockRouteName
+
+/**
  * Which `screenPurpose` means the route is unlocking, rather than one of the Settings jobs
  * that reuse the same screens to SET a PIN or turn biometrics on while the app is already
  * unlocked. Null is for the route that has no purpose to tell apart because unlocking is

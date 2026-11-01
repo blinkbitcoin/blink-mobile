@@ -46,6 +46,11 @@ jest.mock("@app/self-custodial/hooks/use-delete-account", () => ({
   useDeleteAccount: () => ({ deleteWallet: mockDeleteWallet }),
 }))
 
+const mockRouteAfterLogout = jest.fn()
+jest.mock("@app/hooks/use-logout-and-route", () => ({
+  useLogoutAndRoute: () => ({ routeAfterLogout: mockRouteAfterLogout }),
+}))
+
 const mockSetAccountIsBeingDeleted = jest.fn()
 const mockLeaveWhileDeleting = jest.fn((navigate: () => void) => navigate())
 jest.mock("@app/screens/settings-screen/account/account-delete-context", () => ({
@@ -166,10 +171,8 @@ describe("useAccountRemoval", () => {
     await act(() => result.current.runPendingRemoval())
 
     expect(mockLeaveWhileDeleting).toHaveBeenCalledTimes(1)
-    expect(mockDispatch).toHaveBeenCalledWith({
-      type: "reset",
-      payload: { index: 0, routes: [{ name: "getStarted" }] },
-    })
+    expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)
+    expect(mockDispatch).not.toHaveBeenCalled()
     expect(mockSetAccountIsBeingDeleted).not.toHaveBeenCalledWith(false)
     expect(mockToastShow).toHaveBeenCalledWith(
       expect.objectContaining({

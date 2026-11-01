@@ -1,3 +1,4 @@
+import { it } from "@jest/globals"
 import { renderHook, act, waitFor } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -89,7 +90,9 @@ jest.mock("@app/self-custodial/storage/onchain-address", () => ({
   saveIssuedOnchainAddress: async () => undefined,
 }))
 
+const mockLogBreadcrumb = jest.fn()
 jest.mock("@app/utils/error-reporting", () => ({
+  logBreadcrumb: (...args: unknown[]) => mockLogBreadcrumb(...args),
   recordAppError: (...args: unknown[]) => mockRecordAppError(...args),
 }))
 
@@ -322,4 +325,29 @@ describe("invoice generation failures", () => {
       }),
     )
   })
+
+  it.each([
+    ["rejects", () => mockReceiveLightning.mockRejectedValue(new Error("sdk down"))],
+    ["returns no invoice", () => mockReceiveLightning.mockResolvedValue({})],
+  ])(
+    "leaves the amount out of the breadcrumb when the adapter %s",
+    async (_label, fail) => {
+      const { result } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.state).toBe("Created")
+      })
+      fail()
+
+      act(() => {
+        result.current?.setAmount?.(btcAmount(1500))
+      })
+
+      await waitFor(() => {
+        expect(mockLogBreadcrumb).toHaveBeenCalledWith(
+          expect.stringContaining("hasAmount=true"),
+        )
+      })
+      expect(mockLogBreadcrumb).not.toHaveBeenCalledWith(expect.stringContaining("1500"))
+    },
+  )
 })

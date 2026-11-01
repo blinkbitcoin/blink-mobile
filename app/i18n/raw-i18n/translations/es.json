@@ -31,6 +31,8 @@
         "createError": "No se pudo crear la clave API. Inténtalo de nuevo.",
         "revokeError": "No se pudo revocar la clave API. Inténtalo de nuevo.",
         "loadError": "No se pudieron cargar tus claves API. Inténtalo más tarde.",
+        "discardSecretTitle": "¿Descartar esta clave API?",
+        "discardSecretBody": "Esta es la única vez que se muestra el secreto. Si sales ahora, la clave no se podrá recuperar y tendrás que crear una nueva.",
         "done": "Listo"
     },
     "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
         "skip": "Saltar",
         "unlock": "Desbloquear",
         "usePin": "Usar PIN",
-        "confirmLogout": "¿Está seguro de que desea cerrar sesión? Esto reiniciará su caché y todas las configuraciones de usuario locales."
+        "confirmLogout": "¿Está seguro de que desea cerrar sesión? Esto reiniciará su caché y todas las configuraciones de usuario locales.",
+        "forgotPin": "¿Olvidaste el PIN? Eliminar billeteras",
+        "removeWalletsTitle": "¿Eliminar las billeteras de este dispositivo?",
+        "removeWalletsBody": "Esto elimina todas las billeteras de este dispositivo y cierra tu sesión. Para recuperar una billetera, necesitas su frase de respaldo. Sin ella, la billetera se pierde.",
+        "removeWalletsConfirm": "Eliminar billeteras",
+        "removeWalletsFailed": "No se pudieron eliminar algunas billeteras. Inténtalo de nuevo."
     },
     "PeopleScreen": {
         "title": "Personas",
@@ -2175,16 +2182,19 @@
         "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
     },
     "PinScreen": {
+        "attemptUnrecorded": "No se ha podido registrar el intento de forma segura.",
+        "attemptsLeft": "Quedan {attemptsRemaining: string} intentos.",
         "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining: string} intentos.",
         "enterPin": "Introduzca su PIN",
-        "lockoutUnavailable": "No se ha podido registrar el intento fallido de forma segura. Cerrando sesión.",
+        "oneAttemptLeft": "Queda 1 intento.",
         "oneAttemptRemaining": "PIN incorrecto. Queda 1 intento.",
         "pinUnreadable": "No se ha podido comprobar su PIN. Inténtelo de nuevo.",
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
         "storePinFailed": "No se puede guardar su PIN.",
         "tooManyAttempts": "Ha superado el límite de intentos. Cerrando sesión.",
-        "tryAgainIn": "Inténtelo de nuevo en {seconds: number} s.",
+        "attemptBudgetSpent": "Ha superado el límite de intentos.",
+        "tryAgainIn": "Inténtelo de nuevo en {time: string}.",
         "verifyPin": "Verifique su PIN"
     },
     "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
         "problemPersists": "Si el problema persiste, comuníquese con el soporte técnico.",
         "fatalError": "Lo sentimos, parece que estamos teniendo problemas para cargar la aplicación por usted. Si los problemas persisten, comuníquese con el soporte técnico.",
         "showError": "Mostrar error",
-        "clearAppData": "Borrar datos de la aplicación y cerrar sesión"
+        "clearAppData": "Borrar datos de la aplicación y cerrar sesión",
+        "screenSecurityUnavailable": "Esta pantalla se mantiene oculta porque no se pudo activar la protección contra capturas de pantalla."
     },
     "notifications": {
         "payment": {
@@ -3840,20 +3851,28 @@
                 "testSuccess": "Tus frases de respaldo son correctas"
             }
         },
+        "BundleExport": {
+            "title": "Salida de emergencia",
+            "body": "Si Spark deja de funcionar, este paquete te permite mover tus bitcoins on-chain sin Blink. Tu saldo en dólares no se puede recuperar.",
+            "download": "Descargar paquete",
+            "sensitiveTitle": "Sensible",
+            "learnMore": "Más información sobre la salida unilateral",
+            "sensitiveConfirm": "Descargar",
+            "sensitiveBody": "Este archivo muestra tu saldo y tu historial de pagos, así que mantenlo privado. Para usarlo en una emergencia, también necesitas tu frase de recuperación."
+        },
         "CloudBackup": {
             "title": "Respaldemos tu billetera",
             "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
-            "encryptCheckbox": "Agregar frase de contraseña adicional",
-            "password": "Frase de contraseña",
+            "password": "Contraseña",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
-            "confirmPassword": "Confirmar frase de contraseña",
-            "confirmPasswordPlaceholder": "Ingresa la frase de contraseña de nuevo",
+            "confirmPassword": "Confirmar contraseña",
+            "confirmPasswordPlaceholder": "Ingresa la contraseña de nuevo",
             "continueButton": "Continuar",
             "importantTitle": "Importante",
-            "importantMessage": "Blink no almacena esta frase de contraseña. Si la pierdes, {bold} recuperar tu billetera.",
+            "importantMessage": "Blink no almacena esta contraseña. Si la pierdes, {bold} recuperar tu billetera.",
             "importantMessageBold": "no podremos",
             "passwordTooShort": "Mínimo 12 caracteres",
-            "passwordMismatch": "Las frases de contraseña no coinciden",
+            "passwordMismatch": "Las contraseñas no coinciden",
             "uploadSuccess": "Respaldo guardado en {provider}",
             "uploadFailed": "Error al subir el respaldo",
             "signInFailed": "No se pudo iniciar sesión en {provider}",
@@ -4037,12 +4056,18 @@
         "restore": "Restaurar billetera",
         "noBackupFound": "No se encontró respaldo",
         "noBackupDescription": "No pudimos encontrar un respaldo. Puedes ingresar tu frase de respaldo manualmente.",
-        "enterPassword": "Ingresa tu frase de contraseña de cifrado",
-        "wrongPassword": "Frase de contraseña incorrecta. Por favor intenta de nuevo.",
+        "enterPassword": "Ingresa tu contraseña de cifrado",
+        "wrongPassword": "Contraseña incorrecta. Por favor intenta de nuevo.",
         "pickBackupTitle": "Elige una cartera",
         "pickBackupDescription": "Selecciona una copia de seguridad para restaurar",
         "recognizePhraseTitle": "¿Reconoce esta frase de respaldo?",
         "recognizePhraseBody": "Nunca introduzca palabras que otra persona le haya enviado."
+    },
+    "EmergencyRecovery": {
+        "outageTitle": "Operador inaccesible",
+        "outageBody": "Spark está experimentando una interrupción. Espera un par de minutos e inténtalo de nuevo o contacta a nuestro {support}",
+        "outageSupport": "Soporte",
+        "tryAgainLater": "Intentar más tarde"
     },
     "BackupNudge": {
         "title": "Tus fondos están en riesgo",
@@ -4137,6 +4162,15 @@
         "title": "Esta es una cuenta no custodial",
         "body": "Para saber más, lee nuestra entrada del blog",
         "cta": "Leer"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Actualiza tu respaldo en la nube",
+        "body": "Tu paquete de emergencia en {provider} está desactualizado. Vuelve a respaldar tu billetera para actualizarlo.",
+        "cta": "Respaldar de nuevo"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Aún no hay paquete de emergencia. Se crea después de tu primera transacción.",
+        "exportFailed": "No se pudo descargar el paquete de emergencia."
     },
     "StableBalance": {
         "title": "Balance estable",

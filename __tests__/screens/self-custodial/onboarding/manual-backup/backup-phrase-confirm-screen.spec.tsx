@@ -6,6 +6,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseConfirmScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-confirm-screen"
+import { AccountType } from "@app/types/wallet"
 import { ContextForScreen } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
@@ -99,13 +100,10 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
-const mockEnableScreenSecurity = jest.fn()
-const mockDisableScreenSecurity = jest.fn()
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+const mockAcquireScreenSecurity = jest.fn()
 jest.mock("@app/utils/screen-security", () => ({
-  enableScreenSecurity: (...args: readonly unknown[]) =>
-    mockEnableScreenSecurity(...args),
-  disableScreenSecurity: (...args: readonly unknown[]) =>
-    mockDisableScreenSecurity(...args),
+  acquireScreenSecurity: () => mockAcquireScreenSecurity(),
 }))
 
 loadLocale("en")
@@ -117,8 +115,10 @@ describe("BackupPhraseConfirmScreen", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     jest.useFakeTimers({ doNotFake: ["setImmediate"] })
-    mockEnableScreenSecurity.mockResolvedValue(undefined)
-    mockDisableScreenSecurity.mockResolvedValue(undefined)
+    mockAcquireScreenSecurity.mockReturnValue({
+      ready: Promise.resolve(),
+      release: mockReleaseScreenSecurity,
+    })
     mockCheckpoint.mockReturnValue(null)
     mockMigrationAccountId.mockReturnValue("migration-uuid")
     mockCheckpointLoading.mockReturnValue(false)
@@ -269,6 +269,28 @@ describe("BackupPhraseConfirmScreen", () => {
 
       expect(mockReplace).not.toHaveBeenCalled()
       expect(mockReportError).not.toHaveBeenCalled()
+    })
+
+    /** The redirect must not wait for the screen guard: on a device where
+     *  registration keeps failing, the gated content never mounts, so a redirect
+     *  living behind the gate would leave the user stuck on the error view. */
+    it("redirects ahead of the gate, without acquiring screen protection", async () => {
+      mockRouteParams.mockReturnValue(undefined)
+      mockAcquireScreenSecurity.mockReturnValue({
+        // The guard never settles — the gate would sit on its spinner forever.
+        ready: new Promise(() => {}),
+        release: mockReleaseScreenSecurity,
+      })
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReplace).toHaveBeenCalledWith("selfCustodialBackupPhrase", { step: 1 })
+      expect(mockAcquireScreenSecurity).not.toHaveBeenCalled()
     })
   })
 
@@ -434,7 +456,13 @@ describe("BackupPhraseConfirmScreen", () => {
     expect(mockReportError).not.toHaveBeenCalled()
   })
 
-  it("routes to backup success screen with reBackup=true when re-backing-up from settings", async () => {
+  /** A re-backup was already offered the emergency bundle on its first run. */
+  it("sends a settings re-backup straight to success as a re-backup", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockCheckpoint.mockReturnValue("backupAlerts")
     mockBackupStateValue.mockReturnValue({
       backupState: { status: "completed", method: "manual" },
@@ -453,13 +481,20 @@ describe("BackupPhraseConfirmScreen", () => {
       jest.advanceTimersByTime(500)
     })
 
+    expect(mockReplace).not.toHaveBeenCalled()
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
       expect.objectContaining({ reBackup: true }),
     )
   })
 
-  it("routes to backup success screen with reBackup=false during fresh manual backup without checkpoint", async () => {
+  /** The emergency bundle is handed over from Settings only, never in the backup flow. */
+  it("routes a fresh manual backup without checkpoint straight to success", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockCheckpoint.mockReturnValue(null)
 
     const { getByPlaceholderText } = render(
@@ -509,7 +544,12 @@ describe("BackupPhraseConfirmScreen", () => {
     })
   })
 
-  it("forwards the route's successMessage to the success screen when provided", async () => {
+  it("forwards the route's successMessage to the success screen", async () => {
+    mockActiveWalletValue.mockReturnValue({
+      accountType: AccountType.SelfCustodial,
+      isSelfCustodial: true,
+      wallets: [{ id: "btc-1", balance: { amount: 1000 }, walletCurrency: "BTC" }],
+    })
     mockRouteParams.mockReturnValue({
       challenges: [
         { index: 0, word: "youth" },
@@ -517,10 +557,6 @@ describe("BackupPhraseConfirmScreen", () => {
         { index: 8, word: "harvest" },
       ],
       successMessage: "Your backup phrase is correct",
-    })
-    mockBackupStateValue.mockReturnValue({
-      backupState: { status: "completed", method: "manual" },
-      setBackupCompleted: mockSetBackupCompleted,
     })
 
     const { getByPlaceholderText } = render(
@@ -537,10 +573,7 @@ describe("BackupPhraseConfirmScreen", () => {
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "selfCustodialBackupSuccess",
-      expect.objectContaining({
-        reBackup: true,
-        message: "Your backup phrase is correct",
-      }),
+      expect.objectContaining({ message: "Your backup phrase is correct" }),
     )
   })
 
@@ -585,7 +618,7 @@ describe("BackupPhraseConfirmScreen", () => {
   /** The screen shows individual mnemonic words with their positions, so it must carry
    *  the same screenshot/screen-recording protection as the backup-phrase screen. */
   describe("screen security", () => {
-    it("enables screenshot protection on mount", async () => {
+    it("acquires screen protection on mount", async () => {
       render(
         <ContextForScreen>
           <BackupPhraseConfirmScreen />
@@ -593,10 +626,10 @@ describe("BackupPhraseConfirmScreen", () => {
       )
       await flushEffects()
 
-      expect(mockEnableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockAcquireScreenSecurity).toHaveBeenCalledTimes(1)
     })
 
-    it("disables screenshot protection on unmount", async () => {
+    it("releases screen protection on unmount", async () => {
       const { unmount } = render(
         <ContextForScreen>
           <BackupPhraseConfirmScreen />
@@ -606,7 +639,58 @@ describe("BackupPhraseConfirmScreen", () => {
 
       unmount()
 
-      expect(mockDisableScreenSecurity).toHaveBeenCalledTimes(1)
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("moves the suggestions to whichever field the user tapped into", async () => {
+    // Suggestions follow focus, not typing order: tapping back into an earlier
+    // field must not leave the previous field's suggestions on screen.
+    const { getByPlaceholderText, getAllByPlaceholderText, getByText, queryByText } =
+      render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+    await flushEffects()
+
+    const first = getByPlaceholderText(
+      `${LL.BackupScreen.ManualBackup.Confirm.enterWord()} 1`,
+    )
+    const [, second] = getAllByPlaceholderText(
+      new RegExp(LL.BackupScreen.ManualBackup.Confirm.enterWord()),
+    )
+
+    fireEvent.changeText(first, "you")
+    expect(getByText("youth")).toBeTruthy()
+
+    fireEvent(second, "focus")
+    expect(queryByText("youth")).toBeNull()
+  })
+
+  /** The gate unmounts its subtree whenever it re-activates (a theme flip
+   *  re-acquires the guard to apply the new mask color), so the answers the user
+   *  has already typed are held above the gate and handed in. */
+  describe("surviving a gate re-activation", () => {
+    it("builds the confirmation state above the gate, so a pending guard cannot wipe it", async () => {
+      // Never-settling lease: the gate stays on its spinner and mounts no content.
+      mockAcquireScreenSecurity.mockReturnValue({
+        ready: new Promise<void>(() => {}),
+        release: mockReleaseScreenSecurity,
+      })
+
+      const { queryByTestId } = render(
+        <ContextForScreen>
+          <BackupPhraseConfirmScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      // The gated content is genuinely absent...
+      expect(queryByTestId("confirm-word-0")).toBeNull()
+      // ...while the layer that owns the typed answers has still run. Held inside
+      // the gate it would be torn down and rebuilt on every re-activation.
+      expect(mockCheckpointLoading).toHaveBeenCalled()
     })
   })
 })

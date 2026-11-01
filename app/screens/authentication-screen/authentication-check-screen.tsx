@@ -49,9 +49,10 @@ export const AuthenticationCheckScreen: React.FC = () => {
       /**
        * A lock we inferred rather than read is not one we can promise the user
        * can pass: the PIN screen would compare against a secret it also cannot
-       * read, and it offers no way out. The authentication screen does — it
-       * carries the logout escape and still routes to the PIN — so an uncertain
-       * lock goes there instead of into a keypad with no exit.
+       * read. The authentication screen still routes to the PIN and always shows
+       * a way out: a logout that takes the lock with it on a device that stores
+       * no wallet, and removing the wallets on one that does, where a logout
+       * would keep the lock and come straight back here.
        */
       const isLockUncertain =
         pinRead.status === "failed" || biometricsRead.status === "failed"
@@ -71,11 +72,13 @@ export const AuthenticationCheckScreen: React.FC = () => {
           isResume,
         })
       } else {
-        /** Only a cold start opens a device session, and only it owes the user the home
-         *  screen; a resume whose lock was turned off meanwhile just steps back. */
-        completeUnlock(() => {
-          updateDeviceSessionCount(client)
-          navigation.replace("Primary")
+        /** Only a cold start opens a device session, and only one with an account to show
+         *  owes the user the home screen: without one it lands on the landing screen, and
+         *  a resume whose lock was turned off meanwhile just steps back. */
+        completeUnlock((coldStartRoute) => {
+          const isOpeningHome = coldStartRoute === "Primary"
+          if (isOpeningHome) updateDeviceSessionCount(client)
+          navigation.replace(coldStartRoute)
         })
       }
     })()

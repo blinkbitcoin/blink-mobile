@@ -31,6 +31,8 @@
     "createError": "Không thể tạo khóa API. Vui lòng thử lại.",
     "revokeError": "Không thể thu hồi khóa API. Vui lòng thử lại.",
     "loadError": "Không thể tải các khóa API của bạn. Vui lòng thử lại sau.",
+    "discardSecretTitle": "Hủy bỏ khóa API này?",
+    "discardSecretBody": "Đây là lần duy nhất khóa bí mật được hiển thị. Nếu bạn rời đi bây giờ, khóa sẽ không thể khôi phục và bạn sẽ cần tạo khóa mới.",
     "done": "Xong"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Bỏ qua",
     "unlock": "Mở khóa",
     "usePin": "Sử dụng PIN",
-    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ"
+    "confirmLogout": "Bạn có chắc muốn đăng xuất không? Điều này sẽ xóa bộ nhớ đệm và tất cả cài đặt người dùng cục bộ",
+    "forgotPin": "Quên PIN? Xóa ví",
+    "removeWalletsTitle": "Xóa ví khỏi thiết bị này?",
+    "removeWalletsBody": "Thao tác này xóa tất cả ví khỏi thiết bị này và đăng xuất bạn. Để lấy lại ví, bạn cần cụm từ khôi phục của ví đó. Nếu không có, ví sẽ bị mất.",
+    "removeWalletsConfirm": "Xóa ví",
+    "removeWalletsFailed": "Không thể xóa một số ví. Vui lòng thử lại."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Số ví không phải là 2. Vui lòng sử dụng bảng điều khiển để xem tất cả các ví và tiền trong tài khoản này"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Không thể ghi lại lần thử một cách an toàn.",
+    "attemptsLeft": "Còn lại {attemptsRemaining: number} lần thử.",
     "attemptsRemaining": "Mã PIN không chính xác. Còn lại {attemptsRemaining: number} lần thử.",
     "enterPin": "Nhập mã PIN của bạn",
-    "lockoutUnavailable": "Không thể ghi lại lần thử không thành công một cách an toàn. Đang đăng xuất.",
+    "oneAttemptLeft": "Còn lại 1 lần thử.",
     "oneAttemptRemaining": "Mã PIN không chính xác. Còn lại 1 lần thử .",
     "pinUnreadable": "Không thể kiểm tra mã PIN của bạn. Vui lòng thử lại.",
     "setPin": "Đặt mã PIN của bạn",
     "setPinFailedMatch": "Mã PIN không khớp - Đặt mã PIN của bạn",
     "storePinFailed": "Không thể lưu mã pin của bạn.",
     "tooManyAttempts": "Quá nhiều lần thử không thành công. Đang đăng xuất.",
-    "tryAgainIn": "Thử lại sau {seconds: number} giây.",
+    "attemptBudgetSpent": "Quá nhiều lần thử không thành công.",
+    "tryAgainIn": "Thử lại sau {time: string}.",
     "verifyPin": "Xác minh mã PIN của bạn"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Nếu vấn đề vẫn tiếp diễn liên hệ hỗ trợ.",
     "fatalError": "Xin lỗi, chúng tôi dường như đang gặp sự cố khi tải dữ liệu ứng dụng. Nếu vấn đề vẫn tiếp diễn xin vui lòng liên hệ với hỗ trợ.",
     "showError": "Hiển thị lỗi",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "Màn hình này vẫn bị ẩn vì không thể bật tính năng chống chụp màn hình."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Cụm từ sao lưu của bạn là chính xác"
       }
     },
+    "BundleExport": {
+      "title": "Rút khẩn cấp",
+      "body": "Nếu Spark ngừng hoạt động, gói này cho phép bạn chuyển bitcoin của mình on-chain mà không cần Blink. Số dư đô la của bạn không thể khôi phục.",
+      "download": "Tải gói xuống",
+      "sensitiveTitle": "Nhạy cảm",
+      "learnMore": "Tìm hiểu thêm về rút đơn phương",
+      "sensitiveConfirm": "Tải xuống",
+      "sensitiveBody": "Tệp này cho thấy số dư và lịch sử thanh toán của bạn, vì vậy hãy giữ riêng tư. Để dùng tệp này trong trường hợp khẩn cấp, bạn cũng cần cụm từ sao lưu của mình."
+    },
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
-      "encryptCheckbox": "Thêm cụm mật khẩu bổ sung",
-      "password": "Cụm mật khẩu",
+      "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
-      "confirmPassword": "Xác nhận cụm mật khẩu",
-      "confirmPasswordPlaceholder": "Nhập lại cụm mật khẩu",
+      "confirmPassword": "Xác nhận mật khẩu",
+      "confirmPasswordPlaceholder": "Nhập lại mật khẩu",
       "continueButton": "Tiếp tục",
       "importantTitle": "Quan trọng",
-      "importantMessage": "Blink không lưu trữ cụm mật khẩu này. Nếu bạn mất nó, {bold} khôi phục ví của bạn.",
+      "importantMessage": "Blink không lưu trữ mật khẩu này. Nếu bạn mất nó, {bold} khôi phục ví của bạn.",
       "importantMessageBold": "chúng tôi sẽ không thể",
       "passwordTooShort": "Tối thiểu 12 ký tự",
-      "passwordMismatch": "Cụm mật khẩu không khớp",
+      "passwordMismatch": "Mật khẩu không khớp",
       "uploadSuccess": "Bản sao lưu đã được lưu vào {provider}",
       "uploadFailed": "Không thể tải lên bản sao lưu",
       "signInFailed": "Không thể đăng nhập vào {provider}",
@@ -4037,12 +4056,18 @@
     "restore": "Khôi phục ví",
     "noBackupFound": "Không tìm thấy bản sao lưu",
     "noBackupDescription": "Chúng tôi không tìm thấy bản sao lưu. Bạn có thể nhập cụm từ sao lưu thủ công.",
-    "enterPassword": "Nhập cụm mật khẩu mã hóa của bạn",
-    "wrongPassword": "Cụm mật khẩu không đúng. Vui lòng thử lại.",
+    "enterPassword": "Nhập mật khẩu mã hóa của bạn",
+    "wrongPassword": "Mật khẩu không đúng. Vui lòng thử lại.",
     "pickBackupTitle": "Chọn một ví",
     "pickBackupDescription": "Chọn bản sao lưu để khôi phục",
     "recognizePhraseTitle": "Bạn có nhận ra cụm từ sao lưu này không?",
     "recognizePhraseBody": "Không bao giờ nhập các từ mà người khác gửi cho bạn."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Không kết nối được nhà vận hành",
+    "outageBody": "Spark đang gặp sự cố. Vui lòng đợi vài phút rồi thử lại hoặc liên hệ {support} của chúng tôi",
+    "outageSupport": "Bộ phận hỗ trợ",
+    "tryAgainLater": "Thử lại sau"
   },
   "BackupNudge": {
     "title": "Tiền của bạn đang gặp rủi ro",
@@ -4137,6 +4162,15 @@
     "title": "Đây là tài khoản không lưu ký",
     "body": "Để tìm hiểu thêm, hãy đọc bài viết trên blog của chúng tôi",
     "cta": "Đọc"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Cập nhật bản sao lưu trên đám mây",
+    "body": "Gói khẩn cấp của bạn trong {provider} đã cũ. Hãy sao lưu ví của bạn lại để cập nhật.",
+    "cta": "Sao lưu lại"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Chưa có gói khẩn cấp. Gói được tạo sau giao dịch đầu tiên của bạn.",
+    "exportFailed": "Không thể tải xuống gói khẩn cấp."
   },
   "StableBalance": {
     "title": "Số dư ổn định",

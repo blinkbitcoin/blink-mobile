@@ -1,3 +1,5 @@
+import { it } from "@jest/globals"
+
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 const mockGet = jest.fn()
@@ -54,8 +56,18 @@ jest.mock("react-native-secure-key-store", () => ({
   ACCESSIBLE: {
     ALWAYS_THIS_DEVICE_ONLY: "ALWAYS_THIS_DEVICE_ONLY",
     WHEN_UNLOCKED_THIS_DEVICE_ONLY: "WHEN_UNLOCKED_THIS_DEVICE_ONLY",
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
   },
 }))
+
+/**
+ * A legacy keystore that refuses everything: the delete, and the blank write that would
+ * otherwise prove a key that is not there gone.
+ */
+const legacyStoreRejects = (err: Error) => {
+  mockRemove.mockRejectedValue(err)
+  mockSet.mockRejectedValue(err)
+}
 
 describe("KeyStoreWrapper per-account mnemonic methods", () => {
   beforeEach(() => {
@@ -180,8 +192,51 @@ describe("KeyStoreWrapper per-account mnemonic methods", () => {
       expect(result).toBe(true)
     })
 
-    it("returns false when the primary mnemonic removal fails", async () => {
-      mockRemove.mockRejectedValueOnce(new Error("keystore unavailable"))
+    /** What the iOS module rejects with: a delete of any kind that did not land, a lookup
+     *  of any kind that found nothing, and a write the keychain refused. */
+    const couldNotDelete = () =>
+      Object.assign(new Error("could not delete key"), { code: "6" })
+    const keyNotPresent = () =>
+      Object.assign(new Error("key does not present"), { code: "404" })
+    const couldNotSave = () => Object.assign(new Error("error saving key"), { code: "9" })
+
+    it("returns false when neither the removal nor the blank lands", async () => {
+      mockRemove.mockRejectedValue(couldNotDelete())
+      mockSet.mockRejectedValue(couldNotSave())
+
+      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+      expect(result).toBe(false)
+      expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
+        accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+      })
+    })
+
+    /**
+     * The iOS module rejects a delete of a key that is not there, so a removal retried
+     * after an earlier one erased the seed fails the same way a real failure does. A blank
+     * the keychain takes is what lets that retry finish instead of keeping the wallet listed.
+     */
+    it("returns true when the removal fails because the seed is already gone", async () => {
+      mockRemove.mockRejectedValueOnce(couldNotDelete()).mockResolvedValue(undefined)
+      mockSet.mockResolvedValue("key stored successfully")
+
+      const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
+
+      expect(result).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("mnemonic:alice", "", {
+        accessible: "AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY",
+      })
+    })
+
+    /**
+     * A failing iOS keychain answers the lookup with the missing-key code too, so a read
+     * back would call this seed gone while it is still stored.
+     */
+    it("returns false on a failing keychain whose lookup answers missing", async () => {
+      mockRemove.mockRejectedValue(couldNotDelete())
+      mockGet.mockRejectedValue(keyNotPresent())
+      mockSet.mockRejectedValue(couldNotSave())
 
       const result = await KeyStoreWrapper.deleteMnemonicForAccount("alice")
 
@@ -338,7 +393,7 @@ describe("KeyStoreWrapper biometrics methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removeIsBiometricsEnabled()
 
@@ -454,7 +509,7 @@ describe("KeyStoreWrapper PIN methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removePin()
 
@@ -463,7 +518,7 @@ describe("KeyStoreWrapper PIN methods", () => {
   })
 })
 
-describe("KeyStoreWrapper PIN lockout state", () => {
+describe("KeyStoreWrapper PIN attempt state", () => {
   const missingKey = (message = "key has not been set") =>
     Object.assign(new Error(message), { code: "404" })
 
@@ -486,8 +541,22 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     mockResetInternet.mockResolvedValue(undefined)
   })
 
+  /** A read that finds a count in the legacy slot, which is what tells this process the
+   *  slot still has to be erased. */
+  const readsLegacyCount = async (count: string) => {
+    storedKeys({ pinAttempts: count })
+    await KeyStoreWrapper.getPinFailureState()
+    jest.clearAllMocks()
+    mockSet.mockResolvedValue(undefined)
+    mockRemove.mockResolvedValue(undefined)
+    mockSetInternet.mockResolvedValue({ service: "mock" })
+    mockGetInternet.mockResolvedValue(false)
+    mockHasInternet.mockResolvedValue(false)
+    mockResetInternet.mockResolvedValue(undefined)
+  }
+
   describe("getPinFailureState", () => {
-    it("reads the count and the lock from one key", async () => {
+    it("reads the attempt count and the lock expiry from one key", async () => {
       storedKeys({
         pinFailureState: JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 }),
       })
@@ -501,6 +570,34 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       expect(mockGet).toHaveBeenCalledWith("pinFailureState")
     })
 
+    /** A count that reads fine keeps its meaning whatever sits beside it. An expiry that
+     *  does not read is no lock, not a reason to hand back the attempts already spent. */
+    it.each([
+      ["missing", { attempts: 2 }],
+      ["not a number", { attempts: 2, lockedUntil: "soon" }],
+      ["null", { attempts: 2, lockedUntil: null }],
+    ])("keeps the count when the lock expiry beside it is %s", async (_label, stored) => {
+      storedKeys({ pinFailureState: JSON.stringify(stored) })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2, lockedUntil: 0 },
+      })
+    })
+
+    it("coerces numeric strings the way the shipped parser did", async () => {
+      /** No writer stores either field as a string, but every shipped parser since
+       *  3.0.29 accepted one, and this parser keeps that contract. */
+      storedKeys({
+        pinFailureState: JSON.stringify({ attempts: "2", lockedUntil: "1700000060000" }),
+      })
+
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
+        status: "found",
+        state: { attempts: 2, lockedUntil: 1700000060000 },
+      })
+    })
+
     it("reports a clean slate when nothing is stored", async () => {
       storedKeys({})
 
@@ -509,11 +606,17 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
     it("reads back a clean slate for a corrupt or non-finite value", async () => {
       // NaN would slip past every `<` comparison downstream and silently pick
-      // the wrong branch, so it must never escape this layer.
+      // the wrong branch, so it must never escape this layer. The empty-ish
+      // values land on 0 the same way the shipped parser read them.
       for (const stored of [
         "not json",
-        JSON.stringify({ attempts: "abc", lockedUntil: 1 }),
-        JSON.stringify({ attempts: 1, lockedUntil: "Infinity" }),
+        JSON.stringify({ attempts: "abc" }),
+        JSON.stringify({ attempts: "Infinity" }),
+        JSON.stringify({ attempts: null }),
+        JSON.stringify({ attempts: "" }),
+        JSON.stringify({ attempts: [] }),
+        JSON.stringify({ attempts: false }),
+        JSON.stringify({}),
         JSON.stringify(null),
       ]) {
         storedKeys({ pinFailureState: stored })
@@ -534,7 +637,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       })
     })
 
-    it("carries a pre-lockout install's attempt count over from the legacy key", async () => {
+    it("carries an older install's attempt count over from the legacy key", async () => {
       // Upgrading must not hand back a budget the user already spent.
       storedKeys({ pinAttempts: "2" })
 
@@ -585,20 +688,20 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
   })
 
-  describe("migrating the lockout slots", () => {
-    it("moves a lockout state that still lives in the legacy store", async () => {
-      const stored = JSON.stringify({ attempts: 2, lockedUntil: 1700000060000 })
+  describe("migrating the attempt-state slots", () => {
+    it("moves an attempt state that still lives in the legacy store", async () => {
+      const stored = JSON.stringify({ attempts: 2, lockedUntil: 0 })
       onlyInLegacyStore({ pinFailureState: stored })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
         status: "found",
-        state: { attempts: 2, lockedUntil: 1700000060000 },
+        state: { attempts: 2, lockedUntil: 0 },
       })
       expectMigratedWrite("pinFailureState", stored)
       expect(mockRemove).toHaveBeenCalledWith("pinFailureState")
     })
 
-    it("moves a pre-lockout install's bare attempt count, budget intact", async () => {
+    it("moves an older install's bare attempt count, budget intact", async () => {
       onlyInLegacyStore({ pinAttempts: "2" })
 
       expect(await KeyStoreWrapper.getPinFailureState()).toEqual({
@@ -612,6 +715,10 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
   describe("setPinFailureState", () => {
     it("writes one value under one key with AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY accessibility", async () => {
+      // The count and the lock are one logical value: two writes could land
+      // half, and a lock without its failure hands the budget back when it
+      // expires. Both fields are spelled out because the shipped parsers demand
+      // both be finite and fall back to a clean slate otherwise.
       const result = await KeyStoreWrapper.setPinFailureState({
         attempts: 2,
         lockedUntil: 1700000060000,
@@ -626,9 +733,54 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
 
     it("drops the legacy key once the state has moved", async () => {
+      await readsLegacyCount("2")
+
       await KeyStoreWrapper.setPinFailureState({ attempts: 1, lockedUntil: 0 })
 
       expect(mockRemove).toHaveBeenCalledWith("pinAttempts")
+    })
+
+    /** The unlock path writes and clears on every entry, and the legacy slot is emptied
+     *  once per upgrade: after one attempt, it is not erased again in this process. */
+    it("erases the legacy key once, not on every write", async () => {
+      await readsLegacyCount("2")
+
+      await KeyStoreWrapper.setPinFailureState({ attempts: 1, lockedUntil: 0 })
+      await KeyStoreWrapper.setPinFailureState({ attempts: 2, lockedUntil: 0 })
+      await KeyStoreWrapper.clearPinFailureState()
+
+      const legacyErases = mockRemove.mock.calls.filter(([key]) => key === "pinAttempts")
+      expect(legacyErases).toHaveLength(1)
+    })
+
+    /**
+     * The current key shadows a legacy count that would not erase only until a clear erases
+     * that key. Remembered as done, the failed erase would be skipped by that clear, and the
+     * next launch would read the old count back and spend the budget on one more typo.
+     */
+    it("tries a failed legacy erase again, so a later clear cannot bring the old count back", async () => {
+      await readsLegacyCount("2")
+      const stored: Record<string, string> = { pinAttempts: "2" }
+      let isLegacyEraseFailing = true
+      mockGet.mockImplementation(async (key: string) => {
+        if (key in stored) return stored[key]
+        throw missingKey(`${key} has not been set`)
+      })
+      const isLockedKey = (key: string) => key === "pinAttempts" && isLegacyEraseFailing
+      mockRemove.mockImplementation(async (key: string) => {
+        if (isLockedKey(key)) throw new Error("keystore locked")
+        delete stored[key]
+      })
+      mockSet.mockImplementation(async (key: string, value: string) => {
+        if (isLockedKey(key)) throw new Error("keystore locked")
+        stored[key] = value
+      })
+
+      await KeyStoreWrapper.setPinFailureState({ attempts: 3, lockedUntil: 0 })
+      isLegacyEraseFailing = false
+
+      expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
+      expect(await KeyStoreWrapper.getPinFailureState()).toEqual({ status: "absent" })
     })
 
     it("reports failure — and leaves the legacy key alone — when the write is rejected", async () => {
@@ -638,7 +790,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
       const result = await KeyStoreWrapper.setPinFailureState({
         attempts: 1,
-        lockedUntil: 1700000030000,
+        lockedUntil: 0,
       })
 
       expect(result).toBe(false)
@@ -648,6 +800,8 @@ describe("KeyStoreWrapper PIN lockout state", () => {
 
   describe("clearPinFailureState", () => {
     it("drops both the current and the legacy key", async () => {
+      await readsLegacyCount("2")
+
       const result = await KeyStoreWrapper.clearPinFailureState()
 
       expect(result).toBe(true)
@@ -657,19 +811,36 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
 
     it("writes nothing when the erase only failed because nothing was stored", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      // How the iOS module answers a delete of a key that is not there; the blank lands.
+      mockRemove.mockRejectedValue(new Error("could not delete key"))
       storedKeys({})
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
-      expect(mockSet).not.toHaveBeenCalled()
+      expect(mockSetInternet).not.toHaveBeenCalled()
     })
 
     it("writes a cleared value when a failed erase left state readable", async () => {
       // Otherwise a spent budget survives a correct PIN, and the next typo logs
       // the user out on the spot.
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       storedKeys({
-        pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 1700000060000 }),
+        pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 0 }),
+      })
+
+      expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
+      expectMigratedWrite(
+        "pinFailureState",
+        JSON.stringify({ attempts: 0, lockedUntil: 0 }),
+      )
+    })
+
+    it("writes a cleared value when a failed erase left only a lock readable", async () => {
+      // The slate is clean only when both fields are zero. An expiry left
+      // readable is state a shipped build still acts on, so it is written over
+      // rather than taken for nothing.
+      legacyStoreRejects(new Error("keystore locked"))
+      storedKeys({
+        pinFailureState: JSON.stringify({ attempts: 0, lockedUntil: 1700000060000 }),
       })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
@@ -680,7 +851,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
 
     it("writes a cleared value when the fallback read also fails", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       mockGet.mockRejectedValue(new Error("keystore unavailable"))
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
@@ -691,7 +862,8 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
 
     it("repairs a legacy count that would not erase", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      await readsLegacyCount("3")
+      legacyStoreRejects(new Error("keystore locked"))
       storedKeys({ pinAttempts: "3" })
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
@@ -701,9 +873,8 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       )
     })
 
-    // An erase reports failure for a key that was never there too, so a failed
-    // erase over nothing readable is a clear, not a fault: writing on it would
-    // put an item back where none was.
+    // A failed erase over nothing readable is a clear, not a fault: writing on
+    // it would put an item back where none was.
     it("writes nothing when a failed erase left the slot empty anyway", async () => {
       onlyInLegacyStore({})
       mockResetInternet.mockRejectedValue(new Error("keystore locked"))
@@ -718,7 +889,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
       onlyInLegacyStore({
         pinFailureState: JSON.stringify({ attempts: 0, lockedUntil: 0 }),
       })
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
 
       expect(await KeyStoreWrapper.clearPinFailureState()).toBe(true)
       // The one write is the migrating read moving the value across, not a
@@ -727,7 +898,7 @@ describe("KeyStoreWrapper PIN lockout state", () => {
     })
 
     it("reports false when neither the erase nor the repair lands", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore locked"))
+      legacyStoreRejects(new Error("keystore locked"))
       mockSetInternet.mockRejectedValue(new Error("keystore locked"))
       storedKeys({ pinFailureState: JSON.stringify({ attempts: 3, lockedUntil: 0 }) })
 
@@ -901,7 +1072,7 @@ describe("KeyStoreWrapper session-profile methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("not found"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removeSessionProfiles()
 
@@ -1095,7 +1266,7 @@ describe("KeyStoreWrapper active-token methods", () => {
     })
 
     it("returns false when the keystore rejects", async () => {
-      mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+      legacyStoreRejects(new Error("keystore unavailable"))
 
       const result = await KeyStoreWrapper.removeActiveToken()
 
@@ -1123,7 +1294,12 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
    *  not provably done, which is the only thing that counts as a failure. */
   const legacyRefusesToDrop = (slot: string) => {
     onlyInLegacyStore({ [slot]: "still here" })
-    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+    const refusesTheSlot = (key: string) =>
+      key === slot
+        ? Promise.reject(new Error("keystore unavailable"))
+        : Promise.resolve(undefined)
+    mockRemove.mockImplementation(refusesTheSlot)
+    mockSet.mockImplementation(refusesTheSlot)
   }
 
   it("removes every uninstall-surviving slot, and only those", async () => {
@@ -1164,11 +1340,6 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
 
   it("reports a persistently failing token removal and still wipes the profiles", async () => {
     legacyRefusesToDrop("galoyAuthToken")
-    mockRemove.mockImplementation((key: string) =>
-      key === "galoyAuthToken"
-        ? Promise.reject(new Error("keystore unavailable"))
-        : Promise.resolve(undefined),
-    )
 
     await KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure)
 
@@ -1189,20 +1360,109 @@ describe("KeyStoreWrapper clearUninstallSurvivingCredentials", () => {
 
   it("reports every slot when the keystore is fully unavailable, and never throws", async () => {
     mockGet.mockRejectedValue(new Error("keystore unavailable"))
-    mockRemove.mockRejectedValue(new Error("keystore unavailable"))
+    legacyStoreRejects(new Error("keystore unavailable"))
 
     await expect(
       KeyStoreWrapper.clearUninstallSurvivingCredentials(onFailure),
     ).resolves.toBeUndefined()
 
-    // The lockout state is absent from this list on purpose: clearing it falls
+    // The attempt state is absent from this list on purpose: clearing it falls
     // back to writing a clean slate when the erase fails, and a stored
-    // {attempts: 0, lockedUntil: 0} strands nobody.
+    // {attempts: 0} strands nobody.
     expect(onFailure.mock.calls.flat()).toEqual([
       "active token",
       "session profiles",
       "pin",
       "biometrics flag",
     ])
+  })
+})
+
+/**
+ * The lock is one thing made of three slots. Every caller that may erase it erases the same
+ * three, and this is where that list lives so a second copy cannot miss one.
+ */
+describe("KeyStoreWrapper clearAppLock", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  const spyOnSlots = (results: {
+    biometrics: boolean
+    pin: boolean
+    budget: boolean
+  }) => {
+    jest
+      .spyOn(KeyStoreWrapper, "removeIsBiometricsEnabled")
+      .mockResolvedValue(results.biometrics)
+    jest.spyOn(KeyStoreWrapper, "removePin").mockResolvedValue(results.pin)
+    jest.spyOn(KeyStoreWrapper, "clearPinFailureState").mockResolvedValue(results.budget)
+  }
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it("erases all three slots and reports the lock gone", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(true)
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.removePin).toHaveBeenCalledTimes(1)
+    expect(KeyStoreWrapper.clearPinFailureState).toHaveBeenCalledTimes(1)
+  })
+
+  /** A PIN without its spent attempt count hands the next round a fresh budget against a
+   *  secret that no longer expires, so a half-erased lock is still a lock. */
+  it("reports the lock kept when the spent budget will not clear", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: false })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  /** A PIN that survives without its spent count and its biometrics flag is the split
+   *  the group exists to prevent, so a refused PIN leaves the other two where they are. */
+  it("reports the lock kept and leaves the rest alone when the PIN will not erase", async () => {
+    spyOnSlots({ biometrics: true, pin: false, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+    expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).not.toHaveBeenCalled()
+  })
+
+  it("erases the PIN before the spent budget and the biometrics flag", async () => {
+    spyOnSlots({ biometrics: true, pin: true, budget: true })
+
+    await KeyStoreWrapper.clearAppLock()
+
+    const pinOrder = jest.mocked(KeyStoreWrapper.removePin).mock.invocationCallOrder[0]
+    const budgetOrder = jest.mocked(KeyStoreWrapper.clearPinFailureState).mock
+      .invocationCallOrder[0]
+    const flagOrder = jest.mocked(KeyStoreWrapper.removeIsBiometricsEnabled).mock
+      .invocationCallOrder[0]
+    expect(pinOrder).toBeLessThan(budgetOrder)
+    expect(budgetOrder).toBeLessThan(flagOrder)
+  })
+
+  /** A PIN without the biometrics flag routes every later unlock to the keypad instead of
+   *  to the prompt its owner chose. */
+  it("reports the lock kept when the biometrics flag will not erase", async () => {
+    spyOnSlots({ biometrics: false, pin: true, budget: true })
+
+    expect(await KeyStoreWrapper.clearAppLock()).toBe(false)
+  })
+
+  /** Sequential, so a slot that throws stops the ones behind it rather than leaving the
+   *  caller to guess which went. */
+  it("stops at a slot that throws", async () => {
+    jest.spyOn(KeyStoreWrapper, "removeIsBiometricsEnabled").mockResolvedValue(true)
+    jest
+      .spyOn(KeyStoreWrapper, "removePin")
+      .mockRejectedValue(new Error("keystore locked"))
+    jest.spyOn(KeyStoreWrapper, "clearPinFailureState").mockResolvedValue(true)
+
+    await expect(KeyStoreWrapper.clearAppLock()).rejects.toThrow("keystore locked")
+    expect(KeyStoreWrapper.clearPinFailureState).not.toHaveBeenCalled()
+    expect(KeyStoreWrapper.removeIsBiometricsEnabled).not.toHaveBeenCalled()
   })
 })

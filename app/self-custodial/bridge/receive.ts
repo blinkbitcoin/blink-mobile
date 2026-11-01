@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   ReceivePaymentMethod,
   ReceivePaymentRequest,
@@ -9,6 +10,8 @@ import type {
   ReceiveLightningAdapter,
   ReceiveOnchainAdapter,
 } from "@app/types/payment"
+
+import { measure, ScEvent, ScRail } from "../measurement"
 
 const receiveError = (message: string) => ({
   errors: [{ message }] as PaymentError[],
@@ -29,6 +32,10 @@ export const createReceiveLightning = (
           }),
         }),
       )
+      measure(ScEvent.PaymentRequestCreated, {
+        rail: ScRail.Bolt11,
+        has_amount: Boolean(amount),
+      })
       return { invoice: response.paymentRequest }
     } catch (err) {
       return receiveError(err instanceof Error ? err.message : `Receive failed: ${err}`)
@@ -46,6 +53,9 @@ export const createReceiveOnchain = (sdk: BreezSdkInterface): ReceiveOnchainAdap
           }),
         }),
       )
+      /** Not counted here: the receive screen asks for the address on every visit and
+       *  gets the same one back until it rotates, so the screen counts a request only
+       *  when an address is newly handed out. */
       return { address: response.paymentRequest }
     } catch (err) {
       return receiveError(

@@ -336,6 +336,7 @@ export type RootStackParamList = {
     challenges: Array<{ index: number; word: string }>
     successMessage?: string
   }
+  selfCustodialBackupBundleExport: undefined
   selfCustodialBackupSuccess: { reBackup?: boolean; message?: string } | undefined
   /** The settings entry applies the choice to the active account and returns. The
    *  onboarding entries declare their onward step: restore and migration pass the
@@ -378,6 +379,7 @@ export type RootStackParamList = {
   selfCustodialRestorePhrase: { step: PhraseStep; words?: string[] }
   selfCustodialRestoreMethod: undefined
   selfCustodialCloudRestore: undefined
+  selfCustodialOperatorUnreachable: undefined
   stableBalanceSettings: undefined
 }
 

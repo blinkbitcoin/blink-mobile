@@ -3,6 +3,7 @@ import { useNavigation } from "@react-navigation/native"
 import { type NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { CONTACT_EMAIL_ADDRESS } from "@app/config"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { type RootStackParamList } from "@app/navigation/stack-param-lists"
 import {
@@ -37,6 +38,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { LL } = useI18nContext()
   const { deleteWallet } = useDeleteAccount()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const { setAccountIsBeingDeleted, leaveWhileDeleting } = useAccountDeleteContext()
 
   const pendingRemoval = useRef<PendingRemoval | null>(null)
@@ -55,7 +57,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
    *  to the account, so offering a retry there would promise something the app can't do. */
   const failureMessage = useCallback(
     (identifier: string, outcome: DeleteAccountOutcome) =>
-      outcome === "logged-out"
+      outcome === "logged-out" || outcome === "logged-out-locked"
         ? LL.SelfCustodialDelete.removalIncomplete({
             identifier,
             email: CONTACT_EMAIL_ADDRESS,
@@ -80,7 +82,9 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     if (!removed && outcome === "remained") {
       setAccountIsBeingDeleted(false)
     } else {
-      leaveWhileDeleting(() => navigateAfterAccountDelete(navigation, outcome))
+      leaveWhileDeleting(() =>
+        navigateAfterAccountDelete(navigation, routeAfterLogout, outcome),
+      )
     }
 
     toastShow({
@@ -95,6 +99,7 @@ export const useAccountRemoval = (): UseAccountRemovalResult => {
     setAccountIsBeingDeleted,
     leaveWhileDeleting,
     navigation,
+    routeAfterLogout,
     failureMessage,
     LL,
   ])

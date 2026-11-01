@@ -1,9 +1,18 @@
 /* eslint-disable camelcase */
+import { it } from "@jest/globals"
 import { LnUrlPayServiceResponse, Satoshis } from "lnurl-pay"
 
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 import { PaymentType } from "@blinkbitcoin/blink-client"
 
+import {
+  measureObservedPayment,
+  resetMeasuredOnceKeys,
+  resetMeasurementContext,
+  resetSettlementTracking,
+  setMeasurementContext,
+} from "@app/self-custodial/measurement"
+import { AccountMode } from "@app/types/account"
 import { createSelfCustodialLnurlPaymentDetails } from "@app/self-custodial/payment-details/lnurl"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
 
@@ -12,6 +21,12 @@ const mockExecuteLnurl = jest.fn()
 const mockExtractLnurlFee = jest.fn()
 const mockListSentPaymentsSince = jest.fn()
 const mockSyncSelfCustodialWallet = jest.fn()
+
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  isEnhancedIdentityApplied: () => true,
+  onEnhancedIdentityApplied: () => () => undefined,
+}))
 
 jest.mock("@app/self-custodial/bridge", () => ({
   prepareLnurl: (...args: unknown[]) => mockPrepareLnurl(...args),
@@ -69,7 +84,9 @@ jest.mock("@app/self-custodial/sdk-error", () => {
     },
     classifySdkError: (err: { tag?: string } | unknown) => {
       const t = (err as { tag?: string })?.tag
-      if (t === tags.LnurlError) return "sc_invalid_input"
+      if (t === tags.LnurlError || t === tags.InvalidInput) return "sc_invalid_input"
+      if (t === tags.InsufficientFunds) return "sc_insufficient_funds"
+      if (t === "BelowMinimum") return "sc_below_minimum"
       if (t === tags.NetworkError) return "sc_network_error"
       return "sc_generic"
     },
@@ -80,6 +97,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   AesSuccessActionDataResult_Tags: { Decrypted: "Decrypted", ErrorStatus: "ErrorStatus" },
   FeePolicy: { FeesExcluded: 0, FeesIncluded: 1 },
   PaymentStatus: { Completed: 0, Pending: 1, Failed: 2 },
+  PaymentType: { Send: 0, Receive: 1 },
   // The shared fee-failure helper lives in send-helpers, which builds its tier→speed map
   // at module scope.
   OnchainConfirmationSpeed: { Fast: 0, Medium: 1, Slow: 2 },
@@ -91,6 +109,11 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Spark: { instanceOf: (obj: { tag?: string } | undefined) => obj?.tag === "Spark" },
     Token: { instanceOf: (obj: { tag?: string } | undefined) => obj?.tag === "Token" },
   },
+}))
+
+const mockLogEvent = jest.fn()
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
 
 /** The hash of the invoice a quote came back with: what the wallet's record of paying it
@@ -1042,8 +1065,8 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
     },
   })
 
-  const found = (payment: unknown) => ({ status: "found", payment })
-  const notFound = () => ({ status: "not-found" })
+  const found = (payment: unknown) => ({ status: "found", payment, failed: [] })
+  const notFound = () => ({ status: "not-found", failed: [] })
   const unreadable = (error: unknown) => ({ status: "unreadable", error })
 
   const sendFromDollars = async (params = usdParams()) => {
@@ -1555,6 +1578,349 @@ describe("createSelfCustodialLnurlPaymentDetails dollar send that throws after d
       expect(retry.status).toBe(PaymentSendResult.Failure)
       expect(retry.errors?.[0]?.message).toBe(SelfCustodialErrorCode.NetworkError)
       expect(mockExecuteLnurl).toHaveBeenCalledTimes(1)
+    })
+  })
+})
+
+describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const SEND = 0
+
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+  const observe = (status: number) =>
+    measureObservedPayment({ id: "p1", status, paymentType: SEND, method: 0 } as never)
+
+  const sendTo = async (identifier: string, status: number) => {
+    mockPrepareLnurl.mockResolvedValue(quote())
+    mockExecuteLnurl.mockResolvedValue({ payment: { id: "p1", status } })
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({ lnurlParams: baseLnurlParams({ identifier }) }),
+    )
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+    return detail.sendPaymentMutation({} as never)
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+    mockExtractLnurlFee.mockReturnValue(5)
+  })
+
+  afterAll(() => {
+    resetMeasurementContext()
+  })
+
+  it("reports a completed LNURL send as settled on the lnurl_pay rail", async () => {
+    await sendTo("user@example.com", COMPLETED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_settled",
+      expect.objectContaining({ rail: "lnurl_pay" }),
+    )
+  })
+
+  it("reports nothing past initiated for a pending send, until the SDK settles it", async () => {
+    const result = await sendTo("alice@blink.sv", PENDING)
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+
+    observe(COMPLETED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+      "sc_blink_payment_sent",
+    ])
+  })
+
+  it("counts no Blink payment for a send to a Blink address that fails", async () => {
+    await sendTo("alice@blink.sv", PENDING)
+    observe(FAILED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+  })
+
+  it("reports a found earlier attempt by its own status, not as settled", async () => {
+    mockPrepareLnurl.mockResolvedValue(quote())
+    mockExecuteLnurl.mockRejectedValue({ tag: "NetworkError" })
+    mockFindLostSend.mockResolvedValue({
+      status: "found",
+      payment: { id: "p1", status: PENDING },
+      failed: [],
+    })
+    const detail = createSelfCustodialLnurlPaymentDetails(
+      createParams({
+        sendingWalletDescriptor: { id: "w2", currency: WalletCurrency.Usd },
+        unitOfAccountAmount: {
+          amount: 150,
+          currency: WalletCurrency.Usd,
+          currencyCode: WalletCurrency.Usd,
+        },
+      }),
+    )
+    if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+    await detail.sendPaymentMutation({} as never)
+
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+
+  describe("a dollar send that threw after dispatch", () => {
+    const usdDescriptor = { id: "w2", currency: WalletCurrency.Usd }
+    const dollarDetail = () => {
+      const detail = createSelfCustodialLnurlPaymentDetails(
+        createParams({
+          sendingWalletDescriptor: usdDescriptor,
+          unitOfAccountAmount: {
+            amount: 150,
+            currency: WalletCurrency.Usd,
+            currencyCode: WalletCurrency.Usd,
+          },
+        }),
+      )
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      return detail
+    }
+    /** The wallet's record of a payment of the quoted invoice, as a lookup finds it. */
+    const paidInvoice = (status: number, paymentHash = QUOTED_HASH) => ({
+      status: "found",
+      payment: {
+        id: "p1",
+        status,
+        details: { tag: "Lightning", inner: { htlcDetails: { paymentHash } } },
+      },
+      failed: [],
+    })
+    const settledParams = () =>
+      mockLogEvent.mock.calls.find(([name]) => name === "sc_payment_send_settled")?.[1]
+
+    beforeEach(() => {
+      mockPrepareLnurl.mockResolvedValue(quote())
+      mockExecuteLnurl.mockRejectedValue({ tag: "NetworkError" })
+      mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
+    })
+
+    it("counts the send once when a retry finds the payment it had lost", async () => {
+      const detail = dollarDetail()
+
+      const first = await detail.sendPaymentMutation({} as never)
+      expect(first.status).toBe(PaymentSendResult.Failure)
+
+      mockFindLostSend.mockResolvedValue(paidInvoice(COMPLETED))
+      const retry = await detail.sendPaymentMutation({} as never)
+
+      expect(retry.status).toBe(PaymentSendResult.Success)
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_settled",
+      ])
+    })
+
+    it("reports a found payment with the wallet it was sent from, not the rebuilt detail's", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      /** The user switches the send to the bitcoin wallet; the lost attempt carries over. */
+      const rebuilt = detail.setSendingWalletDescriptor?.({
+        id: "w1",
+        currency: WalletCurrency.Btc,
+      })
+      if (!rebuilt?.canSendPayment) throw new Error("expected canSendPayment")
+      mockFindLostSend.mockResolvedValue(paidInvoice(COMPLETED))
+      await rebuilt.sendPaymentMutation({} as never)
+
+      expect(settledParams()).toEqual(
+        expect.objectContaining({ sending_wallet: WalletCurrency.Usd }),
+      )
+    })
+
+    it("counts a retry that has to pay anew as a send of its own", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      mockExecuteLnurl.mockResolvedValue({ payment: { id: "p2", status: COMPLETED } })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_initiated",
+        "sc_payment_send_settled",
+      ])
+    })
+
+    it("reports nothing past initiated while the payment may still turn up", async () => {
+      await dollarDetail().sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    })
+
+    /** The lookup passes a failed payment over (it is not the send landing), so the
+     *  retry sends anew; the attempt it ended still owes its failure. */
+    it("reports a lost attempt as failed once its payment shows failed", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      const failedPayment = paidInvoice(FAILED).payment
+      mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [failedPayment] })
+      mockExecuteLnurl.mockResolvedValue({ payment: { id: "p2", status: COMPLETED } })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+        "sc_payment_send_initiated",
+        "sc_payment_send_settled",
+      ])
+      expect(
+        mockLogEvent.mock.calls.find(([name]) => name === "sc_payment_send_failed")?.[1],
+      ).toEqual(expect.objectContaining({ sending_wallet: WalletCurrency.Usd }))
+    })
+
+    /** The lookup hands back the payment that landed beside every failed one it read,
+     *  so forgetting the lost attempts leaves none of them owing an outcome. */
+    it("reports an older attempt's failure beside a newer one found completed", async () => {
+      const OLDER_HASH = "b".repeat(64)
+      const detail = dollarDetail()
+      mockPrepareLnurl.mockResolvedValueOnce(quote(OLDER_HASH))
+      await detail.sendPaymentMutation({} as never)
+      await detail.sendPaymentMutation({} as never)
+
+      mockFindLostSend.mockResolvedValue({
+        ...paidInvoice(COMPLETED),
+        failed: [{ ...paidInvoice(FAILED, OLDER_HASH).payment, id: "p0" }],
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+        "sc_payment_send_settled",
+      ])
+    })
+
+    it("reports that failure once, however often the history shows it", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+      const failedPayment = paidInvoice(FAILED).payment
+      mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [failedPayment] })
+
+      await detail.sendPaymentMutation({} as never)
+      await detail.sendPaymentMutation({} as never)
+
+      expect(
+        loggedEvents().filter((name) => name === "sc_payment_send_failed"),
+      ).toHaveLength(1)
+    })
+
+    it("reports nothing for a failed payment while the history cannot be read", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      mockFindLostSend.mockResolvedValue({
+        status: "unreadable",
+        error: new Error("down"),
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    })
+
+    it("reports a quote that fails before anything is sent as failed", async () => {
+      mockPrepareLnurl.mockRejectedValue({ tag: "InsufficientFunds" })
+
+      await dollarDetail().sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+      ])
+    })
+
+    it("reports a found payment under the context the send began in, not a later one", async () => {
+      const detail = dollarDetail()
+      await detail.sendPaymentMutation({} as never)
+
+      setMeasurementContext({
+        accountId: "sc-2",
+        mode: AccountMode.Enhanced,
+        network: "mainnet",
+      })
+      mockFindLostSend.mockResolvedValue(paidInvoice(COMPLETED))
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    })
+  })
+
+  describe("a send the SDK refused on the way in", () => {
+    it.each([
+      ["InsufficientFunds", "sc_insufficient_funds"],
+      ["BelowMinimum", "sc_below_minimum"],
+      ["InvalidInput", "sc_invalid_input"],
+    ])(
+      "reports %s as one failure, even though the attempt is kept to look for",
+      async (tag, code) => {
+        mockPrepareLnurl.mockResolvedValue(quote())
+        mockExecuteLnurl.mockRejectedValue({ tag })
+        mockFindLostSend.mockResolvedValue({ status: "not-found", failed: [] })
+        const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+        if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+
+        await detail.sendPaymentMutation({} as never)
+
+        expect(loggedEvents()).toEqual([
+          "sc_payment_send_initiated",
+          "sc_payment_send_failed",
+        ])
+        expect(mockLogEvent).toHaveBeenLastCalledWith(
+          "sc_payment_send_failed",
+          expect.objectContaining({ error_code: code }),
+        )
+      },
+    )
+
+    it("does not report it again as settled if its invoice later turns up paid", async () => {
+      mockPrepareLnurl.mockResolvedValue(quote())
+      mockExecuteLnurl.mockRejectedValue({ tag: "InsufficientFunds" })
+      const detail = createSelfCustodialLnurlPaymentDetails(createParams())
+      if (!detail.canSendPayment) throw new Error("expected canSendPayment")
+      await detail.sendPaymentMutation({} as never)
+
+      mockFindLostSend.mockResolvedValue({
+        status: "found",
+        payment: {
+          id: "p1",
+          status: COMPLETED,
+          details: {
+            tag: "Lightning",
+            inner: { htlcDetails: { paymentHash: QUOTED_HASH } },
+          },
+        },
+        failed: [],
+      })
+      await detail.sendPaymentMutation({} as never)
+
+      expect(loggedEvents()).toEqual([
+        "sc_payment_send_initiated",
+        "sc_payment_send_failed",
+      ])
     })
   })
 })

@@ -31,6 +31,8 @@
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
     "loadError": "No s'han pogut carregar les teves claus API. Torna-ho a provar més tard.",
+    "discardSecretTitle": "Descartar aquesta clau d'API?",
+    "discardSecretBody": "Aquesta és l'única vegada que es mostra el secret. Si surts ara, la clau no es podrà recuperar i hauràs de crear-ne una de nova.",
     "done": "Fet"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Omet",
     "unlock": "Desbloqueja",
     "usePin": "Utilitza el PIN",
-    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari."
+    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari.",
+    "forgotPin": "Has oblidat el PIN? Elimina les carteres",
+    "removeWalletsTitle": "Vols eliminar les carteres d'aquest dispositiu?",
+    "removeWalletsBody": "Això elimina totes les carteres d'aquest dispositiu i tanca la sessió. Per recuperar una cartera, necessites la seva frase de seguretat. Sense ella, la cartera es perd.",
+    "removeWalletsConfirm": "Elimina les carteres",
+    "removeWalletsFailed": "No s'han pogut eliminar algunes carteres. Torna-ho a provar."
   },
   "PeopleScreen": {
     "title": "Gent",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
   },
   "PinScreen": {
+    "attemptUnrecorded": "No s'ha pogut registrar l'intent de manera segura.",
+    "attemptsLeft": "Queden {attemptsRemaining: string} intents.",
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
     "enterPin": "Introdueix el teu codi PIN",
-    "lockoutUnavailable": "No s'ha pogut registrar l'intent fallit de manera segura. Tancant la sessió.",
+    "oneAttemptLeft": "Queda 1 intent.",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "pinUnreadable": "No s'ha pogut comprovar el PIN. Torna-ho a provar.",
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
     "storePinFailed": "No es pot desar el teu pin.",
     "tooManyAttempts": "Massa intents fallits. Tancant la sessió.",
-    "tryAgainIn": "Torna-ho a provar d'aquí a {seconds: number} s.",
+    "attemptBudgetSpent": "Massa intents fallits.",
+    "tryAgainIn": "Torna-ho a provar d'aquí a {time: string}.",
     "verifyPin": "Verifica el teu codi PIN"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Si el problema continua contacta amb suport.",
     "fatalError": "Ho sentim, sembla que estem tenint problemes per carregar les dades de l'aplicació. Si els problemes persisteixen, poseu-vos en contacte amb el servei de suport.",
     "showError": "Mostra l'error",
-    "clearAppData": "Esborra les dades de l'aplicació i tanca la sessió"
+    "clearAppData": "Esborra les dades de l'aplicació i tanca la sessió",
+    "screenSecurityUnavailable": "Aquesta pantalla es manté oculta perquè no s'ha pogut activar la protecció contra captures de pantalla."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
     },
+    "BundleExport": {
+      "title": "Sortida d'emergència",
+      "body": "Si Spark deixa de funcionar, aquest paquet et permet moure els teus bitcoins a la cadena sense Blink. El teu saldo en dòlars no es pot recuperar.",
+      "download": "Baixa el paquet",
+      "sensitiveTitle": "Sensible",
+      "learnMore": "Més informació sobre la sortida unilateral",
+      "sensitiveConfirm": "Baixa",
+      "sensitiveBody": "Aquest fitxer mostra el teu saldo i l'historial de pagaments, així que mantén-lo privat. Per fer-lo servir en una emergència, també necessites la teva frase de còpia de seguretat."
+    },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
       "description": "Desarem una còpia de la teva frase de seguretat al teu {provider}.",
-      "encryptCheckbox": "Afegeix una frase de contrasenya addicional",
-      "password": "Frase de contrasenya",
+      "password": "Contrasenya",
       "passwordPlaceholder": "(mínim 12 caràcters)",
-      "confirmPassword": "Confirma la frase de contrasenya",
-      "confirmPasswordPlaceholder": "Introdueix la frase de contrasenya de nou",
+      "confirmPassword": "Confirmar contrasenya",
+      "confirmPasswordPlaceholder": "Introdueix la contrasenya de nou",
       "continueButton": "Continuar",
       "importantTitle": "Important",
-      "importantMessage": "Blink no emmagatzema aquesta frase de contrasenya. Si la perds, {bold} recuperar la teva cartera.",
+      "importantMessage": "Blink no emmagatzema aquesta contrasenya. Si la perds, {bold} recuperar la teva cartera.",
       "importantMessageBold": "no podrem",
       "passwordTooShort": "Mínim 12 caràcters",
-      "passwordMismatch": "Les frases de contrasenya no coincideixen",
+      "passwordMismatch": "Les contrasenyes no coincideixen",
       "uploadSuccess": "Còpia de seguretat desada a {provider}",
       "uploadFailed": "Error en pujar la còpia de seguretat",
       "signInFailed": "No s'ha pogut iniciar sessió a {provider}",
@@ -4037,12 +4056,18 @@
     "restore": "Restaurar cartera",
     "noBackupFound": "No s'ha trobat cap còpia de seguretat",
     "noBackupDescription": "No hem pogut trobar una còpia de seguretat. Pots introduir la teva frase de recuperació manualment.",
-    "enterPassword": "Introdueix la teva frase de contrasenya de xifratge",
-    "wrongPassword": "Frase de contrasenya incorrecta. Si us plau, torna-ho a provar.",
+    "enterPassword": "Introdueix la teva contrasenya de xifratge",
+    "wrongPassword": "Contrasenya incorrecta. Si us plau, torna-ho a provar.",
     "pickBackupTitle": "Tria una cartera",
     "pickBackupDescription": "Selecciona una còpia de seguretat per restaurar",
     "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
     "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operador inaccessible",
+    "outageBody": "Spark està patint una interrupció. Espera un parell de minuts i torna-ho a provar o contacta amb el nostre {support}",
+    "outageSupport": "Suport",
+    "tryAgainLater": "Torna-ho a provar més tard"
   },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",
@@ -4137,6 +4162,15 @@
     "title": "Aquest és un compte no custodi",
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
     "cta": "Llegeix"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualitza la teva còpia al núvol",
+    "body": "El teu paquet d'emergència a {provider} no està actualitzat. Torna a fer una còpia de seguretat de la cartera per actualitzar-lo.",
+    "cta": "Torna a fer la còpia"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
+    "exportFailed": "No s'ha pogut baixar el paquet d'emergència."
   },
   "StableBalance": {
     "title": "Balanç estable",

@@ -91,12 +91,27 @@ jest.mock("@app/hooks/use-account-registry", () => ({
 }))
 
 jest.mock("@app/utils/error-reporting", () => ({
+  logBreadcrumb: jest.fn(),
   recordAppError: (...args: unknown[]) => mockRecordAppError(...args),
+}))
+
+const mockMeasure = jest.fn()
+jest.mock("@app/self-custodial/measurement", () => ({
+  ...jest.requireActual("@app/self-custodial/measurement"),
+  measure: (...args: unknown[]) => mockMeasure(...args),
 }))
 
 jest.mock("@app/self-custodial/storage/onchain-address", () => ({
   ...jest.requireActual("@app/self-custodial/storage/onchain-address"),
-  loadIssuedOnchainAddress: (...args: unknown[]) => mockLoadIssuedOnchainAddress(...args),
+  /** The hook reads through `readIssuedOnchainAddress`; a spec sets the record (or a
+   *  read failure, by rejecting) on the load mock. */
+  readIssuedOnchainAddress: async (...args: unknown[]) => {
+    try {
+      return { ok: true, issued: await mockLoadIssuedOnchainAddress(...args) }
+    } catch {
+      return { ok: false }
+    }
+  },
   saveIssuedOnchainAddress: (...args: unknown[]) => mockSaveIssuedOnchainAddress(...args),
 }))
 
@@ -106,7 +121,7 @@ beforeEach(() => {
     activeAccount: { id: "sc-account-1", type: "self-custodial" },
   })
   mockLoadIssuedOnchainAddress.mockResolvedValue(null)
-  mockSaveIssuedOnchainAddress.mockResolvedValue(undefined)
+  mockSaveIssuedOnchainAddress.mockResolvedValue(true)
   mockFindLatestOnchainReceiptId.mockResolvedValue(null)
   applyPaymentRequestDefaults({
     receiveLightning: mockReceiveLightning,
@@ -170,7 +185,8 @@ describe("onchain address rotation", () => {
       address: "bc1qrotated...",
       depositMarker: "deposit-1",
       seenPendingDepositIds: [],
-    })
+    }) /** The address already issued is shown, not counted; the rotated one is new. */
+    expect(mockMeasure).toHaveBeenCalledTimes(1)
   })
 
   it("waits for the wallet snapshot instead of reading an empty history as no deposits", async () => {
@@ -704,5 +720,155 @@ describe("onchain address rotation", () => {
         }),
       )
     })
+  })
+})
+
+describe("onchain request telemetry", () => {
+  const onchainRequest = [
+    "sc_payment_request_created",
+    // eslint-disable-next-line camelcase
+    { rail: "onchain", has_amount: false },
+  ] as const
+
+  it("counts the first address an account is given", async () => {
+    renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalled()
+    })
+    expect(mockMeasure).toHaveBeenCalledTimes(1)
+    expect(mockMeasure).toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("does not count a visit that shows the address already issued", async () => {
+    mockLoadIssuedOnchainAddress.mockResolvedValue({
+      address: "bc1qtest...",
+      depositMarker: null,
+    })
+
+    renderHook(() => usePaymentRequest())
+
+    await waitFor(() => {
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalled()
+    })
+    await flushEffects()
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  /** Each case below waits for the save, then settles: the count is the last thing a
+   *  request does, so an address that would count has counted by then. */
+  const settledAfterSave = async () => {
+    await waitFor(() => {
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalled()
+    })
+    await flushEffects()
+  }
+
+  it("counts only once the record of the new address is saved", async () => {
+    let finishSave: (saved: boolean) => void = () => undefined
+    mockSaveIssuedOnchainAddress.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        finishSave = resolve
+      }),
+    )
+
+    renderHook(() => usePaymentRequest())
+    await settledAfterSave()
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+
+    await act(async () => finishSave(true))
+    expect(mockMeasure).toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("does not count an address whose record could not be saved", async () => {
+    mockSaveIssuedOnchainAddress.mockResolvedValue(false)
+
+    renderHook(() => usePaymentRequest())
+    await settledAfterSave()
+
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("does not count an address while the last record could not be read", async () => {
+    /** The record it could not read may hold this very address. */
+    mockLoadIssuedOnchainAddress.mockRejectedValue(new Error("storage read exploded"))
+
+    renderHook(() => usePaymentRequest())
+    await settledAfterSave()
+
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("neither shows nor counts an address that arrives after the screen is gone", async () => {
+    let handOut: (value: { address: string }) => void = () => undefined
+    mockReceiveOnchain.mockReturnValue(
+      new Promise((resolve) => {
+        handOut = resolve
+      }),
+    )
+
+    const { unmount } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(mockReceiveOnchain).toHaveBeenCalled()
+    })
+    unmount()
+    await act(async () => handOut({ address: "bc1qlate..." }))
+    await flushEffects()
+
+    expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("does not count an address whose screen went while its record was being saved", async () => {
+    let finishSave: (saved: boolean) => void = () => undefined
+    mockSaveIssuedOnchainAddress.mockReturnValue(
+      new Promise<boolean>((resolve) => {
+        finishSave = resolve
+      }),
+    )
+
+    const { unmount } = renderHook(() => usePaymentRequest())
+    await settledAfterSave()
+    unmount()
+    await act(async () => finishSave(true))
+    await flushEffects()
+
+    expect(mockMeasure).not.toHaveBeenCalledWith(...onchainRequest)
+  })
+
+  it("counts the address of the account switched to, not the one switched from", async () => {
+    const handOuts: Array<(value: { address: string }) => void> = []
+    mockReceiveOnchain.mockImplementation(
+      () =>
+        new Promise((resolve) => {
+          handOuts.push(resolve)
+        }),
+    )
+
+    const { result, rerender } = renderHook(() => usePaymentRequest())
+    await waitFor(() => {
+      expect(handOuts).toHaveLength(1)
+    })
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { id: "sc-account-2", type: "self-custodial" },
+    })
+    rerender({})
+    await waitFor(() => {
+      expect(handOuts).toHaveLength(2)
+    })
+
+    await act(async () => handOuts[0]({ address: "bc1qold-account..." }))
+    await act(async () => handOuts[1]({ address: "bc1qnew-account..." }))
+
+    await waitFor(() => {
+      expect(result.current?.onchainAddress).toBe("bc1qnew-account...")
+    })
+    await flushEffects()
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledTimes(1)
+    expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledWith(
+      "sc-account-2",
+      expect.objectContaining({ address: "bc1qnew-account..." }),
+    )
+    expect(mockMeasure).toHaveBeenCalledTimes(1)
   })
 })

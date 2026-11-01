@@ -31,6 +31,8 @@
     "createError": "Kon nie die API-sleutel skep nie. Probeer weer.",
     "revokeError": "Kon nie die API-sleutel herroep nie. Probeer weer.",
     "loadError": "Kon nie jou API-sleutels laai nie. Probeer later weer.",
+    "discardSecretTitle": "Gooi hierdie API-sleutel weg?",
+    "discardSecretBody": "Dit is die enigste keer wat die geheim gewys word. As jy nou weggaan, kan die sleutel nie herwin word nie en sal jy 'n nuwe een moet skep.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Gaan verby",
     "unlock": "Ontsluit",
     "usePin": "Gebruik PIN",
-    "confirmLogout": "Is jy seker jy wil afmeld? Dit sal jou kas en alle plaaslike gebruikersinstellings herstel"
+    "confirmLogout": "Is jy seker jy wil afmeld? Dit sal jou kas en alle plaaslike gebruikersinstellings herstel",
+    "forgotPin": "PIN vergeet? Verwyder beursies",
+    "removeWalletsTitle": "Verwyder beursies van hierdie toestel?",
+    "removeWalletsBody": "Dit verwyder alle beursies van hierdie toestel en teken jou uit. Om 'n beursie terug te kry, het jy sy rugsteunfrase nodig. Daarsonder is die beursie weg.",
+    "removeWalletsConfirm": "Verwyder beursies",
+    "removeWalletsFailed": "Sommige beursies kon nie verwyder word nie. Probeer asseblief weer."
   },
   "PeopleScreen": {
     "title": "Mense",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Beursietelling is nie 2 nie. Gebruik asseblief die kontroleskerm om al die beursies en fondse van hierdie rekening te sien"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Kon nie die poging veilig aanteken nie.",
+    "attemptsLeft": "{attemptsRemaining: number} probeerslae oor.",
     "attemptsRemaining": "Verkeerde PIN. {attemptsRemaining: number} probeerslae oor. ",
     "enterPin": "Voer jou PIN-kode in",
-    "lockoutUnavailable": "Kon nie die mislukte poging veilig aanteken nie. Teken uit.",
+    "oneAttemptLeft": "1 probeerslag oor.",
     "oneAttemptRemaining": "Verkeerde PIN, 1 probeerslag oor.",
     "pinUnreadable": "Kon nie jou PIN nagaan nie. Probeer asseblief weer.",
     "setPin": "Stel jou PIN-kode in",
     "setPinFailedMatch": "PINs stem nie ooreen nie - Stel jou PIN-kode in",
     "storePinFailed": "Kan nie nou jou PIN stoor nie.",
     "tooManyAttempts": "Te veel verkeerde probeerslae. Teken uit. ",
-    "tryAgainIn": "Probeer weer oor {seconds: number} s.",
+    "attemptBudgetSpent": "Te veel verkeerde probeerslae.",
+    "tryAgainIn": "Probeer weer oor {time: string}.",
     "verifyPin": "Bevestig jou PIN-kode"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "As die fout aanhou opduik, kontak asseblief ondersteuning. ",
     "fatalError": "Jammer, dit lyk of ons probleme het met die toepassing se data. As die probleem voortduur, kontak asseblief ondersteuning.",
     "showError": "Wys Fout",
-    "clearAppData": "Vee Toepassingdata skoon en Teken Uit"
+    "clearAppData": "Vee Toepassingdata skoon en Teken Uit",
+    "screenSecurityUnavailable": "Hierdie skerm bly versteek omdat skermskootbeskerming nie aangeskakel kon word nie."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Jou rugsteunfrase is korrek"
       }
     },
+    "BundleExport": {
+      "title": "Nooduitgang",
+      "body": "As Spark onbeskikbaar raak, laat hierdie bundel jou toe om jou bitcoin sonder Blink na die ketting te skuif. Jou dollarsaldo kan nie herstel word nie.",
+      "download": "Laai bundel af",
+      "sensitiveTitle": "Sensitief",
+      "learnMore": "Leer meer oor eensydige uitgang",
+      "sensitiveConfirm": "Laai af",
+      "sensitiveBody": "Hierdie lêer wys jou saldo en betalingsgeskiedenis, so hou dit privaat. Om dit in 'n noodgeval te gebruik, het jy ook jou rugsteunfrase nodig."
+    },
     "CloudBackup": {
       "title": "Kom ons rugsteun jou beursie",
       "description": "Ons sal 'n rugsteun van jou rugsteunfrase in jou {provider} stoor.",
-      "encryptCheckbox": "Voeg bykomende wagwoordfrase by",
-      "password": "Wagwoordfrase",
+      "password": "Wagwoord",
       "passwordPlaceholder": "(minimum 12 karakters)",
-      "confirmPassword": "Bevestig wagwoordfrase",
-      "confirmPasswordPlaceholder": "Voer wagwoordfrase weer in",
+      "confirmPassword": "Bevestig wagwoord",
+      "confirmPasswordPlaceholder": "Voer wagwoord weer in",
       "continueButton": "Gaan voort",
       "importantTitle": "Belangrik",
-      "importantMessage": "Blink stoor nie hierdie wagwoordfrase nie. As jy dit verloor, sal ons {bold} jou beursie herstel nie.",
+      "importantMessage": "Blink stoor nie hierdie wagwoord nie. As jy dit verloor, sal ons {bold} jou beursie herstel nie.",
       "importantMessageBold": "nie in staat wees om",
       "passwordTooShort": "Minimum 12 karakters",
-      "passwordMismatch": "Wagwoordfrases stem nie ooreen nie",
+      "passwordMismatch": "Wagwoorde stem nie ooreen nie",
       "uploadSuccess": "Rugsteun gestoor in {provider}",
       "uploadFailed": "Kon nie rugsteun oplaai nie",
       "signInFailed": "Kon nie by {provider} aanmeld nie",
@@ -4037,12 +4056,18 @@
     "restore": "Herstel beursie",
     "noBackupFound": "Geen rugsteun gevind nie",
     "noBackupDescription": "Ons kon nie 'n rugsteun vind nie. Jy kan jou rugsteunfrase handmatig invoer.",
-    "enterPassword": "Voer jou enkripsie-wagwoordfrase in",
-    "wrongPassword": "Verkeerde wagwoordfrase. Probeer asseblief weer.",
+    "enterPassword": "Voer jou enkripsierwagwoord in",
+    "wrongPassword": "Verkeerde wagwoord. Probeer asseblief weer.",
     "pickBackupTitle": "Kies 'n beursie",
     "pickBackupDescription": "Kies 'n rugsteun om te herstel",
     "recognizePhraseTitle": "Herken jy hierdie rugsteunfrase?",
     "recognizePhraseBody": "Moet nooit woorde invoer wat iemand anders aan jou gestuur het nie."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operateur onbereikbaar",
+    "outageBody": "Spark ervaar 'n onderbreking. Wag asseblief 'n paar minute en probeer weer, of kontak ons {support}",
+    "outageSupport": "Ondersteuning",
+    "tryAgainLater": "Probeer later weer"
   },
   "BackupNudge": {
     "title": "Jou fondse is in gevaar",
@@ -4137,6 +4162,15 @@
     "title": "Hierdie is 'n nie-bewaarrekening",
     "body": "Lees ons blogpos om meer te wete te kom",
     "cta": "Lees"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Werk jou wolk-rugsteun by",
+    "body": "Jou noodbundel in {provider} is verouderd. Rugsteun jou beursie weer om dit by te werk.",
+    "cta": "Rugsteun weer"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Nog geen noodbundel nie. Dit word ná jou eerste transaksie geskep.",
+    "exportFailed": "Kon nie die noodbundel aflaai nie."
   },
   "StableBalance": {
     "title": "Stabiele balans",

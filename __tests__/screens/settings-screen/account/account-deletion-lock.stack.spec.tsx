@@ -112,10 +112,17 @@ const raiseLock = async () => {
   })
 }
 
-/** The removal's own way off the screen, as `useAccountRemoval` runs it once it lands. */
+/** The removal's own way off the screen, as `useAccountRemoval` runs it once it lands.
+ *  The logout route owns the lock flag; here it only has to take the locked screen off
+ *  the stack the way that route does when the lock went with the wallet. */
 const leaveWith = async (outcome: DeleteAccountOutcome) => {
+  const routeAfterLogout = (isAppLockKept: boolean) => {
+    if (!controls.navigation || isAppLockKept) return
+    controls.navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
+  }
   const navigate = () => {
-    if (controls.navigation) navigateAfterAccountDelete(controls.navigation, outcome)
+    if (controls.navigation)
+      navigateAfterAccountDelete(controls.navigation, routeAfterLogout, outcome)
   }
   await act(async () => {
     controls.leaveWhileDeleting?.(navigate)

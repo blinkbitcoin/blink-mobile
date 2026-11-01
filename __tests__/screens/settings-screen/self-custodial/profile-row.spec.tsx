@@ -12,6 +12,14 @@ const TEST_ENTRY_ID = "test-account-id"
 
 let mockNetwork = mockSparkNetwork.Regtest
 
+const mockRouteAfterLogout = jest.fn()
+
+/** The shared logout route reaches the lock context, which pulls in native boot code this
+ *  screen never touches; only the way out it hands back is stood in for. */
+jest.mock("@app/hooks/use-logout-and-route", () => ({
+  useLogoutAndRoute: () => ({ routeAfterLogout: mockRouteAfterLogout }),
+}))
+
 jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
   useSparkNetwork: () => mockNetwork,
 }))
@@ -684,5 +692,52 @@ describe("ProfileRow", () => {
     )
 
     expect(getByText("stored")).toBeTruthy()
+  })
+
+  /** A lock the wipe could not take is still owed an answer, so this one may not land on
+   *  the screen that opens a new account. */
+  it("returns through the gate when the deletion left the lock standing", async () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "logged-out-locked" })
+
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
+    expect(mockRouteAfterLogout).toHaveBeenCalledWith(true)
+  })
+
+  /** The lock went with the wallet, so the flag has to come down with it. A relock raised
+   *  while the delete was in flight would otherwise stay up with no lock left to answer,
+   *  parking every later deep link behind it. */
+  it("lowers the lock flag when the deletion took the lock with it", async () => {
+    mockNetwork = mockSparkNetwork.Mainnet
+    mockProbeWallets.mockResolvedValue({ status: "ok", wallets: [] })
+    mockDeleteWallet.mockResolvedValue({ removed: true, outcome: "logged-out" })
+
+    const { getByTestId, findByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+    fireEvent.press(getByTestId(`delete-button-${TEST_ENTRY_ID}`))
+    await findByTestId("delete-modal")
+
+    await act(async () => {
+      await lastConfirmModalProps.onConfirm?.()
+    })
+    await act(async () => {
+      await lastConfirmModalProps.onModalHide?.()
+    })
+
+    expect(mockRouteAfterLogout).toHaveBeenCalledWith(false)
   })
 })

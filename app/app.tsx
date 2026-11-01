@@ -30,6 +30,8 @@ import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
   DisplayCurrencyFromRegionMount,
+  RecoveryBundleListenerMount,
+  TelemetryContextMount,
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
@@ -93,7 +95,9 @@ export const App = () => (
                                               <PushNotificationComponent />
                                               <AutoConvertListenerMount />
                                               <AccountModeSyncMount />
+                                              <TelemetryContextMount />
                                               <DisplayCurrencyFromRegionMount />
+                                              <RecoveryBundleListenerMount />
                                               <RootStack />
                                               <NetworkErrorComponent />
                                               <ActionModals />

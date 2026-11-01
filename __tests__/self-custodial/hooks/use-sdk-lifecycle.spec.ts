@@ -94,6 +94,11 @@ jest.mock("@app/config/feature-flags-context", () => ({
   }),
 }))
 
+const mockMeasureObservedPayment = jest.fn()
+jest.mock("@app/self-custodial/measurement", () => ({
+  measureObservedPayment: (...args: unknown[]) => mockMeasureObservedPayment(...args),
+}))
+
 const mockRecordError = jest.fn()
 const mockCrashlyticsLog = jest.fn()
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
@@ -395,6 +400,44 @@ describe("useSdkLifecycle", () => {
       })
 
       expect(mockGetSnapshot.mock.calls.length).toBeGreaterThan(snapshotCallsBefore)
+    })
+
+    /** A failed send is the only word a pending send gets of its failure, and it is not a
+     *  refresh event: it has to reach telemetry before the refresh filter drops it. */
+    it("hands a failed send to telemetry without refreshing", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      const listener = captureListener()
+      renderHook(() => useSdkLifecycle("acct-1", 0))
+      await waitFor(() => {
+        expect(listener.current).not.toBeNull()
+      })
+      const snapshotCallsBefore = mockGetSnapshot.mock.calls.length
+      const payment = { id: "pay-1", paymentType: 0, method: 0, status: 2 }
+
+      await act(async () => {
+        await listener.current?.({ tag: "PaymentFailed", inner: { payment } })
+      })
+
+      expect(mockMeasureObservedPayment).toHaveBeenCalledWith(payment)
+      expect(mockGetSnapshot.mock.calls).toHaveLength(snapshotCallsBefore)
+    })
+
+    it("hands telemetry nothing for an event whose payment it cannot read", async () => {
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+      const listener = captureListener()
+      renderHook(() => useSdkLifecycle("acct-1", 0))
+      await waitFor(() => {
+        expect(listener.current).not.toBeNull()
+      })
+
+      await act(async () => {
+        await listener.current?.({
+          tag: "PaymentSucceeded",
+          inner: { payment: { id: "pay-1", paymentType: 1, method: 0 } },
+        })
+      })
+
+      expect(mockMeasureObservedPayment).not.toHaveBeenCalled()
     })
 
     it("does not update lastReceivedPaymentId when the event lacks inner.payment", async () => {

@@ -1,3 +1,8 @@
+jest.mock("react-native-bootsplash", () => ({
+  __esModule: true,
+  default: { hide: jest.fn() },
+}))
+
 import React, { useSyncExternalStore } from "react"
 import { Alert, AlertButton, BackHandler, Text } from "react-native"
 import { act, fireEvent, render, screen } from "@testing-library/react-native"
@@ -142,6 +147,10 @@ jest.mock("@app/hooks/use-switch-to-next-profile", () => ({
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
   default: () => ({ logout: jest.fn() }),
+}))
+
+jest.mock("@app/hooks/use-logout-and-route", () => ({
+  useLogoutAndRoute: () => ({ routeAfterLogout: jest.fn() }),
 }))
 
 jest.mock("@app/hooks", () => ({

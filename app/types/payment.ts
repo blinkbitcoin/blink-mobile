@@ -149,10 +149,14 @@ export const convertDirectionFromCurrency = (
 export const oppositeWalletCurrency = (currency: WalletCurrency): WalletCurrency =>
   currency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
 
+export type ConvertSource = "manual" | "auto_convert"
+
 export type ConvertParams = {
   fromAmount: MoneyAmount<WalletCurrency>
   toAmount: MoneyAmount<WalletCurrency>
   direction: ConvertDirection
+  /** Telemetry only: whether the user drove the swap or the auto-convert rule did. */
+  source?: ConvertSource
 }
 
 export type ConversionLimits = {

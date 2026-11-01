@@ -2,6 +2,7 @@ import {
   SdkLogLevel,
   createSdkLogListener,
   logSdkEvent,
+  scrubSdkLogLine,
 } from "@app/self-custodial/logging"
 
 const mockLog = jest.fn()
@@ -42,11 +43,11 @@ describe("logSdkEvent", () => {
     expect(mockRecordError).not.toHaveBeenCalled()
   })
 
-  it("logs info to console and crashlytics", () => {
+  it("keeps info in the console, where every payment the SDK emits is logged", () => {
     logSdkEvent(SdkLogLevel.Info, "info message")
 
     expect(console.debug).toHaveBeenCalledWith("[SparkSDK] info message")
-    expect(mockLog).toHaveBeenCalledWith("[SparkSDK] info message")
+    expect(mockLog).not.toHaveBeenCalled()
     expect(mockRecordError).not.toHaveBeenCalled()
   })
 
@@ -78,6 +79,48 @@ describe("logSdkEvent", () => {
 
     expect(mockRecordError).not.toHaveBeenCalled()
     expect(mockLog).toHaveBeenCalledWith(expect.stringContaining("[transient]"))
+  })
+
+  it("scrubs a warning before it becomes a breadcrumb", () => {
+    logSdkEvent(
+      SdkLogLevel.Warn,
+      'Retrying send: Payment { invoice: "lnbc210n1p4wrhymabcdefghijklmnop" }',
+    )
+
+    expect(console.warn).toHaveBeenCalledWith(
+      '[SparkSDK] Retrying send: Payment { invoice: "lnbc210n1p4wrhymabcdefghijklmnop" }',
+    )
+    expect(mockLog).toHaveBeenCalledWith(
+      '[SparkSDK] Retrying send: Payment { invoice: "…" }',
+    )
+  })
+
+  it("scrubs an error before it is recorded, and still classifies it on its raw text", () => {
+    const fresh = loadFreshLoggingModule()
+    fresh.logSdkEvent(
+      SdkLogLevel.Error,
+      'Send to catalyst@blink.sv failed: Payment { amount: 21, invoice: "lnbc210n1p4wrhymabcdefghijklmnop" }',
+    )
+
+    expect(mockRecordError).toHaveBeenCalledWith(
+      expect.objectContaining({
+        message:
+          '[SparkSDK] Send to <address> failed: Payment { amount: #, invoice: "…" }',
+      }),
+    )
+  })
+
+  it("classifies on the raw line when only a scrubbed field said it was connectivity", () => {
+    const fresh = loadFreshLoggingModule()
+    fresh.logSdkEvent(
+      SdkLogLevel.Error,
+      'Failed to sync: Status { code: Internal, message: "transport error" }',
+    )
+
+    expect(mockLog).toHaveBeenCalledWith(
+      '[transient] [SparkSDK] Failed to sync: Status { code: Internal, message: "…" }',
+    )
+    expect(mockRecordError).not.toHaveBeenCalled()
   })
 
   it("records a repeated defect line only once per session", () => {
@@ -115,7 +158,7 @@ describe("createSdkLogListener", () => {
     listener.log({ level: "INFO", line: "sdk initialized" })
 
     expect(console.debug).toHaveBeenCalledWith("[SparkSDK] sdk initialized")
-    expect(mockLog).toHaveBeenCalledWith("[SparkSDK] sdk initialized")
+    expect(mockLog).not.toHaveBeenCalled()
   })
 
   it("maps unknown level to info", () => {
@@ -124,7 +167,8 @@ describe("createSdkLogListener", () => {
     listener.log({ level: "UNKNOWN", line: "bad level" })
 
     expect(console.debug).toHaveBeenCalledWith("[SparkSDK] bad level")
-    expect(mockLog).toHaveBeenCalledWith("[SparkSDK] bad level")
+    expect(console.warn).not.toHaveBeenCalled()
+    expect(mockLog).not.toHaveBeenCalled()
   })
 
   it("suppresses 'Received empty event' log lines", () => {
@@ -145,5 +189,55 @@ describe("createSdkLogListener", () => {
 
     expect(console.warn).toHaveBeenCalledWith("[SparkSDK] something happened")
     expect(mockLog).toHaveBeenCalledWith("[SparkSDK] something happened")
+  })
+})
+
+describe("scrubSdkLogLine", () => {
+  it("strips a whole emitted Payment down to its shape", () => {
+    const line =
+      'emit(PaymentSucceeded: Payment { id: "98b2cc49-7e3d-43b8-b566-87d46071d51e", payment_type: Send, status: Completed, amount: 21, fees: 0, timestamp: 1793186974, method: Lightning, details: Some(Lightning { description: Some("Pay to catalyst@blink.sv"), invoice: "lnbc210n1p4wrhymabcdefghijklmnop", destination_pubkey: "03093651a7e1d3c1b2f4e5d6c7b8a9f0e1d2c3b4a5968778695a4b3c2d1e0f1a2b" }) }) internal listener 0: 1.2ms'
+
+    expect(scrubSdkLogLine(line)).toBe(
+      'emit(PaymentSucceeded: Payment { id: "…", payment_type: Send, status: Completed, amount: #, fees: #, timestamp: 1793186974, method: Lightning, details: Some(Lightning { description: Some("…"), invoice: "…", destination_pubkey: "…" }) }) internal listener 0: 1.2ms',
+    )
+  })
+
+  it("keeps a URL's host and drops the path and query", () => {
+    expect(
+      scrubSdkLogLine(
+        "Making GET request to: https://lnurl.blink.sv/lnurlp/blink.sv/catalyst/invoice?amount=21000&comment=Pay+to+catalyst%40blink.sv",
+      ),
+    ).toBe("Making GET request to: https://lnurl.blink.sv/…")
+  })
+
+  it("drops a byte array such as an identity pubkey", () => {
+    expect(
+      scrubSdkLogLine(
+        "QueryNodesRequest { source: Some(OwnerIdentityPubkey([2, 176, 67, 202, 43, 164, 175, 8, 40])) }",
+      ),
+    ).toBe("QueryNodesRequest { source: Some(OwnerIdentityPubkey([…])) }")
+  })
+
+  it("masks identifiers that appear outside a field", () => {
+    expect(
+      scrubSdkLogLine(
+        "paid 03093651a7e1d3c1b2f4e5d6c7b8a9f0e1d2c3b4a5968778695a4b3c2d1e0f1a2b via bc1qar0srrr7xfkvy5l643lydnw9re59gtzzwf5mdq from 1BoatSLRHtKNngkdXEeobR76b53LETtpyT for user@example.com, payment 98b2cc49-7e3d-43b8-b566-87d46071d51e",
+      ),
+    ).toBe("paid <hex> via <address> from <address> for <address>, payment <id>")
+  })
+
+  it("masks invoices and LNURLs that appear outside a field", () => {
+    expect(
+      scrubSdkLogLine(
+        "could not pay lnbc210n1p4wrhymabcdefghijklmnop, nor lnurl1dp68gurn8ghj7um9wfmxjcm99e3k7mf0v9cxj0m385ekvcenxc6r2c35xvukxefcv5mkvv34x5ekzd3ev56nyd3hxqurzepexejxxepnxscrvwfnv9nxzcn9xq6xyefhvgcxxcmyxymnserxfq5fns",
+      ),
+    ).toBe("could not pay <invoice>, nor <lnurl>")
+  })
+
+  it("leaves error text in tuple form readable", () => {
+    const line =
+      'Failed to recover lightning address on startup: NetworkError("failed to deserialize response json: missing field `lnurl` at line 1 column 15")'
+
+    expect(scrubSdkLogLine(line)).toBe(line)
   })
 })

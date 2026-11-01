@@ -78,8 +78,8 @@ GestureHandlerRootView
 
 ```
 RootStack (Stack Navigator)
-├── getStarted          # Initial screen (unauthenticated)
-├── authenticationCheck # Auth check screen
+├── getStarted          # Landing screen (no account), reached through the gate
+├── authenticationCheck # Gate: every launch starts here and asks for the app lock, if set
 ├── authentication      # Login/PIN screen
 ├── login               # Login method selection
 ├── pin                 # PIN entry
@@ -171,6 +171,24 @@ cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
 
 ## Authentication Flow
 
+Every launch starts at `authenticationCheck`, with an account or without. It asks for the
+app lock when the device has one, then lands on `Primary` for a device with an account to
+show and on `getStarted` for one without. A logout keeps the app lock for as long as the
+device still stores a self-custodial wallet, and whatever ends a session without the lock
+having been answered returns to the gate rather than to `getStarted`.
+
+Every entry is recorded with its wait before it is compared, and a correct one takes both
+back. The wait is seconds for the first two failures, then minutes that grow with each
+failure from the third on, up to an hour. The third failure is the one that ends the
+session. Where the lock outlives that logout, a later wrong entry ends nothing, and the
+wait is what paces the guesses. The count and the wait are stored as one value, so they
+survive a relaunch. An entry the store cannot record is not judged at all, and the keypad
+stays for a retry. A correct entry whose clear is refused puts back the count from before
+it, but a kill between the record and the clear leaves that entry counted, until the next
+correct one takes it back.
+
+The diagram below is the sign-in that starts from `getStarted`.
+
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐
 │  GetStarted  │────▶│   Login      │────▶│  Primary     │
@@ -248,6 +266,7 @@ cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
 4. **App Check**: Firebase device attestation
 5. **Network**: HTTPS/WSS only, certificate pinning consideration
 6. **Two-factor nudges by balance** (`app/custodial/providers/two-factor-enforcement.tsx`): two-factor authentication means an authenticator (TOTP); an email and a phone together do not count, since an attacker who takes an account over can change both. Custodial accounts without one are nudged as their balance crosses tiers, with the thresholds read from Remote Config (`custodialTwoFactorThresholds`, sats and whole dollars, refused as a whole set when incomplete, not rising tier by tier, or more than ten times off its shipped default), and a tier written to the record only from a balance the network confirmed this session (one network-only read per session, in `useFreshAccountRead`) and thresholds from this launch's fetch, since a reached tier never lowers: a home card at the first tier, a home bulletin at the second that comes back at every session start until it has been dismissed three times, and after that whenever a session start finds a wallet above its all-time high, coming back until it is closed, and at the third a session-start modal three times, then a blocking screen that stands in for the home. A new high in one wallet while the other fell since the last session start is a transfer between them and brings no bulletin back. The blocking screen offers an authenticator or leaving custody; while the console has the self-custodial stack off (`nonCustodialEnabled`), leaving custody is not offered anywhere and the modal stays, dismissible, in the blocking screen's place. The fresh read and the Remote Config fetch each give up after ten seconds, so nothing waits on them for the whole session. The tier reached, the dismissal counters and the all-time highs live only on the device (AsyncStorage, per account), so the wall is a strong nudge rather than an enforcement: a reinstall or a second device starts its counters over, and the backend requires a second code at login only when an authenticator is set. Compliance must not rely on it. Every prompt that asks for an authenticator opens its onboarding (`app/screens/totp-screen/`): why, an app to get, the setup key, the code, then the key's backup, which takes the place of the screens before it, and the done screen, which takes the backup's. The backup is export only, through a copy or, on Android, the system's Credential Manager (`app/utils/credential-manager.ts`, which the self-custodial wallet backup also saves through; iOS offers no save sheet, so there the option is not shown), and a copy of the key is wiped from the clipboard once its screen is gone. While a code is checked, the code screen refuses the user's own ways back for up to twenty seconds, and while the key is at stake, a code being checked or the backup open, every link, the migration's too, waits in the queue (`isSetupKeyAtStake` in `app/navigation/two-factor-remedy-routes.ts`).
+7. **Emergency bundle** (`app/self-custodial/recovery-bundle/`): the file that lets a self-custodial user move their bitcoin onchain without Blink if the Spark operators go offline (unilateral exit). Every self-custodial wallet keeps one on the device, encrypted with a key derived from the seed, in the documents directory and excluded from iOS device backups; a wallet that has never held funds has none yet. `useRecoveryBundleRefresh` (mounted once in `app/app.tsx`) rebuilds it in the background 15 seconds after each payment and at startup when it is a day old or misses a payment, retrying a failed run with backoff; there is no opt-out, since a bundle that falls behind the wallet cannot recover what it misses. When the seed is backed up to iCloud or Google Drive, with or without a passphrase, every saved bundle is also uploaded silently to the same provider; it is the same seed-encrypted file, so it is only as protected as the seed backup beside it. An upload that fails, for example after a lapsed Google sign-in or with iCloud Drive turned off, says nothing, so once the cloud copy has trailed the one on the device for `cloudBundleStaleAfterMs` (remote config, a week by default) the home shows a dismissible bulletin that leads to the cloud backup, which signs in again and uploads the bundle; a dismissal holds until a newer bundle is saved. Restoring from a cloud backup counts as a cloud backup, so the restored device takes over the upload. A manual backup, or a restore from a typed phrase, leaves it on the device only. Settings → Emergency exit shows for every self-custodial account and hands over a decrypted copy through the share sheet, after a sensitive-data warning; until a bundle exists, Download looks inactive and a tap explains that one is created after the first transaction. The app itself cannot restore from a bundle; the screen links to the unilateral-exit case study instead. Deleting the account sweeps the device copy and its state for both networks; the cloud copy stays, like the cloud seed backup.
 
 ## Performance Patterns
 

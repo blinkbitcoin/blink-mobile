@@ -2,9 +2,7 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
-import { recordAppError } from "@app/utils/error-reporting"
+import { logBreadcrumb, recordAppError } from "@app/utils/error-reporting"
 import { utils as lnurlUtils } from "lnurl-pay"
 
 import { WalletCurrency } from "@app/graphql/generated"
@@ -38,12 +36,13 @@ import {
   ReceiveAssetMode,
 } from "../auto-convert"
 import { createReceiveLightning, createReceiveOnchain } from "../bridge"
+import { measure, ScEvent, ScRail } from "../measurement"
 import { AutoConvertStatus, useAutoConvertStatus } from "../providers/auto-convert-status"
 import { useSelfCustodialWallet } from "../providers/wallet"
 import { findLatestOnchainReceiptId } from "../providers/wallet-snapshot"
 import {
   latestOnchainReceiptId,
-  loadIssuedOnchainAddress,
+  readIssuedOnchainAddress,
   mergeSeenPendingDepositIds,
   saveIssuedOnchainAddress,
 } from "../storage/onchain-address"
@@ -216,8 +215,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         memo: memo || undefined,
       })
       if (!("invoice" in result) || !result.invoice) {
-        crashlytics().log(
-          `[Self-custodial] Lightning adapter returned no invoice (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+        logBreadcrumb(
+          `[Self-custodial] Lightning adapter returned no invoice (hasAmount=${Boolean(amount)}, currency=${amount?.currencyCode ?? "none"})`,
         )
         recordAppError(
           new Error("Self-custodial invoice adapter returned no invoice field"),
@@ -240,8 +239,8 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
       setPaymentRequest(result.invoice)
       setRequestState(PaymentRequestState.Created)
     } catch (err) {
-      crashlytics().log(
-        `[Self-custodial] Lightning invoice generation failed (amount=${amount?.amount ?? "none"}, currency=${amount?.currencyCode ?? "none"})`,
+      logBreadcrumb(
+        `[Self-custodial] Lightning invoice generation failed (hasAmount=${Boolean(amount)}, currency=${amount?.currencyCode ?? "none"})`,
       )
       recordAppError(
         err instanceof Error
@@ -407,9 +406,10 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
     // SDK's existing address instead and leave the tracking to the next run that has
     // an account to key on. This state is transient, an account switch mid-render.
     const canTrackReuse = selfCustodialAccountId !== null
-    const issued = canTrackReuse
-      ? await loadIssuedOnchainAddress(selfCustodialAccountId)
+    const read = canTrackReuse
+      ? await readIssuedOnchainAddress(selfCustodialAccountId)
       : null
+    const issued = read?.ok ? read.issued : null
     const seenPendingIds = issued?.seenPendingDepositIds ?? []
 
     /**
@@ -446,7 +446,7 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
 
     setOnchainAddress(result.address)
     if (!canTrackReuse) return
-    await saveIssuedOnchainAddress(selfCustodialAccountId, {
+    const saved = await saveIssuedOnchainAddress(selfCustodialAccountId, {
       address: result.address,
       // Never let a snapshot that has not loaded erase a marker we already had:
       // the next refresh would otherwise read it back as a fresh deposit.
@@ -460,6 +460,18 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
         pendingIds,
       ),
     })
+    /**
+     * A request is an address handed out, not a visit that shows the one issued before
+     * (the first address an account gets counts too, having no record to match). It
+     * counts once the record says so, while this request still owns the screen: a failed
+     * read cannot tell a new address from the last one, and a failed save would let the
+     * next visit count it again.
+     */
+    const isNewAddress = read?.ok === true && result.address !== issued?.address
+    if (saved && isNewAddress && requestId === onchainRequestIdRef.current) {
+      // eslint-disable-next-line camelcase
+      measure(ScEvent.PaymentRequestCreated, { rail: ScRail.Onchain, has_amount: false })
+    }
   }, [sdk, selfCustodialAccountId])
 
   // Runs on mount and again whenever an on-chain receipt or an unclaimed deposit
@@ -474,6 +486,11 @@ export const usePaymentRequest = (): ReceivePaymentRequestState | null => {
           : new Error(`Self-custodial receive onchain adapter failed: ${err}`),
       )
     })
+    /** A request still in flight when the screen goes (or the account changes) has no
+     *  screen to show its address on: it neither displays nor counts it. */
+    return () => {
+      onchainRequestIdRef.current += 1
+    }
   }, [sdk, issueOnchainAddress, loadedDepositMarker, pendingDepositKey])
 
   useEffect(() => {
