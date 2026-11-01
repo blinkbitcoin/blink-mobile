@@ -100,6 +100,9 @@ import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
+import { addSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
+
+const mockedAddAccountId = jest.mocked(addSelfCustodialAccountId)
 
 const makeSdk = () => ({
   updateUserSettings: (...args: unknown[]) => mockUpdateUserSettings(...args),
@@ -313,6 +316,7 @@ describe("selfCustodialCreateWallet", () => {
 
   it("deletes the stored phrase and rethrows when the network label write reports failure", async () => {
     mockSetMnemonicNetwork.mockResolvedValueOnce(false)
+    mockDeleteMnemonic.mockResolvedValue(true)
 
     await expect(
       selfCustodialCreateWallet("test-account", Network.Regtest),
@@ -320,6 +324,30 @@ describe("selfCustodialCreateWallet", () => {
     expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
     /** The hook owns the single crashlytics report now, so the bridge does not double-report. */
     expect(mockRecordError).not.toHaveBeenCalled()
+  })
+
+  it("deletes the stored phrase and rethrows when the account cannot be registered", async () => {
+    mockedAddAccountId.mockRejectedValueOnce(new Error("Account index unreadable"))
+    mockDeleteMnemonic.mockResolvedValue(true)
+
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("Account index unreadable")
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
+  })
+
+  /**
+   * A rollback that could not finish leaves key material under an account id
+   * the app's index never learned about, so nothing in the UI can reach it.
+   */
+  it("reports a rollback that could not remove the phrase", async () => {
+    mockSetMnemonicNetwork.mockResolvedValueOnce(false)
+    mockDeleteMnemonic.mockResolvedValue(false)
+
+    await expect(
+      selfCustodialCreateWallet("test-account", Network.Regtest),
+    ).rejects.toThrow("Failed to store mnemonic network")
+    expect(mockRecordError).toHaveBeenCalledTimes(1)
   })
 })
 
@@ -450,5 +478,20 @@ describe("selfCustodialRestoreWallet", () => {
     expect(mockRecordError).toHaveBeenCalledWith(
       expect.objectContaining({ message: expect.stringContaining("SDK init refused") }),
     )
+  })
+
+  it("rolls back the stored mnemonic when the account cannot be registered", async () => {
+    mockedAddAccountId.mockRejectedValueOnce(new Error("Account index unreadable"))
+
+    await expect(
+      selfCustodialRestoreWallet({
+        accountId: "test-account",
+        mnemonic: "any valid words",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      }),
+    ).rejects.toThrow("Account index unreadable")
+
+    expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
   })
 })
