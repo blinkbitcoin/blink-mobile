@@ -201,7 +201,7 @@ const useStyles = makeStyles(({ colors }) => ({
   frozenTitle: {
     color: colors._white,
     fontSize: 20,
-    fontWeight: "600",
+    fontWeight: "700",
     fontFamily: "Source Sans Pro",
     fontStyle: "normal",
     lineHeight: 24,
