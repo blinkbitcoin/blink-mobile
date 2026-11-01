@@ -11,6 +11,7 @@ import {
 
 export const useTotalBalance = (
   wallets?: readonly WalletBalance[],
+  cardBalanceSats?: number,
 ): {
   formattedBalance: string
   numericBalance: number
@@ -37,6 +38,10 @@ export const useTotalBalance = (
     toUsdMoneyAmount(usdWallet?.balance),
     DisplayCurrency,
   )
+  const cardAmount =
+    cardBalanceSats === undefined
+      ? undefined
+      : convertMoneyAmount?.(toBtcMoneyAmount(cardBalanceSats), DisplayCurrency)
 
   /** The price conversion is the only thing this loader waits on. Callers hand this one flag
    *  to the whole header, so folding the region in blanked the username, the total and the
@@ -54,7 +59,10 @@ export const useTotalBalance = (
     }
   }
 
-  const totalDisplay = addMoneyAmounts({ a: usdAmount, b: btcAmount })
+  const walletTotal = addMoneyAmounts({ a: usdAmount, b: btcAmount })
+  const totalDisplay = cardAmount
+    ? addMoneyAmounts({ a: walletTotal, b: cardAmount })
+    : walletTotal
 
   const integerBalanceString = formatMoneyAmount({
     moneyAmount: totalDisplay,

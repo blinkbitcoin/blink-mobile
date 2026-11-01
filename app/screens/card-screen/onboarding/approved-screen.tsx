@@ -6,7 +6,7 @@ import { CardStatusLayout } from "@app/components/card-screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { useCardData } from "../hooks/use-card-data"
+import { useCardData } from "@app/hooks"
 import { isCardFrozen } from "../utils/card-display"
 
 export const CardApprovedScreen: React.FC = () => {
