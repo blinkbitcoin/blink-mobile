@@ -4,7 +4,7 @@ import { View } from "react-native"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { Text, makeStyles } from "@rn-vui/themed"
 
-import { PIN_HEIGHT, PinShape, usePinColor } from "./pin-shape"
+import { NewPlacePinShape, OUTLINED_PIN_HEIGHT, OUTLINED_PIN_TIP_Y } from "./pin-shape"
 
 /**
  * The pin for a new place, and what to do with it.
@@ -21,15 +21,13 @@ import { PIN_HEIGHT, PinShape, usePinColor } from "./pin-shape"
 export const PlaceLocator: React.FC = () => {
   const { LL } = useI18nContext()
   const styles = useStyles()
-  // The pin being aimed is never a boosted place — it is not a place at all yet.
-  const pinColor = usePinColor(false)
 
   return (
     <View testID="place-pin" style={styles.crosshair} pointerEvents="none">
       <View style={styles.hint}>
         <Text style={styles.hintText}>{LL.MapScreen.placePinHint()}</Text>
       </View>
-      <PinShape color={pinColor} />
+      <NewPlacePinShape />
     </View>
   )
 }
@@ -38,19 +36,20 @@ const useStyles = makeStyles(({ colors }) => ({
   // Full width so the hint above the pin has room to wrap, with the pin itself
   // centred inside it. The teardrop's point is its bottom edge, so lifting the
   // row by the pin's own height is what puts that point — rather than its
-  // middle — on the centre of the map.
+  // middle — on the centre of the map. The ring sits outside the teardrop, so
+  // the point is the ring's width above the box's bottom edge, not on it.
   crosshair: {
     position: "absolute",
     top: "50%",
     left: 0,
     right: 0,
-    marginTop: -PIN_HEIGHT,
+    marginTop: -OUTLINED_PIN_TIP_Y,
     alignItems: "center",
   },
   hint: {
     position: "absolute",
     alignSelf: "center",
-    bottom: PIN_HEIGHT + 8,
+    bottom: OUTLINED_PIN_HEIGHT + 8,
     maxWidth: "80%",
     backgroundColor: colors.white,
     borderRadius: 16,
