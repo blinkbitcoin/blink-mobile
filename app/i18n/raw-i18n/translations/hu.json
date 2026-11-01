@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "A tranzakciót elküldjük a mempoolba",
     "amount": "Összeg",
+    "addAmount": "Összeg hozzáadása",
+    "lowFunds": "Nincs elegendő egyenleg",
     "amountExceed": "Az összeg meghaladja az egyenlegedet: {balance: string}",
     "amountExceedsLimit": "Az összeg meghaladja a napi limitet: {limit: string}",
     "upgradeAccountToIncreaseLimit": "Magasabb tranzakciós limithez magasabb szintű felhasználói fiókra váltás szükséges",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
+  },
+  "Accessibility": {
+    "deleteKey": "Törlés",
+    "swapCurrencyHint": "Átváltja a pénznemet, amelyben az összeget megadja",
+    "switchWalletHint": "Átvált a másik pénztárcájára",
+    "copy": "Másol"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",

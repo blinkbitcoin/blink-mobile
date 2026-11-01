@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakcija bi trebala biti poslana u mempool",
     "amount": "Iznos",
+    "addAmount": "Dodaj iznos",
+    "lowFunds": "Nedovoljno sredstava",
     "amountExceed": "Iznos premašuje vaš saldo od {balance: string}",
     "amountExceedsLimit": "Iznos premašuje vaše preostalo dnevno ograničenje od {limit: string}",
     "upgradeAccountToIncreaseLimit": "Nadogradite svoj račun kako biste povećali svoje ograničenje",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Postavite iznos"
+  },
+  "Accessibility": {
+    "deleteKey": "Izbriši",
+    "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
+    "switchWalletHint": "Prebacuje na vaš drugi novčanik",
+    "copy": "Kopiraj"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Moram ažurirati svoju aplikaciju na najnoviju verziju. Koristim aplikaciju {os: string} s verzijom {version: string}.",

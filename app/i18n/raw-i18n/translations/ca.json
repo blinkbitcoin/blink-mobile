@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "La transacció s'ha d'enviar a la mempool.",
     "amount": "Import",
+    "addAmount": "Afegir import",
+    "lowFunds": "Fons insuficients",
     "amountExceed": "L'import excedeix el teu saldo {balance: string}",
     "amountExceedsLimit": "La quantitat supera el teu límit diari restant de {limit: string}",
     "upgradeAccountToIncreaseLimit": "Actualitza el teu compte per incrementar els teus límits",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Estableix l'import"
+  },
+  "Accessibility": {
+    "deleteKey": "Esborra",
+    "swapCurrencyHint": "Canvia la moneda en què escrius l'import",
+    "switchWalletHint": "Canvia a l'altre moneder",
+    "copy": "Copiar"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Necessito actualitzar l'aplicació a la última versió. Utilitzo  la aplicació per a {os: string} versió {version: string}.",

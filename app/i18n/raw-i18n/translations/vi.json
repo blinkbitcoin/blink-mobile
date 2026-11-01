@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Giao dịch sẽ được gửi vào mempool",
     "amount": "Số tiền",
+    "addAmount": "Thêm số tiền",
+    "lowFunds": "Không đủ số dư",
     "amountExceed": "Số tiền vượt quá số dư {balance: string} của bạn",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "Xóa",
+    "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
+    "switchWalletHint": "Chuyển sang ví còn lại của bạn",
+    "copy": "Sao chép"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

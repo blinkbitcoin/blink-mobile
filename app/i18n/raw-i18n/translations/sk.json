@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Transakciu je potrebné odoslať do mempoolu",
     "amount": "Suma",
+    "addAmount": "Pridať sumu",
+    "lowFunds": "Nedostatok prostriedkov",
     "amountExceed": "Suma prekračuje váš zostatok vo výške {balance: string}",
     "amountExceedsLimit": "Suma prekračuje váš zostávajúci denný limit {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgradujte si účet a zvýšte svoj limit",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Nastaviť sumu"
+  },
+  "Accessibility": {
+    "deleteKey": "Vymazať",
+    "swapCurrencyHint": "Prepne menu, v ktorej zadávate sumu",
+    "switchWalletHint": "Prepne na vašu druhú peňaženku",
+    "copy": "Kopírovať"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potrebujem aktualizovať aplikáciu na najnovšiu verziu. Používam aplikáciu {os: string} s verziou {version: string}.",
