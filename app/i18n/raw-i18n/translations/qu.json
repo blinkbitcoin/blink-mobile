@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Pagota ruwasqaña kanku.\n\nWatiqmanta kay pagota apachiyta munaspaykiqa, qallarimanta qallariy.",
     "slideToConfirm": "Aysay chiqapchanapaq",
     "slideConfirming": "Chiqapchashanku...",
+    "slideToSend": "Aysay kachanapaq",
+    "calculatingFee": "Chiqanakuyta yupashan…",
+    "sendProgress": {
+      "reviewing": "Qhawashan",
+      "signing": "Silq'ushan",
+      "findingRoute": "Ñanta maskhashan",
+      "broadcasting": "Willashan",
+      "checkingDelivery": "Chayasqanta qhawashan",
+      "retrying": "Huktawan ruwashan",
+      "almostThere": "Yaqañam",
+      "anyTimeNow": "Kunanpacha",
+      "ohOh": "Ay ay",
+      "tryingAgain": "Huktawan kallpachashan"
+    },
     "copiedDestination": "Mayman rinanta clipboard nisqaman churasqa",
     "lightningRecommended": "¡Hatun comisión! Lightning nisqata yuyaychayku.",
     "usdRemainderSweep": "Puchurqan {remaining: string} ({remainingSats: string}) Bitcoin-man tikrachisqa kanqa. USD pisi: {minimum: string}."

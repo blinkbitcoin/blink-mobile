@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "A fizetés kisérlet már megtörtént.\n\nHa újra szeretnéd küldeni ezt a fizetést, kezdd elölről.",
     "slideToConfirm": "Húzd el a megerősítéshez",
     "slideConfirming": "Megerősítés...",
+    "slideToSend": "Húzd el a küldéshez",
+    "calculatingFee": "Díj kiszámítása…",
+    "sendProgress": {
+      "reviewing": "Ellenőrzés",
+      "signing": "Aláírás",
+      "findingRoute": "Útvonal keresése",
+      "broadcasting": "Továbbítás",
+      "checkingDelivery": "Kézbesítés ellenőrzése",
+      "retrying": "Újrapróbálás",
+      "almostThere": "Mindjárt kész",
+      "anyTimeNow": "Bármelyik pillanatban",
+      "ohOh": "Ajjaj",
+      "tryingAgain": "Újra próbáljuk"
+    },
     "copiedDestination": "Címzett a vágólapra másolva",
     "lightningRecommended": "Magas díj! Lightning használata ajánlott.",
     "usdRemainderSweep": "A fennmaradó {remaining: string} ({remainingSats: string}) Bitcoinra lesz váltva. USD minimum: {minimum: string}."

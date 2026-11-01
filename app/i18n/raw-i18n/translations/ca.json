@@ -2350,6 +2350,20 @@
     "paymentAlreadyAttempted": "Pagament ja intentat.\n\nSi vols enviar aquest pagament de nou, comença des de zero.",
     "slideToConfirm": "Llisca per confirmar",
     "slideConfirming": "Confirmant...",
+    "slideToSend": "Llisca per enviar",
+    "calculatingFee": "Calculant la comissió…",
+    "sendProgress": {
+      "reviewing": "Revisant",
+      "signing": "Signant",
+      "findingRoute": "Cercant una ruta",
+      "broadcasting": "Difonent",
+      "checkingDelivery": "Comprovant el lliurament",
+      "retrying": "Reintentant",
+      "almostThere": "Gairebé hi som",
+      "anyTimeNow": "En qualsevol moment",
+      "ohOh": "Ui ui",
+      "tryingAgain": "Tornant-ho a provar"
+    },
     "copiedDestination": "Destinació copiada al porta-retalls",
     "lightningRecommended": "Comissió alta! Recomanem utilitzar Lightning.",
     "usdRemainderSweep": "Resta {remaining: string} ({remainingSats: string}) i es convertirà a Bitcoin. Mínim d'USD: {minimum: string}."

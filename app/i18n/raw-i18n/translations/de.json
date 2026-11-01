@@ -2350,6 +2350,20 @@
         "paymentAlreadyAttempted": "Die Zahlung wurde bereits versucht.\n\nWenn Sie diese Zahlung erneut senden möchten, beginnen Sie von vorne.",
         "slideToConfirm": "Schiebe zur Bestätigung",
         "slideConfirming": "Bestätigend…",
+        "slideToSend": "Schiebe zum Senden",
+        "calculatingFee": "Gebühr wird berechnet…",
+        "sendProgress": {
+            "reviewing": "Wird geprüft",
+            "signing": "Wird signiert",
+            "findingRoute": "Route wird gesucht",
+            "broadcasting": "Wird übertragen",
+            "checkingDelivery": "Zustellung wird geprüft",
+            "retrying": "Neuer Versuch",
+            "almostThere": "Fast geschafft",
+            "anyTimeNow": "Jeden Moment",
+            "ohOh": "Oh oh",
+            "tryingAgain": "Erneuter Versuch"
+        },
         "copiedDestination": "Ziel in die Zwischenablage kopiert",
         "lightningRecommended": "Hohe Gebühr! Wir empfehlen Lightning.",
         "usdRemainderSweep": "Restbetrag {remaining: string} ({remainingSats: string}) wird in Bitcoin umgewandelt. USD-Mindestbetrag: {minimum: string}."
