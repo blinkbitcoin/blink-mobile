@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "Muamala unapaswa kuwasilishwa kwenye mempool",
     "amount": "Kiasi",
+    "addAmount": "Ongeza kiasi",
+    "lowFunds": "Fedha hazitoshi",
     "amountExceed": "Kiasi kimepitisha baki yako ya {balance: string}",
     "amountExceedsLimit": "Kiasi kinazidi kikomo chako cha kila siku kilichobaki cha {limit: string}",
     "upgradeAccountToIncreaseLimit": "Boresha akaunti yako ili kuongeza kikomo chako",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Weka kiasi"
+  },
+  "Accessibility": {
+    "deleteKey": "Futa",
+    "swapCurrencyHint": "Hubadilisha sarafu unayoandikia kiasi",
+    "switchWalletHint": "Hubadilisha kwenda kwenye pochi yako nyingine",
+    "copy": "Nakili"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ninahitaji kusasisha programu yangu hadi toleo jipya zaidi. Ninatumia programu ya {os: string} yenye toleo la {version: string}.",

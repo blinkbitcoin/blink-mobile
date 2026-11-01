@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "İşlem mempool'a gönderilmelidir",
     "amount": "Miktar",
+    "addAmount": "Tutar ekle",
+    "lowFunds": "Yetersiz bakiye",
     "amountExceed": "Göndermek istediğin miktar, bakiyenin {balance: string} üstünde.",
     "amountExceedsLimit": "Tutar, kalan günlük {limit: string} limitinizi aşıyor",
     "upgradeAccountToIncreaseLimit": "Limitinizi artırmak için hesabınızı yükseltin",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Miktarı belirle"
+  },
+  "Accessibility": {
+    "deleteKey": "Sil",
+    "swapCurrencyHint": "Tutarı girdiğiniz para birimini değiştirir",
+    "switchWalletHint": "Diğer cüzdanınıza geçer",
+    "copy": "Kopyala"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Uygulamamı en son sürüme güncellemem gerekiyor. {os: string} uygulamasının {version: string} sürümünü kullanıyorum.",

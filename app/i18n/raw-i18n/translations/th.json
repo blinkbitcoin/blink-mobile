@@ -2393,6 +2393,8 @@
   "SendBitcoinScreen": {
     "willBeSentToMempoolBy": "ธุรกรรมจะถูกส่งไปยัง Mempool",
     "amount": "จำนวนเงิน",
+    "addAmount": "เพิ่มจำนวนเงิน",
+    "lowFunds": "ยอดเงินไม่เพียงพอ",
     "amountExceed": "จำนวนมากกว่ายอดคงเหลือ {balance: string} ของคุณ",
     "amountExceedsLimit": "Amount exceeds your remaining daily limit of {limit: string}",
     "upgradeAccountToIncreaseLimit": "Upgrade your account to increase your limit",
@@ -3095,6 +3097,12 @@
   },
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
+  },
+  "Accessibility": {
+    "deleteKey": "ลบ",
+    "swapCurrencyHint": "สลับสกุลเงินที่คุณใช้พิมพ์จำนวน",
+    "switchWalletHint": "สลับไปยังกระเป๋าอีกใบของคุณ",
+    "copy": "คัดลอก"
   },
   "AppUpdate": {
     "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
