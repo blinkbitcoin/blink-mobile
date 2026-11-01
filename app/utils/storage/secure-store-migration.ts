@@ -1,4 +1,5 @@
 /* eslint-disable camelcase */
+
 import analytics from "@react-native-firebase/analytics"
 import type { ACCESSIBLE } from "react-native-keychain"
 
@@ -73,6 +74,18 @@ const logLegacyHit = (legacyKey: string): void => {
 const SLOT_OPERATION_TIMEOUT_MS = 30_000
 
 /**
+ * What the purge waits, in place of the default above.
+ *
+ * The default is right for work whose caller has nowhere else to go: better a
+ * long wait than a failure. The purge is the opposite. It shares three slots with
+ * the lock screen (`PIN`, `pinFailureState`, `pinAttempts`) and runs in the same
+ * few seconds of boot, so a native call of its own that hangs would leave the
+ * user's PIN entry queued behind it. Giving up costs the purge nothing: every
+ * slot it abandons is named again on the next launch.
+ */
+export const PURGE_SLOT_TIMEOUT_MS = 3_000
+
+/**
  * Per-slot serialization of everything that can move a value between the two
  * stores.
  *
@@ -105,6 +118,24 @@ const pendingBySlot = new Map<string, Promise<void>>()
 type IsCurrent = () => boolean
 
 /**
+ * Passed to every queued task beside `isCurrent`, and the only way a task sends a native
+ * call that changes a store: it takes the call unsent. The guard above has to be checked
+ * before every change, and a change sent after the caller timed out lands after the queue
+ * has moved on, putting back what the operation behind it removed. Through this, a task
+ * that was abandoned cannot send one at all, and the slot is kept until every change
+ * already sent has landed, timeout or not. What it does not wait for is the rest of the
+ * task: a read that hangs after a change went out frees the slot once that change has
+ * settled, so a hung native read never holds a slot past its owner's budget.
+ */
+type HoldSlot = <M>(change: () => Promise<M>) => Promise<M>
+
+/** What a queued task holds while it runs, for a helper that needs both halves. */
+type SlotTurn = {
+  readonly isCurrent: IsCurrent
+  readonly holdSlot: HoldSlot
+}
+
+/**
  * Exported for the one caller that needs the queue without the migration: the
  * mnemonic account list is read-modify-written as a whole in `secureStorage.ts`
  * and has no legacy copy to read through. Taking its turn here is what makes
@@ -112,38 +143,58 @@ type IsCurrent = () => boolean
  *
  * Never call it from inside a task already holding the same slot — the inner
  * call would wait on the outer one and neither would ever finish.
+ *
+ * `timeoutMs` is for the one caller that shares slots with the unlock path and
+ * would rather give up than hold them: see PURGE_SLOT_TIMEOUT_MS. Everything else
+ * takes the default.
  */
 export const onSlot = <T>(
   slot: string,
-  task: (isCurrent: IsCurrent) => Promise<T>,
+  task: (isCurrent: IsCurrent, holdSlot: HoldSlot) => Promise<T>,
+  timeoutMs: number = SLOT_OPERATION_TIMEOUT_MS,
 ): Promise<T> => {
   const previous = pendingBySlot.get(slot) ?? Promise.resolve()
+  // Scoped to this operation, so it is collected with the closure rather than
+  // living in a map that has to be pruned. Pruning is the hazard here: a
+  // reset counter would hand a still-running abandoned task its slot back.
+  let isAbandoned = false
+  const sentChanges: Promise<unknown>[] = []
+  const holdSlot: HoldSlot = (change) => {
+    if (isAbandoned) {
+      return Promise.reject(new Error(`secure store ${keyClassOf(slot)} was abandoned`))
+    }
+    const sent = change()
+    sentChanges.push(sent)
+    return sent
+  }
   const result = previous.then(() => {
-    // Scoped to this operation, so it is collected with the closure rather than
-    // living in a map that has to be pruned. Pruning is the hazard here: a
-    // reset counter would hand a still-running abandoned task its slot back.
-    let isAbandoned = false
-    const running = task(() => !isAbandoned)
+    const running = task(() => !isAbandoned, holdSlot)
 
-    return withTimeout(
-      running,
-      SLOT_OPERATION_TIMEOUT_MS,
-      `secure store ${keyClassOf(slot)}`,
-    ).catch((err) => {
-      // Reached on timeout, where the task is still running and must stop, and
-      // on a task that rejected, where the flag is set on work already over.
-      isAbandoned = true
-      throw err
-    })
+    return withTimeout(running, timeoutMs, `secure store ${keyClassOf(slot)}`).catch(
+      (err) => {
+        // Reached on timeout, where the task is still running and must stop, and
+        // on a task that rejected, where the flag is set on work already over.
+        isAbandoned = true
+        throw err
+      },
+    )
   })
 
   // What gets queued is the settled promise, not the result: it absorbs the
   // rejection so that one failed operation cannot cancel the work behind it,
   // while the rejection still reaches its own caller through `result`.
-  const settled = result.then(
-    () => undefined,
-    () => undefined,
-  )
+  //
+  // And it settles only once every change the task sent has landed (see HoldSlot). The
+  // caller is answered at the timeout either way; what waits is the next operation on
+  // this slot, which a late write would otherwise undo. Nothing is added to the list
+  // after this point, since an abandoned task can no longer send a change.
+  const settled = result
+    .then(
+      () => undefined,
+      () => undefined,
+    )
+    .then(() => Promise.allSettled(sentChanges))
+    .then(() => undefined)
   pendingBySlot.set(slot, settled)
   settled.then(() => {
     const isLastInLine = pendingBySlot.get(slot) === settled
@@ -172,14 +223,21 @@ export const onSlot = <T>(
  * A seed an earlier release stored stays here until a read moves it, and its
  * removal clears this copy before it empties the new store, so a retried
  * removal relies on the same answer.
+ *
+ * Exported for the one-shot purge, which erases legacy copies the read path is
+ * no longer allowed to reach and needs the same proof of absence to decide
+ * whether it may record itself as done.
  */
-export const eraseLegacyCopy = async (legacyKey: string): Promise<boolean> => {
-  const erased = await legacyErase(legacyKey)
+export const eraseLegacyCopy = async (
+  legacyKey: string,
+  holdSlot: HoldSlot,
+): Promise<boolean> => {
+  const erased = await holdSlot(() => legacyErase(legacyKey))
   if (erased) return true
 
-  const blanked = await legacyBlank(legacyKey)
+  const blanked = await holdSlot(() => legacyBlank(legacyKey))
   if (blanked) {
-    await legacyErase(legacyKey)
+    await holdSlot(() => legacyErase(legacyKey))
     return true
   }
 
@@ -245,9 +303,39 @@ const recordBeforeMigrate = async (args: ReadThroughArgs): Promise<void> => {
   }
 }
 
+/** What copying a legacy value into the new store came to. `abandoned` means the
+ *  slot changed hands before the write, so nothing was written. */
+type LegacyCopy = "written" | "failed" | "abandoned"
+
+/**
+ * The write half of a migration, shared by the read-through and the purge: count
+ * the legacy hit, record the slot's name, then write the value under the slot's
+ * own protection class.
+ *
+ * The caller has already read both stores, so the slot may have changed hands
+ * while they answered. Everything before this only reads; everything in it writes.
+ */
+const copyLegacyValue = async (
+  args: ReadThroughArgs,
+  value: string,
+  { isCurrent, holdSlot }: SlotTurn,
+): Promise<LegacyCopy> => {
+  if (!isCurrent()) return "abandoned"
+
+  logLegacyHit(args.legacyKey)
+
+  await recordBeforeMigrate(args)
+  // Recording is an await too, so the slot may have changed hands during it.
+  if (!isCurrent()) return "abandoned"
+
+  const written = await holdSlot(() => secureWrite(args.slot, value, args.accessible))
+  return written ? "written" : "failed"
+}
+
 const runRead = async (
   args: ReadThroughArgs,
   isCurrent: IsCurrent,
+  holdSlot: HoldSlot,
 ): Promise<SecureRead> => {
   const current = await secureRead(args.slot)
 
@@ -270,26 +358,19 @@ const runRead = async (
   // scoring the first as absent is what deletes credentials downstream.
   if (legacy.status === "failed") return legacy
 
-  // Both stores have answered, so the slot may have changed hands while they
-  // did. Everything above this line only reads; everything below it writes.
-  if (!isCurrent()) return abandoned(args.slot)
-
-  logLegacyHit(args.legacyKey)
-
-  await recordBeforeMigrate(args)
-  // Recording is an await too, so the slot may have changed hands during it.
-  if (!isCurrent()) return abandoned(args.slot)
-
   // A failed write leaves the legacy copy intact and retries on the next read:
   // migration bookkeeping must never cost availability, so the erase outcome is
   // reported inside `eraseLegacyCopy` and never changes what the caller gets.
-  const written = await secureWrite(args.slot, legacy.value, args.accessible)
+  const copy = await copyLegacyValue(args, legacy.value, { isCurrent, holdSlot })
+  if (copy === "abandoned") return abandoned(args.slot)
+
   // Re-checked because the write is itself an await: a slot handed over while
   // it was in flight leaves this erase as the one side effect still ahead. An
   // unerased legacy copy is the harmless outcome — the new store answers first,
   // so it stays unreachable, and the next `removeThrough` clears it.
-  const shouldEraseLegacy = written && args.deleteLegacyOnMigrate && isCurrent()
-  if (shouldEraseLegacy) await eraseLegacyCopy(args.legacyKey)
+  const shouldEraseLegacy =
+    copy === "written" && args.deleteLegacyOnMigrate && isCurrent()
+  if (shouldEraseLegacy) await eraseLegacyCopy(args.legacyKey, holdSlot)
 
   return legacy
 }
@@ -297,6 +378,7 @@ const runRead = async (
 const runRemove = async (
   args: RemoveThroughArgs,
   isCurrent: IsCurrent,
+  holdSlot: HoldSlot,
 ): Promise<boolean> => {
   // The legacy copy goes first, and a copy that is not provably gone stops the
   // removal there. While the new store still holds the value it answers first,
@@ -309,7 +391,7 @@ const runRemove = async (
   // at the price of a silently restored credential the moment that store
   // recovers. Leaving a failed operation with everything where it was is the
   // safer half, and the caller is told so.
-  const legacyGone = await eraseLegacyCopy(args.legacyKey)
+  const legacyGone = await eraseLegacyCopy(args.legacyKey, holdSlot)
   if (!legacyGone) return false
 
   // The mirror of the read guard: emptying the new store after the slot has
@@ -317,18 +399,19 @@ const runRemove = async (
   // contract for "not provably gone", so the caller keeps treating it as set.
   if (!isCurrent()) return false
 
-  return secureRemove(args.slot)
+  return holdSlot(() => secureRemove(args.slot))
 }
 
 const runExists = async (
   args: ReadThroughArgs,
   isCurrent: IsCurrent,
+  holdSlot: HoldSlot,
 ): Promise<SecureExists> => {
   const current = await secureExists(args.slot)
   if (current.status === "yes") return current
   if (current.status === "failed") return current
 
-  const read = await runRead(args, isCurrent)
+  const read = await runRead(args, isCurrent, holdSlot)
   if (read.status === "found") return { status: "yes" }
   if (read.status === "absent") return { status: "no" }
   return { status: "failed", err: read.err }
@@ -347,7 +430,9 @@ const runExists = async (
  */
 export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runRead(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent, holdSlot) =>
+      runRead(args, isCurrent, holdSlot),
+    )
   } catch (err) {
     return { status: "failed", err }
   }
@@ -367,7 +452,9 @@ export const readThrough = async (args: ReadThroughArgs): Promise<SecureRead> =>
  */
 export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runRemove(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent, holdSlot) =>
+      runRemove(args, isCurrent, holdSlot),
+    )
   } catch {
     return false
   }
@@ -387,8 +474,8 @@ export const removeThrough = async (args: RemoveThroughArgs): Promise<boolean> =
  */
 export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => {
   try {
-    return await onSlot(args.slot, () =>
-      secureWrite(args.slot, args.value, args.accessible),
+    return await onSlot(args.slot, (_isCurrent, holdSlot) =>
+      holdSlot(() => secureWrite(args.slot, args.value, args.accessible)),
     )
   } catch {
     return false
@@ -409,8 +496,188 @@ export const writeThrough = async (args: WriteThroughArgs): Promise<boolean> => 
  */
 export const existsThrough = async (args: ReadThroughArgs): Promise<SecureExists> => {
   try {
-    return await onSlot(args.slot, (isCurrent) => runExists(args, isCurrent))
+    return await onSlot(args.slot, (isCurrent, holdSlot) =>
+      runExists(args, isCurrent, holdSlot),
+    )
   } catch (err) {
     return { status: "failed", err }
+  }
+}
+
+/**
+ * Why a legacy copy is still there, split by whether a later launch could change
+ * the answer. Carries a whole pass as well as a single slot, worst outcome
+ * winning: `transient` beats `permanent`, because a pass with anything still worth
+ * retrying is worth retrying.
+ *
+ * `transient` covers everything a store's silence or a failed write caused. Those
+ * clear themselves, so they must never count against a retry bound: a keychain
+ * that cannot answer for a few launches would otherwise retire the purge and
+ * leave every legacy copy in place for good.
+ *
+ * `permanent` is the state no later launch resolves: every store answered, and
+ * the value is in none of them. An index entry can outlive its key material that
+ * way, and retrying it is spend with no upside. It is what a phone restored from
+ * a backup shows: the account index comes back and neither store's device-only
+ * item does.
+ */
+export type SlotPurge = "gone" | "transient" | "permanent"
+
+/** How much a later launch could still change, low to high. */
+const SLOT_PURGE_RANK: Record<SlotPurge, number> = {
+  gone: 0,
+  permanent: 1,
+  transient: 2,
+}
+
+/** The outcome a pass reports for two of its slots: whichever is worse. */
+export const worsePurge = (a: SlotPurge, b: SlotPurge): SlotPurge =>
+  SLOT_PURGE_RANK[b] > SLOT_PURGE_RANK[a] ? b : a
+
+/** One option, named rather than positional: `purgeThrough(args, true)` at a call
+ *  site says nothing about which rule it is asking for. */
+export type PurgeThroughOptions = {
+  /**
+   * Whether the new store has to hold the value before an empty legacy read
+   * counts as nothing left to erase. True for the seed, where being wrong costs
+   * someone their money; false where it costs a re-login.
+   */
+  requireMigrated: boolean
+}
+
+/**
+ * Finishes a slot's migration and then erases its legacy copy, in that order.
+ *
+ * Erasing first is what the obvious implementation does and it is wrong. A
+ * read-through reports `found` for a value it read out of the legacy store
+ * even when the migrating write failed, so "this slot has been read" is not
+ * evidence the new store holds anything. Erasing on that evidence deletes the
+ * only copy — a re-login for a session slot, and someone's seed for a
+ * mnemonic.
+ *
+ * So the new store has to say `found` itself before anything is deleted, and
+ * every step runs inside the slot queue: a read-through migrating this same
+ * slot concurrently sits between its own miss and its legacy read, and an
+ * unqueued erase in that window takes the value out from under it.
+ *
+ * Anything but `gone` leaves the copy for the next boot, split by whether a
+ * later boot could answer differently. Only the caller can act on that
+ * difference, and it decides both what gets reported and what a retry bound is
+ * allowed to charge for.
+ *
+ * Never rejects, like every other operation on this queue: a slot that timed
+ * out must cost its own key and not the ones behind it, which a rejection
+ * propagating out of the loop would.
+ */
+export const purgeThrough = async (
+  args: ReadThroughArgs,
+  { requireMigrated }: PurgeThroughOptions,
+): Promise<SlotPurge> => {
+  // One turn, one budget and one legacy read per slot. A probe in a turn of its
+  // own ahead of this one held the slot twice, so the lock screen could wait
+  // behind two budgets on `PIN`, and read an unmigrated seed twice.
+  //
+  // A seed does enter memory here, where the erase or the done-flag needs proof
+  // that the value survived the move. That read is the price of not deleting the
+  // last readable copy, and it is paid on every launch until this slot is proven
+  // gone, not on every launch the purge runs: the caller remembers a slot that
+  // reached `gone` and never names it again (see purgeLegacyKeyStore), so a slot
+  // that keeps the pass short of done costs its own re-proof and nobody else's.
+  try {
+    return await onSlot(
+      args.slot,
+      async (isCurrent, holdSlot) => {
+        const legacy = await legacyRead(args.legacyKey)
+        if (legacy.status === "failed") return "transient"
+
+        // `absent` is the legacy store saying the key is missing, and on both
+        // platforms it now says so only for a missing key: a lookup that failed
+        // comes back `failed` above (the iOS half is
+        // patches/react-native-secure-key-store+2.0.10.patch).
+        //
+        // Nothing is erased on this path, so the question is only whether to keep
+        // asking. A session slot stops: a user who never set a PIN has nothing
+        // here and must not be retried forever. A mnemonic keeps its strict rule,
+        // because getting that wrong costs someone their seed — and when both
+        // stores agree the value is nowhere, no later boot changes that.
+        if (legacy.status === "absent") {
+          if (!requireMigrated) return "gone"
+
+          // Probed before it is read. The probe cannot say whether the value is
+          // recoverable — on Android `hasInternetCredentials` resolves true for an
+          // entry it never decrypts — but it is the cheap way to learn that there
+          // is nothing here to confirm, which is the answer on every slot of a
+          // device in this state. The purge names every account it has not yet
+          // proven gone, on every launch until it completes, and reading on all
+          // of them would put every seed into a JS string that cannot be zeroed.
+          const present = await secureExists(args.slot)
+          if (present.status === "failed") return "transient"
+
+          if (present.status === "yes") {
+            // `gone` here is what lets the caller record the purge as finished, so
+            // the proof has to be a read that returns the value. The probe answers
+            // yes for an item the store cannot decrypt, and believing it would
+            // write the done-flag over a seed nothing can read, with no later
+            // launch to look again.
+            const migrated = await secureRead(args.slot)
+            return migrated.status === "found" ? "gone" : "transient"
+          }
+
+          // Both stores say the seed is nowhere, and both can tell a missing key
+          // from a failed lookup, so the verdict is trustworthy and the retry
+          // bound gets the terminal state it exists for.
+          return "permanent"
+        }
+
+        // There is a legacy copy to erase, so the probe is no longer enough.
+        //
+        // On Android `hasInternetCredentials` resolves true for an entry that
+        // exists without decrypting it (KeychainModule.hasInternetCredentialsForOptions),
+        // so a Keystore key invalidated by a lock-screen change — the failure
+        // findSelfCustodialAccountByMnemonic already plans around — answers `yes`
+        // for a value nothing can read. Erasing the legacy copy on that answer
+        // destroys the last readable seed. Only a read that returns the value
+        // proves it survived the move, and it happens here, on the one launch
+        // that erases, rather than on every launch for every account.
+        const migrated = await secureRead(args.slot)
+
+        if (migrated.status !== "found") {
+          // `absent` is a slot nothing has migrated yet, and this is its last
+          // chance to move before its legacy copy goes. `failed` on a seed is the
+          // Android entry whose Keystore key went bad: it never clears itself, and
+          // the release that drops the legacy library would take the only readable
+          // copy with it. Rewriting it from the legacy value is the one repair, and
+          // this is the one moment that holds both the good value and the proof the
+          // new copy is bad.
+          //
+          // Only the seed is rewritten over a failed read. Its value never changes,
+          // since every wallet gets a new account id, so the legacy copy is the same
+          // value. A session slot's legacy copy can be older than the new one, such
+          // as a token rotated since it moved, and a failed read there clears itself.
+          const mayRewrite = migrated.status === "absent" || requireMigrated
+          if (!mayRewrite) return "transient"
+
+          const copy = await copyLegacyValue(args, legacy.value, { isCurrent, holdSlot })
+          if (copy !== "written") return "transient"
+
+          // A write that resolved is not the proof: on Android the entry can land
+          // under a key that still will not decrypt it. The erase below waits for
+          // a read that returns the value.
+          const rewritten = await secureRead(args.slot)
+          const isReadable =
+            rewritten.status === "found" && rewritten.value === legacy.value
+          if (!isReadable) return "transient"
+        }
+
+        // The queue handed this slot to someone else while it was held, so the
+        // proof above describes a state that may already have moved on.
+        if (!isCurrent()) return "transient"
+
+        return (await eraseLegacyCopy(args.legacyKey, holdSlot)) ? "gone" : "transient"
+      },
+      PURGE_SLOT_TIMEOUT_MS,
+    )
+  } catch {
+    return "transient"
   }
 }
