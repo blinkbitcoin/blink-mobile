@@ -207,7 +207,8 @@ export const TwoFactorEnforcementProvider: React.FC<React.PropsWithChildren> = (
   const migrateNowRemedy = useMigrateNowRemedy()
   const isCustodyExitOffered = isNonCustodialFlagSettled && nonCustodialEnabled
   /** Whether the device knows if leaving custody is on offer: the console's word is in,
-   *  or this launch's fetch settled without it, which leaves the shipped default, off. */
+   *  or this launch's fetch settled without it, and until the console's word is in the
+   *  exit is not offered, whatever the shipped default says. */
   const isCustodyExitKnown = isNonCustodialFlagSettled || isConfigSettled
   const isCustodyExitOff = isCustodyExitKnown && !isCustodyExitOffered
 

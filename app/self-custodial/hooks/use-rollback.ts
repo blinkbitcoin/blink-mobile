@@ -19,12 +19,17 @@ export const useSelfCustodialRollback = ({
   accounts,
   setActiveAccountId,
 }: RollbackDeps): RollbackResult => {
-  const { nonCustodialEnabled, remoteConfigReady } = useFeatureFlags()
+  const { nonCustodialEnabled, remoteConfigReady, isNonCustodialFlagSettled } =
+    useFeatureFlags()
   const hasCustodialAccount = useHasCustodialAccount()
+  /** Only the console's word closes the wallet: the shipped default offers self-custodial
+   *  to a device the console never reached, so that device must not lock the user out of
+   *  the wallet onboarding just gave them, nor move them to custodial on every launch. */
+  const isDisabledByConsole = isNonCustodialFlagSettled && !nonCustodialEnabled
 
   useEffect(() => {
     if (!remoteConfigReady) return
-    if (nonCustodialEnabled) return
+    if (!isDisabledByConsole) return
     if (activeAccount?.type !== AccountType.SelfCustodial) return
 
     const fallback = accounts.find((a) => a.type === AccountType.Custodial)
@@ -33,13 +38,13 @@ export const useSelfCustodialRollback = ({
     setActiveAccountId(fallback.id)
   }, [
     remoteConfigReady,
-    nonCustodialEnabled,
+    isDisabledByConsole,
     activeAccount,
     accounts,
     setActiveAccountId,
   ])
 
-  const isLockedOutOfSelfCustodial = remoteConfigReady && !nonCustodialEnabled
+  const isLockedOutOfSelfCustodial = remoteConfigReady && isDisabledByConsole
 
   const shouldShowUnavailable =
     isLockedOutOfSelfCustodial &&
