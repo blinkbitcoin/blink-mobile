@@ -3036,7 +3036,9 @@
         "network": {
             "server": "Erreur de serveur. Merci d’essayer ultérieurement",
             "request": "Problème avec une requête.\nContactez le support technique si le problème persiste",
-            "connection": "Problème de connexion.\nVérifiez votre connexion Internet"
+            "connection": "Problème de connexion.\nVérifiez votre connexion Internet",
+            "statusCode": "Code de statut : {statusCode: number}",
+            "errorCode": "Code d'erreur : {errorCode: string}"
         },
         "unexpectedError": "Une erreur inattendue s’est produite",
         "restartApp": "Veuillez redémarrer l’application.",
