@@ -255,6 +255,7 @@ const TransactionItem: React.FC<Props> = ({
           disabled={!onPress}
           accessibilityRole={onPress ? "button" : undefined}
         >
+          {isFirst ? null : <View style={cardStyles.divider} />}
           <GaloyIcon name={iconName} size={20} color={colors.primary} />
           <View style={cardStyles.content} {...testProps("list-item-content")}>
             <Text
@@ -423,12 +424,19 @@ const useCardStyles = makeStyles(({ colors }, props: UseStyleProps) => ({
     padding: 10,
     overflow: "hidden",
     ...(props.highlight ? { backgroundColor: colors.grey4 } : staticSurface(colors)),
-    borderTopWidth: props.isFirst ? 0 : 1,
-    borderTopColor: colors.grey4,
     borderTopLeftRadius: props.isFirst ? radius.default : 0,
     borderTopRightRadius: props.isFirst ? radius.default : 0,
     borderBottomLeftRadius: props.isLast ? radius.default : 0,
     borderBottomRightRadius: props.isLast ? radius.default : 0,
+  },
+  /** Figma `Line` between rows, inset 10 from each side like the row's padding. */
+  divider: {
+    position: "absolute",
+    top: 0,
+    left: 10,
+    right: 10,
+    height: 1,
+    backgroundColor: colors.grey4,
   },
   content: {
     flex: 1,
