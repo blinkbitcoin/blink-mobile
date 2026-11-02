@@ -1,4 +1,5 @@
 import { WalletCurrency } from "@app/graphql/generated"
+import { resetOnchainRequestQueues } from "@app/self-custodial/hooks/use-payment-request"
 
 /**
  * Fixtures and default mock behaviour shared by the self-custodial receive specs.
@@ -71,6 +72,9 @@ export type PaymentRequestMocks = {
 
 /** Puts every mock in the "self-custodial wallet is ready, BTC mode" baseline state. */
 export const applyPaymentRequestDefaults = (mocks: PaymentRequestMocks): void => {
+  // The on-chain queue outlives a render by design; one spec's hung request must not
+  // hold up the next.
+  resetOnchainRequestQueues()
   mocks.selfCustodialWallet.mockReturnValue({
     sdk: mockSdk,
     lastReceivedPaymentId: null,

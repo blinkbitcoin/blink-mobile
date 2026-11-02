@@ -7,6 +7,17 @@ import { InvoiceType, PaymentRequestStateType } from "./index.types"
 
 type UriParams = { uppercase?: boolean; prefix?: boolean }
 
+/** How a user's request for a fresh on-chain address ended. */
+export const NewOnchainAddressResult = {
+  Created: "Created",
+  Failed: "Failed",
+  RateLimited: "RateLimited",
+  // A wallet switch or a newer request took over; the screen it was for is gone.
+  Superseded: "Superseded",
+} as const
+export type NewOnchainAddressResultType =
+  (typeof NewOnchainAddressResult)[keyof typeof NewOnchainAddressResult]
+
 /** The request currently on screen, in the shape the QR and copy actions need. */
 export type ReceiveInvoiceInfo = {
   invoiceType: InvoiceType
@@ -54,7 +65,11 @@ export type ReceivePaymentRequestState = {
   feesInformation: { deposit: DepositFeesInformation } | undefined
   info?: { data?: ReceiveInvoiceInfo }
   onchainAddress?: string
+  /** Self-custodial only: no address arrived and none is on the way. */
+  onchainAddressFailed?: boolean
   getOnchainFullUriFn?: (params: UriParams) => string
+  /** Self-custodial only; the custodial screen asks the API for its new address. */
+  generateNewOnchainAddress?: () => Promise<NewOnchainAddressResultType>
   pr: {
     state?: PaymentRequestStateType
     info?: { data?: ReceiveInvoiceInfo }

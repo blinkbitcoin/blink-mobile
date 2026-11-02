@@ -19,13 +19,21 @@ import { WalletCurrency } from "@app/graphql/generated"
 import { useNotificationPermission, usePriceConversion } from "@app/hooks"
 import { useActiveWallet } from "@app/hooks/use-active-wallet"
 import { useDollarBalanceGated } from "@app/hooks/use-dollar-balance-restricted"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
+import { useIsMounted } from "@app/hooks/use-is-mounted"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { usePaymentRequest as useSelfCustodialPaymentRequest } from "@app/self-custodial/hooks"
-import type { ReceivePaymentRequestState } from "./payment/request-state.types"
+import {
+  NewOnchainAddressResult,
+  type NewOnchainAddressResultType,
+  type ReceivePaymentRequestState,
+} from "./payment/request-state.types"
 import { ActiveWalletStatus } from "@app/types/wallet"
 import { testProps } from "@app/utils/testProps"
+import { toastShow } from "@app/utils/toast"
 
+import { RECEIVE_ACTIONS_GAP, RECEIVE_INPUTS_GUTTER } from "./layout"
 import { NfcHeaderButton } from "./nfc-header-button"
 import { QRView } from "./qr-view"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"
@@ -128,6 +136,40 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     carousel.onchainWalletCurrency,
   )
 
+  const [isGeneratingAddress, setIsGeneratingAddress] = useState(false)
+  // A second tap can land before the disabled state renders; each one would burn an address.
+  const { run: runNewAddressOnce } = useInFlightGuard()
+  const isMounted = useIsMounted()
+  const { generateNewAddress } = onchain
+  const handleNewAddress = useCallback(
+    () =>
+      runNewAddressOnce(async () => {
+        setIsGeneratingAddress(true)
+        const result = await generateNewAddress()
+        setIsGeneratingAddress(false)
+        // The page the tap was for is gone; any toast would describe another wallet.
+        if (result === NewOnchainAddressResult.Superseded) return
+        // So is the screen: the request still finishes and is recorded, but a toast now would
+        // land on whatever the user moved on to, describing an address it does not show.
+        if (!isMounted()) return
+        const created = result === NewOnchainAddressResult.Created
+        const toastMessages: Record<
+          Exclude<NewOnchainAddressResultType, typeof NewOnchainAddressResult.Superseded>,
+          string
+        > = {
+          [NewOnchainAddressResult.Created]: LL.ReceiveScreen.newAddressGenerated(),
+          [NewOnchainAddressResult.Failed]: LL.ReceiveScreen.newAddressFailed(),
+          [NewOnchainAddressResult.RateLimited]: LL.ReceiveScreen.newAddressRateLimited(),
+        }
+        toastShow({
+          message: toastMessages[result],
+          LL,
+          type: created ? "success" : "error",
+        })
+      }),
+    [runNewAddressOnce, isMounted, generateNewAddress, LL],
+  )
+
   const {
     handleSetAmount,
     handleMemoBlur,
@@ -147,6 +189,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     carousel.isOnChainPage,
     onchain.address,
   )
+  const hasNothingToShare = carousel.isOnChainPage && !onchain.address
 
   const {
     displayReceiveNfc,
@@ -203,9 +246,13 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     ? onchainAmountRowCurrency
     : requestState.receivingWalletDescriptor.currency
 
-  const canToggleWallet = isSelfCustodial
-    ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
-    : !isDollarBalanceGated
+  // Switching wallets mid-create would put the old wallet's new address on the new wallet's
+  // page. Off that page the create finishes quietly and its result is dropped.
+  const canToggleWallet =
+    !(isGeneratingAddress && carousel.isOnChainPage) &&
+    (isSelfCustodial
+      ? !carousel.isOnChainPage && !selfCustodialRequest?.isAssetToggleDisabled
+      : !isDollarBalanceGated)
 
   return (
     <Screen
@@ -241,10 +288,15 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           <QRView
             type={Invoice.OnChain}
             getFullUri={onchain.getFullUriFn}
-            loading={onchain.loading}
+            // The address on screen keeps working while New makes another, so it stays.
+            loading={onchain.loading || (isGeneratingAddress && !onchain.address)}
             completed={requestState.state === PaymentRequestState.Paid}
             converting={isConverting}
-            err=""
+            err={
+              onchain.failed && !isGeneratingAddress
+                ? LL.ReceiveScreen.onchainAddressLoadFailed()
+                : ""
+            }
             expired={false}
             regenerateInvoiceFn={requestState.regenerateInvoice}
             copyToClipboard={handleCopy}
@@ -259,6 +311,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
       <Pressable
         style={styles.paymentIdentifier}
         onPress={handleCopy}
+        disabled={hasNothingToShare}
         accessibilityRole="button"
         accessibilityHint={
           carousel.isOnChainPage
@@ -317,6 +370,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
               label={LL.ReceiveScreen.copyInvoice()}
               icon="copy-paste"
               onPress={handleCopy}
+              disabled={hasNothingToShare}
               accessibilityHint={
                 carousel.isOnChainPage
                   ? LL.ReceiveScreen.copyClipboardBitcoin()
@@ -327,12 +381,23 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
               label={LL.ReceiveScreen.shareInvoice()}
               icon="share"
               onPress={handleShare}
+              disabled={hasNothingToShare}
               accessibilityHint={
                 carousel.isOnChainPage
                   ? LL.common.shareBitcoin()
                   : LL.common.shareLightning()
               }
             />
+            {carousel.isOnChainPage && (
+              <ActionButton
+                label={LL.ReceiveScreen.newAddress()}
+                icon="refresh"
+                onPress={handleNewAddress}
+                loading={isGeneratingAddress}
+                disabled={onchain.loading}
+                accessibilityHint={LL.ReceiveScreen.newAddressHint()}
+              />
+            )}
           </View>
         )}
 
@@ -410,11 +475,11 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     justifyContent: "center",
     alignItems: "flex-start",
-    columnGap: 10,
+    columnGap: RECEIVE_ACTIONS_GAP,
   },
   inputsContainer: {
     marginTop: 14,
-    paddingHorizontal: 20,
+    paddingHorizontal: RECEIVE_INPUTS_GUTTER,
     rowGap: 14,
   },
 }))
