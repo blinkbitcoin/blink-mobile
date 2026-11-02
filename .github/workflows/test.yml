@@ -22,13 +22,17 @@ jobs:
           path: node_modules
           key: node-modules-${{ runner.os }}-${{ hashFiles('yarn.lock') }}
       - run: yarn install --frozen-lockfile
+      # Sizes the jest worker count against what this runner really has.
+      - run: nproc && free -m
       # Flake handling happens at test granularity now: jest retries individual
       # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
       # error, instead of silently re-running the whole job.
       - run: yarn test
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-        timeout-minutes: 20
+        # Green in-band runs finish at 19m46-19m59s, so 20 was failing passing
+        # PRs. Tighten again once the run is parallel.
+        timeout-minutes: 30
   android-unit-test:
     name: Android unit tests
     # GH-hosted: ships the Android SDK and JDK toolchains the Gradle build
