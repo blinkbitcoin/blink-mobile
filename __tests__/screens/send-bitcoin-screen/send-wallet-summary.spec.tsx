@@ -20,7 +20,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
     LL: {
       common: { bitcoin: () => "Bitcoin", dollar: () => "Dollar" },
-      Accessibility: { switchWalletHint: () => "Switches to your other wallet" },
+      Accessibility: {
+        switchToWallet: ({ wallet }: { wallet: string }) => `Switch to ${wallet}`,
+      },
     },
   }),
 }))
@@ -79,7 +81,8 @@ describe("SendWalletSummary", () => {
     expect(visibleStyle.justifyContent).toBe("center")
   })
 
-  it("says the card switches wallets only where it does", () => {
+  /** A screen reader hears only what a tap selects, or the wallet's name; never the balance. */
+  it("reads Switch to the other wallet where it switches, else just the wallet", () => {
     const { rerender } = render(
       <ThemeProvider theme={theme}>
         <SendWalletSummary
@@ -89,13 +92,12 @@ describe("SendWalletSummary", () => {
         />
       </ThemeProvider>,
     )
-    expect(screen.getByLabelText("Bitcoin, 741 SAT").props.accessibilityHint).toBe(
-      "Switches to your other wallet",
+    expect(screen.getByLabelText("Switch to Dollar").props.accessibilityRole).toBe(
+      "button",
     )
 
     rerender(bitcoinCard)
-    expect(
-      screen.getByLabelText("Bitcoin, 741 SAT").props.accessibilityHint,
-    ).toBeUndefined()
+    expect(screen.getByLabelText("Bitcoin").props.accessibilityRole).toBeUndefined()
+    expect(screen.queryByLabelText(/741 SAT/)).toBeNull()
   })
 })
