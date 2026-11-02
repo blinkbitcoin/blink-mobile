@@ -534,6 +534,10 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
     [navigation],
   )
 
+  // A highlighted row bounces once per visit. Toggling a filter rebuilds the sections and
+  // remounts the rows, which would otherwise bounce the newest transaction again.
+  const bouncedTxIdsRef = React.useRef<Set<string>>(new Set())
+
   const renderItem = React.useCallback(
     ({
       item,
@@ -543,25 +547,32 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
       item: TransactionFragment
       index: number
       section: { data: readonly TransactionFragment[] }
-    }) => (
-      <MemoizedTransactionItem
-        key={`txn-${item.id}`}
-        variant="card"
-        isFirst={index === 0}
-        isLast={index === section.data.length - 1}
-        txid={item.id}
-        subtitle
-        testId={`transaction-by-index-${index}`}
-        highlight={shouldHighlightTransactionId({
-          txId: item.id,
-          createdAt: item.createdAt,
-          settlementCurrency: item.settlementCurrency,
-          memo: item.memo,
-          direction: item.direction,
-        })}
-        onPress={handleItemPress}
-      />
-    ),
+    }) => {
+      const highlight = shouldHighlightTransactionId({
+        txId: item.id,
+        createdAt: item.createdAt,
+        settlementCurrency: item.settlementCurrency,
+        memo: item.memo,
+        direction: item.direction,
+      })
+      const bounce = !bouncedTxIdsRef.current.has(item.id)
+      if (highlight) bouncedTxIdsRef.current.add(item.id)
+
+      return (
+        <MemoizedTransactionItem
+          key={`txn-${item.id}`}
+          variant="card"
+          isFirst={index === 0}
+          isLast={index === section.data.length - 1}
+          txid={item.id}
+          subtitle
+          testId={`transaction-by-index-${index}`}
+          highlight={highlight}
+          bounce={bounce}
+          onPress={handleItemPress}
+        />
+      )
+    },
     [shouldHighlightTransactionId, handleItemPress],
   )
 
