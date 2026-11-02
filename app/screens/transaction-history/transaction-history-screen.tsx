@@ -170,6 +170,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const {
     allTransactions: selfCustodialAllTransactions,
     hasMoreTransactions: selfCustodialHasMore,
+    loadingMore: selfCustodialLoadingMore,
     loadMore: selfCustodialLoadMore,
     refreshWallets: refreshSelfCustodialWallets,
   } = useSelfCustodialWallet()
@@ -468,8 +469,10 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
   const loadedCountRef = React.useRef(loadedCount)
   loadedCountRef.current = loadedCount
 
+  // The SDK pages by offset and guards loadMore with state, so a second call while one is
+  // in flight would read the same offset and then skip a page.
   const canExpandSearch = activeWallet.isSelfCustodial
-    ? selfCustodialHasMore
+    ? selfCustodialHasMore && !selfCustodialLoadingMore
     : Boolean(transactions?.pageInfo?.hasNextPage) && loadedCount < CUSTODIAL_SEARCH_CAP
 
   const isExpandingSearch =
