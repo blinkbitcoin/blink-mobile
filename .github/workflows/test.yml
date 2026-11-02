@@ -34,9 +34,9 @@ jobs:
       - run: yarn test:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-        # Kept loose until the parallel run's time on this runner is known;
-        # then tighten to 2-3x it, so a real hang fails fast.
-        timeout-minutes: 30
+        # About 2x the 8m54s two-worker run measured on this runner (4 cores,
+        # 7.9 GB, no swap; #4361), so a real hang fails fast.
+        timeout-minutes: 20
   android-unit-test:
     name: Android unit tests
     # GH-hosted: ships the Android SDK and JDK toolchains the Gradle build
