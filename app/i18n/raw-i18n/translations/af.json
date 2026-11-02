@@ -2696,7 +2696,15 @@
     "findingAccount": "Soek tans die rekening vir hierdie betaling...",
     "txNotFoundInAccounts": "Hierdie betaling kon in geen rekening op hierdie toestel gevind word nie. Dit behoort dalk aan 'n rekening wat uitgeteken is.",
     "txLoadFailed": "Kon nie hierdie betaling laai nie. Kontroleer jou verbinding en probeer weer.",
-    "switchedForPayment": "Oorgeskakel na {identifier: string} om hierdie betaling te wys"
+    "switchedForPayment": "Oorgeskakel na {identifier: string} om hierdie betaling te wys",
+    "customLabel": "Eie etiket",
+    "depositFee": "Depositofooi",
+    "time": "Tyd",
+    "transactionId": "Transaksie-ID",
+    "hash": "Hash",
+    "blinkInternalId": "Blink interne ID",
+    "copyAllData": "Kopieer alle data",
+    "allData": "Transaksiebesonderhede"
   },
   "FeeRatesScreen": {
     "title": "Fooitariewe",
