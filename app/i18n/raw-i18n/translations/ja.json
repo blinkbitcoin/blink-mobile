@@ -31,6 +31,8 @@
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
         "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "discardSecretTitle": "この API キーを破棄しますか？",
+        "discardSecretBody": "シークレットが表示されるのはこの一度だけです。今離れると、キーは復元できず、新しく作成する必要があります。",
         "done": "完了"
     },
     "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
         "skip": "スキップ",
         "unlock": "ロックを解除",
         "usePin": "PINを有効にする",
-        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます"
+        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます",
+        "forgotPin": "PINをお忘れですか？ウォレットを削除",
+        "removeWalletsTitle": "このデバイスからウォレットを削除しますか？",
+        "removeWalletsBody": "このデバイスからすべてのウォレットを削除し、ログアウトします。ウォレットを元に戻すには、そのバックアップフレーズが必要です。フレーズがないと、ウォレットは失われます。",
+        "removeWalletsConfirm": "ウォレットを削除",
+        "removeWalletsFailed": "一部のウォレットを削除できませんでした。もう一度お試しください。"
     },
     "PeopleScreen": {
         "title": "つながり",
@@ -2177,16 +2184,19 @@
         "bulletinReadMore": "続きを読む"
     },
     "PinScreen": {
+        "attemptUnrecorded": "試行を安全に記録できませんでした。",
+        "attemptsLeft": "残り{attemptsRemaining: number}回トライできます。",
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
         "enterPin": "PINコードを入力してください",
-        "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
+        "oneAttemptLeft": "残り1回トライできます。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
         "storePinFailed": "PINコードを保存できません。",
         "tooManyAttempts": "間違えられる上限を超えましたので、自動ログアウトしました。",
-        "tryAgainIn": "{seconds: number}秒後にもう一度お試しください。",
+        "attemptBudgetSpent": "間違えられる上限を超えました。",
+        "tryAgainIn": "{time: string}後にもう一度お試しください。",
         "verifyPin": "PINコードを認証する"
     },
     "PriceHistoryScreen": {
@@ -3035,7 +3045,8 @@
         "problemPersists": "問題が解決しない場合は、サポートにお問い合わせください。",
         "fatalError": "アプリケーションデータの読み込みに問題があるようです。 問題が解決しない場合は、サポートにお問い合わせください。",
         "showError": "エラーを表示する",
-        "clearAppData": "アプリのデータを消去してログアウトする"
+        "clearAppData": "アプリのデータを消去してログアウトする",
+        "screenSecurityUnavailable": "スクリーンショット保護をオンにできなかったため、この画面は非表示のままです。"
     },
     "notifications": {
         "payment": {
@@ -3842,10 +3853,18 @@
                 "testSuccess": "バックアップフレーズは正しいです"
             }
         },
+        "BundleExport": {
+            "title": "緊急出金",
+            "body": "Spark が停止した場合、このバンドルを使えば Blink なしでビットコインをオンチェーンに移せます。ドル残高は復元できません。",
+            "download": "バンドルをダウンロード",
+            "sensitiveTitle": "機密情報",
+            "learnMore": "一方的な出金について詳しく見る",
+            "sensitiveConfirm": "ダウンロード",
+            "sensitiveBody": "このファイルには残高と支払い履歴が含まれるため、非公開にしてください。緊急時に使うには、リカバリーフレーズも必要です。"
+        },
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
             "description": "{provider}にバックアップフレーズのコピーを保存します。",
-            "encryptCheckbox": "追加パスワードで暗号化",
             "password": "パスワード",
             "passwordPlaceholder": "（12文字以上）",
             "confirmPassword": "パスワード確認",
@@ -4046,6 +4065,12 @@
         "recognizePhraseTitle": "このバックアップフレーズに見覚えがありますか？",
         "recognizePhraseBody": "他人から送られた単語は絶対に入力しないでください。"
     },
+    "EmergencyRecovery": {
+        "outageTitle": "オペレーターに接続できません",
+        "outageBody": "Spark で障害が発生しています。数分待ってから再試行するか、{support}にお問い合わせください",
+        "outageSupport": "サポート",
+        "tryAgainLater": "後で再試行"
+    },
     "BackupNudge": {
         "title": "あなたの資金が危険にさらされています",
         "description": "今すぐウォレットを保護してください。1分しかかかりません。",
@@ -4139,6 +4164,15 @@
         "title": "これは非カストディアルアカウントです",
         "body": "詳しくはブログ記事をご覧ください",
         "cta": "読む"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "クラウドのバックアップを更新",
+        "body": "{provider} の緊急バンドルが古くなっています。ウォレットをもう一度バックアップして更新してください。",
+        "cta": "もう一度バックアップ"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "緊急バンドルはまだありません。最初の取引の後に作成されます。",
+        "exportFailed": "緊急バンドルをダウンロードできませんでした。"
     },
     "StableBalance": {
         "title": "ステーブルバランス",

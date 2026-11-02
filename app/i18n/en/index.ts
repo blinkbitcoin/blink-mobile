@@ -55,6 +55,12 @@ const en: BaseTranslation = {
     usePin: "Use PIN",
     confirmLogout:
       "Are you sure you'd like to log out? This will reset your cache and all local user settings",
+    forgotPin: "Forgot PIN? Remove wallets",
+    removeWalletsTitle: "Remove wallets from this device?",
+    removeWalletsBody:
+      "This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.",
+    removeWalletsConfirm: "Remove wallets",
+    removeWalletsFailed: "Some wallets could not be removed. Please try again.",
   },
   PeopleScreen: {
     title: "People",
@@ -2189,16 +2195,19 @@ const en: BaseTranslation = {
     bulletinReadMore: "Read more",
   },
   PinScreen: {
+    attemptBudgetSpent: "Too many failed attempts.",
+    attemptUnrecorded: "Couldn't record the attempt securely.",
+    attemptsLeft: "{attemptsRemaining: number} attempts remaining.",
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
     enterPin: "Enter your PIN code",
-    lockoutUnavailable: "Couldn't record the failed attempt securely. Logging out.",
+    oneAttemptLeft: "1 attempt remaining.",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
     pinUnreadable: "Couldn't check your PIN. Please try again.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
     tooManyAttempts: "Too many failed attempts. Logging out.",
-    tryAgainIn: "Try again in {seconds: number}s.",
+    tryAgainIn: "Try again in {time: string}.",
     verifyPin: "Verify your PIN code",
   },
   PriceHistoryScreen: {
@@ -2532,6 +2541,9 @@ const en: BaseTranslation = {
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",
     loadError: "Could not load your API keys. Please try again later.",
+    discardSecretTitle: "Discard this API key?",
+    discardSecretBody:
+      "This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.",
     done: "Done",
   },
   SettingsScreen: {
@@ -3181,6 +3193,8 @@ const en: BaseTranslation = {
       "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     showError: "Show Error",
     clearAppData: "Clear App Data and Logout",
+    screenSecurityUnavailable:
+      "This screen stays hidden because screenshot protection could not be turned on.",
   },
   notifications: {
     payment: {
@@ -3998,7 +4012,6 @@ const en: BaseTranslation = {
       title: "Let's back up your wallet",
       description:
         "We will save a backup of your backup phrase to your {provider: string}.",
-      encryptCheckbox: "Encrypt with additional password",
       password: "Password",
       passwordPlaceholder: "(12 characters minimum)",
       confirmPassword: "Confirm password",
@@ -4024,6 +4037,16 @@ const en: BaseTranslation = {
       storageAccessRequired: "Allow {provider: string} access to your wallet backup, then try again.",
       cloudNotAvailable: "iCloud Drive is not available. Please sign in to iCloud in Settings and enable iCloud Drive.",
       networkError: "Network error. Please check your connection and try again.",
+    },
+    BundleExport: {
+      title: "Emergency exit",
+      body: "If Spark goes down, this bundle lets you move your bitcoin onchain without Blink. Your dollar balance can't be recovered.",
+      learnMore: "Learn more about unilateral exit",
+      download: "Download bundle",
+      sensitiveTitle: "Sensitive",
+      sensitiveBody:
+        "This file shows your balance and payment history, so keep it private. To use it in an emergency, you also need your backup phrase.",
+      sensitiveConfirm: "Download",
     },
     ManualBackup: {
       Alerts: {
@@ -4264,6 +4287,13 @@ const en: BaseTranslation = {
     recognizePhraseTitle: "Do you recognize this backup phrase?",
     recognizePhraseBody: "Never enter words someone else sent you.",
   },
+  EmergencyRecovery: {
+    // Restore could not reach the Spark operators.
+    outageTitle: "Operator unreachable",
+    outageBody: "Spark is experiencing an outage. Please wait couple minutes and try again or contact our {support: string}",
+    outageSupport: "Support",
+    tryAgainLater: "Try again later",
+  },
   BackupNudge: {
     title: "Your funds are at risk",
     description: "Secure your wallet now. It only takes a minute.",
@@ -4377,6 +4407,15 @@ const en: BaseTranslation = {
     title: "This is a non-custodial account",
     body: "To learn more read our blog post",
     cta: "Read",
+  },
+  StaleCloudBundleBulletin: {
+    title: "Update your cloud backup",
+    body: "Your emergency bundle in {provider: string} is out of date. Back up your wallet again to update it.",
+    cta: "Back up again",
+  },
+  RecoveryBundleScreen: {
+    noBundleToExport: "No emergency bundle yet. It's created after your first transaction.",
+    exportFailed: "Could not download the emergency bundle.",
   },
   SelfCustodialOffline: {
     title: "Wallet is offline",

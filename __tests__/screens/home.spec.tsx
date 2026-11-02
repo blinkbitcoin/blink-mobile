@@ -79,6 +79,14 @@ jest.mock("@app/components/self-custodial-info-bulletin", () => ({
     mockSelfCustodialInfoBulletin(props),
 }))
 
+const mockStaleCloudBundleBulletinState = {
+  shouldShow: false,
+  dismiss: jest.fn(),
+}
+jest.mock("@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin", () => ({
+  useStaleCloudBundleBulletin: () => mockStaleCloudBundleBulletinState,
+}))
+
 const mockTwoFactorEnforcement = {
   tier: 0,
   unmetTier: 0,

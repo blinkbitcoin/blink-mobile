@@ -2,13 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -21,8 +21,11 @@ import {
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
+import { measureObservedPayment } from "../measurement"
 import {
-  extractPaymentId,
+  extractObservedPayment,
+  paymentEventKey,
+  paymentIdFromEventKey,
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
@@ -49,6 +52,12 @@ type SdkLifecycleState = {
   sdk: BreezSdkInterface | null
   connectedAccountId: string | null
   sdkStableBalanceActive?: boolean
+  /** `${event tag}:${payment id}` of the last received payment event (see
+   * paymentEventKey); null until one arrives. Tag-aware so a Pending →
+   * Succeeded transition for the same payment is a distinct value. */
+  lastPaymentEventKey: string | null
+  /** The payment id alone, for consumers that look the payment up by id and
+   * must not re-trigger on settlement of an already-seen payment. */
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -83,7 +92,7 @@ export const useSdkLifecycle = (
   const [allTransactions, setAllTransactions] = useState<NormalizedTransaction[]>([])
   const [status, setStatus] = useState<ActiveWalletStatus>(ActiveWalletStatus.Unavailable)
   const [sdkStableBalanceActive, setSdkStableBalanceActive] = useState<boolean>()
-  const [lastReceivedPaymentId, setLastReceivedPaymentId] = useState<string | null>(null)
+  const [lastPaymentEventKey, setLastPaymentEventKey] = useState<string | null>(null)
   const [hasMoreTransactions, setHasMoreTransactions] = useState(false)
   const [loadingMore, setLoadingMore] = useState(false)
   const [sdk, setSdk] = useState<BreezSdkInterface | null>(null)
@@ -161,7 +170,7 @@ export const useSdkLifecycle = (
           if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
           if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline
           if (onlineState === OnlineState.Unknown) {
-            crashlytics().log(
+            logBreadcrumb(
               `[SparkSDK] connectivity check failed; preserving previous status`,
             )
             if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error
@@ -237,11 +246,17 @@ export const useSdkLifecycle = (
 
       const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
+
+        /** Ahead of the refresh filter: a failed send is not a refresh event, but it is
+         *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
+        const observedPayment = extractObservedPayment(event)
+        if (observedPayment) measureObservedPayment(observedPayment)
+
         if (!REFRESH_EVENTS.has(event.tag)) return
 
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
-          const paymentId = extractPaymentId(event)
-          if (paymentId) setLastReceivedPaymentId(paymentId)
+          const eventKey = paymentEventKey(event)
+          if (eventKey) setLastPaymentEventKey(eventKey)
         }
         await refreshWallets()
       })
@@ -355,6 +370,11 @@ export const useSdkLifecycle = (
     }
   }, [])
 
+  // Derived, not separate state: equal-by-value ids keep effect deps stable
+  // across a Pending -> Succeeded transition, preserving the id-keyed
+  // consumers' behavior.
+  const lastReceivedPaymentId = paymentIdFromEventKey(lastPaymentEventKey)
+
   return {
     wallets,
     allTransactions,
@@ -362,6 +382,7 @@ export const useSdkLifecycle = (
     sdk,
     connectedAccountId,
     sdkStableBalanceActive,
+    lastPaymentEventKey,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,

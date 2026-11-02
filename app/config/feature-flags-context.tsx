@@ -71,6 +71,7 @@ const CustodialTwoFactorEnforcementEnabledKey = "custodialTwoFactorEnforcementEn
 const CustodialTwoFactorThresholdsKey = "custodialTwoFactorThresholds"
 const FeeRatesConfigKey = "feeRatesConfig"
 const InactivityFeeEnabledKey = "inactivityFeeEnabled"
+const CloudBundleStaleAfterMsKey = "cloudBundleStaleAfterMs"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -147,6 +148,7 @@ type RemoteConfig = {
   [CustodialTwoFactorThresholdsKey]: TwoFactorThresholds
   [FeeRatesConfigKey]: FeeRatesConfig
   [InactivityFeeEnabledKey]: boolean
+  [CloudBundleStaleAfterMsKey]: number
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -307,6 +309,10 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  amount comes from `globals.feesInformation.inactivityFee`, the same config the
    *  backend charges from, so it is never priced here (blink-wip#1200). */
   inactivityFeeEnabled: true,
+  /** How long the cloud copy of the emergency bundle may trail the one on the device
+   *  before the home says so. An upload lands within seconds, so a week behind means
+   *  uploads stopped: a lapsed sign-in, or the cloud drive turned off (#4337). */
+  cloudBundleStaleAfterMs: 7 * 24 * 60 * 60 * 1000,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -649,6 +655,11 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.inactivityFeeEnabled,
   )
 
+  const cloudBundleStaleAfterMs = getRemoteConfigPositiveNumber(
+    CloudBundleStaleAfterMsKey,
+    defaultRemoteConfig.cloudBundleStaleAfterMs,
+  )
+
   return {
     deviceAccountEnabledRestAuth,
     balanceLimitToTriggerUpgradeModal,
@@ -697,6 +708,7 @@ const readRemoteConfig = (): RemoteConfig => {
     custodialTwoFactorThresholds,
     feeRatesConfig,
     inactivityFeeEnabled,
+    cloudBundleStaleAfterMs,
   }
 }
 

@@ -131,6 +131,10 @@
           {
             "name": "react-native-secure-key-store",
             "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+          },
+          {
+            "name": "@react-native-firebase/crashlytics",
+            "message": "Write to Crashlytics only through app/utils/error-reporting.ts (logBreadcrumb, recordAppError), which drops everything while an Incognito or unset-mode wallet is active."
           }
         ]
       }
@@ -183,6 +187,22 @@
       ],
       "rules": {
         "no-restricted-imports": "off"
+      }
+    },
+    {
+      "files": ["app/utils/error-reporting.ts", "app/app.tsx"],
+      "rules": {
+        "no-restricted-imports": [
+          "error",
+          {
+            "paths": [
+              {
+                "name": "react-native-secure-key-store",
+                "message": "Import the legacy key store only from app/utils/storage/legacy-key-store.ts, which re-arms the uninstall guard before every call. See blinkbitcoin/blink-wip#1160."
+              }
+            ]
+          }
+        ]
       }
     }
   ],

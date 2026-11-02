@@ -8,6 +8,7 @@ import {
   ArrowsDownUpIcon,
   ArrowsClockwiseIcon,
   ArrowSquareOutIcon,
+  AsteriskIcon,
   BackspaceIcon,
   BankIcon,
   BellIcon,
@@ -91,6 +92,7 @@ import CloseCrossWithBackground from "@app/assets/icons-redesign/close-cross-wit
 import GooglePay from "@app/assets/icons/google-pay.svg"
 import LightningAddress from "@app/assets/icons-redesign/lightning-address.svg"
 import PaymentError from "@app/assets/icons-redesign/payment-error.svg"
+import EmergencyKit from "@app/assets/icons-redesign/emergency-kit.svg"
 import PaymentPending from "@app/assets/icons-redesign/payment-pending.svg"
 import PaymentSuccess from "@app/assets/icons-redesign/payment-success.svg"
 import PhysicalCard from "@app/assets/icons-redesign/physical-card.svg"
@@ -154,6 +156,7 @@ const phosphorIconMap = {
   "calendar": CalendarIcon,
   "caret-down": CaretDownIcon,
   "caret-left": CaretLeftIcon,
+  "asterisk": AsteriskIcon,
   "caret-right": CaretRightIcon,
   "caret-up": CaretUpIcon,
   "chat": ChatCircleDotsIcon,
@@ -229,6 +232,7 @@ const customSvgMap = {
   "google-pay": GooglePay,
   "lightning-address": LightningAddress,
   "payment-error": PaymentError,
+  "emergency-kit": EmergencyKit,
   "payment-pending": PaymentPending,
   "payment-success": PaymentSuccess,
   "physical-card": PhysicalCard,
@@ -306,8 +310,8 @@ export const GaloyIcon = ({
   name,
   size,
   sizeVariant,
-  width,
-  height,
+  width = 0,
+  height = 0,
   color,
   style,
   backgroundColor,
@@ -320,9 +324,7 @@ export const GaloyIcon = ({
   } = useTheme()
 
   const resolvedSize =
-    size ??
-    (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ??
-    Math.max(width ?? 0, height ?? 0)
+    size ?? (sizeVariant ? ICON_SIZES[sizeVariant] : undefined) ?? Math.max(width, height)
   const resolvedColor = color || colors.black
 
   const styles = useStyles({
@@ -383,8 +385,12 @@ export const GaloyIcon = ({
   return (
     <SvgIcon
       opacity={opacity || 1}
-      width={size ?? width}
-      height={size ?? height}
+      /* Falls back to resolvedSize, not to the raw width/height: those default
+         to 0, so a caller passing only sizeVariant would otherwise render the
+         icon at zero pixels. Kept per-axis rather than using resolvedSize
+         outright so an explicit width/height pair stays non-square. */
+      width={width || resolvedSize}
+      height={height || resolvedSize}
       color={resolvedColor}
       style={style}
       testID={`icon-${name}`}

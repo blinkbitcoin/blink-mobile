@@ -162,7 +162,7 @@ describe("useCloudRestore", () => {
     renderHook(() => useCloudRestore())
 
     await waitFor(() => {
-      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3")
+      expect(mockRestore).toHaveBeenCalledWith("word1 word2 word3", "cloud")
     })
   })
 
@@ -241,7 +241,7 @@ describe("useCloudRestore", () => {
     renderHook(() => useCloudRestore())
 
     await waitFor(() => {
-      expect(mockRestore).toHaveBeenCalledWith("words 1")
+      expect(mockRestore).toHaveBeenCalledWith("words 1", "cloud")
     })
   })
 
@@ -456,7 +456,7 @@ describe("useCloudRestore", () => {
     renderHook(() => useCloudRestore())
 
     await waitFor(() => {
-      expect(mockRestore).toHaveBeenCalledWith("valid words")
+      expect(mockRestore).toHaveBeenCalledWith("valid words", "cloud")
     })
   })
 
@@ -509,7 +509,7 @@ describe("useCloudRestore", () => {
       await result.current.handleDecrypt()
     })
 
-    expect(mockRestore).toHaveBeenCalledWith("decrypted words")
+    expect(mockRestore).toHaveBeenCalledWith("decrypted words", "cloud")
   })
 
   it("shows password error only when the decrypt failure is reason='wrong-password'", async () => {
@@ -749,7 +749,7 @@ describe("useCloudRestore", () => {
       if (targetEntry) await result.current.handlePick(targetEntry)
     })
 
-    expect(mockRestore).toHaveBeenCalledWith("words 2")
+    expect(mockRestore).toHaveBeenCalledWith("words 2", "cloud")
   })
 
   /** A download can refresh a revoked token mid-flight; the next pick must reuse the fresh one
