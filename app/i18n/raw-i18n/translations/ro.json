@@ -3112,9 +3112,8 @@
   "Accessibility": {
     "deleteKey": "Șterge",
     "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
-    "switchWalletHint": "Trece la celălalt portofel",
+    "switchToWallet": "Treci la {wallet: string}",
     "copy": "Copiați",
-    "balanceHidden": "Sold ascuns",
     "revealBalanceHint": "Afișează soldul pe acest ecran"
   },
   "AppUpdate": {
