@@ -7,23 +7,26 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { ViewBackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/view-backup-phrase-screen"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 
 const mockNavigate = jest.fn()
 const mockPush = jest.fn()
 const mockGoBack = jest.fn()
 const mockSetOptions = jest.fn()
 const mockDispatch = jest.fn()
+/** One object for every render, like the real hook: the auth gate's effect is keyed
+ *  on it, and a fresh object per render would re-prompt on every re-render. */
+const mockNavigation = {
+  navigate: mockNavigate,
+  push: mockPush,
+  goBack: mockGoBack,
+  setOptions: mockSetOptions,
+  dispatch: mockDispatch,
+  getState: () => ({ key: "stack-key" }),
+}
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({
-    navigate: mockNavigate,
-    push: mockPush,
-    goBack: mockGoBack,
-    setOptions: mockSetOptions,
-    dispatch: mockDispatch,
-    getState: () => ({ key: "stack-key" }),
-  }),
+  useNavigation: () => mockNavigation,
   useRoute: () => ({ key: "view-backup-phrase-route-key" }),
 }))
 
@@ -44,6 +47,25 @@ jest.mock("@app/utils/biometricAuthentication", () => ({
     authenticate: (...args: unknown[]) => mockAuthenticate(...args),
   },
 }))
+
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+let mockLeaseReady: Promise<void> = Promise.resolve()
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => ({
+    ready: mockLeaseReady,
+    release: mockReleaseScreenSecurity,
+  }),
+}))
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
 
 const renderHeaderRight = () => {
   const calls = mockSetOptions.mock.calls
@@ -115,6 +137,122 @@ describe("ViewBackupPhraseScreen", () => {
       .spyOn(KeyStoreWrapper, "readIsPinEnabled")
       .mockResolvedValue({ status: "no" })
     mockIsSensorAvailable.mockResolvedValue(true)
+    mockLeaseReady = Promise.resolve()
+  })
+
+  /** Until the screen guard is actually on, neither the words nor the header Copy
+   *  action may exist — a pending or failed registration must not paint the
+   *  mnemonic. */
+  describe("screen security gate", () => {
+    it("shows no words and installs no Copy action while registration is pending", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+
+      registration.resolve(undefined)
+      await waitFor(() => expect(queryByText("youth")).toBeTruthy())
+      expect(headerRightWasInstalled()).toBe(true)
+    })
+
+    it("keeps the words unmounted after registration fails", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByTestId } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+
+      expect(await findByTestId("screen-security-retry")).toBeTruthy()
+      expect(queryByText("youth")).toBeNull()
+      expect(headerRightWasInstalled()).toBe(false)
+    })
+
+    /** The prompt shows nothing sensitive, so it runs while the guard registers,
+     *  and the words still wait for both. */
+    it("keeps the words hidden after authenticating until the guard is on", async () => {
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+      mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
+        onSuccess()
+      })
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText } = render(
+        <ContextForScreen>
+          <ViewBackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await waitFor(() => expect(mockAuthenticate).toHaveBeenCalledTimes(1))
+
+      expect(queryByText("youth")).toBeNull()
+      expect(mockUseWalletMnemonic).not.toHaveBeenCalled()
+
+      registration.resolve(undefined)
+      await waitFor(() => expect(queryByText("youth")).toBeTruthy())
+    })
+  })
+
+  /** A theme flip re-acquires the guard to apply the new mask color, and the gate
+   *  mounts its content again while that lands. The authentication is held above
+   *  the gate, so it survives that. */
+  describe("a theme flip after the gate opened", () => {
+    const renderInMode = (mode: "light" | "dark") => (
+      <ContextForScreenWithTheme mode={mode}>
+        <ViewBackupPhraseScreen />
+      </ContextForScreenWithTheme>
+    )
+
+    it("does not prompt again for a user who already authenticated", async () => {
+      mockReadIsBiometricsEnabled.mockResolvedValue({ status: "yes" })
+      mockAuthenticate.mockImplementation((_desc: string, onSuccess: () => void) => {
+        onSuccess()
+      })
+
+      const { getByText, rerender } = render(renderInMode("light"))
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+
+      rerender(renderInMode("dark"))
+      await act(async () => {})
+
+      // The gate did re-activate: the first lease was handed back for a new one.
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(mockAuthenticate).toHaveBeenCalledTimes(1)
+    })
+
+    it("still accepts a pin challenge that was on screen when the theme flipped", async () => {
+      mockReadIsPinEnabled.mockResolvedValue({ status: "yes" })
+
+      const { getByText, rerender } = render(renderInMode("light"))
+      await waitFor(() =>
+        expect(mockPush).toHaveBeenCalledWith(
+          "pin",
+          expect.objectContaining({ screenPurpose: "ChallengePin" }),
+        ),
+      )
+
+      rerender(renderInMode("dark"))
+      await act(async () => {})
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+
+      await act(async () => challengeParams().onChallengeSuccess())
+
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      expect(mockPush).toHaveBeenCalledTimes(1)
+    })
   })
 
   it("renders all 12 words once the mnemonic loads", async () => {
