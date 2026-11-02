@@ -3109,9 +3109,8 @@
   "Accessibility": {
     "deleteKey": "Padam",
     "swapCurrencyHint": "Menukar mata wang untuk menaip amaun",
-    "switchWalletHint": "Bertukar ke dompet anda yang lain",
+    "switchToWallet": "Tukar kepada {wallet: string}",
     "copy": "Salin",
-    "balanceHidden": "Baki disembunyikan",
     "revealBalanceHint": "Menunjukkan baki anda pada skrin ini"
   },
   "AppUpdate": {

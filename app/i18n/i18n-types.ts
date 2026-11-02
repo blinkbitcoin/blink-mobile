@@ -10382,10 +10382,6 @@ type RootTranslation = {
 	}
 	Accessibility: {
 		/**
-		 * B​a​l​a​n​c​e​ ​h​i​d​d​e​n
-		 */
-		balanceHidden: string
-		/**
 		 * C​o​p​y
 		 */
 		copy: string
@@ -10402,9 +10398,10 @@ type RootTranslation = {
 		 */
 		swapCurrencyHint: string
 		/**
-		 * S​w​i​t​c​h​e​s​ ​t​o​ ​y​o​u​r​ ​o​t​h​e​r​ ​w​a​l​l​e​t
+		 * S​w​i​t​c​h​ ​t​o​ ​{​w​a​l​l​e​t​}
+		 * @param {string} wallet
 		 */
-		switchWalletHint: string
+		switchToWallet: RequiredParams<'wallet'>
 	}
 	AppUpdate: {
 		/**
@@ -24584,10 +24581,6 @@ export type TranslationFunctions = {
 	}
 	Accessibility: {
 		/**
-		 * Balance hidden
-		 */
-		balanceHidden: () => LocalizedString
-		/**
 		 * Copy
 		 */
 		copy: () => LocalizedString
@@ -24604,9 +24597,9 @@ export type TranslationFunctions = {
 		 */
 		swapCurrencyHint: () => LocalizedString
 		/**
-		 * Switches to your other wallet
+		 * Switch to {wallet}
 		 */
-		switchWalletHint: () => LocalizedString
+		switchToWallet: (arg: { wallet: string }) => LocalizedString
 	}
 	AppUpdate: {
 		/**

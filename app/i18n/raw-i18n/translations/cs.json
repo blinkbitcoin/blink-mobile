@@ -3109,9 +3109,8 @@
   "Accessibility": {
     "deleteKey": "Smazat",
     "swapCurrencyHint": "Přepne měnu, ve které zadáváte částku",
-    "switchWalletHint": "Přepne na vaši druhou peněženku",
+    "switchToWallet": "Přepnout na {wallet: string}",
     "copy": "Kopírovat",
-    "balanceHidden": "Zůstatek skrytý",
     "revealBalanceHint": "Zobrazí váš zůstatek na této obrazovce"
   },
   "AppUpdate": {

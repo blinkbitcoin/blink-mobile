@@ -3109,9 +3109,8 @@
   "Accessibility": {
     "deleteKey": "Обриши",
     "swapCurrencyHint": "Мења валуту у којој уносите износ",
-    "switchWalletHint": "Прелази на ваш други новчаник",
+    "switchToWallet": "Пребаци на {wallet: string}",
     "copy": "Копирај",
-    "balanceHidden": "Стање је скривено",
     "revealBalanceHint": "Приказује ваше стање на овом екрану"
   },
   "AppUpdate": {

@@ -77,8 +77,15 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
 
   const onPress = onSwitch ?? onReveal
 
-  const walletName =
-    currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const walletNameOf = (value: WalletCurrency) =>
+    value === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+
+  // Read by the wallet, never the balance: a switch says what a tap selects.
+  const otherWallet =
+    currency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
+  const accessibilityLabel = onSwitch
+    ? LL.Accessibility.switchToWallet({ wallet: walletNameOf(otherWallet) })
+    : walletNameOf(currency)
 
   return (
     <Pressable
@@ -92,15 +99,9 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       onPress={onPress}
       disabled={!onPress}
       accessibilityRole={onPress ? "button" : undefined}
-      accessibilityLabel={`${walletName}, ${
-        isBalanceHidden ? LL.Accessibility.balanceHidden() : balancePrimary
-      }`}
+      accessibilityLabel={accessibilityLabel}
       accessibilityHint={
-        onSwitch
-          ? LL.Accessibility.switchWalletHint()
-          : onReveal
-            ? LL.Accessibility.revealBalanceHint()
-            : undefined
+        !onSwitch && onReveal ? LL.Accessibility.revealBalanceHint() : undefined
       }
     >
       <View style={styles.balances}>

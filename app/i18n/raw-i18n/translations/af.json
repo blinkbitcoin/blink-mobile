@@ -3109,9 +3109,8 @@
   "Accessibility": {
     "deleteKey": "Vee uit",
     "swapCurrencyHint": "Wissel die geldeenheid waarin jy die bedrag tik",
-    "switchWalletHint": "Skakel oor na jou ander beursie",
+    "switchToWallet": "Skakel oor na {wallet: string}",
     "copy": "Kopieer",
-    "balanceHidden": "Saldo versteek",
     "revealBalanceHint": "Wys jou saldo op hierdie skerm"
   },
   "AppUpdate": {
