@@ -800,8 +800,11 @@ describe("findLostSend", () => {
     pages.forEach((payments) => mockListPayments.mockResolvedValueOnce({ payments }))
   }
 
+  /** A wallet of its own per test. The bridge keeps one sync in flight per wallet, so a
+   *  sync a test leaves pending must not be handed to the next one. */
+  let lookupSdk = mockSdk
   const lookup = () =>
-    findLostSend({ sdk: mockSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
+    findLostSend({ sdk: lookupSdk, startedAtMs: STARTED_AT_MS, matches: toFriend })
 
   /** Runs the lookup to its end, releasing each wait between looks. */
   const settle = async <T>(pending: Promise<T>): Promise<T> => {
@@ -816,6 +819,10 @@ describe("findLostSend", () => {
     jest.clearAllMocks()
     jest.useFakeTimers()
     mockSyncWallet.mockResolvedValue(undefined)
+    lookupSdk = {
+      listPayments: (...args: unknown[]) => mockListPayments(...args),
+      syncWallet: (...args: unknown[]) => mockSyncWallet(...args),
+    } as never
   })
 
   afterEach(() => {
@@ -1128,7 +1135,9 @@ describe("findLostSend", () => {
 
     expect(found).toMatchObject({ status: "unreadable" })
     expect((found as { error: Error }).error.message).toContain("timed out after 15000ms")
-    expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    /** One sync, not three: a look that gives up leaves it running, and the looks after
+     *  it are handed that one rather than each starting another. */
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
     /** Nothing was cancelled: the SDK is asked to sync and nothing else. */
     expect(mockSyncWallet).toHaveBeenLastCalledWith(expect.anything())
     /** The history was never read, so it was never treated as readable. */
@@ -1163,12 +1172,12 @@ describe("findLostSend", () => {
    * read the history: up to 20 pages per abandoned look, released together on recovery.
    */
   it("does not read the history when the wallet answers a look that already ran out of time", async () => {
-    let releaseSync: () => void = () => undefined
+    const releases: Array<() => void> = []
     mockSyncWallet.mockReset()
     mockSyncWallet.mockImplementation(
       () =>
         new Promise<void>((resolve) => {
-          releaseSync = resolve
+          releases.push(resolve)
         }),
     )
 
@@ -1180,11 +1189,59 @@ describe("findLostSend", () => {
     const found = await pending
     expect(found).toMatchObject({ status: "unreadable" })
 
-    /** Connectivity returns and every abandoned sync settles at once. */
-    releaseSync()
+    /** Connectivity returns and every sync the lookup left running settles. */
+    releases.forEach((release) => release())
     await jest.advanceTimersByTimeAsync(0)
 
+    expect(releases.length).toBeGreaterThan(0)
     expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /**
+   * "unreadable" keeps the lost attempt on purpose, so the user's next retry looks again.
+   * That retry must not start another sync while the first is still running, or a wallet
+   * that stays unreachable collects a native future per look per retry.
+   */
+  it("hands a second lookup the sync the first one left running", async () => {
+    const releases: Array<() => void> = []
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          releases.push(resolve)
+        }),
+    )
+
+    const runLookup = async () => {
+      const pending = lookup()
+      for (let attempt = 0; attempt < 3; attempt += 1) {
+        await jest.advanceTimersByTimeAsync(15_000)
+        await jest.advanceTimersByTimeAsync(2000)
+      }
+      return pending
+    }
+
+    expect(await runLookup()).toMatchObject({ status: "unreadable" })
+    expect(await runLookup()).toMatchObject({ status: "unreadable" })
+
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+
+    /** And when it finally answers, neither lookup's looks read the history. */
+    releases.forEach((release) => release())
+    await jest.advanceTimersByTimeAsync(0)
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /** Sharing lasts only while the sync does: once it answers, a later lookup syncs afresh
+   *  rather than reading a history nobody caught up. */
+  it("syncs again for a lookup that starts after the shared sync answered", async () => {
+    walletAnswers([], [], [], [], [], [])
+
+    await settle(lookup())
+    const before = mockSyncWallet.mock.calls.length
+    await settle(lookup())
+
+    expect(mockSyncWallet.mock.calls.length).toBeGreaterThan(before)
   })
 
   /** The same guard between pages: a look can be part-way through the history when its
