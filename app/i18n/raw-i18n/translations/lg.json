@@ -3111,9 +3111,8 @@
   "Accessibility": {
     "deleteKey": "Sazaamu",
     "swapCurrencyHint": "Kyusa ensimbi z'owandiikamu omuwendo",
-    "switchWalletHint": "Kyusa ku waleti yo endala",
+    "switchToWallet": "Kyusa ku {wallet: string}",
     "copy": "Koppa",
-    "balanceHidden": "Ssente ezisigaddewo zikwekeddwa",
     "revealBalanceHint": "Kiraga ssente zo ezisigaddewo ku lupapula luno"
   },
   "AppUpdate": {

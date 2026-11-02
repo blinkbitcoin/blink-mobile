@@ -3111,9 +3111,8 @@
     "Accessibility": {
         "deleteKey": "Effacer",
         "swapCurrencyHint": "Change la devise dans laquelle vous saisissez le montant",
-        "switchWalletHint": "Passe à votre autre portefeuille",
+        "switchToWallet": "Passer à {wallet: string}",
         "copy": "Copier",
-        "balanceHidden": "Solde masqué",
         "revealBalanceHint": "Affiche votre solde sur cet écran"
     },
     "AppUpdate": {

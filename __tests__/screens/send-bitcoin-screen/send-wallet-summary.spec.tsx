@@ -27,9 +27,8 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       common: { bitcoin: () => "Bitcoin", dollar: () => "Dollar" },
       Accessibility: {
-        balanceHidden: () => "Balance hidden",
         revealBalanceHint: () => "Shows your balance on this screen",
-        switchWalletHint: () => "Switches to your other wallet",
+        switchToWallet: ({ wallet }: { wallet: string }) => `Switch to ${wallet}`,
       },
     },
   }),
@@ -151,12 +150,12 @@ describe("SendWalletSummary", () => {
       expect(screen.queryByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeNull()
     })
 
-    it("keeps the balance out of the accessibility label, saying it is hidden", () => {
+    it("reads only the wallet's name, never the balance", () => {
       render(hiddenCard())
 
       expect(
         screen.getByTestId("choose-wallet-to-send-from").props.accessibilityLabel,
-      ).toBe("Bitcoin, Balance hidden")
+      ).toBe("Bitcoin")
     })
 
     it("says a tap reveals the balance where it does", () => {
@@ -177,7 +176,8 @@ describe("SendWalletSummary", () => {
     })
   })
 
-  it("says the card switches wallets only where it does", () => {
+  /** A screen reader hears only what a tap selects, or the wallet's name; never the balance. */
+  it("reads Switch to the other wallet where it switches, else just the wallet", () => {
     const { rerender } = render(
       <ThemeProvider theme={theme}>
         <SendWalletSummary
@@ -187,13 +187,12 @@ describe("SendWalletSummary", () => {
         />
       </ThemeProvider>,
     )
-    expect(screen.getByLabelText("Bitcoin, 741 SAT").props.accessibilityHint).toBe(
-      "Switches to your other wallet",
+    expect(screen.getByLabelText("Switch to Dollar").props.accessibilityRole).toBe(
+      "button",
     )
 
     rerender(bitcoinCard)
-    expect(
-      screen.getByLabelText("Bitcoin, 741 SAT").props.accessibilityHint,
-    ).toBeUndefined()
+    expect(screen.getByLabelText("Bitcoin").props.accessibilityRole).toBeUndefined()
+    expect(screen.queryByLabelText(/741 SAT/)).toBeNull()
   })
 })

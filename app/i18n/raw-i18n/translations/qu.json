@@ -3111,9 +3111,8 @@
   "Accessibility": {
     "deleteKey": "Pichay",
     "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
-    "switchWalletHint": "Huk qipiykiman tikran",
+    "switchToWallet": "{wallet: string}-man tikray",
     "copy": "Kopiay",
-    "balanceHidden": "Puchuq qullqi pakasqa",
     "revealBalanceHint": "Kay pantallapi puchuq qullqiykita rikuchin"
   },
   "AppUpdate": {

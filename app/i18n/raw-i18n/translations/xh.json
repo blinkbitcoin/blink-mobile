@@ -3111,9 +3111,8 @@
   "Accessibility": {
     "deleteKey": "Cima",
     "swapCurrencyHint": "Itshintsha imali obhala ngayo isixa",
-    "switchWalletHint": "Itshintshela kwesinye isipaji sakho",
+    "switchToWallet": "Tshintshela kwi-{wallet: string}",
     "copy": "Khuphela",
-    "balanceHidden": "Ibhalansi ifihliwe",
     "revealBalanceHint": "Ibonisa ibhalansi yakho kwesi skrini"
   },
   "AppUpdate": {

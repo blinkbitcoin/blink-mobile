@@ -3111,9 +3111,8 @@
   "Accessibility": {
     "deleteKey": "Esborra",
     "swapCurrencyHint": "Canvia la moneda en què escrius l'import",
-    "switchWalletHint": "Canvia a l'altre moneder",
+    "switchToWallet": "Canvia a {wallet: string}",
     "copy": "Copiar",
-    "balanceHidden": "Saldo amagat",
     "revealBalanceHint": "Mostra el teu saldo en aquesta pantalla"
   },
   "AppUpdate": {

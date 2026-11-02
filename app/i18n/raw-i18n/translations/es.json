@@ -3111,9 +3111,8 @@
     "Accessibility": {
         "deleteKey": "Borrar",
         "swapCurrencyHint": "Cambia la moneda en la que escribes la cantidad",
-        "switchWalletHint": "Cambia a tu otra billetera",
+        "switchToWallet": "Cambiar a {wallet: string}",
         "copy": "Copiar",
-        "balanceHidden": "Saldo oculto",
         "revealBalanceHint": "Muestra tu saldo en esta pantalla"
     },
     "AppUpdate": {

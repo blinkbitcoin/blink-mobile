@@ -3111,9 +3111,8 @@
   "Accessibility": {
     "deleteKey": "Ջնջել",
     "swapCurrencyHint": "Փոխում է արժույթը, որով մուտքագրում եք գումարը",
-    "switchWalletHint": "Անցնում է ձեր մյուս դրամապանակին",
+    "switchToWallet": "Անցնել {wallet: string}-ին",
     "copy": "Պատճենել",
-    "balanceHidden": "Մնացորդը թաքցված է",
     "revealBalanceHint": "Ցույց է տալիս ձեր մնացորդը այս էկրանին"
   },
   "AppUpdate": {
