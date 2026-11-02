@@ -2682,7 +2682,15 @@
     "findingAccount": "Tunoonya akawunti y'okusasula kuno...",
     "txNotFoundInAccounts": "Okusasula kuno tekuzuuliddwa mu kawunti yonna ku kyuma kino. Kuyinza okuba nga kwa kawunti eyaggibwamu.",
     "txLoadFailed": "Tetusobodde kutikka kusasula kuno. Kebera omutimbagano gwo oddemu ogezeeko.",
-    "switchedForPayment": "Tukyusizza ku {identifier: string} okulaga okusasula kuno"
+    "switchedForPayment": "Tukyusizza ku {identifier: string} okulaga okusasula kuno",
+    "customLabel": "Akabonero kwo",
+    "depositFee": "Sente z'okutereka",
+    "time": "Obudde",
+    "transactionId": "Namba y'okuwanyisa",
+    "hash": "Hash",
+    "blinkInternalId": "Namba ya Blink ey'omunda",
+    "copyAllData": "Koppa ebikwata byonna",
+    "allData": "Ebikwata ku ntuzaanya"
   },
   "FeeRatesScreen": {
     "title": "Emiwendo gy'ebisale",

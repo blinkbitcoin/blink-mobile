@@ -2682,7 +2682,15 @@
     "findingAccount": "Finder kontoen for denne betaling...",
     "txNotFoundInAccounts": "Denne betaling blev ikke fundet på nogen konto på denne enhed. Den tilhører muligvis en konto, der er logget ud.",
     "txLoadFailed": "Kunne ikke indlæse denne betaling. Tjek din forbindelse, og prøv igen.",
-    "switchedForPayment": "Skiftede til {identifier: string} for at vise denne betaling"
+    "switchedForPayment": "Skiftede til {identifier: string} for at vise denne betaling",
+    "customLabel": "Egen etiket",
+    "depositFee": "Indbetalingsgebyr",
+    "time": "Tidspunkt",
+    "transactionId": "Transaktions-ID",
+    "hash": "Hash",
+    "blinkInternalId": "Blink internt ID",
+    "copyAllData": "Kopier alle data",
+    "allData": "Transaktionsdetaljer"
   },
   "FeeRatesScreen": {
     "title": "Gebyrsatser",

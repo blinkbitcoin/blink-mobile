@@ -2682,7 +2682,15 @@
     "findingAccount": "Hľadá sa účet pre túto platbu...",
     "txNotFoundInAccounts": "Táto platba sa nenašla v žiadnom účte v tomto zariadení. Môže patriť k odhlásenému účtu.",
     "txLoadFailed": "Túto platbu sa nepodarilo načítať. Skontrolujte pripojenie a skúste to znova.",
-    "switchedForPayment": "Prepnuté na {identifier: string} na zobrazenie tejto platby"
+    "switchedForPayment": "Prepnuté na {identifier: string} na zobrazenie tejto platby",
+    "customLabel": "Vlastný štítok",
+    "depositFee": "Poplatok za vklad",
+    "time": "Čas",
+    "transactionId": "ID transakcie",
+    "hash": "Hash",
+    "blinkInternalId": "Interné ID Blink",
+    "copyAllData": "Kopírovať všetky údaje",
+    "allData": "Podrobnosti transakcie"
   },
   "FeeRatesScreen": {
     "title": "Sadzby poplatkov",

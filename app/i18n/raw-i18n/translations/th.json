@@ -2682,7 +2682,15 @@
     "findingAccount": "กำลังค้นหาบัญชีของการชำระเงินนี้...",
     "txNotFoundInAccounts": "ไม่พบการชำระเงินนี้ในบัญชีใด ๆ บนอุปกรณ์นี้ อาจเป็นของบัญชีที่ออกจากระบบไปแล้ว",
     "txLoadFailed": "ไม่สามารถโหลดการชำระเงินนี้ได้ ตรวจสอบการเชื่อมต่อของคุณแล้วลองอีกครั้ง",
-    "switchedForPayment": "สลับไปที่ {identifier: string} เพื่อแสดงการชำระเงินนี้"
+    "switchedForPayment": "สลับไปที่ {identifier: string} เพื่อแสดงการชำระเงินนี้",
+    "customLabel": "ป้ายกำกับที่กำหนดเอง",
+    "depositFee": "ค่าธรรมเนียมการฝาก",
+    "time": "เวลา",
+    "transactionId": "รหัสธุรกรรม",
+    "hash": "แฮช",
+    "blinkInternalId": "รหัสภายในของ Blink",
+    "copyAllData": "คัดลอกข้อมูลทั้งหมด",
+    "allData": "รายละเอียดธุรกรรม"
   },
   "FeeRatesScreen": {
     "title": "อัตราค่าธรรมเนียม",

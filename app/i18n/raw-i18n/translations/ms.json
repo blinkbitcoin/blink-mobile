@@ -2682,7 +2682,15 @@
     "findingAccount": "Mencari akaun untuk pembayaran ini...",
     "txNotFoundInAccounts": "Pembayaran ini tidak ditemui dalam mana-mana akaun pada peranti ini. Ia mungkin milik akaun yang telah log keluar.",
     "txLoadFailed": "Tidak dapat memuatkan pembayaran ini. Semak sambungan anda dan cuba lagi.",
-    "switchedForPayment": "Bertukar kepada {identifier: string} untuk memaparkan pembayaran ini"
+    "switchedForPayment": "Bertukar kepada {identifier: string} untuk memaparkan pembayaran ini",
+    "customLabel": "Label tersuai",
+    "depositFee": "Caj deposit",
+    "time": "Masa",
+    "transactionId": "ID transaksi",
+    "hash": "Hash",
+    "blinkInternalId": "ID dalaman Blink",
+    "copyAllData": "Salin semua data",
+    "allData": "Butiran transaksi"
   },
   "FeeRatesScreen": {
     "title": "Kadar caj",

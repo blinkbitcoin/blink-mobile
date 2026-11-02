@@ -2682,7 +2682,15 @@
     "findingAccount": "Mencari akun untuk pembayaran ini...",
     "txNotFoundInAccounts": "Pembayaran ini tidak ditemukan di akun mana pun di perangkat ini. Mungkin milik akun yang telah keluar.",
     "txLoadFailed": "Tidak dapat memuat pembayaran ini. Periksa koneksi Anda dan coba lagi.",
-    "switchedForPayment": "Beralih ke {identifier: string} untuk menampilkan pembayaran ini"
+    "switchedForPayment": "Beralih ke {identifier: string} untuk menampilkan pembayaran ini",
+    "customLabel": "Label khusus",
+    "depositFee": "Biaya deposit",
+    "time": "Waktu",
+    "transactionId": "ID transaksi",
+    "hash": "Hash",
+    "blinkInternalId": "ID internal Blink",
+    "copyAllData": "Salin semua data",
+    "allData": "Detail transaksi"
   },
   "FeeRatesScreen": {
     "title": "Tarif biaya",
