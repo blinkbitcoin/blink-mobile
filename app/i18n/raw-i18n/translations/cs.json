@@ -31,6 +31,8 @@
     "createError": "Klíč API se nepodařilo vytvořit. Zkuste to znovu.",
     "revokeError": "Klíč API se nepodařilo zrušit. Zkuste to znovu.",
     "loadError": "Vaše klíče API se nepodařilo načíst. Zkuste to později.",
+    "discardSecretTitle": "Zahodit tento API klíč?",
+    "discardSecretBody": "Toto je jediný okamžik, kdy se tajný klíč zobrazí. Pokud nyní odejdete, klíč nelze obnovit a budete muset vytvořit nový.",
     "done": "Hotovo"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Přeskočit",
     "unlock": "Odemknout",
     "usePin": "Použít PIN",
-    "confirmLogout": "Opravdu se chcete odhlásit? Tím se resetuje mezipaměť a všechna místní uživatelská nastavení"
+    "confirmLogout": "Opravdu se chcete odhlásit? Tím se resetuje mezipaměť a všechna místní uživatelská nastavení",
+    "forgotPin": "Zapomněli jste PIN? Odstraňte peněženky",
+    "removeWalletsTitle": "Odstranit peněženky z tohoto zařízení?",
+    "removeWalletsBody": "Tím se odstraní všechny peněženky z tohoto zařízení a budete odhlášeni. K obnovení peněženky potřebujete její záložní frázi. Bez ní je peněženka ztracena.",
+    "removeWalletsConfirm": "Odstranit peněženky",
+    "removeWalletsFailed": "Některé peněženky se nepodařilo odstranit. Zkuste to prosím znovu."
   },
   "PeopleScreen": {
     "title": "Lidé",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Počet peněženek není 2. K zobrazení všech peněženek a prostředků tohoto účtu použijte prosím nástěnku"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Pokus se nepodařilo bezpečně zaznamenat.",
+    "attemptsLeft": "{attemptsRemaining: string} zbývající pokusy.",
     "attemptsRemaining": "Nesprávný kód PIN. {attemptsRemaining: string} zbývající pokusy.",
     "enterPin": "Zadejte svůj PIN kód",
-    "lockoutUnavailable": "Neúspěšný pokus se nepodařilo bezpečně zaznamenat. Odhlášení.",
+    "oneAttemptLeft": "Zbývá 1 pokus.",
     "oneAttemptRemaining": "Nesprávný kód PIN. Zbývá 1 pokus.",
     "pinUnreadable": "Kód PIN se nepodařilo ověřit. Zkuste to prosím znovu.",
     "setPin": "Nastavení PIN kódu",
     "setPinFailedMatch": "Piny se neshodují - nastavte svůj PIN kód",
     "storePinFailed": "Nelze uložit váš PIN.",
     "tooManyAttempts": "Příliš mnoho neúspěšných pokusů. Odhlášení.",
-    "tryAgainIn": "Zkuste to znovu za {seconds: number} s.",
+    "attemptBudgetSpent": "Příliš mnoho neúspěšných pokusů.",
+    "tryAgainIn": "Zkuste to znovu za {time: string}.",
     "verifyPin": "Ověřte svůj PIN kód"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Pokud problém přetrvává, kontaktujte podporu.",
     "fatalError": "Omlouváme se, ale zdá se, že máme problémy s načítáním dat aplikace. Pokud problémy přetrvávají, kontaktujte prosím podporu.",
     "showError": "Zobrazit chybu",
-    "clearAppData": "Vymazat aplikační data a odhlásit"
+    "clearAppData": "Vymazat aplikační data a odhlásit",
+    "screenSecurityUnavailable": "Tato obrazovka zůstává skrytá, protože se nepodařilo zapnout ochranu proti snímkům obrazovky."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Vaše záložní fráze je správná"
       }
     },
+    "BundleExport": {
+      "title": "Nouzový odchod",
+      "body": "Pokud Spark přestane fungovat, tento balíček vám umožní přesunout vaše bitcoiny on-chain bez Blinku. Váš dolarový zůstatek obnovit nelze.",
+      "download": "Stáhnout balíček",
+      "sensitiveTitle": "Citlivé",
+      "learnMore": "Více o jednostranném odchodu",
+      "sensitiveConfirm": "Stáhnout",
+      "sensitiveBody": "Tento soubor ukazuje váš zůstatek a historii plateb, proto ho uchovávejte v soukromí. Abyste ho mohli v nouzi použít, budete potřebovat také svou záložní frázi."
+    },
     "CloudBackup": {
       "title": "Zálohujme vaši peněženku",
       "description": "Uložíme zálohu vaší záložní fráze do vašeho {provider}.",
-      "encryptCheckbox": "Přidat dodatečnou heslovou frázi",
-      "password": "Heslová fráze",
+      "password": "Heslo",
       "passwordPlaceholder": "(minimálně 12 znaků)",
-      "confirmPassword": "Potvrdit heslovou frázi",
-      "confirmPasswordPlaceholder": "Zadejte heslovou frázi znovu",
+      "confirmPassword": "Potvrdit heslo",
+      "confirmPasswordPlaceholder": "Zadejte heslo znovu",
       "continueButton": "Pokračovat",
       "importantTitle": "Důležité",
-      "importantMessage": "Blink tuto heslovou frázi neukládá. Pokud ji ztratíte, {bold} obnovit vaši peněženku.",
+      "importantMessage": "Blink toto heslo neukládá. Pokud ho ztratíte, {bold} obnovit vaši peněženku.",
       "importantMessageBold": "nebudeme schopni",
       "passwordTooShort": "Minimálně 12 znaků",
-      "passwordMismatch": "Heslové fráze se neshodují",
+      "passwordMismatch": "Hesla se neshodují",
       "uploadSuccess": "Záloha uložena do {provider}",
       "uploadFailed": "Nahrání zálohy se nezdařilo",
       "signInFailed": "Přihlášení k {provider} se nezdařilo",
@@ -4037,12 +4056,18 @@
     "restore": "Obnovit peněženku",
     "noBackupFound": "Záloha nenalezena",
     "noBackupDescription": "Nepodařilo se najít zálohu. Můžete zadat zálohovací frázi ručně.",
-    "enterPassword": "Zadejte heslovou frázi pro šifrování",
-    "wrongPassword": "Nesprávná heslová fráze. Zkuste to prosím znovu.",
+    "enterPassword": "Zadejte heslo šifrování",
+    "wrongPassword": "Nesprávné heslo. Zkuste to prosím znovu.",
     "pickBackupTitle": "Vyberte peněženku",
     "pickBackupDescription": "Vyberte zálohu k obnovení",
     "recognizePhraseTitle": "Poznáváte tuto zálohovací frázi?",
     "recognizePhraseBody": "Nikdy nezadávejte slova, která vám poslal někdo jiný."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operátor je nedostupný",
+    "outageBody": "Spark má výpadek. Počkejte pár minut a zkuste to znovu, nebo kontaktujte naši {support}",
+    "outageSupport": "Podporu",
+    "tryAgainLater": "Zkusit později"
   },
   "BackupNudge": {
     "title": "Vaše prostředky jsou v ohrožení",
@@ -4137,6 +4162,15 @@
     "title": "Toto je nesvěřenský účet",
     "body": "Chcete-li se dozvědět více, přečtěte si náš příspěvek na blogu",
     "cta": "Číst"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Aktualizujte zálohu v cloudu",
+    "body": "Váš nouzový balíček v {provider} je zastaralý. Znovu zálohujte peněženku, abyste ho aktualizovali.",
+    "cta": "Znovu zálohovat"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Zatím nemáte nouzový balíček. Vytvoří se po vaší první transakci.",
+    "exportFailed": "Nouzový balíček se nepodařilo stáhnout."
   },
   "StableBalance": {
     "title": "Stabilní zůstatek",

@@ -8,7 +8,6 @@ import { validateCloudBackupForm } from "../cloud-backup-validation"
 
 export const useCloudBackupForm = () => {
   const { LL } = useI18nContext()
-  const [isEncrypted, setIsEncrypted] = useState(false)
   const [password, setPassword] = useState("")
   const [confirmPassword, setConfirmPassword] = useState("")
   const [passwordTouched, setPasswordTouched] = useState(false)
@@ -24,14 +23,6 @@ export const useCloudBackupForm = () => {
       }
     }, []),
   )
-
-  const toggleEncryption = useCallback(() => {
-    setIsEncrypted((prev) => !prev)
-    setPassword("")
-    setConfirmPassword("")
-    setPasswordTouched(false)
-    setConfirmPasswordTouched(false)
-  }, [])
 
   const markPasswordTouched = useCallback(() => {
     setPasswordTouched(true)
@@ -52,13 +43,12 @@ export const useCloudBackupForm = () => {
   const { shouldShowPasswordError, shouldShowConfirmPasswordError, isValid } = useMemo(
     () =>
       validateCloudBackupForm({
-        isEncrypted,
         password,
         confirmPassword,
         passwordTouched,
         confirmPasswordTouched,
       }),
-    [isEncrypted, password, confirmPassword, passwordTouched, confirmPasswordTouched],
+    [password, confirmPassword, passwordTouched, confirmPasswordTouched],
   )
 
   const passwordError = shouldShowPasswordError
@@ -69,10 +59,8 @@ export const useCloudBackupForm = () => {
     : undefined
 
   return {
-    isEncrypted,
     password,
     confirmPassword,
-    toggleEncryption,
     setPassword,
     setConfirmPassword,
     markPasswordTouched,

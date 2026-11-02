@@ -31,6 +31,8 @@
         "createError": "Der API-Schlüssel konnte nicht erstellt werden. Bitte versuche es erneut.",
         "revokeError": "Der API-Schlüssel konnte nicht widerrufen werden. Bitte versuche es erneut.",
         "loadError": "Deine API-Schlüssel konnten nicht geladen werden. Bitte versuche es später erneut.",
+        "discardSecretTitle": "Diesen API-Schlüssel verwerfen?",
+        "discardSecretBody": "Das Geheimnis wird nur dieses eine Mal angezeigt. Wenn du jetzt gehst, kann der Schlüssel nicht wiederhergestellt werden und du musst einen neuen erstellen.",
         "done": "Fertig"
     },
     "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
         "skip": "Überspringen",
         "unlock": "Entsperren",
         "usePin": "PIN nutzen",
-        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt."
+        "confirmLogout": "Bist du sicher, dass du dich abmelden möchtest? Dadurch werden dein Cache und alle lokalen Benutzereinstellungen zurückgesetzt.",
+        "forgotPin": "PIN vergessen? Brieftaschen entfernen",
+        "removeWalletsTitle": "Brieftaschen von diesem Gerät entfernen?",
+        "removeWalletsBody": "Damit werden alle Brieftaschen von diesem Gerät entfernt und Sie werden abgemeldet. Um eine Brieftasche zurückzubekommen, brauchen Sie ihre Sicherungsphrase. Ohne sie ist die Brieftasche verloren.",
+        "removeWalletsConfirm": "Brieftaschen entfernen",
+        "removeWalletsFailed": "Einige Brieftaschen konnten nicht entfernt werden. Bitte versuchen Sie es erneut."
     },
     "PeopleScreen": {
         "title": "Leute",
@@ -2175,16 +2182,19 @@
         "walletCountNotTwo": "Die Anzahl der Wallets ist nicht zwei. Bitte verwenden Sie das Dashboard, um alle Wallets und Guthaben dieses Kontos zu sehen"
     },
     "PinScreen": {
+        "attemptUnrecorded": "Der Versuch konnte nicht sicher gespeichert werden.",
+        "attemptsLeft": "{attemptsRemaining: string} verbleibende Versuche.",
         "attemptsRemaining": "Falsche PIN. {attemptsRemaining: string} verbleibende Versuche.",
         "enterPin": "Gib deinen PIN Code ein",
-        "lockoutUnavailable": "Der Fehlversuch konnte nicht sicher gespeichert werden. Du wirst nun ausgeloggt.",
+        "oneAttemptLeft": "Letzter Versuch.",
         "oneAttemptRemaining": "Falsche PIN. Letzter Versuch.",
         "pinUnreadable": "Deine PIN konnte nicht geprüft werden. Bitte versuche es erneut.",
         "setPin": "Erstelle deinen PIN Code",
         "setPinFailedMatch": "Die PINs stimmen nicht überein - Setze deinen PIN Code",
         "storePinFailed": "Dein PIN Code konnte nicht gespeichert werden.",
         "tooManyAttempts": "Zu viele Fehlversuche. Du wirst nun ausgeloggt.",
-        "tryAgainIn": "Versuche es in {seconds: number} s erneut.",
+        "attemptBudgetSpent": "Zu viele Fehlversuche.",
+        "tryAgainIn": "Versuche es in {time: string} erneut.",
         "verifyPin": "Bestätige deinen PIN Code"
     },
     "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
         "problemPersists": "Bitte kontaktiere uns, wenn dieses Problem weiterhin besteht.",
         "fatalError": "Entschuldige, die Applikationsdaten konnten nicht geladen werden. Bitte kontaktiere uns, wenn dieses Problem weiterhin besteht.",
         "showError": "Fehler anzeigen",
-        "clearAppData": "App-Daten löschen und ausloggen"
+        "clearAppData": "App-Daten löschen und ausloggen",
+        "screenSecurityUnavailable": "Dieser Bildschirm bleibt ausgeblendet, weil der Screenshot-Schutz nicht aktiviert werden konnte."
     },
     "notifications": {
         "payment": {
@@ -3840,20 +3851,28 @@
                 "testSuccess": "Deine Wiederherstellungsphrase ist korrekt"
             }
         },
+        "BundleExport": {
+            "title": "Notfall-Ausstieg",
+            "body": "Falls Spark ausfällt, kannst du mit diesem Bundle deine Bitcoin ohne Blink On-Chain bewegen. Dein Dollar-Guthaben lässt sich nicht wiederherstellen.",
+            "download": "Bundle herunterladen",
+            "sensitiveTitle": "Sensibel",
+            "learnMore": "Mehr über den einseitigen Ausstieg",
+            "sensitiveConfirm": "Herunterladen",
+            "sensitiveBody": "Diese Datei zeigt dein Guthaben und deinen Zahlungsverlauf, also halte sie privat. Um sie im Notfall zu nutzen, brauchst du außerdem deine Wiederherstellungsphrase."
+        },
         "CloudBackup": {
             "title": "Sichern wir Ihre Brieftasche",
             "description": "Wir speichern eine Kopie Ihrer Sicherungsphrase in Ihrem {provider}.",
-            "encryptCheckbox": "Zusätzliche Passphrase hinzufügen",
-            "password": "Passphrase",
+            "password": "Passwort",
             "passwordPlaceholder": "(mindestens 12 Zeichen)",
-            "confirmPassword": "Passphrase bestätigen",
-            "confirmPasswordPlaceholder": "Passphrase erneut eingeben",
+            "confirmPassword": "Passwort bestätigen",
+            "confirmPasswordPlaceholder": "Passwort erneut eingeben",
             "continueButton": "Weiter",
             "importantTitle": "Wichtig",
-            "importantMessage": "Blink speichert diese Passphrase nicht. Wenn Sie sie verlieren, {bold} Ihre Brieftasche wiederherstellen.",
+            "importantMessage": "Blink speichert dieses Passwort nicht. Wenn Sie es verlieren, {bold} Ihre Brieftasche wiederherstellen.",
             "importantMessageBold": "können wir nicht",
             "passwordTooShort": "Mindestens 12 Zeichen",
-            "passwordMismatch": "Passphrasen stimmen nicht überein",
+            "passwordMismatch": "Passwörter stimmen nicht überein",
             "uploadSuccess": "Sicherung in {provider} gespeichert",
             "uploadFailed": "Fehler beim Hochladen der Sicherung",
             "signInFailed": "Anmeldung bei {provider} fehlgeschlagen",
@@ -4037,12 +4056,18 @@
         "restore": "Wallet wiederherstellen",
         "noBackupFound": "Kein Backup gefunden",
         "noBackupDescription": "Wir konnten kein Backup finden. Du kannst deine Sicherungsphrase manuell eingeben.",
-        "enterPassword": "Gib deine Verschlüsselungs-Passphrase ein",
-        "wrongPassword": "Falsche Passphrase. Bitte versuche es erneut.",
+        "enterPassword": "Gib dein Verschlüsselungspasswort ein",
+        "wrongPassword": "Falsches Passwort. Bitte versuche es erneut.",
         "pickBackupTitle": "Wallet auswählen",
         "pickBackupDescription": "Wähle ein Backup zum Wiederherstellen",
         "recognizePhraseTitle": "Erkennst du diese Backup-Phrase?",
         "recognizePhraseBody": "Gib niemals Wörter ein, die dir jemand anderes geschickt hat."
+    },
+    "EmergencyRecovery": {
+        "outageTitle": "Betreiber nicht erreichbar",
+        "outageBody": "Bei Spark gibt es eine Störung. Bitte warte ein paar Minuten und versuche es erneut oder kontaktiere unseren {support}",
+        "outageSupport": "Support",
+        "tryAgainLater": "Später erneut versuchen"
     },
     "BackupNudge": {
         "title": "Ihre Mittel sind gefährdet",
@@ -4137,6 +4162,15 @@
         "title": "Dies ist ein nicht-verwahrtes Konto",
         "body": "Lies unseren Blogbeitrag, um mehr zu erfahren",
         "cta": "Lesen"
+    },
+    "StaleCloudBundleBulletin": {
+        "title": "Aktualisiere dein Cloud-Backup",
+        "body": "Dein Notfall-Bundle in {provider} ist veraltet. Sichere deine Brieftasche erneut, um es zu aktualisieren.",
+        "cta": "Erneut sichern"
+    },
+    "RecoveryBundleScreen": {
+        "noBundleToExport": "Noch kein Notfall-Bundle. Es wird nach deiner ersten Transaktion erstellt.",
+        "exportFailed": "Das Notfall-Bundle konnte nicht heruntergeladen werden."
     },
     "StableBalance": {
         "title": "Stabiles Guthaben",

@@ -31,6 +31,8 @@
     "createError": "Ekisumuluzo kya API tekisoboye kukolebwa. Gezaako nate.",
     "revokeError": "Ekisumuluzo kya API tekisoboye kujjibwamu. Gezaako nate.",
     "loadError": "Ebisumuluzo byo bya API tebisoboye kutikkulwa. Gezaako oluvannyuma.",
+    "discardSecretTitle": "Suula ekisumuluzo kya API kino?",
+    "discardSecretBody": "Kino kye kiseera kyokka ekyama we kirabikira. Bw'ovaawo kati, ekisumuluzo tekija kuddizibwamu era ojakwetaaga okukola ekirala.",
     "done": "Kimaze"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Buuka",
     "unlock": "Sumulula",
     "usePin": "Kozesa PINI",
-    "confirmLogout": "Oli mukakafu nti wandyagadde okufuluma? Kino kijja kuzzaa bujja ekifo ekikuumirwamu n'enteekateeka z'okukozesa"
+    "confirmLogout": "Oli mukakafu nti wandyagadde okufuluma? Kino kijja kuzzaa bujja ekifo ekikuumirwamu n'enteekateeka z'okukozesa",
+    "forgotPin": "Weerabidde PINI? Ggyawo akawunti",
+    "removeWalletsTitle": "Ggyawo akawunti ku kyuma kino?",
+    "removeWalletsBody": "Kino kiggyawo akawunti zonna ku kyuma kino era kikuggya mu akawunti. Okuzzaawo akawunti, weetaaga ekigambo kyayo eky'okukuuma. Awatali kyo, akawunti ebula.",
+    "removeWalletsConfirm": "Ggyawo akawunti",
+    "removeWalletsFailed": "Akawunti ezimu tezisobodde kuggyibwawo. Gezaako nate."
   },
   "PeopleScreen": {
     "title": "Abantu",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Embala ya waleti teri 2. Nsaba okozese dashboard olabe waleti zonna ne ssente za akawunti eno"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Tetusobodde kuwandiika kugezaako mu bukuumi.",
+    "attemptsLeft": "{attemptsRemaining: number} okugezaako okusigaddewo.",
     "attemptsRemaining": "PIN enkyamu. {attemptsRemaining: number} okugezaako okusigaddewo.",
     "enterPin": "Teeka pini koodi yo",
-    "lockoutUnavailable": "Tetusobodde kuwandiika kugezaako okulemeredwa mu bukuumi. Logging out.",
+    "oneAttemptLeft": "Mulundi 1 ogw'okugezaako ogusigaddewo.",
     "oneAttemptRemaining": "PIN enkyamu. mulundi 1 ogw'okugezaako ogusigaddewo.",
     "pinUnreadable": "Tetusobodde kukebera PIN yo. Gezaako nate.",
     "setPin": "Kola PIN yo",
     "setPinFailedMatch": "Pins tezikwatagana - Kola PIN yo",
     "storePinFailed": "Tetusobodde kutereka pin yo",
     "tooManyAttempts": "Okugezaako okungi ennyo okulemeredwa. Logging out.",
-    "tryAgainIn": "Gezaako nate mu {seconds: number} s.",
+    "attemptBudgetSpent": "Okugezaako okungi ennyo okulemeredwa.",
+    "tryAgainIn": "Gezaako nate mu {time: string}.",
     "verifyPin": "Kakasa pini koodi yo"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Ekizibu bw'ekisigalawo tutukirire.",
     "fatalError": "Bambi tulabika tulina ensonga mu kutikka eby'okunonyereza byo ebya application. Singa ebizibu bikyaliwo tukusaba otuukirire abayambi.",
     "showError": "Laga Ensobi",
-    "clearAppData": "Sangula Eby'okunonyeereza ku App omale ofulume"
+    "clearAppData": "Sangula Eby'okunonyeereza ku App omale ofulume",
+    "screenSecurityUnavailable": "Olupapula luno lusigala nga lukwekeddwa kubanga obukuumi obuziyiza okukwata ebifaananyi by'olupapula tebusobose kutandikibwa."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Ebigambo byo ebya bbakappu birongoofu"
       }
     },
+    "BundleExport": {
+      "title": "Okufuluma mu bwangu",
+      "body": "Singa Spark egaana okukola, ekipakiti kino kikusobozesa okutwala bitcoin yo ku chain awatali Blink. Ssente zo eza doola teziyinza kuzzibwawo.",
+      "download": "Ggya ekipakiti",
+      "sensitiveTitle": "Kya kyama",
+      "learnMore": "Manya ebisingawo ku kufuluma ku lwo",
+      "sensitiveConfirm": "Ggya",
+      "sensitiveBody": "Fayiro eno eraga ssente zo n'ebyafaayo by'okusasula kwo, n'olwekyo gikuume mu kyama. Okugikozesa mu bwangu, weetaaga n'ebigambo byo eby'enkalakkalira."
+    },
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
-      "encryptCheckbox": "Yongerako ebigambo eby'ekyama",
-      "password": "Ebigambo eby'ekyama",
+      "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
-      "confirmPassword": "Kakasa ebigambo eby'ekyama",
-      "confirmPasswordPlaceholder": "Yingiza ebigambo eby'ekyama nate",
+      "confirmPassword": "Kakasa ekigambo eky'okuyingira",
+      "confirmPasswordPlaceholder": "Yingiza ekigambo eky'okuyingira nate",
       "continueButton": "Weyongere",
       "importantTitle": "Kya mugaso",
-      "importantMessage": "Blink teterekera bigambo bino eby'ekyama. Bw'obifiirwa, {bold} okuzuula akawunti yo.",
+      "importantMessage": "Blink tekutereka kigambo kino eky'okuyingira. Bw'okifiirwa, {bold} okuzuula akawunti yo.",
       "importantMessageBold": "tetujja kusobola",
       "passwordTooShort": "Obunene ennukuta 12",
-      "passwordMismatch": "Ebigambo eby'ekyama tebituukagana",
+      "passwordMismatch": "Ebigambo eby'okuyingira tebituukagana",
       "uploadSuccess": "Kopi eterekedwa mu {provider}",
       "uploadFailed": "Enteeka y'ekopi teeyasoboka",
       "signInFailed": "Okuyingira mu {provider} kukomye",
@@ -4037,12 +4056,18 @@
     "restore": "Zzaawo wallet",
     "noBackupFound": "Tewali koppa efuniddwa",
     "noBackupDescription": "Tetufunye koppa. Osobola okuyingiza ekigambo ky'okukuuma mu ngalo.",
-    "enterPassword": "Yingiza ebigambo byo eby'ekyama eby'okusiba",
-    "wrongPassword": "Ebigambo eby'ekyama si bituufu. Gezaako nate.",
+    "enterPassword": "Yingiza password yo ey'okusiba",
+    "wrongPassword": "Password si ntuufu. Gezaako nate.",
     "pickBackupTitle": "Londa wallet",
     "pickBackupDescription": "Londa kopiyo y'okuzzaawo",
     "recognizePhraseTitle": "Omanyi ebigambo bino eby'okukuuma?",
     "recognizePhraseBody": "Toteekangamu bigambo omuntu omulala by'akuweereza."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Omukugu tatuukibwako",
+    "outageBody": "Spark erina obuzibu mu mpeereza. Lindako eddakiika ntono ogezeeko nate oba tuukirira {support} waffe",
+    "outageSupport": "Obuyambi",
+    "tryAgainLater": "Gezaako oluvannyuma"
   },
   "BackupNudge": {
     "title": "Ssente zo ziri mu bulabe",
@@ -4137,6 +4162,15 @@
     "title": "Eno ye akawunti etakuumibwa",
     "body": "Okumanya ebisingawo, soma blog yaffe",
     "cta": "Soma"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Zza obuggya kkopi yo ey'omu kire",
+    "body": "Ekipakiti kyo eky'obwangu mu {provider} kikadde. Koppa akawunti yo nate okukizza obuggya.",
+    "cta": "Koppa nate"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Tewannabaawo kipakiti kya bwangu. Kikolebwa oluvannyuma lw'okusasula kwo okusooka.",
+    "exportFailed": "Tetusobodde kuwanula kipakiti kya bwangu."
   },
   "StableBalance": {
     "title": "Bbaalansi ennywevu",

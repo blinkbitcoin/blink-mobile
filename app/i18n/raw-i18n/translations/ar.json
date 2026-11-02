@@ -31,6 +31,8 @@
     "createError": "تعذّر إنشاء مفتاح API. يرجى المحاولة مرة أخرى.",
     "revokeError": "تعذّر إلغاء مفتاح API. يرجى المحاولة مرة أخرى.",
     "loadError": "تعذّر تحميل مفاتيح API الخاصة بك. يرجى المحاولة لاحقًا.",
+    "discardSecretTitle": "تجاهل مفتاح API هذا؟",
+    "discardSecretBody": "هذه هي المرة الوحيدة التي يُعرض فيها السر. إذا غادرت الآن، فلن تتمكن من استرداد المفتاح وستحتاج إلى إنشاء مفتاح جديد.",
     "done": "تم"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "تخطى",
     "unlock": "إلغاء القفل",
     "usePin": "استخدم الرمز الشخصي (PIN)",
-    "confirmLogout": "هل أنت متأكد أنك تريد تسجيل الخروج؟ سيؤدي ذلك إلى مسح ذاكرة التخزين المؤقت وجميع إعدادات المستخدم المحلية"
+    "confirmLogout": "هل أنت متأكد أنك تريد تسجيل الخروج؟ سيؤدي ذلك إلى مسح ذاكرة التخزين المؤقت وجميع إعدادات المستخدم المحلية",
+    "forgotPin": "نسيت الرمز الشخصي؟ أزل المحافظ",
+    "removeWalletsTitle": "إزالة المحافظ من هذا الجهاز؟",
+    "removeWalletsBody": "سيزيل هذا جميع المحافظ من هذا الجهاز ويسجل خروجك. لاستعادة محفظة، تحتاج إلى عبارة النسخ الاحتياطي الخاصة بها. بدونها تضيع المحفظة.",
+    "removeWalletsConfirm": "إزالة المحافظ",
+    "removeWalletsFailed": "تعذرت إزالة بعض المحافظ. يرجى المحاولة مرة أخرى."
   },
   "PeopleScreen": {
     "title": "People",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "عدد المحافظ ليس 2. يرجى استخدام لوحة التحكم لعرض جميع المحافظ وأموال هذا الحساب"
   },
   "PinScreen": {
+    "attemptUnrecorded": "تعذّر تسجيل المحاولة بشكل آمن.",
+    "attemptsLeft": "بقي {attemptsRemaining: string} محاولات.",
     "attemptsRemaining": "رمز شخصي خاطئ. بقي {attemptsRemaining: string} محاولات.",
     "enterPin": "أدخل رمز PIN الخاص بك",
-    "lockoutUnavailable": "تعذّر تسجيل المحاولة الفاشلة بشكل آمن. يتم تسجيل الخروج.",
+    "oneAttemptLeft": "بقيت محاولة واحدة.",
     "oneAttemptRemaining": "رمز شخصي خاطئ. بقيت محاولة واحدة.",
     "pinUnreadable": "تعذّر التحقق من رمزك الشخصي. يرجى المحاولة مرة أخرى.",
     "setPin": "عيّن رمزك الشخصي (PIN)",
     "setPinFailedMatch": "رموز ال PIN غير متوافقة - قم بتعيين رمز PIN الخاص بك",
     "storePinFailed": "غير قادر على تخزين ال PIN الخاص بك.",
     "tooManyAttempts": "الكثير من المحاولات الفاشلة. \nيتم تسجيل الخروج.",
-    "tryAgainIn": "حاول مرة أخرى بعد {seconds: number} ث.",
+    "attemptBudgetSpent": "الكثير من المحاولات الفاشلة.",
+    "tryAgainIn": "حاول مرة أخرى بعد {time: string}.",
     "verifyPin": "تحقق من رمز PIN الخاص بك"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "تواصل مع مركز الدعم اذا استمرت المشكلة.",
     "fatalError": "نأسف على ما يبدو أننا نواجه مشكلات في تحميل بيانات التطبيق. إذا استمرت المشاكل يرجى الاتصال بالدعم.",
     "showError": "إظهار الخطأ",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "تبقى هذه الشاشة مخفية لأنه تعذّر تفعيل الحماية من لقطات الشاشة."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "عبارة النسخ الاحتياطي صحيحة"
       }
     },
+    "BundleExport": {
+      "title": "الخروج الطارئ",
+      "body": "إذا توقف Spark، تتيح لك هذه الحزمة نقل البيتكوين الخاص بك على السلسلة بدون Blink. لا يمكن استرداد رصيدك بالدولار.",
+      "download": "تنزيل الحزمة",
+      "sensitiveTitle": "حسّاس",
+      "learnMore": "اعرف المزيد عن الخروج الأحادي",
+      "sensitiveConfirm": "تنزيل",
+      "sensitiveBody": "يعرض هذا الملف رصيدك وسجل مدفوعاتك، لذا احتفظ به بشكل خاص. لاستخدامه في حالة الطوارئ، تحتاج أيضًا إلى عبارة النسخ الاحتياطي."
+    },
     "CloudBackup": {
       "title": "لنقم بنسخ محفظتك احتياطيًا",
       "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
-      "encryptCheckbox": "إضافة عبارة مرور إضافية",
-      "password": "عبارة المرور",
+      "password": "كلمة المرور",
       "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
-      "confirmPassword": "تأكيد عبارة المرور",
-      "confirmPasswordPlaceholder": "أدخل عبارة المرور مرة أخرى",
+      "confirmPassword": "تأكيد كلمة المرور",
+      "confirmPasswordPlaceholder": "أدخل كلمة المرور مرة أخرى",
       "continueButton": "متابعة",
       "importantTitle": "مهم",
-      "importantMessage": "لا يخزن Blink عبارة المرور هذه. إذا فقدتها، {bold} استعادة محفظتك.",
+      "importantMessage": "لا يخزن Blink كلمة المرور هذه. إذا فقدتها، {bold} استعادة محفظتك.",
       "importantMessageBold": "لن نتمكن من",
       "passwordTooShort": "12 حرفًا كحد أدنى",
-      "passwordMismatch": "عبارتا المرور غير متطابقتين",
+      "passwordMismatch": "كلمات المرور غير متطابقة",
       "uploadSuccess": "تم حفظ النسخة الاحتياطية في {provider}",
       "uploadFailed": "فشل رفع النسخة الاحتياطية",
       "signInFailed": "فشل تسجيل الدخول إلى {provider}",
@@ -4037,12 +4056,18 @@
     "restore": "استعادة المحفظة",
     "noBackupFound": "لم يتم العثور على نسخة احتياطية",
     "noBackupDescription": "لم نتمكن من العثور على نسخة احتياطية. يمكنك إدخال عبارة النسخ الاحتياطي يدوياً.",
-    "enterPassword": "أدخل عبارة مرور التشفير",
-    "wrongPassword": "عبارة مرور غير صحيحة. يرجى المحاولة مرة أخرى.",
+    "enterPassword": "أدخل كلمة مرور التشفير",
+    "wrongPassword": "كلمة مرور غير صحيحة. يرجى المحاولة مرة أخرى.",
     "pickBackupTitle": "اختر محفظة",
     "pickBackupDescription": "اختر نسخة احتياطية للاستعادة",
     "recognizePhraseTitle": "هل تتعرّف على عبارة النسخ الاحتياطي هذه؟",
     "recognizePhraseBody": "لا تُدخل أبدًا كلمات أرسلها لك شخص آخر."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "تعذّر الوصول إلى المشغّل",
+    "outageBody": "يواجه Spark انقطاعًا في الخدمة. يُرجى الانتظار بضع دقائق والمحاولة مجددًا أو التواصل مع {support}",
+    "outageSupport": "الدعم",
+    "tryAgainLater": "حاول لاحقًا"
   },
   "BackupNudge": {
     "title": "أموالك في خطر",
@@ -4137,6 +4162,15 @@
     "title": "هذا حساب غير حافظ",
     "body": "لمعرفة المزيد، اقرأ منشور مدونتنا",
     "cta": "اقرأ"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "حدّث نسختك الاحتياطية السحابية",
+    "body": "حزمة الطوارئ في {provider} قديمة. انسخ محفظتك احتياطيًا مرة أخرى لتحديثها.",
+    "cta": "نسخ احتياطي مرة أخرى"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "لا توجد حزمة طوارئ بعد. يتم إنشاؤها بعد معاملتك الأولى.",
+    "exportFailed": "تعذّر تنزيل حزمة الطوارئ."
   },
   "StableBalance": {
     "title": "الرصيد المستقر",

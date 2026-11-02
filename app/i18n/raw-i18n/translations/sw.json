@@ -31,6 +31,8 @@
     "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
     "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
     "loadError": "Imeshindwa kupakia funguo zako za API. Tafadhali jaribu tena baadaye.",
+    "discardSecretTitle": "Tupa ufunguo huu wa API?",
+    "discardSecretBody": "Hii ndiyo mara pekee siri inayoonyeshwa. Ukiacha sasa, ufunguo hauwezi kupatikana tena na utalazimika kuunda mpya.",
     "done": "Imekamilika"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Ruka",
     "unlock": "Fungua",
     "usePin": "Tumia pini",
-    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani"
+    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani",
+    "forgotPin": "Umesahau pini? Ondoa mikoba",
+    "removeWalletsTitle": "Ondoa mikoba kwenye kifaa hiki?",
+    "removeWalletsBody": "Hii inaondoa mikoba yote kwenye kifaa hiki na kukutoa nje. Ili kurudisha mkoba, unahitaji neno lake la kurejesha. Bila hilo, mkoba unapotea.",
+    "removeWalletsConfirm": "Ondoa mikoba",
+    "removeWalletsFailed": "Baadhi ya mikoba haikuweza kuondolewa. Tafadhali jaribu tena."
   },
   "PeopleScreen": {
     "title": "Watunzi",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Idadi ya mifuko haitoshi. Tafadhali tumia kiolesura ili kuona mifuko yote na fedha za akaunti hii"
   },
   "PinScreen": {
-    "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "attemptUnrecorded": "Imeshindwa kurekodi jaribio kwa usalama.",
+    "attemptsLeft": "Majaribio {attemptsRemaining: number} yamesalia.",
+    "attemptsRemaining": "Pini si sahihi. Majaribio {attemptsRemaining: number} yamesalia.",
     "enterPin": "Ingiza pini yako",
-    "lockoutUnavailable": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
+    "oneAttemptLeft": "Jaribio 1 limesalia.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",
     "storePinFailed": "Imeshindwa kuhifadhi pini yako.",
     "tooManyAttempts": "Majaribio mengi sana yaliyokosa. Kutoka nje ya programu.",
-    "tryAgainIn": "Jaribu tena baada ya sekunde {seconds: number}.",
+    "attemptBudgetSpent": "Majaribio mengi sana yaliyokosa.",
+    "tryAgainIn": "Jaribu tena baada ya {time: string}.",
     "verifyPin": "Thibitisha nambari yako ya pini"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Tatizo likiendelea wasiliana na usaidizi",
     "fatalError": "Pole, inaonekana kwamba tunatatizika kupakua data ya aplikisheni. Tatizo likiendelea tafadhali wasiliana na usaidizi. ",
     "showError": "Onyesha kosa",
-    "clearAppData": "Ondoa Data ya Programu na Toka"
+    "clearAppData": "Ondoa Data ya Programu na Toka",
+    "screenSecurityUnavailable": "Skrini hii inabaki imefichwa kwa sababu ulinzi dhidi ya picha za skrini haukuweza kuwashwa."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Maneno yako ya hifadhi ni sahihi"
       }
     },
+    "BundleExport": {
+      "title": "Kutoka kwa dharura",
+      "body": "Iwapo Spark itaacha kufanya kazi, kifurushi hiki hukuwezesha kuhamisha bitcoin zako on-chain bila Blink. Salio lako la dola haliwezi kurejeshwa.",
+      "download": "Pakua kifurushi",
+      "sensitiveTitle": "Nyeti",
+      "learnMore": "Jifunze zaidi kuhusu kutoka kwa upande mmoja",
+      "sensitiveConfirm": "Pakua",
+      "sensitiveBody": "Faili hili linaonyesha salio lako na historia ya malipo yako, kwa hiyo liweke faragha. Ili kulitumia wakati wa dharura, unahitaji pia kifungu chako cha akiba."
+    },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
       "description": "Tutahifadhi nakala ya neno lako la kurejesha kwenye {provider} yako.",
-      "encryptCheckbox": "Ongeza kaulisiri ya ziada",
-      "password": "Kaulisiri",
+      "password": "Nywila",
       "passwordPlaceholder": "(herufi 12 ndogo zaidi)",
-      "confirmPassword": "Thibitisha kaulisiri",
-      "confirmPasswordPlaceholder": "Ingiza kaulisiri tena",
+      "confirmPassword": "Thibitisha nywila",
+      "confirmPasswordPlaceholder": "Ingiza nywila tena",
       "continueButton": "Endelea",
       "importantTitle": "Muhimu",
-      "importantMessage": "Blink haihifadhi kaulisiri hii. Ukiipoteza, {bold} kurejesha mkoba wako.",
+      "importantMessage": "Blink haihifadhi nywila hii. Ukiipoteza, {bold} kurejesha mkoba wako.",
       "importantMessageBold": "hatutaweza",
       "passwordTooShort": "Herufi 12 ndogo zaidi",
-      "passwordMismatch": "Kaulisiri hazifanani",
+      "passwordMismatch": "Nywila hazifanani",
       "uploadSuccess": "Nakala imehifadhiwa kwenye {provider}",
       "uploadFailed": "Imeshindwa kupakia nakala",
       "signInFailed": "Imeshindwa kuingia katika {provider}",
@@ -4037,12 +4056,18 @@
     "restore": "Rejesha mkoba",
     "noBackupFound": "Hakuna hifadhi iliyopatikana",
     "noBackupDescription": "Hatukupata hifadhi. Unaweza kuingiza msemo wako wa hifadhi kwa mkono.",
-    "enterPassword": "Ingiza kaulisiri yako ya usimbaji",
-    "wrongPassword": "Kaulisiri si sahihi. Tafadhali jaribu tena.",
+    "enterPassword": "Ingiza nenosiri lako la usimbaji",
+    "wrongPassword": "Nenosiri si sahihi. Tafadhali jaribu tena.",
     "pickBackupTitle": "Chagua pochi",
     "pickBackupDescription": "Chagua nakala rudufu ya kurejesha",
     "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
     "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Mwendeshaji hapatikani",
+    "outageBody": "Spark inakabiliwa na hitilafu. Tafadhali subiri dakika chache ujaribu tena au wasiliana na {support} wetu",
+    "outageSupport": "Msaada",
+    "tryAgainLater": "Jaribu tena baadaye"
   },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",
@@ -4137,6 +4162,15 @@
     "title": "Hii ni akaunti isiyo ya udhamini",
     "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
     "cta": "Soma"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Sasisha nakala yako ya wingu",
+    "body": "Kifurushi chako cha dharura kwenye {provider} kimepitwa na wakati. Hifadhi nakala ya mkoba wako tena ili kukisasisha.",
+    "cta": "Hifadhi nakala tena"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Bado hakuna kifurushi cha dharura. Kinaundwa baada ya muamala wako wa kwanza.",
+    "exportFailed": "Imeshindwa kupakua kifurushi cha dharura."
   },
   "StableBalance": {
     "title": "Salio thabiti",

@@ -31,6 +31,8 @@
     "createError": "API-nøglen kunne ikke oprettes. Prøv igen.",
     "revokeError": "API-nøglen kunne ikke tilbagekaldes. Prøv igen.",
     "loadError": "Dine API-nøgler kunne ikke indlæses. Prøv igen senere.",
+    "discardSecretTitle": "Kassér denne API-nøgle?",
+    "discardSecretBody": "Dette er den eneste gang, hemmeligheden vises. Hvis du forlader nu, kan nøglen ikke gendannes, og du bliver nødt til at oprette en ny.",
     "done": "Færdig"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Spring over",
     "unlock": "Lås op",
     "usePin": "Brug PIN",
-    "confirmLogout": "Are you sure you'd like to log out? This will reset your cache and all local user settings"
+    "confirmLogout": "Are you sure you'd like to log out? This will reset your cache and all local user settings",
+    "forgotPin": "Glemt PIN? Fjern tegnebøger",
+    "removeWalletsTitle": "Fjern tegnebøger fra denne enhed?",
+    "removeWalletsBody": "Dette fjerner alle tegnebøger fra denne enhed og logger dig ud. For at få en tegnebog tilbage skal du bruge dens gendannelsesfrase. Uden den er tegnebogen tabt.",
+    "removeWalletsConfirm": "Fjern tegnebøger",
+    "removeWalletsFailed": "Nogle tegnebøger kunne ikke fjernes. Prøv igen."
   },
   "PeopleScreen": {
     "title": "Mennesker",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Antallet af tegnebøger er ikke 2. Brug venligst kontrolpanelet for at se alle tegnebøger og midler på denne konto"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Forsøget kunne ikke registreres sikkert.",
+    "attemptsLeft": "{attemptsRemaining: number} forsøg tilbage.",
     "attemptsRemaining": "Forkert PIN-kode. {attemptsRemaining: number} forsøg tilbage.",
     "enterPin": "Indtast din PIN-kode",
-    "lockoutUnavailable": "Det mislykkede forsøg kunne ikke registreres sikkert. Logger ud.",
+    "oneAttemptLeft": "1 forsøg tilbage.",
     "oneAttemptRemaining": "Forkert PIN-kode. 1 forsøg tilbage.",
     "pinUnreadable": "Din PIN-kode kunne ikke kontrolleres. Prøv venligst igen.",
     "setPin": "Vælg din PIN-kode.",
     "setPinFailedMatch": "PIN-koderne matcher ikke - Vælg din PIN-kode.",
     "storePinFailed": "Kunne ikke gemme din PIN-kode",
     "tooManyAttempts": "For mange fejlede forsøg. Logger ud.",
-    "tryAgainIn": "Prøv igen om {seconds: number} s.",
+    "attemptBudgetSpent": "For mange fejlede forsøg.",
+    "tryAgainIn": "Prøv igen om {time: string}.",
     "verifyPin": "Bekræft din PIN-kode"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Hvis problemet fortsætter, kontakt support.",
     "fatalError": "Beklager, det lader til at vi har problemer med at indlæse applikationsdataene. Hvis problemerne fortsætter, kontakt support.",
     "showError": "Vis fejl",
-    "clearAppData": "Ryd appdata og log ud"
+    "clearAppData": "Ryd appdata og log ud",
+    "screenSecurityUnavailable": "Denne skærm forbliver skjult, fordi beskyttelse mod skærmbilleder ikke kunne slås til."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Din backup-frase er korrekt"
       }
     },
+    "BundleExport": {
+      "title": "Nødexit",
+      "body": "Hvis Spark går ned, lader dette bundt dig flytte dine bitcoin on-chain uden Blink. Din dollarsaldo kan ikke gendannes.",
+      "download": "Download bundt",
+      "sensitiveTitle": "Følsom",
+      "learnMore": "Læs mere om ensidig exit",
+      "sensitiveConfirm": "Download",
+      "sensitiveBody": "Denne fil viser din saldo og betalingshistorik, så hold den privat. For at bruge den i en nødsituation skal du også bruge din gendannelsesfrase."
+    },
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
-      "encryptCheckbox": "Tilføj ekstra adgangssætning",
-      "password": "Adgangssætning",
+      "password": "Adgangskode",
       "passwordPlaceholder": "(minimum 12 tegn)",
-      "confirmPassword": "Bekræft adgangssætning",
-      "confirmPasswordPlaceholder": "Indtast adgangssætning igen",
+      "confirmPassword": "Bekræft adgangskode",
+      "confirmPasswordPlaceholder": "Indtast adgangskode igen",
       "continueButton": "Fortsæt",
       "importantTitle": "Vigtigt",
-      "importantMessage": "Blink gemmer ikke denne adgangssætning. Hvis du mister den, {bold} gendanne din tegnebog.",
+      "importantMessage": "Blink gemmer ikke denne adgangskode. Hvis du mister den, {bold} gendanne din tegnebog.",
       "importantMessageBold": "vil vi ikke kunne",
       "passwordTooShort": "Minimum 12 tegn",
-      "passwordMismatch": "Adgangssætningerne stemmer ikke overens",
+      "passwordMismatch": "Adgangskoderne stemmer ikke overens",
       "uploadSuccess": "Sikkerhedskopi gemt i {provider}",
       "uploadFailed": "Kunne ikke uploade sikkerhedskopi",
       "signInFailed": "Kunne ikke logge ind på {provider}",
@@ -4037,12 +4056,18 @@
     "restore": "Gendan tegnebog",
     "noBackupFound": "Ingen sikkerhedskopi fundet",
     "noBackupDescription": "Vi kunne ikke finde en sikkerhedskopi. Du kan indtaste din sikkerhedsfrase manuelt.",
-    "enterPassword": "Indtast din krypteringsadgangssætning",
-    "wrongPassword": "Forkert adgangssætning. Prøv venligst igen.",
+    "enterPassword": "Indtast din krypteringsadgangskode",
+    "wrongPassword": "Forkert adgangskode. Prøv venligst igen.",
     "pickBackupTitle": "Vælg en tegnebog",
     "pickBackupDescription": "Vælg en sikkerhedskopi at gendanne",
     "recognizePhraseTitle": "Genkender du denne backup-sætning?",
     "recognizePhraseBody": "Indtast aldrig ord, som en anden har sendt dig."
+  },
+  "EmergencyRecovery": {
+    "outageTitle": "Operatør kan ikke nås",
+    "outageBody": "Spark har et nedbrud. Vent et par minutter og prøv igen, eller kontakt vores {support}",
+    "outageSupport": "Support",
+    "tryAgainLater": "Prøv igen senere"
   },
   "BackupNudge": {
     "title": "Dine midler er i fare",
@@ -4137,6 +4162,15 @@
     "title": "Dette er en ikke-depotkonto",
     "body": "Læs vores blogindlæg for at lære mere",
     "cta": "Læs"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Opdater din sikkerhedskopi i skyen",
+    "body": "Dit nødbundt i {provider} er forældet. Sikkerhedskopiér din tegnebog igen for at opdatere det.",
+    "cta": "Sikkerhedskopiér igen"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Intet nødbundt endnu. Det oprettes efter din første transaktion.",
+    "exportFailed": "Kunne ikke downloade nødbundtet."
   },
   "StableBalance": {
     "title": "Stabil saldo",

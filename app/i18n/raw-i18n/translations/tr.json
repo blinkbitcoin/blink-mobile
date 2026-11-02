@@ -31,6 +31,8 @@
     "createError": "API anahtarı oluşturulamadı. Lütfen tekrar deneyin.",
     "revokeError": "API anahtarı iptal edilemedi. Lütfen tekrar deneyin.",
     "loadError": "API anahtarlarınız yüklenemedi. Lütfen daha sonra tekrar deneyin.",
+    "discardSecretTitle": "Bu API anahtarından vazgeçilsin mi?",
+    "discardSecretBody": "Gizli anahtar yalnızca bu bir kez gösterilir. Şimdi ayrılırsanız anahtar kurtarılamaz ve yenisini oluşturmanız gerekir.",
     "done": "Tamam"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Atla",
     "unlock": "Kilidi aç",
     "usePin": "PIN kullan",
-    "confirmLogout": "Çıkış yapmak istediğinden emin misin? Bu işlem çerezlerini ve tüm yerel kullanıcı verilerini temizleyecek."
+    "confirmLogout": "Çıkış yapmak istediğinden emin misin? Bu işlem çerezlerini ve tüm yerel kullanıcı verilerini temizleyecek.",
+    "forgotPin": "PIN'i mi unuttunuz? Cüzdanları kaldırın",
+    "removeWalletsTitle": "Cüzdanlar bu cihazdan kaldırılsın mı?",
+    "removeWalletsBody": "Bu işlem bu cihazdaki tüm cüzdanları kaldırır ve oturumunuzu kapatır. Bir cüzdanı geri almak için yedek ifadesine ihtiyacınız var. O olmadan cüzdan kaybolur.",
+    "removeWalletsConfirm": "Cüzdanları kaldır",
+    "removeWalletsFailed": "Bazı cüzdanlar kaldırılamadı. Lütfen tekrar deneyin."
   },
   "PeopleScreen": {
     "title": "İnsanlar",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Cüzdan sayısı 2 değil. Bu hesabın tüm cüzdanlarını ve fonlarını görmek için lütfen kontrol panelini kullanın"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Deneme güvenli şekilde kaydedilemedi.",
+    "attemptsLeft": "Kalan deneme hakkınız: {attemptsRemaining: number}",
     "attemptsRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: {attemptsRemaining: number}",
     "enterPin": "PIN kodunu gir",
-    "lockoutUnavailable": "Başarısız deneme güvenli şekilde kaydedilemedi. Çıkış yapılıyor.",
+    "oneAttemptLeft": "Kalan deneme hakkınız: 1",
     "oneAttemptRemaining": "Yanlış PIN kodu. Kalan deneme hakkınız: 1",
     "pinUnreadable": "PIN kodunuz kontrol edilemedi. Lütfen tekrar deneyin.",
     "setPin": "PIN kodunu ayarla",
     "setPinFailedMatch": "Pin kodu eşleşmedi - PIN kodunu ayarla",
     "storePinFailed": "Pin'in kaydedilemedi.",
     "tooManyAttempts": "Çok fazla başarısız deneme. Çıkış yapılıyor.",
-    "tryAgainIn": "{seconds: number} sn sonra tekrar deneyin.",
+    "attemptBudgetSpent": "Çok fazla başarısız deneme.",
+    "tryAgainIn": "{time: string} sonra tekrar deneyin.",
     "verifyPin": "PIN kodunu onayla"
   },
   "PriceHistoryScreen": {
@@ -3033,7 +3043,8 @@
     "problemPersists": "Problem devam ederse destek birimine ulaşın",
     "fatalError": "Üzgünüz, uygulama verilerini yüklerken sorun yaşıyoruz gibi görünüyor. Sorunlar devam ederse lütfen destek ekibiyle iletişime geçin.",
     "showError": "Hatayı göster",
-    "clearAppData": "Uygulama Verilerini Temizleme ve Oturumu Kapatma"
+    "clearAppData": "Uygulama Verilerini Temizleme ve Oturumu Kapatma",
+    "screenSecurityUnavailable": "Ekran görüntüsü koruması açılamadığı için bu ekran gizli kalıyor."
   },
   "notifications": {
     "payment": {
@@ -3840,20 +3851,28 @@
         "testSuccess": "Yedekleme ifaden doğru"
       }
     },
+    "BundleExport": {
+      "title": "Acil çıkış",
+      "body": "Spark çökerse bu paket, bitcoin'ini Blink olmadan zincir üzerine taşımanı sağlar. Dolar bakiyen kurtarılamaz.",
+      "download": "Paketi indir",
+      "sensitiveTitle": "Hassas",
+      "learnMore": "Tek taraflı çıkış hakkında daha fazla bilgi",
+      "sensitiveConfirm": "İndir",
+      "sensitiveBody": "Bu dosya bakiyeni ve ödeme geçmişini gösterir, bu yüzden gizli tut. Acil bir durumda kullanmak için yedekleme ifadene de ihtiyacın var."
+    },
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
-      "encryptCheckbox": "Ek parola ekle",
-      "password": "Parola",
+      "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
-      "confirmPassword": "Parolayı onayla",
-      "confirmPasswordPlaceholder": "Parolayı tekrar girin",
+      "confirmPassword": "Şifreyi onayla",
+      "confirmPasswordPlaceholder": "Şifreyi tekrar girin",
       "continueButton": "Devam et",
       "importantTitle": "Önemli",
-      "importantMessage": "Blink bu parolayı saklamaz. Kaybederseniz, {bold} cüzdanınızı kurtaramayız.",
+      "importantMessage": "Blink bu şifreyi saklamaz. Kaybederseniz, {bold} cüzdanınızı kurtaramayız.",
       "importantMessageBold": "cüzdanınızı kurtaramayız",
       "passwordTooShort": "En az 12 karakter",
-      "passwordMismatch": "Parolalar uyuşmuyor",
+      "passwordMismatch": "Şifreler uyuşmuyor",
       "uploadSuccess": "Yedek {provider} hesabına kaydedildi",
       "uploadFailed": "Yedek yüklenemedi",
       "signInFailed": "{provider} hesabınıza giriş yapılamadı",
@@ -4044,6 +4063,12 @@
     "recognizePhraseTitle": "Bu yedekleme ifadesini tanıyor musun?",
     "recognizePhraseBody": "Başka birinin sana gönderdiği kelimeleri asla girme."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operatöre ulaşılamıyor",
+    "outageBody": "Spark'ta bir kesinti yaşanıyor. Lütfen birkaç dakika bekleyip tekrar deneyin veya {support} ile iletişime geçin",
+    "outageSupport": "Destek",
+    "tryAgainLater": "Daha sonra dene"
+  },
   "BackupNudge": {
     "title": "Fonlarınız risk altında",
     "description": "Cüzdanınızı şimdi güvenceye alın. Sadece bir dakika sürer.",
@@ -4137,6 +4162,15 @@
     "title": "Bu, saklamasız bir hesaptır",
     "body": "Daha fazla bilgi için blog yazımızı okuyun",
     "cta": "Oku"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Bulut yedeğini güncelle",
+    "body": "{provider} içindeki acil durum paketin güncel değil. Güncellemek için cüzdanını yeniden yedekle.",
+    "cta": "Yeniden yedekle"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Henüz acil durum paketi yok. İlk işleminden sonra oluşturulur.",
+    "exportFailed": "Acil durum paketi indirilemedi."
   },
   "StableBalance": {
     "title": "Sabit bakiye",

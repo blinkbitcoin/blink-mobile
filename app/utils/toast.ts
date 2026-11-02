@@ -1,5 +1,6 @@
 import Toast from "react-native-toast-message"
 
+import type { ToastType } from "@app/components/galoy-toast"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { i18nObject } from "@app/i18n/i18n-util"
 
@@ -15,7 +16,7 @@ export const toastShow = ({
   message: ((translations: TranslationFunctions) => string) | string
   LL: TranslationFunctions
   onHide?: () => void
-  type?: "error" | "success" | "warning"
+  type?: ToastType
   autoHide?: boolean
 }): void => {
   const englishTranslation = i18nObject("en")
@@ -44,8 +45,7 @@ export const toastShow = ({
     type,
     text1: toastTitle[type],
     text2: translatedMessage,
-    position: "bottom",
-    bottomOffset: 80,
+    position: "top",
     onHide,
     visibilityTime: 4000,
     autoHide,
