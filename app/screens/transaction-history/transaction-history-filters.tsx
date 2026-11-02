@@ -61,14 +61,14 @@ export const TransactionHistoryFilters: React.FC<Props> = ({
         <GaloyTertiaryButton
           {...testProps("filter-sent")}
           title={LL.TransactionScreen.sent()}
-          outline={!directions.sent}
+          unfilled={!directions.sent}
           onPress={() => onToggleDirection("sent")}
           accessibilityState={{ selected: directions.sent }}
         />
         <GaloyTertiaryButton
           {...testProps("filter-received")}
           title={LL.TransactionScreen.received()}
-          outline={!directions.received}
+          unfilled={!directions.received}
           onPress={() => onToggleDirection("received")}
           accessibilityState={{ selected: directions.received }}
         />
