@@ -2231,6 +2231,12 @@
     "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
     "copyInvoice": "Copiar",
     "shareInvoice": "Comparteix",
+    "newAddress": "Nova",
+    "newAddressHint": "Genera una nova adreça de Bitcoin. Les adreces anteriors continuen funcionant.",
+    "newAddressGenerated": "Nova adreça a punt. Les adreces anteriors continuen funcionant.",
+    "newAddressFailed": "No s'ha pogut generar una nova adreça. Torna-ho a provar.",
+    "newAddressRateLimited": "Massa adreces noves. Espera una estona i torna-ho a provar.",
+    "onchainAddressLoadFailed": "No s'ha pogut carregar la teva adreça de Bitcoin. Toca Nova per tornar-ho a provar.",
     "addAmount": "Demana l'import específic",
     "expired": "La factura ha caducat",
     "expiresIn": "Caduca en",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",
     "anonModeWalletLabel": "no disponible en mode Incognito",
-    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar"
+    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar",
+    "networkWalletLabel": "no disponible en aquesta xarxa"
   },
   "AnonModeConvertModal": {
     "title": "Transfereix primer el teu saldo en dòlars",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "Hola! Si us plau, tanqueu el meu compte. El meu número de telèfon és {phoneNumber: string}.",
     "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
     "bye": "Adéu!",
-    "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei."
+    "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "No pots enviar més que l'import màxim",

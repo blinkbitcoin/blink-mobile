@@ -218,6 +218,7 @@ jest.mock("@app/config/feature-flags-context", () => {
 })
 
 let mockIsAnonMode = false
+let mockIsTokenMissing = false
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
@@ -234,9 +235,10 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
     isRegionPending: mockRegionPendingOverride,
     isRegionDetermined: mockDollarRegionDeterminedOverride,
   }),
-  useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGated: () =>
+    mockIsTokenMissing || mockIsAnonMode || mockDollarBalanceRestrictedOverride,
   useDollarBalanceGate: () => ({
-    isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+    isGated: mockIsTokenMissing || mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
     reason: mockDollarGateReason(),
   }),
@@ -244,6 +246,7 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 
 /** The gate's own reading of a closed gate, mirrored so the modal's copy can be asserted. */
 const mockDollarGateReason = (): GateReason | null => {
+  if (mockIsTokenMissing) return GateReason.Network
   if (mockIsAnonMode) return GateReason.Anon
   if (!mockDollarBalanceRestrictedOverride) return null
   return mockDollarRegionDeterminedOverride ? GateReason.Region : GateReason.UnknownRegion
@@ -1018,6 +1021,7 @@ const resetHomeScreenMocks = () => {
   mockDollarBalanceModalRegionUnknown = false
   mockForcedConversionParams = null
   mockIsAnonMode = false
+  mockIsTokenMissing = false
   mockIsRestrictedRegion = false
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
@@ -1501,6 +1505,42 @@ describe("HomeScreen", () => {
 
     mockActiveWalletOverride = null
   })
+
+  /** Staging's network has no dollar token: neither Enhanced Mode nor the region would
+   *  open the gate, and the row's label already says why. */
+  it.each([
+    ["outside Anon mode", false],
+    ["in Anon mode", true],
+  ])(
+    "keeps the disabled transfer button quiet on a network with no dollar token, %s",
+    async (_label, isAnonMode) => {
+      mockIsTokenMissing = true
+      mockIsAnonMode = isAnonMode
+      mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 1000,
+        usdBalance: 5000,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+      expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+      expect(mockDollarBalanceModalVisible).toBe(false)
+      expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+
+      mockActiveWalletOverride = null
+    },
+  )
 
   it("keeps the transfer button inert and unexplained while the region is still resolving", async () => {
     mockRegionPendingOverride = true
@@ -2909,6 +2949,23 @@ describe("HomeScreen pending receive badge", () => {
       // their inspection path (txid / mempool link) to that screen.
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("immature")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(await findByTestId("pending-receive-badge"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+
+      await flushEffects()
+    })
+
+    it("opens the unclaimed-deposits screen when the pill holds a deposit claimed early", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("claiming")] }
 
       const { findByTestId } = render(
         <ContextForScreen>

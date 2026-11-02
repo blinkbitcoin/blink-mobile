@@ -2231,6 +2231,12 @@
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
+    "newAddress": "Mới",
+    "newAddressHint": "Tạo một địa chỉ Bitcoin mới. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressGenerated": "Địa chỉ mới đã sẵn sàng. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressFailed": "Không thể tạo địa chỉ mới. Vui lòng thử lại.",
+    "newAddressRateLimited": "Quá nhiều địa chỉ mới. Vui lòng đợi một lúc rồi thử lại.",
+    "onchainAddressLoadFailed": "Không thể tải địa chỉ Bitcoin của bạn. Nhấn Mới để thử lại.",
     "addAmount": "Yêu cầu số tiền cụ thể",
     "expired": "Hóa đơn đã hết hạn",
     "expiresIn": "Hết hạn trong",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
     "anonModeWalletLabel": "không khả dụng ở chế độ Incognito",
-    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại"
+    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại",
+    "networkWalletLabel": "không khả dụng trên mạng này"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "Xin chào!, vui lòng đóng tài khoản của tôi. Số điện thoại của tôi là {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật."
+    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",

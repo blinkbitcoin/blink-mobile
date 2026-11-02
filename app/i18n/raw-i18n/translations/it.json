@@ -2231,6 +2231,12 @@
         "error": "Impossibile generare un'invoice. Contattare l'assistenza se il problema persiste.",
         "copyInvoice": "Copia",
         "shareInvoice": "Condividi",
+        "newAddress": "Nuovo",
+        "newAddressHint": "Genera un nuovo indirizzo Bitcoin. Gli indirizzi precedenti continuano a funzionare.",
+        "newAddressGenerated": "Nuovo indirizzo pronto. Gli indirizzi precedenti funzionano ancora.",
+        "newAddressFailed": "Impossibile generare un nuovo indirizzo. Riprova.",
+        "newAddressRateLimited": "Troppi nuovi indirizzi. Attendi un po' e riprova.",
+        "onchainAddressLoadFailed": "Impossibile caricare il tuo indirizzo Bitcoin. Tocca Nuovo per riprovare.",
         "addAmount": "Richiedi un importo specifico",
         "expired": "L'invoice è scaduta",
         "expiresIn": "Scade in",
@@ -2593,7 +2599,8 @@
     "StablesatsRestriction": {
         "walletLabel": "non è disponibile nella tua regione",
         "anonModeWalletLabel": "non disponibile in modalità Incognito",
-        "unknownRegionWalletLabel": "impossibile verificare la disponibilità, trascina verso il basso per riprovare"
+        "unknownRegionWalletLabel": "impossibile verificare la disponibilità, trascina verso il basso per riprovare",
+        "networkWalletLabel": "non disponibile su questa rete"
     },
     "AnonModeConvertModal": {
         "title": "Trasferisci prima il tuo saldo in dollari",
@@ -3077,7 +3084,13 @@
         "deleteAccountFromPhone": "Ciao! Per favore chiudete il mio account. Il mio numero di telefono è {phoneNumber: string}.",
         "deleteAccountError": "Qualcosa è andato storto. Contatta {email: string} per ulteriore assistenza.",
         "bye": "Ciao!",
-        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge."
+        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge.",
+        "downloadLogs": "Download logs",
+        "exportLogsTitle": "Share your wallet logs",
+        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+        "exportLogsConfirm": "Share logs",
+        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+        "exportLogsError": "Couldn't export your logs. Please try again."
     },
     "lnurl": {
         "overLimit": "Non è possibile inviare più dell'importo massimo",

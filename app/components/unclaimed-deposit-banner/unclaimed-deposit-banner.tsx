@@ -16,14 +16,16 @@ type Props = {
   deposits: readonly PendingDeposit[]
 }
 
-/** Only actionable deposits belong in this banner: Immature ones are the balance header
- *  pill's job until they confirm, and Refunded ones are already resolved. The remaining
- *  statuses (Claimable, FeeExceeded, Error) all carry an action on the unclaimed-deposits
- *  screen. */
+/** Only actionable deposits belong in this banner: Immature and Claiming ones are the
+ *  balance header pill's job until they land, and Refunded ones are already resolved.
+ *  The remaining statuses (Claimable, FeeExceeded, Error) all carry an action on the
+ *  unclaimed-deposits screen. */
 export const actionableDeposits = (deposits: readonly PendingDeposit[]) =>
   deposits.filter(
     ({ status }) =>
-      status !== DepositStatus.Immature && status !== DepositStatus.Refunded,
+      status !== DepositStatus.Immature &&
+      status !== DepositStatus.Claiming &&
+      status !== DepositStatus.Refunded,
   )
 
 /**

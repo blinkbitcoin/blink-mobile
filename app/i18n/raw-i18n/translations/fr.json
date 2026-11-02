@@ -2231,6 +2231,12 @@
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",
         "copyInvoice": "Copier",
         "shareInvoice": "Partager",
+        "newAddress": "Nouvelle",
+        "newAddressHint": "Génère une nouvelle adresse Bitcoin. Les adresses précédentes restent valables.",
+        "newAddressGenerated": "Nouvelle adresse prête. Les adresses précédentes restent valables.",
+        "newAddressFailed": "Impossible de générer une nouvelle adresse. Veuillez réessayer.",
+        "newAddressRateLimited": "Trop de nouvelles adresses. Patientez un moment, puis réessayez.",
+        "onchainAddressLoadFailed": "Impossible de charger votre adresse Bitcoin. Appuyez sur Nouvelle pour réessayer.",
         "addAmount": "Demander un montant spécifique",
         "expired": "La facture a expiré",
         "expiresIn": "Expire dans",
@@ -2593,7 +2599,8 @@
     "StablesatsRestriction": {
         "walletLabel": "n'est pas disponible dans votre région",
         "anonModeWalletLabel": "non disponible en mode Incognito",
-        "unknownRegionWalletLabel": "impossible de vérifier la disponibilité, tirez vers le bas pour réessayer"
+        "unknownRegionWalletLabel": "impossible de vérifier la disponibilité, tirez vers le bas pour réessayer",
+        "networkWalletLabel": "non disponible sur ce réseau"
     },
     "AnonModeConvertModal": {
         "title": "Transférez d'abord votre solde en dollars",
@@ -3077,7 +3084,13 @@
         "deleteAccountFromPhone": "Bonjour ! Merci de clôturer mon compte. Mon numéro de téléphone est le {phoneNumber: string}.",
         "deleteAccountError": "Une erreur est survenue. Contacter {email: string} pour recevoir une aide supplémentaire.",
         "bye": "Salut !",
-        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige."
+        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige.",
+        "downloadLogs": "Download logs",
+        "exportLogsTitle": "Share your wallet logs",
+        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+        "exportLogsConfirm": "Share logs",
+        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+        "exportLogsError": "Couldn't export your logs. Please try again."
     },
     "lnurl": {
         "overLimit": "Vous ne pouvez pas envoyer plus que le montant maximum",

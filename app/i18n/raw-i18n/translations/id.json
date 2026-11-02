@@ -2231,6 +2231,12 @@
     "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
     "copyInvoice": "Salin",
     "shareInvoice": "Bagikan",
+    "newAddress": "Baru",
+    "newAddressHint": "Membuat alamat Bitcoin baru. Alamat sebelumnya tetap berfungsi.",
+    "newAddressGenerated": "Alamat baru siap. Alamat sebelumnya tetap berfungsi.",
+    "newAddressFailed": "Gagal membuat alamat baru. Silakan coba lagi.",
+    "newAddressRateLimited": "Terlalu banyak alamat baru. Tunggu sebentar lalu coba lagi.",
+    "onchainAddressLoadFailed": "Gagal memuat alamat Bitcoin Anda. Ketuk Baru untuk mencoba lagi.",
     "addAmount": "Minta Jumlah Tertentu",
     "expired": "Faktur telah kedaluwarsa",
     "expiresIn": "Berakhir dalam",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
     "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi",
+    "networkWalletLabel": "tidak tersedia di jaringan ini"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "Halo!, tolong tutup akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum."
+    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",
