@@ -251,7 +251,7 @@ export const createSendMutation = (
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: PaymentSendResult.Success }
+      return { status: sendResultOf(response?.payment) }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
@@ -281,7 +281,7 @@ export const createSendMutationOnchain = (
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: PaymentSendResult.Success }
+      return { status: sendResultOf(response?.payment) }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
