@@ -2,6 +2,7 @@ import { Network } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
   hasSparkAddressShape,
+  isOwnLnurlAddress,
   isRegtestNetwork,
   lnurlDomainFor,
   lnurlServerUrlFor,
@@ -235,5 +236,24 @@ describe("required build config", () => {
     expect(() => requireSparkTokenIdentifier()).toThrow(
       "SPARK_TOKEN_IDENTIFIER is not configured for this build",
     )
+  })
+})
+
+describe("isOwnLnurlAddress", () => {
+  it("recognizes our own address domains across networks", () => {
+    expect(isOwnLnurlAddress("alice@blink.sv")).toBe(true)
+    expect(isOwnLnurlAddress("shop@pay.blink.sv")).toBe(true)
+    expect(isOwnLnurlAddress("alice@staging.blink.sv")).toBe(true)
+    expect(isOwnLnurlAddress("shop@pay.staging.blink.sv")).toBe(true)
+  })
+
+  it("is case-insensitive on the domain", () => {
+    expect(isOwnLnurlAddress("alice@BLINK.SV")).toBe(true)
+  })
+
+  it("rejects foreign domains and non-address identifiers", () => {
+    expect(isOwnLnurlAddress("alice@walletofsatoshi.com")).toBe(false)
+    expect(isOwnLnurlAddress("lnurl1dp68gurn8ghj7um9wfmxj")).toBe(false)
+    expect(isOwnLnurlAddress("")).toBe(false)
   })
 })

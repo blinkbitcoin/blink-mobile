@@ -9,6 +9,7 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { DeleteAccountConfirmModal } from "./delete-account-confirm-modal"
@@ -51,6 +52,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     useSelfCustodialWallet()
   const { selfCustodialDepositClaimLeewayVbyte } = useRemoteConfig()
   const { state: deleteState, deleteWallet } = useDeleteAccount()
+  const { routeAfterLogout } = useLogoutAndRoute()
   const network = useSparkNetwork()
 
   const [confirmVisible, setConfirmVisible] = useState(false)
@@ -136,7 +138,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
   const handleConfirm = async () => {
     setConfirmVisible(false)
     const outcome = await deleteWallet(accountId)
-    if (outcome) navigateAfterAccountDelete(navigation, outcome)
+    if (outcome) navigateAfterAccountDelete(navigation, routeAfterLogout, outcome)
   }
 
   const dismissHasFundsWarning = () => {
