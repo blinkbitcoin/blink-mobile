@@ -55,8 +55,23 @@ export const deriveWalletIdentityPubkey = async (
   }
 }
 
-export const syncSelfCustodialWallet = (sdk: BreezSdkInterface) =>
-  sdk.syncWallet(SyncWalletRequest.create({}))
+/**
+ * Lets a caller abandon an SDK call that has not come back. The SDK forwards the signal to
+ * UniFFI's future cancellation, which is best effort — it asks the Rust task to stop at its
+ * next await point, and the binding's own comment notes the task may not honour it. So a
+ * caller that needs a bound still needs its own timer; this only lets the abandoned native
+ * work wind down instead of running to completion unwatched.
+ */
+export type SdkCallOptions = { signal?: AbortSignal }
+
+/** The SDK takes the option only with a signal in it, so an absent one is no option. */
+const asyncOpts = (options?: SdkCallOptions) =>
+  options?.signal ? { signal: options.signal } : undefined
+
+export const syncSelfCustodialWallet = (
+  sdk: BreezSdkInterface,
+  options?: SdkCallOptions,
+) => sdk.syncWallet(SyncWalletRequest.create({}), asyncOpts(options))
 
 export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: number) =>
   sdk.listPayments({
@@ -81,18 +96,22 @@ export const listSentPaymentsSince = (
     limit,
     offset,
   }: { fromTimestamp: bigint; limit: number; offset: number },
+  options?: SdkCallOptions,
 ) =>
-  sdk.listPayments({
-    typeFilter: [PaymentType.Send],
-    statusFilter: undefined,
-    assetFilter: undefined,
-    paymentDetailsFilter: undefined,
-    fromTimestamp,
-    toTimestamp: undefined,
-    offset,
-    limit,
-    sortAscending: false,
-  })
+  sdk.listPayments(
+    {
+      typeFilter: [PaymentType.Send],
+      statusFilter: undefined,
+      assetFilter: undefined,
+      paymentDetailsFilter: undefined,
+      fromTimestamp,
+      toTimestamp: undefined,
+      offset,
+      limit,
+      sortAscending: false,
+    },
+    asyncOpts(options),
+  )
 
 const EXPORT_PAGE_SIZE = 100
 /** 500 pages × 100 payments: far beyond any real wallet, so hitting it means the SDK

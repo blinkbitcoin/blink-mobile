@@ -839,6 +839,8 @@ describe("findLostSend", () => {
         limit: PAGE_SIZE,
         sortAscending: false,
       }),
+      /** Carries the look's deadline, so an unanswered page is abandoned with it. */
+      { signal: expect.any(AbortSignal) },
     )
   })
 
@@ -913,6 +915,7 @@ describe("findLostSend", () => {
     expect(mockListPayments).toHaveBeenCalledTimes(2)
     expect(mockListPayments).toHaveBeenLastCalledWith(
       expect.objectContaining({ offset: PAGE_SIZE, limit: PAGE_SIZE }),
+      { signal: expect.any(AbortSignal) },
     )
   })
 
@@ -1101,6 +1104,54 @@ describe("findLostSend", () => {
 
     expect(found).toEqual({ status: "unreadable", error: offline })
     expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The other shape of a wallet that cannot reach the server: one that never answers at
+   * all, rather than one that fails. Three attempts bound how many looks are taken, not
+   * how long one may take, and an awaited SDK call carries nothing of its own to stop it,
+   * so without a deadline the lookup would simply stay pending — and a send that never
+   * reaches an outcome is worse than one reported unreadable.
+   *
+   * Aborting is best effort: UniFFI forwards the signal to the Rust future's cancel, which
+   * the task honours only at an await point, so the deadline is what actually ends the
+   * look and the signal only lets the abandoned work wind down.
+   */
+  it("abandons a look the wallet never answers, and still never reports a send absent", async () => {
+    let inFlight = 0
+    let mostAtOnce = 0
+    const abortedEach: boolean[] = []
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockImplementation(
+      (_request: unknown, options?: { signal: AbortSignal }) =>
+        new Promise((_resolve, reject) => {
+          inFlight += 1
+          mostAtOnce = Math.max(mostAtOnce, inFlight)
+          const index = abortedEach.push(false) - 1
+          options?.signal.addEventListener("abort", () => {
+            abortedEach[index] = true
+            inFlight -= 1
+            reject(new Error("aborted"))
+          })
+        }),
+    )
+
+    const pending = lookup()
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await jest.advanceTimersByTimeAsync(15_000)
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    const found = await pending
+
+    expect(found).toMatchObject({ status: "unreadable" })
+    expect((found as { error: Error }).error.message).toContain("timed out after 15000ms")
+    expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    /** Every look handed the SDK a signal, and every abandoned one was aborted. */
+    expect(abortedEach).toEqual([true, true, true])
+    /** A look is abandoned before the next begins, so two never run against each other. */
+    expect(mostAtOnce).toBe(1)
+    /** The history was never read, so it was never treated as readable. */
     expect(mockListPayments).not.toHaveBeenCalled()
   })
 })

@@ -145,17 +145,21 @@ describe("listSentPaymentsSince", () => {
       offset: 100,
     })
 
-    expect(listPaymentsFn).toHaveBeenCalledWith({
-      typeFilter: [0],
-      statusFilter: undefined,
-      assetFilter: undefined,
-      paymentDetailsFilter: undefined,
-      fromTimestamp: BigInt(1747691078),
-      toTimestamp: undefined,
-      offset: 100,
-      limit: 50,
-      sortAscending: false,
-    })
+    expect(listPaymentsFn).toHaveBeenCalledWith(
+      {
+        typeFilter: [0],
+        statusFilter: undefined,
+        assetFilter: undefined,
+        paymentDetailsFilter: undefined,
+        fromTimestamp: BigInt(1747691078),
+        toTimestamp: undefined,
+        offset: 100,
+        limit: 50,
+        sortAscending: false,
+      },
+      /** No caller deadline, so no async option: the SDK takes one only with a signal. */
+      undefined,
+    )
   })
 })
 

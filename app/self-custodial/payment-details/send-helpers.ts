@@ -17,6 +17,7 @@ import { toBtcMoneyAmount, type WalletAmount } from "@app/types/amounts"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 import { reportError } from "@app/utils/error-logging"
 import { sleep } from "@app/utils/sleep"
+import { withTimeout } from "@app/utils/with-timeout"
 
 /** GetFee result plus the SDK dust adjustment, kept behind the self-custodial port so the shared GetFee contract stays free of it. */
 export type SelfCustodialFeeResult<T extends WalletCurrency> = Awaited<
@@ -242,6 +243,15 @@ export const createSendMutationOnchain = (
  */
 const LOST_SEND_ATTEMPTS = 3
 const LOST_SEND_DELAY_MS = 2000
+/**
+ * How long one look may spend inside the SDK before it is abandoned. Without it the lookup
+ * is bounded in attempts but not in time: the SDK calls are awaited with nothing to stop
+ * them, so one that never comes back leaves the whole lookup pending and the send with no
+ * outcome at all — the one answer worse than "unreadable". It is not hypothetical here,
+ * because a sync waits for an exit-chain collection pass (`exitChainAutoFetchEnabled`).
+ * Three looks and two waits put the whole lookup under a minute.
+ */
+const LOST_SEND_ATTEMPT_TIMEOUT_MS = 15_000
 const LOST_SEND_LOOKBACK_SECONDS = 24 * 60 * 60
 const LOST_SEND_PAGE_SIZE = 50
 /** Far beyond what a wallet sends in the window: hitting it means the pages never got
@@ -305,23 +315,36 @@ const isLanded = (payment: Payment): boolean =>
  * nothing away from it: a payment of the invoice exists. A failed match is not one, so
  * the pages after it still count.
  */
-const scanHistorySince = async (
-  sdk: BreezSdkInterface,
-  since: bigint,
-  matches: (payment: Payment) => boolean,
-): Promise<HistoryScan> => {
-  await syncSelfCustodialWallet(sdk)
+type ScanHistoryParams = {
+  sdk: BreezSdkInterface
+  since: bigint
+  matches: (payment: Payment) => boolean
+  /** Aborted when the look this scan belongs to is abandoned. */
+  signal: AbortSignal
+}
+
+const scanHistorySince = async ({
+  sdk,
+  since,
+  matches,
+  signal,
+}: ScanHistoryParams): Promise<HistoryScan> => {
+  await syncSelfCustodialWallet(sdk, { signal })
 
   const found: Payment[] = []
   let hasUndescribedSend = false
   for (let page = 0; page < LOST_SEND_MAX_PAGES; page += 1) {
     let payments: Payment[]
     try {
-      ;({ payments } = await listSentPaymentsSince(sdk, {
-        fromTimestamp: since,
-        limit: LOST_SEND_PAGE_SIZE,
-        offset: page * LOST_SEND_PAGE_SIZE,
-      }))
+      ;({ payments } = await listSentPaymentsSince(
+        sdk,
+        {
+          fromTimestamp: since,
+          limit: LOST_SEND_PAGE_SIZE,
+          offset: page * LOST_SEND_PAGE_SIZE,
+        },
+        { signal },
+      ))
     } catch (err) {
       if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
       throw err
@@ -346,6 +369,11 @@ const scanHistorySince = async (
  *
  * The last look decides, since each one reads the history afresh after the wallet caught
  * up: a look that could not read earlier says nothing about one that did later.
+ *
+ * Every look is bounded in time as well, so a wallet that never answers ends the lookup
+ * rather than suspending it: an abandoned look is one that could not read the history,
+ * which is "unreadable" and never "not-found", so it can still never make a send look
+ * safe to repeat.
  */
 export const findLostSend = async ({
   sdk,
@@ -356,8 +384,15 @@ export const findLostSend = async ({
   let lastLook: LostSendLookup = { status: "not-found", failed: [] }
 
   for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
+    /** Abandoning a look does not stop the SDK call it is waiting on, so the signal asks
+     *  the native side to give up too. Aborting after a look that finished is a no-op. */
+    const abandon = new AbortController()
     try {
-      const scan = await scanHistorySince(sdk, since, matches)
+      const scan = await withTimeout(
+        scanHistorySince({ sdk, since, matches, signal: abandon.signal }),
+        LOST_SEND_ATTEMPT_TIMEOUT_MS,
+        "Self-custodial lost send lookup",
+      )
       const failed = scan.matches.filter(isFailedPayment)
       const payment =
         scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
@@ -371,6 +406,8 @@ export const findLostSend = async ({
     } catch (err) {
       reportError("Self-custodial lost send lookup", err)
       lastLook = { status: "unreadable", error: err }
+    } finally {
+      abandon.abort()
     }
 
     const isLastAttempt = attempt === LOST_SEND_ATTEMPTS
