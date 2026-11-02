@@ -357,6 +357,18 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       `blink-lnurl-server`, not Breez's, so diff the routes and signed-message format in
       the SDK's `lnurl.rs` between the two tags, and run username register, availability
       and restore against staging before merging (#4257).
+- [ ] The two routes the app signs for itself (`/recover`, `/mode`) are not the SDK's. Their
+      messages live in `lnurl-server-mode.ts` and are a wire contract with
+      `blink-lnurl-server`'s `signed_message.rs`, pinned by the same golden vectors on both
+      sides, so a change to either locks every deployed build out of its own Lightning
+      address. A client signing a newer message must not reach production before the server
+      that verifies it does (`blink-lnurl:v1` needs server 0.9.0,
+      blinkbitcoin/blink-lnurl-server#52).
+- [ ] A bump that migrates the SDK's own database is one-way: once a wallet has been opened
+      on the new SDK an older build cannot open it (`DatabaseTooFarAhead`), and the seed is
+      the only way back. Say in the PR which SDK floor every rollback candidate has to
+      carry, and record both the upgrade in place and the reverse-open refusal (0.23 adds
+      `instant_claim_status`; 0.26 and 0.27 add more).
 
 ### Feature flags / Remote Config
 
