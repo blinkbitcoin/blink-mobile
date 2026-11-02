@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "δεν είναι διαθέσιμο στην περιοχή σου",
     "anonModeWalletLabel": "μη διαθέσιμο σε λειτουργία Incognito",
-    "unknownRegionWalletLabel": "δεν ήταν δυνατός ο έλεγχος διαθεσιμότητας, σύρε προς τα κάτω για επανάληψη"
+    "unknownRegionWalletLabel": "δεν ήταν δυνατός ο έλεγχος διαθεσιμότητας, σύρε προς τα κάτω για επανάληψη",
+    "networkWalletLabel": "δεν είναι διαθέσιμο σε αυτό το δίκτυο"
   },
   "AnonModeConvertModal": {
     "title": "Μετάφερε πρώτα το υπόλοιπό σου σε δολάρια",

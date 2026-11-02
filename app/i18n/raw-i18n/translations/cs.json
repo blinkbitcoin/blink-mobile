@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "není ve vašem regionu k dispozici",
     "anonModeWalletLabel": "není k dispozici v režimu Incognito",
-    "unknownRegionWalletLabel": "dostupnost se nepodařilo ověřit, potažením dolů to zkuste znovu"
+    "unknownRegionWalletLabel": "dostupnost se nepodařilo ověřit, potažením dolů to zkuste znovu",
+    "networkWalletLabel": "na této síti není k dispozici"
   },
   "AnonModeConvertModal": {
     "title": "Nejprve převeďte svůj dolarový zůstatek",

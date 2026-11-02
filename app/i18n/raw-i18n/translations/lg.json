@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",
     "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito",
-    "unknownRegionWalletLabel": "tetusobodde kukebera oba kiriwo, sika wansi okuddamu okugezaako"
+    "unknownRegionWalletLabel": "tetusobodde kukebera oba kiriwo, sika wansi okuddamu okugezaako",
+    "networkWalletLabel": "tekiriiwo ku mutimbagano guno"
   },
   "AnonModeConvertModal": {
     "title": "Sooka okyuse ssente zo eza Doola",

@@ -12,6 +12,7 @@ import { useAppConfig } from "@app/hooks/use-app-config"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
+import { hasSparkTokenFor, networkForInstance } from "@app/self-custodial/config"
 import {
   TwoFactorConsoleThresholds,
   TwoFactorThresholds,
@@ -908,8 +909,11 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     deviceAccountEnabled:
       remoteConfig.deviceAccountEnabledRestAuth || galoyInstance.id === "Local",
     nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
+    /** Off on a network with no dollar token, where the SDK has no Stable Balance. */
     stableBalanceEnabled:
-      isNonCustodialEnabledByConsole && remoteConfig.stableBalanceEnabled,
+      isNonCustodialEnabledByConsole &&
+      remoteConfig.stableBalanceEnabled &&
+      hasSparkTokenFor(networkForInstance(galoyInstance.id)),
     remoteConfigReady,
     isNonCustodialFlagSettled,
   }

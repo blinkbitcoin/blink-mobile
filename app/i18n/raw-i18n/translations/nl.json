@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
     "anonModeWalletLabel": "niet beschikbaar in Incognito-modus",
-    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen"
+    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen",
+    "networkWalletLabel": "niet beschikbaar op dit netwerk"
   },
   "AnonModeConvertModal": {
     "title": "Zet eerst je dollarsaldo over",

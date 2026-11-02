@@ -1,15 +1,18 @@
 /* eslint-disable camelcase */
-jest.mock("react-native-config", () => ({
+const mockConfig: Record<string, string | undefined> = {
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
-}))
+}
+jest.mock("react-native-config", () => mockConfig)
 
 jest.mock("react-native-fs", () => ({
   DocumentDirectoryPath: "/test/documents",
 }))
 
 const mockConnect = jest.fn()
-const mockDefaultConfig = jest.fn().mockReturnValue({})
+/** A fresh object per call: the config is mutated, and a shared one would carry the last
+ *  network's Stable Balance into the next test. */
+const mockDefaultConfig = jest.fn().mockImplementation(() => ({}))
 const mockUpdateUserSettings = jest.fn()
 const mockDisconnect = jest.fn()
 const mockAddEventListener = jest.fn()
@@ -41,7 +44,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
-  MaxFee: {
+  MaxFee: { create: (p: Record<string, unknown>) => p },
+  MaxOnchainFee: {
     NetworkRecommended: jest
       .fn()
       .mockImplementation((inner: unknown) => ({ tag: "NetworkRecommended", inner })),
@@ -100,6 +104,7 @@ import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
+import { sparkTokenIdentifier } from "@app/self-custodial/config"
 
 const makeSdk = () => ({
   updateUserSettings: (...args: unknown[]) => mockUpdateUserSettings(...args),
@@ -139,15 +144,13 @@ describe("initSdk", () => {
   })
 
   /**
-   * Both fields are the SDK's to default, and both are pinned here instead: the exit-chain
-   * pass is what the recovery backup needs collected, and the instant claim spends a spread
-   * the user never sees. The mock hands back the opposite of each so the assertion fails if
-   * the pin is dropped rather than passing on an inherited value.
+   * The field is the SDK's to default, and it is pinned here instead: the exit-chain pass
+   * is what the recovery backup needs collected. The mock hands back the opposite so the
+   * assertion fails if the pin is dropped rather than passing on an inherited value.
    */
-  it("pins the exit-chain collection and instant-claim policy over the SDK defaults", async () => {
+  it("pins the exit-chain collection over the SDK default", async () => {
     mockDefaultConfig.mockReturnValueOnce({
       exitChainAutoFetchEnabled: false,
-      maxInstantDepositClaimFeeBps: 100,
     })
     mockConnect.mockResolvedValue(makeSdk())
 
@@ -160,7 +163,6 @@ describe("initSdk", () => {
 
     const { config } = mockConnect.mock.calls[0][0]
     expect(config.exitChainAutoFetchEnabled).toBe(true)
-    expect(config.maxInstantDepositClaimFeeBps).toBeUndefined()
   })
 
   it("caps the automatic deposit claim fee at the network-recommended rate plus leeway", async () => {
@@ -177,12 +179,106 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 1n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 1n },
+            },
           },
         }),
       }),
     )
+  })
+
+  it("configures Stable Balance with the mainnet token on mainnet", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Mainnet,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.stableBalanceConfig).toEqual({
+      tokens: [{ label: "USDB", tokenIdentifier: "test-token-id" }],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: 50,
+    })
+  })
+
+  /** 0.27 rejects the mainnet USDB id on regtest, which is what kept Staging from starting. */
+  it("leaves Stable Balance out on regtest when the build names no regtest token", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).not.toHaveProperty("stableBalanceConfig")
+  })
+
+  it("configures Stable Balance with the regtest token a build names", async () => {
+    mockConfig.SPARK_REGTEST_TOKEN_IDENTIFIER = "btknrt1-test"
+    mockConnect.mockResolvedValue(makeSdk())
+
+    try {
+      await initSdk({
+        mnemonic: "word1 word2 word3",
+        storageDir: "/test/storage",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+      })
+    } finally {
+      delete mockConfig.SPARK_REGTEST_TOKEN_IDENTIFIER
+    }
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.stableBalanceConfig).toEqual(
+      expect.objectContaining({
+        tokens: [{ label: "USDB", tokenIdentifier: "btknrt1-test" }],
+      }),
+    )
+  })
+
+  /** The bridge and mappers read the token without being handed the network. */
+  it("points the token lookups at the network it connected to", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+    expect(sparkTokenIdentifier()).toBeNull()
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Mainnet,
+      leewaySatPerVbyte: 1,
+    })
+    expect(sparkTokenIdentifier()).toBe("test-token-id")
+  })
+
+  it("routes the SDK through no proxy, matching the status call", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).toHaveProperty("proxy", undefined)
   })
 
   it("uses the provided leeway for the deposit claim fee cap", async () => {
@@ -199,8 +295,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 3n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 3n },
+            },
           },
         }),
       }),
@@ -221,8 +319,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 2n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 2n },
+            },
           },
         }),
       }),
@@ -243,8 +343,10 @@ describe("initSdk", () => {
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 0n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 0n },
+            },
           },
         }),
       }),

@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",
     "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand",
-    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen"
+    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen",
+    "networkWalletLabel": "ikke tilgængelig på dette netværk"
   },
   "AnonModeConvertModal": {
     "title": "Overfør først din dollarsaldo",

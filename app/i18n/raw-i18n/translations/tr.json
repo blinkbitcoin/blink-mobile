@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",
     "anonModeWalletLabel": "Incognito modunda kullanılamaz",
-    "unknownRegionWalletLabel": "kullanılabilirlik kontrol edilemedi, yeniden denemek için aşağı çekin"
+    "unknownRegionWalletLabel": "kullanılabilirlik kontrol edilemedi, yeniden denemek için aşağı çekin",
+    "networkWalletLabel": "bu ağda kullanılamaz"
   },
   "AnonModeConvertModal": {
     "title": "Önce Dolar bakiyeni aktar",

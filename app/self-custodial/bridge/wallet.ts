@@ -66,9 +66,9 @@ const inFlightSync = new WeakMap<BreezSdkInterface, Promise<SyncWalletResponse>>
  * through to UniFFI's future cancellation, but a user sync is run by the caller's own
  * future: `trigger_sync_and_wait` marks the coordinator `sync_running` and then awaits
  * `run_sync_loop` inline, and that flag is cleared only where the loop drains its waiters
- * (`sdk/sync_coordinator.rs` @0.23.1). Cancelling drops the loop with the flag still set,
- * so every later sync queues behind a runner that no longer exists and waits forever, for
- * as long as the wallet is connected.
+ * (`sdk/sync_coordinator.rs` @0.23.1, unchanged at 0.27.1). Cancelling drops the loop
+ * with the flag still set, so every later sync queues behind a runner that no longer
+ * exists and waits forever, for as long as the wallet is connected.
  *
  * Which means a caller that gives up still leaves the call running, so a second caller
  * arriving meanwhile is handed the first one instead of starting another. Nothing is lost

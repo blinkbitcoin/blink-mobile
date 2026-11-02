@@ -248,7 +248,7 @@ const LOST_SEND_DELAY_MS = 2000
  * is bounded in attempts but not in time: the SDK calls are awaited with nothing to stop
  * them, so one that never comes back leaves the whole lookup pending and the send with no
  * outcome at all — the one answer worse than "unreadable". It is not hypothetical here,
- * because a sync waits for an exit-chain collection pass (`exitChainAutoFetchEnabled`).
+ * because a sync waits for an exit-chain collection pass (`collect_exit_chains`).
  * Three looks and two waits put the whole lookup under a minute.
  *
  * The wait is all it bounds. The SDK call it gave up on is left running, because
@@ -256,8 +256,9 @@ const LOST_SEND_DELAY_MS = 2000
  * stays connected (see `syncSelfCustodialWallet`). A later look's sync does not join that
  * one: the coordinator drains its waiter batch before running the sync and notifies only
  * that batch, so a caller arriving afterwards is served by the next pass of the loop
- * (`sdk/sync_coordinator.rs` @0.23.1). What that leaves behind is a look whose own work
- * carries on after nothing is waiting for it, which is what `isExpired` is for.
+ * (`sdk/sync_coordinator.rs` @0.23.1, unchanged at 0.27.1). What that leaves behind is a
+ * look whose own work carries on after nothing is waiting for it, which is what
+ * `isExpired` is for.
  */
 const LOST_SEND_ATTEMPT_TIMEOUT_MS = 15_000
 const LOST_SEND_LOOKBACK_SECONDS = 24 * 60 * 60
@@ -296,6 +297,9 @@ type HistoryScan = {
    *  carries nothing to match on, and a Lightning send can sit that way until the
    *  wallet has fetched what it paid, so it may be the attempt itself. */
   hasUndescribedSend: boolean
+  /** Set when the wallet could not catch up with the server first. The local history
+   *  can still show the payment, but not that it is absent. */
+  syncFailure?: { readonly error: unknown }
 }
 
 const isUndescribedSend = (payment: Payment): boolean =>
@@ -341,7 +345,17 @@ const scanHistorySince = async ({
   into,
   isExpired,
 }: ScanHistoryParams): Promise<void> => {
-  await syncSelfCustodialWallet(sdk)
+  /**
+   * The sync also waits for exit-chain collection, and fails when that does, while the
+   * history it would have refreshed may already hold the payment. So a failed sync does
+   * not end the look; it only rules out "not-found".
+   */
+  try {
+    await syncSelfCustodialWallet(sdk)
+  } catch (err) {
+    reportError("Self-custodial lost send lookup", err)
+    into.syncFailure = { error: err }
+  }
   if (isExpired()) return
 
   for (let page = 0; page < LOST_SEND_MAX_PAGES; page += 1) {
@@ -358,6 +372,21 @@ const scanHistorySince = async ({
   }
 
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
+}
+
+/** What a look that showed no payment of the attempt is able to say. */
+const withoutPayment = (
+  { syncFailure, hasUndescribedSend }: HistoryScan,
+  failed: ReadonlyArray<Payment>,
+): LostSendLookup => {
+  if (syncFailure) return { status: "unreadable", error: syncFailure.error }
+  if (hasUndescribedSend) {
+    return {
+      status: "unreadable",
+      error: new Error("Lost send lookup met an undescribed send"),
+    }
+  }
+  return { status: "not-found", failed }
 }
 
 /**
@@ -408,12 +437,7 @@ export const findLostSend = async ({
       const payment = landed()
       const failed = scan.matches.filter(isFailedPayment)
       if (payment) return { status: "found", payment, failed }
-      lastLook = scan.hasUndescribedSend
-        ? {
-            status: "unreadable",
-            error: new Error("Lost send lookup met an undescribed send"),
-          }
-        : { status: "not-found", failed }
+      lastLook = withoutPayment(scan, failed)
     } catch (err) {
       const payment = landed()
       /** The failed ones are only the ones this look reached: telemetry a later look can

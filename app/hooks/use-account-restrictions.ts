@@ -34,6 +34,8 @@ type BlockedCountries = {
 }
 
 type GateReasonInputs = {
+  /** Only the dollar balance can lack its token: a transfer moves bitcoin. */
+  isTokenMissing?: boolean
   isAnonMode: boolean
   isRestricted: boolean
   isRegionDetermined: boolean
@@ -41,14 +43,17 @@ type GateReasonInputs = {
 
 /**
  * The one reading of a closed gate, shared by every feature gate so no surface derives it
- * on its own. Anon comes first because it resolves no region, so neither region reason can
- * apply to it; a restriction with no determined region behind it is the unanswered query.
+ * on its own. A missing token comes first because nothing the user does can open it; Anon
+ * next because it resolves no region, so neither region reason can apply to it; a
+ * restriction with no determined region behind it is the unanswered query.
  */
 export const toGateReason = ({
+  isTokenMissing = false,
   isAnonMode,
   isRestricted,
   isRegionDetermined,
 }: GateReasonInputs): GateReason | null => {
+  if (isTokenMissing) return GateReason.Network
   if (isAnonMode) return GateReason.Anon
   if (!isRestricted) return null
   return isRegionDetermined ? GateReason.Region : GateReason.UnknownRegion

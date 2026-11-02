@@ -23,6 +23,7 @@ jest.mock("@app/self-custodial/config", () => ({
   SparkToken: { Label: "USDB", Ticker: "USDB" },
   SparkConfig: {},
   requireSparkTokenIdentifier: () => "test-token-id",
+  sparkTokenIdentifier: () => "test-token-id",
 }))
 
 const loadFreshSnapshotModule = () => {

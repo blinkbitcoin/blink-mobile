@@ -2591,7 +2591,8 @@
     "StablesatsRestriction": {
         "walletLabel": "in deiner Region nicht verfügbar",
         "anonModeWalletLabel": "im Incognito-Modus nicht verfügbar",
-        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen"
+        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen",
+        "networkWalletLabel": "in diesem Netzwerk nicht verfügbar"
     },
     "AnonModeConvertModal": {
         "title": "Übertrage zuerst dein Dollar-Guthaben",

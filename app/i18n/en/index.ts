@@ -2747,6 +2747,7 @@ const en: BaseTranslation = {
     walletLabel: "not available in your region",
     anonModeWalletLabel: "not available in Incognito mode",
     unknownRegionWalletLabel: "couldn't check availability, pull down to retry",
+    networkWalletLabel: "not available on this network",
   },
   AnonModeConvertModal: {
     title: "Transfer your Dollar Balance first",

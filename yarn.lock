@@ -1842,12 +1842,12 @@
   resolved "https://registry.yarnpkg.com/@blinkbitcoin/react-native-geetest-module/-/react-native-geetest-module-0.1.2.tgz#6efc28450ae4e5ee80104c0754b183c589882351"
   integrity sha512-donA4DoTcJvV0RpVjXAyko0UPyPk5nAGElwEE2Nvyc6PQcp0gH/2OSj5OwR2tbnRW+0rPjzOYcrR+93vCXZoGw==
 
-"@breeztech/breez-sdk-spark-react-native@0.23.1":
-  version "0.23.1"
-  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.23.1.tgz#adfc2ca07da8cf8ca88cebc017b36105b6b4f4c6"
-  integrity sha512-dcAHj4zWcEeEKubVk6eEloRXwFrBE3/z3ilSLLWwNo3LHu6jyoXlWncm0l78jKFsmJCm9HZ+peVHzQdzZqHDrA==
+"@breeztech/breez-sdk-spark-react-native@0.27.1":
+  version "0.27.1"
+  resolved "https://registry.yarnpkg.com/@breeztech/breez-sdk-spark-react-native/-/breez-sdk-spark-react-native-0.27.1.tgz#6223656347040e6902b506ee98d6c06241816197"
+  integrity sha512-ExO/CsAmCEXsaSvJ/IO2znW8C4KRbKgyA64q0ijPBJcFbfJ4BrJQjfBnPOyJu4rrvdzWEsnGv6oDSxTSdQFWaw==
   dependencies:
-    uniffi-bindgen-react-native "^0.29.3-1"
+    uniffi-bindgen-react-native "git+https://github.com/breez/uniffi-bindgen-react-native.git#309bc8fa7fc56d4358dc75a78135a54d8225786b"
 
 "@callstack/react-theme-provider@3.0.3":
   version "3.0.3"
@@ -19008,10 +19008,9 @@ unicode-property-aliases-ecmascript@^2.0.0:
   resolved "https://registry.npmjs.org/unicode-property-aliases-ecmascript/-/unicode-property-aliases-ecmascript-2.1.0.tgz#43d41e3be698bd493ef911077c9b131f827e8ccd"
   integrity sha512-6t3foTQI9qne+OZoVQB/8x8rk2k1eVy1gRXhV3oFQ5T6R1dqQ1xtin3XqSlx3+ATBkliTaR/hHyJBm+LVPNM8w==
 
-uniffi-bindgen-react-native@^0.29.3-1:
+"uniffi-bindgen-react-native@git+https://github.com/breez/uniffi-bindgen-react-native.git#309bc8fa7fc56d4358dc75a78135a54d8225786b":
   version "0.29.3-1"
-  resolved "https://registry.yarnpkg.com/uniffi-bindgen-react-native/-/uniffi-bindgen-react-native-0.29.3-1.tgz#bcf3a9759ac036a08a983783d3319e0044c98680"
-  integrity sha512-o6gXZsAh55yuvhwF2WSFdIHV4phyfWcCmg4DuyfJWJ7CvUz1UcIz2S4u9SmXAz1jsuqvu6Xc9hexrRBB0a5osg==
+  resolved "git+https://github.com/breez/uniffi-bindgen-react-native.git#309bc8fa7fc56d4358dc75a78135a54d8225786b"
 
 unique-string@^2.0.0:
   version "2.0.0"

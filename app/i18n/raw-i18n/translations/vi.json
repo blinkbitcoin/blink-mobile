@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
     "anonModeWalletLabel": "không khả dụng ở chế độ Incognito",
-    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại"
+    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại",
+    "networkWalletLabel": "không khả dụng trên mạng này"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",

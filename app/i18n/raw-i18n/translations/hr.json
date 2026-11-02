@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nije dostupan u vašoj regiji",
     "anonModeWalletLabel": "nije dostupno u Incognito načinu",
-    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj"
+    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj",
+    "networkWalletLabel": "nije dostupno na ovoj mreži"
   },
   "AnonModeConvertModal": {
     "title": "Najprije prenesite svoj dolarski saldo",

@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",
     "anonModeWalletLabel": "haipatikani katika hali ya Incognito",
-    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena"
+    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena",
+    "networkWalletLabel": "haipatikani kwenye mtandao huu"
   },
   "AnonModeConvertModal": {
     "title": "Hamisha kwanza salio lako la Dola",

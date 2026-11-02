@@ -2591,7 +2591,8 @@
   "StablesatsRestriction": {
     "walletLabel": "није доступан у вашем региону",
     "anonModeWalletLabel": "није доступно у Incognito режиму",
-    "unknownRegionWalletLabel": "доступност није било могуће проверити, превуците надоле да покушате поново"
+    "unknownRegionWalletLabel": "доступност није било могуће проверити, превуците надоле да покушате поново",
+    "networkWalletLabel": "није доступно на овој мрежи"
   },
   "AnonModeConvertModal": {
     "title": "Прво пребаците свој доларски салдо",

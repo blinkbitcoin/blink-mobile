@@ -4,6 +4,7 @@ import {
   defaultConfig,
   initLogging,
   MaxFee,
+  MaxOnchainFee,
   type BreezSdkInterface,
   type Network,
   type SdkEvent,
@@ -22,8 +23,9 @@ import {
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
-  requireSparkTokenIdentifier,
+  setSparkTokenNetwork,
   SparkToken,
+  sparkTokenIdentifierFor,
   storageDirFor,
 } from "../config"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
@@ -49,43 +51,57 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
   config.lnurlDomain = lnurlDomainFor(network)
 
   /**
-   * The SDK default cap is 1 sat/vByte, which blocks almost every deposit claim.
-   * Track the network-recommended rate plus a small remote-config leeway so
-   * automatic claims succeed at normal fees. Coerce to a non-negative integer:
-   * BigInt() throws on the fractional values an operator could set remotely.
+   * The SDK default cap is a fixed 1 sat/vByte (plus 0.1% of the deposit), which
+   * blocks claims as soon as on-chain fees rise above it. Track the
+   * network-recommended rate plus a small remote-config leeway so automatic claims
+   * succeed at normal fees. Coerce to a non-negative integer: BigInt() throws on
+   * the fractional values an operator could set remotely.
+   *
+   * From 0.26 the same cap also admits early claims: the sync loop claims an
+   * unconfirmed deposit ahead of maturity whenever the provider's spread fits under
+   * this cap, priced as the rate times the SDK's 99 vB claim size. That replaced 0.23's
+   * separate `maxInstantDepositClaimFeeBps`, so there is no longer a switch that keeps
+   * early claims off while this cap stays usable for the claim at maturity.
+   *
+   * No proportional part (`proportionalPpm`, 0.27), so the ceiling stays what it was
+   * before the SDK could express one. Adding one raises it for every claim, early
+   * ones included.
    */
   const safeLeewaySatPerVbyte = Math.max(0, Math.trunc(leewaySatPerVbyte))
-  config.maxDepositClaimFee = new MaxFee.NetworkRecommended({
-    leewaySatPerVbyte: BigInt(safeLeewaySatPerVbyte),
+  config.maxDepositClaimFee = MaxFee.create({
+    onchain: new MaxOnchainFee.NetworkRecommended({
+      leewaySatPerVbyte: BigInt(safeLeewaySatPerVbyte),
+    }),
   })
 
-  config.stableBalanceConfig = {
-    tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],
-    defaultActiveLabel: undefined,
-    thresholdSats: undefined,
-    maxSlippageBps: MAX_SLIPPAGE_BPS,
+  /** No SOCKS5 proxy. `getSparkStatus` runs without the SDK and passes its own, so
+   *  bridge/status.ts must change with this. */
+  config.proxy = undefined
+
+  /** Left out where the network has no token: 0.27 refuses to connect with a token
+   *  minted on another network, and the dollar-balance gate keeps its surfaces closed. */
+  setSparkTokenNetwork(network)
+  const tokenIdentifier = sparkTokenIdentifierFor(network)
+  if (tokenIdentifier !== null) {
+    config.stableBalanceConfig = {
+      tokens: [{ label: SparkToken.Label, tokenIdentifier }],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: MAX_SLIPPAGE_BPS,
+    }
   }
 
   /**
    * Collect what is needed to exit a payment without the Spark operators as funds arrive,
    * which is the SDK's own default and what the recovery backup exports: a leaf whose chain
    * was never collected cannot be exited until the operators are reachable again, which is
-   * the moment the backup exists for. Set here rather than inherited because the cost is
-   * real and belongs on the record: a sync waits for a collection pass, so every wallet
-   * sync is as slow as the slowest pass, and the lost-send lookup syncs before each of its
-   * looks before it will read local history.
+   * the moment the backup exists for. Pinned rather than inherited so a future SDK default
+   * cannot switch it off for us. From 0.26 it governs only this background collection: an
+   * explicit sync collects and waits for the pass whatever the flag says, so every wallet
+   * sync is as slow as the slowest pass either way, and the lost-send lookup syncs before
+   * each of its looks before it will read local history.
    */
   config.exitChainAutoFetchEnabled = true
-
-  /**
-   * No instant (0-conf) deposit claim. The field caps the provider's spread on crediting a
-   * deposit before it confirms, and while it is unset no such claim is attempted; a deposit
-   * is credited once it matures, under `maxDepositClaimFee`. Left off because the spread is
-   * a cost the user is never shown, and turning it on is a product decision rather than a
-   * side effect of a dependency bump. Pinned rather than inherited so a future SDK default
-   * cannot switch it on for us.
-   */
-  config.maxInstantDepositClaimFeeBps = undefined
 
   return config
 }
