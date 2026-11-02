@@ -29,6 +29,9 @@ jest.mock("@app/i18n/i18n-react", () => ({
         dollar: () => "Dollar",
         allAccounts: () => "All accounts",
       },
+      Accessibility: {
+        switchToWallet: ({ wallet }: { wallet: string }) => `Switch to ${wallet}`,
+      },
     },
   }),
 }))
@@ -55,10 +58,10 @@ describe("WalletSummary", () => {
       )
     })
 
-    it("names the card All accounts for screen readers", () => {
+    it("names the card All accounts for screen readers, without the balance", () => {
       renderCard()
 
-      expect(card().props.accessibilityLabel).toBe("All accounts, 1,500 SAT")
+      expect(card().props.accessibilityLabel).toBe("All accounts")
     })
 
     it("hands All to the wallet pill", () => {
@@ -78,6 +81,14 @@ describe("WalletSummary", () => {
       fireEvent.press(card())
 
       expect(onSwitch).toHaveBeenCalledTimes(1)
+    })
+
+    /** A screen reader hears only what a tap selects: no balance, no current wallet. */
+    it("reads as Switch to the wallet a tap selects", () => {
+      renderCard({ onSwitch: () => {}, switchTo: WalletCurrency.Btc })
+
+      expect(card().props.accessibilityRole).toBe("button")
+      expect(card().props.accessibilityLabel).toBe("Switch to Bitcoin")
     })
 
     it("is a plain read-out with no onSwitch", () => {
@@ -143,14 +154,14 @@ describe("WalletSummary", () => {
       expect(within(hiddenCopy).UNSAFE_queryAllByType(Text)).toHaveLength(2)
     })
 
-    it("names the wallet and its amount, drops the swap icon and sits on grey7", () => {
+    it("names only the wallet, drops the swap icon and sits on grey7", () => {
       renderCard({
         inactive: true,
         currency: WalletCurrency.Btc,
         balancePrimary: "741 SAT",
       })
 
-      expect(card().props.accessibilityLabel).toBe("Bitcoin, 741 SAT")
+      expect(card().props.accessibilityLabel).toBe("Bitcoin")
       expect(card().props.accessibilityRole).toBeUndefined()
       expect(mockWalletSwitch).toHaveBeenLastCalledWith(
         expect.objectContaining({ hasSwapIcon: false }),
