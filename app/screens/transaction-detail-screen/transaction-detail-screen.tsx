@@ -597,6 +597,7 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
                   : LL.TransactionDetailScreen.sendingAccount()}
               </Text>
               <WalletSummary
+                inactive
                 currency={settlementCurrency}
                 balancePrimary={walletAmount}
                 balanceSecondary={walletSecondaryAmount}
