@@ -709,6 +709,7 @@ const useStyles = makeStyles(({ colors }) => ({
     rowGap: 20,
     paddingHorizontal: 20,
     paddingTop: 10,
+    paddingBottom: 10,
   },
   list: {
     flex: 1,
