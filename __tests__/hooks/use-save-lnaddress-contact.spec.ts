@@ -123,10 +123,13 @@ describe("useSaveLnAddressContact", () => {
       expect(mockContactCreate).not.toHaveBeenCalled()
     })
 
-    it("returns saved=false with the handle and logs to crashlytics when bridgeFindOrCreateContact rejects (silent swallow)", async () => {
+    it("returns saved=false with the handle and leaves a breadcrumb without it when bridgeFindOrCreateContact rejects (silent swallow)", async () => {
       mockIsSelfCustodial = true
       mockSdk = { id: "sdk" }
-      mockBridgeFindOrCreateContact.mockRejectedValue(new Error("contact upsert failed"))
+      /** The SDK may echo the handle it was given, as both name and payment identifier. */
+      mockBridgeFindOrCreateContact.mockRejectedValue(
+        new Error("failed to add alice@spark.tips (alice@spark.tips)"),
+      )
 
       const { result } = renderHook(() => useSaveLnAddressContact())
 
@@ -138,6 +141,9 @@ describe("useSaveLnAddressContact", () => {
 
       expect(response).toEqual({ saved: false, handle: "alice@spark.tips" })
       expect(mockCrashlyticsLog).toHaveBeenCalledWith(
+        expect.stringContaining("[self-custodial contacts] auto-save failed"),
+      )
+      expect(mockCrashlyticsLog).not.toHaveBeenCalledWith(
         expect.stringContaining("alice@spark.tips"),
       )
       expect(mockContactCreate).not.toHaveBeenCalled()

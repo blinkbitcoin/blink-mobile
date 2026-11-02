@@ -31,6 +31,8 @@
     "createError": "Kan de API-sleutel niet aanmaken. Probeer het opnieuw.",
     "revokeError": "Kan de API-sleutel niet intrekken. Probeer het opnieuw.",
     "loadError": "Kan je API-sleutels niet laden. Probeer het later opnieuw.",
+    "discardSecretTitle": "Deze API-sleutel verwijderen?",
+    "discardSecretBody": "Dit is de enige keer dat het geheim wordt getoond. Als je nu weggaat, kan de sleutel niet worden hersteld en moet je een nieuwe aanmaken.",
     "done": "Klaar"
   },
   "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
     "skip": "Overslaan",
     "unlock": "Ontgrendelen",
     "usePin": "Gebruik je PIN",
-    "confirmLogout": "Weet je zeker dat je wilt uitloggen? Dit wist je cache en alle lokale gebruikersinstellingen"
+    "confirmLogout": "Weet je zeker dat je wilt uitloggen? Dit wist je cache en alle lokale gebruikersinstellingen",
+    "forgotPin": "PIN vergeten? Verwijder portemonnees",
+    "removeWalletsTitle": "Portemonnees van dit apparaat verwijderen?",
+    "removeWalletsBody": "Dit verwijdert alle portemonnees van dit apparaat en logt je uit. Om een portemonnee terug te krijgen, heb je de herstelzin nodig. Zonder die zin is de portemonnee weg.",
+    "removeWalletsConfirm": "Verwijder portemonnees",
+    "removeWalletsFailed": "Sommige portemonnees konden niet worden verwijderd. Probeer het opnieuw."
   },
   "PeopleScreen": {
     "title": "Mensen",
@@ -2175,16 +2182,19 @@
     "walletCountNotTwo": "Wallet-aantal is niet 2. Gebruik het dashboard om alle wallets en fondsen van dit account te bekijken"
   },
   "PinScreen": {
+    "attemptUnrecorded": "Kon de poging niet veilig vastleggen.",
+    "attemptsLeft": "{attemptsRemaining: number} resterende pogingen.",
     "attemptsRemaining": "Onjuiste pincode. {attemptsRemaining: number} resterende pogingen.",
     "enterPin": "Voer uw pincode in",
-    "lockoutUnavailable": "Kon de mislukte poging niet veilig vastleggen. Uitloggen.",
+    "oneAttemptLeft": "1 poging over.",
     "oneAttemptRemaining": "Onjuiste pincode. 1 poging over.",
     "pinUnreadable": "Kon je pincode niet controleren. Probeer het opnieuw.",
     "setPin": "Stel uw PIN code in",
     "setPinFailedMatch": "Pincodes komen niet overeen - Stel uw pincode in",
     "storePinFailed": "Kan je pincode niet opslaan.",
     "tooManyAttempts": "Teveel mislukte pogingen. Uitloggen.",
-    "tryAgainIn": "Probeer het over {seconds: number} s opnieuw.",
+    "attemptBudgetSpent": "Teveel mislukte pogingen.",
+    "tryAgainIn": "Probeer het over {time: string} opnieuw.",
     "verifyPin": "Verifieer uw pincode"
   },
   "PriceHistoryScreen": {
@@ -3057,7 +3067,8 @@
     "problemPersists": "Neem contact op met de technische ondersteuning als het probleem aanhoudt.",
     "fatalError": "Het spijt ons dat we problemen lijken te hebben met het laden van de applicatiegegevens. Neem contact op met de technische ondersteuning als de problemen aanhouden.",
     "showError": "Toon Fout",
-    "clearAppData": "App-gegevens wissen en uitloggen"
+    "clearAppData": "App-gegevens wissen en uitloggen",
+    "screenSecurityUnavailable": "Dit scherm blijft verborgen omdat de bescherming tegen schermafbeeldingen niet kon worden ingeschakeld."
   },
   "notifications": {
     "payment": {

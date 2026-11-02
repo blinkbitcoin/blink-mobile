@@ -28,8 +28,10 @@ import {
   findSelfCustodialAccountByMnemonic,
   listSelfCustodialAccounts,
   StorageReadStatus,
+  readStoredWalletPresence,
   removeSelfCustodialAccountId,
   setSelfCustodialLightningAddress,
+  StoredWalletPresence,
   type SelfCustodialAccountEntry,
 } from "@app/self-custodial/storage/account-index"
 
@@ -370,6 +372,45 @@ describe("self-custodial account-index", () => {
       }
       expect(mockRecordError).toHaveBeenCalledTimes(1)
       expect(mockGetMnemonicForAccount).not.toHaveBeenCalled()
+    })
+  })
+
+  /**
+   * The one reading two callers with opposite biases share. Keeping "could not tell" as its
+   * own answer is what lets the logout treat it as a wallet still being there while a
+   * sessionless cold start treats it as none, without either inheriting the other's bias.
+   */
+  describe("readStoredWalletPresence", () => {
+    it("reports a wallet present when the index names one", async () => {
+      setIndex([{ id: "wallet-1", lightningAddress: null }])
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Present)
+    })
+
+    it("reports absent for an index that is readable and empty", async () => {
+      setIndex([])
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Absent)
+    })
+
+    it("reports absent when the device has no index at all", async () => {
+      mockGetItem.mockResolvedValue(null)
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Absent)
+    })
+
+    /** Never folded into absent: that is the guess that would let a logout drop the lock
+     *  over whatever the index failed to name. */
+    it("reports unknown when the index cannot be read", async () => {
+      mockGetItem.mockRejectedValue(new Error("AsyncStorage unavailable"))
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Unknown)
+    })
+
+    it("counts a wallet the legacy id list still holds", async () => {
+      setLegacyOnly(["legacy-wallet-1"])
+
+      expect(await readStoredWalletPresence()).toBe(StoredWalletPresence.Present)
     })
   })
 })

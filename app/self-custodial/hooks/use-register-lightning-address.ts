@@ -10,6 +10,7 @@ import {
   registerLightningAddress,
 } from "@app/self-custodial/bridge"
 import { BackupStatus, useBackupState } from "@app/self-custodial/providers/backup-state"
+import { measure, ScEvent } from "@app/self-custodial/measurement"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 
 type UseRegisterLightningAddress = {
@@ -59,6 +60,7 @@ export const useRegisterLightningAddress = (
           return
         }
         await registerLightningAddress(sdk, lnAddress)
+        measure(ScEvent.LightningAddressRegistered)
         await updateCurrentSelfCustodialAccount()
         onRegistered()
       } catch {
