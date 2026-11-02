@@ -78,6 +78,30 @@ jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
   usePendingDeposits: () => ({ deposits: [], refetch: jest.fn() }),
 }))
 
+// The active account is the self-custodial one the SDK is connected as: on-chain
+// addresses are only asked for once the two agree.
+jest.mock("@app/hooks/use-account-registry", () => {
+  const actual = jest.requireActual("@app/hooks/use-account-registry")
+  const account = {
+    id: "self-custodial-id",
+    type: "self-custodial",
+    label: "alice@spark.tips",
+    selected: true,
+    status: "available",
+  }
+  return {
+    ...actual,
+    useAccountRegistry: () => ({
+      accounts: [account],
+      activeAccount: account,
+      selfCustodialEntries: [{ id: account.id, lightningAddress: null }],
+      loading: false,
+      setActiveAccountId: () => {},
+      reloadSelfCustodialAccounts: async () => {},
+    }),
+  }
+})
+
 jest.mock("@app/store/persistent-state", () => {
   const actual = jest.requireActual("@app/store/persistent-state")
   return {
@@ -303,6 +327,7 @@ const baseActiveWallet = {
 
 const baseSelfCustodialWallet = {
   sdk: { id: "mock-sdk" },
+  connectedAccountId: "self-custodial-id",
   status: ActiveWalletStatus.Ready,
   wallets: [btcWallet, usdWallet],
   retry: jest.fn(),

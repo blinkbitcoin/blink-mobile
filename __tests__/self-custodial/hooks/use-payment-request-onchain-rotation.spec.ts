@@ -75,7 +75,11 @@ jest.mock("@app/self-custodial/hooks/use-pending-deposits", () => ({
 }))
 
 jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () => mockSelfCustodialWallet(),
+  // Connected as whichever account is active, unless a spec says otherwise.
+  useSelfCustodialWallet: () => ({
+    connectedAccountId: mockAccountRegistry().activeAccount?.id ?? null,
+    ...mockSelfCustodialWallet(),
+  }),
 }))
 
 // The lookback the hook falls through to when the loaded history holds no on-chain
@@ -534,16 +538,18 @@ describe("onchain address rotation", () => {
     })
   })
 
-  describe("without a self-custodial account id", () => {
-    it("still shows an address but neither reads nor writes the record", async () => {
+  describe("until the SDK is connected as the active self-custodial account", () => {
+    // Regression: with no account to key on, the hook still showed the SDK's current
+    // address, unchecked for reuse, and on an account switch that was the previous
+    // account's. Nothing is asked for until the connection and the account agree.
+    it("asks for nothing without an active self-custodial account", async () => {
       mockAccountRegistry.mockReturnValue({ activeAccount: undefined })
 
       const { result } = renderHook(() => usePaymentRequest())
+      await flushEffects()
 
-      await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qtest...")
-      })
-      expect(mockReceiveOnchain).toHaveBeenCalledWith({ newAddress: false })
+      expect(result.current?.onchainAddress).toBeUndefined()
+      expect(mockReceiveOnchain).not.toHaveBeenCalled()
       expect(mockLoadIssuedOnchainAddress).not.toHaveBeenCalled()
       expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
     })
@@ -554,43 +560,49 @@ describe("onchain address rotation", () => {
       })
 
       const { result } = renderHook(() => usePaymentRequest())
-
-      await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qtest...")
-      })
-      expect(mockLoadIssuedOnchainAddress).not.toHaveBeenCalled()
-      expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
-    })
-
-    it("does not rotate on a deposit it would have no way to record", async () => {
-      // Rotating here writes nothing, so the next run has the same evidence and rotates
-      // again: a fresh address every render, and still no reuse tracking to show for it.
-      mockAccountRegistry.mockReturnValue({ activeAccount: undefined })
-
-      const { result, rerender } = renderHook(() => usePaymentRequest())
-      await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qtest...")
-      })
-
-      mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
-      rerender({})
       await flushEffects()
 
-      expect(mockReceiveOnchain).not.toHaveBeenCalledWith({ newAddress: true })
+      expect(result.current?.onchainAddress).toBeUndefined()
+      expect(mockReceiveOnchain).not.toHaveBeenCalled()
       expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalled()
     })
 
-    it("rotates as soon as the account id is back", async () => {
-      // The state above is transient — an account switch mid-render — so the pause on
-      // rotation must not outlive it.
+    it("waits out the commit where the connection is still the previous account's", async () => {
+      mockAccountRegistry.mockReturnValue({
+        activeAccount: { id: "sc-account-2", type: "self-custodial" },
+      })
+      mockSelfCustodialWallet.mockReturnValue({
+        ...walletWith([]),
+        connectedAccountId: "sc-account-1",
+      })
+
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await flushEffects()
+      expect(result.current?.onchainAddress).toBeUndefined()
+      expect(mockReceiveOnchain).not.toHaveBeenCalled()
+
+      mockSelfCustodialWallet.mockReturnValue(walletWith([]))
+      rerender({})
+
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qtest...")
+      })
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledTimes(1)
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledWith(
+        "sc-account-2",
+        expect.objectContaining({ address: "bc1qtest..." }),
+      )
+    })
+
+    it("rotates as soon as the account is back", async () => {
+      // The state above is transient, an account switch mid-render, so the pause must
+      // not outlive it.
       mockAccountRegistry.mockReturnValue({ activeAccount: undefined })
       mockSelfCustodialWallet.mockReturnValue(walletWith([onchainReceipt("deposit-1")]))
 
       const { result, rerender } = renderHook(() => usePaymentRequest())
-      await waitFor(() => {
-        expect(result.current?.onchainAddress).toBe("bc1qtest...")
-      })
-      expect(mockReceiveOnchain).toHaveBeenLastCalledWith({ newAddress: false })
+      await flushEffects()
+      expect(mockReceiveOnchain).not.toHaveBeenCalled()
 
       mockAccountRegistry.mockReturnValue({
         activeAccount: { id: "sc-account-1", type: "self-custodial" },
@@ -607,6 +619,60 @@ describe("onchain address rotation", () => {
         depositMarker: "deposit-1",
         seenPendingDepositIds: [],
       })
+    })
+
+    it("neither shows nor reports a tap that finishes after the account changed", async () => {
+      // Regression: a tap is never superseded by a newer request, so one started on the
+      // previous account's SDK published its address over the new account's.
+      let finishTap: (value: { address: string }) => void = () => {}
+      mockReceiveOnchain
+        .mockResolvedValueOnce({ address: "bc1qfirst..." })
+        .mockReturnValueOnce(
+          new Promise((resolve) => {
+            finishTap = resolve
+          }),
+        )
+        .mockResolvedValue({ address: "bc1qother-account..." })
+      const { result, rerender } = renderHook(() => usePaymentRequest())
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+      })
+      let tap: Promise<NewOnchainAddressResultType | undefined> | undefined
+      await act(async () => {
+        tap = result.current?.generateNewOnchainAddress?.()
+      })
+      await flushEffects()
+
+      mockAccountRegistry.mockReturnValue({
+        activeAccount: { id: "sc-account-2", type: "self-custodial" },
+      })
+      mockSelfCustodialWallet.mockReturnValue({
+        ...walletWith([]),
+        sdk: { id: "other-sdk" },
+      })
+      rerender({})
+      await waitFor(() => {
+        expect(result.current?.onchainAddress).toBe("bc1qother-account...")
+      })
+
+      let outcome: NewOnchainAddressResultType | undefined
+      await act(async () => {
+        finishTap({ address: "bc1qfresh..." })
+        outcome = await tap
+      })
+      await flushEffects()
+
+      expect(outcome).toBe(NewOnchainAddressResult.Failed)
+      expect(result.current?.onchainAddress).toBe("bc1qother-account...")
+      // The rotation happened all the same, so it is recorded, under its own account.
+      expect(mockSaveIssuedOnchainAddress).toHaveBeenCalledWith(
+        "sc-account-1",
+        expect.objectContaining({ address: "bc1qfresh..." }),
+      )
+      expect(mockSaveIssuedOnchainAddress).not.toHaveBeenCalledWith(
+        "sc-account-2",
+        expect.objectContaining({ address: "bc1qfresh..." }),
+      )
     })
   })
 
@@ -1196,6 +1262,46 @@ describe("a request that never settles", () => {
     expect(mockReceiveOnchain).toHaveBeenCalledTimes(3)
   })
 
+  it("fails a tap queued behind a call that never stops, at the tap's own deadline", async () => {
+    // Regression: a request's deadline started only once the one ahead had stopped, so a
+    // call that ignored its cancellation left every tap behind it spinning for good.
+    let answerLate: (value: { address: string }) => void = () => {}
+    mockReceiveOnchain
+      .mockResolvedValueOnce({ address: "bc1qfirst..." })
+      .mockReturnValueOnce(
+        new Promise<{ address: string }>((resolve) => {
+          answerLate = resolve
+        }),
+      )
+      .mockResolvedValue({ address: "bc1qfresh..." })
+    const { result } = renderHook(() => usePaymentRequest())
+    await flushEffects()
+
+    const hungTap = await startTap(result)
+    const queuedTap = await startTap(result)
+    await runOutTheClock()
+    await expect(hungTap()).resolves.toBe(NewOnchainAddressResult.Failed)
+
+    let queuedOutcome: NewOnchainAddressResultType | undefined
+    queuedTap()?.then((outcome) => {
+      queuedOutcome = outcome
+    })
+    await flushEffects()
+    // Its own clock started when the call ahead of it gave up.
+    expect(queuedOutcome).toBeUndefined()
+
+    await runOutTheClock()
+    expect(queuedOutcome).toBe(NewOnchainAddressResult.Failed)
+    expect(result.current?.onchainAddress).toBe("bc1qfirst...")
+
+    // When the call ahead finally answers, the expired tap does not reach the SDK.
+    await act(async () => {
+      answerLate({ address: "bc1qlate..." })
+    })
+    await flushEffects()
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+  })
+
   it("never calls the SDK for a request that ran out of time before reaching it", async () => {
     // The deposit lookup ahead of the SDK call can hang too. Waited on, it would hold
     // the queue for good; and a call sent after the deadline could still rotate.
@@ -1348,9 +1454,12 @@ describe("a tap still running when Receive is left and reopened", () => {
     )
   })
 
-  it("does not hold a different SDK's request behind it", async () => {
-    // An account switch brings its own SDK, which the old one's rotation cannot move.
+  it("does not hold a different account's request behind it", async () => {
+    // Another account has its own wallet, which this rotation cannot move.
     const { finishRotation } = await holdTapThenReopen()
+    mockAccountRegistry.mockReturnValue({
+      activeAccount: { id: "sc-account-2", type: "self-custodial" },
+    })
     mockSelfCustodialWallet.mockReturnValue({
       sdk: { id: "other-sdk" },
       lastReceivedPaymentId: null,
@@ -1366,6 +1475,31 @@ describe("a tap still running when Receive is left and reopened", () => {
     await act(async () => {
       finishRotation()
     })
+  })
+
+  it("holds a reconnected SDK for the same account behind it", async () => {
+    // Regression: the queue was the SDK's, so a reconnect started an empty one. It read
+    // back the address the tap was replacing, and the tap's late save then overwrote
+    // the record the new connection had written.
+    const { finishRotation, stored } = await holdTapThenReopen()
+    mockSelfCustodialWallet.mockReturnValue({
+      sdk: { id: "reconnected-sdk" },
+      lastReceivedPaymentId: null,
+      allTransactions: [],
+    })
+
+    const reconnected = renderHook(() => usePaymentRequest())
+    await flushEffects()
+    expect(mockReceiveOnchain).toHaveBeenCalledTimes(2)
+    expect(reconnected.result.current?.onchainAddress).toBeUndefined()
+
+    await act(async () => {
+      finishRotation()
+    })
+    await flushEffects()
+
+    expect(reconnected.result.current?.onchainAddress).toBe("bc1qtapped...")
+    expect(stored()).toEqual(expect.objectContaining({ address: "bc1qtapped..." }))
   })
 })
 
