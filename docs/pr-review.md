@@ -80,7 +80,7 @@ missing pieces as findings:
 | Check | What it runs | Hard gate? |
 |-------|--------------|-----------|
 | **Check Code** | `yarn check-code` = `tsc:check` + `eslint:check` + `check:translations` + `check:codegen` + `graphql-check` | Yes |
-| **Tests** | Jest (`yarn test`) | Yes — the gate reviewers cite |
+| **Tests** | Jest (`yarn test:ci`: two workers; `yarn test` runs the same suite in band) | Yes — the gate reviewers cite |
 | **Audit** | dependency advisories (`make audit`) | Yes |
 | **Conventional commits** | PR title/commit format | Yes |
 | **CodeQL / spelling / qlty** | static analysis, typos | Yes |
@@ -89,6 +89,23 @@ missing pieces as findings:
 Most common Tests failure: **stale copy assertions after an i18n/copy change** (#3862,
 #3882). If a PR changes user-facing strings, check that test assertions were updated in the
 same PR.
+
+Reading a red Tests run: each failing test is an **annotation on its spec line** in the
+PR's "Files changed" view, and the step log prints each failure once, grouped per file,
+before the totals. A `RETRY n:` warning annotation is a failed attempt of a retried test.
+On a test that ended up passing, that's a flake worth a look, not a blocker.
+
+**A test run prints nothing but results.** Any console call a spec didn't ask for fails
+the test it happened in (the console guard in `jest.setup.js`):
+
+- Output that is expected (a logged error path, a library's debug line): spy on that
+  console method with `mockImplementation` in the spec and assert the call.
+- An Apollo `No more mocked responses` or `Missing field` warning: fix the mock. A missing
+  mock looks exactly like correct behaviour.
+- A library warning that only exists under Jest and that no app or spec change can fix:
+  add it to `TEST_ENVIRONMENT_ARTIFACTS` in `jest.setup.js`, with the reason.
+- Debugging locally: `JEST_ALLOW_CONSOLE=1 yarn jest <path>` prints console calls as
+  usual and fails nothing.
 
 ---
 
