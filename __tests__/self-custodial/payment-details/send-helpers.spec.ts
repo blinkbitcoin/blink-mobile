@@ -1081,6 +1081,28 @@ describe("findLostSend", () => {
 
     expect(found).toEqual({ status: "not-found", failed: [] })
   })
+
+  /**
+   * The whole lookup against a wallet that cannot reach the server at all, which is the
+   * shape degraded connectivity takes: under SDK 0.23 a sync also waits for an exit-chain
+   * collection pass, so there is more that can fail before local history is ever read.
+   *
+   * What matters is the answer it does not give. "not-found" is the only one that makes the
+   * send safe to try again, and a lookup that never read the history has not shown the
+   * payment absent. It stays bounded at the three looks rather than waiting on the wallet,
+   * and the error it met travels with it.
+   */
+  it("stays bounded and never reports a send absent when the wallet never catches up", async () => {
+    const offline = new Error("exit chain collection failed")
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockRejectedValue(offline)
+
+    const found = await settle(lookup())
+
+    expect(found).toEqual({ status: "unreadable", error: offline })
+    expect(mockSyncWallet).toHaveBeenCalledTimes(3)
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
 })
 
 describe("send telemetry", () => {

@@ -66,6 +66,27 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
     maxSlippageBps: MAX_SLIPPAGE_BPS,
   }
 
+  /**
+   * Collect what is needed to exit a payment without the Spark operators as funds arrive,
+   * which is the SDK's own default and what the recovery backup exports: a leaf whose chain
+   * was never collected cannot be exited until the operators are reachable again, which is
+   * the moment the backup exists for. Set here rather than inherited because the cost is
+   * real and belongs on the record: a sync waits for a collection pass, so every wallet
+   * sync is as slow as the slowest pass, and the lost-send lookup syncs before each of its
+   * looks before it will read local history.
+   */
+  config.exitChainAutoFetchEnabled = true
+
+  /**
+   * No instant (0-conf) deposit claim. The field caps the provider's spread on crediting a
+   * deposit before it confirms, and while it is unset no such claim is attempted; a deposit
+   * is credited once it matures, under `maxDepositClaimFee`. Left off because the spread is
+   * a cost the user is never shown, and turning it on is a product decision rather than a
+   * side effect of a dependency bump. Pinned rather than inherited so a future SDK default
+   * cannot switch it on for us.
+   */
+  config.maxInstantDepositClaimFeeBps = undefined
+
   return config
 }
 
