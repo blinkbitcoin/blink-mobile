@@ -1,4 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react"
+import { AppState, AppStateStatus } from "react-native"
 import remoteConfigInstance from "@react-native-firebase/remote-config"
 
 import {
@@ -8,6 +9,7 @@ import {
 } from "@app/custodial/two-factor-enforcement"
 import { useLevel } from "@app/graphql/level-context"
 import { useAppConfig } from "@app/hooks/use-app-config"
+import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
 import { logSelfCustodialRolloutExposed } from "@app/self-custodial/analytics"
 import {
@@ -22,6 +24,7 @@ import {
   getRemoteConfigStringList,
   serializeRemoteConfigDefault,
 } from "@app/utils/remote-config"
+import { withTimeout } from "@app/utils/with-timeout"
 
 const DeviceAccountEnabledKey = "deviceAccountEnabledRestAuth"
 const BalanceLimitToTriggerUpgradeModalKey = "balanceLimitToTriggerUpgradeModal"
@@ -90,12 +93,15 @@ export type FeeRatesConfig = {
 
 type FeatureFlags = {
   deviceAccountEnabled: boolean
+  /** The raw value, on by default so onboarding can offer self-custodial before the
+   *  console answers. A kill switch reads it together with `isNonCustodialFlagSettled`,
+   *  or it stays open on every device the console never reached. */
   nonCustodialEnabled: boolean
   stableBalanceEnabled: boolean
   remoteConfigReady: boolean
-  /** Whether `nonCustodialEnabled` is the console's: fetched on this launch, or
-   *  activated on an earlier one and read before this launch's fetch settles. Off, it is
-   *  the shipped default, which says nothing about what the console set. */
+  /** Whether `nonCustodialEnabled` holds a value the console set, fetched on this launch
+   *  or activated on an earlier one. Off, it is the shipped default, which says nothing
+   *  about the console: the fetch failed, or the console left the flag unset. */
   isNonCustodialFlagSettled: boolean
 }
 
@@ -263,7 +269,11 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  The less intrusive home-screen nudge banner takes over in the meantime, so the
    *  warning never disappears entirely (#4156). */
   backupNudgeModalCooldownMs: 24 * 60 * 60 * 1000,
-  nonCustodialEnabled: false,
+  /** Shipped on, because a first launch that cannot reach Firebase reads this value and
+   *  nothing else: off, it left a new install with custodial signup alone, which many
+   *  regions refuse. The console can still turn it off on every device that fetches, and
+   *  a failed fetch keeps retrying until one does. */
+  nonCustodialEnabled: true,
   stableBalanceEnabled: false,
   /** Kill switch for the map's merchant data, which comes from BTC Map — a third
    *  party we do not control. If the feed starts serving something harmful or
@@ -350,6 +360,63 @@ const defaultsApplied = Promise.resolve(
  *  with what an earlier launch activated: what waits on the fetch, as the two-factor
  *  tiers do, must not wait out Firebase's own minute on a weak connection. */
 const FETCH_TIMEOUT_MS = 10_000
+
+/** The waits between asks while the console has never answered: twice the last each time
+ *  up to a minute, for about a quarter of an hour of waiting, so a network that never lets
+ *  Firebase through does not wake the radio every minute for as long as the app lives. A
+ *  server that answers with errors is already held off by the SDK's own backoff, which
+ *  refuses the fetch on the device until it ends. */
+const FETCH_RETRY_DELAYS_MS: readonly number[] = [
+  2_000,
+  4_000,
+  8_000,
+  16_000,
+  32_000,
+  ...Array<number>(14).fill(60_000),
+]
+
+/** How long a settled fetch waits for the shipped defaults. Until they land Firebase
+ *  reports every key as static, values an earlier launch activated included, so a read
+ *  before them shows the bare defaults; a native call that never answers must still not
+ *  hold the app on a blank screen. */
+const DEFAULTS_WAIT_MS = 1_000
+
+/** Whether a fetch ever landed, on this launch or an earlier one. Firebase keeps -1 until
+ *  a native call hands over the time of the last one, which a wait for the defaults that
+ *  ran out may not have seen yet, so it is read again whenever it decides anything. */
+const hasEverFetched = (): boolean => remoteConfigInstance().fetchTimeMillis > 0
+
+const waitForShippedDefaults = (): Promise<void> =>
+  withTimeout(defaultsApplied, DEFAULTS_WAIT_MS, "setDefaults").then(
+    () => undefined,
+    () => undefined,
+  )
+
+/** Asks for the console's values and activates them, true once they landed. Only the
+ *  launch's first failure is reported: every report also leaves a Crashlytics breadcrumb,
+ *  and a retry every minute would bury the ones that lead up to a real crash. A call that
+ *  throws before it hands back a promise fails the same way, or the first launch would
+ *  never mark the config ready and would stay on an empty screen. */
+const fetchConsoleConfig = async ({
+  isReported,
+}: {
+  isReported: boolean
+}): Promise<boolean> => {
+  try {
+    await remoteConfigInstance().fetchAndActivate()
+    return true
+  } catch (err) {
+    if (isReported) {
+      logError({
+        scope: "remote-config",
+        error: err,
+        context: { stage: "fetchAndActivate" },
+        dedupKey: "remote-config-fetch",
+      })
+    }
+    return false
+  }
+}
 
 remoteConfigInstance().setConfigSettings({
   minimumFetchIntervalMillis: 0,
@@ -536,10 +603,12 @@ const readRemoteConfig = (): RemoteConfig => {
       ? remoteBackupNudgeModalCooldownMs
       : defaultRemoteConfig.backupNudgeModalCooldownMs
 
-  const nonCustodialEnabled = readBoolean(
-    NonCustodialEnabledKey,
-    defaultRemoteConfig.nonCustodialEnabled,
-  )
+  /** The console's value or this build's default, never a default an earlier build left
+   *  on disk: Android serves those until this build's own land, and earlier builds shipped
+   *  it off, which is the custodial-only onboarding this default exists to prevent. */
+  const nonCustodialEnabled = isFromConsole(NonCustodialEnabledKey)
+    ? readBoolean(NonCustodialEnabledKey, defaultRemoteConfig.nonCustodialEnabled)
+    : defaultRemoteConfig.nonCustodialEnabled
 
   const stableBalanceEnabled = readBoolean(
     StableBalanceEnabledKey,
@@ -711,8 +780,8 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
   const [remoteConfigReady, setRemoteConfigReady] = useState(false)
   /** Whether `nonCustodialEnabled` is the console's: activated on an earlier launch,
    *  which cannot change before this launch's fetch settles and is readable once the
-   *  shipped defaults land, or by that fetch. A fetch that fails with nothing activated
-   *  before leaves the shipped default, which says nothing about the console. */
+   *  shipped defaults land, or by that fetch. Anything else is the shipped default, which
+   *  says nothing about the console: the fetch failed, or the console left it unset. */
   const [isNonCustodialFlagSettled, setIsNonCustodialFlagSettled] = useState(() =>
     isFromConsole(NonCustodialEnabledKey),
   )
@@ -722,6 +791,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     appConfig: { galoyInstance },
   } = useAppConfig()
   const hasCustodialAccount = useHasCustodialAccount()
+  const { schedule: scheduleFetchRetry } = useBackoffRetry(FETCH_RETRY_DELAYS_MS)
 
   /** Read again whether or not the fetch lands: a fetch that fails, offline, still
    *  leaves Firebase holding what the device activated on an earlier launch, which the
@@ -735,7 +805,7 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
       .then(() => {
         if (!isMounted) return
         setRemoteConfig(readRemoteConfig())
-        if (isFromConsole(NonCustodialEnabledKey)) setIsNonCustodialFlagSettled(true)
+        setIsNonCustodialFlagSettled(isFromConsole(NonCustodialEnabledKey))
       })
       .catch((err) =>
         logError({
@@ -749,32 +819,97 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [])
 
+  /** Asks the console once per launch, and again while it has never answered: the shipped
+   *  defaults are all a first launch offline has, until the app restarts or a retry lands. */
   useEffect(() => {
-    ;(async () => {
-      try {
-        await remoteConfigInstance().fetchAndActivate()
-        setIsNonCustodialFlagSettled(true)
-      } catch (err) {
-        logError({
-          scope: "remote-config",
-          error: err,
-          context: { stage: "fetchAndActivate" },
-          dedupKey: "remote-config-fetch",
-        })
-      } finally {
-        setRemoteConfig(readRemoteConfig())
+    let isMounted = true
+    let hasFetched = false
+    let isFetching = false
+    let isAwaitingConsole = false
+
+    /** The values and the flag that vouches for them are read together, so one never
+     *  runs ahead of the other. */
+    const readConsoleConfig = () => {
+      setRemoteConfig(readRemoteConfig())
+      setIsNonCustodialFlagSettled(isFromConsole(NonCustodialEnabledKey))
+    }
+
+    const fetchConfig = async () => {
+      const isFirstFetch = !hasFetched
+      hasFetched = true
+      isFetching = true
+      const [isFetched] = await Promise.all([
+        fetchConsoleConfig({ isReported: isFirstFetch }),
+        waitForShippedDefaults(),
+      ])
+      isFetching = false
+      if (!isMounted) return
+
+      /** A failed retry activated nothing, and a new object would re-render the whole tree
+       *  to show the same values. */
+      const shouldReadConfig = isFetched || isFirstFetch
+      if (shouldReadConfig) {
+        readConsoleConfig()
         setRemoteConfigReady(true)
-        if (isFromConsole(NonCustodialEnabledKey)) setIsNonCustodialFlagSettled(true)
       }
-    })()
-  }, [])
+
+      /** Only a device that has never fetched keeps asking. One that fetched on an earlier
+       *  launch already runs on the console's values, and swapping them mid-session would
+       *  move the ground under decisions already made from them. */
+      isAwaitingConsole = !isFetched && !hasEverFetched()
+      if (isAwaitingConsole) scheduleFetchRetry(fetchIfStillAwaiting)
+    }
+
+    /** One ask at a time, and none once the console has answered: both a retry timer and a
+     *  return to the app ask through here, and either may find the other already done. An
+     *  earlier launch's fetch that only became readable after the first read means the
+     *  console did answer, so its values are read rather than asked for. */
+    const fetchIfStillAwaiting = () => {
+      if (!isAwaitingConsole) return
+      if (hasEverFetched()) {
+        isAwaitingConsole = false
+        readConsoleConfig()
+        return
+      }
+      if (!isFetching) fetchConfig()
+    }
+
+    /** Back from the background the user may have just fixed the connection, and the
+     *  retries may have run out while the app was away, so a device still waiting asks at
+     *  once. It asks once without restarting the waits: Android reports the background
+     *  for every screen laid over the app, as the camera or the share sheet, and an
+     *  inactive moment, as an unlock prompt, does not count at all. */
+    let appState = AppState.currentState
+    const fetchOnReturn = (nextAppState: AppStateStatus) => {
+      const isInactiveMoment = nextAppState === "inactive"
+      if (isInactiveMoment) return
+      const wasInBackground = appState === "background"
+      const isNowActive = nextAppState === "active"
+      appState = nextAppState
+      const isReturningFromBackground = wasInBackground && isNowActive
+      if (isReturningFromBackground) fetchIfStillAwaiting()
+    }
+
+    fetchConfig()
+    const subscription = AppState.addEventListener("change", fetchOnReturn)
+    return () => {
+      isMounted = false
+      subscription.remove()
+    }
+  }, [scheduleFetchRetry])
+
+  /** The console's word, not the shipped default: the default turns self-custodial on so a
+   *  first launch can offer it, but what builds on it must still go dark when the console
+   *  turns it off on a device whose fetch never landed. */
+  const isNonCustodialEnabledByConsole =
+    isNonCustodialFlagSettled && remoteConfig.nonCustodialEnabled
 
   const featureFlags: FeatureFlags = {
     deviceAccountEnabled:
       remoteConfig.deviceAccountEnabledRestAuth || galoyInstance.id === "Local",
     nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
     stableBalanceEnabled:
-      remoteConfig.nonCustodialEnabled && remoteConfig.stableBalanceEnabled,
+      isNonCustodialEnabledByConsole && remoteConfig.stableBalanceEnabled,
     remoteConfigReady,
     isNonCustodialFlagSettled,
   }
