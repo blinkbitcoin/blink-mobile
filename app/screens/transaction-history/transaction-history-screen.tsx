@@ -625,6 +625,7 @@ export const TransactionHistoryScreen: React.FC<TransactionHistoryScreenProps> =
           balanceSecondary={walletSummary.balanceSecondary}
           balanceHidden={hideAmount}
           onSwitch={nextWallet ? () => setSelectedWallet(nextWallet) : undefined}
+          switchTo={nextWallet}
         />
       </Animated.View>
     </View>

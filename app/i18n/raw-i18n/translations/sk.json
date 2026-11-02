@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Nastaviť sumu"
   },
+  "Accessibility": {
+    "switchToWallet": "Prepnúť na {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Potrebujem aktualizovať aplikáciu na najnovšiu verziu. Používam aplikáciu {os: string} s verziou {version: string}.",
     "versionNotSupported": "Táto mobilná verzia už nie je podporovaná",

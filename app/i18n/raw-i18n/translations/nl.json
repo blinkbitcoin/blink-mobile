@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Stel bedrag in"
   },
+  "Accessibility": {
+    "switchToWallet": "Overschakelen naar {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ik moet mijn app bijwerken naar de nieuwste versie. Ik gebruik de app {os: string} met versie {version: string}.",
     "versionNotSupported": "Deze mobiele versie wordt niet meer ondersteund",

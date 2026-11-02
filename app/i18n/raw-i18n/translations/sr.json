@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "switchToWallet": "Пребаци на {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Морам да ажурирам апликацију на најновију верзију. Користим {os: string} апликацију са верзијом {version: string}.",
     "versionNotSupported": "Ова верзија мобилне апликације више није подржана",

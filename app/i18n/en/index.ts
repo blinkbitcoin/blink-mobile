@@ -3264,6 +3264,9 @@ const en: BaseTranslation = {
   AmountInputButton: {
     tapToSetAmount: "Set amount",
   },
+  Accessibility: {
+    switchToWallet: "Switch to {wallet: string}",
+  },
   AppUpdate: {
     needToUpdateSupportMessage:
       "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",

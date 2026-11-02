@@ -10403,6 +10403,13 @@ type RootTranslation = {
 		 */
 		tapToSetAmount: string
 	}
+	Accessibility: {
+		/**
+		 * S​w​i​t​c​h​ ​t​o​ ​{​w​a​l​l​e​t​}
+		 * @param {string} wallet
+		 */
+		switchToWallet: RequiredParams<'wallet'>
+	}
 	AppUpdate: {
 		/**
 		 * I​ ​n​e​e​d​ ​t​o​ ​u​p​d​a​t​e​ ​m​y​ ​a​p​p​ ​t​o​ ​t​h​e​ ​l​a​t​e​s​t​ ​v​e​r​s​i​o​n​.​ ​I​'​m​ ​u​s​i​n​g​ ​t​h​e​ ​{​o​s​}​ ​a​p​p​ ​w​i​t​h​ ​v​e​r​s​i​o​n​ ​{​v​e​r​s​i​o​n​}​.
@@ -24600,6 +24607,12 @@ export type TranslationFunctions = {
 		 * Set amount
 		 */
 		tapToSetAmount: () => LocalizedString
+	}
+	Accessibility: {
+		/**
+		 * Switch to {wallet}
+		 */
+		switchToWallet: (arg: { wallet: string }) => LocalizedString
 	}
 	AppUpdate: {
 		/**

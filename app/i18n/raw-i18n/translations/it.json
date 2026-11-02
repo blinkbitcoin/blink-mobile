@@ -3110,6 +3110,9 @@
     "AmountInputButton": {
         "tapToSetAmount": "Imposta importo"
     },
+    "Accessibility": {
+        "switchToWallet": "Passa a {wallet: string}"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "Devo aggiornare la mia app all'ultima versione. Sto usando l'app {os: string} con la versione {version: string}.",
         "versionNotSupported": "Questa versione mobile non è più supportata",

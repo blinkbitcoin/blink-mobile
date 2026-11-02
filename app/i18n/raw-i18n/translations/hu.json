@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Összeg beállítása"
   },
+  "Accessibility": {
+    "switchToWallet": "Váltás erre: {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Frissítenem kell az alkalmazásomat a legújabb verzióra. A(z) {os: string} alkalmazást használom, verziószáma: {version: string}.",
     "versionNotSupported": "Ez a mobil verzió már nem támogatott",

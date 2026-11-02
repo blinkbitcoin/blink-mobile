@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "switchToWallet": "{wallet: string}-man tikray"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Kaypiyta yachayninta munanichu, hamut'a kachun {os: string} app qallarichkanmi, versiyonqa {version: string} nisqan.",
     "versionNotSupported": "Kay warmi versiónqa kanmanmi kaypiyta munanki",

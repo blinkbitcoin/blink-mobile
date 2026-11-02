@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Set amount"
   },
+  "Accessibility": {
+    "switchToWallet": "Անցնել {wallet: string}-ին"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ես պետք է թարմացնել հավելվածը։ Ես օգտագործում եմ {os: string} հավելվածը {version: string} տարբերակով։ ",
     "versionNotSupported": "Բջջային տարբերակն այլևս չի աջակցվում։ ",

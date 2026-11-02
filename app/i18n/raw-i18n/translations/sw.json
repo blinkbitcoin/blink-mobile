@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Weka kiasi"
   },
+  "Accessibility": {
+    "switchToWallet": "Badilisha kwenda {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Ninahitaji kusasisha programu yangu hadi toleo jipya zaidi. Ninatumia programu ya {os: string} yenye toleo la {version: string}.",
     "versionNotSupported": "Toleo hili la simu ya mkononi halitumiki tena",

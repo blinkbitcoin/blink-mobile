@@ -3110,6 +3110,9 @@
     "AmountInputButton": {
         "tapToSetAmount": "金額を設定する"
     },
+    "Accessibility": {
+        "switchToWallet": "{wallet: string} に切り替える"
+    },
     "AppUpdate": {
         "needToUpdateSupportMessage": "I need to update my app to the latest version. I'm using the {os: string} app with version {version: string}.",
         "versionNotSupported": "このモバイル版のサポートは終了しました",

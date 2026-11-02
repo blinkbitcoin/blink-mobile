@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Setați suma"
   },
+  "Accessibility": {
+    "switchToWallet": "Treci la {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Trebuie să-mi actualizez aplicația la cea mai recentă versiune. Folosesc aplicația {os: string} cu versiunea {version: string}.",
     "versionNotSupported": "Această versiune mobilă nu mai este acceptată",

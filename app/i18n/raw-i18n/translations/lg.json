@@ -3110,6 +3110,9 @@
   "AmountInputButton": {
     "tapToSetAmount": "Teekawo omuwendo"
   },
+  "Accessibility": {
+    "switchToWallet": "Kyusa ku {wallet: string}"
+  },
   "AppUpdate": {
     "needToUpdateSupportMessage": "Nneetaaga okukyuusa app yange okutuuka ku nkyusa eyasembyeyo. Ndi mukozesa {os: string} eya app n'e nkyusa eya {version: string}.",
     "versionNotSupported": "Enkyusa eno ey'oku ssimu tekyawagiddwa",

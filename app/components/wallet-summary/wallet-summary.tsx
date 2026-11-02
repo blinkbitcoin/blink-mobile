@@ -32,6 +32,9 @@ export type WalletSummaryProps = {
   /** Absent when there is no other wallet to switch to (the region withholds the dollar
    *  wallet), which leaves the summary as a plain read-out on the active surface. */
   onSwitch?: () => void
+  /** The wallet a tap selects. A screen reader hears "Switch to" it instead of the card's
+   *  balance. */
+  switchTo?: WalletSwitchValue
   /** A settled read-out rather than a control: the static grey7 surface, and no swap icon
    *  at all (rather than the reserved space an unavailable switch keeps). */
   inactive?: boolean
@@ -49,6 +52,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
   balanceSecondary,
   hasError = false,
   onSwitch,
+  switchTo,
   inactive = false,
   balanceHidden = false,
 }) => {
@@ -76,12 +80,18 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
     [progress],
   )
 
-  const walletName =
-    currency === WalletCurrency.Btc
+  const walletNameOf = (value: WalletSwitchValue) =>
+    value === WalletCurrency.Btc
       ? LL.common.bitcoin()
-      : currency === WalletCurrency.Usd
+      : value === WalletCurrency.Usd
         ? LL.common.dollar()
         : LL.common.allAccounts()
+
+  // Read by the wallet, never the balance: a switch says what a tap selects.
+  const accessibilityLabel =
+    onSwitch && switchTo
+      ? LL.Accessibility.switchToWallet({ wallet: walletNameOf(switchTo) })
+      : walletNameOf(currency)
 
   return (
     <Pressable
@@ -95,7 +105,7 @@ export const WalletSummary: React.FC<WalletSummaryProps> = ({
       onPress={onSwitch}
       disabled={!onSwitch}
       accessibilityRole={onSwitch ? "button" : undefined}
-      accessibilityLabel={balanceHidden ? walletName : `${walletName}, ${balancePrimary}`}
+      accessibilityLabel={accessibilityLabel}
     >
       <View style={styles.balances}>
         {/* An invisible two-line copy sets the height, so the card is the same size with or
