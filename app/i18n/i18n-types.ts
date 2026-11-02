@@ -203,6 +203,26 @@ type RootTranslation = {
 		 * A​r​e​ ​y​o​u​ ​s​u​r​e​ ​y​o​u​'​d​ ​l​i​k​e​ ​t​o​ ​l​o​g​ ​o​u​t​?​ ​T​h​i​s​ ​w​i​l​l​ ​r​e​s​e​t​ ​y​o​u​r​ ​c​a​c​h​e​ ​a​n​d​ ​a​l​l​ ​l​o​c​a​l​ ​u​s​e​r​ ​s​e​t​t​i​n​g​s
 		 */
 		confirmLogout: string
+		/**
+		 * F​o​r​g​o​t​ ​P​I​N​?​ ​R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		forgotPin: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​?
+		 */
+		removeWalletsTitle: string
+		/**
+		 * T​h​i​s​ ​r​e​m​o​v​e​s​ ​a​l​l​ ​w​a​l​l​e​t​s​ ​f​r​o​m​ ​t​h​i​s​ ​d​e​v​i​c​e​ ​a​n​d​ ​l​o​g​s​ ​y​o​u​ ​o​u​t​.​ ​T​o​ ​g​e​t​ ​a​ ​w​a​l​l​e​t​ ​b​a​c​k​,​ ​y​o​u​ ​n​e​e​d​ ​i​t​s​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​.​ ​W​i​t​h​o​u​t​ ​i​t​,​ ​t​h​e​ ​w​a​l​l​e​t​ ​i​s​ ​l​o​s​t​.
+		 */
+		removeWalletsBody: string
+		/**
+		 * R​e​m​o​v​e​ ​w​a​l​l​e​t​s
+		 */
+		removeWalletsConfirm: string
+		/**
+		 * S​o​m​e​ ​w​a​l​l​e​t​s​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​r​e​m​o​v​e​d​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		removeWalletsFailed: string
 	}
 	PeopleScreen: {
 		/**
@@ -6793,6 +6813,19 @@ type RootTranslation = {
 	}
 	PinScreen: {
 		/**
+		 * T​o​o​ ​m​a​n​y​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​s​.
+		 */
+		attemptBudgetSpent: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.
+		 */
+		attemptUnrecorded: string
+		/**
+		 * {​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
+		 * @param {number} attemptsRemaining
+		 */
+		attemptsLeft: RequiredParams<'attemptsRemaining'>
+		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​{​a​t​t​e​m​p​t​s​R​e​m​a​i​n​i​n​g​}​ ​a​t​t​e​m​p​t​s​ ​r​e​m​a​i​n​i​n​g​.
 		 * @param {number} attemptsRemaining
 		 */
@@ -6802,9 +6835,9 @@ type RootTranslation = {
 		 */
 		enterPin: string
 		/**
-		 * C​o​u​l​d​n​'​t​ ​r​e​c​o​r​d​ ​t​h​e​ ​f​a​i​l​e​d​ ​a​t​t​e​m​p​t​ ​s​e​c​u​r​e​l​y​.​ ​L​o​g​g​i​n​g​ ​o​u​t​.
+		 * 1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
-		lockoutUnavailable: string
+		oneAttemptLeft: string
 		/**
 		 * I​n​c​o​r​r​e​c​t​ ​P​I​N​.​ ​1​ ​a​t​t​e​m​p​t​ ​r​e​m​a​i​n​i​n​g​.
 		 */
@@ -6830,10 +6863,10 @@ type RootTranslation = {
 		 */
 		tooManyAttempts: string
 		/**
-		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​s​e​c​o​n​d​s​}​s​.
-		 * @param {number} seconds
+		 * T​r​y​ ​a​g​a​i​n​ ​i​n​ ​{​t​i​m​e​}​.
+		 * @param {string} time
 		 */
-		tryAgainIn: RequiredParams<'seconds'>
+		tryAgainIn: RequiredParams<'time'>
 		/**
 		 * V​e​r​i​f​y​ ​y​o​u​r​ ​P​I​N​ ​c​o​d​e
 		 */
@@ -7961,6 +7994,14 @@ type RootTranslation = {
 		 * C​o​u​l​d​ ​n​o​t​ ​l​o​a​d​ ​y​o​u​r​ ​A​P​I​ ​k​e​y​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​ ​l​a​t​e​r​.
 		 */
 		loadError: string
+		/**
+		 * D​i​s​c​a​r​d​ ​t​h​i​s​ ​A​P​I​ ​k​e​y​?
+		 */
+		discardSecretTitle: string
+		/**
+		 * T​h​i​s​ ​i​s​ ​t​h​e​ ​o​n​l​y​ ​t​i​m​e​ ​t​h​e​ ​s​e​c​r​e​t​ ​i​s​ ​s​h​o​w​n​.​ ​I​f​ ​y​o​u​ ​l​e​a​v​e​ ​n​o​w​,​ ​t​h​e​ ​k​e​y​ ​c​a​n​n​o​t​ ​b​e​ ​r​e​c​o​v​e​r​e​d​ ​a​n​d​ ​y​o​u​ ​w​i​l​l​ ​n​e​e​d​ ​t​o​ ​c​r​e​a​t​e​ ​a​ ​n​e​w​ ​o​n​e​.
+		 */
+		discardSecretBody: string
 		/**
 		 * D​o​n​e
 		 */
@@ -10134,6 +10175,10 @@ type RootTranslation = {
 		 * C​l​e​a​r​ ​A​p​p​ ​D​a​t​a​ ​a​n​d​ ​L​o​g​o​u​t
 		 */
 		clearAppData: string
+		/**
+		 * T​h​i​s​ ​s​c​r​e​e​n​ ​s​t​a​y​s​ ​h​i​d​d​e​n​ ​b​e​c​a​u​s​e​ ​s​c​r​e​e​n​s​h​o​t​ ​p​r​o​t​e​c​t​i​o​n​ ​c​o​u​l​d​ ​n​o​t​ ​b​e​ ​t​u​r​n​e​d​ ​o​n​.
+		 */
+		screenSecurityUnavailable: string
 	}
 	notifications: {
 		payment: {
@@ -14450,6 +14495,26 @@ export type TranslationFunctions = {
 		 * Are you sure you'd like to log out? This will reset your cache and all local user settings
 		 */
 		confirmLogout: () => LocalizedString
+		/**
+		 * Forgot PIN? Remove wallets
+		 */
+		forgotPin: () => LocalizedString
+		/**
+		 * Remove wallets from this device?
+		 */
+		removeWalletsTitle: () => LocalizedString
+		/**
+		 * This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.
+		 */
+		removeWalletsBody: () => LocalizedString
+		/**
+		 * Remove wallets
+		 */
+		removeWalletsConfirm: () => LocalizedString
+		/**
+		 * Some wallets could not be removed. Please try again.
+		 */
+		removeWalletsFailed: () => LocalizedString
 	}
 	PeopleScreen: {
 		/**
@@ -21027,6 +21092,18 @@ export type TranslationFunctions = {
 	}
 	PinScreen: {
 		/**
+		 * Too many failed attempts.
+		 */
+		attemptBudgetSpent: () => LocalizedString
+		/**
+		 * Couldn't record the attempt securely.
+		 */
+		attemptUnrecorded: () => LocalizedString
+		/**
+		 * {attemptsRemaining} attempts remaining.
+		 */
+		attemptsLeft: (arg: { attemptsRemaining: number }) => LocalizedString
+		/**
 		 * Incorrect PIN. {attemptsRemaining} attempts remaining.
 		 */
 		attemptsRemaining: (arg: { attemptsRemaining: number }) => LocalizedString
@@ -21035,9 +21112,9 @@ export type TranslationFunctions = {
 		 */
 		enterPin: () => LocalizedString
 		/**
-		 * Couldn't record the failed attempt securely. Logging out.
+		 * 1 attempt remaining.
 		 */
-		lockoutUnavailable: () => LocalizedString
+		oneAttemptLeft: () => LocalizedString
 		/**
 		 * Incorrect PIN. 1 attempt remaining.
 		 */
@@ -21063,9 +21140,9 @@ export type TranslationFunctions = {
 		 */
 		tooManyAttempts: () => LocalizedString
 		/**
-		 * Try again in {seconds}s.
+		 * Try again in {time}.
 		 */
-		tryAgainIn: (arg: { seconds: number }) => LocalizedString
+		tryAgainIn: (arg: { time: string }) => LocalizedString
 		/**
 		 * Verify your PIN code
 		 */
@@ -22142,6 +22219,14 @@ export type TranslationFunctions = {
 		 * Could not load your API keys. Please try again later.
 		 */
 		loadError: () => LocalizedString
+		/**
+		 * Discard this API key?
+		 */
+		discardSecretTitle: () => LocalizedString
+		/**
+		 * This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.
+		 */
+		discardSecretBody: () => LocalizedString
 		/**
 		 * Done
 		 */
@@ -24271,6 +24356,10 @@ export type TranslationFunctions = {
 		 * Clear App Data and Logout
 		 */
 		clearAppData: () => LocalizedString
+		/**
+		 * This screen stays hidden because screenshot protection could not be turned on.
+		 */
+		screenSecurityUnavailable: () => LocalizedString
 	}
 	notifications: {
 		payment: {
