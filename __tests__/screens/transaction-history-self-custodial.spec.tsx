@@ -46,11 +46,6 @@ jest.mock("@app/components/screen", () => ({
     React.createElement("View", { testID: "screen" }, children),
 }))
 
-jest.mock("@app/components/wallet-filter-dropdown", () => ({
-  WalletFilterDropdown: () =>
-    React.createElement("View", { testID: "wallet-filter-dropdown" }),
-}))
-
 jest.mock("@app/components/transaction-item", () => ({
   MemoizedTransactionItem: () => null,
   useDescriptionDisplay: () => "",
@@ -62,9 +57,10 @@ jest.mock("@app/screens/transaction-history/transaction-history-skeleton", () =>
 }))
 
 const mockNavigate = jest.fn()
+const mockSetOptions = jest.fn()
 jest.mock("@react-navigation/native", () => ({
   ...jest.requireActual("@react-navigation/native"),
-  useNavigation: () => ({ navigate: mockNavigate }),
+  useNavigation: () => ({ navigate: mockNavigate, setOptions: mockSetOptions }),
 }))
 
 const mockRefetch = jest.fn()
@@ -172,6 +168,29 @@ jest.mock("@app/hooks", () => ({
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => ({ feeReimbursementMemo: "" }),
 }))
+
+jest.mock("@app/components/wallet-summary", () => {
+  const { Pressable } = jest.requireActual("react-native")
+  return {
+    SEND_WALLET_SUMMARY_TEST_ID: "choose-wallet-to-send-from",
+    WalletSummary: ({ onSwitch }: { onSwitch?: () => void }) => (
+      <Pressable testID="choose-wallet-to-send-from" onPress={onSwitch} />
+    ),
+  }
+})
+
+// The wallet card's balances come through the send wallets and the dollar-balance gate, which
+// these behaviour tests don't exercise. A fixed All → Bitcoin → Dollar cycle stands in.
+jest.mock("@app/screens/transaction-history/use-history-wallet-summary", () => {
+  const next = { ALL: "BTC", BTC: "USD", USD: "ALL" } as const
+  return {
+    useHistoryWalletSummary: (selected: keyof typeof next) => ({
+      wallet: selected,
+      balancePrimary: "0 SAT",
+      nextWallet: next[selected],
+    }),
+  }
+})
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
