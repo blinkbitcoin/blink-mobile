@@ -2257,9 +2257,9 @@
         "lightningInvoice": "Facture lightning",
         "bitcoinOnchain": "Bitcoin onchain",
         "depositFee": "Frais de dépôt : {fee} SAT pour les montants inférieurs à {threshold} SAT ou {overFee} SAT pour les dépôts supérieurs à {threshold} SAT",
-        "depositFeeTiers": "Frais de dépôt : {tiers: string}",
+        "depositFeeTiers": "Frais de dépôt : {tiers: string}",
         "depositFeeTierUpTo": "{fee: string} SAT jusqu'à {max: string} SAT",
-        "depositFeeTierAbove": "{fee: string} SAT au-delà de {min: string} SAT",
+        "depositFeeTierAbove": "{fee: string} SAT au-dessus de {min: string} SAT",
         "autoConvertMinAmount": "Les montants inférieurs à {minSats: number} sats / {minFiat: string} ne peuvent pas être convertis en Dollar automatiquement. Vous recevrez des Bitcoins.",
         "autoConvertFailed": "Paiement reçu mais la conversion a échoué.",
         "pleaseWaitForConversion": "Veuillez patienter jusqu'à ce que la conversion soit terminée"
@@ -4010,9 +4010,9 @@
     "ChooseExperienceScreen": {
         "title": "Sélectionnez le mode sans garde",
         "subtitle": "Votre choix détermine les fonctionnalités disponibles. Vous pouvez changer quand vous voulez.",
-        "enhancedLabel": "Enhanced\nMode",
+        "enhancedLabel": "Mode\nEnhanced",
         "enhancedDescription": "Nous utilisons votre région pour débloquer des services utiles disponibles là où vous êtes.",
-        "anonLabel": "Incognito\nMode",
+        "anonLabel": "Mode\nIncognito",
         "anonDescription": "Pour une confidentialité maximale. Moins de fonctionnalités.",
         "continueButton": "Continuer"
     },
@@ -4059,8 +4059,8 @@
     },
     "BackupRequired": {
         "modalTitle": "Sauvegardez d'abord votre portefeuille",
-        "modalDescription": "Votre adresse Lightning est liée de façon permanente à ce portefeuille. Notez d'abord votre phrase de sauvegarde pour ne jamais perdre l'accès à votre adresse et à vos fonds.",
-        "backupNow": "Back up wallet"
+        "modalDescription": "Votre adresse Lightning est liée de façon permanente à ce portefeuille. Sauvegardez d'abord votre phrase de sauvegarde, pour ne jamais perdre l'accès à votre adresse et à vos fonds.",
+        "backupNow": "Sauvegarder le portefeuille"
     },
     "NonCustodialInfoBulletin": {
         "title": "Ceci est un compte non-custodial",
