@@ -344,9 +344,9 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     },
   })
 
-  /** A payment the SDK handed back. Only a completed one is sent; one still in flight, or
-   *  with no status, is pending. Telemetry waits for the SDK's word on how it ended,
-   *  reported as the attempt that paid it began. */
+  /** A payment the SDK handed back: sent once completed, pending while still in flight.
+   *  Telemetry waits for the SDK's word on how it ended, reported as the attempt that
+   *  paid it began. */
   const dispatchedOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,

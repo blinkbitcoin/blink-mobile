@@ -1398,7 +1398,7 @@ describe("send telemetry", () => {
 
     const result = await sendBolt11()
 
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Pending)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
 
     observe(COMPLETED)
@@ -1508,12 +1508,12 @@ describe("send telemetry", () => {
     },
   )
 
-  it("still reports the send itself as sent when the SDK returns no payment", async () => {
+  it("reports the send as pending when the SDK returns no payment", async () => {
     mockSendPayment.mockResolvedValue(undefined)
 
     const result = await sendBolt11()
 
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Pending)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 })
