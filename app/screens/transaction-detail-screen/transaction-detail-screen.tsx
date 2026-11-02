@@ -286,6 +286,20 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
         <View style={[styles.outerContainer, { paddingBottom: insets.bottom }]}>
           <View style={[styles.amountDetailsContainer, { paddingTop: insets.top }]}>
             <View accessible={false} style={styles.closeIconContainer}>
+              <Pressable
+                {...testProps("transaction-detail-back")}
+                style={styles.backButton}
+                onPress={navigation.goBack}
+                accessibilityRole="button"
+                accessibilityLabel={LL.common.back()}
+              >
+                <GaloyIcon
+                  name="arrow-left"
+                  size={24}
+                  weight="bold"
+                  color={colors.black}
+                />
+              </Pressable>
               <GaloyIconButton
                 name="close"
                 onPress={navigation.goBack}
@@ -720,6 +734,17 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
           />
         )}
 
+        {/* Centred on the close button. */}
+        <Pressable
+          {...testProps("transaction-detail-back")}
+          style={[styles.backButton, styles.backButtonFloating, { top: insets.top + 8 }]}
+          onPress={navigation.goBack}
+          accessibilityRole="button"
+          accessibilityLabel={LL.common.back()}
+        >
+          <GaloyIcon name="arrow-left" size={24} weight="bold" color={colors.black} />
+        </Pressable>
+
         <View style={[styles.closeButton, { top: insets.top + 14 }]}>
           <GaloyIconButton
             name="close"
@@ -736,13 +761,27 @@ export const TransactionDetailScreen: React.FC<Props> = ({ route }) => {
 const useStyles = makeStyles(({ colors }) => ({
   closeIconContainer: {
     flexDirection: "row",
-    justifyContent: "flex-end",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingRight: 10,
+  },
+
+  /** Figma header `icon-left`: arrow-back with 11/12/11/14 padding. */
+  backButton: {
+    paddingTop: 11,
+    paddingRight: 12,
+    paddingBottom: 11,
+    paddingLeft: 14,
   },
 
   closeButton: {
     position: "absolute",
     right: 20,
+  },
+
+  backButtonFloating: {
+    position: "absolute",
+    left: 0,
   },
 
   outerContainer: {
