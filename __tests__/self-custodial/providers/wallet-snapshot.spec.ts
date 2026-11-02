@@ -351,6 +351,31 @@ describe("getSelfCustodialWalletSnapshot pagination preservation", () => {
     expect(snapshot.rawTransactionCount).toBe(25)
     expect(snapshot.hasMore).toBe(false)
   })
+
+  it("returns a payment once when shifted pages repeat it (regression)", async () => {
+    // A payment stored between the two reads pushes page 0's last row onto page 1, so
+    // the same id comes back twice. A repeated id reached the history list as a
+    // duplicate key and made rows vanish.
+    const sdk = createMockSdk()
+    sdk.listPayments
+      .mockResolvedValueOnce({
+        payments: Array.from({ length: 20 }, (_, i) => buildKnownPayment(`p-${i}`)),
+      })
+      .mockResolvedValueOnce({
+        payments: [buildKnownPayment("p-19"), buildKnownPayment("p-20")],
+      })
+
+    const snapshot = await getSelfCustodialWalletSnapshot(sdk as never, 40)
+
+    const ids = snapshot.allTransactions.map((tx) => tx.id)
+    expect(ids.filter((id) => id === "p-19")).toHaveLength(1)
+    expect(new Set(ids).size).toBe(ids.length)
+    expect(ids).toHaveLength(21)
+    const walletIds = snapshot.wallets.flatMap((wallet) =>
+      wallet.transactions.map((tx) => tx.id),
+    )
+    expect(new Set(walletIds).size).toBe(walletIds.length)
+  })
 })
 
 const buildTx = (
