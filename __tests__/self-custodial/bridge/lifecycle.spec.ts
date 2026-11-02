@@ -138,6 +138,31 @@ describe("initSdk", () => {
     expect(result).toBe(sdk)
   })
 
+  /**
+   * Both fields are the SDK's to default, and both are pinned here instead: the exit-chain
+   * pass is what the recovery backup needs collected, and the instant claim spends a spread
+   * the user never sees. The mock hands back the opposite of each so the assertion fails if
+   * the pin is dropped rather than passing on an inherited value.
+   */
+  it("pins the exit-chain collection and instant-claim policy over the SDK defaults", async () => {
+    mockDefaultConfig.mockReturnValueOnce({
+      exitChainAutoFetchEnabled: false,
+      maxInstantDepositClaimFeeBps: 100,
+    })
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.exitChainAutoFetchEnabled).toBe(true)
+    expect(config.maxInstantDepositClaimFeeBps).toBeUndefined()
+  })
+
   it("caps the automatic deposit claim fee at the network-recommended rate plus leeway", async () => {
     mockConnect.mockResolvedValue(makeSdk())
 
