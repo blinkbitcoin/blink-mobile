@@ -1,6 +1,6 @@
 import React from "react"
 
-import { render } from "@testing-library/react-native"
+import { fireEvent, render } from "@testing-library/react-native"
 
 import { WalletCurrency } from "@app/graphql/generated"
 import { TransactionDetailScreen } from "@app/screens/transaction-detail-screen/transaction-detail-screen"
@@ -43,8 +43,11 @@ jest.mock("@app/hooks", () =>
 jest.mock("@app/hooks/use-display-currency", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockDisplayCurrency(),
 )
+const mockGoBack = jest.fn()
 jest.mock("@react-navigation/native", () =>
-  jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
+  jest
+    .requireActual("../helpers/transaction-detail-mocks")
+    .mockNavigation({ getGoBack: () => mockGoBack }),
 )
 
 /** The screen reads the wallet history to tell whether the transaction being shown is the
@@ -256,5 +259,16 @@ describe("TransactionDetailScreen heading for a self-custodial wallet", () => {
       expect(heading?.props.children).toBe(copy)
       tree.unmount()
     })
+  })
+
+  it("offers a back arrow next to close that leaves the screen", () => {
+    const { tree } = renderHeading(toTransactionFragment(selfCustodialSend({})))
+
+    const back = tree.getByTestId("transaction-detail-back")
+    expect(back.props.accessibilityLabel).toBe("Back")
+    fireEvent.press(back)
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
+    tree.unmount()
   })
 })

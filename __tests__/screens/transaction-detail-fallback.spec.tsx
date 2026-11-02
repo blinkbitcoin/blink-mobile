@@ -76,13 +76,17 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet,
 }))
 
+const mockGoBack = jest.fn()
 jest.mock("@react-navigation/native", () =>
-  jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
+  jest
+    .requireActual("../helpers/transaction-detail-mocks")
+    .mockNavigation({ getGoBack: () => mockGoBack }),
 )
 
 jest.mock("@app/i18n/i18n-react", () =>
   jest.requireActual("../helpers/transaction-detail-mocks").mockI18n({
     "common.tryAgain": "try-again",
+    "common.back": "back",
     "TransactionDetailScreen.findingAccount": "finding-account",
     "TransactionDetailScreen.txNotFoundInAccounts": "tx-not-found",
     "TransactionDetailScreen.txLoadFailed": "tx-load-failed",
@@ -118,6 +122,17 @@ describe("TransactionDetailScreen resolver fallback", () => {
     jest.clearAllMocks()
     mockActiveWallet = { isSelfCustodial: false, wallets: [] }
     mockSelfCustodialWallet.allTransactions = []
+  })
+
+  it("offers a back arrow next to close while the transaction is looked up", () => {
+    mockGoBack.mockClear()
+    const { getByTestId } = renderWithStatus("resolving")
+
+    const back = getByTestId("transaction-detail-back")
+    expect(back.props.accessibilityLabel).toBe("back")
+    fireEvent.press(back)
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("passes txid, cache state and the payload hint to the resolver", () => {
