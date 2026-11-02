@@ -31,6 +31,8 @@
         "createError": "No se pudo crear la clave API. Inténtalo de nuevo.",
         "revokeError": "No se pudo revocar la clave API. Inténtalo de nuevo.",
         "loadError": "No se pudieron cargar tus claves API. Inténtalo más tarde.",
+        "discardSecretTitle": "¿Descartar esta clave API?",
+        "discardSecretBody": "Esta es la única vez que se muestra el secreto. Si sales ahora, la clave no se podrá recuperar y tendrás que crear una nueva.",
         "done": "Listo"
     },
     "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
         "skip": "Saltar",
         "unlock": "Desbloquear",
         "usePin": "Usar PIN",
-        "confirmLogout": "¿Está seguro de que desea cerrar sesión? Esto reiniciará su caché y todas las configuraciones de usuario locales."
+        "confirmLogout": "¿Está seguro de que desea cerrar sesión? Esto reiniciará su caché y todas las configuraciones de usuario locales.",
+        "forgotPin": "¿Olvidaste el PIN? Eliminar billeteras",
+        "removeWalletsTitle": "¿Eliminar las billeteras de este dispositivo?",
+        "removeWalletsBody": "Esto elimina todas las billeteras de este dispositivo y cierra tu sesión. Para recuperar una billetera, necesitas su frase de respaldo. Sin ella, la billetera se pierde.",
+        "removeWalletsConfirm": "Eliminar billeteras",
+        "removeWalletsFailed": "No se pudieron eliminar algunas billeteras. Inténtalo de nuevo."
     },
     "PeopleScreen": {
         "title": "Personas",
@@ -2175,16 +2182,19 @@
         "walletCountNotTwo": "El recuento de billeteras no es 2. Utilice el panel para ver todas las billeteras y fondos de esta cuenta."
     },
     "PinScreen": {
+        "attemptUnrecorded": "No se ha podido registrar el intento de forma segura.",
+        "attemptsLeft": "Quedan {attemptsRemaining: string} intentos.",
         "attemptsRemaining": "PIN incorrecto. Quedan {attemptsRemaining: string} intentos.",
         "enterPin": "Introduzca su PIN",
-        "lockoutUnavailable": "No se ha podido registrar el intento fallido de forma segura. Cerrando sesión.",
+        "oneAttemptLeft": "Queda 1 intento.",
         "oneAttemptRemaining": "PIN incorrecto. Queda 1 intento.",
         "pinUnreadable": "No se ha podido comprobar su PIN. Inténtelo de nuevo.",
         "setPin": "Establezca su PIN",
         "setPinFailedMatch": "El PIN no coincide. Establezca su PIN",
         "storePinFailed": "No se puede guardar su PIN.",
         "tooManyAttempts": "Ha superado el límite de intentos. Cerrando sesión.",
-        "tryAgainIn": "Inténtelo de nuevo en {seconds: number} s.",
+        "attemptBudgetSpent": "Ha superado el límite de intentos.",
+        "tryAgainIn": "Inténtelo de nuevo en {time: string}.",
         "verifyPin": "Verifique su PIN"
     },
     "PriceHistoryScreen": {
@@ -3054,7 +3064,8 @@
         "problemPersists": "Si el problema persiste, comuníquese con el soporte técnico.",
         "fatalError": "Lo sentimos, parece que estamos teniendo problemas para cargar la aplicación por usted. Si los problemas persisten, comuníquese con el soporte técnico.",
         "showError": "Mostrar error",
-        "clearAppData": "Borrar datos de la aplicación y cerrar sesión"
+        "clearAppData": "Borrar datos de la aplicación y cerrar sesión",
+        "screenSecurityUnavailable": "Esta pantalla se mantiene oculta porque no se pudo activar la protección contra capturas de pantalla."
     },
     "notifications": {
         "payment": {

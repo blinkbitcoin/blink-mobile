@@ -54,6 +54,24 @@ export const lnurlDomainsFor = (network: Network): string[] =>
     : [lnurlDomainFor(network), REGTEST_PAY_DOMAIN]
 
 /**
+ * Whether an address-form identifier (user@domain) names one of our own accounts on any
+ * network we know. Telemetry only: a cross-network false positive costs a miscounted
+ * referral, not a misrouted payment, so the check spans every known domain instead of
+ * resolving the active network.
+ */
+export const isOwnLnurlAddress = (identifier: string): boolean => {
+  const at = identifier.lastIndexOf("@")
+  if (at < 0) return false
+  const domain = identifier.slice(at + 1).toLowerCase()
+  return [
+    ...LNURL_DOMAINS,
+    MAINNET_LNURL_DOMAIN,
+    REGTEST_LNURL_DOMAIN,
+    REGTEST_PAY_DOMAIN,
+  ].includes(domain)
+}
+
+/**
  * Base URL of the LNURL server for a self-custodial account: the same host its address is
  * spelled with, which is what serves the authenticated `/lnurlpay/{pubkey}` routes. Not
  * the custodial `lnAddressHostname` — `pay.*` fronts the payment app and 404s them.

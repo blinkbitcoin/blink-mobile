@@ -1,8 +1,9 @@
 import { Platform } from "react-native"
 
-import { legacyErase, legacyRead } from "@app/utils/storage/legacy-key-store"
+import { legacyBlank, legacyErase, legacyRead } from "@app/utils/storage/legacy-key-store"
 
 const mockGet = jest.fn()
+const mockSet = jest.fn()
 const mockRemove = jest.fn()
 const mockSetResetOnAppUninstallTo = jest.fn()
 
@@ -10,9 +11,13 @@ jest.mock("react-native-secure-key-store", () => ({
   __esModule: true,
   default: {
     get: (...args: unknown[]) => mockGet(...args),
+    set: (...args: unknown[]) => mockSet(...args),
     remove: (...args: unknown[]) => mockRemove(...args),
     setResetOnAppUninstallTo: (...args: unknown[]) =>
       mockSetResetOnAppUninstallTo(...args),
+  },
+  ACCESSIBLE: {
+    AFTER_FIRST_UNLOCK_THIS_DEVICE_ONLY: "AccessibleAfterFirstUnlockThisDeviceOnly",
   },
 }))
 
@@ -57,6 +62,19 @@ describe("legacy-key-store", () => {
       await legacyErase("PIN")
 
       expect(mockSetResetOnAppUninstallTo).not.toHaveBeenCalled()
+    })
+
+    it("disarms the reinstall wipe before blanking, which reaches it too", async () => {
+      const calls: string[] = []
+      mockSetResetOnAppUninstallTo.mockImplementation(() => calls.push("guard"))
+      mockSet.mockImplementation(() => {
+        calls.push("set")
+        return Promise.resolve("key stored successfully")
+      })
+
+      await legacyBlank("PIN")
+
+      expect(calls).toEqual(["guard", "set"])
     })
 
     it("re-arms per call, since a skipped wipe leaves the trigger armed", async () => {
@@ -159,6 +177,34 @@ describe("legacy-key-store", () => {
       mockRemove.mockRejectedValue(new Error("keystore unavailable"))
 
       expect(await legacyErase("PIN")).toBe(false)
+    })
+  })
+
+  describe("legacyBlank", () => {
+    it("overwrites the key with an empty value, which every read reports as absent", async () => {
+      mockSet.mockResolvedValue("key updated successfully")
+
+      expect(await legacyBlank("PIN")).toBe(true)
+      expect(mockSet).toHaveBeenCalledWith("PIN", "", expect.anything())
+    })
+
+    it("always passes the options the iOS module takes as a fixed argument", async () => {
+      // Left out, the native call crashes the app instead of rejecting.
+      mockSet.mockResolvedValue("key stored successfully")
+
+      await legacyBlank("PIN")
+
+      expect(mockSet).toHaveBeenCalledWith("PIN", "", {
+        accessible: "AccessibleAfterFirstUnlockThisDeviceOnly",
+      })
+    })
+
+    it("returns false on a rejection instead of throwing at the caller", async () => {
+      mockSet.mockRejectedValue(
+        Object.assign(new Error("error saving key"), { code: "9" }),
+      )
+
+      expect(await legacyBlank("PIN")).toBe(false)
     })
   })
 })
