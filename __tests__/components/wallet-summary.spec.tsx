@@ -4,13 +4,17 @@ import { render, screen, within } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
 
 import {
-  WALLET_SUMMARY_SECONDARY_TEST_ID,
-  WALLET_SUMMARY_SIZER_TEST_ID,
-  WALLET_SUMMARY_TEST_ID,
+  SEND_WALLET_SECONDARY_TEST_ID,
+  SEND_WALLET_SIZER_TEST_ID,
+  SEND_SEND_WALLET_SUMMARY_TEST_ID,
   WalletSummary,
 } from "@app/components/wallet-summary"
 import { WalletCurrency } from "@app/graphql/generated"
 import theme from "@app/rne-theme/theme"
+
+jest.mock("@app/components/wallet-switch", () => ({
+  WalletSwitch: () => null,
+}))
 
 jest.mock("@app/i18n/i18n-react", () => ({
   useI18nContext: () => ({
@@ -21,11 +25,11 @@ jest.mock("@app/i18n/i18n-react", () => ({
 const renderCard = (props: React.ComponentProps<typeof WalletSummary>) =>
   render(
     <ThemeProvider theme={theme}>
-      <WalletSummary {...props} />
+      <WalletSummary inactive {...props} />
     </ThemeProvider>,
   )
 
-describe("WalletSummary", () => {
+describe("WalletSummary as a read-out", () => {
   it("shows the display-currency value under the balance when there is one", () => {
     renderCard({
       currency: WalletCurrency.Btc,
@@ -33,20 +37,20 @@ describe("WalletSummary", () => {
       balanceSecondary: "~ $0.57",
     })
 
-    expect(screen.getByTestId(WALLET_SUMMARY_SECONDARY_TEST_ID)).toBeTruthy()
+    expect(screen.getByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeTruthy()
   })
 
   it("shows a single line when there is no second denomination", () => {
     renderCard({ currency: WalletCurrency.Usd, balancePrimary: "$0.57" })
 
-    expect(screen.queryByTestId(WALLET_SUMMARY_SECONDARY_TEST_ID)).toBeNull()
+    expect(screen.queryByTestId(SEND_WALLET_SECONDARY_TEST_ID)).toBeNull()
   })
 
   /** The single line sits in the middle of a card as tall as the two-line one. */
   it("keeps the two-line height with a hidden copy", () => {
     renderCard({ currency: WalletCurrency.Usd, balancePrimary: "$0.57" })
 
-    const hiddenCopy = screen.getByTestId(WALLET_SUMMARY_SIZER_TEST_ID, {
+    const hiddenCopy = screen.getByTestId(SEND_WALLET_SIZER_TEST_ID, {
       includeHiddenElements: true,
     })
     expect(StyleSheet.flatten(hiddenCopy.props.style).opacity).toBe(0)
@@ -57,7 +61,7 @@ describe("WalletSummary", () => {
   it("reads as the wallet and its amount, on the static surface", () => {
     renderCard({ currency: WalletCurrency.Btc, balancePrimary: "741 SAT" })
 
-    const card = screen.getByTestId(WALLET_SUMMARY_TEST_ID)
+    const card = screen.getByTestId(SEND_WALLET_SUMMARY_TEST_ID)
     expect(card.props.accessibilityLabel).toBe("Bitcoin, 741 SAT")
     expect(card.props.accessibilityRole).toBeUndefined()
     expect(StyleSheet.flatten(card.props.style).backgroundColor).toBe(
