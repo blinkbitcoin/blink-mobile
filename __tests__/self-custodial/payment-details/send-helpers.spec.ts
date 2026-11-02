@@ -751,7 +751,7 @@ describe("a dollar send whose quote moved after review", () => {
       conversionOptions: {} as never,
       quoteRef: {},
     }
-    return { getFee: createGetFee(params), send: createSendMutation(params) }
+    return { getFee: createGetFee(params), send: createSendMutation(params, telemetry) }
   }
 
   it("sends nothing, and says so with a code raised before the send", async () => {
@@ -786,7 +786,7 @@ describe("a dollar send whose quote moved after review", () => {
     mockPrepareSendPayment.mockResolvedValueOnce(quoteAt(510))
     mockSendPayment.mockResolvedValue({ payment: { status: 0 } })
 
-    await createSendMutation(params)()
+    await createSendMutation(params, telemetry)()
 
     expect(mockSendPayment).toHaveBeenCalledTimes(1)
   })

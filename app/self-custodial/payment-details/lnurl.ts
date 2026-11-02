@@ -444,8 +444,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
       return sendFailure(err)
     }
 
-    /** A dollar send converts at the price of the moment: one that moved since
-     *  review stops here, before it is sent, for the sender to see it again. */
+    /** A dollar send converts at the price of the moment: one that moved since review
+     *  stops here, before it is sent, for the sender to see it again. */
     if (
       isUsdSend &&
       hasQuoteMoved(
