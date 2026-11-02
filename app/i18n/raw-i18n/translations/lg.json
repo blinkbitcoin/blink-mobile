@@ -2680,7 +2680,7 @@
   "TransactionDetailScreen": {
     "paid": "Zisasuddwa eri/ okuva",
     "received": "Ofunye",
-    "spent": "Okozesezza",
+    "sent": "Osindise",
     "sending": "Okusindika",
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
