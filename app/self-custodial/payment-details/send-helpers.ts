@@ -232,13 +232,26 @@ export const createSendMutation = (
     measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
+      if (
+        params.quoteRef &&
+        hasQuoteMoved(
+          params.quoteRef.current,
+          quoteOf(extractLightningFee(prepared) ?? 0, prepared.conversionEstimate),
+        )
+      ) {
+        measureIn(startedIn, ScEvent.PaymentSendFailed, {
+          ...telemetryParams(telemetry),
+          error_code: SelfCustodialErrorCode.QuoteMoved,
+        })
+        return quoteMovedFailure()
+      }
       const response = await executeSend(params.sdk, prepared)
       measureSettlement(
         response?.payment,
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: PaymentSendResult.Success }
+      return { status: sendResultOf(response?.payment) }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
@@ -268,7 +281,7 @@ export const createSendMutationOnchain = (
         sendSettlement(telemetryParams(telemetry)),
         startedIn,
       )
-      return { status: PaymentSendResult.Success }
+      return { status: sendResultOf(response?.payment) }
     } catch (err) {
       measureIn(startedIn, ScEvent.PaymentSendFailed, {
         ...telemetryParams(telemetry),
