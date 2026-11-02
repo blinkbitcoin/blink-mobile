@@ -119,6 +119,12 @@ type Props = {
   isOnHomeScreen?: boolean
   testId?: string
   highlight?: boolean
+  /**
+   * Whether a highlighted row may bounce. Read once, when the row mounts: a list that
+   * remounts its rows (filtering rebuilds the sections) passes false for a row that has
+   * already bounced, and a bounce in progress is never cut short by the value changing.
+   */
+  bounce?: boolean
   onPress?: (txid: string) => void
 }
 
@@ -131,6 +137,7 @@ const TransactionItem: React.FC<Props> = ({
   isOnHomeScreen = false,
   testId = "transaction-item",
   highlight = false,
+  bounce = true,
   onPress,
 }) => {
   // makeStyles memoizes on the props object identity, so an object literal here
@@ -159,6 +166,7 @@ const TransactionItem: React.FC<Props> = ({
   // never mount it, so they never subscribe to navigation focus.
   const everHighlighted = React.useRef(highlight)
   if (highlight) everHighlighted.current = true
+  const canBounce = React.useRef(bounce).current
 
   const { data: tx } = useFragment<TransactionFragment>({
     fragment: TransactionFragmentDoc,
@@ -245,7 +253,7 @@ const TransactionItem: React.FC<Props> = ({
 
     return (
       <Animated.View style={animatedStyle}>
-        {everHighlighted.current ? (
+        {everHighlighted.current && canBounce ? (
           <BounceOnFocus visible={highlight} scale={scale} />
         ) : null}
         <Pressable
@@ -305,7 +313,7 @@ const TransactionItem: React.FC<Props> = ({
     // below is conditional, and it sits in its own child slot so toggling it
     // leaves the row beside it untouched.
     <Animated.View style={animatedStyle}>
-      {everHighlighted.current ? (
+      {everHighlighted.current && canBounce ? (
         <BounceOnFocus visible={highlight} scale={scale} />
       ) : null}
       <ListItem
