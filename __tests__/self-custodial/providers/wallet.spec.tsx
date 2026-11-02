@@ -97,6 +97,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
   removeSdkEventListener: (...args: unknown[]) => mockRemoveSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
+  SdkStorageRetiredError: class SdkStorageRetiredError extends Error {},
   getLightningAddress: (...args: unknown[]) => mockGetLightningAddress(...args),
 }))
 

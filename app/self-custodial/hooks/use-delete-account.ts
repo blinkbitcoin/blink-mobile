@@ -1,17 +1,26 @@
 import { useCallback, useState } from "react"
 
 import crashlytics from "@react-native-firebase/crashlytics"
-import RNFS from "react-native-fs"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useHasCustodialAccount } from "@app/hooks/use-has-custodial-account"
-import { disconnectSdk, waitForSdkIdle } from "@app/self-custodial/bridge"
+import {
+  disconnectSdk,
+  readmitSdkStorage,
+  retireSdkStorage,
+  waitForSdkIdle,
+} from "@app/self-custodial/bridge"
 import { storageDirFor } from "@app/self-custodial/config"
 import { resetSdkLogs } from "@app/self-custodial/diagnostics/sdk-log-files"
 import { useSparkNetwork } from "@app/self-custodial/hooks/use-spark-network"
 import { removeBackupStateFor } from "@app/self-custodial/providers/backup-state"
 import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { removeSelfCustodialAccountId } from "@app/self-custodial/storage/account-index"
+import {
+  markStorageForRemoval,
+  removeMarkedStorage,
+  unmarkStorageForRemoval,
+} from "@app/self-custodial/storage/storage-removal"
 import { usePersistentStateContext } from "@app/store/persistent-state"
 import { AccountType, DefaultAccountId } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
@@ -50,7 +59,13 @@ export const useDeleteAccount = (): DeleteAccountResult => {
     async (accountId: string): Promise<DeleteAccountOutcome | undefined> => {
       setState("deleting")
       setError(null)
+      const storageDir = storageDirFor(accountId, network)
+      let isWalletGone = false
       try {
+        /** Refuse every SDK connect for this wallet from here on: a lifecycle that read the
+         *  mnemonic before the deletion could otherwise connect after the wait below. */
+        retireSdkStorage(storageDir)
+
         const isActive =
           activeAccount?.type === AccountType.SelfCustodial &&
           activeAccount.id === accountId
@@ -91,15 +106,36 @@ export const useDeleteAccount = (): DeleteAccountResult => {
          *  the cut; and before the wallet goes, so a stop in between still leaves the
          *  reset to finish. It rejects only when it could neither record nor do the
          *  reset, and then the wallet is kept. */
-        const isSdkIdle = await waitForSdkIdle(
-          storageDirFor(accountId, network),
-          SDK_TEARDOWN_TIMEOUT_MS,
-        )
+        const isSdkIdle = await waitForSdkIdle(storageDir, SDK_TEARDOWN_TIMEOUT_MS)
         await resetSdkLogs({ readNothingThisSession: !isSdkIdle })
+
+        /** The storage holds the wallet's history too: record its removal before the
+         *  mnemonic goes, so it finishes at the next launch whatever happens here. */
+        await markStorageForRemoval(storageDir)
         await KeyStoreWrapper.deleteMnemonicForAccount(accountId)
-        await RNFS.unlink(storageDirFor(accountId, network)).catch((err) => {
-          crashlytics().log(`[self-custodial delete] storage dir unlink failed: ${err}`)
-        })
+        isWalletGone = true
+
+        const removeStorage = () => removeMarkedStorage(storageDir)
+        const isStorageRemoved =
+          isSdkIdle &&
+          (await removeStorage().then(
+            () => true,
+            (err) => {
+              crashlytics().log(`[self-custodial delete] storage removal failed: ${err}`)
+              return false
+            },
+          ))
+        if (!isStorageRemoved) {
+          /** An SDK that outlived the wait may hold or recreate the storage: try again
+           *  once it is idle. The marker still covers the next launch. */
+          waitForSdkIdle(storageDir)
+            .then(removeStorage)
+            .catch((err) => {
+              crashlytics().log(
+                `[self-custodial delete] storage removal retry failed: ${err}`,
+              )
+            })
+        }
         await removeSelfCustodialAccountId(accountId)
         await removeBackupStateFor(accountId)
         await reloadSelfCustodialAccounts()
@@ -111,6 +147,10 @@ export const useDeleteAccount = (): DeleteAccountResult => {
         if (hasCustodialAccount) return "switched-to-custodial"
         return "logged-out"
       } catch (err) {
+        if (!isWalletGone) {
+          readmitSdkStorage(storageDir)
+          await unmarkStorageForRemoval(storageDir).catch(() => undefined)
+        }
         const wrapped = err instanceof Error ? err : new Error(String(err))
         reportError("Self-custodial wallet delete", wrapped)
         setState("error")

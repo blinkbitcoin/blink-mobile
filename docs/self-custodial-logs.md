@@ -11,8 +11,10 @@ in the Contact us modal, which Incognito disables.
 Tapping it shows a short disclosure, then the OS share sheet. The user chooses where
 the file goes (mail, a chat app, Files, Drive). The app never uploads it.
 
-If the user has several self-custodial wallets, ask them to switch to the affected one
-first: the row follows the active account.
+**The file covers every self-custodial wallet used on the device, whichever one is
+active.** The SDK log is shared by all of them, and its lines don't say which wallet wrote
+them, so switching wallets doesn't select or filter anything. The disclosure says so, and
+the header gives the number of self-custodial wallets on the device.
 
 ## What is on the device
 
@@ -38,14 +40,24 @@ first: the row follows the active account.
   - With the logger running, the export folder and `sdk.log.1` go at once, and `sdk.log`
     is cut off in memory: for the rest of the session exports read only what it gains
     after the reset, so a wallet restored or created in that session exports at once.
-  - The cut waits until no SDK instance of the deleted wallet is connected or still
-    connecting (`waitForSdkIdle` in `bridge/lifecycle.ts`), so a connect that was in
-    flight when the user deleted it can't write past the cut. If that takes longer than
-    15 s, exports read nothing more this session instead.
+  - Deletion first retires the wallet's storage directory (`retireSdkStorage`), so
+    `initSdk` refuses it from then on, both on entry and again right before `connect`.
+    `useSdkLifecycle` also gives up before connecting once its run is cancelled. Only
+    then does the cut wait until no SDK instance of the wallet is connected or still
+    connecting (`waitForSdkIdle`). A connect already in flight finishes before the cut,
+    and no new one can start after it. If the wait takes longer than 15 s, exports read
+    nothing more this session.
+  - The cut only ever moves later. Once a reset has had to read nothing more, a later
+    ordinary reset in the same session can't reopen what a still-running SDK writes.
   - The next launch removes the logs and then the flag, before the logger opens the
-    file, whether or not a wallet connects again (`SdkLogResetMount`). The logger waits
+    file, whether or not a wallet connects again (`LaunchCleanupMount`). The logger waits
     for it. If it can't finish, the logger runs without a file and the flag stays for the
     launch after.
+  - The wallet's SDK storage directory, which holds its payment history too, gets the same
+    treatment. A `<accountId>.removing` marker is written beside it before the backup phrase
+    goes. The directory is removed at once if the SDK went idle, or once it does, and any
+    leftover is swept at the next launch (`finishPendingStorageRemovals`, which `initSdk`
+    awaits before connecting).
   - If the flag can't be written, the logs are removed at once. If that fails too, the
     reset rejects and the wallet deletion stops before the backup phrase is touched:
     a wallet is never deleted with its history left exportable.

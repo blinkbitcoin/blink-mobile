@@ -159,6 +159,20 @@ export const rnfs = {
     maybeFail("writeFile", path)
     disk.files.set(path, { data: Buffer.from(contents, encoding as BufferEncoding) })
   },
+  /** Direct children of `path`, files and directories, as RNFS lists them. */
+  readDir: async (path: string) => {
+    maybeFail("readDir", path)
+    if (!disk.dirs.has(path)) throw new Error(`${path} is not a directory`)
+    const childOf = (entry: string) =>
+      entry.startsWith(`${path}/`) && !entry.slice(path.length + 1).includes("/")
+    const names = new Set([...disk.files.keys(), ...disk.dirs].filter(childOf))
+    return [...names].map((entry) => ({
+      name: entry.slice(path.length + 1),
+      path: entry,
+      isFile: () => disk.files.has(entry),
+      isDirectory: () => disk.dirs.has(entry),
+    }))
+  },
   unlink: async (path: string) => {
     maybeFail("unlink", path)
     if (disk.dirs.delete(path)) {

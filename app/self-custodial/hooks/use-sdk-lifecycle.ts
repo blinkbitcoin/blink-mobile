@@ -18,6 +18,7 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
+  SdkStorageRetiredError,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
@@ -277,11 +278,17 @@ export const useSdkLifecycle = (
         return
       }
 
-      if (mounted) setStatus(ActiveWalletStatus.Loading)
+      /** The account can change while the mnemonic and network are read: deleting a
+       *  wallet switches away from it first. A cancelled run must not connect at all,
+       *  or it writes the deleted wallet's lines past the log cut. */
+      if (!mounted) return
+      setStatus(ActiveWalletStatus.Loading)
       await connectAndListen(mnemonic)
     }
 
     initialize().catch((err) => {
+      // initSdk refused a wallet that is being deleted; nothing went wrong
+      if (err instanceof SdkStorageRetiredError) return
       logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
       reportError("SDK init", err)
       if (mounted) setStatus(ActiveWalletStatus.Error)

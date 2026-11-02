@@ -74,8 +74,12 @@ export const mismatchedNetworkLabel = (
   return storedLabel === networkLabelFor(network) ? null : storedLabel
 }
 
+/** The directory every wallet's SDK storage on `network` lives under. */
+export const storageRootFor = (network: Network): string =>
+  `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}`
+
 export const storageDirFor = (accountId: string, network: Network): string =>
-  `${DocumentDirectoryPath}/breez-sdk-spark-${networkLabelFor(network)}/${accountId}`
+  `${storageRootFor(network)}/${accountId}`
 
 /**
  * Where the SDK writes `sdk.log`. One directory for the whole process, because the SDK

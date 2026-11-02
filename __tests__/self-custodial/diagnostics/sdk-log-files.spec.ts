@@ -330,6 +330,32 @@ describe("resetSdkLogs", () => {
     await expect(logs.readSdkLogResetByte()).resolves.toBe(Number.POSITIVE_INFINITY)
   })
 
+  it("keeps a read-nothing cut through a later ordinary reset", async () => {
+    const logs = launch()
+    await logs.startSdkLogger()
+    sdkWrites("wallet A")
+    // wallet A's SDK didn't go idle in time; then wallet B is deleted normally (#4351 review 4, finding 2)
+    await logs.resetSdkLogs({ readNothingThisSession: true })
+    sdkWrites("wallet A still writing")
+
+    await logs.resetSdkLogs()
+    sdkWrites("wallet A writing later still")
+
+    await expect(logs.readSdkLogResetByte()).resolves.toBe(Number.POSITIVE_INFINITY)
+  })
+
+  it("moves an ordinary cut later on a second reset, never earlier", async () => {
+    const logs = launch()
+    await logs.startSdkLogger()
+    sdkWrites("wallet A")
+    await logs.resetSdkLogs()
+    sdkWrites("wallet B")
+
+    await logs.resetSdkLogs()
+
+    await expect(logs.readSdkLogResetByte()).resolves.toBe("wallet A\nwallet B\n".length)
+  })
+
   it("reads nothing more this session either when no logger held the file", async () => {
     makeDir(DIR)
     writeText(CURRENT, "wallet A\n")

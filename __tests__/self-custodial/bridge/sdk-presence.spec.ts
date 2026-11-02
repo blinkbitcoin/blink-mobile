@@ -23,8 +23,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
 jest.mock("@app/utils/storage/secureStorage", () => ({ __esModule: true, default: {} }))
 jest.mock("@app/self-custodial/storage/account-index", () => ({}))
 jest.mock("react-native-quick-crypto", () => ({}))
+const mockStartSdkLogger = jest.fn()
 jest.mock("@app/self-custodial/diagnostics/sdk-log-files", () => ({
-  startSdkLogger: async () => undefined,
+  startSdkLogger: () => mockStartSdkLogger(),
+}))
+const mockFinishPendingStorageRemovals = jest.fn()
+jest.mock("@app/self-custodial/storage/storage-removal", () => ({
+  finishPendingStorageRemovals: () => mockFinishPendingStorageRemovals(),
 }))
 
 import type { BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
@@ -70,6 +75,8 @@ describe("waitForSdkIdle", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockConnect.mockImplementation(async () => makeSdk("default"))
+    mockStartSdkLogger.mockResolvedValue(undefined)
+    mockFinishPendingStorageRemovals.mockResolvedValue(undefined)
   })
 
   it("resolves at once for a wallet with no SDK", async () => {
@@ -165,5 +172,89 @@ describe("waitForSdkIdle", () => {
     await lifecycle.disconnectSdk(second)
 
     await expect(idle).resolves.toBe(true)
+  })
+})
+
+describe("retireSdkStorage", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockConnect.mockImplementation(async () => makeSdk("default"))
+    mockStartSdkLogger.mockResolvedValue(undefined)
+    mockFinishPendingStorageRemovals.mockResolvedValue(undefined)
+  })
+
+  it("refuses a retired wallet's connect, and doesn't leave it counted", async () => {
+    const lifecycle = loadLifecycle()
+    lifecycle.retireSdkStorage(WALLET_A)
+
+    await expect(connectTo(lifecycle, WALLET_A)).rejects.toBeInstanceOf(
+      lifecycle.SdkStorageRetiredError,
+    )
+
+    expect(mockConnect).not.toHaveBeenCalled()
+    await expect(lifecycle.waitForSdkIdle(WALLET_A, 10)).resolves.toBe(true)
+  })
+
+  it("refuses at the point of no return when retired while start-up waited on the logger", async () => {
+    const lifecycle = loadLifecycle()
+    let finishLoggerStart: () => void = () => {}
+    mockStartSdkLogger.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishLoggerStart = resolve
+      }),
+    )
+
+    // a lifecycle that read the mnemonic before the deletion began (#4351 review 4, finding 1)
+    const connecting = connectTo(lifecycle, WALLET_A)
+    await new Promise((resolve) => {
+      setImmediate(resolve)
+    })
+    expect(mockStartSdkLogger).toHaveBeenCalledTimes(1)
+    lifecycle.retireSdkStorage(WALLET_A)
+    finishLoggerStart()
+
+    await expect(connecting).rejects.toBeInstanceOf(lifecycle.SdkStorageRetiredError)
+    expect(mockConnect).not.toHaveBeenCalled()
+    await expect(lifecycle.waitForSdkIdle(WALLET_A, 10)).resolves.toBe(true)
+  })
+
+  it("connects only once a deleted wallet's leftover storage has been swept", async () => {
+    const lifecycle = loadLifecycle()
+    let finishSweep: () => void = () => {}
+    mockFinishPendingStorageRemovals.mockReturnValueOnce(
+      new Promise<void>((resolve) => {
+        finishSweep = resolve
+      }),
+    )
+
+    const connecting = connectTo(lifecycle, WALLET_B)
+    await new Promise((resolve) => {
+      setImmediate(resolve)
+    })
+    expect(mockFinishPendingStorageRemovals).toHaveBeenCalledTimes(1)
+    expect(mockConnect).not.toHaveBeenCalled()
+    finishSweep()
+
+    await expect(connecting).resolves.toBeDefined()
+    expect(mockConnect).toHaveBeenCalledTimes(1)
+  })
+
+  it("lets a readmitted wallet connect again", async () => {
+    const lifecycle = loadLifecycle()
+    lifecycle.retireSdkStorage(WALLET_A)
+    lifecycle.readmitSdkStorage(WALLET_A)
+
+    await expect(connectTo(lifecycle, WALLET_A)).resolves.toBeDefined()
+    expect(mockConnect).toHaveBeenCalledTimes(1)
+  })
+
+  it("leaves every other wallet free to connect", async () => {
+    const lifecycle = loadLifecycle()
+    lifecycle.retireSdkStorage(WALLET_A)
+
+    await expect(connectTo(lifecycle, WALLET_B)).resolves.toBeDefined()
+    expect(mockConnect).toHaveBeenCalledWith(
+      expect.objectContaining({ storageDir: WALLET_B }),
+    )
   })
 })

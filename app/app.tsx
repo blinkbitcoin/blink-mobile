@@ -30,7 +30,7 @@ import {
   AccountModeSyncMount,
   AutoConvertListenerMount,
   DisplayCurrencyFromRegionMount,
-  SdkLogResetMount,
+  LaunchCleanupMount,
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
@@ -95,7 +95,7 @@ export const App = () => (
                                               <AutoConvertListenerMount />
                                               <AccountModeSyncMount />
                                               <DisplayCurrencyFromRegionMount />
-                                              <SdkLogResetMount />
+                                              <LaunchCleanupMount />
                                               <RootStack />
                                               <NetworkErrorComponent />
                                               <ActionModals />

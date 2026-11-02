@@ -51,8 +51,17 @@ export const withSdkLogLock = <T>(step: () => Promise<T>): Promise<T> => {
 
 /** Set once initLogging has opened `sdk.log`; it can't be removed in this process after. */
 let isLogFileOpen = false
-/** Where the last reset in this process cut `sdk.log` off; exports read past it. */
+/** Where resets in this process cut `sdk.log` off; exports read past it. */
 let resetAtByte: number | undefined
+
+/**
+ * Only ever moves the cut later. A reset that had to read nothing more (infinity) because
+ * a deleted wallet's SDK might still be writing stays in force: a later, ordinary reset
+ * must not reopen what that SDK writes afterwards.
+ */
+const raiseResetAtByte = (byte: number): void => {
+  resetAtByte = Math.max(resetAtByte ?? Number.NEGATIVE_INFINITY, byte)
+}
 
 /** Removes the logs, then the flag: a stop part-way leaves the flag for the next try. */
 const finishReset = async (dir: string): Promise<void> => {
@@ -173,7 +182,7 @@ const resetLogs = async ({
 }: ResetOptions): Promise<void> => {
   const dir = sdkLogDir()
   const { current, previous, flag } = pathsIn(dir)
-  if (readNothingThisSession) resetAtByte = Number.POSITIVE_INFINITY
+  if (readNothingThisSession) raiseResetAtByte(Number.POSITIVE_INFINITY)
 
   try {
     await RNFS.mkdir(dir)
@@ -188,7 +197,7 @@ const resetLogs = async ({
       [sdkLogExportDir(), current, previous].map(unlinkIfExists),
     )
     if (removals.some(({ status }) => status === "rejected")) {
-      resetAtByte = Number.POSITIVE_INFINITY
+      raiseResetAtByte(Number.POSITIVE_INFINITY)
       throw new Error("SDK logs could be neither marked for reset nor removed")
     }
     return
@@ -204,11 +213,13 @@ const resetLogs = async ({
   /** The logger holds `sdk.log`: keep it, cut it off here, and leave it to the next
    *  launch. The other files are no longer read, so failing to remove them is recorded
    *  and left to that launch too. */
-  resetAtByte = readNothingThisSession
-    ? Number.POSITIVE_INFINITY
-    : await RNFS.stat(current)
-        .then(({ size }) => size)
-        .catch(() => Number.POSITIVE_INFINITY)
+  raiseResetAtByte(
+    readNothingThisSession
+      ? Number.POSITIVE_INFINITY
+      : await RNFS.stat(current)
+          .then(({ size }) => size)
+          .catch(() => Number.POSITIVE_INFINITY),
+  )
   for (const path of [previous, sdkLogExportDir()]) {
     await unlinkIfExists(path).catch((err) =>
       recordErrorOnce("sdk-log-reset", toError(err), { expected: true }),

@@ -68,7 +68,7 @@ const launch = () => {
     logFiles = require("@app/self-custodial/diagnostics/sdk-log-files")
     exporter = require("@app/self-custodial/diagnostics/export-sdk-logs")
   })
-  const { initSdk, disconnectSdk, waitForSdkIdle } = lifecycle!
+  const { initSdk, disconnectSdk, waitForSdkIdle, retireSdkStorage } = lifecycle!
   const { resetSdkLogs, finishPendingSdkLogReset } = logFiles!
   const { exportSdkLogs } = exporter!
   return {
@@ -78,6 +78,7 @@ const launch = () => {
     deleteWallet: resetSdkLogs,
     /** What use-delete-account does: wait out the wallet's SDK, then reset. */
     deleteWalletAfterTeardown: async (storageDir: string) => {
+      retireSdkStorage(storageDir)
       const isSdkIdle = await waitForSdkIdle(storageDir, 1000)
       await resetSdkLogs({ readNothingThisSession: !isSdkIdle })
     },
@@ -209,13 +210,37 @@ describe("deleting a wallet while the SDK logger runs", () => {
       sdkWrites(WALLET_A)
       return { disconnect: async () => undefined }
     })
+    const connectsBefore = mockConnect.mock.calls.length
     const connectingA = app.connectWallet(WALLET_A_DIR)
     // useSdkLifecycle tears an aborted connect down as soon as it resolves
     const tearingDownA = connectingA.then((sdk) => app.disconnect(sdk))
+    // the deletion starts once A's connect is past the point of no return
+    await nextMacrotask()
+    expect(mockConnect.mock.calls).toHaveLength(connectsBefore + 1)
     const deleting = app.deleteWalletAfterTeardown(WALLET_A_DIR)
     await nextMacrotask()
     release()
     await Promise.all([tearingDownA, deleting])
+
+    sdkWrites(WALLET_B)
+    const exported = await app.exportText()
+
+    expect(exported).toContain(WALLET_B)
+    expect(exported).not.toContain(WALLET_A)
+  })
+
+  it("refuses a connect a stale lifecycle starts after its wallet was deleted", async () => {
+    const WALLET_A_DIR = "/documents/breez-sdk-spark-mainnet/wallet-a"
+    const app = launch()
+    await app.connectWallet()
+
+    // the lifecycle read A's mnemonic before the deletion and is still validating (#4351 review 4, finding 1)
+    await app.deleteWalletAfterTeardown(WALLET_A_DIR)
+    mockConnect.mockImplementationOnce(async () => {
+      sdkWrites(WALLET_A)
+      return { disconnect: async () => undefined }
+    })
+    await expect(app.connectWallet(WALLET_A_DIR)).rejects.toThrow("being deleted")
 
     sdkWrites(WALLET_B)
     const exported = await app.exportText()
