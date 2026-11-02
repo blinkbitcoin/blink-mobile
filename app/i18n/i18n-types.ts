@@ -9043,9 +9043,33 @@ type RootTranslation = {
 		 */
 		recentTransactions: string
 		/**
-		 * T​r​a​n​s​a​c​t​i​o​n​ ​H​i​s​t​o​r​y
+		 * T​r​a​n​s​a​c​t​i​o​n​ ​h​i​s​t​o​r​y
 		 */
 		transactionHistoryTitle: string
+		/**
+		 * F​i​l​t​e​r​s
+		 */
+		filters: string
+		/**
+		 * S​e​n​t
+		 */
+		sent: string
+		/**
+		 * R​e​c​e​i​v​e​d
+		 */
+		received: string
+		/**
+		 * S​e​a​r​c​h​.​.​.
+		 */
+		searchPlaceholder: string
+		/**
+		 * E​x​p​a​n​d​i​n​g​ ​s​e​a​r​c​h
+		 */
+		expandingSearch: string
+		/**
+		 * N​o​t​h​i​n​g​ ​c​a​m​e​ ​b​a​c​k
+		 */
+		nothingCameBack: string
 	}
 	TransferScreen: {
 		/**
@@ -10089,7 +10113,7 @@ type RootTranslation = {
 		 */
 		dollar: string
 		/**
-		 * A​L​L
+		 * A​l​l
 		 */
 		all: string
 		/**
@@ -23247,9 +23271,33 @@ export type TranslationFunctions = {
 		 */
 		recentTransactions: () => LocalizedString
 		/**
-		 * Transaction History
+		 * Transaction history
 		 */
 		transactionHistoryTitle: () => LocalizedString
+		/**
+		 * Filters
+		 */
+		filters: () => LocalizedString
+		/**
+		 * Sent
+		 */
+		sent: () => LocalizedString
+		/**
+		 * Received
+		 */
+		received: () => LocalizedString
+		/**
+		 * Search...
+		 */
+		searchPlaceholder: () => LocalizedString
+		/**
+		 * Expanding search
+		 */
+		expandingSearch: () => LocalizedString
+		/**
+		 * Nothing came back
+		 */
+		nothingCameBack: () => LocalizedString
 	}
 	TransferScreen: {
 		/**
@@ -24277,7 +24325,7 @@ export type TranslationFunctions = {
 		 */
 		dollar: () => LocalizedString
 		/**
-		 * ALL
+		 * All
 		 */
 		all: () => LocalizedString
 		/**

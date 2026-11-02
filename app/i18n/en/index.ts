@@ -2861,7 +2861,13 @@ const en: BaseTranslation = {
     noTransaction: "No transaction to show",
     title: "All transactions",
     recentTransactions: "Recent transactions",
-    transactionHistoryTitle: "Transaction History",
+    transactionHistoryTitle: "Transaction history",
+    filters: "Filters",
+    sent: "Sent",
+    received: "Received",
+    searchPlaceholder: "Search...",
+    expandingSearch: "Expanding search",
+    nothingCameBack: "Nothing came back",
   },
   TransferScreen: {
     title: "Transfer",
@@ -3166,7 +3172,7 @@ const en: BaseTranslation = {
       other: "Days"
     },
     dollar: "Dollar",
-    all: "ALL",
+    all: "All",
     allAccounts: "All accounts",
     some: "Some",
     support: "Support",
