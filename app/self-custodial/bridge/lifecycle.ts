@@ -22,8 +22,9 @@ import {
   MAX_SLIPPAGE_BPS,
   networkLabelFor,
   requireBreezApiKey,
-  requireSparkTokenIdentifier,
+  setSparkTokenNetwork,
   SparkToken,
+  sparkTokenIdentifierFor,
   storageDirFor,
 } from "../config"
 import { startSdkLogger } from "../diagnostics/sdk-log-files"
@@ -45,7 +46,9 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
    *
    * From 0.26 the same cap also admits early claims: the sync loop claims an
    * unconfirmed deposit ahead of maturity whenever the provider's spread fits under
-   * this cap, priced as the rate times the SDK's 99 vB claim size.
+   * this cap, priced as the rate times the SDK's 99 vB claim size. That replaced 0.23's
+   * separate `maxInstantDepositClaimFeeBps`, so there is no longer a switch that keeps
+   * early claims off while this cap stays usable for the claim at maturity.
    *
    * No proportional part (`proportionalPpm`, 0.27), so the ceiling stays what it was
    * before the SDK could express one. Adding one raises it for every claim, early
@@ -62,12 +65,30 @@ const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
    *  bridge/status.ts must change with this. */
   config.proxy = undefined
 
-  config.stableBalanceConfig = {
-    tokens: [{ label: SparkToken.Label, tokenIdentifier: requireSparkTokenIdentifier() }],
-    defaultActiveLabel: undefined,
-    thresholdSats: undefined,
-    maxSlippageBps: MAX_SLIPPAGE_BPS,
+  /** Left out where the network has no token: 0.27 refuses to connect with a token
+   *  minted on another network, and the dollar-balance gate keeps its surfaces closed. */
+  setSparkTokenNetwork(network)
+  const tokenIdentifier = sparkTokenIdentifierFor(network)
+  if (tokenIdentifier !== null) {
+    config.stableBalanceConfig = {
+      tokens: [{ label: SparkToken.Label, tokenIdentifier }],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: MAX_SLIPPAGE_BPS,
+    }
   }
+
+  /**
+   * Collect what is needed to exit a payment without the Spark operators as funds arrive,
+   * which is the SDK's own default and what the recovery backup exports: a leaf whose chain
+   * was never collected cannot be exited until the operators are reachable again, which is
+   * the moment the backup exists for. Pinned rather than inherited so a future SDK default
+   * cannot switch it off for us. From 0.26 it governs only this background collection: an
+   * explicit sync collects and waits for the pass whatever the flag says, so every wallet
+   * sync is as slow as the slowest pass either way, and the lost-send lookup syncs before
+   * each of its looks before it will read local history.
+   */
+  config.exitChainAutoFetchEnabled = true
 
   return config
 }

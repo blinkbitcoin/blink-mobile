@@ -109,6 +109,30 @@ export const removeBackupStateFor = async (accountId: string): Promise<void> => 
   await AsyncStorage.removeItem(backupStateKeyFor(accountId))
 }
 
+/** Non-hook read for code that runs outside the provider (e.g. bundle sync). */
+export const readBackupStateFor = async (
+  accountId: string,
+): Promise<BackupState | null> => readBackupState(backupStateKeyFor(accountId))
+
+/**
+ * Single definition of "the seed is backed up to the cloud" - the gate the
+ * recovery-bundle cloud sync follows, with or without a passphrase on the seed.
+ * The refresh hook and the refresh core both use this so they cannot diverge
+ * on it.
+ *
+ * Reads completedMethods rather than method: method is last-wins, so a manual
+ * or keychain backup run after a cloud one would otherwise read as "never
+ * backed up to the cloud" and close the gate on a cloud seed that is still
+ * sitting there, silently stopping the automatic bundle sync.
+ */
+export const isCloudSeedBackupCompleted = (state: BackupState | null): boolean => {
+  /** completedMethods is returned as stored, so status is checked here rather
+   *  than relying on it: readBackupState does not validate the persisted shape,
+   *  and this gate must fail closed on anything it did not write itself. */
+  const isBackupCompleted = state?.status === BackupStatus.Completed
+  return isBackupCompleted && completedMethodsOf(state).includes(BackupMethod.Cloud)
+}
+
 export const markBackupCompletedFor = async (
   accountId: string,
   method: BackupMethod,

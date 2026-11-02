@@ -54,6 +54,24 @@ export const lnurlDomainsFor = (network: Network): string[] =>
     : [lnurlDomainFor(network), REGTEST_PAY_DOMAIN]
 
 /**
+ * Whether an address-form identifier (user@domain) names one of our own accounts on any
+ * network we know. Telemetry only: a cross-network false positive costs a miscounted
+ * referral, not a misrouted payment, so the check spans every known domain instead of
+ * resolving the active network.
+ */
+export const isOwnLnurlAddress = (identifier: string): boolean => {
+  const at = identifier.lastIndexOf("@")
+  if (at < 0) return false
+  const domain = identifier.slice(at + 1).toLowerCase()
+  return [
+    ...LNURL_DOMAINS,
+    MAINNET_LNURL_DOMAIN,
+    REGTEST_LNURL_DOMAIN,
+    REGTEST_PAY_DOMAIN,
+  ].includes(domain)
+}
+
+/**
  * Base URL of the LNURL server for a self-custodial account: the same host its address is
  * spelled with, which is what serves the authenticated `/lnurlpay/{pubkey}` routes. Not
  * the custodial `lnAddressHostname` — `pay.*` fronts the payment app and 404s them.
@@ -121,12 +139,58 @@ let cachedTokenIdentifier: string | null = null
 // throws on a misconfigured build; downstream callers in hot paths (mappers,
 // snapshot loops, conversion entry points) read the cached value without
 // re-validating.
-export const requireSparkTokenIdentifier = (): string => {
+const requireMainnetTokenIdentifier = (): string => {
   if (cachedTokenIdentifier !== null) return cachedTokenIdentifier
   const id = Config.SPARK_TOKEN_IDENTIFIER
   if (!id) {
     throw new Error("SPARK_TOKEN_IDENTIFIER is not configured for this build")
   }
   cachedTokenIdentifier = id
+  return id
+}
+
+/**
+ * The Stable Balance token on a network, or null when it has none. From 0.27 the SDK
+ * refuses to connect with a token minted on another network, and USDB exists on mainnet
+ * only, so regtest carries a token only when the build names a regtest one.
+ */
+export const sparkTokenIdentifierFor = (network: Network): string | null => {
+  if (network === Network.Mainnet) return requireMainnetTokenIdentifier()
+  return Config.SPARK_REGTEST_TOKEN_IDENTIFIER || null
+}
+
+/** Never throws: a mainnet build without its token is the SDK connect's error to raise. */
+export const hasSparkTokenFor = (network: Network): boolean => {
+  if (network === Network.Mainnet) return true
+  return sparkTokenIdentifierFor(network) !== null
+}
+
+/**
+ * The network the SDK was last configured for. Every SDK in a session runs on it, since a
+ * wallet stored for another network is refused before connect, so the token lookups deep
+ * in the bridge and mappers read it here rather than having it threaded through to them.
+ * Null before the first connect, which reads as mainnet: the lookups' behaviour before
+ * the token became per network.
+ */
+let sdkNetwork: Network | null = null
+
+export const setSparkTokenNetwork = (network: Network): void => {
+  sdkNetwork = network
+}
+
+/** The connected network's token, or null when it has none (regtest by default). */
+export const sparkTokenIdentifier = (): string | null =>
+  sdkNetwork === null
+    ? requireMainnetTokenIdentifier()
+    : sparkTokenIdentifierFor(sdkNetwork)
+
+/** For the calls that cannot run without a token: conversions, dollar sends and limits.
+ *  The dollar-balance gate keeps them out of reach on a network without one. */
+export const requireSparkTokenIdentifier = (): string => {
+  const id = sparkTokenIdentifier()
+  if (id === null) {
+    const label = sdkNetwork === null ? "this network" : networkLabelFor(sdkNetwork)
+    throw new Error(`No Spark token is configured for ${label}`)
+  }
   return id
 }

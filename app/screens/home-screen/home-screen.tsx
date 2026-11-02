@@ -78,6 +78,8 @@ import { ConvertDirection, DepositStatus } from "@app/types/payment"
 import { TwoFactorPrompt } from "@app/types/two-factor-enforcement"
 import { useBackupNudgeState } from "@app/self-custodial/hooks/use-backup-nudge-state"
 import { useSelfCustodialInfoBulletinState } from "@app/hooks/use-self-custodial-info-bulletin-state"
+import { StaleCloudBundleBulletin } from "@app/self-custodial/components/stale-cloud-bundle-bulletin"
+import { useStaleCloudBundleBulletin } from "@app/self-custodial/hooks/use-stale-cloud-bundle-bulletin"
 import { useTwoFactorEnforcement } from "@app/custodial/providers/two-factor-enforcement"
 import { useTwoFactorSessionPrompt } from "@app/screens/home-screen/hooks/use-two-factor-session-prompt"
 import { getErrorMessages } from "@app/graphql/utils"
@@ -249,6 +251,10 @@ export const HomeScreen: React.FC = () => {
     shouldShow: shouldShowSelfCustodialInfoBulletin,
     dismiss: dismissSelfCustodialInfoBulletin,
   } = useSelfCustodialInfoBulletinState()
+  const {
+    shouldShow: shouldShowStaleCloudBundleBulletin,
+    dismiss: dismissStaleCloudBundleBulletin,
+  } = useStaleCloudBundleBulletin()
   const {
     shouldShowNudgeCard: shouldShowTwoFactorNudgeCard,
     reminderBulletinReason: twoFactorReminderReason,
@@ -600,6 +606,8 @@ export const HomeScreen: React.FC = () => {
    *  "the migrate-now nudge can surface", so a region-gated account with no wind-down, or
    *  one whose self-custodial stack is off, still gets the compliance explanation. */
   const onGatedDollarTap = () => {
+    /** Nothing the user can do opens it, and the row's label already says why. */
+    if (dollarBalanceGateReason === GateReason.Network) return
     if (isAnonMode) {
       promptEnhancedMode()
       return
@@ -1031,6 +1039,9 @@ export const HomeScreen: React.FC = () => {
         )}
         {shouldShowSelfCustodialInfoBulletin && (
           <SelfCustodialInfoBulletin onDismiss={dismissSelfCustodialInfoBulletin} />
+        )}
+        {shouldShowStaleCloudBundleBulletin && (
+          <StaleCloudBundleBulletin onDismiss={dismissStaleCloudBundleBulletin} />
         )}
         <BulletinsCard loading={bulletinsLoading} bulletins={bulletins} />
         <AppUpdate />

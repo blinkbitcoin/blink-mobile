@@ -26,15 +26,17 @@ const mockIsRestricted = jest.fn()
 let mockIsRegionPending = false
 let mockIsRegionDetermined = true
 /** The gate's own reading of a closed gate, mirrored so the label can be asserted per reason. */
+let mockIsTokenMissing = false
 const mockGateReason = (): GateReason | null => {
+  if (mockIsTokenMissing) return GateReason.Network
   if (mockIsAnonMode) return GateReason.Anon
   if (!mockIsRestricted()) return null
   return mockIsRegionDetermined ? GateReason.Region : GateReason.UnknownRegion
 }
 jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
-  useDollarBalanceGated: () => mockIsAnonMode || mockIsRestricted(),
+  useDollarBalanceGated: () => mockIsTokenMissing || mockIsAnonMode || mockIsRestricted(),
   useDollarBalanceGate: () => ({
-    isGated: mockIsAnonMode || mockIsRestricted(),
+    isGated: mockIsTokenMissing || mockIsAnonMode || mockIsRestricted(),
     isRegionPending: mockIsRegionPending,
     reason: mockGateReason(),
   }),
@@ -112,6 +114,7 @@ describe("WalletOverview", () => {
     loadLocale("en")
     jest.clearAllMocks()
     mockIsAnonMode = false
+    mockIsTokenMissing = false
     mockIsRegionPending = false
     mockIsRegionDetermined = true
     mockIsRestrictedRegion = false
@@ -292,6 +295,27 @@ describe("WalletOverview", () => {
       expect(
         getByText("not available in Incognito mode", { includeHiddenElements: true }),
       ).toBeTruthy()
+      expect(queryByText("not available in your region")).toBeNull()
+    })
+
+    it("shows the network label on a network with no dollar token", async () => {
+      mockIsTokenMissing = true
+      mockIsAnonMode = true
+      const emptyUsdWallets: readonly WalletBalance[] = [
+        { id: "btc-id", walletCurrency: WalletCurrency.Btc, balance: 174726 },
+        { id: "usd-id", walletCurrency: WalletCurrency.Usd, balance: 0 },
+      ]
+
+      const { getByText, queryByText } = renderOverview({
+        wallets: emptyUsdWallets,
+        onGatedTap: jest.fn(),
+      })
+      await flushEffects()
+
+      expect(
+        getByText("not available on this network", { includeHiddenElements: true }),
+      ).toBeTruthy()
+      expect(queryByText("not available in Incognito mode")).toBeNull()
       expect(queryByText("not available in your region")).toBeNull()
     })
 

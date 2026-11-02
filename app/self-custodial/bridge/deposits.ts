@@ -34,22 +34,29 @@ export type MappedDeposit = {
   claimError: ClaimErrorInfo | null
   hasRefund: boolean
   /**
-   * How far an early (0-conf) claim has got (0.26). `settling`: the provider took the
-   * deposit but its transfer has not reached the wallet, so the funds are in neither
-   * the deposit nor the balance yet. `credited`: the funds are in the balance. The SDK
-   * keeps both rows until the provider spends the UTXO.
+   * How far a claim the SDK has already made has got (0.26). `settling`: the deposit is
+   * taken, but no completed receive for it is in the local history yet, so the funds
+   * are in neither the deposit nor the balance. `credited`: that receive is local, so
+   * the funds are in the balance. The SDK keeps the row either way until the provider
+   * spends the UTXO.
    */
   earlyClaim: EarlyClaim
 }
 
 export type EarlyClaim = "none" | "settling" | "credited"
 
-/** The SDK moves an early claim from Submitted to Claimed when the provider's transfer
- *  is claimed into this wallet. */
+/**
+ * Only the local history shows a claim credited, so both statuses start as settling.
+ * Submitted: the provider's transfer has not reached the wallet. Claimed: either the
+ * transfer was claimed here, just before its payment is stored, or a later claim found
+ * the deposit already taken (sdk/deposits.rs, sdk/sync.rs @0.27.1), which stores no
+ * payment at all: that receive comes from payment sync, which runs on its own.
+ */
 const mapEarlyClaim = (deposit: DepositInfo): EarlyClaim => {
-  if (deposit.instantClaimStatus?.tag === InstantClaimTag.Claimed) return "credited"
-  if (deposit.instantClaimStatus?.tag === InstantClaimTag.Submitted) return "settling"
-  return "none"
+  const tag = deposit.instantClaimStatus?.tag
+  return tag === InstantClaimTag.Submitted || tag === InstantClaimTag.Claimed
+    ? "settling"
+    : "none"
 }
 
 const mapClaimError = (deposit: DepositInfo): ClaimErrorInfo | null => {
@@ -99,9 +106,9 @@ const RECEIVES_MAX_PAGES = 500
 
 /**
  * Which of `settling` have already landed as a completed receive. A Submitted deposit
- * can still be credited: the transfer may have been claimed by another device on the
- * same wallet, or while this one was offline, which leaves this device's row
- * Submitted until the UTXO is spent. Any number of receives can land after it, so
+ * can be credited: the transfer may have been claimed by another device on the same
+ * wallet, or while this one was offline, which leaves this device's row Submitted
+ * until the UTXO is spent. A Claimed one can still be waiting for its receive. Any number of receives can land after it, so
  * history is paged, newest first, until every deposit is found or it runs out. A
  * receive arriving mid-scan shifts later pages down, so it repeats an entry rather
  * than skipping one.
@@ -208,10 +215,18 @@ const mapClaimOutcome = (outcome: ClaimDepositOutcome): ClaimOutcome => {
   if (reason.tag === DeferredReasonTag.NoEarlyClaimAvailable) {
     return { status: "deferred", reason: "awaiting_confirmations" }
   }
+  if (reason.tag === DeferredReasonTag.ProviderDeclined) {
+    return {
+      status: "deferred",
+      reason: "provider_declined",
+      message: reason.inner.message,
+    }
+  }
+  /** A reason a later SDK adds: still a deferral, named rather than read. */
   return {
     status: "deferred",
     reason: "provider_declined",
-    message: reason.inner.message,
+    message: `Claim deferred: ${(reason as { tag: string }).tag}`,
   }
 }
 

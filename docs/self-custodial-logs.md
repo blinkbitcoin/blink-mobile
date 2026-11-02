@@ -32,7 +32,9 @@ the header gives the number of self-custodial wallets on the device.
   roughly the last five hours of foreground use.
 - **Deleting any self-custodial wallet resets the whole log.** Lines don't say which
   wallet wrote them, so the only safe deletion is all of it. Remaining wallets lose their
-  log history up to that point. The SDK holds `sdk.log` open for the rest of the process
+  log history up to that point. Both ways a wallet leaves the device do this, since both
+  go through `eraseWalletFromDevice`: deleting it from settings, and the forgotten-PIN
+  escape that removes every wallet. The SDK holds `sdk.log` open for the rest of the process
   and can't reopen it, so the reset runs in steps that hold wherever the process stops:
   - `sdk.log.reset` is written *before* the wallet's backup phrase is removed. Only its
     existence counts, so a write torn by a crash can't make it keep anything.
@@ -124,8 +126,9 @@ log on 0.26.1 and 0.27.1), and preimages are printed as `<redacted>` by the SDK 
 pubkey, account ID or Lightning address.
 
 From 0.27.1 the SDK also passes the identity public key to the app's JS log listener on
-every line (`LogEntry.instanceId`). The listener forwards only the level and the line
-to Crashlytics, and `__tests__/self-custodial/logging.spec.ts` pins that.
+every line (`LogEntry.instanceId`). The listener reads only the level and the line, and
+only warn and error lines reach Crashlytics, scrubbed (`scrubSdkLogLine`);
+`__tests__/self-custodial/logging.spec.ts` pins that.
 
 ## Code
 

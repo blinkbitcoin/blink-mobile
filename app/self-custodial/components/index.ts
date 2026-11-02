@@ -1,6 +1,8 @@
 export { AccountModeSyncMount } from "./account-mode-sync-mount"
 export { AutoConvertListenerMount } from "./auto-convert-listener-mount"
 export { DisplayCurrencyFromRegionMount } from "./display-currency-from-region-mount"
+export { RecoveryBundleListenerMount } from "./recovery-bundle-listener-mount"
 export { OfflineGate } from "./offline-gate"
 export { PaymentOfflineNotice } from "./payment-offline-notice"
 export { LaunchCleanupMount } from "./launch-cleanup-mount"
+export { TelemetryContextMount } from "./telemetry-context-mount"

@@ -67,15 +67,17 @@ type UnavailableLabelInputs = {
 }
 
 /**
- * Anon and an undetermined region each get their own words; a decided restriction keeps
- * the region label. The sanctions block outranks the undetermined region, in the same
- * order the gated tap resolves: a sanctioned row opens the sanctions modal, so a label
- * inviting the user to pull and retry would promise a check that cannot reopen it.
+ * A network with no dollar token, Anon and an undetermined region each get their own
+ * words; a decided restriction keeps the region label. The sanctions block outranks the
+ * undetermined region, in the same order the gated tap resolves: a sanctioned row opens
+ * the sanctions modal, so a label inviting the user to pull and retry would promise a
+ * check that cannot reopen it.
  */
 const unavailableLabelFor = (
   { reason, isRestrictedRegion }: UnavailableLabelInputs,
   LL: TranslationFunctions,
 ): string => {
+  if (reason === GateReason.Network) return LL.StablesatsRestriction.networkWalletLabel()
   if (reason === GateReason.Anon) return LL.StablesatsRestriction.anonModeWalletLabel()
   if (isRestrictedRegion) return LL.StablesatsRestriction.walletLabel()
   if (reason === GateReason.UnknownRegion) {
