@@ -369,6 +369,13 @@ Deep reviews label structural findings by principle, and authors answer per-prin
       the only way back. Say in the PR which SDK floor every rollback candidate has to
       carry, and record both the upgrade in place and the reverse-open refusal (0.23 adds
       `instant_claim_status`; 0.26 and 0.27 add more).
+- [ ] SDK bumps: logging. Diff `crates/breez-sdk/core/src/logger.rs` between the two tags
+      (file name, append mode, filters) and scan the commits for new `{:?}` log lines.
+      Then grep a real `sdk.log` for the test phrase, `xprv`, raw preimages and any new
+      line carrying the identity key (known at 0.27.1: LNURL URLs and `Balance updated
+      for identity`). Since 0.27.1 the identity key travels as
+      `LogEntry.instanceId`: it must stay out of the file (`file_log_filter`) and out of
+      Crashlytics. See [Self-custodial wallet logs](./self-custodial-logs.md).
 
 ### Feature flags / Remote Config
 

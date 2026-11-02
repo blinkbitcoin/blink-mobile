@@ -1,6 +1,10 @@
 export {
   initSdk,
   disconnectSdk,
+  waitForSdkIdle,
+  retireSdkStorage,
+  readmitSdkStorage,
+  SdkStorageRetiredError,
   addSdkEventListener,
   removeSdkEventListener,
   selfCustodialCreateWallet,

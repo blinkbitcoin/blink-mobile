@@ -2,7 +2,6 @@ import {
   Seed,
   connect,
   defaultConfig,
-  initLogging,
   MaxFee,
   MaxOnchainFee,
   type BreezSdkInterface,
@@ -28,22 +27,10 @@ import {
   sparkTokenIdentifierFor,
   storageDirFor,
 } from "../config"
+import { startSdkLogger } from "../diagnostics/sdk-log-files"
 import { recoverLnurlServerMode } from "../lnurl-server-mode"
-import { createSdkLogListener } from "../logging"
 import { addSelfCustodialAccountId } from "../storage/account-index"
-
-const initializeLogging = (() => {
-  let done = false
-  return () => {
-    if (done) return
-    done = true
-    try {
-      initLogging(undefined, createSdkLogListener(), undefined)
-    } catch {
-      // initLogging can fail if called after SDK state changes; non-fatal
-    }
-  }
-})()
+import { finishPendingStorageRemovals } from "../storage/storage-removal"
 
 const createSdkConfig = (network: Network, leewaySatPerVbyte: number) => {
   const config = defaultConfig(network)
@@ -114,20 +101,128 @@ type InitSdkParams = {
   leewaySatPerVbyte: number
 }
 
+/**
+ * SDK instances per wallet storage directory, still connecting or live. Every one of them
+ * writes to the shared log, so a wallet being deleted keeps adding its lines until all of
+ * its instances are gone, including a connect that was in flight when the deletion began.
+ * Deletion waits for that before cutting the log (`waitForSdkIdle`).
+ */
+type SdkPresence = {
+  connecting: number
+  live: Set<BreezSdkInterface>
+  idleWaiters: Array<() => void>
+}
+const presenceByStorageDir = new Map<string, SdkPresence>()
+const storageDirBySdk = new WeakMap<BreezSdkInterface, string>()
+
+/**
+ * Storage directories of wallets being deleted. Waiting for a wallet's SDK to go idle is
+ * only a snapshot: a lifecycle that read the mnemonic before the deletion began can still
+ * call `initSdk` after it, write the deleted wallet's lines past the log cut and recreate
+ * its storage. Retiring the directory first makes `initSdk` refuse it from then on.
+ * Account ids are fresh UUIDs on create and restore, so a retired directory is never
+ * wanted again in this process; only a deletion that keeps the wallet readmits it.
+ */
+const retiredStorageDirs = new Set<string>()
+
+export class SdkStorageRetiredError extends Error {
+  constructor(storageDir: string) {
+    super(`SDK storage ${storageDir} belongs to a wallet being deleted`)
+    this.name = "SdkStorageRetiredError"
+  }
+}
+
+export const retireSdkStorage = (storageDir: string): void => {
+  retiredStorageDirs.add(storageDir)
+}
+
+/** For a deletion that stopped before removing the wallet: it is usable again. */
+export const readmitSdkStorage = (storageDir: string): void => {
+  retiredStorageDirs.delete(storageDir)
+}
+
+const refuseIfRetired = (storageDir: string): void => {
+  if (retiredStorageDirs.has(storageDir)) throw new SdkStorageRetiredError(storageDir)
+}
+
+const presenceFor = (storageDir: string): SdkPresence => {
+  let presence = presenceByStorageDir.get(storageDir)
+  if (!presence) {
+    presence = { connecting: 0, live: new Set(), idleWaiters: [] }
+    presenceByStorageDir.set(storageDir, presence)
+  }
+  return presence
+}
+
+const isIdle = ({ connecting, live }: SdkPresence): boolean =>
+  connecting === 0 && live.size === 0
+
+const notifyIfIdle = (presence: SdkPresence): void => {
+  if (!isIdle(presence)) return
+  const waiters = presence.idleWaiters.splice(0)
+  waiters.forEach((resolve) => resolve())
+}
+
+/**
+ * Resolves true once no SDK instance for `storageDir` is connecting or connected, or false
+ * after `timeoutMs`, if one is given: a connect can hang on the network, and a deletion
+ * must not hang with it. An instance whose disconnect failed never counts as gone.
+ */
+export const waitForSdkIdle = (
+  storageDir: string,
+  timeoutMs?: number,
+): Promise<boolean> => {
+  const presence = presenceFor(storageDir)
+  if (isIdle(presence)) return Promise.resolve(true)
+  return new Promise((resolve) => {
+    let timer: ReturnType<typeof setTimeout> | undefined
+    const onIdle = () => {
+      if (timer !== undefined) clearTimeout(timer)
+      resolve(true)
+    }
+    if (timeoutMs !== undefined) {
+      timer = setTimeout(() => {
+        presence.idleWaiters = presence.idleWaiters.filter((waiter) => waiter !== onIdle)
+        resolve(false)
+      }, timeoutMs)
+    }
+    presence.idleWaiters.push(onIdle)
+  })
+}
+
 export const initSdk = async ({
   mnemonic,
   storageDir,
   network,
   leewaySatPerVbyte,
 }: InitSdkParams): Promise<BreezSdkInterface> => {
-  initializeLogging()
-  const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
-  const config = createSdkConfig(network, leewaySatPerVbyte)
-  return connect({ config, seed, storageDir })
+  const presence = presenceFor(storageDir)
+  presence.connecting += 1
+  try {
+    // a deleted wallet's leftover storage goes before any SDK connects; never rejects
+    await finishPendingStorageRemovals().catch(() => undefined)
+    await startSdkLogger()
+    const seed = new Seed.Mnemonic({ mnemonic, passphrase: undefined })
+    const config = createSdkConfig(network, leewaySatPerVbyte)
+    // checked at the point of no return: everything above can wait (the sweep, the log lock)
+    refuseIfRetired(storageDir)
+    const sdk = await connect({ config, seed, storageDir })
+    presence.live.add(sdk)
+    storageDirBySdk.set(sdk, storageDir)
+    return sdk
+  } finally {
+    presence.connecting -= 1
+    notifyIfIdle(presence)
+  }
 }
 
 export const disconnectSdk = async (sdk: BreezSdkInterface): Promise<void> => {
   await sdk.disconnect()
+  const storageDir = storageDirBySdk.get(sdk)
+  if (storageDir === undefined) return
+  const presence = presenceFor(storageDir)
+  presence.live.delete(sdk)
+  notifyIfIdle(presence)
 }
 
 export const addSdkEventListener = (
