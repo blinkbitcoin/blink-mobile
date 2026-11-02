@@ -68,8 +68,15 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
     [progress],
   )
 
-  const walletName =
-    currency === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+  const walletNameOf = (value: WalletCurrency) =>
+    value === WalletCurrency.Btc ? LL.common.bitcoin() : LL.common.dollar()
+
+  // Read by the wallet, never the balance: a switch says what a tap selects.
+  const otherWallet =
+    currency === WalletCurrency.Btc ? WalletCurrency.Usd : WalletCurrency.Btc
+  const accessibilityLabel = onSwitch
+    ? LL.Accessibility.switchToWallet({ wallet: walletNameOf(otherWallet) })
+    : walletNameOf(currency)
 
   return (
     <Pressable
@@ -83,8 +90,7 @@ export const SendWalletSummary: React.FC<SendWalletSummaryProps> = ({
       onPress={onSwitch}
       disabled={!onSwitch}
       accessibilityRole={onSwitch ? "button" : undefined}
-      accessibilityLabel={`${walletName}, ${balancePrimary}`}
-      accessibilityHint={onSwitch ? LL.Accessibility.switchWalletHint() : undefined}
+      accessibilityLabel={accessibilityLabel}
     >
       <View style={styles.balances}>
         {/* An invisible two-line copy sets the height, so the card is the same size with or
