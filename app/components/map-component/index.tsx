@@ -34,6 +34,7 @@ import { AccountType } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
+import { fonts } from "@app/rne-theme/fonts"
 import { useFocusEffect } from "@react-navigation/native"
 import { isIOS } from "@rn-vui/base"
 import { Text, makeStyles, useTheme } from "@rn-vui/themed"
@@ -672,7 +673,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   addPlace: {
