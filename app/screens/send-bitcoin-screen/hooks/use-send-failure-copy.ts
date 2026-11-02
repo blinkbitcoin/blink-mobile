@@ -1,10 +1,9 @@
 import { useCallback } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { useTranslateSdkError } from "@app/self-custodial/hooks/use-translate-sdk-error"
 import { isSelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 
 import { isNothingSentFailure } from "../use-send-payment"
 
@@ -19,7 +18,7 @@ export const useSendFailureCopy = () => {
 
   return useCallback(
     (raw: string | undefined, { mayHaveSent = false } = {}) => {
-      crashlytics().log(`[send] failed: ${raw}`)
+      logBreadcrumb(`[send] failed: ${raw}`)
       if (isNothingSentFailure(raw)) {
         return (
           (isSelfCustodialErrorCode(raw) && translateSdkError(raw)) ||
