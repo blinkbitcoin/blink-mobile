@@ -1,6 +1,8 @@
 /* eslint-disable camelcase */
 // eslint-disable-next-line @typescript-eslint/ban-ts-comment
 // @ts-nocheck — GetFee<T> type expects GQL fee probe params that self-custodial doesn't use
+import { it } from "@jest/globals"
+
 import { PaymentSendResult, WalletCurrency } from "@app/graphql/generated"
 
 import {
@@ -10,11 +12,28 @@ import {
   createSendMutationOnchain,
   findLostSend,
 } from "@app/self-custodial/payment-details/send-helpers"
+import {
+  measureObservedPayment,
+  resetMeasuredOnceKeys,
+  resetMeasurementContext,
+  resetSettlementTracking,
+  setMeasurementContext,
+} from "@app/self-custodial/measurement"
 import { SelfCustodialErrorCode } from "@app/self-custodial/sdk-error"
+import { AccountMode } from "@app/types/account"
 import { ConvertAmountAdjustment } from "@app/types/payment"
 
 const mockPrepareSendPayment = jest.fn()
+
+const telemetry = { rail: "bolt11", sendingWallet: WalletCurrency.Btc }
+const telemetryOnchain = { rail: "onchain", sendingWallet: WalletCurrency.Btc }
 const mockSendPayment = jest.fn()
+
+jest.mock("@app/self-custodial/analytics-identity", () => ({
+  /** The identity owner's own spec covers when delivery is safe; here it is in place. */
+  isEnhancedIdentityApplied: () => true,
+  onEnhancedIdentityApplied: () => () => undefined,
+}))
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
   const tags = {
@@ -80,6 +99,11 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
 
 jest.mock("@app/screens/send-bitcoin-screen/fee-tier-selector", () => ({
   FeeTierOption: { Fast: "fast", Medium: "medium", Slow: "slow" },
+}))
+
+const mockLogEvent = jest.fn()
+jest.mock("@react-native-firebase/analytics", () => () => ({
+  logEvent: (...args: unknown[]) => mockLogEvent(...args),
 }))
 
 const mockRecordError = jest.fn()
@@ -550,11 +574,14 @@ describe("createSendMutation", () => {
     })
     mockSendPayment.mockResolvedValue(undefined)
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Success)
@@ -563,11 +590,14 @@ describe("createSendMutation", () => {
   it("classifies a thrown SdkError(InsufficientFunds) into the InsufficientFunds code", async () => {
     mockPrepareSendPayment.mockRejectedValue(sdkError("InsufficientFunds"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
@@ -581,11 +611,14 @@ describe("createSendMutation", () => {
       ]),
     )
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.errors?.[0].message).toBe(SelfCustodialErrorCode.InsufficientFunds)
@@ -594,11 +627,14 @@ describe("createSendMutation", () => {
   it("classifies a non-SdkError thrown value as Generic", async () => {
     mockPrepareSendPayment.mockRejectedValue(new Error("boom"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     const result = await send()
 
     expect(result.status).toBe(PaymentSendResult.Failure)
@@ -609,11 +645,14 @@ describe("createSendMutation", () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue(new Error("payment refused"))
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockRecordError).toHaveBeenCalledWith(
@@ -625,11 +664,14 @@ describe("createSendMutation", () => {
     mockRecordError.mockClear()
     mockPrepareSendPayment.mockRejectedValue("network blip")
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockRecordError).toHaveBeenCalledWith(
@@ -647,12 +689,15 @@ describe("createSendMutation", () => {
     })
     mockSendPayment.mockResolvedValue(undefined)
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: BigInt(1500),
-      tokenIdentifier: "usdb-token-id",
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: BigInt(1500),
+        tokenIdentifier: "usdb-token-id",
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockPrepareSendPayment).toHaveBeenCalledWith(
@@ -671,12 +716,15 @@ describe("createSendMutation", () => {
       completionTimeoutSecs: undefined,
     } as never
 
-    const send = createSendMutation({
-      sdk: mockSdk,
-      paymentRequest: "lnbc1...",
-      amount: undefined,
-      conversionOptions,
-    })
+    const send = createSendMutation(
+      {
+        sdk: mockSdk,
+        paymentRequest: "lnbc1...",
+        amount: undefined,
+        conversionOptions,
+      },
+      telemetry,
+    )
     await send()
 
     expect(mockPrepareSendPayment).toHaveBeenCalledWith(
@@ -699,6 +747,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "medium",
+      telemetryOnchain,
     )
     const result = await send()
 
@@ -716,6 +765,7 @@ describe("createSendMutationOnchain", () => {
     const send = createSendMutationOnchain(
       { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
       "fast",
+      telemetryOnchain,
     )
     const result = await send()
 
@@ -810,7 +860,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED) })
+    expect(found).toEqual({ status: "found", payment: sent("p1", COMPLETED), failed: [] })
     expect(mockListPayments).toHaveBeenCalledTimes(1)
   })
 
@@ -819,7 +869,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "found", payment: sent("p1", PENDING) })
+    expect(found).toEqual({ status: "found", payment: sent("p1", PENDING), failed: [] })
   })
 
   it("prefers a completed payment over a pending one for the same attempt", async () => {
@@ -831,12 +881,23 @@ describe("findLostSend", () => {
   })
 
   /** A failed payment is not the attempt landing; it is exactly what makes a retry safe. */
+  it("passes a failed payment back beside the one that landed", async () => {
+    walletAnswers([sent("p1", FAILED), sent("p2", COMPLETED)])
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p2" } })
+    expect(found).toMatchObject({ failed: [{ id: "p1" }] })
+  })
+
   it("passes over a failed payment", async () => {
     walletAnswers([sent("p1", FAILED)], [sent("p1", FAILED)], [sent("p1", FAILED)])
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    /** Not the attempt landing, so still safe to send again; passed back so telemetry
+     *  can close the attempt it ended. */
+    expect(found).toEqual({ status: "not-found", failed: [sent("p1", FAILED)] })
   })
 
   /** A busy wallet fills the first page with later sends; the payment is on the next. */
@@ -855,13 +916,35 @@ describe("findLostSend", () => {
     )
   })
 
-  it("stops at a completed match without turning the page", async () => {
-    walletAnswers([...fullPageOfOthers().slice(1), sent("p1", COMPLETED)])
+  /** An older attempt's failed payment can sit a page below the one that landed, and
+   *  that attempt reports its end only once it is seen. */
+  it("reads past a completed match to the failed ones on later pages", async () => {
+    walletAnswers(
+      [...fullPageOfOthers().slice(1), sent("p2", COMPLETED)],
+      [sent("p1", FAILED)],
+    )
+
+    const found = await settle(lookup())
+
+    expect(found).toMatchObject({
+      status: "found",
+      payment: { id: "p2" },
+      failed: [{ id: "p1" }],
+    })
+    expect(mockListPayments).toHaveBeenCalledTimes(2)
+  })
+
+  /** Pages that never run short leave the later ones unread, but not the match. */
+  it("keeps a completed match when twenty full pages have no end", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", COMPLETED)],
+    })
+    mockListPayments.mockResolvedValue({ payments: fullPageOfOthers() })
 
     const found = await settle(lookup())
 
     expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
-    expect(mockListPayments).toHaveBeenCalledTimes(1)
+    expect(mockListPayments).toHaveBeenCalledTimes(20)
   })
 
   /** A match is a payment of the invoice, whatever a later page would have said. */
@@ -919,7 +1002,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    expect(found).toEqual({ status: "not-found", failed: [] })
     expect(mockListPayments).toHaveBeenCalledTimes(3)
   })
 
@@ -953,7 +1036,7 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    expect(found).toEqual({ status: "not-found", failed: [] })
   })
 
   it("answers unreadable when the wallet could not catch up with the server on the last look", async () => {
@@ -996,6 +1079,187 @@ describe("findLostSend", () => {
 
     const found = await settle(lookup())
 
-    expect(found).toEqual({ status: "not-found" })
+    expect(found).toEqual({ status: "not-found", failed: [] })
+  })
+})
+
+describe("send telemetry", () => {
+  const COMPLETED = 0
+  const PENDING = 1
+  const FAILED = 2
+  const SEND = 0
+
+  const loggedEvents = () => mockLogEvent.mock.calls.map(([name]) => name)
+  const sentPayment = (status: number) => ({ payment: { id: "pay-1", status } })
+  const observe = (status: number) =>
+    measureObservedPayment({
+      id: "pay-1",
+      status,
+      paymentType: SEND,
+      method: 0,
+    } as never)
+
+  const sendBolt11 = () =>
+    createSendMutation(
+      { sdk: mockSdk, paymentRequest: "lnbc1...", amount: undefined },
+      telemetry,
+    )()
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    resetMeasuredOnceKeys()
+    resetSettlementTracking()
+    setMeasurementContext({
+      accountId: "sc-1",
+      mode: AccountMode.Enhanced,
+      network: "mainnet",
+    })
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+    })
+  })
+
+  afterAll(() => {
+    resetMeasurementContext()
+  })
+
+  it("reports a send the SDK completed as settled", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(COMPLETED))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith("sc_payment_send_settled", {
+      network: "mainnet",
+      rail: "bolt11",
+      sending_wallet: WalletCurrency.Btc,
+    })
+  })
+
+  it("holds a dispatched-but-pending send until the SDK settles it, once", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+
+    observe(COMPLETED)
+    observe(COMPLETED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+  })
+
+  it("reports a pending send the SDK later fails as failed, never settled", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await sendBolt11()
+    observe(FAILED)
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_failed",
+      expect.objectContaining({ rail: "bolt11", error_code: "sc_settlement_failed" }),
+    )
+  })
+
+  it("resolves a pending send whose outcome was announced before the call returned", async () => {
+    observe(COMPLETED)
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_settled",
+    ])
+  })
+
+  it("reports a send the SDK returned as failed as failed", async () => {
+    mockSendPayment.mockResolvedValue(sentPayment(FAILED))
+
+    await sendBolt11()
+
+    expect(loggedEvents()).toEqual([
+      "sc_payment_send_initiated",
+      "sc_payment_send_failed",
+    ])
+  })
+
+  it("reports a thrown send as failed with its classified code", async () => {
+    mockSendPayment.mockRejectedValue(sdkError("NetworkError"))
+
+    await sendBolt11()
+
+    expect(mockLogEvent).toHaveBeenLastCalledWith(
+      "sc_payment_send_failed",
+      expect.objectContaining({ error_code: SelfCustodialErrorCode.NetworkError }),
+    )
+  })
+
+  it("does not count a broadcast onchain send as settled", async () => {
+    mockPrepareSendPayment.mockResolvedValue({
+      paymentMethod: { tag: "BitcoinAddress", inner: {} },
+    })
+    mockSendPayment.mockResolvedValue(sentPayment(PENDING))
+
+    await createSendMutationOnchain(
+      { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
+      "medium",
+      telemetryOnchain,
+    )()
+
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+  })
+
+  it.each([
+    [
+      "another account",
+      { accountId: "sc-2", mode: AccountMode.Enhanced, network: "mainnet" },
+    ],
+    ["Incognito", { accountId: "sc-1", mode: AccountMode.Anon, network: "mainnet" }],
+    [
+      "another network",
+      { accountId: "sc-1", mode: AccountMode.Enhanced, network: "regtest" },
+    ],
+  ] as const)(
+    "does not report a rejection that arrives after a switch to %s",
+    async (_label, next) => {
+      let rejectSend: (err: unknown) => void = () => undefined
+      mockSendPayment.mockImplementation(
+        () =>
+          new Promise((_resolve, reject) => {
+            rejectSend = reject
+          }),
+      )
+
+      const pending = sendBolt11()
+      await Promise.resolve()
+      await Promise.resolve()
+      setMeasurementContext(next)
+      rejectSend(sdkError("NetworkError"))
+      const result = await pending
+
+      expect(result.status).toBe(PaymentSendResult.Failure)
+      expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
+    },
+  )
+
+  it("still reports the send itself as sent when the SDK returns no payment", async () => {
+    mockSendPayment.mockResolvedValue(undefined)
+
+    const result = await sendBolt11()
+
+    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 })

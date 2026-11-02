@@ -1,10 +1,16 @@
 import { useCallback, useEffect, useRef } from "react"
 
-import crashlytics from "@react-native-firebase/crashlytics"
 import DeviceInfo from "react-native-device-info"
 
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { AccountType, ActiveWalletStatus } from "@app/types/wallet"
+import {
+  errorKind,
+  logBreadcrumb,
+  recordAppError,
+  type RecordAppErrorOptions,
+  toError,
+} from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 
 import {
@@ -27,6 +33,14 @@ import { useSparkNetwork } from "./use-spark-network"
  * Payments settle asynchronously (claims, swaps, leaf churn); waiting after the
  * last event lets a burst of activity produce one refresh of the final state.
  */
+/** A background failure is otherwise invisible, so it is always a non-fatal, even when
+ *  it reads as connectivity; dropped like every other write while crash reporting is
+ *  closed. */
+const REFRESH_FAILURE: RecordAppErrorOptions = {
+  alwaysRecord: true,
+  jsErrorName: "recovery-bundle-refresh",
+}
+
 const PAYMENT_DEBOUNCE_MS = 15_000
 /** Fallback refresh when no payment happened in a day - covers missed events. */
 const STALE_AFTER_MS = 24 * 60 * 60 * 1000
@@ -74,7 +88,8 @@ const isBenignExportError = (error: unknown): boolean =>
  * send/receive (the SDK's PaymentSucceeded fires for both directions) and on
  * startup when the saved bundle is stale or missing. It always runs: there is
  * no opt-out, since a bundle that falls behind the wallet cannot recover the
- * funds it misses. Errors are recorded to crashlytics, never surfaced - the
+ * funds it misses. Errors are recorded to crashlytics (through the closed-domain
+ * gate), never surfaced - the
  * retries below and the next startup or payment try again.
  */
 export const useRecoveryBundleRefresh = (): void => {
@@ -144,18 +159,16 @@ export const useRecoveryBundleRefresh = (): void => {
         coverageKey,
       })
       if (result.success) {
-        crashlytics().log(`[recovery-bundle] refreshed: ${result.state.leafCount} leaves`)
+        logBreadcrumb(`[recovery-bundle] refreshed: ${result.state.leafCount} leaves`)
         return RefreshOutcome.Settled
       }
       if (isBenignExportError(result.error)) {
-        crashlytics().log("[recovery-bundle] refresh skipped: empty wallet")
+        logBreadcrumb("[recovery-bundle] refresh skipped: empty wallet")
         return RefreshOutcome.Settled
       }
-      // recordError, not a breadcrumb: background failures are otherwise
-      // invisible.
       const wrapped =
         result.error instanceof Error ? result.error : new Error(String(result.error))
-      crashlytics().recordError(wrapped, "recovery-bundle-refresh")
+      recordAppError(wrapped, REFRESH_FAILURE)
       return RefreshOutcome.Failed
     }
 
@@ -189,10 +202,7 @@ export const useRecoveryBundleRefresh = (): void => {
         refresh.timer = null
         runRefresh(paymentEventKey ?? undefined)
           .catch((err) => {
-            crashlytics().recordError(
-              err instanceof Error ? err : new Error(String(err)),
-              "recovery-bundle-refresh",
-            )
+            recordAppError(toError(err), REFRESH_FAILURE)
             return RefreshOutcome.Failed
           })
           .then(settle)
@@ -208,7 +218,7 @@ export const useRecoveryBundleRefresh = (): void => {
        * fresh.
        */
       markRecoveryBundleStale(currentAccountId, network).catch((err) => {
-        crashlytics().log(`[recovery-bundle] stale mark failed: ${err}`)
+        logBreadcrumb(`[recovery-bundle] stale mark failed (${errorKind(err)})`)
       })
       schedule(PAYMENT_DEBOUNCE_MS, lastPaymentEventKey)
       return undefined
@@ -228,7 +238,7 @@ export const useRecoveryBundleRefresh = (): void => {
           schedule(STARTUP_DELAY_MS)
         })
         .catch((err) => {
-          crashlytics().log(`[recovery-bundle] state read failed: ${err}`)
+          logBreadcrumb(`[recovery-bundle] state read failed (${errorKind(err)})`)
         })
       return () => {
         cancelled = true
@@ -257,7 +267,7 @@ export const useRecoveryBundleRefresh = (): void => {
         await syncExistingBundleToCloud(currentAccountId, network)
       })
       .catch((err) => {
-        crashlytics().log(`[recovery-bundle] cloud sync failed: ${err}`)
+        logBreadcrumb(`[recovery-bundle] cloud sync failed (${errorKind(err)})`)
       })
 
     return () => {

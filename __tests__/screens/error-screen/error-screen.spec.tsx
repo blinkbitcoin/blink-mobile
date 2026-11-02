@@ -1,13 +1,25 @@
 import React from "react"
+import { Text } from "react-native"
+import ErrorBoundary from "react-native-error-boundary"
 
-import { render } from "@testing-library/react-native"
+import { act, fireEvent, render, screen } from "@testing-library/react-native"
+import { NavigationContainer, useNavigation } from "@react-navigation/native"
+import {
+  createNativeStackNavigator,
+  NativeStackNavigationProp,
+} from "@react-navigation/native-stack"
 import { ThemeProvider } from "@rn-vui/themed"
 
+import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { LAUNCH_ROUTE } from "@app/navigation/unlock-routes"
 import theme from "@app/rne-theme/theme"
 import { ErrorScreen } from "@app/screens/error-screen/error-screen"
 
 const mockLog = jest.fn()
 const mockRecordError = jest.fn()
+const mockLogout = jest.fn()
+const mockSetAppLocked = jest.fn()
+const mockSetAppUnlocked = jest.fn()
 
 jest.mock("@react-native-firebase/crashlytics", () => () => ({
   log: (...args: string[]) => mockLog(...args),
@@ -20,7 +32,14 @@ jest.mock("@app/hooks", () => ({
 
 jest.mock("@app/hooks/use-logout", () => ({
   __esModule: true,
-  default: () => ({ logout: jest.fn() }),
+  default: () => ({ logout: mockLogout }),
+}))
+
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  useAuthenticationContext: () => ({
+    setAppLocked: mockSetAppLocked,
+    setAppUnlocked: mockSetAppUnlocked,
+  }),
 }))
 
 jest.mock("@app/i18n/i18n-react", () => ({
@@ -57,16 +76,17 @@ jest.mock("@app/components/screen", () => ({
   Screen: ({ children }: { children: React.ReactNode }) => <>{children}</>,
 }))
 
-const renderErrorScreen = (error: Error) =>
+const renderErrorScreen = (error: Error, resetError: () => void = jest.fn()) =>
   render(
     <ThemeProvider theme={theme}>
-      <ErrorScreen error={error} resetError={jest.fn()} />
+      <ErrorScreen error={error} resetError={resetError} />
     </ThemeProvider>,
   )
 
 describe("ErrorScreen crash reporting", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    mockLogout.mockResolvedValue({ isAppLockKept: false })
   })
 
   it("records the boundary error even when its message looks connectivity-shaped", () => {
@@ -84,5 +104,119 @@ describe("ErrorScreen crash reporting", () => {
     renderErrorScreen(error)
 
     expect(mockRecordError).toHaveBeenCalledWith(error)
+  })
+})
+
+describe("ErrorScreen app reset", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockLogout.mockResolvedValue({ isAppLockKept: false })
+  })
+
+  const pressClearAppData = async (resetError: () => void) => {
+    const { getByText } = renderErrorScreen(new Error("boom"), resetError)
+
+    await act(async () => {
+      fireEvent.press(getByText("clear"))
+    })
+  }
+
+  /**
+   * This boundary sits outside the navigator, so there is no route to reset to: raising
+   * the flag is what carries a kept lock across the boundary reset, and without it the
+   * user would drop back into the app with the lock it kept never answered.
+   */
+  it("raises the lock flag before clearing the boundary when the logout kept the lock", async () => {
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
+    const resetError = jest.fn()
+
+    await pressClearAppData(resetError)
+
+    expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
+    expect(resetError).toHaveBeenCalledTimes(1)
+    const lockOrder = mockSetAppLocked.mock.invocationCallOrder[0]
+    const resetOrder = resetError.mock.invocationCallOrder[0]
+    expect(lockOrder).toBeLessThan(resetOrder)
+  })
+
+  /** The flag starts raised, so a crash before the first unlock would otherwise leave it
+   *  up after the lock itself was erased, with no lock screen left that could lower it. */
+  it("lowers the flag when the logout took the lock with it", async () => {
+    mockLogout.mockResolvedValue({ isAppLockKept: false })
+    const resetError = jest.fn()
+
+    await pressClearAppData(resetError)
+
+    expect(mockSetAppUnlocked).toHaveBeenCalledTimes(1)
+    expect(mockSetAppLocked).not.toHaveBeenCalled()
+    expect(resetError).toHaveBeenCalledTimes(1)
+  })
+
+  it("raises the flag without lowering it when the lock was kept", async () => {
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
+
+    await pressClearAppData(jest.fn())
+
+    expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+  })
+})
+
+/**
+ * The app mounts this boundary inside the navigation container and around the root stack,
+ * so the reset hands nothing a route: it relies on the stack remounting at its own launch
+ * route. A container that kept the crashed screen's state would put the user straight back
+ * on it, past the gate.
+ */
+describe("ErrorScreen inside the app's navigation container", () => {
+  const Stack = createNativeStackNavigator<RootStackParamList>()
+
+  const GateScreen = () => {
+    const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+    return <Text onPress={() => navigation.navigate("Primary")}>gate</Text>
+  }
+
+  const CrashingScreen = () => {
+    throw new Error("render crash")
+  }
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    mockLogout.mockResolvedValue({ isAppLockKept: true })
+    jest.spyOn(console, "error").mockImplementation(() => undefined)
+  })
+
+  afterEach(() => {
+    jest.restoreAllMocks()
+  })
+
+  it("comes back at the gate once the app data is cleared, not on the screen that crashed", async () => {
+    render(
+      <ThemeProvider theme={theme}>
+        <NavigationContainer>
+          <ErrorBoundary FallbackComponent={ErrorScreen}>
+            <Stack.Navigator
+              initialRouteName={LAUNCH_ROUTE}
+              screenOptions={{ headerShown: false }}
+            >
+              <Stack.Screen name="authenticationCheck" component={GateScreen} />
+              <Stack.Screen name="Primary" component={CrashingScreen} />
+            </Stack.Navigator>
+          </ErrorBoundary>
+        </NavigationContainer>
+      </ThemeProvider>,
+    )
+
+    await act(async () => {
+      fireEvent.press(screen.getByText("gate"))
+    })
+    expect(screen.getByText("fatal")).toBeTruthy()
+
+    await act(async () => {
+      fireEvent.press(screen.getByText("clear"))
+    })
+
+    expect(screen.getByText("gate")).toBeTruthy()
+    expect(screen.queryByText("fatal")).toBeNull()
+    expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
   })
 })

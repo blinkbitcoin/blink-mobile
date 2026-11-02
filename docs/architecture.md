@@ -78,8 +78,8 @@ GestureHandlerRootView
 
 ```
 RootStack (Stack Navigator)
-├── getStarted          # Initial screen (unauthenticated)
-├── authenticationCheck # Auth check screen
+├── getStarted          # Landing screen (no account), reached through the gate
+├── authenticationCheck # Gate: every launch starts here and asks for the app lock, if set
 ├── authentication      # Login/PIN screen
 ├── login               # Login method selection
 ├── pin                 # PIN entry
@@ -170,6 +170,24 @@ cache, `AsyncStorage_db_size_in_MB` is raised from the 6 MB default in
 `android/gradle.properties`.
 
 ## Authentication Flow
+
+Every launch starts at `authenticationCheck`, with an account or without. It asks for the
+app lock when the device has one, then lands on `Primary` for a device with an account to
+show and on `getStarted` for one without. A logout keeps the app lock for as long as the
+device still stores a self-custodial wallet, and whatever ends a session without the lock
+having been answered returns to the gate rather than to `getStarted`.
+
+Every entry is recorded with its wait before it is compared, and a correct one takes both
+back. The wait is seconds for the first two failures, then minutes that grow with each
+failure from the third on, up to an hour. The third failure is the one that ends the
+session. Where the lock outlives that logout, a later wrong entry ends nothing, and the
+wait is what paces the guesses. The count and the wait are stored as one value, so they
+survive a relaunch. An entry the store cannot record is not judged at all, and the keypad
+stays for a retry. A correct entry whose clear is refused puts back the count from before
+it, but a kill between the record and the clear leaves that entry counted, until the next
+correct one takes it back.
+
+The diagram below is the sign-in that starts from `getStarted`.
 
 ```
 ┌──────────────┐     ┌──────────────┐     ┌──────────────┐

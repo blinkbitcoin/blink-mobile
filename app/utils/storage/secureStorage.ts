@@ -6,6 +6,7 @@ import RNSecureKeyStore, {
 import { type SecureExists } from "./secure-store"
 import {
   type ReadThroughArgs,
+  eraseLegacyCopy,
   existsThrough,
   readThrough,
   removeThrough,
@@ -38,16 +39,11 @@ export type SessionProfilesRead =
   | { status: "absent" }
   | { status: "failed"; err: unknown }
 
-// Both native modules reject a missing key with code "404" (ios/RNSecureKeyStore.m
-// `get`, android RNSecureKeyStoreModule#get). Every other code means the read
-// itself went wrong.
-//
-// True on Android only. The iOS module discards the OSStatus from
-// SecItemCopyMatching (`searchKeychainCopyMatching` returns nil for any failure)
-// and `get` rejects nil with "404", so an entitlement or decode error is
-// indistinguishable from a missing key there. Every caller that branches on this
-// therefore degrades to "absent" on iOS; the distinction becomes real when the
-// slots move to react-native-keychain (blink-wip#1161).
+// Both native modules reject a missing key with code "404", and only a missing key
+// (android RNSecureKeyStoreModule#get, and ios/RNSecureKeyStore.m `get` through
+// patches/react-native-secure-key-store+2.0.10.patch, since the module used to drop
+// the keychain status and reject every failed lookup as missing). Every other code
+// means the read itself went wrong.
 const KEY_NOT_FOUND_CODE = "404"
 
 const isKeyNotFound = (err: unknown): boolean =>
@@ -61,7 +57,8 @@ const isKeyNotFound = (err: unknown): boolean =>
  * the PIN lockout block.
  */
 export type PinFailureState = {
-  /** Consecutive wrong-PIN entries. */
+  /** Consecutive PIN entries counted against the budget: the wrong ones, and
+   *  the one being judged, which is counted before it is compared. */
   readonly attempts: number
   /** Epoch ms the lock lifts at; 0 when no lock is in force. */
   readonly lockedUntil: number
@@ -79,11 +76,34 @@ type SecureStoreRead =
 
 const CLEARED_PIN_FAILURE_STATE: PinFailureState = { attempts: 0, lockedUntil: 0 }
 
+/**
+ * The stored shape: both fields, spelled out, on every write.
+ *
+ * Every release since 3.0.29 parses this blob, and the ones that shipped the
+ * first lockout demand both fields be finite and fall back to a clean slate
+ * otherwise. A blob missing either would hand a downgraded install the budget
+ * its user had already spent.
+ */
+const serializePinFailureState = (state: PinFailureState): string =>
+  JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil })
+
+/**
+ * Whether the legacy attempt count may still be stored, remembered for the life of the
+ * process. Erasing it on every write and clear costs native round trips on the unlock path
+ * for a slot an upgrade empties once. So it is erased by the first write or clear in a
+ * process, and again only after a read finds a count in it. Only an erase that succeeds
+ * settles it: the current key shadows a stale count just until a clear erases that key, and
+ * the next launch would read the old count back, so a failed erase is tried again.
+ */
+let mayLegacyPinAttemptsRemain = true
+
 export default class KeyStoreWrapper {
   private static readonly IS_BIOMETRICS_ENABLED = "isBiometricsEnabled"
   private static readonly PIN = "PIN"
+  /** The key keeps its name across the lockout's arrival, removal and return: it
+   *  is what shipped releases wrote, and renaming it would orphan their state. */
   private static readonly PIN_FAILURE_STATE = "pinFailureState"
-  /** Pre-lockout releases stored the bare attempt count here. Read once, then
+  /** Older releases stored the bare attempt count here. Read once, then
    *  erased — see getPinFailureState. */
   private static readonly LEGACY_PIN_ATTEMPTS = "pinAttempts"
   private static readonly SESSION_PROFILES = "sessionProfiles"
@@ -264,10 +284,12 @@ export default class KeyStoreWrapper {
   }
 
   // ── PIN lockout ───────────────────────────────────────────────────────────
-  // The attempt count and the lock expiry are one logical value, so they live
-  // under one key as one serialized write. Two keys made a write non-atomic:
-  // if only the lock landed, the failure itself was lost, and the attacker got
-  // a free attempt cycle back the moment the lock expired.
+  /** The attempt count and the lock expiry are one logical value, so they live
+   *  under one key as one serialized write. Two keys would make a write
+   *  non-atomic: if only the lock landed, the failure itself would be lost, and
+   *  the budget would come back the moment the lock expired. One write also
+   *  makes the boolean it returns the whole truth about whether the failure was
+   *  recorded, which a caller that must not lose one has to act on. */
 
   public static async getPinFailureState(): Promise<PinFailureStateRead> {
     const current = await KeyStoreWrapper.migratedReadWithStatus(
@@ -282,14 +304,19 @@ export default class KeyStoreWrapper {
     }
     if (current.status === "failed") return current
 
-    // Upgrade path: an install that failed a PIN before this release has an
-    // attempt count and no lock. Reading it keeps that budget spent; the next
-    // write moves it to the new key and erases this one.
+    /** Upgrade path: an install that failed a PIN under an older release has an
+     *  attempt count under the legacy key and no lock. Reading it keeps that
+     *  budget spent; the next write moves it to the new key and erases this
+     *  one. */
     const legacy = await KeyStoreWrapper.migratedReadWithStatus(
       KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
     )
     if (legacy.status === "failed") return legacy
-    if (legacy.status === "absent") return { status: "absent" }
+    if (legacy.status === "absent") {
+      mayLegacyPinAttemptsRemain = false
+      return { status: "absent" }
+    }
+    mayLegacyPinAttemptsRemain = true
 
     const attempts = Number(legacy.value)
     return {
@@ -301,35 +328,53 @@ export default class KeyStoreWrapper {
     }
   }
 
-  /** Missing, corrupt and non-finite all collapse to a clean slate, so no NaN
-   *  can escape into a comparison downstream. */
+  /** Missing, unparseable and a non-finite count all collapse to a clean slate,
+   *  so no NaN can escape into a comparison downstream. */
   private static parsePinFailureState(raw: string): PinFailureState {
     try {
       const parsed = JSON.parse(raw)
       const attempts = Number(parsed?.attempts)
-      const lockedUntil = Number(parsed?.lockedUntil)
-      if (!Number.isFinite(attempts) || !Number.isFinite(lockedUntil)) {
+      if (!Number.isFinite(attempts)) {
         return CLEARED_PIN_FAILURE_STATE
       }
-      return { attempts, lockedUntil }
+      /** A count that reads fine keeps its meaning whatever sits beside it: an
+       *  expiry that does not read is no lock, not a reason to hand the spent
+       *  attempts back. */
+      const lockedUntil = Number(parsed?.lockedUntil)
+      return { attempts, lockedUntil: Number.isFinite(lockedUntil) ? lockedUntil : 0 }
     } catch {
       return CLEARED_PIN_FAILURE_STATE
     }
   }
 
-  /** One write, so the boolean is the whole truth: false means the failure was
-   *  not recorded at all, which a caller that must not lose one has to act on. */
+  /** One write, so the boolean is the whole truth: false means nothing was
+   *  recorded at all, which a caller that must not lose an attempt has to act
+   *  on. */
   public static async setPinFailureState(state: PinFailureState): Promise<boolean> {
     const written = await KeyStoreWrapper.migratedWrite(
       KeyStoreWrapper.PIN_FAILURE_STATE,
-      JSON.stringify({ attempts: state.attempts, lockedUntil: state.lockedUntil }),
+      serializePinFailureState(state),
     )
 
     // The new key shadows the legacy one on read, so a failed erase here costs
     // nothing but a stale entry.
-    if (written) await KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS)
+    if (written) await KeyStoreWrapper.eraseLegacyPinAttemptsOnce()
 
     return written
+  }
+
+  /** Erases the legacy attempt count unless this process already erased it. True when
+   *  there was nothing left to erase, so a clear does not re-read over a slot it skipped. */
+  private static async eraseLegacyPinAttemptsOnce(): Promise<boolean> {
+    if (!mayLegacyPinAttemptsRemain) return true
+    const isErased = await KeyStoreWrapper.migratedErase(
+      KeyStoreWrapper.LEGACY_PIN_ATTEMPTS,
+    )
+    /** Set after the await on purpose: reads and erases of the slot take turns in one
+     *  queue, so a read that found a count before this erase ran was answered first, and
+     *  the slot this settles is empty. */
+    if (isErased) mayLegacyPinAttemptsRemain = false // eslint-disable-line require-atomic-updates
+    return isErased
   }
 
   /**
@@ -343,28 +388,57 @@ export default class KeyStoreWrapper {
   public static async clearPinFailureState(): Promise<boolean> {
     const [erased, legacyErased] = await Promise.all([
       KeyStoreWrapper.migratedErase(KeyStoreWrapper.PIN_FAILURE_STATE),
-      KeyStoreWrapper.migratedErase(KeyStoreWrapper.LEGACY_PIN_ATTEMPTS),
+      KeyStoreWrapper.eraseLegacyPinAttemptsOnce(),
     ])
 
     if (erased && legacyErased) return true
 
-    // An erase reports failure for a key that was never there too, so ask what
-    // is actually still readable rather than writing on every clear.
+    // An erase can fail on a slot that holds nothing to clear, so ask what is
+    // actually still readable rather than writing on every failed clear.
     const remaining = await KeyStoreWrapper.getPinFailureState()
     if (remaining.status === "absent") return true
-    if (
+    const isAlreadyCleared =
       remaining.status === "found" &&
       remaining.state.attempts === 0 &&
       remaining.state.lockedUntil === 0
-    ) {
+    if (isAlreadyCleared) {
       return true
     }
 
     // Writing the cleared value also shadows a legacy key that would not erase.
     return KeyStoreWrapper.migratedWrite(
       KeyStoreWrapper.PIN_FAILURE_STATE,
-      JSON.stringify(CLEARED_PIN_FAILURE_STATE),
+      serializePinFailureState(CLEARED_PIN_FAILURE_STATE),
     )
+  }
+
+  /**
+   * The app lock as one thing: the PIN, the biometrics flag and the spent attempt budget,
+   * kept or dropped together.
+   *
+   * The group cannot be split. A PIN without its spent attempt count hands the next round a
+   * fresh budget against a secret that no longer expires, and a PIN without the biometrics
+   * flag routes every later unlock to the keypad instead of to the prompt its owner chose.
+   * It lives here, beside the slots, so a caller that may erase the lock does not carry its
+   * own copy of the list. `clearUninstallSurvivingCredentials` still enumerates them, on
+   * purpose: it reports and retries per slot, and it wipes more than the lock.
+   *
+   * The PIN goes first, and a PIN that will not erase stops the rest. Left without its
+   * spent count and its biometrics flag, a surviving PIN would be exactly the split the
+   * group exists to prevent. The reverse is harmless: a count left behind is cleared by
+   * the next PIN that is set, and a flag left behind still asks before it opens anything.
+   *
+   * Returns whether the lock is provably gone: a slot that could not be erased is a lock
+   * that is still set, and the caller has to keep treating it as one.
+   */
+  public static async clearAppLock(): Promise<boolean> {
+    const isPinErased = await KeyStoreWrapper.removePin()
+    if (!isPinErased) return false
+
+    const isSpentBudgetErased = await KeyStoreWrapper.clearPinFailureState()
+    const isBiometricsFlagErased = await KeyStoreWrapper.removeIsBiometricsEnabled()
+
+    return isSpentBudgetErased && isBiometricsFlagErased
   }
 
   // ── session profiles ──────────────────────────────────────────────────────
@@ -388,9 +462,6 @@ export default class KeyStoreWrapper {
    * write the list back must use this instead of getSessionProfiles: an empty
    * list scored from a failed read deletes every profile, and profiles carry
    * their sessions' tokens.
-   *
-   * Platform caveat: this only separates the two cases on Android — see the
-   * note above KEY_NOT_FOUND_CODE.
    *
    * A payload that will not parse, or that parses to something other than an
    * array, is reported as absent rather than failed: it holds nothing a caller
@@ -435,10 +506,6 @@ export default class KeyStoreWrapper {
    * "nothing stored" and "the keystore is unhappy" arrive the same way and only
    * the error code tells them apart. Callers that would destroy or overwrite a
    * credential based on an empty read must use this instead of getActiveToken.
-   *
-   * The code only tells them apart on Android — see the note above
-   * KEY_NOT_FOUND_CODE. On iOS every failed read reports absent, so the failed
-   * branch its callers take is unreachable there.
    */
   public static async readActiveToken(): Promise<ActiveTokenRead> {
     const read = await KeyStoreWrapper.migratedReadWithStatus(
@@ -516,7 +583,10 @@ export default class KeyStoreWrapper {
     // that strands its new owner, since a reinstall would boot into a PIN
     // nobody on this device ever chose.
     await removeWithRetry(KeyStoreWrapper.removePin, "pin")
-    await removeWithRetry(KeyStoreWrapper.clearPinFailureState, "pin lockout state")
+    /** A wipe does not trust what this process remembers about the legacy count: the
+     *  slot it asks about is the one an uninstall left behind. */
+    mayLegacyPinAttemptsRemain = true
+    await removeWithRetry(KeyStoreWrapper.clearPinFailureState, "pin attempt count")
     await removeWithRetry(KeyStoreWrapper.removeIsBiometricsEnabled, "biometrics flag")
   }
 
@@ -559,11 +629,18 @@ export default class KeyStoreWrapper {
     )
   }
 
+  /**
+   * Answers whether the seed is gone, not whether this call removed it. A removal retried
+   * after an earlier one landed finds no key, and the iOS module rejects that delete like
+   * any failure, so a seed already gone would count as surviving forever and its wallet
+   * could never leave the list. The legacy-copy rule every migrated slot erases by settles
+   * it with a blank write the keychain has to accept.
+   */
   public static async deleteMnemonicForAccount(accountId: string): Promise<boolean> {
-    const removed = await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicKeyFor(accountId))
+    const isSeedGone = await eraseLegacyCopy(KeyStoreWrapper.mnemonicKeyFor(accountId))
     // The network marker is derived data; failing to drop it is tolerated.
     await KeyStoreWrapper.erase(KeyStoreWrapper.mnemonicNetworkKeyFor(accountId))
-    return removed
+    return isSeedGone
   }
 
   public static async getMnemonicNetworkForAccount(

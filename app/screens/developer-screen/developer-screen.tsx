@@ -22,7 +22,6 @@ import { useAppConfig } from "@app/hooks/use-app-config"
 import { cancelPendingClipboardClear } from "@app/hooks/use-clipboard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import Clipboard from "@react-native-clipboard/clipboard"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { Button, Text, makeStyles } from "@rn-vui/themed"
@@ -31,6 +30,7 @@ import { Screen } from "@app/components/screen"
 import { usePriceConversion, useSaveSessionProfile } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import useLogout from "../../hooks/use-logout"
+import { crashForTesting } from "../../utils/error-reporting"
 import { addDeviceToken } from "../../utils/notifications"
 import { testProps } from "../../utils/testProps"
 import useAppCheckToken from "../get-started-screen/use-device-token"
@@ -263,8 +263,7 @@ export const DeveloperScreen: React.FC = () => {
                 title="Crash test"
                 containerStyle={styles.button}
                 onPress={() => {
-                  crashlytics().log("Testing crash")
-                  crashlytics().crash()
+                  crashForTesting()
                 }}
               />
             </>

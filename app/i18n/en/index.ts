@@ -55,6 +55,12 @@ const en: BaseTranslation = {
     usePin: "Use PIN",
     confirmLogout:
       "Are you sure you'd like to log out? This will reset your cache and all local user settings",
+    forgotPin: "Forgot PIN? Remove wallets",
+    removeWalletsTitle: "Remove wallets from this device?",
+    removeWalletsBody:
+      "This removes all wallets from this device and logs you out. To get a wallet back, you need its backup phrase. Without it, the wallet is lost.",
+    removeWalletsConfirm: "Remove wallets",
+    removeWalletsFailed: "Some wallets could not be removed. Please try again.",
   },
   PeopleScreen: {
     title: "People",
@@ -2187,16 +2193,19 @@ const en: BaseTranslation = {
       "Wallet count is not 2. Please use the dashboard to see all the wallets and funds of this account",
   },
   PinScreen: {
+    attemptBudgetSpent: "Too many failed attempts.",
+    attemptUnrecorded: "Couldn't record the attempt securely.",
+    attemptsLeft: "{attemptsRemaining: number} attempts remaining.",
     attemptsRemaining: "Incorrect PIN. {attemptsRemaining: number} attempts remaining.",
     enterPin: "Enter your PIN code",
-    lockoutUnavailable: "Couldn't record the failed attempt securely. Logging out.",
+    oneAttemptLeft: "1 attempt remaining.",
     oneAttemptRemaining: "Incorrect PIN. 1 attempt remaining.",
     pinUnreadable: "Couldn't check your PIN. Please try again.",
     setPin: "Set your PIN code",
     setPinFailedMatch: "Pins didn't match - Set your PIN code",
     storePinFailed: "Unable to store your pin.",
     tooManyAttempts: "Too many failed attempts. Logging out.",
-    tryAgainIn: "Try again in {seconds: number}s.",
+    tryAgainIn: "Try again in {time: string}.",
     verifyPin: "Verify your PIN code",
   },
   PriceHistoryScreen: {
@@ -2530,6 +2539,9 @@ const en: BaseTranslation = {
     createError: "Could not create the API key. Please try again.",
     revokeError: "Could not revoke the API key. Please try again.",
     loadError: "Could not load your API keys. Please try again later.",
+    discardSecretTitle: "Discard this API key?",
+    discardSecretBody:
+      "This is the only time the secret is shown. If you leave now, the key cannot be recovered and you will need to create a new one.",
     done: "Done",
   },
   SettingsScreen: {
@@ -3179,6 +3191,8 @@ const en: BaseTranslation = {
       "Sorry we appear to be having issues loading the application data.  If problems persist please contact support.",
     showError: "Show Error",
     clearAppData: "Clear App Data and Logout",
+    screenSecurityUnavailable:
+      "This screen stays hidden because screenshot protection could not be turned on.",
   },
   notifications: {
     payment: {
