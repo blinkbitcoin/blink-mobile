@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Xóa",
     "swapCurrencyHint": "Chuyển đơn vị tiền tệ bạn dùng để nhập số tiền",
-    "switchWalletHint": "Chuyển sang ví còn lại của bạn",
+    "switchToWallet": "Chuyển sang {wallet: string}",
     "copy": "Sao chép"
   },
   "AppUpdate": {

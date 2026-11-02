@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Izbriši",
     "swapCurrencyHint": "Mijenja valutu u kojoj upisujete iznos",
-    "switchWalletHint": "Prebacuje na vaš drugi novčanik",
+    "switchToWallet": "Prebaci na {wallet: string}",
     "copy": "Kopiraj"
   },
   "AppUpdate": {

@@ -3090,7 +3090,7 @@
     "Accessibility": {
         "deleteKey": "削除",
         "swapCurrencyHint": "金額を入力する通貨を切り替えます",
-        "switchWalletHint": "もう一方のウォレットに切り替えます",
+        "switchToWallet": "{wallet: string} に切り替える",
         "copy": "コピー"
     },
     "AppUpdate": {

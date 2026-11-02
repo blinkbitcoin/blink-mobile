@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Törlés",
     "swapCurrencyHint": "Átváltja a pénznemet, amelyben az összeget megadja",
-    "switchWalletHint": "Átvált a másik pénztárcájára",
+    "switchToWallet": "Váltás erre: {wallet: string}",
     "copy": "Másol"
   },
   "AppUpdate": {

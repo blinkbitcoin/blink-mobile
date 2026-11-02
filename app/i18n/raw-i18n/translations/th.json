@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "ลบ",
     "swapCurrencyHint": "สลับสกุลเงินที่คุณใช้พิมพ์จำนวน",
-    "switchWalletHint": "สลับไปยังกระเป๋าอีกใบของคุณ",
+    "switchToWallet": "สลับไปใช้ {wallet: string}",
     "copy": "คัดลอก"
   },
   "AppUpdate": {

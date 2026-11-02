@@ -3242,7 +3242,7 @@ const en: BaseTranslation = {
     copy: "Copy",
     deleteKey: "Delete",
     swapCurrencyHint: "Switches the currency you type the amount in",
-    switchWalletHint: "Switches to your other wallet",
+    switchToWallet: "Switch to {wallet: string}",
   },
   AppUpdate: {
     needToUpdateSupportMessage:

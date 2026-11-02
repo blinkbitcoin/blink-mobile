@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Wissen",
     "swapCurrencyHint": "Wisselt de valuta waarin je het bedrag invoert",
-    "switchWalletHint": "Schakelt over naar je andere wallet",
+    "switchToWallet": "Overschakelen naar {wallet: string}",
     "copy": "Kopiëren"
   },
   "AppUpdate": {

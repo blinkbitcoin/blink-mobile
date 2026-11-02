@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Vymazať",
     "swapCurrencyHint": "Prepne menu, v ktorej zadávate sumu",
-    "switchWalletHint": "Prepne na vašu druhú peňaženku",
+    "switchToWallet": "Prepnúť na {wallet: string}",
     "copy": "Kopírovať"
   },
   "AppUpdate": {

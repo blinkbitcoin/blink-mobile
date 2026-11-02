@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Șterge",
     "swapCurrencyHint": "Schimbă moneda în care introduceți suma",
-    "switchWalletHint": "Trece la celălalt portofel",
+    "switchToWallet": "Treci la {wallet: string}",
     "copy": "Copiați"
   },
   "AppUpdate": {

@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Futa",
     "swapCurrencyHint": "Hubadilisha sarafu unayoandikia kiasi",
-    "switchWalletHint": "Hubadilisha kwenda kwenye pochi yako nyingine",
+    "switchToWallet": "Badilisha kwenda {wallet: string}",
     "copy": "Nakili"
   },
   "AppUpdate": {

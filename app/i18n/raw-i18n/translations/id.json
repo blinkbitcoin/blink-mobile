@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Hapus",
     "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
-    "switchWalletHint": "Beralih ke dompet Anda yang lain",
+    "switchToWallet": "Beralih ke {wallet: string}",
     "copy": "Salin"
   },
   "AppUpdate": {

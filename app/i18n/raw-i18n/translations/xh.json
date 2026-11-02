@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Cima",
     "swapCurrencyHint": "Itshintsha imali obhala ngayo isixa",
-    "switchWalletHint": "Itshintshela kwesinye isipaji sakho",
+    "switchToWallet": "Tshintshela kwi-{wallet: string}",
     "copy": "Khuphela"
   },
   "AppUpdate": {

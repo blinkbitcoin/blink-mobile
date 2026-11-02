@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Slet",
     "swapCurrencyHint": "Skifter den valuta, du skriver beløbet i",
-    "switchWalletHint": "Skifter til din anden tegnebog",
+    "switchToWallet": "Skift til {wallet: string}",
     "copy": "Kopier"
   },
   "AppUpdate": {

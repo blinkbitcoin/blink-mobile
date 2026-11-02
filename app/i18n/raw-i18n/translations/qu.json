@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Pichay",
     "swapCurrencyHint": "Chaninta qillqanaykipaq qullqita tikran",
-    "switchWalletHint": "Huk qipiykiman tikran",
+    "switchToWallet": "{wallet: string}-man tikray",
     "copy": "Kopiay"
   },
   "AppUpdate": {

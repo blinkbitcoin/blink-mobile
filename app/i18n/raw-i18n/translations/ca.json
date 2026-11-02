@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Esborra",
     "swapCurrencyHint": "Canvia la moneda en què escrius l'import",
-    "switchWalletHint": "Canvia a l'altre moneder",
+    "switchToWallet": "Canvia a {wallet: string}",
     "copy": "Copiar"
   },
   "AppUpdate": {

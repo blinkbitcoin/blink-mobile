@@ -3090,7 +3090,7 @@
   "Accessibility": {
     "deleteKey": "Sazaamu",
     "swapCurrencyHint": "Kyusa ensimbi z'owandiikamu omuwendo",
-    "switchWalletHint": "Kyusa ku waleti yo endala",
+    "switchToWallet": "Kyusa ku {wallet: string}",
     "copy": "Koppa"
   },
   "AppUpdate": {
