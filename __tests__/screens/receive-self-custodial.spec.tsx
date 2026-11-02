@@ -86,6 +86,9 @@ jest.mock("@app/store/persistent-state", () => {
   }
 })
 
+// The device-location hook resolves the IP country; unmocked, that is a real request.
+jest.mock("@app/utils/ip-country-lookup")
+
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet(),
 }))
