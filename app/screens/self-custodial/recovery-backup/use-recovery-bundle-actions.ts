@@ -2,10 +2,9 @@ import { useCallback, useRef, useState } from "react"
 import Share, { type ShareOptions } from "react-native-share"
 
 import type { Network } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
-
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { recordAppError, toError } from "@app/utils/error-reporting"
 import { networkLabelFor } from "@app/self-custodial/config"
 import { decryptBundleBackupPayload } from "@app/self-custodial/recovery-bundle/encryption"
 import {
@@ -90,7 +89,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
     } catch (err) {
       // Degrade to "no bundle yet" instead of stranding the screen on the
       // loading state.
-      crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
+      recordAppError(toError(err), { alwaysRecord: true })
       next = null
     }
     /** A read overtaken by a newer one is dropped: after an account switch a
@@ -102,7 +101,7 @@ export const useRecoveryBundleActions = (): RecoveryBundleActions => {
   }, [accountId, network, target])
 
   const recordAndToast = (err: unknown, message: string) => {
-    crashlytics().recordError(err instanceof Error ? err : new Error(String(err)))
+    recordAppError(toError(err), { alwaysRecord: true })
     toastShow({ message, LL })
   }
 

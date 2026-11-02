@@ -31,6 +31,8 @@
         "createError": "APIキーを作成できませんでした。もう一度お試しください。",
         "revokeError": "APIキーを取り消せませんでした。もう一度お試しください。",
         "loadError": "APIキーを読み込めませんでした。後でもう一度お試しください。",
+        "discardSecretTitle": "この API キーを破棄しますか？",
+        "discardSecretBody": "シークレットが表示されるのはこの一度だけです。今離れると、キーは復元できず、新しく作成する必要があります。",
         "done": "完了"
     },
     "GaloyAddressScreen": {
@@ -78,7 +80,12 @@
         "skip": "スキップ",
         "unlock": "ロックを解除",
         "usePin": "PINを有効にする",
-        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます"
+        "confirmLogout": "ログアウトしてもよろしいですか？キャッシュとすべてのローカル設定がリセットされます",
+        "forgotPin": "PINをお忘れですか？ウォレットを削除",
+        "removeWalletsTitle": "このデバイスからウォレットを削除しますか？",
+        "removeWalletsBody": "このデバイスからすべてのウォレットを削除し、ログアウトします。ウォレットを元に戻すには、そのバックアップフレーズが必要です。フレーズがないと、ウォレットは失われます。",
+        "removeWalletsConfirm": "ウォレットを削除",
+        "removeWalletsFailed": "一部のウォレットを削除できませんでした。もう一度お試しください。"
     },
     "PeopleScreen": {
         "title": "つながり",
@@ -2175,16 +2182,19 @@
         "walletCountNotTwo": "ウォレット数が2つではありません。ダッシュボードからこのアカウントのすべてのウォレットと資金を確認してください"
     },
     "PinScreen": {
+        "attemptUnrecorded": "試行を安全に記録できませんでした。",
+        "attemptsLeft": "残り{attemptsRemaining: number}回トライできます。",
         "attemptsRemaining": "PINコードが間違っています。残り{attemptsRemaining: number}回トライできます。",
         "enterPin": "PINコードを入力してください",
-        "lockoutUnavailable": "失敗した試行を安全に記録できませんでした。ログアウトします。",
+        "oneAttemptLeft": "残り1回トライできます。",
         "oneAttemptRemaining": "PINコードが間違っています。残り1回トライできます。",
         "pinUnreadable": "PINコードを確認できませんでした。もう一度お試しください。",
         "setPin": "PINコードを設定してください",
         "setPinFailedMatch": "PINコードが一致しませんでした。PINコードを設定してください",
         "storePinFailed": "PINコードを保存できません。",
         "tooManyAttempts": "間違えられる上限を超えましたので、自動ログアウトしました。",
-        "tryAgainIn": "{seconds: number}秒後にもう一度お試しください。",
+        "attemptBudgetSpent": "間違えられる上限を超えました。",
+        "tryAgainIn": "{time: string}後にもう一度お試しください。",
         "verifyPin": "PINコードを認証する"
     },
     "PriceHistoryScreen": {
@@ -3035,7 +3045,8 @@
         "problemPersists": "問題が解決しない場合は、サポートにお問い合わせください。",
         "fatalError": "アプリケーションデータの読み込みに問題があるようです。 問題が解決しない場合は、サポートにお問い合わせください。",
         "showError": "エラーを表示する",
-        "clearAppData": "アプリのデータを消去してログアウトする"
+        "clearAppData": "アプリのデータを消去してログアウトする",
+        "screenSecurityUnavailable": "スクリーンショット保護をオンにできなかったため、この画面は非表示のままです。"
     },
     "notifications": {
         "payment": {
@@ -3090,7 +3101,7 @@
     "Accessibility": {
         "deleteKey": "削除",
         "swapCurrencyHint": "金額を入力する通貨を切り替えます",
-        "switchWalletHint": "もう一方のウォレットに切り替えます",
+        "switchToWallet": "{wallet: string} に切り替える",
         "copy": "コピー"
     },
     "AppUpdate": {

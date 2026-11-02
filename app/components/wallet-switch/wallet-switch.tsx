@@ -9,8 +9,11 @@ import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { WalletCurrency } from "@app/graphql/generated"
 import { useI18nContext } from "@app/i18n/i18n-react"
 
+/** "ALL" is only for lists that span both wallets, such as the transaction history. */
+export type WalletSwitchValue = WalletCurrency | "ALL"
+
 type WalletSwitchProps = {
-  currency: WalletCurrency
+  currency: WalletSwitchValue
   /** Hides the swap icon (keeping its space) where there is no other wallet to switch to. */
   canToggle: boolean
   /** Drops the icon and its space entirely, for a read-out that is not a switch at all. */
@@ -18,8 +21,8 @@ type WalletSwitchProps = {
 }
 
 /**
- * The swap icon and wallet pill of a Bitcoin/Dollar switch. Both pills take the width of the
- * wider label, so the switch keeps its size in either state; the icon spins on each switch.
+ * The swap icon and wallet pill of a Bitcoin/Dollar (or All) switch. Every pill takes the width
+ * of the widest label, so the switch keeps its size in each state; the icon spins on each switch.
  */
 export const WalletSwitch: React.FC<WalletSwitchProps> = ({
   currency,
@@ -54,7 +57,9 @@ export const WalletSwitch: React.FC<WalletSwitchProps> = ({
         currency={currency}
         containerSize="medium"
         containerStyle={widthStyle}
-        onLayout={onPillLayout(currency)}
+        // "All" is shorter than both wallet names, so it takes their width without being
+        // measured itself.
+        onLayout={currency === "ALL" ? undefined : onPillLayout(currency)}
       />
     </View>
   )

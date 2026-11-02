@@ -11,6 +11,7 @@ import { useAppConfig } from "@app/hooks"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { testProps } from "@app/utils/testProps"
 import useLogout from "@app/hooks/use-logout"
+import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button/galoy-icon-button"
 import Modal from "react-native-modal"
@@ -42,6 +43,7 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
 
   const { saveToken } = useAppConfig()
   const { logout } = useLogout()
+  const { logoutAndRoute } = useLogoutAndRoute()
   const { accounts, activeAccount, setActiveAccountId } = useAccountRegistry()
   const isCurrentlyActive = selected && activeAccount?.type === AccountType.Custodial
 
@@ -106,8 +108,10 @@ export const ProfileScreen: React.FC<ProfileProps> = ({
         logout({ stateToDefault: false, token }).catch(() => {})
         return
       case "resetToLaunch":
-        await logout()
-        navigation.reset({ index: 0, routes: [{ name: "getStarted" }] })
+        /** The only branch here that ends every session: the way out is the logout's to
+         *  decide, because a lock kept over a wallet the device still stores is owed an
+         *  answer before the landing screen can offer that wallet again. */
+        await logoutAndRoute()
         return
       case "removeInactive":
         await logout({ stateToDefault: false, token })

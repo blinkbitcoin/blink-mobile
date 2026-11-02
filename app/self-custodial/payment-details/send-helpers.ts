@@ -1,3 +1,4 @@
+/* eslint-disable camelcase */
 import {
   OnchainConfirmationSpeed,
   PaymentStatus,
@@ -33,6 +34,16 @@ import {
   prepareSend,
   syncSelfCustodialWallet,
 } from "../bridge"
+import {
+  measure,
+  measureIn,
+  measurementGeneration,
+  measureSettlement,
+  ScEvent,
+  type ScEventParams,
+  type ScRail,
+  type SettlementTelemetry,
+} from "../measurement"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 
 type PrepareParams = {
@@ -42,6 +53,27 @@ type PrepareParams = {
   tokenIdentifier?: string
   conversionOptions?: ConversionOptions
 }
+
+/** What a send reports about itself: the rail category and the wallet spent from, never
+ *  the destination, amount, or counterparty. */
+export type SendTelemetry = {
+  rail: ScRail
+  sendingWallet: WalletCurrency
+}
+
+const telemetryParams = ({ rail, sendingWallet }: SendTelemetry): ScEventParams => ({
+  rail,
+  sending_wallet: sendingWallet,
+})
+
+/** A send settles or fails once, by the SDK's word; `alsoSettled` rides on the settle. */
+export const sendSettlement = (
+  params: ScEventParams,
+  alsoSettled: SettlementTelemetry["settled"] = [],
+): SettlementTelemetry => ({
+  settled: [{ event: ScEvent.PaymentSendSettled, params }, ...alsoSettled],
+  failed: { event: ScEvent.PaymentSendFailed, params },
+})
 
 const TIER_TO_SPEED: Record<FeeTierOption, OnchainConfirmationSpeed> = {
   [FeeTierOption.Fast]: OnchainConfirmationSpeed.Fast,
@@ -134,13 +166,27 @@ const reportSendFailure = (
   return { __typename: "GraphQLApplicationError", message: classifySdkError(err) }
 }
 
-export const createSendMutation = (params: PrepareParams): SendPaymentMutation => {
+export const createSendMutation = (
+  params: PrepareParams,
+  telemetry: SendTelemetry,
+): SendPaymentMutation => {
   return async () => {
+    const startedIn = measurementGeneration()
+    measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared)
+      const response = await executeSend(params.sdk, prepared)
+      measureSettlement(
+        response?.payment,
+        sendSettlement(telemetryParams(telemetry)),
+        startedIn,
+      )
       return { status: PaymentSendResult.Success }
     } catch (err) {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
+        ...telemetryParams(telemetry),
+        error_code: classifySdkError(err),
+      })
       return {
         status: PaymentSendResult.Failure,
         errors: [reportSendFailure("Self-custodial Lightning send", err)],
@@ -152,13 +198,25 @@ export const createSendMutation = (params: PrepareParams): SendPaymentMutation =
 export const createSendMutationOnchain = (
   params: PrepareParams,
   feeTier: FeeTierOption,
+  telemetry: SendTelemetry,
 ): SendPaymentMutation => {
   return async () => {
+    const startedIn = measurementGeneration()
+    measure(ScEvent.PaymentSendInitiated, telemetryParams(telemetry))
     try {
       const prepared = await prepareSend(params.sdk, toPrepareOptions(params))
-      await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
+      const response = await executeSend(params.sdk, prepared, TIER_TO_SPEED[feeTier])
+      measureSettlement(
+        response?.payment,
+        sendSettlement(telemetryParams(telemetry)),
+        startedIn,
+      )
       return { status: PaymentSendResult.Success }
     } catch (err) {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
+        ...telemetryParams(telemetry),
+        error_code: classifySdkError(err),
+      })
       return {
         status: PaymentSendResult.Failure,
         errors: [reportSendFailure("Self-custodial onchain send", err)],
@@ -199,10 +257,16 @@ type FindLostSendParams = {
 }
 
 export type LostSendLookup =
-  | { readonly status: "found"; readonly payment: Payment }
+  | {
+      readonly status: "found"
+      readonly payment: Payment
+      /** Matches that ended failed, each the end of an attempt: for telemetry only, since
+       *  none of them is the attempt landing. */
+      readonly failed: ReadonlyArray<Payment>
+    }
   /** The last look read the history to its end and none of it was the payment: the one
    *  answer that makes the send safe to try again. */
-  | { readonly status: "not-found" }
+  | { readonly status: "not-found"; readonly failed: ReadonlyArray<Payment> }
   /** The last look could not read the history, or found a send it cannot tell apart from
    *  the attempt, so nothing is known: not the payment, and not its absence. The error
    *  it met is carried for the caller to report. */
@@ -225,16 +289,21 @@ const isCompleted = (payment: Payment): boolean =>
 const isPendingPayment = (payment: Payment): boolean =>
   payment.status === PaymentStatus.Pending
 
+const isFailedPayment = (payment: Payment): boolean =>
+  payment.status === PaymentStatus.Failed
+
 /** A match that is the attempt landing: a failed payment of the invoice is not one. */
 const isLanded = (payment: Payment): boolean =>
   isCompleted(payment) || isPendingPayment(payment)
 
 /**
  * One look: the wallet catches up with the server, then its outgoing payments in the
- * window are read page by page, until the caller's match is complete, the pages run
- * short, or the cap is hit. Throws when the history could not be read, except that a
- * page failing after a landed match was made takes nothing away from it: a payment of
- * the invoice exists. A failed match is not one, so the pages after it still count.
+ * window are read page by page, until the pages run short or the cap is hit. A completed
+ * match does not end it: an older attempt's failed payment may sit on a later page, and
+ * that attempt reports its end only once it is seen. Throws when the history could not
+ * be read, except that a page failing, or the cap, after a landed match was made takes
+ * nothing away from it: a payment of the invoice exists. A failed match is not one, so
+ * the pages after it still count.
  */
 const scanHistorySince = async (
   sdk: BreezSdkInterface,
@@ -261,11 +330,11 @@ const scanHistorySince = async (
     found.push(...payments.filter(matches))
     if (payments.some(isUndescribedSend)) hasUndescribedSend = true
 
-    const isScanComplete =
-      found.some(isCompleted) || payments.length < LOST_SEND_PAGE_SIZE
-    if (isScanComplete) return { matches: found, hasUndescribedSend }
+    if (payments.length < LOST_SEND_PAGE_SIZE)
+      return { matches: found, hasUndescribedSend }
   }
 
+  if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
 }
 
@@ -284,20 +353,21 @@ export const findLostSend = async ({
   matches,
 }: FindLostSendParams): Promise<LostSendLookup> => {
   const since = BigInt(Math.floor(startedAtMs / 1000) - LOST_SEND_LOOKBACK_SECONDS)
-  let lastLook: LostSendLookup = { status: "not-found" }
+  let lastLook: LostSendLookup = { status: "not-found", failed: [] }
 
   for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
     try {
       const scan = await scanHistorySince(sdk, since, matches)
+      const failed = scan.matches.filter(isFailedPayment)
       const payment =
         scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
-      if (payment) return { status: "found", payment }
+      if (payment) return { status: "found", payment, failed }
       lastLook = scan.hasUndescribedSend
         ? {
             status: "unreadable",
             error: new Error("Lost send lookup met an undescribed send"),
           }
-        : { status: "not-found" }
+        : { status: "not-found", failed }
     } catch (err) {
       reportError("Self-custodial lost send lookup", err)
       lastLook = { status: "unreadable", error: err }
