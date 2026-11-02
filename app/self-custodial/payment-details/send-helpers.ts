@@ -253,8 +253,11 @@ const LOST_SEND_DELAY_MS = 2000
  *
  * The wait is all it bounds. The SDK call it gave up on is left running, because
  * cancelling a user sync wedges the SDK's sync coordinator for as long as the wallet
- * stays connected (see `syncSelfCustodialWallet`). A later look's sync joins the one
- * still running instead of starting another, which is the coordinator doing its job.
+ * stays connected (see `syncSelfCustodialWallet`). A later look's sync does not join that
+ * one: the coordinator drains its waiter batch before running the sync and notifies only
+ * that batch, so a caller arriving afterwards is served by the next pass of the loop
+ * (`sdk/sync_coordinator.rs` @0.23.1). What that leaves behind is a look whose own work
+ * carries on after nothing is waiting for it, which is what `isExpired` is for.
  */
 const LOST_SEND_ATTEMPT_TIMEOUT_MS = 15_000
 const LOST_SEND_LOOKBACK_SECONDS = 24 * 60 * 60
@@ -324,6 +327,11 @@ type ScanHistoryParams = {
    *  saw outlives the look itself. A page that fails, a history with no end, and a look
    *  abandoned at its deadline all leave the caller whatever the pages before showed. */
   into: HistoryScan
+  /** Whether the look that owns this scan is already over. The SDK calls cannot be
+   *  cancelled, so an abandoned look keeps running inside them and would come back long
+   *  afterwards to read a history nobody is waiting for — a burst of paging at exactly
+   *  the moment the wallet is busy catching up. Checked between awaits instead. */
+  isExpired: () => boolean
 }
 
 const scanHistorySince = async ({
@@ -331,8 +339,10 @@ const scanHistorySince = async ({
   since,
   matches,
   into,
+  isExpired,
 }: ScanHistoryParams): Promise<void> => {
   await syncSelfCustodialWallet(sdk)
+  if (isExpired()) return
 
   for (let page = 0; page < LOST_SEND_MAX_PAGES; page += 1) {
     const { payments } = await listSentPaymentsSince(sdk, {
@@ -344,7 +354,7 @@ const scanHistorySince = async ({
     into.matches.push(...payments.filter(matches))
     if (payments.some(isUndescribedSend)) into.hasUndescribedSend = true
 
-    if (payments.length < LOST_SEND_PAGE_SIZE) return
+    if (payments.length < LOST_SEND_PAGE_SIZE || isExpired()) return
   }
 
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
@@ -374,6 +384,9 @@ export const findLostSend = async ({
 
   for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
     const scan: HistoryScan = { matches: [], hasUndescribedSend: false }
+    /** Set once this look has its answer, so the work still running inside it stops at
+     *  its next await rather than paging a history nobody will read. */
+    let isOver = false
     /** A payment of the invoice that the pages already showed is evidence, and nothing
      *  afterwards unshows it: not a page that fails, not a history without an end, and
      *  not the look running out of time. Read before the failure is reported, so the one
@@ -382,7 +395,13 @@ export const findLostSend = async ({
       scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
     try {
       await withTimeout(
-        scanHistorySince({ sdk, since, matches, into: scan }),
+        scanHistorySince({
+          sdk,
+          since,
+          matches,
+          into: scan,
+          isExpired: () => isOver,
+        }),
         LOST_SEND_ATTEMPT_TIMEOUT_MS,
         "Self-custodial lost send lookup",
       )
@@ -403,6 +422,8 @@ export const findLostSend = async ({
         return { status: "found", payment, failed: scan.matches.filter(isFailedPayment) }
       reportError("Self-custodial lost send lookup", err)
       lastLook = { status: "unreadable", error: err }
+    } finally {
+      isOver = true
     }
 
     const isLastAttempt = attempt === LOST_SEND_ATTEMPTS

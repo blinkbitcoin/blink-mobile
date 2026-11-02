@@ -1156,6 +1156,64 @@ describe("findLostSend", () => {
     expect(mockSyncWallet).toHaveBeenCalledTimes(1)
   })
 
+  /**
+   * The SDK calls cannot be cancelled, so an abandoned look keeps running inside its sync
+   * and comes back whenever the wallet finally answers — which is exactly when the wallet
+   * is busiest. Nothing is waiting for that look any more, so it must not then go on to
+   * read the history: up to 20 pages per abandoned look, released together on recovery.
+   */
+  it("does not read the history when the wallet answers a look that already ran out of time", async () => {
+    let releaseSync: () => void = () => undefined
+    mockSyncWallet.mockReset()
+    mockSyncWallet.mockImplementation(
+      () =>
+        new Promise<void>((resolve) => {
+          releaseSync = resolve
+        }),
+    )
+
+    const pending = lookup()
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await jest.advanceTimersByTimeAsync(15_000)
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    const found = await pending
+    expect(found).toMatchObject({ status: "unreadable" })
+
+    /** Connectivity returns and every abandoned sync settles at once. */
+    releaseSync()
+    await jest.advanceTimersByTimeAsync(0)
+
+    expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /** The same guard between pages: a look can be part-way through the history when its
+   *  time runs out, and the pages left are as pointless as the first. */
+  it("stops paging when the look runs out of time part-way through the history", async () => {
+    let releasePage: () => void = () => undefined
+    mockListPayments.mockResolvedValueOnce({ payments: fullPageOfOthers() })
+    mockListPayments.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          releasePage = () => resolve({ payments: fullPageOfOthers() })
+        }),
+    )
+
+    const pending = lookup()
+    for (let attempt = 0; attempt < 3; attempt += 1) {
+      await jest.advanceTimersByTimeAsync(15_000)
+      await jest.advanceTimersByTimeAsync(2000)
+    }
+    await pending
+
+    const pagesBefore = mockListPayments.mock.calls.length
+    releasePage()
+    await jest.advanceTimersByTimeAsync(0)
+
+    /** The page that was in flight comes back, and no further page is asked for. */
+    expect(mockListPayments).toHaveBeenCalledTimes(pagesBefore)
+  })
+
   /** The same holds for a pending payment, which the scan does not stop on: it keeps
    *  paging for the failed ones, so the stall lands after the match is already in hand. */
   it("keeps a pending payment the pages already showed when a later page never answers", async () => {
