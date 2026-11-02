@@ -57,7 +57,9 @@ import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 import {
   feeFailure,
   findLostSend,
+  hasQuoteMoved,
   QuoteRef,
+  quoteMovedFailure,
   quoteOf,
   type LostSendLookup,
   sendSettlement,
@@ -437,6 +439,22 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     } catch (err) {
       reportFailed(err)
       return sendFailure(err)
+    }
+
+    /** A dollar send converts at the price of the moment: one that moved since review
+     *  stops here, before it is sent, for the sender to see it again. */
+    if (
+      isUsdSend &&
+      hasQuoteMoved(
+        quoteRef.current,
+        quoteOf(extractLnurlFee(prepared), prepared.conversionEstimate),
+      )
+    ) {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
+        ...sendTelemetry,
+        error_code: SelfCustodialErrorCode.QuoteMoved,
+      })
+      return quoteMovedFailure()
     }
 
     const paymentHash = prepared.invoiceDetails.paymentHash
