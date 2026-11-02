@@ -76,40 +76,22 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => mockActiveWallet,
 }))
 
+const mockGoBack = jest.fn()
 jest.mock("@react-navigation/native", () =>
-  jest.requireActual("../helpers/transaction-detail-mocks").mockNavigation(),
+  jest
+    .requireActual("../helpers/transaction-detail-mocks")
+    .mockNavigation({ getGoBack: () => mockGoBack }),
 )
 
-const LLText = () => ""
-jest.mock("@app/i18n/i18n-react", () => ({
-  useI18nContext: () => ({
-    LL: {
-      common: {
-        date: LLText,
-        fees: LLText,
-        description: LLText,
-        type: LLText,
-        preimageProofOfPayment: LLText,
-        paymentRequest: LLText,
-        hasBeenCopiedToClipboard: LLText,
-        tryAgain: () => "try-again",
-      },
-      TransactionDetailScreen: {
-        received: LLText,
-        sending: LLText,
-        spent: LLText,
-        paid: LLText,
-        receivingAccount: LLText,
-        sendingAccount: LLText,
-        txNotBroadcast: LLText,
-        findingAccount: () => "finding-account",
-        txNotFoundInAccounts: () => "tx-not-found",
-        txLoadFailed: () => "tx-load-failed",
-      },
-    },
-    locale: "en",
+jest.mock("@app/i18n/i18n-react", () =>
+  jest.requireActual("../helpers/transaction-detail-mocks").mockI18n({
+    "common.tryAgain": "try-again",
+    "common.back": "back",
+    "TransactionDetailScreen.findingAccount": "finding-account",
+    "TransactionDetailScreen.txNotFoundInAccounts": "tx-not-found",
+    "TransactionDetailScreen.txLoadFailed": "tx-load-failed",
   }),
-}))
+)
 
 const mockRetry = jest.fn()
 let mockResolveStatus: ResolveTransactionAccountStatus = "resolving"
@@ -140,6 +122,17 @@ describe("TransactionDetailScreen resolver fallback", () => {
     jest.clearAllMocks()
     mockActiveWallet = { isSelfCustodial: false, wallets: [] }
     mockSelfCustodialWallet.allTransactions = []
+  })
+
+  it("offers a back arrow next to close while the transaction is looked up", () => {
+    mockGoBack.mockClear()
+    const { getByTestId } = renderWithStatus("resolving")
+
+    const back = getByTestId("transaction-detail-back")
+    expect(back.props.accessibilityLabel).toBe("back")
+    fireEvent.press(back)
+
+    expect(mockGoBack).toHaveBeenCalledTimes(1)
   })
 
   it("passes txid, cache state and the payload hint to the resolver", () => {

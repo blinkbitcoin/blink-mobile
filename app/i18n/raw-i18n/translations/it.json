@@ -2673,7 +2673,7 @@
     "TransactionDetailScreen": {
         "paid": "Pagato a/da",
         "received": "Hai ricevuto",
-        "spent": "Hai speso",
+        "sent": "Hai inviato",
         "sending": "Invio",
         "receivingAccount": "Conto di ricezione",
         "sendingAccount": "Invio dell'account",
@@ -2682,7 +2682,15 @@
         "findingAccount": "Ricerca dell'account per questo pagamento...",
         "txNotFoundInAccounts": "Questo pagamento non è stato trovato in nessun account su questo dispositivo. Potrebbe appartenere a un account disconnesso.",
         "txLoadFailed": "Impossibile caricare questo pagamento. Controlla la connessione e riprova.",
-        "switchedForPayment": "Passato a {identifier: string} per mostrare questo pagamento"
+        "switchedForPayment": "Passato a {identifier: string} per mostrare questo pagamento",
+        "customLabel": "Etichetta personalizzata",
+        "depositFee": "Commissione di deposito",
+        "time": "Ora",
+        "transactionId": "ID transazione",
+        "hash": "Hash",
+        "blinkInternalId": "ID interno Blink",
+        "copyAllData": "Copia tutti i dati",
+        "allData": "Dettagli transazione"
     },
     "FeeRatesScreen": {
         "title": "Tariffe delle commissioni",

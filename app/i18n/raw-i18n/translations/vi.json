@@ -2673,7 +2673,7 @@
   "TransactionDetailScreen": {
     "paid": "Trả tiền cho/từ",
     "received": "Bạn đã nhận",
-    "spent": "Bạn đã chi",
+    "sent": "Bạn đã gửi",
     "sending": "Đang gửi",
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",
@@ -2682,7 +2682,15 @@
     "findingAccount": "Đang tìm tài khoản cho khoản thanh toán này...",
     "txNotFoundInAccounts": "Không tìm thấy khoản thanh toán này trong bất kỳ tài khoản nào trên thiết bị này. Nó có thể thuộc về một tài khoản đã đăng xuất.",
     "txLoadFailed": "Không thể tải khoản thanh toán này. Kiểm tra kết nối của bạn và thử lại.",
-    "switchedForPayment": "Đã chuyển sang {identifier: string} để hiển thị khoản thanh toán này"
+    "switchedForPayment": "Đã chuyển sang {identifier: string} để hiển thị khoản thanh toán này",
+    "customLabel": "Nhãn tùy chỉnh",
+    "depositFee": "Phí nạp",
+    "time": "Thời gian",
+    "transactionId": "Mã giao dịch",
+    "hash": "Hash",
+    "blinkInternalId": "Mã nội bộ Blink",
+    "copyAllData": "Sao chép tất cả dữ liệu",
+    "allData": "Chi tiết giao dịch"
   },
   "FeeRatesScreen": {
     "title": "Biểu phí",

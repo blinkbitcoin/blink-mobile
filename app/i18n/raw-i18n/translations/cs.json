@@ -2673,7 +2673,7 @@
   "TransactionDetailScreen": {
     "paid": "Zaplaceno do/z",
     "received": "Obdrželi jste",
-    "spent": "Utratili jste",
+    "sent": "Odeslali jste",
     "sending": "Odesílání",
     "receivingAccount": "Přijímací zůstatek",
     "sendingAccount": "Odesílající zůstatek",
@@ -2682,7 +2682,15 @@
     "findingAccount": "Hledání účtu pro tuto platbu...",
     "txNotFoundInAccounts": "Tato platba nebyla nalezena v žádném účtu v tomto zařízení. Může patřit k odhlášenému účtu.",
     "txLoadFailed": "Tuto platbu se nepodařilo načíst. Zkontrolujte připojení a zkuste to znovu.",
-    "switchedForPayment": "Přepnuto na {identifier: string} pro zobrazení této platby"
+    "switchedForPayment": "Přepnuto na {identifier: string} pro zobrazení této platby",
+    "customLabel": "Vlastní štítek",
+    "depositFee": "Poplatek za vklad",
+    "time": "Čas",
+    "transactionId": "ID transakce",
+    "hash": "Hash",
+    "blinkInternalId": "Interní ID Blink",
+    "copyAllData": "Kopírovat všechna data",
+    "allData": "Detaily transakce"
   },
   "FeeRatesScreen": {
     "title": "Sazby poplatků",

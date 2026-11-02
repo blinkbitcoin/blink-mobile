@@ -2673,7 +2673,7 @@
   "TransactionDetailScreen": {
     "paid": "Imelipwa kutoka/kuelekea",
     "received": "Ulipokea",
-    "spent": "Umetumia",
+    "sent": "Ulituma",
     "sending": "Inatuma",
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
@@ -2682,7 +2682,15 @@
     "findingAccount": "Inatafuta akaunti ya malipo haya...",
     "txNotFoundInAccounts": "Malipo haya hayakupatikana katika akaunti yoyote kwenye kifaa hiki. Huenda ni ya akaunti iliyotoka.",
     "txLoadFailed": "Imeshindwa kupakia malipo haya. Angalia muunganisho wako kisha ujaribu tena.",
-    "switchedForPayment": "Imebadilisha hadi {identifier: string} ili kuonyesha malipo haya"
+    "switchedForPayment": "Imebadilisha hadi {identifier: string} ili kuonyesha malipo haya",
+    "customLabel": "Lebo yako",
+    "depositFee": "Ada ya kuweka",
+    "time": "Muda",
+    "transactionId": "Kitambulisho cha muamala",
+    "hash": "Hash",
+    "blinkInternalId": "Kitambulisho cha ndani cha Blink",
+    "copyAllData": "Nakili data yote",
+    "allData": "Maelezo ya muamala"
   },
   "FeeRatesScreen": {
     "title": "Viwango vya ada",

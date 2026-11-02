@@ -2673,7 +2673,7 @@
   "TransactionDetailScreen": {
     "paid": "Ihlawulwe ukuya/ukusuka",
     "received": "Ufumene",
-    "spent": "Uchithe",
+    "sent": "Uthumele",
     "sending": "Iyathumela",
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
@@ -2682,7 +2682,15 @@
     "findingAccount": "Ikhangela i-akhawunti yale ntlawulo...",
     "txNotFoundInAccounts": "Le ntlawulo ayifumanekanga kuyo nayiphi na i-akhawunti kwesi sixhobo. Isenokuba yeye-akhawunti ephume ngaphandle.",
     "txLoadFailed": "Ayikwazanga ukulayisha le ntlawulo. Khangela uqhagamshelo lwakho uzame kwakhona.",
-    "switchedForPayment": "Itshintshele ku-{identifier: string} ukubonisa le ntlawulo"
+    "switchedForPayment": "Itshintshele ku-{identifier: string} ukubonisa le ntlawulo",
+    "customLabel": "Ileyibhile yakho",
+    "depositFee": "Umrhumo wediphozithi",
+    "time": "Ixesha",
+    "transactionId": "I-ID yotshintshiselwano",
+    "hash": "Hash",
+    "blinkInternalId": "I-ID yangaphakathi ye-Blink",
+    "copyAllData": "Kopisha yonke idatha",
+    "allData": "Iinkcukacha zotshintshiselwano"
   },
   "FeeRatesScreen": {
     "title": "Amazinga emirhumo",

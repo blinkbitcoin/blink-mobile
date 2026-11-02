@@ -2673,7 +2673,7 @@
     "TransactionDetailScreen": {
         "paid": "送金先/送金元",
         "received": "受金完了",
-        "spent": "送金完了",
+        "sent": "送金完了",
         "sending": "送信中",
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
@@ -2682,7 +2682,15 @@
         "findingAccount": "この支払いのアカウントを探しています...",
         "txNotFoundInAccounts": "この支払いはこのデバイスのどのアカウントにも見つかりませんでした。ログアウトしたアカウントのものである可能性があります。",
         "txLoadFailed": "この支払いを読み込めませんでした。接続を確認して、もう一度お試しください。",
-        "switchedForPayment": "この支払いを表示するため {identifier: string} に切り替えました"
+        "switchedForPayment": "この支払いを表示するため {identifier: string} に切り替えました",
+        "customLabel": "カスタムラベル",
+        "depositFee": "入金手数料",
+        "time": "時間",
+        "transactionId": "取引ID",
+        "hash": "ハッシュ",
+        "blinkInternalId": "Blink内部ID",
+        "copyAllData": "すべてのデータをコピー",
+        "allData": "取引詳細"
     },
     "FeeRatesScreen": {
         "title": "手数料率",
