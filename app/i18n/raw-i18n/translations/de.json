@@ -2748,7 +2748,13 @@
         "noTransaction": "Keine Transaktionen",
         "title": "Alle Transaktionen",
         "recentTransactions": "Letzte Transaktionen",
-        "transactionHistoryTitle": "Transaktionshistorie"
+        "transactionHistoryTitle": "Transaktionshistorie",
+        "filters": "Filter",
+        "sent": "Gesendet",
+        "received": "Empfangen",
+        "searchPlaceholder": "Suche...",
+        "expandingSearch": "Suche wird erweitert",
+        "nothingCameBack": "Keine Treffer"
     },
     "TransferScreen": {
         "title": "Transfer",
@@ -3039,7 +3045,7 @@
             "other": "Tage"
         },
         "dollar": "Dollar",
-        "all": "ALLE",
+        "all": "Alle",
         "allAccounts": "Alle Konten",
         "some": "Einige",
         "support": "Support",
