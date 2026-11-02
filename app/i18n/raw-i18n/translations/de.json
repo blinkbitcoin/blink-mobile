@@ -3112,9 +3112,8 @@
     "Accessibility": {
         "deleteKey": "Löschen",
         "swapCurrencyHint": "Wechselt die Währung für die Betragseingabe",
-        "switchWalletHint": "Wechselt zur anderen Wallet",
+        "switchToWallet": "Zu {wallet: string} wechseln",
         "copy": "Kopieren",
-        "balanceHidden": "Guthaben ausgeblendet",
         "revealBalanceHint": "Zeigt das Guthaben auf diesem Bildschirm"
     },
     "AppUpdate": {

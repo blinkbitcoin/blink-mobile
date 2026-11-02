@@ -3112,9 +3112,8 @@
   "Accessibility": {
     "deleteKey": "Hapus",
     "swapCurrencyHint": "Mengganti mata uang untuk mengetik jumlah",
-    "switchWalletHint": "Beralih ke dompet Anda yang lain",
+    "switchToWallet": "Beralih ke {wallet: string}",
     "copy": "Salin",
-    "balanceHidden": "Saldo disembunyikan",
     "revealBalanceHint": "Menampilkan saldo Anda di layar ini"
   },
   "AppUpdate": {
