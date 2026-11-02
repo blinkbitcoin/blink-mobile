@@ -2,8 +2,10 @@
 //
 // In CI, retry flaky tests at test granularity instead of re-running the whole
 // job (issue #3815). Every failed attempt is still logged, so flakes stay
-// visible in the CI output instead of being silently absorbed. Local runs stay
-// strict: a genuinely broken test fails fast without retries.
+// visible in the CI output instead of being silently absorbed: the default
+// reporter prints the attempts inline, and on GitHub Actions the reporter turns
+// them into RETRY annotations (jest.config.js). Local runs stay strict: a
+// genuinely broken test fails fast without retries.
 if (process.env.CI) {
   jest.retryTimes(2, { logErrorsBeforeRetry: true })
 }
