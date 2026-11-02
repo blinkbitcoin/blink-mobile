@@ -11,6 +11,61 @@ const MODE_REQUEST_TIMEOUT_MS = 15_000
 /** The server answers this when it holds no account for the pubkey at all. */
 const NOT_FOUND_STATUS = 404
 
+/**
+ * Version prefix of the messages the app signs for itself. The SDK signs its own requests
+ * as `breez-lnurl:v2` and refuses to sign anything in that namespace, so these mirror its
+ * shape under a namespace of our own, which the server verifies alongside it.
+ */
+const BLINK_MESSAGE_VERSION = "blink-lnurl:v1"
+
+type BlinkSignedMessageArgs = {
+  /** The route this signature authorizes, spelled as the server spells it. */
+  route: "recover" | "mode"
+  /** The host the request names, which the server rebuilds the message with. */
+  domain: string
+  pubkey: string
+  /** Only `mode` carries one, between the pubkey and the timestamp. */
+  mode?: AccountMode
+  timestamp: number
+}
+
+/**
+ * The message blink-lnurl-server rebuilds to verify one of the two routes the app signs
+ * itself: the fields LF-joined, version first, no trailing newline.
+ *
+ * Naming the route and the host is the point of it. The pre-v2 message was the bare
+ * `{pubkey}-{timestamp}`, which the server also rebuilds for `/metadata` and
+ * `/invoices-paid`, so a captured recover signature could be replayed inside the freshness
+ * window to read an account's payment metadata; and it named no host, so a mode signature
+ * authorized that mode on any deployment the server answers for.
+ */
+export const blinkSignedMessage = ({
+  route,
+  domain,
+  pubkey,
+  mode,
+  timestamp,
+}: BlinkSignedMessageArgs): string =>
+  [
+    BLINK_MESSAGE_VERSION,
+    route,
+    domain,
+    pubkey,
+    ...(mode === undefined ? [] : [mode]),
+    String(timestamp),
+  ].join("\n")
+
+/**
+ * The host the message names: the one this request is addressed to, which is what the
+ * server reads off the request and rebuilds the message with. Taken from the URL being
+ * posted to rather than from configuration, so the two cannot drift apart, and read through
+ * the URL parser, which lowercases the host for us — the server lowercases its side too, so
+ * a mixed-case URL would otherwise sign a host it never answers for. A URL that will not
+ * parse throws, which is a misconfigured build: a message bound to the wrong host would be
+ * refused by the server anyway, and less legibly.
+ */
+const requestDomain = (serverUrl: string): string => new URL(serverUrl).host
+
 type LnurlServerRequestArgs = {
   sdk: BreezSdkInterface
   serverUrl: string
@@ -28,8 +83,8 @@ type SetLnurlServerModeArgs = LnurlServerRequestArgs & {
  * decides whether it answers, so a switch cannot cost the user their name.
  *
  * Authorization is the signature and nothing else, so the pubkey in the path is the one
- * the wallet signed with. `mode:` domain-separates the message from the register and
- * transfer signatures, which the server verifies against the same key.
+ * the wallet signed with. The message names the route, the host and the mode, so the
+ * signature authorizes this mode on this deployment and nothing else.
  */
 export const setLnurlServerMode = async ({
   sdk,
@@ -43,7 +98,13 @@ export const setLnurlServerMode = async ({
 
   /** DER, not compact: the server parses the signature in DER. */
   const { signature } = await sdk.signMessage({
-    message: `mode:${mode}:${identityPubkey}-${timestamp}`,
+    message: blinkSignedMessage({
+      route: "mode",
+      domain: requestDomain(serverUrl),
+      pubkey: identityPubkey,
+      mode,
+      timestamp,
+    }),
     compact: false,
   })
 
@@ -65,6 +126,9 @@ export const setLnurlServerMode = async ({
  * Null means no mode is held — the server was never told, or has never heard of the
  * wallet. Both leave the caller nothing to honor. A refusal throws instead, so "could not
  * ask" stays distinguishable from "holds none".
+ *
+ * This is the app's own recover, not the SDK's: it answers with the mode, which the SDK's
+ * own `breez-lnurl:v2` recover does not carry.
  */
 export const recoverLnurlServerMode = async ({
   sdk,
@@ -73,9 +137,14 @@ export const recoverLnurlServerMode = async ({
   const { identityPubkey } = await getWalletInfo(sdk)
   const timestamp = Math.floor(Date.now() / 1000)
 
-  /** No `mode:` prefix: recover signs the bare pubkey, like register and unregister. */
+  /** No mode field: recover reads one rather than setting it. */
   const { signature } = await sdk.signMessage({
-    message: `${identityPubkey}-${timestamp}`,
+    message: blinkSignedMessage({
+      route: "recover",
+      domain: requestDomain(serverUrl),
+      pubkey: identityPubkey,
+      timestamp,
+    }),
     compact: false,
   })
 
@@ -102,10 +171,11 @@ const toAccountMode = (mode: string | null | undefined): AccountMode | null => {
 }
 
 /**
- * Signed by hand in the legacy `{message}-{timestamp}` format, which the SDK can no
- * longer produce for us: it refuses to sign anything in its own `breez-lnurl:` v2
- * namespace. `/recover` and `/mode` therefore work only while blink-lnurl-server keeps
- * its legacy verifier on those routes.
+ * Signed by hand, because these two routes are the app's own: the SDK speaks to the
+ * Lightning address server for itself and exposes none of them. `signMessage` signs the
+ * `blink-lnurl:v1` messages above — the only thing it refuses is its own reserved
+ * `breez-lnurl:` namespace — and the server has verified them since 0.9.0, so a
+ * deployment older than that accepts only the pre-v2 message this no longer sends.
  */
 const postSigned = (url: string, body: unknown): Promise<Response> => {
   const controller = new AbortController()
