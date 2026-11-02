@@ -96,7 +96,9 @@ before the totals. A `RETRY n:` warning annotation is a failed attempt of a retr
 On a test that ended up passing, that's a flake worth a look, not a blocker.
 
 **A test run prints nothing but results.** Any console call a spec didn't ask for fails
-the test it happened in (the console guard in `jest.setup.js`):
+the test it happened in, and its file as well, so a CI retry that passes can't hide it.
+Output at import or from a later hook fails the file (the console guard in
+`jest.setup.js`):
 
 - Output that is expected (a logged error path, a library's debug line): spy on that
   console method with `mockImplementation` in the spec and assert the call.
