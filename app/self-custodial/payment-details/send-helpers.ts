@@ -250,6 +250,11 @@ const LOST_SEND_DELAY_MS = 2000
  * outcome at all — the one answer worse than "unreadable". It is not hypothetical here,
  * because a sync waits for an exit-chain collection pass (`exitChainAutoFetchEnabled`).
  * Three looks and two waits put the whole lookup under a minute.
+ *
+ * The wait is all it bounds. The SDK call it gave up on is left running, because
+ * cancelling a user sync wedges the SDK's sync coordinator for as long as the wallet
+ * stays connected (see `syncSelfCustodialWallet`). A later look's sync joins the one
+ * still running instead of starting another, which is the coordinator doing its job.
  */
 const LOST_SEND_ATTEMPT_TIMEOUT_MS = 15_000
 const LOST_SEND_LOOKBACK_SECONDS = 24 * 60 * 60
@@ -283,11 +288,11 @@ export type LostSendLookup =
   | { readonly status: "unreadable"; readonly error: unknown }
 
 type HistoryScan = {
-  readonly matches: Payment[]
+  matches: Payment[]
   /** Whether the window holds a send the wallet has not described yet. Such a payment
    *  carries nothing to match on, and a Lightning send can sit that way until the
    *  wallet has fetched what it paid, so it may be the attempt itself. */
-  readonly hasUndescribedSend: boolean
+  hasUndescribedSend: boolean
 }
 
 const isUndescribedSend = (payment: Payment): boolean =>
@@ -302,10 +307,6 @@ const isPendingPayment = (payment: Payment): boolean =>
 const isFailedPayment = (payment: Payment): boolean =>
   payment.status === PaymentStatus.Failed
 
-/** A match that is the attempt landing: a failed payment of the invoice is not one. */
-const isLanded = (payment: Payment): boolean =>
-  isCompleted(payment) || isPendingPayment(payment)
-
 /**
  * One look: the wallet catches up with the server, then its outgoing payments in the
  * window are read page by page, until the pages run short or the cap is hit. A completed
@@ -319,45 +320,33 @@ type ScanHistoryParams = {
   sdk: BreezSdkInterface
   since: bigint
   matches: (payment: Payment) => boolean
-  /** Aborted when the look this scan belongs to is abandoned. */
-  signal: AbortSignal
+  /** Filled as the pages come in rather than returned at the end, so what a look already
+   *  saw outlives the look itself. A page that fails, a history with no end, and a look
+   *  abandoned at its deadline all leave the caller whatever the pages before showed. */
+  into: HistoryScan
 }
 
 const scanHistorySince = async ({
   sdk,
   since,
   matches,
-  signal,
-}: ScanHistoryParams): Promise<HistoryScan> => {
-  await syncSelfCustodialWallet(sdk, { signal })
+  into,
+}: ScanHistoryParams): Promise<void> => {
+  await syncSelfCustodialWallet(sdk)
 
-  const found: Payment[] = []
-  let hasUndescribedSend = false
   for (let page = 0; page < LOST_SEND_MAX_PAGES; page += 1) {
-    let payments: Payment[]
-    try {
-      ;({ payments } = await listSentPaymentsSince(
-        sdk,
-        {
-          fromTimestamp: since,
-          limit: LOST_SEND_PAGE_SIZE,
-          offset: page * LOST_SEND_PAGE_SIZE,
-        },
-        { signal },
-      ))
-    } catch (err) {
-      if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
-      throw err
-    }
+    const { payments } = await listSentPaymentsSince(sdk, {
+      fromTimestamp: since,
+      limit: LOST_SEND_PAGE_SIZE,
+      offset: page * LOST_SEND_PAGE_SIZE,
+    })
 
-    found.push(...payments.filter(matches))
-    if (payments.some(isUndescribedSend)) hasUndescribedSend = true
+    into.matches.push(...payments.filter(matches))
+    if (payments.some(isUndescribedSend)) into.hasUndescribedSend = true
 
-    if (payments.length < LOST_SEND_PAGE_SIZE)
-      return { matches: found, hasUndescribedSend }
+    if (payments.length < LOST_SEND_PAGE_SIZE) return
   }
 
-  if (found.some(isLanded)) return { matches: found, hasUndescribedSend }
   throw new Error(`Lost send lookup ran past ${LOST_SEND_MAX_PAGES} pages without an end`)
 }
 
@@ -384,18 +373,21 @@ export const findLostSend = async ({
   let lastLook: LostSendLookup = { status: "not-found", failed: [] }
 
   for (let attempt = 1; attempt <= LOST_SEND_ATTEMPTS; attempt += 1) {
-    /** Abandoning a look does not stop the SDK call it is waiting on, so the signal asks
-     *  the native side to give up too. Aborting after a look that finished is a no-op. */
-    const abandon = new AbortController()
+    const scan: HistoryScan = { matches: [], hasUndescribedSend: false }
+    /** A payment of the invoice that the pages already showed is evidence, and nothing
+     *  afterwards unshows it: not a page that fails, not a history without an end, and
+     *  not the look running out of time. Read before the failure is reported, so the one
+     *  thing a look is for is never lost to the way the look ended. */
+    const landed = () =>
+      scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
     try {
-      const scan = await withTimeout(
-        scanHistorySince({ sdk, since, matches, signal: abandon.signal }),
+      await withTimeout(
+        scanHistorySince({ sdk, since, matches, into: scan }),
         LOST_SEND_ATTEMPT_TIMEOUT_MS,
         "Self-custodial lost send lookup",
       )
+      const payment = landed()
       const failed = scan.matches.filter(isFailedPayment)
-      const payment =
-        scan.matches.find(isCompleted) ?? scan.matches.find(isPendingPayment)
       if (payment) return { status: "found", payment, failed }
       lastLook = scan.hasUndescribedSend
         ? {
@@ -404,10 +396,13 @@ export const findLostSend = async ({
           }
         : { status: "not-found", failed }
     } catch (err) {
+      const payment = landed()
+      /** The failed ones are only the ones this look reached: telemetry a later look can
+       *  still complete, where the payment itself cannot wait. */
+      if (payment)
+        return { status: "found", payment, failed: scan.matches.filter(isFailedPayment) }
       reportError("Self-custodial lost send lookup", err)
       lastLook = { status: "unreadable", error: err }
-    } finally {
-      abandon.abort()
     }
 
     const isLastAttempt = attempt === LOST_SEND_ATTEMPTS

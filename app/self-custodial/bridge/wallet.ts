@@ -56,22 +56,18 @@ export const deriveWalletIdentityPubkey = async (
 }
 
 /**
- * Lets a caller abandon an SDK call that has not come back. The SDK forwards the signal to
- * UniFFI's future cancellation, which is best effort — it asks the Rust task to stop at its
- * next await point, and the binding's own comment notes the task may not honour it. So a
- * caller that needs a bound still needs its own timer; this only lets the abandoned native
- * work wind down instead of running to completion unwatched.
+ * Never cancelled, deliberately. The SDK's async option would carry an `AbortSignal`
+ * through to UniFFI's future cancellation, but a user sync is run by the caller's own
+ * future: `trigger_sync_and_wait` marks the coordinator `sync_running` and then awaits
+ * `run_sync_loop` inline, and that flag is cleared only where the loop drains its waiters
+ * (`sdk/sync_coordinator.rs` @0.23.1). Cancelling drops the loop with the flag still set,
+ * so every later sync queues behind a runner that no longer exists and waits forever, for
+ * as long as the wallet is connected. A caller that needs a bound must therefore bound its
+ * own wait and leave this call to finish and release the coordinator. The background sync
+ * does not share the hazard: `trigger_sync_no_wait` spawns its loop.
  */
-export type SdkCallOptions = { signal?: AbortSignal }
-
-/** The SDK takes the option only with a signal in it, so an absent one is no option. */
-const asyncOpts = (options?: SdkCallOptions) =>
-  options?.signal ? { signal: options.signal } : undefined
-
-export const syncSelfCustodialWallet = (
-  sdk: BreezSdkInterface,
-  options?: SdkCallOptions,
-) => sdk.syncWallet(SyncWalletRequest.create({}), asyncOpts(options))
+export const syncSelfCustodialWallet = (sdk: BreezSdkInterface) =>
+  sdk.syncWallet(SyncWalletRequest.create({}))
 
 export const listPayments = (sdk: BreezSdkInterface, offset: number, limit: number) =>
   sdk.listPayments({
@@ -96,22 +92,18 @@ export const listSentPaymentsSince = (
     limit,
     offset,
   }: { fromTimestamp: bigint; limit: number; offset: number },
-  options?: SdkCallOptions,
 ) =>
-  sdk.listPayments(
-    {
-      typeFilter: [PaymentType.Send],
-      statusFilter: undefined,
-      assetFilter: undefined,
-      paymentDetailsFilter: undefined,
-      fromTimestamp,
-      toTimestamp: undefined,
-      offset,
-      limit,
-      sortAscending: false,
-    },
-    asyncOpts(options),
-  )
+  sdk.listPayments({
+    typeFilter: [PaymentType.Send],
+    statusFilter: undefined,
+    assetFilter: undefined,
+    paymentDetailsFilter: undefined,
+    fromTimestamp,
+    toTimestamp: undefined,
+    offset,
+    limit,
+    sortAscending: false,
+  })
 
 const EXPORT_PAGE_SIZE = 100
 /** 500 pages × 100 payments: far beyond any real wallet, so hitting it means the SDK

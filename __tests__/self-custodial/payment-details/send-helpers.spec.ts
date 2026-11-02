@@ -839,8 +839,6 @@ describe("findLostSend", () => {
         limit: PAGE_SIZE,
         sortAscending: false,
       }),
-      /** Carries the look's deadline, so an unanswered page is abandoned with it. */
-      { signal: expect.any(AbortSignal) },
     )
   })
 
@@ -915,7 +913,6 @@ describe("findLostSend", () => {
     expect(mockListPayments).toHaveBeenCalledTimes(2)
     expect(mockListPayments).toHaveBeenLastCalledWith(
       expect.objectContaining({ offset: PAGE_SIZE, limit: PAGE_SIZE }),
-      { signal: expect.any(AbortSignal) },
     )
   })
 
@@ -1114,28 +1111,13 @@ describe("findLostSend", () => {
    * so without a deadline the lookup would simply stay pending — and a send that never
    * reaches an outcome is worse than one reported unreadable.
    *
-   * Aborting is best effort: UniFFI forwards the signal to the Rust future's cancel, which
-   * the task honours only at an await point, so the deadline is what actually ends the
-   * look and the signal only lets the abandoned work wind down.
+   * The abandoned call is deliberately left running rather than cancelled: cancelling a
+   * user sync drops the loop that owns the SDK's sync coordinator while its `sync_running`
+   * flag is set, which wedges every later sync for as long as the wallet stays connected.
    */
   it("abandons a look the wallet never answers, and still never reports a send absent", async () => {
-    let inFlight = 0
-    let mostAtOnce = 0
-    const abortedEach: boolean[] = []
     mockSyncWallet.mockReset()
-    mockSyncWallet.mockImplementation(
-      (_request: unknown, options?: { signal: AbortSignal }) =>
-        new Promise((_resolve, reject) => {
-          inFlight += 1
-          mostAtOnce = Math.max(mostAtOnce, inFlight)
-          const index = abortedEach.push(false) - 1
-          options?.signal.addEventListener("abort", () => {
-            abortedEach[index] = true
-            inFlight -= 1
-            reject(new Error("aborted"))
-          })
-        }),
-    )
+    mockSyncWallet.mockImplementation(() => new Promise(() => {}))
 
     const pending = lookup()
     for (let attempt = 0; attempt < 3; attempt += 1) {
@@ -1147,12 +1129,46 @@ describe("findLostSend", () => {
     expect(found).toMatchObject({ status: "unreadable" })
     expect((found as { error: Error }).error.message).toContain("timed out after 15000ms")
     expect(mockSyncWallet).toHaveBeenCalledTimes(3)
-    /** Every look handed the SDK a signal, and every abandoned one was aborted. */
-    expect(abortedEach).toEqual([true, true, true])
-    /** A look is abandoned before the next begins, so two never run against each other. */
-    expect(mostAtOnce).toBe(1)
+    /** Nothing was cancelled: the SDK is asked to sync and nothing else. */
+    expect(mockSyncWallet).toHaveBeenLastCalledWith(expect.anything())
     /** The history was never read, so it was never treated as readable. */
     expect(mockListPayments).not.toHaveBeenCalled()
+  })
+
+  /**
+   * The deadline must not cost the lookup the one thing it exists to find. A payment of
+   * the invoice can sit on a page the wallet has already answered while a later page
+   * stalls, and reporting that as unreadable would tell the user a send failed that the
+   * history had already shown landing.
+   */
+  it("keeps a payment the pages already showed when a later page never answers", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", COMPLETED)],
+    })
+    mockListPayments.mockImplementationOnce(() => new Promise(() => {}))
+
+    const pending = lookup()
+    await jest.advanceTimersByTimeAsync(15_000)
+    const found = await pending
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
+    /** It answered on the first look, so no further look was taken. */
+    expect(mockSyncWallet).toHaveBeenCalledTimes(1)
+  })
+
+  /** The same holds for a pending payment, which the scan does not stop on: it keeps
+   *  paging for the failed ones, so the stall lands after the match is already in hand. */
+  it("keeps a pending payment the pages already showed when a later page never answers", async () => {
+    mockListPayments.mockResolvedValueOnce({
+      payments: [...fullPageOfOthers().slice(1), sent("p1", PENDING)],
+    })
+    mockListPayments.mockImplementationOnce(() => new Promise(() => {}))
+
+    const pending = lookup()
+    await jest.advanceTimersByTimeAsync(15_000)
+    const found = await pending
+
+    expect(found).toMatchObject({ status: "found", payment: { id: "p1" } })
   })
 })
 
