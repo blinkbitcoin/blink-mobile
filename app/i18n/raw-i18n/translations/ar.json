@@ -2731,7 +2731,13 @@
     "noTransaction": "لا توجد معاملة لإظهارها",
     "title": "المعاملات",
     "recentTransactions": "Recent transactions",
-    "transactionHistoryTitle": "تاريخ المعاملة"
+    "transactionHistoryTitle": "تاريخ المعاملة",
+    "filters": "عوامل التصفية",
+    "sent": "المُرسلة",
+    "received": "المُستلمة",
+    "searchPlaceholder": "البحث...",
+    "expandingSearch": "جارٍ توسيع البحث",
+    "nothingCameBack": "لا توجد نتائج"
   },
   "TransferScreen": {
     "title": "تحويل",

@@ -2731,7 +2731,13 @@
         "noTransaction": "トランザクションがありません",
         "title": "トランザクション",
         "recentTransactions": "最近のトランザクション",
-        "transactionHistoryTitle": "トランザクション履歴"
+        "transactionHistoryTitle": "トランザクション履歴",
+        "filters": "フィルター",
+        "sent": "送金",
+        "received": "受金",
+        "searchPlaceholder": "検索...",
+        "expandingSearch": "検索範囲を広げています",
+        "nothingCameBack": "結果がありません"
     },
     "TransferScreen": {
         "title": "送金",

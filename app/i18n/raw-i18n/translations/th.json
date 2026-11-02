@@ -2731,7 +2731,13 @@
     "noTransaction": "ไม่มีธุรกรรมให้แสดง",
     "title": "ธุรกรรม",
     "recentTransactions": "Recent transactions",
-    "transactionHistoryTitle": "ประวัติธุรกรรม"
+    "transactionHistoryTitle": "ประวัติธุรกรรม",
+    "filters": "ตัวกรอง",
+    "sent": "ส่งแล้ว",
+    "received": "ได้รับ",
+    "searchPlaceholder": "ค้นหา...",
+    "expandingSearch": "กำลังขยายการค้นหา",
+    "nothingCameBack": "ไม่พบผลลัพธ์"
   },
   "TransferScreen": {
     "title": "แลกเปลี่ยน",

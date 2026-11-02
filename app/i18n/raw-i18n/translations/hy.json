@@ -2731,7 +2731,13 @@
     "noTransaction": "Չկա որևէ գործառնություն",
     "title": "Գործառնություններ",
     "recentTransactions": "Վերջին գործառնությունները",
-    "transactionHistoryTitle": "Գործառնությունների պատմություն"
+    "transactionHistoryTitle": "Գործառնությունների պատմություն",
+    "filters": "Զտիչներ",
+    "sent": "Ուղարկված",
+    "received": "Ստացված",
+    "searchPlaceholder": "Փնտրել...",
+    "expandingSearch": "Որոնումն ընդլայնվում է",
+    "nothingCameBack": "Ոչինչ չի գտնվել"
   },
   "TransferScreen": {
     "title": "Փոխանցել",
@@ -3020,7 +3026,7 @@
       "other": "Օրեր"
     },
     "dollar": "Դոլար",
-    "all": "ԲՈԼՈՐԸ",
+    "all": "Բոլորը",
     "allAccounts": "Բոլոր հաշիվները",
     "some": "Որոշ",
     "support": "Աջակցություն",

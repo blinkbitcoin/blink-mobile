@@ -2731,7 +2731,13 @@
     "noTransaction": "Nie sú k dispozícii žiadne transakcie na zobrazenie",
     "title": "Všetky transakcie",
     "recentTransactions": "Nedávne transakcie",
-    "transactionHistoryTitle": "História transakcií"
+    "transactionHistoryTitle": "História transakcií",
+    "filters": "Filtre",
+    "sent": "Odoslané",
+    "received": "Prijaté",
+    "searchPlaceholder": "Hľadať...",
+    "expandingSearch": "Rozširujem vyhľadávanie",
+    "nothingCameBack": "Nič sa nenašlo"
   },
   "TransferScreen": {
     "title": "Prevod",
@@ -3020,7 +3026,7 @@
       "other": "Dní"
     },
     "dollar": "Dolár",
-    "all": "VŠETKO",
+    "all": "Všetko",
     "allAccounts": "Všetky účty",
     "some": "Niektoré",
     "support": "Podpora",

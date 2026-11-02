@@ -2731,7 +2731,13 @@
     "noTransaction": "Δεν υπάρχει συναλλαγή για να εμφανιστεί",
     "title": "Όλες οι συναλλαγές",
     "recentTransactions": "Πρόσφατες συναλλαγές",
-    "transactionHistoryTitle": "Ιστορικό Συναλλαγών"
+    "transactionHistoryTitle": "Ιστορικό συναλλαγών",
+    "filters": "Φίλτρα",
+    "sent": "Απεσταλμένες",
+    "received": "Ληφθείσες",
+    "searchPlaceholder": "Εύρεση...",
+    "expandingSearch": "Επέκταση αναζήτησης",
+    "nothingCameBack": "Δεν βρέθηκε τίποτα"
   },
   "TransferScreen": {
     "title": "Μεταφορά",
@@ -3020,7 +3026,7 @@
       "other": "Ημέρες"
     },
     "dollar": "Δολάριο",
-    "all": "ΟΛΑ",
+    "all": "Όλα",
     "allAccounts": "Όλοι οι λογαριασμοί",
     "some": "Μερικά",
     "support": "Υποστήριξη",

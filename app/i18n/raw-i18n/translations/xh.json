@@ -2731,7 +2731,13 @@
     "noTransaction": "Akho tshintshelwano lubonakalayo",
     "title": "Iintengiselwano/ utshintshwelano",
     "recentTransactions": "Iintengiselwano zakutsha nje",
-    "transactionHistoryTitle": "Imbali yentengiselwano"
+    "transactionHistoryTitle": "Imbali yentengiselwano",
+    "filters": "Izihluzi",
+    "sent": "Ezithunyelweyo",
+    "received": "Ezifunyenweyo",
+    "searchPlaceholder": "Khangela...",
+    "expandingSearch": "Ukwandisa ukukhangela",
+    "nothingCameBack": "Akukho nto ifunyenweyo"
   },
   "TransferScreen": {
     "title": "Udluliselo",
@@ -3020,7 +3026,7 @@
       "other": "Iintsuku"
     },
     "dollar": "Idola",
-    "all": "KONKE",
+    "all": "Konke",
     "allAccounts": "Zonke ii-akhawunti",
     "some": "Ezinye",
     "support": "Inkxaso",

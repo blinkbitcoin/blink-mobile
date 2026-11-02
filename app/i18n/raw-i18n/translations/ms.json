@@ -2731,7 +2731,13 @@
     "noTransaction": "Tiada transaksi untuk dipaparkan",
     "title": "Transaksi",
     "recentTransactions": "Transaksi terkini",
-    "transactionHistoryTitle": "Rekod transaksi"
+    "transactionHistoryTitle": "Rekod transaksi",
+    "filters": "Penapis",
+    "sent": "Dihantar",
+    "received": "Diterima",
+    "searchPlaceholder": "Carian...",
+    "expandingSearch": "Meluaskan carian",
+    "nothingCameBack": "Tiada hasil"
   },
   "TransferScreen": {
     "title": "Pindahkan",
@@ -3020,7 +3026,7 @@
       "other": "Hari"
     },
     "dollar": "Dolar",
-    "all": "SEMUA",
+    "all": "Semua",
     "allAccounts": "Semua akaun",
     "some": "Sebahagian",
     "support": "Sokongan",

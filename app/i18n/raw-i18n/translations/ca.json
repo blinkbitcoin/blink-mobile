@@ -2731,7 +2731,13 @@
     "noTransaction": "Ho hi ha cap transacció per mostrar",
     "title": "Totes les transaccions",
     "recentTransactions": "Transaccions recents",
-    "transactionHistoryTitle": "Historial de transaccions"
+    "transactionHistoryTitle": "Historial de transaccions",
+    "filters": "Filtres",
+    "sent": "Enviades",
+    "received": "Rebudes",
+    "searchPlaceholder": "Busca...",
+    "expandingSearch": "Ampliant la cerca",
+    "nothingCameBack": "No s'ha trobat res"
   },
   "TransferScreen": {
     "title": "Transferència",
@@ -3020,7 +3026,7 @@
       "other": "Dies"
     },
     "dollar": "Dòlar",
-    "all": "TOT",
+    "all": "Tot",
     "allAccounts": "Tots els comptes",
     "some": "Alguns",
     "support": "Suport",

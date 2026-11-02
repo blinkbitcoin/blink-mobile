@@ -2731,7 +2731,13 @@
     "noTransaction": "Geen transaksies om te wys nie",
     "title": "Transaksies",
     "recentTransactions": "Onlangse transaksies",
-    "transactionHistoryTitle": "Transaksiegeskiedenis"
+    "transactionHistoryTitle": "Transaksiegeskiedenis",
+    "filters": "Filters",
+    "sent": "Gestuur",
+    "received": "Ontvang",
+    "searchPlaceholder": "Soek...",
+    "expandingSearch": "Soektog word uitgebrei",
+    "nothingCameBack": "Niks gevind nie"
   },
   "TransferScreen": {
     "title": "Plaas Oor",
@@ -3020,7 +3026,7 @@
       "other": "Dae"
     },
     "dollar": "Dollar",
-    "all": "ALLES",
+    "all": "Alles",
     "allAccounts": "Alle rekeninge",
     "some": "Sommige",
     "support": "Ondersteuning",

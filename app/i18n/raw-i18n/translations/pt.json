@@ -2731,7 +2731,13 @@
         "noTransaction": "Nenhuma transação para mostrar",
         "title": "Todas as transações",
         "recentTransactions": "Transações recentes",
-        "transactionHistoryTitle": "Histórico de transações"
+        "transactionHistoryTitle": "Histórico de transações",
+        "filters": "Filtros",
+        "sent": "Enviadas",
+        "received": "Recebidas",
+        "searchPlaceholder": "Pesquisar...",
+        "expandingSearch": "Ampliando a pesquisa",
+        "nothingCameBack": "Nenhum resultado"
     },
     "TransferScreen": {
         "title": "Transferir",
@@ -3021,7 +3027,7 @@
             "other": "Dias"
         },
         "dollar": "Dólar",
-        "all": "TODOS",
+        "all": "Todos",
         "allAccounts": "Todas as contas",
         "some": "Alguns",
         "support": "Suporte",

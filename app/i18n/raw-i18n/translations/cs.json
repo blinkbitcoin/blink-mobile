@@ -2731,7 +2731,13 @@
     "noTransaction": "Žádná transakce k zobrazení",
     "title": "Transakce",
     "recentTransactions": "Nedávné transakce",
-    "transactionHistoryTitle": "Transakční historie"
+    "transactionHistoryTitle": "Transakční historie",
+    "filters": "Filtry",
+    "sent": "Odeslané",
+    "received": "Přijaté",
+    "searchPlaceholder": "Hledat...",
+    "expandingSearch": "Rozšiřuji hledání",
+    "nothingCameBack": "Nic nenalezeno"
   },
   "TransferScreen": {
     "title": "Převod",
@@ -3020,7 +3026,7 @@
       "other": "Dny"
     },
     "dollar": "Dolar",
-    "all": "VŠE",
+    "all": "Vše",
     "allAccounts": "Všechny účty",
     "some": "Některé",
     "support": "Podpora",
