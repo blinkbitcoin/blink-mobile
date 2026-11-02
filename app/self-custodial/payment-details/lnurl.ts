@@ -57,8 +57,11 @@ import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
 import {
   feeFailure,
   findLostSend,
+  hasQuoteMoved,
   QuoteRef,
+  quoteMovedFailure,
   quoteOf,
+  sendResultOf,
   type LostSendLookup,
   sendSettlement,
 } from "./send-helpers"
@@ -335,9 +338,8 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
   const sendOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,
-    status: PaymentSendResult,
   ) => ({
-    status,
+    status: sendResultOf(payment),
     transaction: { createdAt: Number(payment.timestamp) },
     extraInfo: {
       preimage: extractPreimage(payment),
@@ -345,16 +347,16 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     },
   })
 
-  /** A payment the SDK handed back, reported as sent: it hands one back as soon as it is
-   *  dispatched, pending or not, and every rail reports that as sent. Telemetry waits for
-   *  the SDK's word on how it ended, reported as the attempt that paid it began. */
+  /** A payment the SDK handed back: sent once completed, pending while still in flight.
+   *  Telemetry waits for the SDK's word on how it ended, reported as the attempt that
+   *  paid it began. */
   const dispatchedOutcome = (
     payment: Payment,
     successAction: SuccessActionProcessed | undefined,
     attempt: AttemptTelemetry | undefined,
   ) => {
     if (attempt) measureSettlement(payment, attempt.settlement, attempt.startedIn)
-    return sendOutcome(payment, successAction, PaymentSendResult.Success)
+    return sendOutcome(payment, successAction)
   }
 
   /** The wallet's own record of a send this detail made, reported as the send itself
@@ -437,6 +439,22 @@ export const createSelfCustodialLnurlPaymentDetails = <T extends WalletCurrency>
     } catch (err) {
       reportFailed(err)
       return sendFailure(err)
+    }
+
+    /** A dollar send converts at the price of the moment: one that moved since review
+     *  stops here, before it is sent, for the sender to see it again. */
+    if (
+      isUsdSend &&
+      hasQuoteMoved(
+        quoteRef.current,
+        quoteOf(extractLnurlFee(prepared), prepared.conversionEstimate),
+      )
+    ) {
+      measureIn(startedIn, ScEvent.PaymentSendFailed, {
+        ...sendTelemetry,
+        error_code: SelfCustodialErrorCode.QuoteMoved,
+      })
+      return quoteMovedFailure()
     }
 
     const paymentHash = prepared.invoiceDetails.paymentHash

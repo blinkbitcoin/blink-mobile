@@ -568,23 +568,33 @@ describe("createSendMutation", () => {
     jest.clearAllMocks()
   })
 
-  it("returns success on a successful send", async () => {
-    mockPrepareSendPayment.mockResolvedValue({
-      paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+  // The SDK hands the payment back as soon as it is dispatched: only a completed one is
+  // Sent, and one still in flight, or with no status, may yet fail.
+  const outcomes: [string, unknown, PaymentSendResult][] = [
+    ["a completed payment", { payment: { status: 0 } }, PaymentSendResult.Success],
+    ["a payment still in flight", { payment: { status: 1 } }, PaymentSendResult.Pending],
+    ["a failed payment", { payment: { status: 2 } }, PaymentSendResult.Failure],
+    ["no payment at all", undefined, PaymentSendResult.Pending],
+  ]
+
+  outcomes.forEach(([label, response, status]) => {
+    it(`reports ${status} for ${label}`, async () => {
+      mockPrepareSendPayment.mockResolvedValue({
+        paymentMethod: { tag: "Bolt11Invoice", inner: {} },
+      })
+      mockSendPayment.mockResolvedValue(response)
+
+      const send = createSendMutation(
+        {
+          sdk: mockSdk,
+          paymentRequest: "lnbc1...",
+          amount: undefined,
+        },
+        telemetry,
+      )
+
+      expect((await send()).status).toBe(status)
     })
-    mockSendPayment.mockResolvedValue(undefined)
-
-    const send = createSendMutation(
-      {
-        sdk: mockSdk,
-        paymentRequest: "lnbc1...",
-        amount: undefined,
-      },
-      telemetry,
-    )
-    const result = await send()
-
-    expect(result.status).toBe(PaymentSendResult.Success)
   })
 
   it("classifies a thrown SdkError(InsufficientFunds) into the InsufficientFunds code", async () => {
@@ -751,7 +761,7 @@ describe("a dollar send whose quote moved after review", () => {
       conversionOptions: {} as never,
       quoteRef: {},
     }
-    return { getFee: createGetFee(params), send: createSendMutation(params) }
+    return { getFee: createGetFee(params), send: createSendMutation(params, telemetry) }
   }
 
   it("sends nothing, and says so with a code raised before the send", async () => {
@@ -786,7 +796,7 @@ describe("a dollar send whose quote moved after review", () => {
     mockPrepareSendPayment.mockResolvedValueOnce(quoteAt(510))
     mockSendPayment.mockResolvedValue({ payment: { status: 0 } })
 
-    await createSendMutation(params)()
+    await createSendMutation(params, telemetry)()
 
     expect(mockSendPayment).toHaveBeenCalledTimes(1)
   })
@@ -842,6 +852,7 @@ it("reports a broadcast on-chain send that has not confirmed as Pending", async 
   const send = createSendMutationOnchain(
     { sdk: mockSdk, paymentRequest: "bc1q...", amount: BigInt(50000) },
     "medium",
+    telemetryOnchain,
   )
 
   expect((await send()).status).toBe(PaymentSendResult.Pending)
@@ -1217,7 +1228,7 @@ describe("send telemetry", () => {
 
     const result = await sendBolt11()
 
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Pending)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
 
     observe(COMPLETED)
@@ -1327,12 +1338,12 @@ describe("send telemetry", () => {
     },
   )
 
-  it("still reports the send itself as sent when the SDK returns no payment", async () => {
+  it("reports the send as pending when the SDK returns no payment", async () => {
     mockSendPayment.mockResolvedValue(undefined)
 
     const result = await sendBolt11()
 
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Pending)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
   })
 })

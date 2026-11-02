@@ -1690,7 +1690,7 @@ describe("createSelfCustodialLnurlPaymentDetails send telemetry", () => {
   it("reports nothing past initiated for a pending send, until the SDK settles it", async () => {
     const result = await sendTo("alice@blink.sv", PENDING)
 
-    expect(result.status).toBe(PaymentSendResult.Success)
+    expect(result.status).toBe(PaymentSendResult.Pending)
     expect(loggedEvents()).toEqual(["sc_payment_send_initiated"])
 
     observe(COMPLETED)
