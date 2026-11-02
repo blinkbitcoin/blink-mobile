@@ -380,15 +380,27 @@ describe("listDeposits — early claims (0.26)", () => {
     expect(mockReportError).toHaveBeenCalledTimes(1)
   })
 
-  it("reports a Claimed early claim as credited without reading history", async () => {
+  it("keeps a Claimed deposit settling while its receive is not in local history", async () => {
     mockListUnclaimedDeposits.mockResolvedValue({
       deposits: [depositWithInstantStatus({ tag: "Claimed" })],
     })
+    pagesOf([])
+
+    const [deposit] = await listDeposits(mockSdk)
+
+    expect(deposit.earlyClaim).toBe("settling")
+    expect(mockListPayments).toHaveBeenCalledTimes(1)
+  })
+
+  it("reports a Claimed deposit as credited once its receive has completed", async () => {
+    mockListUnclaimedDeposits.mockResolvedValue({
+      deposits: [depositWithInstantStatus({ tag: "Claimed" })],
+    })
+    pagesOf([depositReceive("pqr678", 1)])
 
     const [deposit] = await listDeposits(mockSdk)
 
     expect(deposit.earlyClaim).toBe("credited")
-    expect(mockListPayments).not.toHaveBeenCalled()
   })
 
   it.each([
@@ -489,6 +501,18 @@ describe("claimDeposit", () => {
       status: "deferred",
       reason: "provider_declined",
       message: "quote expired",
+    })
+  })
+
+  it("names a deferral reason it does not know rather than reading fields it lacks", async () => {
+    mockClaimDeposit.mockResolvedValue(deferred({ tag: "SomethingNew" }))
+
+    const outcome = await claimDeposit({ sdk: mockSdk, txid: "abc", vout: 0 })
+
+    expect(outcome).toEqual({
+      status: "deferred",
+      reason: "provider_declined",
+      message: "Claim deferred: SomethingNew",
     })
   })
 })
