@@ -25,13 +25,17 @@ jobs:
       # Sizes the jest worker count against what this runner really has.
       - run: nproc && free -m
       # Flake handling happens at test granularity now: jest retries individual
-      # failing tests in CI (see jest.setup-after-env.ts) and logs each retried
-      # error, instead of silently re-running the whole job.
-      - run: yarn test
+      # failing tests in CI (see jest.setup-after-env.ts) and annotates each
+      # retried error (see jest.config.js), instead of silently re-running the
+      # whole job.
+      # Two workers instead of `yarn test`'s --runInBand, which took 19m46-19m59s
+      # here against a 20-minute limit. A worker past 1 GB is replaced between
+      # files, so heap growth that used to OOM long in-band runs stays bounded.
+      - run: yarn test:ci
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-        # Green in-band runs finish at 19m46-19m59s, so 20 was failing passing
-        # PRs. Tighten again once the run is parallel.
+        # Kept loose until the parallel run's time on this runner is known;
+        # then tighten to 2-3x it, so a real hang fails fast.
         timeout-minutes: 30
   android-unit-test:
     name: Android unit tests
