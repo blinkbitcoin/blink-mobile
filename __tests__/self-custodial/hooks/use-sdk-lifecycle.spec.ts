@@ -122,27 +122,29 @@ const captureListener = (): { current: SdkEventListener | null } => {
 
 const buildSdk = (id: string) => ({ id }) as unknown as object
 
-describe("useSdkLifecycle", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockDepositClaimLeewayVbyte = 7
-    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
-    mockValidateStoredNetwork.mockResolvedValue(true)
-    mockGetSnapshot.mockResolvedValue({
-      wallets: [],
-      allTransactions: [],
-      hasMore: false,
-      rawTransactionCount: 0,
-    })
-    mockAddSdkEventListener.mockResolvedValue("listener-id")
-    mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockGetUserSettings.mockResolvedValue({ stableBalanceActiveLabel: undefined })
-    mockDisconnectSdk.mockResolvedValue(undefined)
-    const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
-    isOnline.getOnlineState.mockResolvedValue("online")
-    isOnline.getServiceStatus.mockResolvedValue(0)
-    isOnline.isDegradedStatus.mockReturnValue(false)
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockDepositClaimLeewayVbyte = 7
+  mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+  mockValidateStoredNetwork.mockResolvedValue(true)
+  mockGetSnapshot.mockResolvedValue({
+    wallets: [],
+    allTransactions: [],
+    hasMore: false,
+    rawTransactionCount: 0,
   })
+  mockAddSdkEventListener.mockResolvedValue("listener-id")
+  mockRemoveSdkEventListener.mockResolvedValue(undefined)
+  mockGetUserSettings.mockResolvedValue({ stableBalanceActiveLabel: undefined })
+  mockDisconnectSdk.mockResolvedValue(undefined)
+  const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
+  isOnline.getOnlineState.mockResolvedValue("online")
+  isOnline.getServiceStatus.mockResolvedValue(0)
+  isOnline.isDegradedStatus.mockReturnValue(false)
+}
+
+describe("useSdkLifecycle", () => {
+  beforeEach(resetMocks)
 
   describe("inactive paths", () => {
     it("stays Unavailable and never calls initSdk when accountId is null", async () => {
@@ -814,6 +816,10 @@ describe("useSdkLifecycle", () => {
       expect(secondSettled).toBe(true)
     })
   })
+})
+
+describe("useSdkLifecycle: connectivity and retries", () => {
+  beforeEach(resetMocks)
 
   describe("offline / degraded transitions", () => {
     it("flips status to Offline when snapshot fails and connectivity is Offline", async () => {
