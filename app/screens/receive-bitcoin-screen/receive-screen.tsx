@@ -196,6 +196,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     requestState,
     !isSelfCustodial && carousel.isOnChainPage,
   )
+  // The amount carries across pages, so one set on Lightning lands in the onchain URI
+  // too; the sheet alone would never warn about it.
+  const depositWarning =
+    requestState.unitOfAccountAmount &&
+    getAmountWarning?.(requestState.unitOfAccountAmount)
 
   const {
     displayReceiveNfc,
@@ -421,6 +426,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           }
           autoConvertMinSats={selfCustodialRequest?.autoConvertMinSats}
           autoConvertMinFiat={selfCustodialRequest?.autoConvertMinFiat}
+          depositWarning={depositWarning || undefined}
         />
       </View>
 

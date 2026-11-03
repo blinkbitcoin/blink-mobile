@@ -113,10 +113,11 @@ export const depositFeeForAmount = (
 
 /**
  * Classifies an onchain receive amount the way the backend settles it. It
- * drops a deposit under `minimumSats` (its dust threshold) before any fee
- * with no record at all, so that check comes first. Above it the flat fee is
- * taken: under the fee nothing is left, under `multiplier` times the fee most
- * of it goes. An empty or zero amount never warns.
+ * drops a deposit under `minimumSats` (its dust threshold) before any fee,
+ * with no record at all, so that check comes first. It also drops one the
+ * fee would leave nothing of (`AmountLessThanFeeError` when the credit is
+ * `<= 0`, so an amount equal to the fee too). Under `multiplier` times the fee
+ * it arrives with most of it gone. An empty or zero amount never warns.
  */
 export const getDepositFeeWarning = ({
   amountSats,
@@ -133,7 +134,7 @@ export const getDepositFeeWarning = ({
   const fee = depositFeeForAmount(amountSats, deposit)
   const warning = (type: DepositFeeWarningType) => ({ type, fee, minimum: minimumSats })
   if (amountSats < minimumSats) return warning(DepositFeeWarning.BelowMinimum)
-  if (amountSats < fee) return warning(DepositFeeWarning.AllConsumedByFee)
+  if (amountSats <= fee) return warning(DepositFeeWarning.AllConsumedByFee)
   if (amountSats < fee * multiplier) return warning(DepositFeeWarning.ConsumedByFee)
   return null
 }

@@ -113,7 +113,8 @@ describe("useDepositFeeWarning", () => {
       "Amount is below the minimum deposit. Anything under 1,000 SAT will not arrive",
     )
     expect(result.current?.(sats(1000))).toBe(ALL_CONSUMED)
-    expect(result.current?.(sats(2500))).toBe(CONSUMED)
+    expect(result.current?.(sats(2500))).toBe(ALL_CONSUMED)
+    expect(result.current?.(sats(2501))).toBe(CONSUMED)
   })
 
   it("states the backend fee, not a literal", () => {
