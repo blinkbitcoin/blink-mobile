@@ -14,10 +14,7 @@ import { useAppConfig } from "@app/hooks"
 import useLogout from "@app/hooks/use-logout"
 import { useLogoutAndRoute } from "@app/hooks/use-logout-and-route"
 import { useI18nContext } from "@app/i18n/i18n-react"
-import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { toBtcMoneyAmount, toUsdMoneyAmount } from "@app/types/amounts"
-import { useNavigation } from "@react-navigation/native"
-import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { useTheme, Text, makeStyles } from "@rn-vui/themed"
 
 import {
@@ -46,7 +43,6 @@ gql`
 export const Delete = () => {
   const styles = useStyles()
 
-  const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { logout } = useLogout()
   const { routeAfterLogout } = useLogoutAndRoute()
   const { appConfig } = useAppConfig()
