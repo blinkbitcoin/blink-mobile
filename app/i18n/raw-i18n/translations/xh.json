@@ -3085,10 +3085,10 @@
     "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho.",
     "downloadLogs": "Khuphela iirekhodi",
     "exportLogsTitle": "Yabelana ngerekhodi zesipaji sakho",
-    "exportLogsBody": "Le fayile inceda iqela lethu loncedo liphande iingxaki zesipaji sakho. Iqulethe imbali yentlawulo (izixa, ii-invoyisi needilesi) nezichongi zesipaji ngasinye esingagcinwanga kwesi sixhobo, hayi esi kuphela, kodwa ayinazo iibinzana zakho zokugcina okanye izitshixo. Yabelana ngayo kuphela neqela lethu loncedo.",
+    "exportLogsBody": "Le fayile inceda inkxaso iphande iingxaki zesipaji sakho. Iqulethe imbali yentlawulo (izixa, ii-invoyisi needilesi) nezichongi zesipaji ngasinye esingagcinwanga kwesi sixhobo, hayi esi kuphela, kodwa ayinazo iibinzana zakho zokugcina okanye izitshixo. Yabelana ngayo kuphela nenkxaso.",
     "exportLogsConfirm": "Yabelana ngerekhodi",
     "noLogsYet": "Akukabikho rekhodi zokwabelana. Vula isipaji sakho uzame kwakhona.",
-    "exportLogsError": "Ayiphumelelanga ukukhuphela iirekhodi. Nceda uzame kwakhona."
+    "exportLogsError": "Ayiphumelelanga ukukhuphela iirekhodi. Zama kwakhona."
   },
   "lnurl": {
     "overLimit": "You can't send more than max amount",

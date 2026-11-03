@@ -3088,7 +3088,7 @@
     "exportLogsBody": "Fayiro eno eyambako ttiimu yaffe ey'obuyambi okunoonyereza ku bizibu ku kawunti zo. Erimu ebyafaayo by'okusasula (ebitundutundu, invoices n'endagiriro) n'obubonero bwa buli kawunti etakuumibwa ku kyuma kino, si eyo yokka, naye tewali bigambo by'enkalakkalira wadde obusumuluzo. Gigabane ne ttiimu yaffe ey'obuyambi yokka.",
     "exportLogsConfirm": "Gabana ebiwandiiko",
     "noLogsYet": "Tewali biwandiiko kugabana. Ggulawo akawunti yo oddemu ogezeeko.",
-    "exportLogsError": "Tekisobose kufulumya biwandiiko. Gezaako nate."
+    "exportLogsError": "Tekisobose okufulumya ebiwandiiko. Gezaako nate."
   },
   "lnurl": {
     "overLimit": "Tosobola kusindika ssente ezisukka mu muwendo ogusinga obunene",

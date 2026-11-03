@@ -3083,12 +3083,12 @@
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
         "bye": "Adeus!",
         "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei.",
-        "downloadLogs": "Baixar registros",
-        "exportLogsTitle": "Compartilhar os registros da sua carteira",
+        "downloadLogs": "Baixar logs",
+        "exportLogsTitle": "Compartilhar os logs da sua carteira",
         "exportLogsBody": "Este arquivo ajuda nossa equipe de suporte a investigar problemas nas suas carteiras. Ele inclui o histórico de pagamentos (valores, faturas e endereços) e os identificadores de cada carteira não custodial neste dispositivo, não só desta, mas nunca suas frases de recuperação ou chaves. Compartilhe apenas com nossa equipe de suporte.",
-        "exportLogsConfirm": "Compartilhar registros",
-        "noLogsYet": "Ainda não há registros para compartilhar. Abra sua carteira e tente de novo.",
-        "exportLogsError": "Não foi possível exportar seus registros. Tente de novo."
+        "exportLogsConfirm": "Compartilhar logs",
+        "noLogsYet": "Ainda não há logs para compartilhar. Abra sua carteira e tente de novo.",
+        "exportLogsError": "Não foi possível exportar seus logs. Tente de novo."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",

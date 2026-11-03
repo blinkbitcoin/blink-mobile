@@ -3086,7 +3086,7 @@
     "downloadLogs": "Preuzmi zapise",
     "exportLogsTitle": "Podijelite zapise novčanika",
     "exportLogsBody": "Ova datoteka pomaže našem timu za podršku da istraži probleme s vašim novčanicima. Sadrži povijest plaćanja (iznose, račune i adrese) i identifikatore svakog novčanika bez skrbništva na ovom uređaju, ne samo ovog, ali nikada vaše pričuvne fraze ni ključeve. Podijelite je samo s našim timom za podršku.",
-    "exportLogsConfirm": "Podijeli zapise",
+    "exportLogsConfirm": "Podijelite zapise",
     "noLogsYet": "Još nema zapisa za dijeljenje. Otvorite novčanik i pokušajte ponovno.",
     "exportLogsError": "Nije moguće izvesti zapise. Pokušajte ponovno."
   },

@@ -3085,7 +3085,7 @@
     "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale.",
     "downloadLogs": "Descarcă jurnalele",
     "exportLogsTitle": "Partajează jurnalele portofelului",
-    "exportLogsBody": "Acest fișier ajută echipa noastră de suport să investigheze problemele portofelelor tale. Include istoricul plăților (sume, facturi și adrese) și identificatorii fiecărui portofel non-custodial de pe acest dispozitiv, nu doar al acestuia, dar niciodată frazele de recuperare sau cheile. Partajează-l doar cu echipa noastră de suport.",
+    "exportLogsBody": "Acest fișier ajută echipa noastră de asistență să investigheze problemele portofelelor tale. Include istoricul plăților (sume, facturi și adrese) și identificatorii fiecărui portofel non-custodial de pe acest dispozitiv, nu doar al acestuia, dar niciodată frazele de recuperare sau cheile. Partajează-l doar cu echipa noastră de asistență.",
     "exportLogsConfirm": "Partajează jurnalele",
     "noLogsYet": "Nu există încă jurnale de partajat. Deschide portofelul și încearcă din nou.",
     "exportLogsError": "Nu s-au putut exporta jurnalele. Încearcă din nou."

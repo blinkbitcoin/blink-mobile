@@ -3084,10 +3084,10 @@
         "bye": "Auf Wiedersehen!",
         "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren.",
         "downloadLogs": "Logs herunterladen",
-        "exportLogsTitle": "Wallet-Logs teilen",
-        "exportLogsBody": "Diese Datei hilft unserem Support, Probleme mit deinen Wallets zu untersuchen. Sie enthält den Zahlungsverlauf (Beträge, Rechnungen und Adressen) und die Wallet-Kennungen jeder nicht verwahrten Wallet auf diesem Gerät, nicht nur dieser, aber niemals deine Wiederherstellungsphrasen oder Schlüssel. Teile sie nur mit unserem Support.",
+        "exportLogsTitle": "Brieftaschen-Logs teilen",
+        "exportLogsBody": "Diese Datei hilft unserem Support, Probleme mit deinen Brieftaschen zu untersuchen. Sie enthält den Zahlungsverlauf (Beträge, Rechnungen und Adressen) und die Brieftaschen-Kennungen jeder nicht verwahrten Brieftasche auf diesem Gerät, nicht nur dieser, aber niemals deine Wiederherstellungsphrasen oder Schlüssel. Teile sie nur mit unserem Support.",
         "exportLogsConfirm": "Logs teilen",
-        "noLogsYet": "Es gibt noch keine Logs zum Teilen. Öffne deine Wallet und versuche es erneut.",
+        "noLogsYet": "Es gibt noch keine Logs zum Teilen. Öffne deine Brieftasche und versuche es erneut.",
         "exportLogsError": "Logs konnten nicht exportiert werden. Bitte versuche es erneut."
     },
     "lnurl": {

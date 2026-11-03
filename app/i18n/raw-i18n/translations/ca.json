@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
     "bye": "Adéu!",
     "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei.",
-    "downloadLogs": "Baixa els registres",
-    "exportLogsTitle": "Comparteix els registres de la cartera",
-    "exportLogsBody": "Aquest fitxer ajuda l'equip de suport a investigar problemes amb les teves carteres. Inclou l'historial de pagaments (imports, factures i adreces) i els identificadors de cada cartera no custodiada d'aquest dispositiu, no només d'aquesta, però mai les frases de còpia de seguretat ni les claus. Comparteix-lo només amb el nostre equip de suport.",
-    "exportLogsConfirm": "Comparteix els registres",
-    "noLogsYet": "Encara no hi ha registres per compartir. Obre la cartera i torna-ho a provar.",
-    "exportLogsError": "No s'han pogut exportar els registres. Torna-ho a provar."
+    "downloadLogs": "Baixa els logs",
+    "exportLogsTitle": "Comparteix els logs de la cartera",
+    "exportLogsBody": "Aquest fitxer ajuda l'assistència a investigar problemes amb les teves carteres. Inclou l'historial de pagaments (imports, factures i adreces) i els identificadors de cada cartera no custodiada d'aquest dispositiu, no només d'aquesta, però mai les frases de còpia de seguretat ni les claus. Comparteix-lo només amb la nostra assistència.",
+    "exportLogsConfirm": "Comparteix els logs",
+    "noLogsYet": "Encara no hi ha logs per compartir. Obre la cartera i torna-ho a provar.",
+    "exportLogsError": "No s'han pogut exportar els logs. Torna-ho a provar."
   },
   "lnurl": {
     "overLimit": "No pots enviar més que l'import màxim",

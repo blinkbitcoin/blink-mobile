@@ -3085,9 +3085,9 @@
     "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria.",
     "downloadLogs": "Pakua kumbukumbu",
     "exportLogsTitle": "Shiriki kumbukumbu za mkoba wako",
-    "exportLogsBody": "Faili hii husaidia timu yetu ya usaidizi kuchunguza matatizo ya mikoba yako. Inajumuisha historia ya malipo (kiasi, ankara na anwani) na vitambulishi vya kila mkoba usio wa udhamini kwenye kifaa hiki, si huu pekee, lakini kamwe vifungu vyako vya akiba wala funguo. Ishiriki na timu yetu ya usaidizi pekee.",
+    "exportLogsBody": "Faili hili husaidia timu yetu ya usaidizi kuchunguza matatizo ya mikoba yako. Inajumuisha historia ya malipo (kiasi, ankara na anwani) na vitambulishi vya kila mkoba usio wa udhamini kwenye kifaa hiki, si huu pekee, lakini kamwe vifungu vyako vya akiba wala funguo. Ishiriki na timu yetu ya usaidizi pekee.",
     "exportLogsConfirm": "Shiriki kumbukumbu",
-    "noLogsYet": "Bado hakuna kumbukumbu za kushiriki. Fungua mkoba wako ujaribu tena.",
+    "noLogsYet": "Bado hakuna kumbukumbu za kushiriki. Fungua mkoba wako kisha jaribu tena.",
     "exportLogsError": "Imeshindwa kuhamisha kumbukumbu. Tafadhali jaribu tena."
   },
   "lnurl": {

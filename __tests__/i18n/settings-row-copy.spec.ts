@@ -58,8 +58,8 @@ describe("settings rows that stayed in English", () => {
     const LL = i18nObject("es")
 
     expect(LL.BackupScreen.title()).toBe("Respaldar tu billetera")
-    expect(LL.support.downloadLogs()).toBe("Descargar registros")
-    expect(LL.support.exportLogsConfirm()).toBe("Compartir registros")
+    expect(LL.support.downloadLogs()).toBe("Descargar logs")
+    expect(LL.support.exportLogsConfirm()).toBe("Compartir logs")
   })
 
   locales.forEach((locale) => {
