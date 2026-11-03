@@ -137,6 +137,7 @@ yarn update-translations
 ```
 
 ### Running E2E Tests
+E2E runs locally only; no CI workflow runs it while the CI overhaul is pending.
 ```bash
 make tilt-up         # Start local backend
 yarn e2e:build ios.sim.debug
@@ -149,9 +150,10 @@ yarn e2e:test ios.sim.debug
 |----------|---------|---------|
 | `check-code.yml` | PR | Lint, type check |
 | `test.yml` | PR | Unit tests |
-| `e2e.yml` | PR | E2E tests (iOS + Android) |
 | `audit.yml` | Schedule | Security audit |
 | `codeql.yml` | PR | Code analysis |
+
+E2E tests (Detox/Appium) are not run in CI; run them locally per [E2E Testing](./e2e-testing.md).
 
 ## Backend Environments
 
