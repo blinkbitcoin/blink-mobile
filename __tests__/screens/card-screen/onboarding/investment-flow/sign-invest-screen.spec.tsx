@@ -8,6 +8,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { logError } from "@app/utils/log-error"
 import {
   AGREEMENT_LABELS,
+  MAX_QUOTE_AGE_MS,
   ROUTE_MISSING_CODE,
   signingFailure,
 } from "@app/screens/card-screen/onboarding/investment-flow/investment-agreement"
@@ -99,27 +100,31 @@ jest.mock("@app/hooks/use-app-config", () => {
  *  screen being rebuilt around it. */
 const mockUsdCentsPerBtc = { current: USD_CENTS_PER_BTC as number | null }
 
-/** The converter is absent until the feed answers, as in the real hook; once it has, it
- *  prices whatever satoshis it is handed at the holder's rate, so the figures below only
- *  come out right when the screen asks for exactly one bitcoin. */
-jest.mock("@app/hooks/use-price-conversion", () => {
-  const actual = jest.requireActual("@app/hooks/use-price-conversion")
-  const priceInCents = (satoshis: number) =>
-    Math.round((satoshis * (mockUsdCentsPerBtc.current ?? 0)) / actual.SATS_PER_BTC)
+/** When the price service quoted the rate: 22:00 UTC, which Honduras reads as 16:00. */
+const mockQuotedAt = new Date("2026-09-14T22:00:00Z")
 
-  return {
-    ...actual,
-    usePriceConversion: () => ({
-      convertMoneyAmount:
+/** When the quote reached the device; unset means just now. */
+const mockQuoteReceivedAt = { current: undefined as Date | undefined }
+const mockRefreshQuote = jest.fn()
+
+/** No quote until the network answers, as in the real hook; once it has, the holder's
+ *  rate, stamped by the price service and received just now unless a test says when. */
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/use-agreement-quote",
+  () => ({
+    useAgreementQuote: () => ({
+      quote:
         mockUsdCentsPerBtc.current === null
-          ? undefined
-          : ({ amount }: { amount: number }) => ({
-              amount: priceInCents(amount),
-              currency: "USD",
-            }),
+          ? null
+          : {
+              usdCentsPerBtc: mockUsdCentsPerBtc.current,
+              quotedAt: mockQuotedAt,
+              receivedAt: mockQuoteReceivedAt.current ?? new Date(),
+            },
+      refresh: mockRefreshQuote,
     }),
-  }
-})
+  }),
+)
 
 /** The call to the service, which is what the screen has instead of a form url: it hands
  *  over the values and opens whatever the service answers with. */
@@ -260,6 +265,7 @@ const resetScreenMocks = () => {
   mockESign.signSource = null
   mockRouteParams.current = { selectedAmountUsd: SELECTED_AMOUNT_USD }
   mockUsdCentsPerBtc.current = USD_CENTS_PER_BTC
+  mockQuoteReceivedAt.current = undefined
   mockInstanceMintUrl.current = MINT_ORIGIN
   mockRemoteMintUrl.current = ""
   mockMintSigningInstance.mockResolvedValue({
@@ -454,9 +460,9 @@ describe("SignInvestScreen", () => {
   })
 
   /**
-   * The price ticks every few seconds. A source rebuilt on each tick would restart the
-   * session mid-signature, so the rate is read as the document is minted, which is also
-   * the stamped moment the agreement names, and the source stays the same.
+   * The price is asked for again every few minutes. A source rebuilt on each answer would
+   * restart the session mid-signature, so the latest quote is read as the document is
+   * minted, and the source stays the same.
    */
   it("reads the price as it mints, without rebuilding the session on every tick", async () => {
     const { rerender } = await renderScreen()
@@ -980,6 +986,38 @@ describe("SignInvestScreen", () => {
 
       expect(mockESign.retry).toHaveBeenCalledTimes(1)
     })
+  })
+})
+
+describe("SignInvestScreen, at the quote it mints", () => {
+  beforeEach(resetScreenMocks)
+
+  /** The document states when the rate held, which is when the price service quoted it,
+   *  not when the step happened to mint. A fresh quote is not asked for again. */
+  it("stamps the agreement with the moment the price service quoted the rate", async () => {
+    await renderScreen()
+
+    await startedSession()
+
+    expect(mintRequest().prefill[AGREEMENT_LABELS.rateTimestamp]).toEqual({
+      value: "2026-09-14 16:00",
+      locked: true,
+    })
+    expect(mockRefreshQuote).not.toHaveBeenCalled()
+  })
+
+  /** A quote the feed stopped refreshing would bind the signer to a rate the market has
+   *  left: nothing is minted, the price is asked for again, and the retry mints at it. */
+  it("does not mint at a stale quote, and asks for the price again", async () => {
+    mockQuoteReceivedAt.current = new Date(Date.now() - MAX_QUOTE_AGE_MS - 1000)
+    await renderScreen()
+
+    await expect(startedSession()).rejects.toMatchObject({
+      code: "ENVELOPE_CREATION_FAILED",
+    })
+
+    expect(mockMintSigningInstance).not.toHaveBeenCalled()
+    expect(mockRefreshQuote).toHaveBeenCalledTimes(1)
   })
 })
 

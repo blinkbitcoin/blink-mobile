@@ -15,13 +15,10 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { CloseHeader } from "@app/components/close-header"
 import { Screen } from "@app/components/screen"
 import { useRemoteConfig } from "@app/config/feature-flags-context"
-import { WalletCurrency } from "@app/graphql/generated"
-import { SATS_PER_BTC, usePriceConversion } from "@app/hooks/use-price-conversion"
 import { useAppConfig } from "@app/hooks/use-app-config"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { TranslationFunctions } from "@app/i18n/i18n-types"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { toBtcMoneyAmount } from "@app/types/amounts"
 import { logError } from "@app/utils/log-error"
 
 import {
@@ -30,10 +27,12 @@ import {
   trustedRemoteMintOrigin,
 } from "./esign-mint"
 import {
+  isQuoteFresh,
   isSigningError,
   mintInvestmentAgreement,
   ROUTE_MISSING_CODE,
 } from "./investment-agreement"
+import { useAgreementQuote } from "./use-agreement-quote"
 
 type SignInvestRoute = RouteProp<RootStackParamList, "cardOnboardingSignInvestScreen">
 
@@ -192,7 +191,7 @@ export const SignInvestScreen: React.FC = () => {
     appConfig: { galoyInstance, token },
   } = useAppConfig()
   const { cardInvestmentEsignMintUrl } = useRemoteConfig()
-  const { convertMoneyAmount } = usePriceConversion()
+  const { quote, refresh: refreshQuote } = useAgreementQuote()
   const { selectedAmountUsd } = useRoute<SignInvestRoute>().params
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
 
@@ -215,23 +214,16 @@ export const SignInvestScreen: React.FC = () => {
    *  through, for the log to name beside the code. */
   const lastMintStatus = React.useRef<number | undefined>(undefined)
 
-  /** The price of one bitcoin in whole cents, or null while the feed has not answered:
-   *  the rate the agreement states, taken with its cents rather than as the per-satoshi
-   *  figure the hook also offers, which only holds whole dollars. */
-  const usdCentsPerBtc = convertMoneyAmount
-    ? convertMoneyAmount(toBtcMoneyAmount(SATS_PER_BTC), WalletCurrency.Usd).amount
-    : null
-
   /**
    * What the mint reads the moment it runs, kept out of the source's dependencies for the
-   * same reason: the price ticks every few seconds, and a source rebuilt on each tick
-   * would restart the session mid-signature. The rate is read as the document is minted,
-   * which is the stamped moment the agreement names.
+   * same reason: the price is asked for again every few minutes, and a source rebuilt on
+   * each answer would restart the session mid-signature. The latest quote is read as the
+   * document is minted, and the agreement states the moment the price service quoted it.
    */
-  const mintInputs = React.useRef({ token, usdCentsPerBtc })
+  const mintInputs = React.useRef({ token, quote, refreshQuote })
   React.useEffect(() => {
-    mintInputs.current = { token, usdCentsPerBtc }
-  }, [token, usdCentsPerBtc])
+    mintInputs.current = { token, quote, refreshQuote }
+  }, [token, quote, refreshQuote])
 
   /**
    * Set when the session that completed is not the envelope this step minted last. The
@@ -314,15 +306,17 @@ export const SignInvestScreen: React.FC = () => {
    * render would restart the signing session, possibly mid-signature.
    *
    * The document is written from what the app knows at that moment: the figures from the
-   * chosen amount at the price just read; the signer's details the service asks its host
-   * for. A price that has not answered yet cannot be minted around, so it is reported
-   * and the retry asks again.
+   * chosen amount at the latest quote the network answered; the signer's details the
+   * service asks its host for. A quote that has not answered yet, or has gone stale,
+   * cannot be minted around, so it is reported, the price is asked for again, and the
+   * retry mints at the fresh one.
    */
   const source = React.useMemo(
     () =>
       createHostedFormSource({
         createInstance: async () => {
-          const { token: session, usdCentsPerBtc: price } = mintInputs.current
+          const { token: session, quote: latestQuote } = mintInputs.current
+          if (!isQuoteFresh(latestQuote, new Date())) mintInputs.current.refreshQuote()
           mintCount.current += 1
           const generation = mintCount.current
 
@@ -333,7 +327,7 @@ export const SignInvestScreen: React.FC = () => {
           lastMintStatus.current = undefined
           const agreement = await mintInvestmentAgreement({
             totalUsd: selectedAmountUsd,
-            usdCentsPerBtc: price,
+            quote: latestQuote,
             mint: (prefill) =>
               mintSigningInstance({ origin: mintOrigin, token: session, prefill }),
           }).catch((error: unknown) => {
@@ -372,9 +366,10 @@ export const SignInvestScreen: React.FC = () => {
     onError: reportSigningError,
   })
 
-  /** The agreement cannot be minted before the price feed has answered, so a cold open
-   *  waits on the spinner for it rather than failing the session it is about to start. */
-  const isPriceQuoted = usdCentsPerBtc !== null
+  /** The agreement cannot be minted before the network has answered the price, so a cold
+   *  open waits on the spinner for it rather than failing the session it is about to
+   *  start; a price restored from the cache does not count. */
+  const isPriceQuoted = quote !== null
 
   /**
    * Whether that wait has gone on too long. While it is waiting a timer runs; once the
