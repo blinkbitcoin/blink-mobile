@@ -6,7 +6,10 @@ import {
   WalletCurrency,
 } from "@app/graphql/generated"
 import { useIsAuthed } from "@app/graphql/is-authed-context"
-import { createCustodialPriceSource } from "@app/custodial/adapters/price"
+import {
+  createCustodialPriceSource,
+  createFallbackPriceSource,
+} from "@app/custodial/adapters/price"
 import { createSelfCustodialPriceSource } from "@app/self-custodial/adapters/price"
 import { useFiatRates } from "@app/self-custodial/providers/fiat-rates"
 import { noPriceSource, RateFreshness, type PriceSource } from "@app/types/price"
@@ -110,13 +113,20 @@ export const usePriceConversion = () => {
     fetchPolicy: "cache-and-network",
   })
 
-  const backendSource = createCustodialPriceSource(
-    isSelfCustodial
-      ? unauthedData?.realtimePrice
-      : authedPrice ?? unauthedData?.realtimePrice,
-    displayCurrency,
-    !unauthedLoading,
-  )
+  /** The clock is read at render, which a self-custodial session gets every five minutes
+   *  from the feed's own tick: the cadence the feed's freshness is measured at too. */
+  const backendSource = isSelfCustodial
+    ? createFallbackPriceSource({
+        price: unauthedData?.realtimePrice,
+        displayCurrency,
+        hasSettled: !unauthedLoading,
+        now: Date.now(),
+      })
+    : createCustodialPriceSource(
+        authedPrice ?? unauthedData?.realtimePrice,
+        displayCurrency,
+        !unauthedLoading,
+      )
 
   const { source, isSatsOnly, shownCurrency } = selectPrice({
     isSelfCustodial,
@@ -152,8 +162,8 @@ export const usePriceConversion = () => {
 
   /**
    * How current the rate behind these amounts is, as the source that answered reports
-   * it. Only the SDK feed can be old enough to matter; the backend has no persisted
-   * copy to inherit, so anything priced off it reads Fresh.
+   * it: the SDK feed by when this device read it, the backend by its own timestamp in a
+   * self-custodial session, and always Fresh in a custodial one.
    */
   const priceFreshness: RateFreshness = source.freshness
 

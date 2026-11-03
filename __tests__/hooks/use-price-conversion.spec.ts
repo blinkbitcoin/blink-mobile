@@ -101,11 +101,15 @@ const mockPriceData: MockUseRealtimePriceResponse = {
   },
 }
 
-/** The same NGN market as `mockPriceData`, in the shape the unauthed query returns. */
+const SECONDS_PER_HOUR = 60 * 60
+const nowInSeconds = () => Math.floor(Date.now() / 1000)
+
+/** The same NGN market as `mockPriceData`, in the shape the unauthed query returns, as
+ *  the backend just served it: a self-custodial session ages it by this timestamp. */
 const mockUnauthedNgnPrice = {
   __typename: "RealtimePrice" as const,
   id: "unauthed-ngn",
-  timestamp: 1678314952,
+  timestamp: nowInSeconds(),
   denominatorCurrency: "NGN",
   btcSatPrice: {
     __typename: "PriceOfOneSatInMinorUnit" as const,
@@ -408,6 +412,86 @@ describe("usePriceConversion", () => {
 
       expect(result.current.convertMoneyAmount).toBeDefined()
       expect(result.current.priceFreshness).toBe(RateFreshness.Fresh)
+    })
+
+    /** The cache keeps the last answer when a refresh fails, so with Blink unreachable
+     *  the backend price on hand can be days old. */
+    describe("a backend price the cache has held for a while", () => {
+      const backendPriceServedHoursAgo = (hours: number) => ({
+        data: {
+          realtimePrice: {
+            ...mockUnauthedNgnPrice,
+            timestamp: nowInSeconds() - hours * SECONDS_PER_HOUR,
+          },
+        },
+      })
+
+      it("is not taken for a fresh price once it is two days old", () => {
+        mockUseFiatRates.mockReturnValue(sdkRatesAt(RateFreshness.Expired))
+        mockUseRealtimePriceUnauthedQuery.mockReturnValue(backendPriceServedHoursAgo(48))
+
+        const { result } = renderHook(() => usePriceConversion())
+
+        expect(result.current.isSatsOnly).toBe(true)
+        expect(result.current.displayCurrency).toBe("SAT")
+        expect(result.current.priceFreshness).toBe(RateFreshness.Expired)
+        expect(
+          result.current.convertMoneyAmount?.(toBtcMoneyAmount(1000), DisplayCurrency),
+        ).toEqual({ amount: 1000, currency: DisplayCurrency, currencyCode: "SAT" })
+      })
+
+      it("still prices the wallet within the day, and says it is stale", () => {
+        mockUseFiatRates.mockReturnValue(sdkRatesAt(RateFreshness.Expired))
+        mockUseRealtimePriceUnauthedQuery.mockReturnValue(backendPriceServedHoursAgo(3))
+
+        const { result } = renderHook(() => usePriceConversion())
+
+        expect(result.current.isSatsOnly).toBe(false)
+        expect(result.current.displayCurrency).toBe("NGN")
+        expect(result.current.priceFreshness).toBe(RateFreshness.Stale)
+      })
+
+      it("waits rather than falling back to sats while the refresh is in flight", () => {
+        mockUseFiatRates.mockReturnValue(sdkRatesAt(RateFreshness.Expired))
+        mockUseRealtimePriceUnauthedQuery.mockReturnValue({
+          ...backendPriceServedHoursAgo(48),
+          loading: true,
+        })
+
+        const { result } = renderHook(() => usePriceConversion())
+
+        expect(result.current.isSatsOnly).toBe(false)
+        expect(result.current.priceStatus).toBe("pending")
+        expect(result.current.convertMoneyAmount).toBeUndefined()
+      })
+
+      it("is still read as current by a custodial session, whose only source it is", () => {
+        mockUseAccountRegistry.mockReturnValue({
+          activeAccount: { id: "custodial-1", type: AccountType.Custodial },
+        })
+        mockUseRealtimePriceQuery.mockReturnValue({
+          data: {
+            __typename: "Query",
+            me: {
+              __typename: "User",
+              id: "custodial-user",
+              defaultAccount: {
+                __typename: "ConsumerAccount",
+                id: "custodial-account",
+                realtimePrice: {
+                  ...mockUnauthedNgnPrice,
+                  timestamp: nowInSeconds() - 48 * SECONDS_PER_HOUR,
+                },
+              },
+            },
+          },
+        })
+
+        const { result } = renderHook(() => usePriceConversion())
+
+        expect(result.current.convertMoneyAmount).toBeDefined()
+        expect(result.current.priceFreshness).toBe(RateFreshness.Fresh)
+      })
     })
 
     it("leaves a custodial account on the backend price", () => {

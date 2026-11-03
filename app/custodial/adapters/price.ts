@@ -1,4 +1,11 @@
-import { RateFreshness, type PriceRates, type PriceSource } from "@app/types/price"
+import {
+  rateFreshness,
+  RateFreshness,
+  type PriceRates,
+  type PriceSource,
+} from "@app/types/price"
+
+const MS_PER_SECOND = 1000
 
 /**
  * Translates the backend's `realtimePrice` into the app's own price shape, so both
@@ -25,6 +32,8 @@ export const toPriceRatesFromRealtimePrice = (price: {
 
 export type RealtimePrice = {
   denominatorCurrency: string
+  /** When the backend served it, in Unix seconds like every backend `Timestamp`. */
+  timestamp: number
   btcSatPrice: { base: number; offset: number }
   usdCentPrice: { base: number; offset: number }
 }
@@ -37,8 +46,10 @@ export type RealtimePrice = {
  * after the user changes it, and converting with it would silently quote the wrong
  * money.
  *
- * Always {@link RateFreshness.Fresh} when it has rates. Unlike the SDK feed there is no
- * persisted copy to inherit, so anything this source returns was fetched this session.
+ * Always {@link RateFreshness.Fresh} when it has rates, which is how a custodial session
+ * reads it: the backend is its only source and there is no sats fallback behind it, so
+ * withholding an old price would leave every amount on a spinner, and judging the
+ * server's timestamp against the device clock would let a wrong clock do the same.
  */
 export const createCustodialPriceSource = (
   price: RealtimePrice | undefined,
@@ -50,6 +61,39 @@ export const createCustodialPriceSource = (
   return {
     rates,
     freshness: rates ? RateFreshness.Fresh : RateFreshness.Expired,
+    hasSettled,
+  }
+}
+
+/**
+ * The backend's price as a self-custodial session reads it: behind the SDK feed, and
+ * aged by its own timestamp under the same windows as that feed.
+ *
+ * The Apollo cache keeps the last answer when a refresh fails, so with the feed expired
+ * and Blink unreachable the answer still on hand can be days old. Read as current, it
+ * would price sends with no stale notice; aged, it is marked stale past an hour and
+ * withheld past a day, which lets sats-only mode take over. A wrong device clock costs a
+ * self-custodial session the fallback, not its amounts: they are then stated in sats.
+ */
+export const createFallbackPriceSource = ({
+  price,
+  displayCurrency,
+  hasSettled,
+  now,
+}: {
+  price: RealtimePrice | undefined
+  displayCurrency: string
+  hasSettled: boolean
+  /** Unix milliseconds, the clock the timestamp is aged against. */
+  now: number
+}): PriceSource => {
+  const source = createCustodialPriceSource(price, displayCurrency, hasSettled)
+  if (!price || !source.rates) return source
+
+  const freshness = rateFreshness(price.timestamp * MS_PER_SECOND, now)
+  return {
+    rates: freshness === RateFreshness.Expired ? undefined : source.rates,
+    freshness,
     hasSettled,
   }
 }
