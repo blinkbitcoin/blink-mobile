@@ -2229,6 +2229,12 @@
     "error": "Չհաջողվեց ստեղծել վճարման հարցում։ Խնդրի չվերանալու դեպքում խնդրում ենք կապ հաստատել աջակցության ծառայության հետ։ ",
     "copyInvoice": "Պատճենել",
     "shareInvoice": "Կիսվել",
+    "newAddress": "Նոր",
+    "newAddressHint": "Ստեղծում է նոր Bitcoin հասցե։ Նախորդ հասցեները շարունակում են աշխատել։",
+    "newAddressGenerated": "Նոր հասցեն պատրաստ է։ Նախորդ հասցեները դեռ աշխատում են։",
+    "newAddressFailed": "Չհաջողվեց ստեղծել նոր հասցե։ Խնդրում ենք կրկին փորձել։",
+    "newAddressRateLimited": "Չափազանց շատ նոր հասցեներ։ Խնդրում ենք մի փոքր սպասել և կրկին փորձել։",
+    "onchainAddressLoadFailed": "Չհաջողվեց բեռնել ձեր Bitcoin հասցեն։ Սեղմեք Նոր՝ կրկին փորձելու համար։",
     "addAmount": "Պահանջել կոնկրետ գումար",
     "expired": "Վճարման հարցումն անվավեր է",
     "expiresIn": "Վավեր է մինչև",
@@ -2615,7 +2621,8 @@
   "StablesatsRestriction": {
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",
     "anonModeWalletLabel": "հասանելի չէ Incognito ռեժիմում",
-    "unknownRegionWalletLabel": "հասանելիությունը հնարավոր չեղավ ստուգել, քաշեք ներքև՝ կրկին փորձելու համար"
+    "unknownRegionWalletLabel": "հասանելիությունը հնարավոր չեղավ ստուգել, քաշեք ներքև՝ կրկին փորձելու համար",
+    "networkWalletLabel": "հասանելի չէ այս ցանցում"
   },
   "AnonModeConvertModal": {
     "title": "Նախ փոխանցեք ձեր դոլարային մնացորդը",
@@ -2697,7 +2704,7 @@
   "TransactionDetailScreen": {
     "paid": "Վճարվեց ստացողին/ուղարկողից",
     "received": "Դուք ստացաք",
-    "spent": "Դուք ծախսեցիք",
+    "sent": "Դուք ուղարկեցիք",
     "sending": "Ուղարկվում է",
     "receivingAccount": "Ստացողի հաշիվ",
     "sendingAccount": "Ողւարկողի հաշիվ",
@@ -3099,7 +3106,13 @@
     "deleteAccountFromPhone": "Ողջույն: Խնդրում եմ փակեք իմ հաշիվը: Իմ հեռախոսահամարն է {phoneNumber: string}:",
     "deleteAccountError": "Սխալ։ Կապ հաստատեք {email: string} հետագա աջակցության համար։ ",
     "bye": "Հաջողությու՛ն։ ",
-    "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:"
+    "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Դուք չեք կարող առավելագույն չափը գերազանցող գումար ուղարկել",

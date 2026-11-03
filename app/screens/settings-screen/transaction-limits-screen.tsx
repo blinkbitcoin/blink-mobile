@@ -70,18 +70,6 @@ const useStyles = makeStyles(({ colors }) => ({
     marginTop: "50%",
     marginBottom: "50%",
   },
-  increaseLimitsContainer: {
-    flexDirection: "row",
-    alignItems: "center",
-    columnGap: 5,
-    padding: 20,
-  },
-  increaseLimitsText: {
-    color: colors.primary,
-    fontWeight: "600",
-    fontSize: 15,
-    textDecorationLine: "underline",
-  },
 }))
 
 const accountLimitsPeriodInHrs = {

@@ -2229,6 +2229,12 @@
     "error": "Kushindwa kuzalisha bili. Tafadhali wasiliana na msaada ikiwa tatizo hili litadumu.",
     "copyInvoice": "Nakili",
     "shareInvoice": "Shiriki",
+    "newAddress": "Mpya",
+    "newAddressHint": "Huunda anwani mpya ya Bitcoin. Anwani za awali bado zinafanya kazi.",
+    "newAddressGenerated": "Anwani mpya iko tayari. Anwani za awali bado zinafanya kazi.",
+    "newAddressFailed": "Imeshindwa kuunda anwani mpya. Tafadhali jaribu tena.",
+    "newAddressRateLimited": "Anwani mpya nyingi mno. Subiri kidogo kisha ujaribu tena.",
+    "onchainAddressLoadFailed": "Imeshindwa kupakia anwani yako ya Bitcoin. Gusa Mpya ili ujaribu tena.",
     "addAmount": "Omba Kiasi Maalum",
     "expired": "Bili imeisha muda wake",
     "expiresIn": "Inamalizika ndani ya",
@@ -2615,7 +2621,8 @@
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",
     "anonModeWalletLabel": "haipatikani katika hali ya Incognito",
-    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena"
+    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena",
+    "networkWalletLabel": "haipatikani kwenye mtandao huu"
   },
   "AnonModeConvertModal": {
     "title": "Hamisha kwanza salio lako la Dola",
@@ -2697,7 +2704,7 @@
   "TransactionDetailScreen": {
     "paid": "Imelipwa kutoka/kuelekea",
     "received": "Ulipokea",
-    "spent": "Umetumia",
+    "sent": "Ulituma",
     "sending": "Inatuma",
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
@@ -3099,7 +3106,13 @@
     "deleteAccountFromPhone": "Habari!, tafadhali funga akaunti yangu. Nambari yangu ya simu ni {phoneNumber: string}.",
     "deleteAccountError": "Kuna kitu kimeenda kombo. Wasiliana na {email: string} kwa msaada zaidi.",
     "bye": "Kwaheri!",
-    "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria."
+    "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Huwezi kutuma zaidi ya kiasi cha juu",

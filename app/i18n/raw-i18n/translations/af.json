@@ -2229,6 +2229,12 @@
     "error": "Kon nie faktuur genereer nie. Kontak asseblief ondersteuning as hierdie probleem voortduur.",
     "copyInvoice": "Dra oor",
     "shareInvoice": "Deel",
+    "newAddress": "Nuut",
+    "newAddressHint": "Skep 'n nuwe Bitcoin-adres. Vorige adresse werk steeds.",
+    "newAddressGenerated": "Nuwe adres gereed. Vorige adresse werk steeds.",
+    "newAddressFailed": "Kon nie 'n nuwe adres skep nie. Probeer asseblief weer.",
+    "newAddressRateLimited": "Te veel nuwe adresse. Wag 'n rukkie en probeer weer.",
+    "onchainAddressLoadFailed": "Kon nie jou Bitcoin-adres laai nie. Tik op Nuut om weer te probeer.",
     "addAmount": "Vra spesifieke bedrag",
     "expired": "Hierdie faktuur het verval",
     "expiresIn": "Verval in",
@@ -2615,7 +2621,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nie beskikbaar in jou streek nie",
     "anonModeWalletLabel": "nie beskikbaar in Incognito-modus nie",
-    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer"
+    "unknownRegionWalletLabel": "beskikbaarheid kon nie nagegaan word nie, trek af om weer te probeer",
+    "networkWalletLabel": "nie beskikbaar op hierdie netwerk nie"
   },
   "AnonModeConvertModal": {
     "title": "Dra eers jou Dollar-saldo oor",
@@ -2697,7 +2704,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaal aan/van",
     "received": "Jy het ontvang",
-    "spent": "Jy het spandeer",
+    "sent": "Jy het gestuur",
     "sending": "Besig om te stuur",
     "receivingAccount": "Rekening waarin onvang word",
     "sendingAccount": "Rekening waaruit gestuur word",
@@ -3099,7 +3106,13 @@
     "deleteAccountFromPhone": "Hallo daar!, sluit asseblief my rekening. My telefoonnommer is {phoneNumber: string}.",
     "deleteAccountError": "Iets het foutgegaan. Kontak asseblief {email: string} vir verdere hulp. ",
     "bye": "Totsiens!",
-    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis."
+    "deleteAccountWarning": "Let wel: Die sluiting van die rekening is permanent!\nMaak seker dat beursies geen fondse het voor sluiting nie.\n'n Geslote rekening kan nie herstel word nie.\nOns kan sekere rekords hou soos deur die wet vereis.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Jy kan nie meer as die maksimum bedrag stuur nie",

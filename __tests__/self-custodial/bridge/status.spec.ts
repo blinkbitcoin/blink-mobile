@@ -12,6 +12,7 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
     Unknown: 3,
     Major: 4,
   },
+  GetSparkStatusRequest: { create: (p: object) => p },
   getSparkStatus: (...args: unknown[]) => mockBreezGetSparkStatus(...args),
 }))
 
@@ -47,10 +48,13 @@ describe("getSparkStatus (bridge)", () => {
 
     await getSparkStatus(controller.signal)
 
-    expect(mockBreezGetSparkStatus).toHaveBeenCalledWith({ signal: controller.signal })
+    expect(mockBreezGetSparkStatus.mock.calls[0]).toStrictEqual([
+      { proxy: undefined },
+      { signal: controller.signal },
+    ])
   })
 
-  it("calls the SDK without arguments when no signal is provided", async () => {
+  it("sends the request without call options when no signal is provided", async () => {
     mockBreezGetSparkStatus.mockResolvedValue({
       status: ServiceStatus.Operational,
       lastUpdated: BigInt(0),
@@ -58,6 +62,6 @@ describe("getSparkStatus (bridge)", () => {
 
     await getSparkStatus()
 
-    expect(mockBreezGetSparkStatus).toHaveBeenCalledWith()
+    expect(mockBreezGetSparkStatus.mock.calls[0]).toStrictEqual([{ proxy: undefined }])
   })
 })

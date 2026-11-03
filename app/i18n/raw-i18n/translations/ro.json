@@ -2229,6 +2229,12 @@
     "error": "Nu s-a reușit generarea facturii. Vă rugăm să contactați asistența dacă această problemă persistă.",
     "copyInvoice": "Copiați",
     "shareInvoice": "Partajare",
+    "newAddress": "Nouă",
+    "newAddressHint": "Generează o adresă Bitcoin nouă. Adresele anterioare funcționează în continuare.",
+    "newAddressGenerated": "Adresa nouă este gata. Adresele anterioare funcționează în continuare.",
+    "newAddressFailed": "Nu s-a putut genera o adresă nouă. Încercați din nou.",
+    "newAddressRateLimited": "Prea multe adrese noi. Așteptați puțin și încercați din nou.",
+    "onchainAddressLoadFailed": "Adresa dvs. Bitcoin nu a putut fi încărcată. Atingeți Nouă pentru a încerca din nou.",
     "addAmount": "Specificați suma solicitată",
     "expired": "Factura a expirat",
     "expiresIn": "Expiră în",
@@ -2615,7 +2621,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",
     "anonModeWalletLabel": "indisponibil în modul Incognito",
-    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca"
+    "unknownRegionWalletLabel": "disponibilitatea nu a putut fi verificată, trage în jos pentru a reîncerca",
+    "networkWalletLabel": "indisponibil în această rețea"
   },
   "AnonModeConvertModal": {
     "title": "Transferă mai întâi soldul tău în dolari",
@@ -2697,7 +2704,7 @@
   "TransactionDetailScreen": {
     "paid": "Plătit către/de la",
     "received": "Ați primit",
-    "spent": "Ați cheltuit",
+    "sent": "Ați trimis",
     "sending": "Trimitere",
     "receivingAccount": "Cont de primire",
     "sendingAccount": "Cont de trimitere",
@@ -3099,7 +3106,13 @@
     "deleteAccountFromPhone": "Bună!, vă rugăm să închideți contul meu. Numărul meu de telefon este {phoneNumber: string}.",
     "deleteAccountError": "Ceva nu a mers bine. Contactați {email: string} pentru asistență suplimentară.",
     "bye": "La revedere!",
-    "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale."
+    "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Nu puteți trimite mai mult decât suma maximă",

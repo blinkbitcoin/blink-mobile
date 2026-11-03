@@ -166,6 +166,19 @@ jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
 
 jest.mock("@app/self-custodial/bridge", () => ({
   disconnectSdk: jest.fn(),
+  retireSdkStorage: jest.fn(),
+  readmitSdkStorage: jest.fn(),
+  waitForSdkIdle: async () => true,
+}))
+
+jest.mock("@app/self-custodial/diagnostics/sdk-log-files", () => ({
+  resetSdkLogs: async () => undefined,
+}))
+
+jest.mock("@app/self-custodial/storage/storage-removal", () => ({
+  markStorageForRemoval: async () => undefined,
+  removeMarkedStorage: async () => undefined,
+  unmarkStorageForRemoval: async () => undefined,
 }))
 
 /** The one wallet the device stores, open in the app, so deleting it deletes the last one. */

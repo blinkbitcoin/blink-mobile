@@ -257,3 +257,87 @@ describe("isOwnLnurlAddress", () => {
     expect(isOwnLnurlAddress("")).toBe(false)
   })
 })
+
+/** USDB is minted on mainnet only, and from 0.27 the SDK refuses to connect with a token
+ *  from another network, so regtest carries one only when the build names its own. */
+describe("Spark token per network", () => {
+  beforeEach(() => {
+    jest.resetModules()
+  })
+
+  const loadConfig = (env: Record<string, string> = {}) => {
+    jest.doMock("react-native-config", () => ({
+      SPARK_TOKEN_IDENTIFIER: "mainnet-token",
+      ...env,
+    }))
+    return require("@app/self-custodial/config")
+  }
+
+  it("uses the mainnet token on mainnet", () => {
+    const { sparkTokenIdentifierFor, hasSparkTokenFor } = loadConfig()
+
+    expect(sparkTokenIdentifierFor(Network.Mainnet)).toBe("mainnet-token")
+    expect(hasSparkTokenFor(Network.Mainnet)).toBe(true)
+  })
+
+  it("has no token on regtest by default, never the mainnet one", () => {
+    const { sparkTokenIdentifierFor, hasSparkTokenFor } = loadConfig()
+
+    expect(sparkTokenIdentifierFor(Network.Regtest)).toBeNull()
+    expect(hasSparkTokenFor(Network.Regtest)).toBe(false)
+  })
+
+  it("treats an empty regtest token as none", () => {
+    const { sparkTokenIdentifierFor } = loadConfig({ SPARK_REGTEST_TOKEN_IDENTIFIER: "" })
+
+    expect(sparkTokenIdentifierFor(Network.Regtest)).toBeNull()
+  })
+
+  it("uses the regtest token a build names", () => {
+    const { sparkTokenIdentifierFor, hasSparkTokenFor } = loadConfig({
+      SPARK_REGTEST_TOKEN_IDENTIFIER: "btknrt1-test",
+    })
+
+    expect(sparkTokenIdentifierFor(Network.Regtest)).toBe("btknrt1-test")
+    expect(sparkTokenIdentifierFor(Network.Mainnet)).toBe("mainnet-token")
+    expect(hasSparkTokenFor(Network.Regtest)).toBe(true)
+  })
+
+  /** Its caller only decides what to show; the SDK connect reports the misconfiguration. */
+  it("reports mainnet as having a token without validating the build", () => {
+    const { hasSparkTokenFor } = loadConfig({ SPARK_TOKEN_IDENTIFIER: "" })
+
+    expect(hasSparkTokenFor(Network.Mainnet)).toBe(true)
+  })
+
+  it("reads the mainnet token before any SDK is configured", () => {
+    const { sparkTokenIdentifier, requireSparkTokenIdentifier } = loadConfig()
+
+    expect(sparkTokenIdentifier()).toBe("mainnet-token")
+    expect(requireSparkTokenIdentifier()).toBe("mainnet-token")
+  })
+
+  it("follows the network the SDK was configured for", () => {
+    const { setSparkTokenNetwork, sparkTokenIdentifier } = loadConfig({
+      SPARK_REGTEST_TOKEN_IDENTIFIER: "btknrt1-test",
+    })
+
+    setSparkTokenNetwork(Network.Regtest)
+    expect(sparkTokenIdentifier()).toBe("btknrt1-test")
+
+    setSparkTokenNetwork(Network.Mainnet)
+    expect(sparkTokenIdentifier()).toBe("mainnet-token")
+  })
+
+  it("answers no token on a regtest SDK without one", () => {
+    const { setSparkTokenNetwork, sparkTokenIdentifier, requireSparkTokenIdentifier } =
+      loadConfig()
+
+    setSparkTokenNetwork(Network.Regtest)
+
+    expect(sparkTokenIdentifier()).toBeNull()
+    expect(() => requireSparkTokenIdentifier()).toThrow(
+      "No Spark token is configured for regtest",
+    )
+  })
+})
