@@ -2594,7 +2594,8 @@
     "error": "Profielen kunnen op dit moment niet worden opgehaald",
     "fromThisDevice": "van dit apparaat?",
     "switchAccount": "Je bent gewisseld naar een ander account",
-    "removedAccount": "Je hebt account {identifier: string} verwijderd."
+    "removedAccount": "Je hebt account {identifier: string} verwijderd.",
+    "removeAccount": "Account verwijderen"
   },
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",

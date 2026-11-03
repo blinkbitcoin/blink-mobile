@@ -2594,7 +2594,8 @@
     "error": "Հնարավոր չէ այս պահին բեռնել պրոֆիլները",
     "fromThisDevice": "այս սարքից։",
     "switchAccount": "Delays delays delays delays",
-    "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։"
+    "removedAccount": "Դուք հեռացրել եք {identifier: string} հաշիվը։",
+    "removeAccount": "Հեռացնել հաշիվը"
   },
   "StablesatsRestriction": {
     "walletLabel": "հասանելի չէ ձեր տարածաշրջանում",

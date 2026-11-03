@@ -2594,7 +2594,8 @@
         "error": "Profile können derzeit nicht abgerufen werden",
         "fromThisDevice": "von diesem Gerät?",
         "switchAccount": "Du hast zu einem anderen Konto gewechselt",
-        "removedAccount": "Du hast das Konto {identifier: string} entfernt."
+        "removedAccount": "Du hast das Konto {identifier: string} entfernt.",
+        "removeAccount": "Konto entfernen"
     },
     "StablesatsRestriction": {
         "walletLabel": "in deiner Region nicht verfügbar",

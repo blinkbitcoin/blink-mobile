@@ -1,5 +1,10 @@
 import React, { useState } from "react"
-import { ActivityIndicator, TouchableOpacity, View } from "react-native"
+import {
+  AccessibilityActionEvent,
+  ActivityIndicator,
+  TouchableOpacity,
+  View,
+} from "react-native"
 
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
@@ -26,13 +31,18 @@ import { type SelfCustodialAccountEntry } from "@app/self-custodial/storage/acco
 import { AccountType, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
 import { hasFunds } from "@app/utils/has-funds"
-import { extractLightningAddressUsername } from "@app/utils/pay-links"
 import { testProps } from "@app/utils/testProps"
 import { toastShow } from "@app/utils/toast"
 
 import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 
 import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
+
+/** A blank address is no address: it must not mask a stored one or render an empty title. */
+const presentAddress = (address: string | null): string | null => address?.trim() || null
+
+/** The row is one accessibility element, so VoiceOver can't focus the nested delete button: expose it as an action. */
+const REMOVE_ACTION = "remove"
 
 type ProfileRowProps = {
   entry: SelfCustodialAccountEntry
@@ -66,10 +76,11 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     activeAccount?.type === AccountType.SelfCustodial && activeAccount.id === accountId
 
   const lightningAddress = isActive
-    ? liveLightningAddress ?? persistedLightningAddress
-    : persistedLightningAddress
-  const rowTitle =
-    extractLightningAddressUsername(lightningAddress) ?? LL.common.anonymousUser()
+    ? presentAddress(liveLightningAddress) ?? presentAddress(persistedLightningAddress)
+    : presentAddress(persistedLightningAddress)
+  const rowTitle = lightningAddress ?? LL.common.anonymousUser()
+  const accountTypeLabel = LL.AccountTypeSelectionScreen.selfCustodialLabel()
+  const removeAccountLabel = LL.ProfileScreen.removeAccount()
 
   const handleSwitch = () => {
     if (isActive) return
@@ -138,6 +149,10 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     }
   }
 
+  const handleAccessibilityAction = ({ nativeEvent }: AccessibilityActionEvent) => {
+    if (nativeEvent.actionName === REMOVE_ACTION) handleRemovePress()
+  }
+
   const handleConfirm = async () => {
     setConfirmVisible(false)
     const outcome = await deleteWallet(accountId)
@@ -151,7 +166,16 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 
   return (
     <>
-      <TouchableOpacity onPress={handleSwitch} {...testProps(`profile-row-${accountId}`)}>
+      <TouchableOpacity
+        onPress={handleSwitch}
+        testID={`profile-row-${accountId}`}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={`${rowTitle}, ${accountTypeLabel}`}
+        accessibilityState={{ selected: isActive }}
+        accessibilityActions={[{ name: REMOVE_ACTION, label: removeAccountLabel }]}
+        onAccessibilityAction={handleAccessibilityAction}
+      >
         <ListItem
           bottomDivider
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
@@ -166,7 +190,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               {rowTitle}
             </ListItem.Title>
             <Text type="p3" style={styles.subtleText}>
-              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+              {accountTypeLabel}
             </Text>
           </ListItem.Content>
           {probingBalance ? (
@@ -181,7 +205,9 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               size="small"
               onPress={handleRemovePress}
               backgroundColor={colors.grey4}
-              {...testProps(`delete-button-${accountId}`)}
+              testID={`delete-button-${accountId}`}
+              accessibilityRole="button"
+              accessibilityLabel={removeAccountLabel}
             />
           )}
         </ListItem>

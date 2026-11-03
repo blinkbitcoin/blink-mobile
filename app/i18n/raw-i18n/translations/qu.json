@@ -2594,7 +2594,8 @@
     "error": "Kay pachapi perfilkunata mana apamuyta atiyku",
     "fromThisDevice": "¿kay aparatomanta?",
     "switchAccount": "Huk cuentaman tikrarqanki",
-    "removedAccount": "{identifier: string} cuentata qichurqanki."
+    "removedAccount": "{identifier: string} cuentata qichurqanki.",
+    "removeAccount": "Cuentata qichuy"
   },
   "StablesatsRestriction": {
     "walletLabel": "mana kapunchu suyuykipi",

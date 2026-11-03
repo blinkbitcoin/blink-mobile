@@ -2706,6 +2706,7 @@ const en: BaseTranslation = {
     fromThisDevice: "from this device?",
     switchAccount: "You switched to another account",
     removedAccount: "You removed account {identifier: string}.",
+    removeAccount: "Remove account",
   },
   TotpRegistrationInitiateScreen: {
     title: "Two-factor authentication",

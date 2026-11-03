@@ -2594,7 +2594,8 @@
     "error": "Tetusobola kufuna profayiro mu kiseera kino",
     "fromThisDevice": "okuva ku katambi kano?",
     "switchAccount": "Okyusizza eri akawunti endala",
-    "removedAccount": "Oggyewo akawunti {identifier: string}."
+    "removedAccount": "Oggyewo akawunti {identifier: string}.",
+    "removeAccount": "Ggyawo akawunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",

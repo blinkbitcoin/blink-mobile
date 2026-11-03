@@ -2594,7 +2594,8 @@
         "error": "No se pudo obtener la información de los perfiles en este momento",
         "fromThisDevice": "desde este dispositivo?",
         "switchAccount": "Cambiaste a otra cuenta",
-        "removedAccount": "Eliminaste la cuenta {identifier: string}."
+        "removedAccount": "Eliminaste la cuenta {identifier: string}.",
+        "removeAccount": "Eliminar cuenta"
     },
     "StablesatsRestriction": {
         "walletLabel": "no está disponible en tu región",

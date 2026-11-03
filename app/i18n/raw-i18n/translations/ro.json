@@ -2594,7 +2594,8 @@
     "error": "Nu se pot obține profilurile în acest moment",
     "fromThisDevice": "de pe acest dispozitiv?",
     "switchAccount": "Ați comutat pe alt cont",
-    "removedAccount": "Ați eliminat contul {identifier: string}."
+    "removedAccount": "Ați eliminat contul {identifier: string}.",
+    "removeAccount": "Elimină contul"
   },
   "StablesatsRestriction": {
     "walletLabel": "nu este disponibil în regiunea ta",

@@ -2594,7 +2594,8 @@
     "error": "Δεν είναι δυνατή η ανάκτηση προφίλ αυτή τη στιγμή",
     "fromThisDevice": "από αυτή τη συσκευή;",
     "switchAccount": "Κάνατε εναλλαγή σε άλλο λογαριασμό",
-    "removedAccount": "Αφαιρέσατε τον λογαριασμό {identifier: string}."
+    "removedAccount": "Αφαιρέσατε τον λογαριασμό {identifier: string}.",
+    "removeAccount": "Αφαίρεση λογαριασμού"
   },
   "StablesatsRestriction": {
     "walletLabel": "δεν είναι διαθέσιμο στην περιοχή σου",

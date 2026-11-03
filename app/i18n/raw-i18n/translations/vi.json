@@ -2594,7 +2594,8 @@
     "error": "Không thể tải hồ sơ vào lúc này",
     "fromThisDevice": "từ thiết bị này?",
     "switchAccount": "Bạn đã chuyển sang tài khoản khác",
-    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}."
+    "removedAccount": "Bạn đã xóa tài khoản {identifier: string}.",
+    "removeAccount": "Xóa tài khoản"
   },
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",

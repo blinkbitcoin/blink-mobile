@@ -2594,7 +2594,8 @@
     "error": "Momentálne nie je možné načítať profily",
     "fromThisDevice": "z tohto zariadenia?",
     "switchAccount": "Prepli ste sa na iný účet",
-    "removedAccount": "Odstránili ste účet {identifier: string}."
+    "removedAccount": "Odstránili ste účet {identifier: string}.",
+    "removeAccount": "Odstrániť účet"
   },
   "StablesatsRestriction": {
     "walletLabel": "nie je vo vašom regióne k dispozícii",

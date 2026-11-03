@@ -2594,7 +2594,8 @@
     "error": "Haiwezi kupata wasifu kwa wakati huu",
     "fromThisDevice": "kutoka kifaa hiki?",
     "switchAccount": "Umebadilisha kwenda akaunti nyingine",
-    "removedAccount": "Umeondoa akaunti {identifier: string}."
+    "removedAccount": "Umeondoa akaunti {identifier: string}.",
+    "removeAccount": "Ondoa akaunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",

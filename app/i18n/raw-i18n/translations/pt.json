@@ -2594,7 +2594,8 @@
         "error": "Não foi possível buscar perfis no momento",
         "fromThisDevice": "deste dispositivo?",
         "switchAccount": "Você trocou para outra conta",
-        "removedAccount": "Você removeu a conta {identifier: string}."
+        "removedAccount": "Você removeu a conta {identifier: string}.",
+        "removeAccount": "Remover conta"
     },
     "StablesatsRestriction": {
         "walletLabel": "não está disponível na sua região",

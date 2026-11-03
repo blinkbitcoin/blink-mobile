@@ -2594,7 +2594,8 @@
     "error": "Tidak dapat mengambil profil saat ini",
     "fromThisDevice": "dari perangkat ini?",
     "switchAccount": "Anda beralih ke akun lain",
-    "removedAccount": "Anda menghapus akun {identifier: string}."
+    "removedAccount": "Anda menghapus akun {identifier: string}.",
+    "removeAccount": "Hapus akun"
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",

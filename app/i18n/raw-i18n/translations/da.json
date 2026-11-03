@@ -2594,7 +2594,8 @@
     "error": "Kan ikke hente profiler på nuværende tidspunkt",
     "fromThisDevice": "fra denne enhed?",
     "switchAccount": "Du skiftede til en anden konto",
-    "removedAccount": "Du fjernede kontoen {identifier: string}."
+    "removedAccount": "Du fjernede kontoen {identifier: string}.",
+    "removeAccount": "Fjern konto"
   },
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",

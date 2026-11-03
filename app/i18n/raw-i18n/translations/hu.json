@@ -2594,7 +2594,8 @@
     "error": "A profilok jelenleg nem tölthetők be",
     "fromThisDevice": "erről az eszközről?",
     "switchAccount": "Másik fiókra váltottál",
-    "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot."
+    "removedAccount": "Eltávolítottad a(z) {identifier: string} fiókot.",
+    "removeAccount": "Fiók eltávolítása"
   },
   "StablesatsRestriction": {
     "walletLabel": "nem érhető el a régiódban",

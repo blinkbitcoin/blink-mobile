@@ -2594,7 +2594,8 @@
     "error": "ไม่สามารถดึงข้อมูลโปรไฟล์ได้ในขณะนี้",
     "fromThisDevice": "จากอุปกรณ์นี้?",
     "switchAccount": "คุณได้สลับไปยังบัญชีอื่นแล้ว",
-    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
+    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว",
+    "removeAccount": "ลบบัญชี"
   },
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",

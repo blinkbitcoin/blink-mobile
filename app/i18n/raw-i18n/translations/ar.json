@@ -2594,7 +2594,8 @@
     "error": "تعذّر جلب الملفات الشخصية في الوقت الحالي",
     "fromThisDevice": "من هذا الجهاز؟",
     "switchAccount": "لقد انتقلت إلى حساب آخر",
-    "removedAccount": "لقد أزلت الحساب {identifier: string}."
+    "removedAccount": "لقد أزلت الحساب {identifier: string}.",
+    "removeAccount": "إزالة الحساب"
   },
   "StablesatsRestriction": {
     "walletLabel": "غير متاح في منطقتك",

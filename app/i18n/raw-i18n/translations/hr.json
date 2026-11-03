@@ -2594,7 +2594,8 @@
     "error": "Trenutno nije moguće dohvatiti profile",
     "fromThisDevice": "s ovog uređaja?",
     "switchAccount": "Prebacili ste se na drugi račun",
-    "removedAccount": "Uklonili ste račun {identifier: string}."
+    "removedAccount": "Uklonili ste račun {identifier: string}.",
+    "removeAccount": "Ukloni račun"
   },
   "StablesatsRestriction": {
     "walletLabel": "nije dostupan u vašoj regiji",

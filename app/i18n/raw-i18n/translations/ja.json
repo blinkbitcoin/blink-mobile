@@ -2594,7 +2594,8 @@
         "error": "現在プロフィールを取得できません",
         "fromThisDevice": "このデバイスから？",
         "switchAccount": "別のアカウントに切り替えました",
-        "removedAccount": "アカウント {identifier: string} を削除しました。"
+        "removedAccount": "アカウント {identifier: string} を削除しました。",
+        "removeAccount": "アカウントを削除"
     },
     "StablesatsRestriction": {
         "walletLabel": "あなたの地域ではご利用いただけません",

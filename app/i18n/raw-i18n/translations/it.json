@@ -2594,7 +2594,8 @@
         "error": "Impossibile recuperare i profili al momento",
         "fromThisDevice": "da questo dispositivo?",
         "switchAccount": "Hai cambiato account",
-        "removedAccount": "Hai rimosso l'account {identifier: string}."
+        "removedAccount": "Hai rimosso l'account {identifier: string}.",
+        "removeAccount": "Rimuovi account"
     },
     "StablesatsRestriction": {
         "walletLabel": "non è disponibile nella tua regione",

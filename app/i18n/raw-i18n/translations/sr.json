@@ -2594,7 +2594,8 @@
     "error": "Тренутно није могуће преузети профиле",
     "fromThisDevice": "са овог уређаја?",
     "switchAccount": "Пребацили сте се на други налог",
-    "removedAccount": "Уклонили сте налог {identifier: string}."
+    "removedAccount": "Уклонили сте налог {identifier: string}.",
+    "removeAccount": "Уклони налог"
   },
   "StablesatsRestriction": {
     "walletLabel": "није доступан у вашем региону",
