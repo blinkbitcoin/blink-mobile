@@ -2,13 +2,13 @@ import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
 import { type NormalizedTransaction } from "@app/types/transaction"
 import { ActiveWalletStatus, type WalletState } from "@app/types/wallet"
 import { reportError } from "@app/utils/error-logging"
+import { logBreadcrumb } from "@app/utils/error-reporting"
 import KeyStoreWrapper from "@app/utils/storage/secureStorage"
 import { withTimeout } from "@app/utils/with-timeout"
 
@@ -18,10 +18,13 @@ import {
   getUserSettings,
   initSdk,
   removeSdkEventListener,
+  SdkStorageRetiredError,
 } from "../bridge"
 import { storageDirFor } from "../config"
 import { logSdkEvent, SdkLogLevel } from "../logging"
+import { measureObservedPayment } from "../measurement"
 import {
+  extractObservedPayment,
   paymentEventKey,
   paymentIdFromEventKey,
   PAYMENT_RECEIVED_EVENTS,
@@ -170,7 +173,7 @@ export const useSdkLifecycle = (
           if (OFFLINE_EXEMPT_STATUSES.includes(prev)) return prev
           if (onlineState === OnlineState.Offline) return ActiveWalletStatus.Offline
           if (onlineState === OnlineState.Unknown) {
-            crashlytics().log(
+            logBreadcrumb(
               `[SparkSDK] connectivity check failed; preserving previous status`,
             )
             if (prev === ActiveWalletStatus.Loading) return ActiveWalletStatus.Error
@@ -247,6 +250,12 @@ export const useSdkLifecycle = (
 
       const listenerId = await addSdkEventListener(connectedSdk, async (event) => {
         if (!mounted) return
+
+        /** Ahead of the refresh filter: a failed send is not a refresh event, but it is
+         *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
+        const observedPayment = extractObservedPayment(event)
+        if (observedPayment) measureObservedPayment(observedPayment)
+
         if (!REFRESH_EVENTS.has(event.tag)) return
 
         if (PAYMENT_RECEIVED_EVENTS.has(event.tag)) {
@@ -287,11 +296,17 @@ export const useSdkLifecycle = (
         return
       }
 
-      if (mounted) setStatus(ActiveWalletStatus.Loading)
+      /** The account can change while the mnemonic and network are read: deleting a
+       *  wallet switches away from it first. A cancelled run must not connect at all,
+       *  or it writes the deleted wallet's lines past the log cut. */
+      if (!mounted) return
+      setStatus(ActiveWalletStatus.Loading)
       await connectAndListen(mnemonic)
     }
 
     initialize().catch((err) => {
+      // initSdk refused a wallet that is being deleted; nothing went wrong
+      if (err instanceof SdkStorageRetiredError) return
       logSdkEvent(SdkLogLevel.Error, `SDK init failed: ${err}`)
       reportError("SDK init", err)
       if (mounted) setStatus(ActiveWalletStatus.Error)

@@ -21,7 +21,13 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => {
     OptimizationAlreadyRunning: "OptimizationAlreadyRunning",
     OptimizationCancelled: "OptimizationCancelled",
     InsufficientCpfpFunds: "InsufficientCpfpFunds",
-    FundingUtxoConflict: "FundingUtxoConflict",
+    DepositClaimInProgress: "DepositClaimInProgress",
+    RefundReplacementFeeTooLow: "RefundReplacementFeeTooLow",
+    CrossChainAmountOutOfRange: "CrossChainAmountOutOfRange",
+    CrossChainRouteUnavailable: "CrossChainRouteUnavailable",
+    CrossChainDisabled: "CrossChainDisabled",
+    DepositTooSmall: "DepositTooSmall",
+    TokenAllowance: "TokenAllowance",
     Generic: "Generic",
   }
   return {
@@ -64,14 +70,39 @@ describe("classifySdkError", () => {
     )
   })
 
-  it("maps the 0.22 optimization/exit state conflicts to Generic", () => {
+  it("maps the 0.22 optimization state conflicts to Generic", () => {
+    for (const tag of ["OptimizationAlreadyRunning", "OptimizationCancelled"]) {
+      expect(classifySdkError(sdkError(tag))).toBe(SelfCustodialErrorCode.Generic)
+    }
+  })
+
+  it("maps a deposit claim already in progress (0.26) to Generic", () => {
+    expect(classifySdkError(sdkError("DepositClaimInProgress"))).toBe(
+      SelfCustodialErrorCode.Generic,
+    )
+  })
+
+  it("maps a refund fee too low to replace the pending one (0.26) to InvalidInput", () => {
+    expect(classifySdkError(sdkError("RefundReplacementFeeTooLow"))).toBe(
+      SelfCustodialErrorCode.InvalidInput,
+    )
+  })
+
+  it("maps the cross-chain and token allowance refusals to Generic", () => {
     for (const tag of [
-      "OptimizationAlreadyRunning",
-      "OptimizationCancelled",
-      "FundingUtxoConflict",
+      "CrossChainAmountOutOfRange",
+      "CrossChainRouteUnavailable",
+      "CrossChainDisabled",
+      "TokenAllowance",
     ]) {
       expect(classifySdkError(sdkError(tag))).toBe(SelfCustodialErrorCode.Generic)
     }
+  })
+
+  it("maps a deposit too small to claim (0.27) to BelowMinimum", () => {
+    expect(classifySdkError(sdkError("DepositTooSmall"))).toBe(
+      SelfCustodialErrorCode.BelowMinimum,
+    )
   })
 
   it("maps NetworkError and ChainServiceError to NetworkError", () => {

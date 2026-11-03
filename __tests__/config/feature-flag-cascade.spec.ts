@@ -1,6 +1,6 @@
 /**
  * Tests the feature flag cascade invariant:
- * stableBalanceEnabled can only be true when nonCustodialEnabled is also true.
+ * stableBalanceEnabled can only be true when the console turns nonCustodialEnabled on.
  *
  * This used to re-implement the derivation here, with a comment saying it mirrored
  * `feature-flags-context.tsx` — which stopped being true the moment that derivation
@@ -12,10 +12,10 @@ import {
   deriveSelfCustodialFlags,
   FlagOverride,
   NO_FLAG_OVERRIDES,
-  type SelfCustodialFlags,
+  type RemoteSelfCustodialFlags,
 } from "@app/config/feature-flag-overrides"
 
-type RemoteFlags = SelfCustodialFlags
+type RemoteFlags = RemoteSelfCustodialFlags
 
 const deriveFlags = (remote: RemoteFlags) =>
   deriveSelfCustodialFlags(remote, NO_FLAG_OVERRIDES)
@@ -45,6 +45,17 @@ describe("feature flag cascade", () => {
 
     expect(flags.stableBalanceEnabled).toBe(false)
     expect(flags.nonCustodialEnabled).toBe(false)
+  })
+
+  it("stableBalanceEnabled is false while only the shipped default turns nonCustodialEnabled on", () => {
+    const flags = deriveFlags({
+      nonCustodialEnabled: true,
+      stableBalanceEnabled: true,
+      isNonCustodialFlagSettled: false,
+    })
+
+    expect(flags.stableBalanceEnabled).toBe(false)
+    expect(flags.nonCustodialEnabled).toBe(true)
   })
 
   describe("with a developer override", () => {
@@ -101,6 +112,25 @@ describe("feature flag cascade", () => {
 
     it("leaves both to Remote Config when nothing is overridden", () => {
       expect(deriveSelfCustodialFlags(remoteOn, NO_FLAG_OVERRIDES)).toEqual(remoteOn)
+    })
+
+    it("lets a forced-on self-custodial vouch for Stable Balance before the console answers", () => {
+      const flags = deriveSelfCustodialFlags(
+        { ...remoteOn, isNonCustodialFlagSettled: false },
+        { ...NO_FLAG_OVERRIDES, nonCustodialEnabled: FlagOverride.On },
+      )
+
+      expect(flags.stableBalanceEnabled).toBe(true)
+    })
+
+    it("does not let a forced-on Stable Balance outrun an unanswered console", () => {
+      const flags = deriveSelfCustodialFlags(
+        { ...remoteOn, isNonCustodialFlagSettled: false },
+        { ...NO_FLAG_OVERRIDES, stableBalanceEnabled: FlagOverride.On },
+      )
+
+      expect(flags.stableBalanceEnabled).toBe(false)
+      expect(flags.nonCustodialEnabled).toBe(true)
     })
   })
 })

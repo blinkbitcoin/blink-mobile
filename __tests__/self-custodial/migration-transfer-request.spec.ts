@@ -21,6 +21,7 @@ const mockReportError = jest.fn()
 const mockClassifySdkError = jest.fn()
 
 jest.mock("@app/self-custodial/bridge", () => ({
+  ...jest.requireActual("@app/self-custodial/bridge"),
   initSdk: (args: unknown) => mockInitSdk(args),
   disconnectSdk: (sdk: unknown) => mockDisconnectSdk(sdk),
   getWalletInfo: (sdk: unknown) => mockGetWalletInfo(sdk),
@@ -124,7 +125,8 @@ describe("buildMigrationTransferRequest", () => {
 
     await buildRequest()
 
-    expect(mockReceivePayment).toHaveBeenCalledWith({
+    expect(mockReceivePayment).toHaveBeenCalledTimes(1)
+    expect(mockReceivePayment.mock.calls[0][0]).toStrictEqual({
       paymentMethod: {
         tag: "Bolt11Invoice",
         inner: {
@@ -132,6 +134,7 @@ describe("buildMigrationTransferRequest", () => {
           amountSats: undefined,
           expirySecs: 24 * 60 * 60,
           paymentHash: undefined,
+          receiverIdentityPublicKey: undefined,
         },
       },
     })

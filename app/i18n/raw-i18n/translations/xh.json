@@ -2227,8 +2227,14 @@
     "title": "Fumana i-Bitcoin",
     "usdTitle": "Yamkela kwi-Akhawunti ye-Idola",
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
-    "copyInvoice": "Khuphela i-invoyisi",
-    "shareInvoice": "Yabelana nge-invoyisi",
+    "copyInvoice": "Khuphela",
+    "shareInvoice": "Yabelana",
+    "newAddress": "Entsha",
+    "newAddressHint": "Yenza idilesi entsha yeBitcoin. Iidilesi zangaphambili zisasebenza.",
+    "newAddressGenerated": "Idilesi entsha ilungile. Iidilesi zangaphambili zisasebenza.",
+    "newAddressFailed": "Ayikwazanga ukwenza idilesi entsha. Nceda uzame kwakhona.",
+    "newAddressRateLimited": "Zininzi kakhulu iidilesi ezintsha. Nceda ulinde kancinci uze uzame kwakhona.",
+    "onchainAddressLoadFailed": "Ayikwazanga ukulayisha idilesi yakho yeBitcoin. Cofa u-Entsha ukuze uzame kwakhona.",
     "addAmount": "Cela Isixa esithile",
     "expired": "I-invoyisi iphelelwe lixesha",
     "expiresIn": "Iphelelwa",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
     "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito",
-    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona"
+    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona",
+    "networkWalletLabel": "akufumaneki kolu thungelwano"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",
@@ -2675,7 +2682,7 @@
   "TransactionDetailScreen": {
     "paid": "Ihlawulwe ukuya/ukusuka",
     "received": "Ufumene",
-    "spent": "Uchithe",
+    "sent": "Uthumele",
     "sending": "Iyathumela",
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
@@ -3078,7 +3085,13 @@
     "deleteAccountFromPhone": "Molo!, nceda uvale i-akhawunti yam. Inombolo yam yefowuni ngu {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho."
+    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho.",
+    "downloadLogs": "Khuphela iirekhodi",
+    "exportLogsTitle": "Yabelana ngerekhodi zesipaji sakho",
+    "exportLogsBody": "Le fayile inceda inkxaso iphande iingxaki zesipaji sakho. Iqulethe imbali yentlawulo (izixa, ii-invoyisi needilesi) nezichongi zesipaji ngasinye esingagcinwanga kwesi sixhobo, hayi esi kuphela, kodwa ayinazo iibinzana zakho zokugcina okanye izitshixo. Yabelana ngayo kuphela nenkxaso.",
+    "exportLogsConfirm": "Yabelana ngerekhodi",
+    "noLogsYet": "Akukabikho rekhodi zokwabelana. Vula isipaji sakho uzame kwakhona.",
+    "exportLogsError": "Ayiphumelelanga ukukhuphela iirekhodi. Zama kwakhona."
   },
   "lnurl": {
     "overLimit": "You can't send more than max amount",
@@ -3808,7 +3821,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Gcina isipaji sakho",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Khetha indlela yakho yokugcina",
@@ -3866,6 +3879,7 @@
     "CloudBackup": {
       "title": "Masigcine isipaji sakho",
       "description": "Siza kugcina ikopi yesivakalisi sakho sokugcina kwi-{provider} yakho.",
+      "encryptCheckbox": "Bethelela ngegama lokugqitha elongezelelweyo",
       "password": "Igama lokugqitha",
       "passwordPlaceholder": "(ubuncinane oonobumba abayi-12)",
       "confirmPassword": "Qinisekisa igama lokugqitha",

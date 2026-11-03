@@ -2229,6 +2229,12 @@
         "error": "Impossibile generare un'invoice. Contattare l'assistenza se il problema persiste.",
         "copyInvoice": "Copia",
         "shareInvoice": "Condividi",
+        "newAddress": "Nuovo",
+        "newAddressHint": "Genera un nuovo indirizzo Bitcoin. Gli indirizzi precedenti continuano a funzionare.",
+        "newAddressGenerated": "Nuovo indirizzo pronto. Gli indirizzi precedenti funzionano ancora.",
+        "newAddressFailed": "Impossibile generare un nuovo indirizzo. Riprova.",
+        "newAddressRateLimited": "Troppi nuovi indirizzi. Attendi un po' e riprova.",
+        "onchainAddressLoadFailed": "Impossibile caricare il tuo indirizzo Bitcoin. Tocca Nuovo per riprovare.",
         "addAmount": "Richiedi un importo specifico",
         "expired": "L'invoice è scaduta",
         "expiresIn": "Scade in",
@@ -2593,7 +2599,8 @@
     "StablesatsRestriction": {
         "walletLabel": "non è disponibile nella tua regione",
         "anonModeWalletLabel": "non disponibile in modalità Incognito",
-        "unknownRegionWalletLabel": "impossibile verificare la disponibilità, trascina verso il basso per riprovare"
+        "unknownRegionWalletLabel": "impossibile verificare la disponibilità, trascina verso il basso per riprovare",
+        "networkWalletLabel": "non disponibile su questa rete"
     },
     "AnonModeConvertModal": {
         "title": "Trasferisci prima il tuo saldo in dollari",
@@ -2675,7 +2682,7 @@
     "TransactionDetailScreen": {
         "paid": "Pagato a/da",
         "received": "Hai ricevuto",
-        "spent": "Hai speso",
+        "sent": "Hai inviato",
         "sending": "Invio",
         "receivingAccount": "Conto di ricezione",
         "sendingAccount": "Invio dell'account",
@@ -3078,7 +3085,13 @@
         "deleteAccountFromPhone": "Ciao! Per favore chiudete il mio account. Il mio numero di telefono è {phoneNumber: string}.",
         "deleteAccountError": "Qualcosa è andato storto. Contatta {email: string} per ulteriore assistenza.",
         "bye": "Ciao!",
-        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge."
+        "deleteAccountWarning": "Attenzione: la chiusura dell'account è permanente!\nAssicurati che i wallet non abbiano fondi prima della chiusura.\nUn account chiuso non può essere ripristinato.\nPotremmo conservare alcuni dati come richiesto dalla legge.",
+        "downloadLogs": "Scarica i log",
+        "exportLogsTitle": "Condividi i log del portafoglio",
+        "exportLogsBody": "Questo file aiuta la nostra assistenza a esaminare i problemi dei tuoi portafogli. Include la cronologia dei pagamenti (importi, fatture e indirizzi) e gli identificatori di ogni portafoglio non custodiale su questo dispositivo, non solo di questo, ma mai le frasi di recupero o le chiavi. Condividilo solo con la nostra assistenza.",
+        "exportLogsConfirm": "Condividi i log",
+        "noLogsYet": "Non ci sono ancora log da condividere. Apri il portafoglio e riprova.",
+        "exportLogsError": "Impossibile esportare i log. Riprova."
     },
     "lnurl": {
         "overLimit": "Non è possibile inviare più dell'importo massimo",
@@ -3808,7 +3821,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Esegui il backup del portafoglio",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Scegli il metodo di backup",
@@ -3866,6 +3879,7 @@
         "CloudBackup": {
             "title": "Eseguiamo il backup del portafoglio",
             "description": "Salveremo una copia della tua frase di backup nel tuo {provider}.",
+            "encryptCheckbox": "Crittografa con password aggiuntiva",
             "password": "Password",
             "passwordPlaceholder": "(minimo 12 caratteri)",
             "confirmPassword": "Conferma password",

@@ -2229,6 +2229,12 @@
     "error": "Eremereddwa okukola yinivoyisi. Nsaba otutuukirire singa ekizibu kino kisigala nga kigenda mu maaso.",
     "copyInvoice": "Koppa",
     "shareInvoice": "Omugabo",
+    "newAddress": "Empya",
+    "newAddressHint": "Ekola endagiriro ya Bitcoin empya. Endagiriro ez'edda zikyakola.",
+    "newAddressGenerated": "Endagiriro empya etegese. Endagiriro ez'edda zikyakola.",
+    "newAddressFailed": "Tetusobodde kukola ndagiriro mpya. Gezaako nate.",
+    "newAddressRateLimited": "Endagiriro empya nnyingi nnyo. Lindako akaseera ogezeeko nate.",
+    "onchainAddressLoadFailed": "Tetusobodde kufuna ndagiriro yo eya Bitcoin. Nyiga Empya ogezeeko nate.",
     "addAmount": "Saba Omuwendo Gw'enyini Gw'oyagala",
     "expired": "Yiivoyisi eweddeko",
     "expiresIn": "Eggwaako mu",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "teriiwo mu kitundu kyo",
     "anonModeWalletLabel": "tekiriiwo mu modu ya Incognito",
-    "unknownRegionWalletLabel": "tetusobodde kukebera oba kiriwo, sika wansi okuddamu okugezaako"
+    "unknownRegionWalletLabel": "tetusobodde kukebera oba kiriwo, sika wansi okuddamu okugezaako",
+    "networkWalletLabel": "tekiriiwo ku mutimbagano guno"
   },
   "AnonModeConvertModal": {
     "title": "Sooka okyuse ssente zo eza Doola",
@@ -2675,7 +2682,7 @@
   "TransactionDetailScreen": {
     "paid": "Zisasuddwa eri/ okuva",
     "received": "Ofunye",
-    "spent": "Okozesezza",
+    "sent": "Osindise",
     "sending": "Okusindika",
     "receivingAccount": "Akawunti Efuna",
     "sendingAccount": "Akawunti Esindika",
@@ -3078,7 +3085,13 @@
     "deleteAccountFromPhone": "Nkulamusizza! Nkusaba oggalawo akawunti yange. Ennamba yange ey'essimu ye {phoneNumber: string}.",
     "deleteAccountError": "Waliwo ekitatambudde bulungi. Tukirira {email: string} okufuna obuyambi.",
     "bye": "Tweelaba!",
-    "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira."
+    "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira.",
+    "downloadLogs": "Ggya ebiwandiiko",
+    "exportLogsTitle": "Gabana ebiwandiiko by'akawunti yo",
+    "exportLogsBody": "Fayiro eno eyambako ttiimu yaffe ey'obuyambi okunoonyereza ku bizibu ku kawunti zo. Erimu ebyafaayo by'okusasula (ebitundutundu, invoices n'endagiriro) n'obubonero bwa buli kawunti etakuumibwa ku kyuma kino, si eyo yokka, naye tewali bigambo by'enkalakkalira wadde obusumuluzo. Gigabane ne ttiimu yaffe ey'obuyambi yokka.",
+    "exportLogsConfirm": "Gabana ebiwandiiko",
+    "noLogsYet": "Tewali biwandiiko kugabana. Ggulawo akawunti yo oddemu ogezeeko.",
+    "exportLogsError": "Tekisobose okufulumya ebiwandiiko. Gezaako nate."
   },
   "lnurl": {
     "overLimit": "Tosobola kusindika ssente ezisukka mu muwendo ogusinga obunene",
@@ -3808,7 +3821,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Koppa akawunti yo",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Londa enkola yo ey'okukoppa",
@@ -3866,6 +3879,7 @@
     "CloudBackup": {
       "title": "Ka tukoppe akawunti yo",
       "description": "Tujja kutereka kopi y'ekigambo kyo eky'okukuuma mu {provider} yo.",
+      "encryptCheckbox": "Kiziyiza n'ekigambo eky'okustreyitinga ekirala",
       "password": "Ekigambo eky'okuyingira",
       "passwordPlaceholder": "(obunene 12 ennukuta)",
       "confirmPassword": "Kakasa ekigambo eky'okuyingira",

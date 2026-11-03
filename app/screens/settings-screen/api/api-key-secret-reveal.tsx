@@ -1,6 +1,5 @@
 import * as React from "react"
 import { Alert, Share, TouchableOpacity, View } from "react-native"
-import crashlytics from "@react-native-firebase/crashlytics"
 import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
@@ -13,6 +12,7 @@ import { QrCodeComponent } from "@app/components/totp-export"
 import { useClipboard } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
+import { recordAppError } from "@app/utils/error-reporting"
 import { testProps } from "@app/utils/testProps"
 import { makeStyles, Text, useTheme } from "@rn-vui/themed"
 
@@ -47,7 +47,7 @@ const ApiKeySecretRevealContent: React.FC<Props & { onDone: () => void }> = ({
       await Share.share({ message: secret })
     } catch (err) {
       if (err instanceof Error) {
-        crashlytics().recordError(err)
+        recordAppError(err)
         Alert.alert(err.message)
       }
     }

@@ -2229,6 +2229,12 @@
         "error": "Error al generar la factura. Póngase en contacto con el soporte técnico si este problema persiste.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartir",
+        "newAddress": "Nueva",
+        "newAddressHint": "Genera una nueva dirección de Bitcoin. Las direcciones anteriores siguen funcionando.",
+        "newAddressGenerated": "Nueva dirección lista. Las direcciones anteriores siguen funcionando.",
+        "newAddressFailed": "No se pudo generar una nueva dirección. Inténtalo de nuevo.",
+        "newAddressRateLimited": "Demasiadas direcciones nuevas. Espera un rato e inténtalo de nuevo.",
+        "onchainAddressLoadFailed": "No se pudo cargar tu dirección de Bitcoin. Toca Nueva para intentarlo de nuevo.",
         "addAmount": "Solicitar una cantidad específica",
         "expired": "La factura ha caducado",
         "expiresIn": "Expira en",
@@ -2593,7 +2599,8 @@
     "StablesatsRestriction": {
         "walletLabel": "no está disponible en tu región",
         "anonModeWalletLabel": "no disponible en modo Incognito",
-        "unknownRegionWalletLabel": "no se pudo comprobar la disponibilidad, desliza hacia abajo para reintentar"
+        "unknownRegionWalletLabel": "no se pudo comprobar la disponibilidad, desliza hacia abajo para reintentar",
+        "networkWalletLabel": "no disponible en esta red"
     },
     "AnonModeConvertModal": {
         "title": "Transfiere primero tu saldo en dólares",
@@ -2675,7 +2682,7 @@
     "TransactionDetailScreen": {
         "paid": "Pagado a/desde",
         "received": "Recibiste",
-        "spent": "Gastaste",
+        "sent": "Enviaste",
         "sending": "Enviando",
         "receivingAccount": "Saldo receptor",
         "sendingAccount": "Saldo de envío",
@@ -3078,7 +3085,13 @@
         "deleteAccountFromPhone": "¡Hola! Por favor, cierra mi cuenta. Mi número de teléfono es {phoneNumber: string}.",
         "deleteAccountError": "Algo salió mal. Ponte en contacto con {email: string} para obtener más ayuda.",
         "bye": "¡Adiós!",
-        "deleteAccountWarning": "Atención: ¡El cierre de la cuenta es permanente!\nAsegúrate de que las billeteras no tengan fondos antes de cerrarla.\nUna cuenta cerrada no se puede restaurar.\nEs posible que conservemos ciertos registros según lo exija la ley."
+        "deleteAccountWarning": "Atención: ¡El cierre de la cuenta es permanente!\nAsegúrate de que las billeteras no tengan fondos antes de cerrarla.\nUna cuenta cerrada no se puede restaurar.\nEs posible que conservemos ciertos registros según lo exija la ley.",
+        "downloadLogs": "Descargar logs",
+        "exportLogsTitle": "Compartir los logs de tu billetera",
+        "exportLogsBody": "Este archivo ayuda a nuestro equipo de soporte a revisar problemas con tus billeteras. Incluye el historial de pagos (montos, facturas y direcciones) y los identificadores de cada billetera no custodial en este dispositivo, no solo de esta, pero nunca tus frases de recuperación ni tus claves. Compártelo solo con nuestro equipo de soporte.",
+        "exportLogsConfirm": "Compartir logs",
+        "noLogsYet": "Todavía no hay logs para compartir. Abre tu billetera e inténtalo de nuevo.",
+        "exportLogsError": "No se pudieron exportar tus logs. Inténtalo de nuevo."
     },
     "lnurl": {
         "overLimit": "No se puede enviar más de la cantidad máxima",
@@ -3808,7 +3821,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Respaldar tu billetera",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Elige tu método de respaldo",
@@ -3866,6 +3879,7 @@
         "CloudBackup": {
             "title": "Respaldemos tu billetera",
             "description": "Guardaremos una copia de tu frase de respaldo en tu {provider}.",
+            "encryptCheckbox": "Encriptar con contraseña adicional",
             "password": "Contraseña",
             "passwordPlaceholder": "(mínimo 12 caracteres)",
             "confirmPassword": "Confirmar contraseña",

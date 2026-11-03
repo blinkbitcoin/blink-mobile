@@ -8,6 +8,7 @@ import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { Screen } from "@app/components/screen"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { testProps } from "@app/utils/testProps"
+import { fonts } from "@app/rne-theme/fonts"
 
 import { useSelfCustodialWallet } from "../providers/wallet"
 
@@ -59,7 +60,7 @@ const useStyles = makeStyles(() => ({
   },
   title: {
     textAlign: "center",
-    fontWeight: "600",
+    fontFamily: fonts.bold,
   },
   description: {
     textAlign: "center",

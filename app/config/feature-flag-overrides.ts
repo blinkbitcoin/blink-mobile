@@ -136,6 +136,14 @@ export type SelfCustodialFlags = {
 }
 
 /**
+ * What Remote Config resolved to, plus whether the console has vouched for
+ * `nonCustodialEnabled`. Omitted, it has.
+ */
+export type RemoteSelfCustodialFlags = SelfCustodialFlags & {
+  isNonCustodialFlagSettled?: boolean
+}
+
+/**
  * The two self-custodial rollout flags as the app should read them: each override
  * applied, then the cascade — Stable Balance cannot be on while self-custodial is off,
  * since it is a feature *of* a self-custodial account.
@@ -144,25 +152,34 @@ export type SelfCustodialFlags = {
  * which is what the rollback scenario in `docs/self-custodial-rollout.md` expects; the
  * cascade applied first would let a forced Stable Balance survive it.
  *
+ * The cascade reads the console's word, not the shipped default: the default turns
+ * self-custodial on so a first launch can offer it, but what builds on it must still go
+ * dark when the console turns it off on a device whose fetch never landed. A developer
+ * override of `nonCustodialEnabled` is a word as good as the console's.
+ *
  * Exported and pure so the flag context and its spec share one derivation. It lives
  * here rather than in `feature-flags-context.tsx` because importing that pulls in
  * Firebase Remote Config, which a unit test should not have to stand up.
  */
 export const deriveSelfCustodialFlags = (
-  remote: SelfCustodialFlags,
+  { isNonCustodialFlagSettled = true, ...remote }: RemoteSelfCustodialFlags,
   overrides: FeatureFlagOverrides,
 ): SelfCustodialFlags => {
   const nonCustodialEnabled = applyFlagOverride(
     remote.nonCustodialEnabled,
     overrides.nonCustodialEnabled,
   )
+  const isNonCustodialVouchedFor =
+    overrides.nonCustodialEnabled === FlagOverride.Default
+      ? isNonCustodialFlagSettled && nonCustodialEnabled
+      : nonCustodialEnabled
   const stableBalanceEnabled = applyFlagOverride(
     remote.stableBalanceEnabled,
     overrides.stableBalanceEnabled,
   )
   return {
     nonCustodialEnabled,
-    stableBalanceEnabled: nonCustodialEnabled && stableBalanceEnabled,
+    stableBalanceEnabled: isNonCustodialVouchedFor && stableBalanceEnabled,
   }
 }
 
