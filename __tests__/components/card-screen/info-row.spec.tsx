@@ -20,7 +20,7 @@ jest.mock("@rn-vui/themed", () => ({
   }),
   makeStyles: () => () => ({
     container: { flexDirection: "row" },
-    label: { fontWeight: "600" },
+    label: { fontWeight: "700" },
     regularLabel: { fontWeight: "400" },
     value: { fontWeight: "700" },
     mutedValue: { color: "#666666", fontWeight: "400" },
@@ -168,11 +168,11 @@ describe("InfoRow", () => {
       ).toBe("400")
     })
 
-    it("keeps the label bold by default", () => {
+    it("uses the bold label style by default", () => {
       const { getByText } = render(<InfoRow {...defaultProps} />)
 
       expect(StyleSheet.flatten(getByText("Test Label").props.style).fontWeight).toBe(
-        "600",
+        "700",
       )
     })
   })

@@ -30,6 +30,11 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
+let mockHasSparkToken = true
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useHasSparkToken: () => mockHasSparkToken,
+}))
+
 jest.mock("@app/config/feature-flags-context", () => ({
   useRemoteConfig: () => mockUseRemoteConfig(),
   useFeatureFlags: () => ({ remoteConfigReady: mockRemoteConfigReady }),
@@ -90,6 +95,7 @@ const setup = (accountType: AccountType): void => {
   jest.clearAllMocks()
   mockRemoteConfigReady = true
   mockIsAnonMode = false
+  mockHasSparkToken = true
   mockUseDeviceLocation.mockReturnValue({ countryCode: undefined, source: undefined })
   mockUseRemoteConfig.mockReturnValue(remoteConfig)
   mockUseActiveWallet.mockReturnValue({ accountType })
@@ -231,6 +237,19 @@ describe("useDollarBalanceRestriction", () => {
       mockUseDeviceLocation.mockReturnValue({ countryCode: "AR" })
       expect(readGated()).toBe(false)
     })
+
+    it("gates on a network with no dollar token, wherever the user is", () => {
+      mockUseDeviceLocation.mockReturnValue({ countryCode: "AR" })
+      mockHasSparkToken = false
+      expect(readGated()).toBe(true)
+    })
+
+    /** Custodial dollars live on the server, which has its own on every network. */
+    it("leaves a custodial account open on a network with no dollar token", () => {
+      setup(AccountType.Custodial)
+      mockHasSparkToken = false
+      expect(readGated()).toBe(false)
+    })
   })
 
   /** The surface's copy reads the reason, so a gate closed by an unanswered query must
@@ -246,6 +265,22 @@ describe("useDollarBalanceRestriction", () => {
       mockIsAnonMode = true
 
       expect(readReason()).toBe(GateReason.Anon)
+    })
+
+    it("names the network when it has no dollar token", () => {
+      setup(AccountType.SelfCustodial)
+      mockHasSparkToken = false
+
+      expect(readReason()).toBe(GateReason.Network)
+    })
+
+    /** Enhanced mode would not bring the token back, so its prompt must not be offered. */
+    it("names the network over Anon, whose remedy cannot open it", () => {
+      setup(AccountType.SelfCustodial)
+      mockHasSparkToken = false
+      mockIsAnonMode = true
+
+      expect(readReason()).toBe(GateReason.Network)
     })
 
     it("names the region when the server decided the restriction", () => {

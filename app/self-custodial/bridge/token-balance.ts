@@ -4,7 +4,7 @@ import {
   type TokenBalance,
 } from "@breeztech/breez-sdk-spark-react-native"
 
-import { requireSparkTokenIdentifier, SparkToken } from "../config"
+import { SparkToken, sparkTokenIdentifier } from "../config"
 import { recordErrorOnce } from "../logging"
 
 const listTokenBalances = (info: GetInfoResponse): TokenBalance[] =>
@@ -13,7 +13,9 @@ const listTokenBalances = (info: GetInfoResponse): TokenBalance[] =>
     : Object.values(info.tokenBalances ?? {})
 
 export const findUsdbToken = (info: GetInfoResponse): TokenBalance | undefined => {
-  const expectedIdentifier = requireSparkTokenIdentifier()
+  const expectedIdentifier = sparkTokenIdentifier()
+  // No token on this network: there is no balance to find, and nothing to report.
+  if (expectedIdentifier === null) return undefined
   const match = listTokenBalances(info).find(
     (token) => token.tokenMetadata?.identifier === expectedIdentifier,
   )

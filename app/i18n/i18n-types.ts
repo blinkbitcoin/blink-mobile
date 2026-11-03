@@ -6986,6 +6986,30 @@ type RootTranslation = {
 		 */
 		shareInvoice: string
 		/**
+		 * N​e​w
+		 */
+		newAddress: string
+		/**
+		 * G​e​n​e​r​a​t​e​s​ ​a​ ​n​e​w​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.​ ​P​r​e​v​i​o​u​s​ ​a​d​d​r​e​s​s​e​s​ ​k​e​e​p​ ​w​o​r​k​i​n​g​.
+		 */
+		newAddressHint: string
+		/**
+		 * N​e​w​ ​a​d​d​r​e​s​s​ ​r​e​a​d​y​.​ ​P​r​e​v​i​o​u​s​ ​a​d​d​r​e​s​s​e​s​ ​s​t​i​l​l​ ​w​o​r​k​.
+		 */
+		newAddressGenerated: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​g​e​n​e​r​a​t​e​ ​a​ ​n​e​w​ ​a​d​d​r​e​s​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressFailed: string
+		/**
+		 * T​o​o​ ​m​a​n​y​ ​n​e​w​ ​a​d​d​r​e​s​s​e​s​.​ ​P​l​e​a​s​e​ ​w​a​i​t​ ​a​ ​w​h​i​l​e​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		newAddressRateLimited: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​l​o​a​d​ ​y​o​u​r​ ​B​i​t​c​o​i​n​ ​a​d​d​r​e​s​s​.​ ​T​a​p​ ​N​e​w​ ​t​o​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		onchainAddressLoadFailed: string
+		/**
 		 * R​e​q​u​e​s​t​ ​S​p​e​c​i​f​i​c​ ​A​m​o​u​n​t
 		 */
 		addAmount: string
@@ -8666,6 +8690,10 @@ type RootTranslation = {
 		 * c​o​u​l​d​n​'​t​ ​c​h​e​c​k​ ​a​v​a​i​l​a​b​i​l​i​t​y​,​ ​p​u​l​l​ ​d​o​w​n​ ​t​o​ ​r​e​t​r​y
 		 */
 		unknownRegionWalletLabel: string
+		/**
+		 * n​o​t​ ​a​v​a​i​l​a​b​l​e​ ​o​n​ ​t​h​i​s​ ​n​e​t​w​o​r​k
+		 */
+		networkWalletLabel: string
 	}
 	AnonModeConvertModal: {
 		/**
@@ -8825,9 +8853,9 @@ type RootTranslation = {
 		 */
 		received: string
 		/**
-		 * Y​o​u​ ​s​p​e​n​t
+		 * Y​o​u​ ​s​e​n​t
 		 */
-		spent: string
+		sent: string
 		/**
 		 * S​e​n​d​i​n​g
 		 */
@@ -10299,6 +10327,30 @@ type RootTranslation = {
 	​W​e​ ​m​a​y​ ​r​e​t​a​i​n​ ​c​e​r​t​a​i​n​ ​r​e​c​o​r​d​s​ ​a​s​ ​r​e​q​u​i​r​e​d​ ​b​y​ ​l​a​w​.
 		 */
 		deleteAccountWarning: string
+		/**
+		 * D​o​w​n​l​o​a​d​ ​l​o​g​s
+		 */
+		downloadLogs: string
+		/**
+		 * S​h​a​r​e​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​l​o​g​s
+		 */
+		exportLogsTitle: string
+		/**
+		 * T​h​i​s​ ​f​i​l​e​ ​h​e​l​p​s​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​ ​l​o​o​k​ ​i​n​t​o​ ​p​r​o​b​l​e​m​s​ ​w​i​t​h​ ​y​o​u​r​ ​w​a​l​l​e​t​s​.​ ​I​t​ ​i​n​c​l​u​d​e​s​ ​t​h​e​ ​p​a​y​m​e​n​t​ ​h​i​s​t​o​r​y​ ​(​a​m​o​u​n​t​s​,​ ​i​n​v​o​i​c​e​s​ ​a​n​d​ ​a​d​d​r​e​s​s​e​s​)​ ​a​n​d​ ​w​a​l​l​e​t​ ​i​d​e​n​t​i​f​i​e​r​s​ ​o​f​ ​e​v​e​r​y​ ​s​e​l​f​-​c​u​s​t​o​d​i​a​l​ ​w​a​l​l​e​t​ ​o​n​ ​t​h​i​s​ ​d​e​v​i​c​e​,​ ​n​o​t​ ​o​n​l​y​ ​t​h​i​s​ ​o​n​e​,​ ​b​u​t​ ​n​e​v​e​r​ ​y​o​u​r​ ​b​a​c​k​u​p​ ​p​h​r​a​s​e​s​ ​o​r​ ​k​e​y​s​.​ ​O​n​l​y​ ​s​h​a​r​e​ ​i​t​ ​w​i​t​h​ ​o​u​r​ ​s​u​p​p​o​r​t​ ​t​e​a​m​.
+		 */
+		exportLogsBody: string
+		/**
+		 * S​h​a​r​e​ ​l​o​g​s
+		 */
+		exportLogsConfirm: string
+		/**
+		 * T​h​e​r​e​ ​a​r​e​ ​n​o​ ​l​o​g​s​ ​t​o​ ​s​h​a​r​e​ ​y​e​t​.​ ​O​p​e​n​ ​y​o​u​r​ ​w​a​l​l​e​t​ ​a​n​d​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		noLogsYet: string
+		/**
+		 * C​o​u​l​d​n​'​t​ ​e​x​p​o​r​t​ ​y​o​u​r​ ​l​o​g​s​.​ ​P​l​e​a​s​e​ ​t​r​y​ ​a​g​a​i​n​.
+		 */
+		exportLogsError: string
 	}
 	lnurl: {
 		/**
@@ -21262,6 +21314,30 @@ export type TranslationFunctions = {
 		 */
 		shareInvoice: () => LocalizedString
 		/**
+		 * New
+		 */
+		newAddress: () => LocalizedString
+		/**
+		 * Generates a new Bitcoin address. Previous addresses keep working.
+		 */
+		newAddressHint: () => LocalizedString
+		/**
+		 * New address ready. Previous addresses still work.
+		 */
+		newAddressGenerated: () => LocalizedString
+		/**
+		 * Couldn't generate a new address. Please try again.
+		 */
+		newAddressFailed: () => LocalizedString
+		/**
+		 * Too many new addresses. Please wait a while and try again.
+		 */
+		newAddressRateLimited: () => LocalizedString
+		/**
+		 * Couldn't load your Bitcoin address. Tap New to try again.
+		 */
+		onchainAddressLoadFailed: () => LocalizedString
+		/**
 		 * Request Specific Amount
 		 */
 		addAmount: () => LocalizedString
@@ -22881,6 +22957,10 @@ export type TranslationFunctions = {
 		 * couldn't check availability, pull down to retry
 		 */
 		unknownRegionWalletLabel: () => LocalizedString
+		/**
+		 * not available on this network
+		 */
+		networkWalletLabel: () => LocalizedString
 	}
 	AnonModeConvertModal: {
 		/**
@@ -23036,9 +23116,9 @@ export type TranslationFunctions = {
 		 */
 		received: () => LocalizedString
 		/**
-		 * You spent
+		 * You sent
 		 */
-		spent: () => LocalizedString
+		sent: () => LocalizedString
 		/**
 		 * Sending
 		 */
@@ -24471,6 +24551,30 @@ export type TranslationFunctions = {
 	We may retain certain records as required by law.
 		 */
 		deleteAccountWarning: () => LocalizedString
+		/**
+		 * Download logs
+		 */
+		downloadLogs: () => LocalizedString
+		/**
+		 * Share your wallet logs
+		 */
+		exportLogsTitle: () => LocalizedString
+		/**
+		 * This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.
+		 */
+		exportLogsBody: () => LocalizedString
+		/**
+		 * Share logs
+		 */
+		exportLogsConfirm: () => LocalizedString
+		/**
+		 * There are no logs to share yet. Open your wallet and try again.
+		 */
+		noLogsYet: () => LocalizedString
+		/**
+		 * Couldn't export your logs. Please try again.
+		 */
+		exportLogsError: () => LocalizedString
 	}
 	lnurl: {
 		/**

@@ -1,5 +1,6 @@
 import React from "react"
-import { Linking } from "react-native"
+import { Linking, Platform, StyleSheet } from "react-native"
+import type { ReactTestInstance } from "react-test-renderer"
 
 import { fireEvent, render } from "@testing-library/react-native"
 import { ThemeProvider } from "@rn-vui/themed"
@@ -85,14 +86,38 @@ describe("RestrictedRegionScreen", () => {
     expect(getByText("$0.20")).toBeTruthy()
   })
 
-  /** Bold is the bold face, not a weight on the regular one: Android synthesises the
-   *  weight rather than loading the file. */
-  it("renders the native sat amount bold and the fiat conversion plain", () => {
-    const { getByText } = renderScreen()
+  /** Bold is the bold face with no weight on Android: a weight of 700 or more makes it
+   *  look for `SourceSansPro-Bold_bold.ttf` and fall back to Roboto. */
+  describe("on Android", () => {
+    const originalOS = Platform.OS
 
-    expect(getByText("21,493 sats")).toHaveStyle({ fontFamily: fonts.bold })
-    expect(getByText("($22.42)")).toHaveStyle({ fontFamily: fonts.regular })
-    expect(getByText("$0.20")).toHaveStyle({ fontFamily: fonts.bold })
+    beforeEach(() => {
+      Platform.OS = "android"
+    })
+
+    afterEach(() => {
+      Platform.OS = originalOS
+    })
+
+    const expectBoldFace = (element: ReactTestInstance) => {
+      const style = StyleSheet.flatten(element.props.style)
+      expect(style.fontFamily).toBe(fonts.bold)
+      expect(Number(style.fontWeight ?? 0)).toBeLessThan(700)
+    }
+
+    it("renders the title in the bold face", () => {
+      const { getByText } = renderScreen()
+
+      expectBoldFace(getByText(LL.RestrictedRegion.title()))
+    })
+
+    it("renders the native sat amount bold and the fiat conversion plain", () => {
+      const { getByText } = renderScreen()
+
+      expectBoldFace(getByText("21,493 sats"))
+      expect(getByText("($22.42)")).toHaveStyle({ fontFamily: fonts.regular })
+      expectBoldFace(getByText("$0.20"))
+    })
   })
 
   it("renders the bitcoin balance without parentheses when no fiat resolves", () => {
