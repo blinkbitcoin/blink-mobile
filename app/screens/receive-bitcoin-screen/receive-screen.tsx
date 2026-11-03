@@ -39,6 +39,7 @@ import { QRView } from "./qr-view"
 import { withMyLnUpdateSub } from "./my-ln-updates-sub"
 import { Invoice, InvoiceType, PaymentRequestState } from "./payment/index.types"
 import {
+  useDepositFeeWarning,
   useDisplayPaymentRequest,
   useNfcReceive,
   useOnchainResolver,
@@ -190,6 +191,11 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
     onchain.address,
   )
   const hasNothingToShare = carousel.isOnChainPage && !onchain.address
+
+  const getAmountWarning = useDepositFeeWarning(
+    requestState,
+    !isSelfCustodial && carousel.isOnChainPage,
+  )
 
   const {
     displayReceiveNfc,
@@ -347,6 +353,7 @@ const ReceiveScreenContent: React.FC<ReceiveScreenContentProps> = ({
           canSetAmount={requestState.canSetAmount}
           onToggleWallet={handleToggleWallet}
           canToggleWallet={canToggleWallet}
+          getAmountWarning={getAmountWarning}
           disabled={
             !isSelfCustodial &&
             carousel.isOnChainPage &&

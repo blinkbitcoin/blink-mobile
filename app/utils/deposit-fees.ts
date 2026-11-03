@@ -84,3 +84,56 @@ export const formatDepositFeeTiers = (
     }
   })
 }
+
+export const DepositFeeWarning = {
+  BelowMinimum: "belowMinimum",
+  AllConsumedByFee: "allConsumedByFee",
+  ConsumedByFee: "consumedByFee",
+} as const
+
+export type DepositFeeWarningType =
+  (typeof DepositFeeWarning)[keyof typeof DepositFeeWarning]
+
+/**
+ * The flat fee the backend charges a deposit of `amountSats`: the first tier
+ * whose `maxAmount` covers it, inclusive like the backend's tiered strategy.
+ * Before `feesInformation` resolves it is the default minimum bank fee.
+ */
+export const depositFeeForAmount = (
+  amountSats: number,
+  deposit?: DepositFeesInformation,
+): number => {
+  if (!deposit) return DEFAULT_MIN_BANK_FEE
+  const tiers = parseTiers(deposit)
+  const tier = tiers.find(
+    ({ maxAmount }) => maxAmount === null || amountSats <= maxAmount,
+  )
+  return (tier ?? tiers[tiers.length - 1]).amount
+}
+
+/**
+ * Classifies an onchain receive amount the way the backend settles it. It
+ * drops a deposit under `minimumSats` (its dust threshold) before any fee
+ * with no record at all, so that check comes first. Above it the flat fee is
+ * taken: under the fee nothing is left, under `multiplier` times the fee most
+ * of it goes. An empty or zero amount never warns.
+ */
+export const getDepositFeeWarning = ({
+  amountSats,
+  deposit,
+  minimumSats,
+  multiplier,
+}: {
+  amountSats: number
+  deposit?: DepositFeesInformation
+  minimumSats: number
+  multiplier: number
+}): { type: DepositFeeWarningType; fee: number; minimum: number } | null => {
+  if (amountSats <= 0) return null
+  const fee = depositFeeForAmount(amountSats, deposit)
+  const warning = (type: DepositFeeWarningType) => ({ type, fee, minimum: minimumSats })
+  if (amountSats < minimumSats) return warning(DepositFeeWarning.BelowMinimum)
+  if (amountSats < fee) return warning(DepositFeeWarning.AllConsumedByFee)
+  if (amountSats < fee * multiplier) return warning(DepositFeeWarning.ConsumedByFee)
+  return null
+}

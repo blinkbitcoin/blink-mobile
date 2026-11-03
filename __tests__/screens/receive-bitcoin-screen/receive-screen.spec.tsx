@@ -60,6 +60,7 @@ jest.mock("@app/hooks/use-active-wallet", () => ({
 }))
 
 jest.mock("@app/screens/receive-bitcoin-screen/hooks", () => ({
+  useDepositFeeWarning: jest.fn(() => undefined),
   useDisplayPaymentRequest: jest.fn(() => ({})),
   useNfcReceive: jest.fn(() => ({})),
   useOnchainResolver: jest.fn(() => ({})),

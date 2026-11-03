@@ -75,6 +75,8 @@ const CustodialTwoFactorThresholdsKey = "custodialTwoFactorThresholds"
 const FeeRatesConfigKey = "feeRatesConfig"
 const InactivityFeeEnabledKey = "inactivityFeeEnabled"
 const CloudBundleStaleAfterMsKey = "cloudBundleStaleAfterMs"
+const DepositFeeWarningMultiplierKey = "depositFeeWarningMultiplier"
+const OnchainDepositMinimumSatsKey = "onchainDepositMinimumSats"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -154,6 +156,8 @@ type RemoteConfig = {
   [FeeRatesConfigKey]: FeeRatesConfig
   [InactivityFeeEnabledKey]: boolean
   [CloudBundleStaleAfterMsKey]: number
+  [DepositFeeWarningMultiplierKey]: number
+  [OnchainDepositMinimumSatsKey]: number
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -317,6 +321,13 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  before the home says so. An upload lands within seconds, so a week behind means
    *  uploads stopped: a lapsed sign-in, or the cloud drive turned off (#4337). */
   cloudBundleStaleAfterMs: 7 * 24 * 60 * 60 * 1000,
+  /** How many deposit fees an onchain receive amount must cover before the amount
+   *  sheet stops warning that the fee eats most of it (blink-wip#1261). */
+  depositFeeWarningMultiplier: 10,
+  /** The smallest onchain deposit the backend credits. It mirrors the backend's
+   *  `dustThreshold`, which drops anything smaller with no record at all and which
+   *  the API does not expose; keep the two in step (blink-wip#1261). */
+  onchainDepositMinimumSats: 5000,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -718,6 +729,16 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.cloudBundleStaleAfterMs,
   )
 
+  const depositFeeWarningMultiplier = getRemoteConfigPositiveNumber(
+    DepositFeeWarningMultiplierKey,
+    defaultRemoteConfig.depositFeeWarningMultiplier,
+  )
+
+  const onchainDepositMinimumSats = getRemoteConfigPositiveNumber(
+    OnchainDepositMinimumSatsKey,
+    defaultRemoteConfig.onchainDepositMinimumSats,
+  )
+
   return {
     deviceAccountEnabledRestAuth,
     balanceLimitToTriggerUpgradeModal,
@@ -766,6 +787,8 @@ const readRemoteConfig = (): RemoteConfig => {
     feeRatesConfig,
     inactivityFeeEnabled,
     cloudBundleStaleAfterMs,
+    depositFeeWarningMultiplier,
+    onchainDepositMinimumSats,
   }
 }
 
