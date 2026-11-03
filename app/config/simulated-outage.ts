@@ -1,5 +1,4 @@
-import React from "react"
-
+import { createExternalStore, useExternalStore } from "@app/utils/external-store"
 import { loadJson, saveJson } from "@app/utils/storage"
 
 import { type GaloyInstance } from "./galoy-instances"
@@ -68,22 +67,12 @@ const parseStored = (raw: unknown): SimulatedOutage => {
   return { graphql, lnurlServer }
 }
 
-let snapshot: SimulatedOutage = NO_OUTAGE
-const listeners = new Set<() => void>()
+const store = createExternalStore<SimulatedOutage>(NO_OUTAGE)
 
-const notify = (): void => listeners.forEach((listener) => listener())
+export const subscribeToSimulatedOutage = store.subscribe
 
-export const subscribeToSimulatedOutage = (listener: () => void): (() => void) => {
-  listeners.add(listener)
-  return () => {
-    listeners.delete(listener)
-  }
-}
-
-/** Referentially stable while nothing changes, which is what `useSyncExternalStore`
- *  needs to avoid re-rendering on every read. */
 const getSnapshot = (): SimulatedOutage =>
-  isSimulationAvailable() ? snapshot : NO_OUTAGE
+  isSimulationAvailable() ? store.get() : NO_OUTAGE
 
 /**
  * Reads the stored switch into memory. Called once at startup, before the Apollo client
@@ -92,25 +81,20 @@ const getSnapshot = (): SimulatedOutage =>
  */
 export const hydrateSimulatedOutage = async (): Promise<void> => {
   if (!isSimulationAvailable()) return
-  const stored = parseStored(await loadJson(SIMULATED_OUTAGE_KEY))
-  if (stored === snapshot) return
-  snapshot = stored
-  notify()
+  store.set(parseStored(await loadJson(SIMULATED_OUTAGE_KEY)))
 }
 
 export const setSimulatedOutage = (patch: Partial<SimulatedOutage>): void => {
   if (!isSimulationAvailable()) return
-  const next: SimulatedOutage = { ...snapshot, ...patch }
-  if (next.graphql === snapshot.graphql && next.lnurlServer === snapshot.lnurlServer) {
+  const current = store.get()
+  const next: SimulatedOutage = { ...current, ...patch }
+  if (next.graphql === current.graphql && next.lnurlServer === current.lnurlServer) {
     return
   }
-  snapshot =
-    next.graphql === OutageMode.Off && next.lnurlServer === OutageMode.Off
-      ? NO_OUTAGE
-      : next
-  notify()
+  const isAllOff = next.graphql === OutageMode.Off && next.lnurlServer === OutageMode.Off
+  store.set(isAllOff ? NO_OUTAGE : next)
   // Best effort: losing the write costs the next launch its simulation, nothing more.
-  saveJson(SIMULATED_OUTAGE_KEY, snapshot).catch(() => {})
+  saveJson(SIMULATED_OUTAGE_KEY, store.get()).catch(() => {})
 }
 
 /** Synchronous read for the non-React callers — the SDK config builder and the LNURL
@@ -118,13 +102,10 @@ export const setSimulatedOutage = (patch: Partial<SimulatedOutage>): void => {
 export const getSimulatedOutage = (): SimulatedOutage => getSnapshot()
 
 export const useSimulatedOutage = (): SimulatedOutage =>
-  React.useSyncExternalStore(subscribeToSimulatedOutage, getSnapshot, getSnapshot)
+  useExternalStore(store, getSnapshot)
 
 /** Test seam: drops the in-memory switch without touching storage. */
-export const resetSimulatedOutageForTests = (): void => {
-  snapshot = NO_OUTAGE
-  listeners.clear()
-}
+export const resetSimulatedOutageForTests = store.reset
 
 /** The host to dial instead of the real one, or null when the service is not simulated
  *  as down. */

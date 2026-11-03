@@ -1,5 +1,4 @@
-import React from "react"
-
+import { createExternalStore, useExternalStore } from "@app/utils/external-store"
 import { loadJson, saveJson } from "@app/utils/storage"
 
 /**
@@ -67,20 +66,12 @@ const parseStored = (raw: unknown): FeatureFlagOverrides => {
   return isDefaulted(parsed) ? NO_OVERRIDES : parsed
 }
 
-let snapshot: FeatureFlagOverrides = NO_OVERRIDES
-const listeners = new Set<() => void>()
+const store = createExternalStore<FeatureFlagOverrides>(NO_OVERRIDES)
 
-export const subscribeToFeatureFlagOverrides = (listener: () => void): (() => void) => {
-  listeners.add(listener)
-  return () => {
-    listeners.delete(listener)
-  }
-}
+export const subscribeToFeatureFlagOverrides = store.subscribe
 
-/** Referentially stable while nothing changes, which is what `useSyncExternalStore`
- *  needs to avoid re-rendering on every read. */
 const getSnapshot = (): FeatureFlagOverrides =>
-  isSimulationAvailable() ? snapshot : NO_OVERRIDES
+  isSimulationAvailable() ? store.get() : NO_OVERRIDES
 
 /**
  * Reads the stored overrides into memory. Called once at startup, before the flag
@@ -88,37 +79,31 @@ const getSnapshot = (): FeatureFlagOverrides =>
  */
 export const hydrateFeatureFlagOverrides = async (): Promise<void> => {
   if (!isSimulationAvailable()) return
-  const stored = parseStored(await loadJson(OVERRIDES_KEY))
-  if (stored === snapshot) return
-  snapshot = stored
-  listeners.forEach((listener) => listener())
+  store.set(parseStored(await loadJson(OVERRIDES_KEY)))
 }
 
 export const setFeatureFlagOverride = (patch: Partial<FeatureFlagOverrides>): void => {
   if (!isSimulationAvailable()) return
-  const next: FeatureFlagOverrides = { ...snapshot, ...patch }
+  const current = store.get()
+  const next: FeatureFlagOverrides = { ...current, ...patch }
   if (
-    next.nonCustodialEnabled === snapshot.nonCustodialEnabled &&
-    next.stableBalanceEnabled === snapshot.stableBalanceEnabled
+    next.nonCustodialEnabled === current.nonCustodialEnabled &&
+    next.stableBalanceEnabled === current.stableBalanceEnabled
   ) {
     return
   }
-  snapshot = isDefaulted(next) ? NO_OVERRIDES : next
-  listeners.forEach((listener) => listener())
+  store.set(isDefaulted(next) ? NO_OVERRIDES : next)
   // Best effort: losing the write costs the next launch its override, nothing more.
-  saveJson(OVERRIDES_KEY, snapshot).catch(() => {})
+  saveJson(OVERRIDES_KEY, store.get()).catch(() => {})
 }
 
 export const getFeatureFlagOverrides = (): FeatureFlagOverrides => getSnapshot()
 
 export const useFeatureFlagOverrides = (): FeatureFlagOverrides =>
-  React.useSyncExternalStore(subscribeToFeatureFlagOverrides, getSnapshot, getSnapshot)
+  useExternalStore(store, getSnapshot)
 
 /** Test seam: drops the in-memory overrides without touching storage. */
-export const resetFeatureFlagOverridesForTests = (): void => {
-  snapshot = NO_OVERRIDES
-  listeners.clear()
-}
+export const resetFeatureFlagOverridesForTests = store.reset
 
 /** Applies one override to the value Remote Config resolved to. */
 export const applyFlagOverride = (

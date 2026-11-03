@@ -1,6 +1,6 @@
-import React from "react"
-
 import { NetworkError } from "@apollo/client/errors"
+
+import { createExternalStore, useExternalStore } from "@app/utils/external-store"
 
 /**
  * Whether the Blink backend is answering, observed from the traffic the app already
@@ -35,15 +35,8 @@ export type BlinkServicesStatus =
  */
 const FAILURES_BEFORE_UNREACHABLE = 2
 
-let status: BlinkServicesStatus = BlinkServicesStatus.Unknown
+const store = createExternalStore<BlinkServicesStatus>(BlinkServicesStatus.Unknown)
 let consecutiveFailures = 0
-const listeners = new Set<() => void>()
-
-const setStatus = (next: BlinkServicesStatus): void => {
-  if (status === next) return
-  status = next
-  listeners.forEach((listener) => listener())
-}
 
 /**
  * A response arrived. GraphQL errors count as reachable: the server answered, it just
@@ -51,7 +44,7 @@ const setStatus = (next: BlinkServicesStatus): void => {
  */
 export const recordBlinkServiceResponse = (): void => {
   consecutiveFailures = 0
-  setStatus(BlinkServicesStatus.Reachable)
+  store.set(BlinkServicesStatus.Reachable)
 }
 
 /**
@@ -71,7 +64,7 @@ export const recordBlinkServiceTransportError = (error: NetworkError): void => {
 
   consecutiveFailures += 1
   if (consecutiveFailures >= FAILURES_BEFORE_UNREACHABLE) {
-    setStatus(BlinkServicesStatus.Unreachable)
+    store.set(BlinkServicesStatus.Unreachable)
   }
 }
 
@@ -79,28 +72,17 @@ export const recordBlinkServiceTransportError = (error: NetworkError): void => {
  *  old observations were about a different connection. */
 export const resetBlinkServicesStatus = (): void => {
   consecutiveFailures = 0
-  setStatus(BlinkServicesStatus.Unknown)
+  store.set(BlinkServicesStatus.Unknown)
 }
 
-export const subscribeToBlinkServicesStatus = (listener: () => void): (() => void) => {
-  listeners.add(listener)
-  return () => {
-    listeners.delete(listener)
-  }
-}
+export const subscribeToBlinkServicesStatus = store.subscribe
 
-export const getBlinkServicesStatus = (): BlinkServicesStatus => status
+export const getBlinkServicesStatus = store.get
 
-export const useBlinkServicesStatus = (): BlinkServicesStatus =>
-  React.useSyncExternalStore(
-    subscribeToBlinkServicesStatus,
-    getBlinkServicesStatus,
-    getBlinkServicesStatus,
-  )
+export const useBlinkServicesStatus = (): BlinkServicesStatus => useExternalStore(store)
 
 /** Test seam: drops both the status and the listener set. */
 export const resetBlinkServicesStatusForTests = (): void => {
-  status = BlinkServicesStatus.Unknown
   consecutiveFailures = 0
-  listeners.clear()
+  store.reset()
 }
