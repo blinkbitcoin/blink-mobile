@@ -17,6 +17,30 @@ const receiveError = (message: string) => ({
   errors: [{ message }] as PaymentError[],
 })
 
+type Bolt11ReceiveOptions = {
+  description: string
+  amountSats: bigint | undefined
+  expirySecs: number | undefined
+}
+
+/**
+ * Every BOLT11 invoice this app mints pays the wallet that minted it, so the
+ * receiver an invoice can name is never set, and the SDK generates the payment
+ * hash itself.
+ */
+export const bolt11ReceiveMethod = ({
+  description,
+  amountSats,
+  expirySecs,
+}: Bolt11ReceiveOptions) =>
+  new ReceivePaymentMethod.Bolt11Invoice({
+    description,
+    amountSats,
+    expirySecs,
+    paymentHash: undefined,
+    receiverIdentityPublicKey: undefined,
+  })
+
 export const createReceiveLightning = (
   sdk: BreezSdkInterface,
 ): ReceiveLightningAdapter => {
@@ -24,11 +48,10 @@ export const createReceiveLightning = (
     try {
       const response = await sdk.receivePayment(
         ReceivePaymentRequest.create({
-          paymentMethod: new ReceivePaymentMethod.Bolt11Invoice({
+          paymentMethod: bolt11ReceiveMethod({
             description: memo ?? "",
             amountSats: amount ? BigInt(amount.amount) : undefined,
             expirySecs,
-            paymentHash: undefined,
           }),
         }),
       )
@@ -43,7 +66,14 @@ export const createReceiveLightning = (
   }
 }
 
-export const createReceiveOnchain = (sdk: BreezSdkInterface): ReceiveOnchainAdapter => {
+/**
+ * `signal` cancels the SDK call: aborted, it settles at once as an error-only result
+ * instead of running on, so a caller that gave up can wait for it to end.
+ */
+export const createReceiveOnchain = (
+  sdk: BreezSdkInterface,
+  options?: { signal?: AbortSignal },
+): ReceiveOnchainAdapter => {
   return async (params) => {
     try {
       const response = await sdk.receivePayment(
@@ -52,6 +82,7 @@ export const createReceiveOnchain = (sdk: BreezSdkInterface): ReceiveOnchainAdap
             newAddress: params?.newAddress,
           }),
         }),
+        options?.signal ? { signal: options.signal } : undefined,
       )
       /** Not counted here: the receive screen asks for the address on every visit and
        *  gets the same one back until it rotates, so the screen counts a request only

@@ -2227,8 +2227,14 @@
     "title": "Fumana i-Bitcoin",
     "usdTitle": "Yamkela kwi-Akhawunti ye-Idola",
     "error": "Ayiphumelelanga ukwenza i-invoyisi. Nceda uqhakamishele abezoncedo ukuba le ngxaki iyaqhubeka.",
-    "copyInvoice": "Khuphela i-invoyisi",
-    "shareInvoice": "Yabelana nge-invoyisi",
+    "copyInvoice": "Khuphela",
+    "shareInvoice": "Yabelana",
+    "newAddress": "Entsha",
+    "newAddressHint": "Yenza idilesi entsha yeBitcoin. Iidilesi zangaphambili zisasebenza.",
+    "newAddressGenerated": "Idilesi entsha ilungile. Iidilesi zangaphambili zisasebenza.",
+    "newAddressFailed": "Ayikwazanga ukwenza idilesi entsha. Nceda uzame kwakhona.",
+    "newAddressRateLimited": "Zininzi kakhulu iidilesi ezintsha. Nceda ulinde kancinci uze uzame kwakhona.",
+    "onchainAddressLoadFailed": "Ayikwazanga ukulayisha idilesi yakho yeBitcoin. Cofa u-Entsha ukuze uzame kwakhona.",
     "addAmount": "Cela Isixa esithile",
     "expired": "I-invoyisi iphelelwe lixesha",
     "expiresIn": "Iphelelwa",
@@ -2614,7 +2620,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",
     "anonModeWalletLabel": "ayifumaneki kwimo ye-Incognito",
-    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona"
+    "unknownRegionWalletLabel": "ukufumaneka akukwazanga kujongwa, tsala ezantsi ukuze uzame kwakhona",
+    "networkWalletLabel": "akufumaneki kolu thungelwano"
   },
   "AnonModeConvertModal": {
     "title": "Qala udlulisele ibhalansi yakho yeDola",
@@ -2696,7 +2703,7 @@
   "TransactionDetailScreen": {
     "paid": "Ihlawulwe ukuya/ukusuka",
     "received": "Ufumene",
-    "spent": "Uchithe",
+    "sent": "Uthumele",
     "sending": "Iyathumela",
     "receivingAccount": "Ukufumana iAkhawunti",
     "sendingAccount": "Ukuthumela iAkhawunti",
@@ -3098,7 +3105,13 @@
     "deleteAccountFromPhone": "Molo!, nceda uvale i-akhawunti yam. Inombolo yam yefowuni ngu {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho."
+    "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "You can't send more than max amount",

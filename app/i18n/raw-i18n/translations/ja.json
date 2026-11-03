@@ -2229,6 +2229,12 @@
         "error": "インボイスの作成に失敗しました。この問題が解決しない場合は、サポートにお問い合わせください。",
         "copyInvoice": "コピー",
         "shareInvoice": "共有",
+        "newAddress": "新規",
+        "newAddressHint": "新しいビットコインアドレスを生成します。以前のアドレスも引き続き使えます。",
+        "newAddressGenerated": "新しいアドレスの準備ができました。以前のアドレスも引き続き使えます。",
+        "newAddressFailed": "新しいアドレスを生成できませんでした。もう一度お試しください。",
+        "newAddressRateLimited": "新しいアドレスの作成回数が多すぎます。しばらく待ってから再度お試しください。",
+        "onchainAddressLoadFailed": "ビットコインアドレスを読み込めませんでした。「新規」をタップしてもう一度お試しください。",
         "addAmount": "金額を設定する",
         "expired": "有効期限切れのインボイスです",
         "expiresIn": "有効期限",
@@ -2614,7 +2620,8 @@
     "StablesatsRestriction": {
         "walletLabel": "あなたの地域ではご利用いただけません",
         "anonModeWalletLabel": "Incognito モードでは利用できません",
-        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください"
+        "unknownRegionWalletLabel": "利用可否を確認できませんでした。下に引いて再試行してください",
+        "networkWalletLabel": "このネットワークでは利用できません"
     },
     "AnonModeConvertModal": {
         "title": "まずドル残高を移してください",
@@ -2696,7 +2703,7 @@
     "TransactionDetailScreen": {
         "paid": "送金先/送金元",
         "received": "受金完了",
-        "spent": "送金完了",
+        "sent": "送金完了",
         "sending": "送信中",
         "receivingAccount": "受金ウォレット",
         "sendingAccount": "送金ウォレット",
@@ -3098,7 +3105,13 @@
         "deleteAccountFromPhone": "こんにちは！アカウントを閉じてください。私の電話番号は {phoneNumber: string} です。",
         "deleteAccountError": "エラーが発生しました。お問い合わせは{email: string}までお願いします。",
         "bye": "バイバイ！",
-        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。"
+        "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。",
+        "downloadLogs": "Download logs",
+        "exportLogsTitle": "Share your wallet logs",
+        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+        "exportLogsConfirm": "Share logs",
+        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+        "exportLogsError": "Couldn't export your logs. Please try again."
     },
     "lnurl": {
         "overLimit": "最大限度額以上の送金はできません",
