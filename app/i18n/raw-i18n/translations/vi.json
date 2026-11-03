@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Tải nhật ký xuống",
+    "exportLogsTitle": "Chia sẻ nhật ký ví của bạn",
+    "exportLogsBody": "Tệp này giúp bộ phận hỗ trợ xem xét sự cố với ví của bạn. Tệp gồm lịch sử thanh toán (số tiền, hóa đơn và địa chỉ) và mã định danh của mọi ví không lưu ký trên thiết bị này, không chỉ ví này, nhưng không bao giờ gồm cụm từ sao lưu hay khóa. Chỉ chia sẻ với bộ phận hỗ trợ của chúng tôi.",
+    "exportLogsConfirm": "Chia sẻ nhật ký",
+    "noLogsYet": "Chưa có nhật ký để chia sẻ. Mở ví và thử lại.",
+    "exportLogsError": "Không xuất được nhật ký. Vui lòng thử lại."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sao lưu ví của bạn",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",

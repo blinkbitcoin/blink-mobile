@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Valami hiba történt. További segítségért lépj kapcsolatba az alábbi email címen: {email: string}.",
     "bye": "Viszlát!",
     "deleteAccountWarning": "Figyelem: A fiók lezárása végleges!\nA lezárás előtt győződj meg róla, hogy a tárcákban nincs egyenleg.\nA lezárt fiókot nem lehet visszaállítani.\nElőfordulhat, hogy bizonyos adatokat törvényi kötelezettség miatt megőrzünk.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Naplók letöltése",
+    "exportLogsTitle": "Tárcanaplók megosztása",
+    "exportLogsBody": "Ez a fájl segít az ügyfélszolgálatnak megvizsgálni a tárcáiddal kapcsolatos problémákat. Tartalmazza a fizetési előzményeket (összegek, számlák és címek) és a tárcaazonosítókat az eszköz minden nem letétkezelt tárcájáról, nem csak erről, de soha a biztonsági mentési kifejezéseidet vagy a kulcsaidat. Csak az ügyfélszolgálatunkkal oszd meg.",
+    "exportLogsConfirm": "Naplók megosztása",
+    "noLogsYet": "Még nincsenek megosztható naplók. Nyisd meg a tárcádat, és próbáld újra.",
+    "exportLogsError": "A naplókat nem sikerült exportálni. Próbáld újra."
   },
   "lnurl": {
     "overLimit": "Nem küldhetsz többet, mint a maximális összeg",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Tárca biztonsági mentése",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Válassz biztonsági mentési módszert",

@@ -3083,12 +3083,12 @@
         "deleteAccountError": "Algo salió mal. Ponte en contacto con {email: string} para obtener más ayuda.",
         "bye": "¡Adiós!",
         "deleteAccountWarning": "Atención: ¡El cierre de la cuenta es permanente!\nAsegúrate de que las billeteras no tengan fondos antes de cerrarla.\nUna cuenta cerrada no se puede restaurar.\nEs posible que conservemos ciertos registros según lo exija la ley.",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "Descargar logs",
+        "exportLogsTitle": "Compartir los logs de tu billetera",
+        "exportLogsBody": "Este archivo ayuda a nuestro equipo de soporte a revisar problemas con tus billeteras. Incluye el historial de pagos (montos, facturas y direcciones) y los identificadores de cada billetera no custodial en este dispositivo, no solo de esta, pero nunca tus frases de recuperación ni tus claves. Compártelo solo con nuestro equipo de soporte.",
+        "exportLogsConfirm": "Compartir logs",
+        "noLogsYet": "Todavía no hay logs para compartir. Abre tu billetera e inténtalo de nuevo.",
+        "exportLogsError": "No se pudieron exportar tus logs. Inténtalo de nuevo."
     },
     "lnurl": {
         "overLimit": "No se puede enviar más de la cantidad máxima",
@@ -3818,7 +3818,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Respaldar tu billetera",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Elige tu método de respaldo",

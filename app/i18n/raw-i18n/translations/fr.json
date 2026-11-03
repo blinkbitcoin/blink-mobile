@@ -3083,12 +3083,12 @@
         "deleteAccountError": "Une erreur est survenue. Contacter {email: string} pour recevoir une aide supplémentaire.",
         "bye": "Salut !",
         "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige.",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "Télécharger les journaux",
+        "exportLogsTitle": "Partager les journaux de votre portefeuille",
+        "exportLogsBody": "Ce fichier aide notre équipe de support à examiner les problèmes de vos portefeuilles. Il contient l'historique des paiements (montants, factures et adresses) et les identifiants de chaque portefeuille non-custodial sur cet appareil, pas seulement celui-ci, mais jamais vos phrases de sauvegarde ni vos clés. Ne le partagez qu'avec notre équipe de support.",
+        "exportLogsConfirm": "Partager les journaux",
+        "noLogsYet": "Il n'y a pas encore de journaux à partager. Ouvrez votre portefeuille et réessayez.",
+        "exportLogsError": "Impossible d'exporter vos journaux. Veuillez réessayer."
     },
     "lnurl": {
         "overLimit": "Vous ne pouvez pas envoyer plus que le montant maximum",
@@ -3818,7 +3818,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Sauvegarder votre portefeuille",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Choisissez votre méthode de sauvegarde",

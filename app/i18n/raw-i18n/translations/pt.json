@@ -3083,12 +3083,12 @@
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
         "bye": "Adeus!",
         "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei.",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "Baixar logs",
+        "exportLogsTitle": "Compartilhar os logs da sua carteira",
+        "exportLogsBody": "Este arquivo ajuda nossa equipe de suporte a investigar problemas nas suas carteiras. Ele inclui o histórico de pagamentos (valores, faturas e endereços) e os identificadores de cada carteira não custodial neste dispositivo, não só desta, mas nunca suas frases de recuperação ou chaves. Compartilhe apenas com nossa equipe de suporte.",
+        "exportLogsConfirm": "Compartilhar logs",
+        "noLogsYet": "Ainda não há logs para compartilhar. Abra sua carteira e tente de novo.",
+        "exportLogsError": "Não foi possível exportar seus logs. Tente de novo."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",
@@ -3818,7 +3818,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Fazer backup da sua carteira",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Escolha seu método de backup",

@@ -3083,12 +3083,12 @@
         "deleteAccountError": "Etwas ist schief gelaufen. Bitte kontaktiere {email: string}, um weitere Hilfe zu erhalten.",
         "bye": "Auf Wiedersehen!",
         "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren.",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "Logs herunterladen",
+        "exportLogsTitle": "Brieftaschen-Logs teilen",
+        "exportLogsBody": "Diese Datei hilft unserem Support, Probleme mit deinen Brieftaschen zu untersuchen. Sie enthält den Zahlungsverlauf (Beträge, Rechnungen und Adressen) und die Brieftaschen-Kennungen jeder nicht verwahrten Brieftasche auf diesem Gerät, nicht nur dieser, aber niemals deine Wiederherstellungsphrasen oder Schlüssel. Teile sie nur mit unserem Support.",
+        "exportLogsConfirm": "Logs teilen",
+        "noLogsYet": "Es gibt noch keine Logs zum Teilen. Öffne deine Brieftasche und versuche es erneut.",
+        "exportLogsError": "Logs konnten nicht exportiert werden. Bitte versuche es erneut."
     },
     "lnurl": {
         "overLimit": "Du kannst nicht mehr als den Maximalbetrag senden",
@@ -3818,7 +3818,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Brieftasche sichern",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Wähle deine Sicherungsmethode",

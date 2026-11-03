@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "Yuyay: Cuenta wichq'ayqa wiñaypaqmi!\nWichq'aypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nWichq'asqa cuentaqa mana kutichiy atikunchu.\nIcha wakin willakuykunata waqaychaykuymi ley kamasqan.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Qillqakunata urquy",
+    "exportLogsTitle": "Qullqikuqniykipa qillqakunanta qunakuy",
+    "exportLogsBody": "Kay willañiqi yanapan yanapaqkunata qullqikuqniykikunapi sasachakuykunata qhaway. Paypiqa pagay wiñay (chaninkuna, facturas, direccionkuna) hinallataq kay dispositivopi llapa mana waqaychasqa qullqikuqniypa sutichaynin, manan kaylla chu, ichaqa manan waqaychana rimaykuna nitaq llavekuna. Yanapaqkunallawan qunakuy.",
+    "exportLogsConfirm": "Qillqakunata qunakuy",
+    "noLogsYet": "Manaraq qillqakuna kanchu qunanapaq. Qullqikuqniykita kichay, watiqmanta ruway.",
+    "exportLogsError": "Qillqakunataqa manam hurquyta atirqanichu. Hukmanta kallpachakuy."
   },
   "lnurl": {
     "overLimit": "Monto yachanapaq kachkanman.",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Qullqikuqniykita waqaychay",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Akllay imayna waqaychanaykita",

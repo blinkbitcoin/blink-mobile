@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "تنبيه: إغلاق الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الإغلاق.\nلا يمكن استعادة الحساب المغلق.\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "تنزيل السجلات",
+    "exportLogsTitle": "شارك سجلات محفظتك",
+    "exportLogsBody": "يساعد هذا الملف فريق الدعم لدينا على النظر في مشاكل محافظك. يتضمن سجل المدفوعات (المبالغ والفواتير والعناوين) ومعرّفات المحفظة لكل محفظة غير حافظة على هذا الجهاز، وليس هذه المحفظة فقط، لكنه لا يتضمن أبدًا عبارات النسخ الاحتياطي أو المفاتيح. شاركه فقط مع فريق الدعم لدينا.",
+    "exportLogsConfirm": "مشاركة السجلات",
+    "noLogsYet": "لا توجد سجلات لمشاركتها بعد. افتح محفظتك وحاول مرة أخرى.",
+    "exportLogsError": "تعذر تصدير سجلاتك. يرجى المحاولة مرة أخرى."
   },
   "lnurl": {
     "overLimit": "لا يمكنك إرسال مبلغ أكثر من الحد الأعلى",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "انسخ محفظتك احتياطيًا",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "اختر طريقة النسخ الاحتياطي",

@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "ดาวน์โหลดบันทึก",
+    "exportLogsTitle": "แชร์บันทึกกระเป๋าเงินของคุณ",
+    "exportLogsBody": "ไฟล์นี้ช่วยให้ฝ่ายสนับสนุนตรวจสอบปัญหาของกระเป๋าเงินของคุณ ไฟล์มีประวัติการชำระเงิน (จำนวนเงิน ใบแจ้งหนี้ และที่อยู่) และตัวระบุของกระเป๋าเงินแบบไม่ฝากดูแลทุกใบในอุปกรณ์นี้ ไม่ใช่แค่ใบนี้ แต่ไม่มีวลีสำรองหรือกุญแจของคุณ แชร์กับฝ่ายสนับสนุนของเราเท่านั้น",
+    "exportLogsConfirm": "แชร์บันทึก",
+    "noLogsYet": "ยังไม่มีบันทึกให้แชร์ เปิดกระเป๋าเงินแล้วลองอีกครั้ง",
+    "exportLogsError": "ไม่สามารถส่งออกบันทึกได้ โปรดลองใหม่อีกครั้ง"
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "สำรองข้อมูลกระเป๋าเงินของคุณ",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "เลือกวิธีการสำรองข้อมูล",
