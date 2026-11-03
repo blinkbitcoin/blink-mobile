@@ -3876,6 +3876,7 @@
     "CloudBackup": {
       "title": "لنقم بنسخ محفظتك احتياطيًا",
       "description": "سنحفظ نسخة من عبارة النسخ الاحتياطي في {provider} الخاص بك.",
+      "encryptCheckbox": "تشفير بكلمة مرور إضافية",
       "password": "كلمة المرور",
       "passwordPlaceholder": "(12 حرفًا كحد أدنى)",
       "confirmPassword": "تأكيد كلمة المرور",
