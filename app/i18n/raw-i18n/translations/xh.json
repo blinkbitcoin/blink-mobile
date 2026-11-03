@@ -2536,7 +2536,17 @@
         "title": "Utshintsho lwamaxabiso",
         "description": "Izaziso malunga nexabiso le-Bitcoin."
       }
-    }
+    },
+    "inApp": "Kwiprogram",
+    "celebrateIncoming": "Bhiyoza iintlawulo ezingenayo",
+    "celebrationMinimum": "Eyona mali incinci (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Ufumene",
+    "note": "Inqaku",
+    "dontShowAgain": "Ungaphindi ubonise le skrini.",
+    "details": "Iinkcukacha",
+    "announcement": "Ufumene {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "I-akhawunti yakho inangaphezulu kwe-$5",

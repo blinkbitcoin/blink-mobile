@@ -2536,7 +2536,17 @@
         "title": "Prisændringer",
         "description": "Notifikationer om Bitcoin-prisen."
       }
-    }
+    },
+    "inApp": "I appen",
+    "celebrateIncoming": "Fejr indgående betalinger",
+    "celebrationMinimum": "Minimumsbeløb (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Du har modtaget",
+    "note": "Note",
+    "dontShowAgain": "Vis ikke denne skærm igen.",
+    "details": "Detaljer",
+    "announcement": "Modtaget {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Din konto har mere end $5",

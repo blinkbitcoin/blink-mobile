@@ -1,4 +1,5 @@
 import * as React from "react"
+import { TextInput } from "react-native"
 
 import { gql } from "@apollo/client"
 import {
@@ -17,6 +18,8 @@ import { ListItem, makeStyles, Text } from "@rn-vui/themed"
 import { Screen } from "@app/components/screen"
 import { GaloyIcon, IconNamesType } from "@app/components/atomic/galoy-icon"
 import { Switch } from "@app/components/atomic/switch"
+import { useCelebrationSettings } from "@app/screens/receive-bitcoin-screen/celebration"
+import { logReceiveCelebrationSettingChanged } from "@app/utils/analytics"
 import { SettingsGroup } from "./group"
 
 gql`
@@ -231,7 +234,79 @@ export const NotificationSettingsScreen: React.FC = () => {
   return (
     <Screen style={styles.container} preset="scroll">
       <SettingsGroup items={pushNotificationSettings} />
+      <SettingsGroup
+        name={LL.NotificationSettingsScreen.inApp()}
+        items={[CelebrationToggleRow, CelebrationMinimumRow]}
+      />
     </Screen>
+  )
+}
+
+const CelebrationToggleRow: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const { enabled, minSats, setEnabled } = useCelebrationSettings()
+
+  return (
+    <ListItem containerStyle={styles.listItemContainer}>
+      <GaloyIcon name="receive" size={24} />
+      <ListItem.Content>
+        <ListItem.Title>
+          <Text type="p2">{LL.NotificationSettingsScreen.celebrateIncoming()}</Text>
+        </ListItem.Title>
+      </ListItem.Content>
+      <Switch
+        value={enabled}
+        onValueChange={(value) => {
+          setEnabled(value)
+          logReceiveCelebrationSettingChanged({
+            enabled: value,
+            minimumSats: minSats,
+            source: "settings",
+          })
+        }}
+      />
+    </ListItem>
+  )
+}
+
+const CelebrationMinimumRow: React.FC = () => {
+  const { LL } = useI18nContext()
+  const styles = useStyles()
+  const { enabled, minSats, setMinSats } = useCelebrationSettings()
+  const [draft, setDraft] = React.useState(String(minSats))
+
+  const commit = () => {
+    const value = Number.parseInt(draft, 10)
+    if (Number.isFinite(value) && value >= 0) {
+      setMinSats(value)
+      logReceiveCelebrationSettingChanged({
+        enabled,
+        minimumSats: value,
+        source: "settings",
+      })
+      return
+    }
+    setDraft(String(minSats))
+  }
+
+  return (
+    <ListItem containerStyle={styles.listItemContainer}>
+      <ListItem.Content>
+        <ListItem.Title>
+          <Text type="p2">{LL.NotificationSettingsScreen.celebrationMinimum()}</Text>
+        </ListItem.Title>
+      </ListItem.Content>
+      <TextInput
+        style={styles.minimumInput}
+        value={draft}
+        onChangeText={setDraft}
+        onEndEditing={commit}
+        keyboardType="number-pad"
+        returnKeyType="done"
+        selectTextOnFocus
+      />
+    </ListItem>
   )
 }
 
@@ -242,6 +317,16 @@ const useStyles = makeStyles(({ colors }) => ({
   },
   listItemContainer: {
     backgroundColor: colors.transparent,
+  },
+  minimumInput: {
+    minWidth: 72,
+    paddingVertical: 6,
+    paddingHorizontal: 10,
+    borderRadius: 8,
+    backgroundColor: colors.grey5,
+    color: colors.black,
+    fontSize: 16,
+    textAlign: "right",
   },
 }))
 

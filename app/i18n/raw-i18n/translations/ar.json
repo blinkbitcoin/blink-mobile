@@ -2536,7 +2536,17 @@
         "title": "تغيّرات الأسعار",
         "description": "إشعارات حول سعر Bitcoin."
       }
-    }
+    },
+    "inApp": "داخل التطبيق",
+    "celebrateIncoming": "احتفل بالمدفوعات الواردة",
+    "celebrationMinimum": "الحد الأدنى (ساتس)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "استلمت",
+    "note": "ملاحظة",
+    "dontShowAgain": "لا تُظهر هذه الشاشة مرة أخرى.",
+    "details": "التفاصيل",
+    "announcement": "تم استلام {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "حسابك يحتوي على أكثر من 5$",

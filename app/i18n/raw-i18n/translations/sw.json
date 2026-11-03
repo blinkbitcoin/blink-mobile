@@ -2536,7 +2536,17 @@
         "title": "Mabadiliko ya bei",
         "description": "Arifa kuhusu bei ya Bitcoin."
       }
-    }
+    },
+    "inApp": "Ndani ya programu",
+    "celebrateIncoming": "Sherehekea malipo yanayoingia",
+    "celebrationMinimum": "Kiasi cha chini (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Umepokea",
+    "note": "Dokezo",
+    "dontShowAgain": "Usionyeshe skrini hii tena.",
+    "details": "Maelezo",
+    "announcement": "Imepokelewa {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaunti yako ina zaidi ya $5",

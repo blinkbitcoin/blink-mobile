@@ -344,3 +344,66 @@ type LogLoginMethodCodeFailedParams = {
 export const logLoginMethodCodeFailed = (params: LogLoginMethodCodeFailedParams) => {
   analytics().logEvent("login_method_code_failed", { login_method: params.loginMethod })
 }
+
+type CelebrationWallet = "btc" | "usd" | "self_custodial"
+type CelebrationPaymentTypeName = "lightning" | "intraledger" | "onchain"
+type CelebrationCloseAction = "close" | "details" | "back" | "x" | "background"
+type CelebrationSettingSource = "celebration" | "settings"
+
+type LogReceiveCelebrationShownParams = {
+  route: string
+  wallet: CelebrationWallet
+  paymentType: CelebrationPaymentTypeName
+  amountBucket: string
+  hasNote: boolean
+}
+
+export const logReceiveCelebrationShown = (params: LogReceiveCelebrationShownParams) => {
+  analytics().logEvent("receive_celebration_shown", {
+    route: params.route,
+    wallet: params.wallet,
+    payment_type: params.paymentType,
+    amount_bucket: params.amountBucket,
+    has_note: params.hasNote,
+  })
+}
+
+export const logReceiveCelebrationReplaced = (params: {
+  secondsSincePrevious: number
+  route: string
+}) => {
+  analytics().logEvent("receive_celebration_replaced", {
+    seconds_since_previous: params.secondsSincePrevious,
+    route: params.route,
+  })
+}
+
+export const logReceiveCelebrationSuppressed = (params: {
+  reason: "below_minimum" | "blocked_route" | "opted_out" | "balance_hidden"
+}) => {
+  analytics().logEvent("receive_celebration_suppressed", { reason: params.reason })
+}
+
+export const logReceiveCelebrationClosed = (params: {
+  action: CelebrationCloseAction
+  timeOnScreenMs: number
+  optedOut: boolean
+}) => {
+  analytics().logEvent("receive_celebration_closed", {
+    action: params.action,
+    time_on_screen_ms: params.timeOnScreenMs,
+    opted_out: params.optedOut,
+  })
+}
+
+export const logReceiveCelebrationSettingChanged = (params: {
+  enabled: boolean
+  minimumSats: number
+  source: CelebrationSettingSource
+}) => {
+  analytics().logEvent("receive_celebration_setting_changed", {
+    enabled: params.enabled,
+    minimum_sats: params.minimumSats,
+    source: params.source,
+  })
+}

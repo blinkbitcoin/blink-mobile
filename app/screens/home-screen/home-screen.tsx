@@ -10,6 +10,7 @@ import { ScrollView, TouchableWithoutFeedback } from "react-native-gesture-handl
 
 import { radius } from "@app/rne-theme/radius"
 import { AppUpdate } from "@app/components/app-update/app-update"
+import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/celebration/overlay-cover"
 import { GaloyErrorBox } from "@app/components/atomic/galoy-error-box"
 import { GaloyIcon, icons } from "@app/components/atomic/galoy-icon"
 import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
@@ -645,6 +646,14 @@ export const HomeScreen: React.FC = () => {
     !isAnotherHomeModalVisible &&
     !isTwoFactorModalOpen &&
     isFocused
+  useOverlayCover(
+    isFocused &&
+      (isAnotherHomeModalVisible ||
+        shouldShowModal ||
+        isTwoFactorModalVisible ||
+        shouldShowMigrateNowPrompt ||
+        setDefaultAccountModalVisible),
+  )
 
   const closeUpgradeModal = () => setIsUpgradeModalVisible(false)
   const closeRestrictionModal = () => setIsRestrictionModalVisible(false)

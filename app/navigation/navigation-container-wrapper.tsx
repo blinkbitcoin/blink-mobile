@@ -30,7 +30,7 @@ import { RootStackParamList } from "./stack-param-lists"
 import { isSetupKeyAtStake } from "./two-factor-remedy-routes"
 import { isUnlockInProgress } from "./unlock-routes"
 
-const navigationRef = createNavigationContainerRef<RootStackParamList>()
+export const navigationRef = createNavigationContainerRef<RootStackParamList>()
 
 /** The one deeplink the account-closed gate still allows through: the migration entry. */
 const MIGRATION_DEEPLINK_PATH = "account-migration"

@@ -2640,6 +2640,16 @@ const en: BaseTranslation = {
         description: "Notifications about the price of Bitcoin.",
       },
     },
+    inApp: "In the app",
+    celebrateIncoming: "Celebrate incoming payments",
+    celebrationMinimum: "Minimum amount (sats)",
+  },
+  ReceiveCelebration: {
+    youReceived: "You received",
+    note: "Note",
+    dontShowAgain: "Don’t show me this screen again.",
+    details: "Details",
+    announcement: "Received {amount: string}",
   },
   AccountScreen: {
     fundsMoreThan5Dollars: "Your account has more than $5",

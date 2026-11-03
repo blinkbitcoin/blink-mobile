@@ -12,6 +12,7 @@ import {
   PaymentRequestState,
   PaymentRequestCreationData,
 } from "../payment/index.types"
+import { useReceiveCelebration } from "../celebration/receive-celebration-provider"
 import { createPaymentRequest } from "../payment/payment-request"
 
 export const useInvoiceLifecycle = (
@@ -43,6 +44,7 @@ export const useInvoiceLifecycle = (
   }, [])
 
   const lastHash = useLnUpdateHashPaid()
+  const { isCelebratedHash } = useReceiveCelebration()
   useEffect(() => {
     if (
       pr?.state === PaymentRequestState.Created &&
@@ -50,11 +52,13 @@ export const useInvoiceLifecycle = (
       lastHash === pr.info.data.paymentHash
     ) {
       setPR((current) => current && current.setState(PaymentRequestState.Paid))
+      // One payment, one buzz: the celebration plays its own haptic on impact.
+      if (isCelebratedHash(lastHash)) return
       ReactNativeHapticFeedback.trigger("notificationSuccess", {
         ignoreAndroidSystemSettings: true,
       })
     }
-  }, [lastHash, pr])
+  }, [lastHash, pr, isCelebratedHash])
 
   const expiresAt =
     pr?.info?.data?.invoiceType === Invoice.Lightning && pr.info?.data?.expiresAt

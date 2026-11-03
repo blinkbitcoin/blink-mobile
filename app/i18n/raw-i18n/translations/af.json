@@ -2536,7 +2536,17 @@
         "title": "Prysveranderings",
         "description": "Kennisgewings oor die prys van Bitcoin."
       }
-    }
+    },
+    "inApp": "In die app",
+    "celebrateIncoming": "Vier inkomende betalings",
+    "celebrationMinimum": "Minimumbedrag (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Jy het ontvang",
+    "note": "Nota",
+    "dontShowAgain": "Moenie hierdie skerm weer wys nie.",
+    "details": "Besonderhede",
+    "announcement": "Ontvang {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Jou rekening het meer as $5",

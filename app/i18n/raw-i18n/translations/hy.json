@@ -2536,7 +2536,17 @@
         "title": "Գնի փոփոխություններ",
         "description": "Զգուշացումներ Bitcoin-ի գնի մասին։"
       }
-    }
+    },
+    "inApp": "Հավելվածում",
+    "celebrateIncoming": "Տոնել մուտքային վճարումները",
+    "celebrationMinimum": "Նվազագույն գումար (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Դուք ստացել եք",
+    "note": "Նշում",
+    "dontShowAgain": "Այլևս չցուցադրել այս էկրանը։",
+    "details": "Մանրամասներ",
+    "announcement": "Ստացվել է {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ձեր հաշվին $5-ից ավելի միջոցներ կան",

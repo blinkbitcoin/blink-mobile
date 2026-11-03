@@ -13,6 +13,7 @@ import { Text, makeStyles, useTheme } from "@rn-vui/themed"
 
 import { isIos } from "../../utils/helper"
 import { GaloyPrimaryButton } from "../atomic/galoy-primary-button"
+import { useOverlayCover } from "@app/screens/receive-bitcoin-screen/celebration/overlay-cover"
 import { isUpdateAvailableOrRequired } from "./app-update.logic"
 
 gql`
@@ -100,6 +101,7 @@ export const AppUpdateModal = ({
   linkUpgrade: () => void
   isVisible: boolean
 }) => {
+  useOverlayCover(isVisible)
   const {
     theme: { colors },
   } = useTheme()

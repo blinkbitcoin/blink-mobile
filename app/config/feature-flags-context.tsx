@@ -79,6 +79,7 @@ const CustodialTwoFactorThresholdsKey = "custodialTwoFactorThresholds"
 const FeeRatesConfigKey = "feeRatesConfig"
 const InactivityFeeEnabledKey = "inactivityFeeEnabled"
 const CloudBundleStaleAfterMsKey = "cloudBundleStaleAfterMs"
+const ReceiveCelebrationMinSatsKey = "receiveCelebrationMinSats"
 
 type DeliveryOptionConfig = {
   minDays: number
@@ -158,6 +159,7 @@ type RemoteConfig = {
   [FeeRatesConfigKey]: FeeRatesConfig
   [InactivityFeeEnabledKey]: boolean
   [CloudBundleStaleAfterMsKey]: number
+  [ReceiveCelebrationMinSatsKey]: number
 }
 
 const defaultReplaceCardDeliveryConfig = {
@@ -321,6 +323,9 @@ export const defaultRemoteConfig: RemoteConfig = {
    *  before the home says so. An upload lands within seconds, so a week behind means
    *  uploads stopped: a lapsed sign-in, or the cloud drive turned off (#4337). */
   cloudBundleStaleAfterMs: 7 * 24 * 60 * 60 * 1000,
+  /** Incoming payments below this many sats are not celebrated, unless the user set their
+   *  own minimum in Settings › Notifications (blink-wip#1897). */
+  receiveCelebrationMinSats: 100,
 }
 
 const defaultFeatureFlags: FeatureFlags = {
@@ -722,6 +727,11 @@ const readRemoteConfig = (): RemoteConfig => {
     defaultRemoteConfig.cloudBundleStaleAfterMs,
   )
 
+  const receiveCelebrationMinSats = getRemoteConfigPositiveNumber(
+    ReceiveCelebrationMinSatsKey,
+    defaultRemoteConfig.receiveCelebrationMinSats,
+  )
+
   return {
     deviceAccountEnabledRestAuth,
     balanceLimitToTriggerUpgradeModal,
@@ -770,6 +780,7 @@ const readRemoteConfig = (): RemoteConfig => {
     feeRatesConfig,
     inactivityFeeEnabled,
     cloudBundleStaleAfterMs,
+    receiveCelebrationMinSats,
   }
 }
 
