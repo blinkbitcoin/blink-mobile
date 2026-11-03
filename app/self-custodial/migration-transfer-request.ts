@@ -31,6 +31,9 @@ type MigrationSdkConnectionArgs = {
   accountId: string
   network: Network
   leewaySatPerVbyte: number
+  /** From `useLnurlServer()` at the calling hook, so the developer outage switch is
+   *  applied where it can be seen rather than read from a global down here. */
+  lnurlDomain: string
 }
 
 type WithMigrationSdkArgs = MigrationSdkConnectionArgs & {
@@ -94,7 +97,7 @@ const runExclusivePerStorageDir = <T>(
  * route; a network-tagged failure is a retryable ConnectionError; any other failure is Failed.
  */
 const withMigrationSdk = async <T>(
-  { accountId, network, leewaySatPerVbyte }: MigrationSdkConnectionArgs,
+  { accountId, network, leewaySatPerVbyte, lnurlDomain }: MigrationSdkConnectionArgs,
   use: (sdk: BreezSdkInterface) => Promise<T>,
 ): Promise<MigrationSdkResult<T>> => {
   const mnemonic = await KeyStoreWrapper.getMnemonicForAccount(accountId)
@@ -104,7 +107,13 @@ const withMigrationSdk = async <T>(
   return runExclusivePerStorageDir(storageDir, async () => {
     let sdk: BreezSdkInterface | undefined
     try {
-      sdk = await initSdk({ mnemonic, storageDir, network, leewaySatPerVbyte })
+      sdk = await initSdk({
+        mnemonic,
+        storageDir,
+        network,
+        leewaySatPerVbyte,
+        lnurlDomain,
+      })
       const value = await use(sdk)
       return { status: MigrationSdkStatus.Ok, value }
     } catch (err) {

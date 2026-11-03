@@ -19,6 +19,10 @@ import {
 } from "@app/types/two-factor-enforcement"
 import { logError } from "@app/utils/log-error"
 import {
+  deriveSelfCustodialFlags,
+  useFeatureFlagOverrides,
+} from "@app/config/feature-flag-overrides"
+import {
   getRemoteConfigNumericObject,
   getRemoteConfigObject,
   getRemoteConfigPositiveNumber,
@@ -899,20 +903,24 @@ export const FeatureFlagContextProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [scheduleFetchRetry])
 
-  /** The console's word, not the shipped default: the default turns self-custodial on so a
-   *  first launch can offer it, but what builds on it must still go dark when the console
-   *  turns it off on a device whose fetch never landed. */
-  const isNonCustodialEnabledByConsole =
-    isNonCustodialFlagSettled && remoteConfig.nonCustodialEnabled
+  /** A no-op outside `__DEV__`, where the store always reads "no override". */
+  const overrides = useFeatureFlagOverrides()
+
+  /** Overrides applied, then the cascade. Shared with the spec so the two cannot
+   *  drift — see `deriveSelfCustodialFlags`. */
+  const selfCustodialFlags = deriveSelfCustodialFlags(
+    { ...remoteConfig, isNonCustodialFlagSettled },
+    overrides,
+  )
 
   const featureFlags: FeatureFlags = {
     deviceAccountEnabled:
       remoteConfig.deviceAccountEnabledRestAuth || galoyInstance.id === "Local",
-    nonCustodialEnabled: remoteConfig.nonCustodialEnabled,
-    /** Off on a network with no dollar token, where the SDK has no Stable Balance. */
+    nonCustodialEnabled: selfCustodialFlags.nonCustodialEnabled,
+    /** Off on a network with no dollar token, where the SDK has no Stable Balance. No
+     *  override lifts this: 0.27 refuses to connect with another network's token. */
     stableBalanceEnabled:
-      isNonCustodialEnabledByConsole &&
-      remoteConfig.stableBalanceEnabled &&
+      selfCustodialFlags.stableBalanceEnabled &&
       hasSparkTokenFor(networkForInstance(galoyInstance.id)),
     remoteConfigReady,
     isNonCustodialFlagSettled,

@@ -73,7 +73,13 @@ const launch = () => {
   const { exportSdkLogs } = exporter!
   return {
     connectWallet: (storageDir = "/s") =>
-      initSdk({ mnemonic: "m", storageDir, network: 0, leewaySatPerVbyte: 1 }),
+      initSdk({
+        mnemonic: "m",
+        storageDir,
+        network: 0,
+        leewaySatPerVbyte: 1,
+        lnurlDomain: "staging.blink.sv",
+      }),
     disconnect: disconnectSdk,
     deleteWallet: resetSdkLogs,
     /** What use-delete-account does: wait out the wallet's SDK, then reset. */

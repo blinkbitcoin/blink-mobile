@@ -111,6 +111,10 @@ export const InvalidDestinationReason = {
   WrongNetwork: "WrongNetwork",
   InvalidAmount: "InvalidAmount",
   UsernameDoesNotExist: "UsernameDoesNotExist",
+  /** The name could not be checked, which is not the same as it not existing. Telling a
+   *  user that a real payee does not exist is the worst outcome this screen can produce:
+   *  it sends them to correct a spelling that was right. */
+  DestinationUnverifiable: "DestinationUnverifiable",
   SelfPayment: "SelfPayment",
   LnurlUnsupported: "LnurlUnsupported",
   LnurlServiceError: "LnurlServiceError",

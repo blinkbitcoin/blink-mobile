@@ -34,6 +34,7 @@ const params = {
   storageDir: "/test/storage",
   network: 1,
   leewaySatPerVbyte: 1,
+  lnurlDomain: "staging.blink.sv",
 }
 
 /** The logger's own lifecycle is covered in diagnostics/sdk-log-files.spec.ts. */

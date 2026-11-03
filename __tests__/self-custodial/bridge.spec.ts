@@ -6,6 +6,14 @@ import {
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
 
+/** Threaded explicitly since the config functions stopped reading a global; the real
+ *  value comes from `useLnurlServer()` at the calling hook. */
+const TEST_LNURL_DOMAIN = "staging.blink.sv"
+const TEST_LNURL_SERVER = {
+  serverUrl: `https://${TEST_LNURL_DOMAIN}`,
+  domain: TEST_LNURL_DOMAIN,
+}
+
 const mockSetMnemonicForAccount = jest.fn()
 const mockSetMnemonicNetworkForAccount = jest.fn()
 const mockDeleteMnemonicForAccount = jest.fn()
@@ -157,6 +165,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "restore word1 word2 word3",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
   beforeEach(() => {
@@ -173,6 +182,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "restore word1 word2 word3",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockSetMnemonicForAccount).toHaveBeenCalledWith(
@@ -223,6 +233,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "mnemonic",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Failed to store mnemonic")
   })
