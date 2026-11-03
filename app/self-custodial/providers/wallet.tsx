@@ -171,8 +171,17 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [activeSelfCustodialAccountId])
 
+  /**
+   * Asked only while the connection is the active account's. On the commit where the
+   * user switches, the active id has moved but the SDK still belongs to the account
+   * being left, and its lookup can land after the switch: publishing it then would offer
+   * that account's address, and its paycode, under the one now selected. The switch
+   * re-runs this effect, so the cleanup drops a lookup already in flight.
+   */
+  const isSdkOnActiveAccount = connectedAccountId === activeSelfCustodialAccountId
+
   useEffect(() => {
-    if (!sdk || !connectedAccountId) return undefined
+    if (!sdk || !connectedAccountId || !isSdkOnActiveAccount) return undefined
     let mounted = true
     const accountId = connectedAccountId
 
@@ -201,7 +210,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     return () => {
       mounted = false
     }
-  }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
+  }, [sdk, connectedAccountId, isSdkOnActiveAccount, reloadSelfCustodialAccounts])
 
   const updateCurrentSelfCustodialAccount = useCallback(async () => {
     if (!sdk || !connectedAccountId) return
