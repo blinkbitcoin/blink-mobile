@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Waliwo ekitatambudde bulungi. Tukirira {email: string} okufuna obuyambi.",
     "bye": "Tweelaba!",
     "deleteAccountWarning": "Kulabula: Okuggalawo akawunti kwa lubeerera!\nKakasa nti walooti tezirina ssente nga tonnaggalawo.\nAkawunti egaaziddwawo teyinza kuddizibwa.\nTuyinza kukuuma ebiwandiiko ebimu nga amateeka bwe galagira.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Ggya ebiwandiiko",
+    "exportLogsTitle": "Gabana ebiwandiiko by'akawunti yo",
+    "exportLogsBody": "Fayiro eno eyambako ttiimu yaffe ey'obuyambi okunoonyereza ku bizibu ku kawunti zo. Erimu ebyafaayo by'okusasula (ebitundutundu, invoices n'endagiriro) n'obubonero bwa buli kawunti etakuumibwa ku kyuma kino, si eyo yokka, naye tewali bigambo by'enkalakkalira wadde obusumuluzo. Gigabane ne ttiimu yaffe ey'obuyambi yokka.",
+    "exportLogsConfirm": "Gabana ebiwandiiko",
+    "noLogsYet": "Tewali biwandiiko kugabana. Ggulawo akawunti yo oddemu ogezeeko.",
+    "exportLogsError": "Tekisobose kufulumya biwandiiko. Gezaako nate."
   },
   "lnurl": {
     "overLimit": "Tosobola kusindika ssente ezisukka mu muwendo ogusinga obunene",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Koppa akawunti yo",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Londa enkola yo ey'okukoppa",

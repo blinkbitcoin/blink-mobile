@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Kuna kitu kimeenda kombo. Wasiliana na {email: string} kwa msaada zaidi.",
     "bye": "Kwaheri!",
     "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Pakua kumbukumbu",
+    "exportLogsTitle": "Shiriki kumbukumbu za mkoba wako",
+    "exportLogsBody": "Faili hii husaidia timu yetu ya usaidizi kuchunguza matatizo ya mikoba yako. Inajumuisha historia ya malipo (kiasi, ankara na anwani) na vitambulishi vya kila mkoba usio wa udhamini kwenye kifaa hiki, si huu pekee, lakini kamwe vifungu vyako vya akiba wala funguo. Ishiriki na timu yetu ya usaidizi pekee.",
+    "exportLogsConfirm": "Shiriki kumbukumbu",
+    "noLogsYet": "Bado hakuna kumbukumbu za kushiriki. Fungua mkoba wako ujaribu tena.",
+    "exportLogsError": "Imeshindwa kuhamisha kumbukumbu. Tafadhali jaribu tena."
   },
   "lnurl": {
     "overLimit": "Huwezi kutuma zaidi ya kiasi cha juu",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Hifadhi nakala ya mkoba wako",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chagua njia yako ya nakala",

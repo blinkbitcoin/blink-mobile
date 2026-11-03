@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Սխալ։ Կապ հաստատեք {email: string} հետագա աջակցության համար։ ",
     "bye": "Հաջողությու՛ն։ ",
     "deleteAccountWarning": "Ուշադրություն. Հաշվի փակումն անշրջելի է:\nՓակելուց առաջ համոզվեք, որ դրամապանակներում միջոցներ չկան:\nՓակված հաշիվը հնարավոր չէ վերականգնել:\nՄենք կարող ենք պահպանել որոշ գրառումներ, ինչպես պահանջվում է օրենքով:",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Ներբեռնել մատյանները",
+    "exportLogsTitle": "Կիսվել դրամապանակի մատյաններով",
+    "exportLogsBody": "Այս ֆայլը օգնում է աջակցության թիմին ուսումնասիրել ձեր դրամապանակների խնդիրները։ Այն ներառում է վճարումների պատմությունը (գումարներ, հաշիվ-ապրանքագրեր և հասցեներ) և այս սարքի յուրաքանչյուր ոչ պահպանող դրամապանակի նույնացուցիչները, ոչ միայն այս մեկինը, բայց երբեք ձեր պահեստային արտահայտությունները կամ բանալիները։ Կիսվեք դրանով միայն մեր աջակցության թիմի հետ։",
+    "exportLogsConfirm": "Կիսվել մատյաններով",
+    "noLogsYet": "Դեռ չկան մատյաններ կիսվելու համար։ Բացեք դրամապանակը և փորձեք կրկին։",
+    "exportLogsError": "Չհաջողվեց արտահանել մատյանները։ Խնդրում ենք կրկին փորձել։"
   },
   "lnurl": {
     "overLimit": "Դուք չեք կարող առավելագույն չափը գերազանցող գումար ուղարկել",

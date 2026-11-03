@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Bir şeyler yanlış gitti. Daha fazla yardım için {email: string} ile iletişime geçin.",
     "bye": "Güle güle!",
     "deleteAccountWarning": "Dikkat: Hesap kapatma işlemi kalıcıdır!\nKapatmadan önce cüzdanlarınızda bakiye olmadığından emin olun.\nKapatılan hesap geri getirilemez.\nYasal gereklilikler nedeniyle belirli kayıtları saklayabiliriz.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Günlükleri indir",
+    "exportLogsTitle": "Cüzdan günlüklerinizi paylaşın",
+    "exportLogsBody": "Bu dosya, destek ekibimizin cüzdanlarınızdaki sorunları incelemesine yardımcı olur. Bu cihazdaki her saklamasız cüzdanın (yalnızca bu değil) ödeme geçmişini (tutarlar, faturalar ve adresler) ve cüzdan tanımlayıcılarını içerir; yedekleme ifadelerinizi veya anahtarlarınızı asla içermez. Yalnızca destek ekibimizle paylaşın.",
+    "exportLogsConfirm": "Günlükleri paylaş",
+    "noLogsYet": "Henüz paylaşılacak günlük yok. Cüzdanınızı açıp yeniden deneyin.",
+    "exportLogsError": "Günlükler dışa aktarılamadı. Lütfen yeniden deneyin."
   },
   "lnurl": {
     "overLimit": "Maksimum miktarın üzerinde gönderemezsiniz",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Cüzdanınızı yedekleyin",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Yedekleme yönteminizi seçin",

@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Nešto je pošlo po zlu. Kontaktirajte {email: string} za dodatnu pomoć.",
     "bye": "Pozdrav!",
     "deleteAccountWarning": "Pažnja: Zatvaranje računa je trajno!\nPrije zatvaranja provjerite da novčanici nemaju sredstava.\nZatvoreni račun nije moguće vratiti.\nMožemo zadržati određene zapise kako zahtijeva zakon.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Preuzmi zapise",
+    "exportLogsTitle": "Podijelite zapise novčanika",
+    "exportLogsBody": "Ova datoteka pomaže našem timu za podršku da istraži probleme s vašim novčanicima. Sadrži povijest plaćanja (iznose, račune i adrese) i identifikatore svakog novčanika bez skrbništva na ovom uređaju, ne samo ovog, ali nikada vaše pričuvne fraze ni ključeve. Podijelite je samo s našim timom za podršku.",
+    "exportLogsConfirm": "Podijeli zapise",
+    "noLogsYet": "Još nema zapisa za dijeljenje. Otvorite novčanik i pokušajte ponovno.",
+    "exportLogsError": "Nije moguće izvesti zapise. Pokušajte ponovno."
   },
   "lnurl": {
     "overLimit": "Ne možete poslati više od maksimalnog iznosa",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Napravite sigurnosnu kopiju novčanika",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Odaberite metodu sigurnosne kopije",

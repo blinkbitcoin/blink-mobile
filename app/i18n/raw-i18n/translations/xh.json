@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
     "deleteAccountWarning": "Qaphela: Ukuvalwa kwe-akhawunti kusisigxina!\nQinisekisa ukuba iiwoleti azinayo imali ngaphambi kokuvala.\nI-akhawunti evaliweyo ayinakubuyiselwa.\nSinokugcina iirekhodi ezithile njengoko kufunwa luluthetho.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Khuphela iirekhodi",
+    "exportLogsTitle": "Yabelana ngerekhodi zesipaji sakho",
+    "exportLogsBody": "Le fayile inceda iqela lethu loncedo liphande iingxaki zesipaji sakho. Iqulethe imbali yentlawulo (izixa, ii-invoyisi needilesi) nezichongi zesipaji ngasinye esingagcinwanga kwesi sixhobo, hayi esi kuphela, kodwa ayinazo iibinzana zakho zokugcina okanye izitshixo. Yabelana ngayo kuphela neqela lethu loncedo.",
+    "exportLogsConfirm": "Yabelana ngerekhodi",
+    "noLogsYet": "Akukabikho rekhodi zokwabelana. Vula isipaji sakho uzame kwakhona.",
+    "exportLogsError": "Ayiphumelelanga ukukhuphela iirekhodi. Nceda uzame kwakhona."
   },
   "lnurl": {
     "overLimit": "You can't send more than max amount",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Gcina isipaji sakho",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Khetha indlela yakho yokugcina",

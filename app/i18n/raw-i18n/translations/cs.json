@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Něco se pokazilo. Pro další pomoc kontaktujte {email: string}.",
     "bye": "Nashledanou!",
     "deleteAccountWarning": "Pozor: Zavření účtu je nevratné!\nPřed zavřením se ujistěte, že peněženky nemají žádné prostředky.\nZavřený účet nelze obnovit.\nNěkteré záznamy můžeme uchovávat, pokud to vyžaduje zákon.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Stáhnout logy",
+    "exportLogsTitle": "Sdílet logy peněženky",
+    "exportLogsBody": "Tento soubor pomáhá našemu týmu podpory prozkoumat problémy s vašimi peněženkami. Obsahuje historii plateb (částky, faktury a adresy) a identifikátory každé nesvěřenské peněženky v tomto zařízení, nejen této, ale nikdy vaše záložní fráze ani klíče. Sdílejte ho jen s naším týmem podpory.",
+    "exportLogsConfirm": "Sdílet logy",
+    "noLogsYet": "Zatím nejsou žádné logy ke sdílení. Otevřete peněženku a zkuste to znovu.",
+    "exportLogsError": "Logy se nepodařilo exportovat. Zkuste to prosím znovu."
   },
   "lnurl": {
     "overLimit": "Nemůžete poslat více než maximální částku",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Zálohujte peněženku",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Vyberte metodu zálohování",

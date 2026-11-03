@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Ceva nu a mers bine. Contactați {email: string} pentru asistență suplimentară.",
     "bye": "La revedere!",
     "deleteAccountWarning": "Atenție: Închiderea contului este permanentă!\nAsigurați-vă că portofelele nu au fonduri înainte de închidere.\nUn cont închis nu poate fi restabilit.\nEste posibil să păstrăm anumite înregistrări conform cerințelor legale.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Descarcă jurnalele",
+    "exportLogsTitle": "Partajează jurnalele portofelului",
+    "exportLogsBody": "Acest fișier ajută echipa noastră de suport să investigheze problemele portofelelor tale. Include istoricul plăților (sume, facturi și adrese) și identificatorii fiecărui portofel non-custodial de pe acest dispozitiv, nu doar al acestuia, dar niciodată frazele de recuperare sau cheile. Partajează-l doar cu echipa noastră de suport.",
+    "exportLogsConfirm": "Partajează jurnalele",
+    "noLogsYet": "Nu există încă jurnale de partajat. Deschide portofelul și încearcă din nou.",
+    "exportLogsError": "Nu s-au putut exporta jurnalele. Încearcă din nou."
   },
   "lnurl": {
     "overLimit": "Nu puteți trimite mai mult decât suma maximă",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Fă o copie de siguranță a portofelului",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Alege metoda de backup",

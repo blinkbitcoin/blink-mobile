@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
     "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Unduh log",
+    "exportLogsTitle": "Bagikan log dompet Anda",
+    "exportLogsBody": "File ini membantu tim dukungan kami menelusuri masalah pada dompet Anda. File ini berisi riwayat pembayaran (jumlah, faktur, dan alamat) serta pengenal setiap dompet non-kustodial di perangkat ini, bukan hanya yang ini, tetapi tidak pernah frasa cadangan atau kunci Anda. Bagikan hanya kepada tim dukungan kami.",
+    "exportLogsConfirm": "Bagikan log",
+    "noLogsYet": "Belum ada log untuk dibagikan. Buka dompet Anda dan coba lagi.",
+    "exportLogsError": "Tidak dapat mengekspor log. Silakan coba lagi."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Cadangkan dompet Anda",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Pilih metode cadangan Anda",

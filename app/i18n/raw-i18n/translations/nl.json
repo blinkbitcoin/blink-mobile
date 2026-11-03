@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Er is iets fout gegaan. Neem contact op met {email: string} voor verdere hulp.",
     "bye": "Doei!",
     "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Logbestanden downloaden",
+    "exportLogsTitle": "Deel de logbestanden van je portemonnee",
+    "exportLogsBody": "Dit bestand helpt ons supportteam problemen met je portemonnees te onderzoeken. Het bevat de betalingsgeschiedenis (bedragen, facturen en adressen) en de portemonnee-id's van elke niet-bewaarde portemonnee op dit apparaat, niet alleen deze, maar nooit je herstelzinnen of sleutels. Deel het alleen met ons supportteam.",
+    "exportLogsConfirm": "Logbestanden delen",
+    "noLogsYet": "Er zijn nog geen logbestanden om te delen. Open je portemonnee en probeer het opnieuw.",
+    "exportLogsError": "Logbestanden exporteren is mislukt. Probeer het opnieuw."
   },
   "lnurl": {
     "overLimit": "U kunt niet meer dan het maximale bedrag verzenden",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Maak een back-up van je portemonnee",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies je back-upmethode",

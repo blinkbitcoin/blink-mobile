@@ -3083,12 +3083,12 @@
     "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
     "bye": "Adéu!",
     "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei.",
-    "downloadLogs": "Download logs",
-    "exportLogsTitle": "Share your wallet logs",
-    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-    "exportLogsConfirm": "Share logs",
-    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-    "exportLogsError": "Couldn't export your logs. Please try again."
+    "downloadLogs": "Baixa els registres",
+    "exportLogsTitle": "Comparteix els registres de la cartera",
+    "exportLogsBody": "Aquest fitxer ajuda l'equip de suport a investigar problemes amb les teves carteres. Inclou l'historial de pagaments (imports, factures i adreces) i els identificadors de cada cartera no custodiada d'aquest dispositiu, no només d'aquesta, però mai les frases de còpia de seguretat ni les claus. Comparteix-lo només amb el nostre equip de suport.",
+    "exportLogsConfirm": "Comparteix els registres",
+    "noLogsYet": "Encara no hi ha registres per compartir. Obre la cartera i torna-ho a provar.",
+    "exportLogsError": "No s'han pogut exportar els registres. Torna-ho a provar."
   },
   "lnurl": {
     "overLimit": "No pots enviar més que l'import màxim",
@@ -3818,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Fes una còpia de seguretat de la cartera",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Tria el teu mètode de còpia de seguretat",

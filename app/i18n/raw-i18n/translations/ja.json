@@ -3083,12 +3083,12 @@
         "deleteAccountError": "エラーが発生しました。お問い合わせは{email: string}までお願いします。",
         "bye": "バイバイ！",
         "deleteAccountWarning": "注意：アカウントの閉鎖は永久です！\n閉じる前にウォレットに資金がないことを確認してください。\n閉じられたアカウントは復元できません。\n法令により特定の記録を保持する場合があります。",
-        "downloadLogs": "Download logs",
-        "exportLogsTitle": "Share your wallet logs",
-        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
-        "exportLogsConfirm": "Share logs",
-        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
-        "exportLogsError": "Couldn't export your logs. Please try again."
+        "downloadLogs": "ログをダウンロード",
+        "exportLogsTitle": "ウォレットのログを共有",
+        "exportLogsBody": "このファイルは、サポートチームがウォレットの問題を調べるために使います。この端末上のすべての非カストディアルウォレット（このウォレットだけでなく）の支払い履歴（金額、請求書、アドレス）とウォレット識別子が含まれますが、リカバリーフレーズや鍵は含まれません。サポートチームにだけ共有してください。",
+        "exportLogsConfirm": "ログを共有",
+        "noLogsYet": "共有できるログはまだありません。ウォレットを開いて、もう一度お試しください。",
+        "exportLogsError": "ログを書き出せませんでした。もう一度お試しください。"
     },
     "lnurl": {
         "overLimit": "最大限度額以上の送金はできません",
@@ -3818,7 +3818,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "ウォレットをバックアップ",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "バックアップ方法を選択",
