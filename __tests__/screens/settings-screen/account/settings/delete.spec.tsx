@@ -13,6 +13,8 @@ const mockSetAccountIsBeingDeleted = jest.fn()
 const mockSetOptions = jest.fn()
 const mockReset = jest.fn()
 const mockLogout = jest.fn()
+const mockSetAppUnlocked = jest.fn()
+const mockSetAppLocked = jest.fn()
 const mockSwitchToNextProfile = jest.fn()
 
 let mockSettingsData: unknown = { me: { defaultAccount: { wallets: [] } } }
@@ -40,6 +42,17 @@ jest.mock("@app/hooks/use-logout", () => ({
 jest.mock("@app/hooks", () => ({
   ...jest.requireActual("@app/hooks"),
   useAppConfig: () => ({ appConfig: { token: "custodial-token" } }),
+}))
+
+/** The profile switch's module reads the lock flag from this context, which pulls in native
+ *  boot code; the switch itself is stood in for below, so only the import has to load.
+ *  The lock setters are the routing rule's, which decides where a finished logout lands. */
+jest.mock("@app/navigation/navigation-container-wrapper", () => ({
+  useAuthenticationContext: () => ({
+    isAppLocked: false,
+    setAppUnlocked: mockSetAppUnlocked,
+    setAppLocked: mockSetAppLocked,
+  }),
 }))
 
 jest.mock("@app/hooks/use-switch-to-next-profile", () => ({
@@ -162,6 +175,7 @@ describe("Delete", () => {
       data: { accountDelete: { success: true, errors: [] } },
     })
     mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.Switched)
+    mockLogout.mockResolvedValue({ isAppLockKept: false })
     jest
       .spyOn(Alert, "alert")
       .mockImplementation((title, body, buttons) =>
@@ -315,6 +329,38 @@ describe("Delete", () => {
         index: 0,
         routes: [{ name: "getStarted" }],
       })
+    })
+
+    /**
+     * The device still stores a wallet the lock guards, so the logout kept it. The landing
+     * screen opens an account and any account lists that wallet, so the farewell has to
+     * lead back to the gate instead.
+     */
+    it("returns to the gate when the logout kept the lock", async () => {
+      mockSwitchToNextProfile.mockResolvedValue(SwitchProfileOutcome.NoOtherProfile)
+      mockLogout.mockResolvedValue({ isAppLockKept: true })
+      await openDeletionModal()
+      await confirmDeletion()
+      await pressAlertButton(alertCalls.length - 1, "OK")
+
+      expect(mockSetAppLocked).toHaveBeenCalledTimes(1)
+      expect(mockReset).toHaveBeenCalledWith({
+        index: 0,
+        routes: [{ name: "authenticationCheck" }],
+      })
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
+    })
+
+    /** The switched path runs no logout, so nothing dropped the lock: the session it moved
+     *  to stays in front of it rather than the user being sent anywhere. */
+    it("routes nowhere when another profile took over", async () => {
+      await openDeletionModal()
+      await confirmDeletion()
+      await pressAlertButton(alertCalls.length - 1, "OK")
+
+      expect(mockReset).not.toHaveBeenCalled()
+      expect(mockSetAppLocked).not.toHaveBeenCalled()
+      expect(mockSetAppUnlocked).not.toHaveBeenCalled()
     })
   })
 

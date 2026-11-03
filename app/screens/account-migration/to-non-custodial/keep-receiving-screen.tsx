@@ -16,7 +16,7 @@ import { useAppConfig } from "@app/hooks"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { getLightningAddress } from "@app/utils/pay-links"
 import { reportError } from "@app/utils/error-logging"
 import { testProps } from "@app/utils/testProps"
@@ -143,7 +143,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
   if (!hasLightningAddress) return null
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       footer={
         <GaloyPrimaryButton
           title={LL.AccountMigration.keepReceivingCta()}
@@ -172,7 +172,7 @@ export const MigrationKeepReceivingScreen: React.FC = () => {
           {lightningAddress}
         </Text>
       </View>
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
 

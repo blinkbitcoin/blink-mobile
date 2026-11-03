@@ -73,13 +73,14 @@ jest.mock("@app/i18n/i18n-react", () => ({
     LL: {
       common: { cancel: () => "Cancel" },
       SendBitcoinScreen: {
-        fast: () => "Fast",
-        medium: () => "Medium",
-        slow: () => "Slow",
+        fast: () => "Priority",
+        medium: () => "Standard",
+        slow: () => "Economy",
       },
       UnclaimedDeposit: {
         cardTitle: ({ sats }: { sats: string }) => `Claim ${sats} sats`,
         immature: () => "Waiting for confirmations...",
+        claiming: () => "Claiming...",
         claim: () => "Claim now",
         refund: () => "Refund",
         refundAddress: () => "Bitcoin address for refund",
@@ -155,9 +156,9 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     enterRefundMode(utils)
 
     // Each row reads "<label> <eta>", so the rate is matched at the head of the row.
-    expect(utils.getByText(/^Fast \(30 sat\/vB\) /)).toBeTruthy()
-    expect(utils.getByText(/^Medium \(20 sat\/vB\) /)).toBeTruthy()
-    expect(utils.getByText(/^Slow \(10 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Priority \(30 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Standard \(20 sat\/vB\) /)).toBeTruthy()
+    expect(utils.getByText(/^Economy \(10 sat\/vB\) /)).toBeTruthy()
   })
 
   it("labels the tiers without a rate until the rates are quoted", () => {
@@ -166,7 +167,7 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     enterRefundMode(utils)
 
     // A zeroed placeholder must not read as a rate the SDK actually returned.
-    expect(utils.getByText(/^Medium ~/)).toBeTruthy()
+    expect(utils.getByText(/^Standard ~/)).toBeTruthy()
     expect(utils.queryByText(/sat\/vB/)).toBeNull()
   })
 
@@ -273,7 +274,7 @@ describe("UnclaimedDepositsScreen — refund fee gating", () => {
     enterRefundMode(utils)
     setAddress(utils, "bc1qaddr")
 
-    fireEvent.press(utils.getByText(/^Fast/))
+    fireEvent.press(utils.getByText(/^Priority/))
     fireEvent.press(utils.getByTestId("refund-now-button"))
 
     expect(mockHandleRefund).toHaveBeenCalledWith(
@@ -347,6 +348,16 @@ describe("UnclaimedDepositsScreen — broader flows", () => {
     const utils = renderScreen()
 
     expect(utils.getByText("Waiting for confirmations...")).toBeTruthy()
+    expect(utils.queryByTestId(`claim-${claimableDeposit.id}`)).toBeNull()
+    expect(utils.queryByTestId(`refund-toggle-${claimableDeposit.id}`)).toBeNull()
+  })
+
+  it("shows the claiming copy and hides claim/refund actions for deposits claimed early", () => {
+    mockDeposits = [{ ...claimableDeposit, status: DepositStatus.Claiming }]
+    const utils = renderScreen()
+
+    expect(utils.getByText("Claiming...")).toBeTruthy()
+    expect(utils.queryByText("Waiting for confirmations...")).toBeNull()
     expect(utils.queryByTestId(`claim-${claimableDeposit.id}`)).toBeNull()
     expect(utils.queryByTestId(`refund-toggle-${claimableDeposit.id}`)).toBeNull()
   })

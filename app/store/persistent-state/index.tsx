@@ -256,21 +256,27 @@ export const loadPersistentState = async (): Promise<LoadedPersistentState> => {
  * failure here leaves a session credential behind after the profile backing it
  * is gone. On persistent failure the ref keeps the old value, so the next save
  * sees a mismatch and tries again.
+ *
+ * Returns whether the credential is provably gone, because a caller erasing the app lock
+ * has to know: a lock dropped over a bearer token that survived in the keychain leaves that
+ * token recoverable on the next launch with nothing in front of it.
  */
 const removeActiveTokenDurably = async (
   lastPersistedTokenRef: React.MutableRefObject<string>,
-): Promise<void> => {
+): Promise<boolean> => {
   const ok =
     (await KeyStoreWrapper.removeActiveToken()) ||
     (await KeyStoreWrapper.removeActiveToken())
   if (ok) {
     // eslint-disable-next-line require-atomic-updates -- single writer; the provider's save queue serializes this with saves
     lastPersistedTokenRef.current = ""
-  } else {
-    reportError("Active token keychain removal", new Error("keystore remove failed"), {
-      alwaysRecord: true,
-    })
+    return true
   }
+
+  reportError("Active token keychain removal", new Error("keystore remove failed"), {
+    alwaysRecord: true,
+  })
+  return false
 }
 
 /**
@@ -329,8 +335,12 @@ export type PersistentStateContextType = {
    * token it no longer had — after which every subsequent save saw "nothing
    * changed" and skipped the write. The provider owns that slot; going through
    * it keeps the ref and the keychain in step by construction.
+   *
+   * Resolves to whether the keychain copy is provably gone. A caller that erases the app
+   * lock on the strength of "nothing is left" has to include this: a lock dropped over a
+   * surviving bearer token leaves it recoverable with nothing in front of it.
    */
-  clearToken: () => Promise<void>
+  clearToken: () => Promise<boolean>
 }
 
 // TODO: should not be exported
@@ -379,7 +389,7 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
     setPersistentState(defaultPersistentState)
   }, [])
 
-  const clearToken = React.useCallback(async () => {
+  const clearToken = React.useCallback(async (): Promise<boolean> => {
     hasModified.current = true
     // Through the same queue as the saves, so the ref has exactly one writer at
     // a time. Awaited by the caller: logout must know the credential is gone
@@ -389,9 +399,11 @@ export const PersistentStateProvider: React.FC<PropsWithChildren> = ({ children 
     const removal = saveQueueRef.current.then(() =>
       removeActiveTokenDurably(lastPersistedTokenRef),
     )
-    saveQueueRef.current = removal
+    /** The queue only orders the writes, so it takes the removal stripped of its answer;
+     *  the answer goes to the caller, which decides whether the app lock may go with it. */
+    saveQueueRef.current = removal.then(() => undefined)
     setPersistentState((prev) => (prev ? { ...prev, galoyAuthToken: "" } : prev))
-    await removal
+    return removal
   }, [])
 
   if (!persistentState) return null

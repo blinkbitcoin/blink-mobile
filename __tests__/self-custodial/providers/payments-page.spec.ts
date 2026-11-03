@@ -6,7 +6,7 @@ import {
 const mockListPayments = jest.fn()
 const mockMapTransactions = jest.fn()
 const mockRecordErrorOnce = jest.fn()
-const mockRequireSparkTokenIdentifier = jest.fn()
+const mockSparkTokenIdentifier = jest.fn()
 
 jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   PaymentMethod: { Token: "Token", Lightning: "Lightning" },
@@ -22,7 +22,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
 }))
 
 jest.mock("@app/self-custodial/config", () => ({
-  requireSparkTokenIdentifier: () => mockRequireSparkTokenIdentifier(),
+  sparkTokenIdentifier: () => mockSparkTokenIdentifier(),
 }))
 
 jest.mock("@app/self-custodial/logging", () => ({
@@ -50,7 +50,7 @@ describe("fetchAndMapPayments", () => {
   beforeEach(() => {
     jest.clearAllMocks()
     mockMapTransactions.mockReturnValue([])
-    mockRequireSparkTokenIdentifier.mockReturnValue("usdb")
+    mockSparkTokenIdentifier.mockReturnValue("usdb")
   })
 
   it("asks the SDK for one page starting at the given offset", async () => {
@@ -118,6 +118,23 @@ describe("fetchAndMapPayments", () => {
       expect.objectContaining({
         message: expect.stringContaining("Unknown token payment dropped"),
       }),
+    )
+  })
+
+  /** Staging has no dollar token unless the build names one: any token payment there has
+   *  no wallet to land in, and reading the token must not throw on the history page. */
+  it("drops every token payment on a network with no token configured", async () => {
+    mockSparkTokenIdentifier.mockReturnValue(null)
+    mockListPayments.mockResolvedValue({
+      payments: [lightningPayment, tokenPayment("btknrt1-any")],
+    })
+
+    await fetchAndMapPayments(sdk, 0)
+
+    expect(mockMapTransactions).toHaveBeenCalledWith([lightningPayment])
+    expect(mockRecordErrorOnce).toHaveBeenCalledWith(
+      "spark-unknown-token-payment:btknrt1-any",
+      expect.objectContaining({ message: expect.stringContaining("expected=none") }),
     )
   })
 

@@ -172,7 +172,7 @@ export const InviteModal: React.FC<Props> = ({ isVisible, setIsVisible }) => {
           </View>
         </View>
       </View>
-      <GaloyToast />
+      <GaloyToast inModal />
     </Modal>
   )
 }

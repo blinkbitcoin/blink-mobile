@@ -51,7 +51,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args) => ({ tag: "Set", inner: args })),
   },
-  MaxFee: {
+  MaxFee: { create: (p: Record<string, unknown>) => p },
+  MaxOnchainFee: {
     NetworkRecommended: jest
       .fn()
       .mockImplementation((inner) => ({ tag: "NetworkRecommended", inner })),

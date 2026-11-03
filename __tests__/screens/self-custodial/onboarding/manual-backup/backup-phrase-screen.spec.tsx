@@ -4,7 +4,7 @@ import { loadLocale } from "@app/i18n/i18n-util.sync"
 import { i18nObject } from "@app/i18n/i18n-util"
 
 import { BackupPhraseScreen } from "@app/screens/self-custodial/onboarding/manual-backup/backup-phrase-screen"
-import { ContextForScreen } from "../../../helper"
+import { ContextForScreen, ContextForScreenWithTheme } from "../../../helper"
 import { flushEffects } from "../../../../helpers/flush-effects"
 
 const mockNavigate = jest.fn()
@@ -23,6 +23,25 @@ jest.mock("@app/utils/error-logging", () => ({
   reportError: (...args: readonly unknown[]) => mockReportError(...args),
 }))
 
+const mockReleaseScreenSecurity = jest.fn(() => Promise.resolve())
+let mockLeaseReady: Promise<void> = Promise.resolve()
+jest.mock("@app/utils/screen-security", () => ({
+  acquireScreenSecurity: () => ({
+    ready: mockLeaseReady,
+    release: mockReleaseScreenSecurity,
+  }),
+}))
+
+const deferred = <T,>() => {
+  let resolve: (value: T) => void = () => {}
+  let reject: (reason: Error) => void = () => {}
+  const promise = new Promise<T>((res, rej) => {
+    resolve = res
+    reject = rej
+  })
+  return { promise, resolve, reject }
+}
+
 const renderHeaderRight = () => {
   const calls = mockSetOptions.mock.calls
   const lastOptions = calls[calls.length - 1]?.[0]
@@ -32,9 +51,13 @@ const renderHeaderRight = () => {
 
 const mockCopyToClipboard = jest.fn()
 let mockCountdown = { remainingSeconds: 0, isExpired: true }
+const mockUseCountdown = jest.fn()
 jest.mock("@app/hooks", () => ({
   useClipboard: () => ({ copyToClipboard: mockCopyToClipboard }),
-  useCountdown: () => mockCountdown,
+  useCountdown: (expiresAt: Date) => {
+    mockUseCountdown(expiresAt)
+    return mockCountdown
+  },
 }))
 
 jest.mock("@app/config/feature-flags-context", () => ({
@@ -81,6 +104,47 @@ describe("BackupPhraseScreen", () => {
     mockStep = 1
     mockHasParams = true
     mockCountdown = { remainingSeconds: 0, isExpired: true }
+    mockLeaseReady = Promise.resolve()
+  })
+
+  /** The screen shows the mnemonic and a header Copy action; until the screen
+   *  guard is actually on, none of that may exist — a pending or failed
+   *  registration must not paint the seed words. */
+  describe("screen security gate", () => {
+    it("shows no seed words while registration is pending, and the words once it resolves", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByText } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(queryByText("youth")).toBeNull()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+
+      registration.resolve(undefined)
+      expect(await findByText("youth")).toBeTruthy()
+    })
+
+    it("keeps the seed words unmounted when registration is exhausted", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      const { queryByText, findByTestId } = render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      registration.reject(new Error("native failure"))
+
+      expect(await findByTestId("screen-security-retry")).toBeTruthy()
+      expect(queryByText("youth")).toBeNull()
+      expect(mockSetOptions).not.toHaveBeenCalled()
+    })
   })
 
   /** Deep links and navigation-state rehydration can deliver missing or malformed params;
@@ -135,6 +199,27 @@ describe("BackupPhraseScreen", () => {
 
       expect(mockReportError).not.toHaveBeenCalled()
     })
+
+    /** The report must not wait for the screen guard: on a device where registration
+     *  keeps failing the gated content never mounts, and the signal would be lost. */
+    it("reports malformed params even while the guard is still pending", async () => {
+      mockHasParams = false
+      mockLeaseReady = new Promise(() => {}) // the guard never activates
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        expect.any(String),
+        expect.any(Error),
+        expect.objectContaining({ dedupKey: "backup-phrase-params-missing" }),
+      )
+    })
   })
 
   describe("step 1", () => {
@@ -187,6 +272,53 @@ describe("BackupPhraseScreen", () => {
       expect(
         getByText(new RegExp(LL.BackupScreen.ManualBackup.Phrase.saveItNow())),
       ).toBeTruthy()
+    })
+
+    /** A theme flip re-acquires the guard to apply the new mask color, and the gate
+     *  mounts the words again while that lands. The deadline is held above the gate,
+     *  so the user who already waited is not made to wait again. */
+    it("resumes the countdown when a theme flip mounts the words again", async () => {
+      const renderInMode = (mode: "light" | "dark") => (
+        <ContextForScreenWithTheme mode={mode}>
+          <BackupPhraseScreen />
+        </ContextForScreenWithTheme>
+      )
+
+      const { getByText, rerender } = render(renderInMode("light"))
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      const [firstDeadline] = mockUseCountdown.mock.calls[0]
+
+      rerender(renderInMode("dark"))
+      await flushEffects()
+
+      // The gate did re-activate: the first lease was handed back for a new one.
+      expect(mockReleaseScreenSecurity).toHaveBeenCalledTimes(1)
+      await waitFor(() => expect(getByText("youth")).toBeTruthy())
+      const [lastDeadline] =
+        mockUseCountdown.mock.calls[mockUseCountdown.mock.calls.length - 1]
+      expect(lastDeadline).toBe(firstDeadline)
+    })
+
+    it("starts the countdown once the words show, not while the guard registers", async () => {
+      const now = jest.spyOn(Date, "now").mockReturnValue(1_000)
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      render(
+        <ContextForScreen>
+          <BackupPhraseScreen />
+        </ContextForScreen>,
+      )
+      await flushEffects()
+      expect(mockUseCountdown).not.toHaveBeenCalled()
+
+      now.mockReturnValue(30_000)
+      registration.resolve(undefined)
+      await flushEffects()
+      now.mockRestore()
+
+      const [deadline] = mockUseCountdown.mock.calls[0]
+      expect(deadline.getTime()).toBe(40_000)
     })
 
     it("disables button during countdown", async () => {
@@ -322,12 +454,13 @@ describe("BackupPhraseScreen", () => {
       ).toBeTruthy()
     })
 
-    it("opens the spark-compatible link from the info banner", () => {
+    it("opens the spark-compatible link from the info banner", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       fireEvent.press(
         getByText(LL.BackupScreen.ManualBackup.Phrase.sparkCompatibleLink()),
@@ -336,16 +469,36 @@ describe("BackupPhraseScreen", () => {
       expect(mockOpenExternalUrl).toHaveBeenCalledWith("https://example.com")
     })
 
-    it("renders the do-not-share warning card", () => {
+    it("renders the do-not-share warning card", async () => {
       const { getByText } = render(
         <ContextForScreen>
           <BackupPhraseScreen />
         </ContextForScreen>,
       )
+      await flushEffects()
 
       expect(
         getByText(LL.BackupScreen.ManualBackup.Phrase.doNotShareWarning()),
       ).toBeTruthy()
     })
+  })
+
+  /** setOptions has no owner: the route keeps the last value, so a header action
+   *  installed by gated content outlives the unmount that was supposed to hide it. */
+  it("clears the Copy action from the header when the content unmounts", async () => {
+    const { unmount } = render(
+      <ContextForScreen>
+        <BackupPhraseScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+    expect(mockSetOptions).toHaveBeenCalled()
+
+    unmount()
+
+    const calls = mockSetOptions.mock.calls
+    expect(calls[calls.length - 1]?.[0]).toEqual(
+      expect.objectContaining({ headerRight: undefined }),
+    )
   })
 })

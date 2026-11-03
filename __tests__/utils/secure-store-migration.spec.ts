@@ -1,7 +1,7 @@
 /* eslint-disable camelcase */
 import { ACCESSIBLE } from "react-native-keychain"
 
-import { legacyErase, legacyRead } from "@app/utils/storage/legacy-key-store"
+import { legacyBlank, legacyErase, legacyRead } from "@app/utils/storage/legacy-key-store"
 import {
   existsThrough,
   readThrough,
@@ -40,6 +40,7 @@ jest.mock("@app/utils/storage/legacy-key-store", () => ({
   ...jest.requireActual("@app/utils/storage/legacy-key-store"),
   legacyRead: jest.fn(),
   legacyErase: jest.fn(),
+  legacyBlank: jest.fn(),
 }))
 
 const mockedSecureRead = jest.mocked(secureRead)
@@ -48,6 +49,7 @@ const mockedSecureRemove = jest.mocked(secureRemove)
 const mockedSecureExists = jest.mocked(secureExists)
 const mockedLegacyRead = jest.mocked(legacyRead)
 const mockedLegacyErase = jest.mocked(legacyErase)
+const mockedLegacyBlank = jest.mocked(legacyBlank)
 
 const ARGS = {
   slot: "sessionProfiles",
@@ -72,6 +74,7 @@ describe("readThrough", () => {
     mockLogEvent.mockResolvedValue(undefined)
     mockedSecureWrite.mockResolvedValue(true)
     mockedLegacyErase.mockResolvedValue(true)
+    mockedLegacyBlank.mockResolvedValue(true)
   })
 
   describe("the new store answers", () => {
@@ -168,6 +171,7 @@ describe("readThrough", () => {
     it("still returns the value when erasing the legacy copy fails", async () => {
       mockedLegacyRead.mockResolvedValue({ status: "found", value: "legacy-value" })
       mockedLegacyErase.mockResolvedValue(false)
+      mockedLegacyBlank.mockResolvedValue(false)
 
       const read = await readThrough(ARGS)
 
@@ -181,14 +185,13 @@ describe("readThrough", () => {
     })
 
     it("reports nothing when the erase failed on a key that was already gone", async () => {
-      mockedLegacyRead
-        .mockResolvedValueOnce({ status: "found", value: "legacy-value" })
-        .mockResolvedValueOnce({ status: "absent" })
+      mockedLegacyRead.mockResolvedValue({ status: "found", value: "legacy-value" })
       mockedLegacyErase.mockResolvedValue(false)
 
       const read = await readThrough(ARGS)
 
       expect(read).toEqual({ status: "found", value: "legacy-value" })
+      expect(mockedLegacyBlank).toHaveBeenCalledWith(ARGS.legacyKey)
       expect(mockRecordAppError).not.toHaveBeenCalled()
     })
 
@@ -331,6 +334,7 @@ describe("removeThrough", () => {
     mockLogEvent.mockResolvedValue(undefined)
     mockedSecureRemove.mockResolvedValue(true)
     mockedLegacyErase.mockResolvedValue(true)
+    mockedLegacyBlank.mockResolvedValue(true)
   })
 
   it("erases the legacy copy before removing the new slot", async () => {
@@ -356,9 +360,9 @@ describe("removeThrough", () => {
     expect(await removeThrough(REMOVE_ARGS)).toBe(false)
   })
 
-  it("leaves the new slot alone when the legacy copy is still readable", async () => {
+  it("leaves the new slot alone when the keychain refuses the blank too", async () => {
     mockedLegacyErase.mockResolvedValue(false)
-    mockedLegacyRead.mockResolvedValue({ status: "found", value: "legacy-value" })
+    mockedLegacyBlank.mockResolvedValue(false)
 
     expect(await removeThrough(REMOVE_ARGS)).toBe(false)
     // Emptying the new store here is what would make the stale copy the answer
@@ -372,17 +376,20 @@ describe("removeThrough", () => {
     )
   })
 
-  it("leaves the new slot alone when the legacy store cannot say what is left", async () => {
+  /**
+   * The iOS module answers a failing keychain's lookup with the missing-key code, so a read
+   * would call this copy gone. Only the keychain taking a write is proof.
+   */
+  it("never asks a read whether a copy the keychain would not erase is gone", async () => {
     mockedLegacyErase.mockResolvedValue(false)
-    mockedLegacyRead.mockResolvedValue({
-      status: "failed",
-      err: new Error("keystore unavailable"),
-    })
+    mockedLegacyBlank.mockResolvedValue(false)
+    mockedLegacyRead.mockResolvedValue({ status: "absent" })
 
     // Emptying the new store here would turn "two copies, one deleted" into
     // "one copy, and it is the stale one" the moment the legacy store recovers.
     expect(await removeThrough(REMOVE_ARGS)).toBe(false)
     expect(mockedSecureRemove).not.toHaveBeenCalled()
+    expect(mockedLegacyRead).not.toHaveBeenCalled()
   })
 
   it("reports false when the operation times out", async () => {
@@ -396,11 +403,41 @@ describe("removeThrough", () => {
   })
 
   it("succeeds when the erase failed on a key that was never there", async () => {
-    mockedLegacyErase.mockResolvedValue(false)
-    mockedLegacyRead.mockResolvedValue({ status: "absent" })
+    mockedLegacyErase.mockResolvedValueOnce(false).mockResolvedValueOnce(true)
 
     expect(await removeThrough(REMOVE_ARGS)).toBe(true)
+    expect(mockedLegacyBlank).toHaveBeenCalledWith(REMOVE_ARGS.legacyKey)
+    expect(mockedSecureRemove).toHaveBeenCalledWith(REMOVE_ARGS.slot)
     expect(mockRecordAppError).not.toHaveBeenCalled()
+  })
+
+  it("tidies the blank away once it has landed", async () => {
+    const calls: string[] = []
+    mockedLegacyErase.mockImplementation(async () => {
+      calls.push("erase")
+      return calls.length > 1
+    })
+    mockedLegacyBlank.mockImplementation(async () => {
+      calls.push("blank")
+      return true
+    })
+
+    await removeThrough(REMOVE_ARGS)
+
+    expect(calls).toEqual(["erase", "blank", "erase"])
+  })
+
+  it("counts a landed blank as gone when the delete after it fails", async () => {
+    // The blank reads as absent in both stores, so what is left holds nothing to serve.
+    mockedLegacyErase.mockResolvedValue(false)
+
+    expect(await removeThrough(REMOVE_ARGS)).toBe(true)
+    expect(mockedSecureRemove).toHaveBeenCalledWith(REMOVE_ARGS.slot)
+  })
+
+  it("does not blank a copy the delete already removed", async () => {
+    expect(await removeThrough(REMOVE_ARGS)).toBe(true)
+    expect(mockedLegacyBlank).not.toHaveBeenCalled()
   })
 })
 

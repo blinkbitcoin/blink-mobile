@@ -77,9 +77,18 @@ const CustodialAccountBanner: React.FC = () => {
         <View style={styles.iconContainer}>
           <AccountIcon size={25} />
         </View>
-        <Text type="p2">
-          {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
-        </Text>
+        <View style={styles.textContainer}>
+          {/* The address shares the row with the subtitle, so it gets one line and a tail
+              ellipsis; the logged-out sentence has no subtitle and keeps its room to wrap. */}
+          <Text type="p2" numberOfLines={isUserLoggedIn ? 1 : undefined}>
+            {isUserLoggedIn ? usernameTitle : LL.SettingsScreen.logInOrCreateAccount()}
+          </Text>
+          {isUserLoggedIn && (
+            <Text type="p3" style={styles.subtitle}>
+              {LL.SettingsScreen.custodialAccount()}
+            </Text>
+          )}
+        </View>
       </View>
     </TouchableWithoutFeedback>
   )
@@ -162,7 +171,7 @@ export const AccountIcon: React.FC<{ size: number }> = ({ size }) => {
 
 const useStyles = makeStyles((theme) => ({
   outer: {
-    height: 70,
+    minHeight: 70,
     padding: 4,
     display: "flex",
     flexDirection: "row",

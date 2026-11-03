@@ -51,4 +51,15 @@ describe("deep-linkable routes", () => {
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingTransferInvestScreen")
     expect(DEEP_LINK_SCREENS).not.toHaveProperty("cardOnboardingDepositPendingScreen")
   })
+
+  /**
+   * The code screen and the backup take the setup key as a param. A link landing on
+   * either would show a key the registration never issued, and offer to save it as the
+   * account's. The registration is reached from its own start alone.
+   */
+  it("links to no step of the authenticator registration that carries the setup key", () => {
+    const routeNames = collectRouteNames(DEEP_LINK_SCREENS as ScreenConfig)
+    expect(routeNames).not.toContain("totpRegistrationValidate")
+    expect(routeNames).not.toContain("totpRegistrationBackup")
+  })
 })

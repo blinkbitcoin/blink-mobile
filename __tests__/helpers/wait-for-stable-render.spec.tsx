@@ -106,6 +106,9 @@ describe("waitForStableRender", () => {
     const screen = render(<ChurningCallback />)
 
     await expect(waitForStableRender(screen, { maxFlushes: 6 })).resolves.toBeUndefined()
+
+    // It never stops scheduling renders; unmount so the next one cannot land after the test.
+    screen.unmount()
   })
 
   it("waits for a primitive prop to settle", async () => {
