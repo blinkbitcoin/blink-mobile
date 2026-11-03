@@ -44,12 +44,21 @@ describe("resolveInvestmentTerms", () => {
       expect(resolveInvestmentTerms(25000, quote).btcUsdRate).toBe(100000)
     })
 
-    /** The document names the zone, and Honduras holds UTC-6 all year: the stamp says
-     *  which clock fixed the rate, as an offset that reads the same to every party and
-     *  on every device, since a bare time on a binding document says nothing. */
-    it("stamps the rate in Honduras time, naming the offset", () => {
-      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toBe(
-        "2026-09-07 09:09 UTC-06:00",
+    /** The document's label names the zone ("Rate Timestamp (Honduras Time)"), so the
+     *  value is the bare Honduras wall-clock time. */
+    it("stamps the rate in Honduras time", () => {
+      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toBe("2026-09-07 09:09")
+    })
+
+    /** The host checks the figures before the envelope is minted and refuses a stamp
+     *  written any other way; this is its format, and a change on either side breaks
+     *  here before it breaks every mint. */
+    it("writes the stamp in the format the host accepts", () => {
+      const HOST_RATE_TIMESTAMP_FORMAT =
+        /^\d{4}-(0[1-9]|1[0-2])-(0[1-9]|[12]\d|3[01]) ([01]\d|2[0-3]):[0-5]\d$/
+
+      expect(resolveInvestmentTerms(25000, quote).rateTimestamp).toMatch(
+        HOST_RATE_TIMESTAMP_FORMAT,
       )
     })
 

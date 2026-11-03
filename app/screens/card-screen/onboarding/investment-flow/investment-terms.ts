@@ -45,14 +45,6 @@ export const BTC_DECIMALS = 8
  *  right should the zone ever observe daylight saving again. */
 const AGREEMENT_TIMEZONE = "America/Tegucigalpa"
 
-/** How the stamp names that zone on the document: as its offset, which reads the same
- *  to every party and is the same on every device, where a zone's short name is
- *  whatever the phone's own locale data says, or nothing at all. Fixed, because
- *  Honduras keeps UTC-6 all year; the clock above is still shifted by zone name, so
- *  the time stays right should the zone ever observe daylight saving again, and this
- *  label is what would then have to move with it. */
-const AGREEMENT_TIMEZONE_LABEL = "UTC-06:00"
-
 /**
  * The price of one bitcoin, taken in whole cents so the rate the agreement states is the
  * one the feed gave, cents included; a price per satoshi to eight decimals would only
@@ -69,13 +61,14 @@ export const resolveSettlementQuote = (
   return { btcUsdRate: toMajorUnit(usdCentsPerBtc), at }
 }
 
-/** The stamp says which clock fixed the rate; a bare wall-clock time on a binding
- *  document says nothing. */
+/** The stamp is the bare "YYYY-MM-DD HH:mm" the host checks the figures against, which it
+ *  reads in that zone and refuses with anything appended. The document names the zone in
+ *  the field's own label ("Rate Timestamp (Honduras Time)"), so the value carries none. */
 const formatAgreementTime = (at: Date): string =>
-  `${formatUnixTimestampYMDHM({
+  formatUnixTimestampYMDHM({
     timestampSeconds: at.getTime() / 1000,
     timezone: AGREEMENT_TIMEZONE,
-  })} ${AGREEMENT_TIMEZONE_LABEL}`
+  })
 
 export const resolveInvestmentTerms = (
   totalUsd: number,
