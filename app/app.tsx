@@ -32,6 +32,7 @@ import {
   DisplayCurrencyFromRegionMount,
   RecoveryBundleListenerMount,
   TelemetryContextMount,
+  LaunchCleanupMount,
 } from "./self-custodial/components"
 import { AutoConvertStatusProvider } from "./self-custodial/providers/auto-convert-status"
 import { BackupStateProvider } from "./self-custodial/providers/backup-state"
@@ -98,6 +99,7 @@ export const App = () => (
                                               <TelemetryContextMount />
                                               <DisplayCurrencyFromRegionMount />
                                               <RecoveryBundleListenerMount />
+                                              <LaunchCleanupMount />
                                               <RootStack />
                                               <NetworkErrorComponent />
                                               <ActionModals />

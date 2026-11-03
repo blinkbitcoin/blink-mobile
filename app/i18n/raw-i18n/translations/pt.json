@@ -2229,6 +2229,12 @@
         "error": "Falha ao gerar fatura. Entre em contato com o suporte se o problema persistir.",
         "copyInvoice": "Copiar",
         "shareInvoice": "Compartilhar",
+        "newAddress": "Novo",
+        "newAddressHint": "Gera um novo endereço Bitcoin. Os endereços anteriores continuam funcionando.",
+        "newAddressGenerated": "Novo endereço pronto. Os endereços anteriores continuam funcionando.",
+        "newAddressFailed": "Não foi possível gerar um novo endereço. Tente novamente.",
+        "newAddressRateLimited": "Muitos endereços novos. Aguarde um pouco e tente novamente.",
+        "onchainAddressLoadFailed": "Não foi possível carregar seu endereço Bitcoin. Toque em Novo para tentar novamente.",
         "addAmount": "Solicitar valor específico",
         "expired": "A fatura expirou",
         "expiresIn": "Expira em",
@@ -2615,7 +2621,8 @@
     "StablesatsRestriction": {
         "walletLabel": "não está disponível na sua região",
         "anonModeWalletLabel": "não disponível no modo Incognito",
-        "unknownRegionWalletLabel": "não foi possível verificar a disponibilidade, puxe para baixo para tentar novamente"
+        "unknownRegionWalletLabel": "não foi possível verificar a disponibilidade, puxe para baixo para tentar novamente",
+        "networkWalletLabel": "não disponível nesta rede"
     },
     "AnonModeConvertModal": {
         "title": "Transfira primeiro o seu saldo em dólares",
@@ -2697,7 +2704,7 @@
     "TransactionDetailScreen": {
         "paid": "Pago de/para",
         "received": "Você recebeu",
-        "spent": "Você gastou",
+        "sent": "Você enviou",
         "sending": "Enviando",
         "receivingAccount": "Saldo de Recebimento",
         "sendingAccount": "Saldo de Envio",
@@ -3099,7 +3106,13 @@
         "deleteAccountFromPhone": "Olá! Por favor, encerre a minha conta. Meu contato telefônico é {phoneNumber: string}.",
         "deleteAccountError": "Algo deu errado. Fale com {email: string}  para mais assistência.",
         "bye": "Adeus!",
-        "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei."
+        "deleteAccountWarning": "Atenção: O encerramento da conta é permanente!\nCertifique-se de que as carteiras não possuem fundos antes de encerrar.\nUma conta encerrada não pode ser recuperada.\nPodemos reter certos registros conforme exigido por lei.",
+        "downloadLogs": "Download logs",
+        "exportLogsTitle": "Share your wallet logs",
+        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+        "exportLogsConfirm": "Share logs",
+        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+        "exportLogsError": "Couldn't export your logs. Please try again."
     },
     "lnurl": {
         "overLimit": "Você não pode enviar mais do que o valor máximo",

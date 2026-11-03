@@ -1,4 +1,4 @@
-import { StyleProp, TextStyle } from "react-native"
+import { Platform, StyleProp, TextStyle } from "react-native"
 
 import { createTheme } from "@rn-vui/themed"
 
@@ -22,13 +22,18 @@ const theme = createTheme({
     },
     Text: (props, { colors }) => {
       /**
-       * Bold picks the bold face rather than a weight: Android synthesises `fontWeight`
-       * instead of loading the bold file, which reads thinner and clips at large sizes.
-       * It applies with or without a `type`, so `bold` alone is enough to make text bold.
+       * Bold picks the bold face by name, with or without a `type`.
+       *
+       * Android loads `fonts/<fontFamily>.ttf`, or `<fontFamily>_bold.ttf` for a weight of
+       * 700 or more, and falls back to Roboto when that file is missing. So on Android bold
+       * text must carry no weight. iOS resolves the name to the bundled face; the 700 there
+       * only matters if the face is ever missing, where it falls back to the system Bold
+       * rather than Regular.
        */
       const universalStyle = {
         color: props.color || colors.black,
         fontFamily: props.bold ? fonts.bold : fonts.regular,
+        ...(props.bold && Platform.OS === "ios" ? { fontWeight: "700" as const } : {}),
       }
 
       const sizeStyle = props.type

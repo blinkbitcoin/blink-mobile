@@ -2229,6 +2229,12 @@
     "error": "Gagal untuk menjana invois. Sila berhubung dengan tim sokongan\njika masalah ini tetap berlaku",
     "copyInvoice": "Salin",
     "shareInvoice": "Kongsi",
+    "newAddress": "Baharu",
+    "newAddressHint": "Menjana alamat Bitcoin baharu. Alamat sebelumnya masih berfungsi.",
+    "newAddressGenerated": "Alamat baharu sedia. Alamat sebelumnya masih berfungsi.",
+    "newAddressFailed": "Tidak dapat menjana alamat baharu. Sila cuba lagi.",
+    "newAddressRateLimited": "Terlalu banyak alamat baharu. Tunggu sebentar dan cuba lagi.",
+    "onchainAddressLoadFailed": "Tidak dapat memuatkan alamat Bitcoin anda. Ketik Baharu untuk cuba lagi.",
     "addAmount": "Mohon amaun yang spesifik",
     "expired": "Invois ni telah tamat tempoh",
     "expiresIn": "Tamat tempoh dalam",
@@ -2615,7 +2621,8 @@
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di rantau anda",
     "anonModeWalletLabel": "tidak tersedia dalam mod Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat disemak, tarik ke bawah untuk cuba lagi",
+    "networkWalletLabel": "tidak tersedia di rangkaian ini"
   },
   "AnonModeConvertModal": {
     "title": "Pindahkan baki Dolar anda dahulu",
@@ -2697,7 +2704,7 @@
   "TransactionDetailScreen": {
     "paid": "Bayar kepada/daripada",
     "received": "Anda dah terima",
-    "spent": "Anda dah belanjakan",
+    "sent": "Anda dah hantar",
     "sending": "Menghantar",
     "receivingAccount": "Akaun penerimaan",
     "sendingAccount": "Akaun penghantar",
@@ -3099,7 +3106,13 @@
     "deleteAccountFromPhone": "Hai!, sila tutup akaun saya. Nombor telefon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Sesuatu yang salah telah berlaku  Hubungi {email: string} untuk bantuan lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akaun adalah kekal!\nPastikan dompet tiada dana sebelum menutup.\nAkaun yang ditutup tidak boleh dipulihkan.\nKami mungkin menyimpan rekod tertentu sebagaimana dikehendaki oleh undang-undang."
+    "deleteAccountWarning": "Perhatian: Penutupan akaun adalah kekal!\nPastikan dompet tiada dana sebelum menutup.\nAkaun yang ditutup tidak boleh dipulihkan.\nKami mungkin menyimpan rekod tertentu sebagaimana dikehendaki oleh undang-undang.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Tak boleh hantar lebih daripada jumlah maksimum anda",

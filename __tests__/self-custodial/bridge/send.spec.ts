@@ -242,6 +242,21 @@ describe("prepareSend", () => {
     })
   })
 
+  it("hands a fixed invoice to the SDK verbatim, leaving its amount to the invoice", async () => {
+    const prepareSendPayment = jest.fn().mockResolvedValue({})
+    const sdk = { prepareSendPayment } as never
+    const invoice = "lnbc12676440p1examplefixtureonly"
+
+    await prepareSend(sdk, { paymentRequest: invoice, amount: undefined })
+
+    expect(prepareSendPayment.mock.calls[0][0]).toStrictEqual({
+      paymentRequest: { tag: "Input", inner: { input: invoice } },
+      amount: undefined,
+      tokenIdentifier: undefined,
+      conversionOptions: undefined,
+    })
+  })
+
   it("forwards conversionOptions when provided (USDB→BTC Lightning send)", async () => {
     const prepareSendPayment = jest.fn().mockResolvedValue({})
     const sdk = { prepareSendPayment } as never

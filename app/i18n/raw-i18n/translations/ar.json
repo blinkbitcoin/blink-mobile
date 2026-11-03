@@ -2229,6 +2229,12 @@
     "error": "أخفق توليد الفاتورة. أخبر فريق الدعم رجاءً إن استمرت المشكلة.",
     "copyInvoice": "Copy",
     "shareInvoice": "مشاركة",
+    "newAddress": "جديد",
+    "newAddressHint": "ينشئ عنوان بيتكوين جديدًا. تظل العناوين السابقة صالحة.",
+    "newAddressGenerated": "العنوان الجديد جاهز. العناوين السابقة لا تزال تعمل.",
+    "newAddressFailed": "تعذّر إنشاء عنوان جديد. يرجى المحاولة مرة أخرى.",
+    "newAddressRateLimited": "عدد كبير جدًا من العناوين الجديدة. يُرجى الانتظار قليلًا ثم المحاولة مرة أخرى.",
+    "onchainAddressLoadFailed": "تعذّر تحميل عنوان البيتكوين الخاص بك. اضغط على جديد للمحاولة مرة أخرى.",
     "addAmount": "اطلب مقدارًا محدّدًا",
     "expired": "انتهت مدّة صلاحية الفاتورة",
     "expiresIn": "ينتهي في",
@@ -2615,7 +2621,8 @@
   "StablesatsRestriction": {
     "walletLabel": "غير متاح في منطقتك",
     "anonModeWalletLabel": "غير متاح في وضع Incognito",
-    "unknownRegionWalletLabel": "تعذّر التحقق من التوفر، اسحب للأسفل لإعادة المحاولة"
+    "unknownRegionWalletLabel": "تعذّر التحقق من التوفر، اسحب للأسفل لإعادة المحاولة",
+    "networkWalletLabel": "غير متاح على هذه الشبكة"
   },
   "AnonModeConvertModal": {
     "title": "حوّل رصيدك بالدولار أولًا",
@@ -2697,7 +2704,7 @@
   "TransactionDetailScreen": {
     "paid": "دفعت إلى/من",
     "received": "استقبلت",
-    "spent": "أنفقت",
+    "sent": "أرسلت",
     "sending": "جارٍ الإرسال",
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
@@ -3099,7 +3106,13 @@
     "deleteAccountFromPhone": "مرحبًا! يرجى إغلاق حسابي. رقم هاتفي هو {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "تنبيه: إغلاق الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الإغلاق.\nلا يمكن استعادة الحساب المغلق.\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون."
+    "deleteAccountWarning": "تنبيه: إغلاق الحساب نهائي!\nتأكد من أن المحافظ لا تحتوي على أموال قبل الإغلاق.\nلا يمكن استعادة الحساب المغلق.\nقد نحتفظ ببعض السجلات وفقًا لما يقتضيه القانون.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "لا يمكنك إرسال مبلغ أكثر من الحد الأعلى",
