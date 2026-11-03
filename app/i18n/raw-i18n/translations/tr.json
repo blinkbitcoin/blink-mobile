@@ -2280,6 +2280,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Tutar minimum yatırma tutarının altında. {min} SAT altındaki tutarlar ulaşmaz",
+    "depositBelowFee": "Tutar yatırma ücretine gidecek",
+    "depositConsumedByFee": "{fee} SAT yatırma ücretine gidecek",
     "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string} altındaki tutarlar otomatik olarak Dolara çevrilemez. Bunun yerine Bitcoin alacaksınız.",
     "autoConvertFailed": "Ödeme alındı ancak dönüşüm başarısız oldu.",
     "pleaseWaitForConversion": "Lütfen dönüştürme tamamlanana kadar bekleyin"

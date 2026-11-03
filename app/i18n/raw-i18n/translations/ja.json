@@ -2280,6 +2280,9 @@
         "depositFeeTiers": "Deposit fees: {tiers: string}",
         "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
         "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+        "depositBelowMinimum": "金額が最低入金額を下回っています。{min} SAT未満は着金しません",
+        "depositBelowFee": "金額はすべて入金手数料に充てられます",
+        "depositConsumedByFee": "{fee} SATが入金手数料に充てられます",
         "autoConvertMinAmount": "{minSats: number} sats / {minFiat: string}未満の金額はドルに自動変換できません。代わりにビットコインを受け取ります。",
         "autoConvertFailed": "支払いは受け取りましたが、変換に失敗しました。",
         "pleaseWaitForConversion": "変換が完了するまでお待ちください"

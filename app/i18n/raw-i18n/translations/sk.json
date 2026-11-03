@@ -2280,6 +2280,9 @@
     "depositFeeTiers": "Poplatky za vklad: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT do {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT nad {min: string} SAT",
+    "depositBelowMinimum": "Suma je pod minimálnym vkladom. Nič pod {min} SAT nedorazí",
+    "depositBelowFee": "Sumu spotrebuje poplatok za vklad",
+    "depositConsumedByFee": "Poplatok za vklad spotrebuje {fee} SAT",
     "autoConvertMinAmount": "Sumy pod {minSats: number} satoshi / {minFiat: string} nemožno automaticky previesť na Doláre. Namiesto toho dostanete Bitcoin.",
     "autoConvertFailed": "Platba prijatá, ale konverzia zlyhala.",
     "pleaseWaitForConversion": "Počkajte, prosím, kým sa prevod nedokončí"

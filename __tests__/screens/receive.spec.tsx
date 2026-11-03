@@ -1759,3 +1759,61 @@ describe("ReceiveScreen new on-chain address", () => {
     expect(screen.getByText("tb1qstk6xu...w05pc7lmz5")).toBeTruthy()
   })
 })
+
+describe("ReceiveScreen deposit fee warning (blink-wip#1261)", () => {
+  let LL: ReturnType<typeof i18nObject>
+
+  beforeAll(() => {
+    loadLocale("en")
+  })
+
+  beforeEach(() => {
+    jest.clearAllMocks()
+    LL = i18nObject("en")
+  })
+
+  const openAmountSheet = async (page: number) => {
+    render(
+      <ContextForScreen headerShown>
+        <ReceiveScreen />
+      </ContextForScreen>,
+    )
+    await flushAsync()
+    await flushAsync()
+    fireEvent.press(screen.getByTestId(`carousel-page-${page}`))
+    await flushAsync()
+    fireEvent.press(screen.getByLabelText(LL.AmountInputButton.tapToSetAmount()))
+    await waitFor(() => {
+      expect(screen.getByText(LL.AmountInputScreen.setAmount())).toBeTruthy()
+    })
+  }
+  const type = (digit: string) => fireEvent.press(screen.getByTestId(`Key ${digit}`))
+  const warning = () => screen.queryByTestId("amount-input-warning")?.props.children
+
+  it("tracks every keystroke against the 3,000 SAT backend fee on the onchain page", async () => {
+    await openAmountSheet(1)
+    expect(warning()).toBeUndefined()
+    const belowMinimum = LL.ReceiveScreen.depositBelowMinimum({ min: "5,000" })
+
+    // Display currency, converted 1:1 by the price mock: $1 = 100 sats
+    type("1")
+    expect(warning()).toBe(belowMinimum)
+    type("0")
+    expect(warning()).toBe(belowMinimum)
+    type("0")
+    expect(warning()).toBe(LL.ReceiveScreen.depositConsumedByFee({ fee: "3,000" }))
+    type("0")
+    expect(warning()).toBeUndefined()
+
+    await flushEffects()
+  })
+
+  it("never warns on the Paycode / Lightning page", async () => {
+    await openAmountSheet(0)
+
+    type("1")
+    expect(warning()).toBeUndefined()
+
+    await flushEffects()
+  })
+})

@@ -1,3 +1,4 @@
+export { useDepositFeeWarning } from "./use-deposit-fee-warning"
 export { useDisplayPaymentRequest } from "./use-display-payment-request"
 export { useLnurlWithdraw } from "./use-lnurl-withdraw"
 export { useNfcReceive } from "./use-nfc-receive"

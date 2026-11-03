@@ -2280,6 +2280,9 @@
     "depositFeeTiers": "Deposit fees: {tiers: string}",
     "depositFeeTierUpTo": "{fee: string} SAT up to {max: string} SAT",
     "depositFeeTierAbove": "{fee: string} SAT above {min: string} SAT",
+    "depositBelowMinimum": "Jumlah di bawah deposit minimum. Apa pun di bawah {min} SAT tidak akan masuk",
+    "depositBelowFee": "Jumlah akan habis untuk biaya deposit",
+    "depositConsumedByFee": "{fee} SAT akan terpakai untuk biaya deposit",
     "autoConvertMinAmount": "Jumlah di bawah {minSats: number} sats / {minFiat: string} tidak dapat dikonversi ke Dolar secara otomatis. Anda akan menerima Bitcoin.",
     "autoConvertFailed": "Pembayaran diterima tetapi konversi gagal.",
     "pleaseWaitForConversion": "Mohon tunggu sampai konversi selesai"
