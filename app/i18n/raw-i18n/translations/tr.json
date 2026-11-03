@@ -2536,7 +2536,17 @@
         "title": "Fiyat değişiklikleri",
         "description": "Bitcoin fiyatı hakkında bildirimler."
       }
-    }
+    },
+    "inApp": "Uygulamada",
+    "celebrateIncoming": "Gelen ödemeleri kutla",
+    "celebrationMinimum": "En düşük tutar (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Aldınız",
+    "note": "Not",
+    "dontShowAgain": "Bu ekranı bir daha gösterme.",
+    "details": "Ayrıntılar",
+    "announcement": "Alındı {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Hesabınızda 5 dolardan fazla para var",

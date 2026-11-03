@@ -2536,7 +2536,17 @@
         "title": "Změny cen",
         "description": "Oznámení o ceně Bitcoinu."
       }
-    }
+    },
+    "inApp": "V aplikaci",
+    "celebrateIncoming": "Oslavovat příchozí platby",
+    "celebrationMinimum": "Minimální částka (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Obdrželi jste",
+    "note": "Poznámka",
+    "dontShowAgain": "Tuto obrazovku už nezobrazovat.",
+    "details": "Podrobnosti",
+    "announcement": "Přijato {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Váš účet má více než $5",

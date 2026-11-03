@@ -8324,6 +8324,41 @@ type RootTranslation = {
 				description: string
 			}
 		}
+		/**
+		 * I​n​ ​t​h​e​ ​a​p​p
+		 */
+		inApp: string
+		/**
+		 * C​e​l​e​b​r​a​t​e​ ​i​n​c​o​m​i​n​g​ ​p​a​y​m​e​n​t​s
+		 */
+		celebrateIncoming: string
+		/**
+		 * M​i​n​i​m​u​m​ ​a​m​o​u​n​t​ ​(​s​a​t​s​)
+		 */
+		celebrationMinimum: string
+	}
+	ReceiveCelebration: {
+		/**
+		 * Y​o​u​ ​r​e​c​e​i​v​e​d
+		 */
+		youReceived: string
+		/**
+		 * N​o​t​e
+		 */
+		note: string
+		/**
+		 * D​o​n​’​t​ ​s​h​o​w​ ​m​e​ ​t​h​i​s​ ​s​c​r​e​e​n​ ​a​g​a​i​n​.
+		 */
+		dontShowAgain: string
+		/**
+		 * D​e​t​a​i​l​s
+		 */
+		details: string
+		/**
+		 * R​e​c​e​i​v​e​d​ ​{​a​m​o​u​n​t​}
+		 * @param {string} amount
+		 */
+		announcement: RequiredParams<'amount'>
 	}
 	AccountScreen: {
 		/**
@@ -22653,6 +22688,40 @@ export type TranslationFunctions = {
 				description: () => LocalizedString
 			}
 		}
+		/**
+		 * In the app
+		 */
+		inApp: () => LocalizedString
+		/**
+		 * Celebrate incoming payments
+		 */
+		celebrateIncoming: () => LocalizedString
+		/**
+		 * Minimum amount (sats)
+		 */
+		celebrationMinimum: () => LocalizedString
+	}
+	ReceiveCelebration: {
+		/**
+		 * You received
+		 */
+		youReceived: () => LocalizedString
+		/**
+		 * Note
+		 */
+		note: () => LocalizedString
+		/**
+		 * Don’t show me this screen again.
+		 */
+		dontShowAgain: () => LocalizedString
+		/**
+		 * Details
+		 */
+		details: () => LocalizedString
+		/**
+		 * Received {amount}
+		 */
+		announcement: (arg: { amount: string }) => LocalizedString
 	}
 	AccountScreen: {
 		/**

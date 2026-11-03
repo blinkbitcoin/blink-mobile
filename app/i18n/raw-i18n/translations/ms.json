@@ -2536,7 +2536,17 @@
         "title": "Perubahan harga",
         "description": "Notifikasi tentang harga Bitcoin."
       }
-    }
+    },
+    "inApp": "Dalam apl",
+    "celebrateIncoming": "Raikan bayaran masuk",
+    "celebrationMinimum": "Amaun minimum (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Anda menerima",
+    "note": "Nota",
+    "dontShowAgain": "Jangan tunjukkan skrin ini lagi.",
+    "details": "Butiran",
+    "announcement": "Diterima {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akaun anda mempunyai lebih daripada $5",

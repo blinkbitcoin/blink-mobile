@@ -12,6 +12,10 @@ type CheckboxRowProps = {
   centered?: boolean
   disabled?: boolean
   testID?: string
+  /** For a coloured ground: border, label and checked fill. Defaults to the theme's. */
+  color?: string
+  /** The tick's colour on a `color` fill. Defaults to white. */
+  checkColor?: string
 }
 
 export const CheckboxRow: React.FC<CheckboxRowProps> = ({
@@ -21,6 +25,8 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
   centered,
   disabled,
   testID,
+  color,
+  checkColor,
 }) => {
   const styles = useStyles()
   const {
@@ -36,10 +42,27 @@ export const CheckboxRow: React.FC<CheckboxRowProps> = ({
       accessibilityState={{ checked: isChecked }}
       testID={testID}
     >
-      <View style={[styles.checkbox, isChecked && styles.checkboxChecked]}>
-        {isChecked && <GaloyIcon name="check" size={14} color={colors.white} />}
+      <View
+        style={[
+          styles.checkbox,
+          isChecked && styles.checkboxChecked,
+          color ? { borderColor: color } : undefined,
+          color && isChecked ? { backgroundColor: color } : undefined,
+        ]}
+      >
+        {isChecked && (
+          <GaloyIcon name="check" size={14} color={checkColor ?? colors.white} />
+        )}
       </View>
-      <Text style={[styles.label, centered && styles.labelCentered]}>{label}</Text>
+      <Text
+        style={[
+          styles.label,
+          centered && styles.labelCentered,
+          color ? { color } : undefined,
+        ]}
+      >
+        {label}
+      </Text>
     </Pressable>
   )
 }

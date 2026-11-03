@@ -2536,7 +2536,17 @@
         "title": "Promjene cijena",
         "description": "Obavijesti o cijeni Bitcoina."
       }
-    }
+    },
+    "inApp": "U aplikaciji",
+    "celebrateIncoming": "Proslavi dolazne uplate",
+    "celebrationMinimum": "Najmanji iznos (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Primili ste",
+    "note": "Bilješka",
+    "dontShowAgain": "Ne prikazuj više ovaj zaslon.",
+    "details": "Detalji",
+    "announcement": "Primljeno {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Vaš račun ima više od $5",
