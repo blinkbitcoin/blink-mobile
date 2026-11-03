@@ -46,18 +46,19 @@ jest.mock("@app/hooks/use-app-config", () => {
   }
 })
 
-jest.mock("@app/hooks/use-price-conversion", () => {
-  const actual = jest.requireActual("@app/hooks/use-price-conversion")
-  return {
-    ...actual,
-    usePriceConversion: () => ({
-      convertMoneyAmount: ({ amount }: { amount: number }) => ({
-        amount: Math.round((amount * USD_CENTS_PER_BTC) / actual.SATS_PER_BTC),
-        currency: "USD",
-      }),
+jest.mock(
+  "@app/screens/card-screen/onboarding/investment-flow/use-agreement-quote",
+  () => ({
+    useAgreementQuote: () => ({
+      quote: {
+        usdCentsPerBtc: USD_CENTS_PER_BTC,
+        quotedAt: new Date("2026-09-14T22:00:00Z"),
+        receivedAt: new Date(),
+      },
+      refresh: jest.fn(),
     }),
-  }
-})
+  }),
+)
 
 /** The one network call: the service's mint. */
 const mockMintSigningInstance = jest.fn()

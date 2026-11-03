@@ -141,21 +141,48 @@ export type MintedAgreement = {
 /** The call that reaches the service with the figures the document says. */
 type MintAgreement = (prefill: AgreementPrefill) => Promise<MintedAgreement>
 
+/**
+ * A price the network answered on the signing step, never one restored from the cache:
+ * the price of one bitcoin in whole cents, the moment the price service quoted it, which
+ * is the moment the agreement states, and the moment it reached the device, which is what
+ * its age is measured from so a phone whose clock is off cannot age it either way.
+ */
+export type AgreementQuote = {
+  usdCentsPerBtc: number
+  quotedAt: Date
+  receivedAt: Date
+}
+
+/**
+ * How long a quote stays good to mint at. The price is asked for again every few minutes
+ * while the app runs, so an older one means the feed stopped answering; and the host
+ * refuses a rate stamped more than a quarter of an hour before it checks the figures.
+ */
+export const MAX_QUOTE_AGE_MS = 10 * 60 * 1000
+
+/** Whether the agreement may be minted at this quote: one the network answered, and
+ *  recently enough that the rate it binds the signer to is still the market's. */
+export const isQuoteFresh = (
+  quote: AgreementQuote | null,
+  now: Date,
+): quote is AgreementQuote =>
+  quote !== null && now.getTime() - quote.receivedAt.getTime() <= MAX_QUOTE_AGE_MS
+
 type MintInvestmentAgreementInput = {
   totalUsd: number
-  /** The price of one bitcoin in whole cents as the feed last answered, or null
-   *  before it has. */
-  usdCentsPerBtc: number | null
+  /** The latest quote the network answered, or null before it has. */
+  quote: AgreementQuote | null
   mint: MintAgreement
-  /** The moment the rate is quoted at, which the agreement stamps. */
+  /** The moment the quote's age is measured at. */
   now?: Date
 }
 
 /**
- * Mints the agreement from what the app knows at this moment. A price that has not
- * answered yet is a failure the retry can cure, so it is filed under the component's own
- * copy. Who signs is the host's answer, not the app's: a user the host has no signer
- * for is refused by the service, under the copy the component has for a failed mint.
+ * Mints the agreement at the latest quote the network answered, stamped with the moment
+ * the price service quoted it. A quote that has not answered yet, or has gone stale, is a
+ * failure the retry can cure, so it is filed under the component's own copy. Who signs is
+ * the host's answer, not the app's: a user the host has no signer for is refused by the
+ * service, under the copy the component has for a failed mint.
  *
  * The settlement is what this call computed and asked the service to write, so the
  * transfer step bills the figure the document names. That holds while the host passes
@@ -164,16 +191,20 @@ type MintInvestmentAgreementInput = {
  */
 export const mintInvestmentAgreement = async ({
   totalUsd,
-  usdCentsPerBtc,
+  quote,
   mint,
   now = new Date(),
 }: MintInvestmentAgreementInput): Promise<{
   minted: MintedAgreement
   settlementSats: number
 }> => {
+  if (!isQuoteFresh(quote, now)) {
+    throw signingFailure("the bitcoin price is not available yet")
+  }
+
   const terms = resolveInvestmentTerms(
     totalUsd,
-    resolveSettlementQuote(usdCentsPerBtc, now),
+    resolveSettlementQuote(quote.usdCentsPerBtc, quote.quotedAt),
   )
 
   if (!isQuoted(terms)) {
