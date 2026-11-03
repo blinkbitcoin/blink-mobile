@@ -35,6 +35,7 @@ import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { generateSecureRandomUUID } from "@app/utils/uuid"
 import { useBottomTabBarStyle } from "@app/navigation/bottom-tab-bar-style"
+import { fonts } from "@app/rne-theme/fonts"
 import { PrimaryStackParamList } from "@app/navigation/stack-param-lists"
 import {
   BottomTabBarHeightContext,
@@ -725,7 +726,7 @@ const useStyles = makeStyles(({ colors }, { topInset }: { topInset: number }) =>
   },
   retryText: {
     fontSize: 13,
-    fontWeight: "600",
+    fontFamily: fonts.bold,
     color: colors.primary,
   },
   addPlace: {

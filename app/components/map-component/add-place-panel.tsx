@@ -388,9 +388,7 @@ const useStyles = makeStyles(({ colors }, { bottomInset }: { bottomInset: number
   title: {
     flex: 1,
     fontSize: 20,
-    // The bold face by name with no weight: Android swaps a weight on the
-    // regular face for Roboto, and there is no 600 face to ask for.
-    fontFamily: "SourceSansPro-Bold",
+    fontFamily: fonts.bold,
     color: colors.black,
   },
   content: {
