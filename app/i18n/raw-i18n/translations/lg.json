@@ -2532,7 +2532,17 @@
         "title": "Enkyukakyuka mu bbeeyi",
         "description": "Okumanyisibwa ku bbeeyi ya Bitcoin."
       }
-    }
+    },
+    "inApp": "Mu app",
+    "celebrateIncoming": "Jaguza ssente ezijja",
+    "celebrationMinimum": "Omuwendo omutono (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Wafunye",
+    "note": "Ekiwandiiko",
+    "dontShowAgain": "Tolaga olutimbe luno nate.",
+    "details": "Ebikwata ku nsonga",
+    "announcement": "Wafunye {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Akawunti yo erina omuwendo ogusoba mu $5",

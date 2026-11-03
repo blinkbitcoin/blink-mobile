@@ -2532,7 +2532,17 @@
         "title": "Промене цена",
         "description": "Обавештења о цени Bitcoin-а."
       }
-    }
+    },
+    "inApp": "U aplikaciji",
+    "celebrateIncoming": "Proslavi dolazne uplate",
+    "celebrationMinimum": "Najmanji iznos (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Primili ste",
+    "note": "Beleška",
+    "dontShowAgain": "Ne prikazuj više ovaj ekran.",
+    "details": "Detalji",
+    "announcement": "Primljeno {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ваш налог има више од $5",

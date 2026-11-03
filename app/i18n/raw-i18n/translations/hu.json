@@ -2532,7 +2532,17 @@
         "title": "Árváltozások",
         "description": "Értesítések a Bitcoin áráról."
       }
-    }
+    },
+    "inApp": "Az alkalmazásban",
+    "celebrateIncoming": "Bejövő fizetések ünneplése",
+    "celebrationMinimum": "Minimum összeg (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Kaptál",
+    "note": "Megjegyzés",
+    "dontShowAgain": "Ne mutasd többé ezt a képernyőt.",
+    "details": "Részletek",
+    "announcement": "Beérkezett {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "A számládon több mint 5 dollár van",

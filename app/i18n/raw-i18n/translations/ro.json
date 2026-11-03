@@ -2532,7 +2532,17 @@
         "title": "Modificări de preț",
         "description": "Notificări despre prețul Bitcoin."
       }
-    }
+    },
+    "inApp": "În aplicație",
+    "celebrateIncoming": "Sărbătorește plățile primite",
+    "celebrationMinimum": "Sumă minimă (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Ai primit",
+    "note": "Notă",
+    "dontShowAgain": "Nu mai arăta acest ecran.",
+    "details": "Detalii",
+    "announcement": "Primit {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Contul dvs. are mai mult de 5 USD",

@@ -2532,7 +2532,17 @@
                 "title": "Variazioni di prezzo",
                 "description": "Notifiche sul prezzo del Bitcoin."
             }
-        }
+        },
+        "inApp": "Nell'app",
+        "celebrateIncoming": "Celebra i pagamenti in arrivo",
+        "celebrationMinimum": "Importo minimo (sats)"
+    },
+    "ReceiveCelebration": {
+        "youReceived": "Hai ricevuto",
+        "note": "Nota",
+        "dontShowAgain": "Non mostrare più questa schermata.",
+        "details": "Dettagli",
+        "announcement": "Ricevuto {amount}"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Il tuo account ha più di $ 5",

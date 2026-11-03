@@ -2532,7 +2532,17 @@
                 "title": "Preisänderungen",
                 "description": "Benachrichtigungen über den Preis von Bitcoin."
             }
-        }
+        },
+        "inApp": "In der App",
+        "celebrateIncoming": "Eingehende Zahlungen feiern",
+        "celebrationMinimum": "Mindestbetrag (Sats)"
+    },
+    "ReceiveCelebration": {
+        "youReceived": "Du hast erhalten",
+        "note": "Notiz",
+        "dontShowAgain": "Diesen Bildschirm nicht mehr anzeigen.",
+        "details": "Details",
+        "announcement": "Erhalten {amount}"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Ihr Konto hat mehr als $5",

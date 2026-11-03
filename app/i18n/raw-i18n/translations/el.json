@@ -2532,7 +2532,17 @@
         "title": "Price changes",
         "description": "Notifications about the price of Bitcoin."
       }
-    }
+    },
+    "inApp": "Στην εφαρμογή",
+    "celebrateIncoming": "Γιόρτασε τις εισερχόμενες πληρωμές",
+    "celebrationMinimum": "Ελάχιστο ποσό (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Έλαβες",
+    "note": "Σημείωση",
+    "dontShowAgain": "Να μην εμφανιστεί ξανά αυτή η οθόνη.",
+    "details": "Λεπτομέρειες",
+    "announcement": "Ελήφθη {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Ο λογαριασμός σας έχει περισσότερα από $5",

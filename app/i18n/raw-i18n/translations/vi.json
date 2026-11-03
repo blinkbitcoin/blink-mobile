@@ -2532,7 +2532,17 @@
         "title": "Biến động giá",
         "description": "Thông báo về giá Bitcoin."
       }
-    }
+    },
+    "inApp": "Trong ứng dụng",
+    "celebrateIncoming": "Ăn mừng khoản nhận",
+    "celebrationMinimum": "Số tiền tối thiểu (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Bạn đã nhận",
+    "note": "Ghi chú",
+    "dontShowAgain": "Đừng hiện màn hình này nữa.",
+    "details": "Chi tiết",
+    "announcement": "Đã nhận {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "Tài khoản của bạn có hơn $5",

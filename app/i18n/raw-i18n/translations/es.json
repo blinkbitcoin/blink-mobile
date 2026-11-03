@@ -2532,7 +2532,17 @@
                 "title": "Cambios de precio",
                 "description": "Notificaciones sobre el precio de Bitcoin."
             }
-        }
+        },
+        "inApp": "En la app",
+        "celebrateIncoming": "Celebrar pagos entrantes",
+        "celebrationMinimum": "Monto mínimo (sats)"
+    },
+    "ReceiveCelebration": {
+        "youReceived": "Recibiste",
+        "note": "Nota",
+        "dontShowAgain": "No volver a mostrar esta pantalla.",
+        "details": "Detalles",
+        "announcement": "Recibido {amount}"
     },
     "AccountScreen": {
         "fundsMoreThan5Dollars": "Su cuenta tiene más de $5",

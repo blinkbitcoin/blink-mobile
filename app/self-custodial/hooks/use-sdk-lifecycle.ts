@@ -1,7 +1,10 @@
 import { useCallback, useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
-import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
+import {
+  type BreezSdkInterface,
+  SdkEvent_Tags as SdkEventTags,
+} from "@breeztech/breez-sdk-spark-react-native"
 
 import { useRemoteConfig } from "@app/config/feature-flags-context"
 import { useBackoffRetry } from "@app/hooks/use-backoff-retry"
@@ -30,6 +33,7 @@ import {
   PAYMENT_RECEIVED_EVENTS,
   REFRESH_EVENTS,
 } from "../providers/sdk-events"
+import { emitSucceededPayment } from "../providers/succeeded-payments"
 import { validateStoredNetwork } from "../providers/validate-network"
 import {
   getOnlineState,
@@ -260,6 +264,9 @@ export const useSdkLifecycle = (
          *  the only word a pending send gets of its failure. Gated to Enhanced inside. */
         const observedPayment = extractObservedPayment(event)
         if (observedPayment) measureObservedPayment(observedPayment)
+        if (observedPayment && event.tag === SdkEventTags.PaymentSucceeded) {
+          emitSucceededPayment(observedPayment)
+        }
 
         if (!REFRESH_EVENTS.has(event.tag)) return
 

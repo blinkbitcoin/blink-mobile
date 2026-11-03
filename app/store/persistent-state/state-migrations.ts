@@ -295,6 +295,10 @@ type PersistentState_21 = {
     string,
     { btcId: string; usdId: string; announceSinceMs?: number }
   >
+  // Full-screen celebration on an incoming payment (blink-wip#1897). Device-wide; unset
+  // means on, with the remote-config minimum.
+  receiveCelebrationEnabled?: boolean
+  receiveCelebrationMinSats?: number
 }
 
 type PersistentState_22 = Omit<PersistentState_21, "schemaVersion"> & {

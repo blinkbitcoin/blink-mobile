@@ -2532,7 +2532,17 @@
         "title": "Canvis de preu",
         "description": "Notificacions sobre el preu de Bitcoin."
       }
-    }
+    },
+    "inApp": "A l'app",
+    "celebrateIncoming": "Celebra els pagaments entrants",
+    "celebrationMinimum": "Import mínim (sats)"
+  },
+  "ReceiveCelebration": {
+    "youReceived": "Has rebut",
+    "note": "Nota",
+    "dontShowAgain": "No tornis a mostrar aquesta pantalla.",
+    "details": "Detalls",
+    "announcement": "Rebut {amount}"
   },
   "AccountScreen": {
     "fundsMoreThan5Dollars": "El teu compte té més de 5$",
