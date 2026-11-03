@@ -2592,7 +2592,8 @@
     "error": "Ayikwazi ukufumana iiprofayili ngeli xesha",
     "fromThisDevice": "kule divayisi?",
     "switchAccount": "Utshintshele kwenye i-akhawunti",
-    "removedAccount": "Ususile i-akhawunti {identifier: string}."
+    "removedAccount": "Ususile i-akhawunti {identifier: string}.",
+    "removeAccount": "Susa i-akhawunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "ayifumaneki kummandla wakho",

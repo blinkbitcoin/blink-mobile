@@ -2592,7 +2592,8 @@
     "error": "Şu anda profiller getirilemedi",
     "fromThisDevice": "bu cihazdan mı?",
     "switchAccount": "Başka bir hesaba geçiş yaptınız",
-    "removedAccount": "{identifier: string} hesabını kaldırdınız."
+    "removedAccount": "{identifier: string} hesabını kaldırdınız.",
+    "removeAccount": "Hesabı kaldır"
   },
   "StablesatsRestriction": {
     "walletLabel": "bölgenizde kullanılamıyor",

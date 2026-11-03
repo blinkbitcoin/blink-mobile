@@ -2592,7 +2592,8 @@
     "error": "Kan nie tans profiele ophaal nie",
     "fromThisDevice": "van hierdie toestel?",
     "switchAccount": "Jy het na 'n ander rekening oorgeskakel",
-    "removedAccount": "Jy het rekening {identifier: string} verwyder."
+    "removedAccount": "Jy het rekening {identifier: string} verwyder.",
+    "removeAccount": "Verwyder rekening"
   },
   "StablesatsRestriction": {
     "walletLabel": "nie beskikbaar in jou streek nie",

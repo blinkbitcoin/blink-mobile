@@ -2592,7 +2592,8 @@
     "error": "Tidak dapat mendapatkan profil pada masa ini",
     "fromThisDevice": "dari peranti ini?",
     "switchAccount": "Anda telah bertukar ke akaun lain",
-    "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}."
+    "removedAccount": "Anda telah mengalih keluar akaun {identifier: string}.",
+    "removeAccount": "Alih keluar akaun"
   },
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di rantau anda",

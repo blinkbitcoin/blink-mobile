@@ -2592,7 +2592,8 @@
     "error": "Nelze načíst profily v tuto chvíli",
     "fromThisDevice": "z tohoto zařízení?",
     "switchAccount": "Přepnuli jste na jiný účet",
-    "removedAccount": "Odebrali jste účet {identifier: string}."
+    "removedAccount": "Odebrali jste účet {identifier: string}.",
+    "removeAccount": "Odebrat účet"
   },
   "StablesatsRestriction": {
     "walletLabel": "není ve vašem regionu k dispozici",

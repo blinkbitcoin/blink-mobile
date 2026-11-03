@@ -8544,6 +8544,10 @@ type RootTranslation = {
 		 * @param {string} identifier
 		 */
 		removedAccount: RequiredParams<'identifier'>
+		/**
+		 * R​e​m​o​v​e​ ​a​c​c​o​u​n​t
+		 */
+		removeAccount: string
 	}
 	TotpRegistrationInitiateScreen: {
 		/**
@@ -22788,6 +22792,10 @@ export type TranslationFunctions = {
 		 * You removed account {identifier}.
 		 */
 		removedAccount: (arg: { identifier: string }) => LocalizedString
+		/**
+		 * Remove account
+		 */
+		removeAccount: () => LocalizedString
 	}
 	TotpRegistrationInitiateScreen: {
 		/**

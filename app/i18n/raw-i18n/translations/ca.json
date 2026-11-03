@@ -2592,7 +2592,8 @@
     "error": "No es poden obtenir els perfils en aquest moment",
     "fromThisDevice": "des d'aquest dispositiu?",
     "switchAccount": "Has canviat a un altre compte",
-    "removedAccount": "Has eliminat el compte {identifier: string}."
+    "removedAccount": "Has eliminat el compte {identifier: string}.",
+    "removeAccount": "Elimina el compte"
   },
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",

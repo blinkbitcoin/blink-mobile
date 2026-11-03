@@ -2592,7 +2592,8 @@
         "error": "Unable to fetch profiles at this time",
         "fromThisDevice": "from this device?",
         "switchAccount": "You switched to another account",
-        "removedAccount": "You removed account {identifier: string}."
+        "removedAccount": "You removed account {identifier: string}.",
+        "removeAccount": "Remove account"
     },
     "TotpRegistrationInitiateScreen": {
         "title": "Two-factor authentication"
