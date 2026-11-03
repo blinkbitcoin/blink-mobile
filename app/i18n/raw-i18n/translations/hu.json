@@ -2229,6 +2229,12 @@
     "error": "Számla létrehozása sikertelen. Kérjük, vedd fel a kapcsolatot az ügyfélszolgálattal, ha a probléma továbbra is fennáll.",
     "copyInvoice": "Másolás",
     "shareInvoice": "Megosztás",
+    "newAddress": "Új",
+    "newAddressHint": "Új Bitcoin-címet hoz létre. A korábbi címek továbbra is működnek.",
+    "newAddressGenerated": "Az új cím elkészült. A korábbi címek továbbra is működnek.",
+    "newAddressFailed": "Nem sikerült új címet létrehozni. Kérjük, próbáld újra.",
+    "newAddressRateLimited": "Túl sok új cím. Várj egy kicsit, majd próbáld újra.",
+    "onchainAddressLoadFailed": "Nem sikerült betölteni a Bitcoin-címedet. Koppints az Új gombra az újrapróbáláshoz.",
     "addAmount": "Konkrét összeg igénylése",
     "expired": "A számla lejárt",
     "expiresIn": "Lejár",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nem érhető el a régiódban",
     "anonModeWalletLabel": "Incognito módban nem érhető el",
-    "unknownRegionWalletLabel": "az elérhetőséget nem sikerült ellenőrizni, húzd le az újrapróbáláshoz"
+    "unknownRegionWalletLabel": "az elérhetőséget nem sikerült ellenőrizni, húzd le az újrapróbáláshoz",
+    "networkWalletLabel": "ezen a hálózaton nem érhető el"
   },
   "AnonModeConvertModal": {
     "title": "Először utald át a dolláregyenleged",
@@ -2675,7 +2682,7 @@
   "TransactionDetailScreen": {
     "paid": "Kifizetve/kiutalva",
     "received": "Fogadott",
-    "spent": "Elköltött",
+    "sent": "Elküldött",
     "sending": "Küld",
     "receivingAccount": "Fogadó egyenleg",
     "sendingAccount": "Küldő egyenleg",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "Szia! Kérem, zárják le a fiókomat. A telefonszámom: {phoneNumber: string}.",
     "deleteAccountError": "Valami hiba történt. További segítségért lépj kapcsolatba az alábbi email címen: {email: string}.",
     "bye": "Viszlát!",
-    "deleteAccountWarning": "Figyelem: A fiók lezárása végleges!\nA lezárás előtt győződj meg róla, hogy a tárcákban nincs egyenleg.\nA lezárt fiókot nem lehet visszaállítani.\nElőfordulhat, hogy bizonyos adatokat törvényi kötelezettség miatt megőrzünk."
+    "deleteAccountWarning": "Figyelem: A fiók lezárása végleges!\nA lezárás előtt győződj meg róla, hogy a tárcákban nincs egyenleg.\nA lezárt fiókot nem lehet visszaállítani.\nElőfordulhat, hogy bizonyos adatokat törvényi kötelezettség miatt megőrzünk.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Nem küldhetsz többet, mint a maximális összeg",

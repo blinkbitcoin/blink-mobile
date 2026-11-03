@@ -46,6 +46,7 @@ import { TxLimits } from "./settings/account-tx-limits"
 import { FeeRatesSetting } from "./settings/fee-rates"
 import { ApiAccessSetting } from "./settings/advanced-api-access"
 import { ExportCsvSetting } from "./settings/advanced-export-csv"
+import { ExportLogsSetting } from "./settings/advanced-export-logs"
 import { JoinCommunitySetting } from "./settings/community-join"
 import { NeedHelpSetting } from "./settings/community-need-help"
 import { CurrencySetting } from "./settings/preferences-currency"
@@ -160,7 +161,7 @@ export const SettingsScreen: React.FC = () => {
       BackupWalletSetting,
       EmergencyBundleSetting,
     ],
-    advanced: [ExportCsvSetting, ApiAccessSetting],
+    advanced: [ExportCsvSetting, ExportLogsSetting, ApiAccessSetting],
     community: [NeedHelpSetting, JoinCommunitySetting],
   }
 
@@ -219,8 +220,9 @@ export const SettingsScreen: React.FC = () => {
           name={LL.common.securityAndPrivacy()}
           items={items.securityAndPrivacy}
         />
-        {/* Rows gate themselves by account mode (CSV export branches, API access is
-            custodial-only) and SettingsGroup collapses when every row returns null. */}
+        {/* Rows gate themselves by account type (CSV export branches, logs are
+            self-custodial-only, API access is custodial-only) and SettingsGroup
+            collapses when every row returns null. */}
         <SettingsGroup name={LL.common.advanced()} items={items.advanced} />
         <SettingsGroup name={LL.common.support()} items={items.community} />
         <VersionComponent />

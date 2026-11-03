@@ -2229,6 +2229,12 @@
         "error": "Invoice konnte nicht erstellt werden. Bitte kontaktiere den Support, wenn dieses Problem weiterhin besteht.",
         "copyInvoice": "Kopieren",
         "shareInvoice": "Teilen",
+        "newAddress": "Neu",
+        "newAddressHint": "Erzeugt eine neue Bitcoin-Adresse. Frühere Adressen funktionieren weiterhin.",
+        "newAddressGenerated": "Neue Adresse bereit. Frühere Adressen funktionieren weiterhin.",
+        "newAddressFailed": "Neue Adresse konnte nicht erzeugt werden. Bitte versuche es erneut.",
+        "newAddressRateLimited": "Zu viele neue Adressen. Bitte warte eine Weile und versuche es erneut.",
+        "onchainAddressLoadFailed": "Deine Bitcoin-Adresse konnte nicht geladen werden. Tippe auf Neu, um es erneut zu versuchen.",
         "addAmount": "Betrag spezifizieren",
         "expired": "Die Invoice ist abgelaufen",
         "expiresIn": "Läuft ab in",
@@ -2593,7 +2599,8 @@
     "StablesatsRestriction": {
         "walletLabel": "in deiner Region nicht verfügbar",
         "anonModeWalletLabel": "im Incognito-Modus nicht verfügbar",
-        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen"
+        "unknownRegionWalletLabel": "Verfügbarkeit konnte nicht geprüft werden, zum Wiederholen nach unten ziehen",
+        "networkWalletLabel": "in diesem Netzwerk nicht verfügbar"
     },
     "AnonModeConvertModal": {
         "title": "Übertrage zuerst dein Dollar-Guthaben",
@@ -2675,7 +2682,7 @@
     "TransactionDetailScreen": {
         "paid": "Gezahlt an/von",
         "received": "Du erhieltst",
-        "spent": "Du zahltest",
+        "sent": "Du sendetest",
         "sending": "Sendend",
         "receivingAccount": "Empfangendes Guthaben",
         "sendingAccount": "Sendendes Guthaben",
@@ -3077,7 +3084,13 @@
         "deleteAccountFromPhone": "Hey, bitte schließt meinen Account. Meine Telefonnummer ist {phoneNumber: string}.",
         "deleteAccountError": "Etwas ist schief gelaufen. Bitte kontaktiere {email: string}, um weitere Hilfe zu erhalten.",
         "bye": "Auf Wiedersehen!",
-        "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren."
+        "deleteAccountWarning": "Achtung: Die Schließung des Accounts ist endgültig!\nStelle sicher, dass die Wallets kein Guthaben mehr haben, bevor du schließt.\nEin geschlossener Account kann nicht wiederhergestellt werden.\nWir können bestimmte Daten gesetzlich bedingt aufbewahren.",
+        "downloadLogs": "Download logs",
+        "exportLogsTitle": "Share your wallet logs",
+        "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+        "exportLogsConfirm": "Share logs",
+        "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+        "exportLogsError": "Couldn't export your logs. Please try again."
     },
     "lnurl": {
         "overLimit": "Du kannst nicht mehr als den Maximalbetrag senden",

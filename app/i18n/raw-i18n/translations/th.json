@@ -2229,6 +2229,12 @@
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "copyInvoice": "Copy",
     "shareInvoice": "แชร์",
+    "newAddress": "ใหม่",
+    "newAddressHint": "สร้างที่อยู่ Bitcoin ใหม่ ที่อยู่เดิมยังใช้งานได้",
+    "newAddressGenerated": "ที่อยู่ใหม่พร้อมแล้ว ที่อยู่เดิมยังใช้งานได้",
+    "newAddressFailed": "ไม่สามารถสร้างที่อยู่ใหม่ได้ โปรดลองอีกครั้ง",
+    "newAddressRateLimited": "สร้างที่อยู่ใหม่มากเกินไป โปรดรอสักครู่แล้วลองอีกครั้ง",
+    "onchainAddressLoadFailed": "ไม่สามารถโหลดที่อยู่ Bitcoin ของคุณได้ แตะ ใหม่ เพื่อลองอีกครั้ง",
     "addAmount": "ขอจำนวนเงินที่แน่นอน",
     "expired": "Invoiceนี้ หมดอายุแล้ว",
     "expiresIn": "หมดอายุใน",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
     "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito",
-    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง"
+    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง",
+    "networkWalletLabel": "ไม่พร้อมใช้งานบนเครือข่ายนี้"
   },
   "AnonModeConvertModal": {
     "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",
@@ -2675,7 +2682,7 @@
   "TransactionDetailScreen": {
     "paid": "จ่ายเงินให้/มาจาก",
     "received": "คุณได้รับ",
-    "spent": "คุณใช้เงินไป",
+    "sent": "คุณได้ส่ง",
     "sending": "กำลังส่ง",
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "สวัสดี! โปรดปิดบัญชีของฉัน หมายเลขโทรศัพท์ของฉันคือ {phoneNumber: string}",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด"
+    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",

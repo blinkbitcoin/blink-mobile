@@ -2229,6 +2229,12 @@
     "error": "Грешка приликом генерисања рачуна. Молимо вас контактирајте подршку ако се проблем настави.",
     "copyInvoice": "Copy",
     "shareInvoice": "Подели",
+    "newAddress": "Нова",
+    "newAddressHint": "Прави нову Bitcoin адресу. Претходне адресе и даље раде.",
+    "newAddressGenerated": "Нова адреса је спремна. Претходне адресе и даље раде.",
+    "newAddressFailed": "Није могуће направити нову адресу. Покушајте поново.",
+    "newAddressRateLimited": "Превише нових адреса. Сачекајте мало и покушајте поново.",
+    "onchainAddressLoadFailed": "Није могуће учитати вашу Bitcoin адресу. Додирните Нова да покушате поново.",
     "addAmount": "Захтевајте одређени износ",
     "expired": "Рачун је истекао",
     "expiresIn": "Истиче за",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "није доступан у вашем региону",
     "anonModeWalletLabel": "није доступно у Incognito режиму",
-    "unknownRegionWalletLabel": "доступност није било могуће проверити, превуците надоле да покушате поново"
+    "unknownRegionWalletLabel": "доступност није било могуће проверити, превуците надоле да покушате поново",
+    "networkWalletLabel": "није доступно на овој мрежи"
   },
   "AnonModeConvertModal": {
     "title": "Прво пребаците свој доларски салдо",
@@ -2675,7 +2682,7 @@
   "TransactionDetailScreen": {
     "paid": "Плаћено/примљено од",
     "received": "Примили сте",
-    "spent": "Потрошили сте",
+    "sent": "Послали сте",
     "sending": "Слање",
     "receivingAccount": "Рачун за примање",
     "sendingAccount": "Рачун за слање",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "Здраво!, молим вас затворите мој налог. Мој број телефона је {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом."
+    "deleteAccountWarning": "Пажња: Затварање налога је трајно!\nПре затварања проверите да новчаници немају средстава.\nЗатворени налог се не може вратити.\nМожемо задржати одређене записе у складу са законом.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Не можете послати више од максималног износа",

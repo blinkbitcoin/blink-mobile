@@ -159,16 +159,18 @@ describe("useDisplayPaymentRequest", () => {
       expect(result.current.showActions).toBe(true)
     })
 
-    it("hides actions when onchain address is null", () => {
+    it("keeps the actions while there is no onchain address yet", () => {
+      // The screen disables Copy and Share until there is an address; hiding the row
+      // instead made it jump on every load and wallet switch.
       const { result } = renderHook(() =>
         useDisplayPaymentRequest(
-          baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
+          basePayCodeRequest as Parameters<typeof useDisplayPaymentRequest>[0],
           true,
           null,
         ),
       )
 
-      expect(result.current.showActions).toBe(false)
+      expect(result.current.showActions).toBe(true)
     })
   })
 
@@ -209,6 +211,47 @@ describe("useDisplayPaymentRequest", () => {
       })
 
       expect(result.current.displayPaymentRequest).toBe(firstValue)
+    })
+
+    type RailProps = { isOnChain: boolean; onchain: string | null }
+    const renderOnRails = (initialProps: RailProps) =>
+      renderHook(
+        ({ isOnChain, onchain }: RailProps) =>
+          useDisplayPaymentRequest(
+            baseLightningRequest as Parameters<typeof useDisplayPaymentRequest>[0],
+            isOnChain,
+            onchain,
+          ),
+        { initialProps },
+      )
+
+    it("never shows the Lightning request on the on-chain page", () => {
+      const { result, rerender } = renderOnRails({ isOnChain: false, onchain: null })
+      expect(result.current.displayPaymentRequest).toBe("lnbc1...quest")
+
+      rerender({ isOnChain: true, onchain: null })
+      expect(result.current.displayPaymentRequest).toBe("")
+    })
+
+    it("never shows an on-chain address the hook no longer holds", () => {
+      // A wallet switch clears the address while the new wallet's loads: showing the
+      // previous one meanwhile would hand out the other wallet's address.
+      const { result, rerender } = renderOnRails({
+        isOnChain: true,
+        onchain: "bc1qfirstaddress",
+      })
+      expect(result.current.displayPaymentRequest).toBe("bc1qf...dress")
+
+      rerender({ isOnChain: true, onchain: null })
+      expect(result.current.displayPaymentRequest).toBe("")
+    })
+
+    it("shows the Lightning request again after visiting the on-chain page", () => {
+      const { result, rerender } = renderOnRails({ isOnChain: false, onchain: null })
+      rerender({ isOnChain: true, onchain: "bc1qfirstaddress" })
+      rerender({ isOnChain: false, onchain: "bc1qfirstaddress" })
+
+      expect(result.current.displayPaymentRequest).toBe("lnbc1...quest")
     })
   })
 })

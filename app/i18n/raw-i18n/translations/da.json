@@ -2229,6 +2229,12 @@
     "error": "Fejl ved generering af faktura. Kontakt venligst support, hvis dette problem fortsætter.",
     "copyInvoice": "Kopier",
     "shareInvoice": "Del",
+    "newAddress": "Ny",
+    "newAddressHint": "Opretter en ny Bitcoin-adresse. Tidligere adresser virker stadig.",
+    "newAddressGenerated": "Ny adresse klar. Tidligere adresser virker stadig.",
+    "newAddressFailed": "Kunne ikke oprette en ny adresse. Prøv venligst igen.",
+    "newAddressRateLimited": "For mange nye adresser. Vent lidt, og prøv igen.",
+    "onchainAddressLoadFailed": "Kunne ikke indlæse din Bitcoin-adresse. Tryk på Ny for at prøve igen.",
     "addAmount": "Anmod om et bestemt beløb",
     "expired": "Fakturaen er udløbet",
     "expiresIn": "Udløber om",
@@ -2593,7 +2599,8 @@
   "StablesatsRestriction": {
     "walletLabel": "ikke tilgængelig i din region",
     "anonModeWalletLabel": "ikke tilgængelig i Incognito-tilstand",
-    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen"
+    "unknownRegionWalletLabel": "tilgængelighed kunne ikke tjekkes, træk ned for at prøve igen",
+    "networkWalletLabel": "ikke tilgængelig på dette netværk"
   },
   "AnonModeConvertModal": {
     "title": "Overfør først din dollarsaldo",
@@ -2675,7 +2682,7 @@
   "TransactionDetailScreen": {
     "paid": "Betalt til/fra",
     "received": "Du modtog",
-    "spent": "Du brugte",
+    "sent": "Du sendte",
     "sending": "Sending",
     "receivingAccount": "Modtagelseskonto",
     "sendingAccount": "Afsendelseskonto",
@@ -3077,7 +3084,13 @@
     "deleteAccountFromPhone": "Hej! Luk venligst min konto. Mit telefonnummer er {phoneNumber: string}.",
     "deleteAccountError": "Noget gik galt. Kontakt {email: string} for yderligere assistance.",
     "bye": "Farvel!",
-    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven."
+    "deleteAccountWarning": "Bemærk: Lukning af kontoen er permanent!\nSørg for, at tegnebøgerne ikke har penge, før du lukker.\nEn lukket konto kan ikke genoprettes.\nVi kan opbevare visse oplysninger, som påkrævet af loven.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Du kan ikke sende mere end maks beløbet",
