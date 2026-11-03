@@ -2229,6 +2229,12 @@
     "error": "Generiranje fakture nije uspjelo. Obratite se podršci ako se ovaj problem nastavi pojavljivati.",
     "copyInvoice": "Kopiraj",
     "shareInvoice": "Podijeli",
+    "newAddress": "Nova",
+    "newAddressHint": "Stvara novu Bitcoin adresu. Prethodne adrese i dalje rade.",
+    "newAddressGenerated": "Nova adresa je spremna. Prethodne adrese i dalje rade.",
+    "newAddressFailed": "Nije moguće stvoriti novu adresu. Pokušajte ponovno.",
+    "newAddressRateLimited": "Previše novih adresa. Pričekajte malo i pokušajte ponovno.",
+    "onchainAddressLoadFailed": "Nije moguće učitati vašu Bitcoin adresu. Dodirnite Nova za ponovni pokušaj.",
     "addAmount": "Zatraži određeni iznos",
     "expired": "Faktura je istekla",
     "expiresIn": "Istječe za",
@@ -2591,7 +2597,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nije dostupan u vašoj regiji",
     "anonModeWalletLabel": "nije dostupno u Incognito načinu",
-    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj"
+    "unknownRegionWalletLabel": "dostupnost nije bilo moguće provjeriti, povucite prema dolje za ponovni pokušaj",
+    "networkWalletLabel": "nije dostupno na ovoj mreži"
   },
   "AnonModeConvertModal": {
     "title": "Najprije prenesite svoj dolarski saldo",
@@ -2673,7 +2680,7 @@
   "TransactionDetailScreen": {
     "paid": "Plaćeno za/od",
     "received": "Primili ste",
-    "spent": "Potrošili ste",
+    "sent": "Poslali ste",
     "sending": "Slanje",
     "receivingAccount": "Račun primatelj",
     "sendingAccount": "Račun pošiljatelj",
@@ -3075,7 +3082,13 @@
     "deleteAccountFromPhone": "Pozdrav!, molim vas zatvorite moj račun. Moj broj telefona je {phoneNumber: string}.",
     "deleteAccountError": "Nešto je pošlo po zlu. Kontaktirajte {email: string} za dodatnu pomoć.",
     "bye": "Pozdrav!",
-    "deleteAccountWarning": "Pažnja: Zatvaranje računa je trajno!\nPrije zatvaranja provjerite da novčanici nemaju sredstava.\nZatvoreni račun nije moguće vratiti.\nMožemo zadržati određene zapise kako zahtijeva zakon."
+    "deleteAccountWarning": "Pažnja: Zatvaranje računa je trajno!\nPrije zatvaranja provjerite da novčanici nemaju sredstava.\nZatvoreni račun nije moguće vratiti.\nMožemo zadržati određene zapise kako zahtijeva zakon.",
+    "downloadLogs": "Preuzmi zapise",
+    "exportLogsTitle": "Podijelite zapise novčanika",
+    "exportLogsBody": "Ova datoteka pomaže našem timu za podršku da istraži probleme s vašim novčanicima. Sadrži povijest plaćanja (iznose, račune i adrese) i identifikatore svakog novčanika bez skrbništva na ovom uređaju, ne samo ovog, ali nikada vaše pričuvne fraze ni ključeve. Podijelite je samo s našim timom za podršku.",
+    "exportLogsConfirm": "Podijelite zapise",
+    "noLogsYet": "Još nema zapisa za dijeljenje. Otvorite novčanik i pokušajte ponovno.",
+    "exportLogsError": "Nije moguće izvesti zapise. Pokušajte ponovno."
   },
   "lnurl": {
     "overLimit": "Ne možete poslati više od maksimalnog iznosa",
@@ -3805,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Napravite sigurnosnu kopiju novčanika",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Odaberite metodu sigurnosne kopije",
@@ -3863,6 +3876,7 @@
     "CloudBackup": {
       "title": "Napravimo sigurnosnu kopiju vašeg novčanika",
       "description": "Spremit ćemo kopiju vaše sigurnosne fraze u vaš {provider}.",
+      "encryptCheckbox": "Šifriraj dodatnom lozinkom",
       "password": "Lozinka",
       "passwordPlaceholder": "(najmanje 12 znakova)",
       "confirmPassword": "Potvrdi lozinku",

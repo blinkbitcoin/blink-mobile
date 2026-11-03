@@ -59,6 +59,23 @@ describe("createReceiveOnchain", () => {
     expect(methodInnerOf(receivePayment)).toEqual({ newAddress: true })
   })
 
+  it("hands the caller's abort signal to the SDK call", async () => {
+    const { sdk, receivePayment } = buildSdk()
+    const controller = new AbortController()
+
+    await createReceiveOnchain(sdk, { signal: controller.signal })({ newAddress: true })
+
+    expect(receivePayment.mock.calls[0][1]).toEqual({ signal: controller.signal })
+  })
+
+  it("passes no abort options when the caller has no signal", async () => {
+    const { sdk, receivePayment } = buildSdk()
+
+    await createReceiveOnchain(sdk)({ newAddress: true })
+
+    expect(receivePayment.mock.calls[0][1]).toBeUndefined()
+  })
+
   it("returns an error result when the SDK rejects", async () => {
     const receivePayment = jest.fn().mockRejectedValue(new Error("sdk offline"))
     const sdk = { receivePayment } as unknown as BreezSdkInterface
@@ -88,7 +105,7 @@ describe("createReceiveLightning", () => {
     currencyCode: "BTC" as const,
   })
 
-  it("passes amount, memo and expiry through to the SDK", async () => {
+  it("passes amount, memo and expiry through to the SDK, naming no other receiver", async () => {
     const { sdk, receivePayment } = buildSdk("lnbc1invoice")
 
     const result = await createReceiveLightning(sdk)({
@@ -98,11 +115,12 @@ describe("createReceiveLightning", () => {
     })
 
     expect(result).toEqual({ invoice: "lnbc1invoice" })
-    expect(methodInnerOf(receivePayment)).toEqual({
+    expect(methodInnerOf(receivePayment)).toStrictEqual({
       description: "coffee",
       amountSats: BigInt(5000),
       expirySecs: 600,
       paymentHash: undefined,
+      receiverIdentityPublicKey: undefined,
     })
   })
 
@@ -111,11 +129,12 @@ describe("createReceiveLightning", () => {
 
     await createReceiveLightning(sdk)({})
 
-    expect(methodInnerOf(receivePayment)).toEqual({
+    expect(methodInnerOf(receivePayment)).toStrictEqual({
       description: "",
       amountSats: undefined,
       expirySecs: undefined,
       paymentHash: undefined,
+      receiverIdentityPublicKey: undefined,
     })
   })
 

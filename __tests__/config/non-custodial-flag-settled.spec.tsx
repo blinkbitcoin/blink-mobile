@@ -10,13 +10,21 @@ import {
 /** Where Firebase says the value of each key comes from: "remote" for a value the
  *  console set, activated on an earlier launch; "default" for the shipped one. */
 const mockSource = { current: "remote" }
-const mockFetch = { isHeld: true, isFailing: false, release: () => {} }
+const mockFetch = {
+  isHeld: true,
+  isFailing: false,
+  landedSource: "remote",
+  release: () => {},
+}
 
 jest.mock("@react-native-firebase/remote-config", () => ({
   __esModule: true,
   default: () => ({
     setDefaults: jest.fn(async () => undefined),
     setConfigSettings: jest.fn(),
+    get fetchTimeMillis() {
+      return mockSource.current === "remote" ? 1 : -1
+    },
     getValue: () => ({
       getSource: () => mockSource.current,
       asString: () => "",
@@ -26,8 +34,11 @@ jest.mock("@react-native-firebase/remote-config", () => ({
     fetchAndActivate: jest.fn(
       () =>
         new Promise<boolean>((resolve, reject) => {
-          const settle = () =>
-            mockFetch.isFailing ? reject(new Error("offline")) : resolve(true)
+          const settle = () => {
+            if (mockFetch.isFailing) return reject(new Error("offline"))
+            mockSource.current = mockFetch.landedSource
+            return resolve(true)
+          }
           mockFetch.release = settle
           if (!mockFetch.isHeld) settle()
         }),
@@ -81,6 +92,7 @@ describe("isNonCustodialFlagSettled", () => {
     mockSource.current = "remote"
     mockFetch.isHeld = true
     mockFetch.isFailing = false
+    mockFetch.landedSource = "remote"
   })
 
   /** The console's word from an earlier launch is the device's best knowledge until
@@ -118,6 +130,37 @@ describe("isNonCustodialFlagSettled", () => {
     expect(settledShown(view)).toBe("false")
     mockFetch.release()
     await waitFor(() => expect(settledShown(view)).toBe("true"))
+  })
+
+  it("unsettles when the fetch lands without the console value an earlier launch had", async () => {
+    mockFetch.landedSource = "default"
+
+    const view = renderProbe()
+    await act(async () => {})
+    expect(settledShown(view)).toBe("true")
+    await act(async () => mockFetch.release())
+
+    expect(settledShown(view)).toBe("false")
+  })
+
+  it("stays unsettled when the fetch lands without a console value for the flag", async () => {
+    mockSource.current = "default"
+    mockFetch.landedSource = "default"
+
+    const view = renderProbe()
+    await act(async () => mockFetch.release())
+
+    expect(settledShown(view)).toBe("false")
+  })
+
+  it("offers self-custodial while Firebase serves only a default an earlier build left off", async () => {
+    mockSource.current = "default"
+    mockFetch.isFailing = true
+
+    const view = renderProbe()
+    await act(async () => mockFetch.release())
+
+    expect(view.getByTestId("enabled").props.children).toBe("true")
   })
 
   /** Offline with nothing activated before, the value is still the shipped default. */

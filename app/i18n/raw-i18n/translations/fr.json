@@ -2229,6 +2229,12 @@
         "error": "Impossible de générer la facture. Merci de contacter le support si le problème persiste.",
         "copyInvoice": "Copier",
         "shareInvoice": "Partager",
+        "newAddress": "Nouvelle",
+        "newAddressHint": "Génère une nouvelle adresse Bitcoin. Les adresses précédentes restent valables.",
+        "newAddressGenerated": "Nouvelle adresse prête. Les adresses précédentes restent valables.",
+        "newAddressFailed": "Impossible de générer une nouvelle adresse. Veuillez réessayer.",
+        "newAddressRateLimited": "Trop de nouvelles adresses. Patientez un moment, puis réessayez.",
+        "onchainAddressLoadFailed": "Impossible de charger votre adresse Bitcoin. Appuyez sur Nouvelle pour réessayer.",
         "addAmount": "Demander un montant spécifique",
         "expired": "La facture a expiré",
         "expiresIn": "Expire dans",
@@ -2591,7 +2597,8 @@
     "StablesatsRestriction": {
         "walletLabel": "n'est pas disponible dans votre région",
         "anonModeWalletLabel": "non disponible en mode Incognito",
-        "unknownRegionWalletLabel": "impossible de vérifier la disponibilité, tirez vers le bas pour réessayer"
+        "unknownRegionWalletLabel": "impossible de vérifier la disponibilité, tirez vers le bas pour réessayer",
+        "networkWalletLabel": "non disponible sur ce réseau"
     },
     "AnonModeConvertModal": {
         "title": "Transférez d'abord votre solde en dollars",
@@ -2673,7 +2680,7 @@
     "TransactionDetailScreen": {
         "paid": "Payé à/de",
         "received": "Vous avez reçu",
-        "spent": "Vous avez dépensé",
+        "sent": "Vous avez envoyé",
         "sending": "Envoi en cours",
         "receivingAccount": "Solde destinataire",
         "sendingAccount": "Solde expéditeur",
@@ -3075,7 +3082,13 @@
         "deleteAccountFromPhone": "Bonjour ! Merci de clôturer mon compte. Mon numéro de téléphone est le {phoneNumber: string}.",
         "deleteAccountError": "Une erreur est survenue. Contacter {email: string} pour recevoir une aide supplémentaire.",
         "bye": "Salut !",
-        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige."
+        "deleteAccountWarning": "Attention : la clôture du compte est permanente !\nAssurez-vous que les portefeuilles ne contiennent plus de fonds avant la clôture.\nUn compte clôturé ne peut pas être réactivé.\nNous pouvons conserver certains dossiers si la loi l'exige.",
+        "downloadLogs": "Télécharger les journaux",
+        "exportLogsTitle": "Partager les journaux de votre portefeuille",
+        "exportLogsBody": "Ce fichier aide notre équipe de support à examiner les problèmes de vos portefeuilles. Il contient l'historique des paiements (montants, factures et adresses) et les identifiants de chaque portefeuille non-custodial sur cet appareil, pas seulement celui-ci, mais jamais vos phrases de sauvegarde ni vos clés. Ne le partagez qu'avec notre équipe de support.",
+        "exportLogsConfirm": "Partager les journaux",
+        "noLogsYet": "Il n'y a pas encore de journaux à partager. Ouvrez votre portefeuille et réessayez.",
+        "exportLogsError": "Impossible d'exporter vos journaux. Veuillez réessayer."
     },
     "lnurl": {
         "overLimit": "Vous ne pouvez pas envoyer plus que le montant maximum",
@@ -3805,7 +3818,7 @@
         }
     },
     "BackupScreen": {
-        "title": "Back up your wallet",
+        "title": "Sauvegarder votre portefeuille",
         "description": "Choose a backup method to secure your funds",
         "BackupMethod": {
             "title": "Choisissez votre méthode de sauvegarde",
@@ -3863,6 +3876,7 @@
         "CloudBackup": {
             "title": "Sauvegardons votre portefeuille",
             "description": "Nous enregistrerons une copie de votre phrase de sauvegarde dans votre {provider}.",
+            "encryptCheckbox": "Chiffrer avec un mot de passe supplémentaire",
             "password": "Mot de passe",
             "passwordPlaceholder": "(12 caractères minimum)",
             "confirmPassword": "Confirmer le mot de passe",

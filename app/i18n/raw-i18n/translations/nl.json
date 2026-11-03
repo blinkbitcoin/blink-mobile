@@ -2229,6 +2229,12 @@
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "copyInvoice": "Kopiëren",
     "shareInvoice": "Deel",
+    "newAddress": "Nieuw",
+    "newAddressHint": "Maakt een nieuw Bitcoin-adres aan. Eerdere adressen blijven werken.",
+    "newAddressGenerated": "Nieuw adres klaar. Eerdere adressen blijven werken.",
+    "newAddressFailed": "Kon geen nieuw adres aanmaken. Probeer het opnieuw.",
+    "newAddressRateLimited": "Te veel nieuwe adressen. Wacht even en probeer het opnieuw.",
+    "onchainAddressLoadFailed": "Kon je Bitcoin-adres niet laden. Tik op Nieuw om het opnieuw te proberen.",
     "addAmount": "Vraag Specifiek Bedrag Aan",
     "expired": "De factuur is verlopen",
     "expiresIn": "Verloopt in",
@@ -2591,7 +2597,8 @@
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
     "anonModeWalletLabel": "niet beschikbaar in Incognito-modus",
-    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen"
+    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen",
+    "networkWalletLabel": "niet beschikbaar op dit netwerk"
   },
   "AnonModeConvertModal": {
     "title": "Zet eerst je dollarsaldo over",
@@ -2673,7 +2680,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaald van/naar",
     "received": "Jij ontving",
-    "spent": "Je hebt uitgegeven",
+    "sent": "Jij verzond",
     "sending": "Verzenden",
     "receivingAccount": "Ontvangend saldo",
     "sendingAccount": "Verzendend saldo",
@@ -3075,7 +3082,13 @@
     "deleteAccountFromPhone": "Hallo daar!, sluit alstublieft mijn account. Mijn telefoonnummer is {phoneNumber: string}.",
     "deleteAccountError": "Er is iets fout gegaan. Neem contact op met {email: string} voor verdere hulp.",
     "bye": "Doei!",
-    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist."
+    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist.",
+    "downloadLogs": "Logbestanden downloaden",
+    "exportLogsTitle": "Deel de logbestanden van je portemonnee",
+    "exportLogsBody": "Dit bestand helpt ons supportteam problemen met je portemonnees te onderzoeken. Het bevat de betalingsgeschiedenis (bedragen, facturen en adressen) en de portemonnee-id's van elke niet-bewaarde portemonnee op dit apparaat, niet alleen deze, maar nooit je herstelzinnen of sleutels. Deel het alleen met ons supportteam.",
+    "exportLogsConfirm": "Logbestanden delen",
+    "noLogsYet": "Er zijn nog geen logbestanden om te delen. Open je portemonnee en probeer het opnieuw.",
+    "exportLogsError": "Logbestanden exporteren is mislukt. Probeer het opnieuw."
   },
   "lnurl": {
     "overLimit": "U kunt niet meer dan het maximale bedrag verzenden",
@@ -3805,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Maak een back-up van je portemonnee",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Kies je back-upmethode",
@@ -3863,6 +3876,7 @@
     "CloudBackup": {
       "title": "Laten we een back-up maken van je portemonnee",
       "description": "We slaan een back-up van je herstelzin op in je {provider}.",
+      "encryptCheckbox": "Versleutelen met extra wachtwoord",
       "password": "Wachtwoord",
       "passwordPlaceholder": "(minimaal 12 tekens)",
       "confirmPassword": "Bevestig wachtwoord",

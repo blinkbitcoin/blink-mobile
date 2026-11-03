@@ -53,6 +53,7 @@ jest.mock("@app/self-custodial/bridge/limits", () => {
 jest.mock("@app/self-custodial/config", () => ({
   MAX_SLIPPAGE_BPS: 50,
   requireSparkTokenIdentifier: () => mockRequireTokenId(),
+  sparkTokenIdentifier: () => mockRequireTokenId(),
   SparkToken: { Label: "USDB", DefaultDecimals: 6 },
 }))
 

@@ -44,6 +44,7 @@ jest.mock("@app/self-custodial/bridge", () => ({
   addSdkEventListener: (...args: unknown[]) => mockAddSdkEventListener(...args),
   removeSdkEventListener: (...args: unknown[]) => mockRemoveSdkEventListener(...args),
   getUserSettings: (...args: unknown[]) => mockGetUserSettings(...args),
+  SdkStorageRetiredError: class SdkStorageRetiredError extends Error {},
 }))
 
 const mockValidateStoredNetwork = jest.fn()
@@ -121,27 +122,29 @@ const captureListener = (): { current: SdkEventListener | null } => {
 
 const buildSdk = (id: string) => ({ id }) as unknown as object
 
-describe("useSdkLifecycle", () => {
-  beforeEach(() => {
-    jest.clearAllMocks()
-    mockDepositClaimLeewayVbyte = 7
-    mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
-    mockValidateStoredNetwork.mockResolvedValue(true)
-    mockGetSnapshot.mockResolvedValue({
-      wallets: [],
-      allTransactions: [],
-      hasMore: false,
-      rawTransactionCount: 0,
-    })
-    mockAddSdkEventListener.mockResolvedValue("listener-id")
-    mockRemoveSdkEventListener.mockResolvedValue(undefined)
-    mockGetUserSettings.mockResolvedValue({ stableBalanceActiveLabel: undefined })
-    mockDisconnectSdk.mockResolvedValue(undefined)
-    const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
-    isOnline.getOnlineState.mockResolvedValue("online")
-    isOnline.getServiceStatus.mockResolvedValue(0)
-    isOnline.isDegradedStatus.mockReturnValue(false)
+const resetMocks = () => {
+  jest.clearAllMocks()
+  mockDepositClaimLeewayVbyte = 7
+  mockGetMnemonicForAccount.mockResolvedValue("word1 word2 word3")
+  mockValidateStoredNetwork.mockResolvedValue(true)
+  mockGetSnapshot.mockResolvedValue({
+    wallets: [],
+    allTransactions: [],
+    hasMore: false,
+    rawTransactionCount: 0,
   })
+  mockAddSdkEventListener.mockResolvedValue("listener-id")
+  mockRemoveSdkEventListener.mockResolvedValue(undefined)
+  mockGetUserSettings.mockResolvedValue({ stableBalanceActiveLabel: undefined })
+  mockDisconnectSdk.mockResolvedValue(undefined)
+  const isOnline = jest.requireMock("@app/self-custodial/providers/is-online")
+  isOnline.getOnlineState.mockResolvedValue("online")
+  isOnline.getServiceStatus.mockResolvedValue(0)
+  isOnline.isDegradedStatus.mockReturnValue(false)
+}
+
+describe("useSdkLifecycle", () => {
+  beforeEach(resetMocks)
 
   describe("inactive paths", () => {
     it("stays Unavailable and never calls initSdk when accountId is null", async () => {
@@ -183,6 +186,24 @@ describe("useSdkLifecycle", () => {
       await waitFor(() => {
         expect(result.current.status).toBe(ActiveWalletStatus.Error)
       })
+    })
+
+    it("treats a connect refused for a wallet being deleted as expected, not an error", async () => {
+      const { SdkStorageRetiredError } = jest.requireMock("@app/self-custodial/bridge")
+      mockInitSdk.mockRejectedValue(new SdkStorageRetiredError("/tmp/acct-1"))
+
+      const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+
+      await waitFor(() => {
+        expect(mockInitSdk).toHaveBeenCalledTimes(1)
+      })
+      await act(async () => {
+        await new Promise((resolve) => {
+          setImmediate(resolve)
+        })
+      })
+      expect(result.current.status).not.toBe(ActiveWalletStatus.Error)
+      expect(mockRecordError).not.toHaveBeenCalled()
     })
   })
 
@@ -318,6 +339,45 @@ describe("useSdkLifecycle", () => {
         mockInitSdk.mock.invocationCallOrder[1],
       )
       expect(mockRemoveSdkEventListener).toHaveBeenCalledWith(sdkA, "listener-id")
+    })
+
+    it("never connects a run cancelled while it was still validating the network", async () => {
+      // a deletion switches away from the wallet while its lifecycle holds the mnemonic
+      let finishValidation: (isValid: boolean) => void = () => {}
+      mockValidateStoredNetwork.mockImplementationOnce(
+        () =>
+          new Promise<boolean>((resolve) => {
+            finishValidation = resolve
+          }),
+      )
+      mockInitSdk.mockResolvedValue(buildSdk("sdk-B"))
+      captureListener()
+
+      const { rerender } = renderHook(
+        ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+        { initialProps: { accountId: "acct-A" } },
+      )
+      await waitFor(() => {
+        expect(mockValidateStoredNetwork).toHaveBeenCalledTimes(1)
+      })
+      rerender({ accountId: "acct-B" })
+      await waitFor(() => {
+        expect(mockInitSdk).toHaveBeenCalledWith(
+          expect.objectContaining({ storageDir: "/tmp/acct-B" }),
+        )
+      })
+
+      await act(async () => {
+        finishValidation(true)
+        await new Promise((resolve) => {
+          setImmediate(resolve)
+        })
+      })
+
+      expect(mockInitSdk).toHaveBeenCalledTimes(1)
+      expect(mockInitSdk).not.toHaveBeenCalledWith(
+        expect.objectContaining({ storageDir: "/tmp/acct-A" }),
+      )
     })
 
     it("disconnects the SDK on unmount", async () => {
@@ -756,6 +816,10 @@ describe("useSdkLifecycle", () => {
       expect(secondSettled).toBe(true)
     })
   })
+})
+
+describe("useSdkLifecycle: connectivity and retries", () => {
+  beforeEach(resetMocks)
 
   describe("offline / degraded transitions", () => {
     it("flips status to Offline when snapshot fails and connectivity is Offline", async () => {

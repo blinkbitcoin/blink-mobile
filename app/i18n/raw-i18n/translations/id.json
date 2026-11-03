@@ -2229,6 +2229,12 @@
     "error": "Gagal membuat faktur. Silakan hubungi dukungan jika masalah ini terus berlanjut.",
     "copyInvoice": "Salin",
     "shareInvoice": "Bagikan",
+    "newAddress": "Baru",
+    "newAddressHint": "Membuat alamat Bitcoin baru. Alamat sebelumnya tetap berfungsi.",
+    "newAddressGenerated": "Alamat baru siap. Alamat sebelumnya tetap berfungsi.",
+    "newAddressFailed": "Gagal membuat alamat baru. Silakan coba lagi.",
+    "newAddressRateLimited": "Terlalu banyak alamat baru. Tunggu sebentar lalu coba lagi.",
+    "onchainAddressLoadFailed": "Gagal memuat alamat Bitcoin Anda. Ketuk Baru untuk mencoba lagi.",
     "addAmount": "Minta Jumlah Tertentu",
     "expired": "Faktur telah kedaluwarsa",
     "expiresIn": "Berakhir dalam",
@@ -2591,7 +2597,8 @@
   "StablesatsRestriction": {
     "walletLabel": "tidak tersedia di wilayah Anda",
     "anonModeWalletLabel": "tidak tersedia dalam mode Incognito",
-    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi"
+    "unknownRegionWalletLabel": "ketersediaan tidak dapat diperiksa, tarik ke bawah untuk mencoba lagi",
+    "networkWalletLabel": "tidak tersedia di jaringan ini"
   },
   "AnonModeConvertModal": {
     "title": "Transfer saldo Dolar Anda terlebih dahulu",
@@ -2673,7 +2680,7 @@
   "TransactionDetailScreen": {
     "paid": "Dibayar ke/dari",
     "received": "Anda menerima",
-    "spent": "Anda menghabiskan",
+    "sent": "Anda mengirim",
     "sending": "Mengirim",
     "receivingAccount": "Akun Penerima",
     "sendingAccount": "Akun Pengirim",
@@ -3075,7 +3082,13 @@
     "deleteAccountFromPhone": "Halo!, tolong tutup akun saya. Nomor telepon saya adalah {phoneNumber: string}.",
     "deleteAccountError": "Terjadi kesalahan. Hubungi {email: string} untuk bantuan lebih lanjut.",
     "bye": "Selamat tinggal!",
-    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum."
+    "deleteAccountWarning": "Perhatian: Penutupan akun bersifat permanen!\nPastikan dompet tidak memiliki dana sebelum menutup.\nAkun yang ditutup tidak dapat dipulihkan.\nKami dapat menyimpan catatan tertentu sebagaimana diwajibkan oleh hukum.",
+    "downloadLogs": "Unduh log",
+    "exportLogsTitle": "Bagikan log dompet Anda",
+    "exportLogsBody": "Berkas ini membantu tim dukungan kami menelusuri masalah pada dompet Anda. Berkas ini berisi riwayat pembayaran (jumlah, faktur, dan alamat) serta pengenal setiap dompet non-kustodial di perangkat ini, bukan hanya yang ini, tetapi tidak pernah frasa cadangan atau kunci Anda. Bagikan hanya kepada tim dukungan kami.",
+    "exportLogsConfirm": "Bagikan log",
+    "noLogsYet": "Belum ada log untuk dibagikan. Buka dompet Anda dan coba lagi.",
+    "exportLogsError": "Tidak dapat mengekspor log. Coba lagi."
   },
   "lnurl": {
     "overLimit": "Anda tidak dapat mengirim lebih dari jumlah maksimum.",
@@ -3805,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Cadangkan dompet Anda",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Pilih metode cadangan Anda",
@@ -3863,6 +3876,7 @@
     "CloudBackup": {
       "title": "Mari cadangkan dompet Anda",
       "description": "Kami akan menyimpan cadangan frasa pemulihan Anda ke {provider} Anda.",
+      "encryptCheckbox": "Enkripsi dengan kata sandi tambahan",
       "password": "Kata sandi",
       "passwordPlaceholder": "(minimal 12 karakter)",
       "confirmPassword": "Konfirmasi kata sandi",

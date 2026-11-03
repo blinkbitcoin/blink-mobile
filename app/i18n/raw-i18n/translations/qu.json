@@ -2229,6 +2229,12 @@
     "error": "Invoice kawsayniyta qillqata sutichinaqinmi. Chaskisqa kaniyta yachanakuyta sutichaqta munanpi ch'usaq kayniyta rikuy munanpi kawsayniyta qillqata sutichinaqinmi.",
     "copyInvoice": "Copy",
     "shareInvoice": "Ch'usaq k'iru",
+    "newAddress": "Musuq",
+    "newAddressHint": "Musuq Bitcoin tiyanata ruran. Ñawpaq tiyanakunaqa llamk'allanmi.",
+    "newAddressGenerated": "Musuq tiyana listoñam. Ñawpaq tiyanakunaqa llamk'allanmi.",
+    "newAddressFailed": "Manam musuq tiyanata ruraytachu atikurqan. Huktawan kallpachakuy.",
+    "newAddressRateLimited": "Nisyu musuq tiyanakuna. Asllata suyay, huktawan kallpachakuy.",
+    "onchainAddressLoadFailed": "Manam Bitcoin tiyanaykita apamuyta atikurqanchu. Musuqta ñit'iy huktawan kallpachakunaykipaq.",
     "addAmount": "Ch'usaq kayniyta sutichaq",
     "expired": "Qillqa chhikan",
     "expiresIn": "Munanpi chhikan",
@@ -2591,7 +2597,8 @@
   "StablesatsRestriction": {
     "walletLabel": "mana kapunchu suyuykipi",
     "anonModeWalletLabel": "mana Incognito modopi kanchu",
-    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq"
+    "unknownRegionWalletLabel": "manam kasqanta qhawayta atikurqanchu, uraman aysay yapamanta yanaykunaykipaq",
+    "networkWalletLabel": "kay llika-pi mana kanchu"
   },
   "AnonModeConvertModal": {
     "title": "Ñawpaqta Dolar qullqiykita astay",
@@ -2673,7 +2680,7 @@
   "TransactionDetailScreen": {
     "paid": "Riqsichiy",
     "received": "Yachachichiy",
-    "spent": "Qallarichiy",
+    "sent": "Apachirqanki",
     "sending": "Apachishaspa",
     "receivingAccount": "Kawsayniyta qillqata sutichinaqin yachachinaqin sutiyuq",
     "sendingAccount": "Kawsayniyta yachachinaqin qillqata sutiyuq",
@@ -3075,7 +3082,13 @@
     "deleteAccountFromPhone": "Napaykuy!, ama hina kaspa cuentayta wichq'ay. Teléfono numeroyqa {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Yuyay: Cuenta wichq'ayqa wiñaypaqmi!\nWichq'aypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nWichq'asqa cuentaqa mana kutichiy atikunchu.\nIcha wakin willakuykunata waqaychaykuymi ley kamasqan."
+    "deleteAccountWarning": "Yuyay: Cuenta wichq'ayqa wiñaypaqmi!\nWichq'aypa ñawpaqta walletakunapi mana qullqi kananpaq chiqapchay.\nWichq'asqa cuentaqa mana kutichiy atikunchu.\nIcha wakin willakuykunata waqaychaykuymi ley kamasqan.",
+    "downloadLogs": "Qillqakunata urquy",
+    "exportLogsTitle": "Qullqikuqniykipa qillqakunanta qunakuy",
+    "exportLogsBody": "Kay willañiqi yanapan yanapaqkunata qullqikuqniykikunapi sasachakuykunata qhaway. Paypiqa pagay wiñay (chaninkuna, facturas, direccionkuna) hinallataq kay dispositivopi llapa mana waqaychasqa qullqikuqniypa sutichaynin, manan kaylla chu, ichaqa manan waqaychana rimaykuna nitaq llavekuna. Yanapaqkunallawan qunakuy.",
+    "exportLogsConfirm": "Qillqakunata qunakuy",
+    "noLogsYet": "Manaraq qillqakuna kanchu qunanapaq. Qullqikuqniykita kichay, watiqmanta ruway.",
+    "exportLogsError": "Qillqakunataqa manam hurquyta atirqanichu. Hukmanta kallpachakuy."
   },
   "lnurl": {
     "overLimit": "Monto yachanapaq kachkanman.",
@@ -3805,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Qullqikuqniykita waqaychay",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Akllay imayna waqaychanaykita",
@@ -3863,6 +3876,7 @@
     "CloudBackup": {
       "title": "Qullqikuqniykita waqaychasun",
       "description": "Waqaychay simiykipa huknin kaqta {provider} nisqaykiman waqaychasaqku.",
+      "encryptCheckbox": "Yapay contraseñawan pakay",
       "password": "Contraseña",
       "passwordPlaceholder": "(pisi kaptinpas 12 sanampakuna)",
       "confirmPassword": "Contraseñata takyachiy",

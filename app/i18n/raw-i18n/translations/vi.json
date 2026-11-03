@@ -2229,6 +2229,12 @@
     "error": "Không thể tạo hóa đơn. Vui lòng liên hệ với bộ phận hỗ trợ nếu sự cố này vẫn tiếp diễn.",
     "copyInvoice": "Copy",
     "shareInvoice": "Chia sẻ",
+    "newAddress": "Mới",
+    "newAddressHint": "Tạo một địa chỉ Bitcoin mới. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressGenerated": "Địa chỉ mới đã sẵn sàng. Các địa chỉ trước vẫn hoạt động.",
+    "newAddressFailed": "Không thể tạo địa chỉ mới. Vui lòng thử lại.",
+    "newAddressRateLimited": "Quá nhiều địa chỉ mới. Vui lòng đợi một lúc rồi thử lại.",
+    "onchainAddressLoadFailed": "Không thể tải địa chỉ Bitcoin của bạn. Nhấn Mới để thử lại.",
     "addAmount": "Yêu cầu số tiền cụ thể",
     "expired": "Hóa đơn đã hết hạn",
     "expiresIn": "Hết hạn trong",
@@ -2591,7 +2597,8 @@
   "StablesatsRestriction": {
     "walletLabel": "không khả dụng tại khu vực của bạn",
     "anonModeWalletLabel": "không khả dụng ở chế độ Incognito",
-    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại"
+    "unknownRegionWalletLabel": "không thể kiểm tra tình trạng khả dụng, kéo xuống để thử lại",
+    "networkWalletLabel": "không khả dụng trên mạng này"
   },
   "AnonModeConvertModal": {
     "title": "Hãy chuyển số dư Đô la của bạn trước",
@@ -2673,7 +2680,7 @@
   "TransactionDetailScreen": {
     "paid": "Trả tiền cho/từ",
     "received": "Bạn đã nhận",
-    "spent": "Bạn đã chi",
+    "sent": "Bạn đã gửi",
     "sending": "Đang gửi",
     "receivingAccount": "Số dư nhận",
     "sendingAccount": "Số dư gửi",
@@ -3075,7 +3082,13 @@
     "deleteAccountFromPhone": "Xin chào!, vui lòng đóng tài khoản của tôi. Số điện thoại của tôi là {phoneNumber: string}.",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật."
+    "deleteAccountWarning": "Lưu ý: Việc đóng tài khoản là vĩnh viễn!\nHãy đảm bảo ví không còn tiền trước khi đóng.\nTài khoản đã đóng không thể khôi phục.\nChúng tôi có thể lưu giữ một số hồ sơ theo yêu cầu của pháp luật.",
+    "downloadLogs": "Tải nhật ký xuống",
+    "exportLogsTitle": "Chia sẻ nhật ký ví của bạn",
+    "exportLogsBody": "Tệp này giúp bộ phận hỗ trợ xem xét sự cố với ví của bạn. Tệp gồm lịch sử thanh toán (số tiền, hóa đơn và địa chỉ) và mã định danh của mọi ví không lưu ký trên thiết bị này, không chỉ ví này, nhưng không bao giờ gồm cụm từ sao lưu hay khóa. Chỉ chia sẻ với bộ phận hỗ trợ của chúng tôi.",
+    "exportLogsConfirm": "Chia sẻ nhật ký",
+    "noLogsYet": "Chưa có nhật ký để chia sẻ. Mở ví và thử lại.",
+    "exportLogsError": "Không xuất được nhật ký. Vui lòng thử lại."
   },
   "lnurl": {
     "overLimit": "Bạn không thể gửi quá mức tiền tối đa",
@@ -3805,7 +3818,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Sao lưu ví của bạn",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chọn phương thức sao lưu",
@@ -3863,6 +3876,7 @@
     "CloudBackup": {
       "title": "Hãy sao lưu ví của bạn",
       "description": "Chúng tôi sẽ lưu bản sao cụm từ khôi phục của bạn vào {provider} của bạn.",
+      "encryptCheckbox": "Mã hóa bằng mật khẩu bổ sung",
       "password": "Mật khẩu",
       "passwordPlaceholder": "(tối thiểu 12 ký tự)",
       "confirmPassword": "Xác nhận mật khẩu",
