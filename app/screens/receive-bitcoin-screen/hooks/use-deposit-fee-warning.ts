@@ -14,9 +14,8 @@ type AmountWarning = (amount: MoneyAmount<WalletOrDisplayCurrency>) => string | 
  * The amount sheet's warning for a custodial onchain receive whose amount the
  * flat deposit fee would swallow (blink-wip#1261). It reads the typed amount
  * in sats, so a display-currency amount is converted on every keystroke.
- * Under the backend's minimum the deposit never arrives; between it and the
- * fee the fee takes all of it; under `depositFeeWarningMultiplier` fees it
- * takes most. Self-custodial deposits carry no `feesInformation` and never warn.
+ * Under the backend's minimum, or at or under the fee, the deposit never
+ * arrives; under `depositFeeWarningMultiplier` fees it arrives with most gone. Self-custodial deposits carry no `feesInformation` and never warn.
  */
 export const useDepositFeeWarning = (
   requestState: ReceivePaymentRequestState,

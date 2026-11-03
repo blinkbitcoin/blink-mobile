@@ -172,8 +172,12 @@ describe("getDepositFeeWarning", () => {
       expect(classify(F - 1, low)?.type).toBe(DepositFeeWarning.AllConsumedByFee)
     })
 
-    it("warns about the fee from exactly the fee", () => {
-      expect(classify(F, low)?.type).toBe(DepositFeeWarning.ConsumedByFee)
+    it("flags an amount equal to the fee, which the backend credits as nothing", () => {
+      expect(classify(F, low)?.type).toBe(DepositFeeWarning.AllConsumedByFee)
+    })
+
+    it("warns about the fee from one sat over the fee", () => {
+      expect(classify(F + 1, low)?.type).toBe(DepositFeeWarning.ConsumedByFee)
     })
   })
 
@@ -196,7 +200,7 @@ describe("getDepositFeeWarning", () => {
     expect(classify(6001, { deposit: steep })).toEqual(
       result(DepositFeeWarning.AllConsumedByFee, { fee: 8000 }),
     )
-    expect(classify(8000, { deposit: steep })?.type).toBe(DepositFeeWarning.ConsumedByFee)
+    expect(classify(8001, { deposit: steep })?.type).toBe(DepositFeeWarning.ConsumedByFee)
   })
 
   it("narrows the band with a smaller multiplier", () => {

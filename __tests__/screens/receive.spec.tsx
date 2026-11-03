@@ -1808,6 +1808,26 @@ describe("ReceiveScreen deposit fee warning (blink-wip#1261)", () => {
     await flushEffects()
   })
 
+  it("keeps warning on screen for an amount set on another page", async () => {
+    await openAmountSheet(0)
+    type("1")
+    fireEvent.press(screen.getByText(LL.AmountInputScreen.setAmount()))
+    await flushAsync()
+    await flushAsync()
+    expect(screen.queryByTestId("deposit-fee-warning")).toBeNull()
+
+    fireEvent.press(screen.getByTestId("carousel-page-1"))
+    await flushAsync()
+
+    await waitFor(() => {
+      expect(screen.getByTestId("deposit-fee-warning").props.children).toBe(
+        LL.ReceiveScreen.depositBelowMinimum({ min: "5,000" }),
+      )
+    })
+
+    await flushEffects()
+  })
+
   it("never warns on the Paycode / Lightning page", async () => {
     await openAmountSheet(0)
 
