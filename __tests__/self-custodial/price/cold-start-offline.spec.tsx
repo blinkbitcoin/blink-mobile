@@ -13,6 +13,8 @@ import { withSelfCustodialFiatRates } from "@app/store/persistent-state/self-cus
 import { defaultPersistentState } from "@app/store/persistent-state/state-migrations"
 import { DisplayCurrency, toBtcMoneyAmount } from "@app/types/amounts"
 
+import { flushEffects } from "../../helpers/flush-effects"
+
 /**
  * The case the whole price phase exists for: a cold start with every Blink service
  * unreachable. Nothing is in the Apollo cache — it is deliberately never restored
@@ -131,8 +133,9 @@ describe("a cold start with every Blink service unreachable", () => {
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(ratesOnly),
     })
+    await flushEffects()
 
-    await waitFor(() => expect(result.current.isSatsOnly).toBe(true))
+    expect(result.current.isSatsOnly).toBe(true)
     expect(
       result.current.convertMoneyAmount?.(toBtcMoneyAmount(1000), DisplayCurrency)
         ?.amount,
@@ -145,6 +148,7 @@ describe("a cold start with every Blink service unreachable", () => {
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(state),
     })
+    await flushEffects()
 
     const converted = result.current.convertMoneyAmount?.(
       toBtcMoneyAmount(1000),
@@ -163,17 +167,19 @@ describe("a cold start with every Blink service unreachable", () => {
     })
 
     // A failed refresh is answered by the feed already in hand, not by blanking it.
-    await waitFor(() => expect(mockedListFiatRates).toHaveBeenCalled())
+    await flushEffects()
+    expect(mockedListFiatRates).toHaveBeenCalled()
     expect(result.current.convertMoneyAmount).toBeDefined()
     expect(result.current.priceFreshness).toBe("fresh")
   })
 
-  it("marks a day-old persisted feed stale, and still converts from it", () => {
+  it("marks a day-old persisted feed stale, and still converts from it", async () => {
     const state = storedWith(feed, Date.now() - 2 * 60 * 60 * 1000)
 
     const { result } = renderHook(() => usePriceConversion(), {
       wrapper: wrapperWith(state),
     })
+    await flushEffects()
 
     expect(result.current.priceFreshness).toBe("stale")
     expect(result.current.convertMoneyAmount).toBeDefined()
@@ -215,7 +221,8 @@ describe("a cold start with every Blink service unreachable", () => {
 
     // A day-old rate presented as today's is worse than no figure at all, so the fiat
     // price is withheld — and the amounts fall back to sats rather than disappearing.
-    await waitFor(() => expect(result.current.priceStatus).toBe("unavailable"))
+    await flushEffects()
+    expect(result.current.priceStatus).toBe("unavailable")
     expect(result.current.isSatsOnly).toBe(true)
     expect(result.current.displayCurrency).toBe("SAT")
   })
