@@ -133,6 +133,11 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
    *  empty state before any answer, so this is what tells the two apart. */
   const sdkAnsweredForRef = useRef<string | null>(null)
 
+  /** The account selected now, read after an await: a refresh started on one account
+   *  can resolve after the user has switched to another. */
+  const activeAccountIdRef = useRef(activeSelfCustodialAccountId)
+  activeAccountIdRef.current = activeSelfCustodialAccountId
+
   useEffect(() => {
     sdkAnsweredForRef.current = null
     setLightningAddress(null)
@@ -212,14 +217,24 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     }
   }, [sdk, connectedAccountId, isSdkOnActiveAccount, reloadSelfCustodialAccounts])
 
+  /**
+   * The answer is recorded under the account it was asked for whatever happens, but it
+   * is only shown while that account is still the selected one, for the same reason the
+   * lookup above is gated: otherwise a refresh that lands after a switch would offer the
+   * previous account's address, and its paycode, under the new one.
+   */
   const updateCurrentSelfCustodialAccount = useCallback(async () => {
     if (!sdk || !connectedAccountId) return
+    const accountId = connectedAccountId
     try {
       const info = await getLightningAddress(sdk)
       const resolved = info?.lightningAddress ?? null
-      sdkAnsweredForRef.current = connectedAccountId
-      setLightningAddress(resolved)
-      await setSelfCustodialLightningAddress(connectedAccountId, resolved)
+      const isStillActive = activeAccountIdRef.current === accountId
+      if (isStillActive) {
+        sdkAnsweredForRef.current = accountId
+        setLightningAddress(resolved)
+      }
+      await setSelfCustodialLightningAddress(accountId, resolved)
       await reloadSelfCustodialAccounts()
     } catch (err) {
       reportLightningAddressError(LightningAddressOperation.Refresh, err)

@@ -106,6 +106,40 @@ describe("SelfCustodialWalletProvider — the Lightning Address across an accoun
     expect(mockSetSelfCustodialLightningAddress).not.toHaveBeenCalled()
   })
 
+  it("keeps the account switched to when a manual refresh started on the previous one lands late", async () => {
+    mockGetLightningAddress.mockResolvedValueOnce({ lightningAddress: "alice@blink.sv" })
+    let resolveRefreshA: (info: { lightningAddress: string }) => void = () => {}
+    mockGetLightningAddress.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolveRefreshA = resolve
+        }),
+    )
+
+    const { result, rerender } = renderHook(() => useSelfCustodialWallet(), { wrapper })
+    await waitFor(() => expect(result.current.lightningAddress).toBe("alice@blink.sv"))
+    let refreshA: Promise<void> = Promise.resolve()
+    act(() => {
+      refreshA = result.current.updateCurrentSelfCustodialAccount()
+    })
+    await waitFor(() => expect(mockGetLightningAddress).toHaveBeenCalledTimes(2))
+
+    mockActiveAccountId = ACCOUNT_B
+    rerender(undefined)
+    await waitFor(() => expect(result.current.lightningAddress).toBe("bob@blink.sv"))
+
+    await act(async () => {
+      resolveRefreshA({ lightningAddress: "alice@blink.sv" })
+      await refreshA
+    })
+
+    expect(result.current.lightningAddress).toBe("bob@blink.sv")
+    expect(mockSetSelfCustodialLightningAddress).toHaveBeenLastCalledWith(
+      ACCOUNT_A,
+      "alice@blink.sv",
+    )
+  })
+
   it("asks nothing of the previous account's SDK once the account has switched", async () => {
     mockActiveAccountId = ACCOUNT_B
 
