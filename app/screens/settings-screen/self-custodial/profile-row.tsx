@@ -32,6 +32,9 @@ import { useDeleteAccount } from "@app/self-custodial/hooks/use-delete-account"
 
 import { navigateAfterAccountDelete } from "./navigate-after-account-delete"
 
+/** A blank address is no address: it must not mask a stored one or render an empty title. */
+const presentAddress = (address: string | null): string | null => address?.trim() || null
+
 type ProfileRowProps = {
   entry: SelfCustodialAccountEntry
   isFirstItem?: boolean
@@ -63,9 +66,10 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
     activeAccount?.type === AccountType.SelfCustodial && activeAccount.id === accountId
 
   const lightningAddress = isActive
-    ? liveLightningAddress ?? persistedLightningAddress
-    : persistedLightningAddress
+    ? presentAddress(liveLightningAddress) ?? presentAddress(persistedLightningAddress)
+    : presentAddress(persistedLightningAddress)
   const rowTitle = lightningAddress ?? LL.common.anonymousUser()
+  const accountTypeLabel = LL.AccountTypeSelectionScreen.selfCustodialLabel()
 
   const handleSwitch = () => {
     if (isActive) return
@@ -146,7 +150,14 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
 
   return (
     <>
-      <TouchableOpacity onPress={handleSwitch} {...testProps(`profile-row-${accountId}`)}>
+      <TouchableOpacity
+        onPress={handleSwitch}
+        testID={`profile-row-${accountId}`}
+        accessible
+        accessibilityRole="button"
+        accessibilityLabel={`${rowTitle}, ${accountTypeLabel}`}
+        accessibilityState={{ selected: isActive }}
+      >
         <ListItem
           bottomDivider
           containerStyle={[styles.listStyle, isFirstItem && styles.firstItem]}
@@ -161,7 +172,7 @@ export const ProfileRow: React.FC<ProfileRowProps> = ({ entry, isFirstItem }) =>
               {rowTitle}
             </ListItem.Title>
             <Text type="p3" style={styles.subtleText}>
-              {LL.AccountTypeSelectionScreen.selfCustodialLabel()}
+              {accountTypeLabel}
             </Text>
           </ListItem.Content>
           {probingBalance ? (

@@ -1,6 +1,7 @@
 import React from "react"
 import { Network as mockSparkNetwork } from "@breeztech/breez-sdk-spark-react-native"
 import { act, fireEvent, render } from "@testing-library/react-native"
+import { it } from "@jest/globals"
 
 import { AccountStatus, AccountType } from "@app/types/wallet"
 
@@ -239,8 +240,7 @@ describe("ProfileRow", () => {
     })
   })
 
-  /** Custodial rows spell the whole address, and on mainnet every self-custodial address
-   *  is on blink.sv: a bare username here reads as a missing account. */
+  /** Custodial rows spell the whole address, so a bare username here reads as a missing account. */
   it("renders the full lightning address, domain included, as the row title when one is set", () => {
     const { getByText, queryByText } = render(
       <ProfileRow
@@ -258,6 +258,37 @@ describe("ProfileRow", () => {
     )
 
     expect(getByText("Anon user")).toBeTruthy()
+  })
+
+  it.each(["", "   "])(
+    "falls back to anonymous user label when the stored address is blank (%j)",
+    (blank) => {
+      const { getByText } = render(
+        <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: blank }} />,
+      )
+
+      expect(getByText("Anon user")).toBeTruthy()
+    },
+  )
+
+  it("announces the address and account type instead of the test id", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@blink.sv" }} />,
+    )
+
+    expect(getByTestId(`profile-row-${TEST_ENTRY_ID}`).props.accessibilityLabel).toBe(
+      "alice@blink.sv, Non-custodial",
+    )
+  })
+
+  it("announces the anonymous label when no address is set", () => {
+    const { getByTestId } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: null }} />,
+    )
+
+    expect(getByTestId(`profile-row-${TEST_ENTRY_ID}`).props.accessibilityLabel).toBe(
+      "Anon user, Non-custodial",
+    )
   })
 
   it("switches to the entry's account id when the row is pressed", () => {
@@ -582,6 +613,45 @@ describe("ProfileRow", () => {
     )
 
     expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
+  })
+
+  it("falls back to the persisted address on the active row when the SDK has none", () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+
+    const { getByText } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@blink.sv" }} />,
+    )
+
+    expect(getByText("stored@blink.sv")).toBeTruthy()
+  })
+
+  it("does not let a blank live address mask the persisted one on the active row", () => {
+    mockUseAccountRegistry.mockReturnValue({
+      activeAccount: {
+        id: TEST_ENTRY_ID,
+        type: AccountType.SelfCustodial,
+        label: "Spark",
+        selected: true,
+        status: AccountStatus.RequiresRestore,
+      },
+      setActiveAccountId,
+    })
+    mockUseSelfCustodialWallet.mockReturnValue({ lightningAddress: "", wallets: [] })
+
+    const { getByText } = render(
+      <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stored@blink.sv" }} />,
+    )
+
+    expect(getByText("stored@blink.sv")).toBeTruthy()
   })
 
   it("ignores the live lightning address for inactive rows and uses the persisted entry value", () => {
