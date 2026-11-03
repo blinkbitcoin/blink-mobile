@@ -84,7 +84,10 @@ missing pieces as findings:
 | **Audit** | dependency advisories (`make audit`) | Yes |
 | **Conventional commits** | PR title/commit format | Yes |
 | **CodeQL / spelling / qlty** | static analysis, typos | Yes |
-| **Android / iOS (E2E)** | Detox on self-hosted runners | Flaky; routinely fails/times out even on merged PRs. Investigate, but don't treat a red E2E alone as blocking — do treat a *relevant* E2E failure as one |
+
+There is no E2E check: the Android/iOS E2E workflow was removed while the CI overhaul is
+pending. The suites still run locally ([e2e-testing.md](./e2e-testing.md)); for a PR that
+touches a flow they cover, ask the author whether they ran them.
 
 Most common Tests failure: **stale copy assertions after an i18n/copy change** (#3862,
 #3882). If a PR changes user-facing strings, check that test assertions were updated in the
