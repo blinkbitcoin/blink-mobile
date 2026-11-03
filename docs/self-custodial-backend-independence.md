@@ -239,6 +239,10 @@ that touch those call sites, rather than churning them twice.
   query is skipped entirely once the SDK has answered — so a self-custodial
   session makes no price request of its own. It still asks when the feed cannot
   price the display currency, which is the feed's own gap rather than an outage.
+  The backend's answer is aged by its own timestamp under the same windows as
+  the feed, because the Apollo cache keeps the last answer when a refresh fails
+  and a self-custodial session must not price off a days-old one as current. A
+  custodial session still reads it as current, since it has no sats fallback.
   The hook now also returns `priceFreshness`.
 
 Staleness thresholds: fresh under 1 h, usable-but-marked under 24 h, withheld
@@ -378,8 +382,9 @@ deployment, and the switches in Phase 1 can take it down on its own.
   before going off to pick another.
 - **Mode sync retries on foreground**, not only on the next launch, so a user
   who regains signal mid-session gets their Lightning Address back without
-  restarting. Foreground only, never a timer: each Enhanced push costs the
-  server a paid country lookup.
+  restarting. Foreground only, never a timer, and never a second identical
+  request while the first is pending: each Enhanced push costs the server a paid
+  country lookup.
 
 ### Phase 6 — Send destination resolution · done
 

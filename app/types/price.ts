@@ -22,8 +22,9 @@ export type FiatRate = {
   value: number
 }
 
-/** What the conversion layer consumes. Both are "how much display currency", so a
- *  display currency of USD gives `displayCurrencyPerCent` of exactly 0.01. */
+/** What the conversion layer consumes. Both are minor units of the display currency, so
+ *  a display currency of USD gives `displayCurrencyPerCent` of exactly 1: one display
+ *  cent per US cent. */
 export type PriceRates = {
   displayCurrencyPerSat: number
   displayCurrencyPerCent: number
