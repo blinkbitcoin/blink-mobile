@@ -220,7 +220,7 @@ export const Delete = () => {
           placeholder={LL.support.delete()}
           placeholderTextColor={colors.grey3}
         />
-        <View style={styles.actionButtons}>
+        <View style={styles.modalButtons}>
           <GaloyPrimaryButton
             title={LL.common.confirm()}
             disabled={!userWroteDelete}
@@ -280,6 +280,10 @@ const useStyles = makeStyles(({ colors }) => ({
     flexDirection: "row",
     alignItems: "center",
     justifyContent: "space-between",
+  },
+  modalButtons: {
+    flexDirection: "column",
+    rowGap: 12,
   },
   warningText: {
     color: colors.primary,
