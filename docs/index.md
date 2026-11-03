@@ -51,6 +51,7 @@ yarn ios             # iOS (terminal 2)
 | [PR Review Guide](./pr-review.md) | Review conventions, checklists, and enforced standards for pull requests |
 | [E2E Testing](./e2e-testing.md) | End-to-end testing with Detox/Appium |
 | [Android env config & R8](./android-env-config-r8.md) | Verifying `react-native-config` values survive R8 in release builds |
+| [Self-custodial wallet logs](./self-custodial-logs.md) | Where users download the Breez SDK log, what it contains, and how support reads it |
 | [README](../README.md) | Project overview and basic instructions |
 | [Contributing](../CONTRIBUTING.MD) | Contribution guidelines |
 

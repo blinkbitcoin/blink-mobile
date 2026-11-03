@@ -2229,6 +2229,12 @@
     "error": "Kan factuur niet genereren. Neem contact op met klantenservice als dit probleem zich blijft voordoen.",
     "copyInvoice": "Kopiëren",
     "shareInvoice": "Deel",
+    "newAddress": "Nieuw",
+    "newAddressHint": "Maakt een nieuw Bitcoin-adres aan. Eerdere adressen blijven werken.",
+    "newAddressGenerated": "Nieuw adres klaar. Eerdere adressen blijven werken.",
+    "newAddressFailed": "Kon geen nieuw adres aanmaken. Probeer het opnieuw.",
+    "newAddressRateLimited": "Te veel nieuwe adressen. Wacht even en probeer het opnieuw.",
+    "onchainAddressLoadFailed": "Kon je Bitcoin-adres niet laden. Tik op Nieuw om het opnieuw te proberen.",
     "addAmount": "Vraag Specifiek Bedrag Aan",
     "expired": "De factuur is verlopen",
     "expiresIn": "Verloopt in",
@@ -2612,7 +2618,8 @@
   "StablesatsRestriction": {
     "walletLabel": "niet beschikbaar in jouw regio",
     "anonModeWalletLabel": "niet beschikbaar in Incognito-modus",
-    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen"
+    "unknownRegionWalletLabel": "beschikbaarheid kon niet worden gecontroleerd, trek omlaag om opnieuw te proberen",
+    "networkWalletLabel": "niet beschikbaar op dit netwerk"
   },
   "AnonModeConvertModal": {
     "title": "Zet eerst je dollarsaldo over",
@@ -2694,7 +2701,7 @@
   "TransactionDetailScreen": {
     "paid": "Betaald van/naar",
     "received": "Jij ontving",
-    "spent": "Je hebt uitgegeven",
+    "sent": "Jij verzond",
     "sending": "Verzenden",
     "receivingAccount": "Ontvangend saldo",
     "sendingAccount": "Verzendend saldo",
@@ -3096,7 +3103,13 @@
     "deleteAccountFromPhone": "Hallo daar!, sluit alstublieft mijn account. Mijn telefoonnummer is {phoneNumber: string}.",
     "deleteAccountError": "Er is iets fout gegaan. Neem contact op met {email: string} voor verdere hulp.",
     "bye": "Doei!",
-    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist."
+    "deleteAccountWarning": "Let op: het sluiten van het account is permanent!\nZorg ervoor dat wallets geen fondsen bevatten voordat u sluit.\nEen gesloten account kan niet worden hersteld.\nWij kunnen bepaalde gegevens bewaren als de wet dit vereist.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "U kunt niet meer dan het maximale bedrag verzenden",

@@ -65,6 +65,11 @@ jest.mock("@app/self-custodial/hooks/use-self-custodial-account-mode", () => ({
   useSelfCustodialAccountMode: () => ({ isAnonMode: mockIsAnonMode }),
 }))
 
+let mockHasSparkToken = true
+jest.mock("@app/self-custodial/hooks/use-spark-network", () => ({
+  useHasSparkToken: () => mockHasSparkToken,
+}))
+
 const mockAddBounded = jest.fn()
 jest.mock("@app/utils/bounded-collections", () => {
   const actual = jest.requireActual("@app/utils/bounded-collections")
@@ -137,6 +142,7 @@ const makeRecord = (overrides: Partial<Record<string, unknown>> = {}) => ({
 
 const setupDefaults = (sdk: ListenerSdk) => {
   mockIsAnonMode = false
+  mockHasSparkToken = true
   mockUseSelfCustodialWallet.mockReturnValue({
     sdk,
     lastReceivedPaymentId: null,
@@ -257,6 +263,39 @@ describe("useAutoConvertListener — live trigger", () => {
     expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
 
     mockIsAnonMode = false
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  /** The token cannot appear mid-session; flipping it is what proves the hold held a
+   *  payment the listener would otherwise have converted. */
+  it("holds a received payment on a network with no dollar token", async () => {
+    const sdk = makeSdk({
+      getPayment: jest
+        .fn()
+        .mockResolvedValue({ payment: makeLightningPayment("lnbc1dollar", 5000n) }),
+    })
+    setupDefaults(sdk)
+    mockHasSparkToken = false
+    mockUseSelfCustodialWallet.mockReturnValue({
+      sdk,
+      lastReceivedPaymentId: "pid-lnbc1dollar",
+      isStableBalanceActive: false,
+      refreshWallets: mockRefreshWallets,
+    })
+    mockFindPendingAutoConvert.mockResolvedValue(
+      makeRecord({ paymentRequest: "lnbc1dollar" }),
+    )
+
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    await Promise.resolve()
+    expect(sdk.getPayment).not.toHaveBeenCalled()
+    expect(mockExecuteAutoConvert).not.toHaveBeenCalled()
+
+    mockHasSparkToken = true
     rerender({})
 
     await waitFor(() => {
@@ -727,6 +766,31 @@ describe("useAutoConvertListener — mount replay", () => {
     expect(mockListPendingAutoConverts).not.toHaveBeenCalled()
 
     mockIsAnonMode = false
+    rerender({})
+
+    await waitFor(() => {
+      expect(mockExecuteAutoConvert).toHaveBeenCalledTimes(1)
+    })
+  })
+
+  it("holds the replay on a network with no dollar token", async () => {
+    const sdk = makeSdk({
+      listPayments: jest.fn().mockResolvedValue({
+        payments: [makeLightningPayment("lnbc1pending")],
+      }),
+    })
+    setupDefaults(sdk)
+    mockHasSparkToken = false
+    mockListPendingAutoConverts.mockResolvedValue([
+      makeRecord({ paymentRequest: "lnbc1pending" }),
+    ])
+
+    const { rerender } = renderHook(() => useAutoConvertListener())
+    /** The prune is the replay's first, synchronous step: the pending list is only read
+     *  after it resolves, so asserting on that list here would pass either way. */
+    expect(mockPruneExpiredAutoConverts).not.toHaveBeenCalled()
+
+    mockHasSparkToken = true
     rerender({})
 
     await waitFor(() => {

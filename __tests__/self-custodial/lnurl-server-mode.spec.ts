@@ -1,6 +1,7 @@
 import { type BreezSdkInterface } from "@breeztech/breez-sdk-spark-react-native"
 
 import {
+  blinkSignedMessage,
   recoverLnurlServerMode,
   setLnurlServerMode,
 } from "@app/self-custodial/lnurl-server-mode"
@@ -13,7 +14,17 @@ jest.mock("@app/self-custodial/bridge/wallet", () => ({
 
 const PUBKEY = "02ab".padEnd(66, "c")
 const SERVER_URL = "https://pay.example.test"
+const SERVER_HOST = "pay.example.test"
 const NOW_SECONDS = 1_710_000_000
+
+/** The vectors blink-lnurl-server pins in `signed_message.rs`, copied verbatim: a
+ *  compressed key as the wallet really spells one, and the host and clock the server's own
+ *  test uses. Both sides assert the same bytes, so a drift on either breaks here. */
+const SERVER_VECTOR = {
+  domain: "lnurl.example.com",
+  pubkey: "02a1633cafcc01ebfb6d78e39f687a1f0995c62fc95f51ead10a02ee0be551b5dc",
+  timestamp: 1_700_000_000,
+} as const
 
 const mockSignMessage = jest.fn()
 const sdk = { signMessage: mockSignMessage } as unknown as BreezSdkInterface
@@ -60,15 +71,42 @@ describe("setLnurlServerMode", () => {
     })
   })
 
-  /** `mode:` is what keeps a register or transfer signature, made with the same key, from
-   *  being replayed as a mode change. */
-  it("signs the domain-separated challenge the server rebuilds", async () => {
+  /** Naming the route, the host and the mode is what keeps a signature made with this key
+   *  from authorizing anything but this mode on this deployment. */
+  it("signs the blink-lnurl:v1 mode message the server rebuilds", async () => {
     await setup(AccountMode.Anon)
 
     expect(mockSignMessage).toHaveBeenCalledWith({
-      message: `mode:${AccountMode.Anon}:${PUBKEY}-${NOW_SECONDS}`,
+      message: `blink-lnurl:v1\nmode\n${SERVER_HOST}\n${PUBKEY}\n${AccountMode.Anon}\n${NOW_SECONDS}`,
       compact: false,
     })
+  })
+
+  /** The pre-v2 message the server still accepts from older builds. Sending it would keep
+   *  the server's compatibility verifier alive and hand out a credential that also reads
+   *  payment metadata. */
+  it("no longer signs the pre-v2 message", async () => {
+    await setup(AccountMode.Anon)
+
+    expect(mockSignMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({
+        message: `mode:${AccountMode.Anon}:${PUBKEY}-${NOW_SECONDS}`,
+      }),
+    )
+  })
+
+  /** The server rebuilds the message with the host it answered on, so the signature has to
+   *  name the host being posted to rather than anything configuration says. */
+  it("binds the message to the host it posts to, not the whole URL", async () => {
+    await setLnurlServerMode({
+      sdk,
+      serverUrl: "https://Staging.Blink.SV/ignored/path?q=1",
+      mode: AccountMode.Enhanced,
+    })
+
+    expect(mockSignMessage.mock.calls[0][0].message.split("\n")[2]).toBe(
+      "staging.blink.sv",
+    )
   })
 
   /** The server parses DER; a compact signature would be refused as invalid. */
@@ -156,15 +194,24 @@ describe("recoverLnurlServerMode", () => {
     expect(lastRequest().init.method).toBe("POST")
   })
 
-  /** Recover signs the bare pubkey; a `mode:` prefix here would be a message the server
-   *  rebuilds differently and refuses. */
-  it("signs the bare pubkey challenge, undomain-separated", async () => {
+  /** Recover carries no mode field: it reads one rather than setting it. */
+  it("signs the blink-lnurl:v1 recover message the server rebuilds", async () => {
     await recover()
 
     expect(mockSignMessage).toHaveBeenCalledWith({
-      message: `${PUBKEY}-${NOW_SECONDS}`,
+      message: `blink-lnurl:v1\nrecover\n${SERVER_HOST}\n${PUBKEY}\n${NOW_SECONDS}`,
       compact: false,
     })
+  })
+
+  /** The pre-v2 recover message is byte-identical to the server's `/metadata` and
+   *  `/invoices-paid` messages, so signing it hands out a metadata read credential. */
+  it("no longer signs the pre-v2 message, which doubles as a metadata credential", async () => {
+    await recover()
+
+    expect(mockSignMessage).not.toHaveBeenCalledWith(
+      expect.objectContaining({ message: `${PUBKEY}-${NOW_SECONDS}` }),
+    )
   })
 
   it("sends only the signature and the timestamp", async () => {
@@ -237,5 +284,85 @@ describe("recoverLnurlServerMode", () => {
     mockFetch.mockRejectedValue(new Error("network down"))
 
     await expect(recover()).rejects.toThrow("network down")
+  })
+})
+
+/**
+ * The bytes themselves. blink-lnurl-server rebuilds these to verify the two routes the app
+ * signs itself, so they are a wire contract between two repositories: a change on either
+ * side locks every deployed build out of its own Lightning address. The first two cases
+ * are the server's own golden vectors, copied verbatim from `signed_message.rs`.
+ */
+describe("blinkSignedMessage", () => {
+  const { domain, pubkey, timestamp } = SERVER_VECTOR
+
+  it("matches the server's recover vector", () => {
+    expect(blinkSignedMessage({ route: "recover", domain, pubkey, timestamp })).toBe(
+      `blink-lnurl:v1\nrecover\nlnurl.example.com\n${pubkey}\n1700000000`,
+    )
+  })
+
+  it("matches the server's mode vector", () => {
+    expect(
+      blinkSignedMessage({
+        route: "mode",
+        domain,
+        pubkey,
+        mode: AccountMode.Enhanced,
+        timestamp,
+      }),
+    ).toBe(`blink-lnurl:v1\nmode\nlnurl.example.com\n${pubkey}\nenhanced\n1700000000`)
+  })
+
+  it("joins the fields with LF and ends without a trailing newline", () => {
+    const message = blinkSignedMessage({ route: "recover", domain, pubkey, timestamp })
+
+    expect(message.split("\n")).toEqual([
+      "blink-lnurl:v1",
+      "recover",
+      domain,
+      pubkey,
+      "1700000000",
+    ])
+    expect(message.endsWith("\n")).toBe(false)
+  })
+
+  /** A recover signature must not authorize a mode change, and the server verifies both
+   *  against the same key. */
+  it("separates the two routes over the same identity and clock", () => {
+    expect(blinkSignedMessage({ route: "recover", domain, pubkey, timestamp })).not.toBe(
+      blinkSignedMessage({
+        route: "mode",
+        domain,
+        pubkey,
+        mode: AccountMode.Enhanced,
+        timestamp,
+      }),
+    )
+  })
+
+  /** Without the host, a mode set on staging would authorize the same mode on production. */
+  it("separates the deployments", () => {
+    const on = (host: string) =>
+      blinkSignedMessage({ route: "recover", domain: host, pubkey, timestamp })
+
+    expect(on("staging.blink.sv")).not.toBe(on("blink.sv"))
+  })
+
+  /** A signature over Enhanced must not be replayable as Anon, which would undo a
+   *  user's choice to stop the server minting for their address. */
+  it("separates the modes", () => {
+    const withMode = (mode: AccountMode) =>
+      blinkSignedMessage({ route: "mode", domain, pubkey, mode, timestamp })
+
+    expect(withMode(AccountMode.Enhanced)).not.toBe(withMode(AccountMode.Anon))
+  })
+
+  /** The namespace the SDK reserves for itself: `signMessage` refuses to sign anything in
+   *  it, so a message that fell inside it could not be produced at all. */
+  it("stays outside the SDK's reserved namespace", () => {
+    expect(
+      blinkSignedMessage({ route: "recover", domain, pubkey, timestamp }),
+    ).not.toContain("breez-lnurl:")
   })
 })

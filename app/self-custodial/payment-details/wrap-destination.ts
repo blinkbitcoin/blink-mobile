@@ -55,8 +55,13 @@ const buildLightningDetail = <T extends WalletCurrency>({
   destination,
   params,
 }: BuildArgs<T, LightningDestination>) => {
+  /**
+   * A fixed invoice can ask for millisatoshis the SDK debits rounded up to whole
+   * sats, so the amount is rounded the same way here: the screen would otherwise
+   * round it to the nearest sat and show one less than leaves the wallet.
+   */
   const invoiceAmount =
-    "amount" in destination && destination.amount ? destination.amount : 0
+    "amount" in destination && destination.amount ? Math.ceil(destination.amount) : 0
   const invoiceMemo = "memo" in destination ? destination.memo : undefined
 
   return createSelfCustodialLightningPaymentDetails({

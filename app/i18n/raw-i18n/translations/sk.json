@@ -2229,6 +2229,12 @@
     "error": "Nepodarilo sa vygenerovať faktúru. Ak tento problém pretrváva, kontaktujte prosím podporu.",
     "copyInvoice": "Kopírovať",
     "shareInvoice": "Zdieľať",
+    "newAddress": "Nová",
+    "newAddressHint": "Vygeneruje novú bitcoinovú adresu. Predchádzajúce adresy fungujú ďalej.",
+    "newAddressGenerated": "Nová adresa je pripravená. Predchádzajúce adresy stále fungujú.",
+    "newAddressFailed": "Novú adresu sa nepodarilo vygenerovať. Skúste to znova.",
+    "newAddressRateLimited": "Príliš veľa nových adries. Chvíľu počkajte a skúste to znova.",
+    "onchainAddressLoadFailed": "Vašu bitcoinovú adresu sa nepodarilo načítať. Ťuknite na Nová a skúste to znova.",
     "addAmount": "Požiadať o konkrétnu sumu",
     "expired": "Platnosť faktúry vypršala",
     "expiresIn": "Platnosť končí za",
@@ -2612,7 +2618,8 @@
   "StablesatsRestriction": {
     "walletLabel": "nie je vo vašom regióne k dispozícii",
     "anonModeWalletLabel": "nedostupné v režime Incognito",
-    "unknownRegionWalletLabel": "dostupnosť sa nepodarilo overiť, potiahnutím nadol to skúste znova"
+    "unknownRegionWalletLabel": "dostupnosť sa nepodarilo overiť, potiahnutím nadol to skúste znova",
+    "networkWalletLabel": "na tejto sieti nie je k dispozícii"
   },
   "AnonModeConvertModal": {
     "title": "Najprv preveďte svoj dolárový zostatok",
@@ -2694,7 +2701,7 @@
   "TransactionDetailScreen": {
     "paid": "Zaplatili ste do/z",
     "received": "Prijali ste",
-    "spent": "Minuli ste",
+    "sent": "Odoslali ste",
     "sending": "Odosielanie",
     "receivingAccount": "Prijímajúci zostatok",
     "sendingAccount": "Odosielajúci zostatok",
@@ -3096,7 +3103,13 @@
     "deleteAccountFromPhone": "Dobrý deň!, prosím, zatvorte môj účet. Moje telefónne číslo je {phoneNumber: string}.",
     "deleteAccountError": "Niečo sa pokazilo. Pre ďalšiu pomoc kontaktujte {email: string}",
     "bye": "Dovidenia!",
-    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon."
+    "deleteAccountWarning": "Pozor: Zatvorenie účtu je trvalé!\nPred zatvorením sa uistite, že peňaženky nemajú žiadne prostriedky.\nZatvorený účet nie je možné obnoviť.\nNiektoré záznamy môžeme uchovávať, ak to vyžaduje zákon.",
+    "downloadLogs": "Download logs",
+    "exportLogsTitle": "Share your wallet logs",
+    "exportLogsBody": "This file helps our support team look into problems with your wallets. It includes the payment history (amounts, invoices and addresses) and wallet identifiers of every self-custodial wallet on this device, not only this one, but never your backup phrases or keys. Only share it with our support team.",
+    "exportLogsConfirm": "Share logs",
+    "noLogsYet": "There are no logs to share yet. Open your wallet and try again.",
+    "exportLogsError": "Couldn't export your logs. Please try again."
   },
   "lnurl": {
     "overLimit": "Nemôžete poslať viac ako maximálnu sumu",
