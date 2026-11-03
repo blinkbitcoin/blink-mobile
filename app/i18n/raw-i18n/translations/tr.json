@@ -3876,6 +3876,7 @@
     "CloudBackup": {
       "title": "Cüzdanınızı yedekleyelim",
       "description": "Yedek ifadenizin bir kopyasını {provider} hesabınıza kaydedeceğiz.",
+      "encryptCheckbox": "Ek şifre ile şifrele",
       "password": "Şifre",
       "passwordPlaceholder": "(en az 12 karakter)",
       "confirmPassword": "Şifreyi onayla",

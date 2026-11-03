@@ -3876,6 +3876,7 @@
         "CloudBackup": {
             "title": "ウォレットをバックアップしましょう",
             "description": "{provider}にバックアップフレーズのコピーを保存します。",
+            "encryptCheckbox": "追加パスワードで暗号化",
             "password": "パスワード",
             "passwordPlaceholder": "（12文字以上）",
             "confirmPassword": "パスワード確認",

@@ -3876,6 +3876,7 @@
     "CloudBackup": {
       "title": "Lad os sikkerhedskopiere din tegnebog",
       "description": "Vi gemmer en sikkerhedskopi af din gendannelsesfrase i din {provider}.",
+      "encryptCheckbox": "Kryptér med ekstra adgangskode",
       "password": "Adgangskode",
       "passwordPlaceholder": "(minimum 12 tegn)",
       "confirmPassword": "Bekræft adgangskode",

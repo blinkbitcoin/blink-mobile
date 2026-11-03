@@ -12743,6 +12743,10 @@ type RootTranslation = {
 			 */
 			description: RequiredParams<'provider'>
 			/**
+			 * E​n​c​r​y​p​t​ ​w​i​t​h​ ​a​d​d​i​t​i​o​n​a​l​ ​p​a​s​s​w​o​r​d
+			 */
+			encryptCheckbox: string
+			/**
 			 * P​a​s​s​w​o​r​d
 			 */
 			password: string
@@ -26901,6 +26905,10 @@ export type TranslationFunctions = {
 			 * We will save a backup of your backup phrase to your {provider}.
 			 */
 			description: (arg: { provider: string }) => LocalizedString
+			/**
+			 * Encrypt with additional password
+			 */
+			encryptCheckbox: () => LocalizedString
 			/**
 			 * Password
 			 */
