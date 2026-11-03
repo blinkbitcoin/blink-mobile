@@ -14,6 +14,27 @@ function use_ci_node_heap() {
   export NODE_OPTIONS=--max-old-space-size=4096
 }
 
+# GitHub Packages serves the @blinkbitcoin scope and wants a token even for a public package.
+# The token goes in an npmrc of the build's own, outside the checkout (install-deps tars the
+# checkout into the deps bundle), carrying over the user's npmrc so nothing else changes.
+function use_github_packages_auth() {
+  if [[ -z "${GITHUB_PACKAGES_TOKEN:-}" ]]; then
+    return 0
+  fi
+
+  local npmrc="${CI_ROOT}/github-packages.npmrc"
+  (
+    umask 077
+    {
+      if [[ -f "${HOME}/.npmrc" ]]; then
+        cat "${HOME}/.npmrc"
+      fi
+      echo "//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}"
+    } > "${npmrc}"
+  )
+  export NPM_CONFIG_USERCONFIG="${npmrc}"
+}
+
 function unpack_deps() {
 
   echo "Unpacking deps... "

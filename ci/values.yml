@@ -12,6 +12,8 @@ git_build_number_branch: build-numbers
 
 github_private_key: ((github-blinkbitcoin.private_key))
 github_api_token: ((github-blinkbitcoin.api_token))
+#! Reads @blinkbitcoin packages from GitHub Packages, so it needs the read:packages scope.
+github_packages_token: ((github-blinkbitcoin.api_token))
 
 docker_registry: us.gcr.io/galoy-org
 docker_registry_user: ((docker-creds.username))

@@ -5,9 +5,11 @@ export CI_ROOT="$(pwd)"
 export ENVFILE=.env.ci
 REACT_NATIVE_CONFIG_ENV="${CI_ROOT}/repo/${ENVFILE}"
 DISK_CLEANUP_TASK="${CI_ROOT}/pipeline-tasks/ci/tasks/macos-build-disk-cleanup.sh"
+GITHUB_PACKAGES_NPMRC="${CI_ROOT}/github-packages.npmrc"
 
 cleanup_build_task() {
   rm -f "$REACT_NATIVE_CONFIG_ENV"
+  rm -f "$GITHUB_PACKAGES_NPMRC"
   rm -f "${CI_ROOT}/crashlytics-sa.json"
   lsof -ti:8080,8081 | xargs kill -9 || true
   /bin/bash "$DISK_CLEANUP_TASK" post || true
@@ -48,6 +50,23 @@ IPINFO_API_KEY=$IPINFO_API_KEY
 IPAPI_API_KEY=$IPAPI_API_KEY
 PROXYCHECK_API_KEY=$PROXYCHECK_API_KEY
 EOF
+
+# Same as use_github_packages_auth in helpers.sh, which this zsh task does not source: the
+# token goes in an npmrc of the build's own, removed on exit, never in ~/.npmrc of a worker
+# that outlives the build.
+if [[ -n "${GITHUB_PACKAGES_TOKEN:-}" ]]; then
+  echo "    --> Setting up GitHub Packages auth"
+  (
+    umask 077
+    {
+      if [[ -f "${HOME}/.npmrc" ]]; then
+        cat "${HOME}/.npmrc"
+      fi
+      echo "//npm.pkg.github.com/:_authToken=${GITHUB_PACKAGES_TOKEN}"
+    } > "$GITHUB_PACKAGES_NPMRC"
+  )
+  export NPM_CONFIG_USERCONFIG="$GITHUB_PACKAGES_NPMRC"
+fi
 
 echo "    --> Installing dependencies"
 nix develop -c yarn install
