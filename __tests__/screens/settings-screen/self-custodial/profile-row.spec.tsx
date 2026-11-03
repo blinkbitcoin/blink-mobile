@@ -239,15 +239,17 @@ describe("ProfileRow", () => {
     })
   })
 
-  it("renders the lightning username without the domain as the row title when one is set", () => {
+  /** Custodial rows spell the whole address, and on mainnet every self-custodial address
+   *  is on blink.sv: a bare username here reads as a missing account. */
+  it("renders the full lightning address, domain included, as the row title when one is set", () => {
     const { getByText, queryByText } = render(
       <ProfileRow
         entry={{ id: TEST_ENTRY_ID, lightningAddress: "alice@staging.blink.sv" }}
       />,
     )
 
-    expect(getByText("alice")).toBeTruthy()
-    expect(queryByText("alice@staging.blink.sv")).toBeNull()
+    expect(getByText("alice@staging.blink.sv")).toBeTruthy()
+    expect(queryByText("alice")).toBeNull()
   })
 
   it("falls back to anonymous user label when no lightning address is set", () => {
@@ -579,7 +581,7 @@ describe("ProfileRow", () => {
       <ProfileRow entry={{ id: TEST_ENTRY_ID, lightningAddress: "stale@example.com" }} />,
     )
 
-    expect(getByText("magentamouse1845")).toBeTruthy()
+    expect(getByText("magentamouse1845@breez.tips")).toBeTruthy()
   })
 
   it("ignores the live lightning address for inactive rows and uses the persisted entry value", () => {
@@ -594,7 +596,7 @@ describe("ProfileRow", () => {
       />,
     )
 
-    expect(getByText("stored")).toBeTruthy()
+    expect(getByText("stored@example.com")).toBeTruthy()
   })
 
   /** A lock the wipe could not take is still owed an answer, so this one may not land on
