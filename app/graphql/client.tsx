@@ -21,7 +21,7 @@ import { GraphQLWsLink } from "@apollo/client/link/subscriptions"
 import { getMainDefinition } from "@apollo/client/utilities"
 import AsyncStorage from "@react-native-async-storage/async-storage"
 
-import { SCHEMA_VERSION_KEY } from "@app/config"
+import { CACHE_OWNER_KEY, SCHEMA_VERSION_KEY } from "@app/config"
 import { useAppConfig } from "@app/hooks"
 import { AccountRegistryProvider } from "@app/hooks/use-account-registry"
 import { useEffectiveLanguage } from "@app/hooks/use-effective-language"
@@ -31,7 +31,7 @@ import { getAppCheckToken } from "@app/screens/get-started-screen/use-device-tok
 import { getLanguageFromString, getLocaleFromLanguage } from "@app/utils/locale-detector"
 
 import { isIos } from "../utils/helper"
-import { loadString, saveString } from "../utils/storage"
+import { loadString, remove, saveString } from "../utils/storage"
 
 import { useApolloRebuildLifecycle } from "./hooks/use-apollo-rebuild-lifecycle"
 import { useEffectiveAuthToken } from "./hooks/use-effective-auth-token"
@@ -41,6 +41,11 @@ import {
   resetBlinkServicesStatus,
 } from "./blink-services-status"
 import { createCache } from "./cache"
+import {
+  cacheOwnerTag,
+  shouldRestorePersistedCache,
+  stripUnpersistableEntries,
+} from "./cache-persistence"
 import { useRealtimePriceQuery } from "./generated"
 import { createServerTimeLink } from "./server-time"
 import { HideAmountContainer } from "./hide-amount-component"
@@ -78,6 +83,10 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
   const { registerActiveClient } = useApolloRebuildLifecycle(effectiveToken)
 
   useEffect(() => {
+    /** Set when this client is superseded. Its persistor is paused so a late
+     *  write from the outgoing session cannot land in the next session's cache. */
+    let cancelled = false
+    let persistor: CachePersistor<NormalizedCacheObject> | undefined
     ;(async () => {
       const token = effectiveToken
 
@@ -243,20 +252,18 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
       const cache = createCache()
 
-      const persistor = new CachePersistor({
+      const cachePersistor = new CachePersistor({
         cache,
         storage: new AsyncStorageWrapper(AsyncStorage),
         debug: __DEV__,
-
-        persistenceMapper: async (_data) => {
-          // TODO:
-          // we should only store the last 20 transactions to keep the cache small
-          // there could be other data to filter as well
-          // filter your cached data and queries
-          // return filteredData
-          return _data
-        },
+        persistenceMapper: async (data) => stripUnpersistableEntries(data),
       })
+      persistor = cachePersistor
+
+      // Nothing is persisted without a session: there is no account to restore it into.
+      if (!token) {
+        cachePersistor.pause()
+      }
 
       const readableVersion = DeviceInfo.getReadableVersion()
 
@@ -270,25 +277,36 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
 
       const SCHEMA_VERSION = "1"
 
-      // Read the current version from AsyncStorage.
-      const currentVersion = await loadString(SCHEMA_VERSION_KEY)
+      const [storedSchemaVersion, storedOwner] = await Promise.all([
+        loadString(SCHEMA_VERSION_KEY),
+        loadString(CACHE_OWNER_KEY),
+      ])
+      if (cancelled) return
 
-      if (currentVersion === SCHEMA_VERSION) {
-        // Skip restore in self-custodial mode so the persisted custodial cache cannot leak.
-        if (token) {
-          await persistor.restore()
-        }
+      if (
+        shouldRestorePersistedCache({
+          token,
+          storedOwner,
+          storedSchemaVersion,
+          schemaVersion: SCHEMA_VERSION,
+        })
+      ) {
+        await cachePersistor.restore()
       } else {
-        // Otherwise, we'll want to purge the outdated persisted cache
-        // and mark ourselves as having updated to the latest version.
-
-        // init the DB. will be override if a cache exists
-        await persistor.purge()
+        // Another account's, no account's, or an outdated cache: never shown here.
+        await cachePersistor.purge()
+        if (cancelled) return
         await saveString(SCHEMA_VERSION_KEY, SCHEMA_VERSION)
+        if (token) {
+          await saveString(CACHE_OWNER_KEY, cacheOwnerTag(token))
+        } else {
+          await remove(CACHE_OWNER_KEY)
+        }
       }
+      if (cancelled) return
 
       if (token) {
-        client.onClearStore(persistor.purge)
+        client.onClearStore(cachePersistor.purge)
       }
 
       registerActiveClient(client)
@@ -297,9 +315,12 @@ const GaloyClient: React.FC<PropsWithChildren> = ({ children }) => {
         isAuthed: Boolean(token),
       })
       clearNetworkError()
-
-      return () => client.cache.reset()
     })()
+
+    return () => {
+      cancelled = true
+      persistor?.pause()
+    }
   }, [effectiveToken, appConfig.galoyInstance, clearNetworkError, registerActiveClient])
 
   // Before we show the app, we have to wait for our state to be ready.
