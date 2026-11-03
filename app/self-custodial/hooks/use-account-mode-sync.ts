@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { AppState } from "react-native"
 
 import { useSelfCustodialAccountMode } from "@app/self-custodial/hooks/use-self-custodial-account-mode"
@@ -15,6 +15,21 @@ import { recoverLnurlServerMode, setLnurlServerMode } from "../lnurl-server-mode
 import { useSelfCustodialWallet } from "../providers/wallet"
 
 import { useLnurlServer } from "./use-lnurl-server"
+
+/**
+ * Sends `request` unless one under the same key is still waiting on the server. The key
+ * leaves the set when the request settles either way, so a failure is retried by the
+ * next caller rather than suppressed for good.
+ */
+const runOnce = (
+  inFlight: Set<string>,
+  key: string,
+  request: () => Promise<void>,
+): void => {
+  if (inFlight.has(key)) return
+  inFlight.add(key)
+  request().finally(() => inFlight.delete(key))
+}
 
 /**
  * Keeps an account's mode and the LNURL server's copy of it in agreement, which is what
@@ -71,29 +86,41 @@ export const useAccountModeSync = (): void => {
     return () => subscription.remove()
   }, [])
 
+  /**
+   * The requests still waiting on the server, by what they ask. A return to the
+   * foreground while one is pending would otherwise send it again: it is still due,
+   * since nothing has landed, and for an Enhanced push a second identical request is a
+   * second paid country lookup and two writes racing.
+   */
+  const inFlightRef = useRef(new Set<string>())
+
   useEffect(() => {
     if (!sdk || !isResolveDue || !activeAccountId) return
-    recoverLnurlServerMode({ sdk, serverUrl: lnurlServerUrl })
-      .then((recovered) => {
-        updateState(
-          (prev) =>
-            prev && withSelfCustodialModeFromServer(prev, activeAccountId, recovered),
-        )
-      })
-      .catch((err) => reportError("lnurl server mode resolve", err))
+    runOnce(inFlightRef.current, `resolve:${activeAccountId}`, () =>
+      recoverLnurlServerMode({ sdk, serverUrl: lnurlServerUrl })
+        .then((recovered) => {
+          updateState(
+            (prev) =>
+              prev && withSelfCustodialModeFromServer(prev, activeAccountId, recovered),
+          )
+        })
+        .catch((err) => reportError("lnurl server mode resolve", err)),
+    )
   }, [sdk, isResolveDue, activeAccountId, lnurlServerUrl, updateState, foregroundCount])
 
   useEffect(() => {
     if (!sdk || !isPushDue || !activeAccountId || !accountMode) return
-    setLnurlServerMode({ sdk, serverUrl: lnurlServerUrl, mode: accountMode })
-      .then(() => {
-        updateState(
-          (prev) =>
-            prev &&
-            withSelfCustodialServerAccountMode(prev, activeAccountId, accountMode),
-        )
-      })
-      .catch((err) => reportError("lnurl server mode sync", err))
+    runOnce(inFlightRef.current, `push:${activeAccountId}:${accountMode}`, () =>
+      setLnurlServerMode({ sdk, serverUrl: lnurlServerUrl, mode: accountMode })
+        .then(() => {
+          updateState(
+            (prev) =>
+              prev &&
+              withSelfCustodialServerAccountMode(prev, activeAccountId, accountMode),
+          )
+        })
+        .catch((err) => reportError("lnurl server mode sync", err)),
+    )
   }, [
     sdk,
     isPushDue,

@@ -1,4 +1,5 @@
-import { renderHook, waitFor } from "@testing-library/react-native"
+import { AppState, AppStateStatus } from "react-native"
+import { act, renderHook, waitFor } from "@testing-library/react-native"
 
 import { useAccountModeSync } from "@app/self-custodial/hooks/use-account-mode-sync"
 import { getSelfCustodialAccountMode } from "@app/store/persistent-state/self-custodial-account-mode"
@@ -367,5 +368,124 @@ describe("useAccountModeSync", () => {
     rerender(undefined)
 
     expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(1)
+  })
+
+  describe("a return to the foreground", () => {
+    const emitAppState = (status: AppStateStatus) => {
+      const calls = (AppState.addEventListener as jest.Mock).mock.calls
+      const handler = calls[calls.length - 1][1] as (state: AppStateStatus) => void
+      act(() => handler(status))
+    }
+
+    /** A request the test settles by hand, so the foreground can land while it waits. */
+    const deferred = () => {
+      let settle = { resolve: (_value?: unknown) => {}, reject: (_err: Error) => {} }
+      const promise = new Promise((resolve, reject) => {
+        settle = { resolve, reject }
+      })
+      return { promise, settle: () => settle }
+    }
+
+    beforeEach(() => {
+      jest
+        .spyOn(AppState, "addEventListener")
+        .mockReturnValue({ remove: jest.fn() } as never)
+    })
+
+    afterEach(() => jest.restoreAllMocks())
+
+    it("retries a push that failed", async () => {
+      const failure = new Error("server unreachable")
+      mockSetLnurlServerMode.mockRejectedValueOnce(failure)
+
+      renderHook(() => useAccountModeSync())
+      await waitFor(() => {
+        expect(mockReportError).toHaveBeenCalledWith("lnurl server mode sync", failure)
+      })
+      emitAppState("active")
+
+      await waitFor(() => expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(2))
+      await waitFor(() => expect(mockUpdateState).toHaveBeenCalledTimes(1))
+    })
+
+    it("does not send the same push again while the first is still pending", async () => {
+      const pending = deferred()
+      mockSetLnurlServerMode.mockReturnValue(pending.promise)
+
+      renderHook(() => useAccountModeSync())
+      await waitFor(() => expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(1))
+      emitAppState("active")
+      await act(async () => {
+        pending.settle().resolve()
+      })
+
+      expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(1)
+      expect(mockUpdateState).toHaveBeenCalledTimes(1)
+    })
+
+    it("retries on a later foreground once the pending push has failed", async () => {
+      const pending = deferred()
+      mockSetLnurlServerMode.mockReturnValueOnce(pending.promise)
+
+      renderHook(() => useAccountModeSync())
+      await waitFor(() => expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(1))
+      emitAppState("active")
+      await act(async () => {
+        pending.settle().reject(new Error("server unreachable"))
+      })
+      expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(1)
+
+      emitAppState("active")
+
+      await waitFor(() => expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(2))
+    })
+
+    it("pushes a mode chosen while an earlier push is still pending", async () => {
+      const pending = deferred()
+      mockSetLnurlServerMode.mockReturnValueOnce(pending.promise)
+
+      const { rerender } = renderHook(() => useAccountModeSync())
+      await waitFor(() => expect(mockSetLnurlServerMode).toHaveBeenCalledTimes(1))
+      mockAccountMode = AccountMode.Anon
+      rerender(undefined)
+
+      await waitFor(() =>
+        expect(mockSetLnurlServerMode).toHaveBeenLastCalledWith(
+          expect.objectContaining({ mode: AccountMode.Anon }),
+        ),
+      )
+      await act(async () => {
+        pending.settle().resolve()
+      })
+    })
+
+    it("does not ask the server for the mode again while the first question is pending", async () => {
+      mockAccountMode = null
+      const pending = deferred()
+      mockRecoverLnurlServerMode.mockReturnValue(pending.promise)
+
+      renderHook(() => useAccountModeSync())
+      await waitFor(() => expect(mockRecoverLnurlServerMode).toHaveBeenCalledTimes(1))
+      emitAppState("active")
+      await act(async () => {
+        pending.settle().resolve(AccountMode.Anon)
+      })
+
+      expect(mockRecoverLnurlServerMode).toHaveBeenCalledTimes(1)
+    })
+
+    it("asks the server for the mode again after the question failed", async () => {
+      mockAccountMode = null
+      const failure = new Error("server unreachable")
+      mockRecoverLnurlServerMode.mockRejectedValueOnce(failure)
+
+      renderHook(() => useAccountModeSync())
+      await waitFor(() => {
+        expect(mockReportError).toHaveBeenCalledWith("lnurl server mode resolve", failure)
+      })
+      emitAppState("active")
+
+      await waitFor(() => expect(mockRecoverLnurlServerMode).toHaveBeenCalledTimes(2))
+    })
   })
 })
