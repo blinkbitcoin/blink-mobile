@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Kesalahan Server. Silakan coba lagi nanti",
       "request": "Masalah permintaan.\nHubungi dukungan jika masalah berlanjut",
-      "connection": "Masalah koneksi.\nPeriksa koneksi internet Anda"
+      "connection": "Masalah koneksi.\nPeriksa koneksi internet Anda",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Terjadi kesalahan yang tidak terduga",
     "restartApp": "Silakan mulai ulang aplikasi.",

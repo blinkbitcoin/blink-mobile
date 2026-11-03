@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Bediener fout. Probeer asseblief later weer. ",
       "request": "Aanvraag probleem.\nKontak ondersteuning as die fout aanhou. ",
-      "connection": "Verbindingsprobleme. Verifieer asseblief jou internetverbinding."
+      "connection": "Verbindingsprobleme. Verifieer asseblief jou internetverbinding.",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Onverwagte fout het voorgekom",
     "restartApp": "Herlaai asseblief die toepassing. ",

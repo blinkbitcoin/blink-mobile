@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Lỗi máy chủ. Vui lòng thử lại sau",
       "request": " Thắc mắc vấn đề\nLiên hệ hỗ trợ nếu vấn đề vẫn tiếp diễn",
-      "connection": "Vấn đề kết nối.\nXác minh kết nối Internet của bạn"
+      "connection": "Vấn đề kết nối.\nXác minh kết nối Internet của bạn",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Đã xảy ra lỗi bất thường",
     "restartApp": "Vui lòng khởi động lại ứng dụng",

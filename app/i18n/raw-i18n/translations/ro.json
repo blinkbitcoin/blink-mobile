@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Eroare de server. Vă rugăm să încercați din nou mai târziu",
       "request": "Problemă de solicitare.\nContactați asistența dacă problema persistă",
-      "connection": "Problemă de conexiune.\nVerificați conexiunea la internet"
+      "connection": "Problemă de conexiune.\nVerificați conexiunea la internet",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Eroare neașteptată",
     "restartApp": "Vă rugăm să reporniți aplicația.",

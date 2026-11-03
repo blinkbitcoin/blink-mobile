@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Ensobi ku seva. Tukusaba oddemu ogezeeko oluvannyuma",
       "request": "Saba ensonga.\nTukirira obuyambi singa ekizibu kigenda mu maaso ",
-      "connection": "Ensonga y'okuyungibwa.\nKakasa omukutu gwo ogwa yintaneeti"
+      "connection": "Ensonga y'okuyungibwa.\nKakasa omukutu gwo ogwa yintaneeti",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Ensobi etasuubirwa yabaddewo",
     "restartApp": "Tukusaba oddemu okutandika application.",

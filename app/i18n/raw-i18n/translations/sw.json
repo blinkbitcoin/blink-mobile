@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Kosa la seva. Tafadhali jaribu tena baadaye",
       "request": "Tatizo la kuulizia. Wasiliana na usaidizi tatizo likiendelea.",
-      "connection": "Shida la muunganisho. Thibitisha muunganisho wako wa mtandao"
+      "connection": "Shida la muunganisho. Thibitisha muunganisho wako wa mtandao",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Kosa lisilotarajiwa limetokea",
     "restartApp": "Tafadhali anzisha programu tena",

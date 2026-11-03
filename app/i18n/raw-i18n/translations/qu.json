@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Servidorta llank'ayta kani. Kaypiqa, qhipanichu kani kachun.",
       "request": "Llank'ayta kani. Ñuqaqmi, kawsninmanta, kawsaynin rikch'asqanapaqmi kawsayninanta rik'asqanapaq kachkanmi, llank'ayta kani.",
-      "connection": "Kawsayninmanta, hamut'aypi tukuy pacha, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Kawsayninmanta, internetpi kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani."
+      "connection": "Kawsayninmanta, hamut'aypi tukuy pacha, kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi. Kawsayninmanta, internetpi kawsaynin rikch'asqanapaqmi kawsayninanta rikch'asqanapaq kachkanmi, llank'ayta kani.",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "Mana yachanichu kani, llank'ayta kani.",
     "restartApp": "Kaypiqa, aplicacionta qhipanichu kani.",

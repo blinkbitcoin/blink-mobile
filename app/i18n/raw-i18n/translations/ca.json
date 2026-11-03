@@ -3030,7 +3030,9 @@
     "network": {
       "server": "Error del servidor. Si us plau intenta-ho més tard.",
       "request": "Solicitud d'incidència\nContacta amb el servei de suport si el problema persisteix",
-      "connection": "Problemes de connexió.\nVerifica la teva connexió a internet"
+      "connection": "Problemes de connexió.\nVerifica la teva connexió a internet",
+      "statusCode": "Status code: {statusCode: number}",
+      "errorCode": "Error code: {errorCode: string}"
     },
     "unexpectedError": "S'ha produït un error inesperat",
     "restartApp": "Si us plau reinicia l'aplicació",
