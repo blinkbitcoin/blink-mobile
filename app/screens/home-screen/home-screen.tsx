@@ -648,7 +648,12 @@ export const HomeScreen: React.FC = () => {
     isFocused
   useOverlayCover(
     isFocused &&
-      (isAnotherHomeModalVisible ||
+      (isConvertModalVisible ||
+        isUpgradeModalVisible ||
+        isRestrictionModalVisible ||
+        isStablesatModalVisible ||
+        isEnhancedModePromptVisible ||
+        modalVisible ||
         shouldShowModal ||
         isTwoFactorModalVisible ||
         shouldShowMigrateNowPrompt ||

@@ -65,15 +65,13 @@ export const SelfCustodialCelebrationMount = () => {
 
   const toCandidate = useMemo(
     () =>
-      displayInfo &&
-      ((tx: NormalizedTransaction): CelebrationCandidate => ({
+      (tx: NormalizedTransaction): CelebrationCandidate => ({
         transaction: toTransactionFragment(tx, displayInfo),
         paymentType:
           tx.paymentType === PaymentType.Onchain
             ? CelebrationPaymentType.Onchain
             : CelebrationPaymentType.Lightning,
-        createdAtIsSettlement: true,
-      })),
+      }),
     [displayInfo],
   )
 
@@ -83,7 +81,7 @@ export const SelfCustodialCelebrationMount = () => {
     !tx.isConversion
 
   useEffect(() => {
-    if (!isSelfCustodial || !toCandidate) return
+    if (!isSelfCustodial) return
     return onSucceededPayment((payment) => {
       if (!isKnownPayment(payment)) return
       const tx = mapSelfCustodialTransaction(payment)
@@ -94,8 +92,6 @@ export const SelfCustodialCelebrationMount = () => {
   }, [isSelfCustodial, toCandidate, celebrate])
 
   useEffect(() => {
-    if (!toCandidate) return
-
     const last = offered.current
     if (last) {
       const tx = allTransactions.find((candidate) => candidate.id === last.id)
