@@ -31,14 +31,26 @@ const received = {
   createdAt: 1,
 }
 
-/** The ledger, one wallet at a time: the sends it holds for the hash, or no answer. */
-type WalletAnswer = ReturnType<typeof send>[] | (typeof received)[] | "unanswered"
+/** The ledger, one wallet at a time: the sends it holds for the hash, no answer, or an
+ *  answer too malformed to read. */
+type WalletAnswer =
+  | ReturnType<typeof send>[]
+  | (typeof received)[]
+  | "unanswered"
+  | "malformed"
 const mockLedger: { current: Record<string, WalletAnswer> } = { current: {} }
 const mockFetchTransactions = jest.fn(
   ({ variables }: { variables: { walletId: string; paymentHash: string } }) => {
     const answer = mockLedger.current[variables.walletId]
     if (answer === undefined || answer === "unanswered") {
       return Promise.resolve({ data: undefined })
+    }
+    if (answer === "malformed") {
+      return Promise.resolve({
+        data: {
+          me: { defaultAccount: { walletById: { transactionsByPaymentHash: [null] } } },
+        },
+      })
     }
     return Promise.resolve({
       data: {
@@ -56,12 +68,8 @@ jest.mock("@app/graphql/generated", () => ({
   }),
 }))
 
-const mockWallets: { current: { id: string }[] | undefined } = {
-  current: [{ id: "wallet-btc" }, { id: "wallet-usd" }],
-}
-jest.mock("@app/screens/send-bitcoin-screen/hooks/use-send-wallets", () => ({
-  useSendWallets: () => ({ wallets: mockWallets.current }),
-}))
+/** Every wallet the account holds, as the server named them with the account. */
+const mockWalletIds: { current: string[] } = { current: ["wallet-btc", "wallet-usd"] }
 
 const mockProgress: { current: CardInvestmentProgress | null } = { current: null }
 const mockMarkPaid = jest.fn()
@@ -71,6 +79,7 @@ jest.mock("@app/hooks/use-card-investment-progress", () => ({
     progress: mockProgress.current,
     markPaid: mockMarkPaid,
     clearPaying: mockClearPaying,
+    walletIds: mockWalletIds.current,
   }),
 }))
 
@@ -86,7 +95,7 @@ beforeEach(() => {
   jest.clearAllMocks()
   mockLedger.current = { "wallet-btc": [], "wallet-usd": [] }
   mockNetwork.current = "mainnet"
-  mockWallets.current = [{ id: "wallet-btc" }, { id: "wallet-usd" }]
+  mockWalletIds.current = ["wallet-btc", "wallet-usd"]
   mockProgress.current = null
 })
 
@@ -115,8 +124,9 @@ describe("lookUpInvestmentPayment", () => {
     )
   })
 
-  /** A payment is made from one wallet; once it is found the others are not asked. */
-  it("stops at the first wallet that holds the send", async () => {
+  /** A payment is made from one wallet; once its settlement is found the others are not
+   *  asked. */
+  it("stops at the first wallet that holds the settled send", async () => {
     const fetchSends = jest.fn(fetchSendsFrom({ btc: [send(TxStatus.Success)] }))
 
     await lookUpInvestmentPayment({
@@ -126,6 +136,23 @@ describe("lookUpInvestmentPayment", () => {
     })
 
     expect(fetchSends).toHaveBeenCalledTimes(1)
+  })
+
+  /** A send still pending in one wallet does not end the search: the wallet that settled
+   *  may be asked later, and a pending answer then would leave the home waiting on a
+   *  payment already made. */
+  it("answers settled when a later wallet settled after an earlier one held it pending", async () => {
+    expect(
+      await lookUp({ btc: [send(TxStatus.Pending)], usd: [send(TxStatus.Success)] }),
+    ).toBe(CardInvestmentPaymentLookup.Settled)
+  })
+
+  /** A send known to be on its way is still the answer when another wallet could not be
+   *  asked: either way nothing is minted, and the home goes on waiting. */
+  it("answers pending when a wallet holds it pending and another could not be asked", async () => {
+    expect(await lookUp({ btc: [send(TxStatus.Pending)], usd: undefined })).toBe(
+      CardInvestmentPaymentLookup.Pending,
+    )
   })
 
   /** Every wallet answered and none holds a send: the invoice was never paid. A failed
@@ -177,7 +204,7 @@ describe("lookUpInvestmentPayment", () => {
 describe("useLookUpInvestmentPayment", () => {
   it("asks each of the account's wallets with the invoice's own hash", async () => {
     mockLedger.current = { "wallet-btc": [], "wallet-usd": [send(TxStatus.Success)] }
-    const { result } = renderHook(() => useLookUpInvestmentPayment())
+    const { result } = renderHook(() => useLookUpInvestmentPayment(mockWalletIds.current))
 
     expect(await result.current(INVOICE)).toBe(CardInvestmentPaymentLookup.Settled)
     expect(mockFetchTransactions).toHaveBeenCalledWith({
@@ -188,8 +215,20 @@ describe("useLookUpInvestmentPayment", () => {
     })
   })
 
+  /** The wallets come with the account, not from the send flow, whose dollar
+   *  restriction would leave the dollar wallet out: a payment made from it is found. */
+  it("finds a payment from the dollar wallet among the wallets it is given", async () => {
+    mockLedger.current = { "wallet-btc": [], "wallet-usd": [send(TxStatus.Success)] }
+    const { result } = renderHook(() => useLookUpInvestmentPayment(mockWalletIds.current))
+
+    expect(await result.current(INVOICE)).toBe(CardInvestmentPaymentLookup.Settled)
+    expect(mockFetchTransactions).toHaveBeenCalledWith({
+      variables: { walletId: "wallet-usd", paymentHash: INVOICE_HASH },
+    })
+  })
+
   it("answers not found when both wallets answered without the send", async () => {
-    const { result } = renderHook(() => useLookUpInvestmentPayment())
+    const { result } = renderHook(() => useLookUpInvestmentPayment(mockWalletIds.current))
 
     expect(await result.current(INVOICE)).toBe(CardInvestmentPaymentLookup.NotFound)
   })
@@ -197,7 +236,7 @@ describe("useLookUpInvestmentPayment", () => {
   /** A request that came back without data is a wallet that could not be asked. */
   it("answers unknown when a wallet's request brings no data back", async () => {
     mockLedger.current = { "wallet-btc": [], "wallet-usd": "unanswered" }
-    const { result } = renderHook(() => useLookUpInvestmentPayment())
+    const { result } = renderHook(() => useLookUpInvestmentPayment(mockWalletIds.current))
 
     expect(await result.current(INVOICE)).toBe(CardInvestmentPaymentLookup.Unknown)
   })
@@ -205,22 +244,24 @@ describe("useLookUpInvestmentPayment", () => {
   /** Without the network the invoice cannot be decoded, so nothing is asked. */
   it("answers unknown and asks nothing while the network is not known", async () => {
     mockNetwork.current = undefined
-    const { result } = renderHook(() => useLookUpInvestmentPayment())
+    const { result } = renderHook(() => useLookUpInvestmentPayment(mockWalletIds.current))
 
     expect(await result.current(INVOICE)).toBe(CardInvestmentPaymentLookup.Unknown)
     expect(mockFetchTransactions).not.toHaveBeenCalled()
   })
 
   it("answers unknown and asks nothing while the wallets are not known", async () => {
-    mockWallets.current = undefined
-    const { result } = renderHook(() => useLookUpInvestmentPayment())
+    mockWalletIds.current = []
+    const { result } = renderHook(() => useLookUpInvestmentPayment(mockWalletIds.current))
 
     expect(await result.current(INVOICE)).toBe(CardInvestmentPaymentLookup.Unknown)
     expect(mockFetchTransactions).not.toHaveBeenCalled()
   })
 
   it("keeps the same function across renders", () => {
-    const { result, rerender } = renderHook(() => useLookUpInvestmentPayment())
+    const { result, rerender } = renderHook(() =>
+      useLookUpInvestmentPayment(mockWalletIds.current),
+    )
     const first = result.current
 
     rerender({})
@@ -295,6 +336,98 @@ describe("useReconcileInvestmentPayment", () => {
     expect(mockMarkPaid).toHaveBeenCalledTimes(1)
   })
 
+  describe("asking again", () => {
+    /** How often the home asks the ledger again while the payment is on its way. */
+    const RECHECK_INTERVAL_MS = 30_000
+
+    beforeEach(() => {
+      jest.useFakeTimers()
+    })
+
+    afterEach(() => {
+      jest.useRealTimers()
+    })
+
+    const nextRecheck = async () => {
+      await act(async () => {
+        jest.advanceTimersByTime(RECHECK_INTERVAL_MS)
+      })
+    }
+
+    /** A payment still pending when the home opened settles later, with the home open. */
+    it("asks again on an interval while the payment is still on its way", async () => {
+      mockProgress.current = PAYING
+      mockLedger.current = { "wallet-btc": [send(TxStatus.Pending)], "wallet-usd": [] }
+      renderHook(() => useReconcileInvestmentPayment())
+      await act(async () => {})
+      expect(mockMarkPaid).not.toHaveBeenCalled()
+
+      mockLedger.current = { "wallet-btc": [send(TxStatus.Success)], "wallet-usd": [] }
+      await nextRecheck()
+
+      expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+    })
+
+    /** Offline the question goes unanswered; it is asked again once the connection is
+     *  back, and a failed payment then lets the home ask for the money again. */
+    it("asks again after a question that went unanswered", async () => {
+      mockProgress.current = PAYING
+      mockLedger.current = { "wallet-btc": [], "wallet-usd": "unanswered" }
+      renderHook(() => useReconcileInvestmentPayment())
+      await act(async () => {})
+      expect(mockClearPaying).not.toHaveBeenCalled()
+
+      mockLedger.current = { "wallet-btc": [], "wallet-usd": [] }
+      await nextRecheck()
+
+      expect(mockClearPaying).toHaveBeenCalledTimes(1)
+    })
+
+    /** A request that hangs offline holds the next question back rather than having
+     *  more pile up behind it. */
+    it("does not ask again while the last question is still unanswered", async () => {
+      mockProgress.current = PAYING
+      /** The executor never settles it, as a request that hangs offline. */
+      const hanging = new Promise<never>(jest.fn())
+      mockFetchTransactions.mockImplementationOnce(() => hanging)
+      renderHook(() => useReconcileInvestmentPayment())
+      await act(async () => {})
+
+      await nextRecheck()
+      await nextRecheck()
+
+      expect(mockFetchTransactions).toHaveBeenCalledTimes(1)
+    })
+
+    /** A check that fails outright, a malformed answer the decoding trips on, counts as
+     *  unanswered: the home asks again rather than giving up for the session. */
+    it("asks again after a check that failed outright", async () => {
+      mockProgress.current = PAYING
+      mockLedger.current = { "wallet-btc": "malformed", "wallet-usd": [] }
+      renderHook(() => useReconcileInvestmentPayment())
+      await act(async () => {})
+      expect(mockMarkPaid).not.toHaveBeenCalled()
+
+      mockLedger.current = { "wallet-btc": [send(TxStatus.Success)], "wallet-usd": [] }
+      await nextRecheck()
+
+      expect(mockMarkPaid).toHaveBeenCalledTimes(1)
+    })
+
+    it("stops asking once the home is gone", async () => {
+      mockProgress.current = PAYING
+      mockLedger.current = { "wallet-btc": [send(TxStatus.Pending)], "wallet-usd": [] }
+      const { unmount } = renderHook(() => useReconcileInvestmentPayment())
+      await act(async () => {})
+      const asked = mockFetchTransactions.mock.calls.length
+
+      unmount()
+      await nextRecheck()
+
+      expect(mockFetchTransactions).toHaveBeenCalledTimes(asked)
+    })
+  })
+
   it("asks nothing while no payment is on its way", async () => {
     mockProgress.current = SIGNED
 
@@ -336,7 +469,9 @@ describe("useReconcileInvestmentPayment", () => {
       rerender({})
     })
 
-    expect(mockFetchTransactions).toHaveBeenCalledTimes(1)
+    /** One question, one request per wallet: the pending send does not stop the other
+     *  wallet being asked, and the rerender asks nothing more. */
+    expect(mockFetchTransactions).toHaveBeenCalledTimes(2)
   })
 
   /** The answer to a question asked by a home that has since gone is dropped rather

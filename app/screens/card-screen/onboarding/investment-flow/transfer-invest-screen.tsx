@@ -73,6 +73,7 @@ export const TransferInvestScreen: React.FC = () => {
     markPaying,
     isEligible,
     accountId,
+    walletIds,
     isAccountResolved,
   } = useCardInvestmentProgress()
 
@@ -96,7 +97,7 @@ export const TransferInvestScreen: React.FC = () => {
   )
   const totalSats = useInvestmentSats(terms.totalUsd)
   const { requestInvoice, isRequesting } = useInvestmentInvoice()
-  const lookUpPayment = useLookUpInvestmentPayment()
+  const lookUpPayment = useLookUpInvestmentPayment(walletIds)
   const [isLookingUpPayment, setIsLookingUpPayment] = React.useState(false)
   const [failure, setFailure] = React.useState<TransferFailure | null>(null)
 
