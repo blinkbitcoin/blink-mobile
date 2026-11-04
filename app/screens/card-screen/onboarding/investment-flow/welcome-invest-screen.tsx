@@ -13,7 +13,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 
-import { resetToTransferStep } from "./transfer-invest-screen"
+import { hasNothingLeftToPay, resetToTransferStep } from "./transfer-invest-screen"
 import { useGivenUpWaiting } from "./use-given-up-waiting"
 
 export const WelcomeInvestScreen: React.FC = () => {
@@ -37,12 +37,14 @@ export const WelcomeInvestScreen: React.FC = () => {
    * An investor who already signed is not walked through the flow again: every way in,
    * the home's cards, a link, a notification, lands here, and the screens beyond would
    * let them sign a second agreement. A signed investment resumes at its payment, on the
-   * same stack the signing step leaves, whatever was open underneath; a paid one goes
-   * back to the home, where its welcome is.
+   * same stack the signing step leaves, whatever was open underneath. One whose payment
+   * has gone out goes back to the home instead: a paid one to its welcome, and one still
+   * on its way to the ledger check there, since the payment step would offer the same
+   * invoice again.
    */
   React.useEffect(() => {
     if (!progress) return
-    if (progress.paidAt) {
+    if (hasNothingLeftToPay(progress)) {
       navigation.dispatch(RESET_TO_HOME)
       return
     }
@@ -61,9 +63,9 @@ export const WelcomeInvestScreen: React.FC = () => {
   /**
    * Until the account is known the record cannot be read, and a tap in that window
    * would push the next screen over a welcome about to send the investor elsewhere. The
-   * account is usually in the cache already; when it is not and does not come, the wait
-   * ends the way the signing step's does, with the reason and a way to ask again, since
-   * a fetch that failed offline is not retried on its own.
+   * account is asked of the network; when the answer does not come, the wait ends the
+   * way the signing step's does, with the reason and a way to ask again at once, rather
+   * than on the interval a failed fetch is retried on.
    */
   const isWaitingForAccount = isEligible && !isAccountResolved
   const { hasGivenUp: hasGivenUpWaiting, startOver: waitAgain } =

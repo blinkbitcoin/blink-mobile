@@ -3,6 +3,7 @@ import { ScrollView, View } from "react-native"
 import {
   CommonActions,
   RouteProp,
+  useIsFocused,
   useNavigation,
   useRoute,
 } from "@react-navigation/native"
@@ -18,7 +19,10 @@ import { useCardInvestmentProgress } from "@app/hooks/use-card-investment-progre
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RESET_TO_HOME } from "@app/navigation/reset-to-home"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
-import { CardInvestmentPaymentLookup } from "@app/types/card-investment"
+import {
+  CardInvestmentPaymentLookup,
+  CardInvestmentProgress,
+} from "@app/types/card-investment"
 
 import { formatUnitCount, formatUsdAmount } from "./investment-figures"
 import { useLookUpInvestmentPayment } from "./investment-payment-lookup"
@@ -45,6 +49,15 @@ export const resetToTransferStep = (
     index: 1,
     routes: [{ name: "Primary" }, { name: "cardOnboardingTransferInvestScreen", params }],
   })
+
+/**
+ * Whether the investment's payment has already gone out, on its way or settled. Either
+ * way this step has nothing left to offer: paying its invoice again would pay twice if
+ * the first payment lands. The home checks a payment on its way against the ledger, and
+ * welcomes a settled one.
+ */
+export const hasNothingLeftToPay = (progress: CardInvestmentProgress | null): boolean =>
+  progress?.payingAt !== undefined || progress?.paidAt !== undefined
 
 /** Why the step could not open the send flow: no invoice could be issued, or the ledger
  *  could not be asked whether the one on record was already paid. */
@@ -109,10 +122,26 @@ export const TransferInvestScreen: React.FC = () => {
    * then there is none to read.
    */
   const hasNothingToPayFor = isAccountResolved && !progress
-  const isLeavingFlow = !isEligible || hasNothingToPayFor
+  /** A payment that has gone out sends the step home too, but only while the step is in
+   *  front: underneath the send flow it opened, the receipt marks the payment as it
+   *  lands, and the investor stays on the receipt. */
+  const isFocused = useIsFocused()
+  const hasNothingLeftToPayHere = isFocused && hasNothingLeftToPay(progress)
+  const isLeavingFlow = !isEligible || hasNothingToPayFor || hasNothingLeftToPayHere
+
+  /** Leaves for the home once: a tap that finds the payment already made records it,
+   *  which sends the step home from the exit above as well, and a second reset would
+   *  build the home a second time. */
+  const hasLeftForHome = React.useRef(false)
+  const leaveForHome = React.useCallback(() => {
+    if (hasLeftForHome.current) return
+    hasLeftForHome.current = true
+    navigation.dispatch(RESET_TO_HOME)
+  }, [navigation])
+
   React.useEffect(() => {
-    if (isLeavingFlow) navigation.dispatch(RESET_TO_HOME)
-  }, [isLeavingFlow, navigation])
+    if (isLeavingFlow) leaveForHome()
+  }, [isLeavingFlow, leaveForHome])
 
   /**
    * What the invoice is written for: the satoshis the agreement itself names, carried
@@ -137,7 +166,7 @@ export const TransferInvestScreen: React.FC = () => {
    */
   const handleNext = async () => {
     if (!progress) {
-      navigation.dispatch(RESET_TO_HOME)
+      leaveForHome()
       return
     }
 
@@ -156,7 +185,7 @@ export const TransferInvestScreen: React.FC = () => {
     if (!navigation.isFocused()) return
 
     if (payment.kind === "settled") {
-      navigation.dispatch(RESET_TO_HOME)
+      leaveForHome()
       return
     }
     if (payment.kind === "failed") {
@@ -228,11 +257,13 @@ export const TransferInvestScreen: React.FC = () => {
    * either way. The missing wallet is said out loud: a button that stays grey with the
    * money in place, and nothing to explain it, reads as the app being broken. The paying
    * account is waited on the same way, and only on the send path, since the invoice is
-   * filed under it; the home has usually read it already, so the wait is the cache's.
+   * filed under it; it is asked of the network, so the wait lasts until the server
+   * answers.
    */
   const isMissingDepositWallet = hasEnoughBalance && !cardInvestmentDepositBtcWalletId
   const isMissingPayerAccount = hasEnoughBalance && !isAccountResolved
   const isContinueDisabled = isLoading || isMissingDepositWallet || isMissingPayerAccount
+  const isContinueLoading = isRequesting || isLookingUpPayment
 
   /** The invoice failure is borrowed from the receive screen, which words this exact
    *  failure and is already translated everywhere; the ledger one is the flow's own
@@ -284,7 +315,7 @@ export const TransferInvestScreen: React.FC = () => {
         <GaloyPrimaryButton
           title={LL.CardFlow.Onboarding.TransferInvest.buttonText()}
           disabled={isContinueDisabled}
-          loading={isRequesting || isLookingUpPayment}
+          loading={isContinueLoading}
           onPress={handleNext}
         />
       </View>

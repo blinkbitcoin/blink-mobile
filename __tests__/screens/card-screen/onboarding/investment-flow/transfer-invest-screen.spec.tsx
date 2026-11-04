@@ -38,6 +38,8 @@ const mockCardInvestmentProgress: {
     signedAt: number
     settlementSats?: number
     invoice?: { paymentRequest: string; issuedAt: number }
+    payingAt?: number
+    paidAt?: number
   } | null
 } = { current: null }
 const mockRecordInvoice = jest.fn()
@@ -142,6 +144,7 @@ jest.mock("@react-navigation/native", () => {
       dispatch: mockDispatch,
       isFocused: () => mockIsFocused.current,
     }),
+    useIsFocused: () => mockIsFocused.current,
     useRoute: () => ({ params: mockRouteParams.current }),
   }
 })
@@ -284,6 +287,79 @@ describe("TransferInvestScreen", () => {
     await act(async () => {})
 
     expect(mockDispatch).not.toHaveBeenCalled()
+  })
+
+  describe("once the payment has gone out", () => {
+    /** A still-valid invoice on record, and the money to pay it again. */
+    const coveredWithInvoice = (moment: { payingAt?: number; paidAt?: number }) => {
+      mockCardInvestmentProgress.current = {
+        selectedAmountUsd: SELECTED_AMOUNT_USD,
+        signedAt: Date.now(),
+        invoice: { paymentRequest: "lnbc-issued", issuedAt: Date.now() },
+        ...moment,
+      }
+      mockFunding.current = {
+        balanceUsd: SELECTED_AMOUNT_USD,
+        shortfallUsd: 0,
+        hasEnoughBalance: true,
+        totalSats: 31_704_000,
+        isLoading: false,
+      }
+    }
+
+    /** Offering the invoice again would pay it twice if the first payment lands; the
+     *  home checks a payment on its way against the ledger. */
+    it("sends an investor whose payment is on its way home instead of offering the invoice again", async () => {
+      coveredWithInvoice({ payingAt: Date.now() })
+
+      render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+          payload: { index: 0, routes: [{ name: "Primary" }] },
+        }),
+      )
+    })
+
+    it("sends a paid investor home as well", async () => {
+      coveredWithInvoice({ paidAt: Date.now() })
+
+      render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).toHaveBeenCalledWith(
+        expect.objectContaining({
+          type: "RESET",
+          payload: { index: 0, routes: [{ name: "Primary" }] },
+        }),
+      )
+    })
+
+    /** Underneath the send flow it opened, the step hears the receipt mark the payment;
+     *  pulling the investor off the receipt for it would be wrong. */
+    it("leaves the investor on the send flow when the payment is marked behind it", async () => {
+      coveredWithInvoice({ payingAt: Date.now() })
+      mockIsFocused.current = false
+
+      render(
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>,
+      )
+      await act(async () => {})
+
+      expect(mockDispatch).not.toHaveBeenCalled()
+    })
   })
 
   it("renders without crashing", async () => {
@@ -950,6 +1026,36 @@ describe("TransferInvestScreen, the invoice it pays", () => {
           payload: { index: 0, routes: [{ name: "Primary" }] },
         }),
       )
+    })
+
+    /** Recording the payment sends the step home from its own exit too; the home is
+     *  built once, not once per way there. */
+    it("leaves for the home once when the payment it finds settled is recorded", async () => {
+      expiredInvoice()
+      mockLookUpPayment.mockResolvedValue(CardInvestmentPaymentLookup.Settled)
+      /** As the store does: the record carries the payment from the next render on. */
+      mockMarkPaid.mockImplementationOnce(() => {
+        mockCardInvestmentProgress.current = {
+          ...mockCardInvestmentProgress.current!,
+          paidAt: NOW_MS,
+        }
+      })
+      const screen = () => (
+        <ContextForScreen>
+          <TransferInvestScreen />
+        </ContextForScreen>
+      )
+      const { getByText, rerender } = render(screen())
+      await act(async () => {})
+
+      await act(async () => {
+        fireEvent.press(getByText("Continue"))
+      })
+      await act(async () => {
+        rerender(screen())
+      })
+
+      expect(mockDispatch).toHaveBeenCalledTimes(1)
     })
 
     it("records the payment as on its way when the ledger still holds it as pending", async () => {
