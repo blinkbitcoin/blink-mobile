@@ -9,7 +9,7 @@ import { useSelfCustodialWallet } from "@app/self-custodial/providers/wallet"
 import { wrapDestination } from "@app/self-custodial/payment-details/wrap-destination"
 import { toWalletAmount } from "@app/types/amounts"
 
-import { buildFeeTierOptions } from "../fee-tier-options"
+import { buildFeeTierOptions, feeTierLabels } from "../fee-tier-options"
 import { type ParseDestinationResult } from "../payment-destination/index.types"
 import { ConvertMoneyAmount, type PaymentDetail } from "../payment-details/index.types"
 
@@ -86,11 +86,7 @@ export const useOnchainFeeTierOptions = ({
   const feeTierOptions = buildFeeTierOptions({
     hasQuote: feeRail.hasQuote,
     tiers: feeRail.tiers,
-    labels: {
-      [FeeTierOption.Fast]: LL.SendBitcoinScreen.fast(),
-      [FeeTierOption.Medium]: LL.SendBitcoinScreen.medium(),
-      [FeeTierOption.Slow]: LL.SendBitcoinScreen.slow(),
-    },
+    labels: feeTierLabels(LL),
     /**
      * Display currency, like the confirmation screen; the wallet amount only stands in
      * while the price is still loading.

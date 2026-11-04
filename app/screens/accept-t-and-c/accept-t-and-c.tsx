@@ -6,10 +6,12 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 import { RouteProp, useNavigation, useRoute } from "@react-navigation/native"
 
 import { useI18nContext } from "@app/i18n/i18n-react"
+import { reportError } from "@app/utils/error-logging"
 import { toastShow } from "@app/utils/toast"
 import { StorageFailure } from "@app/utils/storage/storage-failure"
 import { BLOCKED_COUNTRIES_FAQ_LINK } from "@app/config"
 import { useFeatureFlags } from "@app/config/feature-flags-context"
+import { useInFlightGuard } from "@app/hooks/use-in-flight-guard"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GaloyPrimaryButton } from "@app/components/atomic/galoy-primary-button"
 import { GaloySecondaryButton } from "@app/components/atomic/galoy-secondary-button"
@@ -35,6 +37,16 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
   const route = useRoute<RouteProp<RootStackParamList, "acceptTermsAndConditions">>()
   const { flow, mode } = route.params || { flow: "phone" }
   const { saveCheckpoint } = useMigrationCheckpoint()
+  /** saveCheckpoint reports a store that refused, but not a save it turned away for want of
+   *  an owner, which never reached the store. That one repeats on every tap while the owner
+   *  lookup is down, so it is reported once for as long as the screen is mounted, as the
+   *  commit screen does: one failure is one event, however many taps it costs. */
+  const hasReportedOwnerlessSaveRef = React.useRef(false)
+  /** The guard holds a second tap before React has committed the disabled button; the
+   *  state is what shows the button busy. Without either, two taps issue two saves and
+   *  both answers navigate. */
+  const { run: runExclusively } = useInFlightGuard()
+  const [isSavingTerms, setIsSavingTerms] = React.useState(false)
 
   const { deviceAccountEnabled } = useFeatureFlags()
   const appCheckToken = useAppCheckToken({ skip: !deviceAccountEnabled })
@@ -55,21 +67,40 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
     return LL.errors.generic()
   }
 
-  const action = async () => {
-    if (flow === "migration") {
-      /** The acceptance is part of the migration's consent trail, so advance only once the
-       *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
-       *  user already accepted. */
+  /** The acceptance is part of the migration's consent trail, so advance only once the
+   *  checkpoint write lands; otherwise a failed write would later re-prompt for terms the
+   *  user already accepted. */
+  const acceptMigrationTerms = async () => {
+    setIsSavingTerms(true)
+    try {
       const { isSaved, failure } = await saveCheckpoint(MigrationCheckpoint.BackupMethod)
       /** A Continue that answers a tap with nothing reads as a broken button. A store that
        *  refused is named as the device's, a full disk most of all since the user can go
        *  and fix it; a write turned away before it reached the store (no owner yet) is not
        *  the device's fault and keeps the generic copy. */
       if (!isSaved) {
+        const isRefusedWithoutOwner = failure === null
+        if (isRefusedWithoutOwner && !hasReportedOwnerlessSaveRef.current) {
+          hasReportedOwnerlessSaveRef.current = true
+          reportError(
+            "Migration terms",
+            new Error("Migration checkpoint save refused without an owner"),
+          )
+        }
         toastShow({ message: resolveNotSavedMessage(failure), LL })
         return
       }
       navigation.navigate("selfCustodialBackupMethod")
+    } finally {
+      setIsSavingTerms(false)
+    }
+  }
+
+  const isAcceptBusy = loading || isSavingTerms
+
+  const action = async () => {
+    if (flow === "migration") {
+      await runExclusively(acceptMigrationTerms)
       return
     }
 
@@ -120,8 +151,8 @@ export const AcceptTermsAndConditionsScreen: React.FC = () => {
           <GaloyPrimaryButton
             title={LL.AcceptTermsAndConditionsScreen.accept()}
             onPress={action}
-            loading={loading}
-            disabled={loading}
+            loading={isAcceptBusy}
+            disabled={isAcceptBusy}
           />
         </View>
       </View>

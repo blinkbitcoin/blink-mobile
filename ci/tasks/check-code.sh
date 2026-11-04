@@ -8,4 +8,6 @@ unpack_deps
 
 pushd repo
 
+use_ci_node_heap
+
 yarn check-code

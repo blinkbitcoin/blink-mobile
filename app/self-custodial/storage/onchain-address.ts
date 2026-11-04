@@ -85,19 +85,30 @@ export const latestOnchainReceiptId = (
       tx.direction === TransactionDirection.Receive,
   )?.id ?? null
 
-/** A missing or unreadable record means "no address issued yet" — never throws. */
-export const loadIssuedOnchainAddress = async (
+/**
+ * The stored record, or null when there is none (or it is malformed, which the next save
+ * replaces). `ok: false` is a failed read: the record may exist, so nothing can be said
+ * about whether an address is new. Never throws.
+ */
+export type IssuedOnchainAddressRead =
+  | { ok: true; issued: IssuedOnchainAddress | null }
+  | { ok: false }
+
+export const readIssuedOnchainAddress = async (
   accountId: string,
-): Promise<IssuedOnchainAddress | null> => {
+): Promise<IssuedOnchainAddressRead> => {
   try {
     const raw = await AsyncStorage.getItem(keyFor(accountId))
-    if (!raw) return null
+    if (!raw) return { ok: true, issued: null }
     const parsed: unknown = JSON.parse(raw)
-    if (!isIssuedOnchainAddress(parsed)) return null
+    if (!isIssuedOnchainAddress(parsed)) return { ok: true, issued: null }
     return {
-      address: parsed.address,
-      depositMarker: parsed.depositMarker,
-      seenPendingDepositIds: readSeenPendingDepositIds(parsed.seenPendingDepositIds),
+      ok: true,
+      issued: {
+        address: parsed.address,
+        depositMarker: parsed.depositMarker,
+        seenPendingDepositIds: readSeenPendingDepositIds(parsed.seenPendingDepositIds),
+      },
     }
   } catch (err) {
     recordAppError(
@@ -105,16 +116,26 @@ export const loadIssuedOnchainAddress = async (
         ? err
         : new Error(`Issued onchain address read failed: ${err}`),
     )
-    return null
+    return { ok: false }
   }
 }
 
+/** A missing or unreadable record means "no address issued yet" — never throws. */
+export const loadIssuedOnchainAddress = async (
+  accountId: string,
+): Promise<IssuedOnchainAddress | null> => {
+  const read = await readIssuedOnchainAddress(accountId)
+  return read.ok ? read.issued : null
+}
+
+/** Whether the record was written. Never throws. */
 export const saveIssuedOnchainAddress = async (
   accountId: string,
   value: IssuedOnchainAddress,
-): Promise<void> => {
+): Promise<boolean> => {
   try {
     await AsyncStorage.setItem(keyFor(accountId), JSON.stringify(value))
+    return true
   } catch (err) {
     // A failed write only costs us a rotation on the next visit; the address on
     // screen is still valid, so this must not surface to the user.
@@ -123,5 +144,6 @@ export const saveIssuedOnchainAddress = async (
         ? err
         : new Error(`Issued onchain address write failed: ${err}`),
     )
+    return false
   }
 }

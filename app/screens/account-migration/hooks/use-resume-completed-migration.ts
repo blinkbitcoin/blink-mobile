@@ -13,6 +13,17 @@ import {
 } from "@app/types/migration"
 import { reportError } from "@app/utils/error-logging"
 
+import {
+  loadReceiveDelayedSince,
+  saveReceiveDelayedSince,
+} from "../utils/migration-receive-delay-storage"
+import {
+  markAppForegrounded,
+  markMigrationReceiveChecked,
+  resetMigrationReceiveWait,
+  setMigrationReceiveOverdue,
+} from "../utils/migration-receive-wait"
+
 import { useCompleteMigration } from "./use-complete-migration"
 import { useMigrationReceiveConfirmation } from "./use-migration-receive-confirmation"
 import { useMigrationStatus } from "./use-migration-status"
@@ -54,29 +65,72 @@ export const useResumeCompletedMigration = (): void => {
   const isServerCompleted =
     status === MigrationStatus.Completed && hasUnfinishedMigration && !migrationLoading
 
+  /** A receive this device already watched run past the notice window, in a session
+   *  before this one. Without it every launch starts the window over, and a receive stuck
+   *  for days spends the first minute of each on "on its way" instead of support. */
+  /** Null until the store has answered, so the record below is never written over an
+   *  earlier one it has not read yet. */
+  const [delayedSince, setDelayedSince] = useState<number | null | undefined>(undefined)
+  useEffect(() => {
+    setDelayedSince(undefined)
+    if (!migrationAccountId) return
+    let isActive = true
+    loadReceiveDelayedSince(migrationAccountId)
+      .then((stored) => {
+        if (isActive) setDelayedSince(stored)
+      })
+      .catch(() => undefined)
+    return () => {
+      isActive = false
+    }
+  }, [migrationAccountId])
+  const wasDelayedEarlier = typeof delayedSince === "number"
+  const hasReadEarlierDelay = delayedSince !== undefined
+
   /** The same receive gate as the transfer screen: a relaunch mid-transfer must not close
    *  the custodial account, nor swap into a wallet whose funds are still in transit
    *  (#4102). Unconfirmed simply means no swap this session — the custodial session stays
    *  intact and the next launch (or this one, once a check lands) picks the swap back up. */
-  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed } =
+  const { isReceiveConfirmed, isReceiveProven, isReceiveDelayed, recheck } =
     useMigrationReceiveConfirmation({
       selfCustodialAccountId: migrationAccountId,
       expectedReceiveSats: migrationExpectedReceiveSats,
       skip: !isServerCompleted,
+      onWalletChecked: markMigrationReceiveChecked,
+      wasDelayedEarlier,
     })
+
+  /** Recorded the first time the window runs out, for the next launch to pick up. */
+  useEffect(() => {
+    const isFirstDelay = hasReadEarlierDelay && !wasDelayedEarlier
+    if (!isReceiveDelayed || !isFirstDelay || !migrationAccountId) return
+    saveReceiveDelayedSince(migrationAccountId, Date.now()).catch(() => undefined)
+  }, [isReceiveDelayed, hasReadEarlierDelay, wasDelayedEarlier, migrationAccountId])
 
   /** This path has no screen of its own to say the wait is unusual, so the crossing is at
    *  least reported: a receive that never lands would otherwise be invisible, the user
    *  sitting on a normal home with nothing pending anywhere. */
-  const hasReportedDelayRef = useRef(false)
+  /** Once per wallet rather than once per mount: this hook outlives an account switch, and
+   *  a second migration's late receive is a story of its own. */
+  const reportedDelayForRef = useRef<string | null>(null)
   useEffect(() => {
-    if (!isReceiveDelayed || hasReportedDelayRef.current) return
-    hasReportedDelayRef.current = true
+    if (!isReceiveDelayed || !migrationAccountId) return
+    if (reportedDelayForRef.current === migrationAccountId) return
+    reportedDelayForRef.current = migrationAccountId
     reportError(
       "Migration resume receive delayed",
       new Error("Receive has not landed within the notice window"),
     )
+  }, [isReceiveDelayed, migrationAccountId])
+
+  /** The migration entry and step screens cannot see this hook, so the overdue receive is
+   *  published for them: past the notice window a tap there offers support instead of
+   *  another "on its way". Withdrawn when this hook unmounts, so a stale wait never outlives
+   *  the watch that raised it. */
+  useEffect(() => {
+    setMigrationReceiveOverdue(isReceiveDelayed)
   }, [isReceiveDelayed])
+  useEffect(() => () => resetMigrationReceiveWait(), [])
 
   /** Blocks the effect from re-entering once the user has been handed to support, so a
    *  terminal outcome hands over exactly once. */
@@ -93,21 +147,30 @@ export const useResumeCompletedMigration = (): void => {
   )
   const timedCloseRetriesRef = useRef(0)
 
-  /** Foregrounding is the cheapest signal that the connection may be back, and the only one
-   *  this hook can watch without a screen: it is mounted under the tab navigator with no UI
-   *  of its own, so nothing else here ever tells it to look again. */
+  /**
+   * Foregrounding is the cheapest signal that the connection may be back, and the only one
+   * this hook can watch without a screen: it is mounted under the tab navigator with no UI
+   * of its own, so nothing else here ever tells it to look again. One listener serves both
+   * of its uses, in the order they need:
+   * - the receive: a fresh look at the wallet on the spot, since the scheduled one can be
+   *   half a minute out once the wait is overdue and the overdue flag is only acted on
+   *   after a check taken since. The foreground is marked first, so that check counts;
+   * - a close deferred for a dropped connection: its one retry for this foreground.
+   */
   useEffect(() => {
     const subscription = AppState.addEventListener("change", (nextAppState) => {
-      const isDeferredCloseWaiting =
-        nextAppState === "active" && hasDeferredCloseRef.current
-      if (!isDeferredCloseWaiting) return
+      if (nextAppState !== "active") return
+      markAppForegrounded()
+      recheck()
+
+      if (!hasDeferredCloseRef.current) return
       hasDeferredCloseRef.current = false
       clearTimeout(deferredCloseTimerRef.current)
       setCloseRetryCount((previous) => previous + 1)
     })
 
     return () => subscription.remove()
-  }, [])
+  }, [recheck])
 
   const scheduleDeferredCloseRetry = useCallback(() => {
     if (timedCloseRetriesRef.current >= MAX_DEFERRED_CLOSE_TIMER_RETRIES) return

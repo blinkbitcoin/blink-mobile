@@ -1,15 +1,52 @@
-import { getAllKeys, loadJson, loadJsonOrThrow } from "@app/utils/storage"
+import {
+  getAllKeys,
+  loadJson,
+  loadJsonOrThrow,
+  remove,
+  removeOrThrow,
+} from "@app/utils/storage"
 
 const mockGetAllKeys = jest.fn()
 const mockGetItem = jest.fn()
+const mockRemoveItem = jest.fn()
 
 jest.mock("@react-native-async-storage/async-storage", () => ({
   __esModule: true,
   default: {
     getAllKeys: (...args: unknown[]) => mockGetAllKeys(...args),
     getItem: (...args: unknown[]) => mockGetItem(...args),
+    removeItem: (...args: unknown[]) => mockRemoveItem(...args),
   },
 }))
+
+/** The removal pair, told apart the way the read pair is: one swallows, one tells. */
+describe("removeOrThrow", () => {
+  beforeEach(() => {
+    jest.clearAllMocks()
+  })
+
+  it("removes the key", async () => {
+    mockRemoveItem.mockResolvedValue(undefined)
+
+    await removeOrThrow("a")
+
+    expect(mockRemoveItem).toHaveBeenCalledWith("a")
+  })
+
+  it("propagates a removal that failed", async () => {
+    mockRemoveItem.mockRejectedValue(new Error("Database Error"))
+
+    await expect(removeOrThrow("a")).rejects.toThrow("Database Error")
+  })
+
+  /** The contrast that makes the new helper necessary. */
+  it("is what tells a failed removal apart from the best-effort remove", async () => {
+    mockRemoveItem.mockRejectedValue(new Error("Database Error"))
+    jest.spyOn(console, "error").mockImplementation(() => undefined)
+
+    await expect(remove("a")).resolves.toBeUndefined()
+  })
+})
 
 describe("getAllKeys", () => {
   beforeEach(() => {

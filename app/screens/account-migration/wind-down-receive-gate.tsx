@@ -5,6 +5,7 @@ import { useNavigation } from "@react-navigation/native"
 import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { useWindDownReceiveBlocked } from "./hooks/use-wind-down-receive-blocked"
+import { useWindDownStatus } from "./hooks/use-wind-down-status"
 
 type WindDownReceiveGateProps = {
   children: React.ReactNode
@@ -14,7 +15,14 @@ type WindDownReceiveGateProps = {
  *  receive screen (home button, modal, deeplink) bounces straight back home. */
 export const WindDownReceiveGate: React.FC<WindDownReceiveGateProps> = ({ children }) => {
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
+  const { refresh } = useWindDownStatus()
   const isReceiveBlocked = useWindDownReceiveBlocked()
+
+  /** The status as it is now, not as it was at the session start: the cutoff can fall
+   *  within a session, so every visit asks again. */
+  React.useEffect(() => {
+    refresh()
+  }, [refresh])
 
   React.useEffect(() => {
     if (!isReceiveBlocked) return

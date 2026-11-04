@@ -5,6 +5,10 @@ import {
   MigrationCheckpoint,
 } from "@app/screens/account-migration/hooks"
 import {
+  type CheckpointUpdate,
+  mergeCheckpoint,
+} from "@app/screens/account-migration/utils/migration-checkpoint-storage"
+import {
   StorageFailure,
   type StorageWriteResult,
 } from "@app/utils/storage/storage-failure"
@@ -72,7 +76,14 @@ const resetCheckpointMocks = () => {
   mockRefetchOwnerId.mockResolvedValue(undefined)
   mockFocusCallback = null
   mockLoadCheckpoint.mockResolvedValue(null)
-  mockSaveCheckpointToStorage.mockResolvedValue(undefined)
+  /** Answers with the record a real save writes: the update merged onto what the store
+   *  holds, which is what the hook now mirrors. */
+  mockSaveCheckpointToStorage.mockImplementation(
+    async (_key: string, update: CheckpointUpdate) => {
+      const existing = await Promise.resolve(mockLoadCheckpoint()).catch(() => null)
+      return mergeCheckpoint(existing ?? null, update)
+    },
+  )
   mockClearCheckpointFromStorage.mockResolvedValue(undefined)
 }
 
@@ -236,6 +247,28 @@ describe("useMigrationCheckpoint", () => {
     /** Surfaced, not swallowed: an unreadable store must stay distinguishable from an
      *  empty one, or the gate reads a transient failure as a wiped device. */
     expect(result.current.hasError).toBe(true)
+  })
+
+  /** The gate words a full disk apart from an unreadable store, and that wording comes
+   *  from the kind this read names. */
+  it("names a full disk as the reason the read failed", async () => {
+    mockLoadCheckpoint.mockRejectedValue(
+      new Error("database or disk is full (code 13 SQLITE_FULL)"),
+    )
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.storageFailure).toBe(StorageFailure.OutOfSpace)
+  })
+
+  it("names any other read failure as unknown", async () => {
+    mockLoadCheckpoint.mockRejectedValue(new Error("Database Error"))
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.storageFailure).toBe(StorageFailure.Unknown)
   })
 
   it("recovers through refetch after a failed load", async () => {
@@ -948,5 +981,138 @@ describe("useMigrationCheckpoint write ordering", () => {
     })
 
     expect(result.current.checkpoint).toBe(MigrationCheckpoint.BalancesOverview)
+  })
+})
+
+describe("useMigrationCheckpoint a start the server accepted", () => {
+  beforeEach(resetCheckpointMocks)
+
+  it("exposes the confirmation stored for this account's flow", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      isStartConfirmed: true,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.isStartConfirmed).toBe(true)
+  })
+
+  /** Another profile's confirmed start says nothing about this account's flow. */
+  it("ignores a confirmation stored for another account", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-other",
+      isStartConfirmed: true,
+    })
+
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.isStartConfirmed).toBe(false)
+  })
+
+  it("reads unconfirmed when nothing is stored", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.isStartConfirmed).toBe(false)
+  })
+
+  it("persists a confirmation the caller saw and exposes it", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        provisionedAccountId: "sc-1",
+        expectedReceiveSats: 21000,
+        isStartConfirmed: true,
+      })
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
+      "migrationCheckpoint_main",
+      expect.objectContaining({ isStartConfirmed: true }),
+    )
+    expect(result.current.isStartConfirmed).toBe(true)
+  })
+
+  /** Another instance on the same key can have written since this one last read it: the
+   *  store merges against the disk, so the hook takes what the store wrote rather than a
+   *  merge of its own older copy. */
+  it("holds the record the store wrote, not its own merge", async () => {
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+    expect(result.current.accountId).toBeNull()
+
+    mockSaveCheckpointToStorage.mockResolvedValueOnce({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-written-elsewhere",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 990,
+    })
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        expectedReceiveSats: 990,
+      })
+    })
+
+    expect(result.current.accountId).toBe("sc-written-elsewhere")
+  })
+
+  /** The receive gate reads the figure this hook holds, so the renewal the store applies
+   *  has to land here too, not only on disk. */
+  it("renews the figure of a run the server has not started, in the store and here", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      expectedReceiveSats: 0,
+    })
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.BalancesOverview, {
+        expectedReceiveSats: 5000,
+        isServerFlowUnstarted: true,
+      })
+    })
+
+    expect(mockSaveCheckpointToStorage).toHaveBeenCalledWith(
+      "migrationCheckpoint_main",
+      expect.objectContaining({ expectedReceiveSats: 5000, isServerFlowUnstarted: true }),
+    )
+    expect(result.current.expectedReceiveSats).toBe(5000)
+  })
+
+  /** The record keeps it for the run; re-sending it from memory would carry it into a
+   *  run that restarted, where it no longer holds. */
+  it("never re-sends a stored confirmation on a later save", async () => {
+    mockLoadCheckpoint.mockResolvedValue({
+      step: MigrationCheckpoint.BalancesOverview,
+      savedAt: Date.now(),
+      accountId: "sc-account-2",
+      custodialAccountId: "custodial-1",
+      isStartConfirmed: true,
+    })
+    const { result } = renderHook(() => useMigrationCheckpoint())
+    await waitFor(() => expect(result.current.loading).toBe(false))
+
+    await act(async () => {
+      await result.current.saveCheckpoint(MigrationCheckpoint.TermsAndConditions)
+    })
+
+    const [, update] = mockSaveCheckpointToStorage.mock.calls[0]
+    expect(update.isStartConfirmed).toBeUndefined()
   })
 })

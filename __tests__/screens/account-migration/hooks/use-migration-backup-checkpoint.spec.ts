@@ -9,6 +9,12 @@ const mockSaveCheckpoint = jest.fn()
 let mockIsSelfCustodial = false
 let mockHasResumableCheckpoint = true
 let mockLoading = false
+let mockIsFocused = true
+
+jest.mock("@react-navigation/native", () => ({
+  ...jest.requireActual("@react-navigation/native"),
+  useIsFocused: () => mockIsFocused,
+}))
 
 jest.mock("@app/hooks/use-active-wallet", () => ({
   useActiveWallet: () => ({ isSelfCustodial: mockIsSelfCustodial }),
@@ -35,6 +41,7 @@ describe("useMigrationBackupCheckpoint", () => {
     mockIsSelfCustodial = false
     mockHasResumableCheckpoint = true
     mockLoading = false
+    mockIsFocused = true
     mockSaveCheckpoint.mockResolvedValue({ isSaved: true, failure: null })
   })
 
@@ -55,6 +62,21 @@ describe("useMigrationBackupCheckpoint", () => {
     expect(mockReportError).toHaveBeenCalledWith(
       "Migration backup checkpoint save",
       expect.any(Error),
+    )
+  })
+
+  /** The save answers a failure today; one that ever throws is still reported rather than
+   *  left as an unhandled rejection. */
+  it("reports a save that throws", async () => {
+    const thrown = new Error("keystore locked")
+    mockSaveCheckpoint.mockRejectedValue(thrown)
+
+    renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.CloudBackup))
+    await flushEffects()
+
+    expect(mockReportError).toHaveBeenCalledWith(
+      "Migration backup checkpoint save",
+      thrown,
     )
   })
 
@@ -84,5 +106,29 @@ describe("useMigrationBackupCheckpoint", () => {
     renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.BackupAlerts))
 
     expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+  })
+
+  /** The backup screens stay mounted beneath the commit screen. One that re-saved its
+   *  earlier step from there would regress the record past the commit point, which reads
+   *  as a restart and drops the expected receive the transfer still waits on. */
+  it("does not save while the screen sits in the background", () => {
+    mockIsFocused = false
+
+    renderHook(() => useMigrationBackupCheckpoint(MigrationCheckpoint.BackupMethod))
+
+    expect(mockSaveCheckpoint).not.toHaveBeenCalled()
+  })
+
+  it("saves once the screen comes back into focus", () => {
+    mockIsFocused = false
+    const { rerender } = renderHook(() =>
+      useMigrationBackupCheckpoint(MigrationCheckpoint.BackupMethod),
+    )
+
+    mockIsFocused = true
+    rerender({})
+
+    expect(mockSaveCheckpoint).toHaveBeenCalledTimes(1)
+    expect(mockSaveCheckpoint).toHaveBeenCalledWith(MigrationCheckpoint.BackupMethod)
   })
 })

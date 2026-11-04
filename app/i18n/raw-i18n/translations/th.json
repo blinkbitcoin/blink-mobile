@@ -33,6 +33,8 @@
     "createError": "ไม่สามารถสร้างคีย์ API ได้ โปรดลองอีกครั้ง",
     "revokeError": "ไม่สามารถเพิกถอนคีย์ API ได้ โปรดลองอีกครั้ง",
     "loadError": "ไม่สามารถโหลดคีย์ API ของคุณได้ โปรดลองอีกครั้งในภายหลัง",
+    "discardSecretTitle": "ละทิ้งคีย์ API นี้?",
+    "discardSecretBody": "นี่เป็นครั้งเดียวที่รหัสลับจะแสดง หากคุณออกตอนนี้ จะไม่สามารถกู้คืนคีย์ได้ และคุณจะต้องสร้างคีย์ใหม่",
     "done": "เสร็จสิ้น"
   },
   "GaloyAddressScreen": {
@@ -80,7 +82,12 @@
     "skip": "ข้าม",
     "unlock": "ปลดล็อค",
     "usePin": "ใช้พิน",
-    "confirmLogout": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ? การดำเนินการนี้จะรีเซ็ตแคชและการตั้งค่าผู้ใช้ในเครื่องทั้งหมด"
+    "confirmLogout": "คุณแน่ใจหรือไม่ว่าต้องการออกจากระบบ? การดำเนินการนี้จะรีเซ็ตแคชและการตั้งค่าผู้ใช้ในเครื่องทั้งหมด",
+    "forgotPin": "ลืมพิน? ลบกระเป๋าเงิน",
+    "removeWalletsTitle": "ลบกระเป๋าเงินออกจากอุปกรณ์นี้หรือไม่",
+    "removeWalletsBody": "การดำเนินการนี้จะลบกระเป๋าเงินทั้งหมดออกจากอุปกรณ์นี้และนำคุณออกจากระบบ หากต้องการกู้คืนกระเป๋าเงิน คุณต้องใช้วลีสำรองของกระเป๋าเงินนั้น หากไม่มีวลีนี้ กระเป๋าเงินจะสูญหาย",
+    "removeWalletsConfirm": "ลบกระเป๋าเงิน",
+    "removeWalletsFailed": "ไม่สามารถลบกระเป๋าเงินบางส่วนได้ โปรดลองอีกครั้ง"
   },
   "PeopleScreen": {
     "title": "People",
@@ -2177,16 +2184,19 @@
     "walletCountNotTwo": "จำนวนกระเป๋าไม่ใช่ 2 กรุณาใช้แดชบอร์ดเพื่อดูกระเป๋าและเงินทั้งหมดของบัญชีนี้"
   },
   "PinScreen": {
+    "attemptUnrecorded": "ไม่สามารถบันทึกการพยายามได้อย่างปลอดภัย",
+    "attemptsLeft": "มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
     "attemptsRemaining": "พินนี้ผิด มีโอกาสใส่พินอีก {attemptsRemaining: number} ครั้ง",
     "enterPin": "ป้อนพินโค้ด",
-    "lockoutUnavailable": "ไม่สามารถบันทึกการพยายามที่ผิดพลาดได้อย่างปลอดภัย ทำการออกจากระบบ",
+    "oneAttemptLeft": "โอกาสสุดท้าย",
     "oneAttemptRemaining": "พินนี้ผิด โอกาสสุดท้าย",
     "pinUnreadable": "ไม่สามารถตรวจสอบพินของคุณได้ กรุณาลองอีกครั้ง",
     "setPin": "ตั้งค่าพินโค้ด",
     "setPinFailedMatch": "พินไม่ตรงกัน - ตั้งค่าพินโค้ดอีกครั้ง",
     "storePinFailed": "ไม่สามารถเก็บพินได้",
     "tooManyAttempts": "คุณใส่ผิดมากเกินไป ทำการออกจากระบบ",
-    "tryAgainIn": "ลองอีกครั้งใน {seconds: number} วินาที",
+    "attemptBudgetSpent": "คุณใส่ผิดมากเกินไป",
+    "tryAgainIn": "ลองอีกครั้งใน {time: string}",
     "verifyPin": "ยืนยันพินโค้ด"
   },
   "PriceHistoryScreen": {
@@ -2221,6 +2231,12 @@
     "error": "การสร้าง invoice ผิดพลาด หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "copyInvoice": "Copy",
     "shareInvoice": "แชร์",
+    "newAddress": "ใหม่",
+    "newAddressHint": "สร้างที่อยู่ Bitcoin ใหม่ ที่อยู่เดิมยังใช้งานได้",
+    "newAddressGenerated": "ที่อยู่ใหม่พร้อมแล้ว ที่อยู่เดิมยังใช้งานได้",
+    "newAddressFailed": "ไม่สามารถสร้างที่อยู่ใหม่ได้ โปรดลองอีกครั้ง",
+    "newAddressRateLimited": "สร้างที่อยู่ใหม่มากเกินไป โปรดรอสักครู่แล้วลองอีกครั้ง",
+    "onchainAddressLoadFailed": "ไม่สามารถโหลดที่อยู่ Bitcoin ของคุณได้ แตะ ใหม่ เพื่อลองอีกครั้ง",
     "addAmount": "ขอจำนวนเงินที่แน่นอน",
     "expired": "Invoiceนี้ หมดอายุแล้ว",
     "expiresIn": "หมดอายุใน",
@@ -2356,6 +2372,8 @@
     "invalidAmount": "จำนวนเงินไม่ถูกต้อง กรุณาสร้างใหม่โดยใช้จำนวนเงินที่ถูกต้อง",
     "usernameDoesNotExist": "{lnAddress: string} ดูเหมือนจะไม่ใช่แอดเดรส {bankName: string} ที่มีอยู่จริง",
     "usernameDoesNotExistAdvice": "ลองเช็คอีกครั้งว่าสะกดถูกต้องไหม ไม่อย่างนั้นก็ลองขอไลท์นิ่งอินวอยซ์หรือบิตคอยน์แอดเดรสมาใช้แทน",
+    "destinationUnverifiable": "ขณะนี้เราไม่สามารถตรวจสอบ {lnAddress} ได้ — เซิร์ฟเวอร์ของ {bankName} ไม่ตอบสนอง",
+    "destinationUnverifiableAdvice": "ที่อยู่นี้อาจถูกต้องอยู่แล้ว ลองอีกครั้งในอีกสักครู่ หรือขอใบแจ้งหนี้ LN หรือที่อยู่ BTC จากผู้รับแทน",
     "selfPaymentError": "{lnAddress: string} คือแอดเดรส {bankName: string} ของคุณ",
     "selfPaymentAdvice": "ถ้าต้องการส่งเงินไปยังบัญชีอื่นที่คุณเป็นเจ้าของ คุณสามารถใช้อินวอยซ์, ไลท์นิ่งแอดเดรส หรือบิตคอยน์แอดเดรสแทนได้",
     "lnAddressError": "เราไม่สามารถเชื่อมต่อไปยังไลท์นิ่งแอดเดรสนี้ได้ ถ้าคุณมั่นใจว่ามันมีตัวตนอยู่จริง คุณสามารถลองใหม่ได้ภายหลัง",
@@ -2428,9 +2446,9 @@
     "time": "เวลา",
     "type": "ประเภท",
     "feeTier": "ลำดับความสำคัญของธุรกรรม",
-    "fast": "เร็ว",
-    "medium": "ปานกลาง",
-    "slow": "ช้า",
+    "fast": "ด่วน",
+    "medium": "มาตรฐาน",
+    "slow": "ประหยัด",
     "recommended": "แนะนำ",
     "walletOffline": "กระเป๋าเงินของคุณออฟไลน์ กรุณาตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "sdkInsufficientFunds": "ยอดเงินไม่เพียงพอสำหรับธุรกรรมนี้",
@@ -2439,7 +2457,7 @@
     "sdkGenericError": "ไม่สามารถประมาณค่าธรรมเนียมได้ กรุณาลองจำนวนอื่น"
   },
   "SettingsScreen": {
-    "createAddress": "สร้างแอดเดรส",
+    "createAddress": "สร้างแอดเดรส Lightning",
     "addressDisabled": "(ปิดใช้งาน)",
     "donationButton": "ปุ่มบริจาค",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2474,7 @@
     "activated": "เปิดใช้งานเป็นที่เรียบร้อย",
     "addressScreen": "Ways to get paid",
     "nonCustodialAccount": "บัญชีแบบไม่ฝากดูแล",
+    "custodialAccount": "บัญชีแบบฝากดูแล",
     "tapUserName": "กดเพื่อตั้งชื่อผู้ใช้",
     "notifications": "Notifications",
     "title": "การตั้งค่า",
@@ -2564,8 +2583,6 @@
     "emailUnverifiedContent": "Ensure you can log back into your account by verifying your email. Do you want to do the verification now?",
     "totp": "Two-factor authentication",
     "totpDeactivated": "Two-factor authentication has been deactivated",
-    "totpDeleteAlertTitle": "Delete two-factor authentication",
-    "totpDeleteAlertContent": "Are you sure you want to delete your two-factor authentication?",
     "copiedAccountId": "Copied your account ID to clipboard",
     "yourAccountId": "Your Account ID",
     "accountId": "รหัสบัญชี",
@@ -2579,12 +2596,14 @@
     "error": "ไม่สามารถดึงข้อมูลโปรไฟล์ได้ในขณะนี้",
     "fromThisDevice": "จากอุปกรณ์นี้?",
     "switchAccount": "คุณได้สลับไปยังบัญชีอื่นแล้ว",
-    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว"
+    "removedAccount": "คุณได้ลบบัญชี {identifier: string} แล้ว",
+    "removeAccount": "ลบบัญชี"
   },
   "StablesatsRestriction": {
     "walletLabel": "ไม่พร้อมใช้งานในภูมิภาคของคุณ",
     "anonModeWalletLabel": "ไม่พร้อมใช้งานในโหมด Incognito",
-    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง"
+    "unknownRegionWalletLabel": "ไม่สามารถตรวจสอบความพร้อมใช้งานได้ ดึงลงเพื่อลองอีกครั้ง",
+    "networkWalletLabel": "ไม่พร้อมใช้งานบนเครือข่ายนี้"
   },
   "AnonModeConvertModal": {
     "title": "โอนยอดคงเหลือดอลลาร์ของคุณก่อน",
@@ -2618,14 +2637,11 @@
     "youGet": "คุณจะได้รับ"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Two-factor authentication",
-    "secret": "รหัสลับ/สำรอง",
-    "content": "Scan this QR code with your authenticator app. Alternatively, you can manually copy/paste the secret into your authenticator app."
+    "title": "Two-factor authentication"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Two-factor authentication",
-    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication.",
-    "success": "Two-factor authentication has been enabled. You will now only be able to log back in with your phone or email AND your two factor authentication.\n\nOnly full KYC accounts may be recovered in the case a user has lost access to their two-factor authentication."
+    "enter6digitCode": "Enter the 6-digit code from your authenticator app to validate your two-factor authentication."
   },
   "TotpLoginValidateScreen": {
     "title": "Two-factor authentication",
@@ -2669,7 +2685,7 @@
   "TransactionDetailScreen": {
     "paid": "จ่ายเงินให้/มาจาก",
     "received": "คุณได้รับ",
-    "spent": "คุณใช้เงินไป",
+    "sent": "คุณได้ส่ง",
     "sending": "กำลังส่ง",
     "receivingAccount": "Receiving Account",
     "sendingAccount": "Sending Account",
@@ -2745,6 +2761,7 @@
       "tooLong": "Address must be at most 50 characters long",
       "invalidCharacter": "Address can only contain letters, numbers, and underscores",
       "addressUnavailable": "Sorry, this address is already taken",
+      "serverUnreachable": "ไม่สามารถเชื่อมต่อเซิร์ฟเวอร์ที่อยู่ได้ ลองอีกครั้งในอีกสักครู่",
       "unknownError": "An unknown error occurred, please try again later",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3039,7 +3056,8 @@
     "problemPersists": "หากปัญหายังคงอยู่ กรุณาติดต่อฝ่ายซัพพอร์ท",
     "fatalError": "ขออภัย เราพบปัญหาในการโหลดข้อมูลแอปพลิเคชั่น หากปัญหานี้ยังคงไม่หายไป กรุณาติดต่อศูนย์ช่วยเหลือ",
     "showError": "ไม่สามารถแสดงได้",
-    "clearAppData": "Clear App Data and Logout"
+    "clearAppData": "Clear App Data and Logout",
+    "screenSecurityUnavailable": "หน้าจอนี้ยังคงถูกซ่อนไว้ เนื่องจากไม่สามารถเปิดการป้องกันการจับภาพหน้าจอได้"
   },
   "notifications": {
     "payment": {
@@ -3070,7 +3088,13 @@
     "deleteAccountFromPhone": "สวัสดี! โปรดปิดบัญชีของฉัน หมายเลขโทรศัพท์ของฉันคือ {phoneNumber: string}",
     "deleteAccountError": "Something went wrong. Contact {email: string} for further assistance.",
     "bye": "Bye!",
-    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด"
+    "deleteAccountWarning": "ข้อควรระวัง: การปิดบัญชีเป็นการกระทำถาวร!\nตรวจสอบให้แน่ใจว่ากระเป๋าเงินไม่มีเงินคงเหลือก่อนปิดบัญชี\nบัญชีที่ปิดแล้วไม่สามารถกู้คืนได้\nเราอาจเก็บรักษาบันทึกบางอย่างตามที่กฎหมายกำหนด",
+    "downloadLogs": "ดาวน์โหลดบันทึก",
+    "exportLogsTitle": "แชร์บันทึกกระเป๋าเงินของคุณ",
+    "exportLogsBody": "ไฟล์นี้ช่วยให้ฝ่ายสนับสนุนตรวจสอบปัญหาของกระเป๋าเงินของคุณ ไฟล์มีประวัติการชำระเงิน (จำนวนเงิน ใบแจ้งหนี้ และที่อยู่) และตัวระบุของกระเป๋าเงินแบบไม่ฝากดูแลทุกใบในอุปกรณ์นี้ ไม่ใช่แค่ใบนี้ แต่ไม่มีวลีสำรองหรือกุญแจของคุณ แชร์กับฝ่ายสนับสนุนของเราเท่านั้น",
+    "exportLogsConfirm": "แชร์บันทึก",
+    "noLogsYet": "ยังไม่มีบันทึกให้แชร์ เปิดกระเป๋าเงินแล้วลองอีกครั้ง",
+    "exportLogsError": "ไม่สามารถส่งออกบันทึกได้ โปรดลองใหม่อีกครั้ง"
   },
   "lnurl": {
     "overLimit": "คุณไม่สามารถส่งเงินได้เกินกว่านี้",
@@ -3800,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "สำรองข้อมูลกระเป๋าเงินของคุณ",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "เลือกวิธีการสำรองข้อมูล",
@@ -3845,6 +3869,15 @@
         "title": "ยินดีต้อนรับสู่ Blink แบบไม่มีผู้ดูแล",
         "testSuccess": "วลีสำรองของคุณถูกต้อง"
       }
+    },
+    "BundleExport": {
+      "title": "ถอนออกฉุกเฉิน",
+      "body": "หาก Spark หยุดทำงาน ชุดข้อมูลนี้ให้คุณย้ายบิตคอยน์ออกบนเชนได้โดยไม่ต้องพึ่ง Blink ยอดเงินดอลลาร์ของคุณไม่สามารถกู้คืนได้",
+      "download": "ดาวน์โหลดชุดข้อมูล",
+      "sensitiveTitle": "ข้อมูลละเอียดอ่อน",
+      "learnMore": "เรียนรู้เพิ่มเติมเกี่ยวกับการถอนออกฝ่ายเดียว",
+      "sensitiveConfirm": "ดาวน์โหลด",
+      "sensitiveBody": "ไฟล์นี้แสดงยอดคงเหลือและประวัติการชำระเงินของคุณ จึงควรเก็บเป็นความลับ หากต้องการใช้ในกรณีฉุกเฉิน คุณต้องมีวลีสำรองของคุณด้วย"
     },
     "CloudBackup": {
       "title": "มาสำรองข้อมูลกระเป๋าเงินของคุณกัน",
@@ -3975,6 +4008,9 @@
     "explainerCheck5": "บัญชีของคุณจะถูกหักค่าธรรมเนียมเครือข่าย Spark",
     "explainerCta": "เข้าใจแล้ว",
     "transferringFunds": "กำลังโอนเงินของคุณ จะเสร็จสิ้นภายในไม่กี่วินาที",
+    "transferInProgress": {
+      "body": "เงินของคุณกำลังอยู่ระหว่างการโอนไปยังบัญชีใหม่ของคุณ เปิดแอปทิ้งไว้ แล้วเราจะดำเนินการให้เสร็จโดยอัตโนมัติ"
+    },
     "transferDelayed": {
       "body": "เงินของคุณกำลังอยู่ระหว่างการโอนไปยังบัญชีใหม่ของคุณ ใช้เวลานานกว่าปกติ — เปิดแอปทิ้งไว้ แล้วเราจะดำเนินการให้เสร็จโดยอัตโนมัติ",
       "contactSupportCta": "ติดต่อฝ่ายสนับสนุน"
@@ -4047,6 +4083,12 @@
     "recognizePhraseTitle": "คุณจำวลีสำรองข้อมูลนี้ได้ไหม",
     "recognizePhraseBody": "อย่าป้อนคำที่คนอื่นส่งมาให้คุณเด็ดขาด"
   },
+  "EmergencyRecovery": {
+    "outageTitle": "ไม่สามารถเชื่อมต่อผู้ให้บริการ",
+    "outageBody": "Spark กำลังมีปัญหาการให้บริการ กรุณารอสักครู่แล้วลองใหม่ หรือติดต่อ{support}ของเรา",
+    "outageSupport": "ฝ่ายสนับสนุน",
+    "tryAgainLater": "ลองใหม่ภายหลัง"
+  },
   "BackupNudge": {
     "title": "เงินของคุณมีความเสี่ยง",
     "description": "รักษาความปลอดภัยกระเป๋าเงินของคุณตอนนี้ ใช้เวลาเพียงนาทีเดียว",
@@ -4055,6 +4097,81 @@
     "modalTitle": "รักษาความปลอดภัยเงินของคุณ",
     "modalDescription": "เราขอแนะนำอย่างยิ่งให้คุณสำรองข้อมูลกระเป๋าเงินเพื่อป้องกันการสูญเสียเงินทั้งหมดในกรณีที่คุณทำอุปกรณ์นี้หาย",
     "secureMe": "รักษาความปลอดภัยกระเป๋าเงิน"
+  },
+  "TwoFactorEnforcement": {
+    "title": "ตั้งค่าการยืนยันตัวตนสองขั้นตอน",
+    "cardDescription": "ปกป้องบัญชีของคุณจากการเข้าถึงโดยไม่ได้รับอนุญาต",
+    "cardCta": "ตั้งค่า",
+    "settingsDescription": "ปกป้องบัญชีของคุณจากการเข้าถึงโดยไม่ได้รับอนุญาตด้วยการตั้งค่า",
+    "setupTitle": "ตั้งค่าการยืนยันตัวตนสองขั้นตอนตอนนี้",
+    "setupDescription": "เพื่อป้องกันการเข้าถึงบัญชีของคุณโดยไม่ได้รับอนุญาต โปรดเพิ่มการยืนยันตัวตนสองขั้นตอนตอนนี้",
+    "setAuthenticator": "ตั้งค่าแอปยืนยันตัวตน",
+    "reminderTitle": "เพิ่มแอปยืนยันตัวตนเพื่อปกป้องเงินของคุณ",
+    "reminderDescription": "ยอดเงินของคุณเพิ่มขึ้นแล้ว แอปยืนยันตัวตนช่วยให้บัญชีของคุณปลอดภัย แม้จะมีคนเข้าถึงอีเมลหรือโทรศัพท์ของคุณได้",
+    "modalReminder": "หากคุณปิดตอนนี้ โปรดเปิดใช้งานโดยเร็วที่สุด",
+    "dismissTwoMore": "คุณสามารถปิดได้อีกสองครั้ง",
+    "dismissOneMore": "คุณสามารถปิดได้อีกหนึ่งครั้ง",
+    "dismissLast": "นี่เป็นครั้งสุดท้ายที่คุณสามารถปิดได้",
+    "setNow": "ตั้งค่าตอนนี้",
+    "dontWantTo": "ฉันไม่ต้องการ",
+    "highBalanceTitle": "คุณมีมากกว่า {amount} โปรดเพิ่มการป้องกันเพิ่มเติม",
+    "protectionRequiredTitle": "โปรดเพิ่มการป้องกันเพิ่มเติมเพื่อใช้งาน Blink ต่อ",
+    "protectionRequiredBody": "ยิ่งคุณมีเงินมากเท่าไร ความปลอดภัยที่ดีกว่าก็ยิ่งสำคัญมากขึ้น โปรดเพิ่มแอปยืนยันตัวตนเพื่อใช้ Blink ต่อไป",
+    "nonCustodialTitle": "หากคุณไม่ต้องการตั้งค่าการยืนยันตัวตนสองขั้นตอน",
+    "nonCustodialBody": "อีกทางเลือกหนึ่งคือย้ายไปใช้แบบไม่ฝากดูแล ซึ่งคุณจะต้องรับผิดชอบเงินของคุณเอง"
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "ปกป้องเงินของคุณด้วยแอปยืนยันตัวตน",
+    "introDescription": "แอปยืนยันตัวตนจะสร้างรหัส 6 หลักใหม่ทุก 30 วินาที",
+    "takeoversTitle": "ป้องกันการยึดบัญชี",
+    "takeoversDescription": "รหัสอยู่ในโทรศัพท์ของคุณเท่านั้น",
+    "stolenNumberTitle": "ปลอดภัยแม้หมายเลขของคุณจะถูกขโมย",
+    "stolenNumberDescription": "แม้จะมีคนเข้าถึงอีเมลหรือหมายเลขโทรศัพท์ของคุณได้ ก็ไม่สามารถเข้าสู่ระบบได้",
+    "durationTitle": "ใช้เวลาประมาณ 2 นาที",
+    "durationDescription": "เราจะแนะนำคุณทีละขั้นตอน",
+    "getStarted": "เริ่มต้นใช้งาน",
+    "appsTitle": "ดาวน์โหลดแอปยืนยันตัวตน",
+    "appsDescription": "ใช้แอปยืนยันตัวตนใดก็ได้ แอปเหล่านี้ฟรีและเชื่อถือได้:",
+    "googleAuthenticatorDescription": "ใช้งานง่ายและเป็นที่นิยม สำรองข้อมูลไปยังบัญชี Google ได้ตามต้องการ",
+    "protonAuthenticatorDescription": "โอเพนซอร์ส สำรองข้อมูลและซิงค์แบบเข้ารหัสตั้งแต่ต้นทางถึงปลายทาง",
+    "twoFasAuthDescription": "โอเพนซอร์ส ไม่ต้องมีบัญชี",
+    "get": "ดาวน์โหลด",
+    "storeNote": "“ดาวน์โหลด” จะเปิด App Store หรือ Google Play กลับมาที่ Blink เมื่อติดตั้งเสร็จแล้ว",
+    "haveAnApp": "ฉันมีแอปแล้ว",
+    "keyInstruction": "คัดลอกคีย์ตั้งค่านี้ไปยังแอปยืนยันตัวตนของคุณ",
+    "qrInstruction": "ใช้อุปกรณ์เครื่องอื่นอยู่ใช่ไหม\nสแกนรหัส QR นี้แทน",
+    "backupTitle": "สำรองคีย์ของคุณ",
+    "backupDescription": "หากคุณทำโทรศัพท์หาย คีย์นี้จะช่วยให้คุณตั้งค่าแอปยืนยันตัวตนได้อีกครั้ง โปรดบันทึกไว้ในที่อื่นที่ไม่ใช่โทรศัพท์เครื่องนี้",
+    "saveToPasswordManager": "บันทึกลงตัวจัดการรหัสผ่าน",
+    "shareToPasswordManager": "แชร์ไปยังตัวจัดการรหัสผ่าน",
+    "copyForManualBackup": "คัดลอกเพื่อสำรองด้วยตนเอง",
+    "passwordManagerUnavailable": "ไม่มีตัวจัดการรหัสผ่านในอุปกรณ์นี้ ให้คัดลอกคีย์เพื่อสำรองข้อมูลด้วยตนเองแทน",
+    "savedIt": "ฉันบันทึกแล้ว",
+    "keyBackupText": "คีย์ตั้งค่าแอปยืนยันตัวตนของ Blink\n\nบัญชี: {account}\nคีย์ตั้งค่า: {key}\n\nหากคุณทำโทรศัพท์หาย ให้เพิ่มคีย์ตั้งค่านี้ลงในแอปยืนยันตัวตนเพื่อรับรหัสเข้าสู่ระบบ Blink ของคุณกลับคืนมา ใครก็ตามที่มีคีย์นี้สามารถสร้างรหัสของคุณได้ จึงควรเก็บไว้เป็นความลับ",
+    "protectedTitle": "บัญชีของคุณได้รับการปกป้องแล้ว",
+    "protectedDescription": "นับจากนี้ การเข้าสู่ระบบต้องใช้รหัสแบบใช้ครั้งเดียวจากแอปยืนยันตัวตนของคุณ",
+    "newPhoneTip": "หากคุณเปลี่ยนโทรศัพท์เครื่องใหม่ ให้ย้ายแอปยืนยันตัวตนไปยังเครื่องใหม่<bold>ก่อน</bold>รีเซ็ตเครื่องเก่า",
+    "done": "เสร็จสิ้น"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: เปิดอยู่",
+    "statusDisabled": "2FA: ปิดอยู่",
+    "modalTitle": "เราไม่แนะนำให้ปิด 2FA",
+    "modalBody": "การปิดจะลดความปลอดภัยของบัญชีและทำให้บุคคลอื่นเข้าถึงบัญชีของคุณได้ง่ายขึ้นโดยไม่ได้รับอนุญาต",
+    "keepProtected": "ให้ฉันได้รับการปกป้องต่อไป",
+    "codeInstruction": "ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนเพื่อปิดการยืนยันตัวตนแบบสองขั้นตอน",
+    "codeInvalid": "รหัสไม่ถูกต้อง ป้อนรหัสปัจจุบันจากแอปยืนยันตัวตนของคุณ",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป โปรดลองอีกครั้งในอีกหนึ่งชั่วโมง",
+    "manualResetTitle": "รีเซ็ต 2FA ด้วยตนเอง",
+    "manualResetBody": "เพื่อปกป้องคุณ เราไม่อนุญาตให้ลบ 2FA ภายในแอป หากต้องการรีเซ็ต 2FA โปรดติดต่อ<support>ฝ่ายสนับสนุน</support>ของเรา"
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "เพิ่มอีเมล",
+    "addPhoneTitle": "เพิ่มหมายเลขโทรศัพท์",
+    "addEmailCode": "หากต้องการเพิ่มอีเมล ให้ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนของคุณ",
+    "addPhoneCode": "หากต้องการเพิ่มหมายเลขโทรศัพท์ ให้ป้อนรหัส 6 หลักจากแอปยืนยันตัวตนของคุณ",
+    "codeInvalid": "รหัสไม่ถูกต้อง ป้อนรหัสปัจจุบันจากแอปยืนยันตัวตนของคุณ",
+    "tooManyAttempts": "ลองหลายครั้งเกินไป โปรดลองอีกครั้งในอีกหนึ่งชั่วโมง"
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4065,6 +4182,15 @@
     "title": "นี่คือบัญชีแบบไม่ฝากดูแล",
     "body": "อ่านบล็อกโพสต์ของเราเพื่อเรียนรู้เพิ่มเติม",
     "cta": "อ่าน"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "อัปเดตข้อมูลสำรองบนคลาวด์",
+    "body": "ชุดข้อมูลฉุกเฉินของคุณใน {provider} ไม่เป็นปัจจุบัน สำรองข้อมูลกระเป๋าเงินอีกครั้งเพื่ออัปเดต",
+    "cta": "สำรองข้อมูลอีกครั้ง"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "ยังไม่มีชุดข้อมูลฉุกเฉิน ระบบจะสร้างหลังจากธุรกรรมแรกของคุณ",
+    "exportFailed": "ไม่สามารถดาวน์โหลดชุดข้อมูลฉุกเฉินได้"
   },
   "StableBalance": {
     "title": "ยอดคงเหลือมั่นคง",
@@ -4098,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "ไม่สามารถเชื่อมต่อ Blink ได้",
+    "unreachableDescription": "{featureName} ต้องใช้เซิร์ฟเวอร์ของ Blink ซึ่งขณะนี้ไม่ตอบสนอง กระเป๋าเงินและยอดเงินของคุณไม่ได้รับผลกระทบ",
     "featureCircles": "Circles",
     "featureEarn": "เรียนรู้",
     "featureCard": "Card"
@@ -4120,6 +4248,10 @@
     "tokenTransfer": "โอน {token}",
     "payTo": "จ่ายไปที่ {address}",
     "payment": "การชำระเงิน"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "อัตราแลกเปลี่ยนอาจไม่เป็นปัจจุบัน",
+    "satsOnly": "แสดงเป็น sats — ไม่มีอัตราแลกเปลี่ยน"
   },
   "SelfCustodialOffline": {
     "title": "กระเป๋าเงินออฟไลน์",
@@ -4155,9 +4287,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "ไม่สามารถโหลดค่าธรรมเนียมเครือข่ายได้ โปรดตรวจสอบการเชื่อมต่อและลองอีกครั้ง",
     "refundNow": "คืนเงินตอนนี้",

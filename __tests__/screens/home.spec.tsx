@@ -9,6 +9,7 @@ import { SafeAreaView } from "react-native-safe-area-context"
 import { HomeScreen } from "../../app/screens/home-screen"
 import { ContextForScreen } from "./helper"
 import { flushEffects } from "../helpers/flush-effects"
+import { waitForStableRender } from "../helpers/wait-for-stable-render"
 import {
   AccountLevel,
   BulletinsDocument,
@@ -74,6 +75,65 @@ const mockSelfCustodialInfoBulletin = jest.fn<null, [{ onDismiss: () => void }]>
 jest.mock("@app/components/self-custodial-info-bulletin", () => ({
   SelfCustodialInfoBulletin: (props: { onDismiss: () => void }) =>
     mockSelfCustodialInfoBulletin(props),
+}))
+
+const mockTwoFactorEnforcement = {
+  tier: 0,
+  unmetTier: 0,
+  hasAuthenticator: false,
+  enforcedCurrency: "BTC",
+  remainingDismissals: 3,
+  sessionPrompt: "none",
+  isSessionStartPending: false,
+  shouldShowNudgeCard: false,
+  reminderBulletinReason: null as string | null,
+  shouldShowSettingsBanner: false,
+  markPromptShown: jest.fn(),
+  dismissNudgeCard: jest.fn(),
+  consumeSessionStart: jest.fn(),
+  registerDismissal: jest.fn(),
+}
+jest.mock("@app/custodial/providers/two-factor-enforcement", () => ({
+  useTwoFactorEnforcement: () => mockTwoFactorEnforcement,
+}))
+
+type TwoFactorNudgeCardProps = Record<string, never>
+const mockTwoFactorNudgeCard = jest.fn<null, [TwoFactorNudgeCardProps]>(() => null)
+jest.mock("@app/custodial/components/two-factor-nudge-card", () => ({
+  TwoFactorNudgeCard: (props: TwoFactorNudgeCardProps) => mockTwoFactorNudgeCard(props),
+}))
+
+type TwoFactorReminderBulletinProps = { reason: string }
+const mockTwoFactorReminderBulletin = jest.fn<null, [TwoFactorReminderBulletinProps]>(
+  () => null,
+)
+jest.mock("@app/custodial/components/two-factor-reminder-bulletin", () => ({
+  TwoFactorReminderBulletin: (props: TwoFactorReminderBulletinProps) =>
+    mockTwoFactorReminderBulletin(props),
+}))
+
+const mockTwoFactorSessionPrompt = {
+  isModalOpen: false,
+  promptTier: 2,
+}
+const mockUseTwoFactorSessionPrompt = jest.fn(
+  (_options: { isBlocked: boolean }) => mockTwoFactorSessionPrompt,
+)
+jest.mock("@app/screens/home-screen/hooks/use-two-factor-session-prompt", () => ({
+  useTwoFactorSessionPrompt: (options: { isBlocked: boolean }) =>
+    mockUseTwoFactorSessionPrompt(options),
+}))
+
+type TwoFactorSessionModalProps = {
+  isVisible: boolean
+  tier: number
+  remainingDismissals: number
+  onDismiss: () => void
+}
+const mockTwoFactorSessionModal = jest.fn<null, [TwoFactorSessionModalProps]>(() => null)
+jest.mock("@app/custodial/components/two-factor-session-modal", () => ({
+  TwoFactorSessionModal: (props: TwoFactorSessionModalProps) =>
+    mockTwoFactorSessionModal(props),
 }))
 
 let mockIsFocused = true
@@ -148,6 +208,7 @@ jest.mock("@app/config/feature-flags-context", () => {
 })
 
 let mockIsAnonMode = false
+let mockIsTokenMissing = false
 
 jest.mock("@app/hooks/use-transfer-blocked", () => ({
   useTransferBlocked: () => mockTransferBlockedOverride,
@@ -164,9 +225,10 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
     isRegionPending: mockRegionPendingOverride,
     isRegionDetermined: mockDollarRegionDeterminedOverride,
   }),
-  useDollarBalanceGated: () => mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+  useDollarBalanceGated: () =>
+    mockIsTokenMissing || mockIsAnonMode || mockDollarBalanceRestrictedOverride,
   useDollarBalanceGate: () => ({
-    isGated: mockIsAnonMode || mockDollarBalanceRestrictedOverride,
+    isGated: mockIsTokenMissing || mockIsAnonMode || mockDollarBalanceRestrictedOverride,
     isRegionPending: mockRegionPendingOverride,
     reason: mockDollarGateReason(),
   }),
@@ -174,6 +236,7 @@ jest.mock("@app/hooks/use-dollar-balance-restricted", () => ({
 
 /** The gate's own reading of a closed gate, mirrored so the modal's copy can be asserted. */
 const mockDollarGateReason = (): GateReason | null => {
+  if (mockIsTokenMissing) return GateReason.Network
   if (mockIsAnonMode) return GateReason.Anon
   if (!mockDollarBalanceRestrictedOverride) return null
   return mockDollarRegionDeterminedOverride ? GateReason.Region : GateReason.UnknownRegion
@@ -252,6 +315,7 @@ jest.mock("@app/hooks/use-dollar-balance-forced-conversion", () => ({
 }))
 
 let mockMigratePromptVisible = false
+let mockMigratePromptPending = false
 let mockCanReopen = false
 const mockDismissMigratePrompt = jest.fn()
 const mockReopenMigratePrompt = jest.fn()
@@ -259,6 +323,7 @@ const mockReopenMigratePrompt = jest.fn()
 jest.mock("@app/screens/account-migration/hooks/use-migrate-now-prompt", () => ({
   useMigrateNowPrompt: () => ({
     isVisible: mockMigratePromptVisible,
+    isPending: mockMigratePromptPending,
     canReopen: mockCanReopen,
     deadlineTimestamp: 1787003999,
     timezone: "Europe/Paris",
@@ -403,23 +468,28 @@ jest.mock("@app/screens/conversion-flow/stable-token-convert-to-btc-modal", () =
   }
 })
 
-jest.mock("@app/self-custodial/providers/wallet", () => ({
-  useSelfCustodialWallet: () =>
-    mockSelfCustodialWalletOverride ?? {
-      sdk: null,
-      wallets: [],
-      allTransactions: [],
-      status: "unavailable",
-      isStableBalanceActive: false,
-      lastReceivedPaymentId: null,
-      hasMoreTransactions: false,
-      loadingMore: false,
-      loadMore: jest.fn(),
-      refreshWallets: jest.fn(),
-      refreshStableBalanceActive: jest.fn(),
-      retry: jest.fn(),
-    },
-}))
+jest.mock("@app/self-custodial/providers/wallet", () => {
+  /** One shared fallback: a fresh object per render gives `wallets` a new identity
+   *  on every re-render, which usePendingDeposits reads as an SDK refresh and
+   *  re-lists after each press, settling after the test has returned. */
+  const unavailableWallet = {
+    sdk: null,
+    wallets: [],
+    allTransactions: [],
+    status: "unavailable",
+    isStableBalanceActive: false,
+    lastReceivedPaymentId: null,
+    hasMoreTransactions: false,
+    loadingMore: false,
+    loadMore: jest.fn(),
+    refreshWallets: jest.fn(),
+    refreshStableBalanceActive: jest.fn(),
+    retry: jest.fn(),
+  }
+  return {
+    useSelfCustodialWallet: () => mockSelfCustodialWalletOverride ?? unavailableWallet,
+  }
+})
 
 jest.mock("@app/hooks/use-balance-mode", () => {
   const BalanceMode = { Btc: "btc", Usd: "usd" } as const
@@ -941,9 +1011,12 @@ const resetHomeScreenMocks = () => {
   mockDollarBalanceModalRegionUnknown = false
   mockForcedConversionParams = null
   mockIsAnonMode = false
+  mockIsTokenMissing = false
   mockIsRestrictedRegion = false
   mockIsRestrictedRegionEvaluationPending = false
   mockCanShowUpgradeModal = false
+  mockTwoFactorSessionPrompt.isModalOpen = false
+  mockTwoFactorEnforcement.isSessionStartPending = false
   jest.clearAllMocks()
   mockUseNonCustodialConversionLimits.mockReturnValue({
     limits: null,
@@ -1422,6 +1495,42 @@ describe("HomeScreen", () => {
 
     mockActiveWalletOverride = null
   })
+
+  /** Staging's network has no dollar token: neither Enhanced Mode nor the region would
+   *  open the gate, and the row's label already says why. */
+  it.each([
+    ["outside Anon mode", false],
+    ["in Anon mode", true],
+  ])(
+    "keeps the disabled transfer button quiet on a network with no dollar token, %s",
+    async (_label, isAnonMode) => {
+      mockIsTokenMissing = true
+      mockIsAnonMode = isAnonMode
+      mockActiveWalletOverride = selfCustodialReadyWalletOverride(5000)
+      currentMocks = generateHomeMock({
+        level: AccountLevel.One,
+        network: Network.Mainnet,
+        btcBalance: 1000,
+        usdBalance: 5000,
+      })
+
+      const { getByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      await flushEffects()
+
+      fireEvent.press(getByTestId("transfer", { includeHiddenElements: true }))
+
+      expect(mockNavigate).not.toHaveBeenCalledWith("conversionDetails")
+      expect(mockDollarBalanceModalVisible).toBe(false)
+      expect(mockPromptEnhancedMode).not.toHaveBeenCalled()
+
+      mockActiveWalletOverride = null
+    },
+  )
 
   it("keeps the transfer button inert and unexplained while the region is still resolving", async () => {
     mockRegionPendingOverride = true
@@ -2083,6 +2192,189 @@ describe("SelfCustodialInfoBulletin gating", () => {
   })
 })
 
+describe("TwoFactorNudgeCard gating", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorEnforcement.shouldShowNudgeCard = false
+    mockTwoFactorEnforcement.unmetTier = 0
+  })
+
+  afterEach(() => {
+    mockTwoFactorEnforcement.shouldShowNudgeCard = false
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("renders the card when the hook says it should show", async () => {
+    mockTwoFactorEnforcement.shouldShowNudgeCard = true
+    mockTwoFactorEnforcement.unmetTier = 1
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorNudgeCard).toHaveBeenCalled()
+  })
+
+  it("does not render the card when the hook says it should not show", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorNudgeCard).not.toHaveBeenCalled()
+  })
+})
+
+describe("TwoFactorReminderBulletin gating", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorEnforcement.reminderBulletinReason = null
+  })
+
+  afterEach(() => {
+    mockTwoFactorEnforcement.reminderBulletinReason = null
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  it("renders the bulletin with its reason when the enforcement gives one", async () => {
+    mockTwoFactorEnforcement.reminderBulletinReason = "new_ath"
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorReminderBulletin).toHaveBeenCalledWith({ reason: "new_ath" })
+  })
+
+  it("does not render the bulletin otherwise", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockTwoFactorReminderBulletin).not.toHaveBeenCalled()
+  })
+})
+
+describe("TwoFactorSessionModal wiring", () => {
+  beforeEach(() => {
+    resetHomeScreenMocks()
+    mockTwoFactorSessionPrompt.isModalOpen = false
+    mockTwoFactorEnforcement.remainingDismissals = 2
+  })
+
+  afterEach(() => {
+    mockTwoFactorSessionPrompt.isModalOpen = false
+    mockTwoFactorEnforcement.remainingDismissals = 3
+    mockMigratePromptVisible = false
+    mockMigratePromptPending = false
+    mockIsFocused = true
+  })
+
+  const renderHome = () =>
+    render(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+
+  const lastModalProps = (): TwoFactorSessionModalProps => {
+    const call = mockTwoFactorSessionModal.mock.calls.at(-1)
+    if (!call) throw new Error("the session modal was not rendered")
+    return call[0]
+  }
+
+  it("shows the modal with the countdown while the home says it is open", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(lastModalProps()).toEqual(
+      expect.objectContaining({ isVisible: true, remainingDismissals: 2 }),
+    )
+  })
+
+  it("keeps the modal hidden while the home says it is closed", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(lastModalProps().isVisible).toBe(false)
+  })
+
+  it("keeps the modal hidden while the home is not focused", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    mockIsFocused = false
+
+    renderHome()
+    await flushEffects()
+
+    expect(lastModalProps().isVisible).toBe(false)
+  })
+
+  it("lets the session start proceed while no other home modal is up", async () => {
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseTwoFactorSessionPrompt).toHaveBeenLastCalledWith({ isBlocked: false })
+  })
+
+  it("holds the session start while the wind-down nudge is up", async () => {
+    mockMigratePromptVisible = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseTwoFactorSessionPrompt).toHaveBeenLastCalledWith({ isBlocked: true })
+  })
+
+  it("holds the session start while the wind-down has not answered yet", async () => {
+    mockMigratePromptPending = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockUseTwoFactorSessionPrompt).toHaveBeenLastCalledWith({ isBlocked: true })
+  })
+
+  it("shows the wind-down nudge while the home is in front and no two-factor modal is open", async () => {
+    mockMigratePromptVisible = true
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(true)
+  })
+
+  it("keeps the wind-down nudge off a screen the two-factor prompt pushed", async () => {
+    mockMigratePromptVisible = true
+    mockIsFocused = false
+
+    renderHome()
+    await flushEffects()
+
+    expect(mockMigrateNowModal.mock.calls.at(-1)?.[0].isVisible).toBe(false)
+  })
+
+  it("charges the dismissal to the prompt's tier, as the modal's, when the modal is waved away", async () => {
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    renderHome()
+    await flushEffects()
+
+    act(() => lastModalProps().onDismiss())
+
+    expect(mockTwoFactorEnforcement.registerDismissal).toHaveBeenCalledWith(2, {
+      prompt: "session_modal",
+    })
+  })
+})
+
 describe("HomeScreen wind-down states", () => {
   beforeEach(() => {
     currentMocks = []
@@ -2661,6 +2953,23 @@ describe("HomeScreen pending receive badge", () => {
       await flushEffects()
     })
 
+    it("opens the unclaimed-deposits screen when the pill holds a deposit claimed early", async () => {
+      mockActiveWalletOverride = selfCustodialWallet
+      mockPendingDepositsOverride = { deposits: [sparkDeposit("claiming")] }
+
+      const { findByTestId } = render(
+        <ContextForScreen>
+          <HomeScreen />
+        </ContextForScreen>,
+      )
+
+      fireEvent.press(await findByTestId("pending-receive-badge"))
+
+      expect(mockNavigate).toHaveBeenCalledWith("unclaimedDepositsScreen")
+
+      await flushEffects()
+    })
+
     it("leaves the badge to the unclaimed-deposit banner for claimable deposits", async () => {
       mockActiveWalletOverride = selfCustodialWallet
       mockPendingDepositsOverride = { deposits: [sparkDeposit("claimable")] }
@@ -2703,17 +3012,20 @@ describe("HomeScreen pull-to-refresh", () => {
 
   it("asks the server for the account's restrictions again on a pull", async () => {
     mockRefetchCustodialRestrictions.mockResolvedValue(undefined)
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getByType } = render(
+    const view = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = view
     await flushEffects()
 
     await act(async () => {
       await UNSAFE_getByType(RefreshControl).props.onRefresh()
     })
+    // The pull refetches the screen's queries, whose results land a turn later.
+    await waitForStableRender(view)
 
     expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
   })
@@ -2722,17 +3034,20 @@ describe("HomeScreen pull-to-refresh", () => {
    *  it: the verdict lands whenever it lands. */
   it("retracts the spinner without waiting for the restrictions verdict", async () => {
     mockRefetchCustodialRestrictions.mockReturnValueOnce(new Promise(() => {}))
-    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
-    const { UNSAFE_getByType } = render(
+    const view = render(
       <ContextForScreen>
         <HomeScreen />
       </ContextForScreen>,
     )
+    // eslint-disable-next-line camelcase -- testing-library exposes this API verbatim
+    const { UNSAFE_getByType } = view
     await flushEffects()
 
     await act(async () => {
       await UNSAFE_getByType(RefreshControl).props.onRefresh()
     })
+    // The pull refetches the screen's queries, whose results land a turn later.
+    await waitForStableRender(view)
 
     expect(mockRefetchCustodialRestrictions).toHaveBeenCalledTimes(1)
     expect(UNSAFE_getByType(RefreshControl).props.refreshing).toBe(false)
@@ -3238,6 +3553,37 @@ describe("HomeScreen sanctioned session", () => {
     const { queryByTestId } = await renderAndSettleUpgradeDelay()
 
     expect(queryByTestId("trial-account-limits-modal")).toBeTruthy()
+  })
+
+  it("keeps the upgrade modal away while the two-factor session start is pending, with its modal up, so only one modal presents", async () => {
+    mockTwoFactorEnforcement.isSessionStartPending = true
+    mockTwoFactorSessionPrompt.isModalOpen = true
+
+    const { queryByTestId } = await renderAndSettleUpgradeDelay()
+
+    expect(queryByTestId("trial-account-limits-modal")).toBeNull()
+    expect(mockTwoFactorSessionModal.mock.calls.at(-1)?.[0].isVisible).toBe(true)
+  })
+
+  it("gives the upgrade modal its turn once the two-factor session start is taken", async () => {
+    mockTwoFactorEnforcement.isSessionStartPending = true
+    mockTwoFactorSessionPrompt.isModalOpen = true
+    const view = await renderAndSettleUpgradeDelay()
+    expect(view.queryByTestId("trial-account-limits-modal")).toBeNull()
+
+    mockTwoFactorEnforcement.isSessionStartPending = false
+    mockTwoFactorSessionPrompt.isModalOpen = false
+    view.rerender(
+      <ContextForScreen>
+        <HomeScreen />
+      </ContextForScreen>,
+    )
+    await flushEffects()
+    await act(async () => {
+      jest.advanceTimersByTime(UPGRADE_MODAL_DELAY_WITH_SLACK_MS)
+    })
+
+    expect(view.queryByTestId("trial-account-limits-modal")).toBeTruthy()
   })
 
   it("keeps the upgrade modal away while the region is restricted", async () => {

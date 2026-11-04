@@ -11,13 +11,16 @@ import { makeStyles } from "@rn-vui/themed"
 import { GaloyIcon } from "@app/components/atomic/galoy-icon"
 
 import { useUnlockScreen } from "./unlock-screen"
-import { usePinLockout } from "./use-pin-lockout"
+import { useForgottenPinEscape } from "./use-forgotten-pin-escape"
+import { usePinAttempts } from "./use-pin-attempts"
 
 import { Screen } from "../../components/screen"
 import useLogout from "../../hooks/use-logout"
+import { useLogoutAndRoute } from "../../hooks/use-logout-and-route"
 import { RootStackParamList } from "../../navigation/stack-param-lists"
 import { PinScreenPurpose } from "../../utils/enum"
 import { sleep } from "../../utils/sleep"
+import { parseTimer } from "../../utils/timer"
 import KeyStoreWrapper from "../../utils/storage/secureStorage"
 
 type Props = {
@@ -48,11 +51,13 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  lock — the back-press swallow is isResume-gated and completeUnlock is only invoked
    *  from the AuthenticatePin branch. Hooks can't be conditional; don't try. */
   const { completeUnlock } = useUnlockScreen({ isResume })
+  const { routeAfterLogout } = useLogoutAndRoute()
+  const { escape, confirmRemoveWallets } = useForgottenPinEscape()
   const { LL } = useI18nContext()
   const isAuthenticate = screenPurpose === PinScreenPurpose.AuthenticatePin
   const isChallenge = screenPurpose === PinScreenPurpose.ChallengePin
   /** Both purposes verify a PIN the user already set, so both answer to the one
-   *  shared attempt budget and its escalating lockout. Only SetPin is exempt —
+   *  shared attempt budget and its escalating lockout. Only SetPin is exempt:
    *  there is nothing to be wrong about yet. */
   const isVerifyingExistingPin = isAuthenticate || isChallenge
   /** Settings jobs and a caller's challenge are both dismissable — the back
@@ -72,14 +77,14 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
 
   /** Dismissal is a decline: a challenge can be swiped or backed away (gestures stay on
    *  for non-resume pin screens, and the BackHandler swallow is isResume-gated), and the
-   *  caller must hear about it exactly once. Success and lockout mark the ref before
-   *  they navigate, so the pop they trigger stays silent here. */
+   *  caller must hear about it exactly once. Success and a spent budget mark the ref
+   *  before they navigate, so the pop they trigger stays silent here. */
   useEffect(() => {
     if (!isChallenge) return undefined
     return navigation.addListener("beforeRemove", (e) => {
       if (challengeResolvedRef.current) return
       challengeResolvedRef.current = true
-      /** RESET is the one removal the challenge doesn't own — the lockout's
+      /** RESET is the one removal the challenge doesn't own — the spent budget's
        *  logout unmounts the caller too, so a decline callback would fire into a
        *  screen that no longer exists. Every OTHER removal declines, including
        *  the ones no allowlist anticipated: a REPLACE from a deep link takes
@@ -105,24 +110,29 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     async (message: string) => {
       setEnteredPIN("")
       setFarewellText(message)
+      /** Kept until the logout says otherwise: one that threw part-way says nothing
+       *  about the lock, and the gate is the way out that asks again. */
+      let isAppLockKept = true
       try {
-        await logout()
+        /** Everything the session held goes: the token and the saved profiles.
+         *  Whether the lock goes with it is the logout's own call, made on what
+         *  the device still stores: it stays, spent budget included, for as
+         *  long as a wallet is left here for it to guard, so the next round
+         *  does not open on a fresh three guesses against it. */
+        ;({ isAppLockKept } = await logout())
         await sleep(1000)
       } catch {
-        /** Swallowed, not rethrown: usePinLockout awaits this from a floating
+        /** Swallowed, not rethrown: usePinAttempts awaits this from a floating
          *  promise, so a rejection would surface as an unhandled one. */
       } finally {
         /** In a finally so a rejected logout cannot strand the screen. A
          *  challenge caller is already marked resolved by the removal this
          *  reset performs, so a screen that never left would leave it waiting
          *  on a callback that can no longer fire. */
-        navigation.reset({
-          index: 0,
-          routes: [{ name: "Primary" }],
-        })
+        routeAfterLogout(isAppLockKept)
       }
     },
-    [logout, navigation],
+    [logout, routeAfterLogout],
   )
 
   /** The challenge's success answer: tell the caller before leaving, and mark it
@@ -141,7 +151,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     navigation.goBack()
   }
 
-  const lockout = usePinLockout({
+  const attempts = usePinAttempts({
     enabled: isVerifyingExistingPin,
     onUnlocked: () => {
       /** A challenge answers its caller and steps back; it must never unlock the
@@ -150,20 +160,23 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         resolveChallenge()
         return
       }
-      completeUnlock(() =>
+      completeUnlock((coldStartRoute) =>
         navigation.reset({
           index: 0,
-          routes: [{ name: "Primary" }],
+          routes: [{ name: coldStartRoute }],
         }),
       )
     },
-    onWrongPin: () => setEnteredPIN(""),
+    onRejected: () => setEnteredPIN(""),
     onUnreadable: () => {
       setEnteredPIN("")
       setNoticeText(LL.PinScreen.pinUnreadable())
     },
     onExhausted: () => endSession(LL.PinScreen.tooManyAttempts()),
-    onUnrecorded: () => endSession(LL.PinScreen.lockoutUnavailable()),
+    onUnrecorded: () => {
+      setEnteredPIN("")
+      setNoticeText(LL.PinScreen.attemptUnrecorded())
+    },
   })
 
   const handleCompletedPinForSetPin = (newEnteredPIN: string) => {
@@ -177,7 +190,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   }
 
   const addDigit = (digit: string) => {
-    if (!lockout.canAcceptInput()) return
+    if (!attempts.canAcceptInput()) return
     if (enteredPIN.length >= PIN_LENGTH) return
 
     setNoticeText("")
@@ -186,7 +199,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     if (newEnteredPIN.length < PIN_LENGTH) return
 
     if (isVerifyingExistingPin) {
-      lockout.submit(newEnteredPIN)
+      attempts.submit(newEnteredPIN)
     } else if (screenPurpose === PinScreenPurpose.SetPin) {
       handleCompletedPinForSetPin(newEnteredPIN)
     }
@@ -196,7 +209,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
   // prop comes from a render that may predate the verification in flight,
   // which is exactly how a backspace used to slip a second attempt through.
   const removeDigit = () => {
-    if (!lockout.canAcceptInput()) return
+    if (!attempts.canAcceptInput()) return
     setEnteredPIN((pin) => pin.slice(0, -1))
   }
 
@@ -206,7 +219,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
       return
     }
 
-    await lockout.runGuarded(async () => {
+    await attempts.runGuarded(async () => {
       if (await KeyStoreWrapper.setPin(previousPIN)) {
         await KeyStoreWrapper.clearPinFailureState()
         navigation.goBack()
@@ -234,12 +247,17 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
    *  affordance disagree with the gesture it stands for.
    *
    *  The `disabled` prop is the whole guard here, unlike on the keypad, which
-   *  additionally asks the lockout at press time because its `disabled` had an
-   *  observed bypass — a backspace from a render predating the verification in
-   *  flight. Nothing derives this from a stale render: it is this render's own
-   *  state, so a second check inside the handler would be a branch nothing can
-   *  reach. */
+   *  additionally asks the in-flight guard at press time because its `disabled`
+   *  had an observed bypass — a backspace from a render predating the
+   *  verification in flight. Nothing derives this from a stale render: it is
+   *  this render's own state, so a second check inside the handler would be a
+   *  branch nothing can reach. */
   const isTearingDown = Boolean(farewellText)
+
+  /** The app lock's only way out on a device that stores a wallet: a logout there keeps
+   *  the lock and returns to this keypad. A device that stores none needs no button, since
+   *  the spent budget's logout takes the lock with it. */
+  const isForgotPinOffered = isAuthenticate && escape === "removeWallets"
 
   const circleComponentForDigit = (digit: number) => {
     return (
@@ -257,7 +275,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         <Button
           buttonStyle={styles.pinPadButton}
           titleStyle={styles.pinPadButtonTitle}
-          disabled={lockout.isInputDisabled}
+          disabled={attempts.isInputDisabled}
           disabledStyle={styles.pinPadButton}
           disabledTitleStyle={styles.pinPadButtonTitleDisabled}
           title={digit}
@@ -267,17 +285,32 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
     )
   }
 
-  // The attempt count is derived from what the lockout hook read back from
-  // storage, so it survives a relaunch instead of living in its own state.
+  // The attempt count is derived from what the hook read back from storage,
+  // so it survives a relaunch instead of living in its own state.
   const attemptsText = () => {
     if (farewellText) return farewellText
     if (!isVerifyingExistingPin) return helperText
-    if (lockout.attemptsRemaining === null) return helperText
-    return lockout.attemptsRemaining === 1
-      ? LL.PinScreen.oneAttemptRemaining()
-      : LL.PinScreen.attemptsRemaining({
-          attemptsRemaining: lockout.attemptsRemaining,
-        })
+
+    const { attemptsRemaining, hasRejectedEntry } = attempts
+    if (attemptsRemaining === null) return helperText
+    /** A spent budget has no number left to show. It is what the keypad comes
+     *  back with when the lock outlives the logout, where a wrong entry no
+     *  longer costs a session but a longer wait, so it says nothing of a logout:
+     *  that is the farewell's to say, on the entry that spends the budget. */
+    if (attemptsRemaining === 0) return LL.PinScreen.attemptBudgetSpent()
+
+    const isLastAttempt = attemptsRemaining === 1
+    /** "Incorrect PIN" is said only of an entry made on this screen. A count the
+     *  screen came back to, after a relaunch or from a challenge elsewhere, is
+     *  stated without blaming an entry nobody made here. */
+    if (hasRejectedEntry) {
+      return isLastAttempt
+        ? LL.PinScreen.oneAttemptRemaining()
+        : LL.PinScreen.attemptsRemaining({ attemptsRemaining })
+    }
+    return isLastAttempt
+      ? LL.PinScreen.oneAttemptLeft()
+      : LL.PinScreen.attemptsLeft({ attemptsRemaining })
   }
 
   return (
@@ -292,9 +325,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
         {/* Both lines, so a countdown never hides how many tries are left. */}
         <Text style={styles.helperText}>{attemptsText()}</Text>
         {noticeText ? <Text style={styles.helperText}>{noticeText}</Text> : null}
-        {lockout.isLocked ? (
+        {attempts.isLocked ? (
           <Text style={styles.helperText}>
-            {LL.PinScreen.tryAgainIn({ seconds: lockout.remainingSeconds })}
+            {LL.PinScreen.tryAgainIn({ time: parseTimer(attempts.remainingSeconds) })}
           </Text>
         ) : null}
       </View>
@@ -321,7 +354,7 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
             <Button
               testID="pinPadBackspace"
               buttonStyle={styles.pinPadButton}
-              disabled={lockout.isInputDisabled}
+              disabled={attempts.isInputDisabled}
               disabledStyle={styles.pinPadButton}
               icon={<GaloyIcon name="arrow-left" size={32} color="white" />}
               onPress={removeDigit}
@@ -329,7 +362,20 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
           </View>
         </View>
       </View>
-      <View style={styles.bottomSpacer} />
+      <View style={styles.bottomSpacer}>
+        {isForgotPinOffered ? (
+          <TouchableOpacity
+            disabled={isTearingDown}
+            onPress={confirmRemoveWallets}
+            accessibilityRole="button"
+            testID="pinScreenForgotPin"
+          >
+            <Text style={styles.forgotPinText}>
+              {LL.AuthenticationScreen.forgotPin()}
+            </Text>
+          </TouchableOpacity>
+        ) : null}
+      </View>
       {/* Last child on purpose: an absolute view earlier in the tree is painted
           under, and hit-tested behind, every sibling that follows it — and the
           top spacer covers exactly the corner this sits in. */}
@@ -353,7 +399,9 @@ export const PinScreen: React.FC<Props> = ({ route }) => {
 
 const useStyles = makeStyles(({ colors }) => ({
   bottomSpacer: {
+    alignItems: "center",
     flex: 1,
+    justifyContent: "center",
   },
 
   /** Absolute, so adding it cannot shift the keypad's flex layout. The screen is
@@ -399,6 +447,12 @@ const useStyles = makeStyles(({ colors }) => ({
     borderRadius: 16 / 2,
     height: 16,
     width: 16,
+  },
+
+  forgotPinText: {
+    color: colors.white,
+    fontSize: 16,
+    textDecorationLine: "underline",
   },
 
   helperText: {

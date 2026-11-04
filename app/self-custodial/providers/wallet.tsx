@@ -4,6 +4,7 @@ import React, {
   useContext,
   useEffect,
   useMemo,
+  useRef,
   useState,
 } from "react"
 
@@ -23,7 +24,10 @@ import {
 import { getLightningAddress } from "../bridge"
 import { useSdkLifecycle } from "../hooks/use-sdk-lifecycle"
 import { classifySdkError, SelfCustodialErrorCode } from "../sdk-error"
-import { setSelfCustodialLightningAddress } from "../storage/account-index"
+import {
+  getSelfCustodialLightningAddress,
+  setSelfCustodialLightningAddress,
+} from "../storage/account-index"
 
 const LightningAddressOperation = {
   Resolve: "resolve",
@@ -55,6 +59,10 @@ type SelfCustodialWalletContextValue = ActiveWalletState & {
   connectedAccountId: string | null
   lightningAddress: string | null
   isStableBalanceActive?: boolean
+  /** Tag-aware `${tag}:${id}` key of the last payment event (dedupe that must
+   * distinguish Pending from Succeeded for the same payment). */
+  lastPaymentEventKey: string | null
+  /** The payment id alone, for consumers that look payments up by id. */
   lastReceivedPaymentId: string | null
   hasMoreTransactions: boolean
   loadingMore: boolean
@@ -75,6 +83,7 @@ const defaultState: SelfCustodialWalletContextValue = {
   sdk: null,
   connectedAccountId: null,
   lightningAddress: null,
+  lastPaymentEventKey: null,
   lastReceivedPaymentId: null,
   hasMoreTransactions: false,
   loadingMore: false,
@@ -103,6 +112,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     sdk,
     connectedAccountId,
     sdkStableBalanceActive,
+    lastPaymentEventKey,
     lastReceivedPaymentId,
     hasMoreTransactions,
     loadingMore,
@@ -119,12 +129,64 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
 
   const [lightningAddress, setLightningAddress] = useState<string | null>(null)
 
+  /** The account the SDK last answered for. An answer of "none" is null like the
+   *  empty state before any answer, so this is what tells the two apart. */
+  const sdkAnsweredForRef = useRef<string | null>(null)
+
+  /** The account selected now, read after an await: a refresh started on one account
+   *  can resolve after the user has switched to another. */
+  const activeAccountIdRef = useRef(activeSelfCustodialAccountId)
+  activeAccountIdRef.current = activeSelfCustodialAccountId
+
   useEffect(() => {
+    sdkAnsweredForRef.current = null
     setLightningAddress(null)
   }, [activeSelfCustodialAccountId])
 
+  /**
+   * Seeds the address from what this device last recorded, before the SDK is asked.
+   *
+   * An address is a name the LNURL server answers for, not device state: it keeps
+   * working for whoever pays it whether or not this device can currently ask about it.
+   * Without this seed a launch with that server unreachable hides the user's own
+   * address and the paycode tab with it, as though the name had been given up.
+   *
+   * The SDK's answer below overwrites this when it arrives, so a name changed on
+   * another device still wins; this only fills the gap where there is no answer. A
+   * seed read that lands after the answer is dropped, so it cannot put back an address
+   * the SDK has just said the account no longer has.
+   */
   useEffect(() => {
-    if (!sdk || !connectedAccountId) return undefined
+    if (!activeSelfCustodialAccountId) return undefined
+    let mounted = true
+    const accountId = activeSelfCustodialAccountId
+
+    getSelfCustodialLightningAddress(accountId)
+      .then((stored) => {
+        const hasSdkAnswered = sdkAnsweredForRef.current === accountId
+        if (!mounted || !stored || hasSdkAnswered) return
+        setLightningAddress(stored)
+      })
+      .catch((err) => {
+        reportLightningAddressError(LightningAddressOperation.Resolve, err)
+      })
+
+    return () => {
+      mounted = false
+    }
+  }, [activeSelfCustodialAccountId])
+
+  /**
+   * Asked only while the connection is the active account's. On the commit where the
+   * user switches, the active id has moved but the SDK still belongs to the account
+   * being left, and its lookup can land after the switch: publishing it then would offer
+   * that account's address, and its paycode, under the one now selected. The switch
+   * re-runs this effect, so the cleanup drops a lookup already in flight.
+   */
+  const isSdkOnActiveAccount = connectedAccountId === activeSelfCustodialAccountId
+
+  useEffect(() => {
+    if (!sdk || !connectedAccountId || !isSdkOnActiveAccount) return undefined
     let mounted = true
     const accountId = connectedAccountId
 
@@ -133,13 +195,17 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
         const info = await getLightningAddress(sdk)
         if (!mounted) return
         const resolved = info?.lightningAddress ?? null
+        sdkAnsweredForRef.current = accountId
         setLightningAddress(resolved)
-        if (!resolved) return
+        /** Recorded even when there is none: the record is what the next launch seeds
+         *  from, so an address the server no longer holds must not outlive it there. */
         await setSelfCustodialLightningAddress(accountId, resolved).catch((err) => {
           reportLightningAddressError(LightningAddressOperation.Persist, err)
         })
         if (mounted) await reloadSelfCustodialAccounts()
       } catch (err) {
+        /** The seeded address stands: a question that could not be asked is not an
+         *  answer that the account has none. */
         reportLightningAddressError(LightningAddressOperation.Resolve, err)
       }
     }
@@ -149,15 +215,26 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
     return () => {
       mounted = false
     }
-  }, [sdk, connectedAccountId, reloadSelfCustodialAccounts])
+  }, [sdk, connectedAccountId, isSdkOnActiveAccount, reloadSelfCustodialAccounts])
 
+  /**
+   * The answer is recorded under the account it was asked for whatever happens, but it
+   * is only shown while that account is still the selected one, for the same reason the
+   * lookup above is gated: otherwise a refresh that lands after a switch would offer the
+   * previous account's address, and its paycode, under the new one.
+   */
   const updateCurrentSelfCustodialAccount = useCallback(async () => {
     if (!sdk || !connectedAccountId) return
+    const accountId = connectedAccountId
     try {
       const info = await getLightningAddress(sdk)
       const resolved = info?.lightningAddress ?? null
-      setLightningAddress(resolved)
-      await setSelfCustodialLightningAddress(connectedAccountId, resolved)
+      const isStillActive = activeAccountIdRef.current === accountId
+      if (isStillActive) {
+        sdkAnsweredForRef.current = accountId
+        setLightningAddress(resolved)
+      }
+      await setSelfCustodialLightningAddress(accountId, resolved)
       await reloadSelfCustodialAccounts()
     } catch (err) {
       reportLightningAddressError(LightningAddressOperation.Refresh, err)
@@ -175,6 +252,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       connectedAccountId,
       lightningAddress,
       isStableBalanceActive,
+      lastPaymentEventKey,
       lastReceivedPaymentId,
       hasMoreTransactions,
       loadingMore,
@@ -192,6 +270,7 @@ export const SelfCustodialWalletProvider: React.FC<React.PropsWithChildren> = ({
       connectedAccountId,
       lightningAddress,
       isStableBalanceActive,
+      lastPaymentEventKey,
       lastReceivedPaymentId,
       hasMoreTransactions,
       loadingMore,

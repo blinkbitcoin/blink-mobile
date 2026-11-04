@@ -15,7 +15,7 @@ import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
 import { GateBalances } from "@app/screens/account-migration/gate-balances"
 import { useMigrationNextStep } from "@app/screens/account-migration/hooks"
-import { MigrationStepLayout } from "@app/screens/account-migration/migration-step-layout"
+import { StepLayout } from "@app/components/step-layout"
 import { testProps } from "@app/utils/testProps"
 
 /**
@@ -136,7 +136,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
   const isCloseHidden = !canClose
 
   return (
-    <MigrationStepLayout
+    <StepLayout
       headerShown={false}
       header={
         <CloseHeader
@@ -163,7 +163,7 @@ export const MigrationRequiredScreen: React.FC<MigrationRequiredScreenProps> = (
       />
 
       {presentation.shouldShowBalances ? <GateBalances /> : null}
-    </MigrationStepLayout>
+    </StepLayout>
   )
 }
 

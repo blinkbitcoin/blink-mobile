@@ -33,6 +33,8 @@
     "createError": "No s'ha pogut crear la clau API. Torna-ho a provar.",
     "revokeError": "No s'ha pogut revocar la clau API. Torna-ho a provar.",
     "loadError": "No s'han pogut carregar les teves claus API. Torna-ho a provar més tard.",
+    "discardSecretTitle": "Descartar aquesta clau d'API?",
+    "discardSecretBody": "Aquesta és l'única vegada que es mostra el secret. Si surts ara, la clau no es podrà recuperar i hauràs de crear-ne una de nova.",
     "done": "Fet"
   },
   "GaloyAddressScreen": {
@@ -80,7 +82,12 @@
     "skip": "Omet",
     "unlock": "Desbloqueja",
     "usePin": "Utilitza el PIN",
-    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari."
+    "confirmLogout": "Esteu segur que vols tancar la sessió? Això restablirà la memòria cau i totes les configuracions locals d'usuari.",
+    "forgotPin": "Has oblidat el PIN? Elimina les carteres",
+    "removeWalletsTitle": "Vols eliminar les carteres d'aquest dispositiu?",
+    "removeWalletsBody": "Això elimina totes les carteres d'aquest dispositiu i tanca la sessió. Per recuperar una cartera, necessites la seva frase de seguretat. Sense ella, la cartera es perd.",
+    "removeWalletsConfirm": "Elimina les carteres",
+    "removeWalletsFailed": "No s'han pogut eliminar algunes carteres. Torna-ho a provar."
   },
   "PeopleScreen": {
     "title": "Gent",
@@ -2177,16 +2184,19 @@
     "walletCountNotTwo": "El recompte de moneders no és 2. Utilitza el tauler per veure tots els moneders i els fons d'aquest compte"
   },
   "PinScreen": {
+    "attemptUnrecorded": "No s'ha pogut registrar l'intent de manera segura.",
+    "attemptsLeft": "Queden {attemptsRemaining: string} intents.",
     "attemptsRemaining": "PIN incorrecte. Queden {attemptsRemaining: string} intents.",
     "enterPin": "Introdueix el teu codi PIN",
-    "lockoutUnavailable": "No s'ha pogut registrar l'intent fallit de manera segura. Tancant la sessió.",
+    "oneAttemptLeft": "Queda 1 intent.",
     "oneAttemptRemaining": "PIN incorrecte. Queda 1 intent.",
     "pinUnreadable": "No s'ha pogut comprovar el PIN. Torna-ho a provar.",
     "setPin": "Configura el teu codi PIN",
     "setPinFailedMatch": "Els Pins no coincideixen - Estableix el teu codi PIN",
     "storePinFailed": "No es pot desar el teu pin.",
     "tooManyAttempts": "Massa intents fallits. Tancant la sessió.",
-    "tryAgainIn": "Torna-ho a provar d'aquí a {seconds: number} s.",
+    "attemptBudgetSpent": "Massa intents fallits.",
+    "tryAgainIn": "Torna-ho a provar d'aquí a {time: string}.",
     "verifyPin": "Verifica el teu codi PIN"
   },
   "PriceHistoryScreen": {
@@ -2221,6 +2231,12 @@
     "error": "No s'ha pogut generar la factura. Si us plau contacta amb el servei d'assistència si aquest problema persisteix.",
     "copyInvoice": "Copiar",
     "shareInvoice": "Comparteix",
+    "newAddress": "Nova",
+    "newAddressHint": "Genera una nova adreça de Bitcoin. Les adreces anteriors continuen funcionant.",
+    "newAddressGenerated": "Nova adreça a punt. Les adreces anteriors continuen funcionant.",
+    "newAddressFailed": "No s'ha pogut generar una nova adreça. Torna-ho a provar.",
+    "newAddressRateLimited": "Massa adreces noves. Espera una estona i torna-ho a provar.",
+    "onchainAddressLoadFailed": "No s'ha pogut carregar la teva adreça de Bitcoin. Toca Nova per tornar-ho a provar.",
     "addAmount": "Demana l'import específic",
     "expired": "La factura ha caducat",
     "expiresIn": "Caduca en",
@@ -2356,6 +2372,8 @@
     "invalidAmount": "Això conté un import invàlid. Si us plau torna-ho a generar amb un import vàlid.",
     "usernameDoesNotExist": "{lnAddress: string} no sembla ser una {bankName: string} adreça existent.",
     "usernameDoesNotExistAdvice": "Assegurat que l'ortografia sigui correcta o demana al destinatari una factura LN o una adreça BTC.",
+    "destinationUnverifiable": "No hem pogut comprovar {lnAddress} ara mateix: els servidors de {bankName} no responen.",
+    "destinationUnverifiableAdvice": "És probable que l'adreça sigui correcta. Torna-ho a provar d'aquí a un moment o demana al destinatari una factura LN o una adreça BTC.",
     "selfPaymentError": "{lnAddress: string} és la teva adreça {bankName: string} .",
     "selfPaymentAdvice": "Si vols enviar diners a un altre compte teu, pots utilitzar una adreça de factura, LN o BTC.",
     "lnAddressError": "No podem contactar a aquesta adreça de Lightning. Si estas segur que existeix, tornar-ho a provar més tard.",
@@ -2428,9 +2446,9 @@
     "time": "Hora",
     "type": "Tipus",
     "feeTier": "Prioritat de la transacció",
-    "fast": "Ràpid",
-    "medium": "Mitjà",
-    "slow": "Lent",
+    "fast": "Prioritari",
+    "medium": "Estàndard",
+    "slow": "Econòmic",
     "recommended": "Recomanat",
     "walletOffline": "La teva cartera està fora de línia. Si us plau, comprova la connexió i torna-ho a provar.",
     "sdkInsufficientFunds": "No hi ha prou fons per a aquesta transacció.",
@@ -2439,7 +2457,7 @@
     "sdkGenericError": "No s'han pogut estimar les comissions. Proveu un import diferent."
   },
   "SettingsScreen": {
-    "createAddress": "Crea una adreça",
+    "createAddress": "Crea una adreça Lightning",
     "addressDisabled": "(desactivat)",
     "donationButton": "Botó Donar",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2474,7 @@
     "activated": "Activat",
     "addressScreen": "Maneres de cobrar",
     "nonCustodialAccount": "Compte no custodi",
+    "custodialAccount": "Compte custodi",
     "tapUserName": "Toca per definir el nom d'usuari",
     "notifications": "Notificacions",
     "title": "Configuració",
@@ -2564,8 +2583,6 @@
     "emailUnverifiedContent": "Assegura't que vols tornar a iniciar sessió al teu compte verificant el teu correu electrònic. Vols fer la verificació ara?",
     "totp": "Autentificació de dos factors",
     "totpDeactivated": "L'autentificació de dos factors ha estat desactivada",
-    "totpDeleteAlertTitle": "Esborra l'autentificació de dos factors",
-    "totpDeleteAlertContent": "Estàs segur que vols suprimir la teva autenticació de dos factors?",
     "copiedAccountId": "S'ha copiat l'identificador del teu compte al porta-retalls",
     "yourAccountId": "La ID del teu compte",
     "accountId": "ID del compte",
@@ -2579,12 +2596,14 @@
     "error": "No es poden obtenir els perfils en aquest moment",
     "fromThisDevice": "des d'aquest dispositiu?",
     "switchAccount": "Has canviat a un altre compte",
-    "removedAccount": "Has eliminat el compte {identifier: string}."
+    "removedAccount": "Has eliminat el compte {identifier: string}.",
+    "removeAccount": "Elimina el compte"
   },
   "StablesatsRestriction": {
     "walletLabel": "no està disponible a la teva regió",
     "anonModeWalletLabel": "no disponible en mode Incognito",
-    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar"
+    "unknownRegionWalletLabel": "no s'ha pogut comprovar la disponibilitat, llisca avall per tornar-ho a provar",
+    "networkWalletLabel": "no disponible en aquesta xarxa"
   },
   "AnonModeConvertModal": {
     "title": "Transfereix primer el teu saldo en dòlars",
@@ -2618,14 +2637,11 @@
     "youGet": "Reps"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "Autentificació de dos factors",
-    "secret": "Secret/còpia de seguretat",
-    "content": "Escaneja aquest codi QR amb la teva aplicació d'autenticació. Alternativament, pots copiar/enganxar manualment el codi a la teva aplicació d'autenticació."
+    "title": "Autentificació de dos factors"
   },
   "TotpRegistrationValidateScreen": {
     "title": "Autentificació de dos factors",
-    "enter6digitCode": "Introdueix el codi de 6 dígits de l'aplicació d'autenticació per validar la teva autenticació de dos factors.",
-    "success": "L'autenticació de dos factors s'ha habilitat. Ara només podràs tornar a iniciar la sessió amb el teu telèfon o correu electrònic i la teva autenticació de dos factors.\n\nEls dispositius d'aquest compte que no estiguin connectats amb 2FA hauran de tornar a iniciar la sessió.\n\nNomés els comptes de nivell 2 poden ser recuperats pel suport al client en cas de pèrdua d'accés a 2FA."
+    "enter6digitCode": "Introdueix el codi de 6 dígits de l'aplicació d'autenticació per validar la teva autenticació de dos factors."
   },
   "TotpLoginValidateScreen": {
     "title": "Autentificació de dos factors",
@@ -2669,7 +2685,7 @@
   "TransactionDetailScreen": {
     "paid": "Pagat a/de",
     "received": "Has rebut",
-    "spent": "Has gastat",
+    "sent": "Has enviat",
     "sending": "Enviant",
     "receivingAccount": "Compte receptor",
     "sendingAccount": "Compte d'enviament",
@@ -2745,6 +2761,7 @@
       "tooLong": "L'adreça pot ser com a màxim de 50 caràcters",
       "invalidCharacter": "L'adreça només pot contenir lletres, números i guions baixos",
       "addressUnavailable": "Ho sentim, aquesta adreça ja està presa",
+      "serverUnreachable": "No s'ha pogut contactar amb el servidor d'adreces. Torna-ho a provar d'aquí a un moment.",
       "unknownError": "S'ha produït un error desconegut. Torna-ho a provar més tard",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3039,7 +3056,8 @@
     "problemPersists": "Si el problema continua contacta amb suport.",
     "fatalError": "Ho sentim, sembla que estem tenint problemes per carregar les dades de l'aplicació. Si els problemes persisteixen, poseu-vos en contacte amb el servei de suport.",
     "showError": "Mostra l'error",
-    "clearAppData": "Esborra les dades de l'aplicació i tanca la sessió"
+    "clearAppData": "Esborra les dades de l'aplicació i tanca la sessió",
+    "screenSecurityUnavailable": "Aquesta pantalla es manté oculta perquè no s'ha pogut activar la protecció contra captures de pantalla."
   },
   "notifications": {
     "payment": {
@@ -3070,7 +3088,13 @@
     "deleteAccountFromPhone": "Hola! Si us plau, tanqueu el meu compte. El meu número de telèfon és {phoneNumber: string}.",
     "deleteAccountError": "Alguna cosa ha anat malament. Contacta amb {email: string} per obtenir més ajuda.",
     "bye": "Adéu!",
-    "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei."
+    "deleteAccountWarning": "Atenció: el tancament del compte és permanent!\nAssegura't que les carteres no tinguin fons abans de tancar-lo.\nUn compte tancat no es pot restaurar.\nÉs possible que conservem certs registres segons ho exigeixi la llei.",
+    "downloadLogs": "Baixa els logs",
+    "exportLogsTitle": "Comparteix els logs de la cartera",
+    "exportLogsBody": "Aquest fitxer ajuda l'assistència a investigar problemes amb les teves carteres. Inclou l'historial de pagaments (imports, factures i adreces) i els identificadors de cada cartera no custodiada d'aquest dispositiu, no només d'aquesta, però mai les frases de còpia de seguretat ni les claus. Comparteix-lo només amb la nostra assistència.",
+    "exportLogsConfirm": "Comparteix els logs",
+    "noLogsYet": "Encara no hi ha logs per compartir. Obre la cartera i torna-ho a provar.",
+    "exportLogsError": "No s'han pogut exportar els logs. Torna-ho a provar."
   },
   "lnurl": {
     "overLimit": "No pots enviar més que l'import màxim",
@@ -3800,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Fes una còpia de seguretat de la cartera",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Tria el teu mètode de còpia de seguretat",
@@ -3845,6 +3869,15 @@
         "title": "Benvingut a Blink sense custòdia",
         "testSuccess": "La teva frase de còpia de seguretat és correcta"
       }
+    },
+    "BundleExport": {
+      "title": "Sortida d'emergència",
+      "body": "Si Spark deixa de funcionar, aquest paquet et permet moure els teus bitcoins a la cadena sense Blink. El teu saldo en dòlars no es pot recuperar.",
+      "download": "Baixa el paquet",
+      "sensitiveTitle": "Sensible",
+      "learnMore": "Més informació sobre la sortida unilateral",
+      "sensitiveConfirm": "Baixa",
+      "sensitiveBody": "Aquest fitxer mostra el teu saldo i l'historial de pagaments, així que mantén-lo privat. Per fer-lo servir en una emergència, també necessites la teva frase de còpia de seguretat."
     },
     "CloudBackup": {
       "title": "Fem una còpia de seguretat de la teva cartera",
@@ -3975,6 +4008,9 @@
     "explainerCheck5": "Es descomptarà una comissió de xarxa de Spark del teu compte",
     "explainerCta": "Ho entenc",
     "transferringFunds": "Transferint els teus fons. Hauria d'estar llest en uns segons.",
+    "transferInProgress": {
+      "body": "Els teus fons estan de camí al teu nou compte. Mantén l'aplicació oberta i ho acabarem automàticament."
+    },
     "transferDelayed": {
       "body": "Els teus fons estan de camí al teu nou compte. Està trigant més de l'habitual — mantén l'aplicació oberta i ho acabarem automàticament.",
       "contactSupportCta": "Contacta amb suport"
@@ -4047,6 +4083,12 @@
     "recognizePhraseTitle": "Reconeixes aquesta frase de còpia de seguretat?",
     "recognizePhraseBody": "No introdueixis mai paraules que t'hagi enviat algú altre."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Operador inaccessible",
+    "outageBody": "Spark està patint una interrupció. Espera un parell de minuts i torna-ho a provar o contacta amb el nostre {support}",
+    "outageSupport": "Suport",
+    "tryAgainLater": "Torna-ho a provar més tard"
+  },
   "BackupNudge": {
     "title": "Els teus fons estan en risc",
     "description": "Assegura la teva cartera ara. Només triga un minut.",
@@ -4055,6 +4097,81 @@
     "modalTitle": "Assegura els teus fons",
     "modalDescription": "Et recomanem fermament que facis una còpia de seguretat de la teva cartera per evitar una pèrdua total de fons en cas que perdis aquest dispositiu.",
     "secureMe": "Assegurar cartera"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Configura l'autenticació de dos factors",
+    "cardDescription": "Protegeix el teu compte de l'accés no autoritzat.",
+    "cardCta": "Configura",
+    "settingsDescription": "Protegeix el teu compte de l'accés no autoritzat configurant-la.",
+    "setupTitle": "Configura ara l'autenticació de dos factors",
+    "setupDescription": "Per evitar l'accés no autoritzat al teu compte, afegeix ara l'autenticació de dos factors.",
+    "setAuthenticator": "Configura l'autenticador",
+    "reminderTitle": "Afegeix un autenticador per protegir els teus fons",
+    "reminderDescription": "El teu saldo ha augmentat. Una aplicació d'autenticació manté el teu compte segur, fins i tot si algú s'apodera del teu correu electrònic o del teu telèfon.",
+    "modalReminder": "Si ho descartes ara, assegura't d'activar-ho tan aviat com puguis.",
+    "dismissTwoMore": "Pots descartar això dues vegades més.",
+    "dismissOneMore": "Pots descartar això una vegada més.",
+    "dismissLast": "Aquesta és l'última vegada que pots descartar això.",
+    "setNow": "Configura ara",
+    "dontWantTo": "No vull",
+    "highBalanceTitle": "Tens més de {amount}, afegeix protecció addicional",
+    "protectionRequiredTitle": "Afegeix protecció addicional per continuar fent servir Blink",
+    "protectionRequiredBody": "Com més fons tens, més important és una millor seguretat. Afegeix un autenticador per continuar fent servir Blink.",
+    "nonCustodialTitle": "Si no vols configurar l'autenticació de dos factors",
+    "nonCustodialBody": "L'altra opció és passar a no custodiat. Llavors ets responsable dels teus propis fons."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Protegeix els teus fons amb un autenticador",
+    "introDescription": "Una aplicació d'autenticació genera un codi nou de 6 dígits cada 30 segons.",
+    "takeoversTitle": "Evita el segrest del compte",
+    "takeoversDescription": "El codi només existeix al teu telèfon",
+    "stolenNumberTitle": "Estigues segur encara que et robin el número",
+    "stolenNumberDescription": "Encara que algú accedeixi al teu correu electrònic o al teu número de telèfon, no podrà iniciar la sessió",
+    "durationTitle": "Triga uns 2 minuts",
+    "durationDescription": "Et guiarem pas a pas",
+    "getStarted": "Comença",
+    "appsTitle": "Aconsegueix una aplicació d'autenticació",
+    "appsDescription": "Qualsevol aplicació d'autenticació funciona. Aquestes són gratuïtes i de confiança:",
+    "googleAuthenticatorDescription": "Senzilla i molt utilitzada. Còpia de seguretat opcional al teu compte de Google.",
+    "protonAuthenticatorDescription": "Codi obert. Còpia de seguretat i sincronització amb xifratge d'extrem a extrem.",
+    "twoFasAuthDescription": "Codi obert. No cal cap compte.",
+    "get": "Obtén",
+    "storeNote": "«Obtén» obre l'App Store o Google Play. Torna a Blink quan estigui instal·lada.",
+    "haveAnApp": "Ja tinc una aplicació",
+    "keyInstruction": "Copia aquesta clau de configuració a la teva aplicació d'autenticació.",
+    "qrInstruction": "Fas servir un altre dispositiu?\nEn comptes d'això, escaneja aquest codi QR.",
+    "backupTitle": "Fes una còpia de seguretat de la clau",
+    "backupDescription": "Si perds el telèfon, aquesta clau et permet tornar a configurar l'autenticador. Desa-la en un lloc que no sigui aquest telèfon.",
+    "saveToPasswordManager": "Desa en un gestor de contrasenyes",
+    "shareToPasswordManager": "Comparteix amb un gestor de contrasenyes",
+    "copyForManualBackup": "Copia per a una còpia de seguretat manual",
+    "passwordManagerUnavailable": "No hi ha cap gestor de contrasenyes disponible en aquest dispositiu. Copia la clau per fer una còpia de seguretat manual.",
+    "savedIt": "Ja l'he desada",
+    "keyBackupText": "Clau de configuració de l'autenticador de Blink\n\nCompte: {account}\nClau de configuració: {key}\n\nSi perds el telèfon, afegeix aquesta clau de configuració a una aplicació d'autenticació per recuperar els teus codis d'inici de sessió de Blink. Qualsevol persona amb aquesta clau pot generar els teus codis, així que mantén-la en privat.",
+    "protectedTitle": "El teu compte ja està protegit",
+    "protectedDescription": "A partir d'ara, per iniciar la sessió caldrà un codi d'un sol ús de la teva aplicació d'autenticació.",
+    "newPhoneTip": "Si canvies de telèfon, passa l'autenticador al nou <bold>abans</bold> de restablir l'antic.",
+    "done": "Fet"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Activada",
+    "statusDisabled": "2FA: Desactivada",
+    "modalTitle": "No et recomanem desactivar la 2FA",
+    "modalBody": "Això reduiria la seguretat del teu compte i facilitaria que un tercer hi accedís sense el teu permís.",
+    "keepProtected": "Mantén-me protegit",
+    "codeInstruction": "Introdueix el codi de 6 dígits de la teva app d'autenticació per desactivar l'autenticació de dos factors.",
+    "codeInvalid": "Aquest codi és incorrecte. Introdueix el codi actual de la teva app d'autenticació.",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a una hora.",
+    "manualResetTitle": "Restabliment manual de la 2FA",
+    "manualResetBody": "Per a la teva protecció, no permetem eliminar la 2FA des de l'app. Si necessites restablir la 2FA, contacta amb el nostre <support>Suport</support>."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Afegeix un correu",
+    "addPhoneTitle": "Afegeix un número de telèfon",
+    "addEmailCode": "Per afegir el teu correu, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "addPhoneCode": "Per afegir el teu número de telèfon, introdueix el codi de 6 dígits de la teva app d'autenticació.",
+    "codeInvalid": "Aquest codi és incorrecte. Introdueix el codi actual de la teva app d'autenticació.",
+    "tooManyAttempts": "Massa intents. Torna-ho a provar d'aquí a una hora."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4065,6 +4182,15 @@
     "title": "Aquest és un compte no custodi",
     "body": "Per saber-ne més, llegeix la nostra entrada del blog",
     "cta": "Llegeix"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Actualitza la teva còpia al núvol",
+    "body": "El teu paquet d'emergència a {provider} no està actualitzat. Torna a fer una còpia de seguretat de la cartera per actualitzar-lo.",
+    "cta": "Torna a fer la còpia"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Encara no hi ha cap paquet d'emergència. Es crea després de la teva primera transacció.",
+    "exportFailed": "No s'ha pogut baixar el paquet d'emergència."
   },
   "StableBalance": {
     "title": "Balanç estable",
@@ -4098,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink no està disponible",
+    "unreachableDescription": "{featureName} necessita els servidors de Blink, que ara mateix no responen. La teva cartera i els teus fons no es veuen afectats.",
     "featureCircles": "Circles",
     "featureEarn": "Aprendre",
     "featureCard": "Card"
@@ -4120,6 +4248,10 @@
     "tokenTransfer": "Transferència {token}",
     "payTo": "Pagar a {address}",
     "payment": "Pagament"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "El tipus de canvi pot estar desactualitzat",
+    "satsOnly": "Es mostren sats: no hi ha tipus de canvi disponible"
   },
   "SelfCustodialOffline": {
     "title": "La cartera està fora de línia",
@@ -4155,9 +4287,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Adreça Bitcoin per al reemborsament",
     "feeRate": "Comissió de xarxa",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "No s'han pogut carregar les comissions de xarxa. Comprova la connexió i torna-ho a provar.",
     "refundNow": "Reemborsar ara",

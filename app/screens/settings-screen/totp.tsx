@@ -1,9 +1,9 @@
-import React, { useState } from "react"
-import { Alert } from "react-native"
+import React, { useCallback, useState } from "react"
 
-import { gql } from "@apollo/client"
-import { GaloyIconButton } from "@app/components/atomic/galoy-icon-button"
-import { useSettingsScreenQuery, useUserTotpDeleteMutation } from "@app/graphql/generated"
+import { TwoFactorManualResetSheet } from "@app/custodial/components/two-factor-manual-reset-sheet"
+import { TwoFactorTurnOffModal } from "@app/custodial/components/two-factor-turn-off-modal"
+import { useTwoFactorTurnOff } from "@app/custodial/hooks/use-two-factor-turn-off"
+import { useSettingsScreenQuery } from "@app/graphql/generated"
 import { useAccountRegistry } from "@app/hooks/use-account-registry"
 import { useI18nContext } from "@app/i18n/i18n-react"
 import { RootStackParamList } from "@app/navigation/stack-param-lists"
@@ -13,96 +13,88 @@ import { NativeStackNavigationProp } from "@react-navigation/native-stack"
 
 import { SettingsRow } from "./row"
 
-gql`
-  mutation userTotpDelete {
-    userTotpDelete {
-      errors {
-        message
-      }
-      me {
-        id
-        phone
-        totpEnabled
-        email {
-          address
-          verified
-        }
-      }
-    }
-  }
-`
+/** What asking to turn the authenticator off shows, one at a time. */
+const TurnOffPrompt = {
+  None: "none",
+  Recommendation: "recommendation",
+  ManualReset: "manual_reset",
+} as const
+type TurnOffPrompt = (typeof TurnOffPrompt)[keyof typeof TurnOffPrompt]
 
+/**
+ * The authenticator's row: off, it opens the setup; on, it asks to turn it off, with an
+ * X where the other rows have their arrow.
+ * Where the authenticator is not mandatory Blink recommends keeping it, and Continue
+ * asks for its code; where it is, support resets it.
+ */
 export const TotpSetting: React.FC = () => {
   const { LL } = useI18nContext()
   const { navigate } = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const { activeAccount } = useAccountRegistry()
+  const { isTurnOffBlocked, isTurnOffDecided, reportAttempt, reportBlocked } =
+    useTwoFactorTurnOff()
+  const [prompt, setPrompt] = useState<TurnOffPrompt>(TurnOffPrompt.None)
+  const [isCodeRequested, setIsCodeRequested] = useState(false)
 
-  const [spinner, setSpinner] = useState(false)
+  const { data, loading } = useSettingsScreenQuery({ fetchPolicy: "cache-only" })
 
-  const {
-    data,
-    loading,
-    refetch: refetchTotpSettings,
-  } = useSettingsScreenQuery({ fetchPolicy: "cache-only" })
-  const [totpDeleteMutation] = useUserTotpDeleteMutation()
+  const askToTurnOff = useCallback(() => {
+    reportAttempt()
+    if (isTurnOffBlocked) {
+      reportBlocked()
+      setPrompt(TurnOffPrompt.ManualReset)
+      return
+    }
+    setPrompt(TurnOffPrompt.Recommendation)
+  }, [isTurnOffBlocked, reportAttempt, reportBlocked])
+
+  const closePrompt = useCallback(() => setPrompt(TurnOffPrompt.None), [])
+
+  /** The code screen opens once the modal is off the screen: pushed while the modal
+   *  still closes, it can hang the transition, and its field does not take the focus. */
+  const continueToCode = useCallback(() => {
+    setIsCodeRequested(true)
+    setPrompt(TurnOffPrompt.None)
+  }, [])
+
+  const openRequestedCode = useCallback(() => {
+    if (!isCodeRequested) return
+    setIsCodeRequested(false)
+    navigate("totpDeleteValidate")
+  }, [isCodeRequested, navigate])
+
+  const openSetup = useCallback(() => navigate("totpRegistrationInitiate"), [navigate])
 
   if (activeAccount?.type === AccountType.SelfCustodial) return null
 
   const totpEnabled = Boolean(data?.me?.totpEnabled)
-
-  const totpDelete = async () => {
-    Alert.alert(
-      LL.AccountScreen.totpDeleteAlertTitle(),
-      LL.AccountScreen.totpDeleteAlertContent(),
-      [
-        { text: LL.common.cancel(), onPress: () => {} },
-        {
-          text: LL.common.ok(),
-          onPress: async () => {
-            setSpinner(true)
-
-            try {
-              const res = await totpDeleteMutation()
-              await refetchTotpSettings()
-              setSpinner(false)
-
-              if (res.data?.userTotpDelete?.me?.totpEnabled === false) {
-                Alert.alert(LL.AccountScreen.totpDeactivated())
-              } else {
-                console.log(res.data?.userTotpDelete.errors)
-                Alert.alert(
-                  LL.common.error(),
-                  res.data?.userTotpDelete?.errors[0]?.message,
-                )
-              }
-            } catch {
-              Alert.alert(LL.common.error())
-            }
-          },
-        },
-      ],
-    )
-  }
+  const title = totpEnabled
+    ? LL.TwoFactorTurnOff.statusEnabled()
+    : LL.TwoFactorTurnOff.statusDisabled()
+  /** The X waits for the tier reached, so a tier-three account is never offered the
+   *  recommendation for the frames its record takes to read. */
+  const isRowLoading = loading || !isTurnOffDecided
+  const rowAction = totpEnabled ? askToTurnOff : openSetup
+  const rightIcon = totpEnabled ? "close" : undefined
+  const isRecommendationVisible = prompt === TurnOffPrompt.Recommendation
+  const isManualResetVisible = prompt === TurnOffPrompt.ManualReset
 
   return (
-    <SettingsRow
-      loading={loading}
-      spinner={spinner}
-      title={LL.AccountScreen.totp()}
-      subtitle={totpEnabled ? LL.common.enabled() : undefined}
-      leftGaloyIcon="lock-closed"
-      action={
-        totpEnabled
-          ? null
-          : () => {
-              navigate("totpRegistrationInitiate")
-            }
-      }
-      rightIcon={
-        totpEnabled ? (
-          <GaloyIconButton name="close" size="medium" onPress={totpDelete} />
-        ) : undefined
-      }
-    />
+    <>
+      <SettingsRow
+        loading={isRowLoading}
+        title={title}
+        leftGaloyIcon="lock-closed"
+        action={rowAction}
+        rightIcon={rightIcon}
+      />
+      <TwoFactorTurnOffModal
+        isVisible={isRecommendationVisible}
+        onKeepProtected={closePrompt}
+        onContinue={continueToCode}
+        onHidden={openRequestedCode}
+      />
+      <TwoFactorManualResetSheet isVisible={isManualResetVisible} onClose={closePrompt} />
+    </>
   )
 }

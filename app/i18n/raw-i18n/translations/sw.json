@@ -33,6 +33,8 @@
     "createError": "Imeshindwa kuunda ufunguo wa API. Tafadhali jaribu tena.",
     "revokeError": "Imeshindwa kubatilisha ufunguo wa API. Tafadhali jaribu tena.",
     "loadError": "Imeshindwa kupakia funguo zako za API. Tafadhali jaribu tena baadaye.",
+    "discardSecretTitle": "Tupa ufunguo huu wa API?",
+    "discardSecretBody": "Hii ndiyo mara pekee siri inayoonyeshwa. Ukiacha sasa, ufunguo hauwezi kupatikana tena na utalazimika kuunda mpya.",
     "done": "Imekamilika"
   },
   "GaloyAddressScreen": {
@@ -80,7 +82,12 @@
     "skip": "Ruka",
     "unlock": "Fungua",
     "usePin": "Tumia pini",
-    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani"
+    "confirmLogout": "Je, una uhakika ungependa kutoka? Hii itaweka upya akiba yako na mipangilio yote ya mtumiaji wa ndani",
+    "forgotPin": "Umesahau pini? Ondoa mikoba",
+    "removeWalletsTitle": "Ondoa mikoba kwenye kifaa hiki?",
+    "removeWalletsBody": "Hii inaondoa mikoba yote kwenye kifaa hiki na kukutoa nje. Ili kurudisha mkoba, unahitaji neno lake la kurejesha. Bila hilo, mkoba unapotea.",
+    "removeWalletsConfirm": "Ondoa mikoba",
+    "removeWalletsFailed": "Baadhi ya mikoba haikuweza kuondolewa. Tafadhali jaribu tena."
   },
   "PeopleScreen": {
     "title": "Watunzi",
@@ -2177,16 +2184,19 @@
     "walletCountNotTwo": "Idadi ya mifuko haitoshi. Tafadhali tumia kiolesura ili kuona mifuko yote na fedha za akaunti hii"
   },
   "PinScreen": {
-    "attemptsRemaining": "Pini sahihi. {attemptsRemaining: number} yamesalia.",
+    "attemptUnrecorded": "Imeshindwa kurekodi jaribio kwa usalama.",
+    "attemptsLeft": "Majaribio {attemptsRemaining: number} yamesalia.",
+    "attemptsRemaining": "Pini si sahihi. Majaribio {attemptsRemaining: number} yamesalia.",
     "enterPin": "Ingiza pini yako",
-    "lockoutUnavailable": "Imeshindwa kurekodi jaribio lililokosa kwa usalama. Kutoka nje ya programu.",
+    "oneAttemptLeft": "Jaribio 1 limesalia.",
     "oneAttemptRemaining": "Pini si sahihi. Jaribio 1 limesalia.",
     "pinUnreadable": "Imeshindwa kuangalia pini yako. Tafadhali jaribu tena.",
     "setPin": "Andikisha pini yako",
     "setPinFailedMatch": "Pini hazikulingana - Andikisha Pini yako.",
     "storePinFailed": "Imeshindwa kuhifadhi pini yako.",
     "tooManyAttempts": "Majaribio mengi sana yaliyokosa. Kutoka nje ya programu.",
-    "tryAgainIn": "Jaribu tena baada ya sekunde {seconds: number}.",
+    "attemptBudgetSpent": "Majaribio mengi sana yaliyokosa.",
+    "tryAgainIn": "Jaribu tena baada ya {time: string}.",
     "verifyPin": "Thibitisha nambari yako ya pini"
   },
   "PriceHistoryScreen": {
@@ -2221,6 +2231,12 @@
     "error": "Kushindwa kuzalisha bili. Tafadhali wasiliana na msaada ikiwa tatizo hili litadumu.",
     "copyInvoice": "Nakili",
     "shareInvoice": "Shiriki",
+    "newAddress": "Mpya",
+    "newAddressHint": "Huunda anwani mpya ya Bitcoin. Anwani za awali bado zinafanya kazi.",
+    "newAddressGenerated": "Anwani mpya iko tayari. Anwani za awali bado zinafanya kazi.",
+    "newAddressFailed": "Imeshindwa kuunda anwani mpya. Tafadhali jaribu tena.",
+    "newAddressRateLimited": "Anwani mpya nyingi mno. Subiri kidogo kisha ujaribu tena.",
+    "onchainAddressLoadFailed": "Imeshindwa kupakia anwani yako ya Bitcoin. Gusa Mpya ili ujaribu tena.",
     "addAmount": "Omba Kiasi Maalum",
     "expired": "Bili imeisha muda wake",
     "expiresIn": "Inamalizika ndani ya",
@@ -2356,6 +2372,8 @@
     "invalidAmount": "Hii ina kiasi batili. Tafadhali toa yenye kiasi halali.",
     "usernameDoesNotExist": "{lnAddress: string} haionekani kuwa anwani ya {bankName: string} ambayo ipo.",
     "usernameDoesNotExistAdvice": "Hakikisha kwamba tahajia ni sahihi ama uliza anayepokea akupee ankara ya LN au anwani ya BTC badala yake.",
+    "destinationUnverifiable": "Hatukuweza kuthibitisha {lnAddress} kwa sasa — seva za {bankName} hazijibu.",
+    "destinationUnverifiableAdvice": "Anwani huenda iko sawa kabisa. Jaribu tena baada ya muda mfupi, au mwombe mpokeaji ankara ya LN au anwani ya BTC.",
     "selfPaymentError": "{lnAddress: string} ni anwani yako ya {bankName: string}",
     "selfPaymentAdvice": "Ikiwa unataka kutuma pesa kwa akaunti yako nyingine, unaweza kutumia ankara ya malipo, LN au anwani ya BTC badala yake.",
     "lnAddressError": "Hatuwezi kupata anwani hii ya Lightning. Ikiwa una uhakika iko, unaweza jaribu tena baadaye.",
@@ -2428,9 +2446,9 @@
     "time": "Muda",
     "type": "Aina",
     "feeTier": "Kipaumbele cha muamala",
-    "fast": "Haraka",
-    "medium": "Wastani",
-    "slow": "Polepole",
+    "fast": "Kipaumbele",
+    "medium": "Kawaida",
+    "slow": "Nafuu",
     "recommended": "Inapendekezwa",
     "walletOffline": "Pochi yako haiko mtandaoni. Tafadhali angalia muunganisho wako na ujaribu tena.",
     "sdkInsufficientFunds": "Fedha hazitoshi kwa muamala huu.",
@@ -2439,7 +2457,7 @@
     "sdkGenericError": "Haiwezekani kukadiri ada. Tafadhali jaribu kiasi tofauti."
   },
   "SettingsScreen": {
-    "createAddress": "Unda anwani",
+    "createAddress": "Unda anwani ya Lightning",
     "addressDisabled": "(imezimwa)",
     "donationButton": "Kitufe cha kuchangia",
     "btcpayServer": "BTCPay Server",
@@ -2456,6 +2474,7 @@
     "activated": "Imewezeshwa",
     "addressScreen": "Njia za kupokea malipo",
     "nonCustodialAccount": "Akaunti isiyo ya udhamini",
+    "custodialAccount": "Akaunti ya udhamini",
     "tapUserName": "Guza ili kuandikisha jina la mtumiaji",
     "notifications": "Arifa",
     "title": "Mipangilio",
@@ -2564,8 +2583,6 @@
     "emailUnverifiedContent": "Hakikisha unaweza kuingia kwenye akaunti yako kwa kuthibitisha anwani yako ya barua pepe. Je, ungependa kufanya uthibitisho sasa?",
     "totp": "uthibitishaji wa hatua mbili",
     "totpDeactivated": "Uthibitishaji wa hatua mbili umefutwa",
-    "totpDeleteAlertTitle": "Futa uthibitishaji wa hatua mbili",
-    "totpDeleteAlertContent": "Una uhakika unataka kufuta uthibitishaji wako wa hatua mbili?",
     "copiedAccountId": "Imeakiliwa ID ya akaunti yako kwenye ubao wa kunakili",
     "yourAccountId": "ID ya Akaunti Yako",
     "accountId": "Kitambulisho cha Akaunti",
@@ -2579,12 +2596,14 @@
     "error": "Haiwezi kupata wasifu kwa wakati huu",
     "fromThisDevice": "kutoka kifaa hiki?",
     "switchAccount": "Umebadilisha kwenda akaunti nyingine",
-    "removedAccount": "Umeondoa akaunti {identifier: string}."
+    "removedAccount": "Umeondoa akaunti {identifier: string}.",
+    "removeAccount": "Ondoa akaunti"
   },
   "StablesatsRestriction": {
     "walletLabel": "haipatikani katika eneo lako",
     "anonModeWalletLabel": "haipatikani katika hali ya Incognito",
-    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena"
+    "unknownRegionWalletLabel": "haikuwezekana kukagua upatikanaji, vuta chini ili kujaribu tena",
+    "networkWalletLabel": "haipatikani kwenye mtandao huu"
   },
   "AnonModeConvertModal": {
     "title": "Hamisha kwanza salio lako la Dola",
@@ -2618,14 +2637,11 @@
     "youGet": "Unapata"
   },
   "TotpRegistrationInitiateScreen": {
-    "title": "uthibitishaji wa hatua mbili",
-    "secret": "Siri/hifadhi rudufu",
-    "content": "Skana nambari hii ya QR na programu yako ya uthibitishaji. Vinginevyo, unaweza kunakili/nakili siri kwa mikono kwenye programu yako ya uthibitishaji."
+    "title": "uthibitishaji wa hatua mbili"
   },
   "TotpRegistrationValidateScreen": {
     "title": "uthibitishaji wa hatua mbili",
-    "enter6digitCode": "Ingiza nambari ya 6-digit kutoka kwenye programu yako ya uthibitishaji kuthibitisha uthibitishaji wa hatua mbili wako.",
-    "success": "Uthibitishaji wa hatua mbili umewezeshwa. Sasa utaweza kuingia kwa kutumia namba yako ya simu au barua pepe PAMOJA NA uthibitishaji wako wa hatua mbili.\n\nVifaa kwenye akaunti hii ambavyo havijathibitishwa na 2FA itahitaji kuingia upya.\n\nAkaunti za kiwango cha 2 pekee ndizo zinazoweza kurejeshwa na msaada wa wateja kwa kupoteza upatikanaji wa 2FA."
+    "enter6digitCode": "Ingiza nambari ya 6-digit kutoka kwenye programu yako ya uthibitishaji kuthibitisha uthibitishaji wa hatua mbili wako."
   },
   "TotpLoginValidateScreen": {
     "title": "uthibitishaji wa hatua mbili",
@@ -2669,7 +2685,7 @@
   "TransactionDetailScreen": {
     "paid": "Imelipwa kutoka/kuelekea",
     "received": "Ulipokea",
-    "spent": "Umetumia",
+    "sent": "Ulituma",
     "sending": "Inatuma",
     "receivingAccount": "Akaunti ya Kupokelea",
     "sendingAccount": "Akaunti ya Kutuma",
@@ -2745,6 +2761,7 @@
       "tooLong": "Anwani lazima iwe na herufi si zaidi ya 50",
       "invalidCharacter": "Anwani inaweza kuwa na herufi, nambari, na alama ya chini pekee",
       "addressUnavailable": "Samahani, anwani hii tayari imetumika",
+      "serverUnreachable": "Haikuweza kufikia seva ya anwani. Jaribu tena baada ya muda mfupi.",
       "unknownError": "Kuna hitilafu isiyofahamika, tafadhali jaribu tena baadaye",
       "backupRequired": "Back up your wallet before creating a Lightning address"
     },
@@ -3039,7 +3056,8 @@
     "problemPersists": "Tatizo likiendelea wasiliana na usaidizi",
     "fatalError": "Pole, inaonekana kwamba tunatatizika kupakua data ya aplikisheni. Tatizo likiendelea tafadhali wasiliana na usaidizi. ",
     "showError": "Onyesha kosa",
-    "clearAppData": "Ondoa Data ya Programu na Toka"
+    "clearAppData": "Ondoa Data ya Programu na Toka",
+    "screenSecurityUnavailable": "Skrini hii inabaki imefichwa kwa sababu ulinzi dhidi ya picha za skrini haukuweza kuwashwa."
   },
   "notifications": {
     "payment": {
@@ -3070,7 +3088,13 @@
     "deleteAccountFromPhone": "Habari!, tafadhali funga akaunti yangu. Nambari yangu ya simu ni {phoneNumber: string}.",
     "deleteAccountError": "Kuna kitu kimeenda kombo. Wasiliana na {email: string} kwa msaada zaidi.",
     "bye": "Kwaheri!",
-    "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria."
+    "deleteAccountWarning": "Kumbuka: Kufunga akaunti ni kwa kudumu!\nHakikisha pochi hazina fedha kabla ya kufunga.\nAkaunti iliyofungwa haiwezi kurejeshwa.\nTunaweza kuhifadhi rekodi fulani kama inavyohitajika na sheria.",
+    "downloadLogs": "Pakua kumbukumbu",
+    "exportLogsTitle": "Shiriki kumbukumbu za mkoba wako",
+    "exportLogsBody": "Faili hili husaidia timu yetu ya usaidizi kuchunguza matatizo ya mikoba yako. Inajumuisha historia ya malipo (kiasi, ankara na anwani) na vitambulishi vya kila mkoba usio wa udhamini kwenye kifaa hiki, si huu pekee, lakini kamwe vifungu vyako vya akiba wala funguo. Ishiriki na timu yetu ya usaidizi pekee.",
+    "exportLogsConfirm": "Shiriki kumbukumbu",
+    "noLogsYet": "Bado hakuna kumbukumbu za kushiriki. Fungua mkoba wako kisha jaribu tena.",
+    "exportLogsError": "Imeshindwa kuhamisha kumbukumbu. Tafadhali jaribu tena."
   },
   "lnurl": {
     "overLimit": "Huwezi kutuma zaidi ya kiasi cha juu",
@@ -3800,7 +3824,7 @@
     }
   },
   "BackupScreen": {
-    "title": "Back up your wallet",
+    "title": "Hifadhi nakala ya mkoba wako",
     "description": "Choose a backup method to secure your funds",
     "BackupMethod": {
       "title": "Chagua njia yako ya nakala",
@@ -3845,6 +3869,15 @@
         "title": "Karibu kwa Blink isiyo na uhifadhi",
         "testSuccess": "Maneno yako ya hifadhi ni sahihi"
       }
+    },
+    "BundleExport": {
+      "title": "Kutoka kwa dharura",
+      "body": "Iwapo Spark itaacha kufanya kazi, kifurushi hiki hukuwezesha kuhamisha bitcoin zako on-chain bila Blink. Salio lako la dola haliwezi kurejeshwa.",
+      "download": "Pakua kifurushi",
+      "sensitiveTitle": "Nyeti",
+      "learnMore": "Jifunze zaidi kuhusu kutoka kwa upande mmoja",
+      "sensitiveConfirm": "Pakua",
+      "sensitiveBody": "Faili hili linaonyesha salio lako na historia ya malipo yako, kwa hiyo liweke faragha. Ili kulitumia wakati wa dharura, unahitaji pia kifungu chako cha akiba."
     },
     "CloudBackup": {
       "title": "Tuhifadhi nakala ya mkoba wako",
@@ -3975,6 +4008,9 @@
     "explainerCheck5": "Akaunti yako itakatwa ada ya mtandao wa Spark",
     "explainerCta": "Naelewa",
     "transferringFunds": "Tunahamisha fedha zako. Inapaswa kukamilika ndani ya sekunde chache.",
+    "transferInProgress": {
+      "body": "Fedha zako ziko njiani kuelekea kwenye akaunti yako mpya. Acha programu ikiwa wazi na tutakamilisha kiotomatiki."
+    },
     "transferDelayed": {
       "body": "Fedha zako ziko njiani kuelekea kwenye akaunti yako mpya. Inachukua muda mrefu kuliko kawaida — acha programu ikiwa wazi na tutakamilisha kiotomatiki.",
       "contactSupportCta": "Wasiliana na usaidizi"
@@ -4047,6 +4083,12 @@
     "recognizePhraseTitle": "Je, unaitambua kaulisiri hii ya nakala rudufu?",
     "recognizePhraseBody": "Kamwe usiweke maneno uliyotumiwa na mtu mwingine."
   },
+  "EmergencyRecovery": {
+    "outageTitle": "Mwendeshaji hapatikani",
+    "outageBody": "Spark inakabiliwa na hitilafu. Tafadhali subiri dakika chache ujaribu tena au wasiliana na {support} wetu",
+    "outageSupport": "Msaada",
+    "tryAgainLater": "Jaribu tena baadaye"
+  },
   "BackupNudge": {
     "title": "Fedha zako ziko hatarini",
     "description": "Linda pochi yako sasa. Inachukua dakika moja tu.",
@@ -4055,6 +4097,81 @@
     "modalTitle": "Linda fedha zako",
     "modalDescription": "Tunakushauri sana uhifadhi pochi yako ili kuzuia kupoteza fedha zako zote iwapo utapoteza kifaa hiki.",
     "secureMe": "Linda pochi"
+  },
+  "TwoFactorEnforcement": {
+    "title": "Weka uthibitishaji wa hatua mbili",
+    "cardDescription": "Linda akaunti yako dhidi ya ufikiaji usioidhinishwa.",
+    "cardCta": "Weka",
+    "settingsDescription": "Linda akaunti yako dhidi ya ufikiaji usioidhinishwa kwa kuuweka.",
+    "setupTitle": "Weka uthibitishaji wa hatua mbili sasa",
+    "setupDescription": "Ili kuzuia ufikiaji usioidhinishwa wa akaunti yako, ongeza uthibitishaji wa hatua mbili sasa.",
+    "setAuthenticator": "Weka kithibitishaji",
+    "reminderTitle": "Ongeza kithibitishaji ili kulinda fedha zako",
+    "reminderDescription": "Salio lako limeongezeka. Programu ya kithibitishaji huweka akaunti yako salama, hata kama mtu atapata barua pepe au simu yako.",
+    "modalReminder": "Ukikataa sasa, hakikisha unaiwasha haraka iwezekanavyo.",
+    "dismissTwoMore": "Unaweza kukataa hii mara mbili zaidi.",
+    "dismissOneMore": "Unaweza kukataa hii mara moja zaidi.",
+    "dismissLast": "Hii ndiyo mara ya mwisho unaweza kukataa hii.",
+    "setNow": "Weka sasa",
+    "dontWantTo": "Sitaki",
+    "highBalanceTitle": "Una zaidi ya {amount}, tafadhali ongeza ulinzi wa ziada",
+    "protectionRequiredTitle": "Tafadhali ongeza ulinzi wa ziada ili uendelee kutumia Blink",
+    "protectionRequiredBody": "Kadiri unavyokuwa na fedha nyingi, ndivyo usalama bora unavyozidi kuwa muhimu. Tafadhali ongeza kithibitishaji ili kuendelea kutumia Blink.",
+    "nonCustodialTitle": "Ikiwa hutaki kuweka uthibitishaji wa hatua mbili",
+    "nonCustodialBody": "Chaguo lingine ni kuhamia kwenye usio wa udhamini. Hapo utakuwa unawajibika kwa fedha zako mwenyewe."
+  },
+  "AuthenticatorOnboarding": {
+    "introTitle": "Linda fedha zako kwa kithibitishaji",
+    "introDescription": "Programu ya kithibitishaji hutengeneza msimbo mpya wa tarakimu 6 kila sekunde 30.",
+    "takeoversTitle": "Huzuia akaunti kutekwa",
+    "takeoversDescription": "Msimbo upo kwenye simu yako pekee",
+    "stolenNumberTitle": "Kuwa salama hata kama nambari yako imeibiwa",
+    "stolenNumberDescription": "Hata kama mtu ataingia kwenye barua pepe yako au nambari yako ya simu, hawezi kuingia kwenye akaunti yako",
+    "durationTitle": "Huchukua takriban dakika 2",
+    "durationDescription": "Tutakuongoza hatua kwa hatua",
+    "getStarted": "Anza",
+    "appsTitle": "Pata programu ya kithibitishaji",
+    "appsDescription": "Programu yoyote ya kithibitishaji inafanya kazi. Hizi ni za bure na zinaaminika:",
+    "googleAuthenticatorDescription": "Rahisi na inatumika sana. Nakala rudufu ya hiari kwenye akaunti yako ya Google.",
+    "protonAuthenticatorDescription": "Chanzo huria. Nakala rudufu na usawazishaji uliosimbwa kwa njia fiche kutoka mwanzo hadi mwisho.",
+    "twoFasAuthDescription": "Chanzo huria. Hakuna akaunti inayohitajika.",
+    "get": "Pakua",
+    "storeNote": "“Pakua” hufungua App Store au Google Play. Rudi kwenye Blink baada ya kusakinisha.",
+    "haveAnApp": "Nina programu",
+    "keyInstruction": "Nakili ufunguo huu wa kusanidi kwenye programu yako ya kithibitishaji.",
+    "qrInstruction": "Unatumia kifaa kingine?\nBadala yake changanua msimbo huu wa QR.",
+    "backupTitle": "Hifadhi nakala ya ufunguo wako",
+    "backupDescription": "Ukipoteza simu yako, ufunguo huu utakuwezesha kusanidi kithibitishaji chako tena. Uhifadhi mahali pengine tofauti na simu hii.",
+    "saveToPasswordManager": "Hifadhi kwenye kidhibiti cha nywila",
+    "shareToPasswordManager": "Shiriki kwenye kidhibiti cha nywila",
+    "copyForManualBackup": "Nakili kwa ajili ya hifadhi ya mkono",
+    "passwordManagerUnavailable": "Hakuna kidhibiti cha manenosiri kinachopatikana kwenye kifaa hiki. Nakili ufunguo kwa nakala ya ziada ya mkono badala yake.",
+    "savedIt": "Nimeuhifadhi",
+    "keyBackupText": "Ufunguo wa kusanidi kithibitishaji cha Blink\n\nAkaunti: {account}\nUfunguo wa kusanidi: {key}\n\nUkipoteza simu yako, ongeza ufunguo huu wa kusanidi kwenye programu ya kithibitishaji ili kurejesha misimbo yako ya kuingia kwenye Blink. Mtu yeyote mwenye ufunguo huu anaweza kutengeneza misimbo yako, kwa hivyo uweke siri.",
+    "protectedTitle": "Akaunti yako sasa imelindwa",
+    "protectedDescription": "Kuanzia sasa, kuingia kunahitaji msimbo wa matumizi ya mara moja kutoka kwenye programu yako ya kithibitishaji.",
+    "newPhoneTip": "Ukipata simu mpya, hamishia kithibitishaji chako kwenye simu hiyo <bold>kabla</bold> ya kuweka upya ile ya zamani.",
+    "done": "Imekamilika"
+  },
+  "TwoFactorTurnOff": {
+    "statusEnabled": "2FA: Imewashwa",
+    "statusDisabled": "2FA: Imezimwa",
+    "modalTitle": "Hatupendekezi kuzima 2FA",
+    "modalBody": "Hii ingepunguza usalama wa akaunti yako na kurahisisha mtu mwingine kuingia kwenye akaunti yako bila ruhusa yako.",
+    "keepProtected": "Niendelee kulindwa",
+    "codeInstruction": "Weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji ili kuzima uthibitishaji wa vipengele viwili.",
+    "codeInvalid": "Msimbo huo si sahihi. Weka msimbo wa sasa kutoka programu yako ya uthibitishaji.",
+    "tooManyAttempts": "Majaribio mengi mno. Jaribu tena baada ya saa moja.",
+    "manualResetTitle": "Kuweka upya 2FA kwa mkono",
+    "manualResetBody": "Kwa ulinzi wako, hatuuruhusu 2FA kuondolewa ndani ya programu. Ikiwa unahitaji kuweka upya 2FA, wasiliana na <support>Usaidizi</support> wetu."
+  },
+  "LoginMethodCode": {
+    "addEmailTitle": "Ongeza barua pepe",
+    "addPhoneTitle": "Ongeza nambari ya simu",
+    "addEmailCode": "Ili kuongeza barua pepe yako, weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji.",
+    "addPhoneCode": "Ili kuongeza nambari yako ya simu, weka msimbo wa tarakimu 6 kutoka programu yako ya uthibitishaji.",
+    "codeInvalid": "Msimbo huo si sahihi. Weka msimbo wa sasa kutoka programu yako ya uthibitishaji.",
+    "tooManyAttempts": "Majaribio mengi mno. Jaribu tena baada ya saa moja."
   },
   "BackupRequired": {
     "modalTitle": "Back up your wallet first",
@@ -4065,6 +4182,15 @@
     "title": "Hii ni akaunti isiyo ya udhamini",
     "body": "Ili kujifunza zaidi, soma chapisho letu la blogu",
     "cta": "Soma"
+    },
+  "StaleCloudBundleBulletin": {
+    "title": "Sasisha nakala yako ya wingu",
+    "body": "Kifurushi chako cha dharura kwenye {provider} kimepitwa na wakati. Hifadhi nakala ya mkoba wako tena ili kukisasisha.",
+    "cta": "Hifadhi nakala tena"
+    },
+  "RecoveryBundleScreen": {
+    "noBundleToExport": "Bado hakuna kifurushi cha dharura. Kinaundwa baada ya muamala wako wa kwanza.",
+    "exportFailed": "Imeshindwa kupakua kifurushi cha dharura."
   },
   "StableBalance": {
     "title": "Salio thabiti",
@@ -4098,6 +4224,8 @@
     "signInDescription": "Sign in to your custodial account to use {featureName}.",
     "noAccountTitle": "Custodial account required",
     "noAccountDescription": "{featureName} requires a Blink custodial account.",
+    "unreachableTitle": "Blink haifikiki",
+    "unreachableDescription": "{featureName} inahitaji seva za Blink, ambazo hazijibu kwa sasa. Pochi yako na fedha zako haziathiriwi.",
     "featureCircles": "Circles",
     "featureEarn": "Jifunze",
     "featureCard": "Card"
@@ -4120,6 +4248,10 @@
     "tokenTransfer": "Uhamisho wa {token}",
     "payTo": "Lipa kwa {address}",
     "payment": "Malipo"
+  },
+  "SelfCustodialStaleRate": {
+    "notice": "Kiwango cha ubadilishaji huenda kimepitwa na wakati",
+    "satsOnly": "Inaonyesha sats — hakuna kiwango cha ubadilishaji"
   },
   "SelfCustodialOffline": {
     "title": "Pochi iko nje ya mtandao",
@@ -4155,9 +4287,6 @@
     "refundFailed": "Refund failed: {error}",
     "refundAddress": "Bitcoin address for refund",
     "feeRate": "Network fee",
-    "feeRateFastest": "Fastest (~{sats} sats) ~10 min",
-    "feeRateHalfHour": "Normal (~{sats} sats) ~30 min",
-    "feeRateHour": "Economy (~{sats} sats) ~60 min",
     "feeRateUnit": "{rate} sat/vB",
     "feeRateUnavailable": "Imeshindwa kupakia ada za mtandao. Tafadhali angalia muunganisho wako na ujaribu tena.",
     "refundNow": "Rudisha sasa",

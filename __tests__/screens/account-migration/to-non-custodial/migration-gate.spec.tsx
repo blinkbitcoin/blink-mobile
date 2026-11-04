@@ -74,14 +74,18 @@ const mockDollarBalanceModal = jest.fn(
   },
 )
 const mockUnavailableScreen = jest.fn(() => null)
-const mockSecondaryButton = jest.fn((props: { title: string; onPress: () => void }) => {
-  const { Pressable, Text } = jest.requireActual("react-native")
-  return (
-    <Pressable testID="gate-storage-support-button" onPress={props.onPress}>
-      <Text>{props.title}</Text>
-    </Pressable>
-  )
-})
+/** Keeps the testID the gate hands it, so the specs find the button by the id the screen
+ *  actually ships rather than one the mock invents. */
+const mockSecondaryButton = jest.fn(
+  (props: { title: string; onPress: () => void; testID?: string }) => {
+    const { Pressable, Text } = jest.requireActual("react-native")
+    return (
+      <Pressable testID={props.testID} onPress={props.onPress}>
+        <Text>{props.title}</Text>
+      </Pressable>
+    )
+  },
+)
 
 const mockPrimaryButton = jest.fn(
   (props: { title: string; onPress: () => void; disabled?: boolean }) => {
@@ -1069,7 +1073,7 @@ describe("MigrationGate, with an unreadable device store", () => {
     await pressRetry(getByTestId, 2)
 
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(2)
-    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+    expect(queryByTestId("migration-gate-storage-support")).toBeNull()
   })
 
   it("offers support once retrying has failed enough times to stop being a fix", async () => {
@@ -1081,7 +1085,7 @@ describe("MigrationGate, with an unreadable device store", () => {
     /** Three real round-trips, not three taps on a retry that threw before fetching. */
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
     expect(mockReportError).not.toHaveBeenCalled()
-    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+    expect(getByTestId("migration-gate-storage-support")).toBeTruthy()
   })
 
   it("holds the retry and the handover while a retry is still in flight", async () => {
@@ -1104,14 +1108,14 @@ describe("MigrationGate, with an unreadable device store", () => {
 
     expect(getByTestId("gate-retry-button")).toBeDisabled()
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
-    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+    expect(queryByTestId("migration-gate-storage-support")).toBeNull()
 
     await act(async () => {
       settleRefetch()
     })
 
     expect(getByTestId("gate-retry-button")).toBeEnabled()
-    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+    expect(getByTestId("migration-gate-storage-support")).toBeTruthy()
   })
 
   /** Production ordering: Apollo's refetch rejects on a network error, often well before the
@@ -1141,14 +1145,14 @@ describe("MigrationGate, with an unreadable device store", () => {
 
     expect(getByTestId("gate-retry-button")).toBeDisabled()
     expect(mockRefetchCheckpoint).toHaveBeenCalledTimes(3)
-    expect(queryByTestId("gate-storage-support-button")).toBeNull()
+    expect(queryByTestId("migration-gate-storage-support")).toBeNull()
 
     await act(async () => {
       settleCheckpointRead()
     })
 
     expect(getByTestId("gate-retry-button")).toBeEnabled()
-    expect(getByTestId("gate-storage-support-button")).toBeTruthy()
+    expect(getByTestId("migration-gate-storage-support")).toBeTruthy()
     expect(mockReportError).toHaveBeenLastCalledWith("Migration gate retry", offline)
   })
 
@@ -1157,7 +1161,7 @@ describe("MigrationGate, with an unreadable device store", () => {
 
     const { getByTestId } = render(<MigrationGate />)
     await pressRetry(getByTestId, 3)
-    fireEvent.press(getByTestId("gate-storage-support-button"))
+    fireEvent.press(getByTestId("migration-gate-storage-support"))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: MigrationSupportReason.StorageUnreadable,
@@ -1175,7 +1179,7 @@ describe("MigrationGate, with an unreadable device store", () => {
     const { getByTestId, getByText } = render(<MigrationGate />)
     expect(getByText("no space left")).toBeTruthy()
     await pressRetry(getByTestId, 3)
-    fireEvent.press(getByTestId("gate-storage-support-button"))
+    fireEvent.press(getByTestId("migration-gate-storage-support"))
 
     expect(mockNavigate).toHaveBeenCalledWith("accountMigrationContactSupport", {
       reason: MigrationSupportReason.StorageOutOfSpace,
@@ -1191,7 +1195,7 @@ describe("MigrationGate, with an unreadable device store", () => {
 
     const { getByTestId } = render(<MigrationGate />)
     await pressRetry(getByTestId, 3)
-    fireEvent.press(getByTestId("gate-storage-support-button"))
+    fireEvent.press(getByTestId("migration-gate-storage-support"))
 
     expect(mockNavigate).toHaveBeenCalledWith(
       "accountMigrationContactSupport",

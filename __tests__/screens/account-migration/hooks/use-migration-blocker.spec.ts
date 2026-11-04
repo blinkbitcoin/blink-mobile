@@ -5,7 +5,11 @@ import {
   useMigrationBlocker,
 } from "@app/screens/account-migration/hooks/use-migration-blocker"
 
-let mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+let mockFeatureFlags = {
+  nonCustodialEnabled: true,
+  remoteConfigReady: true,
+  isNonCustodialFlagSettled: true,
+}
 
 jest.mock("@app/config/feature-flags-context", () => ({
   ...jest.requireActual("@app/config/feature-flags-context"),
@@ -33,7 +37,11 @@ describe("useMigrationBlocker", () => {
     jest.clearAllMocks()
     mockGateArmed = false
     mockMigrationLocked = false
-    mockFeatureFlags = { nonCustodialEnabled: true, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: true,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
   })
 
   it("stays hidden before the gate arms, since the pre-deadline nudge is the home bulletin", () => {
@@ -52,7 +60,11 @@ describe("useMigrationBlocker", () => {
 
   it("stays hidden while the self-custodial kill-switch is off, even with the gate armed", () => {
     mockGateArmed = true
-    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: false,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
 
     const { result } = renderBlocker()
 
@@ -61,7 +73,11 @@ describe("useMigrationBlocker", () => {
 
   it("keeps the gate blocking while the remote config has not settled yet", () => {
     mockGateArmed = true
-    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: false }
+    mockFeatureFlags = {
+      nonCustodialEnabled: false,
+      remoteConfigReady: false,
+      isNonCustodialFlagSettled: false,
+    }
 
     const { result } = renderBlocker()
 
@@ -85,7 +101,11 @@ describe("useMigrationBlocker", () => {
    *  the emergency kill-switch outranks the lock exactly as it outranks the gate. */
   it("stays hidden while the self-custodial kill-switch is off, even when locked", () => {
     mockMigrationLocked = true
-    mockFeatureFlags = { nonCustodialEnabled: false, remoteConfigReady: true }
+    mockFeatureFlags = {
+      nonCustodialEnabled: false,
+      remoteConfigReady: true,
+      isNonCustodialFlagSettled: true,
+    }
 
     const { result } = renderBlocker()
 

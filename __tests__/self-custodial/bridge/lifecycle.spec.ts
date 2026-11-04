@@ -1,15 +1,18 @@
 /* eslint-disable camelcase */
-jest.mock("react-native-config", () => ({
+const mockConfig: Record<string, string | undefined> = {
   SPARK_TOKEN_IDENTIFIER: "test-token-id",
   BREEZ_API_KEY: "test-api-key",
-}))
+}
+jest.mock("react-native-config", () => mockConfig)
 
 jest.mock("react-native-fs", () => ({
   DocumentDirectoryPath: "/test/documents",
 }))
 
 const mockConnect = jest.fn()
-const mockDefaultConfig = jest.fn().mockReturnValue({})
+/** A fresh object per call: the config is mutated, and a shared one would carry the last
+ *  network's Stable Balance into the next test. */
+const mockDefaultConfig = jest.fn().mockImplementation(() => ({}))
 const mockUpdateUserSettings = jest.fn()
 const mockDisconnect = jest.fn()
 const mockAddEventListener = jest.fn()
@@ -41,7 +44,8 @@ jest.mock("@breeztech/breez-sdk-spark-react-native", () => ({
   StableBalanceActiveLabel: {
     Set: jest.fn().mockImplementation((args: unknown) => ({ tag: "Set", inner: args })),
   },
-  MaxFee: {
+  MaxFee: { create: (p: Record<string, unknown>) => p },
+  MaxOnchainFee: {
     NetworkRecommended: jest
       .fn()
       .mockImplementation((inner: unknown) => ({ tag: "NetworkRecommended", inner })),
@@ -100,6 +104,15 @@ import {
   selfCustodialCreateWallet,
   selfCustodialRestoreWallet,
 } from "@app/self-custodial/bridge"
+import { sparkTokenIdentifier } from "@app/self-custodial/config"
+
+/** Threaded explicitly since the config functions stopped reading a global; the real
+ *  value comes from `useLnurlServer()` at the calling hook. */
+const TEST_LNURL_DOMAIN = "staging.blink.sv"
+const TEST_LNURL_SERVER = {
+  serverUrl: `https://${TEST_LNURL_DOMAIN}`,
+  domain: TEST_LNURL_DOMAIN,
+}
 
 const makeSdk = () => ({
   updateUserSettings: (...args: unknown[]) => mockUpdateUserSettings(...args),
@@ -122,6 +135,7 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockDefaultConfig).toHaveBeenCalledWith(Network.Regtest)
@@ -138,6 +152,29 @@ describe("initSdk", () => {
     expect(result).toBe(sdk)
   })
 
+  /**
+   * The field is the SDK's to default, and it is pinned here instead: the exit-chain pass
+   * is what the recovery backup needs collected. The mock hands back the opposite so the
+   * assertion fails if the pin is dropped rather than passing on an inherited value.
+   */
+  it("pins the exit-chain collection over the SDK default", async () => {
+    mockDefaultConfig.mockReturnValueOnce({
+      exitChainAutoFetchEnabled: false,
+    })
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.exitChainAutoFetchEnabled).toBe(true)
+  })
+
   it("caps the automatic deposit claim fee at the network-recommended rate plus leeway", async () => {
     mockConnect.mockResolvedValue(makeSdk())
 
@@ -146,18 +183,119 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 1n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 1n },
+            },
           },
         }),
       }),
     )
+  })
+
+  it("configures Stable Balance with the mainnet token on mainnet", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Mainnet,
+      leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.stableBalanceConfig).toEqual({
+      tokens: [{ label: "USDB", tokenIdentifier: "test-token-id" }],
+      defaultActiveLabel: undefined,
+      thresholdSats: undefined,
+      maxSlippageBps: 50,
+    })
+  })
+
+  /** 0.27 rejects the mainnet USDB id on regtest, which is what kept Staging from starting. */
+  it("leaves Stable Balance out on regtest when the build names no regtest token", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).not.toHaveProperty("stableBalanceConfig")
+  })
+
+  it("configures Stable Balance with the regtest token a build names", async () => {
+    mockConfig.SPARK_REGTEST_TOKEN_IDENTIFIER = "btknrt1-test"
+    mockConnect.mockResolvedValue(makeSdk())
+
+    try {
+      await initSdk({
+        mnemonic: "word1 word2 word3",
+        storageDir: "/test/storage",
+        network: Network.Regtest,
+        leewaySatPerVbyte: 1,
+        lnurlDomain: TEST_LNURL_DOMAIN,
+      })
+    } finally {
+      delete mockConfig.SPARK_REGTEST_TOKEN_IDENTIFIER
+    }
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config.stableBalanceConfig).toEqual(
+      expect.objectContaining({
+        tokens: [{ label: "USDB", tokenIdentifier: "btknrt1-test" }],
+      }),
+    )
+  })
+
+  /** The bridge and mappers read the token without being handed the network. */
+  it("points the token lookups at the network it connected to", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
+    expect(sparkTokenIdentifier()).toBeNull()
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Mainnet,
+      leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
+    expect(sparkTokenIdentifier()).toBe("test-token-id")
+  })
+
+  it("routes the SDK through no proxy, matching the status call", async () => {
+    mockConnect.mockResolvedValue(makeSdk())
+
+    await initSdk({
+      mnemonic: "word1 word2 word3",
+      storageDir: "/test/storage",
+      network: Network.Regtest,
+      leewaySatPerVbyte: 1,
+      lnurlDomain: TEST_LNURL_DOMAIN,
+    })
+
+    const { config } = mockConnect.mock.calls[0][0]
+    expect(config).toHaveProperty("proxy", undefined)
   })
 
   it("uses the provided leeway for the deposit claim fee cap", async () => {
@@ -168,14 +306,17 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 3,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 3n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 3n },
+            },
           },
         }),
       }),
@@ -190,14 +331,17 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: 2.9,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 2n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 2n },
+            },
           },
         }),
       }),
@@ -212,14 +356,17 @@ describe("initSdk", () => {
       storageDir: "/test/storage",
       network: Network.Regtest,
       leewaySatPerVbyte: -5,
+      lnurlDomain: TEST_LNURL_DOMAIN,
     })
 
     expect(mockConnect).toHaveBeenCalledWith(
       expect.objectContaining({
         config: expect.objectContaining({
           maxDepositClaimFee: {
-            tag: "NetworkRecommended",
-            inner: { leewaySatPerVbyte: 0n },
+            onchain: {
+              tag: "NetworkRecommended",
+              inner: { leewaySatPerVbyte: 0n },
+            },
           },
         }),
       }),
@@ -235,6 +382,7 @@ describe("initSdk", () => {
         storageDir: "/test/storage",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlDomain: TEST_LNURL_DOMAIN,
       }),
     ).rejects.toThrow("connect refused")
   })
@@ -341,6 +489,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "  alpha   beta  gamma  ",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -353,6 +502,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "\talpha\tbeta\ngamma\r\n",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -365,6 +515,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "  alpha\t\tbeta \n gamma  ",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockValidateMnemonic).toHaveBeenCalledWith("alpha beta gamma")
@@ -380,6 +531,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "totally invalid",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Invalid BIP39 mnemonic")
 
@@ -394,6 +546,7 @@ describe("selfCustodialRestoreWallet", () => {
       mnemonic: "provided mnemonic words",
       network: Network.Regtest,
       leewaySatPerVbyte: 1,
+      lnurlServer: TEST_LNURL_SERVER,
     })
 
     expect(mockSetMnemonic).toHaveBeenCalledWith("provided mnemonic words")
@@ -412,6 +565,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "any words",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Failed to store mnemonic")
     expect(mockSetMnemonicNetwork).not.toHaveBeenCalled()
@@ -427,6 +581,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "any valid words",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("Failed to store mnemonic network")
     expect(mockDeleteMnemonic).toHaveBeenCalledTimes(1)
@@ -442,6 +597,7 @@ describe("selfCustodialRestoreWallet", () => {
         mnemonic: "any valid words",
         network: Network.Regtest,
         leewaySatPerVbyte: 1,
+        lnurlServer: TEST_LNURL_SERVER,
       }),
     ).rejects.toThrow("SDK init refused")
 

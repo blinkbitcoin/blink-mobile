@@ -1,12 +1,17 @@
 import { renderHook } from "@testing-library/react-native"
 
 import { MigrationStatus } from "@app/graphql/generated"
-import { useMigrationLock } from "@app/screens/account-migration/hooks/use-migration-lock"
+import {
+  resetReportedUnknownMigrationStatuses,
+  useMigrationLock,
+} from "@app/screens/account-migration/hooks/use-migration-lock"
+import { ServerMigrationFlow } from "@app/types/migration"
 import { AccountType } from "@app/types/wallet"
 
 const mockUseMigrationStatus = jest.fn()
 
 let mockActiveAccountType: AccountType | undefined = AccountType.Custodial
+let mockRegistryLoading = false
 
 jest.mock("@app/screens/account-migration/hooks/use-migration-status", () => ({
   useMigrationStatus: (options: unknown) => mockUseMigrationStatus(options),
@@ -18,8 +23,19 @@ jest.mock("@app/hooks/use-account-registry", () => ({
     activeAccount: mockActiveAccountType
       ? { id: "account-1", type: mockActiveAccountType }
       : undefined,
+    loading: mockRegistryLoading,
   }),
 }))
+
+const mockReportError = jest.fn()
+jest.mock("@app/utils/error-logging", () => ({
+  ...jest.requireActual("@app/utils/error-logging"),
+  reportError: (operation: string, err: unknown) => mockReportError(operation, err),
+}))
+
+/** A phase the server may add after this build shipped. The hook reports a given phase
+ *  only once per process, so every test starts from a forgotten set. */
+const phaseFromANewerServer = (name: string) => name as unknown as MigrationStatus
 
 const serverReports = (
   status: MigrationStatus | null,
@@ -30,7 +46,9 @@ const serverReports = (
 describe("useMigrationLock", () => {
   beforeEach(() => {
     jest.clearAllMocks()
+    resetReportedUnknownMigrationStatuses()
     mockActiveAccountType = AccountType.Custodial
+    mockRegistryLoading = false
   })
 
   it("locks an account the server reports as in progress", () => {
@@ -133,6 +151,15 @@ describe("useMigrationLock", () => {
     expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: false })
   })
 
+  /** A caller that only reads the answer in some states does not pay for it in others. */
+  it("does not query the phase for a caller that skips it", () => {
+    mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+    renderHook(() => useMigrationLock({ skip: true }))
+
+    expect(mockUseMigrationStatus).toHaveBeenCalledWith({ skip: true })
+  })
+
   /**
    * An unknown lock is not an unlocked one. Without this a caller cannot tell the two
    * apart and renders as if the answer had arrived, which is what made the gate flash
@@ -198,5 +225,133 @@ describe("useMigrationLock", () => {
     const { result } = renderHook(() => useMigrationLock())
 
     expect(result.current.refetch).toBe(refetch)
+  })
+
+  /** Unlocked is two answers with opposite handling: a migration that never started (or
+   *  support cleared) starts over, while a completed one may still be waiting to swap on
+   *  this device and must be left alone. Only a current answer counts as either. */
+  describe("the flow a commit point acts on", () => {
+    const flowByStatus: ReadonlyArray<[MigrationStatus, ServerMigrationFlow]> = [
+      [MigrationStatus.InProgress, ServerMigrationFlow.Open],
+      [MigrationStatus.Transferring, ServerMigrationFlow.Open],
+      [MigrationStatus.Failed, ServerMigrationFlow.Open],
+      [MigrationStatus.NotStarted, ServerMigrationFlow.NotStarted],
+      [MigrationStatus.Completed, ServerMigrationFlow.Completed],
+    ]
+
+    for (const [status, expectedFlow] of flowByStatus) {
+      it(`reads ${status} as ${expectedFlow}`, () => {
+        mockUseMigrationStatus.mockReturnValue(serverReports(status))
+
+        const { result } = renderHook(() => useMigrationLock())
+
+        expect(result.current.flow).toBe(expectedFlow)
+      })
+    }
+
+    it("has no answer while the read is on its way", () => {
+      mockUseMigrationStatus.mockReturnValue(serverReports(null, true))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
+
+    /** A settled read with no migration on it is never the server's word for a cleared
+     *  flow (that arrives as NOT_STARTED), so it must not route a commit point to the
+     *  restart: only a status the server sent is an answer. */
+    /** An older build handed a newer phase must neither resume nor restart a commit point
+     *  on a guess, nor lock on one. Nor is it "no answer": asking again gets it back, so it
+     *  is named for the routing to hand over. */
+    it("names a phase this build does not know as unrecognised", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
+      )
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unrecognised)
+      expect(result.current.isLocked).toBe(false)
+    })
+
+    /** A failed re-read outranks whatever phase it left behind, an unknown one included. */
+    it("has no answer for an unknown phase left behind by a failed read", () => {
+      mockUseMigrationStatus.mockReturnValue({
+        ...serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
+        error: new Error("Network request failed"),
+      })
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
+
+    it("reports a phase this build does not know, once", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(phaseFromANewerServer("PAUSED_FOR_REVIEW")),
+      )
+
+      const { rerender } = renderHook(() => useMigrationLock())
+      rerender({})
+      renderHook(() => useMigrationLock())
+
+      expect(mockReportError).toHaveBeenCalledTimes(1)
+      expect(mockReportError).toHaveBeenCalledWith(
+        "Migration status unknown to this build",
+        expect.objectContaining({
+          message: expect.stringContaining("PAUSED_FOR_REVIEW"),
+        }),
+      )
+    })
+
+    it("reports nothing for the phases it knows", () => {
+      for (const status of Object.values(MigrationStatus)) {
+        mockUseMigrationStatus.mockReturnValue(serverReports(status))
+        renderHook(() => useMigrationLock())
+      }
+
+      expect(mockReportError).not.toHaveBeenCalled()
+    })
+
+    it("has no answer when a settled read carried no status", () => {
+      mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
+
+    /** A failed re-read can leave the previous answer behind; it is no longer current. */
+    it("has no answer when the read failed, whatever it said before", () => {
+      mockUseMigrationStatus.mockReturnValue(
+        serverReports(MigrationStatus.NotStarted, false, new Error("offline")),
+      )
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
+
+    /** No active account yet is not a self-custodial session: the answer is still on
+     *  its way, so a commit point waits instead of treating it as a failed read. */
+    it("reports loading while the account registry hydrates", () => {
+      mockActiveAccountType = undefined
+      mockRegistryLoading = true
+      mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.loading).toBe(true)
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
+
+    it("never answers for a self-custodial session, which was never asked", () => {
+      mockActiveAccountType = AccountType.SelfCustodial
+      mockUseMigrationStatus.mockReturnValue(serverReports(null))
+
+      const { result } = renderHook(() => useMigrationLock())
+
+      expect(result.current.flow).toBe(ServerMigrationFlow.Unanswered)
+    })
   })
 })
