@@ -35,13 +35,17 @@ type Props = {
  *  its QR and the Copy/Share actions must not exist while registration is pending.
  *  The dismissal guard lives in the wrapper below so it also covers the pending
  *  and failed states. */
-const ApiKeySecretRevealContent: React.FC<Props & { onDone: () => void }> = ({
-  secret,
-  name,
-  onDone,
-}) => {
+const ApiKeySecretRevealContent: React.FC<
+  Props & { onDone: () => void; onShownChange: (shown: boolean) => void }
+> = ({ secret, name, onDone, onShownChange }) => {
   const { LL } = useI18nContext()
   const styles = useStyles()
+
+  React.useEffect(() => {
+    onShownChange(true)
+    return () => onShownChange(false)
+  }, [onShownChange])
+
   const {
     theme: { colors },
   } = useTheme()
@@ -112,11 +116,33 @@ export const ApiKeySecretReveal: React.FC<Props> = (props) => {
   const { LL } = useI18nContext()
   const navigation = useNavigation<NativeStackNavigationProp<RootStackParamList>>()
   const allowLeaveRef = React.useRef(false)
+  // True only while the gated content is mounted, which is only after the
+  // screenshot guard is on. The header callback reads it at press time.
+  const secretShownRef = React.useRef(false)
+  const onShownChange = React.useCallback((shown: boolean) => {
+    secretShownRef.current = shown
+  }, [])
 
   const finish = React.useCallback(() => {
     allowLeaveRef.current = true
     navigation.goBack()
   }, [navigation])
+
+  // The failure view's Back cannot be a plain goBack: it would pop the screen
+  // and destroy the unrecoverable secret without a chance to copy it.
+  const confirmDiscard = React.useCallback(() => {
+    Alert.alert(LL.ApiScreen.discardSecretTitle(), LL.ApiScreen.discardSecretBody(), [
+      { text: LL.common.cancel(), style: "cancel" },
+      { text: LL.common.discard(), style: "destructive", onPress: finish },
+    ])
+  }, [LL, finish])
+
+  // finish() sets allowLeave and pops immediately, so the header must not use it
+  // until the secret is on screen. Until then it asks, the same as the gate's Back.
+  const onHeaderBack = React.useCallback(() => {
+    if (secretShownRef.current) finish()
+    else confirmDiscard()
+  }, [finish, confirmDiscard])
 
   // The dismissal guard is installed here, outside the gate: the one-time secret
   // already sits in the parent's state while registration is pending or failed,
@@ -124,10 +150,10 @@ export const ApiKeySecretReveal: React.FC<Props> = (props) => {
   React.useEffect(() => {
     navigation.setOptions({
       title: LL.ApiScreen.keyCreatedTitle(),
-      headerLeft: headerBackControl({ onPress: finish }),
+      headerLeft: headerBackControl({ onPress: onHeaderBack }),
       gestureEnabled: false,
     })
-  }, [navigation, LL, finish])
+  }, [navigation, LL, onHeaderBack])
 
   // gestureEnabled doesn't cover the Android system back
   // button — block every removal not initiated by Done, the header arrow or a confirmed discard
@@ -139,18 +165,13 @@ export const ApiKeySecretReveal: React.FC<Props> = (props) => {
     [navigation],
   )
 
-  // The failure view's Back cannot be a plain goBack: it would pop the screen
-  // and destroy the unrecoverable secret without a chance to copy it.
-  const confirmDiscard = React.useCallback(() => {
-    Alert.alert(LL.ApiScreen.discardSecretTitle(), LL.ApiScreen.discardSecretBody(), [
-      { text: LL.common.cancel(), style: "cancel" },
-      { text: LL.common.discard(), style: "destructive", onPress: finish },
-    ])
-  }, [LL, finish])
-
   return (
     <ScreenSecurityGate onBack={confirmDiscard}>
-      <ApiKeySecretRevealContent {...props} onDone={finish} />
+      <ApiKeySecretRevealContent
+        {...props}
+        onDone={finish}
+        onShownChange={onShownChange}
+      />
     </ScreenSecurityGate>
   )
 }

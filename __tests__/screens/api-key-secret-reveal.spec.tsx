@@ -83,6 +83,16 @@ const lastAlertButtons = (): AlertButton[] => {
   return call?.[2] ?? []
 }
 
+const pressInstalledHeaderBack = () => {
+  const { headerLeft } = mockSetOptions.mock.calls.at(-1)[0]
+  render(
+    <ContextForScreen>
+      {headerLeft({ canGoBack: true, tintColor: undefined, label: undefined })}
+    </ContextForScreen>,
+  )
+  fireEvent.press(screen.getByLabelText("Go back"))
+}
+
 describe("ApiKeySecretReveal", () => {
   beforeEach(() => {
     jest.clearAllMocks()
@@ -104,13 +114,7 @@ describe("ApiKeySecretReveal", () => {
     renderReveal()
     await screen.findByTestId("api-key-secret")
 
-    const { headerLeft } = mockSetOptions.mock.calls.at(-1)[0]
-    render(
-      <ContextForScreen>
-        {headerLeft({ canGoBack: true, tintColor: undefined, label: undefined })}
-      </ContextForScreen>,
-    )
-    fireEvent.press(screen.getByLabelText("Go back"))
+    pressInstalledHeaderBack()
 
     await waitFor(() => expect(mockGoBack).toHaveBeenCalled())
     const event = emitBeforeRemove()
@@ -207,6 +211,35 @@ describe("ApiKeySecretReveal", () => {
 
     /** Every removal but Done and the header arrow is blocked, so a registration that
      *  does not land would otherwise leave no way out while it is pending. */
+    it("asks before the header arrow discards the secret while registration is pending", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      expect(screen.queryByTestId("api-key-secret")).toBeNull()
+
+      pressInstalledHeaderBack()
+
+      await waitFor(() =>
+        expect(Alert.alert).toHaveBeenCalledWith(
+          LL.ApiScreen.discardSecretTitle(),
+          LL.ApiScreen.discardSecretBody(),
+          expect.any(Array),
+        ),
+      )
+      expect(mockGoBack).not.toHaveBeenCalled()
+      const cancel = lastAlertButtons().find((button) => button.style === "cancel")
+      cancel?.onPress?.()
+      expect(mockGoBack).not.toHaveBeenCalled()
+
+      const discard = lastAlertButtons().find((button) => button.style === "destructive")
+      discard?.onPress?.()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).not.toHaveBeenCalled()
+    })
+
     it("offers Back while registration is pending, and it asks before discarding", async () => {
       const registration = deferred<void>()
       mockLeaseReady = registration.promise
@@ -239,6 +272,32 @@ describe("ApiKeySecretReveal", () => {
 
       const event = emitBeforeRemove()
       expect(event.preventDefault).toHaveBeenCalled()
+    })
+
+    it("asks before the header arrow discards the secret after registration fails", async () => {
+      const registration = deferred<void>()
+      mockLeaseReady = registration.promise
+
+      renderReveal()
+      await act(async () => {})
+      registration.reject(new Error("native failure"))
+      await screen.findByTestId("screen-security-retry")
+
+      pressInstalledHeaderBack()
+
+      await waitFor(() =>
+        expect(Alert.alert).toHaveBeenCalledWith(
+          LL.ApiScreen.discardSecretTitle(),
+          LL.ApiScreen.discardSecretBody(),
+          expect.any(Array),
+        ),
+      )
+      expect(mockGoBack).not.toHaveBeenCalled()
+      const discard = lastAlertButtons().find((button) => button.style === "destructive")
+      discard?.onPress?.()
+      expect(mockGoBack).toHaveBeenCalledTimes(1)
+      const event = emitBeforeRemove()
+      expect(event.preventDefault).not.toHaveBeenCalled()
     })
 
     it("keeps the secret unmounted after registration fails, and Back asks before discarding it", async () => {
