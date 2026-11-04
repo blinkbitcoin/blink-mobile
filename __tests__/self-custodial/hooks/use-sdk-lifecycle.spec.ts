@@ -920,3 +920,85 @@ describe("useSdkLifecycle: connectivity and retries", () => {
     })
   })
 })
+
+describe("useSdkLifecycle loadMore while the connection changes or fails", () => {
+  beforeEach(resetMocks)
+
+  it("drops a page that lands after the account has switched", async () => {
+    mockInitSdk
+      .mockResolvedValueOnce(buildSdk("sdk-A"))
+      .mockResolvedValueOnce(buildSdk("sdk-B"))
+    captureListener()
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+    const { loadMoreTransactions: loadMoreMock, mergeOrderedTransactions: mergeMock } =
+      jest.requireMock("@app/self-custodial/providers/wallet-snapshot")
+    let resolvePageOfA: (page: unknown) => void = () => {}
+    loadMoreMock.mockImplementationOnce(
+      () =>
+        new Promise((resolve) => {
+          resolvePageOfA = resolve
+        }),
+    )
+
+    const { result, rerender } = renderHook(
+      ({ accountId }: { accountId: string }) => useSdkLifecycle(accountId, 0),
+      { initialProps: { accountId: "acct-A" } },
+    )
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+
+    let pageOfA: Promise<void> = Promise.resolve()
+    act(() => {
+      pageOfA = result.current.loadMore()
+    })
+
+    rerender({ accountId: "acct-B" })
+    await waitFor(() => expect(result.current.connectedAccountId).toBe("acct-B"))
+
+    await act(async () => {
+      resolvePageOfA({
+        transactions: [{ id: "older-payment-of-a" }],
+        hasMore: false,
+        rawCount: 1,
+      })
+      await pageOfA
+    })
+
+    expect(mergeMock).not.toHaveBeenCalled()
+    expect(result.current.allTransactions).toEqual([])
+  })
+
+  it("logs a page that fails and stops loading", async () => {
+    mockInitSdk.mockResolvedValue(buildSdk("sdk-1"))
+    captureListener()
+    mockGetSnapshot.mockResolvedValue({
+      wallets: [],
+      allTransactions: [],
+      hasMore: true,
+      rawTransactionCount: 0,
+    })
+    const { loadMoreTransactions: loadMoreMock } = jest.requireMock(
+      "@app/self-custodial/providers/wallet-snapshot",
+    )
+    loadMoreMock.mockRejectedValueOnce(new Error("page failed"))
+    const { logSdkEvent } = jest.requireMock("@app/self-custodial/logging")
+
+    const { result } = renderHook(() => useSdkLifecycle("acct-1", 0))
+    await waitFor(() => expect(result.current.hasMoreTransactions).toBe(true))
+
+    await act(async () => {
+      await result.current.loadMore()
+    })
+
+    expect(logSdkEvent).toHaveBeenCalledWith(
+      "error",
+      "Failed to load more transactions: Error: page failed",
+    )
+    expect(result.current.loadingMore).toBe(false)
+    expect(result.current.hasMoreTransactions).toBe(true)
+  })
+})

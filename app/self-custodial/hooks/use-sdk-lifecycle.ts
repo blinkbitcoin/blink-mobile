@@ -361,10 +361,15 @@ export const useSdkLifecycle = (
   }, [refreshWallets])
 
   const loadMore = useCallback(async () => {
-    if (!sdkRef.current || loadingMore || !hasMoreTransactions) return
+    const sdk = sdkRef.current
+    if (!sdk || loadingMore || !hasMoreTransactions) return
     setLoadingMore(true)
     try {
-      const result = await loadMoreTransactions(sdkRef.current, rawTxOffsetRef.current)
+      const result = await loadMoreTransactions(sdk, rawTxOffsetRef.current)
+      /** A page asked of a connection that an account switch has since replaced belongs
+       *  to the account the user left: merging it would list that account's payments
+       *  under the new one and move the new connection's paging offset. */
+      if (sdkRef.current !== sdk) return
       rawTxOffsetRef.current += result.rawCount
       setHasMoreTransactions(result.hasMore)
       setWallets((prev) => appendTransactions(prev, result.transactions))
