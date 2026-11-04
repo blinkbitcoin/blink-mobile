@@ -16,7 +16,6 @@ gql`
       }
       update {
         ... on LnUpdate {
-          paymentHash
           status
           transaction {
             ...Transaction
@@ -53,12 +52,11 @@ export const MyLnUpdateSub = ({ children }: PropsWithChildren) => {
     const update = dataSub?.myUpdates?.update
     if (!update) return
 
+    const candidate = candidateFromUpdate(update)
     if (update.__typename === "LnUpdate" && update.status === "PAID") {
       client.refetchQueries({ include: [HomeAuthedDocument] })
-      setLastHash(update.paymentHash)
+      if (candidate?.paymentHash) setLastHash(candidate.paymentHash)
     }
-
-    const candidate = candidateFromUpdate(update)
     if (candidate) celebrate(candidate)
   }, [dataSub, client, celebrate])
 

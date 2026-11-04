@@ -2424,7 +2424,6 @@ subscription myLnUpdates {
     }
     update {
       ... on LnUpdate {
-        paymentHash
         status
         transaction {
           ...Transaction
