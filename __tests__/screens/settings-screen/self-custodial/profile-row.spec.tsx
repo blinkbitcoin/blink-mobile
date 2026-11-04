@@ -364,11 +364,12 @@ describe("ProfileRow", () => {
     })
 
     expect(await findByTestId("delete-modal")).toBeTruthy()
-    expect(mockProbeWallets).toHaveBeenCalledWith(
-      TEST_ENTRY_ID,
-      mockSparkNetwork.Mainnet,
-      5,
-    )
+    expect(mockProbeWallets).toHaveBeenCalledWith({
+      accountId: TEST_ENTRY_ID,
+      network: mockSparkNetwork.Mainnet,
+      leewaySatPerVbyte: 5,
+      lnurlDomain: "blink.sv",
+    })
     expect(setActiveAccountId).not.toHaveBeenCalled()
   })
 
